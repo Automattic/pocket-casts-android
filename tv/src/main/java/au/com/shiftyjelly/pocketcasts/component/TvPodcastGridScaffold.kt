@@ -21,9 +21,9 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.Text
+import au.com.shiftyjelly.pocketcasts.theme.TvColors
 import au.com.shiftyjelly.pocketcasts.theme.TvTextStyles
 import kotlinx.coroutines.flow.first
 
@@ -39,8 +39,8 @@ internal fun TvPodcastGridScaffold(
     Column(modifier = modifier) {
         Text(
             text = title,
-            style = TvTextStyles.ScreenTitle,
-            color = Color.White,
+            style = TvTextStyles.Title3,
+            color = TvColors.TextPrimary,
             modifier = Modifier.padding(start = 32.dp, top = 8.dp, bottom = 10.dp),
         )
         val gridState = rememberLazyGridState()

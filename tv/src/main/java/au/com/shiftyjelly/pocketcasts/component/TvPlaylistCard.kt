@@ -11,6 +11,7 @@ import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -59,12 +60,12 @@ fun TvPlaylistCard(
     val isFocused by interactionSource.collectIsFocusedAsState()
 
     val backgroundColor by animateColorAsState(
-        targetValue = if (isFocused) TvColors.LightGray else cardColor,
+        targetValue = if (isFocused) TvColors.BackgroundActive else cardColor,
         animationSpec = tween(durationMillis = 200),
         label = "PlaylistCardBackground",
     )
     val titleColor by animateColorAsState(
-        targetValue = if (isFocused) TvColors.Dark else Color.White,
+        targetValue = if (isFocused) TvColors.TextPrimaryActive else TvColors.TextPrimary,
         animationSpec = tween(durationMillis = 200),
         label = "PlaylistCardTitleColor",
     )
@@ -96,7 +97,7 @@ fun TvPlaylistCard(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(172.dp)
+                .aspectRatio(568f / 258f)
                 .background(backgroundColor),
         ) {
             Column(
@@ -106,7 +107,7 @@ fun TvPlaylistCard(
             ) {
                 Text(
                     text = title,
-                    style = TvTextStyles.PlaylistCardTitle,
+                    style = TvTextStyles.Callout,
                     color = titleColor,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
@@ -115,7 +116,7 @@ fun TvPlaylistCard(
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = stringResource(LR.string.smart_playlist),
-                        style = TvTextStyles.PlaylistCardCaption,
+                        style = TvTextStyles.Caption2,
                         color = captionColor,
                     )
                 }
@@ -123,7 +124,7 @@ fun TvPlaylistCard(
                 if (episodeCount != null) {
                     Text(
                         text = pluralStringResource(LR.plurals.episode_count, episodeCount, episodeCount),
-                        style = TvTextStyles.PlaylistCardCaption,
+                        style = TvTextStyles.Caption2,
                         color = captionColor,
                     )
                 }
@@ -223,7 +224,7 @@ private fun PlaylistCover(
 private fun TvPlaylistCardPreview() {
     AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
         MaterialTheme {
-            Box(modifier = Modifier.background(TvColors.Dark).padding(32.dp)) {
+            Box(modifier = Modifier.background(TvColors.BackgroundSunken).padding(32.dp)) {
                 TvPlaylistCard(
                     title = "New Releases",
                     isSmartPlaylist = true,

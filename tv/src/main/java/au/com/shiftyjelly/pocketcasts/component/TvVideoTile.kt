@@ -118,15 +118,15 @@ fun TvVideoTile(
                             Column {
                                 Text(
                                     text = podcastTitle,
-                                    style = TvTextStyles.VideoTilePodcastTitle,
+                                    style = TvTextStyles.Caption1,
                                     color = TvColors.TextSecondary,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,
                                 )
                                 Text(
                                     text = episodeTitle,
-                                    style = TvTextStyles.VideoTileEpisodeTitle,
-                                    color = Color.White,
+                                    style = TvTextStyles.Caption1,
+                                    color = TvColors.TextPrimary,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,
                                 )
@@ -144,7 +144,7 @@ fun TvVideoTile(
 private fun TvVideoTilePreview() {
     AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
         MaterialTheme {
-            Box(modifier = Modifier.background(TvColors.Dark)) {
+            Box(modifier = Modifier.background(TvColors.BackgroundSunken)) {
                 TvVideoTile(
                     thumbnailUrl = "",
                     podcastArtworkUrl = "",

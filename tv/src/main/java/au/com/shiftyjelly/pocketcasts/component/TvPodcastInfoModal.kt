@@ -23,7 +23,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
@@ -126,14 +125,14 @@ private fun InfoRow(
     Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
         Text(
             text = label,
-            style = TvTextStyles.PlaylistCardCaption,
+            style = TvTextStyles.Caption2,
             color = TvColors.TextSecondary,
         )
         Text(
             text = value,
-            style = TvTextStyles.PlaylistCardCaption,
+            style = TvTextStyles.Caption2,
             fontWeight = FontWeight.Medium,
-            color = Color.White,
+            color = TvColors.TextPrimary,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
         )
@@ -174,20 +173,20 @@ private fun PodcastDescriptionPane(
         if (podcast.author.isNotBlank()) {
             Text(
                 text = podcast.author,
-                style = TvTextStyles.PlaylistCardCaption,
+                style = TvTextStyles.Caption2,
                 color = TvColors.TextSecondary,
             )
         }
         Text(
             text = podcast.title,
-            style = TvTextStyles.ScreenTitle,
-            color = Color.White,
+            style = TvTextStyles.Headline,
+            color = TvColors.TextPrimary,
         )
         if (podcast.podcastDescription.isNotBlank()) {
             Text(
                 text = podcast.podcastDescription,
-                style = TvTextStyles.FeaturedTileDescription,
-                color = Color.White,
+                style = TvTextStyles.Caption2,
+                color = TvColors.TextSecondary,
             )
         }
     }

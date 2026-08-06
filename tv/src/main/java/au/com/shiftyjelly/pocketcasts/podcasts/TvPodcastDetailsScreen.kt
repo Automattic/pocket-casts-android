@@ -30,7 +30,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -120,7 +119,7 @@ private fun TvPodcastDetailsContent(
     Box(modifier = modifier.fillMaxSize()) {
         when (uiState) {
             is TvPodcastDetailsUiState.Loading, TvPodcastDetailsUiState.NotFound -> {
-                LoadingView(color = Color.White, modifier = Modifier.fillMaxSize())
+                LoadingView(color = TvColors.TextPrimary, modifier = Modifier.fillMaxSize())
             }
 
             is TvPodcastDetailsUiState.Loaded -> {
@@ -217,19 +216,19 @@ private fun PodcastInfo(
             if (podcast.author.isNotBlank()) {
                 Text(
                     text = podcast.author,
-                    style = TvTextStyles.Caption,
+                    style = TvTextStyles.Caption1,
                     color = TvColors.TextSecondary,
                 )
             }
             Text(
                 text = podcast.title,
-                style = TvTextStyles.ScreenTitle,
-                color = Color.White,
+                style = TvTextStyles.Title3,
+                color = TvColors.TextPrimary,
             )
             if (podcast.podcastDescription.isNotBlank()) {
                 Text(
                     text = podcast.podcastDescription,
-                    style = TvTextStyles.Caption,
+                    style = TvTextStyles.Caption1,
                     color = TvColors.TextSecondary,
                     maxLines = 3,
                     overflow = TextOverflow.Ellipsis,
@@ -283,8 +282,8 @@ private fun EpisodeList(
         ) {
             Text(
                 text = stringResource(LR.string.search_results_all_episodes),
-                style = TvTextStyles.ScreenTitle,
-                color = Color.White,
+                style = TvTextStyles.Title3,
+                color = TvColors.TextPrimary,
                 modifier = Modifier.weight(1f),
             )
             TvArchivedFilterButton(

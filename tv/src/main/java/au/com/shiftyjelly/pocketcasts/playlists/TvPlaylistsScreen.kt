@@ -34,7 +34,6 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
@@ -156,7 +155,7 @@ private fun TvPlaylistsContent(
         modifier = modifier,
     ) { state ->
         when (state) {
-            is TvPlaylistsUiState.Loading -> LoadingView(color = Color.White, modifier = Modifier.fillMaxSize())
+            is TvPlaylistsUiState.Loading -> LoadingView(color = TvColors.TextPrimary, modifier = Modifier.fillMaxSize())
 
             is TvPlaylistsUiState.Loaded -> if (state.playlists.isEmpty()) {
                 TvPlaylistsEmpty(
@@ -195,8 +194,8 @@ private fun TvPlaylistsGrid(
     Column(modifier = modifier.padding(horizontal = 32.dp)) {
         Text(
             text = stringResource(LR.string.playlists),
-            style = TvTextStyles.ScreenTitle,
-            color = Color.White,
+            style = TvTextStyles.Title3,
+            color = TvColors.TextPrimary,
             modifier = Modifier.padding(top = 8.dp, bottom = 26.dp),
         )
         var lastFocusedIndex by rememberSaveable(playlists) { mutableIntStateOf(0) }
@@ -216,9 +215,9 @@ private fun TvPlaylistsGrid(
 
         LazyVerticalGrid(
             columns = GridCells.Fixed(3),
-            horizontalArrangement = Arrangement.spacedBy(32.dp),
-            verticalArrangement = Arrangement.spacedBy(32.dp),
-            contentPadding = PaddingValues(bottom = 32.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            contentPadding = PaddingValues(top = 16.dp, bottom = 32.dp),
             modifier = Modifier
                 .focusRequester(gridFocusRequester)
                 .focusGroup()
@@ -310,7 +309,7 @@ private fun TvPlaylistsEmpty(
 private fun TvPlaylistsGridPreview() {
     AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
         MaterialTheme {
-            Box(modifier = Modifier.background(TvColors.Dark)) {
+            Box(modifier = Modifier.background(TvColors.BackgroundSunken)) {
                 TvPlaylistsContent(
                     uiState = TvPlaylistsUiState.Loaded(
                         playlists = List(5) { index -> previewPlaylist(index) },
@@ -333,7 +332,7 @@ private fun TvPlaylistsGridPreview() {
 private fun TvPlaylistsEmptyPreview() {
     AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
         MaterialTheme {
-            Box(modifier = Modifier.background(TvColors.Dark)) {
+            Box(modifier = Modifier.background(TvColors.BackgroundSunken)) {
                 TvPlaylistsContent(
                     uiState = TvPlaylistsUiState.Loaded(playlists = emptyList()),
                     getArtworkUuidsFlow = { MutableStateFlow(null) },

@@ -20,6 +20,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -49,7 +50,7 @@ fun TvCreateAccountScreen(
         contentAlignment = Alignment.Center,
         modifier = modifier
             .fillMaxSize()
-            .background(TvColors.Dark),
+            .background(TvColors.BackgroundSunken),
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -62,14 +63,14 @@ fun TvCreateAccountScreen(
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = stringResource(LR.string.tv_create_account_title),
-                color = Color.White,
-                style = TvTextStyles.WelcomeTitle,
+                color = TvColors.TextPrimary,
+                style = TvTextStyles.Title1.copy(textAlign = TextAlign.Center),
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = stringResource(LR.string.tv_create_account_subtitle),
                 color = TvColors.TextSecondary,
-                style = TvTextStyles.SignInSubtitle,
+                style = TvTextStyles.Body.copy(textAlign = TextAlign.Center),
             )
             Spacer(modifier = Modifier.height(24.dp))
             Box(
@@ -87,7 +88,7 @@ fun TvCreateAccountScreen(
             Text(
                 text = stringResource(LR.string.tv_create_account_come_back),
                 color = TvColors.TextSecondary,
-                style = TvTextStyles.SignInSubtitle,
+                style = TvTextStyles.Body.copy(textAlign = TextAlign.Center),
             )
             Spacer(modifier = Modifier.height(24.dp))
             Button(

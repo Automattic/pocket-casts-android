@@ -14,7 +14,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -64,15 +63,14 @@ private fun Header(modifier: Modifier = Modifier) {
     ) {
         Text(
             text = stringResource(LR.string.tv_create_account_modal_title),
-            color = Color.White,
-            style = TvTextStyles.ModalTitle,
+            color = TvColors.TextPrimary,
+            style = TvTextStyles.Headline,
             textAlign = TextAlign.Start,
         )
         Text(
             text = stringResource(LR.string.tv_create_account_modal_subtitle),
             color = TvColors.TextSecondary,
-            style = TvTextStyles.ModalBody,
-            textAlign = TextAlign.Start,
+            style = TvTextStyles.Body,
         )
     }
 }
@@ -112,7 +110,7 @@ private fun LoadingContent(modifier: Modifier = Modifier) {
             .focusRequester(focusRequester)
             .focusable(),
     ) {
-        LoadingView(color = Color.White)
+        LoadingView(color = TvColors.TextPrimary)
     }
 
     LaunchedEffect(Unit) {
@@ -136,7 +134,7 @@ private fun ErrorContent(
         Text(
             text = stringResource(LR.string.error_generic_message),
             color = TvColors.TextSecondary,
-            style = TvTextStyles.SignInSubtitle,
+            style = TvTextStyles.Body.copy(textAlign = TextAlign.Center),
         )
         Spacer(modifier = Modifier.height(24.dp))
         Button(

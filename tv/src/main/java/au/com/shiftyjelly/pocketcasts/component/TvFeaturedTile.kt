@@ -87,9 +87,9 @@ fun TvFeaturedTile(
                         Brush.horizontalGradient(
                             colorStops = arrayOf(
                                 0f to Color.Transparent,
-                                0.2f to TvColors.Dark.copy(alpha = 0.7f),
-                                0.45f to TvColors.Dark,
-                                1f to TvColors.Dark,
+                                0.2f to TvColors.BackgroundSunken.copy(alpha = 0.7f),
+                                0.45f to TvColors.BackgroundSunken,
+                                1f to TvColors.BackgroundSunken,
                             ),
                         ),
                     ),
@@ -118,8 +118,8 @@ fun TvFeaturedTile(
                     if (isSponsored) {
                         Text(
                             text = sponsoredLabel ?: stringResource(LR.string.sponsored),
-                            style = TvTextStyles.FeaturedTileSponsoredLabel,
-                            color = Color.White.copy(alpha = 0.7f),
+                            style = TvTextStyles.Caption2,
+                            color = TvColors.TextPrimary70,
                         )
                     }
 
@@ -127,16 +127,16 @@ fun TvFeaturedTile(
 
                     Text(
                         text = title,
-                        style = TvTextStyles.FeaturedTileTitle,
-                        color = Color.White,
+                        style = TvTextStyles.Headline,
+                        color = TvColors.TextPrimary,
                     )
 
                     Spacer(modifier = Modifier.height(7.dp))
 
                     Text(
                         text = description,
-                        style = TvTextStyles.FeaturedTileDescription,
-                        color = Color.White.copy(alpha = 0.7f),
+                        style = TvTextStyles.Caption2,
+                        color = TvColors.TextPrimary70,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
                     )
@@ -176,7 +176,7 @@ fun TvFeaturedTile(
 private fun TvFeaturedTilePreview() {
     AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
         MaterialTheme {
-            Box(modifier = Modifier.background(TvColors.Dark)) {
+            Box(modifier = Modifier.background(TvColors.BackgroundSunken)) {
                 TvFeaturedTile(
                     artworkUrl = "",
                     isSponsored = true,

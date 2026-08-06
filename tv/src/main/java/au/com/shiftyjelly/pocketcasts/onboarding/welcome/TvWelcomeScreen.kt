@@ -20,9 +20,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -49,7 +49,7 @@ fun TvWelcomeScreen(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(TvColors.Dark),
+            .background(TvColors.BackgroundSunken),
     ) {
         TvAnimatedPodcastGrid(
             modifier = Modifier
@@ -63,10 +63,10 @@ fun TvWelcomeScreen(
                 .background(
                     Brush.verticalGradient(
                         colorStops = arrayOf(
-                            0f to TvColors.Dark.copy(alpha = 0.5f),
-                            0.15f to TvColors.Dark.copy(alpha = 0.5f),
-                            0.40f to TvColors.Dark,
-                            1f to TvColors.Dark,
+                            0f to TvColors.BackgroundSunken.copy(alpha = 0.5f),
+                            0.15f to TvColors.BackgroundSunken.copy(alpha = 0.5f),
+                            0.40f to TvColors.BackgroundSunken,
+                            1f to TvColors.BackgroundSunken,
                         ),
                     ),
                 ),
@@ -87,14 +87,14 @@ fun TvWelcomeScreen(
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = stringResource(LR.string.tv_onboarding_welcome_tv),
-                color = Color.White,
-                style = TvTextStyles.WelcomeTitle,
+                color = TvColors.TextPrimary,
+                style = TvTextStyles.Title1.copy(textAlign = TextAlign.Center),
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = stringResource(LR.string.tv_onboarding_subtitle),
                 color = TvColors.TextSecondary,
-                style = TvTextStyles.WelcomeSubtitle,
+                style = TvTextStyles.Headline.copy(textAlign = TextAlign.Center),
             )
             Spacer(modifier = Modifier.height(32.dp))
 

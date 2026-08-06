@@ -53,7 +53,7 @@ fun TvEpisodeRow(
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
-    val titleColor = if (isFocused) TvColors.Dark else Color.White
+    val titleColor = if (isFocused) TvColors.TextPrimaryActive else TvColors.TextPrimary
     val captionColor = if (isFocused) TvColors.TextSecondaryActive else TvColors.TextSecondary
 
     TvTile(
@@ -61,8 +61,8 @@ fun TvEpisodeRow(
         scale = CardDefaults.scale(focusedScale = 1.02f),
         shape = CardDefaults.shape(RoundedCornerShape(8.dp)),
         colors = CardDefaults.colors(
-            containerColor = TvColors.DarkGray,
-            focusedContainerColor = TvColors.LightGray,
+            containerColor = TvColors.BackgroundBase,
+            focusedContainerColor = TvColors.BackgroundActive,
         ),
         interactionSource = interactionSource,
         modifier = modifier.alpha(if (episode.isArchived && !isFocused) 0.3f else 1f),
@@ -90,13 +90,13 @@ fun TvEpisodeRow(
                     }
                     Text(
                         text = episode.rememberPublishedDateText(dateFormatter),
-                        style = TvTextStyles.PlaylistCardCaption,
+                        style = TvTextStyles.Caption2,
                         color = captionColor,
                     )
                 }
                 Text(
                     text = episode.title,
-                    style = TvTextStyles.EpisodeRowTitle,
+                    style = TvTextStyles.Callout,
                     color = titleColor,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
@@ -107,7 +107,7 @@ fun TvEpisodeRow(
                 ) {
                     Text(
                         text = episode.rememberPlaybackTimeText(),
-                        style = TvTextStyles.PlaylistCardCaption,
+                        style = TvTextStyles.Caption2,
                         color = captionColor,
                     )
                     if (episode.isInProgress && episode.duration > 0.0) {

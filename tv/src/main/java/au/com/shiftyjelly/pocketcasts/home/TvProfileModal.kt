@@ -17,6 +17,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.Button
@@ -82,7 +83,7 @@ private fun ColumnScope.TvProfileModalContent(
                 Text(
                     text = profile.email,
                     color = TvColors.TextPrimary,
-                    style = TvTextStyles.ModalEmail,
+                    style = TvTextStyles.Headline.copy(textAlign = TextAlign.Center),
                     modifier = Modifier.padding(bottom = 16.dp),
                 )
             }
@@ -121,7 +122,7 @@ private fun ColumnScope.TvProfileModalContent(
             BuildConfig.VERSION_CODE.toString(),
         ),
         color = TvColors.TextSecondary,
-        style = TvTextStyles.ModalFootnote,
+        style = TvTextStyles.Caption1,
         modifier = Modifier.padding(top = 8.dp),
     )
 }
@@ -148,7 +149,7 @@ private fun TvProfileModalAvatar(email: String?, modifier: Modifier = Modifier) 
 private fun TvProfileModalAvatarPlaceholder(modifier: Modifier = Modifier) {
     Box(
         contentAlignment = Alignment.Center,
-        modifier = modifier.background(TvColors.Gray, CircleShape),
+        modifier = modifier.background(TvColors.BackgroundOverlay, CircleShape),
     ) {
         Icon(
             painter = painterResource(IR.drawable.ic_profile),
@@ -174,7 +175,7 @@ private fun TvProfileModalButton(
     ) {
         Text(
             text = text,
-            style = TvTextStyles.ModalButtonLabel,
+            style = TvTextStyles.Caption1.copy(textAlign = TextAlign.Center),
             modifier = Modifier.fillMaxWidth(),
         )
     }

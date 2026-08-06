@@ -45,7 +45,7 @@ fun TvArchivedFilterButton(
         ) {
             Text(
                 text = stringResource(if (isShowingArchived) LR.string.show_archived else LR.string.podcast_hide_archived),
-                style = TvTextStyles.PlaylistCardCaption,
+                style = TvTextStyles.Caption2,
             )
             Icon(
                 painter = painterResource(IR.drawable.ic_chevron_small_up),

@@ -19,7 +19,6 @@ import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
@@ -129,7 +128,7 @@ private fun TvYourPodcastsContent(
         modifier = modifier,
     ) { state ->
         when (state) {
-            is TvYourPodcastsUiState.Loading -> LoadingView(color = Color.White, modifier = Modifier.fillMaxSize())
+            is TvYourPodcastsUiState.Loading -> LoadingView(color = TvColors.TextPrimary, modifier = Modifier.fillMaxSize())
 
             is TvYourPodcastsUiState.Empty -> TvEmptyState(
                 title = stringResource(LR.string.tv_your_podcasts_empty_title),
@@ -190,7 +189,7 @@ private const val FOLDER_COVER_COUNT = 4
 private fun TvYourPodcastsGridPreview() {
     AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
         MaterialTheme {
-            Box(modifier = Modifier.background(TvColors.Dark)) {
+            Box(modifier = Modifier.background(TvColors.BackgroundSunken)) {
                 TvYourPodcastsContent(
                     uiState = TvYourPodcastsUiState.Loaded(
                         items = buildList {
@@ -228,7 +227,7 @@ private fun TvYourPodcastsGridPreview() {
 private fun TvYourPodcastsEmptyPreview() {
     AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
         MaterialTheme {
-            Box(modifier = Modifier.background(TvColors.Dark)) {
+            Box(modifier = Modifier.background(TvColors.BackgroundSunken)) {
                 TvYourPodcastsContent(
                     uiState = TvYourPodcastsUiState.Empty,
                     onNavigateToHome = {},

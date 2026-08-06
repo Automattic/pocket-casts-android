@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -23,21 +22,18 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.tv.material3.Button
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import au.com.shiftyjelly.pocketcasts.component.TvEmptyState
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeActionContext
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeActionsModal
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeInfoModal
@@ -49,7 +45,6 @@ import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.podcasts.TvPodcastDetailsScreen
-import au.com.shiftyjelly.pocketcasts.theme.TvButtonDefaults
 import au.com.shiftyjelly.pocketcasts.theme.TvColors
 import au.com.shiftyjelly.pocketcasts.theme.TvTextStyles
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -97,7 +92,7 @@ private fun TvUpNextContent(
     Box(modifier = modifier.fillMaxSize()) {
         when (uiState) {
             is TvUpNextUiState.Loading -> {
-                LoadingView(color = Color.White, modifier = Modifier.fillMaxSize())
+                LoadingView(color = TvColors.TextPrimary, modifier = Modifier.fillMaxSize())
             }
 
             is TvUpNextUiState.Empty -> {
@@ -134,10 +129,10 @@ private fun UpNextList(
         modifier = modifier
             .fillMaxHeight()
             .fillMaxWidth(ROW_WIDTH_FRACTION)
-            .padding(start = 32.dp, top = 16.dp),
+            .padding(start = 32.dp, top = 8.dp),
     ) {
         UpNextHeader(episodes = episodes)
-        Spacer(Modifier.height(24.dp))
+        Spacer(Modifier.height(26.dp))
         LazyColumn(
             state = listState,
             verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -193,12 +188,12 @@ private fun UpNextHeader(
     ) {
         Text(
             text = stringResource(LR.string.up_next),
-            style = TvTextStyles.ScreenTitle,
-            color = Color.White,
+            style = TvTextStyles.Title3,
+            color = TvColors.TextPrimary,
         )
         Text(
             text = episodeSummaryText(episodes),
-            style = TvTextStyles.PlaylistCardCaption,
+            style = TvTextStyles.Caption2,
             color = TvColors.TextSecondary,
         )
     }
@@ -220,34 +215,13 @@ private fun UpNextEmpty(
     onNavigateToHome: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Box(
-        contentAlignment = Alignment.Center,
+    TvEmptyState(
+        title = stringResource(LR.string.tv_up_next_empty_title),
+        subtitle = stringResource(LR.string.tv_up_next_empty_subtitle),
+        actionLabel = stringResource(LR.string.tv_up_next_empty_action_title),
+        onAction = onNavigateToHome,
         modifier = modifier,
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(
-                text = stringResource(LR.string.tv_up_next_empty_title),
-                style = TvTextStyles.ScreenTitle,
-                color = Color.White,
-                textAlign = TextAlign.Center,
-            )
-            Spacer(modifier = Modifier.height(12.dp))
-            Text(
-                text = stringResource(LR.string.tv_up_next_empty_subtitle),
-                style = MaterialTheme.typography.bodyLarge,
-                color = TvColors.TextSecondary,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.widthIn(max = 400.dp),
-            )
-            Spacer(modifier = Modifier.height(32.dp))
-            Button(
-                onClick = onNavigateToHome,
-                colors = TvButtonDefaults.filledButtonColors(),
-            ) {
-                Text(stringResource(LR.string.tv_up_next_empty_action_title))
-            }
-        }
-    }
+    )
 }
 
 private const val ROW_WIDTH_FRACTION = 0.75f
@@ -257,7 +231,7 @@ private const val ROW_WIDTH_FRACTION = 0.75f
 private fun TvUpNextLoadedPreview() {
     AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
         MaterialTheme {
-            Box(modifier = Modifier.background(TvColors.Dark)) {
+            Box(modifier = Modifier.background(TvColors.BackgroundSunken)) {
                 TvUpNextContent(
                     uiState = TvUpNextUiState.Loaded(
                         episodes = List(4) { index ->
@@ -283,7 +257,7 @@ private fun TvUpNextLoadedPreview() {
 private fun TvUpNextEmptyPreview() {
     AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
         MaterialTheme {
-            Box(modifier = Modifier.background(TvColors.Dark)) {
+            Box(modifier = Modifier.background(TvColors.BackgroundSunken)) {
                 TvUpNextContent(
                     uiState = TvUpNextUiState.Empty,
                     onNavigateToHome = {},

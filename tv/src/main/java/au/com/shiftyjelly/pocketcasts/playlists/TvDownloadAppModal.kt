@@ -14,6 +14,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.Button
@@ -54,13 +55,13 @@ private fun ColumnScope.TvDownloadAppModalContent(
 
     Text(
         text = stringResource(LR.string.tv_playlists_download_title),
-        color = Color.White,
-        style = TvTextStyles.ModalTitle,
+        color = TvColors.TextPrimary,
+        style = TvTextStyles.Headline.copy(textAlign = TextAlign.Center),
     )
     Text(
         text = stringResource(LR.string.tv_playlists_download_subtitle),
         color = TvColors.TextSecondary,
-        style = TvTextStyles.ModalBody,
+        style = TvTextStyles.Body.copy(textAlign = TextAlign.Center),
     )
     Image(
         painter = rememberQrPainter(content = DOWNLOAD_URL, size = QrCodeSize),
@@ -74,7 +75,7 @@ private fun ColumnScope.TvDownloadAppModalContent(
     Text(
         text = DOWNLOAD_URL_LABEL,
         color = TvColors.TextSecondary,
-        style = TvTextStyles.ModalBody,
+        style = TvTextStyles.Body.copy(textAlign = TextAlign.Center),
     )
     Button(
         onClick = onDone,
@@ -83,7 +84,7 @@ private fun ColumnScope.TvDownloadAppModalContent(
             .padding(top = 16.dp)
             .focusRequester(focusRequester),
     ) {
-        Text(stringResource(LR.string.done), style = TvTextStyles.ModalButtonLabel)
+        Text(stringResource(LR.string.done), style = TvTextStyles.Caption1)
     }
 }
 

@@ -22,7 +22,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
@@ -90,7 +89,7 @@ private fun TvHomeContent(
     restoreFocusTrigger: Int = 0,
 ) {
     when (uiState) {
-        is TvHomeUiState.Loading -> LoadingView(color = Color.White, modifier = modifier)
+        is TvHomeUiState.Loading -> LoadingView(color = TvColors.TextPrimary, modifier = modifier)
 
         is TvHomeUiState.Error -> TvHomeError(onRetry = onRetry, modifier = modifier)
 
@@ -119,7 +118,7 @@ private fun TvHomeError(
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = stringResource(LR.string.error_generic_message),
-                color = Color.White,
+                color = TvColors.TextPrimary,
                 style = MaterialTheme.typography.bodyLarge,
             )
             Spacer(modifier = Modifier.height(24.dp))
@@ -232,7 +231,7 @@ private fun TvHomeRows(
 private fun TvHomeContentPreview() {
     AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
         MaterialTheme {
-            Box(modifier = Modifier.background(TvColors.Dark)) {
+            Box(modifier = Modifier.background(TvColors.BackgroundSunken)) {
                 TvHomeContent(
                     uiState = TvHomeUiState.Ready(
                         rows = listOf(
@@ -273,7 +272,7 @@ private fun TvHomeContentPreview() {
 private fun TvHomeErrorPreview() {
     AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
         MaterialTheme {
-            Box(modifier = Modifier.background(TvColors.Dark)) {
+            Box(modifier = Modifier.background(TvColors.BackgroundSunken)) {
                 TvHomeContent(
                     uiState = TvHomeUiState.Error,
                     onRetry = {},

@@ -28,12 +28,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -80,7 +80,7 @@ private fun TvSyncingScreenContent(modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(TvColors.Dark),
+            .background(TvColors.BackgroundSunken),
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -95,14 +95,14 @@ private fun TvSyncingScreenContent(modifier: Modifier = Modifier) {
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = stringResource(LR.string.tv_onboarding_welcome_back),
-                color = Color.White,
-                style = TvTextStyles.WelcomeTitle,
+                color = TvColors.TextPrimary,
+                style = TvTextStyles.Title1.copy(textAlign = TextAlign.Center),
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = stringResource(LR.string.tv_onboarding_syncing_subtitle),
                 color = TvColors.TextSecondary,
-                style = TvTextStyles.WelcomeSubtitle,
+                style = TvTextStyles.Headline.copy(textAlign = TextAlign.Center),
             )
             Spacer(modifier = Modifier.height(40.dp))
             TvSyncingCoverRow(
