@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.home
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PodcastDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextDao
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -10,8 +11,11 @@ import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
 import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.SmartPlaylistDraft
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverEpisode
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
@@ -34,6 +38,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlow
+import kotlinx.coroutines.rx2.await
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -45,6 +50,9 @@ class TvHomeViewModel @Inject constructor(
     private val upNextDao: UpNextDao,
     private val settings: Settings,
     private val syncManager: SyncManager,
+    private val episodeManager: EpisodeManager,
+    private val podcastManager: PodcastManager,
+    private val playbackManager: PlaybackManager,
     @ApplicationContext private val context: Context,
 ) : ViewModel() {
 
@@ -165,6 +173,27 @@ class TvHomeViewModel @Inject constructor(
                         ),
                     )
                 }
+            }
+        }
+    }
+
+    fun playEpisode(episode: TvHomeEpisode) {
+        viewModelScope.launch {
+            try {
+                val found = episodeManager.findByUuid(episode.episodeUuid)
+                    ?: run {
+                        podcastManager.findOrDownloadPodcastRxSingle(episode.podcastUuid).await()
+                        episodeManager.findByUuid(episode.episodeUuid)
+                    }
+                if (found != null) {
+                    playbackManager.playNowSuspend(episode = found, sourceView = SourceView.DISCOVER)
+                } else {
+                    Timber.e("Episode %s not found to play from TV home", episode.episodeUuid)
+                }
+            } catch (exception: CancellationException) {
+                throw exception
+            } catch (exception: Exception) {
+                Timber.e(exception, "Failed to play episode from TV home")
             }
         }
     }
