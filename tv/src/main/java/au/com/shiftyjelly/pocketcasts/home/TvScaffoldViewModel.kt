@@ -7,19 +7,14 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
-import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlow
-import kotlinx.coroutines.withTimeoutOrNull
 
 @HiltViewModel
 class TvScaffoldViewModel @Inject constructor(
@@ -31,8 +26,7 @@ class TvScaffoldViewModel @Inject constructor(
 
     private val hasCurrentEpisode = upNextQueue.changesObservable.asFlow()
         .map { state -> state is UpNextQueue.State.Loaded }
-        .onStart { emit(false) }
-        .distinctUntilChanged()
+        .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
     init {
         viewModelScope.launch {
@@ -66,14 +60,7 @@ class TvScaffoldViewModel @Inject constructor(
     }
 
     fun openNowPlaying() {
-        viewModelScope.launch {
-            val hasEpisode = withTimeoutOrNull(OPEN_NOW_PLAYING_TIMEOUT) {
-                hasCurrentEpisode.first { it }
-            }
-            if (hasEpisode == true) {
-                selectedTab.value = TvTab.NowPlaying
-            }
-        }
+        selectedTab.value = TvTab.NowPlaying
     }
 
     fun signOut() {
@@ -86,10 +73,6 @@ class TvScaffoldViewModel @Inject constructor(
         TvProfileState.SignedIn(email = email?.takeIf(String::isNotBlank))
     } else {
         TvProfileState.SignedOut
-    }
-
-    private companion object {
-        val OPEN_NOW_PLAYING_TIMEOUT = 5.seconds
     }
 }
 

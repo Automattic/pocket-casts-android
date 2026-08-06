@@ -12,11 +12,9 @@ import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import com.jakewharton.rxrelay2.BehaviorRelay
 import io.reactivex.subjects.BehaviorSubject
 import java.util.Date
-import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -117,7 +115,20 @@ class TvScaffoldViewModelTest {
     }
 
     @Test
-    fun `openNowPlaying selects the now playing tab once the queue loads`() = runTest {
+    fun `openNowPlaying selects the now playing tab immediately`() = runTest {
+        viewModel.uiState.test {
+            assertEquals(TvTab.Home, awaitItem().selectedTab)
+
+            viewModel.openNowPlaying()
+
+            val state = expectMostRecentItem()
+            assertEquals(TvTab.NowPlaying, state.selectedTab)
+            assertEquals(true, state.tabs.contains(TvTab.NowPlaying))
+        }
+    }
+
+    @Test
+    fun `openNowPlaying keeps the tab selected while the queue loads`() = runTest {
         viewModel.uiState.test {
             assertEquals(TvTab.Home, awaitItem().selectedTab)
 
@@ -127,20 +138,6 @@ class TvScaffoldViewModelTest {
             val state = expectMostRecentItem()
             assertEquals(TvTab.NowPlaying, state.selectedTab)
             assertEquals(4, state.selectedTabIndex)
-        }
-    }
-
-    @Test
-    fun `openNowPlaying does nothing when playback never starts`() = runTest {
-        viewModel.uiState.test {
-            assertEquals(TvTab.Home, awaitItem().selectedTab)
-
-            viewModel.openNowPlaying()
-            advanceTimeBy(6.seconds)
-            queueChanges.onNext(loadedQueue)
-
-            val state = expectMostRecentItem()
-            assertEquals(TvTab.Home, state.selectedTab)
         }
     }
 

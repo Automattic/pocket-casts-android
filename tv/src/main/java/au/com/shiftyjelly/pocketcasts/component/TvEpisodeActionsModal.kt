@@ -246,7 +246,10 @@ private fun TvEpisodeActionsModalPreviewContent(
     actionContext: TvEpisodeActionContext,
 ) {
     TvTheme {
-        CompositionLocalProvider(LocalTvToastHostState provides remember { TvToastHostState() }) {
+        CompositionLocalProvider(
+            LocalTvToastHostState provides remember { TvToastHostState() },
+            LocalOpenNowPlaying provides {},
+        ) {
             TvModalSurface(contentPadding = ContentPadding) {
                 TvEpisodeActionsModalContent(
                     episode = episode,

@@ -47,10 +47,17 @@ fun TvScaffold(
     var isProfileModalVisible by rememberSaveable { mutableStateOf(false) }
     val topBarVisibility = remember { TvTopBarVisibility() }
     var didFocusTopBar by rememberSaveable { mutableStateOf(false) }
+    var nowPlayingOpenTrigger by remember { mutableIntStateOf(0) }
+    val openNowPlaying: () -> Unit = remember(viewModel) {
+        {
+            viewModel.openNowPlaying()
+            nowPlayingOpenTrigger++
+        }
+    }
 
     CompositionLocalProvider(
         LocalTvTopBarVisibility provides topBarVisibility,
-        LocalOpenNowPlaying provides viewModel::openNowPlaying,
+        LocalOpenNowPlaying provides openNowPlaying,
     ) {
         TvScaffoldContent(
             tabs = uiState.tabs,
@@ -59,7 +66,7 @@ fun TvScaffold(
             isTopBarVisible = topBarVisibility.isVisible,
             autoFocusSelectedTab = !didFocusTopBar,
             onSelectedTabFocus = { didFocusTopBar = true },
-            onTabSelect = { index -> uiState.tabs.getOrNull(index)?.let(viewModel::selectTab) },
+            onTabSelect = viewModel::selectTab,
             onProfileClick = { isProfileModalVisible = true },
             modifier = modifier,
         ) { tab ->
@@ -80,7 +87,7 @@ fun TvScaffold(
                     TvUpNextScreen(onNavigateToHome = navigateToHome)
                 }
 
-                is TvTab.NowPlaying -> TvNowPlayingScreen()
+                is TvTab.NowPlaying -> TvNowPlayingScreen(openTrigger = nowPlayingOpenTrigger)
 
                 else -> Box(modifier = belowTopBar) {
                     TvTabPlaceholder(tab = tab)
@@ -118,7 +125,7 @@ private fun TvScaffoldContent(
     selectedTabIndex: Int,
     profile: TvProfileState,
     isTopBarVisible: Boolean,
-    onTabSelect: (Int) -> Unit,
+    onTabSelect: (TvTab) -> Unit,
     onProfileClick: () -> Unit,
     modifier: Modifier = Modifier,
     autoFocusSelectedTab: Boolean = true,
@@ -152,7 +159,9 @@ private fun TvScaffoldContent(
                 tabs = tabs,
                 selectedTabIndex = selectedTabIndex,
                 profile = profile,
-                onTabSelect = onTabSelect,
+                // Resolve against the same list this frame rendered, so a click during a tab-list
+                // change cannot land on the wrong tab.
+                onTabSelect = { index -> tabs.getOrNull(index)?.let(onTabSelect) },
                 onProfileClick = onProfileClick,
                 autoFocusSelectedTab = autoFocusSelectedTab,
                 onSelectedTabFocus = onSelectedTabFocus,
@@ -175,7 +184,7 @@ private fun TvScaffoldPreview() {
             selectedTabIndex = selectedIndex,
             profile = TvProfileState.SignedOut,
             isTopBarVisible = true,
-            onTabSelect = { selectedIndex = it },
+            onTabSelect = { selectedIndex = TvTab.entries.indexOf(it) },
             onProfileClick = {},
         ) { tab ->
             Box(modifier = Modifier.fillMaxSize().padding(top = TvTopBarHeight)) {

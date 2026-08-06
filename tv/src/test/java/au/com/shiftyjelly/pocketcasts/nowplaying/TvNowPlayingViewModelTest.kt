@@ -74,6 +74,7 @@ class TvNowPlayingViewModelTest {
         queueChanges.onNext(UpNextQueue.State.Loaded(audioEpisode, Podcast(uuid = "podcast", title = "Podcast"), emptyList()))
         playbackStates.value = PlaybackState(
             state = PlaybackState.State.PLAYING,
+            episodeUuid = audioEpisode.uuid,
             isBuffering = true,
             positionMs = 1_000,
             durationMs = 60_000,
@@ -86,11 +87,31 @@ class TvNowPlayingViewModelTest {
             assertEquals("Podcast", state.podcastTitle)
             assertEquals(true, state.isPlaying)
             assertEquals(true, state.isBuffering)
-            assertEquals(false, state.isError)
+            assertEquals(null, state.errorMessage)
             assertEquals(1_000, state.positionMs)
             assertEquals(60_000, state.durationMs)
             assertEquals(5_000, state.bufferedMs)
             assertEquals(false, state.isVideo)
+        }
+    }
+
+    @Test
+    fun `playback progress of a different episode falls back to the entity`() = runTest {
+        val episode = PodcastEpisode(uuid = "next", publishedDate = Date(0), playedUpTo = 12.0, duration = 60.0)
+        queueChanges.onNext(UpNextQueue.State.Loaded(episode, null, emptyList()))
+        playbackStates.value = PlaybackState(
+            state = PlaybackState.State.PLAYING,
+            episodeUuid = "previous",
+            positionMs = 55_000,
+            durationMs = 55_000,
+            bufferedMs = 55_000,
+        )
+
+        viewModel.uiState.test {
+            val state = awaitItem() as TvNowPlayingUiState.Loaded
+            assertEquals(12_000, state.positionMs)
+            assertEquals(60_000, state.durationMs)
+            assertEquals(0, state.bufferedMs)
         }
     }
 
@@ -104,7 +125,6 @@ class TvNowPlayingViewModelTest {
 
         viewModel.uiState.test {
             val state = awaitItem() as TvNowPlayingUiState.Loaded
-            assertEquals(true, state.isError)
             assertEquals("Something went wrong", state.errorMessage)
         }
     }

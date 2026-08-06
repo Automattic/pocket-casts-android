@@ -71,14 +71,20 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun TvNowPlayingScreen(
+    openTrigger: Int,
     modifier: Modifier = Modifier,
     viewModel: TvNowPlayingViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var openedPodcastUuid by rememberSaveable { mutableStateOf<String?>(null) }
 
+    LaunchedEffect(openTrigger) {
+        openedPodcastUuid = null
+    }
+
     val podcastUuid = openedPodcastUuid
     if (podcastUuid != null) {
+        HideTvTopBar()
         BackHandler { openedPodcastUuid = null }
         TvPodcastDetailsScreen(
             podcastUuid = podcastUuid,
@@ -140,20 +146,15 @@ private fun TvNowPlayingContent(
         modifier = modifier
             .fillMaxSize()
             .onPreviewKeyEvent { event ->
-                when {
-                    event.type != KeyEventType.KeyDown || event.key == Key.Back -> false
-
-                    !isChromeVisible -> {
-                        isChromeVisible = true
-                        interactionTick++
-                        true
-                    }
-
-                    else -> {
-                        interactionTick++
-                        false
-                    }
+                if (event.type != KeyEventType.KeyDown) return@onPreviewKeyEvent false
+                interactionTick++
+                val revealsChrome = !isChromeVisible
+                if (revealsChrome) {
+                    isChromeVisible = true
                 }
+                // Only navigation presses are swallowed by the reveal; media and back keys keep
+                // their effect even while the chrome is hidden.
+                revealsChrome && event.key in chromeRevealConsumedKeys
             }
             .padding(top = TvTopBarHeight)
             .padding(horizontal = 80.dp, vertical = 24.dp),
@@ -167,12 +168,12 @@ private fun TvNowPlayingContent(
             if (state.isVideo) {
                 TvVideoSurface(player = state.player)
             } else {
-                EpisodeArtworkWithTitles(state = state)
+                EpisodeArtworkWithTitles(episode = episode, podcastTitle = state.podcastTitle)
             }
         }
         Spacer(modifier = Modifier.height(24.dp))
         Column(modifier = Modifier.graphicsLayer { alpha = chromeAlpha }) {
-            state.errorMessage?.takeIf { state.isError }?.let { errorMessage ->
+            state.errorMessage?.let { errorMessage ->
                 Text(
                     text = errorMessage,
                     style = MaterialTheme.tvTypography.caption1,
@@ -232,7 +233,8 @@ private fun TvNowPlayingContent(
 
 @Composable
 private fun EpisodeArtworkWithTitles(
-    state: TvNowPlayingUiState.Loaded,
+    episode: BaseEpisode,
+    podcastTitle: String?,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -240,21 +242,21 @@ private fun EpisodeArtworkWithTitles(
         modifier = modifier,
     ) {
         TvArtworkImage(
-            model = state.episode.artworkModel(),
+            model = episode.artworkModel(),
             modifier = Modifier
                 .size(280.dp)
                 .clip(RoundedCornerShape(8.dp)),
         )
         Spacer(modifier = Modifier.height(24.dp))
         Text(
-            text = state.episode.title,
+            text = episode.title,
             style = MaterialTheme.tvTypography.title3,
             color = MaterialTheme.tvColors.textPrimary,
             textAlign = TextAlign.Center,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
         )
-        state.podcastTitle?.let { podcastTitle ->
+        podcastTitle?.let { podcastTitle ->
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = podcastTitle,
@@ -352,8 +354,17 @@ private fun PlayerControlButton(
 
 private val CHROME_HIDE_DELAY = 4.seconds
 
+private val chromeRevealConsumedKeys = setOf(
+    Key.DirectionUp,
+    Key.DirectionDown,
+    Key.DirectionLeft,
+    Key.DirectionRight,
+    Key.DirectionCenter,
+    Key.Enter,
+)
+
 private fun BaseEpisode.artworkModel(): Any? = when (this) {
-    is PodcastEpisode -> PodcastImage.getArtworkUrl(size = null, uuid = podcastUuid, isWearOS = false)
+    is PodcastEpisode -> PodcastImage.getMediumArtworkUrl(podcastUuid)
     is UserEpisode -> artworkUrl
 }
 
@@ -372,7 +383,6 @@ private fun TvNowPlayingContentPreview() {
                 podcastTitle = "Podcast title",
                 isPlaying = true,
                 isBuffering = false,
-                isError = false,
                 errorMessage = null,
                 positionMs = 600_000,
                 durationMs = 3_600_000,

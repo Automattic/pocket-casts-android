@@ -91,7 +91,7 @@ fun TvSeekBar(
                     modifier = Modifier
                         .fillMaxWidth(buffered)
                         .fillMaxHeight()
-                        .background(MaterialTheme.tvColors.backgroundActive20),
+                        .background(MaterialTheme.tvColors.backgroundActive50),
                 )
                 Box(
                     modifier = Modifier

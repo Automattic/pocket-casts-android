@@ -68,7 +68,7 @@ private class TvVideoView(
     }
 
     fun connectWithDelay() {
-        if (isSurfaceConnected) {
+        if (isSurfaceConnected || isSurfaceConnectionPending) {
             return
         }
         isSurfaceConnectionPending = true

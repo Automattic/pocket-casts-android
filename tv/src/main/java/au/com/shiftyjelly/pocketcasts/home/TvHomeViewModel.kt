@@ -31,8 +31,11 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
@@ -58,6 +61,9 @@ class TvHomeViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow<TvHomeUiState>(TvHomeUiState.Loading)
     val uiState: StateFlow<TvHomeUiState> = _uiState.asStateFlow()
+
+    private val _playFailures = MutableSharedFlow<Unit>()
+    val playFailures: SharedFlow<Unit> = _playFailures.asSharedFlow()
 
     private var loadJob: Job? = null
 
@@ -189,11 +195,13 @@ class TvHomeViewModel @Inject constructor(
                     playbackManager.playNowSuspend(episode = found, sourceView = SourceView.DISCOVER)
                 } else {
                     Timber.e("Episode %s not found to play from TV home", episode.episodeUuid)
+                    _playFailures.emit(Unit)
                 }
             } catch (exception: CancellationException) {
                 throw exception
             } catch (exception: Exception) {
                 Timber.e(exception, "Failed to play episode from TV home")
+                _playFailures.emit(Unit)
             }
         }
     }

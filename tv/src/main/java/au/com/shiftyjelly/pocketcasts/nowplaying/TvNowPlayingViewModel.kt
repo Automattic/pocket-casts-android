@@ -31,17 +31,20 @@ class TvNowPlayingViewModel @Inject constructor(
         playbackManager.videoRenderingEnabled,
     ) { playbackState, queueState, player, streamVideoState, videoRenderingEnabled ->
         if (queueState is UpNextQueue.State.Loaded) {
+            val episode = queueState.episode
+            // The queue and playback relays update at different times during an episode switch, so
+            // fall back to the entity's progress until the playback state refers to this episode.
+            val isPlaybackStateCurrent = playbackState.episodeUuid == episode.uuid
             TvNowPlayingUiState.Loaded(
-                episode = queueState.episode,
+                episode = episode,
                 podcastTitle = queueState.podcast?.title,
                 isPlaying = playbackState.isPlaying,
                 isBuffering = playbackState.isBuffering,
-                isError = playbackState.isError,
-                errorMessage = playbackState.lastErrorMessage,
-                positionMs = playbackState.positionMs,
-                durationMs = playbackState.durationMs,
-                bufferedMs = playbackState.bufferedMs,
-                isVideo = isVideo(queueState.episode, streamVideoState, videoRenderingEnabled),
+                errorMessage = playbackState.lastErrorMessage.takeIf { playbackState.isError },
+                positionMs = if (isPlaybackStateCurrent) playbackState.positionMs else episode.playedUpToMs,
+                durationMs = if (isPlaybackStateCurrent) playbackState.durationMs else episode.durationMs,
+                bufferedMs = if (isPlaybackStateCurrent) playbackState.bufferedMs else 0,
+                isVideo = isVideo(episode, streamVideoState, videoRenderingEnabled),
                 player = player,
             )
         } else {
@@ -58,11 +61,17 @@ class TvNowPlayingViewModel @Inject constructor(
     }
 
     fun skipForward() {
-        playbackManager.skipForward(sourceView = SourceView.PLAYER, jumpAmountSeconds = settings.skipForwardInSecs.value)
+        playbackManager.skipForward(
+            sourceView = SourceView.PLAYER,
+            jumpAmountSeconds = settings.skipForwardInSecs.value,
+        )
     }
 
     fun skipBackward() {
-        playbackManager.skipBackward(sourceView = SourceView.PLAYER, jumpAmountSeconds = settings.skipBackInSecs.value)
+        playbackManager.skipBackward(
+            sourceView = SourceView.PLAYER,
+            jumpAmountSeconds = settings.skipBackInSecs.value,
+        )
     }
 
     private fun isVideo(
@@ -84,7 +93,6 @@ sealed interface TvNowPlayingUiState {
         val podcastTitle: String?,
         val isPlaying: Boolean,
         val isBuffering: Boolean,
-        val isError: Boolean,
         val errorMessage: String?,
         val positionMs: Int,
         val durationMs: Int,

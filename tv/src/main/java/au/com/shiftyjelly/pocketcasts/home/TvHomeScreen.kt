@@ -32,6 +32,7 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.OutlinedButton
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.component.LocalOpenNowPlaying
+import au.com.shiftyjelly.pocketcasts.component.LocalTvToastHostState
 import au.com.shiftyjelly.pocketcasts.component.TvDetailOverlay
 import au.com.shiftyjelly.pocketcasts.component.TvFeaturedTile
 import au.com.shiftyjelly.pocketcasts.component.TvPodcastTile
@@ -58,6 +59,13 @@ fun TvHomeScreen(
 
     val podcastUuid = openedPodcastUuid
     val openNowPlaying = LocalOpenNowPlaying.current
+    val toastHostState = LocalTvToastHostState.current
+    val playFailedMessage = stringResource(LR.string.error_generic_message)
+    LaunchedEffect(Unit) {
+        viewModel.playFailures.collect {
+            toastHostState.show(playFailedMessage)
+        }
+    }
     Box(modifier = modifier.fillMaxSize()) {
         TvHomeContent(
             uiState = uiState,
