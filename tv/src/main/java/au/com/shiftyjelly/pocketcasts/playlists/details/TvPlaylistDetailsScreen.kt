@@ -45,7 +45,6 @@ import au.com.shiftyjelly.pocketcasts.component.TvEpisodeInfoModal
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeListItem
 import au.com.shiftyjelly.pocketcasts.component.TvSortButton
 import au.com.shiftyjelly.pocketcasts.component.rememberTvEpisodeListFocus
-import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.PlaylistArtwork
 import au.com.shiftyjelly.pocketcasts.compose.components.displayLabel
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
@@ -59,10 +58,10 @@ import au.com.shiftyjelly.pocketcasts.repositories.playlist.ManualPlaylist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.availableSortTypes
 import au.com.shiftyjelly.pocketcasts.theme.TvButtonDefaults
-import au.com.shiftyjelly.pocketcasts.theme.TvColors
 import au.com.shiftyjelly.pocketcasts.theme.TvDetailsArtworkSize
-import au.com.shiftyjelly.pocketcasts.theme.TvTextStyles
-import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.theme.TvTheme
+import au.com.shiftyjelly.pocketcasts.theme.tvColors
+import au.com.shiftyjelly.pocketcasts.theme.tvTypography
 import java.util.Date
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -116,7 +115,7 @@ private fun TvPlaylistDetailsContent(
     Box(modifier = modifier.fillMaxSize()) {
         when (uiState) {
             is TvPlaylistDetailsUiState.Loading, TvPlaylistDetailsUiState.NotFound -> {
-                LoadingView(color = TvColors.TextPrimary, modifier = Modifier.fillMaxSize())
+                LoadingView(color = MaterialTheme.tvColors.textPrimary, modifier = Modifier.fillMaxSize())
             }
 
             is TvPlaylistDetailsUiState.Loaded -> {
@@ -220,8 +219,8 @@ private fun AllEpisodesArchived(
     ) {
         Text(
             text = pluralStringResource(LR.plurals.tv_playlist_all_archived, episodeCount, episodeCount),
-            style = MaterialTheme.typography.bodyLarge,
-            color = TvColors.TextSecondary,
+            style = MaterialTheme.tvTypography.caption1,
+            color = MaterialTheme.tvColors.textSecondary,
             textAlign = TextAlign.Center,
             modifier = Modifier.widthIn(max = 400.dp),
         )
@@ -298,8 +297,8 @@ private fun NoEpisodes(
         ) {
             Text(
                 text = stringResource(LR.string.tv_playlist_empty_title),
-                style = TvTextStyles.Title3,
-                color = TvColors.TextPrimary,
+                style = MaterialTheme.tvTypography.title3,
+                color = MaterialTheme.tvColors.textPrimary,
                 textAlign = TextAlign.Center,
             )
             Text(
@@ -307,8 +306,8 @@ private fun NoEpisodes(
                     Playlist.Type.Manual -> stringResource(LR.string.tv_playlist_empty_subtitle_manual)
                     Playlist.Type.Smart -> stringResource(LR.string.tv_playlist_empty_subtitle)
                 },
-                style = MaterialTheme.typography.bodyLarge,
-                color = TvColors.TextSecondary,
+                style = MaterialTheme.tvTypography.caption1,
+                color = MaterialTheme.tvColors.textSecondary,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.widthIn(max = 400.dp),
             )
@@ -338,18 +337,18 @@ private fun PlaylistInfo(
                     Playlist.Type.Manual -> stringResource(LR.string.playlist)
                     Playlist.Type.Smart -> stringResource(LR.string.smart_playlist)
                 },
-                style = TvTextStyles.Caption2,
-                color = TvColors.TextSecondary,
+                style = MaterialTheme.tvTypography.caption2,
+                color = MaterialTheme.tvColors.textSecondary,
             )
             Text(
                 text = playlist.title,
-                style = TvTextStyles.Title3,
-                color = TvColors.TextPrimary,
+                style = MaterialTheme.tvTypography.title3,
+                color = MaterialTheme.tvColors.textPrimary,
             )
             Text(
                 text = episodeSummaryText(episodes),
-                style = TvTextStyles.Caption2,
-                color = TvColors.TextSecondary,
+                style = MaterialTheme.tvTypography.caption2,
+                color = MaterialTheme.tvColors.textSecondary,
             )
         }
         if (episodes.isNotEmpty()) {
@@ -380,57 +379,53 @@ private val InfoPaneWidth = 200.dp
 @Preview(device = Devices.TV_1080p)
 @Composable
 private fun TvPlaylistDetailsPreview() {
-    AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
-        MaterialTheme {
-            TvPlaylistDetailsContent(
-                uiState = TvPlaylistDetailsUiState.Loaded(
-                    playlist = ManualPlaylist(
-                        uuid = "playlist-uuid",
-                        title = "New Releases",
-                        episodes = emptyList(),
-                        settings = Playlist.Settings.ForPreview,
-                        metadata = Playlist.Metadata.ForPreview,
-                    ),
+    TvTheme {
+        TvPlaylistDetailsContent(
+            uiState = TvPlaylistDetailsUiState.Loaded(
+                playlist = ManualPlaylist(
+                    uuid = "playlist-uuid",
+                    title = "New Releases",
                     episodes = emptyList(),
-                    isShowingArchivedOnDevice = false,
+                    settings = Playlist.Settings.ForPreview,
+                    metadata = Playlist.Metadata.ForPreview,
                 ),
-                onChangeSortType = {},
-                onToggleArchiveFilter = {},
-                onOpenPodcast = {},
-            )
-        }
+                episodes = emptyList(),
+                isShowingArchivedOnDevice = false,
+            ),
+            onChangeSortType = {},
+            onToggleArchiveFilter = {},
+            onOpenPodcast = {},
+        )
     }
 }
 
 @Preview(device = Devices.TV_1080p)
 @Composable
 private fun TvPlaylistDetailsLoadedPreview() {
-    AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
-        MaterialTheme {
-            val episodes = List(5) { index ->
-                PodcastEpisode(
-                    uuid = "episode-$index",
-                    title = "Episode $index",
-                    duration = 1800.0,
-                    publishedDate = Date(0),
-                )
-            }
-            TvPlaylistDetailsContent(
-                uiState = TvPlaylistDetailsUiState.Loaded(
-                    playlist = ManualPlaylist(
-                        uuid = "playlist-uuid",
-                        title = "New Releases",
-                        episodes = episodes.map(PlaylistEpisode::Available),
-                        settings = Playlist.Settings.ForPreview,
-                        metadata = Playlist.Metadata.ForPreview,
-                    ),
-                    episodes = episodes,
-                    isShowingArchivedOnDevice = false,
-                ),
-                onChangeSortType = {},
-                onToggleArchiveFilter = {},
-                onOpenPodcast = {},
+    TvTheme {
+        val episodes = List(5) { index ->
+            PodcastEpisode(
+                uuid = "episode-$index",
+                title = "Episode $index",
+                duration = 1800.0,
+                publishedDate = Date(0),
             )
         }
+        TvPlaylistDetailsContent(
+            uiState = TvPlaylistDetailsUiState.Loaded(
+                playlist = ManualPlaylist(
+                    uuid = "playlist-uuid",
+                    title = "New Releases",
+                    episodes = episodes.map(PlaylistEpisode::Available),
+                    settings = Playlist.Settings.ForPreview,
+                    metadata = Playlist.Metadata.ForPreview,
+                ),
+                episodes = episodes,
+                isShowingArchivedOnDevice = false,
+            ),
+            onChangeSortType = {},
+            onToggleArchiveFilter = {},
+            onOpenPodcast = {},
+        )
     }
 }

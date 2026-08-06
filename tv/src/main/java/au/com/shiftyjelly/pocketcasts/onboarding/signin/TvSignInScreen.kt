@@ -30,11 +30,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.Button
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
-import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.theme.TvButtonDefaults
-import au.com.shiftyjelly.pocketcasts.theme.TvColors
-import au.com.shiftyjelly.pocketcasts.theme.TvTextStyles
-import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.theme.TvTheme
+import au.com.shiftyjelly.pocketcasts.theme.tvColors
+import au.com.shiftyjelly.pocketcasts.theme.tvTypography
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -77,7 +76,7 @@ private fun TvSignInLoading(modifier: Modifier = Modifier) {
         contentAlignment = Alignment.Center,
         modifier = modifier
             .fillMaxSize()
-            .background(TvColors.BackgroundSunken)
+            .background(MaterialTheme.tvColors.backgroundSunken)
             .focusRequester(focusRequester)
             .focusable(),
     ) {
@@ -90,8 +89,8 @@ private fun TvSignInLoading(modifier: Modifier = Modifier) {
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = stringResource(LR.string.tv_onboarding_sign_in_title),
-                color = TvColors.TextPrimary,
-                style = TvTextStyles.Title1.copy(textAlign = TextAlign.Center),
+                color = MaterialTheme.tvColors.textPrimary,
+                style = MaterialTheme.tvTypography.title1.copy(textAlign = TextAlign.Center),
             )
         }
     }
@@ -112,7 +111,7 @@ private fun TvSignInError(
         contentAlignment = Alignment.Center,
         modifier = modifier
             .fillMaxSize()
-            .background(TvColors.BackgroundSunken),
+            .background(MaterialTheme.tvColors.backgroundSunken),
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Image(
@@ -123,8 +122,8 @@ private fun TvSignInError(
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = stringResource(LR.string.error_generic_message),
-                color = TvColors.TextSecondary,
-                style = TvTextStyles.Body.copy(textAlign = TextAlign.Center),
+                color = MaterialTheme.tvColors.textSecondary,
+                style = MaterialTheme.tvTypography.body.copy(textAlign = TextAlign.Center),
             )
             Spacer(modifier = Modifier.height(24.dp))
             Button(
@@ -156,7 +155,7 @@ private fun TvSignInContent(
         contentAlignment = Alignment.Center,
         modifier = modifier
             .fillMaxSize()
-            .background(TvColors.BackgroundSunken)
+            .background(MaterialTheme.tvColors.backgroundSunken)
             .focusRequester(focusRequester)
             .focusable(),
     ) {
@@ -166,8 +165,8 @@ private fun TvSignInContent(
         ) {
             Text(
                 text = stringResource(LR.string.tv_sign_in_title),
-                color = TvColors.TextPrimary,
-                style = TvTextStyles.Title1.copy(textAlign = TextAlign.Center),
+                color = MaterialTheme.tvColors.textPrimary,
+                style = MaterialTheme.tvTypography.title1.copy(textAlign = TextAlign.Center),
             )
             TvSignInQrContent(
                 userCode = userCode,
@@ -195,33 +194,27 @@ private fun signInSteps(verificationUri: String): List<String> {
 @Preview(device = Devices.TV_1080p)
 @Composable
 private fun TvSignInScreenLoadingPreview() {
-    AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
-        MaterialTheme {
-            TvSignInLoading()
-        }
+    TvTheme {
+        TvSignInLoading()
     }
 }
 
 @Preview(device = Devices.TV_1080p)
 @Composable
 private fun TvSignInScreenErrorPreview() {
-    AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
-        MaterialTheme {
-            TvSignInError(onRetry = {})
-        }
+    TvTheme {
+        TvSignInError(onRetry = {})
     }
 }
 
 @Preview(device = Devices.TV_1080p)
 @Composable
 private fun TvSignInScreenContentPreview() {
-    AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
-        MaterialTheme {
-            TvSignInContent(
-                userCode = listOf("J", "M", "R", "3", "W", "2"),
-                verificationUri = "https://pocketcasts.com/pair",
-                verificationUriComplete = "https://pocketcasts.com/pair?code=JMR3W2",
-            )
-        }
+    TvTheme {
+        TvSignInContent(
+            userCode = listOf("J", "M", "R", "3", "W", "2"),
+            verificationUri = "https://pocketcasts.com/pair",
+            verificationUriComplete = "https://pocketcasts.com/pair?code=JMR3W2",
+        )
     }
 }

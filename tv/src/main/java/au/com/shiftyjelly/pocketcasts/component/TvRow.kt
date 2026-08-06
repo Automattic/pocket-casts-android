@@ -35,9 +35,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
-import au.com.shiftyjelly.pocketcasts.compose.AppTheme
-import au.com.shiftyjelly.pocketcasts.theme.TvColors
-import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.theme.TvTheme
+import au.com.shiftyjelly.pocketcasts.theme.tvColors
 
 private const val TITLE_UNFOCUSED_SIZE = 17f
 private const val TITLE_FOCUSED_SIZE = 21f
@@ -66,7 +65,7 @@ fun <T> TvRow(
     ) {
         Text(
             text = title,
-            color = TvColors.TextPrimary,
+            color = MaterialTheme.tvColors.textPrimary,
             style = TextStyle(
                 fontSize = titleSize.sp,
                 fontWeight = FontWeight(500),
@@ -115,25 +114,23 @@ fun <T> TvRow(
 @Preview(device = Devices.TV_1080p, showBackground = true)
 @Composable
 private fun TvRowPreview() {
-    AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
-        MaterialTheme {
-            Box(modifier = Modifier.background(TvColors.BackgroundSunken)) {
-                TvRow(
-                    title = "Recently Played",
-                    items = (1..8).toList(),
-                ) { index ->
-                    TvTile(onClick = {}) {
-                        Box(
-                            modifier = Modifier
-                                .size(160.dp, 100.dp)
-                                .padding(12.dp),
-                            contentAlignment = Alignment.BottomStart,
-                        ) {
-                            Text(
-                                text = "Tile $index",
-                                color = Color.White,
-                            )
-                        }
+    TvTheme {
+        Box(modifier = Modifier.background(MaterialTheme.tvColors.backgroundSunken)) {
+            TvRow(
+                title = "Recently Played",
+                items = (1..8).toList(),
+            ) { index ->
+                TvTile(onClick = {}) {
+                    Box(
+                        modifier = Modifier
+                            .size(160.dp, 100.dp)
+                            .padding(12.dp),
+                        contentAlignment = Alignment.BottomStart,
+                    ) {
+                        Text(
+                            text = "Tile $index",
+                            color = Color.White,
+                        )
                     }
                 }
             }

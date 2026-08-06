@@ -37,13 +37,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
-import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
-import au.com.shiftyjelly.pocketcasts.theme.TvColors
-import au.com.shiftyjelly.pocketcasts.theme.TvTextStyles
-import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.theme.TvTheme
+import au.com.shiftyjelly.pocketcasts.theme.tvColors
+import au.com.shiftyjelly.pocketcasts.theme.tvTypography
 import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -125,14 +124,14 @@ private fun InfoRow(
     Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
         Text(
             text = label,
-            style = TvTextStyles.Caption2,
-            color = TvColors.TextSecondary,
+            style = MaterialTheme.tvTypography.caption2,
+            color = MaterialTheme.tvColors.textSecondary,
         )
         Text(
             text = value,
-            style = TvTextStyles.Caption2,
+            style = MaterialTheme.tvTypography.caption2,
             fontWeight = FontWeight.Medium,
-            color = TvColors.TextPrimary,
+            color = MaterialTheme.tvColors.textPrimary,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
         )
@@ -173,20 +172,20 @@ private fun PodcastDescriptionPane(
         if (podcast.author.isNotBlank()) {
             Text(
                 text = podcast.author,
-                style = TvTextStyles.Caption2,
-                color = TvColors.TextSecondary,
+                style = MaterialTheme.tvTypography.caption2,
+                color = MaterialTheme.tvColors.textSecondary,
             )
         }
         Text(
             text = podcast.title,
-            style = TvTextStyles.Headline,
-            color = TvColors.TextPrimary,
+            style = MaterialTheme.tvTypography.headline,
+            color = MaterialTheme.tvColors.textPrimary,
         )
         if (podcast.podcastDescription.isNotBlank()) {
             Text(
                 text = podcast.podcastDescription,
-                style = TvTextStyles.Caption2,
-                color = TvColors.TextSecondary,
+                style = MaterialTheme.tvTypography.caption2,
+                color = MaterialTheme.tvColors.textSecondary,
             )
         }
     }
@@ -227,24 +226,22 @@ private val InfoArtworkSize = 96.dp
 @Preview
 @Composable
 private fun TvPodcastInfoModalPreview() {
-    AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
-        MaterialTheme {
-            TvModalSurface(width = InfoModalWidth) {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(38.dp),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(InfoModalHeight),
-                ) {
-                    PodcastInfoPane(
-                        podcast = previewPodcast,
-                        modifier = Modifier.width(InfoPaneWidth),
-                    )
-                    PodcastDescriptionPane(
-                        podcast = previewPodcast,
-                        modifier = Modifier.weight(1f).fillMaxHeight(),
-                    )
-                }
+    TvTheme {
+        TvModalSurface(width = InfoModalWidth) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(38.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(InfoModalHeight),
+            ) {
+                PodcastInfoPane(
+                    podcast = previewPodcast,
+                    modifier = Modifier.width(InfoPaneWidth),
+                )
+                PodcastDescriptionPane(
+                    podcast = previewPodcast,
+                    modifier = Modifier.weight(1f).fillMaxHeight(),
+                )
             }
         }
     }

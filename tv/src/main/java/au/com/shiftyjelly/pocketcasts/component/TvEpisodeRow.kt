@@ -33,14 +33,13 @@ import androidx.tv.material3.CardDefaults
 import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
-import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
-import au.com.shiftyjelly.pocketcasts.theme.TvColors
-import au.com.shiftyjelly.pocketcasts.theme.TvTextStyles
-import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.theme.TvTheme
+import au.com.shiftyjelly.pocketcasts.theme.tvColors
+import au.com.shiftyjelly.pocketcasts.theme.tvTypography
 import java.util.Date
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
@@ -53,16 +52,20 @@ fun TvEpisodeRow(
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
-    val titleColor = if (isFocused) TvColors.TextPrimaryActive else TvColors.TextPrimary
-    val captionColor = if (isFocused) TvColors.TextSecondaryActive else TvColors.TextSecondary
+    val titleColor = if (isFocused) MaterialTheme.tvColors.textPrimaryActive else MaterialTheme.tvColors.textPrimary
+    val captionColor = if (isFocused) {
+        MaterialTheme.tvColors.textSecondaryActive
+    } else {
+        MaterialTheme.tvColors.textSecondary
+    }
 
     TvTile(
         onClick = onClick,
         scale = CardDefaults.scale(focusedScale = 1.02f),
         shape = CardDefaults.shape(RoundedCornerShape(8.dp)),
         colors = CardDefaults.colors(
-            containerColor = TvColors.BackgroundBase,
-            focusedContainerColor = TvColors.BackgroundActive,
+            containerColor = MaterialTheme.tvColors.backgroundBase,
+            focusedContainerColor = MaterialTheme.tvColors.backgroundActive,
         ),
         interactionSource = interactionSource,
         modifier = modifier.alpha(if (episode.isArchived && !isFocused) 0.3f else 1f),
@@ -90,13 +93,13 @@ fun TvEpisodeRow(
                     }
                     Text(
                         text = episode.rememberPublishedDateText(dateFormatter),
-                        style = TvTextStyles.Caption2,
+                        style = MaterialTheme.tvTypography.caption2,
                         color = captionColor,
                     )
                 }
                 Text(
                     text = episode.title,
-                    style = TvTextStyles.Callout,
+                    style = MaterialTheme.tvTypography.callout,
                     color = titleColor,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
@@ -107,7 +110,7 @@ fun TvEpisodeRow(
                 ) {
                     Text(
                         text = episode.rememberPlaybackTimeText(),
-                        style = TvTextStyles.Caption2,
+                        style = MaterialTheme.tvTypography.caption2,
                         color = captionColor,
                     )
                     if (episode.isInProgress && episode.duration > 0.0) {
@@ -184,19 +187,17 @@ private fun PodcastEpisode.rememberPlaybackTimeText(): String {
 @Preview(device = Devices.TV_1080p)
 @Composable
 private fun TvEpisodeRowPreview() {
-    AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
-        MaterialTheme {
-            TvEpisodeRow(
-                episode = PodcastEpisode(
-                    uuid = "episode-uuid",
-                    title = "A very long episode title that spans over multiple lines to test the ellipsis",
-                    duration = 6000.0,
-                    playedUpTo = 1200.0,
-                    publishedDate = Date(0),
-                ),
-                onClick = {},
-                dateFormatter = RelativeDateFormatter(LocalContext.current),
-            )
-        }
+    TvTheme {
+        TvEpisodeRow(
+            episode = PodcastEpisode(
+                uuid = "episode-uuid",
+                title = "A very long episode title that spans over multiple lines to test the ellipsis",
+                duration = 6000.0,
+                playedUpTo = 1200.0,
+                publishedDate = Date(0),
+            ),
+            onClick = {},
+            dateFormatter = RelativeDateFormatter(LocalContext.current),
+        )
     }
 }

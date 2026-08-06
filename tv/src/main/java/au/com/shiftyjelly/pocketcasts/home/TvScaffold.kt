@@ -25,15 +25,13 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.tv.material3.MaterialTheme
 import au.com.shiftyjelly.pocketcasts.component.LocalTvTopBarVisibility
 import au.com.shiftyjelly.pocketcasts.component.TvTopBarVisibility
-import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.playlists.TvPlaylistsScreen
 import au.com.shiftyjelly.pocketcasts.podcasts.TvYourPodcastsScreen
 import au.com.shiftyjelly.pocketcasts.theme.TvScreenBackgroundBrush
+import au.com.shiftyjelly.pocketcasts.theme.TvTheme
 import au.com.shiftyjelly.pocketcasts.theme.TvTopBarHeight
-import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.upnext.TvUpNextScreen
 
 @Composable
@@ -163,20 +161,18 @@ private const val TAB_CONTENT_ANIMATION_MILLIS = 300
 @Preview(device = Devices.TV_1080p)
 @Composable
 private fun TvScaffoldPreview() {
-    AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
-        MaterialTheme {
-            var selectedIndex by remember { mutableIntStateOf(0) }
-            TvScaffoldContent(
-                tabs = TvTab.entries,
-                selectedTabIndex = selectedIndex,
-                profile = TvProfileState.SignedOut,
-                isTopBarVisible = true,
-                onTabSelect = { selectedIndex = it },
-                onProfileClick = {},
-            ) { tab ->
-                Box(modifier = Modifier.fillMaxSize().padding(top = TvTopBarHeight)) {
-                    TvTabPlaceholder(tab = tab)
-                }
+    TvTheme {
+        var selectedIndex by remember { mutableIntStateOf(0) }
+        TvScaffoldContent(
+            tabs = TvTab.entries,
+            selectedTabIndex = selectedIndex,
+            profile = TvProfileState.SignedOut,
+            isTopBarVisible = true,
+            onTabSelect = { selectedIndex = it },
+            onProfileClick = {},
+        ) { tab ->
+            Box(modifier = Modifier.fillMaxSize().padding(top = TvTopBarHeight)) {
+                TvTabPlaceholder(tab = tab)
             }
         }
     }

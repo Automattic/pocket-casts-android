@@ -43,14 +43,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeInfoViewModel.ShowNotes
-import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
-import au.com.shiftyjelly.pocketcasts.theme.TvColors
-import au.com.shiftyjelly.pocketcasts.theme.TvTextStyles
-import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.theme.TvTheme
+import au.com.shiftyjelly.pocketcasts.theme.tvColors
+import au.com.shiftyjelly.pocketcasts.theme.tvTypography
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -92,9 +91,9 @@ private fun ColumnScope.TvEpisodeInfoModalContent(
     EpisodeHeader(episode = episode, podcastTitle = podcastTitle, context = context)
     Text(
         text = stringResource(LR.string.tv_episode_details),
-        style = TvTextStyles.Callout,
+        style = MaterialTheme.tvTypography.callout,
         fontWeight = FontWeight.SemiBold,
-        color = TvColors.TextPrimary,
+        color = MaterialTheme.tvColors.textPrimary,
         modifier = Modifier.fillMaxWidth(),
     )
     EpisodeDescriptionPane(
@@ -125,21 +124,21 @@ private fun EpisodeHeader(
             if (!podcastTitle.isNullOrBlank()) {
                 Text(
                     text = podcastTitle,
-                    style = TvTextStyles.Caption2,
-                    color = TvColors.TextSecondary,
+                    style = MaterialTheme.tvTypography.caption2,
+                    color = MaterialTheme.tvColors.textSecondary,
                 )
             }
             Text(
                 text = episode.title,
-                style = TvTextStyles.Headline,
-                color = TvColors.TextPrimary,
+                style = MaterialTheme.tvTypography.headline,
+                color = MaterialTheme.tvColors.textPrimary,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
             )
             Text(
                 text = remember(episode.publishedDate, episode.durationMs) { episode.metadataLine(context) },
-                style = TvTextStyles.Caption2,
-                color = TvColors.TextSecondary,
+                style = MaterialTheme.tvTypography.caption2,
+                color = MaterialTheme.tvColors.textSecondary,
             )
         }
     }
@@ -177,19 +176,19 @@ private fun EpisodeDescriptionPane(
             .then(if (isScrollable) Modifier.verticalScroll(scrollState) else Modifier),
     ) {
         when (showNotes) {
-            is ShowNotes.Loading -> LoadingView(color = TvColors.TextPrimary)
+            is ShowNotes.Loading -> LoadingView(color = MaterialTheme.tvColors.textPrimary)
 
             is ShowNotes.Loaded -> Text(
                 text = remember(showNotes.html) { AnnotatedString.fromHtml(showNotes.html) },
-                style = TvTextStyles.Caption2,
-                color = TvColors.TextSecondary,
+                style = MaterialTheme.tvTypography.caption2,
+                color = MaterialTheme.tvColors.textSecondary,
                 modifier = Modifier.fillMaxWidth(),
             )
 
             is ShowNotes.Unavailable -> Text(
                 text = stringResource(LR.string.error_loading_show_notes),
-                style = TvTextStyles.Caption2,
-                color = TvColors.TextSecondary,
+                style = MaterialTheme.tvTypography.caption2,
+                color = MaterialTheme.tvColors.textSecondary,
             )
         }
     }
@@ -213,24 +212,22 @@ private val DescriptionHeight = 240.dp
 @Preview
 @Composable
 private fun TvEpisodeInfoModalPreview() {
-    AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
-        MaterialTheme {
-            TvModalSurface(width = EpisodeInfoModalWidth) {
-                TvEpisodeInfoModalContent(
-                    episode = PodcastEpisode(
-                        uuid = "episode-uuid",
-                        title = "Cassandra Neyenesch Reads \"Enough for Now\"",
-                        podcastUuid = "podcast-uuid",
-                        duration = 1560.0,
-                        publishedDate = Date(0),
-                    ),
-                    podcastTitle = "The Writer's Voice",
-                    showNotes = ShowNotes.Loaded(
-                        html = "Our sense of smell is often dismissed as our less important than sight and hearing, " +
-                            "but what if it's quietly shaping our memories, mood and long-term brain health?",
-                    ),
-                )
-            }
+    TvTheme {
+        TvModalSurface(width = EpisodeInfoModalWidth) {
+            TvEpisodeInfoModalContent(
+                episode = PodcastEpisode(
+                    uuid = "episode-uuid",
+                    title = "Cassandra Neyenesch Reads \"Enough for Now\"",
+                    podcastUuid = "podcast-uuid",
+                    duration = 1560.0,
+                    publishedDate = Date(0),
+                ),
+                podcastTitle = "The Writer's Voice",
+                showNotes = ShowNotes.Loaded(
+                    html = "Our sense of smell is often dismissed as our less important than sight and hearing, " +
+                        "but what if it's quietly shaping our memories, mood and long-term brain health?",
+                ),
+            )
         }
     }
 }

@@ -41,11 +41,10 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
-import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.onboarding.welcome.artworkResIds
-import au.com.shiftyjelly.pocketcasts.theme.TvColors
-import au.com.shiftyjelly.pocketcasts.theme.TvTextStyles
-import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.theme.TvTheme
+import au.com.shiftyjelly.pocketcasts.theme.tvColors
+import au.com.shiftyjelly.pocketcasts.theme.tvTypography
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -80,7 +79,7 @@ private fun TvSyncingScreenContent(modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(TvColors.BackgroundSunken),
+            .background(MaterialTheme.tvColors.backgroundSunken),
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -95,14 +94,14 @@ private fun TvSyncingScreenContent(modifier: Modifier = Modifier) {
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = stringResource(LR.string.tv_onboarding_welcome_back),
-                color = TvColors.TextPrimary,
-                style = TvTextStyles.Title1.copy(textAlign = TextAlign.Center),
+                color = MaterialTheme.tvColors.textPrimary,
+                style = MaterialTheme.tvTypography.title1.copy(textAlign = TextAlign.Center),
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = stringResource(LR.string.tv_onboarding_syncing_subtitle),
-                color = TvColors.TextSecondary,
-                style = TvTextStyles.Headline.copy(textAlign = TextAlign.Center),
+                color = MaterialTheme.tvColors.textSecondary,
+                style = MaterialTheme.tvTypography.headline.copy(textAlign = TextAlign.Center),
             )
             Spacer(modifier = Modifier.height(40.dp))
             TvSyncingCoverRow(
@@ -152,9 +151,7 @@ private fun TvSyncingCoverRow(modifier: Modifier = Modifier) {
 @Preview(device = Devices.TV_1080p)
 @Composable
 private fun TvSyncingScreenPreview() {
-    AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
-        MaterialTheme {
-            TvSyncingScreenContent()
-        }
+    TvTheme {
+        TvSyncingScreenContent()
     }
 }

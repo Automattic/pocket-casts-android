@@ -19,10 +19,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.qr.rememberQrPainter
-import au.com.shiftyjelly.pocketcasts.theme.TvColors
-import au.com.shiftyjelly.pocketcasts.theme.TvTextStyles
+import au.com.shiftyjelly.pocketcasts.theme.tvColors
+import au.com.shiftyjelly.pocketcasts.theme.tvTypography
 
 @Composable
 fun TvSignInQrContent(
@@ -89,19 +90,19 @@ private fun StepRow(number: Int, text: String, modifier: Modifier = Modifier) {
             contentAlignment = Alignment.Center,
             modifier = Modifier
                 .size(28.dp)
-                .background(TvColors.BackgroundActive20, CircleShape),
+                .background(MaterialTheme.tvColors.backgroundActive20, CircleShape),
         ) {
             Text(
                 text = number.toString(),
-                color = TvColors.TextSecondary,
+                color = MaterialTheme.tvColors.textSecondary,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,
             )
         }
         Text(
             text = text,
-            color = TvColors.TextPrimary,
-            style = TvTextStyles.Body,
+            color = MaterialTheme.tvColors.textPrimary,
+            style = MaterialTheme.tvTypography.body,
         )
     }
 }
@@ -117,11 +118,11 @@ private fun CodeRow(userCode: List<String>, modifier: Modifier = Modifier) {
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .size(44.dp)
-                    .background(TvColors.BackgroundActive20, CircleShape),
+                    .background(MaterialTheme.tvColors.backgroundActive20, CircleShape),
             ) {
                 Text(
                     text = character,
-                    color = TvColors.TextSecondary,
+                    color = MaterialTheme.tvColors.textSecondary,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                 )
