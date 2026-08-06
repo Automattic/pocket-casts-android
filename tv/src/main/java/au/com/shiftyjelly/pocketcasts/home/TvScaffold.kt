@@ -54,11 +54,11 @@ fun TvScaffold(
             isTopBarVisible = topBarVisibility.isVisible,
             autoFocusSelectedTab = !didFocusTopBar,
             onSelectedTabFocus = { didFocusTopBar = true },
-            onTabSelect = viewModel::selectTab,
+            onTabSelect = { index -> uiState.tabs.getOrNull(index)?.let(viewModel::selectTab) },
             onProfileClick = { isProfileModalVisible = true },
             modifier = modifier,
         ) { tab ->
-            val navigateToHome = { viewModel.selectTab(TvTab.entries.indexOf(TvTab.Home)) }
+            val navigateToHome = { viewModel.selectTab(TvTab.Home) }
             // Tabs without a detail screen sit below the bar; the detail-bearing tabs pad their own
             // content so their overlays can fill the full height.
             val belowTopBar = Modifier.fillMaxSize().padding(top = TvTopBarHeight)
