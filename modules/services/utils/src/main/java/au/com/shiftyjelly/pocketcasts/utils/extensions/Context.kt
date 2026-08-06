@@ -10,7 +10,9 @@ import android.view.accessibility.AccessibilityManager
 import androidx.appcompat.app.AppCompatActivity
 
 fun Context.getLaunchActivityPendingIntent(): PendingIntent {
+    // TV builds declare only a LEANBACK_LAUNCHER activity, which getLaunchIntentForPackage does not resolve.
     val intent = packageManager.getLaunchIntentForPackage(packageName)
+        ?: packageManager.getLeanbackLaunchIntentForPackage(packageName)
     return PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
 }
 
