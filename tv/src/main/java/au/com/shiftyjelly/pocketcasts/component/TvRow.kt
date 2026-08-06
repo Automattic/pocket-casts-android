@@ -69,7 +69,7 @@ fun <T> TvRow(
             color = TvColors.TextPrimary,
             style = TextStyle(
                 fontSize = titleSize.sp,
-                fontWeight = FontWeight(510),
+                fontWeight = FontWeight(500),
                 platformStyle = PlatformTextStyle(includeFontPadding = false),
             ),
             modifier = Modifier
