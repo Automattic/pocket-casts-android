@@ -68,8 +68,10 @@ private fun ColumnScope.TvEpisodeActionsModalContent(
     }
 
     val toastHostState = LocalTvToastHostState.current
+    val openNowPlaying = LocalOpenNowPlaying.current
     val source = actionContext.source
 
+    val play = stringResource(LR.string.play)
     val episodeDetails = stringResource(LR.string.tv_episode_details)
     val goToPodcast = stringResource(LR.string.go_to_podcast)
     val playNext = stringResource(LR.string.add_to_up_next_top)
@@ -96,6 +98,12 @@ private fun ColumnScope.TvEpisodeActionsModalContent(
 
     val buttons = tvEpisodeActionTypes(actionContext, showGoToPodcast = onGoToPodcast != null).map { button ->
         when (button) {
+            TvEpisodeActionType.Play -> play to {
+                actions.play(episode, source)
+                onDismissRequest()
+                openNowPlaying()
+            }
+
             TvEpisodeActionType.Details -> episodeDetails to onShowEpisodeDetails
 
             TvEpisodeActionType.GoToPodcast -> goToPodcast to {
@@ -136,6 +144,7 @@ private fun ColumnScope.TvEpisodeActionsModalContent(
 }
 
 internal enum class TvEpisodeActionType {
+    Play,
     Details,
     GoToPodcast,
     PlayNext,
@@ -149,12 +158,17 @@ internal fun tvEpisodeActionTypes(
     actionContext: TvEpisodeActionContext,
     showGoToPodcast: Boolean,
 ): List<TvEpisodeActionType> = buildList {
+    if (actionContext != TvEpisodeActionContext.NowPlaying) {
+        add(TvEpisodeActionType.Play)
+    }
     add(TvEpisodeActionType.Details)
     if (showGoToPodcast) {
         add(TvEpisodeActionType.GoToPodcast)
     }
-    add(TvEpisodeActionType.PlayNext)
-    add(TvEpisodeActionType.PlayLast)
+    if (actionContext != TvEpisodeActionContext.NowPlaying) {
+        add(TvEpisodeActionType.PlayNext)
+        add(TvEpisodeActionType.PlayLast)
+    }
     if (actionContext == TvEpisodeActionContext.UpNext) {
         add(TvEpisodeActionType.RemoveFromUpNext)
     } else {
@@ -232,7 +246,10 @@ private fun TvEpisodeActionsModalPreviewContent(
     actionContext: TvEpisodeActionContext,
 ) {
     TvTheme {
-        CompositionLocalProvider(LocalTvToastHostState provides remember { TvToastHostState() }) {
+        CompositionLocalProvider(
+            LocalTvToastHostState provides remember { TvToastHostState() },
+            LocalOpenNowPlaying provides {},
+        ) {
             TvModalSurface(contentPadding = ContentPadding) {
                 TvEpisodeActionsModalContent(
                     episode = episode,
@@ -248,6 +265,7 @@ private fun TvEpisodeActionsModalPreviewContent(
 }
 
 private object NoOpTvEpisodeActions : TvEpisodeActions {
+    override fun play(episode: PodcastEpisode, source: SourceView) = Unit
     override fun playNext(episode: PodcastEpisode, source: SourceView) = Unit
     override fun playLast(episode: PodcastEpisode, source: SourceView) = Unit
     override fun markAsPlayed(episode: PodcastEpisode) = Unit

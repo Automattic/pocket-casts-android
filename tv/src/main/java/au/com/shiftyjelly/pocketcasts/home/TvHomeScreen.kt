@@ -31,6 +31,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.OutlinedButton
 import androidx.tv.material3.Text
+import au.com.shiftyjelly.pocketcasts.component.LocalOpenNowPlaying
+import au.com.shiftyjelly.pocketcasts.component.LocalTvToastHostState
 import au.com.shiftyjelly.pocketcasts.component.TvDetailOverlay
 import au.com.shiftyjelly.pocketcasts.component.TvFeaturedTile
 import au.com.shiftyjelly.pocketcasts.component.TvPodcastTile
@@ -56,11 +58,23 @@ fun TvHomeScreen(
     var restoreFocusTrigger by remember { mutableIntStateOf(0) }
 
     val podcastUuid = openedPodcastUuid
+    val openNowPlaying = LocalOpenNowPlaying.current
+    val toastHostState = LocalTvToastHostState.current
+    val playFailedMessage = stringResource(LR.string.error_generic_message)
+    LaunchedEffect(Unit) {
+        viewModel.playFailures.collect {
+            toastHostState.show(playFailedMessage)
+        }
+    }
     Box(modifier = modifier.fillMaxSize()) {
         TvHomeContent(
             uiState = uiState,
             onRetry = viewModel::load,
             onOpenPodcast = { openedPodcastUuid = it },
+            onPlayEpisode = { episode ->
+                viewModel.playEpisode(episode)
+                openNowPlaying()
+            },
             modifier = Modifier
                 .fillMaxSize()
                 .padding(top = TvTopBarHeight)
@@ -85,6 +99,7 @@ private fun TvHomeContent(
     uiState: TvHomeUiState,
     onRetry: () -> Unit,
     onOpenPodcast: (String) -> Unit,
+    onPlayEpisode: (TvHomeEpisode) -> Unit,
     modifier: Modifier = Modifier,
     restoreFocusTrigger: Int = 0,
 ) {
@@ -99,6 +114,7 @@ private fun TvHomeContent(
             TvHomeRows(
                 rows = uiState.rows,
                 onOpenPodcast = onOpenPodcast,
+                onPlayEpisode = onPlayEpisode,
                 modifier = modifier,
                 restoreFocusTrigger = restoreFocusTrigger,
             )
@@ -133,6 +149,7 @@ private fun TvHomeError(
 private fun TvHomeRows(
     rows: List<TvHomeRow>,
     onOpenPodcast: (String) -> Unit,
+    onPlayEpisode: (TvHomeEpisode) -> Unit,
     modifier: Modifier = Modifier,
     restoreFocusTrigger: Int = 0,
 ) {
@@ -197,7 +214,7 @@ private fun TvHomeRows(
                             podcastArtworkUrl = episode.podcastArtworkUrl,
                             podcastTitle = episode.podcastTitle,
                             episodeTitle = episode.episodeTitle,
-                            onPlayEpisode = {},
+                            onPlayEpisode = { onPlayEpisode(episode) },
                             onGoToPodcast = { onOpenPodcast(episode.podcastUuid) },
                         )
                     }
@@ -260,6 +277,7 @@ private fun TvHomeContentPreview() {
                 ),
                 onRetry = {},
                 onOpenPodcast = {},
+                onPlayEpisode = {},
             )
         }
     }
@@ -274,6 +292,7 @@ private fun TvHomeErrorPreview() {
                 uiState = TvHomeUiState.Error,
                 onRetry = {},
                 onOpenPodcast = {},
+                onPlayEpisode = {},
             )
         }
     }

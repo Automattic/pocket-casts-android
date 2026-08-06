@@ -3,7 +3,7 @@ package au.com.shiftyjelly.pocketcasts
 import android.app.Application
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
-import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.utils.TimberDebugTree
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
@@ -20,7 +20,7 @@ class TvApplication :
 
     @Inject lateinit var workerFactory: HiltWorkerFactory
 
-    @Inject lateinit var upNextQueue: UpNextQueue
+    @Inject lateinit var playbackManager: PlaybackManager
 
     private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
@@ -29,10 +29,10 @@ class TvApplication :
         if (BuildConfig.DEBUG) {
             Timber.plant(TimberDebugTree())
         }
-        // The only setupBlocking() call on TV; there is no PlaybackManager.setup() here,
-        // so calling it again would double-subscribe the queue's sync pipeline.
+        // setup() subscribes the Up Next queue's sync pipeline itself, so there must be no
+        // separate UpNextQueue.setupBlocking() call on TV.
         applicationScope.launch {
-            upNextQueue.setupBlocking()
+            playbackManager.setup()
         }
     }
 

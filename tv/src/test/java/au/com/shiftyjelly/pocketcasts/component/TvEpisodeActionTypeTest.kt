@@ -12,6 +12,7 @@ class TvEpisodeActionTypeTest {
 
         assertEquals(
             listOf(
+                TvEpisodeActionType.Play,
                 TvEpisodeActionType.Details,
                 TvEpisodeActionType.PlayNext,
                 TvEpisodeActionType.PlayLast,
@@ -28,6 +29,7 @@ class TvEpisodeActionTypeTest {
 
         assertEquals(
             listOf(
+                TvEpisodeActionType.Play,
                 TvEpisodeActionType.Details,
                 TvEpisodeActionType.GoToPodcast,
                 TvEpisodeActionType.PlayNext,
@@ -45,11 +47,27 @@ class TvEpisodeActionTypeTest {
 
         assertEquals(
             listOf(
+                TvEpisodeActionType.Play,
                 TvEpisodeActionType.Details,
                 TvEpisodeActionType.GoToPodcast,
                 TvEpisodeActionType.PlayNext,
                 TvEpisodeActionType.PlayLast,
                 TvEpisodeActionType.RemoveFromUpNext,
+            ),
+            actions,
+        )
+    }
+
+    @Test
+    fun `now playing shows the current episode actions without play or queue actions`() {
+        val actions = tvEpisodeActionTypes(TvEpisodeActionContext.NowPlaying, showGoToPodcast = true)
+
+        assertEquals(
+            listOf(
+                TvEpisodeActionType.Details,
+                TvEpisodeActionType.GoToPodcast,
+                TvEpisodeActionType.TogglePlayed,
+                TvEpisodeActionType.ToggleArchived,
             ),
             actions,
         )

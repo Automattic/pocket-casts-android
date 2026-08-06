@@ -2203,7 +2203,8 @@ open class PlaybackManager @Inject constructor(
         if (playingStream) {
             if (!Util.isCarUiMode(application) &&
                 !Util.isWearOs(application) &&
-                // The watch handles these warnings before this is called
+                // The watch handles these warnings before this is called; TV has no data-warning UI
+                !Util.isTv(application) &&
                 settings.warnOnMeteredNetwork.value &&
                 episode.uuid != lastWarnedPlayedEpisodeUuid &&
                 !Network.isUnmeteredConnection(application) &&

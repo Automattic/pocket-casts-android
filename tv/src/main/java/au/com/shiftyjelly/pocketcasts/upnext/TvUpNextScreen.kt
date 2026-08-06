@@ -33,6 +33,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import au.com.shiftyjelly.pocketcasts.component.LocalOpenNowPlaying
 import au.com.shiftyjelly.pocketcasts.component.TvEmptyState
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeActionContext
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeActionsModal
@@ -72,10 +73,15 @@ fun TvUpNextScreen(
             modifier = modifier,
         )
     } else {
+        val openNowPlaying = LocalOpenNowPlaying.current
         TvUpNextContent(
             uiState = uiState,
             onNavigateToHome = onNavigateToHome,
             onOpenPodcast = { openedPodcastUuid = it },
+            onPlayEpisode = { episode ->
+                viewModel.play(episode)
+                openNowPlaying()
+            },
             modifier = modifier,
         )
     }
@@ -86,6 +92,7 @@ private fun TvUpNextContent(
     uiState: TvUpNextUiState,
     onNavigateToHome: () -> Unit,
     onOpenPodcast: (String) -> Unit,
+    onPlayEpisode: (PodcastEpisode) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(modifier = modifier.fillMaxSize()) {
@@ -105,6 +112,7 @@ private fun TvUpNextContent(
                 UpNextList(
                     episodes = uiState.episodes,
                     onOpenPodcast = onOpenPodcast,
+                    onPlayEpisode = onPlayEpisode,
                 )
             }
         }
@@ -115,6 +123,7 @@ private fun TvUpNextContent(
 private fun UpNextList(
     episodes: List<PodcastEpisode>,
     onOpenPodcast: (String) -> Unit,
+    onPlayEpisode: (PodcastEpisode) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -145,7 +154,7 @@ private fun UpNextList(
                 TvEpisodeListItem(
                     episode = episode,
                     dateFormatter = dateFormatter,
-                    onClick = {},
+                    onClick = { onPlayEpisode(episode) },
                     onOpenActions = {
                         focus.watchForRemoval(episodes, index)
                         actionsEpisode = episode
@@ -244,6 +253,7 @@ private fun TvUpNextLoadedPreview() {
                 ),
                 onNavigateToHome = {},
                 onOpenPodcast = {},
+                onPlayEpisode = {},
             )
         }
     }
@@ -258,6 +268,7 @@ private fun TvUpNextEmptyPreview() {
                 uiState = TvUpNextUiState.Empty,
                 onNavigateToHome = {},
                 onOpenPodcast = {},
+                onPlayEpisode = {},
             )
         }
     }
