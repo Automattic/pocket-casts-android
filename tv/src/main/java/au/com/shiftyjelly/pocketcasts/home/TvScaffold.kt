@@ -25,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import au.com.shiftyjelly.pocketcasts.component.LocalOpenNowPlaying
 import au.com.shiftyjelly.pocketcasts.component.LocalTvTopBarVisibility
 import au.com.shiftyjelly.pocketcasts.component.TvTopBarVisibility
 import au.com.shiftyjelly.pocketcasts.playlists.TvPlaylistsScreen
@@ -46,7 +47,10 @@ fun TvScaffold(
     val topBarVisibility = remember { TvTopBarVisibility() }
     var didFocusTopBar by rememberSaveable { mutableStateOf(false) }
 
-    CompositionLocalProvider(LocalTvTopBarVisibility provides topBarVisibility) {
+    CompositionLocalProvider(
+        LocalTvTopBarVisibility provides topBarVisibility,
+        LocalOpenNowPlaying provides viewModel::openNowPlaying,
+    ) {
         TvScaffoldContent(
             tabs = uiState.tabs,
             selectedTabIndex = uiState.selectedTabIndex,
