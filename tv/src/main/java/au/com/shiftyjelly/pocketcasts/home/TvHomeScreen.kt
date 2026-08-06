@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.home
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -8,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
@@ -27,16 +27,18 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.OutlinedButton
 import androidx.tv.material3.Text
-import au.com.shiftyjelly.pocketcasts.component.HideTvTopBar
+import au.com.shiftyjelly.pocketcasts.component.TvDetailOverlay
 import au.com.shiftyjelly.pocketcasts.component.TvFeaturedTile
 import au.com.shiftyjelly.pocketcasts.component.TvPodcastTile
 import au.com.shiftyjelly.pocketcasts.component.TvPodcastTileDefaults
 import au.com.shiftyjelly.pocketcasts.component.TvRow
 import au.com.shiftyjelly.pocketcasts.component.TvVideoTile
+import au.com.shiftyjelly.pocketcasts.component.tvFocusInactiveWhen
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.podcasts.TvPodcastDetailsScreen
 import au.com.shiftyjelly.pocketcasts.theme.TvColors
+import au.com.shiftyjelly.pocketcasts.theme.TvTopBarHeight
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -49,21 +51,25 @@ fun TvHomeScreen(
     var openedPodcastUuid by rememberSaveable { mutableStateOf<String?>(null) }
 
     val podcastUuid = openedPodcastUuid
-    if (podcastUuid != null) {
-        HideTvTopBar()
-        BackHandler { openedPodcastUuid = null }
-        TvPodcastDetailsScreen(
-            podcastUuid = podcastUuid,
-            onClose = { openedPodcastUuid = null },
-            modifier = modifier,
-        )
-    } else {
+    Box(modifier = modifier.fillMaxSize()) {
         TvHomeContent(
             uiState = uiState,
             onRetry = viewModel::load,
             onOpenPodcast = { openedPodcastUuid = it },
-            modifier = modifier,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = TvTopBarHeight)
+                .tvFocusInactiveWhen(podcastUuid != null),
         )
+        TvDetailOverlay(
+            target = podcastUuid,
+            onBack = { openedPodcastUuid = null },
+        ) { uuid ->
+            TvPodcastDetailsScreen(
+                podcastUuid = uuid,
+                onClose = { openedPodcastUuid = null },
+            )
+        }
     }
 }
 

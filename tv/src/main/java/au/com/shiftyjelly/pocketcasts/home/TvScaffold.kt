@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.home
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -22,12 +21,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.MaterialTheme
@@ -36,7 +31,8 @@ import au.com.shiftyjelly.pocketcasts.component.TvTopBarVisibility
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.playlists.TvPlaylistsScreen
 import au.com.shiftyjelly.pocketcasts.podcasts.TvYourPodcastsScreen
-import au.com.shiftyjelly.pocketcasts.theme.TvColors
+import au.com.shiftyjelly.pocketcasts.theme.TvScreenBackgroundBrush
+import au.com.shiftyjelly.pocketcasts.theme.TvTopBarHeight
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.upnext.TvUpNextScreen
 
@@ -65,6 +61,9 @@ fun TvScaffold(
             modifier = modifier,
         ) { tab ->
             val navigateToHome = { viewModel.selectTab(TvTab.entries.indexOf(TvTab.Home)) }
+            // Tabs without a detail screen sit below the bar; the detail-bearing tabs pad their own
+            // content so their overlays can fill the full height.
+            val belowTopBar = Modifier.fillMaxSize().padding(top = TvTopBarHeight)
             when (tab) {
                 is TvTab.Home -> TvHomeScreen()
 
@@ -74,11 +73,13 @@ fun TvScaffold(
 
                 is TvTab.Playlists -> TvPlaylistsScreen()
 
-                is TvTab.UpNext -> TvUpNextScreen(
-                    onNavigateToHome = navigateToHome,
-                )
+                is TvTab.UpNext -> Box(modifier = belowTopBar) {
+                    TvUpNextScreen(onNavigateToHome = navigateToHome)
+                }
 
-                else -> TvTabPlaceholder(tab = tab)
+                else -> Box(modifier = belowTopBar) {
+                    TvTabPlaceholder(tab = tab)
+                }
             }
         }
 
@@ -119,34 +120,19 @@ private fun TvScaffoldContent(
     onSelectedTabFocus: () -> Unit = {},
     tabContent: @Composable (TvTab) -> Unit,
 ) {
-    val density = LocalDensity.current
-    var topBarHeight by remember { mutableStateOf(DEFAULT_TOP_BAR_HEIGHT) }
-    val contentTopPadding by animateDpAsState(
-        targetValue = if (isTopBarVisible) topBarHeight else HIDDEN_TOP_BAR_PADDING,
-        animationSpec = tween(durationMillis = TOP_BAR_ANIMATION_MILLIS, easing = FastOutSlowInEasing),
-        label = "TvTopBarPadding",
-    )
-
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(
-                Brush.horizontalGradient(
-                    colors = listOf(
-                        TvColors.DarkGray,
-                        TvColors.Dark,
-                    ),
-                ),
-            ),
+            .background(TvScreenBackgroundBrush),
     ) {
         val currentTab = tabs.getOrElse(selectedTabIndex) { tabs.first() }
+        // Tab content fills the whole area; top-level content reserves TvTopBarHeight for the bar,
+        // while detail overlays fill the full height under the hidden bar.
         Crossfade(
             targetState = currentTab,
             animationSpec = tween(durationMillis = TAB_CONTENT_ANIMATION_MILLIS, easing = FastOutSlowInEasing),
             label = "TvTabContent",
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(top = contentTopPadding),
+            modifier = Modifier.fillMaxSize(),
         ) { tab ->
             tabContent(tab)
         }
@@ -165,13 +151,7 @@ private fun TvScaffoldContent(
                 onProfileClick = onProfileClick,
                 autoFocusSelectedTab = autoFocusSelectedTab,
                 onSelectedTabFocus = onSelectedTabFocus,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .onSizeChanged { size ->
-                        if (size.height > 0) {
-                            topBarHeight = with(density) { size.height.toDp() }
-                        }
-                    },
+                modifier = Modifier.fillMaxWidth(),
             )
         }
     }
@@ -179,8 +159,6 @@ private fun TvScaffoldContent(
 
 private const val TOP_BAR_ANIMATION_MILLIS = 300
 private const val TAB_CONTENT_ANIMATION_MILLIS = 300
-private val DEFAULT_TOP_BAR_HEIGHT = 82.dp
-private val HIDDEN_TOP_BAR_PADDING = 32.dp
 
 @Preview(device = Devices.TV_1080p)
 @Composable
@@ -196,7 +174,9 @@ private fun TvScaffoldPreview() {
                 onTabSelect = { selectedIndex = it },
                 onProfileClick = {},
             ) { tab ->
-                TvTabPlaceholder(tab = tab)
+                Box(modifier = Modifier.fillMaxSize().padding(top = TvTopBarHeight)) {
+                    TvTabPlaceholder(tab = tab)
+                }
             }
         }
     }

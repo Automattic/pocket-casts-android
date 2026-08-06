@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.podcasts
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -10,6 +9,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -24,11 +24,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.MaterialTheme
-import au.com.shiftyjelly.pocketcasts.component.HideTvTopBar
+import au.com.shiftyjelly.pocketcasts.component.TvDetailOverlay
 import au.com.shiftyjelly.pocketcasts.component.TvEmptyState
 import au.com.shiftyjelly.pocketcasts.component.TvFolderCard
 import au.com.shiftyjelly.pocketcasts.component.TvPodcastGridScaffold
 import au.com.shiftyjelly.pocketcasts.component.TvPodcastTile
+import au.com.shiftyjelly.pocketcasts.component.tvFocusInactiveWhen
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
@@ -37,6 +38,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
 import au.com.shiftyjelly.pocketcasts.theme.TvColors
+import au.com.shiftyjelly.pocketcasts.theme.TvTopBarHeight
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import java.util.Date
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -53,37 +55,37 @@ fun TvYourPodcastsScreen(
 
     val podcastUuid = openedPodcastUuid
     val folder = openedFolder
-    when {
-        podcastUuid != null -> {
-            HideTvTopBar()
-            BackHandler { openedPodcastUuid = null }
-            TvPodcastDetailsScreen(
-                podcastUuid = podcastUuid,
-                onClose = { openedPodcastUuid = null },
-                modifier = modifier,
-            )
-        }
-
-        folder != null -> {
-            HideTvTopBar()
-            BackHandler { openedFolder = null }
+    Box(modifier = modifier.fillMaxSize()) {
+        TvYourPodcastsContent(
+            uiState = uiState,
+            onNavigateToHome = onNavigateToHome,
+            onOpenFolder = { openedFolder = OpenedFolder(it.uuid, it.name) },
+            onOpenPodcast = { openedPodcastUuid = it },
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = TvTopBarHeight)
+                .tvFocusInactiveWhen(folder != null || podcastUuid != null),
+        )
+        TvDetailOverlay(
+            target = folder,
+            onBack = { openedFolder = null },
+            modifier = Modifier.tvFocusInactiveWhen(podcastUuid != null),
+        ) { openFolder ->
             TvFolderDetailScreen(
-                folderUuid = folder.uuid,
-                folderName = folder.name,
+                folderUuid = openFolder.uuid,
+                folderName = openFolder.name,
                 getFolderPodcasts = viewModel::folderPodcasts,
                 onOpenPodcast = { openedPodcastUuid = it },
                 onClose = { openedFolder = null },
-                modifier = modifier,
             )
         }
-
-        else -> {
-            TvYourPodcastsContent(
-                uiState = uiState,
-                onNavigateToHome = onNavigateToHome,
-                onOpenFolder = { openedFolder = OpenedFolder(it.uuid, it.name) },
-                onOpenPodcast = { openedPodcastUuid = it },
-                modifier = modifier,
+        TvDetailOverlay(
+            target = podcastUuid,
+            onBack = { openedPodcastUuid = null },
+        ) { uuid ->
+            TvPodcastDetailsScreen(
+                podcastUuid = uuid,
+                onClose = { openedPodcastUuid = null },
             )
         }
     }
