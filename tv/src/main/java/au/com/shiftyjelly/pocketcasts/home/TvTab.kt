@@ -29,12 +29,12 @@ sealed class TvTab(@StringRes val contentDescriptionRes: Int) {
     data object Search : IconTab(contentDescriptionRes = LR.string.search, iconRes = IR.drawable.ic_search)
 
     companion object {
-        val entries: List<TvTab> = listOf(Home, YourPodcasts, Playlists, UpNext, Search)
+        // Built lazily: referencing the nested objects while the TvTab class hierarchy is still
+        // initializing (e.g. TvTab.Home being the first member touched) would capture them as null.
+        val entries: List<TvTab> by lazy { listOf(Home, YourPodcasts, Playlists, UpNext, Search) }
 
-        fun tabs(showNowPlaying: Boolean): List<TvTab> = if (showNowPlaying) {
-            listOf(Home, YourPodcasts, Playlists, UpNext, NowPlaying, Search)
-        } else {
-            entries
-        }
+        private val entriesWithNowPlaying: List<TvTab> by lazy { listOf(Home, YourPodcasts, Playlists, UpNext, NowPlaying, Search) }
+
+        fun tabs(showNowPlaying: Boolean): List<TvTab> = if (showNowPlaying) entriesWithNowPlaying else entries
     }
 }
