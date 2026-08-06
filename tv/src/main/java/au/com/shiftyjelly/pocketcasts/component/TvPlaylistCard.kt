@@ -11,6 +11,7 @@ import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -96,7 +97,7 @@ fun TvPlaylistCard(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(172.dp)
+                .aspectRatio(568f / 258f)
                 .background(backgroundColor),
         ) {
             Column(
@@ -106,7 +107,7 @@ fun TvPlaylistCard(
             ) {
                 Text(
                     text = title,
-                    style = TvTextStyles.Headline,
+                    style = TvTextStyles.Callout,
                     color = titleColor,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,

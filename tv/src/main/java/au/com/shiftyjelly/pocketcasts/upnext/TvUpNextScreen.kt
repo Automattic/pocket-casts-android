@@ -129,10 +129,10 @@ private fun UpNextList(
         modifier = modifier
             .fillMaxHeight()
             .fillMaxWidth(ROW_WIDTH_FRACTION)
-            .padding(start = 32.dp, top = 16.dp),
+            .padding(start = 32.dp, top = 8.dp),
     ) {
         UpNextHeader(episodes = episodes)
-        Spacer(Modifier.height(24.dp))
+        Spacer(Modifier.height(26.dp))
         LazyColumn(
             state = listState,
             verticalArrangement = Arrangement.spacedBy(12.dp),
