@@ -12,7 +12,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 class TvTopBarVisibility {
     private var detailCount by mutableIntStateOf(0)
 
-    val isVisible: Boolean get() = detailCount == 0
+    val isVisible: Boolean get() = detailCount <= 0
 
     internal fun enterDetail() {
         detailCount += 1

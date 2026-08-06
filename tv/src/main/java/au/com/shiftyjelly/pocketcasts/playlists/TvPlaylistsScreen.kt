@@ -203,8 +203,13 @@ private fun TvPlaylistsGrid(
         val focusRequesters = remember(playlists) { List(playlists.size) { FocusRequester() } }
         val gridFocusRequester = remember { FocusRequester() }
 
+        var isInitialComposition by remember { mutableStateOf(true) }
         LaunchedEffect(restoreFocusTrigger) {
-            if (restoreFocusTrigger > 0) {
+            // Only restore on an actual trigger change, not when a fresh grid mounts with a
+            // non-zero trigger inherited from a hoisted state holder.
+            if (isInitialComposition) {
+                isInitialComposition = false
+            } else {
                 runCatching { gridFocusRequester.requestFocus() }
             }
         }

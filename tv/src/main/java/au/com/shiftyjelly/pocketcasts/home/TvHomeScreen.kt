@@ -140,8 +140,12 @@ private fun TvHomeRows(
     var lastFocusedRowIndex by rememberSaveable(rows.size) { mutableIntStateOf(0) }
     val rowFocusRequesters = remember(rows.size) { List(rows.size) { FocusRequester() } }
 
+    var isInitialComposition by remember { mutableStateOf(true) }
     LaunchedEffect(restoreFocusTrigger) {
-        if (restoreFocusTrigger > 0) {
+        // Only restore on an actual trigger change, not on the initial composition.
+        if (isInitialComposition) {
+            isInitialComposition = false
+        } else {
             runCatching { rowFocusRequesters.getOrNull(lastFocusedRowIndex)?.requestFocus() }
         }
     }

@@ -88,7 +88,7 @@ fun <T> TvRow(
                 .focusGroup()
                 .focusProperties {
                     onEnter = {
-                        focusRequesters.getOrNull(lastFocusedIndex)?.requestFocus()
+                        runCatching { focusRequesters.getOrNull(lastFocusedIndex)?.requestFocus() }
                     }
                 },
         ) {

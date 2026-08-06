@@ -46,7 +46,7 @@ fun TvScaffold(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var isProfileModalVisible by rememberSaveable { mutableStateOf(false) }
     val topBarVisibility = remember { TvTopBarVisibility() }
-    var didFocusTopBar by remember { mutableStateOf(false) }
+    var didFocusTopBar by rememberSaveable { mutableStateOf(false) }
 
     CompositionLocalProvider(LocalTvTopBarVisibility provides topBarVisibility) {
         TvScaffoldContent(

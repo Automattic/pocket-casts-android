@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.component
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -25,7 +26,8 @@ import au.com.shiftyjelly.pocketcasts.theme.TvScreenBackgroundBrush
 /**
  * Fades a detail screen in over the top of the still-composed parent it was opened from, so the
  * parent keeps its scroll position and focus and never reflows. The overlay is opaque (it carries
- * the screen background), hides the top bar while shown, and handles Back.
+ * the screen background), hides the top bar while shown, and handles Back for as long as it is on
+ * screen (including the fade-out).
  *
  * [target] drives visibility: non-null shows the overlay, null fades it out. The last non-null
  * value is retained so [content] still renders during the exit animation. [onHide] fires when the
@@ -44,8 +46,16 @@ fun <T> TvDetailOverlay(
     val visible = target != null
     if (visible) {
         HideTvTopBar()
+    }
+
+    val transitionState = remember { MutableTransitionState(false) }
+    transitionState.targetState = visible
+    // Keep Back handled while the overlay is on screen, including the fade-out, so a quick second
+    // Back can't fall through to the nav host and pop/exit while the detail is still visible.
+    if (transitionState.currentState || transitionState.targetState) {
         BackHandler(onBack = onBack)
     }
+
     val currentOnHide by rememberUpdatedState(onHide)
     var wasVisible by remember { mutableStateOf(false) }
     LaunchedEffect(visible) {
@@ -59,7 +69,7 @@ fun <T> TvDetailOverlay(
         retained = target
     }
     AnimatedVisibility(
-        visible = visible,
+        visibleState = transitionState,
         enter = fadeIn(tween(durationMillis = ANIMATION_MILLIS, easing = FastOutSlowInEasing)),
         exit = fadeOut(tween(durationMillis = ANIMATION_MILLIS, easing = FastOutSlowInEasing)),
         modifier = modifier.fillMaxSize(),
