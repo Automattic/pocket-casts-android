@@ -1,5 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.nowplaying
 
+import androidx.activity.compose.BackHandler
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,10 +12,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -21,6 +24,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -36,6 +45,7 @@ import androidx.tv.material3.IconButton
 import androidx.tv.material3.LocalContentColor
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import au.com.shiftyjelly.pocketcasts.component.HideTvTopBar
 import au.com.shiftyjelly.pocketcasts.component.TvArtworkImage
 import au.com.shiftyjelly.pocketcasts.component.TvEmptyState
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeActionContext
@@ -54,6 +64,8 @@ import au.com.shiftyjelly.pocketcasts.theme.TvTopBarHeight
 import au.com.shiftyjelly.pocketcasts.theme.tvColors
 import au.com.shiftyjelly.pocketcasts.theme.tvTypography
 import java.util.Date
+import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.delay
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -107,11 +119,42 @@ private fun TvNowPlayingContent(
 ) {
     var isActionsModalVisible by remember { mutableStateOf(false) }
     var isDetailsModalVisible by remember { mutableStateOf(false) }
+    var isChromeVisible by remember { mutableStateOf(true) }
+    var interactionTick by remember { mutableIntStateOf(0) }
     val episode = state.episode
+
+    LaunchedEffect(state.isVideo, state.isPlaying, isActionsModalVisible, isDetailsModalVisible, interactionTick) {
+        if (state.isVideo && state.isPlaying && !isActionsModalVisible && !isDetailsModalVisible) {
+            delay(CHROME_HIDE_DELAY)
+            isChromeVisible = false
+        } else {
+            isChromeVisible = true
+        }
+    }
+    if (!isChromeVisible) {
+        HideTvTopBar()
+    }
+    val chromeAlpha by animateFloatAsState(if (isChromeVisible) 1f else 0f, label = "TvNowPlayingChromeAlpha")
 
     Column(
         modifier = modifier
             .fillMaxSize()
+            .onPreviewKeyEvent { event ->
+                when {
+                    event.type != KeyEventType.KeyDown || event.key == Key.Back -> false
+
+                    !isChromeVisible -> {
+                        isChromeVisible = true
+                        interactionTick++
+                        true
+                    }
+
+                    else -> {
+                        interactionTick++
+                        false
+                    }
+                }
+            }
             .padding(top = TvTopBarHeight)
             .padding(horizontal = 80.dp, vertical = 24.dp),
     ) {
@@ -128,39 +171,41 @@ private fun TvNowPlayingContent(
             }
         }
         Spacer(modifier = Modifier.height(24.dp))
-        state.errorMessage?.takeIf { state.isError }?.let { errorMessage ->
-            Text(
-                text = errorMessage,
-                style = MaterialTheme.tvTypography.caption1,
-                color = MaterialTheme.tvColors.textSecondary,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp),
+        Column(modifier = Modifier.graphicsLayer { alpha = chromeAlpha }) {
+            state.errorMessage?.takeIf { state.isError }?.let { errorMessage ->
+                Text(
+                    text = errorMessage,
+                    style = MaterialTheme.tvTypography.caption1,
+                    color = MaterialTheme.tvColors.textSecondary,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp),
+                )
+            }
+            TvSeekBar(
+                positionMs = state.positionMs,
+                durationMs = state.durationMs,
+                bufferedMs = state.bufferedMs,
+                onSeekBack = onSkipBackward,
+                onSeekForward = onSkipForward,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            PlayerControls(
+                isPlaying = state.isPlaying,
+                isBuffering = state.isBuffering,
+                onPlayPause = onPlayPause,
+                onSkipBackward = onSkipBackward,
+                onSkipForward = onSkipForward,
+                onOpenActions = if (episode is PodcastEpisode) {
+                    { isActionsModalVisible = true }
+                } else {
+                    null
+                },
+                modifier = Modifier.fillMaxWidth(),
             )
         }
-        TvSeekBar(
-            positionMs = state.positionMs,
-            durationMs = state.durationMs,
-            bufferedMs = state.bufferedMs,
-            onSeekBack = onSkipBackward,
-            onSeekForward = onSkipForward,
-            modifier = Modifier.fillMaxWidth(),
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        PlayerControls(
-            isPlaying = state.isPlaying,
-            isBuffering = state.isBuffering,
-            onPlayPause = onPlayPause,
-            onSkipBackward = onSkipBackward,
-            onSkipForward = onSkipForward,
-            onOpenActions = if (episode is PodcastEpisode) {
-                { isActionsModalVisible = true }
-            } else {
-                null
-            },
-            modifier = Modifier.fillMaxWidth(),
-        )
     }
 
     if (episode is PodcastEpisode) {
@@ -304,6 +349,8 @@ private fun PlayerControlButton(
         )
     }
 }
+
+private val CHROME_HIDE_DELAY = 4.seconds
 
 private fun BaseEpisode.artworkModel(): Any? = when (this) {
     is PodcastEpisode -> PodcastImage.getArtworkUrl(size = null, uuid = podcastUuid, isWearOS = false)
