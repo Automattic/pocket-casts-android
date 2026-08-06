@@ -93,7 +93,11 @@ private fun TvNowPlayingContent(
                 .weight(1f)
                 .fillMaxWidth(),
         ) {
-            EpisodeArtworkWithTitles(state = state)
+            if (state.isVideo) {
+                TvVideoSurface(player = state.player)
+            } else {
+                EpisodeArtworkWithTitles(state = state)
+            }
         }
         Spacer(modifier = Modifier.height(24.dp))
         state.errorMessage?.takeIf { state.isError }?.let { errorMessage ->
