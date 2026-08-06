@@ -76,6 +76,7 @@ fun TvPlaylistsScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var isDownloadModalVisible by rememberSaveable { mutableStateOf(false) }
     var openedPlaylist by rememberSaveable(stateSaver = OpenedPlaylistSaver) { mutableStateOf<OpenedPlaylist?>(null) }
+    var restoreFocusTrigger by remember { mutableIntStateOf(0) }
 
     val playlist = openedPlaylist
     Box(modifier = modifier.fillMaxSize()) {
@@ -95,6 +96,7 @@ fun TvPlaylistsScreen(
                 .fillMaxSize()
                 .padding(top = TvTopBarHeight)
                 .tvFocusInactiveWhen(playlist != null),
+            restoreFocusTrigger = restoreFocusTrigger,
         )
 
         if (isDownloadModalVisible) {
@@ -106,6 +108,7 @@ fun TvPlaylistsScreen(
         TvDetailOverlay(
             target = playlist,
             onBack = { openedPlaylist = null },
+            onHide = { restoreFocusTrigger++ },
         ) { openPlaylist ->
             TvPlaylistDetailsScreen(
                 playlistUuid = openPlaylist.uuid,
@@ -138,6 +141,7 @@ private fun TvPlaylistsContent(
     onCreatePlaylist: () -> Unit,
     onOpenPlaylist: (PlaylistPreview) -> Unit,
     modifier: Modifier = Modifier,
+    restoreFocusTrigger: Int = 0,
 ) {
     AnimatedContent(
         targetState = uiState,
@@ -169,6 +173,7 @@ private fun TvPlaylistsContent(
                     findPodcastTint = findPodcastTint,
                     onOpenPlaylist = onOpenPlaylist,
                     modifier = Modifier.fillMaxSize(),
+                    restoreFocusTrigger = restoreFocusTrigger,
                 )
             }
         }
@@ -185,6 +190,7 @@ private fun TvPlaylistsGrid(
     findPodcastTint: suspend (String) -> Int?,
     onOpenPlaylist: (PlaylistPreview) -> Unit,
     modifier: Modifier = Modifier,
+    restoreFocusTrigger: Int = 0,
 ) {
     Column(modifier = modifier.padding(horizontal = 32.dp)) {
         Text(
@@ -195,6 +201,13 @@ private fun TvPlaylistsGrid(
         )
         var lastFocusedIndex by rememberSaveable(playlists) { mutableIntStateOf(0) }
         val focusRequesters = remember(playlists) { List(playlists.size) { FocusRequester() } }
+        val gridFocusRequester = remember { FocusRequester() }
+
+        LaunchedEffect(restoreFocusTrigger) {
+            if (restoreFocusTrigger > 0) {
+                runCatching { gridFocusRequester.requestFocus() }
+            }
+        }
 
         LazyVerticalGrid(
             columns = GridCells.Fixed(3),
@@ -202,6 +215,7 @@ private fun TvPlaylistsGrid(
             verticalArrangement = Arrangement.spacedBy(32.dp),
             contentPadding = PaddingValues(bottom = 32.dp),
             modifier = Modifier
+                .focusRequester(gridFocusRequester)
                 .focusGroup()
                 .focusProperties {
                     onEnter = {

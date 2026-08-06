@@ -11,12 +11,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Devices
@@ -49,6 +54,7 @@ fun TvHomeScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var openedPodcastUuid by rememberSaveable { mutableStateOf<String?>(null) }
+    var restoreFocusTrigger by remember { mutableIntStateOf(0) }
 
     val podcastUuid = openedPodcastUuid
     Box(modifier = modifier.fillMaxSize()) {
@@ -60,10 +66,12 @@ fun TvHomeScreen(
                 .fillMaxSize()
                 .padding(top = TvTopBarHeight)
                 .tvFocusInactiveWhen(podcastUuid != null),
+            restoreFocusTrigger = restoreFocusTrigger,
         )
         TvDetailOverlay(
             target = podcastUuid,
             onBack = { openedPodcastUuid = null },
+            onHide = { restoreFocusTrigger++ },
         ) { uuid ->
             TvPodcastDetailsScreen(
                 podcastUuid = uuid,
@@ -79,6 +87,7 @@ private fun TvHomeContent(
     onRetry: () -> Unit,
     onOpenPodcast: (String) -> Unit,
     modifier: Modifier = Modifier,
+    restoreFocusTrigger: Int = 0,
 ) {
     when (uiState) {
         is TvHomeUiState.Loading -> LoadingView(color = Color.White, modifier = modifier)
@@ -88,7 +97,12 @@ private fun TvHomeContent(
         is TvHomeUiState.Ready -> if (uiState.rows.isEmpty()) {
             TvHomeError(onRetry = onRetry, modifier = modifier)
         } else {
-            TvHomeRows(rows = uiState.rows, onOpenPodcast = onOpenPodcast, modifier = modifier)
+            TvHomeRows(
+                rows = uiState.rows,
+                onOpenPodcast = onOpenPodcast,
+                modifier = modifier,
+                restoreFocusTrigger = restoreFocusTrigger,
+            )
         }
     }
 }
@@ -121,14 +135,30 @@ private fun TvHomeRows(
     rows: List<TvHomeRow>,
     onOpenPodcast: (String) -> Unit,
     modifier: Modifier = Modifier,
+    restoreFocusTrigger: Int = 0,
 ) {
+    var lastFocusedRowIndex by rememberSaveable(rows.size) { mutableIntStateOf(0) }
+    val rowFocusRequesters = remember(rows.size) { List(rows.size) { FocusRequester() } }
+
+    LaunchedEffect(restoreFocusTrigger) {
+        if (restoreFocusTrigger > 0) {
+            runCatching { rowFocusRequesters.getOrNull(lastFocusedRowIndex)?.requestFocus() }
+        }
+    }
+
     LazyColumn(
         modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
         item { Spacer(modifier = Modifier.height(8.dp)) }
 
-        rows.forEach { row ->
+        rows.forEachIndexed { rowIndex, row ->
+            val rowModifier = Modifier.onFocusChanged { focusState ->
+                if (focusState.hasFocus) {
+                    lastFocusedRowIndex = rowIndex
+                }
+            }
+            val rowFocusRequester = rowFocusRequesters[rowIndex]
             when (row) {
                 is TvHomeRow.FeaturedPodcasts -> item(key = row.id) {
                     TvRow(
@@ -136,6 +166,8 @@ private fun TvHomeRows(
                         items = row.podcasts,
                         itemSpacing = 32.dp,
                         key = TvHomePodcast::uuid,
+                        focusRequester = rowFocusRequester,
+                        modifier = rowModifier,
                     ) { podcast ->
                         TvFeaturedTile(
                             artworkUrl = podcast.artworkUrl,
@@ -154,6 +186,8 @@ private fun TvHomeRows(
                         items = row.episodes,
                         itemSpacing = 32.dp,
                         key = TvHomeEpisode::episodeUuid,
+                        focusRequester = rowFocusRequester,
+                        modifier = rowModifier,
                     ) { episode ->
                         TvVideoTile(
                             thumbnailUrl = episode.thumbnailUrl,
@@ -171,6 +205,8 @@ private fun TvHomeRows(
                         title = row.title,
                         items = row.podcasts,
                         key = TvHomePodcast::uuid,
+                        focusRequester = rowFocusRequester,
+                        modifier = rowModifier,
                     ) { podcast ->
                         TvPodcastTile(
                             artworkUrl = podcast.artworkUrl,

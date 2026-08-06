@@ -33,6 +33,7 @@ internal fun TvPodcastGridScaffold(
     itemKeys: List<Any>,
     modifier: Modifier = Modifier,
     autoFocusFirstItem: Boolean = false,
+    restoreFocusTrigger: Int = 0,
     itemContent: @Composable (index: Int, itemModifier: Modifier) -> Unit,
 ) {
     Column(modifier = modifier) {
@@ -45,11 +46,18 @@ internal fun TvPodcastGridScaffold(
         val gridState = rememberLazyGridState()
         var lastFocusedKey by rememberSaveable { mutableStateOf<String?>(null) }
         val focusRequesters = remember(itemKeys.size) { List(itemKeys.size) { FocusRequester() } }
+        val gridFocusRequester = remember { FocusRequester() }
 
         if (autoFocusFirstItem) {
             LaunchedEffect(Unit) {
                 snapshotFlow { gridState.layoutInfo.visibleItemsInfo.isNotEmpty() }.first { it }
                 runCatching { focusRequesters.firstOrNull()?.requestFocus() }
+            }
+        }
+
+        LaunchedEffect(restoreFocusTrigger) {
+            if (restoreFocusTrigger > 0) {
+                runCatching { gridFocusRequester.requestFocus() }
             }
         }
 
@@ -60,6 +68,7 @@ internal fun TvPodcastGridScaffold(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             contentPadding = PaddingValues(start = 32.dp, top = 16.dp, end = 32.dp, bottom = 32.dp),
             modifier = Modifier
+                .focusRequester(gridFocusRequester)
                 .focusGroup()
                 .focusProperties {
                     onEnter = {

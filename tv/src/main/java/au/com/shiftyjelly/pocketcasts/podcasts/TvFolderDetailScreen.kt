@@ -41,6 +41,7 @@ fun TvFolderDetailScreen(
     onOpenPodcast: (String) -> Unit,
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
+    restoreFocusTrigger: Int = 0,
 ) {
     var uiState by remember(folderUuid) { mutableStateOf<TvFolderDetailUiState>(TvFolderDetailUiState.Loading) }
     val currentGetFolderPodcasts by rememberUpdatedState(getFolderPodcasts)
@@ -55,6 +56,7 @@ fun TvFolderDetailScreen(
         onOpenPodcast = onOpenPodcast,
         onClose = onClose,
         modifier = modifier,
+        restoreFocusTrigger = restoreFocusTrigger,
     )
 }
 
@@ -65,6 +67,7 @@ private fun TvFolderDetailContent(
     onOpenPodcast: (String) -> Unit,
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
+    restoreFocusTrigger: Int = 0,
 ) {
     AnimatedContent(
         targetState = uiState,
@@ -95,6 +98,7 @@ private fun TvFolderDetailContent(
                 title = folderName,
                 itemKeys = state.podcasts.map(Podcast::uuid),
                 autoFocusFirstItem = true,
+                restoreFocusTrigger = restoreFocusTrigger,
                 modifier = Modifier.fillMaxSize(),
             ) { index, itemModifier ->
                 val podcast = state.podcasts[index]

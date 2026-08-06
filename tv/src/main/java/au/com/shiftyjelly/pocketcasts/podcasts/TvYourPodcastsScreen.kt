@@ -12,7 +12,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -52,6 +54,8 @@ fun TvYourPodcastsScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var openedFolder by rememberSaveable(stateSaver = OpenedFolderSaver) { mutableStateOf<OpenedFolder?>(null) }
     var openedPodcastUuid by rememberSaveable { mutableStateOf<String?>(null) }
+    var gridRestoreTrigger by remember { mutableIntStateOf(0) }
+    var folderRestoreTrigger by remember { mutableIntStateOf(0) }
 
     val podcastUuid = openedPodcastUuid
     val folder = openedFolder
@@ -65,11 +69,13 @@ fun TvYourPodcastsScreen(
                 .fillMaxSize()
                 .padding(top = TvTopBarHeight)
                 .tvFocusInactiveWhen(folder != null || podcastUuid != null),
+            restoreFocusTrigger = gridRestoreTrigger,
         )
         TvDetailOverlay(
             target = folder,
             onBack = { openedFolder = null },
             modifier = Modifier.tvFocusInactiveWhen(podcastUuid != null),
+            onHide = { gridRestoreTrigger++ },
         ) { openFolder ->
             TvFolderDetailScreen(
                 folderUuid = openFolder.uuid,
@@ -77,11 +83,13 @@ fun TvYourPodcastsScreen(
                 getFolderPodcasts = viewModel::folderPodcasts,
                 onOpenPodcast = { openedPodcastUuid = it },
                 onClose = { openedFolder = null },
+                restoreFocusTrigger = folderRestoreTrigger,
             )
         }
         TvDetailOverlay(
             target = podcastUuid,
             onBack = { openedPodcastUuid = null },
+            onHide = { if (openedFolder != null) folderRestoreTrigger++ else gridRestoreTrigger++ },
         ) { uuid ->
             TvPodcastDetailsScreen(
                 podcastUuid = uuid,
@@ -105,6 +113,7 @@ private fun TvYourPodcastsContent(
     onOpenFolder: (Folder) -> Unit,
     onOpenPodcast: (String) -> Unit,
     modifier: Modifier = Modifier,
+    restoreFocusTrigger: Int = 0,
 ) {
     AnimatedContent(
         targetState = uiState,
@@ -135,6 +144,7 @@ private fun TvYourPodcastsContent(
                 onOpenFolder = onOpenFolder,
                 onOpenPodcast = onOpenPodcast,
                 modifier = Modifier.fillMaxSize(),
+                restoreFocusTrigger = restoreFocusTrigger,
             )
         }
     }
@@ -146,11 +156,13 @@ private fun TvYourPodcastsGrid(
     onOpenFolder: (Folder) -> Unit,
     onOpenPodcast: (String) -> Unit,
     modifier: Modifier = Modifier,
+    restoreFocusTrigger: Int = 0,
 ) {
     TvPodcastGridScaffold(
         title = stringResource(LR.string.tv_tab_your_podcasts),
         itemKeys = items.map(FolderItem::uuid),
         modifier = modifier,
+        restoreFocusTrigger = restoreFocusTrigger,
     ) { index, itemModifier ->
         when (val item = items[index]) {
             is FolderItem.Podcast -> TvPodcastTile(

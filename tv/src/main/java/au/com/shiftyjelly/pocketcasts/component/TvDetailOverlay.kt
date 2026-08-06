@@ -11,9 +11,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.focusProperties
@@ -26,21 +28,31 @@ import au.com.shiftyjelly.pocketcasts.theme.TvScreenBackgroundBrush
  * the screen background), hides the top bar while shown, and handles Back.
  *
  * [target] drives visibility: non-null shows the overlay, null fades it out. The last non-null
- * value is retained so [content] still renders during the exit animation. Render this as the last
- * child of the tab's root [Box] and mark the layers behind it inactive with [tvFocusInactiveWhen]
- * so the D-pad can't reach them.
+ * value is retained so [content] still renders during the exit animation. [onHide] fires when the
+ * overlay starts hiding, so the caller can hand focus back to the layer underneath. Render this as
+ * the last child of the tab's root [Box] and mark the layers behind it inactive with
+ * [tvFocusInactiveWhen] so the D-pad can't reach them.
  */
 @Composable
 fun <T> TvDetailOverlay(
     target: T?,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
+    onHide: () -> Unit = {},
     content: @Composable (T) -> Unit,
 ) {
     val visible = target != null
     if (visible) {
         HideTvTopBar()
         BackHandler(onBack = onBack)
+    }
+    val currentOnHide by rememberUpdatedState(onHide)
+    var wasVisible by remember { mutableStateOf(false) }
+    LaunchedEffect(visible) {
+        if (!visible && wasVisible) {
+            currentOnHide()
+        }
+        wasVisible = visible
     }
     var retained by remember { mutableStateOf<T?>(null) }
     if (target != null) {
