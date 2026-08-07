@@ -3,10 +3,13 @@ package au.com.shiftyjelly.pocketcasts.ui.worker
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.work.ListenableWorker
+import androidx.work.NetworkType
+import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
 import androidx.work.testing.TestListenableWorkerBuilder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import coil3.ImageLoader
@@ -15,6 +18,7 @@ import coil3.request.CachePolicy
 import coil3.request.ErrorResult
 import coil3.request.ImageRequest
 import coil3.request.ImageResult
+import coil3.size.Size
 import java.io.IOException
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.test.runTest
@@ -93,6 +97,9 @@ class PrefetchArtworkWorkerTest {
         verify(imageLoader, times(urls.size)).execute(requestCaptor.capture())
         assertEquals(urls, requestCaptor.allValues.map { it.data.toString() })
         assertTrue(requestCaptor.allValues.all { it.memoryCachePolicy == CachePolicy.DISABLED })
+        for (request in requestCaptor.allValues) {
+            assertEquals(Size(1, 1), request.sizeResolver.size())
+        }
 
         networkRecovered = true
         clearInvocations(imageLoader)
@@ -165,6 +172,21 @@ class PrefetchArtworkWorkerTest {
         assertEquals("Worker stopped", cancellation?.message)
     }
 
+    @Test
+    fun `periodic work respects the metered network preference and device health`() {
+        val settings = mock<Settings>()
+        for (networkType in listOf(NetworkType.CONNECTED, NetworkType.UNMETERED)) {
+            whenever(settings.getWorkManagerNetworkTypeConstraint()).thenReturn(networkType)
+
+            val request = PrefetchArtworkWorker.buildPeriodicWorkRequest(settings)
+            val constraints = request.constraints()
+
+            assertEquals(networkType, constraints.requiredNetworkType)
+            assertTrue(constraints.requiresBatteryNotLow())
+            assertTrue(constraints.requiresStorageNotLow())
+        }
+    }
+
     private suspend fun setUpPodcast(): List<String> {
         val podcast = Podcast(uuid = "podcast-uuid")
         whenever(podcastManager.findSubscribedNoOrder()).doReturn(listOf(podcast))
@@ -199,4 +221,7 @@ class PrefetchArtworkWorkerTest {
             runAttemptCount = runAttemptCount,
         ).setWorkerFactory(workerFactory).build()
     }
+
+    @Suppress("RestrictedApi")
+    private fun PeriodicWorkRequest.constraints() = workSpec.constraints
 }

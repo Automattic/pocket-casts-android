@@ -307,7 +307,7 @@ class PocketCastsApplication :
         downloadStatusObserver.monitorDownloadStatus()
         userManager.beginMonitoringAccountManager(playbackManager)
         CuratedPodcastsSyncWorker.enqueuePeriodicWork(this)
-        PrefetchArtworkWorker.enqueuePeriodicWork(this)
+        PrefetchArtworkWorker.enqueuePeriodicWork(this, settings)
         engageSdkBridge.registerIntegration()
         shortcutsSynchronizer.keepShortcutsInSync()
         playlistInteractionNotifier.monitorPlaylistsInteraction()
