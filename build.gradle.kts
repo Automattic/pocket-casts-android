@@ -474,9 +474,11 @@ subprojects {
 }
 
 fun Project.applyCommonSentryConfiguration() {
+    val sentryAuthToken = providers.environmentVariable("SENTRY_AUTH_TOKEN")
+
     extensions.getByType(SentryPluginExtension::class.java).apply {
-        authToken = project.findProperty("sentryAuthToken")?.toString()
-        org = project.findProperty("sentryOrg")?.toString()
+        authToken = sentryAuthToken.orNull
+        org = "a8c"
 
         val shouldUploadDebugFiles = System.getenv()["CI"].toBoolean() &&
             !project.properties["skipSentryProguardMappingUpload"]?.toString().toBoolean()
@@ -489,6 +491,19 @@ fun Project.applyCommonSentryConfiguration() {
         autoInstallation.enabled = false
         includeDependenciesReport = false
         ignoredBuildTypes = setOf("debug", "debugProd", "prototype")
+    }
+
+    // The upload task only exists when includeProguardMapping is on, so this fires exactly when a
+    // mapping upload is expected — fail there rather than ship a release we can't deobfuscate.
+    tasks.matching { it.name.startsWith("uploadSentryProguardMappings") }.configureEach {
+        doFirst {
+            if (!sentryAuthToken.isPresent) {
+                throw GradleException(
+                    "SENTRY_AUTH_TOKEN is not set. Export it to upload ProGuard mappings, " +
+                        "or pass -PskipSentryProguardMappingUpload=true to skip the upload.",
+                )
+            }
+        }
     }
 }
 
