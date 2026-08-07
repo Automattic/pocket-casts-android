@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.widget
 
+import android.appwidget.AppWidgetManager
 import android.content.Context
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetManager
@@ -27,7 +28,7 @@ class PlayerWidgetManager @Inject constructor(
     private val widgetManager = GlanceAppWidgetManager(context)
     private val updateMutex = Mutex()
 
-    suspend fun updateQueue(queue: List<BaseEpisode>) = updateMutex.withLock {
+    suspend fun updateQueue(queue: List<BaseEpisode>) = updateWidgets {
         val episodes = queue.map(PlayerWidgetEpisode::fromBaseEpisode)
         updateSmallWidgets { state -> state.copy(episode = episodes.firstOrNull()) }
         updateMediumWidgets { state -> state.copy(episode = episodes.firstOrNull()) }
@@ -35,7 +36,7 @@ class PlayerWidgetManager @Inject constructor(
         updateClassicWidgets { state -> state.copy(episode = episodes.firstOrNull()) }
     }
 
-    suspend fun updateIsPlaying(isPlaying: Boolean) = updateMutex.withLock {
+    suspend fun updateIsPlaying(isPlaying: Boolean) = updateWidgets {
         updateSmallWidgets { state -> state.copy(isPlaying = isPlaying) }
         updateMediumWidgets { state -> state.copy(isPlaying = isPlaying) }
         updateLargeWidgets { state -> state.copy(isPlaying = isPlaying) }
@@ -44,7 +45,7 @@ class PlayerWidgetManager @Inject constructor(
 
     suspend fun updateUseEpisodeArtwork(
         useEpisodeArtwork: Boolean,
-    ) = updateMutex.withLock {
+    ) = updateWidgets {
         updateSmallWidgets { state -> state.copy(useEpisodeArtwork = useEpisodeArtwork) }
         updateMediumWidgets { state -> state.copy(useEpisodeArtwork = useEpisodeArtwork) }
         updateLargeWidgets { state -> state.copy(useEpisodeArtwork = useEpisodeArtwork) }
@@ -53,19 +54,27 @@ class PlayerWidgetManager @Inject constructor(
 
     suspend fun updateUseDynamicColors(
         useDynamicColors: Boolean,
-    ) = updateMutex.withLock {
+    ) = updateWidgets {
         updateSmallWidgets { state -> state.copy(useDynamicColors = useDynamicColors) }
         updateMediumWidgets { state -> state.copy(useDynamicColors = useDynamicColors) }
         updateLargeWidgets { state -> state.copy(useDynamicColors = useDynamicColors) }
         updateClassicWidgets { state -> state.copy(useDynamicColors = useDynamicColors) }
     }
 
-    suspend fun updateSkipBackwardDuration(seconds: Int) = updateMutex.withLock {
+    suspend fun updateSkipBackwardDuration(seconds: Int) = updateWidgets {
         updateClassicWidgets { state -> state.copy(skipBackwardSeconds = seconds) }
     }
 
-    suspend fun updateSkipForwardDuration(seconds: Int) = updateMutex.withLock {
+    suspend fun updateSkipForwardDuration(seconds: Int) = updateWidgets {
         updateClassicWidgets { state -> state.copy(skipForwardSeconds = seconds) }
+    }
+
+    private suspend fun updateWidgets(update: suspend () -> Unit) {
+        // AppWidgetManager is null on devices without app widget support, Glance crashes with an NPE in that case
+        if (AppWidgetManager.getInstance(context) == null) {
+            return
+        }
+        updateMutex.withLock { update() }
     }
 
     private suspend fun updateSmallWidgets(

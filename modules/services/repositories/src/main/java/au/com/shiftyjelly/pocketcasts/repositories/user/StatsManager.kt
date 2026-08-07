@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.repositories.user
 
 import au.com.shiftyjelly.pocketcasts.models.to.StatsBundle
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import io.reactivex.Single
 
 interface StatsManager {
     val timeSavedVariableSpeed: Long
@@ -37,7 +36,6 @@ interface StatsManager {
     fun reset()
     fun isSynced(settings: Settings): Boolean
     fun setSyncStatus(isSynced: Boolean)
-    fun getServerStatsRx(): Single<StatsBundle>
     suspend fun getServerStats(): StatsBundle
     fun mergeStats(statsOne: Map<String, Long>?, statsTwo: Map<String, Long>?): Map<String, Long>
     suspend fun cacheMergedStats()

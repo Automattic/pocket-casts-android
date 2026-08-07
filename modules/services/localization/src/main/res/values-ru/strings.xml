@@ -1,15 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-06-30 18:57:34+0000
+Translation-Revision-Date: 2026-07-09 11:56:29+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+    <string name="profile_stats_listening_activity_content_description">Тепловая карта прослушиваний</string>
+    <string name="profile_stats_listening_activity">Прослушивания</string>
+    <string name="player_action_show_video">Показать видео</string>
+    <string name="player_action_hide_video">Скрыть видео</string>
+    <string name="up_next_sort_duration_tooltip_body">От самых коротких к самым длинным или наоборот: подстроить выпуск под нужное вам время.</string>
+    <string name="up_next_sort_duration_tooltip_title">Сортировать по длительности</string>
     <string name="transcript_tap_to_seek_streaming_unavailable">Скачать выпуск, чтобы искать нажатием</string>
     <string name="bookmark_play_from">Воспроизвести с %s</string>
-    <string name="profile_try_days_for_free">Попробуйте 30 дней бесплатно</string>
-    <string name="profile_start_free_trial_specific_duration">Начните 30-дневный пробный период</string>
     <string name="summary_upsell_description">Подпишитесь на Plus, чтобы пользоваться ею и другими премиум-функциями, такими как закладки и папки.</string>
     <string name="summary_upsell_title">Сводки на базе ИИ</string>
     <string name="tv_create_account_subtitle">Отсканируйте этот код, чтобы начать работу с телефона. Это займёт всего минуту.</string>
@@ -129,14 +133,10 @@ Language: ru
     <string name="watch_synced_successfully">Часы синхронизированы</string>
     <string name="watch_sync_waiting_for_phone">Ожидание синхронизации телефона…</string>
     <string name="watch_sync_retry">Повторить попытку</string>
-    <string name="watch_sync_error_unknown_help">Повторите попытку или выполните вход вручную</string>
     <string name="watch_sync_error_login_failed_help">Попробуйте выполнить вход вручную</string>
     <string name="watch_sync_error_no_connection_help">Проверьте подключение Bluetooth к телефону</string>
-    <string name="watch_sync_error_timeout_help">Убедитесь, что ваш телефон находится поблизости и подключён через Bluetooth</string>
-    <string name="watch_sync_error_unknown">Что-то пошло не так</string>
     <string name="watch_sync_error_login_failed">Вход не выполнен</string>
     <string name="watch_sync_error_no_connection">Телефон не подключён</string>
-    <string name="watch_sync_error_timeout">Не удалось подключиться к телефону</string>
     <string name="watch_sync_success">Выполнен вход с телефона.</string>
     <string name="watch_sync_syncing">Синхронизация с телефоном…</string>
     <string name="error_download_generic_failure">Не удалось скачать выпуск. %1$s</string>

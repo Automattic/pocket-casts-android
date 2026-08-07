@@ -22,7 +22,7 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.PodcastFragment
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.categories.CategoriesManager
 import au.com.shiftyjelly.pocketcasts.search.SearchFragment
-import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServiceManagerImpl
+import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverEpisode
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
@@ -55,7 +55,7 @@ class DiscoverFragment :
 
     @Inject lateinit var settings: Settings
 
-    @Inject lateinit var staticServiceManager: StaticServiceManagerImpl
+    @Inject lateinit var staticServiceManager: StaticServiceManager
 
     @Inject lateinit var eventHorizon: EventHorizon
 

@@ -49,9 +49,14 @@ interface PlaylistManager {
     // <editor-fold desc="Smart playlists">
     suspend fun createSmartPlaylist(draft: SmartPlaylistDraft): String
 
-    fun smartPlaylistFlow(uuid: String, searchTerm: String? = null): Flow<SmartPlaylist?>
+    fun smartPlaylistFlow(uuid: String, searchTerm: String? = null, includeArchived: Boolean = false): Flow<SmartPlaylist?>
 
-    fun smartEpisodesFlow(rules: SmartRules, sortType: SortType = SortType.NewestToOldest, searchTerm: String? = null): Flow<List<PlaylistEpisode.Available>>
+    fun smartEpisodesFlow(
+        rules: SmartRules,
+        sortType: SortType = SortType.NewestToOldest,
+        searchTerm: String? = null,
+        includeArchived: Boolean = false,
+    ): Flow<List<PlaylistEpisode.Available>>
 
     fun smartEpisodesMetadataFlow(rules: SmartRules): Flow<PlaylistEpisodeMetadata>
 
@@ -68,6 +73,7 @@ interface PlaylistManager {
     fun manualPlaylistFlow(
         uuid: String,
         searchTerm: String? = null,
+        includeArchived: Boolean = false,
     ): Flow<ManualPlaylist?>
 
     fun playlistPreviewsForEpisodeFlow(searchTerm: String? = null): Flow<List<PlaylistPreviewForEpisode>>

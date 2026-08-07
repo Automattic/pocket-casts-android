@@ -122,6 +122,7 @@ val spotlessPreCommitFiles = providers.gradleProperty("spotlessPreCommitFiles").
 val spotlessPreCommitKotlinFiles = spotlessPreCommitFiles?.filter { file ->
     val path = file.relativeTo(rootDir).invariantSeparatorsPath
     path.endsWith(".kt") &&
+        "/uniffi/" !in path &&
         (
             path.startsWith("app/src/") ||
                 path.startsWith("automotive/src/") ||

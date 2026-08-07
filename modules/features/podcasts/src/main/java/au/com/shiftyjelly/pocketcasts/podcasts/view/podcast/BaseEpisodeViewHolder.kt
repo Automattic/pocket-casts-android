@@ -68,6 +68,8 @@ abstract class BaseEpisodeViewHolder<T : Any>(
 
     private var isObservingRowData = false
 
+    private var hasHlsAlternateEnclosure = false
+
     @Suppress("UNCHECKED_CAST")
     private val swipeLayout = binding.root as SwipeRowLayout<SwipeAction>
 
@@ -162,10 +164,12 @@ abstract class BaseEpisodeViewHolder<T : Any>(
 
     private fun observeRowData() {
         disposable.clear()
+        hasHlsAlternateEnclosure = false
         disposable += rowDataProvider.episodeRowDataObservable(episode.uuid)
             .doOnSubscribe { isObservingRowData = true }
             .doOnDispose { isObservingRowData = false }
             .subscribeBy(onNext = { data ->
+                hasHlsAlternateEnclosure = data.hasHlsAlternateEnclosure
                 isPlaying = data.playbackState.isPlaying && data.playbackState.episodeUuid == episode.uuid
                 bindPlaybackButton()
 
@@ -202,7 +206,7 @@ abstract class BaseEpisodeViewHolder<T : Any>(
 
     private fun bindStatus(downloadProgress: Int) {
         binding.star.isVisible = episode.isStarred
-        binding.video.isVisible = episode.isVideo
+        binding.video.isVisible = episode.showsVideoIcon(hasHlsAlternateEnclosure)
         binding.progressBar.isVisible = false
         binding.progressCircle.isVisible = false
 

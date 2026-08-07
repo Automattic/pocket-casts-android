@@ -1,15 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-07-01 16:54:50+0000
+Translation-Revision-Date: 2026-07-08 12:55:41+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: es
 -->
 <resources>
+    <string name="profile_stats_listening_activity_content_description">Mapa de calor de la actividad de escucha</string>
+    <string name="profile_stats_listening_activity">Actividad de escucha</string>
+    <string name="player_action_show_video">Mostrar vídeo</string>
+    <string name="player_action_hide_video">Ocultar vídeo</string>
+    <string name="up_next_sort_duration_tooltip_body">De más cortos a más largos, o al revés: ajusta el episodio al tiempo que realmente tienes.</string>
+    <string name="up_next_sort_duration_tooltip_title">Ordenar por duración</string>
     <string name="transcript_tap_to_seek_streaming_unavailable">Descarga el episodio para pulsar para buscar</string>
     <string name="bookmark_play_from">Reproducir desde %s</string>
-    <string name="profile_try_days_for_free">Prueba gratis durante 30 días</string>
-    <string name="profile_start_free_trial_specific_duration">Empieza la prueba gratuita de 30 días</string>
     <string name="summary_upsell_description">Suscríbete a Plus para acceder a ella y a otras funciones Premium, como los marcadores y las carpetas.</string>
     <string name="summary_upsell_title">Resúmenes con tecnología de IA</string>
     <string name="tv_create_account_subtitle">Escanea este código para empezar en tu teléfono, solo tardarás un minuto.</string>
@@ -129,14 +133,10 @@ Language: es
     <string name="watch_synced_successfully">El reloj se ha sincronizado correctamente</string>
     <string name="watch_sync_waiting_for_phone">Esperando a que el teléfono se sincronice…</string>
     <string name="watch_sync_retry">Inténtalo de nuevo</string>
-    <string name="watch_sync_error_unknown_help">Inténtalo de nuevo o accede manualmente</string>
     <string name="watch_sync_error_login_failed_help">Prueba a acceder manualmente</string>
     <string name="watch_sync_error_no_connection_help">Comprueba la conexión Bluetooth con el teléfono</string>
-    <string name="watch_sync_error_timeout_help">Asegúrate de que el teléfono esté cerca y conectado por Bluetooth</string>
-    <string name="watch_sync_error_unknown">Se ha producido un error</string>
     <string name="watch_sync_error_login_failed">No se ha podido acceder</string>
     <string name="watch_sync_error_no_connection">El teléfono no está conectado</string>
-    <string name="watch_sync_error_timeout">No se ha podido conectar al teléfono</string>
     <string name="watch_sync_success">Has accedido desde el teléfono.</string>
     <string name="watch_sync_syncing">Sincronizando con el teléfono…</string>
     <string name="error_download_generic_failure">No se ha podido descargar el episodio. %1$s</string>

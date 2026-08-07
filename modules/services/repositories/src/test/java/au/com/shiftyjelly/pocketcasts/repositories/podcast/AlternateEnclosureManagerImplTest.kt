@@ -2,9 +2,13 @@ package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
 import au.com.shiftyjelly.pocketcasts.models.db.dao.AlternateEnclosureDao
 import au.com.shiftyjelly.pocketcasts.models.entity.AlternateEnclosureSource
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeAlternateEnclosure
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
@@ -26,6 +30,13 @@ class AlternateEnclosureManagerImplTest {
         whenever(alternateEnclosureDao.findByEpisodeUuid("episode-uuid")).thenReturn(emptyList())
 
         assertEquals(emptyList<EpisodeAlternateEnclosure>(), manager.findForEpisode("episode-uuid"))
+    }
+
+    @Test
+    fun `hasHlsAlternateEnclosure queries the dao with the HLS mime types`() = runBlocking {
+        whenever(alternateEnclosureDao.hasHlsEnclosure("episode-uuid", BaseEpisode.HLS_MIME_TYPES)).thenReturn(flowOf(true))
+
+        assertTrue(manager.hasHlsAlternateEnclosure("episode-uuid").first())
     }
 
     private fun enclosure(position: Int) = EpisodeAlternateEnclosure(

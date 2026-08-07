@@ -72,7 +72,6 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.components.UpgradeFeatu
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.UpgradeRowButton
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesViewModel
-import au.com.shiftyjelly.pocketcasts.analytics.experiments.TrialCtaCopyTreatment
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationIconButton
 import au.com.shiftyjelly.pocketcasts.compose.bars.SystemBarsStyles
@@ -289,7 +288,6 @@ private fun UpgradeLayout(
 
         UpgradeButton(
             selectedPlan = state.selectedPlan,
-            trialCtaCopyTreatment = state.trialCtaCopyTreatment,
             upFocusRequester = focusPager,
             onClickSubscribe = onClickSubscribe,
         )
@@ -487,7 +485,6 @@ internal fun UpgradeButton(
     selectedPlan: OnboardingSubscriptionPlan,
     onClickSubscribe: () -> Unit,
     upFocusRequester: FocusRequester,
-    trialCtaCopyTreatment: TrialCtaCopyTreatment? = null,
 ) {
     Box(
         contentAlignment = Alignment.BottomCenter,
@@ -502,7 +499,7 @@ internal fun UpgradeButton(
     ) {
         Column {
             UpgradeRowButton(
-                primaryText = selectedPlan.ctaButtonText(isRenewingSubscription = false, trialCtaCopyTreatment = trialCtaCopyTreatment),
+                primaryText = selectedPlan.ctaButtonText(isRenewingSubscription = false),
                 backgroundColor = selectedPlan.ctaButtonBackgroundColor,
                 textColor = selectedPlan.ctaButtonTextColor,
                 fontWeight = FontWeight.W500,
