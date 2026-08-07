@@ -1,7 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.nowplaying
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -76,6 +80,7 @@ import au.com.shiftyjelly.pocketcasts.podcasts.TvPodcastDetailsScreen
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
 import au.com.shiftyjelly.pocketcasts.repositories.playback.Player
 import au.com.shiftyjelly.pocketcasts.theme.TvButtonDefaults
+import au.com.shiftyjelly.pocketcasts.theme.TvScreenBackgroundBrush
 import au.com.shiftyjelly.pocketcasts.theme.TvTheme
 import au.com.shiftyjelly.pocketcasts.theme.TvTopBarHeight
 import au.com.shiftyjelly.pocketcasts.theme.tvColors
@@ -163,6 +168,7 @@ private fun TvNowPlayingContent(
     var isSpeedMenuVisible by remember { mutableStateOf(false) }
     var isEffectsMenuVisible by remember { mutableStateOf(false) }
     var isChromeVisible by remember { mutableStateOf(true) }
+    var hasRenderedFirstFrame by remember(state.episode.uuid, state.isVideo) { mutableStateOf(false) }
     var interactionTick by remember { mutableIntStateOf(0) }
     var isContentFocused by remember { mutableStateOf(false) }
     var isTopBarRevealRequested by remember { mutableStateOf(false) }
@@ -237,7 +243,7 @@ private fun TvNowPlayingContent(
             if (state.isVideo) {
                 TvVideoSurface(
                     player = state.player,
-                    onFirstFrameRendered = {},
+                    onFirstFrameRendered = { hasRenderedFirstFrame = true },
                 )
             } else {
                 EpisodeArtworkWithTitles(
@@ -247,6 +253,28 @@ private fun TvNowPlayingContent(
                     player = state.player,
                     audioLevel = { state.player?.currentAudioLevel ?: 0f },
                 )
+            }
+        }
+        if (state.isVideo) {
+            AnimatedVisibility(
+                visible = !hasRenderedFirstFrame || state.errorMessage != null,
+                enter = fadeIn(tween(VIDEO_OVERLAY_FADE_MILLIS)),
+                exit = fadeOut(tween(VIDEO_OVERLAY_FADE_MILLIS)),
+            ) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(TvScreenBackgroundBrush),
+                ) {
+                    EpisodeArtworkWithTitles(
+                        episode = episode,
+                        podcastTitle = state.podcastTitle,
+                        isPlaying = state.isPlaying && !state.isBuffering,
+                        player = state.player,
+                        audioLevel = { state.player?.currentAudioLevel ?: 0f },
+                    )
+                }
             }
         }
         Column(
@@ -530,6 +558,7 @@ private val BlurredArtworkOffset = -ArtworkSize * 0.2f
 private val BlurredArtworkRadius = 66.dp
 
 private val CHROME_HIDE_DELAY = 4.seconds
+private const val VIDEO_OVERLAY_FADE_MILLIS = 200
 
 private val ChromeScrimTopInset = 48.dp
 private val ChromeScrimBrush = Brush.verticalGradient(
