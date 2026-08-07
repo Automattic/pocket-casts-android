@@ -4,18 +4,14 @@ import au.com.shiftyjelly.pocketcasts.models.entity.BlazeAd
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import io.reactivex.Single
 import javax.inject.Inject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.rx2.rxSingle
 
 class StaticServiceManagerImpl @Inject constructor(
     private val service: StaticService,
 ) : StaticServiceManager {
     override fun getColorsSingle(podcastUuid: String): Single<Optional<ArtworkColors>> {
-        return service.getColorsMaybe(podcastUuid)
-            // convert response to artwork colors
-            .map(ColorsResponse::toArtworkColors)
-            // convert to optional so we can handle if the value is missing
-            .map { Optional.of(it) }
-            .defaultIfEmpty(Optional.empty())
-            .toSingle()
+        return rxSingle(Dispatchers.IO) { Optional.of(getColors(podcastUuid)) }
     }
 
     override suspend fun getColors(podcastUuid: String): ArtworkColors? {

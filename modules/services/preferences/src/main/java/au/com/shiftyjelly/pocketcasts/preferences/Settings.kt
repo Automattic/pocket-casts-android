@@ -371,6 +371,8 @@ interface Settings {
 
     fun clearPlusPreferences()
 
+    fun clearUserPreferences()
+
     fun setDismissLowStorageModalTime(lastUpdateTime: Long)
     fun shouldShowLowStorageModalAfterSnooze(): Boolean
 
@@ -387,6 +389,7 @@ interface Settings {
     val streamingMode: UserSetting<Boolean>
     val keepScreenAwake: UserSetting<Boolean>
     val openPlayerAutomatically: UserSetting<Boolean>
+    val showGeneratedChapters: UserSetting<Boolean>
 
     val autoDownloadUnmeteredOnly: UserSetting<Boolean>
     val autoDownloadOnlyWhenCharging: UserSetting<Boolean>
@@ -469,6 +472,8 @@ interface Settings {
     val marketingOptIn: UserSetting<Boolean>
 
     val freeGiftAcknowledged: UserSetting<Boolean>
+
+    val audioOnly: UserSetting<Boolean>
 
     val cloudSortOrder: UserSetting<CloudSortOrder>
     val cloudAddToUpNext: UserSetting<Boolean>

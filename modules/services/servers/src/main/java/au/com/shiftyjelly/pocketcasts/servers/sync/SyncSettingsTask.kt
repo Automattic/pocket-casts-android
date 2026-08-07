@@ -34,6 +34,8 @@ class SyncSettingsTask(context: Context, parameters: WorkerParameters) : Corouti
                     freeGiftAcknowledged = settings.freeGiftAcknowledged.getSyncValue(lastSyncTime),
                     gridOrder = settings.podcastsSortType.getSyncValue(lastSyncTime)?.serverId,
                     listeningTimeStats = settings.collectListeningStats.getSyncValue(lastSyncTime),
+                    audioOnly = settings.audioOnly.getSyncValue(lastSyncTime),
+                    disableAiChapters = settings.showGeneratedChapters.getSyncValue(lastSyncTime)?.not(),
                 ),
             )
 
@@ -58,6 +60,8 @@ class SyncSettingsTask(context: Context, parameters: WorkerParameters) : Corouti
                             "marketingOptIn" -> settings.marketingOptIn.set(value.value, updateModifiedAt = false)
                             "freeGiftAcknowledgement" -> settings.freeGiftAcknowledged.set(value.value, updateModifiedAt = false)
                             "listeningTimeStats" -> settings.collectListeningStats.set(value.value, updateModifiedAt = false)
+                            "audioOnly" -> settings.audioOnly.set(value.value, updateModifiedAt = false)
+                            "disableAiChapters" -> settings.showGeneratedChapters.set(!value.value, updateModifiedAt = false)
                         }
                     } else if (value.value is String) {
                         when (key) {

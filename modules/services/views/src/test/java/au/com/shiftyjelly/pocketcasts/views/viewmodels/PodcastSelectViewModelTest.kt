@@ -33,7 +33,7 @@ class PodcastSelectViewModelTest {
         val podcast1 = Podcast(uuid = uuid1, title = "Apple")
         val podcast2 = Podcast(uuid = uuid2, title = "Zebra")
 
-        whenever(podcastManager.findSubscribedBlocking()).thenReturn(listOf(podcast1, podcast2))
+        whenever(podcastManager.findSubscribedNoOrder()).thenReturn(listOf(podcast1, podcast2))
 
         val viewModel = PodcastSelectViewModel(
             podcastManager = podcastManager,

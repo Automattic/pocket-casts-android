@@ -30,12 +30,14 @@ import coil3.request.ImageRequest
 import com.jakewharton.rxrelay2.PublishRelay
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.Completable
+import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.functions.BiFunction
 import io.reactivex.functions.Function4
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import java.util.Date
+import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.rx2.rxCompletable
@@ -56,7 +58,7 @@ class SubscribeManager @Inject constructor(
     private val subscribeRelay: PublishRelay<PodcastSubscribe> by lazy { setupSubscribeRelay() }
     val subscriptionChangedRelay: PublishRelay<String> = PublishRelay.create()
 
-    private val uuidsInQueue = HashSet<String>()
+    private val uuidsInQueue = ConcurrentHashMap.newKeySet<String>()
     private val podcastDao = appDatabase.podcastDao()
     private val episodeDao = appDatabase.episodeDao()
     private val alternateEnclosureDao = appDatabase.alternateEnclosureDao()
@@ -72,27 +74,35 @@ class SubscribeManager @Inject constructor(
             .flatMap({ info ->
                 // shouldAutoDownload = true because the user manually subscribed to the podcast,
                 // so we want to automatically download episodes at this moment.
-                addPodcastRxSingle(info.podcastUuid, sync = info.sync, subscribed = true, shouldAutoDownload = info.shouldAutoDownload).toObservable()
-            }, true, 5)
-            .doOnError { throwable -> LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, throwable, "Could not subscribe to podcast") }
+                addPodcastRxSingle(info.podcastUuid, sync = info.sync, subscribed = true, shouldAutoDownload = info.shouldAutoDownload)
+                    .doOnError { throwable ->
+                        LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, throwable, "Could not subscribe to podcast ${info.podcastUuid}")
+                        removeFromQueue(info.podcastUuid)
+                    }
+                    .toObservable()
+                    .onErrorResumeNext(Observable.empty())
+            }, 5)
             .subscribeBy(
                 onNext = { podcast ->
-                    uuidsInQueue.remove(podcast.uuid)
                     Timber.i("Subscribed successfully to podcast ${podcast.uuid}")
-                    subscriptionChangedRelay.accept(podcast.uuid)
+                    removeFromQueue(podcast.uuid)
                 },
             )
         return source
+    }
+
+    private fun removeFromQueue(podcastUuid: String) {
+        uuidsInQueue.remove(podcastUuid)
+        subscriptionChangedRelay.accept(podcastUuid)
     }
 
     /**
      * Subscribe to a podcast on a background queue.
      */
     fun subscribeOnQueue(podcastUuid: String, sync: Boolean = false, shouldAutoDownload: Boolean) {
-        if (uuidsInQueue.contains(podcastUuid)) {
+        if (!uuidsInQueue.add(podcastUuid)) {
             return
         }
-        uuidsInQueue.add(podcastUuid)
         subscribeRelay.accept(PodcastSubscribe(podcastUuid, sync, shouldAutoDownload))
     }
 
@@ -148,7 +158,7 @@ class SubscribeManager @Inject constructor(
     }
 
     fun getSubscribingPodcastUuids(): Set<String> {
-        return uuidsInQueue
+        return uuidsInQueue.toSet()
     }
 
     private fun subscribeToExistingOrServerPodcastRxSingle(podcastUuid: String, sync: Boolean, subscribed: Boolean, shouldAutoDownload: Boolean): Single<Podcast> {

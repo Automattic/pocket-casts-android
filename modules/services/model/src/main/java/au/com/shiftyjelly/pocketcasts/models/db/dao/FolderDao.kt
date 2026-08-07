@@ -10,7 +10,6 @@ import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.utils.extensions.unidecode
-import io.reactivex.Flowable
 import io.reactivex.Single
 import kotlinx.coroutines.flow.Flow
 
@@ -31,9 +30,6 @@ abstract class FolderDao {
 
     @Query("SELECT * FROM folders WHERE uuid = :uuid")
     abstract suspend fun findByUuid(uuid: String): Folder?
-
-    @Query("SELECT * FROM folders WHERE uuid = :uuid")
-    abstract fun findByUuidRxFlowable(uuid: String): Flowable<List<Folder>>
 
     @Query("SELECT * FROM folders WHERE uuid = :uuid")
     abstract fun findByUuidFlow(uuid: String): Flow<List<Folder>>

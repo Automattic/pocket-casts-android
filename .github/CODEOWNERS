@@ -1,4 +1,4 @@
-* @Automattic/pocket-casts-android 
+* @Automattic/pocket-casts-android
 
 /Gemfile* @Automattic/apps-infra-tooling
 /.ruby-version @Automattic/apps-infra-tooling
@@ -17,3 +17,4 @@ Dangerfile* @Automattic/apps-infra-tooling
 
 # Secrets
 .configure-files/     @Automattic/apps-infra-tooling
+.a8c-secrets/         @Automattic/apps-infra-tooling

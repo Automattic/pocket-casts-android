@@ -1,6 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.repositories.fingerprint
 
+import android.content.Context
 import au.com.shiftyjelly.pocketcasts.servers.di.NoCache
+import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException
@@ -9,11 +11,12 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.coroutineContext
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.sync.Mutex
@@ -26,15 +29,25 @@ import timber.log.Timber
 @Singleton
 class FingerprintReferenceRetriever @Inject constructor(
     @NoCache private val okHttpClient: OkHttpClient,
+    @ApplicationContext private val context: Context,
 ) {
-    private val inFlightRequests = mutableMapOf<String, Deferred<ByteArray?>>()
+    sealed interface FetchResult {
+        class Success(val data: ByteArray) : FetchResult
+        data object NotFound : FetchResult
+        data object Error : FetchResult
+    }
+
+    private val fetchScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private val inFlightRequests = mutableMapOf<String, Deferred<FetchResult>>()
     private val requestMutex = Mutex()
 
+    // The shared fetch runs in the retriever's own scope, so cancelling one awaiting caller
+    // cannot cancel the request out from under another.
     suspend fun fetchReferenceData(
         baseUrl: String,
         podcastUuid: String,
         episodeUuid: String,
-    ): ByteArray? = coroutineScope {
+    ): FetchResult {
         val key = "$podcastUuid/$episodeUuid"
 
         val deferred = requestMutex.withLock {
@@ -42,7 +55,7 @@ class FingerprintReferenceRetriever @Inject constructor(
             if (existing != null && existing.isActive) {
                 existing
             } else {
-                async {
+                fetchScope.async {
                     try {
                         performFetch(baseUrl, podcastUuid, episodeUuid)
                     } finally {
@@ -51,14 +64,14 @@ class FingerprintReferenceRetriever @Inject constructor(
                 }.also { inFlightRequests[key] = it }
             }
         }
-        deferred.await()
+        return deferred.await()
     }
 
     private suspend fun performFetch(
         baseUrl: String,
         podcastUuid: String,
         episodeUuid: String,
-    ): ByteArray? = withContext(Dispatchers.IO) {
+    ): FetchResult = withContext(Dispatchers.IO) {
         val url = "${baseUrl}$podcastUuid/$episodeUuid-fingerprints.json.gz"
 
         for (attempt in 0 until MAX_RETRIES) {
@@ -76,7 +89,7 @@ class FingerprintReferenceRetriever @Inject constructor(
 
                     if (statusCode == 404 || statusCode == 403) {
                         Timber.d("FingerprintReferenceRetriever: no reference for $episodeUuid ($statusCode)")
-                        return@withContext null
+                        return@withContext FetchResult.NotFound
                     }
 
                     if (statusCode != 200) {
@@ -85,28 +98,28 @@ class FingerprintReferenceRetriever @Inject constructor(
                             continue
                         }
                         Timber.w("FingerprintReferenceRetriever: unexpected status $statusCode for $episodeUuid")
-                        return@withContext null
+                        return@withContext FetchResult.Error
                     }
 
                     val body = response.body.bytes()
                     val jsonData = decompressGzipIfNeeded(body)
 
                     Timber.d("FingerprintReferenceRetriever: reference fetched for $episodeUuid (${jsonData.size} bytes)")
-                    return@withContext jsonData
+                    return@withContext FetchResult.Success(jsonData)
                 }
             } catch (e: CancellationException) {
                 throw e
             } catch (e: IOException) {
                 Timber.w("FingerprintReferenceRetriever: fetch failed for $episodeUuid, attempt ${attempt + 1}/$MAX_RETRIES — ${e.message}")
-                if (attempt == MAX_RETRIES - 1) return@withContext null
+                if (attempt == MAX_RETRIES - 1) return@withContext FetchResult.Error
             }
         }
 
         Timber.w("FingerprintReferenceRetriever: exhausted retries for $episodeUuid")
-        null
+        FetchResult.Error
     }
 
-    fun saveReferenceData(data: ByteArray, audioFilePath: String) {
+    suspend fun saveReferenceData(data: ByteArray, audioFilePath: String) = withContext(Dispatchers.IO) {
         val path = referencePath(audioFilePath)
         try {
             File(path).writeBytes(data)
@@ -116,14 +129,44 @@ class FingerprintReferenceRetriever @Inject constructor(
         }
     }
 
-    fun loadReferenceData(audioFilePath: String): ByteArray? {
+    suspend fun loadReferenceData(audioFilePath: String): ByteArray? = withContext(Dispatchers.IO) {
         val path = referencePath(audioFilePath)
         val file = File(path)
-        return if (file.exists()) file.readBytes() else null
+        if (file.exists()) file.readBytes() else null
+    }
+
+    suspend fun loadCachedReference(episodeUuid: String): ByteArray? = withContext(Dispatchers.IO) {
+        runCatching {
+            val file = cachedReferenceFile(episodeUuid)
+            if (!file.exists()) return@runCatching null
+            file.setLastModified(System.currentTimeMillis())
+            file.readBytes()
+        }.getOrNull()
+    }
+
+    suspend fun saveCachedReference(episodeUuid: String, data: ByteArray) = withContext(Dispatchers.IO) {
+        runCatching {
+            val file = cachedReferenceFile(episodeUuid)
+            file.parentFile?.mkdirs()
+            file.writeBytes(data)
+            pruneCachedReferences()
+        }.onFailure { Timber.w(it, "FingerprintReferenceRetriever: failed to cache reference for $episodeUuid") }
+        Unit
+    }
+
+    private fun cachedReferenceFile(episodeUuid: String) = File(File(context.cacheDir, CACHE_DIR_NAME), "$episodeUuid.ref.fp.json")
+
+    private fun pruneCachedReferences() {
+        val files = File(context.cacheDir, CACHE_DIR_NAME).listFiles() ?: return
+        files.sortedByDescending { it.lastModified() }
+            .drop(REFERENCE_CACHE_MAX_FILES)
+            .forEach { it.delete() }
     }
 
     companion object {
         private const val MAX_RETRIES = 3
+        private const val CACHE_DIR_NAME = "episode_fingerprints"
+        private const val REFERENCE_CACHE_MAX_FILES = 20
 
         fun referencePath(audioFilePath: String): String {
             val dotIndex = audioFilePath.lastIndexOf('.')

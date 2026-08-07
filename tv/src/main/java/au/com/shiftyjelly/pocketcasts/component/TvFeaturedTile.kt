@@ -36,10 +36,9 @@ import androidx.tv.material3.CardDefaults
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.OutlinedButton
 import androidx.tv.material3.Text
-import au.com.shiftyjelly.pocketcasts.compose.AppTheme
-import au.com.shiftyjelly.pocketcasts.theme.TvColors
-import au.com.shiftyjelly.pocketcasts.theme.TvTextStyles
-import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.theme.TvTheme
+import au.com.shiftyjelly.pocketcasts.theme.tvColors
+import au.com.shiftyjelly.pocketcasts.theme.tvTypography
 import coil3.compose.AsyncImage
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -87,9 +86,9 @@ fun TvFeaturedTile(
                         Brush.horizontalGradient(
                             colorStops = arrayOf(
                                 0f to Color.Transparent,
-                                0.2f to TvColors.Dark.copy(alpha = 0.7f),
-                                0.45f to TvColors.Dark,
-                                1f to TvColors.Dark,
+                                0.2f to MaterialTheme.tvColors.backgroundSunken.copy(alpha = 0.7f),
+                                0.45f to MaterialTheme.tvColors.backgroundSunken,
+                                1f to MaterialTheme.tvColors.backgroundSunken,
                             ),
                         ),
                     ),
@@ -118,8 +117,8 @@ fun TvFeaturedTile(
                     if (isSponsored) {
                         Text(
                             text = sponsoredLabel ?: stringResource(LR.string.sponsored),
-                            style = TvTextStyles.FeaturedTileSponsoredLabel,
-                            color = Color.White.copy(alpha = 0.7f),
+                            style = MaterialTheme.tvTypography.caption2,
+                            color = MaterialTheme.tvColors.textPrimary70,
                         )
                     }
 
@@ -127,16 +126,16 @@ fun TvFeaturedTile(
 
                     Text(
                         text = title,
-                        style = TvTextStyles.FeaturedTileTitle,
-                        color = Color.White,
+                        style = MaterialTheme.tvTypography.headline,
+                        color = MaterialTheme.tvColors.textPrimary,
                     )
 
                     Spacer(modifier = Modifier.height(7.dp))
 
                     Text(
                         text = description,
-                        style = TvTextStyles.FeaturedTileDescription,
-                        color = Color.White.copy(alpha = 0.7f),
+                        style = MaterialTheme.tvTypography.caption2,
+                        color = MaterialTheme.tvColors.textPrimary70,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
                     )
@@ -174,19 +173,17 @@ fun TvFeaturedTile(
 @Preview(device = Devices.TV_1080p)
 @Composable
 private fun TvFeaturedTilePreview() {
-    AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
-        MaterialTheme {
-            Box(modifier = Modifier.background(TvColors.Dark)) {
-                TvFeaturedTile(
-                    artworkUrl = "",
-                    isSponsored = true,
-                    sponsoredLabel = "Sponsored \u00B7 iHeartPodcasts and Kaleidoscope",
-                    title = "Superhuman",
-                    description = "SuperHuman is a high-stakes, edge-of-your-seat docuseries that dives into the launch of what many have called the \"Doping Olympics\"",
-                    onGoToPodcast = {},
-                    onPlayLastEpisode = {},
-                )
-            }
+    TvTheme {
+        Box(modifier = Modifier.background(MaterialTheme.tvColors.backgroundSunken)) {
+            TvFeaturedTile(
+                artworkUrl = "",
+                isSponsored = true,
+                sponsoredLabel = "Sponsored \u00B7 iHeartPodcasts and Kaleidoscope",
+                title = "Superhuman",
+                description = "SuperHuman is a high-stakes, edge-of-your-seat docuseries that dives into the launch of what many have called the \"Doping Olympics\"",
+                onGoToPodcast = {},
+                onPlayLastEpisode = {},
+            )
         }
     }
 }

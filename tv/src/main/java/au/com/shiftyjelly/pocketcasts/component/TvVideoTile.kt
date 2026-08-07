@@ -31,10 +31,9 @@ import androidx.compose.ui.unit.dp
 import androidx.tv.material3.Button
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
-import au.com.shiftyjelly.pocketcasts.compose.AppTheme
-import au.com.shiftyjelly.pocketcasts.theme.TvColors
-import au.com.shiftyjelly.pocketcasts.theme.TvTextStyles
-import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.theme.TvTheme
+import au.com.shiftyjelly.pocketcasts.theme.tvColors
+import au.com.shiftyjelly.pocketcasts.theme.tvTypography
 import coil3.compose.AsyncImage
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -118,15 +117,15 @@ fun TvVideoTile(
                             Column {
                                 Text(
                                     text = podcastTitle,
-                                    style = TvTextStyles.VideoTilePodcastTitle,
-                                    color = TvColors.TextSecondary,
+                                    style = MaterialTheme.tvTypography.caption1,
+                                    color = MaterialTheme.tvColors.textSecondary,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,
                                 )
                                 Text(
                                     text = episodeTitle,
-                                    style = TvTextStyles.VideoTileEpisodeTitle,
-                                    color = Color.White,
+                                    style = MaterialTheme.tvTypography.caption1,
+                                    color = MaterialTheme.tvColors.textPrimary,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,
                                 )
@@ -142,18 +141,16 @@ fun TvVideoTile(
 @Preview(device = Devices.TV_1080p)
 @Composable
 private fun TvVideoTilePreview() {
-    AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
-        MaterialTheme {
-            Box(modifier = Modifier.background(TvColors.Dark)) {
-                TvVideoTile(
-                    thumbnailUrl = "",
-                    podcastArtworkUrl = "",
-                    podcastTitle = "Huberman Lab",
-                    episodeTitle = "How to overcome Social Anxiety",
-                    onPlayEpisode = {},
-                    onGoToPodcast = {},
-                )
-            }
+    TvTheme {
+        Box(modifier = Modifier.background(MaterialTheme.tvColors.backgroundSunken)) {
+            TvVideoTile(
+                thumbnailUrl = "",
+                podcastArtworkUrl = "",
+                podcastTitle = "Huberman Lab",
+                episodeTitle = "How to overcome Social Anxiety",
+                onPlayEpisode = {},
+                onGoToPodcast = {},
+            )
         }
     }
 }
