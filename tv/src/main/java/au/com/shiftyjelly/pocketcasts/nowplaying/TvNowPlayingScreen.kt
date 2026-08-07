@@ -166,7 +166,7 @@ private fun TvNowPlayingContent(
         modifier = modifier
             .fillMaxSize()
             .onPreviewKeyEvent { event ->
-                if (event.type != KeyEventType.KeyDown) return@onPreviewKeyEvent false
+                if (event.type != KeyEventType.KeyDown || event.key == Key.Back) return@onPreviewKeyEvent false
                 interactionTick++
                 val revealsChrome = !isChromeVisible
                 if (revealsChrome) {
