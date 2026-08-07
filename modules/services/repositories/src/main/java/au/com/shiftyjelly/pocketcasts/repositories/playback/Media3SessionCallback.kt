@@ -91,6 +91,7 @@ internal class Media3SessionCallback(
             .add(SessionCommand(APP_ACTION_CHANGE_SPEED, Bundle.EMPTY))
             .add(SessionCommand(APP_ACTION_ARCHIVE, Bundle.EMPTY))
             .add(SessionCommand(APP_ACTION_PLAY_NEXT, Bundle.EMPTY))
+            .add(SessionCommand(APP_ACTION_SHUFFLE, Bundle.EMPTY))
             .add(SessionCommand(SessionCommand.COMMAND_CODE_SESSION_SET_RATING))
             .build()
 
@@ -112,6 +113,7 @@ internal class Media3SessionCallback(
             APP_ACTION_CHANGE_SPEED -> launchCommandFuture("Change speed") { actions.changePlaybackSpeedSuspend() }
             APP_ACTION_ARCHIVE -> launchCommandFuture("Archive") { actions.archiveSuspend() }
             APP_ACTION_PLAY_NEXT -> launchCommandFuture("Play next") { playbackManager.playNextInQueue() }
+            APP_ACTION_SHUFFLE -> launchCommandFuture("Toggle Up Next shuffle") { actions.toggleUpNextShuffleSuspend() }
             else -> Futures.immediateFuture(SessionResult(SessionError.ERROR_NOT_SUPPORTED))
         }
     }
