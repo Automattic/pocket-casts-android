@@ -188,7 +188,11 @@ private fun TvNowPlayingContent(
             if (state.isVideo) {
                 TvVideoSurface(player = state.player)
             } else {
-                EpisodeArtworkWithTitles(episode = episode, podcastTitle = state.podcastTitle)
+                EpisodeArtworkWithTitles(
+                    episode = episode,
+                    podcastTitle = state.podcastTitle,
+                    isPlaying = state.isPlaying && !state.isBuffering,
+                )
             }
         }
         Spacer(modifier = Modifier.height(24.dp))
@@ -265,18 +269,25 @@ private fun TvNowPlayingContent(
 private fun EpisodeArtworkWithTitles(
     episode: BaseEpisode,
     podcastTitle: String?,
+    isPlaying: Boolean,
     modifier: Modifier = Modifier,
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier,
     ) {
-        TvArtworkImage(
-            model = episode.artworkModel(),
-            modifier = Modifier
-                .size(280.dp)
-                .clip(RoundedCornerShape(8.dp)),
-        )
+        Box(contentAlignment = Alignment.Center) {
+            TvNowPlayingWaveform(
+                isPlaying = isPlaying,
+                artworkSize = ArtworkSize,
+            )
+            TvArtworkImage(
+                model = episode.artworkModel(),
+                modifier = Modifier
+                    .size(ArtworkSize)
+                    .clip(RoundedCornerShape(8.dp)),
+            )
+        }
         Spacer(modifier = Modifier.height(24.dp))
         Text(
             text = episode.title,
@@ -405,6 +416,8 @@ private fun PlayerControlButton(
         )
     }
 }
+
+private val ArtworkSize = 280.dp
 
 private val CHROME_HIDE_DELAY = 4.seconds
 
