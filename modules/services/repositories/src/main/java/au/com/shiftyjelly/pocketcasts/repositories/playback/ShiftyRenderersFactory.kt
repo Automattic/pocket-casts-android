@@ -34,6 +34,9 @@ class ShiftyRenderersFactory(
     private var audioSink: AudioSink? = null
     private var processorChain: ShiftyAudioProcessorChain? = null
     private val customAudio = ShiftyCustomAudio(statsManager)
+    private val audioLevelMeter = AudioLevelMeterProcessor()
+
+    val currentAudioLevel: Float get() = audioLevelMeter.currentAudioLevel
 
     fun setRemoveSilence(trimMode: TrimMode) {
         processorChain?.applyTrimModeForNextUpdate(trimMode)
@@ -52,7 +55,7 @@ class ShiftyRenderersFactory(
 
     override fun buildAudioSink(context: Context, enableFloatOutput: Boolean, enableAudioOutputPlaybackParameters: Boolean): AudioSink {
         val tapProcessor = fingerprintPcmTap?.let { FingerprintTapAudioProcessor(it, fingerprintTapEnabled) }
-        processorChain = ShiftyAudioProcessorChain(customAudio, tapProcessor)
+        processorChain = ShiftyAudioProcessorChain(customAudio, tapProcessor, audioLevelMeter)
         val sink = DefaultAudioSink.Builder(context)
             .setAudioProcessorChain(processorChain!!)
             .setEnableFloatOutput(enableFloatOutput)
