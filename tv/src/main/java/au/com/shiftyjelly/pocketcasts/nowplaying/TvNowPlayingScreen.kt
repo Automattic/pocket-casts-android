@@ -150,6 +150,10 @@ private fun TvNowPlayingContent(
     }
     if (!isChromeVisible) {
         HideTvTopBar()
+        BackHandler {
+            interactionTick++
+            isChromeVisible = true
+        }
     }
     val chromeAlpha by animateFloatAsState(if (isChromeVisible) 1f else 0f, label = "TvNowPlayingChromeAlpha")
 
@@ -163,8 +167,8 @@ private fun TvNowPlayingContent(
                 if (revealsChrome) {
                     isChromeVisible = true
                 }
-                // Only navigation presses are swallowed by the reveal; media and back keys keep
-                // their effect even while the chrome is hidden.
+                // Only navigation presses are swallowed by the reveal; media keys keep their
+                // effect even while the chrome is hidden and back is revealed via BackHandler.
                 revealsChrome && event.key in chromeRevealConsumedKeys
             }
             .padding(top = TvTopBarHeight)
@@ -406,7 +410,6 @@ private val chromeRevealConsumedKeys = setOf(
     Key.DirectionRight,
     Key.DirectionCenter,
     Key.Enter,
-    Key.Back,
 )
 
 private fun BaseEpisode.artworkModel(): Any? = when (this) {
