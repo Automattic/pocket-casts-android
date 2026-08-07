@@ -44,6 +44,7 @@ class SyncSettingsTaskTest {
         whenever(settings.freeGiftAcknowledged).thenReturn(unsyncedSetting())
         whenever(settings.podcastsSortType).thenReturn(unsyncedSetting())
         whenever(settings.collectListeningStats).thenReturn(unsyncedSetting())
+        whenever(settings.audioOnly).thenReturn(unsyncedSetting())
         whenever(settings.showGeneratedChapters).thenReturn(showGeneratedChapters)
     }
 

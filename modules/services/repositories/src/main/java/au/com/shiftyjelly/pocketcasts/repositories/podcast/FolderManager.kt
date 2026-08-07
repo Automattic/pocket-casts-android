@@ -26,7 +26,6 @@ interface FolderManager {
     fun findFoldersSingle(): Single<List<Folder>>
     suspend fun updatePositions(folders: List<Folder>)
     suspend fun updateSortPosition(folderItems: List<FolderItem>)
-    fun findFoldersToSyncBlocking(): List<Folder>
     suspend fun findFoldersToSync(): List<Folder>
     suspend fun markAllSynced()
     suspend fun countFolders(): Int

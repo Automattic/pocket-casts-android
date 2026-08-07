@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-07-14 13:58:33+0000
+Translation-Revision-Date: 2026-07-24 12:03:29+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
@@ -152,8 +152,8 @@ Language: sv_SE
     <string name="playlist_limit_reached">Spellistor kan innehålla högst %d avsnitt.</string>
     <string name="playlist_limit_almost_full">Spellistan är nästan full. Prova att lägga till färre avsnitt.</string>
     <string name="podcasts_add_episode">Lägg till</string>
-    <string name="add_to_up_next_bottom">Spela upp senaste i Up Next</string>
     <string name="add_to_up_next_top">Spela upp nästa i Nästa</string>
+    <string name="add_to_up_next_bottom">Spela upp sist i Nästa</string>
     <string name="winback_cancel_subscription_perk_installment">Du har ett paket med en 12-månaders avbetalningsplan. Om du avbryter din prenumeration upphör din åtkomst, men Google Play fortsätter att debitera dig för de återstående månaderna.</string>
     <string name="winback_cancel_subscription_header_description_installment">Om du avbryter upphör din Pocket Casts-prenumeration.\nDin betalningsplan för Google Play fortsätter.</string>
     <string name="winback_cancel_subscription_perk_history">Dina podcasts och din lyssningshistorik fortsätter att vara tillgängliga.</string>

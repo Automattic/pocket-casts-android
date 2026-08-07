@@ -189,8 +189,8 @@ abstract class LocalPlayer(override val onPlayerEvent: (Player, PlayerEvent) -> 
         }
     }
 
-    override fun setEpisode(episode: BaseEpisode) {
-        episodeLocation = EpisodeLocation.create(episode)
+    override fun setEpisode(episode: BaseEpisode, preferStream: Boolean) {
+        episodeLocation = EpisodeLocation.create(episode, preferStream)
     }
 
     override suspend fun setPlaybackEffects(playbackEffects: PlaybackEffects) {}

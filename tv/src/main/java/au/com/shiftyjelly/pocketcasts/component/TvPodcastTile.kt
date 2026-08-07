@@ -11,9 +11,8 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.MaterialTheme
-import au.com.shiftyjelly.pocketcasts.compose.AppTheme
-import au.com.shiftyjelly.pocketcasts.theme.TvColors
-import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.theme.TvTheme
+import au.com.shiftyjelly.pocketcasts.theme.tvColors
 import coil3.compose.AsyncImage
 
 @Composable
@@ -22,6 +21,7 @@ fun TvPodcastTile(
     podcastTitle: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    imageModifier: Modifier = Modifier,
 ) {
     TvTile(
         onClick = onClick,
@@ -31,25 +31,26 @@ fun TvPodcastTile(
             model = artworkUrl,
             contentDescription = podcastTitle,
             contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .width(123.dp)
-                .aspectRatio(1f),
+            modifier = imageModifier.aspectRatio(1f),
         )
     }
+}
+
+object TvPodcastTileDefaults {
+    val RowImageWidth = 123.dp
 }
 
 @Preview(device = Devices.TV_1080p)
 @Composable
 private fun TvPodcastTilePreview() {
-    AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
-        MaterialTheme {
-            Box(modifier = Modifier.background(TvColors.Dark)) {
-                TvPodcastTile(
-                    artworkUrl = "",
-                    podcastTitle = "Sample Podcast",
-                    onClick = {},
-                )
-            }
+    TvTheme {
+        Box(modifier = Modifier.background(MaterialTheme.tvColors.backgroundSunken)) {
+            TvPodcastTile(
+                artworkUrl = "",
+                podcastTitle = "Sample Podcast",
+                onClick = {},
+                imageModifier = Modifier.width(TvPodcastTileDefaults.RowImageWidth),
+            )
         }
     }
 }

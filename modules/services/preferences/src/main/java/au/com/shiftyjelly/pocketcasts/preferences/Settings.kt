@@ -371,6 +371,8 @@ interface Settings {
 
     fun clearPlusPreferences()
 
+    fun clearUserPreferences()
+
     fun setDismissLowStorageModalTime(lastUpdateTime: Long)
     fun shouldShowLowStorageModalAfterSnooze(): Boolean
 
@@ -470,6 +472,8 @@ interface Settings {
     val marketingOptIn: UserSetting<Boolean>
 
     val freeGiftAcknowledged: UserSetting<Boolean>
+
+    val audioOnly: UserSetting<Boolean>
 
     val cloudSortOrder: UserSetting<CloudSortOrder>
     val cloudAddToUpNext: UserSetting<Boolean>

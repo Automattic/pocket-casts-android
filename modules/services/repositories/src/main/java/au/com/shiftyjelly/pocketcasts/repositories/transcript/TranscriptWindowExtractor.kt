@@ -79,7 +79,9 @@ class TranscriptWindowExtractor @Inject constructor(
 
     companion object {
         private const val MIN_WORDS = 10
-        private val COVERAGE_TIMEOUT = 5.seconds
+
+        // The tap-built map lags the playhead by a full fingerprint window, so cover that plus slack.
+        private val COVERAGE_TIMEOUT = 12.seconds
 
         internal fun parseVttWindow(content: String, timeSecs: Int, windowSecs: Int): String? {
             val entries = WebVttParser().parse(Buffer().writeUtf8(content)).getOrNull() ?: return null

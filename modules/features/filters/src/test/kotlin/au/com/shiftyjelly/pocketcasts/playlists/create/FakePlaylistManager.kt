@@ -73,12 +73,17 @@ class FakePlaylistManager : PlaylistManager {
     }
 
     val smartPlaylist = MutableStateFlow<SmartPlaylist?>(null)
-    override fun smartPlaylistFlow(uuid: String, searchTerm: String?): Flow<SmartPlaylist?> {
+    override fun smartPlaylistFlow(uuid: String, searchTerm: String?, includeArchived: Boolean): Flow<SmartPlaylist?> {
         return smartPlaylist
     }
 
     val smartEpisodes = MutableStateFlow(emptyList<PlaylistEpisode.Available>())
-    override fun smartEpisodesFlow(rules: SmartRules, sortType: PlaylistEpisodeSortType, searchTerm: String?): Flow<List<PlaylistEpisode.Available>> {
+    override fun smartEpisodesFlow(
+        rules: SmartRules,
+        sortType: PlaylistEpisodeSortType,
+        searchTerm: String?,
+        includeArchived: Boolean,
+    ): Flow<List<PlaylistEpisode.Available>> {
         return smartEpisodes
     }
 
@@ -100,7 +105,7 @@ class FakePlaylistManager : PlaylistManager {
     }
 
     val manualPlaylist = MutableStateFlow<ManualPlaylist?>(null)
-    override fun manualPlaylistFlow(uuid: String, searchTerm: String?): Flow<ManualPlaylist?> {
+    override fun manualPlaylistFlow(uuid: String, searchTerm: String?, includeArchived: Boolean): Flow<ManualPlaylist?> {
         return manualPlaylist
     }
 

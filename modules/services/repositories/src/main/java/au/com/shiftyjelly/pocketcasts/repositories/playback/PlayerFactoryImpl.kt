@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.playback
 
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintPcmTap
 import au.com.shiftyjelly.pocketcasts.repositories.stats.PlaybackStatsCollector
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -12,6 +13,7 @@ class PlayerFactoryImpl @Inject constructor(
     private val statsManager: StatsManager,
     private val playbackStatsCollector: PlaybackStatsCollector,
     private val dataSourceFactory: ExoPlayerDataSourceFactory,
+    private val fingerprintPcmTap: FingerprintPcmTap,
     @ApplicationContext private val context: Context,
 ) : PlayerFactory {
 
@@ -29,6 +31,7 @@ class PlayerFactoryImpl @Inject constructor(
             playbackStatsCollector = playbackStatsCollector,
             context = context,
             dataSourceFactory = dataSourceFactory,
+            fingerprintPcmTap = fingerprintPcmTap,
             onPlayerEvent = onPlayerEvent,
         )
     }

@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-07-14 23:32:07+0000
+Translation-Revision-Date: 2026-07-29 15:50:38+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: ca
 -->
 <resources>
+    <string name="tv_home_keep_listening">Continua escoltant</string>
+    <string name="settings_audio_only_summary">Si s\'activa, els episodis amb vídeo es reproduiran només en àudio i s\'estalviaran dades.</string>
+    <string name="settings_audio_only">Només àudio</string>
+    <string name="profile_try_duration_for_free">Prova %1$s gratis</string>
+    <string name="settings_generated_chapters_summary">Mostra els capítols generats automàticament quan estiguin disponibles.</string>
+    <string name="settings_generated_chapters">Capítols generats</string>
     <string name="profile_stats_listening_activity_info_summary">Una estimació de quan has estat escoltant, basada en el teu historial de reproducció. Si acabes un episodi al llarg de diversos dies, es mostra l\'últim dia.</string>
     <string name="profile_stats_listening_activity_info_title">Activitat d\'escolta</string>
     <string name="profile_stats_listening_activity_info_help">Informació</string>
