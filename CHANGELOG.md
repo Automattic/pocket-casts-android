@@ -1,6 +1,8 @@
 8.19
 -----
-
+*   Bug Fixes
+    *   Fix a crash when showing a bottom sheet after the app is sent to the background
+        ([#5709](https://github.com/Automattic/pocket-casts-android/pull/5709))
 
 8.18
 -----
