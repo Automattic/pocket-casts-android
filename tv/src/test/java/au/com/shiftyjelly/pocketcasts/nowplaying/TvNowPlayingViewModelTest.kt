@@ -285,6 +285,28 @@ class TvNowPlayingViewModelTest {
         verify(playbackManager).updatePlayerEffects(effectsWith(1.5, TrimMode.LOW, true))
     }
 
+    @Test
+    fun `rapid effect changes build on the pending value`() = runTest {
+        viewModel.setPlaybackSpeed(1.5)
+        viewModel.setVolumeBoost(true)
+        runCurrent()
+
+        verify(playbackManager).updatePlayerEffects(effectsWith(1.5, TrimMode.OFF, true))
+    }
+
+    @Test
+    fun `pending effects are dropped once the playback state reflects them`() = runTest {
+        viewModel.setPlaybackSpeed(1.5)
+        runCurrent()
+        playbackStates.value = PlaybackState(playbackSpeed = 1.5)
+        playbackStates.value = PlaybackState(playbackSpeed = 2.0)
+
+        viewModel.setVolumeBoost(true)
+        runCurrent()
+
+        verify(playbackManager).updatePlayerEffects(effectsWith(2.0, TrimMode.OFF, true))
+    }
+
     private fun effectsWith(speed: Double, trimMode: TrimMode, isVolumeBoosted: Boolean) = argThat<PlaybackEffects> {
         playbackSpeed == speed && this.trimMode == trimMode && this.isVolumeBoosted == isVolumeBoosted
     }

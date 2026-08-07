@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.nowplaying
 
+import java.util.Locale
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -31,9 +32,14 @@ class TvPlayerEffectsControlsTest {
 
     @Test
     fun `speed labels use one decimal place`() {
-        assertEquals("0.5x", playbackSpeedLabel(0.5))
-        assertEquals("1.0x", playbackSpeedLabel(1.0))
-        assertEquals("1.2x", playbackSpeedLabel(1.2))
-        assertEquals("3.0x", playbackSpeedLabel(3.0))
+        assertEquals("0.5x", playbackSpeedLabel(0.5, Locale.US))
+        assertEquals("1.0x", playbackSpeedLabel(1.0, Locale.US))
+        assertEquals("1.2x", playbackSpeedLabel(1.2, Locale.US))
+        assertEquals("3.0x", playbackSpeedLabel(3.0, Locale.US))
+    }
+
+    @Test
+    fun `speed labels follow the locale`() {
+        assertEquals("1,2x", playbackSpeedLabel(1.2, Locale.GERMANY))
     }
 }

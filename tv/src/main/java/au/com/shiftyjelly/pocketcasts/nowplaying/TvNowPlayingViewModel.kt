@@ -24,6 +24,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlow
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 @HiltViewModel
 class TvNowPlayingViewModel @Inject constructor(
@@ -93,23 +95,33 @@ class TvNowPlayingViewModel @Inject constructor(
 
     fun setVolumeBoost(isBoosted: Boolean) = updateEffects { it.copy(isVolumeBoosted = isBoosted) }
 
+    private val effectsMutex = Mutex()
+    private var pendingEffects: PlaybackEffectsData? = null
+    private var pendingEffectsBaseline: PlaybackEffectsData? = null
+
     private fun updateEffects(update: (PlaybackEffectsData) -> PlaybackEffectsData) {
         viewModelScope.launch(ioDispatcher) {
-            val playbackState = playbackManager.playbackStateFlow.first()
-            val currentEffects = PlaybackEffectsData(
-                playbackSpeed = playbackState.playbackSpeed,
-                trimMode = playbackState.trimMode,
-                isVolumeBoosted = playbackState.isVolumeBoosted,
-            )
-            val effects = update(currentEffects).toEffects()
-            val podcast = (playbackManager.getCurrentEpisode() as? PodcastEpisode)
-                ?.let { podcastManager.findPodcastByUuid(it.podcastUuid) }
-            if (podcast != null && podcast.overrideGlobalEffects) {
-                podcastManager.updateEffectsBlocking(podcast, effects)
-            } else {
-                settings.globalPlaybackEffects.set(effects, updateModifiedAt = true)
+            effectsMutex.withLock {
+                val playbackState = playbackManager.playbackStateFlow.first()
+                val stateEffects = PlaybackEffectsData(
+                    playbackSpeed = playbackState.playbackSpeed,
+                    trimMode = playbackState.trimMode,
+                    isVolumeBoosted = playbackState.isVolumeBoosted,
+                )
+                val baseEffects = pendingEffects?.takeIf { stateEffects == pendingEffectsBaseline } ?: stateEffects
+                val updatedEffects = update(baseEffects)
+                pendingEffects = updatedEffects
+                pendingEffectsBaseline = stateEffects
+                val effects = updatedEffects.toEffects()
+                val podcast = (playbackManager.getCurrentEpisode() as? PodcastEpisode)
+                    ?.let { podcastManager.findPodcastByUuid(it.podcastUuid) }
+                if (podcast != null && podcast.overrideGlobalEffects) {
+                    podcastManager.updateEffectsBlocking(podcast, effects)
+                } else {
+                    settings.globalPlaybackEffects.set(effects, updateModifiedAt = true)
+                }
+                playbackManager.updatePlayerEffects(effects)
             }
-            playbackManager.updatePlayerEffects(effects)
         }
     }
 

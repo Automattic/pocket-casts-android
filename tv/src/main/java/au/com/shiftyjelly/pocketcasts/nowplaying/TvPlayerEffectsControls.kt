@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.DpOffset
@@ -28,7 +29,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 internal val tvPlaybackSpeedOptions: List<Double> = (5..30).map { it / 10.0 }
 
-internal fun playbackSpeedLabel(speed: Double): String = String.format(Locale.getDefault(), "%.1fx", speed)
+internal fun playbackSpeedLabel(speed: Double, locale: Locale): String = String.format(locale, "%.1fx", speed)
 
 internal fun nearestPlaybackSpeedOption(speed: Double): Double = tvPlaybackSpeedOptions.minBy { abs(it - speed) }
 
@@ -41,6 +42,7 @@ internal fun TvPlaybackSpeedButton(
     modifier: Modifier = Modifier,
 ) {
     val currentSpeed = speed.roundedSpeed()
+    val locale = LocalResources.current.configuration.locales[0]
     Box(modifier = modifier) {
         IconButton(
             onClick = { onMenuVisibleChange(true) },
@@ -48,7 +50,7 @@ internal fun TvPlaybackSpeedButton(
             modifier = Modifier.size(56.dp),
         ) {
             Text(
-                text = playbackSpeedLabel(currentSpeed),
+                text = playbackSpeedLabel(currentSpeed, locale),
                 style = MaterialTheme.tvTypography.caption1,
             )
         }
@@ -65,7 +67,7 @@ internal fun TvPlaybackSpeedButton(
             ) {
                 tvPlaybackSpeedOptions.forEach { option ->
                     TvDropdownMenuItem(
-                        label = playbackSpeedLabel(option),
+                        label = playbackSpeedLabel(option, locale),
                         isSelected = option == currentSpeed,
                         requestInitialFocus = option == focusedOption,
                         onClick = {
@@ -73,7 +75,7 @@ internal fun TvPlaybackSpeedButton(
                             if (option != currentSpeed) {
                                 onSelectSpeed(option)
                                 toastHostState.show(
-                                    String.format(Locale.getDefault(), toastTemplate, playbackSpeedLabel(option)),
+                                    String.format(locale, toastTemplate, playbackSpeedLabel(option, locale)),
                                 )
                             }
                         },
@@ -94,6 +96,7 @@ internal fun TvPlayerEffectsButton(
     onSelectTrimMode: (TrimMode) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val isEffectsOn = isVolumeBoosted || trimMode != TrimMode.OFF
     Box(modifier = modifier) {
         IconButton(
             onClick = { onMenuVisibleChange(true) },
@@ -101,13 +104,14 @@ internal fun TvPlayerEffectsButton(
             modifier = Modifier.size(56.dp),
         ) {
             Icon(
-                painter = painterResource(IR.drawable.ic_effects_off),
+                painter = painterResource(if (isEffectsOn) IR.drawable.ic_effects_plus else IR.drawable.ic_effects_off),
                 contentDescription = stringResource(LR.string.player_effects),
                 modifier = Modifier.size(24.dp),
             )
         }
         if (isMenuVisible) {
             val toastHostState = LocalTvToastHostState.current
+            val locale = LocalResources.current.configuration.locales[0]
             val boostOnToast = stringResource(LR.string.tv_volume_boost_on)
             val boostOffToast = stringResource(LR.string.tv_volume_boost_off)
             val trimChangedTemplate = stringResource(LR.string.tv_trim_silence_changed)
@@ -123,7 +127,6 @@ internal fun TvPlayerEffectsButton(
                     isSelected = isVolumeBoosted,
                     requestInitialFocus = true,
                     onClick = {
-                        onMenuVisibleChange(false)
                         val isBoosted = !isVolumeBoosted
                         onSetVolumeBoost(isBoosted)
                         toastHostState.show(if (isBoosted) boostOnToast else boostOffToast)
@@ -143,7 +146,7 @@ internal fun TvPlayerEffectsButton(
                                 val toast = if (mode == TrimMode.OFF) {
                                     trimOffToast
                                 } else {
-                                    String.format(Locale.getDefault(), trimChangedTemplate, label)
+                                    String.format(locale, trimChangedTemplate, label)
                                 }
                                 toastHostState.show(toast)
                             }
