@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -79,6 +80,9 @@ class TvNowPlayingViewModelTest {
             positionMs = 1_000,
             durationMs = 60_000,
             bufferedMs = 5_000,
+            playbackSpeed = 1.5,
+            trimMode = TrimMode.MEDIUM,
+            isVolumeBoosted = true,
         )
 
         viewModel.uiState.test {
@@ -92,6 +96,21 @@ class TvNowPlayingViewModelTest {
             assertEquals(60_000, state.durationMs)
             assertEquals(5_000, state.bufferedMs)
             assertEquals(false, state.isVideo)
+            assertEquals(1.5, state.playbackSpeed, 0.0)
+            assertEquals(TrimMode.MEDIUM, state.trimMode)
+            assertEquals(true, state.isVolumeBoosted)
+        }
+    }
+
+    @Test
+    fun `a default playback state maps default effects`() = runTest {
+        queueChanges.onNext(UpNextQueue.State.Loaded(audioEpisode, null, emptyList()))
+
+        viewModel.uiState.test {
+            val state = awaitItem() as TvNowPlayingUiState.Loaded
+            assertEquals(1.0, state.playbackSpeed, 0.0)
+            assertEquals(TrimMode.OFF, state.trimMode)
+            assertEquals(false, state.isVolumeBoosted)
         }
     }
 
