@@ -27,10 +27,12 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
@@ -62,6 +64,7 @@ class PodcastsViewModelTest {
             assertEquals(listOf("latest-episode-podcast"), initialState.items.map { it.uuid })
 
             sortTypeFlow.value = PodcastsSortType.RECENTLY_PLAYED
+            advanceUntilIdle()
             expectNoEvents()
 
             recentlyPlayedPodcasts.emit(listOf(podcast("recently-played-podcast")))
@@ -79,7 +82,7 @@ class PodcastsViewModelTest {
     ): PodcastsViewModel {
         val sortTypeSetting = mock<UserSetting<PodcastsSortType>> {
             on { flow } doReturn sortTypeFlow
-            on { value } doReturn sortTypeFlow.value
+            on { value } doAnswer { sortTypeFlow.value }
         }
         val notificationsPromptAcknowledgedSetting = mock<UserSetting<Boolean>> {
             on { flow } doReturn MutableStateFlow(false)
@@ -133,6 +136,7 @@ class PodcastsViewModelTest {
             suggestedFoldersPopupPolicy = mock<SuggestedFoldersPopupPolicy>(),
             userManager = userManager,
             notificationHelper = notificationHelper,
+            computationDispatcher = coroutineRule.testDispatcher,
             blazeAdsManager = blazeAdsManager,
             folderUuid = null,
         )

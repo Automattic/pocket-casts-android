@@ -175,6 +175,13 @@ class PodcastsFragment :
     private var lastWidthPx: Int = 0
     private var listState: Parcelable? = null
     private var scrollToTopRequest: ScrollToTopRequest? = null
+    private val cancelPendingScrollToTopListener = object : RecyclerView.OnScrollListener() {
+        override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+            if (newState == RecyclerView.SCROLL_STATE_DRAGGING) {
+                scrollToTopRequest = null
+            }
+        }
+    }
 
     private val folderUuid: String?
         get() = arguments?.getString(ARG_FOLDER_UUID)
@@ -214,6 +221,7 @@ class PodcastsFragment :
         binding.recyclerView.let {
             it.adapter = adapter
             it.addItemDecoration(SpaceItemDecoration())
+            it.addOnScrollListener(cancelPendingScrollToTopListener)
             ItemTouchHelper(dragAndDropCallback).attachToRecyclerView(it)
         }
 
@@ -390,6 +398,7 @@ class PodcastsFragment :
     override fun onDestroyView() {
         listState = binding.recyclerView.layoutManager?.onSaveInstanceState()
         scrollToTopRequest = null
+        binding.recyclerView.removeOnScrollListener(cancelPendingScrollToTopListener)
         binding.recyclerView.adapter = null
         super.onDestroyView()
         realBinding = null
@@ -696,8 +705,10 @@ class PodcastsFragment :
 
     private fun scrollRecyclerViewToTop() {
         val recyclerView = realBinding?.recyclerView ?: return
-        (recyclerView.layoutManager as? LinearLayoutManager)?.scrollToPositionWithOffset(0, 0)
-            ?: recyclerView.scrollToPosition(0)
+        when (val layoutManager = recyclerView.layoutManager) {
+            is LinearLayoutManager -> layoutManager.scrollToPositionWithOffset(0, 0)
+            else -> recyclerView.scrollToPosition(0)
+        }
     }
 
     private fun keepRecyclerViewAtTopAfterSort(sortType: PodcastsSortType) {
