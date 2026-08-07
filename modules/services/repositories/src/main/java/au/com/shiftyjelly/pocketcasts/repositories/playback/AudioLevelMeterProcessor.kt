@@ -10,6 +10,11 @@ import java.nio.ByteOrder
 import kotlin.math.min
 import kotlin.math.sqrt
 
+/**
+ * Measures a smoothed RMS level of the PCM stream, mirroring the tvOS tap ballistics:
+ * channel 0 only, 3x gain, clamped to 1f, one-pole smoothing applied per buffer. The smoothing
+ * is buffer-rate dependent; frame-rate-independent smoothing happens in the UI layer.
+ */
 @OptIn(UnstableApi::class)
 class AudioLevelMeterProcessor(
     private val isEnabled: () -> Boolean,

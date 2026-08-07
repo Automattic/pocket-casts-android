@@ -39,9 +39,9 @@ class ShiftyAudioProcessorChain(
     private val sonicAudioProcessor = SonicAudioProcessor()
 
     private val trimProcessors = arrayOf(lowProcessor, mediumProcessor, highProcessor)
-    private val audioProcessors = listOfNotNull(fingerprintTapProcessor, audioLevelMeter).toTypedArray() +
+    private val audioProcessors = listOfNotNull<AudioProcessor>(fingerprintTapProcessor).toTypedArray() +
         trimProcessors +
-        arrayOf<AudioProcessor>(sonicAudioProcessor)
+        listOfNotNull(sonicAudioProcessor, audioLevelMeter).toTypedArray()
     private var trimMode = TrimMode.OFF
     override fun getAudioProcessors(): Array<AudioProcessor> {
         return audioProcessors

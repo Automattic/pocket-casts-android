@@ -71,6 +71,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.podcasts.TvPodcastDetailsScreen
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
+import au.com.shiftyjelly.pocketcasts.repositories.playback.Player
 import au.com.shiftyjelly.pocketcasts.theme.TvButtonDefaults
 import au.com.shiftyjelly.pocketcasts.theme.TvTheme
 import au.com.shiftyjelly.pocketcasts.theme.TvTopBarHeight
@@ -233,6 +234,7 @@ private fun TvNowPlayingContent(
                     episode = episode,
                     podcastTitle = state.podcastTitle,
                     isPlaying = state.isPlaying && !state.isBuffering,
+                    player = state.player,
                     audioLevel = { state.player?.currentAudioLevel ?: 0f },
                 )
             }
@@ -313,6 +315,7 @@ private fun EpisodeArtworkWithTitles(
     episode: BaseEpisode,
     podcastTitle: String?,
     isPlaying: Boolean,
+    player: Player?,
     audioLevel: () -> Float,
     modifier: Modifier = Modifier,
 ) {
@@ -324,6 +327,7 @@ private fun EpisodeArtworkWithTitles(
             TvNowPlayingWaveform(
                 isPlaying = isPlaying,
                 episodeUuid = episode.uuid,
+                player = player,
                 audioLevel = audioLevel,
                 artworkSize = ArtworkSize,
             )

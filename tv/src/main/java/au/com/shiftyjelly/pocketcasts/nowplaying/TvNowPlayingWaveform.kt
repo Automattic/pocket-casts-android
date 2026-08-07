@@ -12,7 +12,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.CornerRadius
@@ -28,6 +27,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.tv.material3.MaterialTheme
+import au.com.shiftyjelly.pocketcasts.repositories.playback.Player
 import au.com.shiftyjelly.pocketcasts.theme.tvColors
 import kotlin.math.exp
 import kotlin.math.max
@@ -42,6 +42,7 @@ import kotlin.time.Duration.Companion.seconds
 fun TvNowPlayingWaveform(
     isPlaying: Boolean,
     episodeUuid: String,
+    player: Player?,
     audioLevel: () -> Float,
     artworkSize: Dp,
     modifier: Modifier = Modifier,
@@ -50,22 +51,25 @@ fun TvNowPlayingWaveform(
     val envelope = remember { WaveformEnvelope() }
     val smoother = remember { WaveformLevelSmoother() }
     val latestAudioLevel by rememberUpdatedState(audioLevel)
-    var useAudioReactive by remember { mutableStateOf(false) }
+    var useAudioReactive by remember(episodeUuid, player) { mutableStateOf(false) }
     var frameTimeNanos by remember { mutableLongStateOf(0L) }
 
     val lifecycleOwner = LocalLifecycleOwner.current
     LaunchedEffect(isPlaying, episodeUuid) {
+        // Fade only when the change happens on screen; snap when catching up after being backgrounded.
+        var isLiveChange = lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)
         lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            val now = withFrameNanos { it }
-            if (isPlaying) {
-                envelope.fadeTo(1f, now)
-                useAudioReactive = false
+            val now = withInfiniteAnimationFrameNanos { it }
+            val target = if (isPlaying) 1f else 0f
+            if (isLiveChange) {
+                envelope.fadeTo(target, now)
             } else {
-                envelope.fadeTo(0f, now)
+                envelope.snapTo(target, now)
             }
+            isLiveChange = false
             while (isPlaying || !envelope.isSettledAt(frameTimeNanos)) {
                 frameTimeNanos = withInfiniteAnimationFrameNanos { it }
-                if (isPlaying && !useAudioReactive && latestAudioLevel() > AudioDetectThreshold) {
+                if (isPlaying && !useAudioReactive && latestAudioLevel() > AUDIO_DETECT_THRESHOLD) {
                     useAudioReactive = true
                 }
             }
@@ -77,7 +81,7 @@ fun TvNowPlayingWaveform(
     val artworkSizePx = with(density) { artworkSize.toPx() }
     Spacer(
         modifier = modifier
-            .requiredWidth(windowWidth * WidthFraction)
+            .requiredWidth(windowWidth * WIDTH_FRACTION)
             .requiredHeight(MaxBarHeight)
             .drawBehind {
                 drawWaveform(
@@ -105,7 +109,7 @@ private fun DrawScope.drawWaveform(
     val env = envelope.valueAt(timeNanos)
     if (env <= 0.001f) return
     val time = timeNanos / 1e9
-    val targetLevel = if (useAudioReactive) max(audioLevel(), MinReactiveLevel) else 1f
+    val targetLevel = if (useAudioReactive) max(audioLevel(), MIN_REACTIVE_LEVEL) else 1f
     val level = smoother.smooth(targetLevel, time)
     val barWidthPx = BarWidth.toPx()
     val spacingPx = BarSpacing.toPx()
@@ -154,6 +158,12 @@ internal class WaveformEnvelope(
         startTimeNanos = timeNanos
     }
 
+    fun snapTo(target: Float, timeNanos: Long) {
+        fromValue = target
+        toValue = target
+        startTimeNanos = timeNanos
+    }
+
     fun valueAt(timeNanos: Long): Float {
         val t = ((timeNanos - startTimeNanos).toDouble() / fadeDurationNanos).coerceIn(0.0, 1.0)
         val eased = if (t < 0.5) 2 * t * t else 1 - (-2 * t + 2).pow(2) / 2
@@ -175,8 +185,11 @@ internal class WaveformLevelSmoother(
     fun smooth(target: Float, timeSeconds: Double): Float {
         val lastTime = lastTimeSeconds
         lastTimeSeconds = timeSeconds
-        if (lastTime == null || timeSeconds <= lastTime) {
+        if (lastTime == null) {
             value = target
+            return value
+        }
+        if (timeSeconds <= lastTime) {
             return value
         }
         val dt = min(timeSeconds - lastTime, 0.1)
@@ -186,9 +199,9 @@ internal class WaveformLevelSmoother(
     }
 }
 
-private val WidthFraction = 0.75f
-private val AudioDetectThreshold = 0.01f
-private val MinReactiveLevel = 0.05f
+private const val WIDTH_FRACTION = 0.75f
+private const val AUDIO_DETECT_THRESHOLD = 0.01f
+private const val MIN_REACTIVE_LEVEL = 0.05f
 private val BarWidth = 3.33.dp
 private val BarSpacing = 4.67.dp
 private val MaxBarHeight = 66.67.dp

@@ -15,9 +15,9 @@ class WaveformLevelSmootherTest {
     }
 
     @Test
-    fun `snaps to the target when time does not advance`() {
+    fun `holds the previous value when time does not advance`() {
         smoother.smooth(0f, 1.0)
-        assertEquals(1f, smoother.smooth(1f, 1.0), 0f)
+        assertEquals(0f, smoother.smooth(1f, 1.0), 0f)
     }
 
     @Test
