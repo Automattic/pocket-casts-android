@@ -129,8 +129,8 @@ private fun TvNowPlayingContent(
     var interactionTick by remember { mutableIntStateOf(0) }
     val episode = state.episode
 
-    LaunchedEffect(state.isVideo, state.isPlaying, isActionsModalVisible, isDetailsModalVisible, interactionTick) {
-        if (state.isVideo && state.isPlaying && !isActionsModalVisible && !isDetailsModalVisible) {
+    LaunchedEffect(state.isPlaying, isActionsModalVisible, isDetailsModalVisible, interactionTick) {
+        if (state.isPlaying && !isActionsModalVisible && !isDetailsModalVisible) {
             delay(CHROME_HIDE_DELAY)
             isChromeVisible = false
         } else {
