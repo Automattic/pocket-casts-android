@@ -9,7 +9,7 @@ plugins {
 }
 
 sentry {
-    projectName = project.findProperty("sentryAndroidProject")?.toString()
+    projectName = "pocket-casts-android"
 }
 
 android {
@@ -48,10 +48,6 @@ android {
 
         named("release") {
             manifestPlaceholders["appIcon"] = "@mipmap/ic_launcher"
-
-            if (project.findProperty("sentryAndroidProject")?.toString().isNullOrBlank()) {
-                println("WARNING: Sentry configuration not found. The ProGuard mapping files won't be uploaded.")
-            }
         }
     }
 
