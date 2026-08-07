@@ -25,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import au.com.shiftyjelly.pocketcasts.component.LocalFocusTvTopBar
 import au.com.shiftyjelly.pocketcasts.component.LocalOpenNowPlaying
 import au.com.shiftyjelly.pocketcasts.component.LocalTvTopBarVisibility
 import au.com.shiftyjelly.pocketcasts.component.TvTopBarVisibility
@@ -47,17 +48,22 @@ fun TvScaffold(
     var isProfileModalVisible by rememberSaveable { mutableStateOf(false) }
     val topBarVisibility = remember { TvTopBarVisibility() }
     var didFocusTopBar by rememberSaveable { mutableStateOf(false) }
-    var nowPlayingOpenTrigger by remember { mutableIntStateOf(0) }
+    var isNowPlayingOpenRequested by remember { mutableStateOf(false) }
+    var isTopBarFocusRequested by remember { mutableStateOf(false) }
+    val focusTopBar: () -> Unit = remember {
+        { isTopBarFocusRequested = true }
+    }
     val openNowPlaying: () -> Unit = remember(viewModel) {
         {
             viewModel.openNowPlaying()
-            nowPlayingOpenTrigger++
+            isNowPlayingOpenRequested = true
         }
     }
 
     CompositionLocalProvider(
         LocalTvTopBarVisibility provides topBarVisibility,
         LocalOpenNowPlaying provides openNowPlaying,
+        LocalFocusTvTopBar provides focusTopBar,
     ) {
         TvScaffoldContent(
             tabs = uiState.tabs,
@@ -66,6 +72,8 @@ fun TvScaffold(
             isTopBarVisible = topBarVisibility.isVisible,
             autoFocusSelectedTab = !didFocusTopBar,
             onSelectedTabFocus = { didFocusTopBar = true },
+            focusSelectedTab = isTopBarFocusRequested,
+            onConsumeFocusRequest = { isTopBarFocusRequested = false },
             onTabSelect = viewModel::selectTab,
             onProfileClick = { isProfileModalVisible = true },
             modifier = modifier,
@@ -87,7 +95,10 @@ fun TvScaffold(
                     TvUpNextScreen(onNavigateToHome = navigateToHome)
                 }
 
-                is TvTab.NowPlaying -> TvNowPlayingScreen(openTrigger = nowPlayingOpenTrigger)
+                is TvTab.NowPlaying -> TvNowPlayingScreen(
+                    isOpenRequested = isNowPlayingOpenRequested,
+                    onConsumeOpenRequest = { isNowPlayingOpenRequested = false },
+                )
 
                 else -> Box(modifier = belowTopBar) {
                     TvTabPlaceholder(tab = tab)
@@ -130,6 +141,8 @@ private fun TvScaffoldContent(
     modifier: Modifier = Modifier,
     autoFocusSelectedTab: Boolean = true,
     onSelectedTabFocus: () -> Unit = {},
+    focusSelectedTab: Boolean = false,
+    onConsumeFocusRequest: () -> Unit = {},
     tabContent: @Composable (TvTab) -> Unit,
 ) {
     Box(
@@ -165,6 +178,8 @@ private fun TvScaffoldContent(
                 onProfileClick = onProfileClick,
                 autoFocusSelectedTab = autoFocusSelectedTab,
                 onSelectedTabFocus = onSelectedTabFocus,
+                focusSelectedTab = focusSelectedTab,
+                onConsumeFocusRequest = onConsumeFocusRequest,
                 modifier = Modifier.fillMaxWidth(),
             )
         }

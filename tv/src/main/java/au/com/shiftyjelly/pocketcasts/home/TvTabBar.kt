@@ -48,15 +48,22 @@ fun TvTabBar(
     modifier: Modifier = Modifier,
     autoFocusSelectedTab: Boolean = true,
     onSelectedTabFocus: () -> Unit = {},
+    focusSelectedTab: Boolean = false,
+    onConsumeFocusRequest: () -> Unit = {},
 ) {
     val focusRequester = remember { FocusRequester() }
     val currentOnSelectedTabFocus by rememberUpdatedState(onSelectedTabFocus)
     LaunchedEffect(autoFocusSelectedTab) {
         if (autoFocusSelectedTab) {
             runCatching { focusRequester.requestFocus() }
-            // Always report the request so the once-only flag flips even if the requester was
-            // detached, otherwise it would re-arm and retry on every re-entry.
             currentOnSelectedTabFocus()
+        }
+    }
+    val currentOnConsumeFocusRequest by rememberUpdatedState(onConsumeFocusRequest)
+    LaunchedEffect(focusSelectedTab) {
+        if (focusSelectedTab) {
+            runCatching { focusRequester.requestFocus() }
+            currentOnConsumeFocusRequest()
         }
     }
 

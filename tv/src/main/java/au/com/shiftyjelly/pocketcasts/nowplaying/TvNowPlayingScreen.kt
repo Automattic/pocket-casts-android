@@ -10,20 +10,30 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.BlurredEdgeTreatment
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
@@ -46,6 +56,7 @@ import androidx.tv.material3.LocalContentColor
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.component.HideTvTopBar
+import au.com.shiftyjelly.pocketcasts.component.LocalFocusTvTopBar
 import au.com.shiftyjelly.pocketcasts.component.TvArtworkImage
 import au.com.shiftyjelly.pocketcasts.component.TvEmptyState
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeActionContext
@@ -72,15 +83,18 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun TvNowPlayingScreen(
-    openTrigger: Int,
+    isOpenRequested: Boolean,
+    onConsumeOpenRequest: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: TvNowPlayingViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var openedPodcastUuid by rememberSaveable { mutableStateOf<String?>(null) }
 
-    LaunchedEffect(openTrigger) {
-        openedPodcastUuid = null
+    LaunchedEffect(isOpenRequested) {
+        if (isOpenRequested) {
+            openedPodcastUuid = null
+        }
     }
 
     val podcastUuid = openedPodcastUuid
@@ -106,6 +120,8 @@ fun TvNowPlayingScreen(
 
         is TvNowPlayingUiState.Loaded -> TvNowPlayingContent(
             state = state,
+            isPlayerFocusRequested = isOpenRequested,
+            onConsumePlayerFocusRequest = onConsumeOpenRequest,
             onPlayPause = viewModel::playPause,
             onSkipBackward = viewModel::skipBackward,
             onSkipForward = viewModel::skipForward,
@@ -121,6 +137,8 @@ fun TvNowPlayingScreen(
 @Composable
 private fun TvNowPlayingContent(
     state: TvNowPlayingUiState.Loaded,
+    isPlayerFocusRequested: Boolean,
+    onConsumePlayerFocusRequest: () -> Unit,
     onPlayPause: () -> Unit,
     onSkipBackward: () -> Unit,
     onSkipForward: () -> Unit,
@@ -136,7 +154,19 @@ private fun TvNowPlayingContent(
     var isEffectsMenuVisible by remember { mutableStateOf(false) }
     var isChromeVisible by remember { mutableStateOf(true) }
     var interactionTick by remember { mutableIntStateOf(0) }
+    var isContentFocused by remember { mutableStateOf(false) }
+    var isTopBarRevealRequested by remember { mutableStateOf(false) }
+    val focusTopBar = LocalFocusTvTopBar.current
+    val playPauseFocusRequester = remember { FocusRequester() }
     val episode = state.episode
+
+    val currentOnConsumePlayerFocusRequest by rememberUpdatedState(onConsumePlayerFocusRequest)
+    LaunchedEffect(isPlayerFocusRequested) {
+        if (isPlayerFocusRequested) {
+            runCatching { playPauseFocusRequester.requestFocus() }
+            currentOnConsumePlayerFocusRequest()
+        }
+    }
     val isAnyOverlayVisible =
         isActionsModalVisible || isDetailsModalVisible || isSpeedMenuVisible || isEffectsMenuVisible
 
@@ -148,11 +178,18 @@ private fun TvNowPlayingContent(
             isChromeVisible = true
         }
     }
-    if (!isChromeVisible) {
+    if (isContentFocused && !isTopBarRevealRequested) {
         HideTvTopBar()
+    }
+    if (!isChromeVisible) {
         BackHandler {
             interactionTick++
             isChromeVisible = true
+        }
+    } else if (isContentFocused) {
+        BackHandler {
+            isTopBarRevealRequested = true
+            focusTopBar()
         }
     }
     val chromeAlpha by animateFloatAsState(if (isChromeVisible) 1f else 0f, label = "TvNowPlayingChromeAlpha")
@@ -160,6 +197,12 @@ private fun TvNowPlayingContent(
     Column(
         modifier = modifier
             .fillMaxSize()
+            .onFocusChanged { focusState ->
+                isContentFocused = focusState.hasFocus
+                if (!focusState.hasFocus) {
+                    isTopBarRevealRequested = false
+                }
+            }
             .onPreviewKeyEvent { event ->
                 if (event.type != KeyEventType.KeyDown || event.key == Key.Back) return@onPreviewKeyEvent false
                 interactionTick++
@@ -216,6 +259,7 @@ private fun TvNowPlayingContent(
             PlayerControls(
                 isPlaying = state.isPlaying,
                 isBuffering = state.isBuffering,
+                playPauseFocusRequester = playPauseFocusRequester,
                 playbackSpeed = state.playbackSpeed,
                 trimMode = state.trimMode,
                 isVolumeBoosted = state.isVolumeBoosted,
@@ -283,6 +327,14 @@ private fun EpisodeArtworkWithTitles(
             TvArtworkImage(
                 model = episode.artworkModel(),
                 modifier = Modifier
+                    .requiredSize(ArtworkSize * BlurredArtworkScale)
+                    .offset(x = BlurredArtworkOffset, y = BlurredArtworkOffset)
+                    .blur(BlurredArtworkRadius, BlurredEdgeTreatment.Unbounded)
+                    .alpha(0.7f),
+            )
+            TvArtworkImage(
+                model = episode.artworkModel(),
+                modifier = Modifier
                     .size(ArtworkSize)
                     .clip(RoundedCornerShape(8.dp)),
             )
@@ -314,6 +366,7 @@ private fun EpisodeArtworkWithTitles(
 private fun PlayerControls(
     isPlaying: Boolean,
     isBuffering: Boolean,
+    playPauseFocusRequester: FocusRequester,
     playbackSpeed: Double,
     trimMode: TrimMode,
     isVolumeBoosted: Boolean,
@@ -344,6 +397,7 @@ private fun PlayerControls(
             isPlaying = isPlaying,
             isBuffering = isBuffering,
             onClick = onPlayPause,
+            modifier = Modifier.focusRequester(playPauseFocusRequester),
         )
         PlayerControlButton(
             iconRes = IR.drawable.wear_skip_foreward,
@@ -416,7 +470,10 @@ private fun PlayerControlButton(
     }
 }
 
-private val ArtworkSize = 280.dp
+private val ArtworkSize = 266.dp
+private val BlurredArtworkScale = 1.25f
+private val BlurredArtworkOffset = -ArtworkSize * 0.2f
+private val BlurredArtworkRadius = 66.dp
 
 private val CHROME_HIDE_DELAY = 4.seconds
 
@@ -438,34 +495,38 @@ private fun BaseEpisode.artworkModel(): Any? = when (this) {
 @Composable
 private fun TvNowPlayingContentPreview() {
     TvTheme {
-        TvNowPlayingContent(
-            state = TvNowPlayingUiState.Loaded(
-                episode = PodcastEpisode(
-                    uuid = "episode-uuid",
-                    title = "Episode title that might be quite long and wrap onto two lines",
-                    podcastUuid = "podcast-uuid",
-                    publishedDate = Date(0),
+        CompositionLocalProvider(LocalFocusTvTopBar provides {}) {
+            TvNowPlayingContent(
+                isPlayerFocusRequested = false,
+                onConsumePlayerFocusRequest = {},
+                state = TvNowPlayingUiState.Loaded(
+                    episode = PodcastEpisode(
+                        uuid = "episode-uuid",
+                        title = "Episode title that might be quite long and wrap onto two lines",
+                        podcastUuid = "podcast-uuid",
+                        publishedDate = Date(0),
+                    ),
+                    podcastTitle = "Podcast title",
+                    isPlaying = true,
+                    isBuffering = false,
+                    errorMessage = null,
+                    positionMs = 600_000,
+                    durationMs = 3_600_000,
+                    bufferedMs = 1_200_000,
+                    isVideo = false,
+                    player = null,
+                    playbackSpeed = 1.0,
+                    trimMode = TrimMode.OFF,
+                    isVolumeBoosted = false,
                 ),
-                podcastTitle = "Podcast title",
-                isPlaying = true,
-                isBuffering = false,
-                errorMessage = null,
-                positionMs = 600_000,
-                durationMs = 3_600_000,
-                bufferedMs = 1_200_000,
-                isVideo = false,
-                player = null,
-                playbackSpeed = 1.0,
-                trimMode = TrimMode.OFF,
-                isVolumeBoosted = false,
-            ),
-            onPlayPause = {},
-            onSkipBackward = {},
-            onSkipForward = {},
-            onSelectSpeed = {},
-            onSetVolumeBoost = {},
-            onSelectTrimMode = {},
-            onOpenPodcast = {},
-        )
+                onPlayPause = {},
+                onSkipBackward = {},
+                onSkipForward = {},
+                onSelectSpeed = {},
+                onSetVolumeBoost = {},
+                onSelectTrimMode = {},
+                onOpenPodcast = {},
+            )
+        }
     }
 }
