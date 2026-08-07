@@ -61,6 +61,7 @@ interface Player {
     val name: String
     val isDownloading: Boolean
     val onPlayerEvent: (Player, PlayerEvent) -> Unit
+    val currentAudioLevel: Float get() = 0f
 
     suspend fun load(currentPositionMs: Int)
     suspend fun getCurrentPositionMs(): Int

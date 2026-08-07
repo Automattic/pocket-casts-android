@@ -65,6 +65,8 @@ class SimplePlayer(
 
     override var isPip: Boolean = false
 
+    override val currentAudioLevel: Float get() = renderersFactory?.currentAudioLevel ?: 0f
+
     private var videoChangedListener: VideoChangedListener? = null
 
     @Volatile
