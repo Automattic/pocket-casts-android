@@ -122,6 +122,19 @@ class MediaEventQueueTest {
     }
 
     @Test
+    fun `immediate single tap failure does not orphan the tap window`() = runTest {
+        val handler = MediaEventQueue(scopeProvider = { this })
+        val failure = IllegalStateException("Immediate action failed")
+
+        val thrown = runCatching {
+            handler.consumeEvent(MediaEvent.SingleTap) { throw failure }
+        }.exceptionOrNull()
+
+        assertEquals(failure, thrown)
+        assertEquals(MediaEvent.SingleTap, handler.consumeEvent(MediaEvent.SingleTap))
+    }
+
+    @Test
     fun `handle concurrent immediate single taps exactly once`() = runBlocking {
         val handler = MediaEventQueue(scopeProvider = { this })
         val immediateTapCount = AtomicInteger()

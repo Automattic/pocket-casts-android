@@ -42,7 +42,17 @@ internal class MediaEventQueue(
             }
         } ?: return null
 
-        onImmediateSingleTap?.invoke()
+        try {
+            onImmediateSingleTap?.invoke()
+        } catch (e: Exception) {
+            stateMutex.withLock {
+                if (singleTapJob === newSingleTapJob) {
+                    singleTapJob = null
+                    newSingleTapJob.cancel()
+                }
+            }
+            throw e
+        }
         newSingleTapJob.await()
         return stateMutex.withLock {
             // The immediate callback owns a resolved SingleTap. Follow-up taps still
@@ -70,6 +80,8 @@ internal class MediaEventQueue(
         val isActive get() = job.isActive
 
         suspend fun await() = job.join()
+
+        fun cancel() = job.cancel()
 
         fun incrementTaps() {
             counter++
