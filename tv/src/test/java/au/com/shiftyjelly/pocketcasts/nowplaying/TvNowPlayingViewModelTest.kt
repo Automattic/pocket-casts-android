@@ -4,6 +4,8 @@ import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
@@ -12,18 +14,26 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.Player
 import au.com.shiftyjelly.pocketcasts.repositories.playback.StreamVideoState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import io.reactivex.subjects.BehaviorSubject
 import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.argThat
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class TvNowPlayingViewModelTest {
@@ -48,17 +58,23 @@ class TvNowPlayingViewModelTest {
         on { videoRenderingEnabled } doReturn videoRenderingEnabledStates
     }
 
+    private val podcastManager = mock<PodcastManager>()
+
     private val skipForwardSetting = mock<UserSetting<Int>> { on { value } doReturn 30 }
     private val skipBackSetting = mock<UserSetting<Int>> { on { value } doReturn 10 }
+    private val globalPlaybackEffectsSetting = mock<UserSetting<PlaybackEffects>>()
     private val settings = mock<Settings> {
         on { skipForwardInSecs } doReturn skipForwardSetting
         on { skipBackInSecs } doReturn skipBackSetting
+        on { globalPlaybackEffects } doReturn globalPlaybackEffectsSetting
     }
 
     private val audioEpisode = PodcastEpisode(uuid = "audio", publishedDate = Date(0))
     private val videoEpisode = PodcastEpisode(uuid = "video", publishedDate = Date(0), fileType = "video/mp4")
 
-    private val viewModel by lazy { TvNowPlayingViewModel(playbackManager, settings) }
+    private val viewModel by lazy {
+        TvNowPlayingViewModel(playbackManager, podcastManager, settings, coroutineRule.testDispatcher)
+    }
 
     @Test
     fun `an empty queue maps to the empty state`() = runTest {
@@ -216,5 +232,59 @@ class TvNowPlayingViewModelTest {
         viewModel.skipBackward()
 
         verify(playbackManager).skipBackward(sourceView = SourceView.PLAYER, jumpAmountSeconds = 10)
+    }
+
+    @Test
+    fun `a speed change without a podcast override saves global effects`() = runTest {
+        playbackStates.value = PlaybackState(trimMode = TrimMode.LOW, isVolumeBoosted = true)
+        whenever(playbackManager.getCurrentEpisode()).thenReturn(audioEpisode)
+        whenever(podcastManager.findPodcastByUuid(audioEpisode.podcastUuid)).thenReturn(Podcast(uuid = "podcast"))
+
+        viewModel.setPlaybackSpeed(1.5)
+        runCurrent()
+
+        verify(globalPlaybackEffectsSetting).set(effectsWith(1.5, TrimMode.LOW, true), eq(true), any(), any())
+        verify(playbackManager).updatePlayerEffects(effectsWith(1.5, TrimMode.LOW, true))
+        verify(podcastManager, never()).updateEffectsBlocking(any(), any())
+    }
+
+    @Test
+    fun `a speed change with a podcast override saves the podcast effects`() = runTest {
+        val podcast = Podcast(uuid = "podcast", overrideGlobalEffects = true)
+        whenever(playbackManager.getCurrentEpisode()).thenReturn(audioEpisode)
+        whenever(podcastManager.findPodcastByUuid(audioEpisode.podcastUuid)).thenReturn(podcast)
+
+        viewModel.setPlaybackSpeed(2.0)
+        runCurrent()
+
+        verify(podcastManager).updateEffectsBlocking(eq(podcast), effectsWith(2.0, TrimMode.OFF, false))
+        verify(playbackManager).updatePlayerEffects(effectsWith(2.0, TrimMode.OFF, false))
+        verify(globalPlaybackEffectsSetting, never()).set(any(), any(), any(), any())
+    }
+
+    @Test
+    fun `a user episode saves global effects without a podcast lookup`() = runTest {
+        whenever(playbackManager.getCurrentEpisode()).thenReturn(UserEpisode(uuid = "user", publishedDate = Date(0)))
+
+        viewModel.setTrimMode(TrimMode.HIGH)
+        runCurrent()
+
+        verify(globalPlaybackEffectsSetting).set(effectsWith(1.0, TrimMode.HIGH, false), eq(true), any(), any())
+        verify(playbackManager).updatePlayerEffects(effectsWith(1.0, TrimMode.HIGH, false))
+        verifyNoInteractions(podcastManager)
+    }
+
+    @Test
+    fun `toggling volume boost flips the current value`() = runTest {
+        playbackStates.value = PlaybackState(isVolumeBoosted = true)
+
+        viewModel.toggleVolumeBoost()
+        runCurrent()
+
+        verify(playbackManager).updatePlayerEffects(effectsWith(1.0, TrimMode.OFF, false))
+    }
+
+    private fun effectsWith(speed: Double, trimMode: TrimMode, isVolumeBoosted: Boolean) = argThat<PlaybackEffects> {
+        playbackSpeed == speed && this.trimMode == trimMode && this.isVolumeBoosted == isVolumeBoosted
     }
 }
