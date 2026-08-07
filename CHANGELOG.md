@@ -3,7 +3,8 @@
 *   Bug Fixes
     *   Fix audio stuttering when playing video episodes at high speed in the background
         ([#5707](https://github.com/Automattic/pocket-casts-android/pull/5707))
-
+    *   Fix a crash when showing a bottom sheet after the app is sent to the background
+        ([#5709](https://github.com/Automattic/pocket-casts-android/pull/5709))
 
 8.18
 -----
