@@ -338,16 +338,14 @@ class SimplePlayer(
             }
 
             override fun onVideoSizeChanged(videoSize: VideoSize) {
-                videoWidth = videoSize.width
-                videoHeight = videoSize.height
-
                 // Real video dimensions are definitive proof the stream carries video.
                 if (videoSize.width > 0 && videoSize.height > 0) {
+                    videoWidth = videoSize.width
+                    videoHeight = videoSize.height
                     onVideoTrackChanged(true)
-                }
-
-                videoChangedListener?.let {
-                    Handler(Looper.getMainLooper()).post { it.videoSizeChanged(videoSize.width, videoSize.height, videoSize.pixelWidthHeightRatio) }
+                    videoChangedListener?.let {
+                        Handler(Looper.getMainLooper()).post { it.videoSizeChanged(videoSize.width, videoSize.height, videoSize.pixelWidthHeightRatio) }
+                    }
                 }
             }
         })
