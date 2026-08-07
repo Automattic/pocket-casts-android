@@ -6,13 +6,15 @@ import androidx.work.BackoffPolicy
 import androidx.work.Constraints
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.NetworkType
+import androidx.work.PeriodicWorkRequest
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import coil3.ImageLoader
 import coil3.request.CachePolicy
 import coil3.request.ErrorResult
@@ -43,16 +45,26 @@ class PrefetchArtworkWorker @AssistedInject constructor(
         private const val MAX_RETRY_ATTEMPTS = 5
         private const val WORK_NAME = "PrefetchArtworkWorkerPeriodic"
 
-        fun enqueuePeriodicWork(context: Context) {
-            val request = PeriodicWorkRequestBuilder<PrefetchArtworkWorker>(1, TimeUnit.DAYS)
-                .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
-                .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 10, TimeUnit.MINUTES)
-                .build()
+        fun enqueuePeriodicWork(context: Context, settings: Settings) {
+            val request = buildPeriodicWorkRequest(settings)
             WorkManager.getInstance(context).enqueueUniquePeriodicWork(
                 WORK_NAME,
-                ExistingPeriodicWorkPolicy.KEEP,
+                ExistingPeriodicWorkPolicy.UPDATE,
                 request,
             )
+        }
+
+        internal fun buildPeriodicWorkRequest(settings: Settings): PeriodicWorkRequest {
+            return PeriodicWorkRequestBuilder<PrefetchArtworkWorker>(1, TimeUnit.DAYS)
+                .setConstraints(
+                    Constraints.Builder()
+                        .setRequiredNetworkType(settings.getWorkManagerNetworkTypeConstraint())
+                        .setRequiresBatteryNotLow(true)
+                        .setRequiresStorageNotLow(true)
+                        .build(),
+                )
+                .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 10, TimeUnit.MINUTES)
+                .build()
         }
     }
 
@@ -73,6 +85,8 @@ class PrefetchArtworkWorker @AssistedInject constructor(
                         }
                         val request = ImageRequest.Builder(applicationContext)
                             .data(url)
+                            // The original bytes are still written to disk; only the discarded decode is sampled.
+                            .size(1, 1)
                             .memoryCachePolicy(CachePolicy.DISABLED)
                             .build()
                         val result = imageLoader.execute(request)
@@ -93,10 +107,13 @@ class PrefetchArtworkWorker @AssistedInject constructor(
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            Timber.e(e, "Failed to prefetch podcast artwork.")
+            LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, e, "Failed to prefetch podcast artwork.")
             return retryOrResumeDailySchedule()
         }
-        Timber.i("Prefetched $fetched missing podcast artwork images ($failed failed).")
+        LogBuffer.i(
+            LogBuffer.TAG_BACKGROUND_TASKS,
+            "Prefetched $fetched missing podcast artwork images ($failed failed).",
+        )
         // Retry with backoff so the cache heals shortly after connectivity or the CDN recovers,
         // instead of waiting for the next periodic run. Stop retrying after a few attempts so a
         // permanently missing image doesn't prevent the normal daily schedule from resuming.
@@ -107,7 +124,10 @@ class PrefetchArtworkWorker @AssistedInject constructor(
         return if (runAttemptCount < MAX_RETRY_ATTEMPTS) {
             Result.retry()
         } else {
-            Timber.w("Artwork prefetch failed after $MAX_RETRY_ATTEMPTS retries. Resuming the daily schedule.")
+            LogBuffer.w(
+                LogBuffer.TAG_BACKGROUND_TASKS,
+                "Artwork prefetch failed after $MAX_RETRY_ATTEMPTS retries. Resuming the daily schedule.",
+            )
             Result.success()
         }
     }
