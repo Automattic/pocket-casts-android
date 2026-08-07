@@ -187,6 +187,7 @@ private fun TvNowPlayingContent(
                     episode = episode,
                     podcastTitle = state.podcastTitle,
                     isPlaying = state.isPlaying && !state.isBuffering,
+                    audioLevel = { state.player?.currentAudioLevel ?: 0f },
                 )
             }
         }
@@ -265,6 +266,7 @@ private fun EpisodeArtworkWithTitles(
     episode: BaseEpisode,
     podcastTitle: String?,
     isPlaying: Boolean,
+    audioLevel: () -> Float,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -274,6 +276,8 @@ private fun EpisodeArtworkWithTitles(
         Box(contentAlignment = Alignment.Center) {
             TvNowPlayingWaveform(
                 isPlaying = isPlaying,
+                episodeUuid = episode.uuid,
+                audioLevel = audioLevel,
                 artworkSize = ArtworkSize,
             )
             TvArtworkImage(
