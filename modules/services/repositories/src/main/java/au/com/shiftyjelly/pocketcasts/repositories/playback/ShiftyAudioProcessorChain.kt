@@ -15,6 +15,7 @@ import timber.log.Timber
 class ShiftyAudioProcessorChain(
     private val customAudio: ShiftyCustomAudio,
     fingerprintTapProcessor: AudioProcessor? = null,
+    audioLevelMeter: AudioProcessor? = null,
 ) : AudioProcessorChain {
     private val lowProcessor = ShiftyTrimSilenceProcessor(
         416000.microseconds,
@@ -38,7 +39,7 @@ class ShiftyAudioProcessorChain(
     private val sonicAudioProcessor = SonicAudioProcessor()
 
     private val trimProcessors = arrayOf(lowProcessor, mediumProcessor, highProcessor)
-    private val audioProcessors = listOfNotNull(fingerprintTapProcessor).toTypedArray() +
+    private val audioProcessors = listOfNotNull(fingerprintTapProcessor, audioLevelMeter).toTypedArray() +
         trimProcessors +
         arrayOf<AudioProcessor>(sonicAudioProcessor)
     private var trimMode = TrimMode.OFF
