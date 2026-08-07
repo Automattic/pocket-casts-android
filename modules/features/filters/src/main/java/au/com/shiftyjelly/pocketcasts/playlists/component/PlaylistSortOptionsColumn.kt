@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -26,22 +25,13 @@ import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.TextC50
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
+import au.com.shiftyjelly.pocketcasts.compose.components.displayLabel
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
-
-@Composable
-@ReadOnlyComposable
-internal fun PlaylistEpisodeSortType.displayLabel() = when (this) {
-    PlaylistEpisodeSortType.NewestToOldest -> stringResource(LR.string.sort_newest_to_oldest)
-    PlaylistEpisodeSortType.OldestToNewest -> stringResource(LR.string.sort_oldest_to_newest)
-    PlaylistEpisodeSortType.ShortestToLongest -> stringResource(LR.string.episode_sort_short_to_long)
-    PlaylistEpisodeSortType.LongestToShortest -> stringResource(LR.string.episode_sort_long_to_short)
-    PlaylistEpisodeSortType.DragAndDrop -> stringResource(LR.string.episode_sort_custom_order)
-}
 
 @Composable
 internal fun PlaylistSortOptionsColumn(

@@ -20,20 +20,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.Button
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
-import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.theme.TvButtonDefaults
-import au.com.shiftyjelly.pocketcasts.theme.TvColors
-import au.com.shiftyjelly.pocketcasts.theme.TvTextStyles
-import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.theme.TvTheme
+import au.com.shiftyjelly.pocketcasts.theme.tvColors
+import au.com.shiftyjelly.pocketcasts.theme.tvTypography
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -49,7 +48,7 @@ fun TvWelcomeScreen(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(TvColors.Dark),
+            .background(MaterialTheme.tvColors.backgroundSunken),
     ) {
         TvAnimatedPodcastGrid(
             modifier = Modifier
@@ -63,10 +62,10 @@ fun TvWelcomeScreen(
                 .background(
                     Brush.verticalGradient(
                         colorStops = arrayOf(
-                            0f to TvColors.Dark.copy(alpha = 0.5f),
-                            0.15f to TvColors.Dark.copy(alpha = 0.5f),
-                            0.40f to TvColors.Dark,
-                            1f to TvColors.Dark,
+                            0f to MaterialTheme.tvColors.backgroundSunken.copy(alpha = 0.5f),
+                            0.15f to MaterialTheme.tvColors.backgroundSunken.copy(alpha = 0.5f),
+                            0.40f to MaterialTheme.tvColors.backgroundSunken,
+                            1f to MaterialTheme.tvColors.backgroundSunken,
                         ),
                     ),
                 ),
@@ -87,14 +86,14 @@ fun TvWelcomeScreen(
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = stringResource(LR.string.tv_onboarding_welcome_tv),
-                color = Color.White,
-                style = TvTextStyles.WelcomeTitle,
+                color = MaterialTheme.tvColors.textPrimary,
+                style = MaterialTheme.tvTypography.title1.copy(textAlign = TextAlign.Center),
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = stringResource(LR.string.tv_onboarding_subtitle),
-                color = TvColors.TextSecondary,
-                style = TvTextStyles.WelcomeSubtitle,
+                color = MaterialTheme.tvColors.textSecondary,
+                style = MaterialTheme.tvTypography.headline.copy(textAlign = TextAlign.Center),
             )
             Spacer(modifier = Modifier.height(32.dp))
 
@@ -135,13 +134,11 @@ fun TvWelcomeScreen(
 @Preview(device = Devices.TV_1080p)
 @Composable
 private fun TvWelcomeScreenPreview() {
-    AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
-        MaterialTheme {
-            TvWelcomeScreen(
-                onSignIn = {},
-                onCreateAccount = {},
-                onContinueWithoutAccount = {},
-            )
-        }
+    TvTheme {
+        TvWelcomeScreen(
+            onSignIn = {},
+            onCreateAccount = {},
+            onContinueWithoutAccount = {},
+        )
     }
 }
