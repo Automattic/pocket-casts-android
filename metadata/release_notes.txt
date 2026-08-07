@@ -1,11 +1,5 @@
-
-*   New Features
-    *   Synced episode transcripts
-        ([#5324](https://github.com/Automattic/pocket-casts-android/pull/5324))
-    *   Add the explicit badge to the Discover section
-        ([#5370](https://github.com/Automattic/pocket-casts-android/pull/5370))
 *   Bug Fixes
-    *   Fix Profile settings gear being unreachable in landscape
-        ([#5371](https://github.com/Automattic/pocket-casts-android/pull/5371))
-    *   Fix missing episode dates and durations in Android Auto and Wear OS
-        ([#5388](https://github.com/Automattic/pocket-casts-android/pull/5388))
+    *   Allow copying description and show notes links with a long press
+        ([#5628](https://github.com/Automattic/pocket-casts-android/pull/5628))
+    *   Fix the app briefly freezing when showing the default podcast artwork
+        ([#5634](https://github.com/Automattic/pocket-casts-android/pull/5634))

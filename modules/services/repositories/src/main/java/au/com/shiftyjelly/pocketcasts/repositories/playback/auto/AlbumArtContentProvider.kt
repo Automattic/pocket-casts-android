@@ -37,15 +37,16 @@ class AlbumArtContentProvider : ContentProvider() {
             Timber.tag("AlbumArtProvider").d("Content uri received ${uri.lastPathSegment}")
 
             val applicationContext = context?.applicationContext ?: return@runCatching null
-            val entryPoint = getEntryPoint(applicationContext)
 
             val imageUrl = uri.toImageUrl()
             val artworkFile = if (imageUrl != null) {
-                entryPoint.imageLoader()
+                getEntryPoint(applicationContext).imageLoader()
                     .getArtworkFile(imageUrl, applicationContext)
                     ?.takeIf(File::exists)
             } else {
-                uri.path?.let(::File)
+                // The provider is exported, so only serve local files from our own private storage
+                // to stop a crafted uri from traversing to and leaking other files owned by our uid.
+                uri.toArtworkFileInAppStorage(applicationContext)
             }
 
             artworkFile?.let { ParcelFileDescriptor.open(it, ParcelFileDescriptor.MODE_READ_ONLY) }
@@ -64,6 +65,29 @@ class AlbumArtContentProvider : ContentProvider() {
     }
 
     private fun Uri.toImageUrl() = lastPathSegment?.toHttpUrlOrNull()
+
+    /**
+     * Resolves the uri to a local artwork file only if it stays within the app's private storage.
+     * Canonicalising first collapses `..` and symlinks, so paths that escape our storage are rejected.
+     */
+    private fun Uri.toArtworkFileInAppStorage(context: Context): File? {
+        val path = lastPathSegment ?: return null
+        val canonicalFile = runCatching { File(path).canonicalFile }.getOrNull() ?: return null
+        val isWithinAppStorage = appStorageRoots(context).any { root -> canonicalFile.isWithin(root) }
+        return canonicalFile.takeIf { isWithinAppStorage && it.isFile }
+    }
+
+    private fun appStorageRoots(context: Context): List<File> = listOfNotNull(
+        context.cacheDir,
+        context.filesDir,
+        context.externalCacheDir,
+        context.getExternalFilesDir(null),
+    )
+
+    private fun File.isWithin(directory: File): Boolean {
+        val canonicalDir = runCatching { directory.canonicalPath }.getOrNull() ?: return false
+        return path == canonicalDir || path.startsWith(canonicalDir + File.separator)
+    }
 
     private fun ImageLoader.getArtworkFile(url: HttpUrl, context: Context): File? {
         val requestFactory = PocketCastsImageRequestFactory(context)

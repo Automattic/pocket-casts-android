@@ -128,6 +128,8 @@
     <string name="view_transcript">View transcript</string>
     <string name="episode_chat">Chat with Episode</string>
     <string name="episode_summary">Episode Summary</string>
+    <string name="summary_upsell_title">AI-Powered Summaries</string>
+    <string name="summary_upsell_description">Subscribe to Plus to get access to it and other Premium&#160;features like bookmarks and folders.</string>
     <string name="description">Description</string>
     <string name="summary">Summary</string>
     <string name="transcript">Transcript</string>
@@ -249,8 +251,60 @@
     <string name="tv_row_trending_videos">Trending Videos</string>
     <string name="tv_row_recommendations">Recommendations</string>
     <string name="tv_row_because_you_liked">Because you liked Podcast</string>
-    <string name="tv_sign_in_or_enter_code">or enter the following code</string>
-    <string name="tv_sign_in_go_to_url">going to %1$s</string>
+    <string name="tv_home_keep_listening">Keep Listening</string>
+    <string name="tv_profile_starred_episodes">Starred Episodes</string>
+    <string name="tv_sign_in_title">Log in to Pocket Casts</string>
+    <string name="tv_sign_in_step_scan">Scan the QR code or go to %1$s</string>
+    <string name="tv_sign_in_step_login">Log in to your account</string>
+    <string name="tv_sign_in_step_confirm_code">If asked, confirm with the code below</string>
+    <string name="tv_create_account_modal_title">Your podcasts deserve a home</string>
+    <string name="tv_create_account_modal_subtitle">Create a free account to follow podcasts, build your Up Next, and pick up right where you left off, on any device.</string>
+    <string name="tv_create_account_modal_step_create">Create your account or log in</string>
+    <string name="tv_playlists_empty_title">Your playlists live here</string>
+    <string name="tv_playlists_empty_subtitle">Build one manually or let Smart Rules do the sorting for you.</string>
+    <string name="tv_playlists_empty_action_title">Create a playlist</string>
+    <string name="tv_playlists_download_title">Create playlists on your phone</string>
+    <string name="tv_playlists_download_subtitle">They’ll be waiting here when you’re done. Scan to get the app</string>
+    <string name="tv_playlist_play_all">Play all episodes</string>
+    <plurals name="tv_playlist_all_archived">
+        <item quantity="one">The only episode of this playlist has been archived.</item>
+        <item quantity="other">All %1$d episodes of this playlist have been archived.</item>
+    </plurals>
+    <plurals name="tv_podcast_all_archived">
+        <item quantity="one">The only episode of this podcast has been archived.</item>
+        <item quantity="other">All %1$d episodes of this podcast have been archived.</item>
+    </plurals>
+    <string name="tv_playlist_empty_title">No episodes</string>
+    <string name="tv_playlist_empty_subtitle">Either it’s time to celebrate completing this list or edit your rules in the mobile app to get some more.</string>
+    <string name="tv_playlist_empty_subtitle_manual">Add episodes to this playlist from the mobile app and they’ll show up here.</string>
+    <string name="tv_episode_details">Episode details</string>
+    <string name="tv_episode_marked_as_played">Marked as played</string>
+    <string name="tv_episode_marked_as_unplayed">Marked as unplayed</string>
+    <string name="tv_episode_archived">Archived</string>
+    <string name="tv_episode_unarchived">Unarchived</string>
+    <string name="tv_episode_will_play_next">Will play next</string>
+    <string name="tv_episode_will_play_last">Will play last</string>
+    <string name="tv_episode_removed_from_up_next">Removed from Up Next</string>
+    <string name="tv_up_next_empty_title">Nothing queued up</string>
+    <string name="tv_up_next_empty_subtitle">Add episodes to Up Next and they’ll play in order, back to back</string>
+    <string name="tv_up_next_empty_action_title">Add episodes</string>
+    <string name="tv_your_podcasts_empty_title">Time to fill this up</string>
+    <string name="tv_your_podcasts_empty_subtitle">Followed podcasts show up here, ready to play.</string>
+    <string name="tv_your_podcasts_empty_action_title">Discover podcasts</string>
+    <string name="tv_folder_empty_message">Add podcasts to this folder in the mobile app and they’ll show up here.</string>
+    <string name="tv_podcast_follow">Follow this podcast</string>
+    <string name="tv_podcast_more_info">More info</string>
+    <string name="tv_podcast_info_network">Network</string>
+    <string name="tv_podcast_info_website">Website</string>
+    <string name="tv_podcast_info_schedule">Schedule</string>
+    <string name="tv_podcast_info_next_episode">Next episode</string>
+    <string name="tv_podcast_next_episode_tomorrow">Tomorrow</string>
+    <string name="tv_podcast_next_episode_soon">Any day now</string>
+    <string name="tv_podcast_schedule_hourly">Hourly</string>
+    <string name="tv_podcast_schedule_daily">Daily</string>
+    <string name="tv_podcast_schedule_weekly">Weekly</string>
+    <string name="tv_podcast_schedule_fortnightly">Fortnightly</string>
+    <string name="tv_podcast_schedule_monthly">Monthly</string>
     <string name="unavailable">Unavailable</string>
     <string name="browse_podcasts">Browse podcasts</string>
     <string name="pocket_casts_plus_badge">Pocket Casts Plus badge</string>
@@ -384,8 +438,10 @@
 
     <!-- Player -->
 
+    <string name="player_action_hide_video">Hide video</string>
     <string name="player_action_next_chapter">Next chapter</string>
     <string name="player_action_previous_chapter">Previous chapter</string>
+    <string name="player_action_show_video">Show video</string>
     <string name="player_actions">Episode actions</string>
     <string name="player_battery_warning_snackbar">Your battery restrictions may cause playback interruptions.</string>
     <string name="player_battery_warning_snackbar_action">update</string>
@@ -492,6 +548,8 @@
     <string name="player_time_remaining">Time remaining %s</string>
     <string name="drag_down_to_dismiss_content_description">Drag down to dismiss</string>
     <string name="player_up_next_sort">Sort Up Next</string>
+    <string name="up_next_sort_duration_tooltip_title">Sort by duration</string>
+    <string name="up_next_sort_duration_tooltip_body">Shortest to longest, or the reverse — fit the episode to the time you\'ve actually got.</string>
 
     <!-- Chapters -->
 
@@ -1005,6 +1063,7 @@
     <string name="playlist_select_episodes">Select episodes</string>
     <string name="playlist_setting_auto_download_description">Enable to auto download episodes in this playlist.</string>
     <string name="playlist_sort_by">Sort by</string>
+    <string name="playlist">Playlist</string>
     <string name="playlists">Playlists</string>
     <string name="playlists_empty_state_body">Playlists let you organize episodes manually or automatically with smart rules.</string>
     <string name="playlists_empty_state_title">Organize episodes your way</string>
@@ -1297,6 +1356,11 @@
     </plurals>
     <string name="profile_stats_auto_skipping">Auto Skipping</string>
     <string name="profile_stats_listened_for">You\'ve listened for</string>
+    <string name="profile_stats_listening_activity">Listening Activity</string>
+    <string name="profile_stats_listening_activity_info_help">Information</string>
+    <string name="profile_stats_listening_activity_content_description">Listening activity heatmap</string>
+    <string name="profile_stats_listening_activity_info_title">Listening activity</string>
+    <string name="profile_stats_listening_activity_info_summary">An estimate of when you\'ve been listening, based on your playback history. If you finish an episode over a few days, it shows on the last day.</string>
     <string name="profile_stats_trim_silence">Trim Silence</string>
     <string name="profile_stats_share_to">Share to ...</string>
     <string name="profile_stats_since_listened_for">Since %s you\'ve listened for</string>
@@ -1306,6 +1370,7 @@
     <string name="profile_stats_variable_speed">Variable Speed</string>
     <string name="profile_status_error_internet">🤔\n\nUnable to load stats,\ncheck your internet connection.</string>
     <string name="profile_start_free_trial">Start Free Trial</string>
+    <string name="profile_try_duration_for_free">Try %1$s for free</string>
     <string name="profile_sub_android_goto">To cancel your subscription, you&#x2019;ll need to cancel via the Google Play Store.</string>
     <string name="profile_sub_cancel_hint0">Your current subscription will remain active until</string>
     <string name="profile_sub_cancel_hint1">Access to Pocket Casts Plus features will be locked</string>
@@ -1410,6 +1475,8 @@
     <string name="settings_apply_group_by">Would you like to change all your existing podcasts to be grouped by %s?</string>
     <string name="settings_apply_to_existing">Apply to existing</string>
     <string name="settings_apply_to_existing_podcasts">Apply to existing podcasts?</string>
+    <string name="settings_audio_only">Audio only</string>
+    <string name="settings_audio_only_summary">If on, episodes with video will play as audio only, saving data.</string>
     <string name="settings_auto_archive_episode_limit">Episode limit</string>
     <string name="settings_auto_archive_episode_limit_summary">For shows that release hourly or daily episodes, setting an episode limit can help keep only the most recent ones, while archiving any that are older.</string>
     <string name="settings_auto_archive_inactive">Archive inactive episodes</string>
@@ -1536,6 +1603,8 @@
     <string name="settings_fix_downloads_started_message">Downloads fix will start shortly. Check notifications for progress.</string>
     <string name="settings_fix_downloads_complete_title">Fixing downloads complete</string>
     <string name="settings_fix_downloads_complete_message">Fixed %d downloads</string>
+    <string name="settings_generated_chapters">Generated chapters</string>
+    <string name="settings_generated_chapters_summary">Show automatically generated chapters when available.</string>
     <string name="settings_inactive_episodes">Inactive episodes</string>
     <string name="settings_instagram">instagram link</string>
     <string name="settings_keep_screen_awake">Keep screen awake</string>
@@ -2207,16 +2276,12 @@
     <string name="watch_sync_success">Logged in from phone!</string>
 
     <!-- Watch sync errors -->
-    <string name="watch_sync_error_timeout">Couldn\'t connect to phone</string>
     <string name="watch_sync_error_no_connection">Phone not connected</string>
     <string name="watch_sync_error_login_failed">Login failed</string>
-    <string name="watch_sync_error_unknown">Something went wrong</string>
 
     <!-- Watch sync error help text -->
-    <string name="watch_sync_error_timeout_help">Make sure your phone is nearby and connected via Bluetooth</string>
     <string name="watch_sync_error_no_connection_help">Check Bluetooth connection to your phone</string>
     <string name="watch_sync_error_login_failed_help">Try logging in manually</string>
-    <string name="watch_sync_error_unknown_help">Try again or log in manually</string>
 
     <!-- Watch sync actions -->
     <string name="watch_sync_retry">Try Again</string>
@@ -2337,6 +2402,7 @@
     <!-- Bookmarks -->
 
     <string name="bookmark_play">Play at bookmark position %s</string>
+    <string name="bookmark_play_from">Play from %s</string>
     <string name="bookmarks_headphone_settings">Headphone settings</string>
     <string name="bookmarks_plural">%d bookmarks</string>
     <string name="bookmarks_singular">1 bookmark</string>
@@ -2379,6 +2445,7 @@
     <string name="transcript_generated_paywall_description">Subscribe to Plus to get access to it and other Premium&#160;features like bookmarks and folders.</string>
     <string name="transcript_generated_header">This transcript is automatically generated and available to Plus&#160;subscribers only.</string>
     <string name="transcript_share">Share transcript</string>
+    <string name="transcript_tap_to_seek_streaming_unavailable">Download the episode to tap to seek</string>
 
     <!-- Chat -->
     <string name="chat_paywall_title">Chat with this episode</string>
@@ -2834,4 +2901,7 @@
     <string name="tv_onboarding_syncing">Syncing your podcasts\u2026</string>
     <string name="tv_onboarding_welcome_back">Welcome back!</string>
     <string name="tv_onboarding_syncing_subtitle">Your podcasts are syncing, we\'ll sign you in soon!</string>
+    <string name="tv_create_account_title">Create your free account</string>
+    <string name="tv_create_account_subtitle">Scan this code to get started on your phone, it only takes a minute.</string>
+    <string name="tv_create_account_come_back">Once you\'ve created your account, come back and sign in</string>
 </resources>

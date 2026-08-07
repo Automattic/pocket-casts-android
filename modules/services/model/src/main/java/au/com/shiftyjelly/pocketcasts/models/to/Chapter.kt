@@ -13,8 +13,13 @@ data class Chapter(
     val url: HttpUrl? = null,
     val imagePath: String? = null,
     val selected: Boolean = true,
-    val isGenerated: Boolean = false,
+    val origin: ChapterOrigin = ChapterOrigin.Unknown,
+    // Original reference-timeline start for generated chapters, kept when startTime is aligned to the stream.
+    val referenceStartTime: Duration? = null,
 ) {
+
+    val isGenerated: Boolean
+        get() = origin == ChapterOrigin.Generated
 
     val isImagePresent: Boolean
         get() = !imagePath.isNullOrBlank()

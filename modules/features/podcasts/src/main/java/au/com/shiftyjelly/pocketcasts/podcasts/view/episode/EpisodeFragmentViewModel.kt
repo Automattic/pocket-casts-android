@@ -13,6 +13,11 @@ import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
+import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
+import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionOffer
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.payment.getOrNull
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadProgressCache
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadQueue
@@ -76,6 +81,7 @@ class EpisodeFragmentViewModel @Inject constructor(
     private val eventHorizon: EventHorizon,
     private val transcriptManager: TranscriptManager,
     private val userManager: UserManager,
+    private val paymentClient: PaymentClient,
 ) : ViewModel(),
     CoroutineScope {
     override val coroutineContext: CoroutineContext
@@ -106,6 +112,7 @@ class EpisodeFragmentViewModel @Inject constructor(
     data class EpisodePageState(
         val transcript: Transcript? = null,
         val isPlusUser: Boolean = false,
+        val isFreeTrialAvailable: Boolean = false,
         val summary: String? = null,
         val selectedContentTab: EpisodeContentTab = EpisodeContentTab.DESCRIPTION,
         val episodePublishedDate: Date? = null,
@@ -164,6 +171,17 @@ class EpisodeFragmentViewModel @Inject constructor(
                 _pageState.update { state ->
                     state.copy(isPlusUser = signInState.isSignedInAsPlusOrPatron)
                 }
+            }
+        }
+        viewModelScope.launch {
+            val plans = paymentClient.loadSubscriptionPlans().getOrNull()
+            val hasTrial = plans?.findOfferPlan(
+                SubscriptionTier.Plus,
+                BillingCycle.Monthly,
+                SubscriptionOffer.Trial,
+            ) != null
+            _pageState.update { state ->
+                state.copy(isFreeTrialAvailable = hasTrial)
             }
         }
     }
@@ -294,7 +312,9 @@ class EpisodeFragmentViewModel @Inject constructor(
             }
         }
 
-        if (FeatureFlag.isEnabled(Feature.AI_SUMMARIES) && lastSummaryEpisodeUuid != episodeUuid) {
+        val isSummaryEnabled = FeatureFlag.isEnabled(Feature.AI_SUMMARIES)
+        val isChaptersEnabled = FeatureFlag.isEnabled(Feature.GENERATED_CHAPTERS)
+        if ((isSummaryEnabled || isChaptersEnabled) && lastSummaryEpisodeUuid != episodeUuid) {
             _pageState.update { state ->
                 state.withSummary(null)
             }
@@ -305,11 +325,11 @@ class EpisodeFragmentViewModel @Inject constructor(
                 _pageState.update { state ->
                     state.withSummary(result)
                 }
-                if (result != null) {
+                if (result != null || !isSummaryEnabled) {
                     lastSummaryEpisodeUuid = episodeUuid
                 }
             }
-        } else if (!FeatureFlag.isEnabled(Feature.AI_SUMMARIES)) {
+        } else if (!isSummaryEnabled) {
             _pageState.update { state ->
                 state.withSummary(null)
             }

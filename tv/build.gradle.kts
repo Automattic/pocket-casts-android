@@ -56,6 +56,7 @@ dependencies {
     implementation(libs.compose.foundation)
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.tooling.preview)
+    implementation(libs.coroutines.rx2)
     implementation(libs.dagger.hilt.android)
     implementation(libs.dagger.hilt.core)
     implementation(libs.hilt.navigation.compose)
@@ -67,10 +68,6 @@ dependencies {
     implementation(libs.timber)
     implementation(libs.coil.compose)
     implementation(libs.tv.material)
-
-    implementation(platform(libs.firebase.bom))
-
-    implementation(platform(libs.firebase.bom))
 
     implementation(platform(libs.firebase.bom))
 

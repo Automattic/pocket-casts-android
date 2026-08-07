@@ -122,6 +122,16 @@ data class PodcastEpisode(
     @Ignore
     override var playing: Boolean = false
 
+    /** Parsed from the server response and persisted separately into the episode_alternate_enclosures table. */
+    @Ignore
+    var alternateEnclosures: List<EpisodeAlternateEnclosure> = emptyList()
+
+    @Ignore
+    override var overrideStreamUrl: String? = null
+
+    @Ignore
+    override var overrideStreamContentType: String? = null
+
     val playedPercentage: Int
         get() {
             return if (isFinished) {

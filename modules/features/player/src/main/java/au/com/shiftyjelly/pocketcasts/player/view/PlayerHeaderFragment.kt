@@ -404,6 +404,11 @@ class PlayerHeaderFragment :
                             }
                         }
 
+                        NavigationState.ShowStreamingWarningDialog -> {
+                            warningsHelper.streamingWarningDialog(onConfirm = { shelfSharedViewModel.onVideoToggleConfirmed() })
+                                .show(parentFragmentManager, "stream warning")
+                        }
+
                         NavigationState.ShowAddBookmark -> {
                             val bookmarkArguments = viewModel.createBookmarkArguments()
                             if (bookmarkArguments != null) {
@@ -587,6 +592,7 @@ class PlayerHeaderFragment :
 
     private fun isListDataEquivalentForVisuals(old: PlayerViewModel.ListData, new: PlayerViewModel.ListData): Boolean {
         return old.podcastHeader.episode?.uuid == new.podcastHeader.episode?.uuid &&
+            old.podcastHeader.isVideo == new.podcastHeader.isVideo &&
             old.podcastHeader.useEpisodeArtwork == new.podcastHeader.useEpisodeArtwork &&
             old.podcastHeader.chapter?.index == new.podcastHeader.chapter?.index &&
             old.podcastHeader.isPrepared == new.podcastHeader.isPrepared

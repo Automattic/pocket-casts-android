@@ -6,6 +6,7 @@ import androidx.work.Configuration
 import au.com.shiftyjelly.pocketcasts.BuildConfig
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsController
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentProvider
+import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.crashlogging.InitializeRemoteLogging
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadStatusObserver
@@ -14,6 +15,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.jobs.VersionMigrationsWorker
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackServiceToggle
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.DefaultPlaylistsInitializer
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.stats.PlaybackStatsSyncWorker
@@ -24,15 +26,16 @@ import au.com.shiftyjelly.pocketcasts.utils.TimberDebugTree
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.utils.log.RxJavaUncaughtExceptionHandling
 import au.com.shiftyjelly.pocketcasts.wear.networking.ConnectivityLogger
+import com.automattic.android.tracks.crashlogging.CrashLogging
 import com.google.firebase.FirebaseApp
 import com.squareup.moshi.Moshi
 import dagger.hilt.android.HiltAndroidApp
 import java.io.File
 import java.util.concurrent.Executors
 import javax.inject.Inject
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @HiltAndroidApp
@@ -58,6 +61,8 @@ class PocketCastsWearApplication :
 
     @Inject lateinit var userManager: UserManager
 
+    @Inject lateinit var defaultPlaylistsInitializer: DefaultPlaylistsInitializer
+
     @Inject lateinit var workerFactory: HiltWorkerFactory
 
     @Inject lateinit var analyticsController: AnalyticsController
@@ -69,6 +74,11 @@ class PocketCastsWearApplication :
     @Inject lateinit var initializeRemoteLogging: InitializeRemoteLogging
 
     @Inject lateinit var connectivityLogger: ConnectivityLogger
+
+    @Inject lateinit var crashLogging: CrashLogging
+
+    @Inject @ApplicationScope
+    lateinit var applicationScope: CoroutineScope
 
     override fun onCreate() {
         super.onCreate()
@@ -94,39 +104,63 @@ class PocketCastsWearApplication :
     }
 
     private fun setupApp() {
-        runBlocking {
-            notificationHelper.setupNotificationChannels()
-            appLifecycleObserver.setup()
+        val application = this
 
-            PlaybackServiceToggle.ensureCorrectServiceEnabled(this@PocketCastsWearApplication)
+        notificationHelper.setupNotificationChannels()
+        appLifecycleObserver.setup()
+        PlaybackServiceToggle.ensureCorrectServiceEnabled(application)
 
-            withContext(Dispatchers.Default) {
+        // Apply migrations before the UI starts, so the app never reads pre-migration state.
+        VersionMigrationsWorker.performMigrations(
+            context = application,
+            settings = settings,
+            moshi = moshi,
+        )
+
+        applicationScope.launch {
+            runStartupStep("default playlists seeding") {
+                defaultPlaylistsInitializer.initialize()
+            }
+        }
+
+        // Defer the expensive playback/storage setup and monitors off the main thread to avoid blocking onCreate (ANRs).
+        applicationScope.launch {
+            runStartupStep("playback setup and account monitoring") {
                 playbackManager.setup()
-                val storageChoice = settings.getStorageChoice()
-                if (storageChoice == null) {
+                userManager.beginMonitoringAccountManager(playbackManager)
+            }
+            runStartupStep("storage setup") {
+                if (settings.getStorageChoice() == null) {
                     val folder = StorageOptions()
-                        .getFolderLocations(this@PocketCastsWearApplication)
+                        .getFolderLocations(application)
                         .firstOrNull()
                     if (folder != null) {
                         settings.setStorageChoice(folder.filePath, folder.label)
                     } else {
-                        settings.setStorageCustomFolder(this@PocketCastsWearApplication.filesDir.absolutePath)
+                        settings.setStorageCustomFolder(application.filesDir.absolutePath)
                     }
                 }
             }
-
-            VersionMigrationsWorker.performMigrations(
-                context = this@PocketCastsWearApplication,
-                settings = settings,
-                moshi = moshi,
-            )
+            runStartupStep("download monitoring") {
+                downloadStatusObserver.monitorDownloadStatus()
+            }
+            runStartupStep("playback stats scheduling") {
+                PlaybackStatsSyncWorker.scheduleOneTimeWork(application)
+                PlaybackStatsSyncWorker.schedulePeriodicWork(application)
+            }
         }
+    }
 
-        userManager.beginMonitoringAccountManager(playbackManager)
-        downloadStatusObserver.monitorDownloadStatus()
-
-        PlaybackStatsSyncWorker.scheduleOneTimeWork(this)
-        PlaybackStatsSyncWorker.schedulePeriodicWork(this)
+    /** Runs a deferred startup step, reporting failures to the log buffer and Sentry without skipping later steps. */
+    private inline fun runStartupStep(name: String, block: () -> Unit) {
+        try {
+            block()
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, e, "${WearLogging.PREFIX} Deferred startup step failed: $name")
+            crashLogging.sendReport(e, message = "${WearLogging.PREFIX} Deferred startup step failed: $name")
+        }
     }
 
     private fun setupAnalytics() {

@@ -83,6 +83,7 @@ fun PlayerShelf(
     PlayerShelfContent(
         shelfItems = shelfItemsState.playerShelfItems,
         isTranscriptAvailable = shelfItemsState.isTranscriptAvailable,
+        isVideoEnabled = shelfItemsState.isVideoRenderingEnabled,
         playerShelfData = playerShelfData,
         playerColors = playerColors,
         onEffectsClick = {
@@ -137,6 +138,9 @@ fun PlayerShelf(
         onTranscriptClick = { isTranscriptAvailable: Boolean ->
             shelfSharedViewModel.onTranscriptClick(isTranscriptAvailable, ShelfItemSource.Shelf)
         },
+        onVideoToggleClick = {
+            shelfSharedViewModel.onVideoToggleClick(ShelfItemSource.Shelf)
+        },
         onMoreClick = {
             shelfSharedViewModel.onMoreClick()
         },
@@ -156,6 +160,7 @@ fun PlayerShelf(
 private fun PlayerShelfContent(
     shelfItems: List<ShelfItem>,
     isTranscriptAvailable: Boolean,
+    isVideoEnabled: Boolean,
     playerShelfData: PlayerShelfData,
     onEffectsClick: () -> Unit,
     onSleepClick: () -> Unit,
@@ -168,6 +173,7 @@ private fun PlayerShelfContent(
     onDownloadClick: () -> Unit,
     onAddBookmarkClick: () -> Unit,
     onTranscriptClick: (Boolean) -> Unit,
+    onVideoToggleClick: () -> Unit,
     onAddToPlaylistClick: () -> Unit,
     onMoreClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -251,6 +257,12 @@ private fun PlayerShelfContent(
                 ShelfItem.AddToPlaylist -> AddToPlaylistButton(
                     playerColors = playerColors,
                     onClick = onAddToPlaylistClick,
+                )
+
+                ShelfItem.StreamSelector -> VideoToggleButton(
+                    isVideoEnabled = isVideoEnabled,
+                    playerColors = playerColors,
+                    onClick = onVideoToggleClick,
                 )
             }
         }
@@ -337,6 +349,21 @@ private fun ShareButton(
         Icon(
             painterResource(id = R.drawable.ic_share_android_32),
             contentDescription = stringResource(LR.string.share_podcast),
+            tint = playerColors.contrast03,
+        )
+    }
+}
+
+@Composable
+private fun VideoToggleButton(
+    isVideoEnabled: Boolean,
+    playerColors: PlayerColors,
+    onClick: () -> Unit,
+) {
+    IconButton(onClick = onClick) {
+        Icon(
+            painterResource(id = if (isVideoEnabled) IR.drawable.ic_video_off else IR.drawable.ic_video_on),
+            contentDescription = stringResource(if (isVideoEnabled) LR.string.player_action_hide_video else LR.string.player_action_show_video),
             tint = playerColors.contrast03,
         )
     }
@@ -498,6 +525,7 @@ private fun PlayerShelfPreview(
         PlayerShelfContent(
             shelfItems = ShelfItem.entries.toList().take(4),
             isTranscriptAvailable = false,
+            isVideoEnabled = true,
             playerShelfData = PlayerShelfData(),
             onEffectsClick = {},
             onSleepClick = {},
@@ -510,6 +538,7 @@ private fun PlayerShelfPreview(
             onDownloadClick = {},
             onAddBookmarkClick = {},
             onTranscriptClick = {},
+            onVideoToggleClick = {},
             onAddToPlaylistClick = {},
             onMoreClick = {},
         )

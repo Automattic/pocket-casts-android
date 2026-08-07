@@ -22,8 +22,13 @@ internal class Media3AutomotiveStrategy(
         context: Context,
         buildCustomActionButton: (MediaNotificationControls, BaseEpisode?) -> CommandButton?,
     ): AutomotiveSessionStrategy.ButtonLayout {
-        val buttons = mutableListOf<CommandButton>()
         val currentEpisode = playbackManager.getCurrentEpisode()
+
+        if (currentEpisode == null) {
+            return AutomotiveSessionStrategy.ButtonLayout(primaryButtons = emptyList(), overflowButtons = emptyList())
+        }
+
+        val buttons = mutableListOf<CommandButton>()
 
         if (useCustomSkipButtons()) {
             buttons.add(

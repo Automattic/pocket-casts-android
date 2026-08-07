@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.repositories.transcript
 
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.ChapterOrigin
 import au.com.shiftyjelly.pocketcasts.models.to.Chapters
 import au.com.shiftyjelly.pocketcasts.models.to.DbChapter
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
@@ -35,6 +36,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -434,9 +436,9 @@ class TranscriptManagerTest {
         verify(chapterManager).updateChapters(
             "episode-id",
             listOf(
-                DbChapter(index = 0, episodeUuid = "episode-id", startTimeMs = 15000, title = "Introduction", isGenerated = true),
-                DbChapter(index = 1, episodeUuid = "episode-id", startTimeMs = 73000, title = "Main Topic", isGenerated = true),
-                DbChapter(index = 2, episodeUuid = "episode-id", startTimeMs = 180000, title = "Wrap Up", isGenerated = true),
+                DbChapter(index = 0, episodeUuid = "episode-id", startTimeMs = 15000, title = "Introduction", origin = ChapterOrigin.Generated),
+                DbChapter(index = 1, episodeUuid = "episode-id", startTimeMs = 73000, title = "Main Topic", origin = ChapterOrigin.Generated),
+                DbChapter(index = 2, episodeUuid = "episode-id", startTimeMs = 180000, title = "Wrap Up", origin = ChapterOrigin.Generated),
             ),
         )
     }
@@ -495,7 +497,7 @@ class TranscriptManagerTest {
         verify(chapterManager).updateChapters(
             "episode-id",
             listOf(
-                DbChapter(index = 0, episodeUuid = "episode-id", startTimeMs = 60000, title = "Valid Chapter", isGenerated = true),
+                DbChapter(index = 0, episodeUuid = "episode-id", startTimeMs = 60000, title = "Valid Chapter", origin = ChapterOrigin.Generated),
             ),
         )
     }
@@ -509,6 +511,79 @@ class TranscriptManagerTest {
 
         assertEquals("Just a summary", summary)
         verify(chapterManager, never()).updateChapters(any(), any())
+    }
+
+    @Test
+    fun `save ai chapters but withhold summary when only generated chapters enabled`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        FeatureFlag.setEnabled(Feature.AI_SUMMARIES, false)
+        localTranscriptsFlow.value = listOf(generatedVttTranscript)
+        service.metaJsonResponse = META_JSON_WITH_CHAPTERS
+
+        val summary = transcriptManager.loadSummaryText("episode-id")
+
+        assertNull(summary)
+        verify(chapterManager).updateChapters(
+            "episode-id",
+            listOf(
+                DbChapter(index = 0, episodeUuid = "episode-id", startTimeMs = 15000, title = "Introduction", origin = ChapterOrigin.Generated),
+                DbChapter(index = 1, episodeUuid = "episode-id", startTimeMs = 73000, title = "Main Topic", origin = ChapterOrigin.Generated),
+                DbChapter(index = 2, episodeUuid = "episode-id", startTimeMs = 180000, title = "Wrap Up", origin = ChapterOrigin.Generated),
+            ),
+        )
+    }
+
+    @Test
+    fun `do not return summary when summaries disabled`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        FeatureFlag.setEnabled(Feature.AI_SUMMARIES, false)
+        localTranscriptsFlow.value = listOf(generatedVttTranscript)
+        service.metaJsonResponse = META_JSON_WITH_CHAPTERS
+
+        val summary = transcriptManager.loadSummaryText("episode-id")
+
+        assertNull(summary)
+    }
+
+    @Test
+    fun `do not save ai chapters when generated chapters disabled`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, false)
+        FeatureFlag.setEnabled(Feature.AI_SUMMARIES, true)
+        localTranscriptsFlow.value = listOf(generatedVttTranscript)
+        service.metaJsonResponse = META_JSON_WITH_CHAPTERS
+
+        val summary = transcriptManager.loadSummaryText("episode-id")
+
+        assertEquals("A great episode.", summary)
+        verify(chapterManager, never()).updateChapters(any(), any())
+    }
+
+    @Test
+    fun `do not fetch meta when both ai features disabled`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, false)
+        FeatureFlag.setEnabled(Feature.AI_SUMMARIES, false)
+        localTranscriptsFlow.value = listOf(generatedVttTranscript)
+        service.metaJsonResponse = META_JSON_WITH_CHAPTERS
+
+        val summary = transcriptManager.loadSummaryText("episode-id")
+
+        assertNull(summary)
+        assertEquals(0, service.metaRequestCount)
+        verify(chapterManager, never()).updateChapters(any(), any())
+    }
+
+    @Test
+    fun `fetch meta only once for chapters and summary`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        FeatureFlag.setEnabled(Feature.AI_SUMMARIES, true)
+        localTranscriptsFlow.value = listOf(generatedVttTranscript)
+        service.metaJsonResponse = META_JSON_WITH_CHAPTERS
+
+        val summary = transcriptManager.loadSummaryText("episode-id")
+
+        assertEquals("A great episode.", summary)
+        assertEquals(1, service.metaRequestCount)
+        verify(chapterManager).updateChapters(eq("episode-id"), any())
     }
 }
 
@@ -532,11 +607,13 @@ private class TestTranscriptService : TranscriptService {
     var shouldThrow = false
     var responseBody: String = "Ok"
     var metaJsonResponse: String? = null
+    var metaRequestCount = 0
 
     override suspend fun getTranscriptOrThrow(url: String, cacheControl: CacheControl?): ResponseBody {
         return if (shouldThrow) {
             error("Test exception")
         } else if (url.endsWith("-meta.json") && metaJsonResponse != null) {
+            metaRequestCount++
             metaJsonResponse!!.toResponseBody()
         } else {
             responseBody.toResponseBody()

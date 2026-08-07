@@ -10,6 +10,8 @@ import android.widget.ImageButton
 import androidx.annotation.ColorInt
 import androidx.appcompat.widget.TooltipCompat
 import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.core.view.isVisible
@@ -61,6 +63,7 @@ import com.automattic.eventhorizon.UpNextQueueEpisodeLongPressedEvent
 import com.automattic.eventhorizon.UpNextQueueEpisodeTappedEvent
 import com.automattic.eventhorizon.UpNextShuffleEnabledEvent
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.flow.StateFlow
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -76,7 +79,10 @@ class UpNextAdapter(
     private val settings: Settings,
     private val playbackManager: PlaybackManager,
     private val swipeRowActionsFactory: SwipeRowActions.Factory,
+    private val showSortTooltip: StateFlow<Boolean>,
     private val onSortClick: () -> Unit,
+    private val onSortTooltipShown: () -> Unit,
+    private val onSortTooltipTapped: () -> Unit,
     private val onSwipeAction: (BaseEpisode, SwipeAction) -> Unit,
 ) : ListAdapter<Any, RecyclerView.ViewHolder>(UPNEXT_ADAPTER_DIFF) {
     private val dateFormatter = RelativeDateFormatter(context)
@@ -219,10 +225,6 @@ class UpNextAdapter(
         val onSortClick: () -> Unit,
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        init {
-            binding.sort.setOnClickListener { onSortClick() }
-        }
-
         fun bind(header: PlayerViewModel.UpNextSummary) {
             with(binding) {
                 binding.emptyUpNextComposeView.setContentWithViewCompositionStrategy {
@@ -244,7 +246,19 @@ class UpNextAdapter(
                     root.resources.getQuantityString(LR.plurals.player_up_next_header_title, header.episodeCount, header.episodeCount, time)
                 }
 
-                sort.isVisible = isUpNextNotEmpty
+                sortComposeView.isVisible = isUpNextNotEmpty
+                sortComposeView.setContentWithViewCompositionStrategy {
+                    AppTheme(theme) {
+                        val showTooltip by showSortTooltip.collectAsState()
+                        UpNextSortButton(
+                            showTooltip = showTooltip,
+                            onClick = onSortClick,
+                            onTooltipClick = onSortTooltipTapped,
+                            onTooltipShow = onSortTooltipShown,
+                        )
+                    }
+                }
+
                 shuffle.isVisible = isUpNextNotEmpty
                 shuffle.updateShuffleButton()
 

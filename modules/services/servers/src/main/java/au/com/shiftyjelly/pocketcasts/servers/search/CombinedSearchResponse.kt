@@ -14,7 +14,7 @@ sealed interface CombinedResult {
     @JsonClass(generateAdapter = true)
     data class PodcastResult(
         val uuid: String,
-        val title: String,
+        val title: String? = null,
         val author: String? = "",
         val slug: String,
         val explicit: Boolean? = null,

@@ -32,13 +32,17 @@ class HelpViewModel @Inject constructor(
         )
     }
 
-    suspend fun getSupportIntent(activity: Activity): Intent {
+    suspend fun getSupportIntent(
+        activity: Activity,
+        recipient: String = "support@pocketcasts.com",
+    ): Intent {
         eventHorizon.track(SettingsGetSupportEvent)
         return support.shareLogs(
             subject = "Android support.",
             intro = "Hi there, just needed help with something…",
             emailSupport = true,
             context = activity,
+            recipient = recipient,
         )
     }
 }

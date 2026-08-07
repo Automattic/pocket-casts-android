@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -73,6 +74,7 @@ fun BookmarksPage(
     openFragment: (Fragment) -> Unit,
     onSearchBarClearButtonClick: () -> Unit,
     onHeadphoneControlsButtonClick: () -> Unit,
+    onBookmarkDetailClick: (BookmarksViewModel.BookmarkDetailData) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -126,6 +128,13 @@ fun BookmarksPage(
                 }
                 Toast.makeText(context, string, Toast.LENGTH_SHORT).show()
             }
+    }
+
+    val currentOnBookmarkDetailClick by rememberUpdatedState(onBookmarkDetailClick)
+    LaunchedEffect(bookmarksViewModel) {
+        bookmarksViewModel.showBookmarkDetail.collect { data ->
+            currentOnBookmarkDetailClick(data)
+        }
     }
 }
 

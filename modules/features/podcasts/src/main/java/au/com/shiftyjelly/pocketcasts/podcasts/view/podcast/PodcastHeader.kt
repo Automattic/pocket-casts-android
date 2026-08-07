@@ -117,6 +117,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageReques
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.views.extensions.copyLinkToClipboard
 import coil3.compose.rememberAsyncImagePainter
 import kotlin.math.roundToInt
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -736,6 +737,7 @@ private fun PodcastDetails(
     onClickShowNotes: () -> Unit,
     onClickWebsiteLink: () -> Unit,
 ) {
+    val context = LocalContext.current
     Column {
         if (description.isNotEmpty()) {
             Spacer(
@@ -749,6 +751,8 @@ private fun PodcastDetails(
                     color = MaterialTheme.theme.colors.primaryText01,
                 ),
                 maxLines = 4,
+                onLinkLongPress = { url -> context.copyLinkToClipboard(url) },
+                copyLinkAccessibilityLabel = stringResource(LR.string.share_label_copy_link),
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable(

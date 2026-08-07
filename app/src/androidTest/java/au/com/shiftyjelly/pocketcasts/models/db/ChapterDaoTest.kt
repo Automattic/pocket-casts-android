@@ -7,6 +7,7 @@ import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.models.db.dao.ChapterDao
 import au.com.shiftyjelly.pocketcasts.models.di.ModelModule
 import au.com.shiftyjelly.pocketcasts.models.di.addTypeConverters
+import au.com.shiftyjelly.pocketcasts.models.to.ChapterOrigin
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -115,7 +116,7 @@ class ChapterDaoTest {
                 index = index,
                 episodeUuid = "episode-id",
                 startTimeMs = 0L + index,
-                isEmbedded = true,
+                origin = ChapterOrigin.NativeMedia,
             )
         }
         chapterDao.replaceAllChapters("episode-id", chapters1)
@@ -125,7 +126,7 @@ class ChapterDaoTest {
                 index = index,
                 episodeUuid = "episode-id",
                 startTimeMs = 0L + index,
-                isEmbedded = true,
+                origin = ChapterOrigin.NativeMedia,
             )
         }
         chapterDao.replaceAllChapters("episode-id", chapters2)
@@ -141,7 +142,7 @@ class ChapterDaoTest {
                 index = index,
                 episodeUuid = "episode-id",
                 startTimeMs = 0L + index,
-                isEmbedded = true,
+                origin = ChapterOrigin.NativeMedia,
             )
         }
         chapterDao.replaceAllChapters("episode-id", chapters)
@@ -159,7 +160,6 @@ class ChapterDaoTest {
                 index = index,
                 episodeUuid = "episode-id",
                 startTimeMs = 0L + index,
-                isEmbedded = false,
             )
         }
         chapterDao.replaceAllChapters("episode-id", chapters1)
@@ -169,7 +169,7 @@ class ChapterDaoTest {
                 index = index,
                 episodeUuid = "episode-id",
                 startTimeMs = 0L + index,
-                isEmbedded = true,
+                origin = ChapterOrigin.NativeMedia,
             )
         }
         chapterDao.replaceAllChapters("episode-id", chapters2)
@@ -185,7 +185,7 @@ class ChapterDaoTest {
                 index = index,
                 episodeUuid = "episode-id",
                 startTimeMs = 0L + index,
-                isEmbedded = true,
+                origin = ChapterOrigin.NativeMedia,
             )
         }
         chapterDao.replaceAllChapters("episode-id", chapters1)
@@ -195,7 +195,6 @@ class ChapterDaoTest {
                 index = index,
                 episodeUuid = "episode-id",
                 startTimeMs = 0L + index,
-                isEmbedded = false,
             )
         }
         chapterDao.replaceAllChapters("episode-id", chapters2)

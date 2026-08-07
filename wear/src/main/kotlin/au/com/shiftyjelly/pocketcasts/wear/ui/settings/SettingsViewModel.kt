@@ -16,7 +16,6 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
-import kotlinx.coroutines.rx2.asFlow
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
@@ -28,7 +27,7 @@ class SettingsViewModel @Inject constructor(
 
     data class State(
         val refreshState: RefreshState?,
-        val signInState: SignInState,
+        val signInState: SignInState?,
         val showDataWarning: Boolean,
         val refreshInBackground: Boolean,
     )
@@ -36,7 +35,7 @@ class SettingsViewModel @Inject constructor(
     private val _state = MutableStateFlow(
         State(
             refreshState = null,
-            signInState = userManager.getSignInState().blockingFirst(),
+            signInState = null,
             showDataWarning = settings.warnOnMeteredNetwork.value,
             refreshInBackground = settings.backgroundRefreshPodcasts.value,
         ),
