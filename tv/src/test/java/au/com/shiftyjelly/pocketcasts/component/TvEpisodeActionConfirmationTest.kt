@@ -52,6 +52,7 @@ class TvEpisodeActionConfirmationTest {
         )
     }
 
-    private fun requiresConfirmation(type: TvEpisodeActionType, episode: PodcastEpisode) =
-        tvEpisodeActionRequiresConfirmation(TvEpisodeActionContext.NowPlaying, type, episode)
+    private fun requiresConfirmation(type: TvEpisodeActionType, episode: PodcastEpisode): Boolean {
+        return tvEpisodeActionRequiresConfirmation(TvEpisodeActionContext.NowPlaying, type, episode)
+    }
 }
