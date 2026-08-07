@@ -96,7 +96,7 @@ internal class Media3SessionCallback(
             .add(SessionCommand(SessionCommand.COMMAND_CODE_SESSION_SET_RATING))
             .build()
 
-        return MediaSession.ConnectionResult.accept(sessionCommands, TRANSPORT_PLAYER_COMMANDS)
+        return MediaSession.ConnectionResult.accept(sessionCommands, transportPlayerCommands(isAutomotive))
     }
 
     override fun onCustomCommand(
@@ -221,14 +221,18 @@ internal class Media3SessionCallback(
             KeyEvent.KEYCODE_MEDIA_SKIP_FORWARD,
             KeyEvent.KEYCODE_MEDIA_FAST_FORWARD,
             -> {
-                launchSkipForward()
+                if (keyEvent.repeatCount == 0) {
+                    launchSkipForward()
+                }
                 return true
             }
 
             KeyEvent.KEYCODE_MEDIA_SKIP_BACKWARD,
             KeyEvent.KEYCODE_MEDIA_REWIND,
             -> {
-                launchSkipBackward()
+                if (keyEvent.repeatCount == 0) {
+                    launchSkipBackward()
+                }
                 return true
             }
         }
@@ -236,16 +240,22 @@ internal class Media3SessionCallback(
         // On Android Automotive OS the user controls are hardware buttons (e.g. the
         // steering wheel) that send a single key event per press. Multi-tap detection
         // adds a 250 ms response delay and never resolves to a higher tap count, so
-        // route NEXT/PREVIOUS straight to skip forward/back. See PCDROID-560.
+        // route NEXT/PREVIOUS straight to skip forward/back. These are transport buttons,
+        // not headphone gestures, so deliberately ignore headphone action settings and
+        // preserve the current play/pause state. See PCDROID-560.
         if (isAutomotive) {
             when (keyEvent.keyCode) {
                 KeyEvent.KEYCODE_MEDIA_NEXT -> {
-                    launchSkipForward()
+                    if (keyEvent.repeatCount == 0) {
+                        launchSkipForward()
+                    }
                     return true
                 }
 
                 KeyEvent.KEYCODE_MEDIA_PREVIOUS -> {
-                    launchSkipBackward()
+                    if (keyEvent.repeatCount == 0) {
+                        launchSkipBackward()
+                    }
                     return true
                 }
             }
@@ -405,8 +415,9 @@ internal class Media3SessionCallback(
 }
 
 /**
- * Player commands granted to all connected controllers (known and unknown).
- * Covers basic transport controls: play/pause, stop, seek, and metadata retrieval.
+ * Player commands granted to connected controllers. Automotive also receives directional
+ * skip commands so vehicle media services do not fall back to an ambiguous STOP event.
+ * Keeping them Automotive-only prevents duplicate previous/next controls on Wear OS.
  */
 @OptIn(UnstableApi::class)
 @Suppress("UnsafeOptInUsageError")
@@ -420,6 +431,17 @@ internal val TRANSPORT_PLAYER_COMMANDS: Player.Commands = Player.Commands.Builde
         Player.COMMAND_GET_METADATA,
     )
     .build()
+
+private val AUTOMOTIVE_TRANSPORT_PLAYER_COMMANDS = TRANSPORT_PLAYER_COMMANDS.buildUpon()
+    .addAll(
+        Player.COMMAND_SEEK_TO_NEXT,
+        Player.COMMAND_SEEK_TO_PREVIOUS,
+    )
+    .build()
+
+internal fun transportPlayerCommands(isAutomotive: Boolean): Player.Commands {
+    return if (isAutomotive) AUTOMOTIVE_TRANSPORT_PLAYER_COMMANDS else TRANSPORT_PLAYER_COMMANDS
+}
 
 internal fun resolveArtworkUri(episode: BaseEpisode, podcast: Podcast?): Uri? {
     return when (episode) {
