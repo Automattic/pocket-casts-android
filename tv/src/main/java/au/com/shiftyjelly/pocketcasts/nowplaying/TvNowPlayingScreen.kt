@@ -56,6 +56,7 @@ import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
+import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.podcasts.TvPodcastDetailsScreen
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
 import au.com.shiftyjelly.pocketcasts.theme.TvButtonDefaults
@@ -394,6 +395,9 @@ private fun TvNowPlayingContentPreview() {
                 bufferedMs = 1_200_000,
                 isVideo = false,
                 player = null,
+                playbackSpeed = 1.0,
+                trimMode = TrimMode.OFF,
+                isVolumeBoosted = false,
             ),
             onPlayPause = {},
             onSkipBackward = {},

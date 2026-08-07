@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
+import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.Player
@@ -46,6 +47,9 @@ class TvNowPlayingViewModel @Inject constructor(
                 bufferedMs = if (isPlaybackStateCurrent) playbackState.bufferedMs else 0,
                 isVideo = isVideo(episode, streamVideoState, videoRenderingEnabled),
                 player = player,
+                playbackSpeed = playbackState.playbackSpeed,
+                trimMode = playbackState.trimMode,
+                isVolumeBoosted = playbackState.isVolumeBoosted,
             )
         } else {
             TvNowPlayingUiState.Empty
@@ -99,5 +103,8 @@ sealed interface TvNowPlayingUiState {
         val bufferedMs: Int,
         val isVideo: Boolean,
         val player: Player?,
+        val playbackSpeed: Double,
+        val trimMode: TrimMode,
+        val isVolumeBoosted: Boolean,
     ) : TvNowPlayingUiState
 }
