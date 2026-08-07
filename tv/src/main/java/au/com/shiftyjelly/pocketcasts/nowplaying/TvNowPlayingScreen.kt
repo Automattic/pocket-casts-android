@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.nowplaying
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -35,6 +36,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
@@ -206,7 +209,7 @@ private fun TvNowPlayingContent(
     }
     val chromeAlpha by animateFloatAsState(if (isChromeVisible) 1f else 0f, label = "TvNowPlayingChromeAlpha")
 
-    Column(
+    Box(
         modifier = modifier
             .fillMaxSize()
             .onFocusChanged { focusState ->
@@ -225,15 +228,11 @@ private fun TvNowPlayingContent(
                 // Only navigation presses are swallowed by the reveal; media keys keep their
                 // effect even while the chrome is hidden and back is revealed via BackHandler.
                 revealsChrome && event.key in chromeRevealConsumedKeys
-            }
-            .padding(top = TvTopBarHeight)
-            .padding(horizontal = 80.dp, vertical = 24.dp),
+            },
     ) {
         Box(
             contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth(),
+            modifier = Modifier.fillMaxSize(),
         ) {
             if (state.isVideo) {
                 TvVideoSurface(
@@ -250,8 +249,24 @@ private fun TvNowPlayingContent(
                 )
             }
         }
-        Spacer(modifier = Modifier.height(24.dp))
-        Column(modifier = Modifier.alpha(chromeAlpha)) {
+        Column(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .graphicsLayer { alpha = chromeAlpha }
+                .then(if (state.isVideo) Modifier.background(ChromeScrimBrush) else Modifier)
+                .padding(horizontal = 80.dp)
+                .padding(top = if (state.isVideo) ChromeScrimTopInset else 0.dp, bottom = 24.dp),
+        ) {
+            if (state.isVideo) {
+                EpisodeTitles(
+                    episode = episode,
+                    podcastTitle = state.podcastTitle,
+                    textAlign = TextAlign.Start,
+                    horizontalAlignment = Alignment.Start,
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+            }
             state.errorMessage?.let { errorMessage ->
                 Text(
                     text = errorMessage,
@@ -358,11 +373,32 @@ private fun EpisodeArtworkWithTitles(
             )
         }
         Spacer(modifier = Modifier.height(24.dp))
+        EpisodeTitles(
+            episode = episode,
+            podcastTitle = podcastTitle,
+            textAlign = TextAlign.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+        )
+    }
+}
+
+@Composable
+private fun EpisodeTitles(
+    episode: BaseEpisode,
+    podcastTitle: String?,
+    textAlign: TextAlign,
+    horizontalAlignment: Alignment.Horizontal,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        horizontalAlignment = horizontalAlignment,
+        modifier = modifier,
+    ) {
         Text(
             text = episode.title,
             style = MaterialTheme.tvTypography.title3,
             color = MaterialTheme.tvColors.textPrimary,
-            textAlign = TextAlign.Center,
+            textAlign = textAlign,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
         )
@@ -372,7 +408,7 @@ private fun EpisodeArtworkWithTitles(
                 text = podcastTitle,
                 style = MaterialTheme.tvTypography.caption1,
                 color = MaterialTheme.tvColors.textSecondary,
-                textAlign = TextAlign.Center,
+                textAlign = textAlign,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
@@ -494,6 +530,12 @@ private val BlurredArtworkOffset = -ArtworkSize * 0.2f
 private val BlurredArtworkRadius = 66.dp
 
 private val CHROME_HIDE_DELAY = 4.seconds
+
+private val ChromeScrimTopInset = 48.dp
+private val ChromeScrimBrush = Brush.verticalGradient(
+    0f to Color.Transparent,
+    1f to Color.Black.copy(alpha = 0.8f),
+)
 
 private val chromeRevealConsumedKeys = setOf(
     Key.DirectionUp,
