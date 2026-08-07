@@ -41,6 +41,14 @@ class WaveformEnvelopeTest {
     }
 
     @Test
+    fun `snaps to the target immediately and settled`() {
+        envelope.fadeTo(1f, 0)
+        envelope.snapTo(0f, 1_000.msNanos)
+        assertEquals(0f, envelope.valueAt(1_000.msNanos), 0f)
+        assertTrue(envelope.isSettledAt(1_000.msNanos))
+    }
+
+    @Test
     fun `settles only after the fade duration plus margin`() {
         envelope.fadeTo(1f, 0)
         assertFalse(envelope.isSettledAt(2_000.msNanos))
