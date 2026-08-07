@@ -340,12 +340,31 @@ class Media3SessionCallbackTest {
     // --- Headphone action handler tests ---
 
     @Test
-    fun `KEYCODE_MEDIA_PLAY routes through multi-tap as single tap`() = runTest {
+    fun `KEYCODE_MEDIA_PLAY resumes playback instead of toggling`() = runTest {
         sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_PLAY)
         testScope.advanceUntilIdle()
 
-        // Routed through MediaEventQueue — single tap resolves as play/pause
-        verify(playbackManager).playPause(sourceView = any())
+        // KEYCODE_MEDIA_PLAY is an explicit "play" command, not a play/pause toggle.
+        // It must resume and never call playPause, which would pause already-playing
+        // audio. See https://github.com/Automattic/pocket-casts-android/issues/3919
+        verify(playbackManager).playQueueSuspend(sourceView = any(), showedStreamWarning = any())
+        verify(playbackManager, never()).playPause(sourceView = any())
+    }
+
+    @Test
+    fun `KEYCODE_MEDIA_PLAY does not pause when already playing`() = runTest {
+        whenever(playbackManager.isPlaying()).thenReturn(true)
+
+        sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_PLAY)
+        testScope.advanceUntilIdle()
+
+        // This is the #3919 regression: an explicit play while already playing used to
+        // toggle and pause. It must not pause, and with the already-playing guard it is
+        // a full no-op — re-running the play path would re-fire playback_play analytics
+        // and make CastPlayer reload the stream.
+        verify(playbackManager, never()).playPause(sourceView = any())
+        verify(playbackManager, never()).pauseSuspend(transientLoss = any(), sourceView = any())
+        verify(playbackManager, never()).playQueueSuspend(sourceView = any(), showedStreamWarning = any())
     }
 
     @Test
