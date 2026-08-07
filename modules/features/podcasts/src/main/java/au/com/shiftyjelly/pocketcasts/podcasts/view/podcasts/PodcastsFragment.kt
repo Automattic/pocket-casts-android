@@ -449,9 +449,7 @@ class PodcastsFragment :
                 )
             }
             val onSortTypeChanged = { sort: PodcastsSortType ->
-                if (sort != folder.podcastsSortType) {
-                    keepRecyclerViewAtTopAfterSort(sort)
-                }
+                keepRecyclerViewAtTopAfterSort(sort)
                 eventHorizon.track(
                     FolderSortByChangedEvent(
                         sortOrder = sort.analyticsValue,
@@ -712,6 +710,15 @@ class PodcastsFragment :
     }
 
     private fun keepRecyclerViewAtTopAfterSort(sortType: PodcastsSortType) {
+        val currentSortType = if (folderUuid == null) {
+            settings.podcastsSortType.value
+        } else {
+            viewModel.uiState.value.folder?.podcastsSortType
+        }
+        if (sortType == currentSortType) {
+            scrollToTopRequest = scrollToTopRequest?.takeIf { request -> request.sortType == sortType }
+            return
+        }
         scrollToTopRequest = if (realBinding?.recyclerView?.canScrollVertically(-1) == false) {
             ScrollToTopRequest(sortType)
         } else {

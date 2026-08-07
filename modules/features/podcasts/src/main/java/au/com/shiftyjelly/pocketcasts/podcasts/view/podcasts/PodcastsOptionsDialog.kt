@@ -114,9 +114,7 @@ class PodcastsOptionsDialog(
                 titleId = order.labelId,
                 checked = order.clientId == sortOrder.clientId,
                 click = {
-                    if (order.clientId != sortOrder.clientId) {
-                        onSortTypeChanged(order)
-                    }
+                    onSortTypeChanged(order)
                     settings.podcastsSortType.set(order, updateModifiedAt = true)
                     trackSortByChanged(order)
                 },

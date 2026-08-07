@@ -46,7 +46,7 @@ class PodcastsViewModelTest {
     fun `changing to recently played waits for recently played podcasts before updating sort type`() = runTest {
         val sortTypeFlow = MutableStateFlow(PodcastsSortType.DATE_ADDED_NEWEST_TO_OLDEST)
         val latestEpisodePodcasts = MutableSharedFlow<List<Podcast>>(replay = 1)
-        val recentlyPlayedPodcasts = MutableSharedFlow<List<Podcast>>()
+        val recentlyPlayedPodcasts = MutableSharedFlow<List<Podcast>>(replay = 1)
         latestEpisodePodcasts.emit(listOf(podcast("latest-episode-podcast")))
 
         val viewModel = createViewModel(
@@ -60,19 +60,37 @@ class PodcastsViewModelTest {
             while (initialState.items.isEmpty()) {
                 initialState = awaitItem()
             }
-            assertEquals(PodcastsSortType.DATE_ADDED_NEWEST_TO_OLDEST, initialState.sortType)
-            assertEquals(listOf("latest-episode-podcast"), initialState.items.map { it.uuid })
+            assertSortAndPodcasts(
+                state = initialState,
+                sortType = PodcastsSortType.DATE_ADDED_NEWEST_TO_OLDEST,
+                podcastUuids = listOf("latest-episode-podcast"),
+            )
 
             sortTypeFlow.value = PodcastsSortType.RECENTLY_PLAYED
             advanceUntilIdle()
+            // A UI state must never pair a sort type with podcasts produced for another sort.
             expectNoEvents()
 
             recentlyPlayedPodcasts.emit(listOf(podcast("recently-played-podcast")))
 
             val recentlyPlayedState = awaitItem()
-            assertEquals(PodcastsSortType.RECENTLY_PLAYED, recentlyPlayedState.sortType)
-            assertEquals(listOf("recently-played-podcast"), recentlyPlayedState.items.map { it.uuid })
+            assertSortAndPodcasts(
+                state = recentlyPlayedState,
+                sortType = PodcastsSortType.RECENTLY_PLAYED,
+                podcastUuids = listOf("recently-played-podcast"),
+            )
         }
+    }
+
+    private fun assertSortAndPodcasts(
+        state: PodcastsViewModel.UiState,
+        sortType: PodcastsSortType,
+        podcastUuids: List<String>,
+    ) {
+        assertEquals(
+            sortType to podcastUuids,
+            state.sortType to state.items.map { item -> item.uuid },
+        )
     }
 
     private fun createViewModel(
