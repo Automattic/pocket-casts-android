@@ -10,6 +10,7 @@ import androidx.media3.session.MediaSession
 import androidx.media3.session.SessionCommand
 import androidx.media3.session.SessionError
 import androidx.media3.session.SessionResult
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -19,8 +20,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -31,6 +32,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doCallRealMethod
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -65,7 +67,7 @@ class Media3SessionCallbackTest {
         bookmarkHelper = mock()
         mockSession = mock()
         mockController = mock()
-        testScope = TestScope(UnconfinedTestDispatcher())
+        testScope = TestScope(StandardTestDispatcher())
 
         callback = Media3SessionCallback(
             playbackManager = playbackManager,
@@ -340,12 +342,74 @@ class Media3SessionCallbackTest {
     // --- Headphone action handler tests ---
 
     @Test
-    fun `KEYCODE_MEDIA_PLAY routes through multi-tap as single tap`() = runTest {
+    fun `KEYCODE_MEDIA_PLAY while paused starts playback before the multi-tap window expires`() = runTest {
+        doCallRealMethod().whenever(playbackManager).playIfNotPlaying(any())
+        whenever(playbackManager.isPlaying()).thenReturn(false)
+
+        sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_PLAY)
+
+        // A dedicated play key must not wait 600 ms for tap disambiguation.
+        verify(playbackManager).playQueue(
+            sourceView = eq(SourceView.MEDIA_BUTTON_BROADCAST_ACTION),
+            showedStreamWarning = any(),
+        )
+        verify(playbackManager, never()).playPause(sourceView = any())
+
+        testScope.advanceUntilIdle()
+
+        // A lone dedicated play key has already been handled, so the delayed
+        // single-tap result must not toggle playback.
+        verify(playbackManager, never()).playPause(sourceView = any())
+    }
+
+    @Test
+    fun `KEYCODE_MEDIA_PLAY while paused resumes before the double-tap action`() = runTest {
+        mockHeadphoneNextAction(HeadphoneAction.ADD_BOOKMARK)
+        doCallRealMethod().whenever(playbackManager).playIfNotPlaying(any())
+        whenever(playbackManager.isPlaying()).thenReturn(false)
+
+        sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_PLAY)
+        verify(playbackManager).playQueue(
+            sourceView = eq(SourceView.MEDIA_BUTTON_BROADCAST_ACTION),
+            showedStreamWarning = any(),
+        )
+
+        sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE)
+        testScope.advanceUntilIdle()
+        shadowOf(android.os.Looper.getMainLooper()).idle()
+
+        verify(bookmarkHelper).handleAddBookmarkAction(any(), any())
+        verify(playbackManager, never()).playPause(sourceView = any())
+    }
+
+    @Test
+    fun `KEYCODE_MEDIA_PLAY stays suppressed after KEYCODE_MEDIA_NEXT`() = runTest {
+        mockHeadphoneNextAction(HeadphoneAction.SKIP_FORWARD)
+        mockSkipSettings()
+        whenever(playbackManager.isPlaying()).thenReturn(true)
+
+        sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_NEXT)
         sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_PLAY)
         testScope.advanceUntilIdle()
 
-        // Routed through MediaEventQueue — single tap resolves as play/pause
-        verify(playbackManager).playPause(sourceView = any())
+        verify(playbackManager, never()).playIfNotPlaying(sourceView = any())
+        verify(playbackManager).skipForwardSuspend(
+            sourceView = any(),
+            jumpAmountSeconds = eq(30),
+        )
+    }
+
+    @Test
+    fun `KEYCODE_MEDIA_PLAY while already playing does not toggle`() = runTest {
+        doCallRealMethod().whenever(playbackManager).playIfNotPlaying(any())
+        whenever(playbackManager.isPlaying()).thenReturn(true)
+
+        sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_PLAY)
+        testScope.advanceUntilIdle()
+
+        verify(playbackManager, never()).playQueue(any(), any())
+        verify(playbackManager, never()).pause(any(), any())
+        verify(playbackManager, never()).playPause(any())
     }
 
     @Test
@@ -380,18 +444,6 @@ class Media3SessionCallbackTest {
             sourceView = any(),
             jumpAmountSeconds = eq(30),
         )
-    }
-
-    @Test
-    fun `double tap with ADD_BOOKMARK setting calls bookmarkHelper`() = runTest {
-        mockHeadphoneNextAction(HeadphoneAction.ADD_BOOKMARK)
-
-        sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_NEXT)
-        testScope.advanceUntilIdle()
-        // The bookmark action dispatches on Dispatchers.Main, so idle the main looper
-        shadowOf(android.os.Looper.getMainLooper()).idle()
-
-        verify(bookmarkHelper).handleAddBookmarkAction(any(), any())
     }
 
     @Test
