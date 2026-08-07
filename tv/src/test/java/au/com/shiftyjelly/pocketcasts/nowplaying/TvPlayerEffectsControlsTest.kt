@@ -22,6 +22,14 @@ class TvPlayerEffectsControlsTest {
     }
 
     @Test
+    fun `the nearest option is found for speeds outside the list`() {
+        assertEquals(3.0, nearestPlaybackSpeedOption(5.0), 0.0)
+        assertEquals(3.0, nearestPlaybackSpeedOption(3.1), 0.0)
+        assertEquals(1.2, nearestPlaybackSpeedOption(1.2), 0.0)
+        assertEquals(0.5, nearestPlaybackSpeedOption(0.5), 0.0)
+    }
+
+    @Test
     fun `speed labels use one decimal place`() {
         assertEquals("0.5x", playbackSpeedLabel(0.5))
         assertEquals("1.0x", playbackSpeedLabel(1.0))

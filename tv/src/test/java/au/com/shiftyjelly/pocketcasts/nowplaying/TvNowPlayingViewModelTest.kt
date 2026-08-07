@@ -88,7 +88,8 @@ class TvNowPlayingViewModelTest {
 
     @Test
     fun `a loaded queue maps the playback state`() = runTest {
-        queueChanges.onNext(UpNextQueue.State.Loaded(audioEpisode, Podcast(uuid = "podcast", title = "Podcast"), emptyList()))
+        val podcast = Podcast(uuid = "podcast", title = "Podcast")
+        queueChanges.onNext(UpNextQueue.State.Loaded(audioEpisode, podcast, emptyList()))
         playbackStates.value = PlaybackState(
             state = PlaybackState.State.PLAYING,
             episodeUuid = audioEpisode.uuid,
@@ -275,13 +276,13 @@ class TvNowPlayingViewModelTest {
     }
 
     @Test
-    fun `toggling volume boost flips the current value`() = runTest {
-        playbackStates.value = PlaybackState(isVolumeBoosted = true)
+    fun `setting volume boost keeps the other effects`() = runTest {
+        playbackStates.value = PlaybackState(playbackSpeed = 1.5, trimMode = TrimMode.LOW)
 
-        viewModel.toggleVolumeBoost()
+        viewModel.setVolumeBoost(true)
         runCurrent()
 
-        verify(playbackManager).updatePlayerEffects(effectsWith(1.0, TrimMode.OFF, false))
+        verify(playbackManager).updatePlayerEffects(effectsWith(1.5, TrimMode.LOW, true))
     }
 
     private fun effectsWith(speed: Double, trimMode: TrimMode, isVolumeBoosted: Boolean) = argThat<PlaybackEffects> {

@@ -91,7 +91,7 @@ class TvNowPlayingViewModel @Inject constructor(
 
     fun setTrimMode(trimMode: TrimMode) = updateEffects { it.copy(trimMode = trimMode) }
 
-    fun toggleVolumeBoost() = updateEffects { it.copy(isVolumeBoosted = !it.isVolumeBoosted) }
+    fun setVolumeBoost(isBoosted: Boolean) = updateEffects { it.copy(isVolumeBoosted = isBoosted) }
 
     private fun updateEffects(update: (PlaybackEffectsData) -> PlaybackEffectsData) {
         viewModelScope.launch(ioDispatcher) {
