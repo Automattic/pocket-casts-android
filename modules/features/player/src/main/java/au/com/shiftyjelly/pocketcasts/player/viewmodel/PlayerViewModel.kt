@@ -601,6 +601,10 @@ class PlayerViewModel @Inject constructor(
         playbackManager.seekToTimeMs(seekTimeMs, seekComplete)
     }
 
+    fun seekToMs(episodeUuid: String, seekTimeMs: Int, seekComplete: () -> Unit) {
+        playbackManager.seekIfPlayingToTimeMs(episodeUuid, seekTimeMs, source, seekComplete)
+    }
+
     override fun onCleared() {
         super.onCleared()
         disposables.clear()
