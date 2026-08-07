@@ -710,13 +710,13 @@ class PodcastsFragment :
     }
 
     private fun keepRecyclerViewAtTopAfterSort(sortType: PodcastsSortType) {
-        val currentSortType = if (folderUuid == null) {
+        // A pending request is the latest selection while folder UI state may still reflect the previous sort.
+        val currentSortType = scrollToTopRequest?.sortType ?: if (folderUuid == null) {
             settings.podcastsSortType.value
         } else {
             viewModel.uiState.value.folder?.podcastsSortType
         }
         if (sortType == currentSortType) {
-            scrollToTopRequest = scrollToTopRequest?.takeIf { request -> request.sortType == sortType }
             return
         }
         scrollToTopRequest = if (realBinding?.recyclerView?.canScrollVertically(-1) == false) {
