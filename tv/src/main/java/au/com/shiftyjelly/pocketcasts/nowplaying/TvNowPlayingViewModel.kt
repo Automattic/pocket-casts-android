@@ -4,24 +4,33 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffectsData
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.Player
 import au.com.shiftyjelly.pocketcasts.repositories.playback.StreamVideoState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlow
 
 @HiltViewModel
 class TvNowPlayingViewModel @Inject constructor(
     private val playbackManager: PlaybackManager,
+    private val podcastManager: PodcastManager,
     private val settings: Settings,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     val uiState: StateFlow<TvNowPlayingUiState> = combine(
@@ -76,6 +85,32 @@ class TvNowPlayingViewModel @Inject constructor(
             sourceView = SourceView.PLAYER,
             jumpAmountSeconds = settings.skipBackInSecs.value,
         )
+    }
+
+    fun setPlaybackSpeed(speed: Double) = updateEffects { it.copy(playbackSpeed = speed) }
+
+    fun setTrimMode(trimMode: TrimMode) = updateEffects { it.copy(trimMode = trimMode) }
+
+    fun toggleVolumeBoost() = updateEffects { it.copy(isVolumeBoosted = !it.isVolumeBoosted) }
+
+    private fun updateEffects(update: (PlaybackEffectsData) -> PlaybackEffectsData) {
+        viewModelScope.launch(ioDispatcher) {
+            val playbackState = playbackManager.playbackStateFlow.first()
+            val currentEffects = PlaybackEffectsData(
+                playbackSpeed = playbackState.playbackSpeed,
+                trimMode = playbackState.trimMode,
+                isVolumeBoosted = playbackState.isVolumeBoosted,
+            )
+            val effects = update(currentEffects).toEffects()
+            val podcast = (playbackManager.getCurrentEpisode() as? PodcastEpisode)
+                ?.let { podcastManager.findPodcastByUuid(it.podcastUuid) }
+            if (podcast != null && podcast.overrideGlobalEffects) {
+                podcastManager.updateEffectsBlocking(podcast, effects)
+            } else {
+                settings.globalPlaybackEffects.set(effects, updateModifiedAt = true)
+            }
+            playbackManager.updatePlayerEffects(effects)
+        }
     }
 
     private fun isVideo(
