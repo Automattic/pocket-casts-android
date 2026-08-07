@@ -57,6 +57,7 @@ class SimplePlayer(
     @UnstableApi
     private var trackSelector: DefaultTrackSelector? = null
 
+    @Volatile
     private var renderersFactory: ShiftyRenderersFactory? = null
     private var playbackEffects: PlaybackEffects? = null
 
@@ -351,6 +352,7 @@ class SimplePlayer(
             fingerprintTapEnabled = {
                 FeatureFlag.isEnabled(Feature.SYNCED_TRANSCRIPTS) && Util.getAppPlatform(context) == AppPlatform.Phone
             },
+            audioLevelMeterEnabled = { Util.isTv(context) },
         )
     }
 

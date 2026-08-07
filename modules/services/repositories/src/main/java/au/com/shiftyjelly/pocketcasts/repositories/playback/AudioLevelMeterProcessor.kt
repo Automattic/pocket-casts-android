@@ -11,14 +11,20 @@ import kotlin.math.min
 import kotlin.math.sqrt
 
 @OptIn(UnstableApi::class)
-class AudioLevelMeterProcessor : BaseAudioProcessor() {
+class AudioLevelMeterProcessor(
+    private val isEnabled: () -> Boolean,
+) : BaseAudioProcessor() {
 
     @Volatile
     var currentAudioLevel: Float = 0f
         private set
 
     override fun onConfigure(inputAudioFormat: AudioProcessor.AudioFormat): AudioProcessor.AudioFormat {
-        return if (inputAudioFormat.encoding == C.ENCODING_PCM_16BIT) inputAudioFormat else AudioProcessor.AudioFormat.NOT_SET
+        return if (isEnabled() && inputAudioFormat.encoding == C.ENCODING_PCM_16BIT) {
+            inputAudioFormat
+        } else {
+            AudioProcessor.AudioFormat.NOT_SET
+        }
     }
 
     override fun queueInput(inputBuffer: ByteBuffer) {

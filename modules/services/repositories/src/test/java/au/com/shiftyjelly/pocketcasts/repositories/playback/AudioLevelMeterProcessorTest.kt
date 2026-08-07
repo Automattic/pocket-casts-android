@@ -16,7 +16,7 @@ class AudioLevelMeterProcessorTest {
     private val monoFormat = AudioProcessor.AudioFormat(44100, 1, C.ENCODING_PCM_16BIT)
     private val stereoFormat = AudioProcessor.AudioFormat(44100, 2, C.ENCODING_PCM_16BIT)
 
-    private fun processor(format: AudioProcessor.AudioFormat = monoFormat) = AudioLevelMeterProcessor().apply {
+    private fun processor(format: AudioProcessor.AudioFormat = monoFormat) = AudioLevelMeterProcessor(isEnabled = { true }).apply {
         configure(format)
         flush(AudioProcessor.StreamMetadata.DEFAULT)
     }
@@ -29,8 +29,15 @@ class AudioLevelMeterProcessorTest {
     }
 
     @Test
+    fun `stays inactive when disabled`() {
+        val processor = AudioLevelMeterProcessor(isEnabled = { false })
+        assertSame(AudioProcessor.AudioFormat.NOT_SET, processor.configure(monoFormat))
+        assertFalse(processor.isActive)
+    }
+
+    @Test
     fun `stays inactive for non 16-bit input`() {
-        val processor = AudioLevelMeterProcessor()
+        val processor = AudioLevelMeterProcessor(isEnabled = { true })
         val floatFormat = AudioProcessor.AudioFormat(44100, 2, C.ENCODING_PCM_FLOAT)
         assertSame(AudioProcessor.AudioFormat.NOT_SET, processor.configure(floatFormat))
         assertFalse(processor.isActive)
@@ -38,7 +45,7 @@ class AudioLevelMeterProcessorTest {
 
     @Test
     fun `keeps the input format for 16-bit input`() {
-        val processor = AudioLevelMeterProcessor()
+        val processor = AudioLevelMeterProcessor(isEnabled = { true })
         assertSame(monoFormat, processor.configure(monoFormat))
         assertTrue(processor.isActive)
     }

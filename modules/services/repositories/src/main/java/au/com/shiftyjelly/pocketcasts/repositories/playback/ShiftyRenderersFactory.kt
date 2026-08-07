@@ -27,6 +27,7 @@ class ShiftyRenderersFactory(
     private var boostVolume: Boolean,
     private val fingerprintPcmTap: FingerprintPcmTap? = null,
     private val fingerprintTapEnabled: () -> Boolean = { false },
+    audioLevelMeterEnabled: () -> Boolean = { false },
 ) : DefaultRenderersFactory(context),
     AnalyticsListener {
     private var playbackSpeed = 0f
@@ -34,7 +35,7 @@ class ShiftyRenderersFactory(
     private var audioSink: AudioSink? = null
     private var processorChain: ShiftyAudioProcessorChain? = null
     private val customAudio = ShiftyCustomAudio(statsManager)
-    private val audioLevelMeter = AudioLevelMeterProcessor()
+    private val audioLevelMeter = AudioLevelMeterProcessor(audioLevelMeterEnabled)
 
     val currentAudioLevel: Float get() = audioLevelMeter.currentAudioLevel
 
