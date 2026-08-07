@@ -15,39 +15,30 @@ class TvEpisodeActionConfirmationTest {
 
     @Test
     fun `marking the now playing episode as played requires confirmation`() {
-        assertTrue(
-            tvEpisodeActionRequiresConfirmation(TvEpisodeActionContext.NowPlaying, TvEpisodeActionType.TogglePlayed, episode),
-        )
+        assertTrue(requiresConfirmation(TvEpisodeActionType.TogglePlayed, episode))
     }
 
     @Test
     fun `archiving the now playing episode requires confirmation`() {
-        assertTrue(
-            tvEpisodeActionRequiresConfirmation(TvEpisodeActionContext.NowPlaying, TvEpisodeActionType.ToggleArchived, episode),
-        )
+        assertTrue(requiresConfirmation(TvEpisodeActionType.ToggleArchived, episode))
     }
 
     @Test
     fun `marking as unplayed does not require confirmation`() {
-        assertFalse(
-            tvEpisodeActionRequiresConfirmation(TvEpisodeActionContext.NowPlaying, TvEpisodeActionType.TogglePlayed, finishedEpisode),
-        )
+        assertFalse(requiresConfirmation(TvEpisodeActionType.TogglePlayed, finishedEpisode))
     }
 
     @Test
     fun `unarchiving does not require confirmation`() {
-        assertFalse(
-            tvEpisodeActionRequiresConfirmation(TvEpisodeActionContext.NowPlaying, TvEpisodeActionType.ToggleArchived, archivedEpisode),
-        )
+        assertFalse(requiresConfirmation(TvEpisodeActionType.ToggleArchived, archivedEpisode))
     }
 
     @Test
     fun `other actions do not require confirmation`() {
-        val otherTypes = TvEpisodeActionType.entries - setOf(TvEpisodeActionType.TogglePlayed, TvEpisodeActionType.ToggleArchived)
+        val otherTypes = TvEpisodeActionType.entries -
+            setOf(TvEpisodeActionType.TogglePlayed, TvEpisodeActionType.ToggleArchived)
 
-        assertTrue(
-            otherTypes.none { tvEpisodeActionRequiresConfirmation(TvEpisodeActionContext.NowPlaying, it, episode) },
-        )
+        assertTrue(otherTypes.none { requiresConfirmation(it, episode) })
     }
 
     @Test
@@ -60,4 +51,7 @@ class TvEpisodeActionConfirmationTest {
             },
         )
     }
+
+    private fun requiresConfirmation(type: TvEpisodeActionType, episode: PodcastEpisode) =
+        tvEpisodeActionRequiresConfirmation(TvEpisodeActionContext.NowPlaying, type, episode)
 }
