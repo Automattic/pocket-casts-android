@@ -9,6 +9,7 @@ fun PlayerSeekBar.setPlaybackState(playbackState: PlaybackState?) {
     if (playbackState == null) {
         return
     }
+    setEpisodeUuid(playbackState.episodeUuid)
     setDuration(playbackState.durationMs.milliseconds)
     setPlaybackSpeed(playbackState.playbackSpeed)
     setCurrentTime(playbackState.positionMs.milliseconds)

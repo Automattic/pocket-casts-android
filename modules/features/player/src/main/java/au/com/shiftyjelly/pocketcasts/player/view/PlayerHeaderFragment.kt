@@ -1195,6 +1195,7 @@ class PlayerHeaderFragment :
         modifier: Modifier = Modifier,
     ) {
         PlayerSeekBar(
+            episodeUuid = headerData.episodeUuid,
             playbackPosition = headerData.positionMs.milliseconds,
             playbackDuration = headerData.durationMs.milliseconds,
             adjustPlaybackDuration = headerData.adjustRemainingTimeDuration,
@@ -1203,10 +1204,9 @@ class PlayerHeaderFragment :
             isBuffering = headerData.isBuffering,
             bufferedUpTo = headerData.bufferedUpToMs.milliseconds,
             playerColors = playerColors,
-            onSeekToPosition = { progress, onSeekComplete ->
+            onSeekToPosition = { episodeUuid, progress, onSeekComplete ->
                 val progressMs = progress.inWholeMilliseconds.toInt()
-                viewModel.seekToMs(progressMs, onSeekComplete)
-                playbackManager.trackPlaybackSeek(progressMs, SourceView.PLAYER)
+                viewModel.seekToMs(episodeUuid, progressMs, onSeekComplete)
             },
             modifier = modifier,
         )
