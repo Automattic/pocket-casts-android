@@ -24,6 +24,9 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.tv.material3.MaterialTheme
 import au.com.shiftyjelly.pocketcasts.theme.tvColors
 import kotlin.math.exp
@@ -34,8 +37,6 @@ import kotlin.math.sin
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 @Composable
 fun TvNowPlayingWaveform(
@@ -52,35 +53,43 @@ fun TvNowPlayingWaveform(
     var useAudioReactive by remember { mutableStateOf(false) }
     var frameTimeNanos by remember { mutableLongStateOf(0L) }
 
+    val lifecycleOwner = LocalLifecycleOwner.current
     LaunchedEffect(isPlaying, episodeUuid) {
-        val now = withFrameNanos { it }
-        if (isPlaying) {
-            envelope.fadeTo(1f, now)
-            useAudioReactive = false
-            launch {
-                while (!useAudioReactive) {
-                    if (latestAudioLevel() > AudioDetectThreshold) {
-                        useAudioReactive = true
-                    } else {
-                        delay(AudioDetectInterval)
-                    }
+        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            val now = withFrameNanos { it }
+            if (isPlaying) {
+                envelope.fadeTo(1f, now)
+                useAudioReactive = false
+            } else {
+                envelope.fadeTo(0f, now)
+            }
+            while (isPlaying || !envelope.isSettledAt(frameTimeNanos)) {
+                frameTimeNanos = withInfiniteAnimationFrameNanos { it }
+                if (isPlaying && !useAudioReactive && latestAudioLevel() > AudioDetectThreshold) {
+                    useAudioReactive = true
                 }
             }
-        } else if (envelope.valueAt(now) > 0f) {
-            envelope.fadeTo(0f, now)
-        }
-        while (isPlaying || !envelope.isSettledAt(frameTimeNanos)) {
-            frameTimeNanos = withInfiniteAnimationFrameNanos { it }
         }
     }
 
-    val windowWidth = with(LocalDensity.current) { LocalWindowInfo.current.containerSize.width.toDp() }
-    val artworkSizePx = with(LocalDensity.current) { artworkSize.toPx() }
+    val density = LocalDensity.current
+    val windowWidth = with(density) { LocalWindowInfo.current.containerSize.width.toDp() }
+    val artworkSizePx = with(density) { artworkSize.toPx() }
     Spacer(
         modifier = modifier
             .requiredWidth(windowWidth * WidthFraction)
             .requiredHeight(MaxBarHeight)
-            .drawBehind { drawWaveform(color, frameTimeNanos, envelope, smoother, useAudioReactive, latestAudioLevel, artworkSizePx) },
+            .drawBehind {
+                drawWaveform(
+                    color = color,
+                    timeNanos = frameTimeNanos,
+                    envelope = envelope,
+                    smoother = smoother,
+                    useAudioReactive = useAudioReactive,
+                    audioLevel = latestAudioLevel,
+                    artworkSizePx = artworkSizePx,
+                )
+            },
     )
 }
 
@@ -101,6 +110,9 @@ private fun DrawScope.drawWaveform(
     val barWidthPx = BarWidth.toPx()
     val spacingPx = BarSpacing.toPx()
     val stepPx = barWidthPx + spacingPx
+    val minBarHeightPx = MinBarHeight.toPx()
+    val maxBarHeightPx = MaxBarHeight.toPx()
+    val cornerRadius = CornerRadius(BarCornerRadius.toPx())
     val sideWidth = (size.width - artworkSizePx) / 2
     val barsPerSide = (sideWidth / stepPx).toInt()
     if (barsPerSide <= 0) return
@@ -109,7 +121,7 @@ private fun DrawScope.drawWaveform(
             val normalizedIndex = i.toFloat() / max(1, barsPerSide - 1)
             val distanceFactor = if (side == 0) normalizedIndex else 1f - normalizedIndex
             val sineWave = (sin(time * 2.5 + i * 0.4) * 0.5 + 0.5).toFloat()
-            val barHeight = max(MinBarHeight.toPx(), MaxBarHeight.toPx() * distanceFactor * sineWave * level * env)
+            val barHeight = max(minBarHeightPx, maxBarHeightPx * distanceFactor * sineWave * level * env)
             val x = if (side == 0) {
                 size.width / 2 - artworkSizePx / 2 - (barsPerSide - i) * stepPx
             } else {
@@ -119,7 +131,7 @@ private fun DrawScope.drawWaveform(
                 color = color,
                 topLeft = Offset(x, (size.height - barHeight) / 2),
                 size = Size(barWidthPx, barHeight),
-                cornerRadius = CornerRadius(BarCornerRadius.toPx()),
+                cornerRadius = cornerRadius,
                 alpha = 0.8f * distanceFactor * env,
             )
         }
@@ -177,7 +189,6 @@ internal class WaveformLevelSmoother(
 private val WidthFraction = 0.75f
 private val AudioDetectThreshold = 0.01f
 private val MinReactiveLevel = 0.05f
-private val AudioDetectInterval = 100.milliseconds
 private val BarWidth = 3.33.dp
 private val BarSpacing = 4.67.dp
 private val MaxBarHeight = 66.67.dp
