@@ -411,6 +411,7 @@ private val chromeRevealConsumedKeys = setOf(
     Key.DirectionRight,
     Key.DirectionCenter,
     Key.Enter,
+    Key.Back,
 )
 
 private fun BaseEpisode.artworkModel(): Any? = when (this) {
