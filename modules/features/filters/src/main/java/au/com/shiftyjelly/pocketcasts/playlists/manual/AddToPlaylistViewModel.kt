@@ -1,5 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.playlists.manual
 
+import androidx.annotation.PluralsRes
+import androidx.annotation.StringRes
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.ui.text.TextRange
 import androidx.lifecycle.ViewModel
@@ -44,6 +46,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel(assistedFactory = AddToPlaylistViewModel.Factory::class)
@@ -93,14 +96,22 @@ class AddToPlaylistViewModel @AssistedInject constructor(
         emitAll(uiStates)
     }.stateIn(viewModelScope, SharingStarted.Eagerly, initialValue = null)
 
-    private val playlistsChanges = mutableMapOf<String, Boolean>()
+    private val playlistsChanges = mutableMapOf<String, PlaylistChange>()
 
-    private fun cachePlaylistChange(uuid: String, shouldAdd: Boolean) {
+    private fun cachePlaylistChange(
+        uuid: String,
+        shouldAdd: Boolean,
+        playlistTitle: String? = null,
+    ) {
+        val change = PlaylistChange(
+            shouldAdd = shouldAdd,
+            playlistTitle = playlistTitle,
+        )
         // If the change is not present add it.
-        playlistsChanges.merge(uuid, shouldAdd) { isCurrentlyAdded, _ ->
-            if (isCurrentlyAdded == shouldAdd) {
+        playlistsChanges.merge(uuid, change) { currentChange, _ ->
+            if (currentChange.shouldAdd == shouldAdd) {
                 // If the change is already stored keep it.
-                isCurrentlyAdded
+                currentChange
             } else {
                 // If playlist was added but will be removed or vice versa remove the change value.
                 null
@@ -108,10 +119,27 @@ class AddToPlaylistViewModel @AssistedInject constructor(
         }
     }
 
-    fun getPlaylistsAddedTo(): Set<PlaylistPreviewForEpisode> {
-        val playlists = uiState.value?.playlistPreviews.orEmpty()
-        val uuidsAddedTo = playlistsChanges.filterValues { it }.keys
-        return playlists.filterTo(mutableSetOf()) { playlist -> playlist.uuid in uuidsAddedTo }
+    fun getPlaylistChangeSummary(): PlaylistChangeSummary {
+        return PlaylistChangeSummary(
+            addedCount = playlistsChanges.count { it.value.shouldAdd },
+            removedCount = playlistsChanges.count { !it.value.shouldAdd },
+        )
+    }
+
+    fun getPlaylistChangeFeedback(): PlaylistChangeFeedback {
+        val singleAddedPlaylist = playlistsChanges
+            .entries
+            .singleOrNull { it.value.shouldAdd }
+            ?.let { (uuid, change) ->
+                AddedPlaylist(
+                    uuid = uuid,
+                    title = requireNotNull(change.playlistTitle),
+                )
+            }
+        return PlaylistChangeFeedback.from(
+            summary = getPlaylistChangeSummary(),
+            singleAddedPlaylist = singleAddedPlaylist,
+        )
     }
 
     fun getArtworkUuidsFlow(playlistUuid: String): StateFlow<List<String>?> {
@@ -141,8 +169,15 @@ class AddToPlaylistViewModel @AssistedInject constructor(
         }
     }
 
-    fun addToPlaylist(playlistUuid: String) {
-        cachePlaylistChange(playlistUuid, shouldAdd = true)
+    fun addToPlaylist(
+        playlistUuid: String,
+        playlistTitle: String,
+    ) {
+        cachePlaylistChange(
+            uuid = playlistUuid,
+            shouldAdd = true,
+            playlistTitle = playlistTitle,
+        )
 
         viewModelScope.launch(Dispatchers.Default) {
             previewsFlow.update { previews ->
@@ -179,8 +214,8 @@ class AddToPlaylistViewModel @AssistedInject constructor(
         viewModelScope.launch {
             withContext(NonCancellable) {
                 val uuids = episodeUuids.map(EpisodeUuidPair::episodeUuid)
-                for ((playlistUuid, isAdded) in playlistsChanges) {
-                    if (isAdded) {
+                for ((playlistUuid, change) in playlistsChanges) {
+                    if (change.shouldAdd) {
                         playlistManager.addManualEpisodes(playlistUuid, uuids)
                     } else {
                         playlistManager.deleteManualEpisodes(playlistUuid, uuids)
@@ -290,6 +325,80 @@ class AddToPlaylistViewModel @AssistedInject constructor(
         val uuid: String,
         val title: String,
     )
+
+    data class PlaylistChangeSummary(
+        val addedCount: Int,
+        val removedCount: Int,
+    )
+
+    data class AddedPlaylist(
+        val uuid: String,
+        val title: String,
+    )
+
+    private data class PlaylistChange(
+        val shouldAdd: Boolean,
+        val playlistTitle: String?,
+    )
+
+    sealed interface PlaylistChangeFeedback {
+        data class SinglePlaylistAddition(
+            @StringRes val resourceId: Int,
+            val playlist: AddedPlaylist,
+        ) : PlaylistChangeFeedback
+
+        data class StringResource(
+            @StringRes val resourceId: Int,
+        ) : PlaylistChangeFeedback
+
+        data class PluralResource(
+            @PluralsRes val resourceId: Int,
+            val quantity: Int,
+        ) : PlaylistChangeFeedback
+
+        data object None : PlaylistChangeFeedback
+
+        companion object {
+            fun from(
+                summary: PlaylistChangeSummary,
+                singleAddedPlaylist: AddedPlaylist?,
+            ): PlaylistChangeFeedback {
+                return when {
+                    summary.addedCount > 0 && summary.removedCount > 0 -> {
+                        PluralResource(
+                            resourceId = LR.plurals.changed_playlists,
+                            quantity = summary.addedCount + summary.removedCount,
+                        )
+                    }
+
+                    summary.addedCount == 1 -> {
+                        SinglePlaylistAddition(
+                            resourceId = LR.string.added_to_playlist_single,
+                            playlist = requireNotNull(singleAddedPlaylist),
+                        )
+                    }
+
+                    summary.addedCount > 1 -> {
+                        PluralResource(
+                            resourceId = LR.plurals.added_to_playlist_single_multiple,
+                            quantity = summary.addedCount,
+                        )
+                    }
+
+                    summary.removedCount == 1 -> StringResource(LR.string.removed_from_playlist_feedback)
+
+                    summary.removedCount > 1 -> {
+                        PluralResource(
+                            resourceId = LR.plurals.removed_from_playlists,
+                            quantity = summary.removedCount,
+                        )
+                    }
+
+                    else -> None
+                }
+            }
+        }
+    }
 
     @AssistedFactory
     interface Factory {

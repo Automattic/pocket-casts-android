@@ -4,6 +4,9 @@
 
 8.18
 -----
+*   New Features
+    *   Improve feedback when adding episodes to playlists
+        ([#5632](https://github.com/Automattic/pocket-casts-android/pull/5632))
 *   Bug Fixes
     *   Allow copying description and show notes links with a long press
         ([#5628](https://github.com/Automattic/pocket-casts-android/pull/5628))
