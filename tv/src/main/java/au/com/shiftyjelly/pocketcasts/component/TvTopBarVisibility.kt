@@ -27,6 +27,10 @@ val LocalTvTopBarVisibility = staticCompositionLocalOf<TvTopBarVisibility> {
     error("TvTopBarVisibility was not provided")
 }
 
+val LocalFocusTvTopBar = staticCompositionLocalOf<() -> Unit> {
+    error("LocalFocusTvTopBar was not provided")
+}
+
 @Composable
 fun HideTvTopBar() {
     val visibility = LocalTvTopBarVisibility.current
