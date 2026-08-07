@@ -48,6 +48,8 @@ import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -214,6 +216,9 @@ private fun TvNowPlayingContent(
         }
     }
     val chromeAlpha by animateFloatAsState(if (isChromeVisible) 1f else 0f, label = "TvNowPlayingChromeAlpha")
+    val density = LocalDensity.current
+    var chromeHeight by remember { mutableStateOf(0.dp) }
+    val artworkBottomPadding = chromeHeight * chromeAlpha
 
     Box(
         modifier = modifier
@@ -238,7 +243,9 @@ private fun TvNowPlayingContent(
     ) {
         Box(
             contentAlignment = Alignment.Center,
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = if (state.isVideo) 0.dp else artworkBottomPadding),
         ) {
             if (state.isVideo) {
                 TvVideoSurface(
@@ -265,7 +272,8 @@ private fun TvNowPlayingContent(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(TvScreenBackgroundBrush),
+                        .background(TvScreenBackgroundBrush)
+                        .padding(bottom = artworkBottomPadding),
                 ) {
                     EpisodeArtworkWithTitles(
                         episode = episode,
@@ -283,6 +291,7 @@ private fun TvNowPlayingContent(
                 .fillMaxWidth()
                 .graphicsLayer { alpha = chromeAlpha }
                 .then(if (state.isVideo) Modifier.background(ChromeScrimBrush) else Modifier)
+                .onSizeChanged { size -> chromeHeight = with(density) { size.height.toDp() } }
                 .padding(horizontal = 80.dp)
                 .padding(top = if (state.isVideo) ChromeScrimTopInset else 0.dp, bottom = 24.dp),
         ) {
@@ -583,6 +592,17 @@ private fun BaseEpisode.artworkModel(): Any? = when (this) {
 @Preview(device = Devices.TV_1080p)
 @Composable
 private fun TvNowPlayingContentPreview() {
+    TvNowPlayingContentPreview(isVideo = false)
+}
+
+@Preview(device = Devices.TV_1080p)
+@Composable
+private fun TvNowPlayingVideoContentPreview() {
+    TvNowPlayingContentPreview(isVideo = true)
+}
+
+@Composable
+private fun TvNowPlayingContentPreview(isVideo: Boolean) {
     TvTheme {
         CompositionLocalProvider(LocalFocusTvTopBar provides {}) {
             TvNowPlayingContent(
@@ -602,7 +622,7 @@ private fun TvNowPlayingContentPreview() {
                     positionMs = 600_000,
                     durationMs = 3_600_000,
                     bufferedMs = 1_200_000,
-                    isVideo = false,
+                    isVideo = isVideo,
                     player = null,
                     playbackSpeed = 1.0,
                     trimMode = TrimMode.OFF,
