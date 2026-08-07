@@ -65,7 +65,7 @@ private fun ColumnScope.TvEpisodeActionsModalContent(
     onShowEpisodeDetails: () -> Unit,
     onGoToPodcast: (() -> Unit)?,
 ) {
-    var pendingConfirmation by remember { mutableStateOf<TvEpisodeActionType?>(null) }
+    var pendingConfirmation by remember { mutableStateOf<TvEpisodeActionConfirmation?>(null) }
     val focusRequester = remember { FocusRequester() }
     LaunchedEffect(pendingConfirmation) {
         if (pendingConfirmation == null) {
@@ -102,78 +102,89 @@ private fun ColumnScope.TvEpisodeActionsModalContent(
         onDismissRequest()
     }
 
-    fun performOrConfirm(type: TvEpisodeActionType, message: String, action: () -> Unit): () -> Unit = if (tvEpisodeActionRequiresConfirmation(actionContext, type, episode)) {
-        { pendingConfirmation = type }
-    } else {
-        perform(message, action)
+    val markPlayedTitle = stringResource(LR.string.tv_mark_played_confirmation_title)
+    val archiveTitle = stringResource(LR.string.tv_archive_confirmation_title)
+    val stopPlaybackMessage = stringResource(LR.string.tv_stop_playback_confirmation_message)
+
+    fun confirm(title: String, confirmLabel: String, onConfirm: () -> Unit): () -> Unit = {
+        pendingConfirmation = TvEpisodeActionConfirmation(title, confirmLabel, onConfirm)
     }
 
-    when (pendingConfirmation) {
-        TvEpisodeActionType.TogglePlayed -> TvConfirmationContent(
-            title = stringResource(LR.string.tv_mark_played_confirmation_title),
-            message = stringResource(LR.string.tv_stop_playback_confirmation_message),
-            confirmLabel = stringResource(LR.string.mark_as_played),
-            onConfirm = perform(playedToast) { actions.markAsPlayed(episode) },
+    val confirmation = pendingConfirmation
+    if (confirmation != null) {
+        TvConfirmationContent(
+            title = confirmation.title,
+            message = stopPlaybackMessage,
+            confirmLabel = confirmation.confirmLabel,
+            onConfirm = {
+                pendingConfirmation = null
+                confirmation.onConfirm()
+            },
             onCancel = { pendingConfirmation = null },
         )
+    } else {
+        val markAsPlayed = perform(playedToast) { actions.markAsPlayed(episode) }
+        val archiveEpisode = perform(archiveToast) { actions.archive(episode) }
 
-        TvEpisodeActionType.ToggleArchived -> TvConfirmationContent(
-            title = stringResource(LR.string.tv_archive_confirmation_title),
-            message = stringResource(LR.string.tv_stop_playback_confirmation_message),
-            confirmLabel = stringResource(LR.string.archive),
-            onConfirm = perform(archiveToast) { actions.archive(episode) },
-            onCancel = { pendingConfirmation = null },
-        )
+        val buttons = tvEpisodeActionTypes(actionContext, showGoToPodcast = onGoToPodcast != null).map { button ->
+            when (button) {
+                TvEpisodeActionType.Play -> play to {
+                    actions.play(episode, source)
+                    onDismissRequest()
+                    openNowPlaying()
+                }
 
-        else -> {
-            val buttons = tvEpisodeActionTypes(actionContext, showGoToPodcast = onGoToPodcast != null).map { button ->
-                when (button) {
-                    TvEpisodeActionType.Play -> play to {
-                        actions.play(episode, source)
-                        onDismissRequest()
-                        openNowPlaying()
-                    }
+                TvEpisodeActionType.Details -> episodeDetails to onShowEpisodeDetails
 
-                    TvEpisodeActionType.Details -> episodeDetails to onShowEpisodeDetails
+                TvEpisodeActionType.GoToPodcast -> goToPodcast to {
+                    onGoToPodcast?.invoke()
+                    onDismissRequest()
+                }
 
-                    TvEpisodeActionType.GoToPodcast -> goToPodcast to {
-                        onGoToPodcast?.invoke()
-                        onDismissRequest()
-                    }
+                TvEpisodeActionType.PlayNext -> playNext to perform(playNextToast) { actions.playNext(episode, source) }
 
-                    TvEpisodeActionType.PlayNext -> playNext to perform(playNextToast) { actions.playNext(episode, source) }
+                TvEpisodeActionType.PlayLast -> playLast to perform(playLastToast) { actions.playLast(episode, source) }
 
-                    TvEpisodeActionType.PlayLast -> playLast to perform(playLastToast) { actions.playLast(episode, source) }
+                TvEpisodeActionType.RemoveFromUpNext -> removeFromUpNext to perform(removedToast) {
+                    actions.removeFromUpNext(episode, source)
+                }
 
-                    TvEpisodeActionType.RemoveFromUpNext -> removeFromUpNext to perform(removedToast) {
-                        actions.removeFromUpNext(episode, source)
-                    }
+                TvEpisodeActionType.TogglePlayed -> playedToggle to when {
+                    episode.isFinished -> perform(playedToast) { actions.markAsUnplayed(episode) }
+                    tvEpisodeActionRequiresConfirmation(actionContext, button, episode) ->
+                        confirm(markPlayedTitle, playedToggle, markAsPlayed)
+                    else -> markAsPlayed
+                }
 
-                    TvEpisodeActionType.TogglePlayed -> playedToggle to performOrConfirm(button, playedToast) {
-                        if (episode.isFinished) actions.markAsUnplayed(episode) else actions.markAsPlayed(episode)
-                    }
-
-                    TvEpisodeActionType.ToggleArchived -> archiveToggle to performOrConfirm(button, archiveToast) {
-                        if (episode.isArchived) actions.unarchive(episode) else actions.archive(episode)
-                    }
+                TvEpisodeActionType.ToggleArchived -> archiveToggle to when {
+                    episode.isArchived -> perform(archiveToast) { actions.unarchive(episode) }
+                    tvEpisodeActionRequiresConfirmation(actionContext, button, episode) ->
+                        confirm(archiveTitle, archiveToggle, archiveEpisode)
+                    else -> archiveEpisode
                 }
             }
+        }
 
-            buttons.forEachIndexed { index, (label, onClick) ->
-                TvEpisodeActionButton(
-                    text = label,
-                    onClick = onClick,
-                    modifier = if (index == 0) Modifier.focusRequester(focusRequester) else Modifier,
-                )
-            }
-
+        buttons.forEachIndexed { index, (label, onClick) ->
             TvEpisodeActionButton(
-                text = stringResource(LR.string.cancel),
-                onClick = onDismissRequest,
+                text = label,
+                onClick = onClick,
+                modifier = if (index == 0) Modifier.focusRequester(focusRequester) else Modifier,
             )
         }
+
+        TvEpisodeActionButton(
+            text = stringResource(LR.string.cancel),
+            onClick = onDismissRequest,
+        )
     }
 }
+
+private class TvEpisodeActionConfirmation(
+    val title: String,
+    val confirmLabel: String,
+    val onConfirm: () -> Unit,
+)
 
 internal fun tvEpisodeActionRequiresConfirmation(
     actionContext: TvEpisodeActionContext,
