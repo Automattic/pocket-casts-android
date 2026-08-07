@@ -1673,7 +1673,6 @@ Language: ar
     <string name="settings_apply_group_by">هل ترغب في تغيير جميع حلقات البث الصوتي الموجودة الخاصة بك ليتم تجميعها حسب %s؟</string>
     <string name="settings_apply_archived_show">هل ترغب في تغيير جميع حلقات البث الصوتي الموجودة الخاصة بك لعرض حلقات البث الصوتي التي تمت أرشفتها؟</string>
     <string name="settings_apply_archived_hide">هل ترغب في تغيير جميع حلقات البث الصوتي الموجودة الخاصة بك لإخفاء حلقات البث الصوتي التي تمت أرشفتها؟</string>
-    <string name="settings_app_icon_updated_message">قد يستغرق ظهور هذه الأيقونة الجديدة بضع دقائق، وسترى أيقونتين في شاشة تطبيقاتك. هذا أمر طبيعي. اسحب الأيقونة الجديدة إلى شاشتك الرئيسية، وعندئذٍ ينبغي أن تكون جاهزًا للبدء!</string>
     <string name="settings_app_icon_updated">تم تحديث الأيقونة</string>
     <string name="settings_app_icon_title">الاسم</string>
     <string name="settings_app_icon_image">صورة الأيقونة</string>

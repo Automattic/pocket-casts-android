@@ -1619,7 +1619,6 @@ Language: it
     <string name="settings_apply_group_by">Vuoi modificare tutti i tuoi podcast esistenti in modo che vengano raggruppati per %s?</string>
     <string name="settings_apply_archived_show">Vuoi modificare tutti i tuoi podcast esistenti in modo che vengano visualizzati gli archiviati?</string>
     <string name="settings_apply_archived_hide">Vuoi modificare tutti i tuoi podcast esistenti in modo che vengano nascosti gli archiviati?</string>
-    <string name="settings_app_icon_updated_message">Questa nuova icona potrebbe richiedere alcuni minuti per essere visualizzata e vedrai due icone nella schermata di tutte le app. Questo è normale. Trascina la nuova sulla schermata iniziale e dovrebbe essere tutto in ordine.</string>
     <string name="settings_app_icon_updated">Icona aggiornata</string>
     <string name="settings_app_icon_title">Titolo</string>
     <string name="settings_app_icon_image">immagine dell\'icona</string>

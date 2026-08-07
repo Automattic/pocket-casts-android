@@ -1682,7 +1682,6 @@ Language: zh_CN
     <string name="settings_apply_group_by">是否要将所有现有播客更改为按%s分组？</string>
     <string name="settings_apply_archived_show">是否要将所有现有播客更改为显示已存档的剧集？</string>
     <string name="settings_apply_archived_hide">是否要将所有现有播客更改为隐藏已存档的剧集？</string>
-    <string name="settings_app_icon_updated_message">此新图标可能需要几分钟时间才能显示，您将在“所有应用程序”屏幕中看到两个图标。 这是正常的。 将一个新图标拖放到您的主屏幕上，您应该可以开始！</string>
     <string name="settings_app_icon_updated">图标已更新</string>
     <string name="settings_app_icon_title">标题</string>
     <string name="settings_app_icon_image">图标图像</string>

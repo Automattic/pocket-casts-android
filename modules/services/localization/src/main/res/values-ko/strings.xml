@@ -1673,7 +1673,6 @@ Language: ko_KR
     <string name="settings_apply_group_by">모든 기존 팟캐스트를 %s별로 그룹화하도록 변경하시겠나요?</string>
     <string name="settings_apply_archived_show">모든 기존 팟캐스트를 아카이빙됨 표시로 변경하시겠나요?</string>
     <string name="settings_apply_archived_hide">모든 기존 팟캐스트를 아카이빙됨 숨기기로 변경하시겠나요?</string>
-    <string name="settings_app_icon_updated_message">이 새 아이콘이 표시되려면 몇 분 정도 걸릴 수 있으며, 모든 앱 화면에 아이콘 2개가 표시됩니다. 이것이 정상입니다. 새것을 홈 화면으로 끌면 준비가 완료됩니다!</string>
     <string name="settings_app_icon_updated">아이콘 업데이트됨</string>
     <string name="settings_app_icon_title">제목</string>
     <string name="settings_app_icon_image">아이콘 이미지</string>

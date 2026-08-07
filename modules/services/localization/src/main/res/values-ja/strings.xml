@@ -1682,7 +1682,6 @@ Language: ja_JP
     <string name="settings_apply_group_by">既存ポッドキャストがすべて%s別にグループ化されるように変更しますか ?</string>
     <string name="settings_apply_archived_show">すべての既存ポッドキャストでアーカイブ済みを表示するように変更しますか ?</string>
     <string name="settings_apply_archived_hide">すべての既存ポッドキャストでアーカイブ済みを非表示にするように変更しますか ?</string>
-    <string name="settings_app_icon_updated_message">こちらの新しいアイコンが表示されるまで数分かかる場合があり、2つのアイコンがすべてのアプリ画面に表示されます。 これは通常の動作です。 新しいアイコンをホーム画面にドラッグすれば準備は万端です。</string>
     <string name="settings_app_icon_updated">更新されたアイコン</string>
     <string name="settings_app_icon_title">タイトル</string>
     <string name="settings_app_icon_image">アイコン画像</string>

@@ -1677,7 +1677,6 @@ Language: ru
     <string name="settings_apply_group_by">Хотите сгруппировать все существующие подкасты по %s?</string>
     <string name="settings_apply_archived_show">Хотите показывать во всех существующих подкастах архивированные выпуски?</string>
     <string name="settings_apply_archived_hide">Хотите скрывать во всех существующих подкастах архивированные выпуски?</string>
-    <string name="settings_app_icon_updated_message">Этот новый значок может появиться через несколько минут, после чего на экране всех приложений появятся два значка. Это нормально. Перетащите новый значок на домашний экран, и всё!</string>
     <string name="settings_app_icon_updated">Значок обновлён</string>
     <string name="settings_app_icon_title">Заголовок</string>
     <string name="settings_app_icon_image">изображение значка</string>

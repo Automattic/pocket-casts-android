@@ -3,7 +3,9 @@ package au.com.shiftyjelly.pocketcasts.ui.helper
 import android.content.ComponentName
 import android.content.Context
 import android.content.pm.PackageManager
+import android.os.Build
 import androidx.annotation.DrawableRes
+import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -36,7 +38,7 @@ class AppIcon @Inject constructor(
             settingsIcon = IR.drawable.ic_appicon0,
             tier = null,
             launcherIcon = IR.mipmap.ic_launcher,
-            aliasName = ".ui.MainActivity_0",
+            aliasName = ".ui.MainActivityDefault",
             analyticsValue = EventHorizonAppIconType.Default,
         ),
         DARK(
@@ -237,21 +239,42 @@ class AppIcon @Inject constructor(
     val allAppIconTypes get() = AppIconType.entries
 
     fun enableSelectedAlias(selectedIconType: AppIconType) {
-        val classPath = "au.com.shiftyjelly.pocketcasts"
-        AppIconType.entries.forEach { iconType ->
-            val componentName = ComponentName(context.packageName, "$classPath${iconType.aliasName}")
-            // If we are using the default icon we just switch every alias off
-            val enabledFlag = if (selectedIconType == iconType && selectedIconType != AppIconType.DEFAULT) {
-                PackageManager.COMPONENT_ENABLED_STATE_ENABLED
-            } else {
-                PackageManager.COMPONENT_ENABLED_STATE_DISABLED
-            }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            enableSelectedAliasAtomically(selectedIconType)
+        } else {
+            // Always enable the replacement before disabling the old alias so the app remains launchable.
+            setAliasState(selectedIconType, PackageManager.COMPONENT_ENABLED_STATE_ENABLED)
+            AppIconType.entries
+                .filterNot { it == selectedIconType }
+                .forEach { setAliasState(it, PackageManager.COMPONENT_ENABLED_STATE_DISABLED) }
+        }
+    }
 
-            context.packageManager.setComponentEnabledSetting(
-                componentName,
-                enabledFlag,
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    private fun enableSelectedAliasAtomically(selectedIconType: AppIconType) {
+        val componentSettings = AppIconType.entries.map { iconType ->
+            PackageManager.ComponentEnabledSetting(
+                componentName(iconType),
+                if (selectedIconType == iconType) {
+                    PackageManager.COMPONENT_ENABLED_STATE_ENABLED
+                } else {
+                    PackageManager.COMPONENT_ENABLED_STATE_DISABLED
+                },
                 PackageManager.DONT_KILL_APP,
             )
         }
+        context.packageManager.setComponentEnabledSettings(componentSettings)
+    }
+
+    private fun setAliasState(iconType: AppIconType, state: Int) {
+        context.packageManager.setComponentEnabledSetting(
+            componentName(iconType),
+            state,
+            PackageManager.DONT_KILL_APP,
+        )
+    }
+
+    private fun componentName(iconType: AppIconType): ComponentName {
+        return ComponentName(context.packageName, "au.com.shiftyjelly.pocketcasts${iconType.aliasName}")
     }
 }

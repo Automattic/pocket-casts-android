@@ -1672,7 +1672,6 @@ Language: nl
     <string name="settings_auto_archive_episode_limit">Afleveringlimiet</string>
     <string name="settings_apply_group_by">Wil je al je huidige podcasts veranderen zodat ze gegroepeerd worden door %s?</string>
     <string name="settings_apply_archived_hide">Wil je al je huidige podcasts veranderen naar Gearchiveerde verbergen?</string>
-    <string name="settings_app_icon_updated_message">Het kan even duren voor dit nieuwe pictogram verschijnt en je ziet twee pictogrammen in het scherm Alle apps. Dit is normaal. Sleep het nieuwe pictogram naar je startscherm en je bent klaar om aan de slag te gaan!</string>
     <string name="settings_app_icon_updated">Pictogram bijgewerkt.</string>
     <string name="settings_app_icon_title">Titel</string>
     <string name="settings_app_icon_image">pictogramafbeelding</string>
