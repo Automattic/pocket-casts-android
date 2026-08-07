@@ -13,13 +13,14 @@ import androidx.work.WorkerParameters
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.utils.Util
-import coil3.imageLoader
+import coil3.ImageLoader
 import coil3.request.CachePolicy
 import coil3.request.ErrorResult
 import coil3.request.ImageRequest
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -35,9 +36,11 @@ class PrefetchArtworkWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
     private val podcastManager: PodcastManager,
+    private val imageLoader: ImageLoader,
 ) : CoroutineWorker(context, params) {
 
     companion object {
+        private const val MAX_RETRY_ATTEMPTS = 5
         private const val WORK_NAME = "PrefetchArtworkWorkerPeriodic"
 
         fun enqueuePeriodicWork(context: Context) {
@@ -45,12 +48,15 @@ class PrefetchArtworkWorker @AssistedInject constructor(
                 .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
                 .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 10, TimeUnit.MINUTES)
                 .build()
-            WorkManager.getInstance(context).enqueueUniquePeriodicWork(WORK_NAME, ExistingPeriodicWorkPolicy.KEEP, request)
+            WorkManager.getInstance(context).enqueueUniquePeriodicWork(
+                WORK_NAME,
+                ExistingPeriodicWorkPolicy.KEEP,
+                request,
+            )
         }
     }
 
     override suspend fun doWork(): Result {
-        val imageLoader = applicationContext.imageLoader
         val diskCache = imageLoader.diskCache ?: return Result.success()
         val isWearOs = Util.isWearOs(applicationContext)
         var fetched = 0
@@ -73,19 +79,36 @@ class PrefetchArtworkWorker @AssistedInject constructor(
                         if (result is ErrorResult) {
                             failed++
                             Timber.i("Could not prefetch artwork from $url. ${result.throwable.message}")
+                        } else if (diskCache.openSnapshot(url)?.use { } == null) {
+                            // Coil can return a successful network result even if it couldn't open a
+                            // disk-cache editor. Only report success when the offline copy exists.
+                            failed++
+                            Timber.i("Could not store prefetched artwork from $url in the disk cache.")
                         } else {
                             fetched++
                         }
                     }
                 }
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             Timber.e(e, "Failed to prefetch podcast artwork.")
-            return Result.retry()
+            return retryOrResumeDailySchedule()
         }
         Timber.i("Prefetched $fetched missing podcast artwork images ($failed failed).")
         // Retry with backoff so the cache heals shortly after connectivity or the CDN recovers,
-        // instead of waiting for the next periodic run.
-        return if (failed > 0) Result.retry() else Result.success()
+        // instead of waiting for the next periodic run. Stop retrying after a few attempts so a
+        // permanently missing image doesn't prevent the normal daily schedule from resuming.
+        return if (failed > 0) retryOrResumeDailySchedule() else Result.success()
+    }
+
+    private fun retryOrResumeDailySchedule(): Result {
+        return if (runAttemptCount < MAX_RETRY_ATTEMPTS) {
+            Result.retry()
+        } else {
+            Timber.w("Artwork prefetch failed after $MAX_RETRY_ATTEMPTS retries. Resuming the daily schedule.")
+            Result.success()
+        }
     }
 }
