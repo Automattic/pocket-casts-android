@@ -46,7 +46,6 @@ import androidx.tv.material3.LocalContentColor
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.component.HideTvTopBar
-import au.com.shiftyjelly.pocketcasts.component.LocalTvToastHostState
 import au.com.shiftyjelly.pocketcasts.component.TvArtworkImage
 import au.com.shiftyjelly.pocketcasts.component.TvEmptyState
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeActionContext
@@ -66,7 +65,6 @@ import au.com.shiftyjelly.pocketcasts.theme.TvTopBarHeight
 import au.com.shiftyjelly.pocketcasts.theme.tvColors
 import au.com.shiftyjelly.pocketcasts.theme.tvTypography
 import java.util.Date
-import java.util.Locale
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.delay
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -117,7 +115,7 @@ fun TvNowPlayingScreen(
             onSkipBackward = viewModel::skipBackward,
             onSkipForward = viewModel::skipForward,
             onSelectSpeed = viewModel::setPlaybackSpeed,
-            onToggleVolumeBoost = viewModel::toggleVolumeBoost,
+            onSetVolumeBoost = viewModel::setVolumeBoost,
             onSelectTrimMode = viewModel::setTrimMode,
             onOpenPodcast = { openedPodcastUuid = it },
             modifier = modifier,
@@ -132,7 +130,7 @@ private fun TvNowPlayingContent(
     onSkipBackward: () -> Unit,
     onSkipForward: () -> Unit,
     onSelectSpeed: (Double) -> Unit,
-    onToggleVolumeBoost: () -> Unit,
+    onSetVolumeBoost: (Boolean) -> Unit,
     onSelectTrimMode: (TrimMode) -> Unit,
     onOpenPodcast: (String) -> Unit,
     modifier: Modifier = Modifier,
@@ -144,7 +142,8 @@ private fun TvNowPlayingContent(
     var isChromeVisible by remember { mutableStateOf(true) }
     var interactionTick by remember { mutableIntStateOf(0) }
     val episode = state.episode
-    val isAnyOverlayVisible = isActionsModalVisible || isDetailsModalVisible || isSpeedMenuVisible || isEffectsMenuVisible
+    val isAnyOverlayVisible =
+        isActionsModalVisible || isDetailsModalVisible || isSpeedMenuVisible || isEffectsMenuVisible
 
     LaunchedEffect(state.isPlaying, isAnyOverlayVisible, interactionTick) {
         if (state.isPlaying && !isAnyOverlayVisible) {
@@ -210,13 +209,6 @@ private fun TvNowPlayingContent(
                 modifier = Modifier.fillMaxWidth(),
             )
             Spacer(modifier = Modifier.height(16.dp))
-            val toastHostState = LocalTvToastHostState.current
-            val speedChangedTemplate = stringResource(LR.string.tv_playback_speed_changed)
-            val volumeBoostOnToast = stringResource(LR.string.tv_volume_boost_on)
-            val volumeBoostOffToast = stringResource(LR.string.tv_volume_boost_off)
-            val trimChangedTemplate = stringResource(LR.string.tv_trim_silence_changed)
-            val trimOffToast = stringResource(LR.string.tv_trim_silence_off)
-            val trimLabels = TrimMode.entries.associateWith { stringResource(it.labelId) }
             PlayerControls(
                 isPlaying = state.isPlaying,
                 isBuffering = state.isBuffering,
@@ -230,23 +222,9 @@ private fun TvNowPlayingContent(
                 onSkipForward = onSkipForward,
                 onSpeedMenuVisibleChange = { isSpeedMenuVisible = it },
                 onEffectsMenuVisibleChange = { isEffectsMenuVisible = it },
-                onSelectSpeed = { speed ->
-                    onSelectSpeed(speed)
-                    toastHostState.show(String.format(Locale.getDefault(), speedChangedTemplate, playbackSpeedLabel(speed)))
-                },
-                onToggleVolumeBoost = {
-                    onToggleVolumeBoost()
-                    toastHostState.show(if (state.isVolumeBoosted) volumeBoostOffToast else volumeBoostOnToast)
-                },
-                onSelectTrimMode = { mode ->
-                    onSelectTrimMode(mode)
-                    val toast = if (mode == TrimMode.OFF) {
-                        trimOffToast
-                    } else {
-                        String.format(Locale.getDefault(), trimChangedTemplate, trimLabels.getValue(mode))
-                    }
-                    toastHostState.show(toast)
-                },
+                onSelectSpeed = onSelectSpeed,
+                onSetVolumeBoost = onSetVolumeBoost,
+                onSelectTrimMode = onSelectTrimMode,
                 onOpenActions = if (episode is PodcastEpisode) {
                     { isActionsModalVisible = true }
                 } else {
@@ -333,7 +311,7 @@ private fun PlayerControls(
     onSpeedMenuVisibleChange: (Boolean) -> Unit,
     onEffectsMenuVisibleChange: (Boolean) -> Unit,
     onSelectSpeed: (Double) -> Unit,
-    onToggleVolumeBoost: () -> Unit,
+    onSetVolumeBoost: (Boolean) -> Unit,
     onSelectTrimMode: (TrimMode) -> Unit,
     onOpenActions: (() -> Unit)?,
     modifier: Modifier = Modifier,
@@ -369,7 +347,7 @@ private fun PlayerControls(
             isVolumeBoosted = isVolumeBoosted,
             isMenuVisible = isEffectsMenuVisible,
             onMenuVisibleChange = onEffectsMenuVisibleChange,
-            onToggleVolumeBoost = onToggleVolumeBoost,
+            onSetVolumeBoost = onSetVolumeBoost,
             onSelectTrimMode = onSelectTrimMode,
         )
         if (onOpenActions != null) {
@@ -469,7 +447,7 @@ private fun TvNowPlayingContentPreview() {
             onSkipBackward = {},
             onSkipForward = {},
             onSelectSpeed = {},
-            onToggleVolumeBoost = {},
+            onSetVolumeBoost = {},
             onSelectTrimMode = {},
             onOpenPodcast = {},
         )

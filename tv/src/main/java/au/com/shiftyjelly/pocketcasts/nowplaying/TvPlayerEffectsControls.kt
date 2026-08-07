@@ -13,6 +13,7 @@ import androidx.tv.material3.Icon
 import androidx.tv.material3.IconButton
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import au.com.shiftyjelly.pocketcasts.component.LocalTvToastHostState
 import au.com.shiftyjelly.pocketcasts.component.TvDropdownMenu
 import au.com.shiftyjelly.pocketcasts.component.TvDropdownMenuItem
 import au.com.shiftyjelly.pocketcasts.component.TvDropdownMenuSectionTitle
@@ -21,12 +22,15 @@ import au.com.shiftyjelly.pocketcasts.theme.TvButtonDefaults
 import au.com.shiftyjelly.pocketcasts.theme.tvTypography
 import au.com.shiftyjelly.pocketcasts.utils.extensions.roundedSpeed
 import java.util.Locale
+import kotlin.math.abs
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 internal val tvPlaybackSpeedOptions: List<Double> = (5..30).map { it / 10.0 }
 
 internal fun playbackSpeedLabel(speed: Double): String = String.format(Locale.getDefault(), "%.1fx", speed)
+
+internal fun nearestPlaybackSpeedOption(speed: Double): Double = tvPlaybackSpeedOptions.minBy { abs(it - speed) }
 
 @Composable
 internal fun TvPlaybackSpeedButton(
@@ -49,6 +53,9 @@ internal fun TvPlaybackSpeedButton(
             )
         }
         if (isMenuVisible) {
+            val toastHostState = LocalTvToastHostState.current
+            val toastTemplate = stringResource(LR.string.tv_playback_speed_changed)
+            val focusedOption = nearestPlaybackSpeedOption(currentSpeed)
             TvDropdownMenu(
                 title = stringResource(LR.string.playback_speed),
                 onDismissRequest = { onMenuVisibleChange(false) },
@@ -60,10 +67,14 @@ internal fun TvPlaybackSpeedButton(
                     TvDropdownMenuItem(
                         label = playbackSpeedLabel(option),
                         isSelected = option == currentSpeed,
+                        requestInitialFocus = option == focusedOption,
                         onClick = {
                             onMenuVisibleChange(false)
                             if (option != currentSpeed) {
                                 onSelectSpeed(option)
+                                toastHostState.show(
+                                    String.format(Locale.getDefault(), toastTemplate, playbackSpeedLabel(option)),
+                                )
                             }
                         },
                     )
@@ -79,7 +90,7 @@ internal fun TvPlayerEffectsButton(
     isVolumeBoosted: Boolean,
     isMenuVisible: Boolean,
     onMenuVisibleChange: (Boolean) -> Unit,
-    onToggleVolumeBoost: () -> Unit,
+    onSetVolumeBoost: (Boolean) -> Unit,
     onSelectTrimMode: (TrimMode) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -96,6 +107,11 @@ internal fun TvPlayerEffectsButton(
             )
         }
         if (isMenuVisible) {
+            val toastHostState = LocalTvToastHostState.current
+            val boostOnToast = stringResource(LR.string.tv_volume_boost_on)
+            val boostOffToast = stringResource(LR.string.tv_volume_boost_off)
+            val trimChangedTemplate = stringResource(LR.string.tv_trim_silence_changed)
+            val trimOffToast = stringResource(LR.string.tv_trim_silence_off)
             TvDropdownMenu(
                 title = stringResource(LR.string.player_effects),
                 onDismissRequest = { onMenuVisibleChange(false) },
@@ -108,19 +124,28 @@ internal fun TvPlayerEffectsButton(
                     requestInitialFocus = true,
                     onClick = {
                         onMenuVisibleChange(false)
-                        onToggleVolumeBoost()
+                        val isBoosted = !isVolumeBoosted
+                        onSetVolumeBoost(isBoosted)
+                        toastHostState.show(if (isBoosted) boostOnToast else boostOffToast)
                     },
                 )
                 TvDropdownMenuSectionTitle(text = stringResource(LR.string.player_effects_trim_silence))
                 TrimMode.entries.forEach { mode ->
+                    val label = stringResource(mode.labelId)
                     TvDropdownMenuItem(
-                        label = stringResource(mode.labelId),
+                        label = label,
                         isSelected = mode == trimMode,
                         requestInitialFocus = false,
                         onClick = {
                             onMenuVisibleChange(false)
                             if (mode != trimMode) {
                                 onSelectTrimMode(mode)
+                                val toast = if (mode == TrimMode.OFF) {
+                                    trimOffToast
+                                } else {
+                                    String.format(Locale.getDefault(), trimChangedTemplate, label)
+                                }
+                                toastHostState.show(toast)
                             }
                         },
                     )
