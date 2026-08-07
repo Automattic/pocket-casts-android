@@ -340,6 +340,12 @@ class SimplePlayer(
                     Handler(Looper.getMainLooper()).post { it.videoSizeChanged(videoSize.width, videoSize.height, videoSize.pixelWidthHeightRatio) }
                 }
             }
+
+            override fun onRenderedFirstFrame() {
+                videoChangedListener?.let {
+                    Handler(Looper.getMainLooper()).post { it.videoFirstFrameRendered() }
+                }
+            }
         })
     }
 
@@ -372,6 +378,7 @@ class SimplePlayer(
     interface VideoChangedListener {
         fun videoSizeChanged(width: Int, height: Int, pixelWidthHeightRatio: Float)
         fun videoNeedsReset()
+        fun videoFirstFrameRendered() = Unit
     }
 
     fun setVideoSizeChangedListener(videoChangedListener: VideoChangedListener) {
