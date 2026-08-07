@@ -258,11 +258,12 @@ internal class Media3SessionCallback(
         }
 
         if (inputEvent != null) {
+            val isExplicitPlay = keyEvent.keyCode == KeyEvent.KEYCODE_MEDIA_PLAY
             scope.launch {
                 try {
                     val outputEvent = mediaEventQueue.consumeEvent(inputEvent)
                     when (outputEvent) {
-                        MediaEvent.SingleTap -> handleMediaButtonSingleTap(isExplicitPlay = keyEvent.keyCode == KeyEvent.KEYCODE_MEDIA_PLAY)
+                        MediaEvent.SingleTap -> handleMediaButtonSingleTap(isExplicitPlay = isExplicitPlay)
                         MediaEvent.DoubleTap -> handleMediaButtonDoubleTap()
                         MediaEvent.TripleTap -> handleMediaButtonTripleTap()
                         null -> Unit
@@ -283,7 +284,12 @@ internal class Media3SessionCallback(
         // Toggling here would pause already-playing audio. Only PLAY_PAUSE / HEADSETHOOK
         // should toggle. See https://github.com/Automattic/pocket-casts-android/issues/3919
         if (isExplicitPlay) {
-            playbackManager.playQueueSuspend(sourceView = source)
+            // Nothing to do when already playing — running the play path again would
+            // re-fire playback_play analytics, may re-arm the sleep timer, and would
+            // make CastPlayer reload the stream from a stale position.
+            if (!playbackManager.isPlaying()) {
+                playbackManager.playQueueSuspend(sourceView = source)
+            }
         } else {
             playbackManager.playPause(sourceView = source)
         }

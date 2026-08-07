@@ -352,6 +352,22 @@ class Media3SessionCallbackTest {
     }
 
     @Test
+    fun `KEYCODE_MEDIA_PLAY does not pause when already playing`() = runTest {
+        whenever(playbackManager.isPlaying()).thenReturn(true)
+
+        sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_PLAY)
+        testScope.advanceUntilIdle()
+
+        // This is the #3919 regression: an explicit play while already playing used to
+        // toggle and pause. It must not pause, and with the already-playing guard it is
+        // a full no-op — re-running the play path would re-fire playback_play analytics
+        // and make CastPlayer reload the stream.
+        verify(playbackManager, never()).playPause(sourceView = any())
+        verify(playbackManager, never()).pauseSuspend(transientLoss = any(), sourceView = any())
+        verify(playbackManager, never()).playQueueSuspend(sourceView = any(), showedStreamWarning = any())
+    }
+
+    @Test
     fun `KEYCODE_MEDIA_PAUSE calls pauseSuspend`() = runTest {
         sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_PAUSE)
         testScope.advanceUntilIdle()
