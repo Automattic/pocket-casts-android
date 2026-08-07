@@ -17,6 +17,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -46,6 +47,7 @@ fun TvTabBar(
     selectedTabIndex: Int,
     onTabSelect: (Int) -> Unit,
     modifier: Modifier = Modifier,
+    onTabClick: (Int) -> Unit = {},
     autoFocusSelectedTab: Boolean = true,
     onSelectedTabFocus: () -> Unit = {},
     focusSelectedTab: Boolean = false,
@@ -62,6 +64,7 @@ fun TvTabBar(
     val currentOnConsumeFocusRequest by rememberUpdatedState(onConsumeFocusRequest)
     LaunchedEffect(focusSelectedTab) {
         if (focusSelectedTab) {
+            withFrameNanos { }
             runCatching { focusRequester.requestFocus() }
             currentOnConsumeFocusRequest()
         }
@@ -91,6 +94,7 @@ fun TvTabBar(
                 Tab(
                     selected = index == selectedTabIndex,
                     onFocus = { onTabSelect(index) },
+                    onClick = { onTabClick(index) },
                     modifier = Modifier
                         .height(44.dp)
                         .padding(horizontal = 21.dp)
