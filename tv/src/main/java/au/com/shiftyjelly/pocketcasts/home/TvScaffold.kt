@@ -75,6 +75,11 @@ fun TvScaffold(
             focusSelectedTab = isTopBarFocusRequested,
             onConsumeFocusRequest = { isTopBarFocusRequested = false },
             onTabSelect = viewModel::selectTab,
+            onTabClick = { tab ->
+                if (tab == TvTab.NowPlaying) {
+                    isNowPlayingOpenRequested = true
+                }
+            },
             onProfileClick = { isProfileModalVisible = true },
             modifier = modifier,
         ) { tab ->
@@ -139,6 +144,7 @@ private fun TvScaffoldContent(
     onTabSelect: (TvTab) -> Unit,
     onProfileClick: () -> Unit,
     modifier: Modifier = Modifier,
+    onTabClick: (TvTab) -> Unit = {},
     autoFocusSelectedTab: Boolean = true,
     onSelectedTabFocus: () -> Unit = {},
     focusSelectedTab: Boolean = false,
@@ -175,6 +181,7 @@ private fun TvScaffoldContent(
                 // Resolve against the same list this frame rendered, so a click during a tab-list
                 // change cannot land on the wrong tab.
                 onTabSelect = { index -> tabs.getOrNull(index)?.let(onTabSelect) },
+                onTabClick = { index -> tabs.getOrNull(index)?.let(onTabClick) },
                 onProfileClick = onProfileClick,
                 autoFocusSelectedTab = autoFocusSelectedTab,
                 onSelectedTabFocus = onSelectedTabFocus,

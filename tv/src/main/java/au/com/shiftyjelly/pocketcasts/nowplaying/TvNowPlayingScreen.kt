@@ -25,6 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.BlurredEdgeTreatment
@@ -91,13 +92,7 @@ fun TvNowPlayingScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var openedPodcastUuid by rememberSaveable { mutableStateOf<String?>(null) }
 
-    LaunchedEffect(isOpenRequested) {
-        if (isOpenRequested) {
-            openedPodcastUuid = null
-        }
-    }
-
-    val podcastUuid = openedPodcastUuid
+    val podcastUuid = openedPodcastUuid.takeUnless { isOpenRequested }
     if (podcastUuid != null) {
         HideTvTopBar()
         BackHandler { openedPodcastUuid = null }
@@ -121,7 +116,10 @@ fun TvNowPlayingScreen(
         is TvNowPlayingUiState.Loaded -> TvNowPlayingContent(
             state = state,
             isPlayerFocusRequested = isOpenRequested,
-            onConsumePlayerFocusRequest = onConsumeOpenRequest,
+            onConsumePlayerFocusRequest = {
+                openedPodcastUuid = null
+                onConsumeOpenRequest()
+            },
             onPlayPause = viewModel::playPause,
             onSkipBackward = viewModel::skipBackward,
             onSkipForward = viewModel::skipForward,
@@ -163,6 +161,7 @@ private fun TvNowPlayingContent(
     val currentOnConsumePlayerFocusRequest by rememberUpdatedState(onConsumePlayerFocusRequest)
     LaunchedEffect(isPlayerFocusRequested) {
         if (isPlayerFocusRequested) {
+            withFrameNanos { }
             runCatching { playPauseFocusRequester.requestFocus() }
             currentOnConsumePlayerFocusRequest()
         }
@@ -174,11 +173,14 @@ private fun TvNowPlayingContent(
         if (state.isPlaying && !isAnyOverlayVisible) {
             delay(CHROME_HIDE_DELAY)
             isChromeVisible = false
+            if (!isContentFocused) {
+                runCatching { playPauseFocusRequester.requestFocus() }
+            }
         } else {
             isChromeVisible = true
         }
     }
-    if (isContentFocused && !isTopBarRevealRequested) {
+    if ((isContentFocused || isAnyOverlayVisible) && !isTopBarRevealRequested) {
         HideTvTopBar()
     }
     if (!isChromeVisible) {
@@ -188,6 +190,7 @@ private fun TvNowPlayingContent(
         }
     } else if (isContentFocused) {
         BackHandler {
+            interactionTick++
             isTopBarRevealRequested = true
             focusTopBar()
         }
