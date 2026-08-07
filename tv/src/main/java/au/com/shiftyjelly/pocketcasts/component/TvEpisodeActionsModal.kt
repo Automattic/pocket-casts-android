@@ -151,29 +151,33 @@ private fun ColumnScope.TvEpisodeActionsModalContent(
 
                 TvEpisodeActionType.TogglePlayed -> playedToggle to when {
                     episode.isFinished -> perform(playedToast) { actions.markAsUnplayed(episode) }
+
                     tvEpisodeActionRequiresConfirmation(actionContext, button, episode) ->
                         confirm(markPlayedTitle, playedToggle, markAsPlayed)
+
                     else -> markAsPlayed
                 }
 
                 TvEpisodeActionType.ToggleArchived -> archiveToggle to when {
                     episode.isArchived -> perform(archiveToast) { actions.unarchive(episode) }
+
                     tvEpisodeActionRequiresConfirmation(actionContext, button, episode) ->
                         confirm(archiveTitle, archiveToggle, archiveEpisode)
+
                     else -> archiveEpisode
                 }
             }
         }
 
         buttons.forEachIndexed { index, (label, onClick) ->
-            TvEpisodeActionButton(
+            TvModalButton(
                 text = label,
                 onClick = onClick,
                 modifier = if (index == 0) Modifier.focusRequester(focusRequester) else Modifier,
             )
         }
 
-        TvEpisodeActionButton(
+        TvModalButton(
             text = stringResource(LR.string.cancel),
             onClick = onDismissRequest,
         )
@@ -227,25 +231,6 @@ internal fun tvEpisodeActionTypes(
     } else {
         add(TvEpisodeActionType.TogglePlayed)
         add(TvEpisodeActionType.ToggleArchived)
-    }
-}
-
-@Composable
-private fun TvEpisodeActionButton(
-    text: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Button(
-        onClick = onClick,
-        colors = TvButtonDefaults.filledButtonColors(),
-        modifier = modifier.fillMaxWidth(),
-    ) {
-        Text(
-            text = text,
-            style = MaterialTheme.tvTypography.caption1.copy(textAlign = TextAlign.Center),
-            modifier = Modifier.fillMaxWidth(),
-        )
     }
 }
 

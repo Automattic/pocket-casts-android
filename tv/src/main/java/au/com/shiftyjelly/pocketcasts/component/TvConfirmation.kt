@@ -11,17 +11,15 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.tv.material3.Button
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
-import au.com.shiftyjelly.pocketcasts.theme.TvButtonDefaults
 import au.com.shiftyjelly.pocketcasts.theme.TvTheme
 import au.com.shiftyjelly.pocketcasts.theme.tvColors
 import au.com.shiftyjelly.pocketcasts.theme.tvTypography
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
-fun ColumnScope.TvConfirmationContent(
+internal fun ColumnScope.TvConfirmationContent(
     title: String,
     message: String,
     confirmLabel: String,
@@ -45,34 +43,15 @@ fun ColumnScope.TvConfirmationContent(
         style = MaterialTheme.tvTypography.caption1.copy(textAlign = TextAlign.Center),
         modifier = Modifier.fillMaxWidth(),
     )
-    TvConfirmationButton(
+    TvModalButton(
         text = confirmLabel,
         onClick = onConfirm,
     )
-    TvConfirmationButton(
+    TvModalButton(
         text = stringResource(LR.string.cancel),
         onClick = onCancel,
         modifier = Modifier.focusRequester(focusRequester),
     )
-}
-
-@Composable
-private fun TvConfirmationButton(
-    text: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Button(
-        onClick = onClick,
-        colors = TvButtonDefaults.filledButtonColors(),
-        modifier = modifier.fillMaxWidth(),
-    ) {
-        Text(
-            text = text,
-            style = MaterialTheme.tvTypography.caption1.copy(textAlign = TextAlign.Center),
-            modifier = Modifier.fillMaxWidth(),
-        )
-    }
 }
 
 @Preview
