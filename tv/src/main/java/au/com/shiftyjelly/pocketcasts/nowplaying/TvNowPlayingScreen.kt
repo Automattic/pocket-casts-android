@@ -236,7 +236,10 @@ private fun TvNowPlayingContent(
                 .fillMaxWidth(),
         ) {
             if (state.isVideo) {
-                TvVideoSurface(player = state.player)
+                TvVideoSurface(
+                    player = state.player,
+                    onFirstFrameRendered = {},
+                )
             } else {
                 EpisodeArtworkWithTitles(
                     episode = episode,
