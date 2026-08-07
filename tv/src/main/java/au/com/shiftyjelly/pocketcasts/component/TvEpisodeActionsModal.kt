@@ -169,8 +169,9 @@ private fun ColumnScope.TvEpisodeActionsModalContent(
             }
         }
 
+        val focusLabel = returnFocusLabel?.takeIf { wanted -> buttons.any { it.first == wanted } }
         buttons.forEachIndexed { index, (label, onClick) ->
-            val isInitialFocus = if (returnFocusLabel != null) label == returnFocusLabel else index == 0
+            val isInitialFocus = if (focusLabel != null) label == focusLabel else index == 0
             TvModalButton(
                 text = label,
                 onClick = onClick,

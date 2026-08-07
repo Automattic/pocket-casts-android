@@ -104,7 +104,7 @@ internal fun TvPlayerEffectsButton(
             modifier = Modifier.size(56.dp),
         ) {
             Icon(
-                painter = painterResource(if (isEffectsOn) IR.drawable.ic_effects_plus else IR.drawable.ic_effects_off),
+                painter = painterResource(if (isEffectsOn) IR.drawable.ic_effects_on else IR.drawable.ic_effects_off),
                 contentDescription = stringResource(LR.string.player_effects),
                 modifier = Modifier.size(24.dp),
             )
