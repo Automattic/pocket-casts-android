@@ -53,6 +53,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.withResumed
 import androidx.mediarouter.media.MediaControlIntent
 import androidx.mediarouter.media.MediaRouteSelector
 import androidx.mediarouter.media.MediaRouter
@@ -1404,6 +1405,14 @@ class MainActivity :
     }
 
     override fun showBottomSheet(fragment: Fragment) {
+        if (supportFragmentManager.isStateSaved) {
+            lifecycleScope.launch { withResumed { commitBottomSheet(fragment) } }
+        } else {
+            commitBottomSheet(fragment)
+        }
+    }
+
+    private fun commitBottomSheet(fragment: Fragment) {
         supportFragmentManager.commitNow {
             bottomSheetTag = fragment::class.java.name
             replace(R.id.frameBottomSheet, fragment, bottomSheetTag)
