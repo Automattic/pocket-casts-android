@@ -16,7 +16,7 @@ class WaveformEnvelopeTest {
     }
 
     @Test
-    fun `fades in with a cubic ease in out curve`() {
+    fun `fades in with an ease in out curve`() {
         envelope.fadeTo(1f, 0)
         assertEquals(0f, envelope.valueAt(0), 0f)
         assertEquals(0.125f, envelope.valueAt(500.msNanos), 1e-4f)
