@@ -290,6 +290,11 @@
     <string name="tv_up_next_empty_action_title">Add episodes</string>
     <string name="tv_nothing_playing_title">Nothing playing</string>
     <string name="tv_nothing_playing_subtitle">Play an episode and it’ll show up here.</string>
+    <string name="tv_playback_speed_changed">Playback speed set to %1$s</string>
+    <string name="tv_volume_boost_on">Volume boost on</string>
+    <string name="tv_volume_boost_off">Volume boost off</string>
+    <string name="tv_trim_silence_changed">Trim silence set to %1$s</string>
+    <string name="tv_trim_silence_off">Trim silence off</string>
     <string name="tv_your_podcasts_empty_title">Time to fill this up</string>
     <string name="tv_your_podcasts_empty_subtitle">Followed podcasts show up here, ready to play.</string>
     <string name="tv_your_podcasts_empty_action_title">Discover podcasts</string>
