@@ -46,6 +46,7 @@ class SimplePlayer(
 ) : LocalPlayer(onPlayerEvent) {
     private val reducedBufferManufacturers = listOf("mercedes-benz")
     private val useReducedBuffer = reducedBufferManufacturers.contains(Build.MANUFACTURER.lowercase()) || Util.isWearOs(context)
+    private val isTv = Util.isTv(context)
     private val bufferTimeMinMillis = TimeUnit.MINUTES.toMillis(2).toInt()
     private val bufferTimeMaxMillis = if (useReducedBuffer) TimeUnit.MINUTES.toMillis(2).toInt() else TimeUnit.MINUTES.toMillis(4).toInt()
 
@@ -57,6 +58,7 @@ class SimplePlayer(
     @UnstableApi
     private var trackSelector: DefaultTrackSelector? = null
 
+    @Volatile
     private var renderersFactory: ShiftyRenderersFactory? = null
     private var playbackEffects: PlaybackEffects? = null
 
@@ -64,6 +66,8 @@ class SimplePlayer(
     var videoHeight: Int = 0
 
     override var isPip: Boolean = false
+
+    override val currentAudioLevel: Float get() = renderersFactory?.currentAudioLevel ?: 0f
 
     private var videoChangedListener: VideoChangedListener? = null
 
@@ -349,6 +353,7 @@ class SimplePlayer(
             fingerprintTapEnabled = {
                 FeatureFlag.isEnabled(Feature.SYNCED_TRANSCRIPTS) && Util.getAppPlatform(context) == AppPlatform.Phone
             },
+            audioLevelMeterEnabled = { isTv },
         )
     }
 
