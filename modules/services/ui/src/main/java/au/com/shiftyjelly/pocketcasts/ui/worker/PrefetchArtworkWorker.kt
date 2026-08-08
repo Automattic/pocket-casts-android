@@ -31,7 +31,8 @@ import timber.log.Timber
  * Keeps the artwork of subscribed podcasts in Coil's disk cache so covers still show when the
  * network or CDN is unavailable. Artwork is cached when subscribing to a podcast, but the disk
  * cache can be evicted (LRU pressure or the system trimming the app's cache directory), so this
- * worker periodically re-fetches any artwork that is no longer cached.
+ * worker periodically re-fetches any artwork that is no longer cached. It waits for transient
+ * storage pressure to clear rather than downloading into a cache directory the system is trimming.
  */
 @HiltWorker
 class PrefetchArtworkWorker @AssistedInject constructor(
