@@ -14,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.ui.images.CoilManager
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import coil3.request.CachePolicy
 import coil3.request.ErrorResult
 import coil3.request.ImageRequest
@@ -35,6 +36,8 @@ class RefreshArtworkWorker @AssistedInject constructor(
 ) : CoroutineWorker(context, params) {
 
     companion object {
+        private const val MAX_RETRY_ATTEMPTS = 5
+
         fun start(context: Context) {
             val workRequest = OneTimeWorkRequestBuilder<RefreshArtworkWorker>()
                 .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
@@ -44,11 +47,16 @@ class RefreshArtworkWorker @AssistedInject constructor(
     }
 
     override suspend fun doWork(): Result {
+        var refreshed = 0
+        var failed = 0
         withContext(Dispatchers.IO) {
-            coilManager.clearAll()
             val podcasts = podcastManager.findSubscribedNoOrder()
             colorManager.updateColors(podcasts)
             val isWearOs = Util.isWearOs(applicationContext)
+            // Preserve entries restored by an earlier attempt when retrying a partial refresh.
+            if (runAttemptCount == 0) {
+                coilManager.clearAll()
+            }
             for (podcast in podcasts) {
                 for (url in PodcastImage.getArtworkUrls(uuid = podcast.uuid, isWearOS = isWearOs)) {
                     try {
@@ -60,19 +68,40 @@ class RefreshArtworkWorker @AssistedInject constructor(
                             .build()
                         val result = coilManager.imageLoader.execute(request)
                         if (result is ErrorResult) {
+                            failed++
                             Timber.i("Could not refresh podcast artwork from $url. ${result.throwable.message}")
+                        } else {
+                            refreshed++
                         }
                     } catch (e: CancellationException) {
                         throw e
                     } catch (e: Exception) {
+                        failed++
                         Timber.e(e, "Could not refresh podcast artwork from $url")
                     }
                 }
             }
         }
 
-        Timber.i("Successfully refreshed the podcasts artwork.")
+        val summary = "Refreshed $refreshed podcast artwork images ($failed failed)."
+        return when {
+            failed == 0 -> {
+                LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, summary)
+                Result.success()
+            }
 
-        return Result.success()
+            runAttemptCount < MAX_RETRY_ATTEMPTS -> {
+                LogBuffer.w(LogBuffer.TAG_BACKGROUND_TASKS, "$summary Retrying.")
+                Result.retry()
+            }
+
+            else -> {
+                LogBuffer.w(
+                    LogBuffer.TAG_BACKGROUND_TASKS,
+                    "$summary Giving up after $MAX_RETRY_ATTEMPTS retries.",
+                )
+                Result.failure()
+            }
+        }
     }
 }

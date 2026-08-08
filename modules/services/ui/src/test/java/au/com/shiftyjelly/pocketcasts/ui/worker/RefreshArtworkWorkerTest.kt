@@ -24,6 +24,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mockito.never
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.doReturn
@@ -87,8 +88,36 @@ class RefreshArtworkWorkerTest {
 
         val result = buildWorker().doWork()
 
-        assertTrue(result is ListenableWorker.Result.Success)
+        assertTrue(result is ListenableWorker.Result.Retry)
         verify(imageLoader, times(3)).execute(any())
+    }
+
+    @Test
+    fun `retry preserves artwork restored by the previous attempt`() = runTest {
+        val podcast = Podcast(uuid = "podcast-uuid")
+        whenever(podcastManager.findSubscribedNoOrder()).doReturn(listOf(podcast))
+        whenever(imageLoader.execute(any())).thenReturn(mock<ImageResult>())
+        coilManager = mock()
+        whenever(coilManager.imageLoader).thenReturn(imageLoader)
+
+        val result = buildWorker(runAttemptCount = 1).doWork()
+
+        assertTrue(result is ListenableWorker.Result.Success)
+        verify(coilManager, never()).clearAll()
+    }
+
+    @Test
+    fun `persistent artwork failure stops retrying at the limit`() = runTest {
+        val podcast = Podcast(uuid = "podcast-uuid")
+        whenever(podcastManager.findSubscribedNoOrder()).doReturn(listOf(podcast))
+        whenever(imageLoader.execute(any())).thenThrow(IllegalStateException("Artwork loader unavailable"))
+
+        val retryResult = buildWorker(runAttemptCount = 4).doWork()
+        val finalResult = buildWorker(runAttemptCount = 5).doWork()
+
+        assertTrue(retryResult is ListenableWorker.Result.Retry)
+        assertTrue(finalResult is ListenableWorker.Result.Failure)
+        verify(imageLoader, times(6)).execute(any())
     }
 
     @Test
@@ -107,7 +136,7 @@ class RefreshArtworkWorkerTest {
         assertEquals("Worker stopped", cancellation?.message)
     }
 
-    private fun buildWorker(): RefreshArtworkWorker {
+    private fun buildWorker(runAttemptCount: Int = 0): RefreshArtworkWorker {
         val workerFactory = object : WorkerFactory() {
             override fun createWorker(
                 appContext: Context,
@@ -124,7 +153,10 @@ class RefreshArtworkWorkerTest {
                 )
             }
         }
-        return TestListenableWorkerBuilder<RefreshArtworkWorker>(context = context)
+        return TestListenableWorkerBuilder<RefreshArtworkWorker>(
+            context = context,
+            runAttemptCount = runAttemptCount,
+        )
             .setWorkerFactory(workerFactory)
             .build()
     }
