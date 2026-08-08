@@ -50,13 +50,12 @@ class RefreshArtworkWorker @AssistedInject constructor(
         var successful = 0
         var failed = 0
         withContext(Dispatchers.IO) {
-            val podcasts = podcastManager.findSubscribedNoOrder()
-            colorManager.updateColors(podcasts)
-            val isWearOs = Util.isWearOs(applicationContext)
             // Do not clear entries restored before a prior attempt returned Result.retry().
             if (runAttemptCount == 0) {
                 coilManager.clearAll()
             }
+            val podcasts = podcastManager.findSubscribedNoOrder()
+            val isWearOs = Util.isWearOs(applicationContext)
             for (podcast in podcasts) {
                 for (url in PodcastImage.getArtworkUrls(uuid = podcast.uuid, isWearOS = isWearOs)) {
                     try {
@@ -81,6 +80,7 @@ class RefreshArtworkWorker @AssistedInject constructor(
                     }
                 }
             }
+            colorManager.updateColors(podcasts)
         }
 
         val summary =
