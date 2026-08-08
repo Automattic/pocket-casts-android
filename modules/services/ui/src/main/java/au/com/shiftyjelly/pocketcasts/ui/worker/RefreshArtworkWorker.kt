@@ -47,13 +47,13 @@ class RefreshArtworkWorker @AssistedInject constructor(
     }
 
     override suspend fun doWork(): Result {
-        var refreshed = 0
+        var successful = 0
         var failed = 0
         withContext(Dispatchers.IO) {
             val podcasts = podcastManager.findSubscribedNoOrder()
             colorManager.updateColors(podcasts)
             val isWearOs = Util.isWearOs(applicationContext)
-            // Preserve entries restored by an earlier attempt when retrying a partial refresh.
+            // Do not clear entries restored before a prior attempt returned Result.retry().
             if (runAttemptCount == 0) {
                 coilManager.clearAll()
             }
@@ -71,7 +71,7 @@ class RefreshArtworkWorker @AssistedInject constructor(
                             failed++
                             Timber.i("Could not refresh podcast artwork from $url. ${result.throwable.message}")
                         } else {
-                            refreshed++
+                            successful++
                         }
                     } catch (e: CancellationException) {
                         throw e
@@ -83,7 +83,8 @@ class RefreshArtworkWorker @AssistedInject constructor(
             }
         }
 
-        val summary = "Refreshed $refreshed podcast artwork images ($failed failed)."
+        val summary =
+            "Artwork refresh attempt ${runAttemptCount + 1}: $successful image requests succeeded ($failed failed)."
         return when {
             failed == 0 -> {
                 LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, summary)

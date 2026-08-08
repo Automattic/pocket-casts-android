@@ -93,6 +93,20 @@ class RefreshArtworkWorkerTest {
     }
 
     @Test
+    fun `first attempt clears the cache`() = runTest {
+        val podcast = Podcast(uuid = "podcast-uuid")
+        whenever(podcastManager.findSubscribedNoOrder()).doReturn(listOf(podcast))
+        whenever(imageLoader.execute(any())).thenReturn(mock<ImageResult>())
+        coilManager = mock()
+        whenever(coilManager.imageLoader).thenReturn(imageLoader)
+
+        val result = buildWorker(runAttemptCount = 0).doWork()
+
+        assertTrue(result is ListenableWorker.Result.Success)
+        verify(coilManager).clearAll()
+    }
+
+    @Test
     fun `retry preserves artwork restored by the previous attempt`() = runTest {
         val podcast = Podcast(uuid = "podcast-uuid")
         whenever(podcastManager.findSubscribedNoOrder()).doReturn(listOf(podcast))
