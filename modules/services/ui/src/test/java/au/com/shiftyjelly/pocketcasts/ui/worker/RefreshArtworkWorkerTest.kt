@@ -29,6 +29,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doThrow
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
@@ -93,7 +94,7 @@ class RefreshArtworkWorkerTest {
     }
 
     @Test
-    fun `first attempt clears the cache`() = runTest {
+    fun `first attempt clears the cache before loading podcasts`() = runTest {
         val podcast = Podcast(uuid = "podcast-uuid")
         whenever(podcastManager.findSubscribedNoOrder()).doReturn(listOf(podcast))
         whenever(imageLoader.execute(any())).thenReturn(mock<ImageResult>())
@@ -103,7 +104,10 @@ class RefreshArtworkWorkerTest {
         val result = buildWorker(runAttemptCount = 0).doWork()
 
         assertTrue(result is ListenableWorker.Result.Success)
-        verify(coilManager).clearAll()
+        inOrder(coilManager, podcastManager) {
+            verify(coilManager).clearAll()
+            verify(podcastManager).findSubscribedNoOrder()
+        }
     }
 
     @Test
