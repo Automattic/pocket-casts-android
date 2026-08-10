@@ -3,11 +3,9 @@ package au.com.shiftyjelly.pocketcasts.nowplaying
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.focusable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -128,14 +126,19 @@ fun TvSeekBar(
                 )
             }
         }
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 8.dp),
         ) {
-            SeekBarLabel(text = TimeHelper.formattedSeconds(positionMs / 1000.0))
-            SeekBarLabel(text = if (hasDuration) TimeHelper.formattedSeconds(durationMs / 1000.0) else "-")
+            SeekBarLabel(
+                text = TimeHelper.formattedSeconds(positionMs / 1000.0),
+                modifier = Modifier.align(Alignment.Center),
+            )
+            SeekBarLabel(
+                text = if (hasDuration) TimeHelper.formattedSeconds(durationMs / 1000.0) else "-",
+                modifier = Modifier.align(Alignment.CenterEnd),
+            )
         }
     }
 }
@@ -147,8 +150,8 @@ private fun SeekBarLabel(
 ) {
     Text(
         text = text,
-        style = MaterialTheme.tvTypography.caption2,
-        color = MaterialTheme.tvColors.textSecondary,
+        style = MaterialTheme.tvTypography.caption1,
+        color = MaterialTheme.tvColors.textTertiary,
         modifier = modifier,
     )
 }

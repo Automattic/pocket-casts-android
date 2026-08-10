@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -38,7 +39,6 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -54,13 +54,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.Icon
 import androidx.tv.material3.IconButton
-import androidx.tv.material3.LocalContentColor
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.component.HideTvTopBar
@@ -71,7 +69,6 @@ import au.com.shiftyjelly.pocketcasts.component.TvEpisodeActionContext
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeActionsModal
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeInfoModal
 import au.com.shiftyjelly.pocketcasts.component.TvMoreButton
-import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -175,14 +172,14 @@ private fun TvNowPlayingContent(
     var isContentFocused by remember { mutableStateOf(false) }
     var isTopBarRevealRequested by remember { mutableStateOf(false) }
     val focusTopBar = LocalFocusTvTopBar.current
-    val playPauseFocusRequester = remember { FocusRequester() }
+    val seekBarFocusRequester = remember { FocusRequester() }
     val episode = state.episode
 
     val currentOnConsumePlayerFocusRequest by rememberUpdatedState(onConsumePlayerFocusRequest)
     LaunchedEffect(isPlayerFocusRequested) {
         if (isPlayerFocusRequested) {
             withFrameNanos { }
-            runCatching { playPauseFocusRequester.requestFocus() }
+            runCatching { seekBarFocusRequester.requestFocus() }
             currentOnConsumePlayerFocusRequest()
         }
     }
@@ -194,7 +191,7 @@ private fun TvNowPlayingContent(
             delay(CHROME_HIDE_DELAY)
             isChromeVisible = false
             if (!isContentFocused) {
-                runCatching { playPauseFocusRequester.requestFocus() }
+                runCatching { seekBarFocusRequester.requestFocus() }
             }
         } else {
             isChromeVisible = true
@@ -284,14 +281,43 @@ private fun TvNowPlayingContent(
                 .fillMaxWidth()
                 .graphicsLayer { alpha = chromeAlpha }
                 .background(ChromeScrimBrush)
-                .padding(horizontal = 80.dp)
+                .padding(horizontal = ChromeHorizontalInset)
                 .padding(top = ChromeScrimTopInset, bottom = 24.dp),
         ) {
-            EpisodeTitles(
-                episode = episode,
-                podcastTitle = state.podcastTitle,
-            )
-            Spacer(modifier = Modifier.height(16.dp))
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                EpisodeTitles(
+                    episode = episode,
+                    podcastTitle = state.podcastTitle,
+                    modifier = Modifier.weight(1f),
+                )
+                Spacer(modifier = Modifier.width(24.dp))
+                ControlBar(
+                    playbackSpeed = state.playbackSpeed,
+                    trimMode = state.trimMode,
+                    isVolumeBoosted = state.isVolumeBoosted,
+                    isSpeedMenuVisible = isSpeedMenuVisible,
+                    isEffectsMenuVisible = isEffectsMenuVisible,
+                    onSpeedMenuVisibleChange = { isSpeedMenuVisible = it },
+                    onEffectsMenuVisibleChange = { isEffectsMenuVisible = it },
+                    onSelectSpeed = onSelectSpeed,
+                    onSetVolumeBoost = onSetVolumeBoost,
+                    onSelectTrimMode = onSelectTrimMode,
+                    onOpenDetails = if (episode is PodcastEpisode) {
+                        { isDetailsModalVisible = true }
+                    } else {
+                        null
+                    },
+                    onOpenActions = if (episode is PodcastEpisode) {
+                        { isActionsModalVisible = true }
+                    } else {
+                        null
+                    },
+                )
+            }
+            Spacer(modifier = Modifier.height(24.dp))
             state.errorMessage?.let { errorMessage ->
                 Text(
                     text = errorMessage,
@@ -310,31 +336,7 @@ private fun TvNowPlayingContent(
                 onSkipBack = onSkipBackward,
                 onSkipForward = onSkipForward,
                 onPlayPause = onPlayPause,
-                modifier = Modifier.fillMaxWidth(),
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            PlayerControls(
-                isPlaying = state.isPlaying,
-                isBuffering = state.isBuffering,
-                playPauseFocusRequester = playPauseFocusRequester,
-                playbackSpeed = state.playbackSpeed,
-                trimMode = state.trimMode,
-                isVolumeBoosted = state.isVolumeBoosted,
-                isSpeedMenuVisible = isSpeedMenuVisible,
-                isEffectsMenuVisible = isEffectsMenuVisible,
-                onPlayPause = onPlayPause,
-                onSkipBackward = onSkipBackward,
-                onSkipForward = onSkipForward,
-                onSpeedMenuVisibleChange = { isSpeedMenuVisible = it },
-                onEffectsMenuVisibleChange = { isEffectsMenuVisible = it },
-                onSelectSpeed = onSelectSpeed,
-                onSetVolumeBoost = onSetVolumeBoost,
-                onSelectTrimMode = onSelectTrimMode,
-                onOpenActions = if (episode is PodcastEpisode) {
-                    { isActionsModalVisible = true }
-                } else {
-                    null
-                },
+                focusRequester = seekBarFocusRequester,
                 modifier = Modifier.fillMaxWidth(),
             )
         }
@@ -411,16 +413,7 @@ private fun EpisodeTitles(
         horizontalAlignment = Alignment.Start,
         modifier = modifier,
     ) {
-        Text(
-            text = episode.title,
-            style = MaterialTheme.tvTypography.title3,
-            color = MaterialTheme.tvColors.textPrimary,
-            textAlign = TextAlign.Start,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
-        )
         podcastTitle?.let { podcastTitle ->
-            Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = podcastTitle,
                 style = MaterialTheme.tvTypography.caption1,
@@ -430,51 +423,38 @@ private fun EpisodeTitles(
                 overflow = TextOverflow.Ellipsis,
             )
         }
+        Text(
+            text = episode.title,
+            style = MaterialTheme.tvTypography.title2,
+            color = MaterialTheme.tvColors.textPrimary,
+            textAlign = TextAlign.Start,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
+        )
     }
 }
 
 @Composable
-private fun PlayerControls(
-    isPlaying: Boolean,
-    isBuffering: Boolean,
-    playPauseFocusRequester: FocusRequester,
+private fun ControlBar(
     playbackSpeed: Double,
     trimMode: TrimMode,
     isVolumeBoosted: Boolean,
     isSpeedMenuVisible: Boolean,
     isEffectsMenuVisible: Boolean,
-    onPlayPause: () -> Unit,
-    onSkipBackward: () -> Unit,
-    onSkipForward: () -> Unit,
     onSpeedMenuVisibleChange: (Boolean) -> Unit,
     onEffectsMenuVisibleChange: (Boolean) -> Unit,
     onSelectSpeed: (Double) -> Unit,
     onSetVolumeBoost: (Boolean) -> Unit,
     onSelectTrimMode: (TrimMode) -> Unit,
+    onOpenDetails: (() -> Unit)?,
     onOpenActions: (() -> Unit)?,
     modifier: Modifier = Modifier,
 ) {
     Row(
-        horizontalArrangement = Arrangement.spacedBy(24.dp, Alignment.CenterHorizontally),
+        horizontalArrangement = Arrangement.spacedBy(TvControlBarButtonSpacing),
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier,
     ) {
-        PlayerControlButton(
-            iconRes = IR.drawable.wear_skip_back,
-            contentDescription = stringResource(LR.string.skip_back),
-            onClick = onSkipBackward,
-        )
-        PlayPauseButton(
-            isPlaying = isPlaying,
-            isBuffering = isBuffering,
-            onClick = onPlayPause,
-            modifier = Modifier.focusRequester(playPauseFocusRequester),
-        )
-        PlayerControlButton(
-            iconRes = IR.drawable.wear_skip_foreward,
-            contentDescription = stringResource(LR.string.skip_forward),
-            onClick = onSkipForward,
-        )
         TvPlaybackSpeedButton(
             speed = playbackSpeed,
             isMenuVisible = isSpeedMenuVisible,
@@ -489,54 +469,33 @@ private fun PlayerControls(
             onSetVolumeBoost = onSetVolumeBoost,
             onSelectTrimMode = onSelectTrimMode,
         )
-        if (onOpenActions != null) {
-            TvMoreButton(onClick = onOpenActions)
+        if (onOpenDetails != null) {
+            InfoButton(onClick = onOpenDetails)
         }
-    }
-}
-
-@Composable
-private fun PlayPauseButton(
-    isPlaying: Boolean,
-    isBuffering: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    IconButton(
-        onClick = onClick,
-        colors = TvButtonDefaults.iconButtonColors(),
-        modifier = modifier.size(64.dp),
-    ) {
-        if (isBuffering) {
-            LoadingView(color = LocalContentColor.current)
-        } else {
-            Icon(
-                painter = painterResource(if (isPlaying) IR.drawable.button_pause else IR.drawable.button_play),
-                contentDescription = stringResource(if (isPlaying) LR.string.pause else LR.string.play),
-                modifier = Modifier.size(36.dp),
+        if (onOpenActions != null) {
+            TvMoreButton(
+                onClick = onOpenActions,
+                buttonSize = TvControlBarButtonSize,
+                iconSize = TvControlBarIconSize,
             )
         }
     }
 }
 
 @Composable
-private fun PlayerControlButton(
-    iconRes: Int,
-    contentDescription: String,
+private fun InfoButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    buttonSize: Dp = 56.dp,
-    iconSize: Dp = 24.dp,
 ) {
     IconButton(
         onClick = onClick,
         colors = TvButtonDefaults.iconButtonColors(),
-        modifier = modifier.size(buttonSize),
+        modifier = modifier.size(TvControlBarButtonSize),
     ) {
         Icon(
-            painter = painterResource(iconRes),
-            contentDescription = contentDescription,
-            modifier = Modifier.size(iconSize),
+            painter = painterResource(IR.drawable.ic_info),
+            contentDescription = stringResource(LR.string.tv_episode_details),
+            modifier = Modifier.size(TvControlBarIconSize),
         )
     }
 }
@@ -546,9 +505,10 @@ private val BlurredArtworkScale = 1.25f
 private val BlurredArtworkOffset = -ArtworkSize * 0.2f
 private val BlurredArtworkRadius = 66.dp
 
-private val CHROME_HIDE_DELAY = 4.seconds
+private val CHROME_HIDE_DELAY = 5.seconds
 private const val VIDEO_OVERLAY_FADE_MILLIS = 200
 
+private val ChromeHorizontalInset = 56.dp
 private val ChromeScrimTopInset = 48.dp
 private val ChromeScrimBrush = Brush.verticalGradient(
     0f to Color.Transparent,

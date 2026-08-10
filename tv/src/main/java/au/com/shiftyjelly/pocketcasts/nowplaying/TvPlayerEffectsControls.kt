@@ -27,6 +27,10 @@ import kotlin.math.abs
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
+internal val TvControlBarButtonSize = 64.dp
+internal val TvControlBarIconSize = 24.dp
+internal val TvControlBarButtonSpacing = 11.dp
+
 internal val tvPlaybackSpeedOptions: List<Double> = (5..30).map { it / 10.0 }
 
 internal fun playbackSpeedLabel(speed: Double, locale: Locale): String = String.format(locale, "%.1fx", speed)
@@ -47,7 +51,7 @@ internal fun TvPlaybackSpeedButton(
         IconButton(
             onClick = { onMenuVisibleChange(true) },
             colors = TvButtonDefaults.iconButtonColors(),
-            modifier = Modifier.size(56.dp),
+            modifier = Modifier.size(TvControlBarButtonSize),
         ) {
             Text(
                 text = playbackSpeedLabel(currentSpeed, locale),
@@ -101,12 +105,12 @@ internal fun TvPlayerEffectsButton(
         IconButton(
             onClick = { onMenuVisibleChange(true) },
             colors = TvButtonDefaults.iconButtonColors(),
-            modifier = Modifier.size(56.dp),
+            modifier = Modifier.size(TvControlBarButtonSize),
         ) {
             Icon(
                 painter = painterResource(if (isEffectsOn) IR.drawable.ic_effects_on else IR.drawable.ic_effects_off),
                 contentDescription = stringResource(LR.string.player_effects),
-                modifier = Modifier.size(24.dp),
+                modifier = Modifier.size(TvControlBarIconSize),
             )
         }
         if (isMenuVisible) {
