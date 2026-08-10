@@ -1,10 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.nowplaying
 
 import androidx.compose.animation.core.withInfiniteAnimationFrameNanos
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
@@ -13,7 +14,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -24,6 +24,7 @@ import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.tv.material3.MaterialTheme
@@ -55,16 +56,28 @@ fun TvNowPlayingWaveform(
     var frameTimeNanos by remember { mutableLongStateOf(0L) }
 
     val lifecycleOwner = LocalLifecycleOwner.current
+    val wasBackgrounded = remember { mutableStateOf(false) }
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_STOP) {
+                wasBackgrounded.value = true
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
     LaunchedEffect(isPlaying, episodeUuid) {
-        // Fade only when the change happens on screen; snap when catching up after being backgrounded.
-        var isLiveChange = lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)
+        // Fade only when the change happens on screen; snap when a play state was delivered on return from the background.
+        var isLiveChange = !wasBackgrounded.value
         lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
             val now = withInfiniteAnimationFrameNanos { it }
+            wasBackgrounded.value = false
             val target = if (isPlaying) 1f else 0f
             if (isLiveChange) {
                 envelope.fadeTo(target, now)
             } else {
                 envelope.snapTo(target, now)
+                frameTimeNanos = now
             }
             isLiveChange = false
             while (isPlaying || !envelope.isSettledAt(frameTimeNanos)) {
@@ -79,22 +92,21 @@ fun TvNowPlayingWaveform(
     val density = LocalDensity.current
     val windowWidth = with(density) { LocalWindowInfo.current.containerSize.width.toDp() }
     val artworkSizePx = with(density) { artworkSize.toPx() }
-    Spacer(
+    Canvas(
         modifier = modifier
             .requiredWidth(windowWidth * WIDTH_FRACTION)
-            .requiredHeight(MaxBarHeight)
-            .drawBehind {
-                drawWaveform(
-                    color = color,
-                    timeNanos = frameTimeNanos,
-                    envelope = envelope,
-                    smoother = smoother,
-                    useAudioReactive = useAudioReactive,
-                    audioLevel = latestAudioLevel,
-                    artworkSizePx = artworkSizePx,
-                )
-            },
-    )
+            .requiredHeight(MaxBarHeight),
+    ) {
+        drawWaveform(
+            color = color,
+            timeNanos = frameTimeNanos,
+            envelope = envelope,
+            smoother = smoother,
+            useAudioReactive = useAudioReactive,
+            audioLevel = latestAudioLevel,
+            artworkSizePx = artworkSizePx,
+        )
+    }
 }
 
 private fun DrawScope.drawWaveform(

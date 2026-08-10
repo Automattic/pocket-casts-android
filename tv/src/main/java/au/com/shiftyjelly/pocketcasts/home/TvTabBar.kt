@@ -64,8 +64,14 @@ fun TvTabBar(
     val currentOnConsumeFocusRequest by rememberUpdatedState(onConsumeFocusRequest)
     LaunchedEffect(focusSelectedTab) {
         if (focusSelectedTab) {
-            withFrameNanos { }
-            runCatching { focusRequester.requestFocus() }
+            // Retry across frames so the request is not consumed before the revealed tab bar has attached.
+            repeat(FOCUS_REQUEST_MAX_FRAMES) {
+                withFrameNanos { }
+                if (runCatching { focusRequester.requestFocus() }.isSuccess) {
+                    currentOnConsumeFocusRequest()
+                    return@LaunchedEffect
+                }
+            }
             currentOnConsumeFocusRequest()
         }
     }
@@ -150,6 +156,8 @@ fun TvTabBar(
         }
     }
 }
+
+private const val FOCUS_REQUEST_MAX_FRAMES = 10
 
 @Preview(device = Devices.TV_1080p, showBackground = true)
 @Composable

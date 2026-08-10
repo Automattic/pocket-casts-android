@@ -92,6 +92,7 @@ fun TvNowPlayingScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var openedPodcastUuid by rememberSaveable { mutableStateOf<String?>(null) }
+    val currentOnConsumeOpenRequest by rememberUpdatedState(onConsumeOpenRequest)
 
     val podcastUuid = openedPodcastUuid.takeUnless { isOpenRequested }
     if (podcastUuid != null) {
@@ -106,13 +107,20 @@ fun TvNowPlayingScreen(
     }
 
     when (val state = uiState) {
-        is TvNowPlayingUiState.Empty -> TvEmptyState(
-            title = stringResource(LR.string.tv_nothing_playing_title),
-            subtitle = stringResource(LR.string.tv_nothing_playing_subtitle),
-            modifier = modifier
-                .fillMaxSize()
-                .padding(top = TvTopBarHeight),
-        )
+        is TvNowPlayingUiState.Empty -> {
+            LaunchedEffect(isOpenRequested) {
+                if (isOpenRequested) {
+                    currentOnConsumeOpenRequest()
+                }
+            }
+            TvEmptyState(
+                title = stringResource(LR.string.tv_nothing_playing_title),
+                subtitle = stringResource(LR.string.tv_nothing_playing_subtitle),
+                modifier = modifier
+                    .fillMaxSize()
+                    .padding(top = TvTopBarHeight),
+            )
+        }
 
         is TvNowPlayingUiState.Loaded -> TvNowPlayingContent(
             state = state,
