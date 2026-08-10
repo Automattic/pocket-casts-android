@@ -48,8 +48,6 @@ import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
-import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -216,9 +214,6 @@ private fun TvNowPlayingContent(
         }
     }
     val chromeAlpha by animateFloatAsState(if (isChromeVisible) 1f else 0f, label = "TvNowPlayingChromeAlpha")
-    val density = LocalDensity.current
-    var chromeHeight by remember { mutableStateOf(0.dp) }
-    val artworkBottomPadding = chromeHeight * chromeAlpha
 
     Box(
         modifier = modifier
@@ -243,9 +238,7 @@ private fun TvNowPlayingContent(
     ) {
         Box(
             contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(bottom = if (state.isVideo) 0.dp else artworkBottomPadding),
+            modifier = Modifier.fillMaxSize(),
         ) {
             if (state.isVideo) {
                 TvVideoSurface(
@@ -253,9 +246,8 @@ private fun TvNowPlayingContent(
                     onFirstFrameRendered = { hasRenderedFirstFrame = true },
                 )
             } else {
-                EpisodeArtworkWithTitles(
+                EpisodeArtwork(
                     episode = episode,
-                    podcastTitle = state.podcastTitle,
                     isPlaying = state.isPlaying && !state.isBuffering,
                     player = state.player,
                     audioLevel = { state.player?.currentAudioLevel ?: 0f },
@@ -272,12 +264,10 @@ private fun TvNowPlayingContent(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(TvScreenBackgroundBrush)
-                        .padding(bottom = artworkBottomPadding),
+                        .background(TvScreenBackgroundBrush),
                 ) {
-                    EpisodeArtworkWithTitles(
+                    EpisodeArtwork(
                         episode = episode,
-                        podcastTitle = state.podcastTitle,
                         isPlaying = state.isPlaying && !state.isBuffering,
                         player = state.player,
                         audioLevel = { state.player?.currentAudioLevel ?: 0f },
@@ -290,20 +280,17 @@ private fun TvNowPlayingContent(
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
                 .graphicsLayer { alpha = chromeAlpha }
-                .then(if (state.isVideo) Modifier.background(ChromeScrimBrush) else Modifier)
-                .onSizeChanged { size -> chromeHeight = with(density) { size.height.toDp() } }
+                .background(ChromeScrimBrush)
                 .padding(horizontal = 80.dp)
-                .padding(top = if (state.isVideo) ChromeScrimTopInset else 0.dp, bottom = 24.dp),
+                .padding(top = ChromeScrimTopInset, bottom = 24.dp),
         ) {
-            if (state.isVideo) {
-                EpisodeTitles(
-                    episode = episode,
-                    podcastTitle = state.podcastTitle,
-                    textAlign = TextAlign.Start,
-                    horizontalAlignment = Alignment.Start,
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-            }
+            EpisodeTitles(
+                episode = episode,
+                podcastTitle = state.podcastTitle,
+                textAlign = TextAlign.Start,
+                horizontalAlignment = Alignment.Start,
+            )
+            Spacer(modifier = Modifier.height(16.dp))
             state.errorMessage?.let { errorMessage ->
                 Text(
                     text = errorMessage,
@@ -374,47 +361,37 @@ private fun TvNowPlayingContent(
 }
 
 @Composable
-private fun EpisodeArtworkWithTitles(
+private fun EpisodeArtwork(
     episode: BaseEpisode,
-    podcastTitle: String?,
     isPlaying: Boolean,
     player: Player?,
     audioLevel: () -> Float,
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
+    Box(
+        contentAlignment = Alignment.Center,
         modifier = modifier,
     ) {
-        Box(contentAlignment = Alignment.Center) {
-            TvNowPlayingWaveform(
-                isPlaying = isPlaying,
-                episodeUuid = episode.uuid,
-                player = player,
-                audioLevel = audioLevel,
-                artworkSize = ArtworkSize,
-            )
-            TvArtworkImage(
-                model = episode.artworkModel(),
-                modifier = Modifier
-                    .requiredSize(ArtworkSize * BlurredArtworkScale)
-                    .offset(x = BlurredArtworkOffset, y = BlurredArtworkOffset)
-                    .blur(BlurredArtworkRadius, BlurredEdgeTreatment.Unbounded)
-                    .alpha(0.7f),
-            )
-            TvArtworkImage(
-                model = episode.artworkModel(),
-                modifier = Modifier
-                    .size(ArtworkSize)
-                    .clip(RoundedCornerShape(8.dp)),
-            )
-        }
-        Spacer(modifier = Modifier.height(24.dp))
-        EpisodeTitles(
-            episode = episode,
-            podcastTitle = podcastTitle,
-            textAlign = TextAlign.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
+        TvNowPlayingWaveform(
+            isPlaying = isPlaying,
+            episodeUuid = episode.uuid,
+            player = player,
+            audioLevel = audioLevel,
+            artworkSize = ArtworkSize,
+        )
+        TvArtworkImage(
+            model = episode.artworkModel(),
+            modifier = Modifier
+                .requiredSize(ArtworkSize * BlurredArtworkScale)
+                .offset(x = BlurredArtworkOffset, y = BlurredArtworkOffset)
+                .blur(BlurredArtworkRadius, BlurredEdgeTreatment.Unbounded)
+                .alpha(0.7f),
+        )
+        TvArtworkImage(
+            model = episode.artworkModel(),
+            modifier = Modifier
+                .size(ArtworkSize)
+                .clip(RoundedCornerShape(8.dp)),
         )
     }
 }
@@ -561,7 +538,7 @@ private fun PlayerControlButton(
     }
 }
 
-private val ArtworkSize = 266.dp
+private val ArtworkSize = 240.dp
 private val BlurredArtworkScale = 1.25f
 private val BlurredArtworkOffset = -ArtworkSize * 0.2f
 private val BlurredArtworkRadius = 66.dp
