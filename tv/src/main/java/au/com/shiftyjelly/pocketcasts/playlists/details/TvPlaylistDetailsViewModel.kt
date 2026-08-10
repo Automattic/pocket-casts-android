@@ -2,11 +2,14 @@ package au.com.shiftyjelly.pocketcasts.playlists.details
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.toPodcastEpisodes
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.preferences.TvPreferences
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlayAllHandler
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlayAllResponse
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import dagger.assisted.Assisted
@@ -15,11 +18,15 @@ import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.WhileSubscribed
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -30,7 +37,15 @@ class TvPlaylistDetailsViewModel @AssistedInject constructor(
     @Assisted private val playlistType: Playlist.Type,
     private val playlistManager: PlaylistManager,
     private val preferences: TvPreferences,
+    playAllHandlerFactory: PlayAllHandler.Factory,
 ) : ViewModel() {
+
+    private val playAllHandler = playAllHandlerFactory.create(SourceView.FILTERS)
+
+    private val _events = MutableSharedFlow<TvPlaylistDetailsEvent>(extraBufferCapacity = 1)
+    val events: SharedFlow<TvPlaylistDetailsEvent> = _events.asSharedFlow()
+
+    private var playAllJob: Job? = null
 
     private val playlistFlow: Flow<Playlist?> = when (playlistType) {
         Playlist.Type.Manual -> playlistManager.manualPlaylistFlow(playlistUuid, includeArchived = true)
@@ -71,10 +86,40 @@ class TvPlaylistDetailsViewModel @AssistedInject constructor(
         isShowingArchivedFlow.value = isShowingArchived
     }
 
+    fun playAll() {
+        if (playAllJob?.isActive == true) {
+            return
+        }
+        playAllJob = viewModelScope.launch {
+            val episodes = (uiState.value as? TvPlaylistDetailsUiState.Loaded)?.episodes.orEmpty()
+            when (playAllHandler.handlePlayAllEpisodes(episodes)) {
+                PlayAllResponse.DoNothing -> _events.emit(TvPlaylistDetailsEvent.OpenNowPlaying)
+                PlayAllResponse.ShowWarning -> _events.emit(TvPlaylistDetailsEvent.ShowReplaceUpNextConfirmation)
+                PlayAllResponse.ShowNoEpisodesToPlay -> Unit
+            }
+        }
+    }
+
+    fun replaceUpNextAndPlay(saveUpNext: Boolean, upNextName: String) {
+        viewModelScope.launch {
+            if (saveUpNext) {
+                playAllHandler.saveUpNextAsPlaylist(upNextName)
+            }
+            playAllHandler.playAllPendingEpisodes()
+            _events.emit(TvPlaylistDetailsEvent.OpenNowPlaying)
+        }
+    }
+
     @AssistedFactory
     interface Factory {
         fun create(playlistUuid: String, playlistType: Playlist.Type): TvPlaylistDetailsViewModel
     }
+}
+
+sealed interface TvPlaylistDetailsEvent {
+    data object OpenNowPlaying : TvPlaylistDetailsEvent
+
+    data object ShowReplaceUpNextConfirmation : TvPlaylistDetailsEvent
 }
 
 sealed interface TvPlaylistDetailsUiState {
