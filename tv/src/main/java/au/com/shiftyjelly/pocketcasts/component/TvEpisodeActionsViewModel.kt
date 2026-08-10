@@ -20,9 +20,11 @@ enum class TvEpisodeActionContext(val source: SourceView) {
     PodcastDetails(SourceView.PODCAST_SCREEN),
     Playlist(SourceView.FILTERS),
     UpNext(SourceView.UP_NEXT),
+    NowPlaying(SourceView.PLAYER),
 }
 
 interface TvEpisodeActions {
+    fun play(episode: PodcastEpisode, source: SourceView)
     fun playNext(episode: PodcastEpisode, source: SourceView)
     fun playLast(episode: PodcastEpisode, source: SourceView)
     fun markAsPlayed(episode: PodcastEpisode)
@@ -41,6 +43,10 @@ class TvEpisodeActionsViewModel @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel(),
     TvEpisodeActions {
+
+    override fun play(episode: PodcastEpisode, source: SourceView) = launchWrite {
+        playbackManager.playNowSuspend(episode = episode, sourceView = source)
+    }
 
     override fun playNext(episode: PodcastEpisode, source: SourceView) = launchWrite {
         playbackManager.playNext(episode = episode, source = source)

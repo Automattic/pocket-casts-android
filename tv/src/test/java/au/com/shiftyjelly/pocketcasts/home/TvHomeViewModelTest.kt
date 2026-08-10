@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.home
 import android.content.Context
 import android.content.res.Resources
 import app.cash.turbine.test
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PodcastDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextDao
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -12,7 +13,10 @@ import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.model.Discover
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverEpisode
@@ -25,6 +29,7 @@ import au.com.shiftyjelly.pocketcasts.servers.model.ListFeed
 import au.com.shiftyjelly.pocketcasts.servers.model.ListType
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import com.jakewharton.rxrelay2.BehaviorRelay
+import io.reactivex.Single
 import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
@@ -40,6 +45,8 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyBlocking
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -75,6 +82,9 @@ class TvHomeViewModelTest {
     private val settings = mock<Settings> {
         whenever(it.discoverCountryCode).thenReturn(discoverCountryCode)
     }
+    private val episodeManager = mock<EpisodeManager>()
+    private val podcastManager = mock<PodcastManager>()
+    private val playbackManager = mock<PlaybackManager>()
 
     @Test
     fun `all rows load in feed order`() = runTest {
@@ -492,6 +502,62 @@ class TvHomeViewModelTest {
         }
     }
 
+    @Test
+    fun `playEpisode plays an episode that is already in the database`() = runTest {
+        val episode = episode("episode-1", podcastUuid = "podcast-1")
+        whenever(episodeManager.findByUuid("episode-1")).thenReturn(episode)
+
+        createViewModel().playEpisode(homeEpisode())
+
+        verifyBlocking(playbackManager) { playNowSuspend(episode = episode, sourceView = SourceView.DISCOVER) }
+        verify(podcastManager, never()).findOrDownloadPodcastRxSingle(any(), any())
+    }
+
+    @Test
+    fun `playEpisode fetches the podcast before playing an unknown episode`() = runTest {
+        val episode = episode("episode-1", podcastUuid = "podcast-1")
+        whenever(episodeManager.findByUuid("episode-1")).thenReturn(null, episode)
+        whenever(podcastManager.findOrDownloadPodcastRxSingle("podcast-1")).thenReturn(Single.just(Podcast(uuid = "podcast-1")))
+
+        createViewModel().playEpisode(homeEpisode())
+
+        verifyBlocking(playbackManager) { playNowSuspend(episode = episode, sourceView = SourceView.DISCOVER) }
+    }
+
+    @Test
+    fun `playEpisode reports when playback has started`() = runTest {
+        val episode = episode("episode-1", podcastUuid = "podcast-1")
+        whenever(episodeManager.findByUuid("episode-1")).thenReturn(episode)
+        val viewModel = createViewModel()
+
+        viewModel.playStarted.test {
+            viewModel.playEpisode(homeEpisode())
+
+            awaitItem()
+        }
+    }
+
+    @Test
+    fun `playEpisode reports a failure when the podcast fetch fails`() = runTest {
+        whenever(episodeManager.findByUuid("episode-1")).thenReturn(null)
+        whenever(podcastManager.findOrDownloadPodcastRxSingle("podcast-1")).thenReturn(Single.error(RuntimeException("boom")))
+        val viewModel = createViewModel()
+
+        viewModel.playFailures.test {
+            viewModel.playEpisode(homeEpisode())
+
+            awaitItem()
+            verifyNoInteractions(playbackManager)
+        }
+    }
+
+    private fun homeEpisode() = TvHomeEpisode(
+        episodeUuid = "episode-1",
+        episodeTitle = "Episode",
+        podcastUuid = "podcast-1",
+        podcastTitle = "Podcast",
+    )
+
     private fun createViewModel() = TvHomeViewModel(
         listRepository = listRepository,
         playlistManager = playlistManager,
@@ -499,6 +565,9 @@ class TvHomeViewModelTest {
         upNextDao = upNextDao,
         settings = settings,
         syncManager = syncManager,
+        episodeManager = episodeManager,
+        podcastManager = podcastManager,
+        playbackManager = playbackManager,
         context = context,
     )
 

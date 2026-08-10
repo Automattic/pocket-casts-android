@@ -2,8 +2,10 @@ package au.com.shiftyjelly.pocketcasts.upnext
 
 import android.content.Context
 import app.cash.turbine.test
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
@@ -17,6 +19,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verifyBlocking
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class TvUpNextViewModelTest {
@@ -30,6 +33,7 @@ class TvUpNextViewModelTest {
     }
     private val syncManager = mock<SyncManager>()
     private val context = mock<Context>()
+    private val playbackManager = mock<PlaybackManager>()
 
     private val currentEpisode = episode("current")
 
@@ -122,10 +126,20 @@ class TvUpNextViewModelTest {
         }
     }
 
+    @Test
+    fun `play starts playback of the episode`() = runTest {
+        val episode = episode("episode")
+
+        createViewModel().play(episode)
+
+        verifyBlocking(playbackManager) { playNowSuspend(episode = episode, sourceView = SourceView.UP_NEXT) }
+    }
+
     private fun createViewModel() = TvUpNextViewModel(
         context = context,
         syncManager = syncManager,
         upNextQueue = upNextQueue,
+        playbackManager = playbackManager,
     )
 
     private fun episode(uuid: String) = PodcastEpisode(uuid = uuid, publishedDate = Date(0))
