@@ -354,7 +354,7 @@ class MainActivity :
         get() = binding.bottomContainer.height - binding.bottomContainer.paddingBottom
 
     private var bottomSheetTag: String? = null
-    private val bottomSheetQueue: MutableList<(() -> Unit)?> = mutableListOf()
+    private var pendingBottomSheetFragment: Fragment? = null
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
@@ -1171,9 +1171,9 @@ class MainActivity :
 
             if (viewModel.shouldShowTrialFinished(signinState)) {
                 val trialFinished = TrialFinishedFragment()
-                showBottomSheet(trialFinished)
-
-                settings.setTrialFinishedSeen(true)
+                showBottomSheet(trialFinished) {
+                    settings.setTrialFinishedSeen(true)
+                }
             }
 
             // Result is intentionally ignored; failures are logged internally by sendAuthToDataLayer
@@ -1184,10 +1184,9 @@ class MainActivity :
             lifecycle.repeatOnLifecycle(Lifecycle.State.CREATED) {
                 viewModel.state.collect { state ->
                     if (state.shouldShowWhatsNew) {
-                        showBottomSheet(
-                            fragment = WhatsNewFragment(),
-                        )
-                        viewModel.onWhatsNewShown()
+                        showBottomSheet(WhatsNewFragment()) {
+                            viewModel.onWhatsNewShown()
+                        }
                     }
                 }
             }
@@ -1405,14 +1404,28 @@ class MainActivity :
     }
 
     override fun showBottomSheet(fragment: Fragment) {
+        showBottomSheet(fragment, onShown = {})
+    }
+
+    private fun showBottomSheet(fragment: Fragment, onShown: () -> Unit) {
         if (supportFragmentManager.isStateSaved) {
-            lifecycleScope.launch { withResumed { commitBottomSheet(fragment) } }
+            pendingBottomSheetFragment = fragment
+            lifecycleScope.launch {
+                withResumed {
+                    if (pendingBottomSheetFragment === fragment) {
+                        commitBottomSheet(fragment)
+                        onShown()
+                    }
+                }
+            }
         } else {
             commitBottomSheet(fragment)
+            onShown()
         }
     }
 
     private fun commitBottomSheet(fragment: Fragment) {
+        pendingBottomSheetFragment = null
         supportFragmentManager.commitNow {
             bottomSheetTag = fragment::class.java.name
             replace(R.id.frameBottomSheet, fragment, bottomSheetTag)
@@ -1441,9 +1454,11 @@ class MainActivity :
         }
     }
 
-    override fun isUpNextShowing() = bottomSheetTag == UpNextFragment::class.java.name
+    override fun isUpNextShowing() = isBottomSheetShowing(UpNextFragment::class.java)
 
-    private fun isWhatsNewShowing() = bottomSheetTag == WhatsNewFragment::class.java.name
+    private fun isWhatsNewShowing() = isBottomSheetShowing(WhatsNewFragment::class.java)
+
+    private fun isBottomSheetShowing(fragmentClass: Class<out Fragment>) = bottomSheetTag == fragmentClass.name || pendingBottomSheetFragment?.javaClass == fragmentClass
 
     private fun removeBottomSheetFragment(fragment: Fragment) {
         val tag = fragment::class.java.name
@@ -1453,11 +1468,6 @@ class MainActivity :
 
                 updateStatusBar()
                 bottomSheetTag = null
-
-                if (bottomSheetQueue.isNotEmpty()) {
-                    val next = bottomSheetQueue.removeAt(0)
-                    next?.invoke()
-                }
             }
         }
     }
