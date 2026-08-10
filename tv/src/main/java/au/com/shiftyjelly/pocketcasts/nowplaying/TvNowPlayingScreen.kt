@@ -243,7 +243,7 @@ private fun TvNowPlayingContent(
             if (state.isVideo) {
                 TvVideoSurface(
                     player = state.player,
-                    onFirstFrameRendered = { hasRenderedFirstFrame = true },
+                    onFirstFrameRender = { hasRenderedFirstFrame = true },
                 )
             } else {
                 EpisodeArtwork(
