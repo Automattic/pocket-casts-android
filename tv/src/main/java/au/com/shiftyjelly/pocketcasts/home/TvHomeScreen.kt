@@ -62,6 +62,11 @@ fun TvHomeScreen(
     val toastHostState = LocalTvToastHostState.current
     val playFailedMessage = stringResource(LR.string.error_generic_message)
     LaunchedEffect(Unit) {
+        viewModel.playStarted.collect {
+            openNowPlaying()
+        }
+    }
+    LaunchedEffect(Unit) {
         viewModel.playFailures.collect {
             toastHostState.show(playFailedMessage)
         }
@@ -71,10 +76,7 @@ fun TvHomeScreen(
             uiState = uiState,
             onRetry = viewModel::load,
             onOpenPodcast = { openedPodcastUuid = it },
-            onPlayEpisode = { episode ->
-                viewModel.playEpisode(episode)
-                openNowPlaying()
-            },
+            onPlayEpisode = viewModel::playEpisode,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(top = TvTopBarHeight)

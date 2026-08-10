@@ -19,7 +19,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyBlocking
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class TvUpNextViewModelTest {
@@ -132,7 +132,7 @@ class TvUpNextViewModelTest {
 
         createViewModel().play(episode)
 
-        verify(playbackManager).playNow(episode, sourceView = SourceView.UP_NEXT)
+        verifyBlocking(playbackManager) { playNowSuspend(episode = episode, sourceView = SourceView.UP_NEXT) }
     }
 
     private fun createViewModel() = TvUpNextViewModel(

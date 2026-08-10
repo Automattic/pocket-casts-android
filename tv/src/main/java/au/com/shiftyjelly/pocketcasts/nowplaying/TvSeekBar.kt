@@ -29,6 +29,9 @@ import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
+import androidx.compose.ui.semantics.ProgressBarRangeInfo
+import androidx.compose.ui.semantics.progressBarRangeInfo
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.MaterialTheme
@@ -43,8 +46,8 @@ fun TvSeekBar(
     positionMs: Int,
     durationMs: Int,
     bufferedMs: Int,
-    onSeekBack: () -> Unit,
-    onSeekForward: () -> Unit,
+    onSkipBack: () -> Unit,
+    onSkipForward: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var isFocused by remember { mutableStateOf(false) }
@@ -60,17 +63,20 @@ fun TvSeekBar(
                 .fillMaxWidth()
                 .height(12.dp)
                 .onFocusChanged { isFocused = it.isFocused }
+                .semantics {
+                    progressBarRangeInfo = ProgressBarRangeInfo(progress, 0f..1f)
+                }
                 .onKeyEvent { event ->
                     when {
-                        event.type != KeyEventType.KeyDown -> false
+                        event.type != KeyEventType.KeyDown || !hasDuration -> false
 
                         event.key == Key.DirectionLeft -> {
-                            onSeekBack()
+                            onSkipBack()
                             true
                         }
 
                         event.key == Key.DirectionRight -> {
-                            onSeekForward()
+                            onSkipForward()
                             true
                         }
 
@@ -143,8 +149,8 @@ private fun TvSeekBarPreview() {
             positionMs = 600_000,
             durationMs = 3_600_000,
             bufferedMs = 1_200_000,
-            onSeekBack = {},
-            onSeekForward = {},
+            onSkipBack = {},
+            onSkipForward = {},
         )
     }
 }

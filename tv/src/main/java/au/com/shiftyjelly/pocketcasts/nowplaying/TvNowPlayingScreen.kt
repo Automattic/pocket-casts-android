@@ -23,8 +23,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
@@ -78,8 +78,13 @@ fun TvNowPlayingScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var openedPodcastUuid by rememberSaveable { mutableStateOf<String?>(null) }
 
+    // Skip the first composition so a restored openedPodcastUuid is not cleared.
+    var lastHandledOpenTrigger by remember { mutableIntStateOf(openTrigger) }
     LaunchedEffect(openTrigger) {
-        openedPodcastUuid = null
+        if (openTrigger != lastHandledOpenTrigger) {
+            lastHandledOpenTrigger = openTrigger
+            openedPodcastUuid = null
+        }
     }
 
     val podcastUuid = openedPodcastUuid
@@ -172,7 +177,7 @@ private fun TvNowPlayingContent(
             }
         }
         Spacer(modifier = Modifier.height(24.dp))
-        Column(modifier = Modifier.graphicsLayer { alpha = chromeAlpha }) {
+        Column(modifier = Modifier.alpha(chromeAlpha)) {
             state.errorMessage?.let { errorMessage ->
                 Text(
                     text = errorMessage,
@@ -188,8 +193,8 @@ private fun TvNowPlayingContent(
                 positionMs = state.positionMs,
                 durationMs = state.durationMs,
                 bufferedMs = state.bufferedMs,
-                onSeekBack = onSkipBackward,
-                onSeekForward = onSkipForward,
+                onSkipBack = onSkipBackward,
+                onSkipForward = onSkipForward,
                 modifier = Modifier.fillMaxWidth(),
             )
             Spacer(modifier = Modifier.height(16.dp))

@@ -14,12 +14,15 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.WhileSubscribed
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlow
+import timber.log.Timber
 
 @HiltViewModel
 class TvUpNextViewModel @Inject constructor(
@@ -52,7 +55,15 @@ class TvUpNextViewModel @Inject constructor(
     }
 
     fun play(episode: PodcastEpisode) {
-        playbackManager.playNow(episode, sourceView = SourceView.UP_NEXT)
+        viewModelScope.launch {
+            try {
+                playbackManager.playNowSuspend(episode = episode, sourceView = SourceView.UP_NEXT)
+            } catch (exception: CancellationException) {
+                throw exception
+            } catch (exception: Exception) {
+                Timber.e(exception, "Failed to play episode from TV up next")
+            }
+        }
     }
 }
 

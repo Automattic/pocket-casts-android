@@ -8,11 +8,15 @@ import android.content.ContextWrapper
 import android.content.res.Configuration
 import android.view.accessibility.AccessibilityManager
 import androidx.appcompat.app.AppCompatActivity
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 
 fun Context.getLaunchActivityPendingIntent(): PendingIntent {
     // TV builds declare only a LEANBACK_LAUNCHER activity, which getLaunchIntentForPackage does not resolve.
     val intent = packageManager.getLaunchIntentForPackage(packageName)
         ?: packageManager.getLeanbackLaunchIntentForPackage(packageName)
+    if (intent == null) {
+        LogBuffer.e(LogBuffer.TAG_CRASH, "Could not resolve a launch intent for $packageName; content intent will be inert")
+    }
     return PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
 }
 

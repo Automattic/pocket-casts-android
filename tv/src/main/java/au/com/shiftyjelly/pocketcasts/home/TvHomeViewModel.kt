@@ -62,7 +62,10 @@ class TvHomeViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<TvHomeUiState>(TvHomeUiState.Loading)
     val uiState: StateFlow<TvHomeUiState> = _uiState.asStateFlow()
 
-    private val _playFailures = MutableSharedFlow<Unit>()
+    private val _playStarted = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    val playStarted: SharedFlow<Unit> = _playStarted.asSharedFlow()
+
+    private val _playFailures = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     val playFailures: SharedFlow<Unit> = _playFailures.asSharedFlow()
 
     private var loadJob: Job? = null
@@ -193,15 +196,16 @@ class TvHomeViewModel @Inject constructor(
                     }
                 if (found != null) {
                     playbackManager.playNowSuspend(episode = found, sourceView = SourceView.DISCOVER)
+                    _playStarted.tryEmit(Unit)
                 } else {
                     Timber.e("Episode %s not found to play from TV home", episode.episodeUuid)
-                    _playFailures.emit(Unit)
+                    _playFailures.tryEmit(Unit)
                 }
             } catch (exception: CancellationException) {
                 throw exception
             } catch (exception: Exception) {
                 Timber.e(exception, "Failed to play episode from TV home")
-                _playFailures.emit(Unit)
+                _playFailures.tryEmit(Unit)
             }
         }
     }

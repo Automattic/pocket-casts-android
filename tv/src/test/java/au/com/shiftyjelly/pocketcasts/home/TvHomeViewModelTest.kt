@@ -525,6 +525,19 @@ class TvHomeViewModelTest {
     }
 
     @Test
+    fun `playEpisode reports when playback has started`() = runTest {
+        val episode = episode("episode-1", podcastUuid = "podcast-1")
+        whenever(episodeManager.findByUuid("episode-1")).thenReturn(episode)
+        val viewModel = createViewModel()
+
+        viewModel.playStarted.test {
+            viewModel.playEpisode(homeEpisode())
+
+            awaitItem()
+        }
+    }
+
+    @Test
     fun `playEpisode reports a failure when the podcast fetch fails`() = runTest {
         whenever(episodeManager.findByUuid("episode-1")).thenReturn(null)
         whenever(podcastManager.findOrDownloadPodcastRxSingle("podcast-1")).thenReturn(Single.error(RuntimeException("boom")))
