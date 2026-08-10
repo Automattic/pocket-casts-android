@@ -30,6 +30,10 @@ class PlayAllHandler @AssistedInject constructor(
         return handlePlayAllAction(episodes, PlaylistEpisode::toPodcastEpisode)
     }
 
+    suspend fun handlePlayAllEpisodes(episodes: List<BaseEpisode>): PlayAllResponse {
+        return handlePlayAllAction(episodes) { it }
+    }
+
     private suspend fun <T> handlePlayAllAction(
         episodes: List<T>,
         toBaseEpisode: (T) -> BaseEpisode?,
