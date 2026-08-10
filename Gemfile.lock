@@ -372,7 +372,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  danger-dangermattic (~> 1.4.1)
+  danger-dangermattic (~> 1.4)
   faraday (~> 1.10)
   fastlane (~> 2.237)
   fastlane-plugin-firebase_app_distribution (~> 1.0)
