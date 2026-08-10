@@ -1,29 +1,26 @@
 package au.com.shiftyjelly.pocketcasts.component
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.tv.material3.Button
-import androidx.tv.material3.MaterialTheme
-import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
-import au.com.shiftyjelly.pocketcasts.theme.TvButtonDefaults
 import au.com.shiftyjelly.pocketcasts.theme.TvTheme
-import au.com.shiftyjelly.pocketcasts.theme.tvTypography
 import java.util.Date
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -62,9 +59,13 @@ private fun ColumnScope.TvEpisodeActionsModalContent(
     onShowEpisodeDetails: () -> Unit,
     onGoToPodcast: (() -> Unit)?,
 ) {
+    var pendingConfirmation by remember { mutableStateOf<TvEpisodeActionConfirmation?>(null) }
+    var returnFocusLabel by remember { mutableStateOf<String?>(null) }
     val focusRequester = remember { FocusRequester() }
-    LaunchedEffect(Unit) {
-        focusRequester.requestFocus()
+    LaunchedEffect(pendingConfirmation) {
+        if (pendingConfirmation == null) {
+            focusRequester.requestFocus()
+        }
     }
 
     val toastHostState = LocalTvToastHostState.current
@@ -96,51 +97,109 @@ private fun ColumnScope.TvEpisodeActionsModalContent(
         onDismissRequest()
     }
 
-    val buttons = tvEpisodeActionTypes(actionContext, showGoToPodcast = onGoToPodcast != null).map { button ->
-        when (button) {
-            TvEpisodeActionType.Play -> play to {
-                actions.play(episode, source)
-                onDismissRequest()
-                openNowPlaying()
-            }
+    val markPlayedTitle = stringResource(LR.string.tv_mark_played_confirmation_title)
+    val archiveTitle = stringResource(LR.string.tv_archive_confirmation_title)
+    val stopPlaybackMessage = stringResource(LR.string.tv_stop_playback_confirmation_message)
 
-            TvEpisodeActionType.Details -> episodeDetails to onShowEpisodeDetails
+    fun confirm(title: String, confirmLabel: String, onConfirm: () -> Unit): () -> Unit = {
+        pendingConfirmation = TvEpisodeActionConfirmation(title, confirmLabel, onConfirm)
+    }
 
-            TvEpisodeActionType.GoToPodcast -> goToPodcast to {
-                onGoToPodcast?.invoke()
-                onDismissRequest()
-            }
+    val confirmation = pendingConfirmation
+    if (confirmation != null) {
+        fun cancelConfirmation() {
+            returnFocusLabel = confirmation.confirmLabel
+            pendingConfirmation = null
+        }
+        BackHandler(onBack = ::cancelConfirmation)
+        TvConfirmationContent(
+            title = confirmation.title,
+            message = stopPlaybackMessage,
+            confirmLabel = confirmation.confirmLabel,
+            onConfirm = {
+                pendingConfirmation = null
+                confirmation.onConfirm()
+            },
+            onCancel = ::cancelConfirmation,
+        )
+    } else {
+        val markAsPlayed = perform(playedToast) { actions.markAsPlayed(episode) }
+        val archiveEpisode = perform(archiveToast) { actions.archive(episode) }
 
-            TvEpisodeActionType.PlayNext -> playNext to perform(playNextToast) { actions.playNext(episode, source) }
+        val buttons = tvEpisodeActionTypes(actionContext, showGoToPodcast = onGoToPodcast != null).map { button ->
+            when (button) {
+                TvEpisodeActionType.Play -> play to {
+                    actions.play(episode, source)
+                    onDismissRequest()
+                    openNowPlaying()
+                }
 
-            TvEpisodeActionType.PlayLast -> playLast to perform(playLastToast) { actions.playLast(episode, source) }
+                TvEpisodeActionType.Details -> episodeDetails to onShowEpisodeDetails
 
-            TvEpisodeActionType.RemoveFromUpNext -> removeFromUpNext to perform(removedToast) {
-                actions.removeFromUpNext(episode, source)
-            }
+                TvEpisodeActionType.GoToPodcast -> goToPodcast to {
+                    onGoToPodcast?.invoke()
+                    onDismissRequest()
+                }
 
-            TvEpisodeActionType.TogglePlayed -> playedToggle to perform(playedToast) {
-                if (episode.isFinished) actions.markAsUnplayed(episode) else actions.markAsPlayed(episode)
-            }
+                TvEpisodeActionType.PlayNext -> playNext to perform(playNextToast) { actions.playNext(episode, source) }
 
-            TvEpisodeActionType.ToggleArchived -> archiveToggle to perform(archiveToast) {
-                if (episode.isArchived) actions.unarchive(episode) else actions.archive(episode)
+                TvEpisodeActionType.PlayLast -> playLast to perform(playLastToast) { actions.playLast(episode, source) }
+
+                TvEpisodeActionType.RemoveFromUpNext -> removeFromUpNext to perform(removedToast) {
+                    actions.removeFromUpNext(episode, source)
+                }
+
+                TvEpisodeActionType.TogglePlayed -> playedToggle to when {
+                    episode.isFinished -> perform(playedToast) { actions.markAsUnplayed(episode) }
+
+                    tvEpisodeActionRequiresConfirmation(actionContext, button, episode) ->
+                        confirm(markPlayedTitle, playedToggle, markAsPlayed)
+
+                    else -> markAsPlayed
+                }
+
+                TvEpisodeActionType.ToggleArchived -> archiveToggle to when {
+                    episode.isArchived -> perform(archiveToast) { actions.unarchive(episode) }
+
+                    tvEpisodeActionRequiresConfirmation(actionContext, button, episode) ->
+                        confirm(archiveTitle, archiveToggle, archiveEpisode)
+
+                    else -> archiveEpisode
+                }
             }
         }
-    }
 
-    buttons.forEachIndexed { index, (label, onClick) ->
-        TvEpisodeActionButton(
-            text = label,
-            onClick = onClick,
-            modifier = if (index == 0) Modifier.focusRequester(focusRequester) else Modifier,
+        val focusLabel = returnFocusLabel?.takeIf { wanted -> buttons.any { it.first == wanted } }
+        buttons.forEachIndexed { index, (label, onClick) ->
+            val isInitialFocus = if (focusLabel != null) label == focusLabel else index == 0
+            TvModalButton(
+                text = label,
+                onClick = onClick,
+                modifier = if (isInitialFocus) Modifier.focusRequester(focusRequester) else Modifier,
+            )
+        }
+
+        TvModalButton(
+            text = stringResource(LR.string.cancel),
+            onClick = onDismissRequest,
         )
     }
+}
 
-    TvEpisodeActionButton(
-        text = stringResource(LR.string.cancel),
-        onClick = onDismissRequest,
-    )
+private class TvEpisodeActionConfirmation(
+    val title: String,
+    val confirmLabel: String,
+    val onConfirm: () -> Unit,
+)
+
+internal fun tvEpisodeActionRequiresConfirmation(
+    actionContext: TvEpisodeActionContext,
+    type: TvEpisodeActionType,
+    episode: PodcastEpisode,
+): Boolean = actionContext == TvEpisodeActionContext.NowPlaying && when (type) {
+    TvEpisodeActionType.TogglePlayed -> !episode.isFinished
+    TvEpisodeActionType.ToggleArchived -> !episode.isArchived
+    else -> false
 }
 
 internal enum class TvEpisodeActionType {
@@ -174,25 +233,6 @@ internal fun tvEpisodeActionTypes(
     } else {
         add(TvEpisodeActionType.TogglePlayed)
         add(TvEpisodeActionType.ToggleArchived)
-    }
-}
-
-@Composable
-private fun TvEpisodeActionButton(
-    text: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Button(
-        onClick = onClick,
-        colors = TvButtonDefaults.filledButtonColors(),
-        modifier = modifier.fillMaxWidth(),
-    ) {
-        Text(
-            text = text,
-            style = MaterialTheme.tvTypography.caption1.copy(textAlign = TextAlign.Center),
-            modifier = Modifier.fillMaxWidth(),
-        )
     }
 }
 

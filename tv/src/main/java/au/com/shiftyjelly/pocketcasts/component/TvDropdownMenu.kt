@@ -7,10 +7,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -46,6 +49,7 @@ fun TvDropdownMenu(
     modifier: Modifier = Modifier,
     title: String? = null,
     width: Dp = DefaultMenuWidth,
+    maxHeight: Dp? = null,
     alignment: Alignment = Alignment.TopEnd,
     offset: DpOffset = DpOffset(x = 0.dp, y = 48.dp),
     content: @Composable ColumnScope.() -> Unit,
@@ -62,6 +66,7 @@ fun TvDropdownMenu(
         TvDropdownMenuSurface(
             title = title,
             width = width,
+            maxHeight = maxHeight,
             modifier = modifier,
             content = content,
         )
@@ -73,6 +78,7 @@ internal fun TvDropdownMenuSurface(
     modifier: Modifier = Modifier,
     title: String? = null,
     width: Dp = DefaultMenuWidth,
+    maxHeight: Dp? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Column(
@@ -84,15 +90,32 @@ internal fun TvDropdownMenuSurface(
             .padding(horizontal = 20.dp, vertical = 12.dp),
     ) {
         if (title != null) {
-            Text(
-                text = title,
-                style = MaterialTheme.tvTypography.caption2,
-                color = MaterialTheme.tvColors.textSecondary,
-                modifier = Modifier.padding(start = 16.dp, top = 4.dp, bottom = 8.dp),
-            )
+            TvDropdownMenuSectionTitle(text = title)
         }
-        content()
+        if (maxHeight != null) {
+            Column(
+                modifier = Modifier
+                    .heightIn(max = maxHeight)
+                    .verticalScroll(rememberScrollState()),
+                content = content,
+            )
+        } else {
+            content()
+        }
     }
+}
+
+@Composable
+fun TvDropdownMenuSectionTitle(
+    text: String,
+    modifier: Modifier = Modifier,
+) {
+    Text(
+        text = text,
+        style = MaterialTheme.tvTypography.caption2,
+        color = MaterialTheme.tvColors.textSecondary,
+        modifier = modifier.padding(start = 16.dp, top = 4.dp, bottom = 8.dp),
+    )
 }
 
 @Composable
@@ -101,8 +124,9 @@ fun TvDropdownMenuItem(
     isSelected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    requestInitialFocus: Boolean = isSelected,
 ) {
-    val focusModifier = if (isSelected) {
+    val focusModifier = if (requestInitialFocus) {
         val focusRequester = remember { FocusRequester() }
         LaunchedEffect(Unit) {
             focusRequester.requestFocus()
