@@ -237,7 +237,7 @@ class TvNowPlayingViewModelTest {
 
     @Test
     fun `a speed change without a podcast override saves global effects`() = runTest {
-        playbackStates.value = PlaybackState(trimMode = TrimMode.LOW, isVolumeBoosted = true)
+        playbackStates.value = PlaybackState(episodeUuid = audioEpisode.uuid, trimMode = TrimMode.LOW, isVolumeBoosted = true)
         whenever(playbackManager.getCurrentEpisode()).thenReturn(audioEpisode)
         whenever(podcastManager.findPodcastByUuid(audioEpisode.podcastUuid)).thenReturn(Podcast(uuid = "podcast"))
 
@@ -252,6 +252,7 @@ class TvNowPlayingViewModelTest {
     @Test
     fun `a speed change with a podcast override saves the podcast effects`() = runTest {
         val podcast = Podcast(uuid = "podcast", overrideGlobalEffects = true)
+        playbackStates.value = PlaybackState(episodeUuid = audioEpisode.uuid)
         whenever(playbackManager.getCurrentEpisode()).thenReturn(audioEpisode)
         whenever(podcastManager.findPodcastByUuid(audioEpisode.podcastUuid)).thenReturn(podcast)
 
@@ -265,7 +266,9 @@ class TvNowPlayingViewModelTest {
 
     @Test
     fun `a user episode saves global effects without a podcast lookup`() = runTest {
-        whenever(playbackManager.getCurrentEpisode()).thenReturn(UserEpisode(uuid = "user", publishedDate = Date(0)))
+        val userEpisode = UserEpisode(uuid = "user", publishedDate = Date(0))
+        playbackStates.value = PlaybackState(episodeUuid = userEpisode.uuid)
+        whenever(playbackManager.getCurrentEpisode()).thenReturn(userEpisode)
 
         viewModel.setTrimMode(TrimMode.HIGH)
         runCurrent()
@@ -277,7 +280,8 @@ class TvNowPlayingViewModelTest {
 
     @Test
     fun `setting volume boost keeps the other effects`() = runTest {
-        playbackStates.value = PlaybackState(playbackSpeed = 1.5, trimMode = TrimMode.LOW)
+        playbackStates.value = PlaybackState(episodeUuid = audioEpisode.uuid, playbackSpeed = 1.5, trimMode = TrimMode.LOW)
+        whenever(playbackManager.getCurrentEpisode()).thenReturn(audioEpisode)
 
         viewModel.setVolumeBoost(true)
         runCurrent()
@@ -287,6 +291,9 @@ class TvNowPlayingViewModelTest {
 
     @Test
     fun `rapid effect changes build on the pending value`() = runTest {
+        playbackStates.value = PlaybackState(episodeUuid = audioEpisode.uuid)
+        whenever(playbackManager.getCurrentEpisode()).thenReturn(audioEpisode)
+
         viewModel.setPlaybackSpeed(1.5)
         viewModel.setVolumeBoost(true)
         runCurrent()
@@ -296,15 +303,31 @@ class TvNowPlayingViewModelTest {
 
     @Test
     fun `pending effects are dropped once the playback state reflects them`() = runTest {
+        playbackStates.value = PlaybackState(episodeUuid = audioEpisode.uuid)
+        whenever(playbackManager.getCurrentEpisode()).thenReturn(audioEpisode)
+
         viewModel.setPlaybackSpeed(1.5)
         runCurrent()
-        playbackStates.value = PlaybackState(playbackSpeed = 1.5)
-        playbackStates.value = PlaybackState(playbackSpeed = 2.0)
+        playbackStates.value = PlaybackState(episodeUuid = audioEpisode.uuid, playbackSpeed = 1.5)
+        playbackStates.value = PlaybackState(episodeUuid = audioEpisode.uuid, playbackSpeed = 2.0)
 
         viewModel.setVolumeBoost(true)
         runCurrent()
 
         verify(playbackManager).updatePlayerEffects(effectsWith(2.0, TrimMode.OFF, true))
+    }
+
+    @Test
+    fun `an effect change is ignored while the playback state lags behind an episode switch`() = runTest {
+        playbackStates.value = PlaybackState(episodeUuid = "previous")
+        whenever(playbackManager.getCurrentEpisode()).thenReturn(audioEpisode)
+
+        viewModel.setPlaybackSpeed(2.0)
+        runCurrent()
+
+        verify(playbackManager, never()).updatePlayerEffects(any())
+        verifyNoInteractions(podcastManager)
+        verify(globalPlaybackEffectsSetting, never()).set(any(), any(), any(), any())
     }
 
     private fun effectsWith(speed: Double, trimMode: TrimMode, isVolumeBoosted: Boolean) = argThat<PlaybackEffects> {

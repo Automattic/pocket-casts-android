@@ -103,6 +103,12 @@ class TvNowPlayingViewModel @Inject constructor(
         viewModelScope.launch(ioDispatcher) {
             effectsMutex.withLock {
                 val playbackState = playbackManager.playbackStateFlow.first()
+                val currentEpisode = playbackManager.getCurrentEpisode()
+                // Skip the write while the playback state still points at the previous episode, so a
+                // stale snapshot cannot be persisted onto the episode that is now current.
+                if (currentEpisode == null || playbackState.episodeUuid != currentEpisode.uuid) {
+                    return@withLock
+                }
                 val stateEffects = PlaybackEffectsData(
                     playbackSpeed = playbackState.playbackSpeed,
                     trimMode = playbackState.trimMode,
@@ -113,7 +119,7 @@ class TvNowPlayingViewModel @Inject constructor(
                 pendingEffects = updatedEffects
                 pendingEffectsBaseline = stateEffects
                 val effects = updatedEffects.toEffects()
-                val podcast = (playbackManager.getCurrentEpisode() as? PodcastEpisode)
+                val podcast = (currentEpisode as? PodcastEpisode)
                     ?.let { podcastManager.findPodcastByUuid(it.podcastUuid) }
                 if (podcast != null && podcast.overrideGlobalEffects) {
                     podcastManager.updateEffectsBlocking(podcast, effects)
