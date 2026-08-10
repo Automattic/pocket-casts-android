@@ -30,10 +30,8 @@ fun TvVideoSurface(
             view.onAspectRatioChanged = { ratio -> aspectRatio = ratio }
             view.onFirstFrameRender = onFirstFrameRender
             view.onVideoReset = onVideoReset
-            if (view.player !== player) {
-                view.player = player
-                view.connectWithDelay()
-            }
+            view.player = player
+            view.connectWithDelay()
         },
         onRelease = { view -> view.releaseSurface() },
         modifier = modifier.aspectRatio(aspectRatio),

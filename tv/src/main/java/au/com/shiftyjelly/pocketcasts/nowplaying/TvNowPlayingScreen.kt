@@ -169,6 +169,8 @@ private fun TvNowPlayingContent(
     var isEffectsMenuVisible by remember { mutableStateOf(false) }
     var isChromeVisible by remember { mutableStateOf(true) }
     var hasRenderedFirstFrame by remember(state.episode.uuid, state.isVideo) { mutableStateOf(false) }
+    val onFirstFrameRender = remember(state.episode.uuid, state.isVideo) { { hasRenderedFirstFrame = true } }
+    val onVideoReset = remember(state.episode.uuid, state.isVideo) { { hasRenderedFirstFrame = false } }
     var interactionTick by remember { mutableIntStateOf(0) }
     var isContentFocused by remember { mutableStateOf(false) }
     var isTopBarRevealRequested by remember { mutableStateOf(false) }
@@ -245,8 +247,8 @@ private fun TvNowPlayingContent(
             if (state.isVideo) {
                 TvVideoSurface(
                     player = state.player,
-                    onFirstFrameRender = { hasRenderedFirstFrame = true },
-                    onVideoReset = { hasRenderedFirstFrame = false },
+                    onFirstFrameRender = onFirstFrameRender,
+                    onVideoReset = onVideoReset,
                 )
             } else {
                 EpisodeArtwork(
@@ -271,9 +273,6 @@ private fun TvNowPlayingContent(
                 ) {
                     EpisodeArtwork(
                         episode = episode,
-                        isPlaying = state.isPlaying && !state.isBuffering,
-                        player = state.player,
-                        audioLevel = { state.player?.currentAudioLevel ?: 0f },
                         showWaveform = false,
                     )
                 }
@@ -365,10 +364,10 @@ private fun TvNowPlayingContent(
 @Composable
 private fun EpisodeArtwork(
     episode: BaseEpisode,
-    isPlaying: Boolean,
-    player: Player?,
-    audioLevel: () -> Float,
     modifier: Modifier = Modifier,
+    isPlaying: Boolean = false,
+    player: Player? = null,
+    audioLevel: () -> Float = { 0f },
     showWaveform: Boolean = true,
 ) {
     Box(
