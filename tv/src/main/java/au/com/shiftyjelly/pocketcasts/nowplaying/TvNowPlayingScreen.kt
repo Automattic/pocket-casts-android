@@ -296,7 +296,7 @@ private fun TvNowPlayingContent(
                     text = errorMessage,
                     style = MaterialTheme.tvTypography.caption1,
                     color = MaterialTheme.tvColors.textSecondary,
-                    textAlign = TextAlign.Center,
+                    textAlign = TextAlign.Start,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 16.dp),
