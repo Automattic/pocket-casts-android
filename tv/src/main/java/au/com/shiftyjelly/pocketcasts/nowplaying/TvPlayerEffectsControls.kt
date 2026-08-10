@@ -12,15 +12,12 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.Icon
 import androidx.tv.material3.IconButton
-import androidx.tv.material3.MaterialTheme
-import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.component.LocalTvToastHostState
 import au.com.shiftyjelly.pocketcasts.component.TvDropdownMenu
 import au.com.shiftyjelly.pocketcasts.component.TvDropdownMenuItem
 import au.com.shiftyjelly.pocketcasts.component.TvDropdownMenuSectionTitle
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.theme.TvButtonDefaults
-import au.com.shiftyjelly.pocketcasts.theme.tvTypography
 import au.com.shiftyjelly.pocketcasts.utils.extensions.roundedSpeed
 import java.util.Locale
 import kotlin.math.abs
@@ -53,9 +50,10 @@ internal fun TvPlaybackSpeedButton(
             colors = TvButtonDefaults.controlBarIconButtonColors(),
             modifier = Modifier.size(TvControlBarButtonSize),
         ) {
-            Text(
-                text = playbackSpeedLabel(currentSpeed, locale),
-                style = MaterialTheme.tvTypography.caption1,
+            Icon(
+                painter = painterResource(IR.drawable.ic_effects_off),
+                contentDescription = stringResource(LR.string.playback_speed),
+                modifier = Modifier.size(TvControlBarIconSize),
             )
         }
         if (isMenuVisible) {
@@ -100,7 +98,6 @@ internal fun TvPlayerEffectsButton(
     onSelectTrimMode: (TrimMode) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val isEffectsOn = isVolumeBoosted || trimMode != TrimMode.OFF
     Box(modifier = modifier) {
         IconButton(
             onClick = { onMenuVisibleChange(true) },
@@ -108,7 +105,7 @@ internal fun TvPlayerEffectsButton(
             modifier = Modifier.size(TvControlBarButtonSize),
         ) {
             Icon(
-                painter = painterResource(if (isEffectsOn) IR.drawable.ic_effects_on else IR.drawable.ic_effects_off),
+                painter = painterResource(IR.drawable.ic_player_effects),
                 contentDescription = stringResource(LR.string.player_effects),
                 modifier = Modifier.size(TvControlBarIconSize),
             )
