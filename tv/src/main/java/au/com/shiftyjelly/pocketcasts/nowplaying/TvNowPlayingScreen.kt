@@ -238,12 +238,15 @@ private fun TvNowPlayingContent(
     ) {
         Box(
             contentAlignment = Alignment.Center,
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .then(if (state.isVideo) Modifier.background(Color.Black) else Modifier),
         ) {
             if (state.isVideo) {
                 TvVideoSurface(
                     player = state.player,
                     onFirstFrameRender = { hasRenderedFirstFrame = true },
+                    onVideoReset = { hasRenderedFirstFrame = false },
                 )
             } else {
                 EpisodeArtwork(
@@ -271,6 +274,7 @@ private fun TvNowPlayingContent(
                         isPlaying = state.isPlaying && !state.isBuffering,
                         player = state.player,
                         audioLevel = { state.player?.currentAudioLevel ?: 0f },
+                        showWaveform = false,
                     )
                 }
             }
@@ -287,8 +291,6 @@ private fun TvNowPlayingContent(
             EpisodeTitles(
                 episode = episode,
                 podcastTitle = state.podcastTitle,
-                textAlign = TextAlign.Start,
-                horizontalAlignment = Alignment.Start,
             )
             Spacer(modifier = Modifier.height(16.dp))
             state.errorMessage?.let { errorMessage ->
@@ -367,18 +369,21 @@ private fun EpisodeArtwork(
     player: Player?,
     audioLevel: () -> Float,
     modifier: Modifier = Modifier,
+    showWaveform: Boolean = true,
 ) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier,
     ) {
-        TvNowPlayingWaveform(
-            isPlaying = isPlaying,
-            episodeUuid = episode.uuid,
-            player = player,
-            audioLevel = audioLevel,
-            artworkSize = ArtworkSize,
-        )
+        if (showWaveform) {
+            TvNowPlayingWaveform(
+                isPlaying = isPlaying,
+                episodeUuid = episode.uuid,
+                player = player,
+                audioLevel = audioLevel,
+                artworkSize = ArtworkSize,
+            )
+        }
         TvArtworkImage(
             model = episode.artworkModel(),
             modifier = Modifier
@@ -400,19 +405,17 @@ private fun EpisodeArtwork(
 private fun EpisodeTitles(
     episode: BaseEpisode,
     podcastTitle: String?,
-    textAlign: TextAlign,
-    horizontalAlignment: Alignment.Horizontal,
     modifier: Modifier = Modifier,
 ) {
     Column(
-        horizontalAlignment = horizontalAlignment,
+        horizontalAlignment = Alignment.Start,
         modifier = modifier,
     ) {
         Text(
             text = episode.title,
             style = MaterialTheme.tvTypography.title3,
             color = MaterialTheme.tvColors.textPrimary,
-            textAlign = textAlign,
+            textAlign = TextAlign.Start,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
         )
@@ -422,7 +425,7 @@ private fun EpisodeTitles(
                 text = podcastTitle,
                 style = MaterialTheme.tvTypography.caption1,
                 color = MaterialTheme.tvColors.textSecondary,
-                textAlign = textAlign,
+                textAlign = TextAlign.Start,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
@@ -569,17 +572,17 @@ private fun BaseEpisode.artworkModel(): Any? = when (this) {
 @Preview(device = Devices.TV_1080p)
 @Composable
 private fun TvNowPlayingContentPreview() {
-    TvNowPlayingContentPreview(isVideo = false)
+    TvNowPlayingContentPreviewContent(isVideo = false)
 }
 
 @Preview(device = Devices.TV_1080p)
 @Composable
 private fun TvNowPlayingVideoContentPreview() {
-    TvNowPlayingContentPreview(isVideo = true)
+    TvNowPlayingContentPreviewContent(isVideo = true)
 }
 
 @Composable
-private fun TvNowPlayingContentPreview(isVideo: Boolean) {
+private fun TvNowPlayingContentPreviewContent(isVideo: Boolean) {
     TvTheme {
         CompositionLocalProvider(LocalFocusTvTopBar provides {}) {
             TvNowPlayingContent(

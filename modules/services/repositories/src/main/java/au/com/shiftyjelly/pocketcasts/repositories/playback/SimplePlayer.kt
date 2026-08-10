@@ -70,6 +70,7 @@ class SimplePlayer(
     override val currentAudioLevel: Float get() = renderersFactory?.currentAudioLevel ?: 0f
 
     private var videoChangedListener: VideoChangedListener? = null
+    private val mainHandler = Handler(Looper.getMainLooper())
 
     @Volatile
     private var prepared = false
@@ -337,13 +338,13 @@ class SimplePlayer(
                 }
 
                 videoChangedListener?.let {
-                    Handler(Looper.getMainLooper()).post { it.videoSizeChanged(videoSize.width, videoSize.height, videoSize.pixelWidthHeightRatio) }
+                    mainHandler.post { it.videoSizeChanged(videoSize.width, videoSize.height, videoSize.pixelWidthHeightRatio) }
                 }
             }
 
             override fun onRenderedFirstFrame() {
                 videoChangedListener?.let {
-                    Handler(Looper.getMainLooper()).post { it.videoFirstFrameRendered() }
+                    mainHandler.post { it.videoFirstFrameRendered() }
                 }
             }
         })
@@ -378,7 +379,7 @@ class SimplePlayer(
     interface VideoChangedListener {
         fun videoSizeChanged(width: Int, height: Int, pixelWidthHeightRatio: Float)
         fun videoNeedsReset()
-        fun videoFirstFrameRendered() = Unit
+        fun videoFirstFrameRendered()
     }
 
     fun setVideoSizeChangedListener(videoChangedListener: VideoChangedListener) {

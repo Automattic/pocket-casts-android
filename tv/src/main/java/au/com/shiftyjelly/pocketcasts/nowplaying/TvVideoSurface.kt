@@ -20,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 fun TvVideoSurface(
     player: Player?,
     onFirstFrameRender: () -> Unit,
+    onVideoReset: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var aspectRatio by remember { mutableFloatStateOf(DEFAULT_ASPECT_RATIO) }
@@ -28,8 +29,11 @@ fun TvVideoSurface(
         update = { view ->
             view.onAspectRatioChanged = { ratio -> aspectRatio = ratio }
             view.onFirstFrameRender = onFirstFrameRender
-            view.player = player
-            view.connectWithDelay()
+            view.onVideoReset = onVideoReset
+            if (view.player !== player) {
+                view.player = player
+                view.connectWithDelay()
+            }
         },
         onRelease = { view -> view.releaseSurface() },
         modifier = modifier.aspectRatio(aspectRatio),
@@ -49,6 +53,7 @@ private class TvVideoView(
     var player: Player? = null
     var onAspectRatioChanged: ((Float) -> Unit)? = null
     var onFirstFrameRender: (() -> Unit)? = null
+    var onVideoReset: (() -> Unit)? = null
 
     private var isSurfaceCreated = false
     private var isSurfaceConnectionPending = false
@@ -113,6 +118,7 @@ private class TvVideoView(
 
     override fun videoNeedsReset() {
         isSurfaceConnected = false
+        post { onVideoReset?.invoke() }
     }
 
     override fun videoFirstFrameRendered() {
