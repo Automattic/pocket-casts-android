@@ -1,5 +1,8 @@
 8.19
 -----
+*   Bug Fixes
+    *   Fix audio stuttering when playing video episodes at high speed in the background
+        ([#5707](https://github.com/Automattic/pocket-casts-android/pull/5707))
 
 
 8.18
