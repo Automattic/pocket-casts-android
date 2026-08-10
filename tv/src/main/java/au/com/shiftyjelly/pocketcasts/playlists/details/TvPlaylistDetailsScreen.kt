@@ -100,6 +100,7 @@ fun TvPlaylistDetailsScreen(
             when (event) {
                 TvPlaylistDetailsEvent.OpenNowPlaying -> openNowPlaying()
                 TvPlaylistDetailsEvent.ShowReplaceUpNextConfirmation -> isReplaceUpNextConfirmationVisible = true
+                TvPlaylistDetailsEvent.ShowUpNextSavedToast -> toastHostState.show(savedToast)
             }
         }
     }
@@ -131,7 +132,6 @@ fun TvPlaylistDetailsScreen(
             },
             onSaveAndPlay = {
                 isReplaceUpNextConfirmationVisible = false
-                toastHostState.show(savedToast)
                 viewModel.replaceUpNextAndPlay(saveUpNext = true, upNextName = upNextName)
             },
             onCancel = { isReplaceUpNextConfirmationVisible = false },

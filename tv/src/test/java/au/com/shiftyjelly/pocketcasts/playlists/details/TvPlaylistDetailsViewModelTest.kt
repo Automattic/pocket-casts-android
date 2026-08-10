@@ -193,6 +193,7 @@ class TvPlaylistDetailsViewModelTest {
 
         viewModel.events.test {
             viewModel.replaceUpNextAndPlay(saveUpNext = true, upNextName = "Up Next")
+            assertEquals(TvPlaylistDetailsEvent.ShowUpNextSavedToast, awaitItem())
             assertEquals(TvPlaylistDetailsEvent.OpenNowPlaying, awaitItem())
         }
 

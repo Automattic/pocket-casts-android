@@ -19,17 +19,18 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.WhileSubscribed
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @HiltViewModel(assistedFactory = TvPlaylistDetailsViewModel.Factory::class)
 class TvPlaylistDetailsViewModel @AssistedInject constructor(
@@ -42,10 +43,11 @@ class TvPlaylistDetailsViewModel @AssistedInject constructor(
 
     private val playAllHandler = playAllHandlerFactory.create(SourceView.FILTERS)
 
-    private val _events = MutableSharedFlow<TvPlaylistDetailsEvent>(extraBufferCapacity = 1)
-    val events: SharedFlow<TvPlaylistDetailsEvent> = _events.asSharedFlow()
+    private val _events = Channel<TvPlaylistDetailsEvent>(Channel.BUFFERED)
+    val events: Flow<TvPlaylistDetailsEvent> = _events.receiveAsFlow()
 
     private var playAllJob: Job? = null
+    private var replaceUpNextJob: Job? = null
 
     private val playlistFlow: Flow<Playlist?> = when (playlistType) {
         Playlist.Type.Manual -> playlistManager.manualPlaylistFlow(playlistUuid, includeArchived = true)
@@ -93,20 +95,28 @@ class TvPlaylistDetailsViewModel @AssistedInject constructor(
         playAllJob = viewModelScope.launch {
             val episodes = (uiState.value as? TvPlaylistDetailsUiState.Loaded)?.episodes.orEmpty()
             when (playAllHandler.handlePlayAllEpisodes(episodes)) {
-                PlayAllResponse.DoNothing -> _events.emit(TvPlaylistDetailsEvent.OpenNowPlaying)
-                PlayAllResponse.ShowWarning -> _events.emit(TvPlaylistDetailsEvent.ShowReplaceUpNextConfirmation)
+                PlayAllResponse.DoNothing -> _events.send(TvPlaylistDetailsEvent.OpenNowPlaying)
+                PlayAllResponse.ShowWarning -> _events.send(TvPlaylistDetailsEvent.ShowReplaceUpNextConfirmation)
                 PlayAllResponse.ShowNoEpisodesToPlay -> Unit
             }
         }
     }
 
     fun replaceUpNextAndPlay(saveUpNext: Boolean, upNextName: String) {
-        viewModelScope.launch {
-            if (saveUpNext) {
-                playAllHandler.saveUpNextAsPlaylist(upNextName)
+        if (replaceUpNextJob?.isActive == true) {
+            return
+        }
+        replaceUpNextJob = viewModelScope.launch {
+            withContext(NonCancellable) {
+                if (saveUpNext) {
+                    playAllHandler.saveUpNextAsPlaylist(upNextName)
+                }
+                playAllHandler.playAllPendingEpisodes()
             }
-            playAllHandler.playAllPendingEpisodes()
-            _events.emit(TvPlaylistDetailsEvent.OpenNowPlaying)
+            if (saveUpNext) {
+                _events.send(TvPlaylistDetailsEvent.ShowUpNextSavedToast)
+            }
+            _events.send(TvPlaylistDetailsEvent.OpenNowPlaying)
         }
     }
 
@@ -120,6 +130,8 @@ sealed interface TvPlaylistDetailsEvent {
     data object OpenNowPlaying : TvPlaylistDetailsEvent
 
     data object ShowReplaceUpNextConfirmation : TvPlaylistDetailsEvent
+
+    data object ShowUpNextSavedToast : TvPlaylistDetailsEvent
 }
 
 sealed interface TvPlaylistDetailsUiState {
