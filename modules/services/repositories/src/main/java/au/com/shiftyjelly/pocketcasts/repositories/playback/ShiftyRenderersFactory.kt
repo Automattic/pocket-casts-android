@@ -102,6 +102,9 @@ class ShiftyRenderersFactory(
     }
 
     companion object {
+        // The platform's ~250ms minimum PCM buffer underruns under transient load and (since media3 1.8.0)
+        // flips playback into STATE_BUFFERING. 500ms matches the media3 1.11.0 default and can be dropped
+        // once we bump to it. https://github.com/androidx/media/issues/3210
         private const val MIN_PCM_BUFFER_DURATION_US = 500_000
     }
 }
