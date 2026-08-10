@@ -23,6 +23,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
@@ -48,7 +50,9 @@ fun TvSeekBar(
     bufferedMs: Int,
     onSkipBack: () -> Unit,
     onSkipForward: () -> Unit,
+    onPlayPause: () -> Unit,
     modifier: Modifier = Modifier,
+    focusRequester: FocusRequester? = null,
 ) {
     var isFocused by remember { mutableStateOf(false) }
     val hasDuration = durationMs > 0
@@ -68,7 +72,14 @@ fun TvSeekBar(
                 }
                 .onKeyEvent { event ->
                     when {
-                        event.type != KeyEventType.KeyDown || !hasDuration -> false
+                        event.type != KeyEventType.KeyDown -> false
+
+                        event.key == Key.DirectionCenter || event.key == Key.Enter -> {
+                            onPlayPause()
+                            true
+                        }
+
+                        !hasDuration -> false
 
                         event.key == Key.DirectionLeft -> {
                             onSkipBack()
@@ -83,6 +94,7 @@ fun TvSeekBar(
                         else -> false
                     }
                 }
+                .then(focusRequester?.let { Modifier.focusRequester(it) } ?: Modifier)
                 .focusable(),
         ) {
             val thumbSize = 12.dp
@@ -151,6 +163,7 @@ private fun TvSeekBarPreview() {
             bufferedMs = 1_200_000,
             onSkipBack = {},
             onSkipForward = {},
+            onPlayPause = {},
         )
     }
 }

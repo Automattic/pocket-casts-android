@@ -309,6 +309,7 @@ private fun TvNowPlayingContent(
                 bufferedMs = state.bufferedMs,
                 onSkipBack = onSkipBackward,
                 onSkipForward = onSkipForward,
+                onPlayPause = onPlayPause,
                 modifier = Modifier.fillMaxWidth(),
             )
             Spacer(modifier = Modifier.height(16.dp))
