@@ -64,10 +64,9 @@ class TvEpisodeActionTypeTest {
 
         assertEquals(
             listOf(
-                TvEpisodeActionType.Details,
-                TvEpisodeActionType.GoToPodcast,
                 TvEpisodeActionType.TogglePlayed,
                 TvEpisodeActionType.ToggleArchived,
+                TvEpisodeActionType.GoToPodcast,
             ),
             actions,
         )

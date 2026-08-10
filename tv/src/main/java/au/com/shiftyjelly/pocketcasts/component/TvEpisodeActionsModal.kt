@@ -217,17 +217,21 @@ internal fun tvEpisodeActionTypes(
     actionContext: TvEpisodeActionContext,
     showGoToPodcast: Boolean,
 ): List<TvEpisodeActionType> = buildList {
-    if (actionContext != TvEpisodeActionContext.NowPlaying) {
-        add(TvEpisodeActionType.Play)
+    if (actionContext == TvEpisodeActionContext.NowPlaying) {
+        add(TvEpisodeActionType.TogglePlayed)
+        add(TvEpisodeActionType.ToggleArchived)
+        if (showGoToPodcast) {
+            add(TvEpisodeActionType.GoToPodcast)
+        }
+        return@buildList
     }
+    add(TvEpisodeActionType.Play)
     add(TvEpisodeActionType.Details)
     if (showGoToPodcast) {
         add(TvEpisodeActionType.GoToPodcast)
     }
-    if (actionContext != TvEpisodeActionContext.NowPlaying) {
-        add(TvEpisodeActionType.PlayNext)
-        add(TvEpisodeActionType.PlayLast)
-    }
+    add(TvEpisodeActionType.PlayNext)
+    add(TvEpisodeActionType.PlayLast)
     if (actionContext == TvEpisodeActionContext.UpNext) {
         add(TvEpisodeActionType.RemoveFromUpNext)
     } else {
