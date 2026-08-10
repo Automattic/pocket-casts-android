@@ -230,8 +230,8 @@ private fun TvNowPlayingContent(
                 if (revealsChrome) {
                     isChromeVisible = true
                 }
-                // Only navigation presses are swallowed by the reveal; media keys keep their
-                // effect even while the chrome is hidden and back is revealed via BackHandler.
+                // Directional presses only wake the chrome; OK falls through so play/pause still
+                // fires on the same press once the scrubber is revealed.
                 revealsChrome && event.key in chromeRevealConsumedKeys
             },
     ) {
@@ -520,8 +520,6 @@ private val chromeRevealConsumedKeys = setOf(
     Key.DirectionDown,
     Key.DirectionLeft,
     Key.DirectionRight,
-    Key.DirectionCenter,
-    Key.Enter,
 )
 
 private fun BaseEpisode.artworkModel(): Any? = when (this) {
