@@ -318,6 +318,22 @@ class TvNowPlayingViewModelTest {
     }
 
     @Test
+    fun `pending effects are dropped when the episode changes`() = runTest {
+        playbackStates.value = PlaybackState(episodeUuid = audioEpisode.uuid)
+        whenever(playbackManager.getCurrentEpisode()).thenReturn(audioEpisode)
+        viewModel.setPlaybackSpeed(1.5)
+        runCurrent()
+
+        val nextEpisode = PodcastEpisode(uuid = "next", publishedDate = Date(0))
+        playbackStates.value = PlaybackState(episodeUuid = nextEpisode.uuid)
+        whenever(playbackManager.getCurrentEpisode()).thenReturn(nextEpisode)
+        viewModel.setVolumeBoost(true)
+        runCurrent()
+
+        verify(playbackManager).updatePlayerEffects(effectsWith(1.0, TrimMode.OFF, true))
+    }
+
+    @Test
     fun `an effect change is ignored while the playback state lags behind an episode switch`() = runTest {
         playbackStates.value = PlaybackState(episodeUuid = "previous")
         whenever(playbackManager.getCurrentEpisode()).thenReturn(audioEpisode)

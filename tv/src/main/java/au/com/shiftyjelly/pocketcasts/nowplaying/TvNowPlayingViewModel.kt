@@ -98,6 +98,7 @@ class TvNowPlayingViewModel @Inject constructor(
     private val effectsMutex = Mutex()
     private var pendingEffects: PlaybackEffectsData? = null
     private var pendingEffectsBaseline: PlaybackEffectsData? = null
+    private var pendingEffectsEpisodeUuid: String? = null
 
     private fun updateEffects(update: (PlaybackEffectsData) -> PlaybackEffectsData) {
         viewModelScope.launch(ioDispatcher) {
@@ -114,10 +115,13 @@ class TvNowPlayingViewModel @Inject constructor(
                     trimMode = playbackState.trimMode,
                     isVolumeBoosted = playbackState.isVolumeBoosted,
                 )
-                val baseEffects = pendingEffects?.takeIf { stateEffects == pendingEffectsBaseline } ?: stateEffects
+                val baseEffects = pendingEffects
+                    ?.takeIf { pendingEffectsEpisodeUuid == currentEpisode.uuid && stateEffects == pendingEffectsBaseline }
+                    ?: stateEffects
                 val updatedEffects = update(baseEffects)
                 pendingEffects = updatedEffects
                 pendingEffectsBaseline = stateEffects
+                pendingEffectsEpisodeUuid = currentEpisode.uuid
                 val effects = updatedEffects.toEffects()
                 val podcast = (currentEpisode as? PodcastEpisode)
                     ?.let { podcastManager.findPodcastByUuid(it.podcastUuid) }
