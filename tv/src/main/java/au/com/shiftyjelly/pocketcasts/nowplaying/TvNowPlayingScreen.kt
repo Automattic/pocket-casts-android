@@ -253,6 +253,7 @@ private fun TvNowPlayingContent(
                     isPlaying = state.isPlaying && !state.isBuffering,
                     player = state.player,
                     audioLevel = { state.player?.currentAudioLevel ?: 0f },
+                    modifier = Modifier.offset(y = -ArtworkTopLift),
                 )
             }
         }
@@ -425,10 +426,10 @@ private fun EpisodeTitles(
         }
         Text(
             text = episode.title,
-            style = MaterialTheme.tvTypography.title2,
+            style = MaterialTheme.tvTypography.headline,
             color = MaterialTheme.tvColors.textPrimary,
             textAlign = TextAlign.Start,
-            maxLines = 2,
+            maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
     }
@@ -477,6 +478,7 @@ private fun ControlBar(
                 onClick = onOpenActions,
                 buttonSize = TvControlBarButtonSize,
                 iconSize = TvControlBarIconSize,
+                colors = TvButtonDefaults.controlBarIconButtonColors(),
             )
         }
     }
@@ -489,7 +491,7 @@ private fun InfoButton(
 ) {
     IconButton(
         onClick = onClick,
-        colors = TvButtonDefaults.iconButtonColors(),
+        colors = TvButtonDefaults.controlBarIconButtonColors(),
         modifier = modifier.size(TvControlBarButtonSize),
     ) {
         Icon(
@@ -501,6 +503,7 @@ private fun InfoButton(
 }
 
 private val ArtworkSize = 240.dp
+private val ArtworkTopLift = 24.dp
 private val BlurredArtworkScale = 1.25f
 private val BlurredArtworkOffset = -ArtworkSize * 0.2f
 private val BlurredArtworkRadius = 66.dp

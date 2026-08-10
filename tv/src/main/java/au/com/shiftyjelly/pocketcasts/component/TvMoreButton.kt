@@ -8,6 +8,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.tv.material3.ButtonColors
 import androidx.tv.material3.Icon
 import androidx.tv.material3.IconButton
 import au.com.shiftyjelly.pocketcasts.theme.TvButtonDefaults
@@ -21,10 +22,11 @@ fun TvMoreButton(
     modifier: Modifier = Modifier,
     buttonSize: Dp = 48.dp,
     iconSize: Dp = 20.dp,
+    colors: ButtonColors = TvButtonDefaults.iconButtonColors(),
 ) {
     IconButton(
         onClick = onClick,
-        colors = TvButtonDefaults.iconButtonColors(),
+        colors = colors,
         modifier = Modifier.size(buttonSize).then(modifier),
     ) {
         Icon(

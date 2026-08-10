@@ -50,7 +50,7 @@ internal fun TvPlaybackSpeedButton(
     Box(modifier = modifier) {
         IconButton(
             onClick = { onMenuVisibleChange(true) },
-            colors = TvButtonDefaults.iconButtonColors(),
+            colors = TvButtonDefaults.controlBarIconButtonColors(),
             modifier = Modifier.size(TvControlBarButtonSize),
         ) {
             Text(
@@ -104,7 +104,7 @@ internal fun TvPlayerEffectsButton(
     Box(modifier = modifier) {
         IconButton(
             onClick = { onMenuVisibleChange(true) },
-            colors = TvButtonDefaults.iconButtonColors(),
+            colors = TvButtonDefaults.controlBarIconButtonColors(),
             modifier = Modifier.size(TvControlBarButtonSize),
         ) {
             Icon(
