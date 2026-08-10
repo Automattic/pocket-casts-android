@@ -9,7 +9,9 @@ import androidx.media3.exoplayer.Renderer
 import androidx.media3.exoplayer.analytics.AnalyticsListener
 import androidx.media3.exoplayer.audio.AudioRendererEventListener
 import androidx.media3.exoplayer.audio.AudioSink
+import androidx.media3.exoplayer.audio.AudioTrackAudioOutputProvider
 import androidx.media3.exoplayer.audio.DefaultAudioSink
+import androidx.media3.exoplayer.audio.DefaultAudioTrackBufferSizeProvider
 import androidx.media3.exoplayer.mediacodec.MediaCodecSelector
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintPcmTap
@@ -57,6 +59,15 @@ class ShiftyRenderersFactory(
             .setAudioProcessorChain(processorChain!!)
             .setEnableFloatOutput(enableFloatOutput)
             .setEnableAudioOutputPlaybackParameters(enableAudioOutputPlaybackParameters)
+            .setAudioOutputProvider(
+                AudioTrackAudioOutputProvider.Builder(context)
+                    .setAudioTrackBufferSizeProvider(
+                        DefaultAudioTrackBufferSizeProvider.Builder()
+                            .setMinPcmBufferDurationUs(MIN_PCM_BUFFER_DURATION_US)
+                            .build(),
+                    )
+                    .build(),
+            )
             .build()
         return if (fingerprintPcmTap != null) FingerprintTapAudioSink(sink, fingerprintPcmTap) else sink
     }
@@ -88,5 +99,12 @@ class ShiftyRenderersFactory(
 
     override fun onAudioSessionIdChanged(eventTime: AnalyticsListener.EventTime, audioSessionId: Int) {
         customAudio.setupVolumeBoost(audioSessionId)
+    }
+
+    companion object {
+        // The platform's ~250ms minimum PCM buffer underruns under transient load and (since media3 1.8.0)
+        // flips playback into STATE_BUFFERING. 500ms matches the media3 1.11.0 default and can be dropped
+        // once we bump to it. https://github.com/androidx/media/issues/3210
+        private const val MIN_PCM_BUFFER_DURATION_US = 500_000
     }
 }
