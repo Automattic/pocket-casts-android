@@ -266,8 +266,8 @@
     <string name="tv_playlists_download_title">Create playlists on your phone</string>
     <string name="tv_playlists_download_subtitle">They’ll be waiting here when you’re done. Scan to get the app</string>
     <string name="tv_playlist_play_all">Play all episodes</string>
-    <string name="tv_playlist_play_all_clear_up_next_title">This will clear your Up Next</string>
-    <string name="tv_playlist_play_all_clear_up_next_message">We can save your current Up Next as a playlist</string>
+    <string name="tv_playlist_play_all_clear_up_next_title">This will clear your Up\u00A0Next</string>
+    <string name="tv_playlist_play_all_clear_up_next_message">We can save your current Up Next as a\u00A0playlist</string>
     <string name="tv_playlist_play_all_save_and_play">Save and play</string>
     <string name="tv_playlist_play_all_play_without_saving">Play without saving</string>
     <plurals name="tv_playlist_all_archived">

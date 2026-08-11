@@ -20,14 +20,15 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.WhileSubscribed
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -43,8 +44,8 @@ class TvPlaylistDetailsViewModel @AssistedInject constructor(
 
     private val playAllHandler = playAllHandlerFactory.create(SourceView.FILTERS)
 
-    private val _events = Channel<TvPlaylistDetailsEvent>(Channel.BUFFERED)
-    val events: Flow<TvPlaylistDetailsEvent> = _events.receiveAsFlow()
+    private val _events = MutableSharedFlow<TvPlaylistDetailsEvent>(extraBufferCapacity = 2)
+    val events: SharedFlow<TvPlaylistDetailsEvent> = _events.asSharedFlow()
 
     private var playAllJob: Job? = null
     private var replaceUpNextJob: Job? = null
@@ -95,9 +96,9 @@ class TvPlaylistDetailsViewModel @AssistedInject constructor(
         playAllJob = viewModelScope.launch {
             val episodes = (uiState.value as? TvPlaylistDetailsUiState.Loaded)?.episodes.orEmpty()
             when (playAllHandler.handlePlayAllEpisodes(episodes)) {
-                PlayAllResponse.DoNothing -> _events.send(TvPlaylistDetailsEvent.OpenNowPlaying)
-                PlayAllResponse.ShowWarning -> _events.send(TvPlaylistDetailsEvent.ShowReplaceUpNextConfirmation)
-                PlayAllResponse.ShowNoEpisodesToPlay -> Unit
+                PlayAllResponse.DoNothing -> _events.tryEmit(TvPlaylistDetailsEvent.OpenNowPlaying)
+                PlayAllResponse.ShowWarning -> _events.tryEmit(TvPlaylistDetailsEvent.ShowReplaceUpNextConfirmation)
+                PlayAllResponse.ShowNoEpisodesToPlay -> _events.tryEmit(TvPlaylistDetailsEvent.ShowNoEpisodesToPlay)
             }
         }
     }
@@ -108,15 +109,13 @@ class TvPlaylistDetailsViewModel @AssistedInject constructor(
         }
         replaceUpNextJob = viewModelScope.launch {
             withContext(NonCancellable) {
-                if (saveUpNext) {
-                    playAllHandler.saveUpNextAsPlaylist(upNextName)
+                val saved = saveUpNext && runCatching { playAllHandler.saveUpNextAsPlaylist(upNextName) }.getOrDefault(false)
+                if (saved) {
+                    _events.tryEmit(TvPlaylistDetailsEvent.ShowUpNextSavedToast)
                 }
                 playAllHandler.playAllPendingEpisodes()
             }
-            if (saveUpNext) {
-                _events.send(TvPlaylistDetailsEvent.ShowUpNextSavedToast)
-            }
-            _events.send(TvPlaylistDetailsEvent.OpenNowPlaying)
+            _events.tryEmit(TvPlaylistDetailsEvent.OpenNowPlaying)
         }
     }
 
@@ -132,6 +131,8 @@ sealed interface TvPlaylistDetailsEvent {
     data object ShowReplaceUpNextConfirmation : TvPlaylistDetailsEvent
 
     data object ShowUpNextSavedToast : TvPlaylistDetailsEvent
+
+    data object ShowNoEpisodesToPlay : TvPlaylistDetailsEvent
 }
 
 sealed interface TvPlaylistDetailsUiState {

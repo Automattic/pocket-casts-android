@@ -58,8 +58,8 @@ class PlayAllHandler @AssistedInject constructor(
         }
     }
 
-    suspend fun saveUpNextAsPlaylist(upNextTranslation: String) {
-        val episodes = pendingEpisodes?.episodeInQueue ?: return
+    suspend fun saveUpNextAsPlaylist(upNextTranslation: String): Boolean {
+        val episodes = pendingEpisodes?.episodeInQueue ?: return false
         val baseName = buildString {
             append(upNextTranslation)
             runCatching {
@@ -79,6 +79,7 @@ class PlayAllHandler @AssistedInject constructor(
             val name = if (index == 0) baseName else "$baseName (${index + 1})"
             playlistManager.createManualPlaylistWithEpisodes(name, episodes)
         }
+        return playlistEpisodes.isNotEmpty()
     }
 
     suspend fun playAllPendingEpisodes() {

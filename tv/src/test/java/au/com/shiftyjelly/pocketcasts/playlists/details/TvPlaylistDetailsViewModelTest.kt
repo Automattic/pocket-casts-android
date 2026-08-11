@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import java.util.Date
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.runTest
@@ -21,10 +22,12 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -189,6 +192,7 @@ class TvPlaylistDetailsViewModelTest {
 
     @Test
     fun `replacing with saving saves the queue before playing`() = runTest {
+        whenever(playAllHandler.saveUpNextAsPlaylist(any())) doReturn true
         val viewModel = createViewModel()
 
         viewModel.events.test {
@@ -200,6 +204,78 @@ class TvPlaylistDetailsViewModelTest {
         inOrder(playAllHandler) {
             verify(playAllHandler).saveUpNextAsPlaylist("Up Next")
             verify(playAllHandler).playAllPendingEpisodes()
+        }
+    }
+
+    @Test
+    fun `replacing with saving does not claim a save when nothing was saved`() = runTest {
+        whenever(playAllHandler.saveUpNextAsPlaylist(any())) doReturn false
+        val viewModel = createViewModel()
+
+        viewModel.events.test {
+            viewModel.replaceUpNextAndPlay(saveUpNext = true, upNextName = "Up Next")
+            assertEquals(TvPlaylistDetailsEvent.OpenNowPlaying, awaitItem())
+        }
+
+        verify(playAllHandler).playAllPendingEpisodes()
+    }
+
+    @Test
+    fun `replacing with saving still plays when the save fails`() = runTest {
+        whenever(playAllHandler.saveUpNextAsPlaylist(any())) doSuspendableAnswer { throw RuntimeException("boom") }
+        val viewModel = createViewModel()
+
+        viewModel.events.test {
+            viewModel.replaceUpNextAndPlay(saveUpNext = true, upNextName = "Up Next")
+            assertEquals(TvPlaylistDetailsEvent.OpenNowPlaying, awaitItem())
+        }
+
+        verify(playAllHandler).playAllPendingEpisodes()
+    }
+
+    @Test
+    fun `rapid replace requests save the up next only once`() = runTest {
+        val gate = CompletableDeferred<Boolean>()
+        whenever(playAllHandler.saveUpNextAsPlaylist(any())) doSuspendableAnswer { gate.await() }
+        val viewModel = createViewModel()
+
+        viewModel.replaceUpNextAndPlay(saveUpNext = true, upNextName = "Up Next")
+        viewModel.replaceUpNextAndPlay(saveUpNext = true, upNextName = "Up Next")
+        gate.complete(true)
+
+        verify(playAllHandler, times(1)).saveUpNextAsPlaylist("Up Next")
+    }
+
+    @Test
+    fun `play all passes only the visible episodes to the handler`() = runTest {
+        whenever(playAllHandler.handlePlayAllEpisodes(any())) doReturn PlayAllResponse.DoNothing
+        val viewModel = createViewModel()
+
+        viewModel.uiState.test {
+            assertEquals(TvPlaylistDetailsUiState.Loading, awaitItem())
+            playlists.emit(playlist(availableEpisode, archivedEpisode))
+            assertEquals(listOf(availableEpisode), (awaitItem() as TvPlaylistDetailsUiState.Loaded).episodes)
+
+            viewModel.playAll()
+        }
+
+        verify(playAllHandler).handlePlayAllEpisodes(listOf(availableEpisode))
+    }
+
+    @Test
+    fun `play all surfaces the no episodes toast when nothing can be played`() = runTest {
+        whenever(playAllHandler.handlePlayAllEpisodes(any())) doReturn PlayAllResponse.ShowNoEpisodesToPlay
+        val viewModel = createViewModel()
+
+        viewModel.uiState.test {
+            assertEquals(TvPlaylistDetailsUiState.Loading, awaitItem())
+            playlists.emit(playlist(availableEpisode))
+            assertEquals(listOf(availableEpisode), (awaitItem() as TvPlaylistDetailsUiState.Loaded).episodes)
+
+            viewModel.events.test {
+                viewModel.playAll()
+                assertEquals(TvPlaylistDetailsEvent.ShowNoEpisodesToPlay, awaitItem())
+            }
         }
     }
 
