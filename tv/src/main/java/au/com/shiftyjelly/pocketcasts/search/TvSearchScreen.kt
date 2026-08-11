@@ -11,8 +11,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -64,6 +66,14 @@ private fun TvSearchContent(
     onDelete: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val keyboardState = rememberTvSearchKeyboardState()
+    var hasAutoFocused by remember { mutableStateOf(false) }
+    LaunchedEffect(keyboardState.isFocused) {
+        if (keyboardState.isFocused) {
+            hasAutoFocused = true
+        }
+    }
+
     LazyColumn(modifier = modifier.fillMaxSize()) {
         item {
             Column(modifier = Modifier.padding(ContentPadding)) {
@@ -75,7 +85,8 @@ private fun TvSearchContent(
                     onSpace = onSpace,
                     onDelete = onDelete,
                     onSubmit = {},
-                    autoFocus = true,
+                    autoFocus = !hasAutoFocused,
+                    state = keyboardState,
                 )
                 Spacer(modifier = Modifier.height(24.dp))
             }

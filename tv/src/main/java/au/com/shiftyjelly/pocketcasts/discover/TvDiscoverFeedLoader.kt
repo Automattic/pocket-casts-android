@@ -28,9 +28,16 @@ class TvDiscoverFeedLoader @Inject constructor(
 
     suspend fun loadSearch(isLoggedIn: Boolean): TvSearchDiscover = coroutineScope {
         val discover = listRepository.getSearchDiscoverFeed()
-        val rowsDeferred = async { buildRows(discover, isLoggedIn) }
         val categoriesDeferred = async { loadCategories(discover) }
-        TvSearchDiscover(categories = categoriesDeferred.await(), rows = rowsDeferred.await())
+        val rows = try {
+            buildRows(discover, isLoggedIn)
+        } catch (exception: CancellationException) {
+            throw exception
+        } catch (exception: Exception) {
+            Timber.e(exception, "Failed to load TV search discover rows")
+            emptyList()
+        }
+        TvSearchDiscover(categories = categoriesDeferred.await(), rows = rows)
     }
 
     private suspend fun loadCategories(discover: Discover): List<DiscoverCategory> {

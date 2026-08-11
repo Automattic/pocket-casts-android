@@ -111,6 +111,26 @@ class TvSearchViewModelTest {
         assertTrue(viewModel.discoverRows.value.isEmpty())
     }
 
+    @Test
+    fun `categories still load when building the discover rows fails`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(
+            Discover(
+                layout = listOf(categoriesRow(source = "https://categories.json")),
+                regions = emptyMap(),
+                regionCodeToken = "[regionCode]",
+                regionNameToken = "[regionName]",
+                defaultRegionCode = "us",
+            ),
+        )
+        whenever(listRepository.getCategoriesList(eq("https://categories.json")))
+            .thenReturn(listOf(category(1, "Comedy")))
+
+        val viewModel = createViewModel()
+
+        assertEquals(listOf("Comedy"), viewModel.categories.value.map { it.name })
+        assertTrue(viewModel.discoverRows.value.isEmpty())
+    }
+
     private fun createViewModel() = TvSearchViewModel(
         discoverFeedLoader = TvDiscoverFeedLoader(
             listRepository = listRepository,
