@@ -1,6 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.profile.cloud
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -9,8 +12,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.selection.toggleable
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -21,6 +26,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -30,14 +36,15 @@ import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.PreviewRegularDevice
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
-import au.com.shiftyjelly.pocketcasts.compose.components.Banner
 import au.com.shiftyjelly.pocketcasts.compose.components.GradientIcon
+import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRow
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRowToggle
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingSection
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingSectionHeader
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingsSection
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.profile.R
@@ -119,17 +126,9 @@ private fun CloudSettingsContent(
             }
             if (uiState.isUpgradeBannerVisible) {
                 item {
-                    Banner(
-                        title = stringResource(LR.string.pocket_casts_plus),
-                        description = stringResource(LR.string.profile_get_plus),
-                        actionLabel = stringResource(LR.string.plus_learn_more_button),
-                        icon = painterResource(IR.drawable.ic_plus_feature_cloud_storage),
-                        onActionClick = onUpgradeClick,
+                    UpgradeBanner(
+                        onUpgradeClick = onUpgradeClick,
                         onDismiss = onUpgradeBannerDismiss,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = SettingsSection.horizontalPadding, vertical = 16.dp)
-                            .clickable(role = Role.Button, onClick = onUpgradeClick),
                     )
                 }
             }
@@ -222,6 +221,61 @@ private fun PlusFeaturesSection(
                 if (isPlus) onCloudOnlyOnWifiChange(!uiState.cloudDownloadOnlyOnWifi) else onUpgradeClick()
             },
         )
+    }
+}
+
+/**
+ * Mirrors the layout of the `upgradeLayout` block from the deleted `fragment_cloud_settings.xml`:
+ * a divider, a centred themed Plus wordmark, the upsell copy, and a close affordance top-end.
+ */
+@Composable
+private fun UpgradeBanner(
+    onUpgradeClick: () -> Unit,
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(modifier = modifier.padding(top = 16.dp)) {
+        HorizontalDivider(color = MaterialTheme.theme.colors.secondaryUi02)
+        Box {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable(role = Role.Button, onClick = onUpgradeClick)
+                    .padding(start = 64.dp, end = 64.dp, top = 16.dp, bottom = 64.dp),
+            ) {
+                val logoResource = if (MaterialTheme.theme.isLight) {
+                    IR.drawable.plus_logo_horizontal_light
+                } else {
+                    IR.drawable.plus_logo_horizontal_dark
+                }
+                Image(
+                    painter = painterResource(logoResource),
+                    contentDescription = stringResource(LR.string.pocket_casts_plus),
+                    modifier = Modifier.widthIn(max = 232.dp),
+                )
+                TextH40(
+                    text = stringResource(LR.string.profile_get_plus),
+                    color = MaterialTheme.theme.colors.primaryText02,
+                    textAlign = TextAlign.Center,
+                )
+                TextH50(
+                    text = stringResource(LR.string.plus_learn_more_button),
+                    color = MaterialTheme.theme.colors.primaryInteractive01,
+                    textAlign = TextAlign.Center,
+                )
+            }
+            Icon(
+                painter = painterResource(IR.drawable.ic_close),
+                contentDescription = stringResource(LR.string.close),
+                tint = MaterialTheme.theme.colors.primaryText02,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(top = 16.dp, end = 16.dp)
+                    .clickable(role = Role.Button, onClick = onDismiss),
+            )
+        }
     }
 }
 
