@@ -22,6 +22,14 @@ class ListRepository(
         return listWebService.getSearchDiscoverFeed(platform = platform, version = 3)
     }
 
+    suspend fun getLoggedInDiscoverFeed(): Discover {
+        return listWebService.getLoggedInDiscoverFeed(platform = platform, version = 3)
+    }
+
+    suspend fun getLoggedOutDiscoverFeed(): Discover {
+        return listWebService.getLoggedOutDiscoverFeed(platform = platform, version = 3)
+    }
+
     suspend fun getListFeed(url: String, authenticated: Boolean? = false): ListFeed? {
         return runCatching {
             if (authenticated == true) {
