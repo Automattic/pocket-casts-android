@@ -1,7 +1,12 @@
 package au.com.shiftyjelly.pocketcasts.nowplaying
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -35,6 +40,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
@@ -73,6 +80,7 @@ import au.com.shiftyjelly.pocketcasts.podcasts.TvPodcastDetailsScreen
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
 import au.com.shiftyjelly.pocketcasts.repositories.playback.Player
 import au.com.shiftyjelly.pocketcasts.theme.TvButtonDefaults
+import au.com.shiftyjelly.pocketcasts.theme.TvScreenBackgroundBrush
 import au.com.shiftyjelly.pocketcasts.theme.TvTheme
 import au.com.shiftyjelly.pocketcasts.theme.TvTopBarHeight
 import au.com.shiftyjelly.pocketcasts.theme.tvColors
@@ -160,6 +168,9 @@ private fun TvNowPlayingContent(
     var isSpeedMenuVisible by remember { mutableStateOf(false) }
     var isEffectsMenuVisible by remember { mutableStateOf(false) }
     var isChromeVisible by remember { mutableStateOf(true) }
+    var hasRenderedFirstFrame by remember(state.episode.uuid, state.isVideo) { mutableStateOf(false) }
+    val onFirstFrameRender = remember(state.episode.uuid, state.isVideo) { { hasRenderedFirstFrame = true } }
+    val onVideoReset = remember(state.episode.uuid, state.isVideo) { { hasRenderedFirstFrame = false } }
     var interactionTick by remember { mutableIntStateOf(0) }
     var isContentFocused by remember { mutableStateOf(false) }
     var isTopBarRevealRequested by remember { mutableStateOf(false) }
@@ -206,7 +217,7 @@ private fun TvNowPlayingContent(
     }
     val chromeAlpha by animateFloatAsState(if (isChromeVisible) 1f else 0f, label = "TvNowPlayingChromeAlpha")
 
-    Column(
+    Box(
         modifier = modifier
             .fillMaxSize()
             .onFocusChanged { focusState ->
@@ -225,36 +236,68 @@ private fun TvNowPlayingContent(
                 // Only navigation presses are swallowed by the reveal; media keys keep their
                 // effect even while the chrome is hidden and back is revealed via BackHandler.
                 revealsChrome && event.key in chromeRevealConsumedKeys
-            }
-            .padding(top = TvTopBarHeight)
-            .padding(horizontal = 80.dp, vertical = 24.dp),
+            },
     ) {
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth(),
+                .fillMaxSize()
+                .then(if (state.isVideo) Modifier.background(Color.Black) else Modifier),
         ) {
             if (state.isVideo) {
-                TvVideoSurface(player = state.player)
+                TvVideoSurface(
+                    player = state.player,
+                    onFirstFrameRender = onFirstFrameRender,
+                    onVideoReset = onVideoReset,
+                )
             } else {
-                EpisodeArtworkWithTitles(
+                EpisodeArtwork(
                     episode = episode,
-                    podcastTitle = state.podcastTitle,
                     isPlaying = state.isPlaying && !state.isBuffering,
                     player = state.player,
                     audioLevel = { state.player?.currentAudioLevel ?: 0f },
                 )
             }
         }
-        Spacer(modifier = Modifier.height(24.dp))
-        Column(modifier = Modifier.alpha(chromeAlpha)) {
+        if (state.isVideo) {
+            AnimatedVisibility(
+                visible = !hasRenderedFirstFrame || state.errorMessage != null,
+                enter = fadeIn(tween(VIDEO_OVERLAY_FADE_MILLIS)),
+                exit = fadeOut(tween(VIDEO_OVERLAY_FADE_MILLIS)),
+            ) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(TvScreenBackgroundBrush),
+                ) {
+                    EpisodeArtwork(
+                        episode = episode,
+                        showWaveform = false,
+                    )
+                }
+            }
+        }
+        Column(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .graphicsLayer { alpha = chromeAlpha }
+                .background(ChromeScrimBrush)
+                .padding(horizontal = 80.dp)
+                .padding(top = ChromeScrimTopInset, bottom = 24.dp),
+        ) {
+            EpisodeTitles(
+                episode = episode,
+                podcastTitle = state.podcastTitle,
+            )
+            Spacer(modifier = Modifier.height(16.dp))
             state.errorMessage?.let { errorMessage ->
                 Text(
                     text = errorMessage,
                     style = MaterialTheme.tvTypography.caption1,
                     color = MaterialTheme.tvColors.textSecondary,
-                    textAlign = TextAlign.Center,
+                    textAlign = TextAlign.Start,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 16.dp),
@@ -319,19 +362,19 @@ private fun TvNowPlayingContent(
 }
 
 @Composable
-private fun EpisodeArtworkWithTitles(
+private fun EpisodeArtwork(
     episode: BaseEpisode,
-    podcastTitle: String?,
-    isPlaying: Boolean,
-    player: Player?,
-    audioLevel: () -> Float,
     modifier: Modifier = Modifier,
+    isPlaying: Boolean = false,
+    player: Player? = null,
+    audioLevel: () -> Float = { 0f },
+    showWaveform: Boolean = true,
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
+    Box(
+        contentAlignment = Alignment.Center,
         modifier = modifier,
     ) {
-        Box(contentAlignment = Alignment.Center) {
+        if (showWaveform) {
             TvNowPlayingWaveform(
                 isPlaying = isPlaying,
                 episodeUuid = episode.uuid,
@@ -339,27 +382,39 @@ private fun EpisodeArtworkWithTitles(
                 audioLevel = audioLevel,
                 artworkSize = ArtworkSize,
             )
-            TvArtworkImage(
-                model = episode.artworkModel(),
-                modifier = Modifier
-                    .requiredSize(ArtworkSize * BlurredArtworkScale)
-                    .offset(x = BlurredArtworkOffset, y = BlurredArtworkOffset)
-                    .blur(BlurredArtworkRadius, BlurredEdgeTreatment.Unbounded)
-                    .alpha(0.7f),
-            )
-            TvArtworkImage(
-                model = episode.artworkModel(),
-                modifier = Modifier
-                    .size(ArtworkSize)
-                    .clip(RoundedCornerShape(8.dp)),
-            )
         }
-        Spacer(modifier = Modifier.height(24.dp))
+        TvArtworkImage(
+            model = episode.artworkModel(),
+            modifier = Modifier
+                .requiredSize(ArtworkSize * BlurredArtworkScale)
+                .offset(x = BlurredArtworkOffset, y = BlurredArtworkOffset)
+                .blur(BlurredArtworkRadius, BlurredEdgeTreatment.Unbounded)
+                .alpha(0.7f),
+        )
+        TvArtworkImage(
+            model = episode.artworkModel(),
+            modifier = Modifier
+                .size(ArtworkSize)
+                .clip(RoundedCornerShape(8.dp)),
+        )
+    }
+}
+
+@Composable
+private fun EpisodeTitles(
+    episode: BaseEpisode,
+    podcastTitle: String?,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        horizontalAlignment = Alignment.Start,
+        modifier = modifier,
+    ) {
         Text(
             text = episode.title,
             style = MaterialTheme.tvTypography.title3,
             color = MaterialTheme.tvColors.textPrimary,
-            textAlign = TextAlign.Center,
+            textAlign = TextAlign.Start,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
         )
@@ -369,7 +424,7 @@ private fun EpisodeArtworkWithTitles(
                 text = podcastTitle,
                 style = MaterialTheme.tvTypography.caption1,
                 color = MaterialTheme.tvColors.textSecondary,
-                textAlign = TextAlign.Center,
+                textAlign = TextAlign.Start,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
@@ -485,12 +540,19 @@ private fun PlayerControlButton(
     }
 }
 
-private val ArtworkSize = 266.dp
+private val ArtworkSize = 240.dp
 private val BlurredArtworkScale = 1.25f
 private val BlurredArtworkOffset = -ArtworkSize * 0.2f
 private val BlurredArtworkRadius = 66.dp
 
 private val CHROME_HIDE_DELAY = 4.seconds
+private const val VIDEO_OVERLAY_FADE_MILLIS = 200
+
+private val ChromeScrimTopInset = 48.dp
+private val ChromeScrimBrush = Brush.verticalGradient(
+    0f to Color.Transparent,
+    1f to Color.Black.copy(alpha = 0.8f),
+)
 
 private val chromeRevealConsumedKeys = setOf(
     Key.DirectionUp,
@@ -509,6 +571,17 @@ private fun BaseEpisode.artworkModel(): Any? = when (this) {
 @Preview(device = Devices.TV_1080p)
 @Composable
 private fun TvNowPlayingContentPreview() {
+    TvNowPlayingContentPreviewContent(isVideo = false)
+}
+
+@Preview(device = Devices.TV_1080p)
+@Composable
+private fun TvNowPlayingVideoContentPreview() {
+    TvNowPlayingContentPreviewContent(isVideo = true)
+}
+
+@Composable
+private fun TvNowPlayingContentPreviewContent(isVideo: Boolean) {
     TvTheme {
         CompositionLocalProvider(LocalFocusTvTopBar provides {}) {
             TvNowPlayingContent(
@@ -528,7 +601,7 @@ private fun TvNowPlayingContentPreview() {
                     positionMs = 600_000,
                     durationMs = 3_600_000,
                     bufferedMs = 1_200_000,
-                    isVideo = false,
+                    isVideo = isVideo,
                     player = null,
                     playbackSpeed = 1.0,
                     trimMode = TrimMode.OFF,
