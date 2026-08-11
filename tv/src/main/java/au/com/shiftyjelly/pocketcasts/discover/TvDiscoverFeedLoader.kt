@@ -24,7 +24,10 @@ class TvDiscoverFeedLoader @Inject constructor(
     private val settings: Settings,
     @ApplicationContext private val context: Context,
 ) {
-    suspend fun load(isLoggedIn: Boolean): List<TvDiscoverRow> = buildRows(listRepository.getDiscoverFeed(), isLoggedIn)
+    suspend fun load(isLoggedIn: Boolean): List<TvDiscoverRow> {
+        val feed = if (isLoggedIn) listRepository.getLoggedInDiscoverFeed() else listRepository.getLoggedOutDiscoverFeed()
+        return buildRows(feed, isLoggedIn)
+    }
 
     suspend fun searchDiscoverFeed(): Discover = listRepository.getSearchDiscoverFeed()
 
@@ -61,6 +64,7 @@ class TvDiscoverFeedLoader @Inject constructor(
     }
 
     private suspend fun loadRow(row: DiscoverRow): TvDiscoverRow? {
+        if (row.source.isBlank()) return null
         return when (row.type) {
             is ListType.PodcastList -> loadPodcastsRow(row)
             is ListType.EpisodeList -> loadEpisodesRow(row)
