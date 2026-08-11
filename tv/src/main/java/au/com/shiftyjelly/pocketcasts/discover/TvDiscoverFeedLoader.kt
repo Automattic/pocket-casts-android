@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.discover
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
+import au.com.shiftyjelly.pocketcasts.servers.model.Discover
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverEpisode
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRow
@@ -20,8 +21,11 @@ class TvDiscoverFeedLoader @Inject constructor(
     private val settings: Settings,
     @ApplicationContext private val context: Context,
 ) {
-    suspend fun load(isLoggedIn: Boolean): List<TvDiscoverRow> = coroutineScope {
-        val discover = listRepository.getDiscoverFeed()
+    suspend fun load(isLoggedIn: Boolean): List<TvDiscoverRow> = buildRows(listRepository.getDiscoverFeed(), isLoggedIn)
+
+    suspend fun loadSearch(isLoggedIn: Boolean): List<TvDiscoverRow> = buildRows(listRepository.getSearchDiscoverFeed(), isLoggedIn)
+
+    private suspend fun buildRows(discover: Discover, isLoggedIn: Boolean): List<TvDiscoverRow> = coroutineScope {
         val region = discover.regions[settings.discoverCountryCode.value]
             ?: discover.regions[discover.defaultRegionCode]
             ?: error("Could not resolve discover region")
