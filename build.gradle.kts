@@ -13,6 +13,7 @@ import com.google.devtools.ksp.gradle.KspExtension
 import com.google.devtools.ksp.gradle.KspGradleSubplugin
 import io.sentry.android.gradle.extensions.InstrumentationFeature
 import io.sentry.android.gradle.extensions.SentryPluginExtension
+import io.sentry.android.gradle.tasks.SentryCliExecTask
 import java.util.EnumSet
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
@@ -474,10 +475,13 @@ subprojects {
 }
 
 fun Project.applyCommonSentryConfiguration() {
-    val sentryAuthToken = providers.environmentVariable("SENTRY_AUTH_TOKEN")
+    // A secret-injection step that resolves to nothing exports an empty SENTRY_AUTH_TOKEN rather
+    // than leaving it unset, so treat blank as missing — otherwise the guard below passes and
+    // sentry-cli fails mid-upload with an opaque auth error.
+    val sentryAuthToken = providers.environmentVariable("SENTRY_AUTH_TOKEN").orNull?.takeIf { it.isNotBlank() }
 
     extensions.getByType(SentryPluginExtension::class.java).apply {
-        authToken = sentryAuthToken.orNull
+        authToken = sentryAuthToken
         org = "a8c"
 
         val shouldUploadDebugFiles = System.getenv()["CI"].toBoolean() &&
@@ -493,13 +497,15 @@ fun Project.applyCommonSentryConfiguration() {
         ignoredBuildTypes = setOf("debug", "debugProd", "prototype")
     }
 
-    // The upload task only exists when includeProguardMapping is on, so this fires exactly when a
-    // mapping upload is expected — fail there rather than ship a release we can't deobfuscate.
-    tasks.matching { it.name.startsWith("uploadSentryProguardMappings") }.configureEach {
+    // SentryCliExecTask is the base of every task that shells out to sentry-cli with the auth token
+    // (ProGuard mappings and source bundles here). Those tasks only exist when the upload flags are
+    // on, so this fires exactly when an upload is expected — fail there rather than ship a release
+    // we can't deobfuscate.
+    tasks.withType<SentryCliExecTask>().configureEach {
         doFirst {
-            if (!sentryAuthToken.isPresent) {
+            if (sentryAuthToken == null) {
                 throw GradleException(
-                    "SENTRY_AUTH_TOKEN is not set. Export it to upload ProGuard mappings, " +
+                    "SENTRY_AUTH_TOKEN is not set. Export it to upload debug files to Sentry, " +
                         "or pass -PskipSentryProguardMappingUpload=true to skip the upload.",
                 )
             }
