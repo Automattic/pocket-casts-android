@@ -1,8 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.search
 
-import android.view.InputDevice
 import android.view.KeyCharacterMap
-import android.view.KeyEvent
 import android.view.KeyEvent.KEYCODE_DEL
 import android.view.KeyEvent.KEYCODE_DPAD_CENTER
 import android.view.KeyEvent.KEYCODE_DPAD_LEFT
@@ -198,19 +196,8 @@ internal fun TvSearchKeyboard(
                         when (keyCode) {
                             KEYCODE_DPAD_LEFT, KEYCODE_DPAD_RIGHT -> state.handleDpadDirection(keyCode, isKeyDown)
 
-                            KEYCODE_DPAD_CENTER -> {
+                            KEYCODE_DPAD_CENTER, KEYCODE_ENTER, KEYCODE_NUMPAD_ENTER -> {
                                 if (isKeyDown) activate(state.selectedKey)
-                                true
-                            }
-
-                            KEYCODE_ENTER, KEYCODE_NUMPAD_ENTER -> {
-                                if (isKeyDown) {
-                                    if (event.nativeKeyEvent.isFromPhysicalKeyboard()) {
-                                        onSubmit()
-                                    } else {
-                                        activate(state.selectedKey)
-                                    }
-                                }
                                 true
                             }
 
@@ -259,12 +246,6 @@ internal fun TvSearchKeyboard(
             }
         }
     }
-}
-
-private fun KeyEvent.isFromPhysicalKeyboard(): Boolean {
-    val device = device ?: return false
-    return device.keyboardType == InputDevice.KEYBOARD_TYPE_ALPHABETIC &&
-        (source and InputDevice.SOURCE_KEYBOARD) == InputDevice.SOURCE_KEYBOARD
 }
 
 @Composable
