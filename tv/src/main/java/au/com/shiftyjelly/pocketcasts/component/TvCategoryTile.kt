@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.tv.material3.CardDefaults
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
@@ -40,6 +41,10 @@ fun TvCategoryTile(
 
     TvTile(
         onClick = onClick,
+        colors = CardDefaults.colors(
+            containerColor = MaterialTheme.tvColors.backgroundOverlay,
+            focusedContainerColor = MaterialTheme.tvColors.backgroundOverlay,
+        ),
         modifier = modifier
             .width(280.dp)
             .height(128.dp)
@@ -54,12 +59,12 @@ fun TvCategoryTile(
                 model = category.icon,
                 contentDescription = null,
                 colorFilter = ColorFilter.tint(contentColor),
-                modifier = Modifier.size(40.dp),
+                modifier = Modifier.size(28.dp),
             )
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(10.dp))
             Text(
                 text = category.name,
-                style = MaterialTheme.tvTypography.headline,
+                style = MaterialTheme.tvTypography.body,
                 color = contentColor,
             )
         }
