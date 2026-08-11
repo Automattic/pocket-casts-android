@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.discover
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.ui.Modifier
@@ -18,6 +19,7 @@ fun LazyListScope.tvDiscoverRow(
     onPlayEpisode: (TvDiscoverEpisode) -> Unit,
     modifier: Modifier = Modifier,
     focusRequester: FocusRequester? = null,
+    contentPadding: PaddingValues = PaddingValues(horizontal = 32.dp),
 ) {
     when (row) {
         is TvDiscoverRow.FeaturedPodcasts -> item(key = row.id) {
@@ -25,6 +27,7 @@ fun LazyListScope.tvDiscoverRow(
                 title = row.title,
                 items = row.podcasts,
                 itemSpacing = 32.dp,
+                contentPadding = contentPadding,
                 key = TvDiscoverPodcast::uuid,
                 focusRequester = focusRequester,
                 modifier = modifier,
@@ -45,6 +48,7 @@ fun LazyListScope.tvDiscoverRow(
                 title = row.title,
                 items = row.podcasts,
                 itemSpacing = 32.dp,
+                contentPadding = contentPadding,
                 key = TvDiscoverPodcast::uuid,
                 focusRequester = focusRequester,
                 modifier = modifier,
@@ -65,6 +69,7 @@ fun LazyListScope.tvDiscoverRow(
                 title = row.title,
                 items = row.episodes,
                 itemSpacing = 32.dp,
+                contentPadding = contentPadding,
                 key = TvDiscoverEpisode::episodeUuid,
                 focusRequester = focusRequester,
                 modifier = modifier,
@@ -84,6 +89,7 @@ fun LazyListScope.tvDiscoverRow(
             TvRow(
                 title = row.title,
                 items = row.podcasts,
+                contentPadding = contentPadding,
                 key = TvDiscoverPodcast::uuid,
                 focusRequester = focusRequester,
                 modifier = modifier,
