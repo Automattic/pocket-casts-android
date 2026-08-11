@@ -24,7 +24,7 @@ import kotlin.math.abs
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-internal val TvControlBarButtonSize = 64.dp
+internal val TvControlBarButtonSize = 52.dp
 internal val TvControlBarIconSize = 24.dp
 internal val TvControlBarButtonSpacing = 11.dp
 
