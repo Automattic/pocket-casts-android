@@ -73,7 +73,7 @@ class TvSearchViewModelTest {
 
     @Test
     fun `exposes the loaded discover rows`() = runTest {
-        whenever(listRepository.getDiscoverFeed()).thenReturn(
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(
             discover(row(id = "trending", title = "Trending", source = "https://lists/trending.json")),
         )
         whenever(listRepository.getListFeed(eq("https://lists/trending.json"), any()))
@@ -88,7 +88,7 @@ class TvSearchViewModelTest {
 
     @Test
     fun `discover rows are empty when loading fails`() = runTest {
-        whenever(listRepository.getDiscoverFeed()).thenThrow(RuntimeException("Network error"))
+        whenever(listRepository.getSearchDiscoverFeed()).thenThrow(RuntimeException("Network error"))
 
         val viewModel = createViewModel()
 

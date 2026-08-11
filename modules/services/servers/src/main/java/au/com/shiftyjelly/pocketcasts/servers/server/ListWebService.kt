@@ -12,6 +12,9 @@ interface ListWebService {
     @GET("/discover/{platform}/content_v{version}.json")
     suspend fun getDiscoverFeed(@Path("platform") platform: String, @Path("version") version: Int): Discover
 
+    @GET("/discover/{platform}/content_v{version}_search.json")
+    suspend fun getSearchDiscoverFeed(@Path("platform") platform: String, @Path("version") version: Int): Discover
+
     @GET
     suspend fun getListFeed(@Url url: String): ListFeed
 

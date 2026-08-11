@@ -43,7 +43,7 @@ class TvSearchViewModel @Inject constructor(
         }
         viewModelScope.launch {
             _discoverRows.value = try {
-                discoverFeedLoader.load(syncManager.isLoggedIn())
+                discoverFeedLoader.loadSearch(syncManager.isLoggedIn())
             } catch (exception: CancellationException) {
                 throw exception
             } catch (exception: Exception) {
