@@ -9,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.component.TvFeaturedTile
 import au.com.shiftyjelly.pocketcasts.component.TvPodcastTile
 import au.com.shiftyjelly.pocketcasts.component.TvPodcastTileDefaults
 import au.com.shiftyjelly.pocketcasts.component.TvRow
+import au.com.shiftyjelly.pocketcasts.component.TvSponsoredTile
 import au.com.shiftyjelly.pocketcasts.component.TvVideoTile
 
 fun LazyListScope.tvDiscoverRow(
@@ -48,13 +49,13 @@ fun LazyListScope.tvDiscoverRow(
                 focusRequester = focusRequester,
                 modifier = modifier,
             ) { podcast ->
-                TvFeaturedTile(
+                TvSponsoredTile(
                     artworkUrl = podcast.artworkUrl,
-                    isSponsored = podcast.isSponsored,
                     title = podcast.title,
+                    author = podcast.author,
                     description = podcast.description,
-                    onGoToPodcast = { onOpenPodcast(podcast.uuid) },
-                    onPlayLastEpisode = {},
+                    isSponsored = podcast.isSponsored,
+                    onClick = { onOpenPodcast(podcast.uuid) },
                 )
             }
         }
