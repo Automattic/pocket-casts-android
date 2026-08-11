@@ -253,6 +253,7 @@
     <string name="tv_row_because_you_liked">Because you liked Podcast</string>
     <string name="tv_home_keep_listening">Keep Listening</string>
     <string name="tv_search_keyboard">On-screen keyboard</string>
+    <string name="tv_search_browse_categories">Browse categories</string>
     <string name="tv_search_key_space">Space</string>
     <string name="tv_search_key_symbols" translatable="false">123</string>
     <string name="tv_search_key_letters" translatable="false">ABC</string>
