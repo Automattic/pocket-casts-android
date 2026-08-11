@@ -14,8 +14,9 @@ private fun googleSans(weight: Int) = Font(
     variationSettings = FontVariation.Settings(FontVariation.weight(weight)),
 )
 
-val GoogleSansFontFamily = FontFamily(
+internal val GoogleSansFontFamily = FontFamily(
     googleSans(400),
+    googleSans(500),
     googleSans(510),
     googleSans(700),
 )

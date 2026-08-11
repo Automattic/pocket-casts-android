@@ -5,9 +5,9 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.tv.material3.ColorScheme
-import androidx.tv.material3.LocalTextStyle
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.ProvideTextStyle
 import androidx.tv.material3.Typography
@@ -49,7 +49,7 @@ fun TvTheme(
                 colorScheme = colorScheme,
                 typography = materialTypography,
             ) {
-                ProvideTextStyle(LocalTextStyle.current.merge(TextStyle(fontFamily = GoogleSansFontFamily))) {
+                ProvideTextStyle(TextStyle(fontFamily = GoogleSansFontFamily)) {
                     content()
                 }
             }
@@ -96,7 +96,16 @@ private fun TvTypography.toMaterialTypography(): Typography = Typography(
     bodyLarge = caption1,
     bodyMedium = caption2,
     bodySmall = caption2,
-    labelLarge = DefaultMaterialTypography.labelLarge.copy(fontFamily = GoogleSansFontFamily),
-    labelMedium = DefaultMaterialTypography.labelMedium.copy(fontFamily = GoogleSansFontFamily),
-    labelSmall = DefaultMaterialTypography.labelSmall.copy(fontFamily = GoogleSansFontFamily),
+    labelLarge = DefaultMaterialTypography.labelLarge.copy(
+        fontFamily = GoogleSansFontFamily,
+        platformStyle = PlatformTextStyle(includeFontPadding = false),
+    ),
+    labelMedium = DefaultMaterialTypography.labelMedium.copy(
+        fontFamily = GoogleSansFontFamily,
+        platformStyle = PlatformTextStyle(includeFontPadding = false),
+    ),
+    labelSmall = DefaultMaterialTypography.labelSmall.copy(
+        fontFamily = GoogleSansFontFamily,
+        platformStyle = PlatformTextStyle(includeFontPadding = false),
+    ),
 )
