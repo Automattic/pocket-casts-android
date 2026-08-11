@@ -52,10 +52,12 @@ class TvSearchViewModelTest {
     }
 
     @Test
-    fun `exposes the loaded browse categories`() = runTest {
-        whenever(listRepository.getCategoriesList(any())).thenReturn(
-            listOf(category(1, "Comedy"), category(2, "True Crime")),
+    fun `exposes the browse categories from the search feed row`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(
+            discover(categoriesRow(source = "https://categories.json")),
         )
+        whenever(listRepository.getCategoriesList(eq("https://categories.json")))
+            .thenReturn(listOf(category(1, "Comedy"), category(2, "True Crime")))
 
         val viewModel = createViewModel()
 
@@ -63,7 +65,21 @@ class TvSearchViewModelTest {
     }
 
     @Test
-    fun `categories are empty when loading fails`() = runTest {
+    fun `categories are empty when the feed has no categories row`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(
+            discover(row(id = "trending", title = "Trending", source = "https://lists/trending.json")),
+        )
+
+        val viewModel = createViewModel()
+
+        assertTrue(viewModel.categories.value.isEmpty())
+    }
+
+    @Test
+    fun `categories are empty when the categories request fails`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(
+            discover(categoriesRow(source = "https://categories.json")),
+        )
         whenever(listRepository.getCategoriesList(any())).thenThrow(RuntimeException("Network error"))
 
         val viewModel = createViewModel()
@@ -96,7 +112,6 @@ class TvSearchViewModelTest {
     }
 
     private fun createViewModel() = TvSearchViewModel(
-        listRepository = listRepository,
         discoverFeedLoader = TvDiscoverFeedLoader(
             listRepository = listRepository,
             settings = settings,
@@ -119,9 +134,10 @@ class TvSearchViewModelTest {
         id: String,
         title: String,
         source: String,
+        type: ListType = ListType.PodcastList,
     ) = DiscoverRow(
         id = id,
-        type = ListType.PodcastList,
+        type = type,
         displayStyle = DisplayStyle.SmallList(),
         expandedStyle = ExpandedStyle.PlainList(),
         expandedTopItemLabel = null,
@@ -135,6 +151,13 @@ class TvSearchViewModelTest {
         authenticated = false,
         mostPopularCategoriesId = null,
         sponsoredCategoryIds = null,
+    )
+
+    private fun categoriesRow(source: String) = row(
+        id = "categories",
+        title = "Browse By Category",
+        source = source,
+        type = ListType.Categories,
     )
 
     private fun podcastFeed(vararg podcastUuids: String) = ListFeed(
