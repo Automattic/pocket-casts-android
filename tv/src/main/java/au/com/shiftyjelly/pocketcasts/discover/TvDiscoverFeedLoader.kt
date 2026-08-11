@@ -37,6 +37,7 @@ class TvDiscoverFeedLoader @Inject constructor(
             .map { row -> async { loadRow(row) } }
             .awaitAll()
             .filterNotNull()
+            .distinctBy(TvDiscoverRow::id)
     }
 
     private suspend fun loadRow(row: DiscoverRow): TvDiscoverRow? {
