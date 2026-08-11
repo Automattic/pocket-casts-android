@@ -41,6 +41,9 @@ import au.com.shiftyjelly.pocketcasts.component.TvRow
 import au.com.shiftyjelly.pocketcasts.component.TvVideoTile
 import au.com.shiftyjelly.pocketcasts.component.tvFocusInactiveWhen
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
+import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverEpisode
+import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverPodcast
+import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverRow
 import au.com.shiftyjelly.pocketcasts.podcasts.TvPodcastDetailsScreen
 import au.com.shiftyjelly.pocketcasts.theme.TvTheme
 import au.com.shiftyjelly.pocketcasts.theme.TvTopBarHeight
@@ -101,7 +104,7 @@ private fun TvHomeContent(
     uiState: TvHomeUiState,
     onRetry: () -> Unit,
     onOpenPodcast: (String) -> Unit,
-    onPlayEpisode: (TvHomeEpisode) -> Unit,
+    onPlayEpisode: (TvDiscoverEpisode) -> Unit,
     modifier: Modifier = Modifier,
     restoreFocusTrigger: Int = 0,
 ) {
@@ -149,9 +152,9 @@ private fun TvHomeError(
 
 @Composable
 private fun TvHomeRows(
-    rows: List<TvHomeRow>,
+    rows: List<TvDiscoverRow>,
     onOpenPodcast: (String) -> Unit,
-    onPlayEpisode: (TvHomeEpisode) -> Unit,
+    onPlayEpisode: (TvDiscoverEpisode) -> Unit,
     modifier: Modifier = Modifier,
     restoreFocusTrigger: Int = 0,
 ) {
@@ -182,12 +185,12 @@ private fun TvHomeRows(
             }
             val rowFocusRequester = rowFocusRequesters[rowIndex]
             when (row) {
-                is TvHomeRow.FeaturedPodcasts -> item(key = row.id) {
+                is TvDiscoverRow.FeaturedPodcasts -> item(key = row.id) {
                     TvRow(
                         title = row.title,
                         items = row.podcasts,
                         itemSpacing = 32.dp,
-                        key = TvHomePodcast::uuid,
+                        key = TvDiscoverPodcast::uuid,
                         focusRequester = rowFocusRequester,
                         modifier = rowModifier,
                     ) { podcast ->
@@ -202,12 +205,32 @@ private fun TvHomeRows(
                     }
                 }
 
-                is TvHomeRow.Episodes -> item(key = row.id) {
+                is TvDiscoverRow.SinglePodcast -> item(key = row.id) {
+                    TvRow(
+                        title = row.title,
+                        items = row.podcasts,
+                        itemSpacing = 32.dp,
+                        key = TvDiscoverPodcast::uuid,
+                        focusRequester = rowFocusRequester,
+                        modifier = rowModifier,
+                    ) { podcast ->
+                        TvFeaturedTile(
+                            artworkUrl = podcast.artworkUrl,
+                            isSponsored = podcast.isSponsored,
+                            title = podcast.title,
+                            description = podcast.description,
+                            onGoToPodcast = { onOpenPodcast(podcast.uuid) },
+                            onPlayLastEpisode = {},
+                        )
+                    }
+                }
+
+                is TvDiscoverRow.Episodes -> item(key = row.id) {
                     TvRow(
                         title = row.title,
                         items = row.episodes,
                         itemSpacing = 32.dp,
-                        key = TvHomeEpisode::episodeUuid,
+                        key = TvDiscoverEpisode::episodeUuid,
                         focusRequester = rowFocusRequester,
                         modifier = rowModifier,
                     ) { episode ->
@@ -222,11 +245,11 @@ private fun TvHomeRows(
                     }
                 }
 
-                is TvHomeRow.Podcasts -> item(key = row.id) {
+                is TvDiscoverRow.Podcasts -> item(key = row.id) {
                     TvRow(
                         title = row.title,
                         items = row.podcasts,
-                        key = TvHomePodcast::uuid,
+                        key = TvDiscoverPodcast::uuid,
                         focusRequester = rowFocusRequester,
                         modifier = rowModifier,
                     ) { podcast ->
@@ -253,16 +276,16 @@ private fun TvHomeContentPreview() {
             TvHomeContent(
                 uiState = TvHomeUiState.Ready(
                     rows = listOf(
-                        TvHomeRow.FeaturedPodcasts(
+                        TvDiscoverRow.FeaturedPodcasts(
                             id = "featured",
                             title = "Featured",
                             podcasts = (1..3).map { previewPodcast(it) },
                         ),
-                        TvHomeRow.Episodes(
+                        TvDiscoverRow.Episodes(
                             id = "tv_featured_videos",
                             title = "Made for TV",
                             episodes = (1..6).map {
-                                TvHomeEpisode(
+                                TvDiscoverEpisode(
                                     episodeUuid = "episode-$it",
                                     episodeTitle = "Episode $it",
                                     podcastUuid = "podcast-$it",
@@ -270,7 +293,7 @@ private fun TvHomeContentPreview() {
                                 )
                             },
                         ),
-                        TvHomeRow.Podcasts(
+                        TvDiscoverRow.Podcasts(
                             id = "trending",
                             title = "Trending",
                             podcasts = (1..8).map { previewPodcast(it) },
@@ -300,8 +323,9 @@ private fun TvHomeErrorPreview() {
     }
 }
 
-private fun previewPodcast(index: Int) = TvHomePodcast(
+private fun previewPodcast(index: Int) = TvDiscoverPodcast(
     uuid = "podcast-$index",
     title = "Podcast $index",
+    author = "Author $index",
     description = "Description of podcast $index",
 )

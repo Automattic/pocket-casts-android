@@ -4,6 +4,9 @@ import android.content.Context
 import android.content.res.Resources
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverEpisode
+import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverFeedLoader
+import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverRow
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PodcastDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextDao
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -142,11 +145,11 @@ class TvHomeViewModelTest {
                 listOf("featured", "sponsored-id", "videos-id", "trending", "curated-id"),
                 state.rows.map { it.id },
             )
-            assertTrue(state.rows[0] is TvHomeRow.FeaturedPodcasts)
-            assertTrue(state.rows[1] is TvHomeRow.FeaturedPodcasts)
-            assertTrue(state.rows[2] is TvHomeRow.Episodes)
-            assertTrue(state.rows[3] is TvHomeRow.Podcasts)
-            assertTrue(state.rows[4] is TvHomeRow.Podcasts)
+            assertTrue(state.rows[0] is TvDiscoverRow.FeaturedPodcasts)
+            assertTrue(state.rows[1] is TvDiscoverRow.SinglePodcast)
+            assertTrue(state.rows[2] is TvDiscoverRow.Episodes)
+            assertTrue(state.rows[3] is TvDiscoverRow.Podcasts)
+            assertTrue(state.rows[4] is TvDiscoverRow.Podcasts)
         }
     }
 
@@ -224,7 +227,7 @@ class TvHomeViewModelTest {
 
         viewModel.uiState.test {
             val state = awaitItem() as TvHomeUiState.Ready
-            val row = state.rows.single() as TvHomeRow.FeaturedPodcasts
+            val row = state.rows.single() as TvDiscoverRow.SinglePodcast
             assertTrue(row.podcasts.single().isSponsored)
         }
     }
@@ -407,7 +410,7 @@ class TvHomeViewModelTest {
         viewModel.uiState.test {
             val state = awaitItem() as TvHomeUiState.Ready
             assertEquals(listOf(TvHomeViewModel.KEEP_LISTENING_ROW_ID), state.rows.map { it.id })
-            val row = state.rows.single() as TvHomeRow.Episodes
+            val row = state.rows.single() as TvDiscoverRow.Episodes
             assertEquals("Keep Listening", row.title)
             val rowEpisode = row.episodes.single()
             assertEquals("episode-1", rowEpisode.episodeUuid)
@@ -432,7 +435,7 @@ class TvHomeViewModelTest {
 
         viewModel.uiState.test {
             val state = awaitItem() as TvHomeUiState.Ready
-            val row = state.rows.single() as TvHomeRow.Episodes
+            val row = state.rows.single() as TvDiscoverRow.Episodes
             assertEquals(listOf("episode-1"), row.episodes.map { it.episodeUuid })
         }
     }
@@ -475,9 +478,9 @@ class TvHomeViewModelTest {
                 ),
                 state.rows.map { it.id },
             )
-            val upNextRow = state.rows[1] as TvHomeRow.Episodes
+            val upNextRow = state.rows[1] as TvDiscoverRow.Episodes
             assertEquals(listOf("episode-2", "episode-3"), upNextRow.episodes.map { it.episodeUuid })
-            val newReleasesRow = state.rows[2] as TvHomeRow.Episodes
+            val newReleasesRow = state.rows[2] as TvDiscoverRow.Episodes
             assertEquals(listOf("episode-new"), newReleasesRow.episodes.map { it.episodeUuid })
             assertEquals("Podcast Two", newReleasesRow.episodes.single().podcastTitle)
         }
@@ -551,7 +554,7 @@ class TvHomeViewModelTest {
         }
     }
 
-    private fun homeEpisode() = TvHomeEpisode(
+    private fun homeEpisode() = TvDiscoverEpisode(
         episodeUuid = "episode-1",
         episodeTitle = "Episode",
         podcastUuid = "podcast-1",
@@ -559,11 +562,14 @@ class TvHomeViewModelTest {
     )
 
     private fun createViewModel() = TvHomeViewModel(
-        listRepository = listRepository,
+        discoverFeedLoader = TvDiscoverFeedLoader(
+            listRepository = listRepository,
+            settings = settings,
+            context = context,
+        ),
         playlistManager = playlistManager,
         podcastDao = podcastDao,
         upNextDao = upNextDao,
-        settings = settings,
         syncManager = syncManager,
         episodeManager = episodeManager,
         podcastManager = podcastManager,
