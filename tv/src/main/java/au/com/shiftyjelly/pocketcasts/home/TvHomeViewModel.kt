@@ -4,32 +4,25 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverEpisode
+import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverFeedLoader
+import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverRow
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PodcastDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextDao
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
-import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
-import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.SmartPlaylistDraft
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
-import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverEpisode
-import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
-import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRow
-import au.com.shiftyjelly.pocketcasts.servers.model.DisplayStyle
-import au.com.shiftyjelly.pocketcasts.servers.model.ListType
-import au.com.shiftyjelly.pocketcasts.servers.model.transformWithRegion
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -47,11 +40,10 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
 class TvHomeViewModel @Inject constructor(
-    private val listRepository: ListRepository,
+    private val discoverFeedLoader: TvDiscoverFeedLoader,
     private val playlistManager: PlaylistManager,
     private val podcastDao: PodcastDao,
     private val upNextDao: UpNextDao,
-    private val settings: Settings,
     private val syncManager: SyncManager,
     private val episodeManager: EpisodeManager,
     private val podcastManager: PodcastManager,
@@ -93,12 +85,12 @@ class TvHomeViewModel @Inject constructor(
         }
     }
 
-    private suspend fun loadRows(): List<TvHomeRow> = coroutineScope {
+    private suspend fun loadRows(): List<TvDiscoverRow> = coroutineScope {
         val isLoggedIn = syncManager.isLoggedIn()
         val localRowsDeferred = async { loadLocalRows(isLoggedIn) }
         val discoverRowsDeferred = async {
             try {
-                Result.success(loadDiscoverRows(isLoggedIn))
+                Result.success(discoverFeedLoader.load(isLoggedIn))
             } catch (exception: CancellationException) {
                 throw exception
             } catch (exception: Exception) {
@@ -112,29 +104,10 @@ class TvHomeViewModel @Inject constructor(
             Timber.e(exception, "Failed to load TV discover rows")
             emptyList()
         }
-        (localRows + discoverRows).distinctBy(TvHomeRow::id)
+        (localRows + discoverRows).distinctBy(TvDiscoverRow::id)
     }
 
-    private suspend fun loadDiscoverRows(isLoggedIn: Boolean): List<TvHomeRow> = coroutineScope {
-        val discover = listRepository.getDiscoverFeed()
-        val region = discover.regions[settings.discoverCountryCode.value]
-            ?: discover.regions[discover.defaultRegionCode]
-            ?: error("Could not resolve discover region")
-        val replacements = mapOf(
-            discover.regionCodeToken to region.code,
-            discover.regionNameToken to region.name,
-        )
-
-        discover.layout
-            .transformWithRegion(region, replacements, context.resources)
-            .filter { it.categoryId == null } // Rows with a category ID are sponsored ads for the category pages.
-            .filter { isLoggedIn || it.authenticated != true }
-            .map { row -> async { loadRow(row) } }
-            .awaitAll()
-            .filterNotNull()
-    }
-
-    private suspend fun loadLocalRows(isLoggedIn: Boolean): List<TvHomeRow> = coroutineScope {
+    private suspend fun loadLocalRows(isLoggedIn: Boolean): List<TvDiscoverRow> = coroutineScope {
         val upNextEpisodesDeferred = async {
             upNextDao.getUpNextBaseEpisodes(limit = UP_NEXT_LIMIT + 1).filterIsInstance<PodcastEpisode>()
         }
@@ -155,10 +128,10 @@ class TvHomeViewModel @Inject constructor(
         buildList {
             upNextEpisodes.firstOrNull()?.let { current ->
                 add(
-                    TvHomeRow.Episodes(
+                    TvDiscoverRow.Episodes(
                         id = KEEP_LISTENING_ROW_ID,
                         title = context.getString(LR.string.tv_home_keep_listening),
-                        episodes = listOf(current.toTvHomeEpisode(podcastTitles)),
+                        episodes = listOf(current.toTvDiscoverEpisode(podcastTitles)),
                     ),
                 )
             }
@@ -166,19 +139,19 @@ class TvHomeViewModel @Inject constructor(
                 val queue = upNextEpisodes.drop(1)
                 if (queue.isNotEmpty()) {
                     add(
-                        TvHomeRow.Episodes(
+                        TvDiscoverRow.Episodes(
                             id = UP_NEXT_ROW_ID,
                             title = context.getString(LR.string.up_next),
-                            episodes = queue.map { it.toTvHomeEpisode(podcastTitles) },
+                            episodes = queue.map { it.toTvDiscoverEpisode(podcastTitles) },
                         ),
                     )
                 }
                 if (newReleases.isNotEmpty()) {
                     add(
-                        TvHomeRow.Episodes(
+                        TvDiscoverRow.Episodes(
                             id = NEW_RELEASES_ROW_ID,
                             title = context.getString(LR.string.filters_title_new_releases),
-                            episodes = newReleases.map { it.toTvHomeEpisode(podcastTitles) },
+                            episodes = newReleases.map { it.toTvDiscoverEpisode(podcastTitles) },
                         ),
                     )
                 }
@@ -186,7 +159,7 @@ class TvHomeViewModel @Inject constructor(
         }
     }
 
-    fun playEpisode(episode: TvHomeEpisode) {
+    fun playEpisode(episode: TvDiscoverEpisode) {
         viewModelScope.launch {
             try {
                 val found = episodeManager.findByUuid(episode.episodeUuid)
@@ -216,61 +189,11 @@ class TvHomeViewModel @Inject constructor(
         return podcastDao.findAllIn(uuids).associate { it.uuid to it.title }
     }
 
-    private fun PodcastEpisode.toTvHomeEpisode(podcastTitles: Map<String, String>) = TvHomeEpisode(
+    private fun PodcastEpisode.toTvDiscoverEpisode(podcastTitles: Map<String, String>) = TvDiscoverEpisode(
         episodeUuid = uuid,
         episodeTitle = title,
         podcastUuid = podcastUuid,
         podcastTitle = podcastTitles[podcastUuid].orEmpty(),
-    )
-
-    private suspend fun loadRow(row: DiscoverRow): TvHomeRow? {
-        return when (row.type) {
-            is ListType.PodcastList -> loadPodcastsRow(row)
-            is ListType.EpisodeList -> loadEpisodesRow(row)
-            is ListType.Categories, is ListType.Unknown -> null
-        }
-    }
-
-    private suspend fun loadPodcastsRow(row: DiscoverRow): TvHomeRow? {
-        val feed = listRepository.getListFeed(row.source, row.authenticated) ?: return null
-        val podcasts = feed.podcasts.orEmpty()
-            .distinctBy(DiscoverPodcast::uuid)
-            .map { it.toTvHomePodcast(isSponsored = row.sponsored) }
-        if (podcasts.isEmpty()) return null
-        val title = feed.title?.takeIf { it.isNotBlank() } ?: row.title
-        return when (row.displayStyle) {
-            is DisplayStyle.Carousel, is DisplayStyle.SinglePodcast -> {
-                TvHomeRow.FeaturedPodcasts(id = row.rowId(), title = title, podcasts = podcasts)
-            }
-
-            else -> TvHomeRow.Podcasts(id = row.rowId(), title = title, podcasts = podcasts)
-        }
-    }
-
-    private suspend fun loadEpisodesRow(row: DiscoverRow): TvHomeRow? {
-        val feed = listRepository.getListFeed(row.source, row.authenticated) ?: return null
-        val episodes = feed.episodes.orEmpty()
-            .distinctBy(DiscoverEpisode::uuid)
-            .map { episode ->
-                TvHomeEpisode(
-                    episodeUuid = episode.uuid,
-                    episodeTitle = episode.title.orEmpty(),
-                    podcastUuid = episode.podcast_uuid,
-                    podcastTitle = episode.podcast_title.orEmpty(),
-                )
-            }
-        if (episodes.isEmpty()) return null
-        val title = feed.title?.takeIf { it.isNotBlank() } ?: row.title
-        return TvHomeRow.Episodes(id = row.rowId(), title = title, episodes = episodes)
-    }
-
-    private fun DiscoverRow.rowId() = listUuid ?: id ?: title
-
-    private fun DiscoverPodcast.toTvHomePodcast(isSponsored: Boolean) = TvHomePodcast(
-        uuid = uuid,
-        title = title.orEmpty(),
-        description = description.orEmpty(),
-        isSponsored = isSponsored,
     )
 
     companion object {
@@ -290,47 +213,5 @@ class TvHomeViewModel @Inject constructor(
 sealed interface TvHomeUiState {
     data object Loading : TvHomeUiState
     data object Error : TvHomeUiState
-    data class Ready(val rows: List<TvHomeRow>) : TvHomeUiState
-}
-
-sealed interface TvHomeRow {
-    val id: String
-    val title: String
-
-    data class FeaturedPodcasts(
-        override val id: String,
-        override val title: String,
-        val podcasts: List<TvHomePodcast>,
-    ) : TvHomeRow
-
-    data class Podcasts(
-        override val id: String,
-        override val title: String,
-        val podcasts: List<TvHomePodcast>,
-    ) : TvHomeRow
-
-    data class Episodes(
-        override val id: String,
-        override val title: String,
-        val episodes: List<TvHomeEpisode>,
-    ) : TvHomeRow
-}
-
-data class TvHomePodcast(
-    val uuid: String,
-    val title: String,
-    val description: String,
-    val isSponsored: Boolean = false,
-) {
-    val artworkUrl: String = PodcastImage.getMediumArtworkUrl(uuid)
-}
-
-data class TvHomeEpisode(
-    val episodeUuid: String,
-    val episodeTitle: String,
-    val podcastUuid: String,
-    val podcastTitle: String,
-) {
-    val thumbnailUrl: String = PodcastImage.getArtworkUrl(size = 960, uuid = podcastUuid, isWearOS = false)
-    val podcastArtworkUrl: String = PodcastImage.getArtworkUrl(size = 200, uuid = podcastUuid, isWearOS = false)
+    data class Ready(val rows: List<TvDiscoverRow>) : TvHomeUiState
 }
