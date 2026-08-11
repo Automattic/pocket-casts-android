@@ -5,8 +5,11 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.text.TextStyle
 import androidx.tv.material3.ColorScheme
+import androidx.tv.material3.LocalTextStyle
 import androidx.tv.material3.MaterialTheme
+import androidx.tv.material3.ProvideTextStyle
 import androidx.tv.material3.Typography
 import androidx.tv.material3.darkColorScheme
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
@@ -14,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 
 private val DefaultTvColorScheme = TvColorScheme()
 private val DefaultTvTypography = TvTypography()
+private val DefaultMaterialTypography = Typography()
 
 private val LocalTvColorScheme = staticCompositionLocalOf<TvColorScheme> { error("TvTheme is required") }
 private val LocalTvTypography = staticCompositionLocalOf<TvTypography> { error("TvTheme is required") }
@@ -44,8 +48,11 @@ fun TvTheme(
             MaterialTheme(
                 colorScheme = colorScheme,
                 typography = materialTypography,
-                content = content,
-            )
+            ) {
+                ProvideTextStyle(LocalTextStyle.current.merge(TextStyle(fontFamily = GoogleSansFontFamily))) {
+                    content()
+                }
+            }
         }
     }
 }
@@ -89,4 +96,7 @@ private fun TvTypography.toMaterialTypography(): Typography = Typography(
     bodyLarge = caption1,
     bodyMedium = caption2,
     bodySmall = caption2,
+    labelLarge = DefaultMaterialTypography.labelLarge.copy(fontFamily = GoogleSansFontFamily),
+    labelMedium = DefaultMaterialTypography.labelMedium.copy(fontFamily = GoogleSansFontFamily),
+    labelSmall = DefaultMaterialTypography.labelSmall.copy(fontFamily = GoogleSansFontFamily),
 )
