@@ -3,11 +3,9 @@ package au.com.shiftyjelly.pocketcasts.nowplaying
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.focusable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -17,22 +15,28 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.semantics.progressBarRangeInfo
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
@@ -40,21 +44,23 @@ import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.theme.TvTheme
 import au.com.shiftyjelly.pocketcasts.theme.tvColors
 import au.com.shiftyjelly.pocketcasts.theme.tvTypography
+import kotlin.math.roundToInt
 
 @Composable
 fun TvSeekBar(
     positionMs: Int,
     durationMs: Int,
-    bufferedMs: Int,
     onSkipBack: () -> Unit,
     onSkipForward: () -> Unit,
+    onPlayPause: () -> Unit,
     modifier: Modifier = Modifier,
+    focusRequester: FocusRequester? = null,
 ) {
     var isFocused by remember { mutableStateOf(false) }
     val hasDuration = durationMs > 0
     val progress = if (hasDuration) (positionMs.toFloat() / durationMs).coerceIn(0f, 1f) else 0f
-    val buffered = if (hasDuration) (bufferedMs.toFloat() / durationMs).coerceIn(0f, 1f) else 0f
     val trackHeight by animateDpAsState(if (isFocused) 8.dp else 4.dp, label = "TvSeekBarTrackHeight")
+    val thumbSize = 12.dp
 
     Column(modifier = modifier) {
         BoxWithConstraints(
@@ -68,7 +74,16 @@ fun TvSeekBar(
                 }
                 .onKeyEvent { event ->
                     when {
-                        event.type != KeyEventType.KeyDown || !hasDuration -> false
+                        event.type != KeyEventType.KeyDown -> false
+
+                        event.key == Key.DirectionCenter || event.key == Key.Enter -> {
+                            if (event.nativeKeyEvent.repeatCount == 0) {
+                                onPlayPause()
+                            }
+                            true
+                        }
+
+                        !hasDuration -> false
 
                         event.key == Key.DirectionLeft -> {
                             onSkipBack()
@@ -83,9 +98,9 @@ fun TvSeekBar(
                         else -> false
                     }
                 }
+                .then(if (focusRequester != null) Modifier.focusRequester(focusRequester) else Modifier)
                 .focusable(),
         ) {
-            val thumbSize = 12.dp
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -95,14 +110,9 @@ fun TvSeekBar(
             ) {
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth(buffered)
-                        .fillMaxHeight()
-                        .background(MaterialTheme.tvColors.backgroundActive50),
-                )
-                Box(
-                    modifier = Modifier
                         .fillMaxWidth(progress)
                         .fillMaxHeight()
+                        .clip(CircleShape)
                         .background(MaterialTheme.tvColors.backgroundActive),
                 )
             }
@@ -116,14 +126,30 @@ fun TvSeekBar(
                 )
             }
         }
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
+        BoxWithConstraints(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 8.dp),
         ) {
-            SeekBarLabel(text = TimeHelper.formattedSeconds(positionMs / 1000.0))
-            SeekBarLabel(text = if (hasDuration) TimeHelper.formattedSeconds(durationMs / 1000.0) else "-")
+            val maxWidthPx = constraints.maxWidth.toFloat()
+            val thumbSizePx = with(LocalDensity.current) { thumbSize.toPx() }
+            var positionLabelWidth by remember { mutableIntStateOf(0) }
+            SeekBarLabel(
+                text = TimeHelper.formattedSeconds(positionMs / 1000.0),
+                modifier = Modifier
+                    .align(Alignment.CenterStart)
+                    .onSizeChanged { positionLabelWidth = it.width }
+                    .offset {
+                        val thumbCenter = (maxWidthPx - thumbSizePx) * progress + thumbSizePx / 2f
+                        val x = (thumbCenter - positionLabelWidth / 2f)
+                            .coerceIn(0f, (maxWidthPx - positionLabelWidth).coerceAtLeast(0f))
+                        IntOffset(x.roundToInt(), 0)
+                    },
+            )
+            SeekBarLabel(
+                text = if (hasDuration) TimeHelper.formattedSeconds(durationMs / 1000.0) else "-",
+                modifier = Modifier.align(Alignment.CenterEnd),
+            )
         }
     }
 }
@@ -135,8 +161,8 @@ private fun SeekBarLabel(
 ) {
     Text(
         text = text,
-        style = MaterialTheme.tvTypography.caption2,
-        color = MaterialTheme.tvColors.textSecondary,
+        style = MaterialTheme.tvTypography.caption1,
+        color = MaterialTheme.tvColors.textTertiary,
         modifier = modifier,
     )
 }
@@ -148,9 +174,9 @@ private fun TvSeekBarPreview() {
         TvSeekBar(
             positionMs = 600_000,
             durationMs = 3_600_000,
-            bufferedMs = 1_200_000,
             onSkipBack = {},
             onSkipForward = {},
+            onPlayPause = {},
         )
     }
 }
