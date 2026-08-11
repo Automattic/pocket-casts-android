@@ -32,7 +32,8 @@ class TvDiscoverFeedLoader @Inject constructor(
     suspend fun searchDiscoverFeed(): Discover = listRepository.getSearchDiscoverFeed()
 
     suspend fun loadCategories(discover: Discover): List<DiscoverCategory> {
-        val source = discover.layout.firstOrNull { it.type is ListType.Categories }?.source ?: return emptyList()
+        val source = discover.layout.firstOrNull { it.type is ListType.Categories }
+            ?.source?.takeIf(String::isNotBlank) ?: return emptyList()
         return try {
             listRepository.getCategoriesList(source)
         } catch (exception: CancellationException) {

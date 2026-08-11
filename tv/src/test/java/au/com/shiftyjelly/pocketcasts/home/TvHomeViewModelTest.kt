@@ -180,6 +180,27 @@ class TvHomeViewModelTest {
     }
 
     @Test
+    fun `rows without a source are dropped`() = runTest {
+        whenever(syncManager.isLoggedIn()).thenReturn(false)
+        whenever(listRepository.getLoggedOutDiscoverFeed()).thenReturn(
+            discover(
+                row(id = "up-next-placeholder", title = "Up Next", source = ""),
+                row(id = "trending", title = "Row Trending", source = "https://lists/trending.json"),
+            ),
+        )
+        whenever(listRepository.getListFeed(eq("https://lists/trending.json"), any()))
+            .thenReturn(podcastFeed("podcast-trending"))
+
+        val viewModel = createViewModel()
+
+        viewModel.uiState.test {
+            val state = awaitItem() as TvHomeUiState.Ready
+            assertEquals(listOf("trending"), state.rows.map { it.id })
+        }
+        verify(listRepository, never()).getListFeed(eq(""), any())
+    }
+
+    @Test
     fun `authenticated rows load when signed in`() = runTest {
         whenever(syncManager.isLoggedIn()).thenReturn(true)
         whenever(listRepository.getLoggedInDiscoverFeed()).thenReturn(
