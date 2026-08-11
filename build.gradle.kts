@@ -475,9 +475,6 @@ subprojects {
 }
 
 fun Project.applyCommonSentryConfiguration() {
-    // A secret-injection step that resolves to nothing exports an empty SENTRY_AUTH_TOKEN rather
-    // than leaving it unset, so treat blank as missing — otherwise the guard below passes and
-    // sentry-cli fails mid-upload with an opaque auth error.
     val sentryAuthToken = providers.environmentVariable("SENTRY_AUTH_TOKEN").orNull?.takeIf { it.isNotBlank() }
 
     extensions.getByType(SentryPluginExtension::class.java).apply {
@@ -497,10 +494,6 @@ fun Project.applyCommonSentryConfiguration() {
         ignoredBuildTypes = setOf("debug", "debugProd", "prototype")
     }
 
-    // SentryCliExecTask is the base of every task that shells out to sentry-cli with the auth token
-    // (ProGuard mappings and source bundles here). Those tasks only exist when the upload flags are
-    // on, so this fires exactly when an upload is expected — fail there rather than ship a release
-    // we can't deobfuscate.
     tasks.withType<SentryCliExecTask>().configureEach {
         doFirst {
             if (sentryAuthToken == null) {
