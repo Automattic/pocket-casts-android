@@ -1,5 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.search
 
+import android.view.InputDevice
+import android.view.KeyCharacterMap
 import android.view.KeyEvent.KEYCODE_DEL
 import android.view.KeyEvent.KEYCODE_DPAD_CENTER
 import android.view.KeyEvent.KEYCODE_DPAD_LEFT
@@ -20,6 +22,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
@@ -41,11 +44,16 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.nativeKeyCode
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
@@ -54,7 +62,7 @@ import au.com.shiftyjelly.pocketcasts.theme.tvColors
 import au.com.shiftyjelly.pocketcasts.theme.tvTypography
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-sealed interface TvSearchKey {
+internal sealed interface TvSearchKey {
     data class Character(val char: Char) : TvSearchKey
     data object Space : TvSearchKey
     data object Delete : TvSearchKey
@@ -81,7 +89,7 @@ private val SymbolsKeys: List<TvSearchKey> = buildList {
 private val InitialSelectedIndex = LettersKeys.indexOfFirst { it is TvSearchKey.Character }
 
 @Stable
-class TvSearchKeyboardState {
+internal class TvSearchKeyboardState {
     private var page by mutableStateOf(TvSearchKeyboardPage.Letters)
 
     var selectedIndex by mutableIntStateOf(InitialSelectedIndex)
@@ -125,7 +133,7 @@ class TvSearchKeyboardState {
 }
 
 @Composable
-fun rememberTvSearchKeyboardState(): TvSearchKeyboardState = remember { TvSearchKeyboardState() }
+internal fun rememberTvSearchKeyboardState(): TvSearchKeyboardState = remember { TvSearchKeyboardState() }
 
 @Composable
 internal fun TvSearchKeyboard(
@@ -134,12 +142,15 @@ internal fun TvSearchKeyboard(
     onDelete: () -> Unit,
     onSubmit: () -> Unit,
     modifier: Modifier = Modifier,
+    autoFocus: Boolean = true,
     state: TvSearchKeyboardState = rememberTvSearchKeyboardState(),
 ) {
     val focusRequester = remember { FocusRequester() }
-    LaunchedEffect(Unit) {
-        withFrameNanos {}
-        runCatching { focusRequester.requestFocus() }
+    if (autoFocus) {
+        LaunchedEffect(Unit) {
+            withFrameNanos {}
+            runCatching { focusRequester.requestFocus() }
+        }
     }
 
     fun activate(key: TvSearchKey) {
@@ -151,57 +162,90 @@ internal fun TvSearchKeyboard(
         }
     }
 
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(2.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier
-            .focusRequester(focusRequester)
-            .onFocusChanged { state.onFocusChanged(it.isFocused) }
-            .onPreviewKeyEvent { event ->
-                val keyCode = event.key.nativeKeyCode
-                val isKeyDown = event.type == KeyEventType.KeyDown
-                when (keyCode) {
-                    KEYCODE_DPAD_LEFT, KEYCODE_DPAD_RIGHT -> state.handleDpadDirection(keyCode, isKeyDown)
+    val keyboardDescription = stringResource(LR.string.tv_search_keyboard)
+    val selectedKeyLabel = when (val key = state.selectedKey) {
+        is TvSearchKey.Character -> key.char.toString()
 
-                    KEYCODE_DPAD_CENTER -> {
-                        if (isKeyDown) activate(state.selectedKey)
-                        true
-                    }
+        TvSearchKey.Space -> stringResource(LR.string.tv_search_key_space)
 
-                    KEYCODE_ENTER, KEYCODE_NUMPAD_ENTER -> {
-                        if (isKeyDown) onSubmit()
-                        true
-                    }
+        TvSearchKey.Delete -> stringResource(LR.string.delete)
 
-                    KEYCODE_DEL -> {
-                        if (isKeyDown) onDelete()
-                        true
-                    }
+        TvSearchKey.TogglePage -> stringResource(
+            if (state.isSymbolsPage) LR.string.tv_search_key_letters else LR.string.tv_search_key_symbols,
+        )
+    }
 
-                    KEYCODE_SPACE -> {
-                        if (isKeyDown) onSpace()
-                        true
-                    }
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(2.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = modifier
+                .focusRequester(focusRequester)
+                .onFocusChanged { state.onFocusChanged(it.isFocused) }
+                .semantics {
+                    contentDescription = keyboardDescription
+                    stateDescription = selectedKeyLabel
+                    liveRegion = LiveRegionMode.Polite
+                }
+                .onPreviewKeyEvent { event ->
+                    val keyCode = event.key.nativeKeyCode
+                    val isKeyDown = event.type == KeyEventType.KeyDown
+                    when (keyCode) {
+                        KEYCODE_DPAD_LEFT, KEYCODE_DPAD_RIGHT -> state.handleDpadDirection(keyCode, isKeyDown)
 
-                    else -> {
-                        val unicodeChar = event.nativeKeyEvent.getUnicodeChar(event.nativeKeyEvent.metaState)
-                        if (unicodeChar != 0 && !Character.isISOControl(unicodeChar)) {
-                            if (isKeyDown) onCharacter(unicodeChar.toChar())
+                        KEYCODE_DPAD_CENTER -> {
+                            if (isKeyDown) activate(state.selectedKey)
                             true
-                        } else {
-                            false
+                        }
+
+                        KEYCODE_ENTER, KEYCODE_NUMPAD_ENTER -> {
+                            if (isKeyDown) {
+                                if (event.nativeKeyEvent.device?.keyboardType == InputDevice.KEYBOARD_TYPE_ALPHABETIC) {
+                                    onSubmit()
+                                } else {
+                                    activate(state.selectedKey)
+                                }
+                            }
+                            true
+                        }
+
+                        KEYCODE_DEL -> {
+                            if (isKeyDown) onDelete()
+                            true
+                        }
+
+                        KEYCODE_SPACE -> {
+                            if (isKeyDown) onSpace()
+                            true
+                        }
+
+                        else -> {
+                            val nativeEvent = event.nativeKeyEvent
+                            if (nativeEvent.isCtrlPressed || nativeEvent.isMetaPressed) {
+                                return@onPreviewKeyEvent false
+                            }
+                            val unicodeChar = nativeEvent.getUnicodeChar(nativeEvent.metaState)
+                            val isPrintable = unicodeChar != 0 &&
+                                (unicodeChar and KeyCharacterMap.COMBINING_ACCENT) == 0 &&
+                                !Character.isISOControl(unicodeChar)
+                            if (isPrintable) {
+                                if (isKeyDown) onCharacter(unicodeChar.toChar())
+                                true
+                            } else {
+                                false
+                            }
                         }
                     }
                 }
+                .focusable(),
+        ) {
+            state.keys.forEachIndexed { index, key ->
+                TvSearchKeyCap(
+                    key = key,
+                    selected = state.isSelected(index),
+                    isSymbolsPage = state.isSymbolsPage,
+                )
             }
-            .focusable(),
-    ) {
-        state.keys.forEachIndexed { index, key ->
-            TvSearchKeyCap(
-                key = key,
-                selected = state.isSelected(index),
-                isSymbolsPage = state.isSymbolsPage,
-            )
         }
     }
 }
@@ -219,7 +263,6 @@ private fun TvSearchKeyCap(
         else -> Color.Transparent
     }
     val contentColor = if (selected) MaterialTheme.tvColors.textPrimaryActive else MaterialTheme.tvColors.textSecondary
-    val deleteLabel = stringResource(LR.string.delete)
     val shape = RoundedCornerShape(8.dp)
     val sizeModifier = when (key) {
         is TvSearchKey.Character -> Modifier.width(24.dp).height(48.dp).clip(shape).background(background)
@@ -253,7 +296,6 @@ private fun TvSearchKeyCap(
                 text = "⌫",
                 style = MaterialTheme.tvTypography.title3,
                 color = contentColor,
-                modifier = Modifier.semantics { contentDescription = deleteLabel },
             )
 
             TvSearchKey.TogglePage -> Text(
