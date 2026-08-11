@@ -82,13 +82,15 @@ class PlayAllHandler @AssistedInject constructor(
         return playlistEpisodes.isNotEmpty()
     }
 
-    suspend fun playAllPendingEpisodes() {
-        val episodes = pendingEpisodes?.episodesToPlay ?: return
+    suspend fun playAllPendingEpisodes(): Boolean {
+        val episodes = pendingEpisodes?.episodesToPlay ?: return false
 
         withContext(Dispatchers.Default) {
             playbackManager.upNextQueue.removeAll()
             playbackManager.playEpisodes(episodes, source)
         }
+        pendingEpisodes = null
+        return true
     }
 
     private suspend fun appendToQueueAndPlay(episodes: List<BaseEpisode>) {

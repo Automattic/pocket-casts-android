@@ -18,6 +18,7 @@ import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.Flow
@@ -32,6 +33,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 @HiltViewModel(assistedFactory = TvPlaylistDetailsViewModel.Factory::class)
 class TvPlaylistDetailsViewModel @AssistedInject constructor(
@@ -49,6 +51,8 @@ class TvPlaylistDetailsViewModel @AssistedInject constructor(
 
     private var playAllJob: Job? = null
     private var replaceUpNextJob: Job? = null
+
+    private val isBusy get() = playAllJob?.isActive == true || replaceUpNextJob?.isActive == true
 
     private val playlistFlow: Flow<Playlist?> = when (playlistType) {
         Playlist.Type.Manual -> playlistManager.manualPlaylistFlow(playlistUuid, includeArchived = true)
@@ -90,32 +94,56 @@ class TvPlaylistDetailsViewModel @AssistedInject constructor(
     }
 
     fun playAll() {
-        if (playAllJob?.isActive == true) {
+        if (isBusy) {
             return
         }
         playAllJob = viewModelScope.launch {
-            val episodes = (uiState.value as? TvPlaylistDetailsUiState.Loaded)?.episodes.orEmpty()
-            when (playAllHandler.handlePlayAllEpisodes(episodes)) {
-                PlayAllResponse.DoNothing -> _events.tryEmit(TvPlaylistDetailsEvent.OpenNowPlaying)
-                PlayAllResponse.ShowWarning -> _events.tryEmit(TvPlaylistDetailsEvent.ShowReplaceUpNextConfirmation)
-                PlayAllResponse.ShowNoEpisodesToPlay -> _events.tryEmit(TvPlaylistDetailsEvent.ShowNoEpisodesToPlay)
+            try {
+                val episodes = (uiState.value as? TvPlaylistDetailsUiState.Loaded)?.episodes.orEmpty()
+                when (playAllHandler.handlePlayAllEpisodes(episodes)) {
+                    PlayAllResponse.DoNothing -> _events.tryEmit(TvPlaylistDetailsEvent.OpenNowPlaying)
+                    PlayAllResponse.ShowWarning -> _events.tryEmit(TvPlaylistDetailsEvent.ShowReplaceUpNextConfirmation)
+                    PlayAllResponse.ShowNoEpisodesToPlay -> _events.tryEmit(TvPlaylistDetailsEvent.ShowNoEpisodesToPlay)
+                }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Timber.e(e, "Failed to play all episodes on TV")
             }
         }
     }
 
     fun replaceUpNextAndPlay(saveUpNext: Boolean, upNextName: String) {
-        if (replaceUpNextJob?.isActive == true) {
+        if (isBusy) {
             return
         }
         replaceUpNextJob = viewModelScope.launch {
-            withContext(NonCancellable) {
-                val saved = saveUpNext && runCatching { playAllHandler.saveUpNextAsPlaylist(upNextName) }.getOrDefault(false)
-                if (saved) {
-                    _events.tryEmit(TvPlaylistDetailsEvent.ShowUpNextSavedToast)
+            val played = withContext(NonCancellable) {
+                if (saveUpNext) {
+                    val saved = try {
+                        playAllHandler.saveUpNextAsPlaylist(upNextName)
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: Exception) {
+                        Timber.e(e, "Failed to save Up Next as a playlist on TV")
+                        false
+                    }
+                    if (saved) {
+                        _events.tryEmit(TvPlaylistDetailsEvent.ShowUpNextSavedToast)
+                    }
                 }
-                playAllHandler.playAllPendingEpisodes()
+                try {
+                    playAllHandler.playAllPendingEpisodes()
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    Timber.e(e, "Failed to play the Up Next queue on TV")
+                    false
+                }
             }
-            _events.tryEmit(TvPlaylistDetailsEvent.OpenNowPlaying)
+            if (played) {
+                _events.tryEmit(TvPlaylistDetailsEvent.OpenNowPlaying)
+            }
         }
     }
 

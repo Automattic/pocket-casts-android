@@ -15,6 +15,7 @@ import java.util.Date
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -179,6 +180,7 @@ class TvPlaylistDetailsViewModelTest {
 
     @Test
     fun `replacing without saving plays the pending episodes and opens now playing`() = runTest {
+        whenever(playAllHandler.playAllPendingEpisodes()) doReturn true
         val viewModel = createViewModel()
 
         viewModel.events.test {
@@ -193,6 +195,7 @@ class TvPlaylistDetailsViewModelTest {
     @Test
     fun `replacing with saving saves the queue before playing`() = runTest {
         whenever(playAllHandler.saveUpNextAsPlaylist(any())) doReturn true
+        whenever(playAllHandler.playAllPendingEpisodes()) doReturn true
         val viewModel = createViewModel()
 
         viewModel.events.test {
@@ -210,6 +213,7 @@ class TvPlaylistDetailsViewModelTest {
     @Test
     fun `replacing with saving does not claim a save when nothing was saved`() = runTest {
         whenever(playAllHandler.saveUpNextAsPlaylist(any())) doReturn false
+        whenever(playAllHandler.playAllPendingEpisodes()) doReturn true
         val viewModel = createViewModel()
 
         viewModel.events.test {
@@ -223,6 +227,7 @@ class TvPlaylistDetailsViewModelTest {
     @Test
     fun `replacing with saving still plays when the save fails`() = runTest {
         whenever(playAllHandler.saveUpNextAsPlaylist(any())) doSuspendableAnswer { throw RuntimeException("boom") }
+        whenever(playAllHandler.playAllPendingEpisodes()) doReturn true
         val viewModel = createViewModel()
 
         viewModel.events.test {
@@ -242,8 +247,62 @@ class TvPlaylistDetailsViewModelTest {
         viewModel.replaceUpNextAndPlay(saveUpNext = true, upNextName = "Up Next")
         viewModel.replaceUpNextAndPlay(saveUpNext = true, upNextName = "Up Next")
         gate.complete(true)
+        advanceUntilIdle()
 
         verify(playAllHandler, times(1)).saveUpNextAsPlaylist("Up Next")
+    }
+
+    @Test
+    fun `replacing does not open now playing when there is nothing to play`() = runTest {
+        whenever(playAllHandler.playAllPendingEpisodes()) doReturn false
+        val viewModel = createViewModel()
+
+        viewModel.events.test {
+            viewModel.replaceUpNextAndPlay(saveUpNext = false, upNextName = "Up Next")
+            expectNoEvents()
+        }
+
+        verify(playAllHandler).playAllPendingEpisodes()
+    }
+
+    @Test
+    fun `rapid play all requests reach the handler only once`() = runTest {
+        val gate = CompletableDeferred<PlayAllResponse>()
+        whenever(playAllHandler.handlePlayAllEpisodes(any())) doSuspendableAnswer { gate.await() }
+        val viewModel = createViewModel()
+
+        viewModel.uiState.test {
+            assertEquals(TvPlaylistDetailsUiState.Loading, awaitItem())
+            playlists.emit(playlist(availableEpisode))
+            assertEquals(listOf(availableEpisode), (awaitItem() as TvPlaylistDetailsUiState.Loaded).episodes)
+
+            viewModel.playAll()
+            viewModel.playAll()
+            gate.complete(PlayAllResponse.DoNothing)
+            advanceUntilIdle()
+        }
+
+        verify(playAllHandler, times(1)).handlePlayAllEpisodes(any())
+    }
+
+    @Test
+    fun `replace is ignored while play all is still running`() = runTest {
+        val gate = CompletableDeferred<PlayAllResponse>()
+        whenever(playAllHandler.handlePlayAllEpisodes(any())) doSuspendableAnswer { gate.await() }
+        val viewModel = createViewModel()
+
+        viewModel.uiState.test {
+            assertEquals(TvPlaylistDetailsUiState.Loading, awaitItem())
+            playlists.emit(playlist(availableEpisode))
+            assertEquals(listOf(availableEpisode), (awaitItem() as TvPlaylistDetailsUiState.Loaded).episodes)
+
+            viewModel.playAll()
+            viewModel.replaceUpNextAndPlay(saveUpNext = true, upNextName = "Up Next")
+            gate.complete(PlayAllResponse.ShowWarning)
+            advanceUntilIdle()
+        }
+
+        verify(playAllHandler, never()).saveUpNextAsPlaylist(any())
     }
 
     @Test
