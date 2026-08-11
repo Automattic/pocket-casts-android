@@ -331,7 +331,6 @@ private fun TvNowPlayingContent(
             TvSeekBar(
                 positionMs = state.positionMs,
                 durationMs = state.durationMs,
-                bufferedMs = state.bufferedMs,
                 onSkipBack = onSkipBackward,
                 onSkipForward = onSkipForward,
                 onPlayPause = onPlayPause,

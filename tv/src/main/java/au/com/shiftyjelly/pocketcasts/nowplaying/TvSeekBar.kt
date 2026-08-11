@@ -45,7 +45,6 @@ import au.com.shiftyjelly.pocketcasts.theme.tvTypography
 fun TvSeekBar(
     positionMs: Int,
     durationMs: Int,
-    bufferedMs: Int,
     onSkipBack: () -> Unit,
     onSkipForward: () -> Unit,
     onPlayPause: () -> Unit,
@@ -55,7 +54,6 @@ fun TvSeekBar(
     var isFocused by remember { mutableStateOf(false) }
     val hasDuration = durationMs > 0
     val progress = if (hasDuration) (positionMs.toFloat() / durationMs).coerceIn(0f, 1f) else 0f
-    val buffered = if (hasDuration) (bufferedMs.toFloat() / durationMs).coerceIn(0f, 1f) else 0f
     val trackHeight by animateDpAsState(if (isFocused) 8.dp else 4.dp, label = "TvSeekBarTrackHeight")
 
     Column(modifier = modifier) {
@@ -107,14 +105,9 @@ fun TvSeekBar(
             ) {
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth(buffered)
-                        .fillMaxHeight()
-                        .background(MaterialTheme.tvColors.backgroundActive50),
-                )
-                Box(
-                    modifier = Modifier
                         .fillMaxWidth(progress)
                         .fillMaxHeight()
+                        .clip(CircleShape)
                         .background(MaterialTheme.tvColors.backgroundActive),
                 )
             }
@@ -165,7 +158,6 @@ private fun TvSeekBarPreview() {
         TvSeekBar(
             positionMs = 600_000,
             durationMs = 3_600_000,
-            bufferedMs = 1_200_000,
             onSkipBack = {},
             onSkipForward = {},
             onPlayPause = {},
