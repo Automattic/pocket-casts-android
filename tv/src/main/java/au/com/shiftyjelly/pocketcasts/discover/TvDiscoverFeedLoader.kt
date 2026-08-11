@@ -4,6 +4,7 @@ import android.content.Context
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
 import au.com.shiftyjelly.pocketcasts.servers.model.Discover
+import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverEpisode
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRow
@@ -12,9 +13,11 @@ import au.com.shiftyjelly.pocketcasts.servers.model.ListType
 import au.com.shiftyjelly.pocketcasts.servers.model.transformWithRegion
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import timber.log.Timber
 
 class TvDiscoverFeedLoader @Inject constructor(
     private val listRepository: ListRepository,
@@ -23,7 +26,24 @@ class TvDiscoverFeedLoader @Inject constructor(
 ) {
     suspend fun load(isLoggedIn: Boolean): List<TvDiscoverRow> = buildRows(listRepository.getDiscoverFeed(), isLoggedIn)
 
-    suspend fun loadSearch(isLoggedIn: Boolean): List<TvDiscoverRow> = buildRows(listRepository.getSearchDiscoverFeed(), isLoggedIn)
+    suspend fun loadSearch(isLoggedIn: Boolean): TvSearchDiscover = coroutineScope {
+        val discover = listRepository.getSearchDiscoverFeed()
+        val rowsDeferred = async { buildRows(discover, isLoggedIn) }
+        val categoriesDeferred = async { loadCategories(discover) }
+        TvSearchDiscover(categories = categoriesDeferred.await(), rows = rowsDeferred.await())
+    }
+
+    private suspend fun loadCategories(discover: Discover): List<DiscoverCategory> {
+        val source = discover.layout.firstOrNull { it.type is ListType.Categories }?.source ?: return emptyList()
+        return try {
+            listRepository.getCategoriesList(source)
+        } catch (exception: CancellationException) {
+            throw exception
+        } catch (exception: Exception) {
+            Timber.e(exception, "Failed to load TV search categories")
+            emptyList()
+        }
+    }
 
     private suspend fun buildRows(discover: Discover, isLoggedIn: Boolean): List<TvDiscoverRow> = coroutineScope {
         val region = discover.regions[settings.discoverCountryCode.value]
