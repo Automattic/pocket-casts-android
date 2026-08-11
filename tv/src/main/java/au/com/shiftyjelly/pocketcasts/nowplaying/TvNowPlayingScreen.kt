@@ -190,9 +190,7 @@ private fun TvNowPlayingContent(
         if (state.isPlaying && !isAnyOverlayVisible) {
             delay(CHROME_HIDE_DELAY)
             isChromeVisible = false
-            if (!isContentFocused) {
-                runCatching { seekBarFocusRequester.requestFocus() }
-            }
+            runCatching { seekBarFocusRequester.requestFocus() }
         } else {
             isChromeVisible = true
         }

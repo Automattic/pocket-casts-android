@@ -52,7 +52,7 @@ internal fun TvPlaybackSpeedButton(
         ) {
             Icon(
                 painter = painterResource(IR.drawable.ic_effects_off),
-                contentDescription = stringResource(LR.string.playback_speed),
+                contentDescription = "${stringResource(LR.string.playback_speed)}, ${playbackSpeedLabel(currentSpeed, locale)}",
                 modifier = Modifier.size(TvControlBarIconSize),
             )
         }

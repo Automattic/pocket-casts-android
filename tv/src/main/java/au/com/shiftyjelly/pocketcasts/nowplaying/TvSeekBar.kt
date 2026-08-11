@@ -73,7 +73,9 @@ fun TvSeekBar(
                         event.type != KeyEventType.KeyDown -> false
 
                         event.key == Key.DirectionCenter || event.key == Key.Enter -> {
-                            onPlayPause()
+                            if (event.nativeKeyEvent.repeatCount == 0) {
+                                onPlayPause()
+                            }
                             true
                         }
 
@@ -92,7 +94,7 @@ fun TvSeekBar(
                         else -> false
                     }
                 }
-                .then(focusRequester?.let { Modifier.focusRequester(it) } ?: Modifier)
+                .then(if (focusRequester != null) Modifier.focusRequester(focusRequester) else Modifier)
                 .focusable(),
         ) {
             val thumbSize = 12.dp
