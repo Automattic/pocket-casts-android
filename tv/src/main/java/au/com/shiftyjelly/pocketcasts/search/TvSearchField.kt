@@ -34,7 +34,7 @@ internal fun TvSearchField(
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
-    LaunchedEffect(query) { scrollState.scrollTo(scrollState.maxValue) }
+    LaunchedEffect(scrollState.maxValue) { scrollState.scrollTo(scrollState.maxValue) }
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
