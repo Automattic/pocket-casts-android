@@ -177,7 +177,7 @@ internal fun TvSearchKeyboard(
         )
     }
 
-    Box(modifier = modifier) {
+    Box(modifier = modifier, propagateMinConstraints = true) {
         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(2.dp),

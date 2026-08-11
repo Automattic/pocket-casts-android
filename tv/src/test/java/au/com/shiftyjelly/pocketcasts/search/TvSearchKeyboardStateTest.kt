@@ -1,7 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.search
 
+import android.view.KeyEvent.KEYCODE_DPAD_DOWN
 import android.view.KeyEvent.KEYCODE_DPAD_LEFT
 import android.view.KeyEvent.KEYCODE_DPAD_RIGHT
+import android.view.KeyEvent.KEYCODE_DPAD_UP
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -66,10 +68,20 @@ class TvSearchKeyboardStateTest {
 
     @Test
     fun `toggle page clamps a high selection onto the shorter symbols page`() {
-        repeat(23) { state.handleDpadDirection(KEYCODE_DPAD_RIGHT, isKeyDown = true) }
+        assertEquals(29, state.keys.size)
+        repeat(40) { state.handleDpadDirection(KEYCODE_DPAD_RIGHT, isKeyDown = true) }
+        assertEquals(TvSearchKey.Delete, state.selectedKey)
+
         state.togglePage()
         assertTrue(state.isSymbolsPage)
+        assertEquals(20, state.keys.size)
         assertEquals(TvSearchKey.Delete, state.selectedKey)
+    }
+
+    @Test
+    fun `vertical dpad keys are not consumed so navigation can leave the keyboard`() {
+        assertFalse(state.handleDpadDirection(KEYCODE_DPAD_UP, isKeyDown = true))
+        assertFalse(state.handleDpadDirection(KEYCODE_DPAD_DOWN, isKeyDown = true))
     }
 
     @Test
