@@ -4,6 +4,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -38,11 +39,16 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.Button
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import au.com.shiftyjelly.pocketcasts.component.LocalOpenNowPlaying
+import au.com.shiftyjelly.pocketcasts.component.LocalTvToastHostState
 import au.com.shiftyjelly.pocketcasts.component.TvArchivedFilterButton
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeActionContext
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeActionsModal
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeInfoModal
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeListItem
+import au.com.shiftyjelly.pocketcasts.component.TvModal
+import au.com.shiftyjelly.pocketcasts.component.TvModalButton
+import au.com.shiftyjelly.pocketcasts.component.TvModalSurface
 import au.com.shiftyjelly.pocketcasts.component.TvSortButton
 import au.com.shiftyjelly.pocketcasts.component.rememberTvEpisodeListFocus
 import au.com.shiftyjelly.pocketcasts.compose.components.PlaylistArtwork
@@ -78,10 +84,28 @@ fun TvPlaylistDetailsScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var openedPodcastUuid by rememberSaveable { mutableStateOf<String?>(null) }
+    var isReplaceUpNextConfirmationVisible by rememberSaveable { mutableStateOf(false) }
+
+    val openNowPlaying = LocalOpenNowPlaying.current
+    val toastHostState = LocalTvToastHostState.current
+    val upNextName = stringResource(LR.string.up_next)
+    val savedToast = stringResource(LR.string.up_next_as_playlist_saved)
+    val noEpisodesToast = stringResource(LR.string.play_all_no_episodes_message)
 
     LaunchedEffect(uiState, onClose) {
         if (uiState is TvPlaylistDetailsUiState.NotFound) {
             onClose()
+        }
+    }
+
+    LaunchedEffect(viewModel) {
+        viewModel.events.collect { event ->
+            when (event) {
+                TvPlaylistDetailsEvent.OpenNowPlaying -> openNowPlaying()
+                TvPlaylistDetailsEvent.ShowReplaceUpNextConfirmation -> isReplaceUpNextConfirmationVisible = true
+                TvPlaylistDetailsEvent.ShowUpNextSavedToast -> toastHostState.show(savedToast)
+                TvPlaylistDetailsEvent.ShowNoEpisodesToPlay -> toastHostState.show(noEpisodesToast)
+            }
         }
     }
 
@@ -99,7 +123,22 @@ fun TvPlaylistDetailsScreen(
             onChangeSortType = viewModel::changeSortType,
             onToggleArchiveFilter = viewModel::toggleArchiveFilter,
             onOpenPodcast = { openedPodcastUuid = it },
+            onPlayAll = viewModel::playAll,
             modifier = modifier,
+        )
+    }
+
+    if (isReplaceUpNextConfirmationVisible) {
+        TvPlayAllReplaceUpNextModal(
+            onPlayWithoutSaving = {
+                isReplaceUpNextConfirmationVisible = false
+                viewModel.replaceUpNextAndPlay(saveUpNext = false, upNextName = upNextName)
+            },
+            onSaveAndPlay = {
+                isReplaceUpNextConfirmationVisible = false
+                viewModel.replaceUpNextAndPlay(saveUpNext = true, upNextName = upNextName)
+            },
+            onCancel = { isReplaceUpNextConfirmationVisible = false },
         )
     }
 }
@@ -110,6 +149,7 @@ private fun TvPlaylistDetailsContent(
     onChangeSortType: (PlaylistEpisodeSortType) -> Unit,
     onToggleArchiveFilter: () -> Unit,
     onOpenPodcast: (String) -> Unit,
+    onPlayAll: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(modifier = modifier.fillMaxSize()) {
@@ -129,6 +169,7 @@ private fun TvPlaylistDetailsContent(
                     PlaylistInfo(
                         playlist = uiState.playlist,
                         episodes = uiState.episodes,
+                        onPlayAll = onPlayAll,
                         playAllFocusRequester = playAllFocusRequester,
                         modifier = Modifier.width(InfoPaneWidth),
                     )
@@ -319,6 +360,7 @@ private fun NoEpisodes(
 private fun PlaylistInfo(
     playlist: Playlist,
     episodes: List<PodcastEpisode>,
+    onPlayAll: () -> Unit,
     playAllFocusRequester: FocusRequester,
     modifier: Modifier = Modifier,
 ) {
@@ -353,7 +395,7 @@ private fun PlaylistInfo(
         }
         if (episodes.isNotEmpty()) {
             Button(
-                onClick = {},
+                onClick = onPlayAll,
                 colors = TvButtonDefaults.filledButtonColors(),
                 modifier = Modifier.focusRequester(playAllFocusRequester),
             ) {
@@ -361,6 +403,58 @@ private fun PlaylistInfo(
             }
         }
     }
+}
+
+@Composable
+private fun TvPlayAllReplaceUpNextModal(
+    onPlayWithoutSaving: () -> Unit,
+    onSaveAndPlay: () -> Unit,
+    onCancel: () -> Unit,
+) {
+    TvModal(onDismissRequest = onCancel) {
+        TvPlayAllReplaceUpNextContent(
+            onPlayWithoutSaving = onPlayWithoutSaving,
+            onSaveAndPlay = onSaveAndPlay,
+            onCancel = onCancel,
+        )
+    }
+}
+
+@Composable
+private fun ColumnScope.TvPlayAllReplaceUpNextContent(
+    onPlayWithoutSaving: () -> Unit,
+    onSaveAndPlay: () -> Unit,
+    onCancel: () -> Unit,
+) {
+    val focusRequester = remember { FocusRequester() }
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
+    Text(
+        text = stringResource(LR.string.tv_playlist_play_all_clear_up_next_title),
+        color = MaterialTheme.tvColors.textPrimary,
+        style = MaterialTheme.tvTypography.headline.copy(textAlign = TextAlign.Center),
+        modifier = Modifier.fillMaxWidth(),
+    )
+    Text(
+        text = stringResource(LR.string.tv_playlist_play_all_clear_up_next_message),
+        color = MaterialTheme.tvColors.textSecondary,
+        style = MaterialTheme.tvTypography.caption1.copy(textAlign = TextAlign.Center),
+        modifier = Modifier.fillMaxWidth(),
+    )
+    TvModalButton(
+        text = stringResource(LR.string.tv_playlist_play_all_play_without_saving),
+        onClick = onPlayWithoutSaving,
+    )
+    TvModalButton(
+        text = stringResource(LR.string.tv_playlist_play_all_save_and_play),
+        onClick = onSaveAndPlay,
+    )
+    TvModalButton(
+        text = stringResource(LR.string.cancel),
+        onClick = onCancel,
+        modifier = Modifier.focusRequester(focusRequester),
+    )
 }
 
 @Composable
@@ -395,6 +489,7 @@ private fun TvPlaylistDetailsPreview() {
             onChangeSortType = {},
             onToggleArchiveFilter = {},
             onOpenPodcast = {},
+            onPlayAll = {},
         )
     }
 }
@@ -426,6 +521,21 @@ private fun TvPlaylistDetailsLoadedPreview() {
             onChangeSortType = {},
             onToggleArchiveFilter = {},
             onOpenPodcast = {},
+            onPlayAll = {},
         )
+    }
+}
+
+@Preview
+@Composable
+private fun TvPlayAllReplaceUpNextPreview() {
+    TvTheme {
+        TvModalSurface {
+            TvPlayAllReplaceUpNextContent(
+                onPlayWithoutSaving = {},
+                onSaveAndPlay = {},
+                onCancel = {},
+            )
+        }
     }
 }
