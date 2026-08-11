@@ -36,7 +36,7 @@ import coil3.compose.AsyncImage
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
-fun TvSponsoredTile(
+fun TvSinglePodcastTile(
     artworkUrl: String,
     title: String,
     author: String,
@@ -80,33 +80,35 @@ fun TvSponsoredTile(
                     .weight(1f)
                     .padding(start = 24.dp),
             ) {
-                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    if (isSponsored) {
-                        Text(
-                            text = stringResource(LR.string.sponsored),
-                            style = MaterialTheme.tvTypography.body,
-                            color = textPrimary,
-                        )
+                if (isSponsored || author.isNotBlank()) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                        if (isSponsored) {
+                            Text(
+                                text = stringResource(LR.string.sponsored),
+                                style = MaterialTheme.tvTypography.body,
+                                color = textPrimary,
+                            )
+                            if (author.isNotBlank()) {
+                                Text(
+                                    text = "·",
+                                    style = MaterialTheme.tvTypography.body,
+                                    color = textSecondary,
+                                )
+                            }
+                        }
                         if (author.isNotBlank()) {
                             Text(
-                                text = "·",
+                                text = author,
                                 style = MaterialTheme.tvTypography.body,
                                 color = textSecondary,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
                             )
                         }
                     }
-                    if (author.isNotBlank()) {
-                        Text(
-                            text = author,
-                            style = MaterialTheme.tvTypography.body,
-                            color = textSecondary,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                        )
-                    }
-                }
 
-                Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
+                }
 
                 Text(
                     text = title,
@@ -133,10 +135,10 @@ fun TvSponsoredTile(
 
 @Preview(device = Devices.TV_1080p)
 @Composable
-private fun TvSponsoredTilePreview() {
+private fun TvSinglePodcastTilePreview() {
     TvTheme {
         Box(modifier = Modifier.background(MaterialTheme.tvColors.backgroundSunken).padding(24.dp)) {
-            TvSponsoredTile(
+            TvSinglePodcastTile(
                 artworkUrl = "",
                 title = "The Writer's Voice",
                 author = "iHeartPodcasts and Kaleidoscope",
