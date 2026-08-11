@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -37,13 +38,13 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import kotlin.math.roundToInt
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.theme.TvTheme
 import au.com.shiftyjelly.pocketcasts.theme.tvColors
 import au.com.shiftyjelly.pocketcasts.theme.tvTypography
+import kotlin.math.roundToInt
 
 @Composable
 fun TvSeekBar(
@@ -132,7 +133,7 @@ fun TvSeekBar(
         ) {
             val maxWidthPx = constraints.maxWidth.toFloat()
             val thumbSizePx = with(LocalDensity.current) { thumbSize.toPx() }
-            var positionLabelWidth by remember { mutableStateOf(0) }
+            var positionLabelWidth by remember { mutableIntStateOf(0) }
             SeekBarLabel(
                 text = TimeHelper.formattedSeconds(positionMs / 1000.0),
                 modifier = Modifier
