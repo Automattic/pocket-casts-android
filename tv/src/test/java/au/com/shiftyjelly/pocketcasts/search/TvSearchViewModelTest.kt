@@ -103,6 +103,42 @@ class TvSearchViewModelTest {
     }
 
     @Test
+    fun `authenticated rows are dropped when logged out`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(
+            discover(
+                row(id = "public", title = "Public", source = "https://lists/public.json"),
+                row(id = "members", title = "Members", source = "https://lists/members.json", authenticated = true),
+            ),
+        )
+        whenever(listRepository.getListFeed(eq("https://lists/public.json"), any()))
+            .thenReturn(podcastFeed("podcast-public"))
+
+        val viewModel = createViewModel()
+
+        assertEquals(listOf("public"), viewModel.discoverRows.value.map { it.id })
+    }
+
+    @Test
+    fun `single podcast display style maps to a single podcast row`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(
+            discover(
+                row(
+                    id = "spotlight",
+                    title = "Spotlight",
+                    source = "https://lists/spotlight.json",
+                    displayStyle = DisplayStyle.SinglePodcast(),
+                ),
+            ),
+        )
+        whenever(listRepository.getListFeed(eq("https://lists/spotlight.json"), any()))
+            .thenReturn(podcastFeed("podcast-spotlight"))
+
+        val viewModel = createViewModel()
+
+        assertTrue(viewModel.discoverRows.value.single() is TvDiscoverRow.SinglePodcast)
+    }
+
+    @Test
     fun `discover rows are empty when loading fails`() = runTest {
         whenever(listRepository.getSearchDiscoverFeed()).thenThrow(RuntimeException("Network error"))
 
@@ -155,10 +191,12 @@ class TvSearchViewModelTest {
         title: String,
         source: String,
         type: ListType = ListType.PodcastList,
+        displayStyle: DisplayStyle = DisplayStyle.SmallList(),
+        authenticated: Boolean = false,
     ) = DiscoverRow(
         id = id,
         type = type,
-        displayStyle = DisplayStyle.SmallList(),
+        displayStyle = displayStyle,
         expandedStyle = ExpandedStyle.PlainList(),
         expandedTopItemLabel = null,
         title = title,
@@ -168,7 +206,7 @@ class TvSearchViewModelTest {
         regions = listOf("us"),
         curated = false,
         sponsored = false,
-        authenticated = false,
+        authenticated = authenticated,
         mostPopularCategoriesId = null,
         sponsoredCategoryIds = null,
     )

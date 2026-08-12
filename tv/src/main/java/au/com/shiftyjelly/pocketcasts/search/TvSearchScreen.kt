@@ -117,7 +117,7 @@ private fun TvSearchContent(
 
         if (query.isBlank()) {
             discoverRows.forEach { row ->
-                item(key = "discover-spacer-${row.id}") { Spacer(modifier = Modifier.height(24.dp)) }
+                item { Spacer(modifier = Modifier.height(24.dp)) }
                 tvDiscoverRow(
                     row = row,
                     onOpenPodcast = {},

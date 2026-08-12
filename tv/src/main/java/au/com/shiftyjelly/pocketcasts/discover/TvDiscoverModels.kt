@@ -1,12 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.discover
 
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
-import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
-
-data class TvSearchDiscover(
-    val categories: List<DiscoverCategory>,
-    val rows: List<TvDiscoverRow>,
-)
 
 sealed interface TvDiscoverRow {
     val id: String
