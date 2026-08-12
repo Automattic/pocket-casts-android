@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.search
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
@@ -30,6 +31,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.await
 import timber.log.Timber
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
 class TvSearchViewModel @Inject constructor(
@@ -53,6 +55,9 @@ class TvSearchViewModel @Inject constructor(
 
     private val _searchState = MutableStateFlow<TvSearchState>(TvSearchState.Idle)
     val searchState: StateFlow<TvSearchState> = _searchState.asStateFlow()
+
+    private val _filter = MutableStateFlow(TvSearchFilter.TopResults)
+    val filter: StateFlow<TvSearchFilter> = _filter.asStateFlow()
 
     private val _playStarted = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     val playStarted: SharedFlow<Unit> = _playStarted.asSharedFlow()
@@ -96,6 +101,7 @@ class TvSearchViewModel @Inject constructor(
         searchJob?.cancel()
         val term = query.trim()
         if (term.isEmpty()) {
+            _filter.value = TvSearchFilter.TopResults
             _searchState.value = TvSearchState.Idle
             return
         }
@@ -121,6 +127,10 @@ class TvSearchViewModel @Inject constructor(
                 TvSearchState.Error
             }
         }
+    }
+
+    fun onFilterSelected(filter: TvSearchFilter) {
+        _filter.value = filter
     }
 
     fun playEpisode(episode: ImprovedSearchResultItem.EpisodeItem) {
@@ -182,6 +192,14 @@ private fun Podcast.toSearchItem() = ImprovedSearchResultItem.PodcastItem(
     isFollowed = true,
     isExplicit = explicit == true,
 )
+
+enum class TvSearchFilter(
+    @StringRes val labelRes: Int,
+) {
+    TopResults(LR.string.search_filters_top_results),
+    Podcasts(LR.string.search_filters_podcasts),
+    Episodes(LR.string.search_filters_episodes),
+}
 
 sealed interface TvSearchState {
     data object Idle : TvSearchState

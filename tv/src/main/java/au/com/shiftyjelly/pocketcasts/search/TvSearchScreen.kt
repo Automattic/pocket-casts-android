@@ -41,6 +41,7 @@ import au.com.shiftyjelly.pocketcasts.component.TvEmptyState
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeActionContext
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeActionsModal
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeInfoModal
+import au.com.shiftyjelly.pocketcasts.component.TvPodcastGridScaffold
 import au.com.shiftyjelly.pocketcasts.component.TvPodcastTile
 import au.com.shiftyjelly.pocketcasts.component.TvPodcastTileDefaults
 import au.com.shiftyjelly.pocketcasts.component.TvRow
@@ -59,6 +60,7 @@ import au.com.shiftyjelly.pocketcasts.theme.tvColors
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private val ContentPadding = PaddingValues(horizontal = 48.dp)
+private const val TOP_RESULTS_PREVIEW_COUNT = 6
 
 @Composable
 fun TvSearchScreen(
@@ -67,6 +69,7 @@ fun TvSearchScreen(
 ) {
     val query by viewModel.query.collectAsStateWithLifecycle()
     val searchState by viewModel.searchState.collectAsStateWithLifecycle()
+    val filter by viewModel.filter.collectAsStateWithLifecycle()
     val categories by viewModel.categories.collectAsStateWithLifecycle()
     val discoverRows by viewModel.discoverRows.collectAsStateWithLifecycle()
     val actionsEpisode by viewModel.actionsEpisode.collectAsStateWithLifecycle()
@@ -90,9 +93,11 @@ fun TvSearchScreen(
         TvSearchContent(
             query = query,
             searchState = searchState,
+            filter = filter,
             categories = categories,
             discoverRows = discoverRows,
             onQueryChange = viewModel::onQueryChange,
+            onFilterSelect = viewModel::onFilterSelected,
             onOpenPodcast = { openedPodcastUuid = it },
             onPlayEpisode = viewModel::playEpisode,
             onOpenEpisodeActions = viewModel::openEpisodeActions,
@@ -139,9 +144,11 @@ fun TvSearchScreen(
 private fun TvSearchContent(
     query: String,
     searchState: TvSearchState,
+    filter: TvSearchFilter,
     categories: List<DiscoverCategory>,
     discoverRows: List<TvDiscoverRow>,
     onQueryChange: (String) -> Unit,
+    onFilterSelect: (TvSearchFilter) -> Unit,
     onOpenPodcast: (String) -> Unit,
     onPlayEpisode: (ImprovedSearchResultItem.EpisodeItem) -> Unit,
     onOpenEpisodeActions: (ImprovedSearchResultItem.EpisodeItem) -> Unit,
@@ -163,6 +170,15 @@ private fun TvSearchContent(
                 query = query,
                 onQueryChange = onQueryChange,
                 modifier = Modifier.focusRequester(searchFieldFocusRequester),
+            )
+            Spacer(modifier = Modifier.height(24.dp))
+        }
+
+        if (searchState !is TvSearchState.Idle) {
+            TvSearchFilters(
+                selected = filter,
+                onFilterSelect = onFilterSelect,
+                modifier = Modifier.padding(horizontal = 48.dp),
             )
             Spacer(modifier = Modifier.height(24.dp))
         }
@@ -197,6 +213,7 @@ private fun TvSearchContent(
 
                 is TvSearchState.Results -> TvSearchResults(
                     results = searchState,
+                    filter = filter,
                     onOpenPodcast = onOpenPodcast,
                     onPlayEpisode = onPlayEpisode,
                     onOpenEpisodeActions = onOpenEpisodeActions,
@@ -253,13 +270,71 @@ private fun TvSearchDiscover(
 @Composable
 private fun TvSearchResults(
     results: TvSearchState.Results,
+    filter: TvSearchFilter,
+    onOpenPodcast: (String) -> Unit,
+    onPlayEpisode: (ImprovedSearchResultItem.EpisodeItem) -> Unit,
+    onOpenEpisodeActions: (ImprovedSearchResultItem.EpisodeItem) -> Unit,
+    restoreFocusTrigger: Int,
+) {
+    when (filter) {
+        TvSearchFilter.TopResults -> TvSearchTopResults(
+            podcasts = results.podcasts,
+            episodes = results.episodes,
+            onOpenPodcast = onOpenPodcast,
+            onPlayEpisode = onPlayEpisode,
+            onOpenEpisodeActions = onOpenEpisodeActions,
+            restoreFocusTrigger = restoreFocusTrigger,
+        )
+
+        TvSearchFilter.Podcasts -> if (results.podcasts.isEmpty()) {
+            TvSearchMessage(
+                title = stringResource(LR.string.tv_search_no_results_title),
+                subtitle = stringResource(LR.string.tv_search_no_results_subtitle),
+            )
+        } else {
+            TvPodcastGridScaffold(
+                title = "",
+                itemKeys = results.podcasts.map(ImprovedSearchResultItem.PodcastItem::uuid),
+                modifier = Modifier.fillMaxSize(),
+                restoreFocusTrigger = restoreFocusTrigger,
+            ) { index, itemModifier ->
+                val podcast = results.podcasts[index]
+                TvPodcastTile(
+                    artworkUrl = PodcastImage.getMediumArtworkUrl(podcast.uuid),
+                    podcastTitle = podcast.title,
+                    onClick = { onOpenPodcast(podcast.uuid) },
+                    imageModifier = Modifier.fillMaxWidth(),
+                    modifier = itemModifier,
+                )
+            }
+        }
+
+        TvSearchFilter.Episodes -> if (results.episodes.isEmpty()) {
+            TvSearchMessage(
+                title = stringResource(LR.string.tv_search_no_results_title),
+                subtitle = stringResource(LR.string.tv_search_no_results_subtitle),
+            )
+        } else {
+            TvSearchEpisodeList(
+                episodes = results.episodes,
+                onPlayEpisode = onPlayEpisode,
+                onOpenEpisodeActions = onOpenEpisodeActions,
+            )
+        }
+    }
+}
+
+@Composable
+private fun TvSearchTopResults(
+    podcasts: List<ImprovedSearchResultItem.PodcastItem>,
+    episodes: List<ImprovedSearchResultItem.EpisodeItem>,
     onOpenPodcast: (String) -> Unit,
     onPlayEpisode: (ImprovedSearchResultItem.EpisodeItem) -> Unit,
     onOpenEpisodeActions: (ImprovedSearchResultItem.EpisodeItem) -> Unit,
     restoreFocusTrigger: Int,
 ) {
     val restoreFocusRequester = remember { FocusRequester() }
-    val hasPodcasts = results.podcasts.isNotEmpty()
+    val hasPodcasts = podcasts.isNotEmpty()
     var isInitialComposition by remember { mutableStateOf(true) }
     LaunchedEffect(restoreFocusTrigger) {
         if (isInitialComposition) {
@@ -272,12 +347,12 @@ private fun TvSearchResults(
     LazyColumn(modifier = Modifier.fillMaxSize()) {
         if (hasPodcasts) {
             tvSearchPodcastsRow(
-                podcasts = results.podcasts,
+                podcasts = podcasts,
                 onOpenPodcast = onOpenPodcast,
                 focusRequester = restoreFocusRequester,
             )
         }
-        if (results.episodes.isNotEmpty()) {
+        if (episodes.isNotEmpty()) {
             item {
                 Spacer(modifier = Modifier.height(24.dp))
                 TvSectionTitle(
@@ -288,7 +363,7 @@ private fun TvSearchResults(
                 )
             }
             itemsIndexed(
-                items = results.episodes,
+                items = episodes.take(TOP_RESULTS_PREVIEW_COUNT),
                 key = { _, episode -> episode.uuid },
             ) { index, episode ->
                 TvSearchEpisodeRow(
@@ -300,6 +375,26 @@ private fun TvSearchResults(
                 )
                 Spacer(modifier = Modifier.height(12.dp))
             }
+        }
+        item { Spacer(modifier = Modifier.height(40.dp)) }
+    }
+}
+
+@Composable
+private fun TvSearchEpisodeList(
+    episodes: List<ImprovedSearchResultItem.EpisodeItem>,
+    onPlayEpisode: (ImprovedSearchResultItem.EpisodeItem) -> Unit,
+    onOpenEpisodeActions: (ImprovedSearchResultItem.EpisodeItem) -> Unit,
+) {
+    LazyColumn(modifier = Modifier.fillMaxSize()) {
+        items(episodes, key = ImprovedSearchResultItem.EpisodeItem::uuid) { episode ->
+            TvSearchEpisodeRow(
+                episode = episode,
+                onClick = { onPlayEpisode(episode) },
+                onOpenActions = { onOpenEpisodeActions(episode) },
+                modifier = Modifier.padding(ContentPadding),
+            )
+            Spacer(modifier = Modifier.height(12.dp))
         }
         item { Spacer(modifier = Modifier.height(40.dp)) }
     }
@@ -352,6 +447,7 @@ private fun TvSearchScreenPreview() {
             TvSearchContent(
                 query = "",
                 searchState = TvSearchState.Idle,
+                filter = TvSearchFilter.TopResults,
                 categories = listOf(
                     DiscoverCategory(id = 1, name = "Comedy", icon = "", source = ""),
                     DiscoverCategory(id = 2, name = "True Crime", icon = "", source = ""),
@@ -359,6 +455,7 @@ private fun TvSearchScreenPreview() {
                 ),
                 discoverRows = emptyList(),
                 onQueryChange = {},
+                onFilterSelect = {},
                 onOpenPodcast = {},
                 onPlayEpisode = {},
                 onOpenEpisodeActions = {},
