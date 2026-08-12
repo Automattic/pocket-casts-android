@@ -70,7 +70,7 @@ class TvDiscoverFeedLoader @Inject constructor(
         val replacements = regionReplacements(discover, region)
         discover.layout
             .transformWithRegion(region, replacements, context.resources)
-            .filter { it.categoryId == categoryId && it.sponsored && it.source.isNotBlank() }
+            .filter { it.categoryId == categoryId && it.sponsored && it.source.isNotBlank() && (isLoggedIn || it.authenticated != true) }
             .map { row -> async { loadSponsoredPodcasts(row) } }
             .awaitAll()
             .flatten()
@@ -80,7 +80,7 @@ class TvDiscoverFeedLoader @Inject constructor(
         if (sponsored.isEmpty()) return podcasts
         val sponsoredUuids = sponsored.mapTo(mutableSetOf(), TvDiscoverPodcast::uuid)
         val rest = podcasts.filterNot { it.uuid in sponsoredUuids }
-        val position = if (rest.size > SPONSORED_CATEGORY_POSITION) SPONSORED_CATEGORY_POSITION else 0
+        val position = minOf(SPONSORED_CATEGORY_POSITION, rest.size)
         return rest.toMutableList().apply { addAll(position, sponsored) }
     }
 
@@ -156,7 +156,8 @@ class TvDiscoverFeedLoader @Inject constructor(
 
     private fun insertSponsored(podcasts: List<TvDiscoverPodcast>, insertions: Map<Int, TvDiscoverPodcast>): List<TvDiscoverPodcast> {
         if (insertions.isEmpty()) return podcasts
-        val result = podcasts.toMutableList()
+        val insertedUuids = insertions.values.mapTo(mutableSetOf(), TvDiscoverPodcast::uuid)
+        val result = podcasts.filterNotTo(mutableListOf()) { it.uuid in insertedUuids }
         insertions.toSortedMap().forEach { (position, podcast) ->
             result.add(position.coerceIn(0, result.size), podcast)
         }
@@ -216,7 +217,7 @@ class TvDiscoverFeedLoader @Inject constructor(
     }
 
     private fun DiscoverCategory.resolveSource(replacements: Map<String, String>): DiscoverCategory {
-        return transformWithReplacements(replacements, context.resources) as DiscoverCategory
+        return transformWithReplacements(replacements, context.resources) as? DiscoverCategory ?: this
     }
 
     private fun DiscoverRow.rowId() = listUuid ?: id ?: title

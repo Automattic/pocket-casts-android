@@ -311,7 +311,7 @@ class TvHomeViewModelTest {
     @Test
     fun `banner rows are parsed from the feed even without a source`() = runTest {
         whenever(syncManager.isLoggedIn()).thenReturn(false)
-        whenever(listRepository.getLoggedOutDiscoverFeed()).thenReturn(
+        whenever(listRepository.getHomeDiscoverFeed(isLoggedIn = false)).thenReturn(
             discover(
                 bannerRow(id = "create_account"),
                 bannerRow(id = "discover_more"),
@@ -334,7 +334,7 @@ class TvHomeViewModelTest {
     @Test
     fun `banner rows with an unknown id are dropped`() = runTest {
         whenever(syncManager.isLoggedIn()).thenReturn(false)
-        whenever(listRepository.getLoggedOutDiscoverFeed()).thenReturn(
+        whenever(listRepository.getHomeDiscoverFeed(isLoggedIn = false)).thenReturn(
             discover(
                 bannerRow(id = "mystery_banner"),
                 row(id = "trending", title = "Row Trending", source = "https://lists/trending.json"),
@@ -354,7 +354,7 @@ class TvHomeViewModelTest {
     @Test
     fun `category rows load their pills with region resolved sources`() = runTest {
         whenever(syncManager.isLoggedIn()).thenReturn(false)
-        whenever(listRepository.getLoggedOutDiscoverFeed()).thenReturn(
+        whenever(listRepository.getHomeDiscoverFeed(isLoggedIn = false)).thenReturn(
             discover(
                 row(
                     id = "categories",
@@ -390,7 +390,7 @@ class TvHomeViewModelTest {
     @Test
     fun `category rows are dropped when their pills fail to load`() = runTest {
         whenever(syncManager.isLoggedIn()).thenReturn(false)
-        whenever(listRepository.getLoggedOutDiscoverFeed()).thenReturn(
+        whenever(listRepository.getHomeDiscoverFeed(isLoggedIn = false)).thenReturn(
             discover(
                 row(
                     id = "categories",
@@ -417,7 +417,7 @@ class TvHomeViewModelTest {
 
     @Test
     fun `categoryPodcasts maps the list feed podcasts`() = runTest {
-        whenever(listRepository.getLoggedOutDiscoverFeed()).thenReturn(discover())
+        whenever(listRepository.getHomeDiscoverFeed(isLoggedIn = false)).thenReturn(discover())
         whenever(listRepository.getListFeed(eq("https://category/us.json"), any()))
             .thenReturn(podcastFeed("podcast-1", "podcast-2"))
 
@@ -428,7 +428,7 @@ class TvHomeViewModelTest {
 
     @Test
     fun `categoryPodcasts throws when the feed cannot be loaded`() = runTest {
-        whenever(listRepository.getLoggedOutDiscoverFeed()).thenReturn(discover())
+        whenever(listRepository.getHomeDiscoverFeed(isLoggedIn = false)).thenReturn(discover())
         whenever(listRepository.getListFeed(eq("https://category/us.json"), any())).thenReturn(null)
 
         val result = runCatching { createViewModel().categoryPodcasts(categoryId = 7, source = "https://category/us.json") }
@@ -438,7 +438,7 @@ class TvHomeViewModelTest {
 
     @Test
     fun `categoryPodcasts merges sponsored ads at a fixed position`() = runTest {
-        whenever(listRepository.getLoggedOutDiscoverFeed()).thenReturn(
+        whenever(listRepository.getHomeDiscoverFeed(isLoggedIn = false)).thenReturn(
             discover(
                 row(
                     id = "category-ad",
@@ -462,9 +462,33 @@ class TvHomeViewModelTest {
     }
 
     @Test
+    fun `categoryPodcasts appends the sponsored ad when the category is short`() = runTest {
+        whenever(listRepository.getHomeDiscoverFeed(isLoggedIn = false)).thenReturn(
+            discover(
+                row(
+                    id = "category-ad",
+                    title = "Row Category Ad",
+                    source = "https://lists/category-ad.json",
+                    sponsored = true,
+                    categoryId = 7,
+                ),
+            ),
+        )
+        whenever(listRepository.getListFeed(eq("https://category/us.json"), any()))
+            .thenReturn(podcastFeed("p-0", "p-1"))
+        whenever(listRepository.getListFeed(eq("https://lists/category-ad.json"), any()))
+            .thenReturn(podcastFeed("ad-1"))
+
+        val podcasts = createViewModel().categoryPodcasts(categoryId = 7, source = "https://category/us.json")
+
+        assertEquals(listOf("p-0", "p-1", "ad-1"), podcasts.map { it.uuid })
+        assertTrue(podcasts.last().isSponsored)
+    }
+
+    @Test
     fun `sponsored single-podcast row uses the recommends title`() = runTest {
         whenever(syncManager.isLoggedIn()).thenReturn(false)
-        whenever(listRepository.getLoggedOutDiscoverFeed()).thenReturn(
+        whenever(listRepository.getHomeDiscoverFeed(isLoggedIn = false)).thenReturn(
             discover(
                 row(
                     id = "sponsored-id",
@@ -489,7 +513,7 @@ class TvHomeViewModelTest {
     @Test
     fun `sponsored podcasts are injected at their feed positions`() = runTest {
         whenever(syncManager.isLoggedIn()).thenReturn(false)
-        whenever(listRepository.getLoggedOutDiscoverFeed()).thenReturn(
+        whenever(listRepository.getHomeDiscoverFeed(isLoggedIn = false)).thenReturn(
             discover(
                 row(
                     id = "trending",
@@ -511,6 +535,35 @@ class TvHomeViewModelTest {
             val row = state.rows.single() as TvDiscoverRow.Podcasts
             assertEquals(listOf("p-0", "ad-1", "p-1", "p-2"), row.podcasts.map { it.uuid })
             assertTrue(row.podcasts[1].isSponsored)
+        }
+    }
+
+    @Test
+    fun `sponsored podcast already present in the row is not duplicated`() = runTest {
+        whenever(syncManager.isLoggedIn()).thenReturn(false)
+        whenever(listRepository.getHomeDiscoverFeed(isLoggedIn = false)).thenReturn(
+            discover(
+                row(
+                    id = "trending",
+                    title = "Row Trending",
+                    source = "https://lists/trending.json",
+                    sponsoredPodcasts = listOf(SponsoredPodcast(position = 0, source = "https://lists/ad.json")),
+                ),
+            ),
+        )
+        whenever(listRepository.getListFeed(eq("https://lists/trending.json"), any()))
+            .thenReturn(podcastFeed("p-0", "ad-1", "p-2"))
+        whenever(listRepository.getListFeed(eq("https://lists/ad.json"), any()))
+            .thenReturn(podcastFeed("ad-1"))
+
+        val viewModel = createViewModel()
+
+        viewModel.uiState.test {
+            val state = awaitItem() as TvHomeUiState.Ready
+            val row = state.rows.single() as TvDiscoverRow.Podcasts
+            assertEquals(listOf("ad-1", "p-0", "p-2"), row.podcasts.map { it.uuid })
+            assertEquals(1, row.podcasts.count { it.uuid == "ad-1" })
+            assertTrue(row.podcasts.first().isSponsored)
         }
     }
 

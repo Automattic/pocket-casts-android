@@ -49,7 +49,7 @@ fun TvPodcastTile(
                     text = stringResource(LR.string.sponsored),
                     style = MaterialTheme.tvTypography.caption1,
                     color = MaterialTheme.tvColors.textSecondary,
-                    modifier = Modifier.padding(bottom = 7.dp),
+                    modifier = Modifier.padding(bottom = 9.dp),
                 )
             }
         } else {

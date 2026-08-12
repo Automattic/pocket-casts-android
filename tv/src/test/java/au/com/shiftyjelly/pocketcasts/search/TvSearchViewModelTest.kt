@@ -123,6 +123,22 @@ class TvSearchViewModelTest {
     }
 
     @Test
+    fun `banner rows are excluded from the search discover feed`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(
+            discover(
+                bannerRow(id = "create_account"),
+                row(id = "trending", title = "Trending", source = "https://lists/trending.json"),
+            ),
+        )
+        whenever(listRepository.getListFeed(eq("https://lists/trending.json"), any()))
+            .thenReturn(podcastFeed("podcast-trending"))
+
+        val viewModel = createViewModel()
+
+        assertEquals(listOf("trending"), viewModel.discoverRows.value.map { it.id })
+    }
+
+    @Test
     fun `authenticated rows are dropped when logged out`() = runTest {
         whenever(listRepository.getSearchDiscoverFeed()).thenReturn(
             discover(
@@ -401,6 +417,14 @@ class TvSearchViewModelTest {
         title = "Browse By Category",
         source = source,
         type = ListType.Categories,
+    )
+
+    private fun bannerRow(id: String) = row(
+        id = id,
+        title = "",
+        source = "",
+        type = ListType.Unknown("banner"),
+        displayStyle = DisplayStyle.Unknown("inline_banner"),
     )
 
     private fun podcastFeed(vararg podcastUuids: String) = ListFeed(
