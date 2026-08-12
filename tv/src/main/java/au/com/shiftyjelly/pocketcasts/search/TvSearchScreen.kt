@@ -27,9 +27,13 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.PlatformTextStyle
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.MaterialTheme
@@ -56,7 +60,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 import au.com.shiftyjelly.pocketcasts.theme.TvTheme
 import au.com.shiftyjelly.pocketcasts.theme.tvColors
-import au.com.shiftyjelly.pocketcasts.theme.tvTypography
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private val ContentPadding = PaddingValues(horizontal = 48.dp)
@@ -324,9 +327,13 @@ private fun LazyListScope.tvSearchPodcastsRow(
 private fun TvSearchSectionTitle(title: String) {
     Text(
         text = title,
-        style = MaterialTheme.tvTypography.title3,
         color = MaterialTheme.tvColors.textPrimary,
-        modifier = Modifier.padding(start = 48.dp, bottom = 10.dp),
+        style = TextStyle(
+            fontSize = 17.sp,
+            fontWeight = FontWeight(500),
+            platformStyle = PlatformTextStyle(includeFontPadding = false),
+        ),
+        modifier = Modifier.padding(start = 48.dp, bottom = 17.dp),
     )
 }
 
