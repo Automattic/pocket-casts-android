@@ -11,10 +11,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -49,9 +47,7 @@ fun TvSearchScreen(
         query = query,
         categories = categories,
         discoverRows = discoverRows,
-        onCharacter = { query += it },
-        onSpace = { query += ' ' },
-        onDelete = { query = query.dropLast(1) },
+        onQueryChange = { query = it },
         modifier = modifier,
     )
 }
@@ -61,32 +57,17 @@ private fun TvSearchContent(
     query: String,
     categories: List<DiscoverCategory>,
     discoverRows: List<TvDiscoverRow>,
-    onCharacter: (Char) -> Unit,
-    onSpace: () -> Unit,
-    onDelete: () -> Unit,
+    onQueryChange: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val keyboardState = rememberTvSearchKeyboardState()
-    var hasAutoFocused by remember { mutableStateOf(false) }
-    LaunchedEffect(keyboardState.isFocused) {
-        if (keyboardState.isFocused) {
-            hasAutoFocused = true
-        }
-    }
-
     LazyColumn(modifier = modifier.fillMaxSize()) {
         item {
             Column(modifier = Modifier.padding(ContentPadding)) {
                 Spacer(modifier = Modifier.height(40.dp))
-                TvSearchField(query = query)
-                Spacer(modifier = Modifier.height(40.dp))
-                TvSearchKeyboard(
-                    onCharacter = onCharacter,
-                    onSpace = onSpace,
-                    onDelete = onDelete,
-                    onSubmit = {},
-                    autoFocus = !hasAutoFocused,
-                    state = keyboardState,
+                TvSearchField(
+                    query = query,
+                    onQueryChange = onQueryChange,
+                    autoFocus = true,
                 )
                 Spacer(modifier = Modifier.height(24.dp))
             }
@@ -144,9 +125,7 @@ private fun TvSearchScreenPreview() {
                     DiscoverCategory(id = 3, name = "Fiction", icon = "", source = ""),
                 ),
                 discoverRows = emptyList(),
-                onCharacter = {},
-                onSpace = {},
-                onDelete = {},
+                onQueryChange = {},
             )
         }
     }
