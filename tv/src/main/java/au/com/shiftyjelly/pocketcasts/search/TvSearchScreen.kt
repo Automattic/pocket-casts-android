@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.search
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.focusGroup
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -13,6 +14,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -26,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
@@ -57,10 +62,12 @@ import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 import au.com.shiftyjelly.pocketcasts.theme.TvTheme
 import au.com.shiftyjelly.pocketcasts.theme.tvColors
+import androidx.compose.foundation.lazy.grid.itemsIndexed as gridItemsIndexed
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private val ContentPadding = PaddingValues(horizontal = 48.dp)
 private const val TOP_RESULTS_PREVIEW_COUNT = 6
+private const val EPISODE_GRID_COLUMNS = 2
 
 @Composable
 fun TvSearchScreen(
@@ -315,10 +322,11 @@ private fun TvSearchResults(
                 subtitle = stringResource(LR.string.tv_search_no_results_subtitle),
             )
         } else {
-            TvSearchEpisodeList(
+            TvSearchEpisodeGrid(
                 episodes = results.episodes,
                 onPlayEpisode = onPlayEpisode,
                 onOpenEpisodeActions = onOpenEpisodeActions,
+                restoreFocusTrigger = restoreFocusTrigger,
             )
         }
     }
@@ -381,22 +389,61 @@ private fun TvSearchTopResults(
 }
 
 @Composable
-private fun TvSearchEpisodeList(
+private fun TvSearchEpisodeGrid(
     episodes: List<ImprovedSearchResultItem.EpisodeItem>,
     onPlayEpisode: (ImprovedSearchResultItem.EpisodeItem) -> Unit,
     onOpenEpisodeActions: (ImprovedSearchResultItem.EpisodeItem) -> Unit,
+    restoreFocusTrigger: Int,
 ) {
-    LazyColumn(modifier = Modifier.fillMaxSize()) {
-        items(episodes, key = ImprovedSearchResultItem.EpisodeItem::uuid) { episode ->
-            TvSearchEpisodeRow(
+    val gridState = rememberLazyGridState()
+    val focusRequesters = remember(episodes.size) { List(episodes.size) { FocusRequester() } }
+    val gridFocusRequester = remember { FocusRequester() }
+    var lastFocusedKey by rememberSaveable { mutableStateOf<String?>(null) }
+
+    var isInitialComposition by remember { mutableStateOf(true) }
+    LaunchedEffect(restoreFocusTrigger) {
+        if (isInitialComposition) {
+            isInitialComposition = false
+        } else {
+            runCatching { gridFocusRequester.requestFocus() }
+        }
+    }
+
+    LazyVerticalGrid(
+        state = gridState,
+        columns = GridCells.Fixed(EPISODE_GRID_COLUMNS),
+        horizontalArrangement = Arrangement.spacedBy(24.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        contentPadding = PaddingValues(start = 48.dp, end = 48.dp, bottom = 40.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .focusRequester(gridFocusRequester)
+            .focusGroup()
+            .focusProperties {
+                onEnter = {
+                    val visible = gridState.layoutInfo.visibleItemsInfo
+                    val target = episodes.indexOfFirst { it.uuid == lastFocusedKey }
+                        .takeIf { index -> index >= 0 && visible.any { it.index == index } }
+                        ?: visible.firstOrNull()?.index
+                    target?.let { runCatching { focusRequesters.getOrNull(it)?.requestFocus() } }
+                }
+            },
+    ) {
+        gridItemsIndexed(episodes, key = { _, episode -> episode.uuid }) { index, episode ->
+            TvSearchEpisodeCard(
                 episode = episode,
                 onClick = { onPlayEpisode(episode) },
-                onOpenActions = { onOpenEpisodeActions(episode) },
-                modifier = Modifier.padding(ContentPadding),
+                onLongClick = { onOpenEpisodeActions(episode) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .focusRequester(focusRequesters[index])
+                    .onFocusChanged { focusState ->
+                        if (focusState.hasFocus) {
+                            lastFocusedKey = episode.uuid
+                        }
+                    },
             )
-            Spacer(modifier = Modifier.height(12.dp))
         }
-        item { Spacer(modifier = Modifier.height(40.dp)) }
     }
 }
 
