@@ -42,9 +42,7 @@ fun TvSearchScreen(
     TvSearchContent(
         query = query,
         categories = categories,
-        onCharacter = { query += it },
-        onSpace = { query += ' ' },
-        onDelete = { query = query.dropLast(1) },
+        onQueryChange = { query = it },
         modifier = modifier,
     )
 }
@@ -53,9 +51,7 @@ fun TvSearchScreen(
 private fun TvSearchContent(
     query: String,
     categories: List<DiscoverCategory>,
-    onCharacter: (Char) -> Unit,
-    onSpace: () -> Unit,
-    onDelete: () -> Unit,
+    onQueryChange: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -65,19 +61,15 @@ private fun TvSearchContent(
     ) {
         Column(modifier = Modifier.padding(horizontal = 48.dp)) {
             Spacer(modifier = Modifier.height(40.dp))
-            TvSearchField(query = query)
-            Spacer(modifier = Modifier.height(40.dp))
-            TvSearchKeyboard(
-                onCharacter = onCharacter,
-                onSpace = onSpace,
-                onDelete = onDelete,
-                onSubmit = {},
+            TvSearchField(
+                query = query,
+                onQueryChange = onQueryChange,
                 autoFocus = true,
             )
+            Spacer(modifier = Modifier.height(24.dp))
         }
 
         if (categories.isNotEmpty()) {
-            Spacer(modifier = Modifier.height(24.dp))
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -111,9 +103,7 @@ private fun TvSearchScreenPreview() {
                     DiscoverCategory(id = 2, name = "True Crime", icon = "", source = ""),
                     DiscoverCategory(id = 3, name = "Fiction", icon = "", source = ""),
                 ),
-                onCharacter = {},
-                onSpace = {},
-                onDelete = {},
+                onQueryChange = {},
             )
         }
     }
