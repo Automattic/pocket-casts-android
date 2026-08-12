@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.component
 
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Test
@@ -21,6 +22,11 @@ class TvEpisodeActionTypeTest {
             ),
             actions,
         )
+    }
+
+    @Test
+    fun `search results uses the search results analytics source`() {
+        assertEquals(SourceView.SEARCH_RESULTS, TvEpisodeActionContext.SearchResults.source)
     }
 
     @Test

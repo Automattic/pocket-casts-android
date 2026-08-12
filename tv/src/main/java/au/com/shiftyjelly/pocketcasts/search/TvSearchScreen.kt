@@ -118,7 +118,7 @@ fun TvSearchScreen(
         actionsEpisode?.let { episode ->
             TvEpisodeActionsModal(
                 episode = episode,
-                actionContext = TvEpisodeActionContext.PodcastDetails,
+                actionContext = TvEpisodeActionContext.SearchResults,
                 onDismissRequest = viewModel::dismissEpisodeActions,
                 onShowEpisodeDetails = {
                     detailsEpisode = episode
