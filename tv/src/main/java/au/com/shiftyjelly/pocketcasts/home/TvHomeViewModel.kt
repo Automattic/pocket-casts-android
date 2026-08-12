@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverEpisode
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverFeedLoader
+import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverRow
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PodcastDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextDao
@@ -157,6 +158,10 @@ class TvHomeViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    suspend fun categoryPodcasts(categoryId: Int, source: String): List<TvDiscoverPodcast> {
+        return discoverFeedLoader.loadCategoryPodcasts(source, categoryId, syncManager.isLoggedIn())
     }
 
     fun playEpisode(episode: TvDiscoverEpisode) {
