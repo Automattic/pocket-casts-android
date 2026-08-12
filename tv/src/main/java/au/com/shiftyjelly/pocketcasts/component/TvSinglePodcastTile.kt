@@ -149,3 +149,20 @@ private fun TvSinglePodcastTilePreview() {
         }
     }
 }
+
+@Preview(device = Devices.TV_1080p)
+@Composable
+private fun TvSinglePodcastTileRecommendedPreview() {
+    TvTheme {
+        Box(modifier = Modifier.background(MaterialTheme.tvColors.backgroundSunken).padding(24.dp)) {
+            TvSinglePodcastTile(
+                artworkUrl = "",
+                title = "The Writer's Voice",
+                author = "",
+                description = "New fiction from the pages of The New Yorker, read by its authors.",
+                isSponsored = false,
+                onClick = {},
+            )
+        }
+    }
+}

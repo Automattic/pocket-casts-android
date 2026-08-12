@@ -29,14 +29,26 @@ class TvSearchViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            try {
-                val discover = discoverFeedLoader.loadSearch(syncManager.isLoggedIn())
-                _categories.value = discover.categories
-                _discoverRows.value = discover.rows
+            val discover = try {
+                discoverFeedLoader.searchDiscoverFeed()
             } catch (exception: CancellationException) {
                 throw exception
             } catch (exception: Exception) {
                 Timber.e(exception, "Failed to load TV search discover feed")
+                return@launch
+            }
+            // Publish categories and rows independently so the categories row (2 requests) does not
+            // wait for the whole row fan-out (~10-20 requests) to resolve.
+            launch { _categories.value = discoverFeedLoader.loadCategories(discover) }
+            launch {
+                _discoverRows.value = try {
+                    discoverFeedLoader.buildRows(discover, syncManager.isLoggedIn())
+                } catch (exception: CancellationException) {
+                    throw exception
+                } catch (exception: Exception) {
+                    Timber.e(exception, "Failed to load TV search discover rows")
+                    emptyList()
+                }
             }
         }
     }

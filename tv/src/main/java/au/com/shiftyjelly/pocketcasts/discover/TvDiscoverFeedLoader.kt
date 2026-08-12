@@ -26,21 +26,9 @@ class TvDiscoverFeedLoader @Inject constructor(
 ) {
     suspend fun load(isLoggedIn: Boolean): List<TvDiscoverRow> = buildRows(listRepository.getDiscoverFeed(), isLoggedIn)
 
-    suspend fun loadSearch(isLoggedIn: Boolean): TvSearchDiscover = coroutineScope {
-        val discover = listRepository.getSearchDiscoverFeed()
-        val categoriesDeferred = async { loadCategories(discover) }
-        val rows = try {
-            buildRows(discover, isLoggedIn)
-        } catch (exception: CancellationException) {
-            throw exception
-        } catch (exception: Exception) {
-            Timber.e(exception, "Failed to load TV search discover rows")
-            emptyList()
-        }
-        TvSearchDiscover(categories = categoriesDeferred.await(), rows = rows)
-    }
+    suspend fun searchDiscoverFeed(): Discover = listRepository.getSearchDiscoverFeed()
 
-    private suspend fun loadCategories(discover: Discover): List<DiscoverCategory> {
+    suspend fun loadCategories(discover: Discover): List<DiscoverCategory> {
         val source = discover.layout.firstOrNull { it.type is ListType.Categories }?.source ?: return emptyList()
         return try {
             listRepository.getCategoriesList(source)
@@ -52,7 +40,7 @@ class TvDiscoverFeedLoader @Inject constructor(
         }
     }
 
-    private suspend fun buildRows(discover: Discover, isLoggedIn: Boolean): List<TvDiscoverRow> = coroutineScope {
+    suspend fun buildRows(discover: Discover, isLoggedIn: Boolean): List<TvDiscoverRow> = coroutineScope {
         val region = discover.regions[settings.discoverCountryCode.value]
             ?: discover.regions[discover.defaultRegionCode]
             ?: error("Could not resolve discover region")
@@ -68,6 +56,7 @@ class TvDiscoverFeedLoader @Inject constructor(
             .map { row -> async { loadRow(row) } }
             .awaitAll()
             .filterNotNull()
+            // Dedup after loading so a duplicate id whose feed came back empty falls back to a populated one.
             .distinctBy(TvDiscoverRow::id)
     }
 
