@@ -38,12 +38,14 @@ internal fun TvPodcastGridScaffold(
     itemContent: @Composable (index: Int, itemModifier: Modifier) -> Unit,
 ) {
     Column(modifier = modifier) {
-        Text(
-            text = title,
-            style = MaterialTheme.tvTypography.title3,
-            color = MaterialTheme.tvColors.textPrimary,
-            modifier = Modifier.padding(start = 32.dp, top = 8.dp, bottom = 10.dp),
-        )
+        if (title.isNotEmpty()) {
+            Text(
+                text = title,
+                style = MaterialTheme.tvTypography.title3,
+                color = MaterialTheme.tvColors.textPrimary,
+                modifier = Modifier.padding(start = 32.dp, top = 8.dp, bottom = 10.dp),
+            )
+        }
         val gridState = rememberLazyGridState()
         var lastFocusedKey by rememberSaveable { mutableStateOf<String?>(null) }
         val focusRequesters = remember(itemKeys.size) { List(itemKeys.size) { FocusRequester() } }
