@@ -49,6 +49,7 @@ class ImprovedSearchManagerImpl @Inject constructor(
                     uuid = it.uuid,
                     title = it.title,
                     podcastUuid = it.podcastUuid,
+                    podcastTitle = it.podcastTitle,
                     publishedDate = it.publishedDate,
                     duration = it.duration.seconds,
                 )
