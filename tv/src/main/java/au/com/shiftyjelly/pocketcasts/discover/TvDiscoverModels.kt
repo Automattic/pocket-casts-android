@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.discover
 
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
+import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 
 sealed interface TvDiscoverRow {
     val id: String
@@ -10,6 +11,18 @@ sealed interface TvDiscoverRow {
         override val id: String,
         override val title: String,
         val podcasts: List<TvDiscoverPodcast>,
+    ) : TvDiscoverRow
+
+    data class Categories(
+        override val id: String,
+        override val title: String,
+        val categories: List<DiscoverCategory>,
+    ) : TvDiscoverRow
+
+    data class Banner(
+        override val id: String,
+        override val title: String,
+        val banner: TvDiscoverBanner,
     ) : TvDiscoverRow
 
     data class SinglePodcast(
@@ -29,6 +42,16 @@ sealed interface TvDiscoverRow {
         override val title: String,
         val episodes: List<TvDiscoverEpisode>,
     ) : TvDiscoverRow
+}
+
+enum class TvDiscoverBanner(val id: String) {
+    CreateAccount("create_account"),
+    DiscoverMore("discover_more"),
+    ;
+
+    companion object {
+        fun fromId(id: String?): TvDiscoverBanner? = entries.firstOrNull { it.id == id }
+    }
 }
 
 data class TvDiscoverPodcast(

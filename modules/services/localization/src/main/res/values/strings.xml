@@ -253,6 +253,14 @@
     <string name="tv_row_because_you_liked">Because you liked Podcast</string>
     <string name="tv_home_keep_listening">Keep Listening</string>
     <string name="tv_search_browse_categories">Browse categories</string>
+    <string name="tv_sponsored_podcast_section_title">Pocket Casts recommends</string>
+    <string name="tv_banner_create_account_title">One account. Every screen</string>
+    <string name="tv_banner_create_account_subtitle">Your follows and progress exactly where you left them</string>
+    <string name="tv_banner_create_account_action_title">Create a free account</string>
+    <string name="tv_banner_discover_more_title">You haven\'t seen the half of it</string>
+    <string name="tv_banner_discover_more_subtitle">Your next obsession is in here somewhere</string>
+    <string name="tv_banner_discover_more_action_title">Discover more shows</string>
+    <string name="tv_search_searching">Searching…</string>
     <string name="tv_search_no_results_title">No results</string>
     <string name="tv_search_no_results_subtitle">Try more general or different keywords.</string>
     <string name="tv_search_error_subtitle">Check your connection and try again.</string>
