@@ -1,6 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -11,13 +13,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -36,7 +36,8 @@ fun TvCategoryTile(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var isFocused by remember { mutableStateOf(false) }
+    val interactionSource = remember { MutableInteractionSource() }
+    val isFocused by interactionSource.collectIsFocusedAsState()
     val contentColor = if (isFocused) MaterialTheme.tvColors.textPrimary else MaterialTheme.tvColors.textSecondary
 
     TvTile(
@@ -45,10 +46,10 @@ fun TvCategoryTile(
             containerColor = MaterialTheme.tvColors.backgroundOverlay,
             focusedContainerColor = MaterialTheme.tvColors.backgroundOverlay,
         ),
+        interactionSource = interactionSource,
         modifier = modifier
             .width(280.dp)
-            .height(128.dp)
-            .onFocusChanged { isFocused = it.isFocused },
+            .height(128.dp),
     ) {
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -66,6 +67,9 @@ fun TvCategoryTile(
                 text = category.name,
                 style = MaterialTheme.tvTypography.body,
                 color = contentColor,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.padding(horizontal = 12.dp),
             )
         }
     }
