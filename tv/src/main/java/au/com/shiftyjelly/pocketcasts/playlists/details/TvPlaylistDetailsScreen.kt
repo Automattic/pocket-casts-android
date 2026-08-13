@@ -51,6 +51,7 @@ import au.com.shiftyjelly.pocketcasts.component.TvModalButton
 import au.com.shiftyjelly.pocketcasts.component.TvModalSurface
 import au.com.shiftyjelly.pocketcasts.component.TvSortButton
 import au.com.shiftyjelly.pocketcasts.component.rememberTvEpisodeListFocus
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.components.PlaylistArtwork
 import au.com.shiftyjelly.pocketcasts.compose.components.displayLabel
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
@@ -91,6 +92,8 @@ fun TvPlaylistDetailsScreen(
     val upNextName = stringResource(LR.string.up_next)
     val savedToast = stringResource(LR.string.up_next_as_playlist_saved)
     val noEpisodesToast = stringResource(LR.string.play_all_no_episodes_message)
+
+    CallOnce { viewModel.trackFilterShown() }
 
     LaunchedEffect(uiState, onClose) {
         if (uiState is TvPlaylistDetailsUiState.NotFound) {
@@ -138,7 +141,10 @@ fun TvPlaylistDetailsScreen(
                 isReplaceUpNextConfirmationVisible = false
                 viewModel.replaceUpNextAndPlay(saveUpNext = true, upNextName = upNextName)
             },
-            onCancel = { isReplaceUpNextConfirmationVisible = false },
+            onCancel = {
+                isReplaceUpNextConfirmationVisible = false
+                viewModel.trackPlayAllDismissed()
+            },
         )
     }
 }

@@ -11,6 +11,14 @@ import au.com.shiftyjelly.pocketcasts.repositories.playlist.ManualPlaylist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.FilterHideArchivedTappedEvent
+import com.automattic.eventhorizon.FilterPlayAllDismissedEvent
+import com.automattic.eventhorizon.FilterPlayAllReplaceAndPlayTappedEvent
+import com.automattic.eventhorizon.FilterPlayAllTappedEvent
+import com.automattic.eventhorizon.FilterShowArchivedTappedEvent
+import com.automattic.eventhorizon.FilterShownEvent
+import com.automattic.eventhorizon.PlaylistType
 import java.util.Date
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -41,6 +49,7 @@ class TvPlaylistDetailsViewModelTest {
     private val playlists = MutableSharedFlow<ManualPlaylist?>(replay = 1)
     private val playlistManager = mock<PlaylistManager> {
         on { manualPlaylistFlow(any(), anyOrNull(), any()) } doReturn playlists
+        on { smartPlaylistFlow(any(), anyOrNull(), any()) } doReturn MutableSharedFlow(replay = 1)
     }
     private val preferences = mock<TvPreferences>()
 
@@ -48,6 +57,7 @@ class TvPlaylistDetailsViewModelTest {
     private val playAllHandlerFactory = mock<PlayAllHandler.Factory> {
         on { create(any()) } doReturn playAllHandler
     }
+    private val eventHorizon = mock<EventHorizon>()
 
     private val availableEpisode = episode(uuid = "episode-1", isArchived = false)
     private val archivedEpisode = episode(uuid = "episode-2", isArchived = true)
@@ -338,11 +348,77 @@ class TvPlaylistDetailsViewModelTest {
         }
     }
 
-    private fun createViewModel(prefs: TvPreferences = preferences) = TvPlaylistDetailsViewModel(
+    @Test
+    fun `tracks the filter shown with the playlist type`() = runTest {
+        createViewModel().trackFilterShown()
+
+        verify(eventHorizon).track(FilterShownEvent(filterType = PlaylistType.Manual))
+    }
+
+    @Test
+    fun `toggling the archive filter on a manual playlist tracks show then hide`() = runTest {
+        val viewModel = createViewModel(playlistType = Playlist.Type.Manual)
+
+        viewModel.toggleArchiveFilter()
+        viewModel.toggleArchiveFilter()
+
+        verify(eventHorizon).track(FilterShowArchivedTappedEvent)
+        verify(eventHorizon).track(FilterHideArchivedTappedEvent)
+    }
+
+    @Test
+    fun `toggling the archive filter on a smart playlist tracks nothing`() = runTest {
+        val viewModel = createViewModel(playlistType = Playlist.Type.Smart)
+
+        viewModel.toggleArchiveFilter()
+
+        verify(eventHorizon, never()).track(FilterShowArchivedTappedEvent)
+        verify(eventHorizon, never()).track(FilterHideArchivedTappedEvent)
+    }
+
+    @Test
+    fun `play all tracks the tapped event`() = runTest {
+        whenever(playAllHandler.handlePlayAllEpisodes(any())) doReturn PlayAllResponse.DoNothing
+        val viewModel = createViewModel()
+
+        viewModel.uiState.test {
+            assertEquals(TvPlaylistDetailsUiState.Loading, awaitItem())
+            playlists.emit(playlist(availableEpisode))
+            awaitItem()
+            viewModel.playAll()
+            advanceUntilIdle()
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        verify(eventHorizon).track(FilterPlayAllTappedEvent(filterType = PlaylistType.Manual))
+    }
+
+    @Test
+    fun `replacing up next tracks the replace and play event`() = runTest {
+        val viewModel = createViewModel()
+
+        viewModel.replaceUpNextAndPlay(saveUpNext = true, upNextName = "Up Next")
+        advanceUntilIdle()
+
+        verify(eventHorizon).track(FilterPlayAllReplaceAndPlayTappedEvent(filterType = PlaylistType.Manual, saveUpNext = true))
+    }
+
+    @Test
+    fun `tracks the play all dismissed event`() = runTest {
+        createViewModel().trackPlayAllDismissed()
+
+        verify(eventHorizon).track(FilterPlayAllDismissedEvent(filterType = PlaylistType.Manual))
+    }
+
+    private fun createViewModel(
+        prefs: TvPreferences = preferences,
+        playlistType: Playlist.Type = Playlist.Type.Manual,
+    ) = TvPlaylistDetailsViewModel(
         playlistUuid = "playlist-uuid",
-        playlistType = Playlist.Type.Manual,
+        playlistType = playlistType,
         playlistManager = playlistManager,
         preferences = prefs,
+        eventHorizon = eventHorizon,
         playAllHandlerFactory = playAllHandlerFactory,
     )
 
