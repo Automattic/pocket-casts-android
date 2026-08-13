@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -27,9 +28,15 @@ fun LazyListScope.tvDiscoverRow(
     contentPadding: PaddingValues = PaddingValues(horizontal = 32.dp),
     onOpenCategory: (DiscoverCategory) -> Unit = {},
     onTapBanner: (TvDiscoverBanner) -> Unit = {},
+    onPodcastClick: (TvDiscoverRow, TvDiscoverPodcast) -> Unit = { _, _ -> },
+    onEpisodePlay: (TvDiscoverRow, TvDiscoverEpisode) -> Unit = { _, _ -> },
+    onEpisodePodcastClick: (TvDiscoverRow, TvDiscoverEpisode) -> Unit = { _, _ -> },
+    onCategoryClick: (DiscoverCategory, Int) -> Unit = { _, _ -> },
+    onListImpression: (TvDiscoverRow) -> Unit = {},
 ) {
     when (row) {
         is TvDiscoverRow.FeaturedPodcasts -> item(key = row.id) {
+            LaunchedEffect(row.id) { onListImpression(row) }
             TvRow(
                 title = row.title,
                 items = row.podcasts,
@@ -44,13 +51,17 @@ fun LazyListScope.tvDiscoverRow(
                     isSponsored = podcast.isSponsored,
                     title = podcast.title,
                     description = podcast.description,
-                    onGoToPodcast = { onOpenPodcast(podcast.uuid) },
+                    onGoToPodcast = {
+                        onPodcastClick(row, podcast)
+                        onOpenPodcast(podcast.uuid)
+                    },
                     onPlayLastEpisode = {},
                 )
             }
         }
 
         is TvDiscoverRow.SinglePodcast -> item(key = row.id) {
+            LaunchedEffect(row.id) { onListImpression(row) }
             TvRow(
                 title = row.title,
                 items = row.podcasts,
@@ -66,12 +77,16 @@ fun LazyListScope.tvDiscoverRow(
                     author = podcast.author,
                     description = podcast.description,
                     isSponsored = podcast.isSponsored,
-                    onClick = { onOpenPodcast(podcast.uuid) },
+                    onClick = {
+                        onPodcastClick(row, podcast)
+                        onOpenPodcast(podcast.uuid)
+                    },
                 )
             }
         }
 
         is TvDiscoverRow.Episodes -> item(key = row.id) {
+            LaunchedEffect(row.id) { onListImpression(row) }
             TvRow(
                 title = row.title,
                 items = row.episodes,
@@ -86,13 +101,20 @@ fun LazyListScope.tvDiscoverRow(
                     podcastArtworkUrl = episode.podcastArtworkUrl,
                     podcastTitle = episode.podcastTitle,
                     episodeTitle = episode.episodeTitle,
-                    onPlayEpisode = { onPlayEpisode(episode) },
-                    onGoToPodcast = { onOpenPodcast(episode.podcastUuid) },
+                    onPlayEpisode = {
+                        onEpisodePlay(row, episode)
+                        onPlayEpisode(episode)
+                    },
+                    onGoToPodcast = {
+                        onEpisodePodcastClick(row, episode)
+                        onOpenPodcast(episode.podcastUuid)
+                    },
                 )
             }
         }
 
         is TvDiscoverRow.Podcasts -> item(key = row.id) {
+            LaunchedEffect(row.id) { onListImpression(row) }
             TvRow(
                 title = row.title,
                 items = row.podcasts,
@@ -104,7 +126,10 @@ fun LazyListScope.tvDiscoverRow(
                 TvPodcastTile(
                     artworkUrl = podcast.artworkUrl,
                     podcastTitle = podcast.title,
-                    onClick = { onOpenPodcast(podcast.uuid) },
+                    onClick = {
+                        onPodcastClick(row, podcast)
+                        onOpenPodcast(podcast.uuid)
+                    },
                     imageModifier = Modifier.width(TvPodcastTileDefaults.RowImageWidth),
                     isSponsored = podcast.isSponsored,
                 )
@@ -122,7 +147,10 @@ fun LazyListScope.tvDiscoverRow(
             ) { category ->
                 TvCategoryTile(
                     category = category,
-                    onClick = { onOpenCategory(category) },
+                    onClick = {
+                        onCategoryClick(category, row.categories.indexOf(category))
+                        onOpenCategory(category)
+                    },
                 )
             }
         }

@@ -46,15 +46,17 @@ class TvDiscoverFeedLoader @Inject constructor(
         }
     }
 
-    suspend fun loadCategoryPodcasts(source: String, categoryId: Int, isLoggedIn: Boolean): List<TvDiscoverPodcast> = coroutineScope {
-        val podcastsDeferred = async {
-            val feed = checkNotNull(listRepository.getListFeed(source)) { "Failed to load category feed $source" }
-            feed.podcasts.orEmpty()
-                .distinctBy(DiscoverPodcast::uuid)
-                .map { it.toTvDiscoverPodcast(isSponsored = false) }
-        }
+    suspend fun loadCategoryPodcasts(source: String, categoryId: Int, isLoggedIn: Boolean): TvCategoryPodcasts = coroutineScope {
+        val feedDeferred = async { checkNotNull(listRepository.getListFeed(source)) { "Failed to load category feed $source" } }
         val sponsoredDeferred = async { loadCategorySponsoredPodcasts(categoryId, isLoggedIn) }
-        mergeCategorySponsored(podcastsDeferred.await(), sponsoredDeferred.await())
+        val feed = feedDeferred.await()
+        val podcasts = feed.podcasts.orEmpty()
+            .distinctBy(DiscoverPodcast::uuid)
+            .map { it.toTvDiscoverPodcast(isSponsored = false) }
+        TvCategoryPodcasts(
+            listId = feed.listId,
+            podcasts = mergeCategorySponsored(podcasts, sponsoredDeferred.await()),
+        )
     }
 
     private suspend fun loadCategorySponsoredPodcasts(categoryId: Int, isLoggedIn: Boolean): List<TvDiscoverPodcast> = coroutineScope {

@@ -34,6 +34,7 @@ import au.com.shiftyjelly.pocketcasts.component.LocalOpenNowPlaying
 import au.com.shiftyjelly.pocketcasts.component.LocalTvToastHostState
 import au.com.shiftyjelly.pocketcasts.component.TvDetailOverlay
 import au.com.shiftyjelly.pocketcasts.component.tvFocusInactiveWhen
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.discover.TvCategoryPodcastsScreen
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverBanner
@@ -64,6 +65,8 @@ fun TvHomeScreen(
     var restoreFocusTrigger by remember { mutableIntStateOf(0) }
     var categoryRestoreTrigger by remember { mutableIntStateOf(0) }
 
+    CallOnce { viewModel.trackHomeShown() }
+
     val category = openedCategory
     val podcastUuid = openedPodcastUuid
     val openNowPlaying = LocalOpenNowPlaying.current
@@ -87,11 +90,17 @@ fun TvHomeScreen(
             onPlayEpisode = viewModel::playEpisode,
             onOpenCategory = { openedCategory = TvOpenedCategory(it.id, it.name, it.source) },
             onTapBanner = { banner ->
+                viewModel.trackBannerTapped(banner)
                 when (banner) {
                     TvDiscoverBanner.DiscoverMore -> onNavigateToSearch()
                     TvDiscoverBanner.CreateAccount -> onCreateAccount()
                 }
             },
+            onPodcastClick = viewModel::trackDiscoverPodcastTapped,
+            onEpisodePlay = viewModel::trackDiscoverEpisodePlayed,
+            onEpisodePodcastClick = viewModel::trackDiscoverEpisodePodcastTapped,
+            onCategoryClick = viewModel::trackCategoryPillTapped,
+            onListImpression = viewModel::trackDiscoverListShown,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(top = TvTopBarHeight)
@@ -109,6 +118,7 @@ fun TvHomeScreen(
                 categorySource = openCategory.source,
                 getCategoryPodcasts = { source -> viewModel.categoryPodcasts(openCategory.id, source) },
                 onOpenPodcast = { openedPodcastUuid = it },
+                onPodcastClick = { listId, podcast -> viewModel.trackCategoryPodcastTapped(openCategory, listId, podcast) },
                 onClose = { openedCategory = null },
                 restoreFocusTrigger = categoryRestoreTrigger,
             )
@@ -135,6 +145,11 @@ private fun TvHomeContent(
     modifier: Modifier = Modifier,
     onOpenCategory: (DiscoverCategory) -> Unit = {},
     onTapBanner: (TvDiscoverBanner) -> Unit = {},
+    onPodcastClick: (TvDiscoverRow, TvDiscoverPodcast) -> Unit = { _, _ -> },
+    onEpisodePlay: (TvDiscoverRow, TvDiscoverEpisode) -> Unit = { _, _ -> },
+    onEpisodePodcastClick: (TvDiscoverRow, TvDiscoverEpisode) -> Unit = { _, _ -> },
+    onCategoryClick: (DiscoverCategory, Int) -> Unit = { _, _ -> },
+    onListImpression: (TvDiscoverRow) -> Unit = {},
     restoreFocusTrigger: Int = 0,
 ) {
     when (uiState) {
@@ -151,6 +166,11 @@ private fun TvHomeContent(
                 onPlayEpisode = onPlayEpisode,
                 onOpenCategory = onOpenCategory,
                 onTapBanner = onTapBanner,
+                onPodcastClick = onPodcastClick,
+                onEpisodePlay = onEpisodePlay,
+                onEpisodePodcastClick = onEpisodePodcastClick,
+                onCategoryClick = onCategoryClick,
+                onListImpression = onListImpression,
                 modifier = modifier,
                 restoreFocusTrigger = restoreFocusTrigger,
             )
@@ -189,6 +209,11 @@ private fun TvHomeRows(
     modifier: Modifier = Modifier,
     onOpenCategory: (DiscoverCategory) -> Unit = {},
     onTapBanner: (TvDiscoverBanner) -> Unit = {},
+    onPodcastClick: (TvDiscoverRow, TvDiscoverPodcast) -> Unit = { _, _ -> },
+    onEpisodePlay: (TvDiscoverRow, TvDiscoverEpisode) -> Unit = { _, _ -> },
+    onEpisodePodcastClick: (TvDiscoverRow, TvDiscoverEpisode) -> Unit = { _, _ -> },
+    onCategoryClick: (DiscoverCategory, Int) -> Unit = { _, _ -> },
+    onListImpression: (TvDiscoverRow) -> Unit = {},
     restoreFocusTrigger: Int = 0,
 ) {
     var lastFocusedRowIndex by rememberSaveable(rows.size) { mutableIntStateOf(0) }
@@ -225,6 +250,11 @@ private fun TvHomeRows(
                 focusRequester = rowFocusRequester,
                 onOpenCategory = onOpenCategory,
                 onTapBanner = onTapBanner,
+                onPodcastClick = onPodcastClick,
+                onEpisodePlay = onEpisodePlay,
+                onEpisodePodcastClick = onEpisodePodcastClick,
+                onCategoryClick = onCategoryClick,
+                onListImpression = onListImpression,
             )
         }
 
