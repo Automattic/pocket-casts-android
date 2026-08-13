@@ -3,7 +3,7 @@
 source 'https://rubygems.org'
 
 gem 'danger-dangermattic', '~> 1.4'
-gem 'fastlane', '~> 2.237'
+gem 'fastlane', '~> 2.238'
 gem 'fastlane-plugin-firebase_app_distribution', '~> 1.0'
 
 gem 'fastlane-plugin-wpmreleasetoolkit', '~> 14.11'
@@ -20,7 +20,3 @@ gem 'google-apis-sheets_v4', '~> 0.48'
 #
 # See https://github.com/ruby/openssl/issues/949
 gem 'openssl', '~> 4.0'
-
-# Security: https://github.com/lostisland/faraday/pull/1665
-# Faraday 2.0 is not compatible with Fastlane
-gem 'faraday', '~> 2.14'
