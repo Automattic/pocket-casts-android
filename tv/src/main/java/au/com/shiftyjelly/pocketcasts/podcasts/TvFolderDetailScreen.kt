@@ -39,13 +39,16 @@ fun TvFolderDetailScreen(
     onOpenPodcast: (String) -> Unit,
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
+    onFolderImpression: (podcastCount: Int) -> Unit = {},
     restoreFocusTrigger: Int = 0,
 ) {
     var uiState by remember(folderUuid) { mutableStateOf<TvFolderDetailUiState>(TvFolderDetailUiState.Loading) }
     val currentGetFolderPodcasts by rememberUpdatedState(getFolderPodcasts)
+    val currentOnFolderImpression by rememberUpdatedState(onFolderImpression)
     LaunchedEffect(folderUuid) {
         val podcasts = currentGetFolderPodcasts(folderUuid)
         uiState = if (podcasts.isEmpty()) TvFolderDetailUiState.Empty else TvFolderDetailUiState.Loaded(podcasts)
+        currentOnFolderImpression(podcasts.size)
     }
 
     TvFolderDetailContent(
