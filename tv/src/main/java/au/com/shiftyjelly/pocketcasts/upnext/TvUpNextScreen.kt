@@ -76,7 +76,10 @@ fun TvUpNextScreen(
         val openNowPlaying = LocalOpenNowPlaying.current
         TvUpNextContent(
             uiState = uiState,
-            onNavigateToHome = onNavigateToHome,
+            onNavigateToHome = {
+                viewModel.trackDiscoverButtonTapped()
+                onNavigateToHome()
+            },
             onOpenPodcast = { openedPodcastUuid = it },
             onPlayEpisode = { episode ->
                 viewModel.play(episode)

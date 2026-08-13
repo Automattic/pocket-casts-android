@@ -9,6 +9,10 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.UpNextSyncWorker
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.UpNextDiscoverButtonTappedEvent
+import com.automattic.eventhorizon.UpNextShownEvent
+import com.automattic.eventhorizon.UpNextSourceType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -30,6 +34,7 @@ class TvUpNextViewModel @Inject constructor(
     private val syncManager: SyncManager,
     private val upNextQueue: UpNextQueue,
     private val playbackManager: PlaybackManager,
+    private val eventHorizon: EventHorizon,
 ) : ViewModel() {
 
     val uiState: StateFlow<TvUpNextUiState> = upNextQueue.changesObservable.asFlow()
@@ -51,7 +56,12 @@ class TvUpNextViewModel @Inject constructor(
         )
 
     fun onShown() {
+        eventHorizon.track(UpNextShownEvent(source = UpNextSourceType.TabBar))
         UpNextSyncWorker.enqueue(syncManager, context)
+    }
+
+    fun trackDiscoverButtonTapped() {
+        eventHorizon.track(UpNextDiscoverButtonTappedEvent(source = UpNextSourceType.TabBar))
     }
 
     fun play(episode: PodcastEpisode) {

@@ -9,6 +9,10 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.UpNextDiscoverButtonTappedEvent
+import com.automattic.eventhorizon.UpNextShownEvent
+import com.automattic.eventhorizon.UpNextSourceType
 import io.reactivex.subjects.BehaviorSubject
 import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -19,6 +23,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyBlocking
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -34,6 +39,7 @@ class TvUpNextViewModelTest {
     private val syncManager = mock<SyncManager>()
     private val context = mock<Context>()
     private val playbackManager = mock<PlaybackManager>()
+    private val eventHorizon = mock<EventHorizon>()
 
     private val currentEpisode = episode("current")
 
@@ -135,11 +141,26 @@ class TvUpNextViewModelTest {
         verifyBlocking(playbackManager) { playNowSuspend(episode = episode, sourceView = SourceView.UP_NEXT) }
     }
 
+    @Test
+    fun `showing the screen tracks the up next shown event`() = runTest {
+        createViewModel().onShown()
+
+        verify(eventHorizon).track(UpNextShownEvent(source = UpNextSourceType.TabBar))
+    }
+
+    @Test
+    fun `tapping the empty state discover button tracks the discover button event`() = runTest {
+        createViewModel().trackDiscoverButtonTapped()
+
+        verify(eventHorizon).track(UpNextDiscoverButtonTappedEvent(source = UpNextSourceType.TabBar))
+    }
+
     private fun createViewModel() = TvUpNextViewModel(
         context = context,
         syncManager = syncManager,
         upNextQueue = upNextQueue,
         playbackManager = playbackManager,
+        eventHorizon = eventHorizon,
     )
 
     private fun episode(uuid: String) = PodcastEpisode(uuid = uuid, publishedDate = Date(0))
