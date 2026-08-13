@@ -108,6 +108,7 @@ class SyncManagerImpl @Inject constructor(
 
     private companion object {
         const val MAX_POLL_ATTEMPTS = 20
+        const val NO_REDIRECT_PATH = "none"
     }
 
     override val isLoggedInObservable = BehaviorRelay.create<Boolean>().apply {
@@ -580,11 +581,13 @@ class SyncManagerImpl @Inject constructor(
                             UserAccountCreatedEvent(
                                 source = loginIdentity.analyticsValue,
                                 sourceInCode = signInSource.analyticsValue,
+                                redirectPath = NO_REDIRECT_PATH,
                             )
                         } else {
                             UserSignedInEvent(
                                 source = loginIdentity.analyticsValue,
                                 sourceInCode = signInSource.analyticsValue,
+                                redirectPath = NO_REDIRECT_PATH,
                             )
                         }
                     }
@@ -623,6 +626,7 @@ class SyncManagerImpl @Inject constructor(
                 UserAccountCreatedEvent(
                     source = LoginIdentityType.Password,
                     sourceInCode = signInSource.analyticsValue,
+                    redirectPath = NO_REDIRECT_PATH,
                 )
             }
 
