@@ -1,5 +1,9 @@
 8.19
 -----
+*   Bug Fixes
+    *   Fix the Android TV app being unable to play audio (no MediaSession was
+        registered), and add a Now Playing screen
+        ([#0000](https://github.com/Automattic/pocket-casts-android/pull/0000))
 
 
 8.18

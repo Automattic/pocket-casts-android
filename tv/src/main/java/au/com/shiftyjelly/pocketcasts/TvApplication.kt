@@ -3,6 +3,8 @@ package au.com.shiftyjelly.pocketcasts
 import android.app.Application
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackServiceToggle
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.utils.TimberDebugTree
 import dagger.hilt.android.HiltAndroidApp
@@ -20,6 +22,8 @@ class TvApplication :
 
     @Inject lateinit var workerFactory: HiltWorkerFactory
 
+    @Inject lateinit var playbackManager: PlaybackManager
+
     @Inject lateinit var upNextQueue: UpNextQueue
 
     private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
@@ -29,10 +33,13 @@ class TvApplication :
         if (BuildConfig.DEBUG) {
             Timber.plant(TimberDebugTree())
         }
-        // The only setupBlocking() call on TV; there is no PlaybackManager.setup() here,
-        // so calling it again would double-subscribe the queue's sync pipeline.
+        // PATCHED: turn the TV app from browse-and-queue into a real player.
+        // PlaybackManager.setup() calls upNextQueue.setupBlocking() internally and
+        // also starts mediaSessionManager, so this REPLACES the original
+        // queue-only call rather than duplicating it.
+        PlaybackServiceToggle.ensureCorrectServiceEnabled(this)
         applicationScope.launch {
-            upNextQueue.setupBlocking()
+            playbackManager.setup()
         }
     }
 

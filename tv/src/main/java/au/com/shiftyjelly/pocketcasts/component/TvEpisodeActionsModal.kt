@@ -72,6 +72,7 @@ private fun ColumnScope.TvEpisodeActionsModalContent(
 
     val episodeDetails = stringResource(LR.string.tv_episode_details)
     val goToPodcast = stringResource(LR.string.go_to_podcast)
+    val play = stringResource(LR.string.play)
     val playNext = stringResource(LR.string.add_to_up_next_top)
     val playLast = stringResource(LR.string.add_to_up_next_bottom)
     val removeFromUpNext = stringResource(LR.string.remove_from_up_next)
@@ -100,6 +101,11 @@ private fun ColumnScope.TvEpisodeActionsModalContent(
 
             TvEpisodeActionType.GoToPodcast -> goToPodcast to {
                 onGoToPodcast?.invoke()
+                onDismissRequest()
+            }
+
+            TvEpisodeActionType.Play -> play to {
+                actions.play(episode, source)
                 onDismissRequest()
             }
 
@@ -138,6 +144,7 @@ private fun ColumnScope.TvEpisodeActionsModalContent(
 internal enum class TvEpisodeActionType {
     Details,
     GoToPodcast,
+    Play,
     PlayNext,
     PlayLast,
     RemoveFromUpNext,
@@ -149,6 +156,7 @@ internal fun tvEpisodeActionTypes(
     actionContext: TvEpisodeActionContext,
     showGoToPodcast: Boolean,
 ): List<TvEpisodeActionType> = buildList {
+    add(TvEpisodeActionType.Play)
     add(TvEpisodeActionType.Details)
     if (showGoToPodcast) {
         add(TvEpisodeActionType.GoToPodcast)
@@ -248,6 +256,7 @@ private fun TvEpisodeActionsModalPreviewContent(
 }
 
 private object NoOpTvEpisodeActions : TvEpisodeActions {
+    override fun play(episode: PodcastEpisode, source: SourceView) = Unit
     override fun playNext(episode: PodcastEpisode, source: SourceView) = Unit
     override fun playLast(episode: PodcastEpisode, source: SourceView) = Unit
     override fun markAsPlayed(episode: PodcastEpisode) = Unit

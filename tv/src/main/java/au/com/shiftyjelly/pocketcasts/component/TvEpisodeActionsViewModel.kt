@@ -23,6 +23,7 @@ enum class TvEpisodeActionContext(val source: SourceView) {
 }
 
 interface TvEpisodeActions {
+    fun play(episode: PodcastEpisode, source: SourceView)
     fun playNext(episode: PodcastEpisode, source: SourceView)
     fun playLast(episode: PodcastEpisode, source: SourceView)
     fun markAsPlayed(episode: PodcastEpisode)
@@ -41,6 +42,11 @@ class TvEpisodeActionsViewModel @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel(),
     TvEpisodeActions {
+
+    override fun play(episode: PodcastEpisode, source: SourceView) {
+        // playNow launches its own coroutine, so no launchWrite wrapper needed
+        playbackManager.playNow(episode = episode, sourceView = source)
+    }
 
     override fun playNext(episode: PodcastEpisode, source: SourceView) = launchWrite {
         playbackManager.playNext(episode = episode, source = source)

@@ -21,12 +21,19 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.component.LocalTvTopBarVisibility
 import au.com.shiftyjelly.pocketcasts.component.TvTopBarVisibility
+import au.com.shiftyjelly.pocketcasts.nowplaying.TvMiniPlayerDrawer
+import au.com.shiftyjelly.pocketcasts.nowplaying.TvNowPlayingScreen
 import au.com.shiftyjelly.pocketcasts.playlists.TvPlaylistsScreen
 import au.com.shiftyjelly.pocketcasts.podcasts.TvYourPodcastsScreen
 import au.com.shiftyjelly.pocketcasts.theme.TvScreenBackgroundBrush
@@ -43,64 +50,90 @@ fun TvScaffold(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var isProfileModalVisible by rememberSaveable { mutableStateOf(false) }
+    var isMiniPlayerVisible by rememberSaveable { mutableStateOf(false) }
     val topBarVisibility = remember { TvTopBarVisibility() }
     var didFocusTopBar by rememberSaveable { mutableStateOf(false) }
 
     CompositionLocalProvider(LocalTvTopBarVisibility provides topBarVisibility) {
-        TvScaffoldContent(
-            tabs = uiState.tabs,
-            selectedTabIndex = uiState.selectedTabIndex,
-            profile = uiState.profile,
-            isTopBarVisible = topBarVisibility.isVisible,
-            autoFocusSelectedTab = !didFocusTopBar,
-            onSelectedTabFocus = { didFocusTopBar = true },
-            onTabSelect = viewModel::selectTab,
-            onProfileClick = { isProfileModalVisible = true },
-            modifier = modifier,
-        ) { tab ->
-            val navigateToHome = { viewModel.selectTab(TvTab.entries.indexOf(TvTab.Home)) }
-            // Tabs without a detail screen sit below the bar; the detail-bearing tabs pad their own
-            // content so their overlays can fill the full height.
-            val belowTopBar = Modifier.fillMaxSize().padding(top = TvTopBarHeight)
-            when (tab) {
-                is TvTab.Home -> TvHomeScreen()
+        Box(
+            // This Box is the root-most layout of TvScaffold, so the modifier
+            // TvScaffold was given by its caller is applied here, not further
+            // down inside TvScaffoldContent.
+            modifier = modifier
+                .fillMaxSize()
+                // The Philips remote's Options key sends KEYCODE_MENU and is
+                // otherwise unused, so it toggles the mini player from anywhere.
+                .onPreviewKeyEvent { event ->
+                    if (event.type == KeyEventType.KeyUp && event.key == Key.Menu) {
+                        isMiniPlayerVisible = !isMiniPlayerVisible
+                        true
+                    } else {
+                        false
+                    }
+                },
+        ) {
+            TvScaffoldContent(
+                tabs = uiState.tabs,
+                selectedTabIndex = uiState.selectedTabIndex,
+                profile = uiState.profile,
+                isTopBarVisible = topBarVisibility.isVisible,
+                autoFocusSelectedTab = !didFocusTopBar,
+                onSelectedTabFocus = { didFocusTopBar = true },
+                onTabSelect = viewModel::selectTab,
+                onProfileClick = { isProfileModalVisible = true },
+            ) { tab ->
+                val navigateToHome = { viewModel.selectTab(TvTab.entries.indexOf(TvTab.Home)) }
+                // Tabs without a detail screen sit below the bar; the detail-bearing tabs pad their own
+                // content so their overlays can fill the full height.
+                val belowTopBar = Modifier.fillMaxSize().padding(top = TvTopBarHeight)
+                when (tab) {
+                    is TvTab.Home -> TvHomeScreen()
 
-                is TvTab.YourPodcasts -> TvYourPodcastsScreen(
-                    onNavigateToHome = navigateToHome,
-                )
+                    is TvTab.YourPodcasts -> TvYourPodcastsScreen(
+                        onNavigateToHome = navigateToHome,
+                    )
 
-                is TvTab.Playlists -> TvPlaylistsScreen()
+                    is TvTab.Playlists -> TvPlaylistsScreen()
 
-                is TvTab.UpNext -> Box(modifier = belowTopBar) {
-                    TvUpNextScreen(onNavigateToHome = navigateToHome)
-                }
+                    is TvTab.UpNext -> Box(modifier = belowTopBar) {
+                        TvUpNextScreen(onNavigateToHome = navigateToHome)
+                    }
 
-                else -> Box(modifier = belowTopBar) {
-                    TvTabPlaceholder(tab = tab)
+                    is TvTab.NowPlaying -> Box(modifier = belowTopBar) {
+                        TvNowPlayingScreen()
+                    }
+
+                    else -> Box(modifier = belowTopBar) {
+                        TvTabPlaceholder(tab = tab)
+                    }
                 }
             }
-        }
 
-        if (isProfileModalVisible) {
-            TvProfileModal(
-                profile = uiState.profile,
-                onDismissRequest = { isProfileModalVisible = false },
-                onLogIn = {
-                    isProfileModalVisible = false
-                    onLogIn()
-                },
-                onCreateAccount = {
-                    isProfileModalVisible = false
-                    onCreateAccount()
-                },
-                // TODO: wire up the Starred Episodes and Listening History destinations.
-                onStarredEpisodes = {},
-                onListeningHistory = {},
-                onLogOut = {
-                    isProfileModalVisible = false
-                    viewModel.signOut()
-                },
-            )
+            if (isProfileModalVisible) {
+                TvProfileModal(
+                    profile = uiState.profile,
+                    onDismissRequest = { isProfileModalVisible = false },
+                    onLogIn = {
+                        isProfileModalVisible = false
+                        onLogIn()
+                    },
+                    onCreateAccount = {
+                        isProfileModalVisible = false
+                        onCreateAccount()
+                    },
+                    // TODO: wire up the Starred Episodes and Listening History destinations.
+                    onStarredEpisodes = {},
+                    onListeningHistory = {},
+                    onLogOut = {
+                        isProfileModalVisible = false
+                        viewModel.signOut()
+                    },
+                )
+            }
+
+            if (isMiniPlayerVisible) {
+                TvMiniPlayerDrawer(onDismissRequest = { isMiniPlayerVisible = false })
+            }
         }
     }
 }

@@ -25,9 +25,10 @@ sealed class TvTab(@StringRes val contentDescriptionRes: Int) {
     data object YourPodcasts : TextTab(labelRes = LR.string.tv_tab_your_podcasts)
     data object Playlists : TextTab(labelRes = LR.string.playlists)
     data object UpNext : TextTab(labelRes = LR.string.up_next)
+    data object NowPlaying : TextTab(labelRes = LR.string.play)
     data object Search : IconTab(contentDescriptionRes = LR.string.search, iconRes = IR.drawable.ic_search)
 
     companion object {
-        val entries: List<TvTab> = listOf(Home, YourPodcasts, Playlists, UpNext, Search)
+        val entries: List<TvTab> = listOf(Home, YourPodcasts, Playlists, UpNext, NowPlaying, Search)
     }
 }
