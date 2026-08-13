@@ -5,6 +5,9 @@ import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.shownotes.ShowNotesManager
 import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
+import com.automattic.eventhorizon.EpisodeDetailShownEvent
+import com.automattic.eventhorizon.EpisodeViewSourceType
+import com.automattic.eventhorizon.EventHorizon
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,11 +20,16 @@ import kotlinx.coroutines.launch
 class TvEpisodeInfoViewModel @Inject constructor(
     private val podcastManager: PodcastManager,
     private val showNotesManager: ShowNotesManager,
+    private val eventHorizon: EventHorizon,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow<UiState?>(null)
     val uiState: StateFlow<UiState?> = _uiState.asStateFlow()
 
     private var loadedEpisodeUuid: String? = null
+
+    fun trackShown(source: EpisodeViewSourceType) {
+        eventHorizon.track(EpisodeDetailShownEvent(source = source))
+    }
 
     fun load(podcastUuid: String, episodeUuid: String) {
         if (episodeUuid == loadedEpisodeUuid) {

@@ -67,6 +67,7 @@ import au.com.shiftyjelly.pocketcasts.theme.TvDetailsArtworkSize
 import au.com.shiftyjelly.pocketcasts.theme.TvTheme
 import au.com.shiftyjelly.pocketcasts.theme.tvColors
 import au.com.shiftyjelly.pocketcasts.theme.tvTypography
+import com.automattic.eventhorizon.EpisodeViewSourceType
 import java.util.Date
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -342,6 +343,7 @@ private fun EpisodeList(
     detailsEpisode?.let { episode ->
         TvEpisodeInfoModal(
             episode = episode,
+            source = EpisodeViewSourceType.PodcastScreen,
             onDismissRequest = { detailsEpisode = null },
         )
     }

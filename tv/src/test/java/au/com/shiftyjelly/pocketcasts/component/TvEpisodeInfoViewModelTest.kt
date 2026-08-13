@@ -7,6 +7,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.shownotes.ShowNotesManager
 import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import com.automattic.eventhorizon.EpisodeDetailShownEvent
+import com.automattic.eventhorizon.EpisodeViewSourceType
+import com.automattic.eventhorizon.EventHorizon
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -19,6 +22,7 @@ import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyBlocking
 import org.mockito.kotlin.whenever
 
@@ -30,10 +34,18 @@ class TvEpisodeInfoViewModelTest {
 
     private val podcastManager = mock<PodcastManager>()
     private val showNotesManager = mock<ShowNotesManager>()
+    private val eventHorizon = mock<EventHorizon>()
 
     @Test
     fun `initial state is null`() = runTest {
         assertNull(createViewModel().uiState.value)
+    }
+
+    @Test
+    fun `tracking shown records the detail shown event with the source`() = runTest {
+        createViewModel().trackShown(EpisodeViewSourceType.PodcastScreen)
+
+        verify(eventHorizon).track(EpisodeDetailShownEvent(source = EpisodeViewSourceType.PodcastScreen))
     }
 
     @Test
@@ -148,5 +160,6 @@ class TvEpisodeInfoViewModelTest {
     private fun createViewModel() = TvEpisodeInfoViewModel(
         podcastManager = podcastManager,
         showNotesManager = showNotesManager,
+        eventHorizon = eventHorizon,
     )
 }

@@ -50,6 +50,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
 import au.com.shiftyjelly.pocketcasts.theme.TvTheme
 import au.com.shiftyjelly.pocketcasts.theme.tvColors
 import au.com.shiftyjelly.pocketcasts.theme.tvTypography
+import com.automattic.eventhorizon.EpisodeViewSourceType
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -59,11 +60,13 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun TvEpisodeInfoModal(
     episode: PodcastEpisode,
+    source: EpisodeViewSourceType,
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: TvEpisodeInfoViewModel = hiltViewModel(),
 ) {
     LaunchedEffect(episode.uuid) {
+        viewModel.trackShown(source)
         viewModel.load(episode.podcastUuid, episode.uuid)
     }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()

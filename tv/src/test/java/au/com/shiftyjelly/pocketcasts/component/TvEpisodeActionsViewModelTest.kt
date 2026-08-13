@@ -6,6 +6,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import com.automattic.eventhorizon.EpisodeActionsShownEvent
+import com.automattic.eventhorizon.EpisodeViewSourceType
+import com.automattic.eventhorizon.EventHorizon
 import java.util.Date
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -25,6 +28,7 @@ class TvEpisodeActionsViewModelTest {
     private val episodeManager = mock<EpisodeManager>()
     private val playbackManager = mock<PlaybackManager>()
     private val podcastManager = mock<PodcastManager>()
+    private val eventHorizon = mock<EventHorizon>()
 
     private val episode = PodcastEpisode(
         uuid = "episode-uuid",
@@ -37,9 +41,17 @@ class TvEpisodeActionsViewModelTest {
         episodeManager = episodeManager,
         playbackManager = playbackManager,
         podcastManager = podcastManager,
+        eventHorizon = eventHorizon,
         applicationScope = CoroutineScope(coroutineRule.testDispatcher),
         ioDispatcher = coroutineRule.testDispatcher,
     )
+
+    @Test
+    fun `tracking actions shown records the event with the source`() = runTest {
+        viewModel().trackActionsShown(EpisodeViewSourceType.Search)
+
+        verify(eventHorizon).track(EpisodeActionsShownEvent(source = EpisodeViewSourceType.Search))
+    }
 
     @Test
     fun `play starts playback of the episode`() = runTest {

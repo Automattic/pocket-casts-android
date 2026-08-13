@@ -21,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.theme.TvTheme
+import com.automattic.eventhorizon.EpisodeViewSourceType
 import java.util.Date
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -62,6 +63,9 @@ private fun ColumnScope.TvEpisodeActionsModalContent(
     var pendingConfirmation by remember { mutableStateOf<TvEpisodeActionConfirmation?>(null) }
     var returnFocusLabel by remember { mutableStateOf<String?>(null) }
     val focusRequester = remember { FocusRequester() }
+    LaunchedEffect(Unit) {
+        actions.trackActionsShown(actionContext.episodeViewSource)
+    }
     LaunchedEffect(pendingConfirmation) {
         if (pendingConfirmation == null) {
             focusRequester.requestFocus()
@@ -317,6 +321,7 @@ private object NoOpTvEpisodeActions : TvEpisodeActions {
     override fun archive(episode: PodcastEpisode) = Unit
     override fun unarchive(episode: PodcastEpisode) = Unit
     override fun removeFromUpNext(episode: PodcastEpisode, source: SourceView) = Unit
+    override fun trackActionsShown(source: EpisodeViewSourceType) = Unit
 }
 
 private val ContentPadding = PaddingValues(horizontal = 24.dp, vertical = 27.dp)
