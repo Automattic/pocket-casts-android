@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.sp
 @Immutable
 data class TvTypography(
     val title1: TextStyle = TextStyle(
+        fontFamily = GoogleSansFontFamily,
         fontSize = 50.67.sp,
         lineHeight = 64.sp,
         fontWeight = FontWeight(510),
@@ -20,6 +21,7 @@ data class TvTypography(
         platformStyle = PlatformTextStyle(includeFontPadding = false),
     ),
     val title2: TextStyle = TextStyle(
+        fontFamily = GoogleSansFontFamily,
         fontSize = 38.sp,
         lineHeight = 44.sp,
         fontWeight = FontWeight(510),
@@ -27,6 +29,7 @@ data class TvTypography(
         platformStyle = PlatformTextStyle(includeFontPadding = false),
     ),
     val title3: TextStyle = TextStyle(
+        fontFamily = GoogleSansFontFamily,
         fontSize = 32.sp,
         lineHeight = 37.33.sp,
         fontWeight = FontWeight(510),
@@ -34,6 +37,7 @@ data class TvTypography(
         platformStyle = PlatformTextStyle(includeFontPadding = false),
     ),
     val headline: TextStyle = TextStyle(
+        fontFamily = GoogleSansFontFamily,
         fontSize = 25.33.sp,
         lineHeight = 30.67.sp,
         fontWeight = FontWeight(510),
@@ -41,6 +45,7 @@ data class TvTypography(
         platformStyle = PlatformTextStyle(includeFontPadding = false),
     ),
     val subtitle1: TextStyle = TextStyle(
+        fontFamily = GoogleSansFontFamily,
         fontSize = 25.33.sp,
         lineHeight = 30.67.sp,
         fontWeight = FontWeight(400),
@@ -48,6 +53,7 @@ data class TvTypography(
         platformStyle = PlatformTextStyle(includeFontPadding = false),
     ),
     val callout: TextStyle = TextStyle(
+        fontFamily = GoogleSansFontFamily,
         fontSize = 19.33.sp,
         lineHeight = 24.sp,
         fontWeight = FontWeight(510),
@@ -55,6 +61,7 @@ data class TvTypography(
         platformStyle = PlatformTextStyle(includeFontPadding = false),
     ),
     val body: TextStyle = TextStyle(
+        fontFamily = GoogleSansFontFamily,
         fontSize = 19.33.sp,
         lineHeight = 24.sp,
         fontWeight = FontWeight(400),
@@ -62,6 +69,7 @@ data class TvTypography(
         platformStyle = PlatformTextStyle(includeFontPadding = false),
     ),
     val caption1: TextStyle = TextStyle(
+        fontFamily = GoogleSansFontFamily,
         fontSize = 16.67.sp,
         lineHeight = 21.33.sp,
         fontWeight = FontWeight(510),
@@ -69,6 +77,7 @@ data class TvTypography(
         platformStyle = PlatformTextStyle(includeFontPadding = false),
     ),
     val caption2: TextStyle = TextStyle(
+        fontFamily = GoogleSansFontFamily,
         fontSize = 15.33.sp,
         lineHeight = 20.sp,
         fontWeight = FontWeight(510),
