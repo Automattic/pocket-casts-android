@@ -19,6 +19,8 @@ import com.automattic.eventhorizon.FilterPlayAllReplaceAndPlayTappedEvent
 import com.automattic.eventhorizon.FilterPlayAllTappedEvent
 import com.automattic.eventhorizon.FilterShowArchivedTappedEvent
 import com.automattic.eventhorizon.FilterShownEvent
+import com.automattic.eventhorizon.FilterSortByChangedEvent
+import com.automattic.eventhorizon.FilterSortByTappedEvent
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -91,7 +93,12 @@ class TvPlaylistDetailsViewModel @AssistedInject constructor(
         TvPlaylistDetailsUiState.Loading,
     )
 
+    fun trackSortByTapped() {
+        eventHorizon.track(FilterSortByTappedEvent(filterType = filterType))
+    }
+
     fun changeSortType(sortType: PlaylistEpisodeSortType) {
+        eventHorizon.track(FilterSortByChangedEvent(sortOrder = sortType.analyticsValue, filterType = filterType))
         viewModelScope.launch {
             playlistManager.updateSortType(playlistUuid, sortType)
         }

@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
+import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.preferences.TvPreferences
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlayAllHandler
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlayAllResponse
@@ -18,6 +19,8 @@ import com.automattic.eventhorizon.FilterPlayAllReplaceAndPlayTappedEvent
 import com.automattic.eventhorizon.FilterPlayAllTappedEvent
 import com.automattic.eventhorizon.FilterShowArchivedTappedEvent
 import com.automattic.eventhorizon.FilterShownEvent
+import com.automattic.eventhorizon.FilterSortByChangedEvent
+import com.automattic.eventhorizon.FilterSortByTappedEvent
 import com.automattic.eventhorizon.PlaylistType
 import java.util.Date
 import kotlinx.coroutines.CompletableDeferred
@@ -401,6 +404,24 @@ class TvPlaylistDetailsViewModelTest {
         advanceUntilIdle()
 
         verify(eventHorizon).track(FilterPlayAllReplaceAndPlayTappedEvent(filterType = PlaylistType.Manual, saveUpNext = true))
+    }
+
+    @Test
+    fun `tracks the sort by tapped event`() = runTest {
+        createViewModel().trackSortByTapped()
+
+        verify(eventHorizon).track(FilterSortByTappedEvent(filterType = PlaylistType.Manual))
+    }
+
+    @Test
+    fun `changing the sort type tracks the sort by changed event`() = runTest {
+        val sortType = PlaylistEpisodeSortType.NewestToOldest
+
+        createViewModel().changeSortType(sortType)
+
+        verify(eventHorizon).track(
+            FilterSortByChangedEvent(sortOrder = sortType.analyticsValue, filterType = PlaylistType.Manual),
+        )
     }
 
     @Test
