@@ -26,6 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
@@ -218,6 +219,8 @@ private fun SortableEpisodeList(
             listState.scrollToItem(0)
         }
     }
+    val isManual = uiState.playlist.type == Playlist.Type.Manual
+    val leftFocusRequester = playAllFocusRequester.takeIf { uiState.episodes.isNotEmpty() }
     Column(modifier = modifier) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -226,16 +229,23 @@ private fun SortableEpisodeList(
                 .align(Alignment.End)
                 .padding(bottom = 12.dp),
         ) {
-            TvArchivedFilterButton(
-                isShowingArchived = uiState.isShowingArchivedOnDevice,
-                onToggleArchiveFilter = onToggleArchiveFilter,
-                leftFocusRequester = playAllFocusRequester.takeIf { uiState.episodes.isNotEmpty() },
-            )
+            if (isManual) {
+                TvArchivedFilterButton(
+                    isShowingArchived = uiState.isShowingArchivedOnDevice,
+                    onToggleArchiveFilter = onToggleArchiveFilter,
+                    leftFocusRequester = leftFocusRequester,
+                )
+            }
             TvSortButton(
                 selected = sortType,
                 options = uiState.playlist.availableSortTypes,
                 label = { it.displayLabel() },
                 onSelect = onChangeSortType,
+                modifier = if (isManual) {
+                    Modifier
+                } else {
+                    Modifier.focusProperties { leftFocusRequester?.let { left = it } }
+                },
             )
         }
         if (uiState.episodes.isNotEmpty()) {
