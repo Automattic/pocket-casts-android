@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.search
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -13,9 +14,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
@@ -60,12 +65,21 @@ private fun TvSearchContent(
     onQueryChange: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(modifier = modifier.fillMaxSize()) {
+    val searchFieldFocusRequester = remember { FocusRequester() }
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .focusGroup()
+            .focusProperties {
+                onEnter = { runCatching { searchFieldFocusRequester.requestFocus() } }
+            },
+    ) {
         Column(modifier = Modifier.padding(ContentPadding)) {
             Spacer(modifier = Modifier.height(40.dp))
             TvSearchField(
                 query = query,
                 onQueryChange = onQueryChange,
+                modifier = Modifier.focusRequester(searchFieldFocusRequester),
             )
             Spacer(modifier = Modifier.height(24.dp))
         }
