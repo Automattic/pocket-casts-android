@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.search
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -9,14 +10,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
@@ -26,10 +30,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.MaterialTheme
 import au.com.shiftyjelly.pocketcasts.component.TvCategoryTile
 import au.com.shiftyjelly.pocketcasts.component.TvRow
+import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverRow
+import au.com.shiftyjelly.pocketcasts.discover.tvDiscoverRow
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 import au.com.shiftyjelly.pocketcasts.theme.TvTheme
 import au.com.shiftyjelly.pocketcasts.theme.tvColors
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+
+private val ContentPadding = PaddingValues(horizontal = 48.dp)
 
 @Composable
 fun TvSearchScreen(
@@ -38,10 +46,12 @@ fun TvSearchScreen(
 ) {
     var query by rememberSaveable { mutableStateOf("") }
     val categories by viewModel.categories.collectAsStateWithLifecycle()
+    val discoverRows by viewModel.discoverRows.collectAsStateWithLifecycle()
 
     TvSearchContent(
         query = query,
         categories = categories,
+        discoverRows = discoverRows,
         onQueryChange = { query = it },
         modifier = modifier,
     )
@@ -51,41 +61,66 @@ fun TvSearchScreen(
 private fun TvSearchContent(
     query: String,
     categories: List<DiscoverCategory>,
+    discoverRows: List<TvDiscoverRow>,
     onQueryChange: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val searchFieldFocusRequester = remember { FocusRequester() }
     Column(
         modifier = modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState()),
+            .focusGroup()
+            .focusProperties {
+                onEnter = { runCatching { searchFieldFocusRequester.requestFocus() } }
+            },
     ) {
-        Column(modifier = Modifier.padding(horizontal = 48.dp)) {
+        Column(modifier = Modifier.padding(ContentPadding)) {
             Spacer(modifier = Modifier.height(40.dp))
             TvSearchField(
                 query = query,
                 onQueryChange = onQueryChange,
+                modifier = Modifier.focusRequester(searchFieldFocusRequester),
             )
             Spacer(modifier = Modifier.height(24.dp))
         }
 
-        if (categories.isNotEmpty()) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 48.dp)
-                    .height(1.dp)
-                    .background(MaterialTheme.tvColors.overlayBorder),
-            )
-            Spacer(modifier = Modifier.height(24.dp))
-            TvRow(
-                title = stringResource(LR.string.tv_search_browse_categories),
-                items = categories,
-                contentPadding = PaddingValues(horizontal = 48.dp),
-                key = { it.id },
-            ) { category ->
-                TvCategoryTile(category = category, onClick = {})
+        LazyColumn(modifier = Modifier.fillMaxSize()) {
+            if (categories.isNotEmpty()) {
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(ContentPadding)
+                            .height(1.dp)
+                            .background(MaterialTheme.tvColors.overlayBorder),
+                    )
+                }
+                item {
+                    Spacer(modifier = Modifier.height(24.dp))
+                    TvRow(
+                        title = stringResource(LR.string.tv_search_browse_categories),
+                        items = categories,
+                        contentPadding = ContentPadding,
+                        key = { it.id },
+                    ) { category ->
+                        TvCategoryTile(category = category, onClick = {})
+                    }
+                }
             }
-            Spacer(modifier = Modifier.height(40.dp))
+
+            if (query.isBlank()) {
+                discoverRows.forEach { row ->
+                    item { Spacer(modifier = Modifier.height(24.dp)) }
+                    tvDiscoverRow(
+                        row = row,
+                        onOpenPodcast = {},
+                        onPlayEpisode = {},
+                        contentPadding = ContentPadding,
+                    )
+                }
+            }
+
+            item { Spacer(modifier = Modifier.height(40.dp)) }
         }
     }
 }
@@ -102,6 +137,7 @@ private fun TvSearchScreenPreview() {
                     DiscoverCategory(id = 2, name = "True Crime", icon = "", source = ""),
                     DiscoverCategory(id = 3, name = "Fiction", icon = "", source = ""),
                 ),
+                discoverRows = emptyList(),
                 onQueryChange = {},
             )
         }

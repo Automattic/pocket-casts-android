@@ -18,6 +18,10 @@ class ListRepository(
         return listWebService.getDiscoverFeed(platform = platform, version = 3)
     }
 
+    suspend fun getSearchDiscoverFeed(): Discover {
+        return listWebService.getSearchDiscoverFeed(platform = platform, version = 3)
+    }
+
     suspend fun getListFeed(url: String, authenticated: Boolean? = false): ListFeed? {
         return runCatching {
             if (authenticated == true) {
