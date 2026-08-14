@@ -252,6 +252,7 @@
     <string name="tv_row_recommendations">Recommendations</string>
     <string name="tv_row_because_you_liked">Because you liked Podcast</string>
     <string name="tv_home_keep_listening">Keep Listening</string>
+    <string name="tv_search_browse_categories">Browse categories</string>
     <string name="tv_profile_starred_episodes">Starred Episodes</string>
     <string name="tv_sign_in_title">Log in to Pocket Casts</string>
     <string name="tv_sign_in_step_scan">Scan the QR code or go to %1$s</string>
