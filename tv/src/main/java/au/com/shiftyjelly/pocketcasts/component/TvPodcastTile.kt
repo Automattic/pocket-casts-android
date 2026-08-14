@@ -47,7 +47,7 @@ fun TvPodcastTile(
                 )
                 Text(
                     text = stringResource(LR.string.sponsored),
-                    style = MaterialTheme.tvTypography.caption1,
+                    style = MaterialTheme.tvTypography.caption2,
                     color = MaterialTheme.tvColors.textSecondary,
                     modifier = Modifier.padding(bottom = 9.dp),
                 )
