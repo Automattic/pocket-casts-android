@@ -28,6 +28,11 @@ fun TvOnboardingNavHost(
     viewModel: TvOnboardingViewModel = hiltViewModel(),
 ) {
     val navController = rememberNavController()
+    val navigateClearingBackStack: (String) -> Unit = { route ->
+        navController.navigate(route) {
+            popUpTo(navController.graph.id) { inclusive = true }
+        }
+    }
     val toastHostState = remember { TvToastHostState() }
     CompositionLocalProvider(LocalTvToastHostState provides toastHostState) {
         Box(modifier = modifier.fillMaxSize()) {
@@ -54,11 +59,7 @@ fun TvOnboardingNavHost(
                 }
                 composable(TvOnboardingRoutes.SIGN_IN) {
                     TvSignInScreen(
-                        onSignInComplete = {
-                            navController.navigate(TvOnboardingRoutes.SYNCING) {
-                                popUpTo(navController.graph.id) { inclusive = true }
-                            }
-                        },
+                        onSignInComplete = { navigateClearingBackStack(TvOnboardingRoutes.SYNCING) },
                     )
                 }
                 composable(TvOnboardingRoutes.SYNCING) {
@@ -74,11 +75,7 @@ fun TvOnboardingNavHost(
                     TvScaffold(
                         onLogIn = { navController.navigate(TvOnboardingRoutes.SIGN_IN) },
                         onCreateAccount = { navController.navigate(TvOnboardingRoutes.CREATE_ACCOUNT) },
-                        onSignedOut = {
-                            navController.navigate(TvOnboardingRoutes.LANDING) {
-                                popUpTo(navController.graph.id) { inclusive = true }
-                            }
-                        },
+                        onSignedOut = { navigateClearingBackStack(TvOnboardingRoutes.LANDING) },
                     )
                 }
             }
