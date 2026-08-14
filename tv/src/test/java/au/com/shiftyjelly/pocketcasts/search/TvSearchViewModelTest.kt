@@ -345,20 +345,31 @@ class TvSearchViewModelTest {
     }
 
     @Test
-    fun `searching a term saves it to history and exposes recent searches`() = runTest {
+    fun `saving a search term persists it and exposes recent searches`() = runTest {
         whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
-        whenever { improvedSearchManager.combinedSearch(any()) }.thenReturn(emptyList())
         whenever { searchHistoryManager.findAll(any()) }.thenReturn(
             listOf(SearchHistoryEntry.SearchTerm(term = "sugar")),
         )
 
         val viewModel = createViewModel()
-        viewModel.onQueryChange("sugar")
+        viewModel.saveSearchTerm("sugar")
         advanceUntilIdle()
 
         verifyBlocking(searchHistoryManager) { add(any()) }
         verifyBlocking(searchHistoryManager) { truncateHistory(20) }
         assertEquals(listOf("sugar"), viewModel.history.value)
+    }
+
+    @Test
+    fun `searching does not save partial terms to history`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        whenever { improvedSearchManager.combinedSearch(any()) }.thenReturn(emptyList())
+
+        val viewModel = createViewModel()
+        viewModel.onQueryChange("sug")
+        advanceUntilIdle()
+
+        verifyBlocking(searchHistoryManager, never()) { add(any()) }
     }
 
     @Test
