@@ -57,6 +57,7 @@ internal fun TvSearchField(
     query: String,
     onQueryChange: (String) -> Unit,
     modifier: Modifier = Modifier,
+    onEditingChange: (Boolean) -> Unit = {},
 ) {
     var editing by remember { mutableStateOf(false) }
     var restoreRestFocus by remember { mutableStateOf(false) }
@@ -66,6 +67,7 @@ internal fun TvSearchField(
     val keyboardController = LocalSoftwareKeyboardController.current
 
     LaunchedEffect(editing) {
+        onEditingChange(editing)
         if (editing) {
             runCatching { fieldFocusRequester.requestFocus() }
             keyboardController?.show()

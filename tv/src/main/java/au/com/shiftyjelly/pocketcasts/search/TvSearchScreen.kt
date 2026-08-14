@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -55,6 +56,7 @@ import au.com.shiftyjelly.pocketcasts.component.TvPodcastTile
 import au.com.shiftyjelly.pocketcasts.component.TvPodcastTileDefaults
 import au.com.shiftyjelly.pocketcasts.component.TvRow
 import au.com.shiftyjelly.pocketcasts.component.TvSectionTitle
+import au.com.shiftyjelly.pocketcasts.component.TvTile
 import au.com.shiftyjelly.pocketcasts.component.tvFocusInactiveWhen
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.discover.TvCategoryPodcastsScreen
@@ -89,6 +91,7 @@ fun TvSearchScreen(
     val filter by viewModel.filter.collectAsStateWithLifecycle()
     val categories by viewModel.categories.collectAsStateWithLifecycle()
     val discoverRows by viewModel.discoverRows.collectAsStateWithLifecycle()
+    val suggestions by viewModel.suggestions.collectAsStateWithLifecycle()
     val actionsEpisode by viewModel.actionsEpisode.collectAsStateWithLifecycle()
 
     var openedPodcastUuid by rememberSaveable { mutableStateOf<String?>(null) }
@@ -122,6 +125,8 @@ fun TvSearchScreen(
             onOpenCategory = { openedCategory = TvOpenedCategory(it.id, it.name, it.source) },
             onPlayEpisode = viewModel::playEpisode,
             onOpenEpisodeActions = viewModel::openEpisodeActions,
+            suggestions = suggestions,
+            onSuggestionSelect = viewModel::onQueryChange,
             restoreFocusTrigger = restoreFocusTrigger,
             modifier = Modifier
                 .fillMaxSize()
@@ -192,9 +197,14 @@ private fun TvSearchContent(
     onPlayEpisode: (ImprovedSearchResultItem.EpisodeItem) -> Unit,
     onOpenEpisodeActions: (ImprovedSearchResultItem.EpisodeItem) -> Unit,
     modifier: Modifier = Modifier,
+    suggestions: List<String> = emptyList(),
+    onSuggestionSelect: (String) -> Unit = {},
     restoreFocusTrigger: Int = 0,
 ) {
     val searchFieldFocusRequester = remember { FocusRequester() }
+    var isEditing by remember { mutableStateOf(false) }
+    var suggestionsFocused by remember { mutableStateOf(false) }
+    val showSuggestions = (isEditing || suggestionsFocused) && suggestions.isNotEmpty()
     LaunchedEffect(Unit) {
         withFrameNanos {}
         runCatching { searchFieldFocusRequester.requestFocus() }
@@ -205,12 +215,13 @@ private fun TvSearchContent(
             TvSearchField(
                 query = query,
                 onQueryChange = onQueryChange,
+                onEditingChange = { isEditing = it },
                 modifier = Modifier.focusRequester(searchFieldFocusRequester),
             )
             Spacer(modifier = Modifier.height(24.dp))
         }
 
-        if (searchState !is TvSearchState.Idle) {
+        if (searchState !is TvSearchState.Idle && !showSuggestions) {
             TvSearchFilters(
                 selected = filter,
                 onFilterSelect = onFilterSelect,
@@ -224,6 +235,14 @@ private fun TvSearchContent(
                 .fillMaxWidth()
                 .weight(1f),
         ) {
+            if (showSuggestions) {
+                TvSearchSuggestions(
+                    suggestions = suggestions,
+                    onSuggestionSelect = onSuggestionSelect,
+                    modifier = Modifier.onFocusChanged { suggestionsFocused = it.hasFocus },
+                )
+                return@Box
+            }
             when (searchState) {
                 is TvSearchState.Idle -> TvSearchDiscover(
                     categories = categories,
@@ -539,6 +558,33 @@ private fun TvSearchMessage(
         onAction = onAction,
         modifier = Modifier.fillMaxSize(),
     )
+}
+
+@Composable
+private fun TvSearchSuggestions(
+    suggestions: List<String>,
+    onSuggestionSelect: (String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    LazyColumn(
+        modifier = modifier.fillMaxSize(),
+        contentPadding = PaddingValues(horizontal = ContentHorizontalPadding, vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        items(suggestions) { term ->
+            TvTile(
+                onClick = { onSuggestionSelect(term) },
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(
+                    text = term,
+                    style = MaterialTheme.tvTypography.body,
+                    color = MaterialTheme.tvColors.textPrimary,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+                )
+            }
+        }
+    }
 }
 
 @Composable
