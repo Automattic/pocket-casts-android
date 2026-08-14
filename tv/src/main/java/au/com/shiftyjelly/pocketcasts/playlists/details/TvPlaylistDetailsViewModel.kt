@@ -71,7 +71,9 @@ class TvPlaylistDetailsViewModel @AssistedInject constructor(
         Playlist.Type.Smart -> playlistManager.smartPlaylistFlow(playlistUuid, includeArchived = true)
     }
 
-    private val isShowingArchivedFlow = MutableStateFlow(preferences.isPlaylistShowingArchived(playlistUuid))
+    private val isShowingArchivedFlow = MutableStateFlow(
+        playlistType == Playlist.Type.Manual && preferences.isPlaylistShowingArchived(playlistUuid),
+    )
 
     val uiState: StateFlow<TvPlaylistDetailsUiState> = combine(
         playlistFlow,
@@ -113,10 +115,9 @@ class TvPlaylistDetailsViewModel @AssistedInject constructor(
     }
 
     fun toggleArchiveFilter() {
+        if (playlistType != Playlist.Type.Manual) return
         val isShowingArchived = !isShowingArchivedFlow.value
-        if (playlistType == Playlist.Type.Manual) {
-            eventHorizon.track(if (isShowingArchived) FilterShowArchivedTappedEvent else FilterHideArchivedTappedEvent)
-        }
+        eventHorizon.track(if (isShowingArchived) FilterShowArchivedTappedEvent else FilterHideArchivedTappedEvent)
         preferences.setPlaylistShowingArchived(playlistUuid, isShowingArchived)
         isShowingArchivedFlow.value = isShowingArchived
     }

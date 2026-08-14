@@ -100,6 +100,26 @@ class TvPlaylistDetailsViewModelTest {
     }
 
     @Test
+    fun `smart playlists ignore the stored archived preference`() = runTest {
+        val preferences = mock<TvPreferences> {
+            on { isPlaylistShowingArchived("playlist-uuid") } doReturn true
+        }
+        val smartPlaylists = MutableSharedFlow<Playlist?>(replay = 1)
+        doReturn(smartPlaylists).whenever(playlistManager).smartPlaylistFlow(any(), anyOrNull(), any())
+        val viewModel = createViewModel(preferences, playlistType = Playlist.Type.Smart)
+
+        viewModel.uiState.test {
+            assertEquals(TvPlaylistDetailsUiState.Loading, awaitItem())
+
+            smartPlaylists.emit(playlist(availableEpisode, archivedEpisode))
+
+            val state = awaitItem() as TvPlaylistDetailsUiState.Loaded
+            assertEquals(listOf(availableEpisode), state.episodes)
+            assertEquals(false, state.isShowingArchivedOnDevice)
+        }
+    }
+
+    @Test
     fun `only available episodes are surfaced`() = runTest {
         val available = episode(uuid = "available", isArchived = false)
         val unavailable = PlaylistEpisode.Unavailable(ManualPlaylistEpisode.test(episodeUuid = "unavailable"))
