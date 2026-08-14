@@ -10,17 +10,20 @@ import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverRow
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.ImprovedSearchResultItem
-import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.models.to.SearchAutoCompleteItem
+import au.com.shiftyjelly.pocketcasts.models.to.SearchHistoryEntry
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.search.ImprovedSearchManager
+import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -42,7 +45,7 @@ class TvSearchViewModel @Inject constructor(
     private val podcastManager: PodcastManager,
     private val episodeManager: EpisodeManager,
     private val playbackManager: PlaybackManager,
-    private val settings: Settings,
+    private val searchHistoryManager: SearchHistoryManager,
 ) : ViewModel() {
 
     private val _categories = MutableStateFlow<List<DiscoverCategory>>(emptyList())
@@ -59,6 +62,12 @@ class TvSearchViewModel @Inject constructor(
 
     private val _filter = MutableStateFlow(TvSearchFilter.TopResults)
     val filter: StateFlow<TvSearchFilter> = _filter.asStateFlow()
+
+    private val _suggestions = MutableStateFlow<List<String>>(emptyList())
+    val suggestions: StateFlow<List<String>> = _suggestions.asStateFlow()
+
+    private val _history = MutableStateFlow<List<String>>(emptyList())
+    val history: StateFlow<List<String>> = _history.asStateFlow()
 
     private val _playStarted = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     val playStarted: SharedFlow<Unit> = _playStarted.asSharedFlow()
@@ -95,6 +104,15 @@ class TvSearchViewModel @Inject constructor(
                 }
             }
         }
+        viewModelScope.launch {
+            try {
+                refreshHistory()
+            } catch (exception: CancellationException) {
+                throw exception
+            } catch (exception: Exception) {
+                Timber.e(exception, "Failed to load TV search history")
+            }
+        }
     }
 
     fun onQueryChange(query: String) {
@@ -102,18 +120,37 @@ class TvSearchViewModel @Inject constructor(
         searchJob?.cancel()
         val term = query.trim()
         if (term.isEmpty()) {
-            _filter.value = TvSearchFilter.TopResults
+            _suggestions.value = emptyList()
             _searchState.value = TvSearchState.Idle
             return
         }
         searchJob = viewModelScope.launch {
-            delay(settings.getPodcastSearchDebounceMs())
+            delay(SEARCH_DEBOUNCE_MS)
             _searchState.value = TvSearchState.Searching
             _searchState.value = try {
+                val fullSearch = async { runCatching { improvedSearchManager.combinedSearch(term) } }
                 val localPodcasts = podcastManager.findSubscribedFlow(term).first().map(Podcast::toSearchItem)
-                val remoteResults = improvedSearchManager.combinedSearch(term)
-                val podcasts = (localPodcasts + remoteResults.filterIsInstance<ImprovedSearchResultItem.PodcastItem>())
+                val localUuids = localPodcasts.mapTo(HashSet(), ImprovedSearchResultItem.PodcastItem::uuid)
+                val predictiveResults = try {
+                    improvedSearchManager.autoCompleteSearch(term)
+                } catch (exception: CancellationException) {
+                    throw exception
+                } catch (exception: Exception) {
+                    Timber.e(exception, "Failed to load TV search suggestions")
+                    emptyList()
+                }
+                _suggestions.value = predictiveResults.filterIsInstance<SearchAutoCompleteItem.Term>().map { it.term }
+                val predictivePodcasts = predictiveResults.filterIsInstance<SearchAutoCompleteItem.Podcast>().map { it.toSearchItem() }
+                val earlyPodcasts = (predictivePodcasts + localPodcasts).distinctBy(ImprovedSearchResultItem.PodcastItem::uuid)
+                if (earlyPodcasts.isNotEmpty()) {
+                    _searchState.value = TvSearchState.Results(podcasts = earlyPodcasts, episodes = emptyList(), isPartial = true)
+                }
+
+                val remoteResults = fullSearch.await().getOrThrow()
+                val remotePodcasts = remoteResults.filterIsInstance<ImprovedSearchResultItem.PodcastItem>()
+                val podcasts = (predictivePodcasts + remotePodcasts + localPodcasts)
                     .distinctBy(ImprovedSearchResultItem.PodcastItem::uuid)
+                    .map { if (it.uuid in localUuids) it.copy(isFollowed = true) else it }
                 val episodes = remoteResults.filterIsInstance<ImprovedSearchResultItem.EpisodeItem>()
                     .distinctBy(ImprovedSearchResultItem.EpisodeItem::uuid)
                 if (podcasts.isEmpty() && episodes.isEmpty()) {
@@ -132,6 +169,29 @@ class TvSearchViewModel @Inject constructor(
 
     fun onFilterSelected(filter: TvSearchFilter) {
         _filter.value = filter
+    }
+
+    fun saveSearchTerm(term: String) {
+        val trimmed = term.trim()
+        if (trimmed.isEmpty()) {
+            return
+        }
+        viewModelScope.launch {
+            try {
+                searchHistoryManager.add(SearchHistoryEntry.SearchTerm(term = trimmed))
+                refreshHistory()
+            } catch (exception: CancellationException) {
+                throw exception
+            } catch (exception: Exception) {
+                Timber.e(exception, "Failed to save TV search history")
+            }
+        }
+    }
+
+    private suspend fun refreshHistory() {
+        _history.value = searchHistoryManager.findAll(showFolders = false)
+            .filterIsInstance<SearchHistoryEntry.SearchTerm>()
+            .map(SearchHistoryEntry.SearchTerm::term)
     }
 
     suspend fun categoryPodcasts(categoryId: Int, source: String): List<TvDiscoverPodcast> {
@@ -188,6 +248,10 @@ class TvSearchViewModel @Inject constructor(
                 episodeManager.findByUuid(episode.uuid)
             }
     }
+
+    companion object {
+        private const val SEARCH_DEBOUNCE_MS = 300L
+    }
 }
 
 private fun Podcast.toSearchItem() = ImprovedSearchResultItem.PodcastItem(
@@ -196,6 +260,14 @@ private fun Podcast.toSearchItem() = ImprovedSearchResultItem.PodcastItem(
     author = author,
     isFollowed = true,
     isExplicit = explicit == true,
+)
+
+private fun SearchAutoCompleteItem.Podcast.toSearchItem() = ImprovedSearchResultItem.PodcastItem(
+    uuid = uuid,
+    title = title,
+    author = author,
+    isFollowed = isSubscribed,
+    isExplicit = isExplicit,
 )
 
 enum class TvSearchFilter(
@@ -214,5 +286,6 @@ sealed interface TvSearchState {
     data class Results(
         val podcasts: List<ImprovedSearchResultItem.PodcastItem>,
         val episodes: List<ImprovedSearchResultItem.EpisodeItem>,
+        val isPartial: Boolean = false,
     ) : TvSearchState
 }

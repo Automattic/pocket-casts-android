@@ -42,27 +42,6 @@ import java.util.Date
 import kotlin.time.Duration.Companion.seconds
 
 @Composable
-internal fun TvSearchEpisodeRow(
-    episode: ImprovedSearchResultItem.EpisodeItem,
-    onClick: () -> Unit,
-    onOpenActions: () -> Unit,
-    modifier: Modifier = Modifier,
-    episodeFocusRequester: FocusRequester? = null,
-) {
-    TvEpisodeListItemContainer(
-        onOpenActions = onOpenActions,
-        modifier = modifier,
-    ) { rowModifier ->
-        TvSearchEpisodeCard(
-            episode = episode,
-            onClick = onClick,
-            modifier = rowModifier
-                .then(if (episodeFocusRequester != null) Modifier.focusRequester(episodeFocusRequester) else Modifier),
-        )
-    }
-}
-
-@Composable
 internal fun TvSearchEpisodeCard(
     episode: ImprovedSearchResultItem.EpisodeItem,
     onClick: () -> Unit,
@@ -139,10 +118,10 @@ internal fun TvSearchEpisodeCard(
 
 @Preview(device = Devices.TV_1080p)
 @Composable
-private fun TvSearchEpisodeRowPreview() {
+private fun TvSearchEpisodeCardPreview() {
     TvTheme {
         Box(modifier = Modifier.background(MaterialTheme.tvColors.backgroundSunken).padding(48.dp)) {
-            TvSearchEpisodeRow(
+            TvSearchEpisodeCard(
                 episode = ImprovedSearchResultItem.EpisodeItem(
                     uuid = "episode-1",
                     title = "The real cost of sugar and how it shapes the food we eat",
@@ -152,7 +131,6 @@ private fun TvSearchEpisodeRowPreview() {
                     duration = 1440.seconds,
                 ),
                 onClick = {},
-                onOpenActions = {},
             )
         }
     }

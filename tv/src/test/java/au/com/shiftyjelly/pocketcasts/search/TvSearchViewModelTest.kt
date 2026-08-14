@@ -6,6 +6,8 @@ import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverFeedLoader
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverRow
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.ImprovedSearchResultItem
+import au.com.shiftyjelly.pocketcasts.models.to.SearchAutoCompleteItem
+import au.com.shiftyjelly.pocketcasts.models.to.SearchHistoryEntry
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
@@ -13,6 +15,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.search.ImprovedSearchManager
+import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.model.Discover
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
@@ -62,7 +65,6 @@ class TvSearchViewModelTest {
     }
     private val settings = mock<Settings> {
         whenever(it.discoverCountryCode).thenReturn(discoverCountryCode)
-        whenever(it.getPodcastSearchDebounceMs()).thenReturn(0)
     }
     private val improvedSearchManager = mock<ImprovedSearchManager>()
     private val podcastManager = mock<PodcastManager> {
@@ -70,6 +72,12 @@ class TvSearchViewModelTest {
     }
     private val episodeManager = mock<EpisodeManager>()
     private val playbackManager = mock<PlaybackManager>()
+    private val searchHistoryManager = mock<SearchHistoryManager>()
+
+    init {
+        whenever { improvedSearchManager.autoCompleteSearch(any()) }.thenReturn(emptyList())
+        whenever { searchHistoryManager.findAll(any()) }.thenReturn(emptyList())
+    }
 
     @Test
     fun `exposes the browse categories from the search feed row`() = runTest {
@@ -281,7 +289,6 @@ class TvSearchViewModelTest {
 
     @Test
     fun `keystrokes within the debounce window only search the last term`() = runTest {
-        whenever(settings.getPodcastSearchDebounceMs()).thenReturn(300)
         whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
         whenever { improvedSearchManager.combinedSearch(any()) }.thenReturn(emptyList())
 
@@ -307,11 +314,11 @@ class TvSearchViewModelTest {
     }
 
     @Test
-    fun `subscribed podcasts lead the results and are not duplicated by the server`() = runTest {
+    fun `server results lead and subscribed podcasts fill the remaining gaps`() = runTest {
         whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
         whenever(podcastManager.findSubscribedFlow(any())).thenReturn(flowOf(listOf(subscribedPodcast("podcast-1"))))
         whenever { improvedSearchManager.combinedSearch(any()) }.thenReturn(
-            listOf(podcastItem("podcast-1"), podcastItem("podcast-2")),
+            listOf(podcastItem("podcast-2")),
         )
 
         val viewModel = createViewModel()
@@ -319,8 +326,78 @@ class TvSearchViewModelTest {
         advanceUntilIdle()
 
         val state = viewModel.searchState.value as TvSearchState.Results
-        assertEquals(listOf("podcast-1", "podcast-2"), state.podcasts.map { it.uuid })
-        assertTrue(state.podcasts.first().isFollowed)
+        assertEquals(listOf("podcast-2", "podcast-1"), state.podcasts.map { it.uuid })
+    }
+
+    @Test
+    fun `predictive term results are exposed as suggestions`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        whenever { improvedSearchManager.autoCompleteSearch(any()) }.thenReturn(
+            listOf(SearchAutoCompleteItem.Term("sugar rush"), SearchAutoCompleteItem.Term("sugar high")),
+        )
+        whenever { improvedSearchManager.combinedSearch(any()) }.thenReturn(emptyList())
+
+        val viewModel = createViewModel()
+        viewModel.onQueryChange("sugar")
+        advanceUntilIdle()
+
+        assertEquals(listOf("sugar rush", "sugar high"), viewModel.suggestions.value)
+    }
+
+    @Test
+    fun `saving a search term persists it and exposes recent searches`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        whenever { searchHistoryManager.findAll(any()) }.thenReturn(
+            listOf(SearchHistoryEntry.SearchTerm(term = "sugar")),
+        )
+
+        val viewModel = createViewModel()
+        viewModel.saveSearchTerm("sugar")
+        advanceUntilIdle()
+
+        verifyBlocking(searchHistoryManager) { add(any()) }
+        assertEquals(listOf("sugar"), viewModel.history.value)
+    }
+
+    @Test
+    fun `a failure fetching subscribed podcasts surfaces the error state`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        whenever(podcastManager.findSubscribedFlow(any())).thenThrow(RuntimeException("database unavailable"))
+
+        val viewModel = createViewModel()
+        viewModel.onQueryChange("sugar")
+        advanceUntilIdle()
+
+        assertEquals(TvSearchState.Error, viewModel.searchState.value)
+    }
+
+    @Test
+    fun `searching does not save partial terms to history`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        whenever { improvedSearchManager.combinedSearch(any()) }.thenReturn(emptyList())
+
+        val viewModel = createViewModel()
+        viewModel.onQueryChange("sug")
+        advanceUntilIdle()
+
+        verifyBlocking(searchHistoryManager, never()) { add(any()) }
+    }
+
+    @Test
+    fun `clearing the query clears the suggestions`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        whenever { improvedSearchManager.autoCompleteSearch(any()) }.thenReturn(
+            listOf(SearchAutoCompleteItem.Term("sugar")),
+        )
+        whenever { improvedSearchManager.combinedSearch(any()) }.thenReturn(emptyList())
+        val viewModel = createViewModel()
+        viewModel.onQueryChange("sugar")
+        advanceUntilIdle()
+        assertTrue(viewModel.suggestions.value.isNotEmpty())
+
+        viewModel.onQueryChange("")
+
+        assertTrue(viewModel.suggestions.value.isEmpty())
     }
 
     @Test
@@ -346,7 +423,7 @@ class TvSearchViewModelTest {
     }
 
     @Test
-    fun `clearing the query resets the filter to top results`() = runTest {
+    fun `clearing the query preserves the selected filter`() = runTest {
         whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
         val viewModel = createViewModel()
 
@@ -354,7 +431,7 @@ class TvSearchViewModelTest {
         viewModel.onQueryChange("")
         advanceUntilIdle()
 
-        assertEquals(TvSearchFilter.TopResults, viewModel.filter.value)
+        assertEquals(TvSearchFilter.Podcasts, viewModel.filter.value)
     }
 
     private fun podcastItem(uuid: String) = ImprovedSearchResultItem.PodcastItem(
@@ -386,7 +463,7 @@ class TvSearchViewModelTest {
         podcastManager = podcastManager,
         episodeManager = episodeManager,
         playbackManager = playbackManager,
-        settings = settings,
+        searchHistoryManager = searchHistoryManager,
     )
 
     private fun category(id: Int, name: String) = DiscoverCategory(id = id, name = name, icon = "", source = "")
