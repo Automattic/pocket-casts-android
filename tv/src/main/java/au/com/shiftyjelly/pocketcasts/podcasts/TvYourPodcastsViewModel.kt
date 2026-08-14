@@ -100,17 +100,9 @@ class TvYourPodcastsViewModel @Inject constructor(
         eventHorizon.track(
             FolderShownEvent(
                 numberOfPodcasts = numberOfPodcasts.toLong(),
-                sortOrder = sortType.toPodcastListSortType(),
+                sortOrder = sortType.analyticsValue,
             ),
         )
-    }
-
-    private fun PodcastsSortType.toPodcastListSortType() = when (this) {
-        PodcastsSortType.NAME_A_TO_Z -> PodcastListSortType.Name
-        PodcastsSortType.DATE_ADDED_NEWEST_TO_OLDEST -> PodcastListSortType.DateAdded
-        PodcastsSortType.EPISODE_DATE_NEWEST_TO_OLDEST -> PodcastListSortType.EpisodeReleaseDate
-        PodcastsSortType.RECENTLY_PLAYED -> PodcastListSortType.EpisodeRecentlyPlayed
-        PodcastsSortType.DRAG_DROP -> PodcastListSortType.DragAndDrop
     }
 }
 

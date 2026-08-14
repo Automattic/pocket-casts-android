@@ -133,7 +133,7 @@ private val OpenedFolderSaver = listSaver<OpenedFolder?, String>(
     save = { folder -> folder?.let { listOf(it.uuid, it.name, it.sortType.name) }.orEmpty() },
     restore = { saved ->
         saved.takeIf { it.size == 3 }?.let { (uuid, name, sortType) ->
-            OpenedFolder(uuid, name, PodcastsSortType.valueOf(sortType))
+            PodcastsSortType.entries.firstOrNull { it.name == sortType }?.let { OpenedFolder(uuid, name, it) }
         }
     },
 )

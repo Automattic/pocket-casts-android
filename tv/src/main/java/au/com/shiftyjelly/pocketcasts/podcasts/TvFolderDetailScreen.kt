@@ -38,8 +38,8 @@ fun TvFolderDetailScreen(
     getFolderPodcasts: suspend (String) -> List<Podcast>,
     onOpenPodcast: (String) -> Unit,
     onClose: () -> Unit,
+    onFolderImpression: (podcastCount: Int) -> Unit,
     modifier: Modifier = Modifier,
-    onFolderImpression: (podcastCount: Int) -> Unit = {},
     restoreFocusTrigger: Int = 0,
 ) {
     var uiState by remember(folderUuid) { mutableStateOf<TvFolderDetailUiState>(TvFolderDetailUiState.Loading) }
