@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import au.com.shiftyjelly.pocketcasts.theme.GoogleSansFontFamily
 import au.com.shiftyjelly.pocketcasts.theme.TvTheme
 import au.com.shiftyjelly.pocketcasts.theme.tvColors
 
@@ -67,6 +68,7 @@ fun <T> TvRow(
             text = title,
             color = MaterialTheme.tvColors.textPrimary,
             style = TextStyle(
+                fontFamily = GoogleSansFontFamily,
                 fontSize = titleSize.sp,
                 fontWeight = FontWeight(500),
                 platformStyle = PlatformTextStyle(includeFontPadding = false),
