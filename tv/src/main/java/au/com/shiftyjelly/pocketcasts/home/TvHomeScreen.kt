@@ -35,11 +35,16 @@ import au.com.shiftyjelly.pocketcasts.component.LocalTvToastHostState
 import au.com.shiftyjelly.pocketcasts.component.TvDetailOverlay
 import au.com.shiftyjelly.pocketcasts.component.tvFocusInactiveWhen
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
+import au.com.shiftyjelly.pocketcasts.discover.TvCategoryPodcastsScreen
+import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverBanner
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverEpisode
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverRow
+import au.com.shiftyjelly.pocketcasts.discover.TvOpenedCategory
+import au.com.shiftyjelly.pocketcasts.discover.TvOpenedCategorySaver
 import au.com.shiftyjelly.pocketcasts.discover.tvDiscoverRow
 import au.com.shiftyjelly.pocketcasts.podcasts.TvPodcastDetailsScreen
+import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 import au.com.shiftyjelly.pocketcasts.theme.TvTheme
 import au.com.shiftyjelly.pocketcasts.theme.TvTopBarHeight
 import au.com.shiftyjelly.pocketcasts.theme.tvColors
@@ -48,13 +53,18 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun TvHomeScreen(
+    onNavigateToSearch: () -> Unit,
+    onCreateAccount: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: TvHomeViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    var openedCategory by rememberSaveable(stateSaver = TvOpenedCategorySaver) { mutableStateOf<TvOpenedCategory?>(null) }
     var openedPodcastUuid by rememberSaveable { mutableStateOf<String?>(null) }
     var restoreFocusTrigger by remember { mutableIntStateOf(0) }
+    var categoryRestoreTrigger by remember { mutableIntStateOf(0) }
 
+    val category = openedCategory
     val podcastUuid = openedPodcastUuid
     val openNowPlaying = LocalOpenNowPlaying.current
     val toastHostState = LocalTvToastHostState.current
@@ -75,16 +85,38 @@ fun TvHomeScreen(
             onRetry = viewModel::load,
             onOpenPodcast = { openedPodcastUuid = it },
             onPlayEpisode = viewModel::playEpisode,
+            onOpenCategory = { openedCategory = TvOpenedCategory(it.id, it.name, it.source) },
+            onTapBanner = { banner ->
+                when (banner) {
+                    TvDiscoverBanner.DiscoverMore -> onNavigateToSearch()
+                    TvDiscoverBanner.CreateAccount -> onCreateAccount()
+                }
+            },
             modifier = Modifier
                 .fillMaxSize()
                 .padding(top = TvTopBarHeight)
-                .tvFocusInactiveWhen(podcastUuid != null),
+                .tvFocusInactiveWhen(category != null || podcastUuid != null),
             restoreFocusTrigger = restoreFocusTrigger,
         )
         TvDetailOverlay(
+            target = category,
+            onBack = { openedCategory = null },
+            modifier = Modifier.tvFocusInactiveWhen(podcastUuid != null),
+            onHide = { restoreFocusTrigger++ },
+        ) { openCategory ->
+            TvCategoryPodcastsScreen(
+                categoryName = openCategory.name,
+                categorySource = openCategory.source,
+                getCategoryPodcasts = { source -> viewModel.categoryPodcasts(openCategory.id, source) },
+                onOpenPodcast = { openedPodcastUuid = it },
+                onClose = { openedCategory = null },
+                restoreFocusTrigger = categoryRestoreTrigger,
+            )
+        }
+        TvDetailOverlay(
             target = podcastUuid,
             onBack = { openedPodcastUuid = null },
-            onHide = { restoreFocusTrigger++ },
+            onHide = { if (openedCategory != null) categoryRestoreTrigger++ else restoreFocusTrigger++ },
         ) { uuid ->
             TvPodcastDetailsScreen(
                 podcastUuid = uuid,
@@ -101,6 +133,8 @@ private fun TvHomeContent(
     onOpenPodcast: (String) -> Unit,
     onPlayEpisode: (TvDiscoverEpisode) -> Unit,
     modifier: Modifier = Modifier,
+    onOpenCategory: (DiscoverCategory) -> Unit = {},
+    onTapBanner: (TvDiscoverBanner) -> Unit = {},
     restoreFocusTrigger: Int = 0,
 ) {
     when (uiState) {
@@ -115,6 +149,8 @@ private fun TvHomeContent(
                 rows = uiState.rows,
                 onOpenPodcast = onOpenPodcast,
                 onPlayEpisode = onPlayEpisode,
+                onOpenCategory = onOpenCategory,
+                onTapBanner = onTapBanner,
                 modifier = modifier,
                 restoreFocusTrigger = restoreFocusTrigger,
             )
@@ -151,6 +187,8 @@ private fun TvHomeRows(
     onOpenPodcast: (String) -> Unit,
     onPlayEpisode: (TvDiscoverEpisode) -> Unit,
     modifier: Modifier = Modifier,
+    onOpenCategory: (DiscoverCategory) -> Unit = {},
+    onTapBanner: (TvDiscoverBanner) -> Unit = {},
     restoreFocusTrigger: Int = 0,
 ) {
     var lastFocusedRowIndex by rememberSaveable(rows.size) { mutableIntStateOf(0) }
@@ -185,6 +223,8 @@ private fun TvHomeRows(
                 onPlayEpisode = onPlayEpisode,
                 modifier = rowModifier,
                 focusRequester = rowFocusRequester,
+                onOpenCategory = onOpenCategory,
+                onTapBanner = onTapBanner,
             )
         }
 
@@ -200,10 +240,22 @@ private fun TvHomeContentPreview() {
             TvHomeContent(
                 uiState = TvHomeUiState.Ready(
                     rows = listOf(
+                        TvDiscoverRow.Banner(
+                            id = "discover_more",
+                            title = "",
+                            banner = TvDiscoverBanner.DiscoverMore,
+                        ),
                         TvDiscoverRow.FeaturedPodcasts(
                             id = "featured",
                             title = "Featured",
                             podcasts = (1..3).map { previewPodcast(it) },
+                        ),
+                        TvDiscoverRow.Categories(
+                            id = "categories",
+                            title = "Browse categories",
+                            categories = (1..4).map { index ->
+                                DiscoverCategory(id = index, name = "Category $index", icon = "", source = "")
+                            },
                         ),
                         TvDiscoverRow.Episodes(
                             id = "tv_featured_videos",

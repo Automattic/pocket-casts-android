@@ -89,7 +89,10 @@ fun TvScaffold(
             // content so their overlays can fill the full height.
             val belowTopBar = Modifier.fillMaxSize().padding(top = TvTopBarHeight)
             when (tab) {
-                is TvTab.Home -> TvHomeScreen()
+                is TvTab.Home -> TvHomeScreen(
+                    onNavigateToSearch = { viewModel.selectTab(TvTab.Search) },
+                    onCreateAccount = onCreateAccount,
+                )
 
                 is TvTab.YourPodcasts -> TvYourPodcastsScreen(
                     onNavigateToHome = navigateToHome,
