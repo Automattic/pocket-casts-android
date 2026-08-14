@@ -239,10 +239,7 @@ private fun TvSearchContent(
         if (showSuggestions) {
             TvSearchSuggestions(
                 suggestions = suggestions,
-                onSuggestionSelect = { term ->
-                    suggestionsFocused = false
-                    onSuggestionSelect(term)
-                },
+                onSuggestionSelect = onSuggestionSelect,
                 modifier = Modifier.onFocusChanged { suggestionsFocused = it.hasFocus },
             )
             Spacer(modifier = Modifier.height(24.dp))
@@ -430,10 +427,14 @@ private fun TvSearchResults(
         )
 
         TvSearchFilter.Podcasts -> if (results.podcasts.isEmpty()) {
-            TvSearchMessage(
-                title = stringResource(LR.string.tv_search_no_results_for_title, searchTerm),
-                subtitle = stringResource(LR.string.tv_search_no_results_subtitle),
-            )
+            if (results.isPartial) {
+                TvSearchLoading()
+            } else {
+                TvSearchMessage(
+                    title = stringResource(LR.string.tv_search_no_results_for_title, searchTerm),
+                    subtitle = stringResource(LR.string.tv_search_no_results_subtitle),
+                )
+            }
         } else {
             TvPodcastGridScaffold(
                 itemKeys = results.podcasts.map(ImprovedSearchResultItem.PodcastItem::uuid),
@@ -453,10 +454,14 @@ private fun TvSearchResults(
         }
 
         TvSearchFilter.Episodes -> if (results.episodes.isEmpty()) {
-            TvSearchMessage(
-                title = stringResource(LR.string.tv_search_no_results_for_title, searchTerm),
-                subtitle = stringResource(LR.string.tv_search_no_results_subtitle),
-            )
+            if (results.isPartial) {
+                TvSearchLoading()
+            } else {
+                TvSearchMessage(
+                    title = stringResource(LR.string.tv_search_no_results_for_title, searchTerm),
+                    subtitle = stringResource(LR.string.tv_search_no_results_subtitle),
+                )
+            }
         } else {
             TvSearchEpisodeGrid(
                 episodes = results.episodes,

@@ -356,8 +356,19 @@ class TvSearchViewModelTest {
         advanceUntilIdle()
 
         verifyBlocking(searchHistoryManager) { add(any()) }
-        verifyBlocking(searchHistoryManager) { truncateHistory(20) }
         assertEquals(listOf("sugar"), viewModel.history.value)
+    }
+
+    @Test
+    fun `a failure fetching subscribed podcasts surfaces the error state`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        whenever(podcastManager.findSubscribedFlow(any())).thenThrow(RuntimeException("database unavailable"))
+
+        val viewModel = createViewModel()
+        viewModel.onQueryChange("sugar")
+        advanceUntilIdle()
+
+        assertEquals(TvSearchState.Error, viewModel.searchState.value)
     }
 
     @Test
