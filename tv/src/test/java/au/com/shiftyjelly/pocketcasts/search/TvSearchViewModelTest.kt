@@ -62,7 +62,6 @@ class TvSearchViewModelTest {
     }
     private val settings = mock<Settings> {
         whenever(it.discoverCountryCode).thenReturn(discoverCountryCode)
-        whenever(it.getPodcastSearchDebounceMs()).thenReturn(0)
     }
     private val improvedSearchManager = mock<ImprovedSearchManager>()
     private val podcastManager = mock<PodcastManager> {
@@ -281,7 +280,6 @@ class TvSearchViewModelTest {
 
     @Test
     fun `keystrokes within the debounce window only search the last term`() = runTest {
-        whenever(settings.getPodcastSearchDebounceMs()).thenReturn(300)
         whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
         whenever { improvedSearchManager.combinedSearch(any()) }.thenReturn(emptyList())
 
@@ -346,7 +344,7 @@ class TvSearchViewModelTest {
     }
 
     @Test
-    fun `clearing the query resets the filter to top results`() = runTest {
+    fun `clearing the query preserves the selected filter`() = runTest {
         whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
         val viewModel = createViewModel()
 
@@ -354,7 +352,7 @@ class TvSearchViewModelTest {
         viewModel.onQueryChange("")
         advanceUntilIdle()
 
-        assertEquals(TvSearchFilter.TopResults, viewModel.filter.value)
+        assertEquals(TvSearchFilter.Podcasts, viewModel.filter.value)
     }
 
     private fun podcastItem(uuid: String) = ImprovedSearchResultItem.PodcastItem(
@@ -386,7 +384,6 @@ class TvSearchViewModelTest {
         podcastManager = podcastManager,
         episodeManager = episodeManager,
         playbackManager = playbackManager,
-        settings = settings,
     )
 
     private fun category(id: Int, name: String) = DiscoverCategory(id = id, name = name, icon = "", source = "")

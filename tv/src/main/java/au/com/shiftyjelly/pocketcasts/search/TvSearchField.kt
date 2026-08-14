@@ -175,7 +175,7 @@ private fun TvSearchFieldContent(
         Box(contentAlignment = Alignment.CenterStart) {
             if (query.isEmpty()) {
                 Text(
-                    text = stringResource(LR.string.search),
+                    text = stringResource(LR.string.tv_search_prompt),
                     style = MaterialTheme.tvTypography.title3,
                     color = MaterialTheme.tvColors.textSecondary,
                 )

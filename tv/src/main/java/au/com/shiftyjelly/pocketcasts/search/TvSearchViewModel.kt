@@ -11,7 +11,6 @@ import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverRow
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.ImprovedSearchResultItem
-import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -43,7 +42,6 @@ class TvSearchViewModel @Inject constructor(
     private val podcastManager: PodcastManager,
     private val episodeManager: EpisodeManager,
     private val playbackManager: PlaybackManager,
-    private val settings: Settings,
 ) : ViewModel() {
 
     private val _categories = MutableStateFlow<List<DiscoverCategory>>(emptyList())
@@ -103,12 +101,11 @@ class TvSearchViewModel @Inject constructor(
         searchJob?.cancel()
         val term = query.trim()
         if (term.isEmpty()) {
-            _filter.value = TvSearchFilter.TopResults
             _searchState.value = TvSearchState.Idle
             return
         }
         searchJob = viewModelScope.launch {
-            delay(settings.getPodcastSearchDebounceMs())
+            delay(SEARCH_DEBOUNCE_MS)
             _searchState.value = TvSearchState.Searching
             _searchState.value = try {
                 val localPodcasts = podcastManager.findSubscribedFlow(term).first().map(Podcast::toSearchItem)
@@ -188,6 +185,10 @@ class TvSearchViewModel @Inject constructor(
                 podcastManager.findOrDownloadPodcastRxSingle(episode.podcastUuid).await()
                 episodeManager.findByUuid(episode.uuid)
             }
+    }
+
+    companion object {
+        private const val SEARCH_DEBOUNCE_MS = 300L
     }
 }
 

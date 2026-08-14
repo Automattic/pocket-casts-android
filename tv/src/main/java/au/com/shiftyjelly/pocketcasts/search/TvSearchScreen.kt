@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
@@ -27,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameNanos
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
@@ -39,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.MaterialTheme
+import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.component.LocalOpenNowPlaying
 import au.com.shiftyjelly.pocketcasts.component.LocalTvToastHostState
 import au.com.shiftyjelly.pocketcasts.component.TvCategoryTile
@@ -67,6 +70,7 @@ import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 import au.com.shiftyjelly.pocketcasts.theme.TvTheme
 import au.com.shiftyjelly.pocketcasts.theme.TvTopBarHeight
 import au.com.shiftyjelly.pocketcasts.theme.tvColors
+import au.com.shiftyjelly.pocketcasts.theme.tvTypography
 import androidx.compose.foundation.lazy.grid.itemsIndexed as gridItemsIndexed
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -229,10 +233,7 @@ private fun TvSearchContent(
                     restoreFocusTrigger = restoreFocusTrigger,
                 )
 
-                is TvSearchState.Searching -> LoadingView(
-                    color = MaterialTheme.tvColors.textPrimary,
-                    modifier = Modifier.fillMaxSize(),
-                )
+                is TvSearchState.Searching -> TvSearchLoading()
 
                 is TvSearchState.Error -> TvSearchMessage(
                     title = stringResource(LR.string.error_generic_message),
@@ -242,13 +243,14 @@ private fun TvSearchContent(
                 )
 
                 is TvSearchState.NoResults -> TvSearchMessage(
-                    title = stringResource(LR.string.tv_search_no_results_title),
+                    title = stringResource(LR.string.tv_search_no_results_for_title, query.trim()),
                     subtitle = stringResource(LR.string.tv_search_no_results_subtitle),
                 )
 
                 is TvSearchState.Results -> TvSearchResults(
                     results = searchState,
                     filter = filter,
+                    searchTerm = query.trim(),
                     onOpenPodcast = onOpenPodcast,
                     onPlayEpisode = onPlayEpisode,
                     onOpenEpisodeActions = onOpenEpisodeActions,
@@ -330,6 +332,7 @@ private fun TvSearchDiscover(
 private fun TvSearchResults(
     results: TvSearchState.Results,
     filter: TvSearchFilter,
+    searchTerm: String,
     onOpenPodcast: (String) -> Unit,
     onPlayEpisode: (ImprovedSearchResultItem.EpisodeItem) -> Unit,
     onOpenEpisodeActions: (ImprovedSearchResultItem.EpisodeItem) -> Unit,
@@ -347,7 +350,7 @@ private fun TvSearchResults(
 
         TvSearchFilter.Podcasts -> if (results.podcasts.isEmpty()) {
             TvSearchMessage(
-                title = stringResource(LR.string.tv_search_no_results_title),
+                title = stringResource(LR.string.tv_search_no_results_for_title, searchTerm),
                 subtitle = stringResource(LR.string.tv_search_no_results_subtitle),
             )
         } else {
@@ -370,7 +373,7 @@ private fun TvSearchResults(
 
         TvSearchFilter.Episodes -> if (results.episodes.isEmpty()) {
             TvSearchMessage(
-                title = stringResource(LR.string.tv_search_no_results_title),
+                title = stringResource(LR.string.tv_search_no_results_for_title, searchTerm),
                 subtitle = stringResource(LR.string.tv_search_no_results_subtitle),
             )
         } else {
@@ -536,6 +539,25 @@ private fun TvSearchMessage(
         onAction = onAction,
         modifier = Modifier.fillMaxSize(),
     )
+}
+
+@Composable
+private fun TvSearchLoading() {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+    ) {
+        LoadingView(
+            color = MaterialTheme.tvColors.textPrimary,
+            modifier = Modifier.size(48.dp),
+        )
+        Text(
+            text = stringResource(LR.string.tv_search_searching),
+            style = MaterialTheme.tvTypography.body,
+            color = MaterialTheme.tvColors.textSecondary,
+        )
+    }
 }
 
 @Preview(device = Devices.TV_1080p)
