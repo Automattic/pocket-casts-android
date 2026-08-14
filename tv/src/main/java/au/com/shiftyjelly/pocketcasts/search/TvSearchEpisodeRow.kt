@@ -63,10 +63,11 @@ internal fun TvSearchEpisodeRow(
 }
 
 @Composable
-private fun TvSearchEpisodeCard(
+internal fun TvSearchEpisodeCard(
     episode: ImprovedSearchResultItem.EpisodeItem,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    onLongClick: (() -> Unit)? = null,
 ) {
     var isFocused by remember { mutableStateOf(false) }
     val textPrimary = if (isFocused) MaterialTheme.tvColors.textPrimaryActive else MaterialTheme.tvColors.textPrimary
@@ -79,6 +80,7 @@ private fun TvSearchEpisodeCard(
 
     TvTile(
         onClick = onClick,
+        onLongClick = onLongClick,
         scale = CardDefaults.scale(focusedScale = 1.02f),
         shape = CardDefaults.shape(shape = RoundedCornerShape(12.dp)),
         colors = CardDefaults.colors(
