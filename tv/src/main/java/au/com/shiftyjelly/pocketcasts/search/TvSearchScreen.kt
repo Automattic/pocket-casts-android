@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
@@ -234,7 +235,19 @@ private fun TvSearchContent(
             Spacer(modifier = Modifier.height(24.dp))
         }
 
-        if (searchState !is TvSearchState.Idle && !showSuggestions) {
+        if (showSuggestions) {
+            TvSearchSuggestions(
+                suggestions = suggestions,
+                onSuggestionSelect = { term ->
+                    suggestionsFocused = false
+                    onSuggestionSelect(term)
+                },
+                modifier = Modifier.onFocusChanged { suggestionsFocused = it.hasFocus },
+            )
+            Spacer(modifier = Modifier.height(24.dp))
+        }
+
+        if (searchState !is TvSearchState.Idle) {
             TvSearchFilters(
                 selected = filter,
                 onFilterSelect = onFilterSelect,
@@ -248,17 +261,6 @@ private fun TvSearchContent(
                 .fillMaxWidth()
                 .weight(1f),
         ) {
-            if (showSuggestions) {
-                TvSearchSuggestions(
-                    suggestions = suggestions,
-                    onSuggestionSelect = { term ->
-                        suggestionsFocused = false
-                        onSuggestionSelect(term)
-                    },
-                    modifier = Modifier.onFocusChanged { suggestionsFocused = it.hasFocus },
-                )
-                return@Box
-            }
             when (searchState) {
                 is TvSearchState.Idle -> TvSearchIdle(
                     history = history,
@@ -655,21 +657,19 @@ private fun TvSearchSuggestions(
     onSuggestionSelect: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    LazyColumn(
-        modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(horizontal = ContentHorizontalPadding, vertical = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp),
+    LazyRow(
+        modifier = modifier.fillMaxWidth(),
+        contentPadding = ContentPadding,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         items(suggestions) { term ->
-            TvTile(
-                onClick = { onSuggestionSelect(term) },
-                modifier = Modifier.fillMaxWidth(),
-            ) {
+            TvTile(onClick = { onSuggestionSelect(term) }) {
                 Text(
                     text = term,
                     style = MaterialTheme.tvTypography.body,
                     color = MaterialTheme.tvColors.textPrimary,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+                    maxLines = 1,
+                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp),
                 )
             }
         }
