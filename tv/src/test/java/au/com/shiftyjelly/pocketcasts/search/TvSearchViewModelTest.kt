@@ -4,19 +4,25 @@ import android.content.Context
 import android.content.res.Resources
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverFeedLoader
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverRow
+import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.ImprovedSearchResultItem
 import au.com.shiftyjelly.pocketcasts.models.to.SearchAutoCompleteItem
 import au.com.shiftyjelly.pocketcasts.models.to.SearchHistoryEntry
+import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
+import au.com.shiftyjelly.pocketcasts.models.type.SignInState
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.search.ImprovedSearchManager
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
+import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.servers.model.Discover
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
@@ -27,6 +33,7 @@ import au.com.shiftyjelly.pocketcasts.servers.model.ExpandedStyle
 import au.com.shiftyjelly.pocketcasts.servers.model.ListFeed
 import au.com.shiftyjelly.pocketcasts.servers.model.ListType
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import io.reactivex.Flowable
 import java.util.Date
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -73,10 +80,13 @@ class TvSearchViewModelTest {
     private val episodeManager = mock<EpisodeManager>()
     private val playbackManager = mock<PlaybackManager>()
     private val searchHistoryManager = mock<SearchHistoryManager>()
+    private val folderManager = mock<FolderManager>()
+    private val userManager = mock<UserManager>()
 
     init {
         whenever { improvedSearchManager.autoCompleteSearch(any()) }.thenReturn(emptyList())
         whenever { searchHistoryManager.findAll(any()) }.thenReturn(emptyList())
+        whenever(userManager.getSignInState()).thenReturn(Flowable.just(SignInState.SignedOut))
     }
 
     @Test
@@ -452,6 +462,51 @@ class TvSearchViewModelTest {
 
     private fun subscribedPodcast(uuid: String) = Podcast(uuid = uuid, title = "Podcast $uuid", author = "Author")
 
+    @Test
+    fun `matching folders are surfaced for a plus or patron user`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        whenever { improvedSearchManager.combinedSearch(any()) }.thenReturn(emptyList())
+        whenever(userManager.getSignInState()).thenReturn(Flowable.just(plusSignInState()))
+        whenever { folderManager.getAll() }.thenReturn(listOf(folderEntity("Sugar Shows"), folderEntity("Comedy")))
+        whenever { podcastManager.findPodcastsInFolder(any()) }.thenReturn(emptyList())
+
+        val viewModel = createViewModel()
+        viewModel.onQueryChange("sugar")
+        advanceUntilIdle()
+
+        val state = viewModel.searchState.value as TvSearchState.Results
+        assertEquals(listOf("Sugar Shows"), state.folders.map { it.folder.name })
+    }
+
+    @Test
+    fun `folders are not searched for a non-plus user`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        whenever { improvedSearchManager.combinedSearch(any()) }.thenReturn(listOf(podcastItem("podcast-1")))
+
+        val viewModel = createViewModel()
+        viewModel.onQueryChange("sugar")
+        advanceUntilIdle()
+
+        val state = viewModel.searchState.value as TvSearchState.Results
+        assertTrue(state.folders.isEmpty())
+        verifyBlocking(folderManager, never()) { getAll() }
+    }
+
+    @Test
+    fun `a matching folder alone counts as a result`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        whenever { improvedSearchManager.combinedSearch(any()) }.thenReturn(emptyList())
+        whenever(userManager.getSignInState()).thenReturn(Flowable.just(plusSignInState()))
+        whenever { folderManager.getAll() }.thenReturn(listOf(folderEntity("Sugar")))
+        whenever { podcastManager.findPodcastsInFolder(any()) }.thenReturn(emptyList())
+
+        val viewModel = createViewModel()
+        viewModel.onQueryChange("sugar")
+        advanceUntilIdle()
+
+        assertTrue(viewModel.searchState.value is TvSearchState.Results)
+    }
+
     private fun createViewModel() = TvSearchViewModel(
         discoverFeedLoader = TvDiscoverFeedLoader(
             listRepository = listRepository,
@@ -464,6 +519,21 @@ class TvSearchViewModelTest {
         episodeManager = episodeManager,
         playbackManager = playbackManager,
         searchHistoryManager = searchHistoryManager,
+        folderManager = folderManager,
+        userManager = userManager,
+    )
+
+    private fun plusSignInState() = SignInState.SignedIn(email = "test@example.com", subscription = Subscription.PlusPreview)
+
+    private fun folderEntity(name: String) = Folder(
+        uuid = name,
+        name = name,
+        color = 0,
+        addedDate = Date(0),
+        sortPosition = 0,
+        podcastsSortType = PodcastsSortType.NAME_A_TO_Z,
+        deleted = false,
+        syncModified = 0,
     )
 
     private fun category(id: Int, name: String) = DiscoverCategory(id = id, name = name, icon = "", source = "")

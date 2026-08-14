@@ -9,15 +9,18 @@ import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverRow
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.models.to.ImprovedSearchResultItem
 import au.com.shiftyjelly.pocketcasts.models.to.SearchAutoCompleteItem
 import au.com.shiftyjelly.pocketcasts.models.to.SearchHistoryEntry
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.search.ImprovedSearchManager
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
+import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -46,6 +49,8 @@ class TvSearchViewModel @Inject constructor(
     private val episodeManager: EpisodeManager,
     private val playbackManager: PlaybackManager,
     private val searchHistoryManager: SearchHistoryManager,
+    private val folderManager: FolderManager,
+    private val userManager: UserManager,
 ) : ViewModel() {
 
     private val _categories = MutableStateFlow<List<DiscoverCategory>>(emptyList())
@@ -129,6 +134,7 @@ class TvSearchViewModel @Inject constructor(
             _searchState.value = TvSearchState.Searching
             _searchState.value = try {
                 val fullSearch = async { runCatching { improvedSearchManager.combinedSearch(term) } }
+                val foldersSearch = async { runCatching { searchFolders(term) }.getOrDefault(emptyList()) }
                 val localPodcasts = podcastManager.findSubscribedFlow(term).first().map(Podcast::toSearchItem)
                 val localUuids = localPodcasts.mapTo(HashSet(), ImprovedSearchResultItem.PodcastItem::uuid)
                 val predictiveResults = try {
@@ -153,10 +159,11 @@ class TvSearchViewModel @Inject constructor(
                     .map { if (it.uuid in localUuids) it.copy(isFollowed = true) else it }
                 val episodes = remoteResults.filterIsInstance<ImprovedSearchResultItem.EpisodeItem>()
                     .distinctBy(ImprovedSearchResultItem.EpisodeItem::uuid)
-                if (podcasts.isEmpty() && episodes.isEmpty()) {
+                val folders = foldersSearch.await()
+                if (podcasts.isEmpty() && episodes.isEmpty() && folders.isEmpty()) {
                     TvSearchState.NoResults
                 } else {
-                    TvSearchState.Results(podcasts = podcasts, episodes = episodes)
+                    TvSearchState.Results(podcasts = podcasts, episodes = episodes, folders = folders)
                 }
             } catch (exception: CancellationException) {
                 throw exception
@@ -169,6 +176,19 @@ class TvSearchViewModel @Inject constructor(
 
     fun onFilterSelected(filter: TvSearchFilter) {
         _filter.value = filter
+    }
+
+    private suspend fun searchFolders(term: String): List<FolderItem.Folder> {
+        if (!userManager.getSignInState().firstOrError().await().isSignedInAsPlusOrPatron) {
+            return emptyList()
+        }
+        return folderManager.getAll()
+            .filter { it.name.contains(term, ignoreCase = true) }
+            .map { folder -> FolderItem.Folder(folder = folder, podcasts = podcastManager.findPodcastsInFolder(folder.uuid)) }
+    }
+
+    suspend fun folderPodcasts(folderUuid: String): List<Podcast> {
+        return folderManager.findFolderPodcastsSorted(folderUuid)
     }
 
     fun saveSearchTerm(term: String) {
@@ -286,6 +306,7 @@ sealed interface TvSearchState {
     data class Results(
         val podcasts: List<ImprovedSearchResultItem.PodcastItem>,
         val episodes: List<ImprovedSearchResultItem.EpisodeItem>,
+        val folders: List<FolderItem.Folder> = emptyList(),
         val isPartial: Boolean = false,
     ) : TvSearchState
 }
