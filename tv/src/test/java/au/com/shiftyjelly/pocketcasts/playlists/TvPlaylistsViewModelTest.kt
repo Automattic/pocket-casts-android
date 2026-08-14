@@ -11,6 +11,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreview
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.SmartPlaylistPreview
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.FilterCreateButtonTappedEvent
+import com.automattic.eventhorizon.FilterListShownEvent
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.runTest
@@ -20,6 +23,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class TvPlaylistsViewModelTest {
@@ -32,6 +36,21 @@ class TvPlaylistsViewModelTest {
         on { playlistPreviewsFlow() } doReturn playlistPreviews
     }
     private val podcastManager = mock<PodcastManager>()
+    private val eventHorizon = mock<EventHorizon>()
+
+    @Test
+    fun `tracks the playlists list shown with the filter count`() = runTest {
+        createViewModel().trackPlaylistsListShown(3)
+
+        verify(eventHorizon).track(FilterListShownEvent(filterCount = 3))
+    }
+
+    @Test
+    fun `tracks the create button tapped`() = runTest {
+        createViewModel().trackCreateButtonTapped()
+
+        verify(eventHorizon).track(FilterCreateButtonTappedEvent)
+    }
 
     @Test
     fun `state starts as loading`() = runTest {
@@ -115,6 +134,7 @@ class TvPlaylistsViewModelTest {
     private fun createViewModel(podcastManager: PodcastManager = this.podcastManager) = TvPlaylistsViewModel(
         playlistManager = playlistManager,
         podcastManager = podcastManager,
+        eventHorizon = eventHorizon,
     )
 
     private fun smartPreview(

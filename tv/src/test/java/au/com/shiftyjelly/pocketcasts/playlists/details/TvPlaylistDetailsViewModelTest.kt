@@ -4,13 +4,26 @@ import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
+import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
+import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import au.com.shiftyjelly.pocketcasts.preferences.TvPreferences
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlayAllHandler
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlayAllResponse
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.ManualPlaylist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.SmartPlaylist
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.FilterHideArchivedTappedEvent
+import com.automattic.eventhorizon.FilterPlayAllDismissedEvent
+import com.automattic.eventhorizon.FilterPlayAllReplaceAndPlayTappedEvent
+import com.automattic.eventhorizon.FilterPlayAllTappedEvent
+import com.automattic.eventhorizon.FilterShowArchivedTappedEvent
+import com.automattic.eventhorizon.FilterShownEvent
+import com.automattic.eventhorizon.FilterSortByChangedEvent
+import com.automattic.eventhorizon.FilterSortByTappedEvent
+import com.automattic.eventhorizon.PlaylistType
 import java.util.Date
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -41,6 +54,7 @@ class TvPlaylistDetailsViewModelTest {
     private val playlists = MutableSharedFlow<ManualPlaylist?>(replay = 1)
     private val playlistManager = mock<PlaylistManager> {
         on { manualPlaylistFlow(any(), anyOrNull(), any()) } doReturn playlists
+        on { smartPlaylistFlow(any(), anyOrNull(), any()) } doReturn MutableSharedFlow(replay = 1)
     }
     private val preferences = mock<TvPreferences>()
 
@@ -48,6 +62,7 @@ class TvPlaylistDetailsViewModelTest {
     private val playAllHandlerFactory = mock<PlayAllHandler.Factory> {
         on { create(any()) } doReturn playAllHandler
     }
+    private val eventHorizon = mock<EventHorizon>()
 
     private val availableEpisode = episode(uuid = "episode-1", isArchived = false)
     private val archivedEpisode = episode(uuid = "episode-2", isArchived = true)
@@ -83,6 +98,26 @@ class TvPlaylistDetailsViewModelTest {
             val state = awaitItem() as TvPlaylistDetailsUiState.Loaded
             assertEquals(listOf(availableEpisode, archivedEpisode), state.episodes)
             assertEquals(true, state.isShowingArchivedOnDevice)
+        }
+    }
+
+    @Test
+    fun `smart playlists ignore the stored archived preference`() = runTest {
+        val preferences = mock<TvPreferences> {
+            on { isPlaylistShowingArchived("playlist-uuid") } doReturn true
+        }
+        val smartPlaylists = MutableSharedFlow<Playlist?>(replay = 1)
+        doReturn(smartPlaylists).whenever(playlistManager).smartPlaylistFlow(any(), anyOrNull(), any())
+        val viewModel = createViewModel(preferences, playlistType = Playlist.Type.Smart)
+
+        viewModel.uiState.test {
+            assertEquals(TvPlaylistDetailsUiState.Loading, awaitItem())
+
+            smartPlaylists.emit(smartPlaylist(availableEpisode, archivedEpisode))
+
+            val state = awaitItem() as TvPlaylistDetailsUiState.Loaded
+            assertEquals(listOf(availableEpisode), state.episodes)
+            assertEquals(false, state.isShowingArchivedOnDevice)
         }
     }
 
@@ -338,17 +373,138 @@ class TvPlaylistDetailsViewModelTest {
         }
     }
 
-    private fun createViewModel(prefs: TvPreferences = preferences) = TvPlaylistDetailsViewModel(
+    @Test
+    fun `tracks the filter shown with the playlist type`() = runTest {
+        createViewModel().trackFilterShown()
+
+        verify(eventHorizon).track(FilterShownEvent(filterType = PlaylistType.Manual))
+    }
+
+    @Test
+    fun `toggling the archive filter on a manual playlist tracks show then hide`() = runTest {
+        val viewModel = createViewModel(playlistType = Playlist.Type.Manual)
+
+        viewModel.toggleArchiveFilter()
+        viewModel.toggleArchiveFilter()
+
+        verify(eventHorizon).track(FilterShowArchivedTappedEvent)
+        verify(eventHorizon).track(FilterHideArchivedTappedEvent)
+    }
+
+    @Test
+    fun `toggling the archive filter on a smart playlist tracks nothing`() = runTest {
+        val viewModel = createViewModel(playlistType = Playlist.Type.Smart)
+
+        viewModel.toggleArchiveFilter()
+
+        verify(eventHorizon, never()).track(FilterShowArchivedTappedEvent)
+        verify(eventHorizon, never()).track(FilterHideArchivedTappedEvent)
+        verify(preferences, never()).setPlaylistShowingArchived(any(), any())
+    }
+
+    @Test
+    fun `play all tracks the tapped event`() = runTest {
+        whenever(playAllHandler.handlePlayAllEpisodes(any())) doReturn PlayAllResponse.DoNothing
+        val viewModel = createViewModel()
+
+        viewModel.uiState.test {
+            assertEquals(TvPlaylistDetailsUiState.Loading, awaitItem())
+            playlists.emit(playlist(availableEpisode))
+            awaitItem()
+            viewModel.playAll()
+            advanceUntilIdle()
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        verify(eventHorizon).track(FilterPlayAllTappedEvent(filterType = PlaylistType.Manual))
+    }
+
+    @Test
+    fun `play all does not track the tapped event when there are no episodes`() = runTest {
+        whenever(playAllHandler.handlePlayAllEpisodes(any())) doReturn PlayAllResponse.ShowNoEpisodesToPlay
+        val viewModel = createViewModel()
+
+        viewModel.uiState.test {
+            assertEquals(TvPlaylistDetailsUiState.Loading, awaitItem())
+            playlists.emit(playlist())
+            awaitItem()
+            viewModel.playAll()
+            advanceUntilIdle()
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        verify(eventHorizon, never()).track(any<FilterPlayAllTappedEvent>())
+    }
+
+    @Test
+    fun `replacing up next tracks the replace and play event`() = runTest {
+        val viewModel = createViewModel()
+
+        viewModel.replaceUpNextAndPlay(saveUpNext = true, upNextName = "Up Next")
+        advanceUntilIdle()
+
+        verify(eventHorizon).track(FilterPlayAllReplaceAndPlayTappedEvent(filterType = PlaylistType.Manual, saveUpNext = true))
+    }
+
+    @Test
+    fun `replacing up next without saving tracks the replace and play event with save disabled`() = runTest {
+        val viewModel = createViewModel()
+
+        viewModel.replaceUpNextAndPlay(saveUpNext = false, upNextName = "Up Next")
+        advanceUntilIdle()
+
+        verify(eventHorizon).track(FilterPlayAllReplaceAndPlayTappedEvent(filterType = PlaylistType.Manual, saveUpNext = false))
+    }
+
+    @Test
+    fun `tracks the sort by tapped event`() = runTest {
+        createViewModel().trackSortByTapped()
+
+        verify(eventHorizon).track(FilterSortByTappedEvent(filterType = PlaylistType.Manual))
+    }
+
+    @Test
+    fun `changing the sort type tracks the sort by changed event`() = runTest {
+        val sortType = PlaylistEpisodeSortType.NewestToOldest
+
+        createViewModel().changeSortType(sortType)
+
+        verify(eventHorizon).track(
+            FilterSortByChangedEvent(sortOrder = sortType.analyticsValue, filterType = PlaylistType.Manual),
+        )
+    }
+
+    @Test
+    fun `tracks the play all dismissed event`() = runTest {
+        createViewModel().trackPlayAllDismissed()
+
+        verify(eventHorizon).track(FilterPlayAllDismissedEvent(filterType = PlaylistType.Manual))
+    }
+
+    private fun createViewModel(
+        prefs: TvPreferences = preferences,
+        playlistType: Playlist.Type = Playlist.Type.Manual,
+    ) = TvPlaylistDetailsViewModel(
         playlistUuid = "playlist-uuid",
-        playlistType = Playlist.Type.Manual,
+        playlistType = playlistType,
         playlistManager = playlistManager,
         preferences = prefs,
+        eventHorizon = eventHorizon,
         playAllHandlerFactory = playAllHandlerFactory,
     )
 
     private fun playlist(vararg episodes: PodcastEpisode) = ManualPlaylist(
         uuid = "playlist-uuid",
         title = "Playlist",
+        episodes = episodes.map(PlaylistEpisode::Available),
+        settings = Playlist.Settings.ForPreview,
+        metadata = Playlist.Metadata.ForPreview,
+    )
+
+    private fun smartPlaylist(vararg episodes: PodcastEpisode) = SmartPlaylist(
+        uuid = "playlist-uuid",
+        title = "Playlist",
+        smartRules = SmartRules.Default,
         episodes = episodes.map(PlaylistEpisode::Available),
         settings = Playlist.Settings.ForPreview,
         metadata = Playlist.Metadata.ForPreview,

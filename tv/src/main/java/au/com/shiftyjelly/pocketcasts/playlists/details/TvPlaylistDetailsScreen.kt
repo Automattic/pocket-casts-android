@@ -51,6 +51,7 @@ import au.com.shiftyjelly.pocketcasts.component.TvModalButton
 import au.com.shiftyjelly.pocketcasts.component.TvModalSurface
 import au.com.shiftyjelly.pocketcasts.component.TvSortButton
 import au.com.shiftyjelly.pocketcasts.component.rememberTvEpisodeListFocus
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.components.PlaylistArtwork
 import au.com.shiftyjelly.pocketcasts.compose.components.displayLabel
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
@@ -92,6 +93,8 @@ fun TvPlaylistDetailsScreen(
     val savedToast = stringResource(LR.string.up_next_as_playlist_saved)
     val noEpisodesToast = stringResource(LR.string.play_all_no_episodes_message)
 
+    CallOnce { viewModel.trackFilterShown() }
+
     LaunchedEffect(uiState, onClose) {
         if (uiState is TvPlaylistDetailsUiState.NotFound) {
             onClose()
@@ -121,6 +124,7 @@ fun TvPlaylistDetailsScreen(
         TvPlaylistDetailsContent(
             uiState = uiState,
             onChangeSortType = viewModel::changeSortType,
+            onSortTap = viewModel::trackSortByTapped,
             onToggleArchiveFilter = viewModel::toggleArchiveFilter,
             onOpenPodcast = { openedPodcastUuid = it },
             onPlayAll = viewModel::playAll,
@@ -138,7 +142,10 @@ fun TvPlaylistDetailsScreen(
                 isReplaceUpNextConfirmationVisible = false
                 viewModel.replaceUpNextAndPlay(saveUpNext = true, upNextName = upNextName)
             },
-            onCancel = { isReplaceUpNextConfirmationVisible = false },
+            onCancel = {
+                isReplaceUpNextConfirmationVisible = false
+                viewModel.trackPlayAllDismissed()
+            },
         )
     }
 }
@@ -147,6 +154,7 @@ fun TvPlaylistDetailsScreen(
 private fun TvPlaylistDetailsContent(
     uiState: TvPlaylistDetailsUiState,
     onChangeSortType: (PlaylistEpisodeSortType) -> Unit,
+    onSortTap: () -> Unit,
     onToggleArchiveFilter: () -> Unit,
     onOpenPodcast: (String) -> Unit,
     onPlayAll: () -> Unit,
@@ -182,6 +190,7 @@ private fun TvPlaylistDetailsContent(
                         SortableEpisodeList(
                             uiState = uiState,
                             onChangeSortType = onChangeSortType,
+                            onSortTap = onSortTap,
                             onToggleArchiveFilter = onToggleArchiveFilter,
                             onOpenPodcast = onOpenPodcast,
                             playAllFocusRequester = playAllFocusRequester,
@@ -198,6 +207,7 @@ private fun TvPlaylistDetailsContent(
 private fun SortableEpisodeList(
     uiState: TvPlaylistDetailsUiState.Loaded,
     onChangeSortType: (PlaylistEpisodeSortType) -> Unit,
+    onSortTap: () -> Unit,
     onToggleArchiveFilter: () -> Unit,
     onOpenPodcast: (String) -> Unit,
     playAllFocusRequester: FocusRequester,
@@ -212,6 +222,8 @@ private fun SortableEpisodeList(
             listState.scrollToItem(0)
         }
     }
+    val isManual = uiState.playlist.type == Playlist.Type.Manual
+    val leftFocusRequester = playAllFocusRequester.takeIf { uiState.episodes.isNotEmpty() }
     Column(modifier = modifier) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -220,16 +232,20 @@ private fun SortableEpisodeList(
                 .align(Alignment.End)
                 .padding(bottom = 12.dp),
         ) {
-            TvArchivedFilterButton(
-                isShowingArchived = uiState.isShowingArchivedOnDevice,
-                onToggleArchiveFilter = onToggleArchiveFilter,
-                leftFocusRequester = playAllFocusRequester.takeIf { uiState.episodes.isNotEmpty() },
-            )
+            if (isManual) {
+                TvArchivedFilterButton(
+                    isShowingArchived = uiState.isShowingArchivedOnDevice,
+                    onToggleArchiveFilter = onToggleArchiveFilter,
+                    leftFocusRequester = leftFocusRequester,
+                )
+            }
             TvSortButton(
                 selected = sortType,
                 options = uiState.playlist.availableSortTypes,
                 label = { it.displayLabel() },
                 onSelect = onChangeSortType,
+                onExpand = onSortTap,
+                leftFocusRequester = if (isManual) null else leftFocusRequester,
             )
         }
         if (uiState.episodes.isNotEmpty()) {
@@ -487,6 +503,7 @@ private fun TvPlaylistDetailsPreview() {
                 isShowingArchivedOnDevice = false,
             ),
             onChangeSortType = {},
+            onSortTap = {},
             onToggleArchiveFilter = {},
             onOpenPodcast = {},
             onPlayAll = {},
@@ -519,6 +536,7 @@ private fun TvPlaylistDetailsLoadedPreview() {
                 isShowingArchivedOnDevice = false,
             ),
             onChangeSortType = {},
+            onSortTap = {},
             onToggleArchiveFilter = {},
             onOpenPodcast = {},
             onPlayAll = {},
