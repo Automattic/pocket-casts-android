@@ -66,7 +66,6 @@ private fun TvSearchContent(
             TvSearchField(
                 query = query,
                 onQueryChange = onQueryChange,
-                autoFocus = true,
             )
             Spacer(modifier = Modifier.height(24.dp))
         }
