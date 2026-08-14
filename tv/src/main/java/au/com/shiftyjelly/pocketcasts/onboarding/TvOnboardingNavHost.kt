@@ -74,6 +74,11 @@ fun TvOnboardingNavHost(
                     TvScaffold(
                         onLogIn = { navController.navigate(TvOnboardingRoutes.SIGN_IN) },
                         onCreateAccount = { navController.navigate(TvOnboardingRoutes.CREATE_ACCOUNT) },
+                        onSignedOut = {
+                            navController.navigate(TvOnboardingRoutes.LANDING) {
+                                popUpTo(navController.graph.id) { inclusive = true }
+                            }
+                        },
                     )
                 }
             }
