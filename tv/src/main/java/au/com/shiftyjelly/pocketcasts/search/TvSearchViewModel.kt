@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverRow
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.ImprovedSearchResultItem
+import au.com.shiftyjelly.pocketcasts.models.to.SearchAutoCompleteItem
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -59,6 +60,9 @@ class TvSearchViewModel @Inject constructor(
     private val _filter = MutableStateFlow(TvSearchFilter.TopResults)
     val filter: StateFlow<TvSearchFilter> = _filter.asStateFlow()
 
+    private val _suggestions = MutableStateFlow<List<String>>(emptyList())
+    val suggestions: StateFlow<List<String>> = _suggestions.asStateFlow()
+
     private val _playStarted = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     val playStarted: SharedFlow<Unit> = _playStarted.asSharedFlow()
 
@@ -101,16 +105,34 @@ class TvSearchViewModel @Inject constructor(
         searchJob?.cancel()
         val term = query.trim()
         if (term.isEmpty()) {
+            _suggestions.value = emptyList()
             _searchState.value = TvSearchState.Idle
             return
         }
         searchJob = viewModelScope.launch {
             delay(SEARCH_DEBOUNCE_MS)
             _searchState.value = TvSearchState.Searching
+
+            val localPodcasts = podcastManager.findSubscribedFlow(term).first().map(Podcast::toSearchItem)
+            val predictiveResults = try {
+                improvedSearchManager.autoCompleteSearch(term)
+            } catch (exception: CancellationException) {
+                throw exception
+            } catch (exception: Exception) {
+                Timber.e(exception, "Failed to load TV search suggestions")
+                emptyList()
+            }
+            _suggestions.value = predictiveResults.filterIsInstance<SearchAutoCompleteItem.Term>().map { it.term }
+            val predictivePodcasts = predictiveResults.filterIsInstance<SearchAutoCompleteItem.Podcast>().map { it.toSearchItem() }
+            val earlyPodcasts = (predictivePodcasts + localPodcasts).distinctBy(ImprovedSearchResultItem.PodcastItem::uuid)
+            if (earlyPodcasts.isNotEmpty()) {
+                _searchState.value = TvSearchState.Results(podcasts = earlyPodcasts, episodes = emptyList())
+            }
+
             _searchState.value = try {
-                val localPodcasts = podcastManager.findSubscribedFlow(term).first().map(Podcast::toSearchItem)
                 val remoteResults = improvedSearchManager.combinedSearch(term)
-                val podcasts = (localPodcasts + remoteResults.filterIsInstance<ImprovedSearchResultItem.PodcastItem>())
+                val remotePodcasts = remoteResults.filterIsInstance<ImprovedSearchResultItem.PodcastItem>()
+                val podcasts = (predictivePodcasts + remotePodcasts + localPodcasts)
                     .distinctBy(ImprovedSearchResultItem.PodcastItem::uuid)
                 val episodes = remoteResults.filterIsInstance<ImprovedSearchResultItem.EpisodeItem>()
                     .distinctBy(ImprovedSearchResultItem.EpisodeItem::uuid)
@@ -198,6 +220,14 @@ private fun Podcast.toSearchItem() = ImprovedSearchResultItem.PodcastItem(
     author = author,
     isFollowed = true,
     isExplicit = explicit == true,
+)
+
+private fun SearchAutoCompleteItem.Podcast.toSearchItem() = ImprovedSearchResultItem.PodcastItem(
+    uuid = uuid,
+    title = title,
+    author = author,
+    isFollowed = isSubscribed,
+    isExplicit = isExplicit,
 )
 
 enum class TvSearchFilter(

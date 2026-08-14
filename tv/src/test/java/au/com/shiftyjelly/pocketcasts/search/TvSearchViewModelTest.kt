@@ -6,6 +6,7 @@ import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverFeedLoader
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverRow
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.ImprovedSearchResultItem
+import au.com.shiftyjelly.pocketcasts.models.to.SearchAutoCompleteItem
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
@@ -69,6 +70,10 @@ class TvSearchViewModelTest {
     }
     private val episodeManager = mock<EpisodeManager>()
     private val playbackManager = mock<PlaybackManager>()
+
+    init {
+        whenever { improvedSearchManager.autoCompleteSearch(any()) }.thenReturn(emptyList())
+    }
 
     @Test
     fun `exposes the browse categories from the search feed row`() = runTest {
@@ -305,11 +310,11 @@ class TvSearchViewModelTest {
     }
 
     @Test
-    fun `subscribed podcasts lead the results and are not duplicated by the server`() = runTest {
+    fun `server results lead and subscribed podcasts fill the remaining gaps`() = runTest {
         whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
         whenever(podcastManager.findSubscribedFlow(any())).thenReturn(flowOf(listOf(subscribedPodcast("podcast-1"))))
         whenever { improvedSearchManager.combinedSearch(any()) }.thenReturn(
-            listOf(podcastItem("podcast-1"), podcastItem("podcast-2")),
+            listOf(podcastItem("podcast-2")),
         )
 
         val viewModel = createViewModel()
@@ -317,8 +322,39 @@ class TvSearchViewModelTest {
         advanceUntilIdle()
 
         val state = viewModel.searchState.value as TvSearchState.Results
-        assertEquals(listOf("podcast-1", "podcast-2"), state.podcasts.map { it.uuid })
-        assertTrue(state.podcasts.first().isFollowed)
+        assertEquals(listOf("podcast-2", "podcast-1"), state.podcasts.map { it.uuid })
+    }
+
+    @Test
+    fun `predictive term results are exposed as suggestions`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        whenever { improvedSearchManager.autoCompleteSearch(any()) }.thenReturn(
+            listOf(SearchAutoCompleteItem.Term("sugar rush"), SearchAutoCompleteItem.Term("sugar high")),
+        )
+        whenever { improvedSearchManager.combinedSearch(any()) }.thenReturn(emptyList())
+
+        val viewModel = createViewModel()
+        viewModel.onQueryChange("sugar")
+        advanceUntilIdle()
+
+        assertEquals(listOf("sugar rush", "sugar high"), viewModel.suggestions.value)
+    }
+
+    @Test
+    fun `clearing the query clears the suggestions`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        whenever { improvedSearchManager.autoCompleteSearch(any()) }.thenReturn(
+            listOf(SearchAutoCompleteItem.Term("sugar")),
+        )
+        whenever { improvedSearchManager.combinedSearch(any()) }.thenReturn(emptyList())
+        val viewModel = createViewModel()
+        viewModel.onQueryChange("sugar")
+        advanceUntilIdle()
+        assertTrue(viewModel.suggestions.value.isNotEmpty())
+
+        viewModel.onQueryChange("")
+
+        assertTrue(viewModel.suggestions.value.isEmpty())
     }
 
     @Test
