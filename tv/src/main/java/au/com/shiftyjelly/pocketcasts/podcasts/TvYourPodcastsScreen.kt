@@ -55,7 +55,7 @@ fun TvYourPodcastsScreen(
     var openedPodcastUuid by rememberSaveable { mutableStateOf<String?>(null) }
     var gridRestoreTrigger by remember { mutableIntStateOf(0) }
     var folderRestoreTrigger by remember { mutableIntStateOf(0) }
-    var podcastsListShownTracked by remember { mutableStateOf(false) }
+    var podcastsListShownTracked by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(uiState) {
         if (!podcastsListShownTracked) {
