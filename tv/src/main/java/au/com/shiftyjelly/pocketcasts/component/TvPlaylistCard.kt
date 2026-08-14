@@ -11,6 +11,7 @@ import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -29,8 +30,6 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.painter.ColorPainter
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -41,11 +40,9 @@ import androidx.tv.material3.CardDefaults
 import androidx.tv.material3.Glow
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
-import au.com.shiftyjelly.pocketcasts.compose.AppTheme
-import au.com.shiftyjelly.pocketcasts.theme.TvColors
-import au.com.shiftyjelly.pocketcasts.theme.TvTextStyles
-import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import coil3.compose.AsyncImage
+import au.com.shiftyjelly.pocketcasts.theme.TvTheme
+import au.com.shiftyjelly.pocketcasts.theme.tvColors
+import au.com.shiftyjelly.pocketcasts.theme.tvTypography
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -62,17 +59,21 @@ fun TvPlaylistCard(
     val isFocused by interactionSource.collectIsFocusedAsState()
 
     val backgroundColor by animateColorAsState(
-        targetValue = if (isFocused) TvColors.LightGray else cardColor,
+        targetValue = if (isFocused) MaterialTheme.tvColors.backgroundActive else cardColor,
         animationSpec = tween(durationMillis = 200),
         label = "PlaylistCardBackground",
     )
     val titleColor by animateColorAsState(
-        targetValue = if (isFocused) TvColors.Dark else Color.White,
+        targetValue = if (isFocused) MaterialTheme.tvColors.textPrimaryActive else MaterialTheme.tvColors.textPrimary,
         animationSpec = tween(durationMillis = 200),
         label = "PlaylistCardTitleColor",
     )
     val captionColor by animateColorAsState(
-        targetValue = if (isFocused) TvColors.TextSecondaryActive else TvColors.TextSecondary,
+        targetValue = if (isFocused) {
+            MaterialTheme.tvColors.textSecondaryActive
+        } else {
+            MaterialTheme.tvColors.textSecondary
+        },
         animationSpec = tween(durationMillis = 200),
         label = "PlaylistCardCaptionColor",
     )
@@ -99,7 +100,7 @@ fun TvPlaylistCard(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(172.dp)
+                .aspectRatio(568f / 258f)
                 .background(backgroundColor),
         ) {
             Column(
@@ -109,7 +110,7 @@ fun TvPlaylistCard(
             ) {
                 Text(
                     text = title,
-                    style = TvTextStyles.PlaylistCardTitle,
+                    style = MaterialTheme.tvTypography.callout,
                     color = titleColor,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
@@ -118,7 +119,7 @@ fun TvPlaylistCard(
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = stringResource(LR.string.smart_playlist),
-                        style = TvTextStyles.PlaylistCardCaption,
+                        style = MaterialTheme.tvTypography.caption2,
                         color = captionColor,
                     )
                 }
@@ -126,7 +127,7 @@ fun TvPlaylistCard(
                 if (episodeCount != null) {
                     Text(
                         text = pluralStringResource(LR.plurals.episode_count, episodeCount, episodeCount),
-                        style = TvTextStyles.PlaylistCardCaption,
+                        style = MaterialTheme.tvTypography.caption2,
                         color = captionColor,
                     )
                 }
@@ -206,13 +207,8 @@ private fun PlaylistCover(
     val offsetX = (if (isBackCover) 0.7f else -16f) + restingOffset
     val offsetY = (if (isBackCover) 66.7f else 44.7f) + restingOffset
 
-    val coverPlaceholder = remember { ColorPainter(Color.Black.copy(alpha = 0.2f)) }
-    AsyncImage(
+    TvArtworkImage(
         model = artworkUrl,
-        placeholder = coverPlaceholder,
-        error = coverPlaceholder,
-        contentDescription = null,
-        contentScale = ContentScale.Crop,
         modifier = Modifier
             .offset(x = offsetX.dp, y = offsetY.dp)
             .size(104.dp)
@@ -229,18 +225,16 @@ private fun PlaylistCover(
 @Preview(device = Devices.TV_1080p)
 @Composable
 private fun TvPlaylistCardPreview() {
-    AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
-        MaterialTheme {
-            Box(modifier = Modifier.background(TvColors.Dark).padding(32.dp)) {
-                TvPlaylistCard(
-                    title = "New Releases",
-                    isSmartPlaylist = true,
-                    episodeCount = 24,
-                    artworkUrls = listOf("", ""),
-                    cardColor = TvPlaylistCardColors.cardColor(podcastTint = null, seed = "new-releases"),
-                    onClick = {},
-                )
-            }
+    TvTheme {
+        Box(modifier = Modifier.background(MaterialTheme.tvColors.backgroundSunken).padding(32.dp)) {
+            TvPlaylistCard(
+                title = "New Releases",
+                isSmartPlaylist = true,
+                episodeCount = 24,
+                artworkUrls = listOf("", ""),
+                cardColor = TvPlaylistCardColors.cardColor(podcastTint = null, seed = "new-releases"),
+                onClick = {},
+            )
         }
     }
 }

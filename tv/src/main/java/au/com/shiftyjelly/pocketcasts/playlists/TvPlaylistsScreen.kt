@@ -25,6 +25,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -33,7 +34,6 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
@@ -41,23 +41,27 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.tv.material3.Button
 import androidx.tv.material3.MaterialTheme
-import androidx.tv.material3.OutlinedButton
 import androidx.tv.material3.Text
+import au.com.shiftyjelly.pocketcasts.component.TvDetailOverlay
 import au.com.shiftyjelly.pocketcasts.component.TvEmptyState
 import au.com.shiftyjelly.pocketcasts.component.TvPlaylistCard
 import au.com.shiftyjelly.pocketcasts.component.TvPlaylistCardColors
-import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.component.tvFocusInactiveWhen
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistIcon
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
+import au.com.shiftyjelly.pocketcasts.playlists.details.TvPlaylistDetailsScreen
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreview
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.SmartPlaylistPreview
-import au.com.shiftyjelly.pocketcasts.theme.TvColors
-import au.com.shiftyjelly.pocketcasts.theme.TvTextStyles
-import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.theme.TvButtonDefaults
+import au.com.shiftyjelly.pocketcasts.theme.TvTheme
+import au.com.shiftyjelly.pocketcasts.theme.TvTopBarHeight
+import au.com.shiftyjelly.pocketcasts.theme.tvColors
+import au.com.shiftyjelly.pocketcasts.theme.tvTypography
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -68,16 +72,61 @@ fun TvPlaylistsScreen(
     viewModel: TvPlaylistsViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    TvPlaylistsContent(
-        uiState = uiState,
-        getArtworkUuidsFlow = viewModel::getArtworkUuidsFlow,
-        getEpisodeCountFlow = viewModel::getEpisodeCountFlow,
-        refreshArtworkUuids = viewModel::refreshArtworkUuids,
-        refreshEpisodeCount = viewModel::refreshEpisodeCount,
-        findPodcastTint = viewModel::findPodcastTint,
-        modifier = modifier,
-    )
+    var isDownloadModalVisible by rememberSaveable { mutableStateOf(false) }
+    var openedPlaylist by rememberSaveable(stateSaver = OpenedPlaylistSaver) { mutableStateOf<OpenedPlaylist?>(null) }
+    var restoreFocusTrigger by remember { mutableIntStateOf(0) }
+
+    val playlist = openedPlaylist
+    Box(modifier = modifier.fillMaxSize()) {
+        TvPlaylistsContent(
+            uiState = uiState,
+            getArtworkUuidsFlow = viewModel::getArtworkUuidsFlow,
+            getEpisodeCountFlow = viewModel::getEpisodeCountFlow,
+            refreshArtworkUuids = viewModel::refreshArtworkUuids,
+            refreshEpisodeCount = viewModel::refreshEpisodeCount,
+            findPodcastTint = viewModel::findPodcastTint,
+            onCreatePlaylist = { isDownloadModalVisible = true },
+            onOpenPlaylist = { preview ->
+                isDownloadModalVisible = false
+                openedPlaylist = OpenedPlaylist(preview.uuid, preview.type)
+            },
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = TvTopBarHeight)
+                .tvFocusInactiveWhen(playlist != null),
+            restoreFocusTrigger = restoreFocusTrigger,
+        )
+
+        if (isDownloadModalVisible) {
+            TvDownloadAppModal(
+                onDismissRequest = { isDownloadModalVisible = false },
+            )
+        }
+
+        TvDetailOverlay(
+            target = playlist,
+            onBack = { openedPlaylist = null },
+            onHide = { restoreFocusTrigger++ },
+        ) { openPlaylist ->
+            TvPlaylistDetailsScreen(
+                playlistUuid = openPlaylist.uuid,
+                playlistType = openPlaylist.type,
+                onClose = { openedPlaylist = null },
+            )
+        }
+    }
 }
+
+private data class OpenedPlaylist(val uuid: String, val type: Playlist.Type)
+
+private val OpenedPlaylistSaver = listSaver<OpenedPlaylist?, String>(
+    save = { playlist -> playlist?.let { listOf(it.uuid, it.type.key) }.orEmpty() },
+    restore = { saved ->
+        saved.takeIf { it.size == 2 }?.let { (uuid, typeKey) ->
+            Playlist.Type.fromValue(typeKey)?.let { type -> OpenedPlaylist(uuid, type) }
+        }
+    },
+)
 
 @Composable
 private fun TvPlaylistsContent(
@@ -87,7 +136,10 @@ private fun TvPlaylistsContent(
     refreshArtworkUuids: suspend (String) -> Unit,
     refreshEpisodeCount: suspend (String) -> Unit,
     findPodcastTint: suspend (String) -> Int?,
+    onCreatePlaylist: () -> Unit,
+    onOpenPlaylist: (PlaylistPreview) -> Unit,
     modifier: Modifier = Modifier,
+    restoreFocusTrigger: Int = 0,
 ) {
     AnimatedContent(
         targetState = uiState,
@@ -102,10 +154,16 @@ private fun TvPlaylistsContent(
         modifier = modifier,
     ) { state ->
         when (state) {
-            is TvPlaylistsUiState.Loading -> LoadingView(color = Color.White, modifier = Modifier.fillMaxSize())
+            is TvPlaylistsUiState.Loading -> LoadingView(
+                color = MaterialTheme.tvColors.textPrimary,
+                modifier = Modifier.fillMaxSize(),
+            )
 
             is TvPlaylistsUiState.Loaded -> if (state.playlists.isEmpty()) {
-                TvPlaylistsEmpty(modifier = Modifier.fillMaxSize())
+                TvPlaylistsEmpty(
+                    onCreatePlaylist = onCreatePlaylist,
+                    modifier = Modifier.fillMaxSize(),
+                )
             } else {
                 TvPlaylistsGrid(
                     playlists = state.playlists,
@@ -114,7 +172,9 @@ private fun TvPlaylistsContent(
                     refreshArtworkUuids = refreshArtworkUuids,
                     refreshEpisodeCount = refreshEpisodeCount,
                     findPodcastTint = findPodcastTint,
+                    onOpenPlaylist = onOpenPlaylist,
                     modifier = Modifier.fillMaxSize(),
+                    restoreFocusTrigger = restoreFocusTrigger,
                 )
             }
         }
@@ -129,28 +189,43 @@ private fun TvPlaylistsGrid(
     refreshArtworkUuids: suspend (String) -> Unit,
     refreshEpisodeCount: suspend (String) -> Unit,
     findPodcastTint: suspend (String) -> Int?,
+    onOpenPlaylist: (PlaylistPreview) -> Unit,
     modifier: Modifier = Modifier,
+    restoreFocusTrigger: Int = 0,
 ) {
     Column(modifier = modifier.padding(horizontal = 32.dp)) {
         Text(
             text = stringResource(LR.string.playlists),
-            style = TvTextStyles.ScreenTitle,
-            color = Color.White,
+            style = MaterialTheme.tvTypography.title3,
+            color = MaterialTheme.tvColors.textPrimary,
             modifier = Modifier.padding(top = 8.dp, bottom = 26.dp),
         )
         var lastFocusedIndex by rememberSaveable(playlists) { mutableIntStateOf(0) }
         val focusRequesters = remember(playlists) { List(playlists.size) { FocusRequester() } }
+        val gridFocusRequester = remember { FocusRequester() }
+
+        var isInitialComposition by remember { mutableStateOf(true) }
+        LaunchedEffect(restoreFocusTrigger) {
+            // Only restore on an actual trigger change, not when a fresh grid mounts with a
+            // non-zero trigger inherited from a hoisted state holder.
+            if (isInitialComposition) {
+                isInitialComposition = false
+            } else {
+                runCatching { gridFocusRequester.requestFocus() }
+            }
+        }
 
         LazyVerticalGrid(
             columns = GridCells.Fixed(3),
-            horizontalArrangement = Arrangement.spacedBy(32.dp),
-            verticalArrangement = Arrangement.spacedBy(32.dp),
-            contentPadding = PaddingValues(bottom = 32.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            contentPadding = PaddingValues(top = 16.dp, bottom = 32.dp),
             modifier = Modifier
+                .focusRequester(gridFocusRequester)
                 .focusGroup()
                 .focusProperties {
                     onEnter = {
-                        focusRequesters.getOrNull(lastFocusedIndex)?.requestFocus()
+                        runCatching { focusRequesters.getOrNull(lastFocusedIndex)?.requestFocus() }
                     }
                 },
         ) {
@@ -165,6 +240,7 @@ private fun TvPlaylistsGrid(
                     refreshArtworkUuids = refreshArtworkUuids,
                     refreshEpisodeCount = refreshEpisodeCount,
                     findPodcastTint = findPodcastTint,
+                    onOpenPlaylist = onOpenPlaylist,
                     modifier = Modifier
                         .focusRequester(focusRequesters[index])
                         .onFocusChanged { focusState ->
@@ -186,6 +262,7 @@ private fun TvPlaylistGridItem(
     refreshArtworkUuids: suspend (String) -> Unit,
     refreshEpisodeCount: suspend (String) -> Unit,
     findPodcastTint: suspend (String) -> Int?,
+    onOpenPlaylist: (PlaylistPreview) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val artworkUuids by remember(playlist.uuid) { getArtworkUuidsFlow(playlist.uuid) }.collectAsState()
@@ -210,20 +287,21 @@ private fun TvPlaylistGridItem(
         episodeCount = episodeCount,
         artworkUrls = artworkUuids.orEmpty().map(PodcastImage::getMediumArtworkUrl),
         cardColor = TvPlaylistCardColors.cardColor(podcastTint, seed = playlist.uuid),
-        onClick = {},
+        onClick = { onOpenPlaylist(playlist) },
         modifier = modifier,
     )
 }
 
 @Composable
 private fun TvPlaylistsEmpty(
+    onCreatePlaylist: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     TvEmptyState(
         title = stringResource(LR.string.tv_playlists_empty_title),
         subtitle = stringResource(LR.string.tv_playlists_empty_subtitle),
         actionLabel = stringResource(LR.string.tv_playlists_empty_action_title),
-        onAction = {},
+        onAction = onCreatePlaylist,
         modifier = modifier,
     )
 }
@@ -231,20 +309,20 @@ private fun TvPlaylistsEmpty(
 @Preview(device = Devices.TV_1080p)
 @Composable
 private fun TvPlaylistsGridPreview() {
-    AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
-        MaterialTheme {
-            Box(modifier = Modifier.background(TvColors.Dark)) {
-                TvPlaylistsContent(
-                    uiState = TvPlaylistsUiState.Loaded(
-                        playlists = List(5) { index -> previewPlaylist(index) },
-                    ),
-                    getArtworkUuidsFlow = { MutableStateFlow(listOf("podcast-1", "podcast-2")) },
-                    getEpisodeCountFlow = { MutableStateFlow(42) },
-                    refreshArtworkUuids = {},
-                    refreshEpisodeCount = {},
-                    findPodcastTint = { null },
-                )
-            }
+    TvTheme {
+        Box(modifier = Modifier.background(MaterialTheme.tvColors.backgroundSunken)) {
+            TvPlaylistsContent(
+                uiState = TvPlaylistsUiState.Loaded(
+                    playlists = List(5) { index -> previewPlaylist(index) },
+                ),
+                getArtworkUuidsFlow = { MutableStateFlow(listOf("podcast-1", "podcast-2")) },
+                getEpisodeCountFlow = { MutableStateFlow(42) },
+                refreshArtworkUuids = {},
+                refreshEpisodeCount = {},
+                findPodcastTint = { null },
+                onCreatePlaylist = {},
+                onOpenPlaylist = {},
+            )
         }
     }
 }
@@ -252,18 +330,18 @@ private fun TvPlaylistsGridPreview() {
 @Preview(device = Devices.TV_1080p)
 @Composable
 private fun TvPlaylistsEmptyPreview() {
-    AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
-        MaterialTheme {
-            Box(modifier = Modifier.background(TvColors.Dark)) {
-                TvPlaylistsContent(
-                    uiState = TvPlaylistsUiState.Loaded(playlists = emptyList()),
-                    getArtworkUuidsFlow = { MutableStateFlow(null) },
-                    getEpisodeCountFlow = { MutableStateFlow(null) },
-                    refreshArtworkUuids = {},
-                    refreshEpisodeCount = {},
-                    findPodcastTint = { null },
-                )
-            }
+    TvTheme {
+        Box(modifier = Modifier.background(MaterialTheme.tvColors.backgroundSunken)) {
+            TvPlaylistsContent(
+                uiState = TvPlaylistsUiState.Loaded(playlists = emptyList()),
+                getArtworkUuidsFlow = { MutableStateFlow(null) },
+                getEpisodeCountFlow = { MutableStateFlow(null) },
+                refreshArtworkUuids = {},
+                refreshEpisodeCount = {},
+                findPodcastTint = { null },
+                onCreatePlaylist = {},
+                onOpenPlaylist = {},
+            )
         }
     }
 }

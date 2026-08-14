@@ -3,8 +3,10 @@ package au.com.shiftyjelly.pocketcasts.preferences
 import android.annotation.SuppressLint
 import android.content.SharedPreferences
 import au.com.shiftyjelly.pocketcasts.coroutines.flow.mapState
+import java.lang.ref.WeakReference
 import java.time.Clock
 import java.time.Instant
+import java.util.concurrent.CopyOnWriteArrayList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -52,8 +54,18 @@ abstract class UserSetting<T>(
     // These are lazy because (1) the class needs to initialize before calling get() and
     // (2) we don't want to get the current value from SharedPreferences for every
     // setting immediately on app startup.
-    protected val _flow by lazy { MutableStateFlow(get()) }
+    private val flowDelegate = lazy {
+        allSettings.add(WeakReference(this))
+        MutableStateFlow(get())
+    }
+    protected val _flow by flowDelegate
     override val flow: StateFlow<T> by lazy { _flow }
+
+    fun refresh() {
+        if (flowDelegate.isInitialized()) {
+            _flow.value = get()
+        }
+    }
 
     // External callers should use [value] to get the current value if they can't
     // listen to the flow for changes.
@@ -347,5 +359,17 @@ abstract class UserSetting<T>(
         // This means that if a user syncs settings that were set before we started tracking timestamps
         // they would not update on a new device because we update settings only if the local timestamp is before remote timestamp.
         val DefaultFallbackTimestamp: Instant = Instant.EPOCH.plusSeconds(1)
+
+        private val allSettings = CopyOnWriteArrayList<WeakReference<UserSetting<*>>>()
+
+        fun refreshAll(sharedPrefs: SharedPreferences) {
+            allSettings.removeAll { reference -> reference.get() == null }
+            allSettings.forEach { reference ->
+                val setting = reference.get()
+                if (setting?.sharedPrefs === sharedPrefs) {
+                    setting.refresh()
+                }
+            }
+        }
     }
 }

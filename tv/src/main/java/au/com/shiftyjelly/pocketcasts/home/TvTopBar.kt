@@ -28,10 +28,10 @@ import androidx.tv.material3.Icon
 import androidx.tv.material3.IconButton
 import androidx.tv.material3.IconButtonDefaults
 import androidx.tv.material3.MaterialTheme
-import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.images.GravatarProfileImage
-import au.com.shiftyjelly.pocketcasts.theme.TvColors
-import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.theme.TvButtonDefaults
+import au.com.shiftyjelly.pocketcasts.theme.TvTheme
+import au.com.shiftyjelly.pocketcasts.theme.tvColors
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -43,6 +43,11 @@ fun TvTopBar(
     onTabSelect: (Int) -> Unit,
     onProfileClick: () -> Unit,
     modifier: Modifier = Modifier,
+    onTabClick: (Int) -> Unit = {},
+    autoFocusSelectedTab: Boolean = true,
+    onSelectedTabFocus: () -> Unit = {},
+    focusSelectedTab: Boolean = false,
+    onConsumeFocusRequest: () -> Unit = {},
 ) {
     Row(
         modifier = modifier
@@ -59,6 +64,11 @@ fun TvTopBar(
             tabs = tabs,
             selectedTabIndex = selectedTabIndex,
             onTabSelect = onTabSelect,
+            onTabClick = onTabClick,
+            autoFocusSelectedTab = autoFocusSelectedTab,
+            onSelectedTabFocus = onSelectedTabFocus,
+            focusSelectedTab = focusSelectedTab,
+            onConsumeFocusRequest = onConsumeFocusRequest,
         )
         Spacer(modifier = Modifier.weight(1f))
         Image(
@@ -77,12 +87,7 @@ private fun TvProfileButton(
 ) {
     IconButton(
         onClick = onClick,
-        colors = IconButtonDefaults.colors(
-            containerColor = TvColors.Gray,
-            contentColor = Color.White,
-            focusedContainerColor = Color.White,
-            focusedContentColor = TvColors.Dark,
-        ),
+        colors = TvButtonDefaults.iconButtonColors(containerColor = MaterialTheme.tvColors.backgroundOverlay),
         // The avatar image covers the focused container color, so show focus with a border as well.
         border = IconButtonDefaults.border(
             focusedBorder = Border(BorderStroke(2.dp, Color.White), inset = 2.dp, shape = CircleShape),
@@ -117,16 +122,14 @@ private fun TvProfilePlaceholderIcon(contentDescription: String?, modifier: Modi
 @Preview(device = Devices.TV_1080p)
 @Composable
 private fun TvTopBarPreview() {
-    AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
-        MaterialTheme {
-            var selectedIndex by remember { mutableIntStateOf(1) }
-            TvTopBar(
-                tabs = TvTab.entries,
-                selectedTabIndex = selectedIndex,
-                profile = TvProfileState.SignedOut,
-                onTabSelect = { selectedIndex = it },
-                onProfileClick = {},
-            )
-        }
+    TvTheme {
+        var selectedIndex by remember { mutableIntStateOf(1) }
+        TvTopBar(
+            tabs = TvTab.entries,
+            selectedTabIndex = selectedIndex,
+            profile = TvProfileState.SignedOut,
+            onTabSelect = { selectedIndex = it },
+            onProfileClick = {},
+        )
     }
 }

@@ -46,6 +46,7 @@ class SimplePlayer(
 ) : LocalPlayer(onPlayerEvent) {
     private val reducedBufferManufacturers = listOf("mercedes-benz")
     private val useReducedBuffer = reducedBufferManufacturers.contains(Build.MANUFACTURER.lowercase()) || Util.isWearOs(context)
+    private val isTv = Util.isTv(context)
     private val bufferTimeMinMillis = TimeUnit.MINUTES.toMillis(2).toInt()
     private val bufferTimeMaxMillis = if (useReducedBuffer) TimeUnit.MINUTES.toMillis(2).toInt() else TimeUnit.MINUTES.toMillis(4).toInt()
 
@@ -57,6 +58,7 @@ class SimplePlayer(
     @UnstableApi
     private var trackSelector: DefaultTrackSelector? = null
 
+    @Volatile
     private var renderersFactory: ShiftyRenderersFactory? = null
     private var playbackEffects: PlaybackEffects? = null
 
@@ -65,7 +67,10 @@ class SimplePlayer(
 
     override var isPip: Boolean = false
 
+    override val currentAudioLevel: Float get() = renderersFactory?.currentAudioLevel ?: 0f
+
     private var videoChangedListener: VideoChangedListener? = null
+    private val mainHandler = Handler(Looper.getMainLooper())
 
     private var hasVideoSurface = false
 
@@ -344,8 +349,14 @@ class SimplePlayer(
                     videoHeight = videoSize.height
                     onVideoTrackChanged(true)
                     videoChangedListener?.let {
-                        Handler(Looper.getMainLooper()).post { it.videoSizeChanged(videoSize.width, videoSize.height, videoSize.pixelWidthHeightRatio) }
+                        mainHandler.post { it.videoSizeChanged(videoSize.width, videoSize.height, videoSize.pixelWidthHeightRatio) }
                     }
+                }
+            }
+
+            override fun onRenderedFirstFrame() {
+                videoChangedListener?.let {
+                    mainHandler.post { it.videoFirstFrameRendered() }
                 }
             }
         })
@@ -361,6 +372,7 @@ class SimplePlayer(
             fingerprintTapEnabled = {
                 FeatureFlag.isEnabled(Feature.SYNCED_TRANSCRIPTS) && Util.getAppPlatform(context) == AppPlatform.Phone
             },
+            audioLevelMeterEnabled = { isTv },
         )
     }
 
@@ -379,6 +391,7 @@ class SimplePlayer(
     interface VideoChangedListener {
         fun videoSizeChanged(width: Int, height: Int, pixelWidthHeightRatio: Float)
         fun videoNeedsReset()
+        fun videoFirstFrameRendered()
     }
 
     fun setVideoSizeChangedListener(videoChangedListener: VideoChangedListener) {

@@ -7,6 +7,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -24,17 +25,21 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.DialogWindowProvider
-import au.com.shiftyjelly.pocketcasts.theme.TvColors
+import androidx.tv.material3.MaterialTheme
+import au.com.shiftyjelly.pocketcasts.theme.tvColors
 import java.util.function.Consumer
 
 @Composable
 fun TvModal(
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
+    width: Dp = DefaultModalWidth,
+    contentPadding: PaddingValues = DefaultContentPadding,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Dialog(
@@ -45,6 +50,8 @@ fun TvModal(
         TvModalWindowEffects(isBlurBehindEnabled = isBlurBehindEnabled)
         TvModalSurface(
             isTranslucent = isBlurBehindEnabled,
+            width = width,
+            contentPadding = contentPadding,
             modifier = modifier,
             content = content,
         )
@@ -55,19 +62,26 @@ fun TvModal(
 internal fun TvModalSurface(
     modifier: Modifier = Modifier,
     isTranslucent: Boolean = false,
+    width: Dp = DefaultModalWidth,
+    contentPadding: PaddingValues = DefaultContentPadding,
     content: @Composable ColumnScope.() -> Unit,
 ) {
+    val containerColor = if (isTranslucent) {
+        MaterialTheme.tvColors.translucentOverlayContainer
+    } else {
+        MaterialTheme.tvColors.overlayContainer
+    }
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp),
         content = content,
         modifier = modifier
-            .width(400.dp)
+            .width(width)
             .clip(ModalShape)
-            .background(if (isTranslucent) TranslucentContainerColor else OpaqueContainerColor)
+            .background(containerColor)
             .background(HighlightBrush)
-            .border(1.dp, BorderColor, ModalShape)
-            .padding(horizontal = 53.dp, vertical = 40.dp),
+            .border(1.dp, MaterialTheme.tvColors.overlayBorder, ModalShape)
+            .padding(contentPadding),
     )
 }
 
@@ -105,10 +119,9 @@ private fun rememberIsBlurBehindEnabled(): State<Boolean> {
     return isBlurBehindEnabled
 }
 
+private val DefaultModalWidth = 400.dp
+private val DefaultContentPadding = PaddingValues(horizontal = 53.dp, vertical = 40.dp)
 private val ModalShape = RoundedCornerShape(28.dp)
-private val TranslucentContainerColor = TvColors.Dark.copy(alpha = 0.6f)
-private val OpaqueContainerColor = TvColors.Dark.copy(alpha = 0.94f)
-private val BorderColor = Color.White.copy(alpha = 0.12f)
 private val HighlightBrush = Brush.verticalGradient(
     colors = listOf(
         Color.White.copy(alpha = 0.08f),

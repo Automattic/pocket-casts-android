@@ -14,7 +14,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.nativeKeyCode
@@ -22,7 +21,8 @@ import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.tv.material3.ButtonColors
 import androidx.tv.material3.ButtonDefaults
-import au.com.shiftyjelly.pocketcasts.theme.TvColors
+import androidx.tv.material3.MaterialTheme
+import au.com.shiftyjelly.pocketcasts.theme.tvColors
 
 @Stable
 class TvTileButtonState(val buttonCount: Int) {
@@ -112,8 +112,12 @@ fun Modifier.tvTileButtonNavigation(
 
 @Composable
 fun tileButtonColors(isSelected: Boolean): ButtonColors = ButtonDefaults.colors(
-    containerColor = if (isSelected) Color.White else TvColors.TextPrimary20,
-    contentColor = if (isSelected) Color.Black else TvColors.TextSecondary,
-    focusedContainerColor = TvColors.TextPrimary20,
-    focusedContentColor = TvColors.TextSecondary,
+    containerColor = if (isSelected) {
+        MaterialTheme.tvColors.backgroundActive
+    } else {
+        MaterialTheme.tvColors.backgroundActive20
+    },
+    contentColor = if (isSelected) MaterialTheme.tvColors.textPrimaryActive else MaterialTheme.tvColors.textSecondary,
+    focusedContainerColor = MaterialTheme.tvColors.backgroundActive20,
+    focusedContentColor = MaterialTheme.tvColors.textSecondary,
 )

@@ -7,12 +7,20 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
@@ -22,14 +30,20 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.OutlinedButton
 import androidx.tv.material3.Text
-import au.com.shiftyjelly.pocketcasts.component.TvFeaturedTile
-import au.com.shiftyjelly.pocketcasts.component.TvPodcastTile
-import au.com.shiftyjelly.pocketcasts.component.TvRow
-import au.com.shiftyjelly.pocketcasts.component.TvVideoTile
-import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.component.LocalOpenNowPlaying
+import au.com.shiftyjelly.pocketcasts.component.LocalTvToastHostState
+import au.com.shiftyjelly.pocketcasts.component.TvDetailOverlay
+import au.com.shiftyjelly.pocketcasts.component.tvFocusInactiveWhen
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
-import au.com.shiftyjelly.pocketcasts.theme.TvColors
-import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverEpisode
+import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverPodcast
+import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverRow
+import au.com.shiftyjelly.pocketcasts.discover.tvDiscoverRow
+import au.com.shiftyjelly.pocketcasts.podcasts.TvPodcastDetailsScreen
+import au.com.shiftyjelly.pocketcasts.theme.TvTheme
+import au.com.shiftyjelly.pocketcasts.theme.TvTopBarHeight
+import au.com.shiftyjelly.pocketcasts.theme.tvColors
+import au.com.shiftyjelly.pocketcasts.theme.tvTypography
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -38,28 +52,72 @@ fun TvHomeScreen(
     viewModel: TvHomeViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    TvHomeContent(
-        uiState = uiState,
-        onRetry = viewModel::load,
-        modifier = modifier,
-    )
+    var openedPodcastUuid by rememberSaveable { mutableStateOf<String?>(null) }
+    var restoreFocusTrigger by remember { mutableIntStateOf(0) }
+
+    val podcastUuid = openedPodcastUuid
+    val openNowPlaying = LocalOpenNowPlaying.current
+    val toastHostState = LocalTvToastHostState.current
+    val playFailedMessage = stringResource(LR.string.error_generic_message)
+    LaunchedEffect(Unit) {
+        viewModel.playStarted.collect {
+            openNowPlaying()
+        }
+    }
+    LaunchedEffect(Unit) {
+        viewModel.playFailures.collect {
+            toastHostState.show(playFailedMessage)
+        }
+    }
+    Box(modifier = modifier.fillMaxSize()) {
+        TvHomeContent(
+            uiState = uiState,
+            onRetry = viewModel::load,
+            onOpenPodcast = { openedPodcastUuid = it },
+            onPlayEpisode = viewModel::playEpisode,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = TvTopBarHeight)
+                .tvFocusInactiveWhen(podcastUuid != null),
+            restoreFocusTrigger = restoreFocusTrigger,
+        )
+        TvDetailOverlay(
+            target = podcastUuid,
+            onBack = { openedPodcastUuid = null },
+            onHide = { restoreFocusTrigger++ },
+        ) { uuid ->
+            TvPodcastDetailsScreen(
+                podcastUuid = uuid,
+                onClose = { openedPodcastUuid = null },
+            )
+        }
+    }
 }
 
 @Composable
 private fun TvHomeContent(
     uiState: TvHomeUiState,
     onRetry: () -> Unit,
+    onOpenPodcast: (String) -> Unit,
+    onPlayEpisode: (TvDiscoverEpisode) -> Unit,
     modifier: Modifier = Modifier,
+    restoreFocusTrigger: Int = 0,
 ) {
     when (uiState) {
-        is TvHomeUiState.Loading -> LoadingView(color = Color.White, modifier = modifier)
+        is TvHomeUiState.Loading -> LoadingView(color = MaterialTheme.tvColors.textPrimary, modifier = modifier)
 
         is TvHomeUiState.Error -> TvHomeError(onRetry = onRetry, modifier = modifier)
 
         is TvHomeUiState.Ready -> if (uiState.rows.isEmpty()) {
             TvHomeError(onRetry = onRetry, modifier = modifier)
         } else {
-            TvHomeRows(rows = uiState.rows, modifier = modifier)
+            TvHomeRows(
+                rows = uiState.rows,
+                onOpenPodcast = onOpenPodcast,
+                onPlayEpisode = onPlayEpisode,
+                modifier = modifier,
+                restoreFocusTrigger = restoreFocusTrigger,
+            )
         }
     }
 }
@@ -76,8 +134,8 @@ private fun TvHomeError(
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = stringResource(LR.string.error_generic_message),
-                color = Color.White,
-                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.tvColors.textPrimary,
+                style = MaterialTheme.tvTypography.caption1,
             )
             Spacer(modifier = Modifier.height(24.dp))
             OutlinedButton(onClick = onRetry) {
@@ -89,67 +147,45 @@ private fun TvHomeError(
 
 @Composable
 private fun TvHomeRows(
-    rows: List<TvHomeRow>,
+    rows: List<TvDiscoverRow>,
+    onOpenPodcast: (String) -> Unit,
+    onPlayEpisode: (TvDiscoverEpisode) -> Unit,
     modifier: Modifier = Modifier,
+    restoreFocusTrigger: Int = 0,
 ) {
+    var lastFocusedRowIndex by rememberSaveable(rows.size) { mutableIntStateOf(0) }
+    val rowFocusRequesters = remember(rows.size) { List(rows.size) { FocusRequester() } }
+
+    var isInitialComposition by remember { mutableStateOf(true) }
+    LaunchedEffect(restoreFocusTrigger) {
+        // Only restore on an actual trigger change, not on the initial composition.
+        if (isInitialComposition) {
+            isInitialComposition = false
+        } else {
+            runCatching { rowFocusRequesters.getOrNull(lastFocusedRowIndex)?.requestFocus() }
+        }
+    }
+
     LazyColumn(
         modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
         item { Spacer(modifier = Modifier.height(8.dp)) }
 
-        rows.forEach { row ->
-            when (row) {
-                is TvHomeRow.FeaturedPodcasts -> item(key = row.id) {
-                    TvRow(
-                        title = row.title,
-                        items = row.podcasts,
-                        itemSpacing = 32.dp,
-                        key = TvHomePodcast::uuid,
-                    ) { podcast ->
-                        TvFeaturedTile(
-                            artworkUrl = podcast.artworkUrl,
-                            isSponsored = podcast.isSponsored,
-                            title = podcast.title,
-                            description = podcast.description,
-                            onGoToPodcast = {},
-                            onPlayLastEpisode = {},
-                        )
-                    }
-                }
-
-                is TvHomeRow.Episodes -> item(key = row.id) {
-                    TvRow(
-                        title = row.title,
-                        items = row.episodes,
-                        itemSpacing = 32.dp,
-                        key = TvHomeEpisode::episodeUuid,
-                    ) { episode ->
-                        TvVideoTile(
-                            thumbnailUrl = episode.thumbnailUrl,
-                            podcastArtworkUrl = episode.podcastArtworkUrl,
-                            podcastTitle = episode.podcastTitle,
-                            episodeTitle = episode.episodeTitle,
-                            onPlayEpisode = {},
-                            onGoToPodcast = {},
-                        )
-                    }
-                }
-
-                is TvHomeRow.Podcasts -> item(key = row.id) {
-                    TvRow(
-                        title = row.title,
-                        items = row.podcasts,
-                        key = TvHomePodcast::uuid,
-                    ) { podcast ->
-                        TvPodcastTile(
-                            artworkUrl = podcast.artworkUrl,
-                            podcastTitle = podcast.title,
-                            onClick = {},
-                        )
-                    }
+        rows.forEachIndexed { rowIndex, row ->
+            val rowModifier = Modifier.onFocusChanged { focusState ->
+                if (focusState.hasFocus) {
+                    lastFocusedRowIndex = rowIndex
                 }
             }
+            val rowFocusRequester = rowFocusRequesters[rowIndex]
+            tvDiscoverRow(
+                row = row,
+                onOpenPodcast = onOpenPodcast,
+                onPlayEpisode = onPlayEpisode,
+                modifier = rowModifier,
+                focusRequester = rowFocusRequester,
+            )
         }
 
         item { Spacer(modifier = Modifier.height(8.dp)) }
@@ -159,39 +195,39 @@ private fun TvHomeRows(
 @Preview(device = Devices.TV_1080p)
 @Composable
 private fun TvHomeContentPreview() {
-    AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
-        MaterialTheme {
-            Box(modifier = Modifier.background(TvColors.Dark)) {
-                TvHomeContent(
-                    uiState = TvHomeUiState.Ready(
-                        rows = listOf(
-                            TvHomeRow.FeaturedPodcasts(
-                                id = "featured",
-                                title = "Featured",
-                                podcasts = (1..3).map { previewPodcast(it) },
-                            ),
-                            TvHomeRow.Episodes(
-                                id = "tv_featured_videos",
-                                title = "Made for TV",
-                                episodes = (1..6).map {
-                                    TvHomeEpisode(
-                                        episodeUuid = "episode-$it",
-                                        episodeTitle = "Episode $it",
-                                        podcastUuid = "podcast-$it",
-                                        podcastTitle = "Podcast $it",
-                                    )
-                                },
-                            ),
-                            TvHomeRow.Podcasts(
-                                id = "trending",
-                                title = "Trending",
-                                podcasts = (1..8).map { previewPodcast(it) },
-                            ),
+    TvTheme {
+        Box(modifier = Modifier.background(MaterialTheme.tvColors.backgroundSunken)) {
+            TvHomeContent(
+                uiState = TvHomeUiState.Ready(
+                    rows = listOf(
+                        TvDiscoverRow.FeaturedPodcasts(
+                            id = "featured",
+                            title = "Featured",
+                            podcasts = (1..3).map { previewPodcast(it) },
+                        ),
+                        TvDiscoverRow.Episodes(
+                            id = "tv_featured_videos",
+                            title = "Made for TV",
+                            episodes = (1..6).map {
+                                TvDiscoverEpisode(
+                                    episodeUuid = "episode-$it",
+                                    episodeTitle = "Episode $it",
+                                    podcastUuid = "podcast-$it",
+                                    podcastTitle = "Podcast $it",
+                                )
+                            },
+                        ),
+                        TvDiscoverRow.Podcasts(
+                            id = "trending",
+                            title = "Trending",
+                            podcasts = (1..8).map { previewPodcast(it) },
                         ),
                     ),
-                    onRetry = {},
-                )
-            }
+                ),
+                onRetry = {},
+                onOpenPodcast = {},
+                onPlayEpisode = {},
+            )
         }
     }
 }
@@ -199,20 +235,21 @@ private fun TvHomeContentPreview() {
 @Preview(device = Devices.TV_1080p)
 @Composable
 private fun TvHomeErrorPreview() {
-    AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
-        MaterialTheme {
-            Box(modifier = Modifier.background(TvColors.Dark)) {
-                TvHomeContent(
-                    uiState = TvHomeUiState.Error,
-                    onRetry = {},
-                )
-            }
+    TvTheme {
+        Box(modifier = Modifier.background(MaterialTheme.tvColors.backgroundSunken)) {
+            TvHomeContent(
+                uiState = TvHomeUiState.Error,
+                onRetry = {},
+                onOpenPodcast = {},
+                onPlayEpisode = {},
+            )
         }
     }
 }
 
-private fun previewPodcast(index: Int) = TvHomePodcast(
+private fun previewPodcast(index: Int) = TvDiscoverPodcast(
     uuid = "podcast-$index",
     title = "Podcast $index",
+    author = "Author $index",
     description = "Description of podcast $index",
 )
