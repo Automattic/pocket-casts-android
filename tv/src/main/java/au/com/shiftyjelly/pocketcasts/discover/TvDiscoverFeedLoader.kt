@@ -24,12 +24,15 @@ class TvDiscoverFeedLoader @Inject constructor(
     private val settings: Settings,
     @ApplicationContext private val context: Context,
 ) {
-    suspend fun load(isLoggedIn: Boolean): List<TvDiscoverRow> = buildRows(listRepository.getDiscoverFeed(), isLoggedIn)
+    suspend fun load(isLoggedIn: Boolean): List<TvDiscoverRow> {
+        return buildRows(listRepository.getHomeDiscoverFeed(isLoggedIn), isLoggedIn)
+    }
 
     suspend fun searchDiscoverFeed(): Discover = listRepository.getSearchDiscoverFeed()
 
     suspend fun loadCategories(discover: Discover): List<DiscoverCategory> {
-        val source = discover.layout.firstOrNull { it.type is ListType.Categories }?.source ?: return emptyList()
+        val source = discover.layout.firstOrNull { it.type is ListType.Categories }
+            ?.source?.takeIf(String::isNotBlank) ?: return emptyList()
         return try {
             listRepository.getCategoriesList(source)
         } catch (exception: CancellationException) {
@@ -61,6 +64,10 @@ class TvDiscoverFeedLoader @Inject constructor(
     }
 
     private suspend fun loadRow(row: DiscoverRow): TvDiscoverRow? {
+        if (row.source.isBlank()) {
+            Timber.d("Dropping discover row without a source: ${row.rowId()}")
+            return null
+        }
         return when (row.type) {
             is ListType.PodcastList -> loadPodcastsRow(row)
             is ListType.EpisodeList -> loadEpisodesRow(row)
