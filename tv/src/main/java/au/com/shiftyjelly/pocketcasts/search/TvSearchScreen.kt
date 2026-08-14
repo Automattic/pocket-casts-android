@@ -19,7 +19,6 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -55,7 +54,6 @@ import au.com.shiftyjelly.pocketcasts.component.TvPodcastGridScaffold
 import au.com.shiftyjelly.pocketcasts.component.TvPodcastTile
 import au.com.shiftyjelly.pocketcasts.component.TvPodcastTileDefaults
 import au.com.shiftyjelly.pocketcasts.component.TvRow
-import au.com.shiftyjelly.pocketcasts.component.TvSectionTitle
 import au.com.shiftyjelly.pocketcasts.component.TvTile
 import au.com.shiftyjelly.pocketcasts.component.tvFocusInactiveWhen
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
@@ -130,7 +128,11 @@ fun TvSearchScreen(
             history = history,
             onHistorySelect = viewModel::onQueryChange,
             suggestions = suggestions,
-            onSuggestionSelect = viewModel::onQueryChange,
+            onSuggestionSelect = { term ->
+                viewModel.saveSearchTerm(term)
+                viewModel.onQueryChange(term)
+            },
+            onSaveSearch = viewModel::saveSearchTerm,
             restoreFocusTrigger = restoreFocusTrigger,
             modifier = Modifier
                 .fillMaxSize()
@@ -205,6 +207,7 @@ private fun TvSearchContent(
     onHistorySelect: (String) -> Unit = {},
     suggestions: List<String> = emptyList(),
     onSuggestionSelect: (String) -> Unit = {},
+    onSaveSearch: (String) -> Unit = {},
     restoreFocusTrigger: Int = 0,
 ) {
     val searchFieldFocusRequester = remember { FocusRequester() }
@@ -221,7 +224,12 @@ private fun TvSearchContent(
             TvSearchField(
                 query = query,
                 onQueryChange = onQueryChange,
-                onEditingChange = { isEditing = it },
+                onEditingChange = { editing ->
+                    if (!editing && isEditing && query.isNotBlank()) {
+                        onSaveSearch(query)
+                    }
+                    isEditing = editing
+                },
                 modifier = Modifier.focusRequester(searchFieldFocusRequester),
             )
             Spacer(modifier = Modifier.height(24.dp))
@@ -244,7 +252,10 @@ private fun TvSearchContent(
             if (showSuggestions) {
                 TvSearchSuggestions(
                     suggestions = suggestions,
-                    onSuggestionSelect = onSuggestionSelect,
+                    onSuggestionSelect = { term ->
+                        suggestionsFocused = false
+                        onSuggestionSelect(term)
+                    },
                     modifier = Modifier.onFocusChanged { suggestionsFocused = it.hasFocus },
                 )
                 return@Box

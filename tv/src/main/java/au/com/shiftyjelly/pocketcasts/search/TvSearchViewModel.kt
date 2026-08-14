@@ -119,7 +119,6 @@ class TvSearchViewModel @Inject constructor(
         searchJob = viewModelScope.launch {
             delay(SEARCH_DEBOUNCE_MS)
             _searchState.value = TvSearchState.Searching
-            saveSearchTerm(term)
 
             val localPodcasts = podcastManager.findSubscribedFlow(term).first().map(Podcast::toSearchItem)
             val predictiveResults = try {
