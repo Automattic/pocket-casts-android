@@ -61,6 +61,7 @@ fun TvUpNextScreen(
     var openedPodcastUuid by rememberSaveable { mutableStateOf<String?>(null) }
 
     LaunchedEffect(Unit) {
+        viewModel.trackUpNextShown()
         viewModel.onShown()
     }
 

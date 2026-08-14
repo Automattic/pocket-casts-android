@@ -143,7 +143,7 @@ class TvUpNextViewModelTest {
 
     @Test
     fun `showing the screen tracks the up next shown event`() = runTest {
-        createViewModel().onShown()
+        createViewModel().trackUpNextShown()
 
         verify(eventHorizon).track(UpNextShownEvent(source = UpNextSourceType.TabBar))
     }

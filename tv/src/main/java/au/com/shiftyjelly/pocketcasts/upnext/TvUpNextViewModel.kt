@@ -56,8 +56,11 @@ class TvUpNextViewModel @Inject constructor(
         )
 
     fun onShown() {
-        eventHorizon.track(UpNextShownEvent(source = UpNextSourceType.TabBar))
         UpNextSyncWorker.enqueue(syncManager, context)
+    }
+
+    fun trackUpNextShown() {
+        eventHorizon.track(UpNextShownEvent(source = UpNextSourceType.TabBar))
     }
 
     fun trackDiscoverButtonTapped() {
