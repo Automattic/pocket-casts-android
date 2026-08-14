@@ -63,7 +63,7 @@ data class DiscoverRow(
     @Json(name = "expanded_style") override val expandedStyle: ExpandedStyle = ExpandedStyle.PlainList(),
     @Json(name = "expanded_top_item_label") override val expandedTopItemLabel: String?,
     @Json(name = "title") override val title: String,
-    // Blank when the feed omits the key: a placeholder row the client fills locally. Consumers must skip blank sources.
+    /** Blank when the feed omits the key: a placeholder row the client fills locally. Consumers must skip blank sources. */
     @Json(name = "source") override val source: String = "",
     @Json(name = "uuid") override val listUuid: String?,
     @Json(name = "category_id") val categoryId: Int?,

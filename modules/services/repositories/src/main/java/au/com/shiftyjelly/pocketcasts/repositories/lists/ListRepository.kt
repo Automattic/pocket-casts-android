@@ -22,12 +22,13 @@ class ListRepository(
         return listWebService.getSearchDiscoverFeed(platform = platform, version = 3)
     }
 
-    suspend fun getLoggedInDiscoverFeed(): Discover {
-        return listWebService.getLoggedInDiscoverFeed(platform = platform, version = 3)
-    }
-
-    suspend fun getLoggedOutDiscoverFeed(): Discover {
-        return listWebService.getLoggedOutDiscoverFeed(platform = platform, version = 3)
+    /** Auth-specific home discover feed. Only served for the TV platform. */
+    suspend fun getHomeDiscoverFeed(isLoggedIn: Boolean): Discover {
+        return if (isLoggedIn) {
+            listWebService.getLoggedInDiscoverFeed(platform = platform, version = 3)
+        } else {
+            listWebService.getLoggedOutDiscoverFeed(platform = platform, version = 3)
+        }
     }
 
     suspend fun getListFeed(url: String, authenticated: Boolean? = false): ListFeed? {

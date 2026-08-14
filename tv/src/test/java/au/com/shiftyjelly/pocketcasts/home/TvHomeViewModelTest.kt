@@ -92,7 +92,7 @@ class TvHomeViewModelTest {
     @Test
     fun `all rows load in feed order`() = runTest {
         whenever(syncManager.isLoggedIn()).thenReturn(false)
-        whenever(listRepository.getLoggedOutDiscoverFeed()).thenReturn(
+        whenever(listRepository.getHomeDiscoverFeed(isLoggedIn = false)).thenReturn(
             discover(
                 row(
                     id = "featured",
@@ -156,7 +156,7 @@ class TvHomeViewModelTest {
     @Test
     fun `authenticated rows are excluded when signed out`() = runTest {
         whenever(syncManager.isLoggedIn()).thenReturn(false)
-        whenever(listRepository.getLoggedOutDiscoverFeed()).thenReturn(
+        whenever(listRepository.getHomeDiscoverFeed(isLoggedIn = false)).thenReturn(
             discover(
                 row(
                     id = "recommendations_user",
@@ -182,7 +182,7 @@ class TvHomeViewModelTest {
     @Test
     fun `rows without a source are dropped`() = runTest {
         whenever(syncManager.isLoggedIn()).thenReturn(false)
-        whenever(listRepository.getLoggedOutDiscoverFeed()).thenReturn(
+        whenever(listRepository.getHomeDiscoverFeed(isLoggedIn = false)).thenReturn(
             discover(
                 row(id = "up-next-placeholder", title = "Up Next", source = ""),
                 row(id = "trending", title = "Row Trending", source = "https://lists/trending.json"),
@@ -203,7 +203,7 @@ class TvHomeViewModelTest {
     @Test
     fun `authenticated rows load when signed in`() = runTest {
         whenever(syncManager.isLoggedIn()).thenReturn(true)
-        whenever(listRepository.getLoggedInDiscoverFeed()).thenReturn(
+        whenever(listRepository.getHomeDiscoverFeed(isLoggedIn = true)).thenReturn(
             discover(
                 row(
                     id = "recommendations_user",
@@ -230,7 +230,7 @@ class TvHomeViewModelTest {
     @Test
     fun `sponsored row marks its podcasts as sponsored`() = runTest {
         whenever(syncManager.isLoggedIn()).thenReturn(false)
-        whenever(listRepository.getLoggedOutDiscoverFeed()).thenReturn(
+        whenever(listRepository.getHomeDiscoverFeed(isLoggedIn = false)).thenReturn(
             discover(
                 row(
                     id = "sponsored-id",
@@ -256,7 +256,7 @@ class TvHomeViewModelTest {
     @Test
     fun `rows that fail to load are dropped`() = runTest {
         whenever(syncManager.isLoggedIn()).thenReturn(false)
-        whenever(listRepository.getLoggedOutDiscoverFeed()).thenReturn(
+        whenever(listRepository.getHomeDiscoverFeed(isLoggedIn = false)).thenReturn(
             discover(
                 row(id = "featured", title = "Row Featured", source = "https://lists/featured.json"),
                 row(id = "empty-id", title = "Row Empty", source = "https://lists/empty.json"),
@@ -279,7 +279,7 @@ class TvHomeViewModelTest {
     @Test
     fun `category sponsor rows are excluded`() = runTest {
         whenever(syncManager.isLoggedIn()).thenReturn(false)
-        whenever(listRepository.getLoggedOutDiscoverFeed()).thenReturn(
+        whenever(listRepository.getHomeDiscoverFeed(isLoggedIn = false)).thenReturn(
             discover(
                 row(
                     id = "category-ad",
@@ -306,7 +306,7 @@ class TvHomeViewModelTest {
     @Test
     fun `rows with duplicate ids are deduplicated`() = runTest {
         whenever(syncManager.isLoggedIn()).thenReturn(false)
-        whenever(listRepository.getLoggedOutDiscoverFeed()).thenReturn(
+        whenever(listRepository.getHomeDiscoverFeed(isLoggedIn = false)).thenReturn(
             discover(
                 row(id = "trending", title = "Row Trending", source = "https://lists/trending.json"),
                 row(id = "trending", title = "Row Trending Again", source = "https://lists/trending-2.json"),
@@ -328,7 +328,7 @@ class TvHomeViewModelTest {
     @Test
     fun `rows not available in the current region are excluded`() = runTest {
         whenever(syncManager.isLoggedIn()).thenReturn(false)
-        whenever(listRepository.getLoggedOutDiscoverFeed()).thenReturn(
+        whenever(listRepository.getHomeDiscoverFeed(isLoggedIn = false)).thenReturn(
             discover(
                 row(id = "featured", title = "Row Featured", source = "https://lists/featured.json"),
                 row(
@@ -354,7 +354,7 @@ class TvHomeViewModelTest {
     @Test
     fun `list feed title is preferred over row title`() = runTest {
         whenever(syncManager.isLoggedIn()).thenReturn(false)
-        whenever(listRepository.getLoggedOutDiscoverFeed()).thenReturn(
+        whenever(listRepository.getHomeDiscoverFeed(isLoggedIn = false)).thenReturn(
             discover(
                 row(id = "featured", title = "Row Featured", source = "https://lists/featured.json"),
                 row(id = "trending", title = "Row Trending", source = "https://lists/trending.json"),
@@ -376,7 +376,7 @@ class TvHomeViewModelTest {
     @Test
     fun `feed failure shows error state and retry reloads`() = runTest {
         whenever(syncManager.isLoggedIn()).thenReturn(false)
-        whenever(listRepository.getLoggedOutDiscoverFeed())
+        whenever(listRepository.getHomeDiscoverFeed(isLoggedIn = false))
             .thenThrow(RuntimeException("Network error"))
             .thenReturn(discover(row(id = "trending", title = "Row Trending", source = "https://lists/trending.json")))
         whenever(listRepository.getListFeed(eq("https://lists/trending.json"), any()))
@@ -398,7 +398,7 @@ class TvHomeViewModelTest {
     @Test
     fun `feed failure keeps local rows on screen`() = runTest {
         whenever(syncManager.isLoggedIn()).thenReturn(false)
-        whenever(listRepository.getLoggedOutDiscoverFeed()).thenThrow(RuntimeException("Network error"))
+        whenever(listRepository.getHomeDiscoverFeed(isLoggedIn = false)).thenThrow(RuntimeException("Network error"))
         whenever(upNextDao.getUpNextBaseEpisodes(any())).thenReturn(
             listOf(episode(uuid = "episode-1", podcastUuid = "podcast-1")),
         )
@@ -416,7 +416,7 @@ class TvHomeViewModelTest {
     @Test
     fun `keep listening row shows first up next episode even when signed out`() = runTest {
         whenever(syncManager.isLoggedIn()).thenReturn(false)
-        whenever(listRepository.getLoggedOutDiscoverFeed()).thenReturn(discover())
+        whenever(listRepository.getHomeDiscoverFeed(isLoggedIn = false)).thenReturn(discover())
         whenever(upNextDao.getUpNextBaseEpisodes(any())).thenReturn(
             listOf(
                 episode(uuid = "episode-1", podcastUuid = "podcast-1"),
@@ -442,7 +442,7 @@ class TvHomeViewModelTest {
     @Test
     fun `user episodes in up next are skipped`() = runTest {
         whenever(syncManager.isLoggedIn()).thenReturn(false)
-        whenever(listRepository.getLoggedOutDiscoverFeed()).thenReturn(discover())
+        whenever(listRepository.getHomeDiscoverFeed(isLoggedIn = false)).thenReturn(discover())
         whenever(upNextDao.getUpNextBaseEpisodes(any())).thenReturn(
             listOf(
                 UserEpisode(uuid = "user-file", publishedDate = Date()),
@@ -464,7 +464,7 @@ class TvHomeViewModelTest {
     @Test
     fun `signed in user sees keep listening, up next and new releases rows before discover rows`() = runTest {
         whenever(syncManager.isLoggedIn()).thenReturn(true)
-        whenever(listRepository.getLoggedInDiscoverFeed()).thenReturn(
+        whenever(listRepository.getHomeDiscoverFeed(isLoggedIn = true)).thenReturn(
             discover(row(id = "trending", title = "Row Trending", source = "https://lists/trending.json")),
         )
         whenever(listRepository.getListFeed(eq("https://lists/trending.json"), any()))
@@ -510,7 +510,7 @@ class TvHomeViewModelTest {
     @Test
     fun `up next and new releases rows are hidden when signed out`() = runTest {
         whenever(syncManager.isLoggedIn()).thenReturn(false)
-        whenever(listRepository.getLoggedOutDiscoverFeed()).thenReturn(discover())
+        whenever(listRepository.getHomeDiscoverFeed(isLoggedIn = false)).thenReturn(discover())
         whenever(upNextDao.getUpNextBaseEpisodes(any())).thenReturn(
             listOf(
                 episode(uuid = "episode-1", podcastUuid = "podcast-1"),
