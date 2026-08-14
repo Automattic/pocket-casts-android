@@ -86,9 +86,6 @@ fun TvHomeScreen(
         TvHomeContent(
             uiState = uiState,
             onRetry = viewModel::load,
-            onOpenPodcast = { openedPodcastUuid = it },
-            onPlayEpisode = viewModel::playEpisode,
-            onOpenCategory = { openedCategory = TvOpenedCategory(it.id, it.name, it.source) },
             onTapBanner = { banner ->
                 viewModel.trackBannerTapped(banner)
                 when (banner) {
@@ -96,10 +93,22 @@ fun TvHomeScreen(
                     TvDiscoverBanner.CreateAccount -> onCreateAccount()
                 }
             },
-            onPodcastClick = viewModel::trackDiscoverPodcastTapped,
-            onEpisodePlay = viewModel::trackDiscoverEpisodePlayed,
-            onEpisodePodcastClick = viewModel::trackDiscoverEpisodePodcastTapped,
-            onCategoryClick = viewModel::trackCategoryPillTapped,
+            onPodcastClick = { row, podcast ->
+                viewModel.trackDiscoverPodcastTapped(row, podcast)
+                openedPodcastUuid = podcast.uuid
+            },
+            onEpisodePlay = { row, episode ->
+                viewModel.trackDiscoverEpisodePlayed(row, episode)
+                viewModel.playEpisode(episode)
+            },
+            onEpisodePodcastClick = { row, episode ->
+                viewModel.trackDiscoverEpisodePodcastTapped(row, episode)
+                openedPodcastUuid = episode.podcastUuid
+            },
+            onCategoryClick = { category, index ->
+                viewModel.trackCategoryPillTapped(category, index)
+                openedCategory = TvOpenedCategory(category.id, category.name, category.source)
+            },
             onListImpression = viewModel::trackDiscoverListShown,
             modifier = Modifier
                 .fillMaxSize()
@@ -140,10 +149,7 @@ fun TvHomeScreen(
 private fun TvHomeContent(
     uiState: TvHomeUiState,
     onRetry: () -> Unit,
-    onOpenPodcast: (String) -> Unit,
-    onPlayEpisode: (TvDiscoverEpisode) -> Unit,
     modifier: Modifier = Modifier,
-    onOpenCategory: (DiscoverCategory) -> Unit = {},
     onTapBanner: (TvDiscoverBanner) -> Unit = {},
     onPodcastClick: (TvDiscoverRow, TvDiscoverPodcast) -> Unit = { _, _ -> },
     onEpisodePlay: (TvDiscoverRow, TvDiscoverEpisode) -> Unit = { _, _ -> },
@@ -162,9 +168,6 @@ private fun TvHomeContent(
         } else {
             TvHomeRows(
                 rows = uiState.rows,
-                onOpenPodcast = onOpenPodcast,
-                onPlayEpisode = onPlayEpisode,
-                onOpenCategory = onOpenCategory,
                 onTapBanner = onTapBanner,
                 onPodcastClick = onPodcastClick,
                 onEpisodePlay = onEpisodePlay,
@@ -204,10 +207,7 @@ private fun TvHomeError(
 @Composable
 private fun TvHomeRows(
     rows: List<TvDiscoverRow>,
-    onOpenPodcast: (String) -> Unit,
-    onPlayEpisode: (TvDiscoverEpisode) -> Unit,
     modifier: Modifier = Modifier,
-    onOpenCategory: (DiscoverCategory) -> Unit = {},
     onTapBanner: (TvDiscoverBanner) -> Unit = {},
     onPodcastClick: (TvDiscoverRow, TvDiscoverPodcast) -> Unit = { _, _ -> },
     onEpisodePlay: (TvDiscoverRow, TvDiscoverEpisode) -> Unit = { _, _ -> },
@@ -244,16 +244,13 @@ private fun TvHomeRows(
             val rowFocusRequester = rowFocusRequesters[rowIndex]
             tvDiscoverRow(
                 row = row,
-                onOpenPodcast = onOpenPodcast,
-                onPlayEpisode = onPlayEpisode,
-                modifier = rowModifier,
-                focusRequester = rowFocusRequester,
-                onOpenCategory = onOpenCategory,
-                onTapBanner = onTapBanner,
                 onPodcastClick = onPodcastClick,
                 onEpisodePlay = onEpisodePlay,
                 onEpisodePodcastClick = onEpisodePodcastClick,
                 onCategoryClick = onCategoryClick,
+                modifier = rowModifier,
+                focusRequester = rowFocusRequester,
+                onTapBanner = onTapBanner,
                 onListImpression = onListImpression,
             )
         }
@@ -307,8 +304,6 @@ private fun TvHomeContentPreview() {
                     ),
                 ),
                 onRetry = {},
-                onOpenPodcast = {},
-                onPlayEpisode = {},
             )
         }
     }
@@ -322,8 +317,6 @@ private fun TvHomeErrorPreview() {
             TvHomeContent(
                 uiState = TvHomeUiState.Error,
                 onRetry = {},
-                onOpenPodcast = {},
-                onPlayEpisode = {},
             )
         }
     }

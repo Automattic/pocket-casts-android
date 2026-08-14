@@ -21,17 +21,14 @@ import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 
 fun LazyListScope.tvDiscoverRow(
     row: TvDiscoverRow,
-    onOpenPodcast: (String) -> Unit,
-    onPlayEpisode: (TvDiscoverEpisode) -> Unit,
+    onPodcastClick: (TvDiscoverRow, TvDiscoverPodcast) -> Unit,
+    onEpisodePlay: (TvDiscoverRow, TvDiscoverEpisode) -> Unit,
+    onEpisodePodcastClick: (TvDiscoverRow, TvDiscoverEpisode) -> Unit,
+    onCategoryClick: (DiscoverCategory, Int) -> Unit,
     modifier: Modifier = Modifier,
     focusRequester: FocusRequester? = null,
     contentPadding: PaddingValues = PaddingValues(horizontal = 32.dp),
-    onOpenCategory: (DiscoverCategory) -> Unit = {},
     onTapBanner: (TvDiscoverBanner) -> Unit = {},
-    onPodcastClick: (TvDiscoverRow, TvDiscoverPodcast) -> Unit = { _, _ -> },
-    onEpisodePlay: (TvDiscoverRow, TvDiscoverEpisode) -> Unit = { _, _ -> },
-    onEpisodePodcastClick: (TvDiscoverRow, TvDiscoverEpisode) -> Unit = { _, _ -> },
-    onCategoryClick: (DiscoverCategory, Int) -> Unit = { _, _ -> },
     onListImpression: (TvDiscoverRow) -> Unit = {},
 ) {
     when (row) {
@@ -51,10 +48,7 @@ fun LazyListScope.tvDiscoverRow(
                     isSponsored = podcast.isSponsored,
                     title = podcast.title,
                     description = podcast.description,
-                    onGoToPodcast = {
-                        onPodcastClick(row, podcast)
-                        onOpenPodcast(podcast.uuid)
-                    },
+                    onGoToPodcast = { onPodcastClick(row, podcast) },
                     onPlayLastEpisode = {},
                 )
             }
@@ -77,10 +71,7 @@ fun LazyListScope.tvDiscoverRow(
                     author = podcast.author,
                     description = podcast.description,
                     isSponsored = podcast.isSponsored,
-                    onClick = {
-                        onPodcastClick(row, podcast)
-                        onOpenPodcast(podcast.uuid)
-                    },
+                    onClick = { onPodcastClick(row, podcast) },
                 )
             }
         }
@@ -101,14 +92,8 @@ fun LazyListScope.tvDiscoverRow(
                     podcastArtworkUrl = episode.podcastArtworkUrl,
                     podcastTitle = episode.podcastTitle,
                     episodeTitle = episode.episodeTitle,
-                    onPlayEpisode = {
-                        onEpisodePlay(row, episode)
-                        onPlayEpisode(episode)
-                    },
-                    onGoToPodcast = {
-                        onEpisodePodcastClick(row, episode)
-                        onOpenPodcast(episode.podcastUuid)
-                    },
+                    onPlayEpisode = { onEpisodePlay(row, episode) },
+                    onGoToPodcast = { onEpisodePodcastClick(row, episode) },
                 )
             }
         }
@@ -126,10 +111,7 @@ fun LazyListScope.tvDiscoverRow(
                 TvPodcastTile(
                     artworkUrl = podcast.artworkUrl,
                     podcastTitle = podcast.title,
-                    onClick = {
-                        onPodcastClick(row, podcast)
-                        onOpenPodcast(podcast.uuid)
-                    },
+                    onClick = { onPodcastClick(row, podcast) },
                     imageModifier = Modifier.width(TvPodcastTileDefaults.RowImageWidth),
                     isSponsored = podcast.isSponsored,
                 )
@@ -147,10 +129,7 @@ fun LazyListScope.tvDiscoverRow(
             ) { category ->
                 TvCategoryTile(
                     category = category,
-                    onClick = {
-                        onCategoryClick(category, row.categories.indexOfFirst { it.id == category.id })
-                        onOpenCategory(category)
-                    },
+                    onClick = { onCategoryClick(category, row.categories.indexOfFirst { it.id == category.id }) },
                 )
             }
         }
