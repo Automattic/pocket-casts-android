@@ -28,6 +28,8 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -112,10 +114,32 @@ class TvSearchViewModelTest {
         )
         whenever(listRepository.getListFeed(eq("https://lists/public.json"), any()))
             .thenReturn(podcastFeed("podcast-public"))
+        whenever(listRepository.getListFeed(eq("https://lists/members.json"), any()))
+            .thenReturn(podcastFeed("podcast-members"))
 
         val viewModel = createViewModel()
 
         assertEquals(listOf("public"), viewModel.discoverRows.value.map { it.id })
+        verify(listRepository, never()).getListFeed(eq("https://lists/members.json"), any())
+    }
+
+    @Test
+    fun `authenticated rows are kept when logged in`() = runTest {
+        whenever(syncManager.isLoggedIn()).thenReturn(true)
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(
+            discover(
+                row(id = "public", title = "Public", source = "https://lists/public.json"),
+                row(id = "members", title = "Members", source = "https://lists/members.json", authenticated = true),
+            ),
+        )
+        whenever(listRepository.getListFeed(eq("https://lists/public.json"), any()))
+            .thenReturn(podcastFeed("podcast-public"))
+        whenever(listRepository.getListFeed(eq("https://lists/members.json"), any()))
+            .thenReturn(podcastFeed("podcast-members"))
+
+        val viewModel = createViewModel()
+
+        assertEquals(listOf("public", "members"), viewModel.discoverRows.value.map { it.id })
     }
 
     @Test

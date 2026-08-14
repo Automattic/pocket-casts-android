@@ -60,55 +60,55 @@ private fun TvSearchContent(
     onQueryChange: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    LazyColumn(modifier = modifier.fillMaxSize()) {
-        item {
-            Column(modifier = Modifier.padding(ContentPadding)) {
-                Spacer(modifier = Modifier.height(40.dp))
-                TvSearchField(
-                    query = query,
-                    onQueryChange = onQueryChange,
-                    autoFocus = true,
-                )
-                Spacer(modifier = Modifier.height(24.dp))
-            }
+    Column(modifier = modifier.fillMaxSize()) {
+        Column(modifier = Modifier.padding(ContentPadding)) {
+            Spacer(modifier = Modifier.height(40.dp))
+            TvSearchField(
+                query = query,
+                onQueryChange = onQueryChange,
+                autoFocus = true,
+            )
+            Spacer(modifier = Modifier.height(24.dp))
         }
 
-        if (categories.isNotEmpty()) {
-            item {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(ContentPadding)
-                        .height(1.dp)
-                        .background(MaterialTheme.tvColors.overlayBorder),
-                )
-            }
-            item {
-                Spacer(modifier = Modifier.height(24.dp))
-                TvRow(
-                    title = stringResource(LR.string.tv_search_browse_categories),
-                    items = categories,
-                    contentPadding = ContentPadding,
-                    key = { it.id },
-                ) { category ->
-                    TvCategoryTile(category = category, onClick = {})
+        LazyColumn(modifier = Modifier.fillMaxSize()) {
+            if (categories.isNotEmpty()) {
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(ContentPadding)
+                            .height(1.dp)
+                            .background(MaterialTheme.tvColors.overlayBorder),
+                    )
+                }
+                item {
+                    Spacer(modifier = Modifier.height(24.dp))
+                    TvRow(
+                        title = stringResource(LR.string.tv_search_browse_categories),
+                        items = categories,
+                        contentPadding = ContentPadding,
+                        key = { it.id },
+                    ) { category ->
+                        TvCategoryTile(category = category, onClick = {})
+                    }
                 }
             }
-        }
 
-        if (query.isBlank()) {
-            discoverRows.forEach { row ->
-                item { Spacer(modifier = Modifier.height(24.dp)) }
-                tvDiscoverRow(
-                    row = row,
-                    onOpenPodcast = {},
-                    onPlayEpisode = {},
-                    contentPadding = ContentPadding,
-                )
+            if (query.isBlank()) {
+                discoverRows.forEach { row ->
+                    item { Spacer(modifier = Modifier.height(24.dp)) }
+                    tvDiscoverRow(
+                        row = row,
+                        onOpenPodcast = {},
+                        onPlayEpisode = {},
+                        contentPadding = ContentPadding,
+                    )
+                }
             }
-        }
 
-        item { Spacer(modifier = Modifier.height(40.dp)) }
+            item { Spacer(modifier = Modifier.height(40.dp)) }
+        }
     }
 }
 
