@@ -148,7 +148,7 @@ fun LazyListScope.tvDiscoverRow(
                 TvCategoryTile(
                     category = category,
                     onClick = {
-                        onCategoryClick(category, row.categories.indexOf(category))
+                        onCategoryClick(category, row.categories.indexOfFirst { it.id == category.id })
                         onOpenCategory(category)
                     },
                 )

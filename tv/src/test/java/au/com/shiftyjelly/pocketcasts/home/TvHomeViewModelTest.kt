@@ -943,6 +943,32 @@ class TvHomeViewModelTest {
     }
 
     @Test
+    fun `opening a discover episode podcast tracks the list podcast tapped event`() = runTest {
+        val episode = TvDiscoverEpisode("episode-1", "Episode", "podcast-1", "Podcast")
+        val row = TvDiscoverRow.Episodes(id = "list-videos", title = "Made for TV", episodes = listOf(episode))
+
+        createViewModel().trackDiscoverEpisodePodcastTapped(row, episode)
+
+        verify(eventHorizon).track(DiscoverListPodcastTappedEvent(listId = "list-videos", podcastUuid = "podcast-1", source = "home"))
+    }
+
+    @Test
+    fun `banner and categories rows do not track an impression`() = runTest {
+        val viewModel = createViewModel()
+
+        viewModel.trackDiscoverListShown(TvDiscoverRow.Banner(id = "banner", title = "", banner = TvDiscoverBanner.DiscoverMore))
+        viewModel.trackDiscoverListShown(
+            TvDiscoverRow.Categories(
+                id = "categories",
+                title = "Categories",
+                categories = listOf(DiscoverCategory(id = 1, name = "Comedy", icon = "", source = "")),
+            ),
+        )
+
+        verifyNoInteractions(eventHorizon)
+    }
+
+    @Test
     fun `tracks banner tapped`() = runTest {
         createViewModel().trackBannerTapped(TvDiscoverBanner.DiscoverMore)
 

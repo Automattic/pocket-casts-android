@@ -191,9 +191,8 @@ class TvHomeViewModel @Inject constructor(
     }
 
     fun trackDiscoverPodcastTapped(row: TvDiscoverRow, podcast: TvDiscoverPodcast) {
-        row.discoverListId()?.let { listId ->
-            eventHorizon.track(DiscoverListPodcastTappedEvent(listId = listId, podcastUuid = podcast.uuid, source = SOURCE_HOME))
-        }
+        val listId = row.discoverListId() ?: return
+        eventHorizon.track(DiscoverListPodcastTappedEvent(listId = listId, podcastUuid = podcast.uuid, source = SOURCE_HOME))
         if (row is TvDiscoverRow.FeaturedPodcasts) {
             eventHorizon.track(DiscoverFeaturedPodcastTappedEvent(podcastUuid = podcast.uuid))
         } else if (podcast.isSponsored) {
