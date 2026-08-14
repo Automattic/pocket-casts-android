@@ -1,11 +1,69 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-07-29 15:50:38+0000
+Translation-Revision-Date: 2026-08-11 10:10:10+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: ca
 -->
 <resources>
+    <string name="tv_playlist_play_all_save_and_play">Desa i reprodueix</string>
+    <string name="tv_playlist_play_all_play_without_saving">Reprodueix sense desar</string>
+    <string name="tv_stop_playback_confirmation_message">Això aturarà la reproducció actual.</string>
+    <string name="tv_archive_confirmation_title">Vols arxivar l\'episodi?</string>
+    <string name="tv_mark_played_confirmation_title">Vols marcar-lo com a reproduït?</string>
+    <string name="tv_trim_silence_off">Retallada de silencis desactivada</string>
+    <string name="tv_trim_silence_changed">Retallada de silencis establerta a %1$s</string>
+    <string name="tv_volume_boost_off">Amplificació de volum desactivada</string>
+    <string name="tv_volume_boost_on">Amplificació de volum activada</string>
+    <string name="tv_playback_speed_changed">Velocitat de reproducció establerta a %1$s</string>
+    <string name="tv_nothing_playing_subtitle">Reprodueix un episodi i apareixerà aquí.</string>
+    <string name="tv_nothing_playing_title">No s\'està reproduint res</string>
+    <string name="tv_episode_removed_from_up_next">Eliminat de «Tot seguit»</string>
+    <string name="tv_sign_in_title">Inicia sessió a Pocket Casts</string>
+    <string name="tv_create_account_modal_title">Els teus pòdcasts mereixen una llar</string>
+    <string name="tv_create_account_modal_subtitle">Crea un compte gratuït per a seguir pòdcasts, construir la cua de «Tot seguit» i reprendre-ho exactament on ho vas deixar, a qualsevol dispositiu.</string>
+    <string name="tv_episode_marked_as_played">Marcat com a reproduït</string>
+    <string name="tv_episode_marked_as_unplayed">Marcat com a no reproduït</string>
+    <string name="tv_episode_archived">Arxivat</string>
+    <string name="tv_episode_unarchived">Desarxivat</string>
+    <string name="tv_episode_will_play_next">Es reproduirà a continuació</string>
+    <string name="tv_episode_will_play_last">Es reproduirà al final</string>
+    <string name="tv_podcast_schedule_monthly">Mensual</string>
+    <string name="tv_podcast_schedule_fortnightly">Quinzenal</string>
+    <string name="tv_podcast_schedule_weekly">Setmanal</string>
+    <string name="tv_podcast_schedule_daily">Diari</string>
+    <string name="tv_podcast_schedule_hourly">Cada hora</string>
+    <string name="tv_podcast_next_episode_soon">Qualsevol dia d\'aquests</string>
+    <string name="tv_podcast_next_episode_tomorrow">Demà</string>
+    <string name="tv_podcast_info_next_episode">Pròxim episodi</string>
+    <string name="tv_podcast_info_schedule">Programació</string>
+    <string name="tv_podcast_info_website">Lloc web</string>
+    <string name="tv_podcast_info_network">Xarxa</string>
+    <string name="tv_create_account_modal_step_create">Crea el compte o inicia la sessió</string>
+    <string name="tv_sign_in_step_confirm_code">Si se\'t demana, confirma amb el codi següent</string>
+    <string name="tv_sign_in_step_login">Inicia la sessió al teu compte</string>
+    <string name="tv_sign_in_step_scan">Escaneja el codi QR o ves a %1$s</string>
+    <string name="tv_podcast_more_info">Més informació</string>
+    <string name="tv_podcast_follow">Segueix aquest pòdcast</string>
+    <string name="tv_folder_empty_message">Afegeix pòdcasts a aquesta carpeta des de l\'aplicació mòbil i apareixeran aquí.</string>
+    <string name="tv_up_next_empty_action_title">Afegeix episodis</string>
+    <string name="tv_your_podcasts_empty_action_title">Descobreix pòdcasts</string>
+    <string name="tv_your_podcasts_empty_subtitle">Els pòdcasts que segueixis apareixeran aquí, llestos per reproduir.</string>
+    <string name="tv_your_podcasts_empty_title">És hora d\'omplir-ho</string>
+    <string name="tv_up_next_empty_subtitle">Afegeix episodis a «Tot seguit» i es reproduiran en ordre, un darrere l\'altre.</string>
+    <string name="tv_up_next_empty_title">No hi ha res a la cua</string>
+    <string name="tv_episode_details">Detalls de l\'episodi</string>
+    <string name="playlist">Llista de reproducció</string>
+    <string name="tv_playlist_empty_subtitle_manual">Afegeix episodis a aquesta llista de reproducció des de l’aplicació mòbil i apareixeran aquí.</string>
+    <string name="tv_playlist_empty_subtitle">Ja és hora de celebrar que has completat aquesta llista, o bé edita les teves regles a l’aplicació mòbil per aconseguir-ne més.</string>
+    <string name="tv_playlists_download_title">Crea llistes de reproducció al telèfon</string>
+    <string name="tv_playlist_empty_title">Cap episodi</string>
+    <string name="tv_playlist_play_all">Reprodueix tots els episodis</string>
+    <string name="tv_playlists_download_subtitle">T’esperaran aquí quan hagis acabat. Escaneja per obtenir l’aplicació</string>
+    <string name="tv_playlists_empty_title">Aquí viuran les teves llistes de reproducció</string>
+    <string name="tv_playlists_empty_subtitle">Crea-la manualment o deixa que les Regles intel·ligents l\'organitzin per tu.</string>
+    <string name="tv_playlists_empty_action_title">Crea una llista de reproducció</string>
+    <string name="tv_profile_starred_episodes">Episodis destacats</string>
     <string name="tv_home_keep_listening">Continua escoltant</string>
     <string name="settings_audio_only_summary">Si s\'activa, els episodis amb vídeo es reproduiran només en àudio i s\'estalviaran dades.</string>
     <string name="settings_audio_only">Només àudio</string>
@@ -32,8 +90,6 @@ Language: ca
     <string name="tv_onboarding_welcome_back">Benvingut de nou!</string>
     <string name="tv_onboarding_sign_in_instructions">Obre la càmera i apunta al codi QR</string>
     <string name="tv_onboarding_sign_in_title">Inicia sessió amb el telèfon</string>
-    <string name="tv_sign_in_go_to_url">anant a %1$s</string>
-    <string name="tv_sign_in_or_enter_code">o introdueix el codi següent</string>
     <string name="tv_onboarding_syncing">S\'estan sincronitzant els teus pòdcasts\u2026</string>
     <string name="tv_onboarding_browse_without_account">Navega sense compte</string>
     <string name="tv_onboarding_create_free_account">Crea un compte gratuït</string>
@@ -2437,6 +2493,14 @@ Language: ca
     <plurals name="settings_auto_download_on_follow_podcast_description">
         <item quantity="one">Descarrega automàticament l\'últim episodi dels nous pòdcasts que segueixes.</item>
         <item quantity="other">Descarrega automàticament els últims %s episodis dels nous pòdcasts que segueixes.</item>
+    </plurals>
+    <plurals name="tv_playlist_all_archived">
+        <item quantity="one">L’únic episodi d’aquesta llista de reproducció s’ha arxivat.</item>
+        <item quantity="other">Tots els %1$d episodis d’aquesta llista de reproducció s’han arxivat.</item>
+    </plurals>
+    <plurals name="tv_podcast_all_archived">
+        <item quantity="one">L\'únic episodi d\'aquest pòdcast s\'ha arxivat.</item>
+        <item quantity="other">S\'han arxivat tots els %1$d episodis d\'aquest pòdcast.</item>
     </plurals>
     <plurals name="week_with_count">
         <item quantity="one">%1$d setmana</item>

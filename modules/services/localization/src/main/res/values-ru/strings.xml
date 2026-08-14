@@ -1,11 +1,68 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-07-09 11:56:29+0000
+Translation-Revision-Date: 2026-08-11 13:59:09+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+    <string name="tv_playlist_play_all_save_and_play">Сохранить и воспроизвести</string>
+    <string name="tv_playlist_play_all_play_without_saving">Воспроизвести без сохранения</string>
+    <string name="tv_episode_removed_from_up_next">Удалено из следующих</string>
+    <string name="tv_sign_in_title">Войти в Pocket Casts</string>
+    <string name="tv_create_account_modal_title">Вашим подкастам нужен свой дом</string>
+    <string name="tv_create_account_modal_subtitle">Создайте бесплатную учётную запись, чтобы подписываться на подкасты, создавать свой список «Следующих» и продолжать прослушивание с того места, на котором остановились, на любом устройстве.</string>
+    <string name="tv_episode_marked_as_played">Отмечено как прослушанный</string>
+    <string name="tv_episode_marked_as_unplayed">Отмечено как непрослушанный</string>
+    <string name="tv_episode_archived">Перенесено в архив</string>
+    <string name="tv_episode_unarchived">Разархивировано</string>
+    <string name="tv_episode_will_play_next">Будет воспроизводиться следующий</string>
+    <string name="tv_episode_will_play_last">Будет воспроизводиться последний</string>
+    <string name="tv_podcast_schedule_monthly">Ежемесячно</string>
+    <string name="tv_podcast_schedule_fortnightly">Каждые две недели</string>
+    <string name="tv_podcast_schedule_weekly">Еженедельно</string>
+    <string name="tv_podcast_schedule_daily">Ежедневно</string>
+    <string name="tv_podcast_schedule_hourly">Каждый час</string>
+    <string name="tv_podcast_next_episode_soon">В ближайшее время</string>
+    <string name="tv_podcast_next_episode_tomorrow">Завтра</string>
+    <string name="tv_podcast_info_next_episode">Следующий выпуск</string>
+    <string name="tv_podcast_info_schedule">Планировать</string>
+    <string name="tv_podcast_info_website">Веб-сайт</string>
+    <string name="tv_podcast_info_network">Сеть</string>
+    <string name="tv_create_account_modal_step_create">Создайте учётную запись или войдите</string>
+    <string name="tv_sign_in_step_confirm_code">Если потребуется, подтвердите с помощью кода ниже</string>
+    <string name="tv_sign_in_step_login">Войдите в свою учётную запись</string>
+    <string name="tv_sign_in_step_scan">Сканируйте QR-код или перейдите в %1$s</string>
+    <string name="tv_podcast_more_info">Подробнее</string>
+    <string name="tv_podcast_follow">Подписаться на этот подкаст</string>
+    <string name="tv_folder_empty_message">Добавьте подкасты в эту папку в мобильном приложении, и они появятся здесь.</string>
+    <string name="tv_up_next_empty_action_title">Добавить выпуски</string>
+    <string name="tv_your_podcasts_empty_action_title">Найти подкасты</string>
+    <string name="tv_your_podcasts_empty_subtitle">Подкасты, на которые вы подписаны, появятся здесь и будут готовы к воспроизведению.</string>
+    <string name="tv_your_podcasts_empty_title">Пора заполнять</string>
+    <string name="tv_up_next_empty_subtitle">Добавьте выпуски в «Следующие», и они будут воспроизводиться по порядку, один за другим</string>
+    <string name="tv_up_next_empty_title">Очередь пуста</string>
+    <string name="tv_episode_details">Сведения о выпуске</string>
+    <string name="playlist">Плейлист</string>
+    <string name="tv_playlist_empty_subtitle_manual">Добавьте выпуски из мобильного приложения в этот плейлист, и они появятся здесь.</string>
+    <string name="tv_playlist_empty_subtitle">У вас два варианта: порадоваться завершению этого списка или изменить правила в мобильном приложении, чтобы его расширить.</string>
+    <string name="tv_playlists_download_title">Создавайте плейлисты на телефоне</string>
+    <string name="tv_playlist_empty_title">Нет выпусков</string>
+    <string name="tv_playlist_play_all">Воспроизвести все выпуски</string>
+    <string name="tv_playlists_download_subtitle">Они будут здесь, когда вы закончите. Сканируйте, чтобы получить приложение</string>
+    <string name="tv_playlists_empty_title">Ваши плейлисты находятся здесь</string>
+    <string name="tv_playlists_empty_subtitle">Создайте его самостоятельно или поручите это Smart Rules.</string>
+    <string name="tv_playlists_empty_action_title">Создать плейлист</string>
+    <string name="tv_profile_starred_episodes">Отмеченные выпуски</string>
+    <string name="tv_home_keep_listening">Продолжать прослушивание</string>
+    <string name="settings_audio_only_summary">Если этот параметр включён, видеовыпуски будут воспроизводиться только в аудиоформате, чтобы сэкономить трафик.</string>
+    <string name="settings_audio_only">Только аудио</string>
+    <string name="profile_try_duration_for_free">Попробуйте %1$s бесплатно</string>
+    <string name="settings_generated_chapters_summary">Показывать автоматически сгенерированное оглавление, если оно имеется.</string>
+    <string name="settings_generated_chapters">Автоматическое оглавление</string>
+    <string name="profile_stats_listening_activity_info_summary">Оценка времени прослушивания на основе истории прослушиваний. Если вы прослушаете выпуск за несколько дней, он будет отображаться в последний день.</string>
+    <string name="profile_stats_listening_activity_info_title">Прослушивание</string>
+    <string name="profile_stats_listening_activity_info_help">Информация</string>
     <string name="profile_stats_listening_activity_content_description">Тепловая карта прослушиваний</string>
     <string name="profile_stats_listening_activity">Прослушивания</string>
     <string name="player_action_show_video">Показать видео</string>
@@ -23,8 +80,6 @@ Language: ru
     <string name="tv_onboarding_welcome_back">С возвращением!</string>
     <string name="tv_onboarding_sign_in_instructions">Откройте камеру и наведите на этот QR-код</string>
     <string name="tv_onboarding_sign_in_title">Вход с телефона</string>
-    <string name="tv_sign_in_go_to_url">переход к %1$s</string>
-    <string name="tv_sign_in_or_enter_code">или введите следующий код</string>
     <string name="tv_onboarding_syncing">Синхронизация подкастов\u2026</string>
     <string name="tv_onboarding_browse_without_account">Просмотр без учётной записи</string>
     <string name="tv_onboarding_create_free_account">Создать бесплатную учётную запись</string>
@@ -2462,6 +2517,16 @@ Language: ru
         <item quantity="one">Автоматически загружать свежие выпуски новых шоу, на которые вы подписаны.</item>
         <item quantity="few">Автоматически загружать свежие выпуски (%s) новых шоу, на которые вы подписаны.</item>
         <item quantity="many">Автоматически загружать свежие выпуски (%s) новых шоу, на которые вы подписаны.</item>
+    </plurals>
+    <plurals name="tv_playlist_all_archived">
+        <item quantity="one">Единственный выпуск этого плейлиста архивирован.</item>
+        <item quantity="few">Все выпуски этого плейлиста (%1$d) архивированы.</item>
+        <item quantity="many">Все выпуски этого плейлиста (%1$d) архивированы.</item>
+    </plurals>
+    <plurals name="tv_podcast_all_archived">
+        <item quantity="one">Единственный выпуск этого подкаста архивирован.</item>
+        <item quantity="few">Все выпуски этого подкаста (%1$d) архивированы.</item>
+        <item quantity="many">Все выпуски этого подкаста (%1$d) архивированы.</item>
     </plurals>
     <plurals name="week_with_count">
         <item quantity="one">%1$d нед.</item>
