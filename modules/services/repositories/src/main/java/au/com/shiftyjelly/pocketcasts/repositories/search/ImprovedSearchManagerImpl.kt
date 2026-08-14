@@ -53,6 +53,8 @@ class ImprovedSearchManagerImpl @Inject constructor(
                     publishedDate = it.publishedDate,
                     duration = it.duration.seconds,
                 )
+
+                CombinedResult.Unknown -> null
             }
         }
     }

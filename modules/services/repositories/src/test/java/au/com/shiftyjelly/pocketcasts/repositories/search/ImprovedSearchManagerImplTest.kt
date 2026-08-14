@@ -66,4 +66,24 @@ class ImprovedSearchManagerImplTest {
         val episode = results.filterIsInstance<ImprovedSearchResultItem.EpisodeItem>().single()
         assertEquals("Business Daily", episode.podcastTitle)
     }
+
+    @Test
+    fun `combined search drops unknown result types`() = runTest {
+        whenever(combinedSearchService.combinedSearch(any())) doReturn CombinedSearchResponse(
+            results = listOf(
+                CombinedResult.PodcastResult(
+                    uuid = "podcast-uuid",
+                    title = "Big Sugar",
+                    author = "Weekday Fun Productions",
+                    slug = "big-sugar",
+                    explicit = false,
+                ),
+                CombinedResult.Unknown,
+            ),
+        )
+
+        val results = manager.combinedSearch("big sugar")
+
+        assertEquals(listOf("podcast-uuid"), results.map { it.uuid })
+    }
 }
