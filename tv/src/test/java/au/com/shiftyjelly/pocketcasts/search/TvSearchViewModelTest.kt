@@ -307,6 +307,28 @@ class TvSearchViewModelTest {
         assertEquals(TvSearchState.Error, viewModel.searchState.value)
     }
 
+    @Test
+    fun `onFilterSelected updates the filter`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        val viewModel = createViewModel()
+
+        viewModel.onFilterSelected(TvSearchFilter.Episodes)
+
+        assertEquals(TvSearchFilter.Episodes, viewModel.filter.value)
+    }
+
+    @Test
+    fun `clearing the query resets the filter to top results`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        val viewModel = createViewModel()
+
+        viewModel.onFilterSelected(TvSearchFilter.Podcasts)
+        viewModel.onQueryChange("")
+        advanceUntilIdle()
+
+        assertEquals(TvSearchFilter.TopResults, viewModel.filter.value)
+    }
+
     private fun podcastItem(uuid: String) = ImprovedSearchResultItem.PodcastItem(
         uuid = uuid,
         title = "Podcast $uuid",

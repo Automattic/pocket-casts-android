@@ -21,6 +21,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
@@ -30,20 +31,21 @@ import kotlinx.coroutines.flow.first
 
 @Composable
 internal fun TvPodcastGridScaffold(
-    title: String,
     itemKeys: List<Any>,
     modifier: Modifier = Modifier,
+    title: String? = null,
+    horizontalContentPadding: Dp = 32.dp,
     autoFocusFirstItem: Boolean = false,
     restoreFocusTrigger: Int = 0,
     itemContent: @Composable (index: Int, itemModifier: Modifier) -> Unit,
 ) {
     Column(modifier = modifier) {
-        if (title.isNotEmpty()) {
+        if (title != null) {
             Text(
                 text = title,
                 style = MaterialTheme.tvTypography.title3,
                 color = MaterialTheme.tvColors.textPrimary,
-                modifier = Modifier.padding(start = 32.dp, top = 8.dp, bottom = 10.dp),
+                modifier = Modifier.padding(start = horizontalContentPadding, top = 8.dp, bottom = 10.dp),
             )
         }
         val gridState = rememberLazyGridState()
@@ -74,7 +76,7 @@ internal fun TvPodcastGridScaffold(
             columns = GridCells.Fixed(GRID_COLUMNS),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
-            contentPadding = PaddingValues(start = 32.dp, top = 16.dp, end = 32.dp, bottom = 32.dp),
+            contentPadding = PaddingValues(start = horizontalContentPadding, top = 16.dp, end = horizontalContentPadding, bottom = 32.dp),
             modifier = Modifier
                 .focusRequester(gridFocusRequester)
                 .focusGroup()

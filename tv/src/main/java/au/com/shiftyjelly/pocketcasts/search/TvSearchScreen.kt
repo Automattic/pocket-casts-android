@@ -26,6 +26,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
@@ -65,7 +66,8 @@ import au.com.shiftyjelly.pocketcasts.theme.tvColors
 import androidx.compose.foundation.lazy.grid.itemsIndexed as gridItemsIndexed
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-private val ContentPadding = PaddingValues(horizontal = 48.dp)
+private val ContentHorizontalPadding = 48.dp
+private val ContentPadding = PaddingValues(horizontal = ContentHorizontalPadding)
 private const val TOP_RESULTS_PREVIEW_COUNT = 6
 private const val EPISODE_GRID_COLUMNS = 2
 
@@ -163,14 +165,11 @@ private fun TvSearchContent(
     restoreFocusTrigger: Int = 0,
 ) {
     val searchFieldFocusRequester = remember { FocusRequester() }
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .focusGroup()
-            .focusProperties {
-                onEnter = { runCatching { searchFieldFocusRequester.requestFocus() } }
-            },
-    ) {
+    LaunchedEffect(Unit) {
+        withFrameNanos {}
+        runCatching { searchFieldFocusRequester.requestFocus() }
+    }
+    Column(modifier = modifier.fillMaxSize()) {
         Column(modifier = Modifier.padding(ContentPadding)) {
             Spacer(modifier = Modifier.height(40.dp))
             TvSearchField(
@@ -185,7 +184,7 @@ private fun TvSearchContent(
             TvSearchFilters(
                 selected = filter,
                 onFilterSelect = onFilterSelect,
-                modifier = Modifier.padding(horizontal = 48.dp),
+                modifier = Modifier.padding(ContentPadding),
             )
             Spacer(modifier = Modifier.height(24.dp))
         }
@@ -300,9 +299,9 @@ private fun TvSearchResults(
             )
         } else {
             TvPodcastGridScaffold(
-                title = "",
                 itemKeys = results.podcasts.map(ImprovedSearchResultItem.PodcastItem::uuid),
                 modifier = Modifier.fillMaxSize(),
+                horizontalContentPadding = ContentHorizontalPadding,
                 restoreFocusTrigger = restoreFocusTrigger,
             ) { index, itemModifier ->
                 val podcast = results.podcasts[index]

@@ -91,7 +91,7 @@ fun TvTabBar(
                         currentTabPosition = currentTabPosition,
                         doesTabRowHaveFocus = doesTabRowHaveFocus,
                         activeColor = MaterialTheme.tvColors.backgroundActive,
-                        inactiveColor = MaterialTheme.tvColors.backgroundActive,
+                        inactiveColor = MaterialTheme.tvColors.backgroundBase,
                     )
                 }
             },
@@ -107,7 +107,7 @@ fun TvTabBar(
                         .then(if (index == selectedTabIndex) Modifier.focusRequester(focusRequester) else Modifier),
                     colors = TabDefaults.pillIndicatorTabColors(
                         contentColor = MaterialTheme.tvColors.textPrimary,
-                        selectedContentColor = MaterialTheme.tvColors.textPrimaryActive,
+                        selectedContentColor = MaterialTheme.tvColors.textPrimary,
                         focusedContentColor = MaterialTheme.tvColors.textPrimary,
                         focusedSelectedContentColor = MaterialTheme.tvColors.textPrimaryActive,
                         inactiveContentColor = MaterialTheme.tvColors.textPrimary,

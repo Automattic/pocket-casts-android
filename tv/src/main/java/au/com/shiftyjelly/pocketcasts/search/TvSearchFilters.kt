@@ -69,7 +69,7 @@ private fun TvSearchFilterPills(
                         currentTabPosition = currentTabPosition,
                         doesTabRowHaveFocus = doesTabRowHaveFocus,
                         activeColor = MaterialTheme.tvColors.backgroundActive,
-                        inactiveColor = MaterialTheme.tvColors.backgroundActive,
+                        inactiveColor = MaterialTheme.tvColors.backgroundBase,
                     )
                 }
             },
@@ -84,7 +84,7 @@ private fun TvSearchFilterPills(
                         .padding(horizontal = 21.dp),
                     colors = TabDefaults.pillIndicatorTabColors(
                         contentColor = MaterialTheme.tvColors.textPrimary,
-                        selectedContentColor = MaterialTheme.tvColors.textPrimaryActive,
+                        selectedContentColor = MaterialTheme.tvColors.textPrimary,
                         focusedContentColor = MaterialTheme.tvColors.textPrimary,
                         focusedSelectedContentColor = MaterialTheme.tvColors.textPrimaryActive,
                         inactiveContentColor = MaterialTheme.tvColors.textPrimary,
