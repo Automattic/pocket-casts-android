@@ -78,7 +78,8 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private val ContentHorizontalPadding = 48.dp
 private val ContentPadding = PaddingValues(horizontal = ContentHorizontalPadding)
-private const val TOP_RESULTS_PREVIEW_COUNT = 6
+private const val SEARCH_ROW_LIMIT = 10
+private val SearchEpisodeCardWidth = 360.dp
 private const val EPISODE_GRID_COLUMNS = 2
 
 @Composable
@@ -462,7 +463,6 @@ private fun TvSearchTopResults(
     restoreFocusTrigger: Int,
 ) {
     val restoreFocusRequester = remember { FocusRequester() }
-    val hasPodcasts = podcasts.isNotEmpty()
     var isInitialComposition by remember { mutableStateOf(true) }
     LaunchedEffect(restoreFocusTrigger) {
         if (isInitialComposition) {
@@ -472,39 +472,71 @@ private fun TvSearchTopResults(
         }
     }
 
+    val featured = episodes.filter { it.hasVideo }.take(SEARCH_ROW_LIMIT)
+    val otherEpisodes = episodes.filterNot { it.hasVideo }.take(SEARCH_ROW_LIMIT)
+    val topPodcasts = podcasts.take(SEARCH_ROW_LIMIT)
+    val featuredFirst = featured.isNotEmpty()
+    val episodesFirst = !featuredFirst && otherEpisodes.isNotEmpty()
+    val podcastsFirst = !featuredFirst && !episodesFirst
+
     LazyColumn(modifier = Modifier.fillMaxSize()) {
-        if (hasPodcasts) {
+        item { Spacer(modifier = Modifier.height(8.dp)) }
+        if (featured.isNotEmpty()) {
+            item {
+                TvSearchEpisodeCarousel(
+                    title = stringResource(LR.string.tv_search_featured),
+                    episodes = featured,
+                    onPlayEpisode = onPlayEpisode,
+                    onOpenEpisodeActions = onOpenEpisodeActions,
+                    focusRequester = restoreFocusRequester.takeIf { featuredFirst },
+                )
+            }
+        }
+        if (otherEpisodes.isNotEmpty()) {
+            item { Spacer(modifier = Modifier.height(24.dp)) }
+            item {
+                TvSearchEpisodeCarousel(
+                    title = stringResource(LR.string.episodes),
+                    episodes = otherEpisodes,
+                    onPlayEpisode = onPlayEpisode,
+                    onOpenEpisodeActions = onOpenEpisodeActions,
+                    focusRequester = restoreFocusRequester.takeIf { episodesFirst },
+                )
+            }
+        }
+        if (topPodcasts.isNotEmpty()) {
+            item { Spacer(modifier = Modifier.height(24.dp)) }
             tvSearchPodcastsRow(
-                podcasts = podcasts,
+                podcasts = topPodcasts,
                 onOpenPodcast = onOpenPodcast,
-                focusRequester = restoreFocusRequester,
+                focusRequester = restoreFocusRequester.takeIf { podcastsFirst },
             )
         }
-        if (episodes.isNotEmpty()) {
-            item {
-                Spacer(modifier = Modifier.height(24.dp))
-                TvSectionTitle(
-                    title = stringResource(LR.string.episodes),
-                    modifier = Modifier
-                        .padding(ContentPadding)
-                        .padding(bottom = 17.dp),
-                )
-            }
-            itemsIndexed(
-                items = episodes.take(TOP_RESULTS_PREVIEW_COUNT),
-                key = { _, episode -> episode.uuid },
-            ) { index, episode ->
-                TvSearchEpisodeRow(
-                    episode = episode,
-                    onClick = { onPlayEpisode(episode) },
-                    onOpenActions = { onOpenEpisodeActions(episode) },
-                    modifier = Modifier.padding(ContentPadding),
-                    episodeFocusRequester = if (!hasPodcasts && index == 0) restoreFocusRequester else null,
-                )
-                Spacer(modifier = Modifier.height(12.dp))
-            }
-        }
         item { Spacer(modifier = Modifier.height(40.dp)) }
+    }
+}
+
+@Composable
+private fun TvSearchEpisodeCarousel(
+    title: String,
+    episodes: List<ImprovedSearchResultItem.EpisodeItem>,
+    onPlayEpisode: (ImprovedSearchResultItem.EpisodeItem) -> Unit,
+    onOpenEpisodeActions: (ImprovedSearchResultItem.EpisodeItem) -> Unit,
+    focusRequester: FocusRequester?,
+) {
+    TvRow(
+        title = title,
+        items = episodes,
+        contentPadding = ContentPadding,
+        key = ImprovedSearchResultItem.EpisodeItem::uuid,
+        focusRequester = focusRequester,
+    ) { episode ->
+        TvSearchEpisodeCard(
+            episode = episode,
+            onClick = { onPlayEpisode(episode) },
+            onLongClick = { onOpenEpisodeActions(episode) },
+            modifier = Modifier.width(SearchEpisodeCardWidth),
+        )
     }
 }
 
@@ -570,7 +602,7 @@ private fun TvSearchEpisodeGrid(
 private fun LazyListScope.tvSearchPodcastsRow(
     podcasts: List<ImprovedSearchResultItem.PodcastItem>,
     onOpenPodcast: (String) -> Unit,
-    focusRequester: FocusRequester,
+    focusRequester: FocusRequester?,
 ) {
     item {
         TvRow(
