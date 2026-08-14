@@ -154,11 +154,11 @@ fun TvPlaylistDetailsScreen(
 private fun TvPlaylistDetailsContent(
     uiState: TvPlaylistDetailsUiState,
     onChangeSortType: (PlaylistEpisodeSortType) -> Unit,
+    onSortTap: () -> Unit,
     onToggleArchiveFilter: () -> Unit,
     onOpenPodcast: (String) -> Unit,
     onPlayAll: () -> Unit,
     modifier: Modifier = Modifier,
-    onSortTap: () -> Unit = {},
 ) {
     Box(modifier = modifier.fillMaxSize()) {
         when (uiState) {
@@ -207,11 +207,11 @@ private fun TvPlaylistDetailsContent(
 private fun SortableEpisodeList(
     uiState: TvPlaylistDetailsUiState.Loaded,
     onChangeSortType: (PlaylistEpisodeSortType) -> Unit,
+    onSortTap: () -> Unit,
     onToggleArchiveFilter: () -> Unit,
     onOpenPodcast: (String) -> Unit,
     playAllFocusRequester: FocusRequester,
     modifier: Modifier = Modifier,
-    onSortTap: () -> Unit = {},
 ) {
     val listState = rememberLazyListState()
     val sortType = uiState.playlist.settings.sortType
@@ -503,6 +503,7 @@ private fun TvPlaylistDetailsPreview() {
                 isShowingArchivedOnDevice = false,
             ),
             onChangeSortType = {},
+            onSortTap = {},
             onToggleArchiveFilter = {},
             onOpenPodcast = {},
             onPlayAll = {},
@@ -535,6 +536,7 @@ private fun TvPlaylistDetailsLoadedPreview() {
                 isShowingArchivedOnDevice = false,
             ),
             onChangeSortType = {},
+            onSortTap = {},
             onToggleArchiveFilter = {},
             onOpenPodcast = {},
             onPlayAll = {},

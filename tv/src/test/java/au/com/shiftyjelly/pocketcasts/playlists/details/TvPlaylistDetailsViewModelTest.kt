@@ -5,12 +5,14 @@ import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
+import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import au.com.shiftyjelly.pocketcasts.preferences.TvPreferences
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlayAllHandler
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlayAllResponse
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.ManualPlaylist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.SmartPlaylist
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.FilterHideArchivedTappedEvent
@@ -111,7 +113,7 @@ class TvPlaylistDetailsViewModelTest {
         viewModel.uiState.test {
             assertEquals(TvPlaylistDetailsUiState.Loading, awaitItem())
 
-            smartPlaylists.emit(playlist(availableEpisode, archivedEpisode))
+            smartPlaylists.emit(smartPlaylist(availableEpisode, archivedEpisode))
 
             val state = awaitItem() as TvPlaylistDetailsUiState.Loaded
             assertEquals(listOf(availableEpisode), state.episodes)
@@ -397,6 +399,7 @@ class TvPlaylistDetailsViewModelTest {
 
         verify(eventHorizon, never()).track(FilterShowArchivedTappedEvent)
         verify(eventHorizon, never()).track(FilterHideArchivedTappedEvent)
+        verify(preferences, never()).setPlaylistShowingArchived(any(), any())
     }
 
     @Test
@@ -417,6 +420,23 @@ class TvPlaylistDetailsViewModelTest {
     }
 
     @Test
+    fun `play all does not track the tapped event when there are no episodes`() = runTest {
+        whenever(playAllHandler.handlePlayAllEpisodes(any())) doReturn PlayAllResponse.ShowNoEpisodesToPlay
+        val viewModel = createViewModel()
+
+        viewModel.uiState.test {
+            assertEquals(TvPlaylistDetailsUiState.Loading, awaitItem())
+            playlists.emit(playlist())
+            awaitItem()
+            viewModel.playAll()
+            advanceUntilIdle()
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        verify(eventHorizon, never()).track(any<FilterPlayAllTappedEvent>())
+    }
+
+    @Test
     fun `replacing up next tracks the replace and play event`() = runTest {
         val viewModel = createViewModel()
 
@@ -424,6 +444,16 @@ class TvPlaylistDetailsViewModelTest {
         advanceUntilIdle()
 
         verify(eventHorizon).track(FilterPlayAllReplaceAndPlayTappedEvent(filterType = PlaylistType.Manual, saveUpNext = true))
+    }
+
+    @Test
+    fun `replacing up next without saving tracks the replace and play event with save disabled`() = runTest {
+        val viewModel = createViewModel()
+
+        viewModel.replaceUpNextAndPlay(saveUpNext = false, upNextName = "Up Next")
+        advanceUntilIdle()
+
+        verify(eventHorizon).track(FilterPlayAllReplaceAndPlayTappedEvent(filterType = PlaylistType.Manual, saveUpNext = false))
     }
 
     @Test
@@ -466,6 +496,15 @@ class TvPlaylistDetailsViewModelTest {
     private fun playlist(vararg episodes: PodcastEpisode) = ManualPlaylist(
         uuid = "playlist-uuid",
         title = "Playlist",
+        episodes = episodes.map(PlaylistEpisode::Available),
+        settings = Playlist.Settings.ForPreview,
+        metadata = Playlist.Metadata.ForPreview,
+    )
+
+    private fun smartPlaylist(vararg episodes: PodcastEpisode) = SmartPlaylist(
+        uuid = "playlist-uuid",
+        title = "Playlist",
+        smartRules = SmartRules.Default,
         episodes = episodes.map(PlaylistEpisode::Available),
         settings = Playlist.Settings.ForPreview,
         metadata = Playlist.Metadata.ForPreview,
