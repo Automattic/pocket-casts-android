@@ -206,6 +206,18 @@ class TvSearchViewModelTest {
     }
 
     @Test
+    fun `categoryPodcasts maps the loaded category feed`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        whenever(listRepository.getHomeDiscoverFeed(isLoggedIn = false)).thenReturn(discover())
+        whenever(listRepository.getListFeed(eq("https://category/us.json"), any()))
+            .thenReturn(podcastFeed("podcast-1", "podcast-2"))
+
+        val podcasts = createViewModel().categoryPodcasts(categoryId = 7, source = "https://category/us.json")
+
+        assertEquals(listOf("podcast-1", "podcast-2"), podcasts.map { it.uuid })
+    }
+
+    @Test
     fun `categories still load when building the discover rows fails`() = runTest {
         whenever(listRepository.getSearchDiscoverFeed()).thenReturn(
             Discover(

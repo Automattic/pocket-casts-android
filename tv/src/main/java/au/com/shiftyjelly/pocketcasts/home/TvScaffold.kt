@@ -109,9 +109,7 @@ fun TvScaffold(
                     onConsumeOpenRequest = { isNowPlayingOpenRequested = false },
                 )
 
-                is TvTab.Search -> Box(modifier = belowTopBar) {
-                    TvSearchScreen()
-                }
+                is TvTab.Search -> TvSearchScreen()
             }
         }
 

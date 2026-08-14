@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverFeedLoader
+import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverRow
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -131,6 +132,10 @@ class TvSearchViewModel @Inject constructor(
 
     fun onFilterSelected(filter: TvSearchFilter) {
         _filter.value = filter
+    }
+
+    suspend fun categoryPodcasts(categoryId: Int, source: String): List<TvDiscoverPodcast> {
+        return discoverFeedLoader.loadCategoryPodcasts(source, categoryId, syncManager.isLoggedIn())
     }
 
     fun playEpisode(episode: ImprovedSearchResultItem.EpisodeItem) {

@@ -54,7 +54,10 @@ import au.com.shiftyjelly.pocketcasts.component.TvRow
 import au.com.shiftyjelly.pocketcasts.component.TvSectionTitle
 import au.com.shiftyjelly.pocketcasts.component.tvFocusInactiveWhen
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
+import au.com.shiftyjelly.pocketcasts.discover.TvCategoryPodcastsScreen
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverRow
+import au.com.shiftyjelly.pocketcasts.discover.TvOpenedCategory
+import au.com.shiftyjelly.pocketcasts.discover.TvOpenedCategorySaver
 import au.com.shiftyjelly.pocketcasts.discover.tvDiscoverRow
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.ImprovedSearchResultItem
@@ -62,6 +65,7 @@ import au.com.shiftyjelly.pocketcasts.podcasts.TvPodcastDetailsScreen
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 import au.com.shiftyjelly.pocketcasts.theme.TvTheme
+import au.com.shiftyjelly.pocketcasts.theme.TvTopBarHeight
 import au.com.shiftyjelly.pocketcasts.theme.tvColors
 import androidx.compose.foundation.lazy.grid.itemsIndexed as gridItemsIndexed
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -84,9 +88,12 @@ fun TvSearchScreen(
     val actionsEpisode by viewModel.actionsEpisode.collectAsStateWithLifecycle()
 
     var openedPodcastUuid by rememberSaveable { mutableStateOf<String?>(null) }
+    var openedCategory by rememberSaveable(stateSaver = TvOpenedCategorySaver) { mutableStateOf<TvOpenedCategory?>(null) }
     var detailsEpisode by remember { mutableStateOf<PodcastEpisode?>(null) }
     var restoreFocusTrigger by remember { mutableIntStateOf(0) }
+    var categoryRestoreTrigger by remember { mutableIntStateOf(0) }
     val podcastUuid = openedPodcastUuid
+    val category = openedCategory
 
     val openNowPlaying = LocalOpenNowPlaying.current
     val toastHostState = LocalTvToastHostState.current
@@ -108,17 +115,34 @@ fun TvSearchScreen(
             onQueryChange = viewModel::onQueryChange,
             onFilterSelect = viewModel::onFilterSelected,
             onOpenPodcast = { openedPodcastUuid = it },
+            onOpenCategory = { openedCategory = TvOpenedCategory(it.id, it.name, it.source) },
             onPlayEpisode = viewModel::playEpisode,
             onOpenEpisodeActions = viewModel::openEpisodeActions,
             restoreFocusTrigger = restoreFocusTrigger,
             modifier = Modifier
                 .fillMaxSize()
-                .tvFocusInactiveWhen(podcastUuid != null),
+                .padding(top = TvTopBarHeight)
+                .tvFocusInactiveWhen(podcastUuid != null || category != null),
         )
+        TvDetailOverlay(
+            target = category,
+            onBack = { openedCategory = null },
+            modifier = Modifier.tvFocusInactiveWhen(podcastUuid != null),
+            onHide = { restoreFocusTrigger++ },
+        ) { openCategory ->
+            TvCategoryPodcastsScreen(
+                categoryName = openCategory.name,
+                categorySource = openCategory.source,
+                getCategoryPodcasts = { source -> viewModel.categoryPodcasts(openCategory.id, source) },
+                onOpenPodcast = { openedPodcastUuid = it },
+                onClose = { openedCategory = null },
+                restoreFocusTrigger = categoryRestoreTrigger,
+            )
+        }
         TvDetailOverlay(
             target = podcastUuid,
             onBack = { openedPodcastUuid = null },
-            onHide = { restoreFocusTrigger++ },
+            onHide = { if (openedCategory != null) categoryRestoreTrigger++ else restoreFocusTrigger++ },
         ) { uuid ->
             TvPodcastDetailsScreen(
                 podcastUuid = uuid,
@@ -159,6 +183,7 @@ private fun TvSearchContent(
     onQueryChange: (String) -> Unit,
     onFilterSelect: (TvSearchFilter) -> Unit,
     onOpenPodcast: (String) -> Unit,
+    onOpenCategory: (DiscoverCategory) -> Unit,
     onPlayEpisode: (ImprovedSearchResultItem.EpisodeItem) -> Unit,
     onOpenEpisodeActions: (ImprovedSearchResultItem.EpisodeItem) -> Unit,
     modifier: Modifier = Modifier,
@@ -198,6 +223,9 @@ private fun TvSearchContent(
                 is TvSearchState.Idle -> TvSearchDiscover(
                     categories = categories,
                     discoverRows = discoverRows,
+                    onOpenPodcast = onOpenPodcast,
+                    onOpenCategory = onOpenCategory,
+                    restoreFocusTrigger = restoreFocusTrigger,
                 )
 
                 is TvSearchState.Searching -> LoadingView(
@@ -234,7 +262,24 @@ private fun TvSearchContent(
 private fun TvSearchDiscover(
     categories: List<DiscoverCategory>,
     discoverRows: List<TvDiscoverRow>,
+    onOpenPodcast: (String) -> Unit,
+    onOpenCategory: (DiscoverCategory) -> Unit,
+    restoreFocusTrigger: Int,
 ) {
+    val categoryOffset = if (categories.isNotEmpty()) 1 else 0
+    val rowCount = categoryOffset + discoverRows.size
+    val rowFocusRequesters = remember(rowCount) { List(rowCount) { FocusRequester() } }
+    var lastFocusedRowIndex by rememberSaveable(rowCount) { mutableIntStateOf(0) }
+
+    var isInitialComposition by remember { mutableStateOf(true) }
+    LaunchedEffect(restoreFocusTrigger) {
+        if (isInitialComposition) {
+            isInitialComposition = false
+        } else {
+            runCatching { rowFocusRequesters.getOrNull(lastFocusedRowIndex)?.requestFocus() }
+        }
+    }
+
     LazyColumn(modifier = Modifier.fillMaxSize()) {
         if (categories.isNotEmpty()) {
             item {
@@ -253,19 +298,25 @@ private fun TvSearchDiscover(
                     items = categories,
                     contentPadding = ContentPadding,
                     key = { it.id },
+                    focusRequester = rowFocusRequesters.getOrNull(0),
+                    modifier = Modifier.onFocusChanged { if (it.hasFocus) lastFocusedRowIndex = 0 },
                 ) { category ->
-                    TvCategoryTile(category = category, onClick = {})
+                    TvCategoryTile(category = category, onClick = { onOpenCategory(category) })
                 }
             }
         }
 
-        discoverRows.forEach { row ->
+        discoverRows.forEachIndexed { index, row ->
+            val rowIndex = categoryOffset + index
             item { Spacer(modifier = Modifier.height(24.dp)) }
             tvDiscoverRow(
                 row = row,
-                onOpenPodcast = {},
-                onPlayEpisode = {},
+                onOpenPodcast = onOpenPodcast,
+                onPlayEpisode = {}, // TODO: wire discover-feed episode playback in search
                 contentPadding = ContentPadding,
+                onOpenCategory = onOpenCategory,
+                focusRequester = rowFocusRequesters.getOrNull(rowIndex),
+                modifier = Modifier.onFocusChanged { if (it.hasFocus) lastFocusedRowIndex = rowIndex },
             )
         }
 
@@ -503,6 +554,7 @@ private fun TvSearchScreenPreview() {
                 onQueryChange = {},
                 onFilterSelect = {},
                 onOpenPodcast = {},
+                onOpenCategory = {},
                 onPlayEpisode = {},
                 onOpenEpisodeActions = {},
             )
