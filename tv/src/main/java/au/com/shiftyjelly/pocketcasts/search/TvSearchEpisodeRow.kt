@@ -1,13 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.search
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.expandHorizontally
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkHorizontally
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -27,6 +18,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
@@ -37,7 +30,7 @@ import androidx.tv.material3.CardDefaults
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.component.TvArtworkImage
-import au.com.shiftyjelly.pocketcasts.component.TvMoreButton
+import au.com.shiftyjelly.pocketcasts.component.TvEpisodeListItemContainer
 import au.com.shiftyjelly.pocketcasts.component.TvTile
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.to.ImprovedSearchResultItem
@@ -48,41 +41,24 @@ import au.com.shiftyjelly.pocketcasts.theme.tvTypography
 import java.util.Date
 import kotlin.time.Duration.Companion.seconds
 
-private const val MORE_BUTTON_ANIMATION_DURATION_MS = 200
-
 @Composable
 internal fun TvSearchEpisodeRow(
     episode: ImprovedSearchResultItem.EpisodeItem,
     onClick: () -> Unit,
     onOpenActions: () -> Unit,
     modifier: Modifier = Modifier,
+    episodeFocusRequester: FocusRequester? = null,
 ) {
-    var isItemFocused by remember { mutableStateOf(false) }
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier
-            .fillMaxWidth()
-            .onFocusChanged { isItemFocused = it.hasFocus },
-    ) {
+    TvEpisodeListItemContainer(
+        onOpenActions = onOpenActions,
+        modifier = modifier,
+    ) { rowModifier ->
         TvSearchEpisodeCard(
             episode = episode,
             onClick = onClick,
-            modifier = Modifier.weight(1f),
+            modifier = rowModifier
+                .then(if (episodeFocusRequester != null) Modifier.focusRequester(episodeFocusRequester) else Modifier),
         )
-        AnimatedVisibility(
-            visible = isItemFocused,
-            enter = expandHorizontally(tween(MORE_BUTTON_ANIMATION_DURATION_MS), expandFrom = Alignment.Start) +
-                slideInHorizontally(tween(MORE_BUTTON_ANIMATION_DURATION_MS), initialOffsetX = { it }) +
-                fadeIn(tween(MORE_BUTTON_ANIMATION_DURATION_MS)),
-            exit = shrinkHorizontally(tween(MORE_BUTTON_ANIMATION_DURATION_MS), shrinkTowards = Alignment.Start) +
-                slideOutHorizontally(tween(MORE_BUTTON_ANIMATION_DURATION_MS), targetOffsetX = { it }) +
-                fadeOut(tween(MORE_BUTTON_ANIMATION_DURATION_MS)),
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Spacer(modifier = Modifier.width(16.dp))
-                TvMoreButton(onClick = onOpenActions)
-            }
-        }
     }
 }
 

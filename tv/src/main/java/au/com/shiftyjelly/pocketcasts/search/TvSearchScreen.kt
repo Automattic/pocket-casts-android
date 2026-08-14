@@ -13,7 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -27,17 +27,12 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.PlatformTextStyle
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.MaterialTheme
-import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.component.LocalOpenNowPlaying
 import au.com.shiftyjelly.pocketcasts.component.LocalTvToastHostState
 import au.com.shiftyjelly.pocketcasts.component.TvCategoryTile
@@ -49,6 +44,7 @@ import au.com.shiftyjelly.pocketcasts.component.TvEpisodeInfoModal
 import au.com.shiftyjelly.pocketcasts.component.TvPodcastTile
 import au.com.shiftyjelly.pocketcasts.component.TvPodcastTileDefaults
 import au.com.shiftyjelly.pocketcasts.component.TvRow
+import au.com.shiftyjelly.pocketcasts.component.TvSectionTitle
 import au.com.shiftyjelly.pocketcasts.component.tvFocusInactiveWhen
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverRow
@@ -189,7 +185,9 @@ private fun TvSearchContent(
 
                 is TvSearchState.Error -> TvSearchMessage(
                     title = stringResource(LR.string.error_generic_message),
-                    subtitle = stringResource(LR.string.tv_search_no_results_subtitle),
+                    subtitle = stringResource(LR.string.tv_search_error_subtitle),
+                    actionLabel = stringResource(LR.string.retry),
+                    onAction = { onQueryChange(query) },
                 )
 
                 is TvSearchState.NoResults -> TvSearchMessage(
@@ -260,38 +258,45 @@ private fun TvSearchResults(
     onOpenEpisodeActions: (ImprovedSearchResultItem.EpisodeItem) -> Unit,
     restoreFocusTrigger: Int,
 ) {
-    val podcastsRowFocusRequester = remember { FocusRequester() }
+    val restoreFocusRequester = remember { FocusRequester() }
+    val hasPodcasts = results.podcasts.isNotEmpty()
     var isInitialComposition by remember { mutableStateOf(true) }
     LaunchedEffect(restoreFocusTrigger) {
         if (isInitialComposition) {
             isInitialComposition = false
         } else {
-            runCatching { podcastsRowFocusRequester.requestFocus() }
+            runCatching { restoreFocusRequester.requestFocus() }
         }
     }
 
     LazyColumn(modifier = Modifier.fillMaxSize()) {
-        if (results.podcasts.isNotEmpty()) {
+        if (hasPodcasts) {
             tvSearchPodcastsRow(
                 podcasts = results.podcasts,
                 onOpenPodcast = onOpenPodcast,
-                focusRequester = podcastsRowFocusRequester,
+                focusRequester = restoreFocusRequester,
             )
         }
         if (results.episodes.isNotEmpty()) {
             item {
                 Spacer(modifier = Modifier.height(24.dp))
-                TvSearchSectionTitle(stringResource(LR.string.episodes))
+                TvSectionTitle(
+                    title = stringResource(LR.string.episodes),
+                    modifier = Modifier
+                        .padding(ContentPadding)
+                        .padding(bottom = 17.dp),
+                )
             }
-            items(
+            itemsIndexed(
                 items = results.episodes,
-                key = ImprovedSearchResultItem.EpisodeItem::uuid,
-            ) { episode ->
+                key = { _, episode -> episode.uuid },
+            ) { index, episode ->
                 TvSearchEpisodeRow(
                     episode = episode,
                     onClick = { onPlayEpisode(episode) },
                     onOpenActions = { onOpenEpisodeActions(episode) },
                     modifier = Modifier.padding(ContentPadding),
+                    episodeFocusRequester = if (!hasPodcasts && index == 0) restoreFocusRequester else null,
                 )
                 Spacer(modifier = Modifier.height(12.dp))
             }
@@ -324,27 +329,17 @@ private fun LazyListScope.tvSearchPodcastsRow(
 }
 
 @Composable
-private fun TvSearchSectionTitle(title: String) {
-    Text(
-        text = title,
-        color = MaterialTheme.tvColors.textPrimary,
-        style = TextStyle(
-            fontSize = 17.sp,
-            fontWeight = FontWeight(500),
-            platformStyle = PlatformTextStyle(includeFontPadding = false),
-        ),
-        modifier = Modifier.padding(start = 48.dp, bottom = 17.dp),
-    )
-}
-
-@Composable
 private fun TvSearchMessage(
     title: String,
     subtitle: String,
+    actionLabel: String? = null,
+    onAction: (() -> Unit)? = null,
 ) {
     TvEmptyState(
         title = title,
         subtitle = subtitle,
+        actionLabel = actionLabel,
+        onAction = onAction,
         modifier = Modifier.fillMaxSize(),
     )
 }

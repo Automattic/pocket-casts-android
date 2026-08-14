@@ -40,6 +40,7 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyBlocking
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -233,6 +234,36 @@ class TvSearchViewModelTest {
         val state = viewModel.searchState.value as TvSearchState.Results
         assertEquals(listOf("podcast-1"), state.podcasts.map { it.uuid })
         assertEquals(listOf("episode-1"), state.episodes.map { it.uuid })
+    }
+
+    @Test
+    fun `episodes are de-duplicated by uuid`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        whenever { improvedSearchManager.combinedSearch(any()) }.thenReturn(
+            listOf(episodeItem("episode-1"), episodeItem("episode-1"), episodeItem("episode-2")),
+        )
+
+        val viewModel = createViewModel()
+        viewModel.onQueryChange("sugar")
+        advanceUntilIdle()
+
+        val state = viewModel.searchState.value as TvSearchState.Results
+        assertEquals(listOf("episode-1", "episode-2"), state.episodes.map { it.uuid })
+    }
+
+    @Test
+    fun `keystrokes within the debounce window only search the last term`() = runTest {
+        whenever(settings.getPodcastSearchDebounceMs()).thenReturn(300)
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        whenever { improvedSearchManager.combinedSearch(any()) }.thenReturn(emptyList())
+
+        val viewModel = createViewModel()
+        viewModel.onQueryChange("su")
+        viewModel.onQueryChange("sugar")
+        advanceUntilIdle()
+
+        verifyBlocking(improvedSearchManager) { combinedSearch(eq("sugar")) }
+        verifyBlocking(improvedSearchManager, never()) { combinedSearch(eq("su")) }
     }
 
     @Test

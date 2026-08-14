@@ -108,6 +108,7 @@ class TvSearchViewModel @Inject constructor(
                 val podcasts = (localPodcasts + remoteResults.filterIsInstance<ImprovedSearchResultItem.PodcastItem>())
                     .distinctBy(ImprovedSearchResultItem.PodcastItem::uuid)
                 val episodes = remoteResults.filterIsInstance<ImprovedSearchResultItem.EpisodeItem>()
+                    .distinctBy(ImprovedSearchResultItem.EpisodeItem::uuid)
                 if (podcasts.isEmpty() && episodes.isEmpty()) {
                     TvSearchState.NoResults
                 } else {
