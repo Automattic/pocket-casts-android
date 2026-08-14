@@ -261,6 +261,7 @@
     <string name="tv_banner_discover_more_subtitle">Your next obsession is in here somewhere</string>
     <string name="tv_banner_discover_more_action_title">Discover more shows</string>
     <string name="tv_search_prompt">Podcasts, shows, authors</string>
+    <string name="tv_search_recent">Recent searches</string>
     <string name="tv_search_searching">Searching…</string>
     <string name="tv_search_no_results_title">No results</string>
     <string name="tv_search_no_results_for_title">No results for \“%1$s\”</string>

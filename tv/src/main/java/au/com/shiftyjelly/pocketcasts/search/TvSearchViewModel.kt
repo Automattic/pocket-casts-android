@@ -12,10 +12,12 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.ImprovedSearchResultItem
 import au.com.shiftyjelly.pocketcasts.models.to.SearchAutoCompleteItem
+import au.com.shiftyjelly.pocketcasts.models.to.SearchHistoryEntry
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.search.ImprovedSearchManager
+import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -43,6 +45,7 @@ class TvSearchViewModel @Inject constructor(
     private val podcastManager: PodcastManager,
     private val episodeManager: EpisodeManager,
     private val playbackManager: PlaybackManager,
+    private val searchHistoryManager: SearchHistoryManager,
 ) : ViewModel() {
 
     private val _categories = MutableStateFlow<List<DiscoverCategory>>(emptyList())
@@ -62,6 +65,9 @@ class TvSearchViewModel @Inject constructor(
 
     private val _suggestions = MutableStateFlow<List<String>>(emptyList())
     val suggestions: StateFlow<List<String>> = _suggestions.asStateFlow()
+
+    private val _history = MutableStateFlow<List<String>>(emptyList())
+    val history: StateFlow<List<String>> = _history.asStateFlow()
 
     private val _playStarted = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     val playStarted: SharedFlow<Unit> = _playStarted.asSharedFlow()
@@ -98,6 +104,7 @@ class TvSearchViewModel @Inject constructor(
                 }
             }
         }
+        viewModelScope.launch { refreshHistory() }
     }
 
     fun onQueryChange(query: String) {
@@ -112,6 +119,7 @@ class TvSearchViewModel @Inject constructor(
         searchJob = viewModelScope.launch {
             delay(SEARCH_DEBOUNCE_MS)
             _searchState.value = TvSearchState.Searching
+            saveSearchTerm(term)
 
             val localPodcasts = podcastManager.findSubscribedFlow(term).first().map(Podcast::toSearchItem)
             val predictiveResults = try {
@@ -152,6 +160,24 @@ class TvSearchViewModel @Inject constructor(
 
     fun onFilterSelected(filter: TvSearchFilter) {
         _filter.value = filter
+    }
+
+    fun saveSearchTerm(term: String) {
+        val trimmed = term.trim()
+        if (trimmed.isEmpty()) {
+            return
+        }
+        viewModelScope.launch {
+            searchHistoryManager.add(SearchHistoryEntry.SearchTerm(term = trimmed))
+            searchHistoryManager.truncateHistory(SEARCH_HISTORY_LIMIT)
+            refreshHistory()
+        }
+    }
+
+    private suspend fun refreshHistory() {
+        _history.value = searchHistoryManager.findAll(showFolders = false)
+            .filterIsInstance<SearchHistoryEntry.SearchTerm>()
+            .map(SearchHistoryEntry.SearchTerm::term)
     }
 
     suspend fun categoryPodcasts(categoryId: Int, source: String): TvCategoryPodcasts {
@@ -211,6 +237,7 @@ class TvSearchViewModel @Inject constructor(
 
     companion object {
         private const val SEARCH_DEBOUNCE_MS = 300L
+        private const val SEARCH_HISTORY_LIMIT = 20
     }
 }
 

@@ -92,6 +92,7 @@ fun TvSearchScreen(
     val categories by viewModel.categories.collectAsStateWithLifecycle()
     val discoverRows by viewModel.discoverRows.collectAsStateWithLifecycle()
     val suggestions by viewModel.suggestions.collectAsStateWithLifecycle()
+    val history by viewModel.history.collectAsStateWithLifecycle()
     val actionsEpisode by viewModel.actionsEpisode.collectAsStateWithLifecycle()
 
     var openedPodcastUuid by rememberSaveable { mutableStateOf<String?>(null) }
@@ -125,6 +126,8 @@ fun TvSearchScreen(
             onOpenCategory = { openedCategory = TvOpenedCategory(it.id, it.name, it.source) },
             onPlayEpisode = viewModel::playEpisode,
             onOpenEpisodeActions = viewModel::openEpisodeActions,
+            history = history,
+            onHistorySelect = viewModel::onQueryChange,
             suggestions = suggestions,
             onSuggestionSelect = viewModel::onQueryChange,
             restoreFocusTrigger = restoreFocusTrigger,
@@ -197,6 +200,8 @@ private fun TvSearchContent(
     onPlayEpisode: (ImprovedSearchResultItem.EpisodeItem) -> Unit,
     onOpenEpisodeActions: (ImprovedSearchResultItem.EpisodeItem) -> Unit,
     modifier: Modifier = Modifier,
+    history: List<String> = emptyList(),
+    onHistorySelect: (String) -> Unit = {},
     suggestions: List<String> = emptyList(),
     onSuggestionSelect: (String) -> Unit = {},
     restoreFocusTrigger: Int = 0,
@@ -244,9 +249,11 @@ private fun TvSearchContent(
                 return@Box
             }
             when (searchState) {
-                is TvSearchState.Idle -> TvSearchDiscover(
+                is TvSearchState.Idle -> TvSearchIdle(
+                    history = history,
                     categories = categories,
                     discoverRows = discoverRows,
+                    onHistorySelect = onHistorySelect,
                     onOpenPodcast = onOpenPodcast,
                     onOpenCategory = onOpenCategory,
                     restoreFocusTrigger = restoreFocusTrigger,
@@ -281,12 +288,53 @@ private fun TvSearchContent(
 }
 
 @Composable
+private fun TvSearchIdle(
+    history: List<String>,
+    categories: List<DiscoverCategory>,
+    discoverRows: List<TvDiscoverRow>,
+    onHistorySelect: (String) -> Unit,
+    onOpenPodcast: (String) -> Unit,
+    onOpenCategory: (DiscoverCategory) -> Unit,
+    restoreFocusTrigger: Int,
+) {
+    Column(modifier = Modifier.fillMaxSize()) {
+        if (history.isNotEmpty()) {
+            TvRow(
+                title = stringResource(LR.string.tv_search_recent),
+                items = history,
+                contentPadding = ContentPadding,
+                key = { it },
+            ) { term ->
+                TvTile(onClick = { onHistorySelect(term) }) {
+                    Text(
+                        text = term,
+                        style = MaterialTheme.tvTypography.body,
+                        color = MaterialTheme.tvColors.textPrimary,
+                        modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp),
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(24.dp))
+        }
+        TvSearchDiscover(
+            categories = categories,
+            discoverRows = discoverRows,
+            onOpenPodcast = onOpenPodcast,
+            onOpenCategory = onOpenCategory,
+            restoreFocusTrigger = restoreFocusTrigger,
+            modifier = Modifier.weight(1f),
+        )
+    }
+}
+
+@Composable
 private fun TvSearchDiscover(
     categories: List<DiscoverCategory>,
     discoverRows: List<TvDiscoverRow>,
     onOpenPodcast: (String) -> Unit,
     onOpenCategory: (DiscoverCategory) -> Unit,
     restoreFocusTrigger: Int,
+    modifier: Modifier = Modifier,
 ) {
     val categoryOffset = if (categories.isNotEmpty()) 1 else 0
     val rowCount = categoryOffset + discoverRows.size
@@ -302,7 +350,7 @@ private fun TvSearchDiscover(
         }
     }
 
-    LazyColumn(modifier = Modifier.fillMaxSize()) {
+    LazyColumn(modifier = modifier.fillMaxSize()) {
         if (categories.isNotEmpty()) {
             item {
                 Box(

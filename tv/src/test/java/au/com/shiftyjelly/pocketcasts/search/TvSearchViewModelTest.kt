@@ -7,6 +7,7 @@ import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverRow
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.ImprovedSearchResultItem
 import au.com.shiftyjelly.pocketcasts.models.to.SearchAutoCompleteItem
+import au.com.shiftyjelly.pocketcasts.models.to.SearchHistoryEntry
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
@@ -14,6 +15,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.search.ImprovedSearchManager
+import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.model.Discover
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
@@ -70,9 +72,11 @@ class TvSearchViewModelTest {
     }
     private val episodeManager = mock<EpisodeManager>()
     private val playbackManager = mock<PlaybackManager>()
+    private val searchHistoryManager = mock<SearchHistoryManager>()
 
     init {
         whenever { improvedSearchManager.autoCompleteSearch(any()) }.thenReturn(emptyList())
+        whenever { searchHistoryManager.findAll(any()) }.thenReturn(emptyList())
     }
 
     @Test
@@ -341,6 +345,23 @@ class TvSearchViewModelTest {
     }
 
     @Test
+    fun `searching a term saves it to history and exposes recent searches`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        whenever { improvedSearchManager.combinedSearch(any()) }.thenReturn(emptyList())
+        whenever { searchHistoryManager.findAll(any()) }.thenReturn(
+            listOf(SearchHistoryEntry.SearchTerm(term = "sugar")),
+        )
+
+        val viewModel = createViewModel()
+        viewModel.onQueryChange("sugar")
+        advanceUntilIdle()
+
+        verifyBlocking(searchHistoryManager) { add(any()) }
+        verifyBlocking(searchHistoryManager) { truncateHistory(20) }
+        assertEquals(listOf("sugar"), viewModel.history.value)
+    }
+
+    @Test
     fun `clearing the query clears the suggestions`() = runTest {
         whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
         whenever { improvedSearchManager.autoCompleteSearch(any()) }.thenReturn(
@@ -420,6 +441,7 @@ class TvSearchViewModelTest {
         podcastManager = podcastManager,
         episodeManager = episodeManager,
         playbackManager = playbackManager,
+        searchHistoryManager = searchHistoryManager,
     )
 
     private fun category(id: Int, name: String) = DiscoverCategory(id = id, name = name, icon = "", source = "")
