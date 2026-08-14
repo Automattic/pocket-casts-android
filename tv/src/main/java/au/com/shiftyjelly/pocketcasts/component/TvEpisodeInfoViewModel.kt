@@ -27,7 +27,7 @@ class TvEpisodeInfoViewModel @Inject constructor(
 
     private var loadedEpisodeUuid: String? = null
 
-    fun trackShown(source: EpisodeViewSourceType) {
+    fun trackDetailShown(source: EpisodeViewSourceType) {
         eventHorizon.track(EpisodeDetailShownEvent(source = source))
     }
 

@@ -82,7 +82,6 @@ import au.com.shiftyjelly.pocketcasts.theme.TvTheme
 import au.com.shiftyjelly.pocketcasts.theme.TvTopBarHeight
 import au.com.shiftyjelly.pocketcasts.theme.tvColors
 import au.com.shiftyjelly.pocketcasts.theme.tvTypography
-import com.automattic.eventhorizon.EpisodeViewSourceType
 import java.util.Date
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.delay
@@ -357,7 +356,7 @@ private fun TvNowPlayingContent(
         if (isDetailsModalVisible) {
             TvEpisodeInfoModal(
                 episode = episode,
-                source = EpisodeViewSourceType.NowPlaying,
+                actionContext = TvEpisodeActionContext.NowPlaying,
                 onDismissRequest = { isDetailsModalVisible = false },
             )
         }

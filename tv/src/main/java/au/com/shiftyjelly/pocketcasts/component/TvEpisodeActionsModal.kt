@@ -63,7 +63,7 @@ private fun ColumnScope.TvEpisodeActionsModalContent(
     var pendingConfirmation by remember { mutableStateOf<TvEpisodeActionConfirmation?>(null) }
     var returnFocusLabel by remember { mutableStateOf<String?>(null) }
     val focusRequester = remember { FocusRequester() }
-    LaunchedEffect(Unit) {
+    LaunchedEffect(episode.uuid) {
         actions.trackActionsShown(actionContext.episodeViewSource)
     }
     LaunchedEffect(pendingConfirmation) {

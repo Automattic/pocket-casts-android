@@ -43,7 +43,7 @@ class TvEpisodeInfoViewModelTest {
 
     @Test
     fun `tracking shown records the detail shown event with the source`() = runTest {
-        createViewModel().trackShown(EpisodeViewSourceType.PodcastScreen)
+        createViewModel().trackDetailShown(EpisodeViewSourceType.PodcastScreen)
 
         verify(eventHorizon).track(EpisodeDetailShownEvent(source = EpisodeViewSourceType.PodcastScreen))
     }

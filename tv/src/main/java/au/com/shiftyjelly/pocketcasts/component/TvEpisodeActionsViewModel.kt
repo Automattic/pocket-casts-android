@@ -50,10 +50,6 @@ class TvEpisodeActionsViewModel @Inject constructor(
 ) : ViewModel(),
     TvEpisodeActions {
 
-    override fun trackActionsShown(source: EpisodeViewSourceType) {
-        eventHorizon.track(EpisodeActionsShownEvent(source = source))
-    }
-
     override fun play(episode: PodcastEpisode, source: SourceView) = launchWrite {
         playbackManager.playNowSuspend(episode = episode, sourceView = source)
     }
@@ -84,6 +80,10 @@ class TvEpisodeActionsViewModel @Inject constructor(
 
     override fun removeFromUpNext(episode: PodcastEpisode, source: SourceView) {
         playbackManager.removeEpisode(episodeToRemove = episode, source = source)
+    }
+
+    override fun trackActionsShown(source: EpisodeViewSourceType) {
+        eventHorizon.track(EpisodeActionsShownEvent(source = source))
     }
 
     private fun launchWrite(block: suspend () -> Unit) {

@@ -67,7 +67,6 @@ import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 import au.com.shiftyjelly.pocketcasts.theme.TvTheme
 import au.com.shiftyjelly.pocketcasts.theme.TvTopBarHeight
 import au.com.shiftyjelly.pocketcasts.theme.tvColors
-import com.automattic.eventhorizon.EpisodeViewSourceType
 import androidx.compose.foundation.lazy.grid.itemsIndexed as gridItemsIndexed
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -168,7 +167,7 @@ fun TvSearchScreen(
         detailsEpisode?.let { episode ->
             TvEpisodeInfoModal(
                 episode = episode,
-                source = EpisodeViewSourceType.Search,
+                actionContext = TvEpisodeActionContext.SearchResults,
                 onDismissRequest = { detailsEpisode = null },
             )
         }

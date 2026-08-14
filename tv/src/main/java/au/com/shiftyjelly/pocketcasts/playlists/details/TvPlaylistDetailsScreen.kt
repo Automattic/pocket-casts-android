@@ -69,7 +69,6 @@ import au.com.shiftyjelly.pocketcasts.theme.TvDetailsArtworkSize
 import au.com.shiftyjelly.pocketcasts.theme.TvTheme
 import au.com.shiftyjelly.pocketcasts.theme.tvColors
 import au.com.shiftyjelly.pocketcasts.theme.tvTypography
-import com.automattic.eventhorizon.EpisodeViewSourceType
 import java.util.Date
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -335,7 +334,7 @@ private fun EpisodeList(
     detailsEpisode?.let { episode ->
         TvEpisodeInfoModal(
             episode = episode,
-            source = EpisodeViewSourceType.Filters,
+            actionContext = TvEpisodeActionContext.Playlist,
             onDismissRequest = { detailsEpisode = null },
         )
     }
