@@ -311,10 +311,11 @@ private fun TvSearchDiscover(
             item { Spacer(modifier = Modifier.height(24.dp)) }
             tvDiscoverRow(
                 row = row,
-                onOpenPodcast = onOpenPodcast,
-                onPlayEpisode = {}, // TODO: wire discover-feed episode playback in search
+                onPodcastClick = { _, podcast -> onOpenPodcast(podcast.uuid) },
+                onEpisodePlay = { _, _ -> }, // TODO: wire discover-feed episode playback in search
+                onEpisodePodcastClick = { _, episode -> onOpenPodcast(episode.podcastUuid) },
+                onCategoryClick = { category, _ -> onOpenCategory(category) },
                 contentPadding = ContentPadding,
-                onOpenCategory = onOpenCategory,
                 focusRequester = rowFocusRequesters.getOrNull(rowIndex),
                 modifier = Modifier.onFocusChanged { if (it.hasFocus) lastFocusedRowIndex = rowIndex },
             )

@@ -212,7 +212,7 @@ class TvSearchViewModelTest {
         whenever(listRepository.getListFeed(eq("https://category/us.json"), any()))
             .thenReturn(podcastFeed("podcast-1", "podcast-2"))
 
-        val podcasts = createViewModel().categoryPodcasts(categoryId = 7, source = "https://category/us.json")
+        val podcasts = createViewModel().categoryPodcasts(categoryId = 7, source = "https://category/us.json").podcasts
 
         assertEquals(listOf("podcast-1", "podcast-2"), podcasts.map { it.uuid })
     }

@@ -54,6 +54,11 @@ enum class TvDiscoverBanner(val id: String) {
     }
 }
 
+data class TvCategoryPodcasts(
+    val listId: String?,
+    val podcasts: List<TvDiscoverPodcast>,
+)
+
 data class TvDiscoverPodcast(
     val uuid: String,
     val title: String,

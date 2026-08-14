@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -20,16 +21,19 @@ import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 
 fun LazyListScope.tvDiscoverRow(
     row: TvDiscoverRow,
-    onOpenPodcast: (String) -> Unit,
-    onPlayEpisode: (TvDiscoverEpisode) -> Unit,
+    onPodcastClick: (TvDiscoverRow, TvDiscoverPodcast) -> Unit,
+    onEpisodePlay: (TvDiscoverRow, TvDiscoverEpisode) -> Unit,
+    onEpisodePodcastClick: (TvDiscoverRow, TvDiscoverEpisode) -> Unit,
+    onCategoryClick: (DiscoverCategory, Int) -> Unit,
     modifier: Modifier = Modifier,
     focusRequester: FocusRequester? = null,
     contentPadding: PaddingValues = PaddingValues(horizontal = 32.dp),
-    onOpenCategory: (DiscoverCategory) -> Unit = {},
     onTapBanner: (TvDiscoverBanner) -> Unit = {},
+    onListImpression: (TvDiscoverRow) -> Unit = {},
 ) {
     when (row) {
         is TvDiscoverRow.FeaturedPodcasts -> item(key = row.id) {
+            LaunchedEffect(row.id) { onListImpression(row) }
             TvRow(
                 title = row.title,
                 items = row.podcasts,
@@ -44,13 +48,14 @@ fun LazyListScope.tvDiscoverRow(
                     isSponsored = podcast.isSponsored,
                     title = podcast.title,
                     description = podcast.description,
-                    onGoToPodcast = { onOpenPodcast(podcast.uuid) },
+                    onGoToPodcast = { onPodcastClick(row, podcast) },
                     onPlayLastEpisode = {},
                 )
             }
         }
 
         is TvDiscoverRow.SinglePodcast -> item(key = row.id) {
+            LaunchedEffect(row.id) { onListImpression(row) }
             TvRow(
                 title = row.title,
                 items = row.podcasts,
@@ -66,12 +71,13 @@ fun LazyListScope.tvDiscoverRow(
                     author = podcast.author,
                     description = podcast.description,
                     isSponsored = podcast.isSponsored,
-                    onClick = { onOpenPodcast(podcast.uuid) },
+                    onClick = { onPodcastClick(row, podcast) },
                 )
             }
         }
 
         is TvDiscoverRow.Episodes -> item(key = row.id) {
+            LaunchedEffect(row.id) { onListImpression(row) }
             TvRow(
                 title = row.title,
                 items = row.episodes,
@@ -86,13 +92,14 @@ fun LazyListScope.tvDiscoverRow(
                     podcastArtworkUrl = episode.podcastArtworkUrl,
                     podcastTitle = episode.podcastTitle,
                     episodeTitle = episode.episodeTitle,
-                    onPlayEpisode = { onPlayEpisode(episode) },
-                    onGoToPodcast = { onOpenPodcast(episode.podcastUuid) },
+                    onPlayEpisode = { onEpisodePlay(row, episode) },
+                    onGoToPodcast = { onEpisodePodcastClick(row, episode) },
                 )
             }
         }
 
         is TvDiscoverRow.Podcasts -> item(key = row.id) {
+            LaunchedEffect(row.id) { onListImpression(row) }
             TvRow(
                 title = row.title,
                 items = row.podcasts,
@@ -104,7 +111,7 @@ fun LazyListScope.tvDiscoverRow(
                 TvPodcastTile(
                     artworkUrl = podcast.artworkUrl,
                     podcastTitle = podcast.title,
-                    onClick = { onOpenPodcast(podcast.uuid) },
+                    onClick = { onPodcastClick(row, podcast) },
                     imageModifier = Modifier.width(TvPodcastTileDefaults.RowImageWidth),
                     isSponsored = podcast.isSponsored,
                 )
@@ -122,7 +129,7 @@ fun LazyListScope.tvDiscoverRow(
             ) { category ->
                 TvCategoryTile(
                     category = category,
-                    onClick = { onOpenCategory(category) },
+                    onClick = { onCategoryClick(category, row.categories.indexOfFirst { it.id == category.id }) },
                 )
             }
         }

@@ -35,10 +35,11 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 fun TvCategoryPodcastsScreen(
     categoryName: String,
     categorySource: String,
-    getCategoryPodcasts: suspend (String) -> List<TvDiscoverPodcast>,
+    getCategoryPodcasts: suspend (String) -> TvCategoryPodcasts,
     onOpenPodcast: (String) -> Unit,
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
+    onPodcastClick: (String?, TvDiscoverPodcast) -> Unit = { _, _ -> },
     restoreFocusTrigger: Int = 0,
 ) {
     var reloadTrigger by remember(categorySource) { mutableIntStateOf(0) }
@@ -48,8 +49,12 @@ fun TvCategoryPodcastsScreen(
         uiState = TvCategoryPodcastsUiState.Loading
         uiState = runCatching { currentGetCategoryPodcasts(categorySource) }
             .fold(
-                onSuccess = { podcasts ->
-                    if (podcasts.isEmpty()) TvCategoryPodcastsUiState.Empty else TvCategoryPodcastsUiState.Loaded(podcasts)
+                onSuccess = { result ->
+                    if (result.podcasts.isEmpty()) {
+                        TvCategoryPodcastsUiState.Empty
+                    } else {
+                        TvCategoryPodcastsUiState.Loaded(result.listId, result.podcasts)
+                    }
                 },
                 onFailure = { exception ->
                     if (exception is CancellationException) throw exception
@@ -65,6 +70,7 @@ fun TvCategoryPodcastsScreen(
         onClose = onClose,
         onRetry = { reloadTrigger++ },
         modifier = modifier,
+        onPodcastClick = onPodcastClick,
         restoreFocusTrigger = restoreFocusTrigger,
     )
 }
@@ -77,6 +83,7 @@ private fun TvCategoryPodcastsContent(
     onClose: () -> Unit,
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
+    onPodcastClick: (String?, TvDiscoverPodcast) -> Unit = { _, _ -> },
     restoreFocusTrigger: Int = 0,
 ) {
     AnimatedContent(
@@ -128,7 +135,10 @@ private fun TvCategoryPodcastsContent(
                 TvPodcastTile(
                     artworkUrl = podcast.artworkUrl,
                     podcastTitle = podcast.title,
-                    onClick = { onOpenPodcast(podcast.uuid) },
+                    onClick = {
+                        onPodcastClick(state.listId, podcast)
+                        onOpenPodcast(podcast.uuid)
+                    },
                     imageModifier = Modifier.fillMaxWidth(),
                     modifier = itemModifier,
                     isSponsored = podcast.isSponsored,
@@ -146,6 +156,7 @@ private sealed interface TvCategoryPodcastsUiState {
     data object Error : TvCategoryPodcastsUiState
 
     data class Loaded(
+        val listId: String?,
         val podcasts: List<TvDiscoverPodcast>,
     ) : TvCategoryPodcastsUiState
 }
@@ -158,6 +169,7 @@ private fun TvCategoryPodcastsPreview() {
             TvCategoryPodcastsContent(
                 categoryName = "True Crime",
                 uiState = TvCategoryPodcastsUiState.Loaded(
+                    listId = "list-id",
                     podcasts = (1..6).map { index ->
                         TvDiscoverPodcast(
                             uuid = "podcast-$index",

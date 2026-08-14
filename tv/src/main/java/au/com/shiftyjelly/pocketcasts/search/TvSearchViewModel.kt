@@ -4,6 +4,7 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.discover.TvCategoryPodcasts
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverFeedLoader
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverRow
@@ -134,7 +135,7 @@ class TvSearchViewModel @Inject constructor(
         _filter.value = filter
     }
 
-    suspend fun categoryPodcasts(categoryId: Int, source: String): List<TvDiscoverPodcast> {
+    suspend fun categoryPodcasts(categoryId: Int, source: String): TvCategoryPodcasts {
         return discoverFeedLoader.loadCategoryPodcasts(source, categoryId, syncManager.isLoggedIn())
     }
 

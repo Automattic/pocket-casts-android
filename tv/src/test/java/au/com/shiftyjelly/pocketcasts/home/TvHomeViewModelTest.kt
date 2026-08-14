@@ -7,7 +7,9 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverBanner
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverEpisode
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverFeedLoader
+import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverRow
+import au.com.shiftyjelly.pocketcasts.discover.TvOpenedCategory
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PodcastDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextDao
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -34,6 +36,16 @@ import au.com.shiftyjelly.pocketcasts.servers.model.ListFeed
 import au.com.shiftyjelly.pocketcasts.servers.model.ListType
 import au.com.shiftyjelly.pocketcasts.servers.model.SponsoredPodcast
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import com.automattic.eventhorizon.BannerRowTappedEvent
+import com.automattic.eventhorizon.DiscoverAdCategoryTappedEvent
+import com.automattic.eventhorizon.DiscoverCategoriesPillTappedEvent
+import com.automattic.eventhorizon.DiscoverFeaturedPodcastTappedEvent
+import com.automattic.eventhorizon.DiscoverListEpisodePlayEvent
+import com.automattic.eventhorizon.DiscoverListEpisodeTappedEvent
+import com.automattic.eventhorizon.DiscoverListImpressionEvent
+import com.automattic.eventhorizon.DiscoverListPodcastTappedEvent
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.HomeShownEvent
 import com.jakewharton.rxrelay2.BehaviorRelay
 import io.reactivex.Single
 import java.util.Date
@@ -93,6 +105,7 @@ class TvHomeViewModelTest {
     private val episodeManager = mock<EpisodeManager>()
     private val podcastManager = mock<PodcastManager>()
     private val playbackManager = mock<PlaybackManager>()
+    private val eventHorizon = mock<EventHorizon>()
 
     @Test
     fun `all rows load in feed order`() = runTest {
@@ -421,7 +434,7 @@ class TvHomeViewModelTest {
         whenever(listRepository.getListFeed(eq("https://category/us.json"), any()))
             .thenReturn(podcastFeed("podcast-1", "podcast-2"))
 
-        val podcasts = createViewModel().categoryPodcasts(categoryId = 7, source = "https://category/us.json")
+        val podcasts = createViewModel().categoryPodcasts(categoryId = 7, source = "https://category/us.json").podcasts
 
         assertEquals(listOf("podcast-1", "podcast-2"), podcasts.map { it.uuid })
     }
@@ -454,7 +467,7 @@ class TvHomeViewModelTest {
         whenever(listRepository.getListFeed(eq("https://lists/category-ad.json"), any()))
             .thenReturn(podcastFeed("ad-1"))
 
-        val podcasts = createViewModel().categoryPodcasts(categoryId = 7, source = "https://category/us.json")
+        val podcasts = createViewModel().categoryPodcasts(categoryId = 7, source = "https://category/us.json").podcasts
 
         assertEquals("ad-1", podcasts[5].uuid)
         assertTrue(podcasts[5].isSponsored)
@@ -479,7 +492,7 @@ class TvHomeViewModelTest {
         whenever(listRepository.getListFeed(eq("https://lists/category-ad.json"), any()))
             .thenReturn(podcastFeed("ad-1"))
 
-        val podcasts = createViewModel().categoryPodcasts(categoryId = 7, source = "https://category/us.json")
+        val podcasts = createViewModel().categoryPodcasts(categoryId = 7, source = "https://category/us.json").podcasts
 
         assertEquals(listOf("p-0", "p-1", "ad-1"), podcasts.map { it.uuid })
         assertTrue(podcasts.last().isSponsored)
@@ -846,6 +859,141 @@ class TvHomeViewModelTest {
         podcastTitle = "Podcast",
     )
 
+    @Test
+    fun `tracks home shown`() = runTest {
+        createViewModel().trackHomeShown()
+
+        verify(eventHorizon).track(HomeShownEvent)
+    }
+
+    @Test
+    fun `opening a featured podcast tracks both the list and featured events`() = runTest {
+        val podcast = discoverPodcast("podcast-1")
+        val row = TvDiscoverRow.FeaturedPodcasts(id = "list-featured", title = "Featured", podcasts = listOf(podcast))
+
+        createViewModel().trackDiscoverPodcastTapped(row, podcast)
+
+        verify(eventHorizon).track(DiscoverListPodcastTappedEvent(listId = "list-featured", podcastUuid = "podcast-1", source = "home"))
+        verify(eventHorizon).track(DiscoverFeaturedPodcastTappedEvent(podcastUuid = "podcast-1"))
+    }
+
+    @Test
+    fun `opening a sponsored podcast tracks the ad event`() = runTest {
+        val podcast = discoverPodcast("podcast-1", isSponsored = true)
+        val row = TvDiscoverRow.Podcasts(id = "list-trending", title = "Trending", podcasts = listOf(podcast))
+
+        createViewModel().trackDiscoverPodcastTapped(row, podcast)
+
+        verify(eventHorizon).track(DiscoverListPodcastTappedEvent(listId = "list-trending", podcastUuid = "podcast-1", source = "home"))
+        verify(eventHorizon).track(DiscoverAdCategoryTappedEvent(name = "unknown", region = "us", id = 0, podcastId = "podcast-1"))
+    }
+
+    @Test
+    fun `opening a sponsored featured podcast does not track the ad event`() = runTest {
+        val podcast = discoverPodcast("podcast-1", isSponsored = true)
+        val row = TvDiscoverRow.FeaturedPodcasts(id = "list-featured", title = "Featured", podcasts = listOf(podcast))
+
+        createViewModel().trackDiscoverPodcastTapped(row, podcast)
+
+        verify(eventHorizon).track(DiscoverFeaturedPodcastTappedEvent(podcastUuid = "podcast-1"))
+        verify(eventHorizon, never()).track(any<DiscoverAdCategoryTappedEvent>())
+    }
+
+    @Test
+    fun `opening a sponsored category podcast tracks the list and ad with the category details`() = runTest {
+        val podcast = discoverPodcast("podcast-1", isSponsored = true)
+        val category = TvOpenedCategory(id = 5, name = "True Crime", source = "https://category.json")
+
+        createViewModel().trackCategoryPodcastTapped(category, listId = "list-tc", podcast = podcast)
+
+        verify(eventHorizon).track(DiscoverListPodcastTappedEvent(listId = "list-tc", podcastUuid = "podcast-1", source = "home"))
+        verify(eventHorizon).track(DiscoverAdCategoryTappedEvent(name = "True Crime", region = "us", id = 5, podcastId = "podcast-1"))
+    }
+
+    @Test
+    fun `local rows do not track discover list events`() = runTest {
+        val episode = TvDiscoverEpisode("episode-1", "Episode", "podcast-1", "Podcast")
+        val row = TvDiscoverRow.Episodes(id = TvHomeViewModel.KEEP_LISTENING_ROW_ID, title = "Keep listening", episodes = listOf(episode))
+        val viewModel = createViewModel()
+
+        viewModel.trackDiscoverEpisodePlayed(row, episode)
+        viewModel.trackDiscoverListShown(row)
+
+        verifyNoInteractions(eventHorizon)
+    }
+
+    @Test
+    fun `playing a discover episode tracks the tap and play events`() = runTest {
+        val episode = TvDiscoverEpisode("episode-1", "Episode", "podcast-1", "Podcast")
+        val row = TvDiscoverRow.Episodes(id = "list-videos", title = "Made for TV", episodes = listOf(episode))
+
+        createViewModel().trackDiscoverEpisodePlayed(row, episode)
+
+        verify(eventHorizon).track(DiscoverListEpisodeTappedEvent(listId = "list-videos", podcastUuid = "podcast-1", episodeUuid = "episode-1", source = "home"))
+        verify(eventHorizon).track(DiscoverListEpisodePlayEvent(listId = "list-videos", podcastUuid = "podcast-1"))
+    }
+
+    @Test
+    fun `showing a discover list tracks an impression`() = runTest {
+        val row = TvDiscoverRow.Podcasts(id = "list-trending", title = "Trending", podcasts = listOf(discoverPodcast("podcast-1")))
+
+        createViewModel().trackDiscoverListShown(row)
+
+        verify(eventHorizon).track(DiscoverListImpressionEvent(listId = "list-trending", source = "home"))
+    }
+
+    @Test
+    fun `opening a discover episode podcast tracks the list podcast tapped event`() = runTest {
+        val episode = TvDiscoverEpisode("episode-1", "Episode", "podcast-1", "Podcast")
+        val row = TvDiscoverRow.Episodes(id = "list-videos", title = "Made for TV", episodes = listOf(episode))
+
+        createViewModel().trackDiscoverEpisodePodcastTapped(row, episode)
+
+        verify(eventHorizon).track(DiscoverListPodcastTappedEvent(listId = "list-videos", podcastUuid = "podcast-1", source = "home"))
+    }
+
+    @Test
+    fun `banner and categories rows do not track an impression`() = runTest {
+        val viewModel = createViewModel()
+
+        viewModel.trackDiscoverListShown(TvDiscoverRow.Banner(id = "banner", title = "", banner = TvDiscoverBanner.DiscoverMore))
+        viewModel.trackDiscoverListShown(
+            TvDiscoverRow.Categories(
+                id = "categories",
+                title = "Categories",
+                categories = listOf(DiscoverCategory(id = 1, name = "Comedy", icon = "", source = "")),
+            ),
+        )
+
+        verifyNoInteractions(eventHorizon)
+    }
+
+    @Test
+    fun `tracks banner tapped`() = runTest {
+        createViewModel().trackBannerTapped(TvDiscoverBanner.DiscoverMore)
+
+        verify(eventHorizon).track(BannerRowTappedEvent(type = "discover_more"))
+    }
+
+    @Test
+    fun `tracks category pill tapped`() = runTest {
+        val category = DiscoverCategory(id = 3, name = "True Crime", icon = "", source = "https://category.json", totalVisits = 7, isSponsored = true)
+
+        createViewModel().trackCategoryPillTapped(category, index = 2)
+
+        verify(eventHorizon).track(
+            DiscoverCategoriesPillTappedEvent(name = "True Crime", region = "us", index = 2, visits = 7, sponsored = true, source = "home"),
+        )
+    }
+
+    private fun discoverPodcast(uuid: String, isSponsored: Boolean = false) = TvDiscoverPodcast(
+        uuid = uuid,
+        title = "Title",
+        author = "Author",
+        description = "Description",
+        isSponsored = isSponsored,
+    )
+
     private fun createViewModel() = TvHomeViewModel(
         discoverFeedLoader = TvDiscoverFeedLoader(
             listRepository = listRepository,
@@ -859,6 +1007,8 @@ class TvHomeViewModelTest {
         episodeManager = episodeManager,
         podcastManager = podcastManager,
         playbackManager = playbackManager,
+        eventHorizon = eventHorizon,
+        settings = settings,
         context = context,
     )
 
