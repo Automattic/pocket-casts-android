@@ -9,14 +9,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -26,12 +24,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.CardDefaults
 import androidx.tv.material3.MaterialTheme
@@ -51,15 +51,14 @@ fun TvBannerRow(
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
-    val containerColor = if (isFocused) MaterialTheme.tvColors.backgroundOverlay else MaterialTheme.tvColors.backgroundSurface
 
     TvTile(
         onClick = onClick,
         shape = CardDefaults.shape(RoundedCornerShape(12.dp)),
         scale = CardDefaults.scale(focusedScale = 1.05f),
         colors = CardDefaults.colors(
-            containerColor = MaterialTheme.tvColors.backgroundSurface,
-            focusedContainerColor = MaterialTheme.tvColors.backgroundOverlay,
+            containerColor = Color.Black,
+            focusedContainerColor = Color.Black,
         ),
         interactionSource = interactionSource,
         modifier = modifier
@@ -67,6 +66,7 @@ fun TvBannerRow(
             .height(132.dp),
     ) {
         Box(modifier = Modifier.fillMaxSize().clipToBounds()) {
+            BackgroundLift()
             Image(
                 painter = painterResource(banner.artwork()),
                 contentDescription = null,
@@ -74,64 +74,89 @@ fun TvBannerRow(
                 alignment = Alignment.CenterEnd,
                 modifier = Modifier
                     .align(Alignment.CenterEnd)
-                    .requiredHeight(BannerArtworkHeight),
+                    .requiredHeight(banner.artworkHeight),
             )
-            if (banner.hasGradient) {
+            if (banner.hasArtworkMask) {
+                // Opaque black over the text side so the bright collage only shows on the end edge.
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
                         .background(
                             Brush.horizontalGradient(
-                                0f to containerColor,
-                                0.82f to containerColor,
-                                1f to containerColor.copy(alpha = 0f),
+                                0f to Color.Black,
+                                0.82f to Color.Black,
+                                1f to Color.Transparent,
                             ),
                         ),
                 )
+                BackgroundLift()
             }
             Row(
                 verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(48.dp),
                 modifier = Modifier
+                    .align(Alignment.CenterStart)
                     .fillMaxHeight()
-                    .fillMaxWidth(if (banner.hasGradient) 0.82f else 0.68f)
+                    .fillMaxWidth(banner.contentWidthFraction)
                     .padding(horizontal = 48.dp),
             ) {
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(percent = 50))
-                        .background(if (isFocused) MaterialTheme.tvColors.backgroundActive else MaterialTheme.tvColors.backgroundActive20)
-                        .padding(horizontal = 24.dp, vertical = 12.dp),
-                ) {
-                    Text(
-                        text = banner.actionTitle(),
-                        style = MaterialTheme.tvTypography.caption1,
-                        color = if (isFocused) MaterialTheme.tvColors.textPrimaryActive else MaterialTheme.tvColors.backgroundActive,
-                    )
-                }
-                Spacer(modifier = Modifier.width(48.dp))
-                Column(verticalArrangement = Arrangement.Center) {
-                    Text(
-                        text = banner.title(),
-                        style = MaterialTheme.tvTypography.callout,
-                        color = MaterialTheme.tvColors.textPrimary,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                    Text(
-                        text = banner.subtitle(),
-                        style = MaterialTheme.tvTypography.body,
-                        color = MaterialTheme.tvColors.textSecondary,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                }
+                BannerActionPill(banner, isFocused)
+                BannerText(banner, modifier = Modifier.weight(1f, fill = false))
             }
         }
     }
 }
 
-private val BannerArtworkHeight = 240.dp
+@Composable
+private fun BackgroundLift() {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                Brush.horizontalGradient(
+                    0f to MaterialTheme.tvColors.backgroundActive20,
+                    0.55f to Color.Transparent,
+                ),
+            ),
+    )
+}
+
+@Composable
+private fun BannerText(banner: TvDiscoverBanner, modifier: Modifier = Modifier) {
+    Column(verticalArrangement = Arrangement.Center, modifier = modifier) {
+        Text(
+            text = banner.title(),
+            style = MaterialTheme.tvTypography.callout,
+            color = MaterialTheme.tvColors.textPrimary,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+        Text(
+            text = banner.subtitle(),
+            style = MaterialTheme.tvTypography.body,
+            color = MaterialTheme.tvColors.textSecondary,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
+        )
+    }
+}
+
+@Composable
+private fun BannerActionPill(banner: TvDiscoverBanner, isFocused: Boolean) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .clip(RoundedCornerShape(percent = 50))
+            .background(if (isFocused) MaterialTheme.tvColors.backgroundActive else MaterialTheme.tvColors.backgroundActive20)
+            .padding(horizontal = 24.dp, vertical = 12.dp),
+    ) {
+        Text(
+            text = banner.actionTitle(),
+            style = MaterialTheme.tvTypography.caption1,
+            color = if (isFocused) MaterialTheme.tvColors.textPrimaryActive else MaterialTheme.tvColors.backgroundActive,
+        )
+    }
+}
 
 @DrawableRes
 private fun TvDiscoverBanner.artwork(): Int = when (this) {
@@ -139,7 +164,19 @@ private fun TvDiscoverBanner.artwork(): Int = when (this) {
     TvDiscoverBanner.DiscoverMore -> IR.drawable.tv_banner_discover_more
 }
 
-private val TvDiscoverBanner.hasGradient: Boolean
+private val TvDiscoverBanner.artworkHeight: Dp
+    get() = when (this) {
+        TvDiscoverBanner.CreateAccount -> 150.dp
+        TvDiscoverBanner.DiscoverMore -> 170.dp
+    }
+
+private val TvDiscoverBanner.contentWidthFraction: Float
+    get() = when (this) {
+        TvDiscoverBanner.CreateAccount -> 0.68f
+        TvDiscoverBanner.DiscoverMore -> 0.82f
+    }
+
+private val TvDiscoverBanner.hasArtworkMask: Boolean
     get() = this == TvDiscoverBanner.DiscoverMore
 
 @Composable
