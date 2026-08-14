@@ -31,6 +31,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.tv.material3.MaterialTheme
@@ -41,6 +42,25 @@ import au.com.shiftyjelly.pocketcasts.theme.tvColors
 
 private const val TITLE_UNFOCUSED_SIZE = 17f
 private const val TITLE_FOCUSED_SIZE = 21f
+
+@Composable
+fun TvSectionTitle(
+    title: String,
+    modifier: Modifier = Modifier,
+    fontSize: TextUnit = TITLE_UNFOCUSED_SIZE.sp,
+) {
+    Text(
+        text = title,
+        color = MaterialTheme.tvColors.textPrimary,
+        style = TextStyle(
+            fontFamily = GoogleSansFontFamily,
+            fontSize = fontSize,
+            fontWeight = FontWeight(500),
+            platformStyle = PlatformTextStyle(includeFontPadding = false),
+        ),
+        modifier = modifier,
+    )
+}
 
 @Composable
 fun <T> TvRow(
@@ -64,15 +84,9 @@ fun <T> TvRow(
             hasFocus = focusState.hasFocus
         },
     ) {
-        Text(
-            text = title,
-            color = MaterialTheme.tvColors.textPrimary,
-            style = TextStyle(
-                fontFamily = GoogleSansFontFamily,
-                fontSize = titleSize.sp,
-                fontWeight = FontWeight(500),
-                platformStyle = PlatformTextStyle(includeFontPadding = false),
-            ),
+        TvSectionTitle(
+            title = title,
+            fontSize = titleSize.sp,
             modifier = Modifier
                 .padding(contentPadding)
                 .padding(bottom = 17.dp),

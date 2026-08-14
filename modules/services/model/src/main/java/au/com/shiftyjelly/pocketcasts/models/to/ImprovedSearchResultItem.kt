@@ -29,6 +29,7 @@ sealed interface ImprovedSearchResultItem {
         override val uuid: String,
         override val title: String,
         val podcastUuid: String,
+        val podcastTitle: String,
         val publishedDate: Date,
         val duration: Duration,
     ) : ImprovedSearchResultItem

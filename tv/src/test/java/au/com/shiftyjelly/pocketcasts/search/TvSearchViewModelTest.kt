@@ -4,9 +4,15 @@ import android.content.Context
 import android.content.res.Resources
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverFeedLoader
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverRow
+import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.to.ImprovedSearchResultItem
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.search.ImprovedSearchManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.model.Discover
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
@@ -18,7 +24,11 @@ import au.com.shiftyjelly.pocketcasts.servers.model.ExpandedStyle
 import au.com.shiftyjelly.pocketcasts.servers.model.ListFeed
 import au.com.shiftyjelly.pocketcasts.servers.model.ListType
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import java.util.Date
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -30,6 +40,7 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyBlocking
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -51,7 +62,14 @@ class TvSearchViewModelTest {
     }
     private val settings = mock<Settings> {
         whenever(it.discoverCountryCode).thenReturn(discoverCountryCode)
+        whenever(it.getPodcastSearchDebounceMs()).thenReturn(0)
     }
+    private val improvedSearchManager = mock<ImprovedSearchManager>()
+    private val podcastManager = mock<PodcastManager> {
+        whenever(it.findSubscribedFlow(any())).thenReturn(flowOf(emptyList()))
+    }
+    private val episodeManager = mock<EpisodeManager>()
+    private val playbackManager = mock<PlaybackManager>()
 
     @Test
     fun `exposes the browse categories from the search feed row`() = runTest {
@@ -191,6 +209,122 @@ class TvSearchViewModelTest {
         assertTrue(viewModel.discoverRows.value.isEmpty())
     }
 
+    @Test
+    fun `a blank query stays idle`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        val viewModel = createViewModel()
+
+        viewModel.onQueryChange("   ")
+        advanceUntilIdle()
+
+        assertEquals(TvSearchState.Idle, viewModel.searchState.value)
+    }
+
+    @Test
+    fun `combined results are split into podcasts and episodes`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        whenever { improvedSearchManager.combinedSearch(any()) }.thenReturn(
+            listOf(podcastItem("podcast-1"), episodeItem("episode-1")),
+        )
+
+        val viewModel = createViewModel()
+        viewModel.onQueryChange("sugar")
+        advanceUntilIdle()
+
+        val state = viewModel.searchState.value as TvSearchState.Results
+        assertEquals(listOf("podcast-1"), state.podcasts.map { it.uuid })
+        assertEquals(listOf("episode-1"), state.episodes.map { it.uuid })
+    }
+
+    @Test
+    fun `episodes are de-duplicated by uuid`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        whenever { improvedSearchManager.combinedSearch(any()) }.thenReturn(
+            listOf(episodeItem("episode-1"), episodeItem("episode-1"), episodeItem("episode-2")),
+        )
+
+        val viewModel = createViewModel()
+        viewModel.onQueryChange("sugar")
+        advanceUntilIdle()
+
+        val state = viewModel.searchState.value as TvSearchState.Results
+        assertEquals(listOf("episode-1", "episode-2"), state.episodes.map { it.uuid })
+    }
+
+    @Test
+    fun `keystrokes within the debounce window only search the last term`() = runTest {
+        whenever(settings.getPodcastSearchDebounceMs()).thenReturn(300)
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        whenever { improvedSearchManager.combinedSearch(any()) }.thenReturn(emptyList())
+
+        val viewModel = createViewModel()
+        viewModel.onQueryChange("su")
+        viewModel.onQueryChange("sugar")
+        advanceUntilIdle()
+
+        verifyBlocking(improvedSearchManager) { combinedSearch(eq("sugar")) }
+        verifyBlocking(improvedSearchManager, never()) { combinedSearch(eq("su")) }
+    }
+
+    @Test
+    fun `empty combined results report no results`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        whenever { improvedSearchManager.combinedSearch(any()) }.thenReturn(emptyList())
+
+        val viewModel = createViewModel()
+        viewModel.onQueryChange("sugar")
+        advanceUntilIdle()
+
+        assertEquals(TvSearchState.NoResults, viewModel.searchState.value)
+    }
+
+    @Test
+    fun `subscribed podcasts lead the results and are not duplicated by the server`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        whenever(podcastManager.findSubscribedFlow(any())).thenReturn(flowOf(listOf(subscribedPodcast("podcast-1"))))
+        whenever { improvedSearchManager.combinedSearch(any()) }.thenReturn(
+            listOf(podcastItem("podcast-1"), podcastItem("podcast-2")),
+        )
+
+        val viewModel = createViewModel()
+        viewModel.onQueryChange("sugar")
+        advanceUntilIdle()
+
+        val state = viewModel.searchState.value as TvSearchState.Results
+        assertEquals(listOf("podcast-1", "podcast-2"), state.podcasts.map { it.uuid })
+        assertTrue(state.podcasts.first().isFollowed)
+    }
+
+    @Test
+    fun `a search failure surfaces the error state`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        whenever { improvedSearchManager.combinedSearch(any()) }.thenThrow(RuntimeException("Network error"))
+
+        val viewModel = createViewModel()
+        viewModel.onQueryChange("sugar")
+        advanceUntilIdle()
+
+        assertEquals(TvSearchState.Error, viewModel.searchState.value)
+    }
+
+    private fun podcastItem(uuid: String) = ImprovedSearchResultItem.PodcastItem(
+        uuid = uuid,
+        title = "Podcast $uuid",
+        author = "Author",
+        isFollowed = false,
+    )
+
+    private fun episodeItem(uuid: String) = ImprovedSearchResultItem.EpisodeItem(
+        uuid = uuid,
+        title = "Episode $uuid",
+        podcastUuid = "podcast-$uuid",
+        podcastTitle = "Podcast",
+        publishedDate = Date(0),
+        duration = 120.seconds,
+    )
+
+    private fun subscribedPodcast(uuid: String) = Podcast(uuid = uuid, title = "Podcast $uuid", author = "Author")
+
     private fun createViewModel() = TvSearchViewModel(
         discoverFeedLoader = TvDiscoverFeedLoader(
             listRepository = listRepository,
@@ -198,6 +332,11 @@ class TvSearchViewModelTest {
             context = context,
         ),
         syncManager = syncManager,
+        improvedSearchManager = improvedSearchManager,
+        podcastManager = podcastManager,
+        episodeManager = episodeManager,
+        playbackManager = playbackManager,
+        settings = settings,
     )
 
     private fun category(id: Int, name: String) = DiscoverCategory(id = id, name = name, icon = "", source = "")
