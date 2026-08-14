@@ -134,6 +134,7 @@ class TvSearchViewModel @Inject constructor(
             _searchState.value = TvSearchState.Searching
             _searchState.value = try {
                 val fullSearch = async { runCatching { improvedSearchManager.combinedSearch(term) } }
+                val foldersSearch = async { runCatching { searchFolders(term) }.getOrDefault(emptyList()) }
                 val localPodcasts = podcastManager.findSubscribedFlow(term).first().map(Podcast::toSearchItem)
                 val localUuids = localPodcasts.mapTo(HashSet(), ImprovedSearchResultItem.PodcastItem::uuid)
                 val predictiveResults = try {
@@ -151,7 +152,6 @@ class TvSearchViewModel @Inject constructor(
                     _searchState.value = TvSearchState.Results(podcasts = earlyPodcasts, episodes = emptyList(), isPartial = true)
                 }
 
-                val folders = searchFolders(term)
                 val remoteResults = fullSearch.await().getOrThrow()
                 val remotePodcasts = remoteResults.filterIsInstance<ImprovedSearchResultItem.PodcastItem>()
                 val podcasts = (predictivePodcasts + remotePodcasts + localPodcasts)
@@ -159,6 +159,7 @@ class TvSearchViewModel @Inject constructor(
                     .map { if (it.uuid in localUuids) it.copy(isFollowed = true) else it }
                 val episodes = remoteResults.filterIsInstance<ImprovedSearchResultItem.EpisodeItem>()
                     .distinctBy(ImprovedSearchResultItem.EpisodeItem::uuid)
+                val folders = foldersSearch.await()
                 if (podcasts.isEmpty() && episodes.isEmpty() && folders.isEmpty()) {
                     TvSearchState.NoResults
                 } else {
