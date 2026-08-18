@@ -87,6 +87,11 @@ steps:
         artifact_paths:
           - "**/build/outputs/apk/**/*"
 
+  # Throwaway, delete with `.buildkite/commands/verify-sentry-upload.sh`.
+  - label: ":sentry: Verify Sentry Upload"
+    command: ".buildkite/commands/verify-sentry-upload.sh"
+    plugins: [ $CI_TOOLKIT ]
+
     ##########
     # Optional Prototype Builds
     #
