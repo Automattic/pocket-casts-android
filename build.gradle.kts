@@ -475,7 +475,7 @@ subprojects {
 }
 
 fun Project.applyCommonSentryConfiguration() {
-    val sentryAuthToken = providers.environmentVariable("SENTRY_AUTH_TOKEN").orNull?.takeIf { it.isNotBlank() }
+    val sentryAuthToken = providers.environmentVariable("SENTRY_AUTH_TOKEN").orNull?.trim()?.ifEmpty { null }
 
     extensions.getByType(SentryPluginExtension::class.java).apply {
         authToken = sentryAuthToken
