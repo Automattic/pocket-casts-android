@@ -498,7 +498,7 @@ fun Project.applyCommonSentryConfiguration() {
         doFirst {
             if (sentryAuthToken == null) {
                 throw GradleException(
-                    "SENTRY_AUTH_TOKEN is not set. Export it to upload debug files to Sentry, " +
+                    "SENTRY_AUTH_TOKEN is not set (or is blank). Export it to upload debug files to Sentry, " +
                         "or pass -PskipSentryProguardMappingUpload=true to skip the upload.",
                 )
             }
