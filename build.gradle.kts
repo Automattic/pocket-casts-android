@@ -475,7 +475,7 @@ subprojects {
 }
 
 fun Project.applyCommonSentryConfiguration() {
-    val sentryAuthToken = providers.environmentVariable("SENTRY_AUTH_TOKEN").filter { it.isNotBlank() }
+    val sentryAuthToken = providers.environmentVariable("SENTRY_AUTH_TOKEN").orNull?.takeIf { it.isNotBlank() }
 
     extensions.getByType(SentryPluginExtension::class.java).apply {
         authToken = sentryAuthToken
@@ -496,7 +496,7 @@ fun Project.applyCommonSentryConfiguration() {
 
     tasks.withType<SentryCliExecTask>().configureEach {
         doFirst {
-            if (!sentryAuthToken.isPresent) {
+            if (sentryAuthToken == null) {
                 throw GradleException(
                     "SENTRY_AUTH_TOKEN is not set. Export it to upload debug files to Sentry, " +
                         "or pass -PskipSentryProguardMappingUpload=true to skip the upload.",
