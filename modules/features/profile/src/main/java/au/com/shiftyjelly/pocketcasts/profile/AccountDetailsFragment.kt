@@ -222,7 +222,7 @@ class AccountDetailsFragment : BaseFragment() {
             is DeleteAccountState.Success -> {
                 accountViewModel.clearDeleteAccountState()
                 if (Util.isAutomotive(requireContext())) {
-                    // Automotive are often shared, so clear local podcasts
+                    // Automotive head units are often shared, so clear the local podcasts
                     signOutAndClearData()
                 } else {
                     performSignOut()
