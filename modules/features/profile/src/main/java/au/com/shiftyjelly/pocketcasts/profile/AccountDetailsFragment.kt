@@ -226,7 +226,7 @@ class AccountDetailsFragment : BaseFragment() {
 
             is DeleteAccountState.Failure -> {
                 accountViewModel.clearDeleteAccountState()
-                carThemedAlertBuilder(requireContext())
+                themedAlertBuilder(requireContext())
                     .setTitle(getString(LR.string.profile_delete_account_failed_title))
                     .setMessage(state.message ?: getString(LR.string.profile_delete_account_failed_message))
                     .setPositiveButton(getString(LR.string.ok)) { dialog, _ -> dialog.dismiss() }
@@ -244,7 +244,7 @@ class AccountDetailsFragment : BaseFragment() {
 
     private fun deleteAccountAutomotive() {
         val context = context ?: return
-        carThemedAlertBuilder(context)
+        themedAlertBuilder(context)
             .setTitle(getString(LR.string.profile_delete_account_title))
             .setMessage(getString(LR.string.profile_delete_account_question))
             .setPositiveButton(getString(LR.string.profile_account_delete)) { _, _ -> deleteAccountPermanentAutomotive() }
@@ -254,7 +254,7 @@ class AccountDetailsFragment : BaseFragment() {
 
     private fun deleteAccountPermanentAutomotive() {
         val context = context ?: return
-        carThemedAlertBuilder(context)
+        themedAlertBuilder(context)
             .setTitle(getString(LR.string.profile_delete_account_title))
             .setMessage(getString(LR.string.profile_delete_account_permanent_question))
             .setPositiveButton(getString(LR.string.profile_account_delete_yes)) { _, _ -> performDeleteAccount() }
@@ -262,14 +262,14 @@ class AccountDetailsFragment : BaseFragment() {
             .show()
     }
 
-    private fun carThemedAlertBuilder(context: Context): AlertDialog.Builder {
+    private fun themedAlertBuilder(context: Context): AlertDialog.Builder {
         val themedContext = if (Util.isAutomotive(context)) ContextThemeWrapper(context, CR.style.Theme_Car_NoActionBar) else context
         return AlertDialog.Builder(themedContext)
     }
 
     private fun signOutAutomotive() {
         val context = context ?: return
-        val builder = carThemedAlertBuilder(context)
+        val builder = themedAlertBuilder(context)
         builder.setTitle(getString(LR.string.profile_sign_out))
             .setMessage(getString(LR.string.profile_sign_out_confirm))
             .setPositiveButton(getString(LR.string.profile_sign_out)) { _, _ -> clearDataAlert() }
@@ -279,7 +279,7 @@ class AccountDetailsFragment : BaseFragment() {
 
     private fun clearDataAlert() {
         val context = context ?: return
-        val builder = carThemedAlertBuilder(context)
+        val builder = themedAlertBuilder(context)
         builder.setTitle(getString(LR.string.profile_clear_data_question))
             .setMessage(getString(LR.string.profile_clear_data_would_you_also_like_question))
             .setPositiveButton(getString(LR.string.profile_just_sign_out)) { _, _ -> performSignOut() }
