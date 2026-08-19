@@ -221,7 +221,12 @@ class AccountDetailsFragment : BaseFragment() {
         when (state) {
             is DeleteAccountState.Success -> {
                 accountViewModel.clearDeleteAccountState()
-                performSignOut()
+                if (Util.isAutomotive(requireContext())) {
+                    // Automotive are often shared, so clear local podcasts
+                    signOutAndClearData()
+                } else {
+                    performSignOut()
+                }
             }
 
             is DeleteAccountState.Failure -> {
