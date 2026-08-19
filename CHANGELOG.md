@@ -7,6 +7,8 @@
 *   Bug Fixes
     *   Fix a crash when showing a bottom sheet after the app is sent to the background
         ([#5709](https://github.com/Automattic/pocket-casts-android/pull/5709))
+    *   Fix truncated dialog button labels in the Automotive app
+        ([#5751](https://github.com/Automattic/pocket-casts-android/pull/5751))
 
 8.18
 -----
