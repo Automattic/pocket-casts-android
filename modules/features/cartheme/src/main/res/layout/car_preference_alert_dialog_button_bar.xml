@@ -37,13 +37,13 @@
 
         <Button
             android:id="@android:id/button3"
-            style="@style/Widget.Car.Button.Borderless.Colored"
+            style="@style/Widget.Car.Dialog.Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
         <Button
             android:id="@android:id/button2"
-            style="@style/Widget.Car.Button.Borderless.Colored"
+            style="@style/Widget.Car.Dialog.Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="start"
@@ -52,7 +52,7 @@
 
         <Button
             android:id="@android:id/button1"
-            style="@style/Widget.Car.Button.Borderless.Colored"
+            style="@style/Widget.Car.Dialog.Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
