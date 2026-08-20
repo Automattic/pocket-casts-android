@@ -129,8 +129,6 @@ class AppLifecycleObserver(
             // new installations default to not displaying the tooltip
             settings.showPodcastsRecentlyPlayedSortOrderTooltip.set(false, updateModifiedAt = false)
 
-            settings.showFreeAccountEncouragement.set(false, updateModifiedAt = false)
-
             when (getAppPlatform()) {
                 // do nothing because this already defaults to true for all users on automotive
                 AppPlatform.Automotive -> {}
