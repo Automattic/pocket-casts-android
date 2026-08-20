@@ -56,6 +56,15 @@ class ShowNotesManager @Inject constructor(
         )
     }
 
+    suspend fun refreshTranscriptMetadata(podcastUuid: String, episodeUuid: String) {
+        val showNotes = showNotesServiceManager.downloadShowNotes(podcastUuid) ?: return
+        showNotesProcessor.process(
+            podcastUuid = podcastUuid,
+            episodeUuid = episodeUuid,
+            showNotes = showNotes,
+        )
+    }
+
     suspend fun loadShowNotes(podcastUuid: String, episodeUuid: String): ShowNotesState = showNotesServiceManager.loadShowNotes(
         podcastUuid = podcastUuid,
         episodeUuid = episodeUuid,

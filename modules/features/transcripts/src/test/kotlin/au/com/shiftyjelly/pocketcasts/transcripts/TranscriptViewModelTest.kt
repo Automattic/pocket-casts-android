@@ -15,6 +15,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintTiming
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.transcript.OnDemandTranscriptRepository
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.sharing.SharingRequest
@@ -25,14 +26,15 @@ import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.SyncedTranscriptsAutoScrollResumedEvent
 import com.automattic.eventhorizon.SyncedTranscriptsSeekFailedEvent
 import com.automattic.eventhorizon.SyncedTranscriptsSeekUsedEvent
+import com.automattic.eventhorizon.TranscriptErrorEvent
 import com.automattic.eventhorizon.TranscriptSourceType
 import java.util.Date
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlowable
 import kotlinx.coroutines.test.advanceTimeBy
@@ -63,6 +65,7 @@ class TranscriptViewModelTest {
     val coroutineRule = MainCoroutineRule()
 
     private val transcriptManager = TestTranscriptManager()
+    private val onDemandTranscriptRepository = TestOnDemandTranscriptRepository()
     private val signInStateFlow = MutableStateFlow<SignInState>(SignInState.SignedOut)
     private val playbackStateFlow = MutableStateFlow(PlaybackState(episodeUuid = ""))
     private val syncedStateFlow = MutableStateFlow<FingerprintTimingManager.State>(FingerprintTimingManager.State.Idle)
@@ -84,6 +87,7 @@ class TranscriptViewModelTest {
     fun setUp() {
         viewModel = TranscriptViewModel(
             transcriptManager = transcriptManager,
+            onDemandTranscriptRepository = onDemandTranscriptRepository,
             episodeManager = episodeManager,
             userManager = mock {
                 on { getSignInState() } doReturn signInStateFlow.asFlowable()
@@ -161,6 +165,180 @@ class TranscriptViewModelTest {
             viewModel.loadTranscript("episode-uuid")
             assertEquals(TranscriptState.Failure, awaitItem().transcriptState)
         }
+    }
+
+    @Test
+    fun `paid listener requests missing transcript once and sees generating state`() = runTest {
+        signInStateFlow.value = SignInState.SignedIn("email", Subscription.PlusPreview)
+        transcriptManager.isAvailable.value = false
+        transcriptManager.shouldLoadTranscripts = false
+        whenever(episodeManager.findByUuid("episode-uuid")).thenReturn(
+            PodcastEpisode(uuid = "episode-uuid", publishedDate = Date(), podcastUuid = "podcast-uuid"),
+        )
+
+        viewModel.loadTranscript("episode-uuid")
+        runCurrent()
+        viewModel.loadTranscript("episode-uuid")
+        runCurrent()
+
+        assertEquals(TranscriptState.Generating, viewModel.uiState.value.transcriptState)
+        assertEquals(1, transcriptManager.loadCount)
+        assertEquals(1, onDemandTranscriptRepository.requestCount)
+        assertFalse(eventSink.pollEvent() is TranscriptErrorEvent)
+        assertTrue(eventSink.isEmpty())
+    }
+
+    @Test
+    fun `paid listener loads creator transcript before considering on demand generation`() = runTest {
+        signInStateFlow.value = SignInState.SignedIn("email", Subscription.PlusPreview)
+        transcriptManager.isAvailable.value = false
+        whenever(episodeManager.findByUuid("episode-uuid")).thenReturn(
+            PodcastEpisode(uuid = "episode-uuid", publishedDate = Date(), podcastUuid = "podcast-uuid"),
+        )
+
+        viewModel.loadTranscript("episode-uuid")
+        runCurrent()
+
+        assertEquals(TranscriptState.Loaded(transcriptManager.avaiableTranscript), viewModel.uiState.value.transcriptState)
+        assertEquals(1, transcriptManager.loadCount)
+        assertEquals(0, onDemandTranscriptRepository.requestCount)
+        assertFalse(eventSink.pollEvent() is TranscriptErrorEvent)
+        assertTrue(eventSink.isEmpty())
+    }
+
+    @Test
+    fun `free listener does not request missing transcript`() = runTest {
+        signInStateFlow.value = SignInState.SignedIn("email", subscription = null)
+        transcriptManager.isAvailable.value = false
+        transcriptManager.shouldLoadTranscripts = false
+
+        viewModel.loadTranscript("episode-uuid")
+        advanceTimeBy(60.seconds)
+        runCurrent()
+
+        assertEquals(TranscriptState.Failure, viewModel.uiState.value.transcriptState)
+        assertEquals(0, onDemandTranscriptRepository.requestCount)
+    }
+
+    @Test
+    fun `generation refresh loads transcript when Room reports availability`() = runTest {
+        signInStateFlow.value = SignInState.SignedIn("email", Subscription.PatronPreview)
+        transcriptManager.isAvailable.value = false
+        transcriptManager.shouldLoadTranscripts = false
+        whenever(episodeManager.findByUuid("episode-uuid")).thenReturn(
+            PodcastEpisode(uuid = "episode-uuid", publishedDate = Date(), podcastUuid = "podcast-uuid"),
+        )
+        onDemandTranscriptRepository.onRefresh = {
+            transcriptManager.isAvailable.value = true
+        }
+
+        viewModel.onScreenStarted()
+        viewModel.loadTranscript("episode-uuid")
+        runCurrent()
+        advanceTimeBy(15.seconds)
+        runCurrent()
+
+        assertTrue(viewModel.uiState.value.transcriptState is TranscriptState.Loaded)
+        assertEquals(1, onDemandTranscriptRepository.refreshCount)
+    }
+
+    @Test
+    fun `refresh pauses while screen is stopped`() = runTest {
+        signInStateFlow.value = SignInState.SignedIn("email", Subscription.PlusPreview)
+        transcriptManager.isAvailable.value = false
+        transcriptManager.shouldLoadTranscripts = false
+        whenever(episodeManager.findByUuid("episode-uuid")).thenReturn(
+            PodcastEpisode(uuid = "episode-uuid", publishedDate = Date(), podcastUuid = "podcast-uuid"),
+        )
+
+        viewModel.loadTranscript("episode-uuid")
+        runCurrent()
+        advanceTimeBy(30.seconds)
+        runCurrent()
+        assertEquals(0, onDemandTranscriptRepository.refreshCount)
+
+        viewModel.onScreenStarted()
+        advanceTimeBy(15.seconds)
+        runCurrent()
+        assertEquals(1, onDemandTranscriptRepository.refreshCount)
+
+        viewModel.onScreenStopped()
+        advanceTimeBy(30.seconds)
+        runCurrent()
+        assertEquals(1, onDemandTranscriptRepository.refreshCount)
+    }
+
+    @Test
+    fun `transient request failure does not show generating`() = runTest {
+        signInStateFlow.value = SignInState.SignedIn("email", Subscription.PlusPreview)
+        transcriptManager.isAvailable.value = false
+        transcriptManager.shouldLoadTranscripts = false
+        onDemandTranscriptRepository.outcome = OnDemandTranscriptRepository.Outcome.TransientFailure
+        whenever(episodeManager.findByUuid("episode-uuid")).thenReturn(
+            PodcastEpisode(uuid = "episode-uuid", publishedDate = Date(), podcastUuid = "podcast-uuid"),
+        )
+
+        viewModel.loadTranscript("episode-uuid")
+        runCurrent()
+
+        assertEquals(TranscriptState.GenerationFailed, viewModel.uiState.value.transcriptState)
+    }
+
+    @Test
+    fun `generation refresh stops with delayed state after five foreground minutes`() = runTest {
+        signInStateFlow.value = SignInState.SignedIn("email", Subscription.PlusPreview)
+        transcriptManager.isAvailable.value = false
+        transcriptManager.shouldLoadTranscripts = false
+        whenever(episodeManager.findByUuid("episode-uuid")).thenReturn(
+            PodcastEpisode(uuid = "episode-uuid", publishedDate = Date(), podcastUuid = "podcast-uuid"),
+        )
+
+        viewModel.onScreenStarted()
+        viewModel.loadTranscript("episode-uuid")
+        runCurrent()
+        advanceTimeBy(2.minutes)
+        runCurrent()
+        assertEquals(TranscriptState.Generating, viewModel.uiState.value.transcriptState)
+        assertEquals(8, onDemandTranscriptRepository.refreshCount)
+
+        advanceTimeBy(3.minutes)
+        runCurrent()
+
+        assertEquals(TranscriptState.GenerationDelayed, viewModel.uiState.value.transcriptState)
+        assertEquals(20, onDemandTranscriptRepository.refreshCount)
+
+        viewModel.onScreenStopped()
+        viewModel.onScreenStarted()
+        advanceTimeBy(1.minutes)
+        runCurrent()
+        assertEquals(20, onDemandTranscriptRepository.refreshCount)
+    }
+
+    @Test
+    fun `loading another episode cancels the previous generation refresh`() = runTest {
+        signInStateFlow.value = SignInState.SignedIn("email", Subscription.PlusPreview)
+        transcriptManager.isAvailable.value = false
+        transcriptManager.shouldLoadTranscripts = false
+        whenever(episodeManager.findByUuid("episode-uuid")).thenReturn(
+            PodcastEpisode(uuid = "episode-uuid", publishedDate = Date(), podcastUuid = "podcast-uuid"),
+        )
+        whenever(episodeManager.findByUuid("other-episode-uuid")).thenReturn(
+            PodcastEpisode(uuid = "other-episode-uuid", publishedDate = Date(), podcastUuid = "other-podcast-uuid"),
+        )
+
+        viewModel.onScreenStarted()
+        viewModel.loadTranscript("episode-uuid")
+        runCurrent()
+        advanceTimeBy(15.seconds)
+        runCurrent()
+        viewModel.loadTranscript("other-episode-uuid")
+        runCurrent()
+        advanceTimeBy(15.seconds)
+        runCurrent()
+
+        assertEquals(2, onDemandTranscriptRepository.requestCount)
+        assertEquals(2, onDemandTranscriptRepository.refreshCount)
+        assertEquals(TranscriptState.Generating, viewModel.uiState.value.transcriptState)
     }
 
     @Test
@@ -632,10 +810,13 @@ class TranscriptViewModelTest {
 private class TestTranscriptManager : TranscriptManager {
     var avaiableTranscript: Transcript = Transcript.TextPreview
     var shouldLoadTranscripts = true
+    var loadCount = 0
+    val isAvailable = MutableStateFlow(true)
 
-    override fun observeIsTranscriptAvailable(episodeUuid: String) = emptyFlow<Boolean>()
+    override fun observeIsTranscriptAvailable(episodeUuid: String) = isAvailable
 
     override suspend fun loadTranscript(episodeUuid: String): Transcript? {
+        loadCount++
         yield()
         return avaiableTranscript.takeIf { shouldLoadTranscripts }
     }
@@ -645,4 +826,29 @@ private class TestTranscriptManager : TranscriptManager {
     }
 
     override suspend fun loadSummaryText(episodeUuid: String): String? = null
+}
+
+private class TestOnDemandTranscriptRepository : OnDemandTranscriptRepository {
+    var outcome = OnDemandTranscriptRepository.Outcome.Queued
+    var requestCount = 0
+    var refreshCount = 0
+    var onRefresh: () -> Unit = {}
+
+    override suspend fun request(
+        podcastUuid: String,
+        episodeUuid: String,
+    ): OnDemandTranscriptRepository.RequestResult {
+        requestCount++
+        return OnDemandTranscriptRepository.RequestResult(
+            outcome = outcome,
+            reason = "unspecified",
+            enablement = "enabled",
+            newlyQueuedCount = 1,
+        )
+    }
+
+    override suspend fun refreshMetadata(podcastUuid: String, episodeUuid: String) {
+        refreshCount++
+        onRefresh()
+    }
 }

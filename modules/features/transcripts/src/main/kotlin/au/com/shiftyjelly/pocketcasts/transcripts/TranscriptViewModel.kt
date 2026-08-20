@@ -15,9 +15,12 @@ import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.ChapterSeekResult
 import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintTimingManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.transcript.OnDemandTranscriptRepository
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.sharing.SharingRequest
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.search.SearchCoordinates
 import au.com.shiftyjelly.pocketcasts.utils.search.SearchMatches
 import au.com.shiftyjelly.pocketcasts.utils.search.kmpSearch
@@ -38,6 +41,8 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
@@ -46,16 +51,20 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
+import kotlinx.parcelize.IgnoredOnParcel
+import kotlinx.parcelize.Parcelize
 
 @HiltViewModel(assistedFactory = TranscriptViewModel.Factory::class)
 class TranscriptViewModel @AssistedInject constructor(
     @Assisted private val source: Source,
     private val transcriptManager: TranscriptManager,
+    private val onDemandTranscriptRepository: OnDemandTranscriptRepository,
     private val episodeManager: EpisodeManager,
     private val userManager: UserManager,
     private val paymentClient: PaymentClient,
@@ -96,9 +105,27 @@ class TranscriptViewModel @AssistedInject constructor(
     private var podcastUuid: String? = null
 
     private var loadTranscriptJob: Job? = null
+    private var generationRefreshJob: Job? = null
     private var searchJob: Job? = null
+    private var requestedEpisodeUuid: String? = null
+    private var generationRefreshAttempts = 0
+    private var generationStartedAtNanos: Long? = null
+    private var isScreenStarted = false
 
     fun loadTranscript(episodeUuid: String) {
+        if (
+            this.episodeUuid == episodeUuid &&
+            (loadTranscriptJob?.isActive == true || _uiState.value.transcriptState is TranscriptState.Generating)
+        ) {
+            return
+        }
+        if (this.episodeUuid != episodeUuid) {
+            generationRefreshJob?.cancel()
+            generationRefreshJob = null
+            requestedEpisodeUuid = null
+            generationRefreshAttempts = 0
+            generationStartedAtNanos = null
+        }
         loadTranscriptJob?.cancel()
         syncedStateJob?.cancel()
         loadTranscriptJob = viewModelScope.launch {
@@ -113,49 +140,159 @@ class TranscriptViewModel @AssistedInject constructor(
             }
 
             updateEpisodeMetadata(episodeUuid)
-            val transcriptState = when (val transcript = transcriptManager.loadTranscript(episodeUuid)) {
-                is Transcript.Text -> if (transcript.entries.isNotEmpty()) {
-                    TranscriptState.Loaded(transcript)
-                } else {
-                    track { source, podcastUuid, episodeUuid ->
-                        TranscriptErrorEvent(
-                            podcastUuid = podcastUuid,
-                            episodeUuid = episodeUuid,
+            val isEligibleForOnDemand = FeatureFlag.isEnabled(Feature.ON_DEMAND_TRANSCRIPTS) &&
+                userManager.getSignInState().asFlow().first().isSignedInAsPlusOrPatron
+            val hasExistingTranscript = loadExistingTranscript(
+                episodeUuid = episodeUuid,
+                showMissingFailure = !isEligibleForOnDemand,
+            )
+            if (!hasExistingTranscript && isEligibleForOnDemand) {
+                requestOnDemandTranscript(episodeUuid)
+            }
+        }
+    }
+
+    private suspend fun loadExistingTranscript(
+        episodeUuid: String,
+        showMissingFailure: Boolean = true,
+    ): Boolean {
+        val transcript = transcriptManager.loadTranscript(episodeUuid)
+        if (transcript == null) {
+            if (showMissingFailure) {
+                track { source, podcastUuid, episodeUuid ->
+                    TranscriptErrorEvent(
+                        podcastUuid = podcastUuid,
+                        episodeUuid = episodeUuid,
+                        source = source,
+                    )
+                }
+                _uiState.update { state -> state.copy(transcriptState = TranscriptState.Failure) }
+            }
+            return false
+        }
+        val transcriptState = when (transcript) {
+            is Transcript.Text -> if (transcript.entries.isNotEmpty()) {
+                TranscriptState.Loaded(transcript)
+            } else {
+                track { source, podcastUuid, episodeUuid ->
+                    TranscriptErrorEvent(
+                        podcastUuid = podcastUuid,
+                        episodeUuid = episodeUuid,
+                        source = source,
+                    )
+                }
+                TranscriptState.NoContent
+            }
+
+            is Transcript.Web -> {
+                TranscriptState.Loaded(transcript)
+            }
+        }
+        _uiState.update { state -> state.copy(transcriptState = transcriptState) }
+
+        if (transcriptState is TranscriptState.Loaded) {
+            trackTranscriptShown(transcriptState.transcript)
+        }
+
+        if (transcriptState is TranscriptState.Loaded && transcriptState.transcript is Transcript.Text) {
+            val currentPlayingUuid = playbackManager.getCurrentEpisode()?.uuid
+            if (currentPlayingUuid == episodeUuid) {
+                fingerprintTimingManager.prepareForCurrentEpisode(FingerprintTimingManager.PrepareTrigger.TRANSCRIPT_VIEW)
+                _uiState.update { state -> state.copy(syncedState = fingerprintTimingManager.state) }
+                observeSyncedState()
+            }
+        }
+        return true
+    }
+
+    private suspend fun requestOnDemandTranscript(episodeUuid: String) {
+        if (requestedEpisodeUuid == episodeUuid) {
+            if (_uiState.value.transcriptState is TranscriptState.Generating) {
+                startGenerationRefresh()
+            }
+            return
+        }
+        val podcastUuid = podcastUuid ?: run {
+            _uiState.update { it.copy(transcriptState = TranscriptState.GenerationFailed) }
+            return
+        }
+        requestedEpisodeUuid = episodeUuid
+        generationRefreshAttempts = 0
+        generationStartedAtNanos = System.nanoTime()
+        val result = onDemandTranscriptRepository.request(podcastUuid, episodeUuid)
+        track { source, trackedPodcastUuid, trackedEpisodeUuid ->
+            OnDemandTranscriptRequestedEvent(
+                outcome = result.outcome.name.lowercase(),
+                reason = result.reason,
+                enablement = result.enablement,
+                newlyQueuedCount = result.newlyQueuedCount,
+                podcastUuid = trackedPodcastUuid,
+                episodeUuid = trackedEpisodeUuid,
+                source = source,
+            )
+        }
+        when (result.outcome) {
+            OnDemandTranscriptRepository.Outcome.Queued,
+            OnDemandTranscriptRepository.Outcome.InProgress,
+            OnDemandTranscriptRepository.Outcome.Available,
+            -> {
+                _uiState.update { it.copy(transcriptState = TranscriptState.Generating) }
+                startGenerationRefresh()
+            }
+
+            OnDemandTranscriptRepository.Outcome.NotEligible,
+            OnDemandTranscriptRepository.Outcome.Throttled,
+            OnDemandTranscriptRepository.Outcome.Unknown,
+            -> _uiState.update { it.copy(transcriptState = TranscriptState.GenerationUnavailable) }
+
+            OnDemandTranscriptRepository.Outcome.TransientFailure ->
+                _uiState.update { it.copy(transcriptState = TranscriptState.GenerationFailed) }
+        }
+    }
+
+    fun onScreenStarted() {
+        isScreenStarted = true
+        if (_uiState.value.transcriptState is TranscriptState.Generating) {
+            startGenerationRefresh()
+        }
+    }
+
+    fun onScreenStopped() {
+        isScreenStarted = false
+        generationRefreshJob?.cancel()
+        generationRefreshJob = null
+    }
+
+    private fun startGenerationRefresh() {
+        if (!isScreenStarted || generationRefreshJob?.isActive == true) return
+        val episodeUuid = episodeUuid ?: return
+        val podcastUuid = podcastUuid ?: return
+        generationRefreshJob = viewModelScope.launch {
+            while (generationRefreshAttempts < GENERATION_REFRESH_MAX_ATTEMPTS) {
+                delay(GENERATION_REFRESH_INTERVAL)
+                generationRefreshAttempts++
+                try {
+                    onDemandTranscriptRepository.refreshMetadata(podcastUuid, episodeUuid)
+                } catch (error: Exception) {
+                    if (error is CancellationException) throw error
+                }
+                if (transcriptManager.observeIsTranscriptAvailable(episodeUuid).first()) {
+                    transcriptManager.resetInvalidTranscripts(episodeUuid)
+                    val elapsedSeconds = generationStartedAtNanos
+                        ?.let { startedAt -> (System.nanoTime() - startedAt) / 1_000_000_000 }
+                    track { source, trackedPodcastUuid, trackedEpisodeUuid ->
+                        OnDemandTranscriptReadyEvent(
+                            elapsedSeconds = elapsedSeconds,
+                            podcastUuid = trackedPodcastUuid,
+                            episodeUuid = trackedEpisodeUuid,
                             source = source,
                         )
                     }
-                    TranscriptState.NoContent
-                }
-
-                is Transcript.Web -> {
-                    TranscriptState.Loaded(transcript)
-                }
-
-                null -> {
-                    track { source, podcastUuid, episodeUuid ->
-                        TranscriptErrorEvent(
-                            podcastUuid = podcastUuid,
-                            episodeUuid = episodeUuid,
-                            source = source,
-                        )
-                    }
-                    TranscriptState.Failure
+                    loadExistingTranscript(episodeUuid)
+                    return@launch
                 }
             }
-            _uiState.update { state -> state.copy(transcriptState = transcriptState) }
-
-            if (transcriptState is TranscriptState.Loaded) {
-                trackTranscriptShown(transcriptState.transcript)
-            }
-
-            if (transcriptState is TranscriptState.Loaded && transcriptState.transcript is Transcript.Text) {
-                val currentPlayingUuid = playbackManager.getCurrentEpisode()?.uuid
-                if (currentPlayingUuid == episodeUuid) {
-                    fingerprintTimingManager.prepareForCurrentEpisode(FingerprintTimingManager.PrepareTrigger.TRANSCRIPT_VIEW)
-                    _uiState.update { state -> state.copy(syncedState = fingerprintTimingManager.state) }
-                    observeSyncedState()
-                }
-            }
+            _uiState.update { it.copy(transcriptState = TranscriptState.GenerationDelayed) }
         }
     }
 
@@ -296,6 +433,7 @@ class TranscriptViewModel @AssistedInject constructor(
     override fun onCleared() {
         super.onCleared()
         loadTranscriptJob?.cancel()
+        generationRefreshJob?.cancel()
         syncedStateJob?.cancel()
     }
 
@@ -306,6 +444,8 @@ class TranscriptViewModel @AssistedInject constructor(
 
         episodeUuid?.let { uuid ->
             transcriptManager.resetInvalidTranscripts(uuid)
+            requestedEpisodeUuid = null
+            generationRefreshAttempts = 0
             loadTranscript(uuid)
         }
     }
@@ -558,6 +698,14 @@ sealed interface TranscriptState {
     data object NoContent : TranscriptState
 
     data object Failure : TranscriptState
+
+    data object Generating : TranscriptState
+
+    data object GenerationUnavailable : TranscriptState
+
+    data object GenerationFailed : TranscriptState
+
+    data object GenerationDelayed : TranscriptState
 }
 
 data class SearchState(
@@ -574,5 +722,52 @@ data class SearchState(
                 matchingCoordinates = emptyMap(),
             ),
         )
+    }
+}
+
+private const val GENERATION_REFRESH_MAX_ATTEMPTS = 20
+private val GENERATION_REFRESH_INTERVAL = 15.seconds
+
+@Parcelize
+private data class OnDemandTranscriptRequestedEvent(
+    val outcome: String,
+    val reason: String,
+    val enablement: String,
+    val newlyQueuedCount: Int,
+    val podcastUuid: String,
+    val episodeUuid: String,
+    val source: TranscriptSourceType,
+) : Trackable {
+    @IgnoredOnParcel
+    override val analyticsName = "transcript_on_demand_requested"
+
+    @IgnoredOnParcel
+    override val analyticsProperties = mapOf(
+        "outcome" to outcome,
+        "reason" to reason,
+        "enablement" to enablement,
+        "newly_queued_count" to newlyQueuedCount,
+        "podcast_uuid" to podcastUuid,
+        "episode_uuid" to episodeUuid,
+        "source" to source.toString().lowercase(),
+    )
+}
+
+@Parcelize
+private data class OnDemandTranscriptReadyEvent(
+    val elapsedSeconds: Long?,
+    val podcastUuid: String,
+    val episodeUuid: String,
+    val source: TranscriptSourceType,
+) : Trackable {
+    @IgnoredOnParcel
+    override val analyticsName = "transcript_on_demand_ready"
+
+    @IgnoredOnParcel
+    override val analyticsProperties = buildMap<String, Any> {
+        elapsedSeconds?.let { put("elapsed_seconds", it) }
+        put("podcast_uuid", podcastUuid)
+        put("episode_uuid", episodeUuid)
+        put("source", source.toString().lowercase())
     }
 }

@@ -13,6 +13,10 @@ import timber.log.Timber
 class ShowNotesServiceManager @Inject constructor(
     private val podcastCacheServiceManager: PodcastCacheServiceManager,
 ) {
+    suspend fun downloadShowNotes(podcastUuid: String): ShowNotesResponse? {
+        if (podcastUuid.isBlank()) return null
+        return podcastCacheServiceManager.getShowNotes(podcastUuid)
+    }
 
     /**
      * Check the cache for show notes then download them if not found or update the cache.
@@ -106,7 +110,7 @@ class ShowNotesServiceManager @Inject constructor(
         if (podcastUuid.isBlank() || episodeUuid.isBlank()) {
             return null
         }
-        val response = podcastCacheServiceManager.getShowNotes(podcastUuid = podcastUuid)
+        val response = downloadShowNotes(podcastUuid) ?: return null
         processShowNotes(response)
         return response.findEpisode(episodeUuid)?.showNotes
     }
@@ -118,7 +122,7 @@ class ShowNotesServiceManager @Inject constructor(
         if (podcastUuid.isBlank()) {
             return
         }
-        val response = podcastCacheServiceManager.getShowNotes(podcastUuid = podcastUuid)
+        val response = downloadShowNotes(podcastUuid) ?: return
         processShowNotes(response)
     }
 }

@@ -4,6 +4,7 @@ import android.os.SystemClock
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.DragInteraction
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -29,7 +30,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.LifecycleStartEffect
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptEntry
@@ -76,6 +83,15 @@ fun TranscriptPage(
 ) {
     val theme = rememberTranscriptTheme()
     val listState = rememberLazyListState()
+
+    if (viewModel != null) {
+        LifecycleStartEffect(viewModel) {
+            viewModel.onScreenStarted()
+            onStopOrDispose {
+                viewModel.onScreenStopped()
+            }
+        }
+    }
 
     val syncableEpisodeUuid = uiState.transcriptEpisodeUuid.takeIf { uiState.isTextTranscriptLoaded }
     DisposableEffect(fingerprintTimingManager, syncableEpisodeUuid) {
@@ -331,6 +347,61 @@ private fun TranscriptContent(
                 modifier = modifier.fillMaxSize(),
             )
         }
+
+        is TranscriptState.Generating -> {
+            TranscriptGeneratingContent(
+                color = theme.primaryText,
+                modifier = modifier.fillMaxSize(),
+            )
+        }
+
+        TranscriptState.GenerationUnavailable -> {
+            TranscriptFailureContent(
+                description = stringResource(LR.string.transcript_generation_unavailable),
+                colors = theme.failureColors,
+                modifier = modifier.fillMaxSize(),
+            )
+        }
+
+        TranscriptState.GenerationFailed -> {
+            TranscriptFailureContent(
+                description = stringResource(LR.string.transcript_generation_failed),
+                colors = theme.failureColors,
+                buttonLabel = stringResource(LR.string.try_again),
+                onClickButton = onClickReload,
+                modifier = modifier.fillMaxSize(),
+            )
+        }
+
+        TranscriptState.GenerationDelayed -> {
+            TranscriptFailureContent(
+                description = stringResource(LR.string.transcript_generation_delayed),
+                colors = theme.failureColors,
+                modifier = modifier.fillMaxSize(),
+            )
+        }
+    }
+}
+
+@Composable
+private fun TranscriptGeneratingContent(
+    color: androidx.compose.ui.graphics.Color,
+    modifier: Modifier = Modifier,
+) {
+    val message = stringResource(LR.string.transcript_generation_started)
+    Column(
+        modifier = modifier
+            .semantics { liveRegion = LiveRegionMode.Polite }
+            .padding(32.dp),
+        verticalArrangement = Arrangement.spacedBy(24.dp, Alignment.CenterVertically),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        LoadingView(color = color)
+        TextH30(
+            text = message,
+            color = color,
+            textAlign = TextAlign.Center,
+        )
     }
 }
 
