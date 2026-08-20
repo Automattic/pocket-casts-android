@@ -235,8 +235,6 @@ class TranscriptViewModelTest {
         viewModel.onScreenStarted()
         viewModel.loadTranscript("episode-uuid")
         runCurrent()
-        advanceTimeBy(15.seconds)
-        runCurrent()
 
         assertTrue(viewModel.uiState.value.transcriptState is TranscriptState.Loaded)
         assertEquals(1, onDemandTranscriptRepository.refreshCount)
@@ -258,7 +256,6 @@ class TranscriptViewModelTest {
         assertEquals(0, onDemandTranscriptRepository.refreshCount)
 
         viewModel.onScreenStarted()
-        advanceTimeBy(15.seconds)
         runCurrent()
         assertEquals(1, onDemandTranscriptRepository.refreshCount)
 
@@ -285,6 +282,58 @@ class TranscriptViewModelTest {
     }
 
     @Test
+    fun `re-entry after unavailable generation preserves terminal state`() = runTest {
+        signInStateFlow.value = SignInState.SignedIn("email", Subscription.PlusPreview)
+        transcriptManager.isAvailable.value = false
+        transcriptManager.shouldLoadTranscripts = false
+        onDemandTranscriptRepository.outcome = OnDemandTranscriptRepository.Outcome.NotEligible
+        whenever(episodeManager.findByUuid("episode-uuid")).thenReturn(
+            PodcastEpisode(uuid = "episode-uuid", publishedDate = Date(), podcastUuid = "podcast-uuid"),
+        )
+
+        viewModel.loadTranscript("episode-uuid")
+        runCurrent()
+        viewModel.loadTranscript("episode-uuid")
+        runCurrent()
+
+        assertEquals(TranscriptState.GenerationUnavailable, viewModel.uiState.value.transcriptState)
+        assertEquals(1, transcriptManager.loadCount)
+        assertEquals(1, onDemandTranscriptRepository.requestCount)
+    }
+
+    @Test
+    fun `throttled request shows delayed state`() = runTest {
+        signInStateFlow.value = SignInState.SignedIn("email", Subscription.PlusPreview)
+        transcriptManager.isAvailable.value = false
+        transcriptManager.shouldLoadTranscripts = false
+        onDemandTranscriptRepository.outcome = OnDemandTranscriptRepository.Outcome.Throttled
+        whenever(episodeManager.findByUuid("episode-uuid")).thenReturn(
+            PodcastEpisode(uuid = "episode-uuid", publishedDate = Date(), podcastUuid = "podcast-uuid"),
+        )
+
+        viewModel.loadTranscript("episode-uuid")
+        runCurrent()
+
+        assertEquals(TranscriptState.GenerationDelayed, viewModel.uiState.value.transcriptState)
+    }
+
+    @Test
+    fun `unknown request outcome shows retryable failure`() = runTest {
+        signInStateFlow.value = SignInState.SignedIn("email", Subscription.PlusPreview)
+        transcriptManager.isAvailable.value = false
+        transcriptManager.shouldLoadTranscripts = false
+        onDemandTranscriptRepository.outcome = OnDemandTranscriptRepository.Outcome.Unknown
+        whenever(episodeManager.findByUuid("episode-uuid")).thenReturn(
+            PodcastEpisode(uuid = "episode-uuid", publishedDate = Date(), podcastUuid = "podcast-uuid"),
+        )
+
+        viewModel.loadTranscript("episode-uuid")
+        runCurrent()
+
+        assertEquals(TranscriptState.GenerationFailed, viewModel.uiState.value.transcriptState)
+    }
+
+    @Test
     fun `generation refresh stops with delayed state after five foreground minutes`() = runTest {
         signInStateFlow.value = SignInState.SignedIn("email", Subscription.PlusPreview)
         transcriptManager.isAvailable.value = false
@@ -299,7 +348,7 @@ class TranscriptViewModelTest {
         advanceTimeBy(2.minutes)
         runCurrent()
         assertEquals(TranscriptState.Generating, viewModel.uiState.value.transcriptState)
-        assertEquals(8, onDemandTranscriptRepository.refreshCount)
+        assertEquals(9, onDemandTranscriptRepository.refreshCount)
 
         advanceTimeBy(3.minutes)
         runCurrent()
@@ -337,7 +386,7 @@ class TranscriptViewModelTest {
         runCurrent()
 
         assertEquals(2, onDemandTranscriptRepository.requestCount)
-        assertEquals(2, onDemandTranscriptRepository.refreshCount)
+        assertEquals(4, onDemandTranscriptRepository.refreshCount)
         assertEquals(TranscriptState.Generating, viewModel.uiState.value.transcriptState)
     }
 

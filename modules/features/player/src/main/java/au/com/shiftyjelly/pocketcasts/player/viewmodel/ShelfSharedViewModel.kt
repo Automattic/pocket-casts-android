@@ -8,6 +8,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
+import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.ChromeCastAnalytics
@@ -123,7 +124,7 @@ class ShelfSharedViewModel @Inject constructor(
         shelfUpNext: UpNextQueue.State,
         isTranscriptAvailable: Boolean,
         videoState: VideoState,
-        signInState: au.com.shiftyjelly.pocketcasts.models.type.SignInState,
+        signInState: SignInState,
     ): UiState {
         val episode = (shelfUpNext as? UpNextQueue.State.Loaded)?.episode
         val streamHasVideo = videoState.streamVideoState == StreamVideoState.HasVideo || videoState.streamVideoState == StreamVideoState.Unknown

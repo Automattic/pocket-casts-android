@@ -113,9 +113,17 @@ class TranscriptViewModel @AssistedInject constructor(
     private var isScreenStarted = false
 
     fun loadTranscript(episodeUuid: String) {
+        val transcriptState = _uiState.value.transcriptState
         if (
             this.episodeUuid == episodeUuid &&
-            (loadTranscriptJob?.isActive == true || _uiState.value.transcriptState is TranscriptState.Generating)
+            (
+                loadTranscriptJob?.isActive == true ||
+                    transcriptState is TranscriptState.Generating ||
+                    (
+                        requestedEpisodeUuid == episodeUuid &&
+                            transcriptState.isTerminalGenerationState
+                        )
+                )
         ) {
             return
         }
@@ -240,10 +248,14 @@ class TranscriptViewModel @AssistedInject constructor(
                 startGenerationRefresh()
             }
 
-            OnDemandTranscriptRepository.Outcome.NotEligible,
-            OnDemandTranscriptRepository.Outcome.Throttled,
-            OnDemandTranscriptRepository.Outcome.Unknown,
-            -> _uiState.update { it.copy(transcriptState = TranscriptState.GenerationUnavailable) }
+            OnDemandTranscriptRepository.Outcome.NotEligible ->
+                _uiState.update { it.copy(transcriptState = TranscriptState.GenerationUnavailable) }
+
+            OnDemandTranscriptRepository.Outcome.Throttled ->
+                _uiState.update { it.copy(transcriptState = TranscriptState.GenerationDelayed) }
+
+            OnDemandTranscriptRepository.Outcome.Unknown ->
+                _uiState.update { it.copy(transcriptState = TranscriptState.GenerationFailed) }
 
             OnDemandTranscriptRepository.Outcome.TransientFailure ->
                 _uiState.update { it.copy(transcriptState = TranscriptState.GenerationFailed) }
@@ -269,7 +281,9 @@ class TranscriptViewModel @AssistedInject constructor(
         val podcastUuid = podcastUuid ?: return
         generationRefreshJob = viewModelScope.launch {
             while (generationRefreshAttempts < GENERATION_REFRESH_MAX_ATTEMPTS) {
-                delay(GENERATION_REFRESH_INTERVAL)
+                if (generationRefreshAttempts > 0) {
+                    delay(GENERATION_REFRESH_INTERVAL)
+                }
                 generationRefreshAttempts++
                 try {
                     onDemandTranscriptRepository.refreshMetadata(podcastUuid, episodeUuid)
@@ -707,6 +721,11 @@ sealed interface TranscriptState {
 
     data object GenerationDelayed : TranscriptState
 }
+
+private val TranscriptState.isTerminalGenerationState
+    get() = this is TranscriptState.GenerationUnavailable ||
+        this is TranscriptState.GenerationFailed ||
+        this is TranscriptState.GenerationDelayed
 
 data class SearchState(
     val isSearchOpen: Boolean,

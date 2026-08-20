@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.player.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.Companion.MIN_SHELF_ITEMS_SIZE
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
@@ -85,12 +86,7 @@ class ShelfViewModel @AssistedInject constructor(
                     items
                 },
                 episode = episode,
-                isTranscriptAvailable = hasTranscriptRow ||
-                    (
-                        episode is au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode &&
-                            isEligiblePaidListener &&
-                            FeatureFlag.isEnabled(Feature.ON_DEMAND_TRANSCRIPTS)
-                        ),
+                isTranscriptAvailable = isTranscriptAvailableFor(episode),
             )
         }
     }
@@ -98,15 +94,17 @@ class ShelfViewModel @AssistedInject constructor(
     private fun updateTranscriptAvailability() {
         _uiState.update { state ->
             state.copy(
-                isTranscriptAvailable = hasTranscriptRow ||
-                    (
-                        state.episode is au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode &&
-                            isEligiblePaidListener &&
-                            FeatureFlag.isEnabled(Feature.ON_DEMAND_TRANSCRIPTS)
-                        ),
+                isTranscriptAvailable = isTranscriptAvailableFor(state.episode),
             )
         }
     }
+
+    private fun isTranscriptAvailableFor(episode: BaseEpisode?) = hasTranscriptRow ||
+        (
+            episode is PodcastEpisode &&
+                isEligiblePaidListener &&
+                FeatureFlag.isEnabled(Feature.ON_DEMAND_TRANSCRIPTS)
+            )
 
     fun onShelfItemMove(
         fromPosition: Int,

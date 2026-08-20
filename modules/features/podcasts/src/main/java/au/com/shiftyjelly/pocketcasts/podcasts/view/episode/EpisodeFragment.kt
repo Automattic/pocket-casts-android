@@ -1201,7 +1201,9 @@ class EpisodeFragment : BaseFragment() {
                     viewModel.selectContentTab(EpisodeContentTab.TRANSCRIPT)
                     eventHorizon.track(
                         EpisodeDetailTranscriptCardTappedEvent(
-                            episodeUuid = transcript?.episodeUuid ?: viewModel.episode?.uuid.orEmpty(),
+                            episodeUuid = transcript?.episodeUuid
+                                ?: viewModel.episode?.uuid
+                                ?: AnalyticsTracker.INVALID_OR_NULL_VALUE,
                             podcastUuid = transcript?.podcastUuid
                                 ?: viewModel.podcast?.uuid
                                 ?: AnalyticsTracker.INVALID_OR_NULL_VALUE,

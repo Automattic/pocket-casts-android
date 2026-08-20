@@ -26,6 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
@@ -34,10 +35,14 @@ import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LifecycleStartEffect
+import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
+import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptEntry
 import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintTimingManager
@@ -46,6 +51,7 @@ import au.com.shiftyjelly.pocketcasts.transcripts.TranscriptMessage
 import au.com.shiftyjelly.pocketcasts.transcripts.TranscriptState
 import au.com.shiftyjelly.pocketcasts.transcripts.TranscriptViewModel
 import au.com.shiftyjelly.pocketcasts.transcripts.UiState
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.search.SearchCoordinates
@@ -385,10 +391,9 @@ private fun TranscriptContent(
 
 @Composable
 private fun TranscriptGeneratingContent(
-    color: androidx.compose.ui.graphics.Color,
+    color: Color,
     modifier: Modifier = Modifier,
 ) {
-    val message = stringResource(LR.string.transcript_generation_started)
     Column(
         modifier = modifier
             .semantics { liveRegion = LiveRegionMode.Polite }
@@ -398,9 +403,56 @@ private fun TranscriptGeneratingContent(
     ) {
         LoadingView(color = color)
         TextH30(
-            text = message,
+            text = stringResource(LR.string.transcript_generation_started),
             color = color,
             textAlign = TextAlign.Center,
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun TranscriptGeneratingPreview(
+    @PreviewParameter(ThemePreviewParameterProvider::class) theme: ThemeType,
+) {
+    TranscriptStatePreview(theme, TranscriptState.Generating)
+}
+
+@Preview
+@Composable
+private fun TranscriptGenerationUnavailablePreview(
+    @PreviewParameter(ThemePreviewParameterProvider::class) theme: ThemeType,
+) {
+    TranscriptStatePreview(theme, TranscriptState.GenerationUnavailable)
+}
+
+@Preview
+@Composable
+private fun TranscriptGenerationFailedPreview(
+    @PreviewParameter(ThemePreviewParameterProvider::class) theme: ThemeType,
+) {
+    TranscriptStatePreview(theme, TranscriptState.GenerationFailed)
+}
+
+@Preview
+@Composable
+private fun TranscriptGenerationDelayedPreview(
+    @PreviewParameter(ThemePreviewParameterProvider::class) theme: ThemeType,
+) {
+    TranscriptStatePreview(theme, TranscriptState.GenerationDelayed)
+}
+
+@Composable
+private fun TranscriptStatePreview(themeType: ThemeType, transcriptState: TranscriptState) {
+    AppThemeWithBackground(themeType) {
+        val theme = rememberTranscriptTheme()
+        TranscriptContent(
+            uiState = UiState.Empty.copy(transcriptState = transcriptState),
+            listState = rememberLazyListState(),
+            theme = theme,
+            onClickReload = {},
+            onHighlightText = null,
+            modifier = Modifier.fillMaxSize(),
         )
     }
 }

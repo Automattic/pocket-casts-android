@@ -85,18 +85,18 @@ class OnDemandTranscriptRepositoryImpl @Inject constructor(
         episodeUuid: String,
     ) {
         val remotePodcast = podcastCacheServiceManager.getPodcastAndEpisode(podcastUuid, episodeUuid)
-        val remoteEpisode = remotePodcast.episodes.firstOrNull { it.uuid == episodeUuid }
-        val localEpisode = episodeManager.findByUuid(episodeUuid)
-        if (remoteEpisode != null && localEpisode != null) {
-            localEpisode.hasGeneratedTranscript = remoteEpisode.hasGeneratedTranscript
-            episodeManager.update(localEpisode)
-        }
+        val remoteEpisode = remotePodcast.episodes.firstOrNull { it.uuid == episodeUuid } ?: return
+        val localEpisode = episodeManager.findByUuid(episodeUuid) ?: return
+        if (!remoteEpisode.hasGeneratedTranscript || localEpisode.hasGeneratedTranscript) return
+
+        episodeManager.updateHasGeneratedTranscript(episodeUuid, hasGeneratedTranscript = true)
         showNotesManager.refreshTranscriptMetadata(podcastUuid, episodeUuid)
     }
 }
 
 internal fun Int.toOnDemandTranscriptOutcome() = when (this) {
-    400, 401, 403, 404 -> OnDemandTranscriptRepository.Outcome.NotEligible
+    403, 404 -> OnDemandTranscriptRepository.Outcome.NotEligible
+    401 -> OnDemandTranscriptRepository.Outcome.TransientFailure
     429 -> OnDemandTranscriptRepository.Outcome.Throttled
     in 500..599 -> OnDemandTranscriptRepository.Outcome.TransientFailure
     else -> OnDemandTranscriptRepository.Outcome.Unknown
