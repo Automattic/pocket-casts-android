@@ -2,13 +2,18 @@ package au.com.shiftyjelly.pocketcasts.servers.podcast
 
 import androidx.media3.common.MimeTypes
 import au.com.shiftyjelly.pocketcasts.models.entity.firstHlsStreamUrl
+import au.com.shiftyjelly.pocketcasts.models.type.MediaKind
+import au.com.shiftyjelly.pocketcasts.models.type.MediaKindMoshiAdapter
 import com.squareup.moshi.Moshi
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
 
 class EpisodeInfoTest {
-    private val adapter = Moshi.Builder().build().adapter(EpisodeInfo::class.java)
+    private val adapter = Moshi.Builder()
+        .add(MediaKind::class.java, MediaKindMoshiAdapter().nullSafe())
+        .build()
+        .adapter(EpisodeInfo::class.java)
 
     @Test
     fun `parse episode with hls alternate enclosure`() {
@@ -72,6 +77,7 @@ class EpisodeInfoTest {
                 },
                 {
                   "type": "video/mp4",
+                  "media_kind": "video",
                   "length": 10562995,
                   "bitrate": 681484,
                   "height": 1080,
@@ -104,12 +110,14 @@ class EpisodeInfoTest {
         assertEquals("episode-uuid", hls.episodeUuid)
         assertEquals(0, hls.position)
         assertEquals(MimeTypes.APPLICATION_M3U8, hls.type)
+        assertNull(hls.mediaKind)
         assertEquals(0L, hls.length)
         assertEquals("https://example.com/master.m3u8", hls.sources.single().uri)
 
         val mp4 = enclosures[1]
         assertEquals(1, mp4.position)
         assertEquals("video/mp4", mp4.type)
+        assertEquals(MediaKind.Video, mp4.mediaKind)
         assertEquals(681484L, mp4.bitrate)
         assertEquals(10562995L, mp4.length)
         assertEquals(1080, mp4.height)
@@ -124,6 +132,55 @@ class EpisodeInfoTest {
         assertNull(mp4.sources[0].contentType)
         assertEquals("ipfs://Qm...", mp4.sources[1].uri)
         assertEquals("application/x-bittorrent", mp4.sources[2].contentType)
+    }
+
+    @Test
+    fun `parse every known media kind`() {
+        val episodeInfo = adapter.fromJson(
+            """
+            {
+              "uuid": "episode-uuid",
+              "url": "https://example.com/episode.mp3",
+              "published": "2026-06-11T00:00:00Z",
+              "alternate_enclosures": [
+                { "type": "video/mp4", "media_kind": "video", "sources": [] },
+                { "type": "audio/mpeg", "media_kind": "audio", "sources": [] },
+                { "type": "video/mp4", "media_kind": "youtube", "sources": [] },
+                { "type": "video/mp4", "media_kind": "vimeo", "sources": [] },
+                { "type": "video/mp4", "media_kind": "other", "sources": [] }
+              ]
+            }
+            """.trimIndent(),
+        )
+
+        assertEquals(
+            listOf(MediaKind.Video, MediaKind.Audio, MediaKind.YouTube, MediaKind.Vimeo, MediaKind.Other),
+            episodeInfo?.toAlternateEnclosures()?.map { it.mediaKind },
+        )
+    }
+
+    @Test
+    fun `an unrecognised media kind keeps its raw value instead of failing`() {
+        val episodeInfo = adapter.fromJson(
+            """
+            {
+              "uuid": "episode-uuid",
+              "url": "https://example.com/episode.mp3",
+              "published": "2026-06-11T00:00:00Z",
+              "alternate_enclosures": [
+                { "type": "video/mp4", "media_kind": "hologram", "sources": [] },
+                { "type": "video/mp4", "media_kind": null, "sources": [] },
+                { "type": "video/mp4", "sources": [] }
+              ]
+            }
+            """.trimIndent(),
+        )
+
+        val enclosures = episodeInfo!!.toAlternateEnclosures()
+        assertEquals(MediaKind.Unknown("hologram"), enclosures[0].mediaKind)
+        // An explicit null and an absent key both mean "no media kind", which is not the same as MediaKind.Other.
+        assertNull(enclosures[1].mediaKind)
+        assertNull(enclosures[2].mediaKind)
     }
 
     @Test

@@ -27,6 +27,7 @@ class AppDatabaseTest {
         private const val TEST_DB = "migration-test"
         private const val MIGRATION_DB = "migration-test-132-133"
         private const val MIGRATION_DB_133_134 = "migration-test-133-134"
+        private const val MIGRATION_DB_135_136 = "migration-test-135-136"
     }
 
     @Rule @JvmField
@@ -153,13 +154,7 @@ class AppDatabaseTest {
 
         val db = migrationTestHelper.runMigrationsAndValidate(MIGRATION_DB_133_134, 134, true, AppDatabase.MIGRATION_133_134)
 
-        val columns = mutableListOf<String>()
-        db.query("PRAGMA table_info(episode_alternate_enclosures)").use { cursor ->
-            val nameIndex = cursor.getColumnIndex("name")
-            while (cursor.moveToNext()) {
-                columns.add(cursor.getString(nameIndex))
-            }
-        }
+        val columns = tableColumns(db, "episode_alternate_enclosures")
         assertEquals(
             "All enclosure columns should exist",
             true,
@@ -179,6 +174,33 @@ class AppDatabaseTest {
 
         db.execSQL("INSERT INTO episode_alternate_enclosures (episode_uuid, position, type, is_default, sources) VALUES ('episode-1', 0, 'application/x-mpegURL', 1, '[]')")
         assertEquals(1, countRows(db, "episode_alternate_enclosures"))
+    }
+
+    @Test
+    fun migrate135To136AddsMediaKindColumn() {
+        migrationTestHelper.createDatabase(MIGRATION_DB_135_136, 135).use {
+            it.execSQL("INSERT INTO episode_alternate_enclosures (episode_uuid, position, type, is_default, sources) VALUES ('episode-1', 0, 'video/mp4', 1, '[]')")
+        }
+
+        val db = migrationTestHelper.runMigrationsAndValidate(MIGRATION_DB_135_136, 136, true, AppDatabase.MIGRATION_135_136)
+
+        assertEquals("media_kind column should exist", true, tableColumns(db, "episode_alternate_enclosures").contains("media_kind"))
+        assertEquals("Existing enclosures should be preserved", 1, countRows(db, "episode_alternate_enclosures"))
+        assertEquals("Existing enclosures should default to a null media kind", 1, countWhere(db, "episode_alternate_enclosures", "media_kind IS NULL"))
+
+        db.execSQL("INSERT INTO episode_alternate_enclosures (episode_uuid, position, type, media_kind, is_default, sources) VALUES ('episode-1', 1, 'video/mp4', 'video', 0, '[]')")
+        assertEquals(1, countWhere(db, "episode_alternate_enclosures", "media_kind = 'video'"))
+    }
+
+    private fun tableColumns(db: SupportSQLiteDatabase?, tableName: String): List<String> {
+        val columns = mutableListOf<String>()
+        db?.query("PRAGMA table_info($tableName)")?.use { cursor ->
+            val nameIndex = cursor.getColumnIndex("name")
+            while (cursor.moveToNext()) {
+                columns.add(cursor.getString(nameIndex))
+            }
+        }
+        return columns
     }
 
     private fun countWhere(db: SupportSQLiteDatabase?, tableName: String, where: String): Int {
@@ -284,6 +306,7 @@ class AppDatabaseTest {
                 AppDatabase.MIGRATION_132_133,
                 AppDatabase.MIGRATION_133_134,
                 AppDatabase.MIGRATION_134_135,
+                AppDatabase.MIGRATION_135_136,
             )
             .build()
         // close the database and release any stream resources when the test finishes
