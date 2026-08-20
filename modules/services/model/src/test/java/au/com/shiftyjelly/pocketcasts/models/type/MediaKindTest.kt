@@ -36,4 +36,11 @@ class MediaKindTest {
     fun `kinds are matched case sensitively as the server sends them lowercase`() {
         assertEquals(MediaKind.Unknown("Video"), MediaKind.fromServer("Video"))
     }
+
+    @Test
+    fun `every kind prints as the value the server sends`() {
+        val kinds = listOf(MediaKind.Video, MediaKind.Audio, MediaKind.YouTube, MediaKind.Vimeo, MediaKind.Other, MediaKind.Unknown("hologram"))
+
+        assertEquals(listOf("video", "audio", "youtube", "vimeo", "other", "hologram"), kinds.map(MediaKind::toString))
+    }
 }

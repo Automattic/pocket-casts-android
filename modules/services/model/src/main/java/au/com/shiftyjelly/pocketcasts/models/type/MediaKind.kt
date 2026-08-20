@@ -33,11 +33,17 @@ sealed class MediaKind(val stringValue: String) {
 
     data class Unknown(val value: String) : MediaKind(value)
 
-    override fun toString() = stringValue
+    // Must stay final so the data objects and Unknown don't generate a toString that hides the server value.
+    final override fun toString() = stringValue
 }
 
 class MediaKindMoshiAdapter : JsonAdapter<MediaKind>() {
     override fun fromJson(reader: JsonReader): MediaKind? {
+        // A kind that isn't a string at all is treated as absent rather than failing the whole response.
+        if (reader.peek() != JsonReader.Token.STRING) {
+            reader.skipValue()
+            return null
+        }
         return MediaKind.fromServer(reader.nextString())
     }
 
