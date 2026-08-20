@@ -617,6 +617,7 @@ interface Settings {
     val isFreeAccountProfileBannerDismissed: UserSetting<Boolean>
     val isFreeAccountFiltersBannerDismissed: UserSetting<Boolean>
     val isFreeAccountHistoryBannerDismissed: UserSetting<Boolean>
+
     /**
      * Anchor for the recurring Encourage Account Creation modal cadence. The first eligible launch
      * sets this (without showing the modal); each time the modal is shown it is reset, so the modal
