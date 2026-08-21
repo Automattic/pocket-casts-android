@@ -72,6 +72,7 @@ dependencies {
     implementation(platform(libs.firebase.bom))
 
     implementation(projects.modules.features.shared)
+    implementation(projects.modules.services.analytics)
     implementation(projects.modules.services.compose)
     implementation(projects.modules.services.images)
     implementation(projects.modules.services.localization)

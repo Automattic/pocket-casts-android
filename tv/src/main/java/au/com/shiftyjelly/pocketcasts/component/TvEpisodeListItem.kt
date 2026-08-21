@@ -37,6 +37,27 @@ fun TvEpisodeListItem(
     episodeFocusRequester: FocusRequester? = null,
     leftFocusRequester: FocusRequester? = null,
 ) {
+    TvEpisodeListItemContainer(
+        onOpenActions = onOpenActions,
+        modifier = modifier,
+    ) { rowModifier ->
+        TvEpisodeRow(
+            episode = episode,
+            onClick = onClick,
+            dateFormatter = dateFormatter,
+            modifier = rowModifier
+                .then(if (leftFocusRequester != null) Modifier.focusProperties { left = leftFocusRequester } else Modifier)
+                .then(if (episodeFocusRequester != null) Modifier.focusRequester(episodeFocusRequester) else Modifier),
+        )
+    }
+}
+
+@Composable
+fun TvEpisodeListItemContainer(
+    onOpenActions: () -> Unit,
+    modifier: Modifier = Modifier,
+    content: @Composable (Modifier) -> Unit,
+) {
     var isItemFocused by remember { mutableStateOf(false) }
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -44,15 +65,7 @@ fun TvEpisodeListItem(
             .fillMaxWidth()
             .onFocusChanged { isItemFocused = it.hasFocus },
     ) {
-        TvEpisodeRow(
-            episode = episode,
-            onClick = onClick,
-            dateFormatter = dateFormatter,
-            modifier = Modifier
-                .weight(1f)
-                .then(if (leftFocusRequester != null) Modifier.focusProperties { left = leftFocusRequester } else Modifier)
-                .then(if (episodeFocusRequester != null) Modifier.focusRequester(episodeFocusRequester) else Modifier),
-        )
+        content(Modifier.weight(1f))
         AnimatedVisibility(
             visible = isItemFocused,
             enter = expandHorizontally(tween(MORE_BUTTON_ANIMATION_DURATION_MS), expandFrom = Alignment.Start) +

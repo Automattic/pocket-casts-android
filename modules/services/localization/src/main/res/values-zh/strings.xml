@@ -1,11 +1,68 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-07-09 15:55:32+0000
+Translation-Revision-Date: 2026-08-11 11:57:45+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="tv_playlist_play_all_save_and_play">保存并播放</string>
+    <string name="tv_playlist_play_all_play_without_saving">播放但不保存</string>
+    <string name="tv_episode_removed_from_up_next">已从“接下来播放”中移除</string>
+    <string name="tv_sign_in_title">登录 Pocket Casts</string>
+    <string name="tv_create_account_modal_title">您的播客值得一个归宿</string>
+    <string name="tv_create_account_modal_subtitle">创建一个免费账户以关注播客，创建您的“接下来播放”列表，并在任何设备上从您离开的位置继续播放。</string>
+    <string name="tv_episode_marked_as_played">已标记为已播放</string>
+    <string name="tv_episode_marked_as_unplayed">已标记为未播放</string>
+    <string name="tv_episode_archived">已存档</string>
+    <string name="tv_episode_unarchived">已取消存档</string>
+    <string name="tv_episode_will_play_next">将接下来播放</string>
+    <string name="tv_episode_will_play_last">将最后播放</string>
+    <string name="tv_podcast_schedule_monthly">每月</string>
+    <string name="tv_podcast_schedule_fortnightly">每两周</string>
+    <string name="tv_podcast_schedule_weekly">每周</string>
+    <string name="tv_podcast_schedule_daily">每天</string>
+    <string name="tv_podcast_schedule_hourly">每小时</string>
+    <string name="tv_podcast_next_episode_soon">随时</string>
+    <string name="tv_podcast_next_episode_tomorrow">明天</string>
+    <string name="tv_podcast_info_next_episode">下一集</string>
+    <string name="tv_podcast_info_schedule">定时发布</string>
+    <string name="tv_podcast_info_website">网站</string>
+    <string name="tv_podcast_info_network">网络</string>
+    <string name="tv_create_account_modal_step_create">创建您的账户或登录</string>
+    <string name="tv_sign_in_step_confirm_code">如有要求，请使用下方代码进行确认</string>
+    <string name="tv_sign_in_step_login">登录您的账户</string>
+    <string name="tv_sign_in_step_scan">扫描二维码或转到 %1$s</string>
+    <string name="tv_podcast_more_info">更多信息</string>
+    <string name="tv_podcast_follow">关注此播客</string>
+    <string name="tv_folder_empty_message">在移动应用程序中将播客添加到此文件夹，它们将会显示在此处。</string>
+    <string name="tv_up_next_empty_action_title">添加剧集</string>
+    <string name="tv_your_podcasts_empty_action_title">发现播客</string>
+    <string name="tv_your_podcasts_empty_subtitle">您关注的播客会显示在此处，可随时播放。</string>
+    <string name="tv_your_podcasts_empty_title">是时候将这里填满了</string>
+    <string name="tv_up_next_empty_subtitle">将剧集添加到“接下来播放”中，它们将会按顺序连续播放</string>
+    <string name="tv_up_next_empty_title">没有待播内容</string>
+    <string name="tv_episode_details">剧集详情</string>
+    <string name="playlist">播放列表</string>
+    <string name="tv_playlist_empty_subtitle_manual">通过移动应用程序将剧集添加到此播放列表，它们将会显示在此处。</string>
+    <string name="tv_playlist_empty_subtitle">您已完成此列表，但还可以在移动应用程序中编辑规则以获取更多内容。</string>
+    <string name="tv_playlists_download_title">在您的手机上创建播放列表</string>
+    <string name="tv_playlist_empty_title">无剧集</string>
+    <string name="tv_playlist_play_all">播放所有剧集</string>
+    <string name="tv_playlists_download_subtitle">待您操作完成后，相关文件便会保存在此处。 扫描以获取应用程序</string>
+    <string name="tv_playlists_empty_title">您的播放列表在此</string>
+    <string name="tv_playlists_empty_subtitle">手动构建一个或让智能规则为您排序。</string>
+    <string name="tv_playlists_empty_action_title">创建播放列表</string>
+    <string name="tv_profile_starred_episodes">星标剧集</string>
+    <string name="tv_home_keep_listening">继续收听</string>
+    <string name="settings_audio_only_summary">如果此选项开启，带有视频的剧集将仅以音频形式播放，从而节省数据流量。</string>
+    <string name="settings_audio_only">仅限音频</string>
+    <string name="profile_try_duration_for_free">免费试用 %1$s</string>
+    <string name="settings_generated_chapters_summary">如有自动生成的章节，则显示。</string>
+    <string name="settings_generated_chapters">生成的章节</string>
+    <string name="profile_stats_listening_activity_info_summary">根据您的播放历史记录估算您收听的时间。 如果您分几天听完一集，则它会显示在最后一天。</string>
+    <string name="profile_stats_listening_activity_info_title">收听活动</string>
+    <string name="profile_stats_listening_activity_info_help">信息</string>
     <string name="profile_stats_listening_activity_content_description">收听活动热图</string>
     <string name="profile_stats_listening_activity">收听活动</string>
     <string name="player_action_show_video">显示视频</string>
@@ -23,8 +80,6 @@ Language: zh_CN
     <string name="tv_onboarding_welcome_back">欢迎回来！</string>
     <string name="tv_onboarding_sign_in_instructions">打开摄像头，对准此二维码</string>
     <string name="tv_onboarding_sign_in_title">使用手机登录</string>
-    <string name="tv_sign_in_go_to_url">转至 %1$s</string>
-    <string name="tv_sign_in_or_enter_code">或输入以下代码</string>
     <string name="tv_onboarding_syncing">正在同步您的播客\u2026</string>
     <string name="tv_onboarding_browse_without_account">无需账户即可浏览</string>
     <string name="tv_onboarding_create_free_account">创建免费账户</string>
@@ -2394,6 +2449,12 @@ Language: zh_CN
     </plurals>
     <plurals name="settings_auto_download_on_follow_podcast_description">
         <item quantity="other">自动下载所关注新节目的最新 %s 集。</item>
+    </plurals>
+    <plurals name="tv_playlist_all_archived">
+        <item quantity="other">此播放列表的所有 %1$d 集均已存档。</item>
+    </plurals>
+    <plurals name="tv_podcast_all_archived">
+        <item quantity="other">此播客的所有 %1$d 集均已存档。</item>
     </plurals>
     <plurals name="week_with_count">
         <item quantity="other">%1$d 周</item>

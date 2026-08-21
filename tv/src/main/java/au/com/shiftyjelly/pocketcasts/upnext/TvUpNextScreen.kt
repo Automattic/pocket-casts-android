@@ -61,6 +61,7 @@ fun TvUpNextScreen(
     var openedPodcastUuid by rememberSaveable { mutableStateOf<String?>(null) }
 
     LaunchedEffect(Unit) {
+        viewModel.trackUpNextShown()
         viewModel.onShown()
     }
 
@@ -76,7 +77,10 @@ fun TvUpNextScreen(
         val openNowPlaying = LocalOpenNowPlaying.current
         TvUpNextContent(
             uiState = uiState,
-            onNavigateToHome = onNavigateToHome,
+            onNavigateToHome = {
+                viewModel.trackDiscoverButtonTapped()
+                onNavigateToHome()
+            },
             onOpenPodcast = { openedPodcastUuid = it },
             onPlayEpisode = { episode ->
                 viewModel.play(episode)

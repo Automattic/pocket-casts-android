@@ -1,11 +1,68 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-07-24 12:03:29+0000
+Translation-Revision-Date: 2026-08-11 13:56:43+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="tv_playlist_play_all_save_and_play">Spara och spela</string>
+    <string name="tv_playlist_play_all_play_without_saving">Spela upp utan att spara</string>
+    <string name="tv_episode_removed_from_up_next">Borttagen från Nästa</string>
+    <string name="tv_sign_in_title">Logga in i Pocket Casts</string>
+    <string name="tv_create_account_modal_title">Dina podcasts förtjänar ett hem</string>
+    <string name="tv_create_account_modal_subtitle">Skapa ett gratis konto för att följa podcasts, bygga din Nästa och fortsätta där du slutade på vilken enhet som helst.</string>
+    <string name="tv_episode_marked_as_played">Markera som spelad</string>
+    <string name="tv_episode_marked_as_unplayed">Markerat som ej uppspelat</string>
+    <string name="tv_episode_archived">Arkiverad</string>
+    <string name="tv_episode_unarchived">Avarkiverad</string>
+    <string name="tv_episode_will_play_next">Spelas upp härnäst</string>
+    <string name="tv_episode_will_play_last">Spelas upp sist</string>
+    <string name="tv_podcast_schedule_monthly">Månadsvis</string>
+    <string name="tv_podcast_schedule_fortnightly">Varannan vecka</string>
+    <string name="tv_podcast_schedule_weekly">Veckovis</string>
+    <string name="tv_podcast_schedule_daily">Dagligen</string>
+    <string name="tv_podcast_schedule_hourly">Varje timme</string>
+    <string name="tv_podcast_next_episode_soon">Vilken dag som helst</string>
+    <string name="tv_podcast_next_episode_tomorrow">Imorgon</string>
+    <string name="tv_podcast_info_next_episode">Nästa avsnitt</string>
+    <string name="tv_podcast_info_schedule">Schema</string>
+    <string name="tv_podcast_info_website">Webbplats</string>
+    <string name="tv_podcast_info_network">Nätverk</string>
+    <string name="tv_create_account_modal_step_create">Skapa ditt konto eller logga in</string>
+    <string name="tv_sign_in_step_confirm_code">Om du blir tillfrågad, bekräfta med koden nedan</string>
+    <string name="tv_sign_in_step_login">Logga in med ditt konto.</string>
+    <string name="tv_sign_in_step_scan">Skanna QR-koden eller gå till %1$s</string>
+    <string name="tv_podcast_more_info">Mer information</string>
+    <string name="tv_podcast_follow">Följ denna podcast</string>
+    <string name="tv_folder_empty_message">Lägg till podcasts i den här mappen i mobilappen så visas de här.</string>
+    <string name="tv_up_next_empty_action_title">Lägg till avsnitt</string>
+    <string name="tv_your_podcasts_empty_action_title">Upptäck podcasts</string>
+    <string name="tv_your_podcasts_empty_subtitle">Följda podcasts visas här, redo att spelas upp.</string>
+    <string name="tv_your_podcasts_empty_title">Dags att fylla tomrummet</string>
+    <string name="tv_up_next_empty_subtitle">Lägg till avsnitt i Nästa så spelas de upp i ordning, ett efter ett.</string>
+    <string name="tv_up_next_empty_title">Inget köat</string>
+    <string name="tv_episode_details">Avsnittsinformation</string>
+    <string name="playlist">Spellista</string>
+    <string name="tv_playlist_empty_subtitle_manual">Lägg till avsnitt i den här spellistan från mobilappen så visas de här.</string>
+    <string name="tv_playlist_empty_subtitle">Det är antingen dags att fira att den här listan är slutförd eller att redigera dina regler i mobilappen för att hitta mer innehåll.</string>
+    <string name="tv_playlists_download_title">Skapa spellistor på din telefon</string>
+    <string name="tv_playlist_empty_title">Inga avsnitt</string>
+    <string name="tv_playlist_play_all">Spela upp alla avsnitt</string>
+    <string name="tv_playlists_download_subtitle">De väntar här när du är klar. Skanna för att hämta appen</string>
+    <string name="tv_playlists_empty_title">Dina spellistor live här</string>
+    <string name="tv_playlists_empty_subtitle">Bygg en manuellt eller låt smarta regler sortera åt dig.</string>
+    <string name="tv_playlists_empty_action_title">Skapa en spellista</string>
+    <string name="tv_profile_starred_episodes">Stjärnmärkta avsnitt</string>
+    <string name="tv_home_keep_listening">Fortsätt lyssna</string>
+    <string name="settings_audio_only_summary">Om detta är aktiverat spelas avsnitt med video endast upp som ljud, vilket sparar data.</string>
+    <string name="settings_audio_only">Endast ljud</string>
+    <string name="profile_try_duration_for_free">Testa %1$s gratis</string>
+    <string name="settings_generated_chapters_summary">Visa automatiskt genererade kapitel när de är tillgängliga.</string>
+    <string name="settings_generated_chapters">Genererade kapitel</string>
+    <string name="profile_stats_listening_activity_info_summary">En uppskattning av när du har lyssnat, baserat på din uppspelningshistorik. Om du avslutar ett avsnitt under några dagar visas det på den sista dagen.</string>
+    <string name="profile_stats_listening_activity_info_title">Lyssningsaktivitet</string>
+    <string name="profile_stats_listening_activity_info_help">Information</string>
     <string name="profile_stats_listening_activity">Lyssningsaktivitet</string>
     <string name="profile_stats_listening_activity_content_description">Färgdiagram över lyssningsaktivitet</string>
     <string name="player_action_show_video">Visa videoklipp</string>
@@ -23,8 +80,6 @@ Language: sv_SE
     <string name="tv_onboarding_welcome_back">Välkommen tillbaka!</string>
     <string name="tv_onboarding_sign_in_instructions">Öppna kameran och peka på denna QR-kod</string>
     <string name="tv_onboarding_sign_in_title">Logga in med din telefon</string>
-    <string name="tv_sign_in_go_to_url">går till %1$s</string>
-    <string name="tv_sign_in_or_enter_code">eller ange följande kod</string>
     <string name="tv_onboarding_syncing">Synkroniserar dina podcasts\u2026</string>
     <string name="tv_onboarding_browse_without_account">Bläddra utan ett konto</string>
     <string name="tv_onboarding_create_free_account">Skapa gratis konto</string>
@@ -2428,6 +2483,14 @@ Language: sv_SE
     <plurals name="settings_auto_download_on_follow_podcast_description">
         <item quantity="one">Ladda automatiskt ner det senaste avsnittet från nya shower som du följer.</item>
         <item quantity="other">Ladda automatiskt ner de %s avsnitten från nya shower som du följer.</item>
+    </plurals>
+    <plurals name="tv_playlist_all_archived">
+        <item quantity="one">Det enda avsnittet i den här spellistan har arkiverats.</item>
+        <item quantity="other">Alla %1$d avsnitt i den här spellistan har arkiverats.</item>
+    </plurals>
+    <plurals name="tv_podcast_all_archived">
+        <item quantity="one">Det enda avsnittet av den här podcasten har arkiverats.</item>
+        <item quantity="other">Alla %1$d avsnitt av den här podcasten har arkiverats.</item>
     </plurals>
     <plurals name="week_with_count">
         <item quantity="one">%1$d vecka</item>

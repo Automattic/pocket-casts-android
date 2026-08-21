@@ -18,6 +18,7 @@ import timber.log.Timber
 
 enum class TvEpisodeActionContext(val source: SourceView) {
     PodcastDetails(SourceView.PODCAST_SCREEN),
+    SearchResults(SourceView.SEARCH_RESULTS),
     Playlist(SourceView.FILTERS),
     UpNext(SourceView.UP_NEXT),
     NowPlaying(SourceView.PLAYER),

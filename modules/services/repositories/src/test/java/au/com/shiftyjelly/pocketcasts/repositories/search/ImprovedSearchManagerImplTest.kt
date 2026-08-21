@@ -62,5 +62,8 @@ class ImprovedSearchManagerImplTest {
             results.map { it.uuid },
         )
         assertTrue(results.none { it is ImprovedSearchResultItem.PodcastItem && it.uuid == "null-title-uuid" })
+
+        val episode = results.filterIsInstance<ImprovedSearchResultItem.EpisodeItem>().single()
+        assertEquals("Business Daily", episode.podcastTitle)
     }
 }

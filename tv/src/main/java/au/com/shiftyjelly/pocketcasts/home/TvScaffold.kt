@@ -32,6 +32,7 @@ import au.com.shiftyjelly.pocketcasts.component.TvTopBarVisibility
 import au.com.shiftyjelly.pocketcasts.nowplaying.TvNowPlayingScreen
 import au.com.shiftyjelly.pocketcasts.playlists.TvPlaylistsScreen
 import au.com.shiftyjelly.pocketcasts.podcasts.TvYourPodcastsScreen
+import au.com.shiftyjelly.pocketcasts.search.TvSearchScreen
 import au.com.shiftyjelly.pocketcasts.theme.TvScreenBackgroundBrush
 import au.com.shiftyjelly.pocketcasts.theme.TvTheme
 import au.com.shiftyjelly.pocketcasts.theme.TvTopBarHeight
@@ -88,7 +89,10 @@ fun TvScaffold(
             // content so their overlays can fill the full height.
             val belowTopBar = Modifier.fillMaxSize().padding(top = TvTopBarHeight)
             when (tab) {
-                is TvTab.Home -> TvHomeScreen()
+                is TvTab.Home -> TvHomeScreen(
+                    onNavigateToSearch = { viewModel.selectTab(TvTab.Search) },
+                    onCreateAccount = onCreateAccount,
+                )
 
                 is TvTab.YourPodcasts -> TvYourPodcastsScreen(
                     onNavigateToHome = navigateToHome,
@@ -105,9 +109,7 @@ fun TvScaffold(
                     onConsumeOpenRequest = { isNowPlayingOpenRequested = false },
                 )
 
-                else -> Box(modifier = belowTopBar) {
-                    TvTabPlaceholder(tab = tab)
-                }
+                is TvTab.Search -> TvSearchScreen()
             }
         }
 
