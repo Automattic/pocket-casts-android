@@ -354,6 +354,11 @@ class MainActivity :
         get() = binding.bottomContainer.height - binding.bottomContainer.paddingBottom
 
     private var bottomSheetTag: String? = null
+
+    // True once initial onboarding has been launched this session, so the recurring account-creation
+    // modal isn't chained onto the same launch (hasCompletedOnboarding() flips to true as soon as
+    // onboarding finishes). It shows on the next launch instead.
+    private var launchedInitialOnboarding: Boolean = false
     private val bottomSheetQueue: MutableList<(() -> Unit)?> = mutableListOf()
 
     override val coroutineContext: CoroutineContext
@@ -480,6 +485,7 @@ class MainActivity :
         val needsLoginPromptAfterRestore = settings.getNeedsLoginPromptAfterRestore()
         // Only show if savedInstanceState is null in order to avoid creating onboarding activity twice.
         if (showOnboarding && savedInstanceState == null) {
+            launchedInitialOnboarding = true
             openOnboardingFlow(OnboardingFlow.InitialOnboarding)
         }
 
@@ -686,6 +692,13 @@ class MainActivity :
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 if (!FeatureFlag.isEnabled(Feature.ENCOURAGE_ACCOUNT_CREATION)) {
+                    return@repeatOnLifecycle
+                }
+
+                // Don't chain onto the same launch that presented initial onboarding — completing it
+                // flips hasCompletedOnboarding() to true, which would otherwise show the modal the
+                // moment onboarding is dismissed. It shows on the next launch instead.
+                if (launchedInitialOnboarding) {
                     return@repeatOnLifecycle
                 }
 
