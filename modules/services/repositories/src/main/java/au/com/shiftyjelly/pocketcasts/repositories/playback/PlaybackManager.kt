@@ -125,6 +125,7 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -1104,17 +1105,140 @@ open class PlaybackManager @Inject constructor(
     }
 
     fun seekIfPlayingToTimeMs(episodeUuid: String, positionMs: Int, seekComplete: (() -> Unit)? = null) {
-        // double checking the episode uuid as this may change during the launch
+        // Keep the call-time check as well as the guarded check in the coroutine. Sync updates for
+        // a non-current episode must not become applicable merely because the queue changes before
+        // this launch starts.
         if (getCurrentEpisode()?.uuid != episodeUuid) {
             return
         }
         launch {
-            if (getCurrentEpisode()?.uuid == episodeUuid) {
-                cancelPendingChapterSeek()
-                seekToTimeMsInternal(positionMs)
-                seekComplete?.invoke()
+            guardedSeekMutex.withLock {
+                if (seekToTimeMsInternal(episodeUuid, positionMs, sourceView = null, requestId = null)) {
+                    // Preserve this legacy overload's callback contract for existing sync callers:
+                    // invoke it only after a seek was applied, on the PlaybackManager dispatcher.
+                    seekComplete?.invoke()
+                }
             }
         }
+    }
+
+    @MainThread
+    fun seekIfPlayingToTimeMs(
+        episodeUuid: String,
+        positionMs: Int,
+        sourceView: SourceView,
+        seekComplete: (() -> Unit)? = null,
+    ) {
+        launchSeekIfPlayingToTimeMs(
+            episodeUuid = episodeUuid,
+            positionMs = positionMs,
+            sourceView = sourceView,
+            seekComplete = seekComplete,
+            requestId = registerLatestGuardedSeek(episodeUuid),
+        )
+    }
+
+    private fun launchSeekIfPlayingToTimeMs(
+        episodeUuid: String,
+        positionMs: Int,
+        sourceView: SourceView?,
+        seekComplete: (() -> Unit)?,
+        requestId: Long?,
+    ) {
+        launch {
+            try {
+                guardedSeekMutex.withLock {
+                    if (requestId == null || isLatestGuardedSeek(episodeUuid, requestId)) {
+                        seekToTimeMsInternal(episodeUuid, positionMs, sourceView, requestId)
+                    }
+                }
+            } finally {
+                requestId?.let { clearLatestGuardedSeek(episodeUuid, it) }
+                if (seekComplete != null) {
+                    withContext(NonCancellable + Dispatchers.Main.immediate) {
+                        seekComplete()
+                    }
+                }
+            }
+        }
+    }
+
+    private val guardedSeekMutex = Mutex()
+    private val guardedSeekRequestLock = Any()
+    private var nextGuardedSeekRequestId = 0L
+    private val latestGuardedSeekRequests = mutableMapOf<String, Long>()
+
+    private fun registerLatestGuardedSeek(episodeUuid: String): Long = synchronized(guardedSeekRequestLock) {
+        val requestId = ++nextGuardedSeekRequestId
+        latestGuardedSeekRequests[episodeUuid] = requestId
+        requestId
+    }
+
+    private fun isLatestGuardedSeek(episodeUuid: String, requestId: Long): Boolean = synchronized(guardedSeekRequestLock) {
+        latestGuardedSeekRequests[episodeUuid] == requestId
+    }
+
+    private fun clearLatestGuardedSeek(episodeUuid: String, requestId: Long) {
+        synchronized(guardedSeekRequestLock) {
+            if (latestGuardedSeekRequests[episodeUuid] == requestId) {
+                latestGuardedSeekRequests.remove(episodeUuid)
+            }
+        }
+    }
+
+    private suspend fun seekToTimeMsInternal(
+        episodeUuid: String,
+        positionMs: Int,
+        sourceView: SourceView?,
+        requestId: Long?,
+    ): Boolean {
+        val episode = getCurrentEpisode()?.takeIf { it.uuid == episodeUuid } ?: return false
+        val seekPlayer = player
+        if (seekPlayer != null && seekPlayer.episodeUuid != episodeUuid) {
+            return false
+        }
+
+        // Player implementations also use Dispatchers.Main, so validation and the player seek run
+        // without another dispatch where the player could be rebound to a replacement episode.
+        val accepted = withContext(Dispatchers.Main) {
+            val playbackState = if (seekPlayer == null) null else playbackStateRelay.blockingFirst()
+            val isCurrentTarget = getCurrentEpisode()?.uuid == episodeUuid &&
+                player === seekPlayer &&
+                (seekPlayer == null || seekPlayer.episodeUuid == episodeUuid) &&
+                (playbackState == null || playbackState.episodeUuid == episodeUuid) &&
+                (requestId == null || isLatestGuardedSeek(episodeUuid, requestId))
+            if (!isCurrentTarget) {
+                false
+            } else {
+                cancelPendingChapterSeek()
+                sourceView?.let { trackPlaybackSeek(episode, positionMs, it) }
+                episode.playedUpToMs = positionMs
+                playbackState?.let { state ->
+                    playbackStateRelay.accept(
+                        state.copy(positionMs = positionMs, lastChangeFrom = LastChangeFrom.OnUserSeeking.value),
+                    )
+                }
+                seekPlayer?.seekToTimeMs(positionMs)
+                true
+            }
+        }
+        if (!accepted) {
+            return false
+        }
+
+        if (seekPlayer == null) {
+            updateCurrentPositionInDatabase(episode, positionMs)
+        }
+
+        withContext(Dispatchers.Main.immediate) {
+            val isCurrentTarget = getCurrentEpisode()?.uuid == episodeUuid &&
+                player === seekPlayer &&
+                (seekPlayer == null || seekPlayer.episodeUuid == episodeUuid)
+            if (isCurrentTarget) {
+                updatePausedPlaybackState()
+            }
+        }
+        return true
     }
 
     private suspend fun seekToTimeMsInternal(duration: Duration) {
@@ -2608,14 +2732,18 @@ open class PlaybackManager @Inject constructor(
     }
 
     private suspend fun updateCurrentPositionInDatabase() {
-        updateCount = 0
-
         val episode = getCurrentEpisode() ?: return
         val currentTimeMs = getCurrentTimeMs(episode = episode)
 
         if (currentTimeMs < 0) {
             return
         }
+
+        updateCurrentPositionInDatabase(episode, currentTimeMs)
+    }
+
+    private suspend fun updateCurrentPositionInDatabase(episode: BaseEpisode, currentTimeMs: Int) {
+        updateCount = 0
 
         val currentTimeSecs = currentTimeMs.toDouble() / 1000.0
         episodeManager.updatePlayedUpToBlocking(episode, currentTimeSecs, false)
@@ -2965,20 +3093,22 @@ open class PlaybackManager @Inject constructor(
         sourceView: SourceView,
     ) {
         val episode = getCurrentEpisode()
-        episode?.let {
-            val fromPositionMs = episode.playedUpToMs.toDouble()
-            val durationMs = episode.duration * 1000
-            val seekFromPercent = ((fromPositionMs / durationMs) * 100).toInt()
-            val seekToPercent = ((positionMs / durationMs) * 100).toInt()
+        episode?.let { trackPlaybackSeek(it, positionMs, sourceView) }
+    }
 
-            eventHorizon.track(
-                PlaybackSeekEvent(
-                    source = sourceView.analyticsValue,
-                    seekFromPercent = seekFromPercent.toLong(),
-                    seekToPercent = seekToPercent.toLong(),
-                ),
-            )
-        }
+    private fun trackPlaybackSeek(episode: BaseEpisode, positionMs: Int, sourceView: SourceView) {
+        val fromPositionMs = episode.playedUpToMs.toDouble()
+        val durationMs = episode.duration * 1000
+        val seekFromPercent = ((fromPositionMs / durationMs) * 100).toInt()
+        val seekToPercent = ((positionMs / durationMs) * 100).toInt()
+
+        eventHorizon.track(
+            PlaybackSeekEvent(
+                source = sourceView.analyticsValue,
+                seekFromPercent = seekFromPercent.toLong(),
+                seekToPercent = seekToPercent.toLong(),
+            ),
+        )
     }
 
     fun setNotificationPermissionChecker(notificationPermissionChecker: NotificationPermissionChecker) {

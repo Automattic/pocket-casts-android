@@ -11,7 +11,6 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.player.binding.setPlaybackState
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentVideoBinding
 import au.com.shiftyjelly.pocketcasts.player.view.PlayerSeekBar
@@ -163,10 +162,12 @@ class VideoFragment :
     override fun onSeekPositionChanging(progress: Duration) {
     }
 
-    override fun onSeekPositionChangeStop(progress: Duration, seekComplete: () -> Unit) {
+    override fun onSeekPositionChangeStop(episodeUuid: String, progress: Duration, seekComplete: () -> Unit) {
         val progressMs = progress.inWholeMilliseconds.toInt()
-        viewModel.seekToMs(progressMs)
-        playbackManager.trackPlaybackSeek(progressMs, SourceView.FULL_SCREEN_VIDEO)
-        seekComplete()
+        viewModel.seekToMs(episodeUuid, progressMs, seekComplete)
+    }
+
+    override fun onSeekPositionChangeCancel() {
+        viewModel.seekCancelled()
     }
 }
