@@ -83,6 +83,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.HtmlParser
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.JsonParser
+import au.com.shiftyjelly.pocketcasts.repositories.transcript.OnDemandTranscriptRepository
+import au.com.shiftyjelly.pocketcasts.repositories.transcript.OnDemandTranscriptRepositoryImpl
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.SrtParser
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManagerImpl
@@ -244,6 +246,11 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun provideTranscriptManager(transcriptsManagerImpl: TranscriptManagerImpl): TranscriptManager
+
+    @Binds
+    abstract fun provideOnDemandTranscriptRepository(
+        repository: OnDemandTranscriptRepositoryImpl,
+    ): OnDemandTranscriptRepository
 
     @Binds
     abstract fun providePlaylistManager(playlistManagerImpl: PlaylistManagerImpl): PlaylistManager

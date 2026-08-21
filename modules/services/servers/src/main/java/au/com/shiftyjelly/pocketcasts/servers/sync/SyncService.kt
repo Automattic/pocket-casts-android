@@ -19,6 +19,8 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.register.RegisterRequest
 import com.pocketcasts.service.api.BookmarkRequest
 import com.pocketcasts.service.api.BookmarksResponse
 import com.pocketcasts.service.api.EpisodesResponse
+import com.pocketcasts.service.api.OnDemandTranscriptRequest
+import com.pocketcasts.service.api.OnDemandTranscriptResponse
 import com.pocketcasts.service.api.PodcastRatingAddRequest
 import com.pocketcasts.service.api.PodcastRatingResponse
 import com.pocketcasts.service.api.PodcastRatingShowRequest
@@ -97,6 +99,13 @@ interface SyncService {
     @Headers("Content-Type: application/octet-stream")
     @POST("/user/sync/update")
     suspend fun syncUpdate(@Header("Authorization") authorization: String, @Body request: SyncUpdateRequest): SyncUpdateResponse
+
+    @Headers("Content-Type: application/octet-stream")
+    @POST("/user/transcript/on_demand")
+    suspend fun requestOnDemandTranscript(
+        @Header("Authorization") authorization: String,
+        @Body request: OnDemandTranscriptRequest,
+    ): OnDemandTranscriptResponse
 
     @POST("/up_next/sync")
     suspend fun upNextSync(@Header("Authorization") authorization: String, @Body request: UpNextSyncRequest): UpNextSyncResponse

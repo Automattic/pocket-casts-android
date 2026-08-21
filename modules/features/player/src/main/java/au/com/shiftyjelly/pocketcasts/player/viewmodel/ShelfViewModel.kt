@@ -3,12 +3,16 @@ package au.com.shiftyjelly.pocketcasts.player.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.Companion.MIN_SHELF_ITEMS_SIZE
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfRowItem
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfTitle
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
+import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.PlayerShelfOverflowMenuRearrangeActionMovedEvent
 import com.automattic.eventhorizon.PlayerShelfOverflowMenuRearrangeFinishedEvent
@@ -22,9 +26,11 @@ import java.util.Collections
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.reactive.asFlow
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -33,18 +39,28 @@ class ShelfViewModel @AssistedInject constructor(
     @Assisted private val episodeId: String,
     @Assisted private val isEditable: Boolean,
     private val transcriptManager: TranscriptManager,
+    private val userManager: UserManager,
     private val eventHorizon: EventHorizon,
     private val settings: Settings,
 ) : ViewModel() {
     private var _uiState: MutableStateFlow<UiState> = MutableStateFlow(UiState())
     val uiState: StateFlow<UiState> = _uiState
+    private var hasTranscriptRow = false
+    private var isEligiblePaidListener = false
 
     init {
         viewModelScope.launch {
-            transcriptManager.observeIsTranscriptAvailable(episodeId)
+            combine(
+                transcriptManager.observeIsTranscriptAvailable(episodeId),
+                userManager.getSignInState().asFlow(),
+            ) { isAvailable, signInState ->
+                isAvailable to signInState.isSignedInAsPlusOrPatron
+            }
                 .stateIn(viewModelScope)
-                .collectLatest { isAvailable ->
-                    _uiState.update { it.copy(isTranscriptAvailable = isAvailable) }
+                .collectLatest { (isAvailable, isPaid) ->
+                    hasTranscriptRow = isAvailable
+                    isEligiblePaidListener = isPaid
+                    updateTranscriptAvailability()
                 }
         }
     }
@@ -70,9 +86,25 @@ class ShelfViewModel @AssistedInject constructor(
                     items
                 },
                 episode = episode,
+                isTranscriptAvailable = isTranscriptAvailableFor(episode),
             )
         }
     }
+
+    private fun updateTranscriptAvailability() {
+        _uiState.update { state ->
+            state.copy(
+                isTranscriptAvailable = isTranscriptAvailableFor(state.episode),
+            )
+        }
+    }
+
+    private fun isTranscriptAvailableFor(episode: BaseEpisode?) = hasTranscriptRow ||
+        (
+            episode is PodcastEpisode &&
+                isEligiblePaidListener &&
+                FeatureFlag.isEnabled(Feature.ON_DEMAND_TRANSCRIPTS)
+            )
 
     fun onShelfItemMove(
         fromPosition: Int,

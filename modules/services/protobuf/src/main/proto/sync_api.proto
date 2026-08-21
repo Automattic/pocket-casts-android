@@ -159,6 +159,52 @@ message BookmarksResponse {
   repeated BookmarkResponse bookmarks = 1;
 }
 
+message OnDemandTranscriptRequest {
+  string podcast_uuid = 1;
+  string episode_uuid = 2;
+}
+
+enum OnDemandTranscriptOutcome {
+  OUTCOME_UNSPECIFIED = 0;
+  QUEUED = 1;
+  IN_PROGRESS = 2;
+  AVAILABLE = 3;
+  NOT_ELIGIBLE = 4;
+  TRANSIENT_FAILURE = 5;
+  THROTTLED = 6;
+}
+
+enum OnDemandTranscriptEnablement {
+  ENABLEMENT_UNSPECIFIED = 0;
+  ENABLED = 1;
+  ALREADY_ENABLED = 2;
+  ALREADY_ELIGIBLE = 3;
+  NOT_ENABLED = 4;
+}
+
+enum OnDemandTranscriptReason {
+  REASON_UNSPECIFIED = 0;
+  FEATURE_DISABLED = 1;
+  PODCAST_NOT_FOUND = 2;
+  EPISODE_NOT_FOUND = 3;
+  EPISODE_NOT_IN_PODCAST = 4;
+  PODCAST_DISABLED = 5;
+  PODCAST_DISALLOWED = 6;
+  HOST_IGNORED = 7;
+  TRANSCRIPT_INELIGIBLE = 8;
+  QUEUEING_FAILED = 9;
+  RETRY_NOT_AVAILABLE = 10;
+  INTERNAL_ERROR = 11;
+  UNKNOWN_REASON = 12;
+}
+
+message OnDemandTranscriptResponse {
+  OnDemandTranscriptOutcome outcome = 1;
+  OnDemandTranscriptReason reason = 2;
+  OnDemandTranscriptEnablement enablement = 3;
+  uint32 newly_queued_count = 4;
+}
+
 message UserPodcastListRequest {
   string v = 1;
   string m = 2;
