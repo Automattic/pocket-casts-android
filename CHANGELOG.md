@@ -1,6 +1,8 @@
 8.20
 -----
-
+*   Bug Fixes
+    *   Fix playback pausing when car head units send an explicit play command
+        ([#5426](https://github.com/Automattic/pocket-casts-android/pull/5426))
 
 8.19
 -----

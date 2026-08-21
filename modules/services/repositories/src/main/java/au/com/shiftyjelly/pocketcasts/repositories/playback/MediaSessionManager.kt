@@ -1242,11 +1242,12 @@ class MediaSessionManager(
                     LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Media button input event: ${keyEvent.action}")
 
                     if (inputEvent != null) {
+                        val isExplicitPlay = keyEvent.keyCode == KeyEvent.KEYCODE_MEDIA_PLAY
                         scope.launch {
                             val outputEvent = mediaEventQueue.consumeEvent(inputEvent)
                             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Media button output event: ${keyEvent.action}")
                             when (outputEvent) {
-                                MediaEvent.SingleTap -> handleMediaButtonSingleTap()
+                                MediaEvent.SingleTap -> handleMediaButtonSingleTap(isExplicitPlay = isExplicitPlay)
                                 MediaEvent.DoubleTap -> handleMediaButtonDoubleTap()
                                 MediaEvent.TripleTap -> handleMediaButtonTripleTap()
                                 null -> Unit
@@ -1281,8 +1282,21 @@ class MediaSessionManager(
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Event from Media Session to $action. ${userInfo.orEmpty()}")
         }
 
-        private fun handleMediaButtonSingleTap() {
-            playbackManager.playPause(sourceView = source)
+        private fun handleMediaButtonSingleTap(isExplicitPlay: Boolean) {
+            // KEYCODE_MEDIA_PLAY is an explicit "play" command (e.g. a car head unit sends it
+            // when resuming, such as after shifting out of reverse), not a play/pause toggle.
+            // Toggling here would pause already-playing audio. Only PLAY_PAUSE / HEADSETHOOK
+            // should toggle. See https://github.com/Automattic/pocket-casts-android/issues/3919
+            if (isExplicitPlay) {
+                // Nothing to do when already playing — running the play path again would
+                // re-fire playback_play analytics, may re-arm the sleep timer, and would
+                // make CastPlayer reload the stream from a stale position.
+                if (!playbackManager.isPlaying()) {
+                    enqueueCommand("play") { playbackManager.playQueueSuspend(sourceView = source) }
+                }
+            } else {
+                playbackManager.playPause(sourceView = source)
+            }
         }
 
         private fun handleMediaButtonDoubleTap() {
