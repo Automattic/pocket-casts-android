@@ -145,6 +145,8 @@ class PodcastsFragment :
         }
     }
 
+    private class ScrollToTopRequest(val sortType: PodcastsSortType)
+
     @Inject
     lateinit var settings: Settings
 
@@ -172,6 +174,14 @@ class PodcastsFragment :
     private var lastOrientationRefreshed = LAST_ORIENTATION_NOT_SET
     private var lastWidthPx: Int = 0
     private var listState: Parcelable? = null
+    private var scrollToTopRequest: ScrollToTopRequest? = null
+    private val cancelPendingScrollToTopListener = object : RecyclerView.OnScrollListener() {
+        override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+            if (newState == RecyclerView.SCROLL_STATE_DRAGGING) {
+                scrollToTopRequest = null
+            }
+        }
+    }
 
     private val folderUuid: String?
         get() = arguments?.getString(ARG_FOLDER_UUID)
@@ -211,6 +221,7 @@ class PodcastsFragment :
         binding.recyclerView.let {
             it.adapter = adapter
             it.addItemDecoration(SpaceItemDecoration())
+            it.addOnScrollListener(cancelPendingScrollToTopListener)
             ItemTouchHelper(dragAndDropCallback).attachToRecyclerView(it)
         }
 
@@ -286,7 +297,19 @@ class PodcastsFragment :
                     toolbar.menu.findItem(R.id.create_folder)?.isVisible = rootFolder && isSignedInAsPlusOrPatron
                     toolbar.menu.findItem(R.id.search_podcasts)?.isVisible = rootFolder
 
-                    folderAdapter?.setFolderItems(uiState.items)
+                    val pendingScrollToTopRequest = scrollToTopRequest
+                    val currentSortType = uiState.folder?.podcastsSortType ?: uiState.sortType
+                    val submittedFolderAdapter = folderAdapter
+                    submittedFolderAdapter?.setFolderItems(uiState.items) {
+                        if (
+                            pendingScrollToTopRequest?.sortType == currentSortType &&
+                            scrollToTopRequest === pendingScrollToTopRequest &&
+                            folderAdapter === submittedFolderAdapter
+                        ) {
+                            scrollToTopRequest = null
+                            scrollRecyclerViewToTop()
+                        }
+                    }
 
                     val isEmpty = uiState.items.isEmpty()
                     binding.emptyView.isVisible = isEmpty && !uiState.isLoadingItems
@@ -374,6 +397,8 @@ class PodcastsFragment :
 
     override fun onDestroyView() {
         listState = binding.recyclerView.layoutManager?.onSaveInstanceState()
+        scrollToTopRequest = null
+        binding.recyclerView.removeOnScrollListener(cancelPendingScrollToTopListener)
         binding.recyclerView.adapter = null
         super.onDestroyView()
         realBinding = null
@@ -424,6 +449,7 @@ class PodcastsFragment :
                 )
             }
             val onSortTypeChanged = { sort: PodcastsSortType ->
+                keepRecyclerViewAtTopAfterSort(sort)
                 eventHorizon.track(
                     FolderSortByChangedEvent(
                         sortOrder = sort.analyticsValue,
@@ -455,7 +481,14 @@ class PodcastsFragment :
                 show()
             }
         } else {
-            podcastOptionsDialog = PodcastsOptionsDialog(this, settings, eventHorizon).apply {
+            podcastOptionsDialog = PodcastsOptionsDialog(
+                fragment = this,
+                settings = settings,
+                eventHorizon = eventHorizon,
+                onSortTypeChanged = { sort ->
+                    keepRecyclerViewAtTopAfterSort(sort)
+                },
+            ).apply {
                 show()
             }
         }
@@ -666,6 +699,31 @@ class PodcastsFragment :
         val canScroll = binding.recyclerView.canScrollVertically(-1)
         binding.recyclerView.quickScrollToTop()
         return canScroll
+    }
+
+    private fun scrollRecyclerViewToTop() {
+        val recyclerView = realBinding?.recyclerView ?: return
+        when (val layoutManager = recyclerView.layoutManager) {
+            is LinearLayoutManager -> layoutManager.scrollToPositionWithOffset(0, 0)
+            else -> recyclerView.scrollToPosition(0)
+        }
+    }
+
+    private fun keepRecyclerViewAtTopAfterSort(sortType: PodcastsSortType) {
+        // A pending request is the latest selection while folder UI state may still reflect the previous sort.
+        val currentSortType = scrollToTopRequest?.sortType ?: if (folderUuid == null) {
+            settings.podcastsSortType.value
+        } else {
+            viewModel.uiState.value.folder?.podcastsSortType
+        }
+        if (sortType == currentSortType) {
+            return
+        }
+        scrollToTopRequest = if (realBinding?.recyclerView?.canScrollVertically(-1) == false) {
+            ScrollToTopRequest(sortType)
+        } else {
+            null
+        }
     }
 
     private fun showTooltip() {
