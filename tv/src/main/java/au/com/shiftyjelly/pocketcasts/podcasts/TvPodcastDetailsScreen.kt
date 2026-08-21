@@ -342,6 +342,7 @@ private fun EpisodeList(
     detailsEpisode?.let { episode ->
         TvEpisodeInfoModal(
             episode = episode,
+            actionContext = TvEpisodeActionContext.PodcastDetails,
             onDismissRequest = { detailsEpisode = null },
         )
     }
