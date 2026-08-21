@@ -19,6 +19,8 @@ RELEASE_NOTES_SOURCE_PATH = File.join(PROJECT_ROOT_FOLDER, 'CHANGELOG.md')
 EXTRACTED_RELEASE_NOTES_PATH = File.join(ORIGINALS_METADATA_DIR_PATH, 'release_notes.txt')
 PLAY_STORE_TRACK_AUTOMOTIVE_BETA = 'automotive:beta'
 PLAY_STORE_TRACK_AUTOMOTIVE_PRODUCTION = 'automotive:production'
+PLAY_STORE_TRACK_TV_BETA = 'tv:beta'
+PLAY_STORE_TRACK_TV_PRODUCTION = 'tv:production'
 PLAY_STORE_TRACK_WEAR_BETA = 'wear:beta'
 PLAY_STORE_TRACK_WEAR_PRODUCTION = 'wear:production'
 PLAY_STORE_TRACK_BETA = 'beta'
@@ -66,8 +68,9 @@ ENV['SUPPLY_UPLOAD_MAX_RETRIES'] = '5'
 GITHUB_REPO = 'automattic/pocket-casts-android'
 APPS_APP = 'app'
 APPS_AUTOMOTIVE = 'automotive'
+APPS_TV = 'tv'
 APPS_WEAR = 'wear'
-APPS = [APPS_APP, APPS_AUTOMOTIVE, APPS_WEAR].freeze
+APPS = [APPS_APP, APPS_AUTOMOTIVE, APPS_TV, APPS_WEAR].freeze
 
 UPLOAD_TO_PLAY_STORE_JSON_KEY = File.join(PROJECT_ROOT_FOLDER, 'google-upload-credentials.json')
 UPLOAD_TO_PLAY_STORE_COMMON_OPTIONS = {
@@ -330,7 +333,8 @@ platform :android do
     end
   end
 
-  # Update the rollout of all 3 variants/form-factors (app, automotive, wear) of the latest builds of the given Google Play track to the given % value
+  # Update the rollout of all app variants/form factors for the latest builds of the
+  # given Google Play track to the given % value
   #
   # @param percent [Float] The rollout percentage, between 0 and 1
   # @param track [String] The Google Play track for which to update the rollout of. Must be either `beta` or `production`.
@@ -369,7 +373,12 @@ platform :android do
     not_found_variants.each do |message|
       UI.important(message)
     end
-    UI.user_error!('None of the 3 app variants were found in Google Play Console. We expected at least one') if not_found_variants.count == APPS.count
+    if not_found_variants.count == APPS.count
+      UI.user_error!(
+        "None of the #{APPS.count} app variants were found in Google Play Console. " \
+        'We expected at least one'
+      )
+    end
   end
 
   # Downloads the latest translations from GlotPress and creates a PR to integrate them into the current `release/*` branch
@@ -584,7 +593,7 @@ platform :android do
   #
   # @param version [String] The version to create
   # @param build_code [String] The build code to create
-  # @param app [String] The Android app to build (i.e 'app', 'automotive', or 'wear')
+  # @param app [String] The Android app to build (i.e. 'app', 'automotive', 'tv', or 'wear')
   lane :build_bundle do |app:, version: version_name_current, build_code: build_code_current|
     aab_artifact_path = aab_artifact_path(app, version)
     build_dir = 'artifacts/'
@@ -598,6 +607,7 @@ platform :android do
       build_type: 'Release',
       properties: {
         'IS_AUTOMOTIVE_BUILD' => app == APPS_AUTOMOTIVE,
+        'IS_TV_BUILD' => app == APPS_TV,
         'IS_WEAR_BUILD' => app == APPS_WEAR
       }
     )
@@ -639,7 +649,7 @@ platform :android do
     )
   end
 
-  # Compiles prototype builds and uploads to FAD (app) and S3 (wear/automotive)
+  # Compiles prototype builds and uploads to FAD (app) and S3 (wear/automotive/TV)
   #
   lane :build_and_upload_prototype_build do
     firebase_account_key = ENV.fetch('FIREBASE_APP_DISTRIBUTION_ACCOUNT_KEY', nil)
@@ -688,12 +698,12 @@ platform :android do
       )
     end
 
-    # Build wear/automotive and upload to S3 (PRs only)
+    # Build wear/automotive/TV and upload to S3 (PRs only)
     next unless pr_number
 
     UI.user_error!("'BUILDKITE_ARTIFACTS_S3_BUCKET' must be defined as an environment variable.") unless ENV['BUILDKITE_ARTIFACTS_S3_BUCKET']
 
-    other_platforms = %w[wear automotive]
+    other_platforms = %w[wear automotive tv]
 
     other_apks = []
     other_platforms.each do |platform|
@@ -752,7 +762,7 @@ platform :android do
 
   def get_app_display_name(apk_path:)
     key = get_app_key(apk_path: apk_path).to_sym
-    { app: '📱 Mobile', wear: '⌚ Wear', automotive: '🚗 Automotive' }.fetch(key, '❔ Unknown')
+    { app: '📱 Mobile', wear: '⌚ Wear', automotive: '🚗 Automotive', tv: '📺 TV' }.fetch(key, '❔ Unknown')
   end
 
   # Mimics the subset of ActiveSupport's `String#parameterize` we rely on.
@@ -940,7 +950,7 @@ platform :android do
     BUILD_CODE_FORMATTER.build_code(build_code: build_code_next)
   end
 
-  # Returns the versionCode for a given app, adjusting for offset depending if it's the mobile, automotive or wear app
+  # Returns the versionCode for a given app, adjusting for offset depending on its form factor
   #
   # See also `dependencies.gradle.kts` and its `versionCodeDifferenceBetweenAppAnd*` constants where those offsets are defined
   #
@@ -950,6 +960,8 @@ platform :android do
       (version_code.to_i + 50_000).to_s
     when APPS_WEAR
       (version_code.to_i + 100_000).to_s
+    when APPS_TV
+      (version_code.to_i + 150_000).to_s
     else
       version_code
     end
@@ -957,7 +969,7 @@ platform :android do
 
   # Returns the Play Store track for a given app, for Open Testing or Production
   #
-  # @param app [String] The type of app. One of `APPS_APP`, `APPS_AUTOMOTIVE`, `APPS_WEAR`
+  # @param app [String] The type of app. One of `APPS_APP`, `APPS_AUTOMOTIVE`, `APPS_TV`, `APPS_WEAR`
   # @param is_beta [Boolean] If we want the track for Open Testing. Otherwise, returns the track for Production
   # @return [String] The Play Store track to use in the `upload_to_play_store(track: …)` action call
   #
@@ -967,6 +979,8 @@ platform :android do
       is_beta ? PLAY_STORE_TRACK_AUTOMOTIVE_BETA : PLAY_STORE_TRACK_AUTOMOTIVE_PRODUCTION
     when APPS_WEAR
       is_beta ? PLAY_STORE_TRACK_WEAR_BETA : PLAY_STORE_TRACK_WEAR_PRODUCTION
+    when APPS_TV
+      is_beta ? PLAY_STORE_TRACK_TV_BETA : PLAY_STORE_TRACK_TV_PRODUCTION
     else
       is_beta ? PLAY_STORE_TRACK_BETA : PLAY_STORE_TRACK_PRODUCTION
     end
