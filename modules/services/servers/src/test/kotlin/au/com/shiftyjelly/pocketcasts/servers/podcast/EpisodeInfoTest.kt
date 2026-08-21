@@ -3,17 +3,13 @@ package au.com.shiftyjelly.pocketcasts.servers.podcast
 import androidx.media3.common.MimeTypes
 import au.com.shiftyjelly.pocketcasts.models.entity.firstHlsStreamUrl
 import au.com.shiftyjelly.pocketcasts.models.type.MediaKind
-import au.com.shiftyjelly.pocketcasts.models.type.MediaKindMoshiAdapter
-import com.squareup.moshi.Moshi
+import au.com.shiftyjelly.pocketcasts.servers.di.NetworkModule
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
 
 class EpisodeInfoTest {
-    private val adapter = Moshi.Builder()
-        .add(MediaKind::class.java, MediaKindMoshiAdapter().nullSafe())
-        .build()
-        .adapter(EpisodeInfo::class.java)
+    private val adapter = NetworkModule().provideMoshi().adapter(EpisodeInfo::class.java)
 
     @Test
     fun `parse episode with hls alternate enclosure`() {
