@@ -1,6 +1,8 @@
 8.20
 -----
-
+*   Bug Fixes
+    *   Fix unresponsive steering-wheel skip buttons on Android Automotive OS
+        ([#5328](https://github.com/Automattic/pocket-casts-android/pull/5328))
 
 8.19
 -----
