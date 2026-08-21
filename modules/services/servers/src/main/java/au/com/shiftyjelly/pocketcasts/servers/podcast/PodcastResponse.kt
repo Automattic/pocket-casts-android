@@ -6,6 +6,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.firstHlsMimeType
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
+import au.com.shiftyjelly.pocketcasts.models.type.MediaKind
 import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
@@ -134,6 +135,7 @@ data class EpisodeInfo(
             episodeUuid = uuid,
             position = index,
             type = enclosure.type,
+            mediaKind = enclosure.mediaKind,
             bitrate = enclosure.bitrate,
             length = enclosure.length,
             height = enclosure.height,
@@ -154,6 +156,7 @@ data class EpisodeInfo(
 @JsonClass(generateAdapter = true)
 data class AlternateEnclosure(
     @Json(name = "type") val type: String?,
+    @Json(name = "media_kind") val mediaKind: MediaKind?,
     @Json(name = "bitrate") val bitrate: Long?,
     @Json(name = "length") val length: Long?,
     @Json(name = "height") val height: Int?,
