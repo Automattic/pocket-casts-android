@@ -166,7 +166,8 @@ class EpisodeInfoTest {
               "alternate_enclosures": [
                 { "type": "video/mp4", "media_kind": "hologram", "sources": [] },
                 { "type": "video/mp4", "media_kind": null, "sources": [] },
-                { "type": "video/mp4", "sources": [] }
+                { "type": "video/mp4", "sources": [] },
+                { "type": "video/mp4", "media_kind": 5, "sources": [] }
               ]
             }
             """.trimIndent(),
@@ -177,6 +178,7 @@ class EpisodeInfoTest {
         // An explicit null and an absent key both mean "no media kind", which is not the same as MediaKind.Other.
         assertNull(enclosures[1].mediaKind)
         assertNull(enclosures[2].mediaKind)
+        assertNull(enclosures[3].mediaKind)
     }
 
     @Test

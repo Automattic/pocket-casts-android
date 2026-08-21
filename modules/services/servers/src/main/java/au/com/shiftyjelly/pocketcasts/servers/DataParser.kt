@@ -191,7 +191,8 @@ object DataParser {
                 episodeUuid = episodeUuid,
                 position = i,
                 type = getString(enclosure, "type"),
-                mediaKind = MediaKind.fromServer(getString(enclosure, "media_kind")),
+                // Read as a raw string, not via getString, which would coerce a non-string kind into a junk Unknown.
+                mediaKind = MediaKind.fromServer(enclosure.opt("media_kind") as? String),
                 bitrate = getLongOrNull(enclosure, "bitrate"),
                 length = getLongOrNull(enclosure, "length"),
                 height = getIntOrNull(enclosure, "height"),

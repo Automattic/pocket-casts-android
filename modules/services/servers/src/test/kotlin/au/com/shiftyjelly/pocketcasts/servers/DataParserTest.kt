@@ -38,7 +38,8 @@ class DataParserTest {
             """
             { "type": "video/mp4", "media_kind": "hologram", "sources": [] },
             { "type": "video/mp4", "media_kind": null, "sources": [] },
-            { "type": "video/mp4", "sources": [] }
+            { "type": "video/mp4", "sources": [] },
+            { "type": "video/mp4", "media_kind": 5, "sources": [] }
             """.trimIndent(),
         )
 
@@ -46,6 +47,7 @@ class DataParserTest {
         // An explicit null and an absent key both mean "no media kind", which is not the same as MediaKind.Other.
         assertNull(enclosures[1].mediaKind)
         assertNull(enclosures[2].mediaKind)
+        assertNull(enclosures[3].mediaKind)
     }
 
     @Test
@@ -69,6 +71,7 @@ class DataParserTest {
               "integrity": { "type": "sri", "value": "sha384-abc" }
             },
             { "type": "video/mp4", "media_kind": "hologram", "sources": [] },
+            { "type": "video/mp4", "media_kind": 5, "sources": [] },
             { "type": "video/mp4", "sources": [] }
         """.trimIndent()
 
@@ -84,6 +87,7 @@ class DataParserTest {
             """.trimIndent(),
         )!!.toAlternateEnclosures()
 
+        assertEquals(5, fromRefresh.size)
         assertEquals(fromPodcastResponse, fromRefresh)
     }
 
