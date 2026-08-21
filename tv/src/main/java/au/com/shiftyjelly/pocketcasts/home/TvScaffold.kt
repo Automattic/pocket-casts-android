@@ -42,6 +42,7 @@ import au.com.shiftyjelly.pocketcasts.upnext.TvUpNextScreen
 fun TvScaffold(
     onLogIn: () -> Unit,
     onCreateAccount: () -> Unit,
+    onSignedOut: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: TvScaffoldViewModel = hiltViewModel(),
 ) {
@@ -131,6 +132,7 @@ fun TvScaffold(
                 onLogOut = {
                     isProfileModalVisible = false
                     viewModel.signOut()
+                    onSignedOut()
                 },
             )
         }
