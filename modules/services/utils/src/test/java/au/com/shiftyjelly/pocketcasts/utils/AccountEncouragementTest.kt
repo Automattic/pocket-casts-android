@@ -23,8 +23,8 @@ class AccountEncouragementTest {
     }
 
     @Test
-    fun `anchors on first eligible launch`() {
-        // First eligible launch (no anchor yet) anchors the clock instead of showing.
+    fun `shows on first eligible launch`() {
+        // First eligible launch (no anchor yet) shows immediately, then the clock starts.
         val decision = AccountEncouragement.decide(
             isEligible = true,
             lastShown = null,
@@ -32,7 +32,7 @@ class AccountEncouragementTest {
             interval = interval,
         )
 
-        assertEquals(AccountEncouragement.Decision.Anchor, decision)
+        assertEquals(AccountEncouragement.Decision.Show, decision)
     }
 
     @Test
@@ -74,9 +74,9 @@ class AccountEncouragementTest {
     }
 
     @Test
-    fun `re-anchors when anchor is in the future`() {
-        // A future anchor (backwards device clock / restored skewed backup) must re-anchor rather
-        // than suppress the modal indefinitely.
+    fun `shows when anchor is in the future`() {
+        // A future anchor (backwards device clock / restored skewed backup) shows rather than
+        // suppressing the modal indefinitely.
         val decision = AccountEncouragement.decide(
             isEligible = true,
             lastShown = now.plus(interval),
@@ -84,7 +84,7 @@ class AccountEncouragementTest {
             interval = interval,
         )
 
-        assertEquals(AccountEncouragement.Decision.Anchor, decision)
+        assertEquals(AccountEncouragement.Decision.Show, decision)
     }
 
     @Test

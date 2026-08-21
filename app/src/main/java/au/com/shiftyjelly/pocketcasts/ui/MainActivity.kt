@@ -689,9 +689,8 @@ class MainActivity :
                     return@repeatOnLifecycle
                 }
 
-                // Eligible = logged out and past initial onboarding. The first eligible launch only
-                // anchors the clock (so we don't collide with onboarding); the modal is shown 60 days
-                // later and every 60 days thereafter while the user stays logged out.
+                // Eligible = logged out and past initial onboarding. Shown on the first eligible
+                // launch, then every 60 days while the user stays logged out.
                 val isSignedIn = viewModel.signInState.asFlow().first().isSignedIn
                 val isEligible = !isSignedIn && settings.hasCompletedOnboarding()
 
@@ -702,11 +701,6 @@ class MainActivity :
                 )
                 when (decision) {
                     AccountEncouragement.Decision.Wait -> return@repeatOnLifecycle
-
-                    // Anchor without showing.
-                    AccountEncouragement.Decision.Anchor -> {
-                        settings.freeAccountEncouragementLastShown.set(Instant.now(), updateModifiedAt = true)
-                    }
 
                     AccountEncouragement.Decision.Show -> {
                         // Reset the clock so the next showing is one interval out. Set before

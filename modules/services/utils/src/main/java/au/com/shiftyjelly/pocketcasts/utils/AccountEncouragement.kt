@@ -19,15 +19,16 @@ object AccountEncouragement {
         /** Show the modal now. */
         Show,
 
-        /** Don't show, but anchor the cadence clock to now (the first eligible launch). */
-        Anchor,
-
         /** Don't show and leave the clock untouched. */
         Wait,
     }
 
     /**
      * Pure cadence decision, with no Android/preferences dependencies so it can be unit-tested.
+     *
+     * Shows on the first eligible launch (no anchor yet), once the interval elapses, or when the
+     * stored anchor is in the future (backwards clock / skewed-backup restore). The caller records
+     * `now` as the new anchor when it shows.
      *
      * @param isEligible whether the user currently qualifies (flag on, logged out, onboarding done).
      * @param lastShown the persisted anchor, or `null` if the clock has never been started.
@@ -41,10 +42,7 @@ object AccountEncouragement {
         interval: Duration = this.interval,
     ): Decision {
         if (!isEligible) return Decision.Wait
-        // (Re)anchor when there's no clock yet, or when the stored anchor is in the future — the
-        // latter happens if the device clock moves backwards or a skewed backup is restored, and
-        // would otherwise suppress the modal indefinitely.
-        if (lastShown == null || lastShown.isAfter(now)) return Decision.Anchor
+        if (lastShown == null || lastShown.isAfter(now)) return Decision.Show
         return if (!now.isBefore(lastShown.plus(interval))) Decision.Show else Decision.Wait
     }
 }
