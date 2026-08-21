@@ -188,6 +188,7 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.NavigationBarColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.AccountEncouragement
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
@@ -229,6 +230,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
+import java.time.Instant
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -489,7 +491,9 @@ class MainActivity :
         if (savedInstanceState == null && needsLoginPromptAfterRestore) {
             settings.setNeedsLoginPromptAfterRestore(false)
             if (!showOnboarding && !isLoggedIn) {
-                settings.showFreeAccountEncouragement.set(false, updateModifiedAt = true)
+                // Anchor the recurring clock so encourageAccountCreation() doesn't also show the
+                // modal this launch; the next recurring prompt is then one interval out.
+                settings.freeAccountEncouragementLastShown.set(Instant.now(), updateModifiedAt = true)
                 openOnboardingFlow(OnboardingFlow.AccountEncouragement)
             }
         }
@@ -683,21 +687,35 @@ class MainActivity :
     private fun encourageAccountCreation() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                val encourageAccountCreation = settings.showFreeAccountEncouragement.value
-                if (!encourageAccountCreation) {
+                if (!FeatureFlag.isEnabled(Feature.ENCOURAGE_ACCOUNT_CREATION)) {
                     return@repeatOnLifecycle
                 }
-                settings.showFreeAccountEncouragement.set(false, updateModifiedAt = true)
 
+                // Eligible = logged out and past initial onboarding. Shown on the first eligible
+                // launch, then every 60 days while the user stays logged out.
                 val isSignedIn = viewModel.signInState.asFlow().first().isSignedIn
-                if (isSignedIn) {
-                    return@repeatOnLifecycle
-                }
+                val isEligible = !isSignedIn && settings.hasCompletedOnboarding()
 
-                if (Util.isTablet(this@MainActivity)) {
-                    AccountBenefitsFragment().show(supportFragmentManager, "account_benefits_fragment")
-                } else {
-                    openOnboardingFlow(OnboardingFlow.AccountEncouragement)
+                val decision = AccountEncouragement.decide(
+                    isEligible = isEligible,
+                    lastShown = settings.freeAccountEncouragementLastShown.value,
+                    now = Instant.now(),
+                )
+                when (decision) {
+                    AccountEncouragement.Decision.Wait -> return@repeatOnLifecycle
+
+                    AccountEncouragement.Decision.Show -> {
+                        // Reset the clock so the next showing is one interval out. Set before
+                        // presenting so this STARTED block can't re-show the modal when the activity
+                        // returns to the foreground after it's dismissed.
+                        settings.freeAccountEncouragementLastShown.set(Instant.now(), updateModifiedAt = true)
+
+                        if (Util.isTablet(this@MainActivity)) {
+                            AccountBenefitsFragment().show(supportFragmentManager, "account_benefits_fragment")
+                        } else {
+                            openOnboardingFlow(OnboardingFlow.AccountEncouragement)
+                        }
+                    }
                 }
             }
         }

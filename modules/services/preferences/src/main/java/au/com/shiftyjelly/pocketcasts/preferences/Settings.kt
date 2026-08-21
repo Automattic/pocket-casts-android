@@ -622,7 +622,14 @@ interface Settings {
     val isFreeAccountProfileBannerDismissed: UserSetting<Boolean>
     val isFreeAccountFiltersBannerDismissed: UserSetting<Boolean>
     val isFreeAccountHistoryBannerDismissed: UserSetting<Boolean>
-    val showFreeAccountEncouragement: UserSetting<Boolean>
+
+    /**
+     * Anchor for the recurring Encourage Account Creation modal cadence. The first eligible launch
+     * sets this (without showing the modal); each time the modal is shown it is reset, so the modal
+     * recurs every 60 days while the user stays logged out. `null` means the clock has never been
+     * started.
+     */
+    val freeAccountEncouragementLastShown: UserSetting<Instant?>
 
     val showPlaylistsOnboarding: UserSetting<Boolean>
     val saveUpNextAsPlaylist: UserSetting<Boolean>

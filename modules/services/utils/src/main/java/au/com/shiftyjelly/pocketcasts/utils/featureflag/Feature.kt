@@ -170,6 +170,15 @@ enum class Feature(
         hasDevToggle = true,
         addedOn = LocalDate.parse("2025-11-05"),
     ),
+    ENCOURAGE_ACCOUNT_CREATION(
+        key = "encourage_account_creation",
+        title = "Recurring encourage account creation modal",
+        defaultValue = true,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+        addedOn = LocalDate.parse("2026-08-19"),
+    ),
     NEW_INSTALLMENT_PLAN(
         key = "new_installment_plan",
         title = "New Installment Plan",

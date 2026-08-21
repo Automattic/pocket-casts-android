@@ -52,8 +52,6 @@ class AppLifecycleObserverTest {
 
     @Mock private lateinit var showPodcastsRecentlyPlayedSortOrderSetting: UserSetting<Boolean>
 
-    @Mock private lateinit var showAccountEncouragementSetting: UserSetting<Boolean>
-
     @Mock private lateinit var autoDownloadOnFollowPodcastSetting: UserSetting<Boolean>
 
     @Mock private lateinit var dailyRemindersNotificationSetting: UserSetting<Boolean>
@@ -101,7 +99,6 @@ class AppLifecycleObserverTest {
         whenever(settings.offersNotification).thenReturn(offerNotificationSetting)
         whenever(settings.useDarkUpNextTheme).thenReturn(useUpNextDarkThemeSetting)
         whenever(settings.showPodcastsRecentlyPlayedSortOrderTooltip).thenReturn(showPodcastsRecentlyPlayedSortOrderSetting)
-        whenever(settings.showFreeAccountEncouragement).thenReturn(showAccountEncouragementSetting)
 
         whenever(appLifecycleOwner.lifecycle).thenReturn(appLifecycle)
 
