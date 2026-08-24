@@ -8,6 +8,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import com.automattic.eventhorizon.EpisodeActionsShownEvent
+import com.automattic.eventhorizon.EpisodeViewSourceType
+import com.automattic.eventhorizon.EventHorizon
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.CancellationException
@@ -16,12 +19,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-enum class TvEpisodeActionContext(val source: SourceView) {
-    PodcastDetails(SourceView.PODCAST_SCREEN),
-    SearchResults(SourceView.SEARCH_RESULTS),
-    Playlist(SourceView.FILTERS),
-    UpNext(SourceView.UP_NEXT),
-    NowPlaying(SourceView.PLAYER),
+enum class TvEpisodeActionContext(val source: SourceView, val episodeViewSource: EpisodeViewSourceType) {
+    PodcastDetails(SourceView.PODCAST_SCREEN, EpisodeViewSourceType.PodcastScreen),
+    SearchResults(SourceView.SEARCH_RESULTS, EpisodeViewSourceType.Search),
+    Playlist(SourceView.FILTERS, EpisodeViewSourceType.Filters),
+    UpNext(SourceView.UP_NEXT, EpisodeViewSourceType.UpNext),
+    NowPlaying(SourceView.PLAYER, EpisodeViewSourceType.NowPlaying),
 }
 
 interface TvEpisodeActions {
@@ -33,6 +36,7 @@ interface TvEpisodeActions {
     fun archive(episode: PodcastEpisode)
     fun unarchive(episode: PodcastEpisode)
     fun removeFromUpNext(episode: PodcastEpisode, source: SourceView)
+    fun trackActionsShown(source: EpisodeViewSourceType)
 }
 
 @HiltViewModel
@@ -40,6 +44,7 @@ class TvEpisodeActionsViewModel @Inject constructor(
     private val episodeManager: EpisodeManager,
     private val playbackManager: PlaybackManager,
     private val podcastManager: PodcastManager,
+    private val eventHorizon: EventHorizon,
     @ApplicationScope private val applicationScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel(),
@@ -75,6 +80,10 @@ class TvEpisodeActionsViewModel @Inject constructor(
 
     override fun removeFromUpNext(episode: PodcastEpisode, source: SourceView) {
         playbackManager.removeEpisode(episodeToRemove = episode, source = source)
+    }
+
+    override fun trackActionsShown(source: EpisodeViewSourceType) {
+        eventHorizon.track(EpisodeActionsShownEvent(source = source))
     }
 
     private fun launchWrite(block: suspend () -> Unit) {

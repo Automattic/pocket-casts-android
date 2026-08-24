@@ -167,6 +167,7 @@ fun TvSearchScreen(
         detailsEpisode?.let { episode ->
             TvEpisodeInfoModal(
                 episode = episode,
+                actionContext = TvEpisodeActionContext.SearchResults,
                 onDismissRequest = { detailsEpisode = null },
             )
         }

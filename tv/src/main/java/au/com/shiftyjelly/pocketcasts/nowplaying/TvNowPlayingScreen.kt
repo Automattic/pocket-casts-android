@@ -356,6 +356,7 @@ private fun TvNowPlayingContent(
         if (isDetailsModalVisible) {
             TvEpisodeInfoModal(
                 episode = episode,
+                actionContext = TvEpisodeActionContext.NowPlaying,
                 onDismissRequest = { isDetailsModalVisible = false },
             )
         }

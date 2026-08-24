@@ -59,11 +59,13 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun TvEpisodeInfoModal(
     episode: PodcastEpisode,
+    actionContext: TvEpisodeActionContext,
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: TvEpisodeInfoViewModel = hiltViewModel(),
 ) {
     LaunchedEffect(episode.uuid) {
+        viewModel.trackDetailShown(actionContext.episodeViewSource)
         viewModel.load(episode.podcastUuid, episode.uuid)
     }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()

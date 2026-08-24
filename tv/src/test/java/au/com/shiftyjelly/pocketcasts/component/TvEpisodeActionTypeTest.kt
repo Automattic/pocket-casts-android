@@ -1,11 +1,30 @@
 package au.com.shiftyjelly.pocketcasts.component
 
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import com.automattic.eventhorizon.EpisodeViewSourceType
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Test
 
 class TvEpisodeActionTypeTest {
+
+    @Test
+    fun `every action context maps to the matching analytics and event sources`() {
+        val expected = mapOf(
+            TvEpisodeActionContext.PodcastDetails to (SourceView.PODCAST_SCREEN to EpisodeViewSourceType.PodcastScreen),
+            TvEpisodeActionContext.SearchResults to (SourceView.SEARCH_RESULTS to EpisodeViewSourceType.Search),
+            TvEpisodeActionContext.Playlist to (SourceView.FILTERS to EpisodeViewSourceType.Filters),
+            TvEpisodeActionContext.UpNext to (SourceView.UP_NEXT to EpisodeViewSourceType.UpNext),
+            TvEpisodeActionContext.NowPlaying to (SourceView.PLAYER to EpisodeViewSourceType.NowPlaying),
+        )
+
+        assertEquals(TvEpisodeActionContext.entries.toSet(), expected.keys)
+        TvEpisodeActionContext.entries.forEach { context ->
+            val (source, episodeViewSource) = expected.getValue(context)
+            assertEquals(source, context.source)
+            assertEquals(episodeViewSource, context.episodeViewSource)
+        }
+    }
 
     @Test
     fun `podcast details shows played and archive toggles but no go to podcast`() {
