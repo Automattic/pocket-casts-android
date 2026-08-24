@@ -5,6 +5,7 @@ import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.utils.TimberDebugTree
+import au.com.shiftyjelly.pocketcasts.utils.log.RxJavaUncaughtExceptionHandling
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -29,6 +30,7 @@ class TvApplication :
         if (BuildConfig.DEBUG) {
             Timber.plant(TimberDebugTree())
         }
+        RxJavaUncaughtExceptionHandling.setUp()
         // setup() subscribes the Up Next queue's sync pipeline itself, so there must be no
         // separate UpNextQueue.setupBlocking() call on TV.
         applicationScope.launch {
