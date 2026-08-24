@@ -10,8 +10,6 @@ import au.com.shiftyjelly.pocketcasts.models.to.ImprovedSearchResultItem
 import au.com.shiftyjelly.pocketcasts.models.to.SearchAutoCompleteItem
 import au.com.shiftyjelly.pocketcasts.models.to.SearchHistoryEntry
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
-import au.com.shiftyjelly.pocketcasts.models.type.SignInState
-import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
@@ -22,7 +20,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.search.ImprovedSearchManager
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
-import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.servers.model.Discover
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
@@ -33,7 +30,6 @@ import au.com.shiftyjelly.pocketcasts.servers.model.ExpandedStyle
 import au.com.shiftyjelly.pocketcasts.servers.model.ListFeed
 import au.com.shiftyjelly.pocketcasts.servers.model.ListType
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
-import io.reactivex.Flowable
 import java.util.Date
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -81,12 +77,10 @@ class TvSearchViewModelTest {
     private val playbackManager = mock<PlaybackManager>()
     private val searchHistoryManager = mock<SearchHistoryManager>()
     private val folderManager = mock<FolderManager>()
-    private val userManager = mock<UserManager>()
 
     init {
         whenever { improvedSearchManager.autoCompleteSearch(any()) }.thenReturn(emptyList())
         whenever { searchHistoryManager.findAll(any()) }.thenReturn(emptyList())
-        whenever(userManager.getSignInState()).thenReturn(Flowable.just(SignInState.SignedOut))
     }
 
     @Test
@@ -463,10 +457,10 @@ class TvSearchViewModelTest {
     private fun subscribedPodcast(uuid: String) = Podcast(uuid = uuid, title = "Podcast $uuid", author = "Author")
 
     @Test
-    fun `matching folders are surfaced for a plus or patron user`() = runTest {
+    fun `matching folders are surfaced for a signed-in user`() = runTest {
         whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
         whenever { improvedSearchManager.combinedSearch(any()) }.thenReturn(emptyList())
-        whenever(userManager.getSignInState()).thenReturn(Flowable.just(plusSignInState()))
+        whenever(syncManager.isLoggedIn()).thenReturn(true)
         whenever { folderManager.getAll() }.thenReturn(listOf(folderEntity("Sugar Shows"), folderEntity("Comedy")))
         whenever { podcastManager.findPodcastsInFolder(any()) }.thenReturn(emptyList())
 
@@ -479,7 +473,7 @@ class TvSearchViewModelTest {
     }
 
     @Test
-    fun `folders are not searched for a non-plus user`() = runTest {
+    fun `folders are not searched for a signed-out user`() = runTest {
         whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
         whenever { improvedSearchManager.combinedSearch(any()) }.thenReturn(listOf(podcastItem("podcast-1")))
 
@@ -496,7 +490,7 @@ class TvSearchViewModelTest {
     fun `a matching folder alone counts as a result`() = runTest {
         whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
         whenever { improvedSearchManager.combinedSearch(any()) }.thenReturn(emptyList())
-        whenever(userManager.getSignInState()).thenReturn(Flowable.just(plusSignInState()))
+        whenever(syncManager.isLoggedIn()).thenReturn(true)
         whenever { folderManager.getAll() }.thenReturn(listOf(folderEntity("Sugar")))
         whenever { podcastManager.findPodcastsInFolder(any()) }.thenReturn(emptyList())
 
@@ -511,7 +505,7 @@ class TvSearchViewModelTest {
     fun `a folder search failure does not fail the whole search`() = runTest {
         whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
         whenever { improvedSearchManager.combinedSearch(any()) }.thenReturn(listOf(podcastItem("podcast-1")))
-        whenever(userManager.getSignInState()).thenReturn(Flowable.just(plusSignInState()))
+        whenever(syncManager.isLoggedIn()).thenReturn(true)
         whenever { folderManager.getAll() }.thenThrow(RuntimeException("database unavailable"))
 
         val viewModel = createViewModel()
@@ -536,10 +530,7 @@ class TvSearchViewModelTest {
         playbackManager = playbackManager,
         searchHistoryManager = searchHistoryManager,
         folderManager = folderManager,
-        userManager = userManager,
     )
-
-    private fun plusSignInState() = SignInState.SignedIn(email = "test@example.com", subscription = Subscription.PlusPreview)
 
     private fun folderEntity(name: String) = Folder(
         uuid = name,

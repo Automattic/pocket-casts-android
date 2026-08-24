@@ -14,7 +14,6 @@ import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.models.to.ImprovedSearchResultItem
 import au.com.shiftyjelly.pocketcasts.models.to.SearchAutoCompleteItem
 import au.com.shiftyjelly.pocketcasts.models.to.SearchHistoryEntry
-import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
@@ -22,7 +21,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.search.ImprovedSearchManager
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
-import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -33,14 +31,11 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.rx2.await
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -55,7 +50,6 @@ class TvSearchViewModel @Inject constructor(
     private val playbackManager: PlaybackManager,
     private val searchHistoryManager: SearchHistoryManager,
     private val folderManager: FolderManager,
-    private val userManager: UserManager,
 ) : ViewModel() {
 
     private val _categories = MutableStateFlow<List<DiscoverCategory>>(emptyList())
@@ -89,9 +83,6 @@ class TvSearchViewModel @Inject constructor(
     val actionsEpisode: StateFlow<PodcastEpisode?> = _actionsEpisode.asStateFlow()
 
     private var searchJob: Job? = null
-
-    private val signInState = userManager.getSignInState().asFlow()
-        .stateIn(viewModelScope, SharingStarted.Eagerly, SignInState.SignedOut)
 
     init {
         viewModelScope.launch {
@@ -198,7 +189,7 @@ class TvSearchViewModel @Inject constructor(
     }
 
     private suspend fun searchFolders(term: String): List<FolderItem.Folder> {
-        if (!signInState.value.isSignedInAsPlusOrPatron) {
+        if (!syncManager.isLoggedIn()) {
             return emptyList()
         }
         return folderManager.getAll()
