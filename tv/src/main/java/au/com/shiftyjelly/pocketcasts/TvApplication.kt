@@ -7,6 +7,10 @@ import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelp
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackServiceToggle
 import au.com.shiftyjelly.pocketcasts.utils.TimberDebugTree
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.DefaultReleaseFeatureProvider
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.FirebaseRemoteFeatureProvider
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.PreferencesFeatureProvider
 import au.com.shiftyjelly.pocketcasts.utils.log.RxJavaUncaughtExceptionHandling
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
@@ -27,6 +31,12 @@ class TvApplication :
 
     @Inject lateinit var notificationHelper: NotificationHelper
 
+    @Inject lateinit var defaultReleaseFeatureProvider: DefaultReleaseFeatureProvider
+
+    @Inject lateinit var firebaseRemoteFeatureProvider: FirebaseRemoteFeatureProvider
+
+    @Inject lateinit var preferencesFeatureProvider: PreferencesFeatureProvider
+
     private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     override fun onCreate() {
@@ -35,6 +45,7 @@ class TvApplication :
             Timber.plant(TimberDebugTree())
         }
         RxJavaUncaughtExceptionHandling.setUp()
+        setupFeatureFlags()
         notificationHelper.setupNotificationChannels()
         PlaybackServiceToggle.ensureCorrectServiceEnabled(this)
         // setup() subscribes the Up Next queue's sync pipeline itself, so there must be no
@@ -42,6 +53,18 @@ class TvApplication :
         applicationScope.launch {
             playbackManager.setup()
         }
+    }
+
+    private fun setupFeatureFlags() {
+        val providers = if (BuildConfig.DEBUG || BuildConfig.IS_PROTOTYPE) {
+            listOf(preferencesFeatureProvider)
+        } else {
+            listOf(
+                firebaseRemoteFeatureProvider,
+                defaultReleaseFeatureProvider,
+            )
+        }
+        FeatureFlag.initialize(providers)
     }
 
     override val workManagerConfiguration: Configuration
