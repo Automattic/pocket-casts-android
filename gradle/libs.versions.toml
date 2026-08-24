@@ -274,7 +274,7 @@ google-identity = { module = "com.google.android.libraries.identity.googleid:goo
 
 # Other dependencies
 androidx-annotation = "androidx.annotation:annotation:1.10.0"
-androidx-appcompat = "androidx.appcompat:appcompat:1.7.1"
+androidx-appcompat = "androidx.appcompat:appcompat:1.8.0"
 androidx-arch-core = "androidx.arch.core:core-testing:2.2.0"
 androidx-car = "androidx.car.app:app:1.7.0"
 androidx-cardview = "androidx.cardview:cardview:1.0.0"
