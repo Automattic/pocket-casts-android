@@ -44,4 +44,19 @@ class CombinedSearchResponseTest {
         val types = response?.results?.map { it::class.simpleName }
         assertEquals(listOf("PodcastResult", "EpisodeResult", "Unknown"), types)
     }
+
+    @Test
+    fun `explicit null on unread fields decodes without failing the whole response`() {
+        val response = adapter.fromJson(
+            """
+            {"results":[
+              {"uuid":"p1","title":"Freakonomics Radio","slug":null,"type":"podcast"},
+              {"uuid":"e1","title":"Ep 1","url":null,"published_date":"2024-01-02T03:04:05Z","podcast_uuid":"p1","podcast_title":"Freakonomics Radio","podcast_slug":null,"type":"episode"}
+            ]}
+            """.trimIndent(),
+        )
+
+        val types = response?.results?.map { it::class.simpleName }
+        assertEquals(listOf("PodcastResult", "EpisodeResult"), types)
+    }
 }
