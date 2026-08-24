@@ -79,7 +79,10 @@ fun TvScaffold(
             modifier = modifier
                 .fillMaxSize()
                 .onPreviewKeyEvent { event ->
-                    if (event.type == KeyEventType.KeyDown && event.key == Key.Menu) {
+                    val isMenuPress = event.type == KeyEventType.KeyDown &&
+                        event.key == Key.Menu &&
+                        event.nativeKeyEvent.repeatCount == 0
+                    if (isMenuPress && !isProfileModalVisible) {
                         isMiniPlayerVisible = !isMiniPlayerVisible
                         true
                     } else {
