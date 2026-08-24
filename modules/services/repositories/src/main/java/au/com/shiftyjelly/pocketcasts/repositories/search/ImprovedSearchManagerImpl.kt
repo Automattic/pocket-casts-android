@@ -54,7 +54,7 @@ class ImprovedSearchManagerImpl @Inject constructor(
                     podcastTitle = it.podcastTitle,
                     publishedDate = it.publishedDate,
                     duration = it.duration.seconds,
-                    hasVideo = it.hasVideo,
+                    hasVideo = it.hasVideo == true,
                 )
 
                 CombinedResult.Unknown -> null

@@ -72,6 +72,8 @@ import au.com.shiftyjelly.pocketcasts.theme.TvTheme
 import au.com.shiftyjelly.pocketcasts.theme.TvTopBarHeight
 import au.com.shiftyjelly.pocketcasts.theme.tvColors
 import au.com.shiftyjelly.pocketcasts.theme.tvTypography
+import java.util.Date
+import kotlin.time.Duration.Companion.seconds
 import androidx.compose.foundation.lazy.grid.itemsIndexed as gridItemsIndexed
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -694,6 +696,7 @@ private fun TvSearchLoading() {
             color = MaterialTheme.tvColors.textPrimary,
             modifier = Modifier.size(48.dp),
         )
+        Spacer(modifier = Modifier.height(16.dp))
         Text(
             text = stringResource(LR.string.tv_search_searching),
             style = MaterialTheme.tvTypography.body,
@@ -724,6 +727,94 @@ private fun TvSearchScreenPreview() {
                 onPlayEpisode = {},
                 onOpenEpisodeActions = {},
             )
+        }
+    }
+}
+
+@Preview(device = Devices.TV_1080p)
+@Composable
+private fun TvSearchIdleWithHistoryPreview() {
+    TvTheme {
+        Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.tvColors.backgroundSunken)) {
+            TvSearchContent(
+                query = "",
+                searchState = TvSearchState.Idle,
+                filter = TvSearchFilter.TopResults,
+                categories = emptyList(),
+                discoverRows = emptyList(),
+                onQueryChange = {},
+                onFilterSelect = {},
+                onOpenPodcast = {},
+                onOpenCategory = {},
+                onPlayEpisode = {},
+                onOpenEpisodeActions = {},
+                history = listOf("Freakonomics", "Business Daily", "Science Weekly"),
+            )
+        }
+    }
+}
+
+@Preview(device = Devices.TV_1080p)
+@Composable
+private fun TvSearchResultsPreview() {
+    TvTheme {
+        Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.tvColors.backgroundSunken)) {
+            TvSearchContent(
+                query = "business",
+                searchState = TvSearchState.Results(
+                    podcasts = List(4) {
+                        ImprovedSearchResultItem.PodcastItem(
+                            uuid = "podcast-$it",
+                            title = "Business Daily $it",
+                            author = "BBC",
+                            isFollowed = it == 0,
+                        )
+                    },
+                    episodes = List(3) {
+                        ImprovedSearchResultItem.EpisodeItem(
+                            uuid = "episode-$it",
+                            title = "The real cost of sugar and how it shapes the food we eat",
+                            podcastUuid = "podcast-$it",
+                            podcastTitle = "Business Daily",
+                            publishedDate = Date(0),
+                            duration = 1440.seconds,
+                            hasVideo = it == 0,
+                        )
+                    },
+                ),
+                filter = TvSearchFilter.TopResults,
+                categories = emptyList(),
+                discoverRows = emptyList(),
+                onQueryChange = {},
+                onFilterSelect = {},
+                onOpenPodcast = {},
+                onOpenCategory = {},
+                onPlayEpisode = {},
+                onOpenEpisodeActions = {},
+            )
+        }
+    }
+}
+
+@Preview(device = Devices.TV_1080p)
+@Composable
+private fun TvSearchSuggestionsPreview() {
+    TvTheme {
+        Box(modifier = Modifier.background(MaterialTheme.tvColors.backgroundSunken).padding(48.dp)) {
+            TvSearchSuggestions(
+                suggestions = listOf("business daily", "business wars", "business insider"),
+                onSuggestionSelect = {},
+            )
+        }
+    }
+}
+
+@Preview(device = Devices.TV_1080p)
+@Composable
+private fun TvSearchLoadingPreview() {
+    TvTheme {
+        Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.tvColors.backgroundSunken)) {
+            TvSearchLoading()
         }
     }
 }
