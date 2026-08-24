@@ -142,7 +142,9 @@ class TvSearchViewModel @Inject constructor(
                 }
                 _suggestions.value = predictiveResults.filterIsInstance<SearchAutoCompleteItem.Term>().map { it.term }
                 val predictivePodcasts = predictiveResults.filterIsInstance<SearchAutoCompleteItem.Podcast>().map { it.toSearchItem() }
-                val earlyPodcasts = (predictivePodcasts + localPodcasts).distinctBy(ImprovedSearchResultItem.PodcastItem::uuid)
+                val earlyPodcasts = (predictivePodcasts + localPodcasts)
+                    .distinctBy(ImprovedSearchResultItem.PodcastItem::uuid)
+                    .map { if (it.uuid in localUuids) it.copy(isFollowed = true) else it }
                 if (earlyPodcasts.isNotEmpty()) {
                     _searchState.value = TvSearchState.Results(podcasts = earlyPodcasts, episodes = emptyList(), isPartial = true)
                 }
