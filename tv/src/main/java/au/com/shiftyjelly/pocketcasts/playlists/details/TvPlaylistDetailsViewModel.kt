@@ -12,6 +12,15 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlayAllHandler
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlayAllResponse
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.FilterHideArchivedTappedEvent
+import com.automattic.eventhorizon.FilterPlayAllDismissedEvent
+import com.automattic.eventhorizon.FilterPlayAllReplaceAndPlayTappedEvent
+import com.automattic.eventhorizon.FilterPlayAllTappedEvent
+import com.automattic.eventhorizon.FilterShowArchivedTappedEvent
+import com.automattic.eventhorizon.FilterShownEvent
+import com.automattic.eventhorizon.FilterSortByChangedEvent
+import com.automattic.eventhorizon.FilterSortByTappedEvent
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -41,10 +50,13 @@ class TvPlaylistDetailsViewModel @AssistedInject constructor(
     @Assisted private val playlistType: Playlist.Type,
     private val playlistManager: PlaylistManager,
     private val preferences: TvPreferences,
+    private val eventHorizon: EventHorizon,
     playAllHandlerFactory: PlayAllHandler.Factory,
 ) : ViewModel() {
 
     private val playAllHandler = playAllHandlerFactory.create(SourceView.FILTERS)
+
+    private val filterType = playlistType.analyticsValue
 
     private val _events = MutableSharedFlow<TvPlaylistDetailsEvent>(extraBufferCapacity = 2)
     val events: SharedFlow<TvPlaylistDetailsEvent> = _events.asSharedFlow()
@@ -59,7 +71,9 @@ class TvPlaylistDetailsViewModel @AssistedInject constructor(
         Playlist.Type.Smart -> playlistManager.smartPlaylistFlow(playlistUuid, includeArchived = true)
     }
 
-    private val isShowingArchivedFlow = MutableStateFlow(preferences.isPlaylistShowingArchived(playlistUuid))
+    private val isShowingArchivedFlow = MutableStateFlow(
+        playlistType == Playlist.Type.Manual && preferences.isPlaylistShowingArchived(playlistUuid),
+    )
 
     val uiState: StateFlow<TvPlaylistDetailsUiState> = combine(
         playlistFlow,
@@ -81,14 +95,29 @@ class TvPlaylistDetailsViewModel @AssistedInject constructor(
         TvPlaylistDetailsUiState.Loading,
     )
 
+    fun trackSortByTapped() {
+        eventHorizon.track(FilterSortByTappedEvent(filterType = filterType))
+    }
+
     fun changeSortType(sortType: PlaylistEpisodeSortType) {
+        eventHorizon.track(FilterSortByChangedEvent(sortOrder = sortType.analyticsValue, filterType = filterType))
         viewModelScope.launch {
             playlistManager.updateSortType(playlistUuid, sortType)
         }
     }
 
+    fun trackFilterShown() {
+        eventHorizon.track(FilterShownEvent(filterType = filterType))
+    }
+
+    fun trackPlayAllDismissed() {
+        eventHorizon.track(FilterPlayAllDismissedEvent(filterType = filterType))
+    }
+
     fun toggleArchiveFilter() {
+        if (playlistType != Playlist.Type.Manual) return
         val isShowingArchived = !isShowingArchivedFlow.value
+        eventHorizon.track(if (isShowingArchived) FilterShowArchivedTappedEvent else FilterHideArchivedTappedEvent)
         preferences.setPlaylistShowingArchived(playlistUuid, isShowingArchived)
         isShowingArchivedFlow.value = isShowingArchived
     }
@@ -97,9 +126,12 @@ class TvPlaylistDetailsViewModel @AssistedInject constructor(
         if (isBusy) {
             return
         }
+        val episodes = (uiState.value as? TvPlaylistDetailsUiState.Loaded)?.episodes.orEmpty()
+        if (episodes.isNotEmpty()) {
+            eventHorizon.track(FilterPlayAllTappedEvent(filterType = filterType))
+        }
         playAllJob = viewModelScope.launch {
             try {
-                val episodes = (uiState.value as? TvPlaylistDetailsUiState.Loaded)?.episodes.orEmpty()
                 when (playAllHandler.handlePlayAllEpisodes(episodes)) {
                     PlayAllResponse.DoNothing -> _events.tryEmit(TvPlaylistDetailsEvent.OpenNowPlaying)
                     PlayAllResponse.ShowWarning -> _events.tryEmit(TvPlaylistDetailsEvent.ShowReplaceUpNextConfirmation)
@@ -117,6 +149,7 @@ class TvPlaylistDetailsViewModel @AssistedInject constructor(
         if (isBusy) {
             return
         }
+        eventHorizon.track(FilterPlayAllReplaceAndPlayTappedEvent(filterType = filterType, saveUpNext = saveUpNext))
         replaceUpNextJob = viewModelScope.launch {
             val played = withContext(NonCancellable) {
                 if (saveUpNext) {

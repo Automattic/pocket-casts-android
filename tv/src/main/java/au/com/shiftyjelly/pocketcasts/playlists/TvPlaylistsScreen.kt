@@ -75,6 +75,15 @@ fun TvPlaylistsScreen(
     var isDownloadModalVisible by rememberSaveable { mutableStateOf(false) }
     var openedPlaylist by rememberSaveable(stateSaver = OpenedPlaylistSaver) { mutableStateOf<OpenedPlaylist?>(null) }
     var restoreFocusTrigger by remember { mutableIntStateOf(0) }
+    var filterListShownTracked by remember { mutableStateOf(false) }
+
+    LaunchedEffect(uiState) {
+        val state = uiState
+        if (!filterListShownTracked && state is TvPlaylistsUiState.Loaded) {
+            viewModel.trackPlaylistsListShown(state.playlists.size)
+            filterListShownTracked = true
+        }
+    }
 
     val playlist = openedPlaylist
     Box(modifier = modifier.fillMaxSize()) {
@@ -85,7 +94,10 @@ fun TvPlaylistsScreen(
             refreshArtworkUuids = viewModel::refreshArtworkUuids,
             refreshEpisodeCount = viewModel::refreshEpisodeCount,
             findPodcastTint = viewModel::findPodcastTint,
-            onCreatePlaylist = { isDownloadModalVisible = true },
+            onCreatePlaylist = {
+                viewModel.trackCreateButtonTapped()
+                isDownloadModalVisible = true
+            },
             onOpenPlaylist = { preview ->
                 isDownloadModalVisible = false
                 openedPlaylist = OpenedPlaylist(preview.uuid, preview.type)

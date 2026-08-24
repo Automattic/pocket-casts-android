@@ -91,13 +91,19 @@ fun <T> TvSortButton(
     label: @Composable (T) -> String,
     onSelect: (T) -> Unit,
     modifier: Modifier = Modifier,
+    onExpand: () -> Unit = {},
+    leftFocusRequester: FocusRequester? = null,
 ) {
     var isExpanded by remember { mutableStateOf(false) }
 
     Box(modifier = modifier) {
         IconButton(
-            onClick = { isExpanded = true },
+            onClick = {
+                onExpand()
+                isExpanded = true
+            },
             colors = TvButtonDefaults.iconButtonColors(),
+            modifier = Modifier.focusProperties { leftFocusRequester?.let { left = it } },
         ) {
             Icon(
                 painter = painterResource(IR.drawable.ic_sort),

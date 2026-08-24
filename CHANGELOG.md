@@ -1,10 +1,17 @@
+8.20
+-----
+
+
 8.19
 -----
+*   New Features
+    *   Add the delete account option to the Automotive account screen
+        ([#5757](https://github.com/Automattic/pocket-casts-android/pull/5757))
 *   Bug Fixes
-    *   Fix audio stuttering when playing video episodes at high speed in the background
-        ([#5707](https://github.com/Automattic/pocket-casts-android/pull/5707))
     *   Fix a crash when showing a bottom sheet after the app is sent to the background
         ([#5709](https://github.com/Automattic/pocket-casts-android/pull/5709))
+    *   Fix truncated dialog button labels in the Automotive app
+        ([#5751](https://github.com/Automattic/pocket-casts-android/pull/5751))
 
 8.18
 -----
@@ -13,6 +20,8 @@
         ([#5628](https://github.com/Automattic/pocket-casts-android/pull/5628))
     *   Fix the app briefly freezing when showing the default podcast artwork
         ([#5634](https://github.com/Automattic/pocket-casts-android/pull/5634))
+    *   Fix audio stuttering when playing video episodes at high speed in the background
+        ([#5707](https://github.com/Automattic/pocket-casts-android/pull/5707))
 
 8.17
 -----

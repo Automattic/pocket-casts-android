@@ -16,7 +16,7 @@ class ImprovedSearchManagerImpl @Inject constructor(
 ) : ImprovedSearchManager {
     override suspend fun autoCompleteSearch(term: String): List<SearchAutoCompleteItem> {
         val response = autoCompleteSearchService.autoCompleteSearch(query = term, termsLimit = null, podcastsLimit = null)
-        return response.results.map {
+        return response.results.mapNotNull {
             when (it) {
                 is AutoCompleteResult.TermResult -> SearchAutoCompleteItem.Term(term = it.value)
 
@@ -26,6 +26,8 @@ class ImprovedSearchManagerImpl @Inject constructor(
                     author = it.value.author.orEmpty(),
                     isExplicit = it.value.explicit == true,
                 )
+
+                AutoCompleteResult.Unknown -> null
             }
         }
     }
@@ -49,9 +51,12 @@ class ImprovedSearchManagerImpl @Inject constructor(
                     uuid = it.uuid,
                     title = it.title,
                     podcastUuid = it.podcastUuid,
+                    podcastTitle = it.podcastTitle,
                     publishedDate = it.publishedDate,
                     duration = it.duration.seconds,
                 )
+
+                CombinedResult.Unknown -> null
             }
         }
     }
