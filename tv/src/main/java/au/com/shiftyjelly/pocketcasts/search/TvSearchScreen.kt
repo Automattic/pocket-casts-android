@@ -291,10 +291,15 @@ private fun TvSearchContent(
             Spacer(modifier = Modifier.height(24.dp))
         }
 
+        val hasFolders = (searchState as? TvSearchState.Results)?.folders?.isNotEmpty() == true
+        val filters = TvSearchFilter.entries.filter { it != TvSearchFilter.Folders || hasFolders }
+        val effectiveFilter = if (filter in filters) filter else TvSearchFilter.TopResults
+
         if (searchState !is TvSearchState.Idle) {
             TvSearchFilters(
-                selected = filter,
+                selected = effectiveFilter,
                 onFilterSelect = onFilterSelect,
+                filters = filters,
                 modifier = Modifier.padding(ContentPadding),
                 upFocusRequester = searchFieldFocusRequester,
             )
@@ -333,7 +338,7 @@ private fun TvSearchContent(
 
                 is TvSearchState.Results -> TvSearchResults(
                     results = searchState,
-                    filter = filter,
+                    filter = effectiveFilter,
                     searchTerm = query.trim(),
                     onOpenPodcast = onOpenPodcast,
                     onOpenFolder = onOpenFolder,
@@ -519,6 +524,21 @@ private fun TvSearchResults(
                 onPlayEpisode = onPlayEpisode,
                 onOpenEpisodeActions = onOpenEpisodeActions,
                 restoreFocusTrigger = restoreFocusTrigger,
+            )
+        }
+
+        TvSearchFilter.Folders -> TvPodcastGridScaffold(
+            itemKeys = results.folders.map { it.folder.uuid },
+            modifier = Modifier.fillMaxSize(),
+            horizontalContentPadding = ContentHorizontalPadding,
+            restoreFocusTrigger = restoreFocusTrigger,
+        ) { index, itemModifier ->
+            val folderItem = results.folders[index]
+            TvFolderCard(
+                folder = folderItem.folder,
+                coverUrls = folderItem.podcasts.take(FOLDER_COVER_COUNT).map { PodcastImage.getMediumArtworkUrl(it.uuid) },
+                onClick = { onOpenFolder(folderItem) },
+                modifier = itemModifier,
             )
         }
     }

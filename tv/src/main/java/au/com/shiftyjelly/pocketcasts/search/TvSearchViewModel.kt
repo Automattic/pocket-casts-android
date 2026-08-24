@@ -306,6 +306,7 @@ enum class TvSearchFilter(
     TopResults(LR.string.search_filters_top_results),
     Podcasts(LR.string.search_filters_podcasts),
     Episodes(LR.string.search_filters_episodes),
+    Folders(LR.string.search_filters_folders),
 }
 
 sealed interface TvSearchState {
