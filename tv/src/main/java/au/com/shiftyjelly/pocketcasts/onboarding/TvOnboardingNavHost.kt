@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,6 +32,11 @@ fun TvOnboardingNavHost(
     val navigateClearingBackStack: (String) -> Unit = { route ->
         navController.navigate(route) {
             popUpTo(navController.graph.id) { inclusive = true }
+        }
+    }
+    LaunchedEffect(Unit) {
+        if (viewModel.startDestination == TvOnboardingRoutes.HOME) {
+            viewModel.refreshOnLaunch()
         }
     }
     val toastHostState = remember { TvToastHostState() }
