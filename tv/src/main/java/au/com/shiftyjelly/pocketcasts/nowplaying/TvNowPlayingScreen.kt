@@ -523,7 +523,7 @@ private val chromeRevealConsumedKeys = setOf(
     Key.DirectionRight,
 )
 
-private fun BaseEpisode.artworkModel(): Any? = when (this) {
+internal fun BaseEpisode.artworkModel(): Any? = when (this) {
     is PodcastEpisode -> PodcastImage.getMediumArtworkUrl(podcastUuid)
     is UserEpisode -> artworkUrl
 }
