@@ -507,6 +507,22 @@ class TvSearchViewModelTest {
         assertTrue(viewModel.searchState.value is TvSearchState.Results)
     }
 
+    @Test
+    fun `a folder search failure does not fail the whole search`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        whenever { improvedSearchManager.combinedSearch(any()) }.thenReturn(listOf(podcastItem("podcast-1")))
+        whenever(userManager.getSignInState()).thenReturn(Flowable.just(plusSignInState()))
+        whenever { folderManager.getAll() }.thenThrow(RuntimeException("database unavailable"))
+
+        val viewModel = createViewModel()
+        viewModel.onQueryChange("sugar")
+        advanceUntilIdle()
+
+        val state = viewModel.searchState.value as TvSearchState.Results
+        assertEquals(listOf("podcast-1"), state.podcasts.map { it.uuid })
+        assertTrue(state.folders.isEmpty())
+    }
+
     private fun createViewModel() = TvSearchViewModel(
         discoverFeedLoader = TvDiscoverFeedLoader(
             listRepository = listRepository,

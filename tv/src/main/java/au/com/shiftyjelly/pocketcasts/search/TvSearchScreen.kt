@@ -65,9 +65,12 @@ import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverRow
 import au.com.shiftyjelly.pocketcasts.discover.TvOpenedCategory
 import au.com.shiftyjelly.pocketcasts.discover.TvOpenedCategorySaver
 import au.com.shiftyjelly.pocketcasts.discover.tvDiscoverRow
+import au.com.shiftyjelly.pocketcasts.models.entity.Folder
+import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.models.to.ImprovedSearchResultItem
+import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.podcasts.TvFolderDetailScreen
 import au.com.shiftyjelly.pocketcasts.podcasts.TvPodcastDetailsScreen
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
@@ -170,6 +173,7 @@ fun TvSearchScreen(
                 getFolderPodcasts = viewModel::folderPodcasts,
                 onOpenPodcast = { openedPodcastUuid = it },
                 onClose = { openedFolder = null },
+                onFolderImpression = {},
                 restoreFocusTrigger = folderRestoreTrigger,
             )
         }
@@ -612,6 +616,7 @@ private fun LazyListScope.tvSearchFoldersRow(
                 folder = folderItem.folder,
                 coverUrls = folderItem.podcasts.take(FOLDER_COVER_COUNT).map { PodcastImage.getMediumArtworkUrl(it.uuid) },
                 onClick = { onOpenFolder(folderItem) },
+                modifier = Modifier.width(TvPodcastTileDefaults.RowImageWidth),
             )
         }
     }
@@ -828,6 +833,7 @@ private fun TvSearchIdleWithHistoryPreview() {
                 onOpenCategory = {},
                 onPlayEpisode = {},
                 onOpenEpisodeActions = {},
+                onOpenFolder = {},
                 history = listOf("Freakonomics", "Business Daily", "Science Weekly"),
             )
         }
@@ -861,6 +867,21 @@ private fun TvSearchResultsPreview() {
                             hasVideo = it == 0,
                         )
                     },
+                    folders = listOf(
+                        FolderItem.Folder(
+                            folder = Folder(
+                                uuid = "folder-1",
+                                name = "Business & Finance",
+                                color = 3,
+                                addedDate = Date(0),
+                                sortPosition = 0,
+                                podcastsSortType = PodcastsSortType.NAME_A_TO_Z,
+                                deleted = false,
+                                syncModified = 0,
+                            ),
+                            podcasts = List(4) { Podcast(uuid = "folder-podcast-$it") },
+                        ),
+                    ),
                 ),
                 filter = TvSearchFilter.TopResults,
                 categories = emptyList(),
@@ -871,6 +892,7 @@ private fun TvSearchResultsPreview() {
                 onOpenCategory = {},
                 onPlayEpisode = {},
                 onOpenEpisodeActions = {},
+                onOpenFolder = {},
             )
         }
     }

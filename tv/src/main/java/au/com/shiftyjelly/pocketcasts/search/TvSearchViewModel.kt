@@ -14,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.models.to.ImprovedSearchResultItem
 import au.com.shiftyjelly.pocketcasts.models.to.SearchAutoCompleteItem
 import au.com.shiftyjelly.pocketcasts.models.to.SearchHistoryEntry
+import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
@@ -32,11 +33,14 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.rx2.await
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -85,6 +89,9 @@ class TvSearchViewModel @Inject constructor(
     val actionsEpisode: StateFlow<PodcastEpisode?> = _actionsEpisode.asStateFlow()
 
     private var searchJob: Job? = null
+
+    private val signInState = userManager.getSignInState().asFlow()
+        .stateIn(viewModelScope, SharingStarted.Eagerly, SignInState.SignedOut)
 
     init {
         viewModelScope.launch {
@@ -135,7 +142,16 @@ class TvSearchViewModel @Inject constructor(
             _searchState.value = TvSearchState.Searching
             _searchState.value = try {
                 val fullSearch = async { runCatching { improvedSearchManager.combinedSearch(term) } }
-                val foldersSearch = async { runCatching { searchFolders(term) }.getOrDefault(emptyList()) }
+                val foldersSearch = async {
+                    try {
+                        searchFolders(term)
+                    } catch (exception: CancellationException) {
+                        throw exception
+                    } catch (exception: Exception) {
+                        Timber.e(exception, "Failed to search TV folders")
+                        emptyList()
+                    }
+                }
                 val localPodcasts = podcastManager.findSubscribedFlow(term).first().map(Podcast::toSearchItem)
                 val localUuids = localPodcasts.mapTo(HashSet(), ImprovedSearchResultItem.PodcastItem::uuid)
                 val predictiveResults = try {
@@ -182,7 +198,7 @@ class TvSearchViewModel @Inject constructor(
     }
 
     private suspend fun searchFolders(term: String): List<FolderItem.Folder> {
-        if (!userManager.getSignInState().firstOrError().await().isSignedInAsPlusOrPatron) {
+        if (!signInState.value.isSignedInAsPlusOrPatron) {
             return emptyList()
         }
         return folderManager.getAll()
