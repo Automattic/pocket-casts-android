@@ -36,7 +36,8 @@ import au.com.shiftyjelly.pocketcasts.theme.tvTypography
 @Composable
 internal fun TvSearchFilters(
     selected: TvSearchFilter,
-    onFilterSelect: (TvSearchFilter) -> Unit,
+    onFilterFocus: (TvSearchFilter) -> Unit,
+    onFilterClick: (TvSearchFilter) -> Unit,
     modifier: Modifier = Modifier,
     filters: List<TvSearchFilter> = TvSearchFilter.entries,
     upFocusRequester: FocusRequester? = null,
@@ -50,7 +51,8 @@ internal fun TvSearchFilters(
         TvSearchFilterPills(
             filters = filters,
             selected = selected,
-            onFilterSelect = onFilterSelect,
+            onFilterFocus = onFilterFocus,
+            onFilterClick = onFilterClick,
             upFocusRequester = upFocusRequester,
         )
         Spacer(modifier = Modifier.width(20.dp))
@@ -62,7 +64,8 @@ internal fun TvSearchFilters(
 private fun TvSearchFilterPills(
     filters: List<TvSearchFilter>,
     selected: TvSearchFilter,
-    onFilterSelect: (TvSearchFilter) -> Unit,
+    onFilterFocus: (TvSearchFilter) -> Unit,
+    onFilterClick: (TvSearchFilter) -> Unit,
     upFocusRequester: FocusRequester? = null,
 ) {
     val selectedIndex = filters.indexOf(selected)
@@ -92,8 +95,8 @@ private fun TvSearchFilterPills(
             filters.forEachIndexed { index, filter ->
                 Tab(
                     selected = index == selectedIndex,
-                    onFocus = { onFilterSelect(filter) },
-                    onClick = { onFilterSelect(filter) },
+                    onFocus = { onFilterFocus(filter) },
+                    onClick = { onFilterClick(filter) },
                     modifier = Modifier
                         .height(44.dp)
                         .padding(horizontal = 21.dp)
@@ -138,7 +141,8 @@ private fun TvSearchFiltersPreview() {
     TvTheme {
         TvSearchFilters(
             selected = TvSearchFilter.Podcasts,
-            onFilterSelect = {},
+            onFilterFocus = {},
+            onFilterClick = {},
             modifier = Modifier
                 .background(MaterialTheme.tvColors.backgroundSunken)
                 .padding(48.dp),

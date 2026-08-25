@@ -501,23 +501,25 @@ class TvSearchViewModelTest {
     }
 
     @Test
-    fun `changing the filter tracks a search filter tapped event`() = runTest {
+    fun `clicking a filter tracks a search filter tapped event`() = runTest {
         whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
         val viewModel = createViewModel()
 
-        viewModel.onFilterSelected(TvSearchFilter.Episodes)
+        viewModel.onFilterClicked(TvSearchFilter.Episodes)
 
+        assertEquals(TvSearchFilter.Episodes, viewModel.filter.value)
         verify(eventHorizon).track(SearchFilterTappedEvent(source = SourceViewType.Search, filter = SearchResultFilterType.Episodes))
     }
 
     @Test
-    fun `re-selecting the current filter does not track a filter tapped event`() = runTest {
+    fun `focusing a filter changes it without tracking a filter tapped event`() = runTest {
         whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
         val viewModel = createViewModel()
 
-        viewModel.onFilterSelected(TvSearchFilter.TopResults)
+        viewModel.onFilterSelected(TvSearchFilter.Podcasts)
 
-        verify(eventHorizon, never()).track(SearchFilterTappedEvent(source = SourceViewType.Search, filter = SearchResultFilterType.AllResults))
+        assertEquals(TvSearchFilter.Podcasts, viewModel.filter.value)
+        verify(eventHorizon, never()).track(SearchFilterTappedEvent(source = SourceViewType.Search, filter = SearchResultFilterType.Podcasts))
     }
 
     @Test

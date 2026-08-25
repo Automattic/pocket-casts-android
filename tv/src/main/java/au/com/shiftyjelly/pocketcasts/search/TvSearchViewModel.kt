@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.discover.TvCategoryPodcasts
-import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverBanner
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverEpisode
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverFeedAnalytics
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverFeedLoader
@@ -217,9 +216,10 @@ class TvSearchViewModel @Inject constructor(
     }
 
     fun onFilterSelected(filter: TvSearchFilter) {
-        if (filter == _filter.value) {
-            return
-        }
+        _filter.value = filter
+    }
+
+    fun onFilterClicked(filter: TvSearchFilter) {
         eventHorizon.track(SearchFilterTappedEvent(source = SourceViewType.Search, filter = filter.analyticsValue))
         _filter.value = filter
     }
@@ -279,8 +279,6 @@ class TvSearchViewModel @Inject constructor(
     fun trackCategoryPodcastTapped(category: TvOpenedCategory, listId: String?, podcast: TvDiscoverPodcast) = discoverFeedAnalytics.trackCategoryPodcastTapped(category, listId, podcast)
 
     fun trackCategoryPillTapped(category: DiscoverCategory, index: Int) = discoverFeedAnalytics.trackCategoryPillTapped(category, index)
-
-    fun trackBannerTapped(banner: TvDiscoverBanner) = discoverFeedAnalytics.trackBannerTapped(banner)
 
     fun saveSearchTerm(term: String) {
         val trimmed = term.trim()
