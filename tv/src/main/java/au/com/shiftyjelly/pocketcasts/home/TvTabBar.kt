@@ -54,10 +54,11 @@ fun TvTabBar(
     onConsumeFocusRequest: () -> Unit = {},
 ) {
     val focusRequester = remember { FocusRequester() }
+    val requestSelectedTabFocus = remember { { runCatching { focusRequester.requestFocus() }.isSuccess } }
     val currentOnSelectedTabFocus by rememberUpdatedState(onSelectedTabFocus)
     LaunchedEffect(autoFocusSelectedTab) {
         if (autoFocusSelectedTab) {
-            runCatching { focusRequester.requestFocus() }
+            requestSelectedTabFocus()
             currentOnSelectedTabFocus()
         }
     }
@@ -67,7 +68,7 @@ fun TvTabBar(
             // Retry across frames so the request is not consumed before the revealed tab bar has attached.
             repeat(FOCUS_REQUEST_MAX_FRAMES) {
                 withFrameNanos { }
-                if (runCatching { focusRequester.requestFocus() }.isSuccess) {
+                if (requestSelectedTabFocus()) {
                     currentOnConsumeFocusRequest()
                     return@LaunchedEffect
                 }
@@ -84,7 +85,7 @@ fun TvTabBar(
         TabRow(
             selectedTabIndex = selectedTabIndex,
             modifier = Modifier.focusProperties {
-                onEnter = { runCatching { focusRequester.requestFocus() } }
+                onEnter = { requestSelectedTabFocus() }
             },
             containerColor = Color.Transparent,
             indicator = @Composable { tabPositions, doesTabRowHaveFocus ->
