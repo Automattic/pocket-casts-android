@@ -546,36 +546,18 @@ platform :android do
 
       # Check local repo status
       ensure_git_status_clean unless is_ci
+
+      # THROW AWAY: prove the prechecks block still runs after `android_build_preflight` is gone.
+      UI.success('VALIDATION: prechecks block completed without android_build_preflight')
     end
 
-    release_assets = []
-
-    APPS.each do |app|
-      build_bundle(app: app, version: version, build_code: build_code)
-
-      aab_artifact_path = aab_artifact_path(app, version)
-      UI.error("Unable to find a build artifact at #{aab_artifact_path}") unless File.exist? aab_artifact_path
-
-      track = play_store_track(app: app, is_beta: is_beta)
-      upload_to_play_store(
-        **UPLOAD_TO_PLAY_STORE_COMMON_OPTIONS,
-        aab: aab_artifact_path,
-        track: track,
-        release_status: 'draft'
-      )
-      release_assets << aab_artifact_path
-
-      signed_apk_artifact_path = signed_apk_artifact_path(app, version)
-      download_universal_apk_from_google_play(
-        package_name: APP_PACKAGE_NAME,
-        version_code: version_code_for_app(app: app, version_code: build_code),
-        destination: signed_apk_artifact_path,
-        json_key: UPLOAD_TO_PLAY_STORE_JSON_KEY
-      )
-      release_assets << signed_apk_artifact_path
-    end
-
-    create_gh_release(version: version, prerelease: is_beta, release_assets: release_assets.compact) if create_gh_release
+    # THROW AWAY: build one bundle and stop. The uploads that normally follow are deleted on this branch.
+    UI.message("VALIDATION: is_beta=#{is_beta}, create_gh_release=#{create_gh_release}; both are ignored here")
+    build_bundle(app: APPS_APP, version: version, build_code: build_code)
+    aab_artifact_path = aab_artifact_path(APPS_APP, version)
+    UI.user_error!("VALIDATION: expected AAB at #{aab_artifact_path}") unless File.exist?(aab_artifact_path)
+    UI.user_error!("VALIDATION: AAB at #{aab_artifact_path} is empty") if File.empty?(aab_artifact_path)
+    UI.success("VALIDATION: bundle built (#{File.size(aab_artifact_path)} bytes at #{aab_artifact_path}); stopping before Play Store upload")
   end
 
   # Builds and bundles the given app

@@ -1,108 +1,15 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
 ---
 
+# Validation-only for Automattic/pocket-casts-android#5767. Close; do not merge.
+
 agents:
   queue: "android"
 
 steps:
-  - label: Gradle Wrapper Validation
-    command: validate_gradle_wrapper
-    agents:
-      queue: linter
-
-  # Wait for Gradle Wrapper to be validated before running any other jobs
-  - wait
-
-  - group: "Linters"
-    steps:
-      - label: ":danger: Danger - PR Check"
-        command: danger
-        key: danger
-        if: "build.pull_request.id != null"
-        retry:
-          manual:
-            permit_on_passed: true
-        agents:
-          queue: "linter"
-
-      - label: 'Lint'
-        command: ".buildkite/commands/lint.sh"
-        plugins: [ $CI_TOOLKIT ]
-        artifact_paths:
-          - "**/build/reports/lint-results*.*"
-
-  - label: 'Unit tests'
-    command: ".buildkite/commands/run-unit-tests.sh"
-    plugins: [ $CI_TOOLKIT ]
-
-  - group: "Diff Reports"
-    steps:
-      - label: 'Dependency diff'
-        if: build.pull_request.id != null
-        command: comment_with_dependency_diff 'app' 'releaseRuntimeClasspath'
-        plugins: [ $CI_TOOLKIT ]
-        artifact_paths:
-          - "**/build/reports/diff/*"
-
-      - label: "Merged Manifest Diff"
-        command: ".buildkite/commands/diff-merged-manifest.sh release"
-        if: build.pull_request.id != null
-        plugins: [ $CI_TOOLKIT ]
-        artifact_paths:
-          - "**/build/reports/diff_manifest/**/**/*"
-
-  - label: 'Spotless formatting check'
-    command: |
-      if .buildkite/commands/should-skip-job.sh --job-type validation; then
-        exit 0
-      fi
-
-      echo "--- 🔎 Checking formatting with Spotless"
-      ./gradlew spotlessCheck
-    plugins: [ $CI_TOOLKIT ]
-
-  - label: "Instrumented tests"
-    command: ".buildkite/commands/run-instrumented-tests.sh"
+  - label: ":android: Validate build lane with prechecks ON (no Play Store upload)"
+    key: validate_build_lane
+    command: ".buildkite/commands/validate-build-lane.sh"
     plugins: [ $CI_TOOLKIT ]
     artifact_paths:
-      - "**/build/instrumented-tests/**/*"
-
-  - group: "Assemble release APKs"
-    steps:
-      - label: "Assemble app release APK"
-        command: ".buildkite/commands/assemble-release-apk.sh app"
-        plugins: [ $CI_TOOLKIT ]
-        artifact_paths:
-          - "**/build/outputs/apk/**/*"
-
-      - label: "Assemble automotive release APK"
-        command: ".buildkite/commands/assemble-release-apk.sh automotive"
-        plugins: [ $CI_TOOLKIT ]
-        artifact_paths:
-          - "**/build/outputs/apk/**/*"
-
-      - label: "Assemble wear release APK"
-        command: ".buildkite/commands/assemble-release-apk.sh wear"
-        plugins: [ $CI_TOOLKIT ]
-        artifact_paths:
-          - "**/build/outputs/apk/**/*"
-
-    ##########
-    # Optional Prototype Builds
-    #
-    # Builds all modules, uploads app to FAD and Wear and Automotive to S3
-    ##########
-  - group: Prototype Builds
-    if: "build.pull_request.id != null || build.branch == 'main'"
-    steps:
-      - input: "🚀 Generate Prototype Builds?"
-        prompt: Generate Prototype Builds?
-        key: prototype_builds_triggered
-      - label: ":rocket: Prototype Builds"
-        depends_on: prototype_builds_triggered
-        command: .buildkite/commands/prototype-build.sh
-        plugins: [ $CI_TOOLKIT ]
-        artifact_paths:
-          - "**/build/outputs/apk/**/*"
-        # No notify node to avoid GitHub checks status being stuck on yellow.
-        # This step being optional, chances are it will never be triggered.
+      - "artifacts/*.aab"
