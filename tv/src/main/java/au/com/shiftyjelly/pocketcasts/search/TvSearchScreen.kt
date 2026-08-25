@@ -233,7 +233,9 @@ private fun TvSearchContent(
                     }
                     isEditing = editing
                 },
-                modifier = Modifier.focusRequester(searchFieldFocusRequester),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .focusRequester(searchFieldFocusRequester),
             )
             Spacer(modifier = Modifier.height(24.dp))
         }
@@ -252,6 +254,7 @@ private fun TvSearchContent(
                 selected = filter,
                 onFilterSelect = onFilterSelect,
                 modifier = Modifier.padding(ContentPadding),
+                upFocusRequester = searchFieldFocusRequester,
             )
             Spacer(modifier = Modifier.height(24.dp))
         }
