@@ -462,7 +462,7 @@ class TvSearchViewModelTest {
         whenever { improvedSearchManager.combinedSearch(any()) }.thenReturn(emptyList())
         whenever(syncManager.isLoggedIn()).thenReturn(true)
         whenever { folderManager.getAll() }.thenReturn(listOf(folderEntity("Sugar Shows"), folderEntity("Comedy")))
-        whenever { podcastManager.findPodcastsInFolder(any()) }.thenReturn(emptyList())
+        whenever { folderManager.findFolderPodcastsSorted(any()) }.thenReturn(emptyList())
 
         val viewModel = createViewModel()
         viewModel.onQueryChange("sugar")
@@ -470,6 +470,22 @@ class TvSearchViewModelTest {
 
         val state = viewModel.searchState.value as TvSearchState.Results
         assertEquals(listOf("Sugar Shows"), state.folders.map { it.folder.name })
+    }
+
+    @Test
+    fun `matching folders are sorted by name`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        whenever { improvedSearchManager.combinedSearch(any()) }.thenReturn(emptyList())
+        whenever(syncManager.isLoggedIn()).thenReturn(true)
+        whenever { folderManager.getAll() }.thenReturn(listOf(folderEntity("Sugar Rush"), folderEntity("Sugar Beats")))
+        whenever { folderManager.findFolderPodcastsSorted(any()) }.thenReturn(emptyList())
+
+        val viewModel = createViewModel()
+        viewModel.onQueryChange("sugar")
+        advanceUntilIdle()
+
+        val state = viewModel.searchState.value as TvSearchState.Results
+        assertEquals(listOf("Sugar Beats", "Sugar Rush"), state.folders.map { it.folder.name })
     }
 
     @Test
@@ -492,7 +508,7 @@ class TvSearchViewModelTest {
         whenever { improvedSearchManager.combinedSearch(any()) }.thenReturn(emptyList())
         whenever(syncManager.isLoggedIn()).thenReturn(true)
         whenever { folderManager.getAll() }.thenReturn(listOf(folderEntity("Sugar")))
-        whenever { podcastManager.findPodcastsInFolder(any()) }.thenReturn(emptyList())
+        whenever { folderManager.findFolderPodcastsSorted(any()) }.thenReturn(emptyList())
 
         val viewModel = createViewModel()
         viewModel.onQueryChange("sugar")

@@ -14,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.models.to.ImprovedSearchResultItem
 import au.com.shiftyjelly.pocketcasts.models.to.SearchAutoCompleteItem
 import au.com.shiftyjelly.pocketcasts.models.to.SearchHistoryEntry
+import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
@@ -170,6 +171,9 @@ class TvSearchViewModel @Inject constructor(
                 val episodes = remoteResults.filterIsInstance<ImprovedSearchResultItem.EpisodeItem>()
                     .distinctBy(ImprovedSearchResultItem.EpisodeItem::uuid)
                 val folders = foldersSearch.await()
+                if (folders.isEmpty() && _filter.value == TvSearchFilter.Folders) {
+                    _filter.value = TvSearchFilter.TopResults
+                }
                 if (podcasts.isEmpty() && episodes.isEmpty() && folders.isEmpty()) {
                     TvSearchState.NoResults
                 } else {
@@ -194,7 +198,8 @@ class TvSearchViewModel @Inject constructor(
         }
         return folderManager.getAll()
             .filter { it.name.contains(term, ignoreCase = true) }
-            .map { folder -> FolderItem.Folder(folder = folder, podcasts = podcastManager.findPodcastsInFolder(folder.uuid)) }
+            .sortedBy { PodcastsSortType.cleanStringForSort(it.name) }
+            .map { folder -> FolderItem.Folder(folder = folder, podcasts = folderManager.findFolderPodcastsSorted(folder.uuid)) }
     }
 
     suspend fun folderPodcasts(folderUuid: String): List<Podcast> {

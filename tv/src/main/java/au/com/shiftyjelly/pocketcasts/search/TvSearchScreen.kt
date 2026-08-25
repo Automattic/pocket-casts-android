@@ -291,8 +291,8 @@ private fun TvSearchContent(
             Spacer(modifier = Modifier.height(24.dp))
         }
 
-        val hasFolders = (searchState as? TvSearchState.Results)?.folders?.isNotEmpty() == true
-        val filters = TvSearchFilter.entries.filter { it != TvSearchFilter.Folders || hasFolders }
+        val hasFolders = (searchState as? TvSearchState.Results)?.let { it.folders.isNotEmpty() || it.isPartial } == true
+        val filters = remember(hasFolders) { TvSearchFilter.entries.filter { it != TvSearchFilter.Folders || hasFolders } }
         val effectiveFilter = if (filter in filters) filter else TvSearchFilter.TopResults
 
         if (searchState !is TvSearchState.Idle) {
