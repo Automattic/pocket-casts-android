@@ -528,7 +528,7 @@ platform :android do
   # - Creates draft Github release
   #
   # @param skip_confirm [Boolean] If true, avoids any interactive prompt
-  # @param skip_prechecks [Boolean] If true, skips android_build_preflight
+  # @param skip_prechecks [Boolean] If true, skips the branch, confirmation and clean-tree checks
   # @param create_gh_release [Boolean] If true, creates a draft GitHub release
   #
   lane :build_and_upload_to_play_store do |skip_prechecks: false, skip_confirm: false, create_gh_release: false|
@@ -546,8 +546,6 @@ platform :android do
 
       # Check local repo status
       ensure_git_status_clean unless is_ci
-
-      android_build_preflight
     end
 
     release_assets = []
