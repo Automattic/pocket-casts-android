@@ -72,7 +72,7 @@ class TvSearchViewModel @Inject constructor(
     private val settings: Settings,
 ) : ViewModel() {
 
-    private val discoverFeedAnalytics = TvDiscoverFeedAnalytics(eventHorizon, settings, SOURCE_SEARCH)
+    private val discoverFeedAnalytics = TvDiscoverFeedAnalytics(eventHorizon, settings, SOURCE_SEARCH, localRowIds = emptySet())
 
     private val _categories = MutableStateFlow<List<DiscoverCategory>>(emptyList())
     val categories: StateFlow<List<DiscoverCategory>> = _categories.asStateFlow()
@@ -266,6 +266,12 @@ class TvSearchViewModel @Inject constructor(
         )
     }
 
+    fun trackEpisodeResultTapped(episode: ImprovedSearchResultItem.EpisodeItem) {
+        eventHorizon.track(
+            SearchResultTappedEvent(source = SourceViewType.Search, uuid = episode.uuid, resultType = SearchResultType.Episode),
+        )
+    }
+
     fun trackSearchShown() {
         eventHorizon.track(SearchShownEvent(source = SourceViewType.Search))
     }
@@ -308,9 +314,6 @@ class TvSearchViewModel @Inject constructor(
     }
 
     fun playEpisode(episode: ImprovedSearchResultItem.EpisodeItem) {
-        eventHorizon.track(
-            SearchResultTappedEvent(source = SourceViewType.Search, uuid = episode.uuid, resultType = SearchResultType.Episode),
-        )
         viewModelScope.launch {
             try {
                 val found = hydrate(episode)

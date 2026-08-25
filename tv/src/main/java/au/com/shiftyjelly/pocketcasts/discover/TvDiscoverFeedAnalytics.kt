@@ -16,7 +16,7 @@ class TvDiscoverFeedAnalytics(
     private val eventHorizon: EventHorizon,
     private val settings: Settings,
     private val source: String,
-    private val localRowIds: Set<String> = emptySet(),
+    private val localRowIds: Set<String>,
 ) {
     fun trackListImpression(row: TvDiscoverRow) {
         val listId = row.discoverListId() ?: return

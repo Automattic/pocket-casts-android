@@ -2,7 +2,9 @@ package au.com.shiftyjelly.pocketcasts.search
 
 import android.content.Context
 import android.content.res.Resources
+import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverEpisode
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverFeedLoader
+import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverRow
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -31,6 +33,8 @@ import au.com.shiftyjelly.pocketcasts.servers.model.ListFeed
 import au.com.shiftyjelly.pocketcasts.servers.model.ListType
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import com.automattic.eventhorizon.DiscoverCategoriesPillTappedEvent
+import com.automattic.eventhorizon.DiscoverListImpressionEvent
+import com.automattic.eventhorizon.DiscoverListPodcastTappedEvent
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.SearchEmptyResultsEvent
 import com.automattic.eventhorizon.SearchFailedEvent
@@ -573,11 +577,11 @@ class TvSearchViewModelTest {
     }
 
     @Test
-    fun `playing an episode result tracks an episode result tapped event`() = runTest {
+    fun `tapping an episode result tracks an episode result tapped event`() = runTest {
         whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
         val viewModel = createViewModel()
 
-        viewModel.playEpisode(episodeItem("episode-1"))
+        viewModel.trackEpisodeResultTapped(episodeItem("episode-1"))
 
         verify(eventHorizon).track(
             SearchResultTappedEvent(source = SourceViewType.Search, uuid = "episode-1", resultType = SearchResultType.Episode),
@@ -602,6 +606,48 @@ class TvSearchViewModelTest {
                 source = "search",
             ),
         )
+    }
+
+    @Test
+    fun `a discover row impression in the idle body is stamped with the search source`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        val row = TvDiscoverRow.Podcasts(id = "list-trending", title = "Trending", podcasts = listOf(discoverPodcast("podcast-1")))
+
+        createViewModel().trackDiscoverListShown(row)
+
+        verify(eventHorizon).track(DiscoverListImpressionEvent(listId = "list-trending", source = "search"))
+    }
+
+    @Test
+    fun `opening a discover podcast is stamped with the search source`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        val podcast = discoverPodcast("podcast-1")
+        val row = TvDiscoverRow.Podcasts(id = "list-trending", title = "Trending", podcasts = listOf(podcast))
+
+        createViewModel().trackDiscoverPodcastTapped(row, podcast)
+
+        verify(eventHorizon).track(DiscoverListPodcastTappedEvent(listId = "list-trending", podcastUuid = "podcast-1", source = "search"))
+    }
+
+    @Test
+    fun `opening a discover episode's podcast is stamped with the search source`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        val episode = TvDiscoverEpisode("episode-1", "Episode", "podcast-1", "Podcast")
+        val row = TvDiscoverRow.Episodes(id = "list-videos", title = "Made for TV", episodes = listOf(episode))
+
+        createViewModel().trackDiscoverEpisodePodcastTapped(row, episode)
+
+        verify(eventHorizon).track(DiscoverListPodcastTappedEvent(listId = "list-videos", podcastUuid = "podcast-1", source = "search"))
+    }
+
+    @Test
+    fun `search does not suppress the home local row ids`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        val row = TvDiscoverRow.Podcasts(id = "keep_listening", title = "Keep Listening", podcasts = listOf(discoverPodcast("podcast-1")))
+
+        createViewModel().trackDiscoverListShown(row)
+
+        verify(eventHorizon).track(DiscoverListImpressionEvent(listId = "keep_listening", source = "search"))
     }
 
     private fun podcastItem(uuid: String) = ImprovedSearchResultItem.PodcastItem(
@@ -747,6 +793,8 @@ class TvSearchViewModelTest {
         assertEquals(TvSearchFilter.TopResults, viewModel.filter.value)
         assertFalse(viewModel.hasFolderResults.value)
     }
+
+    private fun discoverPodcast(uuid: String) = TvDiscoverPodcast(uuid = uuid, title = "Title", author = "Author", description = "Description")
 
     private fun createViewModel() = TvSearchViewModel(
         discoverFeedLoader = TvDiscoverFeedLoader(
