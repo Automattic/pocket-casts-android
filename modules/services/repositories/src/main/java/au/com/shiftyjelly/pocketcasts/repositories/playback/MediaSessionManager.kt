@@ -134,7 +134,9 @@ class MediaSessionManager(
     val mediaSession: MediaSessionCompat? by lazy {
         if (!useMedia3Session && !isAutomotive) {
             MediaSessionCompat(context, "PocketCastsMediaSession").also { session ->
-                session.setSessionActivity(context.getLaunchActivityPendingIntent())
+                if (!Util.isTv(context)) {
+                    session.setSessionActivity(context.getLaunchActivityPendingIntent())
+                }
                 session.setRatingType(RatingCompat.RATING_HEART)
                 session.setExtras(
                     Bundle().apply {
@@ -382,7 +384,7 @@ class MediaSessionManager(
                 },
             )
             .apply {
-                if (!Util.isAutomotive(context)) {
+                if (!Util.isAutomotive(context) && !Util.isTv(context)) {
                     setSessionActivity(context.getLaunchActivityPendingIntent())
                 }
             }
