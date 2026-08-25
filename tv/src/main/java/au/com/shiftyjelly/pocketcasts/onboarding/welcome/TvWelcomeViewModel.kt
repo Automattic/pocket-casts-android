@@ -19,7 +19,7 @@ class TvWelcomeViewModel @Inject constructor(
         eventHorizon.track(SetupAccountShownEvent(flow = OnboardingFlowType.Unknown))
     }
 
-    fun trackSignInClicked() {
+    fun trackSignInTapped() {
         eventHorizon.track(
             SetupAccountButtonTappedEvent(
                 flow = OnboardingFlowType.Unknown,
@@ -28,7 +28,7 @@ class TvWelcomeViewModel @Inject constructor(
         )
     }
 
-    fun trackCreateAccountClicked() {
+    fun trackCreateAccountTapped() {
         eventHorizon.track(
             SetupAccountButtonTappedEvent(
                 flow = OnboardingFlowType.Unknown,
@@ -37,7 +37,7 @@ class TvWelcomeViewModel @Inject constructor(
         )
     }
 
-    fun trackBrowseWithoutAccountClicked() {
+    fun trackBrowseNoAccountTapped() {
         eventHorizon.track(BrowseNoAccountTappedEvent)
     }
 }

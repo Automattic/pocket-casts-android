@@ -37,7 +37,7 @@ class TvSignInViewModelTest {
         whenever(syncManager.deviceAuthorize()).thenReturn(createDeviceAuthorizeResponse())
         whenever(syncManager.loginWithDeviceAuth(any(), any())).thenReturn(createLoginSuccess())
 
-        val viewModel = TvSignInViewModel(syncManager, eventHorizon)
+        val viewModel = createViewModel()
         viewModel.trackShown()
 
         verify(eventHorizon).track(SignInShownEvent)
@@ -48,7 +48,7 @@ class TvSignInViewModelTest {
         whenever(syncManager.deviceAuthorize()).thenReturn(createDeviceAuthorizeResponse())
         whenever(syncManager.loginWithDeviceAuth(any(), any())).thenReturn(createLoginSuccess())
 
-        val viewModel = TvSignInViewModel(syncManager, eventHorizon)
+        val viewModel = createViewModel()
 
         viewModel.uiState.test {
             val state = awaitItem()
@@ -66,7 +66,7 @@ class TvSignInViewModelTest {
     fun `device authorize failure transitions to Error state`() = runTest {
         whenever(syncManager.deviceAuthorize()).thenThrow(RuntimeException("Network error"))
 
-        val viewModel = TvSignInViewModel(syncManager, eventHorizon)
+        val viewModel = createViewModel()
 
         viewModel.uiState.test {
             assertEquals(TvSignInUiState.Error, awaitItem())
@@ -78,7 +78,7 @@ class TvSignInViewModelTest {
         whenever(syncManager.deviceAuthorize()).thenReturn(createDeviceAuthorizeResponse())
         whenever(syncManager.loginWithDeviceAuth(eq("device-code-123"), any())).thenReturn(createLoginSuccess())
 
-        val viewModel = TvSignInViewModel(syncManager, eventHorizon)
+        val viewModel = createViewModel()
 
         viewModel.uiState.test {
             // May see Ready briefly before Complete, or jump straight to Complete
@@ -99,7 +99,7 @@ class TvSignInViewModelTest {
             .thenReturn(createAuthorizationPending())
             .thenReturn(createLoginSuccess())
 
-        val viewModel = TvSignInViewModel(syncManager, eventHorizon)
+        val viewModel = createViewModel()
 
         viewModel.uiState.test {
             // Skip Ready, wait for Complete
@@ -118,7 +118,7 @@ class TvSignInViewModelTest {
         whenever(syncManager.loginWithDeviceAuth(eq("device-code-123"), any()))
             .thenReturn(LoginResult.Failed(message = "Token expired", messageId = "expired_token"))
 
-        val viewModel = TvSignInViewModel(syncManager, eventHorizon)
+        val viewModel = createViewModel()
 
         viewModel.uiState.test {
             val states = mutableListOf(awaitItem())
@@ -137,7 +137,7 @@ class TvSignInViewModelTest {
             .thenReturn(createDeviceAuthorizeResponse())
         whenever(syncManager.loginWithDeviceAuth(any(), any())).thenReturn(createLoginSuccess())
 
-        val viewModel = TvSignInViewModel(syncManager, eventHorizon)
+        val viewModel = createViewModel()
 
         viewModel.uiState.test {
             assertEquals(TvSignInUiState.Error, awaitItem())
@@ -153,6 +153,8 @@ class TvSignInViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
+
+    private fun createViewModel() = TvSignInViewModel(syncManager, eventHorizon)
 
     private fun createDeviceAuthorizeResponse() = DeviceAuthorizeResponse(
         deviceCode = "device-code-123",

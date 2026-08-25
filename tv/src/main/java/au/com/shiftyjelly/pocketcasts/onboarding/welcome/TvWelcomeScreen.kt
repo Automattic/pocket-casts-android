@@ -50,15 +50,15 @@ fun TvWelcomeScreen(
 
     TvWelcomeContent(
         onSignIn = {
-            viewModel.trackSignInClicked()
+            viewModel.trackSignInTapped()
             onSignIn()
         },
         onCreateAccount = {
-            viewModel.trackCreateAccountClicked()
+            viewModel.trackCreateAccountTapped()
             onCreateAccount()
         },
         onContinueWithoutAccount = {
-            viewModel.trackBrowseWithoutAccountClicked()
+            viewModel.trackBrowseNoAccountTapped()
             onContinueWithoutAccount()
         },
         modifier = modifier,

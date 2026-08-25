@@ -24,8 +24,8 @@ class TvWelcomeViewModelTest {
     }
 
     @Test
-    fun `trackSignInClicked fires setup account button tapped with sign in`() {
-        viewModel.trackSignInClicked()
+    fun `trackSignInTapped fires setup account button tapped with sign in`() {
+        viewModel.trackSignInTapped()
 
         verify(eventHorizon).track(
             SetupAccountButtonTappedEvent(
@@ -36,8 +36,8 @@ class TvWelcomeViewModelTest {
     }
 
     @Test
-    fun `trackCreateAccountClicked fires setup account button tapped with create account`() {
-        viewModel.trackCreateAccountClicked()
+    fun `trackCreateAccountTapped fires setup account button tapped with create account`() {
+        viewModel.trackCreateAccountTapped()
 
         verify(eventHorizon).track(
             SetupAccountButtonTappedEvent(
@@ -48,8 +48,8 @@ class TvWelcomeViewModelTest {
     }
 
     @Test
-    fun `trackBrowseWithoutAccountClicked fires browse no account tapped event`() {
-        viewModel.trackBrowseWithoutAccountClicked()
+    fun `trackBrowseNoAccountTapped fires browse no account tapped event`() {
+        viewModel.trackBrowseNoAccountTapped()
 
         verify(eventHorizon).track(BrowseNoAccountTappedEvent)
     }
