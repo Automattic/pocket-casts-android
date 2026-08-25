@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.TvLaunchRequests
 import au.com.shiftyjelly.pocketcasts.auth.TvSignOutManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
@@ -20,8 +21,11 @@ import kotlinx.coroutines.rx2.asFlow
 class TvScaffoldViewModel @Inject constructor(
     private val syncManager: SyncManager,
     private val signOutManager: TvSignOutManager,
+    launchRequests: TvLaunchRequests,
     upNextQueue: UpNextQueue,
 ) : ViewModel() {
+    val openNowPlayingRequests = launchRequests.openNowPlaying
+
     private val selectedTab = MutableStateFlow<TvTab>(TvTab.Home)
 
     private val hasCurrentEpisode = upNextQueue.changesObservable.asFlow()
