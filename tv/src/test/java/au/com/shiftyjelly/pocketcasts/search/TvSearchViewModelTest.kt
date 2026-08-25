@@ -30,6 +30,7 @@ import au.com.shiftyjelly.pocketcasts.servers.model.ExpandedStyle
 import au.com.shiftyjelly.pocketcasts.servers.model.ListFeed
 import au.com.shiftyjelly.pocketcasts.servers.model.ListType
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import com.automattic.eventhorizon.EventHorizon
 import java.util.Date
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -78,6 +79,7 @@ class TvSearchViewModelTest {
     private val playbackManager = mock<PlaybackManager>()
     private val searchHistoryManager = mock<SearchHistoryManager>()
     private val folderManager = mock<FolderManager>()
+    private val eventHorizon = mock<EventHorizon>()
 
     init {
         whenever { improvedSearchManager.autoCompleteSearch(any()) }.thenReturn(emptyList())
@@ -596,6 +598,8 @@ class TvSearchViewModelTest {
         playbackManager = playbackManager,
         searchHistoryManager = searchHistoryManager,
         folderManager = folderManager,
+        eventHorizon = eventHorizon,
+        settings = settings,
     )
 
     private fun folderEntity(name: String) = Folder(
