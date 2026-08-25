@@ -94,7 +94,7 @@ private fun TvSearchFilterPills(
                     modifier = Modifier
                         .height(44.dp)
                         .padding(horizontal = 21.dp)
-                        .then(upFocusRequester?.let { Modifier.focusProperties { up = it } } ?: Modifier)
+                        .focusProperties { upFocusRequester?.let { up = it } }
                         .then(if (index == selectedIndex) Modifier.focusRequester(focusRequester) else Modifier),
                     colors = TabDefaults.pillIndicatorTabColors(
                         contentColor = MaterialTheme.tvColors.textPrimary,
