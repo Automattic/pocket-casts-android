@@ -25,17 +25,18 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.semantics.progressBarRangeInfo
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.MaterialTheme
@@ -45,6 +46,9 @@ import au.com.shiftyjelly.pocketcasts.theme.TvTheme
 import au.com.shiftyjelly.pocketcasts.theme.tvColors
 import au.com.shiftyjelly.pocketcasts.theme.tvTypography
 import kotlin.math.roundToInt
+
+private val LabelGap = 8.dp
+private val LabelFadeRange = 16.dp
 
 @Composable
 fun TvSeekBar(
@@ -132,23 +136,31 @@ fun TvSeekBar(
                 .padding(top = 8.dp),
         ) {
             val maxWidthPx = constraints.maxWidth.toFloat()
-            val thumbSizePx = with(LocalDensity.current) { thumbSize.toPx() }
             var positionLabelWidth by remember { mutableIntStateOf(0) }
+            var durationLabelWidth by remember { mutableIntStateOf(0) }
+
+            val positionLabelX: Density.() -> Float = {
+                val thumbCenter = (maxWidthPx - thumbSize.toPx()) * progress + thumbSize.toPx() / 2f
+                (thumbCenter - positionLabelWidth / 2f)
+                    .coerceIn(0f, (maxWidthPx - positionLabelWidth).coerceAtLeast(0f))
+            }
+
             SeekBarLabel(
                 text = TimeHelper.formattedSeconds(positionMs / 1000.0),
                 modifier = Modifier
                     .align(Alignment.CenterStart)
                     .onSizeChanged { positionLabelWidth = it.width }
-                    .offset {
-                        val thumbCenter = (maxWidthPx - thumbSizePx) * progress + thumbSizePx / 2f
-                        val x = (thumbCenter - positionLabelWidth / 2f)
-                            .coerceIn(0f, (maxWidthPx - positionLabelWidth).coerceAtLeast(0f))
-                        IntOffset(x.roundToInt(), 0)
-                    },
+                    .offset { IntOffset(positionLabelX().roundToInt(), 0) },
             )
             SeekBarLabel(
                 text = if (hasDuration) TimeHelper.formattedSeconds(durationMs / 1000.0) else "-",
-                modifier = Modifier.align(Alignment.CenterEnd),
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .onSizeChanged { durationLabelWidth = it.width }
+                    .graphicsLayer {
+                        val availableGap = (maxWidthPx - durationLabelWidth) - (positionLabelX() + positionLabelWidth)
+                        alpha = ((availableGap - LabelGap.toPx()) / LabelFadeRange.toPx()).coerceIn(0f, 1f)
+                    },
             )
         }
     }
