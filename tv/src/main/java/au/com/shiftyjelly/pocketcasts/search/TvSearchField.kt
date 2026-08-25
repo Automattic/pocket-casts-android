@@ -16,6 +16,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -57,6 +58,7 @@ internal fun TvSearchField(
     query: String,
     onQueryChange: (String) -> Unit,
     modifier: Modifier = Modifier,
+    onEditingChange: (Boolean) -> Unit = {},
 ) {
     var editing by remember { mutableStateOf(false) }
     var restoreRestFocus by remember { mutableStateOf(false) }
@@ -64,8 +66,10 @@ internal fun TvSearchField(
     val restFocusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
+    val currentOnEditingChange by rememberUpdatedState(onEditingChange)
 
     LaunchedEffect(editing) {
+        currentOnEditingChange(editing)
         if (editing) {
             runCatching { fieldFocusRequester.requestFocus() }
             keyboardController?.show()
@@ -175,7 +179,7 @@ private fun TvSearchFieldContent(
         Box(contentAlignment = Alignment.CenterStart) {
             if (query.isEmpty()) {
                 Text(
-                    text = stringResource(LR.string.search),
+                    text = stringResource(LR.string.tv_search_prompt),
                     style = MaterialTheme.tvTypography.title3,
                     color = MaterialTheme.tvColors.textSecondary,
                 )

@@ -34,6 +34,8 @@ sealed interface CombinedResult {
         val podcastTitle: String,
         @Json(name = "podcast_slug")
         val podcastSlug: String? = null,
+        @Json(name = "has_video")
+        val hasVideo: Boolean? = null,
     ) : CombinedResult
 
     data object Unknown : CombinedResult
