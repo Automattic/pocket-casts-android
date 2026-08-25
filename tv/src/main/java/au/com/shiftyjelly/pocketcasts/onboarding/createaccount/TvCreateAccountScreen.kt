@@ -24,10 +24,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.tv.material3.Button
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.BuildConfig
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.qr.rememberQrPainter
 import au.com.shiftyjelly.pocketcasts.theme.TvButtonDefaults
 import au.com.shiftyjelly.pocketcasts.theme.TvTheme
@@ -38,6 +40,20 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun TvCreateAccountScreen(
+    onSignIn: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: TvCreateAccountViewModel = hiltViewModel(),
+) {
+    CallOnce { viewModel.trackShown() }
+
+    TvCreateAccountContent(
+        onSignIn = onSignIn,
+        modifier = modifier,
+    )
+}
+
+@Composable
+private fun TvCreateAccountContent(
     onSignIn: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -109,6 +125,6 @@ fun TvCreateAccountScreen(
 @Composable
 private fun TvCreateAccountScreenPreview() {
     TvTheme {
-        TvCreateAccountScreen(onSignIn = {})
+        TvCreateAccountContent(onSignIn = {})
     }
 }
