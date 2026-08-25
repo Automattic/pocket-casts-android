@@ -172,16 +172,16 @@ class TvNowPlayingViewModel @Inject constructor(
                 pendingEffectsBaseline = stateEffects
                 pendingEffectsEpisodeUuid = currentEpisode.uuid
                 val effects = updatedEffects.toEffects()
-                val podcast = (currentEpisode as? PodcastEpisode)
+                val overridingPodcast = (currentEpisode as? PodcastEpisode)
                     ?.let { podcastManager.findPodcastByUuid(it.podcastUuid) }
-                val isLocal = podcast != null && podcast.overrideGlobalEffects
-                if (podcast != null && podcast.overrideGlobalEffects) {
-                    podcastManager.updateEffectsBlocking(podcast, effects)
+                    ?.takeIf { it.overrideGlobalEffects }
+                if (overridingPodcast != null) {
+                    podcastManager.updateEffectsBlocking(overridingPodcast, effects)
                 } else {
                     settings.globalPlaybackEffects.set(effects, updateModifiedAt = true)
                 }
                 playbackManager.updatePlayerEffects(effects)
-                track(if (isLocal) SettingType.Local else SettingType.Global)
+                track(if (overridingPodcast != null) SettingType.Local else SettingType.Global)
             }
         }
     }
