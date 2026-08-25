@@ -41,6 +41,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.onboarding.welcome.artworkResIds
 import au.com.shiftyjelly.pocketcasts.theme.TvTheme
 import au.com.shiftyjelly.pocketcasts.theme.tvColors
@@ -61,6 +62,8 @@ fun TvSyncingScreen(
     viewModel: TvSyncingViewModel = hiltViewModel(),
 ) {
     BackHandler {}
+
+    CallOnce { viewModel.trackShown() }
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
