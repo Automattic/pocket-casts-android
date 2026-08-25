@@ -721,6 +721,13 @@ class MainActivity :
                     AccountEncouragement.Decision.Wait -> return@repeatOnLifecycle
 
                     AccountEncouragement.Decision.Show -> {
+                        // Defer if another bottom sheet (What's New, End of Year, etc.) is already
+                        // showing: don't stack over it, and don't reset the clock for a modal the
+                        // user never saw. Retries on the next eligible launch.
+                        if (bottomSheetTag != null) {
+                            return@repeatOnLifecycle
+                        }
+
                         // Reset the clock so the next showing is one interval out. Set before
                         // presenting so this STARTED block can't re-show the modal when the activity
                         // returns to the foreground after it's dismissed.
