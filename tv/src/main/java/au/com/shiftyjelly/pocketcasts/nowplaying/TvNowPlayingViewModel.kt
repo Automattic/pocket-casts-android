@@ -14,6 +14,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.Player
 import au.com.shiftyjelly.pocketcasts.repositories.playback.StreamVideoState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.PlayerDismissedEvent
+import com.automattic.eventhorizon.PlayerShownEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
@@ -32,6 +35,7 @@ class TvNowPlayingViewModel @Inject constructor(
     private val playbackManager: PlaybackManager,
     private val podcastManager: PodcastManager,
     private val settings: Settings,
+    private val eventHorizon: EventHorizon,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
@@ -70,6 +74,14 @@ class TvNowPlayingViewModel @Inject constructor(
         started = SharingStarted.WhileSubscribed(5_000),
         initialValue = TvNowPlayingUiState.Empty,
     )
+
+    fun trackPlayerShown() {
+        eventHorizon.track(PlayerShownEvent)
+    }
+
+    fun trackPlayerDismissed() {
+        eventHorizon.track(PlayerDismissedEvent)
+    }
 
     fun playPause() {
         playbackManager.playPause(sourceView = SourceView.PLAYER)

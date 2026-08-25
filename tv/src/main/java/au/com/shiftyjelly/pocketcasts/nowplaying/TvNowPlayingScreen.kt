@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -98,6 +99,18 @@ fun TvNowPlayingScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var openedPodcastUuid by rememberSaveable { mutableStateOf<String?>(null) }
     val currentOnConsumeOpenRequest by rememberUpdatedState(onConsumeOpenRequest)
+
+    val isPlayerVisible = uiState is TvNowPlayingUiState.Loaded
+    DisposableEffect(isPlayerVisible) {
+        if (isPlayerVisible) {
+            viewModel.trackPlayerShown()
+        }
+        onDispose {
+            if (isPlayerVisible) {
+                viewModel.trackPlayerDismissed()
+            }
+        }
+    }
 
     val podcastUuid = openedPodcastUuid.takeUnless { isOpenRequested }
     if (podcastUuid != null) {
