@@ -30,7 +30,20 @@ import au.com.shiftyjelly.pocketcasts.servers.model.ExpandedStyle
 import au.com.shiftyjelly.pocketcasts.servers.model.ListFeed
 import au.com.shiftyjelly.pocketcasts.servers.model.ListType
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import com.automattic.eventhorizon.DiscoverCategoriesPillTappedEvent
 import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.SearchEmptyResultsEvent
+import com.automattic.eventhorizon.SearchFailedEvent
+import com.automattic.eventhorizon.SearchFilterTappedEvent
+import com.automattic.eventhorizon.SearchHistoryItemTappedEvent
+import com.automattic.eventhorizon.SearchHistoryType
+import com.automattic.eventhorizon.SearchPerformedEvent
+import com.automattic.eventhorizon.SearchPredictiveTermTappedEvent
+import com.automattic.eventhorizon.SearchResultFilterType
+import com.automattic.eventhorizon.SearchResultTappedEvent
+import com.automattic.eventhorizon.SearchResultType
+import com.automattic.eventhorizon.SearchShownEvent
+import com.automattic.eventhorizon.SourceViewType
 import java.util.Date
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -439,6 +452,154 @@ class TvSearchViewModelTest {
         advanceUntilIdle()
 
         assertEquals(TvSearchFilter.Podcasts, viewModel.filter.value)
+    }
+
+    @Test
+    fun `showing the search screen tracks a search shown event`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        val viewModel = createViewModel()
+
+        viewModel.trackSearchShown()
+
+        verify(eventHorizon).track(SearchShownEvent(source = SourceViewType.Search))
+    }
+
+    @Test
+    fun `running a search tracks a search performed event`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        whenever { improvedSearchManager.combinedSearch(any()) }.thenReturn(listOf(podcastItem("podcast-1")))
+
+        val viewModel = createViewModel()
+        viewModel.onQueryChange("sugar")
+        advanceUntilIdle()
+
+        verify(eventHorizon).track(SearchPerformedEvent(source = SourceViewType.Search))
+    }
+
+    @Test
+    fun `empty results track a search empty results event with the term`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        whenever { improvedSearchManager.combinedSearch(any()) }.thenReturn(emptyList())
+
+        val viewModel = createViewModel()
+        viewModel.onQueryChange("sugar")
+        advanceUntilIdle()
+
+        verify(eventHorizon).track(SearchEmptyResultsEvent(source = SourceViewType.Search, term = "sugar"))
+    }
+
+    @Test
+    fun `a search failure tracks a search failed event with the term`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        whenever { improvedSearchManager.combinedSearch(any()) }.thenThrow(RuntimeException("Network error"))
+
+        val viewModel = createViewModel()
+        viewModel.onQueryChange("sugar")
+        advanceUntilIdle()
+
+        verify(eventHorizon).track(SearchFailedEvent(source = SourceViewType.Search, term = "sugar"))
+    }
+
+    @Test
+    fun `changing the filter tracks a search filter tapped event`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        val viewModel = createViewModel()
+
+        viewModel.onFilterSelected(TvSearchFilter.Episodes)
+
+        verify(eventHorizon).track(SearchFilterTappedEvent(source = SourceViewType.Search, filter = SearchResultFilterType.Episodes))
+    }
+
+    @Test
+    fun `re-selecting the current filter does not track a filter tapped event`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        val viewModel = createViewModel()
+
+        viewModel.onFilterSelected(TvSearchFilter.TopResults)
+
+        verify(eventHorizon, never()).track(SearchFilterTappedEvent(source = SourceViewType.Search, filter = SearchResultFilterType.AllResults))
+    }
+
+    @Test
+    fun `selecting a suggestion tracks a predictive term tapped event and runs the search`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        whenever { improvedSearchManager.combinedSearch(any()) }.thenReturn(emptyList())
+
+        val viewModel = createViewModel()
+        viewModel.selectSuggestion("sugar rush")
+        advanceUntilIdle()
+
+        verify(eventHorizon).track(SearchPredictiveTermTappedEvent(source = SourceViewType.Search, term = "sugar rush"))
+        assertEquals("sugar rush", viewModel.query.value)
+    }
+
+    @Test
+    fun `selecting a history item tracks a history item tapped event and runs the search`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        whenever { improvedSearchManager.combinedSearch(any()) }.thenReturn(emptyList())
+
+        val viewModel = createViewModel()
+        viewModel.selectHistoryItem("sugar")
+        advanceUntilIdle()
+
+        verify(eventHorizon).track(SearchHistoryItemTappedEvent(source = SourceViewType.Search, type = SearchHistoryType.SearchTerm))
+        assertEquals("sugar", viewModel.query.value)
+    }
+
+    @Test
+    fun `tapping a subscribed podcast result tracks a local result`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        val viewModel = createViewModel()
+
+        viewModel.trackPodcastResultTapped(podcastItem("podcast-1").copy(isFollowed = true))
+
+        verify(eventHorizon).track(
+            SearchResultTappedEvent(source = SourceViewType.Search, uuid = "podcast-1", resultType = SearchResultType.PodcastLocalResult),
+        )
+    }
+
+    @Test
+    fun `tapping an unsubscribed podcast result tracks a remote result`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        val viewModel = createViewModel()
+
+        viewModel.trackPodcastResultTapped(podcastItem("podcast-1"))
+
+        verify(eventHorizon).track(
+            SearchResultTappedEvent(source = SourceViewType.Search, uuid = "podcast-1", resultType = SearchResultType.PodcastRemoteResult),
+        )
+    }
+
+    @Test
+    fun `playing an episode result tracks an episode result tapped event`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        val viewModel = createViewModel()
+
+        viewModel.playEpisode(episodeItem("episode-1"))
+
+        verify(eventHorizon).track(
+            SearchResultTappedEvent(source = SourceViewType.Search, uuid = "episode-1", resultType = SearchResultType.Episode),
+        )
+    }
+
+    @Test
+    fun `tapping a browse category stamps the search source on the pill event`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        val viewModel = createViewModel()
+        val category = category(1, "Comedy")
+
+        viewModel.trackCategoryPillTapped(category, index = 3)
+
+        verify(eventHorizon).track(
+            DiscoverCategoriesPillTappedEvent(
+                name = "Comedy",
+                region = "us",
+                index = 3,
+                visits = category.totalVisits.toLong(),
+                sponsored = category.isSponsored ?: false,
+                source = "search",
+            ),
+        )
     }
 
     private fun podcastItem(uuid: String) = ImprovedSearchResultItem.PodcastItem(
