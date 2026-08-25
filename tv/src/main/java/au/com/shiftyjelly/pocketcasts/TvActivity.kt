@@ -17,7 +17,9 @@ class TvActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        handleLaunchIntent(intent)
+        if (savedInstanceState == null) {
+            handleLaunchIntent(intent)
+        }
         setContent {
             TvTheme {
                 TvOnboardingNavHost()
@@ -27,6 +29,7 @@ class TvActivity : ComponentActivity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
+        setIntent(intent)
         handleLaunchIntent(intent)
     }
 

@@ -51,8 +51,10 @@ class TvScaffoldViewModelTest {
         queue = emptyList(),
     )
 
+    private val launchRequests = TvLaunchRequests()
+
     private val viewModel by lazy {
-        TvScaffoldViewModel(syncManager, signOutManager, upNextQueue)
+        TvScaffoldViewModel(syncManager, signOutManager, launchRequests, upNextQueue)
     }
 
     @Test
@@ -213,6 +215,14 @@ class TvScaffoldViewModelTest {
 
             isLoggedIn.accept(false)
             assertEquals(TvProfileState.SignedOut, awaitItem().profile)
+        }
+    }
+
+    @Test
+    fun `openNowPlayingRequests emits when a launch open request is made`() = runTest {
+        viewModel.openNowPlayingRequests.test {
+            launchRequests.requestOpenNowPlaying()
+            awaitItem()
         }
     }
 
