@@ -252,6 +252,7 @@ private fun TvSearchContent(
                 selected = filter,
                 onFilterSelect = onFilterSelect,
                 modifier = Modifier.padding(ContentPadding),
+                upFocusRequester = searchFieldFocusRequester,
             )
             Spacer(modifier = Modifier.height(24.dp))
         }
