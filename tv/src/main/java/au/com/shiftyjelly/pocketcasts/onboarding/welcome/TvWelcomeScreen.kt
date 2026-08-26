@@ -132,7 +132,7 @@ private fun TvWelcomeContent(
                     colors = TvButtonDefaults.filledButtonColors(),
                     modifier = Modifier.focusRequester(focusRequester),
                 ) {
-                    Text(text = stringResource(LR.string.sign_in))
+                    Text(text = stringResource(LR.string.log_in))
                 }
                 Button(
                     onClick = onCreateAccount,

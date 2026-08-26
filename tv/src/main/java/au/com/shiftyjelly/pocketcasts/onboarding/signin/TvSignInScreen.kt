@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -118,14 +119,15 @@ private fun TvSignInError(
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Image(
-                painter = painterResource(IR.drawable.ic_pocket_casts_logo),
+                painter = painterResource(IR.drawable.ic_waitingforwifi),
                 contentDescription = null,
-                modifier = Modifier.size(36.dp),
+                colorFilter = ColorFilter.tint(MaterialTheme.tvColors.textSecondary),
+                modifier = Modifier.size(48.dp),
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = stringResource(LR.string.error_generic_message),
-                color = MaterialTheme.tvColors.textSecondary,
+                text = stringResource(LR.string.tv_sign_in_qr_error),
+                color = MaterialTheme.tvColors.textPrimary,
                 style = MaterialTheme.tvTypography.body.copy(textAlign = TextAlign.Center),
             )
             Spacer(modifier = Modifier.height(24.dp))
@@ -134,7 +136,7 @@ private fun TvSignInError(
                 colors = TvButtonDefaults.filledButtonColors(),
                 modifier = Modifier.focusRequester(focusRequester),
             ) {
-                Text(text = stringResource(LR.string.retry))
+                Text(text = stringResource(LR.string.try_again))
             }
         }
     }
