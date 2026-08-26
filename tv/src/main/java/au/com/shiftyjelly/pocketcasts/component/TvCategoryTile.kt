@@ -8,6 +8,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -43,8 +44,8 @@ import coil3.compose.AsyncImage
 private val CardShape = RoundedCornerShape(12.dp)
 private val CoverSize = 96.dp
 private val CoverShape = RoundedCornerShape(8.dp)
-private const val CoverVisibleFraction = 0.55f
-private const val CoverRestingScale = 0.85f
+private const val COVER_VISIBLE_FRACTION = 0.55f
+private const val COVER_RESTING_SCALE = 0.85f
 
 @Composable
 fun TvCategoryTile(
@@ -139,7 +140,7 @@ fun TvCategoryTile(
 }
 
 @Composable
-private fun CategoryCover(
+private fun BoxScope.CategoryCover(
     url: String,
     alignment: Alignment,
     edgeSign: Float,
@@ -152,10 +153,10 @@ private fun CategoryCover(
             .size(CoverSize)
             .graphicsLayer {
                 alpha = focusProgress
-                val scale = CoverRestingScale + (1f - CoverRestingScale) * focusProgress
+                val scale = COVER_RESTING_SCALE + (1f - COVER_RESTING_SCALE) * focusProgress
                 scaleX = scale
                 scaleY = scale
-                translationX = edgeSign * coverSizePx * (1f - CoverVisibleFraction * focusProgress)
+                translationX = edgeSign * coverSizePx * (1f - COVER_VISIBLE_FRACTION * focusProgress)
             },
     ) {
         TvArtworkImage(
