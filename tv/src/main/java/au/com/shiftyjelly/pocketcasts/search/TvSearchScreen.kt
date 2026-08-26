@@ -178,6 +178,7 @@ fun TvSearchScreen(
             suggestions = suggestions,
             onSuggestionSelect = viewModel::selectSuggestion,
             onSaveSearch = viewModel::saveSearchTerm,
+            loadCategoryCovers = viewModel::categoryCoverUrls,
             restoreFocusTrigger = restoreFocusTrigger,
             modifier = Modifier
                 .fillMaxSize()
@@ -282,6 +283,7 @@ private fun TvSearchContent(
     suggestions: List<String> = emptyList(),
     onSuggestionSelect: (String) -> Unit = {},
     onSaveSearch: (String) -> Unit = {},
+    loadCategoryCovers: (suspend (DiscoverCategory) -> List<String>)? = null,
     restoreFocusTrigger: Int = 0,
 ) {
     val searchFieldFocusRequester = remember { FocusRequester() }
@@ -349,6 +351,7 @@ private fun TvSearchContent(
                     onDiscoverEpisodePodcastClick = onDiscoverEpisodePodcastClick,
                     onDiscoverCategoryClick = onDiscoverCategoryClick,
                     onDiscoverListImpression = onDiscoverListImpression,
+                    loadCategoryCovers = loadCategoryCovers,
                     restoreFocusTrigger = restoreFocusTrigger,
                 )
 
@@ -392,6 +395,7 @@ private fun TvSearchIdle(
     onDiscoverCategoryClick: (DiscoverCategory, Int) -> Unit,
     onDiscoverListImpression: (TvDiscoverRow) -> Unit,
     restoreFocusTrigger: Int,
+    loadCategoryCovers: (suspend (DiscoverCategory) -> List<String>)? = null,
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
         if (history.isNotEmpty()) {
@@ -419,6 +423,7 @@ private fun TvSearchIdle(
             onDiscoverEpisodePodcastClick = onDiscoverEpisodePodcastClick,
             onDiscoverCategoryClick = onDiscoverCategoryClick,
             onDiscoverListImpression = onDiscoverListImpression,
+            loadCategoryCovers = loadCategoryCovers,
             restoreFocusTrigger = restoreFocusTrigger,
             modifier = Modifier.weight(1f),
         )
@@ -435,6 +440,7 @@ private fun TvSearchDiscover(
     onDiscoverListImpression: (TvDiscoverRow) -> Unit,
     restoreFocusTrigger: Int,
     modifier: Modifier = Modifier,
+    loadCategoryCovers: (suspend (DiscoverCategory) -> List<String>)? = null,
 ) {
     val categoryOffset = if (categories.isNotEmpty()) 1 else 0
     val rowCount = categoryOffset + discoverRows.size
@@ -471,9 +477,12 @@ private fun TvSearchDiscover(
                     focusRequester = rowFocusRequesters.getOrNull(0),
                     modifier = Modifier.onFocusChanged { if (it.hasFocus) lastFocusedRowIndex = 0 },
                 ) { category ->
+                    val categoryIndex = categories.indexOfFirst { it.id == category.id }
                     TvCategoryTile(
                         category = category,
-                        onClick = { onDiscoverCategoryClick(category, categories.indexOfFirst { it.id == category.id }) },
+                        onClick = { onDiscoverCategoryClick(category, categoryIndex) },
+                        colorIndex = categoryIndex,
+                        loadCoverUrls = loadCategoryCovers?.let { load -> { load(category) } },
                     )
                 }
             }
@@ -491,6 +500,7 @@ private fun TvSearchDiscover(
                 onListImpression = onDiscoverListImpression,
                 contentPadding = ContentPadding,
                 focusRequester = rowFocusRequesters.getOrNull(rowIndex),
+                loadCategoryCovers = loadCategoryCovers,
                 modifier = Modifier.onFocusChanged { if (it.hasFocus) lastFocusedRowIndex = rowIndex },
             )
         }
