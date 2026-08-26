@@ -82,12 +82,12 @@ private fun TvSignedOutContent(
             Text(
                 text = stringResource(LR.string.tv_account_signed_out_alert_title),
                 color = MaterialTheme.tvColors.textPrimary,
-                style = MaterialTheme.tvTypography.title1.copy(textAlign = TextAlign.Center),
+                style = MaterialTheme.tvTypography.title2.copy(textAlign = TextAlign.Center),
             )
             Text(
                 text = stringResource(LR.string.tv_account_signed_out_alert_message),
                 color = MaterialTheme.tvColors.textSecondary,
-                style = MaterialTheme.tvTypography.headline.copy(textAlign = TextAlign.Center),
+                style = MaterialTheme.tvTypography.body.copy(textAlign = TextAlign.Center),
             )
             Spacer(modifier = Modifier.height(16.dp))
             Button(
