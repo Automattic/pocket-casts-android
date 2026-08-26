@@ -34,7 +34,6 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
-import org.robolectric.annotation.Config
 import retrofit2.create
 
 /** Stands in for the sign in screen each app supplies, so the test does not depend on a real activity. */
