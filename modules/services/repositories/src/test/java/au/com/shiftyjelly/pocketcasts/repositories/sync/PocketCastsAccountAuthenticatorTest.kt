@@ -40,7 +40,6 @@ import retrofit2.create
 /** Stands in for the sign in screen each app supplies, so the test does not depend on a real activity. */
 private class SignInActivity : Activity()
 
-@Config(manifest = Config.NONE)
 @RunWith(RobolectricTestRunner::class)
 class PocketCastsAccountAuthenticatorTest {
 
