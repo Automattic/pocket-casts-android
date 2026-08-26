@@ -1,18 +1,14 @@
-package au.com.shiftyjelly.pocketcasts.profile.accountmanager
+package au.com.shiftyjelly.pocketcasts.repositories.sync
 
 import android.accounts.Account
 import android.accounts.AccountManager
 import android.accounts.NetworkErrorException
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import androidx.core.os.BundleCompat
-import androidx.test.platform.app.InstrumentationRegistry
-import au.com.shiftyjelly.pocketcasts.account.AccountActivity
 import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.preferences.AccountConstants
-import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncAccountManagerImpl
-import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManagerImpl
-import au.com.shiftyjelly.pocketcasts.repositories.sync.TokenErrorNotification
 import au.com.shiftyjelly.pocketcasts.servers.di.NetworkModule
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServiceManager
 import com.automattic.eventhorizon.EventHorizon
@@ -30,12 +26,22 @@ import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertThrows
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.RuntimeEnvironment
+import org.robolectric.annotation.Config
 import retrofit2.create
 
+/** Stands in for the sign in screen each app supplies, so the test does not depend on a real activity. */
+private class SignInActivity : Activity()
+
+@Config(manifest = Config.NONE)
+@RunWith(RobolectricTestRunner::class)
 class PocketCastsAccountAuthenticatorTest {
 
     private lateinit var context: Context
@@ -45,7 +51,7 @@ class PocketCastsAccountAuthenticatorTest {
 
     @Before
     fun setUp() {
-        context = InstrumentationRegistry.getInstrumentation().targetContext
+        context = RuntimeEnvironment.getApplication()
 
         mockWebServer = MockWebServer()
         mockWebServer.start()
@@ -79,10 +85,10 @@ class PocketCastsAccountAuthenticatorTest {
             moshi = moshi,
             notificationManager = mock(),
         )
-        // make sure the test device is signed out
+        // make sure the test account is signed out
         runBlocking { syncManager.signOut() }
 
-        authenticator = PocketCastsAccountAuthenticator(context, syncManager)
+        authenticator = PocketCastsAccountAuthenticator(context, syncManager, SignInActivity::class.java)
     }
 
     @After
@@ -158,7 +164,7 @@ class PocketCastsAccountAuthenticatorTest {
         // if the refresh token has expired and they need to sign in again an intent is returned to the login page
         val intent = BundleCompat.getParcelable(bundle, AccountManager.KEY_INTENT, Intent::class.java)
         assertNotNull(intent)
-        assertEquals(AccountActivity::class.java.name, intent?.component?.className)
+        assertEquals(SignInActivity::class.java.name, intent?.component?.className)
 
         // check the token refresh endpoint was called
         val request = mockWebServer.takeRequest(5, TimeUnit.SECONDS)
@@ -186,5 +192,17 @@ class PocketCastsAccountAuthenticatorTest {
         // check the token refresh endpoint was called
         val request = mockWebServer.takeRequest(5, TimeUnit.SECONDS)
         assertEquals("/user/token", request?.path)
+    }
+
+    /**
+     * The account advertises no features, so only an empty request can be satisfied.
+     */
+    @Test
+    fun hasFeatures() {
+        val noFeatures = authenticator.hasFeatures(null, account, emptyArray())
+        assertTrue(noFeatures.getBoolean(AccountManager.KEY_BOOLEAN_RESULT))
+
+        val unknownFeature = authenticator.hasFeatures(null, account, arrayOf("unsupported_feature"))
+        assertEquals(false, unknownFeature.getBoolean(AccountManager.KEY_BOOLEAN_RESULT))
     }
 }
