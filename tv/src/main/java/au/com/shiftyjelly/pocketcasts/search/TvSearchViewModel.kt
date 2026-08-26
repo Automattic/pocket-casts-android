@@ -68,6 +68,9 @@ class TvSearchViewModel @Inject constructor(
     private val _filter = MutableStateFlow(TvSearchFilter.TopResults)
     val filter: StateFlow<TvSearchFilter> = _filter.asStateFlow()
 
+    private val _hasFolderResults = MutableStateFlow(false)
+    val hasFolderResults: StateFlow<Boolean> = _hasFolderResults.asStateFlow()
+
     private val _suggestions = MutableStateFlow<List<String>>(emptyList())
     val suggestions: StateFlow<List<String>> = _suggestions.asStateFlow()
 
@@ -127,6 +130,7 @@ class TvSearchViewModel @Inject constructor(
         if (term.isEmpty()) {
             _suggestions.value = emptyList()
             _searchState.value = TvSearchState.Idle
+            updateFolderResults(hasFolders = false)
             return
         }
         searchJob = viewModelScope.launch {
@@ -171,9 +175,7 @@ class TvSearchViewModel @Inject constructor(
                 val episodes = remoteResults.filterIsInstance<ImprovedSearchResultItem.EpisodeItem>()
                     .distinctBy(ImprovedSearchResultItem.EpisodeItem::uuid)
                 val folders = foldersSearch.await()
-                if (folders.isEmpty() && _filter.value == TvSearchFilter.Folders) {
-                    _filter.value = TvSearchFilter.TopResults
-                }
+                updateFolderResults(hasFolders = folders.isNotEmpty())
                 if (podcasts.isEmpty() && episodes.isEmpty() && folders.isEmpty()) {
                     TvSearchState.NoResults
                 } else {
@@ -183,6 +185,7 @@ class TvSearchViewModel @Inject constructor(
                 throw exception
             } catch (exception: Exception) {
                 Timber.e(exception, "Failed to search on TV")
+                updateFolderResults(hasFolders = false)
                 TvSearchState.Error
             }
         }
@@ -190,6 +193,13 @@ class TvSearchViewModel @Inject constructor(
 
     fun onFilterSelected(filter: TvSearchFilter) {
         _filter.value = filter
+    }
+
+    private fun updateFolderResults(hasFolders: Boolean) {
+        _hasFolderResults.value = hasFolders
+        if (!hasFolders && _filter.value == TvSearchFilter.Folders) {
+            _filter.value = TvSearchFilter.TopResults
+        }
     }
 
     private suspend fun searchFolders(term: String): List<FolderItem.Folder> {

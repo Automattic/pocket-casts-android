@@ -106,6 +106,7 @@ fun TvSearchScreen(
     val query by viewModel.query.collectAsStateWithLifecycle()
     val searchState by viewModel.searchState.collectAsStateWithLifecycle()
     val filter by viewModel.filter.collectAsStateWithLifecycle()
+    val hasFolderResults by viewModel.hasFolderResults.collectAsStateWithLifecycle()
     val categories by viewModel.categories.collectAsStateWithLifecycle()
     val discoverRows by viewModel.discoverRows.collectAsStateWithLifecycle()
     val suggestions by viewModel.suggestions.collectAsStateWithLifecycle()
@@ -138,6 +139,7 @@ fun TvSearchScreen(
             query = query,
             searchState = searchState,
             filter = filter,
+            hasFolderResults = hasFolderResults,
             categories = categories,
             discoverRows = discoverRows,
             onQueryChange = viewModel::onQueryChange,
@@ -238,6 +240,7 @@ private fun TvSearchContent(
     query: String,
     searchState: TvSearchState,
     filter: TvSearchFilter,
+    hasFolderResults: Boolean,
     categories: List<DiscoverCategory>,
     discoverRows: List<TvDiscoverRow>,
     onQueryChange: (String) -> Unit,
@@ -291,8 +294,7 @@ private fun TvSearchContent(
             Spacer(modifier = Modifier.height(24.dp))
         }
 
-        val hasFolders = (searchState as? TvSearchState.Results)?.let { it.folders.isNotEmpty() || it.isPartial } == true
-        val filters = remember(hasFolders) { TvSearchFilter.entries.filter { it != TvSearchFilter.Folders || hasFolders } }
+        val filters = remember(hasFolderResults) { TvSearchFilter.entries.filter { it != TvSearchFilter.Folders || hasFolderResults } }
         val effectiveFilter = if (filter in filters) filter else TvSearchFilter.TopResults
 
         if (searchState !is TvSearchState.Idle) {
@@ -527,19 +529,30 @@ private fun TvSearchResults(
             )
         }
 
-        TvSearchFilter.Folders -> TvPodcastGridScaffold(
-            itemKeys = results.folders.map { it.folder.uuid },
-            modifier = Modifier.fillMaxSize(),
-            horizontalContentPadding = ContentHorizontalPadding,
-            restoreFocusTrigger = restoreFocusTrigger,
-        ) { index, itemModifier ->
-            val folderItem = results.folders[index]
-            TvFolderCard(
-                folder = folderItem.folder,
-                coverUrls = folderItem.podcasts.take(FOLDER_COVER_COUNT).map { PodcastImage.getMediumArtworkUrl(it.uuid) },
-                onClick = { onOpenFolder(folderItem) },
-                modifier = itemModifier,
-            )
+        TvSearchFilter.Folders -> if (results.folders.isEmpty()) {
+            if (results.isPartial) {
+                TvSearchLoading()
+            } else {
+                TvSearchMessage(
+                    title = stringResource(LR.string.tv_search_no_results_for_title, searchTerm),
+                    subtitle = stringResource(LR.string.tv_search_no_results_subtitle),
+                )
+            }
+        } else {
+            TvPodcastGridScaffold(
+                itemKeys = results.folders.map { it.folder.uuid },
+                modifier = Modifier.fillMaxSize(),
+                horizontalContentPadding = ContentHorizontalPadding,
+                restoreFocusTrigger = restoreFocusTrigger,
+            ) { index, itemModifier ->
+                val folderItem = results.folders[index]
+                TvFolderCard(
+                    folder = folderItem.folder,
+                    coverUrls = folderItem.podcasts.take(FOLDER_COVER_COUNT).map { PodcastImage.getMediumArtworkUrl(it.uuid) },
+                    onClick = { onOpenFolder(folderItem) },
+                    modifier = itemModifier,
+                )
+            }
         }
     }
 }
@@ -818,6 +831,7 @@ private fun TvSearchScreenPreview() {
                 query = "",
                 searchState = TvSearchState.Idle,
                 filter = TvSearchFilter.TopResults,
+                hasFolderResults = false,
                 categories = listOf(
                     DiscoverCategory(id = 1, name = "Comedy", icon = "", source = ""),
                     DiscoverCategory(id = 2, name = "True Crime", icon = "", source = ""),
@@ -845,6 +859,7 @@ private fun TvSearchIdleWithHistoryPreview() {
                 query = "",
                 searchState = TvSearchState.Idle,
                 filter = TvSearchFilter.TopResults,
+                hasFolderResults = false,
                 categories = emptyList(),
                 discoverRows = emptyList(),
                 onQueryChange = {},
@@ -904,6 +919,7 @@ private fun TvSearchResultsPreview() {
                     ),
                 ),
                 filter = TvSearchFilter.TopResults,
+                hasFolderResults = true,
                 categories = emptyList(),
                 discoverRows = emptyList(),
                 onQueryChange = {},

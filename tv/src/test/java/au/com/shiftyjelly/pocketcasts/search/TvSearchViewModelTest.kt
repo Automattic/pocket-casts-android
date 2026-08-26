@@ -37,6 +37,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -531,6 +532,55 @@ class TvSearchViewModelTest {
         val state = viewModel.searchState.value as TvSearchState.Results
         assertEquals(listOf("podcast-1"), state.podcasts.map { it.uuid })
         assertTrue(state.folders.isEmpty())
+    }
+
+    @Test
+    fun `hasFolderResults reflects whether the terminal search found folders`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        whenever { improvedSearchManager.combinedSearch(any()) }.thenReturn(emptyList())
+        whenever(syncManager.isLoggedIn()).thenReturn(true)
+        whenever { folderManager.getAll() }.thenReturn(listOf(folderEntity("Sugar")))
+        whenever { folderManager.findFolderPodcastsSorted(any()) }.thenReturn(emptyList())
+
+        val viewModel = createViewModel()
+        viewModel.onQueryChange("sugar")
+        advanceUntilIdle()
+        assertTrue(viewModel.hasFolderResults.value)
+
+        viewModel.onQueryChange("")
+        assertFalse(viewModel.hasFolderResults.value)
+    }
+
+    @Test
+    fun `a terminal search without folders resets the folders filter`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        whenever { improvedSearchManager.combinedSearch(any()) }.thenReturn(listOf(podcastItem("podcast-1")))
+        whenever(syncManager.isLoggedIn()).thenReturn(true)
+        whenever { folderManager.getAll() }.thenReturn(emptyList())
+
+        val viewModel = createViewModel()
+        viewModel.onFilterSelected(TvSearchFilter.Folders)
+        viewModel.onQueryChange("sugar")
+        advanceUntilIdle()
+
+        assertEquals(TvSearchFilter.TopResults, viewModel.filter.value)
+        assertFalse(viewModel.hasFolderResults.value)
+    }
+
+    @Test
+    fun `a failed search clears folder results and resets the folders filter`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        whenever { improvedSearchManager.combinedSearch(any()) }.thenThrow(RuntimeException("network"))
+        whenever(syncManager.isLoggedIn()).thenReturn(true)
+
+        val viewModel = createViewModel()
+        viewModel.onFilterSelected(TvSearchFilter.Folders)
+        viewModel.onQueryChange("sugar")
+        advanceUntilIdle()
+
+        assertTrue(viewModel.searchState.value is TvSearchState.Error)
+        assertEquals(TvSearchFilter.TopResults, viewModel.filter.value)
+        assertFalse(viewModel.hasFolderResults.value)
     }
 
     private fun createViewModel() = TvSearchViewModel(
