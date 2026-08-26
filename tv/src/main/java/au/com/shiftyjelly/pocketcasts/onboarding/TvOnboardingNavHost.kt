@@ -60,7 +60,7 @@ fun TvOnboardingNavHost(
                 }
                 composable(TvOnboardingRoutes.CREATE_ACCOUNT) {
                     TvCreateAccountScreen(
-                        onSignIn = { navController.navigate(TvOnboardingRoutes.SIGN_IN) },
+                        onCreateAccountComplete = { navigateClearingBackStack(TvOnboardingRoutes.SYNCING) },
                     )
                 }
                 composable(TvOnboardingRoutes.SIGN_IN) {

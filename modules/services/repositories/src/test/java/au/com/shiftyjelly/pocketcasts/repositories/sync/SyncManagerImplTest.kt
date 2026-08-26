@@ -8,6 +8,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationManager
 import au.com.shiftyjelly.pocketcasts.repositories.notification.OnboardingNotificationType
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServiceManager
+import au.com.shiftyjelly.pocketcasts.servers.sync.login.DeviceTokenResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenResponse
 import com.automattic.eventhorizon.EventHorizon
 import com.squareup.moshi.Moshi
@@ -84,6 +85,27 @@ class SyncManagerImplTest {
         syncManager.loginWithGoogle("google_token", SignInSource.UserInitiated.Onboarding)
         verifyNotificationNotCalled()
     }
+
+    @Test
+    fun `device auth login as new account updates sync feature interaction`() = runTest {
+        whenever(syncServiceManager.deviceToken(any(), any())).thenReturn(createDeviceTokenResponse())
+        syncManager.loginWithDeviceAuth("device-code", SignInSource.UserInitiated.Onboarding, isNewAccount = true)
+        verifyNotificationCalled()
+    }
+
+    @Test
+    fun `device auth login as existing account does not update sync feature interaction`() = runTest {
+        whenever(syncServiceManager.deviceToken(any(), any())).thenReturn(createDeviceTokenResponse())
+        syncManager.loginWithDeviceAuth("device-code", SignInSource.UserInitiated.Onboarding, isNewAccount = false)
+        verifyNotificationNotCalled()
+    }
+
+    private fun createDeviceTokenResponse() = DeviceTokenResponse(
+        accessToken = AccessToken("value"),
+        refreshToken = RefreshToken("value"),
+        email = "test@example.com",
+        uuid = "uuid",
+    )
 
     private fun createMockLoginResponse(isNew: Boolean): LoginTokenResponse {
         return LoginTokenResponse(

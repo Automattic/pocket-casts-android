@@ -35,7 +35,7 @@ class TvSignInViewModelTest {
     @Test
     fun `trackShown fires sign in shown event`() = runTest {
         whenever(syncManager.deviceAuthorize()).thenReturn(createDeviceAuthorizeResponse())
-        whenever(syncManager.loginWithDeviceAuth(any(), any())).thenReturn(createLoginSuccess())
+        whenever(syncManager.loginWithDeviceAuth(any(), any(), any())).thenReturn(createLoginSuccess())
 
         val viewModel = createViewModel()
         viewModel.trackShown()
@@ -46,7 +46,7 @@ class TvSignInViewModelTest {
     @Test
     fun `successful device authorize transitions to Ready state`() = runTest {
         whenever(syncManager.deviceAuthorize()).thenReturn(createDeviceAuthorizeResponse())
-        whenever(syncManager.loginWithDeviceAuth(any(), any())).thenReturn(createLoginSuccess())
+        whenever(syncManager.loginWithDeviceAuth(any(), any(), any())).thenReturn(createLoginSuccess())
 
         val viewModel = createViewModel()
 
@@ -76,7 +76,7 @@ class TvSignInViewModelTest {
     @Test
     fun `successful poll transitions to Complete state`() = runTest {
         whenever(syncManager.deviceAuthorize()).thenReturn(createDeviceAuthorizeResponse())
-        whenever(syncManager.loginWithDeviceAuth(eq("device-code-123"), any())).thenReturn(createLoginSuccess())
+        whenever(syncManager.loginWithDeviceAuth(eq("device-code-123"), any(), any())).thenReturn(createLoginSuccess())
 
         val viewModel = createViewModel()
 
@@ -94,7 +94,7 @@ class TvSignInViewModelTest {
     @Test
     fun `authorization pending continues polling until success`() = runTest {
         whenever(syncManager.deviceAuthorize()).thenReturn(createDeviceAuthorizeResponse())
-        whenever(syncManager.loginWithDeviceAuth(eq("device-code-123"), any()))
+        whenever(syncManager.loginWithDeviceAuth(eq("device-code-123"), any(), any()))
             .thenReturn(createAuthorizationPending())
             .thenReturn(createAuthorizationPending())
             .thenReturn(createLoginSuccess())
@@ -115,7 +115,7 @@ class TvSignInViewModelTest {
     @Test
     fun `non-pending error stops polling`() = runTest {
         whenever(syncManager.deviceAuthorize()).thenReturn(createDeviceAuthorizeResponse())
-        whenever(syncManager.loginWithDeviceAuth(eq("device-code-123"), any()))
+        whenever(syncManager.loginWithDeviceAuth(eq("device-code-123"), any(), any()))
             .thenReturn(LoginResult.Failed(message = "Token expired", messageId = "expired_token"))
 
         val viewModel = createViewModel()
@@ -135,7 +135,7 @@ class TvSignInViewModelTest {
         whenever(syncManager.deviceAuthorize())
             .thenThrow(RuntimeException("Network error"))
             .thenReturn(createDeviceAuthorizeResponse())
-        whenever(syncManager.loginWithDeviceAuth(any(), any())).thenReturn(createLoginSuccess())
+        whenever(syncManager.loginWithDeviceAuth(any(), any(), any())).thenReturn(createLoginSuccess())
 
         val viewModel = createViewModel()
 
