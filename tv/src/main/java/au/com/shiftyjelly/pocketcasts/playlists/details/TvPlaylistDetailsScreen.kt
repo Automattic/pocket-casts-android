@@ -83,13 +83,13 @@ fun TvPlaylistDetailsScreen(
         key = playlistUuid,
         creationCallback = { factory -> factory.create(playlistUuid, playlistType) },
     ),
+    episodeActions: TvEpisodeActionsViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var openedPodcastUuid by rememberSaveable { mutableStateOf<String?>(null) }
     var isReplaceUpNextConfirmationVisible by rememberSaveable { mutableStateOf(false) }
 
     val openNowPlaying = LocalOpenNowPlaying.current
-    val episodeActions = hiltViewModel<TvEpisodeActionsViewModel>()
     val toastHostState = LocalTvToastHostState.current
     val upNextName = stringResource(LR.string.up_next)
     val savedToast = stringResource(LR.string.up_next_as_playlist_saved)

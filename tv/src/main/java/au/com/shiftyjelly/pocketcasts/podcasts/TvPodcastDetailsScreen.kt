@@ -83,10 +83,10 @@ fun TvPodcastDetailsScreen(
         key = podcastUuid,
         creationCallback = { factory -> factory.create(podcastUuid) },
     ),
+    episodeActions: TvEpisodeActionsViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val openNowPlaying = LocalOpenNowPlaying.current
-    val episodeActions = hiltViewModel<TvEpisodeActionsViewModel>()
 
     LaunchedEffect(uiState, onClose) {
         if (uiState is TvPodcastDetailsUiState.NotFound) {
