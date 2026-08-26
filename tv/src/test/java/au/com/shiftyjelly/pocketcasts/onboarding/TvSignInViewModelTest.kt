@@ -26,6 +26,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -239,6 +240,21 @@ class TvSignInViewModelTest {
         assertEquals("Wrong password", viewModel.emailState.value.serverError)
         assertFalse(viewModel.emailState.value.isSubmitting)
         assertFalse(viewModel.uiState.value is TvSignInUiState.Complete)
+    }
+
+    @Test
+    fun `submitting again while signing in only attempts one login`() = runTest {
+        val viewModel = createEmailViewModel()
+        whenever(syncManager.loginWithEmailAndPassword(any(), any(), any())).thenReturn(createLoginSuccess())
+
+        viewModel.selectMode(TvSignInMode.Email)
+        viewModel.updateEmail("listener@pocketcasts.com")
+        viewModel.updatePassword("hunter2")
+        viewModel.submitEmailSignIn()
+        viewModel.submitEmailSignIn()
+        advanceUntilIdle()
+
+        verify(syncManager, times(1)).loginWithEmailAndPassword(any(), any(), any())
     }
 
     private fun createViewModel() = TvSignInViewModel(syncManager, eventHorizon)

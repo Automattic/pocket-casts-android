@@ -109,7 +109,6 @@ internal fun TvEmailSignInForm(
         }
         Button(
             onClick = onSubmit,
-            enabled = !state.isSubmitting,
             colors = TvButtonDefaults.filledButtonColors(),
             modifier = Modifier.fillMaxWidth(),
         ) {

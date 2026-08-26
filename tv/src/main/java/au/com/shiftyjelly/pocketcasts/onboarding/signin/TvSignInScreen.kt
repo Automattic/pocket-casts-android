@@ -141,7 +141,7 @@ private fun TvSignInModeTabs(
 
     Box(
         modifier = modifier
-            .background(MaterialTheme.tvColors.backgroundSunken, RoundedCornerShape(percent = 50))
+            .background(MaterialTheme.tvColors.backgroundBase, RoundedCornerShape(percent = 50))
             .padding(3.dp),
     ) {
         TabRow(
@@ -164,7 +164,7 @@ private fun TvSignInModeTabs(
             TvSignInMode.entries.forEachIndexed { index, tabMode ->
                 Tab(
                     selected = index == selectedIndex,
-                    onFocus = { onSelect(tabMode) },
+                    onFocus = {},
                     onClick = { onSelect(tabMode) },
                     modifier = Modifier
                         .height(44.dp)
