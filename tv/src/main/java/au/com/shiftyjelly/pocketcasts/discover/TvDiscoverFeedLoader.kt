@@ -66,21 +66,19 @@ class TvDiscoverFeedLoader @Inject constructor(
     suspend fun loadCategoryCoverUrls(source: String, categoryId: Int): List<String> {
         categoryCoverUrlCache[categoryId]?.let { return it }
         if (source.isBlank()) return emptyList()
-        val urls = try {
-            listRepository.getListFeed(source)?.podcasts.orEmpty()
+        return try {
+            val urls = listRepository.getListFeed(source)?.podcasts.orEmpty()
                 .map(DiscoverPodcast::uuid)
                 .distinct()
                 .map { PodcastImage.getMediumArtworkUrl(it) }
+            categoryCoverUrlCache[categoryId] = urls
+            urls
         } catch (exception: CancellationException) {
             throw exception
         } catch (exception: Exception) {
             Timber.e(exception, "Failed to load TV category covers")
             emptyList()
         }
-        if (urls.isNotEmpty()) {
-            categoryCoverUrlCache[categoryId] = urls
-        }
-        return urls
     }
 
     private suspend fun loadCategorySponsoredPodcasts(categoryId: Int, isLoggedIn: Boolean): List<TvDiscoverPodcast> = coroutineScope {

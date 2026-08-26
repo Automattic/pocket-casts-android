@@ -18,10 +18,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.produceState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -60,8 +62,11 @@ fun TvCategoryTile(
     val contentColor = if (isFocused) MaterialTheme.tvColors.textPrimary else MaterialTheme.tvColors.textSecondary
 
     val loader by rememberUpdatedState(loadCoverUrls)
-    val coverUrls by produceState(initialValue = emptyList<String>(), category.id) {
-        value = loader?.let { runCatching { it() }.getOrDefault(emptyList()) }.orEmpty()
+    var coverUrls by remember(category.id) { mutableStateOf(emptyList<String>()) }
+    LaunchedEffect(category.id, isFocused) {
+        if (isFocused && coverUrls.isEmpty()) {
+            coverUrls = loader?.invoke() ?: emptyList()
+        }
     }
 
     val focusProgress by animateFloatAsState(
@@ -73,6 +78,7 @@ fun TvCategoryTile(
 
     TvTile(
         onClick = onClick,
+        shape = CardDefaults.shape(shape = CardShape),
         colors = CardDefaults.colors(
             containerColor = MaterialTheme.tvColors.backgroundOverlay,
             focusedContainerColor = MaterialTheme.tvColors.backgroundOverlay,
@@ -83,15 +89,11 @@ fun TvCategoryTile(
             .height(128.dp)
             .tvFocusedCardDepth(isFocused, CardShape),
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .clip(CardShape),
-        ) {
+        Box(modifier = Modifier.fillMaxSize()) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .graphicsLayer { alpha = focusProgress }
+                    .graphicsLayer { alpha = focusProgress.coerceIn(0f, 1f) }
                     .background(categoryGradient(colorIndex)),
             )
 
@@ -152,7 +154,7 @@ private fun BoxScope.CategoryCover(
             .align(alignment)
             .size(CoverSize)
             .graphicsLayer {
-                alpha = focusProgress
+                alpha = focusProgress.coerceIn(0f, 1f)
                 val scale = COVER_RESTING_SCALE + (1f - COVER_RESTING_SCALE) * focusProgress
                 scaleX = scale
                 scaleY = scale
