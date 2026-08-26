@@ -154,10 +154,27 @@ class TvScaffoldViewModelTest {
             assertEquals(TvTab.NowPlaying, awaitItem().selectedTab)
 
             queueChanges.onNext(UpNextQueue.State.Empty)
+            coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
 
             val state = expectMostRecentItem()
             assertEquals(TvTab.Home, state.selectedTab)
             assertEquals(TvTab.entries, state.tabs)
+        }
+    }
+
+    @Test
+    fun `stays on now playing when the queue empties only transiently while switching episodes`() = runTest {
+        queueChanges.onNext(loadedQueue)
+
+        viewModel.uiState.test {
+            assertEquals(TvTab.Home, awaitItem().selectedTab)
+
+            viewModel.selectTab(TvTab.NowPlaying)
+            queueChanges.onNext(UpNextQueue.State.Empty)
+            queueChanges.onNext(loadedQueue)
+            coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+            assertEquals(TvTab.NowPlaying, expectMostRecentItem().selectedTab)
         }
     }
 

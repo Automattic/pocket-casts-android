@@ -8,10 +8,12 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -33,13 +35,18 @@ class TvScaffoldViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
     init {
-        viewModelScope.launch {
-            hasCurrentEpisode.collect { hasEpisode ->
+        viewModelScope.launch { leaveNowPlayingWhenEpisodeCleared() }
+    }
+
+    @OptIn(FlowPreview::class)
+    private suspend fun leaveNowPlayingWhenEpisodeCleared() {
+        hasCurrentEpisode
+            .debounce(NOW_PLAYING_EMPTY_DEBOUNCE_MS)
+            .collect { hasEpisode ->
                 if (!hasEpisode && selectedTab.value == TvTab.NowPlaying) {
                     selectedTab.value = TvTab.Home
                 }
             }
-        }
     }
 
     val uiState: StateFlow<TvScaffoldUiState> = combine(
@@ -79,6 +86,8 @@ class TvScaffoldViewModel @Inject constructor(
         TvProfileState.SignedOut
     }
 }
+
+private const val NOW_PLAYING_EMPTY_DEBOUNCE_MS = 500L
 
 data class TvScaffoldUiState(
     val tabs: List<TvTab> = TvTab.entries,
