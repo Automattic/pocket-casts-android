@@ -42,13 +42,8 @@ class TvSignInViewModel @Inject constructor(
         if (_mode.value == mode) return
         _mode.value = mode
         eventHorizon.track(SignInTypeTappedEvent(type = mode.analyticsType))
-        when (mode) {
-            TvSignInMode.QrCode -> requestDeviceCode()
-
-            TvSignInMode.Email -> {
-                pollingJob?.cancel()
-                _emailState.update { it.copy(showEmailError = false, showPasswordError = false, serverError = null) }
-            }
+        if (mode == TvSignInMode.Email) {
+            _emailState.update { it.copy(showEmailError = false, showPasswordError = false, serverError = null) }
         }
     }
 

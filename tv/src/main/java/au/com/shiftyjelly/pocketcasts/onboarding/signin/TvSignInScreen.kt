@@ -98,7 +98,7 @@ private fun TvSignInContent(
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(32.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp),
         ) {
             Image(
                 painter = painterResource(IR.drawable.ic_pocket_casts_logo),
@@ -108,11 +108,11 @@ private fun TvSignInContent(
             Text(
                 text = stringResource(LR.string.tv_sign_in_title),
                 color = MaterialTheme.tvColors.textPrimary,
-                style = MaterialTheme.tvTypography.title1.copy(textAlign = TextAlign.Center),
+                style = MaterialTheme.tvTypography.title2.copy(textAlign = TextAlign.Center),
             )
             TvSignInModeTabs(selected = mode, onSelect = onSelectMode)
             Box(
-                contentAlignment = Alignment.Center,
+                contentAlignment = Alignment.TopCenter,
                 modifier = Modifier.heightIn(min = 320.dp),
             ) {
                 when (mode) {
@@ -156,7 +156,7 @@ private fun TvSignInModeTabs(
                         currentTabPosition = currentTabPosition,
                         doesTabRowHaveFocus = doesTabRowHaveFocus,
                         activeColor = MaterialTheme.tvColors.backgroundActive,
-                        inactiveColor = MaterialTheme.tvColors.backgroundBase,
+                        inactiveColor = MaterialTheme.tvColors.backgroundActive20,
                     )
                 }
             },
@@ -164,7 +164,7 @@ private fun TvSignInModeTabs(
             TvSignInMode.entries.forEachIndexed { index, tabMode ->
                 Tab(
                     selected = index == selectedIndex,
-                    onFocus = {},
+                    onFocus = { onSelect(tabMode) },
                     onClick = { onSelect(tabMode) },
                     modifier = Modifier
                         .height(44.dp)

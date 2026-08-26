@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.onboarding.signin
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,6 +23,7 @@ import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
@@ -70,7 +70,6 @@ internal fun TvEmailSignInForm(
             value = state.email,
             onValueChange = onEmailChange,
             placeholder = stringResource(LR.string.profile_email),
-            isError = state.showEmailError,
             errorText = if (state.showEmailError) stringResource(LR.string.onboarding_email_invalid_message) else null,
             keyboardOptions = KeyboardOptions(
                 capitalization = KeyboardCapitalization.None,
@@ -84,7 +83,6 @@ internal fun TvEmailSignInForm(
             value = state.password,
             onValueChange = onPasswordChange,
             placeholder = stringResource(LR.string.profile_password),
-            isError = state.showPasswordError,
             errorText = if (state.showPasswordError) {
                 stringResource(LR.string.profile_create_password_requirements)
             } else {
@@ -112,15 +110,20 @@ internal fun TvEmailSignInForm(
             colors = TvButtonDefaults.filledButtonColors(),
             modifier = Modifier.fillMaxWidth(),
         ) {
-            if (state.isSubmitting) {
-                LoadingView(
-                    color = LocalContentColor.current,
-                    modifier = Modifier
-                        .size(24.dp)
-                        .semantics { contentDescription = signingInDescription },
-                )
-            } else {
-                Text(text = stringResource(LR.string.log_in))
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center,
+            ) {
+                if (state.isSubmitting) {
+                    LoadingView(
+                        color = LocalContentColor.current,
+                        modifier = Modifier
+                            .size(24.dp)
+                            .semantics { contentDescription = signingInDescription },
+                    )
+                } else {
+                    Text(text = stringResource(LR.string.log_in))
+                }
             }
         }
     }
@@ -133,7 +136,6 @@ private fun TvSignInTextField(
     placeholder: String,
     keyboardOptions: KeyboardOptions,
     keyboardActions: KeyboardActions,
-    isError: Boolean = false,
     errorText: String? = null,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     focusRequester: FocusRequester? = null,
@@ -141,19 +143,17 @@ private fun TvSignInTextField(
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
     var isFocused by remember { mutableStateOf(false) }
-    val borderColor = when {
-        isError -> MaterialTheme.colorScheme.error
-        isFocused -> MaterialTheme.tvColors.backgroundActive
-        else -> MaterialTheme.tvColors.overlayBorder
-    }
+    val fieldColor = if (isFocused) Color.White else MaterialTheme.tvColors.backgroundActive20
+    val contentColor = if (isFocused) MaterialTheme.tvColors.backgroundSunken else MaterialTheme.tvColors.textPrimary
+    val placeholderColor = if (isFocused) contentColor.copy(alpha = 0.5f) else MaterialTheme.tvColors.textSecondary
 
     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
         BasicTextField(
             value = value,
             onValueChange = onValueChange,
             singleLine = true,
-            textStyle = MaterialTheme.tvTypography.body.copy(color = MaterialTheme.tvColors.textPrimary),
-            cursorBrush = SolidColor(MaterialTheme.tvColors.textPrimary),
+            textStyle = MaterialTheme.tvTypography.body.copy(color = contentColor),
+            cursorBrush = SolidColor(contentColor),
             visualTransformation = visualTransformation,
             keyboardOptions = keyboardOptions,
             keyboardActions = keyboardActions,
@@ -185,15 +185,14 @@ private fun TvSignInTextField(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(MaterialTheme.tvColors.backgroundActive20, RoundedCornerShape(8.dp))
-                        .border(1.dp, borderColor, RoundedCornerShape(8.dp))
-                        .padding(horizontal = 16.dp, vertical = 14.dp),
+                        .background(fieldColor, RoundedCornerShape(12.dp))
+                        .padding(horizontal = 20.dp, vertical = 18.dp),
                     contentAlignment = Alignment.CenterStart,
                 ) {
                     if (value.isEmpty()) {
                         Text(
                             text = placeholder,
-                            color = MaterialTheme.tvColors.textSecondary,
+                            color = placeholderColor,
                             style = MaterialTheme.tvTypography.body,
                         )
                     }
