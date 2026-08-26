@@ -17,6 +17,6 @@ class TvCreateAccountViewModelTest {
     fun `trackShown fires create account shown event`() {
         viewModel.trackShown()
 
-        verify(eventHorizon).track(CreateAccountShownEvent(flow = OnboardingFlowType.Unknown))
+        verify(eventHorizon).track(CreateAccountShownEvent(flow = OnboardingFlowType.InitialOnboarding))
     }
 }

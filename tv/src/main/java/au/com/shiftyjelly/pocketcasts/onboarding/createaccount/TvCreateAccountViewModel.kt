@@ -13,6 +13,6 @@ class TvCreateAccountViewModel @Inject constructor(
 ) : ViewModel() {
 
     fun trackShown() {
-        eventHorizon.track(CreateAccountShownEvent(flow = OnboardingFlowType.Unknown))
+        eventHorizon.track(CreateAccountShownEvent(flow = OnboardingFlowType.InitialOnboarding))
     }
 }

@@ -16,13 +16,13 @@ class TvWelcomeViewModel @Inject constructor(
 ) : ViewModel() {
 
     fun trackShown() {
-        eventHorizon.track(SetupAccountShownEvent(flow = OnboardingFlowType.Unknown))
+        eventHorizon.track(SetupAccountShownEvent(flow = OnboardingFlowType.InitialOnboarding))
     }
 
     fun trackSignInTapped() {
         eventHorizon.track(
             SetupAccountButtonTappedEvent(
-                flow = OnboardingFlowType.Unknown,
+                flow = OnboardingFlowType.InitialOnboarding,
                 button = SetupAccountButtonType.SignIn,
             ),
         )
@@ -31,7 +31,7 @@ class TvWelcomeViewModel @Inject constructor(
     fun trackCreateAccountTapped() {
         eventHorizon.track(
             SetupAccountButtonTappedEvent(
-                flow = OnboardingFlowType.Unknown,
+                flow = OnboardingFlowType.InitialOnboarding,
                 button = SetupAccountButtonType.CreateAccount,
             ),
         )

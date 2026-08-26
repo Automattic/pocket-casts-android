@@ -20,7 +20,7 @@ class TvWelcomeViewModelTest {
     fun `trackShown fires setup account shown event`() {
         viewModel.trackShown()
 
-        verify(eventHorizon).track(SetupAccountShownEvent(flow = OnboardingFlowType.Unknown))
+        verify(eventHorizon).track(SetupAccountShownEvent(flow = OnboardingFlowType.InitialOnboarding))
     }
 
     @Test
@@ -29,7 +29,7 @@ class TvWelcomeViewModelTest {
 
         verify(eventHorizon).track(
             SetupAccountButtonTappedEvent(
-                flow = OnboardingFlowType.Unknown,
+                flow = OnboardingFlowType.InitialOnboarding,
                 button = SetupAccountButtonType.SignIn,
             ),
         )
@@ -41,7 +41,7 @@ class TvWelcomeViewModelTest {
 
         verify(eventHorizon).track(
             SetupAccountButtonTappedEvent(
-                flow = OnboardingFlowType.Unknown,
+                flow = OnboardingFlowType.InitialOnboarding,
                 button = SetupAccountButtonType.CreateAccount,
             ),
         )
