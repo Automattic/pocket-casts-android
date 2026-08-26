@@ -50,6 +50,7 @@ import com.automattic.eventhorizon.SearchShownEvent
 import com.automattic.eventhorizon.SourceViewType
 import java.util.Date
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -813,6 +814,7 @@ class TvSearchViewModelTest {
         discoverFeedLoader = TvDiscoverFeedLoader(
             listRepository = listRepository,
             settings = settings,
+            applicationScope = CoroutineScope(coroutineRule.testDispatcher),
             context = context,
         ),
         syncManager = syncManager,

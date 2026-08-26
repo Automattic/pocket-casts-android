@@ -477,7 +477,9 @@ private fun TvSearchDiscover(
                     focusRequester = rowFocusRequesters.getOrNull(0),
                     modifier = Modifier.onFocusChanged { if (it.hasFocus) lastFocusedRowIndex = 0 },
                 ) { category ->
-                    val categoryIndex = categories.indexOfFirst { it.id == category.id }
+                    val categoryIndex = remember(category.id, categories) {
+                        categories.indexOfFirst { it.id == category.id }
+                    }
                     TvCategoryTile(
                         category = category,
                         onClick = { onDiscoverCategoryClick(category, categoryIndex) },

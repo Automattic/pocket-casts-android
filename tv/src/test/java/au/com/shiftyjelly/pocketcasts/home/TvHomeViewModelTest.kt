@@ -49,6 +49,7 @@ import com.automattic.eventhorizon.HomeShownEvent
 import com.jakewharton.rxrelay2.BehaviorRelay
 import io.reactivex.Single
 import java.util.Date
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -998,6 +999,7 @@ class TvHomeViewModelTest {
         discoverFeedLoader = TvDiscoverFeedLoader(
             listRepository = listRepository,
             settings = settings,
+            applicationScope = CoroutineScope(coroutineRule.testDispatcher),
             context = context,
         ),
         playlistManager = playlistManager,

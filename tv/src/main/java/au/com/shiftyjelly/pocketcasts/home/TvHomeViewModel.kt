@@ -177,7 +177,7 @@ class TvHomeViewModel @Inject constructor(
     }
 
     suspend fun categoryCoverUrls(category: DiscoverCategory): List<String> {
-        return discoverFeedLoader.loadCategoryCoverUrls(category.source, category.id)
+        return discoverFeedLoader.loadCategoryCoverUrls(category.source)
     }
 
     fun trackHomeShown() {

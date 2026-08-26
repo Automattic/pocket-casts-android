@@ -27,6 +27,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
@@ -35,6 +36,7 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.CardDefaults
+import androidx.tv.material3.Glow
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
@@ -83,18 +85,20 @@ fun TvCategoryTile(
             containerColor = MaterialTheme.tvColors.backgroundOverlay,
             focusedContainerColor = MaterialTheme.tvColors.backgroundOverlay,
         ),
+        glow = CardDefaults.glow(
+            focusedGlow = Glow(elevationColor = Color.Black.copy(alpha = 0.5f), elevation = 8.dp),
+        ),
         interactionSource = interactionSource,
         modifier = modifier
             .width(280.dp)
-            .height(128.dp)
-            .tvFocusedCardDepth(isFocused, CardShape),
+            .height(128.dp),
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .graphicsLayer { alpha = focusProgress.coerceIn(0f, 1f) }
-                    .background(categoryGradient(colorIndex)),
+                    .background(TvCategoryStyle.gradient(colorIndex)),
             )
 
             coverUrls.firstOrNull()?.let { url ->
