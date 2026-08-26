@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.onboarding.signin
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
 
 class NextDistinctCoverIndexTest {
@@ -26,7 +27,7 @@ class NextDistinctCoverIndexTest {
     }
 
     @Test
-    fun `falls back to the starting index when every cover is mounted`() {
-        assertEquals(1, nextDistinctCoverIndex(pool, from = 1, mounted = pool.toSet()))
+    fun `returns null when every cover is mounted`() {
+        assertNull(nextDistinctCoverIndex(pool, from = 1, mounted = pool.toSet()))
     }
 }

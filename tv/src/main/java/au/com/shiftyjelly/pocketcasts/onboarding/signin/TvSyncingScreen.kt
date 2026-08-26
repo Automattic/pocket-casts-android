@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -146,6 +145,10 @@ private fun TvSyncingCoverStack(
                 continue
             }
             val index = nextDistinctCoverIndex(pool, cursor, mounted.map { it.model }.toSet())
+            if (index == null) {
+                delay(STEP_INTERVAL_MS)
+                continue
+            }
             cursor = index + 1
             val id = nextId++
             mounted.add(MountedCover(id = id, model = pool[index], rotation = coverRotation(id)))
@@ -218,14 +221,14 @@ private fun RevealedCover(cover: MountedCover) {
     }
 }
 
-internal fun nextDistinctCoverIndex(pool: List<Any>, from: Int, mounted: Set<Any>): Int {
+internal fun nextDistinctCoverIndex(pool: List<Any>, from: Int, mounted: Set<Any>): Int? {
     for (offset in pool.indices) {
         val index = (from + offset) % pool.size
         if (pool[index] !in mounted) {
             return index
         }
     }
-    return from % pool.size
+    return null
 }
 
 private fun coverRotation(id: Int): Float {
