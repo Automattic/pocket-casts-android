@@ -1,15 +1,76 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-06-30 09:54:15+0000
+Translation-Revision-Date: 2026-08-11 10:10:10+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="tv_playlist_play_all_save_and_play">儲存並播放</string>
+    <string name="tv_playlist_play_all_play_without_saving">播放但不儲存</string>
+    <string name="tv_episode_removed_from_up_next">已從「接下來播放」移除</string>
+    <string name="tv_sign_in_title">登入 Pocket Casts</string>
+    <string name="tv_create_account_modal_title">你的 Podcast 值得一個家</string>
+    <string name="tv_create_account_modal_subtitle">建立免費帳號即可追蹤 Podcast、打造專屬播放清單，並在任何裝置上隨時接續收聽。</string>
+    <string name="tv_episode_marked_as_played">已標記為已播放</string>
+    <string name="tv_episode_marked_as_unplayed">標示為未播放</string>
+    <string name="tv_episode_archived">已封存</string>
+    <string name="tv_episode_unarchived">已取消封存</string>
+    <string name="tv_episode_will_play_next">將接著播放</string>
+    <string name="tv_episode_will_play_last">將最後播放</string>
+    <string name="tv_podcast_schedule_monthly">每月</string>
+    <string name="tv_podcast_schedule_fortnightly">隔週</string>
+    <string name="tv_podcast_schedule_weekly">每週</string>
+    <string name="tv_podcast_schedule_daily">每日</string>
+    <string name="tv_podcast_schedule_hourly">每小時</string>
+    <string name="tv_podcast_next_episode_soon">即將發佈</string>
+    <string name="tv_podcast_next_episode_tomorrow">明天</string>
+    <string name="tv_podcast_info_next_episode">下一集</string>
+    <string name="tv_podcast_info_schedule">排程</string>
+    <string name="tv_podcast_info_website">網站</string>
+    <string name="tv_podcast_info_network">網路</string>
+    <string name="tv_create_account_modal_step_create">建立帳號或登入</string>
+    <string name="tv_sign_in_step_confirm_code">如果出現提示，請使用以下代碼確認</string>
+    <string name="tv_sign_in_step_login">登入你的帳號</string>
+    <string name="tv_sign_in_step_scan">掃描 QR 碼或前往「%1$s」</string>
+    <string name="tv_podcast_more_info">更多資訊</string>
+    <string name="tv_podcast_follow">追蹤此 Podcast</string>
+    <string name="tv_folder_empty_message">在行動 App 將 Podcast 新增至此資料夾，節目內容會顯示於此處。</string>
+    <string name="tv_up_next_empty_action_title">新增單集</string>
+    <string name="tv_your_podcasts_empty_action_title">探索 Podcast</string>
+    <string name="tv_your_podcasts_empty_subtitle">已追蹤的 Podcast 會顯示於此處，準備播放。</string>
+    <string name="tv_your_podcasts_empty_title">把這裡填滿吧</string>
+    <string name="tv_up_next_empty_subtitle">將單集新增至「接下來播放」，系統會依序播放這些單集</string>
+    <string name="tv_up_next_empty_title">沒有已排入佇列的項目</string>
+    <string name="tv_episode_details">單集詳細資料</string>
+    <string name="playlist">播放清單</string>
+    <string name="tv_playlist_empty_subtitle_manual">從行動 App 將單集新增至此播放清單，節目會顯示於此處。</string>
+    <string name="tv_playlist_empty_subtitle">恭喜你聽完這份清單了，或者可以在行動 App 編輯規則以獲得更多內容。</string>
+    <string name="tv_playlists_download_title">在手機建立播放清單</string>
+    <string name="tv_playlist_empty_title">沒有節目</string>
+    <string name="tv_playlist_play_all">播放所有單集</string>
+    <string name="tv_playlists_download_subtitle">完成後，下載項目就會在這裡等你播放。 掃描以取得 App</string>
+    <string name="tv_playlists_empty_title">你的播放清單會在這裡上線</string>
+    <string name="tv_playlists_empty_subtitle">手動建立，或讓「智慧規則」為你排序。</string>
+    <string name="tv_playlists_empty_action_title">建立播放清單</string>
+    <string name="tv_profile_starred_episodes">標星號的單集</string>
+    <string name="tv_home_keep_listening">繼續收聽</string>
+    <string name="settings_audio_only">僅音訊</string>
+    <string name="settings_audio_only_summary">如果開啟，含影片的單集將以僅音訊的形式播放，以節省流量。</string>
+    <string name="profile_try_duration_for_free">免費試用 %1$s</string>
+    <string name="settings_generated_chapters_summary">顯示自動產生的章節 (若有)。</string>
+    <string name="settings_generated_chapters">產生的章節</string>
+    <string name="profile_stats_listening_activity_info_title">收聽活動</string>
+    <string name="profile_stats_listening_activity_info_help">資訊</string>
+    <string name="profile_stats_listening_activity_info_summary">根據播放歷史，預估收聽的時間點。 如果你分幾天聽完一集，此記錄會在最後一天顯示。</string>
+    <string name="profile_stats_listening_activity_content_description">聆聽活動熱圖</string>
+    <string name="profile_stats_listening_activity">聆聽活動</string>
+    <string name="player_action_show_video">顯示影片</string>
+    <string name="player_action_hide_video">隱藏影片</string>
+    <string name="up_next_sort_duration_tooltip_body">從最短排序到最長 (或相反)，找出符合實際有空時間的單集。</string>
+    <string name="up_next_sort_duration_tooltip_title">依長度排序</string>
     <string name="transcript_tap_to_seek_streaming_unavailable">下載單集即可點選並搜尋</string>
     <string name="bookmark_play_from">透過「%s」播放</string>
-    <string name="profile_try_days_for_free">免費試用 30 天</string>
-    <string name="profile_start_free_trial_specific_duration">開始 30 天免費試用</string>
     <string name="summary_upsell_description">訂閱 Plus 即可存取逐字稿和其他進階版功能，例如書籤和資料夾。</string>
     <string name="summary_upsell_title">AI 摘要</string>
     <string name="tv_create_account_subtitle">掃描此代碼即可使用手機開始進行，只需一分鐘就能完成。</string>
@@ -19,8 +80,6 @@ Language: zh_TW
     <string name="tv_onboarding_welcome_back">歡迎回來！</string>
     <string name="tv_onboarding_sign_in_instructions">開啟相機並對準此 QR 碼</string>
     <string name="tv_onboarding_sign_in_title">使用手機登入</string>
-    <string name="tv_sign_in_go_to_url">前往 %1$s</string>
-    <string name="tv_sign_in_or_enter_code">或輸入以下代碼</string>
     <string name="tv_onboarding_syncing">正在同步處理你的 Podcast\u2026</string>
     <string name="tv_onboarding_browse_without_account">在未登入帳號的狀態下瀏覽</string>
     <string name="tv_onboarding_create_free_account">建立免費帳號</string>
@@ -129,14 +188,10 @@ Language: zh_TW
     <string name="watch_synced_successfully">已成功同步觀看</string>
     <string name="watch_sync_waiting_for_phone">正等待手機同步…</string>
     <string name="watch_sync_retry">再試一次</string>
-    <string name="watch_sync_error_unknown_help">再試一次，或手動登入</string>
     <string name="watch_sync_error_login_failed_help">嘗試手動登入</string>
     <string name="watch_sync_error_no_connection_help">檢查與手機的藍牙連線</string>
-    <string name="watch_sync_error_timeout_help">確認手機在身邊，且已透過藍牙連線</string>
-    <string name="watch_sync_error_unknown">發生錯誤</string>
     <string name="watch_sync_error_login_failed">登入失敗</string>
     <string name="watch_sync_error_no_connection">手機未連線</string>
-    <string name="watch_sync_error_timeout">無法連線至手機</string>
     <string name="watch_sync_success">已從手機登入！</string>
     <string name="watch_sync_syncing">正與手機同步…</string>
     <string name="error_download_generic_failure">無法下載本集。 %1$s</string>
@@ -2394,6 +2449,12 @@ Language: zh_TW
     </plurals>
     <plurals name="settings_auto_download_on_follow_podcast_description">
         <item quantity="other">自動下載所追蹤新節目的最新 %s 集。</item>
+    </plurals>
+    <plurals name="tv_playlist_all_archived">
+        <item quantity="other">此播放清單的所有 %1$d 個單集皆已封存。</item>
+    </plurals>
+    <plurals name="tv_podcast_all_archived">
+        <item quantity="other">此 Podcast 的所有 %1$d 個單集皆已封存。</item>
     </plurals>
     <plurals name="week_with_count">
         <item quantity="other">%1$d 週</item>

@@ -16,7 +16,7 @@ sealed interface CombinedResult {
         val uuid: String,
         val title: String? = null,
         val author: String? = "",
-        val slug: String,
+        val slug: String? = null,
         val explicit: Boolean? = null,
     ) : CombinedResult
 
@@ -26,19 +26,24 @@ sealed interface CombinedResult {
         val title: String,
         @Json(name = "published_date")
         val publishedDate: Date = Date(),
-        val url: String,
+        val url: String? = null,
         val duration: Long = 0L,
         @Json(name = "podcast_uuid")
         val podcastUuid: String,
         @Json(name = "podcast_title")
         val podcastTitle: String,
         @Json(name = "podcast_slug")
-        val podcastSlug: String,
+        val podcastSlug: String? = null,
+        @Json(name = "has_video")
+        val hasVideo: Boolean? = null,
     ) : CombinedResult
+
+    data object Unknown : CombinedResult
 
     companion object {
         val jsonAdapter = PolymorphicJsonAdapterFactory.of(CombinedResult::class.java, "type")
             .withSubtype(PodcastResult::class.java, "podcast")
             .withSubtype(EpisodeResult::class.java, "episode")
+            .withDefaultValue(Unknown)
     }
 }

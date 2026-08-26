@@ -106,6 +106,8 @@ class VideoView @JvmOverloads constructor(
         isSurfaceConnected = false
     }
 
+    override fun videoFirstFrameRendered() = Unit
+
     override fun surfaceCreated(holder: SurfaceHolder) {
         isSurfaceCreated = true
         isSurfaceConnected = false

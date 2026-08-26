@@ -1,15 +1,76 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-06-30 14:57:29+0000
+Translation-Revision-Date: 2026-08-11 11:56:43+0000
 Plural-Forms: nplurals=2; plural=n > 1;
 Generator: GlotPress/2.4.0-alpha
 Language: fr
 -->
 <resources>
+    <string name="tv_playlist_play_all_save_and_play">Enregistrer et lire</string>
+    <string name="tv_playlist_play_all_play_without_saving">Lire sans enregistrer</string>
+    <string name="tv_episode_removed_from_up_next">Supprimé de À suivre</string>
+    <string name="tv_sign_in_title">Se connecter à Pocket Casts</string>
+    <string name="tv_create_account_modal_title">Vos podcasts méritent un accueil chaleureux</string>
+    <string name="tv_create_account_modal_subtitle">Créez un compte gratuit pour suivre des podcasts, créer votre file d’attente et reprendre là où vous en étiez, sur n’importe quel appareil.</string>
+    <string name="tv_episode_marked_as_played">Marqué comme lu</string>
+    <string name="tv_episode_marked_as_unplayed">Marquer comme non lu</string>
+    <string name="tv_episode_archived">Archivé</string>
+    <string name="tv_episode_unarchived">Désarchivé</string>
+    <string name="tv_episode_will_play_next">Sera lu ensuite</string>
+    <string name="tv_episode_will_play_last">Sera lu en dernier</string>
+    <string name="tv_podcast_schedule_monthly">Mensuel</string>
+    <string name="tv_podcast_schedule_fortnightly">Bimensuel</string>
+    <string name="tv_podcast_schedule_weekly">Hebdomadaire</string>
+    <string name="tv_podcast_schedule_daily">Quotidien</string>
+    <string name="tv_podcast_schedule_hourly">Toutes les heures</string>
+    <string name="tv_podcast_next_episode_soon">D’un jour à l’autre</string>
+    <string name="tv_podcast_next_episode_tomorrow">Demain</string>
+    <string name="tv_podcast_info_next_episode">Épisode suivant</string>
+    <string name="tv_podcast_info_schedule">Planifier</string>
+    <string name="tv_podcast_info_website">Site Web</string>
+    <string name="tv_podcast_info_network">Réseau</string>
+    <string name="tv_create_account_modal_step_create">Créer un compte ou se connecter</string>
+    <string name="tv_sign_in_step_confirm_code">Si demandé, confirmez avec le code ci-dessous</string>
+    <string name="tv_sign_in_step_login">Connectez-vous à votre compte.</string>
+    <string name="tv_sign_in_step_scan">Scanner le code QR ou accéder à %1$s</string>
+    <string name="tv_podcast_more_info">En savoir plus </string>
+    <string name="tv_podcast_follow">Suivre ce podcast</string>
+    <string name="tv_folder_empty_message">Ajoutez des podcasts à ce dossier dans l’application mobile et ils s’afficheront ici.</string>
+    <string name="tv_up_next_empty_action_title">Ajouter des épisodes</string>
+    <string name="tv_your_podcasts_empty_action_title">Découvrir des podcasts</string>
+    <string name="tv_your_podcasts_empty_subtitle">Les podcasts suivis s’affichent ici, prêts à être lus.</string>
+    <string name="tv_your_podcasts_empty_title">Il est temps de remplir cette section</string>
+    <string name="tv_up_next_empty_subtitle">Ajoutez des épisodes à la file d’attente et ils seront lus dans l’ordre, l’un à la suite de l’autre</string>
+    <string name="tv_up_next_empty_title">Il n’y a rien dans la file d’attente</string>
+    <string name="tv_episode_details">Détails de l’épisode</string>
+    <string name="playlist">Liste de lecture</string>
+    <string name="tv_playlist_empty_subtitle_manual">Ajoutez des épisodes à cette liste de lecture à partir de l’application mobile et ils s’afficheront ici.</string>
+    <string name="tv_playlist_empty_subtitle">Il est temps de fêter la fin de cette liste ou de modifier vos règles dans l’application afin d’en obtenir d’autres.</string>
+    <string name="tv_playlists_download_title">Créer des listes de lecture sur votre téléphone</string>
+    <string name="tv_playlist_empty_title">Aucun épisode</string>
+    <string name="tv_playlist_play_all">Lire tous les épisodes</string>
+    <string name="tv_playlists_download_subtitle">Ils vous attendront ici lorsque vous aurez terminé. Scanner pour obtenir l’application</string>
+    <string name="tv_playlists_empty_title">Vos playlists sont ici</string>
+    <string name="tv_playlists_empty_subtitle">Créez-en une manuellement ou laissez les règles intelligentes effectuer le tri pour vous.</string>
+    <string name="tv_playlists_empty_action_title">Créer une liste de lecture</string>
+    <string name="tv_profile_starred_episodes">Épisodes marqués d’une étoile</string>
+    <string name="tv_home_keep_listening">Continuer à écouter</string>
+    <string name="settings_audio_only_summary">Si cette option est activée, les épisodes vidéo seront lus uniquement en tant qu’audio, ce qui permet d’économiser des données.</string>
+    <string name="settings_audio_only">Audio uniquement</string>
+    <string name="profile_try_duration_for_free">Essayer %1$s gratuitement</string>
+    <string name="settings_generated_chapters_summary">Affichez les chapitres générés automatiquement lorsqu’ils sont disponibles.</string>
+    <string name="settings_generated_chapters">Chapitres générés</string>
+    <string name="profile_stats_listening_activity_info_summary">Une estimation du moment où vous avez écouté, en fonction de votre historique de lecture. Si vous terminez un épisode sur quelques jours, il s’affiche le dernier jour.</string>
+    <string name="profile_stats_listening_activity_info_title">Activité d’écoute</string>
+    <string name="profile_stats_listening_activity_info_help">Informations</string>
+    <string name="profile_stats_listening_activity_content_description">Carte des activités d’écoute</string>
+    <string name="profile_stats_listening_activity">Activité d’écoute</string>
+    <string name="player_action_show_video">Afficher la vidéo</string>
+    <string name="player_action_hide_video">Masquer la vidéo</string>
+    <string name="up_next_sort_duration_tooltip_body">Du plus court au plus long, ou l’inverse, ajustez l’épisode au temps dont vous disposez réellement.</string>
+    <string name="up_next_sort_duration_tooltip_title">Trier par durée</string>
     <string name="transcript_tap_to_seek_streaming_unavailable">Téléchargez l’épisode afin de pouvoir appuyer pour chercher</string>
     <string name="bookmark_play_from">Lire à partir de %s</string>
-    <string name="profile_try_days_for_free">Essayer 30 jours gratuitement</string>
-    <string name="profile_start_free_trial_specific_duration">Démarrer votre essai gratuit de 30 jours</string>
     <string name="summary_upsell_description">Abonnez-vous à Plus pour y avoir accès ainsi qu’à d’autres fonctionnalités Premium comme les signets et les dossiers.</string>
     <string name="summary_upsell_title">Résumés alimentés par l’IA</string>
     <string name="tv_create_account_subtitle">Scannez ce code pour commencer sur votre téléphone, cela ne prend qu’une minute.</string>
@@ -19,8 +80,6 @@ Language: fr
     <string name="tv_onboarding_welcome_back">Bon retour !</string>
     <string name="tv_onboarding_sign_in_instructions">Ouvrez votre appareil photo et pointez votre appareil sur ce code QR</string>
     <string name="tv_onboarding_sign_in_title">Se connecter avec votre téléphone</string>
-    <string name="tv_sign_in_go_to_url">accédez à %1$s</string>
-    <string name="tv_sign_in_or_enter_code">ou saisissez le code suivant</string>
     <string name="tv_onboarding_syncing">Synchronisation de vos podcasts\u2026</string>
     <string name="tv_onboarding_browse_without_account">Parcourir sans compte</string>
     <string name="tv_onboarding_create_free_account">Créer un compte gratuit</string>
@@ -129,14 +188,10 @@ Language: fr
     <string name="watch_synced_successfully">La montre a bien été synchronisée</string>
     <string name="watch_sync_waiting_for_phone">En attente de la synchronisation du téléphone…</string>
     <string name="watch_sync_retry">Réessayer</string>
-    <string name="watch_sync_error_unknown_help">Réessayer ou se connecter manuellement</string>
     <string name="watch_sync_error_login_failed_help">Essayez de vous connecter manuellement</string>
     <string name="watch_sync_error_no_connection_help">Vérifier la connexion Bluetooth à votre téléphone</string>
-    <string name="watch_sync_error_timeout_help">Vérifiez que votre téléphone se trouve à proximité et qu’il est connecté via Bluetooth</string>
-    <string name="watch_sync_error_unknown">Un problème est survenu</string>
     <string name="watch_sync_error_login_failed">La connexion a échoué</string>
     <string name="watch_sync_error_no_connection">Téléphone non connecté</string>
-    <string name="watch_sync_error_timeout">Échec de la connexion au téléphone</string>
     <string name="watch_sync_success">Connecté depuis le téléphone !</string>
     <string name="watch_sync_syncing">Synchronisation avec le téléphone…</string>
     <string name="error_download_generic_failure">Échec du téléchargement de l’épisode. %1$s</string>
@@ -2428,6 +2483,14 @@ Language: fr
     <plurals name="settings_auto_download_on_follow_podcast_description">
         <item quantity="one">Téléchargez automatiquement le dernier épisode des nouvelles émissions auxquelles vous vous abonnez.</item>
         <item quantity="other">Téléchargez automatiquement les %s derniers épisodes des nouvelles émissions auxquelles vous vous abonnez.</item>
+    </plurals>
+    <plurals name="tv_playlist_all_archived">
+        <item quantity="one">Le seul épisode de cette liste de lecture a été archivé.</item>
+        <item quantity="other">Tous les %1$d épisodes de cette liste de lecture ont été archivés.</item>
+    </plurals>
+    <plurals name="tv_podcast_all_archived">
+        <item quantity="one">Le seul épisode de ce podcast a été archivé.</item>
+        <item quantity="other">Les %1$d épisodes de ce podcast ont tous été archivés.</item>
     </plurals>
     <plurals name="week_with_count">
         <item quantity="one">%1$d semaine</item>

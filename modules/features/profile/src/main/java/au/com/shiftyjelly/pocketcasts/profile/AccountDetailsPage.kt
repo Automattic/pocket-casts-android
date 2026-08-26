@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -33,7 +34,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingSubscriptionPlan
-import au.com.shiftyjelly.pocketcasts.analytics.experiments.TrialCtaCopyTreatment
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.PreviewAutomotive
 import au.com.shiftyjelly.pocketcasts.compose.PreviewOrientation
@@ -85,7 +85,7 @@ internal fun AccountDetailsPage(
                     badgeIconSize = 18.dp,
                     badgeContentPadding = 6.dp,
                 ),
-                infoFontScale = 1.6f,
+                infoFontScale = 2f,
             )
         } else {
             AccountHeaderConfig(
@@ -101,6 +101,10 @@ internal fun AccountDetailsPage(
             AccountSectionsConfig(
                 iconSize = 48.dp,
                 fontScale = 2f,
+                contentPadding = PaddingValues(horizontal = 24.dp, vertical = 20.dp),
+                iconSpacing = 24.dp,
+                minRowHeight = 96.dp,
+                groupSpacing = 32.dp,
             )
         } else {
             AccountSectionsConfig()
@@ -109,7 +113,7 @@ internal fun AccountDetailsPage(
     val sectionsState = remember(state.isAutomotive, state.sectionsState) {
         if (state.isAutomotive) {
             state.sectionsState.copy(
-                availableSections = listOf(AccountSection.SignOut),
+                availableSections = listOf(AccountSection.SignOut, AccountSection.DeleteAccount),
             )
         } else {
             state.sectionsState
@@ -152,7 +156,6 @@ internal fun AccountDetailsPage(
                             NewUpgradeAccountCard(
                                 onClickSubscribe = onAccountUpgradeClick,
                                 recommendedPlan = plan,
-                                trialCtaCopyTreatment = state.trialCtaCopyTreatment,
                             )
                         }
                     }
@@ -190,7 +193,6 @@ private fun NewUpgradeAccountCard(
     recommendedPlan: OnboardingSubscriptionPlan,
     onClickSubscribe: () -> Unit,
     modifier: Modifier = Modifier,
-    trialCtaCopyTreatment: TrialCtaCopyTreatment? = null,
 ) {
     Card(
         modifier = modifier,
@@ -232,7 +234,7 @@ private fun NewUpgradeAccountCard(
                 LocalRippleConfiguration provides RippleConfiguration(NoContentBannerColors.default(MaterialTheme.theme.colors).buttonRipple),
             ) {
                 RowButton(
-                    text = recommendedPlan.ctaButtonText(isRenewingSubscription = false, trialCtaCopyTreatment = trialCtaCopyTreatment),
+                    text = recommendedPlan.ctaButtonText(isRenewingSubscription = false),
                     colors = ButtonDefaults.buttonColors(
                         backgroundColor = MaterialTheme.theme.colors.primaryInteractive01,
                     ),
@@ -251,7 +253,6 @@ internal data class AccountDetailsPageState(
     val headerState: AccountHeaderState,
     val recommendedPlan: OnboardingSubscriptionPlan?,
     val sectionsState: AccountSectionsState,
-    val trialCtaCopyTreatment: TrialCtaCopyTreatment? = null,
 )
 
 @PreviewOrientation

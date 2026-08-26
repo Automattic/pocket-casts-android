@@ -89,6 +89,7 @@ class SettingsImpl @Inject constructor(
         private const val END_OF_YEAR_SHOW_MODAL_2025_KEY = "EndOfYearModalShowModal2025Key"
         private const val DONE_INITIAL_ONBOARDING_KEY = "CompletedOnboardingKey"
         private const val PROCESSED_SIGNOUT_KEY = "ProcessedSignout"
+        private const val MIGRATED_VERSION_CODE_KEY = "MIGRATED_VERSION_CODE"
         private const val NEEDS_LOGIN_PROMPT_AFTER_RESTORE_KEY = "NeedsLoginPromptAfterRestore"
     }
 
@@ -183,6 +184,12 @@ class SettingsImpl @Inject constructor(
 
     override val freeGiftAcknowledged = UserSetting.BoolPref(
         sharedPrefKey = "freeGiftAck",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
+
+    override val audioOnly = UserSetting.BoolPref(
+        sharedPrefKey = "audioOnly",
         defaultValue = false,
         sharedPrefs = sharedPreferences,
     )
@@ -582,6 +589,29 @@ class SettingsImpl @Inject constructor(
         setCancelledAcknowledged(false)
     }
 
+    override fun clearUserPreferences() {
+        val preservedKeys = listOf(collectAnalytics, sendCrashReports, linkCrashReportsToUser)
+            .flatMap { setting -> listOf(setting.sharedPrefKey, "${setting.sharedPrefKey}ModifiedAt") }
+            .toSet() + setOf(
+            PROCESSED_SIGNOUT_KEY,
+            MIGRATED_VERSION_CODE_KEY,
+            AccountConstants.ANON_ID_KEY,
+            Settings.PREFERENCE_STORAGE_CHOICE,
+            Settings.PREFERENCE_STORAGE_CHOICE_NAME,
+            Settings.PREFERENCE_STORAGE_CUSTOM_FOLDER,
+        )
+        val preferenceStores = listOf(sharedPreferences, privatePreferences)
+        preferenceStores.forEach { preferences ->
+            preferences.edit(commit = true) {
+                preferences.all.keys
+                    .filterNot { key -> key in preservedKeys }
+                    .forEach { key -> remove(key) }
+            }
+        }
+        preferenceStores.forEach { preferences -> UserSetting.refreshAll(preferences) }
+        refreshStateFlow.value = RefreshState.Never
+    }
+
     private fun getDefaultCountryCode(): String {
         val languageCode = languageCode
         if (languageCode != null) {
@@ -653,6 +683,12 @@ class SettingsImpl @Inject constructor(
     override val openPlayerAutomatically = UserSetting.BoolPref(
         sharedPrefKey = "openPlayerAutomatically",
         defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
+
+    override val showGeneratedChapters: UserSetting<Boolean> = UserSetting.BoolPref(
+        sharedPrefKey = "showGeneratedChapters",
+        defaultValue = true,
         sharedPrefs = sharedPreferences,
     )
 
@@ -759,11 +795,11 @@ class SettingsImpl @Inject constructor(
     )
 
     override fun getMigratedVersionCode(): Int {
-        return getInt("MIGRATED_VERSION_CODE", 0)
+        return getInt(MIGRATED_VERSION_CODE_KEY, 0)
     }
 
     override fun setMigratedVersionCode(versionCode: Int) {
-        setInt("MIGRATED_VERSION_CODE", versionCode)
+        setInt(MIGRATED_VERSION_CODE_KEY, versionCode)
     }
 
     override val podcastBadgeType = UserSetting.PrefFromInt<BadgeType>(

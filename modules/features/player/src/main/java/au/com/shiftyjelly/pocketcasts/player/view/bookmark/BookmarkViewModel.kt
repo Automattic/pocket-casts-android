@@ -15,6 +15,7 @@ import com.automattic.eventhorizon.BookmarkEditFormShownEvent
 import com.automattic.eventhorizon.BookmarkEditFormSubmittedEvent
 import com.automattic.eventhorizon.BookmarkSourceType
 import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.SourceViewType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -122,15 +123,30 @@ class BookmarkViewModel
         }
     }
 
-    fun onShown() {
-        eventHorizon.track(BookmarkEditFormShownEvent)
+    fun onShown(isNewBookmark: Boolean) {
+        eventHorizon.track(
+            BookmarkEditFormShownEvent(
+                source = SourceViewType.Player,
+                isNewBookmark = isNewBookmark,
+            ),
+        )
     }
 
     fun onClose() {
-        eventHorizon.track(BookmarkEditFormDismissedEvent)
+        eventHorizon.track(
+            BookmarkEditFormDismissedEvent(
+                source = SourceViewType.Player,
+                isNewBookmark = uiState.value.isNewBookmark,
+            ),
+        )
     }
 
     fun onSubmitBookmark() {
-        eventHorizon.track(BookmarkEditFormSubmittedEvent)
+        eventHorizon.track(
+            BookmarkEditFormSubmittedEvent(
+                source = SourceViewType.Player,
+                isNewBookmark = uiState.value.isNewBookmark,
+            ),
+        )
     }
 }

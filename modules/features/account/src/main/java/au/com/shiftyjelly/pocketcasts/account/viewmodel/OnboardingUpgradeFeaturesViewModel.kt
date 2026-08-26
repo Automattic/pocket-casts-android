@@ -6,9 +6,7 @@ import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingSubscriptionPlan
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.Experiment
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentProvider
-import au.com.shiftyjelly.pocketcasts.analytics.experiments.TrialCtaCopyTreatment
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.Variation
-import au.com.shiftyjelly.pocketcasts.analytics.experiments.getTrialCtaCopyTreatment
 import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
 import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
 import au.com.shiftyjelly.pocketcasts.payment.PurchaseResult
@@ -83,7 +81,6 @@ class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
             plansFilter = plansFilter,
             purchaseFailed = false,
             shouldUseInstallmentPlans = shouldUseInstallmentPlans,
-            trialCtaCopyTreatment = experimentProvider.getTrialCtaCopyTreatment(),
         )
     }
 
@@ -280,7 +277,6 @@ sealed class OnboardingUpgradeFeaturesState {
         val plansFilter: LoadedPlansFilter,
         val purchaseFailed: Boolean,
         val shouldUseInstallmentPlans: Boolean = false,
-        val trialCtaCopyTreatment: TrialCtaCopyTreatment? = null,
     ) : OnboardingUpgradeFeaturesState() {
         val availableBasePlans = listOfNotNull(
             plusYearlyPlanWithOffer().takeUnless { plansFilter == LoadedPlansFilter.PATRON_ONLY },

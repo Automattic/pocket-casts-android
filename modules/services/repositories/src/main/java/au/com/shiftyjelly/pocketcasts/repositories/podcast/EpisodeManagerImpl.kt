@@ -5,7 +5,6 @@ import androidx.media3.common.util.UnstableApi
 import androidx.room.withTransaction
 import androidx.sqlite.db.SimpleSQLiteQuery
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
-import au.com.shiftyjelly.pocketcasts.models.converter.EpisodeDownloadStatusConverter
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -149,7 +148,7 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
-    override suspend fun findEpisodesByPodcastOrderedSuspend(podcast: Podcast): List<PodcastEpisode> {
+    override suspend fun findEpisodesByPodcastOrdered(podcast: Podcast): List<PodcastEpisode> {
         return when (podcast.episodesSortType) {
             EpisodesSortType.EPISODES_SORT_BY_TITLE_ASC -> episodeDao.findByPodcastOrderTitleAsc(podcastUuid = podcast.uuid)
             EpisodesSortType.EPISODES_SORT_BY_TITLE_DESC -> episodeDao.findByPodcastOrderTitleDesc(podcastUuid = podcast.uuid)
@@ -178,30 +177,6 @@ class EpisodeManagerImpl @Inject constructor(
         }
         query += queryAfterWhere
         return episodeDao.findEpisodesBlocking(SimpleSQLiteQuery(query))
-    }
-
-    override fun episodeCountRxFlowable(queryAfterWhere: String): Flowable<Int> {
-        return appDatabase.podcastDao().findUnsubscribedUuidRxFlowable()
-            .switchMap {
-                val podcastList = it.joinToString(separator = "', '", prefix = "podcast_id NOT IN ('", postfix = "')")
-                val query = "SELECT COUNT(*) FROM podcast_episodes WHERE $podcastList AND $queryAfterWhere"
-                return@switchMap Flowable.just(query)
-            }
-            .switchMap {
-                episodeDao.countRxFlowable(SimpleSQLiteQuery(it))
-            }
-    }
-
-    override fun findEpisodesWhereRxFlowable(queryAfterWhere: String): Flowable<List<PodcastEpisode>> {
-        return appDatabase.podcastDao().findUnsubscribedUuidRxFlowable()
-            .switchMap {
-                val podcastList = it.joinToString(separator = "', '", prefix = "podcast_id NOT IN ('", postfix = "')")
-                val query = "SELECT podcast_episodes.* FROM podcast_episodes WHERE $podcastList AND $queryAfterWhere"
-                return@switchMap Flowable.just(query)
-            }
-            .switchMap {
-                episodeDao.findEpisodesRxFlowable(SimpleSQLiteQuery(it))
-            }
     }
 
     override fun findPlaybackHistoryEpisodesFlow(): Flow<List<PodcastEpisode>> {
@@ -283,16 +258,6 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
-    override fun updateDownloadErrorDetailsBlocking(episode: BaseEpisode?, message: String?) {
-        if (episode == null) return
-        episode.downloadErrorDetails = message
-        if (episode is PodcastEpisode) {
-            episodeDao.updateBlocking(episode)
-        } else if (episode is UserEpisode) {
-            runBlocking { userEpisodeManager.updateDownloadErrorDetails(episode, message) }
-        }
-    }
-
     override suspend fun updatePlaybackInteractionDate(episode: BaseEpisode?) {
         if (episode == null) {
             return
@@ -300,8 +265,16 @@ class EpisodeManagerImpl @Inject constructor(
 
         // We don't have a playback interaction date for user episodes, just episodes
         if (episode is PodcastEpisode) {
-            episodeDao.updatePlaybackInteractionDate(episode.uuid, System.currentTimeMillis())
+            episodeDao.updatePlaybackInteraction(
+                uuid = episode.uuid,
+                interactionDate = System.currentTimeMillis(),
+                syncStatus = PodcastEpisode.LAST_PLAYBACK_INTERACTION_NOT_SYNCED,
+            )
         }
+    }
+
+    override suspend fun updatePlaybackInteraction(episodeUuid: String, interactionDate: Long, syncStatus: Long) {
+        episodeDao.updatePlaybackInteraction(episodeUuid, interactionDate, syncStatus)
     }
 
     override fun updatePlayingStatusBlocking(episode: BaseEpisode?, status: EpisodePlayingStatus) {
@@ -528,10 +501,6 @@ class EpisodeManagerImpl @Inject constructor(
         return episodeDao.count()
     }
 
-    override fun countEpisodesWhereBlocking(queryAfterWhere: String): Int {
-        return episodeDao.countWhereBlocking(queryAfterWhere, appDatabase)
-    }
-
     override fun addBlocking(episode: PodcastEpisode, downloadMetaData: Boolean): Boolean {
         val episodes = ArrayList<PodcastEpisode>()
         episodes.add(episode)
@@ -718,18 +687,6 @@ class EpisodeManagerImpl @Inject constructor(
 
     override suspend fun findStarredEpisodes(): List<PodcastEpisode> {
         return episodeDao.findStarredEpisodes()
-    }
-
-    override fun findEpisodesDownloadingBlocking(): List<PodcastEpisode> {
-        val statuses = EpisodeDownloadStatus.entries.filter { it.isCancellable }
-        val converter = EpisodeDownloadStatusConverter()
-        val sql = statuses.joinToString(
-            prefix = "(",
-            postfix = ")",
-            separator = " OR ",
-            transform = { "episode_status = ${converter.toInt(it)}" },
-        )
-        return findEpisodesWhereBlocking(sql)
     }
 
     override fun addBlocking(episodes: List<PodcastEpisode>, podcastUuid: String, downloadMetaData: Boolean): List<PodcastEpisode> {

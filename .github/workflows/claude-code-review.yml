@@ -54,7 +54,7 @@ jobs:
       - name: Run Claude Code Review
         if: steps.workflow-changes.outputs.skip != 'true'
         id: claude-review
-        uses: anthropics/claude-code-action@e90deca47693f9457b72f2b53c17d7c445a87342 # v1.0.171
+        uses: anthropics/claude-code-action@9d7150bc8a3dae8149739a88019d192b579ad90c # v1.0.193
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           track_progress: true
