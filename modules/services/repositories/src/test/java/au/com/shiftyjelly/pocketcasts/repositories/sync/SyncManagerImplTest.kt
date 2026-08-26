@@ -11,8 +11,11 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.DeviceTokenResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenResponse
 import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.UserAccountCreatedEvent
+import com.automattic.eventhorizon.UserSignedInEvent
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -46,13 +49,14 @@ class SyncManagerImplTest {
     private lateinit var notificationManager: NotificationManager
 
     private lateinit var syncManager: SyncManagerImpl
+    private val eventSink = TestEventSink()
 
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
 
         syncManager = SyncManagerImpl(
-            eventHorizon = EventHorizon(TestEventSink()),
+            eventHorizon = EventHorizon(eventSink),
             context = context,
             settings = settings,
             syncAccountManager = syncAccountManager,
@@ -87,16 +91,18 @@ class SyncManagerImplTest {
     }
 
     @Test
-    fun `device auth login as new account updates sync feature interaction`() = runTest {
+    fun `device auth login as new account fires account created event`() = runTest {
         whenever(syncServiceManager.deviceToken(any(), any())).thenReturn(createDeviceTokenResponse())
         syncManager.loginWithDeviceAuth("device-code", SignInSource.UserInitiated.Onboarding, isNewAccount = true)
+        assertTrue(eventSink.pollEvent() is UserAccountCreatedEvent)
         verifyNotificationCalled()
     }
 
     @Test
-    fun `device auth login as existing account does not update sync feature interaction`() = runTest {
+    fun `device auth login as existing account fires signed in event`() = runTest {
         whenever(syncServiceManager.deviceToken(any(), any())).thenReturn(createDeviceTokenResponse())
         syncManager.loginWithDeviceAuth("device-code", SignInSource.UserInitiated.Onboarding, isNewAccount = false)
+        assertTrue(eventSink.pollEvent() is UserSignedInEvent)
         verifyNotificationNotCalled()
     }
 

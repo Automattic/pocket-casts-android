@@ -197,6 +197,22 @@ private fun createAccountSteps(verificationUri: String): List<String> {
 
 @Preview(device = Devices.TV_1080p)
 @Composable
+private fun TvCreateAccountScreenLoadingPreview() {
+    TvTheme {
+        TvCreateAccountLoading()
+    }
+}
+
+@Preview(device = Devices.TV_1080p)
+@Composable
+private fun TvCreateAccountScreenErrorPreview() {
+    TvTheme {
+        TvCreateAccountError(onRetry = {})
+    }
+}
+
+@Preview(device = Devices.TV_1080p)
+@Composable
 private fun TvCreateAccountScreenContentPreview() {
     TvTheme {
         TvCreateAccountContent(
