@@ -179,6 +179,20 @@ class TvScaffoldViewModelTest {
     }
 
     @Test
+    fun `keeps now playing selected when the queue reports later than the debounce window`() = runTest {
+        viewModel.uiState.test {
+            assertEquals(TvTab.Home, awaitItem().selectedTab)
+
+            viewModel.openNowPlaying()
+            coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+            queueChanges.onNext(loadedQueue)
+            coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+            assertEquals(TvTab.NowPlaying, expectMostRecentItem().selectedTab)
+        }
+    }
+
+    @Test
     fun `profile is signed out without an account`() = runTest {
         viewModel.uiState.test {
             assertEquals(TvProfileState.SignedOut, awaitItem().profile)

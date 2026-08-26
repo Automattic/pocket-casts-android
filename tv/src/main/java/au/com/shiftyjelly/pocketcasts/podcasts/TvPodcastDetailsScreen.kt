@@ -48,6 +48,7 @@ import au.com.shiftyjelly.pocketcasts.component.TvArchivedFilterButton
 import au.com.shiftyjelly.pocketcasts.component.TvArtworkImage
 import au.com.shiftyjelly.pocketcasts.component.TvEmptyState
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeActionContext
+import au.com.shiftyjelly.pocketcasts.component.TvEpisodeActions
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeActionsModal
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeActionsViewModel
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeInfoModal
@@ -83,7 +84,7 @@ fun TvPodcastDetailsScreen(
         key = podcastUuid,
         creationCallback = { factory -> factory.create(podcastUuid) },
     ),
-    episodeActions: TvEpisodeActionsViewModel = hiltViewModel(),
+    episodeActions: TvEpisodeActions = hiltViewModel<TvEpisodeActionsViewModel>(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val openNowPlaying = LocalOpenNowPlaying.current

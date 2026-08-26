@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -34,21 +35,6 @@ class TvScaffoldViewModel @Inject constructor(
         .map { state -> state is UpNextQueue.State.Loaded }
         .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
-    init {
-        viewModelScope.launch { leaveNowPlayingWhenEpisodeCleared() }
-    }
-
-    @OptIn(FlowPreview::class)
-    private suspend fun leaveNowPlayingWhenEpisodeCleared() {
-        hasCurrentEpisode
-            .debounce(NOW_PLAYING_EMPTY_DEBOUNCE_MS)
-            .collect { hasEpisode ->
-                if (!hasEpisode && selectedTab.value == TvTab.NowPlaying) {
-                    selectedTab.value = TvTab.Home
-                }
-            }
-    }
-
     val uiState: StateFlow<TvScaffoldUiState> = combine(
         selectedTab,
         hasCurrentEpisode,
@@ -66,6 +52,10 @@ class TvScaffoldViewModel @Inject constructor(
         initialValue = TvScaffoldUiState(profile = currentProfileState()),
     )
 
+    init {
+        viewModelScope.launch { leaveNowPlayingWhenEpisodeCleared() }
+    }
+
     fun selectTab(tab: TvTab) {
         selectedTab.value = tab
     }
@@ -76,6 +66,18 @@ class TvScaffoldViewModel @Inject constructor(
 
     fun signOut() {
         signOutManager.signOutAndWipeData()
+    }
+
+    @OptIn(FlowPreview::class)
+    private suspend fun leaveNowPlayingWhenEpisodeCleared() {
+        hasCurrentEpisode
+            .drop(1)
+            .debounce(NOW_PLAYING_EMPTY_DEBOUNCE_MS)
+            .collect { hasEpisode ->
+                if (!hasEpisode && selectedTab.value == TvTab.NowPlaying) {
+                    selectedTab.value = TvTab.Home
+                }
+            }
     }
 
     private fun currentProfileState() = profileState(syncManager.isLoggedIn(), syncManager.getEmail())
