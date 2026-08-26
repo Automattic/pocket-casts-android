@@ -1,23 +1,32 @@
 package au.com.shiftyjelly.pocketcasts.onboarding
 
 import app.cash.turbine.test
+import au.com.shiftyjelly.pocketcasts.onboarding.signin.TvSignInMode
 import au.com.shiftyjelly.pocketcasts.onboarding.signin.TvSignInUiState
 import au.com.shiftyjelly.pocketcasts.onboarding.signin.TvSignInViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
 import au.com.shiftyjelly.pocketcasts.repositories.sync.LoginResult
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SignInSource
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.model.AuthResultModel
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.DeviceAuthorizeResponse
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.SignInType
+import com.automattic.eventhorizon.SignInTypeTappedEvent
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -27,13 +36,14 @@ class TvSignInViewModelTest {
     val coroutineRule = MainCoroutineRule()
 
     private val syncManager = mock<SyncManager>()
+    private val eventHorizon = mock<EventHorizon>()
 
     @Test
     fun `successful device authorize transitions to Ready state`() = runTest {
         whenever(syncManager.deviceAuthorize()).thenReturn(createDeviceAuthorizeResponse())
         whenever(syncManager.loginWithDeviceAuth(any(), any())).thenReturn(createLoginSuccess())
 
-        val viewModel = TvSignInViewModel(syncManager)
+        val viewModel = createViewModel()
 
         viewModel.uiState.test {
             val state = awaitItem()
@@ -51,7 +61,7 @@ class TvSignInViewModelTest {
     fun `device authorize failure transitions to Error state`() = runTest {
         whenever(syncManager.deviceAuthorize()).thenThrow(RuntimeException("Network error"))
 
-        val viewModel = TvSignInViewModel(syncManager)
+        val viewModel = createViewModel()
 
         viewModel.uiState.test {
             assertEquals(TvSignInUiState.Error, awaitItem())
@@ -63,7 +73,7 @@ class TvSignInViewModelTest {
         whenever(syncManager.deviceAuthorize()).thenReturn(createDeviceAuthorizeResponse())
         whenever(syncManager.loginWithDeviceAuth(eq("device-code-123"), any())).thenReturn(createLoginSuccess())
 
-        val viewModel = TvSignInViewModel(syncManager)
+        val viewModel = createViewModel()
 
         viewModel.uiState.test {
             // May see Ready briefly before Complete, or jump straight to Complete
@@ -84,7 +94,7 @@ class TvSignInViewModelTest {
             .thenReturn(createAuthorizationPending())
             .thenReturn(createLoginSuccess())
 
-        val viewModel = TvSignInViewModel(syncManager)
+        val viewModel = createViewModel()
 
         viewModel.uiState.test {
             // Skip Ready, wait for Complete
@@ -103,7 +113,7 @@ class TvSignInViewModelTest {
         whenever(syncManager.loginWithDeviceAuth(eq("device-code-123"), any()))
             .thenReturn(LoginResult.Failed(message = "Token expired", messageId = "expired_token"))
 
-        val viewModel = TvSignInViewModel(syncManager)
+        val viewModel = createViewModel()
 
         viewModel.uiState.test {
             val states = mutableListOf(awaitItem())
@@ -122,7 +132,7 @@ class TvSignInViewModelTest {
             .thenReturn(createDeviceAuthorizeResponse())
         whenever(syncManager.loginWithDeviceAuth(any(), any())).thenReturn(createLoginSuccess())
 
-        val viewModel = TvSignInViewModel(syncManager)
+        val viewModel = createViewModel()
 
         viewModel.uiState.test {
             assertEquals(TvSignInUiState.Error, awaitItem())
@@ -137,6 +147,105 @@ class TvSignInViewModelTest {
             assertEquals(TvSignInUiState.Complete, states.last())
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    @Test
+    fun `switching to email mode tracks password sign in type`() = runTest {
+        val viewModel = createEmailViewModel()
+
+        viewModel.selectMode(TvSignInMode.Email)
+
+        verify(eventHorizon).track(SignInTypeTappedEvent(type = SignInType.Password))
+    }
+
+    @Test
+    fun `switching back to qr mode tracks qr sign in type`() = runTest {
+        val viewModel = createEmailViewModel()
+
+        viewModel.selectMode(TvSignInMode.Email)
+        viewModel.selectMode(TvSignInMode.QrCode)
+
+        verify(eventHorizon).track(SignInTypeTappedEvent(type = SignInType.Qr))
+    }
+
+    @Test
+    fun `reselecting the current mode does not track`() = runTest {
+        val viewModel = createEmailViewModel()
+
+        viewModel.selectMode(TvSignInMode.QrCode)
+
+        verify(eventHorizon, never()).track(any())
+    }
+
+    @Test
+    fun `successful email sign in transitions to Complete state`() = runTest {
+        val viewModel = createEmailViewModel()
+        whenever(syncManager.loginWithEmailAndPassword(any(), any(), any())).thenReturn(createLoginSuccess())
+
+        viewModel.selectMode(TvSignInMode.Email)
+        viewModel.updateEmail("listener@pocketcasts.com")
+        viewModel.updatePassword("hunter2")
+        viewModel.submitEmailSignIn()
+        advanceUntilIdle()
+
+        assertEquals(TvSignInUiState.Complete, viewModel.uiState.value)
+        verify(syncManager).loginWithEmailAndPassword(
+            email = eq("listener@pocketcasts.com"),
+            password = eq("hunter2"),
+            signInSource = eq(SignInSource.UserInitiated.Onboarding),
+        )
+    }
+
+    @Test
+    fun `invalid email shows email error and does not attempt login`() = runTest {
+        val viewModel = createEmailViewModel()
+
+        viewModel.selectMode(TvSignInMode.Email)
+        viewModel.updateEmail("not-an-email")
+        viewModel.updatePassword("hunter2")
+        viewModel.submitEmailSignIn()
+        advanceUntilIdle()
+
+        assertTrue(viewModel.emailState.value.showEmailError)
+        verify(syncManager, never()).loginWithEmailAndPassword(any(), any(), any())
+    }
+
+    @Test
+    fun `short password shows password error and does not attempt login`() = runTest {
+        val viewModel = createEmailViewModel()
+
+        viewModel.selectMode(TvSignInMode.Email)
+        viewModel.updateEmail("listener@pocketcasts.com")
+        viewModel.updatePassword("short")
+        viewModel.submitEmailSignIn()
+        advanceUntilIdle()
+
+        assertTrue(viewModel.emailState.value.showPasswordError)
+        verify(syncManager, never()).loginWithEmailAndPassword(any(), any(), any())
+    }
+
+    @Test
+    fun `failed email sign in shows server error and clears submitting`() = runTest {
+        val viewModel = createEmailViewModel()
+        whenever(syncManager.loginWithEmailAndPassword(any(), any(), any()))
+            .thenReturn(LoginResult.Failed(message = "Wrong password", messageId = "invalid_credentials"))
+
+        viewModel.selectMode(TvSignInMode.Email)
+        viewModel.updateEmail("listener@pocketcasts.com")
+        viewModel.updatePassword("hunter2")
+        viewModel.submitEmailSignIn()
+        advanceUntilIdle()
+
+        assertEquals("Wrong password", viewModel.emailState.value.serverError)
+        assertFalse(viewModel.emailState.value.isSubmitting)
+        assertFalse(viewModel.uiState.value is TvSignInUiState.Complete)
+    }
+
+    private fun createViewModel() = TvSignInViewModel(syncManager, eventHorizon)
+
+    private suspend fun createEmailViewModel(): TvSignInViewModel {
+        whenever(syncManager.deviceAuthorize()).thenThrow(RuntimeException("qr disabled"))
+        return createViewModel()
     }
 
     private fun createDeviceAuthorizeResponse() = DeviceAuthorizeResponse(
