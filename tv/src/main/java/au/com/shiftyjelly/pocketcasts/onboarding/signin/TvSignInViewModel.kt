@@ -48,7 +48,7 @@ class TvSignInViewModel @Inject constructor(
     }
 
     fun updateEmail(email: String) {
-        _emailState.update { it.copy(email = email, showEmailError = false, serverError = null) }
+        _emailState.update { it.copy(email = email.trim(), showEmailError = false, serverError = null) }
     }
 
     fun updatePassword(password: String) {
@@ -69,6 +69,7 @@ class TvSignInViewModel @Inject constructor(
         _emailState.update {
             it.copy(isSubmitting = true, showEmailError = false, showPasswordError = false, serverError = null)
         }
+        pollingJob?.cancel()
         viewModelScope.launch {
             val result = syncManager.loginWithEmailAndPassword(
                 email = current.email,
@@ -76,7 +77,10 @@ class TvSignInViewModel @Inject constructor(
                 signInSource = SignInSource.UserInitiated.Onboarding,
             )
             when (result) {
-                is LoginResult.Success -> _uiState.value = TvSignInUiState.Complete
+                is LoginResult.Success -> {
+                    _emailState.update { it.copy(email = "", password = "", isSubmitting = false) }
+                    _uiState.value = TvSignInUiState.Complete
+                }
 
                 is LoginResult.Failed -> _emailState.update {
                     it.copy(isSubmitting = false, serverError = result.message)
@@ -119,7 +123,11 @@ data class TvEmailSignInState(
     val showEmailError: Boolean = false,
     val showPasswordError: Boolean = false,
     val serverError: String? = null,
-)
+) {
+    override fun toString() = "TvEmailSignInState(email=$email, password=${if (password.isEmpty()) "" else "***"}, " +
+        "isSubmitting=$isSubmitting, showEmailError=$showEmailError, showPasswordError=$showPasswordError, " +
+        "serverError=$serverError)"
+}
 
 sealed interface TvSignInUiState {
     data object Loading : TvSignInUiState

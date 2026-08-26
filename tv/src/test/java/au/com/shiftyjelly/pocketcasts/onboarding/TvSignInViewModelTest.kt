@@ -19,6 +19,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -152,7 +153,7 @@ class TvSignInViewModelTest {
 
     @Test
     fun `switching to email mode tracks password sign in type`() = runTest {
-        val viewModel = createEmailViewModel()
+        val viewModel = createViewModelWithQrDisabled()
 
         viewModel.selectMode(TvSignInMode.Email)
 
@@ -161,7 +162,7 @@ class TvSignInViewModelTest {
 
     @Test
     fun `switching back to qr mode tracks qr sign in type`() = runTest {
-        val viewModel = createEmailViewModel()
+        val viewModel = createViewModelWithQrDisabled()
 
         viewModel.selectMode(TvSignInMode.Email)
         viewModel.selectMode(TvSignInMode.QrCode)
@@ -171,7 +172,7 @@ class TvSignInViewModelTest {
 
     @Test
     fun `reselecting the current mode does not track`() = runTest {
-        val viewModel = createEmailViewModel()
+        val viewModel = createViewModelWithQrDisabled()
 
         viewModel.selectMode(TvSignInMode.QrCode)
 
@@ -180,7 +181,7 @@ class TvSignInViewModelTest {
 
     @Test
     fun `successful email sign in transitions to Complete state`() = runTest {
-        val viewModel = createEmailViewModel()
+        val viewModel = createViewModelWithQrDisabled()
         whenever(syncManager.loginWithEmailAndPassword(any(), any(), any())).thenReturn(createLoginSuccess())
 
         viewModel.selectMode(TvSignInMode.Email)
@@ -199,7 +200,7 @@ class TvSignInViewModelTest {
 
     @Test
     fun `invalid email shows email error and does not attempt login`() = runTest {
-        val viewModel = createEmailViewModel()
+        val viewModel = createViewModelWithQrDisabled()
 
         viewModel.selectMode(TvSignInMode.Email)
         viewModel.updateEmail("not-an-email")
@@ -213,7 +214,7 @@ class TvSignInViewModelTest {
 
     @Test
     fun `short password shows password error and does not attempt login`() = runTest {
-        val viewModel = createEmailViewModel()
+        val viewModel = createViewModelWithQrDisabled()
 
         viewModel.selectMode(TvSignInMode.Email)
         viewModel.updateEmail("listener@pocketcasts.com")
@@ -227,7 +228,7 @@ class TvSignInViewModelTest {
 
     @Test
     fun `failed email sign in shows server error and clears submitting`() = runTest {
-        val viewModel = createEmailViewModel()
+        val viewModel = createViewModelWithQrDisabled()
         whenever(syncManager.loginWithEmailAndPassword(any(), any(), any()))
             .thenReturn(LoginResult.Failed(message = "Wrong password", messageId = "invalid_credentials"))
 
@@ -244,7 +245,7 @@ class TvSignInViewModelTest {
 
     @Test
     fun `submitting again while signing in only attempts one login`() = runTest {
-        val viewModel = createEmailViewModel()
+        val viewModel = createViewModelWithQrDisabled()
         whenever(syncManager.loginWithEmailAndPassword(any(), any(), any())).thenReturn(createLoginSuccess())
 
         viewModel.selectMode(TvSignInMode.Email)
@@ -257,9 +258,70 @@ class TvSignInViewModelTest {
         verify(syncManager, times(1)).loginWithEmailAndPassword(any(), any(), any())
     }
 
+    @Test
+    fun `updating email trims surrounding whitespace`() = runTest {
+        val viewModel = createViewModelWithQrDisabled()
+
+        viewModel.updateEmail("  listener@pocketcasts.com  ")
+
+        assertEquals("listener@pocketcasts.com", viewModel.emailState.value.email)
+    }
+
+    @Test
+    fun `switching to email mode clears field errors`() = runTest {
+        val viewModel = createViewModelWithQrDisabled()
+
+        viewModel.selectMode(TvSignInMode.Email)
+        viewModel.updateEmail("not-an-email")
+        viewModel.updatePassword("short")
+        viewModel.submitEmailSignIn()
+        advanceUntilIdle()
+        assertTrue(viewModel.emailState.value.showEmailError)
+
+        viewModel.selectMode(TvSignInMode.QrCode)
+        viewModel.selectMode(TvSignInMode.Email)
+
+        assertFalse(viewModel.emailState.value.showEmailError)
+        assertFalse(viewModel.emailState.value.showPasswordError)
+    }
+
+    @Test
+    fun `updating email clears the previous server error`() = runTest {
+        val viewModel = createViewModelWithQrDisabled()
+        whenever(syncManager.loginWithEmailAndPassword(any(), any(), any()))
+            .thenReturn(LoginResult.Failed(message = "Wrong password", messageId = "invalid_credentials"))
+
+        viewModel.selectMode(TvSignInMode.Email)
+        viewModel.updateEmail("listener@pocketcasts.com")
+        viewModel.updatePassword("hunter2")
+        viewModel.submitEmailSignIn()
+        advanceUntilIdle()
+        assertEquals("Wrong password", viewModel.emailState.value.serverError)
+
+        viewModel.updateEmail("listener@pocketcasts.com")
+
+        assertNull(viewModel.emailState.value.serverError)
+    }
+
+    @Test
+    fun `successful email sign in clears the credentials`() = runTest {
+        val viewModel = createViewModelWithQrDisabled()
+        whenever(syncManager.loginWithEmailAndPassword(any(), any(), any())).thenReturn(createLoginSuccess())
+
+        viewModel.selectMode(TvSignInMode.Email)
+        viewModel.updateEmail("listener@pocketcasts.com")
+        viewModel.updatePassword("hunter2")
+        viewModel.submitEmailSignIn()
+        advanceUntilIdle()
+
+        assertEquals("", viewModel.emailState.value.email)
+        assertEquals("", viewModel.emailState.value.password)
+        assertFalse(viewModel.emailState.value.isSubmitting)
+    }
+
     private fun createViewModel() = TvSignInViewModel(syncManager, eventHorizon)
 
-    private suspend fun createEmailViewModel(): TvSignInViewModel {
+    private suspend fun createViewModelWithQrDisabled(): TvSignInViewModel {
         whenever(syncManager.deviceAuthorize()).thenThrow(RuntimeException("qr disabled"))
         return createViewModel()
     }

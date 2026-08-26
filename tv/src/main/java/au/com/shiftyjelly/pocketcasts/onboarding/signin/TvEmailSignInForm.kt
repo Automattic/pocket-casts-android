@@ -61,6 +61,7 @@ internal fun TvEmailSignInForm(
     modifier: Modifier = Modifier,
 ) {
     val passwordFocusRequester = remember { FocusRequester() }
+    val keyboardController = LocalSoftwareKeyboardController.current
     val signingInDescription = stringResource(LR.string.tv_sign_in_signing_in)
 
     Column(
@@ -71,6 +72,7 @@ internal fun TvEmailSignInForm(
             value = state.email,
             onValueChange = onEmailChange,
             placeholder = stringResource(LR.string.profile_email),
+            enabled = !state.isSubmitting,
             errorText = if (state.showEmailError) stringResource(LR.string.onboarding_email_invalid_message) else null,
             keyboardOptions = KeyboardOptions(
                 capitalization = KeyboardCapitalization.None,
@@ -84,6 +86,7 @@ internal fun TvEmailSignInForm(
             value = state.password,
             onValueChange = onPasswordChange,
             placeholder = stringResource(LR.string.profile_password),
+            enabled = !state.isSubmitting,
             errorText = if (state.showPasswordError) {
                 stringResource(LR.string.profile_create_password_requirements)
             } else {
@@ -96,7 +99,12 @@ internal fun TvEmailSignInForm(
                 keyboardType = KeyboardType.Password,
                 imeAction = ImeAction.Done,
             ),
-            keyboardActions = KeyboardActions(onDone = { onSubmit() }),
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    keyboardController?.hide()
+                    onSubmit()
+                },
+            ),
             focusRequester = passwordFocusRequester,
         )
         Box(
@@ -144,6 +152,7 @@ private fun TvSignInTextField(
     placeholder: String,
     keyboardOptions: KeyboardOptions,
     keyboardActions: KeyboardActions,
+    enabled: Boolean = true,
     errorText: String? = null,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     focusRequester: FocusRequester? = null,
@@ -159,6 +168,7 @@ private fun TvSignInTextField(
         BasicTextField(
             value = value,
             onValueChange = onValueChange,
+            enabled = enabled,
             singleLine = true,
             textStyle = MaterialTheme.tvTypography.body.copy(color = contentColor),
             cursorBrush = SolidColor(contentColor),
@@ -172,20 +182,15 @@ private fun TvSignInTextField(
                     isFocused = it.isFocused
                     if (it.isFocused) {
                         keyboardController?.show()
+                    } else {
+                        keyboardController?.hide()
                     }
                 }
                 .onPreviewKeyEvent { event ->
                     when {
-                        event.type == KeyEventType.KeyDown && event.key == Key.DirectionDown -> {
-                            focusManager.moveFocus(FocusDirection.Down)
-                            true
-                        }
-
-                        event.type == KeyEventType.KeyDown && event.key == Key.DirectionUp -> {
-                            focusManager.moveFocus(FocusDirection.Up)
-                            true
-                        }
-
+                        event.type != KeyEventType.KeyDown -> false
+                        event.key == Key.DirectionDown -> focusManager.moveFocus(FocusDirection.Down)
+                        event.key == Key.DirectionUp -> focusManager.moveFocus(FocusDirection.Up)
                         else -> false
                     }
                 },

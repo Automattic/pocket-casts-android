@@ -227,6 +227,7 @@ private fun TvQrSignInError(
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val retryFocusRequester = remember { FocusRequester() }
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier,
@@ -240,9 +241,14 @@ private fun TvQrSignInError(
         Button(
             onClick = onRetry,
             colors = TvButtonDefaults.filledButtonColors(),
+            modifier = Modifier.focusRequester(retryFocusRequester),
         ) {
             Text(text = stringResource(LR.string.retry))
         }
+    }
+
+    LaunchedEffect(Unit) {
+        runCatching { retryFocusRequester.requestFocus() }
     }
 }
 
