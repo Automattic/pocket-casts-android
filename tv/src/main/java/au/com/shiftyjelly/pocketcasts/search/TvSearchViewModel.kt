@@ -312,6 +312,10 @@ class TvSearchViewModel @Inject constructor(
         return discoverFeedLoader.loadCategoryPodcasts(source, categoryId, syncManager.isLoggedIn())
     }
 
+    suspend fun categoryCoverUrls(category: DiscoverCategory): List<String> {
+        return discoverFeedLoader.loadCategoryCoverUrls(category.source, category.id)
+    }
+
     fun playEpisode(episode: ImprovedSearchResultItem.EpisodeItem) {
         viewModelScope.launch {
             try {

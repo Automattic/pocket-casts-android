@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.discover
 
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
 import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
 import au.com.shiftyjelly.pocketcasts.servers.model.Discover
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
@@ -13,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.servers.model.DisplayStyle
 import au.com.shiftyjelly.pocketcasts.servers.model.ListType
 import au.com.shiftyjelly.pocketcasts.servers.model.transformWithRegion
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.async
@@ -26,6 +28,8 @@ class TvDiscoverFeedLoader @Inject constructor(
     private val settings: Settings,
     @ApplicationContext private val context: Context,
 ) {
+    private val categoryCoverUrlCache = ConcurrentHashMap<Int, List<String>>()
+
     suspend fun load(isLoggedIn: Boolean): List<TvDiscoverRow> {
         return buildRows(listRepository.getHomeDiscoverFeed(isLoggedIn), isLoggedIn, includeHomeSections = true)
     }
@@ -57,6 +61,26 @@ class TvDiscoverFeedLoader @Inject constructor(
             listId = feed.listId,
             podcasts = mergeCategorySponsored(podcasts, sponsoredDeferred.await()),
         )
+    }
+
+    suspend fun loadCategoryCoverUrls(source: String, categoryId: Int): List<String> {
+        categoryCoverUrlCache[categoryId]?.let { return it }
+        if (source.isBlank()) return emptyList()
+        val urls = try {
+            listRepository.getListFeed(source)?.podcasts.orEmpty()
+                .map(DiscoverPodcast::uuid)
+                .distinct()
+                .map { PodcastImage.getMediumArtworkUrl(it) }
+        } catch (exception: CancellationException) {
+            throw exception
+        } catch (exception: Exception) {
+            Timber.e(exception, "Failed to load TV category covers")
+            emptyList()
+        }
+        if (urls.isNotEmpty()) {
+            categoryCoverUrlCache[categoryId] = urls
+        }
+        return urls
     }
 
     private suspend fun loadCategorySponsoredPodcasts(categoryId: Int, isLoggedIn: Boolean): List<TvDiscoverPodcast> = coroutineScope {
