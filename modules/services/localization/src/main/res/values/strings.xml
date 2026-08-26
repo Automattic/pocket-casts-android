@@ -273,6 +273,8 @@
     <string name="tv_sign_in_step_scan">Scan the QR code or go to %1$s</string>
     <string name="tv_sign_in_step_login">Log in to your account</string>
     <string name="tv_sign_in_step_confirm_code">If asked, confirm with the code below</string>
+    <string name="tv_account_signed_out_alert_title">You\'ve been logged out</string>
+    <string name="tv_account_signed_out_alert_message">There was a problem and you\'ve been logged out.\nTap the button below to log in to your Pocket Casts account again.</string>
     <string name="tv_create_account_modal_title">Your podcasts deserve a home</string>
     <string name="tv_create_account_modal_subtitle">Create a free account to follow podcasts, build your Up Next, and pick up right where you left off, on any device.</string>
     <string name="tv_create_account_modal_step_create">Create your account or log in</string>
