@@ -53,8 +53,8 @@ import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-private const val COVER_SIZE_DP = 272
-private const val COVER_CORNER_RADIUS_DP = 16
+private const val COVER_SIZE_DP = 240
+private const val COVER_CORNER_RADIUS_DP = 14
 private const val MAX_SIMULTANEOUS = 2
 private const val MIN_ROTATION = 2.0
 private const val MAX_ROTATION = 10.0
@@ -110,13 +110,13 @@ private fun TvSyncingScreenContent(
             Text(
                 text = stringResource(LR.string.tv_onboarding_welcome_back),
                 color = MaterialTheme.tvColors.textPrimary,
-                style = MaterialTheme.tvTypography.title1.copy(textAlign = TextAlign.Center),
+                style = MaterialTheme.tvTypography.title2.copy(textAlign = TextAlign.Center),
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = stringResource(LR.string.tv_onboarding_syncing_subtitle),
                 color = MaterialTheme.tvColors.textSecondary,
-                style = MaterialTheme.tvTypography.headline.copy(textAlign = TextAlign.Center),
+                style = MaterialTheme.tvTypography.body.copy(textAlign = TextAlign.Center),
             )
             Spacer(modifier = Modifier.height(40.dp))
             TvSyncingCoverStack(podcastUuids = podcastUuids)
