@@ -68,7 +68,7 @@ interface SyncManager : NamedSettingsCaller {
     suspend fun loginWithEmailAndPassword(email: String, password: String, signInSource: SignInSource): LoginResult
     suspend fun loginWithToken(token: RefreshToken, loginIdentity: LoginIdentity, signInSource: SignInSource): LoginResult
     suspend fun deviceAuthorize(): DeviceAuthorizeResponse
-    suspend fun loginWithDeviceAuth(deviceCode: String, signInSource: SignInSource): LoginResult
+    suspend fun loginWithDeviceAuth(deviceCode: String, signInSource: SignInSource, isNewAccount: Boolean = false): LoginResult
     suspend fun createUserWithEmailAndPassword(email: String, password: String, signInSource: SignInSource.UserInitiated): LoginResult
     suspend fun forgotPassword(email: String, onSuccess: () -> Unit, onError: (String) -> Unit)
     suspend fun getAccessToken(account: Account): AccessToken
