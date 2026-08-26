@@ -91,13 +91,12 @@ private fun TvSignInContent(
     modifier: Modifier = Modifier,
 ) {
     Box(
-        contentAlignment = Alignment.TopCenter,
+        contentAlignment = Alignment.Center,
         modifier = modifier
             .fillMaxSize()
             .background(MaterialTheme.tvColors.backgroundSunken),
     ) {
         Column(
-            modifier = Modifier.padding(top = 96.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(20.dp),
         ) {
@@ -112,20 +111,15 @@ private fun TvSignInContent(
                 style = MaterialTheme.tvTypography.title2.copy(textAlign = TextAlign.Center),
             )
             TvSignInModeTabs(selected = mode, onSelect = onSelectMode)
-            Box(
-                contentAlignment = Alignment.TopCenter,
-                modifier = Modifier.heightIn(min = 320.dp),
-            ) {
-                when (mode) {
-                    TvSignInMode.QrCode -> TvQrSignIn(state = qrState, onRetry = onRetryQr)
+            when (mode) {
+                TvSignInMode.QrCode -> TvQrSignIn(state = qrState, onRetry = onRetryQr)
 
-                    TvSignInMode.Email -> TvEmailSignInForm(
-                        state = emailState,
-                        onEmailChange = onEmailChange,
-                        onPasswordChange = onPasswordChange,
-                        onSubmit = onSubmitEmail,
-                    )
-                }
+                TvSignInMode.Email -> TvEmailSignInForm(
+                    state = emailState,
+                    onEmailChange = onEmailChange,
+                    onPasswordChange = onPasswordChange,
+                    onSubmit = onSubmitEmail,
+                )
             }
         }
     }
@@ -207,20 +201,24 @@ private fun TvQrSignIn(
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    when (state) {
-        is TvSignInUiState.Ready -> TvSignInQrContent(
-            userCode = state.userCode,
-            verificationUriComplete = state.verificationUriComplete,
-            steps = signInSteps(state.verificationUri),
-            modifier = modifier,
-        )
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier.heightIn(min = 280.dp),
+    ) {
+        when (state) {
+            is TvSignInUiState.Ready -> TvSignInQrContent(
+                userCode = state.userCode,
+                verificationUriComplete = state.verificationUriComplete,
+                steps = signInSteps(state.verificationUri),
+            )
 
-        is TvSignInUiState.Error -> TvQrSignInError(onRetry = onRetry, modifier = modifier)
+            is TvSignInUiState.Error -> TvQrSignInError(onRetry = onRetry)
 
-        else -> LoadingView(
-            color = MaterialTheme.tvColors.textPrimary,
-            modifier = modifier,
-        )
+            else -> LoadingView(
+                color = MaterialTheme.tvColors.textPrimary,
+                modifier = Modifier.size(48.dp),
+            )
+        }
     }
 }
 
