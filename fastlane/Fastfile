@@ -528,28 +528,25 @@ platform :android do
   # - Creates draft Github release
   #
   # @param skip_confirm [Boolean] If true, avoids any interactive prompt
-  # @param skip_prechecks [Boolean] If true, skips the branch, confirmation and clean-tree checks
   # @param create_gh_release [Boolean] If true, creates a draft GitHub release
   #
-  lane :build_and_upload_to_play_store do |skip_prechecks: false, skip_confirm: false, create_gh_release: false|
+  lane :build_and_upload_to_play_store do |skip_confirm: false, create_gh_release: false|
     version = version_name_current
     build_code = build_code_current
     is_beta = beta_version?(version)
 
-    unless skip_prechecks
-      # Match branch names that begin with `release/`
-      # Skip this check on CI because that action relies on CI env vars, but when this lane is called as part of `code_freeze` the branch changed since the CI build started, so that wouldn't work
-      ensure_git_branch(branch: '^release/') unless is_ci
+    # Match branch names that begin with `release/`
+    # Skip this check on CI because that action relies on CI env vars, but when this lane is called as part of `code_freeze` the branch changed since the CI build started, so that wouldn't work
+    ensure_git_branch(branch: '^release/') unless is_ci
 
-      UI.important("Building version #{version_name_current} (#{build_code_current}) for upload to Google Play Console")
-      UI.user_error!("Terminating as requested. Don't forget to run the remainder of this automation manually.") unless skip_confirm || UI.confirm('Do you want to continue?')
+    UI.important("Building version #{version_name_current} (#{build_code_current}) for upload to Google Play Console")
+    UI.user_error!("Terminating as requested. Don't forget to run the remainder of this automation manually.") unless skip_confirm || UI.confirm('Do you want to continue?')
 
-      # Check local repo status
-      ensure_git_status_clean unless is_ci
+    # Check local repo status
+    ensure_git_status_clean unless is_ci
 
-      # THROW AWAY: prove the prechecks block still runs after `android_build_preflight` is gone.
-      UI.success('VALIDATION: prechecks block completed without android_build_preflight')
-    end
+    # THROW AWAY: prove the prechecks ran now that they are unconditional.
+    UI.success('VALIDATION: prechecks block completed without android_build_preflight')
 
     # THROW AWAY: build one bundle and stop. The uploads that normally follow are deleted on this branch.
     UI.message("VALIDATION: is_beta=#{is_beta}, create_gh_release=#{create_gh_release}; both are ignored here")
