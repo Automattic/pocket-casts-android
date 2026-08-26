@@ -101,14 +101,11 @@ class TracksAnalyticsTracker @Inject constructor(
             PredefinedEventProperty.THEME_DARK_PREFERENCE to settings.darkThemePreference.value.analyticsValue,
             PredefinedEventProperty.THEME_LIGHT_PREFERENCE to settings.lightThemePreference.value.analyticsValue,
             PredefinedEventProperty.THEME_USE_SYSTEM_SETTINGS to settings.useSystemTheme.value,
-            PredefinedEventProperty.PLATFORM to when {
-                Util.isTv(appContext) -> "tv"
-
-                else -> when (Util.getAppPlatform(appContext)) {
-                    AppPlatform.Automotive -> "automotive"
-                    AppPlatform.Phone -> "phone"
-                    AppPlatform.WearOs -> "watch"
-                }
+            PredefinedEventProperty.PLATFORM to when (Util.getAppPlatform(appContext)) {
+                AppPlatform.Automotive -> "automotive"
+                AppPlatform.Phone -> "phone"
+                AppPlatform.WearOs -> "watch"
+                AppPlatform.Tv -> "tv"
             },
         ).mapKeys { it.key.analyticsKey }
     }
