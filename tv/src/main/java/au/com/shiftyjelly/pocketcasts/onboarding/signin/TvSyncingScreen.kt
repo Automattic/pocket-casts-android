@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.onboarding.signin
 
 import androidx.activity.compose.BackHandler
+import androidx.annotation.DrawableRes
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.spring
@@ -46,7 +47,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
 import au.com.shiftyjelly.pocketcasts.theme.TvTheme
 import au.com.shiftyjelly.pocketcasts.theme.tvColors
 import au.com.shiftyjelly.pocketcasts.theme.tvTypography
-import kotlin.random.Random
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -56,13 +56,15 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 private const val COVER_SIZE_DP = 240
 private const val COVER_CORNER_RADIUS_DP = 14
 private const val MAX_SIMULTANEOUS = 2
-private const val MIN_ROTATION = 2.0
-private const val MAX_ROTATION = 10.0
+private const val MIN_ROTATION = 2f
+private const val MAX_ROTATION = 10f
+private const val ROTATION_STEPS = 5
 private const val STEP_INTERVAL_MS = 800L
-private const val WARM_UP_INTERVAL_MS = 100L
 private const val RETIRE_FADE_MS = 500
+private const val RETIRE_REMOVE_MS = RETIRE_FADE_MS + 100L
 
 private val RevealSpring = spring<Float>(dampingRatio = 0.5f, stiffness = 250f)
+private val bundledCovers = artworkResIds.map(CoverModel::Bundled)
 
 @Composable
 fun TvSyncingScreen(
@@ -129,34 +131,36 @@ private fun TvSyncingCoverStack(
     podcastUuids: List<String>,
     modifier: Modifier = Modifier,
 ) {
-    val realCovers = remember(podcastUuids) { podcastUuids.map { PodcastImage.getMediumArtworkUrl(it) } }
-    val source: List<Any> = realCovers.ifEmpty { artworkResIds }
+    val realCovers = remember(podcastUuids) {
+        podcastUuids.map { CoverModel.Remote(PodcastImage.getMediumArtworkUrl(it)) }
+    }
+    val source: List<CoverModel> = if (realCovers.size > MAX_SIMULTANEOUS) realCovers else bundledCovers
     val currentSource by rememberUpdatedState(source)
 
     val mounted = remember { mutableStateListOf<MountedCover>() }
 
     LaunchedEffect(Unit) {
-        var cursor = 0
+        val revealed = mutableSetOf<CoverModel>()
         var nextId = 0
         while (isActive) {
             val pool = currentSource
-            if (pool.isEmpty()) {
-                delay(WARM_UP_INTERVAL_MS)
-                continue
-            }
-            val index = nextDistinctCoverIndex(pool, cursor, mounted.map { it.model }.toSet())
-            if (index == null) {
+            val visible = mounted.filterNot { it.exiting }.mapTo(mutableSetOf()) { it.model }
+            val cover = nextCover(pool, visible, revealed)
+            if (cover == null) {
                 delay(STEP_INTERVAL_MS)
                 continue
             }
-            cursor = index + 1
+            if (cover in revealed) {
+                revealed.clear()
+            }
+            revealed.add(cover)
             val id = nextId++
-            mounted.add(MountedCover(id = id, model = pool[index], rotation = coverRotation(id)))
+            mounted.add(MountedCover(id = id, model = cover, rotation = coverRotation(id)))
             if (mounted.count { !it.exiting } > MAX_SIMULTANEOUS) {
                 mounted.firstOrNull { !it.exiting }?.let { stale ->
                     stale.exiting = true
                     launch {
-                        delay(RETIRE_FADE_MS.toLong())
+                        delay(RETIRE_REMOVE_MS)
                         mounted.remove(stale)
                     }
                 }
@@ -206,39 +210,40 @@ private fun RevealedCover(cover: MountedCover) {
             .clip(RoundedCornerShape(COVER_CORNER_RADIUS_DP.dp)),
     ) {
         when (val model = cover.model) {
-            is Int -> Image(
-                painter = painterResource(model),
+            is CoverModel.Bundled -> Image(
+                painter = painterResource(model.resId),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize(),
             )
 
-            else -> TvArtworkImage(
-                model = model,
+            is CoverModel.Remote -> TvArtworkImage(
+                model = model.url,
                 modifier = Modifier.fillMaxSize(),
             )
         }
     }
 }
 
-internal fun nextDistinctCoverIndex(pool: List<Any>, from: Int, mounted: Set<Any>): Int? {
-    for (offset in pool.indices) {
-        val index = (from + offset) % pool.size
-        if (pool[index] !in mounted) {
-            return index
-        }
-    }
-    return null
+internal fun <T> nextCover(pool: List<T>, visible: Set<T>, revealed: Set<T>): T? {
+    return pool.firstOrNull { it !in visible && it !in revealed }
+        ?: pool.firstOrNull { it !in visible }
 }
 
 private fun coverRotation(id: Int): Float {
     val sign = if (id % 2 == 0) -1f else 1f
-    return sign * Random.nextDouble(MIN_ROTATION, MAX_ROTATION).toFloat()
+    val t = (id * 3 % ROTATION_STEPS).toFloat() / (ROTATION_STEPS - 1)
+    return sign * (MIN_ROTATION + t * (MAX_ROTATION - MIN_ROTATION))
+}
+
+private sealed interface CoverModel {
+    data class Bundled(@DrawableRes val resId: Int) : CoverModel
+    data class Remote(val url: String) : CoverModel
 }
 
 private class MountedCover(
     val id: Int,
-    val model: Any,
+    val model: CoverModel,
     val rotation: Float,
 ) {
     var exiting by mutableStateOf(false)
