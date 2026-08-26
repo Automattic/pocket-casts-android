@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -98,12 +99,19 @@ internal fun TvEmailSignInForm(
             keyboardActions = KeyboardActions(onDone = { onSubmit() }),
             focusRequester = passwordFocusRequester,
         )
-        state.serverError?.let { serverError ->
-            Text(
-                text = serverError,
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.tvTypography.caption1,
-            )
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = 24.dp),
+            contentAlignment = Alignment.CenterStart,
+        ) {
+            state.serverError?.let { serverError ->
+                Text(
+                    text = serverError,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.tvTypography.caption1,
+                )
+            }
         }
         Button(
             onClick = onSubmit,

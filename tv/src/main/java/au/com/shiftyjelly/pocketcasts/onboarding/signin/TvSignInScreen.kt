@@ -91,12 +91,13 @@ private fun TvSignInContent(
     modifier: Modifier = Modifier,
 ) {
     Box(
-        contentAlignment = Alignment.Center,
+        contentAlignment = Alignment.TopCenter,
         modifier = modifier
             .fillMaxSize()
             .background(MaterialTheme.tvColors.backgroundSunken),
     ) {
         Column(
+            modifier = Modifier.padding(top = 96.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(20.dp),
         ) {
