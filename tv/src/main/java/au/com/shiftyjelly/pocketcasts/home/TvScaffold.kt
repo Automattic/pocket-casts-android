@@ -153,6 +153,9 @@ fun TvScaffold(
         }
 
         if (isProfileModalVisible) {
+            LaunchedEffect(Unit) {
+                viewModel.trackProfileShown()
+            }
             TvProfileModal(
                 profile = uiState.profile,
                 onDismissRequest = { isProfileModalVisible = false },

@@ -6,6 +6,8 @@ import au.com.shiftyjelly.pocketcasts.TvLaunchRequests
 import au.com.shiftyjelly.pocketcasts.auth.TvSignOutManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.ProfileShownEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.FlowPreview
@@ -24,6 +26,7 @@ import kotlinx.coroutines.rx2.asFlow
 class TvScaffoldViewModel @Inject constructor(
     private val syncManager: SyncManager,
     private val signOutManager: TvSignOutManager,
+    private val eventHorizon: EventHorizon,
     launchRequests: TvLaunchRequests,
     upNextQueue: UpNextQueue,
 ) : ViewModel() {
@@ -66,6 +69,10 @@ class TvScaffoldViewModel @Inject constructor(
 
     fun signOut() {
         signOutManager.signOutAndWipeData()
+    }
+
+    fun trackProfileShown() {
+        eventHorizon.track(ProfileShownEvent)
     }
 
     @OptIn(FlowPreview::class)

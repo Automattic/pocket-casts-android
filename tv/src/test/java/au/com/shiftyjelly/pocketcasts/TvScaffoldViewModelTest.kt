@@ -9,6 +9,8 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.ProfileShownEvent
 import com.jakewharton.rxrelay2.BehaviorRelay
 import io.reactivex.subjects.BehaviorSubject
 import java.util.Date
@@ -52,9 +54,10 @@ class TvScaffoldViewModelTest {
     )
 
     private val launchRequests = TvLaunchRequests()
+    private val eventHorizon = mock<EventHorizon>()
 
     private val viewModel by lazy {
-        TvScaffoldViewModel(syncManager, signOutManager, launchRequests, upNextQueue)
+        TvScaffoldViewModel(syncManager, signOutManager, eventHorizon, launchRequests, upNextQueue)
     }
 
     @Test
@@ -262,5 +265,12 @@ class TvScaffoldViewModelTest {
         viewModel.signOut()
 
         verify(signOutManager).signOutAndWipeData()
+    }
+
+    @Test
+    fun `trackProfileShown tracks the profile shown event`() = runTest {
+        viewModel.trackProfileShown()
+
+        verify(eventHorizon).track(ProfileShownEvent)
     }
 }
