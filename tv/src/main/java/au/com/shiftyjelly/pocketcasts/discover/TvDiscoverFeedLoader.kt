@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRegion
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRow
 import au.com.shiftyjelly.pocketcasts.servers.model.DisplayStyle
+import au.com.shiftyjelly.pocketcasts.servers.model.ListFeed
 import au.com.shiftyjelly.pocketcasts.servers.model.ListType
 import au.com.shiftyjelly.pocketcasts.servers.model.transformWithRegion
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -161,15 +162,17 @@ class TvDiscoverFeedLoader @Inject constructor(
         val podcasts = insertSponsored(basePodcasts, insertionsDeferred.await())
         if (podcasts.isEmpty()) return@coroutineScope null
         val feedTitle = feed.title?.takeIf { it.isNotBlank() } ?: row.title
+        val listId = row.analyticsListId(feed)
+        val listDatetime = feed.date
         when (row.displayStyle) {
-            is DisplayStyle.Carousel -> TvDiscoverRow.FeaturedPodcasts(id = row.rowId(), title = feedTitle, podcasts = podcasts)
+            is DisplayStyle.Carousel -> TvDiscoverRow.FeaturedPodcasts(id = row.rowId(), title = feedTitle, podcasts = podcasts, listId = listId, listDatetime = listDatetime)
 
             is DisplayStyle.SinglePodcast -> {
                 val title = if (row.sponsored) context.getString(LR.string.tv_sponsored_podcast_section_title) else feedTitle
-                TvDiscoverRow.SinglePodcast(id = row.rowId(), title = title, podcasts = podcasts)
+                TvDiscoverRow.SinglePodcast(id = row.rowId(), title = title, podcasts = podcasts, listId = listId, listDatetime = listDatetime)
             }
 
-            else -> TvDiscoverRow.Podcasts(id = row.rowId(), title = feedTitle, podcasts = podcasts)
+            else -> TvDiscoverRow.Podcasts(id = row.rowId(), title = feedTitle, podcasts = podcasts, listId = listId, listDatetime = listDatetime)
         }
     }
 
@@ -215,7 +218,7 @@ class TvDiscoverFeedLoader @Inject constructor(
             }
         if (episodes.isEmpty()) return null
         val title = feed.title?.takeIf { it.isNotBlank() } ?: row.title
-        return TvDiscoverRow.Episodes(id = row.rowId(), title = title, episodes = episodes)
+        return TvDiscoverRow.Episodes(id = row.rowId(), title = title, episodes = episodes, listId = row.analyticsListId(feed), listDatetime = feed.date)
     }
 
     private suspend fun loadCategoriesRow(row: DiscoverRow, replacements: Map<String, String>): TvDiscoverRow? {
@@ -258,6 +261,8 @@ class TvDiscoverFeedLoader @Inject constructor(
     }
 
     private fun DiscoverRow.rowId() = listUuid ?: id ?: title
+
+    private fun DiscoverRow.analyticsListId(feed: ListFeed): String? = listUuid ?: feed.listId ?: id
 
     private fun DiscoverPodcast.toTvDiscoverPodcast(isSponsored: Boolean) = TvDiscoverPodcast(
         uuid = uuid,

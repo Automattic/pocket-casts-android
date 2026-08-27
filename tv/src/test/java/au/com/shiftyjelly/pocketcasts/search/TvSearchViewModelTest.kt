@@ -632,7 +632,7 @@ class TvSearchViewModelTest {
     @Test
     fun `a discover row impression in the idle body is stamped with the search source`() = runTest {
         whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
-        val row = TvDiscoverRow.Podcasts(id = "list-trending", title = "Trending", podcasts = listOf(discoverPodcast("podcast-1")))
+        val row = TvDiscoverRow.Podcasts(id = "list-trending", title = "Trending", podcasts = listOf(discoverPodcast("podcast-1")), listId = "list-trending")
 
         createViewModel().trackDiscoverListShown(row)
 
@@ -643,7 +643,7 @@ class TvSearchViewModelTest {
     fun `opening a discover podcast is stamped with the search source`() = runTest {
         whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
         val podcast = discoverPodcast("podcast-1")
-        val row = TvDiscoverRow.Podcasts(id = "list-trending", title = "Trending", podcasts = listOf(podcast))
+        val row = TvDiscoverRow.Podcasts(id = "list-trending", title = "Trending", podcasts = listOf(podcast), listId = "list-trending")
 
         createViewModel().trackDiscoverPodcastTapped(row, podcast)
 
@@ -654,7 +654,7 @@ class TvSearchViewModelTest {
     fun `opening a discover episode's podcast is stamped with the search source`() = runTest {
         whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
         val episode = TvDiscoverEpisode("episode-1", "Episode", "podcast-1", "Podcast")
-        val row = TvDiscoverRow.Episodes(id = "list-videos", title = "Made for TV", episodes = listOf(episode))
+        val row = TvDiscoverRow.Episodes(id = "list-videos", title = "Made for TV", episodes = listOf(episode), listId = "list-videos")
 
         createViewModel().trackDiscoverEpisodePodcastTapped(row, episode)
 
@@ -664,7 +664,7 @@ class TvSearchViewModelTest {
     @Test
     fun `search does not suppress the home local row ids`() = runTest {
         whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
-        val row = TvDiscoverRow.Podcasts(id = "keep_listening", title = "Keep Listening", podcasts = listOf(discoverPodcast("podcast-1")))
+        val row = TvDiscoverRow.Podcasts(id = "keep_listening", title = "Keep Listening", podcasts = listOf(discoverPodcast("podcast-1")), listId = "keep_listening")
 
         createViewModel().trackDiscoverListShown(row)
 
@@ -703,7 +703,7 @@ class TvSearchViewModelTest {
         whenever(podcastManager.findOrDownloadPodcastRxSingle("podcast-1")).thenReturn(Single.just(podcast))
         whenever(episodeManager.findEpisodesByPodcastOrderedByPublishDate(podcast))
             .thenReturn(listOf(newest, podcastEpisode("episode-old")))
-        val row = TvDiscoverRow.FeaturedPodcasts(id = "list-featured", title = "Featured", podcasts = listOf(discoverPodcast("podcast-1")))
+        val row = TvDiscoverRow.FeaturedPodcasts(id = "list-featured", title = "Featured", podcasts = listOf(discoverPodcast("podcast-1")), listId = "list-featured")
 
         createViewModel().playLatestEpisode(row, discoverPodcast("podcast-1"))
 
@@ -720,7 +720,7 @@ class TvSearchViewModelTest {
         val podcast = subscribedPodcast("podcast-1")
         whenever(podcastManager.findOrDownloadPodcastRxSingle("podcast-1")).thenReturn(Single.just(podcast))
         whenever(episodeManager.findEpisodesByPodcastOrderedByPublishDate(podcast)).thenReturn(emptyList())
-        val row = TvDiscoverRow.FeaturedPodcasts(id = "list-featured", title = "Featured", podcasts = listOf(discoverPodcast("podcast-1")))
+        val row = TvDiscoverRow.FeaturedPodcasts(id = "list-featured", title = "Featured", podcasts = listOf(discoverPodcast("podcast-1")), listId = "list-featured")
         val viewModel = createViewModel()
 
         viewModel.playFailures.test {
@@ -740,7 +740,7 @@ class TvSearchViewModelTest {
         whenever(episodeManager.findEpisodesByPodcastOrderedByPublishDate(podcast)).thenReturn(listOf(newest))
         whenever { playbackManager.playNowSuspend(episode = newest, sourceView = SourceView.SEARCH) }
             .thenThrow(RuntimeException("boom"))
-        val row = TvDiscoverRow.FeaturedPodcasts(id = "list-featured", title = "Featured", podcasts = listOf(discoverPodcast("podcast-1")))
+        val row = TvDiscoverRow.FeaturedPodcasts(id = "list-featured", title = "Featured", podcasts = listOf(discoverPodcast("podcast-1")), listId = "list-featured")
 
         createViewModel().playLatestEpisode(row, discoverPodcast("podcast-1"))
 
