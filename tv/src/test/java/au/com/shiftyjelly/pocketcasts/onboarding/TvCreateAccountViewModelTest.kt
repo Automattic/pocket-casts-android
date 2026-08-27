@@ -15,7 +15,6 @@ import com.automattic.eventhorizon.OnboardingFlowType
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -45,16 +44,17 @@ class TvCreateAccountViewModelTest {
     @Test
     fun `successful device authorize transitions to Ready state`() = runTest {
         whenever(syncManager.deviceAuthorize()).thenReturn(createDeviceAuthorizeResponse())
-        whenever(syncManager.loginWithDeviceAuth(any(), any(), any())).thenReturn(createLoginSuccess())
+        whenever(syncManager.loginWithDeviceAuth(eq("device-code-123"), any(), any())).thenReturn(createLoginSuccess())
 
         val viewModel = createViewModel()
 
         viewModel.uiState.test {
-            val state = awaitItem()
-            assertTrue(state is TvSignInUiState.Ready || state is TvSignInUiState.Complete)
-            if (state is TvSignInUiState.Ready) {
-                assertEquals(listOf("A", "B", "C", "1", "2", "3"), state.userCode)
+            val states = mutableListOf(awaitItem())
+            while (states.last() !is TvSignInUiState.Complete) {
+                states.add(awaitItem())
             }
+            val ready = states.filterIsInstance<TvSignInUiState.Ready>().first()
+            assertEquals(listOf("A", "B", "C", "1", "2", "3"), ready.userCode)
             cancelAndIgnoreRemainingEvents()
         }
     }

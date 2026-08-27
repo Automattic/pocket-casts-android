@@ -100,7 +100,7 @@ class TvPodcastDetailsViewModel @AssistedInject constructor(
         accountAuthJob?.cancel()
         _accountAuthState.value = TvSignInUiState.Loading
         accountAuthJob = viewModelScope.launch {
-            deviceAuthFlow(syncManager, isNewAccount = true).collect { state ->
+            deviceAuthFlow(syncManager, isNewAccount = false).collect { state ->
                 _accountAuthState.value = state
                 if (state is TvSignInUiState.Complete) {
                     podcastManager.subscribeToPodcast(podcastUuid, sync = true)

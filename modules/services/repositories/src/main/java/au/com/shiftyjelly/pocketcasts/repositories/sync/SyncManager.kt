@@ -68,7 +68,13 @@ interface SyncManager : NamedSettingsCaller {
     suspend fun loginWithEmailAndPassword(email: String, password: String, signInSource: SignInSource): LoginResult
     suspend fun loginWithToken(token: RefreshToken, loginIdentity: LoginIdentity, signInSource: SignInSource): LoginResult
     suspend fun deviceAuthorize(): DeviceAuthorizeResponse
-    suspend fun loginWithDeviceAuth(deviceCode: String, signInSource: SignInSource, isNewAccount: Boolean = false): LoginResult
+
+    /**
+     * [isNewAccount] is a caller assertion that this pairing is a signup, not server truth the way
+     * AuthResultModel.isNewAccount carries it elsewhere. It drives new-account analytics attribution
+     * (and the value stored in that field), so each caller must set it deliberately.
+     */
+    suspend fun loginWithDeviceAuth(deviceCode: String, signInSource: SignInSource, isNewAccount: Boolean): LoginResult
     suspend fun createUserWithEmailAndPassword(email: String, password: String, signInSource: SignInSource.UserInitiated): LoginResult
     suspend fun forgotPassword(email: String, onSuccess: () -> Unit, onError: (String) -> Unit)
     suspend fun getAccessToken(account: Account): AccessToken

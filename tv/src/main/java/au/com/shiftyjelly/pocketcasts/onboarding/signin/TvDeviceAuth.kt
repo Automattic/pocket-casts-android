@@ -12,7 +12,7 @@ import timber.log.Timber
 private const val AUTHORIZATION_PENDING = "authorization_pending"
 private const val MIN_POLL_INTERVAL_SECONDS = 5L
 
-fun deviceAuthFlow(syncManager: SyncManager, isNewAccount: Boolean = false): Flow<TvSignInUiState> = flow {
+fun deviceAuthFlow(syncManager: SyncManager, isNewAccount: Boolean): Flow<TvSignInUiState> = flow {
     emit(TvSignInUiState.Loading)
     val response = try {
         syncManager.deviceAuthorize()

@@ -11,10 +11,14 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.DeviceTokenResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenResponse
 import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.LoginIdentityType
+import com.automattic.eventhorizon.OnboardingFlowType
+import com.automattic.eventhorizon.SignInSourceType
 import com.automattic.eventhorizon.UserAccountCreatedEvent
 import com.automattic.eventhorizon.UserSignedInEvent
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -94,7 +98,16 @@ class SyncManagerImplTest {
     fun `device auth login as new account fires account created event`() = runTest {
         whenever(syncServiceManager.deviceToken(any(), any())).thenReturn(createDeviceTokenResponse())
         syncManager.loginWithDeviceAuth("device-code", SignInSource.UserInitiated.Onboarding, isNewAccount = true)
-        assertTrue(eventSink.pollEvent() is UserAccountCreatedEvent)
+        assertEquals(
+            UserAccountCreatedEvent(
+                source = LoginIdentityType.QrCode,
+                sourceInCode = SignInSourceType.Onboarding,
+                redirectPath = "none",
+                flow = OnboardingFlowType.Unknown,
+            ),
+            eventSink.pollEvent(),
+        )
+        assertTrue(eventSink.isEmpty())
         verifyNotificationCalled()
     }
 
@@ -102,7 +115,15 @@ class SyncManagerImplTest {
     fun `device auth login as existing account fires signed in event`() = runTest {
         whenever(syncServiceManager.deviceToken(any(), any())).thenReturn(createDeviceTokenResponse())
         syncManager.loginWithDeviceAuth("device-code", SignInSource.UserInitiated.Onboarding, isNewAccount = false)
-        assertTrue(eventSink.pollEvent() is UserSignedInEvent)
+        assertEquals(
+            UserSignedInEvent(
+                source = LoginIdentityType.QrCode,
+                sourceInCode = SignInSourceType.Onboarding,
+                redirectPath = "none",
+            ),
+            eventSink.pollEvent(),
+        )
+        assertTrue(eventSink.isEmpty())
         verifyNotificationNotCalled()
     }
 

@@ -36,7 +36,7 @@ class TvSignInViewModel @Inject constructor(
         pollingJob?.cancel()
         _uiState.value = TvSignInUiState.Loading
         pollingJob = viewModelScope.launch {
-            deviceAuthFlow(syncManager).collect { _uiState.value = it }
+            deviceAuthFlow(syncManager, isNewAccount = false).collect { _uiState.value = it }
         }
     }
 
