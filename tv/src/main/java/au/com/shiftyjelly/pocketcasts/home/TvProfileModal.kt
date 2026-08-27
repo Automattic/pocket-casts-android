@@ -41,6 +41,7 @@ fun TvProfileModal(
     onCreateAccount: () -> Unit,
     onStarredEpisodes: () -> Unit,
     onListeningHistory: () -> Unit,
+    onSettings: () -> Unit,
     onLogOut: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -54,6 +55,7 @@ fun TvProfileModal(
             onCreateAccount = onCreateAccount,
             onStarredEpisodes = onStarredEpisodes,
             onListeningHistory = onListeningHistory,
+            onSettings = onSettings,
             onLogOut = onLogOut,
         )
     }
@@ -66,6 +68,7 @@ private fun ColumnScope.TvProfileModalContent(
     onCreateAccount: () -> Unit,
     onStarredEpisodes: () -> Unit,
     onListeningHistory: () -> Unit,
+    onSettings: () -> Unit,
     onLogOut: () -> Unit,
 ) {
     val focusRequester = remember { FocusRequester() }
@@ -94,6 +97,10 @@ private fun ColumnScope.TvProfileModalContent(
                 onClick = onListeningHistory,
             )
             TvModalButton(
+                text = stringResource(LR.string.settings),
+                onClick = onSettings,
+            )
+            TvModalButton(
                 text = stringResource(LR.string.log_out),
                 onClick = onLogOut,
             )
@@ -108,6 +115,10 @@ private fun ColumnScope.TvProfileModalContent(
             TvModalButton(
                 text = stringResource(LR.string.create_account),
                 onClick = onCreateAccount,
+            )
+            TvModalButton(
+                text = stringResource(LR.string.settings),
+                onClick = onSettings,
             )
         }
     }
@@ -170,6 +181,7 @@ private fun TvProfileModalSignedOutPreview() {
                 onCreateAccount = {},
                 onStarredEpisodes = {},
                 onListeningHistory = {},
+                onSettings = {},
                 onLogOut = {},
             )
         }
@@ -187,6 +199,7 @@ private fun TvProfileModalSignedInPreview() {
                 onCreateAccount = {},
                 onStarredEpisodes = {},
                 onListeningHistory = {},
+                onSettings = {},
                 onLogOut = {},
             )
         }

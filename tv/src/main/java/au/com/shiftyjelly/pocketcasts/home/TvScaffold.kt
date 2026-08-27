@@ -37,6 +37,7 @@ import au.com.shiftyjelly.pocketcasts.nowplaying.TvNowPlayingScreen
 import au.com.shiftyjelly.pocketcasts.playlists.TvPlaylistsScreen
 import au.com.shiftyjelly.pocketcasts.podcasts.TvYourPodcastsScreen
 import au.com.shiftyjelly.pocketcasts.search.TvSearchScreen
+import au.com.shiftyjelly.pocketcasts.settings.TvSettingsModal
 import au.com.shiftyjelly.pocketcasts.starred.TvStarredScreen
 import au.com.shiftyjelly.pocketcasts.theme.TvScreenBackgroundBrush
 import au.com.shiftyjelly.pocketcasts.theme.TvTheme
@@ -55,6 +56,7 @@ fun TvScaffold(
     var isProfileModalVisible by rememberSaveable { mutableStateOf(false) }
     var isStarredVisible by rememberSaveable { mutableStateOf(false) }
     var isListeningHistoryVisible by rememberSaveable { mutableStateOf(false) }
+    var isSettingsModalVisible by rememberSaveable { mutableStateOf(false) }
     val topBarVisibility = remember { TvTopBarVisibility() }
     var didFocusTopBar by rememberSaveable { mutableStateOf(false) }
     var isNowPlayingOpenRequested by remember { mutableStateOf(false) }
@@ -170,11 +172,18 @@ fun TvScaffold(
                     isProfileModalVisible = false
                     isListeningHistoryVisible = true
                 },
+                onSettings = { isSettingsModalVisible = true },
                 onLogOut = {
                     isProfileModalVisible = false
                     viewModel.signOut()
                     onSignedOut()
                 },
+            )
+        }
+
+        if (isSettingsModalVisible) {
+            TvSettingsModal(
+                onDismissRequest = { isSettingsModalVisible = false },
             )
         }
     }
