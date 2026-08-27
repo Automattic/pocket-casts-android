@@ -347,7 +347,7 @@ class TvSearchViewModel @Inject constructor(
                         episodeManager.findByUuid(episode.episodeUuid)
                     }
                 if (found != null) {
-                    playbackManager.playNowSuspend(episode = found, sourceView = SourceView.DISCOVER)
+                    playbackManager.playNowSuspend(episode = found, sourceView = SourceView.SEARCH)
                     _playStarted.tryEmit(Unit)
                 } else {
                     Timber.e("Episode %s not found to play from TV search discover", episode.episodeUuid)
@@ -370,7 +370,7 @@ class TvSearchViewModel @Inject constructor(
                 val latest = episodeManager.findEpisodesByPodcastOrderedByPublishDate(loadedPodcast).firstOrNull()
                 if (latest != null) {
                     discoverFeedAnalytics.trackEpisodePlayed(row, latest.toTvDiscoverEpisode(podcast))
-                    playbackManager.playNowSuspend(episode = latest, sourceView = SourceView.DISCOVER)
+                    playbackManager.playNowSuspend(episode = latest, sourceView = SourceView.SEARCH)
                     _playStarted.tryEmit(Unit)
                 } else {
                     Timber.e("No episode found to play from featured podcast %s on TV search", podcast.uuid)

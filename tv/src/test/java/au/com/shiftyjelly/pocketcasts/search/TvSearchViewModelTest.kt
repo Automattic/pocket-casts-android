@@ -679,7 +679,7 @@ class TvSearchViewModelTest {
 
         createViewModel().playDiscoverEpisode(discoverEpisode("episode-1"))
 
-        verifyBlocking(playbackManager) { playNowSuspend(episode = episode, sourceView = SourceView.DISCOVER) }
+        verifyBlocking(playbackManager) { playNowSuspend(episode = episode, sourceView = SourceView.SEARCH) }
         verify(podcastManager, never()).findOrDownloadPodcastRxSingle(any(), any())
     }
 
@@ -692,7 +692,7 @@ class TvSearchViewModelTest {
 
         createViewModel().playDiscoverEpisode(discoverEpisode("episode-1"))
 
-        verifyBlocking(playbackManager) { playNowSuspend(episode = episode, sourceView = SourceView.DISCOVER) }
+        verifyBlocking(playbackManager) { playNowSuspend(episode = episode, sourceView = SourceView.SEARCH) }
     }
 
     @Test
@@ -707,7 +707,7 @@ class TvSearchViewModelTest {
 
         createViewModel().playLatestEpisode(row, discoverPodcast("podcast-1"))
 
-        verifyBlocking(playbackManager) { playNowSuspend(episode = newest, sourceView = SourceView.DISCOVER) }
+        verifyBlocking(playbackManager) { playNowSuspend(episode = newest, sourceView = SourceView.SEARCH) }
         verify(eventHorizon).track(
             DiscoverListEpisodeTappedEvent(listId = "list-featured", podcastUuid = "podcast-1", episodeUuid = "episode-new", source = "search"),
         )
@@ -738,7 +738,7 @@ class TvSearchViewModelTest {
         val newest = podcastEpisode("episode-new")
         whenever(podcastManager.findOrDownloadPodcastRxSingle("podcast-1")).thenReturn(Single.just(podcast))
         whenever(episodeManager.findEpisodesByPodcastOrderedByPublishDate(podcast)).thenReturn(listOf(newest))
-        whenever { playbackManager.playNowSuspend(episode = newest, sourceView = SourceView.DISCOVER) }
+        whenever { playbackManager.playNowSuspend(episode = newest, sourceView = SourceView.SEARCH) }
             .thenThrow(RuntimeException("boom"))
         val row = TvDiscoverRow.FeaturedPodcasts(id = "list-featured", title = "Featured", podcasts = listOf(discoverPodcast("podcast-1")))
 
