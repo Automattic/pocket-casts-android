@@ -80,6 +80,7 @@ billing-ktx = { module = "com.android.billingclient:billing-ktx", version.ref = 
 coil = { module = "io.coil-kt.coil3:coil", version.ref = "coil" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
 coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coil" }
+coil-video = { module = "io.coil-kt.coil3:coil-video", version.ref = "coil" }
 
 # Compose
 compose-activity = "androidx.activity:activity-compose:1.13.0"
