@@ -148,7 +148,6 @@ class AppLifecycleObserverTest {
         verify(newFeaturesNotificationSetting).set(true, updateModifiedAt = false)
         verify(offerNotificationSetting).set(true, updateModifiedAt = false)
         verify(useUpNextDarkThemeSetting).set(false, updateModifiedAt = false)
-        // Fresh installs anchor the encouragement cadence so the modal waits a full interval.
         verify(freeAccountEncouragementLastShownSetting).set(any(), any(), any(), any())
 
         verify(appLifecycleAnalytics, never()).onApplicationUpgrade(any())
@@ -213,7 +212,6 @@ class AppLifecycleObserverTest {
         verify(autoDownloadOnFollowPodcastSetting, never()).set(any(), any(), any(), any())
         verify(dailyRemindersNotificationSetting, never()).set(any(), any(), any(), any())
         verify(useUpNextDarkThemeSetting, never()).set(any(), any(), any(), any())
-        // Upgrading users leave the cadence anchor null so the modal shows on the first eligible launch.
         verify(freeAccountEncouragementLastShownSetting, never()).set(any(), any(), any(), any())
         verify(notificationScheduler, never()).setupOnboardingNotifications()
         verify(notificationScheduler, times(1)).setupReEngagementNotification()

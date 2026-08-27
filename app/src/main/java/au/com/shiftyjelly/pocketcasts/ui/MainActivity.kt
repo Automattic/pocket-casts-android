@@ -357,9 +357,7 @@ class MainActivity :
 
     private var bottomSheetTag: String? = null
 
-    // True once initial onboarding has been launched this session, so the recurring account-creation
-    // modal isn't chained onto the same launch (hasCompletedOnboarding() flips to true as soon as
-    // onboarding finishes). It shows on the next launch instead.
+    // hasCompletedOnboarding() flips true as onboarding finishes, which would chain the modal onto the same launch.
     private var launchedInitialOnboarding: Boolean = false
     private var pendingBottomSheetFragment: Fragment? = null
 
@@ -497,8 +495,7 @@ class MainActivity :
         if (savedInstanceState == null && needsLoginPromptAfterRestore) {
             settings.setNeedsLoginPromptAfterRestore(false)
             if (!showOnboarding && !isLoggedIn) {
-                // Anchor the recurring clock so encourageAccountCreation() doesn't also show the
-                // modal this launch; the next recurring prompt is then one interval out.
+                // Anchor the clock so encourageAccountCreation() doesn't also show the modal this launch.
                 settings.freeAccountEncouragementLastShown.set(Instant.now(), updateModifiedAt = true)
                 openOnboardingFlow(OnboardingFlow.AccountEncouragement)
             }
@@ -697,15 +694,10 @@ class MainActivity :
                     return@repeatOnLifecycle
                 }
 
-                // Don't chain onto the same launch that presented initial onboarding — completing it
-                // flips hasCompletedOnboarding() to true, which would otherwise show the modal the
-                // moment onboarding is dismissed. It shows on the next launch instead.
                 if (launchedInitialOnboarding) {
                     return@repeatOnLifecycle
                 }
 
-                // Eligible = logged out and past initial onboarding. Shown on the first eligible
-                // launch, then every 60 days while the user stays logged out.
                 val isSignedIn = viewModel.signInState.asFlow().first().isSignedIn
                 val isEligible = !isSignedIn && settings.hasCompletedOnboarding()
 
@@ -718,16 +710,10 @@ class MainActivity :
                     AccountEncouragement.Decision.Wait -> return@repeatOnLifecycle
 
                     AccountEncouragement.Decision.Show -> {
-                        // Defer if another bottom sheet (What's New, End of Year, etc.) is already
-                        // showing or pending: don't stack over it, and don't reset the clock for a
-                        // modal the user never saw. Retries on the next eligible launch.
                         if (bottomSheetTag != null || pendingBottomSheetFragment != null) {
                             return@repeatOnLifecycle
                         }
 
-                        // Reset the clock so the next showing is one interval out. Set before
-                        // presenting so this STARTED block can't re-show the modal when the activity
-                        // returns to the foreground after it's dismissed.
                         settings.freeAccountEncouragementLastShown.set(Instant.now(), updateModifiedAt = true)
 
                         if (Util.isTablet(this@MainActivity)) {

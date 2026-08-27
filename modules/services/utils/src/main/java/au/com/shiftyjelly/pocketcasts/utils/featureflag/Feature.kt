@@ -171,9 +171,6 @@ enum class Feature(
         addedOn = LocalDate.parse("2025-11-05"),
     ),
     ENCOURAGE_ACCOUNT_CREATION(
-        // Deliberately not "encourage_account_creation" — that Firebase parameter still exists from
-        // the 2025 one-shot experiment (added in #3865, code removed in #4595) and its stale value
-        // would override defaultValue here.
         key = "encourage_account_creation_recurring",
         title = "Recurring encourage account creation modal",
         defaultValue = true,

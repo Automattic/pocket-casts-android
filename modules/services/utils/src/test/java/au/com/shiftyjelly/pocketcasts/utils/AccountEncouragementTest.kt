@@ -11,7 +11,6 @@ class AccountEncouragementTest {
 
     @Test
     fun `waits when not eligible`() {
-        // Even with an elapsed clock, an ineligible user is never shown the modal.
         val decision = AccountEncouragement.decide(
             isEligible = false,
             lastShown = now.minus(interval.multipliedBy(2)),
@@ -24,7 +23,6 @@ class AccountEncouragementTest {
 
     @Test
     fun `shows on first eligible launch`() {
-        // First eligible launch (no anchor yet) shows immediately, then the clock starts.
         val decision = AccountEncouragement.decide(
             isEligible = true,
             lastShown = null,
@@ -37,7 +35,6 @@ class AccountEncouragementTest {
 
     @Test
     fun `waits before interval elapses`() {
-        // One second short of the interval should not show yet.
         val decision = AccountEncouragement.decide(
             isEligible = true,
             lastShown = now.minus(interval).plusSeconds(1),
@@ -50,7 +47,6 @@ class AccountEncouragementTest {
 
     @Test
     fun `shows when interval elapsed`() {
-        // Exactly at the interval boundary should show.
         val decision = AccountEncouragement.decide(
             isEligible = true,
             lastShown = now.minus(interval),
@@ -75,8 +71,7 @@ class AccountEncouragementTest {
 
     @Test
     fun `shows when anchor is in the future`() {
-        // A future anchor (backwards device clock / restored skewed backup) shows rather than
-        // suppressing the modal indefinitely.
+        // A future anchor means a backwards device clock or a restored skewed backup.
         val decision = AccountEncouragement.decide(
             isEligible = true,
             lastShown = now.plus(interval),

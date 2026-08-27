@@ -130,9 +130,7 @@ class AppLifecycleObserver(
             // new installations default to not displaying the tooltip
             settings.showPodcastsRecentlyPlayedSortOrderTooltip.set(false, updateModifiedAt = false)
 
-            // Anchor the account-encouragement cadence on fresh install so the modal waits a full
-            // interval before its first show (existing users upgrading leave it null and see it
-            // immediately).
+            // Anchor the cadence so new installs wait a full interval; upgrading users leave it null.
             settings.freeAccountEncouragementLastShown.set(Instant.now(), updateModifiedAt = false)
 
             when (getAppPlatform()) {
