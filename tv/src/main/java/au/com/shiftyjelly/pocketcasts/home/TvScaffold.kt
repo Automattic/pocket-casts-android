@@ -67,6 +67,7 @@ fun TvScaffold(
             viewModel.openNowPlaying()
             isNowPlayingOpenRequested = true
             isStarredVisible = false
+            isListeningHistoryVisible = false
         }
     }
     LaunchedEffect(viewModel) {
@@ -141,6 +142,7 @@ fun TvScaffold(
             TvDetailOverlay(
                 target = if (isListeningHistoryVisible) Unit else null,
                 onBack = { isListeningHistoryVisible = false },
+                onHide = focusTopBar,
             ) {
                 TvListeningHistoryScreen()
             }
