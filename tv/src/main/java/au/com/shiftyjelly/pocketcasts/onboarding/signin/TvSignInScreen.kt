@@ -26,6 +26,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -223,7 +224,7 @@ private fun TvQrSignIn(
                 steps = signInSteps(state.verificationUri),
             )
 
-            is TvSignInUiState.Error -> TvQrSignInError(onRetry = onRetry)
+            is TvSignInUiState.Error -> TvSignInErrorContent(onRetry = onRetry)
 
             else -> LoadingView(
                 color = MaterialTheme.tvColors.textPrimary,
@@ -234,32 +235,37 @@ private fun TvQrSignIn(
 }
 
 @Composable
-private fun TvQrSignInError(
+internal fun TvSignInErrorContent(
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val retryFocusRequester = remember { FocusRequester() }
+    val focusRequester = remember { FocusRequester() }
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
         modifier = modifier,
     ) {
+        Image(
+            painter = painterResource(IR.drawable.ic_waitingforwifi),
+            contentDescription = null,
+            colorFilter = ColorFilter.tint(MaterialTheme.tvColors.textSecondary),
+            modifier = Modifier.size(48.dp),
+        )
+        Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = stringResource(LR.string.error_generic_message),
-            color = MaterialTheme.tvColors.textSecondary,
+            text = stringResource(LR.string.tv_sign_in_qr_error),
+            color = MaterialTheme.tvColors.textPrimary,
             style = MaterialTheme.tvTypography.body.copy(textAlign = TextAlign.Center),
         )
         Spacer(modifier = Modifier.height(24.dp))
         Button(
             onClick = onRetry,
             colors = TvButtonDefaults.filledButtonColors(),
-            modifier = Modifier.focusRequester(retryFocusRequester),
+            modifier = Modifier.focusRequester(focusRequester),
         ) {
-            Text(text = stringResource(LR.string.retry))
+            Text(text = stringResource(LR.string.try_again))
         }
-    }
-
-    LaunchedEffect(Unit) {
-        runCatching { retryFocusRequester.requestFocus() }
     }
 }
 

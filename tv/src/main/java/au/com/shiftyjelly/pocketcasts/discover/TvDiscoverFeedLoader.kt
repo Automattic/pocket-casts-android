@@ -1,7 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.discover
 
 import android.content.Context
+import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
 import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
 import au.com.shiftyjelly.pocketcasts.servers.model.Discover
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
@@ -13,19 +15,28 @@ import au.com.shiftyjelly.pocketcasts.servers.model.DisplayStyle
 import au.com.shiftyjelly.pocketcasts.servers.model.ListType
 import au.com.shiftyjelly.pocketcasts.servers.model.transformWithRegion
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
+@Singleton
 class TvDiscoverFeedLoader @Inject constructor(
     private val listRepository: ListRepository,
     private val settings: Settings,
+    @ApplicationScope private val applicationScope: CoroutineScope,
     @ApplicationContext private val context: Context,
 ) {
+    private val categoryCoverUrlCache = ConcurrentHashMap<String, List<String>>()
+    private val categoryCoverUrlLoads = ConcurrentHashMap<String, Deferred<List<String>>>()
+
     suspend fun load(isLoggedIn: Boolean): List<TvDiscoverRow> {
         return buildRows(listRepository.getHomeDiscoverFeed(isLoggedIn), isLoggedIn, includeHomeSections = true)
     }
@@ -57,6 +68,30 @@ class TvDiscoverFeedLoader @Inject constructor(
             listId = feed.listId,
             podcasts = mergeCategorySponsored(podcasts, sponsoredDeferred.await()),
         )
+    }
+
+    suspend fun loadCategoryCoverUrls(source: String): List<String> {
+        if (source.isBlank()) return emptyList()
+        categoryCoverUrlCache[source]?.let { return it }
+        val load = categoryCoverUrlLoads.computeIfAbsent(source) {
+            applicationScope.async {
+                try {
+                    val feed = listRepository.getListFeed(source) ?: return@async emptyList()
+                    val uuids = feed.podcasts.orEmpty().map(DiscoverPodcast::uuid).distinct()
+                    val urls = listOfNotNull(uuids.firstOrNull(), uuids.lastOrNull().takeIf { uuids.size > 1 })
+                        .map { PodcastImage.getArtworkUrl(size = COVER_ARTWORK_SIZE, uuid = it, isWearOS = false) }
+                    categoryCoverUrlCache[source] = urls
+                    urls
+                } catch (exception: CancellationException) {
+                    throw exception
+                } catch (exception: Exception) {
+                    Timber.e(exception, "Failed to load TV category covers")
+                    emptyList()
+                }
+            }
+        }
+        load.invokeOnCompletion { categoryCoverUrlLoads.remove(source, load) }
+        return load.await()
     }
 
     private suspend fun loadCategorySponsoredPodcasts(categoryId: Int, isLoggedIn: Boolean): List<TvDiscoverPodcast> = coroutineScope {
@@ -235,5 +270,6 @@ class TvDiscoverFeedLoader @Inject constructor(
     companion object {
         private const val BANNER_TYPE = "banner"
         private const val SPONSORED_CATEGORY_POSITION = 5
+        private const val COVER_ARTWORK_SIZE = 200
     }
 }

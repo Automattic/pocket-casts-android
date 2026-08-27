@@ -176,6 +176,10 @@ class TvHomeViewModel @Inject constructor(
         return discoverFeedLoader.loadCategoryPodcasts(source, categoryId, syncManager.isLoggedIn())
     }
 
+    suspend fun categoryCoverUrls(category: DiscoverCategory): List<String> {
+        return discoverFeedLoader.loadCategoryCoverUrls(category.source)
+    }
+
     fun trackHomeShown() {
         eventHorizon.track(HomeShownEvent)
     }
