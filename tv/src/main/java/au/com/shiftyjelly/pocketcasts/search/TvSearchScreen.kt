@@ -59,8 +59,11 @@ import au.com.shiftyjelly.pocketcasts.component.TvPodcastTileDefaults
 import au.com.shiftyjelly.pocketcasts.component.TvRow
 import au.com.shiftyjelly.pocketcasts.component.TvTile
 import au.com.shiftyjelly.pocketcasts.component.tvFocusInactiveWhen
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.discover.TvCategoryPodcastsScreen
+import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverEpisode
+import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverRow
 import au.com.shiftyjelly.pocketcasts.discover.TvOpenedCategory
 import au.com.shiftyjelly.pocketcasts.discover.TvOpenedCategorySaver
@@ -127,6 +130,9 @@ fun TvSearchScreen(
     val openNowPlaying = LocalOpenNowPlaying.current
     val toastHostState = LocalTvToastHostState.current
     val playFailedMessage = stringResource(LR.string.error_generic_message)
+
+    CallOnce { viewModel.trackSearchShown() }
+
     LaunchedEffect(Unit) {
         viewModel.playStarted.collect { openNowPlaying() }
     }
@@ -144,18 +150,33 @@ fun TvSearchScreen(
             discoverRows = discoverRows,
             onQueryChange = viewModel::onQueryChange,
             onFilterSelect = viewModel::onFilterSelected,
-            onOpenPodcast = { openedPodcastUuid = it },
             onOpenFolder = { openedFolder = SearchOpenedFolder(it.folder.uuid, it.folder.name) },
-            onOpenCategory = { openedCategory = TvOpenedCategory(it.id, it.name, it.source) },
-            onPlayEpisode = viewModel::playEpisode,
+            onPodcastResultClick = { podcast ->
+                viewModel.trackPodcastResultTapped(podcast)
+                openedPodcastUuid = podcast.uuid
+            },
+            onDiscoverPodcastClick = { row, podcast ->
+                viewModel.trackDiscoverPodcastTapped(row, podcast)
+                openedPodcastUuid = podcast.uuid
+            },
+            onDiscoverEpisodePodcastClick = { row, episode ->
+                viewModel.trackDiscoverEpisodePodcastTapped(row, episode)
+                openedPodcastUuid = episode.podcastUuid
+            },
+            onDiscoverCategoryClick = { discoverCategory, index ->
+                viewModel.trackCategoryPillTapped(discoverCategory, index)
+                openedCategory = TvOpenedCategory(discoverCategory.id, discoverCategory.name, discoverCategory.source)
+            },
+            onDiscoverListImpression = viewModel::trackDiscoverListShown,
+            onPlayEpisode = { episode ->
+                viewModel.trackEpisodeResultTapped(episode.uuid)
+                viewModel.playEpisode(episode)
+            },
             onOpenEpisodeActions = viewModel::openEpisodeActions,
             history = history,
-            onHistorySelect = viewModel::onQueryChange,
+            onHistorySelect = viewModel::selectHistoryItem,
             suggestions = suggestions,
-            onSuggestionSelect = { term ->
-                viewModel.saveSearchTerm(term)
-                viewModel.onQueryChange(term)
-            },
+            onSuggestionSelect = viewModel::selectSuggestion,
             onSaveSearch = viewModel::saveSearchTerm,
             restoreFocusTrigger = restoreFocusTrigger,
             modifier = Modifier
@@ -190,6 +211,7 @@ fun TvSearchScreen(
                 categorySource = openCategory.source,
                 getCategoryPodcasts = { source -> viewModel.categoryPodcasts(openCategory.id, source) },
                 onOpenPodcast = { openedPodcastUuid = it },
+                onPodcastClick = { listId, podcast -> viewModel.trackCategoryPodcastTapped(openCategory, listId, podcast) },
                 onClose = { openedCategory = null },
                 restoreFocusTrigger = categoryRestoreTrigger,
             )
@@ -220,6 +242,7 @@ fun TvSearchScreen(
                     viewModel.dismissEpisodeActions()
                 },
                 onGoToPodcast = {
+                    viewModel.trackEpisodeResultTapped(episode.uuid)
                     viewModel.dismissEpisodeActions()
                     openedPodcastUuid = episode.podcastUuid
                 },
@@ -245,12 +268,15 @@ private fun TvSearchContent(
     discoverRows: List<TvDiscoverRow>,
     onQueryChange: (String) -> Unit,
     onFilterSelect: (TvSearchFilter) -> Unit,
-    onOpenPodcast: (String) -> Unit,
     onOpenFolder: (FolderItem.Folder) -> Unit,
-    onOpenCategory: (DiscoverCategory) -> Unit,
+    onPodcastResultClick: (ImprovedSearchResultItem.PodcastItem) -> Unit,
+    onDiscoverPodcastClick: (TvDiscoverRow, TvDiscoverPodcast) -> Unit,
+    onDiscoverEpisodePodcastClick: (TvDiscoverRow, TvDiscoverEpisode) -> Unit,
+    onDiscoverCategoryClick: (DiscoverCategory, Int) -> Unit,
     onPlayEpisode: (ImprovedSearchResultItem.EpisodeItem) -> Unit,
     onOpenEpisodeActions: (ImprovedSearchResultItem.EpisodeItem) -> Unit,
     modifier: Modifier = Modifier,
+    onDiscoverListImpression: (TvDiscoverRow) -> Unit = {},
     history: List<String> = emptyList(),
     onHistorySelect: (String) -> Unit = {},
     suggestions: List<String> = emptyList(),
@@ -319,8 +345,10 @@ private fun TvSearchContent(
                     categories = categories,
                     discoverRows = discoverRows,
                     onHistorySelect = onHistorySelect,
-                    onOpenPodcast = onOpenPodcast,
-                    onOpenCategory = onOpenCategory,
+                    onDiscoverPodcastClick = onDiscoverPodcastClick,
+                    onDiscoverEpisodePodcastClick = onDiscoverEpisodePodcastClick,
+                    onDiscoverCategoryClick = onDiscoverCategoryClick,
+                    onDiscoverListImpression = onDiscoverListImpression,
                     restoreFocusTrigger = restoreFocusTrigger,
                 )
 
@@ -342,7 +370,7 @@ private fun TvSearchContent(
                     results = searchState,
                     filter = effectiveFilter,
                     searchTerm = query.trim(),
-                    onOpenPodcast = onOpenPodcast,
+                    onPodcastResultClick = onPodcastResultClick,
                     onOpenFolder = onOpenFolder,
                     onPlayEpisode = onPlayEpisode,
                     onOpenEpisodeActions = onOpenEpisodeActions,
@@ -359,8 +387,10 @@ private fun TvSearchIdle(
     categories: List<DiscoverCategory>,
     discoverRows: List<TvDiscoverRow>,
     onHistorySelect: (String) -> Unit,
-    onOpenPodcast: (String) -> Unit,
-    onOpenCategory: (DiscoverCategory) -> Unit,
+    onDiscoverPodcastClick: (TvDiscoverRow, TvDiscoverPodcast) -> Unit,
+    onDiscoverEpisodePodcastClick: (TvDiscoverRow, TvDiscoverEpisode) -> Unit,
+    onDiscoverCategoryClick: (DiscoverCategory, Int) -> Unit,
+    onDiscoverListImpression: (TvDiscoverRow) -> Unit,
     restoreFocusTrigger: Int,
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
@@ -385,8 +415,10 @@ private fun TvSearchIdle(
         TvSearchDiscover(
             categories = categories,
             discoverRows = discoverRows,
-            onOpenPodcast = onOpenPodcast,
-            onOpenCategory = onOpenCategory,
+            onDiscoverPodcastClick = onDiscoverPodcastClick,
+            onDiscoverEpisodePodcastClick = onDiscoverEpisodePodcastClick,
+            onDiscoverCategoryClick = onDiscoverCategoryClick,
+            onDiscoverListImpression = onDiscoverListImpression,
             restoreFocusTrigger = restoreFocusTrigger,
             modifier = Modifier.weight(1f),
         )
@@ -397,8 +429,10 @@ private fun TvSearchIdle(
 private fun TvSearchDiscover(
     categories: List<DiscoverCategory>,
     discoverRows: List<TvDiscoverRow>,
-    onOpenPodcast: (String) -> Unit,
-    onOpenCategory: (DiscoverCategory) -> Unit,
+    onDiscoverPodcastClick: (TvDiscoverRow, TvDiscoverPodcast) -> Unit,
+    onDiscoverEpisodePodcastClick: (TvDiscoverRow, TvDiscoverEpisode) -> Unit,
+    onDiscoverCategoryClick: (DiscoverCategory, Int) -> Unit,
+    onDiscoverListImpression: (TvDiscoverRow) -> Unit,
     restoreFocusTrigger: Int,
     modifier: Modifier = Modifier,
 ) {
@@ -437,7 +471,10 @@ private fun TvSearchDiscover(
                     focusRequester = rowFocusRequesters.getOrNull(0),
                     modifier = Modifier.onFocusChanged { if (it.hasFocus) lastFocusedRowIndex = 0 },
                 ) { category ->
-                    TvCategoryTile(category = category, onClick = { onOpenCategory(category) })
+                    TvCategoryTile(
+                        category = category,
+                        onClick = { onDiscoverCategoryClick(category, categories.indexOfFirst { it.id == category.id }) },
+                    )
                 }
             }
         }
@@ -447,10 +484,11 @@ private fun TvSearchDiscover(
             item { Spacer(modifier = Modifier.height(24.dp)) }
             tvDiscoverRow(
                 row = row,
-                onPodcastClick = { _, podcast -> onOpenPodcast(podcast.uuid) },
+                onPodcastClick = onDiscoverPodcastClick,
                 onEpisodePlay = { _, _ -> }, // TODO: wire discover-feed episode playback in search
-                onEpisodePodcastClick = { _, episode -> onOpenPodcast(episode.podcastUuid) },
-                onCategoryClick = { category, _ -> onOpenCategory(category) },
+                onEpisodePodcastClick = onDiscoverEpisodePodcastClick,
+                onCategoryClick = onDiscoverCategoryClick,
+                onListImpression = onDiscoverListImpression,
                 contentPadding = ContentPadding,
                 focusRequester = rowFocusRequesters.getOrNull(rowIndex),
                 modifier = Modifier.onFocusChanged { if (it.hasFocus) lastFocusedRowIndex = rowIndex },
@@ -466,7 +504,7 @@ private fun TvSearchResults(
     results: TvSearchState.Results,
     filter: TvSearchFilter,
     searchTerm: String,
-    onOpenPodcast: (String) -> Unit,
+    onPodcastResultClick: (ImprovedSearchResultItem.PodcastItem) -> Unit,
     onOpenFolder: (FolderItem.Folder) -> Unit,
     onPlayEpisode: (ImprovedSearchResultItem.EpisodeItem) -> Unit,
     onOpenEpisodeActions: (ImprovedSearchResultItem.EpisodeItem) -> Unit,
@@ -477,7 +515,7 @@ private fun TvSearchResults(
             podcasts = results.podcasts,
             episodes = results.episodes,
             folders = results.folders,
-            onOpenPodcast = onOpenPodcast,
+            onPodcastResultClick = onPodcastResultClick,
             onOpenFolder = onOpenFolder,
             onPlayEpisode = onPlayEpisode,
             onOpenEpisodeActions = onOpenEpisodeActions,
@@ -504,7 +542,7 @@ private fun TvSearchResults(
                 TvPodcastTile(
                     artworkUrl = PodcastImage.getMediumArtworkUrl(podcast.uuid),
                     podcastTitle = podcast.title,
-                    onClick = { onOpenPodcast(podcast.uuid) },
+                    onClick = { onPodcastResultClick(podcast) },
                     imageModifier = Modifier.fillMaxWidth(),
                     modifier = itemModifier,
                 )
@@ -562,7 +600,7 @@ private fun TvSearchTopResults(
     podcasts: List<ImprovedSearchResultItem.PodcastItem>,
     episodes: List<ImprovedSearchResultItem.EpisodeItem>,
     folders: List<FolderItem.Folder>,
-    onOpenPodcast: (String) -> Unit,
+    onPodcastResultClick: (ImprovedSearchResultItem.PodcastItem) -> Unit,
     onOpenFolder: (FolderItem.Folder) -> Unit,
     onPlayEpisode: (ImprovedSearchResultItem.EpisodeItem) -> Unit,
     onOpenEpisodeActions: (ImprovedSearchResultItem.EpisodeItem) -> Unit,
@@ -624,7 +662,7 @@ private fun TvSearchTopResults(
             item { Spacer(modifier = Modifier.height(24.dp)) }
             tvSearchPodcastsRow(
                 podcasts = topPodcasts,
-                onOpenPodcast = onOpenPodcast,
+                onPodcastResultClick = onPodcastResultClick,
                 focusRequester = restoreFocusRequester.takeIf { podcastsFirst },
             )
         }
@@ -740,7 +778,7 @@ private fun TvSearchEpisodeGrid(
 
 private fun LazyListScope.tvSearchPodcastsRow(
     podcasts: List<ImprovedSearchResultItem.PodcastItem>,
-    onOpenPodcast: (String) -> Unit,
+    onPodcastResultClick: (ImprovedSearchResultItem.PodcastItem) -> Unit,
     focusRequester: FocusRequester?,
 ) {
     item {
@@ -754,7 +792,7 @@ private fun LazyListScope.tvSearchPodcastsRow(
             TvPodcastTile(
                 artworkUrl = PodcastImage.getMediumArtworkUrl(podcast.uuid),
                 podcastTitle = podcast.title,
-                onClick = { onOpenPodcast(podcast.uuid) },
+                onClick = { onPodcastResultClick(podcast) },
                 imageModifier = Modifier.width(TvPodcastTileDefaults.RowImageWidth),
             )
         }
@@ -840,9 +878,11 @@ private fun TvSearchScreenPreview() {
                 discoverRows = emptyList(),
                 onQueryChange = {},
                 onFilterSelect = {},
-                onOpenPodcast = {},
                 onOpenFolder = {},
-                onOpenCategory = {},
+                onPodcastResultClick = {},
+                onDiscoverPodcastClick = { _, _ -> },
+                onDiscoverEpisodePodcastClick = { _, _ -> },
+                onDiscoverCategoryClick = { _, _ -> },
                 onPlayEpisode = {},
                 onOpenEpisodeActions = {},
             )
@@ -864,8 +904,10 @@ private fun TvSearchIdleWithHistoryPreview() {
                 discoverRows = emptyList(),
                 onQueryChange = {},
                 onFilterSelect = {},
-                onOpenPodcast = {},
-                onOpenCategory = {},
+                onPodcastResultClick = {},
+                onDiscoverPodcastClick = { _, _ -> },
+                onDiscoverEpisodePodcastClick = { _, _ -> },
+                onDiscoverCategoryClick = { _, _ -> },
                 onPlayEpisode = {},
                 onOpenEpisodeActions = {},
                 onOpenFolder = {},
@@ -924,8 +966,10 @@ private fun TvSearchResultsPreview() {
                 discoverRows = emptyList(),
                 onQueryChange = {},
                 onFilterSelect = {},
-                onOpenPodcast = {},
-                onOpenCategory = {},
+                onPodcastResultClick = {},
+                onDiscoverPodcastClick = { _, _ -> },
+                onDiscoverEpisodePodcastClick = { _, _ -> },
+                onDiscoverCategoryClick = { _, _ -> },
                 onPlayEpisode = {},
                 onOpenEpisodeActions = {},
                 onOpenFolder = {},
