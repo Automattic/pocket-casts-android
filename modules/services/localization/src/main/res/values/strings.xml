@@ -316,6 +316,8 @@
     <string name="tv_up_next_empty_action_title">Add episodes</string>
     <string name="tv_starred_empty_title">No starred episodes</string>
     <string name="tv_starred_empty_subtitle">Star episodes to keep them handy, and they’ll show up here</string>
+    <string name="tv_history_empty_title">No listening history</string>
+    <string name="tv_history_empty_subtitle">Episodes you play will show up here</string>
     <string name="tv_nothing_playing_title">Nothing playing</string>
     <string name="tv_nothing_playing_subtitle">Play an episode and it’ll show up here.</string>
     <string name="tv_playback_speed_changed">Playback speed set to %1$s</string>
