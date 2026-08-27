@@ -43,11 +43,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.Button
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import au.com.shiftyjelly.pocketcasts.component.LocalOpenNowPlaying
 import au.com.shiftyjelly.pocketcasts.component.TvArchivedFilterButton
 import au.com.shiftyjelly.pocketcasts.component.TvArtworkImage
 import au.com.shiftyjelly.pocketcasts.component.TvEmptyState
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeActionContext
+import au.com.shiftyjelly.pocketcasts.component.TvEpisodeActions
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeActionsModal
+import au.com.shiftyjelly.pocketcasts.component.TvEpisodeActionsViewModel
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeInfoModal
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeListItem
 import au.com.shiftyjelly.pocketcasts.component.TvPodcastInfoModal
@@ -81,8 +84,10 @@ fun TvPodcastDetailsScreen(
         key = podcastUuid,
         creationCallback = { factory -> factory.create(podcastUuid) },
     ),
+    episodeActions: TvEpisodeActions = hiltViewModel<TvEpisodeActionsViewModel>(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val openNowPlaying = LocalOpenNowPlaying.current
 
     LaunchedEffect(uiState, onClose) {
         if (uiState is TvPodcastDetailsUiState.NotFound) {
@@ -99,6 +104,10 @@ fun TvPodcastDetailsScreen(
         onRetryAccountAuth = viewModel::retryAccountAuth,
         onChangeSortType = viewModel::changeSortType,
         onToggleArchiveFilter = viewModel::toggleArchiveFilter,
+        onPlayEpisode = { episode ->
+            episodeActions.play(episode, TvEpisodeActionContext.PodcastDetails.source)
+            openNowPlaying()
+        },
         modifier = modifier,
     )
 }
@@ -113,6 +122,7 @@ private fun TvPodcastDetailsContent(
     onRetryAccountAuth: () -> Unit,
     onChangeSortType: (EpisodesSortType) -> Unit,
     onToggleArchiveFilter: () -> Unit,
+    onPlayEpisode: (PodcastEpisode) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(modifier = modifier.fillMaxSize()) {
@@ -158,6 +168,7 @@ private fun TvPodcastDetailsContent(
                             isShowingArchived = uiState.isShowingArchived,
                             onChangeSortType = onChangeSortType,
                             onToggleArchiveFilter = onToggleArchiveFilter,
+                            onPlayEpisode = onPlayEpisode,
                             leftFocusRequester = followFocusRequester,
                             modifier = Modifier.weight(1f - INFO_PANE_WEIGHT),
                         )
@@ -260,6 +271,7 @@ private fun EpisodeList(
     isShowingArchived: Boolean,
     onChangeSortType: (EpisodesSortType) -> Unit,
     onToggleArchiveFilter: () -> Unit,
+    onPlayEpisode: (PodcastEpisode) -> Unit,
     leftFocusRequester: FocusRequester,
     modifier: Modifier = Modifier,
 ) {
@@ -316,7 +328,7 @@ private fun EpisodeList(
                     TvEpisodeListItem(
                         episode = episode,
                         dateFormatter = dateFormatter,
-                        onClick = {},
+                        onClick = { onPlayEpisode(episode) },
                         onOpenActions = {
                             focus.watchForRemoval(episodes, index)
                             actionsEpisode = episode
@@ -430,6 +442,7 @@ private fun TvPodcastDetailsContentPreview(
             onRetryAccountAuth = {},
             onChangeSortType = {},
             onToggleArchiveFilter = {},
+            onPlayEpisode = {},
         )
     }
 }

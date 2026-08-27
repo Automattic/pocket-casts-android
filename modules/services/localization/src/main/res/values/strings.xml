@@ -276,6 +276,8 @@
     <string name="tv_sign_in_tab_qr_code">QR code</string>
     <string name="tv_sign_in_tab_email">Email</string>
     <string name="tv_sign_in_signing_in">Signing in</string>
+    <string name="tv_account_signed_out_alert_title">You\'ve been logged out</string>
+    <string name="tv_account_signed_out_alert_message">There was a problem and you\'ve been logged out.\nSelect the button below to log in to your Pocket Casts account again.</string>
     <string name="tv_create_account_modal_title">Your podcasts deserve a home</string>
     <string name="tv_create_account_modal_subtitle">Create a free account to follow podcasts, build your Up Next, and pick up right where you left off, on any device.</string>
     <string name="tv_create_account_modal_step_create">Create your account or log in</string>
@@ -2886,6 +2888,7 @@
     <string name="search_filters_top_results">Top Results</string>
     <string name="search_filters_podcasts" translatable="false">@string/podcasts</string>
     <string name="search_filters_episodes" translatable="false">@string/episodes</string>
+    <string name="search_filters_folders" translatable="false">@string/folders</string>
     <string name="search_suggestions_view_all">View all for \"%1$s\"</string>
     <string name="search_suggestions_no_results_title">No Results</string>
     <string name="search_suggestions_no_results_message">Try a new search, or by adding a podcast feed URL</string>
@@ -2935,6 +2938,4 @@
     <string name="tv_onboarding_welcome_back">Welcome back!</string>
     <string name="tv_onboarding_syncing_subtitle">Your podcasts are syncing, we\'ll sign you in soon!</string>
     <string name="tv_create_account_title">Create your free account</string>
-    <string name="tv_create_account_subtitle">Scan this code to get started on your phone, it only takes a minute.</string>
-    <string name="tv_create_account_come_back">Once you\'ve created your account, come back and sign in</string>
 </resources>

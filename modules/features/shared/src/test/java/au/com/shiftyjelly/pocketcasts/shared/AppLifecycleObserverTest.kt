@@ -176,6 +176,27 @@ class AppLifecycleObserverTest {
     }
 
     @Test
+    fun handlesNewInstallTv() = runTest {
+        whenever(settings.getMigratedVersionCode()).thenReturn(VERSION_CODE_DEFAULT)
+
+        appLifecycleObserver = spy(appLifecycleObserver)
+        doReturn(AppPlatform.Tv).whenever(appLifecycleObserver).getAppPlatform()
+
+        appLifecycleObserver.setup()
+
+        verify(appLifecycleAnalytics).onNewApplicationInstall()
+
+        verify(autoPlayNextEpisodeSetting, never()).set(any(), any(), any(), any())
+        verify(autoDownloadOnFollowPodcastSetting, never()).set(any(), any(), any(), any())
+        verify(dailyRemindersNotificationSetting, never()).set(any(), any(), any(), any())
+        verify(useUpNextDarkThemeSetting).set(false, updateModifiedAt = false)
+        verify(appLifecycleAnalytics, never()).onApplicationUpgrade(any())
+        verify(notificationScheduler, never()).setupOnboardingNotifications()
+        verify(notificationScheduler, times(1)).setupReEngagementNotification()
+        verify(notificationScheduler, times(1)).setupTrendingAndRecommendationsNotifications()
+    }
+
+    @Test
     fun handlesNewInstallAutomotive() = runTest {
         whenever(settings.getMigratedVersionCode()).thenReturn(VERSION_CODE_DEFAULT)
 

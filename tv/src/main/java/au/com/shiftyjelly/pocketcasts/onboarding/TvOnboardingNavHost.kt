@@ -19,6 +19,7 @@ import au.com.shiftyjelly.pocketcasts.component.TvToastHost
 import au.com.shiftyjelly.pocketcasts.component.TvToastHostState
 import au.com.shiftyjelly.pocketcasts.home.TvScaffold
 import au.com.shiftyjelly.pocketcasts.onboarding.createaccount.TvCreateAccountScreen
+import au.com.shiftyjelly.pocketcasts.onboarding.signedout.TvSignedOutScreen
 import au.com.shiftyjelly.pocketcasts.onboarding.signin.TvSignInScreen
 import au.com.shiftyjelly.pocketcasts.onboarding.signin.TvSyncingScreen
 import au.com.shiftyjelly.pocketcasts.onboarding.welcome.TvWelcomeScreen
@@ -37,6 +38,13 @@ fun TvOnboardingNavHost(
     LaunchedEffect(Unit) {
         if (viewModel.startDestination == TvOnboardingRoutes.HOME) {
             viewModel.refreshOnLaunch()
+        }
+    }
+    LaunchedEffect(Unit) {
+        viewModel.onServerSignOut.collect {
+            if (navController.currentDestination?.route != TvOnboardingRoutes.SIGNED_OUT) {
+                navigateClearingBackStack(TvOnboardingRoutes.SIGNED_OUT)
+            }
         }
     }
     val toastHostState = remember { TvToastHostState() }
@@ -60,7 +68,7 @@ fun TvOnboardingNavHost(
                 }
                 composable(TvOnboardingRoutes.CREATE_ACCOUNT) {
                     TvCreateAccountScreen(
-                        onSignIn = { navController.navigate(TvOnboardingRoutes.SIGN_IN) },
+                        onCreateAccountComplete = { navigateClearingBackStack(TvOnboardingRoutes.SYNCING) },
                     )
                 }
                 composable(TvOnboardingRoutes.SIGN_IN) {
@@ -75,6 +83,11 @@ fun TvOnboardingNavHost(
                                 popUpTo(TvOnboardingRoutes.SYNCING) { inclusive = true }
                             }
                         },
+                    )
+                }
+                composable(TvOnboardingRoutes.SIGNED_OUT) {
+                    TvSignedOutScreen(
+                        onLogIn = { navigateClearingBackStack(TvOnboardingRoutes.LANDING) },
                     )
                 }
                 composable(TvOnboardingRoutes.HOME) {

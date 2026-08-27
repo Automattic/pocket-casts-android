@@ -34,7 +34,7 @@ class TvSignOutManager @Inject constructor(
     @ApplicationScope private val applicationScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {
-    fun signOutAndWipeData() {
+    fun signOutAndWipeData(wasInitiatedByUser: Boolean = true) {
         applicationScope.launch(ioDispatcher) {
             val signOutJob = runWipeStep("sign out and clear data") {
                 userManager.signOutAndClearData(
@@ -43,7 +43,7 @@ class TvSignOutManager @Inject constructor(
                     folderManager = folderManager.get(),
                     searchHistoryManager = searchHistoryManager.get(),
                     episodeManager = episodeManager.get(),
-                    wasInitiatedByUser = true,
+                    wasInitiatedByUser = wasInitiatedByUser,
                 )
             }
             if (signOutJob != null && withTimeoutOrNull(SIGN_OUT_TIMEOUT) { signOutJob.join() } == null) {

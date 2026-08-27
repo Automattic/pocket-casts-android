@@ -138,6 +138,9 @@ class AppLifecycleObserver(
                 // do nothing because feature has not been enabled on Wear OS yet
                 AppPlatform.WearOs -> {}
 
+                // do nothing because feature has not been enabled on TV yet
+                AppPlatform.Tv -> {}
+
                 AppPlatform.Phone -> {
                     // For new users we want to auto play when the queue is empty by default
                     settings.autoPlayNextEpisodeOnEmpty.set(true, updateModifiedAt = false)

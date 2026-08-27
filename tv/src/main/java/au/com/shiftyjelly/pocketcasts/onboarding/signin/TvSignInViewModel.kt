@@ -6,6 +6,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.LoginResult
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SignInSource
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.SignInShownEvent
 import com.automattic.eventhorizon.SignInType
 import com.automattic.eventhorizon.SignInTypeTappedEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -36,6 +37,10 @@ class TvSignInViewModel @Inject constructor(
 
     init {
         requestDeviceCode()
+    }
+
+    fun trackShown() {
+        eventHorizon.track(SignInShownEvent)
     }
 
     fun selectMode(mode: TvSignInMode) {
@@ -97,7 +102,7 @@ class TvSignInViewModel @Inject constructor(
         pollingJob?.cancel()
         _uiState.value = TvSignInUiState.Loading
         pollingJob = viewModelScope.launch {
-            deviceAuthFlow(syncManager).collect { _uiState.value = it }
+            deviceAuthFlow(syncManager, isNewAccount = false).collect { _uiState.value = it }
         }
     }
 

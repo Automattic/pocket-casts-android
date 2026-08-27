@@ -42,6 +42,7 @@ import androidx.tv.material3.TabDefaults
 import androidx.tv.material3.TabRow
 import androidx.tv.material3.TabRowDefaults
 import androidx.tv.material3.Text
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.theme.TvButtonDefaults
 import au.com.shiftyjelly.pocketcasts.theme.TvTheme
@@ -60,6 +61,8 @@ fun TvSignInScreen(
     val mode by viewModel.mode.collectAsStateWithLifecycle()
     val emailState by viewModel.emailState.collectAsStateWithLifecycle()
     val currentOnSignInComplete by rememberUpdatedState(onSignInComplete)
+
+    CallOnce { viewModel.trackShown() }
 
     LaunchedEffect(uiState) {
         if (uiState is TvSignInUiState.Complete) {
