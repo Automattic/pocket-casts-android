@@ -272,7 +272,8 @@
     <string name="tv_sign_in_title">Log in to Pocket Casts</string>
     <string name="tv_sign_in_step_scan">Scan the QR code or go to %1$s</string>
     <string name="tv_sign_in_step_login">Log in to your account</string>
-    <string name="tv_sign_in_step_confirm_code">If asked, confirm with the code below</string>
+    <string name="tv_sign_in_step_confirm_code">If asked, confirm the code below</string>
+    <string name="tv_sign_in_qr_error">Couldn\'t get your log in code</string>
     <string name="tv_account_signed_out_alert_title">You\'ve been logged out</string>
     <string name="tv_account_signed_out_alert_message">There was a problem and you\'ve been logged out.\nSelect the button below to log in to your Pocket Casts account again.</string>
     <string name="tv_create_account_modal_title">Your podcasts deserve a home</string>
@@ -2926,13 +2927,13 @@
     <!-- TV Onboarding -->
     <string name="tv_onboarding_welcome">Welcome to Pocket Casts</string>
     <string name="tv_onboarding_welcome_tv">Welcome to Pocket Casts TV</string>
-    <string name="tv_onboarding_subtitle">Your podcasts, on the big screen</string>
+    <string name="tv_onboarding_subtitle">Your podcasts. On the big screen. Obviously.</string>
     <string name="tv_onboarding_create_free_account">Create free account</string>
     <string name="tv_onboarding_browse_without_account">Browse without an account</string>
     <string name="tv_onboarding_sign_in_title">Sign in with your phone</string>
     <string name="tv_onboarding_sign_in_instructions">Open the camera and point to this QR code</string>
     <string name="tv_onboarding_syncing">Syncing your podcasts\u2026</string>
-    <string name="tv_onboarding_welcome_back">Welcome back!</string>
-    <string name="tv_onboarding_syncing_subtitle">Your podcasts are syncing, we\'ll sign you in soon!</string>
+    <string name="tv_onboarding_welcome_back">Good to see you</string>
+    <string name="tv_onboarding_syncing_subtitle">Loading your podcasts now.</string>
     <string name="tv_create_account_title">Create your free account</string>
 </resources>

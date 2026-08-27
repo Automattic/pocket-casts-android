@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -108,34 +109,47 @@ private fun TvSignInError(
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val focusRequester = remember { FocusRequester() }
-
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
             .fillMaxSize()
             .background(MaterialTheme.tvColors.backgroundSunken),
     ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Image(
-                painter = painterResource(IR.drawable.ic_pocket_casts_logo),
-                contentDescription = null,
-                modifier = Modifier.size(36.dp),
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text = stringResource(LR.string.error_generic_message),
-                color = MaterialTheme.tvColors.textSecondary,
-                style = MaterialTheme.tvTypography.body.copy(textAlign = TextAlign.Center),
-            )
-            Spacer(modifier = Modifier.height(24.dp))
-            Button(
-                onClick = onRetry,
-                colors = TvButtonDefaults.filledButtonColors(),
-                modifier = Modifier.focusRequester(focusRequester),
-            ) {
-                Text(text = stringResource(LR.string.retry))
-            }
+        TvSignInErrorContent(onRetry = onRetry)
+    }
+}
+
+@Composable
+internal fun TvSignInErrorContent(
+    onRetry: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val focusRequester = remember { FocusRequester() }
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+        modifier = modifier,
+    ) {
+        Image(
+            painter = painterResource(IR.drawable.ic_waitingforwifi),
+            contentDescription = null,
+            colorFilter = ColorFilter.tint(MaterialTheme.tvColors.textSecondary),
+            modifier = Modifier.size(48.dp),
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = stringResource(LR.string.tv_sign_in_qr_error),
+            color = MaterialTheme.tvColors.textPrimary,
+            style = MaterialTheme.tvTypography.body.copy(textAlign = TextAlign.Center),
+        )
+        Spacer(modifier = Modifier.height(24.dp))
+        Button(
+            onClick = onRetry,
+            colors = TvButtonDefaults.filledButtonColors(),
+            modifier = Modifier.focusRequester(focusRequester),
+        ) {
+            Text(text = stringResource(LR.string.try_again))
         }
     }
 
