@@ -272,6 +272,7 @@
     <string name="tv_settings_subscription_title">Subscription</string>
     <string name="tv_settings_subscription_plan">Plan</string>
     <string name="tv_settings_subscription_next_renewal">Next renewal</string>
+    <string name="tv_settings_subscription_expires">Expires</string>
     <string name="tv_settings_subscription_lifetime">Lifetime</string>
     <string name="tv_settings_subscription_other_platform">This subscription was made on another platform. Please use that platform to manage the subscription.</string>
     <string name="tv_settings_privacy_policy_qr_message">Scan the QR code below, or open the URL on your phone to access the Privacy Policy.</string>
