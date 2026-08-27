@@ -2,22 +2,23 @@ package au.com.shiftyjelly.pocketcasts.onboarding.createaccount
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.focusable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -25,12 +26,14 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.Button
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
-import au.com.shiftyjelly.pocketcasts.BuildConfig
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
-import au.com.shiftyjelly.pocketcasts.qr.rememberQrPainter
+import au.com.shiftyjelly.pocketcasts.onboarding.signin.TvSignInQrContent
+import au.com.shiftyjelly.pocketcasts.onboarding.signin.TvSignInUiState
+import au.com.shiftyjelly.pocketcasts.onboarding.signin.verificationDisplayUrl
 import au.com.shiftyjelly.pocketcasts.theme.TvButtonDefaults
 import au.com.shiftyjelly.pocketcasts.theme.TvTheme
 import au.com.shiftyjelly.pocketcasts.theme.tvColors
@@ -40,36 +43,48 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun TvCreateAccountScreen(
-    onSignIn: () -> Unit,
+    onCreateAccountComplete: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: TvCreateAccountViewModel = hiltViewModel(),
 ) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val currentOnComplete by rememberUpdatedState(onCreateAccountComplete)
+
     CallOnce { viewModel.trackShown() }
 
-    TvCreateAccountContent(
-        onSignIn = onSignIn,
-        modifier = modifier,
-    )
+    LaunchedEffect(uiState) {
+        if (uiState is TvSignInUiState.Complete) {
+            currentOnComplete()
+        }
+    }
+
+    when (val state = uiState) {
+        is TvSignInUiState.Loading, is TvSignInUiState.Complete -> TvCreateAccountLoading(modifier)
+
+        is TvSignInUiState.Ready -> TvCreateAccountContent(
+            userCode = state.userCode,
+            verificationUri = state.verificationUri,
+            verificationUriComplete = state.verificationUriComplete,
+            modifier = modifier,
+        )
+
+        is TvSignInUiState.Error -> TvCreateAccountError(onRetry = viewModel::retry, modifier = modifier)
+    }
 }
 
 @Composable
-private fun TvCreateAccountContent(
-    onSignIn: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
+private fun TvCreateAccountLoading(modifier: Modifier = Modifier) {
     val focusRequester = remember { FocusRequester() }
-    val createAccountUrl = remember { "https://${BuildConfig.WEB_BASE_HOST}/create" }
-    val qrPainter = rememberQrPainter(content = createAccountUrl, size = 118.dp)
 
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
             .fillMaxSize()
-            .background(MaterialTheme.tvColors.backgroundSunken),
+            .background(MaterialTheme.tvColors.backgroundSunken)
+            .focusRequester(focusRequester)
+            .focusable(),
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Image(
                 painter = painterResource(IR.drawable.ic_pocket_casts_logo),
                 contentDescription = null,
@@ -81,37 +96,46 @@ private fun TvCreateAccountContent(
                 color = MaterialTheme.tvColors.textPrimary,
                 style = MaterialTheme.tvTypography.title1.copy(textAlign = TextAlign.Center),
             )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = stringResource(LR.string.tv_create_account_subtitle),
-                color = MaterialTheme.tvColors.textSecondary,
-                style = MaterialTheme.tvTypography.body.copy(textAlign = TextAlign.Center),
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
+}
+
+@Composable
+private fun TvCreateAccountError(
+    onRetry: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val focusRequester = remember { FocusRequester() }
+
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier
+            .fillMaxSize()
+            .background(MaterialTheme.tvColors.backgroundSunken),
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Image(
+                painter = painterResource(IR.drawable.ic_pocket_casts_logo),
+                contentDescription = null,
+                modifier = Modifier.size(36.dp),
             )
-            Spacer(modifier = Modifier.height(24.dp))
-            Box(
-                modifier = Modifier
-                    .background(Color.White, RoundedCornerShape(4.dp))
-                    .padding(4.dp),
-            ) {
-                Image(
-                    painter = qrPainter,
-                    contentDescription = stringResource(LR.string.tv_create_account_subtitle),
-                    modifier = Modifier.size(118.dp),
-                )
-            }
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = stringResource(LR.string.tv_create_account_come_back),
+                text = stringResource(LR.string.error_generic_message),
                 color = MaterialTheme.tvColors.textSecondary,
                 style = MaterialTheme.tvTypography.body.copy(textAlign = TextAlign.Center),
             )
             Spacer(modifier = Modifier.height(24.dp))
             Button(
-                onClick = onSignIn,
-                colors = TvButtonDefaults.prominentButtonColors(),
+                onClick = onRetry,
+                colors = TvButtonDefaults.filledButtonColors(),
                 modifier = Modifier.focusRequester(focusRequester),
             ) {
-                Text(text = stringResource(LR.string.sign_in))
+                Text(text = stringResource(LR.string.retry))
             }
         }
     }
@@ -121,10 +145,80 @@ private fun TvCreateAccountContent(
     }
 }
 
+@Composable
+private fun TvCreateAccountContent(
+    userCode: List<String>,
+    verificationUri: String,
+    verificationUriComplete: String,
+    modifier: Modifier = Modifier,
+) {
+    val focusRequester = remember { FocusRequester() }
+    val steps = createAccountSteps(verificationUri)
+
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier
+            .fillMaxSize()
+            .background(MaterialTheme.tvColors.backgroundSunken)
+            .focusRequester(focusRequester)
+            .focusable(),
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(48.dp),
+        ) {
+            Text(
+                text = stringResource(LR.string.tv_create_account_title),
+                color = MaterialTheme.tvColors.textPrimary,
+                style = MaterialTheme.tvTypography.title1.copy(textAlign = TextAlign.Center),
+            )
+            TvSignInQrContent(
+                userCode = userCode,
+                verificationUriComplete = verificationUriComplete,
+                steps = steps,
+            )
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
+}
+
+@Composable
+private fun createAccountSteps(verificationUri: String): List<String> {
+    val url = remember(verificationUri) { verificationDisplayUrl(verificationUri) }
+    return listOf(
+        stringResource(LR.string.tv_sign_in_step_scan, url),
+        stringResource(LR.string.tv_create_account_modal_step_create),
+        stringResource(LR.string.tv_sign_in_step_confirm_code),
+    )
+}
+
 @Preview(device = Devices.TV_1080p)
 @Composable
-private fun TvCreateAccountScreenPreview() {
+private fun TvCreateAccountScreenLoadingPreview() {
     TvTheme {
-        TvCreateAccountContent(onSignIn = {})
+        TvCreateAccountLoading()
+    }
+}
+
+@Preview(device = Devices.TV_1080p)
+@Composable
+private fun TvCreateAccountScreenErrorPreview() {
+    TvTheme {
+        TvCreateAccountError(onRetry = {})
+    }
+}
+
+@Preview(device = Devices.TV_1080p)
+@Composable
+private fun TvCreateAccountScreenContentPreview() {
+    TvTheme {
+        TvCreateAccountContent(
+            userCode = listOf("J", "M", "R", "3", "W", "2"),
+            verificationUri = "https://pocketcasts.com/pair",
+            verificationUriComplete = "https://pocketcasts.com/pair?code=JMR3W2",
+        )
     }
 }

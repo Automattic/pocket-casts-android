@@ -227,6 +227,7 @@ class SyncManagerImpl @Inject constructor(
     override suspend fun loginWithDeviceAuth(
         deviceCode: String,
         signInSource: SignInSource,
+        isNewAccount: Boolean,
     ): LoginResult {
         return try {
             val response = syncServiceManager.deviceToken(deviceCode)
@@ -245,7 +246,7 @@ class SyncManagerImpl @Inject constructor(
             val result = AuthResultModel(
                 token = response.accessToken,
                 uuid = uuid,
-                isNewAccount = false,
+                isNewAccount = isNewAccount,
             )
             trackSignIn(LoginResult.Success(result), signInSource, LoginIdentity.QrCode)
             LoginResult.Success(result)

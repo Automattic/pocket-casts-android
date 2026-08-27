@@ -277,7 +277,7 @@ class TvPodcastDetailsViewModelTest {
     @Test
     fun `starting account auth drives the account state to complete`() = runTest {
         whenever(syncManager.deviceAuthorize()).thenReturn(deviceAuthorizeResponse())
-        whenever(syncManager.loginWithDeviceAuth(any(), any())).thenReturn(loginSuccess())
+        whenever(syncManager.loginWithDeviceAuth(any(), any(), any())).thenReturn(loginSuccess())
         val viewModel = createViewModel()
 
         viewModel.accountAuthState.test {
