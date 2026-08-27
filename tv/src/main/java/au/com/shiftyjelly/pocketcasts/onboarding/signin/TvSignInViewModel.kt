@@ -69,7 +69,6 @@ class TvSignInViewModel @Inject constructor(
         _emailState.update {
             it.copy(isSubmitting = true, showEmailError = false, showPasswordError = false, serverError = null)
         }
-        pollingJob?.cancel()
         viewModelScope.launch {
             val result = syncManager.loginWithEmailAndPassword(
                 email = current.email,
@@ -78,6 +77,7 @@ class TvSignInViewModel @Inject constructor(
             )
             when (result) {
                 is LoginResult.Success -> {
+                    pollingJob?.cancel()
                     _emailState.update { it.copy(email = "", password = "", isSubmitting = false) }
                     _uiState.value = TvSignInUiState.Complete
                 }

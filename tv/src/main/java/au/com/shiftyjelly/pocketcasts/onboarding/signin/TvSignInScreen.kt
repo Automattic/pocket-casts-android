@@ -12,7 +12,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -91,12 +93,15 @@ private fun TvSignInContent(
     modifier: Modifier = Modifier,
 ) {
     Box(
-        contentAlignment = Alignment.Center,
+        contentAlignment = Alignment.TopCenter,
         modifier = modifier
             .fillMaxSize()
             .background(MaterialTheme.tvColors.backgroundSunken),
     ) {
         Column(
+            modifier = Modifier
+                .verticalScroll(rememberScrollState())
+                .padding(vertical = 48.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(20.dp),
         ) {
@@ -120,6 +125,9 @@ private fun TvSignInContent(
                     onPasswordChange = onPasswordChange,
                     onSubmit = onSubmitEmail,
                 )
+            }
+            if (mode == TvSignInMode.Email) {
+                Spacer(modifier = Modifier.height(TvSignInKeyboardInset))
             }
         }
     }
