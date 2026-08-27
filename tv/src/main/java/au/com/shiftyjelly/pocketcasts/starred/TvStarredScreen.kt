@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
@@ -56,6 +57,7 @@ fun TvStarredScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var openedPodcastUuid by rememberSaveable { mutableStateOf<String?>(null) }
+    val listState = rememberLazyListState()
 
     LaunchedEffect(Unit) {
         viewModel.trackStarredShown()
@@ -79,6 +81,7 @@ fun TvStarredScreen(
                 viewModel.play(episode)
                 openNowPlaying()
             },
+            listState = listState,
             modifier = modifier,
         )
     }
@@ -90,6 +93,7 @@ private fun TvStarredContent(
     onOpenPodcast: (String) -> Unit,
     onPlayEpisode: (PodcastEpisode) -> Unit,
     modifier: Modifier = Modifier,
+    listState: LazyListState = rememberLazyListState(),
 ) {
     Box(modifier = modifier.fillMaxSize()) {
         when (uiState) {
@@ -106,6 +110,7 @@ private fun TvStarredContent(
                     episodes = uiState.episodes,
                     onOpenPodcast = onOpenPodcast,
                     onPlayEpisode = onPlayEpisode,
+                    listState = listState,
                 )
             }
         }
@@ -118,10 +123,10 @@ private fun StarredList(
     onOpenPodcast: (String) -> Unit,
     onPlayEpisode: (PodcastEpisode) -> Unit,
     modifier: Modifier = Modifier,
+    listState: LazyListState = rememberLazyListState(),
 ) {
     val context = LocalContext.current
     val dateFormatter = remember(context) { RelativeDateFormatter(context) }
-    val listState = rememberLazyListState()
     val focus = rememberTvEpisodeListFocus(episodes, listState, requestInitialFocus = true)
     var actionsEpisode by remember { mutableStateOf<PodcastEpisode?>(null) }
     var detailsEpisode by remember { mutableStateOf<PodcastEpisode?>(null) }
