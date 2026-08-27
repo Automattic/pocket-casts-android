@@ -30,6 +30,7 @@ fun LazyListScope.tvDiscoverRow(
     contentPadding: PaddingValues = PaddingValues(horizontal = 32.dp),
     onTapBanner: (TvDiscoverBanner) -> Unit = {},
     onListImpression: (TvDiscoverRow) -> Unit = {},
+    loadCategoryCovers: (suspend (DiscoverCategory) -> List<String>)? = null,
 ) {
     when (row) {
         is TvDiscoverRow.FeaturedPodcasts -> item(key = row.id) {
@@ -127,9 +128,12 @@ fun LazyListScope.tvDiscoverRow(
                 focusRequester = focusRequester,
                 modifier = modifier,
             ) { category ->
+                val categoryIndex = row.categories.indexOfFirst { it.id == category.id }
                 TvCategoryTile(
                     category = category,
-                    onClick = { onCategoryClick(category, row.categories.indexOfFirst { it.id == category.id }) },
+                    onClick = { onCategoryClick(category, categoryIndex) },
+                    colorIndex = categoryIndex,
+                    loadCoverUrls = loadCategoryCovers?.let { load -> { load(category) } },
                 )
             }
         }

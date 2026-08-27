@@ -110,6 +110,7 @@ fun TvHomeScreen(
                 openedCategory = TvOpenedCategory(category.id, category.name, category.source)
             },
             onListImpression = viewModel::trackDiscoverListShown,
+            loadCategoryCovers = viewModel::categoryCoverUrls,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(top = TvTopBarHeight)
@@ -156,6 +157,7 @@ private fun TvHomeContent(
     onEpisodePodcastClick: (TvDiscoverRow, TvDiscoverEpisode) -> Unit = { _, _ -> },
     onCategoryClick: (DiscoverCategory, Int) -> Unit = { _, _ -> },
     onListImpression: (TvDiscoverRow) -> Unit = {},
+    loadCategoryCovers: (suspend (DiscoverCategory) -> List<String>)? = null,
     restoreFocusTrigger: Int = 0,
 ) {
     when (uiState) {
@@ -174,6 +176,7 @@ private fun TvHomeContent(
                 onEpisodePodcastClick = onEpisodePodcastClick,
                 onCategoryClick = onCategoryClick,
                 onListImpression = onListImpression,
+                loadCategoryCovers = loadCategoryCovers,
                 modifier = modifier,
                 restoreFocusTrigger = restoreFocusTrigger,
             )
@@ -214,6 +217,7 @@ private fun TvHomeRows(
     onEpisodePodcastClick: (TvDiscoverRow, TvDiscoverEpisode) -> Unit = { _, _ -> },
     onCategoryClick: (DiscoverCategory, Int) -> Unit = { _, _ -> },
     onListImpression: (TvDiscoverRow) -> Unit = {},
+    loadCategoryCovers: (suspend (DiscoverCategory) -> List<String>)? = null,
     restoreFocusTrigger: Int = 0,
 ) {
     var lastFocusedRowIndex by rememberSaveable(rows.size) { mutableIntStateOf(0) }
@@ -252,6 +256,7 @@ private fun TvHomeRows(
                 focusRequester = rowFocusRequester,
                 onTapBanner = onTapBanner,
                 onListImpression = onListImpression,
+                loadCategoryCovers = loadCategoryCovers,
             )
         }
 
