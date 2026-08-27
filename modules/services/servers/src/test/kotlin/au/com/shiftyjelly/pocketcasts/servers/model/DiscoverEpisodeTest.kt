@@ -42,6 +42,32 @@ class DiscoverEpisodeTest {
     }
 
     @Test
+    fun `videoUrl skips alternate sources without an uri`() {
+        val episode = episode(
+            url = "https://example.com/episode.mp3",
+            fileType = "audio/mpeg",
+            alternateEnclosures = listOf(
+                DiscoverAlternateEnclosure("video/mp4", listOf(DiscoverEnclosureSource(uri = null))),
+            ),
+        )
+
+        assertNull(episode.videoUrl)
+    }
+
+    @Test
+    fun `videoUrl ignores non-http uris`() {
+        val episode = episode(
+            url = "https://example.com/episode.mp3",
+            fileType = "audio/mpeg",
+            alternateEnclosures = listOf(
+                DiscoverAlternateEnclosure("video/mp4", listOf(DiscoverEnclosureSource("file:///data/video.mp4"))),
+            ),
+        )
+
+        assertNull(episode.videoUrl)
+    }
+
+    @Test
     fun `videoUrl is null when there is no url and no video enclosure`() {
         val episode = episode(
             url = null,

@@ -23,7 +23,6 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
 import au.com.shiftyjelly.pocketcasts.R
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import timber.log.Timber
 
 private const val PLAY_DELAY_MS = 2000L
@@ -43,11 +42,13 @@ fun TvVideoPreviewPlayer(
     val currentIsPodcastPlaying by rememberUpdatedState(isPodcastPlaying)
 
     var player by remember(videoUrl) { mutableStateOf<ExoPlayer?>(null) }
+    val playerViewHolder = remember { PlayerViewHolder() }
     var hasFirstFrame by remember(videoUrl) { mutableStateOf(false) }
     var isPreviewing by remember(videoUrl) { mutableStateOf(false) }
 
     DisposableEffect(videoUrl) {
         onDispose {
+            playerViewHolder.view?.player = null
             player?.release()
             player = null
         }
@@ -64,14 +65,14 @@ fun TvVideoPreviewPlayer(
             exoPlayer.playWhenReady = true
             isPreviewing = true
             delay(MAX_PREVIEW_MS)
-            fadeOutAndRelease(exoPlayer)
+            isPreviewing = false
+            fadeOutAndRelease(playerViewHolder.view, exoPlayer)
             player = null
             hasFirstFrame = false
-            isPreviewing = false
         } else {
             player?.let { exoPlayer ->
                 isPreviewing = false
-                fadeOutAndRelease(exoPlayer)
+                fadeOutAndRelease(playerViewHolder.view, exoPlayer)
                 player = null
                 hasFirstFrame = false
             }
@@ -89,12 +90,16 @@ fun TvVideoPreviewPlayer(
         factory = { viewContext ->
             (LayoutInflater.from(viewContext).inflate(R.layout.view_tv_video_preview, null) as PlayerView).apply {
                 useController = false
-            }
+            }.also { playerViewHolder.view = it }
         },
         update = { view -> view.player = player },
         onRelease = { view -> view.player = null },
         modifier = modifier.alpha(videoAlpha),
     )
+}
+
+private class PlayerViewHolder {
+    var view: PlayerView? = null
 }
 
 private fun createPreviewPlayer(context: Context, videoUrl: String, onFirstFrame: () -> Unit): ExoPlayer {
@@ -116,7 +121,7 @@ private fun createPreviewPlayer(context: Context, videoUrl: String, onFirstFrame
     }
 }
 
-private suspend fun fadeOutAndRelease(player: ExoPlayer) {
+private suspend fun fadeOutAndRelease(playerView: PlayerView?, player: ExoPlayer) {
     val startVolume = player.volume
     if (player.isPlaying && startVolume > 0f) {
         repeat(FADE_STEPS) { step ->
@@ -126,5 +131,6 @@ private suspend fun fadeOutAndRelease(player: ExoPlayer) {
     } else {
         delay(FADE_DURATION_MS.toLong())
     }
+    playerView?.player = null
     player.release()
 }

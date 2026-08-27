@@ -242,12 +242,14 @@ data class DiscoverEpisode(
 ) : Parcelable {
     val videoUrl: String?
         get() {
-            if (url != null && isSupportedVideoType(fileType)) {
+            if (url != null && isSupportedVideoType(fileType) && url.isPlayableHttpUri()) {
                 return url
             }
             return alternateEnclosures
-                ?.firstOrNull { isSupportedVideoType(it.type) && it.sources.isNotEmpty() }
-                ?.sources?.firstOrNull()?.uri
+                ?.firstOrNull { isSupportedVideoType(it.type) && !it.sources.isNullOrEmpty() }
+                ?.sources
+                ?.firstOrNull { it.uri?.isPlayableHttpUri() == true }
+                ?.uri
         }
 
     companion object {
@@ -256,20 +258,24 @@ data class DiscoverEpisode(
         private fun isSupportedVideoType(type: String?): Boolean {
             return BaseEpisode.isHlsMimeType(type) || type.equals(VIDEO_MP4, ignoreCase = true)
         }
+
+        private fun String.isPlayableHttpUri(): Boolean {
+            return startsWith("http://", ignoreCase = true) || startsWith("https://", ignoreCase = true)
+        }
     }
 }
 
 @Parcelize
 @JsonClass(generateAdapter = true)
 data class DiscoverAlternateEnclosure(
-    @Json(name = "type") val type: String,
-    @Json(name = "sources") val sources: List<DiscoverEnclosureSource>,
+    @Json(name = "type") val type: String? = null,
+    @Json(name = "sources") val sources: List<DiscoverEnclosureSource>? = null,
 ) : Parcelable
 
 @Parcelize
 @JsonClass(generateAdapter = true)
 data class DiscoverEnclosureSource(
-    @Json(name = "uri") val uri: String,
+    @Json(name = "uri") val uri: String? = null,
 ) : Parcelable
 
 @Parcelize
