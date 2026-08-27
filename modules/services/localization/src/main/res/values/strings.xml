@@ -269,6 +269,8 @@
     <string name="tv_search_no_results_subtitle">Try more general or different keywords.</string>
     <string name="tv_search_error_subtitle">Check your connection and try again.</string>
     <string name="tv_profile_starred_episodes">Starred Episodes</string>
+    <string name="tv_profile_log_out_confirmation_title">Log out?</string>
+    <string name="tv_profile_log_out_confirmation_message">This removes all downloaded podcasts and data from this device. You can log in again to restore them.</string>
     <string name="tv_settings_subscription_title">Subscription</string>
     <string name="tv_settings_subscription_plan">Plan</string>
     <string name="tv_settings_subscription_next_renewal">Next renewal</string>
