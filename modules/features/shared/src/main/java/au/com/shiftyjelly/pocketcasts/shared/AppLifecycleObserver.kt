@@ -18,6 +18,7 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.FirebaseRemote
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.PreferencesFeatureProvider
 import au.com.shiftyjelly.pocketcasts.utils.getVersionCode
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.time.Instant
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
@@ -128,6 +129,11 @@ class AppLifecycleObserver(
 
             // new installations default to not displaying the tooltip
             settings.showPodcastsRecentlyPlayedSortOrderTooltip.set(false, updateModifiedAt = false)
+
+            // Anchor the account-encouragement cadence on fresh install so the modal waits a full
+            // interval before its first show (existing users upgrading leave it null and see it
+            // immediately).
+            settings.freeAccountEncouragementLastShown.set(Instant.now(), updateModifiedAt = false)
 
             when (getAppPlatform()) {
                 // do nothing because this already defaults to true for all users on automotive

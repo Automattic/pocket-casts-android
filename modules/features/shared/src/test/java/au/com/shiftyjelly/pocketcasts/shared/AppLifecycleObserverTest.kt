@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.DefaultRelease
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.FirebaseRemoteFeatureProvider
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.PreferencesFeatureProvider
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.time.Instant
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
@@ -51,6 +52,8 @@ class AppLifecycleObserverTest {
     @Mock private lateinit var useUpNextDarkThemeSetting: UserSetting<Boolean>
 
     @Mock private lateinit var showPodcastsRecentlyPlayedSortOrderSetting: UserSetting<Boolean>
+
+    @Mock private lateinit var freeAccountEncouragementLastShownSetting: UserSetting<Instant?>
 
     @Mock private lateinit var autoDownloadOnFollowPodcastSetting: UserSetting<Boolean>
 
@@ -99,6 +102,7 @@ class AppLifecycleObserverTest {
         whenever(settings.offersNotification).thenReturn(offerNotificationSetting)
         whenever(settings.useDarkUpNextTheme).thenReturn(useUpNextDarkThemeSetting)
         whenever(settings.showPodcastsRecentlyPlayedSortOrderTooltip).thenReturn(showPodcastsRecentlyPlayedSortOrderSetting)
+        whenever(settings.freeAccountEncouragementLastShown).thenReturn(freeAccountEncouragementLastShownSetting)
 
         whenever(appLifecycleOwner.lifecycle).thenReturn(appLifecycle)
 
@@ -144,6 +148,8 @@ class AppLifecycleObserverTest {
         verify(newFeaturesNotificationSetting).set(true, updateModifiedAt = false)
         verify(offerNotificationSetting).set(true, updateModifiedAt = false)
         verify(useUpNextDarkThemeSetting).set(false, updateModifiedAt = false)
+        // Fresh installs anchor the encouragement cadence so the modal waits a full interval.
+        verify(freeAccountEncouragementLastShownSetting).set(any(), any(), any(), any())
 
         verify(appLifecycleAnalytics, never()).onApplicationUpgrade(any())
         verify(notificationScheduler, times(1)).setupOnboardingNotifications()
@@ -207,6 +213,8 @@ class AppLifecycleObserverTest {
         verify(autoDownloadOnFollowPodcastSetting, never()).set(any(), any(), any(), any())
         verify(dailyRemindersNotificationSetting, never()).set(any(), any(), any(), any())
         verify(useUpNextDarkThemeSetting, never()).set(any(), any(), any(), any())
+        // Upgrading users leave the cadence anchor null so the modal shows on the first eligible launch.
+        verify(freeAccountEncouragementLastShownSetting, never()).set(any(), any(), any(), any())
         verify(notificationScheduler, never()).setupOnboardingNotifications()
         verify(notificationScheduler, times(1)).setupReEngagementNotification()
         verify(notificationScheduler, times(1)).setupTrendingAndRecommendationsNotifications()

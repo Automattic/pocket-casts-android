@@ -376,11 +376,6 @@ class MainActivity :
                     lifecycleScope.launch { openLandingTabAfterOnboarding() }
                 }
                 settings.setHasDoneInitialOnboarding()
-                // Start the recurring account-creation clock when initial onboarding finishes
-                // without an account, so a fresh install isn't prompted on the very next launch.
-                if (launchedInitialOnboarding && !syncManager.isLoggedIn()) {
-                    settings.freeAccountEncouragementLastShown.set(Instant.now(), updateModifiedAt = true)
-                }
             }
 
             is OnboardingFinish.DoneGoToDiscover -> {
