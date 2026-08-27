@@ -163,6 +163,11 @@ fun TvSearchScreen(
                 viewModel.trackDiscoverEpisodePodcastTapped(row, episode)
                 openedPodcastUuid = episode.podcastUuid
             },
+            onDiscoverEpisodePlay = { row, episode ->
+                viewModel.trackDiscoverEpisodePlayed(row, episode)
+                viewModel.playDiscoverEpisode(episode)
+            },
+            onDiscoverPlayLatestEpisode = viewModel::playLatestEpisode,
             onDiscoverCategoryClick = { discoverCategory, index ->
                 viewModel.trackCategoryPillTapped(discoverCategory, index)
                 openedCategory = TvOpenedCategory(discoverCategory.id, discoverCategory.name, discoverCategory.source)
@@ -273,6 +278,8 @@ private fun TvSearchContent(
     onPodcastResultClick: (ImprovedSearchResultItem.PodcastItem) -> Unit,
     onDiscoverPodcastClick: (TvDiscoverRow, TvDiscoverPodcast) -> Unit,
     onDiscoverEpisodePodcastClick: (TvDiscoverRow, TvDiscoverEpisode) -> Unit,
+    onDiscoverEpisodePlay: (TvDiscoverRow, TvDiscoverEpisode) -> Unit,
+    onDiscoverPlayLatestEpisode: (TvDiscoverRow, TvDiscoverPodcast) -> Unit,
     onDiscoverCategoryClick: (DiscoverCategory, Int) -> Unit,
     onPlayEpisode: (ImprovedSearchResultItem.EpisodeItem) -> Unit,
     onOpenEpisodeActions: (ImprovedSearchResultItem.EpisodeItem) -> Unit,
@@ -349,6 +356,8 @@ private fun TvSearchContent(
                     onHistorySelect = onHistorySelect,
                     onDiscoverPodcastClick = onDiscoverPodcastClick,
                     onDiscoverEpisodePodcastClick = onDiscoverEpisodePodcastClick,
+                    onDiscoverEpisodePlay = onDiscoverEpisodePlay,
+                    onDiscoverPlayLatestEpisode = onDiscoverPlayLatestEpisode,
                     onDiscoverCategoryClick = onDiscoverCategoryClick,
                     onDiscoverListImpression = onDiscoverListImpression,
                     loadCategoryCovers = loadCategoryCovers,
@@ -392,6 +401,8 @@ private fun TvSearchIdle(
     onHistorySelect: (String) -> Unit,
     onDiscoverPodcastClick: (TvDiscoverRow, TvDiscoverPodcast) -> Unit,
     onDiscoverEpisodePodcastClick: (TvDiscoverRow, TvDiscoverEpisode) -> Unit,
+    onDiscoverEpisodePlay: (TvDiscoverRow, TvDiscoverEpisode) -> Unit,
+    onDiscoverPlayLatestEpisode: (TvDiscoverRow, TvDiscoverPodcast) -> Unit,
     onDiscoverCategoryClick: (DiscoverCategory, Int) -> Unit,
     onDiscoverListImpression: (TvDiscoverRow) -> Unit,
     restoreFocusTrigger: Int,
@@ -421,6 +432,8 @@ private fun TvSearchIdle(
             discoverRows = discoverRows,
             onDiscoverPodcastClick = onDiscoverPodcastClick,
             onDiscoverEpisodePodcastClick = onDiscoverEpisodePodcastClick,
+            onDiscoverEpisodePlay = onDiscoverEpisodePlay,
+            onDiscoverPlayLatestEpisode = onDiscoverPlayLatestEpisode,
             onDiscoverCategoryClick = onDiscoverCategoryClick,
             onDiscoverListImpression = onDiscoverListImpression,
             loadCategoryCovers = loadCategoryCovers,
@@ -436,6 +449,8 @@ private fun TvSearchDiscover(
     discoverRows: List<TvDiscoverRow>,
     onDiscoverPodcastClick: (TvDiscoverRow, TvDiscoverPodcast) -> Unit,
     onDiscoverEpisodePodcastClick: (TvDiscoverRow, TvDiscoverEpisode) -> Unit,
+    onDiscoverEpisodePlay: (TvDiscoverRow, TvDiscoverEpisode) -> Unit,
+    onDiscoverPlayLatestEpisode: (TvDiscoverRow, TvDiscoverPodcast) -> Unit,
     onDiscoverCategoryClick: (DiscoverCategory, Int) -> Unit,
     onDiscoverListImpression: (TvDiscoverRow) -> Unit,
     restoreFocusTrigger: Int,
@@ -496,9 +511,10 @@ private fun TvSearchDiscover(
             tvDiscoverRow(
                 row = row,
                 onPodcastClick = onDiscoverPodcastClick,
-                onEpisodePlay = { _, _ -> }, // TODO: wire discover-feed episode playback in search
+                onEpisodePlay = onDiscoverEpisodePlay,
                 onEpisodePodcastClick = onDiscoverEpisodePodcastClick,
                 onCategoryClick = onDiscoverCategoryClick,
+                onPlayLatestEpisode = onDiscoverPlayLatestEpisode,
                 onListImpression = onDiscoverListImpression,
                 contentPadding = ContentPadding,
                 focusRequester = rowFocusRequesters.getOrNull(rowIndex),
@@ -894,6 +910,8 @@ private fun TvSearchScreenPreview() {
                 onPodcastResultClick = {},
                 onDiscoverPodcastClick = { _, _ -> },
                 onDiscoverEpisodePodcastClick = { _, _ -> },
+                onDiscoverEpisodePlay = { _, _ -> },
+                onDiscoverPlayLatestEpisode = { _, _ -> },
                 onDiscoverCategoryClick = { _, _ -> },
                 onPlayEpisode = {},
                 onOpenEpisodeActions = {},
@@ -919,6 +937,8 @@ private fun TvSearchIdleWithHistoryPreview() {
                 onPodcastResultClick = {},
                 onDiscoverPodcastClick = { _, _ -> },
                 onDiscoverEpisodePodcastClick = { _, _ -> },
+                onDiscoverEpisodePlay = { _, _ -> },
+                onDiscoverPlayLatestEpisode = { _, _ -> },
                 onDiscoverCategoryClick = { _, _ -> },
                 onPlayEpisode = {},
                 onOpenEpisodeActions = {},
@@ -981,6 +1001,8 @@ private fun TvSearchResultsPreview() {
                 onPodcastResultClick = {},
                 onDiscoverPodcastClick = { _, _ -> },
                 onDiscoverEpisodePodcastClick = { _, _ -> },
+                onDiscoverEpisodePlay = { _, _ -> },
+                onDiscoverPlayLatestEpisode = { _, _ -> },
                 onDiscoverCategoryClick = { _, _ -> },
                 onPlayEpisode = {},
                 onOpenEpisodeActions = {},

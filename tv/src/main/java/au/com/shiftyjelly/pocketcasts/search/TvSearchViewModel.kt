@@ -279,6 +279,8 @@ class TvSearchViewModel @Inject constructor(
 
     fun trackDiscoverPodcastTapped(row: TvDiscoverRow, podcast: TvDiscoverPodcast) = discoverFeedAnalytics.trackPodcastTapped(row, podcast)
 
+    fun trackDiscoverEpisodePlayed(row: TvDiscoverRow, episode: TvDiscoverEpisode) = discoverFeedAnalytics.trackEpisodePlayed(row, episode)
+
     fun trackDiscoverEpisodePodcastTapped(row: TvDiscoverRow, episode: TvDiscoverEpisode) = discoverFeedAnalytics.trackEpisodePodcastTapped(row, episode)
 
     fun trackCategoryPodcastTapped(category: TvOpenedCategory, listId: String?, podcast: TvDiscoverPodcast) = discoverFeedAnalytics.trackCategoryPodcastTapped(category, listId, podcast)
@@ -336,6 +338,52 @@ class TvSearchViewModel @Inject constructor(
         }
     }
 
+    fun playDiscoverEpisode(episode: TvDiscoverEpisode) {
+        viewModelScope.launch {
+            try {
+                val found = episodeManager.findByUuid(episode.episodeUuid)
+                    ?: run {
+                        podcastManager.findOrDownloadPodcastRxSingle(episode.podcastUuid).await()
+                        episodeManager.findByUuid(episode.episodeUuid)
+                    }
+                if (found != null) {
+                    playbackManager.playNowSuspend(episode = found, sourceView = SourceView.DISCOVER)
+                    _playStarted.tryEmit(Unit)
+                } else {
+                    Timber.e("Episode %s not found to play from TV search discover", episode.episodeUuid)
+                    _playFailures.tryEmit(Unit)
+                }
+            } catch (exception: CancellationException) {
+                throw exception
+            } catch (exception: Exception) {
+                Timber.e(exception, "Failed to play discover episode from TV search")
+                _playFailures.tryEmit(Unit)
+            }
+        }
+    }
+
+    fun playLatestEpisode(row: TvDiscoverRow, podcast: TvDiscoverPodcast) {
+        viewModelScope.launch {
+            try {
+                val loadedPodcast = podcastManager.findOrDownloadPodcastRxSingle(podcast.uuid).await()
+                val latest = episodeManager.findEpisodesByPodcastOrderedByPublishDate(loadedPodcast).firstOrNull()
+                if (latest != null) {
+                    playbackManager.playNowSuspend(episode = latest, sourceView = SourceView.DISCOVER)
+                    discoverFeedAnalytics.trackEpisodePlayed(row, latest.toTvDiscoverEpisode(podcast))
+                    _playStarted.tryEmit(Unit)
+                } else {
+                    Timber.e("No episode found to play from featured podcast %s on TV search", podcast.uuid)
+                    _playFailures.tryEmit(Unit)
+                }
+            } catch (exception: CancellationException) {
+                throw exception
+            } catch (exception: Exception) {
+                Timber.e(exception, "Failed to play latest episode from TV search")
+                _playFailures.tryEmit(Unit)
+            }
+        }
+    }
+
     fun openEpisodeActions(episode: ImprovedSearchResultItem.EpisodeItem) {
         viewModelScope.launch {
             try {
@@ -380,6 +428,13 @@ private val TvSearchFilter.analyticsValue
         TvSearchFilter.Episodes -> SearchResultFilterType.Episodes
         TvSearchFilter.Folders -> SearchResultFilterType.Folders
     }
+
+private fun PodcastEpisode.toTvDiscoverEpisode(podcast: TvDiscoverPodcast) = TvDiscoverEpisode(
+    episodeUuid = uuid,
+    episodeTitle = title,
+    podcastUuid = podcast.uuid,
+    podcastTitle = podcast.title,
+)
 
 private fun Podcast.toSearchItem() = ImprovedSearchResultItem.PodcastItem(
     uuid = uuid,
