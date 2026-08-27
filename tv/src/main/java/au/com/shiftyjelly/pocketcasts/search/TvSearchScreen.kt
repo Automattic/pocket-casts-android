@@ -149,8 +149,7 @@ fun TvSearchScreen(
             categories = categories,
             discoverRows = discoverRows,
             onQueryChange = viewModel::onQueryChange,
-            onFilterFocus = viewModel::onFilterSelected,
-            onFilterClick = viewModel::onFilterClicked,
+            onFilterSelect = viewModel::onFilterSelected,
             onOpenFolder = { openedFolder = SearchOpenedFolder(it.folder.uuid, it.folder.name) },
             onPodcastResultClick = { podcast ->
                 viewModel.trackPodcastResultTapped(podcast)
@@ -170,7 +169,7 @@ fun TvSearchScreen(
             },
             onDiscoverListImpression = viewModel::trackDiscoverListShown,
             onPlayEpisode = { episode ->
-                viewModel.trackEpisodeResultTapped(episode)
+                viewModel.trackEpisodeResultTapped(episode.uuid)
                 viewModel.playEpisode(episode)
             },
             onOpenEpisodeActions = viewModel::openEpisodeActions,
@@ -243,6 +242,7 @@ fun TvSearchScreen(
                     viewModel.dismissEpisodeActions()
                 },
                 onGoToPodcast = {
+                    viewModel.trackEpisodeResultTapped(episode.uuid)
                     viewModel.dismissEpisodeActions()
                     openedPodcastUuid = episode.podcastUuid
                 },
@@ -267,8 +267,7 @@ private fun TvSearchContent(
     categories: List<DiscoverCategory>,
     discoverRows: List<TvDiscoverRow>,
     onQueryChange: (String) -> Unit,
-    onFilterFocus: (TvSearchFilter) -> Unit,
-    onFilterClick: (TvSearchFilter) -> Unit,
+    onFilterSelect: (TvSearchFilter) -> Unit,
     onOpenFolder: (FolderItem.Folder) -> Unit,
     onPodcastResultClick: (ImprovedSearchResultItem.PodcastItem) -> Unit,
     onDiscoverPodcastClick: (TvDiscoverRow, TvDiscoverPodcast) -> Unit,
@@ -327,8 +326,7 @@ private fun TvSearchContent(
         if (searchState !is TvSearchState.Idle) {
             TvSearchFilters(
                 selected = effectiveFilter,
-                onFilterFocus = onFilterFocus,
-                onFilterClick = onFilterClick,
+                onFilterSelect = onFilterSelect,
                 filters = filters,
                 modifier = Modifier.padding(ContentPadding),
                 upFocusRequester = searchFieldFocusRequester,
@@ -879,8 +877,7 @@ private fun TvSearchScreenPreview() {
                 ),
                 discoverRows = emptyList(),
                 onQueryChange = {},
-                onFilterFocus = {},
-                onFilterClick = {},
+                onFilterSelect = {},
                 onOpenFolder = {},
                 onPodcastResultClick = {},
                 onDiscoverPodcastClick = { _, _ -> },
@@ -906,8 +903,7 @@ private fun TvSearchIdleWithHistoryPreview() {
                 categories = emptyList(),
                 discoverRows = emptyList(),
                 onQueryChange = {},
-                onFilterFocus = {},
-                onFilterClick = {},
+                onFilterSelect = {},
                 onPodcastResultClick = {},
                 onDiscoverPodcastClick = { _, _ -> },
                 onDiscoverEpisodePodcastClick = { _, _ -> },
@@ -969,8 +965,7 @@ private fun TvSearchResultsPreview() {
                 categories = emptyList(),
                 discoverRows = emptyList(),
                 onQueryChange = {},
-                onFilterFocus = {},
-                onFilterClick = {},
+                onFilterSelect = {},
                 onPodcastResultClick = {},
                 onDiscoverPodcastClick = { _, _ -> },
                 onDiscoverEpisodePodcastClick = { _, _ -> },

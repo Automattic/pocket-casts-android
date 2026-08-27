@@ -216,12 +216,11 @@ class TvSearchViewModel @Inject constructor(
     }
 
     fun onFilterSelected(filter: TvSearchFilter) {
+        if (_filter.value == filter) {
+            return
+        }
         _filter.value = filter
-    }
-
-    fun onFilterClicked(filter: TvSearchFilter) {
         eventHorizon.track(SearchFilterTappedEvent(source = SourceViewType.Search, filter = filter.analyticsValue))
-        _filter.value = filter
     }
 
     private fun updateFolderResults(hasFolders: Boolean) {
@@ -266,9 +265,9 @@ class TvSearchViewModel @Inject constructor(
         )
     }
 
-    fun trackEpisodeResultTapped(episode: ImprovedSearchResultItem.EpisodeItem) {
+    fun trackEpisodeResultTapped(episodeUuid: String) {
         eventHorizon.track(
-            SearchResultTappedEvent(source = SourceViewType.Search, uuid = episode.uuid, resultType = SearchResultType.Episode),
+            SearchResultTappedEvent(source = SourceViewType.Search, uuid = episodeUuid, resultType = SearchResultType.Episode),
         )
     }
 
@@ -375,6 +374,7 @@ private val TvSearchFilter.analyticsValue
         TvSearchFilter.TopResults -> SearchResultFilterType.AllResults
         TvSearchFilter.Podcasts -> SearchResultFilterType.Podcasts
         TvSearchFilter.Episodes -> SearchResultFilterType.Episodes
+        TvSearchFilter.Folders -> SearchResultFilterType.Unknown
     }
 
 private fun Podcast.toSearchItem() = ImprovedSearchResultItem.PodcastItem(

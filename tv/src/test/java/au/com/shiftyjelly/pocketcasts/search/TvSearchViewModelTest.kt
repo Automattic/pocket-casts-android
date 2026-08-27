@@ -64,6 +64,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyBlocking
 import org.mockito.kotlin.whenever
@@ -505,25 +506,26 @@ class TvSearchViewModelTest {
     }
 
     @Test
-    fun `clicking a filter tracks a search filter tapped event`() = runTest {
+    fun `selecting a filter tracks a search filter tapped event`() = runTest {
         whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
         val viewModel = createViewModel()
 
-        viewModel.onFilterClicked(TvSearchFilter.Episodes)
+        viewModel.onFilterSelected(TvSearchFilter.Episodes)
 
         assertEquals(TvSearchFilter.Episodes, viewModel.filter.value)
         verify(eventHorizon).track(SearchFilterTappedEvent(source = SourceViewType.Search, filter = SearchResultFilterType.Episodes))
     }
 
     @Test
-    fun `focusing a filter changes it without tracking a filter tapped event`() = runTest {
+    fun `re-selecting the current filter does not track another filter tapped event`() = runTest {
         whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
         val viewModel = createViewModel()
 
         viewModel.onFilterSelected(TvSearchFilter.Podcasts)
+        viewModel.onFilterSelected(TvSearchFilter.Podcasts)
 
         assertEquals(TvSearchFilter.Podcasts, viewModel.filter.value)
-        verify(eventHorizon, never()).track(SearchFilterTappedEvent(source = SourceViewType.Search, filter = SearchResultFilterType.Podcasts))
+        verify(eventHorizon, times(1)).track(SearchFilterTappedEvent(source = SourceViewType.Search, filter = SearchResultFilterType.Podcasts))
     }
 
     @Test
@@ -581,7 +583,7 @@ class TvSearchViewModelTest {
         whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
         val viewModel = createViewModel()
 
-        viewModel.trackEpisodeResultTapped(episodeItem("episode-1"))
+        viewModel.trackEpisodeResultTapped("episode-1")
 
         verify(eventHorizon).track(
             SearchResultTappedEvent(source = SourceViewType.Search, uuid = "episode-1", resultType = SearchResultType.Episode),
