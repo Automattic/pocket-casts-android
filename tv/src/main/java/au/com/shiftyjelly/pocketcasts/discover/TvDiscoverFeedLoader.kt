@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.discover
 
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
+import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
 import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
@@ -259,8 +260,9 @@ class TvDiscoverFeedLoader @Inject constructor(
     }
 
     private fun ListFeed.displayTitle(fallbackTitle: String): String {
-        val feedTitle = title?.takeIf(String::isNotBlank) ?: fallbackTitle
-        val feedSubtitle = subtitle?.takeIf(String::isNotBlank) ?: return feedTitle
+        val resources = context.resources
+        val feedTitle = (title?.takeIf(String::isNotBlank) ?: fallbackTitle).tryToLocalise(resources)
+        val feedSubtitle = subtitle?.takeIf(String::isNotBlank)?.tryToLocalise(resources) ?: return feedTitle
         return "$feedSubtitle: $feedTitle"
     }
 
