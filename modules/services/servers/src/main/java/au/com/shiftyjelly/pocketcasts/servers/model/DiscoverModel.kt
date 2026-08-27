@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.os.Parcelable
 import androidx.annotation.ColorInt
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.BundlePaidType
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
@@ -236,7 +237,40 @@ data class DiscoverEpisode(
     @Json(name = "type") val type: String?,
     @Json(name = "season") val season: Int?,
     @Json(name = "number") val number: Int?,
+    @Json(name = "alternate_enclosures") val alternateEnclosures: List<DiscoverAlternateEnclosure>? = null,
     val isPlaying: Boolean = false,
+) : Parcelable {
+    val videoUrl: String?
+        get() {
+            if (url != null && isSupportedVideoType(fileType)) {
+                return url
+            }
+            val enclosures = alternateEnclosures ?: return url
+            return enclosures
+                .firstOrNull { isSupportedVideoType(it.type) && it.sources.isNotEmpty() }
+                ?.sources?.firstOrNull()?.uri
+        }
+
+    companion object {
+        private const val VIDEO_MP4 = "video/mp4"
+
+        private fun isSupportedVideoType(type: String?): Boolean {
+            return BaseEpisode.isHlsMimeType(type) || type.equals(VIDEO_MP4, ignoreCase = true)
+        }
+    }
+}
+
+@Parcelize
+@JsonClass(generateAdapter = true)
+data class DiscoverAlternateEnclosure(
+    @Json(name = "type") val type: String,
+    @Json(name = "sources") val sources: List<DiscoverEnclosureSource>,
+) : Parcelable
+
+@Parcelize
+@JsonClass(generateAdapter = true)
+data class DiscoverEnclosureSource(
+    @Json(name = "uri") val uri: String,
 ) : Parcelable
 
 @Parcelize
