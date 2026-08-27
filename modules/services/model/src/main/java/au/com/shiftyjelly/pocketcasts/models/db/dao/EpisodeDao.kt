@@ -275,7 +275,7 @@ abstract class EpisodeDao {
     ): Int
 
     @Transaction
-    @Query("SELECT * FROM podcast_episodes WHERE starred = 1 ORDER BY last_starred_date DESC")
+    @Query("SELECT * FROM podcast_episodes WHERE starred = 1 ORDER BY last_starred_date DESC LIMIT 1000")
     abstract fun findStarredEpisodesFlow(): Flow<List<PodcastEpisode>>
 
     @Transaction
