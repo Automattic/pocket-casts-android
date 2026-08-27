@@ -7,14 +7,14 @@ import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.preferences.ReadSetting
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
-import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
+import au.com.shiftyjelly.pocketcasts.preferences.TvPreferences
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import com.automattic.eventhorizon.AccountDetailsShowPrivacyPolicyEvent
 import com.automattic.eventhorizon.AccountDetailsShowTosEvent
 import com.automattic.eventhorizon.AccountDetailsSubscriptionEvent
 import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.SettingsAppearanceUseEpisodeArtworkToggledEvent
 import com.automattic.eventhorizon.SettingsGeneralShownEvent
 import com.jakewharton.rxrelay2.BehaviorRelay
 import java.time.Instant
@@ -24,9 +24,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 
@@ -37,24 +35,21 @@ class TvSettingsViewModelTest {
     val coroutineRule = MainCoroutineRule()
 
     private val isLoggedIn = BehaviorRelay.createDefault(false)
-    private val artworkFlow = MutableStateFlow(ArtworkConfiguration(useEpisodeArtwork = false))
     private val subscriptionFlow = MutableStateFlow<Subscription?>(null)
 
-    private val artworkSetting = mock<UserSetting<ArtworkConfiguration>> {
-        on { flow } doReturn artworkFlow
-        on { value } doReturn ArtworkConfiguration(useEpisodeArtwork = false)
-    }
     private val subscriptionSetting = mock<ReadSetting<Subscription?>> {
         on { flow } doReturn subscriptionFlow
         on { value } doReturn null
     }
     private val settings = mock<Settings> {
-        on { artworkConfiguration } doReturn artworkSetting
         on { cachedSubscription } doReturn subscriptionSetting
     }
     private val syncManager = mock<SyncManager> {
         on { isLoggedIn() } doReturn false
         on { isLoggedInObservable } doReturn isLoggedIn
+    }
+    private val tvPreferences = mock<TvPreferences> {
+        on { isUsingEpisodeArtwork() } doReturn false
     }
     private val eventHorizon = mock<EventHorizon>()
 
@@ -72,13 +67,14 @@ class TvSettingsViewModelTest {
     fun `state reflects sign in artwork and subscription changes`() = runTest {
         val subscription = subscription(platform = SubscriptionPlatform.Android)
 
-        createViewModel().uiState.test {
+        val viewModel = createViewModel()
+        viewModel.uiState.test {
             skipItems(1)
 
             isLoggedIn.accept(true)
             assertEquals(true, awaitItem().isSignedIn)
 
-            artworkFlow.value = ArtworkConfiguration(useEpisodeArtwork = true)
+            viewModel.setUseEpisodeArtwork(true)
             assertEquals(true, awaitItem().useEpisodeArtwork)
 
             subscriptionFlow.value = subscription
@@ -87,10 +83,11 @@ class TvSettingsViewModelTest {
     }
 
     @Test
-    fun `setUseEpisodeArtwork writes the artwork configuration`() = runTest {
+    fun `setUseEpisodeArtwork stores the value on device and tracks the toggle event`() = runTest {
         createViewModel().setUseEpisodeArtwork(true)
 
-        verify(artworkSetting).set(eq(ArtworkConfiguration(useEpisodeArtwork = true)), eq(true), any(), any())
+        verify(tvPreferences).setUsingEpisodeArtwork(true)
+        verify(eventHorizon).track(SettingsAppearanceUseEpisodeArtworkToggledEvent(enabled = true))
     }
 
     @Test
@@ -124,6 +121,7 @@ class TvSettingsViewModelTest {
     private fun createViewModel() = TvSettingsViewModel(
         settings = settings,
         syncManager = syncManager,
+        tvPreferences = tvPreferences,
         eventHorizon = eventHorizon,
     )
 

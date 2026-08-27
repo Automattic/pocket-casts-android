@@ -29,6 +29,14 @@ class TvPreferences @Inject constructor(
         prefs.edit().putBoolean(podcastArchivedKey(podcastUuid), isShowingArchived).apply()
     }
 
+    fun isUsingEpisodeArtwork(): Boolean {
+        return prefs.getBoolean(USE_EPISODE_ARTWORK_KEY, false)
+    }
+
+    fun setUsingEpisodeArtwork(isUsingEpisodeArtwork: Boolean) {
+        prefs.edit().putBoolean(USE_EPISODE_ARTWORK_KEY, isUsingEpisodeArtwork).apply()
+    }
+
     @SuppressLint("ApplySharedPref")
     fun clearAll() {
         prefs.edit().clear().commit()
@@ -37,4 +45,8 @@ class TvPreferences @Inject constructor(
     private fun playlistArchivedKey(playlistUuid: String) = "show_archived_playlist_$playlistUuid"
 
     private fun podcastArchivedKey(podcastUuid: String) = "show_archived_podcast_$podcastUuid"
+
+    private companion object {
+        const val USE_EPISODE_ARTWORK_KEY = "use_episode_artwork"
+    }
 }
