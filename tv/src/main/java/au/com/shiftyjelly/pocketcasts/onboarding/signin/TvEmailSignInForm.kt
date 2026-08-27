@@ -17,10 +17,10 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -61,7 +61,6 @@ import au.com.shiftyjelly.pocketcasts.theme.TvButtonDefaults
 import au.com.shiftyjelly.pocketcasts.theme.tvColors
 import au.com.shiftyjelly.pocketcasts.theme.tvTypography
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -176,7 +175,6 @@ private fun TvSignInTextField(
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
     val bringIntoViewRequester = remember { BringIntoViewRequester() }
-    val coroutineScope = rememberCoroutineScope()
     val keyboardInsetPx = with(LocalDensity.current) { TvSignInKeyboardInset.toPx() }
     var fieldSize by remember { mutableStateOf(IntSize.Zero) }
     var isFocused by remember { mutableStateOf(false) }
@@ -205,16 +203,6 @@ private fun TvSignInTextField(
                     isFocused = it.isFocused
                     if (it.isFocused) {
                         keyboardController?.show()
-                        coroutineScope.launch {
-                            delay(IME_SETTLE_MILLIS)
-                            val revealRect = Rect(
-                                left = 0f,
-                                top = 0f,
-                                right = fieldSize.width.toFloat(),
-                                bottom = fieldSize.height + keyboardInsetPx,
-                            )
-                            bringIntoViewRequester.bringIntoView(revealRect)
-                        }
                     } else {
                         keyboardController?.hide()
                     }
@@ -253,6 +241,14 @@ private fun TvSignInTextField(
                 style = MaterialTheme.tvTypography.caption1,
             )
         }
+    }
+
+    LaunchedEffect(isFocused) {
+        if (!isFocused) return@LaunchedEffect
+        delay(IME_SETTLE_MILLIS)
+        bringIntoViewRequester.bringIntoView(
+            Rect(0f, 0f, fieldSize.width.toFloat(), fieldSize.height + keyboardInsetPx),
+        )
     }
 }
 

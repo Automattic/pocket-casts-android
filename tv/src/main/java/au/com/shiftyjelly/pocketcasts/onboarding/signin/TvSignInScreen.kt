@@ -267,6 +267,10 @@ internal fun TvSignInErrorContent(
             Text(text = stringResource(LR.string.try_again))
         }
     }
+
+    LaunchedEffect(Unit) {
+        runCatching { focusRequester.requestFocus() }
+    }
 }
 
 @Composable
