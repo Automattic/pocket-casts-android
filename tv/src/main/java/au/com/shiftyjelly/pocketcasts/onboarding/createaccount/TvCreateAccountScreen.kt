@@ -94,7 +94,7 @@ private fun TvCreateAccountLoading(modifier: Modifier = Modifier) {
             Text(
                 text = stringResource(LR.string.tv_create_account_title),
                 color = MaterialTheme.tvColors.textPrimary,
-                style = MaterialTheme.tvTypography.title1.copy(textAlign = TextAlign.Center),
+                style = MaterialTheme.tvTypography.title2.copy(textAlign = TextAlign.Center),
             )
         }
     }
@@ -170,7 +170,7 @@ private fun TvCreateAccountContent(
             Text(
                 text = stringResource(LR.string.tv_create_account_title),
                 color = MaterialTheme.tvColors.textPrimary,
-                style = MaterialTheme.tvTypography.title1.copy(textAlign = TextAlign.Center),
+                style = MaterialTheme.tvTypography.title2.copy(textAlign = TextAlign.Center),
             )
             TvSignInQrContent(
                 userCode = userCode,
