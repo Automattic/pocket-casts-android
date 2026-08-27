@@ -245,9 +245,8 @@ data class DiscoverEpisode(
             if (url != null && isSupportedVideoType(fileType)) {
                 return url
             }
-            val enclosures = alternateEnclosures ?: return url
-            return enclosures
-                .firstOrNull { isSupportedVideoType(it.type) && it.sources.isNotEmpty() }
+            return alternateEnclosures
+                ?.firstOrNull { isSupportedVideoType(it.type) && it.sources.isNotEmpty() }
                 ?.sources?.firstOrNull()?.uri
         }
 

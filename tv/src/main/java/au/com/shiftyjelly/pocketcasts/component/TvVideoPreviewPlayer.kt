@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.component
 
+import android.content.Context
 import android.graphics.Color
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -9,17 +10,20 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.media3.common.MediaItem
+import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
 import kotlinx.coroutines.delay
+import timber.log.Timber
 
 private const val PLAY_DELAY_MS = 2000L
 private const val MAX_PREVIEW_MS = 30_000L
@@ -35,39 +39,36 @@ fun TvVideoPreviewPlayer(
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
-    val player = remember(videoUrl) {
-        ExoPlayer.Builder(context).build().apply {
-            repeatMode = Player.REPEAT_MODE_OFF
-            volume = 0f
-            setMediaItem(MediaItem.fromUri(videoUrl))
-        }
-    }
+    val currentIsPodcastPlaying by rememberUpdatedState(isPodcastPlaying)
+    var player by remember(videoUrl) { mutableStateOf<ExoPlayer?>(null) }
     var showVideo by remember(videoUrl) { mutableStateOf(false) }
 
-    DisposableEffect(player) {
-        val listener = object : Player.Listener {
-            override fun onRenderedFirstFrame() {
-                showVideo = true
-            }
-        }
-        player.addListener(listener)
+    DisposableEffect(videoUrl) {
         onDispose {
-            player.removeListener(listener)
-            player.release()
+            player?.release()
+            player = null
         }
     }
 
-    LaunchedEffect(player, isFocused) {
+    LaunchedEffect(videoUrl, isFocused) {
         if (isFocused) {
             delay(PLAY_DELAY_MS)
-            player.volume = if (isPodcastPlaying()) 0f else PREVIEW_VOLUME
-            player.prepare()
-            player.seekTo(0)
-            player.playWhenReady = true
+            val exoPlayer = player ?: createPreviewPlayer(context, videoUrl) { showVideo = true }.also { player = it }
+            exoPlayer.volume = if (currentIsPodcastPlaying()) 0f else PREVIEW_VOLUME
+            exoPlayer.prepare()
+            exoPlayer.seekTo(0)
+            exoPlayer.playWhenReady = true
             delay(MAX_PREVIEW_MS)
+            exoPlayer.fadeOutAndStop()
+            showVideo = false
+        } else {
+            player?.let { exoPlayer ->
+                exoPlayer.fadeOutAndStop()
+                exoPlayer.release()
+            }
+            player = null
+            showVideo = false
         }
-        player.fadeOutAndStop()
-        showVideo = false
     }
 
     val videoAlpha by animateFloatAsState(
@@ -82,13 +83,31 @@ fun TvVideoPreviewPlayer(
                 useController = false
                 resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
                 setBackgroundColor(Color.TRANSPARENT)
-                this.player = player
             }
         },
         update = { view -> view.player = player },
         onRelease = { view -> view.player = null },
         modifier = modifier.alpha(videoAlpha),
     )
+}
+
+private fun createPreviewPlayer(context: Context, videoUrl: String, onFirstFrame: () -> Unit): ExoPlayer {
+    return ExoPlayer.Builder(context).build().apply {
+        repeatMode = Player.REPEAT_MODE_OFF
+        volume = 0f
+        setMediaItem(MediaItem.fromUri(videoUrl))
+        addListener(
+            object : Player.Listener {
+                override fun onRenderedFirstFrame() {
+                    onFirstFrame()
+                }
+
+                override fun onPlayerError(error: PlaybackException) {
+                    Timber.w(error, "Failed to play TV discover video preview")
+                }
+            },
+        )
+    }
 }
 
 private suspend fun ExoPlayer.fadeOutAndStop() {

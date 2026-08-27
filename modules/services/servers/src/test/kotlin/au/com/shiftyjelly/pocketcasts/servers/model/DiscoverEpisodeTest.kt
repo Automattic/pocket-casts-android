@@ -35,10 +35,10 @@ class DiscoverEpisodeTest {
     }
 
     @Test
-    fun `videoUrl falls back to the default url when there are no alternate enclosures`() {
+    fun `videoUrl is null when the default is audio and there are no alternate enclosures`() {
         val episode = episode(url = "https://example.com/episode.mp3", fileType = "audio/mpeg")
 
-        assertEquals("https://example.com/episode.mp3", episode.videoUrl)
+        assertNull(episode.videoUrl)
     }
 
     @Test
