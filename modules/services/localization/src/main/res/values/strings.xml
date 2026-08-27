@@ -269,6 +269,13 @@
     <string name="tv_search_no_results_subtitle">Try more general or different keywords.</string>
     <string name="tv_search_error_subtitle">Check your connection and try again.</string>
     <string name="tv_profile_starred_episodes">Starred Episodes</string>
+    <string name="tv_settings_subscription_title">Subscription</string>
+    <string name="tv_settings_subscription_plan">Plan</string>
+    <string name="tv_settings_subscription_next_renewal">Next renewal</string>
+    <string name="tv_settings_subscription_lifetime">Lifetime</string>
+    <string name="tv_settings_subscription_other_platform">This subscription was made on another platform. Please use that platform to manage the subscription.</string>
+    <string name="tv_settings_privacy_policy_qr_message">Scan the QR code below, or open the URL on your phone to access the Privacy Policy.</string>
+    <string name="tv_settings_terms_of_use_qr_message">Scan the QR code below, or open the URL on your phone to access the Terms of Use.</string>
     <string name="tv_sign_in_title">Log in to Pocket Casts</string>
     <string name="tv_sign_in_step_scan">Scan the QR code or go to %1$s</string>
     <string name="tv_sign_in_step_login">Log in to your account</string>
