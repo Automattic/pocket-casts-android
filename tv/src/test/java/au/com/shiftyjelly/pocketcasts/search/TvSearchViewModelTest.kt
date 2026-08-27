@@ -731,6 +731,25 @@ class TvSearchViewModelTest {
         }
     }
 
+    @Test
+    fun `playLatestEpisode records the tap even when playback fails`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        val podcast = subscribedPodcast("podcast-1")
+        val newest = podcastEpisode("episode-new")
+        whenever(podcastManager.findOrDownloadPodcastRxSingle("podcast-1")).thenReturn(Single.just(podcast))
+        whenever(episodeManager.findEpisodesByPodcastOrderedByPublishDate(podcast)).thenReturn(listOf(newest))
+        whenever { playbackManager.playNowSuspend(episode = newest, sourceView = SourceView.DISCOVER) }
+            .thenThrow(RuntimeException("boom"))
+        val row = TvDiscoverRow.FeaturedPodcasts(id = "list-featured", title = "Featured", podcasts = listOf(discoverPodcast("podcast-1")))
+
+        createViewModel().playLatestEpisode(row, discoverPodcast("podcast-1"))
+
+        verify(eventHorizon).track(
+            DiscoverListEpisodeTappedEvent(listId = "list-featured", podcastUuid = "podcast-1", episodeUuid = "episode-new", source = "search"),
+        )
+        verify(eventHorizon).track(DiscoverListEpisodePlayEvent(listId = "list-featured", podcastUuid = "podcast-1"))
+    }
+
     private fun podcastEpisode(uuid: String) = PodcastEpisode(uuid = uuid, publishedDate = Date(0))
 
     private fun discoverEpisode(uuid: String) = TvDiscoverEpisode(

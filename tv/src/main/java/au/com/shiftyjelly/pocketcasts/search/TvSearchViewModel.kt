@@ -366,10 +366,11 @@ class TvSearchViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val loadedPodcast = podcastManager.findOrDownloadPodcastRxSingle(podcast.uuid).await()
+                podcastManager.refreshPodcast(loadedPodcast, playbackManager)
                 val latest = episodeManager.findEpisodesByPodcastOrderedByPublishDate(loadedPodcast).firstOrNull()
                 if (latest != null) {
-                    playbackManager.playNowSuspend(episode = latest, sourceView = SourceView.DISCOVER)
                     discoverFeedAnalytics.trackEpisodePlayed(row, latest.toTvDiscoverEpisode(podcast))
+                    playbackManager.playNowSuspend(episode = latest, sourceView = SourceView.DISCOVER)
                     _playStarted.tryEmit(Unit)
                 } else {
                     Timber.e("No episode found to play from featured podcast %s on TV search", podcast.uuid)
