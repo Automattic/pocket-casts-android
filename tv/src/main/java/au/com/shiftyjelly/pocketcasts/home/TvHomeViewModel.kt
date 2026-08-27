@@ -222,6 +222,28 @@ class TvHomeViewModel @Inject constructor(
         }
     }
 
+    fun playLatestEpisode(row: TvDiscoverRow, podcast: TvDiscoverPodcast) {
+        viewModelScope.launch {
+            try {
+                val loadedPodcast = podcastManager.findOrDownloadPodcastRxSingle(podcast.uuid).await()
+                val latest = episodeManager.findEpisodesByPodcastOrderedByPublishDate(loadedPodcast).firstOrNull()
+                if (latest != null) {
+                    playbackManager.playNowSuspend(episode = latest, sourceView = SourceView.DISCOVER)
+                    discoverFeedAnalytics.trackEpisodePlayed(row, latest.toTvDiscoverEpisode(podcast))
+                    _playStarted.tryEmit(Unit)
+                } else {
+                    Timber.e("No episode found to play from featured podcast %s on TV home", podcast.uuid)
+                    _playFailures.tryEmit(Unit)
+                }
+            } catch (exception: CancellationException) {
+                throw exception
+            } catch (exception: Exception) {
+                Timber.e(exception, "Failed to play latest episode from TV home")
+                _playFailures.tryEmit(Unit)
+            }
+        }
+    }
+
     private suspend fun findPodcastTitles(episodes: List<PodcastEpisode>): Map<String, String> {
         val uuids = episodes.map(PodcastEpisode::podcastUuid).distinct()
         if (uuids.isEmpty()) return emptyMap()
@@ -233,6 +255,13 @@ class TvHomeViewModel @Inject constructor(
         episodeTitle = title,
         podcastUuid = podcastUuid,
         podcastTitle = podcastTitles[podcastUuid].orEmpty(),
+    )
+
+    private fun PodcastEpisode.toTvDiscoverEpisode(podcast: TvDiscoverPodcast) = TvDiscoverEpisode(
+        episodeUuid = uuid,
+        episodeTitle = title,
+        podcastUuid = podcast.uuid,
+        podcastTitle = podcast.title,
     )
 
     companion object {

@@ -28,6 +28,7 @@ fun LazyListScope.tvDiscoverRow(
     modifier: Modifier = Modifier,
     focusRequester: FocusRequester? = null,
     contentPadding: PaddingValues = PaddingValues(horizontal = 32.dp),
+    onPlayLatestEpisode: (TvDiscoverRow, TvDiscoverPodcast) -> Unit = { _, _ -> },
     onTapBanner: (TvDiscoverBanner) -> Unit = {},
     onListImpression: (TvDiscoverRow) -> Unit = {},
     loadCategoryCovers: (suspend (DiscoverCategory) -> List<String>)? = null,
@@ -50,7 +51,7 @@ fun LazyListScope.tvDiscoverRow(
                     title = podcast.title,
                     description = podcast.description,
                     onGoToPodcast = { onPodcastClick(row, podcast) },
-                    onPlayLastEpisode = {},
+                    onPlayLastEpisode = { onPlayLatestEpisode(row, podcast) },
                 )
             }
         }

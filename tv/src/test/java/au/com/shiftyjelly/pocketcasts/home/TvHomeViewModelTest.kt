@@ -853,6 +853,44 @@ class TvHomeViewModelTest {
         }
     }
 
+    @Test
+    fun `playLatestEpisode plays the newest episode of a featured podcast`() = runTest {
+        val podcast = Podcast(uuid = "podcast-1")
+        val newest = episode(uuid = "episode-new", podcastUuid = "podcast-1")
+        whenever(podcastManager.findOrDownloadPodcastRxSingle("podcast-1")).thenReturn(Single.just(podcast))
+        whenever(episodeManager.findEpisodesByPodcastOrderedByPublishDate(podcast))
+            .thenReturn(listOf(newest, episode(uuid = "episode-old", podcastUuid = "podcast-1")))
+
+        createViewModel().playLatestEpisode(featuredRow(), discoverPodcast("podcast-1"))
+
+        verifyBlocking(playbackManager) { playNowSuspend(episode = newest, sourceView = SourceView.DISCOVER) }
+        verify(eventHorizon).track(
+            DiscoverListEpisodeTappedEvent(listId = "list-featured", podcastUuid = "podcast-1", episodeUuid = "episode-new", source = "home"),
+        )
+        verify(eventHorizon).track(DiscoverListEpisodePlayEvent(listId = "list-featured", podcastUuid = "podcast-1"))
+    }
+
+    @Test
+    fun `playLatestEpisode reports a failure when the podcast has no episodes`() = runTest {
+        val podcast = Podcast(uuid = "podcast-1")
+        whenever(podcastManager.findOrDownloadPodcastRxSingle("podcast-1")).thenReturn(Single.just(podcast))
+        whenever(episodeManager.findEpisodesByPodcastOrderedByPublishDate(podcast)).thenReturn(emptyList())
+        val viewModel = createViewModel()
+
+        viewModel.playFailures.test {
+            viewModel.playLatestEpisode(featuredRow(), discoverPodcast("podcast-1"))
+
+            awaitItem()
+            verifyNoInteractions(playbackManager)
+        }
+    }
+
+    private fun featuredRow() = TvDiscoverRow.FeaturedPodcasts(
+        id = "list-featured",
+        title = "Featured",
+        podcasts = listOf(discoverPodcast("podcast-1")),
+    )
+
     private fun homeEpisode() = TvDiscoverEpisode(
         episodeUuid = "episode-1",
         episodeTitle = "Episode",
