@@ -106,7 +106,7 @@ class TvStarredViewModelTest {
     }
 
     @Test
-    fun `showing the screen only syncs when signed in`() = runTest {
+    fun `showing the screen checks whether the user is signed in before syncing`() = runTest {
         createViewModel().onShown()
 
         verify(syncManager).isLoggedIn()
