@@ -374,7 +374,7 @@ private val TvSearchFilter.analyticsValue
         TvSearchFilter.TopResults -> SearchResultFilterType.AllResults
         TvSearchFilter.Podcasts -> SearchResultFilterType.Podcasts
         TvSearchFilter.Episodes -> SearchResultFilterType.Episodes
-        TvSearchFilter.Folders -> SearchResultFilterType.Unknown
+        TvSearchFilter.Folders -> SearchResultFilterType.Folders
     }
 
 private fun Podcast.toSearchItem() = ImprovedSearchResultItem.PodcastItem(

@@ -517,6 +517,17 @@ class TvSearchViewModelTest {
     }
 
     @Test
+    fun `selecting the folders filter tracks a search filter tapped event with the folders filter`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        val viewModel = createViewModel()
+
+        viewModel.onFilterSelected(TvSearchFilter.Folders)
+
+        assertEquals(TvSearchFilter.Folders, viewModel.filter.value)
+        verify(eventHorizon).track(SearchFilterTappedEvent(source = SourceViewType.Search, filter = SearchResultFilterType.Folders))
+    }
+
+    @Test
     fun `re-selecting the current filter does not track another filter tapped event`() = runTest {
         whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
         val viewModel = createViewModel()

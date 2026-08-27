@@ -3,6 +3,8 @@ package au.com.shiftyjelly.pocketcasts.onboarding.signin
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.SignInShownEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.Job
@@ -14,6 +16,7 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class TvSignInViewModel @Inject constructor(
     private val syncManager: SyncManager,
+    private val eventHorizon: EventHorizon,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<TvSignInUiState>(TvSignInUiState.Loading)
@@ -23,6 +26,10 @@ class TvSignInViewModel @Inject constructor(
 
     init {
         requestDeviceCode()
+    }
+
+    fun trackShown() {
+        eventHorizon.track(SignInShownEvent)
     }
 
     private fun requestDeviceCode() {
