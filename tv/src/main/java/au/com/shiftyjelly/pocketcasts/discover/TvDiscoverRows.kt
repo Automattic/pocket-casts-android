@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -129,9 +128,7 @@ fun LazyListScope.tvDiscoverRow(
                 focusRequester = focusRequester,
                 modifier = modifier,
             ) { category ->
-                val categoryIndex = remember(category.id, row.categories) {
-                    row.categories.indexOfFirst { it.id == category.id }
-                }
+                val categoryIndex = row.categories.indexOfFirst { it.id == category.id }
                 TvCategoryTile(
                     category = category,
                     onClick = { onCategoryClick(category, categoryIndex) },

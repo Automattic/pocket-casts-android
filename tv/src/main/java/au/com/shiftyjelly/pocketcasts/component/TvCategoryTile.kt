@@ -31,9 +31,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.CardDefaults
 import androidx.tv.material3.Glow
@@ -46,7 +48,7 @@ import au.com.shiftyjelly.pocketcasts.theme.tvTypography
 import coil3.compose.AsyncImage
 
 private val CardShape = RoundedCornerShape(12.dp)
-private val CoverSize = 96.dp
+private val CoverSize = 80.dp
 private val CoverShape = RoundedCornerShape(8.dp)
 private const val COVER_VISIBLE_FRACTION = 0.55f
 private const val COVER_RESTING_SCALE = 0.85f
@@ -71,12 +73,13 @@ fun TvCategoryTile(
         }
     }
 
-    val focusProgress by animateFloatAsState(
+    val focusProgress = animateFloatAsState(
         targetValue = if (isFocused) 1f else 0f,
         animationSpec = spring(dampingRatio = 0.6f, stiffness = Spring.StiffnessMediumLow),
         label = "TvCategoryTileFocus",
     )
     val coverSizePx = with(LocalDensity.current) { CoverSize.toPx() }
+    val directionSign = if (LocalLayoutDirection.current == LayoutDirection.Rtl) -1f else 1f
 
     TvTile(
         onClick = onClick,
@@ -97,7 +100,7 @@ fun TvCategoryTile(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .graphicsLayer { alpha = focusProgress.coerceIn(0f, 1f) }
+                    .graphicsLayer { alpha = focusProgress.value.coerceIn(0f, 1f) }
                     .background(TvCategoryStyle.gradient(colorIndex)),
             )
 
@@ -105,17 +108,17 @@ fun TvCategoryTile(
                 CategoryCover(
                     url = url,
                     alignment = Alignment.CenterStart,
-                    edgeSign = -1f,
-                    focusProgress = focusProgress,
+                    edgeSign = -1f * directionSign,
+                    focusProgress = { focusProgress.value },
                     coverSizePx = coverSizePx,
                 )
             }
-            coverUrls.takeIf { it.size > 1 }?.last()?.let { url ->
+            coverUrls.getOrNull(1)?.let { url ->
                 CategoryCover(
                     url = url,
                     alignment = Alignment.CenterEnd,
-                    edgeSign = 1f,
-                    focusProgress = focusProgress,
+                    edgeSign = 1f * directionSign,
+                    focusProgress = { focusProgress.value },
                     coverSizePx = coverSizePx,
                 )
             }
@@ -150,7 +153,7 @@ private fun BoxScope.CategoryCover(
     url: String,
     alignment: Alignment,
     edgeSign: Float,
-    focusProgress: Float,
+    focusProgress: () -> Float,
     coverSizePx: Float,
 ) {
     Box(
@@ -158,11 +161,12 @@ private fun BoxScope.CategoryCover(
             .align(alignment)
             .size(CoverSize)
             .graphicsLayer {
-                alpha = focusProgress.coerceIn(0f, 1f)
-                val scale = COVER_RESTING_SCALE + (1f - COVER_RESTING_SCALE) * focusProgress
+                val progress = focusProgress().coerceIn(0f, 1f)
+                alpha = progress
+                val scale = COVER_RESTING_SCALE + (1f - COVER_RESTING_SCALE) * progress
                 scaleX = scale
                 scaleY = scale
-                translationX = edgeSign * coverSizePx * (1f - COVER_VISIBLE_FRACTION * focusProgress)
+                translationX = edgeSign * coverSizePx * (1f - COVER_VISIBLE_FRACTION * progress)
             },
     ) {
         TvArtworkImage(

@@ -7,14 +7,20 @@ import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.servers.model.ListFeed
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
@@ -31,10 +37,10 @@ class TvDiscoverFeedLoaderTest {
     private val settings = mock<Settings>()
     private val context = mock<Context>()
 
-    private fun loader() = TvDiscoverFeedLoader(
+    private fun TestScope.loader() = TvDiscoverFeedLoader(
         listRepository = listRepository,
         settings = settings,
-        applicationScope = CoroutineScope(coroutineRule.testDispatcher),
+        applicationScope = backgroundScope,
         context = context,
     )
 
@@ -64,6 +70,38 @@ class TvDiscoverFeedLoaderTest {
         assertEquals(emptyList<String>(), first)
         assertEquals(listOf(artwork("a"), artwork("b")), second)
         verify(listRepository, times(2)).getListFeed(eq(SOURCE), any())
+    }
+
+    @Test
+    fun `a cancelled caller does not stop the covers from loading`() = runTest {
+        val gate = CompletableDeferred<ListFeed>()
+        whenever(listRepository.getListFeed(eq(SOURCE), any())).doSuspendableAnswer { gate.await() }
+        val loader = loader()
+
+        val cancelled = launch { loader.loadCategoryCoverUrls(SOURCE) }
+        runCurrent()
+        cancelled.cancel()
+        gate.complete(feedOf("a", "b"))
+        advanceUntilIdle()
+
+        assertEquals(listOf(artwork("a"), artwork("b")), loader.loadCategoryCoverUrls(SOURCE))
+        verify(listRepository, times(1)).getListFeed(eq(SOURCE), any())
+    }
+
+    @Test
+    fun `concurrent callers for the same source share one fetch`() = runTest {
+        val gate = CompletableDeferred<ListFeed>()
+        whenever(listRepository.getListFeed(eq(SOURCE), any())).doSuspendableAnswer { gate.await() }
+        val loader = loader()
+
+        val first = async { loader.loadCategoryCoverUrls(SOURCE) }
+        val second = async { loader.loadCategoryCoverUrls(SOURCE) }
+        runCurrent()
+        gate.complete(feedOf("a", "b"))
+
+        assertEquals(listOf(artwork("a"), artwork("b")), first.await())
+        assertEquals(first.await(), second.await())
+        verify(listRepository, times(1)).getListFeed(eq(SOURCE), any())
     }
 
     private fun feedOf(vararg uuids: String) = mock<ListFeed> {
