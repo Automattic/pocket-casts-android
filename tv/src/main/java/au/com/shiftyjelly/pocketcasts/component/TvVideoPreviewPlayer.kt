@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.component
 
+import android.content.Context
 import android.view.LayoutInflater
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -41,61 +42,39 @@ fun TvVideoPreviewPlayer(
     val context = LocalContext.current
     val currentIsPodcastPlaying by rememberUpdatedState(isPodcastPlaying)
 
-    // Keep a single player alive for as long as this tile is composed. Like tvOS, the preview
-    // is paused (not torn down) when focus leaves, so losing focus never releases the surface.
-    val player = remember(videoUrl) {
-        ExoPlayer.Builder(context).build().apply {
-            repeatMode = Player.REPEAT_MODE_OFF
-            volume = 0f
-            setMediaItem(MediaItem.fromUri(videoUrl))
-        }
-    }
+    var player by remember(videoUrl) { mutableStateOf<ExoPlayer?>(null) }
     var hasFirstFrame by remember(videoUrl) { mutableStateOf(false) }
-    var prepared by remember(videoUrl) { mutableStateOf(false) }
     var isPreviewing by remember(videoUrl) { mutableStateOf(false) }
 
-    DisposableEffect(player) {
-        val listener = object : Player.Listener {
-            override fun onRenderedFirstFrame() {
-                hasFirstFrame = true
-            }
-
-            override fun onPlayerError(error: PlaybackException) {
-                Timber.w(error, "Failed to play TV discover video preview")
-            }
-        }
-        player.addListener(listener)
+    DisposableEffect(videoUrl) {
         onDispose {
-            player.removeListener(listener)
-            player.release()
+            player?.release()
+            player = null
         }
     }
 
     LaunchedEffect(videoUrl, isFocused) {
         if (isFocused) {
+            player?.volume = 0f
             delay(PLAY_DELAY_MS)
-            player.volume = if (currentIsPodcastPlaying()) 0f else PREVIEW_VOLUME
-            if (!prepared) {
-                player.prepare()
-                prepared = true
-            }
-            player.seekTo(0)
-            player.playWhenReady = true
+            val exoPlayer = player ?: createPreviewPlayer(context, videoUrl) { hasFirstFrame = true }.also { player = it }
+            exoPlayer.volume = if (currentIsPodcastPlaying()) 0f else PREVIEW_VOLUME
+            exoPlayer.prepare()
+            exoPlayer.seekTo(0)
+            exoPlayer.playWhenReady = true
             isPreviewing = true
             delay(MAX_PREVIEW_MS)
-            // Reached the preview cap: fade out but keep the player and its last frame in place.
+            fadeOutAndRelease(exoPlayer)
+            player = null
+            hasFirstFrame = false
             isPreviewing = false
-            val audioFade = launch { player.fadeOutVolume() }
-            delay(FADE_DURATION_MS.toLong())
-            audioFade.cancel()
-            player.pause()
-        } else if (isPreviewing || player.isPlaying) {
-            // Fade the video out first (revealing the poster), then pause once it is invisible.
-            isPreviewing = false
-            val audioFade = launch { player.fadeOutVolume() }
-            delay(FADE_DURATION_MS.toLong())
-            audioFade.cancel()
-            player.pause()
+        } else {
+            player?.let { exoPlayer ->
+                isPreviewing = false
+                fadeOutAndRelease(exoPlayer)
+                player = null
+                hasFirstFrame = false
+            }
         }
     }
 
@@ -118,11 +97,34 @@ fun TvVideoPreviewPlayer(
     )
 }
 
-private suspend fun ExoPlayer.fadeOutVolume() {
-    val startVolume = volume
-    if (startVolume <= 0f) return
-    repeat(FADE_STEPS) { step ->
-        volume = (startVolume * (FADE_STEPS - step - 1) / FADE_STEPS).coerceAtLeast(0f)
-        delay((FADE_DURATION_MS / FADE_STEPS).toLong())
+private fun createPreviewPlayer(context: Context, videoUrl: String, onFirstFrame: () -> Unit): ExoPlayer {
+    return ExoPlayer.Builder(context).build().apply {
+        repeatMode = Player.REPEAT_MODE_OFF
+        volume = 0f
+        setMediaItem(MediaItem.fromUri(videoUrl))
+        addListener(
+            object : Player.Listener {
+                override fun onRenderedFirstFrame() {
+                    onFirstFrame()
+                }
+
+                override fun onPlayerError(error: PlaybackException) {
+                    Timber.w(error, "Failed to play TV discover video preview")
+                }
+            },
+        )
     }
+}
+
+private suspend fun fadeOutAndRelease(player: ExoPlayer) {
+    val startVolume = player.volume
+    if (player.isPlaying && startVolume > 0f) {
+        repeat(FADE_STEPS) { step ->
+            player.volume = (startVolume * (FADE_STEPS - step - 1) / FADE_STEPS).coerceAtLeast(0f)
+            delay((FADE_DURATION_MS / FADE_STEPS).toLong())
+        }
+    } else {
+        delay(FADE_DURATION_MS.toLong())
+    }
+    player.release()
 }
