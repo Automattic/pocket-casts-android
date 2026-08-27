@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.home
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ColumnScope
@@ -49,36 +50,19 @@ fun TvProfileModal(
     onLogOut: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var isShowingLogoutConfirmation by remember { mutableStateOf(false) }
     TvModal(
-        onDismissRequest = {
-            if (isShowingLogoutConfirmation) {
-                isShowingLogoutConfirmation = false
-            } else {
-                onDismissRequest()
-            }
-        },
+        onDismissRequest = onDismissRequest,
         modifier = modifier,
     ) {
-        if (isShowingLogoutConfirmation) {
-            TvConfirmationContent(
-                title = stringResource(LR.string.tv_profile_log_out_confirmation_title),
-                message = stringResource(LR.string.tv_profile_log_out_confirmation_message),
-                confirmLabel = stringResource(LR.string.log_out),
-                onConfirm = onLogOut,
-                onCancel = { isShowingLogoutConfirmation = false },
-            )
-        } else {
-            TvProfileModalContent(
-                profile = profile,
-                onLogIn = onLogIn,
-                onCreateAccount = onCreateAccount,
-                onStarredEpisodes = onStarredEpisodes,
-                onListeningHistory = onListeningHistory,
-                onSettings = onSettings,
-                onLogOut = { isShowingLogoutConfirmation = true },
-            )
-        }
+        TvProfileModalContent(
+            profile = profile,
+            onLogIn = onLogIn,
+            onCreateAccount = onCreateAccount,
+            onStarredEpisodes = onStarredEpisodes,
+            onListeningHistory = onListeningHistory,
+            onSettings = onSettings,
+            onLogOut = onLogOut,
+        )
     }
 }
 
@@ -92,9 +76,29 @@ private fun ColumnScope.TvProfileModalContent(
     onSettings: () -> Unit,
     onLogOut: () -> Unit,
 ) {
+    var isShowingLogoutConfirmation by remember { mutableStateOf(false) }
+    var returnFocusToLogOut by remember { mutableStateOf(false) }
     val focusRequester = remember { FocusRequester() }
-    LaunchedEffect(profile is TvProfileState.SignedIn) {
-        focusRequester.requestFocus()
+    LaunchedEffect(profile is TvProfileState.SignedIn, isShowingLogoutConfirmation) {
+        if (!isShowingLogoutConfirmation) {
+            focusRequester.requestFocus()
+        }
+    }
+
+    if (isShowingLogoutConfirmation) {
+        fun cancel() {
+            returnFocusToLogOut = true
+            isShowingLogoutConfirmation = false
+        }
+        BackHandler(onBack = ::cancel)
+        TvConfirmationContent(
+            title = stringResource(LR.string.tv_profile_log_out_confirmation_title),
+            message = stringResource(LR.string.tv_profile_log_out_confirmation_message),
+            confirmLabel = stringResource(LR.string.log_out),
+            onConfirm = onLogOut,
+            onCancel = ::cancel,
+        )
+        return
     }
 
     when (profile) {
@@ -111,7 +115,7 @@ private fun ColumnScope.TvProfileModalContent(
             TvModalButton(
                 text = stringResource(LR.string.tv_profile_starred_episodes),
                 onClick = onStarredEpisodes,
-                modifier = Modifier.focusRequester(focusRequester),
+                modifier = if (returnFocusToLogOut) Modifier else Modifier.focusRequester(focusRequester),
             )
             TvModalButton(
                 text = stringResource(LR.string.profile_navigation_listening_history),
@@ -123,7 +127,8 @@ private fun ColumnScope.TvProfileModalContent(
             )
             TvModalButton(
                 text = stringResource(LR.string.log_out),
-                onClick = onLogOut,
+                onClick = { isShowingLogoutConfirmation = true },
+                modifier = if (returnFocusToLogOut) Modifier.focusRequester(focusRequester) else Modifier,
             )
         }
 
