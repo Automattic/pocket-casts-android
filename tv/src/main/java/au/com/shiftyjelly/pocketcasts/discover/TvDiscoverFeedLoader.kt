@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRegion
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRow
 import au.com.shiftyjelly.pocketcasts.servers.model.DisplayStyle
+import au.com.shiftyjelly.pocketcasts.servers.model.ListFeed
 import au.com.shiftyjelly.pocketcasts.servers.model.ListType
 import au.com.shiftyjelly.pocketcasts.servers.model.transformWithRegion
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -160,7 +161,7 @@ class TvDiscoverFeedLoader @Inject constructor(
             .map { it.toTvDiscoverPodcast(isSponsored = row.sponsored) }
         val podcasts = insertSponsored(basePodcasts, insertionsDeferred.await())
         if (podcasts.isEmpty()) return@coroutineScope null
-        val feedTitle = feed.title?.takeIf { it.isNotBlank() } ?: row.title
+        val feedTitle = feed.displayTitle(fallbackTitle = row.title)
         when (row.displayStyle) {
             is DisplayStyle.Carousel -> TvDiscoverRow.FeaturedPodcasts(id = row.rowId(), title = feedTitle, podcasts = podcasts)
 
@@ -214,7 +215,7 @@ class TvDiscoverFeedLoader @Inject constructor(
                 )
             }
         if (episodes.isEmpty()) return null
-        val title = feed.title?.takeIf { it.isNotBlank() } ?: row.title
+        val title = feed.displayTitle(fallbackTitle = row.title)
         return TvDiscoverRow.Episodes(id = row.rowId(), title = title, episodes = episodes)
     }
 
@@ -255,6 +256,12 @@ class TvDiscoverFeedLoader @Inject constructor(
 
     private fun DiscoverCategory.resolveSource(replacements: Map<String, String>): DiscoverCategory {
         return transformWithReplacements(replacements, context.resources) as? DiscoverCategory ?: this
+    }
+
+    private fun ListFeed.displayTitle(fallbackTitle: String): String {
+        val feedTitle = title?.takeIf(String::isNotBlank) ?: fallbackTitle
+        val feedSubtitle = subtitle?.takeIf(String::isNotBlank) ?: return feedTitle
+        return "$feedSubtitle: $feedTitle"
     }
 
     private fun DiscoverRow.rowId() = listUuid ?: id ?: title
