@@ -110,36 +110,29 @@ class TvNowPlayingViewModel @Inject constructor(
 
     fun setPlaybackSpeed(speed: Double) = updateEffects(
         update = { it.copy(playbackSpeed = speed) },
-        track = { setting ->
-            trackEffectEvent { source, contentType ->
-                PlaybackEffectSpeedChangedEvent(speed = speed, settings = setting, source = source, contentType = contentType)
-            }
+        event = { setting, source, contentType ->
+            PlaybackEffectSpeedChangedEvent(speed = speed, settings = setting, source = source, contentType = contentType)
         },
     )
 
     fun setTrimMode(trimMode: TrimMode) = updateEffects(
         update = { it.copy(trimMode = trimMode) },
-        track = { setting ->
-            trackEffectEvent { source, contentType ->
-                PlaybackEffectTrimSilenceAmountChangedEvent(amount = trimMode.analyticsValue, settings = setting, source = source, contentType = contentType)
-            }
+        event = { setting, source, contentType ->
+            PlaybackEffectTrimSilenceAmountChangedEvent(
+                amount = trimMode.analyticsValue,
+                settings = setting,
+                source = source,
+                contentType = contentType,
+            )
         },
     )
 
     fun setVolumeBoost(isBoosted: Boolean) = updateEffects(
         update = { it.copy(isVolumeBoosted = isBoosted) },
-        track = { setting ->
-            trackEffectEvent { source, contentType ->
-                PlaybackEffectVolumeBoostToggledEvent(enabled = isBoosted, settings = setting, source = source, contentType = contentType)
-            }
+        event = { setting, source, contentType ->
+            PlaybackEffectVolumeBoostToggledEvent(enabled = isBoosted, settings = setting, source = source, contentType = contentType)
         },
     )
-
-    private fun trackEffectEvent(event: (SourceViewType, PlaybackContentType) -> Trackable) {
-        playbackManager.trackPlaybackEvent(SourceView.PLAYER_PLAYBACK_EFFECTS) { source, contentType ->
-            event(source.analyticsValue, contentType)
-        }
-    }
 
     private val effectsMutex = Mutex()
     private var pendingEffects: PlaybackEffectsData? = null
@@ -148,7 +141,7 @@ class TvNowPlayingViewModel @Inject constructor(
 
     private fun updateEffects(
         update: (PlaybackEffectsData) -> PlaybackEffectsData,
-        track: (SettingType) -> Unit = {},
+        event: (SettingType, SourceViewType, PlaybackContentType) -> Trackable,
     ) {
         viewModelScope.launch(ioDispatcher) {
             effectsMutex.withLock {
@@ -181,7 +174,10 @@ class TvNowPlayingViewModel @Inject constructor(
                     settings.globalPlaybackEffects.set(effects, updateModifiedAt = true)
                 }
                 playbackManager.updatePlayerEffects(effects)
-                track(if (overridingPodcast != null) SettingType.Local else SettingType.Global)
+                val setting = if (overridingPodcast != null) SettingType.Local else SettingType.Global
+                playbackManager.trackPlaybackEvent(SourceView.PLAYER_PLAYBACK_EFFECTS) { source, contentType ->
+                    event(setting, source.analyticsValue, contentType)
+                }
             }
         }
     }

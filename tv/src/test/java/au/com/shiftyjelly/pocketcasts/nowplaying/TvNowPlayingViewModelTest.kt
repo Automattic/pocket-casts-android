@@ -36,6 +36,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argThat
+import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
@@ -73,12 +74,13 @@ class TvNowPlayingViewModelTest {
     private var trackedEffectEvent: Trackable? = null
 
     init {
-        whenever(playbackManager.trackPlaybackEvent(any(), any())).thenAnswer { invocation ->
+        // The stub supplies the content type; the real derivation lives in PlaybackManager.playbackContentTypeFor.
+        doAnswer { invocation ->
             @Suppress("UNCHECKED_CAST")
             val builder = invocation.arguments[1] as (SourceView, PlaybackContentType) -> Trackable
             trackedEffectEvent = builder(invocation.arguments[0] as SourceView, PlaybackContentType.Audio)
             null
-        }
+        }.whenever(playbackManager).trackPlaybackEvent(any(), any())
     }
 
     private val skipForwardSetting = mock<UserSetting<Int>> { on { value } doReturn 30 }

@@ -100,13 +100,12 @@ fun TvNowPlayingScreen(
     var openedPodcastUuid by rememberSaveable { mutableStateOf<String?>(null) }
     val currentOnConsumeOpenRequest by rememberUpdatedState(onConsumeOpenRequest)
 
-    val isPlayerVisible = uiState is TvNowPlayingUiState.Loaded
-    DisposableEffect(isPlayerVisible) {
-        if (isPlayerVisible) {
+    // Keep this above the podcast-details early return, so opening a podcast from the player
+    // does not re-fire shown/dismissed on the way back.
+    if (uiState is TvNowPlayingUiState.Loaded) {
+        DisposableEffect(Unit) {
             viewModel.trackPlayerShown()
-        }
-        onDispose {
-            if (isPlayerVisible) {
+            onDispose {
                 viewModel.trackPlayerDismissed()
             }
         }
