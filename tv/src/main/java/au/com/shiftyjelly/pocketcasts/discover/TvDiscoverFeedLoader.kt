@@ -203,6 +203,7 @@ class TvDiscoverFeedLoader @Inject constructor(
 
     private suspend fun loadEpisodesRow(row: DiscoverRow): TvDiscoverRow? {
         val feed = listRepository.getListFeed(row.source, row.authenticated) ?: return null
+        val playsVideoPreview = row.displayStyle is DisplayStyle.VideoPreviewList
         val episodes = feed.episodes.orEmpty()
             .distinctBy(DiscoverEpisode::uuid)
             .map { episode ->
@@ -211,6 +212,7 @@ class TvDiscoverFeedLoader @Inject constructor(
                     episodeTitle = episode.title.orEmpty(),
                     podcastUuid = episode.podcast_uuid,
                     podcastTitle = episode.podcast_title.orEmpty(),
+                    videoPreviewUrl = if (playsVideoPreview) episode.videoUrl else null,
                 )
             }
         if (episodes.isEmpty()) return null

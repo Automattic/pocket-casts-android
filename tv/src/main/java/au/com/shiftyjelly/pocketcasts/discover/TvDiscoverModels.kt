@@ -74,6 +74,7 @@ data class TvDiscoverEpisode(
     val episodeTitle: String,
     val podcastUuid: String,
     val podcastTitle: String,
+    val videoPreviewUrl: String? = null,
 ) {
     val thumbnailUrl: String = PodcastImage.getArtworkUrl(size = 960, uuid = podcastUuid, isWearOS = false)
     val podcastArtworkUrl: String = PodcastImage.getArtworkUrl(size = 200, uuid = podcastUuid, isWearOS = false)
