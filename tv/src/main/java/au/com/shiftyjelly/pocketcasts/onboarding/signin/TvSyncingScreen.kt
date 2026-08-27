@@ -56,6 +56,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 private const val COVER_SIZE_DP = 240
 private const val COVER_CORNER_RADIUS_DP = 14
 private const val MAX_SIMULTANEOUS = 2
+private const val MAX_COVER_POOL = 40
 private const val MIN_ROTATION = 2f
 private const val MAX_ROTATION = 10f
 private const val ROTATION_STEPS = 5
@@ -132,7 +133,7 @@ private fun TvSyncingCoverStack(
     modifier: Modifier = Modifier,
 ) {
     val realCovers = remember(podcastUuids) {
-        podcastUuids.map { CoverModel.Remote(PodcastImage.getMediumArtworkUrl(it)) }
+        podcastUuids.take(MAX_COVER_POOL).map { CoverModel.Remote(PodcastImage.getMediumArtworkUrl(it)) }
     }
     val source: List<CoverModel> = if (realCovers.size > MAX_SIMULTANEOUS) realCovers else bundledCovers
     val currentSource by rememberUpdatedState(source)
@@ -251,8 +252,16 @@ private class MountedCover(
 
 @Preview(device = Devices.TV_1080p)
 @Composable
-private fun TvSyncingScreenPreview() {
+private fun TvSyncingScreenFallbackPreview() {
     TvTheme {
         TvSyncingScreenContent(podcastUuids = emptyList())
+    }
+}
+
+@Preview(device = Devices.TV_1080p)
+@Composable
+private fun TvSyncingScreenRealCoversPreview() {
+    TvTheme {
+        TvSyncingScreenContent(podcastUuids = List(6) { "uuid-$it" })
     }
 }
