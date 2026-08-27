@@ -31,6 +31,7 @@ fun LazyListScope.tvDiscoverRow(
     onTapBanner: (TvDiscoverBanner) -> Unit = {},
     onListImpression: (TvDiscoverRow) -> Unit = {},
     loadCategoryCovers: (suspend (DiscoverCategory) -> List<String>)? = null,
+    isPodcastPlaying: () -> Boolean = { false },
 ) {
     when (row) {
         is TvDiscoverRow.FeaturedPodcasts -> item(key = row.id) {
@@ -95,6 +96,8 @@ fun LazyListScope.tvDiscoverRow(
                     episodeTitle = episode.episodeTitle,
                     onPlayEpisode = { onEpisodePlay(row, episode) },
                     onGoToPodcast = { onEpisodePodcastClick(row, episode) },
+                    videoPreviewUrl = episode.videoPreviewUrl,
+                    isPodcastPlaying = isPodcastPlaying,
                 )
             }
         }

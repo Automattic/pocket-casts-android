@@ -23,6 +23,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Devices
@@ -35,7 +36,11 @@ import au.com.shiftyjelly.pocketcasts.theme.TvTheme
 import au.com.shiftyjelly.pocketcasts.theme.tvColors
 import au.com.shiftyjelly.pocketcasts.theme.tvTypography
 import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
+import coil3.video.videoFramePercent
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+
+private const val VIDEO_POSTER_FRAME_PERCENT = 0.1
 
 @Composable
 fun TvVideoTile(
@@ -46,6 +51,8 @@ fun TvVideoTile(
     onPlayEpisode: () -> Unit,
     onGoToPodcast: () -> Unit,
     modifier: Modifier = Modifier,
+    videoPreviewUrl: String? = null,
+    isPodcastPlaying: () -> Boolean = { false },
 ) {
     val buttonState = rememberTvTileButtonState(buttonCount = 2)
     val buttonActions = remember(onPlayEpisode, onGoToPodcast) { listOf(onPlayEpisode, onGoToPodcast) }
@@ -65,6 +72,28 @@ fun TvVideoTile(
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize(),
             )
+
+            if (videoPreviewUrl != null) {
+                val context = LocalContext.current
+                val frameRequest = remember(videoPreviewUrl) {
+                    ImageRequest.Builder(context)
+                        .data(videoPreviewUrl)
+                        .videoFramePercent(VIDEO_POSTER_FRAME_PERCENT)
+                        .build()
+                }
+                AsyncImage(
+                    model = frameRequest,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize(),
+                )
+                TvVideoPreviewPlayer(
+                    videoUrl = videoPreviewUrl,
+                    isFocused = buttonState.isFocused,
+                    isPodcastPlaying = isPodcastPlaying,
+                    modifier = Modifier.fillMaxSize(),
+                )
+            }
 
             Box(
                 modifier = Modifier

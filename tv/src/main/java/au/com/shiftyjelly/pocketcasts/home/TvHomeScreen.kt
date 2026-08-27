@@ -111,6 +111,7 @@ fun TvHomeScreen(
             },
             onListImpression = viewModel::trackDiscoverListShown,
             loadCategoryCovers = viewModel::categoryCoverUrls,
+            isPodcastPlaying = viewModel::isPlaying,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(top = TvTopBarHeight)
@@ -158,6 +159,7 @@ private fun TvHomeContent(
     onCategoryClick: (DiscoverCategory, Int) -> Unit = { _, _ -> },
     onListImpression: (TvDiscoverRow) -> Unit = {},
     loadCategoryCovers: (suspend (DiscoverCategory) -> List<String>)? = null,
+    isPodcastPlaying: () -> Boolean = { false },
     restoreFocusTrigger: Int = 0,
 ) {
     when (uiState) {
@@ -177,6 +179,7 @@ private fun TvHomeContent(
                 onCategoryClick = onCategoryClick,
                 onListImpression = onListImpression,
                 loadCategoryCovers = loadCategoryCovers,
+                isPodcastPlaying = isPodcastPlaying,
                 modifier = modifier,
                 restoreFocusTrigger = restoreFocusTrigger,
             )
@@ -218,6 +221,7 @@ private fun TvHomeRows(
     onCategoryClick: (DiscoverCategory, Int) -> Unit = { _, _ -> },
     onListImpression: (TvDiscoverRow) -> Unit = {},
     loadCategoryCovers: (suspend (DiscoverCategory) -> List<String>)? = null,
+    isPodcastPlaying: () -> Boolean = { false },
     restoreFocusTrigger: Int = 0,
 ) {
     var lastFocusedRowIndex by rememberSaveable(rows.size) { mutableIntStateOf(0) }
@@ -257,6 +261,7 @@ private fun TvHomeRows(
                 onTapBanner = onTapBanner,
                 onListImpression = onListImpression,
                 loadCategoryCovers = loadCategoryCovers,
+                isPodcastPlaying = isPodcastPlaying,
             )
         }
 
