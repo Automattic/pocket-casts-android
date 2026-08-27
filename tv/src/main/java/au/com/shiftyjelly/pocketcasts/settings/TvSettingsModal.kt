@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.settings
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -17,8 +19,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -35,21 +39,17 @@ import au.com.shiftyjelly.pocketcasts.component.TvModalButton
 import au.com.shiftyjelly.pocketcasts.component.TvModalSurface
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
+import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.qr.rememberQrPainter
 import au.com.shiftyjelly.pocketcasts.theme.TvButtonDefaults
 import au.com.shiftyjelly.pocketcasts.theme.TvTheme
 import au.com.shiftyjelly.pocketcasts.theme.tvColors
 import au.com.shiftyjelly.pocketcasts.theme.tvTypography
-import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
-import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import java.text.DateFormat
 import java.time.Instant
 import java.util.Date
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -61,6 +61,15 @@ fun TvSettingsModal(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var subScreen by remember { mutableStateOf<TvSettingsSubScreen?>(null) }
+
+    LaunchedEffect(subScreen) {
+        when (subScreen) {
+            TvSettingsSubScreen.Subscription -> viewModel.trackSubscriptionShown()
+            TvSettingsSubScreen.PrivacyPolicy -> viewModel.trackPrivacyPolicyShown()
+            TvSettingsSubScreen.TermsOfUse -> viewModel.trackTermsOfUseShown()
+            null -> Unit
+        }
+    }
 
     TvModal(
         onDismissRequest = onDismissRequest,
@@ -83,7 +92,6 @@ fun TvSettingsModal(
         TvSettingsSubScreen.Subscription -> TvSubscriptionInfoModal(
             subscription = uiState.subscription,
             onDismissRequest = { subScreen = null },
-            onShown = viewModel::trackSubscriptionShown,
         )
 
         TvSettingsSubScreen.PrivacyPolicy -> TvQrLinkModal(
@@ -91,7 +99,6 @@ fun TvSettingsModal(
             message = stringResource(LR.string.tv_settings_privacy_policy_qr_message),
             url = Settings.INFO_PRIVACY_URL,
             onDismissRequest = { subScreen = null },
-            onShown = viewModel::trackPrivacyPolicyShown,
         )
 
         TvSettingsSubScreen.TermsOfUse -> TvQrLinkModal(
@@ -99,7 +106,6 @@ fun TvSettingsModal(
             message = stringResource(LR.string.tv_settings_terms_of_use_qr_message),
             url = Settings.INFO_TOS_URL,
             onDismissRequest = { subScreen = null },
-            onShown = viewModel::trackTermsOfUseShown,
         )
 
         null -> Unit
@@ -196,12 +202,12 @@ private fun TvSettingsDivider() {
 private fun TvSubscriptionInfoModal(
     subscription: Subscription?,
     onDismissRequest: () -> Unit,
-    onShown: () -> Unit,
 ) {
+    val focusRequester = remember { FocusRequester() }
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
     TvModal(onDismissRequest = onDismissRequest) {
-        LaunchedEffect(Unit) {
-            onShown()
-        }
         Text(
             text = stringResource(LR.string.tv_settings_subscription_title),
             color = MaterialTheme.tvColors.textPrimary,
@@ -224,7 +230,7 @@ private fun TvSubscriptionInfoModal(
                 label = stringResource(LR.string.tv_settings_subscription_next_renewal),
                 value = subscriptionRenewalText(subscription),
             )
-            if (subscription.platform != SubscriptionPlatform.Android) {
+            if (subscription.isManagedOnAnotherPlatform) {
                 Text(
                     text = stringResource(LR.string.tv_settings_subscription_other_platform),
                     color = MaterialTheme.tvColors.textSecondary,
@@ -233,8 +239,16 @@ private fun TvSubscriptionInfoModal(
                 )
             }
         }
+        TvModalButton(
+            text = stringResource(LR.string.done),
+            onClick = onDismissRequest,
+            modifier = Modifier.focusRequester(focusRequester),
+        )
     }
 }
+
+private val Subscription.isManagedOnAnotherPlatform: Boolean
+    get() = platform == SubscriptionPlatform.iOS || platform == SubscriptionPlatform.Web
 
 @Composable
 private fun TvSettingsInfoRow(label: String, value: String) {
@@ -286,12 +300,12 @@ private fun TvQrLinkModal(
     message: String,
     url: String,
     onDismissRequest: () -> Unit,
-    onShown: () -> Unit,
 ) {
+    val focusRequester = remember { FocusRequester() }
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
     TvModal(onDismissRequest = onDismissRequest) {
-        LaunchedEffect(Unit) {
-            onShown()
-        }
         Text(
             text = title,
             color = MaterialTheme.tvColors.textPrimary,
@@ -317,6 +331,7 @@ private fun TvQrLinkModal(
         TvModalButton(
             text = stringResource(LR.string.done),
             onClick = onDismissRequest,
+            modifier = Modifier.focusRequester(focusRequester),
         )
     }
 }
