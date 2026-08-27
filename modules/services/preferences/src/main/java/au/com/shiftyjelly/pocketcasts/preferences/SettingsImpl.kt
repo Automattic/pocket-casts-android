@@ -1078,6 +1078,7 @@ class SettingsImpl @Inject constructor(
 
             AppPlatform.Phone,
             AppPlatform.WearOs,
+            AppPlatform.Tv,
             -> false
         },
         sharedPrefs = sharedPreferences,
