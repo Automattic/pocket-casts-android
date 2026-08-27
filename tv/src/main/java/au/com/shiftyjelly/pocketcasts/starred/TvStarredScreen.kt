@@ -122,7 +122,7 @@ private fun StarredList(
     val context = LocalContext.current
     val dateFormatter = remember(context) { RelativeDateFormatter(context) }
     val listState = rememberLazyListState()
-    val focus = rememberTvEpisodeListFocus(episodes, listState, requestInitialFocus = false)
+    val focus = rememberTvEpisodeListFocus(episodes, listState, requestInitialFocus = true)
     var actionsEpisode by remember { mutableStateOf<PodcastEpisode?>(null) }
     var detailsEpisode by remember { mutableStateOf<PodcastEpisode?>(null) }
 
