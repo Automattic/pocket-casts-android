@@ -248,7 +248,7 @@ private fun TvSubscriptionInfoModal(
 }
 
 private val Subscription.isManagedOnAnotherPlatform: Boolean
-    get() = platform == SubscriptionPlatform.iOS || platform == SubscriptionPlatform.Web
+    get() = platform != SubscriptionPlatform.Android
 
 @Composable
 private fun TvSettingsInfoRow(label: String, value: String) {
