@@ -4,15 +4,18 @@ import android.content.Context
 import android.content.res.Resources
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverFeedLoader
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverRow
+import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.ImprovedSearchResultItem
 import au.com.shiftyjelly.pocketcasts.models.to.SearchAutoCompleteItem
 import au.com.shiftyjelly.pocketcasts.models.to.SearchHistoryEntry
+import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.search.ImprovedSearchManager
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
@@ -34,6 +37,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -73,6 +77,7 @@ class TvSearchViewModelTest {
     private val episodeManager = mock<EpisodeManager>()
     private val playbackManager = mock<PlaybackManager>()
     private val searchHistoryManager = mock<SearchHistoryManager>()
+    private val folderManager = mock<FolderManager>()
 
     init {
         whenever { improvedSearchManager.autoCompleteSearch(any()) }.thenReturn(emptyList())
@@ -452,6 +457,132 @@ class TvSearchViewModelTest {
 
     private fun subscribedPodcast(uuid: String) = Podcast(uuid = uuid, title = "Podcast $uuid", author = "Author")
 
+    @Test
+    fun `matching folders are surfaced for a signed-in user`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        whenever { improvedSearchManager.combinedSearch(any()) }.thenReturn(emptyList())
+        whenever(syncManager.isLoggedIn()).thenReturn(true)
+        whenever { folderManager.getAll() }.thenReturn(listOf(folderEntity("Sugar Shows"), folderEntity("Comedy")))
+        whenever { folderManager.findFolderPodcastsSorted(any()) }.thenReturn(emptyList())
+
+        val viewModel = createViewModel()
+        viewModel.onQueryChange("sugar")
+        advanceUntilIdle()
+
+        val state = viewModel.searchState.value as TvSearchState.Results
+        assertEquals(listOf("Sugar Shows"), state.folders.map { it.folder.name })
+    }
+
+    @Test
+    fun `matching folders are sorted by name`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        whenever { improvedSearchManager.combinedSearch(any()) }.thenReturn(emptyList())
+        whenever(syncManager.isLoggedIn()).thenReturn(true)
+        whenever { folderManager.getAll() }.thenReturn(listOf(folderEntity("Sugar Rush"), folderEntity("Sugar Beats")))
+        whenever { folderManager.findFolderPodcastsSorted(any()) }.thenReturn(emptyList())
+
+        val viewModel = createViewModel()
+        viewModel.onQueryChange("sugar")
+        advanceUntilIdle()
+
+        val state = viewModel.searchState.value as TvSearchState.Results
+        assertEquals(listOf("Sugar Beats", "Sugar Rush"), state.folders.map { it.folder.name })
+    }
+
+    @Test
+    fun `folders are not searched for a signed-out user`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        whenever { improvedSearchManager.combinedSearch(any()) }.thenReturn(listOf(podcastItem("podcast-1")))
+
+        val viewModel = createViewModel()
+        viewModel.onQueryChange("sugar")
+        advanceUntilIdle()
+
+        val state = viewModel.searchState.value as TvSearchState.Results
+        assertTrue(state.folders.isEmpty())
+        verifyBlocking(folderManager, never()) { getAll() }
+    }
+
+    @Test
+    fun `a matching folder alone counts as a result`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        whenever { improvedSearchManager.combinedSearch(any()) }.thenReturn(emptyList())
+        whenever(syncManager.isLoggedIn()).thenReturn(true)
+        whenever { folderManager.getAll() }.thenReturn(listOf(folderEntity("Sugar")))
+        whenever { folderManager.findFolderPodcastsSorted(any()) }.thenReturn(emptyList())
+
+        val viewModel = createViewModel()
+        viewModel.onQueryChange("sugar")
+        advanceUntilIdle()
+
+        assertTrue(viewModel.searchState.value is TvSearchState.Results)
+    }
+
+    @Test
+    fun `a folder search failure does not fail the whole search`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        whenever { improvedSearchManager.combinedSearch(any()) }.thenReturn(listOf(podcastItem("podcast-1")))
+        whenever(syncManager.isLoggedIn()).thenReturn(true)
+        whenever { folderManager.getAll() }.thenThrow(RuntimeException("database unavailable"))
+
+        val viewModel = createViewModel()
+        viewModel.onQueryChange("sugar")
+        advanceUntilIdle()
+
+        val state = viewModel.searchState.value as TvSearchState.Results
+        assertEquals(listOf("podcast-1"), state.podcasts.map { it.uuid })
+        assertTrue(state.folders.isEmpty())
+    }
+
+    @Test
+    fun `hasFolderResults reflects whether the terminal search found folders`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        whenever { improvedSearchManager.combinedSearch(any()) }.thenReturn(emptyList())
+        whenever(syncManager.isLoggedIn()).thenReturn(true)
+        whenever { folderManager.getAll() }.thenReturn(listOf(folderEntity("Sugar")))
+        whenever { folderManager.findFolderPodcastsSorted(any()) }.thenReturn(emptyList())
+
+        val viewModel = createViewModel()
+        viewModel.onQueryChange("sugar")
+        advanceUntilIdle()
+        assertTrue(viewModel.hasFolderResults.value)
+
+        viewModel.onQueryChange("")
+        assertFalse(viewModel.hasFolderResults.value)
+    }
+
+    @Test
+    fun `a terminal search without folders resets the folders filter`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        whenever { improvedSearchManager.combinedSearch(any()) }.thenReturn(listOf(podcastItem("podcast-1")))
+        whenever(syncManager.isLoggedIn()).thenReturn(true)
+        whenever { folderManager.getAll() }.thenReturn(emptyList())
+
+        val viewModel = createViewModel()
+        viewModel.onFilterSelected(TvSearchFilter.Folders)
+        viewModel.onQueryChange("sugar")
+        advanceUntilIdle()
+
+        assertEquals(TvSearchFilter.TopResults, viewModel.filter.value)
+        assertFalse(viewModel.hasFolderResults.value)
+    }
+
+    @Test
+    fun `a failed search clears folder results and resets the folders filter`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        whenever { improvedSearchManager.combinedSearch(any()) }.thenThrow(RuntimeException("network"))
+        whenever(syncManager.isLoggedIn()).thenReturn(true)
+
+        val viewModel = createViewModel()
+        viewModel.onFilterSelected(TvSearchFilter.Folders)
+        viewModel.onQueryChange("sugar")
+        advanceUntilIdle()
+
+        assertTrue(viewModel.searchState.value is TvSearchState.Error)
+        assertEquals(TvSearchFilter.TopResults, viewModel.filter.value)
+        assertFalse(viewModel.hasFolderResults.value)
+    }
+
     private fun createViewModel() = TvSearchViewModel(
         discoverFeedLoader = TvDiscoverFeedLoader(
             listRepository = listRepository,
@@ -464,6 +595,18 @@ class TvSearchViewModelTest {
         episodeManager = episodeManager,
         playbackManager = playbackManager,
         searchHistoryManager = searchHistoryManager,
+        folderManager = folderManager,
+    )
+
+    private fun folderEntity(name: String) = Folder(
+        uuid = name,
+        name = name,
+        color = 0,
+        addedDate = Date(0),
+        sortPosition = 0,
+        podcastsSortType = PodcastsSortType.NAME_A_TO_Z,
+        deleted = false,
+        syncModified = 0,
     )
 
     private fun category(id: Int, name: String) = DiscoverCategory(id = id, name = name, icon = "", source = "")

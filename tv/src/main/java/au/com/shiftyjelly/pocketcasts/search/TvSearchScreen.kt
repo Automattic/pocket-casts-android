@@ -26,6 +26,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameNanos
@@ -51,6 +52,7 @@ import au.com.shiftyjelly.pocketcasts.component.TvEmptyState
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeActionContext
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeActionsModal
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeInfoModal
+import au.com.shiftyjelly.pocketcasts.component.TvFolderCard
 import au.com.shiftyjelly.pocketcasts.component.TvPodcastGridScaffold
 import au.com.shiftyjelly.pocketcasts.component.TvPodcastTile
 import au.com.shiftyjelly.pocketcasts.component.TvPodcastTileDefaults
@@ -63,8 +65,13 @@ import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverRow
 import au.com.shiftyjelly.pocketcasts.discover.TvOpenedCategory
 import au.com.shiftyjelly.pocketcasts.discover.TvOpenedCategorySaver
 import au.com.shiftyjelly.pocketcasts.discover.tvDiscoverRow
+import au.com.shiftyjelly.pocketcasts.models.entity.Folder
+import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.models.to.ImprovedSearchResultItem
+import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
+import au.com.shiftyjelly.pocketcasts.podcasts.TvFolderDetailScreen
 import au.com.shiftyjelly.pocketcasts.podcasts.TvPodcastDetailsScreen
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
@@ -80,8 +87,16 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 private val ContentHorizontalPadding = 48.dp
 private val ContentPadding = PaddingValues(horizontal = ContentHorizontalPadding)
 private const val SEARCH_ROW_LIMIT = 10
+private const val FOLDER_COVER_COUNT = 4
 private val SearchEpisodeCardWidth = 360.dp
 private const val EPISODE_GRID_COLUMNS = 2
+
+private data class SearchOpenedFolder(val uuid: String, val name: String)
+
+private val SearchOpenedFolderSaver = listSaver<SearchOpenedFolder?, String>(
+    save = { folder -> folder?.let { listOf(it.uuid, it.name) } ?: emptyList() },
+    restore = { saved -> saved.takeIf { it.size == 2 }?.let { (uuid, name) -> SearchOpenedFolder(uuid, name) } },
+)
 
 @Composable
 fun TvSearchScreen(
@@ -91,6 +106,7 @@ fun TvSearchScreen(
     val query by viewModel.query.collectAsStateWithLifecycle()
     val searchState by viewModel.searchState.collectAsStateWithLifecycle()
     val filter by viewModel.filter.collectAsStateWithLifecycle()
+    val hasFolderResults by viewModel.hasFolderResults.collectAsStateWithLifecycle()
     val categories by viewModel.categories.collectAsStateWithLifecycle()
     val discoverRows by viewModel.discoverRows.collectAsStateWithLifecycle()
     val suggestions by viewModel.suggestions.collectAsStateWithLifecycle()
@@ -99,11 +115,14 @@ fun TvSearchScreen(
 
     var openedPodcastUuid by rememberSaveable { mutableStateOf<String?>(null) }
     var openedCategory by rememberSaveable(stateSaver = TvOpenedCategorySaver) { mutableStateOf<TvOpenedCategory?>(null) }
+    var openedFolder by rememberSaveable(stateSaver = SearchOpenedFolderSaver) { mutableStateOf<SearchOpenedFolder?>(null) }
     var detailsEpisode by remember { mutableStateOf<PodcastEpisode?>(null) }
     var restoreFocusTrigger by remember { mutableIntStateOf(0) }
     var categoryRestoreTrigger by remember { mutableIntStateOf(0) }
+    var folderRestoreTrigger by remember { mutableIntStateOf(0) }
     val podcastUuid = openedPodcastUuid
     val category = openedCategory
+    val folder = openedFolder
 
     val openNowPlaying = LocalOpenNowPlaying.current
     val toastHostState = LocalTvToastHostState.current
@@ -120,11 +139,13 @@ fun TvSearchScreen(
             query = query,
             searchState = searchState,
             filter = filter,
+            hasFolderResults = hasFolderResults,
             categories = categories,
             discoverRows = discoverRows,
             onQueryChange = viewModel::onQueryChange,
             onFilterSelect = viewModel::onFilterSelected,
             onOpenPodcast = { openedPodcastUuid = it },
+            onOpenFolder = { openedFolder = SearchOpenedFolder(it.folder.uuid, it.folder.name) },
             onOpenCategory = { openedCategory = TvOpenedCategory(it.id, it.name, it.source) },
             onPlayEpisode = viewModel::playEpisode,
             onOpenEpisodeActions = viewModel::openEpisodeActions,
@@ -140,8 +161,24 @@ fun TvSearchScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(top = TvTopBarHeight)
-                .tvFocusInactiveWhen(podcastUuid != null || category != null),
+                .tvFocusInactiveWhen(podcastUuid != null || category != null || folder != null),
         )
+        TvDetailOverlay(
+            target = folder,
+            onBack = { openedFolder = null },
+            modifier = Modifier.tvFocusInactiveWhen(podcastUuid != null),
+            onHide = { restoreFocusTrigger++ },
+        ) { openFolder ->
+            TvFolderDetailScreen(
+                folderUuid = openFolder.uuid,
+                folderName = openFolder.name,
+                getFolderPodcasts = viewModel::folderPodcasts,
+                onOpenPodcast = { openedPodcastUuid = it },
+                onClose = { openedFolder = null },
+                onFolderImpression = {},
+                restoreFocusTrigger = folderRestoreTrigger,
+            )
+        }
         TvDetailOverlay(
             target = category,
             onBack = { openedCategory = null },
@@ -160,7 +197,13 @@ fun TvSearchScreen(
         TvDetailOverlay(
             target = podcastUuid,
             onBack = { openedPodcastUuid = null },
-            onHide = { if (openedCategory != null) categoryRestoreTrigger++ else restoreFocusTrigger++ },
+            onHide = {
+                when {
+                    openedCategory != null -> categoryRestoreTrigger++
+                    openedFolder != null -> folderRestoreTrigger++
+                    else -> restoreFocusTrigger++
+                }
+            },
         ) { uuid ->
             TvPodcastDetailsScreen(
                 podcastUuid = uuid,
@@ -197,11 +240,13 @@ private fun TvSearchContent(
     query: String,
     searchState: TvSearchState,
     filter: TvSearchFilter,
+    hasFolderResults: Boolean,
     categories: List<DiscoverCategory>,
     discoverRows: List<TvDiscoverRow>,
     onQueryChange: (String) -> Unit,
     onFilterSelect: (TvSearchFilter) -> Unit,
     onOpenPodcast: (String) -> Unit,
+    onOpenFolder: (FolderItem.Folder) -> Unit,
     onOpenCategory: (DiscoverCategory) -> Unit,
     onPlayEpisode: (ImprovedSearchResultItem.EpisodeItem) -> Unit,
     onOpenEpisodeActions: (ImprovedSearchResultItem.EpisodeItem) -> Unit,
@@ -249,10 +294,14 @@ private fun TvSearchContent(
             Spacer(modifier = Modifier.height(24.dp))
         }
 
+        val filters = remember(hasFolderResults) { TvSearchFilter.entries.filter { it != TvSearchFilter.Folders || hasFolderResults } }
+        val effectiveFilter = if (filter in filters) filter else TvSearchFilter.TopResults
+
         if (searchState !is TvSearchState.Idle) {
             TvSearchFilters(
-                selected = filter,
+                selected = effectiveFilter,
                 onFilterSelect = onFilterSelect,
+                filters = filters,
                 modifier = Modifier.padding(ContentPadding),
                 upFocusRequester = searchFieldFocusRequester,
             )
@@ -291,9 +340,10 @@ private fun TvSearchContent(
 
                 is TvSearchState.Results -> TvSearchResults(
                     results = searchState,
-                    filter = filter,
+                    filter = effectiveFilter,
                     searchTerm = query.trim(),
                     onOpenPodcast = onOpenPodcast,
+                    onOpenFolder = onOpenFolder,
                     onPlayEpisode = onPlayEpisode,
                     onOpenEpisodeActions = onOpenEpisodeActions,
                     restoreFocusTrigger = restoreFocusTrigger,
@@ -417,6 +467,7 @@ private fun TvSearchResults(
     filter: TvSearchFilter,
     searchTerm: String,
     onOpenPodcast: (String) -> Unit,
+    onOpenFolder: (FolderItem.Folder) -> Unit,
     onPlayEpisode: (ImprovedSearchResultItem.EpisodeItem) -> Unit,
     onOpenEpisodeActions: (ImprovedSearchResultItem.EpisodeItem) -> Unit,
     restoreFocusTrigger: Int,
@@ -425,7 +476,9 @@ private fun TvSearchResults(
         TvSearchFilter.TopResults -> TvSearchTopResults(
             podcasts = results.podcasts,
             episodes = results.episodes,
+            folders = results.folders,
             onOpenPodcast = onOpenPodcast,
+            onOpenFolder = onOpenFolder,
             onPlayEpisode = onPlayEpisode,
             onOpenEpisodeActions = onOpenEpisodeActions,
             restoreFocusTrigger = restoreFocusTrigger,
@@ -475,6 +528,32 @@ private fun TvSearchResults(
                 restoreFocusTrigger = restoreFocusTrigger,
             )
         }
+
+        TvSearchFilter.Folders -> if (results.folders.isEmpty()) {
+            if (results.isPartial) {
+                TvSearchLoading()
+            } else {
+                TvSearchMessage(
+                    title = stringResource(LR.string.tv_search_no_results_for_title, searchTerm),
+                    subtitle = stringResource(LR.string.tv_search_no_results_subtitle),
+                )
+            }
+        } else {
+            TvPodcastGridScaffold(
+                itemKeys = results.folders.map { it.folder.uuid },
+                modifier = Modifier.fillMaxSize(),
+                horizontalContentPadding = ContentHorizontalPadding,
+                restoreFocusTrigger = restoreFocusTrigger,
+            ) { index, itemModifier ->
+                val folderItem = results.folders[index]
+                TvFolderCard(
+                    folder = folderItem.folder,
+                    coverUrls = folderItem.podcasts.take(FOLDER_COVER_COUNT).map { PodcastImage.getMediumArtworkUrl(it.uuid) },
+                    onClick = { onOpenFolder(folderItem) },
+                    modifier = itemModifier,
+                )
+            }
+        }
     }
 }
 
@@ -482,7 +561,9 @@ private fun TvSearchResults(
 private fun TvSearchTopResults(
     podcasts: List<ImprovedSearchResultItem.PodcastItem>,
     episodes: List<ImprovedSearchResultItem.EpisodeItem>,
+    folders: List<FolderItem.Folder>,
     onOpenPodcast: (String) -> Unit,
+    onOpenFolder: (FolderItem.Folder) -> Unit,
     onPlayEpisode: (ImprovedSearchResultItem.EpisodeItem) -> Unit,
     onOpenEpisodeActions: (ImprovedSearchResultItem.EpisodeItem) -> Unit,
     restoreFocusTrigger: Int,
@@ -499,10 +580,12 @@ private fun TvSearchTopResults(
 
     val featured = episodes.filter { it.hasVideo }.take(SEARCH_ROW_LIMIT)
     val otherEpisodes = episodes.filterNot { it.hasVideo }.take(SEARCH_ROW_LIMIT)
+    val topFolders = folders.take(SEARCH_ROW_LIMIT)
     val topPodcasts = podcasts.take(SEARCH_ROW_LIMIT)
     val featuredFirst = featured.isNotEmpty()
     val episodesFirst = !featuredFirst && otherEpisodes.isNotEmpty()
-    val podcastsFirst = !featuredFirst && !episodesFirst
+    val foldersFirst = !featuredFirst && !episodesFirst && topFolders.isNotEmpty()
+    val podcastsFirst = !featuredFirst && !episodesFirst && !foldersFirst
 
     LazyColumn(modifier = Modifier.fillMaxSize()) {
         item { Spacer(modifier = Modifier.height(8.dp)) }
@@ -529,6 +612,14 @@ private fun TvSearchTopResults(
                 )
             }
         }
+        if (topFolders.isNotEmpty()) {
+            item { Spacer(modifier = Modifier.height(24.dp)) }
+            tvSearchFoldersRow(
+                folders = topFolders,
+                onOpenFolder = onOpenFolder,
+                focusRequester = restoreFocusRequester.takeIf { foldersFirst },
+            )
+        }
         if (topPodcasts.isNotEmpty()) {
             item { Spacer(modifier = Modifier.height(24.dp)) }
             tvSearchPodcastsRow(
@@ -538,6 +629,29 @@ private fun TvSearchTopResults(
             )
         }
         item { Spacer(modifier = Modifier.height(40.dp)) }
+    }
+}
+
+private fun LazyListScope.tvSearchFoldersRow(
+    folders: List<FolderItem.Folder>,
+    onOpenFolder: (FolderItem.Folder) -> Unit,
+    focusRequester: FocusRequester?,
+) {
+    item {
+        TvRow(
+            title = stringResource(LR.string.folders),
+            items = folders,
+            contentPadding = ContentPadding,
+            key = { it.folder.uuid },
+            focusRequester = focusRequester,
+        ) { folderItem ->
+            TvFolderCard(
+                folder = folderItem.folder,
+                coverUrls = folderItem.podcasts.take(FOLDER_COVER_COUNT).map { PodcastImage.getMediumArtworkUrl(it.uuid) },
+                onClick = { onOpenFolder(folderItem) },
+                modifier = Modifier.width(TvPodcastTileDefaults.RowImageWidth),
+            )
+        }
     }
 }
 
@@ -717,6 +831,7 @@ private fun TvSearchScreenPreview() {
                 query = "",
                 searchState = TvSearchState.Idle,
                 filter = TvSearchFilter.TopResults,
+                hasFolderResults = false,
                 categories = listOf(
                     DiscoverCategory(id = 1, name = "Comedy", icon = "", source = ""),
                     DiscoverCategory(id = 2, name = "True Crime", icon = "", source = ""),
@@ -726,6 +841,7 @@ private fun TvSearchScreenPreview() {
                 onQueryChange = {},
                 onFilterSelect = {},
                 onOpenPodcast = {},
+                onOpenFolder = {},
                 onOpenCategory = {},
                 onPlayEpisode = {},
                 onOpenEpisodeActions = {},
@@ -743,6 +859,7 @@ private fun TvSearchIdleWithHistoryPreview() {
                 query = "",
                 searchState = TvSearchState.Idle,
                 filter = TvSearchFilter.TopResults,
+                hasFolderResults = false,
                 categories = emptyList(),
                 discoverRows = emptyList(),
                 onQueryChange = {},
@@ -751,6 +868,7 @@ private fun TvSearchIdleWithHistoryPreview() {
                 onOpenCategory = {},
                 onPlayEpisode = {},
                 onOpenEpisodeActions = {},
+                onOpenFolder = {},
                 history = listOf("Freakonomics", "Business Daily", "Science Weekly"),
             )
         }
@@ -784,8 +902,24 @@ private fun TvSearchResultsPreview() {
                             hasVideo = it == 0,
                         )
                     },
+                    folders = listOf(
+                        FolderItem.Folder(
+                            folder = Folder(
+                                uuid = "folder-1",
+                                name = "Business & Finance",
+                                color = 3,
+                                addedDate = Date(0),
+                                sortPosition = 0,
+                                podcastsSortType = PodcastsSortType.NAME_A_TO_Z,
+                                deleted = false,
+                                syncModified = 0,
+                            ),
+                            podcasts = List(4) { Podcast(uuid = "folder-podcast-$it") },
+                        ),
+                    ),
                 ),
                 filter = TvSearchFilter.TopResults,
+                hasFolderResults = true,
                 categories = emptyList(),
                 discoverRows = emptyList(),
                 onQueryChange = {},
@@ -794,6 +928,7 @@ private fun TvSearchResultsPreview() {
                 onOpenCategory = {},
                 onPlayEpisode = {},
                 onOpenEpisodeActions = {},
+                onOpenFolder = {},
             )
         }
     }

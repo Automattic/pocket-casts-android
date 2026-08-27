@@ -10,11 +10,14 @@ import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverRow
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.models.to.ImprovedSearchResultItem
 import au.com.shiftyjelly.pocketcasts.models.to.SearchAutoCompleteItem
 import au.com.shiftyjelly.pocketcasts.models.to.SearchHistoryEntry
+import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.search.ImprovedSearchManager
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
@@ -47,6 +50,7 @@ class TvSearchViewModel @Inject constructor(
     private val episodeManager: EpisodeManager,
     private val playbackManager: PlaybackManager,
     private val searchHistoryManager: SearchHistoryManager,
+    private val folderManager: FolderManager,
 ) : ViewModel() {
 
     private val _categories = MutableStateFlow<List<DiscoverCategory>>(emptyList())
@@ -63,6 +67,9 @@ class TvSearchViewModel @Inject constructor(
 
     private val _filter = MutableStateFlow(TvSearchFilter.TopResults)
     val filter: StateFlow<TvSearchFilter> = _filter.asStateFlow()
+
+    private val _hasFolderResults = MutableStateFlow(false)
+    val hasFolderResults: StateFlow<Boolean> = _hasFolderResults.asStateFlow()
 
     private val _suggestions = MutableStateFlow<List<String>>(emptyList())
     val suggestions: StateFlow<List<String>> = _suggestions.asStateFlow()
@@ -123,6 +130,7 @@ class TvSearchViewModel @Inject constructor(
         if (term.isEmpty()) {
             _suggestions.value = emptyList()
             _searchState.value = TvSearchState.Idle
+            updateFolderResults(hasFolders = false)
             return
         }
         searchJob = viewModelScope.launch {
@@ -130,6 +138,16 @@ class TvSearchViewModel @Inject constructor(
             _searchState.value = TvSearchState.Searching
             _searchState.value = try {
                 val fullSearch = async { runCatching { improvedSearchManager.combinedSearch(term) } }
+                val foldersSearch = async {
+                    try {
+                        searchFolders(term)
+                    } catch (exception: CancellationException) {
+                        throw exception
+                    } catch (exception: Exception) {
+                        Timber.e(exception, "Failed to search TV folders")
+                        emptyList()
+                    }
+                }
                 val localPodcasts = podcastManager.findSubscribedFlow(term).first().map(Podcast::toSearchItem)
                 val localUuids = localPodcasts.mapTo(HashSet(), ImprovedSearchResultItem.PodcastItem::uuid)
                 val predictiveResults = try {
@@ -156,15 +174,18 @@ class TvSearchViewModel @Inject constructor(
                     .map { if (it.uuid in localUuids) it.copy(isFollowed = true) else it }
                 val episodes = remoteResults.filterIsInstance<ImprovedSearchResultItem.EpisodeItem>()
                     .distinctBy(ImprovedSearchResultItem.EpisodeItem::uuid)
-                if (podcasts.isEmpty() && episodes.isEmpty()) {
+                val folders = foldersSearch.await()
+                updateFolderResults(hasFolders = folders.isNotEmpty())
+                if (podcasts.isEmpty() && episodes.isEmpty() && folders.isEmpty()) {
                     TvSearchState.NoResults
                 } else {
-                    TvSearchState.Results(podcasts = podcasts, episodes = episodes)
+                    TvSearchState.Results(podcasts = podcasts, episodes = episodes, folders = folders)
                 }
             } catch (exception: CancellationException) {
                 throw exception
             } catch (exception: Exception) {
                 Timber.e(exception, "Failed to search on TV")
+                updateFolderResults(hasFolders = false)
                 TvSearchState.Error
             }
         }
@@ -172,6 +193,27 @@ class TvSearchViewModel @Inject constructor(
 
     fun onFilterSelected(filter: TvSearchFilter) {
         _filter.value = filter
+    }
+
+    private fun updateFolderResults(hasFolders: Boolean) {
+        _hasFolderResults.value = hasFolders
+        if (!hasFolders && _filter.value == TvSearchFilter.Folders) {
+            _filter.value = TvSearchFilter.TopResults
+        }
+    }
+
+    private suspend fun searchFolders(term: String): List<FolderItem.Folder> {
+        if (!syncManager.isLoggedIn()) {
+            return emptyList()
+        }
+        return folderManager.getAll()
+            .filter { it.name.contains(term, ignoreCase = true) }
+            .sortedBy { PodcastsSortType.cleanStringForSort(it.name) }
+            .map { folder -> FolderItem.Folder(folder = folder, podcasts = folderManager.findFolderPodcastsSorted(folder.uuid)) }
+    }
+
+    suspend fun folderPodcasts(folderUuid: String): List<Podcast> {
+        return folderManager.findFolderPodcastsSorted(folderUuid)
     }
 
     fun saveSearchTerm(term: String) {
@@ -279,6 +321,7 @@ enum class TvSearchFilter(
     TopResults(LR.string.search_filters_top_results),
     Podcasts(LR.string.search_filters_podcasts),
     Episodes(LR.string.search_filters_episodes),
+    Folders(LR.string.search_filters_folders),
 }
 
 sealed interface TvSearchState {
@@ -289,6 +332,7 @@ sealed interface TvSearchState {
     data class Results(
         val podcasts: List<ImprovedSearchResultItem.PodcastItem>,
         val episodes: List<ImprovedSearchResultItem.EpisodeItem>,
+        val folders: List<FolderItem.Folder> = emptyList(),
         val isPartial: Boolean = false,
     ) : TvSearchState
 }

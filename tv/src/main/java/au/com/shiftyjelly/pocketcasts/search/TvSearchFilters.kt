@@ -38,6 +38,7 @@ internal fun TvSearchFilters(
     selected: TvSearchFilter,
     onFilterSelect: (TvSearchFilter) -> Unit,
     modifier: Modifier = Modifier,
+    filters: List<TvSearchFilter> = TvSearchFilter.entries,
     upFocusRequester: FocusRequester? = null,
 ) {
     Row(
@@ -47,6 +48,7 @@ internal fun TvSearchFilters(
         FilterDivider(modifier = Modifier.weight(1f))
         Spacer(modifier = Modifier.width(20.dp))
         TvSearchFilterPills(
+            filters = filters,
             selected = selected,
             onFilterSelect = onFilterSelect,
             upFocusRequester = upFocusRequester,
@@ -58,11 +60,12 @@ internal fun TvSearchFilters(
 
 @Composable
 private fun TvSearchFilterPills(
+    filters: List<TvSearchFilter>,
     selected: TvSearchFilter,
     onFilterSelect: (TvSearchFilter) -> Unit,
     upFocusRequester: FocusRequester? = null,
 ) {
-    val selectedIndex = TvSearchFilter.entries.indexOf(selected)
+    val selectedIndex = filters.indexOf(selected)
     val focusRequester = remember { FocusRequester() }
     Box(
         modifier = Modifier
@@ -86,7 +89,7 @@ private fun TvSearchFilterPills(
                 }
             },
         ) {
-            TvSearchFilter.entries.forEachIndexed { index, filter ->
+            filters.forEachIndexed { index, filter ->
                 Tab(
                     selected = index == selectedIndex,
                     onFocus = { onFilterSelect(filter) },
