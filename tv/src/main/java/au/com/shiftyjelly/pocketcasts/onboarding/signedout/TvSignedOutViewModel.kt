@@ -18,6 +18,6 @@ class TvSignedOutViewModel @Inject constructor(
     }
 
     fun logOut() {
-        signOutManager.signOutAndWipeData()
+        signOutManager.signOutAndWipeData(wasInitiatedByUser = false)
     }
 }

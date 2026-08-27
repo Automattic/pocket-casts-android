@@ -7,6 +7,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -53,7 +54,7 @@ class UserManagerImplTest {
         }
     }
 
-    private fun createUserManager() = UserManagerImpl(
+    private fun TestScope.createUserManager() = UserManagerImpl(
         application = mock(),
         settings = settings,
         syncManager = syncManager,
@@ -65,7 +66,7 @@ class UserManagerImplTest {
         analyticsController = mock(),
         eventHorizon = mock(),
         accountStatusInfo = mock(),
-        applicationScope = CoroutineScope(StandardTestDispatcher()),
+        applicationScope = CoroutineScope(StandardTestDispatcher(testScheduler)),
         crashLogging = mock(),
         experimentProvider = mock(),
         endOfYearSync = mock(),

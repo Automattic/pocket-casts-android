@@ -42,7 +42,9 @@ fun TvOnboardingNavHost(
     }
     LaunchedEffect(Unit) {
         viewModel.onServerSignOut.collect {
-            navigateClearingBackStack(TvOnboardingRoutes.SIGNED_OUT)
+            if (navController.currentDestination?.route != TvOnboardingRoutes.SIGNED_OUT) {
+                navigateClearingBackStack(TvOnboardingRoutes.SIGNED_OUT)
+            }
         }
     }
     val toastHostState = remember { TvToastHostState() }

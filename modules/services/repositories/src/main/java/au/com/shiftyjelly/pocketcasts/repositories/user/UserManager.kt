@@ -171,10 +171,8 @@ class UserManagerImpl @Inject constructor(
 
     override fun signOut(playbackManager: PlaybackManager, wasInitiatedByUser: Boolean): Job? {
         var signOutJob: Job? = null
-        if (wasInitiatedByUser || !settings.getFullySignedOut()) {
-            if (!wasInitiatedByUser) {
-                _onServerSignOut.tryEmit(Unit)
-            }
+        val isSigningOut = wasInitiatedByUser || !settings.getFullySignedOut()
+        if (isSigningOut) {
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Signing out")
             signOutJob = applicationScope.launch {
                 syncManager.signOut {
@@ -203,6 +201,9 @@ class UserManagerImpl @Inject constructor(
             }
         }
         settings.setFullySignedOut(true)
+        if (isSigningOut && !wasInitiatedByUser) {
+            _onServerSignOut.tryEmit(Unit)
+        }
         return signOutJob
     }
 

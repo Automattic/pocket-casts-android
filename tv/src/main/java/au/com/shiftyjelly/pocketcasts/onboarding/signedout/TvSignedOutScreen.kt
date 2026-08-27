@@ -12,9 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -43,14 +41,12 @@ fun TvSignedOutScreen(
     modifier: Modifier = Modifier,
     viewModel: TvSignedOutViewModel = hiltViewModel(),
 ) {
-    val currentOnLogIn by rememberUpdatedState(onLogIn)
-
     CallOnce { viewModel.trackShown() }
 
     TvSignedOutContent(
         onLogIn = {
             viewModel.logOut()
-            currentOnLogIn()
+            onLogIn()
         },
         modifier = modifier,
     )

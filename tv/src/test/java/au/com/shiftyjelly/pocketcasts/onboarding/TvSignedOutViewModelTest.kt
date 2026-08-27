@@ -24,7 +24,7 @@ class TvSignedOutViewModelTest {
     fun `logOut wipes the local data`() {
         viewModel().logOut()
 
-        verify(signOutManager).signOutAndWipeData()
+        verify(signOutManager).signOutAndWipeData(wasInitiatedByUser = false)
     }
 
     private fun viewModel() = TvSignedOutViewModel(eventHorizon, signOutManager)
