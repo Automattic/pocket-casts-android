@@ -75,6 +75,10 @@ jobs:
             4. Performance - only where the impact is user-visible.
 
             Comments:
+            - Open a blocking correctness or behaviour-change finding with its
+              user-facing impact in one plain sentence: what breaks, for which
+              user, and when, and then the code mechanism, the problem and the
+              fix.
             - Keep comments short by default - a few sentences stating the problem
               and the fix, not the reasoning that led you there. Spend more words
               only where the finding needs them to be actionable: a subtle race, a
@@ -100,9 +104,10 @@ jobs:
               - Then the findings grouped under `### Blocking`, `### Non-blocking`,
                 `### Nits`. Skip a group that is empty; skip the section entirely if
                 there are no findings, leaving the verdict as the whole summary.
-              - One line per finding: `path/File.swift:123` followed by a single
-                sentence naming the problem and the fix - enough to act on without
-                opening the thread. Add the inline comment's URL when you have one.
+              - One line per finding: `path/to/file:123` followed by a single
+                sentence that leads with the user-facing impact, then the fix -
+                enough to act on without opening the thread. Add the inline
+                comment's URL when you have one.
               - A finding with no line to anchor to takes the same shape with just
                 the path, or no path when it is repo-wide.
             - No tables, no re-analysis, no checklist of what you read, no praise.
