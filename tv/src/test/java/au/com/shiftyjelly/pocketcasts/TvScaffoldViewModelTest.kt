@@ -6,6 +6,9 @@ import au.com.shiftyjelly.pocketcasts.home.TvProfileState
 import au.com.shiftyjelly.pocketcasts.home.TvScaffoldViewModel
 import au.com.shiftyjelly.pocketcasts.home.TvTab
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
@@ -56,8 +59,16 @@ class TvScaffoldViewModelTest {
     private val launchRequests = TvLaunchRequests()
     private val eventHorizon = mock<EventHorizon>()
 
+    private val artworkConfigurationSetting = mock<UserSetting<ArtworkConfiguration>> {
+        on { flow } doReturn MutableStateFlow(ArtworkConfiguration(useEpisodeArtwork = false))
+        on { value } doReturn ArtworkConfiguration(useEpisodeArtwork = false)
+    }
+    private val settings = mock<Settings> {
+        on { artworkConfiguration } doReturn artworkConfigurationSetting
+    }
+
     private val viewModel by lazy {
-        TvScaffoldViewModel(syncManager, signOutManager, eventHorizon, launchRequests, upNextQueue)
+        TvScaffoldViewModel(syncManager, signOutManager, eventHorizon, settings, launchRequests, upNextQueue)
     }
 
     @Test

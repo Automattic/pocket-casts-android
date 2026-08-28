@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.TvLaunchRequests
 import au.com.shiftyjelly.pocketcasts.auth.TvSignOutManager
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import com.automattic.eventhorizon.EventHorizon
@@ -27,6 +28,7 @@ class TvScaffoldViewModel @Inject constructor(
     private val syncManager: SyncManager,
     private val signOutManager: TvSignOutManager,
     private val eventHorizon: EventHorizon,
+    private val settings: Settings,
     launchRequests: TvLaunchRequests,
     upNextQueue: UpNextQueue,
 ) : ViewModel() {
@@ -43,16 +45,21 @@ class TvScaffoldViewModel @Inject constructor(
         hasCurrentEpisode,
         syncManager.isLoggedInObservable.asFlow(),
         syncManager.emailFlow(),
-    ) { tab, hasEpisode, isLoggedIn, email ->
+        settings.artworkConfiguration.flow,
+    ) { tab, hasEpisode, isLoggedIn, email, artworkConfiguration ->
         TvScaffoldUiState(
             tabs = TvTab.tabs(showNowPlaying = hasEpisode || tab == TvTab.NowPlaying),
             selectedTab = tab,
             profile = profileState(isLoggedIn, email),
+            useEpisodeArtwork = artworkConfiguration.useEpisodeArtwork,
         )
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = TvScaffoldUiState(profile = currentProfileState()),
+        initialValue = TvScaffoldUiState(
+            profile = currentProfileState(),
+            useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork,
+        ),
     )
 
     init {
@@ -102,6 +109,7 @@ data class TvScaffoldUiState(
     val tabs: List<TvTab> = TvTab.entries,
     val selectedTab: TvTab = TvTab.Home,
     val profile: TvProfileState = TvProfileState.SignedOut,
+    val useEpisodeArtwork: Boolean = false,
 ) {
     val selectedTabIndex: Int get() = tabs.indexOf(selectedTab).coerceAtLeast(0)
 }

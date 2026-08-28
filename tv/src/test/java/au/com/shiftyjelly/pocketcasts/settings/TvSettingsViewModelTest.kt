@@ -7,7 +7,8 @@ import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.preferences.ReadSetting
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.preferences.TvPreferences
+import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import com.automattic.eventhorizon.AccountDetailsShowPrivacyPolicyEvent
@@ -24,7 +25,10 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 
@@ -36,20 +40,27 @@ class TvSettingsViewModelTest {
 
     private val isLoggedIn = BehaviorRelay.createDefault(false)
     private val subscriptionFlow = MutableStateFlow<Subscription?>(null)
+    private val artworkConfigurationFlow = MutableStateFlow(ArtworkConfiguration(useEpisodeArtwork = false))
 
     private val subscriptionSetting = mock<ReadSetting<Subscription?>> {
         on { flow } doReturn subscriptionFlow
         on { value } doReturn null
     }
+    private val artworkConfigurationSetting = mock<UserSetting<ArtworkConfiguration>> {
+        on { flow } doReturn artworkConfigurationFlow
+        on { value } doAnswer { artworkConfigurationFlow.value }
+        on { set(any(), any(), any(), any()) } doAnswer {
+            artworkConfigurationFlow.value = it.getArgument(0)
+            Unit
+        }
+    }
     private val settings = mock<Settings> {
         on { cachedSubscription } doReturn subscriptionSetting
+        on { artworkConfiguration } doReturn artworkConfigurationSetting
     }
     private val syncManager = mock<SyncManager> {
         on { isLoggedIn() } doReturn false
         on { isLoggedInObservable } doReturn isLoggedIn
-    }
-    private val tvPreferences = mock<TvPreferences> {
-        on { isUsingEpisodeArtwork() } doReturn false
     }
     private val eventHorizon = mock<EventHorizon>()
 
@@ -83,10 +94,10 @@ class TvSettingsViewModelTest {
     }
 
     @Test
-    fun `setUseEpisodeArtwork stores the value on device and tracks the toggle event`() = runTest {
+    fun `setUseEpisodeArtwork updates the shared artwork setting and tracks the toggle event`() = runTest {
         createViewModel().setUseEpisodeArtwork(true)
 
-        verify(tvPreferences).setUsingEpisodeArtwork(true)
+        verify(artworkConfigurationSetting).set(eq(ArtworkConfiguration(useEpisodeArtwork = true)), eq(true), any(), any())
         verify(eventHorizon).track(SettingsAppearanceUseEpisodeArtworkToggledEvent(enabled = true))
     }
 
@@ -121,7 +132,6 @@ class TvSettingsViewModelTest {
     private fun createViewModel() = TvSettingsViewModel(
         settings = settings,
         syncManager = syncManager,
-        tvPreferences = tvPreferences,
         eventHorizon = eventHorizon,
     )
 

@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.preferences.TvPreferences
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import com.automattic.eventhorizon.AccountDetailsShowPrivacyPolicyEvent
 import com.automattic.eventhorizon.AccountDetailsShowTosEvent
@@ -14,7 +13,6 @@ import com.automattic.eventhorizon.SettingsAppearanceUseEpisodeArtworkToggledEve
 import com.automattic.eventhorizon.SettingsGeneralShownEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -25,19 +23,17 @@ import kotlinx.coroutines.rx2.asFlow
 class TvSettingsViewModel @Inject constructor(
     private val settings: Settings,
     private val syncManager: SyncManager,
-    private val tvPreferences: TvPreferences,
     private val eventHorizon: EventHorizon,
 ) : ViewModel() {
-    private val useEpisodeArtwork = MutableStateFlow(tvPreferences.isUsingEpisodeArtwork())
 
     val uiState: StateFlow<TvSettingsUiState> = combine(
         syncManager.isLoggedInObservable.asFlow(),
-        useEpisodeArtwork,
+        settings.artworkConfiguration.flow,
         settings.cachedSubscription.flow,
-    ) { isSignedIn, useEpisodeArtwork, subscription ->
+    ) { isSignedIn, artworkConfiguration, subscription ->
         TvSettingsUiState(
             isSignedIn = isSignedIn,
-            useEpisodeArtwork = useEpisodeArtwork,
+            useEpisodeArtwork = artworkConfiguration.useEpisodeArtwork,
             subscription = subscription,
         )
     }.stateIn(
@@ -45,14 +41,14 @@ class TvSettingsViewModel @Inject constructor(
         started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS),
         initialValue = TvSettingsUiState(
             isSignedIn = syncManager.isLoggedIn(),
-            useEpisodeArtwork = useEpisodeArtwork.value,
+            useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork,
             subscription = settings.cachedSubscription.value,
         ),
     )
 
     fun setUseEpisodeArtwork(value: Boolean) {
-        tvPreferences.setUsingEpisodeArtwork(value)
-        useEpisodeArtwork.value = value
+        val currentConfiguration = settings.artworkConfiguration.value
+        settings.artworkConfiguration.set(currentConfiguration.copy(useEpisodeArtwork = value), updateModifiedAt = true)
         eventHorizon.track(SettingsAppearanceUseEpisodeArtworkToggledEvent(enabled = value))
     }
 
