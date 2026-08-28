@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverRow
 import au.com.shiftyjelly.pocketcasts.discover.TvOpenedCategory
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PodcastDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextDao
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -21,6 +22,8 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -48,10 +51,13 @@ import com.automattic.eventhorizon.DiscoverListPodcastTappedEvent
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.HomeShownEvent
 import com.jakewharton.rxrelay2.BehaviorRelay
+import com.jakewharton.rxrelay2.PublishRelay
+import io.reactivex.Observable
 import io.reactivex.Single
 import java.util.Date
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -111,7 +117,13 @@ class TvHomeViewModelTest {
     }
     private val episodeManager = mock<EpisodeManager>()
     private val podcastManager = mock<PodcastManager>()
-    private val playbackManager = mock<PlaybackManager>()
+    private val upNextQueue = mock<UpNextQueue> {
+        on { changesObservable } doReturn Observable.never()
+    }
+    private val playbackManager = mock<PlaybackManager> {
+        on { upNextQueue } doReturn this@TvHomeViewModelTest.upNextQueue
+        on { playbackStateFlow } doReturn emptyFlow()
+    }
     private val eventHorizon = mock<EventHorizon>()
 
     @Test
@@ -847,6 +859,57 @@ class TvHomeViewModelTest {
     }
 
     @Test
+    fun `keep listening row is hidden after playback starts in the session`() = runTest {
+        whenever(syncManager.isLoggedIn()).thenReturn(false)
+        whenever(listRepository.getHomeDiscoverFeed(isLoggedIn = false)).thenReturn(discover())
+        whenever(upNextDao.getUpNextBaseEpisodes(any())).thenReturn(
+            listOf(episode(uuid = "episode-1", podcastUuid = "podcast-1")),
+        )
+        val playingState = mock<PlaybackState> {
+            on { isPlaying } doReturn true
+        }
+        whenever(playbackManager.playbackStateFlow).thenReturn(flowOf(playingState))
+
+        val viewModel = createViewModel()
+
+        viewModel.uiState.test {
+            assertEquals(
+                listOf(TvHomeViewModel.KEEP_LISTENING_ROW_ID),
+                (awaitItem() as TvHomeUiState.Ready).rows.map { it.id },
+            )
+            assertEquals(
+                emptyList<String>(),
+                (awaitItem() as TvHomeUiState.Ready).rows.map { it.id },
+            )
+        }
+    }
+
+    @Test
+    fun `an up next queue change rebuilds the local rows`() = runTest {
+        val changes = PublishRelay.create<UpNextQueue.State>()
+        whenever(upNextQueue.changesObservable).thenReturn(changes)
+        whenever(syncManager.isLoggedIn()).thenReturn(false)
+        whenever(listRepository.getHomeDiscoverFeed(isLoggedIn = false)).thenReturn(discover())
+        whenever(upNextDao.getUpNextBaseEpisodes(any())).thenReturn(emptyList())
+
+        val viewModel = createViewModel()
+
+        viewModel.uiState.test {
+            assertEquals(emptyList<String>(), (awaitItem() as TvHomeUiState.Ready).rows.map { it.id })
+
+            whenever(upNextDao.getUpNextBaseEpisodes(any())).thenReturn(
+                listOf(episode(uuid = "episode-1", podcastUuid = "podcast-1")),
+            )
+            changes.accept(UpNextQueue.State.Empty)
+
+            assertEquals(
+                listOf(TvHomeViewModel.KEEP_LISTENING_ROW_ID),
+                (awaitItem() as TvHomeUiState.Ready).rows.map { it.id },
+            )
+        }
+    }
+
+    @Test
     fun `up next and new releases rows are hidden when signed out`() = runTest {
         whenever(syncManager.isLoggedIn()).thenReturn(false)
         whenever(listRepository.getHomeDiscoverFeed(isLoggedIn = false)).thenReturn(discover())
@@ -974,7 +1037,7 @@ class TvHomeViewModelTest {
             viewModel.playEpisode(homeEpisode())
 
             awaitItem()
-            verifyNoInteractions(playbackManager)
+            verifyBlocking(playbackManager, never()) { playNowSuspend(any<BaseEpisode>(), any(), any(), any()) }
         }
     }
 
@@ -1006,7 +1069,7 @@ class TvHomeViewModelTest {
             viewModel.playLatestEpisode(featuredRow(), discoverPodcast("podcast-1"))
 
             awaitItem()
-            verifyNoInteractions(playbackManager)
+            verifyBlocking(playbackManager, never()) { playNowSuspend(any<BaseEpisode>(), any(), any(), any()) }
         }
     }
 

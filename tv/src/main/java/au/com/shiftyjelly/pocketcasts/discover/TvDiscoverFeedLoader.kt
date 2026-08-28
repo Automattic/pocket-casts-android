@@ -164,9 +164,15 @@ class TvDiscoverFeedLoader @Inject constructor(
         }
         return when (row.type) {
             is ListType.PodcastList -> if (row.source.isBlank()) null else loadRowOrFailed(row) { loadPodcastsRow(row) }
+
             is ListType.EpisodeList -> if (row.source.isBlank()) null else loadRowOrFailed(row) { loadEpisodesRow(row) }
+
             is ListType.Categories -> if (includeHomeSections) loadCategoriesRow(row, replacements) else null
-            is ListType.Unknown -> null
+
+            is ListType.Unknown -> {
+                Timber.w("Dropping unknown TV discover row type '${(row.type as ListType.Unknown).value}' for ${row.rowId()}")
+                null
+            }
         }
     }
 
