@@ -256,7 +256,7 @@ class SyncManagerImpl @Inject constructor(
                 message = tokenError?.errorDescription ?: context.resources.getString(LR.string.error_login_failed),
                 messageId = tokenError?.error,
             )
-            if (tokenError?.error != "authorization_pending") {
+            if (tokenError?.error != "authorization_pending" && tokenError?.error != "expired_token") {
                 trackSignIn(result, signInSource, LoginIdentity.QrCode)
             }
             result
