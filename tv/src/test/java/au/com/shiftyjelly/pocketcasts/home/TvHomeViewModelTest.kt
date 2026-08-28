@@ -8,6 +8,7 @@ import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverBanner
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverEpisode
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverFeedLoader
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverPodcast
+import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverPodcastAttribution
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverRow
 import au.com.shiftyjelly.pocketcasts.discover.TvOpenedCategory
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PodcastDao
@@ -1067,6 +1068,7 @@ class TvHomeViewModelTest {
         playbackManager = playbackManager,
         eventHorizon = eventHorizon,
         settings = settings,
+        discoverPodcastAttribution = TvDiscoverPodcastAttribution(),
         context = context,
     )
 

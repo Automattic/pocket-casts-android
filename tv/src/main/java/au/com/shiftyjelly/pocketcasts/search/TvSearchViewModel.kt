@@ -9,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverEpisode
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverFeedAnalytics
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverFeedLoader
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverPodcast
+import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverPodcastAttribution
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverRow
 import au.com.shiftyjelly.pocketcasts.discover.TvOpenedCategory
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -70,9 +71,10 @@ class TvSearchViewModel @Inject constructor(
     private val folderManager: FolderManager,
     private val eventHorizon: EventHorizon,
     private val settings: Settings,
+    private val discoverPodcastAttribution: TvDiscoverPodcastAttribution,
 ) : ViewModel() {
 
-    private val discoverFeedAnalytics = TvDiscoverFeedAnalytics(eventHorizon, settings, SOURCE_SEARCH, localRowIds = emptySet())
+    private val discoverFeedAnalytics = TvDiscoverFeedAnalytics(eventHorizon, settings, SOURCE_SEARCH, localRowIds = emptySet(), attribution = discoverPodcastAttribution)
 
     private val _categories = MutableStateFlow<List<DiscoverCategory>>(emptyList())
     val categories: StateFlow<List<DiscoverCategory>> = _categories.asStateFlow()

@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.podcasts
 
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverPodcastAttribution
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
@@ -15,6 +16,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.model.AuthResultModel
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.DeviceAuthorizeResponse
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import com.automattic.eventhorizon.DiscoverFeaturedPodcastSubscribedEvent
+import com.automattic.eventhorizon.DiscoverListPodcastSubscribedEvent
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.PodcastScreenShownEvent
 import com.automattic.eventhorizon.PodcastScreenSubscribeTappedEvent
@@ -40,6 +43,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyBlocking
@@ -69,6 +73,7 @@ class TvPodcastDetailsViewModelTest {
         on { isLoggedInObservable } doReturn loggedIn
     }
     private val eventHorizon = mock<EventHorizon>()
+    private val discoverPodcastAttribution = TvDiscoverPodcastAttribution()
 
     @Test
     fun `archived episodes are hidden by default`() = runTest {
@@ -374,6 +379,44 @@ class TvPodcastDetailsViewModelTest {
     }
 
     @Test
+    fun `following a podcast opened from discover fires the list and featured subscribed events`() = runTest {
+        discoverPodcastAttribution.record("podcast-uuid", listId = "list-1", listDatetime = "2026-08-28", isFeatured = true)
+        val viewModel = createViewModel(source = SourceView.DISCOVER)
+
+        viewModel.uiState.test {
+            assertEquals(TvPodcastDetailsUiState.Loading, awaitItem())
+            episodes.emit(listOf(availableEpisode))
+            awaitItem() as TvPodcastDetailsUiState.Loaded
+
+            viewModel.toggleSubscribe()
+
+            cancelAndConsumeRemainingEvents()
+        }
+
+        verify(eventHorizon).track(DiscoverListPodcastSubscribedEvent(listId = "list-1", podcastUuid = "podcast-uuid", listDatetime = "2026-08-28"))
+        verify(eventHorizon).track(DiscoverFeaturedPodcastSubscribedEvent(podcastUuid = "podcast-uuid"))
+    }
+
+    @Test
+    fun `following a library opened podcast does not fire discover subscribed events`() = runTest {
+        discoverPodcastAttribution.record("podcast-uuid", listId = "list-1", listDatetime = null, isFeatured = false)
+        val viewModel = createViewModel(source = SourceView.PODCAST_LIST)
+
+        viewModel.uiState.test {
+            assertEquals(TvPodcastDetailsUiState.Loading, awaitItem())
+            episodes.emit(listOf(availableEpisode))
+            awaitItem() as TvPodcastDetailsUiState.Loaded
+
+            viewModel.toggleSubscribe()
+
+            cancelAndConsumeRemainingEvents()
+        }
+
+        verify(eventHorizon, never()).track(any<DiscoverListPodcastSubscribedEvent>())
+        verify(eventHorizon, never()).track(any<DiscoverFeaturedPodcastSubscribedEvent>())
+    }
+
+    @Test
     fun `starting account auth drives the account state to complete`() = runTest {
         whenever(syncManager.deviceAuthorize()).thenReturn(deviceAuthorizeResponse())
         whenever(syncManager.loginWithDeviceAuth(any(), any(), any())).thenReturn(loginSuccess())
@@ -435,6 +478,7 @@ class TvPodcastDetailsViewModelTest {
         syncManager = syncManager,
         preferences = prefs,
         eventHorizon = eventHorizon,
+        discoverPodcastAttribution = discoverPodcastAttribution,
         defaultDispatcher = coroutineRule.testDispatcher,
         ioDispatcher = coroutineRule.testDispatcher,
     )

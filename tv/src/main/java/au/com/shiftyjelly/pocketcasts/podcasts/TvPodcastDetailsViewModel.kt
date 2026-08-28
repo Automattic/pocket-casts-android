@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.podcasts
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverPodcastAttribution
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
@@ -15,6 +16,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import com.automattic.eventhorizon.DiscoverFeaturedPodcastSubscribedEvent
+import com.automattic.eventhorizon.DiscoverListPodcastSubscribedEvent
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.PodcastScreenShownEvent
 import com.automattic.eventhorizon.PodcastScreenSubscribeTappedEvent
@@ -61,6 +64,7 @@ class TvPodcastDetailsViewModel @AssistedInject constructor(
     private val syncManager: SyncManager,
     private val preferences: TvPreferences,
     private val eventHorizon: EventHorizon,
+    private val discoverPodcastAttribution: TvDiscoverPodcastAttribution,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
@@ -165,6 +169,16 @@ class TvPodcastDetailsViewModel @AssistedInject constructor(
 
     private fun trackSubscribed() {
         eventHorizon.track(PodcastSubscribedEvent(uuid = podcastUuid, source = SourceView.PODCAST_SCREEN.analyticsValue))
+        if (source in DISCOVER_SOURCES) {
+            discoverPodcastAttribution.consume(podcastUuid)?.let { attribution ->
+                attribution.listId?.let { listId ->
+                    eventHorizon.track(DiscoverListPodcastSubscribedEvent(listId = listId, podcastUuid = podcastUuid, listDatetime = attribution.listDatetime))
+                }
+                if (attribution.isFeatured) {
+                    eventHorizon.track(DiscoverFeaturedPodcastSubscribedEvent(podcastUuid = podcastUuid))
+                }
+            }
+        }
     }
 
     fun changeSortType(sortType: EpisodesSortType) {
@@ -184,6 +198,10 @@ class TvPodcastDetailsViewModel @AssistedInject constructor(
     @AssistedFactory
     interface Factory {
         fun create(podcastUuid: String, source: SourceView): TvPodcastDetailsViewModel
+    }
+
+    private companion object {
+        val DISCOVER_SOURCES = setOf(SourceView.DISCOVER, SourceView.SEARCH_RESULTS)
     }
 }
 

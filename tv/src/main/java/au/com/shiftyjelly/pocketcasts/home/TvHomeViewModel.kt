@@ -10,6 +10,7 @@ import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverEpisode
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverFeedAnalytics
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverFeedLoader
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverPodcast
+import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverPodcastAttribution
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverRow
 import au.com.shiftyjelly.pocketcasts.discover.TvOpenedCategory
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PodcastDao
@@ -59,6 +60,7 @@ class TvHomeViewModel @Inject constructor(
     private val playbackManager: PlaybackManager,
     private val eventHorizon: EventHorizon,
     private val settings: Settings,
+    private val discoverPodcastAttribution: TvDiscoverPodcastAttribution,
     @ApplicationContext private val context: Context,
 ) : ViewModel() {
 
@@ -71,7 +73,7 @@ class TvHomeViewModel @Inject constructor(
     private val _playFailures = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     val playFailures: SharedFlow<Unit> = _playFailures.asSharedFlow()
 
-    private val discoverFeedAnalytics = TvDiscoverFeedAnalytics(eventHorizon, settings, SOURCE_HOME, LOCAL_ROW_IDS)
+    private val discoverFeedAnalytics = TvDiscoverFeedAnalytics(eventHorizon, settings, SOURCE_HOME, LOCAL_ROW_IDS, discoverPodcastAttribution)
 
     private var loadJob: Job? = null
 
