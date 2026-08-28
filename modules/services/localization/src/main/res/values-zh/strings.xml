@@ -1,11 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-08-11 11:57:45+0000
+Translation-Revision-Date: 2026-08-28 10:10:11+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="tv_starred_empty_title">无星标剧集</string>
+    <string name="tv_account_signed_out_alert_title">您已退出登录。</string>
+    <string name="tv_search_prompt">播客、节目、作者</string>
+    <string name="tv_banner_discover_more_title">这还只是冰山一角。</string>
+    <string name="tv_banner_discover_more_subtitle">您的下一个心头好，就在这里等着您。</string>
+    <string name="tv_banner_discover_more_action_title">探索更多节目</string>
+    <string name="tv_sponsored_podcast_section_title">Pocket Casts 推荐</string>
+    <string name="tv_banner_create_account_title">一个账户。 适配所有屏幕</string>
+    <string name="tv_banner_create_account_subtitle">您的关注和进度都保持原样</string>
+    <string name="tv_banner_create_account_action_title">创建一个免费账户</string>
     <string name="tv_playlist_play_all_save_and_play">保存并播放</string>
     <string name="tv_playlist_play_all_play_without_saving">播放但不保存</string>
     <string name="tv_episode_removed_from_up_next">已从“接下来播放”中移除</string>
@@ -30,7 +40,6 @@ Language: zh_CN
     <string name="tv_podcast_info_website">网站</string>
     <string name="tv_podcast_info_network">网络</string>
     <string name="tv_create_account_modal_step_create">创建您的账户或登录</string>
-    <string name="tv_sign_in_step_confirm_code">如有要求，请使用下方代码进行确认</string>
     <string name="tv_sign_in_step_login">登录您的账户</string>
     <string name="tv_sign_in_step_scan">扫描二维码或转到 %1$s</string>
     <string name="tv_podcast_more_info">更多信息</string>
@@ -73,17 +82,12 @@ Language: zh_CN
     <string name="bookmark_play_from">从 %s 播放</string>
     <string name="summary_upsell_description">订阅 Plus 以使用此功能和其他高级功能（如书签和文件夹）。</string>
     <string name="summary_upsell_title">AI 驱动的摘要</string>
-    <string name="tv_create_account_subtitle">扫描此二维码即可在手机上开始使用，整个过程只需一分钟。</string>
-    <string name="tv_create_account_come_back">创建账户后，请返回并登录</string>
     <string name="tv_create_account_title">创建您的免费账户</string>
-    <string name="tv_onboarding_syncing_subtitle">您的播客正在同步，我们很快就会为您登录！</string>
-    <string name="tv_onboarding_welcome_back">欢迎回来！</string>
     <string name="tv_onboarding_sign_in_instructions">打开摄像头，对准此二维码</string>
     <string name="tv_onboarding_sign_in_title">使用手机登录</string>
     <string name="tv_onboarding_syncing">正在同步您的播客\u2026</string>
     <string name="tv_onboarding_browse_without_account">无需账户即可浏览</string>
     <string name="tv_onboarding_create_free_account">创建免费账户</string>
-    <string name="tv_onboarding_subtitle">您的播客，大屏呈现</string>
     <string name="tv_onboarding_welcome_tv">欢迎使用 Pocket Casts TV</string>
     <string name="tv_onboarding_welcome">欢迎使用 Pocket Casts</string>
     <string name="sort_longest_to_shortest">最长到最短</string>

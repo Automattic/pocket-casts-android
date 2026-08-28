@@ -1,11 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-08-12 09:58:31+0000
+Translation-Revision-Date: 2026-08-28 10:10:11+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="tv_starred_empty_title">Geen favoriete afleveringen</string>
+    <string name="tv_account_signed_out_alert_title">Je bent uitgelogd.</string>
+    <string name="tv_search_prompt">Podcasts, shows, auteurs</string>
+    <string name="tv_banner_discover_more_title">Je hebt nog lang niet alles gezien.</string>
+    <string name="tv_banner_discover_more_subtitle">Je volgende obsessie zit hier ergens.</string>
+    <string name="tv_banner_discover_more_action_title">Ontdek meer shows</string>
+    <string name="tv_sponsored_podcast_section_title">Aanbevolen door Pocket Casts</string>
+    <string name="tv_banner_create_account_title">Eén account. Elk scherm</string>
+    <string name="tv_banner_create_account_subtitle">Je volgt en ontwikkelt precies waar je ze hebt achtergelaten</string>
+    <string name="tv_banner_create_account_action_title">Een gratis account aanmaken</string>
     <string name="tv_playlist_play_all_save_and_play">Opslaan en afspelen</string>
     <string name="tv_playlist_play_all_play_without_saving">Afspelen zonder op te slaan</string>
     <string name="tv_episode_removed_from_up_next">Verwijderd uit Hierna</string>
@@ -27,7 +37,6 @@ Language: nl
     <string name="tv_podcast_next_episode_tomorrow">Morgen</string>
     <string name="tv_podcast_info_schedule">Inplannen</string>
     <string name="tv_create_account_modal_step_create">Maak je account aan of log in</string>
-    <string name="tv_sign_in_step_confirm_code">Indien gevraagd, bevestig met de code hieronder</string>
     <string name="tv_sign_in_step_scan">Scan de QR-code of ga naar %1$s</string>
     <string name="tv_podcast_info_next_episode">Volgende aflevering</string>
     <string name="tv_podcast_info_website">Website</string>
@@ -73,17 +82,12 @@ Language: nl
     <string name="bookmark_play_from">Afspelen van %s</string>
     <string name="summary_upsell_description">Abonneer je op Plus om er toegang tot te krijgen en tot andere Premium-functies zoals bladwijzers en mappen.</string>
     <string name="summary_upsell_title">AI-samenvattingen</string>
-    <string name="tv_create_account_subtitle">Scan deze code om aan de slag te gaan op je telefoon, het duurt maar een minuut.</string>
-    <string name="tv_create_account_come_back">Zodra je je account hebt aangemaakt, kom je terug en meld je je aan</string>
     <string name="tv_create_account_title">Je gratis account aanmaken</string>
-    <string name="tv_onboarding_syncing_subtitle">Je podcasts worden gesynchroniseerd, we melden je snel aan!</string>
-    <string name="tv_onboarding_welcome_back">Welkom terug</string>
     <string name="tv_onboarding_sign_in_instructions">Open de camera en wijs naar deze QR-code</string>
     <string name="tv_onboarding_sign_in_title">Aanmelden met je telefoon</string>
     <string name="tv_onboarding_syncing">Je podcasts synchroniseren\u2026</string>
     <string name="tv_onboarding_browse_without_account">Bladeren zonder account</string>
     <string name="tv_onboarding_create_free_account">Een gratis account aanmaken</string>
-    <string name="tv_onboarding_subtitle">Je podcasts, op het grote scherm</string>
     <string name="tv_onboarding_welcome_tv">Welkom bij Pocket Casts TV</string>
     <string name="tv_onboarding_welcome">Welkom bij Pocket Casts</string>
     <string name="sort_longest_to_shortest">Langste naar kortste</string>

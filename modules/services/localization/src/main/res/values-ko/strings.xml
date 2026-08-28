@@ -1,11 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-08-11 10:10:10+0000
+Translation-Revision-Date: 2026-08-28 10:10:11+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="tv_starred_empty_title">별 표시 에피소드 없음</string>
+    <string name="tv_account_signed_out_alert_title">로그아웃되었습니다.</string>
+    <string name="tv_search_prompt">팟캐스트, 프로그램, 제작자</string>
+    <string name="tv_banner_discover_more_title">아직 반도 못 봤습니다.</string>
+    <string name="tv_banner_discover_more_subtitle">이 중에 맘에 드는 게 있을 거예요.</string>
+    <string name="tv_banner_discover_more_action_title">더 많은 프로그램 보기</string>
+    <string name="tv_sponsored_podcast_section_title">Pocket Casts 추천</string>
+    <string name="tv_banner_create_account_title">계정 1개만 있으면 돼요. 모든 화면</string>
+    <string name="tv_banner_create_account_subtitle">팔로우 목록과 진행률이 정확히 이전 상태 그대로 유지됩니다</string>
+    <string name="tv_banner_create_account_action_title">무료 계정 생성</string>
     <string name="tv_playlist_play_all_save_and_play">저장하고 재생</string>
     <string name="tv_playlist_play_all_play_without_saving">저장하지 않고 재생</string>
     <string name="tv_episode_removed_from_up_next">다음 순서에서 제거됨</string>
@@ -30,7 +40,6 @@ Language: ko_KR
     <string name="tv_podcast_info_website">웹사이트</string>
     <string name="tv_podcast_info_network">네트워크</string>
     <string name="tv_create_account_modal_step_create">계정 생성 또는 로그인</string>
-    <string name="tv_sign_in_step_confirm_code">메시지가 표시되면 아래 코드로 확인하세요</string>
     <string name="tv_sign_in_step_login">계정 로그인</string>
     <string name="tv_sign_in_step_scan">QR 코드를 스캔하거나 %1$s(으)로 이동 </string>
     <string name="tv_podcast_more_info">자세한 정보</string>
@@ -73,17 +82,12 @@ Language: ko_KR
     <string name="bookmark_play_from">%s에서 재생</string>
     <string name="summary_upsell_description">Plus를 구독하여 북마크, 폴더와 같은 기타 프리미엄 기능을 이용하세요.</string>
     <string name="summary_upsell_title">AI 기반 요약</string>
-    <string name="tv_create_account_subtitle">스마트폰에서 시작하려면 이 코드를 스캔하세요. 1분이면 충분합니다.</string>
-    <string name="tv_create_account_come_back">계정 생성 후 돌아와서 로그인</string>
     <string name="tv_create_account_title">무료 계정 생성</string>
-    <string name="tv_onboarding_syncing_subtitle">팟캐스트 동기화 중이며, 곧 로그인됩니다!</string>
-    <string name="tv_onboarding_welcome_back">다시 오신 것을 환영합니다!</string>
     <string name="tv_onboarding_sign_in_instructions">카메라를 열어 이 QR 코드에 맞추기</string>
     <string name="tv_onboarding_sign_in_title">스마트폰으로 로그인</string>
     <string name="tv_onboarding_syncing">팟캐스트 동기화 중\u2026</string>
     <string name="tv_onboarding_browse_without_account">계정 없이 둘러보기</string>
     <string name="tv_onboarding_create_free_account">무료 계정 생성</string>
-    <string name="tv_onboarding_subtitle">큰 화면의 회원님 팟캐스트</string>
     <string name="tv_onboarding_welcome_tv">Pocket Casts TV 시작</string>
     <string name="tv_onboarding_welcome">Pocket Casts 시작</string>
     <string name="sort_longest_to_shortest">길이 내림차순</string>

@@ -27,7 +27,6 @@ Language: ar
     <string name="tv_create_account_modal_step_create">أنشئ حسابك أو سجّل الدخول</string>
     <string name="tv_create_account_modal_subtitle">أنشئ حسابًا مجّانيًا لمتابعة برامج البث الصوتي، وبناء قائمة \"التالي\" الخاصة بك، ومتابعة الاستماع من حيث توقفت، على أي جهاز.</string>
     <string name="tv_create_account_modal_title">تستحق برامج البث الصوتي التي تتابعها مكانًا خاصًا بها</string>
-    <string name="tv_sign_in_step_confirm_code">إذا طُلِب منك ذلك، فقم بالتأكيد باستخدام الكود أدناه</string>
     <string name="tv_sign_in_step_login">تسجيل الدخول إلى حسابك</string>
     <string name="tv_sign_in_step_scan">امسح رمز الاستجابة السريعة ضوئيًا أو انتقل إلى ⁦%1$s⁩</string>
     <string name="tv_sign_in_title">تسجيل الدخول إلى Pocket Casts</string>
@@ -71,17 +70,12 @@ Language: ar
     <string name="bookmark_play_from">تشغيل من %s</string>
     <string name="summary_upsell_description">اشترك في خطة Plus للحصول على حق الوصول إليها وإلى الميزات الأخرى للخطة المميزة، مثل: الإشارات المرجعية والمجلدات.</string>
     <string name="summary_upsell_title">ملخصات مدعومة بالذكاء الاصطناعي</string>
-    <string name="tv_create_account_come_back">بمجرد أن يتم إنشاء حسابك، يمكنك الرجوع وتسجيل الدخول</string>
-    <string name="tv_create_account_subtitle">امسح هذا الكود ضوئيًا للبدء على هاتفك، فالأمر لن يستغرق سوى دقيقة واحدة.</string>
     <string name="tv_create_account_title">إنشاء حساب مجّاني لك</string>
-    <string name="tv_onboarding_syncing_subtitle">تتم مزامنة حلقات البث الصوتي لديك، وسنُسجِّل دخولك قريبًا!</string>
-    <string name="tv_onboarding_welcome_back">مرحبًا بك مرة أخرى!</string>
     <string name="tv_onboarding_sign_in_instructions">افتح الكاميرا ووجّهها إلى كود الاستجابة السريعة (QR) هذا</string>
     <string name="tv_onboarding_sign_in_title">تسجيل الدخول باستخدام هاتفك</string>
     <string name="tv_onboarding_syncing">جارٍ مزامنة حلقات البث الصوتي لديك\u2026</string>
     <string name="tv_onboarding_browse_without_account">تصفح من دون حساب</string>
     <string name="tv_onboarding_create_free_account">إنشاء حساب مجّاني</string>
-    <string name="tv_onboarding_subtitle">شاهد حلقات البث الصوتي لديك على الشاشة الكبيرة</string>
     <string name="tv_onboarding_welcome_tv">مرحبًا بك في تطبيق Pocket Casts على التلفاز</string>
     <string name="tv_onboarding_welcome">مرحبًا بك في تطبيق Pocket Casts</string>
     <string name="sort_longest_to_shortest">من الأطول إلى الأقصر</string>
