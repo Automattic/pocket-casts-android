@@ -2,12 +2,15 @@ package au.com.shiftyjelly.pocketcasts.search
 
 import android.content.Context
 import android.content.res.Resources
+import app.cash.turbine.test
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverEpisode
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverFeedLoader
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverRow
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.ImprovedSearchResultItem
 import au.com.shiftyjelly.pocketcasts.models.to.SearchAutoCompleteItem
 import au.com.shiftyjelly.pocketcasts.models.to.SearchHistoryEntry
@@ -33,6 +36,8 @@ import au.com.shiftyjelly.pocketcasts.servers.model.ListFeed
 import au.com.shiftyjelly.pocketcasts.servers.model.ListType
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import com.automattic.eventhorizon.DiscoverCategoriesPillTappedEvent
+import com.automattic.eventhorizon.DiscoverListEpisodePlayEvent
+import com.automattic.eventhorizon.DiscoverListEpisodeTappedEvent
 import com.automattic.eventhorizon.DiscoverListImpressionEvent
 import com.automattic.eventhorizon.DiscoverListPodcastTappedEvent
 import com.automattic.eventhorizon.EventHorizon
@@ -48,6 +53,7 @@ import com.automattic.eventhorizon.SearchResultTappedEvent
 import com.automattic.eventhorizon.SearchResultType
 import com.automattic.eventhorizon.SearchShownEvent
 import com.automattic.eventhorizon.SourceViewType
+import io.reactivex.Single
 import java.util.Date
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
@@ -68,6 +74,7 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyBlocking
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -625,7 +632,7 @@ class TvSearchViewModelTest {
     @Test
     fun `a discover row impression in the idle body is stamped with the search source`() = runTest {
         whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
-        val row = TvDiscoverRow.Podcasts(id = "list-trending", title = "Trending", podcasts = listOf(discoverPodcast("podcast-1")))
+        val row = TvDiscoverRow.Podcasts(id = "list-trending", title = "Trending", podcasts = listOf(discoverPodcast("podcast-1")), listId = "list-trending")
 
         createViewModel().trackDiscoverListShown(row)
 
@@ -636,7 +643,7 @@ class TvSearchViewModelTest {
     fun `opening a discover podcast is stamped with the search source`() = runTest {
         whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
         val podcast = discoverPodcast("podcast-1")
-        val row = TvDiscoverRow.Podcasts(id = "list-trending", title = "Trending", podcasts = listOf(podcast))
+        val row = TvDiscoverRow.Podcasts(id = "list-trending", title = "Trending", podcasts = listOf(podcast), listId = "list-trending")
 
         createViewModel().trackDiscoverPodcastTapped(row, podcast)
 
@@ -647,7 +654,7 @@ class TvSearchViewModelTest {
     fun `opening a discover episode's podcast is stamped with the search source`() = runTest {
         whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
         val episode = TvDiscoverEpisode("episode-1", "Episode", "podcast-1", "Podcast")
-        val row = TvDiscoverRow.Episodes(id = "list-videos", title = "Made for TV", episodes = listOf(episode))
+        val row = TvDiscoverRow.Episodes(id = "list-videos", title = "Made for TV", episodes = listOf(episode), listId = "list-videos")
 
         createViewModel().trackDiscoverEpisodePodcastTapped(row, episode)
 
@@ -657,12 +664,100 @@ class TvSearchViewModelTest {
     @Test
     fun `search does not suppress the home local row ids`() = runTest {
         whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
-        val row = TvDiscoverRow.Podcasts(id = "keep_listening", title = "Keep Listening", podcasts = listOf(discoverPodcast("podcast-1")))
+        val row = TvDiscoverRow.Podcasts(id = "keep_listening", title = "Keep Listening", podcasts = listOf(discoverPodcast("podcast-1")), listId = "keep_listening")
 
         createViewModel().trackDiscoverListShown(row)
 
         verify(eventHorizon).track(DiscoverListImpressionEvent(listId = "keep_listening", source = "search"))
     }
+
+    @Test
+    fun `playDiscoverEpisode plays an episode that is already in the database`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        val episode = podcastEpisode("episode-1")
+        whenever(episodeManager.findByUuid("episode-1")).thenReturn(episode)
+
+        createViewModel().playDiscoverEpisode(discoverEpisode("episode-1"))
+
+        verifyBlocking(playbackManager) { playNowSuspend(episode = episode, sourceView = SourceView.SEARCH) }
+        verify(podcastManager, never()).findOrDownloadPodcastRxSingle(any(), any())
+    }
+
+    @Test
+    fun `playDiscoverEpisode fetches the podcast before playing an unknown episode`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        val episode = podcastEpisode("episode-1")
+        whenever(episodeManager.findByUuid("episode-1")).thenReturn(null, episode)
+        whenever(podcastManager.findOrDownloadPodcastRxSingle("podcast-episode-1")).thenReturn(Single.just(subscribedPodcast("podcast-episode-1")))
+
+        createViewModel().playDiscoverEpisode(discoverEpisode("episode-1"))
+
+        verifyBlocking(playbackManager) { playNowSuspend(episode = episode, sourceView = SourceView.SEARCH) }
+    }
+
+    @Test
+    fun `playLatestEpisode plays the newest episode of a featured podcast and stamps the search source`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        val podcast = subscribedPodcast("podcast-1")
+        val newest = podcastEpisode("episode-new")
+        whenever(podcastManager.findOrDownloadPodcastRxSingle("podcast-1")).thenReturn(Single.just(podcast))
+        whenever(episodeManager.findEpisodesByPodcastOrderedByPublishDate(podcast))
+            .thenReturn(listOf(newest, podcastEpisode("episode-old")))
+        val row = TvDiscoverRow.FeaturedPodcasts(id = "list-featured", title = "Featured", podcasts = listOf(discoverPodcast("podcast-1")), listId = "list-featured")
+
+        createViewModel().playLatestEpisode(row, discoverPodcast("podcast-1"))
+
+        verifyBlocking(playbackManager) { playNowSuspend(episode = newest, sourceView = SourceView.SEARCH) }
+        verify(eventHorizon).track(
+            DiscoverListEpisodeTappedEvent(listId = "list-featured", podcastUuid = "podcast-1", episodeUuid = "episode-new", source = "search"),
+        )
+        verify(eventHorizon).track(DiscoverListEpisodePlayEvent(listId = "list-featured", podcastUuid = "podcast-1"))
+    }
+
+    @Test
+    fun `playLatestEpisode reports a failure when the podcast has no episodes`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        val podcast = subscribedPodcast("podcast-1")
+        whenever(podcastManager.findOrDownloadPodcastRxSingle("podcast-1")).thenReturn(Single.just(podcast))
+        whenever(episodeManager.findEpisodesByPodcastOrderedByPublishDate(podcast)).thenReturn(emptyList())
+        val row = TvDiscoverRow.FeaturedPodcasts(id = "list-featured", title = "Featured", podcasts = listOf(discoverPodcast("podcast-1")), listId = "list-featured")
+        val viewModel = createViewModel()
+
+        viewModel.playFailures.test {
+            viewModel.playLatestEpisode(row, discoverPodcast("podcast-1"))
+
+            awaitItem()
+            verifyNoInteractions(playbackManager)
+        }
+    }
+
+    @Test
+    fun `playLatestEpisode records the tap even when playback fails`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        val podcast = subscribedPodcast("podcast-1")
+        val newest = podcastEpisode("episode-new")
+        whenever(podcastManager.findOrDownloadPodcastRxSingle("podcast-1")).thenReturn(Single.just(podcast))
+        whenever(episodeManager.findEpisodesByPodcastOrderedByPublishDate(podcast)).thenReturn(listOf(newest))
+        whenever { playbackManager.playNowSuspend(episode = newest, sourceView = SourceView.SEARCH) }
+            .thenThrow(RuntimeException("boom"))
+        val row = TvDiscoverRow.FeaturedPodcasts(id = "list-featured", title = "Featured", podcasts = listOf(discoverPodcast("podcast-1")), listId = "list-featured")
+
+        createViewModel().playLatestEpisode(row, discoverPodcast("podcast-1"))
+
+        verify(eventHorizon).track(
+            DiscoverListEpisodeTappedEvent(listId = "list-featured", podcastUuid = "podcast-1", episodeUuid = "episode-new", source = "search"),
+        )
+        verify(eventHorizon).track(DiscoverListEpisodePlayEvent(listId = "list-featured", podcastUuid = "podcast-1"))
+    }
+
+    private fun podcastEpisode(uuid: String) = PodcastEpisode(uuid = uuid, publishedDate = Date(0))
+
+    private fun discoverEpisode(uuid: String) = TvDiscoverEpisode(
+        episodeUuid = uuid,
+        episodeTitle = "Episode $uuid",
+        podcastUuid = "podcast-$uuid",
+        podcastTitle = "Podcast",
+    )
 
     private fun podcastItem(uuid: String) = ImprovedSearchResultItem.PodcastItem(
         uuid = uuid,
