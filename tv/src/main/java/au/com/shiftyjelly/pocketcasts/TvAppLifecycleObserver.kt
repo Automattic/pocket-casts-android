@@ -10,12 +10,24 @@ import au.com.shiftyjelly.pocketcasts.utils.getVersionCode
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
-class TvAppLifecycleObserver @Inject constructor(
-    @ApplicationContext private val appContext: Context,
+class TvAppLifecycleObserver(
+    private val appContext: Context,
     private val appLifecycleAnalytics: AppLifecycleAnalytics,
     private val settings: Settings,
-    private val appLifecycleOwner: LifecycleOwner = ProcessLifecycleOwner.get(),
+    private val appLifecycleOwner: LifecycleOwner,
 ) : DefaultLifecycleObserver {
+
+    @Inject
+    constructor(
+        @ApplicationContext appContext: Context,
+        appLifecycleAnalytics: AppLifecycleAnalytics,
+        settings: Settings,
+    ) : this(
+        appContext = appContext,
+        appLifecycleAnalytics = appLifecycleAnalytics,
+        settings = settings,
+        appLifecycleOwner = ProcessLifecycleOwner.get(),
+    )
 
     fun setup() {
         appLifecycleOwner.lifecycle.addObserver(this)
