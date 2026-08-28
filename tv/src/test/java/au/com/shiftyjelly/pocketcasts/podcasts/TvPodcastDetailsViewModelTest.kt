@@ -17,6 +17,13 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.login.DeviceAuthorizeResponse
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.PodcastScreenShownEvent
+import com.automattic.eventhorizon.PodcastScreenSubscribeTappedEvent
+import com.automattic.eventhorizon.PodcastScreenToggleArchivedEvent
+import com.automattic.eventhorizon.PodcastScreenToggleSummaryEvent
+import com.automattic.eventhorizon.PodcastScreenUnsubscribeTappedEvent
+import com.automattic.eventhorizon.PodcastSubscribedEvent
+import com.automattic.eventhorizon.PodcastUnsubscribedEvent
+import com.automattic.eventhorizon.PodcastsScreenSortOrderChangedEvent
 import com.jakewharton.rxrelay2.BehaviorRelay
 import io.reactivex.Single
 import java.util.Date
@@ -275,6 +282,95 @@ class TvPodcastDetailsViewModelTest {
         advanceUntilIdle()
 
         verifyBlocking(podcastManager) { unsubscribe("podcast-uuid", SourceView.PODCAST_SCREEN) }
+    }
+
+    @Test
+    fun `following a podcast tracks the subscribe tapped and subscribed events`() = runTest {
+        val viewModel = createViewModel()
+
+        viewModel.uiState.test {
+            assertEquals(TvPodcastDetailsUiState.Loading, awaitItem())
+            episodes.emit(listOf(availableEpisode))
+            awaitItem() as TvPodcastDetailsUiState.Loaded
+
+            viewModel.toggleSubscribe()
+
+            cancelAndConsumeRemainingEvents()
+        }
+
+        verify(eventHorizon).track(PodcastScreenSubscribeTappedEvent)
+        verify(eventHorizon).track(PodcastSubscribedEvent(uuid = "podcast-uuid", source = SourceView.PODCAST_SCREEN.analyticsValue))
+    }
+
+    @Test
+    fun `unfollowing a podcast tracks the unsubscribe tapped and unsubscribed events`() = runTest {
+        val subscribedPodcast = podcast.copy(isSubscribed = true)
+        val podcastManager = mock<PodcastManager> {
+            on { findOrDownloadPodcastRxSingle(any(), any()) } doReturn Single.just(subscribedPodcast)
+            on { podcastByUuidFlow(any()) } doReturn MutableStateFlow(subscribedPodcast)
+        }
+        val viewModel = createViewModel(podcastManager = podcastManager)
+
+        viewModel.uiState.test {
+            assertEquals(TvPodcastDetailsUiState.Loading, awaitItem())
+            episodes.emit(listOf(availableEpisode))
+            awaitItem() as TvPodcastDetailsUiState.Loaded
+
+            viewModel.toggleSubscribe()
+
+            cancelAndConsumeRemainingEvents()
+        }
+
+        verify(eventHorizon).track(PodcastScreenUnsubscribeTappedEvent)
+        verify(eventHorizon).track(PodcastUnsubscribedEvent(uuid = "podcast-uuid", source = SourceView.PODCAST_SCREEN.analyticsValue))
+    }
+
+    @Test
+    fun `changing the sort type tracks the sort order changed event`() = runTest {
+        val viewModel = createViewModel()
+
+        viewModel.changeSortType(EpisodesSortType.EPISODES_SORT_BY_TITLE_ASC)
+
+        verify(eventHorizon).track(PodcastsScreenSortOrderChangedEvent(sortOrder = EpisodesSortType.EPISODES_SORT_BY_TITLE_ASC.analyticsValue))
+    }
+
+    @Test
+    fun `toggling the archive filter tracks the toggle archived event`() = runTest {
+        val viewModel = createViewModel()
+
+        viewModel.toggleArchiveFilter()
+
+        verify(eventHorizon).track(PodcastScreenToggleArchivedEvent(showArchived = true))
+    }
+
+    @Test
+    fun `expanding the summary tracks the toggle summary event`() = runTest {
+        val viewModel = createViewModel()
+
+        viewModel.trackSummaryExpanded()
+
+        verify(eventHorizon).track(PodcastScreenToggleSummaryEvent(isExpanded = true))
+    }
+
+    @Test
+    fun `auto follow after account auth tracks the subscribed event`() = runTest {
+        whenever(syncManager.deviceAuthorize()).thenReturn(deviceAuthorizeResponse())
+        whenever(syncManager.loginWithDeviceAuth(any(), any(), any())).thenReturn(loginSuccess())
+        val viewModel = createViewModel()
+
+        viewModel.accountAuthState.test {
+            assertEquals(TvSignInUiState.Loading, awaitItem())
+
+            viewModel.startAccountAuth()
+
+            val states = mutableListOf<TvSignInUiState>()
+            while (states.lastOrNull() !is TvSignInUiState.Complete) {
+                states.add(awaitItem())
+            }
+        }
+        advanceUntilIdle()
+
+        verify(eventHorizon).track(PodcastSubscribedEvent(uuid = "podcast-uuid", source = SourceView.PODCAST_SCREEN.analyticsValue))
     }
 
     @Test

@@ -111,6 +111,7 @@ fun TvPodcastDetailsScreen(
         onRetryAccountAuth = viewModel::retryAccountAuth,
         onChangeSortType = viewModel::changeSortType,
         onToggleArchiveFilter = viewModel::toggleArchiveFilter,
+        onMoreInfo = viewModel::trackSummaryExpanded,
         onPlayEpisode = { episode ->
             episodeActions.play(episode, TvEpisodeActionContext.PodcastDetails.source)
             openNowPlaying()
@@ -129,6 +130,7 @@ private fun TvPodcastDetailsContent(
     onRetryAccountAuth: () -> Unit,
     onChangeSortType: (EpisodesSortType) -> Unit,
     onToggleArchiveFilter: () -> Unit,
+    onMoreInfo: () -> Unit,
     onPlayEpisode: (PodcastEpisode) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -158,7 +160,10 @@ private fun TvPodcastDetailsContent(
                                 isShowingAccountModal = true
                             }
                         },
-                        onMoreInfo = { isShowingInfoModal = true },
+                        onMoreInfo = {
+                            onMoreInfo()
+                            isShowingInfoModal = true
+                        },
                         modifier = Modifier.weight(INFO_PANE_WEIGHT),
                     )
                     if (uiState.episodes.isEmpty() && uiState.archivedEpisodeCount == 0) {
@@ -449,6 +454,7 @@ private fun TvPodcastDetailsContentPreview(
             onRetryAccountAuth = {},
             onChangeSortType = {},
             onToggleArchiveFilter = {},
+            onMoreInfo = {},
             onPlayEpisode = {},
         )
     }
