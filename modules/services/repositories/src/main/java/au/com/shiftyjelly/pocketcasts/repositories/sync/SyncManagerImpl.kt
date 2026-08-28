@@ -86,6 +86,7 @@ import java.io.File
 import java.net.HttpURLConnection
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.rx2.rxSingle
@@ -260,6 +261,8 @@ class SyncManagerImpl @Inject constructor(
                 trackSignIn(result, signInSource, LoginIdentity.QrCode, isNewAccount)
             }
             result
+        } catch (ex: CancellationException) {
+            throw ex
         } catch (ex: Exception) {
             Timber.e(ex, "Device auth failed")
             val result = exceptionToAuthResult(exception = ex, fallbackMessage = LR.string.error_login_failed)
