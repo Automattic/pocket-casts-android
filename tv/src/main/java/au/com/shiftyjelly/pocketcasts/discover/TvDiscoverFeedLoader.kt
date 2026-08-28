@@ -138,6 +138,23 @@ class TvDiscoverFeedLoader @Inject constructor(
             .distinctBy(TvDiscoverRow::id)
     }
 
+    suspend fun reloadHomeRow(rowId: String, isLoggedIn: Boolean): TvDiscoverRow? {
+        return reloadRow(listRepository.getHomeDiscoverFeed(isLoggedIn), rowId, includeHomeSections = true)
+    }
+
+    suspend fun reloadSearchRow(rowId: String, isLoggedIn: Boolean): TvDiscoverRow? {
+        return reloadRow(listRepository.getSearchDiscoverFeed(), rowId, includeHomeSections = false)
+    }
+
+    private suspend fun reloadRow(discover: Discover, rowId: String, includeHomeSections: Boolean): TvDiscoverRow? {
+        val region = resolveRegion(discover)
+        val replacements = regionReplacements(discover, region)
+        val row = discover.layout
+            .transformWithRegion(region, replacements, context.resources)
+            .firstOrNull { it.rowId() == rowId } ?: return null
+        return loadRow(row, includeHomeSections, replacements)
+    }
+
     private suspend fun loadRow(row: DiscoverRow, includeHomeSections: Boolean, replacements: Map<String, String>): TvDiscoverRow? {
         val bannerType = row.type
         if (bannerType is ListType.Unknown && bannerType.value == BANNER_TYPE) {
@@ -146,15 +163,26 @@ class TvDiscoverFeedLoader @Inject constructor(
             return TvDiscoverRow.Banner(id = banner.id, title = row.title, banner = banner)
         }
         return when (row.type) {
-            is ListType.PodcastList -> if (row.source.isBlank()) null else loadPodcastsRow(row)
-            is ListType.EpisodeList -> if (row.source.isBlank()) null else loadEpisodesRow(row)
+            is ListType.PodcastList -> if (row.source.isBlank()) null else loadRowOrFailed(row) { loadPodcastsRow(row) }
+            is ListType.EpisodeList -> if (row.source.isBlank()) null else loadRowOrFailed(row) { loadEpisodesRow(row) }
             is ListType.Categories -> if (includeHomeSections) loadCategoriesRow(row, replacements) else null
             is ListType.Unknown -> null
         }
     }
 
+    private suspend fun loadRowOrFailed(row: DiscoverRow, block: suspend () -> TvDiscoverRow?): TvDiscoverRow? {
+        return try {
+            block()
+        } catch (exception: CancellationException) {
+            throw exception
+        } catch (exception: Exception) {
+            Timber.e(exception, "Failed to load TV discover row ${row.rowId()}")
+            TvDiscoverRow.Failed(id = row.rowId(), title = row.title)
+        }
+    }
+
     private suspend fun loadPodcastsRow(row: DiscoverRow): TvDiscoverRow? = coroutineScope {
-        val feedDeferred = async { listRepository.getListFeed(row.source, row.authenticated) }
+        val feedDeferred = async { listRepository.getListFeedResult(row.source, row.authenticated).getOrThrow() }
         val insertionsDeferred = async { loadSponsoredInsertions(row) }
         val feed = feedDeferred.await() ?: return@coroutineScope null
         val basePodcasts = feed.podcasts.orEmpty()
@@ -206,7 +234,7 @@ class TvDiscoverFeedLoader @Inject constructor(
     }
 
     private suspend fun loadEpisodesRow(row: DiscoverRow): TvDiscoverRow? {
-        val feed = listRepository.getListFeed(row.source, row.authenticated) ?: return null
+        val feed = listRepository.getListFeedResult(row.source, row.authenticated).getOrThrow() ?: return null
         val playsVideoPreview = row.displayStyle is DisplayStyle.VideoPreviewList
         val episodes = feed.episodes.orEmpty()
             .distinctBy(DiscoverEpisode::uuid)

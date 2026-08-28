@@ -112,6 +112,7 @@ fun TvHomeScreen(
                 openedCategory = TvOpenedCategory(category.id, category.name, category.source)
             },
             onListImpression = viewModel::trackDiscoverListShown,
+            onRetryRow = viewModel::retryDiscoverRow,
             loadCategoryCovers = viewModel::categoryCoverUrls,
             isPodcastPlaying = viewModel::isPlaying,
             modifier = Modifier
@@ -162,6 +163,7 @@ private fun TvHomeContent(
     onEpisodePodcastClick: (TvDiscoverRow, TvDiscoverEpisode) -> Unit = { _, _ -> },
     onCategoryClick: (DiscoverCategory, Int) -> Unit = { _, _ -> },
     onListImpression: (TvDiscoverRow) -> Unit = {},
+    onRetryRow: (TvDiscoverRow) -> Unit = {},
     loadCategoryCovers: (suspend (DiscoverCategory) -> List<String>)? = null,
     isPodcastPlaying: () -> Boolean = { false },
     restoreFocusTrigger: Int = 0,
@@ -183,6 +185,7 @@ private fun TvHomeContent(
                 onEpisodePodcastClick = onEpisodePodcastClick,
                 onCategoryClick = onCategoryClick,
                 onListImpression = onListImpression,
+                onRetryRow = onRetryRow,
                 loadCategoryCovers = loadCategoryCovers,
                 isPodcastPlaying = isPodcastPlaying,
                 modifier = modifier,
@@ -226,6 +229,7 @@ private fun TvHomeRows(
     onEpisodePodcastClick: (TvDiscoverRow, TvDiscoverEpisode) -> Unit = { _, _ -> },
     onCategoryClick: (DiscoverCategory, Int) -> Unit = { _, _ -> },
     onListImpression: (TvDiscoverRow) -> Unit = {},
+    onRetryRow: (TvDiscoverRow) -> Unit = {},
     loadCategoryCovers: (suspend (DiscoverCategory) -> List<String>)? = null,
     isPodcastPlaying: () -> Boolean = { false },
     restoreFocusTrigger: Int = 0,
@@ -267,6 +271,7 @@ private fun TvHomeRows(
                 focusRequester = rowFocusRequester,
                 onTapBanner = onTapBanner,
                 onListImpression = onListImpression,
+                onRetryRow = onRetryRow,
                 loadCategoryCovers = loadCategoryCovers,
                 isPodcastPlaying = isPodcastPlaying,
             )

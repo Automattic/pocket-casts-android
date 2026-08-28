@@ -68,7 +68,9 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -84,7 +86,11 @@ class TvSearchViewModelTest {
     @get:Rule
     val coroutineRule = MainCoroutineRule()
 
-    private val listRepository = mock<ListRepository>()
+    private val listRepository = mock<ListRepository> {
+        on { getListFeedResult(any(), anyOrNull()) } doSuspendableAnswer { invocation ->
+            Result.success((invocation.mock as ListRepository).getListFeed(invocation.getArgument(0), invocation.getArgument(1)))
+        }
+    }
     private val syncManager = mock<SyncManager> {
         on { isLoggedIn() } doReturn false
     }

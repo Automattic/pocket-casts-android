@@ -174,6 +174,25 @@ class TvHomeViewModel @Inject constructor(
         }
     }
 
+    fun retryDiscoverRow(row: TvDiscoverRow) {
+        viewModelScope.launch {
+            val reloaded = try {
+                discoverFeedLoader.reloadHomeRow(row.id, syncManager.isLoggedIn())
+            } catch (exception: CancellationException) {
+                throw exception
+            } catch (exception: Exception) {
+                Timber.e(exception, "Failed to reload TV home row ${row.id}")
+                row
+            }
+            replaceRow(row.id, reloaded)
+        }
+    }
+
+    private fun replaceRow(rowId: String, newRow: TvDiscoverRow?) {
+        val current = _uiState.value as? TvHomeUiState.Ready ?: return
+        _uiState.value = TvHomeUiState.Ready(current.rows.mapNotNull { if (it.id == rowId) newRow else it })
+    }
+
     suspend fun categoryPodcasts(categoryId: Int, source: String): TvCategoryPodcasts {
         return discoverFeedLoader.loadCategoryPodcasts(source, categoryId, syncManager.isLoggedIn())
     }

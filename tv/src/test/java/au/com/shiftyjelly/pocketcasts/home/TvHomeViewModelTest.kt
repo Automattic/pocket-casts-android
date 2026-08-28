@@ -61,6 +61,7 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -76,7 +77,11 @@ class TvHomeViewModelTest {
     @get:Rule
     val coroutineRule = MainCoroutineRule()
 
-    private val listRepository = mock<ListRepository>()
+    private val listRepository = mock<ListRepository> {
+        on { getListFeedResult(any(), anyOrNull()) } doSuspendableAnswer { invocation ->
+            Result.success((invocation.mock as ListRepository).getListFeed(invocation.getArgument(0), invocation.getArgument(1)))
+        }
+    }
     private val syncManager = mock<SyncManager> {
         on { isLoggedInObservable } doReturn BehaviorRelay.createDefault(false)
     }
@@ -881,6 +886,46 @@ class TvHomeViewModelTest {
         viewModel.uiState.test {
             val state = awaitItem() as TvHomeUiState.Ready
             assertEquals(listOf("trending"), state.rows.map { it.id })
+        }
+    }
+
+    @Test
+    fun `a discover row whose feed fails to load becomes a failed row instead of being dropped`() = runTest {
+        whenever(syncManager.isLoggedIn()).thenReturn(false)
+        whenever(listRepository.getHomeDiscoverFeed(isLoggedIn = false)).thenReturn(
+            discover(row(id = "trending", title = "Row Trending", source = "https://lists/trending.json")),
+        )
+        whenever(listRepository.getListFeedResult(eq("https://lists/trending.json"), any()))
+            .thenReturn(Result.failure(RuntimeException("boom")))
+
+        val viewModel = createViewModel()
+
+        viewModel.uiState.test {
+            val row = (awaitItem() as TvHomeUiState.Ready).rows.single { it.id == "trending" }
+            assertTrue(row is TvDiscoverRow.Failed)
+        }
+    }
+
+    @Test
+    fun `retrying a failed discover row reloads it`() = runTest {
+        whenever(syncManager.isLoggedIn()).thenReturn(false)
+        whenever(listRepository.getHomeDiscoverFeed(isLoggedIn = false)).thenReturn(
+            discover(row(id = "trending", title = "Row Trending", source = "https://lists/trending.json")),
+        )
+        whenever(listRepository.getListFeedResult(eq("https://lists/trending.json"), any()))
+            .thenReturn(Result.failure(RuntimeException("boom")))
+            .thenReturn(Result.success(podcastFeed("podcast-trending")))
+
+        val viewModel = createViewModel()
+
+        viewModel.uiState.test {
+            val failedRow = (awaitItem() as TvHomeUiState.Ready).rows.single { it.id == "trending" }
+            assertTrue(failedRow is TvDiscoverRow.Failed)
+
+            viewModel.retryDiscoverRow(failedRow)
+
+            val reloaded = (awaitItem() as TvHomeUiState.Ready).rows.single { it.id == "trending" }
+            assertTrue(reloaded is TvDiscoverRow.Podcasts)
         }
     }
 
