@@ -58,7 +58,6 @@ import kotlinx.coroutines.rx2.await
 @HiltViewModel(assistedFactory = TvPodcastDetailsViewModel.Factory::class)
 class TvPodcastDetailsViewModel @AssistedInject constructor(
     @Assisted private val podcastUuid: String,
-    @Assisted private val source: SourceView,
     private val podcastManager: PodcastManager,
     private val episodeManager: EpisodeManager,
     private val syncManager: SyncManager,
@@ -70,6 +69,8 @@ class TvPodcastDetailsViewModel @AssistedInject constructor(
 ) : ViewModel() {
 
     private val isShowingArchivedFlow = MutableStateFlow(preferences.isPodcastShowingArchived(podcastUuid))
+
+    private var discoverAttribution: TvDiscoverPodcastAttribution.Attribution? = null
 
     private val _accountAuthState = MutableStateFlow<TvSignInUiState>(TvSignInUiState.Loading)
     val accountAuthState: StateFlow<TvSignInUiState> = _accountAuthState.asStateFlow()
@@ -111,8 +112,14 @@ class TvPodcastDetailsViewModel @AssistedInject constructor(
             TvPodcastDetailsUiState.Loading,
         )
 
-    fun trackScreenShown() {
+    fun onScreenOpened(source: SourceView) {
         eventHorizon.track(PodcastScreenShownEvent(source = source.analyticsValue))
+        discoverAttribution = if (source in DISCOVER_SOURCES) {
+            discoverPodcastAttribution.consume(podcastUuid)
+        } else {
+            discoverPodcastAttribution.clear(podcastUuid)
+            null
+        }
     }
 
     fun trackSummaryExpanded() {
@@ -169,14 +176,12 @@ class TvPodcastDetailsViewModel @AssistedInject constructor(
 
     private fun trackSubscribed() {
         eventHorizon.track(PodcastSubscribedEvent(uuid = podcastUuid, source = SourceView.PODCAST_SCREEN.analyticsValue))
-        if (source in DISCOVER_SOURCES) {
-            discoverPodcastAttribution.consume(podcastUuid)?.let { attribution ->
-                attribution.listId?.let { listId ->
-                    eventHorizon.track(DiscoverListPodcastSubscribedEvent(listId = listId, podcastUuid = podcastUuid, listDatetime = attribution.listDatetime))
-                }
-                if (attribution.isFeatured) {
-                    eventHorizon.track(DiscoverFeaturedPodcastSubscribedEvent(podcastUuid = podcastUuid))
-                }
+        discoverAttribution?.let { attribution ->
+            attribution.listId?.let { listId ->
+                eventHorizon.track(DiscoverListPodcastSubscribedEvent(listId = listId, podcastUuid = podcastUuid, listDatetime = attribution.listDatetime))
+            }
+            if (attribution.isFeatured) {
+                eventHorizon.track(DiscoverFeaturedPodcastSubscribedEvent(podcastUuid = podcastUuid))
             }
         }
     }
@@ -197,7 +202,7 @@ class TvPodcastDetailsViewModel @AssistedInject constructor(
 
     @AssistedFactory
     interface Factory {
-        fun create(podcastUuid: String, source: SourceView): TvPodcastDetailsViewModel
+        fun create(podcastUuid: String): TvPodcastDetailsViewModel
     }
 
     private companion object {

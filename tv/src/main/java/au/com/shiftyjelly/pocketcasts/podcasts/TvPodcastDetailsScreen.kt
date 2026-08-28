@@ -85,7 +85,7 @@ fun TvPodcastDetailsScreen(
     modifier: Modifier = Modifier,
     viewModel: TvPodcastDetailsViewModel = hiltViewModel<TvPodcastDetailsViewModel, TvPodcastDetailsViewModel.Factory>(
         key = podcastUuid,
-        creationCallback = { factory -> factory.create(podcastUuid, source) },
+        creationCallback = { factory -> factory.create(podcastUuid) },
     ),
     episodeActions: TvEpisodeActions = hiltViewModel<TvEpisodeActionsViewModel>(),
 ) {
@@ -93,7 +93,7 @@ fun TvPodcastDetailsScreen(
     val openNowPlaying = LocalOpenNowPlaying.current
 
     CallOnce {
-        viewModel.trackScreenShown()
+        viewModel.onScreenOpened(source)
     }
 
     LaunchedEffect(uiState, onClose) {

@@ -381,7 +381,8 @@ class TvPodcastDetailsViewModelTest {
     @Test
     fun `following a podcast opened from discover fires the list and featured subscribed events`() = runTest {
         discoverPodcastAttribution.record("podcast-uuid", listId = "list-1", listDatetime = "2026-08-28", isFeatured = true)
-        val viewModel = createViewModel(source = SourceView.DISCOVER)
+        val viewModel = createViewModel()
+        viewModel.onScreenOpened(SourceView.DISCOVER)
 
         viewModel.uiState.test {
             assertEquals(TvPodcastDetailsUiState.Loading, awaitItem())
@@ -400,7 +401,8 @@ class TvPodcastDetailsViewModelTest {
     @Test
     fun `following a library opened podcast does not fire discover subscribed events`() = runTest {
         discoverPodcastAttribution.record("podcast-uuid", listId = "list-1", listDatetime = null, isFeatured = false)
-        val viewModel = createViewModel(source = SourceView.PODCAST_LIST)
+        val viewModel = createViewModel()
+        viewModel.onScreenOpened(SourceView.PODCAST_LIST)
 
         viewModel.uiState.test {
             assertEquals(TvPodcastDetailsUiState.Loading, awaitItem())
@@ -441,10 +443,10 @@ class TvPodcastDetailsViewModelTest {
     }
 
     @Test
-    fun `showing the screen tracks the podcast screen shown event with its source`() = runTest {
-        val viewModel = createViewModel(source = SourceView.DISCOVER)
+    fun `opening the screen tracks the podcast screen shown event with its source`() = runTest {
+        val viewModel = createViewModel()
 
-        viewModel.trackScreenShown()
+        viewModel.onScreenOpened(SourceView.DISCOVER)
 
         verify(eventHorizon).track(PodcastScreenShownEvent(source = SourceView.DISCOVER.analyticsValue))
     }
@@ -469,10 +471,8 @@ class TvPodcastDetailsViewModelTest {
     private fun createViewModel(
         prefs: TvPreferences = preferences,
         podcastManager: PodcastManager = this.podcastManager,
-        source: SourceView = SourceView.PODCAST_SCREEN,
     ) = TvPodcastDetailsViewModel(
         podcastUuid = "podcast-uuid",
-        source = source,
         podcastManager = podcastManager,
         episodeManager = episodeManager,
         syncManager = syncManager,

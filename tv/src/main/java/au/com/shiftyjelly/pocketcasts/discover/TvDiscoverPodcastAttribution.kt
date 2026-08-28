@@ -25,4 +25,9 @@ class TvDiscoverPodcastAttribution @Inject constructor() {
 
     @Synchronized
     fun consume(podcastUuid: String): Attribution? = attributions.remove(podcastUuid)
+
+    @Synchronized
+    fun clear(podcastUuid: String) {
+        attributions.remove(podcastUuid)
+    }
 }
