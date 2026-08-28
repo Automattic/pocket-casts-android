@@ -16,6 +16,7 @@ class TvEpisodeActionTypeTest {
             TvEpisodeActionContext.Playlist to (SourceView.FILTERS to EpisodeViewSourceType.Filters),
             TvEpisodeActionContext.UpNext to (SourceView.UP_NEXT to EpisodeViewSourceType.UpNext),
             TvEpisodeActionContext.NowPlaying to (SourceView.PLAYER to EpisodeViewSourceType.NowPlaying),
+            TvEpisodeActionContext.Starred to (SourceView.STARRED to EpisodeViewSourceType.Starred),
         )
 
         assertEquals(TvEpisodeActionContext.entries.toSet(), expected.keys)
