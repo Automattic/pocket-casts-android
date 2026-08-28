@@ -45,6 +45,8 @@ class TvApplication :
 
     @Inject lateinit var userManager: UserManager
 
+    @Inject lateinit var appLifecycleObserver: TvAppLifecycleObserver
+
     private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     override fun onCreate() {
@@ -56,6 +58,7 @@ class TvApplication :
         setupFeatureFlags()
         setupAnalytics()
         notificationHelper.setupNotificationChannels()
+        appLifecycleObserver.setup()
         PlaybackServiceToggle.ensureCorrectServiceEnabled(this)
         // setup() subscribes the Up Next queue's sync pipeline itself, so there must be no
         // separate UpNextQueue.setupBlocking() call on TV.
