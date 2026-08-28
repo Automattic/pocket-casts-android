@@ -8,7 +8,7 @@ import au.com.shiftyjelly.pocketcasts.crashlogging.InitializeRemoteLogging
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackServiceToggle
-import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.utils.ChainedExceptionHandler
 import au.com.shiftyjelly.pocketcasts.utils.TimberDebugTree
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
@@ -49,7 +49,7 @@ class TvApplication :
 
     @Inject lateinit var analyticsController: AnalyticsController
 
-    @Inject lateinit var userManager: UserManager
+    @Inject lateinit var syncManager: SyncManager
 
     @Inject lateinit var appLifecycleObserver: TvAppLifecycleObserver
 
@@ -93,7 +93,7 @@ class TvApplication :
         analyticsController.clearAllData()
         analyticsController.refreshMetadata()
         applicationScope.launch {
-            userManager.getSignInState().toObservable().asFlow()
+            syncManager.isLoggedInObservable.asFlow()
                 .distinctUntilChanged()
                 .collect { analyticsController.refreshMetadata() }
         }
