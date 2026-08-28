@@ -128,8 +128,10 @@ fun TvScaffold(
 
             TvDetailOverlay(
                 target = if (isStarredVisible) Unit else null,
-                onBack = { isStarredVisible = false },
-                onHide = focusTopBar,
+                onBack = {
+                    isStarredVisible = false
+                    focusTopBar()
+                },
             ) {
                 TvStarredScreen()
             }

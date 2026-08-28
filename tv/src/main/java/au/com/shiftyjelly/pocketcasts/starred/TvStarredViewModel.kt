@@ -34,7 +34,7 @@ class TvStarredViewModel @Inject constructor(
     private val eventHorizon: EventHorizon,
 ) : ViewModel() {
 
-    val uiState: StateFlow<TvStarredUiState> = episodeManager.findStarredEpisodesFlow()
+    val uiState: StateFlow<TvStarredUiState> = episodeManager.findStarredEpisodesFlow(limit = STARRED_EPISODE_LIMIT)
         .map { episodes ->
             if (episodes.isEmpty()) {
                 TvStarredUiState.Empty
@@ -68,6 +68,8 @@ class TvStarredViewModel @Inject constructor(
         }
     }
 }
+
+private const val STARRED_EPISODE_LIMIT = 1000
 
 sealed interface TvStarredUiState {
     data object Loading : TvStarredUiState

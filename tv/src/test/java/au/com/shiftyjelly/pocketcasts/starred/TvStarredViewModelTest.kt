@@ -17,6 +17,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
@@ -30,7 +31,7 @@ class TvStarredViewModelTest {
 
     private val starredEpisodes = MutableSharedFlow<List<PodcastEpisode>>(replay = 1)
     private val episodeManager = mock<EpisodeManager> {
-        on { findStarredEpisodesFlow() } doReturn starredEpisodes
+        on { findStarredEpisodesFlow(any()) } doReturn starredEpisodes
     }
     private val syncManager = mock<SyncManager>()
     private val context = mock<Context>()
