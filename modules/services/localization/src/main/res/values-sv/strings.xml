@@ -1,11 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-08-11 13:56:43+0000
+Translation-Revision-Date: 2026-08-28 10:10:11+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="tv_starred_empty_title">Inga stjärnmärkta avsnitt</string>
+    <string name="tv_account_signed_out_alert_title">Du har loggats ut.</string>
+    <string name="tv_search_prompt">Podcasts, shower, författare</string>
+    <string name="tv_banner_discover_more_title">Du har inte sett hälften än.</string>
+    <string name="tv_banner_discover_more_subtitle">Din nästa favorit finns här någonstans.</string>
+    <string name="tv_banner_discover_more_action_title">Upptäck fler program</string>
+    <string name="tv_sponsored_podcast_section_title">Pocket Casts rekommenderar</string>
+    <string name="tv_banner_create_account_title">Ett konto. Alla skärmar</string>
+    <string name="tv_banner_create_account_subtitle">Dina följningar och ditt förlopp exakt där du lämnade dem</string>
+    <string name="tv_banner_create_account_action_title">Skapa ett gratis konto</string>
     <string name="tv_playlist_play_all_save_and_play">Spara och spela</string>
     <string name="tv_playlist_play_all_play_without_saving">Spela upp utan att spara</string>
     <string name="tv_episode_removed_from_up_next">Borttagen från Nästa</string>
@@ -30,7 +40,6 @@ Language: sv_SE
     <string name="tv_podcast_info_website">Webbplats</string>
     <string name="tv_podcast_info_network">Nätverk</string>
     <string name="tv_create_account_modal_step_create">Skapa ditt konto eller logga in</string>
-    <string name="tv_sign_in_step_confirm_code">Om du blir tillfrågad, bekräfta med koden nedan</string>
     <string name="tv_sign_in_step_login">Logga in med ditt konto.</string>
     <string name="tv_sign_in_step_scan">Skanna QR-koden eller gå till %1$s</string>
     <string name="tv_podcast_more_info">Mer information</string>
@@ -73,17 +82,12 @@ Language: sv_SE
     <string name="bookmark_play_from">Spela upp från %s</string>
     <string name="summary_upsell_description">Prenumerera på Plus för att få åtkomst till den och andra Premium-funktioner som bokmärken och mappar.</string>
     <string name="summary_upsell_title">AI-drivna sammanfattningar</string>
-    <string name="tv_create_account_subtitle">Skanna denna kod för att komma igång på din telefon, det tar bara en minut.</string>
-    <string name="tv_create_account_come_back">Kom tillbaka och logga in när du har skapat ditt konto</string>
     <string name="tv_create_account_title">Skapa ditt gratis konto</string>
-    <string name="tv_onboarding_syncing_subtitle">Dina podcasts synkroniseras, vi loggar in dig snart!</string>
-    <string name="tv_onboarding_welcome_back">Välkommen tillbaka!</string>
     <string name="tv_onboarding_sign_in_instructions">Öppna kameran och peka på denna QR-kod</string>
     <string name="tv_onboarding_sign_in_title">Logga in med din telefon</string>
     <string name="tv_onboarding_syncing">Synkroniserar dina podcasts\u2026</string>
     <string name="tv_onboarding_browse_without_account">Bläddra utan ett konto</string>
     <string name="tv_onboarding_create_free_account">Skapa gratis konto</string>
-    <string name="tv_onboarding_subtitle">Dina podcasts på den stora skärmen</string>
     <string name="tv_onboarding_welcome_tv">Välkommen till Pocket Casts TV</string>
     <string name="tv_onboarding_welcome">Välkommen till Pocket Casts</string>
     <string name="sort_longest_to_shortest">Längsta till kortaste</string>

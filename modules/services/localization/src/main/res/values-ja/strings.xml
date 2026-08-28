@@ -1,11 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-08-12 09:57:16+0000
+Translation-Revision-Date: 2026-08-28 10:10:11+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="tv_starred_empty_title">星付きエピソードなし</string>
+    <string name="tv_account_signed_out_alert_title">ログアウトしました。</string>
+    <string name="tv_search_prompt">ポッドキャスト、番組、作成者</string>
+    <string name="tv_banner_discover_more_title">まだ半分も見ていませんよ。</string>
+    <string name="tv_banner_discover_more_subtitle">こちらで次のお気に入りを見つけましょう。</string>
+    <string name="tv_banner_discover_more_action_title">番組をもっと見る</string>
+    <string name="tv_sponsored_podcast_section_title">Pocket Casts のおすすめ</string>
+    <string name="tv_banner_create_account_title">1つのアカウント。 すべての画面</string>
+    <string name="tv_banner_create_account_subtitle">お気に入りの番組も、再生した内容も、中断したまさにその場所から</string>
+    <string name="tv_banner_create_account_action_title">無料アカウントを作成</string>
     <string name="tv_playlist_play_all_save_and_play">保存して再生</string>
     <string name="tv_playlist_play_all_play_without_saving">保存せずに再生</string>
     <string name="tv_episode_removed_from_up_next">次のエピソードから削除しました</string>
@@ -30,7 +40,6 @@ Language: ja_JP
     <string name="tv_podcast_info_website">サイト</string>
     <string name="tv_podcast_info_network">ネットワーク</string>
     <string name="tv_create_account_modal_step_create">アカウントを作成、またはログイン</string>
-    <string name="tv_sign_in_step_confirm_code">尋ねられた場合は、以下のコードで確認してください</string>
     <string name="tv_sign_in_step_login">アカウントにログイン</string>
     <string name="tv_sign_in_step_scan">QR コードをスキャン、または %1$s に移動</string>
     <string name="tv_podcast_more_info">詳細情報</string>
@@ -73,17 +82,12 @@ Language: ja_JP
     <string name="bookmark_play_from">%s から再生</string>
     <string name="summary_upsell_description">Plus サブスクリプションに登録すると、Plus にアクセスし、ブックマークやフォルダーなどのその他のプレミアム機能もご利用いただけます。</string>
     <string name="summary_upsell_title">AI を活用した概要</string>
-    <string name="tv_create_account_subtitle">このコードをスキャンして、スマートフォンで開始できます。わずか1分で完了します。</string>
-    <string name="tv_create_account_come_back">アカウントを作成したら、こちらに戻ってログインしてください</string>
     <string name="tv_create_account_title">無料アカウントを作成</string>
-    <string name="tv_onboarding_syncing_subtitle">ポッドキャストを同期しています。間もなくログインします。</string>
-    <string name="tv_onboarding_welcome_back">おかえりなさい。</string>
     <string name="tv_onboarding_sign_in_instructions">カメラを開き、この QR コードに向けます</string>
     <string name="tv_onboarding_sign_in_title">スマートフォンでログイン</string>
     <string name="tv_onboarding_syncing">ポッドキャストを同期しています\u2026</string>
     <string name="tv_onboarding_browse_without_account">アカウントなしで閲覧</string>
     <string name="tv_onboarding_create_free_account">無料アカウントを作成</string>
-    <string name="tv_onboarding_subtitle">ポッドキャストを大画面で</string>
     <string name="tv_onboarding_welcome_tv">Pocket Casts TV へようこそ</string>
     <string name="tv_onboarding_welcome">Pocket Casts へようこそ</string>
     <string name="sort_longest_to_shortest">長い順</string>
