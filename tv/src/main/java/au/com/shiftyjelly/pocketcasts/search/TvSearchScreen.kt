@@ -290,10 +290,6 @@ private fun TvSearchContent(
     var isEditing by remember { mutableStateOf(false) }
     var suggestionsFocused by remember { mutableStateOf(false) }
     val showSuggestions = (isEditing || suggestionsFocused) && suggestions.isNotEmpty()
-    LaunchedEffect(Unit) {
-        withFrameNanos {}
-        runCatching { searchFieldFocusRequester.requestFocus() }
-    }
     Column(modifier = modifier.fillMaxSize()) {
         Column(modifier = Modifier.padding(ContentPadding)) {
             Spacer(modifier = Modifier.height(40.dp))
