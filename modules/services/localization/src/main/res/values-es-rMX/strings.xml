@@ -1,11 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-08-11 11:57:44+0000
+Translation-Revision-Date: 2026-08-28 10:10:11+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: es
 -->
 <resources>
+    <string name="tv_starred_empty_title">No hay episodios destacados</string>
+    <string name="tv_account_signed_out_alert_title">Te has desconectado.</string>
+    <string name="tv_search_prompt">Podcasts, programas y autores</string>
+    <string name="tv_banner_discover_more_title">No has visto ni la mitad.</string>
+    <string name="tv_banner_discover_more_subtitle">Tu próxima obsesión está aquí en algún lugar.</string>
+    <string name="tv_banner_discover_more_action_title">Descubrir más series</string>
+    <string name="tv_sponsored_podcast_section_title">Recomendaciones de Pocket Casts</string>
+    <string name="tv_banner_create_account_title">Una cuenta. Todas las pantallas</string>
+    <string name="tv_banner_create_account_subtitle">Tus seguimientos y progresos exactamente donde los dejaste</string>
+    <string name="tv_banner_create_account_action_title">Crear una cuenta gratuita</string>
     <string name="tv_playlist_play_all_save_and_play">Guardar y reproducir</string>
     <string name="tv_playlist_play_all_play_without_saving">Reproducir sin guardar</string>
     <string name="tv_episode_removed_from_up_next">Eliminado de \"A continuación\"</string>
@@ -30,7 +40,6 @@ Language: es
     <string name="tv_podcast_info_website">Web</string>
     <string name="tv_podcast_info_network">Red</string>
     <string name="tv_create_account_modal_step_create">Crea tu cuenta o accede</string>
-    <string name="tv_sign_in_step_confirm_code">Si se te pide, confirma con el siguiente código</string>
     <string name="tv_sign_in_step_login">Accede a tu cuenta</string>
     <string name="tv_sign_in_step_scan">Escanea el código QR o ve a %1$s</string>
     <string name="tv_podcast_more_info">Más información</string>
@@ -73,17 +82,12 @@ Language: es
     <string name="bookmark_play_from">Reproducir desde %s</string>
     <string name="summary_upsell_description">Suscríbete a Plus para acceder a ella y a otras funciones Premium, como los marcadores y las carpetas.</string>
     <string name="summary_upsell_title">Resúmenes con tecnología de IA</string>
-    <string name="tv_create_account_subtitle">Escanea este código para empezar en tu teléfono, solo tardarás un minuto.</string>
-    <string name="tv_create_account_come_back">Cuando hayas creado tu cuenta, vuelve y accede.</string>
     <string name="tv_create_account_title">Crea tu cuenta gratuita</string>
-    <string name="tv_onboarding_syncing_subtitle">Tus podcasts se están sincronizando, iniciaremos sesión en breve.</string>
-    <string name="tv_onboarding_welcome_back">¡Te damos la bienvenida de nuevo!</string>
     <string name="tv_onboarding_sign_in_instructions">Abre la cámara y señala este código QR</string>
     <string name="tv_onboarding_sign_in_title">Inicia sesión con tu teléfono</string>
     <string name="tv_onboarding_syncing">Sincronizando tus podcasts\u2026</string>
     <string name="tv_onboarding_browse_without_account">Navegar sin una cuenta</string>
     <string name="tv_onboarding_create_free_account">Crear cuenta gratuita</string>
-    <string name="tv_onboarding_subtitle">Tus podcasts en pantalla grande</string>
     <string name="tv_onboarding_welcome_tv">Te damos la bienvenida a Pocket Casts TV</string>
     <string name="tv_onboarding_welcome">Te damos la bienvenida a Pocket Casts</string>
     <string name="sort_longest_to_shortest">De más largos a más cortos</string>
