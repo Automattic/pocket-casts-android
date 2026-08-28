@@ -141,8 +141,10 @@ fun TvScaffold(
 
             TvDetailOverlay(
                 target = if (isListeningHistoryVisible) Unit else null,
-                onBack = { isListeningHistoryVisible = false },
-                onHide = focusTopBar,
+                onBack = {
+                    isListeningHistoryVisible = false
+                    focusTopBar()
+                },
             ) {
                 TvListeningHistoryScreen()
             }
