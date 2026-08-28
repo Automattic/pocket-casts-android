@@ -15,6 +15,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.model.AuthResultModel
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.DeviceAuthorizeResponse
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.PodcastScreenShownEvent
 import com.jakewharton.rxrelay2.BehaviorRelay
 import io.reactivex.Single
 import java.util.Date
@@ -59,6 +61,7 @@ class TvPodcastDetailsViewModelTest {
     private val syncManager = mock<SyncManager> {
         on { isLoggedInObservable } doReturn loggedIn
     }
+    private val eventHorizon = mock<EventHorizon>()
 
     @Test
     fun `archived episodes are hidden by default`() = runTest {
@@ -298,6 +301,15 @@ class TvPodcastDetailsViewModelTest {
         verify(podcastManager).refreshPodcastsAfterSignIn()
     }
 
+    @Test
+    fun `showing the screen tracks the podcast screen shown event with its source`() = runTest {
+        val viewModel = createViewModel(source = SourceView.DISCOVER)
+
+        viewModel.trackScreenShown()
+
+        verify(eventHorizon).track(PodcastScreenShownEvent(source = SourceView.DISCOVER.analyticsValue))
+    }
+
     private fun deviceAuthorizeResponse() = DeviceAuthorizeResponse(
         deviceCode = "device-code",
         userCode = "ABC123",
@@ -318,12 +330,15 @@ class TvPodcastDetailsViewModelTest {
     private fun createViewModel(
         prefs: TvPreferences = preferences,
         podcastManager: PodcastManager = this.podcastManager,
+        source: SourceView = SourceView.PODCAST_SCREEN,
     ) = TvPodcastDetailsViewModel(
         podcastUuid = "podcast-uuid",
+        source = source,
         podcastManager = podcastManager,
         episodeManager = episodeManager,
         syncManager = syncManager,
         preferences = prefs,
+        eventHorizon = eventHorizon,
         defaultDispatcher = coroutineRule.testDispatcher,
         ioDispatcher = coroutineRule.testDispatcher,
     )

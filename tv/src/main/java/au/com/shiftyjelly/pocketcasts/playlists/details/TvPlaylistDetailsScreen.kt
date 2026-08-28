@@ -39,6 +39,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.Button
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.component.LocalOpenNowPlaying
 import au.com.shiftyjelly.pocketcasts.component.LocalTvToastHostState
 import au.com.shiftyjelly.pocketcasts.component.TvArchivedFilterButton
@@ -120,6 +121,7 @@ fun TvPlaylistDetailsScreen(
         BackHandler { openedPodcastUuid = null }
         TvPodcastDetailsScreen(
             podcastUuid = podcastUuid,
+            source = SourceView.FILTERS,
             onClose = { openedPodcastUuid = null },
             modifier = modifier,
         )

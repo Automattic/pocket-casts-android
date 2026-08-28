@@ -33,6 +33,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.component.LocalOpenNowPlaying
 import au.com.shiftyjelly.pocketcasts.component.TvEmptyState
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeActionContext
@@ -69,6 +70,7 @@ fun TvStarredScreen(
         BackHandler { openedPodcastUuid = null }
         TvPodcastDetailsScreen(
             podcastUuid = podcastUuid,
+            source = SourceView.STARRED,
             onClose = { openedPodcastUuid = null },
             modifier = modifier,
         )

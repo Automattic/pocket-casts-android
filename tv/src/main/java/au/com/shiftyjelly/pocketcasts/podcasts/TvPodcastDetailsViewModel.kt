@@ -15,6 +15,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.PodcastScreenShownEvent
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -46,10 +48,12 @@ import kotlinx.coroutines.rx2.await
 @HiltViewModel(assistedFactory = TvPodcastDetailsViewModel.Factory::class)
 class TvPodcastDetailsViewModel @AssistedInject constructor(
     @Assisted private val podcastUuid: String,
+    @Assisted private val source: SourceView,
     private val podcastManager: PodcastManager,
     private val episodeManager: EpisodeManager,
     private val syncManager: SyncManager,
     private val preferences: TvPreferences,
+    private val eventHorizon: EventHorizon,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
@@ -95,6 +99,10 @@ class TvPodcastDetailsViewModel @AssistedInject constructor(
             SharingStarted.WhileSubscribed(stopTimeout = 300.milliseconds, replayExpiration = Duration.ZERO),
             TvPodcastDetailsUiState.Loading,
         )
+
+    fun trackScreenShown() {
+        eventHorizon.track(PodcastScreenShownEvent(source = source.analyticsValue))
+    }
 
     fun startAccountAuth() {
         accountAuthJob?.cancel()
@@ -153,7 +161,7 @@ class TvPodcastDetailsViewModel @AssistedInject constructor(
 
     @AssistedFactory
     interface Factory {
-        fun create(podcastUuid: String): TvPodcastDetailsViewModel
+        fun create(podcastUuid: String, source: SourceView): TvPodcastDetailsViewModel
     }
 }
 
