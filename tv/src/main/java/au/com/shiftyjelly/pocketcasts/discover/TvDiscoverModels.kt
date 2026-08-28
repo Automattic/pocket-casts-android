@@ -11,6 +11,8 @@ sealed interface TvDiscoverRow {
         override val id: String,
         override val title: String,
         val podcasts: List<TvDiscoverPodcast>,
+        val listId: String? = null,
+        val listDatetime: String? = null,
     ) : TvDiscoverRow
 
     data class Categories(
@@ -29,18 +31,24 @@ sealed interface TvDiscoverRow {
         override val id: String,
         override val title: String,
         val podcasts: List<TvDiscoverPodcast>,
+        val listId: String? = null,
+        val listDatetime: String? = null,
     ) : TvDiscoverRow
 
     data class Podcasts(
         override val id: String,
         override val title: String,
         val podcasts: List<TvDiscoverPodcast>,
+        val listId: String? = null,
+        val listDatetime: String? = null,
     ) : TvDiscoverRow
 
     data class Episodes(
         override val id: String,
         override val title: String,
         val episodes: List<TvDiscoverEpisode>,
+        val listId: String? = null,
+        val listDatetime: String? = null,
     ) : TvDiscoverRow
 }
 

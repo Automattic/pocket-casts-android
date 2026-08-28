@@ -27,6 +27,9 @@ open class TokenErrorNotification @Inject constructor(
     private var lastSignInErrorNotification: Long? = null
 
     fun show(intent: Intent) {
+        if (Util.isTv(context)) {
+            return
+        }
         onShowSignInErrorNotificationDebounced {
             eventHorizon.track(SignedOutAlertShownEvent)
         }

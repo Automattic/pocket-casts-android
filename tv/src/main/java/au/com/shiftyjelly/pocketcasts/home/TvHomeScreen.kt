@@ -101,6 +101,7 @@ fun TvHomeScreen(
                 viewModel.trackDiscoverEpisodePlayed(row, episode)
                 viewModel.playEpisode(episode)
             },
+            onPlayLatestEpisode = viewModel::playLatestEpisode,
             onEpisodePodcastClick = { row, episode ->
                 viewModel.trackDiscoverEpisodePodcastTapped(row, episode)
                 openedPodcastUuid = episode.podcastUuid
@@ -110,6 +111,7 @@ fun TvHomeScreen(
                 openedCategory = TvOpenedCategory(category.id, category.name, category.source)
             },
             onListImpression = viewModel::trackDiscoverListShown,
+            loadCategoryCovers = viewModel::categoryCoverUrls,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(top = TvTopBarHeight)
@@ -153,9 +155,11 @@ private fun TvHomeContent(
     onTapBanner: (TvDiscoverBanner) -> Unit = {},
     onPodcastClick: (TvDiscoverRow, TvDiscoverPodcast) -> Unit = { _, _ -> },
     onEpisodePlay: (TvDiscoverRow, TvDiscoverEpisode) -> Unit = { _, _ -> },
+    onPlayLatestEpisode: (TvDiscoverRow, TvDiscoverPodcast) -> Unit = { _, _ -> },
     onEpisodePodcastClick: (TvDiscoverRow, TvDiscoverEpisode) -> Unit = { _, _ -> },
     onCategoryClick: (DiscoverCategory, Int) -> Unit = { _, _ -> },
     onListImpression: (TvDiscoverRow) -> Unit = {},
+    loadCategoryCovers: (suspend (DiscoverCategory) -> List<String>)? = null,
     restoreFocusTrigger: Int = 0,
 ) {
     when (uiState) {
@@ -171,9 +175,11 @@ private fun TvHomeContent(
                 onTapBanner = onTapBanner,
                 onPodcastClick = onPodcastClick,
                 onEpisodePlay = onEpisodePlay,
+                onPlayLatestEpisode = onPlayLatestEpisode,
                 onEpisodePodcastClick = onEpisodePodcastClick,
                 onCategoryClick = onCategoryClick,
                 onListImpression = onListImpression,
+                loadCategoryCovers = loadCategoryCovers,
                 modifier = modifier,
                 restoreFocusTrigger = restoreFocusTrigger,
             )
@@ -211,9 +217,11 @@ private fun TvHomeRows(
     onTapBanner: (TvDiscoverBanner) -> Unit = {},
     onPodcastClick: (TvDiscoverRow, TvDiscoverPodcast) -> Unit = { _, _ -> },
     onEpisodePlay: (TvDiscoverRow, TvDiscoverEpisode) -> Unit = { _, _ -> },
+    onPlayLatestEpisode: (TvDiscoverRow, TvDiscoverPodcast) -> Unit = { _, _ -> },
     onEpisodePodcastClick: (TvDiscoverRow, TvDiscoverEpisode) -> Unit = { _, _ -> },
     onCategoryClick: (DiscoverCategory, Int) -> Unit = { _, _ -> },
     onListImpression: (TvDiscoverRow) -> Unit = {},
+    loadCategoryCovers: (suspend (DiscoverCategory) -> List<String>)? = null,
     restoreFocusTrigger: Int = 0,
 ) {
     var lastFocusedRowIndex by rememberSaveable(rows.size) { mutableIntStateOf(0) }
@@ -248,10 +256,12 @@ private fun TvHomeRows(
                 onEpisodePlay = onEpisodePlay,
                 onEpisodePodcastClick = onEpisodePodcastClick,
                 onCategoryClick = onCategoryClick,
+                onPlayLatestEpisode = onPlayLatestEpisode,
                 modifier = rowModifier,
                 focusRequester = rowFocusRequester,
                 onTapBanner = onTapBanner,
                 onListImpression = onListImpression,
+                loadCategoryCovers = loadCategoryCovers,
             )
         }
 

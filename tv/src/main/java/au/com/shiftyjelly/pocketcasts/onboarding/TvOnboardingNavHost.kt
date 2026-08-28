@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,6 +19,7 @@ import au.com.shiftyjelly.pocketcasts.component.TvToastHost
 import au.com.shiftyjelly.pocketcasts.component.TvToastHostState
 import au.com.shiftyjelly.pocketcasts.home.TvScaffold
 import au.com.shiftyjelly.pocketcasts.onboarding.createaccount.TvCreateAccountScreen
+import au.com.shiftyjelly.pocketcasts.onboarding.signedout.TvSignedOutScreen
 import au.com.shiftyjelly.pocketcasts.onboarding.signin.TvSignInScreen
 import au.com.shiftyjelly.pocketcasts.onboarding.signin.TvSyncingScreen
 import au.com.shiftyjelly.pocketcasts.onboarding.welcome.TvWelcomeScreen
@@ -28,6 +30,23 @@ fun TvOnboardingNavHost(
     viewModel: TvOnboardingViewModel = hiltViewModel(),
 ) {
     val navController = rememberNavController()
+    val navigateClearingBackStack: (String) -> Unit = { route ->
+        navController.navigate(route) {
+            popUpTo(navController.graph.id) { inclusive = true }
+        }
+    }
+    LaunchedEffect(Unit) {
+        if (viewModel.startDestination == TvOnboardingRoutes.HOME) {
+            viewModel.refreshOnLaunch()
+        }
+    }
+    LaunchedEffect(Unit) {
+        viewModel.onServerSignOut.collect {
+            if (navController.currentDestination?.route != TvOnboardingRoutes.SIGNED_OUT) {
+                navigateClearingBackStack(TvOnboardingRoutes.SIGNED_OUT)
+            }
+        }
+    }
     val toastHostState = remember { TvToastHostState() }
     CompositionLocalProvider(LocalTvToastHostState provides toastHostState) {
         Box(modifier = modifier.fillMaxSize()) {
@@ -41,7 +60,6 @@ fun TvOnboardingNavHost(
                         onSignIn = { navController.navigate(TvOnboardingRoutes.SIGN_IN) },
                         onCreateAccount = { navController.navigate(TvOnboardingRoutes.CREATE_ACCOUNT) },
                         onContinueWithoutAccount = {
-                            viewModel.completeOnboarding()
                             navController.navigate(TvOnboardingRoutes.HOME) {
                                 popUpTo(TvOnboardingRoutes.LANDING) { inclusive = true }
                             }
@@ -50,32 +68,33 @@ fun TvOnboardingNavHost(
                 }
                 composable(TvOnboardingRoutes.CREATE_ACCOUNT) {
                     TvCreateAccountScreen(
-                        onSignIn = { navController.navigate(TvOnboardingRoutes.SIGN_IN) },
+                        onCreateAccountComplete = { navigateClearingBackStack(TvOnboardingRoutes.SYNCING) },
                     )
                 }
                 composable(TvOnboardingRoutes.SIGN_IN) {
                     TvSignInScreen(
-                        onSignInComplete = {
-                            navController.navigate(TvOnboardingRoutes.SYNCING) {
-                                popUpTo(navController.graph.id) { inclusive = true }
-                            }
-                        },
+                        onSignInComplete = { navigateClearingBackStack(TvOnboardingRoutes.SYNCING) },
                     )
                 }
                 composable(TvOnboardingRoutes.SYNCING) {
                     TvSyncingScreen(
                         onSyncComplete = {
-                            viewModel.completeOnboarding()
                             navController.navigate(TvOnboardingRoutes.HOME) {
                                 popUpTo(TvOnboardingRoutes.SYNCING) { inclusive = true }
                             }
                         },
                     )
                 }
+                composable(TvOnboardingRoutes.SIGNED_OUT) {
+                    TvSignedOutScreen(
+                        onLogIn = { navigateClearingBackStack(TvOnboardingRoutes.LANDING) },
+                    )
+                }
                 composable(TvOnboardingRoutes.HOME) {
                     TvScaffold(
                         onLogIn = { navController.navigate(TvOnboardingRoutes.SIGN_IN) },
                         onCreateAccount = { navController.navigate(TvOnboardingRoutes.CREATE_ACCOUNT) },
+                        onSignedOut = { navigateClearingBackStack(TvOnboardingRoutes.LANDING) },
                     )
                 }
             }

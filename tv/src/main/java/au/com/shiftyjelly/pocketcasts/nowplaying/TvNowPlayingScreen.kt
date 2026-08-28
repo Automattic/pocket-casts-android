@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -98,6 +99,17 @@ fun TvNowPlayingScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var openedPodcastUuid by rememberSaveable { mutableStateOf<String?>(null) }
     val currentOnConsumeOpenRequest by rememberUpdatedState(onConsumeOpenRequest)
+
+    // Keep this above the podcast-details early return, so opening a podcast from the player
+    // does not re-fire shown/dismissed on the way back.
+    if (uiState is TvNowPlayingUiState.Loaded) {
+        DisposableEffect(Unit) {
+            viewModel.trackPlayerShown()
+            onDispose {
+                viewModel.trackPlayerDismissed()
+            }
+        }
+    }
 
     val podcastUuid = openedPodcastUuid.takeUnless { isOpenRequested }
     if (podcastUuid != null) {
@@ -356,6 +368,7 @@ private fun TvNowPlayingContent(
         if (isDetailsModalVisible) {
             TvEpisodeInfoModal(
                 episode = episode,
+                actionContext = TvEpisodeActionContext.NowPlaying,
                 onDismissRequest = { isDetailsModalVisible = false },
             )
         }

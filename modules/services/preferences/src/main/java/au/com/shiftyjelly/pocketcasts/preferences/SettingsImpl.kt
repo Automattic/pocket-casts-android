@@ -1078,6 +1078,7 @@ class SettingsImpl @Inject constructor(
 
             AppPlatform.Phone,
             AppPlatform.WearOs,
+            AppPlatform.Tv,
             -> false
         },
         sharedPrefs = sharedPreferences,
@@ -1705,9 +1706,11 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override val showFreeAccountEncouragement = UserSetting.BoolPref(
-        sharedPrefKey = "show_free_account_encouragement",
-        defaultValue = true,
+    override val freeAccountEncouragementLastShown = UserSetting.PrefFromString<Instant?>(
+        sharedPrefKey = "free_account_encouragement_last_shown",
+        defaultValue = null,
+        fromString = { value -> runCatching { Instant.parse(value) }.getOrNull() },
+        toString = { value -> value.toString() },
         sharedPrefs = sharedPreferences,
     )
 

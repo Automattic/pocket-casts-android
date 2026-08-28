@@ -8,10 +8,18 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationManager
 import au.com.shiftyjelly.pocketcasts.repositories.notification.OnboardingNotificationType
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServiceManager
+import au.com.shiftyjelly.pocketcasts.servers.sync.login.DeviceTokenResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenResponse
 import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.LoginIdentityType
+import com.automattic.eventhorizon.OnboardingFlowType
+import com.automattic.eventhorizon.SignInSourceType
+import com.automattic.eventhorizon.UserAccountCreatedEvent
+import com.automattic.eventhorizon.UserSignedInEvent
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -45,13 +53,14 @@ class SyncManagerImplTest {
     private lateinit var notificationManager: NotificationManager
 
     private lateinit var syncManager: SyncManagerImpl
+    private val eventSink = TestEventSink()
 
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
 
         syncManager = SyncManagerImpl(
-            eventHorizon = EventHorizon(TestEventSink()),
+            eventHorizon = EventHorizon(eventSink),
             context = context,
             settings = settings,
             syncAccountManager = syncAccountManager,
@@ -84,6 +93,46 @@ class SyncManagerImplTest {
         syncManager.loginWithGoogle("google_token", SignInSource.UserInitiated.Onboarding)
         verifyNotificationNotCalled()
     }
+
+    @Test
+    fun `device auth login as new account fires account created event`() = runTest {
+        whenever(syncServiceManager.deviceToken(any(), any())).thenReturn(createDeviceTokenResponse())
+        syncManager.loginWithDeviceAuth("device-code", SignInSource.UserInitiated.Onboarding, isNewAccount = true)
+        assertEquals(
+            UserAccountCreatedEvent(
+                source = LoginIdentityType.QrCode,
+                sourceInCode = SignInSourceType.Onboarding,
+                redirectPath = "none",
+                flow = OnboardingFlowType.Unknown,
+            ),
+            eventSink.pollEvent(),
+        )
+        assertTrue(eventSink.isEmpty())
+        verifyNotificationCalled()
+    }
+
+    @Test
+    fun `device auth login as existing account fires signed in event`() = runTest {
+        whenever(syncServiceManager.deviceToken(any(), any())).thenReturn(createDeviceTokenResponse())
+        syncManager.loginWithDeviceAuth("device-code", SignInSource.UserInitiated.Onboarding, isNewAccount = false)
+        assertEquals(
+            UserSignedInEvent(
+                source = LoginIdentityType.QrCode,
+                sourceInCode = SignInSourceType.Onboarding,
+                redirectPath = "none",
+            ),
+            eventSink.pollEvent(),
+        )
+        assertTrue(eventSink.isEmpty())
+        verifyNotificationNotCalled()
+    }
+
+    private fun createDeviceTokenResponse() = DeviceTokenResponse(
+        accessToken = AccessToken("value"),
+        refreshToken = RefreshToken("value"),
+        email = "test@example.com",
+        uuid = "uuid",
+    )
 
     private fun createMockLoginResponse(isNew: Boolean): LoginTokenResponse {
         return LoginTokenResponse(

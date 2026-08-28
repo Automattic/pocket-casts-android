@@ -622,7 +622,9 @@ interface Settings {
     val isFreeAccountProfileBannerDismissed: UserSetting<Boolean>
     val isFreeAccountFiltersBannerDismissed: UserSetting<Boolean>
     val isFreeAccountHistoryBannerDismissed: UserSetting<Boolean>
-    val showFreeAccountEncouragement: UserSetting<Boolean>
+
+    /** Cadence anchor for the recurring account-encouragement modal; `null` means the clock has never started. */
+    val freeAccountEncouragementLastShown: UserSetting<Instant?>
 
     val showPlaylistsOnboarding: UserSetting<Boolean>
     val saveUpNextAsPlaylist: UserSetting<Boolean>

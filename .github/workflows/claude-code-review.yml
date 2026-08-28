@@ -46,7 +46,7 @@ jobs:
 
       - name: Checkout repository
         if: steps.workflow-changes.outputs.skip != 'true'
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 1
           persist-credentials: false
@@ -54,7 +54,7 @@ jobs:
       - name: Run Claude Code Review
         if: steps.workflow-changes.outputs.skip != 'true'
         id: claude-review
-        uses: anthropics/claude-code-action@6b082c41935b4c8a3b8b0ef85ba4ba4d9eeb8975 # v1.0.189
+        uses: anthropics/claude-code-action@c81e3bc69d1b18badbb63ba39581218f02421678 # v1.0.201
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           track_progress: true
@@ -62,13 +62,61 @@ jobs:
             REPO: ${{ github.repository }}
             PR NUMBER: ${{ github.event.pull_request.number }}
 
-            Please review this pull request with a focus on:
-            - Code quality and best practices
-            - Potential bugs or issues
-            - Security implications
-            - Performance considerations
+            Read AGENTS.md first - it carries this repo's conventions.
 
-            Provide detailed feedback using inline comments for specific issues.
+            Priorities, in order:
+            1. Correctness - bugs reachable from real user flows: wrong logic,
+               unhandled states, races and threading violations, object lifetime
+               and retain issues, leaks.
+            2. Unintended behaviour change - anything the diff changes that the
+               description does not claim to change.
+            3. Security and privacy - untrusted input reaching queries, parsers or
+               the filesystem; secrets or user data in logs.
+            4. Performance - only where the impact is user-visible.
+
+            Comments:
+            - Open a blocking correctness or behaviour-change finding with its
+              user-facing impact in one plain sentence: what breaks, for which
+              user, and when, and then the code mechanism, the problem and the
+              fix.
+            - Keep comments short by default - a few sentences stating the problem
+              and the fix, not the reasoning that led you there. Spend more words
+              only where the finding needs them to be actionable: a subtle race, a
+              non-obvious call path, a concrete repro.
+            - Start a comment with "(nit)" for a trivial suggestion, and
+              "(non-blocking)" for something worth knowing that should not hold up
+              the merge. An unprefixed comment means it blocks.
+            - At most three "(nit)"/"(non-blocking)" comments between them. Blocking
+              findings are uncapped.
+            - Raise a pre-existing issue only if this PR makes it reachable, more
+              likely, or harder to fix later - and say which.
+            - Never comment to confirm code is correct, restate the diff, or praise it.
+            - Never describe a command you did not run or a file you did not read.
+
+            Do not comment on what other CI already checks: formatting and lint, PR
+            hygiene (labels, milestone, description, CHANGELOG presence), or whether
+            tests pass.
+
+            Output:
+            - Inline comments for anything anchored to a line.
+            - One summary comment:
+              - Two to four sentences of verdict. No preamble, no restating the PR.
+              - Then the findings grouped under `### Blocking`, `### Non-blocking`,
+                `### Nits`. Skip a group that is empty; skip the section entirely if
+                there are no findings, leaving the verdict as the whole summary.
+              - One line per finding: `path/to/file:123` followed by a single
+                sentence that leads with the user-facing impact, then the fix -
+                enough to act on without opening the thread. Add the inline
+                comment's URL when you have one.
+              - A finding with no line to anchor to takes the same shape with just
+                the path, or no path when it is repo-wide.
+            - No tables, no re-analysis, no checklist of what you read, no praise.
+
+            If new commits arrived since your last review on this PR:
+            - Review only what changed since then.
+            - Re-raise an earlier finding only if it is still open - one line, linking
+              the existing thread rather than restating it.
+            - If nothing new and nothing open, say so in one sentence and stop.
 
           claude_args: |
             --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr diff:*),Bash(gh pr view:*)"

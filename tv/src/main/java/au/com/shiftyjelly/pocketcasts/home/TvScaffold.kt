@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -28,11 +29,17 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.component.LocalFocusTvTopBar
 import au.com.shiftyjelly.pocketcasts.component.LocalOpenNowPlaying
 import au.com.shiftyjelly.pocketcasts.component.LocalTvTopBarVisibility
+import au.com.shiftyjelly.pocketcasts.component.LocalUseEpisodeArtwork
+import au.com.shiftyjelly.pocketcasts.component.TvDetailOverlay
 import au.com.shiftyjelly.pocketcasts.component.TvTopBarVisibility
+import au.com.shiftyjelly.pocketcasts.component.tvFocusInactiveWhen
+import au.com.shiftyjelly.pocketcasts.history.TvListeningHistoryScreen
 import au.com.shiftyjelly.pocketcasts.nowplaying.TvNowPlayingScreen
 import au.com.shiftyjelly.pocketcasts.playlists.TvPlaylistsScreen
 import au.com.shiftyjelly.pocketcasts.podcasts.TvYourPodcastsScreen
 import au.com.shiftyjelly.pocketcasts.search.TvSearchScreen
+import au.com.shiftyjelly.pocketcasts.settings.TvSettingsModal
+import au.com.shiftyjelly.pocketcasts.starred.TvStarredScreen
 import au.com.shiftyjelly.pocketcasts.theme.TvScreenBackgroundBrush
 import au.com.shiftyjelly.pocketcasts.theme.TvTheme
 import au.com.shiftyjelly.pocketcasts.theme.TvTopBarHeight
@@ -42,11 +49,15 @@ import au.com.shiftyjelly.pocketcasts.upnext.TvUpNextScreen
 fun TvScaffold(
     onLogIn: () -> Unit,
     onCreateAccount: () -> Unit,
+    onSignedOut: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: TvScaffoldViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var isProfileModalVisible by rememberSaveable { mutableStateOf(false) }
+    var isStarredVisible by rememberSaveable { mutableStateOf(false) }
+    var isListeningHistoryVisible by rememberSaveable { mutableStateOf(false) }
+    var isSettingsModalVisible by rememberSaveable { mutableStateOf(false) }
     val topBarVisibility = remember { TvTopBarVisibility() }
     var didFocusTopBar by rememberSaveable { mutableStateOf(false) }
     var isNowPlayingOpenRequested by remember { mutableStateOf(false) }
@@ -58,6 +69,13 @@ fun TvScaffold(
         {
             viewModel.openNowPlaying()
             isNowPlayingOpenRequested = true
+            isStarredVisible = false
+            isListeningHistoryVisible = false
+        }
+    }
+    LaunchedEffect(viewModel) {
+        viewModel.openNowPlayingRequests.collect {
+            openNowPlaying()
         }
     }
 
@@ -65,55 +83,81 @@ fun TvScaffold(
         LocalTvTopBarVisibility provides topBarVisibility,
         LocalOpenNowPlaying provides openNowPlaying,
         LocalFocusTvTopBar provides focusTopBar,
+        LocalUseEpisodeArtwork provides uiState.useEpisodeArtwork,
     ) {
-        TvScaffoldContent(
-            tabs = uiState.tabs,
-            selectedTabIndex = uiState.selectedTabIndex,
-            profile = uiState.profile,
-            isTopBarVisible = topBarVisibility.isVisible,
-            autoFocusSelectedTab = !didFocusTopBar,
-            onSelectedTabFocus = { didFocusTopBar = true },
-            focusSelectedTab = isTopBarFocusRequested,
-            onConsumeFocusRequest = { isTopBarFocusRequested = false },
-            onTabSelect = viewModel::selectTab,
-            onTabClick = { tab ->
-                if (tab == TvTab.NowPlaying) {
-                    isNowPlayingOpenRequested = true
+        Box(modifier = modifier.fillMaxSize()) {
+            TvScaffoldContent(
+                tabs = uiState.tabs,
+                selectedTabIndex = uiState.selectedTabIndex,
+                profile = uiState.profile,
+                isTopBarVisible = topBarVisibility.isVisible,
+                autoFocusSelectedTab = !didFocusTopBar,
+                onSelectedTabFocus = { didFocusTopBar = true },
+                focusSelectedTab = isTopBarFocusRequested,
+                onConsumeFocusRequest = { isTopBarFocusRequested = false },
+                onTabSelect = viewModel::selectTab,
+                onTabClick = { tab ->
+                    if (tab == TvTab.NowPlaying) {
+                        isNowPlayingOpenRequested = true
+                    }
+                },
+                onProfileClick = { isProfileModalVisible = true },
+                modifier = Modifier.tvFocusInactiveWhen(isStarredVisible || isListeningHistoryVisible),
+            ) { tab ->
+                val navigateToHome = { viewModel.selectTab(TvTab.Home) }
+                // Tabs without a detail screen sit below the bar; the detail-bearing tabs pad their own
+                // content so their overlays can fill the full height.
+                val belowTopBar = Modifier.fillMaxSize().padding(top = TvTopBarHeight)
+                when (tab) {
+                    is TvTab.Home -> TvHomeScreen(
+                        onNavigateToSearch = { viewModel.selectTab(TvTab.Search) },
+                        onCreateAccount = onCreateAccount,
+                    )
+
+                    is TvTab.YourPodcasts -> TvYourPodcastsScreen(
+                        onNavigateToHome = navigateToHome,
+                    )
+
+                    is TvTab.Playlists -> TvPlaylistsScreen()
+
+                    is TvTab.UpNext -> Box(modifier = belowTopBar) {
+                        TvUpNextScreen(onNavigateToHome = navigateToHome)
+                    }
+
+                    is TvTab.NowPlaying -> TvNowPlayingScreen(
+                        isOpenRequested = isNowPlayingOpenRequested,
+                        onConsumeOpenRequest = { isNowPlayingOpenRequested = false },
+                    )
+
+                    is TvTab.Search -> TvSearchScreen()
                 }
-            },
-            onProfileClick = { isProfileModalVisible = true },
-            modifier = modifier,
-        ) { tab ->
-            val navigateToHome = { viewModel.selectTab(TvTab.Home) }
-            // Tabs without a detail screen sit below the bar; the detail-bearing tabs pad their own
-            // content so their overlays can fill the full height.
-            val belowTopBar = Modifier.fillMaxSize().padding(top = TvTopBarHeight)
-            when (tab) {
-                is TvTab.Home -> TvHomeScreen(
-                    onNavigateToSearch = { viewModel.selectTab(TvTab.Search) },
-                    onCreateAccount = onCreateAccount,
-                )
+            }
 
-                is TvTab.YourPodcasts -> TvYourPodcastsScreen(
-                    onNavigateToHome = navigateToHome,
-                )
+            TvDetailOverlay(
+                target = if (isStarredVisible) Unit else null,
+                onBack = {
+                    isStarredVisible = false
+                    focusTopBar()
+                },
+            ) {
+                TvStarredScreen()
+            }
 
-                is TvTab.Playlists -> TvPlaylistsScreen()
-
-                is TvTab.UpNext -> Box(modifier = belowTopBar) {
-                    TvUpNextScreen(onNavigateToHome = navigateToHome)
-                }
-
-                is TvTab.NowPlaying -> TvNowPlayingScreen(
-                    isOpenRequested = isNowPlayingOpenRequested,
-                    onConsumeOpenRequest = { isNowPlayingOpenRequested = false },
-                )
-
-                is TvTab.Search -> TvSearchScreen()
+            TvDetailOverlay(
+                target = if (isListeningHistoryVisible) Unit else null,
+                onBack = {
+                    isListeningHistoryVisible = false
+                    focusTopBar()
+                },
+            ) {
+                TvListeningHistoryScreen()
             }
         }
 
         if (isProfileModalVisible) {
+            LaunchedEffect(Unit) {
+                viewModel.trackProfileShown()
+            }
             TvProfileModal(
                 profile = uiState.profile,
                 onDismissRequest = { isProfileModalVisible = false },
@@ -125,13 +169,29 @@ fun TvScaffold(
                     isProfileModalVisible = false
                     onCreateAccount()
                 },
-                // TODO: wire up the Starred Episodes and Listening History destinations.
-                onStarredEpisodes = {},
-                onListeningHistory = {},
+                onStarredEpisodes = {
+                    isProfileModalVisible = false
+                    isStarredVisible = true
+                },
+                onListeningHistory = {
+                    isProfileModalVisible = false
+                    isListeningHistoryVisible = true
+                },
+                onSettings = {
+                    isProfileModalVisible = false
+                    isSettingsModalVisible = true
+                },
                 onLogOut = {
                     isProfileModalVisible = false
                     viewModel.signOut()
+                    onSignedOut()
                 },
+            )
+        }
+
+        if (isSettingsModalVisible) {
+            TvSettingsModal(
+                onDismissRequest = { isSettingsModalVisible = false },
             )
         }
     }

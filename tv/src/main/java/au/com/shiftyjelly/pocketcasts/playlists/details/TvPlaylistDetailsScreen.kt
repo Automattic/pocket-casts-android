@@ -43,7 +43,9 @@ import au.com.shiftyjelly.pocketcasts.component.LocalOpenNowPlaying
 import au.com.shiftyjelly.pocketcasts.component.LocalTvToastHostState
 import au.com.shiftyjelly.pocketcasts.component.TvArchivedFilterButton
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeActionContext
+import au.com.shiftyjelly.pocketcasts.component.TvEpisodeActions
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeActionsModal
+import au.com.shiftyjelly.pocketcasts.component.TvEpisodeActionsViewModel
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeInfoModal
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeListItem
 import au.com.shiftyjelly.pocketcasts.component.TvModal
@@ -82,6 +84,7 @@ fun TvPlaylistDetailsScreen(
         key = playlistUuid,
         creationCallback = { factory -> factory.create(playlistUuid, playlistType) },
     ),
+    episodeActions: TvEpisodeActions = hiltViewModel<TvEpisodeActionsViewModel>(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var openedPodcastUuid by rememberSaveable { mutableStateOf<String?>(null) }
@@ -128,6 +131,10 @@ fun TvPlaylistDetailsScreen(
             onToggleArchiveFilter = viewModel::toggleArchiveFilter,
             onOpenPodcast = { openedPodcastUuid = it },
             onPlayAll = viewModel::playAll,
+            onPlayEpisode = { episode ->
+                episodeActions.play(episode, TvEpisodeActionContext.Playlist.source)
+                openNowPlaying()
+            },
             modifier = modifier,
         )
     }
@@ -158,6 +165,7 @@ private fun TvPlaylistDetailsContent(
     onToggleArchiveFilter: () -> Unit,
     onOpenPodcast: (String) -> Unit,
     onPlayAll: () -> Unit,
+    onPlayEpisode: (PodcastEpisode) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(modifier = modifier.fillMaxSize()) {
@@ -193,6 +201,7 @@ private fun TvPlaylistDetailsContent(
                             onSortTap = onSortTap,
                             onToggleArchiveFilter = onToggleArchiveFilter,
                             onOpenPodcast = onOpenPodcast,
+                            onPlayEpisode = onPlayEpisode,
                             playAllFocusRequester = playAllFocusRequester,
                             modifier = Modifier.weight(1f),
                         )
@@ -210,6 +219,7 @@ private fun SortableEpisodeList(
     onSortTap: () -> Unit,
     onToggleArchiveFilter: () -> Unit,
     onOpenPodcast: (String) -> Unit,
+    onPlayEpisode: (PodcastEpisode) -> Unit,
     playAllFocusRequester: FocusRequester,
     modifier: Modifier = Modifier,
 ) {
@@ -252,6 +262,7 @@ private fun SortableEpisodeList(
             EpisodeList(
                 episodes = uiState.episodes,
                 onOpenPodcast = onOpenPodcast,
+                onPlayEpisode = onPlayEpisode,
                 playAllFocusRequester = playAllFocusRequester,
                 listState = listState,
                 modifier = Modifier.weight(1f),
@@ -288,6 +299,7 @@ private fun AllEpisodesArchived(
 private fun EpisodeList(
     episodes: List<PodcastEpisode>,
     onOpenPodcast: (String) -> Unit,
+    onPlayEpisode: (PodcastEpisode) -> Unit,
     playAllFocusRequester: FocusRequester,
     listState: LazyListState,
     modifier: Modifier = Modifier,
@@ -309,7 +321,7 @@ private fun EpisodeList(
             TvEpisodeListItem(
                 episode = episode,
                 dateFormatter = dateFormatter,
-                onClick = {},
+                onClick = { onPlayEpisode(episode) },
                 onOpenActions = {
                     focus.watchForRemoval(episodes, index)
                     actionsEpisode = episode
@@ -334,6 +346,7 @@ private fun EpisodeList(
     detailsEpisode?.let { episode ->
         TvEpisodeInfoModal(
             episode = episode,
+            actionContext = TvEpisodeActionContext.Playlist,
             onDismissRequest = { detailsEpisode = null },
         )
     }
@@ -507,6 +520,7 @@ private fun TvPlaylistDetailsPreview() {
             onToggleArchiveFilter = {},
             onOpenPodcast = {},
             onPlayAll = {},
+            onPlayEpisode = {},
         )
     }
 }
@@ -540,6 +554,7 @@ private fun TvPlaylistDetailsLoadedPreview() {
             onToggleArchiveFilter = {},
             onOpenPodcast = {},
             onPlayAll = {},
+            onPlayEpisode = {},
         )
     }
 }

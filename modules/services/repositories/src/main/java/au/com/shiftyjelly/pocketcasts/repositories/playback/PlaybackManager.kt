@@ -1803,7 +1803,7 @@ open class PlaybackManager @Inject constructor(
         return when (Util.getAppPlatform(application)) {
             AppPlatform.Automotive -> episodeWithSource?.first ?: episodeManager.findLatestEpisodeToPlayBlocking()
 
-            AppPlatform.WearOs -> episodeWithSource?.first
+            AppPlatform.WearOs, AppPlatform.Tv -> episodeWithSource?.first
 
             AppPlatform.Phone -> {
                 if (episodeWithSource != null) {

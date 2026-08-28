@@ -260,15 +260,35 @@
     <string name="tv_banner_discover_more_title">You haven\'t seen the half of it</string>
     <string name="tv_banner_discover_more_subtitle">Your next obsession is in here somewhere</string>
     <string name="tv_banner_discover_more_action_title">Discover more shows</string>
+    <string name="tv_search_prompt">Podcasts, shows, authors</string>
+    <string name="tv_search_recent">Recent searches</string>
+    <string name="tv_search_featured">Featured</string>
     <string name="tv_search_searching">Searching…</string>
     <string name="tv_search_no_results_title">No results</string>
+    <string name="tv_search_no_results_for_title">No results for \“%1$s\”</string>
     <string name="tv_search_no_results_subtitle">Try more general or different keywords.</string>
     <string name="tv_search_error_subtitle">Check your connection and try again.</string>
     <string name="tv_profile_starred_episodes">Starred Episodes</string>
+    <string name="tv_profile_log_out_confirmation_title">Log out?</string>
+    <string name="tv_profile_log_out_confirmation_message">This removes all downloaded podcasts and data from this device. You can log in again to sync your podcasts back.</string>
+    <string name="tv_settings_subscription_title">Subscription</string>
+    <string name="tv_settings_subscription_plan">Plan</string>
+    <string name="tv_settings_subscription_next_renewal">Next renewal</string>
+    <string name="tv_settings_subscription_expires">Expires</string>
+    <string name="tv_settings_subscription_lifetime">Lifetime</string>
+    <string name="tv_settings_subscription_other_platform">This subscription was made on another platform. Please use that platform to manage the subscription.</string>
+    <string name="tv_settings_privacy_policy_qr_message">Scan the QR code below, or open the URL on your phone to access the Privacy Policy.</string>
+    <string name="tv_settings_terms_of_use_qr_message">Scan the QR code below, or open the URL on your phone to access the Terms of Use.</string>
     <string name="tv_sign_in_title">Log in to Pocket Casts</string>
     <string name="tv_sign_in_step_scan">Scan the QR code or go to %1$s</string>
     <string name="tv_sign_in_step_login">Log in to your account</string>
-    <string name="tv_sign_in_step_confirm_code">If asked, confirm with the code below</string>
+    <string name="tv_sign_in_step_confirm_code">If asked, confirm the code below</string>
+    <string name="tv_sign_in_qr_error">Couldn\'t get your log in code</string>
+    <string name="tv_sign_in_tab_qr_code">QR code</string>
+    <string name="tv_sign_in_tab_email">Email</string>
+    <string name="tv_sign_in_signing_in">Signing in</string>
+    <string name="tv_account_signed_out_alert_title">You\'ve been logged out</string>
+    <string name="tv_account_signed_out_alert_message">There was a problem and you\'ve been logged out.\nSelect the button below to log in to your Pocket Casts account again.</string>
     <string name="tv_create_account_modal_title">Your podcasts deserve a home</string>
     <string name="tv_create_account_modal_subtitle">Create a free account to follow podcasts, build your Up Next, and pick up right where you left off, on any device.</string>
     <string name="tv_create_account_modal_step_create">Create your account or log in</string>
@@ -304,6 +324,10 @@
     <string name="tv_up_next_empty_title">Nothing queued up</string>
     <string name="tv_up_next_empty_subtitle">Add episodes to Up Next and they’ll play in order, back to back</string>
     <string name="tv_up_next_empty_action_title">Add episodes</string>
+    <string name="tv_starred_empty_title">No starred episodes</string>
+    <string name="tv_starred_empty_subtitle">Star episodes to keep them handy, and they’ll show up here</string>
+    <string name="tv_history_empty_title">No listening history</string>
+    <string name="tv_history_empty_subtitle">Episodes you play will show up here</string>
     <string name="tv_nothing_playing_title">Nothing playing</string>
     <string name="tv_nothing_playing_subtitle">Play an episode and it’ll show up here.</string>
     <string name="tv_playback_speed_changed">Playback speed set to %1$s</string>
@@ -2879,6 +2903,7 @@
     <string name="search_filters_top_results">Top Results</string>
     <string name="search_filters_podcasts" translatable="false">@string/podcasts</string>
     <string name="search_filters_episodes" translatable="false">@string/episodes</string>
+    <string name="search_filters_folders" translatable="false">@string/folders</string>
     <string name="search_suggestions_view_all">View all for \"%1$s\"</string>
     <string name="search_suggestions_no_results_title">No Results</string>
     <string name="search_suggestions_no_results_message">Try a new search, or by adding a podcast feed URL</string>
@@ -2919,15 +2944,13 @@
     <!-- TV Onboarding -->
     <string name="tv_onboarding_welcome">Welcome to Pocket Casts</string>
     <string name="tv_onboarding_welcome_tv">Welcome to Pocket Casts TV</string>
-    <string name="tv_onboarding_subtitle">Your podcasts, on the big screen</string>
+    <string name="tv_onboarding_subtitle">Your podcasts. On the big screen. Obviously.</string>
     <string name="tv_onboarding_create_free_account">Create free account</string>
     <string name="tv_onboarding_browse_without_account">Browse without an account</string>
     <string name="tv_onboarding_sign_in_title">Sign in with your phone</string>
     <string name="tv_onboarding_sign_in_instructions">Open the camera and point to this QR code</string>
     <string name="tv_onboarding_syncing">Syncing your podcasts\u2026</string>
-    <string name="tv_onboarding_welcome_back">Welcome back!</string>
-    <string name="tv_onboarding_syncing_subtitle">Your podcasts are syncing, we\'ll sign you in soon!</string>
+    <string name="tv_onboarding_welcome_back">Good to see you</string>
+    <string name="tv_onboarding_syncing_subtitle">Loading your podcasts now.</string>
     <string name="tv_create_account_title">Create your free account</string>
-    <string name="tv_create_account_subtitle">Scan this code to get started on your phone, it only takes a minute.</string>
-    <string name="tv_create_account_come_back">Once you\'ve created your account, come back and sign in</string>
 </resources>

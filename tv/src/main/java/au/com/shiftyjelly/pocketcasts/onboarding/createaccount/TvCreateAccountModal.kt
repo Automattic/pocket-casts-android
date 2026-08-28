@@ -4,7 +4,6 @@ import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
@@ -17,15 +16,14 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.tv.material3.Button
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.component.TvModal
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
+import au.com.shiftyjelly.pocketcasts.onboarding.signin.TvSignInErrorContent
 import au.com.shiftyjelly.pocketcasts.onboarding.signin.TvSignInQrContent
 import au.com.shiftyjelly.pocketcasts.onboarding.signin.TvSignInUiState
 import au.com.shiftyjelly.pocketcasts.onboarding.signin.verificationDisplayUrl
-import au.com.shiftyjelly.pocketcasts.theme.TvButtonDefaults
 import au.com.shiftyjelly.pocketcasts.theme.tvColors
 import au.com.shiftyjelly.pocketcasts.theme.tvTypography
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -107,7 +105,7 @@ private fun LoadingContent(modifier: Modifier = Modifier) {
         contentAlignment = Alignment.Center,
         modifier = modifier
             .fillMaxWidth()
-            .height(LoadingHeight)
+            .height(ContentHeight)
             .focusRequester(focusRequester)
             .focusable(),
     ) {
@@ -124,33 +122,13 @@ private fun ErrorContent(
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val focusRequester = remember { FocusRequester() }
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
+    TvSignInErrorContent(
+        onRetry = onRetry,
         modifier = modifier
             .fillMaxWidth()
-            .height(LoadingHeight),
-    ) {
-        Text(
-            text = stringResource(LR.string.error_generic_message),
-            color = MaterialTheme.tvColors.textSecondary,
-            style = MaterialTheme.tvTypography.body.copy(textAlign = TextAlign.Center),
-        )
-        Spacer(modifier = Modifier.height(24.dp))
-        Button(
-            onClick = onRetry,
-            colors = TvButtonDefaults.filledButtonColors(),
-            modifier = Modifier.focusRequester(focusRequester),
-        ) {
-            Text(text = stringResource(LR.string.retry))
-        }
-    }
-
-    LaunchedEffect(Unit) {
-        focusRequester.requestFocus()
-    }
+            .height(ContentHeight),
+    )
 }
 
 private val ModalWidth = 760.dp
-private val LoadingHeight = 220.dp
+private val ContentHeight = 220.dp

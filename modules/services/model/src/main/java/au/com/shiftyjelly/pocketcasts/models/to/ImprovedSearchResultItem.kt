@@ -32,5 +32,6 @@ sealed interface ImprovedSearchResultItem {
         val podcastTitle: String,
         val publishedDate: Date,
         val duration: Duration,
+        val hasVideo: Boolean = false,
     ) : ImprovedSearchResultItem
 }

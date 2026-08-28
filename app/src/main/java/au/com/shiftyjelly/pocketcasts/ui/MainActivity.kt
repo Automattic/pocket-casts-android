@@ -188,6 +188,7 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.NavigationBarColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.AccountEncouragement
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
@@ -229,6 +230,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
+import java.time.Instant
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -354,6 +356,9 @@ class MainActivity :
         get() = binding.bottomContainer.height - binding.bottomContainer.paddingBottom
 
     private var bottomSheetTag: String? = null
+
+    // hasCompletedOnboarding() flips true as onboarding finishes, which would chain the modal onto the same launch.
+    private var launchedInitialOnboarding: Boolean = false
     private var pendingBottomSheetFragment: Fragment? = null
 
     override val coroutineContext: CoroutineContext
@@ -480,6 +485,7 @@ class MainActivity :
         val needsLoginPromptAfterRestore = settings.getNeedsLoginPromptAfterRestore()
         // Only show if savedInstanceState is null in order to avoid creating onboarding activity twice.
         if (showOnboarding && savedInstanceState == null) {
+            launchedInitialOnboarding = true
             openOnboardingFlow(OnboardingFlow.InitialOnboarding)
         }
 
@@ -489,7 +495,8 @@ class MainActivity :
         if (savedInstanceState == null && needsLoginPromptAfterRestore) {
             settings.setNeedsLoginPromptAfterRestore(false)
             if (!showOnboarding && !isLoggedIn) {
-                settings.showFreeAccountEncouragement.set(false, updateModifiedAt = true)
+                // Anchor the clock so encourageAccountCreation() doesn't also show the modal this launch.
+                settings.freeAccountEncouragementLastShown.set(Instant.now(), updateModifiedAt = true)
                 openOnboardingFlow(OnboardingFlow.AccountEncouragement)
             }
         }
@@ -683,21 +690,38 @@ class MainActivity :
     private fun encourageAccountCreation() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                val encourageAccountCreation = settings.showFreeAccountEncouragement.value
-                if (!encourageAccountCreation) {
+                if (!FeatureFlag.isEnabled(Feature.ENCOURAGE_ACCOUNT_CREATION)) {
                     return@repeatOnLifecycle
                 }
-                settings.showFreeAccountEncouragement.set(false, updateModifiedAt = true)
+
+                if (launchedInitialOnboarding) {
+                    return@repeatOnLifecycle
+                }
 
                 val isSignedIn = viewModel.signInState.asFlow().first().isSignedIn
-                if (isSignedIn) {
-                    return@repeatOnLifecycle
-                }
+                val isEligible = !isSignedIn && settings.hasCompletedOnboarding()
 
-                if (Util.isTablet(this@MainActivity)) {
-                    AccountBenefitsFragment().show(supportFragmentManager, "account_benefits_fragment")
-                } else {
-                    openOnboardingFlow(OnboardingFlow.AccountEncouragement)
+                val decision = AccountEncouragement.decide(
+                    isEligible = isEligible,
+                    lastShown = settings.freeAccountEncouragementLastShown.value,
+                    now = Instant.now(),
+                )
+                when (decision) {
+                    AccountEncouragement.Decision.Wait -> return@repeatOnLifecycle
+
+                    AccountEncouragement.Decision.Show -> {
+                        if (bottomSheetTag != null || pendingBottomSheetFragment != null) {
+                            return@repeatOnLifecycle
+                        }
+
+                        settings.freeAccountEncouragementLastShown.set(Instant.now(), updateModifiedAt = true)
+
+                        if (Util.isTablet(this@MainActivity)) {
+                            AccountBenefitsFragment().show(supportFragmentManager, "account_benefits_fragment")
+                        } else {
+                            openOnboardingFlow(OnboardingFlow.AccountEncouragement)
+                        }
+                    }
                 }
             }
         }

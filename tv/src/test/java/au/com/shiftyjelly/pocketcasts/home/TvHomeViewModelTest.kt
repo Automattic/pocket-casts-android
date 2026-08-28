@@ -49,6 +49,7 @@ import com.automattic.eventhorizon.HomeShownEvent
 import com.jakewharton.rxrelay2.BehaviorRelay
 import io.reactivex.Single
 import java.util.Date
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -852,6 +853,62 @@ class TvHomeViewModelTest {
         }
     }
 
+    @Test
+    fun `playLatestEpisode plays the newest episode of a featured podcast`() = runTest {
+        val podcast = Podcast(uuid = "podcast-1")
+        val newest = episode(uuid = "episode-new", podcastUuid = "podcast-1")
+        whenever(podcastManager.findOrDownloadPodcastRxSingle("podcast-1")).thenReturn(Single.just(podcast))
+        whenever(episodeManager.findEpisodesByPodcastOrderedByPublishDate(podcast))
+            .thenReturn(listOf(newest, episode(uuid = "episode-old", podcastUuid = "podcast-1")))
+
+        createViewModel().playLatestEpisode(featuredRow(), discoverPodcast("podcast-1"))
+
+        verifyBlocking(playbackManager) { playNowSuspend(episode = newest, sourceView = SourceView.DISCOVER) }
+        verify(eventHorizon).track(
+            DiscoverListEpisodeTappedEvent(listId = "list-featured", podcastUuid = "podcast-1", episodeUuid = "episode-new", source = "home"),
+        )
+        verify(eventHorizon).track(DiscoverListEpisodePlayEvent(listId = "list-featured", podcastUuid = "podcast-1"))
+    }
+
+    @Test
+    fun `playLatestEpisode reports a failure when the podcast has no episodes`() = runTest {
+        val podcast = Podcast(uuid = "podcast-1")
+        whenever(podcastManager.findOrDownloadPodcastRxSingle("podcast-1")).thenReturn(Single.just(podcast))
+        whenever(episodeManager.findEpisodesByPodcastOrderedByPublishDate(podcast)).thenReturn(emptyList())
+        val viewModel = createViewModel()
+
+        viewModel.playFailures.test {
+            viewModel.playLatestEpisode(featuredRow(), discoverPodcast("podcast-1"))
+
+            awaitItem()
+            verifyNoInteractions(playbackManager)
+        }
+    }
+
+    @Test
+    fun `playLatestEpisode records the tap even when playback fails`() = runTest {
+        val podcast = Podcast(uuid = "podcast-1")
+        val newest = episode(uuid = "episode-new", podcastUuid = "podcast-1")
+        whenever(podcastManager.findOrDownloadPodcastRxSingle("podcast-1")).thenReturn(Single.just(podcast))
+        whenever(episodeManager.findEpisodesByPodcastOrderedByPublishDate(podcast)).thenReturn(listOf(newest))
+        whenever { playbackManager.playNowSuspend(episode = newest, sourceView = SourceView.DISCOVER) }
+            .thenThrow(RuntimeException("boom"))
+
+        createViewModel().playLatestEpisode(featuredRow(), discoverPodcast("podcast-1"))
+
+        verify(eventHorizon).track(
+            DiscoverListEpisodeTappedEvent(listId = "list-featured", podcastUuid = "podcast-1", episodeUuid = "episode-new", source = "home"),
+        )
+        verify(eventHorizon).track(DiscoverListEpisodePlayEvent(listId = "list-featured", podcastUuid = "podcast-1"))
+    }
+
+    private fun featuredRow() = TvDiscoverRow.FeaturedPodcasts(
+        id = "list-featured",
+        title = "Featured",
+        podcasts = listOf(discoverPodcast("podcast-1")),
+        listId = "list-featured",
+    )
+
     private fun homeEpisode() = TvDiscoverEpisode(
         episodeUuid = "episode-1",
         episodeTitle = "Episode",
@@ -869,7 +926,7 @@ class TvHomeViewModelTest {
     @Test
     fun `opening a featured podcast tracks both the list and featured events`() = runTest {
         val podcast = discoverPodcast("podcast-1")
-        val row = TvDiscoverRow.FeaturedPodcasts(id = "list-featured", title = "Featured", podcasts = listOf(podcast))
+        val row = TvDiscoverRow.FeaturedPodcasts(id = "list-featured", title = "Featured", podcasts = listOf(podcast), listId = "list-featured")
 
         createViewModel().trackDiscoverPodcastTapped(row, podcast)
 
@@ -880,7 +937,7 @@ class TvHomeViewModelTest {
     @Test
     fun `opening a sponsored podcast tracks the ad event`() = runTest {
         val podcast = discoverPodcast("podcast-1", isSponsored = true)
-        val row = TvDiscoverRow.Podcasts(id = "list-trending", title = "Trending", podcasts = listOf(podcast))
+        val row = TvDiscoverRow.Podcasts(id = "list-trending", title = "Trending", podcasts = listOf(podcast), listId = "list-trending")
 
         createViewModel().trackDiscoverPodcastTapped(row, podcast)
 
@@ -891,7 +948,7 @@ class TvHomeViewModelTest {
     @Test
     fun `opening a sponsored featured podcast does not track the ad event`() = runTest {
         val podcast = discoverPodcast("podcast-1", isSponsored = true)
-        val row = TvDiscoverRow.FeaturedPodcasts(id = "list-featured", title = "Featured", podcasts = listOf(podcast))
+        val row = TvDiscoverRow.FeaturedPodcasts(id = "list-featured", title = "Featured", podcasts = listOf(podcast), listId = "list-featured")
 
         createViewModel().trackDiscoverPodcastTapped(row, podcast)
 
@@ -925,7 +982,7 @@ class TvHomeViewModelTest {
     @Test
     fun `playing a discover episode tracks the tap and play events`() = runTest {
         val episode = TvDiscoverEpisode("episode-1", "Episode", "podcast-1", "Podcast")
-        val row = TvDiscoverRow.Episodes(id = "list-videos", title = "Made for TV", episodes = listOf(episode))
+        val row = TvDiscoverRow.Episodes(id = "list-videos", title = "Made for TV", episodes = listOf(episode), listId = "list-videos")
 
         createViewModel().trackDiscoverEpisodePlayed(row, episode)
 
@@ -935,7 +992,7 @@ class TvHomeViewModelTest {
 
     @Test
     fun `showing a discover list tracks an impression`() = runTest {
-        val row = TvDiscoverRow.Podcasts(id = "list-trending", title = "Trending", podcasts = listOf(discoverPodcast("podcast-1")))
+        val row = TvDiscoverRow.Podcasts(id = "list-trending", title = "Trending", podcasts = listOf(discoverPodcast("podcast-1")), listId = "list-trending")
 
         createViewModel().trackDiscoverListShown(row)
 
@@ -945,7 +1002,7 @@ class TvHomeViewModelTest {
     @Test
     fun `opening a discover episode podcast tracks the list podcast tapped event`() = runTest {
         val episode = TvDiscoverEpisode("episode-1", "Episode", "podcast-1", "Podcast")
-        val row = TvDiscoverRow.Episodes(id = "list-videos", title = "Made for TV", episodes = listOf(episode))
+        val row = TvDiscoverRow.Episodes(id = "list-videos", title = "Made for TV", episodes = listOf(episode), listId = "list-videos")
 
         createViewModel().trackDiscoverEpisodePodcastTapped(row, episode)
 
@@ -998,6 +1055,7 @@ class TvHomeViewModelTest {
         discoverFeedLoader = TvDiscoverFeedLoader(
             listRepository = listRepository,
             settings = settings,
+            applicationScope = CoroutineScope(coroutineRule.testDispatcher),
             context = context,
         ),
         playlistManager = playlistManager,

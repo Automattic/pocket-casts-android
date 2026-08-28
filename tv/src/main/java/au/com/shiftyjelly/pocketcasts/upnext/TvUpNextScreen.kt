@@ -184,6 +184,7 @@ private fun UpNextList(
     detailsEpisode?.let { episode ->
         TvEpisodeInfoModal(
             episode = episode,
+            actionContext = TvEpisodeActionContext.UpNext,
             onDismissRequest = { detailsEpisode = null },
         )
     }

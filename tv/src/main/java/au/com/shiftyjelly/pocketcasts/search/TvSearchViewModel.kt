@@ -5,23 +5,46 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.discover.TvCategoryPodcasts
+import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverEpisode
+import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverFeedAnalytics
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverFeedLoader
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverRow
+import au.com.shiftyjelly.pocketcasts.discover.TvOpenedCategory
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.models.to.ImprovedSearchResultItem
+import au.com.shiftyjelly.pocketcasts.models.to.SearchAutoCompleteItem
+import au.com.shiftyjelly.pocketcasts.models.to.SearchHistoryEntry
+import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.search.ImprovedSearchManager
+import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.SearchEmptyResultsEvent
+import com.automattic.eventhorizon.SearchFailedEvent
+import com.automattic.eventhorizon.SearchFilterTappedEvent
+import com.automattic.eventhorizon.SearchHistoryItemTappedEvent
+import com.automattic.eventhorizon.SearchHistoryType
+import com.automattic.eventhorizon.SearchPerformedEvent
+import com.automattic.eventhorizon.SearchPredictiveTermTappedEvent
+import com.automattic.eventhorizon.SearchResultFilterType
+import com.automattic.eventhorizon.SearchResultTappedEvent
+import com.automattic.eventhorizon.SearchResultType
+import com.automattic.eventhorizon.SearchShownEvent
+import com.automattic.eventhorizon.SourceViewType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -43,8 +66,13 @@ class TvSearchViewModel @Inject constructor(
     private val podcastManager: PodcastManager,
     private val episodeManager: EpisodeManager,
     private val playbackManager: PlaybackManager,
+    private val searchHistoryManager: SearchHistoryManager,
+    private val folderManager: FolderManager,
+    private val eventHorizon: EventHorizon,
     private val settings: Settings,
 ) : ViewModel() {
+
+    private val discoverFeedAnalytics = TvDiscoverFeedAnalytics(eventHorizon, settings, SOURCE_SEARCH, localRowIds = emptySet())
 
     private val _categories = MutableStateFlow<List<DiscoverCategory>>(emptyList())
     val categories: StateFlow<List<DiscoverCategory>> = _categories.asStateFlow()
@@ -60,6 +88,15 @@ class TvSearchViewModel @Inject constructor(
 
     private val _filter = MutableStateFlow(TvSearchFilter.TopResults)
     val filter: StateFlow<TvSearchFilter> = _filter.asStateFlow()
+
+    private val _hasFolderResults = MutableStateFlow(false)
+    val hasFolderResults: StateFlow<Boolean> = _hasFolderResults.asStateFlow()
+
+    private val _suggestions = MutableStateFlow<List<String>>(emptyList())
+    val suggestions: StateFlow<List<String>> = _suggestions.asStateFlow()
+
+    private val _history = MutableStateFlow<List<String>>(emptyList())
+    val history: StateFlow<List<String>> = _history.asStateFlow()
 
     private val _playStarted = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     val playStarted: SharedFlow<Unit> = _playStarted.asSharedFlow()
@@ -96,6 +133,15 @@ class TvSearchViewModel @Inject constructor(
                 }
             }
         }
+        viewModelScope.launch {
+            try {
+                refreshHistory()
+            } catch (exception: CancellationException) {
+                throw exception
+            } catch (exception: Exception) {
+                Timber.e(exception, "Failed to load TV search history")
+            }
+        }
     }
 
     fun onQueryChange(query: String) {
@@ -103,40 +149,173 @@ class TvSearchViewModel @Inject constructor(
         searchJob?.cancel()
         val term = query.trim()
         if (term.isEmpty()) {
-            _filter.value = TvSearchFilter.TopResults
+            _suggestions.value = emptyList()
             _searchState.value = TvSearchState.Idle
+            updateFolderResults(hasFolders = false)
             return
         }
         searchJob = viewModelScope.launch {
-            delay(settings.getPodcastSearchDebounceMs())
+            delay(SEARCH_DEBOUNCE_MS)
             _searchState.value = TvSearchState.Searching
+            eventHorizon.track(SearchPerformedEvent(source = SourceViewType.Search))
             _searchState.value = try {
+                val fullSearch = async { runCatching { improvedSearchManager.combinedSearch(term) } }
+                val foldersSearch = async {
+                    try {
+                        searchFolders(term)
+                    } catch (exception: CancellationException) {
+                        throw exception
+                    } catch (exception: Exception) {
+                        Timber.e(exception, "Failed to search TV folders")
+                        emptyList()
+                    }
+                }
                 val localPodcasts = podcastManager.findSubscribedFlow(term).first().map(Podcast::toSearchItem)
-                val remoteResults = improvedSearchManager.combinedSearch(term)
-                val podcasts = (localPodcasts + remoteResults.filterIsInstance<ImprovedSearchResultItem.PodcastItem>())
+                val localUuids = localPodcasts.mapTo(HashSet(), ImprovedSearchResultItem.PodcastItem::uuid)
+                val predictiveResults = try {
+                    improvedSearchManager.autoCompleteSearch(term)
+                } catch (exception: CancellationException) {
+                    throw exception
+                } catch (exception: Exception) {
+                    Timber.e(exception, "Failed to load TV search suggestions")
+                    emptyList()
+                }
+                _suggestions.value = predictiveResults.filterIsInstance<SearchAutoCompleteItem.Term>().map { it.term }
+                val predictivePodcasts = predictiveResults.filterIsInstance<SearchAutoCompleteItem.Podcast>().map { it.toSearchItem() }
+                val earlyPodcasts = (predictivePodcasts + localPodcasts)
                     .distinctBy(ImprovedSearchResultItem.PodcastItem::uuid)
+                    .map { if (it.uuid in localUuids) it.copy(isFollowed = true) else it }
+                if (earlyPodcasts.isNotEmpty()) {
+                    _searchState.value = TvSearchState.Results(podcasts = earlyPodcasts, episodes = emptyList(), isPartial = true)
+                }
+
+                val remoteResults = fullSearch.await().getOrThrow()
+                val remotePodcasts = remoteResults.filterIsInstance<ImprovedSearchResultItem.PodcastItem>()
+                val podcasts = (predictivePodcasts + remotePodcasts + localPodcasts)
+                    .distinctBy(ImprovedSearchResultItem.PodcastItem::uuid)
+                    .map { if (it.uuid in localUuids) it.copy(isFollowed = true) else it }
                 val episodes = remoteResults.filterIsInstance<ImprovedSearchResultItem.EpisodeItem>()
                     .distinctBy(ImprovedSearchResultItem.EpisodeItem::uuid)
-                if (podcasts.isEmpty() && episodes.isEmpty()) {
+                val folders = foldersSearch.await()
+                updateFolderResults(hasFolders = folders.isNotEmpty())
+                if (podcasts.isEmpty() && episodes.isEmpty() && folders.isEmpty()) {
+                    eventHorizon.track(SearchEmptyResultsEvent(source = SourceViewType.Search, term = term))
                     TvSearchState.NoResults
                 } else {
-                    TvSearchState.Results(podcasts = podcasts, episodes = episodes)
+                    TvSearchState.Results(podcasts = podcasts, episodes = episodes, folders = folders)
                 }
             } catch (exception: CancellationException) {
                 throw exception
             } catch (exception: Exception) {
                 Timber.e(exception, "Failed to search on TV")
+                updateFolderResults(hasFolders = false)
+                eventHorizon.track(SearchFailedEvent(source = SourceViewType.Search, term = term))
                 TvSearchState.Error
             }
         }
     }
 
     fun onFilterSelected(filter: TvSearchFilter) {
+        if (_filter.value == filter) {
+            return
+        }
         _filter.value = filter
+        eventHorizon.track(SearchFilterTappedEvent(source = SourceViewType.Search, filter = filter.analyticsValue))
+    }
+
+    private fun updateFolderResults(hasFolders: Boolean) {
+        _hasFolderResults.value = hasFolders
+        if (!hasFolders && _filter.value == TvSearchFilter.Folders) {
+            _filter.value = TvSearchFilter.TopResults
+        }
+    }
+
+    private suspend fun searchFolders(term: String): List<FolderItem.Folder> {
+        if (!syncManager.isLoggedIn()) {
+            return emptyList()
+        }
+        return folderManager.getAll()
+            .filter { it.name.contains(term, ignoreCase = true) }
+            .sortedBy { PodcastsSortType.cleanStringForSort(it.name) }
+            .map { folder -> FolderItem.Folder(folder = folder, podcasts = folderManager.findFolderPodcastsSorted(folder.uuid)) }
+    }
+
+    suspend fun folderPodcasts(folderUuid: String): List<Podcast> {
+        return folderManager.findFolderPodcastsSorted(folderUuid)
+    }
+
+    fun selectSuggestion(term: String) {
+        eventHorizon.track(SearchPredictiveTermTappedEvent(source = SourceViewType.Search, term = term))
+        saveSearchTerm(term)
+        onQueryChange(term)
+    }
+
+    fun selectHistoryItem(term: String) {
+        eventHorizon.track(SearchHistoryItemTappedEvent(source = SourceViewType.Search, type = SearchHistoryType.SearchTerm))
+        onQueryChange(term)
+    }
+
+    fun trackPodcastResultTapped(podcast: ImprovedSearchResultItem.PodcastItem) {
+        eventHorizon.track(
+            SearchResultTappedEvent(
+                source = SourceViewType.Search,
+                uuid = podcast.uuid,
+                resultType = if (podcast.isFollowed) SearchResultType.PodcastLocalResult else SearchResultType.PodcastRemoteResult,
+            ),
+        )
+    }
+
+    fun trackEpisodeResultTapped(episodeUuid: String) {
+        eventHorizon.track(
+            SearchResultTappedEvent(source = SourceViewType.Search, uuid = episodeUuid, resultType = SearchResultType.Episode),
+        )
+    }
+
+    fun trackSearchShown() {
+        eventHorizon.track(SearchShownEvent(source = SourceViewType.Search))
+    }
+
+    fun trackDiscoverListShown(row: TvDiscoverRow) = discoverFeedAnalytics.trackListImpression(row)
+
+    fun trackDiscoverPodcastTapped(row: TvDiscoverRow, podcast: TvDiscoverPodcast) = discoverFeedAnalytics.trackPodcastTapped(row, podcast)
+
+    fun trackDiscoverEpisodePlayed(row: TvDiscoverRow, episode: TvDiscoverEpisode) = discoverFeedAnalytics.trackEpisodePlayed(row, episode)
+
+    fun trackDiscoverEpisodePodcastTapped(row: TvDiscoverRow, episode: TvDiscoverEpisode) = discoverFeedAnalytics.trackEpisodePodcastTapped(row, episode)
+
+    fun trackCategoryPodcastTapped(category: TvOpenedCategory, listId: String?, podcast: TvDiscoverPodcast) = discoverFeedAnalytics.trackCategoryPodcastTapped(category, listId, podcast)
+
+    fun trackCategoryPillTapped(category: DiscoverCategory, index: Int) = discoverFeedAnalytics.trackCategoryPillTapped(category, index)
+
+    fun saveSearchTerm(term: String) {
+        val trimmed = term.trim()
+        if (trimmed.isEmpty()) {
+            return
+        }
+        viewModelScope.launch {
+            try {
+                searchHistoryManager.add(SearchHistoryEntry.SearchTerm(term = trimmed))
+                refreshHistory()
+            } catch (exception: CancellationException) {
+                throw exception
+            } catch (exception: Exception) {
+                Timber.e(exception, "Failed to save TV search history")
+            }
+        }
+    }
+
+    private suspend fun refreshHistory() {
+        _history.value = searchHistoryManager.findAll(showFolders = false)
+            .filterIsInstance<SearchHistoryEntry.SearchTerm>()
+            .map(SearchHistoryEntry.SearchTerm::term)
     }
 
     suspend fun categoryPodcasts(categoryId: Int, source: String): TvCategoryPodcasts {
         return discoverFeedLoader.loadCategoryPodcasts(source, categoryId, syncManager.isLoggedIn())
+    }
+
+    suspend fun categoryCoverUrls(category: DiscoverCategory): List<String> {
+        return discoverFeedLoader.loadCategoryCoverUrls(category.source)
     }
 
     fun playEpisode(episode: ImprovedSearchResultItem.EpisodeItem) {
@@ -154,6 +333,53 @@ class TvSearchViewModel @Inject constructor(
                 throw exception
             } catch (exception: Exception) {
                 Timber.e(exception, "Failed to play episode from TV search")
+                _playFailures.tryEmit(Unit)
+            }
+        }
+    }
+
+    fun playDiscoverEpisode(episode: TvDiscoverEpisode) {
+        viewModelScope.launch {
+            try {
+                val found = episodeManager.findByUuid(episode.episodeUuid)
+                    ?: run {
+                        podcastManager.findOrDownloadPodcastRxSingle(episode.podcastUuid).await()
+                        episodeManager.findByUuid(episode.episodeUuid)
+                    }
+                if (found != null) {
+                    playbackManager.playNowSuspend(episode = found, sourceView = SourceView.SEARCH)
+                    _playStarted.tryEmit(Unit)
+                } else {
+                    Timber.e("Episode %s not found to play from TV search discover", episode.episodeUuid)
+                    _playFailures.tryEmit(Unit)
+                }
+            } catch (exception: CancellationException) {
+                throw exception
+            } catch (exception: Exception) {
+                Timber.e(exception, "Failed to play discover episode from TV search")
+                _playFailures.tryEmit(Unit)
+            }
+        }
+    }
+
+    fun playLatestEpisode(row: TvDiscoverRow, podcast: TvDiscoverPodcast) {
+        viewModelScope.launch {
+            try {
+                val loadedPodcast = podcastManager.findOrDownloadPodcastRxSingle(podcast.uuid).await()
+                podcastManager.refreshPodcast(loadedPodcast, playbackManager)
+                val latest = episodeManager.findEpisodesByPodcastOrderedByPublishDate(loadedPodcast).firstOrNull()
+                if (latest != null) {
+                    discoverFeedAnalytics.trackEpisodePlayed(row, latest.toTvDiscoverEpisode(podcast))
+                    playbackManager.playNowSuspend(episode = latest, sourceView = SourceView.SEARCH)
+                    _playStarted.tryEmit(Unit)
+                } else {
+                    Timber.e("No episode found to play from featured podcast %s on TV search", podcast.uuid)
+                    _playFailures.tryEmit(Unit)
+                }
+            } catch (exception: CancellationException) {
+                throw exception
+            } catch (exception: Exception) {
+                Timber.e(exception, "Failed to play latest episode from TV search")
                 _playFailures.tryEmit(Unit)
             }
         }
@@ -189,7 +415,27 @@ class TvSearchViewModel @Inject constructor(
                 episodeManager.findByUuid(episode.uuid)
             }
     }
+
+    companion object {
+        private const val SEARCH_DEBOUNCE_MS = 300L
+        private const val SOURCE_SEARCH = "search"
+    }
 }
+
+private val TvSearchFilter.analyticsValue
+    get() = when (this) {
+        TvSearchFilter.TopResults -> SearchResultFilterType.AllResults
+        TvSearchFilter.Podcasts -> SearchResultFilterType.Podcasts
+        TvSearchFilter.Episodes -> SearchResultFilterType.Episodes
+        TvSearchFilter.Folders -> SearchResultFilterType.Folders
+    }
+
+private fun PodcastEpisode.toTvDiscoverEpisode(podcast: TvDiscoverPodcast) = TvDiscoverEpisode(
+    episodeUuid = uuid,
+    episodeTitle = title,
+    podcastUuid = podcast.uuid,
+    podcastTitle = podcast.title,
+)
 
 private fun Podcast.toSearchItem() = ImprovedSearchResultItem.PodcastItem(
     uuid = uuid,
@@ -199,12 +445,21 @@ private fun Podcast.toSearchItem() = ImprovedSearchResultItem.PodcastItem(
     isExplicit = explicit == true,
 )
 
+private fun SearchAutoCompleteItem.Podcast.toSearchItem() = ImprovedSearchResultItem.PodcastItem(
+    uuid = uuid,
+    title = title,
+    author = author,
+    isFollowed = isSubscribed,
+    isExplicit = isExplicit,
+)
+
 enum class TvSearchFilter(
     @StringRes val labelRes: Int,
 ) {
     TopResults(LR.string.search_filters_top_results),
     Podcasts(LR.string.search_filters_podcasts),
     Episodes(LR.string.search_filters_episodes),
+    Folders(LR.string.search_filters_folders),
 }
 
 sealed interface TvSearchState {
@@ -215,5 +470,7 @@ sealed interface TvSearchState {
     data class Results(
         val podcasts: List<ImprovedSearchResultItem.PodcastItem>,
         val episodes: List<ImprovedSearchResultItem.EpisodeItem>,
+        val folders: List<FolderItem.Folder> = emptyList(),
+        val isPartial: Boolean = false,
     ) : TvSearchState
 }

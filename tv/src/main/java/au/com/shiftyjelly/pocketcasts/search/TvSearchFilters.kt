@@ -11,9 +11,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.focusRestorer
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Devices
@@ -35,6 +38,8 @@ internal fun TvSearchFilters(
     selected: TvSearchFilter,
     onFilterSelect: (TvSearchFilter) -> Unit,
     modifier: Modifier = Modifier,
+    filters: List<TvSearchFilter> = TvSearchFilter.entries,
+    upFocusRequester: FocusRequester? = null,
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
@@ -42,7 +47,12 @@ internal fun TvSearchFilters(
     ) {
         FilterDivider(modifier = Modifier.weight(1f))
         Spacer(modifier = Modifier.width(20.dp))
-        TvSearchFilterPills(selected = selected, onFilterSelect = onFilterSelect)
+        TvSearchFilterPills(
+            filters = filters,
+            selected = selected,
+            onFilterSelect = onFilterSelect,
+            upFocusRequester = upFocusRequester,
+        )
         Spacer(modifier = Modifier.width(20.dp))
         FilterDivider(modifier = Modifier.weight(1f))
     }
@@ -50,10 +60,13 @@ internal fun TvSearchFilters(
 
 @Composable
 private fun TvSearchFilterPills(
+    filters: List<TvSearchFilter>,
     selected: TvSearchFilter,
     onFilterSelect: (TvSearchFilter) -> Unit,
+    upFocusRequester: FocusRequester? = null,
 ) {
-    val selectedIndex = TvSearchFilter.entries.indexOf(selected)
+    val selectedIndex = filters.indexOf(selected)
+    val focusRequester = remember { FocusRequester() }
     Box(
         modifier = Modifier
             .background(MaterialTheme.tvColors.backgroundSunken, RoundedCornerShape(percent = 50))
@@ -61,7 +74,9 @@ private fun TvSearchFilterPills(
     ) {
         TabRow(
             selectedTabIndex = selectedIndex,
-            modifier = Modifier.focusRestorer(),
+            modifier = Modifier.focusProperties {
+                onEnter = { runCatching { focusRequester.requestFocus() } }
+            },
             containerColor = Color.Transparent,
             indicator = @Composable { tabPositions, doesTabRowHaveFocus ->
                 tabPositions.getOrNull(selectedIndex)?.let { currentTabPosition ->
@@ -74,14 +89,16 @@ private fun TvSearchFilterPills(
                 }
             },
         ) {
-            TvSearchFilter.entries.forEachIndexed { index, filter ->
+            filters.forEachIndexed { index, filter ->
                 Tab(
                     selected = index == selectedIndex,
                     onFocus = { onFilterSelect(filter) },
                     onClick = { onFilterSelect(filter) },
                     modifier = Modifier
                         .height(44.dp)
-                        .padding(horizontal = 21.dp),
+                        .padding(horizontal = 21.dp)
+                        .focusProperties { upFocusRequester?.let { up = it } }
+                        .then(if (index == selectedIndex) Modifier.focusRequester(focusRequester) else Modifier),
                     colors = TabDefaults.pillIndicatorTabColors(
                         contentColor = MaterialTheme.tvColors.textPrimary,
                         selectedContentColor = MaterialTheme.tvColors.textPrimary,

@@ -26,9 +26,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.tv.material3.Button
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.theme.TvButtonDefaults
 import au.com.shiftyjelly.pocketcasts.theme.TvTheme
 import au.com.shiftyjelly.pocketcasts.theme.tvColors
@@ -38,6 +40,33 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun TvWelcomeScreen(
+    onSignIn: () -> Unit,
+    onCreateAccount: () -> Unit,
+    onContinueWithoutAccount: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: TvWelcomeViewModel = hiltViewModel(),
+) {
+    CallOnce { viewModel.trackShown() }
+
+    TvWelcomeContent(
+        onSignIn = {
+            viewModel.trackSignInTapped()
+            onSignIn()
+        },
+        onCreateAccount = {
+            viewModel.trackCreateAccountTapped()
+            onCreateAccount()
+        },
+        onContinueWithoutAccount = {
+            viewModel.trackBrowseNoAccountTapped()
+            onContinueWithoutAccount()
+        },
+        modifier = modifier,
+    )
+}
+
+@Composable
+private fun TvWelcomeContent(
     onSignIn: () -> Unit,
     onCreateAccount: () -> Unit,
     onContinueWithoutAccount: () -> Unit,
@@ -87,13 +116,13 @@ fun TvWelcomeScreen(
             Text(
                 text = stringResource(LR.string.tv_onboarding_welcome_tv),
                 color = MaterialTheme.tvColors.textPrimary,
-                style = MaterialTheme.tvTypography.title1.copy(textAlign = TextAlign.Center),
+                style = MaterialTheme.tvTypography.title2.copy(textAlign = TextAlign.Center),
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = stringResource(LR.string.tv_onboarding_subtitle),
                 color = MaterialTheme.tvColors.textSecondary,
-                style = MaterialTheme.tvTypography.headline.copy(textAlign = TextAlign.Center),
+                style = MaterialTheme.tvTypography.body.copy(textAlign = TextAlign.Center),
             )
             Spacer(modifier = Modifier.height(32.dp))
 
@@ -103,7 +132,7 @@ fun TvWelcomeScreen(
                     colors = TvButtonDefaults.filledButtonColors(),
                     modifier = Modifier.focusRequester(focusRequester),
                 ) {
-                    Text(text = stringResource(LR.string.sign_in))
+                    Text(text = stringResource(LR.string.log_in))
                 }
                 Button(
                     onClick = onCreateAccount,
@@ -135,7 +164,7 @@ fun TvWelcomeScreen(
 @Composable
 private fun TvWelcomeScreenPreview() {
     TvTheme {
-        TvWelcomeScreen(
+        TvWelcomeContent(
             onSignIn = {},
             onCreateAccount = {},
             onContinueWithoutAccount = {},

@@ -6,9 +6,14 @@ import au.com.shiftyjelly.pocketcasts.home.TvProfileState
 import au.com.shiftyjelly.pocketcasts.home.TvScaffoldViewModel
 import au.com.shiftyjelly.pocketcasts.home.TvTab
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.ProfileShownEvent
 import com.jakewharton.rxrelay2.BehaviorRelay
 import io.reactivex.subjects.BehaviorSubject
 import java.util.Date
@@ -51,8 +56,19 @@ class TvScaffoldViewModelTest {
         queue = emptyList(),
     )
 
+    private val launchRequests = TvLaunchRequests()
+    private val eventHorizon = mock<EventHorizon>()
+
+    private val artworkConfigurationSetting = mock<UserSetting<ArtworkConfiguration>> {
+        on { flow } doReturn MutableStateFlow(ArtworkConfiguration(useEpisodeArtwork = false))
+        on { value } doReturn ArtworkConfiguration(useEpisodeArtwork = false)
+    }
+    private val settings = mock<Settings> {
+        on { artworkConfiguration } doReturn artworkConfigurationSetting
+    }
+
     private val viewModel by lazy {
-        TvScaffoldViewModel(syncManager, signOutManager, upNextQueue)
+        TvScaffoldViewModel(syncManager, signOutManager, eventHorizon, settings, launchRequests, upNextQueue)
     }
 
     @Test
@@ -152,10 +168,41 @@ class TvScaffoldViewModelTest {
             assertEquals(TvTab.NowPlaying, awaitItem().selectedTab)
 
             queueChanges.onNext(UpNextQueue.State.Empty)
+            coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
 
             val state = expectMostRecentItem()
             assertEquals(TvTab.Home, state.selectedTab)
             assertEquals(TvTab.entries, state.tabs)
+        }
+    }
+
+    @Test
+    fun `stays on now playing when the queue empties only transiently while switching episodes`() = runTest {
+        queueChanges.onNext(loadedQueue)
+
+        viewModel.uiState.test {
+            assertEquals(TvTab.Home, awaitItem().selectedTab)
+
+            viewModel.selectTab(TvTab.NowPlaying)
+            queueChanges.onNext(UpNextQueue.State.Empty)
+            queueChanges.onNext(loadedQueue)
+            coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+            assertEquals(TvTab.NowPlaying, expectMostRecentItem().selectedTab)
+        }
+    }
+
+    @Test
+    fun `keeps now playing selected when the queue reports later than the debounce window`() = runTest {
+        viewModel.uiState.test {
+            assertEquals(TvTab.Home, awaitItem().selectedTab)
+
+            viewModel.openNowPlaying()
+            coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+            queueChanges.onNext(loadedQueue)
+            coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+            assertEquals(TvTab.NowPlaying, expectMostRecentItem().selectedTab)
         }
     }
 
@@ -217,9 +264,24 @@ class TvScaffoldViewModelTest {
     }
 
     @Test
+    fun `openNowPlayingRequests emits when a launch open request is made`() = runTest {
+        viewModel.openNowPlayingRequests.test {
+            launchRequests.requestOpenNowPlaying()
+            awaitItem()
+        }
+    }
+
+    @Test
     fun `signOut delegates to the sign out manager`() = runTest {
         viewModel.signOut()
 
         verify(signOutManager).signOutAndWipeData()
+    }
+
+    @Test
+    fun `trackProfileShown tracks the profile shown event`() = runTest {
+        viewModel.trackProfileShown()
+
+        verify(eventHorizon).track(ProfileShownEvent)
     }
 }
