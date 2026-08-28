@@ -32,6 +32,7 @@ import au.com.shiftyjelly.pocketcasts.component.LocalTvTopBarVisibility
 import au.com.shiftyjelly.pocketcasts.component.TvDetailOverlay
 import au.com.shiftyjelly.pocketcasts.component.TvTopBarVisibility
 import au.com.shiftyjelly.pocketcasts.component.tvFocusInactiveWhen
+import au.com.shiftyjelly.pocketcasts.history.TvListeningHistoryScreen
 import au.com.shiftyjelly.pocketcasts.nowplaying.TvNowPlayingScreen
 import au.com.shiftyjelly.pocketcasts.playlists.TvPlaylistsScreen
 import au.com.shiftyjelly.pocketcasts.podcasts.TvYourPodcastsScreen
@@ -53,6 +54,7 @@ fun TvScaffold(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var isProfileModalVisible by rememberSaveable { mutableStateOf(false) }
     var isStarredVisible by rememberSaveable { mutableStateOf(false) }
+    var isListeningHistoryVisible by rememberSaveable { mutableStateOf(false) }
     val topBarVisibility = remember { TvTopBarVisibility() }
     var didFocusTopBar by rememberSaveable { mutableStateOf(false) }
     var isNowPlayingOpenRequested by remember { mutableStateOf(false) }
@@ -65,6 +67,7 @@ fun TvScaffold(
             viewModel.openNowPlaying()
             isNowPlayingOpenRequested = true
             isStarredVisible = false
+            isListeningHistoryVisible = false
         }
     }
     LaunchedEffect(viewModel) {
@@ -95,7 +98,7 @@ fun TvScaffold(
                     }
                 },
                 onProfileClick = { isProfileModalVisible = true },
-                modifier = Modifier.tvFocusInactiveWhen(isStarredVisible),
+                modifier = Modifier.tvFocusInactiveWhen(isStarredVisible || isListeningHistoryVisible),
             ) { tab ->
                 val navigateToHome = { viewModel.selectTab(TvTab.Home) }
                 // Tabs without a detail screen sit below the bar; the detail-bearing tabs pad their own
@@ -135,6 +138,16 @@ fun TvScaffold(
             ) {
                 TvStarredScreen()
             }
+
+            TvDetailOverlay(
+                target = if (isListeningHistoryVisible) Unit else null,
+                onBack = {
+                    isListeningHistoryVisible = false
+                    focusTopBar()
+                },
+            ) {
+                TvListeningHistoryScreen()
+            }
         }
 
         if (isProfileModalVisible) {
@@ -153,8 +166,10 @@ fun TvScaffold(
                     isProfileModalVisible = false
                     isStarredVisible = true
                 },
-                // TODO: wire up the Listening History destination.
-                onListeningHistory = {},
+                onListeningHistory = {
+                    isProfileModalVisible = false
+                    isListeningHistoryVisible = true
+                },
                 onLogOut = {
                     isProfileModalVisible = false
                     viewModel.signOut()
