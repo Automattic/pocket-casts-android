@@ -71,10 +71,12 @@ dependencies {
     implementation(libs.tv.material)
 
     implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.config)
 
     implementation(projects.modules.features.shared)
     implementation(projects.modules.services.analytics)
     implementation(projects.modules.services.compose)
+    implementation(projects.modules.services.crashlogging)
     implementation(projects.modules.services.images)
     implementation(projects.modules.services.localization)
     implementation(projects.modules.services.qr)

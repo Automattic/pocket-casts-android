@@ -4,17 +4,23 @@ import android.app.Application
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsController
+import au.com.shiftyjelly.pocketcasts.crashlogging.InitializeRemoteLogging
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackServiceToggle
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import au.com.shiftyjelly.pocketcasts.utils.ChainedExceptionHandler
 import au.com.shiftyjelly.pocketcasts.utils.TimberDebugTree
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.DefaultReleaseFeatureProvider
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.FirebaseRemoteFeatureProvider
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.PreferencesFeatureProvider
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBufferUncaughtExceptionHandler
 import au.com.shiftyjelly.pocketcasts.utils.log.RxJavaUncaughtExceptionHandling
+import com.google.firebase.FirebaseApp
 import dagger.hilt.android.HiltAndroidApp
+import java.io.File
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -47,6 +53,8 @@ class TvApplication :
 
     @Inject lateinit var appLifecycleObserver: TvAppLifecycleObserver
 
+    @Inject lateinit var initializeRemoteLogging: InitializeRemoteLogging
+
     private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     override fun onCreate() {
@@ -55,6 +63,7 @@ class TvApplication :
             Timber.plant(TimberDebugTree())
         }
         RxJavaUncaughtExceptionHandling.setUp()
+        setupCrashLogging()
         setupFeatureFlags()
         setupAnalytics()
         notificationHelper.setupNotificationChannels()
@@ -65,6 +74,19 @@ class TvApplication :
         applicationScope.launch {
             playbackManager.setup()
         }
+    }
+
+    private fun setupCrashLogging() {
+        LogBuffer.setup(File(filesDir, "logs").absolutePath)
+        val exceptionHandler = ChainedExceptionHandler(
+            listOfNotNull(
+                LogBufferUncaughtExceptionHandler(),
+                Thread.getDefaultUncaughtExceptionHandler(),
+            ),
+        )
+        Thread.setDefaultUncaughtExceptionHandler(exceptionHandler)
+        initializeRemoteLogging()
+        FirebaseApp.initializeApp(this)
     }
 
     private fun setupAnalytics() {
