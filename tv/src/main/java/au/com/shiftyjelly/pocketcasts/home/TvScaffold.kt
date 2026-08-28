@@ -177,7 +177,10 @@ fun TvScaffold(
                     isProfileModalVisible = false
                     isListeningHistoryVisible = true
                 },
-                onSettings = { isSettingsModalVisible = true },
+                onSettings = {
+                    isProfileModalVisible = false
+                    isSettingsModalVisible = true
+                },
                 onLogOut = {
                     isProfileModalVisible = false
                     viewModel.signOut()

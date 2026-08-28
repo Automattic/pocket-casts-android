@@ -226,10 +226,19 @@ private fun TvSubscriptionInfoModal(
                 label = stringResource(LR.string.tv_settings_subscription_plan),
                 value = subscriptionPlanText(subscription),
             )
-            TvSettingsInfoRow(
-                label = subscriptionRenewalLabel(subscription),
-                value = subscriptionRenewalText(subscription),
-            )
+            if (subscription.isChampion) {
+                Text(
+                    text = stringResource(LR.string.tv_settings_subscription_lifetime),
+                    color = MaterialTheme.tvColors.textSecondary,
+                    style = MaterialTheme.tvTypography.caption1.copy(textAlign = TextAlign.Center),
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            } else {
+                TvSettingsInfoRow(
+                    label = subscriptionRenewalLabel(subscription),
+                    value = subscriptionRenewalText(subscription),
+                )
+            }
             if (subscription.isManagedOnAnotherPlatform) {
                 Text(
                     text = stringResource(LR.string.tv_settings_subscription_other_platform),
@@ -287,16 +296,13 @@ private fun subscriptionPlanText(subscription: Subscription): String {
 @Composable
 private fun subscriptionRenewalLabel(subscription: Subscription): String = stringResource(
     when {
-        subscription.isChampion || subscription.isAutoRenewing -> LR.string.tv_settings_subscription_next_renewal
+        subscription.isAutoRenewing -> LR.string.tv_settings_subscription_next_renewal
         else -> LR.string.tv_settings_subscription_expires
     },
 )
 
 @Composable
 private fun subscriptionRenewalText(subscription: Subscription): String {
-    if (subscription.isChampion) {
-        return stringResource(LR.string.tv_settings_subscription_lifetime)
-    }
     return remember(subscription.expiryDate) {
         Date.from(subscription.expiryDate).toLocalizedFormatLongStyle()
     }
