@@ -152,7 +152,7 @@ class TvHomeViewModel @Inject constructor(
             }
             if (isLoggedIn) {
                 val queue = upNextEpisodes.drop(1)
-                if (queue.isNotEmpty()) {
+                if (queue.size >= UP_NEXT_ROW_MIN) {
                     add(
                         TvDiscoverRow.Episodes(
                             id = UP_NEXT_ROW_ID,
@@ -279,6 +279,7 @@ class TvHomeViewModel @Inject constructor(
         private val LOCAL_ROW_IDS = setOf(KEEP_LISTENING_ROW_ID, UP_NEXT_ROW_ID, NEW_RELEASES_ROW_ID)
 
         private const val UP_NEXT_LIMIT = 12
+        private const val UP_NEXT_ROW_MIN = 2
         private const val NEW_RELEASES_LIMIT = 12
 
         private val NEW_RELEASES_RULES = SmartPlaylistDraft.NewReleases.rules.copy(

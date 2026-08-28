@@ -823,6 +823,25 @@ class TvHomeViewModelTest {
     }
 
     @Test
+    fun `up next row is hidden when only one episode is queued beyond the current one`() = runTest {
+        whenever(syncManager.isLoggedIn()).thenReturn(true)
+        whenever(listRepository.getHomeDiscoverFeed(isLoggedIn = true)).thenReturn(discover())
+        whenever(upNextDao.getUpNextBaseEpisodes(any())).thenReturn(
+            listOf(
+                episode(uuid = "episode-1", podcastUuid = "podcast-1"),
+                episode(uuid = "episode-2", podcastUuid = "podcast-1"),
+            ),
+        )
+
+        val viewModel = createViewModel()
+
+        viewModel.uiState.test {
+            val state = awaitItem() as TvHomeUiState.Ready
+            assertEquals(listOf(TvHomeViewModel.KEEP_LISTENING_ROW_ID), state.rows.map { it.id })
+        }
+    }
+
+    @Test
     fun `up next and new releases rows are hidden when signed out`() = runTest {
         whenever(syncManager.isLoggedIn()).thenReturn(false)
         whenever(listRepository.getHomeDiscoverFeed(isLoggedIn = false)).thenReturn(discover())
@@ -838,6 +857,30 @@ class TvHomeViewModelTest {
         viewModel.uiState.test {
             val state = awaitItem() as TvHomeUiState.Ready
             assertEquals(listOf(TvHomeViewModel.KEEP_LISTENING_ROW_ID), state.rows.map { it.id })
+        }
+    }
+
+    @Test
+    fun `discover feed falls back to a default region when the country cannot be resolved`() = runTest {
+        whenever(discoverCountryCode.value).thenReturn("zz")
+        whenever(syncManager.isLoggedIn()).thenReturn(false)
+        whenever(listRepository.getHomeDiscoverFeed(isLoggedIn = false)).thenReturn(
+            Discover(
+                layout = listOf(row(id = "trending", title = "Row Trending", source = "https://lists/trending.json")),
+                regions = mapOf("us" to DiscoverRegion(name = "United States", flag = "flag", code = "us")),
+                regionCodeToken = "[regionCode]",
+                regionNameToken = "[regionName]",
+                defaultRegionCode = "unknown",
+            ),
+        )
+        whenever(listRepository.getListFeed(eq("https://lists/trending.json"), any()))
+            .thenReturn(podcastFeed("podcast-trending"))
+
+        val viewModel = createViewModel()
+
+        viewModel.uiState.test {
+            val state = awaitItem() as TvHomeUiState.Ready
+            assertEquals(listOf("trending"), state.rows.map { it.id })
         }
     }
 

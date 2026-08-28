@@ -248,7 +248,10 @@ class TvDiscoverFeedLoader @Inject constructor(
     }
 
     private fun resolveRegion(discover: Discover): DiscoverRegion {
-        return resolveRegionOrNull(discover) ?: error("Could not resolve discover region")
+        return resolveRegionOrNull(discover)
+            ?: discover.regions[FALLBACK_REGION_CODE]
+            ?: discover.regions.values.firstOrNull()
+            ?: error("Could not resolve discover region")
     }
 
     private fun regionReplacements(discover: Discover, region: DiscoverRegion? = resolveRegionOrNull(discover)): Map<String, String> {
@@ -284,6 +287,7 @@ class TvDiscoverFeedLoader @Inject constructor(
 
     companion object {
         private const val BANNER_TYPE = "banner"
+        private const val FALLBACK_REGION_CODE = "us"
         private const val SPONSORED_CATEGORY_POSITION = 5
         private const val COVER_ARTWORK_SIZE = 200
     }
