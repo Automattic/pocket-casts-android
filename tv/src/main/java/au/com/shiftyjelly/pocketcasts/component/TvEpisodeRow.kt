@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -36,12 +37,17 @@ import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
+import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory.PlaceholderType
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
 import au.com.shiftyjelly.pocketcasts.theme.TvTheme
 import au.com.shiftyjelly.pocketcasts.theme.tvColors
 import au.com.shiftyjelly.pocketcasts.theme.tvTypography
 import java.util.Date
 import au.com.shiftyjelly.pocketcasts.images.R as IR
+
+/** Whether episode rows render episode artwork over podcast artwork; mirrors the shared appearance setting. */
+val LocalUseEpisodeArtwork = staticCompositionLocalOf { false }
 
 @Composable
 fun TvEpisodeRow(
@@ -77,7 +83,7 @@ fun TvEpisodeRow(
                 .fillMaxWidth()
                 .padding(12.dp),
         ) {
-            EpisodeArtwork(podcastUuid = episode.podcastUuid)
+            EpisodeArtwork(episode = episode)
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -134,11 +140,21 @@ fun TvEpisodeRow(
 
 @Composable
 private fun EpisodeArtwork(
-    podcastUuid: String,
+    episode: PodcastEpisode,
     modifier: Modifier = Modifier,
 ) {
+    val useEpisodeArtwork = LocalUseEpisodeArtwork.current
+    val context = LocalContext.current
+    val model = if (useEpisodeArtwork) {
+        remember(episode.uuid) {
+            PocketCastsImageRequestFactory(context, placeholderType = PlaceholderType.None)
+                .create(episode, useEpisodeArtwork = true)
+        }
+    } else {
+        PodcastImage.getMediumArtworkUrl(episode.podcastUuid)
+    }
     TvArtworkImage(
-        model = PodcastImage.getMediumArtworkUrl(podcastUuid),
+        model = model,
         modifier = modifier
             .size(82.dp)
             .clip(RoundedCornerShape(4.dp)),

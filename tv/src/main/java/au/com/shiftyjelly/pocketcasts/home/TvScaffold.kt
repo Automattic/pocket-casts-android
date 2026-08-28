@@ -29,6 +29,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.component.LocalFocusTvTopBar
 import au.com.shiftyjelly.pocketcasts.component.LocalOpenNowPlaying
 import au.com.shiftyjelly.pocketcasts.component.LocalTvTopBarVisibility
+import au.com.shiftyjelly.pocketcasts.component.LocalUseEpisodeArtwork
 import au.com.shiftyjelly.pocketcasts.component.TvDetailOverlay
 import au.com.shiftyjelly.pocketcasts.component.TvTopBarVisibility
 import au.com.shiftyjelly.pocketcasts.component.tvFocusInactiveWhen
@@ -37,6 +38,7 @@ import au.com.shiftyjelly.pocketcasts.nowplaying.TvNowPlayingScreen
 import au.com.shiftyjelly.pocketcasts.playlists.TvPlaylistsScreen
 import au.com.shiftyjelly.pocketcasts.podcasts.TvYourPodcastsScreen
 import au.com.shiftyjelly.pocketcasts.search.TvSearchScreen
+import au.com.shiftyjelly.pocketcasts.settings.TvSettingsModal
 import au.com.shiftyjelly.pocketcasts.starred.TvStarredScreen
 import au.com.shiftyjelly.pocketcasts.theme.TvScreenBackgroundBrush
 import au.com.shiftyjelly.pocketcasts.theme.TvTheme
@@ -55,6 +57,7 @@ fun TvScaffold(
     var isProfileModalVisible by rememberSaveable { mutableStateOf(false) }
     var isStarredVisible by rememberSaveable { mutableStateOf(false) }
     var isListeningHistoryVisible by rememberSaveable { mutableStateOf(false) }
+    var isSettingsModalVisible by rememberSaveable { mutableStateOf(false) }
     val topBarVisibility = remember { TvTopBarVisibility() }
     var didFocusTopBar by rememberSaveable { mutableStateOf(false) }
     var isNowPlayingOpenRequested by remember { mutableStateOf(false) }
@@ -80,6 +83,7 @@ fun TvScaffold(
         LocalTvTopBarVisibility provides topBarVisibility,
         LocalOpenNowPlaying provides openNowPlaying,
         LocalFocusTvTopBar provides focusTopBar,
+        LocalUseEpisodeArtwork provides uiState.useEpisodeArtwork,
     ) {
         Box(modifier = modifier.fillMaxSize()) {
             TvScaffoldContent(
@@ -151,6 +155,9 @@ fun TvScaffold(
         }
 
         if (isProfileModalVisible) {
+            LaunchedEffect(Unit) {
+                viewModel.trackProfileShown()
+            }
             TvProfileModal(
                 profile = uiState.profile,
                 onDismissRequest = { isProfileModalVisible = false },
@@ -170,11 +177,21 @@ fun TvScaffold(
                     isProfileModalVisible = false
                     isListeningHistoryVisible = true
                 },
+                onSettings = {
+                    isProfileModalVisible = false
+                    isSettingsModalVisible = true
+                },
                 onLogOut = {
                     isProfileModalVisible = false
                     viewModel.signOut()
                     onSignedOut()
                 },
+            )
+        }
+
+        if (isSettingsModalVisible) {
+            TvSettingsModal(
+                onDismissRequest = { isSettingsModalVisible = false },
             )
         }
     }
