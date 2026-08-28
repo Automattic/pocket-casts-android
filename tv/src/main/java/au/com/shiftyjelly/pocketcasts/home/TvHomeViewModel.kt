@@ -47,6 +47,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlow
 import kotlinx.coroutines.rx2.await
@@ -110,10 +111,16 @@ class TvHomeViewModel @Inject constructor(
     }
 
     private suspend fun refreshLocalRows() {
-        val current = _uiState.value as? TvHomeUiState.Ready ?: return
-        val nonLocalRows = current.rows.filterNot { it.id in LOCAL_ROW_IDS }
+        if (_uiState.value !is TvHomeUiState.Ready) return
         val localRows = loadLocalRows(syncManager.isLoggedIn())
-        _uiState.value = TvHomeUiState.Ready((localRows + nonLocalRows).distinctBy(TvDiscoverRow::id))
+        _uiState.update { current ->
+            if (current is TvHomeUiState.Ready) {
+                val nonLocalRows = current.rows.filterNot { it.id in LOCAL_ROW_IDS }
+                TvHomeUiState.Ready((localRows + nonLocalRows).distinctBy(TvDiscoverRow::id))
+            } else {
+                current
+            }
+        }
     }
 
     fun load() {
