@@ -16,9 +16,11 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.component.TvModal
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.onboarding.signin.TvSignInErrorContent
 import au.com.shiftyjelly.pocketcasts.onboarding.signin.TvSignInQrContent
@@ -34,7 +36,11 @@ fun TvCreateAccountModal(
     onRetry: () -> Unit,
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
+    viewModel: TvCreateAccountModalViewModel = hiltViewModel(),
 ) {
+    CallOnce {
+        viewModel.trackShown()
+    }
     TvModal(
         onDismissRequest = onDismissRequest,
         width = ModalWidth,
