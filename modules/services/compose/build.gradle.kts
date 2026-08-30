@@ -3,6 +3,17 @@ plugins {
     alias(libs.plugins.kotlin.parcelize)
     alias(libs.plugins.ksp)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.compose.ai.preview)
+}
+
+// Renders this module's `@Preview`s to PNG on CI. `sdkVersion` is pinned because auto-detect
+// silently clamps compileSdk 37 to Robolectric's sdk=36 ceiling; `hostTheme` is required because
+// `HtmlText` resolves `?attr/primary_text_01`, which only our own themes define and a library
+// module's merged manifest does not supply — without it those previews render nothing.
+composePreview {
+    variant.set("debug")
+    sdkVersion.set(35)
+    hostTheme.set("@style/ThemeLight")
 }
 
 android {
