@@ -27,6 +27,7 @@ class VideoViewModel @Inject constructor(
 
     private var hideControlsTimer: Disposable? = null
     private var lastTimeHidingControls = 0L
+    private var seekGeneration = 0L
 
     private var controlsVisibleMutable = MutableLiveData(true)
     private val sourceView = SourceView.FULL_SCREEN_VIDEO
@@ -64,11 +65,22 @@ class VideoViewModel @Inject constructor(
     }
 
     fun seekStarted() {
+        seekGeneration++
         stopHideControlsTimer()
     }
 
-    fun seekToMs(seekTimeMs: Int) {
-        playbackManager.seekToTimeMs(seekTimeMs)
+    fun seekToMs(episodeUuid: String, seekTimeMs: Int, seekComplete: () -> Unit) {
+        val generation = seekGeneration
+        playbackManager.seekIfPlayingToTimeMs(episodeUuid, seekTimeMs, sourceView) {
+            if (generation == seekGeneration) {
+                startHideControlsTimer()
+            }
+            seekComplete()
+        }
+    }
+
+    fun seekCancelled() {
+        seekGeneration++
         startHideControlsTimer()
     }
 
@@ -110,6 +122,7 @@ class VideoViewModel @Inject constructor(
     }
 
     override fun onCleared() {
+        seekGeneration++
         super.onCleared()
         stopHideControlsTimer()
     }
