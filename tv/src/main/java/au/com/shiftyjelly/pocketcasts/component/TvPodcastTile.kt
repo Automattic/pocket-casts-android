@@ -64,7 +64,7 @@ fun TvPodcastTile(
 }
 
 object TvPodcastTileDefaults {
-    val RowImageWidth = 92.dp
+    val RowImageWidth = 136.dp
 }
 
 @Preview(device = Devices.TV_1080p)

@@ -61,7 +61,7 @@ fun TvVideoTile(
     ) {
         Box(
             modifier = Modifier
-                .width(242.dp)
+                .width(358.dp)
                 .aspectRatio(16f / 9f),
         ) {
             AsyncImage(
@@ -102,11 +102,11 @@ fun TvVideoTile(
                             colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.9f)),
                         ),
                     )
-                    .padding(10.5.dp),
+                    .padding(16.dp),
                 contentAlignment = Alignment.BottomStart,
             ) {
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(7.5.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     AsyncImage(
@@ -114,7 +114,7 @@ fun TvVideoTile(
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
-                            .size(27.dp)
+                            .size(36.dp)
                             .clip(RoundedCornerShape(3.dp)),
                     )
                     Column {

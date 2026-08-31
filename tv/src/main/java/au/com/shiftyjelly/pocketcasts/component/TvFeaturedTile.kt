@@ -67,8 +67,8 @@ fun TvFeaturedTile(
     ) {
         Box(
             modifier = Modifier
-                .width(481.5.dp)
-                .height(150.dp),
+                .width(802.dp)
+                .height(250.dp),
         ) {
             AsyncImage(
                 model = artworkUrl,
@@ -103,8 +103,8 @@ fun TvFeaturedTile(
                     contentDescription = title,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
-                        .padding(12.dp)
-                        .size(126.dp)
+                        .padding(20.dp)
+                        .size(210.dp)
                         .clip(RoundedCornerShape(3.dp)),
                 )
 
@@ -126,7 +126,7 @@ fun TvFeaturedTile(
 
                     Text(
                         text = title,
-                        style = MaterialTheme.tvTypography.headline,
+                        style = MaterialTheme.tvTypography.title2,
                         color = MaterialTheme.tvColors.textPrimary,
                     )
 
@@ -148,7 +148,7 @@ fun TvFeaturedTile(
                         exit = fadeOut() + shrinkVertically(shrinkTowards = Alignment.Top),
                     ) {
                         Row(
-                            horizontalArrangement = Arrangement.spacedBy(9.dp),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
                         ) {
                             OutlinedButton(
                                 onClick = onPlayLastEpisode,

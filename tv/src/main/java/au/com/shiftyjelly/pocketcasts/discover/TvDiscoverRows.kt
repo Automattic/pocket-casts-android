@@ -52,7 +52,7 @@ fun LazyListScope.tvDiscoverRow(
             TvRow(
                 title = row.title,
                 items = row.podcasts,
-                itemSpacing = 24.dp,
+                itemSpacing = 12.dp,
                 contentPadding = contentPadding,
                 key = TvDiscoverPodcast::uuid,
                 focusRequester = focusRequester,
@@ -74,7 +74,7 @@ fun LazyListScope.tvDiscoverRow(
             TvRow(
                 title = row.title,
                 items = row.podcasts,
-                itemSpacing = 24.dp,
+                itemSpacing = 12.dp,
                 contentPadding = contentPadding,
                 key = TvDiscoverPodcast::uuid,
                 focusRequester = focusRequester,
@@ -96,7 +96,7 @@ fun LazyListScope.tvDiscoverRow(
             TvRow(
                 title = row.title,
                 items = row.episodes,
-                itemSpacing = 24.dp,
+                itemSpacing = 12.dp,
                 contentPadding = contentPadding,
                 key = TvDiscoverEpisode::episodeUuid,
                 focusRequester = focusRequester,

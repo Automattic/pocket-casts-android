@@ -249,7 +249,7 @@ private fun TvHomeRows(
 
     LazyColumn(
         modifier = modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(18.dp),
+        verticalArrangement = Arrangement.spacedBy(40.dp),
     ) {
         item { Spacer(modifier = Modifier.height(6.dp)) }
 

@@ -48,7 +48,7 @@ import au.com.shiftyjelly.pocketcasts.theme.tvTypography
 import coil3.compose.AsyncImage
 
 private val CardShape = RoundedCornerShape(9.dp)
-private val CoverSize = 60.dp
+private val CoverSize = 78.dp
 private val CoverShape = RoundedCornerShape(6.dp)
 private const val COVER_VISIBLE_FRACTION = 0.55f
 private const val COVER_RESTING_SCALE = 0.85f
@@ -93,8 +93,8 @@ fun TvCategoryTile(
         ),
         interactionSource = interactionSource,
         modifier = modifier
-            .width(210.dp)
-            .height(96.dp),
+            .width(284.dp)
+            .height(129.dp),
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             Box(
@@ -132,12 +132,12 @@ fun TvCategoryTile(
                     model = category.icon,
                     contentDescription = null,
                     colorFilter = ColorFilter.tint(contentColor),
-                    modifier = Modifier.size(21.dp),
+                    modifier = Modifier.size(24.dp),
                 )
-                Spacer(modifier = Modifier.height(7.5.dp))
+                Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = category.name,
-                    style = MaterialTheme.tvTypography.body,
+                    style = MaterialTheme.tvTypography.headline,
                     color = contentColor,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
