@@ -43,6 +43,11 @@ class CanaryFlashBackend @Inject constructor(
             return@withContext Result.failure(IllegalStateException("Canary Flash model files missing"))
         }
         val srcLang = canarySourceLanguage()
+        // Reject unsupported source languages (e.g. forced via a manual override on a
+        // locale Canary does not cover) rather than passing an invalid config to the runtime.
+        if (srcLang !in SUPPORTED_SOURCE_LANGUAGES) {
+            return@withContext Result.failure(IllegalArgumentException("Unsupported Canary source language: $srcLang"))
+        }
         try {
             val config = OfflineRecognizerConfig(
                 featConfig = FeatureConfig(sampleRate = 16000, featureDim = 80),
@@ -59,6 +64,7 @@ class CanaryFlashBackend @Inject constructor(
                     provider = "cpu",
                 ),
             )
+            recognizer?.release()
             recognizer = OfflineRecognizer(config = config)
             Timber.i("CanaryFlashBackend ready (src=%s, tgt=en)", srcLang)
             Result.success(Unit)
@@ -75,16 +81,19 @@ class CanaryFlashBackend @Inject constructor(
         }
         try {
             val stream = rec.createStream()
-            stream.acceptWaveform(samples, sampleRateHz)
-            rec.decode(stream)
-            val result = rec.getResult(stream)
-            stream.release()
-            val trimmed = result.text.trim()
-            if (trimmed.isEmpty()) {
-                AsrResult(text = "", detectedLanguage = canarySourceLanguage())
-            } else {
-                // Canary translates to English natively, so the transcript is English.
-                AsrResult(text = trimmed, detectedLanguage = "en")
+            try {
+                stream.acceptWaveform(samples, sampleRateHz)
+                rec.decode(stream)
+                val result = rec.getResult(stream)
+                val trimmed = result.text.trim()
+                if (trimmed.isEmpty()) {
+                    AsrResult(text = "", detectedLanguage = canarySourceLanguage())
+                } else {
+                    // Canary translates to English natively, so the transcript is English.
+                    AsrResult(text = trimmed, detectedLanguage = "en")
+                }
+            } finally {
+                stream.release()
             }
         } catch (e: Exception) {
             Timber.e(e, "Canary Flash transcription failed")
@@ -131,5 +140,7 @@ class CanaryFlashBackend @Inject constructor(
         private const val CANARY_DECODER_FILENAME = "decoder.int8.onnx"
         private const val CANARY_TOKENS_FILENAME = "tokens.txt"
         private const val CANARY_TARGET_DIR = "canary-flash-model"
+
+        private val SUPPORTED_SOURCE_LANGUAGES = setOf("en", "de", "es", "fr")
     }
 }

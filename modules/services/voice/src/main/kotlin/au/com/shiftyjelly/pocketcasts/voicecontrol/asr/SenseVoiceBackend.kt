@@ -38,6 +38,7 @@ class SenseVoiceBackend @Inject constructor() : AsrBackend {
                     provider = "cpu",
                 ),
             )
+            recognizer?.release()
             recognizer = OfflineRecognizer(config = config)
             Timber.i("SenseVoiceBackend ready")
             Result.success(Unit)
@@ -54,18 +55,21 @@ class SenseVoiceBackend @Inject constructor() : AsrBackend {
         }
         try {
             val stream = rec.createStream()
-            stream.acceptWaveform(samples, sampleRateHz)
-            rec.decode(stream)
-            val result = rec.getResult(stream)
-            stream.release()
-            val trimmed = result.text.trim()
-            if (trimmed.isEmpty()) {
-                AsrResult(text = "", detectedLanguage = null)
-            } else {
-                // SenseVoice auto-LID prefixes text like "<|zh|>...", strip and detect
-                val lang = detectLanguage(trimmed)
-                val cleanText = stripLanguageTag(trimmed)
-                AsrResult(text = cleanText, detectedLanguage = lang)
+            try {
+                stream.acceptWaveform(samples, sampleRateHz)
+                rec.decode(stream)
+                val result = rec.getResult(stream)
+                val trimmed = result.text.trim()
+                if (trimmed.isEmpty()) {
+                    AsrResult(text = "", detectedLanguage = null)
+                } else {
+                    // SenseVoice auto-LID prefixes text like "<|zh|>...", strip and detect
+                    val lang = detectLanguage(trimmed)
+                    val cleanText = stripLanguageTag(trimmed)
+                    AsrResult(text = cleanText, detectedLanguage = lang)
+                }
+            } finally {
+                stream.release()
             }
         } catch (e: Exception) {
             Timber.e(e, "SenseVoice transcription failed")
