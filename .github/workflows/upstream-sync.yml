@@ -2,9 +2,9 @@ name: Upstream release sync
 
 on:
   schedule:
-    # Daily at 10:00 UTC. Preflight no-ops when already synced; upstream
-    # releases land mostly on Fridays, so a single weekday check can lag 3-6 days.
-    - cron: '0 10 * * *'
+    # Weekly on Mondays at 10:00 UTC. Upstream releases mostly land Fridays;
+    # preflight no-ops when already synced.
+    - cron: '0 10 * * 1'
   workflow_dispatch:
 
 permissions:
