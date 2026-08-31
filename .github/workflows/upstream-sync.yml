@@ -21,6 +21,10 @@ jobs:
     env:
       UPSTREAM_REPO: Automattic/pocket-casts-android
       BASE_BRANCH: main
+      AURIS_CUSTOMIZATION_HINT: >-
+        Preserve ALL Auris-specific customizations (voice module, wake word,
+        on-device ASR/intent routing, and related assets under modules/services/voice/).
+        Prefer upstream changes everywhere else. Do not delete Auris-only modules or features.
 
     steps:
       - name: Checkout
@@ -36,15 +40,27 @@ jobs:
           chmod +x ./scripts/upstream-sync-preflight.sh
           ./scripts/upstream-sync-preflight.sh
 
-      - name: Validate Pi configuration
+      - name: Prepare upstream merge
+        id: prepare
         if: steps.preflight.outputs.proceed == 'true'
+        env:
+          SYNC_TAG: ${{ steps.preflight.outputs.tag }}
+          SYNC_COMMIT: ${{ steps.preflight.outputs.commit }}
+          SYNC_BRANCH: ${{ steps.preflight.outputs.branch }}
+        run: |
+          chmod +x ./scripts/upstream-sync-prepare.sh
+          ./scripts/upstream-sync-prepare.sh
+
+      - name: Validate Pi configuration
+        if: steps.preflight.outputs.proceed == 'true' && steps.prepare.outputs.merge_conflicts == 'true'
         run: |
           test -n "${{ secrets.PI_PROVIDER || vars.PI_PROVIDER }}" || { echo "PI_PROVIDER is not set"; exit 1; }
           test -n "${{ secrets.PI_MODEL || vars.PI_MODEL }}" || { echo "PI_MODEL is not set"; exit 1; }
           test -n "${{ secrets.PI_API_KEY }}" || { echo "PI_API_KEY is not set"; exit 1; }
 
-      - name: Sync upstream release with Pi
-        if: steps.preflight.outputs.proceed == 'true'
+      - name: Resolve merge conflicts with Pi
+        id: pi
+        if: steps.preflight.outputs.proceed == 'true' && steps.prepare.outputs.merge_conflicts == 'true'
         uses: shaftoe/pi-coding-agent-action@v2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -52,31 +68,79 @@ jobs:
           model: ${{ secrets.PI_MODEL || vars.PI_MODEL }}
           token: ${{ secrets.PI_API_KEY }}
           auto_compaction: true
+          export_session_jsonl: true
           prompt: |
-            Sync upstream Pocket Casts release `${{ steps.preflight.outputs.tag }}` into this Auris Android fork.
+            Resolve merge conflicts from upstream Pocket Casts release `${{ steps.preflight.outputs.tag }}`.
+
+            Work ONLY in this worktree (do not touch the main checkout):
+            `${{ steps.prepare.outputs.worktree_root }}`
 
             Upstream repository: `${{ env.UPSTREAM_REPO }}`
             Upstream release tag: `${{ steps.preflight.outputs.tag }}`
-            Upstream tag commit: `${{ steps.preflight.outputs.commit }}`
-            Base branch: `${{ env.BASE_BRANCH }}`
             Sync branch: `${{ steps.preflight.outputs.branch }}`
 
-            CRITICAL RULES:
-            - Do ALL git work in an isolated git worktree. NEVER commit directly to `${{ env.BASE_BRANCH }}`.
-            - Create branch `${{ steps.preflight.outputs.branch }}` from `origin/${{ env.BASE_BRANCH }}`.
-            - Create a worktree under `${{ runner.temp }}/upstream-sync-worktrees/${{ steps.preflight.outputs.branch }}`.
-            - In that worktree, merge upstream tag `${{ steps.preflight.outputs.tag }}` (commit `${{ steps.preflight.outputs.commit }}`).
-            - Add `upstream` remote as `https://github.com/${{ env.UPSTREAM_REPO }}.git` if missing, then fetch tags.
-
-            Conflict resolution:
-            - Preserve ALL Auris-specific customizations (voice module, wake word, on-device ASR/intent routing, and related assets under `modules/services/voice/`).
-            - Prefer upstream changes everywhere else.
-            - Do not delete Auris-only modules or features.
-
-            When merge is complete:
-            - Push `${{ steps.preflight.outputs.branch }}` to `origin`.
-            - Open a PR into `${{ env.BASE_BRANCH }}` titled `chore(upstream): merge release ${{ steps.preflight.outputs.tag }}`.
-            - Include a short summary of what was merged and any conflict areas touched.
+            Rules:
+            - ${AURIS_CUSTOMIZATION_HINT}
+            - **Include upstream `.github/` changes** (workflows, actions, templates). Do NOT revert or strip `.github/` files to match old Auris main.
+            - Resolve every conflict marker and unmerged path.
+            - Stage all resolved files and commit with message: `chore(upstream): merge release ${{ steps.preflight.outputs.tag }}`
+            - Do NOT push or open a PR (a later step handles that).
             - Remove the worktree when finished.
 
             Do not run full builds unless required to validate a conflict resolution.
+
+      - name: Log Pi agent response
+        if: steps.preflight.outputs.proceed == 'true' && steps.prepare.outputs.merge_conflicts == 'true'
+        run: |
+          echo "::group::Pi agent response"
+          echo "${{ steps.pi.outputs.response }}"
+          echo "::endgroup::"
+          if [ "${{ steps.pi.outputs.success }}" != "true" ]; then
+            echo "::warning::Pi agent did not report success (success=${{ steps.pi.outputs.success }})"
+          fi
+
+      - name: Finalize sync and open PR
+        id: finalize
+        if: steps.preflight.outputs.proceed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          UPSTREAM_SYNC_PAT: ${{ secrets.UPSTREAM_SYNC_PAT }}
+          PI_RESPONSE: ${{ steps.pi.outputs.response }}
+          PI_SUCCESS: ${{ steps.pi.outputs.success }}
+        run: |
+          chmod +x ./scripts/upstream-sync-audit.sh ./scripts/upstream-sync-finalize.sh
+          ./scripts/upstream-sync-finalize.sh
+
+      - name: Sync incomplete
+        if: steps.preflight.outputs.proceed == 'true' && steps.finalize.outputs.has_unresolved_conflicts == 'true'
+        run: |
+          echo "::error::Upstream sync has unresolved merge conflicts. See the PR and workflow logs."
+          exit 1
+
+      - name: Push failed
+        if: steps.preflight.outputs.proceed == 'true' && steps.finalize.outputs.push_succeeded != 'true'
+        run: |
+          echo "::error::Upstream sync branch could not be pushed. See the PR body and workflow logs."
+          exit 1
+
+      - name: Workflow files deferred
+        if: steps.preflight.outputs.proceed == 'true' && steps.finalize.outputs.workflows_deferred == 'true'
+        run: |
+          echo "::warning::.github/workflows/ changes were deferred — apply the patch from the PR or workflow artifact manually."
+          exit 1
+
+      - name: Upload deferred workflow patch
+        if: steps.preflight.outputs.proceed == 'true' && steps.finalize.outputs.workflows_deferred == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: upstream-sync-workflows-patch
+          path: ${{ runner.temp }}/upstream-sync/github-workflows.patch
+          if-no-files-found: ignore
+
+      - name: Upload Pi session JSONL
+        if: steps.preflight.outputs.proceed == 'true' && steps.prepare.outputs.merge_conflicts == 'true' && steps.pi.outputs.session_jsonl_path != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: upstream-sync-pi-session
+          path: ${{ steps.pi.outputs.session_jsonl_path }}
+          if-no-files-found: ignore
