@@ -17,7 +17,7 @@ echo "--- 🧹 Linting"
 ./gradlew :app:lintRelease
 app_lint_exit_code=$?
 
-./gradlew :automotive:lintRelease :tv:lintRelease :wear:lintRelease
+./gradlew --continue :automotive:lintRelease :tv:lintRelease :wear:lintRelease
 other_lint_exit_code=$?
 
 if [ $app_lint_exit_code -ne 0 ] || [ $other_lint_exit_code -ne 0 ]; then
