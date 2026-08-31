@@ -1,0 +1,99 @@
+name: Upstream release sync
+
+on:
+  schedule:
+    # Biweekly on Mondays at 10:00 UTC (odd ISO weeks only).
+    - cron: '0 10 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: upstream-sync-${{ github.repository }}
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    env:
+      UPSTREAM_REPO: Automattic/pocket-casts-android
+      BASE_BRANCH: main
+
+    steps:
+      - name: Biweekly gate
+        id: gate
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          week=$(date -u +%V)
+          if (( 10#$week % 2 == 1 )); then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            echo "ISO week ${week} — running biweekly sync"
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "ISO week ${week} — skipping (biweekly schedule)"
+          fi
+
+      - name: Checkout
+        if: steps.gate.outputs.run == 'true'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Preflight
+        id: preflight
+        if: steps.gate.outputs.run == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          chmod +x ./scripts/upstream-sync-preflight.sh
+          ./scripts/upstream-sync-preflight.sh
+
+      - name: Validate Pi configuration
+        if: steps.gate.outputs.run == 'true' && steps.preflight.outputs.proceed == 'true'
+        run: |
+          test -n "${{ secrets.PI_PROVIDER || vars.PI_PROVIDER }}" || { echo "PI_PROVIDER is not set"; exit 1; }
+          test -n "${{ secrets.PI_MODEL || vars.PI_MODEL }}" || { echo "PI_MODEL is not set"; exit 1; }
+          test -n "${{ secrets.PI_API_KEY }}" || { echo "PI_API_KEY is not set"; exit 1; }
+
+      - name: Sync upstream release with Pi
+        if: steps.gate.outputs.run == 'true' && steps.preflight.outputs.proceed == 'true'
+        uses: shaftoe/pi-coding-agent-action@v2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          provider: ${{ secrets.PI_PROVIDER || vars.PI_PROVIDER }}
+          model: ${{ secrets.PI_MODEL || vars.PI_MODEL }}
+          token: ${{ secrets.PI_API_KEY }}
+          auto_compaction: true
+          prompt: |
+            Sync upstream Pocket Casts release `${{ steps.preflight.outputs.tag }}` into this Auris Android fork.
+
+            Upstream repository: `${{ env.UPSTREAM_REPO }}`
+            Upstream release tag: `${{ steps.preflight.outputs.tag }}`
+            Upstream tag commit: `${{ steps.preflight.outputs.commit }}`
+            Base branch: `${{ env.BASE_BRANCH }}`
+            Sync branch: `${{ steps.preflight.outputs.branch }}`
+
+            CRITICAL RULES:
+            - Do ALL git work in an isolated git worktree. NEVER commit directly to `${{ env.BASE_BRANCH }}`.
+            - Create branch `${{ steps.preflight.outputs.branch }}` from `origin/${{ env.BASE_BRANCH }}`.
+            - Create a worktree under `${{ runner.temp }}/upstream-sync-worktrees/${{ steps.preflight.outputs.branch }}`.
+            - In that worktree, merge upstream tag `${{ steps.preflight.outputs.tag }}` (commit `${{ steps.preflight.outputs.commit }}`).
+            - Add `upstream` remote as `https://github.com/${{ env.UPSTREAM_REPO }}.git` if missing, then fetch tags.
+
+            Conflict resolution:
+            - Preserve ALL Auris-specific customizations (voice module, wake word, on-device ASR/intent routing, and related assets under `modules/services/voice/`).
+            - Prefer upstream changes everywhere else.
+            - Do not delete Auris-only modules or features.
+
+            When merge is complete:
+            - Push `${{ steps.preflight.outputs.branch }}` to `origin`.
+            - Open a PR into `${{ env.BASE_BRANCH }}` titled `chore(upstream): merge release ${{ steps.preflight.outputs.tag }}`.
+            - Include a short summary of what was merged and any conflict areas touched.
+            - Remove the worktree when finished.
+
+            Do not run full builds unless required to validate a conflict resolution.
