@@ -87,6 +87,12 @@ steps:
         artifact_paths:
           - "**/build/outputs/apk/**/*"
 
+      - label: "Assemble tv release APK"
+        command: ".buildkite/commands/assemble-release-apk.sh tv"
+        plugins: [ $CI_TOOLKIT ]
+        artifact_paths:
+          - "**/build/outputs/apk/**/*"
+
     ##########
     # Optional Prototype Builds
     #
