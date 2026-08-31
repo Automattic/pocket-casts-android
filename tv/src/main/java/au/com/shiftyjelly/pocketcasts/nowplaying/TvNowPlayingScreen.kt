@@ -438,7 +438,7 @@ private fun EpisodeTitles(
         }
         Text(
             text = episode.title,
-            style = MaterialTheme.tvTypography.headline,
+            style = MaterialTheme.tvTypography.title2,
             color = MaterialTheme.tvColors.textPrimary,
             textAlign = TextAlign.Start,
             maxLines = 1,
@@ -514,7 +514,7 @@ private fun InfoButton(
     }
 }
 
-private val ArtworkSize = 180.dp
+private val ArtworkSize = 210.dp
 private val ArtworkTopLift = 18.dp
 private val BlurredArtworkScale = 1.25f
 private val BlurredArtworkOffset = -ArtworkSize * 0.2f

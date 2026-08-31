@@ -63,7 +63,7 @@ fun TvSeekBar(
     var isFocused by remember { mutableStateOf(false) }
     val hasDuration = durationMs > 0
     val progress = if (hasDuration) (positionMs.toFloat() / durationMs).coerceIn(0f, 1f) else 0f
-    val trackHeight by animateDpAsState(if (isFocused) 6.dp else 3.dp, label = "TvSeekBarTrackHeight")
+    val trackHeight by animateDpAsState(if (isFocused) 8.dp else 4.dp, label = "TvSeekBarTrackHeight")
     val thumbSize = 9.dp
 
     Column(modifier = modifier) {
