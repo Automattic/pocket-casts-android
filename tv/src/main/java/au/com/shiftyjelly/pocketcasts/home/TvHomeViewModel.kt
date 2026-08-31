@@ -198,6 +198,8 @@ class TvHomeViewModel @Inject constructor(
 
     fun trackBannerTapped(banner: TvDiscoverBanner) = discoverFeedAnalytics.trackBannerTapped(banner)
 
+    fun isPlaying(): Boolean = playbackManager.isPlaying()
+
     fun playEpisode(episode: TvDiscoverEpisode) {
         viewModelScope.launch {
             try {

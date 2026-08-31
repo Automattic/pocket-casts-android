@@ -67,6 +67,9 @@ dependencies {
     implementation(libs.lifecycle.viewmodel.compose)
     implementation(libs.timber)
     implementation(libs.coil.compose)
+    implementation(libs.media3.exoplayer)
+    implementation(libs.media3.exoplayer.hls)
+    implementation(libs.media3.ui.compose)
     implementation(libs.tv.material)
 
     implementation(platform(libs.firebase.bom))

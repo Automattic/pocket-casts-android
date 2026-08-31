@@ -30,4 +30,21 @@ class DiscoverModelTest {
         assertEquals("", row?.source)
         assertTrue(row?.expandedStyle is ExpandedStyle.PlainList)
     }
+
+    @Test
+    fun `discover row parses the video preview list summary style`() {
+        val row = adapter.fromJson(
+            """
+            {
+              "type": "episode_list",
+              "summary_style": "video_preview_list",
+              "expanded_style": "plain_list",
+              "title": "Made for TV",
+              "regions": ["us"]
+            }
+            """.trimIndent(),
+        )
+
+        assertTrue(row?.displayStyle is DisplayStyle.VideoPreviewList)
+    }
 }
