@@ -206,10 +206,36 @@ defer_workflow_files() {
 }
 
 use_pat_for_gh_cli() {
-  # gh pr create/edit should use the same privileged token when available.
+  # One token for push + PR create/edit. Requires UPSTREAM_SYNC_PAT with
+  # Contents write, Workflows write, and Pull requests write (or classic repo+workflow).
   if [ -n "${UPSTREAM_SYNC_PAT:-}" ]; then
     export GH_TOKEN="$UPSTREAM_SYNC_PAT"
   fi
+}
+
+create_or_update_pr() {
+  local title="chore(upstream): merge release ${SYNC_TAG}"
+  local existing
+  existing="$(gh pr list --head "$SYNC_BRANCH" --state open --json number --jq '.[0].number // empty' || true)"
+  if [ -n "$existing" ]; then
+    if gh pr edit "$existing" --title "$title" --body-file "$PR_BODY_FILE"; then
+      pr_number="$existing"
+      log "Updated PR #${pr_number}"
+      return 0
+    fi
+    add_alert "Pushed \`${SYNC_BRANCH}\` but failed to update existing PR #${existing}."
+    return 1
+  fi
+
+  local url
+  if url="$(gh pr create --base "$BASE_BRANCH" --head "$SYNC_BRANCH" --title "$title" --body-file "$PR_BODY_FILE")"; then
+    pr_number="$(printf '%s\n' "$url" | sed -n 's#.*/pull/\([0-9]*\)$#\1#p')"
+    log "Created PR #${pr_number:-?} (${url})"
+    return 0
+  fi
+
+  add_alert "Pushed \`${SYNC_BRANCH}\` but failed to open a PR. Ensure \`UPSTREAM_SYNC_PAT\` has Pull requests write (fine-grained) or classic \`repo\` scope."
+  return 1
 }
 
 main() {
@@ -260,15 +286,14 @@ main() {
 
   build_pr_body "$PR_BODY_FILE"
 
+  local pr_ok=false
   if [ "$push_succeeded" = true ] || git ls-remote --heads origin "$SYNC_BRANCH" | grep -q .; then
-    pr_number="$(gh pr list --head "$SYNC_BRANCH" --state open --json number --jq '.[0].number // empty')"
-    local title="chore(upstream): merge release ${SYNC_TAG}"
-    if [ -n "$pr_number" ]; then
-      gh pr edit "$pr_number" --title "$title" --body-file "$PR_BODY_FILE"
-      log "Updated PR #${pr_number}"
+    if create_or_update_pr; then
+      pr_ok=true
     else
-      pr_number="$(gh pr create --base "$BASE_BRANCH" --head "$SYNC_BRANCH" --title "$title" --body-file "$PR_BODY_FILE" | sed -n 's/.*\/\([0-9]*\)$/\1/p')"
-      log "Created PR #${pr_number}"
+      build_pr_body "$PR_BODY_FILE"
+      log "PR body (push succeeded, PR create/update failed):"
+      cat "$PR_BODY_FILE" >&2
     fi
   else
     add_alert "No PR was opened because the sync branch is not on origin."
@@ -284,7 +309,7 @@ main() {
     [ -n "$pr_number" ] && echo "pr_number=${pr_number}"
   } >>"${GITHUB_OUTPUT:-/dev/stdout}"
 
-  if [ "$has_unresolved_conflicts" = true ] || [ "$push_succeeded" != true ]; then
+  if [ "$has_unresolved_conflicts" = true ] || [ "$push_succeeded" != true ] || [ "$pr_ok" != true ]; then
     exit 1
   fi
 }
