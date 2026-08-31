@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.podcasts
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverPodcastAttribution
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
@@ -15,6 +16,17 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import com.automattic.eventhorizon.DiscoverFeaturedPodcastSubscribedEvent
+import com.automattic.eventhorizon.DiscoverListPodcastSubscribedEvent
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.PodcastScreenShownEvent
+import com.automattic.eventhorizon.PodcastScreenSubscribeTappedEvent
+import com.automattic.eventhorizon.PodcastScreenToggleArchivedEvent
+import com.automattic.eventhorizon.PodcastScreenToggleSummaryEvent
+import com.automattic.eventhorizon.PodcastScreenUnsubscribeTappedEvent
+import com.automattic.eventhorizon.PodcastSubscribedEvent
+import com.automattic.eventhorizon.PodcastUnsubscribedEvent
+import com.automattic.eventhorizon.PodcastsScreenSortOrderChangedEvent
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -50,11 +62,15 @@ class TvPodcastDetailsViewModel @AssistedInject constructor(
     private val episodeManager: EpisodeManager,
     private val syncManager: SyncManager,
     private val preferences: TvPreferences,
+    private val eventHorizon: EventHorizon,
+    private val discoverPodcastAttribution: TvDiscoverPodcastAttribution,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     private val isShowingArchivedFlow = MutableStateFlow(preferences.isPodcastShowingArchived(podcastUuid))
+
+    private var discoverAttribution: TvDiscoverPodcastAttribution.Attribution? = null
 
     private val _accountAuthState = MutableStateFlow<TvSignInUiState>(TvSignInUiState.Loading)
     val accountAuthState: StateFlow<TvSignInUiState> = _accountAuthState.asStateFlow()
@@ -96,6 +112,20 @@ class TvPodcastDetailsViewModel @AssistedInject constructor(
             TvPodcastDetailsUiState.Loading,
         )
 
+    fun onScreenOpened(source: SourceView) {
+        eventHorizon.track(PodcastScreenShownEvent(source = source.analyticsValue))
+        discoverAttribution = if (source in DISCOVER_SOURCES) {
+            discoverPodcastAttribution.consume(podcastUuid)
+        } else {
+            discoverPodcastAttribution.clear(podcastUuid)
+            null
+        }
+    }
+
+    fun trackSummaryExpanded() {
+        eventHorizon.track(PodcastScreenToggleSummaryEvent(isExpanded = true))
+    }
+
     fun startAccountAuth() {
         accountAuthJob?.cancel()
         _accountAuthState.value = TvSignInUiState.Loading
@@ -104,6 +134,7 @@ class TvPodcastDetailsViewModel @AssistedInject constructor(
                 _accountAuthState.value = state
                 if (state is TvSignInUiState.Complete) {
                     podcastManager.subscribeToPodcast(podcastUuid, sync = true)
+                    trackSubscribed()
                     // Sibling of accountAuthJob so the modal dismiss cancel doesn't kill the refresh.
                     viewModelScope.launch {
                         try {
@@ -131,15 +162,32 @@ class TvPodcastDetailsViewModel @AssistedInject constructor(
     fun toggleSubscribe() {
         val podcast = (uiState.value as? TvPodcastDetailsUiState.Loaded)?.podcast ?: return
         if (podcast.isSubscribed) {
+            eventHorizon.track(PodcastScreenUnsubscribeTappedEvent)
+            eventHorizon.track(PodcastUnsubscribedEvent(uuid = podcastUuid, source = SourceView.PODCAST_SCREEN.analyticsValue))
             viewModelScope.launch(ioDispatcher) {
                 podcastManager.unsubscribe(podcastUuid, SourceView.PODCAST_SCREEN)
             }
         } else {
+            eventHorizon.track(PodcastScreenSubscribeTappedEvent)
             podcastManager.subscribeToPodcast(podcastUuid, sync = true)
+            trackSubscribed()
+        }
+    }
+
+    private fun trackSubscribed() {
+        eventHorizon.track(PodcastSubscribedEvent(uuid = podcastUuid, source = SourceView.PODCAST_SCREEN.analyticsValue))
+        discoverAttribution?.let { attribution ->
+            attribution.listId?.let { listId ->
+                eventHorizon.track(DiscoverListPodcastSubscribedEvent(listId = listId, podcastUuid = podcastUuid, listDatetime = attribution.listDatetime))
+            }
+            if (attribution.isFeatured) {
+                eventHorizon.track(DiscoverFeaturedPodcastSubscribedEvent(podcastUuid = podcastUuid))
+            }
         }
     }
 
     fun changeSortType(sortType: EpisodesSortType) {
+        eventHorizon.track(PodcastsScreenSortOrderChangedEvent(sortOrder = sortType.analyticsValue))
         viewModelScope.launch(ioDispatcher) {
             podcastManager.updateEpisodesSortTypeBlocking(Podcast(uuid = podcastUuid), sortType)
         }
@@ -147,6 +195,7 @@ class TvPodcastDetailsViewModel @AssistedInject constructor(
 
     fun toggleArchiveFilter() {
         val isShowingArchived = !isShowingArchivedFlow.value
+        eventHorizon.track(PodcastScreenToggleArchivedEvent(showArchived = isShowingArchived))
         preferences.setPodcastShowingArchived(podcastUuid, isShowingArchived)
         isShowingArchivedFlow.value = isShowingArchived
     }
@@ -154,6 +203,10 @@ class TvPodcastDetailsViewModel @AssistedInject constructor(
     @AssistedFactory
     interface Factory {
         fun create(podcastUuid: String): TvPodcastDetailsViewModel
+    }
+
+    private companion object {
+        val DISCOVER_SOURCES = setOf(SourceView.DISCOVER, SourceView.SEARCH_RESULTS)
     }
 }
 

@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.podcasts
 
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverPodcastAttribution
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
@@ -15,6 +16,17 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.model.AuthResultModel
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.DeviceAuthorizeResponse
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import com.automattic.eventhorizon.DiscoverFeaturedPodcastSubscribedEvent
+import com.automattic.eventhorizon.DiscoverListPodcastSubscribedEvent
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.PodcastScreenShownEvent
+import com.automattic.eventhorizon.PodcastScreenSubscribeTappedEvent
+import com.automattic.eventhorizon.PodcastScreenToggleArchivedEvent
+import com.automattic.eventhorizon.PodcastScreenToggleSummaryEvent
+import com.automattic.eventhorizon.PodcastScreenUnsubscribeTappedEvent
+import com.automattic.eventhorizon.PodcastSubscribedEvent
+import com.automattic.eventhorizon.PodcastUnsubscribedEvent
+import com.automattic.eventhorizon.PodcastsScreenSortOrderChangedEvent
 import com.jakewharton.rxrelay2.BehaviorRelay
 import io.reactivex.Single
 import java.util.Date
@@ -31,6 +43,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyBlocking
@@ -59,6 +72,8 @@ class TvPodcastDetailsViewModelTest {
     private val syncManager = mock<SyncManager> {
         on { isLoggedInObservable } doReturn loggedIn
     }
+    private val eventHorizon = mock<EventHorizon>()
+    private val discoverPodcastAttribution = TvDiscoverPodcastAttribution()
 
     @Test
     fun `archived episodes are hidden by default`() = runTest {
@@ -275,6 +290,135 @@ class TvPodcastDetailsViewModelTest {
     }
 
     @Test
+    fun `following a podcast tracks the subscribe tapped and subscribed events`() = runTest {
+        val viewModel = createViewModel()
+
+        viewModel.uiState.test {
+            assertEquals(TvPodcastDetailsUiState.Loading, awaitItem())
+            episodes.emit(listOf(availableEpisode))
+            awaitItem() as TvPodcastDetailsUiState.Loaded
+
+            viewModel.toggleSubscribe()
+
+            cancelAndConsumeRemainingEvents()
+        }
+
+        verify(eventHorizon).track(PodcastScreenSubscribeTappedEvent)
+        verify(eventHorizon).track(PodcastSubscribedEvent(uuid = "podcast-uuid", source = SourceView.PODCAST_SCREEN.analyticsValue))
+    }
+
+    @Test
+    fun `unfollowing a podcast tracks the unsubscribe tapped and unsubscribed events`() = runTest {
+        val subscribedPodcast = podcast.copy(isSubscribed = true)
+        val podcastManager = mock<PodcastManager> {
+            on { findOrDownloadPodcastRxSingle(any(), any()) } doReturn Single.just(subscribedPodcast)
+            on { podcastByUuidFlow(any()) } doReturn MutableStateFlow(subscribedPodcast)
+        }
+        val viewModel = createViewModel(podcastManager = podcastManager)
+
+        viewModel.uiState.test {
+            assertEquals(TvPodcastDetailsUiState.Loading, awaitItem())
+            episodes.emit(listOf(availableEpisode))
+            awaitItem() as TvPodcastDetailsUiState.Loaded
+
+            viewModel.toggleSubscribe()
+
+            cancelAndConsumeRemainingEvents()
+        }
+
+        verify(eventHorizon).track(PodcastScreenUnsubscribeTappedEvent)
+        verify(eventHorizon).track(PodcastUnsubscribedEvent(uuid = "podcast-uuid", source = SourceView.PODCAST_SCREEN.analyticsValue))
+    }
+
+    @Test
+    fun `changing the sort type tracks the sort order changed event`() = runTest {
+        val viewModel = createViewModel()
+
+        viewModel.changeSortType(EpisodesSortType.EPISODES_SORT_BY_TITLE_ASC)
+
+        verify(eventHorizon).track(PodcastsScreenSortOrderChangedEvent(sortOrder = EpisodesSortType.EPISODES_SORT_BY_TITLE_ASC.analyticsValue))
+    }
+
+    @Test
+    fun `toggling the archive filter tracks the toggle archived event`() = runTest {
+        val viewModel = createViewModel()
+
+        viewModel.toggleArchiveFilter()
+
+        verify(eventHorizon).track(PodcastScreenToggleArchivedEvent(showArchived = true))
+    }
+
+    @Test
+    fun `expanding the summary tracks the toggle summary event`() = runTest {
+        val viewModel = createViewModel()
+
+        viewModel.trackSummaryExpanded()
+
+        verify(eventHorizon).track(PodcastScreenToggleSummaryEvent(isExpanded = true))
+    }
+
+    @Test
+    fun `auto follow after account auth tracks the subscribed event`() = runTest {
+        whenever(syncManager.deviceAuthorize()).thenReturn(deviceAuthorizeResponse())
+        whenever(syncManager.loginWithDeviceAuth(any(), any(), any())).thenReturn(loginSuccess())
+        val viewModel = createViewModel()
+
+        viewModel.accountAuthState.test {
+            assertEquals(TvSignInUiState.Loading, awaitItem())
+
+            viewModel.startAccountAuth()
+
+            val states = mutableListOf<TvSignInUiState>()
+            while (states.lastOrNull() !is TvSignInUiState.Complete) {
+                states.add(awaitItem())
+            }
+        }
+        advanceUntilIdle()
+
+        verify(eventHorizon).track(PodcastSubscribedEvent(uuid = "podcast-uuid", source = SourceView.PODCAST_SCREEN.analyticsValue))
+    }
+
+    @Test
+    fun `following a podcast opened from discover fires the list and featured subscribed events`() = runTest {
+        discoverPodcastAttribution.record("podcast-uuid", listId = "list-1", listDatetime = "2026-08-28", isFeatured = true)
+        val viewModel = createViewModel()
+        viewModel.onScreenOpened(SourceView.DISCOVER)
+
+        viewModel.uiState.test {
+            assertEquals(TvPodcastDetailsUiState.Loading, awaitItem())
+            episodes.emit(listOf(availableEpisode))
+            awaitItem() as TvPodcastDetailsUiState.Loaded
+
+            viewModel.toggleSubscribe()
+
+            cancelAndConsumeRemainingEvents()
+        }
+
+        verify(eventHorizon).track(DiscoverListPodcastSubscribedEvent(listId = "list-1", podcastUuid = "podcast-uuid", listDatetime = "2026-08-28"))
+        verify(eventHorizon).track(DiscoverFeaturedPodcastSubscribedEvent(podcastUuid = "podcast-uuid"))
+    }
+
+    @Test
+    fun `following a library opened podcast does not fire discover subscribed events`() = runTest {
+        discoverPodcastAttribution.record("podcast-uuid", listId = "list-1", listDatetime = null, isFeatured = false)
+        val viewModel = createViewModel()
+        viewModel.onScreenOpened(SourceView.PODCAST_LIST)
+
+        viewModel.uiState.test {
+            assertEquals(TvPodcastDetailsUiState.Loading, awaitItem())
+            episodes.emit(listOf(availableEpisode))
+            awaitItem() as TvPodcastDetailsUiState.Loaded
+
+            viewModel.toggleSubscribe()
+
+            cancelAndConsumeRemainingEvents()
+        }
+
+        verify(eventHorizon, never()).track(any<DiscoverListPodcastSubscribedEvent>())
+        verify(eventHorizon, never()).track(any<DiscoverFeaturedPodcastSubscribedEvent>())
+    }
+
+    @Test
     fun `starting account auth drives the account state to complete`() = runTest {
         whenever(syncManager.deviceAuthorize()).thenReturn(deviceAuthorizeResponse())
         whenever(syncManager.loginWithDeviceAuth(any(), any(), any())).thenReturn(loginSuccess())
@@ -296,6 +440,15 @@ class TvPodcastDetailsViewModelTest {
 
         verify(podcastManager).subscribeToPodcast(podcastUuid = "podcast-uuid", sync = true)
         verify(podcastManager).refreshPodcastsAfterSignIn()
+    }
+
+    @Test
+    fun `opening the screen tracks the podcast screen shown event with its source`() = runTest {
+        val viewModel = createViewModel()
+
+        viewModel.onScreenOpened(SourceView.DISCOVER)
+
+        verify(eventHorizon).track(PodcastScreenShownEvent(source = SourceView.DISCOVER.analyticsValue))
     }
 
     private fun deviceAuthorizeResponse() = DeviceAuthorizeResponse(
@@ -324,6 +477,8 @@ class TvPodcastDetailsViewModelTest {
         episodeManager = episodeManager,
         syncManager = syncManager,
         preferences = prefs,
+        eventHorizon = eventHorizon,
+        discoverPodcastAttribution = discoverPodcastAttribution,
         defaultDispatcher = coroutineRule.testDispatcher,
         ioDispatcher = coroutineRule.testDispatcher,
     )
