@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.component
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
@@ -19,6 +20,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -30,6 +32,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.style.TextOverflow
@@ -46,6 +50,10 @@ import au.com.shiftyjelly.pocketcasts.theme.TvTheme
 import au.com.shiftyjelly.pocketcasts.theme.tvColors
 import au.com.shiftyjelly.pocketcasts.theme.tvTypography
 import coil3.compose.AsyncImage
+import coil3.compose.AsyncImagePainter
+import coil3.compose.rememberAsyncImagePainter
+import coil3.request.ImageRequest
+import coil3.request.crossfade
 
 private val CardShape = RoundedCornerShape(12.dp)
 private val CoverSize = 80.dp
@@ -109,7 +117,7 @@ fun TvCategoryTile(
                     url = url,
                     alignment = Alignment.CenterStart,
                     edgeSign = -1f * directionSign,
-                    focusProgress = { focusProgress.value },
+                    focused = isFocused,
                     coverSizePx = coverSizePx,
                 )
             }
@@ -118,7 +126,7 @@ fun TvCategoryTile(
                     url = url,
                     alignment = Alignment.CenterEnd,
                     edgeSign = 1f * directionSign,
-                    focusProgress = { focusProgress.value },
+                    focused = isFocused,
                     coverSizePx = coverSizePx,
                 )
             }
@@ -153,15 +161,29 @@ private fun BoxScope.CategoryCover(
     url: String,
     alignment: Alignment,
     edgeSign: Float,
-    focusProgress: () -> Float,
+    focused: Boolean,
     coverSizePx: Float,
 ) {
+    val painter = rememberAsyncImagePainter(
+        model = ImageRequest.Builder(LocalContext.current)
+            .data(url)
+            .crossfade(true)
+            .build(),
+    )
+    val state by painter.state.collectAsState()
+    val imageReady = state is AsyncImagePainter.State.Success
+
+    val reveal = animateFloatAsState(
+        targetValue = if (focused && imageReady) 1f else 0f,
+        animationSpec = spring(dampingRatio = 0.6f, stiffness = Spring.StiffnessMediumLow),
+        label = "TvCategoryCoverReveal",
+    )
     Box(
         modifier = Modifier
             .align(alignment)
             .size(CoverSize)
             .graphicsLayer {
-                val progress = focusProgress().coerceIn(0f, 1f)
+                val progress = reveal.value.coerceIn(0f, 1f)
                 alpha = progress
                 val scale = COVER_RESTING_SCALE + (1f - COVER_RESTING_SCALE) * progress
                 scaleX = scale
@@ -169,8 +191,10 @@ private fun BoxScope.CategoryCover(
                 translationX = edgeSign * coverSizePx * (1f - COVER_VISIBLE_FRACTION * progress)
             },
     ) {
-        TvArtworkImage(
-            model = url,
+        Image(
+            painter = painter,
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
             modifier = Modifier
                 .fillMaxSize()
                 .clip(CoverShape),
