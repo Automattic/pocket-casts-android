@@ -206,19 +206,40 @@ defer_workflow_files() {
 }
 
 use_pat_for_gh_cli() {
-  # One token for push + PR create/edit. Requires UPSTREAM_SYNC_PAT with
-  # Contents write, Workflows write, and Pull requests write (or classic repo+workflow).
+  # One token for push + PR create/edit.
   if [ -n "${UPSTREAM_SYNC_PAT:-}" ]; then
     export GH_TOKEN="$UPSTREAM_SYNC_PAT"
   fi
 }
 
+json_pr_payload() {
+  # Build JSON for REST create/update — avoids GraphQL and shell-escaping issues.
+  python3 - "$1" "$2" "$3" "$4" "$5" <<'PY'
+import json, pathlib, sys
+mode, body_path, title, head, base = sys.argv[1:6]
+payload = {"title": title, "body": pathlib.Path(body_path).read_text()}
+if mode == "create":
+    payload["head"] = head
+    payload["base"] = base
+print(json.dumps(payload))
+PY
+}
+
 create_or_update_pr() {
+  # Prefer REST over `gh pr create` — fine-grained PATs often fail GraphQL
+  # createPullRequest with "Resource not accessible by personal access token"
+  # even when Pull requests write is granted.
   local title="chore(upstream): merge release ${SYNC_TAG}"
+  local owner="${GITHUB_REPOSITORY_OWNER:-${GITHUB_REPOSITORY%%/*}}"
   local existing
-  existing="$(gh pr list --head "$SYNC_BRANCH" --state open --json number --jq '.[0].number // empty' || true)"
+
+  existing="$(gh api "repos/${GITHUB_REPOSITORY}/pulls?state=open&head=${owner}:${SYNC_BRANCH}" \
+    --jq '.[0].number // empty' 2>/dev/null || true)"
+
   if [ -n "$existing" ]; then
-    if gh pr edit "$existing" --title "$title" --body-file "$PR_BODY_FILE"; then
+    if json_pr_payload update "$PR_BODY_FILE" "$title" "$SYNC_BRANCH" "$BASE_BRANCH" \
+      | gh api "repos/${GITHUB_REPOSITORY}/pulls/${existing}" --method PATCH --input - \
+      --jq .number >/dev/null; then
       pr_number="$existing"
       log "Updated PR #${pr_number}"
       return 0
@@ -227,14 +248,15 @@ create_or_update_pr() {
     return 1
   fi
 
-  local url
-  if url="$(gh pr create --base "$BASE_BRANCH" --head "$SYNC_BRANCH" --title "$title" --body-file "$PR_BODY_FILE")"; then
-    pr_number="$(printf '%s\n' "$url" | sed -n 's#.*/pull/\([0-9]*\)$#\1#p')"
-    log "Created PR #${pr_number:-?} (${url})"
+  local response
+  if response="$(json_pr_payload create "$PR_BODY_FILE" "$title" "$SYNC_BRANCH" "$BASE_BRANCH" \
+    | gh api "repos/${GITHUB_REPOSITORY}/pulls" --method POST --input -)"; then
+    pr_number="$(printf '%s' "$response" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("number",""))')"
+    log "Created PR #${pr_number} via REST"
     return 0
   fi
 
-  add_alert "Pushed \`${SYNC_BRANCH}\` but failed to open a PR. Ensure \`UPSTREAM_SYNC_PAT\` has Pull requests write (fine-grained) or classic \`repo\` scope."
+  add_alert "Pushed \`${SYNC_BRANCH}\` but failed to open a PR via REST. Check \`UPSTREAM_SYNC_PAT\` Pull requests write access."
   return 1
 }
 
