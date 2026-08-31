@@ -49,7 +49,6 @@ class FingerprintDecodePolicy @Inject constructor(
             return isHuawei && isHiSilicon
         }
 
-        private fun parseOverride(value: String): FingerprintPolicy? =
-            FingerprintPolicy.entries.firstOrNull { it.name.equals(value.trim(), ignoreCase = true) }
+        private fun parseOverride(value: String): FingerprintPolicy? = FingerprintPolicy.entries.firstOrNull { it.name.equals(value.trim(), ignoreCase = true) }
     }
 }
