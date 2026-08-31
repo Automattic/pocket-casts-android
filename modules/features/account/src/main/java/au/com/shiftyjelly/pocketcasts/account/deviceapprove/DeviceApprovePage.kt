@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.account.deviceapprove
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -95,7 +96,7 @@ fun DeviceApprovePage(
 }
 
 @Composable
-private fun ApproveContent(
+private fun ColumnScope.ApproveContent(
     state: DeviceApproveUiState,
     onConnect: () -> Unit,
     onSetUpAccount: () -> Unit,
@@ -174,7 +175,7 @@ private fun CodeChip(code: String) {
 }
 
 @Composable
-private fun ResultContent(
+private fun ColumnScope.ResultContent(
     title: String,
     message: String,
     buttonText: String,
