@@ -50,6 +50,11 @@ sealed interface TvDiscoverRow {
         val listId: String? = null,
         val listDatetime: String? = null,
     ) : TvDiscoverRow
+
+    data class Failed(
+        override val id: String,
+        override val title: String,
+    ) : TvDiscoverRow
 }
 
 enum class TvDiscoverBanner(val id: String) {

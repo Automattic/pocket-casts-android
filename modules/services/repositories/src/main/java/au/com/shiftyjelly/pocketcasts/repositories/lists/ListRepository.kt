@@ -32,6 +32,14 @@ class ListRepository(
     }
 
     suspend fun getListFeed(url: String, authenticated: Boolean? = false): ListFeed? {
+        return getListFeedResult(url, authenticated)
+            .onFailure { exception ->
+                Timber.e(exception, "Failed to fetch list feed $url")
+            }
+            .getOrNull()
+    }
+
+    suspend fun getListFeedResult(url: String, authenticated: Boolean? = false): Result<ListFeed?> {
         return runCatching {
             if (authenticated == true) {
                 checkNotNull(syncManager) { "Sync Manager is null" }
@@ -43,10 +51,6 @@ class ListRepository(
                 listWebService.getListFeed(url)
             }
         }
-            .onFailure { exception ->
-                Timber.e(exception, "Failed to fetch list feed $url")
-            }
-            .getOrNull()
     }
 
     suspend fun getCategoriesList(url: String): List<DiscoverCategory> {

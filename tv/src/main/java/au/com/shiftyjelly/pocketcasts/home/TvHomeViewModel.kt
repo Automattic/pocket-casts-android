@@ -31,6 +31,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -40,8 +41,13 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlow
 import kotlinx.coroutines.rx2.await
@@ -77,11 +83,46 @@ class TvHomeViewModel @Inject constructor(
 
     private var loadJob: Job? = null
 
+    @Volatile
+    private var playbackStartedThisSession = false
+
     init {
         viewModelScope.launch {
             syncManager.isLoggedInObservable.asFlow()
                 .distinctUntilChanged()
                 .collect { load() }
+        }
+        observeLocalRowSignals()
+    }
+
+    @OptIn(FlowPreview::class)
+    private fun observeLocalRowSignals() {
+        viewModelScope.launch {
+            merge(
+                playbackManager.upNextQueue.changesObservable.asFlow().map {},
+                playbackManager.playbackStateFlow
+                    .onEach { if (it.isPlaying) playbackStartedThisSession = true }
+                    .map { it.isPlaying to it.episodeUuid }
+                    .distinctUntilChanged()
+                    .map {},
+                playlistManager.smartEpisodesFlow(NEW_RELEASES_RULES).distinctUntilChanged().map {},
+            )
+                .debounce(LOCAL_ROWS_DEBOUNCE_MS)
+                .collect { refreshLocalRows() }
+        }
+    }
+
+    private suspend fun refreshLocalRows() {
+        if (_uiState.value !is TvHomeUiState.Ready) return
+        val isLoggedIn = syncManager.isLoggedIn()
+        val localRows = loadLocalRows(isLoggedIn)
+        _uiState.update { current ->
+            if (current is TvHomeUiState.Ready && isLoggedIn == syncManager.isLoggedIn()) {
+                val nonLocalRows = current.rows.filterNot { it.id in LOCAL_ROW_IDS }
+                TvHomeUiState.Ready((localRows + nonLocalRows).distinctBy(TvDiscoverRow::id))
+            } else {
+                current
+            }
         }
     }
 
@@ -141,18 +182,20 @@ class TvHomeViewModel @Inject constructor(
         val podcastTitles = findPodcastTitles(upNextEpisodes + newReleases)
 
         buildList {
-            upNextEpisodes.firstOrNull()?.let { current ->
-                add(
-                    TvDiscoverRow.Episodes(
-                        id = KEEP_LISTENING_ROW_ID,
-                        title = context.getString(LR.string.tv_home_keep_listening),
-                        episodes = listOf(current.toTvDiscoverEpisode(podcastTitles)),
-                    ),
-                )
+            if (!playbackStartedThisSession) {
+                upNextEpisodes.firstOrNull()?.let { current ->
+                    add(
+                        TvDiscoverRow.Episodes(
+                            id = KEEP_LISTENING_ROW_ID,
+                            title = context.getString(LR.string.tv_home_keep_listening),
+                            episodes = listOf(current.toTvDiscoverEpisode(podcastTitles)),
+                        ),
+                    )
+                }
             }
             if (isLoggedIn) {
                 val queue = upNextEpisodes.drop(1)
-                if (queue.isNotEmpty()) {
+                if (queue.size >= UP_NEXT_ROW_MIN) {
                     add(
                         TvDiscoverRow.Episodes(
                             id = UP_NEXT_ROW_ID,
@@ -172,6 +215,25 @@ class TvHomeViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    fun retryDiscoverRow(row: TvDiscoverRow) {
+        viewModelScope.launch {
+            val reloaded = try {
+                discoverFeedLoader.reloadHomeRow(row.id, syncManager.isLoggedIn()) ?: row
+            } catch (exception: CancellationException) {
+                throw exception
+            } catch (exception: Exception) {
+                Timber.e(exception, "Failed to reload TV home row ${row.id}")
+                row
+            }
+            replaceRow(row.id, reloaded)
+        }
+    }
+
+    private fun replaceRow(rowId: String, newRow: TvDiscoverRow?) {
+        val current = _uiState.value as? TvHomeUiState.Ready ?: return
+        _uiState.value = TvHomeUiState.Ready(current.rows.mapNotNull { if (it.id == rowId) newRow else it })
     }
 
     suspend fun categoryPodcasts(categoryId: Int, source: String): TvCategoryPodcasts {
@@ -279,7 +341,9 @@ class TvHomeViewModel @Inject constructor(
         private val LOCAL_ROW_IDS = setOf(KEEP_LISTENING_ROW_ID, UP_NEXT_ROW_ID, NEW_RELEASES_ROW_ID)
 
         private const val UP_NEXT_LIMIT = 12
+        private const val UP_NEXT_ROW_MIN = 2
         private const val NEW_RELEASES_LIMIT = 12
+        private const val LOCAL_ROWS_DEBOUNCE_MS = 1000L
 
         private val NEW_RELEASES_RULES = SmartPlaylistDraft.NewReleases.rules.copy(
             episodeStatus = SmartRules.EpisodeStatusRule(unplayed = true, inProgress = false, completed = false),

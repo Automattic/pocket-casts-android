@@ -98,6 +98,7 @@ class TvDiscoverFeedAnalytics(
 
         is TvDiscoverRow.Banner,
         is TvDiscoverRow.Categories,
+        is TvDiscoverRow.Failed,
         -> null
     }?.takeUnless { it in localRowIds }
 
@@ -112,6 +113,7 @@ class TvDiscoverFeedAnalytics(
 
         is TvDiscoverRow.Banner,
         is TvDiscoverRow.Categories,
+        is TvDiscoverRow.Failed,
         -> null
     }
 

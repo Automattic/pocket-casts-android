@@ -27,6 +27,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
@@ -41,7 +42,11 @@ class TvDiscoverFeedLoaderTest {
     @get:Rule
     val coroutineRule = MainCoroutineRule()
 
-    private val listRepository = mock<ListRepository>()
+    private val listRepository = mock<ListRepository> {
+        on { getListFeedResult(any(), anyOrNull()) } doSuspendableAnswer { invocation ->
+            Result.success((invocation.mock as ListRepository).getListFeed(invocation.getArgument(0), invocation.getArgument(1)))
+        }
+    }
     private val settings = mock<Settings>()
     private val context = mock<Context>()
 

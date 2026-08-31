@@ -1,14 +1,21 @@
 package au.com.shiftyjelly.pocketcasts.discover
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.tv.material3.Button
+import androidx.tv.material3.MaterialTheme
+import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.component.TvBannerRow
 import au.com.shiftyjelly.pocketcasts.component.TvCategoryTile
 import au.com.shiftyjelly.pocketcasts.component.TvFeaturedTile
@@ -18,6 +25,10 @@ import au.com.shiftyjelly.pocketcasts.component.TvRow
 import au.com.shiftyjelly.pocketcasts.component.TvSinglePodcastTile
 import au.com.shiftyjelly.pocketcasts.component.TvVideoTile
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
+import au.com.shiftyjelly.pocketcasts.theme.TvButtonDefaults
+import au.com.shiftyjelly.pocketcasts.theme.tvColors
+import au.com.shiftyjelly.pocketcasts.theme.tvTypography
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 fun LazyListScope.tvDiscoverRow(
     row: TvDiscoverRow,
@@ -31,6 +42,7 @@ fun LazyListScope.tvDiscoverRow(
     contentPadding: PaddingValues = PaddingValues(horizontal = 32.dp),
     onTapBanner: (TvDiscoverBanner) -> Unit = {},
     onListImpression: (TvDiscoverRow) -> Unit = {},
+    onRetryRow: (TvDiscoverRow) -> Unit = {},
     loadCategoryCovers: (suspend (DiscoverCategory) -> List<String>)? = null,
     isPodcastPlaying: () -> Boolean = { false },
 ) {
@@ -149,6 +161,38 @@ fun LazyListScope.tvDiscoverRow(
                 onClick = { onTapBanner(row.banner) },
                 modifier = bannerModifier.padding(contentPadding),
             )
+        }
+
+        is TvDiscoverRow.Failed -> item(key = row.id) {
+            val failedModifier = if (focusRequester != null) modifier.focusRequester(focusRequester) else modifier
+            TvDiscoverFailedRow(
+                title = row.title,
+                onRetry = { onRetryRow(row) },
+                modifier = failedModifier.padding(contentPadding),
+            )
+        }
+    }
+}
+
+@Composable
+private fun TvDiscoverFailedRow(
+    title: String,
+    onRetry: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = modifier) {
+        if (title.isNotBlank()) {
+            Text(
+                text = title,
+                style = MaterialTheme.tvTypography.title3,
+                color = MaterialTheme.tvColors.textPrimary,
+            )
+        }
+        Button(
+            onClick = onRetry,
+            colors = TvButtonDefaults.filledButtonColors(),
+        ) {
+            Text(text = stringResource(LR.string.try_again))
         }
     }
 }

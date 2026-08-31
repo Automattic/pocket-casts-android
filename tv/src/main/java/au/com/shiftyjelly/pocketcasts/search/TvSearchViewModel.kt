@@ -277,6 +277,20 @@ class TvSearchViewModel @Inject constructor(
         eventHorizon.track(SearchShownEvent(source = SourceViewType.Search))
     }
 
+    fun retryDiscoverRow(row: TvDiscoverRow) {
+        viewModelScope.launch {
+            val reloaded = try {
+                discoverFeedLoader.reloadSearchRow(row.id, syncManager.isLoggedIn()) ?: row
+            } catch (exception: CancellationException) {
+                throw exception
+            } catch (exception: Exception) {
+                Timber.e(exception, "Failed to reload TV search row ${row.id}")
+                row
+            }
+            _discoverRows.value = _discoverRows.value.mapNotNull { if (it.id == row.id) reloaded else it }
+        }
+    }
+
     fun trackDiscoverListShown(row: TvDiscoverRow) = discoverFeedAnalytics.trackListImpression(row)
 
     fun trackDiscoverPodcastTapped(row: TvDiscoverRow, podcast: TvDiscoverPodcast) = discoverFeedAnalytics.trackPodcastTapped(row, podcast)

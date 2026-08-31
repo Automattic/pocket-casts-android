@@ -174,6 +174,7 @@ fun TvSearchScreen(
                 openedCategory = TvOpenedCategory(discoverCategory.id, discoverCategory.name, discoverCategory.source)
             },
             onDiscoverListImpression = viewModel::trackDiscoverListShown,
+            onDiscoverRetryRow = viewModel::retryDiscoverRow,
             onPlayEpisode = { episode ->
                 viewModel.trackEpisodeResultTapped(episode.uuid)
                 viewModel.playEpisode(episode)
@@ -287,6 +288,7 @@ private fun TvSearchContent(
     onOpenEpisodeActions: (ImprovedSearchResultItem.EpisodeItem) -> Unit,
     modifier: Modifier = Modifier,
     onDiscoverListImpression: (TvDiscoverRow) -> Unit = {},
+    onDiscoverRetryRow: (TvDiscoverRow) -> Unit = {},
     history: List<String> = emptyList(),
     onHistorySelect: (String) -> Unit = {},
     suggestions: List<String> = emptyList(),
@@ -358,6 +360,7 @@ private fun TvSearchContent(
                     onDiscoverPlayLatestEpisode = onDiscoverPlayLatestEpisode,
                     onDiscoverCategoryClick = onDiscoverCategoryClick,
                     onDiscoverListImpression = onDiscoverListImpression,
+                    onDiscoverRetryRow = onDiscoverRetryRow,
                     loadCategoryCovers = loadCategoryCovers,
                     restoreFocusTrigger = restoreFocusTrigger,
                 )
@@ -403,6 +406,7 @@ private fun TvSearchIdle(
     onDiscoverPlayLatestEpisode: (TvDiscoverRow, TvDiscoverPodcast) -> Unit,
     onDiscoverCategoryClick: (DiscoverCategory, Int) -> Unit,
     onDiscoverListImpression: (TvDiscoverRow) -> Unit,
+    onDiscoverRetryRow: (TvDiscoverRow) -> Unit,
     restoreFocusTrigger: Int,
     loadCategoryCovers: (suspend (DiscoverCategory) -> List<String>)? = null,
 ) {
@@ -434,6 +438,7 @@ private fun TvSearchIdle(
             onDiscoverPlayLatestEpisode = onDiscoverPlayLatestEpisode,
             onDiscoverCategoryClick = onDiscoverCategoryClick,
             onDiscoverListImpression = onDiscoverListImpression,
+            onDiscoverRetryRow = onDiscoverRetryRow,
             loadCategoryCovers = loadCategoryCovers,
             restoreFocusTrigger = restoreFocusTrigger,
             modifier = Modifier.weight(1f),
@@ -451,6 +456,7 @@ private fun TvSearchDiscover(
     onDiscoverPlayLatestEpisode: (TvDiscoverRow, TvDiscoverPodcast) -> Unit,
     onDiscoverCategoryClick: (DiscoverCategory, Int) -> Unit,
     onDiscoverListImpression: (TvDiscoverRow) -> Unit,
+    onDiscoverRetryRow: (TvDiscoverRow) -> Unit,
     restoreFocusTrigger: Int,
     modifier: Modifier = Modifier,
     loadCategoryCovers: (suspend (DiscoverCategory) -> List<String>)? = null,
@@ -514,6 +520,7 @@ private fun TvSearchDiscover(
                 onCategoryClick = onDiscoverCategoryClick,
                 onPlayLatestEpisode = onDiscoverPlayLatestEpisode,
                 onListImpression = onDiscoverListImpression,
+                onRetryRow = onDiscoverRetryRow,
                 contentPadding = ContentPadding,
                 focusRequester = rowFocusRequesters.getOrNull(rowIndex),
                 loadCategoryCovers = loadCategoryCovers,

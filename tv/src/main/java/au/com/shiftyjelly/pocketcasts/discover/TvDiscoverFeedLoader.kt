@@ -105,7 +105,7 @@ class TvDiscoverFeedLoader @Inject constructor(
             Timber.e(exception, "Failed to load TV category sponsored ads")
             return@coroutineScope emptyList()
         }
-        val region = resolveRegionOrNull(discover) ?: return@coroutineScope emptyList()
+        val region = resolveRegionOrFallback(discover) ?: return@coroutineScope emptyList()
         val replacements = regionReplacements(discover, region)
         discover.layout
             .transformWithRegion(region, replacements, context.resources)
@@ -134,8 +134,29 @@ class TvDiscoverFeedLoader @Inject constructor(
             .map { row -> async { loadRow(row, includeHomeSections, replacements) } }
             .awaitAll()
             .filterNotNull()
-            // Dedup after loading so a duplicate id whose feed came back empty falls back to a populated one.
-            .distinctBy(TvDiscoverRow::id)
+            .let { rows ->
+                // Dedup after loading so a duplicate id whose feed failed or came back empty falls back to a populated one.
+                val populatedIds = rows.filterNot { it is TvDiscoverRow.Failed }.mapTo(mutableSetOf(), TvDiscoverRow::id)
+                rows.filterNot { it is TvDiscoverRow.Failed && it.id in populatedIds }
+                    .distinctBy(TvDiscoverRow::id)
+            }
+    }
+
+    suspend fun reloadHomeRow(rowId: String, isLoggedIn: Boolean): TvDiscoverRow? {
+        return reloadRow(listRepository.getHomeDiscoverFeed(isLoggedIn), rowId, includeHomeSections = true)
+    }
+
+    suspend fun reloadSearchRow(rowId: String, isLoggedIn: Boolean): TvDiscoverRow? {
+        return reloadRow(listRepository.getSearchDiscoverFeed(), rowId, includeHomeSections = false)
+    }
+
+    private suspend fun reloadRow(discover: Discover, rowId: String, includeHomeSections: Boolean): TvDiscoverRow? {
+        val region = resolveRegion(discover)
+        val replacements = regionReplacements(discover, region)
+        val row = discover.layout
+            .transformWithRegion(region, replacements, context.resources)
+            .firstOrNull { it.rowId() == rowId } ?: return null
+        return loadRow(row, includeHomeSections, replacements)
     }
 
     private suspend fun loadRow(row: DiscoverRow, includeHomeSections: Boolean, replacements: Map<String, String>): TvDiscoverRow? {
@@ -146,15 +167,32 @@ class TvDiscoverFeedLoader @Inject constructor(
             return TvDiscoverRow.Banner(id = banner.id, title = row.title, banner = banner)
         }
         return when (row.type) {
-            is ListType.PodcastList -> if (row.source.isBlank()) null else loadPodcastsRow(row)
-            is ListType.EpisodeList -> if (row.source.isBlank()) null else loadEpisodesRow(row)
+            is ListType.PodcastList -> if (row.source.isBlank()) null else loadRowOrFailed(row) { loadPodcastsRow(row) }
+
+            is ListType.EpisodeList -> if (row.source.isBlank()) null else loadRowOrFailed(row) { loadEpisodesRow(row) }
+
             is ListType.Categories -> if (includeHomeSections) loadCategoriesRow(row, replacements) else null
-            is ListType.Unknown -> null
+
+            is ListType.Unknown -> {
+                Timber.w("Dropping unknown TV discover row type '${(row.type as ListType.Unknown).value}' for ${row.rowId()}")
+                null
+            }
+        }
+    }
+
+    private suspend fun loadRowOrFailed(row: DiscoverRow, block: suspend () -> TvDiscoverRow?): TvDiscoverRow? {
+        return try {
+            block()
+        } catch (exception: CancellationException) {
+            throw exception
+        } catch (exception: Exception) {
+            Timber.e(exception, "Failed to load TV discover row ${row.rowId()}")
+            TvDiscoverRow.Failed(id = row.rowId(), title = row.title)
         }
     }
 
     private suspend fun loadPodcastsRow(row: DiscoverRow): TvDiscoverRow? = coroutineScope {
-        val feedDeferred = async { listRepository.getListFeed(row.source, row.authenticated) }
+        val feedDeferred = async { listRepository.getListFeedResult(row.source, row.authenticated).getOrThrow() }
         val insertionsDeferred = async { loadSponsoredInsertions(row) }
         val feed = feedDeferred.await() ?: return@coroutineScope null
         val basePodcasts = feed.podcasts.orEmpty()
@@ -206,7 +244,7 @@ class TvDiscoverFeedLoader @Inject constructor(
     }
 
     private suspend fun loadEpisodesRow(row: DiscoverRow): TvDiscoverRow? {
-        val feed = listRepository.getListFeed(row.source, row.authenticated) ?: return null
+        val feed = listRepository.getListFeedResult(row.source, row.authenticated).getOrThrow() ?: return null
         val playsVideoPreview = row.displayStyle is DisplayStyle.VideoPreviewList
         val episodes = feed.episodes.orEmpty()
             .distinctBy(DiscoverEpisode::uuid)
@@ -247,11 +285,18 @@ class TvDiscoverFeedLoader @Inject constructor(
             ?: discover.regions[discover.defaultRegionCode]
     }
 
-    private fun resolveRegion(discover: Discover): DiscoverRegion {
-        return resolveRegionOrNull(discover) ?: error("Could not resolve discover region")
+    private fun resolveRegionOrFallback(discover: Discover): DiscoverRegion? {
+        return resolveRegionOrNull(discover)
+            ?: discover.regions[FALLBACK_REGION_CODE]
+            ?: discover.regions.values.firstOrNull()
     }
 
-    private fun regionReplacements(discover: Discover, region: DiscoverRegion? = resolveRegionOrNull(discover)): Map<String, String> {
+    private fun resolveRegion(discover: Discover): DiscoverRegion {
+        return resolveRegionOrFallback(discover)
+            ?: error("Could not resolve discover region")
+    }
+
+    private fun regionReplacements(discover: Discover, region: DiscoverRegion? = resolveRegionOrFallback(discover)): Map<String, String> {
         if (region == null) return emptyMap()
         return mapOf(
             discover.regionCodeToken to region.code,
@@ -284,6 +329,7 @@ class TvDiscoverFeedLoader @Inject constructor(
 
     companion object {
         private const val BANNER_TYPE = "banner"
+        private const val FALLBACK_REGION_CODE = "us"
         private const val SPONSORED_CATEGORY_POSITION = 5
         private const val COVER_ARTWORK_SIZE = 200
     }
