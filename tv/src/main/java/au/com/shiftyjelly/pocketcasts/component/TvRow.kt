@@ -67,8 +67,8 @@ fun <T> TvRow(
     title: String,
     items: List<T>,
     modifier: Modifier = Modifier,
-    contentPadding: PaddingValues = PaddingValues(horizontal = 32.dp),
-    itemSpacing: Dp = 16.dp,
+    contentPadding: PaddingValues = PaddingValues(horizontal = 42.dp),
+    itemSpacing: Dp = 12.dp,
     key: ((T) -> Any)? = null,
     focusRequester: FocusRequester? = null,
     content: @Composable (T) -> Unit,
@@ -89,7 +89,7 @@ fun <T> TvRow(
             fontSize = titleSize.sp,
             modifier = Modifier
                 .padding(contentPadding)
-                .padding(bottom = 17.dp),
+                .padding(bottom = 13.dp),
         )
 
         var lastFocusedIndex by rememberSaveable(items) { mutableIntStateOf(0) }
@@ -139,8 +139,8 @@ private fun TvRowPreview() {
                 TvTile(onClick = {}) {
                     Box(
                         modifier = Modifier
-                            .size(160.dp, 100.dp)
-                            .padding(12.dp),
+                            .size(120.dp, 75.dp)
+                            .padding(9.dp),
                         contentAlignment = Alignment.BottomStart,
                     ) {
                         Text(

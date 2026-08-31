@@ -47,9 +47,9 @@ import au.com.shiftyjelly.pocketcasts.theme.tvColors
 import au.com.shiftyjelly.pocketcasts.theme.tvTypography
 import coil3.compose.AsyncImage
 
-private val CardShape = RoundedCornerShape(12.dp)
-private val CoverSize = 80.dp
-private val CoverShape = RoundedCornerShape(8.dp)
+private val CardShape = RoundedCornerShape(9.dp)
+private val CoverSize = 60.dp
+private val CoverShape = RoundedCornerShape(6.dp)
 private const val COVER_VISIBLE_FRACTION = 0.55f
 private const val COVER_RESTING_SCALE = 0.85f
 
@@ -89,12 +89,12 @@ fun TvCategoryTile(
             focusedContainerColor = MaterialTheme.tvColors.backgroundOverlay,
         ),
         glow = CardDefaults.glow(
-            focusedGlow = Glow(elevationColor = Color.Black.copy(alpha = 0.5f), elevation = 8.dp),
+            focusedGlow = Glow(elevationColor = Color.Black.copy(alpha = 0.5f), elevation = 6.dp),
         ),
         interactionSource = interactionSource,
         modifier = modifier
-            .width(280.dp)
-            .height(128.dp),
+            .width(210.dp)
+            .height(96.dp),
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             Box(
@@ -132,16 +132,16 @@ fun TvCategoryTile(
                     model = category.icon,
                     contentDescription = null,
                     colorFilter = ColorFilter.tint(contentColor),
-                    modifier = Modifier.size(28.dp),
+                    modifier = Modifier.size(21.dp),
                 )
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(7.5.dp))
                 Text(
                     text = category.name,
                     style = MaterialTheme.tvTypography.body,
                     color = contentColor,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.padding(horizontal = 12.dp),
+                    modifier = Modifier.padding(horizontal = 9.dp),
                 )
             }
         }
@@ -185,7 +185,7 @@ private fun TvCategoryTilePreview() {
         Column(
             modifier = Modifier
                 .background(MaterialTheme.tvColors.backgroundSunken)
-                .padding(48.dp),
+                .padding(36.dp),
         ) {
             TvCategoryTile(
                 category = DiscoverCategory(id = 1, name = "Comedy", icon = "", source = ""),

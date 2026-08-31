@@ -105,14 +105,14 @@ private fun TvToastContent(
             .clip(ToastShape)
             .background(MaterialTheme.tvColors.overlayContainer)
             .border(1.dp, MaterialTheme.tvColors.overlayBorder, ToastShape)
-            .padding(horizontal = 30.dp, vertical = 20.dp),
+            .padding(horizontal = 22.5.dp, vertical = 15.dp),
     )
 }
 
 private val ToastDurationMillis = 3000L
 private val ToastAnimationMillis = 300
-private val ToastMaxWidth = 600.dp
-private val ToastShape = RoundedCornerShape(16.dp)
+private val ToastMaxWidth = 450.dp
+private val ToastShape = RoundedCornerShape(12.dp)
 
 @Preview(device = Devices.TV_1080p)
 @Composable

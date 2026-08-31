@@ -67,9 +67,9 @@ private fun TvTilePreview() {
         TvTile(onClick = {}) {
             Box(
                 modifier = Modifier
-                    .size(160.dp, 100.dp)
+                    .size(120.dp, 75.dp)
                     .background(MaterialTheme.tvColors.backgroundBase)
-                    .padding(12.dp),
+                    .padding(9.dp),
                 contentAlignment = Alignment.BottomStart,
             ) {
                 Text(

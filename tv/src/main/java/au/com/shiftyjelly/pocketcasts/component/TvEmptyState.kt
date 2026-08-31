@@ -54,16 +54,16 @@ fun TvEmptyState(
                 color = MaterialTheme.tvColors.textPrimary,
                 textAlign = TextAlign.Center,
             )
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(9.dp))
             Text(
                 text = subtitle,
                 style = MaterialTheme.tvTypography.caption1,
                 color = MaterialTheme.tvColors.textSecondary,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.widthIn(max = 400.dp),
+                modifier = Modifier.widthIn(max = 300.dp),
             )
             if (actionLabel != null && onAction != null) {
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(24.dp))
                 Button(
                     onClick = onAction,
                     colors = TvButtonDefaults.filledButtonColors(),

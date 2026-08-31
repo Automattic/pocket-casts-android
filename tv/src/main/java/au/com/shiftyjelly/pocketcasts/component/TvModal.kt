@@ -73,7 +73,7 @@ internal fun TvModalSurface(
     }
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
         content = content,
         modifier = modifier
             .width(width)
@@ -88,7 +88,7 @@ internal fun TvModalSurface(
 @Composable
 private fun TvModalWindowEffects(isBlurBehindEnabled: Boolean) {
     val window = (LocalView.current.parent as? DialogWindowProvider)?.window ?: return
-    val blurRadius = with(LocalDensity.current) { 60.dp.roundToPx() }
+    val blurRadius = with(LocalDensity.current) { 45.dp.roundToPx() }
     LaunchedEffect(window, isBlurBehindEnabled, blurRadius) {
         window.setDimAmount(0.55f)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -119,9 +119,9 @@ private fun rememberIsBlurBehindEnabled(): State<Boolean> {
     return isBlurBehindEnabled
 }
 
-private val DefaultModalWidth = 400.dp
-private val DefaultContentPadding = PaddingValues(horizontal = 53.dp, vertical = 40.dp)
-private val ModalShape = RoundedCornerShape(28.dp)
+private val DefaultModalWidth = 300.dp
+private val DefaultContentPadding = PaddingValues(horizontal = 40.dp, vertical = 30.dp)
+private val ModalShape = RoundedCornerShape(21.dp)
 private val HighlightBrush = Brush.verticalGradient(
     colors = listOf(
         Color.White.copy(alpha = 0.08f),
