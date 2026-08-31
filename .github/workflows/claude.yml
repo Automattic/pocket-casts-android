@@ -82,12 +82,20 @@ jobs:
         if: steps.pr-origin.outputs.is_internal == 'true'
         id: claude
         uses: anthropics/claude-code-action@be7b93b1907a4abad570368f3c74b6fe3807510b # v1.0.183
+        env:
+          # Anthropic-compatible gateway (Auris). Sourced from secrets for uniformity.
+          ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          # Skip Claude GitHub App install; use Actions token for GitHub API.
+          github_token: ${{ secrets.GITHUB_TOKEN }}
 
           # Allows Claude to read CI results on PRs
           additional_permissions: |
             actions: read
+
+          claude_args: |
+            --model ${{ secrets.ANTHROPIC_MODEL }}
 
           # Tools are intentionally left at the action's tag-mode defaults: file edits
           # are confined to the workspace (acceptEdits) and arbitrary Bash is blocked.
