@@ -67,7 +67,7 @@ steps:
     artifact_paths:
       - "**/build/instrumented-tests/**/*"
 
-  - group: "Assemble release APKs"
+  - group: "Assemble Mobile, Automotive, TV, and Wear release APKs"
     steps:
       - label: "Assemble app release APK"
         command: ".buildkite/commands/assemble-release-apk.sh app"
@@ -81,6 +81,12 @@ steps:
         artifact_paths:
           - "**/build/outputs/apk/**/*"
 
+      - label: "Assemble TV release APK"
+        command: ".buildkite/commands/assemble-release-apk.sh tv"
+        plugins: [ $CI_TOOLKIT ]
+        artifact_paths:
+          - "**/build/outputs/apk/**/*"
+
       - label: "Assemble wear release APK"
         command: ".buildkite/commands/assemble-release-apk.sh wear"
         plugins: [ $CI_TOOLKIT ]
@@ -90,7 +96,7 @@ steps:
     ##########
     # Optional Prototype Builds
     #
-    # Builds all modules, uploads app to FAD and Wear and Automotive to S3
+    # Builds all modules, uploads app to FAD and Wear, Automotive, and TV to S3
     ##########
   - group: Prototype Builds
     if: "build.pull_request.id != null || build.branch == 'main'"
