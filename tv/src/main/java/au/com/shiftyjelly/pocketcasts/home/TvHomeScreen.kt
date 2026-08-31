@@ -101,6 +101,7 @@ fun TvHomeScreen(
                 viewModel.trackDiscoverEpisodePlayed(row, episode)
                 viewModel.playEpisode(episode)
             },
+            onPlayLatestEpisode = viewModel::playLatestEpisode,
             onEpisodePodcastClick = { row, episode ->
                 viewModel.trackDiscoverEpisodePodcastTapped(row, episode)
                 openedPodcastUuid = episode.podcastUuid
@@ -154,6 +155,7 @@ private fun TvHomeContent(
     onTapBanner: (TvDiscoverBanner) -> Unit = {},
     onPodcastClick: (TvDiscoverRow, TvDiscoverPodcast) -> Unit = { _, _ -> },
     onEpisodePlay: (TvDiscoverRow, TvDiscoverEpisode) -> Unit = { _, _ -> },
+    onPlayLatestEpisode: (TvDiscoverRow, TvDiscoverPodcast) -> Unit = { _, _ -> },
     onEpisodePodcastClick: (TvDiscoverRow, TvDiscoverEpisode) -> Unit = { _, _ -> },
     onCategoryClick: (DiscoverCategory, Int) -> Unit = { _, _ -> },
     onListImpression: (TvDiscoverRow) -> Unit = {},
@@ -173,6 +175,7 @@ private fun TvHomeContent(
                 onTapBanner = onTapBanner,
                 onPodcastClick = onPodcastClick,
                 onEpisodePlay = onEpisodePlay,
+                onPlayLatestEpisode = onPlayLatestEpisode,
                 onEpisodePodcastClick = onEpisodePodcastClick,
                 onCategoryClick = onCategoryClick,
                 onListImpression = onListImpression,
@@ -214,6 +217,7 @@ private fun TvHomeRows(
     onTapBanner: (TvDiscoverBanner) -> Unit = {},
     onPodcastClick: (TvDiscoverRow, TvDiscoverPodcast) -> Unit = { _, _ -> },
     onEpisodePlay: (TvDiscoverRow, TvDiscoverEpisode) -> Unit = { _, _ -> },
+    onPlayLatestEpisode: (TvDiscoverRow, TvDiscoverPodcast) -> Unit = { _, _ -> },
     onEpisodePodcastClick: (TvDiscoverRow, TvDiscoverEpisode) -> Unit = { _, _ -> },
     onCategoryClick: (DiscoverCategory, Int) -> Unit = { _, _ -> },
     onListImpression: (TvDiscoverRow) -> Unit = {},
@@ -252,6 +256,7 @@ private fun TvHomeRows(
                 onEpisodePlay = onEpisodePlay,
                 onEpisodePodcastClick = onEpisodePodcastClick,
                 onCategoryClick = onCategoryClick,
+                onPlayLatestEpisode = onPlayLatestEpisode,
                 modifier = rowModifier,
                 focusRequester = rowFocusRequester,
                 onTapBanner = onTapBanner,

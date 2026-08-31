@@ -25,7 +25,7 @@ class TvDiscoverFeedAnalytics(
 
     fun trackPodcastTapped(row: TvDiscoverRow, podcast: TvDiscoverPodcast) {
         val listId = row.discoverListId() ?: return
-        eventHorizon.track(DiscoverListPodcastTappedEvent(listId = listId, podcastUuid = podcast.uuid, source = source))
+        eventHorizon.track(DiscoverListPodcastTappedEvent(listId = listId, podcastUuid = podcast.uuid, listDatetime = row.discoverListDatetime(), source = source))
         if (row is TvDiscoverRow.FeaturedPodcasts) {
             eventHorizon.track(DiscoverFeaturedPodcastTappedEvent(podcastUuid = podcast.uuid))
         } else if (podcast.isSponsored) {
@@ -43,7 +43,7 @@ class TvDiscoverFeedAnalytics(
 
     fun trackEpisodePodcastTapped(row: TvDiscoverRow, episode: TvDiscoverEpisode) {
         val listId = row.discoverListId() ?: return
-        eventHorizon.track(DiscoverListPodcastTappedEvent(listId = listId, podcastUuid = episode.podcastUuid, source = source))
+        eventHorizon.track(DiscoverListPodcastTappedEvent(listId = listId, podcastUuid = episode.podcastUuid, listDatetime = row.discoverListDatetime(), source = source))
     }
 
     fun trackCategoryPodcastTapped(category: TvOpenedCategory, listId: String?, podcast: TvDiscoverPodcast) {
@@ -83,11 +83,27 @@ class TvDiscoverFeedAnalytics(
     private fun discoverRegion(): String = settings.discoverCountryCode.value
 
     private fun TvDiscoverRow.discoverListId(): String? = when (this) {
-        is TvDiscoverRow.FeaturedPodcasts,
-        is TvDiscoverRow.SinglePodcast,
-        is TvDiscoverRow.Podcasts,
-        is TvDiscoverRow.Episodes,
-        -> id.takeUnless { it in localRowIds }
+        is TvDiscoverRow.FeaturedPodcasts -> listId
+
+        is TvDiscoverRow.SinglePodcast -> listId
+
+        is TvDiscoverRow.Podcasts -> listId
+
+        is TvDiscoverRow.Episodes -> listId
+
+        is TvDiscoverRow.Banner,
+        is TvDiscoverRow.Categories,
+        -> null
+    }?.takeUnless { it in localRowIds }
+
+    private fun TvDiscoverRow.discoverListDatetime(): String? = when (this) {
+        is TvDiscoverRow.FeaturedPodcasts -> listDatetime
+
+        is TvDiscoverRow.SinglePodcast -> listDatetime
+
+        is TvDiscoverRow.Podcasts -> listDatetime
+
+        is TvDiscoverRow.Episodes -> listDatetime
 
         is TvDiscoverRow.Banner,
         is TvDiscoverRow.Categories,

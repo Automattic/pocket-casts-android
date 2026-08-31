@@ -47,6 +47,13 @@ class TvDiscoverFeedAnalyticsTest {
     }
 
     @Test
+    fun `list impression is not tracked for a row without a list id`() {
+        analytics().trackListImpression(TvDiscoverRow.Podcasts(id = "trending", title = "Trending", podcasts = emptyList(), listId = null))
+
+        verifyNoInteractions(eventHorizon)
+    }
+
+    @Test
     fun `list impression is not tracked for a banner row`() {
         analytics().trackListImpression(
             TvDiscoverRow.Banner(id = "create_account", title = "", banner = TvDiscoverBanner.CreateAccount),
@@ -75,8 +82,19 @@ class TvDiscoverFeedAnalyticsTest {
     }
 
     @Test
+    fun `podcast tapped carries the list datetime when the section provides it`() {
+        val row = TvDiscoverRow.Podcasts(id = "trending", title = "Trending", podcasts = emptyList(), listId = "trending", listDatetime = "2026-08-27")
+
+        analytics(source = "search").trackPodcastTapped(row, podcast("podcast-1"))
+
+        verify(eventHorizon).track(
+            DiscoverListPodcastTappedEvent(listId = "trending", podcastUuid = "podcast-1", listDatetime = "2026-08-27", source = "search"),
+        )
+    }
+
+    @Test
     fun `a featured podcast tap also tracks the featured podcast event`() {
-        val row = TvDiscoverRow.FeaturedPodcasts(id = "featured", title = "Featured", podcasts = emptyList())
+        val row = TvDiscoverRow.FeaturedPodcasts(id = "featured", title = "Featured", podcasts = emptyList(), listId = "featured")
 
         analytics().trackPodcastTapped(row, podcast("podcast-1"))
 
@@ -164,7 +182,7 @@ class TvDiscoverFeedAnalyticsTest {
         verify(eventHorizon).track(BannerRowTappedEvent(type = "discover_more"))
     }
 
-    private fun podcastsRow(id: String) = TvDiscoverRow.Podcasts(id = id, title = "Trending", podcasts = emptyList())
+    private fun podcastsRow(id: String) = TvDiscoverRow.Podcasts(id = id, title = "Trending", podcasts = emptyList(), listId = id)
 
     private fun podcast(uuid: String, isSponsored: Boolean = false) = TvDiscoverPodcast(
         uuid = uuid,

@@ -25,6 +25,8 @@ enum class TvEpisodeActionContext(val source: SourceView, val episodeViewSource:
     Playlist(SourceView.FILTERS, EpisodeViewSourceType.Filters),
     UpNext(SourceView.UP_NEXT, EpisodeViewSourceType.UpNext),
     NowPlaying(SourceView.PLAYER, EpisodeViewSourceType.NowPlaying),
+    Starred(SourceView.STARRED, EpisodeViewSourceType.Starred),
+    ListeningHistory(SourceView.LISTENING_HISTORY, EpisodeViewSourceType.ListeningHistory),
 }
 
 interface TvEpisodeActions {

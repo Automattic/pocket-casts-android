@@ -1,11 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-08-11 10:10:10+0000
+Translation-Revision-Date: 2026-08-28 10:10:11+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="tv_starred_empty_title">沒有標星號的單集</string>
+    <string name="tv_account_signed_out_alert_title">你已登出。</string>
+    <string name="tv_search_prompt">Podcast、節目、作者</string>
+    <string name="tv_banner_discover_more_title">這還只是冰山一角。</string>
+    <string name="tv_banner_discover_more_subtitle">下一個熱播節目就在這裡。</string>
+    <string name="tv_banner_discover_more_action_title">深入探索更多節目</string>
+    <string name="tv_sponsored_podcast_section_title">Pocket Casts 推薦</string>
+    <string name="tv_banner_create_account_title">單一個帳號， 跨裝置通用</string>
+    <string name="tv_banner_create_account_subtitle">你的追蹤和進度完全依上次結束時的狀態保留</string>
+    <string name="tv_banner_create_account_action_title">建立免費帳號</string>
     <string name="tv_playlist_play_all_save_and_play">儲存並播放</string>
     <string name="tv_playlist_play_all_play_without_saving">播放但不儲存</string>
     <string name="tv_episode_removed_from_up_next">已從「接下來播放」移除</string>
@@ -30,7 +40,6 @@ Language: zh_TW
     <string name="tv_podcast_info_website">網站</string>
     <string name="tv_podcast_info_network">網路</string>
     <string name="tv_create_account_modal_step_create">建立帳號或登入</string>
-    <string name="tv_sign_in_step_confirm_code">如果出現提示，請使用以下代碼確認</string>
     <string name="tv_sign_in_step_login">登入你的帳號</string>
     <string name="tv_sign_in_step_scan">掃描 QR 碼或前往「%1$s」</string>
     <string name="tv_podcast_more_info">更多資訊</string>
@@ -73,17 +82,12 @@ Language: zh_TW
     <string name="bookmark_play_from">透過「%s」播放</string>
     <string name="summary_upsell_description">訂閱 Plus 即可存取逐字稿和其他進階版功能，例如書籤和資料夾。</string>
     <string name="summary_upsell_title">AI 摘要</string>
-    <string name="tv_create_account_subtitle">掃描此代碼即可使用手機開始進行，只需一分鐘就能完成。</string>
-    <string name="tv_create_account_come_back">建立帳號後，請返回並登入</string>
     <string name="tv_create_account_title">建立免費帳號</string>
-    <string name="tv_onboarding_syncing_subtitle">正在同步你的 Podcast，稍後即可登入！</string>
-    <string name="tv_onboarding_welcome_back">歡迎回來！</string>
     <string name="tv_onboarding_sign_in_instructions">開啟相機並對準此 QR 碼</string>
     <string name="tv_onboarding_sign_in_title">使用手機登入</string>
     <string name="tv_onboarding_syncing">正在同步處理你的 Podcast\u2026</string>
     <string name="tv_onboarding_browse_without_account">在未登入帳號的狀態下瀏覽</string>
     <string name="tv_onboarding_create_free_account">建立免費帳號</string>
-    <string name="tv_onboarding_subtitle">將 Podcast 投到大螢幕上</string>
     <string name="tv_onboarding_welcome_tv">歡迎使用 Pocket Casts TV</string>
     <string name="tv_onboarding_welcome">歡迎使用 Pocket Casts</string>
     <string name="sort_longest_to_shortest">長到短</string>

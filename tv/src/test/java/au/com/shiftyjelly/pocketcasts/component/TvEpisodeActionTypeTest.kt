@@ -16,6 +16,8 @@ class TvEpisodeActionTypeTest {
             TvEpisodeActionContext.Playlist to (SourceView.FILTERS to EpisodeViewSourceType.Filters),
             TvEpisodeActionContext.UpNext to (SourceView.UP_NEXT to EpisodeViewSourceType.UpNext),
             TvEpisodeActionContext.NowPlaying to (SourceView.PLAYER to EpisodeViewSourceType.NowPlaying),
+            TvEpisodeActionContext.Starred to (SourceView.STARRED to EpisodeViewSourceType.Starred),
+            TvEpisodeActionContext.ListeningHistory to (SourceView.LISTENING_HISTORY to EpisodeViewSourceType.ListeningHistory),
         )
 
         assertEquals(TvEpisodeActionContext.entries.toSet(), expected.keys)
@@ -92,6 +94,23 @@ class TvEpisodeActionTypeTest {
                 TvEpisodeActionType.TogglePlayed,
                 TvEpisodeActionType.ToggleArchived,
                 TvEpisodeActionType.GoToPodcast,
+            ),
+            actions,
+        )
+    }
+
+    @Test
+    fun `listening history shows played and archive toggles but no go to podcast`() {
+        val actions = tvEpisodeActionTypes(TvEpisodeActionContext.ListeningHistory, showGoToPodcast = false)
+
+        assertEquals(
+            listOf(
+                TvEpisodeActionType.Play,
+                TvEpisodeActionType.Details,
+                TvEpisodeActionType.PlayNext,
+                TvEpisodeActionType.PlayLast,
+                TvEpisodeActionType.TogglePlayed,
+                TvEpisodeActionType.ToggleArchived,
             ),
             actions,
         )

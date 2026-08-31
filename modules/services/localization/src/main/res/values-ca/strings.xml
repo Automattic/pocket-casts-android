@@ -1,13 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-08-11 10:10:10+0000
+Translation-Revision-Date: 2026-08-28 10:10:11+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: ca
 -->
 <resources>
+    <string name="tv_starred_empty_title">Sense episodis destacats</string>
+    <string name="tv_account_signed_out_alert_title">Has tancat la sessió.</string>
+    <string name="tv_search_prompt">Pòdcasts, programes, autors</string>
+    <string name="tv_banner_discover_more_title">Encara no n\'has vist ni la meitat.</string>
+    <string name="tv_banner_discover_more_subtitle">La teva pròxima obsessió és aquí, en algun lloc.</string>
+    <string name="tv_banner_discover_more_action_title">Descobreix més programes</string>
+    <string name="tv_search_searching">S\'està cercant…</string>
+    <string name="tv_sponsored_podcast_section_title">Pocket Casts recomana</string>
+    <string name="tv_banner_create_account_title">Un compte. Totes les pantalles</string>
+    <string name="tv_banner_create_account_subtitle">Els teus seguiments i el teu progrés, exactament on els vas deixar</string>
+    <string name="tv_banner_create_account_action_title">Crea un compte gratuït</string>
+    <string name="tv_search_error_subtitle">Comprova la connexió i torna-ho a provar.</string>
+    <string name="tv_search_no_results_subtitle">Prova amb paraules clau més generals o diferents.</string>
+    <string name="tv_search_no_results_title">Cap resultat</string>
+    <string name="tv_search_browse_categories">Explora les categories</string>
     <string name="tv_playlist_play_all_save_and_play">Desa i reprodueix</string>
     <string name="tv_playlist_play_all_play_without_saving">Reprodueix sense desar</string>
+    <string name="tv_playlist_play_all_clear_up_next_message">Podem desar la cua «Tot seguit» actual com a\u00A0llista de reproducció</string>
+    <string name="tv_playlist_play_all_clear_up_next_title">Això esborrarà la cua «Tot\u00A0seguit»</string>
     <string name="tv_stop_playback_confirmation_message">Això aturarà la reproducció actual.</string>
     <string name="tv_archive_confirmation_title">Vols arxivar l\'episodi?</string>
     <string name="tv_mark_played_confirmation_title">Vols marcar-lo com a reproduït?</string>
@@ -40,7 +57,6 @@ Language: ca
     <string name="tv_podcast_info_website">Lloc web</string>
     <string name="tv_podcast_info_network">Xarxa</string>
     <string name="tv_create_account_modal_step_create">Crea el compte o inicia la sessió</string>
-    <string name="tv_sign_in_step_confirm_code">Si se\'t demana, confirma amb el codi següent</string>
     <string name="tv_sign_in_step_login">Inicia la sessió al teu compte</string>
     <string name="tv_sign_in_step_scan">Escaneja el codi QR o ves a %1$s</string>
     <string name="tv_podcast_more_info">Més informació</string>
@@ -83,17 +99,12 @@ Language: ca
     <string name="bookmark_play_from">Reprodueix des de %s</string>
     <string name="summary_upsell_description">Subscriu-te a Plus per a accedir-hi i a altres funcions Prèmium com ara els marcadors i les carpetes.</string>
     <string name="summary_upsell_title">Resums amb IA</string>
-    <string name="tv_create_account_come_back">Quan hagis creat el teu compte, torna i inicia la sessió</string>
-    <string name="tv_create_account_subtitle">Escaneja aquest codi per a començar al teu telèfon, només triga un minut.</string>
     <string name="tv_create_account_title">Crea el teu compte gratuït</string>
-    <string name="tv_onboarding_syncing_subtitle">Els teus pòdcasts s\'estan sincronitzant, aviat iniciarem la sessió!</string>
-    <string name="tv_onboarding_welcome_back">Benvingut de nou!</string>
     <string name="tv_onboarding_sign_in_instructions">Obre la càmera i apunta al codi QR</string>
     <string name="tv_onboarding_sign_in_title">Inicia sessió amb el telèfon</string>
     <string name="tv_onboarding_syncing">S\'estan sincronitzant els teus pòdcasts\u2026</string>
     <string name="tv_onboarding_browse_without_account">Navega sense compte</string>
     <string name="tv_onboarding_create_free_account">Crea un compte gratuït</string>
-    <string name="tv_onboarding_subtitle">Els teus pòdcasts, a la pantalla gran</string>
     <string name="tv_onboarding_welcome_tv">Benvingut a Pocket Casts TV</string>
     <string name="tv_onboarding_welcome">Benvingut a Pocket Casts</string>
     <string name="sort_longest_to_shortest">De més llarg a més curt</string>
@@ -1991,8 +2002,8 @@ Language: ca
     <string name="profile_get_plus">Aconsegueix Pocket Casts Plus per a desbloquejar aquesta funció i moltes més!</string>
     <string name="profile_files_empty_summary">Vols escoltar els teus propis fitxers? \nToca el botó + per a obrir-los a Pocket Casts, i apareixeran aquí.</string>
     <string name="filters_no_episodes">No s\'han trobat episodis</string>
-    <string name="profile_license_agreement">Pocket Casts valora la teva privadesa. Aquesta política de privadesa explica quina informació recopilem sobre tu i per què, què podem fer amb aquesta informació i com la gestionem. S\'aplica a les aplicacions Pocket Casts per iOS i Android, i al servei web Pocket Casts amb les aplicacions associades per macOS i Windows (conjuntament i de manera solidària, el Servei). En utilitzar el servei, acceptes aquesta política de privadesa. Si actives les notificacions push a l\'aplicació, emmagatzemem el token push que Apple ens proporciona per a poder enviar-te aquestes notificacions push al teu dispositiu. Si compres l\'aplicació web, emmagatzemem una id de transacció per la teva compra. Si decideixes no crear un compte, i no utilitzes notificacions push, no s\'emmagatzema cap dada teva als nostres servidors. El servei web Pocket Casts també utilitza galetes i tecnologies similars per a mantenir-te connectat. Si decideixes generar una sol·licitud d\'assistència des del servei, podem generar un adjunt que contingui dades addicionals per a ajudar a abordar la teva sol·licitud d\'assistència que pots consultar abans de la seva presentació.</string>
     <string name="filters_create_select_criteria">Selecciona els teus criteris de filtre amb aquests botons per a crear una llista de reproducció intel·ligent d\'episodis actualitzada.</string>
+    <string name="profile_license_agreement">Pocket Casts valora la teva privadesa. Aquesta política de privadesa explica quina informació recopilem sobre tu i per què, què podem fer amb aquesta informació i com la gestionem. S\'aplica a les aplicacions Pocket Casts per iOS i Android, i al servei web Pocket Casts amb les aplicacions associades per macOS i Windows (conjuntament i de manera solidària, el Servei). En utilitzar el servei, acceptes aquesta política de privadesa. Si actives les notificacions push a l\'aplicació, emmagatzemem el token push que Apple ens proporciona per a poder enviar-te aquestes notificacions push al teu dispositiu. Si compres l\'aplicació web, emmagatzemem una id de transacció per la teva compra. Si decideixes no crear un compte, i no utilitzes notificacions push, no s\'emmagatzema cap dada teva als nostres servidors. El servei web Pocket Casts també utilitza galetes i tecnologies similars per a mantenir-te connectat. Si decideixes generar una sol·licitud d\'assistència des del servei, podem generar un adjunt que contingui dades addicionals per a ajudar a abordar la teva sol·licitud d\'assistència que pots consultar abans de la seva presentació.</string>
     <string name="podcasts">Pòdcasts</string>
     <string name="download_warning_title">Descarrega-ho tot</string>
     <string name="episode_row_download_failed">Error a la descàrrega</string>
