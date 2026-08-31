@@ -52,6 +52,8 @@ class TvAppLifecycleObserver(
         } else if (previousVersionCode < versionCode) {
             appLifecycleAnalytics.onApplicationUpgrade(previousVersionCode)
         }
-        settings.setMigratedVersionCode(versionCode)
+        if (previousVersionCode != versionCode) {
+            settings.setMigratedVersionCode(versionCode)
+        }
     }
 }

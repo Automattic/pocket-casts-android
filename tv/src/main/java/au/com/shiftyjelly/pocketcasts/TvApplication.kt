@@ -5,6 +5,7 @@ import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsController
 import au.com.shiftyjelly.pocketcasts.crashlogging.InitializeRemoteLogging
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackServiceToggle
@@ -25,6 +26,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlow
@@ -50,6 +52,8 @@ class TvApplication :
     @Inject lateinit var analyticsController: AnalyticsController
 
     @Inject lateinit var syncManager: SyncManager
+
+    @Inject lateinit var settings: Settings
 
     @Inject lateinit var appLifecycleObserver: TvAppLifecycleObserver
 
@@ -93,7 +97,10 @@ class TvApplication :
         analyticsController.clearAllData()
         analyticsController.refreshMetadata()
         applicationScope.launch {
-            syncManager.isLoggedInObservable.asFlow()
+            combine(
+                syncManager.isLoggedInObservable.asFlow(),
+                settings.cachedSubscription.flow,
+            ) { isLoggedIn, subscription -> isLoggedIn to subscription }
                 .distinctUntilChanged()
                 .collect { analyticsController.refreshMetadata() }
         }
