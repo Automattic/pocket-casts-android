@@ -20,6 +20,8 @@ import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.utils.fingerprint.FingerprintDecodePolicy
+import au.com.shiftyjelly.pocketcasts.utils.fingerprint.FingerprintPolicy
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.SyncedTranscriptsPreparationCompletedEvent
 import com.automattic.eventhorizon.SyncedTranscriptsPreparationFailedEvent
@@ -73,6 +75,7 @@ class FingerprintTimingManager @Inject constructor(
     private val settings: Settings,
     private val dataSourceFactory: Lazy<ExoPlayerDataSourceFactory>,
     private val pcmTap: FingerprintPcmTap,
+    private val decodePolicy: FingerprintDecodePolicy,
 ) {
 
     /** Who asked for preparation; decides whether streaming over a metered network is acceptable. */
@@ -328,6 +331,9 @@ class FingerprintTimingManager @Inject constructor(
      * accumulator, and never touches the continuous mapping or the public state.
      */
     suspend fun resolvePlaybackTime(episode: BaseEpisode, referenceTime: Duration): ChapterSeekResult {
+        if (decodePolicy.current() != FingerprintPolicy.PLATFORM) {
+            return ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_UNSUPPORTED_DEVICE)
+        }
         val audioSource = episode.downloadedFilePath
             ?: episode.downloadUrl
             ?: return ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_NO_AUDIO_SOURCE)
@@ -716,6 +722,7 @@ class FingerprintTimingManager @Inject constructor(
      */
     private suspend fun shouldRunEagerPass(episodeUuid: String, isDownloaded: Boolean): Boolean {
         if (Util.getAppPlatform(context) != AppPlatform.Phone) return false
+        if (decodePolicy.current() != FingerprintPolicy.PLATFORM) return false
         return computeEager(
             hasGeneratedChapters = chapterManager.get().hasGeneratedChapters(episodeUuid),
             isDownloaded = isDownloaded,
@@ -741,6 +748,12 @@ class FingerprintTimingManager @Inject constructor(
         if (Util.getAppPlatform(context) != AppPlatform.Phone) {
             markUnavailable(reason = "unsupported_platform", isStreaming = !isDownloaded, episodeUuid = episodeUuid)
             Timber.d("FingerprintTimingManager: unsupported platform")
+            return
+        }
+
+        if (decodePolicy.current() == FingerprintPolicy.DISABLED) {
+            markUnavailable(reason = "unsupported_device", isStreaming = !isDownloaded, episodeUuid = episodeUuid)
+            Timber.d("FingerprintTimingManager: unsupported device")
             return
         }
 
@@ -982,6 +995,7 @@ class FingerprintTimingManager @Inject constructor(
      */
     private fun maybeStartCatchUpResolve(gen: Long, startSec: Double) {
         if (currentEager) return
+        if (decodePolicy.current() != FingerprintPolicy.PLATFORM) return
         if (isWithinMatchedContent(startSec, snapshotPlaybackToReference)) return
         catchUpJob?.cancel()
         catchUpJob = scope.launch(Dispatchers.IO) {
