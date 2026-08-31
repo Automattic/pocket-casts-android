@@ -1,13 +1,93 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-06-15 18:10:08+0000
+Translation-Revision-Date: 2026-08-12 09:56:32+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: de
 -->
 <resources>
+    <string name="tv_playlist_play_all_save_and_play">Speichern und abspielen</string>
+    <string name="tv_playlist_play_all_play_without_saving">Ohne Speichern abspielen</string>
+    <string name="tv_episode_removed_from_up_next">Aus „Als Nächstes“ entfernt</string>
+    <string name="tv_sign_in_title">Bei Pocket Casts anmelden</string>
+    <string name="tv_create_account_modal_title">Deine Podcasts verdienen ein Zuhause</string>
+    <string name="tv_create_account_modal_subtitle">Erstelle ein kostenloses Konto, um Podcasts zu abonnieren, deine Liste „Als Nächstes“ zu erstellen und genau dort weiterzumachen, wo du aufgehört hast – auf jedem Gerät.</string>
+    <string name="tv_episode_marked_as_played">Als gehört markiert</string>
+    <string name="tv_episode_marked_as_unplayed">Als nicht angehört markiert</string>
+    <string name="tv_episode_archived">Archiviert</string>
+    <string name="tv_episode_unarchived">Wiederhergestellt</string>
+    <string name="tv_episode_will_play_next">Wird als Nächstes abgespielt</string>
+    <string name="tv_episode_will_play_last">Wird zuletzt abgespielt</string>
+    <string name="tv_podcast_schedule_monthly">Monatlich</string>
+    <string name="tv_podcast_schedule_fortnightly">Zweiwöchentlich</string>
+    <string name="tv_podcast_schedule_weekly">Wöchentlich</string>
+    <string name="tv_podcast_schedule_daily">Täglich</string>
+    <string name="tv_podcast_schedule_hourly">Stündlich</string>
+    <string name="tv_podcast_next_episode_soon">In Kürze</string>
+    <string name="tv_podcast_next_episode_tomorrow">Morgen</string>
+    <string name="tv_podcast_info_next_episode">Nächste Folge</string>
+    <string name="tv_podcast_info_schedule">Planen</string>
+    <string name="tv_podcast_info_website">Website</string>
+    <string name="tv_podcast_info_network">Netzwerk</string>
+    <string name="tv_create_account_modal_step_create">Erstelle dein Konto oder melde dich an</string>
+    <string name="tv_sign_in_step_scan">Scanne den QR-Code oder gehe zu %1$s</string>
+    <string name="tv_sign_in_step_confirm_code">Gib den unten stehenden Code zur Bestätigung ein, wenn du dazu aufgefordert wirst</string>
+    <string name="tv_sign_in_step_login">Melde dich bei deinem Konto an</string>
+    <string name="tv_podcast_follow">Diesem Podcast folgen</string>
+    <string name="tv_podcast_more_info">Weitere Informationen</string>
+    <string name="tv_folder_empty_message">Füge in der Mobil-App Podcasts zu diesem Ordner hinzu, damit sie hier angezeigt werden.</string>
+    <string name="tv_up_next_empty_action_title">Folgen hinzufügen</string>
+    <string name="tv_your_podcasts_empty_action_title">Podcasts entdecken</string>
+    <string name="tv_your_podcasts_empty_subtitle">Abonnierte Podcasts werden hier angezeigt und können jetzt abgespielt werden.</string>
+    <string name="tv_your_podcasts_empty_title">Zeit zum Ausfüllen</string>
+    <string name="tv_up_next_empty_subtitle">Füge Folgen zur Warteschlange hinzu und sie werden nacheinander abgespielt</string>
+    <string name="tv_up_next_empty_title">Nichts in der Warteschlange</string>
+    <string name="tv_episode_details">Details zur Folge</string>
+    <string name="playlist">Playlist</string>
+    <string name="tv_playlist_empty_subtitle_manual">Füge über die Mobil-App Folgen zu dieser Playlist hinzu, damit sie hier angezeigt werden.</string>
+    <string name="tv_playlist_empty_subtitle">Jetzt kannst du entweder stolz darauf sein, deine Liste durchgehört zu haben, oder deine Regeln in der Mobil-App bearbeiten, um dir weitere Folgen vorzuknöpfen.</string>
+    <string name="tv_playlists_download_title">Playlists auf deinem Mobiltelefon erstellen</string>
+    <string name="tv_playlist_empty_title">Keine Folgen</string>
+    <string name="tv_playlist_play_all">Alle Folgen abspielen</string>
+    <string name="tv_playlists_download_subtitle">Sie warten hier, wenn du fertig bist. Scannen, um die App zu erhalten</string>
+    <string name="tv_playlists_empty_title">Deine Playlists sind hier</string>
+    <string name="tv_playlists_empty_subtitle">Erstelle manuell eine oder überlasse die Sortierung intelligenten Regeln.</string>
+    <string name="tv_playlists_empty_action_title">Playlist erstellen</string>
+    <string name="tv_profile_starred_episodes">Mit Stern markierte Folgen</string>
+    <string name="tv_home_keep_listening">Weiter zuhören</string>
+    <string name="settings_audio_only_summary">Wenn diese Option aktiviert ist, werden Videofolgen nur als Audio abgespielt, wodurch Daten gespeichert werden.</string>
+    <string name="settings_audio_only">Nur Audio</string>
+    <string name="profile_try_duration_for_free">%1$s kostenlos ausprobieren</string>
+    <string name="settings_generated_chapters_summary">Zeige automatisch generierte Kapitel an, sofern verfügbar.</string>
+    <string name="settings_generated_chapters">Generierte Kapitel</string>
+    <string name="profile_stats_listening_activity_info_summary">Eine Schätzung, wann du gehört hast, basierend auf deinem Wiedergabeverlauf. Wenn du eine Folge über mehrere Tage anhörst, wird sie am letzten Tag angezeigt.</string>
+    <string name="profile_stats_listening_activity_info_title">Höraktivität</string>
+    <string name="profile_stats_listening_activity_info_help">Informationen</string>
+    <string name="profile_stats_listening_activity_content_description">Heatmap der Höraktivität</string>
+    <string name="profile_stats_listening_activity">Höraktivität</string>
+    <string name="player_action_show_video">Video anzeigen</string>
+    <string name="player_action_hide_video">Video ausblenden</string>
+    <string name="up_next_sort_duration_tooltip_body">Kurz nach lang, oder umgekehrt – passe die Folge an deine verfügbare Zeit an.</string>
+    <string name="up_next_sort_duration_tooltip_title">Nach Dauer sortieren</string>
+    <string name="transcript_tap_to_seek_streaming_unavailable">Lade die Folge herunter, um zum Suchen zu tippen</string>
+    <string name="bookmark_play_from">Abspielen von %s</string>
+    <string name="summary_upsell_description">Werde Plus-Abonnent, um Zugriff auf das Transkript und andere Premium-Funktionen wie Lesezeichen und Ordner zu erhalten.</string>
+    <string name="summary_upsell_title">KI-gestützte Zusammenfassungen</string>
     <string name="tv_create_account_subtitle">Scanne diesen Code, um auf deinem Mobiltelefon zu beginnen. Es dauert nur eine Minute.</string>
+    <string name="tv_create_account_come_back">Sobald du dein Konto erstellt hast, komm zurück und melde dich an</string>
     <string name="tv_create_account_title">Kostenloses Konto erstellen</string>
+    <string name="tv_onboarding_syncing_subtitle">Deine Podcasts werden gerade synchronisiert. Wir melden dich in Kürze an!</string>
+    <string name="tv_onboarding_welcome_back">Willkommen zurück!</string>
+    <string name="tv_onboarding_sign_in_instructions">Öffne die Kamera und richte sie auf diesen QR-Code</string>
+    <string name="tv_onboarding_sign_in_title">Mit deinem Mobiltelefon anmelden</string>
+    <string name="tv_onboarding_syncing">Deine Podcasts werden synchronisiert …</string>
+    <string name="tv_onboarding_browse_without_account">Ohne Konto durchsuchen</string>
+    <string name="tv_onboarding_create_free_account">Kostenloses Konto erstellen</string>
+    <string name="tv_onboarding_subtitle">Deine Podcasts auf dem großen Bildschirm</string>
+    <string name="tv_onboarding_welcome_tv">Willkommen bei Pocket Casts TV</string>
+    <string name="tv_onboarding_welcome">Willkommen bei Pocket Casts</string>
+    <string name="sort_longest_to_shortest">Lang nach kurz</string>
+    <string name="sort_shortest_to_longest">Kurz nach lang</string>
     <string name="synced_transcripts_whats_new_button_note">Synchronisierte Transkripte sind nur für die neuesten Folgen verfügbar.</string>
     <string name="synced_transcripts_whats_new_message">Lies schnell, verpasse nichts. Der Name, den du überlesen hast, das Buch, das sie empfohlen haben, die Statistik, die du wolltest – tippe auf das Wort und springe zurück.</string>
     <string name="synced_transcripts_whats_new_title">Lies mit. Sogar bei doppelter Geschwindigkeit.</string>
@@ -108,14 +188,10 @@ Language: de
     <string name="watch_synced_successfully">Watch erfolgreich synchronisiert</string>
     <string name="watch_sync_waiting_for_phone">Auf Synchronisierung des Mobiltelefons warten …</string>
     <string name="watch_sync_retry">Erneut versuchen</string>
-    <string name="watch_sync_error_unknown_help">Versuche es erneut oder melde dich manuell an</string>
     <string name="watch_sync_error_login_failed_help">Versuche, dich manuell anzumelden</string>
     <string name="watch_sync_error_no_connection_help">Bluetooth-Verbindung zu deinem Mobiltelefon überprüfen</string>
-    <string name="watch_sync_error_timeout_help">Stelle sicher, dass sich dein Mobiltelefon in der Nähe befindet und über Bluetooth verbunden ist</string>
-    <string name="watch_sync_error_unknown">Es ist ein Fehler aufgetreten</string>
     <string name="watch_sync_error_login_failed">Anmeldung fehlgeschlagen</string>
     <string name="watch_sync_error_no_connection">Mobiltelefon nicht verbunden</string>
-    <string name="watch_sync_error_timeout">Verbindung zum Mobiltelefon fehlgeschlagen</string>
     <string name="watch_sync_success">Über das Mobiltelefon angemeldet!</string>
     <string name="watch_sync_syncing">Mobiltelefon wird synchronisiert… </string>
     <string name="error_download_generic_failure">Die Folge konnte nicht heruntergeladen werden. %1$s</string>
@@ -2407,6 +2483,14 @@ Language: de
     <plurals name="settings_auto_download_on_follow_podcast_description">
         <item quantity="one">Lade automatisch die aktuellste Folge von Shows herunter, denen du seit Neuestem folgst.</item>
         <item quantity="other">Lade automatisch die %s aktuellsten Folgen von Shows herunter, denen du seit Neuestem folgst.</item>
+    </plurals>
+    <plurals name="tv_playlist_all_archived">
+        <item quantity="one">Die einzige Folge dieser Playlist wurde archiviert.</item>
+        <item quantity="other">Alle %1$d Folgen dieser Playlist wurden archiviert.</item>
+    </plurals>
+    <plurals name="tv_podcast_all_archived">
+        <item quantity="one">Die einzige Folge dieses Podcasts wurde archiviert.</item>
+        <item quantity="other">Alle %1$d Folgen dieses Podcasts wurden archiviert.</item>
     </plurals>
     <plurals name="week_with_count">
         <item quantity="one">%1$d Woche</item>

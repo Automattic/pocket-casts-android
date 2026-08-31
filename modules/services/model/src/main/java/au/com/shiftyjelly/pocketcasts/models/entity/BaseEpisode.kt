@@ -3,8 +3,6 @@ package au.com.shiftyjelly.pocketcasts.models.entity
 import androidx.media3.common.MimeTypes
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import java.util.Date
 import java.util.UUID
 
@@ -19,9 +17,17 @@ sealed interface BaseEpisode {
             return path.endsWith(".m3u8", ignoreCase = true)
         }
 
-        private fun isHlsMimeType(type: String?): Boolean {
-            return type.equals(MimeTypes.APPLICATION_M3U8, ignoreCase = true) ||
-                type.equals("application/vnd.apple.mpegurl", ignoreCase = true)
+        /** The HLS MIME types the server may pass through verbatim; match case-insensitively. */
+        val HLS_MIME_TYPES: Set<String> = setOf(
+            MimeTypes.APPLICATION_M3U8.lowercase(), // application/x-mpegurl
+            "application/vnd.apple.mpegurl",
+            "audio/mpegurl",
+            "application/mpegurl",
+            "audio/x-mpegurl",
+        )
+
+        fun isHlsMimeType(type: String?): Boolean {
+            return type != null && type.lowercase() in HLS_MIME_TYPES
         }
 
         /**
@@ -49,8 +55,6 @@ sealed interface BaseEpisode {
     var duration: Double
     var downloadUrl: String?
 
-    val hlsUrl: String?
-        get() = null
     var playedUpTo: Double
     var playingStatus: EpisodePlayingStatus
     var addedDate: Date
@@ -130,23 +134,37 @@ sealed interface BaseEpisode {
     val isVideo: Boolean
         get() = fileType?.startsWith("video/") ?: false
 
-    /** The enclosure itself is HLS or missing, so there is no progressive file to download. */
+    /** The enclosure itself is HLS, so there is no progressive file to download. */
     val isHlsOnly: Boolean
-        get() = isHlsUrl(downloadUrl) || isHlsMimeType(fileType) || (downloadUrl == null && hlsUrl != null)
+        get() = isHlsUrl(downloadUrl) || isHlsMimeType(fileType)
 
-    /** The URL to use when streaming. Downloaded playback uses [downloadedFilePath] instead. */
+    /** A runtime-only resolved stream (e.g. the HLS alternate enclosure); overrides [streamUrl] when set. */
+    var overrideStreamUrl: String?
+
+    /** The content type of [overrideStreamUrl], used to decide HLS/video handling. */
+    var overrideStreamContentType: String?
+
+    /**
+     * The URL to use when streaming. Downloaded playback uses [downloadedFilePath] instead. Falls back
+     * to the progressive [downloadUrl] unless a stream has been resolved into [overrideStreamUrl].
+     */
     val streamUrl: String?
-        get() = if (FeatureFlag.isEnabled(Feature.HLS_STREAMING)) hlsUrl ?: downloadUrl else downloadUrl
+        get() = overrideStreamUrl ?: downloadUrl
 
     /** Whether the URL that streaming will actually use is HLS. */
     val isStreamUrlHls: Boolean
         get() {
             val url = streamUrl ?: return false
-            return (hlsUrl != null && url == hlsUrl) || isHlsUrl(url) || (url == downloadUrl && isHlsMimeType(fileType))
+            if (overrideStreamUrl != null) {
+                return isHlsMimeType(overrideStreamContentType) || isHlsUrl(url)
+            }
+            return isHlsUrl(url) || (url == downloadUrl && isHlsMimeType(fileType))
         }
 
     val isAudio: Boolean
         get() = !isVideo
+
+    fun showsVideoIcon(hasHlsAlternateEnclosure: Boolean): Boolean = isVideo || isHlsOnly || hasHlsAlternateEnclosure
 
     val podcastOrSubstituteUuid: String
         get() = if (this is PodcastEpisode) this.podcastUuid else Podcast.userPodcast.uuid

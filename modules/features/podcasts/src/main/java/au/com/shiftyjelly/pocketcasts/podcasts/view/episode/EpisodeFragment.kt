@@ -152,6 +152,7 @@ import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.utils.parceler.DurationParceler
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.extensions.cleanup
+import au.com.shiftyjelly.pocketcasts.views.extensions.copyLinkOnLongPress
 import au.com.shiftyjelly.pocketcasts.views.extensions.hide
 import au.com.shiftyjelly.pocketcasts.views.extensions.show
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
@@ -911,6 +912,7 @@ class EpisodeFragment : BaseFragment() {
                                     onSkipChaptersClick = chaptersViewModel::enableTogglingOrUpsell,
                                     isTogglingChapters = chaptersState.isTogglingChapters,
                                     showSubscriptionIcon = chaptersState.showSubscriptionIcon,
+                                    resolvingChapterIndex = chaptersViewModel.resolvingChapterIndex.collectAsState().value,
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .heightIn(max = screenHeight),
@@ -1339,6 +1341,7 @@ class EpisodeFragment : BaseFragment() {
                     isVerticalScrollBarEnabled = false
                     // stop the web view jumping after loading
                     isFocusable = false
+                    copyLinkOnLongPress()
                     webViewClient = object : WebViewClient() {
                         override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
                             val url = request.url.toString()

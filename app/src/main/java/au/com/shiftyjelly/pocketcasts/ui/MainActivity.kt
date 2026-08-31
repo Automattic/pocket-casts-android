@@ -163,6 +163,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.opml.OpmlImportTask
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackNoticeType
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
+import au.com.shiftyjelly.pocketcasts.repositories.playback.StreamVideoState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -716,7 +717,12 @@ class MainActivity :
     override fun onStart() {
         super.onStart()
         if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            if (!videoPlayerShown && playbackManager.getCurrentEpisode()?.isVideo == true && playbackManager.isPlaybackLocal() && playbackManager.isPlaying() && viewModel.isPlayerOpen) {
+            val isPlayingVideo = playbackManager.videoRenderingEnabled.value &&
+                (
+                    (playbackManager.getCurrentEpisode()?.isVideo == true && !settings.audioOnly.value) ||
+                        playbackManager.streamVideoState.value == StreamVideoState.HasVideo
+                    )
+            if (!videoPlayerShown && isPlayingVideo && playbackManager.isPlaybackLocal() && playbackManager.isPlaying() && viewModel.isPlayerOpen) {
                 openFullscreenViewPlayer()
             } else {
                 videoPlayerShown = false
@@ -733,6 +739,14 @@ class MainActivity :
         // addCallback() again in order to tell the media router that it no longer
         // needs to invest effort trying to discover routes of these kinds for now.
         mediaRouter?.addCallback(mediaRouteSelector, mediaRouterCallback, 0)
+    }
+
+    private fun openVideoPlayer() {
+        if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            binding.playerBottomSheet.openPlayer()
+        } else {
+            openFullscreenViewPlayer()
+        }
     }
 
     private fun openFullscreenViewPlayer() {
@@ -1074,12 +1088,8 @@ class MainActivity :
                         val episode = withContext(Dispatchers.Default) {
                             episodeManager.findEpisodeByUuid(state.episodeUuid)
                         }
-                        if (episode?.isVideo == true && state.isPlaying) {
-                            if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
-                                binding.playerBottomSheet.openPlayer()
-                            } else {
-                                openFullscreenViewPlayer()
-                            }
+                        if (episode?.isVideo == true && state.isPlaying && !settings.audioOnly.value && playbackManager.videoRenderingEnabled.value) {
+                            openVideoPlayer()
                         }
                     }
 
@@ -1094,6 +1104,26 @@ class MainActivity :
                     updatePlaybackState(state)
 
                     viewModel.lastPlaybackState = state
+                }
+            }
+        }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                var previousStreamVideoState: StreamVideoState? = null
+                playbackManager.streamVideoState.collect { streamVideoState ->
+                    val didResolveVideoStream = previousStreamVideoState == StreamVideoState.Unknown &&
+                        streamVideoState == StreamVideoState.HasVideo
+                    previousStreamVideoState = streamVideoState
+
+                    if (didResolveVideoStream &&
+                        playbackManager.isPlaying() &&
+                        playbackManager.isPlaybackLocal() &&
+                        playbackManager.videoRenderingEnabled.value &&
+                        playbackManager.getCurrentEpisode()?.isVideo != true
+                    ) {
+                        openVideoPlayer()
+                    }
                 }
             }
         }

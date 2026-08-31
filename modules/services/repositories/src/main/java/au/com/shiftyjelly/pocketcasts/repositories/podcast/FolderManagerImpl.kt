@@ -147,10 +147,6 @@ class FolderManagerImpl @Inject constructor(
         updatePositions(folders)
     }
 
-    override fun findFoldersToSyncBlocking(): List<Folder> {
-        return folderDao.findNotSyncedBlocking()
-    }
-
     override suspend fun findFoldersToSync(): List<Folder> {
         return folderDao.findNotSynced()
     }

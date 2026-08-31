@@ -69,7 +69,7 @@ class AutoPlaySelector @Inject constructor(
         currentEpisodeUuid: String?,
     ): List<PodcastEpisode> {
         val episodes = episodeManager
-            .findEpisodesByPodcastOrderedSuspend(podcast)
+            .findEpisodesByPodcastOrdered(podcast)
             .filter { episode ->
                 (!episode.isArchived && !episode.isFinished) ||
                     episode.uuid == currentEpisodeUuid

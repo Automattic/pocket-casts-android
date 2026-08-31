@@ -1,13 +1,93 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-06-15 18:10:08+0000
+Translation-Revision-Date: 2026-08-12 09:58:31+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="tv_playlist_play_all_save_and_play">Opslaan en afspelen</string>
+    <string name="tv_playlist_play_all_play_without_saving">Afspelen zonder op te slaan</string>
+    <string name="tv_episode_removed_from_up_next">Verwijderd uit Hierna</string>
+    <string name="tv_sign_in_title">Log in bij Pocket Casts</string>
+    <string name="tv_create_account_modal_title">Je podcasts verdienen een thuis</string>
+    <string name="tv_create_account_modal_subtitle">Maak een gratis account aan om podcasts te volgen, je Hierna op te bouwen en op elk apparaat verder te gaan waar je gebleven was.</string>
+    <string name="tv_episode_marked_as_played">Markeren als afgespeeld</string>
+    <string name="tv_episode_marked_as_unplayed">Markeren als niet-afgespeeld</string>
+    <string name="tv_episode_archived">Gearchiveerd</string>
+    <string name="tv_episode_unarchived">Niet gearchiveerd</string>
+    <string name="tv_episode_will_play_next">Wordt hierna afgespeeld</string>
+    <string name="tv_episode_will_play_last">Wordt als laatste afgespeeld</string>
+    <string name="tv_podcast_schedule_monthly">Maandelijks</string>
+    <string name="tv_podcast_schedule_fortnightly">Tweewekelijks</string>
+    <string name="tv_podcast_schedule_weekly">Wekelijks</string>
+    <string name="tv_podcast_schedule_daily">Dagelijks</string>
+    <string name="tv_podcast_schedule_hourly">Elk uur</string>
+    <string name="tv_podcast_next_episode_soon">Op elk moment</string>
+    <string name="tv_podcast_next_episode_tomorrow">Morgen</string>
+    <string name="tv_podcast_info_schedule">Inplannen</string>
+    <string name="tv_create_account_modal_step_create">Maak je account aan of log in</string>
+    <string name="tv_sign_in_step_confirm_code">Indien gevraagd, bevestig met de code hieronder</string>
+    <string name="tv_sign_in_step_scan">Scan de QR-code of ga naar %1$s</string>
+    <string name="tv_podcast_info_next_episode">Volgende aflevering</string>
+    <string name="tv_podcast_info_website">Website</string>
+    <string name="tv_podcast_info_network">Netwerk</string>
+    <string name="tv_sign_in_step_login">Log in bij je account.</string>
+    <string name="tv_podcast_more_info">Meer informatie</string>
+    <string name="tv_podcast_follow">Volg deze podcast</string>
+    <string name="tv_folder_empty_message">Voeg podcasts toe aan deze map in de mobiele app en ze worden hier weergegeven.</string>
+    <string name="tv_up_next_empty_action_title">Afleveringen toevoegen</string>
+    <string name="tv_your_podcasts_empty_action_title">Podcasts ontdekken</string>
+    <string name="tv_your_podcasts_empty_subtitle">Gevolgde podcasts verschijnen hier, klaar om af te spelen.</string>
+    <string name="tv_your_podcasts_empty_title">Tijd om dit op te vullen</string>
+    <string name="tv_up_next_empty_subtitle">Voeg afleveringen toe aan Hierna en ze worden in volgorde afgespeeld, zonder onderbreking</string>
+    <string name="tv_up_next_empty_title">Niets in de wachtrij geplaatst</string>
+    <string name="tv_episode_details">Informatie over aflevering</string>
+    <string name="playlist">Playlists</string>
+    <string name="tv_playlist_empty_subtitle_manual">Voeg afleveringen toe aan deze playlist vanuit de mobiele app en ze worden hier weergegeven.</string>
+    <string name="tv_playlist_empty_subtitle">Het wordt ofwel tijd om te vieren dat je deze lijst hebt afgerond of om je regels in de mobiele app te bewerken om er meer te krijgen.</string>
+    <string name="tv_playlists_download_title">Maak afspeellijsten aan op je telefoon</string>
+    <string name="tv_playlist_empty_title">Geen afleveringen</string>
+    <string name="tv_playlist_play_all">Alle afleveringen afspelen</string>
+    <string name="tv_playlists_download_subtitle">Ze zullen hier wachten als je klaar bent. Scan om de app te krijgen</string>
+    <string name="tv_playlists_empty_title">Je afspeellijsten staan hier</string>
+    <string name="tv_playlists_empty_subtitle">Bouw er handmatig een of laat slimme regels het sorteren voor je doen.</string>
+    <string name="tv_playlists_empty_action_title">Maak een afspeellijst aan</string>
+    <string name="tv_profile_starred_episodes">Favoriete afleveringen</string>
+    <string name="tv_home_keep_listening">Blijf luisteren</string>
+    <string name="settings_audio_only_summary">Indien ingeschakeld, worden afleveringen met video alleen als audio afgespeeld, waardoor gegevens worden opgeslagen.</string>
+    <string name="settings_audio_only">Alleen audio</string>
+    <string name="profile_try_duration_for_free">Probeer %1$s gratis</string>
+    <string name="settings_generated_chapters_summary">Automatisch gegenereerde hoofdstukken weergeven indien beschikbaar.</string>
+    <string name="settings_generated_chapters">Gegenereerde hoofdstukken</string>
+    <string name="profile_stats_listening_activity_info_summary">Een schatting van wanneer je hebt geluisterd, op basis van je afspeelgeschiedenis. Als je een aflevering over een paar dagen luistert, wordt deze op de laatste dag weergegeven.</string>
+    <string name="profile_stats_listening_activity_info_title">Luisteractiviteit</string>
+    <string name="profile_stats_listening_activity_info_help">Informatie</string>
+    <string name="profile_stats_listening_activity_content_description">Heatmap luisteractiviteit</string>
+    <string name="profile_stats_listening_activity">Luisteractiviteit</string>
+    <string name="player_action_show_video">Video tonen</string>
+    <string name="player_action_hide_video">Video verbergen</string>
+    <string name="up_next_sort_duration_tooltip_body">Kortste naar langste, of andersom - pas de aflevering aan op de tijd die je daadwerkelijk hebt.</string>
+    <string name="up_next_sort_duration_tooltip_title">Sorteren op duur</string>
+    <string name="transcript_tap_to_seek_streaming_unavailable">Download de aflevering om te zoeken</string>
+    <string name="bookmark_play_from">Afspelen van %s</string>
+    <string name="summary_upsell_description">Abonneer je op Plus om er toegang tot te krijgen en tot andere Premium-functies zoals bladwijzers en mappen.</string>
+    <string name="summary_upsell_title">AI-samenvattingen</string>
     <string name="tv_create_account_subtitle">Scan deze code om aan de slag te gaan op je telefoon, het duurt maar een minuut.</string>
+    <string name="tv_create_account_come_back">Zodra je je account hebt aangemaakt, kom je terug en meld je je aan</string>
     <string name="tv_create_account_title">Je gratis account aanmaken</string>
+    <string name="tv_onboarding_syncing_subtitle">Je podcasts worden gesynchroniseerd, we melden je snel aan!</string>
+    <string name="tv_onboarding_welcome_back">Welkom terug</string>
+    <string name="tv_onboarding_sign_in_instructions">Open de camera en wijs naar deze QR-code</string>
+    <string name="tv_onboarding_sign_in_title">Aanmelden met je telefoon</string>
+    <string name="tv_onboarding_syncing">Je podcasts synchroniseren\u2026</string>
+    <string name="tv_onboarding_browse_without_account">Bladeren zonder account</string>
+    <string name="tv_onboarding_create_free_account">Een gratis account aanmaken</string>
+    <string name="tv_onboarding_subtitle">Je podcasts, op het grote scherm</string>
+    <string name="tv_onboarding_welcome_tv">Welkom bij Pocket Casts TV</string>
+    <string name="tv_onboarding_welcome">Welkom bij Pocket Casts</string>
+    <string name="sort_longest_to_shortest">Langste naar kortste</string>
+    <string name="sort_shortest_to_longest">Kortste naar langste</string>
     <string name="synced_transcripts_whats_new_button_note">Gesynchroniseerde transcripties alleen beschikbaar voor recente afleveringen.</string>
     <string name="synced_transcripts_whats_new_message">Lees snel, mis niets. De naam die je bent vergeten, het boek dat ze aanraadden, de statistiek die je wilde - tik op het woord, spring terug.</string>
     <string name="synced_transcripts_whats_new_title">Lees mee. Zelfs bij 2x.</string>
@@ -108,14 +188,10 @@ Language: nl
     <string name="watch_synced_successfully">Horloge is gesynchroniseerd</string>
     <string name="watch_sync_waiting_for_phone">Wachten tot de telefoon is gesynchroniseerd …</string>
     <string name="watch_sync_retry">Probeer opnieuw</string>
-    <string name="watch_sync_error_unknown_help">Probeer het opnieuw of log handmatig in</string>
     <string name="watch_sync_error_login_failed_help">Probeer handmatig in te loggen</string>
     <string name="watch_sync_error_no_connection_help">Controleer de Bluetooth-verbinding met je telefoon</string>
-    <string name="watch_sync_error_timeout_help">Zorg ervoor dat je telefoon in de buurt is en verbonden is via Bluetooth</string>
-    <string name="watch_sync_error_unknown">Er is iets fout gegaan</string>
     <string name="watch_sync_error_login_failed">Inloggen is mislukt</string>
     <string name="watch_sync_error_no_connection">Telefoon niet verbonden</string>
-    <string name="watch_sync_error_timeout">Kon niet verbinden met telefoon</string>
     <string name="watch_sync_success">Ingelogd via telefoon!</string>
     <string name="watch_sync_syncing">Synchroniseren met telefoon …</string>
     <string name="error_download_generic_failure">Downloaden van aflevering is mislukt. %1$s</string>
@@ -2406,6 +2482,14 @@ Language: nl
     <plurals name="settings_auto_download_on_follow_podcast_description">
         <item quantity="one">Download automatisch de nieuwste aflevering van nieuwe shows die je volgt.</item>
         <item quantity="other">Download automatisch de nieuwste %s afleveringen van nieuwe shows die je volgt.</item>
+    </plurals>
+    <plurals name="tv_playlist_all_archived">
+        <item quantity="one">De enige aflevering van deze playlist is gearchiveerd.</item>
+        <item quantity="other">Alle %1$d afleveringen van deze playlist zijn gearchiveerd.</item>
+    </plurals>
+    <plurals name="tv_podcast_all_archived">
+        <item quantity="one">De enige aflevering van deze podcast is gearchiveerd.</item>
+        <item quantity="other">Alle %1$d afleveringen van deze podcast zijn gearchiveerd</item>
     </plurals>
     <plurals name="week_with_count">
         <item quantity="one">%1$d week</item>

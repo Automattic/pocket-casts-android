@@ -50,7 +50,6 @@ class PodcastRefresherImpl @Inject constructor(
                     val originalEpisode = existingEpisode.copy()
                     existingEpisode.title = newEpisode.title
                     existingEpisode.downloadUrl = newEpisode.downloadUrl
-                    existingEpisode.hlsUrl = newEpisode.hlsUrl
                     existingEpisode.fileType = newEpisode.fileType
                     // after downloading an episode use file size instead of the feed XML size
                     if (newEpisode.sizeInBytes > 0 && !existingEpisode.isDownloaded) {

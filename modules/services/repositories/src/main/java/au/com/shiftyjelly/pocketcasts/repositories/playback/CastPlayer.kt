@@ -237,7 +237,7 @@ class CastPlayer(
         this.podcast = podcast
     }
 
-    override fun setEpisode(episode: BaseEpisode) {
+    override fun setEpisode(episode: BaseEpisode, preferStream: Boolean) {
         this.episodeLocation = EpisodeLocation.Stream(episode, episode.streamUrl, episode.isStreamUrlHls)
         localEpisodeUuid = episode.uuid
         buildCustomData()

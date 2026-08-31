@@ -188,6 +188,12 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
+    override val audioOnly = UserSetting.BoolPref(
+        sharedPrefKey = "audioOnly",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
+
     override val liveAnalyticsUrl = UserSetting.StringPref(
         sharedPrefKey = "liveAnalyticsUrl",
         defaultValue = "",
@@ -654,6 +660,12 @@ class SettingsImpl @Inject constructor(
     override val openPlayerAutomatically = UserSetting.BoolPref(
         sharedPrefKey = "openPlayerAutomatically",
         defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
+
+    override val showGeneratedChapters: UserSetting<Boolean> = UserSetting.BoolPref(
+        sharedPrefKey = "showGeneratedChapters",
+        defaultValue = true,
         sharedPrefs = sharedPreferences,
     )
 
