@@ -47,7 +47,7 @@ fun TvCreateAccountModal(
         modifier = modifier,
     ) {
         Column(
-            verticalArrangement = Arrangement.spacedBy(32.dp),
+            verticalArrangement = Arrangement.spacedBy(24.dp),
             modifier = Modifier.fillMaxWidth(),
         ) {
             Header()
@@ -63,7 +63,7 @@ fun TvCreateAccountModal(
 @Composable
 private fun Header(modifier: Modifier = Modifier) {
     Column(
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        verticalArrangement = Arrangement.spacedBy(9.dp),
         modifier = modifier.fillMaxWidth(),
     ) {
         Text(
@@ -136,5 +136,5 @@ private fun ErrorContent(
     )
 }
 
-private val ModalWidth = 760.dp
-private val ContentHeight = 220.dp
+private val ModalWidth = 570.dp
+private val ContentHeight = 165.dp

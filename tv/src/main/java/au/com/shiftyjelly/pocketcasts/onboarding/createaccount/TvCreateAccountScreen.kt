@@ -165,7 +165,7 @@ private fun TvCreateAccountContent(
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(48.dp),
+            verticalArrangement = Arrangement.spacedBy(40.dp),
         ) {
             Text(
                 text = stringResource(LR.string.tv_create_account_title),

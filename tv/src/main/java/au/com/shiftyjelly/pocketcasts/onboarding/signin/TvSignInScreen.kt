@@ -107,19 +107,21 @@ private fun TvSignInContent(
                 .verticalScroll(rememberScrollState())
                 .padding(vertical = 48.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(20.dp),
         ) {
             Image(
                 painter = painterResource(IR.drawable.ic_pocket_casts_logo),
                 contentDescription = null,
                 modifier = Modifier.size(36.dp),
             )
+            Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = stringResource(LR.string.tv_sign_in_title),
                 color = MaterialTheme.tvColors.textPrimary,
                 style = MaterialTheme.tvTypography.title2.copy(textAlign = TextAlign.Center),
             )
+            Spacer(modifier = Modifier.height(40.dp))
             TvSignInModeTabs(selected = mode, onSelect = onSelectMode)
+            Spacer(modifier = Modifier.height(40.dp))
             when (mode) {
                 TvSignInMode.QrCode -> TvQrSignIn(state = qrState, onRetry = onRetryQr)
 
@@ -174,8 +176,8 @@ private fun TvSignInModeTabs(
                     onFocus = { onSelect(tabMode) },
                     onClick = { onSelect(tabMode) },
                     modifier = Modifier
-                        .height(44.dp)
-                        .padding(horizontal = 24.dp)
+                        .height(33.dp)
+                        .padding(horizontal = 19.dp)
                         .then(
                             if (index == selectedIndex) Modifier.focusRequester(selectedTabFocusRequester) else Modifier,
                         ),
@@ -215,7 +217,7 @@ private fun TvQrSignIn(
 ) {
     Box(
         contentAlignment = Alignment.Center,
-        modifier = modifier.heightIn(min = 280.dp),
+        modifier = modifier.heightIn(min = 216.dp),
     ) {
         when (state) {
             is TvSignInUiState.Ready -> TvSignInQrContent(

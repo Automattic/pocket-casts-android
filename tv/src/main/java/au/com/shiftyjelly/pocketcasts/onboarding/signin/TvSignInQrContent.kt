@@ -33,11 +33,11 @@ fun TvSignInQrContent(
     modifier: Modifier = Modifier,
 ) {
     Column(
-        verticalArrangement = Arrangement.spacedBy(28.dp),
+        verticalArrangement = Arrangement.spacedBy(40.dp),
         modifier = modifier,
     ) {
         Row(
-            horizontalArrangement = Arrangement.spacedBy(40.dp),
+            horizontalArrangement = Arrangement.spacedBy(32.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             QrCode(content = verificationUriComplete)
@@ -55,9 +55,9 @@ private fun QrCode(content: String, modifier: Modifier = Modifier) {
     val qrPainter = rememberQrPainter(content = content, size = QrSize)
     Box(
         modifier = modifier
-            .clip(RoundedCornerShape(8.dp))
+            .clip(RoundedCornerShape(6.dp))
             .background(Color.White)
-            .padding(10.dp),
+            .padding(7.dp),
     ) {
         Image(
             painter = qrPainter,
@@ -110,14 +110,14 @@ private fun StepRow(number: Int, text: String, modifier: Modifier = Modifier) {
 @Composable
 private fun CodeRow(userCode: List<String>, modifier: Modifier = Modifier) {
     Row(
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
         modifier = modifier,
     ) {
         userCode.forEach { character ->
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
-                    .size(44.dp)
+                    .size(40.dp)
                     .background(MaterialTheme.tvColors.backgroundActive20, CircleShape),
             ) {
                 Text(
@@ -139,4 +139,4 @@ fun verificationDisplayUrl(verificationUri: String): String {
         .trimEnd('/')
 }
 
-private val QrSize = 132.dp
+private val QrSize = 121.dp

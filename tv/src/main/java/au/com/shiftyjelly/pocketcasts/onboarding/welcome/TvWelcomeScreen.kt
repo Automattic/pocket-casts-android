@@ -110,23 +110,23 @@ private fun TvWelcomeContent(
             Image(
                 painter = painterResource(IR.drawable.ic_pocket_casts_logo),
                 contentDescription = null,
-                modifier = Modifier.size(36.dp),
+                modifier = Modifier.size(40.dp),
             )
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(20.dp))
             Text(
                 text = stringResource(LR.string.tv_onboarding_welcome_tv),
                 color = MaterialTheme.tvColors.textPrimary,
                 style = MaterialTheme.tvTypography.title2.copy(textAlign = TextAlign.Center),
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = stringResource(LR.string.tv_onboarding_subtitle),
                 color = MaterialTheme.tvColors.textSecondary,
                 style = MaterialTheme.tvTypography.body.copy(textAlign = TextAlign.Center),
             )
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
-            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Button(
                     onClick = onSignIn,
                     colors = TvButtonDefaults.filledButtonColors(),

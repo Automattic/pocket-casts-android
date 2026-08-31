@@ -107,21 +107,21 @@ private fun TvSyncingScreenContent(
             Image(
                 painter = painterResource(IR.drawable.ic_pocket_casts_logo),
                 contentDescription = null,
-                modifier = Modifier.size(36.dp),
+                modifier = Modifier.size(27.dp),
             )
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
             Text(
                 text = stringResource(LR.string.tv_onboarding_welcome_back),
                 color = MaterialTheme.tvColors.textPrimary,
                 style = MaterialTheme.tvTypography.title2.copy(textAlign = TextAlign.Center),
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(6.dp))
             Text(
                 text = stringResource(LR.string.tv_onboarding_syncing_subtitle),
                 color = MaterialTheme.tvColors.textSecondary,
                 style = MaterialTheme.tvTypography.body.copy(textAlign = TextAlign.Center),
             )
-            Spacer(modifier = Modifier.height(40.dp))
+            Spacer(modifier = Modifier.height(30.dp))
             TvSyncingCoverStack(podcastUuids = podcastUuids)
         }
     }
