@@ -86,6 +86,7 @@ import java.io.File
 import java.net.HttpURLConnection
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.rx2.rxSingle
@@ -256,14 +257,16 @@ class SyncManagerImpl @Inject constructor(
                 message = tokenError?.errorDescription ?: context.resources.getString(LR.string.error_login_failed),
                 messageId = tokenError?.error,
             )
-            if (tokenError?.error != "authorization_pending") {
-                trackSignIn(result, signInSource, LoginIdentity.QrCode)
+            if (tokenError?.error != "authorization_pending" && tokenError?.error != "expired_token") {
+                trackSignIn(result, signInSource, LoginIdentity.QrCode, isNewAccount)
             }
             result
+        } catch (ex: CancellationException) {
+            throw ex
         } catch (ex: Exception) {
             Timber.e(ex, "Device auth failed")
             val result = exceptionToAuthResult(exception = ex, fallbackMessage = LR.string.error_login_failed)
-            trackSignIn(result, signInSource, LoginIdentity.QrCode)
+            trackSignIn(result, signInSource, LoginIdentity.QrCode, isNewAccount)
             result
         }
     }
@@ -569,6 +572,7 @@ class SyncManagerImpl @Inject constructor(
         loginResult: LoginResult,
         signInSource: SignInSource,
         loginIdentity: LoginIdentity,
+        isNewAccount: Boolean = false,
     ) {
         val event = when (loginResult) {
             is LoginResult.Success -> {
@@ -607,11 +611,17 @@ class SyncManagerImpl @Inject constructor(
                     }
 
                     is SignInSource.UserInitiated -> {
-                        UserSigninFailedEvent(
-                            source = loginIdentity.analyticsValue,
-                            sourceInCode = signInSource.analyticsValue,
-                            errorCode = errorCodeValue,
-                        )
+                        if (isNewAccount) {
+                            UserAccountCreationFailedEvent(
+                                errorCode = errorCodeValue,
+                            )
+                        } else {
+                            UserSigninFailedEvent(
+                                source = loginIdentity.analyticsValue,
+                                sourceInCode = signInSource.analyticsValue,
+                                errorCode = errorCodeValue,
+                            )
+                        }
                     }
                 }
             }
