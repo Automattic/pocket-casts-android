@@ -179,10 +179,10 @@ private fun TvPlaylistDetailsContent(
             is TvPlaylistDetailsUiState.Loaded -> {
                 val playAllFocusRequester = remember { FocusRequester() }
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(80.dp),
+                    horizontalArrangement = Arrangement.spacedBy(60.dp),
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(start = 32.dp, top = 16.dp, end = 32.dp),
+                        .padding(start = 42.dp, top = 12.dp, end = 42.dp),
                 ) {
                     PlaylistInfo(
                         playlist = uiState.playlist,
@@ -238,11 +238,11 @@ private fun SortableEpisodeList(
     val leftFocusRequester = playAllFocusRequester.takeIf { uiState.episodes.isNotEmpty() }
     Column(modifier = modifier) {
         Row(
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(9.dp),
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .align(Alignment.End)
-                .padding(bottom = 12.dp),
+                .padding(bottom = 9.dp),
         ) {
             if (isManual) {
                 TvArchivedFilterButton(
@@ -292,7 +292,7 @@ private fun AllEpisodesArchived(
             style = MaterialTheme.tvTypography.caption1,
             color = MaterialTheme.tvColors.textSecondary,
             textAlign = TextAlign.Center,
-            modifier = Modifier.widthIn(max = 400.dp),
+            modifier = Modifier.widthIn(max = 300.dp),
         )
     }
 }
@@ -313,7 +313,7 @@ private fun EpisodeList(
     var detailsEpisode by remember { mutableStateOf<PodcastEpisode?>(null) }
     LazyColumn(
         state = listState,
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        verticalArrangement = Arrangement.spacedBy(9.dp),
         modifier = modifier,
     ) {
         itemsIndexed(
@@ -365,7 +365,7 @@ private fun NoEpisodes(
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(9.dp),
         ) {
             Text(
                 text = stringResource(LR.string.tv_playlist_empty_title),
@@ -381,7 +381,7 @@ private fun NoEpisodes(
                 style = MaterialTheme.tvTypography.caption1,
                 color = MaterialTheme.tvColors.textSecondary,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.widthIn(max = 400.dp),
+                modifier = Modifier.widthIn(max = 300.dp),
             )
         }
     }
@@ -396,15 +396,15 @@ private fun PlaylistInfo(
     modifier: Modifier = Modifier,
 ) {
     Column(
-        verticalArrangement = Arrangement.spacedBy(28.dp),
+        verticalArrangement = Arrangement.spacedBy(21.dp),
         modifier = modifier,
     ) {
         PlaylistArtwork(
             podcastUuids = playlist.metadata.artworkUuids,
             artworkSize = TvDetailsArtworkSize,
-            cornerSize = 8.dp,
+            cornerSize = 6.dp,
         )
-        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(4.5.dp)) {
             Text(
                 text = when (playlist.type) {
                     Playlist.Type.Manual -> stringResource(LR.string.playlist)
@@ -499,7 +499,7 @@ private fun episodeSummaryText(episodes: List<PodcastEpisode>): String {
     }
 }
 
-private val InfoPaneWidth = 200.dp
+private val InfoPaneWidth = 150.dp
 
 @Preview(device = Devices.TV_1080p)
 @Composable
