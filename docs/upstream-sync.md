@@ -4,9 +4,9 @@ Periodic CI merges the latest upstream Pocket Casts **release tag** into `main` 
 
 ## Schedule
 
-**Biweekly — Mondays 10:00 UTC** (`0 10 * * 1` with an odd ISO-week gate).
+**Weekly — Mondays 10:00 UTC** (`0 10 * * 1`).
 
-Upstream Pocket Casts ships minor releases on a **~14-day cadence** (Android median 14 days over the 8.x series; iOS minor releases average ~11 days). Biweekly checks catch each minor release without spamming no-op runs. The preflight step also skips when the latest tag is already merged or an open sync PR exists.
+Upstream Pocket Casts ships minor releases on a **~14-day cadence**. Weekly checks catch each release within about a week. Preflight makes no-op runs cheap: it exits early when the latest tag is already merged or an open sync PR exists, so Pi is only invoked when there is actual work.
 
 Trigger manually with **Actions → Upstream release sync → Run workflow**.
 

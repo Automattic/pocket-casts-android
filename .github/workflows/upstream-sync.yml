@@ -2,7 +2,7 @@ name: Upstream release sync
 
 on:
   schedule:
-    # Biweekly on Mondays at 10:00 UTC (odd ISO weeks only).
+    # Weekly on Mondays at 10:00 UTC. Preflight no-ops when already synced.
     - cron: '0 10 * * 1'
   workflow_dispatch:
 
@@ -22,31 +22,13 @@ jobs:
       BASE_BRANCH: main
 
     steps:
-      - name: Biweekly gate
-        id: gate
-        run: |
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            echo "run=true" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          week=$(date -u +%V)
-          if (( 10#$week % 2 == 1 )); then
-            echo "run=true" >> "$GITHUB_OUTPUT"
-            echo "ISO week ${week} — running biweekly sync"
-          else
-            echo "run=false" >> "$GITHUB_OUTPUT"
-            echo "ISO week ${week} — skipping (biweekly schedule)"
-          fi
-
       - name: Checkout
-        if: steps.gate.outputs.run == 'true'
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Preflight
         id: preflight
-        if: steps.gate.outputs.run == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -54,14 +36,14 @@ jobs:
           ./scripts/upstream-sync-preflight.sh
 
       - name: Validate Pi configuration
-        if: steps.gate.outputs.run == 'true' && steps.preflight.outputs.proceed == 'true'
+        if: steps.preflight.outputs.proceed == 'true'
         run: |
           test -n "${{ secrets.PI_PROVIDER || vars.PI_PROVIDER }}" || { echo "PI_PROVIDER is not set"; exit 1; }
           test -n "${{ secrets.PI_MODEL || vars.PI_MODEL }}" || { echo "PI_MODEL is not set"; exit 1; }
           test -n "${{ secrets.PI_API_KEY }}" || { echo "PI_API_KEY is not set"; exit 1; }
 
       - name: Sync upstream release with Pi
-        if: steps.gate.outputs.run == 'true' && steps.preflight.outputs.proceed == 'true'
+        if: steps.preflight.outputs.proceed == 'true'
         uses: shaftoe/pi-coding-agent-action@v2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
