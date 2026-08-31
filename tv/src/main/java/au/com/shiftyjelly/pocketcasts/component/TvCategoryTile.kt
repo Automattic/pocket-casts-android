@@ -54,6 +54,7 @@ import coil3.compose.AsyncImagePainter
 import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import coil3.size.Size
 
 private val CardShape = RoundedCornerShape(12.dp)
 private val CoverSize = 80.dp
@@ -168,7 +169,9 @@ private fun BoxScope.CategoryCover(
         model = ImageRequest.Builder(LocalContext.current)
             .data(url)
             .crossfade(true)
+            .size(Size.ORIGINAL)
             .build(),
+        contentScale = ContentScale.Crop,
     )
     val state by painter.state.collectAsState()
     val imageReady = state is AsyncImagePainter.State.Success
