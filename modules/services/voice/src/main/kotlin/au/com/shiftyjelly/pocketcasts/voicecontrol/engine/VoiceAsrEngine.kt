@@ -9,6 +9,7 @@ import android.media.AudioManager
 import androidx.annotation.RequiresPermission
 import au.com.shiftyjelly.pocketcasts.voicecontrol.asr.AsrBackend
 import au.com.shiftyjelly.pocketcasts.voicecontrol.asr.AsrResult
+import au.com.shiftyjelly.pocketcasts.voicecontrol.asr.TranslationStage
 import au.com.shiftyjelly.pocketcasts.voicecontrol.audio.VoiceAudioProcessor
 import au.com.shiftyjelly.pocketcasts.voicecontrol.audio.VoiceSegmenterResult
 import au.com.shiftyjelly.pocketcasts.voicecontrol.feedback.AudioFeedbackRenderer
@@ -42,6 +43,7 @@ class VoiceAsrEngine @Inject constructor(
     private val wakeWordDetector: WakeWordDetector,
     private val gracePeriodSignal: GracePeriodSignal,
     private val audioFeedbackRenderer: AudioFeedbackRenderer,
+    private val translationStage: TranslationStage,
     @ApplicationContext private val context: Context,
 ) {
     private val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
@@ -234,7 +236,12 @@ class VoiceAsrEngine @Inject constructor(
             }
             return
         }
-        processUtterance(asrResult.copy(text = transcript))
+        // Translate to English when the ASR backend did not already translate and
+        // the detected language is not English (the SenseVoice CJK path).
+        // Use the wake-trimmed transcript from LFM's WakeTranscriptTrimmer.
+        val trimmedResult = asrResult.copy(text = transcript)
+        val finalResult = maybeTranslate(trimmedResult, b)
+        processUtterance(finalResult)
     }
 
     private suspend fun processUtterance(result: AsrResult) {
@@ -261,6 +268,25 @@ class VoiceAsrEngine @Inject constructor(
         } else {
             Timber.i("No intent (%dms)", elapsedMs)
         }
+    }
+
+    private suspend fun maybeTranslate(result: AsrResult, backend: AsrBackend): AsrResult {
+        val detected = result.detectedLanguage?.lowercase() ?: return result
+        if (detected == "en") return result
+        if (backend.capabilities.canTranslateToEnglish) return result
+
+        val ready = translationStage.ensureReady(detected)
+        if (ready.isFailure) {
+            Timber.w("Translation stage not ready for %s, using native transcript", detected)
+            return result
+        }
+        val translated = translationStage.translate(result.text, detected)
+        if (translated.isBlank()) {
+            Timber.w("Translation returned blank for %s, using native transcript", detected)
+            return result
+        }
+        Timber.i("Translated %s -> en: '%s'", detected, translated)
+        return result.copy(text = translated, detectedLanguage = "en")
     }
 
     fun stop() {

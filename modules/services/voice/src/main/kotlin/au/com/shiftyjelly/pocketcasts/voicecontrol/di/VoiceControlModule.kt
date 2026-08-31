@@ -7,6 +7,8 @@ import android.telephony.TelephonyManager
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
+import au.com.shiftyjelly.pocketcasts.voicecontrol.asr.GoogleMlKitTranslator
+import au.com.shiftyjelly.pocketcasts.voicecontrol.asr.TranslationStage
 import au.com.shiftyjelly.pocketcasts.voicecontrol.feedback.AudioFeedbackRenderer
 import au.com.shiftyjelly.pocketcasts.voicecontrol.feedback.EarconPlayer
 import au.com.shiftyjelly.pocketcasts.voicecontrol.foreground.ForegroundStateMonitor
@@ -112,6 +114,8 @@ abstract class VoiceControlModule {
     @Binds abstract fun bindWakeWordDetector(impl: OpenWakeWordDetector): WakeWordDetector
 
     @Binds abstract fun bindTtsEngine(impl: AndroidPlatformTtsEngine): TtsEngine
+
+    @Binds abstract fun bindTranslationStage(impl: GoogleMlKitTranslator): TranslationStage
 
     companion object {
         @Provides @Singleton

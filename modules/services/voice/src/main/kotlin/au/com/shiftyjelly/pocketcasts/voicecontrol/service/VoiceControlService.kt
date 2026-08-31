@@ -10,6 +10,7 @@ import android.os.Build
 import android.os.IBinder
 import androidx.annotation.RequiresPermission
 import au.com.shiftyjelly.pocketcasts.voicecontrol.asr.AsrBackendSelector
+import au.com.shiftyjelly.pocketcasts.voicecontrol.asr.CanaryFlashBackend
 import au.com.shiftyjelly.pocketcasts.voicecontrol.asr.SenseVoiceBackend
 import au.com.shiftyjelly.pocketcasts.voicecontrol.asr.WhisperCppBackend
 import au.com.shiftyjelly.pocketcasts.voicecontrol.engine.PlaybackBufferRecorder
@@ -265,6 +266,9 @@ class VoiceControlService : Service() {
             backend.setModelFile(modelFile)
         }
         if (backend is SenseVoiceBackend) {
+            backend.setModelDir(modelDir)
+        }
+        if (backend is CanaryFlashBackend) {
             backend.setModelDir(modelDir)
         }
         Timber.i("ASR model ready")

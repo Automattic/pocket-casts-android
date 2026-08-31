@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.voicecontrol.asr.AsrCapabilities
 import au.com.shiftyjelly.pocketcasts.voicecontrol.asr.AsrResult
 import au.com.shiftyjelly.pocketcasts.voicecontrol.asr.AsrToken
 import au.com.shiftyjelly.pocketcasts.voicecontrol.asr.ModelSpec
+import au.com.shiftyjelly.pocketcasts.voicecontrol.asr.TranslationStage
 import au.com.shiftyjelly.pocketcasts.voicecontrol.audio.PcmAudioFrame
 import au.com.shiftyjelly.pocketcasts.voicecontrol.audio.VoiceAudioProcessor
 import au.com.shiftyjelly.pocketcasts.voicecontrol.audio.VoiceSegmenterResult
@@ -53,6 +54,7 @@ class VoiceAsrEngineTest {
     private val gracePeriodSignal = mock<au.com.shiftyjelly.pocketcasts.voicecontrol.gate.signals.GracePeriodSignal>()
     private val audioFeedbackRenderer = mock<au.com.shiftyjelly.pocketcasts.voicecontrol.feedback.AudioFeedbackRenderer>()
     private val backend = mock<AsrBackend>()
+    private val translationStage = mock<TranslationStage>()
 
     private var capturedReceiver: BroadcastReceiver? = null
 
@@ -93,6 +95,7 @@ class VoiceAsrEngineTest {
             wakeWordDetector = wakeWordDetector,
             gracePeriodSignal = gracePeriodSignal,
             audioFeedbackRenderer = audioFeedbackRenderer,
+            translationStage = translationStage,
             context = context,
         )
         engine.scope = this
@@ -249,6 +252,7 @@ class VoiceAsrEngineTest {
             wakeWordDetector = wakeWordDetector,
             gracePeriodSignal = gracePeriodSignal,
             audioFeedbackRenderer = audioFeedbackRenderer,
+            translationStage = translationStage,
             context = context,
         )
         engine.scope = this
@@ -267,6 +271,111 @@ class VoiceAsrEngineTest {
         assertEquals(listOf("ensureReady", "recognize:pause"), recognizer.calls)
         assertEquals(listOf(VoiceIntent.Playback.Pause), handledIntents)
         verify(wakeWordDetector).detect(any(), eq(16000), eq(2))
+
+        engine.stop()
+    }
+
+    // ── Translation stage wiring ───────────────────────────────────────
+
+    @Test
+    fun `non-English transcript translated by stage before intent routing when backend cannot translate`() = runTest {
+        val recognizer = RecordingRecognizer(VoiceIntent.Playback.Pause)
+        `when`(context.getSystemService(Context.AUDIO_SERVICE)).thenReturn(audioManager)
+        `when`(audioManager.mode).thenReturn(AudioManager.MODE_NORMAL)
+        `when`(voiceAudioProcessor.startProcessing()).thenReturn(
+            flowOf(
+                VoiceSegmenterResult.SpeechEnded(
+                    listOf(PcmAudioFrame(shortArrayOf(100, 200, 300, 400), 16000)),
+                    speechOnsetSample = 2,
+                ),
+            ),
+        )
+        `when`(utteranceFilter.shouldProcess(any(), any(), any(), any())).thenReturn(true)
+        `when`(wakeWordDetector.detect(any(), any(), any())).thenReturn(
+            au.com.shiftyjelly.pocketcasts.voicecontrol.wakeword.WakeWordResult(
+                detected = false,
+                confidence = 0f,
+                remainderSamples = null,
+            ),
+        )
+        `when`(translationStage.ensureReady("zh")).thenReturn(Result.success(Unit))
+        `when`(translationStage.translate("你好", "zh")).thenReturn("hello")
+
+        engine = VoiceAsrEngine(
+            voiceAudioProcessor = voiceAudioProcessor,
+            utteranceFilter = utteranceFilter,
+            intentRecognizer = recognizer,
+            wakeWordDetector = wakeWordDetector,
+            gracePeriodSignal = gracePeriodSignal,
+            audioFeedbackRenderer = audioFeedbackRenderer,
+            translationStage = translationStage,
+            context = context,
+        )
+        engine.scope = this
+
+        engine.start(
+            backend = ResultBackend(AsrResult(text = "你好", detectedLanguage = "zh")),
+            audioRoute = AudioRoute.Speaker,
+            listeningMode = ListeningMode.Continuous,
+            playbackBufferProvider = { FloatArray(0) },
+            micExposureProvider = { MicExposure.Exposed },
+            onIntent = {},
+        )
+        advanceUntilIdle()
+
+        verify(translationStage).ensureReady("zh")
+        verify(translationStage).translate("你好", "zh")
+        assertTrue("Expected translated 'hello' to reach recognizer", recognizer.calls.contains("recognize:hello"))
+
+        engine.stop()
+    }
+
+    @Test
+    fun `english transcript bypasses translation stage`() = runTest {
+        val recognizer = RecordingRecognizer(VoiceIntent.Playback.Pause)
+        `when`(context.getSystemService(Context.AUDIO_SERVICE)).thenReturn(audioManager)
+        `when`(audioManager.mode).thenReturn(AudioManager.MODE_NORMAL)
+        `when`(voiceAudioProcessor.startProcessing()).thenReturn(
+            flowOf(
+                VoiceSegmenterResult.SpeechEnded(
+                    listOf(PcmAudioFrame(shortArrayOf(100, 200, 300, 400), 16000)),
+                    speechOnsetSample = 2,
+                ),
+            ),
+        )
+        `when`(utteranceFilter.shouldProcess(any(), any(), any(), any())).thenReturn(true)
+        `when`(wakeWordDetector.detect(any(), any(), any())).thenReturn(
+            au.com.shiftyjelly.pocketcasts.voicecontrol.wakeword.WakeWordResult(
+                detected = false,
+                confidence = 0f,
+                remainderSamples = null,
+            ),
+        )
+
+        engine = VoiceAsrEngine(
+            voiceAudioProcessor = voiceAudioProcessor,
+            utteranceFilter = utteranceFilter,
+            intentRecognizer = recognizer,
+            wakeWordDetector = wakeWordDetector,
+            gracePeriodSignal = gracePeriodSignal,
+            audioFeedbackRenderer = audioFeedbackRenderer,
+            translationStage = translationStage,
+            context = context,
+        )
+        engine.scope = this
+
+        engine.start(
+            backend = ResultBackend(AsrResult(text = "pause", detectedLanguage = "en")),
+            audioRoute = AudioRoute.Speaker,
+            listeningMode = ListeningMode.Continuous,
+            playbackBufferProvider = { FloatArray(0) },
+            micExposureProvider = { MicExposure.Exposed },
+            onIntent = {},
+        )
+        advanceUntilIdle()
+
+        verify(translationStage, never()).translate(any(), any())
+        assertTrue("Expected native 'pause' to reach recognizer", recognizer.calls.contains("recognize:pause"))
 
         engine.stop()
     }
@@ -366,6 +475,7 @@ class VoiceAsrEngineTest {
             wakeWordDetector = wakeWordDetector,
             gracePeriodSignal = gracePeriodSignal,
             audioFeedbackRenderer = audioFeedbackRenderer,
+            translationStage = translationStage,
             context = context,
         )
         engine.scope = this
@@ -503,6 +613,23 @@ class VoiceAsrEngineTest {
         override val requiredModel: ModelSpec = ModelSpec(files = emptyList(), targetDir = "")
 
         override val capabilities: AsrCapabilities = AsrCapabilities(supportedLanguages = setOf("en"))
+
+        override fun release() = Unit
+    }
+
+    private class ResultBackend(
+        private val result: AsrResult,
+    ) : AsrBackend {
+        override suspend fun ensureReady(): Result<Unit> = Result.success(Unit)
+
+        override suspend fun transcribe(samples: FloatArray, sampleRateHz: Int): AsrResult = result
+
+        override val requiredModel: ModelSpec = ModelSpec(files = emptyList(), targetDir = "")
+
+        override val capabilities: AsrCapabilities = AsrCapabilities(
+            supportedLanguages = setOf("zh", "en"),
+            canTranslateToEnglish = false,
+        )
 
         override fun release() = Unit
     }

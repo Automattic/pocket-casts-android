@@ -46,6 +46,7 @@ dependencies {
     implementation(libs.coroutines.rx2)
     // onnxruntime .so provided by sherpa-onnx JNI libs in jniLibs/; headers are bundled in src/main/cpp/
     implementation(libs.timber)
+    implementation(libs.mlkit.translate)
 
     implementation(projects.modules.services.analytics)
     implementation(projects.modules.services.coroutines)

@@ -41,6 +41,7 @@ lifecycle = "2.11.0"
 lottie = "6.7.1"
 measure-builds = "3.2.2"
 media3 = "1.10.1"
+mlkit-translate = "17.0.3"
 mockito = "5.23.0"
 mockito-kotlin = "6.3.0"
 moshi = "1.15.2"
@@ -67,6 +68,9 @@ google-id = "1.2.0"
 [libraries]
 # JNA (required by UniFFI-generated fingerprint bindings)
 jna = { module = "net.java.dev.jna:jna", version = "5.18.1" }
+
+# Google ML Kit on-device translation
+mlkit-translate = { module = "com.google.mlkit:translate", version.ref = "mlkit-translate" }
 
 # About Libraries
 aboutlibraries-compose = { module = "com.mikepenz:aboutlibraries-compose", version.ref = "aboutlibraries" }
