@@ -688,7 +688,7 @@ platform :android do
 
     UI.user_error!("'BUILDKITE_ARTIFACTS_S3_BUCKET' must be defined as an environment variable.") unless ENV['BUILDKITE_ARTIFACTS_S3_BUCKET']
 
-    other_platforms = %w[wear automotive]
+    other_platforms = %w[wear automotive tv]
 
     other_apks = []
     other_platforms.each do |platform|
@@ -747,7 +747,7 @@ platform :android do
 
   def get_app_display_name(apk_path:)
     key = get_app_key(apk_path: apk_path).to_sym
-    { app: '📱 Mobile', wear: '⌚ Wear', automotive: '🚗 Automotive' }.fetch(key, '❔ Unknown')
+    { app: '📱 Mobile', wear: '⌚ Wear', automotive: '🚗 Automotive', tv: '📺 TV' }.fetch(key, '❔ Unknown')
   end
 
   # Mimics the subset of ActiveSupport's `String#parameterize` we rely on.
