@@ -1,5 +1,8 @@
 8.21
 -----
+*   New Features
+    *   Recognise TV sign-in pairing links and approve the device in-app instead of the browser
+        ([#5813](https://github.com/Automattic/pocket-casts-android/pull/5813))
 
 
 8.20
