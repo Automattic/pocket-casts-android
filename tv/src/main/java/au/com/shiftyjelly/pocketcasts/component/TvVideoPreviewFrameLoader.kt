@@ -5,6 +5,7 @@ import android.media.MediaMetadataRetriever
 import android.util.LruCache
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 private const val FRAME_POSITION_PERCENT = 0.1
 private const val FRAME_TARGET_WIDTH = 640
@@ -48,6 +49,7 @@ object TvVideoPreviewFrameLoader {
                 FRAME_TARGET_HEIGHT,
             )
         } catch (e: Exception) {
+            Timber.w(e, "Failed to extract TV discover video preview frame")
             null
         } finally {
             retriever.release()

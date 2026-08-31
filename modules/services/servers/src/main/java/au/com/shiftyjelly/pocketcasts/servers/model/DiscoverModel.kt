@@ -246,10 +246,12 @@ data class DiscoverEpisode(
                 return url
             }
             return alternateEnclosures
-                ?.firstOrNull { isSupportedVideoType(it.type) && !it.sources.isNullOrEmpty() }
-                ?.sources
-                ?.firstOrNull { it.uri?.isPlayableHttpUri() == true }
-                ?.uri
+                ?.filter { isSupportedVideoType(it.type) }
+                ?.firstNotNullOfOrNull { enclosure ->
+                    enclosure.sources?.firstNotNullOfOrNull { source ->
+                        source.uri?.takeIf { it.isPlayableHttpUri() }
+                    }
+                }
         }
 
     companion object {
