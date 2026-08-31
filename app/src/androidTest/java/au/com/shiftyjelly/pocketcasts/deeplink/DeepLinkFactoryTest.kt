@@ -1126,6 +1126,39 @@ class DeepLinkFactoryTest {
     }
 
     @Test
+    fun pairDevice() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("https://pocketcasts.com/pair?user_code=ABCD12"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(PairDeviceDeepLink(userCode = "ABCD12"), deepLink)
+    }
+
+    @Test
+    fun pairDeviceShareHost() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("https://pca.st/pair?user_code=ABCD12"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(PairDeviceDeepLink(userCode = "ABCD12"), deepLink)
+    }
+
+    @Test
+    fun pairDeviceWithoutUserCodeIsNotPairing() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("https://pocketcasts.com/pair"))
+
+        val deepLink = factory.create(intent)
+
+        assertNull(deepLink)
+    }
+
+    @Test
     fun referralDeepLink() {
         val intent = Intent()
             .setAction(ACTION_VIEW)

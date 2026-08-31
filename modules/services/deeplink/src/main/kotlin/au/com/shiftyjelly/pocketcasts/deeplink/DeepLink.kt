@@ -296,6 +296,19 @@ data class SignInDeepLink(
     }
 }
 
+data class PairDeviceDeepLink(
+    val userCode: String,
+) : UriDeepLink {
+    override fun toUri(shareHost: String): Uri {
+        return Uri.Builder()
+            .scheme("https")
+            .authority(shareHost)
+            .appendPath("pair")
+            .appendQueryParameter("user_code", userCode)
+            .build()
+    }
+}
+
 data class ReferralsDeepLink(
     val code: String,
 ) : UriDeepLink {

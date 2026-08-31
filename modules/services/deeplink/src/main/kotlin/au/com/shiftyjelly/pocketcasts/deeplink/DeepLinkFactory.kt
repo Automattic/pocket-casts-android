@@ -61,6 +61,7 @@ class DeepLinkFactory(
         PromoCodeAdapter(),
         ShareLinkNativeAdapter(),
         SignInAdapter(shareHost),
+        PairDeviceAdapter(hosts = listOf(webBaseHost, shareHost)),
         ShareLinkAdapter(shareHost),
         WebPlayerShareLinkAdapter(webBaseHost = webBaseHost, webPlayerHost = webPlayerHost),
         OpmlAdapter(listOf(listHost, shareHost)),
@@ -756,6 +757,24 @@ private class SignInAdapter(
 
         return if (intent.action == ACTION_VIEW && scheme in listOf("http", "https") && host == webBaseHost && path == "/sign-in") {
             SignInDeepLink(source)
+        } else {
+            null
+        }
+    }
+}
+
+private class PairDeviceAdapter(
+    private val hosts: List<String>,
+) : DeepLinkAdapter {
+    override fun create(intent: Intent): DeepLink? {
+        val uriData = intent.data ?: return null
+        val scheme = uriData.scheme
+        val host = uriData.host
+        val path = uriData.path
+        val userCode = uriData.getQueryParameter("user_code")?.takeIf { it.isNotBlank() } ?: return null
+
+        return if (intent.action == ACTION_VIEW && scheme in listOf("http", "https") && host in hosts && path == "/pair") {
+            PairDeviceDeepLink(userCode)
         } else {
             null
         }
