@@ -95,7 +95,7 @@ jobs:
             actions: read
 
           claude_args: |
-            --model ${{ secrets.ANTHROPIC_MODEL }}
+            --model ${{ secrets.ANTHROPIC_MODEL || 'sonnet' }}
 
           # Tools are intentionally left at the action's tag-mode defaults: file edits
           # are confined to the workspace (acceptEdits) and arbitrary Bash is blocked.
