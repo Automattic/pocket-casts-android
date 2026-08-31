@@ -333,6 +333,15 @@ enum class Feature(
         hasDevToggle = true,
         addedOn = LocalDate.parse("2026-05-29"),
     ),
+    WAKE_WORD_DEBUG_CAPTURE(
+        key = "wake_word_debug_capture",
+        title = "Wake word debug capture",
+        defaultValue = false,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = false,
+        hasDevToggle = true,
+        addedOn = LocalDate.parse("2026-08-06"),
+    ),
     UP_NEXT_SORT(
         key = "up_next_sort",
         title = "Up Next sort by duration",

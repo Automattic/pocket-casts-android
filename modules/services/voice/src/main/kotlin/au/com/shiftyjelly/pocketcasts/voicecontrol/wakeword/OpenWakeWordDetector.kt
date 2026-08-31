@@ -6,19 +6,13 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.json.JSONObject
 import timber.log.Timber
 
 /**
  * Wake word detector using an openWakeWord Conv-Attention classifier trained via livekit-wakeword.
  *
- * The deployment threshold is loaded from [assets/oww/auris_eval.json] (optimal_threshold),
- * falling back to a hardcoded default if the file is missing or unreadable.
- *
- * Known limitation: the model was trained on synthetic TTS audio augmented with room impulse
- * responses and background noise. Scores on real voice captured through the phone microphone
- * are significantly lower than on synthetic training clips (~0.05 vs ~0.95). Improving
- * real-voice detection requires fine-tuning with phone-recorded wake word examples.
+ * The deployment threshold is loaded from [assets/oww/auris_eval.json]. Missing, invalid,
+ * or legacy threshold fields leave the detector unready instead of changing its operating point.
  */
 @Singleton
 class OpenWakeWordDetector @Inject constructor(
@@ -30,51 +24,69 @@ class OpenWakeWordDetector @Inject constructor(
 
     @Volatile
     private var ready = false
-    private val detectionThreshold: Float
+    val detectionThreshold: Float
 
     init {
-        detectionThreshold = loadThreshold()
-        try {
-            val melModel = context.assets.open("oww/melspectrogram.onnx").use { it.readBytes() }
-            val embedModel = context.assets.open("oww/embedding_model.onnx").use { it.readBytes() }
-            val classifierModel = context.assets.open("oww/auris.onnx").use { it.readBytes() }
+        val thresholdResult = WakeWordThresholdLoader.load(context.assets)
+        detectionThreshold = thresholdResult.getOrNull() ?: Float.NaN
+        if (thresholdResult.isFailure) {
+            Timber.e(thresholdResult.exceptionOrNull(), "Wake word threshold validation failed")
+        } else {
+            try {
+                val melModel = context.assets.open("oww/melspectrogram.onnx").use { it.readBytes() }
+                val embedModel = context.assets.open("oww/embedding_model.onnx").use { it.readBytes() }
+                val classifierModel = context.assets.open("oww/auris.onnx").use { it.readBytes() }
 
-            ready = WakeWordJni.nativeInit(melModel, embedModel, classifierModel, detectionThreshold)
-            if (ready) {
-                Timber.i("OpenWakeWordDetector initialized (threshold=%.3f)", detectionThreshold)
-            } else {
-                Timber.e("OpenWakeWordDetector failed to initialize native pipeline")
+                ready = WakeWordJni.nativeInit(melModel, embedModel, classifierModel, detectionThreshold)
+                if (ready) {
+                    Timber.i("OpenWakeWordDetector initialized (threshold=%.3f)", detectionThreshold)
+                } else {
+                    Timber.e("OpenWakeWordDetector failed to initialize native pipeline")
+                }
+            } catch (e: Exception) {
+                Timber.e(e, "OpenWakeWordDetector init failed")
+                ready = false
             }
-        } catch (e: Exception) {
-            Timber.e(e, "OpenWakeWordDetector init failed")
-            ready = false
         }
     }
 
-    override suspend fun detect(segment: FloatArray, sampleRateHz: Int): WakeWordResult {
-        if (!ready) return WakeWordResult(detected = false)
-        if (sampleRateHz != 16000) return WakeWordResult(detected = false)
+    override suspend fun detect(
+        segment: FloatArray,
+        sampleRateHz: Int,
+        speechOnsetSample: Int,
+    ): WakeWordResult {
+        if (!ready) return WakeWordResult(detected = false, error = true)
+        if (sampleRateHz != 16000) return WakeWordResult(detected = false, error = true)
+        if (speechOnsetSample !in 0..segment.size) return WakeWordResult(detected = false, error = true)
 
         return withContext(Dispatchers.IO) {
             try {
                 val outOffset = FloatArray(1)
-                val score = WakeWordJni.nativeDetect(segment, sampleRateHz, outOffset)
-                if (score < 0f) {
-                    WakeWordResult(detected = false)
-                } else if (score >= detectionThreshold) {
-                    Timber.i("Wake word detected (score=%.3f)", score)
-                    WakeWordResult(
-                        detected = true,
-                        confidence = score.coerceAtMost(1f),
-                        remainderSamples = extractRemainder(segment, outOffset[0].toInt()),
-                    )
-                } else {
-                    Timber.i("Wake word score: %.3f (threshold=%.3f)", score, detectionThreshold)
-                    WakeWordResult(detected = false)
+                val detectorSamples = onsetAlignedSamples(segment, speechOnsetSample)
+                val score = WakeWordJni.nativeDetect(detectorSamples, sampleRateHz, outOffset)
+                when {
+                    score < 0f -> WakeWordResult(detected = false, error = true)
+
+                    score >= detectionThreshold -> {
+                        Timber.i("Wake word detected (score=%.3f)", score)
+                        WakeWordResult(
+                            detected = true,
+                            confidence = score.coerceAtMost(1f),
+                            remainderSamples = extractRemainder(
+                                segment,
+                                outOffset[0].toInt().takeIf { it >= 0 }?.plus(speechOnsetSample) ?: -1,
+                            ),
+                        )
+                    }
+
+                    else -> {
+                        Timber.i("Wake word score: %.3f (threshold=%.3f)", score, detectionThreshold)
+                        WakeWordResult(detected = false, confidence = score.coerceAtMost(1f))
+                    }
                 }
             } catch (e: Exception) {
                 Timber.w(e, "Wake word detection failed")
-                WakeWordResult(detected = false)
+                WakeWordResult(detected = false, error = true)
             }
         }
     }
@@ -88,31 +100,19 @@ class OpenWakeWordDetector @Inject constructor(
         }
     }
 
-    private fun loadThreshold(): Float {
-        return try {
-            val json = context.assets.open("oww/auris_eval.json").use { it.readBytes() }
-            val threshold = JSONObject(String(json)).optDouble("optimal_threshold", -1.0)
-            if (threshold > 0.0) {
-                Timber.i("Loaded wake word threshold from auris_eval.json: %.3f", threshold)
-                threshold.toFloat()
-            } else {
-                Timber.w("auris_eval.json missing optimal_threshold, using default")
-                DEFAULT_THRESHOLD
-            }
-        } catch (e: Exception) {
-            Timber.w(e, "Failed to load auris_eval.json, using default threshold")
-            DEFAULT_THRESHOLD
-        }
-    }
-
     companion object {
-        private const val DEFAULT_THRESHOLD = 0.80f
-
         private const val SILENCE_THRESHOLD = 0.02f // RMS whisper floor
         private const val MIN_SILENCE_SAMPLES = 3200 // 200ms at 16kHz
         private const val WINDOW_SIZE_SAMPLES = 32000 // 2s at 16kHz
         private const val RMS_WINDOW = 80 // 5ms local RMS window at 16kHz
         private const val MIN_REMAINDER_SAMPLES = 8000 // 500ms minimum remainder
+
+        internal fun onsetAlignedSamples(segment: FloatArray, speechOnsetSample: Int): FloatArray {
+            require(speechOnsetSample in 0..segment.size) {
+                "Speech onset $speechOnsetSample outside segment of ${segment.size} samples"
+            }
+            return if (speechOnsetSample == 0) segment else segment.copyOfRange(speechOnsetSample, segment.size)
+        }
 
         /**
          * Extract the command remainder after the wake word using silence-gap detection.

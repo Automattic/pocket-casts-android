@@ -24,6 +24,14 @@ object WakeWordJni {
      */
     external fun nativeDetect(samples: FloatArray, sampleRateHz: Int, outOffset: FloatArray): Float
 
+    /**
+     * Debug-only: compute the log-Mel matrix for a segment.
+     * @param samples Normalized float PCM in [-1, 1] at 16kHz.
+     * @param sampleRateHz Must be 16000.
+     * @return Flat float array of shape (time_frames * 32), or null on error.
+     */
+    external fun nativeGetLogMel(samples: FloatArray, sampleRateHz: Int): FloatArray?
+
     /** Release native resources. */
     external fun nativeRelease()
 }

@@ -53,8 +53,18 @@ class SherpaOnnxKwsDetector @Inject constructor(
         const val CHUNK_SAMPLES = 1024 // matches OboeConfig.FRAMES_PER_POLL
     }
 
-    override suspend fun detect(segment: FloatArray, sampleRateHz: Int): WakeWordResult {
+    override suspend fun detect(
+        segment: FloatArray,
+        sampleRateHz: Int,
+        speechOnsetSample: Int,
+    ): WakeWordResult {
         val kws = spotter ?: return WakeWordResult(detected = false)
+        if (speechOnsetSample !in 0..segment.size) return WakeWordResult(detected = false, error = true)
+        val detectorSegment = if (speechOnsetSample == 0) {
+            segment
+        } else {
+            segment.copyOfRange(speechOnsetSample, segment.size)
+        }
 
         return try {
             val stream = kws.createStream()
@@ -62,10 +72,10 @@ class SherpaOnnxKwsDetector @Inject constructor(
             var keywordEndSec = 0f
 
             var offset = 0
-            while (offset < segment.size) {
-                val remaining = segment.size - offset
+            while (offset < detectorSegment.size) {
+                val remaining = detectorSegment.size - offset
                 val chunkSize = minOf(CHUNK_SAMPLES, remaining)
-                stream.acceptWaveform(segment.copyOfRange(offset, offset + chunkSize), sampleRateHz)
+                stream.acceptWaveform(detectorSegment.copyOfRange(offset, offset + chunkSize), sampleRateHz)
                 offset += chunkSize
 
                 while (kws.isReady(stream)) {
@@ -87,8 +97,11 @@ class SherpaOnnxKwsDetector @Inject constructor(
 
             // If the keyword is at the start of the segment, trim it to get the
             // command remainder ("Auris, skip forward" → "skip forward")
-            val remainder = if (keywordEndSec > 0.1f && keywordEndSec < segment.size / sampleRateHz * 0.9f) {
-                val endSample = (keywordEndSec * sampleRateHz).toInt().coerceAtMost(segment.size)
+            val remainder = if (
+                keywordEndSec > 0.1f &&
+                keywordEndSec < detectorSegment.size / sampleRateHz * 0.9f
+            ) {
+                val endSample = (speechOnsetSample + keywordEndSec * sampleRateHz).toInt().coerceAtMost(segment.size)
                 segment.copyOfRange(endSample, segment.size)
             } else {
                 null

@@ -66,6 +66,7 @@ void NativeVadProcessor::stop() {
     mContextCount = 0;
     mSpeechBuffer.clear();
     mSpeechFrames = 0;
+    mSpeechOnsetSample = 0;
     mSpeechActive = false;
     mConsecutiveSilentFrames = 0;
     mDrainRemaining = 0;
@@ -74,6 +75,7 @@ void NativeVadProcessor::stop() {
     {
         std::lock_guard<std::mutex> lock(mSpeechMutex);
         mSnapshotBuffer.clear();
+        mSnapshotSpeechOnsetSample = 0;
     }
 
     LOGI("VAD processor thread stopped");
@@ -108,6 +110,11 @@ int32_t NativeVadProcessor::getSpeechPcm(int16_t* outBuffer, int32_t maxSamples)
         : static_cast<int32_t>(mSnapshotBuffer.size());
     std::memcpy(outBuffer, mSnapshotBuffer.data(), static_cast<size_t>(count) * sizeof(int16_t));
     return count;
+}
+
+int32_t NativeVadProcessor::getSpeechOnsetSample() {
+    std::lock_guard<std::mutex> lock(mSpeechMutex);
+    return mSnapshotSpeechOnsetSample;
 }
 
 // ---------------------------------------------------------------------------
@@ -209,10 +216,12 @@ void NativeVadProcessor::runLoop() {
             {
                 std::lock_guard<std::mutex> lock(mSpeechMutex);
                 mSnapshotBuffer = std::move(mSpeechBuffer);
+                mSnapshotSpeechOnsetSample = mSpeechOnsetSample;
                 mSpeechBuffer.clear();
             }
 
             mSpeechFrames = 0;
+            mSpeechOnsetSample = 0;
             mSpeechActive = false;
             mConsecutiveSilentFrames = 0;
             mDrainRemaining = 0;
@@ -242,6 +251,8 @@ void NativeVadProcessor::runLoop() {
             mDrainRemaining = 0;
 
             if (!mSpeechActive) {
+                mSpeechOnsetSample = mContextCount * kVadFrameSize;
+
                 // Flush pre-speech context into speech buffer.
                 flushContextIntoSpeech(mSpeechBuffer, mSpeechFrames,
                     mContextBuffer, mContextHead, mContextCount,
@@ -257,7 +268,8 @@ void NativeVadProcessor::runLoop() {
                 mEventReady = true;
                 mEventCv.notify_one();
 
-                LOGI("VAD: speech started");
+                LOGI("VAD: speech started (pre-speech context=%d samples)",
+                    mSpeechOnsetSample);
             }
 
             // Accumulate current frame.
@@ -305,10 +317,12 @@ void NativeVadProcessor::runLoop() {
                     {
                         std::lock_guard<std::mutex> lock(mSpeechMutex);
                         mSnapshotBuffer = std::move(mSpeechBuffer);
+                        mSnapshotSpeechOnsetSample = mSpeechOnsetSample;
                         mSpeechBuffer.clear();
                     }
 
                     mSpeechFrames = 0;
+                    mSpeechOnsetSample = 0;
                     mSpeechActive = false;
                     mConsecutiveSilentFrames = 0;
                     mDrainRemaining = 0;

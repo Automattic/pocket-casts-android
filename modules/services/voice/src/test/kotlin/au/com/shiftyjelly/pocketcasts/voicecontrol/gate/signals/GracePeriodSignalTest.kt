@@ -48,6 +48,34 @@ class GracePeriodSignalTest {
     }
 
     @Test
+    fun `active after wake word detection`() = runTest {
+        val signal = GracePeriodSignal(timeoutMs = 100L)
+        signal.onWakeWordDetected()
+        assertTrue(signal.isActive.value)
+    }
+
+    @Test
+    fun `wake word detection expires after timeout`() = runTest {
+        val signal = GracePeriodSignal(timeoutMs = 100L)
+        signal.onWakeWordDetected()
+        assertTrue(signal.isActive.value)
+        delay(150L)
+        assertFalse(signal.isActive.value)
+    }
+
+    @Test
+    fun `wake word resets the same timer as command`() = runTest {
+        val signal = GracePeriodSignal(timeoutMs = 200L)
+        signal.onCommandRecognized()
+        delay(150L)
+        signal.onWakeWordDetected() // resets the shared timer
+        delay(150L)
+        assertTrue(signal.isActive.value) // still active
+        delay(60L)
+        assertFalse(signal.isActive.value) // 210ms after wake word
+    }
+
+    @Test
     fun `route change breaks grace period`() = runTest {
         val signal = GracePeriodSignal(timeoutMs = 200L)
         signal.onCommandRecognized()

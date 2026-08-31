@@ -16,112 +16,28 @@ import org.junit.Test
 
 class ListeningModePolicyTest {
 
-    // --- New-priority tests ---
+    // --- Static resolve tests ---
 
     @Test
-    fun `grace period active resolves to Continuous regardless of exposure and foreground`() {
-        // Grace period overrides everything — even Exposed + background
+    fun `grace period active resolves to Continuous regardless of exposure`() {
+        // Grace period overrides everything — the ONLY path to Continuous
         val result = resolve(
             gateState = allowedGateState,
             micExposure = MicExposure.Exposed,
-            isForeground = false,
-            isPlaybackActive = false,
-            isAttended = false,
             isGracePeriodActive = true,
-            isPlaybackRecent = false,
-            wakeWordReady = true,
         )
         assertEquals(ListeningMode.Continuous, result)
     }
 
     @Test
-    fun `foreground plus attended resolves to Continuous`() {
-        val result = resolve(
-            gateState = allowedGateState,
-            micExposure = MicExposure.Exposed,
-            isForeground = true,
-            isPlaybackActive = false,
-            isAttended = true,
-            isGracePeriodActive = false,
-            isPlaybackRecent = false,
-            wakeWordReady = true,
-        )
-        assertEquals(ListeningMode.Continuous, result)
-    }
-
-    @Test
-    fun `foreground plus unattended resolves to WakeWord`() {
-        val result = resolve(
-            gateState = allowedGateState,
-            micExposure = MicExposure.Exposed,
-            isForeground = true,
-            isPlaybackActive = false,
-            isAttended = false,
-            isGracePeriodActive = false,
-            isPlaybackRecent = false,
-            wakeWordReady = true,
-        )
-        assertEquals(ListeningMode.WakeWord, result)
-    }
-
-    @Test
-    fun `background Isolated playback active plus recent resolves to Continuous`() {
+    fun `grace period inactive resolves to WakeWord even with Isolated route`() {
+        // Isolated route still requires wake word without grace
         val result = resolve(
             gateState = allowedGateState,
             micExposure = MicExposure.Isolated,
-            isForeground = false,
-            isPlaybackActive = true,
-            isAttended = false,
             isGracePeriodActive = false,
-            isPlaybackRecent = true,
-            wakeWordReady = true,
-        )
-        assertEquals(ListeningMode.Continuous, result)
-    }
-
-    @Test
-    fun `background Isolated playback active not recent resolves to WakeWord`() {
-        val result = resolve(
-            gateState = allowedGateState,
-            micExposure = MicExposure.Isolated,
-            isForeground = false,
-            isPlaybackActive = true,
-            isAttended = false,
-            isGracePeriodActive = false,
-            isPlaybackRecent = false,
-            wakeWordReady = true,
         )
         assertEquals(ListeningMode.WakeWord, result)
-    }
-
-    @Test
-    fun `background Exposed playback active resolves to WakeWord`() {
-        val result = resolve(
-            gateState = allowedGateState,
-            micExposure = MicExposure.Exposed,
-            isForeground = false,
-            isPlaybackActive = true,
-            isAttended = false,
-            isGracePeriodActive = false,
-            isPlaybackRecent = false,
-            wakeWordReady = true,
-        )
-        assertEquals(ListeningMode.WakeWord, result)
-    }
-
-    @Test
-    fun `background Exposed wake word not ready resolves to Off`() {
-        val result = resolve(
-            gateState = allowedGateState,
-            micExposure = MicExposure.Exposed,
-            isForeground = false,
-            isPlaybackActive = true,
-            isAttended = false,
-            isGracePeriodActive = false,
-            isPlaybackRecent = false,
-            wakeWordReady = false,
-        )
-        assertEquals(ListeningMode.Off, result)
     }
 
     @Test
@@ -133,12 +49,7 @@ class ListeningModePolicyTest {
             val result = resolve(
                 gateState = awaitItem(),
                 micExposure = MicExposure.Exposed,
-                isForeground = true,
-                isPlaybackActive = true,
-                isAttended = true,
                 isGracePeriodActive = true,
-                isPlaybackRecent = true,
-                wakeWordReady = true,
             )
             assertEquals(ListeningMode.Off, result)
             cancelAndIgnoreRemainingEvents()
@@ -146,16 +57,11 @@ class ListeningModePolicyTest {
     }
 
     @Test
-    fun `NoMic resolves to Off`() {
+    fun `NoMic resolves to Off even with grace active`() {
         val result = resolve(
             gateState = allowedGateState,
             micExposure = MicExposure.NoMic,
-            isForeground = true,
-            isPlaybackActive = true,
-            isAttended = true,
-            isGracePeriodActive = false,
-            isPlaybackRecent = true,
-            wakeWordReady = true,
+            isGracePeriodActive = true,
         )
         assertEquals(ListeningMode.Off, result)
     }
@@ -166,31 +72,55 @@ class ListeningModePolicyTest {
         val result = resolve(
             gateState = VoiceControlGateState(allowed = false, rules = emptyMap()),
             micExposure = MicExposure.Exposed,
-            isForeground = true,
-            isPlaybackActive = true,
-            isAttended = true,
             isGracePeriodActive = true,
-            isPlaybackRecent = true,
-            wakeWordReady = true,
         )
         assertEquals(ListeningMode.Off, result)
     }
 
-    // --- Still-valid tests from the old rule set ---
+    // --- Transition tests ---
 
     @Test
-    fun `background with no active playback resolves to Off`() {
-        val result = resolve(
-            gateState = allowedGateState,
-            micExposure = MicExposure.Exposed,
-            isForeground = false,
-            isPlaybackActive = false,
-            isAttended = false,
-            isGracePeriodActive = false,
-            isPlaybackRecent = false,
-            wakeWordReady = true,
+    fun `grace opens transitions from WakeWord to Continuous`() {
+        // Start with grace inactive → WakeWord
+        assertEquals(
+            ListeningMode.WakeWord,
+            resolve(
+                gateState = allowedGateState,
+                micExposure = MicExposure.Exposed,
+                isGracePeriodActive = false,
+            ),
         )
-        assertEquals(ListeningMode.Off, result)
+        // Grace becomes active → Continuous
+        assertEquals(
+            ListeningMode.Continuous,
+            resolve(
+                gateState = allowedGateState,
+                micExposure = MicExposure.Exposed,
+                isGracePeriodActive = true,
+            ),
+        )
+    }
+
+    @Test
+    fun `grace expires transitions from Continuous to WakeWord`() {
+        // Start with grace active → Continuous
+        assertEquals(
+            ListeningMode.Continuous,
+            resolve(
+                gateState = allowedGateState,
+                micExposure = MicExposure.Exposed,
+                isGracePeriodActive = true,
+            ),
+        )
+        // Grace expires → WakeWord (capture continues)
+        assertEquals(
+            ListeningMode.WakeWord,
+            resolve(
+                gateState = allowedGateState,
+                micExposure = MicExposure.Exposed,
+                isGracePeriodActive = false,
+            ),
+        )
     }
 
     // --- Helpers ---

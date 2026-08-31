@@ -98,6 +98,7 @@ class GateAndPolicyIntegrationTest {
             audioPolicy = VoiceControlAudioRoutePolicy.SpeakerExperimental,
             appInForeground = true,
             playbackActive = true,
+            graceActive = false,
         )
 
         gate.state.test {
@@ -116,6 +117,7 @@ class GateAndPolicyIntegrationTest {
             audioPolicy = VoiceControlAudioRoutePolicy.HeadsetOnly,
             appInForeground = true,
             playbackActive = true,
+            graceActive = false,
         )
 
         gate.state.test {
@@ -133,6 +135,7 @@ class GateAndPolicyIntegrationTest {
             audioPolicy = VoiceControlAudioRoutePolicy.SpeakerExperimental,
             appInForeground = false,
             playbackActive = true,
+            graceActive = false,
         )
 
         gate.state.test {
@@ -144,13 +147,35 @@ class GateAndPolicyIntegrationTest {
     }
 
     @Test
-    fun `gate blocked when neither foreground nor playback active`() = runTest {
+    fun `gate passes when grace period active despite no foreground or playback`() = runTest {
+        // Grace period active condition in Context group allows the gate to pass
+        // even when app is in background and playback is inactive
         val gate = makeGate(
             scope = backgroundScope,
             audioRoute = AudioRoute.Speaker,
             audioPolicy = VoiceControlAudioRoutePolicy.SpeakerExperimental,
             appInForeground = false,
             playbackActive = false,
+            graceActive = true,
+        )
+
+        gate.state.test {
+            val state = awaitItem()
+            val failures = state.rules.filter { it.value !is VoiceControlRuleState.Allowed }
+            assertTrue("Gate blocked by: $failures", state.allowed)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `gate blocked when neither foreground nor playback active nor grace active`() = runTest {
+        val gate = makeGate(
+            scope = backgroundScope,
+            audioRoute = AudioRoute.Speaker,
+            audioPolicy = VoiceControlAudioRoutePolicy.SpeakerExperimental,
+            appInForeground = false,
+            playbackActive = false,
+            graceActive = false,
         )
 
         gate.state.test {
@@ -160,98 +185,79 @@ class GateAndPolicyIntegrationTest {
         }
     }
 
-    // --- resolve() edge cases updated for new priority rules ---
+    // --- resolve() with simplified policy ---
 
     @Test
-    fun `resolve foreground attended with Exposed playback produces Continuous`() {
-        // Simulates: app in foreground, user attended, playing on speaker → Continuous
+    fun `resolve grace period active produces Continuous`() {
+        // Grace period is the ONLY path to Continuous
         val result = resolve(
             gateState = allowedGateState,
             micExposure = MicExposure.Exposed,
-            isForeground = true,
-            isPlaybackActive = true,
-            isAttended = true,
-            isGracePeriodActive = false,
-            isPlaybackRecent = true,
-            wakeWordReady = true,
+            isGracePeriodActive = true,
         )
         assertEquals(ListeningMode.Continuous, result)
     }
 
     @Test
-    fun `resolve foreground unattended with Exposed playback produces WakeWord`() {
-        // Simulates: app in foreground, user unattended, playing on speaker → WakeWord
+    fun `resolve grace period inactive produces WakeWord even with Isolated route`() {
         val result = resolve(
             gateState = allowedGateState,
-            micExposure = MicExposure.Exposed,
-            isForeground = true,
-            isPlaybackActive = true,
-            isAttended = false,
+            micExposure = MicExposure.Isolated,
             isGracePeriodActive = false,
-            isPlaybackRecent = true,
-            wakeWordReady = true,
         )
         assertEquals(ListeningMode.WakeWord, result)
     }
 
     @Test
-    fun `resolve background Exposed playback produces WakeWord`() {
+    fun `resolve gate blocked produces Off regardless of grace`() {
         val result = resolve(
-            gateState = allowedGateState,
+            gateState = VoiceControlGateState(allowed = false, rules = emptyMap()),
             micExposure = MicExposure.Exposed,
-            isForeground = false,
-            isPlaybackActive = true,
-            isAttended = false,
-            isGracePeriodActive = false,
-            isPlaybackRecent = false,
-            wakeWordReady = true,
-        )
-        assertEquals(ListeningMode.WakeWord, result)
-    }
-
-    @Test
-    fun `resolve WakeWord requires detector ready`() {
-        val result = resolve(
-            gateState = allowedGateState,
-            micExposure = MicExposure.Exposed,
-            isForeground = false,
-            isPlaybackActive = true,
-            isAttended = false,
-            isGracePeriodActive = false,
-            isPlaybackRecent = false,
-            wakeWordReady = false,
+            isGracePeriodActive = true,
         )
         assertEquals(ListeningMode.Off, result)
     }
 
     @Test
-    fun `resolution flips from Continuous to WakeWord when attended expires`() {
-        // Foreground + attended → Continuous
+    fun `resolution flips from Continuous to WakeWord when grace expires`() {
+        // Grace active → Continuous
         assertEquals(
             ListeningMode.Continuous,
             resolve(
                 gateState = allowedGateState,
                 micExposure = MicExposure.Exposed,
-                isForeground = true,
-                isPlaybackActive = true,
-                isAttended = true,
-                isGracePeriodActive = false,
-                isPlaybackRecent = true,
-                wakeWordReady = true,
+                isGracePeriodActive = true,
             ),
         )
-        // Foreground + unattended → WakeWord
+        // Grace expires → WakeWord (capture continues)
         assertEquals(
             ListeningMode.WakeWord,
             resolve(
                 gateState = allowedGateState,
                 micExposure = MicExposure.Exposed,
-                isForeground = true,
-                isPlaybackActive = true,
-                isAttended = false,
                 isGracePeriodActive = false,
-                isPlaybackRecent = true,
-                wakeWordReady = true,
+            ),
+        )
+    }
+
+    @Test
+    fun `resolution flips from WakeWord to Continuous when grace opens`() {
+        // Grace inactive → WakeWord
+        assertEquals(
+            ListeningMode.WakeWord,
+            resolve(
+                gateState = allowedGateState,
+                micExposure = MicExposure.Exposed,
+                isGracePeriodActive = false,
+            ),
+        )
+        // Grace becomes active → Continuous
+        assertEquals(
+            ListeningMode.Continuous,
+            resolve(
+                gateState = allowedGateState,
+                micExposure = MicExposure.Exposed,
+                isGracePeriodActive = true,
             ),
         )
     }
@@ -272,6 +278,7 @@ class GateAndPolicyIntegrationTest {
         audioPolicy: VoiceControlAudioRoutePolicy,
         appInForeground: Boolean,
         playbackActive: Boolean,
+        graceActive: Boolean,
         scope: kotlinx.coroutines.CoroutineScope,
     ): VoiceControlGate {
         val rules: List<VoiceControlRule> = listOf(
@@ -291,6 +298,7 @@ class GateAndPolicyIntegrationTest {
             // Context group (ANY must pass)
             fakeRule("app_in_foreground", VoiceControlRuleGroup.Context, allowed = appInForeground),
             fakeRule("playback_context", VoiceControlRuleGroup.Context, allowed = playbackActive),
+            fakeRule("grace_period_active", VoiceControlRuleGroup.Context, allowed = graceActive),
         )
         return VoiceControlGate(rules, scope)
     }

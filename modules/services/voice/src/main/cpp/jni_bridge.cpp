@@ -156,3 +156,19 @@ Java_au_com_shiftyjelly_pocketcasts_voicecontrol_audio_OboeNative_nativeGetSpeec
     }
     return processor->getSpeechPcmSize();
 }
+
+extern "C" JNIEXPORT jint JNICALL
+Java_au_com_shiftyjelly_pocketcasts_voicecontrol_audio_OboeNative_nativeGetSpeechOnsetSample(
+    JNIEnv* /*env*/,
+    jclass /*clazz*/)
+{
+    NativeVadProcessor* processor = nullptr;
+    {
+        std::lock_guard<std::mutex> lock(gCaptureMutex);
+        processor = gVadProcessor;
+    }
+    if (processor == nullptr) {
+        return 0;
+    }
+    return processor->getSpeechOnsetSample();
+}

@@ -8,9 +8,14 @@ import au.com.shiftyjelly.pocketcasts.voicecontrol.gate.signals.GracePeriodSigna
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 @Singleton
 class AndroidAudioRouteMonitor @Inject constructor(
@@ -19,16 +24,28 @@ class AndroidAudioRouteMonitor @Inject constructor(
 ) : AudioRouteMonitor {
     private val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
     private val mutableRoute = MutableStateFlow(readRoute())
+    private val scope = CoroutineScope(Dispatchers.Default)
+    private var debounceJob: Job? = null
 
+    // Bluetooth devices are enumerated incrementally — output first, then input.
+    // A 500ms debounce prevents transient Headset(hasMicrophone=false) → NoMic
+    // from killing the engine during the connection gap.
     override val route: StateFlow<AudioRoute> = mutableRoute.asStateFlow()
 
     private val audioDeviceCallback = object : AudioDeviceCallback() {
         override fun onAudioDevicesAdded(addedDevices: Array<out AudioDeviceInfo>) {
-            mutableRoute.value = readRoute()
-            gracePeriodSignal.onAudioRouteChanged()
+            scheduleRouteUpdate()
         }
 
         override fun onAudioDevicesRemoved(removedDevices: Array<out AudioDeviceInfo>) {
+            scheduleRouteUpdate()
+        }
+    }
+
+    private fun scheduleRouteUpdate() {
+        debounceJob?.cancel()
+        debounceJob = scope.launch {
+            delay(500L)
             mutableRoute.value = readRoute()
             gracePeriodSignal.onAudioRouteChanged()
         }

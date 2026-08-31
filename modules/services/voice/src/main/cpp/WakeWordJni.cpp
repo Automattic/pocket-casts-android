@@ -8,8 +8,8 @@
 //   2. Speech embedding — mel frames → 96-dim embedding (embedding_model.onnx)
 //   3. Wake word classifier — 16 embeddings → sigmoid score (auris.onnx)
 //
-// Each detect() call processes the complete audio segment and returns the max
-// classifier score. State is fully reset between calls.
+// Each detect() call prepends virtual leading context and scores only the
+// onset-eligible classifier windows. State is fully reset between calls.
 
 #include <jni.h>
 #include <android/asset_manager_jni.h>
@@ -32,10 +32,19 @@ typedef const OrtApiBase* (*FnOrtGetApiBase)(void);
 
 // --- Model parameters ---
 static constexpr int      kSampleRateHz          = 16000;
-static constexpr int      kMelWindowSamples      = 1280;   // 80ms @ 16kHz (minimum segment length)
+static constexpr int      kMelWindowSamples      = 1280;   // debug log-Mel minimum
 static constexpr int      kMelBins               = 32;
 static constexpr int      kEmbeddingDim          = 96;
 static constexpr int      kMaxEmbeddings         = 16;     // classifier context window
+static constexpr int      kVirtualContextSamples = 32000;  // 2s before VAD onset
+static constexpr int      kOnsetCutoffSamples    = 32000;  // last eligible endpoint after onset
+static constexpr int      kMelFrameStrideSamples = 160;
+static constexpr int      kEmbeddingWindowFrames = 76;
+static constexpr int      kEmbeddingStrideFrames = 8;
+static constexpr int      kEmbeddingStrideSamples =
+    kEmbeddingStrideFrames * kMelFrameStrideSamples;
+static constexpr int      kEmbeddingEndpointOffsetSamples =
+    kEmbeddingWindowFrames * kMelFrameStrideSamples;
 
 // --- Global ORT state ---
 static const OrtApi*      g_ort = nullptr;
@@ -208,23 +217,22 @@ Java_au_com_shiftyjelly_pocketcasts_voicecontrol_wakeword_WakeWordJni_nativeDete
     }
 
     jsize numSamples = env->GetArrayLength(jSamples);
-    if (numSamples < kMelWindowSamples) return 0.0f;
+    if (numSamples <= 0) return 0.0f;
 
     jfloat* samples = env->GetFloatArrayElements(jSamples, nullptr);
     if (!samples) return -1.0f;
 
-    // --- Stage 1: Apply gain and run mel on ENTIRE audio at once ---
+    // --- Stage 1: prepend virtual context and run mel once ---
     // Training uses normalized [-1,1] audio directly — do NOT multiply by 32768.
-    std::vector<float> audioIn(numSamples);
-    for (int i = 0; i < numSamples; i++) {
-        audioIn[i] = samples[i];
-    }
+    // The virtual samples exist only inside the detector and never reach ASR.
+    std::vector<float> audioIn(kVirtualContextSamples + numSamples, 0.0f);
+    std::copy(samples, samples + numSamples, audioIn.begin() + kVirtualContextSamples);
 
     // Run mel model on full audio. Output shape: (1, 1, time_frames, 32)
-    int64_t melInShape[] = {1, (int64_t)numSamples};
+    int64_t melInShape[] = {1, (int64_t)audioIn.size()};
     // We don't know the output size ahead of time — use the variable-size helper.
     OrtValue* melInputTensor = nullptr;
-    size_t melCount = (size_t)numSamples;
+    size_t melCount = audioIn.size();
     OrtStatus* st = g_ort->CreateTensorWithDataAsOrtValue(
         g_memInfo, audioIn.data(), melCount * sizeof(float),
         melInShape, 2, ONNX_TENSOR_ELEMENT_DATA_TYPE_FLOAT, &melInputTensor);
@@ -271,30 +279,29 @@ Java_au_com_shiftyjelly_pocketcasts_voicecontrol_wakeword_WakeWordJni_nativeDete
     for (float& v : melFrames) { v = v / 10.0f + 2.0f; }
     g_ort->ReleaseValue(melOutputTensor);
 
-    LOGI("Mel: %d frames, %zu dims, %zu elements from %d samples",
-         nMelFrames, melNumDims, melNumElements, (int)numSamples);
+    LOGI("Mel: %d frames, %zu dims, %zu elements from %zu detector samples",
+         nMelFrames, melNumDims, melNumElements, audioIn.size());
 
     // --- Stage 2: Extract embeddings with stride 8, 76-frame window ---
-    const int embStride = 8;
-    const int melWindow = 76;
-    int nEmbeddings = (nMelFrames - melWindow) / embStride + 1;
+    int nEmbeddings =
+        (nMelFrames - kEmbeddingWindowFrames) / kEmbeddingStrideFrames + 1;
     if (nEmbeddings < 0) nEmbeddings = 0;
 
     std::vector<float> embeddings;  // (nEmbeddings, 96) flattened
     embeddings.reserve(nEmbeddings * kEmbeddingDim);
 
     for (int i = 0; i < nEmbeddings; i++) {
-        int melStart = i * embStride;
+        int melStart = i * kEmbeddingStrideFrames;
         // Build input: (1, 76, 32, 1) from melFrames[melStart:melStart+76, :]
         std::vector<float> melWindowInput;
-        melWindowInput.reserve(melWindow * kMelBins);
-        for (int f = 0; f < melWindow; f++) {
+        melWindowInput.reserve(kEmbeddingWindowFrames * kMelBins);
+        for (int f = 0; f < kEmbeddingWindowFrames; f++) {
             int frameOffset = (melStart + f) * kMelBins;
             melWindowInput.insert(melWindowInput.end(),
                                   melFrames.begin() + frameOffset,
                                   melFrames.begin() + frameOffset + kMelBins);
         }
-        int64_t embedInShape[] = {1, melWindow, kMelBins, 1};
+        int64_t embedInShape[] = {1, kEmbeddingWindowFrames, kMelBins, 1};
         bool embedOk = false;
         std::vector<float> embedOut = runModel(g_embedSession, "input_1", "conv2d_19",
                                                 melWindowInput.data(), embedInShape, 4,
@@ -305,31 +312,35 @@ Java_au_com_shiftyjelly_pocketcasts_voicecontrol_wakeword_WakeWordJni_nativeDete
 
     LOGI("Extracted %d embeddings from %d mel frames", nEmbeddings, nMelFrames);
 
-    // --- Stage 3: Slide 16-embedding window, take max score ---
-    // The classifier uses only the last 16 embeddings (~1.28s context). For short
-    // segments (<16 embeddings) left-pad with zeros. For longer segments, slide a
-    // 16-embedding window with stride 1 across all embeddings and take the max score,
-    // so the wake word is detected regardless of position within the segment.
-    int numWindows = nEmbeddings - kMaxEmbeddings + 1;
-    if (numWindows < 1) numWindows = 1;
+    // --- Stage 3: score dense windows whose endpoints remain inside the onset gate ---
+    // For classifier window start w, the final embedding index is w+15 and its
+    // waveform endpoint relative to speech onset is:
+    //   76*160 + 8*160*(w+15) - virtualContext.
+    // With the frozen 2s context/cutoff this admits starts 0...25 (26 windows).
+    int totalWindows = nEmbeddings - kMaxEmbeddings + 1;
+    if (totalWindows < 1) {
+        LOGE("Virtual context produced only %d embeddings", nEmbeddings);
+        env->ReleaseFloatArrayElements(jSamples, samples, JNI_ABORT);
+        return -1.0f;
+    }
+    int maxLastEmbeddingIndex =
+        (kVirtualContextSamples + kOnsetCutoffSamples -
+         kEmbeddingEndpointOffsetSamples) /
+        kEmbeddingStrideSamples;
+    int maxEligibleWindowStart = maxLastEmbeddingIndex - (kMaxEmbeddings - 1);
+    int numWindows = std::min(totalWindows, maxEligibleWindowStart + 1);
+    if (numWindows < 1) {
+        env->ReleaseFloatArrayElements(jSamples, samples, JNI_ABORT);
+        return 0.0f;
+    }
     int64_t clsInShape[] = {1, kMaxEmbeddings, kEmbeddingDim};
 
-    // Compute samples-per-mel-frame ratio for offset calculation.
-    // Each mel frame advances by ~numSamples/nMelFrames samples in the original audio.
-    float samplesPerMelFrame = (nMelFrames > 0) ? (float)numSamples / (float)nMelFrames : 0.0f;
-    // Each embedding stride advances by embStride mel frames.
-    int strideSamples = (int)(embStride * samplesPerMelFrame);
-
     float maxScore = 0.0f;
-    int bestWindowIndex = 0;
     for (int w = 0; w < numWindows; w++) {
         float clsInputData[kMaxEmbeddings * kEmbeddingDim] = {};
-        int embStart = (nEmbeddings < kMaxEmbeddings) ? 0 : w;
-        int embCount = (nEmbeddings < kMaxEmbeddings) ? nEmbeddings : kMaxEmbeddings;
-        int dstStart = (kMaxEmbeddings - embCount) * kEmbeddingDim;  // left-pad short segments
-        int srcStart = embStart * kEmbeddingDim;
-        for (int i = 0; i < embCount * kEmbeddingDim; i++) {
-            clsInputData[dstStart + i] = embeddings[srcStart + i];
+        int srcStart = w * kEmbeddingDim;
+        for (int i = 0; i < kMaxEmbeddings * kEmbeddingDim; i++) {
+            clsInputData[i] = embeddings[srcStart + i];
         }
 
         bool clsOk = false;
@@ -341,21 +352,92 @@ Java_au_com_shiftyjelly_pocketcasts_voicecontrol_wakeword_WakeWordJni_nativeDete
         }
         if (clsOut[0] > maxScore) {
             maxScore = clsOut[0];
-            bestWindowIndex = w;
         }
     }
 
-    // Write the sample offset of the max-score window start.
-    if (jOutOffset) {
-        jfloat* outOffset = env->GetFloatArrayElements(jOutOffset, nullptr);
-        if (outOffset) {
-            outOffset[0] = (jfloat)(bestWindowIndex * strideSamples);
-            env->ReleaseFloatArrayElements(jOutOffset, outOffset, 0);
-        }
-    }
+    // Onset-eligible classifier windows begin inside virtual context, so there
+    // is no valid non-negative window-start offset to return to the VAD segment.
+    // Keeping the default -1 makes command extraction use the full segment.
+    LOGI("Scored %d/%d onset-eligible classifier windows", numWindows, totalWindows);
 
     env->ReleaseFloatArrayElements(jSamples, samples, JNI_ABORT);
     return maxScore;
+}
+
+// Debug-only: return the log-Mel matrix for a segment as a flat float array
+// of shape (time_frames * kMelBins), same transform as nativeDetect
+// (v/10 + 2). Used to render a per-segment log-Mel spectrogram PNG for
+// diagnosing wake-word false activations. Returns null on error.
+JNIEXPORT jfloatArray JNICALL
+Java_au_com_shiftyjelly_pocketcasts_voicecontrol_wakeword_WakeWordJni_nativeGetLogMel(
+    JNIEnv* env, jclass /*clazz*/, jfloatArray jSamples, jint sampleRateHz)
+{
+    if (!g_initialized) return nullptr;
+    if (sampleRateHz != kSampleRateHz) return nullptr;
+
+    jsize numSamples = env->GetArrayLength(jSamples);
+    if (numSamples < kMelWindowSamples) return nullptr;
+
+    jfloat* samples = env->GetFloatArrayElements(jSamples, nullptr);
+    if (!samples) return nullptr;
+
+    std::vector<float> audioIn(numSamples);
+    for (int i = 0; i < numSamples; i++) {
+        audioIn[i] = samples[i];
+    }
+    env->ReleaseFloatArrayElements(jSamples, samples, JNI_ABORT);
+
+    // --- Run mel model on full audio, mirroring nativeDetect ---
+    int64_t melInShape[] = {1, (int64_t)numSamples};
+    OrtValue* melInputTensor = nullptr;
+    OrtStatus* st = g_ort->CreateTensorWithDataAsOrtValue(
+        g_memInfo, audioIn.data(), numSamples * sizeof(float),
+        melInShape, 2, ONNX_TENSOR_ELEMENT_DATA_TYPE_FLOAT, &melInputTensor);
+    if (st) { g_ort->ReleaseStatus(st); return nullptr; }
+
+    const char* melInputName = "input";
+    const char* melOutputName = "output";
+    OrtValue* melOutputTensor = nullptr;
+    st = g_ort->Run(g_melSession, nullptr, &melInputName, &melInputTensor, 1,
+                    &melOutputName, 1, &melOutputTensor);
+    g_ort->ReleaseValue(melInputTensor);
+    if (st) { g_ort->ReleaseStatus(st); return nullptr; }
+
+    float* melData = nullptr;
+    st = g_ort->GetTensorMutableData(melOutputTensor, (void**)&melData);
+    if (st) {
+        g_ort->ReleaseStatus(st);
+        g_ort->ReleaseValue(melOutputTensor);
+        return nullptr;
+    }
+
+    // Apply the same log-Mel transform as nativeDetect: mel = mel/10 + 2.
+    OrtTensorTypeAndShapeInfo* melInfo = nullptr;
+    size_t melNumElements = 0;
+    if (OrtStatus* infoSt = g_ort->GetTensorTypeAndShape(melOutputTensor, &melInfo)) {
+        g_ort->ReleaseStatus(infoSt);
+        g_ort->ReleaseValue(melOutputTensor);
+        return nullptr;
+    }
+    if (OrtStatus* countSt = g_ort->GetTensorShapeElementCount(melInfo, &melNumElements)) {
+        g_ort->ReleaseStatus(countSt);
+        g_ort->ReleaseTensorTypeAndShapeInfo(melInfo);
+        g_ort->ReleaseValue(melOutputTensor);
+        return nullptr;
+    }
+    g_ort->ReleaseTensorTypeAndShapeInfo(melInfo);
+
+    jfloatArray result = env->NewFloatArray((jsize)melNumElements);
+    if (result) {
+        // Copy with the transform applied.
+        std::vector<jfloat> transformed(melNumElements);
+        for (size_t i = 0; i < melNumElements; i++) {
+            transformed[i] = melData[i] / 10.0f + 2.0f;
+        }
+        env->SetFloatArrayRegion(result, 0, (jsize)melNumElements, transformed.data());
+    }
+    g_ort->ReleaseValue(melOutputTensor);
+    return result;
 }
 
 JNIEXPORT void JNICALL

@@ -18,7 +18,9 @@ import au.com.shiftyjelly.pocketcasts.voicecontrol.feedback.AudioFeedbackRendere
 import au.com.shiftyjelly.pocketcasts.voicecontrol.feedback.EarconId
 import au.com.shiftyjelly.pocketcasts.voicecontrol.gate.LiveConditionMonitor
 import au.com.shiftyjelly.pocketcasts.voicecontrol.gate.VoiceControlGate
+import au.com.shiftyjelly.pocketcasts.voicecontrol.gate.VoiceControlRuleState
 import au.com.shiftyjelly.pocketcasts.voicecontrol.gate.conditions.ModelsReadyCondition
+import au.com.shiftyjelly.pocketcasts.voicecontrol.gate.signals.GracePeriodSignal
 import au.com.shiftyjelly.pocketcasts.voicecontrol.mode.ListeningMode
 import au.com.shiftyjelly.pocketcasts.voicecontrol.mode.ListeningModePolicy
 import au.com.shiftyjelly.pocketcasts.voicecontrol.model.VoiceRecognitionContext
@@ -71,11 +73,15 @@ class VoiceControlService : Service() {
 
     @Inject lateinit var audioFeedbackRenderer: AudioFeedbackRenderer
 
+    @Inject lateinit var gracePeriodSignal: GracePeriodSignal
+
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
     private var modeJob: Job? = null
     private var lastIntentType: String? = null
     private var lastCommandTime: Long = 0L
     private var engineStarted = false
+    private var captureWasEverActive = false
+    private var acquisitionLogged = false
     private var mediaSession: MediaSession? = null
     private var currentMode: ListeningMode = ListeningMode.Off
 
@@ -134,16 +140,62 @@ class VoiceControlService : Service() {
                     listeningModePolicy.mode,
                     audioRouteMonitor.route,
                 ) { mode, _ -> mode }.onEach { mode ->
+                    val route = audioRouteMonitor.route.value
+                    val micExposure = route.toMicExposure()
                     when (mode) {
                         ListeningMode.Off -> {
-                            stopEngine()
+                            if (engineStarted) {
+                                // Active capture was ongoing, now stopping
+                                val gateState = gate.state.value
+                                val blockedRules = gateState.rules
+                                    .filter { it.value !is VoiceControlRuleState.Allowed }
+                                val reasons = blockedRules.entries
+                                    .joinToString(";") { "${it.key}=${it.value}" }
+                                val isUserRequested = blockedRules.keys.any {
+                                    it == "voice_control_user_enabled"
+                                }
+                                val msg = "mic_capture_stopped: reasons=%s setup=%b conflicts=%b context=%b micExposure=%s route=%s mode=%s priorCaptureActive=true"
+                                if (isUserRequested) {
+                                    Timber.i(msg, reasons, gateState.setupPassed, gateState.conflictsPassed, gateState.contextPassed, micExposure, route, mode)
+                                } else {
+                                    Timber.e(msg, reasons, gateState.setupPassed, gateState.conflictsPassed, gateState.contextPassed, micExposure, route, mode)
+                                }
+                                stopEngine()
+                            } else if (!captureWasEverActive && !acquisitionLogged) {
+                                // Capture never started — log once, not on every recomputation
+                                acquisitionLogged = true
+                                val gateState = gate.state.value
+                                val blockedRules = gateState.rules
+                                    .filter { it.value !is VoiceControlRuleState.Allowed }
+                                val reasons = blockedRules.entries
+                                    .joinToString(";") { "${it.key}=${it.value}" }
+                                Timber.i(
+                                    "mic_acquisition_skipped: reasons=%s setup=%b conflicts=%b context=%b micExposure=%s route=%s mode=%s priorCaptureActive=false",
+                                    reasons,
+                                    gateState.setupPassed,
+                                    gateState.conflictsPassed,
+                                    gateState.contextPassed,
+                                    micExposure,
+                                    route,
+                                    mode,
+                                )
+                            }
+                            // else: was Off before, still Off — skip (reactive recomputation)
                             currentMode = ListeningMode.Off
                             updateListeningState()
                         }
 
                         ListeningMode.Continuous, ListeningMode.WakeWord -> {
+                            captureWasEverActive = true
                             if (engineStarted) {
-                                voiceAsrEngine.get().updateListeningMode(mode)
+                                if (mode != currentMode) {
+                                    voiceAsrEngine.get().updateListeningMode(mode)
+                                    // Keep the wake-word hint accurate as grace opens/expires
+                                    val notification = notificationManager.createListeningNotification(
+                                        wakeWordRequired = mode == ListeningMode.WakeWord,
+                                    )
+                                    notificationManager.notify(notification)
+                                }
                             } else {
                                 @Suppress("MissingPermission") // permission checked in hasRequiredPermissions() above
                                 startEngine(mode)
@@ -238,7 +290,9 @@ class VoiceControlService : Service() {
                 audioFeedbackRenderer.playEarcon(EarconId.LISTENING_START)
             }
 
-            val notification = notificationManager.createListeningNotification()
+            val notification = notificationManager.createListeningNotification(
+                wakeWordRequired = mode == ListeningMode.WakeWord,
+            )
             notificationManager.notify(notification)
             Timber.i("Engine started in %s mode", mode)
         } catch (e: Exception) {
@@ -269,6 +323,7 @@ class VoiceControlService : Service() {
         serviceScope.launch(Dispatchers.IO) {
             val response = voicePlaybackIntentExecutor.execute(intent)
             audioFeedbackRenderer.render(response)
+            gracePeriodSignal.onCommandRecognized()
         }
     }
 

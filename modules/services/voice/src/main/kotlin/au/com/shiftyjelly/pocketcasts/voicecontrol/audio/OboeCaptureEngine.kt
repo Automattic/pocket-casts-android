@@ -31,6 +31,7 @@ internal object OboeNative {
     external fun nativeWaitForVadEvent(timeoutMs: Int): Int
     external fun nativeGetSpeechPcm(buffer: ShortArray): Int
     external fun nativeGetSpeechPcmSize(): Int
+    external fun nativeGetSpeechOnsetSample(): Int
 }
 
 /** Configuration constants shared between Kotlin capture loop and native code. */
@@ -73,6 +74,10 @@ internal class OboeCaptureEngine(
                             val buffer = ShortArray(totalSamples)
                             val copied = OboeNative.nativeGetSpeechPcm(buffer)
                             if (copied > 0) {
+                                val speechOnsetSample = OboeNative.nativeGetSpeechOnsetSample()
+                                require(speechOnsetSample in 0 until copied) {
+                                    "Native VAD speech onset $speechOnsetSample outside 0 until $copied"
+                                }
                                 val frames = mutableListOf<PcmAudioFrame>()
                                 var offset = 0
                                 while (offset < copied) {
@@ -81,7 +86,12 @@ internal class OboeCaptureEngine(
                                     frames.add(PcmAudioFrame(frameSamples, OboeConfig.SAMPLE_RATE_HZ))
                                     offset += frameSize
                                 }
-                                emit(VoiceSegmenterResult.SpeechEnded(frames))
+                                emit(
+                                    VoiceSegmenterResult.SpeechEnded(
+                                        frames = frames,
+                                        speechOnsetSample = speechOnsetSample,
+                                    ),
+                                )
                             }
                         }
                     }

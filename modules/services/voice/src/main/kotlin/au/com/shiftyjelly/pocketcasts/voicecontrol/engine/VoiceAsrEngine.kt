@@ -11,14 +11,17 @@ import au.com.shiftyjelly.pocketcasts.voicecontrol.asr.AsrBackend
 import au.com.shiftyjelly.pocketcasts.voicecontrol.asr.AsrResult
 import au.com.shiftyjelly.pocketcasts.voicecontrol.audio.VoiceAudioProcessor
 import au.com.shiftyjelly.pocketcasts.voicecontrol.audio.VoiceSegmenterResult
+import au.com.shiftyjelly.pocketcasts.voicecontrol.feedback.AudioFeedbackRenderer
+import au.com.shiftyjelly.pocketcasts.voicecontrol.feedback.EarconId
+import au.com.shiftyjelly.pocketcasts.voicecontrol.gate.signals.GracePeriodSignal
 import au.com.shiftyjelly.pocketcasts.voicecontrol.intent.VoiceIntent
 import au.com.shiftyjelly.pocketcasts.voicecontrol.mode.ListeningMode
 import au.com.shiftyjelly.pocketcasts.voicecontrol.model.VoiceRecognitionContext
 import au.com.shiftyjelly.pocketcasts.voicecontrol.model.VoiceRecognizer
 import au.com.shiftyjelly.pocketcasts.voicecontrol.route.AudioRoute
 import au.com.shiftyjelly.pocketcasts.voicecontrol.route.MicExposure
-import au.com.shiftyjelly.pocketcasts.voicecontrol.wakeword.CommandWindow
 import au.com.shiftyjelly.pocketcasts.voicecontrol.wakeword.WakeWordDetector
+import au.com.shiftyjelly.pocketcasts.voicecontrol.wakeword.WakeWordSegmentCapture
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -36,11 +39,12 @@ class VoiceAsrEngine @Inject constructor(
     private val utteranceFilter: UtteranceFilter,
     private val intentRecognizer: VoiceRecognizer,
     private val wakeWordDetector: WakeWordDetector,
+    private val gracePeriodSignal: GracePeriodSignal,
+    private val audioFeedbackRenderer: AudioFeedbackRenderer,
     @ApplicationContext private val context: Context,
 ) {
     private val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
     internal var scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-    private val commandWindow = CommandWindow()
     private var processingJob: Job? = null
     private var scoStarted = false
     private var savedAudioMode: Int? = null
@@ -76,7 +80,7 @@ class VoiceAsrEngine @Inject constructor(
             try {
                 voiceAudioProcessor.startProcessing().collect { result ->
                     when (result) {
-                        is VoiceSegmenterResult.SpeechStarted -> commandWindow.onActivity()
+                        is VoiceSegmenterResult.SpeechStarted -> { /* utterance started */ }
 
                         is VoiceSegmenterResult.SpeechContinuing -> { /* accumulating frames */ }
 
@@ -109,7 +113,18 @@ class VoiceAsrEngine @Inject constructor(
         Timber.i("VoiceAsrEngine mode updated to %s", mode)
     }
 
-    /** Returns the audio to transcribe, or null if the segment should be dropped. */
+    /**
+     * Runs wake-word detection on every utterance in both listening modes,
+     * then decides whether to transcribe. Per spec:
+     *
+     * - Positive detection (either mode): strips wake-word audio, emits WAKE_WORD
+     *   earcon, opens/resets the conversation grace period, and forwards the
+     *   command remainder to ASR.
+     * - Negative outside grace (WakeWord): drops the segment.
+     * - Negative during grace (Continuous): forwards the full segment.
+     * - Wake-only (positive but no safe remainder): plays WAKE_WORD then ERROR,
+     *   opens/resets grace, skips ASR.
+     */
     private suspend fun shouldTranscribe(segment: VoiceSegmenterResult.SpeechEnded): FloatArray? {
         // Build float samples from the segment
         val totalSamples = segment.frames.sumOf { it.samples.size }
@@ -122,25 +137,62 @@ class VoiceAsrEngine @Inject constructor(
             offset += frame.samples.size
         }
 
+        // Always run the wake-word detector — it's lightweight and must observe
+        // every utterance so wake-word audio is always stripped and every
+        // detection is acknowledged.
+        val wwResult = runCatching {
+            wakeWordDetector.detect(
+                segment = floatSamples,
+                sampleRateHz = segment.frames.firstOrNull()?.sampleRateHz ?: 16000,
+                speechOnsetSample = segment.speechOnsetSample,
+            )
+        }.getOrElse { e ->
+            Timber.w(e, "Wake word detection failed, dropping segment")
+            return null
+        }
+
+        // Debug instrumentation: behind WAKE_WORD_DEBUG_CAPTURE, dump every
+        // VAD segment (raw WAV + log-Mel PNG) named by timestamp + score.
+        WakeWordSegmentCapture.capture(
+            context,
+            floatSamples,
+            segment.frames.firstOrNull()?.sampleRateHz ?: 16000,
+            wwResult.confidence,
+        )
+
         val mode = currentMode
+
+        if (wwResult.detected) {
+            Timber.i("Wake word detected (confidence=%.2f)", wwResult.confidence)
+
+            // Open or reset the conversation grace period. This causes
+            // ListeningModePolicy to switch to Continuous for subsequent utterances.
+            gracePeriodSignal.onWakeWordDetected()
+
+            // Always acknowledge detection with the WAKE_WORD earcon
+            audioFeedbackRenderer.playEarcon(EarconId.WAKE_WORD)
+
+            if (wwResult.remainderSamples != null) {
+                // Safe command remainder — forward to ASR
+                return wwResult.remainderSamples
+            } else {
+                // Wake-only (no safe command remainder localized) — skip ASR
+                Timber.i("Wake-only: no safe command remainder, skipping ASR")
+                audioFeedbackRenderer.playEarcon(EarconId.ERROR)
+                return null
+            }
+        }
+
+        // Negative detection
         return when (mode) {
-            ListeningMode.Continuous -> floatSamples
+            ListeningMode.Continuous -> {
+                // During grace: forward the full segment
+                floatSamples
+            }
 
             ListeningMode.WakeWord -> {
-                val wwResult = runCatching {
-                    wakeWordDetector.detect(floatSamples, segment.frames.firstOrNull()?.sampleRateHz ?: 16000)
-                }.getOrElse { e ->
-                    Timber.w(e, "Wake word detection failed, dropping segment")
-                    return null
-                }
-
-                if (wwResult.detected) {
-                    Timber.i("Wake word detected (confidence=%.2f)", wwResult.confidence)
-                    commandWindow.onWakeWord()
-                    wwResult.remainderSamples ?: floatSamples
-                } else {
-                    if (commandWindow.isActive) floatSamples else null
-                }
+                // Outside grace: drop — wake word is required
+                null
             }
 
             ListeningMode.Off -> null
@@ -216,7 +268,6 @@ class VoiceAsrEngine @Inject constructor(
         backend?.release()
         backend = null
         closeBluetoothSco()
-        commandWindow.reset()
         Timber.i("VoiceAsrEngine stopped")
     }
 

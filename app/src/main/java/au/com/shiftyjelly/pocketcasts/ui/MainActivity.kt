@@ -203,7 +203,6 @@ import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
 import au.com.shiftyjelly.pocketcasts.views.helper.OffsettingBottomSheetCallback
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
-import au.com.shiftyjelly.pocketcasts.voicecontrol.gate.signals.AttendedSignal
 import com.automattic.android.tracks.crashlogging.CrashLogging
 import com.automattic.eventhorizon.DiscoverTabOpenedEvent
 import com.automattic.eventhorizon.EndOfYearModalDismissedEvent
@@ -327,9 +326,6 @@ class MainActivity :
 
     @Inject
     lateinit var appReviewManager: AppReviewManager
-
-    @Inject
-    lateinit var attendedSignal: AttendedSignal
 
     private val viewModel: MainActivityViewModel by viewModels()
     private val disposables = CompositeDisposable()
@@ -753,9 +749,6 @@ class MainActivity :
 
     override fun onUserInteraction() {
         super.onUserInteraction()
-        if (::attendedSignal.isInitialized) {
-            attendedSignal.onUserInteraction()
-        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

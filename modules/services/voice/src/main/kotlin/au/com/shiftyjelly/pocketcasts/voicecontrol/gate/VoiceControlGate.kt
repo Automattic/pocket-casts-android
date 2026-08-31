@@ -11,6 +11,11 @@ import timber.log.Timber
 data class VoiceControlGateState(
     val allowed: Boolean,
     val rules: Map<String, VoiceControlRuleState>,
+    // Per-group condition states, surfaced for lifecycle logging (spec: logs carry
+    // setup/conflict/context condition states). Defaults keep rule-free states allowed.
+    val setupPassed: Boolean = true,
+    val conflictsPassed: Boolean = true,
+    val contextPassed: Boolean = true,
 )
 
 class VoiceControlGate(
@@ -53,7 +58,13 @@ class VoiceControlGate(
             rulesMap.entries.joinToString { (id, state) -> "$id=$state" },
         )
 
-        return VoiceControlGateState(allowed = allowed, rules = rulesMap)
+        return VoiceControlGateState(
+            allowed = allowed,
+            rules = rulesMap,
+            setupPassed = setupPassed,
+            conflictsPassed = conflictsPassed,
+            contextPassed = contextPassed,
+        )
     }
 
     private fun groupAllAllowed(rulesInGroup: List<Pair<VoiceControlRule, VoiceControlRuleState>>?): Boolean {

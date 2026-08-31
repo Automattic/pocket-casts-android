@@ -8,7 +8,10 @@ sealed interface VoiceSegmenterResult {
     data object Silence : VoiceSegmenterResult
     data object SpeechStarted : VoiceSegmenterResult
     data object SpeechContinuing : VoiceSegmenterResult
-    data class SpeechEnded(val frames: List<PcmAudioFrame>) : VoiceSegmenterResult
+    data class SpeechEnded(
+        val frames: List<PcmAudioFrame>,
+        val speechOnsetSample: Int = 0,
+    ) : VoiceSegmenterResult
     data class Rejected(val reason: RejectionReason) : VoiceSegmenterResult
 }
 

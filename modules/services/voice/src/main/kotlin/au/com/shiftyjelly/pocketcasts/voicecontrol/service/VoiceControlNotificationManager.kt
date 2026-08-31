@@ -71,8 +71,10 @@ class VoiceControlNotificationManager @Inject constructor(
 
     /**
      * Create a notification indicating that voice control is actively listening.
+     *
+     * @param wakeWordRequired whether the user must say the wake word before speaking a command
      */
-    fun createListeningNotification(): Notification {
+    fun createListeningNotification(wakeWordRequired: Boolean): Notification {
         createNotificationChannel()
 
         val stopIntent = createStopIntent()
@@ -83,9 +85,15 @@ class VoiceControlNotificationManager @Inject constructor(
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
         )
 
+        val contentText = if (wakeWordRequired) {
+            "Listening — say wake word to start"
+        } else {
+            "Listening for voice commands"
+        }
+
         return NotificationCompat.Builder(context, CHANNEL_ID)
             .setContentTitle("Voice Control")
-            .setContentText("Listening for voice commands")
+            .setContentText(contentText)
             .setSmallIcon(android.R.drawable.ic_btn_speak_now)
             .setOngoing(true)
             .setPriority(NotificationCompat.PRIORITY_LOW)

@@ -17,11 +17,12 @@ import au.com.shiftyjelly.pocketcasts.voicecontrol.gate.VoiceControlRule
 import au.com.shiftyjelly.pocketcasts.voicecontrol.gate.conditions.AppInForegroundCondition
 import au.com.shiftyjelly.pocketcasts.voicecontrol.gate.conditions.BatteryOkCondition
 import au.com.shiftyjelly.pocketcasts.voicecontrol.gate.conditions.DeviceSupportedCondition
+import au.com.shiftyjelly.pocketcasts.voicecontrol.gate.conditions.GracePeriodActiveCondition
 import au.com.shiftyjelly.pocketcasts.voicecontrol.gate.conditions.ModelsReadyCondition
 import au.com.shiftyjelly.pocketcasts.voicecontrol.gate.conditions.NotCastingCondition
 import au.com.shiftyjelly.pocketcasts.voicecontrol.gate.conditions.NotOnCallCondition
 import au.com.shiftyjelly.pocketcasts.voicecontrol.gate.conditions.OtherAppPlayingCondition
-import au.com.shiftyjelly.pocketcasts.voicecontrol.gate.signals.AttendedSignal
+import au.com.shiftyjelly.pocketcasts.voicecontrol.gate.signals.GracePeriodSignal
 import au.com.shiftyjelly.pocketcasts.voicecontrol.intent.EmbeddingIntentMatcher
 import au.com.shiftyjelly.pocketcasts.voicecontrol.intent.EntityExtractor
 import au.com.shiftyjelly.pocketcasts.voicecontrol.intent.FunctionGemmaIntentRouter
@@ -63,7 +64,6 @@ import au.com.shiftyjelly.pocketcasts.voicecontrol.playback.VoiceStatsQuerySink
 import au.com.shiftyjelly.pocketcasts.voicecontrol.playback.VoiceVolumeSink
 import au.com.shiftyjelly.pocketcasts.voicecontrol.route.AndroidAudioRouteMonitor
 import au.com.shiftyjelly.pocketcasts.voicecontrol.route.AudioRouteMonitor
-import au.com.shiftyjelly.pocketcasts.voicecontrol.route.AudioRoutePolicyRule
 import au.com.shiftyjelly.pocketcasts.voicecontrol.tts.AndroidPlatformTtsEngine
 import au.com.shiftyjelly.pocketcasts.voicecontrol.tts.TtsEngine
 import au.com.shiftyjelly.pocketcasts.voicecontrol.wakeword.OpenWakeWordDetector
@@ -141,9 +141,6 @@ abstract class VoiceControlModule {
         fun provideEmbeddingTokenizerFile(manager: ModelManager): File = manager.tokenizerModelFile
 
         @Provides @Singleton
-        fun provideAttendedSignal(): AttendedSignal = AttendedSignal(timeoutMs = 30_000L)
-
-        @Provides @Singleton
         fun provideDeviceProbe(): au.com.shiftyjelly.pocketcasts.voicecontrol.asr.DeviceProbe = au.com.shiftyjelly.pocketcasts.voicecontrol.asr.DeviceProbe()
 
         @Provides @Singleton
@@ -184,6 +181,12 @@ abstract class VoiceControlModule {
         ): AppInForegroundCondition = AppInForegroundCondition(foregroundState, scope)
 
         @Provides @Singleton
+        fun provideGracePeriodActiveCondition(
+            gracePeriodSignal: GracePeriodSignal,
+            @ApplicationScope scope: CoroutineScope,
+        ): GracePeriodActiveCondition = GracePeriodActiveCondition(gracePeriodSignal, scope)
+
+        @Provides @Singleton
         fun provideOtherAppPlayingCondition(
             @ApplicationContext context: Context,
             playbackContextMonitor: PlaybackContextMonitor,
@@ -198,7 +201,6 @@ abstract class VoiceControlModule {
         @Singleton
         fun provideVoiceControlGate(
             playbackContextMonitor: PlaybackContextMonitor,
-            audioRouteMonitor: AudioRouteMonitor,
             settings: Settings,
             deviceSupported: DeviceSupportedCondition,
             modelsReady: ModelsReadyCondition,
@@ -207,6 +209,7 @@ abstract class VoiceControlModule {
             batteryOk: BatteryOkCondition,
             appInForeground: AppInForegroundCondition,
             otherAppPlaying: OtherAppPlayingCondition,
+            gracePeriodActive: GracePeriodActiveCondition,
             @ApplicationScope scope: CoroutineScope,
         ): VoiceControlGate {
             val rules: List<VoiceControlRule> = listOf(
@@ -214,8 +217,8 @@ abstract class VoiceControlModule {
                 EnabledByUserCondition(settings, scope),
                 deviceSupported,
                 modelsReady,
-                // Conflicts group
-                AudioRoutePolicyRule(audioRouteMonitor.route, settings.voiceControlAudioRoutePolicy.flow, scope),
+                // Conflicts group — audio route does not gate voice control; MicExposure
+                // only blocks capture for NoMic (spec: MicExposure does not select mode)
                 notOnCall,
                 notCasting,
                 batteryOk,
@@ -223,6 +226,7 @@ abstract class VoiceControlModule {
                 // Context group
                 appInForeground,
                 PlaybackContextActiveCondition(playbackContextMonitor.context, scope),
+                gracePeriodActive,
             )
             return VoiceControlGate(rules = rules, scope = scope)
         }
