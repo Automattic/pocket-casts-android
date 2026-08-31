@@ -7,6 +7,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.ExoPlayerDataSourceF
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
+import au.com.shiftyjelly.pocketcasts.utils.fingerprint.FingerprintDecodePolicy
+import au.com.shiftyjelly.pocketcasts.utils.fingerprint.FingerprintPolicy
 import com.automattic.eventhorizon.EventHorizon
 import dagger.Lazy
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,6 +29,8 @@ class DriftFilterTest {
     fun setUp() {
         val playbackManager = mock(PlaybackManager::class.java)
         whenever(playbackManager.playbackStateFlow).thenReturn(MutableStateFlow(PlaybackState()))
+        val decodePolicy = mock(FingerprintDecodePolicy::class.java)
+        whenever(decodePolicy.current()).thenReturn(FingerprintPolicy.PLATFORM)
         manager = FingerprintTimingManager(
             playbackManager = playbackManager,
             referenceRetriever = mock(FingerprintReferenceRetriever::class.java),
@@ -36,6 +40,7 @@ class DriftFilterTest {
             settings = mock(Settings::class.java),
             dataSourceFactory = Lazy { mock(ExoPlayerDataSourceFactory::class.java) },
             pcmTap = FingerprintPcmTap(),
+            decodePolicy = decodePolicy,
         )
         manager.debugTrackingEnabled = true
     }

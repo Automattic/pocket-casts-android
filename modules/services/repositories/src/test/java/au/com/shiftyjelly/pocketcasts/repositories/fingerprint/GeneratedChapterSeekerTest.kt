@@ -7,6 +7,7 @@ import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.utils.fingerprint.FingerprintPolicy
 import dagger.Lazy
 import java.util.Date
 import kotlin.time.Duration.Companion.seconds
@@ -63,6 +64,7 @@ class GeneratedChapterSeekerTest {
     private fun seeker(appPlatform: AppPlatform = AppPlatform.Phone) = GeneratedChapterSeeker(
         fingerprintTimingManager = Lazy { timingManager },
         appPlatform = appPlatform,
+        decodePolicy = mock { on { current() } doReturn FingerprintPolicy.PLATFORM },
     )
 
     @Test
