@@ -26,7 +26,8 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
-      id-token: write # Required by claude-code-action for GitHub App token exchange.
+      # Unused while github_token is passed below (App OIDC exchange skipped).
+      id-token: write
     steps:
       - name: Check workflow changes
         id: workflow-changes
@@ -37,7 +38,8 @@ jobs:
           WORKFLOW_PATH: .github/workflows/claude-code-review.yml
         run: |
           set -euo pipefail
-          if gh pr diff "$PR_NUMBER" --repo "$REPOSITORY" --name-only | grep -Fx "$WORKFLOW_PATH"; then
+          # Use the files API — `gh pr diff --name-only` 406s on diffs >20k lines.
+          if gh api "repos/${REPOSITORY}/pulls/${PR_NUMBER}/files?per_page=100" --paginate --jq '.[].filename' | grep -Fx "$WORKFLOW_PATH"; then
             echo "skip=true" >> "$GITHUB_OUTPUT"
             echo "Skipping Claude review because this PR changes ${WORKFLOW_PATH}; Claude app token validation requires the workflow to match the default branch."
           else

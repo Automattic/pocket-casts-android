@@ -38,7 +38,8 @@ jobs:
       pull-requests: write
       issues: write
       actions: read # Required for Claude to read CI results on PRs
-      id-token: write # Required by claude-code-action for GitHub App token exchange.
+      # Unused while github_token is passed below (App OIDC exchange skipped).
+      id-token: write
     steps:
       # issue_comment payloads identify PR comments, but do not include the PR
       # head repo. Query the PR before allowing Claude to run on fork PRs.
