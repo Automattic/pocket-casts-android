@@ -280,7 +280,7 @@ class TvSearchViewModel @Inject constructor(
     fun retryDiscoverRow(row: TvDiscoverRow) {
         viewModelScope.launch {
             val reloaded = try {
-                discoverFeedLoader.reloadSearchRow(row.id, syncManager.isLoggedIn())
+                discoverFeedLoader.reloadSearchRow(row.id, syncManager.isLoggedIn()) ?: row
             } catch (exception: CancellationException) {
                 throw exception
             } catch (exception: Exception) {

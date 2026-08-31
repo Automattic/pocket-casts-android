@@ -102,8 +102,10 @@ class TvHomeViewModel @Inject constructor(
                 playbackManager.upNextQueue.changesObservable.asFlow().map {},
                 playbackManager.playbackStateFlow
                     .onEach { if (it.isPlaying) playbackStartedThisSession = true }
+                    .map { it.isPlaying to it.episodeUuid }
+                    .distinctUntilChanged()
                     .map {},
-                playlistManager.smartEpisodesFlow(NEW_RELEASES_RULES).map {},
+                playlistManager.smartEpisodesFlow(NEW_RELEASES_RULES).distinctUntilChanged().map {},
             )
                 .debounce(LOCAL_ROWS_DEBOUNCE_MS)
                 .collect { refreshLocalRows() }
@@ -112,9 +114,10 @@ class TvHomeViewModel @Inject constructor(
 
     private suspend fun refreshLocalRows() {
         if (_uiState.value !is TvHomeUiState.Ready) return
-        val localRows = loadLocalRows(syncManager.isLoggedIn())
+        val isLoggedIn = syncManager.isLoggedIn()
+        val localRows = loadLocalRows(isLoggedIn)
         _uiState.update { current ->
-            if (current is TvHomeUiState.Ready) {
+            if (current is TvHomeUiState.Ready && isLoggedIn == syncManager.isLoggedIn()) {
                 val nonLocalRows = current.rows.filterNot { it.id in LOCAL_ROW_IDS }
                 TvHomeUiState.Ready((localRows + nonLocalRows).distinctBy(TvDiscoverRow::id))
             } else {
@@ -217,7 +220,7 @@ class TvHomeViewModel @Inject constructor(
     fun retryDiscoverRow(row: TvDiscoverRow) {
         viewModelScope.launch {
             val reloaded = try {
-                discoverFeedLoader.reloadHomeRow(row.id, syncManager.isLoggedIn())
+                discoverFeedLoader.reloadHomeRow(row.id, syncManager.isLoggedIn()) ?: row
             } catch (exception: CancellationException) {
                 throw exception
             } catch (exception: Exception) {

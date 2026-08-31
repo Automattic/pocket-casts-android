@@ -57,8 +57,11 @@ import io.reactivex.Single
 import java.util.Date
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -71,6 +74,7 @@ import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyBlocking
 import org.mockito.kotlin.verifyNoInteractions
@@ -989,6 +993,55 @@ class TvHomeViewModelTest {
 
             val reloaded = (awaitItem() as TvHomeUiState.Ready).rows.single { it.id == "trending" }
             assertTrue(reloaded is TvDiscoverRow.Podcasts)
+        }
+    }
+
+    @Test
+    fun `repeated playback updates for the same episode rebuild local rows only once`() = runTest {
+        whenever(syncManager.isLoggedIn()).thenReturn(false)
+        whenever(listRepository.getHomeDiscoverFeed(isLoggedIn = false)).thenReturn(discover())
+        whenever(upNextDao.getUpNextBaseEpisodes(any())).thenReturn(
+            listOf(episode(uuid = "episode-1", podcastUuid = "podcast-1")),
+        )
+        val playing = mock<PlaybackState> {
+            on { isPlaying } doReturn true
+            on { episodeUuid } doReturn "episode-1"
+        }
+        whenever(playbackManager.playbackStateFlow).thenReturn(
+            flow {
+                emit(playing)
+                delay(2_000)
+                emit(playing)
+                delay(2_000)
+                emit(playing)
+            },
+        )
+
+        createViewModel()
+        advanceUntilIdle()
+
+        verify(upNextDao, times(2)).getUpNextBaseEpisodes(any())
+    }
+
+    @Test
+    fun `a failed row does not shadow a populated row with the same id`() = runTest {
+        whenever(syncManager.isLoggedIn()).thenReturn(false)
+        whenever(listRepository.getHomeDiscoverFeed(isLoggedIn = false)).thenReturn(
+            discover(
+                row(id = "trending", title = "Row Trending", source = "https://lists/trending.json"),
+                row(id = "trending", title = "Row Trending Again", source = "https://lists/trending-2.json"),
+            ),
+        )
+        whenever(listRepository.getListFeedResult(eq("https://lists/trending.json"), any()))
+            .thenReturn(Result.failure(RuntimeException("boom")))
+        whenever(listRepository.getListFeed(eq("https://lists/trending-2.json"), any()))
+            .thenReturn(podcastFeed("podcast-2"))
+
+        val viewModel = createViewModel()
+
+        viewModel.uiState.test {
+            val row = (awaitItem() as TvHomeUiState.Ready).rows.single { it.id == "trending" }
+            assertTrue(row is TvDiscoverRow.Podcasts)
         }
     }
 

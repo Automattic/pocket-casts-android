@@ -105,7 +105,7 @@ class TvDiscoverFeedLoader @Inject constructor(
             Timber.e(exception, "Failed to load TV category sponsored ads")
             return@coroutineScope emptyList()
         }
-        val region = resolveRegionOrNull(discover) ?: return@coroutineScope emptyList()
+        val region = resolveRegionOrFallback(discover) ?: return@coroutineScope emptyList()
         val replacements = regionReplacements(discover, region)
         discover.layout
             .transformWithRegion(region, replacements, context.resources)
@@ -134,8 +134,12 @@ class TvDiscoverFeedLoader @Inject constructor(
             .map { row -> async { loadRow(row, includeHomeSections, replacements) } }
             .awaitAll()
             .filterNotNull()
-            // Dedup after loading so a duplicate id whose feed came back empty falls back to a populated one.
-            .distinctBy(TvDiscoverRow::id)
+            .let { rows ->
+                // Dedup after loading so a duplicate id whose feed failed or came back empty falls back to a populated one.
+                val populatedIds = rows.filterNot { it is TvDiscoverRow.Failed }.mapTo(mutableSetOf(), TvDiscoverRow::id)
+                rows.filterNot { it is TvDiscoverRow.Failed && it.id in populatedIds }
+                    .distinctBy(TvDiscoverRow::id)
+            }
     }
 
     suspend fun reloadHomeRow(rowId: String, isLoggedIn: Boolean): TvDiscoverRow? {
@@ -281,14 +285,18 @@ class TvDiscoverFeedLoader @Inject constructor(
             ?: discover.regions[discover.defaultRegionCode]
     }
 
-    private fun resolveRegion(discover: Discover): DiscoverRegion {
+    private fun resolveRegionOrFallback(discover: Discover): DiscoverRegion? {
         return resolveRegionOrNull(discover)
             ?: discover.regions[FALLBACK_REGION_CODE]
             ?: discover.regions.values.firstOrNull()
+    }
+
+    private fun resolveRegion(discover: Discover): DiscoverRegion {
+        return resolveRegionOrFallback(discover)
             ?: error("Could not resolve discover region")
     }
 
-    private fun regionReplacements(discover: Discover, region: DiscoverRegion? = resolveRegionOrNull(discover)): Map<String, String> {
+    private fun regionReplacements(discover: Discover, region: DiscoverRegion? = resolveRegionOrFallback(discover)): Map<String, String> {
         if (region == null) return emptyMap()
         return mapOf(
             discover.regionCodeToken to region.code,
