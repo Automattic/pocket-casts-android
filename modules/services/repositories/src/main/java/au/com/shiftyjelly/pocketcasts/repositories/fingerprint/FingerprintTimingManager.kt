@@ -332,7 +332,9 @@ class FingerprintTimingManager @Inject constructor(
      */
     suspend fun resolvePlaybackTime(episode: BaseEpisode, referenceTime: Duration): ChapterSeekResult {
         if (decodePolicy.current() != FingerprintPolicy.PLATFORM) {
-            return ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_UNSUPPORTED_DEVICE)
+            return densePlaybackTime(episode.uuid, referenceTime)
+                ?.let { ChapterSeekResult.Resolved(it, usedPrior = true) }
+                ?: ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_UNSUPPORTED_DEVICE)
         }
         val audioSource = episode.downloadedFilePath
             ?: episode.downloadUrl
