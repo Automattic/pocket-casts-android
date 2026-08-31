@@ -219,7 +219,7 @@ class TvDiscoverFeedLoader @Inject constructor(
             }
         if (episodes.isEmpty()) return null
         val title = feed.title?.takeIf { it.isNotBlank() } ?: row.title
-        return TvDiscoverRow.Episodes(id = row.rowId(), title = title, episodes = episodes)
+        return TvDiscoverRow.Episodes(id = row.rowId(), title = title, episodes = episodes, listId = row.analyticsListId(feed), listDatetime = feed.date)
     }
 
     private suspend fun loadCategoriesRow(row: DiscoverRow, replacements: Map<String, String>): TvDiscoverRow? {
