@@ -72,6 +72,17 @@ class DeviceApproveViewModelTest {
     }
 
     @Test
+    fun `upsell is prompted only when the user signed in during pairing`() = runTest {
+        whenever(syncManager.isLoggedIn()).thenReturn(false)
+        val signedOut = createViewModel(userCode = "ABCD12")
+        assertTrue(signedOut.shouldPromptUpsellAfterApproval)
+
+        whenever(syncManager.isLoggedIn()).thenReturn(true)
+        val signedIn = createViewModel(userCode = "ABCD12")
+        assertFalse(signedIn.shouldPromptUpsellAfterApproval)
+    }
+
+    @Test
     fun `refreshAccountState reflects the current login`() = runTest {
         whenever(syncManager.isLoggedIn()).thenReturn(false)
         whenever(syncManager.getEmail()).thenReturn(null)

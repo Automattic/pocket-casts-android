@@ -44,6 +44,7 @@ fun DeviceApprovePage(
     state: DeviceApproveUiState,
     onConnect: () -> Unit,
     onSetUpAccount: () -> Unit,
+    onDone: () -> Unit,
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -69,7 +70,7 @@ fun DeviceApprovePage(
                 title = stringResource(LR.string.device_approve_success_title),
                 message = stringResource(LR.string.device_approve_success_message),
                 buttonText = stringResource(LR.string.ok),
-                onButtonClick = onClose,
+                onButtonClick = onDone,
             )
 
             DeviceApproveStatus.ExpiredError -> ResultContent(
@@ -202,6 +203,7 @@ private fun DeviceApprovePageLoggedInPreview(
             state = DeviceApproveUiState(userCode = "ABCD12", isLoggedIn = true, email = "user@example.com"),
             onConnect = {},
             onSetUpAccount = {},
+            onDone = {},
             onClose = {},
         )
     }
@@ -217,6 +219,7 @@ private fun DeviceApprovePageLoggedOutPreview(
             state = DeviceApproveUiState(userCode = "ABCD12", isLoggedIn = false),
             onConnect = {},
             onSetUpAccount = {},
+            onDone = {},
             onClose = {},
         )
     }

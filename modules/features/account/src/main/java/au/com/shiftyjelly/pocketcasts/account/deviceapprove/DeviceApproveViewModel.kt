@@ -22,6 +22,10 @@ class DeviceApproveViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(DeviceApproveUiState())
     val uiState: StateFlow<DeviceApproveUiState> = _uiState.asStateFlow()
 
+    private val wasSignedOutInitially = !syncManager.isLoggedIn()
+
+    val shouldPromptUpsellAfterApproval get() = wasSignedOutInitially
+
     init {
         refreshAccountState()
     }

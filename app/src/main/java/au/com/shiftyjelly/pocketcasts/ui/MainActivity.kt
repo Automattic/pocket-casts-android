@@ -483,7 +483,8 @@ class MainActivity :
 
         val hasCompletedOnboarding = settings.hasCompletedOnboarding()
         val isLoggedIn = syncManager.isLoggedIn()
-        val showOnboarding = !hasCompletedOnboarding && !isLoggedIn
+        val isPairingDeepLink = deepLinkFactory.create(intent) is PairDeviceDeepLink
+        val showOnboarding = !hasCompletedOnboarding && !isLoggedIn && !isPairingDeepLink
         val needsLoginPromptAfterRestore = settings.getNeedsLoginPromptAfterRestore()
         // Only show if savedInstanceState is null in order to avoid creating onboarding activity twice.
         if (showOnboarding && savedInstanceState == null) {

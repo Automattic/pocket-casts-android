@@ -10,6 +10,7 @@ import androidx.fragment.compose.content
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -35,8 +36,9 @@ class DeviceApproveFragment : BaseDialogFragment() {
                 state = state,
                 onConnect = viewModel::connect,
                 onSetUpAccount = {
-                    OnboardingLauncher.openOnboardingFlow(requireActivity(), OnboardingFlow.LoggedOut)
+                    OnboardingLauncher.openOnboardingFlow(requireActivity(), OnboardingFlow.DeviceApproval)
                 },
+                onDone = ::finishAfterApproval,
                 onClose = ::dismiss,
             )
         }
@@ -45,6 +47,15 @@ class DeviceApproveFragment : BaseDialogFragment() {
     override fun onResume() {
         super.onResume()
         viewModel.refreshAccountState()
+    }
+
+    private fun finishAfterApproval() {
+        val activity = requireActivity()
+        val promptUpsell = viewModel.shouldPromptUpsellAfterApproval
+        dismiss()
+        if (promptUpsell) {
+            OnboardingLauncher.openOnboardingFlow(activity, OnboardingFlow.Upsell(OnboardingUpgradeSource.LOGIN))
+        }
     }
 
     companion object {
