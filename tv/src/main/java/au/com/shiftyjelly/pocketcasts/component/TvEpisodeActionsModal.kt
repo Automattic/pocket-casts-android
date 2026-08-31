@@ -127,8 +127,8 @@ private fun ColumnScope.TvEpisodeActionsModalContent(
             onCancel = ::cancelConfirmation,
         )
     } else {
-        val markAsPlayed = perform(playedToast) { actions.markAsPlayed(episode) }
-        val archiveEpisode = perform(archiveToast) { actions.archive(episode) }
+        val markAsPlayed = perform(playedToast) { actions.markAsPlayed(episode, source) }
+        val archiveEpisode = perform(archiveToast) { actions.archive(episode, source) }
 
         val buttons = tvEpisodeActionTypes(actionContext, showGoToPodcast = onGoToPodcast != null).map { button ->
             when (button) {
@@ -154,7 +154,7 @@ private fun ColumnScope.TvEpisodeActionsModalContent(
                 }
 
                 TvEpisodeActionType.TogglePlayed -> playedToggle to when {
-                    episode.isFinished -> perform(playedToast) { actions.markAsUnplayed(episode) }
+                    episode.isFinished -> perform(playedToast) { actions.markAsUnplayed(episode, source) }
 
                     tvEpisodeActionRequiresConfirmation(actionContext, button, episode) ->
                         confirm(markPlayedTitle, playedToggle, markAsPlayed)
@@ -163,7 +163,7 @@ private fun ColumnScope.TvEpisodeActionsModalContent(
                 }
 
                 TvEpisodeActionType.ToggleArchived -> archiveToggle to when {
-                    episode.isArchived -> perform(archiveToast) { actions.unarchive(episode) }
+                    episode.isArchived -> perform(archiveToast) { actions.unarchive(episode, source) }
 
                     tvEpisodeActionRequiresConfirmation(actionContext, button, episode) ->
                         confirm(archiveTitle, archiveToggle, archiveEpisode)
@@ -316,10 +316,10 @@ private object NoOpTvEpisodeActions : TvEpisodeActions {
     override fun play(episode: PodcastEpisode, source: SourceView) = Unit
     override fun playNext(episode: PodcastEpisode, source: SourceView) = Unit
     override fun playLast(episode: PodcastEpisode, source: SourceView) = Unit
-    override fun markAsPlayed(episode: PodcastEpisode) = Unit
-    override fun markAsUnplayed(episode: PodcastEpisode) = Unit
-    override fun archive(episode: PodcastEpisode) = Unit
-    override fun unarchive(episode: PodcastEpisode) = Unit
+    override fun markAsPlayed(episode: PodcastEpisode, source: SourceView) = Unit
+    override fun markAsUnplayed(episode: PodcastEpisode, source: SourceView) = Unit
+    override fun archive(episode: PodcastEpisode, source: SourceView) = Unit
+    override fun unarchive(episode: PodcastEpisode, source: SourceView) = Unit
     override fun removeFromUpNext(episode: PodcastEpisode, source: SourceView) = Unit
     override fun trackActionsShown(source: EpisodeViewSourceType) = Unit
 }
