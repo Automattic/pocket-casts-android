@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.account.deviceapprove
 
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -7,6 +8,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.fragment.app.viewModels
 import androidx.fragment.compose.content
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
@@ -30,17 +32,27 @@ class DeviceApproveFragment : BaseDialogFragment() {
     ) = content {
         val state by viewModel.uiState.collectAsState()
 
+        CallOnce {
+            viewModel.onShown()
+        }
+
         DialogBox(fillMaxHeight = false) {
             DeviceApprovePage(
                 state = state,
                 onConnect = viewModel::connect,
                 onSetUpAccount = {
+                    viewModel.onSetupAccountTapped()
                     OnboardingLauncher.openOnboardingFlow(requireActivity(), OnboardingFlow.DeviceApproval)
                 },
                 onDone = ::finishAfterApproval,
                 onClose = ::dismiss,
             )
         }
+    }
+
+    override fun onDismiss(dialog: DialogInterface) {
+        viewModel.onDismissed()
+        super.onDismiss(dialog)
     }
 
     override fun onResume() {
