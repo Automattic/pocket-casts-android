@@ -16,12 +16,12 @@ class FingerprintDecodePolicyTest {
 
     @Test
     fun `platform for huawei without a hisilicon soc`() {
-        val policy = FingerprintDecodePolicy.resolve(
+        val policy = resolve(
             sdkInt = 28,
             manufacturer = "HUAWEI",
             brand = "HUAWEI",
-            hardware = "qcom",
-            board = "msm8998",
+            hardware = "mt6762",
+            board = "mt6762",
             override = "",
         )
         assertEquals(FingerprintPolicy.PLATFORM, policy)
@@ -34,12 +34,25 @@ class FingerprintDecodePolicyTest {
 
     @Test
     fun `tap only for honor hisilicon`() {
-        val policy = FingerprintDecodePolicy.resolve(
+        val policy = resolve(
             sdkInt = 27,
             manufacturer = "HONOR",
             brand = "HONOR",
             hardware = "hi3660",
             board = "hi3660",
+            override = "",
+        )
+        assertEquals(FingerprintPolicy.TAP_ONLY, policy)
+    }
+
+    @Test
+    fun `tap only for kirin 6xx hisilicon soc codename`() {
+        val policy = resolve(
+            sdkInt = 26,
+            manufacturer = "HUAWEI",
+            brand = "HONOR",
+            hardware = "hi6250",
+            board = "hi6250",
             override = "",
         )
         assertEquals(FingerprintPolicy.TAP_ONLY, policy)
@@ -65,7 +78,7 @@ class FingerprintDecodePolicyTest {
         assertEquals(FingerprintPolicy.PLATFORM, resolvePixel(sdkInt = 28, override = "DISABLED"))
     }
 
-    private fun resolveHuaweiKirin(sdkInt: Int, override: String) = FingerprintDecodePolicy.resolve(
+    private fun resolveHuaweiKirin(sdkInt: Int, override: String) = resolve(
         sdkInt = sdkInt,
         manufacturer = "HUAWEI",
         brand = "HUAWEI",
@@ -74,12 +87,28 @@ class FingerprintDecodePolicyTest {
         override = override,
     )
 
-    private fun resolvePixel(sdkInt: Int, override: String) = FingerprintDecodePolicy.resolve(
+    private fun resolvePixel(sdkInt: Int, override: String) = resolve(
         sdkInt = sdkInt,
         manufacturer = "Google",
         brand = "google",
         hardware = "walleye",
         board = "walleye",
         override = override,
+    )
+
+    private fun resolve(
+        sdkInt: Int,
+        manufacturer: String,
+        brand: String,
+        hardware: String,
+        board: String,
+        override: String,
+    ) = FingerprintDecodePolicy.resolve(
+        sdkInt = sdkInt,
+        manufacturer = manufacturer,
+        brand = brand,
+        hardware = hardware,
+        board = board,
+        override = { override },
     )
 }

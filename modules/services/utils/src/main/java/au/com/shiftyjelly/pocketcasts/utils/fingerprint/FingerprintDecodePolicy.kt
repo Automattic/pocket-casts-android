@@ -17,10 +17,12 @@ class FingerprintDecodePolicy @Inject constructor(
         brand = Build.BRAND,
         hardware = Build.HARDWARE,
         board = Build.BOARD,
-        override = remoteConfig.getString(FirebaseConfig.FINGERPRINT_POLICY_OVERRIDE),
+        override = { remoteConfig.getString(FirebaseConfig.FINGERPRINT_POLICY_OVERRIDE) },
     )
 
     companion object {
+        private val hiSiliconSocPattern = Regex("hi\\d")
+
         @VisibleForTesting
         fun resolve(
             sdkInt: Int,
@@ -28,10 +30,10 @@ class FingerprintDecodePolicy @Inject constructor(
             brand: String,
             hardware: String,
             board: String,
-            override: String,
+            override: () -> String,
         ): FingerprintPolicy {
             if (!isAffected(sdkInt, manufacturer, brand, hardware, board)) return FingerprintPolicy.PLATFORM
-            return parseOverride(override) ?: FingerprintPolicy.TAP_ONLY
+            return parseOverride(override()) ?: FingerprintPolicy.TAP_ONLY
         }
 
         private fun isAffected(
@@ -45,7 +47,7 @@ class FingerprintDecodePolicy @Inject constructor(
             val vendor = "$manufacturer $brand".lowercase()
             val soc = "$hardware $board".lowercase()
             val isHuawei = "huawei" in vendor || "honor" in vendor
-            val isHiSilicon = "kirin" in soc || "hi3" in soc
+            val isHiSilicon = "kirin" in soc || hiSiliconSocPattern.containsMatchIn(soc)
             return isHuawei && isHiSilicon
         }
 
