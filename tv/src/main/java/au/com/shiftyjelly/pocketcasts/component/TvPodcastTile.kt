@@ -42,14 +42,14 @@ fun TvPodcastTile(
                     contentDescription = podcastTitle,
                     contentScale = ContentScale.Crop,
                     modifier = imageModifier
-                        .padding(horizontal = 18.dp, vertical = 9.dp)
+                        .padding(horizontal = 13.5.dp, vertical = 7.dp)
                         .aspectRatio(1f),
                 )
                 Text(
                     text = stringResource(LR.string.sponsored),
                     style = MaterialTheme.tvTypography.caption2,
                     color = MaterialTheme.tvColors.textSecondary,
-                    modifier = Modifier.padding(bottom = 9.dp),
+                    modifier = Modifier.padding(bottom = 7.dp),
                 )
             }
         } else {
@@ -64,7 +64,7 @@ fun TvPodcastTile(
 }
 
 object TvPodcastTileDefaults {
-    val RowImageWidth = 123.dp
+    val RowImageWidth = 92.dp
 }
 
 @Preview(device = Devices.TV_1080p)

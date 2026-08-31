@@ -58,7 +58,7 @@ fun TvPodcastInfoModal(
         modifier = modifier,
     ) {
         Row(
-            horizontalArrangement = Arrangement.spacedBy(38.dp),
+            horizontalArrangement = Arrangement.spacedBy(28.5.dp),
             modifier = Modifier
                 .fillMaxWidth()
                 .height(InfoModalHeight),
@@ -83,16 +83,16 @@ private fun PodcastInfoPane(
     val context = LocalContext.current
     val dateFormatter = remember(context) { RelativeDateFormatter(context) }
     Column(
-        verticalArrangement = Arrangement.spacedBy(24.dp),
+        verticalArrangement = Arrangement.spacedBy(18.dp),
         modifier = modifier,
     ) {
         TvArtworkImage(
             model = PodcastImage.getMediumArtworkUrl(podcast.uuid),
             modifier = Modifier
                 .size(InfoArtworkSize)
-                .clip(RoundedCornerShape(8.dp)),
+                .clip(RoundedCornerShape(6.dp)),
         )
-        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             InfoRow(
                 label = stringResource(LR.string.tv_podcast_info_network),
                 value = podcast.author.takeIf { it.isNotBlank() },
@@ -121,7 +121,7 @@ private fun InfoRow(
     if (value == null) {
         return
     }
-    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(1.5.dp)) {
         Text(
             text = label,
             style = MaterialTheme.tvTypography.caption2,
@@ -146,12 +146,12 @@ private fun PodcastDescriptionPane(
     val scrollState = rememberScrollState()
     val scope = rememberCoroutineScope()
     val focusRequester = remember { FocusRequester() }
-    val scrollStep = with(LocalDensity.current) { 120.dp.toPx() }
+    val scrollStep = with(LocalDensity.current) { 90.dp.toPx() }
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
     }
     Column(
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        verticalArrangement = Arrangement.spacedBy(9.dp),
         modifier = modifier
             .focusRequester(focusRequester)
             .onKeyEvent { event ->
@@ -218,10 +218,10 @@ private fun Podcast.displayableNextEpisode(context: Context, dateFormatter: Rela
     }
 }
 
-private val InfoModalWidth = 688.dp
-private val InfoModalHeight = 336.dp
-private val InfoPaneWidth = 176.dp
-private val InfoArtworkSize = 96.dp
+private val InfoModalWidth = 516.dp
+private val InfoModalHeight = 252.dp
+private val InfoPaneWidth = 132.dp
+private val InfoArtworkSize = 72.dp
 
 @Preview
 @Composable
@@ -229,7 +229,7 @@ private fun TvPodcastInfoModalPreview() {
     TvTheme {
         TvModalSurface(width = InfoModalWidth) {
             Row(
-                horizontalArrangement = Arrangement.spacedBy(38.dp),
+                horizontalArrangement = Arrangement.spacedBy(28.5.dp),
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(InfoModalHeight),

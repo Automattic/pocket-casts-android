@@ -87,7 +87,7 @@ fun TvFolderCard(
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(horizontal = 16.dp, vertical = cardWidth * TITLE_VERTICAL_PADDING_RATIO)
+                    .padding(horizontal = 12.dp, vertical = cardWidth * TITLE_VERTICAL_PADDING_RATIO)
                     .fillMaxWidth(),
             )
         }
@@ -103,7 +103,7 @@ private const val TITLE_VERTICAL_PADDING_RATIO = 0.064f
 @Composable
 private fun TvFolderCardPreview() {
     TvTheme {
-        Box(modifier = Modifier.background(MaterialTheme.tvColors.backgroundSunken).padding(32.dp)) {
+        Box(modifier = Modifier.background(MaterialTheme.tvColors.backgroundSunken).padding(24.dp)) {
             TvFolderCard(
                 folder = Folder(
                     uuid = "folder",
@@ -117,7 +117,7 @@ private fun TvFolderCardPreview() {
                 ),
                 coverUrls = listOf("", ""),
                 onClick = {},
-                modifier = Modifier.size(160.dp),
+                modifier = Modifier.size(120.dp),
             )
         }
     }

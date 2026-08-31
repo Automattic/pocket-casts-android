@@ -145,10 +145,10 @@ private fun TvPodcastDetailsContent(
                 var isShowingInfoModal by remember { mutableStateOf(false) }
                 var isShowingAccountModal by rememberSaveable { mutableStateOf(false) }
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(80.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(start = 32.dp, top = 16.dp, end = 32.dp),
+                        .padding(start = 42.dp, top = 16.dp, end = 42.dp),
                 ) {
                     PodcastInfo(
                         podcast = uiState.podcast,
@@ -225,7 +225,7 @@ private fun PodcastInfo(
     modifier: Modifier = Modifier,
 ) {
     Column(
-        verticalArrangement = Arrangement.spacedBy(24.dp),
+        verticalArrangement = Arrangement.spacedBy(20.dp),
         modifier = modifier,
     ) {
         TvArtworkImage(
@@ -234,7 +234,7 @@ private fun PodcastInfo(
                 .size(TvDetailsArtworkSize)
                 .clip(RoundedCornerShape(8.dp)),
         )
-        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
             if (podcast.author.isNotBlank()) {
                 Text(
                     text = podcast.author,
@@ -244,7 +244,7 @@ private fun PodcastInfo(
             }
             Text(
                 text = podcast.title,
-                style = MaterialTheme.tvTypography.title3,
+                style = MaterialTheme.tvTypography.title2,
                 color = MaterialTheme.tvColors.textPrimary,
             )
             if (podcast.podcastDescription.isNotBlank()) {
@@ -330,7 +330,7 @@ private fun EpisodeList(
         } else {
             LazyColumn(
                 state = listState,
-                verticalArrangement = Arrangement.spacedBy(12.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.weight(1f),
             ) {
                 itemsIndexed(
