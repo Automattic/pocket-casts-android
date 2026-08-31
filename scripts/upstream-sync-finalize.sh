@@ -133,15 +133,53 @@ build_pr_body() {
   } >>"$body_file"
 }
 
+push_token() {
+  # Prefer PAT so we can push .github/workflows/; fall back to Actions token.
+  if [ -n "${UPSTREAM_SYNC_PAT:-}" ]; then
+    printf '%s\n' "$UPSTREAM_SYNC_PAT"
+  elif [ -n "${GH_TOKEN:-}" ]; then
+    printf '%s\n' "$GH_TOKEN"
+  else
+    printf '%s\n' "${GITHUB_TOKEN:-}"
+  fi
+}
+
+push_token_label() {
+  if [ -n "${UPSTREAM_SYNC_PAT:-}" ]; then
+    printf 'UPSTREAM_SYNC_PAT'
+  elif [ -n "${GH_TOKEN:-}" ]; then
+    printf 'GH_TOKEN'
+  else
+    printf 'GITHUB_TOKEN'
+  fi
+}
+
+push_rejected_for_workflows() {
+  [ -f "${REPORT_DIR}/push.err" ] && grep -qiE 'workflow|workflows permission' "${REPORT_DIR}/push.err"
+}
+
 push_branch() {
-  local token="${UPSTREAM_SYNC_PAT:-${GH_TOKEN:-${GITHUB_TOKEN:-}}}"
+  local token
+  token="$(push_token)"
   if [ -z "$token" ]; then
     log "No push token available"
     return 1
   fi
 
-  local remote_url="https://x-access-token:${token}@${GITHUB_SERVER_URL#https://}/${GITHUB_REPOSITORY}.git"
-  git -C "$WORKTREE_ROOT" push "$remote_url" "HEAD:${SYNC_BRANCH}" 2>"${REPORT_DIR}/push.err"
+  local host="${GITHUB_SERVER_URL#https://}"
+  local remote_url="https://x-access-token:${token}@${host}/${GITHUB_REPOSITORY}.git"
+
+  # actions/checkout persists GITHUB_TOKEN in http.*.extraheader, which overrides
+  # credentials embedded in the remote URL. Clear it for this push only.
+  log "Pushing ${SYNC_BRANCH} with $(push_token_label)"
+  mkdir -p "$REPORT_DIR"
+  if ! git -C "$WORKTREE_ROOT" \
+    -c "http.https://${host}/.extraheader=" \
+    -c "http.https://github.com/.extraheader=" \
+    push "$remote_url" "HEAD:${SYNC_BRANCH}" 2>"${REPORT_DIR}/push.err"; then
+    return 1
+  fi
+  return 0
 }
 
 configure_git_identity() {
@@ -161,46 +199,59 @@ defer_workflow_files() {
   git diff "origin/${BASE_BRANCH}" HEAD -- '.github/workflows/' >"$patch_file"
   git checkout "origin/${BASE_BRANCH}" -- '.github/workflows/'
   if ! git diff --cached --quiet; then
-    git commit -m "chore(upstream): defer .github/workflows sync (GITHUB_TOKEN cannot push workflow files)"
+    git commit -m "chore(upstream): defer .github/workflows sync (token cannot push workflow files)"
     return 0
   fi
   return 1
+}
+
+use_pat_for_gh_cli() {
+  # gh pr create/edit should use the same privileged token when available.
+  if [ -n "${UPSTREAM_SYNC_PAT:-}" ]; then
+    export GH_TOKEN="$UPSTREAM_SYNC_PAT"
+  fi
 }
 
 main() {
   REPORT_DIR="$REPORT_DIR" BASE_BRANCH="$BASE_BRANCH" WORKTREE_ROOT="$WORKTREE_ROOT" \
     "$(dirname "$0")/upstream-sync-audit.sh" || true
   read_audit
+  use_pat_for_gh_cli
 
   if [ "${has_unresolved_conflicts:-false}" = true ]; then
     has_unresolved_conflicts=true
     add_alert "Unresolved merge conflicts remain. This PR is **not** ready to merge."
   fi
 
-  if [ "$workflow_changed" = true ] && [ -z "${UPSTREAM_SYNC_PAT:-}" ] && [ "$has_unresolved_conflicts" = false ]; then
-    if defer_workflow_files "$WORKFLOW_PATCH_FILE"; then
-      workflows_deferred=true
-      add_alert "\`.github/workflows/\` changes were merged locally but **cannot be pushed** with \`GITHUB_TOKEN\`. Workflow updates are saved as a patch below and in the workflow artifact — apply them manually with a PAT that has the \`workflow\` scope."
-    fi
-  fi
-
-  if [ "$github_changed" = true ] && [ "$workflows_deferred" != true ] && [ -z "${UPSTREAM_SYNC_PAT:-}" ]; then
-    add_alert "This merge includes \`.github/\` changes. If push fails, set the \`UPSTREAM_SYNC_PAT\` repository secret (PAT with \`workflow\` scope) so CI can push workflow files."
-  fi
-
   if [ "$has_unresolved_conflicts" = false ]; then
     if push_branch; then
       push_succeeded=true
       log "Pushed ${SYNC_BRANCH}"
+    elif push_rejected_for_workflows && [ "$workflow_changed" = true ]; then
+      log "Push rejected for workflow files — deferring .github/workflows/ and retrying"
+      cat "${REPORT_DIR}/push.err" >&2 || true
+      if defer_workflow_files "$WORKFLOW_PATCH_FILE"; then
+        workflows_deferred=true
+        add_alert "\`.github/workflows/\` changes were merged locally but **could not be pushed** (token lacks \`workflow\` permission). Workflow updates are saved as a patch below and in the workflow artifact — apply them manually, or set \`UPSTREAM_SYNC_PAT\` to a classic PAT with the \`workflow\` scope / fine-grained PAT with Workflows write."
+        if push_branch; then
+          push_succeeded=true
+          log "Pushed ${SYNC_BRANCH} after deferring workflow files"
+        else
+          push_succeeded=false
+          add_alert "Failed to push \`${SYNC_BRANCH}\` even after deferring workflow files. See workflow logs."
+          log "Push error:"
+          cat "${REPORT_DIR}/push.err" >&2 || true
+        fi
+      else
+        push_succeeded=false
+        add_alert "Push rejected for \`.github/workflows/\` changes, and deferral failed. See workflow logs."
+      fi
     else
       push_succeeded=false
       add_alert "Failed to push \`${SYNC_BRANCH}\` to origin. See workflow logs for details."
       if [ -f "${REPORT_DIR}/push.err" ]; then
         log "Push error:"
         cat "${REPORT_DIR}/push.err" >&2
-        if grep -qi 'workflow' "${REPORT_DIR}/push.err"; then
-          add_alert "Push was rejected because \`GITHUB_TOKEN\` cannot modify \`.github/workflows/\` files. Set \`UPSTREAM_SYNC_PAT\` or apply workflow changes manually."
-        fi
       fi
     fi
   else
