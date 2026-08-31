@@ -39,7 +39,7 @@ fun LazyListScope.tvDiscoverRow(
     onPlayLatestEpisode: (TvDiscoverRow, TvDiscoverPodcast) -> Unit,
     modifier: Modifier = Modifier,
     focusRequester: FocusRequester? = null,
-    contentPadding: PaddingValues = PaddingValues(horizontal = 32.dp),
+    contentPadding: PaddingValues = PaddingValues(horizontal = 42.dp),
     onTapBanner: (TvDiscoverBanner) -> Unit = {},
     onListImpression: (TvDiscoverRow) -> Unit = {},
     onRetryRow: (TvDiscoverRow) -> Unit = {},
@@ -52,7 +52,7 @@ fun LazyListScope.tvDiscoverRow(
             TvRow(
                 title = row.title,
                 items = row.podcasts,
-                itemSpacing = 32.dp,
+                itemSpacing = 24.dp,
                 contentPadding = contentPadding,
                 key = TvDiscoverPodcast::uuid,
                 focusRequester = focusRequester,
@@ -74,7 +74,7 @@ fun LazyListScope.tvDiscoverRow(
             TvRow(
                 title = row.title,
                 items = row.podcasts,
-                itemSpacing = 32.dp,
+                itemSpacing = 24.dp,
                 contentPadding = contentPadding,
                 key = TvDiscoverPodcast::uuid,
                 focusRequester = focusRequester,
@@ -96,7 +96,7 @@ fun LazyListScope.tvDiscoverRow(
             TvRow(
                 title = row.title,
                 items = row.episodes,
-                itemSpacing = 32.dp,
+                itemSpacing = 24.dp,
                 contentPadding = contentPadding,
                 key = TvDiscoverEpisode::episodeUuid,
                 focusRequester = focusRequester,
@@ -180,7 +180,7 @@ private fun TvDiscoverFailedRow(
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = modifier) {
+    Column(verticalArrangement = Arrangement.spacedBy(9.dp), modifier = modifier) {
         if (title.isNotBlank()) {
             Text(
                 text = title,
