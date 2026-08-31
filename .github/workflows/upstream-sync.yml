@@ -85,23 +85,28 @@ jobs:
             - Resolve every conflict marker and unmerged path.
             - Stage all resolved files and commit with message: `chore(upstream): merge release ${{ steps.preflight.outputs.tag }}`
             - Do NOT push or open a PR (a later step handles that).
-            - Remove the worktree when finished.
+            - Do NOT remove the worktree (a later step needs it).
 
             Do not run full builds unless required to validate a conflict resolution.
 
       - name: Log Pi agent response
         if: steps.preflight.outputs.proceed == 'true' && steps.prepare.outputs.merge_conflicts == 'true'
+        env:
+          # Use env (not ${{ }} interpolation in the script body) so multiline
+          # responses with quotes/backticks/parens do not break the shell.
+          PI_RESPONSE: ${{ steps.pi.outputs.response }}
+          PI_SUCCESS: ${{ steps.pi.outputs.success }}
         run: |
           echo "::group::Pi agent response"
-          echo "${{ steps.pi.outputs.response }}"
+          printf '%s\n' "$PI_RESPONSE"
           echo "::endgroup::"
-          if [ "${{ steps.pi.outputs.success }}" != "true" ]; then
-            echo "::warning::Pi agent did not report success (success=${{ steps.pi.outputs.success }})"
+          if [ "$PI_SUCCESS" != "true" ]; then
+            echo "::warning::Pi agent did not report success (success=${PI_SUCCESS})"
           fi
 
       - name: Finalize sync and open PR
         id: finalize
-        if: steps.preflight.outputs.proceed == 'true'
+        if: always() && steps.preflight.outputs.proceed == 'true' && steps.prepare.outcome == 'success'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           UPSTREAM_SYNC_PAT: ${{ secrets.UPSTREAM_SYNC_PAT }}

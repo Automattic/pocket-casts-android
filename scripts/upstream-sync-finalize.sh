@@ -144,9 +144,15 @@ push_branch() {
   git -C "$WORKTREE_ROOT" push "$remote_url" "HEAD:${SYNC_BRANCH}" 2>"${REPORT_DIR}/push.err"
 }
 
+configure_git_identity() {
+  git -C "$WORKTREE_ROOT" config user.name "${GIT_AUTHOR_NAME:-github-actions[bot]}"
+  git -C "$WORKTREE_ROOT" config user.email "${GIT_AUTHOR_EMAIL:-github-actions[bot]@users.noreply.github.com}"
+}
+
 defer_workflow_files() {
   local patch_file="$1"
   cd "$WORKTREE_ROOT"
+  configure_git_identity
 
   if ! git diff --name-only "origin/${BASE_BRANCH}"...HEAD -- '.github/workflows/' | grep -q .; then
     return 1

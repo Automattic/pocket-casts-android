@@ -28,10 +28,18 @@ print(max(tags, key=key))
 }
 
 tag_commit() {
-  local tag="$1"
-  git rev-parse "refs/tags/${tag}^{commit}" 2>/dev/null \
-    || git ls-remote "https://github.com/${UPSTREAM_REPO}.git" "refs/tags/${tag}^{}" \
-      | awk '{print $1}'
+  local tag="$1" commit
+  # Prefer peeled annotated-tag object from upstream; fall back to local tag.
+  commit="$(git ls-remote "https://github.com/${UPSTREAM_REPO}.git" "refs/tags/${tag}^{}" "refs/tags/${tag}" \
+    | awk 'NF { print $1; exit }')"
+  if [[ ! "$commit" =~ ^[0-9a-f]{40}$ ]]; then
+    commit="$(git rev-parse "refs/tags/${tag}^{commit}")"
+  fi
+  if [[ ! "$commit" =~ ^[0-9a-f]{40}$ ]]; then
+    log "Failed to resolve tag ${tag} to a commit SHA (got: ${commit:-empty})"
+    exit 1
+  fi
+  printf '%s\n' "$commit"
 }
 
 branch_for_tag() {
