@@ -652,6 +652,42 @@ class TvHomeViewModelTest {
     }
 
     @Test
+    fun `feed subtitle is prefixed to the feed title`() = runTest {
+        whenever(syncManager.isLoggedIn()).thenReturn(false)
+        whenever(listRepository.getHomeDiscoverFeed(isLoggedIn = false)).thenReturn(
+            discover(row(id = "rnz", title = "Row RNZ", source = "https://lists/rnz.json")),
+        )
+        whenever(listRepository.getListFeed(eq("https://lists/rnz.json"), any()))
+            .thenReturn(podcastFeed("podcast-rnz", title = "RNZ Podcasts", subtitle = "Network Highlight"))
+
+        val viewModel = createViewModel()
+
+        viewModel.uiState.test {
+            val state = awaitItem() as TvHomeUiState.Ready
+            assertEquals("Network Highlight: RNZ Podcasts", state.rows.single().title)
+        }
+    }
+
+    @Test
+    fun `feed title and subtitle are localised`() = runTest {
+        whenever(resources.getString(LR.string.discover_featured)).thenReturn("Localised featured")
+        whenever(resources.getString(LR.string.discover_trending)).thenReturn("Localised trending")
+        whenever(syncManager.isLoggedIn()).thenReturn(false)
+        whenever(listRepository.getHomeDiscoverFeed(isLoggedIn = false)).thenReturn(
+            discover(row(id = "featured", title = "Row Featured", source = "https://lists/featured.json")),
+        )
+        whenever(listRepository.getListFeed(eq("https://lists/featured.json"), any()))
+            .thenReturn(podcastFeed("podcast-featured", title = "Featured", subtitle = "Trending"))
+
+        val viewModel = createViewModel()
+
+        viewModel.uiState.test {
+            val state = awaitItem() as TvHomeUiState.Ready
+            assertEquals("Localised trending: Localised featured", state.rows.single().title)
+        }
+    }
+
+    @Test
     fun `feed failure shows error state and retry reloads`() = runTest {
         whenever(syncManager.isLoggedIn()).thenReturn(false)
         whenever(listRepository.getHomeDiscoverFeed(isLoggedIn = false))
@@ -1125,8 +1161,9 @@ class TvHomeViewModelTest {
         displayStyle = DisplayStyle.Unknown("inline_banner"),
     )
 
-    private fun podcastFeed(vararg podcastUuids: String, title: String? = null) = listFeed(
+    private fun podcastFeed(vararg podcastUuids: String, title: String? = null, subtitle: String? = null) = listFeed(
         title = title,
+        subtitle = subtitle,
         podcasts = podcastUuids.map { uuid ->
             DiscoverPodcast(
                 uuid = uuid,
@@ -1162,11 +1199,12 @@ class TvHomeViewModelTest {
 
     private fun listFeed(
         title: String? = null,
+        subtitle: String? = null,
         podcasts: List<DiscoverPodcast>? = null,
         episodes: List<DiscoverEpisode>? = null,
     ) = ListFeed(
         title = title,
-        subtitle = null,
+        subtitle = subtitle,
         description = null,
         shortDescription = null,
         date = null,
