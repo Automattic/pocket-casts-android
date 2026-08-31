@@ -44,7 +44,7 @@ class SimplePlayer(
     private val context: Context,
     private val dataSourceFactory: ExoPlayerDataSourceFactory,
     private val fingerprintPcmTap: FingerprintPcmTap? = null,
-    private val fingerprintDecodePolicy: FingerprintDecodePolicy? = null,
+    private val fingerprintDecodePolicy: FingerprintDecodePolicy,
     override val onPlayerEvent: (au.com.shiftyjelly.pocketcasts.repositories.playback.Player, PlayerEvent) -> Unit,
 ) : LocalPlayer(onPlayerEvent) {
     private val reducedBufferManufacturers = listOf("mercedes-benz")
@@ -375,7 +375,7 @@ class SimplePlayer(
             fingerprintTapEnabled = {
                 FeatureFlag.isEnabled(Feature.SYNCED_TRANSCRIPTS) &&
                     Util.getAppPlatform(context) == AppPlatform.Phone &&
-                    fingerprintDecodePolicy?.current() != FingerprintPolicy.DISABLED
+                    fingerprintDecodePolicy.current() != FingerprintPolicy.DISABLED
             },
             audioLevelMeterEnabled = { isTv },
         )
