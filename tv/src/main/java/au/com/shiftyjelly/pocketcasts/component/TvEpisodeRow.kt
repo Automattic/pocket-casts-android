@@ -78,7 +78,7 @@ fun TvEpisodeRow(
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(12.dp),
@@ -156,7 +156,7 @@ private fun EpisodeArtwork(
     TvArtworkImage(
         model = model,
         modifier = modifier
-            .size(82.dp)
+            .size(62.dp)
             .clip(RoundedCornerShape(4.dp)),
     )
 }

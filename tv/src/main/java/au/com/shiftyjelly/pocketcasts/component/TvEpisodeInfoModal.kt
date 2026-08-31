@@ -113,16 +113,16 @@ private fun EpisodeHeader(
     context: Context,
 ) {
     Row(
-        horizontalArrangement = Arrangement.spacedBy(24.dp),
+        horizontalArrangement = Arrangement.spacedBy(18.dp),
         modifier = Modifier.fillMaxWidth(),
     ) {
         TvArtworkImage(
             model = PodcastImage.getMediumArtworkUrl(episode.podcastUuid),
             modifier = Modifier
                 .size(ArtworkSize)
-                .clip(RoundedCornerShape(8.dp)),
+                .clip(RoundedCornerShape(6.dp)),
         )
-        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(4.5.dp)) {
             if (!podcastTitle.isNullOrBlank()) {
                 Text(
                     text = podcastTitle,
@@ -154,7 +154,7 @@ private fun EpisodeDescriptionPane(
     val scrollState = rememberScrollState()
     val scope = rememberCoroutineScope()
     val focusRequester = remember { FocusRequester() }
-    val scrollStep = with(LocalDensity.current) { 120.dp.toPx() }
+    val scrollStep = with(LocalDensity.current) { 90.dp.toPx() }
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
     }
@@ -207,9 +207,9 @@ private fun Date.formatSkeleton(skeleton: String): String {
     return SimpleDateFormat(DateFormat.getBestDateTimePattern(locale, skeleton), locale).format(this)
 }
 
-private val EpisodeInfoModalWidth = 760.dp
-private val ArtworkSize = 96.dp
-private val DescriptionHeight = 240.dp
+private val EpisodeInfoModalWidth = 570.dp
+private val ArtworkSize = 72.dp
+private val DescriptionHeight = 180.dp
 
 @Preview
 @Composable
