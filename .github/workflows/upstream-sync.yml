@@ -37,8 +37,8 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          chmod +x ./scripts/upstream-sync-preflight.sh
-          ./scripts/upstream-sync-preflight.sh
+          chmod +x ./.github/scripts/upstream-sync-preflight.sh
+          ./.github/scripts/upstream-sync-preflight.sh
 
       - name: Prepare upstream merge
         id: prepare
@@ -48,8 +48,8 @@ jobs:
           SYNC_COMMIT: ${{ steps.preflight.outputs.commit }}
           SYNC_BRANCH: ${{ steps.preflight.outputs.branch }}
         run: |
-          chmod +x ./scripts/upstream-sync-prepare.sh
-          ./scripts/upstream-sync-prepare.sh
+          chmod +x ./.github/scripts/upstream-sync-prepare.sh
+          ./.github/scripts/upstream-sync-prepare.sh
 
       - name: Validate Pi configuration
         if: steps.preflight.outputs.proceed == 'true' && steps.prepare.outputs.merge_conflicts == 'true'
@@ -113,8 +113,8 @@ jobs:
           PI_RESPONSE: ${{ steps.pi.outputs.response }}
           PI_SUCCESS: ${{ steps.pi.outputs.success }}
         run: |
-          chmod +x ./scripts/upstream-sync-audit.sh ./scripts/upstream-sync-finalize.sh
-          ./scripts/upstream-sync-finalize.sh
+          chmod +x ./.github/scripts/upstream-sync-audit.sh ./.github/scripts/upstream-sync-finalize.sh
+          ./.github/scripts/upstream-sync-finalize.sh
 
       - name: Sync incomplete
         if: steps.preflight.outputs.proceed == 'true' && steps.finalize.outputs.has_unresolved_conflicts == 'true'
