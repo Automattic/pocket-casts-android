@@ -4,6 +4,11 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.google.services)
+    alias(libs.plugins.sentry)
+}
+
+sentry {
+    projectName = project.findProperty("sentryTvProject")?.toString()
 }
 
 android {
@@ -31,6 +36,10 @@ android {
 
         named("release") {
             manifestPlaceholders["appIcon"] = "@mipmap/ic_launcher"
+
+            if (project.findProperty("sentryTvProject")?.toString().isNullOrBlank()) {
+                println("WARNING: Sentry configuration not found. The ProGuard mapping files won't be uploaded.")
+            }
         }
     }
 
