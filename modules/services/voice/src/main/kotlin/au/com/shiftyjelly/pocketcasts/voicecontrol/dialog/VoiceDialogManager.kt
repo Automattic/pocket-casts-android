@@ -35,7 +35,7 @@ class VoiceDialogManager @Inject constructor(
             promptHistory = (
                 previousHistory +
                     DialogPromptTurn("user", transcript) +
-                    DialogPromptTurn("model", generated)
+                    DialogPromptTurn("assistant", generated)
                 ).takeLast(MAX_PROMPT_TURNS),
         )
         return result

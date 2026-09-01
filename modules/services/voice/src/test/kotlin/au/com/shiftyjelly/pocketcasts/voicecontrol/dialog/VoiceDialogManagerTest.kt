@@ -23,7 +23,7 @@ class VoiceDialogManagerTest {
         assertEquals(
             listOf(
                 DialogPromptTurn("user", "Rename a bookmark."),
-                DialogPromptTurn("model", generated),
+                DialogPromptTurn("assistant", generated),
             ),
             manager.promptHistory(),
         )
@@ -39,7 +39,7 @@ class VoiceDialogManagerTest {
         assertEquals(
             listOf(
                 DialogPromptTurn("user", "Clear the queue."),
-                DialogPromptTurn("model", replacementGenerated),
+                DialogPromptTurn("assistant", replacementGenerated),
             ),
             manager.promptHistory(),
         )
@@ -62,9 +62,9 @@ class VoiceDialogManagerTest {
         assertEquals(
             listOf(
                 DialogPromptTurn("user", "Delete a bookmark."),
-                DialogPromptTurn("model", nativeCall("begin")),
+                DialogPromptTurn("assistant", nativeCall("begin")),
                 DialogPromptTurn("user", "The latest one."),
-                DialogPromptTurn("model", generated),
+                DialogPromptTurn("assistant", generated),
             ),
             manager.promptHistory(),
         )
@@ -79,9 +79,9 @@ class VoiceDialogManagerTest {
         assertEquals(
             listOf(
                 DialogPromptTurn("user", "The latest one."),
-                DialogPromptTurn("model", nativeCall("provide ref")),
+                DialogPromptTurn("assistant", nativeCall("provide ref")),
                 DialogPromptTurn("user", "Call it highlight."),
-                DialogPromptTurn("model", nativeCall("provide title")),
+                DialogPromptTurn("assistant", nativeCall("provide title")),
             ),
             manager.promptHistory(),
         )
@@ -93,7 +93,7 @@ class VoiceDialogManagerTest {
 
         manager.resolve("Rename a bookmark.", generated, beginCall())
 
-        assertEquals(DialogPromptTurn("model", generated), manager.promptHistory().last())
+        assertEquals(DialogPromptTurn("assistant", generated), manager.promptHistory().last())
     }
 
     @Test

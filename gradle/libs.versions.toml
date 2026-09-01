@@ -38,7 +38,6 @@ ksp = "2.3.9"
 ktlint = "1.8.0"
 ktlint-compose-rules = "0.6.3"
 lifecycle = "2.11.0"
-litertlm = { strictly = "0.13.1" }
 lottie = "6.7.1"
 measure-builds = "3.2.2"
 media3 = "1.10.1"
@@ -68,9 +67,6 @@ google-id = "1.2.0"
 [libraries]
 # JNA (required by UniFFI-generated fingerprint bindings)
 jna = { module = "net.java.dev.jna:jna", version = "5.18.1" }
-
-# LiteRT-LM
-litertlm-android = { module = "com.google.ai.edge.litertlm:litertlm-android", version.ref = "litertlm" }
 
 # About Libraries
 aboutlibraries-compose = { module = "com.mikepenz:aboutlibraries-compose", version.ref = "aboutlibraries" }
