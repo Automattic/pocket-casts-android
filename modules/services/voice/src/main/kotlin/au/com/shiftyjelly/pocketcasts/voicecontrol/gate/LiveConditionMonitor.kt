@@ -20,7 +20,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.rx2.asFlow
 import timber.log.Timber
 
 /**
@@ -75,8 +74,7 @@ class LiveConditionMonitor @Inject constructor(
         )
 
         // Cast state
-        castManager.isConnectedObservable
-            .asFlow()
+        castManager.isConnectedFlow
             .onEach { isCasting -> notCastingCondition.updateCasting(isCasting) }
             .launchIn(scope)
     }

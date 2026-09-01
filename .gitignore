@@ -74,3 +74,6 @@ developer.properties
 # Claude Code local settings
 .claude/
 .functiongemma-model/
+
+# Local scratch / working notes (not tracked)
+scratch/

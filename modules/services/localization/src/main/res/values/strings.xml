@@ -251,8 +251,13 @@
     <string name="tv_row_trending_videos">Trending Videos</string>
     <string name="tv_row_recommendations">Recommendations</string>
     <string name="tv_row_because_you_liked">Because you liked Podcast</string>
+    <string name="tv_home_keep_listening">Keep Listening</string>
+    <string name="tv_profile_starred_episodes">Starred Episodes</string>
     <string name="tv_sign_in_or_enter_code">or enter the following code</string>
     <string name="tv_sign_in_go_to_url">going to %1$s</string>
+    <string name="tv_playlists_empty_title">Your playlists live here</string>
+    <string name="tv_playlists_empty_subtitle">Build one manually or let Smart Rules do the sorting for you.</string>
+    <string name="tv_playlists_empty_action_title">Create a playlist</string>
     <string name="unavailable">Unavailable</string>
     <string name="browse_podcasts">Browse podcasts</string>
     <string name="pocket_casts_plus_badge">Pocket Casts Plus badge</string>
@@ -386,8 +391,10 @@
 
     <!-- Player -->
 
+    <string name="player_action_hide_video">Hide video</string>
     <string name="player_action_next_chapter">Next chapter</string>
     <string name="player_action_previous_chapter">Previous chapter</string>
+    <string name="player_action_show_video">Show video</string>
     <string name="player_actions">Episode actions</string>
     <string name="player_battery_warning_snackbar">Your battery restrictions may cause playback interruptions.</string>
     <string name="player_battery_warning_snackbar_action">update</string>
@@ -1301,6 +1308,11 @@
     </plurals>
     <string name="profile_stats_auto_skipping">Auto Skipping</string>
     <string name="profile_stats_listened_for">You\'ve listened for</string>
+    <string name="profile_stats_listening_activity">Listening Activity</string>
+    <string name="profile_stats_listening_activity_info_help">Information</string>
+    <string name="profile_stats_listening_activity_content_description">Listening activity heatmap</string>
+    <string name="profile_stats_listening_activity_info_title">Listening activity</string>
+    <string name="profile_stats_listening_activity_info_summary">An estimate of when you\'ve been listening, based on your playback history. If you finish an episode over a few days, it shows on the last day.</string>
     <string name="profile_stats_trim_silence">Trim Silence</string>
     <string name="profile_stats_share_to">Share to ...</string>
     <string name="profile_stats_since_listened_for">Since %s you\'ve listened for</string>
@@ -1310,8 +1322,7 @@
     <string name="profile_stats_variable_speed">Variable Speed</string>
     <string name="profile_status_error_internet">🤔\n\nUnable to load stats,\ncheck your internet connection.</string>
     <string name="profile_start_free_trial">Start Free Trial</string>
-    <string name="profile_start_free_trial_specific_duration">Start your 30-day Free Trial</string>
-    <string name="profile_try_days_for_free">Try 30 days for free</string>
+    <string name="profile_try_duration_for_free">Try %1$s for free</string>
     <string name="profile_sub_android_goto">To cancel your subscription, you&#x2019;ll need to cancel via the Google Play Store.</string>
     <string name="profile_sub_cancel_hint0">Your current subscription will remain active until</string>
     <string name="profile_sub_cancel_hint1">Access to Pocket Casts Plus features will be locked</string>
@@ -1416,6 +1427,8 @@
     <string name="settings_apply_group_by">Would you like to change all your existing podcasts to be grouped by %s?</string>
     <string name="settings_apply_to_existing">Apply to existing</string>
     <string name="settings_apply_to_existing_podcasts">Apply to existing podcasts?</string>
+    <string name="settings_audio_only">Audio only</string>
+    <string name="settings_audio_only_summary">If on, episodes with video will play as audio only, saving data.</string>
     <string name="settings_auto_archive_episode_limit">Episode limit</string>
     <string name="settings_auto_archive_episode_limit_summary">For shows that release hourly or daily episodes, setting an episode limit can help keep only the most recent ones, while archiving any that are older.</string>
     <string name="settings_auto_archive_inactive">Archive inactive episodes</string>
@@ -1542,6 +1555,8 @@
     <string name="settings_fix_downloads_started_message">Downloads fix will start shortly. Check notifications for progress.</string>
     <string name="settings_fix_downloads_complete_title">Fixing downloads complete</string>
     <string name="settings_fix_downloads_complete_message">Fixed %d downloads</string>
+    <string name="settings_generated_chapters">Generated chapters</string>
+    <string name="settings_generated_chapters_summary">Show automatically generated chapters when available.</string>
     <string name="settings_inactive_episodes">Inactive episodes</string>
     <string name="settings_instagram">instagram link</string>
     <string name="settings_keep_screen_awake">Keep screen awake</string>

@@ -32,6 +32,10 @@
         android:theme="@style/Theme.AppCompat.NoActionBar"
         android:appCategory="audio">
 
+        <meta-data
+            android:name="pocketcasts_tv"
+            android:value="true" />
+
         <activity
             android:name=".TvActivity"
             android:exported="true">

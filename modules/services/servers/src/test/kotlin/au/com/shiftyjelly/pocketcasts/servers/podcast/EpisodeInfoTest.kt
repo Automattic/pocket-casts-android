@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.servers.podcast
 
 import androidx.media3.common.MimeTypes
+import au.com.shiftyjelly.pocketcasts.models.entity.firstHlsStreamUrl
 import com.squareup.moshi.Moshi
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -26,7 +27,7 @@ class EpisodeInfoTest {
 
         val episode = episodeInfo?.toEpisode("podcast-uuid")
         assertEquals("https://example.com/episode.mp3", episode?.downloadUrl)
-        assertEquals("https://example.com/master.m3u8", episode?.hlsUrl)
+        assertEquals("https://example.com/master.m3u8", episode?.alternateEnclosures?.firstHlsStreamUrl())
     }
 
     @Test
@@ -51,7 +52,7 @@ class EpisodeInfoTest {
             """.trimIndent(),
         )
 
-        assertEquals("https://example.com/master.m3u8", episodeInfo?.toEpisode("podcast-uuid")?.hlsUrl)
+        assertEquals("https://example.com/master.m3u8", episodeInfo?.toEpisode("podcast-uuid")?.alternateEnclosures?.firstHlsStreamUrl())
     }
 
     @Test
@@ -93,8 +94,8 @@ class EpisodeInfoTest {
         )
 
         val episode = episodeInfo!!.toEpisode("podcast-uuid")
-        // The HLS enclosure is selected for the streaming fast-path.
-        assertEquals("https://example.com/master.m3u8", episode?.hlsUrl)
+        // The HLS enclosure is selectable for streaming.
+        assertEquals("https://example.com/master.m3u8", episode?.alternateEnclosures?.firstHlsStreamUrl())
 
         val enclosures = episodeInfo.toAlternateEnclosures()
         assertEquals(2, enclosures.size)
@@ -126,13 +127,54 @@ class EpisodeInfoTest {
     }
 
     @Test
+    fun `hls-only episode without a progressive url is detected as hls-only`() {
+        val episodeInfo = adapter.fromJson(
+            """
+            {
+              "uuid": "episode-uuid",
+              "url": "",
+              "published": "2026-06-11T00:00:00Z",
+              "alternate_enclosures": [
+                { "type": "application/x-mpegURL", "length": 0, "sources": [{ "uri": "https://example.com/master.m3u8" }] }
+              ]
+            }
+            """.trimIndent(),
+        )
+
+        val episode = episodeInfo?.toEpisode("podcast-uuid")
+        assertEquals(MimeTypes.APPLICATION_M3U8, episode?.fileType)
+        assertEquals(true, episode?.isHlsOnly)
+    }
+
+    @Test
+    fun `hls-only video episode keeps its video file type`() {
+        val episodeInfo = adapter.fromJson(
+            """
+            {
+              "uuid": "episode-uuid",
+              "url": "",
+              "file_type": "video/mp4",
+              "published": "2026-06-11T00:00:00Z",
+              "alternate_enclosures": [
+                { "type": "application/x-mpegURL", "length": 0, "sources": [{ "uri": "https://example.com/master.m3u8" }] }
+              ]
+            }
+            """.trimIndent(),
+        )
+
+        val episode = episodeInfo?.toEpisode("podcast-uuid")
+        assertEquals("video/mp4", episode?.fileType)
+        assertEquals(true, episode?.isVideo)
+    }
+
+    @Test
     fun `parse episode without alternate enclosures`() {
         val episodeInfo = adapter.fromJson(
             """{"uuid":"episode-uuid","url":"https://example.com/episode.mp3","published":"2026-06-11T00:00:00Z"}""",
         )
 
         assertNull(episodeInfo?.alternateEnclosures)
-        assertNull(episodeInfo?.toEpisode("podcast-uuid")?.hlsUrl)
+        assertNull(episodeInfo?.toEpisode("podcast-uuid")?.alternateEnclosures?.firstHlsStreamUrl())
     }
 
     @Test
@@ -150,6 +192,6 @@ class EpisodeInfoTest {
             """.trimIndent(),
         )
 
-        assertNull(episodeInfo?.toEpisode("podcast-uuid")?.hlsUrl)
+        assertNull(episodeInfo?.toEpisode("podcast-uuid")?.alternateEnclosures?.firstHlsStreamUrl())
     }
 }

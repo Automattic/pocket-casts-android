@@ -13,14 +13,16 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.focusRestorer
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.PlatformTextStyle
@@ -74,21 +76,32 @@ fun <T> TvRow(
                 .padding(bottom = 17.dp),
         )
 
-        val firstItemFocusRequester = remember { FocusRequester() }
+        var lastFocusedIndex by rememberSaveable(items) { mutableIntStateOf(0) }
+        val focusRequesters = remember(items) { List(items.size) { FocusRequester() } }
 
         LazyRow(
             contentPadding = contentPadding,
             horizontalArrangement = Arrangement.spacedBy(itemSpacing),
             modifier = Modifier
                 .focusGroup()
-                .focusRestorer(firstItemFocusRequester),
+                .focusProperties {
+                    onEnter = {
+                        focusRequesters.getOrNull(lastFocusedIndex)?.requestFocus()
+                    }
+                },
         ) {
             itemsIndexed(
                 items = items,
                 key = key?.let { k -> { _, item: T -> k(item) } },
             ) { index, item ->
                 Box(
-                    modifier = if (index == 0) Modifier.focusRequester(firstItemFocusRequester) else Modifier,
+                    modifier = Modifier
+                        .focusRequester(focusRequesters[index])
+                        .onFocusChanged { focusState ->
+                            if (focusState.hasFocus) {
+                                lastFocusedIndex = index
+                            }
+                        },
                 ) {
                     content(item)
                 }

@@ -1,13 +1,93 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-06-15 18:10:08+0000
+Translation-Revision-Date: 2026-08-12 09:57:16+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="tv_playlist_play_all_save_and_play">保存して再生</string>
+    <string name="tv_playlist_play_all_play_without_saving">保存せずに再生</string>
+    <string name="tv_episode_removed_from_up_next">次のエピソードから削除しました</string>
+    <string name="tv_sign_in_title">Pocket Casts にログイン</string>
+    <string name="tv_create_account_modal_title">ポッドキャストにはホームが必要です</string>
+    <string name="tv_create_account_modal_subtitle">無料アカウントを作成すると、あらゆる端末でポッドキャストをフォローしたり、次のエピソードを設定したり、中断した場所から開始したりできます。</string>
+    <string name="tv_episode_marked_as_played">再生済みとしてマークしました</string>
+    <string name="tv_episode_marked_as_unplayed">未再生とマークしました</string>
+    <string name="tv_episode_archived">アーカイブしました</string>
+    <string name="tv_episode_unarchived">アーカイブ解除しました</string>
+    <string name="tv_episode_will_play_next">次に再生</string>
+    <string name="tv_episode_will_play_last">最後に再生</string>
+    <string name="tv_podcast_schedule_monthly">毎月</string>
+    <string name="tv_podcast_schedule_fortnightly">2週間おき</string>
+    <string name="tv_podcast_schedule_weekly">毎週</string>
+    <string name="tv_podcast_schedule_daily">毎日</string>
+    <string name="tv_podcast_schedule_hourly">毎時間</string>
+    <string name="tv_podcast_next_episode_soon">近日登場</string>
+    <string name="tv_podcast_next_episode_tomorrow">明日</string>
+    <string name="tv_podcast_info_next_episode">次のエピソード</string>
+    <string name="tv_podcast_info_schedule">予約</string>
+    <string name="tv_podcast_info_website">サイト</string>
+    <string name="tv_podcast_info_network">ネットワーク</string>
+    <string name="tv_create_account_modal_step_create">アカウントを作成、またはログイン</string>
+    <string name="tv_sign_in_step_confirm_code">尋ねられた場合は、以下のコードで確認してください</string>
+    <string name="tv_sign_in_step_login">アカウントにログイン</string>
+    <string name="tv_sign_in_step_scan">QR コードをスキャン、または %1$s に移動</string>
+    <string name="tv_podcast_more_info">詳細情報</string>
+    <string name="tv_podcast_follow">このポッドキャストをフォロー</string>
+    <string name="tv_folder_empty_message">モバイルアプリでこのフォルダーにポッドキャストを追加すると、こちらに表示されます。</string>
+    <string name="tv_up_next_empty_action_title">すべてのエピソード</string>
+    <string name="tv_your_podcasts_empty_action_title">ポッドキャストをディスカバー</string>
+    <string name="tv_your_podcasts_empty_subtitle">フォロー中のポッドキャストがこちらに表示され、再生できます。</string>
+    <string name="tv_your_podcasts_empty_title">ここを埋めてみましょう</string>
+    <string name="tv_up_next_empty_subtitle">エピソードを「次のエピソード」に追加すると、順番に再生されます</string>
+    <string name="tv_up_next_empty_title">待機がありません</string>
+    <string name="tv_episode_details">エピソードの詳細</string>
+    <string name="playlist">プレイリスト</string>
+    <string name="tv_playlist_empty_subtitle_manual">モバイルアプリからこのプレイリストにエピソードを追加すると、こちらに表示されます。</string>
+    <string name="tv_playlist_empty_subtitle">このリストの再生が完了しました。モバイルアプリでルールを編集するとさらに追加できます。</string>
+    <string name="tv_playlists_download_title">スマートフォンでプレイリストを作成</string>
+    <string name="tv_playlist_empty_title">エピソードなし</string>
+    <string name="tv_playlist_play_all">すべてのエピソードを再生</string>
+    <string name="tv_playlists_download_subtitle">完了するとこちらに表示されます。 スキャンしてアプリを取得</string>
+    <string name="tv_playlists_empty_title">プレイリストはこちらに表示されます</string>
+    <string name="tv_playlists_empty_subtitle">手動で作成するか、スマートルールで並べ替えを行います。</string>
+    <string name="tv_playlists_empty_action_title">プレイリストを作成</string>
+    <string name="tv_profile_starred_episodes">星付きエピソード</string>
+    <string name="tv_home_keep_listening">聴取を継続</string>
+    <string name="settings_audio_only_summary">オンにすると、動画のあるエピソードは音声のみとして再生され、データが節約されます。</string>
+    <string name="settings_audio_only">音声のみ</string>
+    <string name="profile_try_duration_for_free">無料で %1$s お試し</string>
+    <string name="settings_generated_chapters_summary">自動生成されたチャプターを表示します (利用可能な場合)。</string>
+    <string name="settings_generated_chapters">生成されたチャプター</string>
+    <string name="profile_stats_listening_activity_info_summary">再生履歴に基づいた再生タイミングの概算。  エピソードを数日にわたって完了した場合は、最終日に表示されます。</string>
+    <string name="profile_stats_listening_activity_info_title">聴取アクティビティ</string>
+    <string name="profile_stats_listening_activity_info_help">情報</string>
+    <string name="profile_stats_listening_activity_content_description">聴取アクティビティのヒートマップ</string>
+    <string name="profile_stats_listening_activity">聴取アクティビティ</string>
+    <string name="player_action_show_video">動画を表示</string>
+    <string name="player_action_hide_video">動画を非表示</string>
+    <string name="up_next_sort_duration_tooltip_body">短いエピソードから長いエピソード、またはその逆に並べ替えて、あなたの時間に合わせます。</string>
+    <string name="up_next_sort_duration_tooltip_title">所要時間で並び替え</string>
+    <string name="transcript_tap_to_seek_streaming_unavailable">エピソードをダウンロードし、タップして検索</string>
+    <string name="bookmark_play_from">%s から再生</string>
+    <string name="summary_upsell_description">Plus サブスクリプションに登録すると、Plus にアクセスし、ブックマークやフォルダーなどのその他のプレミアム機能もご利用いただけます。</string>
+    <string name="summary_upsell_title">AI を活用した概要</string>
     <string name="tv_create_account_subtitle">このコードをスキャンして、スマートフォンで開始できます。わずか1分で完了します。</string>
+    <string name="tv_create_account_come_back">アカウントを作成したら、こちらに戻ってログインしてください</string>
     <string name="tv_create_account_title">無料アカウントを作成</string>
+    <string name="tv_onboarding_syncing_subtitle">ポッドキャストを同期しています。間もなくログインします。</string>
+    <string name="tv_onboarding_welcome_back">おかえりなさい。</string>
+    <string name="tv_onboarding_sign_in_instructions">カメラを開き、この QR コードに向けます</string>
+    <string name="tv_onboarding_sign_in_title">スマートフォンでログイン</string>
+    <string name="tv_onboarding_syncing">ポッドキャストを同期しています\u2026</string>
+    <string name="tv_onboarding_browse_without_account">アカウントなしで閲覧</string>
+    <string name="tv_onboarding_create_free_account">無料アカウントを作成</string>
+    <string name="tv_onboarding_subtitle">ポッドキャストを大画面で</string>
+    <string name="tv_onboarding_welcome_tv">Pocket Casts TV へようこそ</string>
+    <string name="tv_onboarding_welcome">Pocket Casts へようこそ</string>
+    <string name="sort_longest_to_shortest">長い順</string>
+    <string name="sort_shortest_to_longest">短い順</string>
     <string name="synced_transcripts_whats_new_button_note">同期されたトランスクリプトは最近のエピソードでのみ利用可能です。</string>
     <string name="synced_transcripts_whats_new_message">すばやく読んで、逃さない。 聞き逃した名前、紹介された本、気になった統計情報。文字をタップして、そこまでジャンプ。</string>
     <string name="synced_transcripts_whats_new_title">併せて読む。 2倍速でも。</string>
@@ -108,14 +188,10 @@ Language: ja_JP
     <string name="watch_synced_successfully">視聴の同期に成功しました</string>
     <string name="watch_sync_waiting_for_phone">スマートフォンの同期を待機中…</string>
     <string name="watch_sync_retry">もう一度試す</string>
-    <string name="watch_sync_error_unknown_help">もう一度試すか、手動でログインする</string>
     <string name="watch_sync_error_login_failed_help">手動でログインを試す</string>
     <string name="watch_sync_error_no_connection_help">スマートフォンへの Bluetooth 接続を確認する</string>
-    <string name="watch_sync_error_timeout_help">スマートフォンが近くにあり、Bluetooth 経由で接続されていることを確認してください</string>
-    <string name="watch_sync_error_unknown">エラーが発生しました</string>
     <string name="watch_sync_error_login_failed">ログインに失敗しました</string>
     <string name="watch_sync_error_no_connection">スマートフォンが接続されていません</string>
-    <string name="watch_sync_error_timeout">スマートフォンに接続できませんでした</string>
     <string name="watch_sync_success">スマートフォンからログインしました</string>
     <string name="watch_sync_syncing">スマートフォンと同期中…</string>
     <string name="error_download_generic_failure">エピソードをダウンロードできませんでした。 %1$s</string>
@@ -2373,6 +2449,12 @@ Language: ja_JP
     </plurals>
     <plurals name="settings_auto_download_on_follow_podcast_description">
         <item quantity="other">フォローする新しい番組から最新エピソード%s件を自動でダウンロードします。</item>
+    </plurals>
+    <plurals name="tv_playlist_all_archived">
+        <item quantity="other">このプレイリストの%1$d件のエピソードがすべてアーカイブされました。</item>
+    </plurals>
+    <plurals name="tv_podcast_all_archived">
+        <item quantity="other">このポッドキャストの%1$d件のエピソードがすべてアーカイブされました。</item>
     </plurals>
     <plurals name="week_with_count">
         <item quantity="other">%1$d週</item>

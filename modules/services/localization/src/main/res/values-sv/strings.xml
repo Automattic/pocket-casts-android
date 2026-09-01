@@ -1,13 +1,93 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-06-15 18:10:08+0000
+Translation-Revision-Date: 2026-08-11 13:56:43+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="tv_playlist_play_all_save_and_play">Spara och spela</string>
+    <string name="tv_playlist_play_all_play_without_saving">Spela upp utan att spara</string>
+    <string name="tv_episode_removed_from_up_next">Borttagen från Nästa</string>
+    <string name="tv_sign_in_title">Logga in i Pocket Casts</string>
+    <string name="tv_create_account_modal_title">Dina podcasts förtjänar ett hem</string>
+    <string name="tv_create_account_modal_subtitle">Skapa ett gratis konto för att följa podcasts, bygga din Nästa och fortsätta där du slutade på vilken enhet som helst.</string>
+    <string name="tv_episode_marked_as_played">Markera som spelad</string>
+    <string name="tv_episode_marked_as_unplayed">Markerat som ej uppspelat</string>
+    <string name="tv_episode_archived">Arkiverad</string>
+    <string name="tv_episode_unarchived">Avarkiverad</string>
+    <string name="tv_episode_will_play_next">Spelas upp härnäst</string>
+    <string name="tv_episode_will_play_last">Spelas upp sist</string>
+    <string name="tv_podcast_schedule_monthly">Månadsvis</string>
+    <string name="tv_podcast_schedule_fortnightly">Varannan vecka</string>
+    <string name="tv_podcast_schedule_weekly">Veckovis</string>
+    <string name="tv_podcast_schedule_daily">Dagligen</string>
+    <string name="tv_podcast_schedule_hourly">Varje timme</string>
+    <string name="tv_podcast_next_episode_soon">Vilken dag som helst</string>
+    <string name="tv_podcast_next_episode_tomorrow">Imorgon</string>
+    <string name="tv_podcast_info_next_episode">Nästa avsnitt</string>
+    <string name="tv_podcast_info_schedule">Schema</string>
+    <string name="tv_podcast_info_website">Webbplats</string>
+    <string name="tv_podcast_info_network">Nätverk</string>
+    <string name="tv_create_account_modal_step_create">Skapa ditt konto eller logga in</string>
+    <string name="tv_sign_in_step_confirm_code">Om du blir tillfrågad, bekräfta med koden nedan</string>
+    <string name="tv_sign_in_step_login">Logga in med ditt konto.</string>
+    <string name="tv_sign_in_step_scan">Skanna QR-koden eller gå till %1$s</string>
+    <string name="tv_podcast_more_info">Mer information</string>
+    <string name="tv_podcast_follow">Följ denna podcast</string>
+    <string name="tv_folder_empty_message">Lägg till podcasts i den här mappen i mobilappen så visas de här.</string>
+    <string name="tv_up_next_empty_action_title">Lägg till avsnitt</string>
+    <string name="tv_your_podcasts_empty_action_title">Upptäck podcasts</string>
+    <string name="tv_your_podcasts_empty_subtitle">Följda podcasts visas här, redo att spelas upp.</string>
+    <string name="tv_your_podcasts_empty_title">Dags att fylla tomrummet</string>
+    <string name="tv_up_next_empty_subtitle">Lägg till avsnitt i Nästa så spelas de upp i ordning, ett efter ett.</string>
+    <string name="tv_up_next_empty_title">Inget köat</string>
+    <string name="tv_episode_details">Avsnittsinformation</string>
+    <string name="playlist">Spellista</string>
+    <string name="tv_playlist_empty_subtitle_manual">Lägg till avsnitt i den här spellistan från mobilappen så visas de här.</string>
+    <string name="tv_playlist_empty_subtitle">Det är antingen dags att fira att den här listan är slutförd eller att redigera dina regler i mobilappen för att hitta mer innehåll.</string>
+    <string name="tv_playlists_download_title">Skapa spellistor på din telefon</string>
+    <string name="tv_playlist_empty_title">Inga avsnitt</string>
+    <string name="tv_playlist_play_all">Spela upp alla avsnitt</string>
+    <string name="tv_playlists_download_subtitle">De väntar här när du är klar. Skanna för att hämta appen</string>
+    <string name="tv_playlists_empty_title">Dina spellistor live här</string>
+    <string name="tv_playlists_empty_subtitle">Bygg en manuellt eller låt smarta regler sortera åt dig.</string>
+    <string name="tv_playlists_empty_action_title">Skapa en spellista</string>
+    <string name="tv_profile_starred_episodes">Stjärnmärkta avsnitt</string>
+    <string name="tv_home_keep_listening">Fortsätt lyssna</string>
+    <string name="settings_audio_only_summary">Om detta är aktiverat spelas avsnitt med video endast upp som ljud, vilket sparar data.</string>
+    <string name="settings_audio_only">Endast ljud</string>
+    <string name="profile_try_duration_for_free">Testa %1$s gratis</string>
+    <string name="settings_generated_chapters_summary">Visa automatiskt genererade kapitel när de är tillgängliga.</string>
+    <string name="settings_generated_chapters">Genererade kapitel</string>
+    <string name="profile_stats_listening_activity_info_summary">En uppskattning av när du har lyssnat, baserat på din uppspelningshistorik. Om du avslutar ett avsnitt under några dagar visas det på den sista dagen.</string>
+    <string name="profile_stats_listening_activity_info_title">Lyssningsaktivitet</string>
+    <string name="profile_stats_listening_activity_info_help">Information</string>
+    <string name="profile_stats_listening_activity">Lyssningsaktivitet</string>
+    <string name="profile_stats_listening_activity_content_description">Färgdiagram över lyssningsaktivitet</string>
+    <string name="player_action_show_video">Visa videoklipp</string>
+    <string name="player_action_hide_video">Dölj videoklipp</string>
+    <string name="up_next_sort_duration_tooltip_body">Kortaste till längsta, eller tvärtom – passa in avsnittet på den tid du faktiskt har.</string>
+    <string name="up_next_sort_duration_tooltip_title">Sortera efter varaktighet</string>
+    <string name="transcript_tap_to_seek_streaming_unavailable">Ladda ner avsnittet och tryck för att söka</string>
+    <string name="bookmark_play_from">Spela upp från %s</string>
+    <string name="summary_upsell_description">Prenumerera på Plus för att få åtkomst till den och andra Premium-funktioner som bokmärken och mappar.</string>
+    <string name="summary_upsell_title">AI-drivna sammanfattningar</string>
     <string name="tv_create_account_subtitle">Skanna denna kod för att komma igång på din telefon, det tar bara en minut.</string>
+    <string name="tv_create_account_come_back">Kom tillbaka och logga in när du har skapat ditt konto</string>
     <string name="tv_create_account_title">Skapa ditt gratis konto</string>
+    <string name="tv_onboarding_syncing_subtitle">Dina podcasts synkroniseras, vi loggar in dig snart!</string>
+    <string name="tv_onboarding_welcome_back">Välkommen tillbaka!</string>
+    <string name="tv_onboarding_sign_in_instructions">Öppna kameran och peka på denna QR-kod</string>
+    <string name="tv_onboarding_sign_in_title">Logga in med din telefon</string>
+    <string name="tv_onboarding_syncing">Synkroniserar dina podcasts\u2026</string>
+    <string name="tv_onboarding_browse_without_account">Bläddra utan ett konto</string>
+    <string name="tv_onboarding_create_free_account">Skapa gratis konto</string>
+    <string name="tv_onboarding_subtitle">Dina podcasts på den stora skärmen</string>
+    <string name="tv_onboarding_welcome_tv">Välkommen till Pocket Casts TV</string>
+    <string name="tv_onboarding_welcome">Välkommen till Pocket Casts</string>
+    <string name="sort_longest_to_shortest">Längsta till kortaste</string>
+    <string name="sort_shortest_to_longest">Kortaste till längsta</string>
     <string name="synced_transcripts_whats_new_button_note">Synkroniserade transkriptioner är bara tillgängliga för de senaste avsnitten.</string>
     <string name="synced_transcripts_whats_new_message">Läs snabbt, missa ingenting. Namnet du svepte förbi, boken de rekommenderade, statistiken du ville ha — tryck på ordet och hoppa tillbaka.</string>
     <string name="synced_transcripts_whats_new_title">Läs med. Även vid 2x.</string>
@@ -105,16 +185,12 @@ Language: sv_SE
     <string name="episode_row_waiting_for_storage">Väntar på lagringsutrymme</string>
     <string name="podcasts_download_storage">Nedladdning väntar på lagringsutrymme</string>
     <string name="watch_sync_retry">Försök igen</string>
-    <string name="watch_sync_error_unknown_help">Försök igen eller logga in manuellt</string>
     <string name="watch_sync_error_login_failed_help">Försök logga in manuellt</string>
-    <string name="watch_sync_error_unknown">Något gick fel</string>
     <string name="watch_sync_error_login_failed">Inloggning misslyckades</string>
     <string name="watch_sync_error_no_connection">Telefon inte ansluten</string>
-    <string name="watch_sync_error_timeout">Kunde inte ansluta till telefon</string>
     <string name="watch_sync_success">Inloggad från telefon!</string>
     <string name="watch_sync_syncing">Synkroniserar med telefon …</string>
     <string name="error_download_generic_failure">Misslyckades att ladda ner avsnittet. %1$s</string>
-    <string name="watch_sync_error_timeout_help">Se till att din telefon är i närheten och ansluten via Bluetooth</string>
     <string name="watch_sync_error_no_connection_help">Kontrollera Bluetooth-anslutning till din telefon</string>
     <string name="watch_sync_failed">Kunde inte synkronisera till klocka</string>
     <string name="watch_synced_successfully">Klockan har synkroniserats</string>
@@ -131,7 +207,8 @@ Language: sv_SE
     <string name="playlist_limit_reached">Spellistor kan innehålla högst %d avsnitt.</string>
     <string name="playlist_limit_almost_full">Spellistan är nästan full. Prova att lägga till färre avsnitt.</string>
     <string name="podcasts_add_episode">Lägg till</string>
-    <string name="add_to_up_next_bottom">Spela upp senaste i Up Next</string>
+    <string name="add_to_up_next_top">Spela upp nästa i Nästa</string>
+    <string name="add_to_up_next_bottom">Spela upp sist i Nästa</string>
     <string name="winback_cancel_subscription_perk_installment">Du har ett paket med en 12-månaders avbetalningsplan. Om du avbryter din prenumeration upphör din åtkomst, men Google Play fortsätter att debitera dig för de återstående månaderna.</string>
     <string name="winback_cancel_subscription_header_description_installment">Om du avbryter upphör din Pocket Casts-prenumeration.\nDin betalningsplan för Google Play fortsätter.</string>
     <string name="winback_cancel_subscription_perk_history">Dina podcasts och din lyssningshistorik fortsätter att vara tillgängliga.</string>
@@ -2406,6 +2483,14 @@ Language: sv_SE
     <plurals name="settings_auto_download_on_follow_podcast_description">
         <item quantity="one">Ladda automatiskt ner det senaste avsnittet från nya shower som du följer.</item>
         <item quantity="other">Ladda automatiskt ner de %s avsnitten från nya shower som du följer.</item>
+    </plurals>
+    <plurals name="tv_playlist_all_archived">
+        <item quantity="one">Det enda avsnittet i den här spellistan har arkiverats.</item>
+        <item quantity="other">Alla %1$d avsnitt i den här spellistan har arkiverats.</item>
+    </plurals>
+    <plurals name="tv_podcast_all_archived">
+        <item quantity="one">Det enda avsnittet av den här podcasten har arkiverats.</item>
+        <item quantity="other">Alla %1$d avsnitt av den här podcasten har arkiverats.</item>
     </plurals>
     <plurals name="week_with_count">
         <item quantity="one">%1$d vecka</item>

@@ -15,10 +15,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -32,6 +35,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -44,6 +48,7 @@ import androidx.compose.ui.unit.sp
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
 import au.com.shiftyjelly.pocketcasts.compose.components.TextC70
@@ -51,6 +56,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
+import au.com.shiftyjelly.pocketcasts.compose.stats.CalendarHeatMap
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.helper.StatsHelper
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -59,12 +65,18 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getActivity
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toLocalizedFormatLongStyle
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.HeatmapInfoOpenedEvent
+import com.automattic.eventhorizon.HeatmapShownEvent
 import com.automattic.eventhorizon.StatsDismissedEvent
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Date
 import javax.inject.Inject
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
@@ -91,6 +103,8 @@ class StatsFragment : BaseFragment() {
                 },
                 onRetryClick = { viewModel.loadStats() },
                 launchReviewDialog = { viewModel.launchAppReviewDialog(it) },
+                onShowHeatmap = { eventHorizon.track(HeatmapShownEvent) },
+                onListeningActivityInfoClick = { showListeningActivityInfoDialog() },
                 bottomInset = bottomInset.value.pxToDp(LocalContext.current).dp,
             )
         }
@@ -106,6 +120,16 @@ class StatsFragment : BaseFragment() {
         eventHorizon.track(StatsDismissedEvent)
         return super.onBackPressed()
     }
+
+    private fun showListeningActivityInfoDialog() {
+        eventHorizon.track(HeatmapInfoOpenedEvent)
+        ConfirmationDialog()
+            .setTitle(getString(LR.string.profile_stats_listening_activity_info_title))
+            .setSummary(getString(LR.string.profile_stats_listening_activity_info_summary))
+            .setButtonType(ConfirmationDialog.ButtonType.Normal(getString(LR.string.got_it)))
+            .setOnConfirm {}
+            .show(parentFragmentManager, "listening_activity_info")
+    }
 }
 
 @Composable
@@ -114,6 +138,8 @@ private fun StatsPage(
     onBackPress: () -> Unit,
     onRetryClick: () -> Unit,
     launchReviewDialog: (AppCompatActivity) -> Unit,
+    onShowHeatmap: () -> Unit,
+    onListeningActivityInfoClick: () -> Unit,
     bottomInset: Dp,
 ) {
     Column {
@@ -122,7 +148,7 @@ private fun StatsPage(
             onNavigationClick = onBackPress,
         )
         when (state) {
-            is StatsViewModel.State.Loaded -> StatsPageLoaded(state, bottomInset, launchReviewDialog)
+            is StatsViewModel.State.Loaded -> StatsPageLoaded(state, bottomInset, launchReviewDialog, onShowHeatmap, onListeningActivityInfoClick)
             is StatsViewModel.State.Error -> StatsPageError(onRetryClick)
             is StatsViewModel.State.Loading -> StatsPageLoading()
         }
@@ -166,6 +192,8 @@ private fun StatsPageLoaded(
     state: StatsViewModel.State.Loaded,
     bottomInset: Dp,
     launchReviewDialog: (AppCompatActivity) -> Unit,
+    onShowHeatmap: () -> Unit,
+    onListeningActivityInfoClick: () -> Unit,
 ) {
     val context = LocalContext.current
     LazyColumn(
@@ -190,6 +218,34 @@ private fun StatsPageLoaded(
         item {
             TextP40(state.funnyText)
             Spacer(Modifier.height(24.dp))
+        }
+        if (FeatureFlag.isEnabled(Feature.STATS_HEATMAP)) {
+            item {
+                CallOnce { onShowHeatmap() }
+                val heatmapDescription = stringResource(LR.string.profile_stats_listening_activity_content_description)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    TextC70(stringResource(LR.string.profile_stats_listening_activity))
+                    IconButton(
+                        onClick = onListeningActivityInfoClick,
+                        // Offset counteracts IconButton's built-in padding so the icon sits close to the label while keeping a 48dp touch target
+                        modifier = Modifier.offset(x = (-8).dp),
+                    ) {
+                        Icon(
+                            painter = painterResource(IR.drawable.ic_info),
+                            contentDescription = stringResource(LR.string.profile_stats_listening_activity_info_help),
+                            tint = MaterialTheme.theme.colors.primaryText01,
+                            modifier = Modifier.size(16.dp),
+                        )
+                    }
+                }
+                CalendarHeatMap(
+                    start = state.heatmapStart,
+                    end = state.heatmapEnd,
+                    heatLevels = state.heatLevels,
+                    modifier = Modifier.semantics { contentDescription = heatmapDescription },
+                )
+                Spacer(Modifier.height(24.dp))
+            }
         }
         item {
             TextC70(stringResource(LR.string.profile_stats_time_saved_by))
@@ -335,6 +391,8 @@ private fun StatsPageLoadedPreview(@PreviewParameter(ThemePreviewParameterProvid
             onBackPress = { },
             onRetryClick = { },
             launchReviewDialog = { },
+            onShowHeatmap = { },
+            onListeningActivityInfoClick = { },
             bottomInset = 0.dp,
         )
     }
@@ -349,6 +407,8 @@ private fun StatsPageErrorPreview(@PreviewParameter(ThemePreviewParameterProvide
             onBackPress = { },
             onRetryClick = { },
             launchReviewDialog = { },
+            onShowHeatmap = { },
+            onListeningActivityInfoClick = { },
             bottomInset = 0.dp,
         )
     }

@@ -1,13 +1,93 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-06-15 18:10:08+0000
+Translation-Revision-Date: 2026-08-11 10:10:10+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="tv_playlist_play_all_save_and_play">저장하고 재생</string>
+    <string name="tv_playlist_play_all_play_without_saving">저장하지 않고 재생</string>
+    <string name="tv_episode_removed_from_up_next">다음 순서에서 제거됨</string>
+    <string name="tv_sign_in_title">Pocket Casts에 로그인</string>
+    <string name="tv_create_account_modal_title">보관 가치가 있는 회원님의 팟캐스트</string>
+    <string name="tv_create_account_modal_subtitle">무료 계정을 생성하여 모든 기기에서 팟캐스트를 팔로우하고, 다음 순서를 만들고, 중단한 부분에서 바로 속개하세요.</string>
+    <string name="tv_episode_marked_as_played">재생됨으로 표시됨</string>
+    <string name="tv_episode_marked_as_unplayed">재생 안 됨으로 표시됨</string>
+    <string name="tv_episode_archived">보관됨</string>
+    <string name="tv_episode_unarchived">보관되지 않음</string>
+    <string name="tv_episode_will_play_next">다음 재생 예정</string>
+    <string name="tv_episode_will_play_last">마지막 재생 예정</string>
+    <string name="tv_podcast_schedule_monthly">매월</string>
+    <string name="tv_podcast_schedule_fortnightly">격주</string>
+    <string name="tv_podcast_schedule_weekly">주간</string>
+    <string name="tv_podcast_schedule_daily">매일</string>
+    <string name="tv_podcast_schedule_hourly">시간별</string>
+    <string name="tv_podcast_next_episode_soon">조만간</string>
+    <string name="tv_podcast_next_episode_tomorrow">내일</string>
+    <string name="tv_podcast_info_next_episode">다음 에피소드</string>
+    <string name="tv_podcast_info_schedule">일정</string>
+    <string name="tv_podcast_info_website">웹사이트</string>
+    <string name="tv_podcast_info_network">네트워크</string>
+    <string name="tv_create_account_modal_step_create">계정 생성 또는 로그인</string>
+    <string name="tv_sign_in_step_confirm_code">메시지가 표시되면 아래 코드로 확인하세요</string>
+    <string name="tv_sign_in_step_login">계정 로그인</string>
+    <string name="tv_sign_in_step_scan">QR 코드를 스캔하거나 %1$s(으)로 이동 </string>
+    <string name="tv_podcast_more_info">자세한 정보</string>
+    <string name="tv_podcast_follow">이 팟캐스트 팔로우하기</string>
+    <string name="tv_folder_empty_message">모바일 앱의 이 폴더에 팟캐스트를 추가하면 여기에 표시됩니다.</string>
+    <string name="tv_up_next_empty_action_title">에피소드 추가</string>
+    <string name="tv_your_podcasts_empty_action_title">팟캐스트 검색</string>
+    <string name="tv_your_podcasts_empty_subtitle">팔로우한 팟캐스트가 여기에 표시되어 바로 재생할 수 있습니다.</string>
+    <string name="tv_your_podcasts_empty_title">이제 채워 봅시다</string>
+    <string name="tv_up_next_empty_subtitle">에피소드를 ‘다음 재생’에 추가하면 순서대로 연속 재생됩니다.</string>
+    <string name="tv_up_next_empty_title">대기 중인 항목이 없습니다.</string>
+    <string name="tv_episode_details">에피소드 상세 정보</string>
+    <string name="playlist">재생목록</string>
+    <string name="tv_playlist_empty_subtitle_manual">모바일 앱에서 이 재생목록에 에피소드를 추가하면 여기에 표시됩니다.</string>
+    <string name="tv_playlist_empty_subtitle">목록 완성을 축하하거나 모바일 앱에서 규칙을 편집해 항목을 더 추가해 보세요.</string>
+    <string name="tv_playlists_download_title">스마트폰에서 재생 목록 만들기</string>
+    <string name="tv_playlist_empty_title">에피소드 없음</string>
+    <string name="tv_playlist_play_all">모든 에피소드 재생</string>
+    <string name="tv_playlists_download_subtitle">완료하고 나면 여기에서 기다리고 있을 거예요. 스캔하여 앱 받기</string>
+    <string name="tv_playlists_empty_title">여기에 재생목록이 만들어졌습니다.</string>
+    <string name="tv_playlists_empty_subtitle">직접 만들거나 스마트 규칙이 만들어 준 목록을 사용해 보세요.</string>
+    <string name="tv_playlists_empty_action_title">재생목록 만들기</string>
+    <string name="tv_profile_starred_episodes">별 표시 에피소드</string>
+    <string name="tv_home_keep_listening">계속 듣기</string>
+    <string name="settings_audio_only_summary">켜면 비디오가 포함된 에피소드가 오디오로만 재생되어 데이터를 절약할 수 있습니다.</string>
+    <string name="settings_audio_only">오디오만 재생</string>
+    <string name="profile_try_duration_for_free">%1$s 무료 체험</string>
+    <string name="settings_generated_chapters_summary">자동 생성된 챕터가 있으면 표시합니다.</string>
+    <string name="settings_generated_chapters">생성된 챕터</string>
+    <string name="profile_stats_listening_activity_info_summary">재생 기록을 바탕으로 청취 시간을 추정해 표시합니다. 에피소드를 며칠에 걸쳐 들은 경우에는 마지막으로 재생을 완료한 날짜에 표시됩니다.</string>
+    <string name="profile_stats_listening_activity_info_title">청취 활동</string>
+    <string name="profile_stats_listening_activity_info_help">정보</string>
+    <string name="profile_stats_listening_activity_content_description">청취 활동 히트맵</string>
+    <string name="profile_stats_listening_activity">청취 활동</string>
+    <string name="player_action_hide_video">비디오 숨기기</string>
+    <string name="player_action_show_video">비디오 표시</string>
+    <string name="up_next_sort_duration_tooltip_body">짧은 순 또는 긴 순으로 정렬해 실제로 들을 수 있는 시간에 맞는 에피소드를 찾아보세요.</string>
+    <string name="up_next_sort_duration_tooltip_title">재생 시간순 정렬</string>
+    <string name="transcript_tap_to_seek_streaming_unavailable">눌러서 검색하려면 에피소드를 다운로드하세요</string>
+    <string name="bookmark_play_from">%s에서 재생</string>
+    <string name="summary_upsell_description">Plus를 구독하여 북마크, 폴더와 같은 기타 프리미엄 기능을 이용하세요.</string>
+    <string name="summary_upsell_title">AI 기반 요약</string>
     <string name="tv_create_account_subtitle">스마트폰에서 시작하려면 이 코드를 스캔하세요. 1분이면 충분합니다.</string>
+    <string name="tv_create_account_come_back">계정 생성 후 돌아와서 로그인</string>
     <string name="tv_create_account_title">무료 계정 생성</string>
+    <string name="tv_onboarding_syncing_subtitle">팟캐스트 동기화 중이며, 곧 로그인됩니다!</string>
+    <string name="tv_onboarding_welcome_back">다시 오신 것을 환영합니다!</string>
+    <string name="tv_onboarding_sign_in_instructions">카메라를 열어 이 QR 코드에 맞추기</string>
+    <string name="tv_onboarding_sign_in_title">스마트폰으로 로그인</string>
+    <string name="tv_onboarding_syncing">팟캐스트 동기화 중\u2026</string>
+    <string name="tv_onboarding_browse_without_account">계정 없이 둘러보기</string>
+    <string name="tv_onboarding_create_free_account">무료 계정 생성</string>
+    <string name="tv_onboarding_subtitle">큰 화면의 회원님 팟캐스트</string>
+    <string name="tv_onboarding_welcome_tv">Pocket Casts TV 시작</string>
+    <string name="tv_onboarding_welcome">Pocket Casts 시작</string>
+    <string name="sort_longest_to_shortest">길이 내림차순</string>
+    <string name="sort_shortest_to_longest">길이 오름차순</string>
     <string name="synced_transcripts_whats_new_button_note">최근 에피소드에만 사용할 수 있는 동기화된 대본.</string>
     <string name="synced_transcripts_whats_new_message">빠르게 읽으세요. 놓치지 마세요. 스쳐 지나간 이름, 추천한 책, 궁금했던 통계. 단어를 누르고, 바로 돌아가서 살펴보세요.</string>
     <string name="synced_transcripts_whats_new_title">함께 읽어 보세요. 2배 속도로도 가능합니다.</string>
@@ -108,14 +188,10 @@ Language: ko_KR
     <string name="watch_synced_successfully">시계 동기화됨</string>
     <string name="watch_sync_waiting_for_phone">스마트폰 동기화 대기 중…</string>
     <string name="watch_sync_retry">다시 시도</string>
-    <string name="watch_sync_error_unknown_help">다시 시도하거나 수동으로 로그인</string>
     <string name="watch_sync_error_login_failed_help">수동으로 로그인 시도</string>
     <string name="watch_sync_error_no_connection_help">스마트폰의 블루투스 연결 확인</string>
-    <string name="watch_sync_error_timeout_help">스마트폰이 근처에 있고 블루투스로 연결되었는지 확인</string>
-    <string name="watch_sync_error_unknown">문제가 발생했음</string>
     <string name="watch_sync_error_login_failed">로그인 실패</string>
     <string name="watch_sync_error_no_connection">스마트폰 연결 안 됨</string>
-    <string name="watch_sync_error_timeout">스마트폰에 연결할 수 없음</string>
     <string name="watch_sync_success">스마트폰에서 로그인했습니다!</string>
     <string name="watch_sync_syncing">스마트폰과 동기화 중…</string>
     <string name="error_download_generic_failure">에피소드를 다운로드하지 못했습니다. %1$s</string>
@@ -2373,6 +2449,12 @@ Language: ko_KR
     </plurals>
     <plurals name="settings_auto_download_on_follow_podcast_description">
         <item quantity="other">팔로우하는 새 프로그램의 최신 에피소드 %s개를 자동으로 다운로드하세요.</item>
+    </plurals>
+    <plurals name="tv_playlist_all_archived">
+        <item quantity="other">이 재생목록의 에피소드 %1$d개가 모두 아카이빙되었습니다.</item>
+    </plurals>
+    <plurals name="tv_podcast_all_archived">
+        <item quantity="other">이 팟캐스트의 에피소드 %1$d개가 모두 아카이빙되었습니다.</item>
     </plurals>
     <plurals name="week_with_count">
         <item quantity="other">%1$d주</item>

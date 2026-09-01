@@ -122,6 +122,7 @@ val spotlessPreCommitFiles = providers.gradleProperty("spotlessPreCommitFiles").
 val spotlessPreCommitKotlinFiles = spotlessPreCommitFiles?.filter { file ->
     val path = file.relativeTo(rootDir).invariantSeparatorsPath
     path.endsWith(".kt") &&
+        "/uniffi/" !in path &&
         (
             path.startsWith("app/src/") ||
                 path.startsWith("automotive/src/") ||
@@ -151,14 +152,26 @@ spotless {
             target(spotlessPreCommitKotlinFiles)
         } else {
             target(
-                "app/src/**/*.kt",
-                "automotive/src/**/*.kt",
-                "modules/**/src/**/*.kt",
-                "tv/src/**/*.kt",
-                "wear/src/**/*.kt",
+                fileTree(rootDir) {
+                    include(
+                        "app/src/**/*.kt",
+                        "automotive/src/**/*.kt",
+                        "modules/**/src/**/*.kt",
+                        "tv/src/**/*.kt",
+                        "wear/src/**/*.kt",
+                    )
+                    exclude(
+                        "**/build/**",
+                        "**/uniffi/**",
+                        "vendor/**",
+                        ".git/**",
+                        ".gradle/**",
+                        ".idea/**",
+                    )
+                },
             )
         }
-        targetExclude("**/uniffi/**/*.kt", "**/.cxx/**")
+
         ktlint(ktlintVersion)
             .editorConfigOverride(ktLintConfigOverride + ktLintConfigComposeOverride)
             .customRuleSets(listOf(ktlintComposeRules))
