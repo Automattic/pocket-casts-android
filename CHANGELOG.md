@@ -1,7 +1,7 @@
 8.21
 -----
 *   Bug Fixes
-    *   Fix the Cast notification rewind button showing 30 seconds regardless of the configured skip back interval
+    *   Fix the skip forward and back intervals in the Cast notification
         ([#5820](https://github.com/Automattic/pocket-casts-android/pull/5820))
 
 
