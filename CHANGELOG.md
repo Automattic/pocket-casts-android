@@ -1,6 +1,8 @@
 8.21
 -----
-
+*   Bug Fixes
+    *   Avoid showing duplicate launcher icons when using a custom app icon
+        ([#5609](https://github.com/Automattic/pocket-casts-android/pull/5609))
 
 8.20
 -----
