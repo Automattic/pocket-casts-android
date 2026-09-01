@@ -1,15 +1,21 @@
 package au.com.shiftyjelly.pocketcasts.repositories.fingerprint
 
 import android.content.Context
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintTimingManager.TimeMappingEntry
 import au.com.shiftyjelly.pocketcasts.repositories.playback.ExoPlayerDataSourceFactory
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
+import au.com.shiftyjelly.pocketcasts.utils.fingerprint.FingerprintDecodePolicy
+import au.com.shiftyjelly.pocketcasts.utils.fingerprint.FingerprintPolicy
 import com.automattic.eventhorizon.EventHorizon
 import dagger.Lazy
+import java.util.Date
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
@@ -25,9 +31,16 @@ class DriftFilterTest {
 
     @Before
     fun setUp() {
+        manager = buildManager()
+        manager.debugTrackingEnabled = true
+    }
+
+    private fun buildManager(policy: FingerprintPolicy = FingerprintPolicy.PLATFORM): FingerprintTimingManager {
         val playbackManager = mock(PlaybackManager::class.java)
         whenever(playbackManager.playbackStateFlow).thenReturn(MutableStateFlow(PlaybackState()))
-        manager = FingerprintTimingManager(
+        val decodePolicy = mock(FingerprintDecodePolicy::class.java)
+        whenever(decodePolicy.current()).thenReturn(policy)
+        return FingerprintTimingManager(
             playbackManager = playbackManager,
             referenceRetriever = mock(FingerprintReferenceRetriever::class.java),
             eventHorizon = mock(EventHorizon::class.java),
@@ -36,8 +49,8 @@ class DriftFilterTest {
             settings = mock(Settings::class.java),
             dataSourceFactory = Lazy { mock(ExoPlayerDataSourceFactory::class.java) },
             pcmTap = FingerprintPcmTap(),
+            decodePolicy = decodePolicy,
         )
-        manager.debugTrackingEnabled = true
     }
 
     @Test
@@ -188,5 +201,18 @@ class DriftFilterTest {
 
         val rejections = manager.debugRejectionsSnapshot
         assertTrue("Rejections should not exceed cap", rejections.size <= cap)
+    }
+
+    @Test
+    fun `resolvePlaybackTime is unavailable under a restricted policy`() = runTest {
+        val restricted = buildManager(FingerprintPolicy.TAP_ONLY)
+        val episode = PodcastEpisode(uuid = "episode-uuid", publishedDate = Date())
+
+        val result = restricted.resolvePlaybackTime(episode, 100.seconds)
+
+        assertEquals(
+            ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_UNSUPPORTED_DEVICE),
+            result,
+        )
     }
 }
