@@ -71,6 +71,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import java.io.File
+import java.util.Locale
 import javax.inject.Named
 import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineScope
@@ -128,6 +129,9 @@ abstract class VoiceControlModule {
 
         @Provides @Singleton
         fun provideDeviceProbe(): au.com.shiftyjelly.pocketcasts.voicecontrol.asr.DeviceProbe = au.com.shiftyjelly.pocketcasts.voicecontrol.asr.DeviceProbe()
+
+        @Provides @Singleton
+        fun provideCurrentLocale(): () -> Locale = { Locale.getDefault() }
 
         @Provides @Singleton
         fun provideDeviceSupportedCondition(): DeviceSupportedCondition = DeviceSupportedCondition()

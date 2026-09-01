@@ -25,7 +25,7 @@ import timber.log.Timber
  */
 @Singleton
 class CanaryFlashBackend @Inject constructor(
-    private val currentLocale: () -> Locale = { Locale.getDefault() },
+    private val currentLocale: () -> Locale,
 ) : AsrBackend {
 
     private var recognizer: OfflineRecognizer? = null

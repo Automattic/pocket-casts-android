@@ -10,7 +10,7 @@ class AsrBackendSelector @Inject constructor(
     private val whisperCppBackend: Lazy<WhisperCppBackend>,
     private val senseVoiceBackend: Lazy<SenseVoiceBackend>,
     private val canaryFlashBackend: Lazy<CanaryFlashBackend>,
-    private val currentLocale: () -> Locale = { Locale.getDefault() },
+    private val currentLocale: () -> Locale,
 ) {
 
     /** Manual override: force a specific backend. Set to "whisper-cpp", "sensevoice", or "canary-flash". */

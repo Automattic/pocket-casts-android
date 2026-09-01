@@ -31,7 +31,7 @@ class AsrBackendSelectorTest {
     fun setUp() {
         whisperCppBackend = WhisperCppBackend()
         senseVoiceBackend = SenseVoiceBackend()
-        canaryFlashBackend = CanaryFlashBackend()
+        canaryFlashBackend = CanaryFlashBackend(currentLocale = { Locale.getDefault() })
         selector = buildSelector()
     }
 
