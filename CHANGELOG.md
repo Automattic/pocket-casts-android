@@ -3,7 +3,7 @@
 
 8.20
 -----
-*   New Features
+*   Updates 
     *   Allow the skip forward and skip back intents to specify a custom number of seconds
 
 8.19

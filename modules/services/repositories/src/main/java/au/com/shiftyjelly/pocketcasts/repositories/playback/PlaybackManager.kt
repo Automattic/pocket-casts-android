@@ -1160,7 +1160,7 @@ open class PlaybackManager @Inject constructor(
 
     fun skipForward(
         sourceView: SourceView = SourceView.UNKNOWN,
-        jumpAmountSeconds: Int = settings.skipForwardInSecs.value,
+        jumpAmountSeconds: Int? = null,
     ) {
         launch {
             skipForwardSuspend(sourceView, jumpAmountSeconds)
@@ -1169,13 +1169,13 @@ open class PlaybackManager @Inject constructor(
 
     suspend fun skipForwardSuspend(
         sourceView: SourceView = SourceView.UNKNOWN,
-        jumpAmountSeconds: Int = settings.skipForwardInSecs.value,
+        jumpAmountSeconds: Int? = null,
     ) {
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Skip forward tapped")
 
         cancelPendingChapterSeek()
         val episode = getCurrentEpisode() ?: return
-        val jumpAmountMs = jumpAmountSeconds * 1000
+        val jumpAmountMs = (jumpAmountSeconds ?: settings.skipForwardInSecs.value) * 1000
 
         val currentTimeMs = getCurrentTimeMs(episode = episode)
         if (currentTimeMs < 0 || player?.episodeUuid != episode.uuid) return // Make sure the player hasn't changed episodes before using the current time to seek
@@ -1199,19 +1199,19 @@ open class PlaybackManager @Inject constructor(
         }
     }
 
-    fun skipBackward(sourceView: SourceView = SourceView.UNKNOWN, jumpAmountSeconds: Int = settings.skipBackInSecs.value) {
+    fun skipBackward(sourceView: SourceView = SourceView.UNKNOWN, jumpAmountSeconds: Int? = null) {
         launch {
             skipBackwardSuspend(sourceView, jumpAmountSeconds)
         }
     }
 
-    suspend fun skipBackwardSuspend(sourceView: SourceView = SourceView.UNKNOWN, jumpAmountSeconds: Int = settings.skipBackInSecs.value) {
+    suspend fun skipBackwardSuspend(sourceView: SourceView = SourceView.UNKNOWN, jumpAmountSeconds: Int? = null) {
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Skip backward tapped")
 
         cancelPendingChapterSeek()
         val episode = getCurrentEpisode() ?: return
 
-        val jumpAmountMs = jumpAmountSeconds * 1000
+        val jumpAmountMs = (jumpAmountSeconds ?: settings.skipBackInSecs.value) * 1000
         val currentTimeMs = getCurrentTimeMs(episode = episode)
         if (currentTimeMs < 0) return
 

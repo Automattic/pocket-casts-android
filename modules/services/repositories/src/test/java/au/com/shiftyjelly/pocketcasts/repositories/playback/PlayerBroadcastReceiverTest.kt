@@ -45,8 +45,13 @@ class PlayerBroadcastReceiverTest {
     }
 
     @Test
-    fun `caps an amount that would overflow the millisecond conversion`() {
-        assertEquals(86_400, skipIntent().putExtra(INTENT_EXTRA_SECONDS, Int.MAX_VALUE).skipAmountSecondsOrNull())
+    fun `caps an amount above an hour`() {
+        assertEquals(3_600, skipIntent().putExtra(INTENT_EXTRA_SECONDS, Int.MAX_VALUE).skipAmountSecondsOrNull())
+    }
+
+    @Test
+    fun `keeps an amount at the cap`() {
+        assertEquals(3_600, skipIntent().putExtra(INTENT_EXTRA_SECONDS, 3_600).skipAmountSecondsOrNull())
     }
 
     private fun skipIntent() = Intent(INTENT_ACTION_SKIP_FORWARD)

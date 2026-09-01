@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
-import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.AndroidEntryPoint
@@ -34,8 +33,6 @@ class PlayerBroadcastReceiver : BroadcastReceiver() {
 
     @Inject lateinit var playbackManager: PlaybackManager
 
-    @Inject lateinit var settings: Settings
-
     private val sourceView = SourceView.PLAYER_BROADCAST_ACTION
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -61,17 +58,11 @@ class PlayerBroadcastReceiver : BroadcastReceiver() {
     }
 
     private fun skipBackward(jumpAmountSeconds: Int?) {
-        playbackManager.skipBackward(
-            sourceView = sourceView,
-            jumpAmountSeconds = jumpAmountSeconds ?: settings.skipBackInSecs.value,
-        )
+        playbackManager.skipBackward(sourceView = sourceView, jumpAmountSeconds = jumpAmountSeconds)
     }
 
     private fun skipForward(jumpAmountSeconds: Int?) {
-        playbackManager.skipForward(
-            sourceView = sourceView,
-            jumpAmountSeconds = jumpAmountSeconds ?: settings.skipForwardInSecs.value,
-        )
+        playbackManager.skipForward(sourceView = sourceView, jumpAmountSeconds = jumpAmountSeconds)
     }
 
     private fun pause() {
@@ -95,10 +86,12 @@ class PlayerBroadcastReceiver : BroadcastReceiver() {
  * Reads the skip amount override, or null to fall back to the user's setting.
  */
 internal fun Intent.skipAmountSecondsOrNull(): Int? {
-    val seconds = getStringExtra(PlayerBroadcastReceiver.INTENT_EXTRA_SECONDS)?.toIntOrNull()
-        ?: getIntExtra(PlayerBroadcastReceiver.INTENT_EXTRA_SECONDS, 0)
-    // Capped because PlaybackManager converts the amount to milliseconds in Int arithmetic.
+    val seconds = runCatching {
+        getStringExtra(PlayerBroadcastReceiver.INTENT_EXTRA_SECONDS)?.toIntOrNull()
+            ?: getIntExtra(PlayerBroadcastReceiver.INTENT_EXTRA_SECONDS, 0)
+    }.getOrDefault(0)
     return seconds.takeIf { it > 0 }?.coerceAtMost(MAX_SKIP_AMOUNT_SECONDS)
 }
 
-private const val MAX_SKIP_AMOUNT_SECONDS = 86_400
+// Limit the skip amount to an hour
+private const val MAX_SKIP_AMOUNT_SECONDS = 3_600
