@@ -21,43 +21,39 @@ import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import timber.log.Timber
 
-internal data class FunctionGemmaAsset(
+internal data class LfmAsset(
     val name: String,
     val url: String,
     val bytes: Long,
     val sha256: String,
 )
 
-internal data class FunctionGemmaRelease(
+internal data class LfmRelease(
     val version: String,
-    val requiredAssets: List<FunctionGemmaAsset>,
+    val requiredAssets: List<LfmAsset>,
 )
 
-internal fun parseFunctionGemmaManifest(json: String): FunctionGemmaRelease {
+internal fun parseLfmManifest(json: String): LfmRelease {
     val manifest = JSONObject(json)
     val version = manifest.getString("version")
     val assets = manifest.getJSONObject("assets")
-    val requiredNames = assets.keys().asSequence()
-        .filter { it == ModelManager.FUNCTION_GEMMA_MODEL_FILENAME || it.startsWith("model.litertlm.xnnpack_cache_") }
-        .sorted()
-        .toList()
-    require(requiredNames.count { it == ModelManager.FUNCTION_GEMMA_MODEL_FILENAME } == 1) {
-        "FunctionGemma manifest must contain model.litertlm"
-    }
-    require(requiredNames.count { it.startsWith("model.litertlm.xnnpack_cache_") } == 1) {
-        "FunctionGemma manifest must contain exactly one XNNPack cache"
-    }
+    val requiredNames = listOf(
+        ModelManager.LFM_MODEL_FILENAME,
+        ModelManager.LFM_CLASSIFIER_FILENAME,
+        ModelManager.LFM_LABEL_MAP_FILENAME,
+    )
     val requiredAssets = requiredNames.map { name ->
-        require(name == File(name).name) { "Invalid FunctionGemma asset name: $name" }
+        require(assets.has(name)) { "LFM manifest must contain $name" }
+        require(name == File(name).name) { "Invalid LFM asset name: $name" }
         val asset = assets.getJSONObject(name)
-        FunctionGemmaAsset(
+        LfmAsset(
             name = name,
             url = asset.getString("url"),
             bytes = asset.getLong("bytes"),
             sha256 = asset.getString("sha256"),
         )
     }
-    return FunctionGemmaRelease(version, requiredAssets)
+    return LfmRelease(version, requiredAssets)
 }
 
 @Singleton
@@ -95,9 +91,11 @@ class ModelManager @Inject constructor(
             "/intfloat/multilingual-e5-small/resolve/main/tokenizer.json"
         const val TOKENIZER_FILENAME = "tokenizer.json"
 
-        internal const val FUNCTION_GEMMA_MODEL_FILENAME = "model.litertlm"
-        private const val FUNCTION_GEMMA_MANIFEST_FILENAME = "manifest.json"
-        private const val FUNCTION_GEMMA_LATEST_URL =
+        internal const val LFM_MODEL_FILENAME = "model.gguf"
+        internal const val LFM_CLASSIFIER_FILENAME = "classifier.bin"
+        internal const val LFM_LABEL_MAP_FILENAME = "label_map.json"
+        private const val LFM_MANIFEST_FILENAME = "manifest.json"
+        private const val LFM_LATEST_URL =
             "https://download.auris.fm/function-call/latest.json"
     }
 
@@ -133,55 +131,57 @@ class ModelManager @Inject constructor(
         }
     }
 
-    // -- FunctionGemma model -------------------------------------------------
+    // -- LFM router model --------------------------------------------------
 
-    val functionGemmaDir get() = File(filesDir, "functiongemma-model")
-    val functionGemmaModelFile get() = File(functionGemmaDir, FUNCTION_GEMMA_MODEL_FILENAME)
-    private val functionGemmaManifestFile get() = File(functionGemmaDir, FUNCTION_GEMMA_MANIFEST_FILENAME)
+    val lfmDir get() = File(filesDir, "function-call")
+    val lfmModelFile get() = File(lfmDir, LFM_MODEL_FILENAME)
+    val lfmClassifierFile get() = File(lfmDir, LFM_CLASSIFIER_FILENAME)
+    val lfmLabelMapFile get() = File(lfmDir, LFM_LABEL_MAP_FILENAME)
+    private val lfmManifestFile get() = File(lfmDir, LFM_MANIFEST_FILENAME)
 
-    fun isFunctionGemmaModelReady(): Boolean {
-        if (!functionGemmaManifestFile.exists()) return false
+    fun isLfmModelReady(): Boolean {
+        if (!lfmManifestFile.exists()) return false
         return try {
-            val release = parseFunctionGemmaManifest(functionGemmaManifestFile.readText())
+            val release = parseLfmManifest(lfmManifestFile.readText())
             release.requiredAssets.all { asset ->
-                val file = File(functionGemmaDir, asset.name)
+                val file = File(lfmDir, asset.name)
                 file.isFile && file.length() == asset.bytes
             }
         } catch (e: Exception) {
-            Timber.w(e, "FunctionGemma manifest is invalid")
+            Timber.w(e, "LFM manifest is invalid")
             false
         }
     }
 
-    fun functionGemmaReleaseVersion(): String? {
-        if (!functionGemmaManifestFile.exists()) return null
+    fun lfmReleaseVersion(): String? {
+        if (!lfmManifestFile.exists()) return null
         return runCatching {
-            parseFunctionGemmaManifest(functionGemmaManifestFile.readText()).version
+            parseLfmManifest(lfmManifestFile.readText()).version
         }.getOrNull()
     }
 
-    suspend fun ensureFunctionGemmaModel(): Result<Unit> = withContext(Dispatchers.IO) {
-        if (isFunctionGemmaModelReady()) return@withContext Result.success(Unit)
+    suspend fun ensureLfmModel(): Result<Unit> = withContext(Dispatchers.IO) {
+        if (isLfmModelReady()) return@withContext Result.success(Unit)
         downloadMutex.withLock {
-            if (isFunctionGemmaModelReady()) return@withContext Result.success(Unit)
+            if (isLfmModelReady()) return@withContext Result.success(Unit)
             try {
-                functionGemmaDir.mkdirs()
-                val manifest = downloadText(FUNCTION_GEMMA_LATEST_URL, "FunctionGemma manifest")
-                val release = parseFunctionGemmaManifest(manifest)
+                lfmDir.mkdirs()
+                val manifest = downloadText(LFM_LATEST_URL, "LFM manifest")
+                val release = parseLfmManifest(manifest)
                 release.requiredAssets.forEach { asset ->
                     downloadFile(
                         urlStr = asset.url,
-                        dest = File(functionGemmaDir, asset.name),
-                        label = "FunctionGemma/${asset.name}",
+                        dest = File(lfmDir, asset.name),
+                        label = "LFM/${asset.name}",
                         expectedSha256 = asset.sha256,
                         expectedBytes = asset.bytes,
                     )
                 }
-                writeAtomically(functionGemmaManifestFile, manifest.toByteArray())
-                Timber.i("FunctionGemma release %s ready", release.version)
+                writeAtomically(lfmManifestFile, manifest.toByteArray())
+                Timber.i("LFM release %s ready", release.version)
                 Result.success(Unit)
             } catch (e: Exception) {
-                Timber.e(e, "FunctionGemma model download failed")
+                Timber.e(e, "LFM model download failed")
                 Result.failure(e)
             }
         }

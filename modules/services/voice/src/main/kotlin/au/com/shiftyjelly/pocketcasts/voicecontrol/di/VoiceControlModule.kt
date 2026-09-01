@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.voicecontrol.di
 import android.content.Context
 import android.media.AudioManager
 import android.os.PowerManager
-import android.os.SystemClock
 import android.telephony.TelephonyManager
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -25,17 +24,12 @@ import au.com.shiftyjelly.pocketcasts.voicecontrol.gate.conditions.OtherAppPlayi
 import au.com.shiftyjelly.pocketcasts.voicecontrol.gate.signals.GracePeriodSignal
 import au.com.shiftyjelly.pocketcasts.voicecontrol.intent.EmbeddingIntentMatcher
 import au.com.shiftyjelly.pocketcasts.voicecontrol.intent.EntityExtractor
-import au.com.shiftyjelly.pocketcasts.voicecontrol.intent.FunctionGemmaIntentRouter
-import au.com.shiftyjelly.pocketcasts.voicecontrol.intent.FunctionGemmaMetrics
-import au.com.shiftyjelly.pocketcasts.voicecontrol.intent.TimberFunctionGemmaMetrics
+import au.com.shiftyjelly.pocketcasts.voicecontrol.intent.lfm.LfmIntentRouter
 import au.com.shiftyjelly.pocketcasts.voicecontrol.intent.embedding.BpeTokenizer
 import au.com.shiftyjelly.pocketcasts.voicecontrol.intent.embedding.EmbeddingEngine
 import au.com.shiftyjelly.pocketcasts.voicecontrol.intent.embedding.JniEmbeddingEngine
 import au.com.shiftyjelly.pocketcasts.voicecontrol.intent.embedding.TextTokenizer
 import au.com.shiftyjelly.pocketcasts.voicecontrol.intent.entity.GrammarEntityExtractor
-import au.com.shiftyjelly.pocketcasts.voicecontrol.intent.runtime.FunctionGemmaRuntimeFactory
-import au.com.shiftyjelly.pocketcasts.voicecontrol.intent.runtime.LiteRtFunctionGemmaRuntimeFactory
-import au.com.shiftyjelly.pocketcasts.voicecontrol.intent.runtime.MonotonicClock
 import au.com.shiftyjelly.pocketcasts.voicecontrol.model.ModelManager
 import au.com.shiftyjelly.pocketcasts.voicecontrol.model.VoiceRecognizer
 import au.com.shiftyjelly.pocketcasts.voicecontrol.playback.AudioManagerVolumeSink
@@ -83,15 +77,7 @@ import kotlinx.coroutines.CoroutineScope
 @InstallIn(SingletonComponent::class)
 abstract class VoiceControlModule {
 
-    @Binds abstract fun bindVoiceRecognizer(impl: FunctionGemmaIntentRouter): VoiceRecognizer
-
-    @Binds abstract fun bindFunctionGemmaRuntimeFactory(
-        impl: LiteRtFunctionGemmaRuntimeFactory,
-    ): FunctionGemmaRuntimeFactory
-
-    @Binds abstract fun bindFunctionGemmaMetrics(
-        impl: TimberFunctionGemmaMetrics,
-    ): FunctionGemmaMetrics
+    @Binds abstract fun bindVoiceRecognizer(impl: LfmIntentRouter): VoiceRecognizer
 
     @Binds abstract fun bindVoicePlaybackSink(impl: PlaybackManagerPlaybackSink): VoicePlaybackSink
 
@@ -128,10 +114,6 @@ abstract class VoiceControlModule {
     @Binds abstract fun bindTtsEngine(impl: AndroidPlatformTtsEngine): TtsEngine
 
     companion object {
-        @Provides
-        @Singleton
-        fun provideMonotonicClock(): MonotonicClock = MonotonicClock(SystemClock::elapsedRealtime)
-
         @Provides @Singleton
         @Named("embeddingModel")
         fun provideEmbeddingModelFile(manager: ModelManager): File = manager.embeddingModelFile
