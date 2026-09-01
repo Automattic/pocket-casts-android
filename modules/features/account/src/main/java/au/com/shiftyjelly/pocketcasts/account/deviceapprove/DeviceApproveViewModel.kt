@@ -4,6 +4,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
+import com.automattic.eventhorizon.DeviceApproveConnectTappedEvent
+import com.automattic.eventhorizon.DeviceApproveDismissedEvent
+import com.automattic.eventhorizon.DeviceApproveFailedEvent
+import com.automattic.eventhorizon.DeviceApproveShownEvent
+import com.automattic.eventhorizon.DeviceApproveSuccessfulEvent
+import com.automattic.eventhorizon.DeviceSetupAccountTappedEvent
+import com.automattic.eventhorizon.EventHorizon
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.CancellationException
@@ -19,6 +26,7 @@ import timber.log.Timber
 class DeviceApproveViewModel @Inject constructor(
     private val syncManager: SyncManager,
     private val settings: Settings,
+    private val eventHorizon: EventHorizon,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(DeviceApproveUiState())
@@ -40,13 +48,29 @@ class DeviceApproveViewModel @Inject constructor(
         _uiState.update { it.copy(isLoggedIn = syncManager.isLoggedIn(), email = syncManager.getEmail()) }
     }
 
+    fun onShown() {
+        eventHorizon.track(DeviceApproveShownEvent())
+    }
+
+    fun onSetupAccountTapped() {
+        eventHorizon.track(DeviceSetupAccountTappedEvent)
+    }
+
+    fun onDismissed() {
+        if (_uiState.value.status != DeviceApproveStatus.Approved) {
+            eventHorizon.track(DeviceApproveDismissedEvent)
+        }
+    }
+
     fun connect() {
         val userCode = _uiState.value.userCode
         if (userCode.isBlank() || _uiState.value.status == DeviceApproveStatus.Submitting) {
             return
         }
+        eventHorizon.track(DeviceApproveConnectTappedEvent)
         _uiState.update { it.copy(status = DeviceApproveStatus.Submitting) }
         viewModelScope.launch {
+            var errorCode: String? = null
             val status = try {
                 syncManager.deviceApprove(userCode = userCode, approve = true)
                 DeviceApproveStatus.Approved
@@ -54,10 +78,22 @@ class DeviceApproveViewModel @Inject constructor(
                 throw ex
             } catch (ex: HttpException) {
                 Timber.e(ex, "Failed to approve TV device")
-                if (ex.code() in EXPIRED_CODES) DeviceApproveStatus.ExpiredError else DeviceApproveStatus.GenericError
+                if (ex.code() in EXPIRED_CODES) {
+                    errorCode = INVALID_GRANT
+                    DeviceApproveStatus.ExpiredError
+                } else {
+                    errorCode = ex.code().toString()
+                    DeviceApproveStatus.GenericError
+                }
             } catch (ex: Exception) {
                 Timber.e(ex, "Failed to approve TV device")
+                errorCode = UNKNOWN_ERROR
                 DeviceApproveStatus.GenericError
+            }
+            if (status == DeviceApproveStatus.Approved) {
+                eventHorizon.track(DeviceApproveSuccessfulEvent)
+            } else {
+                eventHorizon.track(DeviceApproveFailedEvent(errorCode = errorCode ?: UNKNOWN_ERROR))
             }
             _uiState.update { it.copy(status = status) }
         }
@@ -65,6 +101,8 @@ class DeviceApproveViewModel @Inject constructor(
 
     private companion object {
         val EXPIRED_CODES = setOf(400, 410)
+        const val INVALID_GRANT = "invalid_grant"
+        const val UNKNOWN_ERROR = "unknown"
     }
 }
 

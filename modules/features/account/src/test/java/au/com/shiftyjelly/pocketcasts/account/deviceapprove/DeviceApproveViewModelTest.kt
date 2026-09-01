@@ -5,6 +5,13 @@ import au.com.shiftyjelly.pocketcasts.preferences.ReadSetting
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import com.automattic.eventhorizon.DeviceApproveConnectTappedEvent
+import com.automattic.eventhorizon.DeviceApproveDismissedEvent
+import com.automattic.eventhorizon.DeviceApproveFailedEvent
+import com.automattic.eventhorizon.DeviceApproveShownEvent
+import com.automattic.eventhorizon.DeviceApproveSuccessfulEvent
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.Trackable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -34,6 +41,8 @@ class DeviceApproveViewModelTest {
     private val settings = mock<Settings> {
         on { cachedSubscription } doReturn cachedSubscription
     }
+    private val trackedEvents = mutableListOf<Trackable>()
+    private val eventHorizon = EventHorizon { trackedEvents.add(it) }
 
     @Test
     fun `connect approves the device`() = runTest {
@@ -44,6 +53,8 @@ class DeviceApproveViewModelTest {
         advanceUntilIdle()
 
         assertEquals(DeviceApproveStatus.Approved, viewModel.uiState.value.status)
+        assertTrue(trackedEvents.any { it is DeviceApproveConnectTappedEvent })
+        assertTrue(trackedEvents.any { it is DeviceApproveSuccessfulEvent })
     }
 
     @Test
@@ -56,6 +67,25 @@ class DeviceApproveViewModelTest {
         advanceUntilIdle()
 
         assertEquals(DeviceApproveStatus.ExpiredError, viewModel.uiState.value.status)
+        assertEquals("invalid_grant", trackedEvents.filterIsInstance<DeviceApproveFailedEvent>().single().errorCode)
+    }
+
+    @Test
+    fun `shown is tracked and dismissed only before approval`() = runTest {
+        whenever(syncManager.isLoggedIn()).thenReturn(true)
+
+        val viewModel = createViewModel(userCode = "ABCD12")
+        viewModel.onShown()
+        assertEquals(1, trackedEvents.count { it is DeviceApproveShownEvent })
+
+        viewModel.onDismissed()
+        assertTrue(trackedEvents.any { it is DeviceApproveDismissedEvent })
+
+        trackedEvents.clear()
+        viewModel.connect()
+        advanceUntilIdle()
+        viewModel.onDismissed()
+        assertTrue(trackedEvents.none { it is DeviceApproveDismissedEvent })
     }
 
     @Test
@@ -117,7 +147,7 @@ class DeviceApproveViewModelTest {
         assertFalse(viewModel.shouldPromptUpsellAfterApproval)
     }
 
-    private fun createViewModel(userCode: String) = DeviceApproveViewModel(syncManager, settings).apply {
+    private fun createViewModel(userCode: String) = DeviceApproveViewModel(syncManager, settings, eventHorizon).apply {
         setUserCode(userCode)
     }
 
