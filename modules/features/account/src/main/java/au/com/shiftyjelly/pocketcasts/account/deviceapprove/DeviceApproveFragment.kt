@@ -7,15 +7,21 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.fragment.app.viewModels
 import androidx.fragment.compose.content
-import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class DeviceApproveFragment : BaseDialogFragment() {
+
+    @Inject lateinit var userManager: UserManager
+
+    @Inject lateinit var playbackManager: PlaybackManager
 
     private val viewModel by viewModels<DeviceApproveViewModel>()
 
@@ -31,11 +37,15 @@ class DeviceApproveFragment : BaseDialogFragment() {
     ) = content {
         val state by viewModel.uiState.collectAsState()
 
-        AppTheme(theme.activeTheme) {
+        DialogBox(fillMaxHeight = false) {
             DeviceApprovePage(
                 state = state,
                 onConnect = viewModel::connect,
                 onSetUpAccount = {
+                    OnboardingLauncher.openOnboardingFlow(requireActivity(), OnboardingFlow.DeviceApproval)
+                },
+                onSwitchAccount = {
+                    userManager.signOut(playbackManager, wasInitiatedByUser = true)
                     OnboardingLauncher.openOnboardingFlow(requireActivity(), OnboardingFlow.DeviceApproval)
                 },
                 onDone = ::finishAfterApproval,

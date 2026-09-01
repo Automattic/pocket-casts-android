@@ -18,6 +18,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -28,15 +29,17 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
-import au.com.shiftyjelly.pocketcasts.compose.buttons.CloseButton
+import au.com.shiftyjelly.pocketcasts.compose.bottomsheet.Pill
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowLoadingButton
+import au.com.shiftyjelly.pocketcasts.compose.buttons.RowOutlinedButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
@@ -55,6 +58,7 @@ fun DeviceApprovePage(
     state: DeviceApproveUiState,
     onConnect: () -> Unit,
     onSetUpAccount: () -> Unit,
+    onSwitchAccount: () -> Unit,
     onDone: () -> Unit,
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
@@ -63,18 +67,11 @@ fun DeviceApprovePage(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
             .fillMaxWidth()
-            .background(MaterialTheme.theme.colors.primaryUi01)
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 24.dp, vertical = 16.dp),
     ) {
-        Box(Modifier.fillMaxWidth()) {
-            CloseButton(
-                onClick = onClose,
-                tintColor = MaterialTheme.theme.colors.primaryText02,
-                modifier = Modifier.align(Alignment.CenterStart),
-            )
-        }
-        Spacer(Modifier.height(8.dp))
+        Pill()
+        Spacer(Modifier.height(24.dp))
         PairingBadges()
         Spacer(Modifier.height(24.dp))
         when (state.status) {
@@ -103,6 +100,7 @@ fun DeviceApprovePage(
                 state = state,
                 onConnect = onConnect,
                 onSetUpAccount = onSetUpAccount,
+                onSwitchAccount = onSwitchAccount,
             )
         }
     }
@@ -113,6 +111,7 @@ private fun ColumnScope.ApproveContent(
     state: DeviceApproveUiState,
     onConnect: () -> Unit,
     onSetUpAccount: () -> Unit,
+    onSwitchAccount: () -> Unit,
 ) {
     TextH20(
         text = stringResource(LR.string.device_approve_title),
@@ -129,6 +128,16 @@ private fun ColumnScope.ApproveContent(
     Spacer(Modifier.height(24.dp))
     if (state.isLoggedIn) {
         AccountCard(email = state.email.orEmpty())
+        RowOutlinedButton(
+            text = stringResource(LR.string.device_approve_switch_account),
+            onClick = onSwitchAccount,
+            border = null,
+            colors = ButtonDefaults.outlinedButtonColors(
+                contentColor = MaterialTheme.theme.colors.primaryInteractive01,
+            ),
+            fontWeight = FontWeight.Normal,
+            includePadding = false,
+        )
         Spacer(Modifier.height(16.dp))
         CodeChip(code = state.userCode)
         Spacer(Modifier.height(24.dp))
@@ -268,6 +277,7 @@ private fun DeviceApprovePageLoggedInPreview(
             state = DeviceApproveUiState(userCode = "ABCD12", isLoggedIn = true, email = "user@example.com"),
             onConnect = {},
             onSetUpAccount = {},
+            onSwitchAccount = {},
             onDone = {},
             onClose = {},
         )
@@ -284,6 +294,7 @@ private fun DeviceApprovePageLoggedOutPreview(
             state = DeviceApproveUiState(userCode = "ABCD12", isLoggedIn = false),
             onConnect = {},
             onSetUpAccount = {},
+            onSwitchAccount = {},
             onDone = {},
             onClose = {},
         )
