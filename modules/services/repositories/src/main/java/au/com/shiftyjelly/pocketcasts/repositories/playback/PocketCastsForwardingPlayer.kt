@@ -172,16 +172,7 @@ class PocketCastsForwardingPlayer(
                 )
                 .build()
         }
-        return Player.Commands.Builder()
-            .addAll(
-                Player.COMMAND_PLAY_PAUSE,
-                Player.COMMAND_SET_MEDIA_ITEM,
-                Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM,
-                Player.COMMAND_STOP,
-                Player.COMMAND_GET_CURRENT_MEDIA_ITEM,
-                Player.COMMAND_GET_METADATA,
-            )
-            .build()
+        return transportPlayerCommands(isAutomotive)
     }
 
     override fun seekTo(positionMs: Long) {
