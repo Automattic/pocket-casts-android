@@ -16,23 +16,42 @@ class PocketCastsMediaIntentReceiver : MediaIntentReceiver() {
     }
 
     override fun onReceiveActionRewind(session: Session, skipStepMs: Long) {
-        seek(session, -application.settings.skipBackInSecs.value * 1000L)
+        seek(session, rewindDeltaMs(application.settings.skipBackInSecs.value))
     }
 
     override fun onReceiveActionForward(session: Session, skipStepMs: Long) {
-        seek(session, application.settings.skipForwardInSecs.value * 1000L)
+        seek(session, forwardDeltaMs(application.settings.skipForwardInSecs.value))
     }
 
     private fun seek(session: Session, deltaMs: Long) {
-        if (deltaMs == 0L) return
         val castSession = session as? CastSession ?: return
         if (!castSession.isConnected) return
         val client = castSession.remoteMediaClient ?: return
-        if (client.isLiveStream || client.isPlayingAd) return
-        val seekOptions = MediaSeekOptions.Builder()
-            .setPosition(client.approximateStreamPosition + deltaMs)
-            .setResumeState(MediaSeekOptions.RESUME_STATE_UNCHANGED)
-            .build()
-        client.seek(seekOptions)
+        val targetPositionMs = seekTargetPositionMs(
+            approximatePositionMs = client.approximateStreamPosition,
+            deltaMs = deltaMs,
+            isLiveStream = client.isLiveStream,
+            isPlayingAd = client.isPlayingAd,
+        ) ?: return
+        client.seek(
+            MediaSeekOptions.Builder()
+                .setPosition(targetPositionMs)
+                .setResumeState(MediaSeekOptions.RESUME_STATE_UNCHANGED)
+                .build(),
+        )
     }
+}
+
+internal fun rewindDeltaMs(skipBackInSecs: Int): Long = -skipBackInSecs.toLong() * 1000L
+
+internal fun forwardDeltaMs(skipForwardInSecs: Int): Long = skipForwardInSecs.toLong() * 1000L
+
+internal fun seekTargetPositionMs(
+    approximatePositionMs: Long,
+    deltaMs: Long,
+    isLiveStream: Boolean,
+    isPlayingAd: Boolean,
+): Long? {
+    if (deltaMs == 0L || isLiveStream || isPlayingAd) return null
+    return approximatePositionMs + deltaMs
 }
