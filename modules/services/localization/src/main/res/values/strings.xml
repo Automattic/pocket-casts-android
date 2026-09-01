@@ -2958,7 +2958,6 @@
     <string name="device_approve_login_required">In order to connect your device you need to have an account. Please sign in or create an account and try again.</string>
     <string name="device_approve_signing_in_as">Signing in as…</string>
     <string name="device_approve_connect">Connect</string>
-    <string name="device_approve_switch_account">Not you? Switch account</string>
     <string name="device_approve_success_title">TV connected</string>
     <string name="device_approve_success_message">Your TV is now connected to your account.</string>
     <string name="device_approve_expired_title">Your QR code expired</string>
