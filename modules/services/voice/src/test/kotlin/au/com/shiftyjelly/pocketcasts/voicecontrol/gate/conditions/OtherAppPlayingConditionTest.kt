@@ -111,42 +111,20 @@ class OtherAppPlayingConditionTest {
     }
 
     @Test
-    fun `host own audio while playing is not other app`() {
-        // Host is actively playing -> owns the audio session -> not another app.
-        assertFalse(otherAppPlaying(isMusicActive = true, hostCurrentlyPlaying = true, msSinceHostPlaying = 0, transitionWindowMs = 5000))
+    fun `host own audio with active context is not other app`() {
+        // Fix for the false positive: audio is active (host is audibly playing) but the
+        // host holds a playback context, so the session belongs to the host, not another app.
+        assertFalse(otherAppPlaying(isMusicActive = true, hostHasActiveContext = true))
     }
 
     @Test
-    fun `other app audio when host does not own it is other app`() {
-        // Host not playing and not recently played -> another app owns the active audio.
-        assertTrue(otherAppPlaying(isMusicActive = true, hostCurrentlyPlaying = false, msSinceHostPlaying = 10_000, transitionWindowMs = 5000))
+    fun `other app audio when host has no context is other app`() {
+        assertTrue(otherAppPlaying(isMusicActive = true, hostHasActiveContext = false))
     }
 
     @Test
     fun `no active audio is never other app`() {
-        assertFalse(otherAppPlaying(isMusicActive = false, hostCurrentlyPlaying = false, msSinceHostPlaying = 0, transitionWindowMs = 5000))
-        assertFalse(otherAppPlaying(isMusicActive = false, hostCurrentlyPlaying = true, msSinceHostPlaying = 0, transitionWindowMs = 5000))
-    }
-
-    @Test
-    fun `host owns audio during play-pause transition window`() {
-        // The reported false positive: host was playing within the last few seconds but
-        // isPlaying momentarily flickered false. The transition window attributes the
-        // still-active audio session to the host, not "another app".
-        assertFalse(otherAppPlaying(isMusicActive = true, hostCurrentlyPlaying = false, msSinceHostPlaying = 2_000, transitionWindowMs = 5000))
-    }
-
-    @Test
-    fun `host paused beyond window does not own audio (no false negative)`() {
-        // Host holds a paused, loaded episode but did not play within the window; a
-        // genuinely different app playing is correctly blocked (avoids the open-mic-
-        // over-background-music false negative).
-        assertTrue(otherAppPlaying(isMusicActive = true, hostCurrentlyPlaying = false, msSinceHostPlaying = 60_000, transitionWindowMs = 5000))
-    }
-
-    @Test
-    fun `host never played does not own audio`() {
-        // Long.MIN_VALUE sentinel -> msSinceHostPlaying is huge -> not host-owned.
-        assertTrue(otherAppPlaying(isMusicActive = true, hostCurrentlyPlaying = false, msSinceHostPlaying = Long.MIN_VALUE, transitionWindowMs = 5000))
+        assertFalse(otherAppPlaying(isMusicActive = false, hostHasActiveContext = false))
+        assertFalse(otherAppPlaying(isMusicActive = false, hostHasActiveContext = true))
     }
 }
