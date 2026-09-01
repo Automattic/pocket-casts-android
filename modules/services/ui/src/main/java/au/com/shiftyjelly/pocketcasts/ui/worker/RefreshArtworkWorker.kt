@@ -10,14 +10,17 @@ import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.colors.ColorManager
-import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
+import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.images.CoilManager
-import coil3.imageLoader
+import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import coil3.request.CachePolicy
+import coil3.request.ErrorResult
+import coil3.request.ImageRequest
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -33,6 +36,8 @@ class RefreshArtworkWorker @AssistedInject constructor(
 ) : CoroutineWorker(context, params) {
 
     companion object {
+        private const val MAX_RETRY_ATTEMPTS = 5
+
         fun start(context: Context) {
             val workRequest = OneTimeWorkRequestBuilder<RefreshArtworkWorker>()
                 .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
@@ -42,26 +47,62 @@ class RefreshArtworkWorker @AssistedInject constructor(
     }
 
     override suspend fun doWork(): Result {
+        var successful = 0
+        var failed = 0
         withContext(Dispatchers.IO) {
-            coilManager.clearAll()
+            // Do not clear entries restored before a prior attempt returned Result.retry().
+            if (runAttemptCount == 0) {
+                coilManager.clearAll()
+            }
             val podcasts = podcastManager.findSubscribedNoOrder()
-            colorManager.updateColors(podcasts)
-            val imageRequestFactory = PocketCastsImageRequestFactory(applicationContext).themed()
+            val isWearOs = Util.isWearOs(applicationContext)
             for (podcast in podcasts) {
-                try {
-                    val request = imageRequestFactory.create(podcast)
-                        .newBuilder()
-                        .memoryCachePolicy(CachePolicy.DISABLED)
-                        .build()
-                    applicationContext.imageLoader.execute(request)
-                } catch (e: Exception) {
-                    Timber.e(e)
+                for (url in PodcastImage.getArtworkUrls(uuid = podcast.uuid, isWearOS = isWearOs)) {
+                    try {
+                        val request = ImageRequest.Builder(applicationContext)
+                            .data(url)
+                            // The original bytes are still cached; only the discarded decode is sampled.
+                            .size(1, 1)
+                            .memoryCachePolicy(CachePolicy.DISABLED)
+                            .build()
+                        val result = coilManager.imageLoader.execute(request)
+                        if (result is ErrorResult) {
+                            failed++
+                            Timber.i("Could not refresh podcast artwork from $url. ${result.throwable.message}")
+                        } else {
+                            successful++
+                        }
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: Exception) {
+                        failed++
+                        Timber.e(e, "Could not refresh podcast artwork from $url")
+                    }
                 }
             }
+            colorManager.updateColors(podcasts)
         }
 
-        Timber.i("Successfully refreshed the podcasts artwork.")
+        val summary =
+            "Artwork refresh attempt ${runAttemptCount + 1}: $successful image requests succeeded ($failed failed)."
+        return when {
+            failed == 0 -> {
+                LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, summary)
+                Result.success()
+            }
 
-        return Result.success()
+            runAttemptCount < MAX_RETRY_ATTEMPTS -> {
+                LogBuffer.w(LogBuffer.TAG_BACKGROUND_TASKS, "$summary Retrying.")
+                Result.retry()
+            }
+
+            else -> {
+                LogBuffer.w(
+                    LogBuffer.TAG_BACKGROUND_TASKS,
+                    "$summary Giving up after $MAX_RETRY_ATTEMPTS retries.",
+                )
+                Result.failure()
+            }
+        }
     }
 }
