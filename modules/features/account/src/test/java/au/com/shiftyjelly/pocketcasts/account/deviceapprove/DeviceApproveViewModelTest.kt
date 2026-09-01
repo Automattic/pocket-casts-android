@@ -71,7 +71,7 @@ class DeviceApproveViewModelTest {
     }
 
     @Test
-    fun `shown is tracked once and dismissed only before approval`() = runTest {
+    fun `shown is tracked and dismissed only before approval`() = runTest {
         whenever(syncManager.isLoggedIn()).thenReturn(true)
 
         val viewModel = createViewModel(userCode = "ABCD12")

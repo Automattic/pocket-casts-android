@@ -51,7 +51,9 @@ class DeviceApproveFragment : BaseDialogFragment() {
     }
 
     override fun onDismiss(dialog: DialogInterface) {
-        viewModel.onDismissed()
+        if (!requireActivity().isChangingConfigurations) {
+            viewModel.onDismissed()
+        }
         super.onDismiss(dialog)
     }
 
