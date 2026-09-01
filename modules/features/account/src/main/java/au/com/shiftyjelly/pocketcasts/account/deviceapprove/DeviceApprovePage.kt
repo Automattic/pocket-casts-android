@@ -1,7 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.account.deviceapprove
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -10,8 +12,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
@@ -20,6 +24,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -36,11 +43,11 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.components.UserAvatar
 import au.com.shiftyjelly.pocketcasts.compose.components.UserAvatarConfig
-import au.com.shiftyjelly.pocketcasts.compose.images.HorizontalLogo
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Gravatar
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -68,7 +75,7 @@ fun DeviceApprovePage(
             )
         }
         Spacer(Modifier.height(8.dp))
-        HorizontalLogo(Modifier.height(28.dp))
+        PairingBadges()
         Spacer(Modifier.height(24.dp))
         when (state.status) {
             DeviceApproveStatus.Approved -> ResultContent(
@@ -135,6 +142,59 @@ private fun ColumnScope.ApproveContent(
             text = stringResource(LR.string.profile_set_up_account),
             onClick = onSetUpAccount,
         )
+    }
+}
+
+@Composable
+private fun PairingBadges(modifier: Modifier = Modifier) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier,
+    ) {
+        LogoBadge {
+            Image(
+                painter = painterResource(IR.drawable.ic_pocket_casts_logo),
+                contentDescription = null,
+                modifier = Modifier.size(28.dp),
+            )
+        }
+        BadgeDots(Modifier.padding(horizontal = 12.dp))
+        LogoBadge {
+            Image(
+                painter = painterResource(IR.drawable.ic_android_robot),
+                contentDescription = null,
+                modifier = Modifier.size(34.dp),
+            )
+        }
+    }
+}
+
+@Composable
+private fun LogoBadge(content: @Composable () -> Unit) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .size(64.dp)
+            .clip(CircleShape)
+            .background(Brush.linearGradient(listOf(Color(0xFF03161F), Color(0xFF08354F)))),
+        content = { content() },
+    )
+}
+
+@Composable
+private fun BadgeDots(modifier: Modifier = Modifier) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        modifier = modifier,
+    ) {
+        repeat(3) {
+            Box(
+                Modifier
+                    .size(4.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.theme.colors.primaryText02),
+            )
+        }
     }
 }
 
