@@ -109,4 +109,22 @@ class OtherAppPlayingConditionTest {
         val state = condition.evaluate(otherAppPlaying = false)
         assertTrue(state is VoiceControlRuleState.Allowed)
     }
+
+    @Test
+    fun `host own audio with active context is not other app`() {
+        // Fix for the false positive: audio is active (host is audibly playing) but the
+        // host holds a playback context, so the session belongs to the host, not another app.
+        assertFalse(otherAppPlaying(isMusicActive = true, hostHasActiveContext = true))
+    }
+
+    @Test
+    fun `other app audio when host has no context is other app`() {
+        assertTrue(otherAppPlaying(isMusicActive = true, hostHasActiveContext = false))
+    }
+
+    @Test
+    fun `no active audio is never other app`() {
+        assertFalse(otherAppPlaying(isMusicActive = false, hostHasActiveContext = false))
+        assertFalse(otherAppPlaying(isMusicActive = false, hostHasActiveContext = true))
+    }
 }

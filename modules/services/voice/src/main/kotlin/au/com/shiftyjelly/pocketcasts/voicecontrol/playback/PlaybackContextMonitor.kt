@@ -27,10 +27,21 @@ class PlaybackContextMonitor @javax.inject.Inject constructor(
 
     /**
      * True when the host app (Pocket Casts) is actively playing audio.
-     * Used by [OtherAppPlayingCondition] to distinguish own playback from external apps.
      */
     val isHostAudioActive: StateFlow<Boolean> = context.map {
         it is PlaybackContext.Active && it.isPlaying
+    }.stateIn(scope, SharingStarted.Eagerly, false)
+
+    /**
+     * True when the host app holds an active playback context (a loaded episode,
+     * playing or paused). Used by [OtherAppPlayingCondition] to attribute an active
+     * audio session to the host rather than to another app. This is less brittle than
+     * [isHostAudioActive]: during a play/pause/route transition `isMusicActive` can be
+     * true while `isPlaying` has not yet flipped, which would otherwise misattribute
+     * the host's own audio to "another app" and block the mic (see voice-control-core).
+     */
+    val hasActiveContext: StateFlow<Boolean> = context.map {
+        it is PlaybackContext.Active
     }.stateIn(scope, SharingStarted.Eagerly, false)
 
     private fun toPlaybackContext(playbackState: PlaybackState): PlaybackContext {

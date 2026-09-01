@@ -193,7 +193,7 @@ abstract class VoiceControlModule {
             @ApplicationScope scope: CoroutineScope,
         ): OtherAppPlayingCondition = OtherAppPlayingCondition(
             audioManager = context.getSystemService(Context.AUDIO_SERVICE) as? AudioManager,
-            hostAudioPlaying = playbackContextMonitor.isHostAudioActive,
+            hostHasActiveContext = playbackContextMonitor.hasActiveContext,
             scope = scope,
         )
 
