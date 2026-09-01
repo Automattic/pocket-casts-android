@@ -22,3 +22,6 @@ comment_with_manifest_diff "wear" ${BUILD_VARIANT}
 
 echo "--- 💾 Diff Merged Manifest (Module: automotive, Build Variant: ${BUILD_VARIANT})"
 comment_with_manifest_diff "automotive" ${BUILD_VARIANT}
+
+echo "--- 💾 Diff Merged Manifest (Module: tv, Build Variant: ${BUILD_VARIANT})"
+comment_with_manifest_diff "tv" ${BUILD_VARIANT}

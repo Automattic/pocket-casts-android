@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.component
 
 import android.content.Context
+import androidx.annotation.OptIn
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
@@ -17,6 +18,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.compose.PlayerSurface
 import androidx.media3.ui.compose.SURFACE_TYPE_TEXTURE_VIEW
@@ -29,6 +31,7 @@ private const val FADE_DURATION_MS = 300
 private const val FADE_STEPS = 20
 private const val PREVIEW_VOLUME = 0.5f
 
+@OptIn(UnstableApi::class)
 @Composable
 fun TvVideoPreviewPlayer(
     videoUrl: String,
