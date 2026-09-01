@@ -32,6 +32,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -90,6 +91,16 @@ fun TvCategoryTile(
     val coverSizePx = with(LocalDensity.current) { CoverSize.toPx() }
     val directionSign = if (LocalLayoutDirection.current == LayoutDirection.Rtl) -1f else 1f
 
+    val firstCover = coverUrls.firstOrNull()?.let { rememberCoverState(it) }
+    val secondCover = coverUrls.getOrNull(1)?.let { rememberCoverState(it) }
+    val covers = listOfNotNull(firstCover, secondCover)
+    val coversReady = covers.isNotEmpty() && covers.all { it.isReady }
+    val coverReveal = animateFloatAsState(
+        targetValue = if (isFocused && coversReady) 1f else 0f,
+        animationSpec = spring(dampingRatio = 0.6f, stiffness = Spring.StiffnessMediumLow),
+        label = "TvCategoryCoverReveal",
+    )
+
     TvTile(
         onClick = onClick,
         shape = CardDefaults.shape(shape = CardShape),
@@ -113,21 +124,21 @@ fun TvCategoryTile(
                     .background(TvCategoryStyle.gradient(colorIndex)),
             )
 
-            coverUrls.firstOrNull()?.let { url ->
+            firstCover?.let { cover ->
                 CategoryCover(
-                    url = url,
+                    painter = cover.painter,
                     alignment = Alignment.CenterStart,
                     edgeSign = -1f * directionSign,
-                    focused = isFocused,
+                    reveal = { coverReveal.value },
                     coverSizePx = coverSizePx,
                 )
             }
-            coverUrls.getOrNull(1)?.let { url ->
+            secondCover?.let { cover ->
                 CategoryCover(
-                    url = url,
+                    painter = cover.painter,
                     alignment = Alignment.CenterEnd,
                     edgeSign = 1f * directionSign,
-                    focused = isFocused,
+                    reveal = { coverReveal.value },
                     coverSizePx = coverSizePx,
                 )
             }
@@ -157,14 +168,13 @@ fun TvCategoryTile(
     }
 }
 
+private data class CoverState(
+    val painter: AsyncImagePainter,
+    val isReady: Boolean,
+)
+
 @Composable
-private fun BoxScope.CategoryCover(
-    url: String,
-    alignment: Alignment,
-    edgeSign: Float,
-    focused: Boolean,
-    coverSizePx: Float,
-) {
+private fun rememberCoverState(url: String): CoverState {
     val painter = rememberAsyncImagePainter(
         model = ImageRequest.Builder(LocalContext.current)
             .data(url)
@@ -174,19 +184,23 @@ private fun BoxScope.CategoryCover(
         contentScale = ContentScale.Crop,
     )
     val state by painter.state.collectAsState()
-    val imageReady = state is AsyncImagePainter.State.Success
+    return CoverState(painter, isReady = state is AsyncImagePainter.State.Success)
+}
 
-    val reveal = animateFloatAsState(
-        targetValue = if (focused && imageReady) 1f else 0f,
-        animationSpec = spring(dampingRatio = 0.6f, stiffness = Spring.StiffnessMediumLow),
-        label = "TvCategoryCoverReveal",
-    )
+@Composable
+private fun BoxScope.CategoryCover(
+    painter: Painter,
+    alignment: Alignment,
+    edgeSign: Float,
+    reveal: () -> Float,
+    coverSizePx: Float,
+) {
     Box(
         modifier = Modifier
             .align(alignment)
             .size(CoverSize)
             .graphicsLayer {
-                val progress = reveal.value.coerceIn(0f, 1f)
+                val progress = reveal().coerceIn(0f, 1f)
                 alpha = progress
                 val scale = COVER_RESTING_SCALE + (1f - COVER_RESTING_SCALE) * progress
                 scaleX = scale
