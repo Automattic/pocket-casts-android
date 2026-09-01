@@ -32,6 +32,8 @@
         ([#5645](https://github.com/Automattic/pocket-casts-android/pull/5645))
     *   Prevent Cast connection failures from interrupting local playback or removing playback controls
         ([#5656](https://github.com/Automattic/pocket-casts-android/pull/5656))
+    *   Fix the Cast notification rewind button showing 30 seconds regardless of the configured skip back interval
+        ([#5820](https://github.com/Automattic/pocket-casts-android/pull/5820))
 
 8.21
 -----
