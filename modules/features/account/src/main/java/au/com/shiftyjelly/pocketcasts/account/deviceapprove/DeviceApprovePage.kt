@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.account.deviceapprove
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -9,14 +10,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,11 +34,13 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
-import au.com.shiftyjelly.pocketcasts.compose.images.GravatarProfileImage
+import au.com.shiftyjelly.pocketcasts.compose.components.UserAvatar
+import au.com.shiftyjelly.pocketcasts.compose.components.UserAvatarConfig
 import au.com.shiftyjelly.pocketcasts.compose.images.HorizontalLogo
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.Gravatar
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -144,14 +146,13 @@ private fun AccountCard(email: String) {
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
             .background(MaterialTheme.theme.colors.primaryUi06)
+            .border(1.dp, MaterialTheme.theme.colors.primaryUi05, RoundedCornerShape(12.dp))
             .padding(16.dp),
     ) {
-        GravatarProfileImage(
-            email = email,
-            contentDescription = null,
-            modifier = Modifier
-                .size(48.dp)
-                .clip(CircleShape),
+        UserAvatar(
+            imageUrl = remember(email) { Gravatar.getUrl(email) },
+            subscriptionTier = null,
+            config = UserAvatarConfig(imageSize = 48.dp),
         )
         Spacer(Modifier.width(16.dp))
         Column {
@@ -172,6 +173,7 @@ private fun CodeChip(code: String) {
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
             .background(MaterialTheme.theme.colors.primaryUi06)
+            .border(1.dp, MaterialTheme.theme.colors.primaryUi05, RoundedCornerShape(12.dp))
             .padding(vertical = 16.dp),
     ) {
         TextH20(text = code, letterSpacing = 4.sp)
