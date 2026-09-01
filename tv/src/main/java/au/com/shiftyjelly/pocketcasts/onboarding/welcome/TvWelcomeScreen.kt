@@ -116,13 +116,13 @@ private fun TvWelcomeContent(
             Text(
                 text = stringResource(LR.string.tv_onboarding_welcome_tv),
                 color = MaterialTheme.tvColors.textPrimary,
-                style = MaterialTheme.tvTypography.title2.copy(textAlign = TextAlign.Center),
+                style = MaterialTheme.tvTypography.title1.copy(textAlign = TextAlign.Center),
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = stringResource(LR.string.tv_onboarding_subtitle),
                 color = MaterialTheme.tvColors.textSecondary,
-                style = MaterialTheme.tvTypography.body.copy(textAlign = TextAlign.Center),
+                style = MaterialTheme.tvTypography.headline.copy(textAlign = TextAlign.Center),
             )
             Spacer(modifier = Modifier.height(20.dp))
 

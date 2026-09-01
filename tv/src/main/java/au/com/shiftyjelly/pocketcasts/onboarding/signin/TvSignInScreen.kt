@@ -45,6 +45,7 @@ import androidx.tv.material3.TabRowDefaults
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
+import au.com.shiftyjelly.pocketcasts.onboarding.tvOnboardingBackground
 import au.com.shiftyjelly.pocketcasts.theme.TvButtonDefaults
 import au.com.shiftyjelly.pocketcasts.theme.TvTheme
 import au.com.shiftyjelly.pocketcasts.theme.tvColors
@@ -100,7 +101,7 @@ private fun TvSignInContent(
         contentAlignment = Alignment.TopCenter,
         modifier = modifier
             .fillMaxSize()
-            .background(MaterialTheme.tvColors.backgroundSunken),
+            .tvOnboardingBackground(MaterialTheme.tvColors.backgroundBase, MaterialTheme.tvColors.backgroundSunken),
     ) {
         Column(
             modifier = Modifier
@@ -117,7 +118,7 @@ private fun TvSignInContent(
             Text(
                 text = stringResource(LR.string.tv_sign_in_title),
                 color = MaterialTheme.tvColors.textPrimary,
-                style = MaterialTheme.tvTypography.title2.copy(textAlign = TextAlign.Center),
+                style = MaterialTheme.tvTypography.title3.copy(textAlign = TextAlign.Center),
             )
             Spacer(modifier = Modifier.height(40.dp))
             TvSignInModeTabs(selected = mode, onSelect = onSelectMode)

@@ -7,7 +7,6 @@ import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -42,6 +41,7 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.component.TvArtworkImage
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
+import au.com.shiftyjelly.pocketcasts.onboarding.tvOnboardingBackground
 import au.com.shiftyjelly.pocketcasts.onboarding.welcome.artworkResIds
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
 import au.com.shiftyjelly.pocketcasts.theme.TvTheme
@@ -53,7 +53,7 @@ import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-private const val COVER_SIZE_DP = 240
+private const val COVER_SIZE_DP = 140
 private const val COVER_CORNER_RADIUS_DP = 14
 private const val MAX_SIMULTANEOUS = 2
 private const val MAX_COVER_POOL = 40
@@ -97,7 +97,7 @@ private fun TvSyncingScreenContent(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(MaterialTheme.tvColors.backgroundSunken),
+            .tvOnboardingBackground(MaterialTheme.tvColors.backgroundBase, MaterialTheme.tvColors.backgroundSunken),
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -113,13 +113,13 @@ private fun TvSyncingScreenContent(
             Text(
                 text = stringResource(LR.string.tv_onboarding_welcome_back),
                 color = MaterialTheme.tvColors.textPrimary,
-                style = MaterialTheme.tvTypography.title2.copy(textAlign = TextAlign.Center),
+                style = MaterialTheme.tvTypography.title1.copy(textAlign = TextAlign.Center),
             )
             Spacer(modifier = Modifier.height(6.dp))
             Text(
                 text = stringResource(LR.string.tv_onboarding_syncing_subtitle),
                 color = MaterialTheme.tvColors.textSecondary,
-                style = MaterialTheme.tvTypography.body.copy(textAlign = TextAlign.Center),
+                style = MaterialTheme.tvTypography.headline.copy(textAlign = TextAlign.Center),
             )
             Spacer(modifier = Modifier.height(30.dp))
             TvSyncingCoverStack(podcastUuids = podcastUuids)
