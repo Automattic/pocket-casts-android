@@ -51,6 +51,7 @@ class DeviceApproveViewModel @Inject constructor(
             } catch (ex: CancellationException) {
                 throw ex
             } catch (ex: HttpException) {
+                Timber.e(ex, "Failed to approve TV device")
                 if (ex.code() in EXPIRED_CODES) DeviceApproveStatus.ExpiredError else DeviceApproveStatus.GenericError
             } catch (ex: Exception) {
                 Timber.e(ex, "Failed to approve TV device")

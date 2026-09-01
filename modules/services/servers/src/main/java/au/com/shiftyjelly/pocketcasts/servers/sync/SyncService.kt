@@ -7,7 +7,6 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.forgotpassword.ForgotPassword
 import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearSyncRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.DeviceApproveRequest
-import au.com.shiftyjelly.pocketcasts.servers.sync.login.DeviceApproveResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.DeviceAuthorizeRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.DeviceAuthorizeResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.DeviceTokenRequest
@@ -76,7 +75,7 @@ interface SyncService {
     suspend fun deviceToken(@Body request: DeviceTokenRequest): DeviceTokenResponse
 
     @POST("/device/approve")
-    suspend fun deviceApprove(@Header("Authorization") authorization: String, @Body request: DeviceApproveRequest): DeviceApproveResponse
+    suspend fun deviceApprove(@Header("Authorization") authorization: String, @Body request: DeviceApproveRequest)
 
     @POST("/user/register_pocket_casts")
     suspend fun register(@Body request: RegisterRequest): LoginTokenResponse

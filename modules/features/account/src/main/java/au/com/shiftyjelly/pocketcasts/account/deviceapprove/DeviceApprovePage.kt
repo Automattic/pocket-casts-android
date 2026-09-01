@@ -11,8 +11,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -53,6 +55,7 @@ fun DeviceApprovePage(
         modifier = modifier
             .fillMaxWidth()
             .background(MaterialTheme.theme.colors.primaryUi01)
+            .verticalScroll(rememberScrollState())
             .padding(horizontal = 24.dp, vertical = 16.dp),
     ) {
         Box(Modifier.fillMaxWidth()) {
@@ -140,7 +143,7 @@ private fun AccountCard(email: String) {
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .background(MaterialTheme.theme.colors.primaryUi02)
+            .background(MaterialTheme.theme.colors.primaryUi06)
             .padding(16.dp),
     ) {
         GravatarProfileImage(
@@ -168,7 +171,7 @@ private fun CodeChip(code: String) {
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .background(MaterialTheme.theme.colors.primaryUi02)
+            .background(MaterialTheme.theme.colors.primaryUi06)
             .padding(vertical = 16.dp),
     ) {
         TextH20(text = code, letterSpacing = 4.sp)

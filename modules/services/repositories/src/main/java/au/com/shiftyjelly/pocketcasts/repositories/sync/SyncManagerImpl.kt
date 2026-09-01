@@ -39,7 +39,6 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.UserChangeResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.bookmark.toBookmark
 import au.com.shiftyjelly.pocketcasts.servers.sync.exception.RefreshTokenExpiredException
 import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearResponse
-import au.com.shiftyjelly.pocketcasts.servers.sync.login.DeviceApproveResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.DeviceAuthorizeResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.ExchangeSonosResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenResponse
@@ -226,7 +225,7 @@ class SyncManagerImpl @Inject constructor(
         return syncServiceManager.deviceAuthorize()
     }
 
-    override suspend fun deviceApprove(userCode: String, approve: Boolean): DeviceApproveResponse = getCacheTokenOrLogin { token ->
+    override suspend fun deviceApprove(userCode: String, approve: Boolean) = getCacheTokenOrLogin { token ->
         syncServiceManager.deviceApprove(token, userCode, approve)
     }
 

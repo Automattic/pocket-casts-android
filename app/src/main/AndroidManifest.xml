@@ -127,7 +127,7 @@
                 <data
                     android:host="pocketcasts.com"
                     android:scheme="https"
-                    android:pathPrefix="/pair" />
+                    android:path="/pair" />
             </intent-filter>
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW"/>
@@ -136,7 +136,7 @@
                 <data
                     android:host="pocketcasts.net"
                     android:scheme="https"
-                    android:pathPrefix="/pair" />
+                    android:path="/pair" />
             </intent-filter>
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW"/>

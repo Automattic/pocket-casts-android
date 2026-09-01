@@ -61,7 +61,7 @@ class DeepLinkFactory(
         PromoCodeAdapter(),
         ShareLinkNativeAdapter(),
         SignInAdapter(shareHost),
-        PairDeviceAdapter(hosts = listOf(webBaseHost, shareHost)),
+        PairDeviceAdapter(hosts = PAIRING_HOSTS),
         ShareLinkAdapter(shareHost),
         WebPlayerShareLinkAdapter(webBaseHost = webBaseHost, webPlayerHost = webPlayerHost),
         OpmlAdapter(listOf(listHost, shareHost)),
@@ -100,6 +100,7 @@ class DeepLinkFactory(
 
     private companion object {
         val TAG = "DeepLinking"
+        val PAIRING_HOSTS = listOf("pocketcasts.com", "pocketcasts.net")
     }
 }
 

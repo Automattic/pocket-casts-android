@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.account.deviceapprove
 
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
-import au.com.shiftyjelly.pocketcasts.servers.sync.login.DeviceApproveResponse
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -29,7 +28,6 @@ class DeviceApproveViewModelTest {
     @Test
     fun `connect approves the device`() = runTest {
         whenever(syncManager.isLoggedIn()).thenReturn(true)
-        whenever(syncManager.deviceApprove("ABCD12", true)).thenReturn(DeviceApproveResponse())
 
         val viewModel = createViewModel(userCode = "ABCD12")
         viewModel.connect()

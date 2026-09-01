@@ -1137,10 +1137,10 @@ class DeepLinkFactoryTest {
     }
 
     @Test
-    fun pairDeviceShareHost() {
+    fun pairDeviceStagingHost() {
         val intent = Intent()
             .setAction(ACTION_VIEW)
-            .setData(Uri.parse("https://pca.st/pair?user_code=ABCD12"))
+            .setData(Uri.parse("https://pocketcasts.net/pair?user_code=ABCD12"))
 
         val deepLink = factory.create(intent)
 

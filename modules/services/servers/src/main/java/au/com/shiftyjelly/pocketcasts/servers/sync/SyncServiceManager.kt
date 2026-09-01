@@ -15,7 +15,6 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.forgotpassword.ForgotPassword
 import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearSyncRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.DeviceApproveRequest
-import au.com.shiftyjelly.pocketcasts.servers.sync.login.DeviceApproveResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.DeviceAuthorizeRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.DeviceAuthorizeResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.DeviceTokenRequest
@@ -128,9 +127,9 @@ open class SyncServiceManager @Inject constructor(
         return service.deviceToken(request)
     }
 
-    suspend fun deviceApprove(token: AccessToken, userCode: String, approve: Boolean): DeviceApproveResponse {
+    suspend fun deviceApprove(token: AccessToken, userCode: String, approve: Boolean) {
         val request = DeviceApproveRequest(userCode = userCode, deny = !approve)
-        return service.deviceApprove(addBearer(token), request)
+        service.deviceApprove(addBearer(token), request)
     }
 
     suspend fun forgotPassword(email: String): ForgotPasswordResponse {

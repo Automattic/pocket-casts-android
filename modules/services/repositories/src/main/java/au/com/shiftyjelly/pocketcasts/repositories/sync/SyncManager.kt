@@ -24,7 +24,6 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.UpNextSyncRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.UpNextSyncResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.UserChangeResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearResponse
-import au.com.shiftyjelly.pocketcasts.servers.sync.login.DeviceApproveResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.DeviceAuthorizeResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.ExchangeSonosResponse
 import au.com.shiftyjelly.pocketcasts.utils.Optional
@@ -70,7 +69,7 @@ interface SyncManager : NamedSettingsCaller {
     suspend fun loginWithToken(token: RefreshToken, loginIdentity: LoginIdentity, signInSource: SignInSource): LoginResult
     suspend fun deviceAuthorize(): DeviceAuthorizeResponse
 
-    suspend fun deviceApprove(userCode: String, approve: Boolean): DeviceApproveResponse
+    suspend fun deviceApprove(userCode: String, approve: Boolean)
 
     /**
      * [isNewAccount] is a caller assertion that this pairing is a signup, not server truth the way
