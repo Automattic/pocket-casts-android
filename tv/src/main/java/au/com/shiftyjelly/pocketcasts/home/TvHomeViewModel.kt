@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverPodcastAttribution
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverRow
 import au.com.shiftyjelly.pocketcasts.discover.TvOpenedCategory
+import au.com.shiftyjelly.pocketcasts.discover.TvProgressCardStyle
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PodcastDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextDao
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -189,6 +190,7 @@ class TvHomeViewModel @Inject constructor(
                             id = KEEP_LISTENING_ROW_ID,
                             title = context.getString(LR.string.tv_home_keep_listening),
                             episodes = listOf(current.toTvDiscoverEpisode(podcastTitles)),
+                            progressCardStyle = TvProgressCardStyle.Resume,
                         ),
                     )
                 }
@@ -201,6 +203,7 @@ class TvHomeViewModel @Inject constructor(
                             id = UP_NEXT_ROW_ID,
                             title = context.getString(LR.string.up_next),
                             episodes = queue.map { it.toTvDiscoverEpisode(podcastTitles) },
+                            progressCardStyle = TvProgressCardStyle.Queue,
                         ),
                     )
                 }
@@ -322,6 +325,7 @@ class TvHomeViewModel @Inject constructor(
         episodeTitle = title,
         podcastUuid = podcastUuid,
         podcastTitle = podcastTitles[podcastUuid].orEmpty(),
+        episode = this,
     )
 
     private fun PodcastEpisode.toTvDiscoverEpisode(podcast: TvDiscoverPodcast) = TvDiscoverEpisode(

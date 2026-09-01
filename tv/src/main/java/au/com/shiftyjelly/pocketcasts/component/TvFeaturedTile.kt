@@ -58,7 +58,7 @@ fun TvFeaturedTile(
 
     TvTile(
         onClick = onPlayLastEpisode,
-        scale = CardDefaults.scale(focusedScale = 1.05f),
+        scale = CardDefaults.scale(focusedScale = 1.02f),
         colors = CardDefaults.colors(
             containerColor = Color.Transparent,
             focusedContainerColor = Color.Transparent,
@@ -113,6 +113,7 @@ fun TvFeaturedTile(
                         .fillMaxHeight()
                         .weight(1f)
                         .padding(horizontal = 10.5.dp, vertical = 13.dp),
+                    verticalArrangement = Arrangement.Center,
                 ) {
                     if (isSponsored) {
                         Text(
@@ -120,9 +121,8 @@ fun TvFeaturedTile(
                             style = MaterialTheme.tvTypography.caption2,
                             color = MaterialTheme.tvColors.textPrimary70,
                         )
+                        Spacer(modifier = Modifier.height(4.dp))
                     }
-
-                    Spacer(modifier = Modifier.weight(1f))
 
                     Text(
                         text = title,
@@ -140,14 +140,13 @@ fun TvFeaturedTile(
                         overflow = TextOverflow.Ellipsis,
                     )
 
-                    Spacer(modifier = Modifier.weight(1f))
-
                     AnimatedVisibility(
                         visible = buttonState.isFocused,
                         enter = fadeIn() + expandVertically(expandFrom = Alignment.Top),
                         exit = fadeOut() + shrinkVertically(shrinkTowards = Alignment.Top),
                     ) {
                         Row(
+                            modifier = Modifier.padding(top = 12.dp),
                             horizontalArrangement = Arrangement.spacedBy(12.dp),
                         ) {
                             OutlinedButton(

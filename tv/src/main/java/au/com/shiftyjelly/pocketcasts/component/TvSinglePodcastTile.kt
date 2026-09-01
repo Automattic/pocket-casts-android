@@ -51,7 +51,7 @@ fun TvSinglePodcastTile(
 
     TvTile(
         onClick = onClick,
-        scale = CardDefaults.scale(focusedScale = 1.05f),
+        scale = CardDefaults.scale(focusedScale = 1.02f),
         shape = CardDefaults.shape(shape = RoundedCornerShape(9.dp)),
         colors = CardDefaults.colors(
             containerColor = MaterialTheme.tvColors.backgroundSunken,
@@ -61,8 +61,8 @@ fun TvSinglePodcastTile(
     ) {
         Row(
             modifier = Modifier
-                .width(481.5.dp)
-                .height(150.dp)
+                .width(876.dp)
+                .height(184.dp)
                 .padding(18.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
