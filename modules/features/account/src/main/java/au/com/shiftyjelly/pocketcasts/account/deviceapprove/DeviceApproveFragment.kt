@@ -53,7 +53,7 @@ class DeviceApproveFragment : BaseDialogFragment() {
         val promptUpsell = viewModel.shouldPromptUpsellAfterApproval
         dismiss()
         if (promptUpsell) {
-            OnboardingLauncher.openOnboardingFlow(activity, OnboardingFlow.Upsell(OnboardingUpgradeSource.LOGIN))
+            OnboardingLauncher.openOnboardingFlow(activity, OnboardingFlow.Upsell(OnboardingUpgradeSource.LOGIN_PLUS_PROMOTION))
         }
     }
 

@@ -1,5 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.account.deviceapprove
 
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
+import au.com.shiftyjelly.pocketcasts.preferences.ReadSetting
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -13,6 +16,7 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import retrofit2.HttpException
@@ -24,6 +28,12 @@ class DeviceApproveViewModelTest {
     val coroutineRule = MainCoroutineRule()
 
     private val syncManager = mock<SyncManager>()
+    private val cachedSubscription = mock<ReadSetting<Subscription?>> {
+        on { value } doReturn null
+    }
+    private val settings = mock<Settings> {
+        on { cachedSubscription } doReturn cachedSubscription
+    }
 
     @Test
     fun `connect approves the device`() = runTest {
@@ -96,7 +106,18 @@ class DeviceApproveViewModelTest {
         assertEquals("user@example.com", viewModel.uiState.value.email)
     }
 
-    private fun createViewModel(userCode: String) = DeviceApproveViewModel(syncManager).apply {
+    @Test
+    fun `upsell is not prompted when signing into an existing subscription`() = runTest {
+        whenever(syncManager.isLoggedIn()).thenReturn(false)
+        val subscription = mock<Subscription>()
+        whenever(cachedSubscription.value).thenReturn(subscription)
+
+        val viewModel = createViewModel(userCode = "ABCD12")
+
+        assertFalse(viewModel.shouldPromptUpsellAfterApproval)
+    }
+
+    private fun createViewModel(userCode: String) = DeviceApproveViewModel(syncManager, settings).apply {
         setUserCode(userCode)
     }
 

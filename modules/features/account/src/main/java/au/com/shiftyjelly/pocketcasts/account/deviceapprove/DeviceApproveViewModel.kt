@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.account.deviceapprove
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -17,6 +18,7 @@ import timber.log.Timber
 @HiltViewModel
 class DeviceApproveViewModel @Inject constructor(
     private val syncManager: SyncManager,
+    private val settings: Settings,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(DeviceApproveUiState())
@@ -24,7 +26,7 @@ class DeviceApproveViewModel @Inject constructor(
 
     private val wasSignedOutInitially = !syncManager.isLoggedIn()
 
-    val shouldPromptUpsellAfterApproval get() = wasSignedOutInitially
+    val shouldPromptUpsellAfterApproval get() = wasSignedOutInitially && settings.cachedSubscription.value == null
 
     init {
         refreshAccountState()
