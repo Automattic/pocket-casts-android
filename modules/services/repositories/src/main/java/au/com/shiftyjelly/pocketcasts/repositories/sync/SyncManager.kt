@@ -69,6 +69,8 @@ interface SyncManager : NamedSettingsCaller {
     suspend fun loginWithToken(token: RefreshToken, loginIdentity: LoginIdentity, signInSource: SignInSource): LoginResult
     suspend fun deviceAuthorize(): DeviceAuthorizeResponse
 
+    suspend fun deviceApprove(userCode: String, approve: Boolean)
+
     /**
      * [isNewAccount] is a caller assertion that this pairing is a signup, not server truth the way
      * AuthResultModel.isNewAccount carries it elsewhere. It drives new-account analytics attribution

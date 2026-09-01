@@ -225,6 +225,10 @@ class SyncManagerImpl @Inject constructor(
         return syncServiceManager.deviceAuthorize()
     }
 
+    override suspend fun deviceApprove(userCode: String, approve: Boolean) = getCacheTokenOrLogin { token ->
+        syncServiceManager.deviceApprove(token, userCode, approve)
+    }
+
     override suspend fun loginWithDeviceAuth(
         deviceCode: String,
         signInSource: SignInSource,
