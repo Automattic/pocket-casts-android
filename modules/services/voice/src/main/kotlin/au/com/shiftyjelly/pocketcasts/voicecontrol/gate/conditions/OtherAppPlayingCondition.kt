@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.voicecontrol.gate.conditions
 
 import android.media.AudioManager
+import android.os.SystemClock
 import au.com.shiftyjelly.pocketcasts.voicecontrol.gate.VoiceControlRule
 import au.com.shiftyjelly.pocketcasts.voicecontrol.gate.VoiceControlRuleGroup
 import au.com.shiftyjelly.pocketcasts.voicecontrol.gate.VoiceControlRuleState
@@ -16,7 +17,9 @@ import kotlinx.coroutines.withContext
 
 class OtherAppPlayingCondition(
     private val audioManager: AudioManager? = null,
-    private val hostHasActiveContext: StateFlow<Boolean> = MutableStateFlow(false),
+    private val hostIsPlaying: StateFlow<Boolean> = MutableStateFlow(false),
+    private val nowMs: () -> Long = { SystemClock.elapsedRealtime() },
+    private val transitionWindowMs: Long = 5_000,
     private val debounceMs: Long = 500,
     private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default),
 ) : VoiceControlRule {
@@ -29,6 +32,12 @@ class OtherAppPlayingCondition(
 
     private var debounceJob: Job? = null
 
+    // Last time (monotonic ms) the host was observed actively playing, used for a
+    // bounded attribution window so a play/pause/route transition (where isMusicActive
+    // is true but isPlaying has not yet flipped) is still attributed to the host without
+    // permanently treating a long-paused loaded episode as host-owned.
+    private var lastHostPlayingMs: Long = Long.MIN_VALUE
+
     init {
         if (audioManager != null) {
             scope.launch { pollLoop() }
@@ -37,13 +46,14 @@ class OtherAppPlayingCondition(
 
     private suspend fun pollLoop() {
         while (true) {
-            val hasOtherAppPlaying = withContext(Dispatchers.IO) {
+            val hasOtherApp = withContext(Dispatchers.IO) {
                 val am = audioManager ?: return@withContext false
-                // See otherAppPlaying() for host-audio attribution rationale.
-                val isMusicActive = am.isMusicActive
-                otherAppPlaying(isMusicActive, hostHasActiveContext.value)
+                otherAppPlaying(am.isMusicActive, hostIsPlaying.value, nowMs() - lastHostPlayingMs, transitionWindowMs)
             }
-            handleStateChange(hasOtherAppPlaying)
+            if (hostIsPlaying.value) {
+                lastHostPlayingMs = nowMs()
+            }
+            handleStateChange(hasOtherApp)
             delay(1000)
         }
     }
@@ -70,8 +80,7 @@ class OtherAppPlayingCondition(
 
     fun evaluate(): VoiceControlRuleState {
         val hasOtherApp = audioManager?.let { am ->
-            val isMusicActive = am.isMusicActive
-            otherAppPlaying(isMusicActive, hostHasActiveContext.value)
+            otherAppPlaying(am.isMusicActive, hostIsPlaying.value, nowMs() - lastHostPlayingMs, transitionWindowMs)
         } ?: false
         return evaluate(hasOtherApp)
     }
@@ -87,15 +96,22 @@ class OtherAppPlayingCondition(
 
 /**
  * Decides whether "another app is playing": audio is active ([isMusicActive]) and the
- * host does not hold a playback context ([hostHasActiveContext]). When the host holds a
- * context (playing or paused) the active audio session is attributed to the host, not to
- * another app, so the mic is not blocked over the host's own audio. This is the fix for
- * the false positive where `AudioManager.isMusicActive()` is true (the host is audibly
- * playing) while the host's `isPlaying` flag is momentarily false (play/pause/route
- * transition), which previously misattributed the host's own audio to "another app".
- * The trade-off is a false negative when the host is paused with a loaded episode and another
- * app plays; that is preferable to blocking the host's own audio.
+ * host does not own it. The host owns audio when it is currently playing
+ * ([hostCurrentlyPlaying]) or was playing within [transitionWindowMs] (i.e.
+ * [msSinceHostPlaying] < window). The window covers the play/pause/route transition
+ * where `AudioManager.isMusicActive()` is true while the host's `isPlaying` has not yet
+ * flipped — previously that misattributed the host's own audio to "another app" and
+ * blocked the mic. Bounding the window (rather than treating any loaded episode as
+ * host-owned) keeps the gate blocking when a genuinely different app plays while the
+ * host is long-paused.
  */
-internal fun otherAppPlaying(isMusicActive: Boolean, hostHasActiveContext: Boolean): Boolean {
-    return isMusicActive && !hostHasActiveContext
+internal fun otherAppPlaying(
+    isMusicActive: Boolean,
+    hostCurrentlyPlaying: Boolean,
+    msSinceHostPlaying: Long,
+    transitionWindowMs: Long,
+): Boolean {
+    if (!isMusicActive) return false
+    val hostOwnsAudio = hostCurrentlyPlaying || (msSinceHostPlaying >= 0 && msSinceHostPlaying < transitionWindowMs)
+    return !hostOwnsAudio
 }
