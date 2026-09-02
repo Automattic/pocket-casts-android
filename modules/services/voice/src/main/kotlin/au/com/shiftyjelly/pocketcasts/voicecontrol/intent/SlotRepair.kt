@@ -67,7 +67,11 @@ object SlotRepair {
         "playback" to "next_episode" to emptySet(),
         "bookmark" to "rename" to setOf("ref", "title"),
         "bookmark" to "add" to setOf("title"),
+        "dialog_control" to "begin" to setOf("target_tool", "target_action"),
         "dialog_control" to "provide_slot" to setOf("target_tool", "target_action", "slot", "value"),
+        "dialog_control" to "confirm" to emptySet(),
+        "dialog_control" to "deny" to emptySet(),
+        "dialog_control" to "cancel" to emptySet(),
         "dialog_control" to "new_command" to setOf("value"),
         "no_match" to "" to emptySet(),
     )
