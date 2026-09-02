@@ -102,7 +102,7 @@ fun TvOnboardingNavHost(
                 state = toastHostState,
                 modifier = Modifier
                     .align(Alignment.TopEnd)
-                    .padding(top = 60.dp, end = 36.dp),
+                    .padding(top = 44.dp, end = 42.dp),
             )
         }
     }

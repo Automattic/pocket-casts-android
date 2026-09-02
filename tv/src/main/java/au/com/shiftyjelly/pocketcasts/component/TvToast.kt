@@ -7,7 +7,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -98,21 +97,20 @@ private fun TvToastContent(
     Text(
         text = message,
         color = MaterialTheme.tvColors.textPrimary,
-        style = MaterialTheme.tvTypography.body.copy(textAlign = TextAlign.Center),
+        style = MaterialTheme.tvTypography.caption1.copy(textAlign = TextAlign.Center),
         modifier = modifier
             .semantics { liveRegion = LiveRegionMode.Polite }
             .widthIn(max = ToastMaxWidth)
             .clip(ToastShape)
-            .background(MaterialTheme.tvColors.overlayContainer)
-            .border(1.dp, MaterialTheme.tvColors.overlayBorder, ToastShape)
-            .padding(horizontal = 22.5.dp, vertical = 15.dp),
+            .background(MaterialTheme.tvColors.backgroundOverlay)
+            .padding(horizontal = 16.dp, vertical = 12.dp),
     )
 }
 
 private val ToastDurationMillis = 3000L
 private val ToastAnimationMillis = 300
 private val ToastMaxWidth = 450.dp
-private val ToastShape = RoundedCornerShape(12.dp)
+private val ToastShape = RoundedCornerShape(5.dp)
 
 @Preview(device = Devices.TV_1080p)
 @Composable
