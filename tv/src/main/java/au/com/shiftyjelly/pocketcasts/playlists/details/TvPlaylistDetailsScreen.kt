@@ -499,7 +499,7 @@ private fun episodeSummaryText(episodes: List<PodcastEpisode>): String {
     }
 }
 
-private val InfoPaneWidth = 150.dp
+private val InfoPaneWidth = TvDetailsArtworkSize
 
 @Preview(device = Devices.TV_1080p)
 @Composable
