@@ -130,7 +130,7 @@ sealed interface BaseEpisode {
         get() = autoDownloadStatus == AUTO_DOWNLOAD_STATUS_IGNORE
 
     val canQueueForAutoDownload
-        get() = !isFinished && !isArchived && !isAutoDownloadDisabled && !isStreamOnly
+        get() = !isFinished && !isArchived && !isAutoDownloadDisabled && !isHlsOnly
 
     val isInProgress: Boolean
         get() = EpisodePlayingStatus.IN_PROGRESS == playingStatus
@@ -142,15 +142,14 @@ sealed interface BaseEpisode {
     val isHlsOnly: Boolean
         get() = isHlsUrl(downloadUrl) || isHlsMimeType(fileType)
 
-    /** Playable only by streaming an alternate enclosure: HLS, or the server sent no progressive enclosure at all. */
-    val isStreamOnly: Boolean
-        get() = isHlsOnly || (this is PodcastEpisode && downloadUrl.isNullOrBlank())
-
     /** A runtime-only resolved stream (e.g. the HLS alternate enclosure); overrides [streamUrl] when set. */
     var overrideStreamUrl: String?
 
     /** The content type of [overrideStreamUrl], used to decide HLS/video handling. */
     var overrideStreamContentType: String?
+
+    /** Whether [overrideStreamUrl] is a video rendition, as the server's media kind declared it. */
+    var overrideStreamIsVideo: Boolean
 
     /**
      * The URL to use when streaming. Downloaded playback uses [downloadedFilePath] instead. Falls back
@@ -171,7 +170,7 @@ sealed interface BaseEpisode {
 
     /** Whether streaming will use an alternate rendition that carries video the progressive enclosure may not. */
     val isStreamUrlVideo: Boolean
-        get() = isStreamUrlHls || isVideoMimeType(overrideStreamContentType)
+        get() = isStreamUrlHls || (overrideStreamUrl != null && overrideStreamIsVideo)
 
     val isAudio: Boolean
         get() = !isVideo

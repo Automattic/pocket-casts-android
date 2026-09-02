@@ -330,8 +330,8 @@ private class DownloadQueueController(
             is DownloadType.UserTriggered -> true
             is DownloadType.Automatic -> !episode.isDownloadFailure && (downloadType.bypassAutoDownloadStatus || !episode.isAutoDownloadDisabled)
         }
-        // Stream-only episodes have no progressive file to download, only an alternate enclosure.
-        return !episode.isDownloaded && isFileAvailable && isDownloadTypeAllowed && !episode.isStreamOnly
+        // HLS-only episodes have no progressive file to download, only a manifest.
+        return !episode.isDownloaded && isFileAvailable && isDownloadTypeAllowed && !episode.isHlsOnly
     }
 
     private fun BaseEpisode.toDownloadCommand(

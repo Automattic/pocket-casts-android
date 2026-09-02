@@ -127,7 +127,8 @@ class AlternateEnclosureDaoTest {
         alternateEnclosureDao.replaceForEpisode(
             "audio-episode",
             listOf(
-                enclosure(position = 0, type = "audio/mp3", uri = "https://example.com/file.mp3", mediaKind = MediaKind.Audio)
+                // A video MIME type the server did not mark as video must not count.
+                enclosure(position = 0, type = "video/mp4", uri = "https://example.com/file.mp4", mediaKind = MediaKind.Audio)
                     .copy(episodeUuid = "audio-episode"),
             ),
         )

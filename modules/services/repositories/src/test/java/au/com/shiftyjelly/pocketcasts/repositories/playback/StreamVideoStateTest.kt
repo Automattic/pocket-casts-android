@@ -40,6 +40,7 @@ class StreamVideoStateTest {
         val episode = createEpisode(fileType = "audio/mp3").apply {
             overrideStreamUrl = "https://example.com/episode.mp4"
             overrideStreamContentType = "video/mp4"
+            overrideStreamIsVideo = true
         }
 
         assertEquals(StreamVideoState.Unknown, StreamVideoState.initialFor(episode, audioOnly = false, playingVideoStream = true, isRemote = false))
@@ -50,6 +51,7 @@ class StreamVideoStateTest {
         val episode = createEpisode(fileType = "audio/mp3").apply {
             overrideStreamUrl = "https://example.com/episode.mp4"
             overrideStreamContentType = "video/mp4"
+            overrideStreamIsVideo = true
         }
 
         assertEquals(StreamVideoState.NotVideo, StreamVideoState.initialFor(episode, audioOnly = false, playingVideoStream = false, isRemote = false))

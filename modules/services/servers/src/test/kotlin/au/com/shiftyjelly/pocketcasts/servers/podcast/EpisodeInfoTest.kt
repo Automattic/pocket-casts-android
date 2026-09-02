@@ -221,7 +221,6 @@ class EpisodeInfoTest {
         assertEquals("video/mp4", episode?.fileType)
         assertEquals(true, episode?.isVideo)
         assertEquals(false, episode?.isHlsOnly)
-        assertEquals(true, episode?.isStreamOnly)
     }
 
     @Test
@@ -242,7 +241,6 @@ class EpisodeInfoTest {
 
         val episode = episodeInfo?.toEpisode("podcast-uuid")
         assertEquals("audio/mp3", episode?.fileType)
-        assertEquals(false, episode?.isStreamOnly)
         assertEquals(
             "https://example.com/episode.mp4",
             episode?.alternateEnclosures?.firstProgressiveVideoStream()?.url,

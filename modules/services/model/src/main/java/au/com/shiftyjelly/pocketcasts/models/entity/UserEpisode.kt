@@ -74,6 +74,9 @@ data class UserEpisode(
     @Ignore
     override var overrideStreamContentType: String? = null
 
+    @Ignore
+    override var overrideStreamIsVideo: Boolean = false
+
     override fun displaySubtitle(podcast: Podcast?): String {
         return Podcast.userPodcast.title
     }

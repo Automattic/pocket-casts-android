@@ -143,6 +143,7 @@ class BaseEpisodeHlsDetectionTest {
         val episode = createEpisode(downloadUrl = "https://example.com/episode.mp3", fileType = "audio/mp3").apply {
             overrideStreamUrl = "https://example.com/episode.mp4"
             overrideStreamContentType = "video/mp4"
+            overrideStreamIsVideo = true
         }
 
         assertTrue(episode.isStreamUrlVideo)
@@ -171,35 +172,22 @@ class BaseEpisodeHlsDetectionTest {
     }
 
     @Test
+    fun `video rendition is trusted from the media kind, not the content type the source declared`() {
+        val episode = createEpisode(downloadUrl = "https://example.com/episode.mp3", fileType = "audio/mp3").apply {
+            overrideStreamUrl = "https://example.com/episode.mp4"
+            overrideStreamContentType = "application/octet-stream"
+            overrideStreamIsVideo = true
+        }
+
+        assertTrue(episode.isStreamUrlVideo)
+    }
+
+    @Test
     fun `video file episode is not treated as an alternate video stream`() {
         val episode = createEpisode(downloadUrl = "https://example.com/episode.mp4", fileType = "video/mp4")
 
         assertTrue(episode.isVideo)
         assertFalse(episode.isStreamUrlVideo)
-    }
-
-    @Test
-    fun `episode without a progressive enclosure is stream only`() {
-        val episode = createEpisode(fileType = "video/mp4")
-
-        assertTrue(episode.isStreamOnly)
-        assertFalse(episode.isHlsOnly)
-        assertFalse(episode.canQueueForAutoDownload)
-    }
-
-    @Test
-    fun `episode with a progressive enclosure is not stream only`() {
-        val episode = createEpisode(downloadUrl = "https://example.com/episode.mp3", fileType = "audio/mp3")
-
-        assertFalse(episode.isStreamOnly)
-        assertTrue(episode.canQueueForAutoDownload)
-    }
-
-    @Test
-    fun `hls only episode is stream only`() {
-        val episode = createEpisode(downloadUrl = "https://example.com/episode.m3u8")
-
-        assertTrue(episode.isStreamOnly)
     }
 
     private fun createEpisode(

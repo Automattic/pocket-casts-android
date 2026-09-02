@@ -7,6 +7,7 @@ data class AlternateEnclosureStream(
     val url: String,
     val contentType: String?,
     val isHls: Boolean,
+    val isVideo: Boolean,
 )
 
 /** First HLS enclosure's first http(s) source URI, or null if none can be streamed. */
@@ -25,9 +26,6 @@ fun List<EpisodeAlternateEnclosure>?.firstProgressiveVideoStream(): AlternateEnc
     ?.filter { it.isProgressiveVideo }
     ?.firstNotNullOfOrNull { it.toStream(isHls = false) }
 
-/** Whether any enclosure offers video, whether or not it has a source we can actually stream. */
-fun List<EpisodeAlternateEnclosure>?.hasVideoEnclosure(): Boolean = this?.any { BaseEpisode.isHlsMimeType(it.type) || it.isProgressiveVideo } == true
-
 /** MIME type to record on an episode the server sent no progressive enclosure for. */
 fun List<EpisodeAlternateEnclosure>?.firstStreamOnlyMimeType(): String? = firstHlsMimeType() ?: this?.firstOrNull { it.isProgressiveVideo }?.type
 
@@ -36,7 +34,9 @@ private val EpisodeAlternateEnclosure.isProgressiveVideo: Boolean
 
 private fun EpisodeAlternateEnclosure.toStream(isHls: Boolean): AlternateEnclosureStream? {
     val source = sources.firstOrNull { it.uri.isPlayableHttpUri() } ?: return null
-    return AlternateEnclosureStream(url = source.uri, contentType = source.contentType?.takeIf { it.isNotBlank() } ?: type, isHls = isHls)
+    // The enclosure's own type describes the rendition; a source may declare a generic type such as application/octet-stream.
+    val contentType = type?.takeIf { it.isNotBlank() } ?: source.contentType?.takeIf { it.isNotBlank() }
+    return AlternateEnclosureStream(url = source.uri, contentType = contentType, isHls = isHls, isVideo = mediaKind == MediaKind.Video)
 }
 
 private fun String.isPlayableHttpUri(): Boolean {

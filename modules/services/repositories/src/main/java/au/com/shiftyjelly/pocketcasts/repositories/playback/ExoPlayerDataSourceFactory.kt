@@ -125,7 +125,7 @@ class ExoPlayerDataSourceFactory @Inject constructor(
         episodeLocation: EpisodeLocation,
         onCachingComplete: (String) -> Unit,
     ) {
-        if (episodeLocation.isHlsStream) return
+        if (episodeLocation.isVideoStream) return
         val episodeUri = episodeLocation.uri ?: return
         val cacheFactory = cacheDataSourceFactory ?: cacheFactory
             .setCacheWriteDataSinkFactory(null)
@@ -168,7 +168,8 @@ class ExoPlayerDataSourceFactory @Inject constructor(
         }
     }
 
-    private fun EpisodeLocation.shouldUseCache() = !episode.isDownloaded && !episode.isDownloading && !isHlsStream && settings.cacheEntirePlayingEpisode.value
+    // The cache is keyed by episode uuid, so an alternate rendition would collide with the progressive enclosure.
+    private fun EpisodeLocation.shouldUseCache() = !episode.isDownloaded && !episode.isDownloading && !isVideoStream && settings.cacheEntirePlayingEpisode.value
 
     private fun ClosedRange<Long>.toClippingConfiguration() = ClippingConfiguration.Builder()
         .setStartPositionMs(start)

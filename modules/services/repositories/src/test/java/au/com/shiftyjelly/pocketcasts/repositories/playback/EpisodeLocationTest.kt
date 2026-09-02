@@ -73,6 +73,7 @@ class EpisodeLocationTest {
         ).apply {
             overrideStreamUrl = "https://example.com/episode.mp4"
             overrideStreamContentType = "video/mp4"
+            overrideStreamIsVideo = true
         }
 
         val location = EpisodeLocation.create(episode, preferStream = true)

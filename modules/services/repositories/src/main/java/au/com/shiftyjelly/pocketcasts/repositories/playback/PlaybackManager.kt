@@ -368,14 +368,14 @@ open class PlaybackManager @Inject constructor(
 
         launch {
             upNextQueue.changesObservable.asFlow()
-                .map { state -> (state as? UpNextQueue.State.Loaded)?.episode?.uuid }
-                .distinctUntilChanged()
-                .collect { uuid ->
-                    val enclosures = uuid?.let { alternateEnclosureManager.findForEpisode(it) }.orEmpty()
+                .map { state -> (state as? UpNextQueue.State.Loaded)?.episode }
+                .distinctUntilChanged { old, new -> old?.uuid == new?.uuid }
+                .collect { episode ->
+                    val enclosures = episode?.let { alternateEnclosureManager.findForEpisode(it.uuid) }.orEmpty()
                     _streamHlsAvailable.value = enclosures.firstHlsStreamUrl() != null
                     _streamVideoAvailable.value = selectAlternateStream(
                         enclosures = enclosures,
-                        hasProgressiveEnclosure = upNextQueue.currentEpisode?.downloadUrl.isNullOrBlank() != true,
+                        hasProgressiveEnclosure = !episode?.downloadUrl.isNullOrBlank(),
                     ) != null
                 }
         }
@@ -429,6 +429,7 @@ open class PlaybackManager @Inject constructor(
     private suspend fun applyStreamOverride(episode: BaseEpisode) {
         episode.overrideStreamUrl = null
         episode.overrideStreamContentType = null
+        episode.overrideStreamIsVideo = false
         val enclosures = alternateEnclosureManager.findForEpisode(episode.uuid)
         _streamHlsAvailable.value = enclosures.firstHlsStreamUrl() != null
         val stream = selectAlternateStream(
@@ -440,6 +441,7 @@ open class PlaybackManager @Inject constructor(
             episode.overrideStreamUrl = stream.url
             // Normalise the manifest type so ExoPlayer and Cast agree, whichever HLS MIME the server sent.
             episode.overrideStreamContentType = if (stream.isHls) MimeTypes.APPLICATION_M3U8 else stream.contentType
+            episode.overrideStreamIsVideo = stream.isVideo
         }
     }
 

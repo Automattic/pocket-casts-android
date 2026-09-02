@@ -49,6 +49,23 @@ class SelectAlternateStreamTest {
     }
 
     @Test
+    fun `streams an hls-only episode even when the hls flag is off`() {
+        val enclosures = listOf(videoEnclosure(MimeTypes.APPLICATION_M3U8, HLS_URL))
+
+        val stream = select(enclosures, isHlsEnabled = false, hasProgressiveEnclosure = false)
+
+        assertEquals(HLS_URL, stream?.url)
+        assertTrue(stream!!.isHls)
+    }
+
+    @Test
+    fun `selects nothing when both flags are off and the episode has a progressive enclosure`() {
+        val enclosures = listOf(videoEnclosure("video/mp4", MP4_URL), videoEnclosure(MimeTypes.APPLICATION_M3U8, HLS_URL))
+
+        assertNull(select(enclosures, isHlsEnabled = false, isVideoEnclosureEnabled = false))
+    }
+
+    @Test
     fun `selects nothing when no enclosure offers video`() {
         assertNull(select(listOf(enclosure("audio/mp3", "https://example.com/episode.mp3"))))
         assertNull(select(emptyList()))

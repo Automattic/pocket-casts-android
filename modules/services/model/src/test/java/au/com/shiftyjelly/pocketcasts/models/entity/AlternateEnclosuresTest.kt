@@ -107,6 +107,26 @@ class AlternateEnclosuresTest {
         assertEquals("https://example.com/episode.mp4", stream?.url)
         assertEquals("video/mp4", stream?.contentType)
         assertFalse(stream!!.isHls)
+        assertTrue(stream.isVideo)
+    }
+
+    @Test
+    fun `keeps the enclosure type when a source declares a generic content type`() {
+        val enclosures = listOf(
+            EpisodeAlternateEnclosure(
+                episodeUuid = "episode-uuid",
+                position = 0,
+                type = "video/mp4",
+                mediaKind = MediaKind.Video,
+                sources = listOf(AlternateEnclosureSource(uri = "https://example.com/episode.mp4", contentType = "application/octet-stream")),
+            ),
+        )
+
+        val stream = enclosures.firstProgressiveVideoStream()
+
+        assertEquals("video/mp4", stream?.contentType)
+        // Video-ness comes from the media kind, so a generic source type cannot hide it.
+        assertTrue(stream!!.isVideo)
     }
 
     @Test
@@ -119,7 +139,7 @@ class AlternateEnclosuresTest {
     }
 
     @Test
-    fun `ignores video enclosures we cannot stream directly`() {
+    fun `ignores a video enclosure whose media kind we cannot stream directly`() {
         val enclosures = listOf(
             EpisodeAlternateEnclosure(
                 episodeUuid = "episode-uuid",
@@ -170,17 +190,6 @@ class AlternateEnclosuresTest {
         )
 
         assertEquals("https://example.com/master.m3u8", enclosures.firstHlsStreamUrl())
-    }
-
-    @Test
-    fun `detects video enclosures for the episode row icon`() {
-        assertTrue(listOf(enclosure(MimeTypes.APPLICATION_M3U8, "https://example.com/master.m3u8")).hasVideoEnclosure())
-        assertTrue(listOf(videoEnclosure("video/mp4", "https://example.com/episode.mp4")).hasVideoEnclosure())
-        // The icon reflects what the server offers, even when no source can be streamed.
-        assertTrue(listOf(videoEnclosure("video/mp4")).hasVideoEnclosure())
-        assertFalse(listOf(enclosure("audio/mp3", "https://example.com/episode.mp3")).hasVideoEnclosure())
-        assertFalse(emptyList<EpisodeAlternateEnclosure>().hasVideoEnclosure())
-        assertFalse(null.hasVideoEnclosure())
     }
 
     @Test

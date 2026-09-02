@@ -132,6 +132,9 @@ data class PodcastEpisode(
     @Ignore
     override var overrideStreamContentType: String? = null
 
+    @Ignore
+    override var overrideStreamIsVideo: Boolean = false
+
     val playedPercentage: Int
         get() {
             return if (isFinished) {

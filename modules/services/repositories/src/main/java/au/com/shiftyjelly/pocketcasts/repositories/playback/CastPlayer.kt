@@ -291,13 +291,11 @@ class CastPlayer(
         // STREAM_TYPE_BUFFERED is correct for VOD podcasts (including VOD HLS). Live HLS would
         // need STREAM_TYPE_LIVE, but we don't currently serve live streams.
         var mediaInfo = MediaInfo.Builder(url).setStreamType(MediaInfo.STREAM_TYPE_BUFFERED).setMetadata(mediaMetadata)
-        val contentType = when {
-            episodeLocation.isHlsStream -> MimeTypes.APPLICATION_M3U8
-
-            // An alternate rendition has its own type; the episode's own fileType describes the progressive enclosure.
-            episodeLocation is EpisodeLocation.Stream -> episode.overrideStreamContentType ?: episode.fileType
-
-            else -> episode.fileType
+        // An alternate rendition has its own type; the episode's own fileType describes the progressive enclosure.
+        val contentType = if (episodeLocation.isHlsStream) {
+            MimeTypes.APPLICATION_M3U8
+        } else {
+            episode.overrideStreamContentType ?: episode.fileType
         }
         contentType?.let {
             mediaInfo = mediaInfo.setContentType(it)
