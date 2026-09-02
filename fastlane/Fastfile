@@ -1015,10 +1015,9 @@ platform :android do
   lane :slack_webhook_probe do
     build_url = ENV.fetch('BUILDKITE_BUILD_URL', 'a local run')
 
-    UI.message('Probe 1/2 — real webhook, no channel override.')
+    UI.message("Probe 1/2 — real webhook, routed to #{SLACK_CHANNEL}.")
     send_slack_message(
-      message: ":test_tube: *Webhook wiring check — please ignore.* Confirming where `SLACK_WEBHOOK` posts, for AINFRA-3066. Triggered by #{build_url}",
-      channel: nil
+      message: ":test_tube: *Webhook wiring check — please ignore.* Confirming `SLACK_WEBHOOK` can deliver here, for AINFRA-3066. Triggered by #{build_url}"
     )
 
     UI.message('Probe 2/2 — invalid webhook, expecting a logged failure and a green job.')
