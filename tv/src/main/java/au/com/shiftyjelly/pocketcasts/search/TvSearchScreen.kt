@@ -518,7 +518,7 @@ private fun TvSearchDiscover(
 
         discoverRows.forEachIndexed { index, row ->
             val rowIndex = categoryOffset + index
-            item { Spacer(modifier = Modifier.height(18.dp)) }
+            item { Spacer(modifier = Modifier.height(40.dp)) }
             tvDiscoverRow(
                 row = row,
                 onPodcastClick = onDiscoverPodcastClick,
