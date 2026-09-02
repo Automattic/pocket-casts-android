@@ -256,4 +256,4 @@ private val FormWidth = 315.dp
 private const val IME_SETTLE_MILLIS = 250L
 
 /** Estimated height of the TV soft keyboard, which reports no window insets, used to lift a focused field clear of it. */
-internal val TvSignInKeyboardInset = 240.dp
+internal val TvSignInKeyboardInset = 320.dp

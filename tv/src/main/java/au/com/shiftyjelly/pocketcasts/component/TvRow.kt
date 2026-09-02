@@ -98,6 +98,7 @@ fun <T> TvRow(
         LazyRow(
             contentPadding = contentPadding,
             horizontalArrangement = Arrangement.spacedBy(itemSpacing),
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .then(if (focusRequester != null) Modifier.focusRequester(focusRequester) else Modifier)
                 .focusGroup()
