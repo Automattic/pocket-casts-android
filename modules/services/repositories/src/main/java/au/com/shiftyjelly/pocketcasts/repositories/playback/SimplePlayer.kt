@@ -77,6 +77,8 @@ class SimplePlayer(
 
     private var hasVideoSurface = false
 
+    private var pendingSurface: SurfaceView? = null
+
     @Volatile
     private var prepared = false
 
@@ -242,6 +244,16 @@ class SimplePlayer(
 
         handleStop()
         this.player = player
+        pendingSurface?.let { surface ->
+            pendingSurface = null
+            try {
+                player.setVideoSurfaceHolder(surface.holder)
+                hasVideoSurface = true
+                applyVideoTrackSelection()
+            } catch (e: Exception) {
+                Timber.e(e)
+            }
+        }
 
         setPlayerEffects()
         player.addListener(object : Player.Listener {
@@ -382,7 +394,12 @@ class SimplePlayer(
     }
 
     fun setDisplay(surfaceView: SurfaceView?): Boolean {
-        val player = player ?: return false
+        val player = player
+        if (player == null) {
+            pendingSurface = surfaceView
+            return false
+        }
+        pendingSurface = null
 
         return try {
             player.setVideoSurfaceHolder(surfaceView?.holder)
