@@ -9,15 +9,19 @@ import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
 import au.com.shiftyjelly.pocketcasts.models.di.ModelModule
 import au.com.shiftyjelly.pocketcasts.models.di.addTypeConverters
 import au.com.shiftyjelly.pocketcasts.models.entity.AlternateEnclosureSource
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeAlternateEnclosure
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.MediaKind
 import com.squareup.moshi.Moshi
 import java.util.Date
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -102,6 +106,43 @@ class AlternateEnclosureDaoTest {
         assertNull(stored[1].mediaKind)
         assertEquals(MediaKind.Unknown("hologram"), stored[2].mediaKind)
     }
+
+    @Test
+    fun hasVideoEnclosureMatchesHlsAndVideoMediaKind() = runTest {
+        episodeDao.insertBlocking(PodcastEpisode(uuid = "hls-episode", publishedDate = Date()))
+        episodeDao.insertBlocking(PodcastEpisode(uuid = "video-episode", publishedDate = Date()))
+        episodeDao.insertBlocking(PodcastEpisode(uuid = "audio-episode", publishedDate = Date()))
+
+        alternateEnclosureDao.replaceForEpisode(
+            "hls-episode",
+            listOf(enclosure(position = 0, type = "APPLICATION/X-MPEGURL", uri = "https://example.com/master.m3u8").copy(episodeUuid = "hls-episode")),
+        )
+        alternateEnclosureDao.replaceForEpisode(
+            "video-episode",
+            listOf(
+                enclosure(position = 0, type = "video/mp4", uri = "https://example.com/file.mp4", mediaKind = MediaKind.Video)
+                    .copy(episodeUuid = "video-episode"),
+            ),
+        )
+        alternateEnclosureDao.replaceForEpisode(
+            "audio-episode",
+            listOf(
+                enclosure(position = 0, type = "audio/mp3", uri = "https://example.com/file.mp3", mediaKind = MediaKind.Audio)
+                    .copy(episodeUuid = "audio-episode"),
+            ),
+        )
+
+        assertTrue(hasVideoEnclosure("hls-episode"))
+        assertTrue(hasVideoEnclosure("video-episode"))
+        assertFalse(hasVideoEnclosure("audio-episode"))
+        assertFalse(hasVideoEnclosure("unknown-episode"))
+    }
+
+    private suspend fun hasVideoEnclosure(episodeUuid: String) = alternateEnclosureDao.hasVideoEnclosure(
+        episodeUuid = episodeUuid,
+        hlsMimeTypes = BaseEpisode.HLS_MIME_TYPES,
+        videoMediaKind = MediaKind.Video.stringValue,
+    ).first()
 
     private fun enclosure(position: Int, type: String, uri: String, mediaKind: MediaKind? = null) = EpisodeAlternateEnclosure(
         episodeUuid = "episode-1",
