@@ -116,7 +116,7 @@ fun TvCategoryTile(
             .width(284.dp)
             .height(129.dp),
     ) {
-        Box(modifier = Modifier.fillMaxSize()) {
+        Box(modifier = Modifier.fillMaxSize().clip(TvCardShape)) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
