@@ -139,15 +139,16 @@ class BaseEpisodeHlsDetectionTest {
     }
 
     @Test
-    fun `episode streaming a video alternate enclosure counts as video`() {
+    fun `episode streaming a video alternate enclosure is a video stream but not a video file`() {
         val episode = createEpisode(downloadUrl = "https://example.com/episode.mp3", fileType = "audio/mp3").apply {
             overrideStreamUrl = "https://example.com/episode.mp4"
             overrideStreamContentType = "video/mp4"
         }
 
-        assertTrue(episode.isVideo)
         assertTrue(episode.isStreamUrlVideo)
         assertFalse(episode.isStreamUrlHls)
+        // The episode's own enclosure is still audio, so anything reading it from the database sees audio.
+        assertFalse(episode.isVideo)
     }
 
     @Test

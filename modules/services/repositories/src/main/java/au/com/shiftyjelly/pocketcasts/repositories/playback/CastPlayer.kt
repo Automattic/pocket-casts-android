@@ -238,7 +238,7 @@ class CastPlayer(
     }
 
     override fun setEpisode(episode: BaseEpisode, preferStream: Boolean) {
-        this.episodeLocation = EpisodeLocation.Stream(episode, episode.streamUrl, episode.isStreamUrlHls)
+        this.episodeLocation = EpisodeLocation.Stream(episode, episode.streamUrl, episode.isStreamUrlHls, episode.isStreamUrlVideo)
         localEpisodeUuid = episode.uuid
         buildCustomData()
     }
@@ -280,7 +280,8 @@ class CastPlayer(
     }
 
     private fun buildMediaInfo(url: String, episode: BaseEpisode, podcast: Podcast): MediaInfo {
-        val mediaMetadata = MediaMetadata(if (episode.isVideo) MediaMetadata.MEDIA_TYPE_MOVIE else MediaMetadata.MEDIA_TYPE_MUSIC_TRACK).apply {
+        val isVideo = episode.isVideo || episodeLocation.isVideoStream
+        val mediaMetadata = MediaMetadata(if (isVideo) MediaMetadata.MEDIA_TYPE_MOVIE else MediaMetadata.MEDIA_TYPE_MUSIC_TRACK).apply {
             putString(MediaMetadata.KEY_TITLE, episode.title)
             putString(MediaMetadata.KEY_SUBTITLE, podcast.title)
             putString(MediaMetadata.KEY_ALBUM_ARTIST, podcast.author)

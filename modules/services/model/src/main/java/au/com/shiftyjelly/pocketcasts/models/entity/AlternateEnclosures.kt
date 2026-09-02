@@ -36,7 +36,7 @@ private val EpisodeAlternateEnclosure.isProgressiveVideo: Boolean
 
 private fun EpisodeAlternateEnclosure.toStream(isHls: Boolean): AlternateEnclosureStream? {
     val source = sources.firstOrNull { it.uri.isPlayableHttpUri() } ?: return null
-    return AlternateEnclosureStream(url = source.uri, contentType = source.contentType ?: type, isHls = isHls)
+    return AlternateEnclosureStream(url = source.uri, contentType = source.contentType?.takeIf { it.isNotBlank() } ?: type, isHls = isHls)
 }
 
 private fun String.isPlayableHttpUri(): Boolean {

@@ -22,6 +22,7 @@ class EpisodeLocationTest {
         assertTrue(location is EpisodeLocation.Downloaded)
         assertEquals("/path/episode.mp3", location.uri)
         assertFalse(location.isHlsStream)
+        assertFalse(location.isVideoStream)
     }
 
     @Test
@@ -65,7 +66,25 @@ class EpisodeLocationTest {
     }
 
     @Test
-    fun `downloaded episode without hls stays downloaded when preferring stream`() {
+    fun `downloaded episode prefers a video alternate enclosure override stream`() {
+        val episode = createEpisode(
+            downloadStatus = EpisodeDownloadStatus.Downloaded,
+            downloadedFilePath = "/path/episode.mp3",
+        ).apply {
+            overrideStreamUrl = "https://example.com/episode.mp4"
+            overrideStreamContentType = "video/mp4"
+        }
+
+        val location = EpisodeLocation.create(episode, preferStream = true)
+
+        assertTrue(location is EpisodeLocation.Stream)
+        assertEquals("https://example.com/episode.mp4", location.uri)
+        assertFalse(location.isHlsStream)
+        assertTrue(location.isVideoStream)
+    }
+
+    @Test
+    fun `downloaded episode without a video rendition stays downloaded when preferring stream`() {
         val episode = createEpisode(
             downloadStatus = EpisodeDownloadStatus.Downloaded,
             downloadedFilePath = "/path/episode.mp3",
@@ -76,6 +95,7 @@ class EpisodeLocationTest {
         assertTrue(location is EpisodeLocation.Downloaded)
         assertEquals("/path/episode.mp3", location.uri)
         assertFalse(location.isHlsStream)
+        assertFalse(location.isVideoStream)
     }
 
     @Test

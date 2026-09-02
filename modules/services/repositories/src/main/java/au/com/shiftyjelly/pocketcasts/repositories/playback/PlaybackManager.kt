@@ -273,8 +273,8 @@ open class PlaybackManager @Inject constructor(
     private val _playerFlow = MutableStateFlow<Player?>(null)
     val playerFlow = _playerFlow.asStateFlow()
 
-    // HLS starts Unknown until the player's tracks resolve it to HasVideo or AudioOnly; the video
-    // surface is shown only once HasVideo is known.
+    // A resolved video rendition starts Unknown until the player's tracks resolve it to HasVideo or
+    // AudioOnly; the video surface is shown only once HasVideo is known.
     private val _streamVideoState = MutableStateFlow(StreamVideoState.NotVideo)
     val streamVideoState = _streamVideoState.asStateFlow()
 
@@ -2193,12 +2193,13 @@ open class PlaybackManager @Inject constructor(
 
         flushPendingContentTypeEvents()
 
-        // Audio only forces video content to audio. Otherwise HLS starts Unknown until the tracks resolve it; non-HLS keeps its own flag.
+        // Audio only forces video content to audio. Otherwise a resolved video rendition starts Unknown until the
+        // tracks resolve it; an episode playing its own enclosure keeps its file type's flag.
         synchronized(pendingContentTypeEvents) {
             _streamVideoState.value = StreamVideoState.initialFor(
                 episode,
                 audioOnly = settings.audioOnly.value,
-                playingHlsStream = playingStream && episode.isStreamUrlHls,
+                playingVideoStream = playingStream && episode.isStreamUrlVideo,
                 isRemote = castConnected,
             )
         }

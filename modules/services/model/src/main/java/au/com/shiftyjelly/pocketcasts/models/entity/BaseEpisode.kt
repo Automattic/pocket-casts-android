@@ -135,9 +135,8 @@ sealed interface BaseEpisode {
     val isInProgress: Boolean
         get() = EpisodePlayingStatus.IN_PROGRESS == playingStatus
 
-    /** Video either because the episode's own enclosure is video, or because a video rendition was resolved to stream. */
     val isVideo: Boolean
-        get() = isVideoMimeType(fileType) || isVideoMimeType(overrideStreamContentType)
+        get() = isVideoMimeType(fileType)
 
     /** The enclosure itself is HLS, so there is no progressive file to download. */
     val isHlsOnly: Boolean

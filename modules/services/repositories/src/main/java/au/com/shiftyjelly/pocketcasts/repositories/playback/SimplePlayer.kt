@@ -344,7 +344,7 @@ class SimplePlayer(
     private fun applyVideoTrackSelection() {
         val trackSelector = trackSelector ?: return
         trackSelector.parameters = trackSelector.buildUponParameters()
-            .setTrackTypeDisabled(C.TRACK_TYPE_VIDEO, shouldDisableVideoTrack(settings.audioOnly.value, hasVideoSurface, episodeLocation.isHlsStream))
+            .setTrackTypeDisabled(C.TRACK_TYPE_VIDEO, shouldDisableVideoTrack(settings.audioOnly.value, hasVideoSurface, episodeLocation.isVideoStream))
             .build()
     }
 
@@ -438,8 +438,9 @@ class SimplePlayer(
     }
 }
 
-internal fun shouldDisableVideoTrack(audioOnly: Boolean, hasVideoSurface: Boolean, isHlsStream: Boolean): Boolean {
-    return audioOnly || (!hasVideoSurface && !isHlsStream)
+// A resolved video rendition keeps its video track so the player can report whether the stream carries video.
+internal fun shouldDisableVideoTrack(audioOnly: Boolean, hasVideoSurface: Boolean, isVideoStream: Boolean): Boolean {
+    return audioOnly || (!hasVideoSurface && !isVideoStream)
 }
 
 private class PlayPauseListener(
