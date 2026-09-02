@@ -49,7 +49,6 @@ fun TvModal(
         val isBlurBehindEnabled by rememberIsBlurBehindEnabled()
         TvModalWindowEffects(isBlurBehindEnabled = isBlurBehindEnabled)
         TvModalSurface(
-            isTranslucent = isBlurBehindEnabled,
             width = width,
             contentPadding = contentPadding,
             modifier = modifier,
@@ -61,16 +60,11 @@ fun TvModal(
 @Composable
 internal fun TvModalSurface(
     modifier: Modifier = Modifier,
-    isTranslucent: Boolean = false,
     width: Dp = DefaultModalWidth,
     contentPadding: PaddingValues = DefaultContentPadding,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    val containerColor = if (isTranslucent) {
-        MaterialTheme.tvColors.translucentOverlayContainer
-    } else {
-        MaterialTheme.tvColors.overlayContainer
-    }
+    val containerColor = MaterialTheme.tvColors.translucentOverlayContainer
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(12.dp),
