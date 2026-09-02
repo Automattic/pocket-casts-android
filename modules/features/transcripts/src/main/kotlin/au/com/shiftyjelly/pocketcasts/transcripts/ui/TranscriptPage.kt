@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.transcripts.ui
 
 import android.os.SystemClock
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.DragInteraction
 import androidx.compose.foundation.layout.Box
@@ -211,6 +212,10 @@ fun TranscriptPage(
                     .padding(start = 16.dp, end = 16.dp, bottom = debugBottomPadding),
             )
         }
+    }
+
+    BackHandler(enabled = isSearching) {
+        onHideSearchBar()
     }
 
     ScrollToItemEffect(
