@@ -56,7 +56,7 @@ fun TvBannerRow(
     TvTile(
         onClick = onClick,
         shape = CardDefaults.shape(TvCardShape),
-        scale = CardDefaults.scale(focusedScale = 1.05f),
+        scale = CardDefaults.scale(focusedScale = TvFocusedCardScale),
         colors = CardDefaults.colors(
             containerColor = Color.Black,
             focusedContainerColor = Color.Black,

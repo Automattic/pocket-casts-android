@@ -85,7 +85,7 @@ fun TvPlaylistCard(
 
     TvTile(
         onClick = onClick,
-        scale = CardDefaults.scale(focusedScale = 1.05f),
+        scale = CardDefaults.scale(focusedScale = TvFocusedCardScale),
         shape = CardDefaults.shape(RoundedCornerShape(11.dp)),
         colors = CardDefaults.colors(
             containerColor = Color.Transparent,

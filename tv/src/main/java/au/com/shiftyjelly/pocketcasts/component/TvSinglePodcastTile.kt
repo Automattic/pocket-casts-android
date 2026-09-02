@@ -52,7 +52,7 @@ fun TvSinglePodcastTile(
 
     TvTile(
         onClick = onClick,
-        scale = CardDefaults.scale(focusedScale = 1.02f),
+        scale = CardDefaults.scale(focusedScale = TvFocusedWideCardScale),
         shape = CardDefaults.shape(shape = TvCardShape),
         colors = CardDefaults.colors(
             containerColor = MaterialTheme.tvColors.backgroundSunken,

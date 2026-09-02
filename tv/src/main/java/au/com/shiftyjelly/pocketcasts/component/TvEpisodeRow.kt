@@ -70,7 +70,7 @@ fun TvEpisodeRow(
     TvTile(
         onClick = onClick,
         onLongClick = onLongClick,
-        scale = CardDefaults.scale(focusedScale = 1.02f),
+        scale = CardDefaults.scale(focusedScale = TvFocusedWideCardScale),
         shape = CardDefaults.shape(RoundedCornerShape(8.dp)),
         colors = CardDefaults.colors(
             containerColor = MaterialTheme.tvColors.backgroundBase,
@@ -162,7 +162,7 @@ fun TvResumeCard(
     TvTile(
         onClick = onClick,
         onLongClick = onLongClick,
-        scale = CardDefaults.scale(focusedScale = 1.02f),
+        scale = CardDefaults.scale(focusedScale = TvFocusedWideCardScale),
         shape = CardDefaults.shape(RoundedCornerShape(8.dp)),
         colors = CardDefaults.colors(
             containerColor = MaterialTheme.tvColors.backgroundBase,

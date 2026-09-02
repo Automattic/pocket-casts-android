@@ -58,7 +58,7 @@ fun TvFeaturedTile(
 
     TvTile(
         onClick = onPlayLastEpisode,
-        scale = CardDefaults.scale(focusedScale = 1.02f),
+        scale = CardDefaults.scale(focusedScale = TvFocusedWideCardScale),
         colors = CardDefaults.colors(
             containerColor = Color.Transparent,
             focusedContainerColor = Color.Transparent,
