@@ -13,6 +13,11 @@ steps:
   # Wait for Gradle Wrapper to be validated before running any other jobs
   - wait
 
+  # TEMPORARY — validation only (see the PR description). Never to be merged.
+  - label: ":slack: [TEMP] Slack webhook probe"
+    command: .buildkite/commands/slack-webhook-probe.sh
+    plugins: [ $CI_TOOLKIT ]
+
   - group: "Linters"
     steps:
       - label: ":danger: Danger - PR Check"

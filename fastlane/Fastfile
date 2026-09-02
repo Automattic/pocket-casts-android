@@ -81,6 +81,11 @@ UPLOAD_TO_PLAY_STORE_COMMON_OPTIONS = {
 }.freeze
 
 ########################################################################
+# Slack
+########################################################################
+SLACK_CHANNEL = '#pocket-casts-android'
+
+########################################################################
 # Firebase App Distribution (FAD)
 ########################################################################
 FIREBASE_APP_ID = '1:124902176124:android:ad0ff1c7193b55ee1620f9'
@@ -977,6 +982,55 @@ platform :android do
 
     UI.user_error!(error_message)
   end
+
+  #####################################################################################
+  # Slack helpers
+  #####################################################################################
+
+  # Sends a Slack message to the given channel via the incoming webhook.
+  def send_slack_message(message:, channel: SLACK_CHANNEL)
+    slack(
+      username: 'Pocket Casts Release Bot',
+      slack_url: ENV.fetch('SLACK_WEBHOOK'),
+      channel: channel,
+      message: message,
+      default_payloads: []
+    )
+  end
+
+  # Posts to Slack without letting a webhook hiccup abort the caller. A release job must not
+  # go red because a notification did not land.
+  def notify_slack(message)
+    send_slack_message(message: message)
+  rescue StandardError => e
+    UI.important("Slack notification failed (#{e.message}); continuing without it.")
+  end
+
+  # TEMPORARY — validation only, never to be merged. See the PR description.
+  #
+  # Posts one clearly-marked message through the real webhook with no channel override, so we
+  # can read back which channel it is bound to and whether the `username` override is honoured.
+  # Then posts through a deliberately invalid webhook to prove `notify_slack` degrades instead
+  # of failing the job.
+  lane :slack_webhook_probe do
+    build_url = ENV.fetch('BUILDKITE_BUILD_URL', 'a local run')
+
+    UI.message('Probe 1/2 — real webhook, no channel override.')
+    send_slack_message(
+      message: ":test_tube: *Webhook wiring check — please ignore.* Confirming where `SLACK_WEBHOOK` posts, for AINFRA-3066. Triggered by #{build_url}",
+      channel: nil
+    )
+
+    UI.message('Probe 2/2 — invalid webhook, expecting a logged failure and a green job.')
+    real_webhook = ENV.fetch('SLACK_WEBHOOK', nil)
+    begin
+      ENV['SLACK_WEBHOOK'] = 'https://hooks.slack.com/services/DELIBERATELY/INVALID/WEBHOOK'
+      notify_slack('This message must never reach Slack.')
+    ensure
+      ENV['SLACK_WEBHOOK'] = real_webhook
+    end
+  end
+
 
   # Reports a milestone-related error, both in the logs and — on CI — as a Buildkite annotation,
   # clarifying that the error is expected when the release task is not being run for the first time.
