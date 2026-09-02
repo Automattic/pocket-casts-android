@@ -64,7 +64,7 @@ fun TvBannerRow(
         interactionSource = interactionSource,
         modifier = modifier
             .fillMaxWidth()
-            .height(99.dp),
+            .height(153.dp),
     ) {
         Box(modifier = Modifier.fillMaxSize().clipToBounds()) {
             BackgroundLift()
@@ -167,8 +167,8 @@ private fun TvDiscoverBanner.artwork(): Int = when (this) {
 
 private val TvDiscoverBanner.artworkHeight: Dp
     get() = when (this) {
-        TvDiscoverBanner.CreateAccount -> 112.5.dp
-        TvDiscoverBanner.DiscoverMore -> 127.5.dp
+        TvDiscoverBanner.CreateAccount -> 174.dp
+        TvDiscoverBanner.DiscoverMore -> 197.dp
     }
 
 private val TvDiscoverBanner.contentWidthFraction: Float
