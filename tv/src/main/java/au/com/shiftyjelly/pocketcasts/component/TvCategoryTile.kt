@@ -47,6 +47,7 @@ import androidx.tv.material3.Glow
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
+import au.com.shiftyjelly.pocketcasts.theme.TvCardShape
 import au.com.shiftyjelly.pocketcasts.theme.TvTheme
 import au.com.shiftyjelly.pocketcasts.theme.tvColors
 import au.com.shiftyjelly.pocketcasts.theme.tvTypography
@@ -57,7 +58,6 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import coil3.size.Size
 
-private val CardShape = RoundedCornerShape(9.dp)
 private val CoverSize = 78.dp
 private val CoverShape = RoundedCornerShape(6.dp)
 private const val COVER_VISIBLE_FRACTION = 0.55f
@@ -103,7 +103,7 @@ fun TvCategoryTile(
 
     TvTile(
         onClick = onClick,
-        shape = CardDefaults.shape(shape = CardShape),
+        shape = CardDefaults.shape(shape = TvCardShape),
         colors = CardDefaults.colors(
             containerColor = MaterialTheme.tvColors.backgroundOverlay,
             focusedContainerColor = MaterialTheme.tvColors.backgroundOverlay,

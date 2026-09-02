@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.tv.material3.CardDefaults
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import au.com.shiftyjelly.pocketcasts.theme.TvCardShape
 import au.com.shiftyjelly.pocketcasts.theme.TvTheme
 import au.com.shiftyjelly.pocketcasts.theme.tvColors
 import au.com.shiftyjelly.pocketcasts.theme.tvTypography
@@ -52,7 +53,7 @@ fun TvSinglePodcastTile(
     TvTile(
         onClick = onClick,
         scale = CardDefaults.scale(focusedScale = 1.02f),
-        shape = CardDefaults.shape(shape = RoundedCornerShape(9.dp)),
+        shape = CardDefaults.shape(shape = TvCardShape),
         colors = CardDefaults.colors(
             containerColor = MaterialTheme.tvColors.backgroundSunken,
             focusedContainerColor = MaterialTheme.tvColors.backgroundActive,

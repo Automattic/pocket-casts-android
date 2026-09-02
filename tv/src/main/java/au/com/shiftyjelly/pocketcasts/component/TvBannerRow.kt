@@ -37,6 +37,7 @@ import androidx.tv.material3.CardDefaults
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverBanner
+import au.com.shiftyjelly.pocketcasts.theme.TvCardShape
 import au.com.shiftyjelly.pocketcasts.theme.TvTheme
 import au.com.shiftyjelly.pocketcasts.theme.tvColors
 import au.com.shiftyjelly.pocketcasts.theme.tvTypography
@@ -54,7 +55,7 @@ fun TvBannerRow(
 
     TvTile(
         onClick = onClick,
-        shape = CardDefaults.shape(RoundedCornerShape(9.dp)),
+        shape = CardDefaults.shape(TvCardShape),
         scale = CardDefaults.scale(focusedScale = 1.05f),
         colors = CardDefaults.colors(
             containerColor = Color.Black,
