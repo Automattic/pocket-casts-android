@@ -4,6 +4,7 @@ import au.com.shiftyjelly.pocketcasts.models.db.dao.AlternateEnclosureDao
 import au.com.shiftyjelly.pocketcasts.models.entity.AlternateEnclosureSource
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeAlternateEnclosure
+import au.com.shiftyjelly.pocketcasts.models.type.MediaKind
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
@@ -33,10 +34,10 @@ class AlternateEnclosureManagerImplTest {
     }
 
     @Test
-    fun `hasHlsAlternateEnclosure queries the dao with the HLS mime types`() = runBlocking {
-        whenever(alternateEnclosureDao.hasHlsEnclosure("episode-uuid", BaseEpisode.HLS_MIME_TYPES)).thenReturn(flowOf(true))
+    fun `hasVideoAlternateEnclosure queries the dao with the HLS mime types and the video media kind`() = runBlocking {
+        whenever(alternateEnclosureDao.hasVideoEnclosure("episode-uuid", BaseEpisode.HLS_MIME_TYPES, MediaKind.Video.stringValue)).thenReturn(flowOf(true))
 
-        assertTrue(manager.hasHlsAlternateEnclosure("episode-uuid").first())
+        assertTrue(manager.hasVideoAlternateEnclosure("episode-uuid").first())
     }
 
     private fun enclosure(position: Int) = EpisodeAlternateEnclosure(

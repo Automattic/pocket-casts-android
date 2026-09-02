@@ -6,5 +6,5 @@ import kotlinx.coroutines.flow.Flow
 interface AlternateEnclosureManager {
     suspend fun findForEpisode(episodeUuid: String): List<EpisodeAlternateEnclosure>
 
-    fun hasHlsAlternateEnclosure(episodeUuid: String): Flow<Boolean>
+    fun hasVideoAlternateEnclosure(episodeUuid: String): Flow<Boolean>
 }

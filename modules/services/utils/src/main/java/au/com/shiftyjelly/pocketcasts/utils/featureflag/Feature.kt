@@ -360,6 +360,15 @@ enum class Feature(
         hasDevToggle = true,
         addedOn = LocalDate.parse("2026-06-11"),
     ),
+    VIDEO_ALTERNATE_ENCLOSURES(
+        key = "video_alternate_enclosures",
+        title = "Prefer video alternate enclosure when available",
+        defaultValue = isDebugOrPrototypeBuild,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = false,
+        hasDevToggle = true,
+        addedOn = LocalDate.parse("2026-09-02"),
+    ),
     STATS_HEATMAP(
         key = "stats_heatmap",
         title = "Show listening activity heatmap on Stats",
