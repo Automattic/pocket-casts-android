@@ -38,7 +38,6 @@ fun TvVideoPreviewPlayer(
     isFocused: Boolean,
     isPodcastPlaying: () -> Boolean,
     modifier: Modifier = Modifier,
-    stopRequested: Boolean = false,
 ) {
     val context = LocalContext.current
     val currentIsPodcastPlaying by rememberUpdatedState(isPodcastPlaying)
@@ -47,16 +46,7 @@ fun TvVideoPreviewPlayer(
     var hasFirstFrame by remember(videoUrl) { mutableStateOf(false) }
     var isPreviewing by remember(videoUrl) { mutableStateOf(false) }
 
-    LaunchedEffect(videoUrl, isFocused, stopRequested) {
-        if (stopRequested) {
-            // The user has chosen to play the episode. Release the preview player immediately so its
-            // video decoder is freed before the main player prepares and requests one of its own,
-            // avoiding MediaCodec "insufficient resources" failures on codec-limited devices.
-            player = null
-            isPreviewing = false
-            hasFirstFrame = false
-            return@LaunchedEffect
-        }
+    LaunchedEffect(videoUrl, isFocused) {
         if (isFocused) {
             val exoPlayer = player ?: run {
                 delay(PLAY_DELAY_MS)

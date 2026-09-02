@@ -54,13 +54,9 @@ fun TvVideoTile(
     isPodcastPlaying: () -> Boolean = { false },
 ) {
     var isFocused by remember { mutableStateOf(false) }
-    var stopPreview by remember { mutableStateOf(false) }
 
     TvTile(
-        onClick = {
-            stopPreview = true
-            onPlayEpisode()
-        },
+        onClick = onPlayEpisode,
         onLongClick = onGoToPodcast,
         scale = CardDefaults.scale(focusedScale = 1.05f),
         modifier = modifier.onFocusChanged { isFocused = it.hasFocus },
@@ -95,7 +91,6 @@ fun TvVideoTile(
                     isFocused = isFocused,
                     isPodcastPlaying = isPodcastPlaying,
                     modifier = Modifier.fillMaxSize(),
-                    stopRequested = stopPreview,
                 )
             }
 
