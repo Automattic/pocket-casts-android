@@ -273,17 +273,17 @@ open class PlaybackManager @Inject constructor(
     private val _playerFlow = MutableStateFlow<Player?>(null)
     val playerFlow = _playerFlow.asStateFlow()
 
-    // A resolved rendition starts Unknown until the player's tracks resolve it; the surface shows only at HasVideo.
+    // A resolved encoding starts Unknown until the player's tracks resolve it; the surface shows only at HasVideo.
     private val _streamVideoState = MutableStateFlow(StreamVideoState.NotVideo)
     val streamVideoState = _streamVideoState.asStateFlow()
 
     private val _videoRenderingEnabled = MutableStateFlow(true)
     val videoRenderingEnabled = _videoRenderingEnabled.asStateFlow()
 
-    // Strictly whether an HLS rendition exists, which is what the analytics schema's hls_available means.
+    // Strictly whether an HLS encoding exists, which is what the analytics schema's hls_available means.
     private val _streamHlsAvailable = MutableStateFlow(false)
 
-    // Unlike _streamHlsAvailable this also requires the rendition's feature flag to be on.
+    // Unlike _streamHlsAvailable this also requires the encoding's feature flag to be on.
     private val _streamVideoAvailable = MutableStateFlow(false)
     val streamVideoAvailable = _streamVideoAvailable.asStateFlow()
 
@@ -2194,7 +2194,7 @@ open class PlaybackManager @Inject constructor(
 
         flushPendingContentTypeEvents()
 
-        // Audio only forces video content to audio; otherwise only a rendition we are actually playing starts Unknown.
+        // Audio only forces video content to audio; otherwise only an encoding we are actually playing starts Unknown.
         synchronized(pendingContentTypeEvents) {
             _streamVideoState.value = StreamVideoState.initialFor(
                 episode,
@@ -3090,7 +3090,7 @@ internal fun buildPrefetchRequest(
     if (episode.isDownloaded) return null
     if (episode.isDownloading) return null
     if (episode.isStreamUrlVideo) return null
-    // The next episode will stream an alternate rendition by default, so there is no progressive file worth prefetching.
+    // The next episode will stream an alternate encoding by default, so there is no progressive file worth prefetching.
     if (isAlternateStreamDefault) return null
     val url = episode.downloadUrl ?: return null
 

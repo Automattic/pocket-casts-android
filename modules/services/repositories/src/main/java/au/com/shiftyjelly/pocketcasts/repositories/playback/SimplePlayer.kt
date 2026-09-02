@@ -438,7 +438,7 @@ class SimplePlayer(
     }
 }
 
-// A resolved video rendition keeps its video track so the player can report whether the stream carries video.
+// A resolved video encoding keeps its video track so the player can report whether the stream carries video.
 internal fun shouldDisableVideoTrack(audioOnly: Boolean, hasVideoSurface: Boolean, isVideoStream: Boolean): Boolean {
     return audioOnly || (!hasVideoSurface && !isVideoStream)
 }

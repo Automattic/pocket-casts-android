@@ -148,7 +148,7 @@ sealed interface BaseEpisode {
     /** The content type of [overrideStreamUrl], used to decide HLS/video handling. */
     var overrideStreamContentType: String?
 
-    /** Whether [overrideStreamUrl] is a video rendition, as the server's media kind declared it. */
+    /** Whether [overrideStreamUrl] is a video encoding, as the server's media kind declared it. */
     var overrideStreamIsVideo: Boolean
 
     /**
@@ -168,7 +168,7 @@ sealed interface BaseEpisode {
             return isHlsUrl(url) || (url == downloadUrl && isHlsMimeType(fileType))
         }
 
-    /** Whether streaming will use an alternate rendition that carries video the progressive enclosure may not. */
+    /** Whether streaming will use an alternate encoding that carries video the progressive enclosure may not. */
     val isStreamUrlVideo: Boolean
         get() = isStreamUrlHls || (overrideStreamUrl != null && overrideStreamIsVideo)
 

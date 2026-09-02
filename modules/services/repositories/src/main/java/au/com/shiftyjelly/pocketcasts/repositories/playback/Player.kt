@@ -32,12 +32,12 @@ sealed interface EpisodeLocation {
 val EpisodeLocation?.isHlsStream: Boolean
     get() = (this as? EpisodeLocation.Stream)?.isHls == true
 
-/** Whether the stream is a video rendition, which the episode's own file type may not advertise. */
+/** Whether the stream is a video encoding, which the episode's own file type may not advertise. */
 val EpisodeLocation?.isVideoStream: Boolean
     get() = (this as? EpisodeLocation.Stream)?.isVideo == true
 
 /**
- * Whether the stream the player prepared carries video. A resolved video rendition starts [Unknown] until
+ * Whether the stream the player prepared carries video. A resolved video encoding starts [Unknown] until
  * the player's tracks resolve it to [HasVideo] or [AudioOnly]; the surface is shown only once it reaches [HasVideo].
  */
 enum class StreamVideoState {

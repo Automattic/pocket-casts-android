@@ -15,12 +15,12 @@ fun List<EpisodeAlternateEnclosure>?.firstHlsStreamUrl(): String? = firstHlsStre
 /** The first HLS enclosure's MIME type, or null if none. Lets HLS-only episodes be detected synchronously. */
 fun List<EpisodeAlternateEnclosure>?.firstHlsMimeType(): String? = this?.firstOrNull { BaseEpisode.isHlsMimeType(it.type) }?.type
 
-/** The streamable HLS rendition, preferred over [firstProgressiveVideoStream] because it adapts to bandwidth. */
+/** The streamable HLS encoding, preferred over [firstProgressiveVideoStream] because it adapts to bandwidth. */
 fun List<EpisodeAlternateEnclosure>?.firstHlsStream(): AlternateEnclosureStream? = this
     ?.filter { BaseEpisode.isHlsMimeType(it.type) }
     ?.firstNotNullOfOrNull { it.toStream(isHls = true) }
 
-/** The streamable non-HLS rendition the server marked `media_kind = "video"`, such as a `video/mp4` enclosure. */
+/** The streamable non-HLS encoding the server marked `media_kind = "video"`, such as a `video/mp4` enclosure. */
 fun List<EpisodeAlternateEnclosure>?.firstProgressiveVideoStream(): AlternateEnclosureStream? = this
     ?.filter { it.isProgressiveVideo }
     ?.firstNotNullOfOrNull { it.toStream(isHls = false) }
@@ -33,7 +33,7 @@ private val EpisodeAlternateEnclosure.isProgressiveVideo: Boolean
 
 private fun EpisodeAlternateEnclosure.toStream(isHls: Boolean): AlternateEnclosureStream? {
     val source = sources.firstOrNull { it.uri.isPlayableHttpUri() } ?: return null
-    // The enclosure's own type describes the rendition; a source may declare a generic type such as application/octet-stream.
+    // The enclosure's own type describes the encoding; a source may declare a generic type such as application/octet-stream.
     val contentType = type?.takeIf { it.isNotBlank() } ?: source.contentType?.takeIf { it.isNotBlank() }
     return AlternateEnclosureStream(url = source.uri, contentType = contentType, isHls = isHls, isVideo = mediaKind == MediaKind.Video)
 }
