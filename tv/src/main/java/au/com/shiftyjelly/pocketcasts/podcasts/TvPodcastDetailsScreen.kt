@@ -145,7 +145,7 @@ private fun TvPodcastDetailsContent(
                 var isShowingInfoModal by remember { mutableStateOf(false) }
                 var isShowingAccountModal by rememberSaveable { mutableStateOf(false) }
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(60.dp),
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(start = 42.dp, top = 16.dp, end = 42.dp),
