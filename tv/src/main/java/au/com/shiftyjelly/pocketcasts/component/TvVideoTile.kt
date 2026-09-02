@@ -33,6 +33,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.tv.material3.CardDefaults
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.theme.TvTheme
@@ -57,11 +58,12 @@ fun TvVideoTile(
     TvTile(
         onClick = onPlayEpisode,
         onLongClick = onGoToPodcast,
+        scale = CardDefaults.scale(focusedScale = 1.05f),
         modifier = modifier.onFocusChanged { isFocused = it.hasFocus },
     ) {
         Box(
             modifier = Modifier
-                .width(323.dp)
+                .width(358.dp)
                 .aspectRatio(16f / 9f),
         ) {
             AsyncImage(
@@ -102,11 +104,11 @@ fun TvVideoTile(
                             colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.9f)),
                         ),
                     )
-                    .padding(14.dp),
+                    .padding(16.dp),
                 contentAlignment = Alignment.BottomStart,
             ) {
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     AsyncImage(
@@ -115,7 +117,7 @@ fun TvVideoTile(
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
                             .size(36.dp)
-                            .clip(RoundedCornerShape(4.dp)),
+                            .clip(RoundedCornerShape(3.dp)),
                     )
                     Column {
                         Text(

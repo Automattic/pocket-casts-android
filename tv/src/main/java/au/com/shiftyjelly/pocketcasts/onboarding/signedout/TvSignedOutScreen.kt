@@ -67,13 +67,13 @@ private fun TvSignedOutContent(
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier.padding(horizontal = 48.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier.padding(horizontal = 36.dp),
         ) {
             Image(
                 painter = painterResource(IR.drawable.ic_pocket_casts_logo),
                 contentDescription = null,
-                modifier = Modifier.size(36.dp),
+                modifier = Modifier.size(27.dp),
             )
             Text(
                 text = stringResource(LR.string.tv_account_signed_out_alert_title),
@@ -85,7 +85,7 @@ private fun TvSignedOutContent(
                 color = MaterialTheme.tvColors.textSecondary,
                 style = MaterialTheme.tvTypography.body.copy(textAlign = TextAlign.Center),
             )
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
             Button(
                 onClick = onLogIn,
                 colors = TvButtonDefaults.filledButtonColors(),

@@ -8,9 +8,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.Button
@@ -18,12 +20,15 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.component.TvBannerRow
 import au.com.shiftyjelly.pocketcasts.component.TvCategoryTile
+import au.com.shiftyjelly.pocketcasts.component.TvEpisodeRow
 import au.com.shiftyjelly.pocketcasts.component.TvFeaturedTile
 import au.com.shiftyjelly.pocketcasts.component.TvPodcastTile
 import au.com.shiftyjelly.pocketcasts.component.TvPodcastTileDefaults
+import au.com.shiftyjelly.pocketcasts.component.TvResumeCard
 import au.com.shiftyjelly.pocketcasts.component.TvRow
 import au.com.shiftyjelly.pocketcasts.component.TvSinglePodcastTile
 import au.com.shiftyjelly.pocketcasts.component.TvVideoTile
+import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 import au.com.shiftyjelly.pocketcasts.theme.TvButtonDefaults
 import au.com.shiftyjelly.pocketcasts.theme.tvColors
@@ -39,7 +44,7 @@ fun LazyListScope.tvDiscoverRow(
     onPlayLatestEpisode: (TvDiscoverRow, TvDiscoverPodcast) -> Unit,
     modifier: Modifier = Modifier,
     focusRequester: FocusRequester? = null,
-    contentPadding: PaddingValues = PaddingValues(horizontal = 32.dp),
+    contentPadding: PaddingValues = PaddingValues(horizontal = 42.dp),
     onTapBanner: (TvDiscoverBanner) -> Unit = {},
     onListImpression: (TvDiscoverRow) -> Unit = {},
     onRetryRow: (TvDiscoverRow) -> Unit = {},
@@ -52,7 +57,7 @@ fun LazyListScope.tvDiscoverRow(
             TvRow(
                 title = row.title,
                 items = row.podcasts,
-                itemSpacing = 32.dp,
+                itemSpacing = 12.dp,
                 contentPadding = contentPadding,
                 key = TvDiscoverPodcast::uuid,
                 focusRequester = focusRequester,
@@ -74,7 +79,7 @@ fun LazyListScope.tvDiscoverRow(
             TvRow(
                 title = row.title,
                 items = row.podcasts,
-                itemSpacing = 32.dp,
+                itemSpacing = 12.dp,
                 contentPadding = contentPadding,
                 key = TvDiscoverPodcast::uuid,
                 focusRequester = focusRequester,
@@ -96,22 +101,42 @@ fun LazyListScope.tvDiscoverRow(
             TvRow(
                 title = row.title,
                 items = row.episodes,
-                itemSpacing = 32.dp,
+                itemSpacing = 12.dp,
                 contentPadding = contentPadding,
                 key = TvDiscoverEpisode::episodeUuid,
                 focusRequester = focusRequester,
                 modifier = modifier,
             ) { episode ->
-                TvVideoTile(
-                    thumbnailUrl = episode.thumbnailUrl,
-                    podcastArtworkUrl = episode.podcastArtworkUrl,
-                    podcastTitle = episode.podcastTitle,
-                    episodeTitle = episode.episodeTitle,
-                    onPlayEpisode = { onEpisodePlay(row, episode) },
-                    onGoToPodcast = { onEpisodePodcastClick(row, episode) },
-                    videoPreviewUrl = episode.videoPreviewUrl,
-                    isPodcastPlaying = isPodcastPlaying,
-                )
+                val podcastEpisode = episode.episode
+                if (row.progressCardStyle != null && podcastEpisode != null) {
+                    val context = LocalContext.current
+                    val dateFormatter = remember(context) { RelativeDateFormatter(context) }
+                    when (row.progressCardStyle) {
+                        TvProgressCardStyle.Resume -> TvResumeCard(
+                            episode = podcastEpisode,
+                            onClick = { onEpisodePlay(row, episode) },
+                            dateFormatter = dateFormatter,
+                        )
+
+                        TvProgressCardStyle.Queue -> TvEpisodeRow(
+                            episode = podcastEpisode,
+                            onClick = { onEpisodePlay(row, episode) },
+                            dateFormatter = dateFormatter,
+                            modifier = Modifier.width(431.dp),
+                        )
+                    }
+                } else {
+                    TvVideoTile(
+                        thumbnailUrl = episode.thumbnailUrl,
+                        podcastArtworkUrl = episode.podcastArtworkUrl,
+                        podcastTitle = episode.podcastTitle,
+                        episodeTitle = episode.episodeTitle,
+                        onPlayEpisode = { onEpisodePlay(row, episode) },
+                        onGoToPodcast = { onEpisodePodcastClick(row, episode) },
+                        videoPreviewUrl = episode.videoPreviewUrl,
+                        isPodcastPlaying = isPodcastPlaying,
+                    )
+                }
             }
         }
 
@@ -180,7 +205,7 @@ private fun TvDiscoverFailedRow(
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = modifier) {
+    Column(verticalArrangement = Arrangement.spacedBy(9.dp), modifier = modifier) {
         if (title.isNotBlank()) {
             Text(
                 text = title,

@@ -214,8 +214,8 @@ internal class WaveformLevelSmoother(
 private const val WIDTH_FRACTION = 0.75f
 private const val AUDIO_DETECT_THRESHOLD = 0.01f
 private const val MIN_REACTIVE_LEVEL = 0.05f
-private val BarWidth = 3.33.dp
-private val BarSpacing = 4.67.dp
-private val MaxBarHeight = 66.67.dp
-private val MinBarHeight = 1.33.dp
-private val BarCornerRadius = 1.33.dp
+private val BarWidth = 2.5.dp
+private val BarSpacing = 3.5.dp
+private val MaxBarHeight = 50.dp
+private val MinBarHeight = 1.dp
+private val BarCornerRadius = 1.dp

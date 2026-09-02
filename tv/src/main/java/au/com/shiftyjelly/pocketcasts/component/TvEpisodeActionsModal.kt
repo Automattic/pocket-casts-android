@@ -324,4 +324,4 @@ private object NoOpTvEpisodeActions : TvEpisodeActions {
     override fun trackActionsShown(source: EpisodeViewSourceType) = Unit
 }
 
-private val ContentPadding = PaddingValues(horizontal = 24.dp, vertical = 27.dp)
+private val ContentPadding = PaddingValues(horizontal = 18.dp, vertical = 20.dp)

@@ -58,7 +58,7 @@ internal fun TvSearchEpisodeCard(
         onClick = onClick,
         onLongClick = onLongClick,
         scale = CardDefaults.scale(focusedScale = 1.02f),
-        shape = CardDefaults.shape(shape = RoundedCornerShape(12.dp)),
+        shape = CardDefaults.shape(shape = RoundedCornerShape(9.dp)),
         colors = CardDefaults.colors(
             containerColor = MaterialTheme.tvColors.backgroundSunken,
             focusedContainerColor = MaterialTheme.tvColors.backgroundActive,
@@ -68,19 +68,19 @@ internal fun TvSearchEpisodeCard(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(24.dp),
+                .padding(18.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             TvArtworkImage(
                 model = PodcastImage.getMediumArtworkUrl(episode.podcastUuid),
                 modifier = Modifier
-                    .size(96.dp)
-                    .clip(RoundedCornerShape(6.dp)),
+                    .size(72.dp)
+                    .clip(RoundedCornerShape(4.5.dp)),
             )
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(start = 24.dp),
+                    .padding(start = 18.dp),
             ) {
                 if (episode.podcastTitle.isNotBlank()) {
                     Text(
@@ -90,7 +90,7 @@ internal fun TvSearchEpisodeCard(
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(3.dp))
                 }
                 Text(
                     text = episode.title,
@@ -100,7 +100,7 @@ internal fun TvSearchEpisodeCard(
                     overflow = TextOverflow.Ellipsis,
                 )
                 if (duration.isNotBlank()) {
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(3.dp))
                     Text(
                         text = duration,
                         style = MaterialTheme.tvTypography.caption1,
@@ -117,7 +117,7 @@ internal fun TvSearchEpisodeCard(
 @Composable
 private fun TvSearchEpisodeCardPreview() {
     TvTheme {
-        Box(modifier = Modifier.background(MaterialTheme.tvColors.backgroundSunken).padding(48.dp)) {
+        Box(modifier = Modifier.background(MaterialTheme.tvColors.backgroundSunken).padding(36.dp)) {
             TvSearchEpisodeCard(
                 episode = ImprovedSearchResultItem.EpisodeItem(
                     uuid = "episode-1",

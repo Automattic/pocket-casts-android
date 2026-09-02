@@ -106,11 +106,11 @@ fun TvPlaylistCard(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 24.dp, vertical = 16.dp),
+                    .padding(horizontal = 18.dp, vertical = 12.dp),
             ) {
                 Text(
                     text = title,
-                    style = MaterialTheme.tvTypography.callout,
+                    style = MaterialTheme.tvTypography.headline,
                     color = titleColor,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,

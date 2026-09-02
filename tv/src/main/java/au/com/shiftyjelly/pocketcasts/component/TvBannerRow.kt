@@ -54,7 +54,7 @@ fun TvBannerRow(
 
     TvTile(
         onClick = onClick,
-        shape = CardDefaults.shape(RoundedCornerShape(12.dp)),
+        shape = CardDefaults.shape(RoundedCornerShape(9.dp)),
         scale = CardDefaults.scale(focusedScale = 1.05f),
         colors = CardDefaults.colors(
             containerColor = Color.Black,
@@ -63,7 +63,7 @@ fun TvBannerRow(
         interactionSource = interactionSource,
         modifier = modifier
             .fillMaxWidth()
-            .height(132.dp),
+            .height(99.dp),
     ) {
         Box(modifier = Modifier.fillMaxSize().clipToBounds()) {
             BackgroundLift()
@@ -93,12 +93,12 @@ fun TvBannerRow(
             }
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(48.dp),
+                horizontalArrangement = Arrangement.spacedBy(36.dp),
                 modifier = Modifier
                     .align(Alignment.CenterStart)
                     .fillMaxHeight()
                     .fillMaxWidth(banner.contentWidthFraction)
-                    .padding(horizontal = 48.dp),
+                    .padding(horizontal = 36.dp),
             ) {
                 BannerActionPill(banner, isFocused)
                 BannerText(banner, modifier = Modifier.weight(1f, fill = false))
@@ -148,7 +148,7 @@ private fun BannerActionPill(banner: TvDiscoverBanner, isFocused: Boolean) {
         modifier = Modifier
             .clip(RoundedCornerShape(percent = 50))
             .background(if (isFocused) MaterialTheme.tvColors.backgroundActive else MaterialTheme.tvColors.backgroundActive20)
-            .padding(horizontal = 24.dp, vertical = 12.dp),
+            .padding(horizontal = 18.dp, vertical = 9.dp),
     ) {
         Text(
             text = banner.actionTitle(),
@@ -166,8 +166,8 @@ private fun TvDiscoverBanner.artwork(): Int = when (this) {
 
 private val TvDiscoverBanner.artworkHeight: Dp
     get() = when (this) {
-        TvDiscoverBanner.CreateAccount -> 150.dp
-        TvDiscoverBanner.DiscoverMore -> 170.dp
+        TvDiscoverBanner.CreateAccount -> 112.5.dp
+        TvDiscoverBanner.DiscoverMore -> 127.5.dp
     }
 
 private val TvDiscoverBanner.contentWidthFraction: Float
@@ -202,10 +202,10 @@ private fun TvDiscoverBanner.actionTitle(): String = when (this) {
 private fun TvBannerRowPreview() {
     TvTheme {
         Column(
-            verticalArrangement = Arrangement.spacedBy(24.dp),
+            verticalArrangement = Arrangement.spacedBy(18.dp),
             modifier = Modifier
                 .background(MaterialTheme.tvColors.backgroundSunken)
-                .padding(48.dp),
+                .padding(36.dp),
         ) {
             TvBannerRow(banner = TvDiscoverBanner.CreateAccount, onClick = {})
             TvBannerRow(banner = TvDiscoverBanner.DiscoverMore, onClick = {})

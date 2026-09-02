@@ -210,7 +210,7 @@ private fun TvHomeError(
                 color = MaterialTheme.tvColors.textPrimary,
                 style = MaterialTheme.tvTypography.caption1,
             )
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(18.dp))
             OutlinedButton(onClick = onRetry) {
                 Text(stringResource(LR.string.retry))
             }
@@ -249,9 +249,9 @@ private fun TvHomeRows(
 
     LazyColumn(
         modifier = modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(24.dp),
+        verticalArrangement = Arrangement.spacedBy(40.dp),
     ) {
-        item { Spacer(modifier = Modifier.height(8.dp)) }
+        item { Spacer(modifier = Modifier.height(6.dp)) }
 
         rows.forEachIndexed { rowIndex, row ->
             val rowModifier = Modifier.onFocusChanged { focusState ->
@@ -277,7 +277,7 @@ private fun TvHomeRows(
             )
         }
 
-        item { Spacer(modifier = Modifier.height(8.dp)) }
+        item { Spacer(modifier = Modifier.height(6.dp)) }
     }
 }
 

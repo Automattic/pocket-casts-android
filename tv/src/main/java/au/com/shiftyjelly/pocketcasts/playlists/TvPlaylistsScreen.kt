@@ -205,12 +205,12 @@ private fun TvPlaylistsGrid(
     modifier: Modifier = Modifier,
     restoreFocusTrigger: Int = 0,
 ) {
-    Column(modifier = modifier.padding(horizontal = 32.dp)) {
+    Column(modifier = modifier.padding(horizontal = 42.dp)) {
         Text(
             text = stringResource(LR.string.playlists),
-            style = MaterialTheme.tvTypography.title3,
+            style = MaterialTheme.tvTypography.title2,
             color = MaterialTheme.tvColors.textPrimary,
-            modifier = Modifier.padding(top = 8.dp, bottom = 26.dp),
+            modifier = Modifier.padding(top = 40.dp, bottom = 0.dp),
         )
         var lastFocusedIndex by rememberSaveable(playlists) { mutableIntStateOf(0) }
         val focusRequesters = remember(playlists) { List(playlists.size) { FocusRequester() } }
@@ -229,9 +229,9 @@ private fun TvPlaylistsGrid(
 
         LazyVerticalGrid(
             columns = GridCells.Fixed(3),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            contentPadding = PaddingValues(top = 16.dp, bottom = 32.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            contentPadding = PaddingValues(top = 20.dp, bottom = 32.dp),
             modifier = Modifier
                 .focusRequester(gridFocusRequester)
                 .focusGroup()

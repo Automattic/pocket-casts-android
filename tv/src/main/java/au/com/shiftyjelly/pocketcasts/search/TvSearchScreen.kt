@@ -88,11 +88,11 @@ import kotlin.time.Duration.Companion.seconds
 import androidx.compose.foundation.lazy.grid.itemsIndexed as gridItemsIndexed
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-private val ContentHorizontalPadding = 48.dp
+private val ContentHorizontalPadding = 42.dp
 private val ContentPadding = PaddingValues(horizontal = ContentHorizontalPadding)
 private const val SEARCH_ROW_LIMIT = 10
 private const val FOLDER_COVER_COUNT = 4
-private val SearchEpisodeCardWidth = 360.dp
+private val SearchEpisodeCardWidth = 270.dp
 private const val EPISODE_GRID_COLUMNS = 2
 
 private data class SearchOpenedFolder(val uuid: String, val name: String)
@@ -303,7 +303,7 @@ private fun TvSearchContent(
     val showSuggestions = (isEditing || suggestionsFocused) && suggestions.isNotEmpty()
     Column(modifier = modifier.fillMaxSize()) {
         Column(modifier = Modifier.padding(ContentPadding)) {
-            Spacer(modifier = Modifier.height(40.dp))
+            Spacer(modifier = Modifier.height(30.dp))
             TvSearchField(
                 query = query,
                 onQueryChange = onQueryChange,
@@ -317,7 +317,7 @@ private fun TvSearchContent(
                     .fillMaxWidth()
                     .focusRequester(searchFieldFocusRequester),
             )
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(18.dp))
         }
 
         if (showSuggestions) {
@@ -326,7 +326,7 @@ private fun TvSearchContent(
                 onSuggestionSelect = onSuggestionSelect,
                 modifier = Modifier.onFocusChanged { suggestionsFocused = it.hasFocus },
             )
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(18.dp))
         }
 
         val filters = remember(hasFolderResults) { TvSearchFilter.entries.filter { it != TvSearchFilter.Folders || hasFolderResults } }
@@ -340,7 +340,7 @@ private fun TvSearchContent(
                 modifier = Modifier.padding(ContentPadding),
                 upFocusRequester = searchFieldFocusRequester,
             )
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(18.dp))
         }
 
         Box(
@@ -423,11 +423,11 @@ private fun TvSearchIdle(
                         text = term,
                         style = MaterialTheme.tvTypography.body,
                         color = MaterialTheme.tvColors.textPrimary,
-                        modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp),
+                        modifier = Modifier.padding(horizontal = 15.dp, vertical = 9.dp),
                     )
                 }
             }
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(18.dp))
         }
         TvSearchDiscover(
             categories = categories,
@@ -487,7 +487,7 @@ private fun TvSearchDiscover(
                 )
             }
             item {
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(18.dp))
                 TvRow(
                     title = stringResource(LR.string.tv_search_browse_categories),
                     items = categories,
@@ -511,7 +511,7 @@ private fun TvSearchDiscover(
 
         discoverRows.forEachIndexed { index, row ->
             val rowIndex = categoryOffset + index
-            item { Spacer(modifier = Modifier.height(24.dp)) }
+            item { Spacer(modifier = Modifier.height(18.dp)) }
             tvDiscoverRow(
                 row = row,
                 onPodcastClick = onDiscoverPodcastClick,
@@ -528,7 +528,7 @@ private fun TvSearchDiscover(
             )
         }
 
-        item { Spacer(modifier = Modifier.height(40.dp)) }
+        item { Spacer(modifier = Modifier.height(30.dp)) }
     }
 }
 
@@ -659,7 +659,7 @@ private fun TvSearchTopResults(
     val podcastsFirst = !featuredFirst && !episodesFirst && !foldersFirst
 
     LazyColumn(modifier = Modifier.fillMaxSize()) {
-        item { Spacer(modifier = Modifier.height(8.dp)) }
+        item { Spacer(modifier = Modifier.height(6.dp)) }
         if (featured.isNotEmpty()) {
             item {
                 TvSearchEpisodeCarousel(
@@ -672,7 +672,7 @@ private fun TvSearchTopResults(
             }
         }
         if (otherEpisodes.isNotEmpty()) {
-            item { Spacer(modifier = Modifier.height(24.dp)) }
+            item { Spacer(modifier = Modifier.height(18.dp)) }
             item {
                 TvSearchEpisodeCarousel(
                     title = stringResource(LR.string.episodes),
@@ -684,7 +684,7 @@ private fun TvSearchTopResults(
             }
         }
         if (topFolders.isNotEmpty()) {
-            item { Spacer(modifier = Modifier.height(24.dp)) }
+            item { Spacer(modifier = Modifier.height(18.dp)) }
             tvSearchFoldersRow(
                 folders = topFolders,
                 onOpenFolder = onOpenFolder,
@@ -692,14 +692,14 @@ private fun TvSearchTopResults(
             )
         }
         if (topPodcasts.isNotEmpty()) {
-            item { Spacer(modifier = Modifier.height(24.dp)) }
+            item { Spacer(modifier = Modifier.height(18.dp)) }
             tvSearchPodcastsRow(
                 podcasts = topPodcasts,
                 onPodcastResultClick = onPodcastResultClick,
                 focusRequester = restoreFocusRequester.takeIf { podcastsFirst },
             )
         }
-        item { Spacer(modifier = Modifier.height(40.dp)) }
+        item { Spacer(modifier = Modifier.height(30.dp)) }
     }
 }
 
@@ -774,9 +774,9 @@ private fun TvSearchEpisodeGrid(
     LazyVerticalGrid(
         state = gridState,
         columns = GridCells.Fixed(EPISODE_GRID_COLUMNS),
-        horizontalArrangement = Arrangement.spacedBy(24.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        contentPadding = PaddingValues(start = 48.dp, end = 48.dp, bottom = 40.dp),
+        horizontalArrangement = Arrangement.spacedBy(18.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        contentPadding = PaddingValues(start = 42.dp, end = 42.dp, bottom = 30.dp),
         modifier = Modifier
             .fillMaxSize()
             .focusRequester(gridFocusRequester)
@@ -857,7 +857,7 @@ private fun TvSearchSuggestions(
     LazyRow(
         modifier = modifier.fillMaxWidth(),
         contentPadding = ContentPadding,
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        horizontalArrangement = Arrangement.spacedBy(9.dp),
     ) {
         items(suggestions) { term ->
             TvTile(onClick = { onSuggestionSelect(term) }) {
@@ -866,7 +866,7 @@ private fun TvSearchSuggestions(
                     style = MaterialTheme.tvTypography.body,
                     color = MaterialTheme.tvColors.textPrimary,
                     maxLines = 1,
-                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp),
+                    modifier = Modifier.padding(horizontal = 15.dp, vertical = 9.dp),
                 )
             }
         }
@@ -882,9 +882,9 @@ private fun TvSearchLoading() {
     ) {
         LoadingView(
             color = MaterialTheme.tvColors.textPrimary,
-            modifier = Modifier.size(48.dp),
+            modifier = Modifier.size(36.dp),
         )
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(12.dp))
         Text(
             text = stringResource(LR.string.tv_search_searching),
             style = MaterialTheme.tvTypography.body,
@@ -1021,7 +1021,7 @@ private fun TvSearchResultsPreview() {
 @Composable
 private fun TvSearchSuggestionsPreview() {
     TvTheme {
-        Box(modifier = Modifier.background(MaterialTheme.tvColors.backgroundSunken).padding(48.dp)) {
+        Box(modifier = Modifier.background(MaterialTheme.tvColors.backgroundSunken).padding(36.dp)) {
             TvSearchSuggestions(
                 suggestions = listOf("business daily", "business wars", "business insider"),
                 onSuggestionSelect = {},

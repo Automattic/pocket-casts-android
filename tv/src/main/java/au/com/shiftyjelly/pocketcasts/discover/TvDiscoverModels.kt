@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.discover
 
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 
@@ -49,12 +50,18 @@ sealed interface TvDiscoverRow {
         val episodes: List<TvDiscoverEpisode>,
         val listId: String? = null,
         val listDatetime: String? = null,
+        val progressCardStyle: TvProgressCardStyle? = null,
     ) : TvDiscoverRow
 
     data class Failed(
         override val id: String,
         override val title: String,
     ) : TvDiscoverRow
+}
+
+enum class TvProgressCardStyle {
+    Resume,
+    Queue,
 }
 
 enum class TvDiscoverBanner(val id: String) {
@@ -88,6 +95,7 @@ data class TvDiscoverEpisode(
     val podcastUuid: String,
     val podcastTitle: String,
     val videoPreviewUrl: String? = null,
+    val episode: PodcastEpisode? = null,
 ) {
     val thumbnailUrl: String = PodcastImage.getArtworkUrl(size = 960, uuid = podcastUuid, isWearOS = false)
     val podcastArtworkUrl: String = PodcastImage.getArtworkUrl(size = 200, uuid = podcastUuid, isWearOS = false)
