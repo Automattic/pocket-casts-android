@@ -274,6 +274,11 @@ class TvHomeViewModel @Inject constructor(
                     ?: run {
                         podcastManager.findOrDownloadPodcastRxSingle(episode.podcastUuid).await()
                         episodeManager.findByUuid(episode.episodeUuid)
+                            ?: episodeManager.downloadMissingPodcastEpisode(episode.episodeUuid, episode.podcastUuid)
+                    }
+                    ?: episode.toPlayableEpisode()?.let { playable ->
+                        episodeManager.add(listOf(playable), playable.podcastUuid, downloadMetaData = false)
+                        episodeManager.findByUuid(episode.episodeUuid)
                     }
                 if (found != null) {
                     playbackManager.playNowSuspend(episode = found, sourceView = SourceView.DISCOVER)

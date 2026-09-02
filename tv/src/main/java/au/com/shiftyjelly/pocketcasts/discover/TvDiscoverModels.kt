@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.discover
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
+import java.util.Date
 
 sealed interface TvDiscoverRow {
     val id: String
@@ -96,7 +97,27 @@ data class TvDiscoverEpisode(
     val podcastTitle: String,
     val videoPreviewUrl: String? = null,
     val episode: PodcastEpisode? = null,
+    val mediaUrl: String? = null,
+    val mediaType: String? = null,
+    val durationSecs: Int? = null,
+    val publishedDate: Date? = null,
+    val sizeInBytes: Long? = null,
 ) {
     val thumbnailUrl: String = PodcastImage.getArtworkUrl(size = 960, uuid = podcastUuid, isWearOS = false)
     val podcastArtworkUrl: String = PodcastImage.getArtworkUrl(size = 200, uuid = podcastUuid, isWearOS = false)
+
+    fun toPlayableEpisode(): PodcastEpisode? {
+        val url = mediaUrl ?: return null
+        return PodcastEpisode(
+            uuid = episodeUuid,
+            podcastUuid = podcastUuid,
+            title = episodeTitle,
+            downloadUrl = url,
+            fileType = mediaType,
+            duration = durationSecs?.toDouble() ?: 0.0,
+            sizeInBytes = sizeInBytes ?: 0,
+            publishedDate = publishedDate ?: Date(),
+            addedDate = Date(),
+        )
+    }
 }

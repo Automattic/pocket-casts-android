@@ -69,6 +69,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.argThat
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
@@ -1095,6 +1096,34 @@ class TvHomeViewModelTest {
     }
 
     @Test
+    fun `playEpisode streams a curated clip from the feed url when the episode cannot be resolved`() = runTest {
+        val playable = episode("episode-1", podcastUuid = "podcast-1")
+        whenever(episodeManager.findByUuid("episode-1")).thenReturn(null, null, playable)
+        whenever(podcastManager.findOrDownloadPodcastRxSingle("podcast-1")).thenReturn(Single.just(Podcast(uuid = "podcast-1")))
+
+        createViewModel().playEpisode(madeForTvEpisode())
+
+        verifyBlocking(episodeManager) {
+            add(argThat { size == 1 && first().downloadUrl == "https://example.com/clip.mp4" }, eq("podcast-1"), eq(false))
+        }
+        verifyBlocking(playbackManager) { playNowSuspend(episode = playable, sourceView = SourceView.DISCOVER) }
+    }
+
+    @Test
+    fun `playEpisode reports a failure when the episode carries no playable url`() = runTest {
+        whenever(episodeManager.findByUuid("episode-1")).thenReturn(null)
+        whenever(podcastManager.findOrDownloadPodcastRxSingle("podcast-1")).thenReturn(Single.just(Podcast(uuid = "podcast-1")))
+        val viewModel = createViewModel()
+
+        viewModel.playFailures.test {
+            viewModel.playEpisode(homeEpisode())
+
+            awaitItem()
+            verifyBlocking(playbackManager, never()) { playNowSuspend(any<BaseEpisode>(), any(), any(), any()) }
+        }
+    }
+
+    @Test
     fun `playLatestEpisode plays the newest episode of a featured podcast`() = runTest {
         val podcast = Podcast(uuid = "podcast-1")
         val newest = episode(uuid = "episode-new", podcastUuid = "podcast-1")
@@ -1155,6 +1184,11 @@ class TvHomeViewModelTest {
         episodeTitle = "Episode",
         podcastUuid = "podcast-1",
         podcastTitle = "Podcast",
+    )
+
+    private fun madeForTvEpisode() = homeEpisode().copy(
+        mediaUrl = "https://example.com/clip.mp4",
+        mediaType = "video/mp4",
     )
 
     @Test

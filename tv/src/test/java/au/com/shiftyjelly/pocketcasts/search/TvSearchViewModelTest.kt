@@ -69,6 +69,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.argThat
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
@@ -700,6 +701,23 @@ class TvSearchViewModelTest {
         createViewModel().playDiscoverEpisode(discoverEpisode("episode-1"))
 
         verifyBlocking(playbackManager) { playNowSuspend(episode = episode, sourceView = SourceView.SEARCH) }
+    }
+
+    @Test
+    fun `playDiscoverEpisode streams a curated clip from the feed url when the episode cannot be resolved`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        val playable = podcastEpisode("episode-1")
+        whenever(episodeManager.findByUuid("episode-1")).thenReturn(null, null, playable)
+        whenever(podcastManager.findOrDownloadPodcastRxSingle("podcast-episode-1")).thenReturn(Single.just(subscribedPodcast("podcast-episode-1")))
+
+        createViewModel().playDiscoverEpisode(
+            discoverEpisode("episode-1").copy(mediaUrl = "https://example.com/clip.mp4", mediaType = "video/mp4"),
+        )
+
+        verifyBlocking(episodeManager) {
+            add(argThat { size == 1 && first().downloadUrl == "https://example.com/clip.mp4" }, eq("podcast-episode-1"), eq(false))
+        }
+        verifyBlocking(playbackManager) { playNowSuspend(episode = playable, sourceView = SourceView.SEARCH) }
     }
 
     @Test
