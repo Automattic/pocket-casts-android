@@ -80,6 +80,34 @@ class DiscoverEpisodeTest {
         assertNull(episode.videoUrl)
     }
 
+    @Test
+    fun `videoContentType is the file type when the default url is used`() {
+        val episode = episode(url = "https://example.com/episode.mp4", fileType = "video/mp4")
+
+        assertEquals("video/mp4", episode.videoContentType)
+    }
+
+    @Test
+    fun `videoContentType describes the alternate enclosure when its url is used`() {
+        val episode = episode(
+            url = "https://example.com/episode.mp3",
+            fileType = "audio/mpeg",
+            alternateEnclosures = listOf(
+                DiscoverAlternateEnclosure("audio/mpeg", listOf(DiscoverEnclosureSource("https://example.com/audio.mp3"))),
+                DiscoverAlternateEnclosure("video/mp4", listOf(DiscoverEnclosureSource("https://example.com/video.mp4"))),
+            ),
+        )
+
+        assertEquals("video/mp4", episode.videoContentType)
+    }
+
+    @Test
+    fun `videoContentType is null when there is no playable video`() {
+        val episode = episode(url = "https://example.com/episode.mp3", fileType = "audio/mpeg")
+
+        assertNull(episode.videoContentType)
+    }
+
     private fun episode(
         url: String?,
         fileType: String?,

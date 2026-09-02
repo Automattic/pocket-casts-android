@@ -241,18 +241,25 @@ data class DiscoverEpisode(
     val isPlaying: Boolean = false,
 ) : Parcelable {
     val videoUrl: String?
-        get() {
-            if (url != null && isSupportedVideoType(fileType) && url.isPlayableHttpUri()) {
-                return url
-            }
-            return alternateEnclosures
-                ?.filter { isSupportedVideoType(it.type) }
-                ?.firstNotNullOfOrNull { enclosure ->
-                    enclosure.sources?.firstNotNullOfOrNull { source ->
-                        source.uri?.takeIf { it.isPlayableHttpUri() }
-                    }
-                }
+        get() = resolveVideo()?.url
+
+    val videoContentType: String?
+        get() = resolveVideo()?.type
+
+    private fun resolveVideo(): ResolvedVideo? {
+        if (url != null && isSupportedVideoType(fileType) && url.isPlayableHttpUri()) {
+            return ResolvedVideo(url, fileType)
         }
+        return alternateEnclosures
+            ?.filter { isSupportedVideoType(it.type) }
+            ?.firstNotNullOfOrNull { enclosure ->
+                enclosure.sources
+                    ?.firstNotNullOfOrNull { source -> source.uri?.takeIf { it.isPlayableHttpUri() } }
+                    ?.let { uri -> ResolvedVideo(uri, enclosure.type) }
+            }
+    }
+
+    private data class ResolvedVideo(val url: String, val type: String?)
 
     companion object {
         private const val VIDEO_MP4 = "video/mp4"

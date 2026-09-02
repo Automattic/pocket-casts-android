@@ -139,6 +139,7 @@ class SimplePlayer(
 
         player = null
         prepared = false
+        pendingSurface = null
 
         videoChangedListener?.videoNeedsReset()
     }
@@ -242,10 +243,10 @@ class SimplePlayer(
         player.addListener(PlayPauseListener(playbackStatsCollector))
         player.addAnalyticsListener(renderer)
 
+        val surfaceToAttach = pendingSurface
         handleStop()
         this.player = player
-        pendingSurface?.let { surface ->
-            pendingSurface = null
+        surfaceToAttach?.let { surface ->
             try {
                 player.setVideoSurfaceHolder(surface.holder)
                 hasVideoSurface = true

@@ -257,7 +257,7 @@ class TvDiscoverFeedLoader @Inject constructor(
                     podcastTitle = episode.podcast_title.orEmpty(),
                     videoPreviewUrl = if (playsVideoPreview) mediaUrl else null,
                     mediaUrl = mediaUrl,
-                    mediaType = episode.fileType,
+                    mediaType = episode.videoContentType,
                     durationSecs = episode.duration,
                     publishedDate = episode.published,
                     sizeInBytes = episode.size,

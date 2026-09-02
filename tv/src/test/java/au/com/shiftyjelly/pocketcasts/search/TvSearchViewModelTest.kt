@@ -721,6 +721,23 @@ class TvSearchViewModelTest {
     }
 
     @Test
+    fun `playDiscoverEpisode streams a curated clip from the feed url when the lookup throws`() = runTest {
+        whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
+        val playable = podcastEpisode("episode-1")
+        whenever(episodeManager.findByUuid("episode-1")).thenReturn(null, playable)
+        whenever(podcastManager.findOrDownloadPodcastRxSingle("podcast-episode-1")).thenReturn(Single.error(RuntimeException("boom")))
+
+        createViewModel().playDiscoverEpisode(
+            discoverEpisode("episode-1").copy(mediaUrl = "https://example.com/clip.mp4", mediaType = "video/mp4"),
+        )
+
+        verifyBlocking(episodeManager) {
+            add(argThat { size == 1 && first().downloadUrl == "https://example.com/clip.mp4" }, eq("podcast-episode-1"), eq(false))
+        }
+        verifyBlocking(playbackManager) { playNowSuspend(episode = playable, sourceView = SourceView.SEARCH) }
+    }
+
+    @Test
     fun `playLatestEpisode plays the newest episode of a featured podcast and stamps the search source`() = runTest {
         whenever(listRepository.getSearchDiscoverFeed()).thenReturn(discover())
         val podcast = subscribedPodcast("podcast-1")

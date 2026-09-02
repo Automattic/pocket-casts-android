@@ -1110,6 +1110,20 @@ class TvHomeViewModelTest {
     }
 
     @Test
+    fun `playEpisode streams a curated clip from the feed url when the lookup throws`() = runTest {
+        val playable = episode("episode-1", podcastUuid = "podcast-1")
+        whenever(episodeManager.findByUuid("episode-1")).thenReturn(null, playable)
+        whenever(podcastManager.findOrDownloadPodcastRxSingle("podcast-1")).thenReturn(Single.error(RuntimeException("boom")))
+
+        createViewModel().playEpisode(madeForTvEpisode())
+
+        verifyBlocking(episodeManager) {
+            add(argThat { size == 1 && first().downloadUrl == "https://example.com/clip.mp4" }, eq("podcast-1"), eq(false))
+        }
+        verifyBlocking(playbackManager) { playNowSuspend(episode = playable, sourceView = SourceView.DISCOVER) }
+    }
+
+    @Test
     fun `playEpisode reports a failure when the episode carries no playable url`() = runTest {
         whenever(episodeManager.findByUuid("episode-1")).thenReturn(null)
         whenever(podcastManager.findOrDownloadPodcastRxSingle("podcast-1")).thenReturn(Single.just(Podcast(uuid = "podcast-1")))
