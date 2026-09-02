@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -83,7 +82,7 @@ fun TvEpisodeRow(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp),
+                .padding(16.dp),
         ) {
             EpisodeArtwork(episode = episode)
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -125,6 +124,7 @@ fun TvEpisodeRow(
                         EpisodeProgressBar(
                             progress = (episode.playedUpTo / episode.duration).toFloat().coerceIn(0f, 1f),
                             color = captionColor,
+                            modifier = Modifier.width(48.dp),
                         )
                     } else if (episode.isFinished) {
                         Icon(
@@ -166,25 +166,24 @@ fun TvResumeCard(
         ),
         interactionSource = interactionSource,
         modifier = modifier
-            .width(653.dp)
-            .height(184.dp)
+            .width(621.dp)
             .alpha(if (episode.isArchived && !isFocused) 0.3f else 1f),
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(18.dp),
+            horizontalArrangement = Arrangement.spacedBy(24.dp),
             modifier = Modifier
-                .fillMaxSize()
-                .padding(18.dp),
+                .fillMaxWidth()
+                .padding(16.dp),
         ) {
-            EpisodeArtwork(episode = episode, size = 148.dp, cornerRadius = 6.dp)
+            EpisodeArtwork(episode = episode, size = 136.dp, cornerRadius = 6.dp)
             Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.weight(1f),
             ) {
                 Text(
                     text = episode.rememberPublishedDateText(dateFormatter),
-                    style = MaterialTheme.tvTypography.caption2,
+                    style = MaterialTheme.tvTypography.body,
                     color = captionColor,
                 )
                 Text(
@@ -194,29 +193,18 @@ fun TvResumeCard(
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                 )
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    Text(
-                        text = episode.rememberPlaybackTimeText(),
-                        style = MaterialTheme.tvTypography.caption2,
+                if (episode.isInProgress && episode.duration > 0.0) {
+                    EpisodeProgressBar(
+                        progress = (episode.playedUpTo / episode.duration).toFloat().coerceIn(0f, 1f),
                         color = captionColor,
+                        modifier = Modifier.fillMaxWidth(),
                     )
-                    if (episode.isInProgress && episode.duration > 0.0) {
-                        EpisodeProgressBar(
-                            progress = (episode.playedUpTo / episode.duration).toFloat().coerceIn(0f, 1f),
-                            color = captionColor,
-                        )
-                    } else if (episode.isFinished) {
-                        Icon(
-                            painter = painterResource(IR.drawable.ic_check),
-                            contentDescription = null,
-                            tint = captionColor,
-                            modifier = Modifier.size(14.dp),
-                        )
-                    }
                 }
+                Text(
+                    text = episode.rememberPlaybackTimeText(),
+                    style = MaterialTheme.tvTypography.body,
+                    color = captionColor,
+                )
             }
         }
     }
@@ -255,8 +243,7 @@ private fun EpisodeProgressBar(
 ) {
     Box(
         modifier = modifier
-            .width(120.dp)
-            .height(4.dp)
+            .height(3.dp)
             .clip(CircleShape)
             .background(color.copy(alpha = 0.3f)),
     ) {
