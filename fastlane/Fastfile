@@ -1025,9 +1025,7 @@ platform :android do
 
     # The scenario submits a build for Google to review by rolling production out to 1%, so that
     # one rollout announces a submission instead of a percentage.
-    if track == 'production' && (percent - 0.01).abs < 0.001
-      return ":announcement: `#{version}` has been submitted to the Production track for Google to review."
-    end
+    return ":announcement: `#{version}` has been submitted to the Production track for Google to review." if track == 'production' && (percent - 0.01).abs < 0.001
 
     milestone = ENV.fetch('MILESTONE', nil).to_s.strip
     subject = ["`#{version}`", milestone].reject(&:empty?).join(' ')
