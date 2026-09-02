@@ -273,8 +273,7 @@ open class PlaybackManager @Inject constructor(
     private val _playerFlow = MutableStateFlow<Player?>(null)
     val playerFlow = _playerFlow.asStateFlow()
 
-    // A resolved video rendition starts Unknown until the player's tracks resolve it to HasVideo or
-    // AudioOnly; the video surface is shown only once HasVideo is known.
+    // A resolved rendition starts Unknown until the player's tracks resolve it; the surface shows only at HasVideo.
     private val _streamVideoState = MutableStateFlow(StreamVideoState.NotVideo)
     val streamVideoState = _streamVideoState.asStateFlow()
 
@@ -284,7 +283,7 @@ open class PlaybackManager @Inject constructor(
     // Strictly whether an HLS rendition exists, which is what the analytics schema's hls_available means.
     private val _streamHlsAvailable = MutableStateFlow(false)
 
-    // Whether an alternate video rendition (HLS or progressive) is available and enabled for this episode.
+    // Unlike _streamHlsAvailable this also requires the rendition's feature flag to be on.
     private val _streamVideoAvailable = MutableStateFlow(false)
     val streamVideoAvailable = _streamVideoAvailable.asStateFlow()
 
@@ -2195,8 +2194,7 @@ open class PlaybackManager @Inject constructor(
 
         flushPendingContentTypeEvents()
 
-        // Audio only forces video content to audio. Otherwise a resolved video rendition starts Unknown until the
-        // tracks resolve it; an episode playing its own enclosure keeps its file type's flag.
+        // Audio only forces video content to audio; otherwise only a rendition we are actually playing starts Unknown.
         synchronized(pendingContentTypeEvents) {
             _streamVideoState.value = StreamVideoState.initialFor(
                 episode,
@@ -2840,8 +2838,7 @@ open class PlaybackManager @Inject constructor(
         val prefetchEnabled = FeatureFlag.isEnabled(Feature.NEXT_EPISODE_PREFETCH)
         val nextEpisode = upNextQueue.queueEpisodes.firstOrNull()
         launch {
-            // The next episode isn't run through applyStreamOverride, so resolve its alternate stream default
-            // here and skip prefetching a progressive file that streaming would bypass.
+            // The next episode never goes through applyStreamOverride, so resolve here whether streaming would bypass the file.
             val isAlternateStreamDefault = prefetchEnabled &&
                 (nextEpisode as? PodcastEpisode)?.let {
                     selectAlternateStream(
@@ -3059,7 +3056,6 @@ open class PlaybackManager @Inject constructor(
     }
 }
 
-/** The alternate rendition to stream: HLS when enabled, otherwise a progressive video rendition. */
 internal fun selectAlternateStream(
     enclosures: List<EpisodeAlternateEnclosure>,
     isHlsEnabled: Boolean,

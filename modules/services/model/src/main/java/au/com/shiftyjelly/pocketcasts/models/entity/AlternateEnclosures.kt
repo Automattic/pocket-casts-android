@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.models.entity
 
 import au.com.shiftyjelly.pocketcasts.models.type.MediaKind
 
-/** A playable rendition resolved from an alternate enclosure. */
 data class AlternateEnclosureStream(
     val url: String,
     val contentType: String?,

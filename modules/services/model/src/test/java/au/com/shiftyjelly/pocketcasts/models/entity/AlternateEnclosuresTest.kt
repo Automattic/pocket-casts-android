@@ -125,7 +125,6 @@ class AlternateEnclosuresTest {
         val stream = enclosures.firstProgressiveVideoStream()
 
         assertEquals("video/mp4", stream?.contentType)
-        // Video-ness comes from the media kind, so a generic source type cannot hide it.
         assertTrue(stream!!.isVideo)
     }
 
