@@ -1,5 +1,8 @@
 8.21
 -----
+*   Bug Fixes
+    *   Fix the skip forward and back intervals in the Cast notification
+        ([#5820](https://github.com/Automattic/pocket-casts-android/pull/5820))
 
 8.20
 -----
