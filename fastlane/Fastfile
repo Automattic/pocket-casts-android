@@ -81,6 +81,11 @@ UPLOAD_TO_PLAY_STORE_COMMON_OPTIONS = {
 }.freeze
 
 ########################################################################
+# Slack
+########################################################################
+SLACK_CHANNEL = '#pocket-casts-android'
+
+########################################################################
 # Firebase App Distribution (FAD)
 ########################################################################
 FIREBASE_APP_ID = '1:124902176124:android:ad0ff1c7193b55ee1620f9'
@@ -370,6 +375,8 @@ platform :android do
       UI.important(message)
     end
     UI.user_error!('None of the 3 app variants were found in Google Play Console. We expected at least one') if not_found_variants.count == APPS.count
+
+    notify_slack(rollout_announcement(track: track, percent: percent.to_f))
   end
 
   # Downloads the latest translations from GlotPress and creates a PR to integrate them into the current `release/*` branch
@@ -977,6 +984,54 @@ platform :android do
 
     UI.user_error!(error_message)
   end
+
+  #####################################################################################
+  # Slack helpers
+  #####################################################################################
+
+  # Sends a Slack message via the incoming webhook.
+  #
+  # `channel` is not optional in practice: `SLACK_WEBHOOK` holds the webhook shared across
+  # products, which posts to a test channel unless told otherwise.
+  def send_slack_message(message:, channel: SLACK_CHANNEL)
+    slack(
+      username: 'Pocket Cats',
+      slack_url: ENV.fetch('SLACK_WEBHOOK'),
+      channel: channel,
+      message: message,
+      default_payloads: []
+    )
+  end
+
+  # Posts to Slack without letting a webhook hiccup abort the caller. A rollout that reached
+  # Google Play must not be reported as failed because the announcement did not land.
+  def notify_slack(message)
+    send_slack_message(message: message)
+  rescue StandardError => e
+    UI.important("Slack notification failed (#{e.message}); continuing without it.")
+  end
+
+  # Wording for a rollout update, matching what the release scenario used to post by hand.
+  #
+  # `RELEASE_VERSION` and `MILESTONE` are passed by the Releases V2 Buildkite action. Rollouts
+  # usually run from `main`, whose `version.properties` has already moved on to the next
+  # version, so the fallback is only right for a run from the release branch.
+  def rollout_announcement(track:, percent:)
+    version = ENV.fetch('RELEASE_VERSION', nil).to_s
+    version = release_version_current if version.empty?
+
+    # The scenario submits a build for Google to review by rolling production out to 1%, so that
+    # one rollout announces a submission instead of a percentage.
+    if track == 'production' && (percent - 0.01).abs < 0.001
+      return ":announcement: `#{version}` has been submitted to the Production track for Google to review."
+    end
+
+    milestone = ENV.fetch('MILESTONE', nil).to_s.strip
+    subject = ["`#{version}`", milestone].reject(&:empty?).join(' ')
+
+    ":announcement: #{subject} has started rolling out to #{(percent * 100).round}% of users."
+  end
+
 
   # Reports a milestone-related error, both in the logs and — on CI — as a Buildkite annotation,
   # clarifying that the error is expected when the release task is not being run for the first time.
