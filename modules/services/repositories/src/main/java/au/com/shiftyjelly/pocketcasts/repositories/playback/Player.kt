@@ -20,7 +20,7 @@ sealed interface EpisodeLocation {
     ) : EpisodeLocation
 
     companion object {
-        fun create(episode: BaseEpisode, preferStream: Boolean = false) = if (episode.isDownloaded && !(preferStream && episode.isStreamUrlHls)) {
+        fun create(episode: BaseEpisode, preferStream: Boolean = false) = if (episode.isDownloaded && !(preferStream && episode.isStreamUrlVideo)) {
             EpisodeLocation.Downloaded(episode, episode.downloadedFilePath)
         } else {
             EpisodeLocation.Stream(episode, episode.streamUrl, episode.isStreamUrlHls)

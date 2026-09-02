@@ -110,13 +110,13 @@ class PrefetchNextEpisodeTest {
     }
 
     @Test
-    fun `should not prefetch when the next episode streams hls by default`() {
+    fun `should not prefetch when the next episode streams an alternate rendition by default`() {
         val result = buildPrefetchRequest(
             isFeatureEnabled = true,
             isPlayerRemote = false,
             nextEpisode = createEpisode(),
             warnOnMeteredNetwork = false,
-            isHlsDefault = true,
+            isAlternateStreamDefault = true,
         )
 
         assertNull(result)

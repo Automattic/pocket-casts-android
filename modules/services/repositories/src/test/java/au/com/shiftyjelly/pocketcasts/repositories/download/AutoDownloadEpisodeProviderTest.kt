@@ -553,6 +553,8 @@ private class EpisodeDsl {
     fun toPodcastEpisode() = PodcastEpisode(
         uuid = uuid,
         publishedDate = Date(),
+        // An episode with no progressive enclosure is stream-only and never queued for auto download.
+        downloadUrl = "https://example.com/$uuid.mp3",
         isArchived = isArchived,
         playingStatus = if (isCompleted) {
             EpisodePlayingStatus.COMPLETED
