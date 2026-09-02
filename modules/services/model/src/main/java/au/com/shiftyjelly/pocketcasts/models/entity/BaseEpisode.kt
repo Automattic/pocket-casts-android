@@ -30,6 +30,10 @@ sealed interface BaseEpisode {
             return type != null && type.lowercase() in HLS_MIME_TYPES
         }
 
+        fun isVideoMimeType(type: String?): Boolean {
+            return type?.startsWith("video/", ignoreCase = true) == true
+        }
+
         /**
          * Used to reduce the changes sent out by the media session.
          * Returns true if the objects are the same.
@@ -126,17 +130,22 @@ sealed interface BaseEpisode {
         get() = autoDownloadStatus == AUTO_DOWNLOAD_STATUS_IGNORE
 
     val canQueueForAutoDownload
-        get() = !isFinished && !isArchived && !isAutoDownloadDisabled && !isHlsOnly
+        get() = !isFinished && !isArchived && !isAutoDownloadDisabled && !isStreamOnly
 
     val isInProgress: Boolean
         get() = EpisodePlayingStatus.IN_PROGRESS == playingStatus
 
+    /** Video either because the episode's own enclosure is video, or because a video rendition was resolved to stream. */
     val isVideo: Boolean
-        get() = fileType?.startsWith("video/") ?: false
+        get() = isVideoMimeType(fileType) || isVideoMimeType(overrideStreamContentType)
 
     /** The enclosure itself is HLS, so there is no progressive file to download. */
     val isHlsOnly: Boolean
         get() = isHlsUrl(downloadUrl) || isHlsMimeType(fileType)
+
+    /** Playable only by streaming an alternate enclosure: HLS, or the server sent no progressive enclosure at all. */
+    val isStreamOnly: Boolean
+        get() = isHlsOnly || (this is PodcastEpisode && downloadUrl.isNullOrBlank())
 
     /** A runtime-only resolved stream (e.g. the HLS alternate enclosure); overrides [streamUrl] when set. */
     var overrideStreamUrl: String?
@@ -161,10 +170,14 @@ sealed interface BaseEpisode {
             return isHlsUrl(url) || (url == downloadUrl && isHlsMimeType(fileType))
         }
 
+    /** Whether streaming will use an alternate rendition that carries video the progressive enclosure may not. */
+    val isStreamUrlVideo: Boolean
+        get() = isStreamUrlHls || isVideoMimeType(overrideStreamContentType)
+
     val isAudio: Boolean
         get() = !isVideo
 
-    fun showsVideoIcon(hasHlsAlternateEnclosure: Boolean): Boolean = isVideo || isHlsOnly || hasHlsAlternateEnclosure
+    fun showsVideoIcon(hasVideoAlternateEnclosure: Boolean): Boolean = isVideo || isHlsOnly || hasVideoAlternateEnclosure
 
     val podcastOrSubstituteUuid: String
         get() = if (this is PodcastEpisode) this.podcastUuid else Podcast.userPodcast.uuid

@@ -4,7 +4,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.AlternateEnclosureSource
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeAlternateEnclosure
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.models.entity.firstHlsMimeType
+import au.com.shiftyjelly.pocketcasts.models.entity.firstStreamOnlyMimeType
 import au.com.shiftyjelly.pocketcasts.models.to.Share
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
@@ -147,9 +147,9 @@ object DataParser {
         val enclosures = parseAlternateEnclosures(jsonEpisode, uuid)
         val url = getString(jsonEpisode, "url")
         val fileType = getString(jsonEpisode, "file_type")
-        // HLS-only episode (no progressive download): surface the HLS MIME for isHlsOnly, but keep a real video type.
+        // Stream-only episode (no progressive download): surface the alternate enclosure's MIME, but keep a real video type.
         val resolvedFileType = if (url.isNullOrBlank() && fileType?.startsWith("video/") != true) {
-            enclosures.firstHlsMimeType() ?: fileType
+            enclosures.firstStreamOnlyMimeType() ?: fileType
         } else {
             fileType
         }

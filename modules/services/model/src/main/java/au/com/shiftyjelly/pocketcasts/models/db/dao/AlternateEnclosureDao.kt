@@ -12,8 +12,11 @@ abstract class AlternateEnclosureDao {
     @Query("SELECT * FROM episode_alternate_enclosures WHERE episode_uuid IS :episodeUuid ORDER BY position ASC")
     abstract suspend fun findByEpisodeUuid(episodeUuid: String): List<EpisodeAlternateEnclosure>
 
-    @Query("SELECT EXISTS(SELECT 1 FROM episode_alternate_enclosures WHERE episode_uuid IS :episodeUuid AND LOWER(type) IN (:hlsMimeTypes))")
-    abstract fun hasHlsEnclosure(episodeUuid: String, hlsMimeTypes: Set<String>): Flow<Boolean>
+    @Query(
+        "SELECT EXISTS(SELECT 1 FROM episode_alternate_enclosures WHERE episode_uuid IS :episodeUuid " +
+            "AND (LOWER(type) IN (:hlsMimeTypes) OR media_kind IS :videoMediaKind))",
+    )
+    abstract fun hasVideoEnclosure(episodeUuid: String, hlsMimeTypes: Set<String>, videoMediaKind: String): Flow<Boolean>
 
     @Insert
     protected abstract suspend fun insertAll(enclosures: List<EpisodeAlternateEnclosure>)

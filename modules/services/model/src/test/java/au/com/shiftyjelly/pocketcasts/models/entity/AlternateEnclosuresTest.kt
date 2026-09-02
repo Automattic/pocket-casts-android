@@ -1,8 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.models.entity
 
 import androidx.media3.common.MimeTypes
+import au.com.shiftyjelly.pocketcasts.models.type.MediaKind
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class AlternateEnclosuresTest {
@@ -93,10 +96,124 @@ class AlternateEnclosuresTest {
         assertNull(null.firstHlsStreamUrl())
     }
 
+    @Test
+    fun `selects the progressive video source marked as video media kind`() {
+        val enclosures = listOf(
+            videoEnclosure("video/mp4", "https://example.com/episode.mp4"),
+        )
+
+        val stream = enclosures.firstProgressiveVideoStream()
+
+        assertEquals("https://example.com/episode.mp4", stream?.url)
+        assertEquals("video/mp4", stream?.contentType)
+        assertFalse(stream!!.isHls)
+    }
+
+    @Test
+    fun `ignores a video mime type the server did not mark as video media kind`() {
+        val enclosures = listOf(
+            enclosure("video/mp4", "https://example.com/episode.mp4"),
+        )
+
+        assertNull(enclosures.firstProgressiveVideoStream())
+    }
+
+    @Test
+    fun `ignores video enclosures we cannot stream directly`() {
+        val enclosures = listOf(
+            EpisodeAlternateEnclosure(
+                episodeUuid = "episode-uuid",
+                position = 0,
+                type = "video/mp4",
+                mediaKind = MediaKind.YouTube,
+                sources = listOf(AlternateEnclosureSource(uri = "https://example.com/watch")),
+            ),
+        )
+
+        assertNull(enclosures.firstProgressiveVideoStream())
+    }
+
+    @Test
+    fun `skips non-http progressive video sources`() {
+        val enclosures = listOf(
+            videoEnclosure("video/mp4", "ipfs://QmEpisode", "https://example.com/episode.mp4"),
+        )
+
+        assertEquals("https://example.com/episode.mp4", enclosures.firstProgressiveVideoStream()?.url)
+    }
+
+    @Test
+    fun `hls and progressive video are resolved independently`() {
+        val enclosures = listOf(
+            videoEnclosure("video/mp4", "https://example.com/episode.mp4"),
+            videoEnclosure(MimeTypes.APPLICATION_M3U8, "https://example.com/master.m3u8"),
+        )
+
+        assertEquals("https://example.com/master.m3u8", enclosures.firstHlsStream()?.url)
+        assertEquals("https://example.com/episode.mp4", enclosures.firstProgressiveVideoStream()?.url)
+    }
+
+    @Test
+    fun `hls enclosure marked as video is not also a progressive video rendition`() {
+        val enclosures = listOf(
+            videoEnclosure(MimeTypes.APPLICATION_M3U8, "https://example.com/master.m3u8"),
+        )
+
+        assertNull(enclosures.firstProgressiveVideoStream())
+    }
+
+    @Test
+    fun `falls through to the next hls enclosure when the first has no playable source`() {
+        val enclosures = listOf(
+            enclosure(MimeTypes.APPLICATION_M3U8, "ipfs://QmManifest"),
+            enclosure(MimeTypes.APPLICATION_M3U8, "https://example.com/master.m3u8"),
+        )
+
+        assertEquals("https://example.com/master.m3u8", enclosures.firstHlsStreamUrl())
+    }
+
+    @Test
+    fun `detects video enclosures for the episode row icon`() {
+        assertTrue(listOf(enclosure(MimeTypes.APPLICATION_M3U8, "https://example.com/master.m3u8")).hasVideoEnclosure())
+        assertTrue(listOf(videoEnclosure("video/mp4", "https://example.com/episode.mp4")).hasVideoEnclosure())
+        // The icon reflects what the server offers, even when no source can be streamed.
+        assertTrue(listOf(videoEnclosure("video/mp4")).hasVideoEnclosure())
+        assertFalse(listOf(enclosure("audio/mp3", "https://example.com/episode.mp3")).hasVideoEnclosure())
+        assertFalse(emptyList<EpisodeAlternateEnclosure>().hasVideoEnclosure())
+        assertFalse(null.hasVideoEnclosure())
+    }
+
+    @Test
+    fun `stream only mime type prefers hls over progressive video`() {
+        val enclosures = listOf(
+            videoEnclosure("video/mp4", "https://example.com/episode.mp4"),
+            enclosure(MimeTypes.APPLICATION_M3U8, "https://example.com/master.m3u8"),
+        )
+
+        assertEquals(MimeTypes.APPLICATION_M3U8, enclosures.firstStreamOnlyMimeType())
+    }
+
+    @Test
+    fun `stream only mime type falls back to the progressive video type`() {
+        val enclosures = listOf(
+            videoEnclosure("video/mp4", "https://example.com/episode.mp4"),
+        )
+
+        assertEquals("video/mp4", enclosures.firstStreamOnlyMimeType())
+    }
+
+    @Test
+    fun `stream only mime type is null without a video enclosure`() {
+        assertNull(listOf(enclosure("audio/mp3", "https://example.com/episode.mp3")).firstStreamOnlyMimeType())
+        assertNull(null.firstStreamOnlyMimeType())
+    }
+
     private fun enclosure(type: String, vararg uris: String) = EpisodeAlternateEnclosure(
         episodeUuid = "episode-uuid",
         position = 0,
         type = type,
         sources = uris.map { AlternateEnclosureSource(uri = it) },
     )
+
+    private fun videoEnclosure(type: String, vararg uris: String) = enclosure(type, *uris).copy(mediaKind = MediaKind.Video)
 }

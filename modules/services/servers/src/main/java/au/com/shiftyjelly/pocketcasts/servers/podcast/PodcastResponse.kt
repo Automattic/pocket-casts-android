@@ -4,7 +4,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.AlternateEnclosureSource
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeAlternateEnclosure
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.models.entity.firstHlsMimeType
+import au.com.shiftyjelly.pocketcasts.models.entity.firstStreamOnlyMimeType
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.models.type.MediaKind
 import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
@@ -104,9 +104,9 @@ data class EpisodeInfo(
         val publishedDate = published.parseIsoDate() ?: return null
         val episodeTitle = title.orEmpty()
         val enclosures = toAlternateEnclosures()
-        // HLS-only episode (no progressive download): surface the HLS MIME for isHlsOnly, but keep a real video type.
+        // Stream-only episode (no progressive download): surface the alternate enclosure's MIME, but keep a real video type.
         val resolvedFileType = if (url.isNullOrBlank() && fileType?.startsWith("video/") != true) {
-            enclosures.firstHlsMimeType() ?: fileType
+            enclosures.firstStreamOnlyMimeType() ?: fileType
         } else {
             fileType
         }

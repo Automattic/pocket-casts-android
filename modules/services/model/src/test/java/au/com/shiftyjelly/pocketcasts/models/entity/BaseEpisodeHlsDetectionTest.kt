@@ -117,25 +117,88 @@ class BaseEpisodeHlsDetectionTest {
     @Test
     fun `video episode shows the video icon`() {
         val episode = createEpisode(downloadUrl = "https://example.com/episode.mp4", fileType = "video/mp4")
-        assertTrue(episode.showsVideoIcon(hasHlsAlternateEnclosure = false))
+        assertTrue(episode.showsVideoIcon(hasVideoAlternateEnclosure = false))
     }
 
     @Test
     fun `HLS only episode shows the video icon`() {
         val episode = createEpisode(downloadUrl = "https://example.com/episode.m3u8")
-        assertTrue(episode.showsVideoIcon(hasHlsAlternateEnclosure = false))
+        assertTrue(episode.showsVideoIcon(hasVideoAlternateEnclosure = false))
     }
 
     @Test
     fun `episode with an HLS alternate enclosure shows the video icon`() {
         val episode = createEpisode(downloadUrl = "https://example.com/episode.mp3")
-        assertTrue(episode.showsVideoIcon(hasHlsAlternateEnclosure = true))
+        assertTrue(episode.showsVideoIcon(hasVideoAlternateEnclosure = true))
     }
 
     @Test
     fun `plain audio episode does not show the video icon`() {
         val episode = createEpisode(downloadUrl = "https://example.com/episode.mp3", fileType = "audio/mpeg")
-        assertFalse(episode.showsVideoIcon(hasHlsAlternateEnclosure = false))
+        assertFalse(episode.showsVideoIcon(hasVideoAlternateEnclosure = false))
+    }
+
+    @Test
+    fun `episode streaming a video alternate enclosure counts as video`() {
+        val episode = createEpisode(downloadUrl = "https://example.com/episode.mp3", fileType = "audio/mp3").apply {
+            overrideStreamUrl = "https://example.com/episode.mp4"
+            overrideStreamContentType = "video/mp4"
+        }
+
+        assertTrue(episode.isVideo)
+        assertTrue(episode.isStreamUrlVideo)
+        assertFalse(episode.isStreamUrlHls)
+    }
+
+    @Test
+    fun `episode streaming an hls alternate enclosure is a video stream but not a video file`() {
+        val episode = createEpisode(downloadUrl = "https://example.com/episode.mp3", fileType = "audio/mp3").apply {
+            overrideStreamUrl = "https://example.com/master.m3u8"
+            overrideStreamContentType = "application/x-mpegURL"
+        }
+
+        assertFalse(episode.isVideo)
+        assertTrue(episode.isStreamUrlVideo)
+    }
+
+    @Test
+    fun `audio episode without a resolved stream is neither video nor a video stream`() {
+        val episode = createEpisode(downloadUrl = "https://example.com/episode.mp3", fileType = "audio/mp3")
+
+        assertFalse(episode.isVideo)
+        assertFalse(episode.isStreamUrlVideo)
+    }
+
+    @Test
+    fun `video file episode is not treated as an alternate video stream`() {
+        val episode = createEpisode(downloadUrl = "https://example.com/episode.mp4", fileType = "video/mp4")
+
+        assertTrue(episode.isVideo)
+        assertFalse(episode.isStreamUrlVideo)
+    }
+
+    @Test
+    fun `episode without a progressive enclosure is stream only`() {
+        val episode = createEpisode(fileType = "video/mp4")
+
+        assertTrue(episode.isStreamOnly)
+        assertFalse(episode.isHlsOnly)
+        assertFalse(episode.canQueueForAutoDownload)
+    }
+
+    @Test
+    fun `episode with a progressive enclosure is not stream only`() {
+        val episode = createEpisode(downloadUrl = "https://example.com/episode.mp3", fileType = "audio/mp3")
+
+        assertFalse(episode.isStreamOnly)
+        assertTrue(episode.canQueueForAutoDownload)
+    }
+
+    @Test
+    fun `hls only episode is stream only`() {
+        val episode = createEpisode(downloadUrl = "https://example.com/episode.m3u8")
+
+        assertTrue(episode.isStreamOnly)
     }
 
     private fun createEpisode(
