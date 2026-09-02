@@ -358,8 +358,13 @@ class TvSearchViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val found = episodeManager.findByUuid(episode.episodeUuid)
-                    ?: run {
+                    ?: runCatching {
                         podcastManager.findOrDownloadPodcastRxSingle(episode.podcastUuid).await()
+                        episodeManager.findByUuid(episode.episodeUuid)
+                            ?: episodeManager.downloadMissingPodcastEpisode(episode.episodeUuid, episode.podcastUuid)
+                    }.getOrElse { if (it is CancellationException) throw it else null }
+                    ?: episode.toPlayableEpisode()?.let { playable ->
+                        episodeManager.add(listOf(playable), playable.podcastUuid, downloadMetaData = false)
                         episodeManager.findByUuid(episode.episodeUuid)
                     }
                 if (found != null) {

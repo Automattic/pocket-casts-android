@@ -249,12 +249,18 @@ class TvDiscoverFeedLoader @Inject constructor(
         val episodes = feed.episodes.orEmpty()
             .distinctBy(DiscoverEpisode::uuid)
             .map { episode ->
+                val mediaUrl = episode.videoUrl
                 TvDiscoverEpisode(
                     episodeUuid = episode.uuid,
                     episodeTitle = episode.title.orEmpty(),
                     podcastUuid = episode.podcast_uuid,
                     podcastTitle = episode.podcast_title.orEmpty(),
-                    videoPreviewUrl = if (playsVideoPreview) episode.videoUrl else null,
+                    videoPreviewUrl = if (playsVideoPreview) mediaUrl else null,
+                    mediaUrl = mediaUrl,
+                    mediaType = episode.videoContentType,
+                    durationSecs = episode.duration,
+                    publishedDate = episode.published,
+                    sizeInBytes = episode.size,
                 )
             }
         if (episodes.isEmpty()) return null
