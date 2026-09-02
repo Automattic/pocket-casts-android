@@ -115,12 +115,14 @@ fun LazyListScope.tvDiscoverRow(
                         TvProgressCardStyle.Resume -> TvResumeCard(
                             episode = podcastEpisode,
                             onClick = { onEpisodePlay(row, episode) },
+                            onLongClick = { onEpisodePodcastClick(row, episode) },
                             dateFormatter = dateFormatter,
                         )
 
                         TvProgressCardStyle.Queue -> TvEpisodeRow(
                             episode = podcastEpisode,
                             onClick = { onEpisodePlay(row, episode) },
+                            onLongClick = { onEpisodePodcastClick(row, episode) },
                             dateFormatter = dateFormatter,
                             modifier = Modifier.width(431.dp),
                         )
