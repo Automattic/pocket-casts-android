@@ -25,16 +25,48 @@ class AndroidAudioRouteMonitorTest {
     }
 
     @Test
-    fun `bluetooth sco headset with mic`() {
+    fun `bluetooth sco headset with active sco is headset with mic`() {
         val route = AndroidAudioRouteMonitor.classifyRoute(
             outputDeviceTypes = listOf(AudioDeviceInfo.TYPE_BLUETOOTH_SCO),
             inputDeviceTypes = listOf(AudioDeviceInfo.TYPE_BLUETOOTH_SCO),
+            bluetoothScoActive = true,
         )
         assertEquals(AudioRoute.Headset(hasMicrophone = true), route)
     }
 
     @Test
-    fun `bluetooth a2dp with headset mic input`() {
+    fun `airpods a2dp with sco devices enumerated but sco inactive needs sco open`() {
+        // Android enumerates TYPE_BLUETOOTH_SCO I/O for AirPods even when the SCO
+        // link is off (music is on A2DP). That must NOT be treated as an already-open
+        // headset mic — otherwise VoiceAsrEngine skips startBluetoothSco() and capture
+        // stays on the phone bottom mic.
+        val route = AndroidAudioRouteMonitor.classifyRoute(
+            outputDeviceTypes = listOf(
+                AudioDeviceInfo.TYPE_BUILTIN_SPEAKER,
+                AudioDeviceInfo.TYPE_BLUETOOTH_A2DP,
+                AudioDeviceInfo.TYPE_BLUETOOTH_SCO,
+            ),
+            inputDeviceTypes = listOf(AudioDeviceInfo.TYPE_BLUETOOTH_SCO),
+            bluetoothScoActive = false,
+        )
+        assertEquals(AudioRoute.BluetoothA2dpOnly, route)
+    }
+
+    @Test
+    fun `airpods with active sco is headset with mic`() {
+        val route = AndroidAudioRouteMonitor.classifyRoute(
+            outputDeviceTypes = listOf(
+                AudioDeviceInfo.TYPE_BLUETOOTH_A2DP,
+                AudioDeviceInfo.TYPE_BLUETOOTH_SCO,
+            ),
+            inputDeviceTypes = listOf(AudioDeviceInfo.TYPE_BLUETOOTH_SCO),
+            bluetoothScoActive = true,
+        )
+        assertEquals(AudioRoute.Headset(hasMicrophone = true), route)
+    }
+
+    @Test
+    fun `bluetooth a2dp with wired headset mic input`() {
         val route = AndroidAudioRouteMonitor.classifyRoute(
             outputDeviceTypes = listOf(AudioDeviceInfo.TYPE_BLUETOOTH_A2DP),
             inputDeviceTypes = listOf(AudioDeviceInfo.TYPE_WIRED_HEADSET),

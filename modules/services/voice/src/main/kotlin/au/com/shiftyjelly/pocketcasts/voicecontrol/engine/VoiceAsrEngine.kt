@@ -77,6 +77,7 @@ class VoiceAsrEngine @Inject constructor(
         utteranceFilter.reset()
 
         processingJob = scope.launch {
+            Timber.i("VoiceAsrEngine audioRoute=%s scoRequired=%b", audioRoute, audioRoute is AudioRoute.BluetoothA2dpOnly)
             if (audioRoute is AudioRoute.BluetoothA2dpOnly) {
                 awaitBluetoothSco()
             }

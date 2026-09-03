@@ -55,6 +55,7 @@ class AndroidAudioRouteMonitor @Inject constructor(
         audioManager.registerAudioDeviceCallback(audioDeviceCallback, null)
     }
 
+    @Suppress("DEPRECATION") // isBluetoothScoOn deprecated in API 34; used to distinguish enumerated-but-inactive SCO
     private fun readRoute(): AudioRoute {
         val outputDevices = audioManager.getDevices(AudioManager.GET_DEVICES_OUTPUTS).toList()
         val inputDevices = audioManager.getDevices(AudioManager.GET_DEVICES_INPUTS).toList()
@@ -62,6 +63,9 @@ class AndroidAudioRouteMonitor @Inject constructor(
         return classifyRoute(
             outputDeviceTypes = outputDevices.map { it.type },
             inputDeviceTypes = inputDevices.map { it.type },
+            // SCO I/O devices are enumerated for AirPods even when the SCO link is off
+            // (A2DP music path). Only treat BT as a live headset mic when SCO is actually on.
+            bluetoothScoActive = audioManager.isBluetoothScoOn,
         )
     }
 
@@ -69,30 +73,41 @@ class AndroidAudioRouteMonitor @Inject constructor(
         fun classifyRoute(
             outputDeviceTypes: List<Int>,
             inputDeviceTypes: List<Int>,
+            bluetoothScoActive: Boolean = false,
         ): AudioRoute {
-            val hasHeadsetInput = inputDeviceTypes.any { it.isHeadsetInput() }
+            val hasWiredOrBleOutput = outputDeviceTypes.any { it.isWiredOrBleHeadsetOutput() }
+            val hasWiredOrBleInput = inputDeviceTypes.any { it.isWiredOrBleHeadsetInput() }
             val hasA2dp = outputDeviceTypes.any { it == AudioDeviceInfo.TYPE_BLUETOOTH_A2DP }
+            val hasScoDevices = outputDeviceTypes.any { it == AudioDeviceInfo.TYPE_BLUETOOTH_SCO } ||
+                inputDeviceTypes.any { it == AudioDeviceInfo.TYPE_BLUETOOTH_SCO }
 
             return when {
-                outputDeviceTypes.any { it.isHeadsetOutput() } -> AudioRoute.Headset(hasMicrophone = hasHeadsetInput)
-                hasA2dp && hasHeadsetInput -> AudioRoute.Headset(hasMicrophone = true)
-                hasA2dp -> AudioRoute.BluetoothA2dpOnly
+                // Wired / BLE headsets don't need classic SCO.
+                hasWiredOrBleOutput || hasWiredOrBleInput ->
+                    AudioRoute.Headset(hasMicrophone = hasWiredOrBleInput)
+
+                // Classic BT with a live SCO link — mic is on the headset.
+                (hasScoDevices || hasA2dp) && bluetoothScoActive ->
+                    AudioRoute.Headset(hasMicrophone = true)
+
+                // A2DP (and/or enumerated-but-inactive SCO) — VoiceAsrEngine must open SCO
+                // before capture, otherwise Oboe binds the phone bottom mic.
+                hasA2dp || hasScoDevices -> AudioRoute.BluetoothA2dpOnly
+
                 outputDeviceTypes.any { it == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER } -> AudioRoute.Speaker
+
                 else -> AudioRoute.Unknown
             }
         }
 
-        private fun Int.isHeadsetOutput(): Boolean {
+        private fun Int.isWiredOrBleHeadsetOutput(): Boolean {
             return this == AudioDeviceInfo.TYPE_WIRED_HEADSET ||
                 this == AudioDeviceInfo.TYPE_WIRED_HEADPHONES ||
-                this == AudioDeviceInfo.TYPE_BLUETOOTH_SCO ||
                 isBleHeadset()
         }
 
-        private fun Int.isHeadsetInput(): Boolean {
-            return this == AudioDeviceInfo.TYPE_WIRED_HEADSET ||
-                this == AudioDeviceInfo.TYPE_BLUETOOTH_SCO ||
-                isBleHeadset()
+        private fun Int.isWiredOrBleHeadsetInput(): Boolean {
+            return this == AudioDeviceInfo.TYPE_WIRED_HEADSET || isBleHeadset()
         }
 
         private fun Int.isBleHeadset(): Boolean {
