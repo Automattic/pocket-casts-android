@@ -336,6 +336,7 @@ Java_au_com_shiftyjelly_pocketcasts_voicecontrol_wakeword_WakeWordJni_nativeDete
     int64_t clsInShape[] = {1, kMaxEmbeddings, kEmbeddingDim};
 
     float maxScore = 0.0f;
+    int bestWindow = -1;
     for (int w = 0; w < numWindows; w++) {
         float clsInputData[kMaxEmbeddings * kEmbeddingDim] = {};
         int srcStart = w * kEmbeddingDim;
@@ -352,13 +353,33 @@ Java_au_com_shiftyjelly_pocketcasts_voicecontrol_wakeword_WakeWordJni_nativeDete
         }
         if (clsOut[0] > maxScore) {
             maxScore = clsOut[0];
+            bestWindow = w;
         }
     }
 
-    // Onset-eligible classifier windows begin inside virtual context, so there
-    // is no valid non-negative window-start offset to return to the VAD segment.
-    // Keeping the default -1 makes command extraction use the full segment.
-    LOGI("Scored %d/%d onset-eligible classifier windows", numWindows, totalWindows);
+    // Winning window endpoint relative to speech onset (virtual context is
+    // not part of the VAD segment). Last embedding index is w+15.
+    if (jOutOffset && bestWindow >= 0) {
+        jfloat* outOffset = env->GetFloatArrayElements(jOutOffset, nullptr);
+        if (outOffset) {
+            int lastEmb = bestWindow + kMaxEmbeddings - 1;
+            int endpointRelOnset =
+                kEmbeddingEndpointOffsetSamples +
+                lastEmb * kEmbeddingStrideSamples -
+                kVirtualContextSamples;
+            if (endpointRelOnset < 0) endpointRelOnset = 0;
+            outOffset[0] = static_cast<jfloat>(endpointRelOnset);
+            env->ReleaseFloatArrayElements(jOutOffset, outOffset, 0);
+        }
+    }
+
+    LOGI("Scored %d/%d onset-eligible classifier windows (bestW=%d endpoint=%d)",
+         numWindows, totalWindows, bestWindow,
+         bestWindow >= 0
+             ? kEmbeddingEndpointOffsetSamples +
+                   (bestWindow + kMaxEmbeddings - 1) * kEmbeddingStrideSamples -
+                   kVirtualContextSamples
+             : -1);
 
     env->ReleaseFloatArrayElements(jSamples, samples, JNI_ABORT);
     return maxScore;

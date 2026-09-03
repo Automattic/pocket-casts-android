@@ -18,8 +18,8 @@ object WakeWordJni {
      * Run detection on a complete audio segment.
      * @param samples Normalized float PCM in [-1, 1] at 16kHz.
      * @param sampleRateHz Must be 16000.
-     * @param outOffset Single-element array that receives the sample offset of the
-     *   max-score detection window start, or -1 on error / no mel frames computed.
+     * @param outOffset Single-element array that receives the winning window's
+     *   waveform endpoint in onset-aligned samples, or -1 on error / no window.
      * @return Max classifier score across the segment, or -1 on error.
      */
     external fun nativeDetect(samples: FloatArray, sampleRateHz: Int, outOffset: FloatArray): Float

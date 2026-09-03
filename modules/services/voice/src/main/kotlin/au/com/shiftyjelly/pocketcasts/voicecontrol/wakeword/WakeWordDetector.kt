@@ -18,8 +18,8 @@ interface WakeWordDetector {
 data class WakeWordResult(
     val detected: Boolean,
     val confidence: Float = 0f,
-    /** If wake word was at start of segment, remaining audio after the keyword. */
-    val remainderSamples: FloatArray? = null,
+    /** Winning classifier window endpoint in the original VAD segment (samples). */
+    val completionSample: Int = 0,
     /** True when scoring failed (native error, unready detector, unsupported rate). */
     val error: Boolean = false,
 )

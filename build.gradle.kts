@@ -123,6 +123,7 @@ val spotlessPreCommitKotlinFiles = spotlessPreCommitFiles?.filter { file ->
     val path = file.relativeTo(rootDir).invariantSeparatorsPath
     path.endsWith(".kt") &&
         "/uniffi/" !in path &&
+        "/.cxx/" !in path &&
         (
             path.startsWith("app/src/") ||
                 path.startsWith("automotive/src/") ||
@@ -162,6 +163,7 @@ spotless {
                     )
                     exclude(
                         "**/build/**",
+                        "**/.cxx/**",
                         "**/uniffi/**",
                         "vendor/**",
                         ".git/**",

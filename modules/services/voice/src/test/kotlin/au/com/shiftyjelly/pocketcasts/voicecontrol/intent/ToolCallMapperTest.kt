@@ -227,7 +227,7 @@ class ToolCallMapperTest {
     }
 
     @Test
-    fun `tool call parse from native FunctionGemma output`() {
+    fun `tool call parse from legacy escaped function-call output`() {
         val response =
             """
             <start_function_call>call:sleep{action:<escape>set</escape>,minutes:30}<end_function_call>

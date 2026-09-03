@@ -132,7 +132,7 @@ class VoiceControlService : Service() {
 
         // Handle models first: defer mode observation until readiness completes.
         // This avoids lazy init on first utterance — both whisper and the
-        // FunctionGemma inference runtime are fully prepared before audio capture.
+        // LFM inference runtime are fully prepared before audio capture.
         serviceScope.launch(Dispatchers.IO) {
             ensureModelsReady()
             launch(Dispatchers.Main) {
@@ -218,7 +218,7 @@ class VoiceControlService : Service() {
         Timber.i("Selected ASR backend: %s", backend::class.simpleName)
 
         val needDownload = !modelManager.isModelReady(backend.requiredModel) ||
-            !modelManager.isFunctionGemmaModelReady()
+            !modelManager.isLfmModelReady()
 
         if (needDownload) {
             modelsReadyCondition.update(isReady = false)
@@ -237,13 +237,13 @@ class VoiceControlService : Service() {
             return
         }
 
-        if (modelManager.ensureFunctionGemmaModel().isFailure) {
-            Timber.e("FunctionGemma model download failed")
+        if (modelManager.ensureLfmModel().isFailure) {
+            Timber.e("LFM model download failed")
             serviceScope.launch(Dispatchers.Main) { stopSelf() }
             return
         }
 
-        Timber.i("FunctionGemma model ready, initializing intent router")
+        Timber.i("LFM model ready, initializing intent router")
         val routerResult = voiceRecognizer.ensureReady()
         if (routerResult.isFailure) {
             Timber.e(routerResult.exceptionOrNull(), "Intent router initialization failed")

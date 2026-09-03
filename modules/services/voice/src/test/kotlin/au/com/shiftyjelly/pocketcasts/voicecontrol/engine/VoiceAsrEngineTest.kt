@@ -11,6 +11,7 @@ import android.media.AudioManager
 import au.com.shiftyjelly.pocketcasts.voicecontrol.asr.AsrBackend
 import au.com.shiftyjelly.pocketcasts.voicecontrol.asr.AsrCapabilities
 import au.com.shiftyjelly.pocketcasts.voicecontrol.asr.AsrResult
+import au.com.shiftyjelly.pocketcasts.voicecontrol.asr.AsrToken
 import au.com.shiftyjelly.pocketcasts.voicecontrol.asr.ModelSpec
 import au.com.shiftyjelly.pocketcasts.voicecontrol.audio.PcmAudioFrame
 import au.com.shiftyjelly.pocketcasts.voicecontrol.audio.VoiceAudioProcessor
@@ -70,7 +71,7 @@ class VoiceAsrEngineTest {
                 au.com.shiftyjelly.pocketcasts.voicecontrol.wakeword.WakeWordResult(
                     detected = false,
                     confidence = 0f,
-                    remainderSamples = null,
+                    completionSample = 4000,
                 ),
             )
         }
@@ -237,7 +238,7 @@ class VoiceAsrEngineTest {
             au.com.shiftyjelly.pocketcasts.voicecontrol.wakeword.WakeWordResult(
                 detected = false,
                 confidence = 0f,
-                remainderSamples = null,
+                completionSample = 4000,
             ),
         )
 
@@ -371,20 +372,27 @@ class VoiceAsrEngineTest {
     }
 
     @Test
-    fun `wake word detection opens grace plays earcon and forwards remainder to ASR`() = runTest {
+    fun `wake word detection opens grace plays earcon and forwards full segment to ASR`() = runTest {
         val recognizer = RecordingRecognizer(VoiceIntent.Playback.Pause)
         createEngineWithSpeech(
             recognizer = recognizer,
             wakeWordResult = WakeWordResult(
                 detected = true,
                 confidence = 0.9f,
-                remainderSamples = floatArrayOf(0.1f, 0.2f, 0.3f),
+                completionSample = 4000,
             ),
         )
         val handledIntents = mutableListOf<VoiceIntent>()
 
         engine.start(
-            backend = FakeAsrBackend("pause"),
+            backend = FakeAsrBackend(
+                "Auris skip forward",
+                tokens = listOf(
+                    AsrToken("Auris", 0, 300),
+                    AsrToken(" skip", 500, 800),
+                    AsrToken(" forward", 800, 1200),
+                ),
+            ),
             audioRoute = AudioRoute.Speaker,
             listeningMode = ListeningMode.WakeWord,
             playbackBufferProvider = { FloatArray(0) },
@@ -395,26 +403,29 @@ class VoiceAsrEngineTest {
 
         verify(gracePeriodSignal).onWakeWordDetected()
         verify(audioFeedbackRenderer).playEarcon(EarconId.WAKE_WORD)
-        assertEquals(listOf("ensureReady", "recognize:pause"), recognizer.calls)
+        assertEquals(listOf("ensureReady", "recognize:skip forward"), recognizer.calls)
         assertEquals(listOf(VoiceIntent.Playback.Pause), handledIntents)
 
         engine.stop()
     }
 
     @Test
-    fun `wake-only detection opens grace plays error earcon and skips ASR`() = runTest {
+    fun `wake-only detection opens grace plays error earcon after empty command transcript`() = runTest {
         val recognizer = RecordingRecognizer(VoiceIntent.Playback.Pause)
         createEngineWithSpeech(
             recognizer = recognizer,
             wakeWordResult = WakeWordResult(
                 detected = true,
                 confidence = 0.9f,
-                remainderSamples = null,
+                completionSample = 4000,
             ),
         )
 
         engine.start(
-            backend = FakeAsrBackend("pause"),
+            backend = FakeAsrBackend(
+                "Auris",
+                tokens = listOf(AsrToken("Auris", 0, 400)),
+            ),
             audioRoute = AudioRoute.Speaker,
             listeningMode = ListeningMode.WakeWord,
             playbackBufferProvider = { FloatArray(0) },
@@ -426,7 +437,7 @@ class VoiceAsrEngineTest {
         verify(gracePeriodSignal).onWakeWordDetected()
         verify(audioFeedbackRenderer).playEarcon(EarconId.WAKE_WORD)
         verify(audioFeedbackRenderer).playEarcon(EarconId.ERROR)
-        assertTrue("Expected no ASR calls, got ${recognizer.calls}", recognizer.calls.isEmpty())
+        assertTrue("Expected no intent routing, got ${recognizer.calls}", recognizer.calls.isEmpty())
 
         engine.stop()
     }
@@ -439,7 +450,7 @@ class VoiceAsrEngineTest {
             wakeWordResult = WakeWordResult(
                 detected = false,
                 confidence = 0f,
-                remainderSamples = null,
+                completionSample = 4000,
             ),
         )
 
@@ -483,10 +494,11 @@ class VoiceAsrEngineTest {
 
     private class FakeAsrBackend(
         private val transcript: String,
+        private val tokens: List<AsrToken>? = null,
     ) : AsrBackend {
         override suspend fun ensureReady(): Result<Unit> = Result.success(Unit)
 
-        override suspend fun transcribe(samples: FloatArray, sampleRateHz: Int): AsrResult = AsrResult(transcript)
+        override suspend fun transcribe(samples: FloatArray, sampleRateHz: Int): AsrResult = AsrResult(transcript, tokens = tokens)
 
         override val requiredModel: ModelSpec = ModelSpec(files = emptyList(), targetDir = "")
 

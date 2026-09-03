@@ -95,4 +95,23 @@ class WhisperCppBackendTest {
             )
         }
     }
+
+    @Test
+    fun `json payload parses timed tokens`() {
+        val result = parseWhisperPayload(
+            """{"text":"Auris skip","tokens":[{"text":"Auris","startMs":0,"endMs":300},{"text":" skip","startMs":500,"endMs":800}]}""",
+        )
+        assertEquals("Auris skip", result.text)
+        val tokens = result.tokens
+        assertEquals(2, tokens?.size)
+        assertEquals("Auris", tokens?.get(0)?.text)
+        assertEquals(300, tokens?.get(0)?.endMs)
+    }
+
+    @Test
+    fun `plain text payload has no tokens`() {
+        val result = parseWhisperPayload(" skip forward ")
+        assertEquals("skip forward", result.text)
+        assertNull(result.tokens)
+    }
 }

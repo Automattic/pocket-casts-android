@@ -95,19 +95,9 @@ class SherpaOnnxKwsDetector @Inject constructor(
 
             if (!detected) return WakeWordResult(detected = false)
 
-            // If the keyword is at the start of the segment, trim it to get the
-            // command remainder ("Auris, skip forward" → "skip forward")
-            val remainder = if (
-                keywordEndSec > 0.1f &&
-                keywordEndSec < detectorSegment.size / sampleRateHz * 0.9f
-            ) {
-                val endSample = (speechOnsetSample + keywordEndSec * sampleRateHz).toInt().coerceAtMost(segment.size)
-                segment.copyOfRange(endSample, segment.size)
-            } else {
-                null
-            }
-
-            WakeWordResult(detected = true, confidence = 1.0f, remainderSamples = remainder)
+            val completionSample = (speechOnsetSample + (keywordEndSec * sampleRateHz).toInt())
+                .coerceIn(0, segment.size)
+            WakeWordResult(detected = true, confidence = 1.0f, completionSample = completionSample)
         } catch (e: Exception) {
             Timber.w(e, "KWS detection failed")
             WakeWordResult(detected = false)

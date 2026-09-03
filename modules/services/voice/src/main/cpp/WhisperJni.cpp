@@ -4,8 +4,10 @@
 #include "whisper.h"
 #include <android/log.h>
 #include <chrono>
+#include <cstdio>
 #include <cstdlib>
 #include <mutex>
+#include <sstream>
 #include <thread>
 #include <vector>
 
@@ -128,17 +130,61 @@ Java_au_com_shiftyjelly_pocketcasts_voicecontrol_asr_WhisperNative_transcribe(
     if (decodeResult != 0)
         return stringToJstring(env, "");
 
-    std::string result;
+    std::string text;
+    std::ostringstream tokensJson;
+    tokensJson << "[";
+    bool firstTok = true;
     int n = whisper_full_n_segments(g_ctx);
+    const int eot = whisper_token_eot(g_ctx);
     for (int i = 0; i < n; i++) {
-        const char* text = whisper_full_get_segment_text(g_ctx, i);
-        if (text) {
-            if (!result.empty()) result += " ";
-            result += text;
+        const char* seg = whisper_full_get_segment_text(g_ctx, i);
+        if (seg) {
+            if (!text.empty()) text += " ";
+            text += seg;
+        }
+        const int nTok = whisper_full_n_tokens(g_ctx, i);
+        for (int t = 0; t < nTok; t++) {
+            whisper_token_data data = whisper_full_get_token_data(g_ctx, i, t);
+            if (data.id >= eot) continue;
+            const char* tok = whisper_full_get_token_text(g_ctx, i, t);
+            if (!tok || tok[0] == '\0' || tok[0] == '[') continue;
+            if (!firstTok) tokensJson << ",";
+            firstTok = false;
+            tokensJson << "{\"text\":\"";
+            for (const char* p = tok; *p; ++p) {
+                unsigned char c = static_cast<unsigned char>(*p);
+                if (c == '"' || c == '\\') tokensJson << '\\' << *p;
+                else if (c < 0x20) {
+                    char buf[8];
+                    std::snprintf(buf, sizeof(buf), "\\u%04x", c);
+                    tokensJson << buf;
+                } else {
+                    tokensJson << *p;
+                }
+            }
+            tokensJson << "\",\"startMs\":" << (data.t0 * 10)
+                       << ",\"endMs\":" << (data.t1 * 10) << "}";
         }
     }
-    LOGI("whisper result (%d segments): \"%s\"", n, result.c_str());
-    return stringToJstring(env, result);
+    tokensJson << "]";
+
+    std::ostringstream payload;
+    payload << "{\"text\":\"";
+    for (char ch : text) {
+        unsigned char c = static_cast<unsigned char>(ch);
+        if (c == '"' || c == '\\') payload << '\\' << ch;
+        else if (c < 0x20) {
+            char buf[8];
+            std::snprintf(buf, sizeof(buf), "\\u%04x", c);
+            payload << buf;
+        } else {
+            payload << ch;
+        }
+    }
+    payload << "\",\"tokens\":" << tokensJson.str() << "}";
+
+    LOGI("whisper result (%d segments): \"%s\"", n, text.c_str());
+    return stringToJstring(env, payload.str());
 }
 
 JNIEXPORT void JNICALL
