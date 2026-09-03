@@ -341,9 +341,8 @@ platform :android do
   #
   # @param percent [Float] The rollout percentage, between 0 and 1
   # @param track [String] The Google Play track for which to update the rollout of. Must be either `beta` or `production`.
-  # @param version [String] (optional) The release version the announcement is about. Provided by
-  #                Releases V2. When omitted, uses the current project version, which is only correct
-  #                on a release branch.
+  # @param version [String] (optional) The release version the announcement is about. When
+  #                omitted, uses the current project version, which is only correct on a release branch.
   # @param milestone [String] (optional) The milestone to name alongside the version.
   #                  Provided by Releases V2, which is the only place it can come from.
   #
@@ -1004,8 +1003,6 @@ platform :android do
   # Slack helpers
   #####################################################################################
 
-  # `channel` is not optional in practice: `SLACK_WEBHOOK` holds the webhook shared across
-  # products, which posts to a test channel unless told otherwise.
   def send_slack_message(message:, channel: SLACK_CHANNEL)
     webhook = ENV.fetch('SLACK_WEBHOOK') do
       UI.user_error!("Environment variable 'SLACK_WEBHOOK' is not set. See `fastlane/env/user.env-example`.")

@@ -17,7 +17,6 @@ def rollout_announcement(track:, percent:, version:, milestone: nil, skipped_app
   version = version.to_s.strip
   subject = ["`#{version}`", milestone.to_s.strip].reject(&:empty?).join(' ')
 
-  # Derived once so the announced percentage and the submission check cannot disagree.
   percentage = (percent * 100).round
   message = if track == 'production' && percentage == SUBMISSION_ROLLOUT_PERCENTAGE
               ":announcement: `#{version}` has been submitted to the Production track for Google to review."
