@@ -1,5 +1,8 @@
 8.21
 -----
+*   Bug Fixes
+    *   Fix video freezing when rotating a video podcast into landscape fullscreen
+        ([#5844](https://github.com/Automattic/pocket-casts-android/pull/5844))
 
 8.20
 -----
