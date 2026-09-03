@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playback
 
 import androidx.work.NetworkType
+import au.com.shiftyjelly.pocketcasts.models.entity.AlternateEnclosureStream
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
@@ -125,8 +126,7 @@ class PrefetchNextEpisodeTest {
     @Test
     fun `should not prefetch when a selected stream override is HLS`() {
         val episode = createEpisode().apply {
-            overrideStreamUrl = "https://example.com/episode.m3u8"
-            overrideStreamContentType = "application/x-mpegURL"
+            overrideStream = AlternateEnclosureStream(url = "https://example.com/episode.m3u8", contentType = "application/x-mpegURL", mediaKind = null)
         }
         val result = buildPrefetchRequest(
             isFeatureEnabled = true,

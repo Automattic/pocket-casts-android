@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.servers
 
 import au.com.shiftyjelly.pocketcasts.models.entity.AlternateEnclosureSource
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeAlternateEnclosure
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -148,7 +149,7 @@ object DataParser {
         val url = getString(jsonEpisode, "url")
         val fileType = getString(jsonEpisode, "file_type")
         // Stream-only episode (no progressive download): surface the alternate enclosure's MIME, but keep a real video type.
-        val resolvedFileType = if (url.isNullOrBlank() && fileType?.startsWith("video/") != true) {
+        val resolvedFileType = if (url.isNullOrBlank() && !BaseEpisode.isVideoMimeType(fileType)) {
             enclosures.firstStreamOnlyMimeType() ?: fileType
         } else {
             fileType

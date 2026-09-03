@@ -14,7 +14,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.toLiveData
-import androidx.media3.common.MimeTypes
 import androidx.media3.common.util.StuckPlayerException
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.datasource.HttpDataSource
@@ -410,12 +409,17 @@ open class PlaybackManager @Inject constructor(
             }
         }
 
-        val autoPlayOffersHls = alternateEnclosureManager.findForEpisode(autoPlayEpisode.uuid).firstHlsStreamUrl() != null
+        val autoPlayEnclosures = alternateEnclosureManager.findForEpisode(autoPlayEpisode.uuid)
+        val autoPlayOffersHls = autoPlayEnclosures.firstHlsStreamUrl() != null
+        val autoPlayStreamsVideo = selectAlternateStream(
+            enclosures = autoPlayEnclosures,
+            hasProgressiveEnclosure = !autoPlayEpisode.downloadUrl.isNullOrBlank(),
+        ) != null
         eventHorizon.track(
             PlaybackEpisodeAutoplayedEvent(
                 episodeUuid = autoPlayEpisode.uuid,
                 hlsAvailable = autoPlayOffersHls,
-                audioOnlyMode = if (autoPlayOffersHls || autoPlayEpisode.isVideo) settings.audioOnly.value else null,
+                audioOnlyMode = if (autoPlayStreamsVideo || autoPlayEpisode.isVideo) settings.audioOnly.value else null,
             ),
         )
         return autoPlayEpisode
@@ -426,9 +430,7 @@ open class PlaybackManager @Inject constructor(
     }
 
     private suspend fun applyStreamOverride(episode: BaseEpisode) {
-        episode.overrideStreamUrl = null
-        episode.overrideStreamContentType = null
-        episode.overrideStreamIsVideo = false
+        episode.overrideStream = null
         val enclosures = alternateEnclosureManager.findForEpisode(episode.uuid)
         _streamHlsAvailable.value = enclosures.firstHlsStreamUrl() != null
         val stream = selectAlternateStream(
@@ -436,20 +438,8 @@ open class PlaybackManager @Inject constructor(
             hasProgressiveEnclosure = !episode.downloadUrl.isNullOrBlank(),
         )
         _streamVideoAvailable.value = stream != null
-        if (stream != null) {
-            episode.overrideStreamUrl = stream.url
-            // Normalise the manifest type so ExoPlayer and Cast agree, whichever HLS MIME the server sent.
-            episode.overrideStreamContentType = if (stream.isHls) MimeTypes.APPLICATION_M3U8 else stream.contentType
-            episode.overrideStreamIsVideo = stream.isVideo
-        }
+        episode.overrideStream = stream
     }
-
-    private fun selectAlternateStream(enclosures: List<EpisodeAlternateEnclosure>, hasProgressiveEnclosure: Boolean) = selectAlternateStream(
-        enclosures = enclosures,
-        isHlsEnabled = FeatureFlag.isEnabled(Feature.HLS_STREAMING),
-        isVideoEnclosureEnabled = FeatureFlag.isEnabled(Feature.VIDEO_ALTERNATE_ENCLOSURES),
-        hasProgressiveEnclosure = hasProgressiveEnclosure,
-    )
 
     fun videoToggleRequiresStreamSwitch(): Boolean {
         val episode = getCurrentEpisode() ?: return false
@@ -3065,8 +3055,17 @@ internal fun selectAlternateStream(
     // An episode with no progressive enclosure has nothing else to play, so the flags can't gate it.
     val hls = enclosures.firstHlsStream()?.takeIf { isHlsEnabled || !hasProgressiveEnclosure }
     val video = enclosures.firstProgressiveVideoStream()?.takeIf { isVideoEnclosureEnabled || !hasProgressiveEnclosure }
-    return hls ?: video
+    // HLS adapts to bandwidth, but not when the server marked it audio and a video rendition sits beside it.
+    return if (hls != null && !hls.isAudioOnly) hls else video ?: hls
 }
+
+/** The stream playback would resolve for these enclosures, with the encoding feature flags applied. */
+internal fun selectAlternateStream(enclosures: List<EpisodeAlternateEnclosure>, hasProgressiveEnclosure: Boolean) = selectAlternateStream(
+    enclosures = enclosures,
+    isHlsEnabled = FeatureFlag.isEnabled(Feature.HLS_STREAMING),
+    isVideoEnclosureEnabled = FeatureFlag.isEnabled(Feature.VIDEO_ALTERNATE_ENCLOSURES),
+    hasProgressiveEnclosure = hasProgressiveEnclosure,
+)
 
 internal data class PrefetchRequest(
     val episodeUuid: String,

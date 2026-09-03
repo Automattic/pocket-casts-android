@@ -168,8 +168,7 @@ class ExoPlayerDataSourceFactory @Inject constructor(
         }
     }
 
-    // The cache is keyed by episode uuid, so an alternate encoding would collide with the progressive enclosure.
-    private fun EpisodeLocation.shouldUseCache() = !episode.isDownloaded && !episode.isDownloading && !isVideoStream && settings.cacheEntirePlayingEpisode.value
+    private fun EpisodeLocation.shouldUseCache() = episode.usesSharedPlayerCache && settings.cacheEntirePlayingEpisode.value
 
     private fun ClosedRange<Long>.toClippingConfiguration() = ClippingConfiguration.Builder()
         .setStartPositionMs(start)

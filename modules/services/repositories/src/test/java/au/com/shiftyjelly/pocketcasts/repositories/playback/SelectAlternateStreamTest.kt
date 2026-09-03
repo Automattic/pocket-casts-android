@@ -20,6 +20,29 @@ class SelectAlternateStreamTest {
     }
 
     @Test
+    fun `prefers the video rendition over an hls rendition the server marked audio`() {
+        val audioHls = enclosure(MimeTypes.APPLICATION_M3U8, HLS_URL).copy(mediaKind = MediaKind.Audio)
+
+        val stream = select(listOf(audioHls, videoEnclosure("video/mp4", MP4_URL)))
+
+        assertEquals(MP4_URL, stream?.url)
+    }
+
+    @Test
+    fun `keeps an audio hls rendition when there is no video rendition beside it`() {
+        val audioHls = enclosure(MimeTypes.APPLICATION_M3U8, HLS_URL).copy(mediaKind = MediaKind.Audio)
+
+        assertEquals(HLS_URL, select(listOf(audioHls))?.url)
+    }
+
+    @Test
+    fun `prefers hls when the server left its media kind unstated`() {
+        val stream = select(listOf(enclosure(MimeTypes.APPLICATION_M3U8, HLS_URL), videoEnclosure("video/mp4", MP4_URL)))
+
+        assertEquals(HLS_URL, stream?.url)
+    }
+
+    @Test
     fun `falls back to the progressive video rendition when hls is disabled`() {
         val enclosures = listOf(videoEnclosure("video/mp4", MP4_URL), videoEnclosure(MimeTypes.APPLICATION_M3U8, HLS_URL))
 

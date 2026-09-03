@@ -2,9 +2,11 @@ package au.com.shiftyjelly.pocketcasts.models.entity
 
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
+import au.com.shiftyjelly.pocketcasts.models.type.MediaKind
 import java.util.Date
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -141,9 +143,7 @@ class BaseEpisodeHlsDetectionTest {
     @Test
     fun `episode streaming a video alternate enclosure is a video stream but not a video file`() {
         val episode = createEpisode(downloadUrl = "https://example.com/episode.mp3", fileType = "audio/mp3").apply {
-            overrideStreamUrl = "https://example.com/episode.mp4"
-            overrideStreamContentType = "video/mp4"
-            overrideStreamIsVideo = true
+            overrideStream = AlternateEnclosureStream(url = "https://example.com/episode.mp4", contentType = "video/mp4", mediaKind = MediaKind.Video)
         }
 
         assertTrue(episode.isStreamUrlVideo)
@@ -155,8 +155,7 @@ class BaseEpisodeHlsDetectionTest {
     @Test
     fun `episode streaming an hls alternate enclosure is a video stream but not a video file`() {
         val episode = createEpisode(downloadUrl = "https://example.com/episode.mp3", fileType = "audio/mp3").apply {
-            overrideStreamUrl = "https://example.com/master.m3u8"
-            overrideStreamContentType = "application/x-mpegURL"
+            overrideStream = AlternateEnclosureStream(url = "https://example.com/master.m3u8", contentType = "application/x-mpegURL", mediaKind = null)
         }
 
         assertFalse(episode.isVideo)
@@ -174,9 +173,7 @@ class BaseEpisodeHlsDetectionTest {
     @Test
     fun `video rendition is trusted from the media kind, not the content type the source declared`() {
         val episode = createEpisode(downloadUrl = "https://example.com/episode.mp3", fileType = "audio/mp3").apply {
-            overrideStreamUrl = "https://example.com/episode.mp4"
-            overrideStreamContentType = "application/octet-stream"
-            overrideStreamIsVideo = true
+            overrideStream = AlternateEnclosureStream(url = "https://example.com/episode.mp4", contentType = "application/octet-stream", mediaKind = MediaKind.Video)
         }
 
         assertTrue(episode.isStreamUrlVideo)
@@ -188,6 +185,64 @@ class BaseEpisodeHlsDetectionTest {
 
         assertTrue(episode.isVideo)
         assertFalse(episode.isStreamUrlVideo)
+    }
+
+    @Test
+    fun `episode whose feed sent no progressive url has nothing to download`() {
+        val episode = createEpisode(downloadUrl = "", fileType = "video/mp4")
+
+        assertTrue(episode.isStreamOnly)
+        assertFalse(episode.canQueueForAutoDownload)
+        // Its own enclosure is video, so isHlsOnly cannot be what guards the download.
+        assertFalse(episode.isHlsOnly)
+    }
+
+    @Test
+    fun `episode awaiting a refreshed download url is still downloadable`() {
+        val episode = createEpisode(downloadUrl = null, fileType = "audio/mp3")
+
+        assertFalse(episode.isStreamOnly)
+        assertTrue(episode.canQueueForAutoDownload)
+    }
+
+    @Test
+    fun `hls only episode is still stream only`() {
+        assertTrue(createEpisode(downloadUrl = "https://example.com/episode.m3u8").isStreamOnly)
+    }
+
+    @Test
+    fun `episode with a progressive url is not stream only`() {
+        val episode = createEpisode(downloadUrl = "https://example.com/episode.mp3", fileType = "audio/mp3")
+
+        assertFalse(episode.isStreamOnly)
+        assertTrue(episode.canQueueForAutoDownload)
+    }
+
+    @Test
+    fun `stream content type describes the resolved encoding, never the progressive enclosure`() {
+        val episode = createEpisode(downloadUrl = "https://example.com/episode.mp3", fileType = "audio/mpeg")
+        assertEquals("audio/mpeg", episode.streamContentType)
+
+        // A rendition the server sent no type for must not borrow the progressive enclosure's.
+        episode.overrideStream = AlternateEnclosureStream(
+            url = "https://example.com/episode.mp4",
+            contentType = null,
+            mediaKind = MediaKind.Video,
+        )
+        assertNull(episode.streamContentType)
+    }
+
+    @Test
+    fun `an alternate video rendition must not share the progressive file's cache entry`() {
+        val episode = createEpisode(downloadUrl = "https://example.com/episode.mp3", fileType = "audio/mp3")
+        assertTrue(episode.usesSharedPlayerCache)
+
+        episode.overrideStream = AlternateEnclosureStream(
+            url = "https://example.com/episode.mp4",
+            contentType = "video/mp4",
+            mediaKind = MediaKind.Video,
+        )
+        assertFalse(episode.usesSharedPlayerCache)
     }
 
     private fun createEpisode(

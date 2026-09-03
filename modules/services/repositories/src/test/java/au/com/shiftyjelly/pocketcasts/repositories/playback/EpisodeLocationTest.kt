@@ -1,7 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playback
 
+import au.com.shiftyjelly.pocketcasts.models.entity.AlternateEnclosureStream
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
+import au.com.shiftyjelly.pocketcasts.models.type.MediaKind
 import java.util.Date
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -38,8 +40,7 @@ class EpisodeLocationTest {
     @Test
     fun `streams a selected hls override`() {
         val episode = createEpisode().apply {
-            overrideStreamUrl = "https://example.com/episode.m3u8"
-            overrideStreamContentType = "application/x-mpegURL"
+            overrideStream = AlternateEnclosureStream(url = "https://example.com/episode.m3u8", contentType = "application/x-mpegURL", mediaKind = null)
         }
 
         val location = EpisodeLocation.create(episode)
@@ -54,8 +55,7 @@ class EpisodeLocationTest {
             downloadStatus = EpisodeDownloadStatus.Downloaded,
             downloadedFilePath = "/path/episode.mp3",
         ).apply {
-            overrideStreamUrl = "https://example.com/episode.m3u8"
-            overrideStreamContentType = "application/x-mpegURL"
+            overrideStream = AlternateEnclosureStream(url = "https://example.com/episode.m3u8", contentType = "application/x-mpegURL", mediaKind = null)
         }
 
         val location = EpisodeLocation.create(episode, preferStream = true)
@@ -71,9 +71,7 @@ class EpisodeLocationTest {
             downloadStatus = EpisodeDownloadStatus.Downloaded,
             downloadedFilePath = "/path/episode.mp3",
         ).apply {
-            overrideStreamUrl = "https://example.com/episode.mp4"
-            overrideStreamContentType = "video/mp4"
-            overrideStreamIsVideo = true
+            overrideStream = AlternateEnclosureStream(url = "https://example.com/episode.mp4", contentType = "video/mp4", mediaKind = MediaKind.Video)
         }
 
         val location = EpisodeLocation.create(episode, preferStream = true)

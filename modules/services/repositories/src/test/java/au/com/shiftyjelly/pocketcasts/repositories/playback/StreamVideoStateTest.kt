@@ -1,6 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playback
 
+import au.com.shiftyjelly.pocketcasts.models.entity.AlternateEnclosureStream
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.type.MediaKind
 import java.util.Date
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -38,9 +40,7 @@ class StreamVideoStateTest {
     @Test
     fun `video alternate enclosure stream starts unknown like hls`() {
         val episode = createEpisode(fileType = "audio/mp3").apply {
-            overrideStreamUrl = "https://example.com/episode.mp4"
-            overrideStreamContentType = "video/mp4"
-            overrideStreamIsVideo = true
+            overrideStream = AlternateEnclosureStream(url = "https://example.com/episode.mp4", contentType = "video/mp4", mediaKind = MediaKind.Video)
         }
 
         assertEquals(StreamVideoState.Unknown, StreamVideoState.initialFor(episode, audioOnly = false, playingVideoStream = true, isRemote = false))
@@ -49,9 +49,7 @@ class StreamVideoStateTest {
     @Test
     fun `downloaded episode with a resolved video stream it is not playing stays not video`() {
         val episode = createEpisode(fileType = "audio/mp3").apply {
-            overrideStreamUrl = "https://example.com/episode.mp4"
-            overrideStreamContentType = "video/mp4"
-            overrideStreamIsVideo = true
+            overrideStream = AlternateEnclosureStream(url = "https://example.com/episode.mp4", contentType = "video/mp4", mediaKind = MediaKind.Video)
         }
 
         assertEquals(StreamVideoState.NotVideo, StreamVideoState.initialFor(episode, audioOnly = false, playingVideoStream = false, isRemote = false))
@@ -107,7 +105,6 @@ class StreamVideoStateTest {
     )
 
     private fun createHlsEpisode() = createEpisode(fileType = "audio/mpeg").apply {
-        overrideStreamUrl = "https://example.com/episode.m3u8"
-        overrideStreamContentType = "application/x-mpegURL"
+        overrideStream = AlternateEnclosureStream(url = "https://example.com/episode.m3u8", contentType = "application/x-mpegURL", mediaKind = null)
     }
 }

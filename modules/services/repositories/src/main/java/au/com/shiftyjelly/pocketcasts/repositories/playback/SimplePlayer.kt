@@ -344,7 +344,7 @@ class SimplePlayer(
     private fun applyVideoTrackSelection() {
         val trackSelector = trackSelector ?: return
         trackSelector.parameters = trackSelector.buildUponParameters()
-            .setTrackTypeDisabled(C.TRACK_TYPE_VIDEO, shouldDisableVideoTrack(settings.audioOnly.value, hasVideoSurface, episodeLocation.isVideoStream))
+            .setTrackTypeDisabled(C.TRACK_TYPE_VIDEO, shouldDisableVideoTrack(settings.audioOnly.value, hasVideoSurface, episodeLocation.isHlsStream))
             .build()
     }
 
@@ -438,9 +438,9 @@ class SimplePlayer(
     }
 }
 
-// A resolved video encoding keeps its video track so the player can report whether the stream carries video.
-internal fun shouldDisableVideoTrack(audioOnly: Boolean, hasVideoSurface: Boolean, isVideoStream: Boolean): Boolean {
-    return audioOnly || (!hasVideoSurface && !isVideoStream)
+// HLS can mux audio into the video track, so it keeps that track even with no surface to draw on.
+internal fun shouldDisableVideoTrack(audioOnly: Boolean, hasVideoSurface: Boolean, isHlsStream: Boolean): Boolean {
+    return audioOnly || (!hasVideoSurface && !isHlsStream)
 }
 
 private class PlayPauseListener(

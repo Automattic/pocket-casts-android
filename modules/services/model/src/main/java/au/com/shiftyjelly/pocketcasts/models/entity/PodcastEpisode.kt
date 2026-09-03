@@ -127,13 +127,7 @@ data class PodcastEpisode(
     var alternateEnclosures: List<EpisodeAlternateEnclosure> = emptyList()
 
     @Ignore
-    override var overrideStreamUrl: String? = null
-
-    @Ignore
-    override var overrideStreamContentType: String? = null
-
-    @Ignore
-    override var overrideStreamIsVideo: Boolean = false
+    override var overrideStream: AlternateEnclosureStream? = null
 
     val playedPercentage: Int
         get() {

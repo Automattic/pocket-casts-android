@@ -15,8 +15,7 @@ class BaseEpisodeStreamOverrideTest {
         val episode = createEpisode(
             downloadUrl = "https://example.com/episode.mp3",
         ).apply {
-            overrideStreamUrl = "https://example.com/video-1080.mp4"
-            overrideStreamContentType = "video/mp4"
+            overrideStream = AlternateEnclosureStream(url = "https://example.com/video-1080.mp4", contentType = "video/mp4", mediaKind = null)
         }
         assertEquals("https://example.com/video-1080.mp4", episode.streamUrl)
     }
@@ -32,14 +31,12 @@ class BaseEpisodeStreamOverrideTest {
     @Test
     fun `isStreamUrlHls reflects override content type`() {
         val hls = createEpisode(downloadUrl = "https://example.com/episode.mp3").apply {
-            overrideStreamUrl = "https://example.com/master.m3u8"
-            overrideStreamContentType = "application/x-mpegURL"
+            overrideStream = AlternateEnclosureStream(url = "https://example.com/master.m3u8", contentType = "application/x-mpegURL", mediaKind = null)
         }
         assertTrue(hls.isStreamUrlHls)
 
         val mp4 = createEpisode(downloadUrl = "https://example.com/episode.mp3").apply {
-            overrideStreamUrl = "https://example.com/video-1080.mp4"
-            overrideStreamContentType = "video/mp4"
+            overrideStream = AlternateEnclosureStream(url = "https://example.com/video-1080.mp4", contentType = "video/mp4", mediaKind = null)
         }
         assertFalse(mp4.isStreamUrlHls)
     }
