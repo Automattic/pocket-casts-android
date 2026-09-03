@@ -370,15 +370,22 @@ platform :android do
     rescue FastlaneCore::Interface::FastlaneError => e
       raise unless e.message =~ /Unable to find the requested release on track/
 
-      not_found_variants << "'#{app}' variant with version code `#{variant_version_code}` was not found in `#{variant_track}` track in Google Play Console"
+      not_found_variants << { app: app, version_code: variant_version_code, track: variant_track }
     end
 
-    not_found_variants.each do |message|
-      UI.important(message)
+    not_found_variants.each do |variant|
+      UI.important("'#{variant[:app]}' variant with version code `#{variant[:version_code]}` was not found in `#{variant[:track]}` track in Google Play Console")
     end
     UI.user_error!('None of the 3 app variants were found in Google Play Console. We expected at least one') if not_found_variants.count == APPS.count
 
-    notify_slack { rollout_announcement(track: track, percent: percent.to_f, fallback_version: release_version_current) }
+    notify_slack do
+      rollout_announcement(
+        track: track,
+        percent: percent.to_f,
+        fallback_version: release_version_current,
+        skipped_apps: not_found_variants.map { |variant| variant[:app] }
+      )
+    end
   end
 
   # Downloads the latest translations from GlotPress and creates a PR to integrate them into the current `release/*` branch

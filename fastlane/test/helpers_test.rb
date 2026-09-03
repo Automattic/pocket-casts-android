@@ -72,6 +72,33 @@ class FastlaneHelpersTest < Minitest::Test
     end
   end
 
+  def test_rollout_announcement_names_the_variants_that_were_not_rolled_out
+    with_env('RELEASE_VERSION' => '7.94', 'MILESTONE' => nil) do
+      assert_equal <<~MESSAGE.chomp,
+        :announcement: `7.94` has started rolling out to 20% of users.
+        :warning: Not rolled out to automotive, wear — Google Play had no matching release.
+      MESSAGE
+                   rollout_announcement(track: 'beta', percent: 0.2, fallback_version: 'unused', skipped_apps: %w[automotive wear])
+    end
+  end
+
+  def test_rollout_announcement_flags_skipped_variants_on_the_submission_message_too
+    with_env('RELEASE_VERSION' => '7.94', 'MILESTONE' => nil) do
+      assert_equal <<~MESSAGE.chomp,
+        :announcement: `7.94` has been submitted to the Production track for Google to review.
+        :warning: Not rolled out to wear — Google Play had no matching release.
+      MESSAGE
+                   rollout_announcement(track: 'production', percent: 0.01, fallback_version: 'unused', skipped_apps: ['wear'])
+    end
+  end
+
+  def test_rollout_announcement_keeps_the_original_wording_when_every_variant_rolled_out
+    with_env('RELEASE_VERSION' => '7.94', 'MILESTONE' => nil) do
+      assert_equal ':announcement: `7.94` has started rolling out to 20% of users.',
+                   rollout_announcement(track: 'beta', percent: 0.2, fallback_version: 'unused', skipped_apps: [])
+    end
+  end
+
   private
 
   # Sets the given environment variables for the duration of the block, then puts back what was
