@@ -161,8 +161,8 @@ object ToolSchema {
             "description": "Basic playback controls: pause, resume, skip forward or backward, seek to a position, play next episode.",
             "parameters": {
               "action": {"type": "string", "enum": ["pause", "resume", "seek_relative", "seek_to", "next_episode"]},
-              "delta_seconds": {"type": "integer", "description": "Signed seek delta. Use with seek_relative; positive=forward, negative=backward. Omit to use the app's default skip interval."},
-              "position_seconds": {"type": "integer", "description": "Signed absolute episode position. Use with seek_to; non-negative values are offsets from the beginning, 0 means beginning, and negative values are offsets back from the episode end."}
+              "delta_seconds": {"type": "integer", "description": "Signed seek delta. Use with seek_relative; positive=forward, negative=backward. Omit when the utterance has no explicit duration — SlotRepair fills a signed ±30s default from forward/back wording."},
+              "position_seconds": {"type": "integer", "description": "Non-negative absolute episode position in seconds from the beginning. Use with seek_to; 0 means the beginning."}
             }
           },
           {

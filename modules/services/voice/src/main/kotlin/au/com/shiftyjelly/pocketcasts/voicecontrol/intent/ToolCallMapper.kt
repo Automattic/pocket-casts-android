@@ -29,7 +29,8 @@ class ToolCallMapper @Inject constructor() {
         "resume" -> VoiceIntent.Playback.Resume
 
         "seek_relative" -> {
-            // Spec: delta_seconds optional; app default skip interval is 30s.
+            // Last-resort magnitude when SlotRepair did not fill a signed default.
+            // Prefer SlotRepair's utterance-aware ±30s; this is not the user skip setting.
             val seconds = call.intParam("delta_seconds") ?: 30
             VoiceIntent.Playback.SeekRelative(seconds * 1000)
         }
@@ -124,8 +125,10 @@ class ToolCallMapper @Inject constructor() {
         }
 
         "open_link" -> {
-            val index = call.intParam("index") ?: return null
-            VoiceIntent.Chapter.OpenLink(index)
+            call.intParam("index")?.let { return VoiceIntent.Chapter.OpenLink(it) }
+            // Schema allows query when the speaker names the chapter; route as by_title.
+            val query = call.stringParam("query") ?: return null
+            VoiceIntent.Chapter.ByTitle(query)
         }
 
         "query_list" -> VoiceIntent.Chapter.QueryList

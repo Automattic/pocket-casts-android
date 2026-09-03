@@ -90,4 +90,23 @@ class SlotRepairTest {
         assertEquals("set_volume", repaired.action)
         assertEquals(50, repaired.params["volume"])
     }
+
+    @Test
+    fun repair_seekRelativeWithoutDelta_fillsSignedDefaultFromWording() {
+        val forward = SlotRepair.repair(
+            raw = "<|tool_call_start|>[playback(action='seek_relative')]<|tool_call_end|>",
+            utterance = "skip ahead",
+            tool = "playback",
+            action = "seek_relative",
+        )
+        assertEquals(30, forward!!.params["delta_seconds"])
+
+        val backward = SlotRepair.repair(
+            raw = "<|tool_call_start|>[playback(action='seek_relative')]<|tool_call_end|>",
+            utterance = "skip back",
+            tool = "playback",
+            action = "seek_relative",
+        )
+        assertEquals(-30, backward!!.params["delta_seconds"])
+    }
 }

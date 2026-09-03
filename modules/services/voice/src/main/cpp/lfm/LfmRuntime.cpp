@@ -236,7 +236,7 @@ std::string LfmRuntime::generate(const std::string& prefill, int nPredict) {
     const auto prefillTokens = toLlamaTokens(tokenize(prefill, false));
     // Empty prefill leaves no decoded logits; sampling at -1 would be undefined.
     if (prefillTokens.empty()) {
-        return prefill;
+        throw LfmError("empty prefill");
     }
     if (!decodeTokens(*this, prefillTokens, false)) {
         throw LfmError("prefill decode failed");

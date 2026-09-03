@@ -45,9 +45,9 @@ class WakeTranscriptTrimmerTest {
     }
 
     @Test
-    fun `missing tokens are wake-only`() {
+    fun `missing tokens leave transcript unstripped`() {
         assertEquals(
-            "",
+            "Auris skip forward",
             WakeTranscriptTrimmer.commandText(
                 result = AsrResult(text = "Auris skip forward"),
                 wakePositive = true,

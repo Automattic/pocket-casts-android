@@ -41,8 +41,10 @@ object LfmTokenSpan {
         if (start >= 0) {
             return start to start + userTokenIds.size - 1
         }
-        // BPE can merge across the user/transcript boundary so isolated
-        // tokenization may not appear contiguously; pool the full prompt.
-        return 0 to promptTokenIds.lastIndex
+        // BPE can merge across the user/transcript boundary. Prefer a trailing
+        // window sized to the utterance so dialog history does not dominate.
+        val window = maxOf(userTokenIds.size, 32).coerceAtMost(promptTokenIds.size)
+        val fallbackStart = promptTokenIds.size - window
+        return fallbackStart to promptTokenIds.lastIndex
     }
 }

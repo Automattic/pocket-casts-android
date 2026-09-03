@@ -10,6 +10,7 @@ import au.com.shiftyjelly.pocketcasts.voicecontrol.model.VoiceRecognizer
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -117,7 +118,12 @@ class LfmIntentRouter internal constructor(
     }
 
     override fun release() {
-        loadedRelease = null
-        inference.release()
+        // Same mutex as recognize/ensureReady so teardown cannot free native state mid-decode.
+        runBlocking {
+            mutex.withLock {
+                loadedRelease = null
+                inference.release()
+            }
+        }
     }
 }

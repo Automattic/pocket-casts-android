@@ -20,6 +20,7 @@ object SlotRepair {
         params = repairStringParams(tool, action, params, utterance).toMutableMap()
         params = sanitizeParams(tool, action, params).toMutableMap()
         params = dropNoneLike(params).toMutableMap()
+        params = fillSeekRelativeDefault(tool, action, params, utterance).toMutableMap()
         return ToolCall(tool, action, params)
     }
 
@@ -192,8 +193,22 @@ object SlotRepair {
         return if (BACK_REGEX.containsMatchIn(lower)) -seconds else seconds
     }
 
+    /** When the model omits delta_seconds, fill a signed ±30s default from wording. */
+    private fun fillSeekRelativeDefault(
+        tool: String,
+        action: String,
+        params: Map<String, Any?>,
+        utterance: String,
+    ): Map<String, Any?> {
+        if (tool != "playback" || action != "seek_relative") return params
+        if (params.containsKey("delta_seconds")) return params
+        val signed = if (BACK_REGEX.containsMatchIn(utterance.lowercase())) -DEFAULT_SKIP_SECONDS else DEFAULT_SKIP_SECONDS
+        return params + ("delta_seconds" to signed)
+    }
+
     private val A_MINUTE_REGEX = Regex("""\ba\s+minute\b""")
     private val BACK_REGEX = Regex("""\b(back|rewind|behind)\b""")
+    private const val DEFAULT_SKIP_SECONDS = 30
 
     private fun durationPairs(utterance: String): List<Pair<Number, String>> {
         val pairs = mutableListOf<Pair<Number, String>>()
