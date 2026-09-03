@@ -1,5 +1,8 @@
 8.21
 -----
+*   Bug Fixes
+    *   Prevent the app from being killed in the background on low-memory devices by pausing player UI updates while playing
+        ([#5843](https://github.com/Automattic/pocket-casts-android/pull/5843))
 
 8.20
 -----
