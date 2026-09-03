@@ -341,11 +341,11 @@ platform :android do
   #
   # @param percent [Float] The rollout percentage, between 0 and 1
   # @param track [String] The Google Play track for which to update the rollout of. Must be either `beta` or `production`.
-  # @param version [String] (optional) The release version the announcement is about.
-  #                Typically provided by Releases V2. When omitted, uses the current project version, which on
-  #                `main` has already moved on to the next one.
+  # @param version [String] (optional) The release version the announcement is about. Provided by
+  #                Releases V2. When omitted, uses the current project version, which is only correct
+  #                on a release branch.
   # @param milestone [String] (optional) The milestone to name alongside the version.
-  #                  Typically provided by Releases V2.
+  #                  Provided by Releases V2, which is the only place it can come from.
   #
   lane :update_rollouts do |percent:, track:, version: release_version_current, milestone: nil|
     UI.user_error!('percent parameter must be between 0.0 and 1.0') if percent.to_f.negative? || percent.to_f > 1
@@ -1004,8 +1004,6 @@ platform :android do
   # Slack helpers
   #####################################################################################
 
-  # Sends a Slack message via the incoming webhook.
-  #
   # `channel` is not optional in practice: `SLACK_WEBHOOK` holds the webhook shared across
   # products, which posts to a test channel unless told otherwise.
   def send_slack_message(message:, channel: SLACK_CHANNEL)
@@ -1022,10 +1020,9 @@ platform :android do
     )
   end
 
-  # Posts to Slack without letting the caller fail over it. A rollout that reached Google Play
-  # must not be reported as failed because the announcement did not land. The failure is annotated
-  # and not just logged, because an announcement that quietly stops posting is the one nobody
-  # notices.
+  # Posts to Slack without letting the caller fail over it, reporting loudly and annotating the CI build
+  # (if any) instead. Rationale: A hard failure in the release process is costly to address. A missing
+  # Slack message is not worth halting the release process.
   #
   # Takes a block rather than a string so that building the message is covered too, not just
   # sending it.
