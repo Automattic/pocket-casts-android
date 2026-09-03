@@ -31,10 +31,11 @@ steps:
         artifact_paths:
           - "**/build/reports/lint-results*.*"
 
+  # Not on the `linter` queue: those agents only accept an allowlist of commands
+  # (danger, rubocop, swiftlint, validate_gradle_wrapper).
   - label: ":fastlane: fastlane Helper Tests"
     command: ruby fastlane/test/helpers_test.rb
-    agents:
-      queue: "linter"
+    plugins: [ $CI_TOOLKIT ]
 
   - label: 'Unit tests'
     command: ".buildkite/commands/run-unit-tests.sh"
