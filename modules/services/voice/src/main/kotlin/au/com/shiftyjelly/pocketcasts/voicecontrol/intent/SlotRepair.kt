@@ -207,7 +207,7 @@ object SlotRepair {
     }
 
     private val A_MINUTE_REGEX = Regex("""\ba\s+minute\b""")
-    private val BACK_REGEX = Regex("""\b(back|rewind|behind)\b""")
+    private val BACK_REGEX = Regex("""\b(back|backward|backwards|rewind|behind)\b""")
     private const val DEFAULT_SKIP_SECONDS = 30
 
     private fun durationPairs(utterance: String): List<Pair<Number, String>> {

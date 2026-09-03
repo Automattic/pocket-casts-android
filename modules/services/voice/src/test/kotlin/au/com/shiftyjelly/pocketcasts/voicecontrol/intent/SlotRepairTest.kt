@@ -108,5 +108,14 @@ class SlotRepairTest {
             action = "seek_relative",
         )
         assertEquals(-30, backward!!.params["delta_seconds"])
+
+        // `\bback\b` does not match inside "backwards" — must still fill -30.
+        val backwards = SlotRepair.repair(
+            raw = "<|tool_call_start|>[playback(action='seek_relative')]<|tool_call_end|>",
+            utterance = "skip backwards",
+            tool = "playback",
+            action = "seek_relative",
+        )
+        assertEquals(-30, backwards!!.params["delta_seconds"])
     }
 }
