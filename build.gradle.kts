@@ -192,16 +192,6 @@ tasks.withType(SpotlessTask::class.java).configureEach {
 
 val javaTarget = JvmTarget.fromTarget(libs.versions.java.get())
 
-allprojects {
-    configurations.configureEach {
-        resolutionStrategy.eachDependency {
-            if (requested.name.startsWith("kotlin-stdlib")) {
-                useVersion(libs.versions.kotlin.asProvider().get())
-            }
-        }
-    }
-}
-
 subprojects {
     apply(plugin = rootProject.libs.plugins.dependency.analysis.get().pluginId)
 
