@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
+# The scenario submits a build for Google to review by rolling production out to 1%, so that one
+# rollout announces a submission instead of a percentage.
+SUBMISSION_ROLLOUT_PERCENTAGE = 1
+
 # Wording for a rollout update, matching what the release scenario used to post by hand.
 #
 # `RELEASE_VERSION` and `MILESTONE` are passed by the Releases V2 Buildkite action. `MILESTONE` is
@@ -23,12 +27,12 @@ def rollout_announcement(track:, percent:, fallback_version:, skipped_apps: [])
   milestone = ENV.fetch('MILESTONE', nil).to_s.strip
   subject = ["`#{version}`", milestone].reject(&:empty?).join(' ')
 
-  # The scenario submits a build for Google to review by rolling production out to 1%, so that
-  # one rollout announces a submission instead of a percentage.
-  message = if track == 'production' && (percent - 0.01).abs < 0.001
+  # Derived once so the announced percentage and the submission check cannot disagree.
+  percentage = (percent * 100).round
+  message = if track == 'production' && percentage == SUBMISSION_ROLLOUT_PERCENTAGE
               ":announcement: `#{version}` has been submitted to the Production track for Google to review."
             else
-              ":announcement: #{subject} has started rolling out to #{(percent * 100).round}% of users."
+              ":announcement: #{subject} has started rolling out to #{percentage}% of users."
             end
 
   return message if skipped_apps.empty?
