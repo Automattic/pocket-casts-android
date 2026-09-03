@@ -52,6 +52,10 @@ target_link_libraries(pocketcasts_voice_llm
     android
 )
 
+# Hide symbols from static archives so llama/ggml cannot interpose with
+# whisper's separately-linked ggml in pocketcasts_voice_capture.
+target_link_options(pocketcasts_voice_llm PRIVATE -Wl,--exclude-libs,ALL)
+
 target_compile_features(pocketcasts_voice_llm PUBLIC cxx_std_17)
 target_compile_options(pocketcasts_voice_llm PRIVATE -Wall -Werror -O2 -fvisibility=hidden)
 
@@ -98,6 +102,9 @@ target_link_libraries(pocketcasts_voice_capture
     android
     whisper
 )
+
+# Mirror llm: do not re-export whisper/ggml archive symbols into the .so.
+target_link_options(pocketcasts_voice_capture PRIVATE -Wl,--exclude-libs,ALL)
 
 target_compile_features(pocketcasts_voice_capture PUBLIC cxx_std_17)
 target_compile_options(pocketcasts_voice_capture PRIVATE -Wall -Werror -Os -fvisibility=hidden)

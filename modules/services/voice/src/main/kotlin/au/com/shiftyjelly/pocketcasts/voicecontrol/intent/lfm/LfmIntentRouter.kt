@@ -64,51 +64,55 @@ class LfmIntentRouter internal constructor(
         transcript: String,
         context: VoiceRecognitionContext,
     ): VoiceIntent? = withContext(Dispatchers.IO) {
-        if (transcript.isBlank()) return@withContext null
-        if (loadedRelease == null) {
-            Timber.w("LFM router not ready — ensureReady() was not called before recognize()")
-            return@withContext null
-        }
-
-        try {
-            val prompt = LfmPrompt.render(
-                transcript = transcript,
-                history = dialogManager.promptHistory(),
-            )
-            val promptTokenIds = inference.tokenize(prompt, addBos = false)
-                ?: return@withContext null
-            val userTokenIds = inference.tokenize(transcript, addBos = false)
-                ?: return@withContext null
-            val (poolStart, poolEnd) = LfmTokenSpan.lastUserTokenSpan(promptTokenIds, userTokenIds)
-            val label = inference.classify(promptTokenIds, poolStart, poolEnd)
-                ?: return@withContext null
-            val (tool, action) = LfmLabel.parse(label)
-            if (tool == "no_match") {
+        // Hold one lock across tokenize→classify→generate so KV-cache continuity
+        // cannot be poisoned by a concurrent recognize/ensureReady caller.
+        mutex.withLock {
+            if (transcript.isBlank()) return@withContext null
+            if (loadedRelease == null) {
+                Timber.w("LFM router not ready — ensureReady() was not called before recognize()")
                 return@withContext null
             }
 
-            val prefill = LfmCallPrefill.render(tool, action)
-            val generated = inference.generate(prefill) ?: return@withContext null
-            val repaired = SlotRepair.repair(
-                raw = generated,
-                utterance = transcript,
-                tool = tool,
-                action = action,
-            ) ?: return@withContext null
-
-            if (repaired.name == "dialog_control") {
-                return@withContext dialogManager.resolve(
+            try {
+                val prompt = LfmPrompt.render(
                     transcript = transcript,
-                    generated = generated,
-                    call = repaired,
+                    history = dialogManager.promptHistory(),
                 )
+                val promptTokenIds = inference.tokenize(prompt, addBos = false)
+                    ?: return@withContext null
+                val userTokenIds = inference.tokenize(transcript, addBos = false)
+                    ?: return@withContext null
+                val (poolStart, poolEnd) = LfmTokenSpan.lastUserTokenSpan(promptTokenIds, userTokenIds)
+                val label = inference.classify(promptTokenIds, poolStart, poolEnd)
+                    ?: return@withContext null
+                val (tool, action) = LfmLabel.parse(label)
+                if (tool == "no_match") {
+                    return@withContext null
+                }
+
+                val prefill = LfmCallPrefill.render(tool, action)
+                val generated = inference.generate(prefill) ?: return@withContext null
+                val repaired = SlotRepair.repair(
+                    raw = generated,
+                    utterance = transcript,
+                    tool = tool,
+                    action = action,
+                ) ?: return@withContext null
+
+                if (repaired.name == "dialog_control") {
+                    return@withContext dialogManager.resolve(
+                        transcript = transcript,
+                        generated = generated,
+                        call = repaired,
+                    )
+                }
+                dialogManager.resolve(repaired)
+            } catch (error: Throwable) {
+                Timber.w(error, "LFM inference failed")
+                null
+            } finally {
+                inference.reset()
             }
-            dialogManager.resolve(repaired)
-        } catch (error: Throwable) {
-            Timber.w(error, "LFM inference failed")
-            null
-        } finally {
-            inference.reset()
         }
     }
 

@@ -76,4 +76,18 @@ class SlotRepairTest {
         assertEquals("playback", repaired!!.name)
         assertEquals("seek_relative", repaired.action)
     }
+
+    @Test
+    fun repair_volumeKeepsVolumeSlot() {
+        val repaired = SlotRepair.repair(
+            raw = "<|tool_call_start|>[volume(action='set_volume', volume=50)]<|tool_call_end|>",
+            utterance = "set volume to 50",
+            tool = "volume",
+            action = "set_volume",
+        )
+        assertNotNull(repaired)
+        assertEquals("volume", repaired!!.name)
+        assertEquals("set_volume", repaired.action)
+        assertEquals(50, repaired.params["volume"])
+    }
 }

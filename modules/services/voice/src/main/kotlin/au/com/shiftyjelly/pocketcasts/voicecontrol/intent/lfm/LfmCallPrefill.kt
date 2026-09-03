@@ -30,13 +30,19 @@ object LfmTokenSpan {
         require(userTokenIds.isNotEmpty()) { "user utterance must not be empty" }
         var start = -1
         val userList = userTokenIds.toList()
-        for (index in 0..promptTokenIds.size - userTokenIds.size) {
-            val slice = promptTokenIds.sliceArray(index until index + userTokenIds.size).toList()
-            if (slice == userList) {
-                start = index
+        if (promptTokenIds.size >= userTokenIds.size) {
+            for (index in 0..promptTokenIds.size - userTokenIds.size) {
+                val slice = promptTokenIds.sliceArray(index until index + userTokenIds.size).toList()
+                if (slice == userList) {
+                    start = index
+                }
             }
         }
-        require(start >= 0) { "user utterance tokens not found in prompt" }
-        return start to start + userTokenIds.size - 1
+        if (start >= 0) {
+            return start to start + userTokenIds.size - 1
+        }
+        // BPE can merge across the user/transcript boundary so isolated
+        // tokenization may not appear contiguously; pool the full prompt.
+        return 0 to promptTokenIds.lastIndex
     }
 }

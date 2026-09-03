@@ -161,7 +161,8 @@ object ToolSchema {
             "description": "Basic playback controls: pause, resume, skip forward or backward, seek to a position, play next episode.",
             "parameters": {
               "action": {"type": "string", "enum": ["pause", "resume", "seek_relative", "seek_to", "next_episode"]},
-              "seconds": {"type": "integer", "description": "Seconds. For seek_relative: signed delta (positive=forward, negative=backward). For seek_to: absolute position from 0."}
+              "delta_seconds": {"type": "integer", "description": "Signed seek delta. Use with seek_relative; positive=forward, negative=backward. Omit to use the app's default skip interval."},
+              "position_seconds": {"type": "integer", "description": "Signed absolute episode position. Use with seek_to; non-negative values are offsets from the beginning, 0 means beginning, and negative values are offsets back from the episode end."}
             }
           },
           {

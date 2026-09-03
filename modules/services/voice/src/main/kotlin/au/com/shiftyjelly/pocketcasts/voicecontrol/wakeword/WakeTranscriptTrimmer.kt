@@ -17,7 +17,9 @@ object WakeTranscriptTrimmer {
         utteranceDurationMs: Int,
     ): String {
         if (!wakePositive) return result.text.trim()
-        val tokens = result.tokens ?: return result.text.trim()
+        // Without token timestamps we cannot strip by time band; treat as wake-only
+        // so the wake phrase never reaches the classifier.
+        val tokens = result.tokens ?: return ""
         val rate = sampleRateHz.coerceAtLeast(1)
         val completionMs = ((completionSample.toLong() * 1000L) / rate).toInt()
         val bandEndMs = (completionMs + PAD_MS).let { end ->

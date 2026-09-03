@@ -29,12 +29,13 @@ class ToolCallMapper @Inject constructor() {
         "resume" -> VoiceIntent.Playback.Resume
 
         "seek_relative" -> {
-            val seconds = call.intParam("seconds") ?: return null
+            // Spec: delta_seconds optional; app default skip interval is 30s.
+            val seconds = call.intParam("delta_seconds") ?: 30
             VoiceIntent.Playback.SeekRelative(seconds * 1000)
         }
 
         "seek_to" -> {
-            val seconds = call.intParam("seconds") ?: return null
+            val seconds = call.intParam("position_seconds") ?: return null
             VoiceIntent.Playback.SeekAbsolute(seconds * 1000)
         }
 

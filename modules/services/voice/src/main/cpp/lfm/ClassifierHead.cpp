@@ -23,10 +23,13 @@ void readExact(std::ifstream& input, void* buffer, std::size_t size) {
     }
 }
 
-uint32_t readU32(const uint8_t* bytes) {
-    uint32_t value = 0;
-    std::memcpy(&value, bytes, sizeof(value));
-    return value;
+uint32_t readU32LE(const uint8_t* bytes) {
+    // classifier.bin is little-endian on disk; load explicitly so host-endian hosts
+    // cannot silently misread the header on a future big-endian exporter/host.
+    return static_cast<uint32_t>(bytes[0])
+        | (static_cast<uint32_t>(bytes[1]) << 8)
+        | (static_cast<uint32_t>(bytes[2]) << 16)
+        | (static_cast<uint32_t>(bytes[3]) << 24);
 }
 
 std::string unescapeJson(const std::string& value) {
@@ -68,8 +71,8 @@ std::unique_ptr<ClassifierHead> ClassifierHead::loadFromFile(
         throw ClassifierLoadError("invalid classifier.bin magic");
     }
 
-    const uint32_t numLabels = readU32(header + 4);
-    const uint32_t hiddenSize = readU32(header + 8);
+    const uint32_t numLabels = readU32LE(header + 4);
+    const uint32_t hiddenSize = readU32LE(header + 8);
     if (numLabels == 0 || hiddenSize == 0) {
         throw ClassifierLoadError("classifier.bin has zero labels or hidden size");
     }
