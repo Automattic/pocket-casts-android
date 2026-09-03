@@ -341,8 +341,13 @@ platform :android do
   #
   # @param percent [Float] The rollout percentage, between 0 and 1
   # @param track [String] The Google Play track for which to update the rollout of. Must be either `beta` or `production`.
+  # @param version [String] (optional) The release version the announcement is about.
+  #                Typically provided by Releases V2. When omitted, uses the current project version, which on
+  #                `main` has already moved on to the next one.
+  # @param milestone [String] (optional) The milestone to name alongside the version.
+  #                  Typically provided by Releases V2.
   #
-  lane :update_rollouts do |percent:, track:|
+  lane :update_rollouts do |percent:, track:, version: release_version_current, milestone: nil|
     UI.user_error!('percent parameter must be between 0.0 and 1.0') if percent.to_f.negative? || percent.to_f > 1
     UI.user_error!('track parameter must be either `beta` or `production`') unless %w[beta production].include?(track)
 
@@ -382,7 +387,8 @@ platform :android do
       rollout_announcement(
         track: track,
         percent: percent.to_f,
-        fallback_version: release_version_current,
+        version: version,
+        milestone: milestone,
         skipped_apps: not_found_variants.map { |variant| variant[:app] }
       )
     end
