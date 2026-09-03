@@ -295,7 +295,6 @@ class VoiceAsrEngineTest {
             au.com.shiftyjelly.pocketcasts.voicecontrol.wakeword.WakeWordResult(
                 detected = false,
                 confidence = 0f,
-                remainderSamples = null,
             ),
         )
         `when`(translationStage.ensureReady("zh")).thenReturn(Result.success(Unit))
@@ -348,7 +347,6 @@ class VoiceAsrEngineTest {
             au.com.shiftyjelly.pocketcasts.voicecontrol.wakeword.WakeWordResult(
                 detected = false,
                 confidence = 0f,
-                remainderSamples = null,
             ),
         )
 
