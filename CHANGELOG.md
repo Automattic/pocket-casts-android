@@ -1,5 +1,8 @@
 8.21
 -----
+*   Bug Fixes
+    *   Closing the transcript search bar now keeps the transcript open at the same scroll position instead of exiting the transcript
+        ([#5835](https://github.com/Automattic/pocket-casts-android/pull/5835))
 
 8.20
 -----
