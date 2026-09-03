@@ -462,7 +462,7 @@ class SimplePlayer(
     }
 }
 
-private const val VIDEO_TRACK_DISABLE_GRACE_MS = 2_000L
+private const val VIDEO_TRACK_DISABLE_GRACE_MS = 10_000L
 
 internal fun shouldDisableVideoTrack(audioOnly: Boolean, hasVideoSurface: Boolean, isHlsStream: Boolean): Boolean {
     return audioOnly || (!hasVideoSurface && !isHlsStream)
