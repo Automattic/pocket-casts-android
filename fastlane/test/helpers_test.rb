@@ -99,6 +99,15 @@ class FastlaneHelpersTest < Minitest::Test
     end
   end
 
+  # A percentage the message would round to 1% must take the submission branch, otherwise the
+  # announced number and the submission check disagree.
+  def test_rollout_announcement_ties_the_submission_check_to_the_announced_percentage
+    with_env('RELEASE_VERSION' => '7.94', 'MILESTONE' => nil) do
+      assert_equal ':announcement: `7.94` has been submitted to the Production track for Google to review.',
+                   rollout_announcement(track: 'production', percent: 0.014, fallback_version: 'unused')
+    end
+  end
+
   private
 
   # Sets the given environment variables for the duration of the block, then puts back what was
