@@ -253,6 +253,7 @@ class PlayerHeaderFragment :
                     TranscriptContent(
                         state = transcriptUiState,
                         isVisible = transitionData.isTranscriptOpen,
+                        isPlayerOpen = isPlayerOpen,
                         isPortraitPlayer = isPortraitPlayer,
                         modifier = Modifier
                             .fillMaxWidth(fraction = maxWidthFraction)
@@ -1007,6 +1008,7 @@ class PlayerHeaderFragment :
     private fun TranscriptContent(
         state: TranscriptsUiState,
         isVisible: Boolean,
+        isPlayerOpen: Boolean,
         isPortraitPlayer: Boolean,
         modifier: Modifier = Modifier,
     ) {
@@ -1036,6 +1038,7 @@ class PlayerHeaderFragment :
                 onSelectNextSearch = transcriptViewModel::selectNextSearchMatch,
                 onShowSearchBar = transcriptViewModel::openSearch,
                 onHideSearchBar = transcriptViewModel::hideSearch,
+                isBackHandlerEnabled = isPlayerOpen,
                 onClickSubscribe = {
                     transcriptViewModel.track { source, podcastUuid, episodeUuid ->
                         TranscriptGeneratedPaywallSubscribeTappedEvent(

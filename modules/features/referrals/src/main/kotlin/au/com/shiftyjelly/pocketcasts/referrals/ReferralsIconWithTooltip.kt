@@ -70,6 +70,7 @@ private fun ReferralsIconWithTooltip(
                     title = stringResource(LR.string.referrals_tooltip_message, state.referralPlan.offerDurationText),
                     tipPosition = if (isLandscape) TipPosition.TopEnd else TipPosition.TopStart,
                     anchorOffset = DpOffset(0.dp, (-4).dp),
+                    clickableElevationPadding = true,
                     onClick = onTooltipClick,
                 )
             }

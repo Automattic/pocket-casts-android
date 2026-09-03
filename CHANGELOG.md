@@ -3,6 +3,8 @@
 *   Bug Fixes
     *   Prevent the app from being killed in the background on low-memory devices by pausing player UI updates while playing
         ([#5843](https://github.com/Automattic/pocket-casts-android/pull/5843))
+    *   Closing the transcript search bar now keeps the transcript open at the same scroll position instead of exiting the transcript
+        ([#5835](https://github.com/Automattic/pocket-casts-android/pull/5835))
 
 8.20
 -----
