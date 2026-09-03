@@ -1013,14 +1013,18 @@ platform :android do
   end
 
   # Posts to Slack without letting the caller fail over it. A rollout that reached Google Play
-  # must not be reported as failed because the announcement did not land.
+  # must not be reported as failed because the announcement did not land. The failure is annotated
+  # and not just logged, because an announcement that quietly stops posting is the one nobody
+  # notices.
   #
   # Takes a block rather than a string so that building the message is covered too, not just
   # sending it.
   def notify_slack(&message)
     send_slack_message(message: message.call)
   rescue StandardError => e
-    UI.important("Slack notification failed (#{e.message}); continuing without it.")
+    warning = "Slack notification failed (#{e.message}); continuing without it."
+    UI.important(warning)
+    buildkite_annotate(style: 'warning', context: 'slack-notification-failed', message: warning) if is_ci
   end
 
   # Reports a milestone-related error, both in the logs and — on CI — as a Buildkite annotation,
