@@ -1003,9 +1003,13 @@ platform :android do
   # `channel` is not optional in practice: `SLACK_WEBHOOK` holds the webhook shared across
   # products, which posts to a test channel unless told otherwise.
   def send_slack_message(message:, channel: SLACK_CHANNEL)
+    webhook = ENV.fetch('SLACK_WEBHOOK') do
+      UI.user_error!("Environment variable 'SLACK_WEBHOOK' is not set. See `fastlane/env/user.env-example`.")
+    end
+
     slack(
       username: 'Pocket Cats',
-      slack_url: ENV.fetch('SLACK_WEBHOOK'),
+      slack_url: webhook,
       channel: channel,
       message: message,
       default_payloads: []
