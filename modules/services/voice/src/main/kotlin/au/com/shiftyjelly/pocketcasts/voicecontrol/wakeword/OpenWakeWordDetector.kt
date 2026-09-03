@@ -68,7 +68,7 @@ class OpenWakeWordDetector @Inject constructor(
                     score < 0f -> WakeWordResult(detected = false, error = true)
 
                     score >= detectionThreshold -> {
-                        Timber.i("Wake word detected (score=%.3f)", score)
+                        Timber.i("[VoicePipeline] wake %.3f >= %.3f", score, detectionThreshold)
                         val onsetRel = outOffset[0].toInt().takeIf { it >= 0 } ?: 0
                         WakeWordResult(
                             detected = true,
@@ -78,7 +78,7 @@ class OpenWakeWordDetector @Inject constructor(
                     }
 
                     else -> {
-                        Timber.i("Wake word score: %.3f (threshold=%.3f)", score, detectionThreshold)
+                        Timber.i("[VoicePipeline] wake %.3f < %.3f", score, detectionThreshold)
                         WakeWordResult(detected = false, confidence = score.coerceAtMost(1f))
                     }
                 }

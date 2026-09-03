@@ -77,7 +77,7 @@ class VoiceAsrEngine @Inject constructor(
         utteranceFilter.reset()
 
         processingJob = scope.launch {
-            Timber.i("VoiceAsrEngine audioRoute=%s scoRequired=%b", audioRoute, audioRoute is AudioRoute.BluetoothA2dpOnly)
+            Timber.i("[VoicePipeline] start route=%s sco=%b", audioRoute, audioRoute is AudioRoute.BluetoothA2dpOnly)
             if (audioRoute is AudioRoute.BluetoothA2dpOnly) {
                 awaitBluetoothSco()
             }
@@ -91,7 +91,7 @@ class VoiceAsrEngine @Inject constructor(
                         is VoiceSegmenterResult.SpeechEnded -> {
                             val totalSamples = result.frames.sumOf { it.samples.size }
                             val durationMs = totalSamples * 1000L / 16000
-                            Timber.i("[VoicePipeline] vad speechEnded samples=%d ~%dms", totalSamples, durationMs)
+                            Timber.i("[VoicePipeline] vad ~%dms (%d samples)", durationMs, totalSamples)
 
                             val request = shouldTranscribe(result)
                             if (request != null) {
@@ -172,13 +172,6 @@ class VoiceAsrEngine @Inject constructor(
         val mode = currentMode
 
         if (wwResult.detected) {
-            Timber.i(
-                "[VoicePipeline] wake detected=true confidence=%.3f completionSample=%d mode=%s",
-                wwResult.confidence,
-                wwResult.completionSample,
-                mode,
-            )
-
             // Open or reset the conversation grace period. This causes
             // ListeningModePolicy to switch to Continuous for subsequent utterances.
             gracePeriodSignal.onWakeWordDetected()
@@ -186,6 +179,7 @@ class VoiceAsrEngine @Inject constructor(
             // Always acknowledge detection with the WAKE_WORD earcon
             audioFeedbackRenderer.playEarcon(EarconId.WAKE_WORD)
 
+            Timber.i("[VoicePipeline] → ASR (wake hit, mode=%s)", mode)
             return TranscribeRequest(
                 samples = floatSamples,
                 wakePositive = true,
@@ -193,21 +187,16 @@ class VoiceAsrEngine @Inject constructor(
             )
         }
 
-        Timber.d(
-            "[VoicePipeline] wake detected=false confidence=%.3f mode=%s",
-            wwResult.confidence,
-            mode,
-        )
-
         // Negative detection
         return when (mode) {
             ListeningMode.Continuous -> {
+                Timber.i("[VoicePipeline] → ASR (wake miss, grace/continuous)")
                 TranscribeRequest(samples = floatSamples, wakePositive = false)
             }
 
             ListeningMode.WakeWord -> {
                 // Outside grace: drop — wake word is required
-                Timber.i("[VoicePipeline] drop utterance: no wake word outside grace")
+                Timber.i("[VoicePipeline] → drop (wake miss, no grace)")
                 null
             }
 
@@ -226,7 +215,7 @@ class VoiceAsrEngine @Inject constructor(
         // Filter out playback bleed before transcribing
         val playbackBuffer = playbackBufferProvider?.invoke() ?: FloatArray(0)
         if (!utteranceFilter.shouldProcess(floatSamples, false, 0, playbackBuffer)) {
-            Timber.i("[VoicePipeline] utterance rejected by bleed filter")
+            Timber.i("[VoicePipeline] → drop (bleed filter)")
             return
         }
 
@@ -236,13 +225,10 @@ class VoiceAsrEngine @Inject constructor(
         val asrMs = System.currentTimeMillis() - asrStartedAt
         val durationMs = (floatSamples.size * 1000L / sampleRateHz).toInt()
         Timber.i(
-            "[VoicePipeline] asr backend=%s ms=%d durationMs=%d lang=%s conf=%.3f tokens=%d text='%s'",
+            "[VoicePipeline] asr %s %dms lang=%s '%s'",
             b::class.simpleName,
             asrMs,
-            durationMs,
             asrResult.detectedLanguage ?: "?",
-            asrResult.confidence,
-            asrResult.tokens?.size ?: 0,
             asrResult.text,
         )
         val transcript = WakeTranscriptTrimmer.commandText(
@@ -252,19 +238,17 @@ class VoiceAsrEngine @Inject constructor(
             sampleRateHz = sampleRateHz,
             utteranceDurationMs = durationMs,
         )
-        Timber.i(
-            "[VoicePipeline] wakeTrim wakePositive=%b completionSample=%d raw='%s' trimmed='%s'",
-            request.wakePositive,
-            request.completionSample,
-            asrResult.text,
-            transcript,
-        )
+        if (request.wakePositive && asrResult.text != transcript) {
+            Timber.i("[VoicePipeline] trim '%s' → '%s'", asrResult.text, transcript)
+        } else if (request.wakePositive) {
+            Timber.i("[VoicePipeline] trim (no change) '%s'", transcript)
+        }
         if (transcript.isBlank()) {
             if (request.wakePositive) {
-                Timber.i("[VoicePipeline] wake-only utterance — no command remainder after ASR")
+                Timber.i("[VoicePipeline] → drop (wake-only, empty command)")
                 audioFeedbackRenderer.playEarcon(EarconId.ERROR)
             } else {
-                Timber.i("[VoicePipeline] ASR returned empty transcript after trim")
+                Timber.i("[VoicePipeline] → drop (empty ASR)")
             }
             return
         }
@@ -273,11 +257,6 @@ class VoiceAsrEngine @Inject constructor(
         // Use the wake-trimmed transcript from LFM's WakeTranscriptTrimmer.
         val trimmedResult = asrResult.copy(text = transcript)
         val finalResult = maybeTranslate(trimmedResult, b)
-        Timber.i(
-            "[VoicePipeline] finalToIntent lang=%s text='%s'",
-            finalResult.detectedLanguage ?: "?",
-            finalResult.text,
-        )
         processUtterance(finalResult)
     }
 
@@ -287,7 +266,7 @@ class VoiceAsrEngine @Inject constructor(
 
         val ready = recognizer.ensureReady()
         if (ready.isFailure) {
-            Timber.e(ready.exceptionOrNull(), "[VoicePipeline] intent recognizer not ready")
+            Timber.e(ready.exceptionOrNull(), "[VoicePipeline] intent not ready")
             return
         }
 
@@ -300,32 +279,26 @@ class VoiceAsrEngine @Inject constructor(
         val elapsedMs = System.currentTimeMillis() - t0
 
         if (intent != null) {
-            Timber.i(
-                "[VoicePipeline] intent ms=%d type=%s input='%s' detail=%s",
-                elapsedMs,
-                intent::class.simpleName,
-                result.text,
-                intent,
-            )
+            Timber.i("[VoicePipeline] intent %s %dms ← '%s'", intent::class.simpleName, elapsedMs, result.text)
             handler(intent)
         } else {
-            Timber.i("[VoicePipeline] intent ms=%d none for input='%s'", elapsedMs, result.text)
+            Timber.i("[VoicePipeline] intent none %dms ← '%s'", elapsedMs, result.text)
         }
     }
 
     private suspend fun maybeTranslate(result: AsrResult, backend: AsrBackend): AsrResult {
         val detected = result.detectedLanguage?.lowercase()
         if (detected == null) {
-            Timber.i("[VoicePipeline] translate skip: no detected language; text='%s'", result.text)
+            Timber.i("[VoicePipeline] translate skip (no lang) '%s'", result.text)
             return result
         }
         if (detected == "en") {
-            Timber.i("[VoicePipeline] translate skip: already en; text='%s'", result.text)
+            Timber.i("[VoicePipeline] translate skip (en) '%s'", result.text)
             return result
         }
         if (backend.capabilities.canTranslateToEnglish) {
             Timber.i(
-                "[VoicePipeline] translate skip: backend=%s already translates; lang=%s text='%s'",
+                "[VoicePipeline] translate skip (%s already translates) lang=%s '%s'",
                 backend::class.simpleName,
                 detected,
                 result.text,
@@ -336,28 +309,18 @@ class VoiceAsrEngine @Inject constructor(
         val ready = translationStage.ensureReady(detected)
         if (ready.isFailure) {
             Timber.w(
-                "[VoicePipeline] translate unavailable for %s (%s); using native '%s'",
+                "[VoicePipeline] translate fail (%s unavailable) keep '%s'",
                 detected,
-                ready.exceptionOrNull()?.message ?: "unknown",
                 result.text,
             )
             return result
         }
         val translated = translationStage.translate(result.text, detected)
         if (translated.isBlank()) {
-            Timber.w(
-                "[VoicePipeline] translate blank for %s; using native '%s'",
-                detected,
-                result.text,
-            )
+            Timber.w("[VoicePipeline] translate blank (%s) keep '%s'", detected, result.text)
             return result
         }
-        Timber.i(
-            "[VoicePipeline] translate %s -> en: src='%s' dst='%s'",
-            detected,
-            result.text,
-            translated,
-        )
+        Timber.i("[VoicePipeline] translate %s→en '%s' → '%s'", detected, result.text, translated)
         return result.copy(text = translated, detectedLanguage = "en")
     }
 
