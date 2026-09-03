@@ -1020,7 +1020,7 @@ platform :android do
   # usually run from `main`, whose `version.properties` has already moved on to the next
   # version, so the fallback is only right for a run from the release branch.
   def rollout_announcement(track:, percent:)
-    version = ENV.fetch('RELEASE_VERSION', nil).to_s
+    version = ENV.fetch('RELEASE_VERSION', nil).to_s.strip
     version = release_version_current if version.empty?
 
     # The scenario submits a build for Google to review by rolling production out to 1%, so that
