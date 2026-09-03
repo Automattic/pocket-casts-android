@@ -796,7 +796,12 @@ class EpisodeFragment : BaseFragment() {
                             }
                         }
 
-                        val tabs = buildMergedTabs(transcript, summaryText, hasChapters)
+                        val tabs = buildMergedTabs(
+                            transcript = transcript,
+                            summaryText = summaryText,
+                            hasChapters = hasChapters,
+                            canRequestOnDemandTranscript = pageState.canRequestOnDemandTranscript,
+                        )
 
                         val isSelectedTabAvailable = tabs.any { it.labelResId == selectedTab.labelResId }
                         LaunchedEffect(isSelectedTabAvailable) {
@@ -1080,7 +1085,12 @@ class EpisodeFragment : BaseFragment() {
                 if (isSummaryEnabled) {
                     val chaptersState = chaptersViewModel.uiState.collectAsState().value
                     val hasChapters = chaptersState.chaptersCount > 0
-                    val tabs = buildMergedTabs(transcript, summaryText, hasChapters)
+                    val tabs = buildMergedTabs(
+                        transcript = transcript,
+                        summaryText = summaryText,
+                        hasChapters = hasChapters,
+                        canRequestOnDemandTranscript = pageState.canRequestOnDemandTranscript,
+                    )
                     val askTheEpisodeVisible = FeatureFlag.isEnabled(Feature.EPISODE_CHAT) && transcript != null
 
                     Column(modifier = Modifier.fillMaxWidth()) {
@@ -1177,6 +1187,7 @@ class EpisodeFragment : BaseFragment() {
         transcript: Transcript.Text?,
         summaryText: String?,
         hasChapters: Boolean,
+        canRequestOnDemandTranscript: Boolean,
     ): List<ButtonTab> {
         val tabClickHandlers = mapOf<Int, () -> Unit>(
             LR.string.details to { viewModel.selectContentTab(EpisodeContentTab.DESCRIPTION) },
@@ -1186,12 +1197,16 @@ class EpisodeFragment : BaseFragment() {
             },
             LR.string.bookmarks to { viewModel.selectContentTab(EpisodeContentTab.BOOKMARKS) },
             LR.string.transcript to {
-                if (transcript != null) {
+                if (transcript != null || canRequestOnDemandTranscript) {
                     viewModel.selectContentTab(EpisodeContentTab.TRANSCRIPT)
                     eventHorizon.track(
                         EpisodeDetailTranscriptCardTappedEvent(
-                            episodeUuid = transcript.episodeUuid,
-                            podcastUuid = transcript.podcastUuid ?: AnalyticsTracker.INVALID_OR_NULL_VALUE,
+                            episodeUuid = transcript?.episodeUuid
+                                ?: viewModel.episode?.uuid
+                                ?: AnalyticsTracker.INVALID_OR_NULL_VALUE,
+                            podcastUuid = transcript?.podcastUuid
+                                ?: viewModel.podcast?.uuid
+                                ?: AnalyticsTracker.INVALID_OR_NULL_VALUE,
                         ),
                     )
                 }
@@ -1199,7 +1214,7 @@ class EpisodeFragment : BaseFragment() {
             LR.string.summary to { viewModel.selectContentTab(EpisodeContentTab.SUMMARY) },
         )
         return mergedTabLabelResIds(
-            hasTranscript = transcript != null,
+            hasTranscript = transcript != null || canRequestOnDemandTranscript,
             hasSummary = summaryText != null,
             hasChapters = hasChapters,
         ).map { labelResId ->

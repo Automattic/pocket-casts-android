@@ -2496,6 +2496,11 @@
     <string name="transcript_generated_header">This transcript is automatically generated and available to Plus&#160;subscribers only.</string>
     <string name="transcript_share">Share transcript</string>
     <string name="transcript_tap_to_seek_streaming_unavailable">Download the episode to tap to seek</string>
+    <!-- Prototype copy; Design will finalize before beta. -->
+    <string name="transcript_generation_started">We’re generating this transcript. It will appear here automatically when it’s ready.</string>
+    <string name="transcript_generation_delayed">This transcript is taking longer than expected. Check back later.</string>
+    <string name="transcript_generation_failed">We couldn’t start transcript generation. Check your connection and try again.</string>
+    <string name="transcript_generation_unavailable">This episode isn’t available for transcript generation.</string>
 
     <!-- Chat -->
     <string name="chat_paywall_title">Chat with this episode</string>

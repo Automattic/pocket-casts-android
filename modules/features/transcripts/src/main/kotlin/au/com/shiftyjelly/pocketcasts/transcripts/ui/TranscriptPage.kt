@@ -4,6 +4,7 @@ import android.os.SystemClock
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.DragInteraction
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -25,12 +26,23 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.LifecycleStartEffect
+import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
+import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptEntry
 import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintTimingManager
@@ -39,6 +51,7 @@ import au.com.shiftyjelly.pocketcasts.transcripts.TranscriptMessage
 import au.com.shiftyjelly.pocketcasts.transcripts.TranscriptState
 import au.com.shiftyjelly.pocketcasts.transcripts.TranscriptViewModel
 import au.com.shiftyjelly.pocketcasts.transcripts.UiState
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.search.SearchCoordinates
@@ -76,6 +89,15 @@ fun TranscriptPage(
 ) {
     val theme = rememberTranscriptTheme()
     val listState = rememberLazyListState()
+
+    if (viewModel != null) {
+        LifecycleStartEffect(viewModel) {
+            viewModel.onScreenStarted()
+            onStopOrDispose {
+                viewModel.onScreenStopped()
+            }
+        }
+    }
 
     val syncableEpisodeUuid = uiState.transcriptEpisodeUuid.takeIf { uiState.isTextTranscriptLoaded }
     DisposableEffect(fingerprintTimingManager, syncableEpisodeUuid) {
@@ -331,6 +353,107 @@ private fun TranscriptContent(
                 modifier = modifier.fillMaxSize(),
             )
         }
+
+        is TranscriptState.Generating -> {
+            TranscriptGeneratingContent(
+                color = theme.primaryText,
+                modifier = modifier.fillMaxSize(),
+            )
+        }
+
+        TranscriptState.GenerationUnavailable -> {
+            TranscriptFailureContent(
+                description = stringResource(LR.string.transcript_generation_unavailable),
+                colors = theme.failureColors,
+                modifier = modifier.fillMaxSize(),
+            )
+        }
+
+        TranscriptState.GenerationFailed -> {
+            TranscriptFailureContent(
+                description = stringResource(LR.string.transcript_generation_failed),
+                colors = theme.failureColors,
+                buttonLabel = stringResource(LR.string.try_again),
+                onClickButton = onClickReload,
+                modifier = modifier.fillMaxSize(),
+            )
+        }
+
+        TranscriptState.GenerationDelayed -> {
+            TranscriptFailureContent(
+                description = stringResource(LR.string.transcript_generation_delayed),
+                colors = theme.failureColors,
+                modifier = modifier.fillMaxSize(),
+            )
+        }
+    }
+}
+
+@Composable
+private fun TranscriptGeneratingContent(
+    color: Color,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier
+            .semantics { liveRegion = LiveRegionMode.Polite }
+            .padding(32.dp),
+        verticalArrangement = Arrangement.spacedBy(24.dp, Alignment.CenterVertically),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        LoadingView(color = color)
+        TextH30(
+            text = stringResource(LR.string.transcript_generation_started),
+            color = color,
+            textAlign = TextAlign.Center,
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun TranscriptGeneratingPreview(
+    @PreviewParameter(ThemePreviewParameterProvider::class) theme: ThemeType,
+) {
+    TranscriptStatePreview(theme, TranscriptState.Generating)
+}
+
+@Preview
+@Composable
+private fun TranscriptGenerationUnavailablePreview(
+    @PreviewParameter(ThemePreviewParameterProvider::class) theme: ThemeType,
+) {
+    TranscriptStatePreview(theme, TranscriptState.GenerationUnavailable)
+}
+
+@Preview
+@Composable
+private fun TranscriptGenerationFailedPreview(
+    @PreviewParameter(ThemePreviewParameterProvider::class) theme: ThemeType,
+) {
+    TranscriptStatePreview(theme, TranscriptState.GenerationFailed)
+}
+
+@Preview
+@Composable
+private fun TranscriptGenerationDelayedPreview(
+    @PreviewParameter(ThemePreviewParameterProvider::class) theme: ThemeType,
+) {
+    TranscriptStatePreview(theme, TranscriptState.GenerationDelayed)
+}
+
+@Composable
+private fun TranscriptStatePreview(themeType: ThemeType, transcriptState: TranscriptState) {
+    AppThemeWithBackground(themeType) {
+        val theme = rememberTranscriptTheme()
+        TranscriptContent(
+            uiState = UiState.Empty.copy(transcriptState = transcriptState),
+            listState = rememberLazyListState(),
+            theme = theme,
+            onClickReload = {},
+            onHighlightText = null,
+            modifier = Modifier.fillMaxSize(),
+        )
     }
 }
 

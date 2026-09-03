@@ -333,6 +333,15 @@ enum class Feature(
         hasDevToggle = true,
         addedOn = LocalDate.parse("2026-05-29"),
     ),
+    ON_DEMAND_TRANSCRIPTS(
+        key = "on_demand_transcripts",
+        title = "On-demand transcript generation",
+        defaultValue = isDebugOrPrototypeBuild,
+        tier = FeatureTier.Plus(),
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+        addedOn = LocalDate.parse("2026-08-20"),
+    ),
     UP_NEXT_SORT(
         key = "up_next_sort",
         title = "Up Next sort by duration",

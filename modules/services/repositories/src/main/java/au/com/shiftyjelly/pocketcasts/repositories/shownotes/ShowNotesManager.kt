@@ -8,9 +8,11 @@ import au.com.shiftyjelly.pocketcasts.servers.podcast.TranscriptService
 import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.CacheControl
 import okhttp3.HttpUrl.Companion.toHttpUrl
 
@@ -54,6 +56,17 @@ class ShowNotesManager @Inject constructor(
                 }
             },
         )
+    }
+
+    suspend fun refreshTranscriptMetadata(podcastUuid: String, episodeUuid: String) {
+        val showNotes = showNotesServiceManager.downloadShowNotes(podcastUuid) ?: return
+        withContext(Dispatchers.IO) {
+            showNotesProcessor.process(
+                podcastUuid = podcastUuid,
+                episodeUuid = episodeUuid,
+                showNotes = showNotes,
+            )
+        }
     }
 
     suspend fun loadShowNotes(podcastUuid: String, episodeUuid: String): ShowNotesState = showNotesServiceManager.loadShowNotes(

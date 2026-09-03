@@ -29,6 +29,7 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
 import com.google.protobuf.StringValue
 import com.pocketcasts.service.api.BookmarksResponse
 import com.pocketcasts.service.api.EpisodesResponse
+import com.pocketcasts.service.api.OnDemandTranscriptResponse
 import com.pocketcasts.service.api.PodcastRatingAddRequest
 import com.pocketcasts.service.api.PodcastRatingResponse
 import com.pocketcasts.service.api.PodcastRatingShowRequest
@@ -49,6 +50,7 @@ import com.pocketcasts.service.api.WebFeedCreateRequest
 import com.pocketcasts.service.api.WebFeedCreateResponse
 import com.pocketcasts.service.api.WinbackResponse
 import com.pocketcasts.service.api.bookmarkRequest
+import com.pocketcasts.service.api.onDemandTranscriptRequest
 import com.pocketcasts.service.api.userPlaylistListRequest
 import com.pocketcasts.service.api.userPodcastListRequest
 import dagger.Lazy
@@ -168,6 +170,18 @@ open class SyncServiceManager @Inject constructor(
 
     suspend fun syncUpdateOrThrow(token: AccessToken, request: SyncUpdateRequest): SyncUpdateResponse {
         return service.syncUpdate(addBearer(token), request)
+    }
+
+    suspend fun requestOnDemandTranscript(
+        podcastUuid: String,
+        episodeUuid: String,
+        token: AccessToken,
+    ): OnDemandTranscriptResponse {
+        val request = onDemandTranscriptRequest {
+            this.podcastUuid = podcastUuid
+            this.episodeUuid = episodeUuid
+        }
+        return service.requestOnDemandTranscript(addBearer(token), request)
     }
 
     suspend fun upNextSync(request: UpNextSyncRequest, token: AccessToken): UpNextSyncResponse = service.upNextSync(addBearer(token), request)
