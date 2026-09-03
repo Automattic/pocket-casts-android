@@ -91,6 +91,8 @@ SLACK_CHANNEL = '#pocket-casts-android'
 FIREBASE_APP_ID = '1:124902176124:android:ad0ff1c7193b55ee1620f9'
 FIREBASE_TESTERS_GROUP = 'pocketcasts-android---prototype-builds'
 
+import 'lib/helpers.rb'
+
 before_all do |_lane|
   # Ensure we use the latest version of the toolkit
   check_for_toolkit_updates unless is_ci || ENV['FASTLANE_SKIP_TOOLKIT_UPDATE_CHECK']
@@ -376,7 +378,7 @@ platform :android do
     end
     UI.user_error!('None of the 3 app variants were found in Google Play Console. We expected at least one') if not_found_variants.count == APPS.count
 
-    notify_slack { rollout_announcement(track: track, percent: percent.to_f) }
+    notify_slack { rollout_announcement(track: track, percent: percent.to_f, fallback_version: release_version_current) }
   end
 
   # Downloads the latest translations from GlotPress and creates a PR to integrate them into the current `release/*` branch
@@ -1012,25 +1014,6 @@ platform :android do
     send_slack_message(message: message.call)
   rescue StandardError => e
     UI.important("Slack notification failed (#{e.message}); continuing without it.")
-  end
-
-  # Wording for a rollout update, matching what the release scenario used to post by hand.
-  #
-  # `RELEASE_VERSION` and `MILESTONE` are passed by the Releases V2 Buildkite action. Rollouts
-  # usually run from `main`, whose `version.properties` has already moved on to the next
-  # version, so the fallback is only right for a run from the release branch.
-  def rollout_announcement(track:, percent:)
-    version = ENV.fetch('RELEASE_VERSION', nil).to_s.strip
-    version = release_version_current if version.empty?
-
-    # The scenario submits a build for Google to review by rolling production out to 1%, so that
-    # one rollout announces a submission instead of a percentage.
-    return ":announcement: `#{version}` has been submitted to the Production track for Google to review." if track == 'production' && (percent - 0.01).abs < 0.001
-
-    milestone = ENV.fetch('MILESTONE', nil).to_s.strip
-    subject = ["`#{version}`", milestone].reject(&:empty?).join(' ')
-
-    ":announcement: #{subject} has started rolling out to #{(percent * 100).round}% of users."
   end
 
   # Reports a milestone-related error, both in the logs and — on CI — as a Buildkite annotation,
