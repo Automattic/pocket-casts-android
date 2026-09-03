@@ -4,15 +4,13 @@
 # rollout announces a submission instead of a percentage.
 SUBMISSION_ROLLOUT_PERCENTAGE = 1
 
-# Wording for a rollout update, matching what the release scenario used to post by hand.
+# The rollout announcement.
 #
 # @param track [String] The Google Play track the rollout is for, either `beta` or `production`.
 # @param percent [Float] The rollout percentage, between 0 and 1.
 # @param version [String] The version the announcement is about.
 # @param milestone [String, nil] The milestone to name alongside the version, when there is one.
-# @param skipped_apps [Array<String>] Variants Google Play had no matching release for. The lane
-#   treats those as non-fatal as long as one variant rolled out, so the message has to say which
-#   ones did not.
+# @param skipped_apps [Array<String>] Variants Google Play had no matching release for.
 # @return [String] The slack message body to use, typically in a call to the `slack()` fastlane action
 #
 def rollout_announcement(track:, percent:, version:, milestone: nil, skipped_apps: [])
