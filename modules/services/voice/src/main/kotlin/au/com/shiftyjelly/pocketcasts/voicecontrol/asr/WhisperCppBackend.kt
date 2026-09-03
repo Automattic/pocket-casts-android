@@ -16,6 +16,46 @@ internal fun normalizeWhisperTranscript(text: String): String? {
     return trimmed.takeUnless { it.isEmpty() || annotationOnlyTranscript.matches(it) }
 }
 
+internal fun parseWhisperPayload(raw: String): AsrResult {
+    if (!raw.trimStart().startsWith("{")) {
+        val transcript = normalizeWhisperTranscript(raw)
+        return if (transcript == null) {
+            AsrResult(text = "", detectedLanguage = null)
+        } else {
+            AsrResult(text = transcript, detectedLanguage = "en")
+        }
+    }
+    return try {
+        val obj = org.json.JSONObject(raw)
+        val transcript = normalizeWhisperTranscript(obj.optString("text"))
+        if (transcript == null) {
+            AsrResult(text = "", detectedLanguage = null)
+        } else {
+            val arr = obj.optJSONArray("tokens")
+            val tokens = if (arr == null || arr.length() == 0) {
+                null
+            } else {
+                List(arr.length()) { i ->
+                    val t = arr.getJSONObject(i)
+                    AsrToken(
+                        text = t.getString("text"),
+                        startMs = t.getInt("startMs"),
+                        endMs = t.getInt("endMs"),
+                    )
+                }
+            }
+            AsrResult(text = transcript, detectedLanguage = "en", tokens = tokens)
+        }
+    } catch (_: Exception) {
+        val transcript = normalizeWhisperTranscript(raw)
+        if (transcript == null) {
+            AsrResult(text = "", detectedLanguage = null)
+        } else {
+            AsrResult(text = transcript, detectedLanguage = "en")
+        }
+    }
+}
+
 @Singleton
 class WhisperCppBackend @Inject constructor() : AsrBackend {
 
@@ -54,15 +94,9 @@ class WhisperCppBackend @Inject constructor() : AsrBackend {
             (samples[i] * 32768f).toInt().coerceIn(Short.MIN_VALUE.toInt(), Short.MAX_VALUE.toInt()).toShort()
         }
         try {
-            val text = WhisperNative.transcribe(path, shortSamples, sampleRateHz)
-            Timber.i("Whisper ASR: '%s'", text)
-            val transcript = normalizeWhisperTranscript(text)
-            if (transcript == null) {
-                AsrResult(text = "", detectedLanguage = null)
-            } else {
-                // whisper.cpp translate mode always outputs English
-                AsrResult(text = transcript, detectedLanguage = "en")
-            }
+            val payload = WhisperNative.transcribe(path, shortSamples, sampleRateHz)
+            Timber.i("Whisper ASR: '%s'", payload)
+            parseWhisperPayload(payload)
         } catch (e: Exception) {
             Timber.e(e, "Whisper transcription failed")
             AsrResult(text = "", detectedLanguage = null)

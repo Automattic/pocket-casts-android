@@ -24,12 +24,12 @@ import au.com.shiftyjelly.pocketcasts.voicecontrol.gate.conditions.OtherAppPlayi
 import au.com.shiftyjelly.pocketcasts.voicecontrol.gate.signals.GracePeriodSignal
 import au.com.shiftyjelly.pocketcasts.voicecontrol.intent.EmbeddingIntentMatcher
 import au.com.shiftyjelly.pocketcasts.voicecontrol.intent.EntityExtractor
-import au.com.shiftyjelly.pocketcasts.voicecontrol.intent.lfm.LfmIntentRouter
 import au.com.shiftyjelly.pocketcasts.voicecontrol.intent.embedding.BpeTokenizer
 import au.com.shiftyjelly.pocketcasts.voicecontrol.intent.embedding.EmbeddingEngine
 import au.com.shiftyjelly.pocketcasts.voicecontrol.intent.embedding.JniEmbeddingEngine
 import au.com.shiftyjelly.pocketcasts.voicecontrol.intent.embedding.TextTokenizer
 import au.com.shiftyjelly.pocketcasts.voicecontrol.intent.entity.GrammarEntityExtractor
+import au.com.shiftyjelly.pocketcasts.voicecontrol.intent.lfm.LfmIntentRouter
 import au.com.shiftyjelly.pocketcasts.voicecontrol.model.ModelManager
 import au.com.shiftyjelly.pocketcasts.voicecontrol.model.VoiceRecognizer
 import au.com.shiftyjelly.pocketcasts.voicecontrol.playback.AudioManagerVolumeSink

@@ -58,6 +58,5 @@ class LfmProductPathTest {
         error("Could not locate repository root from $start")
     }
 
-    private fun voiceModuleFile(relativePath: String): File =
-        repoRoot().resolve("modules/services/voice/src/main/kotlin/au/com/shiftyjelly/pocketcasts/voicecontrol/$relativePath")
+    private fun voiceModuleFile(relativePath: String): File = repoRoot().resolve("modules/services/voice/src/main/kotlin/au/com/shiftyjelly/pocketcasts/voicecontrol/$relativePath")
 }

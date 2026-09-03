@@ -31,14 +31,11 @@ internal object LfmNativeInference : LfmInference {
         nCtx: Int,
     ): Boolean = LfmNative.load(modelPath, classifierPath, labelMapPath, nCtx)
 
-    override fun classify(promptTokenIds: IntArray, poolStart: Int, poolEnd: Int): String? =
-        LfmNative.classify(promptTokenIds, poolStart, poolEnd)
+    override fun classify(promptTokenIds: IntArray, poolStart: Int, poolEnd: Int): String? = LfmNative.classify(promptTokenIds, poolStart, poolEnd)
 
-    override fun generate(prefill: String, nPredict: Int): String? =
-        LfmNative.generate(prefill, nPredict)
+    override fun generate(prefill: String, nPredict: Int): String? = LfmNative.generate(prefill, nPredict)
 
-    override fun tokenize(text: String, addBos: Boolean): IntArray? =
-        LfmNative.tokenize(text, addBos)
+    override fun tokenize(text: String, addBos: Boolean): IntArray? = LfmNative.tokenize(text, addBos)
 
     override fun reset() = LfmNative.reset()
 

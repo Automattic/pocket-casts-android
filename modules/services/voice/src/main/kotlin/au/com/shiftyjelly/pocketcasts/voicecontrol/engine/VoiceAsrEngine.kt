@@ -20,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.voicecontrol.model.VoiceRecognitionContext
 import au.com.shiftyjelly.pocketcasts.voicecontrol.model.VoiceRecognizer
 import au.com.shiftyjelly.pocketcasts.voicecontrol.route.AudioRoute
 import au.com.shiftyjelly.pocketcasts.voicecontrol.route.MicExposure
+import au.com.shiftyjelly.pocketcasts.voicecontrol.wakeword.WakeTranscriptTrimmer
 import au.com.shiftyjelly.pocketcasts.voicecontrol.wakeword.WakeWordDetector
 import au.com.shiftyjelly.pocketcasts.voicecontrol.wakeword.WakeWordSegmentCapture
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -89,9 +90,9 @@ class VoiceAsrEngine @Inject constructor(
                             val durationMs = totalSamples * 1000L / 16000
                             Timber.i("VAD: speech ended (%d samples, ~%dms)", totalSamples, durationMs)
 
-                            val audio = shouldTranscribe(result)
-                            if (audio != null) {
-                                transcribeSegment(result, overrideAudio = audio)
+                            val request = shouldTranscribe(result)
+                            if (request != null) {
+                                transcribeSegment(result, request)
                             }
                         }
 
@@ -117,15 +118,20 @@ class VoiceAsrEngine @Inject constructor(
      * Runs wake-word detection on every utterance in both listening modes,
      * then decides whether to transcribe. Per spec:
      *
-     * - Positive detection (either mode): strips wake-word audio, emits WAKE_WORD
-     *   earcon, opens/resets the conversation grace period, and forwards the
-     *   command remainder to ASR.
+     * - Positive detection (either mode): emits WAKE_WORD earcon, opens/resets
+     *   grace, and forwards the complete VAD segment to ASR. Wake-positive
+     *   time-band trim happens on timed ASR tokens after ASR, not by cutting audio.
      * - Negative outside grace (WakeWord): drops the segment.
      * - Negative during grace (Continuous): forwards the full segment.
-     * - Wake-only (positive but no safe remainder): plays WAKE_WORD then ERROR,
-     *   opens/resets grace, skips ASR.
+     * - Wake-only is decided after ASR: empty leftover after time-band trim plays ERROR.
      */
-    private suspend fun shouldTranscribe(segment: VoiceSegmenterResult.SpeechEnded): FloatArray? {
+    private data class TranscribeRequest(
+        val samples: FloatArray,
+        val wakePositive: Boolean,
+        val completionSample: Int = 0,
+    )
+
+    private suspend fun shouldTranscribe(segment: VoiceSegmenterResult.SpeechEnded): TranscribeRequest? {
         // Build float samples from the segment
         val totalSamples = segment.frames.sumOf { it.samples.size }
         val floatSamples = FloatArray(totalSamples)
@@ -172,22 +178,17 @@ class VoiceAsrEngine @Inject constructor(
             // Always acknowledge detection with the WAKE_WORD earcon
             audioFeedbackRenderer.playEarcon(EarconId.WAKE_WORD)
 
-            if (wwResult.remainderSamples != null) {
-                // Safe command remainder — forward to ASR
-                return wwResult.remainderSamples
-            } else {
-                // Wake-only (no safe command remainder localized) — skip ASR
-                Timber.i("Wake-only: no safe command remainder, skipping ASR")
-                audioFeedbackRenderer.playEarcon(EarconId.ERROR)
-                return null
-            }
+            return TranscribeRequest(
+                samples = floatSamples,
+                wakePositive = true,
+                completionSample = wwResult.completionSample,
+            )
         }
 
         // Negative detection
         return when (mode) {
             ListeningMode.Continuous -> {
-                // During grace: forward the full segment
-                floatSamples
+                TranscribeRequest(samples = floatSamples, wakePositive = false)
             }
 
             ListeningMode.WakeWord -> {
@@ -201,24 +202,11 @@ class VoiceAsrEngine @Inject constructor(
 
     private suspend fun transcribeSegment(
         segment: VoiceSegmenterResult.SpeechEnded,
-        overrideAudio: FloatArray? = null,
+        request: TranscribeRequest,
     ) {
         val b = backend ?: return
         val sampleRateHz = segment.frames.firstOrNull()?.sampleRateHz ?: 16000
-
-        // Use override audio if provided (e.g., remainder after wake word), else build from frames
-        val floatSamples = overrideAudio ?: run {
-            val totalSamples = segment.frames.sumOf { it.samples.size }
-            val samples = FloatArray(totalSamples)
-            var off = 0
-            for (frame in segment.frames) {
-                for (i in frame.samples.indices) {
-                    samples[off + i] = frame.samples[i].toFloat() / 32768f
-                }
-                off += frame.samples.size
-            }
-            samples
-        }
+        val floatSamples = request.samples
 
         // Filter out playback bleed before transcribing
         val playbackBuffer = playbackBufferProvider?.invoke() ?: FloatArray(0)
@@ -229,11 +217,24 @@ class VoiceAsrEngine @Inject constructor(
 
         // ASR
         val asrResult = b.transcribe(floatSamples, sampleRateHz)
-        if (asrResult.text.isBlank()) {
-            Timber.i("ASR returned empty transcript")
+        val durationMs = (floatSamples.size * 1000L / sampleRateHz).toInt()
+        val transcript = WakeTranscriptTrimmer.commandText(
+            result = asrResult,
+            wakePositive = request.wakePositive,
+            completionSample = request.completionSample,
+            sampleRateHz = sampleRateHz,
+            utteranceDurationMs = durationMs,
+        )
+        if (transcript.isBlank()) {
+            if (request.wakePositive) {
+                Timber.i("Wake-only utterance — no command remainder after ASR")
+                audioFeedbackRenderer.playEarcon(EarconId.ERROR)
+            } else {
+                Timber.i("ASR returned empty transcript")
+            }
             return
         }
-        processUtterance(asrResult)
+        processUtterance(asrResult.copy(text = transcript))
     }
 
     private suspend fun processUtterance(result: AsrResult) {

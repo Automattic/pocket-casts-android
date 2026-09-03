@@ -14,6 +14,7 @@ struct LfmRuntime {
     llama_context* context = nullptr;
     llama_batch batch{};
     bool batchInitialized = false;
+    int batchCapacity = 0;
 
     std::unique_ptr<ClassifierHead> classifier;
     std::vector<std::string> labels;

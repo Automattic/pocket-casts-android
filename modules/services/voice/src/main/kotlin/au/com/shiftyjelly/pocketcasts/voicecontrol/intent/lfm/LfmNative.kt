@@ -7,8 +7,7 @@ object LfmNative {
 
     fun lastError(): String = lastErrorNative()
 
-    fun loadClassifier(classifierPath: String, labelMapPath: String, expectedHiddenSize: Int = -1): Boolean =
-        nativeLoadClassifier(classifierPath, labelMapPath, expectedHiddenSize)
+    fun loadClassifier(classifierPath: String, labelMapPath: String, expectedHiddenSize: Int = -1): Boolean = nativeLoadClassifier(classifierPath, labelMapPath, expectedHiddenSize)
 
     fun classifyEmbedding(embedding: FloatArray): String? = nativeClassifyEmbedding(embedding)
 
@@ -21,8 +20,7 @@ object LfmNative {
         nCtx: Int = 2048,
     ): Boolean = nativeLoad(modelPath, classifierPath, labelMapPath, nCtx)
 
-    fun classify(promptTokenIds: IntArray, poolStart: Int, poolEnd: Int): String? =
-        nativeClassify(promptTokenIds, poolStart, poolEnd)
+    fun classify(promptTokenIds: IntArray, poolStart: Int, poolEnd: Int): String? = nativeClassify(promptTokenIds, poolStart, poolEnd)
 
     fun generate(prefill: String, nPredict: Int = 64): String? = nativeGenerate(prefill, nPredict)
 

@@ -1,5 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.voicecontrol.intent.lfm
 
+import java.io.File
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -7,9 +10,6 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
-import java.io.File
-import java.nio.ByteBuffer
-import java.nio.ByteOrder
 
 @RunWith(RobolectricTestRunner::class)
 class ClassifierHeadTest {

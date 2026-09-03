@@ -19,12 +19,17 @@ public:
 };
 
 void ensureBatch(LfmRuntime& runtime, int32_t capacity) {
-    if (!runtime.batchInitialized || runtime.batch.n_tokens > capacity) {
+    // We always (re)allocate on a capacity change. A batched decode that reused a
+    // larger buffer across calls is fine, but never write past the currently allocated
+    // token count: llama_batch_init places a NULL sentinel at seq_id[capacity], and
+    // decoding exactly `capacity` tokens can otherwise write through it to address 0.
+    if (!runtime.batchInitialized || capacity != runtime.batchCapacity) {
         if (runtime.batchInitialized) {
             llama_batch_free(runtime.batch);
             runtime.batchInitialized = false;
         }
         runtime.batch = llama_batch_init(capacity, 0, 1);
+        runtime.batchCapacity = capacity;
         runtime.batchInitialized = true;
     }
 }
@@ -40,8 +45,21 @@ bool decodeTokens(LfmRuntime& runtime, const std::vector<llama_token>& tokens, b
     ensureBatch(runtime, static_cast<int32_t>(tokens.size()));
     clearBatch(runtime);
 
+    // Defensive: if the batch came back without the pointers we are about to write
+    // (allocation failure), fail cleanly instead of dereferencing null during decode.
+    if (runtime.batch.token == nullptr || runtime.batch.pos == nullptr ||
+        runtime.batch.n_seq_id == nullptr || runtime.batch.seq_id == nullptr ||
+        runtime.batch.logits == nullptr) {
+        LOGE("batch buffers are null");
+        return false;
+    }
+
     for (std::size_t i = 0; i < tokens.size(); ++i) {
         const int index = runtime.batch.n_tokens;
+        if (index >= runtime.batchCapacity) {
+            LOGE("batch overflow at index %d (cap %d)", index, runtime.batchCapacity);
+            return false;
+        }
         runtime.batch.token[index] = tokens[i];
         runtime.batch.pos[index] = runtime.position + static_cast<llama_pos>(i);
         runtime.batch.n_seq_id[index] = 1;
@@ -117,6 +135,7 @@ void LfmRuntime::release() {
     if (batchInitialized) {
         llama_batch_free(batch);
         batchInitialized = false;
+        batchCapacity = 0;
     }
     if (context != nullptr) {
         llama_free(context);
@@ -242,7 +261,11 @@ std::string LfmRuntime::generate(const std::string& prefill, int nPredict) {
             break;
         }
 
-        ensureBatch(*this, 1);
+        // Keep the existing decode-size batch (no per-token churn); only allocate a
+        // fresh one when the (empty) prefill left no buffer behind.
+        if (batchCapacity < 1) {
+            ensureBatch(*this, 1);
+        }
         clearBatch(*this);
         batch.token[0] = next;
         batch.pos[0] = position;
