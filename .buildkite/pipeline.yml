@@ -67,7 +67,7 @@ steps:
     artifact_paths:
       - "**/build/instrumented-tests/**/*"
 
-  - group: "Assemble Mobile, Automotive, TV, and Wear release APKs"
+  - group: "Assemble release APKs"
     steps:
       - label: "Assemble app release APK"
         command: ".buildkite/commands/assemble-release-apk.sh app"
