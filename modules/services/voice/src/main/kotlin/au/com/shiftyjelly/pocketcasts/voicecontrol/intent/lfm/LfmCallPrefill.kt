@@ -30,13 +30,21 @@ object LfmTokenSpan {
         require(userTokenIds.isNotEmpty()) { "user utterance must not be empty" }
         var start = -1
         val userList = userTokenIds.toList()
-        for (index in 0..promptTokenIds.size - userTokenIds.size) {
-            val slice = promptTokenIds.sliceArray(index until index + userTokenIds.size).toList()
-            if (slice == userList) {
-                start = index
+        if (promptTokenIds.size >= userTokenIds.size) {
+            for (index in 0..promptTokenIds.size - userTokenIds.size) {
+                val slice = promptTokenIds.sliceArray(index until index + userTokenIds.size).toList()
+                if (slice == userList) {
+                    start = index
+                }
             }
         }
-        require(start >= 0) { "user utterance tokens not found in prompt" }
-        return start to start + userTokenIds.size - 1
+        if (start >= 0) {
+            return start to start + userTokenIds.size - 1
+        }
+        // BPE can merge across the user/transcript boundary. Prefer a trailing
+        // window sized to the utterance so dialog history does not dominate.
+        val window = maxOf(userTokenIds.size, 32).coerceAtMost(promptTokenIds.size)
+        val fallbackStart = promptTokenIds.size - window
+        return fallbackStart to promptTokenIds.lastIndex
     }
 }

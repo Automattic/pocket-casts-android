@@ -76,4 +76,46 @@ class SlotRepairTest {
         assertEquals("playback", repaired!!.name)
         assertEquals("seek_relative", repaired.action)
     }
+
+    @Test
+    fun repair_volumeKeepsVolumeSlot() {
+        val repaired = SlotRepair.repair(
+            raw = "<|tool_call_start|>[volume(action='set_volume', volume=50)]<|tool_call_end|>",
+            utterance = "set volume to 50",
+            tool = "volume",
+            action = "set_volume",
+        )
+        assertNotNull(repaired)
+        assertEquals("volume", repaired!!.name)
+        assertEquals("set_volume", repaired.action)
+        assertEquals(50, repaired.params["volume"])
+    }
+
+    @Test
+    fun repair_seekRelativeWithoutDelta_fillsSignedDefaultFromWording() {
+        val forward = SlotRepair.repair(
+            raw = "<|tool_call_start|>[playback(action='seek_relative')]<|tool_call_end|>",
+            utterance = "skip ahead",
+            tool = "playback",
+            action = "seek_relative",
+        )
+        assertEquals(30, forward!!.params["delta_seconds"])
+
+        val backward = SlotRepair.repair(
+            raw = "<|tool_call_start|>[playback(action='seek_relative')]<|tool_call_end|>",
+            utterance = "skip back",
+            tool = "playback",
+            action = "seek_relative",
+        )
+        assertEquals(-30, backward!!.params["delta_seconds"])
+
+        // `\bback\b` does not match inside "backwards" — must still fill -30.
+        val backwards = SlotRepair.repair(
+            raw = "<|tool_call_start|>[playback(action='seek_relative')]<|tool_call_end|>",
+            utterance = "skip backwards",
+            tool = "playback",
+            action = "seek_relative",
+        )
+        assertEquals(-30, backwards!!.params["delta_seconds"])
+    }
 }

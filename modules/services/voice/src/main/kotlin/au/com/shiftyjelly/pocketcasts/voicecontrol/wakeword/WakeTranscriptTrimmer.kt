@@ -17,6 +17,9 @@ object WakeTranscriptTrimmer {
         utteranceDurationMs: Int,
     ): String {
         if (!wakePositive) return result.text.trim()
+        // Backends that never emit timestamps (e.g. SenseVoice) must keep the raw
+        // transcript so wake+command still reaches the classifier. Time-band trim
+        // only applies when tokens are present.
         val tokens = result.tokens ?: return result.text.trim()
         val rate = sampleRateHz.coerceAtLeast(1)
         val completionMs = ((completionSample.toLong() * 1000L) / rate).toInt()

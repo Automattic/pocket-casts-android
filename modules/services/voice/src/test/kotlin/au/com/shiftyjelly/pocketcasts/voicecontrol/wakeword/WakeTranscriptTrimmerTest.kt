@@ -74,4 +74,26 @@ class WakeTranscriptTrimmerTest {
             ),
         )
     }
+
+    @Test
+    fun `zero gap command word starting inside pad is dropped`() {
+        // completion at 250ms → bandEnd = 370ms; "skip" starts at 300ms (inside pad).
+        assertEquals(
+            "forward",
+            WakeTranscriptTrimmer.commandText(
+                result = AsrResult(
+                    text = "Auris skip forward",
+                    tokens = listOf(
+                        AsrToken("Auris", 0, 250),
+                        AsrToken(" skip", 300, 500),
+                        AsrToken(" forward", 500, 900),
+                    ),
+                ),
+                wakePositive = true,
+                completionSample = 4000,
+                sampleRateHz = 16000,
+                utteranceDurationMs = 2000,
+            ),
+        )
+    }
 }

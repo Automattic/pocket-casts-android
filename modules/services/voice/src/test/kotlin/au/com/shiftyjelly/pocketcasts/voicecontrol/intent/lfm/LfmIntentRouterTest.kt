@@ -99,6 +99,22 @@ class LfmIntentRouterTest {
         assertEquals(VoiceIntent.Playback.Pause, router.recognize("pause", RECOGNITION_CONTEXT))
     }
 
+    @Test
+    fun seekRelative_mapsDeltaSecondsThroughSlotRepair() = runTest {
+        val inference = FakeLfmInference().apply {
+            classifyLabel = "playback:seek_relative"
+            generateResult =
+                "<|tool_call_start|>[playback(action='seek_relative', minutes=1)]<|tool_call_end|>"
+        }
+        val router = createRouter(inference)
+
+        router.ensureReady().getOrThrow()
+        assertEquals(
+            VoiceIntent.Playback.SeekRelative(-60_000),
+            router.recognize("go back a minute", RECOGNITION_CONTEXT),
+        )
+    }
+
     private fun createRouter(inference: FakeLfmInference): LfmIntentRouter {
         val context = ApplicationProvider.getApplicationContext<Context>()
         val manager = ModelManager(context).apply {
@@ -177,7 +193,7 @@ internal class FakeLfmInference : LfmInference {
     override fun tokenize(text: String, addBos: Boolean): IntArray? {
         tokenizeThrows?.let { throw it }
         return when (text) {
-            "pause" -> intArrayOf(10)
+            "pause", "go back a minute" -> intArrayOf(10)
             else -> intArrayOf(1, 10, 2)
         }
     }

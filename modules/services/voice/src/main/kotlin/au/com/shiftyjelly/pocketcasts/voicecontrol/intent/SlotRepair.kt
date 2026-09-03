@@ -20,6 +20,7 @@ object SlotRepair {
         params = repairStringParams(tool, action, params, utterance).toMutableMap()
         params = sanitizeParams(tool, action, params).toMutableMap()
         params = dropNoneLike(params).toMutableMap()
+        params = fillSeekRelativeDefault(tool, action, params, utterance).toMutableMap()
         return ToolCall(tool, action, params)
     }
 
@@ -57,16 +58,80 @@ object SlotRepair {
         "slot",
         "target_tool",
         "target_action",
+        "period",
     )
 
+    // Must cover every (tool, action) ToolCallMapper / ToolSchema can dispatch so
+    // sanitizeParams does not strip legitimate generated slots.
     private val ACTION_PARAMS: Map<Pair<String, String>, Set<String>> = mapOf(
         "playback" to "pause" to emptySet(),
         "playback" to "resume" to emptySet(),
         "playback" to "seek_relative" to setOf("delta_seconds"),
         "playback" to "seek_to" to setOf("position_seconds"),
         "playback" to "next_episode" to emptySet(),
-        "bookmark" to "rename" to setOf("ref", "title"),
+        "effects" to "set_speed" to setOf("speed"),
+        "effects" to "adjust_speed" to setOf("delta"),
+        "effects" to "set_trim_mode" to setOf("mode"),
+        "effects" to "set_volume_boost" to setOf("enabled"),
+        "effects" to "query_effects" to emptySet(),
+        "volume" to "set_volume" to setOf("volume"),
+        "volume" to "adjust_volume" to setOf("delta"),
+        "volume" to "query" to emptySet(),
+        "sleep" to "set" to setOf("minutes"),
+        "sleep" to "end_of_episode" to emptySet(),
+        "sleep" to "end_of_chapter" to emptySet(),
+        "sleep" to "add_time" to setOf("minutes"),
+        "sleep" to "cancel" to emptySet(),
+        "sleep" to "query" to emptySet(),
+        "chapter" to "next" to emptySet(),
+        "chapter" to "previous" to emptySet(),
+        "chapter" to "by_index" to setOf("index"),
+        "chapter" to "by_title" to setOf("query"),
+        "chapter" to "open_link" to setOf("index", "query"),
+        "chapter" to "query_list" to emptySet(),
+        "chapter" to "query_current" to emptySet(),
+        "chapter" to "query_count" to emptySet(),
+        "chapter" to "query_next" to emptySet(),
         "bookmark" to "add" to setOf("title"),
+        "bookmark" to "rename" to setOf("ref", "title"),
+        "bookmark" to "play" to setOf("ref"),
+        "bookmark" to "delete" to setOf("ref"),
+        "bookmark" to "delete_all" to emptySet(),
+        "bookmark" to "query_list" to emptySet(),
+        "bookmark" to "query_count" to emptySet(),
+        "bookmark" to "query_nearby" to emptySet(),
+        "queue" to "add_top" to setOf("episode"),
+        "queue" to "add_bottom" to setOf("episode"),
+        "queue" to "remove" to setOf("episode"),
+        "queue" to "move_to_top" to setOf("episode"),
+        "queue" to "move_to_bottom" to setOf("episode"),
+        "queue" to "clear" to emptySet(),
+        "queue" to "remove_by_podcast" to setOf("podcast"),
+        "queue" to "sort" to setOf("sort_order"),
+        "queue" to "query_contents" to emptySet(),
+        "queue" to "query_next" to emptySet(),
+        "queue" to "query_length" to emptySet(),
+        "queue" to "query_is_queued" to setOf("episode"),
+        "playback_query" to "whats_playing" to emptySet(),
+        "playback_query" to "position" to emptySet(),
+        "playback_query" to "time_remaining" to emptySet(),
+        "playback_query" to "current_podcast" to emptySet(),
+        "playback_query" to "episode_duration" to emptySet(),
+        "playback_query" to "publish_date" to emptySet(),
+        "playback_query" to "episode_description" to emptySet(),
+        "playback_query" to "download_status" to emptySet(),
+        "playback_query" to "episode_title" to emptySet(),
+        "stats_query" to "listening_time" to setOf("period"),
+        "stats_query" to "top_podcasts" to setOf("period"),
+        "stats_query" to "episodes_finished" to setOf("period"),
+        "stats_query" to "listening_streak" to emptySet(),
+        "stats_query" to "subscription_count" to emptySet(),
+        "stats_query" to "unplayed_total" to emptySet(),
+        "stats_query" to "download_stats" to emptySet(),
+        "stats_query" to "queue_total" to emptySet(),
+        "stats_query" to "new_episodes" to setOf("timeframe"),
+        "stats_query" to "time_since_last_listen" to emptySet(),
+        "cloud_route" to "route" to setOf("request", "tier"),
         "dialog_control" to "begin" to setOf("target_tool", "target_action"),
         "dialog_control" to "provide_slot" to setOf("target_tool", "target_action", "slot", "value"),
         "dialog_control" to "confirm" to emptySet(),
@@ -128,8 +193,22 @@ object SlotRepair {
         return if (BACK_REGEX.containsMatchIn(lower)) -seconds else seconds
     }
 
+    /** When the model omits delta_seconds, fill a signed ±30s default from wording. */
+    private fun fillSeekRelativeDefault(
+        tool: String,
+        action: String,
+        params: Map<String, Any?>,
+        utterance: String,
+    ): Map<String, Any?> {
+        if (tool != "playback" || action != "seek_relative") return params
+        if (params.containsKey("delta_seconds")) return params
+        val signed = if (BACK_REGEX.containsMatchIn(utterance.lowercase())) -DEFAULT_SKIP_SECONDS else DEFAULT_SKIP_SECONDS
+        return params + ("delta_seconds" to signed)
+    }
+
     private val A_MINUTE_REGEX = Regex("""\ba\s+minute\b""")
-    private val BACK_REGEX = Regex("""\b(back|rewind|behind)\b""")
+    private val BACK_REGEX = Regex("""\b(back|backward|backwards|rewind|behind)\b""")
+    private const val DEFAULT_SKIP_SECONDS = 30
 
     private fun durationPairs(utterance: String): List<Pair<Number, String>> {
         val pairs = mutableListOf<Pair<Number, String>>()
