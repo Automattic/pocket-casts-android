@@ -25,6 +25,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -75,7 +76,8 @@ fun TvBannerRow(
                 alignment = Alignment.CenterEnd,
                 modifier = Modifier
                     .align(Alignment.CenterEnd)
-                    .requiredHeight(banner.artworkHeight),
+                    .requiredHeight(banner.artworkHeight)
+                    .graphicsLayer { scaleX = if (banner.isArtworkMirrored) -1f else 1f },
             )
             if (banner.hasArtworkMask) {
                 // Opaque black over the text side so the bright collage only shows on the end edge.
@@ -136,7 +138,7 @@ private fun BannerText(banner: TvDiscoverBanner, modifier: Modifier = Modifier) 
             text = banner.subtitle(),
             style = MaterialTheme.tvTypography.body,
             color = MaterialTheme.tvColors.textSecondary,
-            maxLines = 2,
+            maxLines = banner.subtitleMaxLines,
             overflow = TextOverflow.Ellipsis,
         )
     }
@@ -167,8 +169,17 @@ private fun TvDiscoverBanner.artwork(): Int = when (this) {
 
 private val TvDiscoverBanner.artworkHeight: Dp
     get() = when (this) {
-        TvDiscoverBanner.CreateAccount -> 174.dp
+        TvDiscoverBanner.CreateAccount -> 150.dp
         TvDiscoverBanner.DiscoverMore -> 197.dp
+    }
+
+private val TvDiscoverBanner.isArtworkMirrored: Boolean
+    get() = this == TvDiscoverBanner.CreateAccount
+
+private val TvDiscoverBanner.subtitleMaxLines: Int
+    get() = when (this) {
+        TvDiscoverBanner.CreateAccount -> 1
+        TvDiscoverBanner.DiscoverMore -> 2
     }
 
 private val TvDiscoverBanner.contentWidthFraction: Float
