@@ -58,7 +58,7 @@ fun TvVideoTile(
     TvTile(
         onClick = onPlayEpisode,
         onLongClick = onGoToPodcast,
-        scale = CardDefaults.scale(focusedScale = 1.05f),
+        scale = CardDefaults.scale(focusedScale = TvFocusedCardScale),
         modifier = modifier.onFocusChanged { isFocused = it.hasFocus },
     ) {
         Box(

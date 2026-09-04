@@ -18,7 +18,7 @@ data class TvColorScheme(
     val backgroundSurface: Color = Color(0xFF1F2123),
     val backgroundBase: Color = Color(0xFF292B2E),
     val backgroundOverlay: Color = Color(0xFF323538),
-    val backgroundActive: Color = Color(0xFFD4D6DB),
+    val backgroundActive: Color = Color(0xFFFBFBFC),
     val backgroundActive50: Color = Color(0x80FBFBFC),
     val backgroundActive20: Color = Color(0x33FBFBFC),
     val overlayContainer: Color = backgroundSunken.copy(alpha = 0.94f),

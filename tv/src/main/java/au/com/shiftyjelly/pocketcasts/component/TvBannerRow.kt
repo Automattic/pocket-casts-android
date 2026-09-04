@@ -37,6 +37,7 @@ import androidx.tv.material3.CardDefaults
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverBanner
+import au.com.shiftyjelly.pocketcasts.theme.TvCardShape
 import au.com.shiftyjelly.pocketcasts.theme.TvTheme
 import au.com.shiftyjelly.pocketcasts.theme.tvColors
 import au.com.shiftyjelly.pocketcasts.theme.tvTypography
@@ -54,8 +55,8 @@ fun TvBannerRow(
 
     TvTile(
         onClick = onClick,
-        shape = CardDefaults.shape(RoundedCornerShape(9.dp)),
-        scale = CardDefaults.scale(focusedScale = 1.05f),
+        shape = CardDefaults.shape(TvCardShape),
+        scale = CardDefaults.scale(focusedScale = TvFocusedCardScale),
         colors = CardDefaults.colors(
             containerColor = Color.Black,
             focusedContainerColor = Color.Black,
@@ -63,7 +64,7 @@ fun TvBannerRow(
         interactionSource = interactionSource,
         modifier = modifier
             .fillMaxWidth()
-            .height(99.dp),
+            .height(153.dp),
     ) {
         Box(modifier = Modifier.fillMaxSize().clipToBounds()) {
             BackgroundLift()
@@ -166,8 +167,8 @@ private fun TvDiscoverBanner.artwork(): Int = when (this) {
 
 private val TvDiscoverBanner.artworkHeight: Dp
     get() = when (this) {
-        TvDiscoverBanner.CreateAccount -> 112.5.dp
-        TvDiscoverBanner.DiscoverMore -> 127.5.dp
+        TvDiscoverBanner.CreateAccount -> 174.dp
+        TvDiscoverBanner.DiscoverMore -> 197.dp
     }
 
 private val TvDiscoverBanner.contentWidthFraction: Float

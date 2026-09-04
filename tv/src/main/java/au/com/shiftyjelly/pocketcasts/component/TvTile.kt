@@ -26,12 +26,15 @@ import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.theme.TvTheme
 import au.com.shiftyjelly.pocketcasts.theme.tvColors
 
+val TvFocusedCardScale = 1.05f
+val TvFocusedWideCardScale = 1.02f
+
 @Composable
 fun TvTile(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     onLongClick: (() -> Unit)? = null,
-    scale: CardScale = CardDefaults.scale(focusedScale = 1.1f),
+    scale: CardScale = CardDefaults.scale(focusedScale = TvFocusedCardScale),
     shape: CardShape = CardDefaults.shape(),
     colors: CardColors = CardDefaults.colors(
         containerColor = MaterialTheme.tvColors.backgroundBase,
