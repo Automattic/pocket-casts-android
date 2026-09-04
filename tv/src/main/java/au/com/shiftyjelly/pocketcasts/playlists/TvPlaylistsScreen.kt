@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -44,6 +45,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.Button
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import au.com.shiftyjelly.pocketcasts.component.ScrollToTopEffect
 import au.com.shiftyjelly.pocketcasts.component.TvDetailOverlay
 import au.com.shiftyjelly.pocketcasts.component.TvEmptyState
 import au.com.shiftyjelly.pocketcasts.component.TvPlaylistCard
@@ -215,6 +217,8 @@ private fun TvPlaylistsGrid(
         var lastFocusedIndex by rememberSaveable(playlists) { mutableIntStateOf(0) }
         val focusRequesters = remember(playlists) { List(playlists.size) { FocusRequester() } }
         val gridFocusRequester = remember { FocusRequester() }
+        val gridState = rememberLazyGridState()
+        ScrollToTopEffect { gridState.scrollToItem(0) }
 
         var isInitialComposition by remember { mutableStateOf(true) }
         LaunchedEffect(restoreFocusTrigger) {
@@ -228,6 +232,7 @@ private fun TvPlaylistsGrid(
         }
 
         LazyVerticalGrid(
+            state = gridState,
             columns = GridCells.Fixed(3),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
