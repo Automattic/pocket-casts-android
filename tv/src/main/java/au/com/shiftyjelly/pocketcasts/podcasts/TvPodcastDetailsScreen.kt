@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.podcasts
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -27,6 +29,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.BlurredEdgeTreatment
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -144,11 +149,20 @@ private fun TvPodcastDetailsContent(
                 val followFocusRequester = remember { FocusRequester() }
                 var isShowingInfoModal by remember { mutableStateOf(false) }
                 var isShowingAccountModal by rememberSaveable { mutableStateOf(false) }
+                TvArtworkImage(
+                    model = PodcastImage.getMediumArtworkUrl(uiState.podcast.uuid),
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .offset(x = CoverGlowOffset, y = CoverGlowOffset)
+                        .size(CoverGlowSize)
+                        .blur(CoverGlowBlurRadius, BlurredEdgeTreatment.Unbounded)
+                        .alpha(0.4f),
+                )
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(60.dp),
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(start = 42.dp, top = 16.dp, end = 42.dp),
+                        .padding(start = 42.dp, top = DetailsTopPadding, end = 42.dp),
                 ) {
                     PodcastInfo(
                         podcast = uiState.podcast,
@@ -261,7 +275,9 @@ private fun PodcastInfo(
             Button(
                 onClick = onFollow,
                 colors = TvButtonDefaults.filledButtonColors(),
-                modifier = Modifier.focusRequester(followFocusRequester),
+                modifier = Modifier
+                    .focusRequester(followFocusRequester)
+                    .animateContentSize(),
             ) {
                 Text(stringResource(if (podcast.isSubscribed) LR.string.podcast_subscribed else LR.string.tv_podcast_follow))
             }
@@ -392,6 +408,10 @@ private fun AllEpisodesArchived(
 }
 
 private const val INFO_PANE_WEIGHT = 0.35f
+private val DetailsTopPadding = 56.dp
+private val CoverGlowSize = 460.dp
+private val CoverGlowOffset = (-140).dp
+private val CoverGlowBlurRadius = 80.dp
 
 private val PodcastSortOptions = listOf(
     EpisodesSortType.EPISODES_SORT_BY_TITLE_ASC,
