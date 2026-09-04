@@ -74,15 +74,16 @@ for module in $MODULES; do
 done
 
 # `--rerun` forces the upload task to execute again; without it the run above leaves it
-# up-to-date, `doFirst` never fires, and a passing build would prove nothing.
+# up-to-date, `doFirst` never fires, and a passing build would prove nothing. It is a task
+# option, so it only parses after the task name.
 # `--no-daemon` keeps `providers.environmentVariable` off a daemon that read the real token.
 echo "--- :no_entry: Checking the guard fails the build on a blank token"
 
 guard_log="$(pwd)/sentry-guard.log"
 
 set +e
-SENTRY_AUTH_TOKEN='' ./gradlew --no-daemon --console=plain --rerun \
-  :app:uploadSentryProguardMappingsRelease 2>&1 | tee "$guard_log"
+SENTRY_AUTH_TOKEN='' ./gradlew --no-daemon --console=plain \
+  :app:uploadSentryProguardMappingsRelease --rerun 2>&1 | tee "$guard_log"
 guard_status=${PIPESTATUS[0]}
 set -e
 
