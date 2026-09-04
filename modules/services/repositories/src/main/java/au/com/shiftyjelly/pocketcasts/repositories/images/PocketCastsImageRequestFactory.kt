@@ -120,7 +120,7 @@ data class PocketCastsImageRequestFactory(
                 actualSize > 280 -> 960
                 else -> 280
             }
-            "${Settings.SERVER_STATIC_URL}/discover/images/artwork/$themeType/$urlSize/$tintColorIndex.png"
+            "${Settings.SERVER_STATIC_URL}/discover/images/artwork/$themeType/$urlSize/$tintColorIndex.webp"
         }
     }
 
