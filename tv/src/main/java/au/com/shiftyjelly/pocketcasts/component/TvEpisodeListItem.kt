@@ -79,7 +79,7 @@ private fun MoreButtonSlot(
         contentAlignment = Alignment.Center,
         modifier = Modifier
             .padding(start = 12.dp)
-            .size(36.dp),
+            .size(TvMoreButtonSize),
     ) {
         AnimatedVisibility(
             visible = visible,
