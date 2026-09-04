@@ -1,0 +1,84 @@
+name: Compose Preview
+
+# Renders the repository's `@Preview`s to PNG (Robolectric, no emulator) and posts a sticky
+# before/after comment on pull requests; a push to `main` refreshes the baseline. Modules opt in
+# with a `composePreview { }` block in their own build file.
+#
+# This half never publishes: a fork's pull request gets a read-only token, and the alternative
+# (`pull_request_target`) hands a write token to a job that builds untrusted code. See
+# compose-preview-publish.yml.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  # Per-PR so concurrent pull requests don't cancel each other. Without this an older render can
+  # finish last and overwrite the newer one's branches and comment with stale pixels.
+  group: compose-preview-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # A separate job, not a conditional `phase`: an org can enable write tokens for fork pull
+  # requests, and job-level `permissions` is what holds regardless of that setting.
+  render-fork:
+    name: Render (fork)
+    if: github.event.pull_request.head.repo.fork
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          # 21, not the version catalog's `java = "17"` — that is the bytecode target, not the JDK
+          # the build runs on. `com.automattic.android:crashlogging` ships class-file version 65,
+          # which javac 17 cannot read.
+          java-version: '21'
+      - uses: android-actions/setup-android@v3
+      - uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6.3.0
+      - uses: yschimke/compose-ai-tools/.github/actions/apply@v1.53.1
+        with:
+          phase: render
+          # a11y and notifications are opt-in later by widening this.
+          only: compose,resources
+          # A few previews rendering nothing should report, not gate every pull request.
+          missing-renders: warn
+      - uses: actions/upload-artifact@v7
+        with:
+          name: compose-preview-handoff
+          path: _compose_preview_handoff/
+          if-no-files-found: error
+          retention-days: 1
+
+  # Same-repo pull requests and the baseline push already hold the write token they need.
+  apply:
+    name: Compose previews
+    if: ${{ !github.event.pull_request.head.repo.fork }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # renders are pushed to compose-preview/* branches
+      pull-requests: write # the before/after comparison is a sticky comment
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          # See the note on the render-fork job.
+          java-version: '21'
+      - uses: android-actions/setup-android@v3
+      - uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6.3.0
+      - uses: yschimke/compose-ai-tools/.github/actions/apply@v1.53.1
+        with:
+          only: compose,resources
+          missing-renders: warn

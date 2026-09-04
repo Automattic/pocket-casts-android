@@ -1,0 +1,60 @@
+name: Compose Preview Publish
+
+# The trusted half of the preview-diff surface: publishes renders and the sticky comment for fork
+# pull requests, running the base branch's code and reading the fork's render as data. Same-repo
+# runs publish inline and upload no handoff, so this usually fires with nothing to do.
+
+on:
+  workflow_run:
+    workflows: [Compose Preview]
+    types: [completed]
+
+permissions:
+  contents: write # renders are pushed to compose-preview/* branches
+  pull-requests: write # sticky comment upsert
+  actions: read # cross-run artifact download
+
+concurrency:
+  # Serialized per head branch. Not `cancel-in-progress`: a publisher mid-push should finish, and
+  # the next one supersedes it on the same branch anyway.
+  group: compose-preview-publish-${{ github.event.workflow_run.head_repository.full_name }}-${{ github.event.workflow_run.head_branch }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    # A failed render has nothing worth publishing.
+    if: github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      # The base branch's code, never the pull request's.
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      # Only a fork run uploads a handoff. Decided from `head_repository` rather than the download's
+      # outcome, so a genuine artifact or auth failure still fails instead of publishing nothing.
+      - id: fork
+        run: |
+          if [ "${{ github.event.workflow_run.head_repository.full_name }}" = "${{ github.repository }}" ]; then
+            echo "is_fork=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "is_fork=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/download-artifact@v7
+        if: steps.fork.outputs.is_fork == 'true'
+        with:
+          name: compose-preview-handoff
+          path: _compose_preview_handoff
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - id: pr
+        if: steps.fork.outputs.is_fork == 'true'
+        run: echo "number=$(cat _compose_preview_handoff/_pr_number)" >> "$GITHUB_OUTPUT"
+
+      - uses: yschimke/compose-ai-tools/.github/actions/apply@v1.53.1
+        if: steps.pr.outputs.number != ''
+        with:
+          phase: publish
+          pr-number: ${{ steps.pr.outputs.number }}

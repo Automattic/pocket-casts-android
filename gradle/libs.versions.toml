@@ -22,6 +22,7 @@ android-gradle-plugin = "9.3.2"
 billing = "9.1.0"
 coil = "3.6.0"
 compose = "2026.05.01" # https://developer.android.com/jetpack/compose/bom/bom-mapping
+compose-ai-preview = "1.53.1" # Renders @Preview functions to PNG outside Android Studio, for CI preview diffs.
 datastore = "1.2.1"
 dependency-analysis = "3.18.0"
 firebase = "34.17.0"
@@ -330,3 +331,4 @@ room = { id = "androidx.room", version.ref = "room" }
 sentry = { id = "io.sentry.android.gradle", version.ref = "sentry-plugin" }
 spotless = "com.diffplug.spotless:8.9.0"
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+compose-ai-preview = { id = "ee.schimke.composeai.preview", version.ref = "compose-ai-preview" }

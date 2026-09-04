@@ -8,6 +8,14 @@ plugins {
     alias(libs.plugins.sentry)
     alias(libs.plugins.google.services)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.compose.ai.preview)
+}
+
+// Renders this module's `@Preview`s to PNG on CI. `sdkVersion` is pinned rather than auto-detected
+// — see the note in modules/services/compose/build.gradle.kts.
+composePreview {
+    variant.set("debug")
+    sdkVersion.set(35)
 }
 
 sentry {

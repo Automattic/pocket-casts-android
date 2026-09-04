@@ -6,6 +6,14 @@ plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.aboutlibraries)
     alias(libs.plugins.aboutlibraries.android)
+    alias(libs.plugins.compose.ai.preview)
+}
+
+// Renders this module's `@Preview`s to PNG on CI. `sdkVersion` matches :modules:services:compose so
+// the components the two share render identically.
+composePreview {
+    variant.set("debug")
+    sdkVersion.set(35)
 }
 
 android {
