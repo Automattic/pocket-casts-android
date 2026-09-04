@@ -18,6 +18,8 @@
         ([#6206](https://github.com/Automattic/pocket-casts-android/pull/6206))
     *   Fix downloads and streams from some hosts, such as Buzzsprout, failing for good after a single failed attempt
         ([#6212](https://github.com/Automattic/pocket-casts-android/pull/6212))
+    *   Fix new-episode notifications replacing earlier unread ones, so episodes published overnight no longer go missing
+        ([#5850](https://github.com/Automattic/pocket-casts-android/pull/5850))
 
 
 8.23
