@@ -11,7 +11,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -71,6 +73,7 @@ fun <T> TvRow(
     itemSpacing: Dp = 12.dp,
     key: ((T) -> Any)? = null,
     focusRequester: FocusRequester? = null,
+    centerFocusedItem: Boolean = false,
     content: @Composable (T) -> Unit,
 ) {
     var hasFocus by remember { mutableStateOf(false) }
@@ -94,8 +97,19 @@ fun <T> TvRow(
 
         var lastFocusedIndex by rememberSaveable(items) { mutableIntStateOf(0) }
         val focusRequesters = remember(items) { List(items.size) { FocusRequester() } }
+        val listState = rememberLazyListState()
+
+        if (centerFocusedItem) {
+            LaunchedEffect(lastFocusedIndex) {
+                val item = listState.layoutInfo.visibleItemsInfo.firstOrNull { it.index == lastFocusedIndex }
+                val viewport = listState.layoutInfo.viewportSize.width
+                val centerOffset = item?.let { -(viewport - it.size) / 2 } ?: 0
+                listState.animateScrollToItem(lastFocusedIndex, centerOffset)
+            }
+        }
 
         LazyRow(
+            state = listState,
             contentPadding = contentPadding,
             horizontalArrangement = Arrangement.spacedBy(itemSpacing),
             verticalAlignment = Alignment.CenterVertically,

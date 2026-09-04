@@ -47,6 +47,7 @@ fun TvTabPlaceholder(
                     isSponsored = true,
                     sponsoredLabel = "Sponsored \u00B7 iHeartPodcasts and Kaleidoscope",
                     title = "Superhuman",
+                    author = "iHeartPodcasts",
                     description = "SuperHuman is a high-stakes, edge-of-your-seat docuseries",
                     onGoToPodcast = {},
                     onPlayLastEpisode = {},
