@@ -81,10 +81,17 @@ UPLOAD_TO_PLAY_STORE_COMMON_OPTIONS = {
 }.freeze
 
 ########################################################################
+# Slack
+########################################################################
+SLACK_CHANNEL = '#pocket-casts-android'
+
+########################################################################
 # Firebase App Distribution (FAD)
 ########################################################################
 FIREBASE_APP_ID = '1:124902176124:android:ad0ff1c7193b55ee1620f9'
 FIREBASE_TESTERS_GROUP = 'pocketcasts-android---prototype-builds'
+
+import 'lib/helpers.rb'
 
 before_all do |_lane|
   # Ensure we use the latest version of the toolkit
@@ -334,8 +341,12 @@ platform :android do
   #
   # @param percent [Float] The rollout percentage, between 0 and 1
   # @param track [String] The Google Play track for which to update the rollout of. Must be either `beta` or `production`.
+  # @param version [String] (optional) The release version the announcement is about. When
+  #                omitted, uses the current project version, which is only correct on a release branch.
+  # @param milestone [String] (optional) The milestone to name alongside the version.
+  #                  Provided by Releases V2, which is the only place it can come from.
   #
-  lane :update_rollouts do |percent:, track:|
+  lane :update_rollouts do |percent:, track:, version: release_version_current, milestone: nil|
     UI.user_error!('percent parameter must be between 0.0 and 1.0') if percent.to_f.negative? || percent.to_f > 1
     UI.user_error!('track parameter must be either `beta` or `production`') unless %w[beta production].include?(track)
 
@@ -363,13 +374,23 @@ platform :android do
     rescue FastlaneCore::Interface::FastlaneError => e
       raise unless e.message =~ /Unable to find the requested release on track/
 
-      not_found_variants << "'#{app}' variant with version code `#{variant_version_code}` was not found in `#{variant_track}` track in Google Play Console"
+      not_found_variants << { app: app, version_code: variant_version_code, track: variant_track }
     end
 
-    not_found_variants.each do |message|
-      UI.important(message)
+    not_found_variants.each do |variant|
+      UI.important("'#{variant[:app]}' variant with version code `#{variant[:version_code]}` was not found in `#{variant[:track]}` track in Google Play Console")
     end
     UI.user_error!('None of the 3 app variants were found in Google Play Console. We expected at least one') if not_found_variants.count == APPS.count
+
+    notify_slack do
+      rollout_announcement(
+        track: track,
+        percent: percent.to_f,
+        version: version,
+        milestone: milestone,
+        skipped_apps: not_found_variants.map { |variant| variant[:app] }
+      )
+    end
   end
 
   # Downloads the latest translations from GlotPress and creates a PR to integrate them into the current `release/*` branch
@@ -976,6 +997,38 @@ platform :android do
     buildkite_annotate(style: 'error', context: 'error-checking-branch', message: error_message) if is_ci
 
     UI.user_error!(error_message)
+  end
+
+  #####################################################################################
+  # Slack helpers
+  #####################################################################################
+
+  def send_slack_message(message:, channel: SLACK_CHANNEL)
+    webhook = ENV.fetch('SLACK_WEBHOOK') do
+      UI.user_error!("Environment variable 'SLACK_WEBHOOK' is not set. See `fastlane/env/user.env-example`.")
+    end
+
+    slack(
+      username: 'Pocket Cats',
+      slack_url: webhook,
+      channel: channel,
+      message: message,
+      default_payloads: []
+    )
+  end
+
+  # Posts to Slack without letting the caller fail over it, reporting loudly and annotating the CI build
+  # (if any) instead. Rationale: A hard failure in the release process is costly to address. A missing
+  # Slack message is not worth halting the release process.
+  #
+  # Takes a block rather than a string so that building the message is covered too, not just
+  # sending it.
+  def notify_slack(&message)
+    send_slack_message(message: message.call)
+  rescue StandardError => e
+    warning = "Slack notification failed (#{e.message}); continuing without it."
+    UI.important(warning)
+    buildkite_annotate(style: 'warning', context: 'slack-notification-failed', message: warning) if is_ci
   end
 
   # Reports a milestone-related error, both in the logs and — on CI — as a Buildkite annotation,

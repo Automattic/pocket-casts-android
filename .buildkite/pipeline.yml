@@ -31,6 +31,10 @@ steps:
         artifact_paths:
           - "**/build/reports/lint-results*.*"
 
+  - label: ":fastlane: fastlane Helper Tests"
+    command: ruby fastlane/test/helpers_test.rb
+    plugins: [ $CI_TOOLKIT ]
+
   - label: 'Unit tests'
     command: ".buildkite/commands/run-unit-tests.sh"
     plugins: [ $CI_TOOLKIT ]
