@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.component
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.runtime.Composable
@@ -10,6 +11,8 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import au.com.shiftyjelly.pocketcasts.theme.TvTopBarHeight
 
@@ -55,4 +58,17 @@ internal fun TopBarScrollReporter(gridState: LazyGridState) {
             if (gridState.firstVisibleItemIndex == 0) gridState.firstVisibleItemScrollOffset else Int.MAX_VALUE
         }.collect { offset -> topBar.set(offset.toFloat().coerceAtMost(barHeightPx)) }
     }
+}
+
+/**
+ * Lays content out below the top bar so directional focus can still descend into it from the top
+ * navigation, then translates it up in step with the bar as the active list scrolls, so the bar and
+ * content slide out of view together.
+ */
+@Composable
+internal fun Modifier.scrollAwayTopBar(): Modifier {
+    val topBar = LocalTopBarScrollState.current
+    return this
+        .padding(top = TvTopBarHeight)
+        .graphicsLayer { translationY = -topBar.offsetPx }
 }

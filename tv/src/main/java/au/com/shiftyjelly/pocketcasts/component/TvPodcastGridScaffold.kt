@@ -44,9 +44,8 @@ internal fun TvPodcastGridScaffold(
     scrollsTopBar: Boolean = false,
     itemContent: @Composable (index: Int, itemModifier: Modifier) -> Unit,
 ) {
-    val spacerCount = if (scrollsTopBar) 1 else 0
-    val titleCount = if (scrollsTopBar && title != null) 1 else 0
-    val headerCount = spacerCount + titleCount
+    val headerCount = if (scrollsTopBar && title != null) 1 else 0
+    val gridModifier = if (scrollsTopBar) Modifier.scrollAwayTopBar() else Modifier
 
     Column(modifier = modifier) {
         if (title != null && !scrollsTopBar) {
@@ -91,11 +90,11 @@ internal fun TvPodcastGridScaffold(
             verticalArrangement = Arrangement.spacedBy(12.dp),
             contentPadding = PaddingValues(
                 start = horizontalContentPadding,
-                top = if (scrollsTopBar) 0.dp else 20.dp,
+                top = 20.dp,
                 end = horizontalContentPadding,
                 bottom = 32.dp,
             ),
-            modifier = Modifier
+            modifier = gridModifier
                 .focusRequester(gridFocusRequester)
                 .focusGroup()
                 .focusProperties {
@@ -108,11 +107,6 @@ internal fun TvPodcastGridScaffold(
                     }
                 },
         ) {
-            if (scrollsTopBar) {
-                item(span = { GridItemSpan(maxLineSpan) }) {
-                    Spacer(modifier = Modifier.height(TvTopBarHeight))
-                }
-            }
             if (scrollsTopBar && title != null) {
                 item(span = { GridItemSpan(maxLineSpan) }) {
                     Text(

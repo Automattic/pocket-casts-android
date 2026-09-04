@@ -52,6 +52,7 @@ import au.com.shiftyjelly.pocketcasts.component.TvDetailOverlay
 import au.com.shiftyjelly.pocketcasts.component.TvEmptyState
 import au.com.shiftyjelly.pocketcasts.component.TvPlaylistCard
 import au.com.shiftyjelly.pocketcasts.component.TvPlaylistCardColors
+import au.com.shiftyjelly.pocketcasts.component.scrollAwayTopBar
 import au.com.shiftyjelly.pocketcasts.component.tvFocusInactiveWhen
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistIcon
@@ -238,6 +239,7 @@ private fun TvPlaylistsGrid(
             verticalArrangement = Arrangement.spacedBy(12.dp),
             contentPadding = PaddingValues(bottom = 32.dp),
             modifier = Modifier
+                .scrollAwayTopBar()
                 .focusRequester(gridFocusRequester)
                 .focusGroup()
                 .focusProperties {
@@ -246,9 +248,6 @@ private fun TvPlaylistsGrid(
                     }
                 },
         ) {
-            item(span = { GridItemSpan(maxLineSpan) }) {
-                Spacer(modifier = Modifier.height(TvTopBarHeight))
-            }
             item(span = { GridItemSpan(maxLineSpan) }) {
                 Text(
                     text = stringResource(LR.string.playlists),

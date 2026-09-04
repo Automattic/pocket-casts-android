@@ -43,6 +43,7 @@ import au.com.shiftyjelly.pocketcasts.component.TvEpisodeActionsModal
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeInfoModal
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeListItem
 import au.com.shiftyjelly.pocketcasts.component.rememberTvEpisodeListFocus
+import au.com.shiftyjelly.pocketcasts.component.scrollAwayTopBar
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
@@ -158,9 +159,9 @@ private fun UpNextList(
         modifier = modifier
             .fillMaxHeight()
             .fillMaxWidth(ROW_WIDTH_FRACTION)
+            .scrollAwayTopBar()
             .padding(start = 42.dp),
     ) {
-        item { Spacer(Modifier.height(TvTopBarHeight)) }
         item {
             Column(modifier = Modifier.padding(top = 40.dp, bottom = 16.dp)) {
                 UpNextHeader(episodes = episodes)
