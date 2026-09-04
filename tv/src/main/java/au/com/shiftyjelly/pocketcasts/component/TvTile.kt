@@ -27,6 +27,7 @@ import au.com.shiftyjelly.pocketcasts.theme.TvTheme
 import au.com.shiftyjelly.pocketcasts.theme.tvColors
 
 val TvFocusedCardScale = 1.05f
+val TvFocusedPodcastScale = 1.12f
 val TvFocusedWideCardScale = 1.02f
 
 @Composable
