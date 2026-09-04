@@ -3,6 +3,8 @@
 *   Bug Fixes
     *   Closing the transcript search bar now keeps the transcript open at the same scroll position instead of exiting the transcript
         ([#5835](https://github.com/Automattic/pocket-casts-android/pull/5835))
+    *   New-episode notifications no longer replace earlier unread ones; notifications for episodes that arrive over time now stack
+        ([#5850](https://github.com/Automattic/pocket-casts-android/pull/5850))
 
 8.20
 -----
