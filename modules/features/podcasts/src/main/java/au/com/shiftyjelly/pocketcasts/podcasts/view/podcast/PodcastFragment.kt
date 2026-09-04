@@ -941,8 +941,10 @@ class PodcastFragment : BaseFragment() {
 
     override fun onPause() {
         super.onPause()
-        viewModel.multiSelectEpisodesHelper.isMultiSelecting = false
-        viewModel.multiSelectBookmarksHelper.isMultiSelecting = false
+        if (!requireActivity().isChangingConfigurations) {
+            viewModel.multiSelectEpisodesHelper.isMultiSelecting = false
+            viewModel.multiSelectBookmarksHelper.isMultiSelecting = false
+        }
     }
 
     private fun onShareBookmarkClick() {
