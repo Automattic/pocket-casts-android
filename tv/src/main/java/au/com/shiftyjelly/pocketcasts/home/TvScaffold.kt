@@ -23,6 +23,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Devices
@@ -71,6 +72,7 @@ fun TvScaffold(
     var didFocusTopBar by rememberSaveable { mutableStateOf(false) }
     var isNowPlayingOpenRequested by remember { mutableStateOf(false) }
     var isTopBarFocusRequested by remember { mutableStateOf(false) }
+    var isTopBarFocused by remember { mutableStateOf(false) }
     val focusTopBar: () -> Unit = remember {
         { isTopBarFocusRequested = true }
     }
@@ -88,7 +90,7 @@ fun TvScaffold(
         }
     }
 
-    BackHandler(enabled = topBarVisibility.isVisible) {
+    BackHandler(enabled = topBarVisibility.isVisible && !isTopBarFocused) {
         focusTopBar()
         scrollToTop.request()
     }
@@ -111,6 +113,7 @@ fun TvScaffold(
                 onSelectedTabFocus = { didFocusTopBar = true },
                 focusSelectedTab = isTopBarFocusRequested,
                 onConsumeFocusRequest = { isTopBarFocusRequested = false },
+                onTopBarFocusChange = { isTopBarFocused = it },
                 onTabSelect = viewModel::selectTab,
                 onTabClick = { tab ->
                     if (tab == TvTab.NowPlaying) {
@@ -222,6 +225,7 @@ private fun TvScaffoldContent(
     onSelectedTabFocus: () -> Unit = {},
     focusSelectedTab: Boolean = false,
     onConsumeFocusRequest: () -> Unit = {},
+    onTopBarFocusChange: (Boolean) -> Unit = {},
     tabContent: @Composable (TvTab) -> Unit,
 ) {
     Box(
@@ -265,6 +269,7 @@ private fun TvScaffoldContent(
                 onConsumeFocusRequest = onConsumeFocusRequest,
                 modifier = Modifier
                     .fillMaxWidth()
+                    .onFocusChanged { onTopBarFocusChange(it.hasFocus) }
                     .graphicsLayer {
                         translationY = -topBarScroll.offsetPx.coerceAtMost(topBarHeightPx)
                     },

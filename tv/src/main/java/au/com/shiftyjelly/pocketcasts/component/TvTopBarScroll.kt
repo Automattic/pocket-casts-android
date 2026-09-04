@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
@@ -29,9 +30,7 @@ class TvTopBarScrollState {
     }
 }
 
-val LocalTopBarScrollState = staticCompositionLocalOf<TvTopBarScrollState> {
-    error("TvTopBarScrollState was not provided")
-}
+val LocalTopBarScrollState = staticCompositionLocalOf { TvTopBarScrollState() }
 
 /**
  * Reports the scroll position of [listState] to [LocalTopBarScrollState]. The first item of the
@@ -47,6 +46,9 @@ internal fun TopBarScrollReporter(listState: LazyListState) {
             if (listState.firstVisibleItemIndex == 0) listState.firstVisibleItemScrollOffset else Int.MAX_VALUE
         }.collect { offset -> topBar.set(offset.toFloat().coerceAtMost(barHeightPx)) }
     }
+    DisposableEffect(listState) {
+        onDispose { topBar.set(0f) }
+    }
 }
 
 @Composable
@@ -57,6 +59,9 @@ internal fun TopBarScrollReporter(gridState: LazyGridState) {
         snapshotFlow {
             if (gridState.firstVisibleItemIndex == 0) gridState.firstVisibleItemScrollOffset else Int.MAX_VALUE
         }.collect { offset -> topBar.set(offset.toFloat().coerceAtMost(barHeightPx)) }
+    }
+    DisposableEffect(gridState) {
+        onDispose { topBar.set(0f) }
     }
 }
 
