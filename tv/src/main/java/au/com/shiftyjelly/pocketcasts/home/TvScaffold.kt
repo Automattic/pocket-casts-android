@@ -235,8 +235,6 @@ private fun TvScaffoldContent(
         LaunchedEffect(currentTab) {
             topBarScroll.set(0f)
         }
-        // Tab content fills the whole area; top-level content reserves TvTopBarHeight for the bar,
-        // while detail overlays fill the full height under the hidden bar.
         Crossfade(
             targetState = currentTab,
             animationSpec = tween(durationMillis = TAB_CONTENT_ANIMATION_MILLIS, easing = FastOutSlowInEasing),

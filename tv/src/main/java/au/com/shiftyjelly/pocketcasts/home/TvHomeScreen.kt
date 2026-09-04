@@ -37,6 +37,7 @@ import au.com.shiftyjelly.pocketcasts.component.LocalTvToastHostState
 import au.com.shiftyjelly.pocketcasts.component.ScrollToTopEffect
 import au.com.shiftyjelly.pocketcasts.component.TopBarScrollReporter
 import au.com.shiftyjelly.pocketcasts.component.TvDetailOverlay
+import au.com.shiftyjelly.pocketcasts.component.scrollAwayTopBar
 import au.com.shiftyjelly.pocketcasts.component.tvFocusInactiveWhen
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
@@ -257,10 +258,10 @@ private fun TvHomeRows(
 
     LazyColumn(
         state = listState,
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize().scrollAwayTopBar(),
         verticalArrangement = Arrangement.spacedBy(40.dp),
     ) {
-        item { Spacer(modifier = Modifier.height(TvTopBarHeight)) }
+        item { Spacer(modifier = Modifier.height(6.dp)) }
 
         rows.forEachIndexed { rowIndex, row ->
             val rowModifier = Modifier.onFocusChanged { focusState ->

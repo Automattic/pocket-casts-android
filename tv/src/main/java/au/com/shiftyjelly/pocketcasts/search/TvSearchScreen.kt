@@ -42,7 +42,6 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
@@ -53,7 +52,6 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.component.LocalOpenNowPlaying
-import au.com.shiftyjelly.pocketcasts.component.LocalTopBarScrollState
 import au.com.shiftyjelly.pocketcasts.component.LocalTvToastHostState
 import au.com.shiftyjelly.pocketcasts.component.ScrollToTopEffect
 import au.com.shiftyjelly.pocketcasts.component.TopBarScrollReporter
@@ -69,6 +67,7 @@ import au.com.shiftyjelly.pocketcasts.component.TvPodcastTile
 import au.com.shiftyjelly.pocketcasts.component.TvPodcastTileDefaults
 import au.com.shiftyjelly.pocketcasts.component.TvRow
 import au.com.shiftyjelly.pocketcasts.component.TvTile
+import au.com.shiftyjelly.pocketcasts.component.scrollAwayTopBar
 import au.com.shiftyjelly.pocketcasts.component.tvFocusInactiveWhen
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
@@ -316,13 +315,7 @@ private fun TvSearchContent(
     var historyFocused by remember { mutableStateOf(false) }
     val showSuggestions = (isEditing || suggestionsFocused) && suggestions.isNotEmpty()
     val showHistory = (searchFieldFocused || historyFocused || isEditing) && !showSuggestions && query.isBlank() && history.isNotEmpty()
-    val barScroll = LocalTopBarScrollState.current
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .graphicsLayer { translationY = -barScroll.offsetPx },
-    ) {
-        Spacer(modifier = Modifier.height(TvTopBarHeight))
+    Column(modifier = modifier.fillMaxSize().scrollAwayTopBar()) {
         Column(modifier = Modifier.padding(ContentPadding)) {
             Spacer(modifier = Modifier.height(30.dp))
             TvSearchField(
