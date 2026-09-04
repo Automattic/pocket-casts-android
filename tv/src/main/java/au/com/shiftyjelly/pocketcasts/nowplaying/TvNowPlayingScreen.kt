@@ -62,6 +62,7 @@ import androidx.tv.material3.Icon
 import androidx.tv.material3.IconButton
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.component.HideTvTopBar
 import au.com.shiftyjelly.pocketcasts.component.LocalFocusTvTopBar
 import au.com.shiftyjelly.pocketcasts.component.TvArtworkImage
@@ -117,6 +118,7 @@ fun TvNowPlayingScreen(
         BackHandler { openedPodcastUuid = null }
         TvPodcastDetailsScreen(
             podcastUuid = podcastUuid,
+            source = SourceView.PLAYER,
             onClose = { openedPodcastUuid = null },
             modifier = modifier,
         )
@@ -293,7 +295,7 @@ private fun TvNowPlayingContent(
                 .graphicsLayer { alpha = chromeAlpha }
                 .background(ChromeScrimBrush)
                 .padding(horizontal = ChromeHorizontalInset)
-                .padding(top = ChromeScrimTopInset, bottom = 24.dp),
+                .padding(top = ChromeScrimTopInset, bottom = 18.dp),
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -304,7 +306,7 @@ private fun TvNowPlayingContent(
                     podcastTitle = state.podcastTitle,
                     modifier = Modifier.weight(1f),
                 )
-                Spacer(modifier = Modifier.width(24.dp))
+                Spacer(modifier = Modifier.width(18.dp))
                 ControlBar(
                     playbackSpeed = state.playbackSpeed,
                     trimMode = state.trimMode,
@@ -328,7 +330,7 @@ private fun TvNowPlayingContent(
                     },
                 )
             }
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(9.dp))
             state.errorMessage?.let { errorMessage ->
                 Text(
                     text = errorMessage,
@@ -337,7 +339,7 @@ private fun TvNowPlayingContent(
                     textAlign = TextAlign.Start,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 16.dp),
+                        .padding(bottom = 12.dp),
                 )
             }
             TvSeekBar(
@@ -409,7 +411,7 @@ private fun EpisodeArtwork(
             model = episode.artworkModel(),
             modifier = Modifier
                 .size(ArtworkSize)
-                .clip(RoundedCornerShape(8.dp)),
+                .clip(RoundedCornerShape(6.dp)),
         )
     }
 }
@@ -436,7 +438,7 @@ private fun EpisodeTitles(
         }
         Text(
             text = episode.title,
-            style = MaterialTheme.tvTypography.headline,
+            style = MaterialTheme.tvTypography.title2,
             color = MaterialTheme.tvColors.textPrimary,
             textAlign = TextAlign.Start,
             maxLines = 1,
@@ -512,17 +514,17 @@ private fun InfoButton(
     }
 }
 
-private val ArtworkSize = 240.dp
-private val ArtworkTopLift = 24.dp
+private val ArtworkSize = 210.dp
+private val ArtworkTopLift = 18.dp
 private val BlurredArtworkScale = 1.25f
 private val BlurredArtworkOffset = -ArtworkSize * 0.2f
-private val BlurredArtworkRadius = 66.dp
+private val BlurredArtworkRadius = 49.5.dp
 
 private val CHROME_HIDE_DELAY = 5.seconds
 private const val VIDEO_OVERLAY_FADE_MILLIS = 200
 
-private val ChromeHorizontalInset = 56.dp
-private val ChromeScrimTopInset = 48.dp
+private val ChromeHorizontalInset = 42.dp
+private val ChromeScrimTopInset = 36.dp
 private val ChromeScrimBrush = Brush.verticalGradient(
     0f to Color.Transparent,
     1f to Color.Black.copy(alpha = 0.8f),

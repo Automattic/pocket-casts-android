@@ -76,7 +76,7 @@ fun TvEpisodeListItemContainer(
                 fadeOut(tween(MORE_BUTTON_ANIMATION_DURATION_MS)),
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Spacer(Modifier.width(16.dp))
+                Spacer(Modifier.width(12.dp))
                 TvMoreButton(onClick = onOpenActions)
             }
         }

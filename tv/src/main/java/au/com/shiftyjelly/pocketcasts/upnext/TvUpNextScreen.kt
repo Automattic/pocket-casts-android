@@ -33,6 +33,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.component.LocalOpenNowPlaying
 import au.com.shiftyjelly.pocketcasts.component.TvEmptyState
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeActionContext
@@ -70,6 +71,7 @@ fun TvUpNextScreen(
         BackHandler { openedPodcastUuid = null }
         TvPodcastDetailsScreen(
             podcastUuid = podcastUuid,
+            source = SourceView.UP_NEXT,
             onClose = { openedPodcastUuid = null },
             modifier = modifier,
         )
@@ -141,13 +143,13 @@ private fun UpNextList(
         modifier = modifier
             .fillMaxHeight()
             .fillMaxWidth(ROW_WIDTH_FRACTION)
-            .padding(start = 32.dp, top = 8.dp),
+            .padding(start = 42.dp, top = 40.dp),
     ) {
         UpNextHeader(episodes = episodes)
-        Spacer(Modifier.height(26.dp))
+        Spacer(Modifier.height(16.dp))
         LazyColumn(
             state = listState,
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp),
             contentPadding = PaddingValues(bottom = 32.dp),
             modifier = Modifier.weight(1f),
         ) {
@@ -201,7 +203,7 @@ private fun UpNextHeader(
     ) {
         Text(
             text = stringResource(LR.string.up_next),
-            style = MaterialTheme.tvTypography.title3,
+            style = MaterialTheme.tvTypography.title2,
             color = MaterialTheme.tvColors.textPrimary,
         )
         Text(
@@ -237,7 +239,7 @@ private fun UpNextEmpty(
     )
 }
 
-private const val ROW_WIDTH_FRACTION = 0.75f
+private const val ROW_WIDTH_FRACTION = 0.65f
 
 @Preview(device = Devices.TV_1080p)
 @Composable

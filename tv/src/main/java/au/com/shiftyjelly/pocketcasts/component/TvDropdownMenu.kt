@@ -51,7 +51,7 @@ fun TvDropdownMenu(
     width: Dp = DefaultMenuWidth,
     maxHeight: Dp? = null,
     alignment: Alignment = Alignment.TopEnd,
-    offset: DpOffset = DpOffset(x = 0.dp, y = 48.dp),
+    offset: DpOffset = DpOffset(x = 0.dp, y = 36.dp),
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val intOffset = with(LocalDensity.current) {
@@ -87,7 +87,7 @@ internal fun TvDropdownMenuSurface(
             .clip(MenuShape)
             .background(MaterialTheme.tvColors.overlayContainer)
             .border(1.dp, MaterialTheme.tvColors.overlayBorder, MenuShape)
-            .padding(horizontal = 20.dp, vertical = 12.dp),
+            .padding(horizontal = 15.dp, vertical = 9.dp),
     ) {
         if (title != null) {
             TvDropdownMenuSectionTitle(text = title)
@@ -114,7 +114,7 @@ fun TvDropdownMenuSectionTitle(
         text = text,
         style = MaterialTheme.tvTypography.caption2,
         color = MaterialTheme.tvColors.textSecondary,
-        modifier = modifier.padding(start = 16.dp, top = 4.dp, bottom = 8.dp),
+        modifier = modifier.padding(start = 12.dp, top = 3.dp, bottom = 6.dp),
     )
 }
 
@@ -148,25 +148,25 @@ fun TvDropdownMenuItem(
             .fillMaxWidth()
             .then(focusModifier),
     ) {
-        Box(modifier = Modifier.size(14.dp)) {
+        Box(modifier = Modifier.size(10.5.dp)) {
             if (isSelected) {
                 Icon(
                     painter = painterResource(IR.drawable.ic_check),
                     contentDescription = null,
-                    modifier = Modifier.size(14.dp),
+                    modifier = Modifier.size(10.5.dp),
                 )
             }
         }
         Text(
             text = label,
-            modifier = Modifier.padding(start = 10.dp),
+            modifier = Modifier.padding(start = 7.5.dp),
         )
         Spacer(modifier = Modifier.weight(1f))
     }
 }
 
-private val DefaultMenuWidth = 256.dp
-private val MenuShape = RoundedCornerShape(20.dp)
+private val DefaultMenuWidth = 192.dp
+private val MenuShape = RoundedCornerShape(15.dp)
 
 @Preview
 @Composable

@@ -17,6 +17,7 @@ class TvDiscoverFeedAnalytics(
     private val settings: Settings,
     private val source: String,
     private val localRowIds: Set<String>,
+    private val attribution: TvDiscoverPodcastAttribution,
 ) {
     fun trackListImpression(row: TvDiscoverRow) {
         val listId = row.discoverListId() ?: return
@@ -24,9 +25,11 @@ class TvDiscoverFeedAnalytics(
     }
 
     fun trackPodcastTapped(row: TvDiscoverRow, podcast: TvDiscoverPodcast) {
+        val isFeatured = row is TvDiscoverRow.FeaturedPodcasts
+        attribution.record(podcast.uuid, listId = row.discoverListId(), listDatetime = row.discoverListDatetime(), isFeatured = isFeatured)
         val listId = row.discoverListId() ?: return
         eventHorizon.track(DiscoverListPodcastTappedEvent(listId = listId, podcastUuid = podcast.uuid, listDatetime = row.discoverListDatetime(), source = source))
-        if (row is TvDiscoverRow.FeaturedPodcasts) {
+        if (isFeatured) {
             eventHorizon.track(DiscoverFeaturedPodcastTappedEvent(podcastUuid = podcast.uuid))
         } else if (podcast.isSponsored) {
             trackSponsoredPodcastTapped(podcast.uuid)
@@ -42,11 +45,13 @@ class TvDiscoverFeedAnalytics(
     }
 
     fun trackEpisodePodcastTapped(row: TvDiscoverRow, episode: TvDiscoverEpisode) {
+        attribution.record(episode.podcastUuid, listId = row.discoverListId(), listDatetime = row.discoverListDatetime(), isFeatured = false)
         val listId = row.discoverListId() ?: return
         eventHorizon.track(DiscoverListPodcastTappedEvent(listId = listId, podcastUuid = episode.podcastUuid, listDatetime = row.discoverListDatetime(), source = source))
     }
 
     fun trackCategoryPodcastTapped(category: TvOpenedCategory, listId: String?, podcast: TvDiscoverPodcast) {
+        attribution.record(podcast.uuid, listId = listId, listDatetime = null, isFeatured = false)
         if (listId != null) {
             eventHorizon.track(DiscoverListPodcastTappedEvent(listId = listId, podcastUuid = podcast.uuid, source = source))
         }
@@ -93,6 +98,7 @@ class TvDiscoverFeedAnalytics(
 
         is TvDiscoverRow.Banner,
         is TvDiscoverRow.Categories,
+        is TvDiscoverRow.Failed,
         -> null
     }?.takeUnless { it in localRowIds }
 
@@ -107,6 +113,7 @@ class TvDiscoverFeedAnalytics(
 
         is TvDiscoverRow.Banner,
         is TvDiscoverRow.Categories,
+        is TvDiscoverRow.Failed,
         -> null
     }
 

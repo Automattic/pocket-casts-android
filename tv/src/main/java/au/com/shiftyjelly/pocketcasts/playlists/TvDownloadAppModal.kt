@@ -36,7 +36,7 @@ fun TvDownloadAppModal(
 ) {
     TvModal(
         onDismissRequest = onDismissRequest,
-        width = 600.dp,
+        width = 450.dp,
         modifier = modifier,
     ) {
         TvDownloadAppModalContent(onDone = onDismissRequest)
@@ -66,9 +66,9 @@ private fun ColumnScope.TvDownloadAppModalContent(
         painter = rememberQrPainter(content = DOWNLOAD_URL, size = QrCodeSize),
         contentDescription = null,
         modifier = Modifier
-            .padding(vertical = 16.dp)
-            .background(Color.White, RoundedCornerShape(8.dp))
-            .padding(10.dp)
+            .padding(vertical = 12.dp)
+            .background(Color.White, RoundedCornerShape(6.dp))
+            .padding(7.5.dp)
             .size(QrCodeSize),
     )
     Text(
@@ -80,7 +80,7 @@ private fun ColumnScope.TvDownloadAppModalContent(
         onClick = onDone,
         colors = TvButtonDefaults.filledButtonColors(),
         modifier = Modifier
-            .padding(top = 16.dp)
+            .padding(top = 12.dp)
             .focusRequester(focusRequester),
     ) {
         Text(stringResource(LR.string.done), style = MaterialTheme.tvTypography.caption1)
@@ -89,13 +89,13 @@ private fun ColumnScope.TvDownloadAppModalContent(
 
 private const val DOWNLOAD_URL = "https://pocketcasts.com/downloads"
 private val DOWNLOAD_URL_LABEL = DOWNLOAD_URL.removePrefix("https://")
-private val QrCodeSize = 144.dp
+private val QrCodeSize = 108.dp
 
 @Preview
 @Composable
 private fun TvDownloadAppModalPreview() {
     TvTheme {
-        TvModalSurface(width = 600.dp) {
+        TvModalSurface(width = 450.dp) {
             TvDownloadAppModalContent(onDone = {})
         }
     }

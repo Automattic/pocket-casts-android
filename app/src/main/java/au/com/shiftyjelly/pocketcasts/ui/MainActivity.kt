@@ -61,6 +61,7 @@ import androidx.transition.Slide
 import au.com.shiftyjelly.pocketcasts.R
 import au.com.shiftyjelly.pocketcasts.account.AccountActivity
 import au.com.shiftyjelly.pocketcasts.account.PromoCodeUpgradedFragment
+import au.com.shiftyjelly.pocketcasts.account.deviceapprove.DeviceApproveFragment
 import au.com.shiftyjelly.pocketcasts.account.onboarding.AccountBenefitsFragment
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivity
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivityContract
@@ -87,6 +88,7 @@ import au.com.shiftyjelly.pocketcasts.deeplink.DownloadsDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ImportDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.NativeShareDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.OpmlImportDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.PairDeviceDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.PlayFromSearchDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.PocketCastsWebsiteGetDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.PromoCodeDeepLink
@@ -481,7 +483,8 @@ class MainActivity :
 
         val hasCompletedOnboarding = settings.hasCompletedOnboarding()
         val isLoggedIn = syncManager.isLoggedIn()
-        val showOnboarding = !hasCompletedOnboarding && !isLoggedIn
+        val isPairingDeepLink = deepLinkFactory.create(intent) is PairDeviceDeepLink
+        val showOnboarding = !hasCompletedOnboarding && !isLoggedIn && !isPairingDeepLink
         val needsLoginPromptAfterRestore = settings.getNeedsLoginPromptAfterRestore()
         // Only show if savedInstanceState is null in order to avoid creating onboarding activity twice.
         if (showOnboarding && savedInstanceState == null) {
@@ -1833,6 +1836,12 @@ class MainActivity :
                         else -> OnboardingFlow.LoggedOut
                     }
                     openOnboardingFlow(onboardingFlow)
+                }
+
+                is PairDeviceDeepLink -> {
+                    if (supportFragmentManager.findFragmentByTag("device_approve") == null) {
+                        DeviceApproveFragment.newInstance(deepLink.userCode).show(supportFragmentManager, "device_approve")
+                    }
                 }
 
                 is ThemesDeepLink -> {

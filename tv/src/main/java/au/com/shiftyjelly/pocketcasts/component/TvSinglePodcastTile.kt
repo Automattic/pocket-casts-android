@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.tv.material3.CardDefaults
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import au.com.shiftyjelly.pocketcasts.theme.TvCardShape
 import au.com.shiftyjelly.pocketcasts.theme.TvTheme
 import au.com.shiftyjelly.pocketcasts.theme.tvColors
 import au.com.shiftyjelly.pocketcasts.theme.tvTypography
@@ -51,8 +52,8 @@ fun TvSinglePodcastTile(
 
     TvTile(
         onClick = onClick,
-        scale = CardDefaults.scale(focusedScale = 1.05f),
-        shape = CardDefaults.shape(shape = RoundedCornerShape(12.dp)),
+        scale = CardDefaults.scale(focusedScale = TvFocusedWideCardScale),
+        shape = CardDefaults.shape(shape = TvCardShape),
         colors = CardDefaults.colors(
             containerColor = MaterialTheme.tvColors.backgroundSunken,
             focusedContainerColor = MaterialTheme.tvColors.backgroundActive,
@@ -61,9 +62,9 @@ fun TvSinglePodcastTile(
     ) {
         Row(
             modifier = Modifier
-                .width(642.dp)
-                .height(200.dp)
-                .padding(24.dp),
+                .width(876.dp)
+                .height(184.dp)
+                .padding(18.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             AsyncImage(
@@ -71,17 +72,17 @@ fun TvSinglePodcastTile(
                 contentDescription = title,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
-                    .size(152.dp)
-                    .clip(RoundedCornerShape(4.dp)),
+                    .size(114.dp)
+                    .clip(RoundedCornerShape(3.dp)),
             )
 
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(start = 24.dp),
+                    .padding(start = 18.dp),
             ) {
                 if (isSponsored || author.isNotBlank()) {
-                    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(3.dp)) {
                         if (isSponsored) {
                             Text(
                                 text = stringResource(LR.string.sponsored),
@@ -107,7 +108,7 @@ fun TvSinglePodcastTile(
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(9.dp))
                 }
 
                 Text(
@@ -119,7 +120,7 @@ fun TvSinglePodcastTile(
                 )
 
                 if (description.isNotBlank()) {
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(6.dp))
                     Text(
                         text = description,
                         style = MaterialTheme.tvTypography.body,
@@ -137,7 +138,7 @@ fun TvSinglePodcastTile(
 @Composable
 private fun TvSinglePodcastTilePreview() {
     TvTheme {
-        Box(modifier = Modifier.background(MaterialTheme.tvColors.backgroundSunken).padding(24.dp)) {
+        Box(modifier = Modifier.background(MaterialTheme.tvColors.backgroundSunken).padding(18.dp)) {
             TvSinglePodcastTile(
                 artworkUrl = "",
                 title = "The Writer's Voice",
@@ -154,7 +155,7 @@ private fun TvSinglePodcastTilePreview() {
 @Composable
 private fun TvSinglePodcastTileRecommendedPreview() {
     TvTheme {
-        Box(modifier = Modifier.background(MaterialTheme.tvColors.backgroundSunken).padding(24.dp)) {
+        Box(modifier = Modifier.background(MaterialTheme.tvColors.backgroundSunken).padding(18.dp)) {
             TvSinglePodcastTile(
                 artworkUrl = "",
                 title = "The Writer's Voice",

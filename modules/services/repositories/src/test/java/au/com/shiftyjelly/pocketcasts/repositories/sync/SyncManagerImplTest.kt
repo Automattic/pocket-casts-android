@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.repositories.sync
 
 import android.content.Context
+import android.content.res.Resources
 import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
 import au.com.shiftyjelly.pocketcasts.preferences.RefreshToken
@@ -15,7 +16,9 @@ import com.automattic.eventhorizon.LoginIdentityType
 import com.automattic.eventhorizon.OnboardingFlowType
 import com.automattic.eventhorizon.SignInSourceType
 import com.automattic.eventhorizon.UserAccountCreatedEvent
+import com.automattic.eventhorizon.UserAccountCreationFailedEvent
 import com.automattic.eventhorizon.UserSignedInEvent
+import com.automattic.eventhorizon.UserSigninFailedEvent
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -27,6 +30,7 @@ import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -125,6 +129,28 @@ class SyncManagerImplTest {
         )
         assertTrue(eventSink.isEmpty())
         verifyNotificationNotCalled()
+    }
+
+    @Test
+    fun `device auth failure as new account fires account creation failed event`() = runTest {
+        stubResources()
+        whenever(syncServiceManager.deviceToken(any(), any())).thenThrow(RuntimeException("boom"))
+        syncManager.loginWithDeviceAuth("device-code", SignInSource.UserInitiated.Onboarding, isNewAccount = true)
+        assertTrue(eventSink.pollEvent() is UserAccountCreationFailedEvent)
+    }
+
+    @Test
+    fun `device auth failure as existing account fires signin failed event`() = runTest {
+        stubResources()
+        whenever(syncServiceManager.deviceToken(any(), any())).thenThrow(RuntimeException("boom"))
+        syncManager.loginWithDeviceAuth("device-code", SignInSource.UserInitiated.Onboarding, isNewAccount = false)
+        assertTrue(eventSink.pollEvent() is UserSigninFailedEvent)
+    }
+
+    private fun stubResources() {
+        val resources = mock<Resources>()
+        whenever(context.resources).thenReturn(resources)
+        whenever(resources.getString(any())).thenReturn("error")
     }
 
     private fun createDeviceTokenResponse() = DeviceTokenResponse(

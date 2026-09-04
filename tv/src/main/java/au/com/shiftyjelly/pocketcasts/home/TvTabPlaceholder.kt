@@ -32,15 +32,15 @@ fun TvTabPlaceholder(
 ) {
     LazyColumn(
         modifier = modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(24.dp),
+        verticalArrangement = Arrangement.spacedBy(18.dp),
     ) {
-        item { Spacer(modifier = Modifier.height(8.dp)) }
+        item { Spacer(modifier = Modifier.height(6.dp)) }
 
         item {
             TvRow(
                 title = stringResource(LR.string.tv_row_featured),
                 items = (1..3).toList(),
-                itemSpacing = 32.dp,
+                itemSpacing = 24.dp,
             ) { index ->
                 TvFeaturedTile(
                     artworkUrl = "https://picsum.photos/seed/featured$index/500/500",
@@ -58,7 +58,7 @@ fun TvTabPlaceholder(
             TvRow(
                 title = stringResource(LR.string.tv_row_trending_videos),
                 items = (1..6).toList(),
-                itemSpacing = 32.dp,
+                itemSpacing = 24.dp,
             ) { index ->
                 TvVideoTile(
                     thumbnailUrl = "https://picsum.photos/seed/video$index/716/403",
@@ -99,7 +99,7 @@ fun TvTabPlaceholder(
             }
         }
 
-        item { Spacer(modifier = Modifier.height(8.dp)) }
+        item { Spacer(modifier = Modifier.height(6.dp)) }
     }
 }
 

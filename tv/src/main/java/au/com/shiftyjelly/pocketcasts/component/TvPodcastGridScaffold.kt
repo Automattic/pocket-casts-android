@@ -34,7 +34,7 @@ internal fun TvPodcastGridScaffold(
     itemKeys: List<Any>,
     modifier: Modifier = Modifier,
     title: String? = null,
-    horizontalContentPadding: Dp = 32.dp,
+    horizontalContentPadding: Dp = 42.dp,
     autoFocusFirstItem: Boolean = false,
     restoreFocusTrigger: Int = 0,
     itemContent: @Composable (index: Int, itemModifier: Modifier) -> Unit,
@@ -43,9 +43,9 @@ internal fun TvPodcastGridScaffold(
         if (title != null) {
             Text(
                 text = title,
-                style = MaterialTheme.tvTypography.title3,
+                style = MaterialTheme.tvTypography.title2,
                 color = MaterialTheme.tvColors.textPrimary,
-                modifier = Modifier.padding(start = horizontalContentPadding, top = 8.dp, bottom = 10.dp),
+                modifier = Modifier.padding(start = horizontalContentPadding, top = 40.dp, bottom = 0.dp),
             )
         }
         val gridState = rememberLazyGridState()
@@ -74,9 +74,9 @@ internal fun TvPodcastGridScaffold(
         LazyVerticalGrid(
             state = gridState,
             columns = GridCells.Fixed(GRID_COLUMNS),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            contentPadding = PaddingValues(start = horizontalContentPadding, top = 16.dp, end = horizontalContentPadding, bottom = 32.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            contentPadding = PaddingValues(start = horizontalContentPadding, top = 20.dp, end = horizontalContentPadding, bottom = 32.dp),
             modifier = Modifier
                 .focusRequester(gridFocusRequester)
                 .focusGroup()

@@ -16,9 +16,11 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.component.TvModal
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.onboarding.signin.TvSignInErrorContent
 import au.com.shiftyjelly.pocketcasts.onboarding.signin.TvSignInQrContent
@@ -34,14 +36,18 @@ fun TvCreateAccountModal(
     onRetry: () -> Unit,
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
+    viewModel: TvCreateAccountModalViewModel = hiltViewModel(),
 ) {
+    CallOnce {
+        viewModel.trackShown()
+    }
     TvModal(
         onDismissRequest = onDismissRequest,
         width = ModalWidth,
         modifier = modifier,
     ) {
         Column(
-            verticalArrangement = Arrangement.spacedBy(32.dp),
+            verticalArrangement = Arrangement.spacedBy(24.dp),
             modifier = Modifier.fillMaxWidth(),
         ) {
             Header()
@@ -57,7 +63,7 @@ fun TvCreateAccountModal(
 @Composable
 private fun Header(modifier: Modifier = Modifier) {
     Column(
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        verticalArrangement = Arrangement.spacedBy(9.dp),
         modifier = modifier.fillMaxWidth(),
     ) {
         Text(
@@ -130,5 +136,5 @@ private fun ErrorContent(
     )
 }
 
-private val ModalWidth = 760.dp
-private val ContentHeight = 220.dp
+private val ModalWidth = 570.dp
+private val ContentHeight = 165.dp

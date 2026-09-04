@@ -7,6 +7,10 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import com.automattic.eventhorizon.EpisodeActionsShownEvent
+import com.automattic.eventhorizon.EpisodeArchivedEvent
+import com.automattic.eventhorizon.EpisodeMarkedAsPlayedEvent
+import com.automattic.eventhorizon.EpisodeMarkedAsUnplayedEvent
+import com.automattic.eventhorizon.EpisodeUnarchivedEvent
 import com.automattic.eventhorizon.EpisodeViewSourceType
 import com.automattic.eventhorizon.EventHorizon
 import java.util.Date
@@ -75,31 +79,35 @@ class TvEpisodeActionsViewModelTest {
     }
 
     @Test
-    fun `markAsPlayed marks the episode as played`() = runTest {
-        viewModel().markAsPlayed(episode)
+    fun `markAsPlayed marks the episode as played and tracks the event with the source`() = runTest {
+        viewModel().markAsPlayed(episode, SourceView.PODCAST_SCREEN)
 
         verify(episodeManager).markAsPlayedBlocking(episode, playbackManager, podcastManager)
+        verify(eventHorizon).track(EpisodeMarkedAsPlayedEvent(source = SourceView.PODCAST_SCREEN.analyticsValue, episodeUuid = "episode-uuid"))
     }
 
     @Test
-    fun `markAsUnplayed marks the episode as not played`() = runTest {
-        viewModel().markAsUnplayed(episode)
+    fun `markAsUnplayed marks the episode as not played and tracks the event with the source`() = runTest {
+        viewModel().markAsUnplayed(episode, SourceView.LISTENING_HISTORY)
 
         verify(episodeManager).markAsNotPlayedBlocking(episode)
+        verify(eventHorizon).track(EpisodeMarkedAsUnplayedEvent(source = SourceView.LISTENING_HISTORY.analyticsValue, episodeUuid = "episode-uuid"))
     }
 
     @Test
-    fun `archive archives the episode`() = runTest {
-        viewModel().archive(episode)
+    fun `archive archives the episode and tracks the event with the source`() = runTest {
+        viewModel().archive(episode, SourceView.UP_NEXT)
 
         verify(episodeManager).archiveBlocking(episode, playbackManager)
+        verify(eventHorizon).track(EpisodeArchivedEvent(source = SourceView.UP_NEXT.analyticsValue, episodeUuid = "episode-uuid"))
     }
 
     @Test
-    fun `unarchive unarchives the episode`() = runTest {
-        viewModel().unarchive(episode)
+    fun `unarchive unarchives the episode and tracks the event with the source`() = runTest {
+        viewModel().unarchive(episode, SourceView.STARRED)
 
         verify(episodeManager).unarchiveBlocking(episode)
+        verify(eventHorizon).track(EpisodeUnarchivedEvent(source = SourceView.STARRED.analyticsValue, episodeUuid = "episode-uuid"))
     }
 
     @Test

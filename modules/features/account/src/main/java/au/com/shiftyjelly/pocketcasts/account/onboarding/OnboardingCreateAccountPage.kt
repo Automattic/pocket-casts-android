@@ -183,7 +183,7 @@ internal fun OnboardingCreateAccountPage(
 }
 
 private val OnboardingFlow.shouldOfferLogin: Boolean
-    get() = this is OnboardingFlow.LoggedOut || this is OnboardingFlow.Upsell || this is OnboardingFlow.UpsellSuggestedFolder
+    get() = this is OnboardingFlow.LoggedOut || this is OnboardingFlow.DeviceApproval || this is OnboardingFlow.Upsell || this is OnboardingFlow.UpsellSuggestedFolder
 
 @Composable
 internal fun OnboardingCreateAccountPage(

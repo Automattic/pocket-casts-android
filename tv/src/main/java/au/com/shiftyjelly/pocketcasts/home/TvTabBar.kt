@@ -105,8 +105,8 @@ fun TvTabBar(
                     onFocus = { onTabSelect(index) },
                     onClick = { onTabClick(index) },
                     modifier = Modifier
-                        .height(44.dp)
-                        .padding(horizontal = 21.dp)
+                        .height(33.dp)
+                        .padding(horizontal = 19.dp)
                         .then(if (index == selectedTabIndex) Modifier.focusRequester(focusRequester) else Modifier),
                     colors = TabDefaults.pillIndicatorTabColors(
                         contentColor = MaterialTheme.tvColors.textPrimary,

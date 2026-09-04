@@ -43,6 +43,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.Button
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.component.LocalOpenNowPlaying
 import au.com.shiftyjelly.pocketcasts.component.TvArchivedFilterButton
 import au.com.shiftyjelly.pocketcasts.component.TvArtworkImage
@@ -56,6 +57,7 @@ import au.com.shiftyjelly.pocketcasts.component.TvEpisodeListItem
 import au.com.shiftyjelly.pocketcasts.component.TvPodcastInfoModal
 import au.com.shiftyjelly.pocketcasts.component.TvSortButton
 import au.com.shiftyjelly.pocketcasts.component.rememberTvEpisodeListFocus
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.components.displayLabel
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
@@ -78,6 +80,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun TvPodcastDetailsScreen(
     podcastUuid: String,
+    source: SourceView,
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: TvPodcastDetailsViewModel = hiltViewModel<TvPodcastDetailsViewModel, TvPodcastDetailsViewModel.Factory>(
@@ -88,6 +91,10 @@ fun TvPodcastDetailsScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val openNowPlaying = LocalOpenNowPlaying.current
+
+    CallOnce {
+        viewModel.onScreenOpened(source)
+    }
 
     LaunchedEffect(uiState, onClose) {
         if (uiState is TvPodcastDetailsUiState.NotFound) {
@@ -104,6 +111,7 @@ fun TvPodcastDetailsScreen(
         onRetryAccountAuth = viewModel::retryAccountAuth,
         onChangeSortType = viewModel::changeSortType,
         onToggleArchiveFilter = viewModel::toggleArchiveFilter,
+        onMoreInfo = viewModel::trackSummaryExpanded,
         onPlayEpisode = { episode ->
             episodeActions.play(episode, TvEpisodeActionContext.PodcastDetails.source)
             openNowPlaying()
@@ -122,6 +130,7 @@ private fun TvPodcastDetailsContent(
     onRetryAccountAuth: () -> Unit,
     onChangeSortType: (EpisodesSortType) -> Unit,
     onToggleArchiveFilter: () -> Unit,
+    onMoreInfo: () -> Unit,
     onPlayEpisode: (PodcastEpisode) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -136,10 +145,10 @@ private fun TvPodcastDetailsContent(
                 var isShowingInfoModal by remember { mutableStateOf(false) }
                 var isShowingAccountModal by rememberSaveable { mutableStateOf(false) }
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(80.dp),
+                    horizontalArrangement = Arrangement.spacedBy(60.dp),
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(start = 32.dp, top = 16.dp, end = 32.dp),
+                        .padding(start = 42.dp, top = 16.dp, end = 42.dp),
                 ) {
                     PodcastInfo(
                         podcast = uiState.podcast,
@@ -151,7 +160,10 @@ private fun TvPodcastDetailsContent(
                                 isShowingAccountModal = true
                             }
                         },
-                        onMoreInfo = { isShowingInfoModal = true },
+                        onMoreInfo = {
+                            onMoreInfo()
+                            isShowingInfoModal = true
+                        },
                         modifier = Modifier.weight(INFO_PANE_WEIGHT),
                     )
                     if (uiState.episodes.isEmpty() && uiState.archivedEpisodeCount == 0) {
@@ -213,7 +225,7 @@ private fun PodcastInfo(
     modifier: Modifier = Modifier,
 ) {
     Column(
-        verticalArrangement = Arrangement.spacedBy(24.dp),
+        verticalArrangement = Arrangement.spacedBy(20.dp),
         modifier = modifier,
     ) {
         TvArtworkImage(
@@ -222,7 +234,7 @@ private fun PodcastInfo(
                 .size(TvDetailsArtworkSize)
                 .clip(RoundedCornerShape(8.dp)),
         )
-        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
             if (podcast.author.isNotBlank()) {
                 Text(
                     text = podcast.author,
@@ -232,7 +244,7 @@ private fun PodcastInfo(
             }
             Text(
                 text = podcast.title,
-                style = MaterialTheme.tvTypography.title3,
+                style = MaterialTheme.tvTypography.title2,
                 color = MaterialTheme.tvColors.textPrimary,
             )
             if (podcast.podcastDescription.isNotBlank()) {
@@ -318,7 +330,7 @@ private fun EpisodeList(
         } else {
             LazyColumn(
                 state = listState,
-                verticalArrangement = Arrangement.spacedBy(12.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.weight(1f),
             ) {
                 itemsIndexed(
@@ -442,6 +454,7 @@ private fun TvPodcastDetailsContentPreview(
             onRetryAccountAuth = {},
             onChangeSortType = {},
             onToggleArchiveFilter = {},
+            onMoreInfo = {},
             onPlayEpisode = {},
         )
     }

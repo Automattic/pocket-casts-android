@@ -30,6 +30,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.OutlinedButton
 import androidx.tv.material3.Text
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.component.LocalOpenNowPlaying
 import au.com.shiftyjelly.pocketcasts.component.LocalTvToastHostState
 import au.com.shiftyjelly.pocketcasts.component.TvDetailOverlay
@@ -111,7 +112,9 @@ fun TvHomeScreen(
                 openedCategory = TvOpenedCategory(category.id, category.name, category.source)
             },
             onListImpression = viewModel::trackDiscoverListShown,
+            onRetryRow = viewModel::retryDiscoverRow,
             loadCategoryCovers = viewModel::categoryCoverUrls,
+            isPodcastPlaying = viewModel::isPlaying,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(top = TvTopBarHeight)
@@ -141,6 +144,7 @@ fun TvHomeScreen(
         ) { uuid ->
             TvPodcastDetailsScreen(
                 podcastUuid = uuid,
+                source = SourceView.DISCOVER,
                 onClose = { openedPodcastUuid = null },
             )
         }
@@ -159,7 +163,9 @@ private fun TvHomeContent(
     onEpisodePodcastClick: (TvDiscoverRow, TvDiscoverEpisode) -> Unit = { _, _ -> },
     onCategoryClick: (DiscoverCategory, Int) -> Unit = { _, _ -> },
     onListImpression: (TvDiscoverRow) -> Unit = {},
+    onRetryRow: (TvDiscoverRow) -> Unit = {},
     loadCategoryCovers: (suspend (DiscoverCategory) -> List<String>)? = null,
+    isPodcastPlaying: () -> Boolean = { false },
     restoreFocusTrigger: Int = 0,
 ) {
     when (uiState) {
@@ -179,7 +185,9 @@ private fun TvHomeContent(
                 onEpisodePodcastClick = onEpisodePodcastClick,
                 onCategoryClick = onCategoryClick,
                 onListImpression = onListImpression,
+                onRetryRow = onRetryRow,
                 loadCategoryCovers = loadCategoryCovers,
+                isPodcastPlaying = isPodcastPlaying,
                 modifier = modifier,
                 restoreFocusTrigger = restoreFocusTrigger,
             )
@@ -202,7 +210,7 @@ private fun TvHomeError(
                 color = MaterialTheme.tvColors.textPrimary,
                 style = MaterialTheme.tvTypography.caption1,
             )
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(18.dp))
             OutlinedButton(onClick = onRetry) {
                 Text(stringResource(LR.string.retry))
             }
@@ -221,7 +229,9 @@ private fun TvHomeRows(
     onEpisodePodcastClick: (TvDiscoverRow, TvDiscoverEpisode) -> Unit = { _, _ -> },
     onCategoryClick: (DiscoverCategory, Int) -> Unit = { _, _ -> },
     onListImpression: (TvDiscoverRow) -> Unit = {},
+    onRetryRow: (TvDiscoverRow) -> Unit = {},
     loadCategoryCovers: (suspend (DiscoverCategory) -> List<String>)? = null,
+    isPodcastPlaying: () -> Boolean = { false },
     restoreFocusTrigger: Int = 0,
 ) {
     var lastFocusedRowIndex by rememberSaveable(rows.size) { mutableIntStateOf(0) }
@@ -239,9 +249,9 @@ private fun TvHomeRows(
 
     LazyColumn(
         modifier = modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(24.dp),
+        verticalArrangement = Arrangement.spacedBy(40.dp),
     ) {
-        item { Spacer(modifier = Modifier.height(8.dp)) }
+        item { Spacer(modifier = Modifier.height(6.dp)) }
 
         rows.forEachIndexed { rowIndex, row ->
             val rowModifier = Modifier.onFocusChanged { focusState ->
@@ -261,11 +271,13 @@ private fun TvHomeRows(
                 focusRequester = rowFocusRequester,
                 onTapBanner = onTapBanner,
                 onListImpression = onListImpression,
+                onRetryRow = onRetryRow,
                 loadCategoryCovers = loadCategoryCovers,
+                isPodcastPlaying = isPodcastPlaying,
             )
         }
 
-        item { Spacer(modifier = Modifier.height(8.dp)) }
+        item { Spacer(modifier = Modifier.height(6.dp)) }
     }
 }
 

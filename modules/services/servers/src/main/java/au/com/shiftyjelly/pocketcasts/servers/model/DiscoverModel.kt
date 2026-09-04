@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.os.Parcelable
 import androidx.annotation.ColorInt
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.BundlePaidType
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
@@ -145,7 +146,14 @@ data class ListFeed(
     @Json(name = "paid") val paid: Boolean? = false,
     @Json(name = "author") val author: String? = null,
     @Json(name = "list_id") val listId: String? = null,
+    @Json(name = "type") val type: ListType? = null,
+    @Json(name = "summary_style") val summaryStyle: DisplayStyle? = null,
+    @Json(name = "expanded_style") val expandedStyle: ExpandedStyle? = null,
+    @Json(name = "lists") val lists: List<NetworkListSummary> = emptyList(),
 ) {
+    /** A `lists_list` may only carry `podcast_list` entries, so anything else the server adds is dropped here. */
+    val networks get() = lists.filter { it.type is ListType.PodcastList }
+
     val displayList: List<Any>
         get() {
             return if (promotion != null) {
@@ -155,6 +163,21 @@ data class ListFeed(
             }
         }
 }
+
+/** An entry inside a `lists_list`. */
+@JsonClass(generateAdapter = true)
+data class NetworkListSummary(
+    @Json(name = "uuid") val uuid: String,
+    @Json(name = "title") val title: String?,
+    @Json(name = "description") val description: String?,
+    @Json(name = "type") val type: ListType?,
+    @Json(name = "summary_style") val summaryStyle: DisplayStyle?,
+    @Json(name = "expanded_style") val expandedStyle: ExpandedStyle?,
+    @Json(name = "source") val source: String?,
+    @Json(name = "collection_image") val collectionImage: String?,
+    @Json(name = "item_count") val itemCount: Int?,
+    @Json(name = "url_path") val urlPath: String?,
+)
 
 @JsonClass(generateAdapter = true)
 data class ListPayment(
@@ -236,7 +259,54 @@ data class DiscoverEpisode(
     @Json(name = "type") val type: String?,
     @Json(name = "season") val season: Int?,
     @Json(name = "number") val number: Int?,
+    @Json(name = "alternate_enclosures") val alternateEnclosures: List<DiscoverAlternateEnclosure>? = null,
     val isPlaying: Boolean = false,
+) : Parcelable {
+    val videoUrl: String?
+        get() = resolveVideo()?.url
+
+    val videoContentType: String?
+        get() = resolveVideo()?.type
+
+    private fun resolveVideo(): ResolvedVideo? {
+        if (url != null && isSupportedVideoType(fileType) && url.isPlayableHttpUri()) {
+            return ResolvedVideo(url, fileType)
+        }
+        return alternateEnclosures
+            ?.filter { isSupportedVideoType(it.type) }
+            ?.firstNotNullOfOrNull { enclosure ->
+                enclosure.sources
+                    ?.firstNotNullOfOrNull { source -> source.uri?.takeIf { it.isPlayableHttpUri() } }
+                    ?.let { uri -> ResolvedVideo(uri, enclosure.type) }
+            }
+    }
+
+    private data class ResolvedVideo(val url: String, val type: String?)
+
+    companion object {
+        private const val VIDEO_MP4 = "video/mp4"
+
+        private fun isSupportedVideoType(type: String?): Boolean {
+            return BaseEpisode.isHlsMimeType(type) || type.equals(VIDEO_MP4, ignoreCase = true)
+        }
+
+        private fun String.isPlayableHttpUri(): Boolean {
+            return startsWith("http://", ignoreCase = true) || startsWith("https://", ignoreCase = true)
+        }
+    }
+}
+
+@Parcelize
+@JsonClass(generateAdapter = true)
+data class DiscoverAlternateEnclosure(
+    @Json(name = "type") val type: String? = null,
+    @Json(name = "sources") val sources: List<DiscoverEnclosureSource>? = null,
+) : Parcelable
+
+@Parcelize
+@JsonClass(generateAdapter = true)
+data class DiscoverEnclosureSource(
+    @Json(name = "uri") val uri: String? = null,
 ) : Parcelable
 
 @Parcelize

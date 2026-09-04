@@ -77,7 +77,7 @@ internal fun TvEmailSignInForm(
 
     Column(
         modifier = modifier.width(FormWidth),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         TvSignInTextField(
             value = state.email,
@@ -123,7 +123,7 @@ internal fun TvEmailSignInForm(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .heightIn(min = 24.dp),
+                .heightIn(min = 18.dp),
             contentAlignment = Alignment.CenterStart,
         ) {
             state.serverError?.let { serverError ->
@@ -147,7 +147,7 @@ internal fun TvEmailSignInForm(
                     LoadingView(
                         color = LocalContentColor.current,
                         modifier = Modifier
-                            .size(24.dp)
+                            .size(18.dp)
                             .semantics { contentDescription = signingInDescription },
                     )
                 } else {
@@ -182,7 +182,7 @@ private fun TvSignInTextField(
     val contentColor = if (isFocused) MaterialTheme.tvColors.backgroundSunken else MaterialTheme.tvColors.textPrimary
     val placeholderColor = if (isFocused) contentColor.copy(alpha = 0.5f) else MaterialTheme.tvColors.textSecondary
 
-    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(4.5.dp)) {
         BasicTextField(
             value = value,
             onValueChange = onValueChange,
@@ -219,8 +219,8 @@ private fun TvSignInTextField(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(fieldColor, RoundedCornerShape(12.dp))
-                        .padding(horizontal = 20.dp, vertical = 18.dp),
+                        .background(fieldColor, RoundedCornerShape(9.dp))
+                        .padding(horizontal = 15.dp, vertical = 13.5.dp),
                     contentAlignment = Alignment.CenterStart,
                 ) {
                     if (value.isEmpty()) {
@@ -252,7 +252,7 @@ private fun TvSignInTextField(
     }
 }
 
-private val FormWidth = 420.dp
+private val FormWidth = 315.dp
 private const val IME_SETTLE_MILLIS = 250L
 
 /** Estimated height of the TV soft keyboard, which reports no window insets, used to lift a focused field clear of it. */

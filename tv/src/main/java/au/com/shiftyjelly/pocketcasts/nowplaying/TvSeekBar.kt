@@ -47,8 +47,8 @@ import au.com.shiftyjelly.pocketcasts.theme.tvColors
 import au.com.shiftyjelly.pocketcasts.theme.tvTypography
 import kotlin.math.roundToInt
 
-private val LabelGap = 8.dp
-private val LabelFadeRange = 16.dp
+private val LabelGap = 6.dp
+private val LabelFadeRange = 12.dp
 
 @Composable
 fun TvSeekBar(
@@ -133,7 +133,7 @@ fun TvSeekBar(
         BoxWithConstraints(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 8.dp),
+                .padding(top = 6.dp),
         ) {
             val maxWidthPx = constraints.maxWidth.toFloat()
             var positionLabelWidth by remember { mutableIntStateOf(0) }

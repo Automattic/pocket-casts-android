@@ -181,7 +181,7 @@ private fun TvSettingsToggleRow(
                 Icon(
                     painter = painterResource(IR.drawable.ic_check),
                     contentDescription = null,
-                    modifier = Modifier.size(20.dp),
+                    modifier = Modifier.size(15.dp),
                 )
             }
         }
@@ -262,7 +262,7 @@ private val Subscription.isManagedOnAnotherPlatform: Boolean
 @Composable
 private fun TvSettingsInfoRow(label: String, value: String) {
     Row(
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
         modifier = Modifier.fillMaxWidth(),
     ) {
         Text(
@@ -355,9 +355,9 @@ private fun TvQrCode(content: String, modifier: Modifier = Modifier) {
     val qrPainter = rememberQrPainter(content = content, size = QrSize)
     Box(
         modifier = modifier
-            .clip(RoundedCornerShape(8.dp))
+            .clip(RoundedCornerShape(6.dp))
             .background(Color.White)
-            .padding(10.dp),
+            .padding(7.5.dp),
     ) {
         Image(
             painter = qrPainter,
@@ -367,7 +367,7 @@ private fun TvQrCode(content: String, modifier: Modifier = Modifier) {
     }
 }
 
-private val QrSize = 160.dp
+private val QrSize = 120.dp
 
 @Preview
 @Composable

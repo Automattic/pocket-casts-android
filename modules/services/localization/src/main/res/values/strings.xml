@@ -2953,4 +2953,15 @@
     <string name="tv_onboarding_welcome_back">Good to see you</string>
     <string name="tv_onboarding_syncing_subtitle">Loading your podcasts now.</string>
     <string name="tv_create_account_title">Create your free account</string>
+    <string name="device_approve_title">Connect to your TV</string>
+    <string name="device_approve_description">Your listening will sync automatically.\nYou can disconnect at any time from Settings.</string>
+    <string name="device_approve_login_required">In order to connect your device you need to have an account. Please sign in or create an account and try again.</string>
+    <string name="device_approve_signing_in_as">Signing in as…</string>
+    <string name="device_approve_connect">Connect</string>
+    <string name="device_approve_success_title">TV connected</string>
+    <string name="device_approve_success_message">Your TV is now connected to your account.</string>
+    <string name="device_approve_expired_title">Your QR code expired</string>
+    <string name="device_approve_expired_message">Please go back to your TV to generate a new one.</string>
+    <string name="device_approve_error_title">Device approval failed</string>
+    <string name="device_approve_error_message">Please try again later.</string>
 </resources>
