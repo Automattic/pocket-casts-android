@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.home
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -28,9 +29,11 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.component.LocalFocusTvTopBar
 import au.com.shiftyjelly.pocketcasts.component.LocalOpenNowPlaying
+import au.com.shiftyjelly.pocketcasts.component.LocalScrollToTop
 import au.com.shiftyjelly.pocketcasts.component.LocalTvTopBarVisibility
 import au.com.shiftyjelly.pocketcasts.component.LocalUseEpisodeArtwork
 import au.com.shiftyjelly.pocketcasts.component.TvDetailOverlay
+import au.com.shiftyjelly.pocketcasts.component.TvScrollToTop
 import au.com.shiftyjelly.pocketcasts.component.TvTopBarVisibility
 import au.com.shiftyjelly.pocketcasts.component.tvFocusInactiveWhen
 import au.com.shiftyjelly.pocketcasts.history.TvListeningHistoryScreen
@@ -59,6 +62,7 @@ fun TvScaffold(
     var isListeningHistoryVisible by rememberSaveable { mutableStateOf(false) }
     var isSettingsModalVisible by rememberSaveable { mutableStateOf(false) }
     val topBarVisibility = remember { TvTopBarVisibility() }
+    val scrollToTop = remember { TvScrollToTop() }
     var didFocusTopBar by rememberSaveable { mutableStateOf(false) }
     var isNowPlayingOpenRequested by remember { mutableStateOf(false) }
     var isTopBarFocusRequested by remember { mutableStateOf(false) }
@@ -79,10 +83,16 @@ fun TvScaffold(
         }
     }
 
+    BackHandler(enabled = topBarVisibility.isVisible) {
+        focusTopBar()
+        scrollToTop.request()
+    }
+
     CompositionLocalProvider(
         LocalTvTopBarVisibility provides topBarVisibility,
         LocalOpenNowPlaying provides openNowPlaying,
         LocalFocusTvTopBar provides focusTopBar,
+        LocalScrollToTop provides scrollToTop,
         LocalUseEpisodeArtwork provides uiState.useEpisodeArtwork,
     ) {
         Box(modifier = modifier.fillMaxSize()) {
