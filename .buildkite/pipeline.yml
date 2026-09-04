@@ -13,6 +13,11 @@ steps:
   # Wait for Gradle Wrapper to be validated before running any other jobs
   - wait
 
+  # Throwaway, delete with `.buildkite/commands/verify-sentry-upload.sh`.
+  - label: ":sentry: Verify Sentry Upload"
+    command: ".buildkite/commands/verify-sentry-upload.sh"
+    plugins: [ $CI_TOOLKIT ]
+
   - group: "Linters"
     steps:
       - label: ":danger: Danger - PR Check"
