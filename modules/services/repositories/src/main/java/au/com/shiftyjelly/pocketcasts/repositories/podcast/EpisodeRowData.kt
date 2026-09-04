@@ -28,7 +28,7 @@ data class EpisodeRowData(
     val playbackState: PlaybackState,
     val isInUpNext: Boolean,
     val hasBookmarks: Boolean,
-    val hasHlsAlternateEnclosure: Boolean,
+    val hasVideoAlternateEnclosure: Boolean,
 )
 
 data class UserEpisodeRowData(
@@ -73,7 +73,7 @@ class EpisodeRowDataProvider @Inject constructor(
                     playbackStatusObservable(episodeUuid),
                     isInUpNextObservable(episodeUuid),
                     hasBookmarksObservable(episodeUuid),
-                    hasHlsAlternateEnclosureObservable(episodeUuid),
+                    hasVideoAlternateEnclosureObservable(episodeUuid),
                     ::EpisodeRowData,
                 )
             }
@@ -110,8 +110,8 @@ class EpisodeRowDataProvider @Inject constructor(
             }
     }
 
-    private fun hasHlsAlternateEnclosureObservable(episodeUuid: String): Observable<Boolean> {
-        return alternateEnclosureManager.hasHlsAlternateEnclosure(episodeUuid)
+    private fun hasVideoAlternateEnclosureObservable(episodeUuid: String): Observable<Boolean> {
+        return alternateEnclosureManager.hasVideoAlternateEnclosure(episodeUuid)
             .asObservable()
             .startWith(false)
             .distinctUntilChanged()

@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.servers.podcast
 
 import androidx.media3.common.MimeTypes
 import au.com.shiftyjelly.pocketcasts.models.entity.firstHlsStreamUrl
+import au.com.shiftyjelly.pocketcasts.models.entity.firstProgressiveVideoStream
 import au.com.shiftyjelly.pocketcasts.models.type.MediaKind
 import au.com.shiftyjelly.pocketcasts.servers.di.NetworkModule
 import org.junit.Assert.assertEquals
@@ -199,6 +200,51 @@ class EpisodeInfoTest {
         val episode = episodeInfo?.toEpisode("podcast-uuid")
         assertEquals(MimeTypes.APPLICATION_M3U8, episode?.fileType)
         assertEquals(true, episode?.isHlsOnly)
+    }
+
+    @Test
+    fun `video-only episode without a progressive url takes the alternate enclosure file type`() {
+        val episodeInfo = adapter.fromJson(
+            """
+            {
+              "uuid": "episode-uuid",
+              "url": "",
+              "published": "2026-06-11T00:00:00Z",
+              "alternate_enclosures": [
+                { "type": "video/mp4", "media_kind": "video", "sources": [{ "uri": "https://example.com/episode.mp4" }] }
+              ]
+            }
+            """.trimIndent(),
+        )
+
+        val episode = episodeInfo?.toEpisode("podcast-uuid")
+        assertEquals("video/mp4", episode?.fileType)
+        assertEquals(true, episode?.isVideo)
+        assertEquals(false, episode?.isHlsOnly)
+    }
+
+    @Test
+    fun `episode with a progressive url keeps its own file type alongside a video alternate enclosure`() {
+        val episodeInfo = adapter.fromJson(
+            """
+            {
+              "uuid": "episode-uuid",
+              "url": "https://example.com/episode.mp3",
+              "file_type": "audio/mp3",
+              "published": "2026-06-11T00:00:00Z",
+              "alternate_enclosures": [
+                { "type": "video/mp4", "media_kind": "video", "sources": [{ "uri": "https://example.com/episode.mp4" }] }
+              ]
+            }
+            """.trimIndent(),
+        )
+
+        val episode = episodeInfo?.toEpisode("podcast-uuid")
+        assertEquals("audio/mp3", episode?.fileType)
+        assertEquals(
+            "https://example.com/episode.mp4",
+            episode?.alternateEnclosures?.firstProgressiveVideoStream()?.url,
+        )
     }
 
     @Test

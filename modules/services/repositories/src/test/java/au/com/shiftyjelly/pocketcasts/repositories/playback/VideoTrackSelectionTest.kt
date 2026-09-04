@@ -23,7 +23,7 @@ class VideoTrackSelectionTest {
     }
 
     @Test
-    fun `keeps video for hls streams without a surface`() {
+    fun `keeps video for hls streams without a surface because audio may be muxed into it`() {
         assertFalse(shouldDisableVideoTrack(audioOnly = false, hasVideoSurface = false, isHlsStream = true))
     }
 }

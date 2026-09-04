@@ -14,7 +14,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.toLiveData
-import androidx.media3.common.MimeTypes
 import androidx.media3.common.util.StuckPlayerException
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.datasource.HttpDataSource
@@ -22,12 +21,16 @@ import androidx.work.NetworkType
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.localization.BuildConfig
+import au.com.shiftyjelly.pocketcasts.models.entity.AlternateEnclosureStream
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeAlternateEnclosure
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast.AutoAddUpNext
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.firstHlsStream
 import au.com.shiftyjelly.pocketcasts.models.entity.firstHlsStreamUrl
+import au.com.shiftyjelly.pocketcasts.models.entity.firstProgressiveVideoStream
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.models.to.ChapterOrigin
 import au.com.shiftyjelly.pocketcasts.models.to.Chapters
@@ -269,16 +272,19 @@ open class PlaybackManager @Inject constructor(
     private val _playerFlow = MutableStateFlow<Player?>(null)
     val playerFlow = _playerFlow.asStateFlow()
 
-    // HLS starts Unknown until the player's tracks resolve it to HasVideo or AudioOnly; the video
-    // surface is shown only once HasVideo is known.
+    // A resolved encoding starts Unknown until the player's tracks resolve it; the surface shows only at HasVideo.
     private val _streamVideoState = MutableStateFlow(StreamVideoState.NotVideo)
     val streamVideoState = _streamVideoState.asStateFlow()
 
     private val _videoRenderingEnabled = MutableStateFlow(true)
     val videoRenderingEnabled = _videoRenderingEnabled.asStateFlow()
 
+    // Strictly whether an HLS encoding exists, which is what the analytics schema's hls_available means.
     private val _streamHlsAvailable = MutableStateFlow(false)
-    val streamHlsAvailable = _streamHlsAvailable.asStateFlow()
+
+    // Unlike _streamHlsAvailable this also requires the encoding's feature flag to be on.
+    private val _streamVideoAvailable = MutableStateFlow(false)
+    val streamVideoAvailable = _streamVideoAvailable.asStateFlow()
 
     private var videoStreamPreferred = false
     private var videoStreamPreferredEpisodeUuid: String? = null
@@ -360,10 +366,15 @@ open class PlaybackManager @Inject constructor(
 
         launch {
             upNextQueue.changesObservable.asFlow()
-                .map { state -> (state as? UpNextQueue.State.Loaded)?.episode?.uuid }
-                .distinctUntilChanged()
-                .collect { uuid ->
-                    _streamHlsAvailable.value = uuid != null && alternateEnclosureManager.findForEpisode(uuid).firstHlsStreamUrl() != null
+                .map { state -> (state as? UpNextQueue.State.Loaded)?.episode }
+                .distinctUntilChanged { old, new -> old?.uuid == new?.uuid }
+                .collect { episode ->
+                    val enclosures = episode?.let { alternateEnclosureManager.findForEpisode(it.uuid) }.orEmpty()
+                    _streamHlsAvailable.value = enclosures.firstHlsStreamUrl() != null
+                    _streamVideoAvailable.value = selectAlternateStream(
+                        enclosures = enclosures,
+                        hasProgressiveEnclosure = !episode?.downloadUrl.isNullOrBlank(),
+                    ) != null
                 }
         }
     }
@@ -398,12 +409,17 @@ open class PlaybackManager @Inject constructor(
             }
         }
 
-        val autoPlayOffersHls = alternateEnclosureManager.findForEpisode(autoPlayEpisode.uuid).firstHlsStreamUrl() != null
+        val autoPlayEnclosures = alternateEnclosureManager.findForEpisode(autoPlayEpisode.uuid)
+        val autoPlayOffersHls = autoPlayEnclosures.firstHlsStreamUrl() != null
+        val autoPlayStreamsVideo = selectAlternateStream(
+            enclosures = autoPlayEnclosures,
+            hasProgressiveEnclosure = !autoPlayEpisode.downloadUrl.isNullOrBlank(),
+        ) != null
         eventHorizon.track(
             PlaybackEpisodeAutoplayedEvent(
                 episodeUuid = autoPlayEpisode.uuid,
                 hlsAvailable = autoPlayOffersHls,
-                audioOnlyMode = if (autoPlayOffersHls || autoPlayEpisode.isVideo) settings.audioOnly.value else null,
+                audioOnlyMode = if (autoPlayStreamsVideo || autoPlayEpisode.isVideo) settings.audioOnly.value else null,
             ),
         )
         return autoPlayEpisode
@@ -414,25 +430,23 @@ open class PlaybackManager @Inject constructor(
     }
 
     private suspend fun applyStreamOverride(episode: BaseEpisode) {
-        episode.overrideStreamUrl = null
-        episode.overrideStreamContentType = null
-        // Stream the first HLS alternate enclosure when streaming is on, or when the episode is HLS-only.
-        val hlsUrl = alternateEnclosureManager.findForEpisode(episode.uuid).firstHlsStreamUrl()
-        _streamHlsAvailable.value = hlsUrl != null
-        val hlsStreamingEnabled = FeatureFlag.isEnabled(Feature.HLS_STREAMING)
-        if (hlsUrl != null && (hlsStreamingEnabled || episode.downloadUrl.isNullOrBlank())) {
-            episode.overrideStreamUrl = hlsUrl
-            episode.overrideStreamContentType = MimeTypes.APPLICATION_M3U8
-        }
+        episode.overrideStream = null
+        val enclosures = alternateEnclosureManager.findForEpisode(episode.uuid)
+        _streamHlsAvailable.value = enclosures.firstHlsStreamUrl() != null
+        val stream = selectAlternateStream(
+            enclosures = enclosures,
+            hasProgressiveEnclosure = !episode.downloadUrl.isNullOrBlank(),
+        )
+        _streamVideoAvailable.value = stream != null
+        episode.overrideStream = stream
     }
 
     fun videoToggleRequiresStreamSwitch(): Boolean {
         val episode = getCurrentEpisode() ?: return false
         return episode.isDownloaded &&
-            _streamHlsAvailable.value &&
+            _streamVideoAvailable.value &&
             !videoStreamPreferred &&
-            player?.isRemote != true &&
-            FeatureFlag.isEnabled(Feature.HLS_STREAMING)
+            player?.isRemote != true
     }
 
     fun toggleVideoRendering(streamWarningConfirmed: Boolean = false) {
@@ -2157,7 +2171,7 @@ open class PlaybackManager @Inject constructor(
             }
         }
 
-        // Resolve the HLS alternate enclosure so streamUrl reflects the stream that will play.
+        // Resolve the alternate enclosure so streamUrl reflects the stream that will play.
         applyStreamOverride(episode)
 
         if (videoStreamPreferred && episode.uuid != videoStreamPreferredEpisodeUuid) {
@@ -2166,16 +2180,16 @@ open class PlaybackManager @Inject constructor(
         }
 
         val castConnected = castManager.isConnected()
-        val playingStream = !episode.isDownloaded || (videoStreamPreferred && episode.isStreamUrlHls && !castConnected)
+        val playingStream = !episode.isDownloaded || (videoStreamPreferred && episode.isStreamUrlVideo && !castConnected)
 
         flushPendingContentTypeEvents()
 
-        // Audio only forces video content to audio. Otherwise HLS starts Unknown until the tracks resolve it; non-HLS keeps its own flag.
+        // Audio only forces video content to audio; otherwise only an encoding we are actually playing starts Unknown.
         synchronized(pendingContentTypeEvents) {
             _streamVideoState.value = StreamVideoState.initialFor(
                 episode,
                 audioOnly = settings.audioOnly.value,
-                playingHlsStream = playingStream && episode.isStreamUrlHls,
+                playingVideoStream = playingStream && episode.isStreamUrlVideo,
                 isRemote = castConnected,
             )
         }
@@ -2814,18 +2828,21 @@ open class PlaybackManager @Inject constructor(
         val prefetchEnabled = FeatureFlag.isEnabled(Feature.NEXT_EPISODE_PREFETCH)
         val nextEpisode = upNextQueue.queueEpisodes.firstOrNull()
         launch {
-            // The next episode isn't run through applyStreamOverride, so resolve its HLS default here
-            // and skip prefetching a progressive file that streaming would bypass.
-            val isHlsDefault = prefetchEnabled &&
-                FeatureFlag.isEnabled(Feature.HLS_STREAMING) &&
-                (nextEpisode as? PodcastEpisode)?.let { alternateEnclosureManager.findForEpisode(it.uuid).firstHlsStreamUrl() != null } == true
+            // The next episode never goes through applyStreamOverride, so resolve here whether streaming would bypass the file.
+            val isAlternateStreamDefault = prefetchEnabled &&
+                (nextEpisode as? PodcastEpisode)?.let {
+                    selectAlternateStream(
+                        enclosures = alternateEnclosureManager.findForEpisode(it.uuid),
+                        hasProgressiveEnclosure = !it.downloadUrl.isNullOrBlank(),
+                    ) != null
+                } == true
             val request = buildPrefetchRequest(
                 isFeatureEnabled = prefetchEnabled,
                 isPlayerRemote = player?.isRemote,
                 nextEpisode = nextEpisode,
                 warnOnMeteredNetwork = settings.warnOnMeteredNetwork.value,
                 appPlatform = Util.getAppPlatform(application),
-                isHlsDefault = isHlsDefault,
+                isAlternateStreamDefault = isAlternateStreamDefault,
             ) ?: return@launch
 
             if (lastPrefetchedEpisodeUuid.getAndSet(request.episodeUuid) == request.episodeUuid) return@launch
@@ -3029,6 +3046,27 @@ open class PlaybackManager @Inject constructor(
     }
 }
 
+internal fun selectAlternateStream(
+    enclosures: List<EpisodeAlternateEnclosure>,
+    isHlsEnabled: Boolean,
+    isVideoEnclosureEnabled: Boolean,
+    hasProgressiveEnclosure: Boolean,
+): AlternateEnclosureStream? {
+    // An episode with no progressive enclosure has nothing else to play, so the flags can't gate it.
+    val hls = enclosures.firstHlsStream()?.takeIf { isHlsEnabled || !hasProgressiveEnclosure }
+    val video = enclosures.firstProgressiveVideoStream()?.takeIf { isVideoEnclosureEnabled || !hasProgressiveEnclosure }
+    // HLS adapts to bandwidth, but not when the server marked it audio and a video rendition sits beside it.
+    return if (hls != null && !hls.isAudioOnly) hls else video ?: hls
+}
+
+/** The stream playback would resolve for these enclosures, with the encoding feature flags applied. */
+internal fun selectAlternateStream(enclosures: List<EpisodeAlternateEnclosure>, hasProgressiveEnclosure: Boolean) = selectAlternateStream(
+    enclosures = enclosures,
+    isHlsEnabled = FeatureFlag.isEnabled(Feature.HLS_STREAMING),
+    isVideoEnclosureEnabled = FeatureFlag.isEnabled(Feature.VIDEO_ALTERNATE_ENCLOSURES),
+    hasProgressiveEnclosure = hasProgressiveEnclosure,
+)
+
 internal data class PrefetchRequest(
     val episodeUuid: String,
     val downloadUrl: String,
@@ -3041,7 +3079,7 @@ internal fun buildPrefetchRequest(
     nextEpisode: BaseEpisode?,
     warnOnMeteredNetwork: Boolean,
     appPlatform: AppPlatform = AppPlatform.Phone,
-    isHlsDefault: Boolean = false,
+    isAlternateStreamDefault: Boolean = false,
 ): PrefetchRequest? {
     if (!isFeatureEnabled) return null
     if (appPlatform == AppPlatform.WearOs) return null
@@ -3050,9 +3088,9 @@ internal fun buildPrefetchRequest(
     val episode = nextEpisode ?: return null
     if (episode.isDownloaded) return null
     if (episode.isDownloading) return null
-    if (episode.isStreamUrlHls) return null
-    // The next episode will stream HLS by default, so there is no progressive file worth prefetching.
-    if (isHlsDefault) return null
+    if (episode.isStreamUrlVideo) return null
+    // The next episode will stream an alternate encoding by default, so there is no progressive file worth prefetching.
+    if (isAlternateStreamDefault) return null
     val url = episode.downloadUrl ?: return null
 
     return PrefetchRequest(

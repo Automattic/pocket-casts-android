@@ -14,10 +14,12 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.MediaKind
 import com.squareup.moshi.Moshi
 import java.util.Date
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -101,6 +103,26 @@ class AlternateEnclosureDaoTest {
         assertEquals(MediaKind.Video, stored[0].mediaKind)
         assertNull(stored[1].mediaKind)
         assertEquals(MediaKind.Unknown("hologram"), stored[2].mediaKind)
+    }
+
+    @Test
+    fun observeByEpisodeUuidEmitsStoredEnclosuresInPositionOrder() = runTest {
+        episodeDao.insertBlocking(PodcastEpisode(uuid = "video-episode", publishedDate = Date()))
+
+        alternateEnclosureDao.replaceForEpisode(
+            "video-episode",
+            listOf(
+                enclosure(position = 1, type = "video/mp4", uri = "https://example.com/file.mp4", mediaKind = MediaKind.Video)
+                    .copy(episodeUuid = "video-episode"),
+                enclosure(position = 0, type = "APPLICATION/X-MPEGURL", uri = "https://example.com/master.m3u8")
+                    .copy(episodeUuid = "video-episode"),
+            ),
+        )
+
+        val observed = alternateEnclosureDao.observeByEpisodeUuid("video-episode").first()
+        assertEquals(listOf(0, 1), observed.map { it.position })
+        assertEquals(MediaKind.Video, observed[1].mediaKind)
+        assertTrue(alternateEnclosureDao.observeByEpisodeUuid("unknown-episode").first().isEmpty())
     }
 
     private fun enclosure(position: Int, type: String, uri: String, mediaKind: MediaKind? = null) = EpisodeAlternateEnclosure(

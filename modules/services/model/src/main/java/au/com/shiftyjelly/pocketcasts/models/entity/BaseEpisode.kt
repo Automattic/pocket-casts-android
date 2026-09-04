@@ -30,6 +30,10 @@ sealed interface BaseEpisode {
             return type != null && type.lowercase() in HLS_MIME_TYPES
         }
 
+        fun isVideoMimeType(type: String?): Boolean {
+            return type?.startsWith("video/", ignoreCase = true) == true
+        }
+
         /**
          * Used to reduce the changes sent out by the media session.
          * Returns true if the objects are the same.
@@ -126,45 +130,59 @@ sealed interface BaseEpisode {
         get() = autoDownloadStatus == AUTO_DOWNLOAD_STATUS_IGNORE
 
     val canQueueForAutoDownload
-        get() = !isFinished && !isArchived && !isAutoDownloadDisabled && !isHlsOnly
+        get() = !isFinished && !isArchived && !isAutoDownloadDisabled && !isStreamOnly
 
     val isInProgress: Boolean
         get() = EpisodePlayingStatus.IN_PROGRESS == playingStatus
 
     val isVideo: Boolean
-        get() = fileType?.startsWith("video/") ?: false
+        get() = isVideoMimeType(fileType)
 
     /** The enclosure itself is HLS, so there is no progressive file to download. */
     val isHlsOnly: Boolean
         get() = isHlsUrl(downloadUrl) || isHlsMimeType(fileType)
 
-    /** A runtime-only resolved stream (e.g. the HLS alternate enclosure); overrides [streamUrl] when set. */
-    var overrideStreamUrl: String?
+    /** No progressive file to download. A blank [downloadUrl] alone will not do: the download worker refetches one. */
+    val isStreamOnly: Boolean
+        get() = isHlsOnly || (isVideo && downloadUrl.isNullOrBlank())
 
-    /** The content type of [overrideStreamUrl], used to decide HLS/video handling. */
-    var overrideStreamContentType: String?
+    /** A runtime-only resolved alternate encoding (HLS or progressive video); overrides [streamUrl] when set. */
+    var overrideStream: AlternateEnclosureStream?
 
     /**
      * The URL to use when streaming. Downloaded playback uses [downloadedFilePath] instead. Falls back
-     * to the progressive [downloadUrl] unless a stream has been resolved into [overrideStreamUrl].
+     * to the progressive [downloadUrl] unless a stream has been resolved into [overrideStream].
      */
     val streamUrl: String?
-        get() = overrideStreamUrl ?: downloadUrl
+        get() = overrideStream?.url ?: downloadUrl
+
+    /** The content type of [streamUrl]. A resolved encoding's own type wins even when it is unknown. */
+    val streamContentType: String?
+        get() {
+            val stream = overrideStream ?: return fileType
+            return stream.contentType
+        }
 
     /** Whether the URL that streaming will actually use is HLS. */
     val isStreamUrlHls: Boolean
         get() {
-            val url = streamUrl ?: return false
-            if (overrideStreamUrl != null) {
-                return isHlsMimeType(overrideStreamContentType) || isHlsUrl(url)
-            }
-            return isHlsUrl(url) || (url == downloadUrl && isHlsMimeType(fileType))
+            overrideStream?.let { return it.isHls }
+            val url = downloadUrl ?: return false
+            return isHlsUrl(url) || isHlsMimeType(fileType)
         }
+
+    /** Whether streaming will use an alternate encoding that carries video the progressive enclosure may not. */
+    val isStreamUrlVideo: Boolean
+        get() = isStreamUrlHls || overrideStream?.isVideo == true
+
+    /** The player caches by episode uuid, so an alternate encoding must not share that entry with the progressive file. */
+    val usesSharedPlayerCache: Boolean
+        get() = !isDownloaded && !isDownloading && !isStreamUrlVideo
 
     val isAudio: Boolean
         get() = !isVideo
 
-    fun showsVideoIcon(hasHlsAlternateEnclosure: Boolean): Boolean = isVideo || isHlsOnly || hasHlsAlternateEnclosure
+    fun showsVideoIcon(hasVideoAlternateEnclosure: Boolean): Boolean = isVideo || isHlsOnly || hasVideoAlternateEnclosure
 
     val podcastOrSubstituteUuid: String
         get() = if (this is PodcastEpisode) this.podcastUuid else Podcast.userPodcast.uuid
@@ -207,7 +225,7 @@ sealed interface BaseEpisode {
             fileType.equals("audio/x-ms-wma", ignoreCase = true) -> return ".wma"
             fileType.equals(MimeTypes.APPLICATION_M3U8, ignoreCase = true) -> return ".m3u8"
             fileType.equals("application/vnd.apple.mpegurl", ignoreCase = true) -> return ".m3u8"
-            else -> return if (fileType.startsWith("video/")) ".mp4" else ".mp3"
+            else -> return if (isVideoMimeType(fileType)) ".mp4" else ".mp3"
         }
     }
 
