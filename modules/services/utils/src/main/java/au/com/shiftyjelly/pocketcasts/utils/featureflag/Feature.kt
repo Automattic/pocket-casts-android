@@ -374,7 +374,7 @@ enum class Feature(
         title = "Networks in Discover, search and the podcast page",
         defaultValue = isDebugOrPrototypeBuild,
         tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = true,
+        hasFirebaseRemoteFlag = false,
         hasDevToggle = true,
         addedOn = LocalDate.parse("2026-09-04"),
     ),
