@@ -76,6 +76,7 @@ class SimplePlayer(
     private val mainHandler = Handler(Looper.getMainLooper())
 
     private var hasVideoSurface = false
+    private var videoTrackDisableRunnable: Runnable? = null
 
     private var pendingSurface: SurfaceView? = null
 
@@ -140,6 +141,7 @@ class SimplePlayer(
         player = null
         prepared = false
         pendingSurface = null
+        cancelPendingVideoTrackDisable()
 
         videoChangedListener?.videoNeedsReset()
     }
@@ -348,13 +350,35 @@ class SimplePlayer(
             .build()
     }
 
+    private fun scheduleVideoTrackDisable() {
+        cancelPendingVideoTrackDisable()
+        val runnable = Runnable {
+            videoTrackDisableRunnable = null
+            if (!hasVideoSurface) {
+                applyVideoTrackSelection()
+            }
+        }
+        videoTrackDisableRunnable = runnable
+        mainHandler.postDelayed(runnable, VIDEO_TRACK_DISABLE_GRACE_MS)
+    }
+
+    private fun cancelPendingVideoTrackDisable() {
+        videoTrackDisableRunnable?.let(mainHandler::removeCallbacks)
+        videoTrackDisableRunnable = null
+    }
+
     private fun addVideoListener(player: ExoPlayer) {
         player.addListener(object : Player.Listener {
             override fun onSurfaceSizeChanged(width: Int, height: Int) {
                 val attached = width != 0 || height != 0
                 if (attached != hasVideoSurface) {
                     hasVideoSurface = attached
-                    applyVideoTrackSelection()
+                    if (attached) {
+                        cancelPendingVideoTrackDisable()
+                        applyVideoTrackSelection()
+                    } else {
+                        scheduleVideoTrackDisable()
+                    }
                 }
             }
 
@@ -437,6 +461,8 @@ class SimplePlayer(
         player.playbackParameters = PlaybackParameters(playbackEffects.playbackSpeed.toFloat(), 1f)
     }
 }
+
+private const val VIDEO_TRACK_DISABLE_GRACE_MS = 10_000L
 
 internal fun shouldDisableVideoTrack(audioOnly: Boolean, hasVideoSurface: Boolean, isHlsStream: Boolean): Boolean {
     return audioOnly || (!hasVideoSurface && !isHlsStream)
