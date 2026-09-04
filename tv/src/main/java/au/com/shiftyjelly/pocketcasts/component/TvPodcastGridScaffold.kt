@@ -49,6 +49,7 @@ internal fun TvPodcastGridScaffold(
             )
         }
         val gridState = rememberLazyGridState()
+        ScrollToTopEffect { gridState.scrollToItem(0) }
         var lastFocusedKey by rememberSaveable { mutableStateOf<String?>(null) }
         val focusRequesters = remember(itemKeys.size) { List(itemKeys.size) { FocusRequester() } }
         val gridFocusRequester = remember { FocusRequester() }
