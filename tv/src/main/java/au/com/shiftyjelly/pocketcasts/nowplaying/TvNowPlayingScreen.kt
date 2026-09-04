@@ -288,12 +288,20 @@ private fun TvNowPlayingContent(
                 }
             }
         }
+        if (state.isVideo) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .graphicsLayer { alpha = chromeAlpha }
+                    .background(VideoControlsScrimBrush),
+            )
+        }
         Column(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
                 .graphicsLayer { alpha = chromeAlpha }
-                .background(ChromeScrimBrush)
+                .then(if (state.isVideo) Modifier else Modifier.background(ChromeScrimBrush))
                 .padding(horizontal = ChromeHorizontalInset)
                 .padding(top = ChromeScrimTopInset, bottom = 18.dp),
         ) {
@@ -528,6 +536,12 @@ private val ChromeScrimTopInset = 36.dp
 private val ChromeScrimBrush = Brush.verticalGradient(
     0f to Color.Transparent,
     1f to Color.Black.copy(alpha = 0.8f),
+)
+
+private val VideoControlsScrimBrush = Brush.verticalGradient(
+    0f to Color.Transparent,
+    0.5f to Color.Black.copy(alpha = 0.5f),
+    1f to Color.Black,
 )
 
 private val chromeRevealConsumedKeys = setOf(
