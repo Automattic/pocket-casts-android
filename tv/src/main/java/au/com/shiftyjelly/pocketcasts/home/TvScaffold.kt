@@ -23,6 +23,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -30,10 +32,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.component.LocalFocusTvTopBar
 import au.com.shiftyjelly.pocketcasts.component.LocalOpenNowPlaying
 import au.com.shiftyjelly.pocketcasts.component.LocalScrollToTop
+import au.com.shiftyjelly.pocketcasts.component.LocalTopBarScrollState
 import au.com.shiftyjelly.pocketcasts.component.LocalTvTopBarVisibility
 import au.com.shiftyjelly.pocketcasts.component.LocalUseEpisodeArtwork
 import au.com.shiftyjelly.pocketcasts.component.TvDetailOverlay
 import au.com.shiftyjelly.pocketcasts.component.TvScrollToTop
+import au.com.shiftyjelly.pocketcasts.component.TvTopBarScrollState
 import au.com.shiftyjelly.pocketcasts.component.TvTopBarVisibility
 import au.com.shiftyjelly.pocketcasts.component.tvFocusInactiveWhen
 import au.com.shiftyjelly.pocketcasts.history.TvListeningHistoryScreen
@@ -63,6 +67,7 @@ fun TvScaffold(
     var isSettingsModalVisible by rememberSaveable { mutableStateOf(false) }
     val topBarVisibility = remember { TvTopBarVisibility() }
     val scrollToTop = remember { TvScrollToTop() }
+    val topBarScroll = remember { TvTopBarScrollState() }
     var didFocusTopBar by rememberSaveable { mutableStateOf(false) }
     var isNowPlayingOpenRequested by remember { mutableStateOf(false) }
     var isTopBarFocusRequested by remember { mutableStateOf(false) }
@@ -93,6 +98,7 @@ fun TvScaffold(
         LocalOpenNowPlaying provides openNowPlaying,
         LocalFocusTvTopBar provides focusTopBar,
         LocalScrollToTop provides scrollToTop,
+        LocalTopBarScrollState provides topBarScroll,
         LocalUseEpisodeArtwork provides uiState.useEpisodeArtwork,
     ) {
         Box(modifier = modifier.fillMaxSize()) {
@@ -115,9 +121,6 @@ fun TvScaffold(
                 modifier = Modifier.tvFocusInactiveWhen(isStarredVisible || isListeningHistoryVisible),
             ) { tab ->
                 val navigateToHome = { viewModel.selectTab(TvTab.Home) }
-                // Tabs without a detail screen sit below the bar; the detail-bearing tabs pad their own
-                // content so their overlays can fill the full height.
-                val belowTopBar = Modifier.fillMaxSize().padding(top = TvTopBarHeight)
                 when (tab) {
                     is TvTab.Home -> TvHomeScreen(
                         onNavigateToSearch = { viewModel.selectTab(TvTab.Search) },
@@ -130,9 +133,7 @@ fun TvScaffold(
 
                     is TvTab.Playlists -> TvPlaylistsScreen()
 
-                    is TvTab.UpNext -> Box(modifier = belowTopBar) {
-                        TvUpNextScreen(onNavigateToHome = navigateToHome)
-                    }
+                    is TvTab.UpNext -> TvUpNextScreen(onNavigateToHome = navigateToHome)
 
                     is TvTab.NowPlaying -> TvNowPlayingScreen(
                         isOpenRequested = isNowPlayingOpenRequested,
@@ -229,6 +230,11 @@ private fun TvScaffoldContent(
             .background(TvScreenBackgroundBrush),
     ) {
         val currentTab = tabs.getOrElse(selectedTabIndex) { tabs.first() }
+        val topBarScroll = LocalTopBarScrollState.current
+        val topBarHeightPx = with(LocalDensity.current) { TvTopBarHeight.toPx() }
+        LaunchedEffect(currentTab) {
+            topBarScroll.set(0f)
+        }
         // Tab content fills the whole area; top-level content reserves TvTopBarHeight for the bar,
         // while detail overlays fill the full height under the hidden bar.
         Crossfade(
@@ -259,7 +265,11 @@ private fun TvScaffoldContent(
                 onSelectedTabFocus = onSelectedTabFocus,
                 focusSelectedTab = focusSelectedTab,
                 onConsumeFocusRequest = onConsumeFocusRequest,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .graphicsLayer {
+                        translationY = -topBarScroll.offsetPx.coerceAtMost(topBarHeightPx)
+                    },
             )
         }
     }

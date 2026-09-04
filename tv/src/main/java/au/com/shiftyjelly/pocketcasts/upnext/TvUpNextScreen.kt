@@ -36,6 +36,7 @@ import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.component.LocalOpenNowPlaying
 import au.com.shiftyjelly.pocketcasts.component.ScrollToTopEffect
+import au.com.shiftyjelly.pocketcasts.component.TopBarScrollReporter
 import au.com.shiftyjelly.pocketcasts.component.TvEmptyState
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeActionContext
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeActionsModal
@@ -48,6 +49,7 @@ import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.podcasts.TvPodcastDetailsScreen
 import au.com.shiftyjelly.pocketcasts.theme.TvTheme
+import au.com.shiftyjelly.pocketcasts.theme.TvTopBarHeight
 import au.com.shiftyjelly.pocketcasts.theme.tvColors
 import au.com.shiftyjelly.pocketcasts.theme.tvTypography
 import java.util.Date
@@ -105,13 +107,20 @@ private fun TvUpNextContent(
     Box(modifier = modifier.fillMaxSize()) {
         when (uiState) {
             is TvUpNextUiState.Loading -> {
-                LoadingView(color = MaterialTheme.tvColors.textPrimary, modifier = Modifier.fillMaxSize())
+                LoadingView(
+                    color = MaterialTheme.tvColors.textPrimary,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = TvTopBarHeight),
+                )
             }
 
             is TvUpNextUiState.Empty -> {
                 UpNextEmpty(
                     onNavigateToHome = onNavigateToHome,
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = TvTopBarHeight),
                 )
             }
 
@@ -137,39 +146,40 @@ private fun UpNextList(
     val dateFormatter = remember(context) { RelativeDateFormatter(context) }
     val listState = rememberLazyListState()
     ScrollToTopEffect { listState.scrollToItem(0) }
+    TopBarScrollReporter(listState)
     val focus = rememberTvEpisodeListFocus(episodes, listState, requestInitialFocus = false)
     var actionsEpisode by remember { mutableStateOf<PodcastEpisode?>(null) }
     var detailsEpisode by remember { mutableStateOf<PodcastEpisode?>(null) }
 
-    Column(
+    LazyColumn(
+        state = listState,
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+        contentPadding = PaddingValues(bottom = 32.dp),
         modifier = modifier
             .fillMaxHeight()
             .fillMaxWidth(ROW_WIDTH_FRACTION)
-            .padding(start = 42.dp, top = 40.dp),
+            .padding(start = 42.dp),
     ) {
-        UpNextHeader(episodes = episodes)
-        Spacer(Modifier.height(16.dp))
-        LazyColumn(
-            state = listState,
-            verticalArrangement = Arrangement.spacedBy(6.dp),
-            contentPadding = PaddingValues(bottom = 32.dp),
-            modifier = Modifier.weight(1f),
-        ) {
-            itemsIndexed(
-                items = episodes,
-                key = { _, episode -> episode.uuid },
-            ) { index, episode ->
-                TvEpisodeListItem(
-                    episode = episode,
-                    dateFormatter = dateFormatter,
-                    onClick = { onPlayEpisode(episode) },
-                    onOpenActions = {
-                        focus.watchForRemoval(episodes, index)
-                        actionsEpisode = episode
-                    },
-                    episodeFocusRequester = focus.requesterFor(episode.uuid),
-                )
+        item { Spacer(Modifier.height(TvTopBarHeight)) }
+        item {
+            Column(modifier = Modifier.padding(top = 40.dp, bottom = 16.dp)) {
+                UpNextHeader(episodes = episodes)
             }
+        }
+        itemsIndexed(
+            items = episodes,
+            key = { _, episode -> episode.uuid },
+        ) { index, episode ->
+            TvEpisodeListItem(
+                episode = episode,
+                dateFormatter = dateFormatter,
+                onClick = { onPlayEpisode(episode) },
+                onOpenActions = {
+                    focus.watchForRemoval(episodes, index)
+                    actionsEpisode = episode
+                },
+                episodeFocusRequester = focus.requesterFor(episode.uuid),
+            )
         }
     }
 

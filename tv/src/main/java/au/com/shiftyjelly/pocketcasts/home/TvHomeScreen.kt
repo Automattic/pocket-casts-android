@@ -35,6 +35,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.component.LocalOpenNowPlaying
 import au.com.shiftyjelly.pocketcasts.component.LocalTvToastHostState
 import au.com.shiftyjelly.pocketcasts.component.ScrollToTopEffect
+import au.com.shiftyjelly.pocketcasts.component.TopBarScrollReporter
 import au.com.shiftyjelly.pocketcasts.component.TvDetailOverlay
 import au.com.shiftyjelly.pocketcasts.component.tvFocusInactiveWhen
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
@@ -119,7 +120,6 @@ fun TvHomeScreen(
             isPodcastPlaying = viewModel::isPlaying,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = TvTopBarHeight)
                 .tvFocusInactiveWhen(category != null || podcastUuid != null),
             restoreFocusTrigger = restoreFocusTrigger,
         )
@@ -171,9 +171,12 @@ private fun TvHomeContent(
     restoreFocusTrigger: Int = 0,
 ) {
     when (uiState) {
-        is TvHomeUiState.Loading -> LoadingView(color = MaterialTheme.tvColors.textPrimary, modifier = modifier)
+        is TvHomeUiState.Loading -> LoadingView(
+            color = MaterialTheme.tvColors.textPrimary,
+            modifier = modifier.padding(top = TvTopBarHeight),
+        )
 
-        is TvHomeUiState.Error -> TvHomeError(onRetry = onRetry, modifier = modifier)
+        is TvHomeUiState.Error -> TvHomeError(onRetry = onRetry, modifier = modifier.padding(top = TvTopBarHeight))
 
         is TvHomeUiState.Ready -> if (uiState.rows.isEmpty()) {
             TvHomeError(onRetry = onRetry, modifier = modifier)
@@ -240,6 +243,7 @@ private fun TvHomeRows(
     val rowFocusRequesters = remember(rows.size) { List(rows.size) { FocusRequester() } }
     val listState = rememberLazyListState()
     ScrollToTopEffect { listState.scrollToItem(0) }
+    TopBarScrollReporter(listState)
 
     var isInitialComposition by remember { mutableStateOf(true) }
     LaunchedEffect(restoreFocusTrigger) {
@@ -256,7 +260,7 @@ private fun TvHomeRows(
         modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(40.dp),
     ) {
-        item { Spacer(modifier = Modifier.height(6.dp)) }
+        item { Spacer(modifier = Modifier.height(TvTopBarHeight)) }
 
         rows.forEachIndexed { rowIndex, row ->
             val rowModifier = Modifier.onFocusChanged { focusState ->
