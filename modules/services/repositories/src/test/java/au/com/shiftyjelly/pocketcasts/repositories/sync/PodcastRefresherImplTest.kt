@@ -74,6 +74,7 @@ class PodcastRefresherImplTest {
             fundingUrl = podcast.fundingUrl,
             explicit = podcast.explicit,
             webFeed = podcast.webFeed,
+            networkListId = podcast.networkListId,
         )
     }
 
@@ -96,6 +97,7 @@ class PodcastRefresherImplTest {
             fundingUrl = existingPodcast.fundingUrl,
             explicit = existingPodcast.explicit,
             webFeed = existingPodcast.webFeed,
+            networkListId = existingPodcast.networkListId,
         )
     }
 
@@ -118,6 +120,7 @@ class PodcastRefresherImplTest {
             fundingUrl = existingPodcast.fundingUrl,
             explicit = existingPodcast.explicit,
             webFeed = existingPodcast.webFeed,
+            networkListId = existingPodcast.networkListId,
         )
     }
 
@@ -140,6 +143,7 @@ class PodcastRefresherImplTest {
             fundingUrl = existingPodcast.fundingUrl,
             explicit = existingPodcast.explicit,
             webFeed = existingPodcast.webFeed,
+            networkListId = existingPodcast.networkListId,
         )
     }
 
@@ -162,6 +166,7 @@ class PodcastRefresherImplTest {
             fundingUrl = existingPodcast.fundingUrl,
             explicit = existingPodcast.explicit,
             webFeed = existingPodcast.webFeed,
+            networkListId = existingPodcast.networkListId,
         )
     }
 
@@ -186,6 +191,7 @@ class PodcastRefresherImplTest {
             fundingUrl = existingPodcast.fundingUrl,
             explicit = existingPodcast.explicit,
             webFeed = existingPodcast.webFeed,
+            networkListId = existingPodcast.networkListId,
         )
     }
 
@@ -208,6 +214,7 @@ class PodcastRefresherImplTest {
             fundingUrl = existingPodcast.fundingUrl,
             explicit = existingPodcast.explicit,
             webFeed = existingPodcast.webFeed,
+            networkListId = existingPodcast.networkListId,
         )
     }
 
@@ -230,6 +237,7 @@ class PodcastRefresherImplTest {
             fundingUrl = existingPodcast.fundingUrl,
             explicit = existingPodcast.explicit,
             webFeed = existingPodcast.webFeed,
+            networkListId = existingPodcast.networkListId,
         )
     }
 
@@ -252,6 +260,7 @@ class PodcastRefresherImplTest {
             fundingUrl = "https://new.com",
             explicit = existingPodcast.explicit,
             webFeed = existingPodcast.webFeed,
+            networkListId = existingPodcast.networkListId,
         )
     }
 
@@ -274,6 +283,7 @@ class PodcastRefresherImplTest {
             fundingUrl = existingPodcast.fundingUrl,
             explicit = true,
             webFeed = existingPodcast.webFeed,
+            networkListId = existingPodcast.networkListId,
         )
     }
 
@@ -296,6 +306,7 @@ class PodcastRefresherImplTest {
             fundingUrl = existingPodcast.fundingUrl,
             explicit = true,
             webFeed = existingPodcast.webFeed,
+            networkListId = existingPodcast.networkListId,
         )
     }
 
@@ -318,6 +329,7 @@ class PodcastRefresherImplTest {
             fundingUrl = existingPodcast.fundingUrl,
             explicit = existingPodcast.explicit,
             webFeed = true,
+            networkListId = existingPodcast.networkListId,
         )
     }
 
@@ -350,6 +362,7 @@ class PodcastRefresherImplTest {
             fundingUrl = existingPodcast.fundingUrl,
             explicit = existingPodcast.explicit,
             webFeed = existingPodcast.webFeed,
+            networkListId = existingPodcast.networkListId,
         )
     }
 
@@ -376,6 +389,53 @@ class PodcastRefresherImplTest {
             fundingUrl = existingPodcast.fundingUrl,
             explicit = existingPodcast.explicit,
             webFeed = existingPodcast.webFeed,
+            networkListId = existingPodcast.networkListId,
+        )
+    }
+
+    @Test
+    fun `updatePodcastIfRequired updates when the network list id changes`() = runTest {
+        val existingPodcast = createPodcast(networkListId = null)
+        val updatedPodcast = existingPodcast.copy(networkListId = "cdb75bc0-9f5a-4217-b1ca-f573821a7913")
+
+        podcastRefresher.updatePodcastIfRequired(existingPodcast, updatedPodcast)
+
+        verify(podcastDao).updateRefresh(
+            uuid = existingPodcast.uuid,
+            title = existingPodcast.title,
+            author = existingPodcast.author,
+            podcastCategory = existingPodcast.podcastCategory,
+            podcastDescription = existingPodcast.podcastDescription,
+            estimatedNextEpisode = existingPodcast.estimatedNextEpisode,
+            episodeFrequency = existingPodcast.episodeFrequency,
+            refreshAvailable = existingPodcast.refreshAvailable,
+            fundingUrl = existingPodcast.fundingUrl,
+            explicit = existingPodcast.explicit,
+            webFeed = existingPodcast.webFeed,
+            networkListId = "cdb75bc0-9f5a-4217-b1ca-f573821a7913",
+        )
+    }
+
+    @Test
+    fun `updatePodcastIfRequired keeps the network list id when another field changes`() = runTest {
+        val existingPodcast = createPodcast(title = "Old Title", networkListId = "cdb75bc0-9f5a-4217-b1ca-f573821a7913")
+        val updatedPodcast = existingPodcast.copy(title = "New Title")
+
+        podcastRefresher.updatePodcastIfRequired(existingPodcast, updatedPodcast)
+
+        verify(podcastDao).updateRefresh(
+            uuid = existingPodcast.uuid,
+            title = "New Title",
+            author = existingPodcast.author,
+            podcastCategory = existingPodcast.podcastCategory,
+            podcastDescription = existingPodcast.podcastDescription,
+            estimatedNextEpisode = existingPodcast.estimatedNextEpisode,
+            episodeFrequency = existingPodcast.episodeFrequency,
+            refreshAvailable = existingPodcast.refreshAvailable,
+            fundingUrl = existingPodcast.fundingUrl,
+            explicit = existingPodcast.explicit,
+            webFeed = existingPodcast.webFeed,
+            networkListId = "cdb75bc0-9f5a-4217-b1ca-f573821a7913",
         )
     }
 
@@ -391,6 +451,7 @@ class PodcastRefresherImplTest {
         fundingUrl: String? = null,
         explicit: Boolean? = null,
         webFeed: Boolean = false,
+        networkListId: String? = null,
     ) = Podcast(
         uuid = uuid,
         title = title,
@@ -403,5 +464,6 @@ class PodcastRefresherImplTest {
         fundingUrl = fundingUrl,
         explicit = explicit,
         webFeed = webFeed,
+        networkListId = networkListId,
     )
 }

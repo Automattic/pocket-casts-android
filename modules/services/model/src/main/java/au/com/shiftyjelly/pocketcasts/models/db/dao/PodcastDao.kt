@@ -292,8 +292,8 @@ abstract class PodcastDao {
     @Update
     abstract suspend fun updateSuspend(podcast: Podcast)
 
-    @Query("UPDATE podcasts SET title = :title, author = :author, podcast_category = :podcastCategory, podcast_description = :podcastDescription, estimated_next_episode = :estimatedNextEpisode, episode_frequency = :episodeFrequency, refresh_available = :refreshAvailable, funding_url = :fundingUrl, explicit = :explicit, web_feed = :webFeed WHERE uuid = :uuid")
-    abstract suspend fun updateRefresh(uuid: String, title: String, author: String, podcastCategory: String, podcastDescription: String, estimatedNextEpisode: Date?, episodeFrequency: String?, refreshAvailable: Boolean, fundingUrl: String?, explicit: Boolean?, webFeed: Boolean)
+    @Query("UPDATE podcasts SET title = :title, author = :author, podcast_category = :podcastCategory, podcast_description = :podcastDescription, estimated_next_episode = :estimatedNextEpisode, episode_frequency = :episodeFrequency, refresh_available = :refreshAvailable, funding_url = :fundingUrl, explicit = :explicit, web_feed = :webFeed, network_list_id = :networkListId WHERE uuid = :uuid")
+    abstract suspend fun updateRefresh(uuid: String, title: String, author: String, podcastCategory: String, podcastDescription: String, estimatedNextEpisode: Date?, episodeFrequency: String?, refreshAvailable: Boolean, fundingUrl: String?, explicit: Boolean?, webFeed: Boolean, networkListId: String?)
 
     @Query("DELETE FROM podcasts WHERE uuid = :uuid")
     abstract fun deleteByUuidBlocking(uuid: String)

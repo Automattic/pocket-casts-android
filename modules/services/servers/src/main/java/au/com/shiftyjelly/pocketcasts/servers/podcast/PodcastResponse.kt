@@ -53,6 +53,7 @@ data class PodcastInfo(
     @Json(name = "slug") val slug: String?,
     @Json(name = "explicit") val explicit: Boolean?,
     @Json(name = "web_feed") val webFeed: Boolean?,
+    @Json(name = "network_list") val networkList: NetworkList?,
 ) {
 
     fun toPodcast(): Podcast {
@@ -73,9 +74,15 @@ data class PodcastInfo(
         podcast.slug = slug.orEmpty()
         podcast.explicit = explicit
         podcast.webFeed = webFeed ?: false
+        podcast.networkListId = networkList?.listId?.takeIf(String::isNotBlank)
         return podcast
     }
 }
+
+@JsonClass(generateAdapter = true)
+data class NetworkList(
+    @Json(name = "list_id") val listId: String?,
+)
 
 @JsonClass(generateAdapter = true)
 data class Funding(
