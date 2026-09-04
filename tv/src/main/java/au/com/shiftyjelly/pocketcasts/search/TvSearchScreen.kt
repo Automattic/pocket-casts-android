@@ -99,6 +99,8 @@ private const val SEARCH_ROW_LIMIT = 10
 private const val FOLDER_COVER_COUNT = 4
 private val SearchEpisodeCardWidth = 270.dp
 private const val EPISODE_GRID_COLUMNS = 2
+private val ResultsTopPadding = 20.dp
+private val TopResultsRowTopPadding = 2.dp
 
 private data class SearchOpenedFolder(val uuid: String, val name: String)
 
@@ -666,7 +668,7 @@ private fun TvSearchTopResults(
     val podcastsFirst = !featuredFirst && !episodesFirst && !foldersFirst
 
     LazyColumn(modifier = Modifier.fillMaxSize()) {
-        item { Spacer(modifier = Modifier.height(6.dp)) }
+        item { Spacer(modifier = Modifier.height(TopResultsRowTopPadding)) }
         if (featured.isNotEmpty()) {
             item {
                 TvSearchEpisodeCarousel(
@@ -783,7 +785,7 @@ private fun TvSearchEpisodeGrid(
         columns = GridCells.Fixed(EPISODE_GRID_COLUMNS),
         horizontalArrangement = Arrangement.spacedBy(18.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
-        contentPadding = PaddingValues(start = 42.dp, end = 42.dp, bottom = 30.dp),
+        contentPadding = PaddingValues(start = 42.dp, top = ResultsTopPadding, end = 42.dp, bottom = 30.dp),
         modifier = Modifier
             .fillMaxSize()
             .focusRequester(gridFocusRequester)
