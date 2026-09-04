@@ -35,7 +35,6 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.component.LocalOpenNowPlaying
-import au.com.shiftyjelly.pocketcasts.component.ScrollToTopEffect
 import au.com.shiftyjelly.pocketcasts.component.TvEmptyState
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeActionContext
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeActionsModal
@@ -130,7 +129,6 @@ private fun StarredList(
 ) {
     val context = LocalContext.current
     val dateFormatter = remember(context) { RelativeDateFormatter(context) }
-    ScrollToTopEffect { listState.scrollToItem(0) }
     val focus = rememberTvEpisodeListFocus(episodes, listState, requestInitialFocus = true)
     var actionsEpisode by remember { mutableStateOf<PodcastEpisode?>(null) }
     var detailsEpisode by remember { mutableStateOf<PodcastEpisode?>(null) }

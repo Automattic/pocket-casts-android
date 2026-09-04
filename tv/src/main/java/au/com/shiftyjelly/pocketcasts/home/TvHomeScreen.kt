@@ -180,7 +180,7 @@ private fun TvHomeContent(
         is TvHomeUiState.Error -> TvHomeError(onRetry = onRetry, modifier = modifier.padding(top = TvTopBarHeight))
 
         is TvHomeUiState.Ready -> if (uiState.rows.isEmpty()) {
-            TvHomeError(onRetry = onRetry, modifier = modifier)
+            TvHomeError(onRetry = onRetry, modifier = modifier.padding(top = TvTopBarHeight))
         } else {
             TvHomeRows(
                 rows = uiState.rows,

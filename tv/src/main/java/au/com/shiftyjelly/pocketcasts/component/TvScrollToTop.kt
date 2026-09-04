@@ -24,9 +24,7 @@ class TvScrollToTop {
     }
 }
 
-val LocalScrollToTop = staticCompositionLocalOf<TvScrollToTop> {
-    error("TvScrollToTop was not provided")
-}
+val LocalScrollToTop = staticCompositionLocalOf { TvScrollToTop() }
 
 /** Runs [onScrollToTop] whenever a Back-triggered scroll-to-top request arrives after composition. */
 @Composable
