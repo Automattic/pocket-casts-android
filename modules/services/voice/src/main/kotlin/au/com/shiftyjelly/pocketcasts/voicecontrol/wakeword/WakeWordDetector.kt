@@ -22,4 +22,6 @@ data class WakeWordResult(
     val completionSample: Int = 0,
     /** True when scoring failed (native error, unready detector, unsupported rate). */
     val error: Boolean = false,
+    /** Detector threshold used for [detected], when known. */
+    val threshold: Float = Float.NaN,
 )

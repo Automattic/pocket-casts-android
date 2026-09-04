@@ -267,9 +267,6 @@ void NativeVadProcessor::runLoop() {
                 mPendingEvent = 1; // speech started
                 mEventReady = true;
                 mEventCv.notify_one();
-
-                LOGI("VAD: speech started (pre-speech context=%d samples)",
-                    mSpeechOnsetSample);
             }
 
             // Accumulate current frame.
@@ -312,7 +309,6 @@ void NativeVadProcessor::runLoop() {
 
                 if (mDrainRemaining <= 0) {
                     // Drain complete — finalize the utterance.
-                    LOGI("VAD: speech ended (%d frames total)", mSpeechFrames);
 
                     {
                         std::lock_guard<std::mutex> lock(mSpeechMutex);

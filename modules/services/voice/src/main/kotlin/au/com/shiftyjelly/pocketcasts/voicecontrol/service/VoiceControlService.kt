@@ -323,7 +323,6 @@ class VoiceControlService : Service() {
         lastIntentType = intentType
         lastCommandTime = now
 
-        Timber.i("[VoicePipeline] executing %s", intent)
         serviceScope.launch(Dispatchers.IO) {
             val response = voicePlaybackIntentExecutor.execute(intent)
             audioFeedbackRenderer.render(response)
