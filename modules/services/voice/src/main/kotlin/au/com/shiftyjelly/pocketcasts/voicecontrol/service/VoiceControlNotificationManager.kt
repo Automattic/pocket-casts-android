@@ -42,7 +42,7 @@ class VoiceControlNotificationManager @Inject constructor(
             }
 
             notificationManager.createNotificationChannel(channel)
-            Timber.i("Voice control notification channel created")
+            Timber.i("[VoicePipeline] notification channel created")
         }
     }
 

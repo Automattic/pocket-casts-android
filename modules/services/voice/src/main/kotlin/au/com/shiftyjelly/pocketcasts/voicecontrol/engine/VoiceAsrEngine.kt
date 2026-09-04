@@ -100,21 +100,21 @@ class VoiceAsrEngine @Inject constructor(
                         }
 
                         is VoiceSegmenterResult.Rejected ->
-                            Timber.w("VAD: rejected - %s", result.reason)
+                            Timber.w("[VoicePipeline] vad rejected - %s", result.reason)
 
                         VoiceSegmenterResult.Silence -> { /* no speech */ }
                     }
                 }
             } catch (e: Exception) {
-                Timber.e(e, "Voice audio processing failed")
+                Timber.e(e, "[VoicePipeline] audio processing failed")
             }
         }
-        Timber.i("VoiceAsrEngine started (backend=%s, mode=%s)", backend::class.simpleName, listeningMode)
+        Timber.i("[VoicePipeline] engine started backend=%s mode=%s", backend::class.simpleName, listeningMode)
     }
 
     fun updateListeningMode(mode: ListeningMode) {
         currentMode = mode
-        Timber.i("VoiceAsrEngine mode updated to %s", mode)
+        Timber.i("[VoicePipeline] mode updated to %s", mode)
     }
 
     /**
@@ -156,7 +156,7 @@ class VoiceAsrEngine @Inject constructor(
                 speechOnsetSample = segment.speechOnsetSample,
             )
         }.getOrElse { e ->
-            Timber.w(e, "Wake word detection failed, dropping segment")
+            Timber.w(e, "[VoicePipeline] wake detection failed, dropping segment")
             return null
         }
 
@@ -330,7 +330,7 @@ class VoiceAsrEngine @Inject constructor(
         backend?.release()
         backend = null
         closeBluetoothSco()
-        Timber.i("VoiceAsrEngine stopped")
+        Timber.i("[VoicePipeline] engine stopped")
     }
 
     @Suppress("DEPRECATION") // startBluetoothSco + SCO broadcast deprecated in API 33; no replacement
@@ -343,7 +343,7 @@ class VoiceAsrEngine @Inject constructor(
                         AudioManager.EXTRA_SCO_AUDIO_STATE,
                         AudioManager.SCO_AUDIO_STATE_ERROR,
                     )
-                    Timber.i("SCO state: %d", state)
+                    Timber.i("[VoicePipeline] sco state=%d", state)
                     if (state == AudioManager.SCO_AUDIO_STATE_CONNECTED ||
                         state == AudioManager.SCO_AUDIO_STATE_DISCONNECTED
                     ) {
@@ -360,7 +360,7 @@ class VoiceAsrEngine @Inject constructor(
             audioManager.mode = AudioManager.MODE_NORMAL
             audioManager.startBluetoothSco()
             scoStarted = true
-            Timber.i("SCO requested, waiting for connection")
+            Timber.i("[VoicePipeline] sco requested, waiting")
 
             cont.invokeOnCancellation {
                 try {

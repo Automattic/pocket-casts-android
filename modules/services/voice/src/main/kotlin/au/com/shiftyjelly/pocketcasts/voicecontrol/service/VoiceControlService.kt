@@ -298,9 +298,9 @@ class VoiceControlService : Service() {
                 wakeWordRequired = mode == ListeningMode.WakeWord,
             )
             notificationManager.notify(notification)
-            Timber.i("Engine started in %s mode", mode)
+            Timber.i("[VoicePipeline] engine started mode=%s", mode)
         } catch (e: Exception) {
-            Timber.e(e, "Engine start failed")
+            Timber.e(e, "[VoicePipeline] engine start failed")
         }
     }
 
@@ -308,7 +308,7 @@ class VoiceControlService : Service() {
         if (!engineStarted) return
         voiceAsrEngine.get().stop()
         engineStarted = false
-        Timber.i("Engine stopped")
+        Timber.i("[VoicePipeline] engine stopped")
     }
 
     private fun handleIntent(
@@ -317,13 +317,13 @@ class VoiceControlService : Service() {
         val now = System.currentTimeMillis()
         val intentType = intent::class.simpleName ?: intent.toString()
         if (intentType == lastIntentType && (now - lastCommandTime) < COMMAND_DEBOUNCE_MS) {
-            Timber.i("Debounce: $intentType")
+            Timber.i("[VoicePipeline] debounce %s", intentType)
             return
         }
         lastIntentType = intentType
         lastCommandTime = now
 
-        Timber.i("Executing: $intent")
+        Timber.i("[VoicePipeline] executing %s", intent)
         serviceScope.launch(Dispatchers.IO) {
             val response = voicePlaybackIntentExecutor.execute(intent)
             audioFeedbackRenderer.render(response)

@@ -50,20 +50,20 @@ internal fun resolve(
     isGracePeriodActive: Boolean,
 ): ListeningMode {
     if (!gateState.allowed) {
-        Timber.d("Mode: Off (gate blocked)")
+        Timber.d("[VoicePipeline] mode Off (gate blocked)")
         return ListeningMode.Off
     }
     if (micExposure == MicExposure.NoMic) {
-        Timber.d("Mode: Off (no mic)")
+        Timber.d("[VoicePipeline] mode Off (no mic)")
         return ListeningMode.Off
     }
 
     // Grace period is the ONLY wake-word waiver
     if (isGracePeriodActive) {
-        Timber.d("Mode: Continuous (grace period)")
+        Timber.d("[VoicePipeline] mode Continuous (grace period)")
         return ListeningMode.Continuous
     }
 
-    Timber.d("Mode: WakeWord")
+    Timber.d("[VoicePipeline] mode WakeWord")
     return ListeningMode.WakeWord
 }
