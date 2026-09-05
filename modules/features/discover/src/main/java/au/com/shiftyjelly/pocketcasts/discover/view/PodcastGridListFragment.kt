@@ -157,7 +157,7 @@ open class PodcastGridListFragment :
         get() = expandedStyle is ExpandedStyle.NetworkGrid
 
     /** The entry point that opened this page. Network-specific analytics are picked up in a follow-up. */
-    val sourceView: SourceView
+    val entrySourceView: SourceView
         get() = SourceView.fromString(arguments?.getString(ARG_SOURCE_VIEW))
 
     protected val viewModel: PodcastListViewModel by viewModels()

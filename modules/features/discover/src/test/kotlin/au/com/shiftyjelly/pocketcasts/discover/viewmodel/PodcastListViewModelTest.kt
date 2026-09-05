@@ -33,6 +33,7 @@ import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 class PodcastListViewModelTest {
@@ -125,6 +126,17 @@ class PodcastListViewModelTest {
         viewModel.load(sourceUrl = RELAY_URL, listStyle = ExpandedStyle.NetworkGrid(), authenticated = false)
 
         assertTrue(viewModel.state.value is PodcastListViewState.ListLoaded)
+    }
+
+    @Test
+    fun `retrying an unusable source url does not re-run the failed load`() {
+        val viewModel = createViewModel()
+        viewModel.load(sourceUrl = null, listStyle = ExpandedStyle.NetworkGrid(), authenticated = false)
+
+        viewModel.retry()
+
+        assertTrue(viewModel.state.value is PodcastListViewState.Error)
+        verifyNoInteractions(listRepository)
     }
 
     @Test
