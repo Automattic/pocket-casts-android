@@ -149,7 +149,7 @@ data class ListFeed(
     @Json(name = "type") val type: ListType? = null,
     @Json(name = "summary_style") val summaryStyle: DisplayStyle? = null,
     @Json(name = "expanded_style") val expandedStyle: ExpandedStyle? = null,
-    @Json(name = "lists") val lists: List<NetworkListSummary> = emptyList(),
+    @Json(name = "lists") val lists: List<DiscoverListSummary> = emptyList(),
 ) {
     /** A `lists_list` may only carry `podcast_list` entries, so anything else the server adds is dropped here. */
     val networks get() = lists.filter { it.type is ListType.PodcastList }
@@ -166,7 +166,7 @@ data class ListFeed(
 
 /** An entry inside a `lists_list`. */
 @JsonClass(generateAdapter = true)
-data class NetworkListSummary(
+data class DiscoverListSummary(
     @Json(name = "uuid") val uuid: String,
     @Json(name = "title") val title: String?,
     @Json(name = "description") val description: String?,

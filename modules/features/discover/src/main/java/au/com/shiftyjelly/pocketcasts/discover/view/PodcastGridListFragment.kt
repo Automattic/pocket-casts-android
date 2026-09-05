@@ -31,6 +31,7 @@ import au.com.shiftyjelly.pocketcasts.servers.model.ExpandedStyle
 import au.com.shiftyjelly.pocketcasts.servers.model.ListFeed
 import au.com.shiftyjelly.pocketcasts.servers.model.ListType
 import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList
+import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.images.ThemedImageTintTransformation
 import au.com.shiftyjelly.pocketcasts.views.activity.WebViewActivity
@@ -38,6 +39,8 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.hide
 import au.com.shiftyjelly.pocketcasts.views.extensions.show
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import coil3.load
+import coil3.request.error
+import coil3.request.placeholder
 import coil3.request.transformations
 import coil3.transform.CircleCropTransformation
 import com.automattic.eventhorizon.DiscoverCollectionLinkTappedEvent
@@ -50,7 +53,9 @@ import com.automattic.eventhorizon.PodcastSubscribedEvent
 import javax.inject.Inject
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 open class PodcastGridListFragment :
     BaseFragment(),
@@ -76,6 +81,7 @@ open class PodcastGridListFragment :
         internal const val ARG_CURATED = "curated"
         internal const val ARG_INFERRED_ID = "inferredId"
         internal const val ARG_AUTHENTICATED = "authenticated"
+        internal const val ARG_SOURCE_VIEW = "sourceView"
 
         fun newInstanceBundle(
             networkLoadableList: NetworkLoadableList,
@@ -93,6 +99,28 @@ open class PodcastGridListFragment :
                 putBoolean(ARG_AUTHENTICATED, networkLoadableList.authenticated ?: false)
             }
         }
+
+        /** Callers outside Discover reach a network by id, so the styles a Discover row would supply are fixed here. */
+        fun newInstanceBundle(
+            listId: String,
+            title: String?,
+            sourceView: SourceView?,
+        ): Bundle {
+            return Bundle().apply {
+                putString(ARG_LIST_UUID, listId)
+                putString(ARG_INFERRED_ID, listId)
+                putString(ARG_TITLE, title)
+                putString(ARG_SOURCE_URL, listUrl(listId))
+                putString(ARG_LIST_TYPE, ListType.PodcastList.stringValue)
+                putString(ARG_DISPLAY_STYLE, DisplayStyle.CollectionList().stringValue)
+                putString(ARG_EXPANDED_STYLE, ExpandedStyle.NetworkGrid().stringValue)
+                putBoolean(ARG_CURATED, false)
+                putBoolean(ARG_AUTHENTICATED, false)
+                putString(ARG_SOURCE_VIEW, sourceView?.key)
+            }
+        }
+
+        fun listUrl(listId: String) = "${Settings.SERVER_LIST_URL}/$listId.json"
     }
 
     val listType: ListType
@@ -124,6 +152,13 @@ open class PodcastGridListFragment :
 
     val curated: Boolean
         get() = arguments?.getBoolean(ARG_CURATED) ?: false
+
+    val isNetworkPage: Boolean
+        get() = expandedStyle is ExpandedStyle.NetworkGrid
+
+    /** The entry point that opened this page. Network-specific analytics are picked up in a follow-up. */
+    val sourceView: SourceView
+        get() = SourceView.fromString(arguments?.getString(ARG_SOURCE_VIEW))
 
     protected val viewModel: PodcastListViewModel by viewModels()
 
@@ -241,17 +276,21 @@ open class PodcastGridListFragment :
         linkTextView: TextView,
         toolbar: Toolbar,
     ) {
-        toolbar.title = listFeed.subtitle?.tryToLocalise(resources)
-        toolbar.menu.findItem(R.id.share_list)?.isVisible = curated
+        toolbar.title = if (isNetworkPage) listFeed.title else listFeed.subtitle?.tryToLocalise(resources)
+        toolbar.menu.findItem(R.id.share_list)?.isVisible = isNetworkPage || curated
 
-        subTitleTextView.text = listFeed.subtitle?.uppercase()
+        // most networks ship an empty subtitle, and a server-supplied label would never be translated
+        subTitleTextView.text = if (isNetworkPage) getString(LR.string.discover_network).uppercase() else listFeed.subtitle?.uppercase()
+        if (isNetworkPage) {
+            subTitleTextView.setTextColor(subTitleTextView.context.getThemeColor(UR.attr.primary_icon_01))
+        }
         titleTextView.text = listFeed.title
         bodyTextView.text = listFeed.description
 
-        // website
+        // website, which the network design hides even when the feed carries the fields
         val linkTitle = listFeed.webLinkTitle
         val linkUrl = listFeed.webLinkUrl
-        if (linkTitle != null && linkUrl != null) {
+        if (!isNetworkPage && linkTitle != null && linkUrl != null) {
             linkView.visibility = View.VISIBLE
             linkTextView.text = linkTitle
             linkView.setOnClickListener {
@@ -267,11 +306,17 @@ open class PodcastGridListFragment :
         // circular headshot image
         val headshotImageUrl = listFeed.collectionImageUrl
         headshotImageView.apply {
-            if (headshotImageUrl == null) {
+            if (headshotImageUrl == null && !isNetworkPage) {
                 hide()
             } else {
                 show()
-                load(headshotImageUrl) {
+                val placeholder = if (theme.isDarkTheme) IR.drawable.defaultartwork_dark else IR.drawable.defaultartwork
+                load(headshotImageUrl ?: placeholder) {
+                    // curated collections keep their existing blank-on-failure behaviour
+                    if (isNetworkPage) {
+                        placeholder(placeholder)
+                        error(placeholder)
+                    }
                     transformations(ThemedImageTintTransformation(context), CircleCropTransformation())
                 }
             }
@@ -302,7 +347,9 @@ open class PodcastGridListFragment :
         listFeed.tintColors?.let { tintColors ->
             try {
                 val tintColor = tintColors.tintColorInt(theme.isDarkTheme) ?: return@let
-                subTitleTextView.setTextColor(tintColor)
+                if (!isNetworkPage) {
+                    subTitleTextView.setTextColor(tintColor)
+                }
                 tintImageView.setBackgroundColor(tintColor)
             } catch (e: Exception) {
                 Timber.e(e)

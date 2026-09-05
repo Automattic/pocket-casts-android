@@ -2039,6 +2039,7 @@
 
     <string name="discover">Discover</string>
     <string name="discover_error">There was an error loading the content.</string>
+    <string name="discover_network">Network</string>
     <string name="discover_error_try_again">Could not load content. Please check your internet connection and try again.</string>
     <string name="discover_retry" translatable="false">@string/retry</string>
     <string name="discover_row_fresh_pick">FRESH PICK</string>
