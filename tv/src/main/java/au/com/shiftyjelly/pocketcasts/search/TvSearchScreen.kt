@@ -25,6 +25,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -52,6 +53,8 @@ import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.component.LocalOpenNowPlaying
 import au.com.shiftyjelly.pocketcasts.component.LocalTvToastHostState
+import au.com.shiftyjelly.pocketcasts.component.ScrollToTopEffect
+import au.com.shiftyjelly.pocketcasts.component.TopBarScrollReporter
 import au.com.shiftyjelly.pocketcasts.component.TvCategoryTile
 import au.com.shiftyjelly.pocketcasts.component.TvDetailOverlay
 import au.com.shiftyjelly.pocketcasts.component.TvEmptyState
@@ -64,6 +67,7 @@ import au.com.shiftyjelly.pocketcasts.component.TvPodcastTile
 import au.com.shiftyjelly.pocketcasts.component.TvPodcastTileDefaults
 import au.com.shiftyjelly.pocketcasts.component.TvRow
 import au.com.shiftyjelly.pocketcasts.component.TvTile
+import au.com.shiftyjelly.pocketcasts.component.scrollAwayTopBar
 import au.com.shiftyjelly.pocketcasts.component.tvFocusInactiveWhen
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
@@ -196,7 +200,6 @@ fun TvSearchScreen(
             restoreFocusTrigger = restoreFocusTrigger,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = TvTopBarHeight)
                 .tvFocusInactiveWhen(podcastUuid != null || category != null || folder != null),
         )
         TvDetailOverlay(
@@ -312,7 +315,7 @@ private fun TvSearchContent(
     var historyFocused by remember { mutableStateOf(false) }
     val showSuggestions = (isEditing || suggestionsFocused) && suggestions.isNotEmpty()
     val showHistory = (searchFieldFocused || historyFocused || isEditing) && !showSuggestions && query.isBlank() && history.isNotEmpty()
-    Column(modifier = modifier.fillMaxSize()) {
+    Column(modifier = modifier.fillMaxSize().scrollAwayTopBar()) {
         Column(modifier = Modifier.padding(ContentPadding)) {
             Spacer(modifier = Modifier.height(30.dp))
             TvSearchField(
@@ -474,6 +477,9 @@ private fun TvSearchDiscover(
     val rowCount = categoryOffset + discoverRows.size
     val rowFocusRequesters = remember(rowCount) { List(rowCount) { FocusRequester() } }
     var lastFocusedRowIndex by rememberSaveable(rowCount) { mutableIntStateOf(0) }
+    val listState = rememberLazyListState()
+    ScrollToTopEffect { listState.scrollToItem(0) }
+    TopBarScrollReporter(listState)
 
     var isInitialComposition by remember { mutableStateOf(true) }
     LaunchedEffect(restoreFocusTrigger) {
@@ -484,7 +490,7 @@ private fun TvSearchDiscover(
         }
     }
 
-    LazyColumn(modifier = modifier.fillMaxSize()) {
+    LazyColumn(state = listState, modifier = modifier.fillMaxSize()) {
         if (categories.isNotEmpty()) {
             item {
                 Box(
@@ -649,6 +655,9 @@ private fun TvSearchTopResults(
     restoreFocusTrigger: Int,
 ) {
     val restoreFocusRequester = remember { FocusRequester() }
+    val listState = rememberLazyListState()
+    ScrollToTopEffect { listState.scrollToItem(0) }
+    TopBarScrollReporter(listState)
     var isInitialComposition by remember { mutableStateOf(true) }
     LaunchedEffect(restoreFocusTrigger) {
         if (isInitialComposition) {
@@ -667,7 +676,7 @@ private fun TvSearchTopResults(
     val foldersFirst = !featuredFirst && !episodesFirst && topFolders.isNotEmpty()
     val podcastsFirst = !featuredFirst && !episodesFirst && !foldersFirst
 
-    LazyColumn(modifier = Modifier.fillMaxSize()) {
+    LazyColumn(state = listState, modifier = Modifier.fillMaxSize()) {
         item { Spacer(modifier = Modifier.height(TopResultsRowTopPadding)) }
         if (featured.isNotEmpty()) {
             item {
@@ -767,6 +776,8 @@ private fun TvSearchEpisodeGrid(
     restoreFocusTrigger: Int,
 ) {
     val gridState = rememberLazyGridState()
+    ScrollToTopEffect { gridState.scrollToItem(0) }
+    TopBarScrollReporter(gridState)
     val focusRequesters = remember(episodes.size) { List(episodes.size) { FocusRequester() } }
     val gridFocusRequester = remember { FocusRequester() }
     var lastFocusedKey by rememberSaveable { mutableStateOf<String?>(null) }
