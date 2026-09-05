@@ -136,7 +136,7 @@ private fun BannerText(banner: TvDiscoverBanner, modifier: Modifier = Modifier) 
             text = banner.subtitle(),
             style = MaterialTheme.tvTypography.body,
             color = MaterialTheme.tvColors.textSecondary,
-            maxLines = 2,
+            maxLines = banner.subtitleMaxLines,
             overflow = TextOverflow.Ellipsis,
         )
     }
@@ -167,13 +167,19 @@ private fun TvDiscoverBanner.artwork(): Int = when (this) {
 
 private val TvDiscoverBanner.artworkHeight: Dp
     get() = when (this) {
-        TvDiscoverBanner.CreateAccount -> 174.dp
+        TvDiscoverBanner.CreateAccount -> 150.dp
         TvDiscoverBanner.DiscoverMore -> 197.dp
+    }
+
+private val TvDiscoverBanner.subtitleMaxLines: Int
+    get() = when (this) {
+        TvDiscoverBanner.CreateAccount -> 1
+        TvDiscoverBanner.DiscoverMore -> 2
     }
 
 private val TvDiscoverBanner.contentWidthFraction: Float
     get() = when (this) {
-        TvDiscoverBanner.CreateAccount -> 0.68f
+        TvDiscoverBanner.CreateAccount -> 0.78f
         TvDiscoverBanner.DiscoverMore -> 0.82f
     }
 
