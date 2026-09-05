@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.ui.helper
 
 import android.view.View
 import androidx.fragment.app.Fragment
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlin.time.Duration
@@ -21,6 +22,9 @@ interface FragmentHostListener {
     fun closePodcastsToRoot()
     fun closeFiltersToRoot()
     fun openPodcastPage(uuid: String, sourceView: String? = null)
+
+    /** Feature modules cannot depend on each other, so this is how they reach the Discover network page. */
+    fun openNetworkPage(listId: String, title: String? = null, sourceView: SourceView? = null)
     fun openCloudFiles()
     fun snackBarView(): View
     fun setFullScreenDarkOverlayViewVisibility(visible: Boolean)

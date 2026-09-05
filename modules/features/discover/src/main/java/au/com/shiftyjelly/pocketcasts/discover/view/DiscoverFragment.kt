@@ -116,7 +116,7 @@ class DiscoverFragment :
             trackCategoryShownImpression(contentList)
         }
 
-        if (contentList.expandedStyle is ExpandedStyle.GridList) {
+        if (contentList.expandedStyle.opensPodcastGrid) {
             val fragment = PodcastGridFragment.newInstance(transformedList)
             (activity as FragmentHostListener).addFragment(fragment)
         } else {
@@ -134,7 +134,7 @@ class DiscoverFragment :
                 ),
             )
         }
-        if (list.expandedStyle is ExpandedStyle.GridList) {
+        if (list.expandedStyle.opensPodcastGrid) {
             val fragment = PodcastGridFragment.newInstance(transformedList)
             (activity as FragmentHostListener).addFragment(fragment)
         }
