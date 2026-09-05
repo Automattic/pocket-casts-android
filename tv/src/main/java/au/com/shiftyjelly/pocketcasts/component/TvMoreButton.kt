@@ -20,7 +20,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 fun TvMoreButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    buttonSize: Dp = 36.dp,
+    buttonSize: Dp = TvMoreButtonSize,
     iconSize: Dp = 15.dp,
     colors: ButtonColors = TvButtonDefaults.iconButtonColors(),
 ) {
@@ -36,6 +36,8 @@ fun TvMoreButton(
         )
     }
 }
+
+val TvMoreButtonSize = 36.dp
 
 @Preview
 @Composable
