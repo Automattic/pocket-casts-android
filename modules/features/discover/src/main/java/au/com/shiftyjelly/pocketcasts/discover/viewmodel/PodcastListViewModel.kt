@@ -57,12 +57,12 @@ class PodcastListViewModel @Inject constructor(
     }
 
     fun load(sourceUrl: String?, listStyle: ExpandedStyle, authenticated: Boolean?) {
-        lastLoad = LoadRequest(sourceUrl, listStyle, authenticated)
-
         if (sourceUrl == null) {
             state.value = PodcastListViewState.Error(IllegalStateException("Must provide a source url"))
             return
         }
+
+        lastLoad = LoadRequest(sourceUrl, listStyle, authenticated)
 
         // a reload keeps whatever is already on screen; only a page with nothing to show falls back to the spinner
         if (state.value !is PodcastListViewState.ListLoaded) {

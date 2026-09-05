@@ -75,7 +75,9 @@ class PodcastGridFragment : PodcastGridListFragment() {
 
                         feed = state.feed
                         feed?.let {
-                            if (displayStyle.toString() != DisplayStyle.CollectionList().toString()) {
+                            // a network page always gets the header, whatever summary_style its Discover row carried
+                            val showHeader = isNetworkPage || displayStyle.toString() == DisplayStyle.CollectionList().toString()
+                            if (!showHeader) {
                                 binding.headerLayout.visibility = View.GONE
                             } else {
                                 binding.headerLayout.visibility = View.VISIBLE
