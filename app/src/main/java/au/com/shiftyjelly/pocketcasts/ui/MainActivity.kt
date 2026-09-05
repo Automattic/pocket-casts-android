@@ -117,6 +117,7 @@ import au.com.shiftyjelly.pocketcasts.discover.util.DiscoverDeepLinkManager
 import au.com.shiftyjelly.pocketcasts.discover.util.DiscoverDeepLinkManager.Companion.RECOMMENDATIONS_USER
 import au.com.shiftyjelly.pocketcasts.discover.util.DiscoverDeepLinkManager.Companion.STAFF_PICKS_LIST_ID
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment
+import au.com.shiftyjelly.pocketcasts.discover.view.PodcastGridFragment
 import au.com.shiftyjelly.pocketcasts.discover.view.PodcastGridListFragment
 import au.com.shiftyjelly.pocketcasts.discover.view.PodcastListFragment
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesActivity
@@ -1899,6 +1900,15 @@ class MainActivity :
         val currentFragment = navigator.currentFragment()
         if (currentFragment is PodcastFragment && uuid == currentFragment.podcastUuid) return // We are already showing it
         addFragment(PodcastFragment.newInstance(podcastUuid = uuid, sourceView = SourceView.fromString(sourceView)))
+    }
+
+    override fun openNetworkPage(listId: String, title: String?, sourceView: SourceView?) {
+        closePlayer()
+        frameBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+
+        val currentFragment = navigator.currentFragment()
+        if (currentFragment is PodcastGridFragment && listId == currentFragment.listUuid) return // We are already showing it
+        addFragment(PodcastGridFragment.newInstance(listId = listId, title = title, sourceView = sourceView))
     }
 
     @Suppress("DEPRECATION")

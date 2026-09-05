@@ -63,7 +63,7 @@ class ListFeedTest {
     fun `a feed without a lists array decodes to no entries`() {
         val feed = adapter.fromJson("""{"title": "Featured", "type": "podcast_list"}""")
 
-        assertEquals(emptyList<NetworkListSummary>(), feed?.networks)
+        assertEquals(emptyList<DiscoverListSummary>(), feed?.networks)
     }
 
     companion object {
