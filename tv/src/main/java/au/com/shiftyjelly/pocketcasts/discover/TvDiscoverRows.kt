@@ -61,12 +61,14 @@ fun LazyListScope.tvDiscoverRow(
                 contentPadding = contentPadding,
                 key = TvDiscoverPodcast::uuid,
                 focusRequester = focusRequester,
+                centerFocusedItem = true,
                 modifier = modifier,
             ) { podcast ->
                 TvFeaturedTile(
                     artworkUrl = podcast.artworkUrl,
                     isSponsored = podcast.isSponsored,
                     title = podcast.title,
+                    author = podcast.author,
                     description = podcast.description,
                     onGoToPodcast = { onPodcastClick(row, podcast) },
                     onPlayLastEpisode = { onPlayLatestEpisode(row, podcast) },
