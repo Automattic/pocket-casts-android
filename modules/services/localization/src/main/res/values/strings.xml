@@ -2039,6 +2039,7 @@
 
     <string name="discover">Discover</string>
     <string name="discover_error">There was an error loading the content.</string>
+    <!-- translators: Label above a podcast network's name, e.g. above "Relay". A network is a company that publishes several podcasts. -->
     <string name="discover_network">Network</string>
     <string name="discover_error_try_again">Could not load content. Please check your internet connection and try again.</string>
     <string name="discover_retry" translatable="false">@string/retry</string>

@@ -97,6 +97,7 @@ open class PodcastGridListFragment :
                 putString(ARG_TAGLINE, networkLoadableList.expandedTopItemLabel)
                 putBoolean(ARG_CURATED, networkLoadableList.curated)
                 putBoolean(ARG_AUTHENTICATED, networkLoadableList.authenticated ?: false)
+                putString(ARG_SOURCE_VIEW, SourceView.DISCOVER.key)
             }
         }
 
