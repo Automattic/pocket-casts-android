@@ -2,16 +2,13 @@ package au.com.shiftyjelly.pocketcasts.component
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkHorizontally
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -66,19 +63,30 @@ fun TvEpisodeListItemContainer(
             .onFocusChanged { isItemFocused = it.hasFocus },
     ) {
         content(Modifier.weight(1f))
-        AnimatedVisibility(
+        MoreButtonSlot(
             visible = isItemFocused,
-            enter = expandHorizontally(tween(MORE_BUTTON_ANIMATION_DURATION_MS), expandFrom = Alignment.Start) +
-                slideInHorizontally(tween(MORE_BUTTON_ANIMATION_DURATION_MS), initialOffsetX = { it }) +
-                fadeIn(tween(MORE_BUTTON_ANIMATION_DURATION_MS)),
-            exit = shrinkHorizontally(tween(MORE_BUTTON_ANIMATION_DURATION_MS), shrinkTowards = Alignment.Start) +
-                slideOutHorizontally(tween(MORE_BUTTON_ANIMATION_DURATION_MS), targetOffsetX = { it }) +
-                fadeOut(tween(MORE_BUTTON_ANIMATION_DURATION_MS)),
+            onClick = onOpenActions,
+        )
+    }
+}
+
+@Composable
+private fun MoreButtonSlot(
+    visible: Boolean,
+    onClick: () -> Unit,
+) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .padding(start = 12.dp)
+            .size(TvMoreButtonSize),
+    ) {
+        AnimatedVisibility(
+            visible = visible,
+            enter = fadeIn(tween(MORE_BUTTON_ANIMATION_DURATION_MS)),
+            exit = fadeOut(tween(MORE_BUTTON_ANIMATION_DURATION_MS)),
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Spacer(Modifier.width(12.dp))
-                TvMoreButton(onClick = onOpenActions)
-            }
+            TvMoreButton(onClick = onClick)
         }
     }
 }
