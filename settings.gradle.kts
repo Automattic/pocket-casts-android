@@ -17,7 +17,7 @@ pluginManagement {
 }
 
 plugins {
-    id("com.gradle.develocity").version("4.2.1")
+    id("com.gradle.develocity").version("4.5.0")
     id("com.gradle.common-custom-user-data-gradle-plugin").version("2.4.0")
 }
 

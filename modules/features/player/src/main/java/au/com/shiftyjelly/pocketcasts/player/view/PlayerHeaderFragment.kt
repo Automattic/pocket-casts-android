@@ -47,7 +47,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -218,7 +218,7 @@ class PlayerHeaderFragment :
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ) = contentWithoutConsumedInsets {
-        val windowSize = currentWindowAdaptiveInfo().windowSizeClass
+        val windowSize = currentWindowAdaptiveInfoV2().windowSizeClass
         val isPortraitConfiguration = LocalConfiguration.current.inPortrait()
         val isPortraitPlayer = isPortraitConfiguration || windowSize.isAtLeastMediumHeight()
         val maxWidthFraction = if (isPortraitConfiguration && windowSize.isAtLeastMediumWidth()) 0.8f else 1f
