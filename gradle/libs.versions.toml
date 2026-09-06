@@ -18,7 +18,7 @@
 [versions]
 # ignore AboutLibraries versions such as -b02 and stick to the stable versions
 aboutlibraries = "15.1.1"
-android-gradle-plugin = "9.3.2"
+android-gradle-plugin = "9.4.0"
 billing = "9.1.0"
 coil = "3.6.0"
 compose = "2026.08.00" # https://developer.android.com/jetpack/compose/bom/bom-mapping
@@ -32,9 +32,9 @@ hilt = "2.60.1"
 hilt-compiler = "1.4.0"
 horologist = "0.8.4-alpha"
 java = "17"
-kotlin = "2.3.21"
+kotlin = "2.4.10"
 kotlin-coroutines = "1.11.0"
-ksp = "2.3.9"
+ksp = "2.3.11"
 ktlint = "1.8.0"
 ktlint-compose-rules = "0.6.4"
 lifecycle = "2.11.0"
