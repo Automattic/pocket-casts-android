@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.podcasts
 
+import android.os.Build
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -149,15 +150,17 @@ private fun TvPodcastDetailsContent(
                 val followFocusRequester = remember { FocusRequester() }
                 var isShowingInfoModal by remember { mutableStateOf(false) }
                 var isShowingAccountModal by rememberSaveable { mutableStateOf(false) }
-                TvArtworkImage(
-                    model = PodcastImage.getMediumArtworkUrl(uiState.podcast.uuid),
-                    modifier = Modifier
-                        .align(Alignment.TopStart)
-                        .offset(x = CoverGlowOffset, y = CoverGlowOffset)
-                        .size(CoverGlowSize)
-                        .blur(CoverGlowBlurRadius, BlurredEdgeTreatment.Unbounded)
-                        .alpha(0.4f),
-                )
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    TvArtworkImage(
+                        model = PodcastImage.getMediumArtworkUrl(uiState.podcast.uuid),
+                        modifier = Modifier
+                            .align(Alignment.TopStart)
+                            .offset(x = CoverGlowOffset, y = CoverGlowOffset)
+                            .size(CoverGlowSize)
+                            .blur(CoverGlowBlurRadius, BlurredEdgeTreatment.Unbounded)
+                            .alpha(0.4f),
+                    )
+                }
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(60.dp),
                     modifier = Modifier
