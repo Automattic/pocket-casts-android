@@ -46,6 +46,8 @@ fun TvFolderCard(
             containerColor = folderColor,
             focusedContainerColor = folderColor,
         ),
+        scale = tvFocusedCoverScale(),
+        glow = tvFocusedCoverGlow(),
         modifier = modifier,
     ) {
         BoxWithConstraints(

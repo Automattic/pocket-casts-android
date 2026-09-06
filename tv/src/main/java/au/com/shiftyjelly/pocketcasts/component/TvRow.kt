@@ -68,7 +68,7 @@ fun <T> TvRow(
     items: List<T>,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(horizontal = 42.dp),
-    itemSpacing: Dp = 12.dp,
+    itemSpacing: Dp = TvTileSpacing,
     key: ((T) -> Any)? = null,
     focusRequester: FocusRequester? = null,
     content: @Composable (T) -> Unit,
