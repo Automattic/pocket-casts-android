@@ -288,10 +288,10 @@ open class PodcastGridListFragment :
         titleTextView.text = listFeed.title
         bodyTextView.text = listFeed.description
 
-        // website, which the network design hides even when the feed carries the fields
+        // website
         val linkTitle = listFeed.webLinkTitle
         val linkUrl = listFeed.webLinkUrl
-        if (!isNetworkPage && linkTitle != null && linkUrl != null) {
+        if (linkTitle != null && linkUrl != null) {
             linkView.visibility = View.VISIBLE
             linkTextView.text = linkTitle
             linkView.setOnClickListener {
