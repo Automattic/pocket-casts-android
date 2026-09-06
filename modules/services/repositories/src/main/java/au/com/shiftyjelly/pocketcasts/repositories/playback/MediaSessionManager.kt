@@ -329,7 +329,15 @@ class MediaSessionManager(
                 scope.launch { commandMutex.withLock { playbackManager.playQueueSuspend(sourceView = SourceView.MEDIA_BUTTON_BROADCAST_ACTION) } }
             },
             onPause = {
-                scope.launch { commandMutex.withLock { playbackManager.pauseSuspend(sourceView = SourceView.MEDIA_BUTTON_BROADCAST_ACTION) } }
+                scope.launch {
+                    commandMutex.withLock {
+                        if (playbackManager.isPlaying()) {
+                            playbackManager.pauseSuspend(sourceView = SourceView.MEDIA_BUTTON_BROADCAST_ACTION)
+                        } else {
+                            playbackManager.playQueueSuspend(sourceView = SourceView.MEDIA_BUTTON_BROADCAST_ACTION)
+                        }
+                    }
+                }
             },
             onSeekTo = { positionMs ->
                 scope.launch {
@@ -1235,6 +1243,14 @@ class MediaSessionManager(
                 val keyEvent = IntentCompat.getParcelableExtra(mediaButtonEvent, Intent.EXTRA_KEY_EVENT, KeyEvent::class.java) ?: return false
                 logEvent(keyEvent.toString())
                 if (keyEvent.action == KeyEvent.ACTION_DOWN) {
+                    if (keyEvent.keyCode == KeyEvent.KEYCODE_MEDIA_PAUSE) {
+                        if (playbackManager.isPlaying()) {
+                            enqueueCommand("pause") { playbackManager.pauseSuspend(sourceView = source) }
+                        } else {
+                            enqueueCommand("play") { playbackManager.playQueueSuspend(sourceView = source) }
+                        }
+                        return true
+                    }
                     LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Media button Android event: ${keyEvent.action}")
                     val inputEvent = when (keyEvent.keyCode) {
                         KeyEvent.KEYCODE_MEDIA_PLAY, KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE, KeyEvent.KEYCODE_HEADSETHOOK -> MediaEvent.SingleTap
@@ -1339,7 +1355,11 @@ class MediaSessionManager(
 
         override fun onPause() {
             logEvent("pause")
-            enqueueCommand("pause") { playbackManager.pauseSuspend(sourceView = source) }
+            if (playbackManager.isPlaying()) {
+                enqueueCommand("pause") { playbackManager.pauseSuspend(sourceView = source) }
+            } else {
+                enqueueCommand("play") { playbackManager.playQueueSuspend(sourceView = source) }
+            }
         }
 
         override fun onPlayFromSearch(query: String?, extras: Bundle?) {
