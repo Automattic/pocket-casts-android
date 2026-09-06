@@ -21,13 +21,22 @@ import androidx.tv.material3.CardDefaults
 import androidx.tv.material3.CardGlow
 import androidx.tv.material3.CardScale
 import androidx.tv.material3.CardShape
+import androidx.tv.material3.Glow
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.theme.TvTheme
 import au.com.shiftyjelly.pocketcasts.theme.tvColors
 
 val TvFocusedCardScale = 1.05f
+val TvFocusedPodcastScale = 1.12f
 val TvFocusedWideCardScale = 1.02f
+val TvTileSpacing = 20.dp
+
+fun tvFocusedCoverScale(): CardScale = CardDefaults.scale(focusedScale = TvFocusedPodcastScale)
+
+fun tvFocusedCoverGlow(): CardGlow = CardDefaults.glow(
+    focusedGlow = Glow(elevationColor = Color.Black, elevation = 16.dp),
+)
 
 @Composable
 fun TvTile(

@@ -74,8 +74,8 @@ internal fun TvPodcastGridScaffold(
         LazyVerticalGrid(
             state = gridState,
             columns = GridCells.Fixed(GRID_COLUMNS),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(TvTileSpacing),
+            verticalArrangement = Arrangement.spacedBy(TvTileSpacing),
             contentPadding = PaddingValues(start = horizontalContentPadding, top = 20.dp, end = horizontalContentPadding, bottom = 32.dp),
             modifier = Modifier
                 .focusRequester(gridFocusRequester)
