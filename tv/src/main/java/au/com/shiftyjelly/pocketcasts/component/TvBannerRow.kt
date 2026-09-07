@@ -25,7 +25,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -85,8 +84,8 @@ fun TvBannerRow(
                             .matchParentSize()
                             .background(
                                 Brush.horizontalGradient(
-                                    0f to Color.Black,
-                                    0.85f to Color.Transparent,
+                                    0f to backgroundColor,
+                                    0.85f to backgroundColor.copy(alpha = 0f),
                                 ),
                             ),
                     )
