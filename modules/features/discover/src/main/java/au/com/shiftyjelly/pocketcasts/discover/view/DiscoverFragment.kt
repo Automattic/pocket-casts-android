@@ -16,6 +16,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.discover.databinding.FragmentDiscoverBinding
 import au.com.shiftyjelly.pocketcasts.discover.viewmodel.DiscoverViewModel
 import au.com.shiftyjelly.pocketcasts.discover.viewmodel.PodcastList
+import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeContainerFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.PodcastFragment
@@ -25,8 +26,10 @@ import au.com.shiftyjelly.pocketcasts.search.SearchFragment
 import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverEpisode
+import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverListSummary
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRegion
+import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRow
 import au.com.shiftyjelly.pocketcasts.servers.model.ExpandedStyle
 import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
@@ -140,6 +143,32 @@ class DiscoverFragment :
         }
     }
 
+    override fun onNetworkClicked(network: DiscoverListSummary) {
+        (activity as FragmentHostListener).openNetworkPage(
+            listId = network.uuid,
+            title = network.title,
+            sourceView = SourceView.DISCOVER,
+        )
+    }
+
+    override fun onNetworksShowAllClicked(row: DiscoverRow, listDate: String?) {
+        // the Networks row always carries a uuid, so the inferred-id fallback that onPodcastListClicked needs does not apply
+        row.listUuid?.let { listId ->
+            eventHorizon.track(
+                DiscoverListShowAllTappedEvent(
+                    listId = listId,
+                    listDatetime = listDate.orEmpty(),
+                ),
+            )
+        }
+        val transformedList = viewModel.transformNetworkLoadableList(row, resources)
+        val fragment = NetworksGridFragment.newInstance(
+            sourceUrl = transformedList.source,
+            title = transformedList.title.tryToLocalise(resources),
+        )
+        (activity as FragmentHostListener).addFragment(fragment)
+    }
+
     override fun onEpisodeClicked(episode: DiscoverEpisode, listUuid: String?) {
         val fragment = EpisodeContainerFragment.newInstance(
             episodeUuid = episode.uuid,
@@ -226,6 +255,7 @@ class DiscoverFragment :
                 listener = this,
                 theme = theme,
                 loadPodcastList = { source, authenticated -> viewModel.loadPodcastList(source, authenticated) },
+                loadNetworkList = { source, authenticated -> viewModel.loadNetworkList(source, authenticated) },
                 loadCarouselSponsoredPodcastList = viewModel::loadCarouselSponsoredPodcasts,
                 categoriesState = { (url, popularIds, sponsoredIds) ->
                     categoriesManager.setRowInfo(popularCategoryIds = popularIds, sponsoredCategoryIds = sponsoredIds)
