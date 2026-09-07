@@ -22,7 +22,7 @@ internal class ContentLengthValidatorInterceptor : Interceptor {
         if (request.method != "GET" || response.code !in VALIDATED_STATUS_CODES) {
             return response
         }
-        val body = response.body ?: return response
+        val body = response.body
         val declaredLength = body.contentLength()
         if (declaredLength <= 0) {
             return response
