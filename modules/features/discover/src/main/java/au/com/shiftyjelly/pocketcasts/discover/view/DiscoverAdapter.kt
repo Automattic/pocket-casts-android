@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -28,6 +29,7 @@ import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
 import au.com.shiftyjelly.pocketcasts.discover.R
 import au.com.shiftyjelly.pocketcasts.discover.compose.NetworksRow
+import au.com.shiftyjelly.pocketcasts.discover.compose.NetworksRowPlaceholder
 import au.com.shiftyjelly.pocketcasts.discover.compose.SmallListRow
 import au.com.shiftyjelly.pocketcasts.discover.compose.SmallListRowPlaceholder
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowCarouselListBinding
@@ -422,15 +424,25 @@ internal class DiscoverAdapter(
 
     inner class NetworksViewHolder(val binding: RowNetworksBinding) : NetworkLoadableViewHolder(binding.root) {
         private var networks by mutableStateOf(emptyList<DiscoverListSummary>())
+        private var isLoading by mutableStateOf(true)
+        private var boundSource: String? = null
+
+        // the composition is disposed when the row leaves the window, so the scroll position is held out here
+        private var scrollState by mutableStateOf(LazyListState())
 
         init {
             binding.networksRow.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindowOrReleasedFromPool)
             binding.networksRow.setContent {
                 AppTheme(theme.activeTheme) {
-                    NetworksRow(
-                        networks = networks,
-                        onClickNetwork = listener::onNetworkClicked,
-                    )
+                    if (isLoading) {
+                        NetworksRowPlaceholder()
+                    } else {
+                        NetworksRow(
+                            networks = networks,
+                            scrollState = scrollState,
+                            onClickNetwork = listener::onNetworkClicked,
+                        )
+                    }
                 }
             }
         }
@@ -438,11 +450,19 @@ internal class DiscoverAdapter(
         fun loading(row: DiscoverRow) {
             binding.lblTitle.text = row.title.tryToLocalise(context.resources)
             binding.btnShowAll.setOnClickListener(null)
-            networks = emptyList()
+            if (row.source != boundSource) {
+                // a recycled holder must not inherit the previous row's cards or scroll position
+                boundSource = row.source
+                networks = emptyList()
+                scrollState = LazyListState()
+            }
+            // a reload keeps whatever is already on screen; only a row with nothing to show falls back to placeholders
+            isLoading = networks.isEmpty()
         }
 
         fun bind(list: NetworkList, row: DiscoverRow) {
             networks = list.networks
+            isLoading = false
             binding.btnShowAll.setOnClickListener {
                 listener.onNetworksShowAllClicked(row, list.date)
             }

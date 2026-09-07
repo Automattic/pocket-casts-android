@@ -152,7 +152,8 @@ data class ListFeed(
     @Json(name = "lists") val lists: List<DiscoverListSummary> = emptyList(),
 ) {
     /** A `lists_list` may only carry `podcast_list` entries, so anything else the server adds is dropped here. */
-    val networks get() = lists.filter { it.type is ListType.PodcastList }
+    // uuids key the lazy lists that render these, and a duplicate key is a crash, so a repeated entry is dropped too
+    val networks get() = lists.filter { it.type is ListType.PodcastList }.distinctBy { it.uuid }
 
     val displayList: List<Any>
         get() {
