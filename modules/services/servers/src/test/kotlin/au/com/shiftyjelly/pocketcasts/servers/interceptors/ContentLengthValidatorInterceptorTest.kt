@@ -11,10 +11,15 @@ import okhttp3.Protocol
 import okhttp3.Request
 import okhttp3.Response
 import okhttp3.ResponseBody.Companion.asResponseBody
+import okhttp3.mockwebserver.MockResponse
+import okhttp3.mockwebserver.MockWebServer
 import okio.Buffer
+import okio.Source
+import okio.Timeout
+import okio.blackholeSink
+import okio.buffer
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertThrows
-import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 
@@ -22,113 +27,121 @@ class ContentLengthValidatorInterceptorTest {
     @get:Rule
     val featureFlagRule = InMemoryFeatureFlagRule()
 
+    @get:Rule
+    val server = MockWebServer()
+
+    @Test
+    fun `complete response over the network passes through with body intact`() {
+        server.enqueue(MockResponse().setBody("hello world"))
+        val client = OkHttpClient.Builder()
+            .addNetworkInterceptor(ContentLengthValidatorInterceptor())
+            .build()
+
+        client.newCall(Request.Builder().url(server.url("/episode.mp3")).build()).execute().use { response ->
+            assertEquals("hello world", response.body.string())
+        }
+    }
+
     @Test
     fun `complete body passes through`() {
-        val body = readWholeBody(declaredLength = MB, deliveredBytes = MB.toInt())
-
-        assertEquals(MB.toInt(), body.size)
+        assertEquals(MB, readBody(declaredLength = MB, deliveredBytes = MB))
     }
 
     @Test
     fun `grossly truncated body throws`() {
         assertThrows(ProtocolException::class.java) {
-            readWholeBody(declaredLength = 2 * MB, deliveredBytes = MB.toInt())
+            readBody(declaredLength = 2 * MB, deliveredBytes = MB)
         }
     }
 
     @Test
-    fun `shortfall within absolute tolerance passes through`() {
-        val body = readWholeBody(declaredLength = MB, deliveredBytes = 600_000)
-
-        assertEquals(600_000, body.size)
-    }
-
-    @Test
-    fun `shortfall equal to the absolute threshold passes through`() {
-        val body = readWholeBody(declaredLength = MB, deliveredBytes = (MB - 512 * KB).toInt())
-
-        assertEquals((MB - 512 * KB).toInt(), body.size)
-    }
-
-    @Test
-    fun `grossly truncated partial content throws`() {
+    fun `large truncation beyond the capped tolerance throws`() {
         assertThrows(ProtocolException::class.java) {
-            readWholeBody(declaredLength = 2 * MB, deliveredBytes = MB.toInt(), code = 206)
+            readBody(declaredLength = 200 * MB, deliveredBytes = 200 * MB - 3 * MB)
         }
     }
 
     @Test
-    fun `shortfall above ninety percent delivered passes through`() {
-        val deliveredBytes = (6 * MB - 600 * KB).toInt()
+    fun `shortfall within the capped tolerance passes through`() {
+        val deliveredBytes = 200 * MB - MB
 
-        val body = readWholeBody(declaredLength = 6 * MB, deliveredBytes = deliveredBytes)
+        assertEquals(deliveredBytes, readBody(declaredLength = 200 * MB, deliveredBytes = deliveredBytes))
+    }
 
-        assertEquals(deliveredBytes, body.size)
+    @Test
+    fun `shortfall within the absolute floor passes through`() {
+        val deliveredBytes = MB - 400 * KB
+
+        assertEquals(deliveredBytes, readBody(declaredLength = MB, deliveredBytes = deliveredBytes))
+    }
+
+    @Test
+    fun `shortfall equal to the tolerance passes through`() {
+        val deliveredBytes = MB - 512 * KB
+
+        assertEquals(deliveredBytes, readBody(declaredLength = MB, deliveredBytes = deliveredBytes))
     }
 
     @Test
     fun `unknown content length is not validated`() {
-        val body = readWholeBody(declaredLength = -1L, deliveredBytes = 1_000)
-
-        assertEquals(1_000, body.size)
+        assertEquals(1_000L, readBody(declaredLength = -1L, deliveredBytes = 1_000L))
     }
 
     @Test
     fun `head request is not validated`() {
-        val body = readWholeBody(declaredLength = 2 * MB, deliveredBytes = 1_000, method = "HEAD")
-
-        assertEquals(1_000, body.size)
+        assertEquals(1_000L, readBody(declaredLength = 2 * MB, deliveredBytes = 1_000L, method = "HEAD"))
     }
 
     @Test
     fun `non success response is not validated`() {
-        val body = readWholeBody(declaredLength = 2 * MB, deliveredBytes = 1_000, code = 302)
+        assertEquals(1_000L, readBody(declaredLength = 2 * MB, deliveredBytes = 1_000L, code = 302))
+    }
 
-        assertEquals(1_000, body.size)
+    @Test
+    fun `truncated partial content throws`() {
+        assertThrows(ProtocolException::class.java) {
+            readBody(declaredLength = 2 * MB, deliveredBytes = MB, code = 206)
+        }
     }
 
     @Test
     fun `disabled flag skips validation`() {
         FeatureFlag.setEnabled(Feature.VALIDATE_CONTENT_LENGTH, false)
 
-        val body = readWholeBody(declaredLength = 2 * MB, deliveredBytes = 1_000)
-
-        assertEquals(1_000, body.size)
+        assertEquals(1_000L, readBody(declaredLength = 2 * MB, deliveredBytes = 1_000L))
     }
 
     @Test
     fun `closing before end of stream does not throw`() {
-        execute(declaredLength = 2 * MB, deliveredBytes = MB.toInt()).use { response ->
-            val read = response.body.source().read(Buffer(), 1_024)
-            assertTrue(read > 0)
+        execute(declaredLength = 2 * MB, deliveredBytes = MB).use { response ->
+            response.body.source().read(Buffer(), 1_024)
         }
     }
 
-    private fun readWholeBody(
+    private fun readBody(
         declaredLength: Long,
-        deliveredBytes: Int,
+        deliveredBytes: Long,
         method: String = "GET",
         code: Int = 200,
-    ): ByteArray {
+    ): Long {
         return execute(declaredLength, deliveredBytes, method, code).use { response ->
-            response.body.source().readByteArray()
+            response.body.source().readAll(blackholeSink())
         }
     }
 
     private fun execute(
         declaredLength: Long,
-        deliveredBytes: Int,
+        deliveredBytes: Long,
         method: String = "GET",
         code: Int = 200,
     ): Response {
         val responder = Interceptor { chain ->
-            val payload = Buffer().write(ByteArray(deliveredBytes))
             Response.Builder()
                 .request(chain.request())
                 .protocol(Protocol.HTTP_2)
                 .code(code)
                 .message("")
-                .body(payload.asResponseBody("audio/mpeg".toMediaType(), declaredLength))
+                .body(ZeroSource(deliveredBytes).buffer().asResponseBody("audio/mpeg".toMediaType(), declaredLength))
                 .build()
         }
         val client = OkHttpClient.Builder()
@@ -142,8 +155,25 @@ class ContentLengthValidatorInterceptorTest {
         return client.newCall(request).execute()
     }
 
+    private class ZeroSource(private var remaining: Long) : Source {
+        override fun read(sink: Buffer, byteCount: Long): Long {
+            if (remaining <= 0L) {
+                return -1L
+            }
+            val count = minOf(byteCount, remaining, CHUNK.size.toLong())
+            sink.write(CHUNK, 0, count.toInt())
+            remaining -= count
+            return count
+        }
+
+        override fun timeout(): Timeout = Timeout.NONE
+
+        override fun close() = Unit
+    }
+
     private companion object {
         const val KB = 1024L
         const val MB = 1024L * 1024L
+        val CHUNK = ByteArray(8 * 1024)
     }
 }
