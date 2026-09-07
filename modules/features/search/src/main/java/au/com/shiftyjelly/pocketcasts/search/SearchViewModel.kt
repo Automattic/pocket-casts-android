@@ -325,17 +325,10 @@ class SearchViewModel @Inject constructor(
 private fun SearchUiState.SearchOperation<SearchResults.Results>.toResultsState(): SearchUiState.Results {
     val results = (this as? SearchUiState.SearchOperation.Success)?.results
     val hasNetworks = results?.results.orEmpty().any { it is ImprovedSearchResultItem.NetworkItem }
-    val filterOptions = ResultsFilters.entries.filter { it != ResultsFilters.NETWORKS || hasNetworks }
-    val selectedFilter = results?.filter?.takeIf { it in filterOptions } ?: ResultsFilters.TOP_RESULTS
-    val operation = if (results != null && results.filter != selectedFilter) {
-        SearchUiState.SearchOperation.Success(searchTerm = searchTerm, results = results.copy(filter = selectedFilter))
-    } else {
-        this
-    }
+    // Every result set arrives filtered to Top Results, so a filter that is no longer offered cannot strand the user.
     return SearchUiState.Results(
-        operation = operation,
-        filterOptions = filterOptions,
-        selectedFilterIndex = filterOptions.indexOf(selectedFilter),
+        operation = this,
+        filterOptions = ResultsFilters.entries.filter { it != ResultsFilters.NETWORKS || hasNetworks },
     )
 }
 

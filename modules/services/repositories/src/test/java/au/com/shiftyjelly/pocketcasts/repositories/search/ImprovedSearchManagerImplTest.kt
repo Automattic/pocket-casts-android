@@ -155,10 +155,11 @@ class ImprovedSearchManagerImplTest {
     }
 
     @Test
-    fun `combined search drops networks with a blank title`() = runTest {
+    fun `combined search drops networks without a uuid or a title`() = runTest {
         FeatureFlag.setEnabled(Feature.NETWORK_DISCOVERY, true)
         whenever(combinedSearchService.combinedSearch(any())) doReturn CombinedSearchResponse(
             results = listOf(
+                networkResult.copy(uuid = null),
                 networkResult.copy(uuid = "no-title-uuid", title = null),
                 networkResult.copy(uuid = "blank-title-uuid", title = "  "),
                 networkResult,

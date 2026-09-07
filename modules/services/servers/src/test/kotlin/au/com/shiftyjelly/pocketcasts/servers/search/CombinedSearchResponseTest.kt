@@ -68,6 +68,21 @@ class CombinedSearchResponseTest {
     }
 
     @Test
+    fun `a network missing its uuid does not fail the whole response`() {
+        val response = adapter.fromJson(
+            """
+            {"results":[
+              {"uuid":"p1","title":"Freakonomics Radio","slug":"freakonomics-radio","type":"podcast"},
+              {"title":"WNYC","type":"network"}
+            ]}
+            """.trimIndent(),
+        )
+
+        val types = response?.results?.map { it::class.simpleName }
+        assertEquals(listOf("PodcastResult", "NetworkResult"), types)
+    }
+
+    @Test
     fun `network results decode when the optional fields are missing`() {
         val response = adapter.fromJson(
             """
