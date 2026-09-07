@@ -78,7 +78,7 @@ fun ImprovedSearchResultsPage(
                     playButtonListener = playButtonListener,
                     onScroll = onScroll,
                     selectedFilterIndex = state.selectedFilterIndex,
-                    filterOptions = state.filterOptions.toList(),
+                    filterOptions = state.filterOptions,
                     onFilterSelect = onFilterSelect,
                     onEmptyResultsShow = onEmptyResultsShow,
                     onResultsShow = onResultsShow,
@@ -131,7 +131,7 @@ private fun ImprovedSearchResultsView(
     }
     val listState = rememberLazyListState()
 
-    LaunchedEffect(state.searchTerm, state.results.filteredResults.size, onResultsShow, onEmptyResultsShow) {
+    LaunchedEffect(state.searchTerm, state.results.filter, state.results.filteredResults.size, onResultsShow, onEmptyResultsShow) {
         if (state.results.filteredResults.isNotEmpty()) {
             onResultsShow()
         } else if (state.searchTerm.isNotEmpty()) {
