@@ -137,6 +137,7 @@ class ExoPlayerDataSourceFactory @Inject constructor(
                 url = episodeUri,
                 episodeUuid = episodeLocation.episode.uuid,
                 networkConstraint = cacheNetworkConstraint(settings.warnOnMeteredNetwork.value),
+                maxCacheBytes = maxCacheSizeBytes(),
                 onCachingComplete = onCachingComplete,
             )
         }
