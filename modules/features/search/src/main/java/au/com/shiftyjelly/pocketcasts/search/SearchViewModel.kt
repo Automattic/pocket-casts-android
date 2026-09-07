@@ -312,6 +312,9 @@ class SearchViewModel @Inject constructor(
         EPISODE(
             analyticsValue = EventHorizonSearchResultType.Episode,
         ),
+        NETWORK(
+            analyticsValue = EventHorizonSearchResultType.Network,
+        ),
     }
 }
 

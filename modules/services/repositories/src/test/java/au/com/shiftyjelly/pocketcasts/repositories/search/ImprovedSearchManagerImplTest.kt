@@ -9,10 +9,14 @@ import au.com.shiftyjelly.pocketcasts.servers.search.AutoCompleteSearchService
 import au.com.shiftyjelly.pocketcasts.servers.search.CombinedResult
 import au.com.shiftyjelly.pocketcasts.servers.search.CombinedSearchResponse
 import au.com.shiftyjelly.pocketcasts.servers.search.PodcastResultValue
+import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import java.util.Date
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
@@ -21,6 +25,9 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 class ImprovedSearchManagerImplTest {
+    @get:Rule
+    val featureFlagRule = InMemoryFeatureFlagRule()
+
     private val autoCompleteSearchService = mock<AutoCompleteSearchService>()
     private val combinedSearchService = mock<PodcastCacheService>()
     private val manager = ImprovedSearchManagerImpl(
@@ -114,4 +121,67 @@ class ImprovedSearchManagerImplTest {
             results,
         )
     }
+
+    @Test
+    fun `combined search maps networks when network discovery is enabled`() = runTest {
+        FeatureFlag.setEnabled(Feature.NETWORK_DISCOVERY, true)
+        whenever(combinedSearchService.combinedSearch(any())) doReturn CombinedSearchResponse(
+            results = listOf(networkResult, podcastResult),
+        )
+
+        val results = manager.combinedSearch("wnyc")
+
+        assertEquals(
+            ImprovedSearchResultItem.NetworkItem(
+                uuid = "network-uuid",
+                title = "WNYC",
+                description = "New York's flagship public radio station",
+                imageUrl = "https://static.pocketcasts.com/wnyc-author.png",
+            ),
+            results.filterIsInstance<ImprovedSearchResultItem.NetworkItem>().single(),
+        )
+    }
+
+    @Test
+    fun `combined search drops networks when network discovery is disabled`() = runTest {
+        FeatureFlag.setEnabled(Feature.NETWORK_DISCOVERY, false)
+        whenever(combinedSearchService.combinedSearch(any())) doReturn CombinedSearchResponse(
+            results = listOf(networkResult, podcastResult),
+        )
+
+        val results = manager.combinedSearch("wnyc")
+
+        assertEquals(listOf("podcast-uuid"), results.map { it.uuid })
+    }
+
+    @Test
+    fun `combined search drops networks with a blank title`() = runTest {
+        FeatureFlag.setEnabled(Feature.NETWORK_DISCOVERY, true)
+        whenever(combinedSearchService.combinedSearch(any())) doReturn CombinedSearchResponse(
+            results = listOf(
+                networkResult.copy(uuid = "no-title-uuid", title = null),
+                networkResult.copy(uuid = "blank-title-uuid", title = "  "),
+                networkResult,
+            ),
+        )
+
+        val results = manager.combinedSearch("wnyc")
+
+        assertEquals(listOf("network-uuid"), results.map { it.uuid })
+    }
+
+    private val networkResult = CombinedResult.NetworkResult(
+        uuid = "network-uuid",
+        title = "WNYC",
+        shortDescription = "New York's flagship public radio station",
+        collectionImage = "https://static.pocketcasts.com/wnyc-author.png",
+    )
+
+    private val podcastResult = CombinedResult.PodcastResult(
+        uuid = "podcast-uuid",
+        title = "Big Sugar",
+        author = "Weekday Fun Productions",
+        slug = "big-sugar",
+        explicit = false,
+    )
 }

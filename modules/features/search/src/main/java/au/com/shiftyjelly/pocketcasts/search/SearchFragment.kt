@@ -32,6 +32,7 @@ import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompo
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.EpisodeItem
+import au.com.shiftyjelly.pocketcasts.models.to.ImprovedSearchResultItem
 import au.com.shiftyjelly.pocketcasts.models.to.SearchHistoryEntry
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -41,6 +42,7 @@ import au.com.shiftyjelly.pocketcasts.search.searchhistory.SearchHistoryClearAll
 import au.com.shiftyjelly.pocketcasts.search.searchhistory.SearchHistoryPage
 import au.com.shiftyjelly.pocketcasts.search.searchhistory.SearchHistoryViewModel
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
+import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.views.extensions.hide
 import au.com.shiftyjelly.pocketcasts.views.extensions.show
@@ -347,6 +349,7 @@ class SearchFragment : BaseFragment() {
                                 onEpisodeClick = { onEpisodeClick(episode = SearchHistoryEntry.fromImprovedEpisodeResult(it)) },
                                 onPodcastClick = { onPodcastClick(SearchHistoryEntry.fromImprovedPodcastResult(it), it.isFollowed) },
                                 onFolderClick = ::onFolderClick,
+                                onNetworkClick = ::onNetworkClick,
                                 onFollowPodcast = { viewModel.onSubscribeToPodcast(it.uuid) },
                                 playButtonListener = playButtonListener,
                                 onScroll = { UiUtil.hideKeyboard(searchView) },
@@ -415,6 +418,20 @@ class SearchFragment : BaseFragment() {
         )
         searchHistoryViewModel.add(folder)
         listener?.onSearchFolderClick(folder.uuid)
+        binding?.searchView?.let { UiUtil.hideKeyboard(it) }
+    }
+
+    private fun onNetworkClick(network: ImprovedSearchResultItem.NetworkItem) {
+        viewModel.trackSearchResultTapped(
+            source = source,
+            uuid = network.uuid,
+            type = SearchResultType.NETWORK,
+        )
+        (requireActivity() as FragmentHostListener).openNetworkPage(
+            listId = network.uuid,
+            title = network.title,
+            sourceView = SourceView.SEARCH_RESULTS,
+        )
         binding?.searchView?.let { UiUtil.hideKeyboard(it) }
     }
 
