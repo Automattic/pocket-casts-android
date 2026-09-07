@@ -86,7 +86,7 @@ fun TvBannerRow(
                             .background(
                                 Brush.horizontalGradient(
                                     0f to Color.Black,
-                                    0.35f to Color.Transparent,
+                                    0.6f to Color.Transparent,
                                 ),
                             ),
                     )
