@@ -1,10 +1,13 @@
 package au.com.shiftyjelly.pocketcasts.discover.compose
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -21,6 +24,8 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
+import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowOutlinedButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
@@ -29,6 +34,36 @@ import au.com.shiftyjelly.pocketcasts.discover.viewmodel.NetworksGridViewModel.U
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverListSummary
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+
+@Composable
+internal fun NetworksGridPage(
+    title: String?,
+    state: UiState,
+    onClickBack: () -> Unit,
+    onClickNetwork: (DiscoverListSummary) -> Unit,
+    onClickRetry: () -> Unit,
+    bottomInset: Dp,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(MaterialTheme.theme.colors.primaryUi02),
+    ) {
+        ThemedTopAppBar(
+            title = title,
+            navigationButton = NavigationButton.Back,
+            onNavigationClick = onClickBack,
+        )
+        NetworksGrid(
+            state = state,
+            onClickNetwork = onClickNetwork,
+            onClickRetry = onClickRetry,
+            bottomInset = bottomInset,
+            modifier = Modifier.weight(1f),
+        )
+    }
+}
 
 @Composable
 internal fun NetworksGrid(
