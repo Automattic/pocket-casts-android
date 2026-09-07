@@ -7,6 +7,8 @@ import au.com.shiftyjelly.pocketcasts.servers.search.AutoCompleteResult
 import au.com.shiftyjelly.pocketcasts.servers.search.AutoCompleteSearchService
 import au.com.shiftyjelly.pocketcasts.servers.search.CombinedResult
 import au.com.shiftyjelly.pocketcasts.servers.search.CombinedSearchRequest
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
 
@@ -56,6 +58,17 @@ class ImprovedSearchManagerImpl @Inject constructor(
                     duration = it.duration.seconds,
                     hasVideo = it.hasVideo == true,
                 )
+
+                is CombinedResult.NetworkResult -> {
+                    if (!FeatureFlag.isEnabled(Feature.NETWORK_DISCOVERY)) return@mapNotNull null
+                    val title = it.title?.takeIf { title -> title.isNotBlank() } ?: return@mapNotNull null
+                    ImprovedSearchResultItem.NetworkItem(
+                        uuid = it.uuid,
+                        title = title,
+                        description = it.shortDescription,
+                        imageUrl = it.collectionImage,
+                    )
+                }
 
                 CombinedResult.Unknown -> null
             }
