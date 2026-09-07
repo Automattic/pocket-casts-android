@@ -427,7 +427,6 @@ internal class DiscoverAdapter(
         private var isLoading by mutableStateOf(true)
         private var boundSource: String? = null
 
-        // the composition is disposed when the row leaves the window, so the scroll position is held out here
         private var scrollState by mutableStateOf(LazyListState())
 
         init {
@@ -451,12 +450,10 @@ internal class DiscoverAdapter(
             binding.lblTitle.text = row.title.tryToLocalise(context.resources)
             binding.btnShowAll.setOnClickListener(null)
             if (row.source != boundSource) {
-                // a recycled holder must not inherit the previous row's cards or scroll position
                 boundSource = row.source
                 networks = emptyList()
                 scrollState = LazyListState()
             }
-            // a reload keeps whatever is already on screen; only a row with nothing to show falls back to placeholders
             isLoading = networks.isEmpty()
         }
 
