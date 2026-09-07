@@ -45,12 +45,12 @@ private class TruncationDetectingSource(
     private val redactedUrl: String,
 ) : ForwardingSource(delegate) {
     private var bytesRead = 0L
+    private val tolerance = maxOf(MIN_TOLERANCE_BYTES, minOf(declaredLength / 10, MAX_TOLERANCE_BYTES))
 
     override fun read(sink: Buffer, byteCount: Long): Long {
         val read = super.read(sink, byteCount)
         if (read == -1L) {
-            val missing = declaredLength - bytesRead
-            if (missing > MIN_MISSING_BYTES && bytesRead < declaredLength * MIN_DELIVERED_FRACTION) {
+            if (declaredLength - bytesRead > tolerance) {
                 throw ProtocolException(
                     "unexpected end of stream: received $bytesRead of $declaredLength bytes from $redactedUrl",
                 )
@@ -62,7 +62,7 @@ private class TruncationDetectingSource(
     }
 
     private companion object {
-        const val MIN_MISSING_BYTES = 512L * 1024L
-        const val MIN_DELIVERED_FRACTION = 0.9
+        const val MIN_TOLERANCE_BYTES = 512L * 1024L
+        const val MAX_TOLERANCE_BYTES = 2L * 1024L * 1024L
     }
 }
