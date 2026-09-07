@@ -54,6 +54,7 @@ val LocalUseEpisodeArtwork = staticCompositionLocalOf { false }
 fun TvEpisodeRow(
     episode: PodcastEpisode,
     onClick: () -> Unit,
+    onLongClick: (() -> Unit)? = null,
     dateFormatter: RelativeDateFormatter,
     modifier: Modifier = Modifier,
 ) {
@@ -68,7 +69,8 @@ fun TvEpisodeRow(
 
     TvTile(
         onClick = onClick,
-        scale = CardDefaults.scale(focusedScale = 1.02f),
+        onLongClick = onLongClick,
+        scale = CardDefaults.scale(focusedScale = TvFocusedWideCardScale),
         shape = CardDefaults.shape(RoundedCornerShape(8.dp)),
         colors = CardDefaults.colors(
             containerColor = MaterialTheme.tvColors.backgroundBase,
@@ -144,6 +146,7 @@ fun TvEpisodeRow(
 fun TvResumeCard(
     episode: PodcastEpisode,
     onClick: () -> Unit,
+    onLongClick: (() -> Unit)? = null,
     dateFormatter: RelativeDateFormatter,
     modifier: Modifier = Modifier,
 ) {
@@ -158,7 +161,8 @@ fun TvResumeCard(
 
     TvTile(
         onClick = onClick,
-        scale = CardDefaults.scale(focusedScale = 1.02f),
+        onLongClick = onLongClick,
+        scale = CardDefaults.scale(focusedScale = TvFocusedWideCardScale),
         shape = CardDefaults.shape(RoundedCornerShape(8.dp)),
         colors = CardDefaults.colors(
             containerColor = MaterialTheme.tvColors.backgroundBase,

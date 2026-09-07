@@ -34,7 +34,7 @@ fun String.parseIsoDate(): Date? {
             // try next format
         }
     }
-    Timber.e("Parsing ISO date failed [${toString()}]")
+    Timber.e("Parsing ISO date failed [$this]")
     return null
 }
 

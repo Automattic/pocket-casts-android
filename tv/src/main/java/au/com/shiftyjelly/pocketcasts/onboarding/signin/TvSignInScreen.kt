@@ -109,12 +109,6 @@ private fun TvSignInContent(
                 .padding(vertical = 48.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Image(
-                painter = painterResource(IR.drawable.ic_pocket_casts_logo),
-                contentDescription = null,
-                modifier = Modifier.size(36.dp),
-            )
-            Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = stringResource(LR.string.tv_sign_in_title),
                 color = MaterialTheme.tvColors.textPrimary,

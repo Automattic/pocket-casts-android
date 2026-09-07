@@ -54,6 +54,6 @@ object TvButtonDefaults {
 
     @Composable
     fun controlBarIconButtonColors() = iconButtonColors(
-        contentColor = MaterialTheme.tvColors.textPrimary70,
+        contentColor = MaterialTheme.tvColors.textSecondary,
     )
 }

@@ -55,6 +55,7 @@ fun TooltipPopup(
     elevation: Dp = 16.dp,
     anchorOffset: DpOffset = DpOffset.Zero,
     properties: PopupProperties = PopupProperties(dismissOnClickOutside = false),
+    clickableElevationPadding: Boolean = false,
     onClick: (() -> Unit)? = null,
     onClickOutside: (() -> Unit)? = null,
 ) {
@@ -68,6 +69,17 @@ fun TooltipPopup(
     ) {
         Box(
             modifier = Modifier
+                .then(
+                    if (onClick != null && clickableElevationPadding) {
+                        Modifier.clickable(
+                            interactionSource = null,
+                            indication = null,
+                            onClick = onClick,
+                        )
+                    } else {
+                        Modifier
+                    },
+                )
                 .padding(elevationPadding)
                 .then(modifier),
         ) {

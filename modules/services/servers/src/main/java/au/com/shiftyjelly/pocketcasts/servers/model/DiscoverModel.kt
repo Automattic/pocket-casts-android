@@ -146,7 +146,14 @@ data class ListFeed(
     @Json(name = "paid") val paid: Boolean? = false,
     @Json(name = "author") val author: String? = null,
     @Json(name = "list_id") val listId: String? = null,
+    @Json(name = "type") val type: ListType? = null,
+    @Json(name = "summary_style") val summaryStyle: DisplayStyle? = null,
+    @Json(name = "expanded_style") val expandedStyle: ExpandedStyle? = null,
+    @Json(name = "lists") val lists: List<NetworkListSummary> = emptyList(),
 ) {
+    /** A `lists_list` may only carry `podcast_list` entries, so anything else the server adds is dropped here. */
+    val networks get() = lists.filter { it.type is ListType.PodcastList }
+
     val displayList: List<Any>
         get() {
             return if (promotion != null) {
@@ -156,6 +163,21 @@ data class ListFeed(
             }
         }
 }
+
+/** An entry inside a `lists_list`. */
+@JsonClass(generateAdapter = true)
+data class NetworkListSummary(
+    @Json(name = "uuid") val uuid: String,
+    @Json(name = "title") val title: String?,
+    @Json(name = "description") val description: String?,
+    @Json(name = "type") val type: ListType?,
+    @Json(name = "summary_style") val summaryStyle: DisplayStyle?,
+    @Json(name = "expanded_style") val expandedStyle: ExpandedStyle?,
+    @Json(name = "source") val source: String?,
+    @Json(name = "collection_image") val collectionImage: String?,
+    @Json(name = "item_count") val itemCount: Int?,
+    @Json(name = "url_path") val urlPath: String?,
+)
 
 @JsonClass(generateAdapter = true)
 data class ListPayment(
