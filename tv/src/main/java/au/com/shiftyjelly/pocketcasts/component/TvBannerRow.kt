@@ -3,11 +3,13 @@ package au.com.shiftyjelly.pocketcasts.component
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -67,7 +69,8 @@ fun TvBannerRow(
         interactionSource = interactionSource,
         modifier = modifier
             .fillMaxWidth()
-            .height(153.dp),
+            .height(153.dp)
+            .border(1.dp, MaterialTheme.tvColors.overlayBorder, TvCardShape),
     ) {
         Box(modifier = Modifier.fillMaxSize().clipToBounds()) {
             if (banner.hasArtworkMask) {
@@ -80,7 +83,8 @@ fun TvBannerRow(
                 alignment = Alignment.CenterEnd,
                 modifier = Modifier
                     .align(Alignment.CenterEnd)
-                    .requiredHeight(banner.artworkHeight),
+                    .requiredHeight(banner.artworkHeight)
+                    .padding(banner.artworkPadding),
             )
             if (banner.hasArtworkMask) {
                 // Opaque black over the text side so the bright collage only shows on the end edge.
@@ -172,8 +176,14 @@ private fun TvDiscoverBanner.artwork(): Int = when (this) {
 
 private val TvDiscoverBanner.artworkHeight: Dp
     get() = when (this) {
-        TvDiscoverBanner.CreateAccount -> 150.dp
+        TvDiscoverBanner.CreateAccount -> 168.dp
         TvDiscoverBanner.DiscoverMore -> 197.dp
+    }
+
+private val TvDiscoverBanner.artworkPadding: PaddingValues
+    get() = when (this) {
+        TvDiscoverBanner.CreateAccount -> PaddingValues(top = 10.dp, end = 28.dp)
+        TvDiscoverBanner.DiscoverMore -> PaddingValues()
     }
 
 private val TvDiscoverBanner.contentWidthFraction: Float
