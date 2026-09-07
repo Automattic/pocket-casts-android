@@ -16,8 +16,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -44,10 +46,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.Button
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import au.com.shiftyjelly.pocketcasts.component.ScrollToTopEffect
+import au.com.shiftyjelly.pocketcasts.component.TopBarScrollReporter
 import au.com.shiftyjelly.pocketcasts.component.TvDetailOverlay
 import au.com.shiftyjelly.pocketcasts.component.TvEmptyState
 import au.com.shiftyjelly.pocketcasts.component.TvPlaylistCard
 import au.com.shiftyjelly.pocketcasts.component.TvPlaylistCardColors
+import au.com.shiftyjelly.pocketcasts.component.scrollAwayTopBar
 import au.com.shiftyjelly.pocketcasts.component.tvFocusInactiveWhen
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistIcon
@@ -104,7 +109,6 @@ fun TvPlaylistsScreen(
             },
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = TvTopBarHeight)
                 .tvFocusInactiveWhen(playlist != null),
             restoreFocusTrigger = restoreFocusTrigger,
         )
@@ -168,13 +172,17 @@ private fun TvPlaylistsContent(
         when (state) {
             is TvPlaylistsUiState.Loading -> LoadingView(
                 color = MaterialTheme.tvColors.textPrimary,
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = TvTopBarHeight),
             )
 
             is TvPlaylistsUiState.Loaded -> if (state.playlists.isEmpty()) {
                 TvPlaylistsEmpty(
                     onCreatePlaylist = onCreatePlaylist,
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = TvTopBarHeight),
                 )
             } else {
                 TvPlaylistsGrid(
@@ -206,15 +214,12 @@ private fun TvPlaylistsGrid(
     restoreFocusTrigger: Int = 0,
 ) {
     Column(modifier = modifier.padding(horizontal = 42.dp)) {
-        Text(
-            text = stringResource(LR.string.playlists),
-            style = MaterialTheme.tvTypography.title2,
-            color = MaterialTheme.tvColors.textPrimary,
-            modifier = Modifier.padding(top = 40.dp, bottom = 0.dp),
-        )
         var lastFocusedIndex by rememberSaveable(playlists) { mutableIntStateOf(0) }
         val focusRequesters = remember(playlists) { List(playlists.size) { FocusRequester() } }
         val gridFocusRequester = remember { FocusRequester() }
+        val gridState = rememberLazyGridState()
+        ScrollToTopEffect { gridState.scrollToItem(0) }
+        TopBarScrollReporter(gridState)
 
         var isInitialComposition by remember { mutableStateOf(true) }
         LaunchedEffect(restoreFocusTrigger) {
@@ -228,11 +233,13 @@ private fun TvPlaylistsGrid(
         }
 
         LazyVerticalGrid(
+            state = gridState,
             columns = GridCells.Fixed(3),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
-            contentPadding = PaddingValues(top = 20.dp, bottom = 32.dp),
+            contentPadding = PaddingValues(bottom = 32.dp),
             modifier = Modifier
+                .scrollAwayTopBar()
                 .focusRequester(gridFocusRequester)
                 .focusGroup()
                 .focusProperties {
@@ -241,6 +248,14 @@ private fun TvPlaylistsGrid(
                     }
                 },
         ) {
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                Text(
+                    text = stringResource(LR.string.playlists),
+                    style = MaterialTheme.tvTypography.title2,
+                    color = MaterialTheme.tvColors.textPrimary,
+                    modifier = Modifier.padding(top = 40.dp, bottom = 0.dp),
+                )
+            }
             itemsIndexed(
                 items = playlists,
                 key = { _, playlist -> playlist.uuid },
