@@ -87,8 +87,8 @@ fun TvBannerRow(
                         .background(
                             Brush.horizontalGradient(
                                 0f to Color.Transparent,
-                                0.58f to Color.Transparent,
-                                0.74f to Color.Black,
+                                0.66f to Color.Transparent,
+                                0.78f to Color.Black,
                                 1f to Color.Transparent,
                             ),
                         ),
@@ -156,7 +156,7 @@ private fun TvDiscoverBanner.artwork(): Int = when (this) {
 private val TvDiscoverBanner.artworkHeight: Dp
     get() = when (this) {
         TvDiscoverBanner.CreateAccount -> 184.dp
-        TvDiscoverBanner.DiscoverMore -> 197.dp
+        TvDiscoverBanner.DiscoverMore -> 153.dp
     }
 
 private val TvDiscoverBanner.artworkPadding: PaddingValues
