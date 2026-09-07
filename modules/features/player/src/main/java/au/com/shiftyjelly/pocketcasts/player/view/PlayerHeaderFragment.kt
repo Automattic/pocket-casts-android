@@ -231,7 +231,7 @@ class PlayerHeaderFragment :
         val activeAd by viewModel.activeAd.collectAsStateWithLifecycle()
         val playbackNotice by viewModel.playbackNotice.collectAsStateWithLifecycle()
 
-        val isPlayerOpen by isPlayerOpenFlow().collectAsStateWithLifecycle(false)
+        val isPlayerOpen by remember { isPlayerOpenFlow() }.collectAsStateWithLifecycle(false)
         val isTranscriptOpen by shelfSharedViewModel.isTranscriptOpen.collectAsStateWithLifecycle()
         val transcriptUiState by transcriptViewModel.uiState.collectAsStateWithLifecycle()
 
@@ -637,6 +637,7 @@ class PlayerHeaderFragment :
             override fun onSlide(bottomSheet: View, slideOffset: Float) = Unit
         }
         val hostListener = (requireActivity() as FragmentHostListener)
+        send(hostListener.getPlayerBottomSheetState() == BottomSheetBehavior.STATE_EXPANDED)
         hostListener.addPlayerBottomSheetCallback(callback)
         awaitClose {
             hostListener.removePlayerBottomSheetCallback(callback)

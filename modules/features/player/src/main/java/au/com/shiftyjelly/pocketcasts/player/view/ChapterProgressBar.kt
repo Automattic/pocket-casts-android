@@ -24,7 +24,7 @@ class ChapterProgressBar @JvmOverloads constructor(
             if (field == value) return
             field = value
             progressDrawRect = RectF(0f, 0f, backgroundDrawRect.right * progress, backgroundDrawRect.bottom)
-            if (isAttachedToWindow && isShown) invalidate()
+            invalidate()
         }
 
     val cornerRadius = 8.dpToPx(context).toFloat()
