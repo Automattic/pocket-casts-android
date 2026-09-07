@@ -44,6 +44,20 @@ class ContentLengthValidatorInterceptorTest {
     }
 
     @Test
+    fun `shortfall equal to the absolute threshold passes through`() {
+        val body = readWholeBody(declaredLength = MB, deliveredBytes = (MB - 512 * KB).toInt())
+
+        assertEquals((MB - 512 * KB).toInt(), body.size)
+    }
+
+    @Test
+    fun `grossly truncated partial content throws`() {
+        assertThrows(ProtocolException::class.java) {
+            readWholeBody(declaredLength = 2 * MB, deliveredBytes = MB.toInt(), code = 206)
+        }
+    }
+
+    @Test
     fun `shortfall above ninety percent delivered passes through`() {
         val deliveredBytes = (6 * MB - 600 * KB).toInt()
 
