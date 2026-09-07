@@ -2,6 +2,14 @@ package au.com.shiftyjelly.pocketcasts.component
 
 import android.os.Build
 import android.view.WindowManager
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -14,15 +22,19 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.Dp
@@ -42,19 +54,39 @@ fun TvModal(
     contentPadding: PaddingValues = DefaultContentPadding,
     content: @Composable ColumnScope.() -> Unit,
 ) {
+    var visible by remember { mutableStateOf(true) }
+    val currentOnDismissRequest by rememberUpdatedState(onDismissRequest)
     Dialog(
-        onDismissRequest = onDismissRequest,
+        onDismissRequest = { visible = false },
         properties = DialogProperties(usePlatformDefaultWidth = false),
     ) {
+        val transitionState = remember { MutableTransitionState(false) }
+        transitionState.targetState = visible
         val isBlurBehindEnabled by rememberIsBlurBehindEnabled()
-        TvModalWindowEffects(isBlurBehindEnabled = isBlurBehindEnabled)
-        TvModalSurface(
-            isTranslucent = isBlurBehindEnabled,
-            width = width,
-            contentPadding = contentPadding,
-            modifier = modifier,
-            content = content,
+        val dimAmount by animateFloatAsState(
+            targetValue = if (visible) ModalDimAmount else 0f,
+            animationSpec = tween(ModalAnimationDuration),
+            label = "TvModalDim",
         )
+        TvModalWindowEffects(isBlurBehindEnabled = isBlurBehindEnabled, dimAmount = dimAmount)
+        LaunchedEffect(transitionState.isIdle) {
+            if (!visible && transitionState.isIdle && !transitionState.currentState) {
+                currentOnDismissRequest()
+            }
+        }
+        AnimatedVisibility(
+            visibleState = transitionState,
+            enter = fadeIn(tween(ModalAnimationDuration)) + scaleIn(tween(ModalAnimationDuration), initialScale = 0.92f),
+            exit = fadeOut(tween(ModalAnimationDuration)) + scaleOut(tween(ModalAnimationDuration), targetScale = 0.92f),
+        ) {
+            TvModalSurface(
+                isTranslucent = isBlurBehindEnabled,
+                width = width,
+                contentPadding = contentPadding,
+                modifier = modifier.onPreviewKeyEvent { visible.not() },
+                content = content,
+            )
+        }
     }
 }
 
@@ -86,11 +118,14 @@ internal fun TvModalSurface(
 }
 
 @Composable
-private fun TvModalWindowEffects(isBlurBehindEnabled: Boolean) {
+private fun TvModalWindowEffects(isBlurBehindEnabled: Boolean, dimAmount: Float) {
     val window = (LocalView.current.parent as? DialogWindowProvider)?.window ?: return
-    val blurRadius = with(LocalDensity.current) { 45.dp.roundToPx() }
+    val blurRadius = with(LocalDensity.current) { ModalBlurRadius.roundToPx() }
+    SideEffect {
+        window.setWindowAnimations(0)
+        window.setDimAmount(dimAmount)
+    }
     LaunchedEffect(window, isBlurBehindEnabled, blurRadius) {
-        window.setDimAmount(0.55f)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             if (isBlurBehindEnabled) {
                 window.addFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND)
@@ -119,6 +154,9 @@ private fun rememberIsBlurBehindEnabled(): State<Boolean> {
     return isBlurBehindEnabled
 }
 
+private val ModalAnimationDuration = 200
+private val ModalDimAmount = 0.4f
+private val ModalBlurRadius = 30.dp
 private val DefaultModalWidth = 300.dp
 private val DefaultContentPadding = PaddingValues(horizontal = 40.dp, vertical = 30.dp)
 private val ModalShape = RoundedCornerShape(21.dp)
