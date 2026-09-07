@@ -26,7 +26,7 @@ sealed class ExpandedStyle(val stringValue: String) {
     }
 
     /** `network_grid` renders the same page as `grid`, so both open the podcast grid screen. */
-    val opensPodcastGrid get() = this is GridList || this is NetworkGrid
+    val usePodcastGrid get() = this is GridList || this is NetworkGrid
 
     class RankedList : ExpandedStyle(RANKED_LIST)
     class PlainList : ExpandedStyle(PLAIN_LIST)

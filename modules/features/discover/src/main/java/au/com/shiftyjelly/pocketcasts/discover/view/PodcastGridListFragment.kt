@@ -157,7 +157,6 @@ open class PodcastGridListFragment :
     val isNetworkPage: Boolean
         get() = expandedStyle is ExpandedStyle.NetworkGrid
 
-    /** The entry point that opened this page. Network-specific analytics are picked up in a follow-up. */
     val entrySourceView: SourceView
         get() = SourceView.fromString(arguments?.getString(ARG_SOURCE_VIEW))
 
