@@ -11,8 +11,6 @@ import au.com.shiftyjelly.pocketcasts.models.to.SearchAutoCompleteItem
 import au.com.shiftyjelly.pocketcasts.models.to.SearchHistoryEntry
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.PodcastSubscribedEvent
 import com.automattic.eventhorizon.SearchDismissedEvent
@@ -54,73 +52,64 @@ class SearchViewModel @Inject constructor(
     val state: StateFlow<SearchUiState> = _state
 
     init {
-        if (FeatureFlag.isEnabled(Feature.IMPROVED_SEARCH_SUGGESTIONS)) {
-            viewModelScope.launch {
-                searchHandler.searchSuggestions
-                    .collect { operation ->
-                        showSearchHistory = false
-                        _state.update { uiState ->
-                            when (operation) {
-                                is SearchUiState.SearchOperation.Error -> {
+        viewModelScope.launch {
+            searchHandler.searchSuggestions
+                .collect { operation ->
+                    showSearchHistory = false
+                    _state.update { uiState ->
+                        when (operation) {
+                            is SearchUiState.SearchOperation.Error -> {
+                                eventHorizon.track(
+                                    SearchPredictiveFailedEvent(
+                                        source = source.analyticsValue,
+                                        term = operation.searchTerm,
+                                    ),
+                                )
+                            }
+
+                            is SearchUiState.SearchOperation.Success -> {
+                                if (operation.results.isEmpty() && operation.searchTerm.isNotEmpty()) {
                                     eventHorizon.track(
-                                        SearchPredictiveFailedEvent(
+                                        SearchEmptyResultsEvent(
                                             source = source.analyticsValue,
                                             term = operation.searchTerm,
                                         ),
                                     )
                                 }
-
-                                is SearchUiState.SearchOperation.Success -> {
-                                    if (operation.results.isEmpty() && operation.searchTerm.isNotEmpty()) {
-                                        eventHorizon.track(
-                                            SearchEmptyResultsEvent(
-                                                source = source.analyticsValue,
-                                                term = operation.searchTerm,
-                                            ),
-                                        )
-                                    }
-                                }
-
-                                else -> Unit
                             }
 
-                            // only show loading for the initial query when autocomplete results are empty
-                            if (((uiState as? SearchUiState.Suggestions)?.operation as? SearchUiState.SearchOperation.Success)?.results?.isNotEmpty() == true && operation is SearchUiState.SearchOperation.Loading) {
-                                uiState
-                            } else {
-                                SearchUiState.Suggestions(operation = operation)
-                            }
+                            else -> Unit
+                        }
+
+                        // only show loading for the initial query when autocomplete results are empty
+                        if (((uiState as? SearchUiState.Suggestions)?.operation as? SearchUiState.SearchOperation.Success)?.results?.isNotEmpty() == true && operation is SearchUiState.SearchOperation.Loading) {
+                            uiState
+                        } else {
+                            SearchUiState.Suggestions(operation = operation)
                         }
                     }
-            }
+                }
         }
 
         viewModelScope.launch {
             searchHandler.improvedSearchResults.collect {
                 showSearchHistory = false
                 _state.value = SearchUiState.Results(operation = it)
-                if (!FeatureFlag.isEnabled(Feature.IMPROVED_SEARCH_SUGGESTIONS) && it is SearchUiState.SearchOperation.Loading) {
-                    saveSearchTerm(it.searchTerm)
-                }
             }
         }
     }
 
-    fun updateSearchQuery(query: String, immediate: Boolean = false) {
+    fun updateSearchQuery(query: String) {
         // Prevent updating the search query when navigating back to the search results after tapping on a result.
         if (query == _state.value.searchTerm) return
 
-        if (FeatureFlag.isEnabled(Feature.IMPROVED_SEARCH_SUGGESTIONS)) {
-            searchHandler.updateAutCompleteQuery(query)
-            _state.update {
-                if (it is SearchUiState.Results && it.searchTerm.orEmpty().length > query.length) {
-                    SearchUiState.Suggestions(operation = SearchUiState.SearchOperation.Success(searchTerm = query, results = emptyList()))
-                } else {
-                    it
-                }
+        searchHandler.updateAutCompleteQuery(query)
+        _state.update {
+            if (it is SearchUiState.Results && it.searchTerm.orEmpty().length > query.length) {
+                SearchUiState.Suggestions(operation = SearchUiState.SearchOperation.Success(searchTerm = query, results = emptyList()))
+            } else {
+                it
             }
-        } else {
-            searchHandler.updateSearchQuery(query, immediate)
         }
     }
 
