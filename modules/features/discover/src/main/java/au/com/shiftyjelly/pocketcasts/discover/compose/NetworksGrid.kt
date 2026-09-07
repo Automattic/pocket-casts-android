@@ -54,7 +54,8 @@ internal fun NetworksGrid(
         }
 
         is UiState.Loaded -> LazyVerticalGrid(
-            columns = GridCells.Fixed(COLUMN_COUNT),
+            // sizing the columns off the card keeps landscape and tablets near the designed 168dp rather than stretching two across
+            columns = GridCells.Adaptive(NetworkCardWidth),
             contentPadding = PaddingValues(
                 start = HorizontalMargin,
                 end = HorizontalMargin,
@@ -96,11 +97,23 @@ private fun NetworksGridError(
     }
 }
 
-private const val COLUMN_COUNT = 2
 private val HorizontalMargin = 24.dp
 private val VerticalMargin = 16.dp
 private val Gutter = 18.dp
 private val RowSpacing = 26.dp
+
+@Preview(name = "Landscape", widthDp = 874, heightDp = 402)
+@Composable
+private fun NetworksGridLandscapePreview() {
+    AppThemeWithBackground(Theme.ThemeType.LIGHT) {
+        NetworksGrid(
+            state = UiState.Loaded(List(6) { index -> NetworkPreview.copy(uuid = "network-$index") }),
+            onClickNetwork = {},
+            onClickRetry = {},
+            bottomInset = 0.dp,
+        )
+    }
+}
 
 @Preview(widthDp = 402)
 @Composable
