@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.discover.compose
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -49,12 +48,13 @@ internal fun NetworkCard(
         modifier = modifier.clickable(onClick = onClick),
     ) {
         NetworkImage(imageUrl = network.collectionImage)
-        Spacer(Modifier.height(10.dp))
+        Spacer(Modifier.height(TitleSpacing))
         TextH40(
             text = network.title.orEmpty(),
             color = MaterialTheme.theme.colors.primaryText01,
             maxLines = 1,
         )
+        Spacer(Modifier.height(DescriptionSpacing))
         TextP50(
             text = network.description.orEmpty(),
             color = MaterialTheme.theme.colors.primaryText02,
@@ -93,6 +93,8 @@ private fun NetworkImage(
 }
 
 private val NetworkImageElevation: Dp = 4.dp
+private val TitleSpacing: Dp = 10.dp
+private val DescriptionSpacing: Dp = 2.dp
 private val DescriptionHeight: Dp = 40.dp
 
 internal val NetworkPreview = DiscoverListSummary(
