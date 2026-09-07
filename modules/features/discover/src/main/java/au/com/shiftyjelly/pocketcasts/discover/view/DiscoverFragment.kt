@@ -29,7 +29,6 @@ import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverEpisode
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverListSummary
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRegion
-import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRow
 import au.com.shiftyjelly.pocketcasts.servers.model.ExpandedStyle
 import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
@@ -119,7 +118,7 @@ class DiscoverFragment :
             trackCategoryShownImpression(contentList)
         }
 
-        if (contentList.expandedStyle.opensPodcastGrid) {
+        if (contentList.expandedStyle.usePodcastGrid) {
             val fragment = PodcastGridFragment.newInstance(transformedList)
             (activity as FragmentHostListener).addFragment(fragment)
         } else {
@@ -137,7 +136,7 @@ class DiscoverFragment :
                 ),
             )
         }
-        if (list.expandedStyle.opensPodcastGrid) {
+        if (list.expandedStyle.usePodcastGrid) {
             val fragment = PodcastGridFragment.newInstance(transformedList)
             (activity as FragmentHostListener).addFragment(fragment)
         }
