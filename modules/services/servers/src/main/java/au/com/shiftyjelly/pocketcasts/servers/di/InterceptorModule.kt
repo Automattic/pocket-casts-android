@@ -7,6 +7,7 @@ import au.com.shiftyjelly.pocketcasts.servers.BuildConfig
 import au.com.shiftyjelly.pocketcasts.servers.CleanAndRetryInterceptor
 import au.com.shiftyjelly.pocketcasts.servers.OkHttpInterceptor
 import au.com.shiftyjelly.pocketcasts.servers.interceptors.BasicAuthInterceptor
+import au.com.shiftyjelly.pocketcasts.servers.interceptors.ContentLengthValidatorInterceptor
 import au.com.shiftyjelly.pocketcasts.servers.interceptors.InternationalizationInterceptor
 import au.com.shiftyjelly.pocketcasts.servers.interceptors.UserFileAuthInterceptor
 import au.com.shiftyjelly.pocketcasts.servers.sync.TokenHandler
@@ -95,6 +96,8 @@ object InterceptorModule {
     ).toClientInterceptor() // Must be client interceptor. Otherwise calls cannot be retried.
 
     private val basicAuthInterceptor = BasicAuthInterceptor().toClientInterceptor()
+
+    private val contentLengthValidatorInterceptor = ContentLengthValidatorInterceptor().toNetworkInterceptor()
 
     @Provides
     @TokenInterceptor
@@ -231,6 +234,7 @@ object InterceptorModule {
             add(basicAuthInterceptor)
             add(cleanAndRetryInterceptor)
             add(userFileAuthInterceptor.toClientInterceptor())
+            add(contentLengthValidatorInterceptor)
 
             if (BuildConfig.DEBUG) {
                 val loggingInterceptor = HttpLoggingInterceptor().apply {
@@ -276,6 +280,7 @@ object InterceptorModule {
             add(basicAuthInterceptor)
             add(cleanAndRetryInterceptor)
             add(userFileAuthInterceptor.toClientInterceptor())
+            add(contentLengthValidatorInterceptor)
 
             if (BuildConfig.DEBUG) {
                 val loggingInterceptor = HttpLoggingInterceptor().apply {
