@@ -1,5 +1,8 @@
 8.21
 -----
+*   New Features
+    *   Browse podcast networks from Discover, search and the podcast page
+        ([#5865](https://github.com/Automattic/pocket-casts-android/pull/5865))
 *   Bug Fixes
     *   Keep the multi-select episode selection when rotating the device on the podcast screen
         ([#5836](https://github.com/Automattic/pocket-casts-android/pull/5836))
