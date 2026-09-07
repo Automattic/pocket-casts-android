@@ -61,9 +61,10 @@ class ImprovedSearchManagerImpl @Inject constructor(
 
                 is CombinedResult.NetworkResult -> {
                     if (!FeatureFlag.isEnabled(Feature.NETWORK_DISCOVERY)) return@mapNotNull null
+                    val uuid = it.uuid ?: return@mapNotNull null
                     val title = it.title?.takeIf { title -> title.isNotBlank() } ?: return@mapNotNull null
                     ImprovedSearchResultItem.NetworkItem(
-                        uuid = it.uuid,
+                        uuid = uuid,
                         title = title,
                         description = it.shortDescription,
                         imageUrl = it.collectionImage,

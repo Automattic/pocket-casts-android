@@ -40,7 +40,7 @@ sealed interface CombinedResult {
 
     @JsonClass(generateAdapter = true)
     data class NetworkResult(
-        val uuid: String,
+        val uuid: String? = null,
         val title: String? = null,
         @Json(name = "short_description")
         val shortDescription: String? = null,

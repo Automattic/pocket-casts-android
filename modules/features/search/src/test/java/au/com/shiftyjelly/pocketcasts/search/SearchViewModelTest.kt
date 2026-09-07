@@ -100,7 +100,7 @@ class SearchViewModelTest {
         viewModel.selectFilter(ResultsFilters.NETWORKS)
         assertEquals(listOf(networkItem), filteredResults())
 
-        emitResults(podcastItem, filter = ResultsFilters.NETWORKS)
+        emitResults(podcastItem)
 
         val state = resultsState()
         assertEquals(0, state.selectedFilterIndex)
@@ -154,11 +154,11 @@ class SearchViewModelTest {
         assertTrue(event.displaying == null)
     }
 
-    private fun emitResults(vararg items: ImprovedSearchResultItem, filter: ResultsFilters = ResultsFilters.TOP_RESULTS) {
+    private fun emitResults(vararg items: ImprovedSearchResultItem) {
         improvedSearchResults.tryEmit(
             SearchUiState.SearchOperation.Success(
                 searchTerm = "the times",
-                results = SearchResults.Results(results = items.toList(), filter = filter),
+                results = SearchResults.Results(results = items.toList(), filter = ResultsFilters.TOP_RESULTS),
             ),
         )
     }
