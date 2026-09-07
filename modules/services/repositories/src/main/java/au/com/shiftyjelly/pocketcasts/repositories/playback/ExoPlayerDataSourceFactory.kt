@@ -19,6 +19,7 @@ import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.extractor.DefaultExtractorsFactory
 import androidx.media3.extractor.mp3.Mp3Extractor
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.servers.di.Player
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
@@ -43,8 +44,7 @@ class ExoPlayerDataSourceFactory @Inject constructor(
 ) {
     private val cache = runCatching {
         val cacheDir = File(context.cacheDir, CACHE_DIR_NAME)
-        val size = settings.getExoPlayerCacheEntirePlayingEpisodeSizeInMB() * 1024 * 1024L
-        val evictor = LeastRecentlyUsedCacheEvictor(size)
+        val evictor = LeastRecentlyUsedCacheEvictor(maxCacheSizeBytes())
         SimpleCache(cacheDir, evictor, StandaloneDatabaseProvider(context))
     }.onFailure { e ->
         val errorMessage = "Failed to instantiate ExoPlayer cache ${e.message}"
@@ -168,7 +168,14 @@ class ExoPlayerDataSourceFactory @Inject constructor(
         }
     }
 
-    private fun EpisodeLocation.shouldUseCache() = !episode.isDownloaded && !episode.isDownloading && !isHlsStream && settings.cacheEntirePlayingEpisode.value
+    private fun EpisodeLocation.shouldUseCache() = shouldCacheEntireEpisode(
+        episode = episode,
+        isHlsStream = isHlsStream,
+        cacheEntirePlayingEpisodeEnabled = settings.cacheEntirePlayingEpisode.value,
+        maxCacheSizeBytes = maxCacheSizeBytes(),
+    )
+
+    private fun maxCacheSizeBytes() = settings.getExoPlayerCacheEntirePlayingEpisodeSizeInMB() * 1024 * 1024L
 
     private fun ClosedRange<Long>.toClippingConfiguration() = ClippingConfiguration.Builder()
         .setStartPositionMs(start)
@@ -179,3 +186,15 @@ class ExoPlayerDataSourceFactory @Inject constructor(
         const val CACHE_DIR_NAME = "pocketcasts-exoplayer-cache"
     }
 }
+
+internal fun shouldCacheEntireEpisode(
+    episode: BaseEpisode,
+    isHlsStream: Boolean,
+    cacheEntirePlayingEpisodeEnabled: Boolean,
+    maxCacheSizeBytes: Long,
+) = !episode.isDownloaded &&
+    !episode.isDownloading &&
+    !isHlsStream &&
+    !episode.isVideo &&
+    cacheEntirePlayingEpisodeEnabled &&
+    !(maxCacheSizeBytes > 0 && episode.sizeInBytes > maxCacheSizeBytes)
