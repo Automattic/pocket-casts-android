@@ -54,9 +54,7 @@ fun TvBannerRow(
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
 
-    // The collage banner sits on black behind its gradient mask; the rest read as a raised card that
-    // stays distinct from the base->sunken screen gradient it sits on.
-    val backgroundColor = if (banner.hasArtworkMask) Color.Black else MaterialTheme.tvColors.backgroundSurface
+    val backgroundColor = MaterialTheme.tvColors.backgroundSurface
 
     TvTile(
         onClick = onClick,
@@ -72,33 +70,27 @@ fun TvBannerRow(
             .height(153.dp),
     ) {
         Box(modifier = Modifier.fillMaxSize().clipToBounds()) {
-            if (banner.hasArtworkMask) {
-                BackgroundLift()
-            }
-            Image(
-                painter = painterResource(banner.artwork()),
-                contentDescription = null,
-                contentScale = ContentScale.FillHeight,
-                alignment = Alignment.CenterEnd,
-                modifier = Modifier
-                    .align(Alignment.CenterEnd)
-                    .requiredHeight(banner.artworkHeight)
-                    .padding(banner.artworkPadding),
-            )
-            if (banner.hasArtworkMask) {
-                // Opaque black over the text side so the bright collage only shows on the end edge.
-                Box(
+            Box(modifier = Modifier.align(Alignment.CenterEnd)) {
+                Image(
+                    painter = painterResource(banner.artwork()),
+                    contentDescription = null,
+                    contentScale = ContentScale.FillHeight,
                     modifier = Modifier
-                        .fillMaxSize()
-                        .background(
-                            Brush.horizontalGradient(
-                                0f to Color.Black,
-                                0.82f to Color.Black,
-                                1f to Color.Transparent,
-                            ),
-                        ),
+                        .requiredHeight(banner.artworkHeight)
+                        .padding(banner.artworkPadding),
                 )
-                BackgroundLift()
+                if (banner.hasArtworkMask) {
+                    Box(
+                        modifier = Modifier
+                            .matchParentSize()
+                            .background(
+                                Brush.horizontalGradient(
+                                    0f to Color.Black,
+                                    0.35f to Color.Transparent,
+                                ),
+                            ),
+                    )
+                }
             }
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -114,20 +106,6 @@ fun TvBannerRow(
             }
         }
     }
-}
-
-@Composable
-private fun BackgroundLift() {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                Brush.horizontalGradient(
-                    0f to MaterialTheme.tvColors.backgroundActive20,
-                    0.55f to Color.Transparent,
-                ),
-            ),
-    )
 }
 
 @Composable
@@ -175,13 +153,13 @@ private fun TvDiscoverBanner.artwork(): Int = when (this) {
 
 private val TvDiscoverBanner.artworkHeight: Dp
     get() = when (this) {
-        TvDiscoverBanner.CreateAccount -> 168.dp
+        TvDiscoverBanner.CreateAccount -> 184.dp
         TvDiscoverBanner.DiscoverMore -> 197.dp
     }
 
 private val TvDiscoverBanner.artworkPadding: PaddingValues
     get() = when (this) {
-        TvDiscoverBanner.CreateAccount -> PaddingValues(top = 10.dp, end = 28.dp)
+        TvDiscoverBanner.CreateAccount -> PaddingValues(top = 26.dp, end = 28.dp)
         TvDiscoverBanner.DiscoverMore -> PaddingValues()
     }
 
