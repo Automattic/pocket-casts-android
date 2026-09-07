@@ -21,6 +21,7 @@ class ChapterProgressBar @JvmOverloads constructor(
 
     var progress: Float = 0.0f
         set(value) {
+            if (field == value) return
             field = value
             progressDrawRect = RectF(0f, 0f, backgroundDrawRect.right * progress, backgroundDrawRect.bottom)
             invalidate()
