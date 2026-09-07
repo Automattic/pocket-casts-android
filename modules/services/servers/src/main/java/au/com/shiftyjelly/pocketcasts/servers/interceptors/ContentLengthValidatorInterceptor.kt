@@ -51,7 +51,9 @@ private class TruncationDetectingSource(
         if (read == -1L) {
             val missing = declaredLength - bytesRead
             if (missing > MIN_MISSING_BYTES && bytesRead < declaredLength * MIN_DELIVERED_FRACTION) {
-                throw ProtocolException("unexpected end of stream: received $bytesRead of $declaredLength bytes from $redactedUrl")
+                throw ProtocolException(
+                    "unexpected end of stream: received $bytesRead of $declaredLength bytes from $redactedUrl",
+                )
             }
         } else {
             bytesRead += read
