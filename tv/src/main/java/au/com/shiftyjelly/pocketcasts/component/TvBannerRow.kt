@@ -53,13 +53,16 @@ fun TvBannerRow(
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
 
+    // The collage banner sits on black behind its gradient mask; the rest read as a solid card.
+    val backgroundColor = if (banner.hasArtworkMask) Color.Black else MaterialTheme.tvColors.backgroundSunken
+
     TvTile(
         onClick = onClick,
         shape = CardDefaults.shape(TvCardShape),
         scale = CardDefaults.scale(focusedScale = TvFocusedCardScale),
         colors = CardDefaults.colors(
-            containerColor = Color.Black,
-            focusedContainerColor = Color.Black,
+            containerColor = backgroundColor,
+            focusedContainerColor = backgroundColor,
         ),
         interactionSource = interactionSource,
         modifier = modifier
@@ -67,7 +70,9 @@ fun TvBannerRow(
             .height(153.dp),
     ) {
         Box(modifier = Modifier.fillMaxSize().clipToBounds()) {
-            BackgroundLift()
+            if (banner.hasArtworkMask) {
+                BackgroundLift()
+            }
             Image(
                 painter = painterResource(banner.artwork()),
                 contentDescription = null,
