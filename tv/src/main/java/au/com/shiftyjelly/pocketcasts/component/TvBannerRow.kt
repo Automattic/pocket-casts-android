@@ -79,18 +79,20 @@ fun TvBannerRow(
                         .requiredHeight(banner.artworkHeight)
                         .padding(banner.artworkPadding),
                 )
-                if (banner.hasArtworkMask) {
-                    Box(
-                        modifier = Modifier
-                            .matchParentSize()
-                            .background(
-                                Brush.horizontalGradient(
-                                    0f to Color.Black,
-                                    0.6f to Color.Transparent,
-                                ),
+            }
+            if (banner.hasArtworkMask) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(
+                            Brush.horizontalGradient(
+                                0f to Color.Transparent,
+                                0.58f to Color.Transparent,
+                                0.74f to Color.Black,
+                                1f to Color.Transparent,
                             ),
-                    )
-                }
+                        ),
+                )
             }
             Row(
                 verticalAlignment = Alignment.CenterVertically,
