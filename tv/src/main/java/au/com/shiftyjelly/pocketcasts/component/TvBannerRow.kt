@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.component
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Arrangement
@@ -55,8 +54,9 @@ fun TvBannerRow(
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
 
-    // The collage banner sits on black behind its gradient mask; the rest read as a solid card.
-    val backgroundColor = if (banner.hasArtworkMask) Color.Black else MaterialTheme.tvColors.backgroundSunken
+    // The collage banner sits on black behind its gradient mask; the rest read as a raised card that
+    // stays distinct from the base->sunken screen gradient it sits on.
+    val backgroundColor = if (banner.hasArtworkMask) Color.Black else MaterialTheme.tvColors.backgroundSurface
 
     TvTile(
         onClick = onClick,
@@ -69,8 +69,7 @@ fun TvBannerRow(
         interactionSource = interactionSource,
         modifier = modifier
             .fillMaxWidth()
-            .height(153.dp)
-            .border(1.dp, MaterialTheme.tvColors.overlayBorder, TvCardShape),
+            .height(153.dp),
     ) {
         Box(modifier = Modifier.fillMaxSize().clipToBounds()) {
             if (banner.hasArtworkMask) {
