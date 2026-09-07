@@ -8,6 +8,7 @@ import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,7 +25,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -53,13 +53,15 @@ fun TvBannerRow(
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
 
+    val backgroundColor = MaterialTheme.tvColors.backgroundSurface
+
     TvTile(
         onClick = onClick,
         shape = CardDefaults.shape(TvCardShape),
         scale = CardDefaults.scale(focusedScale = TvFocusedCardScale),
         colors = CardDefaults.colors(
-            containerColor = Color.Black,
-            focusedContainerColor = Color.Black,
+            containerColor = backgroundColor,
+            focusedContainerColor = backgroundColor,
         ),
         interactionSource = interactionSource,
         modifier = modifier
@@ -67,30 +69,27 @@ fun TvBannerRow(
             .height(153.dp),
     ) {
         Box(modifier = Modifier.fillMaxSize().clipToBounds()) {
-            BackgroundLift()
-            Image(
-                painter = painterResource(banner.artwork()),
-                contentDescription = null,
-                contentScale = ContentScale.FillHeight,
-                alignment = Alignment.CenterEnd,
-                modifier = Modifier
-                    .align(Alignment.CenterEnd)
-                    .requiredHeight(banner.artworkHeight),
-            )
-            if (banner.hasArtworkMask) {
-                // Opaque black over the text side so the bright collage only shows on the end edge.
-                Box(
+            Box(modifier = Modifier.align(Alignment.CenterEnd)) {
+                Image(
+                    painter = painterResource(banner.artwork()),
+                    contentDescription = null,
+                    contentScale = ContentScale.FillHeight,
                     modifier = Modifier
-                        .fillMaxSize()
-                        .background(
-                            Brush.horizontalGradient(
-                                0f to Color.Black,
-                                0.82f to Color.Black,
-                                1f to Color.Transparent,
-                            ),
-                        ),
+                        .requiredHeight(banner.artworkHeight)
+                        .padding(banner.artworkPadding),
                 )
-                BackgroundLift()
+                if (banner.hasArtworkMask) {
+                    Box(
+                        modifier = Modifier
+                            .matchParentSize()
+                            .background(
+                                Brush.horizontalGradient(
+                                    0f to backgroundColor,
+                                    0.85f to backgroundColor.copy(alpha = 0f),
+                                ),
+                            ),
+                    )
+                }
             }
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -106,20 +105,6 @@ fun TvBannerRow(
             }
         }
     }
-}
-
-@Composable
-private fun BackgroundLift() {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                Brush.horizontalGradient(
-                    0f to MaterialTheme.tvColors.backgroundActive20,
-                    0.55f to Color.Transparent,
-                ),
-            ),
-    )
 }
 
 @Composable
@@ -167,13 +152,19 @@ private fun TvDiscoverBanner.artwork(): Int = when (this) {
 
 private val TvDiscoverBanner.artworkHeight: Dp
     get() = when (this) {
-        TvDiscoverBanner.CreateAccount -> 174.dp
-        TvDiscoverBanner.DiscoverMore -> 197.dp
+        TvDiscoverBanner.CreateAccount -> 184.dp
+        TvDiscoverBanner.DiscoverMore -> 153.dp
+    }
+
+private val TvDiscoverBanner.artworkPadding: PaddingValues
+    get() = when (this) {
+        TvDiscoverBanner.CreateAccount -> PaddingValues(top = 26.dp, end = 28.dp)
+        TvDiscoverBanner.DiscoverMore -> PaddingValues()
     }
 
 private val TvDiscoverBanner.contentWidthFraction: Float
     get() = when (this) {
-        TvDiscoverBanner.CreateAccount -> 0.68f
+        TvDiscoverBanner.CreateAccount -> 0.78f
         TvDiscoverBanner.DiscoverMore -> 0.82f
     }
 
