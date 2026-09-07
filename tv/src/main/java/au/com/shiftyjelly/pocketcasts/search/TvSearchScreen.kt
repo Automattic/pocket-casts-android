@@ -67,6 +67,7 @@ import au.com.shiftyjelly.pocketcasts.component.TvPodcastTile
 import au.com.shiftyjelly.pocketcasts.component.TvPodcastTileDefaults
 import au.com.shiftyjelly.pocketcasts.component.TvRow
 import au.com.shiftyjelly.pocketcasts.component.TvTile
+import au.com.shiftyjelly.pocketcasts.component.collapseWithTopBar
 import au.com.shiftyjelly.pocketcasts.component.scrollAwayTopBar
 import au.com.shiftyjelly.pocketcasts.component.tvFocusInactiveWhen
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
@@ -316,7 +317,7 @@ private fun TvSearchContent(
     val showSuggestions = (isEditing || suggestionsFocused) && suggestions.isNotEmpty()
     val showHistory = (searchFieldFocused || historyFocused || isEditing) && !showSuggestions && query.isBlank() && history.isNotEmpty()
     Column(modifier = modifier.fillMaxSize().scrollAwayTopBar()) {
-        Column(modifier = Modifier.padding(ContentPadding)) {
+        Column(modifier = Modifier.collapseWithTopBar(enabled = searchState is TvSearchState.Idle).padding(ContentPadding)) {
             Spacer(modifier = Modifier.height(30.dp))
             TvSearchField(
                 query = query,
