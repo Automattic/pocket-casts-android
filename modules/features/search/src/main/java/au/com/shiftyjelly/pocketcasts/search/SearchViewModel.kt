@@ -23,6 +23,7 @@ import com.automattic.eventhorizon.SearchPredictiveShownEvent
 import com.automattic.eventhorizon.SearchPredictiveTermTappedEvent
 import com.automattic.eventhorizon.SearchPredictiveViewAllTappedEvent
 import com.automattic.eventhorizon.SearchResultFilterType
+import com.automattic.eventhorizon.SearchResultLegacyType
 import com.automattic.eventhorizon.SearchResultTappedEvent
 import com.automattic.eventhorizon.SearchShownEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -94,7 +95,7 @@ class SearchViewModel @Inject constructor(
         viewModelScope.launch {
             searchHandler.improvedSearchResults.collect {
                 showSearchHistory = false
-                _state.value = SearchUiState.Results(operation = it)
+                _state.value = it.toResultsState()
             }
         }
     }
@@ -147,6 +148,7 @@ class SearchViewModel @Inject constructor(
         eventHorizon.track(
             SearchListShownEvent(
                 source = source.analyticsValue,
+                displaying = (_state.value as? SearchUiState.Results)?.selectedFilter?.displayingAnalyticsValue,
             ),
         )
     }
@@ -161,30 +163,32 @@ class SearchViewModel @Inject constructor(
     }
 
     fun selectFilter(filter: ResultsFilters) {
-        if (_state.value is SearchUiState.Results) {
-            eventHorizon.track(
-                SearchFilterTappedEvent(
-                    source = source.analyticsValue,
-                    filter = filter.analyticsValue,
-                ),
-            )
-            _state.update { state ->
-                when (state) {
-                    is SearchUiState.Results -> {
-                        if (state.operation is SearchUiState.SearchOperation.Success) {
-                            state.copy(
-                                selectedFilterIndex = ResultsFilters.entries.indexOf(filter),
-                                operation = state.operation.copy(
-                                    results = state.operation.results.copy(filter = filter),
-                                ),
-                            )
-                        } else {
-                            state
-                        }
-                    }
+        // A tap can land on a filter that the newest results no longer offer.
+        if ((_state.value as? SearchUiState.Results)?.filterOptions?.contains(filter) != true) return
 
-                    else -> state
+        eventHorizon.track(
+            SearchFilterTappedEvent(
+                source = source.analyticsValue,
+                filter = filter.analyticsValue,
+            ),
+        )
+        _state.update { state ->
+            when (state) {
+                is SearchUiState.Results -> {
+                    val filterIndex = state.filterOptions.indexOf(filter)
+                    if (filterIndex >= 0 && state.operation is SearchUiState.SearchOperation.Success) {
+                        state.copy(
+                            selectedFilterIndex = filterIndex,
+                            operation = state.operation.copy(
+                                results = state.operation.results.copy(filter = filter),
+                            ),
+                        )
+                    } else {
+                        state
+                    }
                 }
+
+                else -> state
             }
         }
     }
@@ -230,7 +234,7 @@ class SearchViewModel @Inject constructor(
         saveSearchTerm(term)
         searchHandler.updateSearchQuery(term, true)
 
-        _state.value = SearchUiState.Results(operation = SearchUiState.SearchOperation.Loading(term))
+        _state.value = SearchUiState.SearchOperation.Loading(term).toResultsState()
     }
 
     fun selectSuggestion(suggestion: String) {
@@ -312,7 +316,20 @@ class SearchViewModel @Inject constructor(
         EPISODE(
             analyticsValue = EventHorizonSearchResultType.Episode,
         ),
+        NETWORK(
+            analyticsValue = EventHorizonSearchResultType.Network,
+        ),
     }
+}
+
+private fun SearchUiState.SearchOperation<SearchResults.Results>.toResultsState(): SearchUiState.Results {
+    val results = (this as? SearchUiState.SearchOperation.Success)?.results
+    val hasNetworks = results?.results.orEmpty().any { it is ImprovedSearchResultItem.NetworkItem }
+    // Every result set arrives filtered to Top Results, so a filter that is no longer offered cannot strand the user.
+    return SearchUiState.Results(
+        operation = this,
+        filterOptions = ResultsFilters.entries.filter { it != ResultsFilters.NETWORKS || hasNetworks },
+    )
 }
 
 sealed interface SearchResults {
@@ -347,6 +364,7 @@ sealed interface SearchResults {
                     ResultsFilters.TOP_RESULTS -> true
                     ResultsFilters.EPISODES -> item is ImprovedSearchResultItem.EpisodeItem
                     ResultsFilters.PODCASTS -> item is ImprovedSearchResultItem.PodcastItem || item is ImprovedSearchResultItem.FolderItem
+                    ResultsFilters.NETWORKS -> item is ImprovedSearchResultItem.NetworkItem
                 }
             }
 
@@ -359,6 +377,7 @@ sealed interface SearchResults {
 enum class ResultsFilters(
     val resId: Int,
     val analyticsValue: SearchResultFilterType,
+    val displayingAnalyticsValue: SearchResultLegacyType? = null,
 ) {
     TOP_RESULTS(
         resId = LR.string.search_filters_top_results,
@@ -367,10 +386,17 @@ enum class ResultsFilters(
     PODCASTS(
         resId = LR.string.search_filters_podcasts,
         analyticsValue = SearchResultFilterType.Podcasts,
+        displayingAnalyticsValue = SearchResultLegacyType.Podcasts,
     ),
     EPISODES(
         resId = LR.string.search_filters_episodes,
         analyticsValue = SearchResultFilterType.Episodes,
+        displayingAnalyticsValue = SearchResultLegacyType.Episodes,
+    ),
+    NETWORKS(
+        resId = LR.string.search_filters_networks,
+        analyticsValue = SearchResultFilterType.Networks,
+        displayingAnalyticsValue = SearchResultLegacyType.Networks,
     ),
 }
 
@@ -402,7 +428,9 @@ sealed interface SearchUiState {
     data class Suggestions(val operation: SearchOperation<List<SearchAutoCompleteItem>>) : SearchUiState
     data class Results(
         val operation: SearchOperation<SearchResults.Results>,
-        val filterOptions: Set<ResultsFilters> = ResultsFilters.entries.toSet(),
+        val filterOptions: List<ResultsFilters>,
         val selectedFilterIndex: Int = 0,
-    ) : SearchUiState
+    ) : SearchUiState {
+        val selectedFilter get() = filterOptions.getOrElse(selectedFilterIndex) { ResultsFilters.TOP_RESULTS }
+    }
 }
