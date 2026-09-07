@@ -38,12 +38,23 @@ sealed interface CombinedResult {
         val hasVideo: Boolean? = null,
     ) : CombinedResult
 
+    @JsonClass(generateAdapter = true)
+    data class NetworkResult(
+        val uuid: String,
+        val title: String? = null,
+        @Json(name = "short_description")
+        val shortDescription: String? = null,
+        @Json(name = "collection_image")
+        val collectionImage: String? = null,
+    ) : CombinedResult
+
     data object Unknown : CombinedResult
 
     companion object {
         val jsonAdapter = PolymorphicJsonAdapterFactory.of(CombinedResult::class.java, "type")
             .withSubtype(PodcastResult::class.java, "podcast")
             .withSubtype(EpisodeResult::class.java, "episode")
+            .withSubtype(NetworkResult::class.java, "network")
             .withDefaultValue(Unknown)
     }
 }
