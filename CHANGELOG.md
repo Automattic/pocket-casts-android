@@ -10,6 +10,8 @@
         ([#5843](https://github.com/Automattic/pocket-casts-android/pull/5843))
     *   Closing the transcript search bar now keeps the transcript open at the same scroll position instead of exiting the transcript
         ([#5835](https://github.com/Automattic/pocket-casts-android/pull/5835))
+    *   Fix a crash on Android 8 devices when the full-screen player loaded show notes containing remote images
+        ([#5847](https://github.com/Automattic/pocket-casts-android/pull/5847))
 
 8.20
 -----
