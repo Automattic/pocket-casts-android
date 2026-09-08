@@ -218,11 +218,11 @@ class FingerprintTimingManager @Inject constructor(
 
         val episodeUuid = episode.uuid
         val podcastUuid = episode.podcastOrSubstituteUuid
-        // Fingerprint the progressive enclosure, not the HLS rendition; timings may drift if the renditions differ.
+        // Fingerprint the progressive enclosure, not the alternate rendition; timings may drift if they differ.
         val audioSource = episode.downloadedFilePath ?: episode.downloadUrl
         // Reuse the player's on-disk cache (same UUID key) instead of a second download when it applies.
         val sharedCacheKey = episodeUuid.takeIf {
-            !episode.isDownloaded && !episode.isDownloading && !episode.isStreamUrlHls && settings.cacheEntirePlayingEpisode.value
+            episode.usesSharedPlayerCache && settings.cacheEntirePlayingEpisode.value
         }
 
         scope.launch {

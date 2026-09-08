@@ -93,11 +93,11 @@ class ShelfSharedViewModel @Inject constructor(
 
     private val videoStateFlow = combine(
         playbackManager.streamVideoState,
-        playbackManager.streamHlsAvailable,
+        playbackManager.streamVideoAvailable,
         playbackManager.videoRenderingEnabled,
         settings.audioOnly.flow,
-    ) { streamVideoState, hlsAvailable, renderingEnabled, audioOnly ->
-        VideoState(streamVideoState, hlsAvailable, renderingEnabled, audioOnly)
+    ) { streamVideoState, videoStreamAvailable, renderingEnabled, audioOnly ->
+        VideoState(streamVideoState, videoStreamAvailable, renderingEnabled, audioOnly)
     }
 
     val uiState = combine(
@@ -123,9 +123,9 @@ class ShelfSharedViewModel @Inject constructor(
         val episode = (shelfUpNext as? UpNextQueue.State.Loaded)?.episode
         val streamHasVideo = videoState.streamVideoState == StreamVideoState.HasVideo || videoState.streamVideoState == StreamVideoState.Unknown
         val canToggleVideo = !videoState.audioOnly &&
-            FeatureFlag.isEnabled(Feature.HLS_STREAMING) &&
+            (FeatureFlag.isEnabled(Feature.HLS_STREAMING) || FeatureFlag.isEnabled(Feature.VIDEO_ALTERNATE_ENCLOSURES)) &&
             episode is PodcastEpisode &&
-            (streamHasVideo || videoState.hlsAvailable)
+            (streamHasVideo || videoState.videoStreamAvailable)
         return uiState.value.copy(
             shelfItems = shelfItems.filter { it.showIf(episode) && (it != ShelfItem.StreamSelector || canToggleVideo) },
             episode = episode,
@@ -136,7 +136,7 @@ class ShelfSharedViewModel @Inject constructor(
 
     private data class VideoState(
         val streamVideoState: StreamVideoState,
-        val hlsAvailable: Boolean,
+        val videoStreamAvailable: Boolean,
         val renderingEnabled: Boolean,
         val audioOnly: Boolean,
     )

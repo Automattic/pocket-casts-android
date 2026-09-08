@@ -1,6 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playback
 
+import au.com.shiftyjelly.pocketcasts.models.entity.AlternateEnclosureStream
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.type.MediaKind
 import java.util.Date
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -11,70 +13,88 @@ class StreamVideoStateTest {
     fun `audio episode starts not video`() {
         val episode = createEpisode(fileType = "audio/mpeg")
 
-        assertEquals(StreamVideoState.NotVideo, StreamVideoState.initialFor(episode, audioOnly = false, playingHlsStream = false, isRemote = false))
+        assertEquals(StreamVideoState.NotVideo, StreamVideoState.initialFor(episode, audioOnly = false, playingVideoStream = false, isRemote = false))
     }
 
     @Test
     fun `audio episode ignores audio only`() {
         val episode = createEpisode(fileType = "audio/mpeg")
 
-        assertEquals(StreamVideoState.NotVideo, StreamVideoState.initialFor(episode, audioOnly = true, playingHlsStream = false, isRemote = false))
+        assertEquals(StreamVideoState.NotVideo, StreamVideoState.initialFor(episode, audioOnly = true, playingVideoStream = false, isRemote = false))
     }
 
     @Test
     fun `video episode starts not video so its own flag decides`() {
         val episode = createEpisode(fileType = "video/mp4")
 
-        assertEquals(StreamVideoState.NotVideo, StreamVideoState.initialFor(episode, audioOnly = false, playingHlsStream = false, isRemote = false))
+        assertEquals(StreamVideoState.NotVideo, StreamVideoState.initialFor(episode, audioOnly = false, playingVideoStream = false, isRemote = false))
     }
 
     @Test
     fun `audio only forces a video episode to audio`() {
         val episode = createEpisode(fileType = "video/mp4")
 
-        assertEquals(StreamVideoState.AudioOnly, StreamVideoState.initialFor(episode, audioOnly = true, playingHlsStream = false, isRemote = false))
+        assertEquals(StreamVideoState.AudioOnly, StreamVideoState.initialFor(episode, audioOnly = true, playingVideoStream = false, isRemote = false))
+    }
+
+    @Test
+    fun `video alternate enclosure stream starts unknown like hls`() {
+        val episode = createEpisode(fileType = "audio/mp3").apply {
+            overrideStream = AlternateEnclosureStream(url = "https://example.com/episode.mp4", contentType = "video/mp4", mediaKind = MediaKind.Video)
+        }
+
+        assertEquals(StreamVideoState.Unknown, StreamVideoState.initialFor(episode, audioOnly = false, playingVideoStream = true, isRemote = false))
+    }
+
+    @Test
+    fun `downloaded episode with a resolved video stream it is not playing stays not video`() {
+        val episode = createEpisode(fileType = "audio/mp3").apply {
+            overrideStream = AlternateEnclosureStream(url = "https://example.com/episode.mp4", contentType = "video/mp4", mediaKind = MediaKind.Video)
+        }
+
+        assertEquals(StreamVideoState.NotVideo, StreamVideoState.initialFor(episode, audioOnly = false, playingVideoStream = false, isRemote = false))
     }
 
     @Test
     fun `hls stream starts unknown`() {
         val episode = createHlsEpisode()
 
-        assertEquals(StreamVideoState.Unknown, StreamVideoState.initialFor(episode, audioOnly = false, playingHlsStream = true, isRemote = false))
+        assertEquals(StreamVideoState.Unknown, StreamVideoState.initialFor(episode, audioOnly = false, playingVideoStream = true, isRemote = false))
     }
 
     @Test
     fun `audio only forces an hls stream to audio`() {
         val episode = createHlsEpisode()
 
-        assertEquals(StreamVideoState.AudioOnly, StreamVideoState.initialFor(episode, audioOnly = true, playingHlsStream = true, isRemote = false))
+        assertEquals(StreamVideoState.AudioOnly, StreamVideoState.initialFor(episode, audioOnly = true, playingVideoStream = true, isRemote = false))
     }
 
     @Test
     fun `remote hls stream resolves without waiting for tracks`() {
         val episode = createHlsEpisode()
 
-        assertEquals(StreamVideoState.NotVideo, StreamVideoState.initialFor(episode, audioOnly = false, playingHlsStream = true, isRemote = true))
+        assertEquals(StreamVideoState.NotVideo, StreamVideoState.initialFor(episode, audioOnly = false, playingVideoStream = true, isRemote = true))
     }
 
     @Test
     fun `audio only forces a remote hls stream to audio`() {
         val episode = createHlsEpisode()
 
-        assertEquals(StreamVideoState.AudioOnly, StreamVideoState.initialFor(episode, audioOnly = true, playingHlsStream = true, isRemote = true))
+        assertEquals(StreamVideoState.AudioOnly, StreamVideoState.initialFor(episode, audioOnly = true, playingVideoStream = true, isRemote = true))
     }
 
     @Test
     fun `downloaded hls episode playing its local file starts not video`() {
         val episode = createHlsEpisode()
 
-        assertEquals(StreamVideoState.NotVideo, StreamVideoState.initialFor(episode, audioOnly = false, playingHlsStream = false, isRemote = false))
+        assertEquals(StreamVideoState.NotVideo, StreamVideoState.initialFor(episode, audioOnly = false, playingVideoStream = false, isRemote = false))
     }
 
     @Test
     fun `downloaded hls episode playing its local audio file ignores audio only`() {
         val episode = createHlsEpisode()
 
-        assertEquals(StreamVideoState.NotVideo, StreamVideoState.initialFor(episode, audioOnly = true, playingHlsStream = false, isRemote = false))
+        assertEquals(StreamVideoState.NotVideo, StreamVideoState.initialFor(episode, audioOnly = true, playingVideoStream = false, isRemote = false))
     }
 
     private fun createEpisode(fileType: String) = PodcastEpisode(
@@ -85,7 +105,6 @@ class StreamVideoStateTest {
     )
 
     private fun createHlsEpisode() = createEpisode(fileType = "audio/mpeg").apply {
-        overrideStreamUrl = "https://example.com/episode.m3u8"
-        overrideStreamContentType = "application/x-mpegURL"
+        overrideStream = AlternateEnclosureStream(url = "https://example.com/episode.m3u8", contentType = "application/x-mpegURL", mediaKind = null)
     }
 }

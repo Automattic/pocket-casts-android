@@ -438,6 +438,7 @@ class SimplePlayer(
     }
 }
 
+// HLS can mux audio into the video track, so it keeps that track even with no surface to draw on.
 internal fun shouldDisableVideoTrack(audioOnly: Boolean, hasVideoSurface: Boolean, isHlsStream: Boolean): Boolean {
     return audioOnly || (!hasVideoSurface && !isHlsStream)
 }

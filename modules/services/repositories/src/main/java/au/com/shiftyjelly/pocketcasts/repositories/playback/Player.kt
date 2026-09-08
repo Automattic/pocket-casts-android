@@ -12,6 +12,7 @@ sealed interface EpisodeLocation {
         override val episode: BaseEpisode,
         override val uri: String?,
         val isHls: Boolean,
+        val isVideo: Boolean,
     ) : EpisodeLocation
 
     data class Downloaded(
@@ -20,10 +21,10 @@ sealed interface EpisodeLocation {
     ) : EpisodeLocation
 
     companion object {
-        fun create(episode: BaseEpisode, preferStream: Boolean = false) = if (episode.isDownloaded && !(preferStream && episode.isStreamUrlHls)) {
+        fun create(episode: BaseEpisode, preferStream: Boolean = false) = if (episode.isDownloaded && !(preferStream && episode.isStreamUrlVideo)) {
             EpisodeLocation.Downloaded(episode, episode.downloadedFilePath)
         } else {
-            EpisodeLocation.Stream(episode, episode.streamUrl, episode.isStreamUrlHls)
+            EpisodeLocation.Stream(episode, episode.streamUrl, episode.isStreamUrlHls, episode.isStreamUrlVideo)
         }
     }
 }
@@ -31,9 +32,13 @@ sealed interface EpisodeLocation {
 val EpisodeLocation?.isHlsStream: Boolean
     get() = (this as? EpisodeLocation.Stream)?.isHls == true
 
+/** Whether the stream is a video encoding, which the episode's own file type may not advertise. */
+val EpisodeLocation?.isVideoStream: Boolean
+    get() = (this as? EpisodeLocation.Stream)?.isVideo == true
+
 /**
- * Whether the stream the player prepared carries video. HLS starts [Unknown] until the player's tracks
- * resolve it to [HasVideo] or [AudioOnly]; the video surface is shown only once it reaches [HasVideo].
+ * Whether the stream the player prepared carries video. A resolved video encoding starts [Unknown] until
+ * the player's tracks resolve it to [HasVideo] or [AudioOnly]; the surface is shown only once it reaches [HasVideo].
  */
 enum class StreamVideoState {
     NotVideo,
@@ -43,9 +48,9 @@ enum class StreamVideoState {
     ;
 
     companion object {
-        fun initialFor(episode: BaseEpisode, audioOnly: Boolean, playingHlsStream: Boolean, isRemote: Boolean) = when {
-            audioOnly && (episode.isVideo || playingHlsStream) -> AudioOnly
-            playingHlsStream && !isRemote -> Unknown
+        fun initialFor(episode: BaseEpisode, audioOnly: Boolean, playingVideoStream: Boolean, isRemote: Boolean) = when {
+            audioOnly && (episode.isVideo || playingVideoStream) -> AudioOnly
+            playingVideoStream && !isRemote -> Unknown
             else -> NotVideo
         }
     }

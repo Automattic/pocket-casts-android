@@ -326,11 +326,11 @@ class ShelfSharedViewModelTest {
     }
 
     @Test
-    fun `given hls stream available and no video, then stream selector is shown`() = runTest {
+    fun `given a video stream is available and no video, then stream selector is shown`() = runTest {
         val episode = PodcastEpisode("uuid", publishedDate = Date())
         initViewModel(
             currentEpisode = episode,
-            hlsAvailable = true,
+            videoStreamAvailable = true,
             streamVideoState = StreamVideoState.NotVideo,
         )
 
@@ -349,7 +349,7 @@ class ShelfSharedViewModelTest {
         val episode = PodcastEpisode("uuid", publishedDate = Date())
         initViewModel(
             currentEpisode = episode,
-            hlsAvailable = true,
+            videoStreamAvailable = true,
             streamVideoState = StreamVideoState.AudioOnly,
             audioOnly = true,
         )
@@ -365,11 +365,11 @@ class ShelfSharedViewModelTest {
     }
 
     @Test
-    fun `given no hls stream and no video, then stream selector is hidden`() = runTest {
+    fun `given no video stream and no video, then stream selector is hidden`() = runTest {
         val episode = PodcastEpisode("uuid", publishedDate = Date())
         initViewModel(
             currentEpisode = episode,
-            hlsAvailable = false,
+            videoStreamAvailable = false,
             streamVideoState = StreamVideoState.NotVideo,
         )
 
@@ -420,7 +420,7 @@ class ShelfSharedViewModelTest {
     private fun initViewModel(
         subscription: Subscription? = plusSubscription,
         currentEpisode: PodcastEpisode? = null,
-        hlsAvailable: Boolean = false,
+        videoStreamAvailable: Boolean = false,
         streamVideoState: StreamVideoState = StreamVideoState.NotVideo,
         audioOnly: Boolean = false,
     ) {
@@ -452,7 +452,7 @@ class ShelfSharedViewModelTest {
         whenever(settings.cachedSubscription).thenReturn(userSubscriptionSetting)
 
         whenever(playbackManager.streamVideoState).thenReturn(MutableStateFlow(streamVideoState))
-        whenever(playbackManager.streamHlsAvailable).thenReturn(MutableStateFlow(hlsAvailable))
+        whenever(playbackManager.streamVideoAvailable).thenReturn(MutableStateFlow(videoStreamAvailable))
         whenever(playbackManager.videoRenderingEnabled).thenReturn(MutableStateFlow(true))
 
         val audioOnlySetting = mock<UserSetting<Boolean>>()
