@@ -102,6 +102,7 @@ fun NavGraphBuilder.authenticationNavGraph(
                 }
             }
             val defaultErrorMessage = stringResource(LR.string.onboarding_continue_with_google_error)
+            val serverErrorMessage = stringResource(LR.string.onboarding_continue_with_google_server_error)
 
             LoginWithGoogleScreen(
                 successContent = {
@@ -112,6 +113,9 @@ fun NavGraphBuilder.authenticationNavGraph(
                 },
                 onGoogleNotAvailable = {
                     showErrorToastMessage = defaultErrorMessage
+                },
+                onServerError = {
+                    showErrorToastMessage = serverErrorMessage
                 },
                 onCancel = {
                     navController.popBackStack()
