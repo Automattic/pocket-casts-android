@@ -267,10 +267,6 @@ data class Podcast(
         return if (isDarkTheme) darkThemeTint() else lightThemeTint()
     }
 
-    fun getPlayerTintColor(isDarkTheme: Boolean): Int {
-        return if (isDarkTheme) tintColorForDarkBg else tintColorForLightBg
-    }
-
     fun displayableFrequency(resources: Resources): String? {
         val frequency = episodeFrequency ?: return null
         val stringId = when (frequency.lowercase()) {
