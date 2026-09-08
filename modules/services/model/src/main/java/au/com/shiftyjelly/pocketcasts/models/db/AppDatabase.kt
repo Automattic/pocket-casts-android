@@ -121,7 +121,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         EpisodeChatMessage::class,
         EpisodeAlternateEnclosure::class,
     ],
-    version = 137,
+    version = 138,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 81, to = 82, spec = AppDatabase.Companion.DeleteSilenceRemovedMigration::class),
@@ -1510,6 +1510,10 @@ abstract class AppDatabase : RoomDatabase() {
         }
 
         val MIGRATION_136_137 = addMigration(136, 137) { database ->
+            database.execSQL("ALTER TABLE podcasts ADD COLUMN network_list_id TEXT")
+        }
+
+        val MIGRATION_137_138 = addMigration(137, 138) { database ->
             database.execSQL(
                 "CREATE TABLE `bookmarks_new` (`uuid` TEXT NOT NULL, `podcast_uuid` TEXT NOT NULL, `episode_uuid` TEXT NOT NULL, `time` INTEGER NOT NULL, `created_at` INTEGER NOT NULL, `title` TEXT NOT NULL, `title_modified` INTEGER, `deleted` INTEGER NOT NULL, `deleted_modified` INTEGER, `passage` TEXT, `passage_location` INTEGER, `passage_modified` INTEGER, `reference_time` INTEGER, `reference_time_modified` INTEGER, `sync_status` INTEGER NOT NULL, `clean_title` TEXT NOT NULL, PRIMARY KEY(`uuid`))",
             )
@@ -1952,6 +1956,7 @@ abstract class AppDatabase : RoomDatabase() {
                 MIGRATION_134_135,
                 MIGRATION_135_136,
                 MIGRATION_136_137,
+                MIGRATION_137_138,
             )
         }
 

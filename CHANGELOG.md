@@ -1,8 +1,17 @@
 8.21
 -----
+*   New Features
+    *   Browse podcast networks from Discover, search and the podcast page
+        ([#5865](https://github.com/Automattic/pocket-casts-android/pull/5865))
 *   Bug Fixes
+    *   Keep the multi-select episode selection when rotating the device on the podcast screen
+        ([#5836](https://github.com/Automattic/pocket-casts-android/pull/5836))
+    *   Prevent the app from being killed in the background on low-memory devices by pausing player UI updates while playing
+        ([#5843](https://github.com/Automattic/pocket-casts-android/pull/5843))
     *   Closing the transcript search bar now keeps the transcript open at the same scroll position instead of exiting the transcript
         ([#5835](https://github.com/Automattic/pocket-casts-android/pull/5835))
+    *   Stop "Cache entire playing episode" from silently downloading oversized or video enclosures in the background
+        ([#5868](https://github.com/Automattic/pocket-casts-android/pull/5868))
 
 8.20
 -----

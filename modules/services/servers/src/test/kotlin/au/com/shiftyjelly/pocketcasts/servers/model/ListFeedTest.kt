@@ -60,10 +60,30 @@ class ListFeedTest {
     }
 
     @Test
+    fun `a repeated uuid is dropped, because it would be a duplicate key in the lists that render it`() {
+        val feed = adapter.fromJson(
+            """
+            {
+              "title": "Networks",
+              "type": "lists_list",
+              "lists": [
+                {"uuid": "relay", "title": "Relay", "type": "podcast_list"},
+                {"uuid": "relay", "title": "Relay again", "type": "podcast_list"},
+                {"uuid": "wnyc", "title": "WNYC", "type": "podcast_list"}
+              ]
+            }
+            """.trimIndent(),
+        )
+
+        assertEquals(listOf("relay", "wnyc"), feed?.networks?.map { it.uuid })
+        assertEquals(listOf("Relay", "WNYC"), feed?.networks?.map { it.title })
+    }
+
+    @Test
     fun `a feed without a lists array decodes to no entries`() {
         val feed = adapter.fromJson("""{"title": "Featured", "type": "podcast_list"}""")
 
-        assertEquals(emptyList<NetworkListSummary>(), feed?.networks)
+        assertEquals(emptyList<DiscoverListSummary>(), feed?.networks)
     }
 
     companion object {

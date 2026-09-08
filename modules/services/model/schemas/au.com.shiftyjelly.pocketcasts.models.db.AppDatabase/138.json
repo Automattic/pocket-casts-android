@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 137,
-    "identityHash": "622f9c27a0005f779811798484114f13",
+    "version": 138,
+    "identityHash": "8a2fdf750fa43735cd7739610ab8ae58",
     "entities": [
       {
         "tableName": "bump_stats",
@@ -38,7 +38,7 @@
       },
       {
         "tableName": "bookmarks",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uuid` TEXT NOT NULL, `podcast_uuid` TEXT NOT NULL, `episode_uuid` TEXT NOT NULL, `time` INTEGER NOT NULL, `created_at` INTEGER NOT NULL, `title` TEXT NOT NULL, `title_modified` INTEGER, `deleted` INTEGER NOT NULL, `deleted_modified` INTEGER, `ai_title` TEXT, `ai_summary` TEXT, `ai_title_modified` INTEGER, `ai_summary_modified` INTEGER, `sync_status` INTEGER NOT NULL, `clean_title` TEXT NOT NULL, PRIMARY KEY(`uuid`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uuid` TEXT NOT NULL, `podcast_uuid` TEXT NOT NULL, `episode_uuid` TEXT NOT NULL, `time` INTEGER NOT NULL, `created_at` INTEGER NOT NULL, `title` TEXT NOT NULL, `title_modified` INTEGER, `deleted` INTEGER NOT NULL, `deleted_modified` INTEGER, `passage` TEXT, `passage_location` INTEGER, `passage_modified` INTEGER, `reference_time` INTEGER, `reference_time_modified` INTEGER, `sync_status` INTEGER NOT NULL, `clean_title` TEXT NOT NULL, PRIMARY KEY(`uuid`))",
         "fields": [
           {
             "fieldPath": "uuid",
@@ -93,23 +93,28 @@
             "affinity": "INTEGER"
           },
           {
-            "fieldPath": "aiTitle",
-            "columnName": "ai_title",
+            "fieldPath": "passage",
+            "columnName": "passage",
             "affinity": "TEXT"
           },
           {
-            "fieldPath": "aiSummary",
-            "columnName": "ai_summary",
-            "affinity": "TEXT"
-          },
-          {
-            "fieldPath": "aiTitleModified",
-            "columnName": "ai_title_modified",
+            "fieldPath": "passageLocation",
+            "columnName": "passage_location",
             "affinity": "INTEGER"
           },
           {
-            "fieldPath": "aiSummaryModified",
-            "columnName": "ai_summary_modified",
+            "fieldPath": "passageModified",
+            "columnName": "passage_modified",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "referenceTime",
+            "columnName": "reference_time",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "referenceTimeModified",
+            "columnName": "reference_time_modified",
             "affinity": "INTEGER"
           },
           {
@@ -2364,7 +2369,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '622f9c27a0005f779811798484114f13')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '8a2fdf750fa43735cd7739610ab8ae58')"
     ]
   }
 }
