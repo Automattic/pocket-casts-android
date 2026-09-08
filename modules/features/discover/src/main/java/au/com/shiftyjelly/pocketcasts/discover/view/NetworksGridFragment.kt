@@ -16,6 +16,8 @@ import au.com.shiftyjelly.pocketcasts.discover.viewmodel.NetworksGridViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
+import com.automattic.eventhorizon.DiscoverListShowAllTappedEvent
+import com.automattic.eventhorizon.EventHorizon
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -37,6 +39,8 @@ class NetworksGridFragment : BaseFragment() {
 
     @Inject lateinit var settings: Settings
 
+    @Inject lateinit var eventHorizon: EventHorizon
+
     private val viewModel: NetworksGridViewModel by viewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) = contentWithoutConsumedInsets {
@@ -50,6 +54,13 @@ class NetworksGridFragment : BaseFragment() {
                 state = state,
                 onClickBack = { requireActivity().onBackPressedDispatcher.onBackPressed() },
                 onClickNetwork = { network ->
+                    eventHorizon.track(
+                        DiscoverListShowAllTappedEvent(
+                            listId = network.uuid,
+                            // No date passed as it's not available until the list is loaded
+                            listDatetime = "",
+                        ),
+                    )
                     (requireActivity() as FragmentHostListener).openNetworkPage(
                         listId = network.uuid,
                         title = network.title,
