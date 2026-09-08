@@ -493,11 +493,7 @@ class RefreshPodcastsThread(
             }
             intentId += 1
 
-            val notificationTag = if (isGroupNotification) {
-                NotificationBroadcastReceiver.NOTIFICATION_TAG_NEW_EPISODES_PREFIX + episode.uuid
-            } else {
-                NotificationBroadcastReceiver.NOTIFICATION_TAG_NEW_EPISODES_PRIMARY
-            }
+            val notificationTag = NotificationBroadcastReceiver.NOTIFICATION_TAG_NEW_EPISODES_PREFIX + episode.uuid
 
             val userActions = settings.newEpisodeNotificationActions.value
 
