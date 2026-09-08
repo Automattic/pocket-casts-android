@@ -123,7 +123,7 @@ class VideoView @JvmOverloads constructor(
     override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) = Unit
 
     companion object {
-        private const val SURFACE_CONNECT_DELAY_MS = 300L
+        private const val SURFACE_CONNECT_DELAY_MS = 400L
         private const val TAG = "VideoView"
     }
 }
