@@ -50,7 +50,6 @@ import au.com.shiftyjelly.pocketcasts.theme.tvTypography
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private const val COVER_SIZE_DP = 140
@@ -104,12 +103,6 @@ private fun TvSyncingScreenContent(
             verticalArrangement = Arrangement.Center,
             modifier = Modifier.fillMaxSize(),
         ) {
-            Image(
-                painter = painterResource(IR.drawable.ic_pocket_casts_logo),
-                contentDescription = null,
-                modifier = Modifier.size(27.dp),
-            )
-            Spacer(modifier = Modifier.height(12.dp))
             Text(
                 text = stringResource(LR.string.tv_onboarding_welcome_back),
                 color = MaterialTheme.tvColors.textPrimary,

@@ -34,6 +34,8 @@ fun TvPodcastTile(
     TvTile(
         onClick = onClick,
         modifier = modifier,
+        scale = tvFocusedCoverScale(),
+        glow = tvFocusedCoverGlow(),
     ) {
         if (isSponsored) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {

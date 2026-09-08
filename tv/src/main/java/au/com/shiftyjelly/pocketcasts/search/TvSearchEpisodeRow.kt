@@ -28,10 +28,12 @@ import androidx.tv.material3.CardDefaults
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.component.TvArtworkImage
+import au.com.shiftyjelly.pocketcasts.component.TvFocusedWideCardScale
 import au.com.shiftyjelly.pocketcasts.component.TvTile
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.to.ImprovedSearchResultItem
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
+import au.com.shiftyjelly.pocketcasts.theme.TvCardShape
 import au.com.shiftyjelly.pocketcasts.theme.TvTheme
 import au.com.shiftyjelly.pocketcasts.theme.tvColors
 import au.com.shiftyjelly.pocketcasts.theme.tvTypography
@@ -57,8 +59,8 @@ internal fun TvSearchEpisodeCard(
     TvTile(
         onClick = onClick,
         onLongClick = onLongClick,
-        scale = CardDefaults.scale(focusedScale = 1.02f),
-        shape = CardDefaults.shape(shape = RoundedCornerShape(9.dp)),
+        scale = CardDefaults.scale(focusedScale = TvFocusedWideCardScale),
+        shape = CardDefaults.shape(shape = TvCardShape),
         colors = CardDefaults.colors(
             containerColor = MaterialTheme.tvColors.backgroundSunken,
             focusedContainerColor = MaterialTheme.tvColors.backgroundActive,

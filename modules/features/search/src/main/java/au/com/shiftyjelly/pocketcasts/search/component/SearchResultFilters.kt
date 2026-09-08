@@ -97,7 +97,7 @@ private fun PreviewSearchResultFilters(
 ) {
     AppThemeWithBackground(themeType) {
         SearchResultFilters(
-            items = listOf("Top Results", "Podcasts", "Episodes"),
+            items = listOf("Top Results", "Podcasts", "Episodes", "Networks"),
             selectedIndex = 1,
             onFilterSelect = {},
         )

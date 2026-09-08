@@ -47,7 +47,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -76,6 +76,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.asFlow
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import au.com.shiftyjelly.pocketcasts.ads.AdReportFragment
@@ -218,20 +219,21 @@ class PlayerHeaderFragment :
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ) = contentWithoutConsumedInsets {
-        val windowSize = currentWindowAdaptiveInfo().windowSizeClass
+        val windowSize = currentWindowAdaptiveInfoV2().windowSizeClass
         val isPortraitConfiguration = LocalConfiguration.current.inPortrait()
         val isPortraitPlayer = isPortraitConfiguration || windowSize.isAtLeastMediumHeight()
         val maxWidthFraction = if (isPortraitConfiguration && windowSize.isAtLeastMediumWidth()) 0.8f else 1f
 
-        val podcastColors by remember { podcastColorsFlow() }.collectAsState(PodcastColors.ForUserEpisode)
-        val headerData by remember { playerHeaderFlow() }.collectAsState(PlayerViewModel.PlayerHeader())
+        val podcastColors by remember { podcastColorsFlow() }.collectAsStateWithLifecycle(PodcastColors.ForUserEpisode)
+        val headerData by remember { playerHeaderFlow() }.collectAsStateWithLifecycle(PlayerViewModel.PlayerHeader())
+        // Not lifecycle-gated: carries the video Player/surface and re-emitting it on resume can freeze the frame.
         val artworkOrVideoState by remember { playerVisualsStateFlow() }.collectAsState(ArtworkOrVideoState.NoContent)
-        val activeAd by viewModel.activeAd.collectAsState()
-        val playbackNotice by viewModel.playbackNotice.collectAsState()
+        val activeAd by viewModel.activeAd.collectAsStateWithLifecycle()
+        val playbackNotice by viewModel.playbackNotice.collectAsStateWithLifecycle()
 
-        val isPlayerOpen by isPlayerOpenFlow().collectAsState(false)
-        val isTranscriptOpen by shelfSharedViewModel.isTranscriptOpen.collectAsState()
-        val transcriptUiState by transcriptViewModel.uiState.collectAsState()
+        val isPlayerOpen by remember { isPlayerOpenFlow() }.collectAsStateWithLifecycle(false)
+        val isTranscriptOpen by shelfSharedViewModel.isTranscriptOpen.collectAsStateWithLifecycle()
+        val transcriptUiState by transcriptViewModel.uiState.collectAsStateWithLifecycle()
 
         val transitionData = updateTranscriptTransitionData(
             isTranscriptOpen = isTranscriptOpen,
@@ -635,6 +637,7 @@ class PlayerHeaderFragment :
             override fun onSlide(bottomSheet: View, slideOffset: Float) = Unit
         }
         val hostListener = (requireActivity() as FragmentHostListener)
+        send(hostListener.getPlayerBottomSheetState() == BottomSheetBehavior.STATE_EXPANDED)
         hostListener.addPlayerBottomSheetCallback(callback)
         awaitClose {
             hostListener.removePlayerBottomSheetCallback(callback)

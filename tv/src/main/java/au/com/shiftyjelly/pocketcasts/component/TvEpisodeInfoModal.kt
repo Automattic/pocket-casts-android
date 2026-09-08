@@ -132,7 +132,7 @@ private fun EpisodeHeader(
             }
             Text(
                 text = episode.title,
-                style = MaterialTheme.tvTypography.headline,
+                style = MaterialTheme.tvTypography.body,
                 color = MaterialTheme.tvColors.textPrimary,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,

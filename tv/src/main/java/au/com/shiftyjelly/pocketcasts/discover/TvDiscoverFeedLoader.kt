@@ -173,6 +173,9 @@ class TvDiscoverFeedLoader @Inject constructor(
 
             is ListType.Categories -> if (includeHomeSections) loadCategoriesRow(row, replacements) else null
 
+            // Networks are a mobile feature, so TV has no row to render them in.
+            is ListType.ListsList -> null
+
             is ListType.Unknown -> {
                 Timber.w("Dropping unknown TV discover row type '${(row.type as ListType.Unknown).value}' for ${row.rowId()}")
                 null

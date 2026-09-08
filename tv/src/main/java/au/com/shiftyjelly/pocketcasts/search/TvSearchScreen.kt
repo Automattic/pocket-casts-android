@@ -1,5 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.search
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.layout.Arrangement
@@ -20,6 +25,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -47,6 +53,8 @@ import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.component.LocalOpenNowPlaying
 import au.com.shiftyjelly.pocketcasts.component.LocalTvToastHostState
+import au.com.shiftyjelly.pocketcasts.component.ScrollToTopEffect
+import au.com.shiftyjelly.pocketcasts.component.TopBarScrollReporter
 import au.com.shiftyjelly.pocketcasts.component.TvCategoryTile
 import au.com.shiftyjelly.pocketcasts.component.TvDetailOverlay
 import au.com.shiftyjelly.pocketcasts.component.TvEmptyState
@@ -59,6 +67,8 @@ import au.com.shiftyjelly.pocketcasts.component.TvPodcastTile
 import au.com.shiftyjelly.pocketcasts.component.TvPodcastTileDefaults
 import au.com.shiftyjelly.pocketcasts.component.TvRow
 import au.com.shiftyjelly.pocketcasts.component.TvTile
+import au.com.shiftyjelly.pocketcasts.component.collapseWithTopBar
+import au.com.shiftyjelly.pocketcasts.component.scrollAwayTopBar
 import au.com.shiftyjelly.pocketcasts.component.tvFocusInactiveWhen
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
@@ -94,6 +104,8 @@ private const val SEARCH_ROW_LIMIT = 10
 private const val FOLDER_COVER_COUNT = 4
 private val SearchEpisodeCardWidth = 270.dp
 private const val EPISODE_GRID_COLUMNS = 2
+private val ResultsTopPadding = 20.dp
+private val TopResultsRowTopPadding = 2.dp
 
 private data class SearchOpenedFolder(val uuid: String, val name: String)
 
@@ -189,7 +201,6 @@ fun TvSearchScreen(
             restoreFocusTrigger = restoreFocusTrigger,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = TvTopBarHeight)
                 .tvFocusInactiveWhen(podcastUuid != null || category != null || folder != null),
         )
         TvDetailOverlay(
@@ -298,11 +309,15 @@ private fun TvSearchContent(
     restoreFocusTrigger: Int = 0,
 ) {
     val searchFieldFocusRequester = remember { FocusRequester() }
+    val dropdownFocusRequester = remember { FocusRequester() }
     var isEditing by remember { mutableStateOf(false) }
+    var searchFieldFocused by remember { mutableStateOf(false) }
     var suggestionsFocused by remember { mutableStateOf(false) }
+    var historyFocused by remember { mutableStateOf(false) }
     val showSuggestions = (isEditing || suggestionsFocused) && suggestions.isNotEmpty()
-    Column(modifier = modifier.fillMaxSize()) {
-        Column(modifier = Modifier.padding(ContentPadding)) {
+    val showHistory = (searchFieldFocused || historyFocused || isEditing) && !showSuggestions && query.isBlank() && history.isNotEmpty()
+    Column(modifier = modifier.fillMaxSize().scrollAwayTopBar()) {
+        Column(modifier = Modifier.collapseWithTopBar(enabled = searchState is TvSearchState.Idle).padding(ContentPadding)) {
             Spacer(modifier = Modifier.height(30.dp))
             TvSearchField(
                 query = query,
@@ -315,18 +330,38 @@ private fun TvSearchContent(
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .focusRequester(searchFieldFocusRequester),
+                    .focusRequester(searchFieldFocusRequester)
+                    .onFocusChanged { searchFieldFocused = it.hasFocus }
+                    .focusProperties { if (showSuggestions || showHistory) down = dropdownFocusRequester },
             )
             Spacer(modifier = Modifier.height(18.dp))
         }
 
-        if (showSuggestions) {
-            TvSearchSuggestions(
-                suggestions = suggestions,
-                onSuggestionSelect = onSuggestionSelect,
-                modifier = Modifier.onFocusChanged { suggestionsFocused = it.hasFocus },
-            )
-            Spacer(modifier = Modifier.height(18.dp))
+        AnimatedVisibility(
+            visible = showSuggestions || showHistory,
+            enter = fadeIn() + expandVertically(),
+            exit = fadeOut() + shrinkVertically(),
+        ) {
+            Column(
+                modifier = Modifier
+                    .focusRequester(dropdownFocusRequester)
+                    .focusGroup(),
+            ) {
+                if (showSuggestions) {
+                    TvSearchSuggestions(
+                        suggestions = suggestions,
+                        onSuggestionSelect = onSuggestionSelect,
+                        modifier = Modifier.onFocusChanged { suggestionsFocused = it.hasFocus },
+                    )
+                } else if (history.isNotEmpty()) {
+                    TvSearchHistory(
+                        history = history,
+                        onHistorySelect = onHistorySelect,
+                        modifier = Modifier.onFocusChanged { historyFocused = it.hasFocus },
+                    )
+                }
+                Spacer(modifier = Modifier.height(18.dp))
+            }
         }
 
         val filters = remember(hasFolderResults) { TvSearchFilter.entries.filter { it != TvSearchFilter.Folders || hasFolderResults } }
@@ -350,10 +385,8 @@ private fun TvSearchContent(
         ) {
             when (searchState) {
                 is TvSearchState.Idle -> TvSearchIdle(
-                    history = history,
                     categories = categories,
                     discoverRows = discoverRows,
-                    onHistorySelect = onHistorySelect,
                     onDiscoverPodcastClick = onDiscoverPodcastClick,
                     onDiscoverEpisodePodcastClick = onDiscoverEpisodePodcastClick,
                     onDiscoverEpisodePlay = onDiscoverEpisodePlay,
@@ -396,10 +429,8 @@ private fun TvSearchContent(
 
 @Composable
 private fun TvSearchIdle(
-    history: List<String>,
     categories: List<DiscoverCategory>,
     discoverRows: List<TvDiscoverRow>,
-    onHistorySelect: (String) -> Unit,
     onDiscoverPodcastClick: (TvDiscoverRow, TvDiscoverPodcast) -> Unit,
     onDiscoverEpisodePodcastClick: (TvDiscoverRow, TvDiscoverEpisode) -> Unit,
     onDiscoverEpisodePlay: (TvDiscoverRow, TvDiscoverEpisode) -> Unit,
@@ -411,24 +442,6 @@ private fun TvSearchIdle(
     loadCategoryCovers: (suspend (DiscoverCategory) -> List<String>)? = null,
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
-        if (history.isNotEmpty()) {
-            TvRow(
-                title = stringResource(LR.string.tv_search_recent),
-                items = history,
-                contentPadding = ContentPadding,
-                key = { it },
-            ) { term ->
-                TvTile(onClick = { onHistorySelect(term) }) {
-                    Text(
-                        text = term,
-                        style = MaterialTheme.tvTypography.body,
-                        color = MaterialTheme.tvColors.textPrimary,
-                        modifier = Modifier.padding(horizontal = 15.dp, vertical = 9.dp),
-                    )
-                }
-            }
-            Spacer(modifier = Modifier.height(18.dp))
-        }
         TvSearchDiscover(
             categories = categories,
             discoverRows = discoverRows,
@@ -465,6 +478,9 @@ private fun TvSearchDiscover(
     val rowCount = categoryOffset + discoverRows.size
     val rowFocusRequesters = remember(rowCount) { List(rowCount) { FocusRequester() } }
     var lastFocusedRowIndex by rememberSaveable(rowCount) { mutableIntStateOf(0) }
+    val listState = rememberLazyListState()
+    ScrollToTopEffect { listState.scrollToItem(0) }
+    TopBarScrollReporter(listState)
 
     var isInitialComposition by remember { mutableStateOf(true) }
     LaunchedEffect(restoreFocusTrigger) {
@@ -475,7 +491,7 @@ private fun TvSearchDiscover(
         }
     }
 
-    LazyColumn(modifier = modifier.fillMaxSize()) {
+    LazyColumn(state = listState, modifier = modifier.fillMaxSize()) {
         if (categories.isNotEmpty()) {
             item {
                 Box(
@@ -511,7 +527,7 @@ private fun TvSearchDiscover(
 
         discoverRows.forEachIndexed { index, row ->
             val rowIndex = categoryOffset + index
-            item { Spacer(modifier = Modifier.height(18.dp)) }
+            item { Spacer(modifier = Modifier.height(40.dp)) }
             tvDiscoverRow(
                 row = row,
                 onPodcastClick = onDiscoverPodcastClick,
@@ -640,6 +656,9 @@ private fun TvSearchTopResults(
     restoreFocusTrigger: Int,
 ) {
     val restoreFocusRequester = remember { FocusRequester() }
+    val listState = rememberLazyListState()
+    ScrollToTopEffect { listState.scrollToItem(0) }
+    TopBarScrollReporter(listState)
     var isInitialComposition by remember { mutableStateOf(true) }
     LaunchedEffect(restoreFocusTrigger) {
         if (isInitialComposition) {
@@ -658,8 +677,8 @@ private fun TvSearchTopResults(
     val foldersFirst = !featuredFirst && !episodesFirst && topFolders.isNotEmpty()
     val podcastsFirst = !featuredFirst && !episodesFirst && !foldersFirst
 
-    LazyColumn(modifier = Modifier.fillMaxSize()) {
-        item { Spacer(modifier = Modifier.height(6.dp)) }
+    LazyColumn(state = listState, modifier = Modifier.fillMaxSize()) {
+        item { Spacer(modifier = Modifier.height(TopResultsRowTopPadding)) }
         if (featured.isNotEmpty()) {
             item {
                 TvSearchEpisodeCarousel(
@@ -758,6 +777,8 @@ private fun TvSearchEpisodeGrid(
     restoreFocusTrigger: Int,
 ) {
     val gridState = rememberLazyGridState()
+    ScrollToTopEffect { gridState.scrollToItem(0) }
+    TopBarScrollReporter(gridState)
     val focusRequesters = remember(episodes.size) { List(episodes.size) { FocusRequester() } }
     val gridFocusRequester = remember { FocusRequester() }
     var lastFocusedKey by rememberSaveable { mutableStateOf<String?>(null) }
@@ -776,7 +797,7 @@ private fun TvSearchEpisodeGrid(
         columns = GridCells.Fixed(EPISODE_GRID_COLUMNS),
         horizontalArrangement = Arrangement.spacedBy(18.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
-        contentPadding = PaddingValues(start = 42.dp, end = 42.dp, bottom = 30.dp),
+        contentPadding = PaddingValues(start = 42.dp, top = ResultsTopPadding, end = 42.dp, bottom = 30.dp),
         modifier = Modifier
             .fillMaxSize()
             .focusRequester(gridFocusRequester)
@@ -874,6 +895,30 @@ private fun TvSearchSuggestions(
 }
 
 @Composable
+private fun TvSearchHistory(
+    history: List<String>,
+    onHistorySelect: (String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    TvRow(
+        title = stringResource(LR.string.tv_search_recent),
+        items = history,
+        contentPadding = ContentPadding,
+        key = { it },
+        modifier = modifier,
+    ) { term ->
+        TvTile(onClick = { onHistorySelect(term) }) {
+            Text(
+                text = term,
+                style = MaterialTheme.tvTypography.body,
+                color = MaterialTheme.tvColors.textPrimary,
+                modifier = Modifier.padding(horizontal = 15.dp, vertical = 9.dp),
+            )
+        }
+    }
+}
+
+@Composable
 private fun TvSearchLoading() {
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -927,28 +972,12 @@ private fun TvSearchScreenPreview() {
 
 @Preview(device = Devices.TV_1080p)
 @Composable
-private fun TvSearchIdleWithHistoryPreview() {
+private fun TvSearchHistoryPreview() {
     TvTheme {
-        Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.tvColors.backgroundSunken)) {
-            TvSearchContent(
-                query = "",
-                searchState = TvSearchState.Idle,
-                filter = TvSearchFilter.TopResults,
-                hasFolderResults = false,
-                categories = emptyList(),
-                discoverRows = emptyList(),
-                onQueryChange = {},
-                onFilterSelect = {},
-                onPodcastResultClick = {},
-                onDiscoverPodcastClick = { _, _ -> },
-                onDiscoverEpisodePodcastClick = { _, _ -> },
-                onDiscoverEpisodePlay = { _, _ -> },
-                onDiscoverPlayLatestEpisode = { _, _ -> },
-                onDiscoverCategoryClick = { _, _ -> },
-                onPlayEpisode = {},
-                onOpenEpisodeActions = {},
-                onOpenFolder = {},
+        Box(modifier = Modifier.background(MaterialTheme.tvColors.backgroundSunken).padding(36.dp)) {
+            TvSearchHistory(
                 history = listOf("Freakonomics", "Business Daily", "Science Weekly"),
+                onHistorySelect = {},
             )
         }
     }

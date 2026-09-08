@@ -141,17 +141,26 @@ class TvDiscoverFeedLoaderTest {
         assertEquals(null, episodes.single().videoPreviewUrl)
     }
 
+    @Test
+    fun `a networks row is dropped because tv has nowhere to render it`() = runTest {
+        stubCountry()
+
+        val rows = loader().buildRows(discoverWith(DisplayStyle.LargeList(), type = ListType.ListsList), isLoggedIn = true)
+
+        assertEquals(emptyList<TvDiscoverRow>(), rows)
+    }
+
     private fun stubCountry() {
         val countrySetting = mock<UserSetting<String>> { on { value } doReturn REGION }
         whenever(settings.discoverCountryCode).doReturn(countrySetting)
         whenever(context.resources).doReturn(mock<Resources>())
     }
 
-    private fun discoverWith(displayStyle: DisplayStyle) = Discover(
+    private fun discoverWith(displayStyle: DisplayStyle, type: ListType = ListType.EpisodeList) = Discover(
         layout = listOf(
             DiscoverRow(
                 id = "made-for-tv",
-                type = ListType.EpisodeList,
+                type = type,
                 displayStyle = displayStyle,
                 expandedTopItemLabel = null,
                 title = "Made for TV",
