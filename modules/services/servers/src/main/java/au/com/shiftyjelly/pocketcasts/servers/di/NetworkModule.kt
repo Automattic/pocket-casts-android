@@ -6,6 +6,8 @@ import au.com.shiftyjelly.pocketcasts.models.type.BlazeAdLocation
 import au.com.shiftyjelly.pocketcasts.models.type.BlazeAdLocationMoshiAdapter
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatusMoshiAdapter
+import au.com.shiftyjelly.pocketcasts.models.type.MediaKind
+import au.com.shiftyjelly.pocketcasts.models.type.MediaKindMoshiAdapter
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortTypeMoshiAdapter
 import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
@@ -98,6 +100,7 @@ class NetworkModule {
             .add(AccessToken::class.java, AccessToken.Adapter)
             .add(RefreshToken::class.java, RefreshToken.Adapter)
             .add(BlazeAdLocation::class.java, BlazeAdLocationMoshiAdapter())
+            .add(MediaKind::class.java, MediaKindMoshiAdapter().nullSafe())
             .add(AutoCompleteResult.jsonAdapter)
             .add(CombinedResult.jsonAdapter)
             .add(AnonymousBumpStat.Adapter)

@@ -48,6 +48,7 @@ import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.LoginIdentityType
+import com.automattic.eventhorizon.OnboardingFlowType
 import com.automattic.eventhorizon.UserAccountCreatedEvent
 import com.automattic.eventhorizon.UserAccountCreationFailedEvent
 import com.automattic.eventhorizon.UserAccountDeletedEvent
@@ -85,6 +86,7 @@ import java.io.File
 import java.net.HttpURLConnection
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.rx2.rxSingle
@@ -108,6 +110,7 @@ class SyncManagerImpl @Inject constructor(
 
     private companion object {
         const val MAX_POLL_ATTEMPTS = 20
+        const val NO_REDIRECT_PATH = "none"
     }
 
     override val isLoggedInObservable = BehaviorRelay.create<Boolean>().apply {
@@ -222,9 +225,14 @@ class SyncManagerImpl @Inject constructor(
         return syncServiceManager.deviceAuthorize()
     }
 
+    override suspend fun deviceApprove(userCode: String, approve: Boolean) = getCacheTokenOrLogin { token ->
+        syncServiceManager.deviceApprove(token, userCode, approve)
+    }
+
     override suspend fun loginWithDeviceAuth(
         deviceCode: String,
         signInSource: SignInSource,
+        isNewAccount: Boolean,
     ): LoginResult {
         return try {
             val response = syncServiceManager.deviceToken(deviceCode)
@@ -235,7 +243,7 @@ class SyncManagerImpl @Inject constructor(
                 uuid = uuid,
                 refreshToken = response.refreshToken,
                 accessToken = response.accessToken,
-                loginIdentity = LoginIdentity.PocketCasts,
+                loginIdentity = LoginIdentity.QrCode,
             )
             isLoggedInObservable.accept(true)
             settings.setFullySignedOut(false)
@@ -243,9 +251,9 @@ class SyncManagerImpl @Inject constructor(
             val result = AuthResultModel(
                 token = response.accessToken,
                 uuid = uuid,
-                isNewAccount = false,
+                isNewAccount = isNewAccount,
             )
-            trackSignIn(LoginResult.Success(result), signInSource, LoginIdentity.PocketCasts)
+            trackSignIn(LoginResult.Success(result), signInSource, LoginIdentity.QrCode)
             LoginResult.Success(result)
         } catch (ex: HttpException) {
             val tokenError = ex.parseTokenErrorResponse(moshi)
@@ -253,14 +261,16 @@ class SyncManagerImpl @Inject constructor(
                 message = tokenError?.errorDescription ?: context.resources.getString(LR.string.error_login_failed),
                 messageId = tokenError?.error,
             )
-            if (tokenError?.error != "authorization_pending") {
-                trackSignIn(result, signInSource, LoginIdentity.PocketCasts)
+            if (tokenError?.error != "authorization_pending" && tokenError?.error != "expired_token") {
+                trackSignIn(result, signInSource, LoginIdentity.QrCode, isNewAccount)
             }
             result
+        } catch (ex: CancellationException) {
+            throw ex
         } catch (ex: Exception) {
             Timber.e(ex, "Device auth failed")
             val result = exceptionToAuthResult(exception = ex, fallbackMessage = LR.string.error_login_failed)
-            trackSignIn(result, signInSource, LoginIdentity.PocketCasts)
+            trackSignIn(result, signInSource, LoginIdentity.QrCode, isNewAccount)
             result
         }
     }
@@ -566,6 +576,7 @@ class SyncManagerImpl @Inject constructor(
         loginResult: LoginResult,
         signInSource: SignInSource,
         loginIdentity: LoginIdentity,
+        isNewAccount: Boolean = false,
     ) {
         val event = when (loginResult) {
             is LoginResult.Success -> {
@@ -580,11 +591,14 @@ class SyncManagerImpl @Inject constructor(
                             UserAccountCreatedEvent(
                                 source = loginIdentity.analyticsValue,
                                 sourceInCode = signInSource.analyticsValue,
+                                redirectPath = NO_REDIRECT_PATH,
+                                flow = OnboardingFlowType.Unknown,
                             )
                         } else {
                             UserSignedInEvent(
                                 source = loginIdentity.analyticsValue,
                                 sourceInCode = signInSource.analyticsValue,
+                                redirectPath = NO_REDIRECT_PATH,
                             )
                         }
                     }
@@ -601,11 +615,17 @@ class SyncManagerImpl @Inject constructor(
                     }
 
                     is SignInSource.UserInitiated -> {
-                        UserSigninFailedEvent(
-                            source = loginIdentity.analyticsValue,
-                            sourceInCode = signInSource.analyticsValue,
-                            errorCode = errorCodeValue,
-                        )
+                        if (isNewAccount) {
+                            UserAccountCreationFailedEvent(
+                                errorCode = errorCodeValue,
+                            )
+                        } else {
+                            UserSigninFailedEvent(
+                                source = loginIdentity.analyticsValue,
+                                sourceInCode = signInSource.analyticsValue,
+                                errorCode = errorCodeValue,
+                            )
+                        }
                     }
                 }
             }
@@ -623,6 +643,8 @@ class SyncManagerImpl @Inject constructor(
                 UserAccountCreatedEvent(
                     source = LoginIdentityType.Password,
                     sourceInCode = signInSource.analyticsValue,
+                    redirectPath = NO_REDIRECT_PATH,
+                    flow = OnboardingFlowType.Unknown,
                 )
             }
 

@@ -7,6 +7,7 @@ import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.utils.fingerprint.FingerprintPolicy
 import dagger.Lazy
 import java.util.Date
 import kotlin.time.Duration.Companion.seconds
@@ -60,10 +61,35 @@ class GeneratedChapterSeekerTest {
         timingManager = mock()
     }
 
-    private fun seeker(appPlatform: AppPlatform = AppPlatform.Phone) = GeneratedChapterSeeker(
+    private fun seeker(
+        appPlatform: AppPlatform = AppPlatform.Phone,
+        policy: FingerprintPolicy = FingerprintPolicy.PLATFORM,
+    ) = GeneratedChapterSeeker(
         fingerprintTimingManager = Lazy { timingManager },
         appPlatform = appPlatform,
+        decodePolicy = mock { on { current() } doReturn policy },
     )
+
+    @Test
+    fun `tap only policy resolves from the dense map without an on-demand decode`() = runTest {
+        timingManager = mock { on { densePlaybackTime(eq("episode-uuid"), eq(100.seconds)) } doReturn 131.5.seconds }
+        assertEquals(131.5.seconds, seeker(policy = FingerprintPolicy.TAP_ONLY).resolveSeekTime(episode, generatedChapter))
+        verifyBlocking(timingManager, never()) { resolvePlaybackTime(any(), any()) }
+    }
+
+    @Test
+    fun `tap only policy returns null when the dense map misses without resolving`() = runTest {
+        timingManager = mock { on { densePlaybackTime(any(), any()) } doReturn null }
+        assertNull(seeker(policy = FingerprintPolicy.TAP_ONLY).resolveSeekTime(episode, generatedChapter))
+        verifyBlocking(timingManager, never()) { resolvePlaybackTime(any(), any()) }
+    }
+
+    @Test
+    fun `disabled policy returns null without touching the timing manager`() = runTest {
+        assertNull(seeker(policy = FingerprintPolicy.DISABLED).resolveSeekTime(episode, generatedChapter))
+        verify(timingManager, never()).densePlaybackTime(any(), any())
+        verifyBlocking(timingManager, never()) { resolvePlaybackTime(any(), any()) }
+    }
 
     @Test
     fun `returns null for non-generated chapters`() = runTest {

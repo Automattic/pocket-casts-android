@@ -24,11 +24,15 @@ class PlayerBroadcastReceiver : BroadcastReceiver() {
         const val INTENT_ACTION_PAUSE = "au.com.shiftyjelly.pocketcasts.action.PAUSE"
         const val INTENT_ACTION_STOP = "au.com.shiftyjelly.pocketcasts.action.STOP"
         const val INTENT_ACTION_NEXT = "au.com.shiftyjelly.pocketcasts.action.NEXT"
+
+        // Optional extra on the skip actions to override the user's configured skip amount.
+        const val INTENT_EXTRA_SECONDS = "au.com.shiftyjelly.pocketcasts.extra.SECONDS"
     }
 
     @Inject lateinit var podcastManager: PodcastManager
 
     @Inject lateinit var playbackManager: PlaybackManager
+
     private val sourceView = SourceView.PLAYER_BROADCAST_ACTION
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -40,8 +44,8 @@ class PlayerBroadcastReceiver : BroadcastReceiver() {
                 INTENT_ACTION_NOTIFICATION_PAUSE, INTENT_ACTION_WIDGET_PAUSE, INTENT_ACTION_PAUSE -> pause()
                 INTENT_ACTION_STOP -> stop()
                 INTENT_ACTION_NEXT -> playNext()
-                INTENT_ACTION_SKIP_FORWARD -> skipForward()
-                INTENT_ACTION_SKIP_BACKWARD -> skipBackward()
+                INTENT_ACTION_SKIP_FORWARD -> skipForward(intent.skipAmountSecondsOrNull())
+                INTENT_ACTION_SKIP_BACKWARD -> skipBackward(intent.skipAmountSecondsOrNull())
             }
             // To help us with debugging user support emails log where the user took the action.
             val logFrom = when (intent.action) {
@@ -53,12 +57,12 @@ class PlayerBroadcastReceiver : BroadcastReceiver() {
         }
     }
 
-    private fun skipBackward() {
-        playbackManager.skipBackward(sourceView = sourceView)
+    private fun skipBackward(jumpAmountSeconds: Int?) {
+        playbackManager.skipBackward(sourceView = sourceView, jumpAmountSeconds = jumpAmountSeconds)
     }
 
-    private fun skipForward() {
-        playbackManager.skipForward(sourceView = sourceView)
+    private fun skipForward(jumpAmountSeconds: Int?) {
+        playbackManager.skipForward(sourceView = sourceView, jumpAmountSeconds = jumpAmountSeconds)
     }
 
     private fun pause() {
@@ -77,3 +81,17 @@ class PlayerBroadcastReceiver : BroadcastReceiver() {
         playbackManager.stopAsync(sourceView = sourceView)
     }
 }
+
+/**
+ * Reads the skip amount override, or null to fall back to the user's setting.
+ */
+internal fun Intent.skipAmountSecondsOrNull(): Int? {
+    val seconds = runCatching {
+        getStringExtra(PlayerBroadcastReceiver.INTENT_EXTRA_SECONDS)?.toIntOrNull()
+            ?: getIntExtra(PlayerBroadcastReceiver.INTENT_EXTRA_SECONDS, 0)
+    }.getOrDefault(0)
+    return seconds.takeIf { it > 0 }?.coerceAtMost(MAX_SKIP_AMOUNT_SECONDS)
+}
+
+// Limit the skip amount to an hour
+private const val MAX_SKIP_AMOUNT_SECONDS = 3_600

@@ -11,7 +11,6 @@ import android.view.accessibility.AccessibilityManager
 import androidx.car.app.connection.CarConnection
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.map
-import au.com.shiftyjelly.pocketcasts.utils.Util.isAutomotive
 import java.util.Locale
 
 object Util {
@@ -38,6 +37,7 @@ object Util {
         val value = when {
             isAutomotive(context) -> AppPlatform.Automotive
             isWearOs(context) -> AppPlatform.WearOs
+            isTv(context) -> AppPlatform.Tv
             else -> AppPlatform.Phone
         }
         appPlatform = value

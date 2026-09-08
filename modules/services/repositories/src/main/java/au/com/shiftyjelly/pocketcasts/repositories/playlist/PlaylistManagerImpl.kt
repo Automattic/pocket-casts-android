@@ -217,7 +217,7 @@ class PlaylistManagerImpl(
         )
     }
 
-    override fun smartPlaylistFlow(uuid: String, searchTerm: String?): Flow<SmartPlaylist?> {
+    override fun smartPlaylistFlow(uuid: String, searchTerm: String?, includeArchived: Boolean): Flow<SmartPlaylist?> {
         return playlistDao
             .smartPlaylistFlow(uuid)
             .flatMapLatest { playlist ->
@@ -226,7 +226,7 @@ class PlaylistManagerImpl(
                 } else {
                     val smartRules = playlist.smartRules
                     val podcastsFlow = smartPlaylistArtworkPodcastsFlow(playlist.smartRules, playlist.sortType)
-                    val episodesFlow = smartEpisodesFlow(smartRules, playlist.sortType, searchTerm)
+                    val episodesFlow = smartEpisodesFlow(smartRules, playlist.sortType, searchTerm, includeArchived)
                     val metadataFlow = playlistDao.smartPlaylistMetadataFlow(clock, smartRules)
 
                     combine(podcastsFlow, episodesFlow, metadataFlow) { podcasts, episodes, metadata ->
@@ -257,7 +257,12 @@ class PlaylistManagerImpl(
             .distinctUntilChanged()
     }
 
-    override fun smartEpisodesFlow(rules: SmartRules, sortType: PlaylistEpisodeSortType, searchTerm: String?): Flow<List<PlaylistEpisode.Available>> {
+    override fun smartEpisodesFlow(
+        rules: SmartRules,
+        sortType: PlaylistEpisodeSortType,
+        searchTerm: String?,
+        includeArchived: Boolean,
+    ): Flow<List<PlaylistEpisode.Available>> {
         return playlistDao
             .smartEpisodesFlow(
                 clock = clock,
@@ -265,6 +270,7 @@ class PlaylistManagerImpl(
                 sortType = sortType,
                 limit = smartEpisodeLimit,
                 searchTerm = searchTerm,
+                includeArchived = includeArchived,
             )
             .distinctUntilChanged()
     }
@@ -326,14 +332,18 @@ class PlaylistManagerImpl(
         }
     }
 
-    override fun manualPlaylistFlow(uuid: String, searchTerm: String?): Flow<ManualPlaylist?> {
+    override fun manualPlaylistFlow(uuid: String, searchTerm: String?, includeArchived: Boolean): Flow<ManualPlaylist?> {
         return playlistDao.manualPlaylistFlow(uuid)
             .flatMapLatest { playlist ->
                 if (playlist == null) {
                     flowOf(null)
                 } else {
                     val podcastsFlow = manualPlaylistArtworkPodcastsFlow(playlist.uuid)
-                    val episodesFlow = playlistDao.manualEpisodesFlow(playlist.uuid, searchTerm.orEmpty())
+                    val episodesFlow = playlistDao.manualEpisodesFlow(
+                        playlistUuid = playlist.uuid,
+                        searchTerm = searchTerm.orEmpty(),
+                        includeArchived = includeArchived,
+                    )
                     val metadataFlow = playlistDao.manualPlaylistMetadataFlow(playlist.uuid)
 
                     combine(podcastsFlow, episodesFlow, metadataFlow) { podcasts, episodes, metadata ->

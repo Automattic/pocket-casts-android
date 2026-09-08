@@ -26,6 +26,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationMana
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackServiceToggle
 import au.com.shiftyjelly.pocketcasts.repositories.playback.SleepTimerRestartWhenShakingDevice
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.DefaultPlaylistsInitializer
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistInteractionNotifier
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -55,6 +56,7 @@ import java.io.File
 import java.util.concurrent.Executors
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -105,6 +107,8 @@ class PocketCastsApplication :
     @Inject lateinit var coilImageLoader: ImageLoader
 
     @Inject lateinit var userManager: UserManager
+
+    @Inject lateinit var defaultPlaylistsInitializer: DefaultPlaylistsInitializer
 
     @Inject lateinit var analyticsController: AnalyticsController
 
@@ -202,6 +206,16 @@ class PocketCastsApplication :
 
     private fun setupApp() {
         LogBuffer.i("Application", "App started. ${settings.getVersion()} (${settings.getVersionCode()})")
+
+        applicationScope.launch {
+            try {
+                defaultPlaylistsInitializer.initialize()
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, e, "Failed to seed the default playlists")
+            }
+        }
 
         runBlocking {
             appIcon.enableSelectedAlias(appIcon.activeAppIcon)

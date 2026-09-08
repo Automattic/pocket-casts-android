@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -84,7 +85,7 @@ internal fun AccountDetailsPage(
                     badgeIconSize = 18.dp,
                     badgeContentPadding = 6.dp,
                 ),
-                infoFontScale = 1.6f,
+                infoFontScale = 2f,
             )
         } else {
             AccountHeaderConfig(
@@ -100,6 +101,10 @@ internal fun AccountDetailsPage(
             AccountSectionsConfig(
                 iconSize = 48.dp,
                 fontScale = 2f,
+                contentPadding = PaddingValues(horizontal = 24.dp, vertical = 20.dp),
+                iconSpacing = 24.dp,
+                minRowHeight = 96.dp,
+                groupSpacing = 32.dp,
             )
         } else {
             AccountSectionsConfig()
@@ -108,7 +113,7 @@ internal fun AccountDetailsPage(
     val sectionsState = remember(state.isAutomotive, state.sectionsState) {
         if (state.isAutomotive) {
             state.sectionsState.copy(
-                availableSections = listOf(AccountSection.SignOut),
+                availableSections = listOf(AccountSection.SignOut, AccountSection.DeleteAccount),
             )
         } else {
             state.sectionsState

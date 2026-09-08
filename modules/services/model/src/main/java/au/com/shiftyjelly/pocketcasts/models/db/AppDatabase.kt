@@ -28,6 +28,7 @@ import au.com.shiftyjelly.pocketcasts.models.converter.EpisodeDownloadStatusConv
 import au.com.shiftyjelly.pocketcasts.models.converter.EpisodePlayingStatusConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.EpisodesSortTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.InstantConverter
+import au.com.shiftyjelly.pocketcasts.models.converter.MediaKindConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.PlaylistEpisodeSortTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.PodcastAutoUpNextConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.PodcastGroupingTypeConverter
@@ -120,7 +121,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         EpisodeChatMessage::class,
         EpisodeAlternateEnclosure::class,
     ],
-    version = 135,
+    version = 137,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 81, to = 82, spec = AppDatabase.Companion.DeleteSilenceRemovedMigration::class),
@@ -153,6 +154,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
     InstantConverter::class,
     BlazeAdLocationConverter::class,
     AlternateEnclosureSourcesConverter::class,
+    MediaKindConverter::class,
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun podcastDao(): PodcastDao
@@ -1503,6 +1505,14 @@ abstract class AppDatabase : RoomDatabase() {
             database.execSQL("CREATE INDEX IF NOT EXISTS `episode_published_date` ON `podcast_episodes` (`published_date`)")
         }
 
+        val MIGRATION_135_136 = addMigration(135, 136) { database ->
+            database.execSQL("ALTER TABLE episode_alternate_enclosures ADD COLUMN media_kind TEXT")
+        }
+
+        val MIGRATION_136_137 = addMigration(136, 137) { database ->
+            database.execSQL("ALTER TABLE podcasts ADD COLUMN network_list_id TEXT")
+        }
+
         fun addMigrations(databaseBuilder: Builder<AppDatabase>, context: Context) {
             databaseBuilder.addMigrations(
                 addMigration(1, 2) { },
@@ -1927,6 +1937,8 @@ abstract class AppDatabase : RoomDatabase() {
                 MIGRATION_132_133,
                 MIGRATION_133_134,
                 MIGRATION_134_135,
+                MIGRATION_135_136,
+                MIGRATION_136_137,
             )
         }
 

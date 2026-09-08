@@ -121,6 +121,7 @@ class MediaSessionManager(
         FeatureFlag.isEnabled(Feature.MEDIA3_SESSION)
     }
     private val isAutomotive = Util.isAutomotive(context)
+    private val isTv = Util.isTv(context)
 
     // Automotive always needs a MediaLibrarySession for the service contract (it's the
     // app entry point on AAOS), even when the Media3 flag is OFF. The internal behavior
@@ -134,7 +135,9 @@ class MediaSessionManager(
     val mediaSession: MediaSessionCompat? by lazy {
         if (!useMedia3Session && !isAutomotive) {
             MediaSessionCompat(context, "PocketCastsMediaSession").also { session ->
-                session.setSessionActivity(context.getLaunchActivityPendingIntent())
+                if (!isTv) {
+                    session.setSessionActivity(context.getLaunchActivityPendingIntent())
+                }
                 session.setRatingType(RatingCompat.RATING_HEART)
                 session.setExtras(
                     Bundle().apply {
@@ -382,7 +385,7 @@ class MediaSessionManager(
                 },
             )
             .apply {
-                if (!Util.isAutomotive(context)) {
+                if (!isAutomotive && !isTv) {
                     setSessionActivity(context.getLaunchActivityPendingIntent())
                 }
             }

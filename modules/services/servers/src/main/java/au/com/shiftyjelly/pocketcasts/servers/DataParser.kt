@@ -8,6 +8,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.firstHlsMimeType
 import au.com.shiftyjelly.pocketcasts.models.to.Share
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
+import au.com.shiftyjelly.pocketcasts.models.type.MediaKind
 import au.com.shiftyjelly.pocketcasts.servers.discover.PodcastSearch
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -190,6 +191,8 @@ object DataParser {
                 episodeUuid = episodeUuid,
                 position = i,
                 type = getString(enclosure, "type"),
+                // Read as a raw string, not via getString, which would coerce a non-string kind into a junk Unknown.
+                mediaKind = MediaKind.fromServer(enclosure.opt("media_kind") as? String),
                 bitrate = getLongOrNull(enclosure, "bitrate"),
                 length = getLongOrNull(enclosure, "length"),
                 height = getIntOrNull(enclosure, "height"),

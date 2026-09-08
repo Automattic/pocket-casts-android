@@ -378,6 +378,25 @@ class PlaylistManagerSmartTest {
     }
 
     @Test
+    fun observeEpisodesIncludingArchived() = dsl.test {
+        insertPodcast(index = 0)
+        val episodes = transaction {
+            listOf(
+                insertPodcastEpisode(index = 0, podcastIndex = 0),
+                insertPodcastEpisode(index = 1, podcastIndex = 0) { it.copy(isArchived = true) },
+            )
+        }
+
+        manager.smartEpisodesFlow(smartRules()).test {
+            assertEquals(episodes.take(1).map(PlaylistEpisode::Available), awaitItem())
+        }
+
+        manager.smartEpisodesFlow(smartRules(), includeArchived = true).test {
+            assertEquals(episodes.map(PlaylistEpisode::Available), awaitItem())
+        }
+    }
+
+    @Test
     fun observePlaylist() = dsl.test {
         insertPodcast(index = 0)
         insertPodcast(index = 1)

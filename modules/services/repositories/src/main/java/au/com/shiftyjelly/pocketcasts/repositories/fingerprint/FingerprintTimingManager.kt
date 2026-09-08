@@ -14,12 +14,15 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.BuildConfig
 import au.com.shiftyjelly.pocketcasts.repositories.playback.ExoPlayerDataSourceFactory
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.shouldCacheEntireEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.utils.fingerprint.FingerprintDecodePolicy
+import au.com.shiftyjelly.pocketcasts.utils.fingerprint.FingerprintPolicy
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.SyncedTranscriptsPreparationCompletedEvent
 import com.automattic.eventhorizon.SyncedTranscriptsPreparationFailedEvent
@@ -73,6 +76,7 @@ class FingerprintTimingManager @Inject constructor(
     private val settings: Settings,
     private val dataSourceFactory: Lazy<ExoPlayerDataSourceFactory>,
     private val pcmTap: FingerprintPcmTap,
+    private val decodePolicy: FingerprintDecodePolicy,
 ) {
 
     /** Who asked for preparation; decides whether streaming over a metered network is acceptable. */
@@ -219,7 +223,12 @@ class FingerprintTimingManager @Inject constructor(
         val audioSource = episode.downloadedFilePath ?: episode.downloadUrl
         // Reuse the player's on-disk cache (same UUID key) instead of a second download when it applies.
         val sharedCacheKey = episodeUuid.takeIf {
-            !episode.isDownloaded && !episode.isDownloading && !episode.isStreamUrlHls && settings.cacheEntirePlayingEpisode.value
+            shouldCacheEntireEpisode(
+                episode = episode,
+                isHlsStream = episode.isStreamUrlHls,
+                cacheEntirePlayingEpisodeEnabled = settings.cacheEntirePlayingEpisode.value,
+                maxCacheSizeBytes = settings.getExoPlayerCacheEntirePlayingEpisodeSizeInMB() * 1024 * 1024L,
+            )
         }
 
         scope.launch {
@@ -328,6 +337,11 @@ class FingerprintTimingManager @Inject constructor(
      * accumulator, and never touches the continuous mapping or the public state.
      */
     suspend fun resolvePlaybackTime(episode: BaseEpisode, referenceTime: Duration): ChapterSeekResult {
+        if (decodePolicy.current() != FingerprintPolicy.PLATFORM) {
+            return densePlaybackTime(episode.uuid, referenceTime)
+                ?.let { ChapterSeekResult.Resolved(it, usedPrior = true) }
+                ?: ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_UNSUPPORTED_DEVICE)
+        }
         val audioSource = episode.downloadedFilePath
             ?: episode.downloadUrl
             ?: return ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_NO_AUDIO_SOURCE)
@@ -716,6 +730,7 @@ class FingerprintTimingManager @Inject constructor(
      */
     private suspend fun shouldRunEagerPass(episodeUuid: String, isDownloaded: Boolean): Boolean {
         if (Util.getAppPlatform(context) != AppPlatform.Phone) return false
+        if (decodePolicy.current() != FingerprintPolicy.PLATFORM) return false
         return computeEager(
             hasGeneratedChapters = chapterManager.get().hasGeneratedChapters(episodeUuid),
             isDownloaded = isDownloaded,
@@ -741,6 +756,12 @@ class FingerprintTimingManager @Inject constructor(
         if (Util.getAppPlatform(context) != AppPlatform.Phone) {
             markUnavailable(reason = "unsupported_platform", isStreaming = !isDownloaded, episodeUuid = episodeUuid)
             Timber.d("FingerprintTimingManager: unsupported platform")
+            return
+        }
+
+        if (decodePolicy.current() == FingerprintPolicy.DISABLED) {
+            markUnavailable(reason = "unsupported_device", isStreaming = !isDownloaded, episodeUuid = episodeUuid)
+            Timber.d("FingerprintTimingManager: unsupported device")
             return
         }
 
@@ -982,6 +1003,7 @@ class FingerprintTimingManager @Inject constructor(
      */
     private fun maybeStartCatchUpResolve(gen: Long, startSec: Double) {
         if (currentEager) return
+        if (decodePolicy.current() != FingerprintPolicy.PLATFORM) return
         if (isWithinMatchedContent(startSec, snapshotPlaybackToReference)) return
         catchUpJob?.cancel()
         catchUpJob = scope.launch(Dispatchers.IO) {
@@ -1111,10 +1133,10 @@ class FingerprintTimingManager @Inject constructor(
         }
 
         override fun close() {
-            runCatching { codec.stop() }
-            codec.release()
-            extractor.release()
-            cacheSource?.close()
+            // Skip stop(): release() works from any state and the Executing→Idle transition crashes some OMX decoders.
+            runCatching { codec.release() }.onFailure { Timber.d(it, "FingerprintTimingManager: codec release failed") }
+            runCatching { extractor.release() }.onFailure { Timber.d(it, "FingerprintTimingManager: extractor release failed") }
+            runCatching { cacheSource?.close() }.onFailure { Timber.d(it, "FingerprintTimingManager: cache source close failed") }
         }
     }
 
@@ -1169,6 +1191,11 @@ class FingerprintTimingManager @Inject constructor(
             } else {
                 extractor.setDataSource(audioFilePath)
             }
+        } catch (e: CancellationException) {
+            // Cancellation is not an open failure, don't let it reach markFailed.
+            extractor.release()
+            cacheSource?.close()
+            throw e
         } catch (e: Exception) {
             extractor.release()
             cacheSource?.close()
@@ -1184,34 +1211,39 @@ class FingerprintTimingManager @Inject constructor(
             throw AudioUnavailableException("no audio track found")
         }
 
-        extractor.selectTrack(audioTrackIndex)
-        val format = extractor.getTrackFormat(audioTrackIndex)
-        val sampleRate = format.getInteger(MediaFormat.KEY_SAMPLE_RATE)
-        val channelCount = format.getInteger(MediaFormat.KEY_CHANNEL_COUNT)
-        val mime = format.getString(MediaFormat.KEY_MIME) ?: "audio/mpeg"
+        try {
+            extractor.selectTrack(audioTrackIndex)
+            val format = extractor.getTrackFormat(audioTrackIndex)
+            val sampleRate = format.getInteger(MediaFormat.KEY_SAMPLE_RATE)
+            val channelCount = format.getInteger(MediaFormat.KEY_CHANNEL_COUNT)
+            val mime = format.getString(MediaFormat.KEY_MIME) ?: "audio/mpeg"
 
-        var startSec = startingAt
-        if (startingAt > 0) {
-            extractor.seekTo((startingAt * 1_000_000).toLong(), MediaExtractor.SEEK_TO_CLOSEST_SYNC)
-            val landedUs = extractor.sampleTime
-            if (landedUs >= 0) {
-                startSec = landedUs / 1_000_000.0
+            var startSec = startingAt
+            if (startingAt > 0) {
+                extractor.seekTo((startingAt * 1_000_000).toLong(), MediaExtractor.SEEK_TO_CLOSEST_SYNC)
+                val landedUs = extractor.sampleTime
+                if (landedUs >= 0) {
+                    startSec = landedUs / 1_000_000.0
+                }
+                Timber.d(
+                    "FingerprintTimingManager: extractor seek requested=%.2fs landed=%.2fs",
+                    startingAt,
+                    startSec,
+                )
             }
-            Timber.d(
-                "FingerprintTimingManager: extractor seek requested=%.2fs landed=%.2fs",
-                startingAt,
-                startSec,
-            )
-        }
 
-        val codec = try {
-            MediaCodec.createDecoderByType(mime)
+            val codec = MediaCodec.createDecoderByType(mime)
+            return AudioStream(extractor, codec, format, sampleRate, channelCount, startSec, cacheSource)
+        } catch (e: CancellationException) {
+            // Cancellation is not an open failure, don't let it reach markFailed.
+            extractor.release()
+            cacheSource?.close()
+            throw e
         } catch (e: Exception) {
             extractor.release()
             cacheSource?.close()
             throw AudioOpenException(e)
         }
-        return AudioStream(extractor, codec, format, sampleRate, channelCount, startSec, cacheSource)
     }
 
     private suspend fun streamFingerprint(
@@ -1340,20 +1372,28 @@ class FingerprintTimingManager @Inject constructor(
                 outputIndex >= 0 -> {
                     val isEos = bufferInfo.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0
 
-                    val outputBuffer = codec.getOutputBuffer(outputIndex)
-                    if (outputBuffer != null && bufferInfo.size > 0) {
-                        val samples = extractFloatSamples(outputBuffer, bufferInfo, isOutputFloat)
-                        if (samples.isNotEmpty()) {
-                            val windows = streamer.pushSamplesF32(samples, stream.channelCount.toUShort())
-                            if (windows.isNotEmpty()) {
-                                onWindows(windows)
-                                if (stopWhen?.invoke() == true) {
-                                    stopRequested = true
-                                }
+                    // Never hold a buffer across onWindows suspending or an extraction throw, OMX decoders crash on it.
+                    val samples = try {
+                        val outputBuffer = codec.getOutputBuffer(outputIndex)
+                        if (outputBuffer != null && bufferInfo.size > 0) {
+                            extractFloatSamples(outputBuffer, bufferInfo, isOutputFloat)
+                        } else {
+                            emptyList()
+                        }
+                    } finally {
+                        runCatching { codec.releaseOutputBuffer(outputIndex, false) }.onFailure {
+                            Timber.d(it, "FingerprintTimingManager: codec releaseOutputBuffer failed")
+                        }
+                    }
+                    if (samples.isNotEmpty()) {
+                        val windows = streamer.pushSamplesF32(samples, stream.channelCount.toUShort())
+                        if (windows.isNotEmpty()) {
+                            onWindows(windows)
+                            if (stopWhen?.invoke() == true) {
+                                stopRequested = true
                             }
                         }
                     }
-                    codec.releaseOutputBuffer(outputIndex, false)
                     if (isEos || stopRequested) break
                     if (endingAt != null && startOffset + streamer.durationMs().toDouble() / 1000.0 >= endingAt) break
                 }

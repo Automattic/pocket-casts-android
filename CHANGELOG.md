@@ -1,8 +1,43 @@
+8.21
+-----
+*   New Features
+    *   Browse podcast networks from Discover, search and the podcast page
+        ([#5865](https://github.com/Automattic/pocket-casts-android/pull/5865))
+*   Bug Fixes
+    *   Keep the multi-select episode selection when rotating the device on the podcast screen
+        ([#5836](https://github.com/Automattic/pocket-casts-android/pull/5836))
+    *   Prevent the app from being killed in the background on low-memory devices by pausing player UI updates while playing
+        ([#5843](https://github.com/Automattic/pocket-casts-android/pull/5843))
+    *   Closing the transcript search bar now keeps the transcript open at the same scroll position instead of exiting the transcript
+        ([#5835](https://github.com/Automattic/pocket-casts-android/pull/5835))
+    *   Stop "Cache entire playing episode" from silently downloading oversized or video enclosures in the background
+        ([#5868](https://github.com/Automattic/pocket-casts-android/pull/5868))
+
+8.20
+-----
+*   Updates 
+    *   Allow the skip forward and skip back intents to specify a custom number of seconds
+
+8.19
+-----
+*   New Features
+    *   Add the delete account option to the Automotive account screen
+        ([#5757](https://github.com/Automattic/pocket-casts-android/pull/5757))
+*   Bug Fixes
+    *   Fix a crash when showing a bottom sheet after the app is sent to the background
+        ([#5709](https://github.com/Automattic/pocket-casts-android/pull/5709))
+    *   Fix truncated dialog button labels in the Automotive app
+        ([#5751](https://github.com/Automattic/pocket-casts-android/pull/5751))
+
 8.18
 -----
 *   Bug Fixes
     *   Allow copying description and show notes links with a long press
         ([#5628](https://github.com/Automattic/pocket-casts-android/pull/5628))
+    *   Fix the app briefly freezing when showing the default podcast artwork
+        ([#5634](https://github.com/Automattic/pocket-casts-android/pull/5634))
+    *   Fix audio stuttering when playing video episodes at high speed in the background
+        ([#5707](https://github.com/Automattic/pocket-casts-android/pull/5707))
 
 8.17
 -----

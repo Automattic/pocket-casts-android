@@ -14,6 +14,7 @@ object FirebaseConfig {
     const val EXOPLAYER_CACHE_ENTIRE_PLAYING_EPISODE_SIZE_IN_MB = "exoplayer_cache_entire_playing_episode_size_in_mb"
     const val EXOPLAYER_CACHE_ENTIRE_PLAYING_EPISODE_SETTING_DEFAULT = "exoplayer_cache_entire_playing_episode_setting_default"
     const val PLAYBACK_EPISODE_POSITION_CHANGED_ON_SYNC_THRESHOLD_SECS = "playback_episode_position_changed_on_sync_threshold_secs"
+    const val FINGERPRINT_POLICY_OVERRIDE = "fingerprint_policy_override"
 
     val defaults = mapOf(
         PERIODIC_SAVE_TIME_MS to 60000L,
@@ -26,6 +27,7 @@ object FirebaseConfig {
         EXOPLAYER_CACHE_ENTIRE_PLAYING_EPISODE_SIZE_IN_MB to 500L,
         EXOPLAYER_CACHE_ENTIRE_PLAYING_EPISODE_SETTING_DEFAULT to true,
         PLAYBACK_EPISODE_POSITION_CHANGED_ON_SYNC_THRESHOLD_SECS to 5L,
+        FINGERPRINT_POLICY_OVERRIDE to "",
     ) + Feature.entries
         .filter { it.hasFirebaseRemoteFlag }
         .associate { it.key to it.defaultValue }

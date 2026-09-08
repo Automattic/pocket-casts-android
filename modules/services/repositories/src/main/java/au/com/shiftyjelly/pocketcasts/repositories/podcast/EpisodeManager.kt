@@ -47,7 +47,7 @@ interface EpisodeManager {
 
     fun findDownloadEpisodesFlow(): Flow<List<PodcastEpisode>>
     fun findDownloadedEpisodesRxFlowable(): Flowable<List<PodcastEpisode>>
-    fun findStarredEpisodesFlow(): Flow<List<PodcastEpisode>>
+    fun findStarredEpisodesFlow(limit: Int = Int.MAX_VALUE): Flow<List<PodcastEpisode>>
     suspend fun findStarredEpisodes(): List<PodcastEpisode>
     suspend fun downloadedEpisodesThatHaveNotBeenPlayedCount(): Int
 

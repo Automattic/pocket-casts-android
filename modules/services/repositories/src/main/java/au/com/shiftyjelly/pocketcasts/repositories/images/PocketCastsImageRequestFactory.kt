@@ -82,8 +82,7 @@ data class PocketCastsImageRequestFactory(
     @get:DrawableRes private val placeholderId
         get() = when (placeholderType) {
             PlaceholderType.None -> 0
-            PlaceholderType.Small -> if (isDarkTheme) IR.drawable.defaultartwork_small_dark else IR.drawable.defaultartwork_small
-            PlaceholderType.Large -> if (isDarkTheme) IR.drawable.defaultartwork_dark else IR.drawable.defaultartwork
+            PlaceholderType.Large, PlaceholderType.Small -> if (isDarkTheme) IR.drawable.defaultartwork_dark else IR.drawable.defaultartwork
         }
 
     private fun RequestType.data(context: Context) = when (this) {

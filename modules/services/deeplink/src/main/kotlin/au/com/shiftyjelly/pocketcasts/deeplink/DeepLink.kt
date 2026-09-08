@@ -296,6 +296,10 @@ data class SignInDeepLink(
     }
 }
 
+data class PairDeviceDeepLink(
+    val userCode: String,
+) : DeepLink
+
 data class ReferralsDeepLink(
     val code: String,
 ) : UriDeepLink {

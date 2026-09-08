@@ -34,7 +34,8 @@
         <service
             android:name=".accountmanager.PocketCastsAuthenticatorService"
             android:enabled="true"
-            android:exported="true">
+            android:exported="true"
+            android:permission="android.permission.BIND_ACCOUNT_AUTHENTICATOR">
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator" />
             </intent-filter>

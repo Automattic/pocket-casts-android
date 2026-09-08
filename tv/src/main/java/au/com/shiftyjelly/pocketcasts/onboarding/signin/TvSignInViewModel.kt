@@ -5,69 +5,90 @@ import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.repositories.sync.LoginResult
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SignInSource
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.SignInShownEvent
+import com.automattic.eventhorizon.SignInType
+import com.automattic.eventhorizon.SignInTypeTappedEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
-import kotlin.coroutines.cancellation.CancellationException
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 @HiltViewModel
 class TvSignInViewModel @Inject constructor(
     private val syncManager: SyncManager,
+    private val eventHorizon: EventHorizon,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<TvSignInUiState>(TvSignInUiState.Loading)
     val uiState: StateFlow<TvSignInUiState> = _uiState.asStateFlow()
 
+    private val _mode = MutableStateFlow(TvSignInMode.QrCode)
+    val mode: StateFlow<TvSignInMode> = _mode.asStateFlow()
+
+    private val _emailState = MutableStateFlow(TvEmailSignInState())
+    val emailState: StateFlow<TvEmailSignInState> = _emailState.asStateFlow()
+
+    private var pollingJob: Job? = null
+
     init {
         requestDeviceCode()
     }
 
-    private fun requestDeviceCode() {
-        viewModelScope.launch {
-            _uiState.value = TvSignInUiState.Loading
-            try {
-                val response = syncManager.deviceAuthorize()
-                _uiState.value = TvSignInUiState.Ready(
-                    userCode = response.userCode.map { it.toString() },
-                    verificationUri = response.verificationUri,
-                    verificationUriComplete = response.verificationUriComplete,
-                )
-                pollForApproval(response.deviceCode, response.interval.toLong())
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
-                Timber.e(e, "Failed to request device code")
-                _uiState.value = TvSignInUiState.Error
-            }
+    fun trackShown() {
+        eventHorizon.track(SignInShownEvent)
+    }
+
+    fun selectMode(mode: TvSignInMode) {
+        if (_mode.value == mode) return
+        _mode.value = mode
+        eventHorizon.track(SignInTypeTappedEvent(type = mode.analyticsType))
+        if (mode == TvSignInMode.Email) {
+            _emailState.update { it.copy(showEmailError = false, showPasswordError = false, serverError = null) }
         }
     }
 
-    private suspend fun pollForApproval(deviceCode: String, intervalSeconds: Long) {
-        while (true) {
-            delay(intervalSeconds.coerceAtLeast(MIN_POLL_INTERVAL_SECONDS) * 1000)
-            val result = syncManager.loginWithDeviceAuth(
-                deviceCode = deviceCode,
+    fun updateEmail(email: String) {
+        _emailState.update { it.copy(email = email.trim(), showEmailError = false, serverError = null) }
+    }
+
+    fun updatePassword(password: String) {
+        _emailState.update { it.copy(password = password, showPasswordError = false, serverError = null) }
+    }
+
+    fun submitEmailSignIn() {
+        val current = _emailState.value
+        if (current.isSubmitting) return
+
+        val emailValid = isEmailValid(current.email)
+        val passwordValid = isPasswordValid(current.password)
+        if (!emailValid || !passwordValid) {
+            _emailState.update { it.copy(showEmailError = !emailValid, showPasswordError = !passwordValid) }
+            return
+        }
+
+        _emailState.update {
+            it.copy(isSubmitting = true, showEmailError = false, showPasswordError = false, serverError = null)
+        }
+        viewModelScope.launch {
+            val result = syncManager.loginWithEmailAndPassword(
+                email = current.email,
+                password = current.password,
                 signInSource = SignInSource.UserInitiated.Onboarding,
             )
-            when {
-                result is LoginResult.Success -> {
+            when (result) {
+                is LoginResult.Success -> {
+                    pollingJob?.cancel()
+                    _emailState.update { it.copy(email = "", password = "", isSubmitting = false) }
                     _uiState.value = TvSignInUiState.Complete
-                    return
                 }
 
-                result is LoginResult.Failed && result.messageId == AUTHORIZATION_PENDING -> {
-                    // Keep polling
-                }
-
-                else -> {
-                    Timber.w("Device auth polling stopped: ${(result as? LoginResult.Failed)?.message}")
-                    _uiState.value = TvSignInUiState.Error
-                    return
+                is LoginResult.Failed -> _emailState.update {
+                    it.copy(isSubmitting = false, serverError = result.message)
                 }
             }
         }
@@ -77,10 +98,40 @@ class TvSignInViewModel @Inject constructor(
         requestDeviceCode()
     }
 
-    companion object {
-        private const val AUTHORIZATION_PENDING = "authorization_pending"
-        private const val MIN_POLL_INTERVAL_SECONDS = 5L
+    private fun requestDeviceCode() {
+        pollingJob?.cancel()
+        _uiState.value = TvSignInUiState.Loading
+        pollingJob = viewModelScope.launch {
+            deviceAuthFlow(syncManager, isNewAccount = false).collect { _uiState.value = it }
+        }
     }
+
+    private fun isEmailValid(email: String) = EMAIL_REGEX.matches(email)
+
+    private fun isPasswordValid(password: String) = password.length >= MIN_PASSWORD_LENGTH
+
+    private companion object {
+        const val MIN_PASSWORD_LENGTH = 6
+        val EMAIL_REGEX = Regex("[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}")
+    }
+}
+
+enum class TvSignInMode(val analyticsType: SignInType) {
+    QrCode(SignInType.Qr),
+    Email(SignInType.Password),
+}
+
+data class TvEmailSignInState(
+    val email: String = "",
+    val password: String = "",
+    val isSubmitting: Boolean = false,
+    val showEmailError: Boolean = false,
+    val showPasswordError: Boolean = false,
+    val serverError: String? = null,
+) {
+    override fun toString() = "TvEmailSignInState(email=$email, password=${if (password.isEmpty()) "" else "***"}, " +
+        "isSubmitting=$isSubmitting, showEmailError=$showEmailError, showPasswordError=$showPasswordError, " +
+        "serverError=$serverError)"
 }
 
 sealed interface TvSignInUiState {

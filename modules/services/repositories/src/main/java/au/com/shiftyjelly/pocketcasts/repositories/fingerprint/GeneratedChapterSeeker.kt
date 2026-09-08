@@ -5,6 +5,8 @@ import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.utils.fingerprint.FingerprintDecodePolicy
+import au.com.shiftyjelly.pocketcasts.utils.fingerprint.FingerprintPolicy
 import dagger.Lazy
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -35,6 +37,7 @@ import timber.log.Timber
 class GeneratedChapterSeeker @Inject constructor(
     private val fingerprintTimingManager: Lazy<FingerprintTimingManager>,
     private val appPlatform: AppPlatform,
+    private val decodePolicy: FingerprintDecodePolicy,
 ) {
     data class ResolvingChapter(val episodeUuid: String, val chapterIndex: Int)
 
@@ -89,6 +92,8 @@ class GeneratedChapterSeeker @Inject constructor(
         val manager = fingerprintTimingManager.get()
         manager.densePlaybackTime(episode.uuid, referenceTime)?.let { return it.coerceAtLeast(chapter.startTime) }
 
+        if (decodePolicy.current() != FingerprintPolicy.PLATFORM) return null
+
         // A remembered failure repeats deterministically, so fall back without re-resolving.
         if (mutex.withLock { referenceUnavailable || chapter.index in failedChapters }) return null
 
@@ -139,6 +144,7 @@ class GeneratedChapterSeeker @Inject constructor(
 
     private fun isEnabled(chapter: Chapter): Boolean = chapter.isGenerated &&
         appPlatform == AppPlatform.Phone &&
+        decodePolicy.current() != FingerprintPolicy.DISABLED &&
         FeatureFlag.isEnabled(Feature.SYNCED_TRANSCRIPTS) &&
         FeatureFlag.isEnabled(Feature.GENERATED_CHAPTERS)
 }

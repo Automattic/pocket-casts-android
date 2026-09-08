@@ -40,7 +40,11 @@ import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -52,8 +56,15 @@ import timber.log.Timber
 interface UserManager {
     fun beginMonitoringAccountManager(playbackManager: PlaybackManager)
     fun getSignInState(): Flowable<SignInState>
-    fun signOut(playbackManager: PlaybackManager, wasInitiatedByUser: Boolean)
-    fun signOutAndClearData(playbackManager: PlaybackManager, upNextQueue: UpNextQueue, folderManager: FolderManager, searchHistoryManager: SearchHistoryManager, episodeManager: EpisodeManager, wasInitiatedByUser: Boolean)
+
+    /** Emits when the user is signed out by the server rather than by their own action. */
+    val onServerSignOut: SharedFlow<Unit>
+
+    /** Returns the job for the async credential sign out, or null when the sign out is skipped. */
+    fun signOut(playbackManager: PlaybackManager, wasInitiatedByUser: Boolean): Job?
+
+    /** Returns the [signOut] job; the data is already cleared when this call returns. */
+    fun signOutAndClearData(playbackManager: PlaybackManager, upNextQueue: UpNextQueue, folderManager: FolderManager, searchHistoryManager: SearchHistoryManager, episodeManager: EpisodeManager, wasInitiatedByUser: Boolean): Job?
 }
 
 class UserManagerImpl @Inject constructor(
@@ -85,6 +96,9 @@ class UserManagerImpl @Inject constructor(
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
+
+    private val _onServerSignOut = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    override val onServerSignOut: SharedFlow<Unit> = _onServerSignOut.asSharedFlow()
 
     override fun beginMonitoringAccountManager(playbackManager: PlaybackManager) {
         val accountListener = OnAccountsUpdateListener {
@@ -155,10 +169,12 @@ class UserManagerImpl @Inject constructor(
         return settings.cachedSubscription.value
     }
 
-    override fun signOut(playbackManager: PlaybackManager, wasInitiatedByUser: Boolean) {
-        if (wasInitiatedByUser || !settings.getFullySignedOut()) {
+    override fun signOut(playbackManager: PlaybackManager, wasInitiatedByUser: Boolean): Job? {
+        var signOutJob: Job? = null
+        val isSigningOut = wasInitiatedByUser || !settings.getFullySignedOut()
+        if (isSigningOut) {
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Signing out")
-            applicationScope.launch {
+            signOutJob = applicationScope.launch {
                 syncManager.signOut {
                     settings.clearPlusPreferences()
 
@@ -185,6 +201,10 @@ class UserManagerImpl @Inject constructor(
             }
         }
         settings.setFullySignedOut(true)
+        if (isSigningOut && !wasInitiatedByUser) {
+            _onServerSignOut.tryEmit(Unit)
+        }
+        return signOutJob
     }
 
     override fun signOutAndClearData(
@@ -194,9 +214,9 @@ class UserManagerImpl @Inject constructor(
         searchHistoryManager: SearchHistoryManager,
         episodeManager: EpisodeManager,
         wasInitiatedByUser: Boolean,
-    ) {
+    ): Job? {
         // Sign out first to make sure no data changes get synced
-        signOut(playbackManager = playbackManager, wasInitiatedByUser = wasInitiatedByUser)
+        val signOutJob = signOut(playbackManager = playbackManager, wasInitiatedByUser = wasInitiatedByUser)
 
         // Need to stop playback before we start clearing data
         playbackManager.removeEpisode(
@@ -222,5 +242,6 @@ class UserManagerImpl @Inject constructor(
             }
             episodeManager.deleteAll(SourceView.UNKNOWN)
         }
+        return signOutJob
     }
 }

@@ -1,40 +1,212 @@
 package au.com.shiftyjelly.pocketcasts.home
 
+import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.tv.material3.MaterialTheme
-import au.com.shiftyjelly.pocketcasts.compose.AppTheme
-import au.com.shiftyjelly.pocketcasts.theme.TvColors
-import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.component.LocalFocusTvTopBar
+import au.com.shiftyjelly.pocketcasts.component.LocalOpenNowPlaying
+import au.com.shiftyjelly.pocketcasts.component.LocalScrollToTop
+import au.com.shiftyjelly.pocketcasts.component.LocalTopBarScrollState
+import au.com.shiftyjelly.pocketcasts.component.LocalTvTopBarVisibility
+import au.com.shiftyjelly.pocketcasts.component.LocalUseEpisodeArtwork
+import au.com.shiftyjelly.pocketcasts.component.TvDetailOverlay
+import au.com.shiftyjelly.pocketcasts.component.TvScrollToTop
+import au.com.shiftyjelly.pocketcasts.component.TvTopBarScrollState
+import au.com.shiftyjelly.pocketcasts.component.TvTopBarVisibility
+import au.com.shiftyjelly.pocketcasts.component.tvFocusInactiveWhen
+import au.com.shiftyjelly.pocketcasts.history.TvListeningHistoryScreen
+import au.com.shiftyjelly.pocketcasts.nowplaying.TvNowPlayingScreen
+import au.com.shiftyjelly.pocketcasts.playlists.TvPlaylistsScreen
+import au.com.shiftyjelly.pocketcasts.podcasts.TvYourPodcastsScreen
+import au.com.shiftyjelly.pocketcasts.search.TvSearchScreen
+import au.com.shiftyjelly.pocketcasts.settings.TvSettingsModal
+import au.com.shiftyjelly.pocketcasts.starred.TvStarredScreen
+import au.com.shiftyjelly.pocketcasts.theme.TvScreenBackgroundBrush
+import au.com.shiftyjelly.pocketcasts.theme.TvTheme
+import au.com.shiftyjelly.pocketcasts.theme.TvTopBarHeight
+import au.com.shiftyjelly.pocketcasts.upnext.TvUpNextScreen
 
 @Composable
 fun TvScaffold(
+    onLogIn: () -> Unit,
+    onCreateAccount: () -> Unit,
+    onSignedOut: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: TvScaffoldViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    TvScaffoldContent(
-        tabs = uiState.tabs,
-        selectedTabIndex = uiState.selectedTabIndex,
-        onTabSelect = viewModel::selectTab,
-        modifier = modifier,
-    ) { tab ->
-        when (tab) {
-            is TvTab.Home -> TvHomeScreen()
-            else -> TvTabPlaceholder(tab = tab)
+    var isProfileModalVisible by rememberSaveable { mutableStateOf(false) }
+    var isStarredVisible by rememberSaveable { mutableStateOf(false) }
+    var isListeningHistoryVisible by rememberSaveable { mutableStateOf(false) }
+    var isSettingsModalVisible by rememberSaveable { mutableStateOf(false) }
+    val topBarVisibility = remember { TvTopBarVisibility() }
+    val scrollToTop = remember { TvScrollToTop() }
+    val topBarScroll = remember { TvTopBarScrollState() }
+    var didFocusTopBar by rememberSaveable { mutableStateOf(false) }
+    var isNowPlayingOpenRequested by remember { mutableStateOf(false) }
+    var isTopBarFocusRequested by remember { mutableStateOf(false) }
+    var isTopBarFocused by remember { mutableStateOf(false) }
+    val focusTopBar: () -> Unit = remember {
+        { isTopBarFocusRequested = true }
+    }
+    val openNowPlaying: () -> Unit = remember(viewModel) {
+        {
+            viewModel.openNowPlaying()
+            isNowPlayingOpenRequested = true
+            isStarredVisible = false
+            isListeningHistoryVisible = false
+        }
+    }
+    LaunchedEffect(viewModel) {
+        viewModel.openNowPlayingRequests.collect {
+            openNowPlaying()
+        }
+    }
+
+    BackHandler(enabled = topBarVisibility.isVisible && !isTopBarFocused) {
+        focusTopBar()
+        scrollToTop.request()
+    }
+
+    CompositionLocalProvider(
+        LocalTvTopBarVisibility provides topBarVisibility,
+        LocalOpenNowPlaying provides openNowPlaying,
+        LocalFocusTvTopBar provides focusTopBar,
+        LocalScrollToTop provides scrollToTop,
+        LocalTopBarScrollState provides topBarScroll,
+        LocalUseEpisodeArtwork provides uiState.useEpisodeArtwork,
+    ) {
+        Box(modifier = modifier.fillMaxSize()) {
+            TvScaffoldContent(
+                tabs = uiState.tabs,
+                selectedTabIndex = uiState.selectedTabIndex,
+                profile = uiState.profile,
+                isTopBarVisible = topBarVisibility.isVisible,
+                autoFocusSelectedTab = !didFocusTopBar,
+                onSelectedTabFocus = { didFocusTopBar = true },
+                focusSelectedTab = isTopBarFocusRequested,
+                onConsumeFocusRequest = { isTopBarFocusRequested = false },
+                onTopBarFocusChange = { isTopBarFocused = it },
+                onTabSelect = viewModel::selectTab,
+                onTabClick = { tab ->
+                    if (tab == TvTab.NowPlaying) {
+                        isNowPlayingOpenRequested = true
+                    }
+                },
+                onProfileClick = { isProfileModalVisible = true },
+                modifier = Modifier.tvFocusInactiveWhen(isStarredVisible || isListeningHistoryVisible),
+            ) { tab ->
+                val navigateToHome = { viewModel.selectTab(TvTab.Home) }
+                when (tab) {
+                    is TvTab.Home -> TvHomeScreen(
+                        onNavigateToSearch = { viewModel.selectTab(TvTab.Search) },
+                        onCreateAccount = onCreateAccount,
+                    )
+
+                    is TvTab.YourPodcasts -> TvYourPodcastsScreen(
+                        onNavigateToHome = navigateToHome,
+                    )
+
+                    is TvTab.Playlists -> TvPlaylistsScreen()
+
+                    is TvTab.UpNext -> TvUpNextScreen(onNavigateToHome = navigateToHome)
+
+                    is TvTab.NowPlaying -> TvNowPlayingScreen(
+                        isOpenRequested = isNowPlayingOpenRequested,
+                        onConsumeOpenRequest = { isNowPlayingOpenRequested = false },
+                    )
+
+                    is TvTab.Search -> TvSearchScreen()
+                }
+            }
+
+            TvDetailOverlay(
+                target = if (isStarredVisible) Unit else null,
+                onBack = {
+                    isStarredVisible = false
+                    focusTopBar()
+                },
+            ) {
+                TvStarredScreen()
+            }
+
+            TvDetailOverlay(
+                target = if (isListeningHistoryVisible) Unit else null,
+                onBack = {
+                    isListeningHistoryVisible = false
+                    focusTopBar()
+                },
+            ) {
+                TvListeningHistoryScreen()
+            }
+        }
+
+        if (isProfileModalVisible) {
+            LaunchedEffect(Unit) {
+                viewModel.trackProfileShown()
+            }
+            TvProfileModal(
+                profile = uiState.profile,
+                onDismissRequest = { isProfileModalVisible = false },
+                onLogIn = {
+                    isProfileModalVisible = false
+                    onLogIn()
+                },
+                onCreateAccount = {
+                    isProfileModalVisible = false
+                    onCreateAccount()
+                },
+                onStarredEpisodes = {
+                    isProfileModalVisible = false
+                    isStarredVisible = true
+                },
+                onListeningHistory = {
+                    isProfileModalVisible = false
+                    isListeningHistoryVisible = true
+                },
+                onSettings = {
+                    isProfileModalVisible = false
+                    isSettingsModalVisible = true
+                },
+                onLogOut = {
+                    isProfileModalVisible = false
+                    viewModel.signOut()
+                    onSignedOut()
+                },
+            )
+        }
+
+        if (isSettingsModalVisible) {
+            TvSettingsModal(
+                onDismissRequest = { isSettingsModalVisible = false },
+            )
         }
     }
 }
@@ -43,46 +215,86 @@ fun TvScaffold(
 private fun TvScaffoldContent(
     tabs: List<TvTab>,
     selectedTabIndex: Int,
-    onTabSelect: (Int) -> Unit,
+    profile: TvProfileState,
+    isTopBarVisible: Boolean,
+    onTabSelect: (TvTab) -> Unit,
+    onProfileClick: () -> Unit,
     modifier: Modifier = Modifier,
+    onTabClick: (TvTab) -> Unit = {},
+    autoFocusSelectedTab: Boolean = true,
+    onSelectedTabFocus: () -> Unit = {},
+    focusSelectedTab: Boolean = false,
+    onConsumeFocusRequest: () -> Unit = {},
+    onTopBarFocusChange: (Boolean) -> Unit = {},
     tabContent: @Composable (TvTab) -> Unit,
 ) {
-    Column(
+    Box(
         modifier = modifier
             .fillMaxSize()
-            .background(
-                Brush.horizontalGradient(
-                    colors = listOf(
-                        TvColors.DarkGray,
-                        TvColors.Dark,
-                    ),
-                ),
-            ),
+            .background(TvScreenBackgroundBrush),
     ) {
-        TvTopBar(
-            tabs = tabs,
-            selectedTabIndex = selectedTabIndex,
-            onTabSelect = onTabSelect,
-            onProfileClick = {},
-        )
-        Box(modifier = Modifier.weight(1f)) {
-            val currentTab = tabs.getOrElse(selectedTabIndex) { tabs.first() }
-            tabContent(currentTab)
+        val currentTab = tabs.getOrElse(selectedTabIndex) { tabs.first() }
+        val topBarScroll = LocalTopBarScrollState.current
+        val topBarHeightPx = with(LocalDensity.current) { TvTopBarHeight.toPx() }
+        LaunchedEffect(currentTab) {
+            topBarScroll.set(0f)
+        }
+        Crossfade(
+            targetState = currentTab,
+            animationSpec = tween(durationMillis = TAB_CONTENT_ANIMATION_MILLIS, easing = FastOutSlowInEasing),
+            label = "TvTabContent",
+            modifier = Modifier.fillMaxSize(),
+        ) { tab ->
+            tabContent(tab)
+        }
+
+        AnimatedVisibility(
+            visible = isTopBarVisible,
+            enter = fadeIn(tween(durationMillis = TOP_BAR_ANIMATION_MILLIS, easing = FastOutSlowInEasing)),
+            exit = fadeOut(tween(durationMillis = TOP_BAR_ANIMATION_MILLIS, easing = FastOutSlowInEasing)),
+            modifier = Modifier.align(Alignment.TopCenter),
+        ) {
+            TvTopBar(
+                tabs = tabs,
+                selectedTabIndex = selectedTabIndex,
+                profile = profile,
+                // Resolve against the same list this frame rendered, so a click during a tab-list
+                // change cannot land on the wrong tab.
+                onTabSelect = { index -> tabs.getOrNull(index)?.let(onTabSelect) },
+                onTabClick = { index -> tabs.getOrNull(index)?.let(onTabClick) },
+                onProfileClick = onProfileClick,
+                autoFocusSelectedTab = autoFocusSelectedTab,
+                onSelectedTabFocus = onSelectedTabFocus,
+                focusSelectedTab = focusSelectedTab,
+                onConsumeFocusRequest = onConsumeFocusRequest,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .onFocusChanged { onTopBarFocusChange(it.hasFocus) }
+                    .graphicsLayer {
+                        translationY = -topBarScroll.offsetPx.coerceAtMost(topBarHeightPx)
+                    },
+            )
         }
     }
 }
 
+private const val TOP_BAR_ANIMATION_MILLIS = 300
+private const val TAB_CONTENT_ANIMATION_MILLIS = 300
+
 @Preview(device = Devices.TV_1080p)
 @Composable
 private fun TvScaffoldPreview() {
-    AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
-        MaterialTheme {
-            var selectedIndex by remember { mutableIntStateOf(0) }
-            TvScaffoldContent(
-                tabs = TvTab.entries,
-                selectedTabIndex = selectedIndex,
-                onTabSelect = { selectedIndex = it },
-            ) { tab ->
+    TvTheme {
+        var selectedIndex by remember { mutableIntStateOf(0) }
+        TvScaffoldContent(
+            tabs = TvTab.entries,
+            selectedTabIndex = selectedIndex,
+            profile = TvProfileState.SignedOut,
+            isTopBarVisible = true,
+            onTabSelect = { selectedIndex = TvTab.entries.indexOf(it) },
+            onProfileClick = {},
+        ) { tab ->
+            Box(modifier = Modifier.fillMaxSize().padding(top = TvTopBarHeight)) {
                 TvTabPlaceholder(tab = tab)
             }
         }

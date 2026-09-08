@@ -43,9 +43,9 @@ enum class StreamVideoState {
     ;
 
     companion object {
-        fun initialFor(episode: BaseEpisode, audioOnly: Boolean, playingHlsStream: Boolean) = when {
+        fun initialFor(episode: BaseEpisode, audioOnly: Boolean, playingHlsStream: Boolean, isRemote: Boolean) = when {
             audioOnly && (episode.isVideo || playingHlsStream) -> AudioOnly
-            playingHlsStream -> Unknown
+            playingHlsStream && !isRemote -> Unknown
             else -> NotVideo
         }
     }
@@ -61,6 +61,13 @@ interface Player {
     val name: String
     val isDownloading: Boolean
     val onPlayerEvent: (Player, PlayerEvent) -> Unit
+
+    /**
+     * Smoothed RMS level of the playing audio in the range 0f..1f, updated from the audio
+     * pipeline so it is safe to poll every frame. Players that don't measure audio return 0f,
+     * which the UI treats as "no level available" rather than silence.
+     */
+    val currentAudioLevel: Float get() = 0f
 
     suspend fun load(currentPositionMs: Int)
     suspend fun getCurrentPositionMs(): Int

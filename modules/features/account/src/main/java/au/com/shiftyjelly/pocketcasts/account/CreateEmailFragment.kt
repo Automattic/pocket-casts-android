@@ -24,6 +24,7 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import com.automattic.eventhorizon.CreateAccountNextButtonTappedEvent
 import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.OnboardingFlowType
 import com.google.android.material.textfield.TextInputEditText
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -134,7 +135,7 @@ class CreateEmailFragment : BaseFragment() {
             ) {
                 txtError.text = ""
                 UiUtil.hideKeyboard(v)
-                eventHorizon.track(CreateAccountNextButtonTappedEvent)
+                eventHorizon.track(CreateAccountNextButtonTappedEvent(flow = OnboardingFlowType.Unknown))
                 viewModel.sendCreateAccount()
             }
         }

@@ -18,6 +18,7 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.FirebaseRemote
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.PreferencesFeatureProvider
 import au.com.shiftyjelly.pocketcasts.utils.getVersionCode
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.time.Instant
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
@@ -129,7 +130,8 @@ class AppLifecycleObserver(
             // new installations default to not displaying the tooltip
             settings.showPodcastsRecentlyPlayedSortOrderTooltip.set(false, updateModifiedAt = false)
 
-            settings.showFreeAccountEncouragement.set(false, updateModifiedAt = false)
+            // Anchor the cadence so new installs wait a full interval; upgrading users leave it null.
+            settings.freeAccountEncouragementLastShown.set(Instant.now(), updateModifiedAt = false)
 
             when (getAppPlatform()) {
                 // do nothing because this already defaults to true for all users on automotive
@@ -137,6 +139,9 @@ class AppLifecycleObserver(
 
                 // do nothing because feature has not been enabled on Wear OS yet
                 AppPlatform.WearOs -> {}
+
+                // do nothing because feature has not been enabled on TV yet
+                AppPlatform.Tv -> {}
 
                 AppPlatform.Phone -> {
                     // For new users we want to auto play when the queue is empty by default

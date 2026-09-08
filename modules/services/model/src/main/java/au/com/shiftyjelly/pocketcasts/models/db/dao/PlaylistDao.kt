@@ -573,8 +573,9 @@ abstract class PlaylistDao {
         JOIN playlists AS playlist ON playlist.uuid IS :playlistUuid
         WHERE
           manual_episode.playlist_uuid IS :playlistUuid
-          AND (CASE 
-            WHEN playlist.showArchivedEpisodes IS NOT 0 THEN 1 
+          AND (CASE
+            WHEN :includeArchived IS NOT 0 THEN 1
+            WHEN playlist.showArchivedEpisodes IS NOT 0 THEN 1
             ELSE IFNULL(podcast_episode.archived, 0) IS 0
           END)
           AND (
@@ -606,13 +607,15 @@ abstract class PlaylistDao {
         playlistUuid: String,
         searchTerm: String,
         forcedEpisodeUuid: String?,
+        includeArchived: Boolean,
     ): Flow<List<RawManualEpisode>>
 
     fun manualEpisodesFlow(
         playlistUuid: String,
         searchTerm: String = "",
         forcedEpisodeUuid: String? = null,
-    ) = manualEpisodesRawFlow(playlistUuid, searchTerm.escapeLike('\\'), forcedEpisodeUuid).map { rawEpisodes ->
+        includeArchived: Boolean = false,
+    ) = manualEpisodesRawFlow(playlistUuid, searchTerm.escapeLike('\\'), forcedEpisodeUuid, includeArchived).map { rawEpisodes ->
         rawEpisodes.map(RawManualEpisode::toEpisode)
     }
 
@@ -644,12 +647,13 @@ abstract class PlaylistDao {
         limit: Int,
         searchTerm: String? = null,
         forcedEpisodeUuid: String? = null,
+        includeArchived: Boolean = false,
     ): Flow<List<PlaylistEpisode.Available>> {
         val escapedTerm = searchTerm?.takeIf(String::isNotBlank)?.escapeLike('\\')
         val query = createSmartPlaylistEpisodeQuery(
             selectClause = "episode.*",
             whereClause = buildString {
-                append(smartRules.toSqlWhereClause(clock))
+                append(smartRules.toSqlWhereClause(clock, includeArchived))
                 if (forcedEpisodeUuid != null) {
                     append(" OR (")
                     append("episode.uuid = '$forcedEpisodeUuid'")

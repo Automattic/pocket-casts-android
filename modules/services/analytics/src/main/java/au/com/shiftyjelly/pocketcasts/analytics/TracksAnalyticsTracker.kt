@@ -105,6 +105,7 @@ class TracksAnalyticsTracker @Inject constructor(
                 AppPlatform.Automotive -> "automotive"
                 AppPlatform.Phone -> "phone"
                 AppPlatform.WearOs -> "watch"
+                AppPlatform.Tv -> "tv"
             },
         ).mapKeys { it.key.analyticsKey }
     }
