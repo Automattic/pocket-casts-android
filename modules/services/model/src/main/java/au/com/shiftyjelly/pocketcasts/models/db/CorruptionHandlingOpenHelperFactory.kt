@@ -58,8 +58,8 @@ class CorruptionHandlingOpenHelperFactory(
                 return null
             }
             val directory = databaseFile.parentFile ?: return null
-            val prefix = "${databaseFile.name}.$BACKUP_MARKER-"
-            directory.listFiles { file -> file.name.startsWith(prefix) }?.forEach { it.delete() }
+            val marker = ".$BACKUP_MARKER-"
+            directory.listFiles { file -> file.name.startsWith(databaseFile.name) && file.name.contains(marker) }?.forEach { it.delete() }
 
             val suffix = "$BACKUP_MARKER-${System.currentTimeMillis()}"
             val backup = File(directory, "${databaseFile.name}.$suffix")
