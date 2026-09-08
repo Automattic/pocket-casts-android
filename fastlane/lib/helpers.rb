@@ -1,10 +1,8 @@
 # frozen_string_literal: true
 
-# The scenario submits a build for Google to review by rolling production out to 1%, so that one
-# rollout announces a submission instead of a percentage.
 SUBMISSION_ROLLOUT_PERCENTAGE = 1
 
-# The rollout announcement.
+# The rollout announcement message for Slack.
 #
 # @param track [String] The Google Play track the rollout is for, either `beta` or `production`.
 # @param percent [Float] The rollout percentage, between 0 and 1.
