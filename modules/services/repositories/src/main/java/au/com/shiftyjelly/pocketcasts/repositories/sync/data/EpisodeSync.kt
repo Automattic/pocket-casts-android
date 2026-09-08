@@ -118,14 +118,7 @@ internal class EpisodeSync(
                         episodeUuids.add(episode.uuid)
                     }
                 }
-                syncManager.getEpisodesOrThrow(request).episodesList.map { serverEpisode ->
-                    serverEpisode.toPodcastEpisode().copy(
-                        playingStatus = EpisodePlayingStatus.NOT_PLAYED,
-                        playedUpTo = 0.0,
-                        isStarred = false,
-                        isArchived = false,
-                    )
-                }
+                syncManager.getEpisodesOrThrow(request).episodesList.map { it.toPodcastEpisode() }
             }.also { shells ->
                 shells.groupBy(PodcastEpisode::podcastUuid).forEach { (podcastUuid, episodes) ->
                     episodeManager.add(episodes, podcastUuid, downloadMetaData = false)

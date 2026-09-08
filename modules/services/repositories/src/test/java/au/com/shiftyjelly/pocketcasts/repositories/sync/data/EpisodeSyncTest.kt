@@ -55,7 +55,7 @@ class EpisodeSyncTest {
     }
 
     @Test
-    fun `fetch and mark played a missing episode from a subscribed podcast`() = runTest {
+    fun `fetch and store the authoritative state of a missing episode from a subscribed podcast`() = runTest {
         val serverEpisode = completedServerEpisode(uuid = "episode1", podcastUuid = "podcast1")
 
         whenever(episodeManager.findByUuids(any())).thenReturn(emptyList())
@@ -66,8 +66,9 @@ class EpisodeSyncTest {
 
         verify(syncManager).getEpisodesOrThrow(any())
         verify(episodeManager).add(argThat { size == 1 && first().uuid == "episode1" }, eq("podcast1"), eq(false))
-        verify(episodeManager).markedAsPlayedExternally(argThat { uuid == "episode1" }, eq(playbackManager), eq(podcastManager))
-        verify(episodeManager).updateAllSyncFields(argThat { any { it.uuid == "episode1" && it.playingStatus == EpisodePlayingStatus.COMPLETED } })
+        verify(episodeManager).updateAllSyncFields(
+            argThat { any { it.uuid == "episode1" && it.playingStatus == EpisodePlayingStatus.COMPLETED && it.isStarred } },
+        )
     }
 
     @Test
@@ -122,6 +123,8 @@ class EpisodeSyncTest {
                     .setPodcastUuid(podcastUuid)
                     .setTitle("Title $uuid")
                     .setUrl("https://example.com/$uuid")
+                    .setPlayingStatus(EpisodePlayingStatus.COMPLETED.toInt())
+                    .setStarred(true)
                     .build(),
             )
             .build()
