@@ -10,7 +10,8 @@ import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 fun LoginWithGoogleScreen(
     onError: (t: Throwable?) -> Unit,
     onGoogleNotAvailable: () -> Unit,
-    onServerError: () -> Unit,
+    onNoCredential: () -> Unit,
+    onOtherFailure: () -> Unit,
     onCancel: () -> Unit,
     viewModel: LoginWithGoogleViewModel = hiltViewModel(),
     successContent: @Composable (LoginWithGoogleViewModel.State.SignedInWithGoogle) -> Unit,
@@ -27,9 +28,11 @@ fun LoginWithGoogleScreen(
     when (state) {
         is LoginWithGoogleViewModel.State.Failed.GoogleLoginUnavailable -> onGoogleNotAvailable()
 
+        is LoginWithGoogleViewModel.State.Failed.NoGoogleCredential -> onNoCredential()
+
         is LoginWithGoogleViewModel.State.Failed.CredentialError -> onError(state.exception)
 
-        is LoginWithGoogleViewModel.State.Failed.Other -> onServerError()
+        is LoginWithGoogleViewModel.State.Failed.Other -> onOtherFailure()
 
         is LoginWithGoogleViewModel.State.Failed.Cancelled -> onCancel()
 
