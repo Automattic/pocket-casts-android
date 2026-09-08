@@ -121,7 +121,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         EpisodeChatMessage::class,
         EpisodeAlternateEnclosure::class,
     ],
-    version = 136,
+    version = 137,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 81, to = 82, spec = AppDatabase.Companion.DeleteSilenceRemovedMigration::class),
@@ -1509,6 +1509,23 @@ abstract class AppDatabase : RoomDatabase() {
             database.execSQL("ALTER TABLE episode_alternate_enclosures ADD COLUMN media_kind TEXT")
         }
 
+        val MIGRATION_136_137 = addMigration(136, 137) { database ->
+            database.execSQL(
+                "CREATE TABLE `bookmarks_new` (`uuid` TEXT NOT NULL, `podcast_uuid` TEXT NOT NULL, `episode_uuid` TEXT NOT NULL, `time` INTEGER NOT NULL, `created_at` INTEGER NOT NULL, `title` TEXT NOT NULL, `title_modified` INTEGER, `deleted` INTEGER NOT NULL, `deleted_modified` INTEGER, `passage` TEXT, `passage_location` INTEGER, `passage_modified` INTEGER, `reference_time` INTEGER, `reference_time_modified` INTEGER, `sync_status` INTEGER NOT NULL, `clean_title` TEXT NOT NULL, PRIMARY KEY(`uuid`))",
+            )
+            database.execSQL(
+                "INSERT INTO `bookmarks_new` (`uuid`, `podcast_uuid`, `episode_uuid`, `time`, `created_at`, `title`, `title_modified`, `deleted`, `deleted_modified`, `passage`, `passage_location`, `passage_modified`, `reference_time`, `reference_time_modified`, `sync_status`, `clean_title`) " +
+                    "SELECT `uuid`, `podcast_uuid`, `episode_uuid`, `time`, `created_at`, " +
+                    "CASE WHEN `ai_title` IS NOT NULL AND (`title_modified` IS NULL OR `title_modified` <= `created_at`) THEN `ai_title` ELSE `title` END, " +
+                    "`title_modified`, `deleted`, `deleted_modified`, NULL, NULL, NULL, NULL, NULL, `sync_status`, " +
+                    "CASE WHEN `ai_title` IS NOT NULL AND (`title_modified` IS NULL OR `title_modified` <= `created_at`) THEN `ai_title` ELSE `clean_title` END " +
+                    "FROM `bookmarks`",
+            )
+            database.execSQL("DROP TABLE `bookmarks`")
+            database.execSQL("ALTER TABLE `bookmarks_new` RENAME TO `bookmarks`")
+            database.execSQL("CREATE INDEX IF NOT EXISTS `bookmarks_podcast_uuid` ON `bookmarks` (`podcast_uuid`)")
+        }
+
         fun addMigrations(databaseBuilder: Builder<AppDatabase>, context: Context) {
             databaseBuilder.addMigrations(
                 addMigration(1, 2) { },
@@ -1934,6 +1951,7 @@ abstract class AppDatabase : RoomDatabase() {
                 MIGRATION_133_134,
                 MIGRATION_134_135,
                 MIGRATION_135_136,
+                MIGRATION_136_137,
             )
         }
 
