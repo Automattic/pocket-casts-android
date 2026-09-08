@@ -143,6 +143,13 @@ class DiscoverFragment :
     }
 
     override fun onNetworkClicked(network: DiscoverListSummary) {
+        eventHorizon.track(
+            DiscoverListShowAllTappedEvent(
+                listId = network.uuid,
+                // No date passed as it's not available until the list is loaded
+                listDatetime = "",
+            ),
+        )
         (activity as FragmentHostListener).openNetworkPage(
             listId = network.uuid,
             title = network.title,
