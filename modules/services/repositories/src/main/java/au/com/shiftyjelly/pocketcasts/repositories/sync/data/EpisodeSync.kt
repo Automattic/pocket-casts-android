@@ -7,6 +7,8 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.google.protobuf.boolValue
 import com.google.protobuf.int32Value
 import com.google.protobuf.int64Value
@@ -16,6 +18,7 @@ import com.pocketcasts.service.api.durationOrNull
 import com.pocketcasts.service.api.isDeletedOrNull
 import com.pocketcasts.service.api.playedUpToOrNull
 import com.pocketcasts.service.api.playingStatusOrNull
+import com.pocketcasts.service.api.podcastsEpisodesRequest
 import com.pocketcasts.service.api.record
 import com.pocketcasts.service.api.starredModifiedOrNull
 import com.pocketcasts.service.api.starredOrNull
@@ -28,6 +31,7 @@ internal class EpisodeSync(
     private val podcastManager: PodcastManager,
     private val playbackManager: PlaybackManager,
     private val settings: Settings,
+    private val syncManager: SyncManager,
 ) {
     suspend fun incrementalData(): List<Record> {
         val episodes = episodeManager.findEpisodesToSync()
@@ -69,7 +73,9 @@ internal class EpisodeSync(
 
     suspend fun processIncrementalResponse(serverEpisodes: List<SyncUserEpisode>) {
         val serverEpisodesMap = serverEpisodes.associateBy(SyncUserEpisode::getUuid)
-        val localEpisodes = episodeManager.findByUuids(serverEpisodesMap.keys)
+        val presentEpisodes = episodeManager.findByUuids(serverEpisodesMap.keys)
+        val presentUuids = presentEpisodes.mapTo(mutableSetOf(), PodcastEpisode::uuid)
+        val localEpisodes = presentEpisodes + fetchMissingEpisodes(serverEpisodesMap, presentUuids)
 
         val episodesToArchive = mutableListOf<PodcastEpisode>()
         val episodeToFinish = mutableListOf<PodcastEpisode>()
@@ -89,6 +95,46 @@ internal class EpisodeSync(
             episodeManager.markedAsPlayedExternally(episode, playbackManager, podcastManager)
         }
         episodeManager.updateAllSyncFields(localEpisodes)
+    }
+
+    private suspend fun fetchMissingEpisodes(
+        serverEpisodesMap: Map<String, SyncUserEpisode>,
+        presentUuids: Set<String>,
+    ): List<PodcastEpisode> {
+        val missingEpisodes = serverEpisodesMap.values.filter { it.uuid !in presentUuids }
+        if (missingEpisodes.isEmpty()) {
+            return emptyList()
+        }
+        val subscribedPodcastUuids = podcastManager.findSubscribedUuids().toSet()
+        val episodesToFetch = missingEpisodes.filter { it.podcastUuid in subscribedPodcastUuids }
+        if (episodesToFetch.isEmpty()) {
+            return emptyList()
+        }
+        return runCatching {
+            episodesToFetch.chunked(MISSING_EPISODES_BATCH_SIZE).flatMap { batch ->
+                val request = podcastsEpisodesRequest {
+                    batch.forEach { episode ->
+                        podcastUuids.add(episode.podcastUuid)
+                        episodeUuids.add(episode.uuid)
+                    }
+                }
+                syncManager.getEpisodesOrThrow(request).episodesList.map { serverEpisode ->
+                    serverEpisode.toPodcastEpisode().copy(
+                        playingStatus = EpisodePlayingStatus.NOT_PLAYED,
+                        playedUpTo = 0.0,
+                        isStarred = false,
+                        isArchived = false,
+                    )
+                }
+            }.also { shells ->
+                shells.groupBy(PodcastEpisode::podcastUuid).forEach { (podcastUuid, episodes) ->
+                    episodeManager.add(episodes, podcastUuid, downloadMetaData = false)
+                }
+            }
+        }.getOrElse { error ->
+            LogBuffer.e("DataSync", error, "Failed to fetch missing episodes during incremental sync")
+            emptyList()
+        }
     }
 
     private fun PodcastEpisode.applyServerEpisode(
@@ -150,5 +196,9 @@ internal class EpisodeSync(
                 playedUpTo = value
                 playbackManager.seekIfPlayingToTimeMs(uuid, playedUpToMs)
             }
+    }
+
+    companion object {
+        private const val MISSING_EPISODES_BATCH_SIZE = 100
     }
 }
