@@ -58,8 +58,6 @@ class CorruptionHandlingOpenHelperFactory(
                 return null
             }
             val directory = databaseFile.parentFile ?: return null
-            val marker = ".$BACKUP_MARKER-"
-            directory.listFiles { file -> file.name.startsWith(databaseFile.name) && file.name.contains(marker) }?.forEach { it.delete() }
 
             val suffix = "$BACKUP_MARKER-${System.currentTimeMillis()}"
             val backup = File(directory, "${databaseFile.name}.$suffix")
@@ -70,7 +68,17 @@ class CorruptionHandlingOpenHelperFactory(
                     auxiliary.copyTo(File(directory, "${databaseFile.name}$extension.$suffix"), overwrite = true)
                 }
             }
+
+            pruneOlderBackups(directory, databaseFile, keepSuffix = suffix)
             return backup
+        }
+
+        private fun pruneOlderBackups(directory: File, databaseFile: File, keepSuffix: String) {
+            val backupBaseNames = listOf(databaseFile.name) + AUXILIARY_EXTENSIONS.map { "${databaseFile.name}$it" }
+            directory.listFiles { file ->
+                !file.name.endsWith(".$keepSuffix") &&
+                    backupBaseNames.any { baseName -> file.name.startsWith("$baseName.$BACKUP_MARKER-") }
+            }?.forEach { it.delete() }
         }
     }
 
