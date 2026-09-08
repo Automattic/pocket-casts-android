@@ -90,7 +90,10 @@ constructor(
                     loginIdentity = data.loginIdentity,
                     signInSource = SignInSource.WatchPhoneSync,
                 )
-                LogBuffer.i(TAG, "Login result: ${result::class.simpleName}")
+                when (result) {
+                    is LoginResult.Success -> LogBuffer.i(TAG, "Login from phone succeeded")
+                    is LoginResult.Failed -> LogBuffer.e(TAG, "Login from phone failed: ${result.message} (id: ${result.messageId})")
+                }
                 onResult(result)
             } else {
                 LogBuffer.i(TAG, "Already logged in, skipping login")
