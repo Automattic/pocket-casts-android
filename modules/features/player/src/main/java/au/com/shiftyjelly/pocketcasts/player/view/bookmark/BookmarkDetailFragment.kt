@@ -55,8 +55,7 @@ class BookmarkDetailFragment : BaseDialogFragment() {
                 putParcelable(
                     NEW_INSTANCE_ARG,
                     Args(
-                        displayTitle = bookmark.displayTitle,
-                        aiSummary = bookmark.aiSummary,
+                        title = bookmark.title,
                         episodeTitle = episodeTitle,
                         episodeUuid = bookmark.episodeUuid,
                         podcastUuid = podcastUuid,
@@ -72,8 +71,7 @@ class BookmarkDetailFragment : BaseDialogFragment() {
 
     @Parcelize
     private data class Args(
-        val displayTitle: String,
-        val aiSummary: String?,
+        val title: String,
         val episodeTitle: String,
         val episodeUuid: String,
         val podcastUuid: String,
@@ -101,8 +99,7 @@ class BookmarkDetailFragment : BaseDialogFragment() {
     ) = contentWithoutConsumedInsets {
         DialogBox(fillMaxHeight = false) {
             BookmarkDetailPage(
-                displayTitle = args.displayTitle,
-                aiSummary = args.aiSummary,
+                title = args.title,
                 episodeTitle = args.episodeTitle,
                 podcastUuid = args.podcastUuid,
                 podcastTitle = args.podcastTitle,

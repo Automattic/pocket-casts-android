@@ -34,7 +34,6 @@ import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
-import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
@@ -44,8 +43,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 internal fun BookmarkDetailPage(
-    displayTitle: String,
-    aiSummary: String?,
+    title: String,
     episodeTitle: String,
     podcastUuid: String,
     podcastTitle: String,
@@ -127,7 +125,7 @@ internal fun BookmarkDetailPage(
             Spacer(modifier = Modifier.height(8.dp))
 
             TextH30(
-                text = displayTitle,
+                text = title,
                 color = colors.primaryText,
             )
 
@@ -138,14 +136,6 @@ internal fun BookmarkDetailPage(
                 text = formattedTime,
                 color = colors.secondaryText,
             )
-
-            if (!aiSummary.isNullOrEmpty()) {
-                Spacer(modifier = Modifier.height(16.dp))
-                TextP40(
-                    text = aiSummary,
-                    color = colors.secondaryText,
-                )
-            }
 
             Spacer(modifier = Modifier.height(12.dp))
 
@@ -210,8 +200,7 @@ private fun BookmarkDetailPagePreview(
 ) {
     AppThemeWithBackground(themeType) {
         BookmarkDetailPage(
-            displayTitle = "Latency vs throughput tradeoff",
-            aiSummary = "Why optimizing for low latency often means sacrificing batch throughput.",
+            title = "Latency vs throughput tradeoff",
             episodeTitle = "Can the U.S. Rein in Prediction Markets?",
             podcastUuid = "",
             podcastTitle = "Hard Fork",
