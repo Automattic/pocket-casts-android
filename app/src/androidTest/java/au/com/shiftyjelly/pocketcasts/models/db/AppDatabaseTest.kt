@@ -28,6 +28,7 @@ class AppDatabaseTest {
         private const val MIGRATION_DB = "migration-test-132-133"
         private const val MIGRATION_DB_133_134 = "migration-test-133-134"
         private const val MIGRATION_DB_135_136 = "migration-test-135-136"
+        private const val MIGRATION_DB_136_137 = "migration-test-136-137"
     }
 
     @Rule @JvmField
@@ -190,6 +191,40 @@ class AppDatabaseTest {
 
         db.execSQL("INSERT INTO episode_alternate_enclosures (episode_uuid, position, type, media_kind, is_default, sources) VALUES ('episode-1', 1, 'video/mp4', 'video', 0, '[]')")
         assertEquals(1, countWhere(db, "episode_alternate_enclosures", "media_kind = 'video'"))
+    }
+
+    @Test
+    fun migrate136To137AdoptsSingleTitleModel() {
+        migrationTestHelper.createDatabase(MIGRATION_DB_136_137, 136).use {
+            it.execSQL(
+                "INSERT INTO bookmarks (uuid, podcast_uuid, episode_uuid, time, created_at, title, title_modified, deleted, deleted_modified, ai_title, ai_summary, ai_title_modified, ai_summary_modified, sync_status, clean_title) " +
+                    "VALUES ('a', 'p', 'e', 10, 1000, 'Bookmark', 1000, 0, 1000, 'AI Title A', 'summary', 1000, 1000, 1, 'Bookmark')",
+            )
+            it.execSQL(
+                "INSERT INTO bookmarks (uuid, podcast_uuid, episode_uuid, time, created_at, title, title_modified, deleted, deleted_modified, ai_title, ai_summary, ai_title_modified, ai_summary_modified, sync_status, clean_title) " +
+                    "VALUES ('b', 'p', 'e', 20, 1000, 'My Title', 2000, 0, 1000, 'AI Title B', NULL, 1000, NULL, 1, 'My Title')",
+            )
+            it.execSQL(
+                "INSERT INTO bookmarks (uuid, podcast_uuid, episode_uuid, time, created_at, title, title_modified, deleted, deleted_modified, ai_title, ai_summary, ai_title_modified, ai_summary_modified, sync_status, clean_title) " +
+                    "VALUES ('c', 'p', 'e', 30, 1000, 'Plain', 1000, 0, 1000, NULL, NULL, NULL, NULL, 1, 'Plain')",
+            )
+        }
+
+        val db = migrationTestHelper.runMigrationsAndValidate(MIGRATION_DB_136_137, 137, true, AppDatabase.MIGRATION_136_137)
+
+        val columns = tableColumns(db, "bookmarks")
+        assertEquals(
+            "Passage and reference columns should exist",
+            true,
+            columns.containsAll(listOf("passage", "passage_location", "passage_modified", "reference_time", "reference_time_modified")),
+        )
+        assertEquals("ai_title column should be dropped", false, columns.contains("ai_title"))
+        assertEquals("ai_summary column should be dropped", false, columns.contains("ai_summary"))
+
+        assertEquals("All bookmarks should be preserved", 3, countRows(db, "bookmarks"))
+        assertEquals("An unedited title is backfilled from ai_title", 1, countWhere(db, "bookmarks", "uuid = 'a' AND title = 'AI Title A'"))
+        assertEquals("A user-edited title is kept", 1, countWhere(db, "bookmarks", "uuid = 'b' AND title = 'My Title'"))
+        assertEquals("A title without an ai_title is kept", 1, countWhere(db, "bookmarks", "uuid = 'c' AND title = 'Plain'"))
     }
 
     private fun tableColumns(db: SupportSQLiteDatabase?, tableName: String): List<String> {
