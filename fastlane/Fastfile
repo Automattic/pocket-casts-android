@@ -70,7 +70,7 @@ APPS_APP = 'app'
 APPS_AUTOMOTIVE = 'automotive'
 APPS_TV = 'tv'
 APPS_WEAR = 'wear'
-APPS = [APPS_APP, APPS_AUTOMOTIVE, APPS_TV, APPS_WEAR].freeze
+APPS = [APPS_APP, APPS_AUTOMOTIVE, APPS_WEAR, APPS_TV].freeze
 
 UPLOAD_TO_PLAY_STORE_JSON_KEY = File.join(PROJECT_ROOT_FOLDER, 'google-upload-credentials.json')
 UPLOAD_TO_PLAY_STORE_COMMON_OPTIONS = {
@@ -592,19 +592,16 @@ platform :android do
   lane :build_bundle do |app:, version: version_name_current, build_code: build_code_current|
     aab_artifact_path = aab_artifact_path(app, version)
     build_dir = 'artifacts/'
+    gradle_properties = gradle_properties_for_app(app: app)
 
     gradle(task: 'clean')
     UI.message('Running lint...')
-    gradle(task: ":#{app}:lintRelease")
+    gradle(task: ":#{app}:lintRelease", properties: gradle_properties)
     UI.message("Building #{version} / #{build_code} - #{aab_artifact_path}...")
     gradle(
       task: ":#{app}:bundle",
       build_type: 'Release',
-      properties: {
-        'IS_AUTOMOTIVE_BUILD' => app == APPS_AUTOMOTIVE,
-        'IS_TV_BUILD' => app == APPS_TV,
-        'IS_WEAR_BUILD' => app == APPS_WEAR
-      }
+      properties: gradle_properties
     )
 
     aab_file = File.join(PROJECT_ROOT_FOLDER, bundle_output_path(app))
@@ -659,7 +656,7 @@ platform :android do
     gradle(
       task: 'app:assemble',
       build_type: app_build_type,
-      properties: gradle_properties
+      properties: gradle_properties.merge(gradle_properties_for_app(app: APPS_APP))
     )
 
     app_apk = lane_context[SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS].first
@@ -705,7 +702,7 @@ platform :android do
       gradle(
         task: "#{platform}:assemble",
         build_type: other_builds_type,
-        properties: gradle_properties
+        properties: gradle_properties.merge(gradle_properties_for_app(app: platform))
       )
 
       generated_apk_paths = lane_context[SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS]
@@ -943,6 +940,15 @@ platform :android do
     build_code_next = BUILD_CODE_CALCULATOR.next_build_code(build_code: build_code_current)
     # Return the formatted build code
     BUILD_CODE_FORMATTER.build_code(build_code: build_code_next)
+  end
+
+  # Shared modules use these properties for versioning, platform metadata, and the runtime Sentry DSN.
+  def gradle_properties_for_app(app:)
+    {
+      'IS_AUTOMOTIVE_BUILD' => app == APPS_AUTOMOTIVE,
+      'IS_WEAR_BUILD' => app == APPS_WEAR,
+      'IS_TV_BUILD' => app == APPS_TV
+    }
   end
 
   # Returns the versionCode for a given app, adjusting for offset depending on its form factor
