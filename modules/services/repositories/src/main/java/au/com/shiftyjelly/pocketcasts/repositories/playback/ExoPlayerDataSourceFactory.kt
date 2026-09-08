@@ -42,9 +42,11 @@ class ExoPlayerDataSourceFactory @Inject constructor(
     private val settings: Settings,
     private val crashLogging: CrashLogging,
 ) {
+    private val maxCacheSizeBytes = settings.getExoPlayerCacheEntirePlayingEpisodeSizeInMB() * 1024 * 1024L
+
     private val cache = runCatching {
         val cacheDir = File(context.cacheDir, CACHE_DIR_NAME)
-        val evictor = LeastRecentlyUsedCacheEvictor(maxCacheSizeBytes())
+        val evictor = LeastRecentlyUsedCacheEvictor(maxCacheSizeBytes)
         SimpleCache(cacheDir, evictor, StandaloneDatabaseProvider(context))
     }.onFailure { e ->
         val errorMessage = "Failed to instantiate ExoPlayer cache ${e.message}"
@@ -137,7 +139,7 @@ class ExoPlayerDataSourceFactory @Inject constructor(
                 url = episodeUri,
                 episodeUuid = episodeLocation.episode.uuid,
                 networkConstraint = cacheNetworkConstraint(settings.warnOnMeteredNetwork.value),
-                maxCacheBytes = maxCacheSizeBytes(),
+                maxCacheBytes = maxCacheSizeBytes,
                 onCachingComplete = onCachingComplete,
             )
         }
@@ -173,10 +175,8 @@ class ExoPlayerDataSourceFactory @Inject constructor(
         episode = episode,
         isHlsStream = isHlsStream,
         cacheEntirePlayingEpisodeEnabled = settings.cacheEntirePlayingEpisode.value,
-        maxCacheSizeBytes = maxCacheSizeBytes(),
+        maxCacheSizeBytes = maxCacheSizeBytes,
     )
-
-    private fun maxCacheSizeBytes() = settings.getExoPlayerCacheEntirePlayingEpisodeSizeInMB() * 1024 * 1024L
 
     private fun ClosedRange<Long>.toClippingConfiguration() = ClippingConfiguration.Builder()
         .setStartPositionMs(start)

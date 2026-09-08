@@ -18,6 +18,7 @@ import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import au.com.shiftyjelly.pocketcasts.utils.config.FirebaseConfig
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -93,7 +94,7 @@ class CacheWorker @AssistedInject constructor(
         private const val URL_KEY = "url_key"
         private const val EPISODE_UUID_KEY = "episode_uuid_key"
         private const val MAX_CACHE_BYTES_KEY = "max_cache_bytes_key"
-        private const val DEFAULT_MAX_CACHE_BYTES = 500L * 1024 * 1024
+        private val DEFAULT_MAX_CACHE_BYTES = (FirebaseConfig.defaults[FirebaseConfig.EXOPLAYER_CACHE_ENTIRE_PLAYING_EPISODE_SIZE_IN_MB] as Long) * 1024 * 1024
 
         fun startCachingEntireEpisode(
             context: Context,
