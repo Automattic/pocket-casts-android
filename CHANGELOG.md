@@ -32,6 +32,8 @@
         ([#5645](https://github.com/Automattic/pocket-casts-android/pull/5645))
     *   Prevent Cast connection failures from interrupting local playback or removing playback controls
         ([#5656](https://github.com/Automattic/pocket-casts-android/pull/5656))
+    *   Preserve and report a corrupt local database instead of silently recreating it empty and losing the library
+        ([#5878](https://github.com/Automattic/pocket-casts-android/pull/5878))
 
 8.21
 -----
