@@ -12,6 +12,8 @@
         ([#5835](https://github.com/Automattic/pocket-casts-android/pull/5835))
     *   Stop "Cache entire playing episode" from silently downloading oversized or video enclosures in the background
         ([#5868](https://github.com/Automattic/pocket-casts-android/pull/5868))
+    *   Keep the Playback Effects icon visible on the Now Playing screen when a podcast's colours haven't loaded yet
+        ([#5877](https://github.com/Automattic/pocket-casts-android/pull/5877))
 
 8.20
 -----
