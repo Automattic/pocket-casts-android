@@ -346,7 +346,9 @@ platform :android do
   # @param milestone [String] (optional) The milestone to name alongside the version.
   #                  Provided by Releases V2, which is the only place it can come from.
   #
-  lane :update_rollouts do |percent:, track:, version: release_version_current, milestone: nil|
+  lane :update_rollouts do |percent:, track:, version: nil, milestone: nil|
+    version = version.to_s.strip
+    version = release_version_current if version.empty?
     UI.user_error!('percent parameter must be between 0.0 and 1.0') if percent.to_f.negative? || percent.to_f > 1
     UI.user_error!('track parameter must be either `beta` or `production`') unless %w[beta production].include?(track)
 
