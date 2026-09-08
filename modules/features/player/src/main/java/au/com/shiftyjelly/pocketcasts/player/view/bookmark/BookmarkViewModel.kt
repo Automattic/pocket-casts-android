@@ -8,8 +8,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.automattic.eventhorizon.BookmarkEditFormDismissedEvent
 import com.automattic.eventhorizon.BookmarkEditFormShownEvent
 import com.automattic.eventhorizon.BookmarkEditFormSubmittedEvent
@@ -113,9 +111,6 @@ class BookmarkViewModel
                 }
                 if (bookmark != null) {
                     onSaved(bookmark, isExistingBookmark)
-                    if (!isExistingBookmark && FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS)) {
-                        bookmarkManager.enrichBookmark(bookmark)
-                    }
                 }
             } catch (e: Exception) {
                 Timber.e(e)

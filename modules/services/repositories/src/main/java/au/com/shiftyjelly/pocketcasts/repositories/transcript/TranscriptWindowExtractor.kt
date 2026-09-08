@@ -22,6 +22,12 @@ import okhttp3.CacheControl
 import okio.Buffer
 import timber.log.Timber
 
+data class TranscriptWindow(
+    val passage: String,
+    val location: Int,
+    val referenceTimeSecs: Int,
+)
+
 @Singleton
 class TranscriptWindowExtractor @Inject constructor(
     private val transcriptDao: TranscriptDao,
@@ -29,7 +35,7 @@ class TranscriptWindowExtractor @Inject constructor(
     private val fingerprintTimingManager: Lazy<FingerprintTimingManager>,
     private val playbackManager: Lazy<PlaybackManager>,
 ) {
-    suspend fun extractWindow(episodeUuid: String, timeSecs: Int, windowSecs: Int = 30): String? {
+    suspend fun extractWindow(episodeUuid: String, timeSecs: Int): TranscriptWindow? {
         return try {
             val transcripts = withTimeoutOrNull(1.minutes) {
                 transcriptDao.observeTranscripts(episodeUuid)
@@ -38,12 +44,14 @@ class TranscriptWindowExtractor @Inject constructor(
             }
             val generated = transcripts?.firstOrNull { it.isGenerated } ?: return null
 
+            val centerSecs = referenceCenterSecs(episodeUuid, timeSecs) ?: return null
+
             val body = runCatching { transcriptService.getTranscriptOrThrow(generated.url) }
                 .recoverCatching { transcriptService.getTranscriptOrThrow(generated.url, CacheControl.FORCE_CACHE) }
                 .getOrNull() ?: return null
 
             val vttContent = body.use { it.string() }
-            parseVttWindow(vttContent, referenceCenterSecs(episodeUuid, timeSecs), windowSecs)
+            parseVttWindow(vttContent, centerSecs)
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
@@ -53,16 +61,16 @@ class TranscriptWindowExtractor @Inject constructor(
     }
 
     // Generated transcripts are in the reference timeline; map the playback-time bookmark onto it.
-    private suspend fun referenceCenterSecs(episodeUuid: String, timeSecs: Int): Int {
+    private suspend fun referenceCenterSecs(episodeUuid: String, timeSecs: Int): Int? {
         val manager = fingerprintTimingManager.get()
         val playbackMs = timeSecs * 1000
         fun refNow() = if (manager.activeEpisodeUuid == episodeUuid) manager.referenceTime(playbackMs)?.roundToInt() else null
 
         refNow()?.let { return it }
-        if (playbackManager.get().getCurrentEpisode()?.uuid != episodeUuid) return timeSecs
+        if (playbackManager.get().getCurrentEpisode()?.uuid != episodeUuid) return null
 
         manager.prepareForCurrentEpisode(FingerprintTimingManager.PrepareTrigger.BOOKMARK)
-        val ref = withTimeoutOrNull(COVERAGE_TIMEOUT) {
+        return withTimeoutOrNull(COVERAGE_TIMEOUT) {
             merge(
                 manager.mappingVersion.map { refNow() }.filter { it != null },
                 // Bail only on this episode's terminal states; the conflated flow can hold a stale one.
@@ -74,31 +82,35 @@ class TranscriptWindowExtractor @Inject constructor(
                     .map { null },
             ).first()
         }
-        return ref ?: timeSecs
     }
 
     companion object {
         private const val MIN_WORDS = 10
+        private const val BACKWARD_WINDOW_SECS = 25
+        private const val FORWARD_WINDOW_SECS = 5
 
         // The tap-built map lags the playhead by a full fingerprint window, so cover that plus slack.
         private val COVERAGE_TIMEOUT = 12.seconds
 
-        internal fun parseVttWindow(content: String, timeSecs: Int, windowSecs: Int): String? {
+        internal fun parseVttWindow(content: String, centerSecs: Int): TranscriptWindow? {
             val entries = WebVttParser().parse(Buffer().writeUtf8(content)).getOrNull() ?: return null
-            return windowText(entries, timeSecs, windowSecs)
+            return windowText(entries, centerSecs)
         }
 
-        private fun windowText(entries: List<TranscriptEntry>, timeSecs: Int, windowSecs: Int): String? {
-            val windowStartMs = (timeSecs - windowSecs).coerceAtLeast(0) * 1000L
-            val windowEndMs = (timeSecs + windowSecs) * 1000L
+        private fun windowText(entries: List<TranscriptEntry>, centerSecs: Int): TranscriptWindow? {
+            val windowStartMs = (centerSecs - BACKWARD_WINDOW_SECS).coerceAtLeast(0) * 1000L
+            val windowEndMs = (centerSecs + FORWARD_WINDOW_SECS) * 1000L
 
-            val result = entries
-                .filterIsInstance<TranscriptEntry.Text>()
-                .filter { it.startTimeMs >= 0 && it.startTimeMs < windowEndMs && it.endTimeMs > windowStartMs }
-                .joinToString(" ") { it.value.trim() }
-                .trim()
+            val texts = entries.filterIsInstance<TranscriptEntry.Text>()
+            val inWindow = texts.filter { it.startTimeMs >= 0 && it.startTimeMs < windowEndMs && it.endTimeMs > windowStartMs }
+            if (inWindow.isEmpty()) return null
 
-            return result.takeIf { it.split("\\s+".toRegex()).size >= MIN_WORDS }
+            val passage = inWindow.joinToString(" ") { it.value.trim() }.trim()
+            if (passage.split("\\s+".toRegex()).size < MIN_WORDS) return null
+
+            val firstIndex = texts.indexOf(inWindow.first())
+            val location = texts.take(firstIndex).sumOf { it.value.trim().length + 1 }
+            return TranscriptWindow(passage = passage, location = location, referenceTimeSecs = centerSecs)
         }
     }
 }

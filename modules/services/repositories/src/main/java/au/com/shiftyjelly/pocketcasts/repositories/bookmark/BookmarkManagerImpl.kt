@@ -234,28 +234,28 @@ class BookmarkManagerImpl @Inject constructor(
     override fun enrichBookmark(bookmark: Bookmark) {
         launch(Dispatchers.IO) {
             try {
-                val snippet = transcriptWindowExtractor.extractWindow(
+                val window = transcriptWindowExtractor.extractWindow(
                     episodeUuid = bookmark.episodeUuid,
                     timeSecs = bookmark.timeSecs,
                 ) ?: return@launch
 
-                val response = callEnrichApi(snippet)
+                val response = callEnrichApi(window.passage)
                 if (response.error != null) {
                     Timber.w("Smart bookmark enrichment returned error for ${bookmark.uuid}: ${response.error}")
                 }
-                val title = response.title
-                val summary = response.summary
-                if (title != null || summary != null) {
-                    val now = System.currentTimeMillis()
-                    bookmarkDao.updateAiData(
-                        bookmarkUuid = bookmark.uuid,
-                        aiTitle = title,
-                        aiSummary = summary,
-                        aiTitleModified = now.takeIf { title != null },
-                        aiSummaryModified = now.takeIf { summary != null },
-                        syncStatus = SyncStatus.NOT_SYNCED,
-                    )
-                }
+                val title = response.title?.takeIf { it.isNotEmpty() }
+                val now = System.currentTimeMillis()
+                bookmarkDao.updateGeneratedData(
+                    bookmarkUuid = bookmark.uuid,
+                    title = title,
+                    titleModified = now.takeIf { title != null },
+                    passage = window.passage,
+                    passageLocation = window.location,
+                    passageModified = now,
+                    referenceTime = window.referenceTimeSecs,
+                    referenceTimeModified = now,
+                    syncStatus = SyncStatus.NOT_SYNCED,
+                )
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
