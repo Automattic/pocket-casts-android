@@ -12,6 +12,8 @@
         ([#5835](https://github.com/Automattic/pocket-casts-android/pull/5835))
     *   Stop "Cache entire playing episode" from silently downloading oversized or video enclosures in the background
         ([#5868](https://github.com/Automattic/pocket-casts-android/pull/5868))
+    *   Refresh a podcast's private flag so sharing becomes available again once a podcast is made public
+        ([#5875](https://github.com/Automattic/pocket-casts-android/pull/5875))
 
 8.20
 -----
