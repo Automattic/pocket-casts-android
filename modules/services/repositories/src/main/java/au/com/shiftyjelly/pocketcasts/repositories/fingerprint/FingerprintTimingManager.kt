@@ -14,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.BuildConfig
 import au.com.shiftyjelly.pocketcasts.repositories.playback.ExoPlayerDataSourceFactory
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.shouldCacheEntireEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Network
@@ -222,7 +223,12 @@ class FingerprintTimingManager @Inject constructor(
         val audioSource = episode.downloadedFilePath ?: episode.downloadUrl
         // Reuse the player's on-disk cache (same UUID key) instead of a second download when it applies.
         val sharedCacheKey = episodeUuid.takeIf {
-            !episode.isDownloaded && !episode.isDownloading && !episode.isStreamUrlHls && settings.cacheEntirePlayingEpisode.value
+            shouldCacheEntireEpisode(
+                episode = episode,
+                isHlsStream = episode.isStreamUrlHls,
+                cacheEntirePlayingEpisodeEnabled = settings.cacheEntirePlayingEpisode.value,
+                maxCacheSizeBytes = settings.getExoPlayerCacheEntirePlayingEpisodeSizeInMB() * 1024 * 1024L,
+            )
         }
 
         scope.launch {
