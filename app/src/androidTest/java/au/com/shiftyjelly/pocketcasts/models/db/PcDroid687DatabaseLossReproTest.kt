@@ -64,18 +64,16 @@ class PcDroid687DatabaseLossReproTest {
         db.execSQL(insertUpNext)
     }
 
-    private fun countRows(db: SupportSQLiteDatabase, table: String): Int =
-        db.query("SELECT count(*) FROM $table").use { cursor ->
-            cursor.moveToFirst()
-            cursor.getInt(0)
-        }
+    private fun countRows(db: SupportSQLiteDatabase, table: String): Int = db.query("SELECT count(*) FROM $table").use { cursor ->
+        cursor.moveToFirst()
+        cursor.getInt(0)
+    }
 
-    private fun productionRoom(dbName: String, reporter: DatabaseCorruptionReporter): AppDatabase =
-        Room.databaseBuilder(context, AppDatabase::class.java, dbName)
-            .openHelperFactory(CorruptionHandlingOpenHelperFactory(FrameworkSQLiteOpenHelperFactory()) { reporter })
-            .also { builder -> AppDatabase.addMigrations(builder, context) }
-            .addTypeConverters(ModelModule.provideRoomConverters(Moshi.Builder().build()))
-            .build()
+    private fun productionRoom(dbName: String, reporter: DatabaseCorruptionReporter): AppDatabase = Room.databaseBuilder(context, AppDatabase::class.java, dbName)
+        .openHelperFactory(CorruptionHandlingOpenHelperFactory(FrameworkSQLiteOpenHelperFactory()) { reporter })
+        .also { builder -> AppDatabase.addMigrations(builder, context) }
+        .addTypeConverters(ModelModule.provideRoomConverters(Moshi.Builder().build()))
+        .build()
 
     @Test
     fun migration133ToCurrentPreservesPopulatedLibrary() {
