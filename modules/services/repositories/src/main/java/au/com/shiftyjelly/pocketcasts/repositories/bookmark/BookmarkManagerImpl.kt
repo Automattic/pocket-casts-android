@@ -104,6 +104,16 @@ class BookmarkManagerImpl @Inject constructor(
         )
     }
 
+    override suspend fun updatePassage(bookmarkUuid: String, passage: String, passageLocation: Int) {
+        bookmarkDao.updatePassage(
+            bookmarkUuid = bookmarkUuid,
+            passage = passage,
+            passageLocation = passageLocation,
+            passageModified = System.currentTimeMillis(),
+            syncStatus = SyncStatus.NOT_SYNCED,
+        )
+    }
+
     /**
      * Find the bookmark by its UUID.
      */

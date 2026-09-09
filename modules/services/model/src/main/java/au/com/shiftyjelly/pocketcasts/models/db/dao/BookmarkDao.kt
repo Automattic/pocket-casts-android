@@ -260,6 +260,22 @@ abstract class BookmarkDao {
         )
     }
 
+    @Query(
+        """UPDATE bookmarks SET
+            passage = :passage,
+            passage_location = :passageLocation,
+            passage_modified = :passageModified,
+            sync_status = :syncStatus
+            WHERE uuid = :bookmarkUuid""",
+    )
+    abstract suspend fun updatePassage(
+        bookmarkUuid: String,
+        passage: String,
+        passageLocation: Int,
+        passageModified: Long,
+        syncStatus: SyncStatus,
+    )
+
     @Query("SELECT * FROM bookmarks WHERE sync_status = :syncStatus")
     abstract fun findNotSyncedBlocking(syncStatus: SyncStatus = SyncStatus.NOT_SYNCED): List<Bookmark>
 
