@@ -70,6 +70,8 @@ class BookmarkDetailFragment : BaseDialogFragment() {
                         timeSecs = bookmark.timeSecs,
                         createdAtText = bookmark.createdAt.toLocalizedFormatPattern(bookmark.createdAtDatePattern()),
                         sourceView = sourceView,
+                        passage = bookmark.passage,
+                        passageLocation = bookmark.passageLocation,
                     ),
                 )
             }
@@ -87,6 +89,8 @@ class BookmarkDetailFragment : BaseDialogFragment() {
         val timeSecs: Int,
         val createdAtText: String,
         val sourceView: SourceView,
+        val passage: String?,
+        val passageLocation: Int?,
     ) : Parcelable
 
     @Inject
