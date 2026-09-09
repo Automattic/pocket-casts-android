@@ -19,6 +19,8 @@
     <string name="bookmark_new_badge">New</string>
     <string name="bookmark_player_tip_title" translatable="false">@string/add_bookmark</string>
     <string name="bookmark_player_tip_message">Keep the part you wanted</string>
+    <string name="bookmark_suggesting_title">Suggesting a title…</string>
+    <string name="bookmark_suggestion_prefix">Suggestion:</string>
     <string name="bookmark_updated">Bookmark \"%s\" updated</string>
     <string name="change_title">Change title</string>
     <string name="add_bookmark_title_hint">Add an optional title to identify this bookmark</string>
