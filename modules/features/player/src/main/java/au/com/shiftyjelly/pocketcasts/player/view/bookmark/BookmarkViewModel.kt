@@ -47,6 +47,7 @@ class BookmarkViewModel
     data class UiState(
         val bookmarkUuid: String? = null,
         val title: TextFieldValue = buildSelectedTextFieldValue(DEFAULT_TITLE),
+        val passage: String? = null,
     ) {
         val isNewBookmark: Boolean = bookmarkUuid == null
     }
@@ -77,8 +78,17 @@ class BookmarkViewModel
                 mutableUiState.value = mutableUiState.value.copy(
                     bookmarkUuid = bookmark.uuid,
                     title = buildSelectedTextFieldValue(bookmark.title),
+                    passage = bookmark.passage,
                 )
             }
+        }
+    }
+
+    fun refreshPassage() {
+        val bookmarkUuid = uiState.value.bookmarkUuid ?: return
+        viewModelScope.launch {
+            val bookmark = bookmarkManager.findBookmark(bookmarkUuid) ?: return@launch
+            mutableUiState.value = mutableUiState.value.copy(passage = bookmark.passage)
         }
     }
 
