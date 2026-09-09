@@ -236,6 +236,7 @@ internal fun PodcastHeader(
                     isDescriptionExpanded = isDescriptionExpanded,
                     onClickShowNotes = onToggleDescription,
                     onClickWebsiteLink = onClickWebsiteLink,
+                    onClickNetwork = onClickNetwork,
                 )
             }
         }
@@ -766,6 +767,7 @@ private fun PodcastDetails(
     isDescriptionExpanded: Boolean,
     onClickShowNotes: () -> Unit,
     onClickWebsiteLink: () -> Unit,
+    onClickNetwork: () -> Unit,
 ) {
     val context = LocalContext.current
     Column {
@@ -798,6 +800,7 @@ private fun PodcastDetails(
         PodcastInfoView(
             state = podcastInfoState,
             onWebsiteLinkClick = onClickWebsiteLink,
+            onNetworkClick = onClickNetwork,
             linkColor = linkColor,
         )
     }
@@ -1019,6 +1022,7 @@ private fun PodcastHeaderPreview(
                 ),
                 podcastInfoState = PodcastInfoState(
                     author = "Pocket Casts",
+                    networkListId = "list-id",
                     link = "pocketcasts.com",
                     schedule = "Every two weeks",
                     next = "Meaning of life",

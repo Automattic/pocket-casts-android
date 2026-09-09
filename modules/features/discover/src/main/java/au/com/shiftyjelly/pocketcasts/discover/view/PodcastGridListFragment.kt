@@ -290,7 +290,7 @@ open class PodcastGridListFragment :
         // website
         val linkTitle = listFeed.webLinkTitle
         val linkUrl = listFeed.webLinkUrl
-        if (linkTitle != null && linkUrl != null) {
+        if (!linkTitle.isNullOrBlank() && !linkUrl.isNullOrBlank()) {
             linkView.visibility = View.VISIBLE
             linkTextView.text = linkTitle
             linkView.setOnClickListener {
