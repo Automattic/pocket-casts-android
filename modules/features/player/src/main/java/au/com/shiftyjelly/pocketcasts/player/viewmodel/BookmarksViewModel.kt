@@ -15,6 +15,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkArguments
+import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkPlaybackTimeResolver
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.search.BookmarkSearchHandler
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
@@ -67,6 +68,7 @@ class BookmarksViewModel
     private val playbackManager: PlaybackManager,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val bookmarkSearchHandler: BookmarkSearchHandler,
+    private val bookmarkPlaybackTimeResolver: BookmarkPlaybackTimeResolver,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
@@ -317,19 +319,22 @@ class BookmarksViewModel
 
     fun play(bookmark: Bookmark) {
         viewModelScope.launch {
-            val bookmarkEpisode = episodeManager.findEpisodeByUuid(bookmark.episodeUuid)
-            bookmarkEpisode?.let {
-                val shouldLoadOrSwitchEpisode = !playbackManager.isPlaying() ||
-                    playbackManager.getCurrentEpisode()?.uuid != bookmarkEpisode.uuid
-                if (shouldLoadOrSwitchEpisode) {
-                    playbackManager.playNowSync(it, sourceView = sourceView)
-                }
-            } ?: run {
+            val bookmarkEpisode = episodeManager.findEpisodeByUuid(bookmark.episodeUuid) ?: run {
                 _message.emit(BookmarkMessage.BookmarkEpisodeNotFound)
                 return@launch
             }
+            val seekToMs = bookmarkPlaybackTimeResolver.playbackTimeMs(
+                episode = bookmarkEpisode,
+                referenceTimeSecs = bookmark.referenceTime,
+                fallbackTimeSecs = bookmark.timeSecs,
+            )
+            val shouldLoadOrSwitchEpisode = !playbackManager.isPlaying() ||
+                playbackManager.getCurrentEpisode()?.uuid != bookmarkEpisode.uuid
+            if (shouldLoadOrSwitchEpisode) {
+                playbackManager.playNowSync(bookmarkEpisode, sourceView = sourceView)
+            }
             _message.emit(BookmarkMessage.PlayingBookmark(bookmark.title))
-            playbackManager.seekToTimeMs(positionMs = bookmark.timeSecs * 1000)
+            playbackManager.seekToTimeMs(positionMs = seekToMs)
             eventHorizon.track(
                 BookmarkPlayTappedEvent(
                     source = sourceView.analyticsValue,

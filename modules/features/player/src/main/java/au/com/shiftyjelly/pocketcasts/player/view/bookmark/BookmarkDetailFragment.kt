@@ -56,6 +56,7 @@ class BookmarkDetailFragment : BaseDialogFragment() {
                     NEW_INSTANCE_ARG,
                     Args(
                         title = bookmark.title,
+                        referenceTime = bookmark.referenceTime,
                         episodeTitle = episodeTitle,
                         episodeUuid = bookmark.episodeUuid,
                         podcastUuid = podcastUuid,
@@ -72,6 +73,7 @@ class BookmarkDetailFragment : BaseDialogFragment() {
     @Parcelize
     private data class Args(
         val title: String,
+        val referenceTime: Int?,
         val episodeTitle: String,
         val episodeUuid: String,
         val podcastUuid: String,
@@ -89,6 +91,9 @@ class BookmarkDetailFragment : BaseDialogFragment() {
 
     @Inject
     internal lateinit var eventHorizon: EventHorizon
+
+    @Inject
+    internal lateinit var bookmarkPlaybackTimeResolver: BookmarkPlaybackTimeResolver
 
     private val args get() = requireArguments().requireParcelable<Args>(NEW_INSTANCE_ARG)
 
@@ -123,8 +128,13 @@ class BookmarkDetailFragment : BaseDialogFragment() {
                 dismiss()
                 return@launch
             }
+            val seekToMs = bookmarkPlaybackTimeResolver.playbackTimeMs(
+                episode = episode,
+                referenceTimeSecs = args.referenceTime,
+                fallbackTimeSecs = args.timeSecs,
+            )
             playbackManager.playNowSuspend(episode, sourceView = args.sourceView)
-            playbackManager.seekToTimeMs(positionMs = args.timeSecs * 1000)
+            playbackManager.seekToTimeMs(positionMs = seekToMs)
             eventHorizon.track(
                 BookmarkPlayTappedEvent(
                     source = args.sourceView.analyticsValue,
