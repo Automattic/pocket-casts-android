@@ -1,8 +1,6 @@
 #!/bin/bash -eu
 
-if "$(dirname "${BASH_SOURCE[0]}")/should-skip-job.sh" --job-type build; then
-  exit 0
-fi
+# The pipeline requires manual confirmation, so build even when only automation files changed.
 
 "$(dirname "${BASH_SOURCE[0]}")/restore-cache.sh"
 
