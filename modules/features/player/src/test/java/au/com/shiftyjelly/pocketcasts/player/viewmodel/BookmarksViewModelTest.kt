@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
 import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkPlaybackTimeResolver
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.search.BookmarkSearchHandler
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
@@ -45,7 +46,9 @@ import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -80,6 +83,9 @@ class BookmarksViewModelTest {
 
     @Mock
     private lateinit var playbackManager: PlaybackManager
+
+    @Mock
+    private lateinit var bookmarkPlaybackTimeResolver: BookmarkPlaybackTimeResolver
 
     private lateinit var bookmarkSearchHandler: BookmarkSearchHandler
 
@@ -133,6 +139,7 @@ class BookmarksViewModelTest {
             playbackManager = playbackManager,
             ioDispatcher = UnconfinedTestDispatcher(),
             bookmarkSearchHandler = bookmarkSearchHandler,
+            bookmarkPlaybackTimeResolver = bookmarkPlaybackTimeResolver,
         )
     }
 
@@ -214,5 +221,15 @@ class BookmarksViewModelTest {
             expectNoEvents()
         }
         verify(multiSelectHelper).select(bookmark)
+    }
+
+    @Test
+    fun `play seeks to the resolved reference time`() = runTest {
+        val bookmark = Bookmark("uuid1", episodeUuid = episodeUuid, timeSecs = 10)
+        whenever(bookmarkPlaybackTimeResolver.playbackTimeMs(any(), anyOrNull(), any())).thenReturn(42_000)
+
+        bookmarksViewModel.play(bookmark)
+
+        verify(playbackManager).seekToTimeMs(eq(42_000), anyOrNull())
     }
 }
