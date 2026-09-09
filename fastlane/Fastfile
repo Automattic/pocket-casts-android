@@ -695,7 +695,7 @@ platform :android do
 
     UI.user_error!("'BUILDKITE_ARTIFACTS_S3_BUCKET' must be defined as an environment variable.") unless ENV['BUILDKITE_ARTIFACTS_S3_BUCKET']
 
-    other_platforms = %w[wear automotive tv]
+    other_platforms = [APPS_WEAR, APPS_AUTOMOTIVE, APPS_TV]
 
     other_apks = []
     other_platforms.each do |platform|
