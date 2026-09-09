@@ -56,11 +56,13 @@ fun ProvideTextSelectionToolbar(
     customMenuItems: List<CustomMenuItemOption>,
     onHighlightText: (() -> Unit)?,
     modifier: Modifier = Modifier,
+    onBookmarkText: ((String) -> Unit)? = null,
     content: @Composable () -> Unit,
 ) {
     val view = LocalView.current
     val clipboard = LocalClipboard.current
     val latestOnTextHighlighted = rememberUpdatedState(onHighlightText)
+    val latestOnBookmarkText = rememberUpdatedState(onBookmarkText)
 
     // onGloballyPositioned may fire with the same LayoutCoordinates containing different positioning
     // data, so always trigger read observation when this is set.
@@ -73,6 +75,7 @@ fun ProvideTextSelectionToolbar(
             customMenuItems = customMenuItems,
             coordinatesProvider = { coordinates },
             onTextHighlighted = { latestOnTextHighlighted.value?.invoke() },
+            onBookmarkText = { latestOnBookmarkText.value?.invoke(it) },
         )
     }
 
@@ -103,6 +106,7 @@ internal class CustomTextContextMenuProvider(
     private val customMenuItems: List<CustomMenuItemOption>,
     private val coordinatesProvider: () -> LayoutCoordinates?,
     private val onTextHighlighted: (() -> Unit)?,
+    private val onBookmarkText: ((String) -> Unit)? = null,
 ) : TextContextMenuProvider {
     private val textHighlightReporter = TextHighlightReporter(onTextHighlighted)
 
@@ -155,19 +159,20 @@ internal class CustomTextContextMenuProvider(
         session: TextContextMenuSession,
     ) {
         when (item) {
-            CustomMenuItemOption.Share -> {
-                // Workaround until the selected text is exposed from the SelectionContainer: copy the
-                // selection to the clipboard via Compose's own Copy action, then read it back.
-                // It's fixed in the issue so it should be available soon.
-                // https://issuetracker.google.com/issues/142551575
-                val copyItem = data.components
-                    .filterIsInstance<TextContextMenuItem>()
-                    .firstOrNull { it.key === TextContextMenuKeys.CopyKey }
-                copyItem?.let { with(it) { session.onClick() } }
-                val text = clipboard.getPrimaryClipText().orEmpty()
-                shareText(text)
-            }
+            CustomMenuItemOption.Share -> shareText(copySelectedText(data, session))
+            CustomMenuItemOption.Bookmark -> onBookmarkText?.invoke(copySelectedText(data, session))
         }
+    }
+
+    // Workaround until the selected text is exposed from the SelectionContainer: copy the selection
+    // to the clipboard via Compose's own Copy action, then read it back.
+    // https://issuetracker.google.com/issues/142551575
+    private fun copySelectedText(data: TextContextMenuData, session: TextContextMenuSession): String {
+        val copyItem = data.components
+            .filterIsInstance<TextContextMenuItem>()
+            .firstOrNull { it.key === TextContextMenuKeys.CopyKey }
+        copyItem?.let { with(it) { session.onClick() } }
+        return clipboard.getPrimaryClipText().orEmpty()
     }
 
     private fun shareText(text: String) {
