@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
+import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkSuggestion
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
@@ -37,6 +38,8 @@ class BookmarkViewModel
     CoroutineScope {
 
     private lateinit var arguments: BookmarkArguments
+    private var capturedSuggestion: BookmarkSuggestion? = null
+    private var titleEdited = false
 
     companion object {
         private const val DEFAULT_TITLE = "Bookmark"
@@ -50,8 +53,15 @@ class BookmarkViewModel
         val bookmarkUuid: String? = null,
         val title: TextFieldValue = buildSelectedTextFieldValue(DEFAULT_TITLE),
         val passage: String? = null,
+        val titleSuggestion: TitleSuggestion = TitleSuggestion.None,
     ) {
         val isNewBookmark: Boolean = bookmarkUuid == null
+    }
+
+    sealed interface TitleSuggestion {
+        data object None : TitleSuggestion
+        data object Generating : TitleSuggestion
+        data class Available(val title: String) : TitleSuggestion
     }
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
@@ -82,7 +92,21 @@ class BookmarkViewModel
                     title = buildSelectedTextFieldValue(bookmark.title),
                     passage = displayPassage(bookmark),
                 )
+            } else if (bookmarkUuid == null && FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS)) {
+                generateTitleSuggestion(arguments.episodeUuid, arguments.timeSecs)
             }
+        }
+    }
+
+    private suspend fun generateTitleSuggestion(episodeUuid: String, timeSecs: Int) {
+        mutableUiState.value = mutableUiState.value.copy(titleSuggestion = TitleSuggestion.Generating)
+        val suggestion = bookmarkManager.suggestBookmark(episodeUuid, timeSecs)
+        capturedSuggestion = suggestion
+        val suggestedTitle = suggestion?.title?.takeIf { it.isNotBlank() }
+        when {
+            suggestedTitle == null -> mutableUiState.value = mutableUiState.value.copy(titleSuggestion = TitleSuggestion.None)
+            !titleEdited -> applySuggestion(suggestedTitle)
+            else -> mutableUiState.value = mutableUiState.value.copy(titleSuggestion = TitleSuggestion.Available(suggestedTitle))
         }
     }
 
@@ -97,9 +121,20 @@ class BookmarkViewModel
     private fun displayPassage(bookmark: Bookmark) = bookmark.passage?.takeIf { FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS) }
 
     fun changeTitle(title: TextFieldValue) {
-        // limit the title to 100 characters
+        titleEdited = true
         val titleLimited = title.copy(text = title.text.take(100))
-        mutableUiState.value = mutableUiState.value.copy(title = titleLimited)
+        val suggestion = uiState.value.titleSuggestion
+        mutableUiState.value = mutableUiState.value.copy(
+            title = titleLimited,
+            titleSuggestion = if (suggestion is TitleSuggestion.Generating) TitleSuggestion.None else suggestion,
+        )
+    }
+
+    fun applySuggestion(title: String) {
+        mutableUiState.value = mutableUiState.value.copy(
+            title = buildSelectedTextFieldValue(title),
+            titleSuggestion = TitleSuggestion.None,
+        )
     }
 
     fun saveBookmark(onSaved: (Bookmark, isExistingBookmark: Boolean) -> Unit) {
@@ -113,11 +148,15 @@ class BookmarkViewModel
                     val episode = episodeManager.findByUuid(episodeUuid)
                         ?: userEpisodeManager.findEpisodeByUuid(episodeUuid)
                         ?: return@launch
+                    val suggestion = capturedSuggestion
                     bookmarkManager.add(
                         episode = episode,
                         timeSecs = arguments.timeSecs,
                         title = state.title.text,
                         creationSource = BookmarkSourceType.Player,
+                        passage = suggestion?.passage,
+                        passageLocation = suggestion?.passageLocation,
+                        referenceTime = suggestion?.referenceTimeSecs,
                     )
                 } else {
                     bookmarkManager.updateTitle(bookmarkUuid, state.title.text)
