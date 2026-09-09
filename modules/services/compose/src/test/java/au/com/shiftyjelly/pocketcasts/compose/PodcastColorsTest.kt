@@ -20,6 +20,15 @@ class PodcastColorsTest {
     }
 
     @Test
+    fun `player tint falls back to white when the podcast uses the server default dark tint`() {
+        val serverDefaultDarkTint = 0xFFC62828.toInt()
+
+        val podcastColors = PodcastColors(Podcast(uuid = "uuid", tintColorForDarkBg = serverDefaultDarkTint))
+
+        assertEquals(Color.White, podcastColors.playerTint)
+    }
+
+    @Test
     fun `player tint uses the podcast dark tint when it is set`() {
         val tint = 0xFF3366FF.toInt()
 
