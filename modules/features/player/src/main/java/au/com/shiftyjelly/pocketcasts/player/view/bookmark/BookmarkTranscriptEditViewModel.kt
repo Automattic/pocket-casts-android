@@ -8,12 +8,10 @@ import au.com.shiftyjelly.pocketcasts.repositories.transcript.TextSpan
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 @HiltViewModel
 class BookmarkTranscriptEditViewModel @Inject constructor(
@@ -44,14 +42,12 @@ class BookmarkTranscriptEditViewModel @Inject constructor(
                 mutableUiState.value = UiState.NotAvailable
                 return@launch
             }
-            val transcript = withContext(Dispatchers.IO) {
-                transcriptManager.loadGeneratedTranscript(arguments.episodeUuid)
-            }
+            val transcript = transcriptManager.loadGeneratedTranscript(arguments.episodeUuid)
             if (transcript == null) {
                 mutableUiState.value = UiState.NotAvailable
                 return@launch
             }
-            val model = withContext(Dispatchers.Default) { BookmarkTranscript.from(transcript) }
+            val model = BookmarkTranscript.from(transcript)
             mutableUiState.value = UiState.Loaded(
                 transcript = model,
                 passage = model.passageDisplaySpan(storedPassage, bookmark.passageLocation),
