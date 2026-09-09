@@ -5,9 +5,11 @@ import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
@@ -16,6 +18,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toLocalizedFormatPattern
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import com.automattic.eventhorizon.BookmarkPlayTappedEvent
 import com.automattic.eventhorizon.EventHorizon
@@ -109,13 +113,18 @@ class BookmarkDetailFragment : BaseDialogFragment() {
 
     private val args get() = requireArguments().requireParcelable<Args>(NEW_INSTANCE_ARG)
 
+    private val viewModel: BookmarkDetailViewModel by viewModels()
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ) = contentWithoutConsumedInsets {
-        DialogBox(fillMaxHeight = false) {
+        val hasTranscript = args.passage != null && FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS)
+        LaunchedEffect(Unit) { viewModel.load(args.episodeUuid, args.passage, args.passageLocation) }
+        DialogBox(fillMaxHeight = hasTranscript) {
             val resolving by isResolving.collectAsState()
+            val transcriptState by viewModel.transcriptState.collectAsState()
             BookmarkDetailPage(
                 title = args.title,
                 episodeTitle = args.episodeTitle,
@@ -126,6 +135,8 @@ class BookmarkDetailFragment : BaseDialogFragment() {
                 isResolving = resolving,
                 onPlayClick = ::onPlayClick,
                 onClose = { dismiss() },
+                passage = args.passage,
+                transcriptState = transcriptState,
             )
         }
     }

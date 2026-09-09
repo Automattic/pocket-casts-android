@@ -1,10 +1,12 @@
 package au.com.shiftyjelly.pocketcasts.player.view.bookmark
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -39,6 +41,9 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
+import au.com.shiftyjelly.pocketcasts.models.to.Transcript
+import au.com.shiftyjelly.pocketcasts.repositories.transcript.BookmarkTranscript
+import au.com.shiftyjelly.pocketcasts.transcripts.ui.BookmarkTranscriptView
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -55,6 +60,8 @@ internal fun BookmarkDetailPage(
     onPlayClick: () -> Unit,
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
+    passage: String? = null,
+    transcriptState: BookmarkDetailViewModel.TranscriptState = BookmarkDetailViewModel.TranscriptState.None,
 ) {
     val theme = MaterialTheme.theme
     val playerColors = theme.rememberPlayerColors()
@@ -76,11 +83,20 @@ internal fun BookmarkDetailPage(
         theme.colors.primaryInteractive02
     }
 
+    val showTranscript = transcriptState !is BookmarkDetailViewModel.TranscriptState.None
+
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .verticalScroll(rememberScrollState())
-            .padding(bottom = 24.dp),
+            .then(
+                if (showTranscript) {
+                    Modifier.fillMaxHeight()
+                } else {
+                    Modifier
+                        .verticalScroll(rememberScrollState())
+                        .padding(bottom = 24.dp)
+                },
+            ),
     ) {
         DragHandle(
             modifier = Modifier
@@ -174,6 +190,75 @@ internal fun BookmarkDetailPage(
                 )
             }
         }
+
+        if (showTranscript) {
+            TranscriptSection(
+                transcriptState = transcriptState,
+                passage = passage,
+                colors = colors,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .padding(top = 16.dp),
+            )
+        }
+    }
+}
+
+@Composable
+private fun TranscriptSection(
+    transcriptState: BookmarkDetailViewModel.TranscriptState,
+    passage: String?,
+    colors: BookmarkRowColors,
+    modifier: Modifier = Modifier,
+) {
+    when (transcriptState) {
+        BookmarkDetailViewModel.TranscriptState.None -> Unit
+
+        BookmarkDetailViewModel.TranscriptState.Loading -> TranscriptLoadingPlaceholder(
+            colors = colors,
+            modifier = modifier,
+        )
+
+        BookmarkDetailViewModel.TranscriptState.Unavailable -> {
+            if (passage != null) {
+                Column(
+                    modifier = modifier
+                        .verticalScroll(rememberScrollState())
+                        .padding(horizontal = 20.dp),
+                ) {
+                    TextH70(text = passage, color = colors.primaryText)
+                }
+            }
+        }
+
+        is BookmarkDetailViewModel.TranscriptState.Loaded -> BookmarkTranscriptView(
+            transcript = transcriptState.transcript,
+            passage = transcriptState.passage,
+            editable = false,
+            modifier = modifier,
+        )
+    }
+}
+
+@Composable
+private fun TranscriptLoadingPlaceholder(
+    colors: BookmarkRowColors,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        modifier = modifier.padding(horizontal = 20.dp, vertical = 24.dp),
+    ) {
+        listOf(0.9f, 0.75f, 0.95f, 0.6f, 0.85f, 0.7f, 0.9f, 0.5f).forEach { fraction ->
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(fraction)
+                    .height(16.dp)
+                    .clip(RoundedCornerShape(4.dp))
+                    .background(colors.primaryText.copy(alpha = 0.12f)),
+            )
+        }
     }
 }
 
@@ -227,6 +312,32 @@ private fun BookmarkDetailPagePreview(
             isResolving = false,
             onPlayClick = {},
             onClose = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun BookmarkDetailPageTranscriptPreview(
+    @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
+) {
+    val transcript = remember { BookmarkTranscript.from(Transcript.TextPreview) }
+    AppThemeWithBackground(themeType) {
+        BookmarkDetailPage(
+            title = "Why admissions feel like a lottery",
+            episodeTitle = "Higher Education's Identity Crisis",
+            podcastUuid = "",
+            podcastTitle = "Radio Atlantic",
+            timeSecs = 1390,
+            createdAtText = "May 7, 2024 - 6:40 PM",
+            isResolving = false,
+            onPlayClick = {},
+            onClose = {},
+            passage = "Lorem ipsum",
+            transcriptState = BookmarkDetailViewModel.TranscriptState.Loaded(
+                transcript = transcript,
+                passage = transcript.sentenceDisplaySpan(index = 40),
+            ),
         )
     }
 }
