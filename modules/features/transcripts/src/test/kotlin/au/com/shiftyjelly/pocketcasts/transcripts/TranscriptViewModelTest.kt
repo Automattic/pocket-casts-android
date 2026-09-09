@@ -640,6 +640,11 @@ private class TestTranscriptManager : TranscriptManager {
         return avaiableTranscript.takeIf { shouldLoadTranscripts }
     }
 
+    override suspend fun loadGeneratedTranscript(episodeUuid: String): Transcript.Text? {
+        yield()
+        return (avaiableTranscript as? Transcript.Text).takeIf { shouldLoadTranscripts }
+    }
+
     override fun resetInvalidTranscripts(episodeUuid: String) {
         shouldLoadTranscripts = true
     }
