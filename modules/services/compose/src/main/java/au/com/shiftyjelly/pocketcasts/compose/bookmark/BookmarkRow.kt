@@ -78,8 +78,8 @@ fun BookmarkRow(
     showEpisodeTitle: Boolean,
     useEpisodeArtwork: Boolean,
     onPlayClick: () -> Unit,
-    isLoading: Boolean = false,
     modifier: Modifier = Modifier,
+    isLoading: Boolean = false,
     colors: BookmarkColors = rememberBookmarkColors(),
 ) {
     Column(

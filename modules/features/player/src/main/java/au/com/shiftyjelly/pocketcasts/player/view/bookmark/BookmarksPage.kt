@@ -79,10 +79,12 @@ fun BookmarksPage(
 ) {
     val context = LocalContext.current
     val state by bookmarksViewModel.uiState.collectAsStateWithLifecycle()
+    val resolvingBookmarkUuid by bookmarksViewModel.resolvingBookmarkUuid.collectAsStateWithLifecycle()
     val bookmarkColors = rememberBookmarkColors()
 
     Content(
         state = state,
+        resolvingBookmarkUuid = resolvingBookmarkUuid,
         colors = bookmarkColors,
         bottomInset = bottomInset,
         onRowLongClick = onRowLongClick,
@@ -141,6 +143,7 @@ fun BookmarksPage(
 @Composable
 private fun Content(
     state: UiState,
+    resolvingBookmarkUuid: String?,
     colors: BookmarkColors,
     bottomInset: Dp,
     onRowLongClick: (Bookmark) -> Unit,
@@ -165,6 +168,7 @@ private fun Content(
 
             is UiState.Loaded -> BookmarksView(
                 state = state,
+                resolvingBookmarkUuid = resolvingBookmarkUuid,
                 colors = colors,
                 bottomInset = bottomInset,
                 onRowLongClick = onRowLongClick,
@@ -209,6 +213,7 @@ private fun Content(
 @Composable
 private fun BookmarksView(
     state: UiState.Loaded,
+    resolvingBookmarkUuid: String?,
     bottomInset: Dp,
     colors: BookmarkColors,
     onRowLongClick: (Bookmark) -> Unit,
@@ -276,6 +281,7 @@ private fun BookmarksView(
                 showIcon = state.showIcon,
                 useEpisodeArtwork = state.useEpisodeArtwork,
                 showEpisodeTitle = state.showEpisodeTitle,
+                isLoading = bookmark.uuid == resolvingBookmarkUuid,
                 colors = colors,
                 onPlayClick = { onPlayClick(bookmark) },
                 modifier = Modifier.pointerInput(bookmark.adapterId) {
@@ -321,6 +327,7 @@ private fun BookmarksPreview(
                 onRowClick = {},
                 sourceView = SourceView.PLAYER,
             ),
+            resolvingBookmarkUuid = null,
             bottomInset = 0.dp,
             colors = rememberBookmarkColors(),
             onPlayClick = {},
