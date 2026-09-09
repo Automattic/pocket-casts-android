@@ -831,6 +831,7 @@ class PodcastAdapter(
                         description = podcastDescription,
                         podcastInfoState = PodcastInfoState(
                             author = podcast.author,
+                            networkListId = podcast.networkListId,
                             link = podcast.getShortUrl(),
                             schedule = podcast.displayableFrequency(context.resources),
                             next = podcast.displayableNextEpisodeDate(context),
