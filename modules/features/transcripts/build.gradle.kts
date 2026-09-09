@@ -48,6 +48,7 @@ dependencies {
 
     implementation(projects.modules.features.settings)
     implementation(projects.modules.services.compose)
+    implementation(projects.modules.services.deeplink)
     implementation(projects.modules.services.images)
     implementation(projects.modules.services.localization)
     implementation(projects.modules.services.ui)

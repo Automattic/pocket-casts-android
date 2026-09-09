@@ -11,16 +11,19 @@ import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionOffer
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.payment.getOrNull
+import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.ChapterSeekResult
 import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintTimingManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.transcript.BookmarkTranscript
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.sharing.SharingRequest
 import au.com.shiftyjelly.pocketcasts.utils.search.SearchCoordinates
 import au.com.shiftyjelly.pocketcasts.utils.search.SearchMatches
 import au.com.shiftyjelly.pocketcasts.utils.search.kmpSearch
+import com.automattic.eventhorizon.BookmarkSourceType
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.SyncedTranscriptsAutoScrollResumedEvent
 import com.automattic.eventhorizon.SyncedTranscriptsSeekFailedEvent
@@ -61,6 +64,7 @@ class TranscriptViewModel @AssistedInject constructor(
     private val paymentClient: PaymentClient,
     private val eventHorizon: EventHorizon,
     private val sharingClient: TranscriptSharingClient,
+    private val bookmarkManager: BookmarkManager,
     val fingerprintTimingManager: FingerprintTimingManager,
     val playbackManager: PlaybackManager,
 ) : ViewModel() {
@@ -436,6 +440,40 @@ class TranscriptViewModel @AssistedInject constructor(
         }
     }
 
+    fun createBookmarkFromSelection(selectedText: String) {
+        val transcript = (uiState.value.transcriptState as? TranscriptState.Loaded)?.transcript as? Transcript.Text ?: return
+        viewModelScope.launch {
+            val model = BookmarkTranscript.from(transcript)
+            val span = model.passageDisplaySpan(selectedText, location = null) ?: return@launch
+            val passage = model.passage(span)
+            if (passage.text.isEmpty()) return@launch
+            val referenceTimeMs = model.referenceTimeMsAt(span.start) ?: return@launch
+            val episode = episodeManager.findByUuid(transcript.episodeUuid) ?: return@launch
+
+            val timeSecs: Int
+            val referenceTimeSecs: Int?
+            if (transcript.isGenerated) {
+                val playbackMs = fingerprintTimingManager.playbackTimeMs(forReferenceTime = referenceTimeMs / 1000.0) ?: return@launch
+                timeSecs = playbackMs / 1000
+                referenceTimeSecs = (referenceTimeMs / 1000).toInt()
+            } else {
+                timeSecs = (referenceTimeMs / 1000).toInt()
+                referenceTimeSecs = null
+            }
+
+            val bookmark = bookmarkManager.add(
+                episode = episode,
+                timeSecs = timeSecs,
+                title = DEFAULT_BOOKMARK_TITLE,
+                creationSource = BookmarkSourceType.Player,
+                passage = passage.text,
+                passageLocation = passage.location,
+                referenceTime = referenceTimeSecs,
+            )
+            _messages.send(TranscriptMessage.OpenBookmarkEditor(bookmark.uuid))
+        }
+    }
+
     private fun trackTranscriptShown(transcript: Transcript) {
         val isPaywallVisible = !_uiState.value.isPlusUser && transcript.isGenerated
         if (isPaywallVisible) {
@@ -507,10 +545,15 @@ class TranscriptViewModel @AssistedInject constructor(
     interface Factory {
         fun create(source: Source): TranscriptViewModel
     }
+
+    companion object {
+        private const val DEFAULT_BOOKMARK_TITLE = "Bookmark"
+    }
 }
 
 sealed interface TranscriptMessage {
     data object TapToSeekStreamingUnavailable : TranscriptMessage
+    data class OpenBookmarkEditor(val bookmarkUuid: String) : TranscriptMessage
 }
 
 data class UiState(
@@ -537,6 +580,12 @@ data class UiState(
         !isPaywallVisible &&
         transcriptEpisodeUuid != null &&
         transcriptEpisodeUuid == playingEpisodeUuid
+
+    // A generated transcript needs the fingerprint mapping (playing + synced) to place the bookmark;
+    // an external transcript is already cued against the audio.
+    val isBookmarkFromSelectionAvailable get() = isPlusUser &&
+        isTextTranscriptLoaded &&
+        (!isGeneratedTextTranscript || isSyncedActive)
 
     companion object {
         val Empty = UiState(

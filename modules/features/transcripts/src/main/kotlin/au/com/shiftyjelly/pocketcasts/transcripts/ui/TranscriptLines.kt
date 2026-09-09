@@ -67,9 +67,13 @@ internal fun TranscriptLines(
     state: LazyListState = rememberLazyListState(),
     theme: TranscriptTheme = TranscriptTheme.default(MaterialTheme.theme.colors),
     onHighlightText: (() -> Unit)? = null,
+    onBookmarkText: ((String) -> Unit)? = null,
 ) {
-    val customMenuItems = remember {
+    val customMenuItems = remember(onBookmarkText != null) {
         buildList {
+            if (onBookmarkText != null) {
+                add(CustomMenuItemOption.Bookmark)
+            }
             // Only show the share option on older versions of Android, as the new versions
             // have a share feature built into the copy
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
@@ -86,6 +90,7 @@ internal fun TranscriptLines(
         ProvideTextSelectionToolbar(
             customMenuItems = customMenuItems,
             onHighlightText = onHighlightText,
+            onBookmarkText = onBookmarkText,
         ) {
             SelectionContainer {
                 FadedLazyColumn(
