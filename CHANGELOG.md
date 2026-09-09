@@ -12,6 +12,8 @@
         ([#5835](https://github.com/Automattic/pocket-casts-android/pull/5835))
     *   Stop "Cache entire playing episode" from silently downloading oversized or video enclosures in the background
         ([#5868](https://github.com/Automattic/pocket-casts-android/pull/5868))
+    *   Sync the played, archived and starred status set on other devices even for episodes not yet in your local library
+        ([#5879](https://github.com/Automattic/pocket-casts-android/pull/5879))
 
 8.20
 -----
