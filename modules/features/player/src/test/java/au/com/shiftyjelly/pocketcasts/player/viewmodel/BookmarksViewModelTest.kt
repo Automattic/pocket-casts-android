@@ -50,7 +50,9 @@ import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyBlocking
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
@@ -231,5 +233,31 @@ class BookmarksViewModelTest {
         bookmarksViewModel.play(bookmark)
 
         verify(playbackManager).seekToTimeMs(eq(42_000), anyOrNull())
+    }
+
+    @Test
+    fun `play pauses the current episode for a reference-timed bookmark`() = runTest {
+        whenever(playbackManager.isPlaying()).thenReturn(true)
+        whenever(playbackManager.getCurrentEpisode()).thenReturn(episode)
+        whenever(bookmarkPlaybackTimeResolver.playbackTimeMs(any(), anyOrNull(), any())).thenReturn(42_000)
+        val bookmark = Bookmark("uuid1", episodeUuid = episodeUuid, timeSecs = 10, referenceTime = 25)
+
+        bookmarksViewModel.play(bookmark)
+
+        verifyBlocking(playbackManager) { pauseSuspend(any(), any()) }
+        verify(playbackManager).seekToTimeMs(eq(42_000), anyOrNull())
+    }
+
+    @Test
+    fun `play does not pause the current episode for a bookmark without a reference time`() = runTest {
+        whenever(playbackManager.isPlaying()).thenReturn(true)
+        whenever(playbackManager.getCurrentEpisode()).thenReturn(episode)
+        whenever(bookmarkPlaybackTimeResolver.playbackTimeMs(any(), anyOrNull(), any())).thenReturn(10_000)
+        val bookmark = Bookmark("uuid1", episodeUuid = episodeUuid, timeSecs = 10)
+
+        bookmarksViewModel.play(bookmark)
+
+        verifyBlocking(playbackManager, never()) { pauseSuspend(any(), any()) }
+        verify(playbackManager).seekToTimeMs(eq(10_000), anyOrNull())
     }
 }
