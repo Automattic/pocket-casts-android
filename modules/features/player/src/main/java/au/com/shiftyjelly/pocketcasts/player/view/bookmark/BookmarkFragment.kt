@@ -80,6 +80,8 @@ class BookmarkFragment : BaseFragment() {
                     onClose = ::close,
                     passage = uiState.passage,
                     onEditTranscript = ::editTranscript,
+                    titleSuggestion = uiState.titleSuggestion,
+                    onApplySuggestion = { viewModel.applySuggestion(it) },
                     modifier = Modifier
                         .background(playerColors.background01)
                         .windowInsetsPadding(WindowInsets.ime.union(WindowInsets.systemBars)),
