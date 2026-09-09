@@ -78,6 +78,7 @@ fun BookmarkRow(
     showEpisodeTitle: Boolean,
     useEpisodeArtwork: Boolean,
     onPlayClick: () -> Unit,
+    isLoading: Boolean = false,
     modifier: Modifier = Modifier,
     colors: BookmarkColors = rememberBookmarkColors(),
 ) {
@@ -174,6 +175,7 @@ fun BookmarkRow(
                     timeSecs = bookmark.timeSecs,
                     contentDescriptionId = LR.string.bookmark_play,
                     onClick = { onPlayClick() },
+                    isLoading = isLoading,
                     colors = colors.playButton,
                 )
             }
