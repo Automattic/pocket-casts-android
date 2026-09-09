@@ -32,6 +32,7 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
+import au.com.shiftyjelly.pocketcasts.deeplink.ChangeBookmarkTitleDeepLink
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptEntry
 import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintTimingManager
@@ -174,6 +175,13 @@ fun TranscriptPage(
                         null
                     }
 
+                val onBookmarkText: ((String) -> Unit)? =
+                    if (viewModel != null && uiState.isBookmarkFromSelectionAvailable && FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS)) {
+                        viewModel::createBookmarkFromSelection
+                    } else {
+                        null
+                    }
+
                 TranscriptContent(
                     uiState = uiState,
                     listState = listState,
@@ -182,6 +190,7 @@ fun TranscriptPage(
                     highlightState = highlightState,
                     onEntryClick = tapToSeekHandler,
                     onHighlightText = onHighlightText,
+                    onBookmarkText = onBookmarkText,
                     modifier = Modifier
                         .padding(top = 16.dp)
                         .padding(transcriptPadding),
@@ -272,6 +281,10 @@ private fun TranscriptMessageEffect(viewModel: TranscriptViewModel?) {
                 TranscriptMessage.TapToSeekStreamingUnavailable -> {
                     Toast.makeText(context, tapToSeekUnavailableMessage, Toast.LENGTH_SHORT).show()
                 }
+
+                is TranscriptMessage.OpenBookmarkEditor -> {
+                    context.startActivity(ChangeBookmarkTitleDeepLink(message.bookmarkUuid).toIntent(context))
+                }
             }
         }
     }
@@ -287,6 +300,7 @@ private fun TranscriptContent(
     modifier: Modifier = Modifier,
     highlightState: HighlightState = HighlightState(),
     onEntryClick: ((TranscriptEntry, Int) -> Unit)? = null,
+    onBookmarkText: ((String) -> Unit)? = null,
 ) {
     when (val transcriptState = uiState.transcriptState) {
         is TranscriptState.Loading -> {
@@ -307,6 +321,7 @@ private fun TranscriptContent(
                     state = listState,
                     theme = theme,
                     onHighlightText = onHighlightText,
+                    onBookmarkText = onBookmarkText,
                     modifier = modifier,
                 )
             }
