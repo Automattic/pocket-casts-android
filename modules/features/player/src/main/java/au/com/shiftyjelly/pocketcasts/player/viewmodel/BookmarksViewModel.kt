@@ -44,6 +44,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -84,6 +85,8 @@ class BookmarksViewModel
     val showBookmarkDetail = _showBookmarkDetail.asSharedFlow()
 
     private var isFragmentActive: Boolean = true
+
+    private var playJob: Job? = null
 
     private var sourceView: SourceView = SourceView.UNKNOWN
         set(value) {
@@ -318,7 +321,8 @@ class BookmarksViewModel
     }
 
     fun play(bookmark: Bookmark) {
-        viewModelScope.launch {
+        playJob?.cancel()
+        playJob = viewModelScope.launch {
             val bookmarkEpisode = episodeManager.findEpisodeByUuid(bookmark.episodeUuid) ?: run {
                 _message.emit(BookmarkMessage.BookmarkEpisodeNotFound)
                 return@launch
