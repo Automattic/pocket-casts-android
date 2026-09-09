@@ -15,13 +15,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.dropShadow
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
@@ -87,12 +91,18 @@ private fun NetworkImage(
         modifier = modifier
             .fillMaxWidth()
             .aspectRatio(1f)
-            // the shadow keeps light artwork from blending into the background
-            .shadow(NetworkImageElevation, CircleShape),
+            .dropShadow(CircleShape, NetworkImageShadow)
+            .clip(CircleShape),
     )
 }
 
-private val NetworkImageElevation: Dp = 4.dp
+private val NetworkImageShadow = Shadow(
+    radius = 8.dp,
+    color = Color.Black,
+    spread = 0.dp,
+    offset = DpOffset(x = 0.dp, y = 2.dp),
+    alpha = 0.15f,
+)
 private val TitleSpacing: Dp = 10.dp
 private val DescriptionSpacing: Dp = 2.dp
 private val DescriptionHeight: Dp = 40.dp
