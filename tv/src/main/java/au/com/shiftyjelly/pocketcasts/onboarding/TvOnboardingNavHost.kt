@@ -14,7 +14,10 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import au.com.shiftyjelly.pocketcasts.component.LocalTvModalBackdrop
 import au.com.shiftyjelly.pocketcasts.component.LocalTvToastHostState
+import au.com.shiftyjelly.pocketcasts.component.TvModalBackdrop
+import au.com.shiftyjelly.pocketcasts.component.TvModalBackdropState
 import au.com.shiftyjelly.pocketcasts.component.TvToastHost
 import au.com.shiftyjelly.pocketcasts.component.TvToastHostState
 import au.com.shiftyjelly.pocketcasts.home.TvScaffold
@@ -48,54 +51,63 @@ fun TvOnboardingNavHost(
         }
     }
     val toastHostState = remember { TvToastHostState() }
-    CompositionLocalProvider(LocalTvToastHostState provides toastHostState) {
+    val modalBackdropState = remember { TvModalBackdropState() }
+    CompositionLocalProvider(
+        LocalTvToastHostState provides toastHostState,
+        LocalTvModalBackdrop provides modalBackdropState,
+    ) {
         Box(modifier = modifier.fillMaxSize()) {
-            NavHost(
-                navController = navController,
-                startDestination = viewModel.startDestination,
+            TvModalBackdrop(
+                state = modalBackdropState,
                 modifier = Modifier.fillMaxSize(),
             ) {
-                composable(TvOnboardingRoutes.LANDING) {
-                    TvWelcomeScreen(
-                        onSignIn = { navController.navigate(TvOnboardingRoutes.SIGN_IN) },
-                        onCreateAccount = { navController.navigate(TvOnboardingRoutes.CREATE_ACCOUNT) },
-                        onContinueWithoutAccount = {
-                            navController.navigate(TvOnboardingRoutes.HOME) {
-                                popUpTo(TvOnboardingRoutes.LANDING) { inclusive = true }
-                            }
-                        },
-                    )
-                }
-                composable(TvOnboardingRoutes.CREATE_ACCOUNT) {
-                    TvCreateAccountScreen(
-                        onCreateAccountComplete = { navigateClearingBackStack(TvOnboardingRoutes.SYNCING) },
-                    )
-                }
-                composable(TvOnboardingRoutes.SIGN_IN) {
-                    TvSignInScreen(
-                        onSignInComplete = { navigateClearingBackStack(TvOnboardingRoutes.SYNCING) },
-                    )
-                }
-                composable(TvOnboardingRoutes.SYNCING) {
-                    TvSyncingScreen(
-                        onSyncComplete = {
-                            navController.navigate(TvOnboardingRoutes.HOME) {
-                                popUpTo(TvOnboardingRoutes.SYNCING) { inclusive = true }
-                            }
-                        },
-                    )
-                }
-                composable(TvOnboardingRoutes.SIGNED_OUT) {
-                    TvSignedOutScreen(
-                        onLogIn = { navigateClearingBackStack(TvOnboardingRoutes.LANDING) },
-                    )
-                }
-                composable(TvOnboardingRoutes.HOME) {
-                    TvScaffold(
-                        onLogIn = { navController.navigate(TvOnboardingRoutes.SIGN_IN) },
-                        onCreateAccount = { navController.navigate(TvOnboardingRoutes.CREATE_ACCOUNT) },
-                        onSignedOut = { navigateClearingBackStack(TvOnboardingRoutes.LANDING) },
-                    )
+                NavHost(
+                    navController = navController,
+                    startDestination = viewModel.startDestination,
+                    modifier = Modifier.fillMaxSize(),
+                ) {
+                    composable(TvOnboardingRoutes.LANDING) {
+                        TvWelcomeScreen(
+                            onSignIn = { navController.navigate(TvOnboardingRoutes.SIGN_IN) },
+                            onCreateAccount = { navController.navigate(TvOnboardingRoutes.CREATE_ACCOUNT) },
+                            onContinueWithoutAccount = {
+                                navController.navigate(TvOnboardingRoutes.HOME) {
+                                    popUpTo(TvOnboardingRoutes.LANDING) { inclusive = true }
+                                }
+                            },
+                        )
+                    }
+                    composable(TvOnboardingRoutes.CREATE_ACCOUNT) {
+                        TvCreateAccountScreen(
+                            onCreateAccountComplete = { navigateClearingBackStack(TvOnboardingRoutes.SYNCING) },
+                        )
+                    }
+                    composable(TvOnboardingRoutes.SIGN_IN) {
+                        TvSignInScreen(
+                            onSignInComplete = { navigateClearingBackStack(TvOnboardingRoutes.SYNCING) },
+                        )
+                    }
+                    composable(TvOnboardingRoutes.SYNCING) {
+                        TvSyncingScreen(
+                            onSyncComplete = {
+                                navController.navigate(TvOnboardingRoutes.HOME) {
+                                    popUpTo(TvOnboardingRoutes.SYNCING) { inclusive = true }
+                                }
+                            },
+                        )
+                    }
+                    composable(TvOnboardingRoutes.SIGNED_OUT) {
+                        TvSignedOutScreen(
+                            onLogIn = { navigateClearingBackStack(TvOnboardingRoutes.LANDING) },
+                        )
+                    }
+                    composable(TvOnboardingRoutes.HOME) {
+                        TvScaffold(
+                            onLogIn = { navController.navigate(TvOnboardingRoutes.SIGN_IN) },
+                            onCreateAccount = { navController.navigate(TvOnboardingRoutes.CREATE_ACCOUNT) },
+                            onSignedOut = { navigateClearingBackStack(TvOnboardingRoutes.LANDING) },
+                        )
+                    }
                 }
             }
             TvToastHost(
