@@ -4,7 +4,6 @@ import android.os.Build
 import android.view.WindowManager
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -23,7 +22,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,7 +33,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.onPreviewKeyEvent
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -44,7 +41,10 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.DialogWindowProvider
 import androidx.tv.material3.MaterialTheme
 import au.com.shiftyjelly.pocketcasts.theme.tvColors
-import java.util.function.Consumer
+
+interface TvModalScope : ColumnScope {
+    fun dismiss()
+}
 
 @Composable
 fun TvModal(
@@ -52,23 +52,25 @@ fun TvModal(
     modifier: Modifier = Modifier,
     width: Dp = DefaultModalWidth,
     contentPadding: PaddingValues = DefaultContentPadding,
-    content: @Composable ColumnScope.() -> Unit,
+    content: @Composable TvModalScope.() -> Unit,
 ) {
     var visible by remember { mutableStateOf(true) }
     val currentOnDismissRequest by rememberUpdatedState(onDismissRequest)
+    val backdrop = LocalTvModalBackdrop.current
+    val backdropKey = remember { Any() }
+    LaunchedEffect(visible) {
+        backdrop.setActive(backdropKey, visible)
+    }
+    DisposableEffect(Unit) {
+        onDispose { backdrop.setActive(backdropKey, false) }
+    }
     Dialog(
         onDismissRequest = { visible = false },
         properties = DialogProperties(usePlatformDefaultWidth = false),
     ) {
         val transitionState = remember { MutableTransitionState(false) }
         transitionState.targetState = visible
-        val isBlurBehindEnabled by rememberIsBlurBehindEnabled()
-        val dimAmount by animateFloatAsState(
-            targetValue = if (visible) ModalDimAmount else 0f,
-            animationSpec = tween(ModalAnimationDuration),
-            label = "TvModalDim",
-        )
-        TvModalWindowEffects(isBlurBehindEnabled = isBlurBehindEnabled, dimAmount = dimAmount)
+        TvModalDialogWindowEffects()
         LaunchedEffect(transitionState.isIdle) {
             if (!visible && transitionState.isIdle && !transitionState.currentState) {
                 currentOnDismissRequest()
@@ -76,18 +78,29 @@ fun TvModal(
         }
         AnimatedVisibility(
             visibleState = transitionState,
-            enter = fadeIn(tween(ModalAnimationDuration)) + scaleIn(tween(ModalAnimationDuration), initialScale = 0.92f),
-            exit = fadeOut(tween(ModalAnimationDuration)) + scaleOut(tween(ModalAnimationDuration), targetScale = 0.92f),
+            enter = fadeIn(tween(TvModalAnimationDurationMillis)) +
+                scaleIn(tween(TvModalAnimationDurationMillis), initialScale = 0.92f),
+            exit = fadeOut(tween(TvModalAnimationDurationMillis)) +
+                scaleOut(tween(TvModalAnimationDurationMillis), targetScale = 0.92f),
         ) {
             TvModalSurface(
-                isTranslucent = isBlurBehindEnabled,
+                isTranslucent = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S,
                 width = width,
                 contentPadding = contentPadding,
                 modifier = modifier.onPreviewKeyEvent { visible.not() },
-                content = content,
-            )
+            ) {
+                val scope = remember(this) { TvModalScopeImpl(this) { visible = false } }
+                scope.content()
+            }
         }
     }
+}
+
+private class TvModalScopeImpl(
+    columnScope: ColumnScope,
+    private val onDismiss: () -> Unit,
+) : TvModalScope, ColumnScope by columnScope {
+    override fun dismiss() = onDismiss()
 }
 
 @Composable
@@ -118,45 +131,14 @@ internal fun TvModalSurface(
 }
 
 @Composable
-private fun TvModalWindowEffects(isBlurBehindEnabled: Boolean, dimAmount: Float) {
+private fun TvModalDialogWindowEffects() {
     val window = (LocalView.current.parent as? DialogWindowProvider)?.window ?: return
-    val blurRadius = with(LocalDensity.current) { ModalBlurRadius.roundToPx() }
     SideEffect {
         window.setWindowAnimations(0)
-        window.setDimAmount(dimAmount)
-    }
-    LaunchedEffect(window, isBlurBehindEnabled, blurRadius) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            if (isBlurBehindEnabled) {
-                window.addFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND)
-                window.attributes = window.attributes.apply { blurBehindRadius = blurRadius }
-            } else {
-                window.clearFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND)
-            }
-        }
+        window.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
     }
 }
 
-@Composable
-private fun rememberIsBlurBehindEnabled(): State<Boolean> {
-    val isBlurBehindEnabled = remember { mutableStateOf(false) }
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        val view = LocalView.current
-        DisposableEffect(view) {
-            val windowManager = view.context.getSystemService(WindowManager::class.java)
-            val listener = Consumer<Boolean> { isEnabled -> isBlurBehindEnabled.value = isEnabled }
-            windowManager.addCrossWindowBlurEnabledListener(listener)
-            onDispose {
-                windowManager.removeCrossWindowBlurEnabledListener(listener)
-            }
-        }
-    }
-    return isBlurBehindEnabled
-}
-
-private val ModalAnimationDuration = 200
-private val ModalDimAmount = 0.4f
-private val ModalBlurRadius = 30.dp
 private val DefaultModalWidth = 300.dp
 private val DefaultContentPadding = PaddingValues(horizontal = 40.dp, vertical = 30.dp)
 private val ModalShape = RoundedCornerShape(21.dp)
