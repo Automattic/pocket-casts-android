@@ -411,7 +411,6 @@ private fun EpisodeArtwork(
             model = episode.artworkModel(),
             modifier = Modifier
                 .requiredSize(ArtworkSize * BlurredArtworkScale)
-                .offset(x = BlurredArtworkOffset, y = BlurredArtworkOffset)
                 .blur(BlurredArtworkRadius, BlurredEdgeTreatment.Unbounded)
                 .alpha(0.7f),
         )
@@ -525,7 +524,6 @@ private fun InfoButton(
 private val ArtworkSize = 210.dp
 private val ArtworkTopLift = 18.dp
 private val BlurredArtworkScale = 1.25f
-private val BlurredArtworkOffset = -ArtworkSize * 0.2f
 private val BlurredArtworkRadius = 49.5.dp
 
 private val CHROME_HIDE_DELAY = 5.seconds
