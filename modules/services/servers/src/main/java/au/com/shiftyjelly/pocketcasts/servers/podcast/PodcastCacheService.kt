@@ -125,7 +125,7 @@ interface PodcastCacheService {
     @POST("/podcast/suggest_folders")
     suspend fun suggestedFolders(@Body request: SuggestedFoldersRequest): SuggestedFoldersResponse
 
-    @POST("/search/combined")
+    @POST("/v2/search/combined")
     suspend fun combinedSearch(
         @Body request: CombinedSearchRequest,
     ): CombinedSearchResponse
