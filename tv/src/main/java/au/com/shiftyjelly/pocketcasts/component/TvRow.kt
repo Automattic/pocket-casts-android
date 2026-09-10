@@ -73,7 +73,7 @@ fun <T> TvRow(
     itemSpacing: Dp = TvTileSpacing,
     key: ((T) -> Any)? = null,
     focusRequester: FocusRequester? = null,
-    centerFocusedItem: Boolean = false,
+    leftAlignFocusedItem: Boolean = false,
     content: @Composable (T) -> Unit,
 ) {
     var hasFocus by remember { mutableStateOf(false) }
@@ -99,12 +99,9 @@ fun <T> TvRow(
         val focusRequesters = remember(items) { List(items.size) { FocusRequester() } }
         val listState = rememberLazyListState()
 
-        if (centerFocusedItem) {
+        if (leftAlignFocusedItem) {
             LaunchedEffect(lastFocusedIndex) {
-                val item = listState.layoutInfo.visibleItemsInfo.firstOrNull { it.index == lastFocusedIndex }
-                val viewport = listState.layoutInfo.viewportSize.width
-                val centerOffset = item?.let { -(viewport - it.size) / 2 } ?: 0
-                listState.animateScrollToItem(lastFocusedIndex, centerOffset)
+                listState.animateScrollToItem(lastFocusedIndex)
             }
         }
 
