@@ -92,7 +92,9 @@ internal fun TvPodcastGridScaffold(
             verticalArrangement = Arrangement.spacedBy(TvTileSpacing),
             contentPadding = PaddingValues(
                 start = horizontalContentPadding,
-                top = 20.dp,
+                // A scrolling title sits inside the grid and carries its own top padding, so it
+                // aligns with the other screens; a fixed title needs a gap above the first row.
+                top = if (titleScrolls) 0.dp else 20.dp,
                 end = horizontalContentPadding,
                 bottom = 32.dp,
             ),
