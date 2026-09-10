@@ -41,11 +41,12 @@ fun TvEpisodeListItem(
     TvEpisodeListItemContainer(
         onOpenActions = onOpenActions,
         modifier = modifier,
-    ) { rowModifier ->
+    ) { rowModifier, isRowFocused ->
         TvEpisodeRow(
             episode = episode,
             onClick = onClick,
             dateFormatter = dateFormatter,
+            isRowFocused = isRowFocused,
             modifier = rowModifier
                 .then(if (leftFocusRequester != null) Modifier.focusProperties { left = leftFocusRequester } else Modifier)
                 .then(if (episodeFocusRequester != null) Modifier.focusRequester(episodeFocusRequester) else Modifier),
@@ -57,7 +58,7 @@ fun TvEpisodeListItem(
 fun TvEpisodeListItemContainer(
     onOpenActions: () -> Unit,
     modifier: Modifier = Modifier,
-    content: @Composable (Modifier) -> Unit,
+    content: @Composable (rowModifier: Modifier, isRowFocused: Boolean) -> Unit,
 ) {
     var isItemFocused by remember { mutableStateOf(false) }
     Row(
@@ -66,7 +67,7 @@ fun TvEpisodeListItemContainer(
             .fillMaxWidth()
             .onFocusChanged { isItemFocused = it.hasFocus },
     ) {
-        content(Modifier.weight(1f))
+        content(Modifier.weight(1f), isItemFocused)
         MoreButtonSlot(
             visible = isItemFocused,
             onClick = onOpenActions,

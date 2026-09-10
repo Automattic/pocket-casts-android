@@ -48,7 +48,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.Button
-import androidx.tv.material3.ButtonDefaults
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
@@ -282,7 +281,7 @@ private fun PodcastInfo(
             Button(
                 onClick = onFollow,
                 colors = TvButtonDefaults.filledButtonColors(),
-                scale = ButtonDefaults.scale(focusedScale = 1f),
+                scale = TvButtonDefaults.noScale(),
                 modifier = Modifier
                     .focusRequester(followFocusRequester)
                     .animateContentSize(),
@@ -292,7 +291,7 @@ private fun PodcastInfo(
             Button(
                 onClick = onMoreInfo,
                 colors = TvButtonDefaults.filledButtonColors(),
-                scale = ButtonDefaults.scale(focusedScale = 1f),
+                scale = TvButtonDefaults.noScale(),
             ) {
                 Text(stringResource(LR.string.tv_podcast_more_info))
             }
@@ -315,7 +314,7 @@ private fun EpisodeList(
     val context = LocalContext.current
     val dateFormatter = remember(context) { RelativeDateFormatter(context) }
     val listState = rememberLazyListState()
-    val focus = rememberTvEpisodeListFocus(episodes, listState, requestInitialFocus = true)
+    val focus = rememberTvEpisodeListFocus(episodes, listState, requestInitialFocus = true, leadingItemCount = 1)
     LaunchedEffect(podcast.episodesSortType) {
         listState.scrollToItem(0)
     }

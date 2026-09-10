@@ -312,7 +312,7 @@ private fun EpisodeList(
 ) {
     val context = LocalContext.current
     val dateFormatter = remember(context) { RelativeDateFormatter(context) }
-    val focus = rememberTvEpisodeListFocus(episodes, listState, requestInitialFocus = true)
+    val focus = rememberTvEpisodeListFocus(episodes, listState, requestInitialFocus = true, leadingItemCount = 1)
     var actionsEpisode by remember { mutableStateOf<PodcastEpisode?>(null) }
     var detailsEpisode by remember { mutableStateOf<PodcastEpisode?>(null) }
     LazyColumn(
