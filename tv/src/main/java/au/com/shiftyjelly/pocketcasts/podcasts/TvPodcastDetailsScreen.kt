@@ -321,32 +321,14 @@ private fun EpisodeList(
     var actionsEpisode by remember { mutableStateOf<PodcastEpisode?>(null) }
     var detailsEpisode by remember { mutableStateOf<PodcastEpisode?>(null) }
     Column(modifier = modifier) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 12.dp),
-        ) {
-            Text(
-                text = stringResource(LR.string.search_results_all_episodes),
-                style = MaterialTheme.tvTypography.title3,
-                color = MaterialTheme.tvColors.textPrimary,
-                modifier = Modifier.weight(1f),
-            )
-            TvArchivedFilterButton(
+        if (episodes.isEmpty()) {
+            EpisodeListHeader(
+                podcast = podcast,
                 isShowingArchived = isShowingArchived,
+                onChangeSortType = onChangeSortType,
                 onToggleArchiveFilter = onToggleArchiveFilter,
                 leftFocusRequester = leftFocusRequester,
             )
-            Spacer(Modifier.width(12.dp))
-            TvSortButton(
-                selected = podcast.episodesSortType,
-                options = PodcastSortOptions,
-                label = { it.displayLabel() },
-                onSelect = onChangeSortType,
-            )
-        }
-        if (episodes.isEmpty()) {
             AllEpisodesArchived(
                 episodeCount = archivedEpisodeCount,
                 modifier = Modifier.weight(1f).fillMaxWidth(),
@@ -357,6 +339,15 @@ private fun EpisodeList(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.weight(1f),
             ) {
+                item(key = "episode-list-header") {
+                    EpisodeListHeader(
+                        podcast = podcast,
+                        isShowingArchived = isShowingArchived,
+                        onChangeSortType = onChangeSortType,
+                        onToggleArchiveFilter = onToggleArchiveFilter,
+                        leftFocusRequester = leftFocusRequester,
+                    )
+                }
                 itemsIndexed(
                     items = episodes,
                     key = { _, episode -> episode.uuid },
@@ -392,6 +383,42 @@ private fun EpisodeList(
             episode = episode,
             actionContext = TvEpisodeActionContext.PodcastDetails,
             onDismissRequest = { detailsEpisode = null },
+        )
+    }
+}
+
+@Composable
+private fun EpisodeListHeader(
+    podcast: Podcast,
+    isShowingArchived: Boolean,
+    onChangeSortType: (EpisodesSortType) -> Unit,
+    onToggleArchiveFilter: () -> Unit,
+    leftFocusRequester: FocusRequester,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(bottom = 12.dp),
+    ) {
+        Text(
+            text = stringResource(LR.string.search_results_all_episodes),
+            style = MaterialTheme.tvTypography.title3,
+            color = MaterialTheme.tvColors.textPrimary,
+            modifier = Modifier.weight(1f),
+        )
+        TvArchivedFilterButton(
+            isShowingArchived = isShowingArchived,
+            onToggleArchiveFilter = onToggleArchiveFilter,
+            leftFocusRequester = leftFocusRequester,
+        )
+        Spacer(Modifier.width(12.dp))
+        TvSortButton(
+            selected = podcast.episodesSortType,
+            options = PodcastSortOptions,
+            label = { it.displayLabel() },
+            onSelect = onChangeSortType,
         )
     }
 }
