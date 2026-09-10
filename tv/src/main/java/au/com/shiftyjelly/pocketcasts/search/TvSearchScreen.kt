@@ -28,6 +28,7 @@ import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -325,16 +326,19 @@ private fun TvSearchContent(
 
     val topBarScroll = LocalTopBarScrollState.current
     val barHeightPx = with(LocalDensity.current) { TvTopBarHeight.toPx() }
+    val isSearchActive = searchState !is TvSearchState.Idle
     var resultsFocused by remember { mutableStateOf(false) }
     val headerCollapse by animateFloatAsState(
-        targetValue = if (resultsFocused) barHeightPx else 0f,
+        targetValue = if (resultsFocused && isSearchActive) barHeightPx else 0f,
         label = "searchHeaderCollapse",
     )
-    val isSearchActive = searchState !is TvSearchState.Idle
     LaunchedEffect(isSearchActive) {
         if (isSearchActive) {
             snapshotFlow { headerCollapse }.collect { topBarScroll.offsetPx = it }
         }
+    }
+    DisposableEffect(topBarScroll) {
+        onDispose { topBarScroll.offsetPx = 0f }
     }
 
     Column(modifier = modifier.fillMaxSize().scrollAwayTopBar()) {
@@ -411,8 +415,8 @@ private fun TvSearchContent(
                 .onFocusChanged { resultsFocused = it.hasFocus }
                 .focusProperties {
                     onExit = {
-                        if (requestedFocusDirection == FocusDirection.Up) {
-                            filtersFocusRequester.requestFocus()
+                        if (requestedFocusDirection == FocusDirection.Up && isSearchActive) {
+                            runCatching { filtersFocusRequester.requestFocus() }
                         }
                     }
                 }
