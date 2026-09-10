@@ -5,7 +5,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -34,38 +33,38 @@ fun TvEpisodeListItem(
     episodeFocusRequester: FocusRequester? = null,
     leftFocusRequester: FocusRequester? = null,
 ) {
-    TvEpisodeListItemContainer(
-        onOpenActions = onOpenActions,
-        modifier = modifier,
-    ) { rowModifier ->
-        TvEpisodeRow(
-            episode = episode,
-            onClick = onClick,
-            dateFormatter = dateFormatter,
-            modifier = rowModifier
-                .then(if (leftFocusRequester != null) Modifier.focusProperties { left = leftFocusRequester } else Modifier)
-                .then(if (episodeFocusRequester != null) Modifier.focusRequester(episodeFocusRequester) else Modifier),
-        )
-    }
-}
-
-@Composable
-fun TvEpisodeListItemContainer(
-    onOpenActions: () -> Unit,
-    modifier: Modifier = Modifier,
-    content: @Composable (Modifier) -> Unit,
-) {
     var isItemFocused by remember { mutableStateOf(false) }
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
+    val moreButtonFocusRequester = remember { FocusRequester() }
+    Box(
         modifier = modifier
             .fillMaxWidth()
             .onFocusChanged { isItemFocused = it.hasFocus },
     ) {
-        content(Modifier.weight(1f))
+        TvEpisodeRow(
+            episode = episode,
+            onClick = onClick,
+            dateFormatter = dateFormatter,
+            contentEndPadding = MoreButtonReservedWidth,
+            modifier = Modifier
+                .fillMaxWidth()
+                .focusProperties {
+                    if (isItemFocused) {
+                        right = moreButtonFocusRequester
+                    }
+                    if (leftFocusRequester != null) {
+                        left = leftFocusRequester
+                    }
+                }
+                .then(if (episodeFocusRequester != null) Modifier.focusRequester(episodeFocusRequester) else Modifier),
+        )
         MoreButtonSlot(
             visible = isItemFocused,
             onClick = onOpenActions,
+            modifier = Modifier
+                .align(Alignment.CenterEnd)
+                .padding(end = MoreButtonEndInset)
+                .then(if (episodeFocusRequester != null) Modifier.focusProperties { left = episodeFocusRequester } else Modifier)
+                .focusRequester(moreButtonFocusRequester),
         )
     }
 }
@@ -74,12 +73,11 @@ fun TvEpisodeListItemContainer(
 private fun MoreButtonSlot(
     visible: Boolean,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Box(
         contentAlignment = Alignment.Center,
-        modifier = Modifier
-            .padding(start = 12.dp)
-            .size(TvMoreButtonSize),
+        modifier = modifier.size(TvMoreButtonSize),
     ) {
         AnimatedVisibility(
             visible = visible,
@@ -92,3 +90,5 @@ private fun MoreButtonSlot(
 }
 
 private const val MORE_BUTTON_ANIMATION_DURATION_MS = 200
+private val MoreButtonEndInset = 16.dp
+private val MoreButtonReservedWidth = TvMoreButtonSize + 16.dp

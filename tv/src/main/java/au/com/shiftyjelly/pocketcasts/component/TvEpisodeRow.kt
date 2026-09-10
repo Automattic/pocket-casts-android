@@ -54,9 +54,10 @@ val LocalUseEpisodeArtwork = staticCompositionLocalOf { false }
 fun TvEpisodeRow(
     episode: PodcastEpisode,
     onClick: () -> Unit,
-    onLongClick: (() -> Unit)? = null,
     dateFormatter: RelativeDateFormatter,
     modifier: Modifier = Modifier,
+    onLongClick: (() -> Unit)? = null,
+    contentEndPadding: Dp = 0.dp,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
@@ -84,7 +85,7 @@ fun TvEpisodeRow(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(start = 16.dp, top = 16.dp, end = 16.dp + contentEndPadding, bottom = 16.dp),
         ) {
             EpisodeArtwork(episode = episode)
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
