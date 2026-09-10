@@ -118,19 +118,31 @@ internal fun TvPlayerEffectsButton(
             val trimChangedTemplate = stringResource(LR.string.tv_trim_silence_changed)
             val trimOffToast = stringResource(LR.string.tv_trim_silence_off)
             TvDropdownMenu(
-                title = stringResource(LR.string.player_effects),
+                title = stringResource(LR.string.player_effects_volume_boost),
                 onDismissRequest = { onMenuVisibleChange(false) },
                 alignment = Alignment.BottomCenter,
                 offset = DpOffset(x = 0.dp, y = (-64).dp),
             ) {
                 TvDropdownMenuItem(
-                    label = stringResource(LR.string.player_effects_volume_boost),
-                    isSelected = isVolumeBoosted,
-                    requestInitialFocus = true,
+                    label = stringResource(LR.string.off),
+                    isSelected = !isVolumeBoosted,
                     onClick = {
-                        val isBoosted = !isVolumeBoosted
-                        onSetVolumeBoost(isBoosted)
-                        toastHostState.show(if (isBoosted) boostOnToast else boostOffToast)
+                        onMenuVisibleChange(false)
+                        if (isVolumeBoosted) {
+                            onSetVolumeBoost(false)
+                            toastHostState.show(boostOffToast)
+                        }
+                    },
+                )
+                TvDropdownMenuItem(
+                    label = stringResource(LR.string.on),
+                    isSelected = isVolumeBoosted,
+                    onClick = {
+                        onMenuVisibleChange(false)
+                        if (!isVolumeBoosted) {
+                            onSetVolumeBoost(true)
+                            toastHostState.show(boostOnToast)
+                        }
                     },
                 )
                 TvDropdownMenuSectionTitle(text = stringResource(LR.string.player_effects_trim_silence))
