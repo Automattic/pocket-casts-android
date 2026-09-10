@@ -230,7 +230,6 @@ object InterceptorModule {
             add(crashLoggingInterceptor.toClientInterceptor())
             add(basicAuthInterceptor)
             add(cleanAndRetryInterceptor)
-            // Must be after cleanAndRetry, which re-issues any 401 before this can refresh the token.
             add(userFileAuthInterceptor.toClientInterceptor())
 
             if (BuildConfig.DEBUG) {
@@ -276,7 +275,6 @@ object InterceptorModule {
             add(crashLoggingInterceptor.toClientInterceptor())
             add(basicAuthInterceptor)
             add(cleanAndRetryInterceptor)
-            // Must be after cleanAndRetry, which re-issues any 401 before this can refresh the token.
             add(userFileAuthInterceptor.toClientInterceptor())
 
             if (BuildConfig.DEBUG) {

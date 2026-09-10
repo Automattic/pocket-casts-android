@@ -11,8 +11,7 @@ import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.Response
 
-// Must be a client interceptor: the endpoint redirects to signed storage, and a network interceptor
-// would run again on that hop and send the token to a third party host.
+// Must be a client interceptor: a network interceptor would run on the redirect to signed storage and leak the token.
 internal class UserFileAuthInterceptor(
     private val apiUrl: HttpUrl,
     private val tokenHandler: TokenHandler,
@@ -25,7 +24,7 @@ internal class UserFileAuthInterceptor(
 
         val token = accessToken() ?: return chain.proceed(request)
         val response = chain.proceed(request.withBearer(token))
-        // chain.proceed already followed the redirect, so a 401 here can come from signed storage, not the API.
+        // chain.proceed follows redirects, so a 401 here can come from signed storage rather than the API.
         if (response.code != HttpURLConnection.HTTP_UNAUTHORIZED || !response.request.isUserFileRequest()) {
             return response
         }
