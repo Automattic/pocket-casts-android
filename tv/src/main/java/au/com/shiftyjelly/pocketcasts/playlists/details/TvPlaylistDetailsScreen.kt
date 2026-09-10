@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -237,32 +238,33 @@ private fun SortableEpisodeList(
     val isManual = uiState.playlist.type == Playlist.Type.Manual
     val leftFocusRequester = playAllFocusRequester.takeIf { uiState.episodes.isNotEmpty() }
     Column(modifier = modifier) {
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(9.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .align(Alignment.End)
-                .padding(bottom = 9.dp),
-        ) {
-            if (isManual) {
-                TvArchivedFilterButton(
-                    isShowingArchived = uiState.isShowingArchivedOnDevice,
-                    onToggleArchiveFilter = onToggleArchiveFilter,
-                    leftFocusRequester = leftFocusRequester,
+        val header: @Composable (Modifier) -> Unit = { headerModifier ->
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(9.dp, Alignment.End),
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = headerModifier.fillMaxWidth(),
+            ) {
+                if (isManual) {
+                    TvArchivedFilterButton(
+                        isShowingArchived = uiState.isShowingArchivedOnDevice,
+                        onToggleArchiveFilter = onToggleArchiveFilter,
+                        leftFocusRequester = leftFocusRequester,
+                    )
+                }
+                TvSortButton(
+                    selected = sortType,
+                    options = uiState.playlist.availableSortTypes,
+                    label = { it.displayLabel() },
+                    onSelect = onChangeSortType,
+                    onExpand = onSortTap,
+                    leftFocusRequester = if (isManual) null else leftFocusRequester,
                 )
             }
-            TvSortButton(
-                selected = sortType,
-                options = uiState.playlist.availableSortTypes,
-                label = { it.displayLabel() },
-                onSelect = onChangeSortType,
-                onExpand = onSortTap,
-                leftFocusRequester = if (isManual) null else leftFocusRequester,
-            )
         }
         if (uiState.episodes.isNotEmpty()) {
             EpisodeList(
                 episodes = uiState.episodes,
+                header = header,
                 onOpenPodcast = onOpenPodcast,
                 onPlayEpisode = onPlayEpisode,
                 playAllFocusRequester = playAllFocusRequester,
@@ -270,6 +272,7 @@ private fun SortableEpisodeList(
                 modifier = Modifier.weight(1f),
             )
         } else {
+            header(Modifier.padding(bottom = 9.dp))
             AllEpisodesArchived(
                 episodeCount = uiState.availableEpisodeCount,
                 modifier = Modifier.weight(1f).fillMaxWidth(),
@@ -300,6 +303,7 @@ private fun AllEpisodesArchived(
 @Composable
 private fun EpisodeList(
     episodes: List<PodcastEpisode>,
+    header: @Composable (Modifier) -> Unit,
     onOpenPodcast: (String) -> Unit,
     onPlayEpisode: (PodcastEpisode) -> Unit,
     playAllFocusRequester: FocusRequester,
@@ -314,8 +318,12 @@ private fun EpisodeList(
     LazyColumn(
         state = listState,
         verticalArrangement = Arrangement.spacedBy(9.dp),
+        contentPadding = PaddingValues(top = 8.dp, end = 8.dp, bottom = 24.dp),
         modifier = modifier,
     ) {
+        item(key = "sort-filter-header") {
+            header(Modifier)
+        }
         itemsIndexed(
             items = episodes,
             key = { _, episode -> episode.uuid },
