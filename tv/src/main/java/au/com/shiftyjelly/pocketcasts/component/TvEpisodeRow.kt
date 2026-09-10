@@ -54,12 +54,16 @@ val LocalUseEpisodeArtwork = staticCompositionLocalOf { false }
 fun TvEpisodeRow(
     episode: PodcastEpisode,
     onClick: () -> Unit,
-    onLongClick: (() -> Unit)? = null,
     dateFormatter: RelativeDateFormatter,
     modifier: Modifier = Modifier,
+    onLongClick: (() -> Unit)? = null,
+    isRowFocused: Boolean = false,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
-    val isFocused by interactionSource.collectIsFocusedAsState()
+    val isTileFocused by interactionSource.collectIsFocusedAsState()
+    // Focus can sit on a sibling control (e.g. the "…" button) that logically belongs to this row,
+    // so keep the row lit for that too rather than fading it back to its resting appearance.
+    val isFocused = isTileFocused || isRowFocused
     val titleColor = if (isFocused) MaterialTheme.tvColors.textPrimaryActive else MaterialTheme.tvColors.textPrimary
     val captionColor = if (isFocused) {
         MaterialTheme.tvColors.textSecondaryActive
@@ -73,7 +77,11 @@ fun TvEpisodeRow(
         scale = CardDefaults.scale(focusedScale = TvFocusedWideCardScale),
         shape = CardDefaults.shape(RoundedCornerShape(8.dp)),
         colors = CardDefaults.colors(
-            containerColor = MaterialTheme.tvColors.backgroundBase,
+            containerColor = if (isRowFocused) {
+                MaterialTheme.tvColors.backgroundActive
+            } else {
+                MaterialTheme.tvColors.backgroundBase
+            },
             focusedContainerColor = MaterialTheme.tvColors.backgroundActive,
         ),
         interactionSource = interactionSource,

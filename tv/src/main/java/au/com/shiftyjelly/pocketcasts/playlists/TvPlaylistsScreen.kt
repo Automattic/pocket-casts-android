@@ -47,12 +47,10 @@ import androidx.tv.material3.Button
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.component.ScrollToTopEffect
-import au.com.shiftyjelly.pocketcasts.component.TopBarScrollReporter
 import au.com.shiftyjelly.pocketcasts.component.TvDetailOverlay
 import au.com.shiftyjelly.pocketcasts.component.TvEmptyState
 import au.com.shiftyjelly.pocketcasts.component.TvPlaylistCard
 import au.com.shiftyjelly.pocketcasts.component.TvPlaylistCardColors
-import au.com.shiftyjelly.pocketcasts.component.scrollAwayTopBar
 import au.com.shiftyjelly.pocketcasts.component.tvFocusInactiveWhen
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistIcon
@@ -219,7 +217,6 @@ private fun TvPlaylistsGrid(
         val gridFocusRequester = remember { FocusRequester() }
         val gridState = rememberLazyGridState()
         ScrollToTopEffect { gridState.scrollToItem(0) }
-        TopBarScrollReporter(gridState)
 
         var isInitialComposition by remember { mutableStateOf(true) }
         LaunchedEffect(restoreFocusTrigger) {
@@ -239,7 +236,7 @@ private fun TvPlaylistsGrid(
             verticalArrangement = Arrangement.spacedBy(12.dp),
             contentPadding = PaddingValues(bottom = 32.dp),
             modifier = Modifier
-                .scrollAwayTopBar()
+                .padding(top = TvTopBarHeight)
                 .focusRequester(gridFocusRequester)
                 .focusGroup()
                 .focusProperties {
