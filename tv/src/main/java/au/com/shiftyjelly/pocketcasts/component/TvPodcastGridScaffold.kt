@@ -113,7 +113,7 @@ internal fun TvPodcastGridScaffold(
                         text = title,
                         style = MaterialTheme.tvTypography.title2,
                         color = MaterialTheme.tvColors.textPrimary,
-                        modifier = Modifier.padding(start = horizontalContentPadding, top = 40.dp, bottom = 0.dp),
+                        modifier = Modifier.padding(top = 40.dp),
                     )
                 }
             }
