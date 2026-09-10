@@ -58,9 +58,10 @@ fun TvEpisodeRow(
     modifier: Modifier = Modifier,
     onLongClick: (() -> Unit)? = null,
     contentEndPadding: Dp = 0.dp,
+    interactionSource: MutableInteractionSource? = null,
 ) {
-    val interactionSource = remember { MutableInteractionSource() }
-    val isFocused by interactionSource.collectIsFocusedAsState()
+    val resolvedInteractionSource = interactionSource ?: remember { MutableInteractionSource() }
+    val isFocused by resolvedInteractionSource.collectIsFocusedAsState()
     val titleColor = if (isFocused) MaterialTheme.tvColors.textPrimaryActive else MaterialTheme.tvColors.textPrimary
     val captionColor = if (isFocused) {
         MaterialTheme.tvColors.textSecondaryActive
@@ -77,7 +78,7 @@ fun TvEpisodeRow(
             containerColor = MaterialTheme.tvColors.backgroundBase,
             focusedContainerColor = MaterialTheme.tvColors.backgroundActive,
         ),
-        interactionSource = interactionSource,
+        interactionSource = resolvedInteractionSource,
         modifier = modifier.alpha(if (episode.isArchived && !isFocused) 0.3f else 1f),
     ) {
         Row(
