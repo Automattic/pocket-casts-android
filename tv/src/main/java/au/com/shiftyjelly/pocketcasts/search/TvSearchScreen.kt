@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.search
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -35,6 +36,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,6 +44,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
@@ -52,6 +55,7 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.component.LocalOpenNowPlaying
+import au.com.shiftyjelly.pocketcasts.component.LocalTopBarScrollState
 import au.com.shiftyjelly.pocketcasts.component.LocalTvToastHostState
 import au.com.shiftyjelly.pocketcasts.component.ScrollToTopEffect
 import au.com.shiftyjelly.pocketcasts.component.TopBarScrollReporter
@@ -316,8 +320,23 @@ private fun TvSearchContent(
     var historyFocused by remember { mutableStateOf(false) }
     val showSuggestions = (isEditing || suggestionsFocused) && suggestions.isNotEmpty()
     val showHistory = (searchFieldFocused || historyFocused || isEditing) && !showSuggestions && query.isBlank() && history.isNotEmpty()
+
+    val topBarScroll = LocalTopBarScrollState.current
+    val barHeightPx = with(LocalDensity.current) { TvTopBarHeight.toPx() }
+    var resultsFocused by remember { mutableStateOf(false) }
+    val headerCollapse by animateFloatAsState(
+        targetValue = if (resultsFocused) barHeightPx else 0f,
+        label = "searchHeaderCollapse",
+    )
+    val isSearchActive = searchState !is TvSearchState.Idle
+    LaunchedEffect(isSearchActive) {
+        if (isSearchActive) {
+            snapshotFlow { headerCollapse }.collect { topBarScroll.offsetPx = it }
+        }
+    }
+
     Column(modifier = modifier.fillMaxSize().scrollAwayTopBar()) {
-        Column(modifier = Modifier.collapseWithTopBar(enabled = searchState is TvSearchState.Idle).padding(ContentPadding)) {
+        Column(modifier = Modifier.collapseWithTopBar().padding(ContentPadding)) {
             Spacer(modifier = Modifier.height(30.dp))
             TvSearchField(
                 query = query,
@@ -381,7 +400,8 @@ private fun TvSearchContent(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f),
+                .weight(1f)
+                .onFocusChanged { resultsFocused = it.hasFocus },
         ) {
             when (searchState) {
                 is TvSearchState.Idle -> TvSearchIdle(
@@ -658,7 +678,6 @@ private fun TvSearchTopResults(
     val restoreFocusRequester = remember { FocusRequester() }
     val listState = rememberLazyListState()
     ScrollToTopEffect { listState.scrollToItem(0) }
-    TopBarScrollReporter(listState)
     var isInitialComposition by remember { mutableStateOf(true) }
     LaunchedEffect(restoreFocusTrigger) {
         if (isInitialComposition) {
@@ -778,7 +797,6 @@ private fun TvSearchEpisodeGrid(
 ) {
     val gridState = rememberLazyGridState()
     ScrollToTopEffect { gridState.scrollToItem(0) }
-    TopBarScrollReporter(gridState)
     val focusRequesters = remember(episodes.size) { List(episodes.size) { FocusRequester() } }
     val gridFocusRequester = remember { FocusRequester() }
     var lastFocusedKey by rememberSaveable { mutableStateOf<String?>(null) }
