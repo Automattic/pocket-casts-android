@@ -138,7 +138,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlow
 import kotlinx.coroutines.rx2.asFlowable
-import kotlinx.coroutines.rx2.await
 import kotlinx.coroutines.rx2.awaitSingleOrNull
 import kotlinx.coroutines.rx2.rxCompletable
 import kotlinx.coroutines.sync.Mutex
@@ -2145,14 +2144,7 @@ open class PlaybackManager @Inject constructor(
 
             is UserEpisode -> {
                 if (episode.serverStatus == UserEpisodeServerStatus.UPLOADED) {
-                    try {
-                        val newDownloadUrl = userEpisodeManager.getPlaybackUrlRxSingle(episode).await()
-                        episode.downloadUrl = newDownloadUrl
-                    } catch (e: Exception) {
-                        onPlayerError(PlayerEvent.PlayerError("Could not load cloud file ${e.message}"))
-                        removeEpisode(episode, source = sourceView)
-                        return
-                    }
+                    episode.downloadUrl = userEpisodeManager.getPlaybackUrl(episode)
                 }
             }
         }

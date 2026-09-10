@@ -178,6 +178,9 @@ interface SyncService {
     @GET("/files/{uuid}")
     fun getFile(@Header("Authorization") authorization: String, @Path("uuid") uuid: String): Single<Response<ServerFile>>
 
+    @GET("/files/play/{uuid}")
+    suspend fun getFilePlaybackUrl(@Header("Authorization") authorization: String, @Path("uuid") uuid: String): FileUrlResponse
+
     @POST("/user/stats/summary")
     suspend fun loadStats(@Header("Authorization") authorization: String, @Body request: StatsSummaryRequest): Map<String, Any>
 

@@ -82,6 +82,9 @@ open class SyncServiceManager @Inject constructor(
         const val SCOPE_MOBILE = "mobile"
         const val SCOPE_TV = "tv"
 
+        // Credentials come from UserFileAuthInterceptor, not from the URL.
+        internal const val USER_FILE_PLAYBACK_PATH = "/files/url/token/"
+
         private val userPodcastListRequest = userPodcastListRequest {
             v = Settings.SYNC_API_VERSION.toString()
             m = Settings.SYNC_API_MODEL
@@ -269,7 +272,9 @@ open class SyncServiceManager @Inject constructor(
 
     fun deleteFromServer(episode: UserEpisode, token: AccessToken): Single<Response<Void>> = service.deleteFile(addBearer(token), episode.uuid)
 
-    fun getPlaybackUrl(episode: UserEpisode, token: AccessToken): Single<String> = Single.just("${Settings.SERVER_API_URL}/files/url/${episode.uuid}?token=${token.value}")
+    fun getPlaybackUrl(episode: UserEpisode): String = "${Settings.SERVER_API_URL}$USER_FILE_PLAYBACK_PATH${episode.uuid}"
+
+    suspend fun getSignedPlaybackUrl(episode: UserEpisode, token: AccessToken): String = service.getFilePlaybackUrl(addBearer(token), episode.uuid).url
 
     fun getUserEpisode(uuid: String, token: AccessToken): Single<Response<ServerFile>> = service.getFile(addBearer(token), uuid)
 
