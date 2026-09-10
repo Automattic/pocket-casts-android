@@ -57,7 +57,7 @@ fun LazyListScope.tvDiscoverRow(
             TvRow(
                 title = row.title,
                 items = row.podcasts,
-                itemSpacing = 12.dp,
+                itemSpacing = 40.dp,
                 contentPadding = contentPadding,
                 key = TvDiscoverPodcast::uuid,
                 focusRequester = focusRequester,
