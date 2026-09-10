@@ -61,7 +61,7 @@ fun LazyListScope.tvDiscoverRow(
                 contentPadding = contentPadding,
                 key = TvDiscoverPodcast::uuid,
                 focusRequester = focusRequester,
-                centerFocusedItem = true,
+                leftAlignFocusedItem = true,
                 modifier = modifier,
             ) { podcast ->
                 TvFeaturedTile(
