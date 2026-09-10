@@ -42,13 +42,15 @@ internal fun TvPodcastGridScaffold(
     autoFocusFirstItem: Boolean = false,
     restoreFocusTrigger: Int = 0,
     scrollsTopBar: Boolean = false,
+    scrollsTitle: Boolean = false,
     itemContent: @Composable (index: Int, itemModifier: Modifier) -> Unit,
 ) {
-    val headerCount = if (scrollsTopBar && title != null) 1 else 0
+    val titleScrolls = scrollsTopBar || scrollsTitle
+    val headerCount = if (title != null && titleScrolls) 1 else 0
     val gridModifier = if (scrollsTopBar) Modifier.scrollAwayTopBar() else Modifier
 
     Column(modifier = modifier) {
-        if (title != null && !scrollsTopBar) {
+        if (title != null && !titleScrolls) {
             Text(
                 text = title,
                 style = MaterialTheme.tvTypography.title2,
@@ -107,7 +109,7 @@ internal fun TvPodcastGridScaffold(
                     }
                 },
         ) {
-            if (scrollsTopBar && title != null) {
+            if (titleScrolls && title != null) {
                 item(span = { GridItemSpan(maxLineSpan) }) {
                     Text(
                         text = title,
