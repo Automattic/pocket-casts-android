@@ -44,7 +44,7 @@ fun TvEpisodeActionsModal(
             episode = episode,
             actionContext = actionContext,
             actions = actions,
-            onDismissRequest = onDismissRequest,
+            onDismissRequest = { dismiss() },
             onShowEpisodeDetails = onShowEpisodeDetails,
             onGoToPodcast = onGoToPodcast,
         )

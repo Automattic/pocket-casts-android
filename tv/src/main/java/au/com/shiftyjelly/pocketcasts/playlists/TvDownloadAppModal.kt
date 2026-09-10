@@ -39,7 +39,7 @@ fun TvDownloadAppModal(
         width = 450.dp,
         modifier = modifier,
     ) {
-        TvDownloadAppModalContent(onDone = onDismissRequest)
+        TvDownloadAppModalContent(onDone = { dismiss() })
     }
 }
 
