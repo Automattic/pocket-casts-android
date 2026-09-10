@@ -47,6 +47,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.Button
+import androidx.tv.material3.ButtonDefaults
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
@@ -280,6 +281,7 @@ private fun PodcastInfo(
             Button(
                 onClick = onFollow,
                 colors = TvButtonDefaults.filledButtonColors(),
+                scale = ButtonDefaults.scale(focusedScale = 1f),
                 modifier = Modifier
                     .focusRequester(followFocusRequester)
                     .animateContentSize(),
@@ -289,6 +291,7 @@ private fun PodcastInfo(
             Button(
                 onClick = onMoreInfo,
                 colors = TvButtonDefaults.filledButtonColors(),
+                scale = ButtonDefaults.scale(focusedScale = 1f),
             ) {
                 Text(stringResource(LR.string.tv_podcast_more_info))
             }
