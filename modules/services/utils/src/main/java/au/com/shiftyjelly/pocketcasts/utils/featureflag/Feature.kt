@@ -369,6 +369,15 @@ enum class Feature(
         hasDevToggle = true,
         addedOn = LocalDate.parse("2026-09-04"),
     ),
+    VALIDATE_CONTENT_LENGTH(
+        key = "validate_content_length",
+        title = "Fail truncated media responses instead of treating them as end of stream",
+        defaultValue = true,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+        addedOn = LocalDate.parse("2026-09-07"),
+    ),
 }
 
 sealed class FeatureTier {
