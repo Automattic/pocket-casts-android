@@ -15,6 +15,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkArguments
+import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkPlaybackTimeResolver
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.search.BookmarkSearchHandler
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
@@ -43,6 +44,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -67,6 +69,7 @@ class BookmarksViewModel
     private val playbackManager: PlaybackManager,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val bookmarkSearchHandler: BookmarkSearchHandler,
+    private val bookmarkPlaybackTimeResolver: BookmarkPlaybackTimeResolver,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
@@ -81,7 +84,12 @@ class BookmarksViewModel
     private val _showBookmarkDetail = MutableSharedFlow<BookmarkDetailData>(extraBufferCapacity = 1)
     val showBookmarkDetail = _showBookmarkDetail.asSharedFlow()
 
+    private val _resolvingBookmarkUuid = MutableStateFlow<String?>(null)
+    val resolvingBookmarkUuid: StateFlow<String?> = _resolvingBookmarkUuid
+
     private var isFragmentActive: Boolean = true
+
+    private var playJob: Job? = null
 
     private var sourceView: SourceView = SourceView.UNKNOWN
         set(value) {
@@ -316,20 +324,37 @@ class BookmarksViewModel
     }
 
     fun play(bookmark: Bookmark) {
-        viewModelScope.launch {
-            val bookmarkEpisode = episodeManager.findEpisodeByUuid(bookmark.episodeUuid)
-            bookmarkEpisode?.let {
-                val shouldLoadOrSwitchEpisode = !playbackManager.isPlaying() ||
-                    playbackManager.getCurrentEpisode()?.uuid != bookmarkEpisode.uuid
-                if (shouldLoadOrSwitchEpisode) {
-                    playbackManager.playNowSync(it, sourceView = sourceView)
-                }
-            } ?: run {
+        playJob?.cancel()
+        playJob = viewModelScope.launch {
+            val bookmarkEpisode = episodeManager.findEpisodeByUuid(bookmark.episodeUuid) ?: run {
                 _message.emit(BookmarkMessage.BookmarkEpisodeNotFound)
                 return@launch
             }
+            val hasReferenceTime = bookmark.referenceTime != null
+            val isPlayingBookmarkEpisode = playbackManager.isPlaying() &&
+                playbackManager.getCurrentEpisode()?.uuid == bookmarkEpisode.uuid
+            if (hasReferenceTime && isPlayingBookmarkEpisode) {
+                playbackManager.pauseSuspend()
+            }
+            if (hasReferenceTime) {
+                _resolvingBookmarkUuid.value = bookmark.uuid
+            }
+            val seekToMs = try {
+                bookmarkPlaybackTimeResolver.playbackTimeMs(
+                    episode = bookmarkEpisode,
+                    referenceTimeSecs = bookmark.referenceTime,
+                    fallbackTimeSecs = bookmark.timeSecs,
+                )
+            } finally {
+                if (_resolvingBookmarkUuid.value == bookmark.uuid) {
+                    _resolvingBookmarkUuid.value = null
+                }
+            }
+            if (hasReferenceTime || !isPlayingBookmarkEpisode) {
+                playbackManager.playNowSync(bookmarkEpisode, sourceView = sourceView)
+            }
             _message.emit(BookmarkMessage.PlayingBookmark(bookmark.title))
-            playbackManager.seekToTimeMs(positionMs = bookmark.timeSecs * 1000)
+            playbackManager.seekToTimeMs(positionMs = seekToMs)
             eventHorizon.track(
                 BookmarkPlayTappedEvent(
                     source = sourceView.analyticsValue,
