@@ -40,6 +40,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
@@ -314,6 +315,7 @@ private fun TvSearchContent(
 ) {
     val searchFieldFocusRequester = remember { FocusRequester() }
     val dropdownFocusRequester = remember { FocusRequester() }
+    val filtersFocusRequester = remember { FocusRequester() }
     var isEditing by remember { mutableStateOf(false) }
     var searchFieldFocused by remember { mutableStateOf(false) }
     var suggestionsFocused by remember { mutableStateOf(false) }
@@ -387,21 +389,34 @@ private fun TvSearchContent(
         val effectiveFilter = if (filter in filters) filter else TvSearchFilter.TopResults
 
         if (searchState !is TvSearchState.Idle) {
-            TvSearchFilters(
-                selected = effectiveFilter,
-                onFilterSelect = onFilterSelect,
-                filters = filters,
-                modifier = Modifier.padding(ContentPadding),
-                upFocusRequester = searchFieldFocusRequester,
-            )
-            Spacer(modifier = Modifier.height(18.dp))
+            Column(modifier = Modifier.collapseWithTopBar()) {
+                TvSearchFilters(
+                    selected = effectiveFilter,
+                    onFilterSelect = onFilterSelect,
+                    filters = filters,
+                    modifier = Modifier
+                        .padding(ContentPadding)
+                        .focusRequester(filtersFocusRequester)
+                        .focusGroup(),
+                    upFocusRequester = searchFieldFocusRequester,
+                )
+                Spacer(modifier = Modifier.height(18.dp))
+            }
         }
 
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
-                .onFocusChanged { resultsFocused = it.hasFocus },
+                .onFocusChanged { resultsFocused = it.hasFocus }
+                .focusProperties {
+                    onExit = {
+                        if (requestedFocusDirection == FocusDirection.Up) {
+                            filtersFocusRequester.requestFocus()
+                        }
+                    }
+                }
+                .focusGroup(),
         ) {
             when (searchState) {
                 is TvSearchState.Idle -> TvSearchIdle(
