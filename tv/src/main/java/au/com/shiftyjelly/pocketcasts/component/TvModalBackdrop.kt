@@ -59,6 +59,6 @@ fun TvModalBackdrop(
     }
 }
 
-internal const val TvModalAnimationDurationMillis = 200
+internal val TvModalAnimationDurationMillis = 200
 private val ModalBlurRadius = 30.dp
-private const val ModalScrimAlpha = 0.4f
+private val ModalScrimAlpha = 0.4f

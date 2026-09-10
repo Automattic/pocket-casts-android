@@ -99,7 +99,8 @@ fun TvModal(
 private class TvModalScopeImpl(
     columnScope: ColumnScope,
     private val onDismiss: () -> Unit,
-) : TvModalScope, ColumnScope by columnScope {
+) : TvModalScope,
+    ColumnScope by columnScope {
     override fun dismiss() = onDismiss()
 }
 
