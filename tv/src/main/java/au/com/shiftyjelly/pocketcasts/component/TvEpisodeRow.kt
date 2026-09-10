@@ -54,14 +54,12 @@ val LocalUseEpisodeArtwork = staticCompositionLocalOf { false }
 fun TvEpisodeRow(
     episode: PodcastEpisode,
     onClick: () -> Unit,
+    onLongClick: (() -> Unit)? = null,
     dateFormatter: RelativeDateFormatter,
     modifier: Modifier = Modifier,
-    onLongClick: (() -> Unit)? = null,
-    contentEndPadding: Dp = 0.dp,
-    interactionSource: MutableInteractionSource? = null,
 ) {
-    val resolvedInteractionSource = interactionSource ?: remember { MutableInteractionSource() }
-    val isFocused by resolvedInteractionSource.collectIsFocusedAsState()
+    val interactionSource = remember { MutableInteractionSource() }
+    val isFocused by interactionSource.collectIsFocusedAsState()
     val titleColor = if (isFocused) MaterialTheme.tvColors.textPrimaryActive else MaterialTheme.tvColors.textPrimary
     val captionColor = if (isFocused) {
         MaterialTheme.tvColors.textSecondaryActive
@@ -78,7 +76,7 @@ fun TvEpisodeRow(
             containerColor = MaterialTheme.tvColors.backgroundBase,
             focusedContainerColor = MaterialTheme.tvColors.backgroundActive,
         ),
-        interactionSource = resolvedInteractionSource,
+        interactionSource = interactionSource,
         modifier = modifier.alpha(if (episode.isArchived && !isFocused) 0.3f else 1f),
     ) {
         Row(
@@ -86,7 +84,7 @@ fun TvEpisodeRow(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 16.dp, top = 16.dp, end = 16.dp + contentEndPadding, bottom = 16.dp),
+                .padding(16.dp),
         ) {
             EpisodeArtwork(episode = episode)
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {

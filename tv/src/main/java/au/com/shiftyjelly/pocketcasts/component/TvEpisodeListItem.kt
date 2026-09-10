@@ -4,9 +4,8 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -21,14 +20,9 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
-import androidx.tv.material3.MaterialTheme
 import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.theme.TvButtonDefaults
-import au.com.shiftyjelly.pocketcasts.theme.tvColors
 
 @Composable
 fun TvEpisodeListItem(
@@ -40,40 +34,38 @@ fun TvEpisodeListItem(
     episodeFocusRequester: FocusRequester? = null,
     leftFocusRequester: FocusRequester? = null,
 ) {
-    val rowInteractionSource = remember { MutableInteractionSource() }
-    val isRowFocused by rowInteractionSource.collectIsFocusedAsState()
-    var isMoreButtonFocused by remember { mutableStateOf(false) }
-    val moreButtonFocusRequester = remember { FocusRequester() }
-    val showMoreButton = isRowFocused || isMoreButtonFocused
-    Box(modifier = modifier.fillMaxWidth()) {
+    TvEpisodeListItemContainer(
+        onOpenActions = onOpenActions,
+        modifier = modifier,
+    ) { rowModifier ->
         TvEpisodeRow(
             episode = episode,
             onClick = onClick,
             dateFormatter = dateFormatter,
-            contentEndPadding = MoreButtonReservedWidth,
-            interactionSource = rowInteractionSource,
-            modifier = Modifier
-                .fillMaxWidth()
-                .focusProperties {
-                    if (showMoreButton) {
-                        right = moreButtonFocusRequester
-                    }
-                    if (leftFocusRequester != null) {
-                        left = leftFocusRequester
-                    }
-                }
+            modifier = rowModifier
+                .then(if (leftFocusRequester != null) Modifier.focusProperties { left = leftFocusRequester } else Modifier)
                 .then(if (episodeFocusRequester != null) Modifier.focusRequester(episodeFocusRequester) else Modifier),
         )
+    }
+}
+
+@Composable
+fun TvEpisodeListItemContainer(
+    onOpenActions: () -> Unit,
+    modifier: Modifier = Modifier,
+    content: @Composable (Modifier) -> Unit,
+) {
+    var isItemFocused by remember { mutableStateOf(false) }
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier
+            .fillMaxWidth()
+            .onFocusChanged { isItemFocused = it.hasFocus },
+    ) {
+        content(Modifier.weight(1f))
         MoreButtonSlot(
-            visible = showMoreButton,
+            visible = isItemFocused,
             onClick = onOpenActions,
-            modifier = Modifier
-                .align(Alignment.CenterEnd)
-                .zIndex(1f)
-                .padding(end = MoreButtonEndInset)
-                .onFocusChanged { isMoreButtonFocused = it.hasFocus }
-                .then(if (episodeFocusRequester != null) Modifier.focusProperties { left = episodeFocusRequester } else Modifier)
-                .focusRequester(moreButtonFocusRequester),
         )
     }
 }
@@ -82,28 +74,21 @@ fun TvEpisodeListItem(
 private fun MoreButtonSlot(
     visible: Boolean,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier,
 ) {
     Box(
         contentAlignment = Alignment.Center,
-        modifier = modifier.size(TvMoreButtonSize),
+        modifier = Modifier
+            .padding(start = 12.dp)
+            .size(TvMoreButtonSize),
     ) {
         AnimatedVisibility(
             visible = visible,
             enter = fadeIn(tween(MORE_BUTTON_ANIMATION_DURATION_MS)),
             exit = fadeOut(tween(MORE_BUTTON_ANIMATION_DURATION_MS)),
         ) {
-            TvMoreButton(
-                onClick = onClick,
-                colors = TvButtonDefaults.iconButtonColors(
-                    containerColor = Color.Transparent,
-                    contentColor = MaterialTheme.tvColors.textPrimaryActive,
-                ),
-            )
+            TvMoreButton(onClick = onClick)
         }
     }
 }
 
 private const val MORE_BUTTON_ANIMATION_DURATION_MS = 200
-private val MoreButtonEndInset = 16.dp
-private val MoreButtonReservedWidth = TvMoreButtonSize + 16.dp
