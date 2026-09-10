@@ -263,6 +263,8 @@ private fun PodcastInfo(
                 text = podcast.title,
                 style = MaterialTheme.tvTypography.title2,
                 color = MaterialTheme.tvColors.textPrimary,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
             )
             if (podcast.podcastDescription.isNotBlank()) {
                 Text(
