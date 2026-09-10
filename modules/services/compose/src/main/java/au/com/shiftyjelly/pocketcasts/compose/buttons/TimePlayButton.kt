@@ -62,7 +62,8 @@ fun TimePlayButton(
     val description = stringResource(contentDescriptionId, timeText)
 
     OutlinedButton(
-        onClick = { if (!isLoading) onClick() },
+        onClick = onClick,
+        enabled = !isLoading,
         border = BorderStroke(2.dp, colors.border),
         colors = ButtonDefaults.outlinedButtonColors(
             backgroundColor = Color.Transparent,

@@ -42,9 +42,11 @@ import com.automattic.eventhorizon.BookmarksSortByChangedEvent
 import com.automattic.eventhorizon.EventHorizon
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -56,6 +58,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @HiltViewModel
 class BookmarksViewModel
@@ -333,7 +336,8 @@ class BookmarksViewModel
             val hasReferenceTime = bookmark.referenceTime != null
             val isPlayingBookmarkEpisode = playbackManager.isPlaying() &&
                 playbackManager.getCurrentEpisode()?.uuid == bookmarkEpisode.uuid
-            if (hasReferenceTime && isPlayingBookmarkEpisode) {
+            val pausedForResolve = hasReferenceTime && isPlayingBookmarkEpisode
+            if (pausedForResolve) {
                 playbackManager.pauseSuspend()
             }
             if (hasReferenceTime) {
@@ -345,6 +349,13 @@ class BookmarksViewModel
                     referenceTimeSecs = bookmark.referenceTime,
                     fallbackTimeSecs = bookmark.timeSecs,
                 )
+            } catch (e: CancellationException) {
+                if (pausedForResolve) {
+                    withContext(NonCancellable) {
+                        playbackManager.playNowSync(bookmarkEpisode, sourceView = sourceView)
+                    }
+                }
+                throw e
             } finally {
                 if (_resolvingBookmarkUuid.value == bookmark.uuid) {
                     _resolvingBookmarkUuid.value = null

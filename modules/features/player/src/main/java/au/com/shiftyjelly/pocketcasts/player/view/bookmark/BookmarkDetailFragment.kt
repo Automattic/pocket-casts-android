@@ -21,8 +21,11 @@ import com.automattic.eventhorizon.BookmarkPlayTappedEvent
 import com.automattic.eventhorizon.EventHorizon
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -136,10 +139,10 @@ class BookmarkDetailFragment : BaseDialogFragment() {
                 return@launch
             }
             val hasReferenceTime = args.referenceTime != null
-            if (hasReferenceTime &&
+            val pausedForResolve = hasReferenceTime &&
                 playbackManager.isPlaying() &&
                 playbackManager.getCurrentEpisode()?.uuid == args.episodeUuid
-            ) {
+            if (pausedForResolve) {
                 playbackManager.pauseSuspend()
             }
             if (hasReferenceTime) {
@@ -151,6 +154,13 @@ class BookmarkDetailFragment : BaseDialogFragment() {
                     referenceTimeSecs = args.referenceTime,
                     fallbackTimeSecs = args.timeSecs,
                 )
+            } catch (e: CancellationException) {
+                if (pausedForResolve) {
+                    withContext(NonCancellable) {
+                        playbackManager.playNowSuspend(episode, sourceView = args.sourceView)
+                    }
+                }
+                throw e
             } finally {
                 isResolving.value = false
             }
