@@ -211,9 +211,9 @@ abstract class BookmarkDao {
 
     @Query(
         """UPDATE bookmarks SET
-            title = COALESCE(:title, title),
-            clean_title = COALESCE(:cleanTitle, clean_title),
-            title_modified = CASE WHEN :title IS NOT NULL THEN :titleModified ELSE title_modified END,
+            title = CASE WHEN :title IS NOT NULL AND (title_modified IS NULL OR title_modified <= created_at) THEN :title ELSE title END,
+            clean_title = CASE WHEN :title IS NOT NULL AND (title_modified IS NULL OR title_modified <= created_at) THEN :cleanTitle ELSE clean_title END,
+            title_modified = CASE WHEN :title IS NOT NULL AND (title_modified IS NULL OR title_modified <= created_at) THEN :titleModified ELSE title_modified END,
             passage = :passage,
             passage_location = :passageLocation,
             passage_modified = :passageModified,

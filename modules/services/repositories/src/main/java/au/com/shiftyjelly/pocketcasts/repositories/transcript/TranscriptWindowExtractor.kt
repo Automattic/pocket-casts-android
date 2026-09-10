@@ -108,7 +108,7 @@ class TranscriptWindowExtractor @Inject constructor(
             val passage = inWindow.joinToString(" ") { it.value.trim() }.trim()
             if (passage.split("\\s+".toRegex()).size < MIN_WORDS) return null
 
-            val firstIndex = texts.indexOf(inWindow.first())
+            val firstIndex = texts.indexOfFirst { it === inWindow.first() }
             val location = texts.take(firstIndex).sumOf { it.value.trim().length + 1 }
             return TranscriptWindow(passage = passage, location = location, referenceTimeSecs = centerSecs)
         }
