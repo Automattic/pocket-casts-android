@@ -58,10 +58,8 @@ fun TvModal(
     val currentOnDismissRequest by rememberUpdatedState(onDismissRequest)
     val backdrop = LocalTvModalBackdrop.current
     val backdropKey = remember { Any() }
-    LaunchedEffect(visible) {
+    DisposableEffect(visible) {
         backdrop.setActive(backdropKey, visible)
-    }
-    DisposableEffect(Unit) {
         onDispose { backdrop.setActive(backdropKey, false) }
     }
     Dialog(

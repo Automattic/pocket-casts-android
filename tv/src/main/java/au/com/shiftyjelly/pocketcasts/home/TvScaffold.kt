@@ -172,33 +172,24 @@ fun TvScaffold(
             LaunchedEffect(Unit) {
                 viewModel.trackProfileShown()
             }
+            var pendingProfileAction by remember { mutableStateOf<(() -> Unit)?>(null) }
             TvProfileModal(
                 profile = uiState.profile,
-                onDismissRequest = { isProfileModalVisible = false },
-                onLogIn = {
+                onDismissRequest = {
                     isProfileModalVisible = false
-                    onLogIn()
+                    pendingProfileAction?.invoke()
+                    pendingProfileAction = null
                 },
-                onCreateAccount = {
-                    isProfileModalVisible = false
-                    onCreateAccount()
-                },
-                onStarredEpisodes = {
-                    isProfileModalVisible = false
-                    isStarredVisible = true
-                },
-                onListeningHistory = {
-                    isProfileModalVisible = false
-                    isListeningHistoryVisible = true
-                },
-                onSettings = {
-                    isProfileModalVisible = false
-                    isSettingsModalVisible = true
-                },
+                onLogIn = { pendingProfileAction = onLogIn },
+                onCreateAccount = { pendingProfileAction = onCreateAccount },
+                onStarredEpisodes = { isStarredVisible = true },
+                onListeningHistory = { isListeningHistoryVisible = true },
+                onSettings = { isSettingsModalVisible = true },
                 onLogOut = {
-                    isProfileModalVisible = false
-                    viewModel.signOut()
-                    onSignedOut()
+                    pendingProfileAction = {
+                        viewModel.signOut()
+                        onSignedOut()
+                    }
                 },
             )
         }

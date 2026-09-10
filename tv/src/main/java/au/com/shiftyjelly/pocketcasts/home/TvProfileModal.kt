@@ -56,12 +56,30 @@ fun TvProfileModal(
     ) {
         TvProfileModalContent(
             profile = profile,
-            onLogIn = onLogIn,
-            onCreateAccount = onCreateAccount,
-            onStarredEpisodes = onStarredEpisodes,
-            onListeningHistory = onListeningHistory,
-            onSettings = onSettings,
-            onLogOut = onLogOut,
+            onLogIn = {
+                dismiss()
+                onLogIn()
+            },
+            onCreateAccount = {
+                dismiss()
+                onCreateAccount()
+            },
+            onStarredEpisodes = {
+                dismiss()
+                onStarredEpisodes()
+            },
+            onListeningHistory = {
+                dismiss()
+                onListeningHistory()
+            },
+            onSettings = {
+                dismiss()
+                onSettings()
+            },
+            onLogOut = {
+                dismiss()
+                onLogOut()
+            },
         )
     }
 }

@@ -1,8 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.component
 
+import android.os.Build
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -11,8 +11,12 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateSetOf
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.blur
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.BlurEffect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.TileMode
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 
 @Stable
@@ -43,19 +47,26 @@ fun TvModalBackdrop(
         animationSpec = tween(TvModalAnimationDurationMillis),
         label = "TvModalBackdrop",
     )
-    Box(modifier.fillMaxSize()) {
-        Box(
-            modifier = if (progress > 0f) Modifier.blur(ModalBlurRadius * progress) else Modifier,
-        ) {
-            content()
-        }
-        if (progress > 0f) {
-            Box(
-                modifier = Modifier
-                    .matchParentSize()
-                    .background(Color.Black.copy(alpha = ModalScrimAlpha * progress)),
-            )
-        }
+    val blurRadiusPx = with(LocalDensity.current) { ModalBlurRadius.toPx() }
+    Box(
+        modifier
+            .fillMaxSize()
+            .drawWithContent {
+                drawContent()
+                if (progress > 0f) {
+                    drawRect(Color.Black, alpha = ModalScrimAlpha * progress)
+                }
+            }
+            .graphicsLayer {
+                renderEffect = if (progress > 0f && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    val radius = blurRadiusPx * progress
+                    BlurEffect(radius, radius, TileMode.Clamp)
+                } else {
+                    null
+                }
+            },
+    ) {
+        content()
     }
 }
 
