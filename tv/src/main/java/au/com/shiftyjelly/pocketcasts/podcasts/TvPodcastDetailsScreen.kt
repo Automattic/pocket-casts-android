@@ -445,7 +445,7 @@ private fun AllEpisodesArchived(
 }
 
 private const val INFO_PANE_WEIGHT = 0.35f
-private val DetailsTopPadding = 56.dp
+private val DetailsTopPadding = 12.dp
 private val CoverGlowSize = 460.dp
 private val CoverGlowOffset = (-140).dp
 private val CoverGlowBlurRadius = 80.dp
