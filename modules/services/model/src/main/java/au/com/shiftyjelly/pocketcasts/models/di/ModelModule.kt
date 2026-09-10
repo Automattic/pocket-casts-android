@@ -3,8 +3,11 @@ package au.com.shiftyjelly.pocketcasts.models.di
 import android.app.Application
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import au.com.shiftyjelly.pocketcasts.models.converter.AlternateEnclosureSourcesConverter
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
+import au.com.shiftyjelly.pocketcasts.models.db.CorruptionHandlingOpenHelperFactory
+import au.com.shiftyjelly.pocketcasts.models.db.DatabaseCorruptionReporter
 import au.com.shiftyjelly.pocketcasts.models.db.dao.AlternateEnclosureDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.ChapterDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.EndOfYearDao
@@ -21,6 +24,7 @@ import au.com.shiftyjelly.pocketcasts.models.db.dao.UserCategoryVisitsDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UserNotificationsDao
 import au.com.shiftyjelly.pocketcasts.models.entity.AnonymousBumpStat
 import com.squareup.moshi.Moshi
+import dagger.Lazy
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -45,8 +49,12 @@ object ModelModule {
     fun providesAppDatabase(
         application: Application,
         @RoomConverters converters: List<@JvmSuppressWildcards Any>,
+        databaseCorruptionReporter: Lazy<DatabaseCorruptionReporter>,
     ): AppDatabase {
         return Room.databaseBuilder(application, AppDatabase::class.java, "pocketcasts")
+            .openHelperFactory(
+                CorruptionHandlingOpenHelperFactory(FrameworkSQLiteOpenHelperFactory()) { databaseCorruptionReporter.get() },
+            )
             .also { builder -> AppDatabase.addMigrations(builder, application) }
             .addTypeConverters(converters)
             .build()

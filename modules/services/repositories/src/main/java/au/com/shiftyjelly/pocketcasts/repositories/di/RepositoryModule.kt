@@ -6,6 +6,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AccountStatusInfo
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsListener
 import au.com.shiftyjelly.pocketcasts.crashlogging.CrashReportPermissionCheck
 import au.com.shiftyjelly.pocketcasts.crashlogging.ObserveUser
+import au.com.shiftyjelly.pocketcasts.models.db.DatabaseCorruptionReporter
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptType
 import au.com.shiftyjelly.pocketcasts.payment.PurchaseApprover
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -22,6 +23,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatManager
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManagerImpl
+import au.com.shiftyjelly.pocketcasts.repositories.database.DatabaseCorruptionReporterImpl
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadQueue
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadStatusObserver
@@ -114,6 +116,10 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun provideWorkerFactory(castsWorkerFactory: CastsWorkerFactory): WorkerFactory
+
+    @Binds
+    @Singleton
+    abstract fun bindDatabaseCorruptionReporter(impl: DatabaseCorruptionReporterImpl): DatabaseCorruptionReporter
 
     @Binds
     @Singleton

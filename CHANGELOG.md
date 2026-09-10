@@ -4,6 +4,8 @@
     *   Browse podcast networks from Discover, search and the podcast page
         ([#5865](https://github.com/Automattic/pocket-casts-android/pull/5865))
 *   Bug Fixes
+    *   Preserve and report a corrupt local database instead of silently recreating it empty and losing the library
+        ([#5878](https://github.com/Automattic/pocket-casts-android/pull/5878))
     *   Keep the multi-select episode selection when rotating the device on the podcast screen
         ([#5836](https://github.com/Automattic/pocket-casts-android/pull/5836))
     *   Prevent the app from being killed in the background on low-memory devices by pausing player UI updates while playing
