@@ -6,8 +6,6 @@ import au.com.shiftyjelly.pocketcasts.preferences.AccountConstants
 import au.com.shiftyjelly.pocketcasts.preferences.RefreshToken
 import au.com.shiftyjelly.pocketcasts.servers.sync.LoginIdentity
 import au.com.shiftyjelly.pocketcasts.servers.sync.TokenHandler
-import au.com.shiftyjelly.pocketcasts.utils.Optional
-import io.reactivex.Flowable
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -20,7 +18,6 @@ interface SyncAccountManager : TokenHandler {
     fun getAccount(): Account?
     fun getEmail(): String?
     fun emailFlow(): Flow<String?>
-    fun emailFlowable(): Flowable<Optional<String>>
     fun getLoginIdentity(): LoginIdentity?
     fun getRefreshToken(account: Account? = null): RefreshToken?
     fun getSignInType(account: Account): AccountConstants.SignInType

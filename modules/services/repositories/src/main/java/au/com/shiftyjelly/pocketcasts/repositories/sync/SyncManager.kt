@@ -26,7 +26,6 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.UserChangeResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.DeviceAuthorizeResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.ExchangeSonosResponse
-import au.com.shiftyjelly.pocketcasts.utils.Optional
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.pocketcasts.service.api.BookmarksResponse
 import com.pocketcasts.service.api.EpisodesResponse
@@ -45,7 +44,6 @@ import com.pocketcasts.service.api.UserPodcastListResponse
 import com.pocketcasts.service.api.WebFeedCreateResponse
 import com.pocketcasts.service.api.WinbackResponse
 import io.reactivex.Completable
-import io.reactivex.Flowable
 import io.reactivex.Maybe
 import io.reactivex.Single
 import java.io.File
@@ -62,7 +60,6 @@ interface SyncManager : NamedSettingsCaller {
     fun getLoginIdentity(): LoginIdentity?
     fun getEmail(): String?
     fun emailFlow(): Flow<String?>
-    fun emailFlowable(): Flowable<Optional<String>>
     suspend fun signOut(action: suspend () -> Unit = {})
     suspend fun loginWithGoogle(idToken: String, signInSource: SignInSource): LoginResult
     suspend fun loginWithEmailAndPassword(email: String, password: String, signInSource: SignInSource): LoginResult
