@@ -22,6 +22,6 @@ data class TvColorScheme(
     val backgroundActive50: Color = backgroundActive.copy(alpha = 0.5f),
     val backgroundActive20: Color = backgroundActive.copy(alpha = 0.2f),
     val overlayContainer: Color = backgroundSunken.copy(alpha = 0.94f),
-    val translucentOverlayContainer: Color = backgroundSunken.copy(alpha = 0.6f),
+    val translucentOverlayContainer: Color = Color.Black.copy(alpha = 0.8f),
     val overlayBorder: Color = backgroundActive.copy(alpha = 0.12f),
 )
