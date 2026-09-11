@@ -77,7 +77,8 @@ interface UserEpisodeManager {
     fun removeFromCloud(userEpisode: UserEpisode)
     fun cancelUpload(userEpisode: UserEpisode)
     suspend fun syncFiles(playbackManager: PlaybackManager)
-    fun getPlaybackUrlRxSingle(userEpisode: UserEpisode): Single<String>
+    fun getPlaybackUrl(userEpisode: UserEpisode): String
+    suspend fun getSignedPlaybackUrl(userEpisode: UserEpisode): String
     fun downloadUserEpisodesRxFlowable(): Flowable<List<UserEpisode>>
     suspend fun updateDownloadedFilePath(episode: UserEpisode, filePath: String)
     suspend fun updateFileType(episode: UserEpisode, fileType: String)
@@ -518,9 +519,9 @@ class UserEpisodeManagerImpl @Inject constructor(
         update(userEpisode)
     }
 
-    override fun getPlaybackUrlRxSingle(userEpisode: UserEpisode): Single<String> {
-        return syncManager.getPlaybackUrlRxSingle(userEpisode)
-    }
+    override fun getPlaybackUrl(userEpisode: UserEpisode) = syncManager.getPlaybackUrl(userEpisode)
+
+    override suspend fun getSignedPlaybackUrl(userEpisode: UserEpisode) = syncManager.getSignedPlaybackUrl(userEpisode)
 
     override suspend fun updateEpisodeStatus(episode: UserEpisode, status: EpisodeDownloadStatus) {
         userEpisodeDao.updateEpisodeStatusBlocking(episode.uuid, status)

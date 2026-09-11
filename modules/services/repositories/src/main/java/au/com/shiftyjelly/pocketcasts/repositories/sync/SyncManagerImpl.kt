@@ -371,8 +371,10 @@ class SyncManagerImpl @Inject constructor(
         syncServiceManager.deleteFromServer(episode, token)
     }
 
-    override fun getPlaybackUrlRxSingle(episode: UserEpisode): Single<String> = getCacheTokenOrLoginRxSingle { token ->
-        syncServiceManager.getPlaybackUrl(episode, token)
+    override fun getPlaybackUrl(episode: UserEpisode): String = syncServiceManager.getPlaybackUrl(episode)
+
+    override suspend fun getSignedPlaybackUrl(episode: UserEpisode): String = getCacheTokenOrLogin { token ->
+        syncServiceManager.getSignedPlaybackUrl(episode, token)
     }
 
     override fun getUserEpisodeRxMaybe(uuid: String): Maybe<ServerFile> = if (settings.cachedMembership.value.subscription != null) {

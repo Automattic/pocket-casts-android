@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.type.UserEpisodeServerStatus
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.getArtworkUrl
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.stats.PlaybackStatsCollector
 import com.google.android.gms.cast.MediaInfo
 import com.google.android.gms.cast.MediaLoadOptions
@@ -23,6 +24,7 @@ import com.google.android.gms.cast.framework.CastSession
 import com.google.android.gms.cast.framework.SessionManager
 import com.google.android.gms.cast.framework.media.RemoteMediaClient
 import com.google.android.gms.common.images.WebImage
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONException
@@ -31,6 +33,7 @@ import timber.log.Timber
 
 class CastPlayer(
     private val playbackStatsCollector: PlaybackStatsCollector,
+    private val userEpisodeManager: UserEpisodeManager,
     override val onPlayerEvent: (Player, PlayerEvent) -> Unit,
 ) : Player {
 
@@ -252,7 +255,7 @@ class CastPlayer(
         remoteMediaClient?.registerCallback(playPauseCallback)
     }
 
-    private fun loadEpisode(episodeUuid: String, currentPositionMs: Int, autoPlay: Boolean) {
+    private suspend fun loadEpisode(episodeUuid: String, currentPositionMs: Int, autoPlay: Boolean) {
         if (episodeUuid == remoteEpisodeUuid && autoPlay) {
             remoteMediaClient?.play()
             return
@@ -268,7 +271,20 @@ class CastPlayer(
             onPlayerEvent(this, PlayerEvent.PlayerError("Unable to cast local file"))
             return
         }
-        val mediaInfo = buildMediaInfo(url, episode, podcast)
+        // A cast device fetches the file itself and cannot send our auth header, so it needs a signed URL.
+        val castUrl = if (episode is UserEpisode) {
+            try {
+                withContext(Dispatchers.IO) { userEpisodeManager.getSignedPlaybackUrl(episode) }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                onPlayerEvent(this, PlayerEvent.PlayerError("Could not load cloud file ${e.message}"))
+                return
+            }
+        } else {
+            url
+        }
+        val mediaInfo = buildMediaInfo(castUrl, episode, podcast)
         val loadOptions = MediaLoadOptions.Builder()
             .setAutoplay(autoPlay)
             .setPlaybackRate(calcPlaybackSpeed())

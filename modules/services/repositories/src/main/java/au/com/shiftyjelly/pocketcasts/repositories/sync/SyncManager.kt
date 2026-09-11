@@ -96,7 +96,8 @@ interface SyncManager : NamedSettingsCaller {
     fun getFileUsageRxSingle(): Single<FileAccount>
     fun deleteImageFromServerRxSingle(episode: UserEpisode): Single<Response<Void>>
     fun deleteFromServerRxSingle(episode: UserEpisode): Single<Response<Void>>
-    fun getPlaybackUrlRxSingle(episode: UserEpisode): Single<String>
+    fun getPlaybackUrl(episode: UserEpisode): String
+    suspend fun getSignedPlaybackUrl(episode: UserEpisode): String
 
     // History
     fun historySyncRxSingle(request: HistorySyncRequest): Single<HistorySyncResponse>
