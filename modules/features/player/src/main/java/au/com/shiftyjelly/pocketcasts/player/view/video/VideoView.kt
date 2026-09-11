@@ -14,6 +14,7 @@ import androidx.media3.common.util.UnstableApi
 import au.com.shiftyjelly.pocketcasts.player.databinding.VideoViewBinding
 import au.com.shiftyjelly.pocketcasts.repositories.playback.Player
 import au.com.shiftyjelly.pocketcasts.repositories.playback.SimplePlayer
+import au.com.shiftyjelly.pocketcasts.repositories.playback.VideoSurfaceState
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 
 @OptIn(UnstableApi::class)
@@ -25,6 +26,7 @@ class VideoView @JvmOverloads constructor(
     SurfaceHolder.Callback,
     SimplePlayer.VideoChangedListener {
     var player: Player? = null
+    var videoSurfaceStateProvider: (() -> VideoSurfaceState)? = null
     private var isSurfaceCreated = false
     private var isSurfaceConnectionPending = false
     private var isSurfaceConnected = false
@@ -99,12 +101,17 @@ class VideoView @JvmOverloads constructor(
 
         // A backgrounded host must not steal the video output from the fullscreen player.
         val lifecycleState = findViewTreeLifecycleOwner()?.lifecycle?.currentState
-        if (lifecycleState != null && !lifecycleState.isAtLeast(Lifecycle.State.RESUMED)) {
+        if (lifecycleState != null && !lifecycleState.isAtLeast(Lifecycle.State.STARTED)) {
+            return
+        }
+
+        // The fullscreen or PiP player owns the surface while it lives, so don't claim it here.
+        if ((videoSurfaceStateProvider?.invoke() ?: VideoSurfaceState.NONE) != VideoSurfaceState.NONE) {
             return
         }
 
         val player = this.player as? SimplePlayer
-        if (player == null || !player.supportsVideo() || player.isRemote || player.isPip) {
+        if (player == null || !player.supportsVideo() || player.isRemote) {
             return
         }
 

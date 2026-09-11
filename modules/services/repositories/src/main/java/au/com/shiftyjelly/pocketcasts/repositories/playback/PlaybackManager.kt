@@ -268,6 +268,13 @@ open class PlaybackManager @Inject constructor(
     private val _playerFlow = MutableStateFlow<Player?>(null)
     val playerFlow = _playerFlow.asStateFlow()
 
+    private val _videoSurfaceState = MutableStateFlow(VideoSurfaceState.NONE)
+    val videoSurfaceState = _videoSurfaceState.asStateFlow()
+
+    fun setVideoSurfaceState(state: VideoSurfaceState) {
+        _videoSurfaceState.value = state
+    }
+
     // HLS starts Unknown until the player's tracks resolve it to HasVideo or AudioOnly; the video
     // surface is shown only once HasVideo is known.
     private val _streamVideoState = MutableStateFlow(StreamVideoState.NotVideo)

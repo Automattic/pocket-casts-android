@@ -99,7 +99,7 @@ private class TvVideoView(
         }
 
         val player = this.player as? SimplePlayer
-        if (player == null || !player.supportsVideo() || player.isRemote || player.isPip) {
+        if (player == null || !player.supportsVideo() || player.isRemote) {
             return
         }
 
