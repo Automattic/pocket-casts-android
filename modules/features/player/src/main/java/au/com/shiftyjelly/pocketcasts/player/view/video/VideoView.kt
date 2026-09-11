@@ -44,7 +44,7 @@ class VideoView @JvmOverloads constructor(
         super.setVisibility(visibility)
         if (visibility == GONE) {
             isSurfaceConnected = false
-            (player as? SimplePlayer)?.setDisplay(null)
+            (player as? SimplePlayer)?.clearDisplay(binding.surfaceView)
         }
     }
 
@@ -66,7 +66,7 @@ class VideoView @JvmOverloads constructor(
 
     /** Detach the surface from the player so no frozen frame lingers once video is no longer shown. */
     fun releaseSurface() {
-        (player as? SimplePlayer)?.setDisplay(null)
+        (player as? SimplePlayer)?.clearDisplay(binding.surfaceView)
         isSurfaceConnected = false
         isSurfaceConnectionPending = false
     }

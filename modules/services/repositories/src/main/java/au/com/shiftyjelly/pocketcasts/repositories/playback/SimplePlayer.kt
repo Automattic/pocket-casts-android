@@ -418,7 +418,7 @@ class SimplePlayer(
         )
     }
 
-    fun setDisplay(surfaceView: SurfaceView?): Boolean {
+    fun setDisplay(surfaceView: SurfaceView): Boolean {
         val player = player
         if (player == null) {
             pendingSurface = surfaceView
@@ -427,11 +427,27 @@ class SimplePlayer(
         pendingSurface = null
 
         return try {
-            player.setVideoSurfaceHolder(surfaceView?.holder)
+            player.setVideoSurfaceHolder(surfaceView.holder)
             true
         } catch (e: Exception) {
             Timber.e(e)
             false
+        }
+    }
+
+    fun clearDisplay(surfaceView: SurfaceView) {
+        val player = player
+        if (player == null) {
+            if (pendingSurface == surfaceView) {
+                pendingSurface = null
+            }
+            return
+        }
+
+        try {
+            player.clearVideoSurfaceHolder(surfaceView.holder)
+        } catch (e: Exception) {
+            Timber.e(e)
         }
     }
 

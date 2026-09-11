@@ -68,7 +68,7 @@ private class TvVideoView(
     }
 
     fun releaseSurface() {
-        (player as? SimplePlayer)?.setDisplay(null)
+        (player as? SimplePlayer)?.clearDisplay(surfaceView)
         isSurfaceConnected = false
         isSurfaceConnectionPending = false
     }
