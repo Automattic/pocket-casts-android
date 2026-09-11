@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require 'cgi'
+require 'json'
+
 default_platform(:android)
 fastlane_require 'dotenv'
 
@@ -693,6 +696,9 @@ platform :android do
     # Build wear/automotive/TV and upload to S3 (PRs only)
     next unless pr_number
 
+    # The comment action otherwise reuses the mobile build's Firebase URL and metadata for S3 builds.
+    lane_context.delete(SharedValues::FIREBASE_APP_DISTRO_RELEASE)
+
     UI.user_error!("'BUILDKITE_ARTIFACTS_S3_BUCKET' must be defined as an environment variable.") unless ENV['BUILDKITE_ARTIFACTS_S3_BUCKET']
 
     other_platforms = [APPS_WEAR, APPS_AUTOMOTIVE, APPS_TV]
@@ -729,7 +735,7 @@ platform :android do
         app_display_name: get_app_display_name(apk_path: apk_path),
         app_icon: ':amazon-s3:',
         download_url: install_url,
-        metadata: { 'Build Type': other_builds_type },
+        metadata: { 'Build Type': other_builds_type }.merge(apk_metadata_for_comment(apk_path: apk_path)),
         fold: true
       )
     end
@@ -755,6 +761,19 @@ platform :android do
   def get_app_display_name(apk_path:)
     key = get_app_key(apk_path: apk_path).to_sym
     { app: '📱 Mobile', wear: '⌚ Wear', automotive: '🚗 Automotive', tv: '📺 TV' }.fetch(key, '❔ Unknown')
+  end
+
+  def apk_metadata_for_comment(apk_path:)
+    metadata_path = File.join(File.dirname(apk_path), 'output-metadata.json')
+    metadata = JSON.parse(File.read(metadata_path))
+    apk_metadata = metadata.fetch('elements').find { |element| element['outputFile'] == File.basename(apk_path) }
+    UI.user_error!("No metadata for '#{File.basename(apk_path)}' in '#{metadata_path}'.") unless apk_metadata
+
+    {
+      'Build Number' => apk_metadata.fetch('versionCode'),
+      'Version' => apk_metadata.fetch('versionName'),
+      'Application ID' => metadata.fetch('applicationId')
+    }.transform_values { |value| "<code>#{CGI.escapeHTML(value.to_s)}</code>" }
   end
 
   # Mimics the subset of ActiveSupport's `String#parameterize` we rely on.
