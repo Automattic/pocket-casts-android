@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
@@ -132,7 +133,7 @@ private fun Header(
                         text = stringResource(LR.string.done),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
-                        color = playerColors.highlight01,
+                        color = playerColors.highlight01.copy(alpha = if (doneEnabled) 1f else ContentAlpha.disabled),
                     )
                 }
             } else {
