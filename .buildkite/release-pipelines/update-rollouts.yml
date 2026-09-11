@@ -3,21 +3,13 @@
 
 # This pipeline is meant to be triggered by the MC scenario in ReleasesV2
 
-# Expected variables passed to the pipeline by ReleasesV2: `TRACK`, `ROLLOUT_PERCENT`
+# Expected variables passed to the pipeline by ReleasesV2: `TRACK`, `ROLLOUT_PERCENT`, `RELEASE_VERSION`, `MILESTONE`
 
 priority: 1
 
 steps:
   - label: "🚂 Update Rollouts"
-    command: |
-      echo '--- :ruby: Setup Ruby Tools'
-      install_gems
-
-      echo '--- 🔐 Access Secrets'
-      bundle exec fastlane run configure_apply
-
-      echo '--- 🚀 Update Rollouts'
-      bundle exec fastlane update_rollouts track:"$TRACK" percent:"$ROLLOUT_PERCENT"
+    command: .buildkite/commands/update-rollouts.sh
     plugins: [$CI_TOOLKIT]
     agents:
       queue: "mac-metal"
