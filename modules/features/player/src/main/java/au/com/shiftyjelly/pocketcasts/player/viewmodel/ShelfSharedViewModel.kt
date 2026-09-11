@@ -107,6 +107,7 @@ class ShelfSharedViewModel @Inject constructor(
             .mapNotNull { state -> (state as? UpNextQueue.State.Loaded)?.episode?.uuid }
             .flatMapLatest { episodeUuid -> transcriptManager.observeIsTranscriptAvailable(episodeUuid) },
         videoStateFlow,
+        settings.showSmartBookmarksTooltip.flow,
         ::createUiState,
     ).stateIn(
         viewModelScope,
@@ -119,6 +120,7 @@ class ShelfSharedViewModel @Inject constructor(
         shelfUpNext: UpNextQueue.State,
         isTranscriptAvailable: Boolean,
         videoState: VideoState,
+        showSmartBookmarksTooltip: Boolean,
     ): UiState {
         val episode = (shelfUpNext as? UpNextQueue.State.Loaded)?.episode
         val streamHasVideo = videoState.streamVideoState == StreamVideoState.HasVideo || videoState.streamVideoState == StreamVideoState.Unknown
@@ -131,6 +133,7 @@ class ShelfSharedViewModel @Inject constructor(
             episode = episode,
             isTranscriptAvailable = isTranscriptAvailable,
             isVideoRenderingEnabled = videoState.renderingEnabled && streamHasVideo,
+            isSmartBookmarksPromoActive = showSmartBookmarksTooltip && FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS),
         )
     }
 
@@ -262,10 +265,15 @@ class ShelfSharedViewModel @Inject constructor(
         }
     }
 
+    fun dismissBookmarkTooltip() {
+        settings.showSmartBookmarksTooltip.set(false, updateModifiedAt = false)
+    }
+
     fun onAddBookmarkClick(
         onboardingUpgradeSource: OnboardingUpgradeSource,
         source: ShelfItemSource,
     ) {
+        dismissBookmarkTooltip()
         trackShelfAction(ShelfItem.Bookmark, source)
         viewModelScope.launch {
             val isPaidUser = settings.cachedSubscription.value != null
@@ -361,11 +369,14 @@ class ShelfSharedViewModel @Inject constructor(
         val episode: BaseEpisode? = null,
         val isTranscriptAvailable: Boolean = false,
         val isVideoRenderingEnabled: Boolean = true,
+        val isSmartBookmarksPromoActive: Boolean = false,
     ) {
         val playerShelfItems: List<ShelfItem>
             get() = shelfItems.take(MIN_SHELF_ITEMS_SIZE)
         val playerBottomSheetShelfItems: List<ShelfItem>
             get() = shelfItems.drop(MIN_SHELF_ITEMS_SIZE)
+        val showBookmarkTooltip: Boolean
+            get() = isSmartBookmarksPromoActive && ShelfItem.Bookmark in playerShelfItems
     }
 
     data class PlayerShelfData(
