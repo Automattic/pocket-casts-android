@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.component
 
+import android.os.Build
 import android.view.WindowManager
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
@@ -62,6 +63,9 @@ fun TvModal(
         backdrop.setActive(backdropKey, visible)
         onDispose { backdrop.setActive(backdropKey, false) }
     }
+    DisposableEffect(Unit) {
+        onDispose { backdrop.removePanel(backdropKey) }
+    }
     Dialog(
         onDismissRequest = { visible = false },
         properties = DialogProperties(usePlatformDefaultWidth = false),
@@ -82,11 +86,11 @@ fun TvModal(
                 scaleOut(tween(TvModalAnimationDurationMillis), targetScale = 0.92f),
         ) {
             TvModalSurface(
-                isTranslucent = true,
+                isTranslucent = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S,
                 width = width,
                 contentPadding = contentPadding,
                 modifier = modifier
-                    .onGloballyPositioned { backdrop.dialogSize = it.size }
+                    .onGloballyPositioned { backdrop.setSize(backdropKey, it.size) }
                     .onPreviewKeyEvent { visible.not() },
             ) {
                 val scope = remember(this) { TvModalScopeImpl(this) { visible = false } }

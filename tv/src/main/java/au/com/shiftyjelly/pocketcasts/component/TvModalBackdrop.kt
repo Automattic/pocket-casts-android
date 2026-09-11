@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.component
 
+import android.os.Build
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
@@ -8,9 +9,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateSetOf
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.CornerRadius
@@ -29,10 +29,11 @@ import androidx.compose.ui.unit.dp
 @Stable
 class TvModalBackdropState {
     private val activeKeys = mutableStateSetOf<Any>()
+    private val panelSizes = mutableStateListOf<Pair<Any, IntSize>>()
 
     val isActive: Boolean get() = activeKeys.isNotEmpty()
 
-    var dialogSize: IntSize? by mutableStateOf(null)
+    val dialogSize: IntSize? get() = panelSizes.lastOrNull()?.second
 
     fun setActive(key: Any, active: Boolean) {
         if (active) {
@@ -40,6 +41,19 @@ class TvModalBackdropState {
         } else {
             activeKeys.remove(key)
         }
+    }
+
+    fun setSize(key: Any, size: IntSize) {
+        val index = panelSizes.indexOfFirst { it.first === key }
+        if (index >= 0) {
+            panelSizes[index] = key to size
+        } else {
+            panelSizes.add(key to size)
+        }
+    }
+
+    fun removePanel(key: Any) {
+        panelSizes.removeAll { it.first === key }
     }
 }
 
@@ -70,7 +84,9 @@ fun TvModalBackdrop(
                 drawContent()
                 drawRect(Color.Black, alpha = ModalScrimAlpha * progress)
                 val dialogSize = state.dialogSize
-                if (dialogSize != null && dialogSize.width > 0 && dialogSize.height > 0) {
+                if (dialogSize != null && dialogSize.width > 0 && dialogSize.height > 0 &&
+                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+                ) {
                     graphicsLayer.record { this@drawWithContent.drawContent() }
                     graphicsLayer.renderEffect = BlurEffect(blurRadiusPx, blurRadiusPx, TileMode.Clamp)
                     graphicsLayer.alpha = progress
