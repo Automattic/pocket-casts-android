@@ -74,14 +74,14 @@ jobs:
 
       - name: Checkout repository
         if: steps.pr-origin.outputs.is_internal == 'true'
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 1
 
       - name: Run Claude Code
         if: steps.pr-origin.outputs.is_internal == 'true'
         id: claude
-        uses: anthropics/claude-code-action@9d7150bc8a3dae8149739a88019d192b579ad90c # v1.0.193
+        uses: anthropics/claude-code-action@9c5ddab2e6d17b83ea679153b31f1d5f023cf636 # v1.0.217
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
 

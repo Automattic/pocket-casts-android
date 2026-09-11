@@ -681,8 +681,8 @@ class EpisodeManagerImpl @Inject constructor(
         return episodeDao.downloadedEpisodesThatHaveNotBeenPlayedCount()
     }
 
-    override fun findStarredEpisodesFlow(): Flow<List<PodcastEpisode>> {
-        return episodeDao.findStarredEpisodesFlow()
+    override fun findStarredEpisodesFlow(limit: Int): Flow<List<PodcastEpisode>> {
+        return episodeDao.findStarredEpisodesFlow(limit)
     }
 
     override suspend fun findStarredEpisodes(): List<PodcastEpisode> {

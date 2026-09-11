@@ -61,6 +61,7 @@ import androidx.transition.Slide
 import au.com.shiftyjelly.pocketcasts.R
 import au.com.shiftyjelly.pocketcasts.account.AccountActivity
 import au.com.shiftyjelly.pocketcasts.account.PromoCodeUpgradedFragment
+import au.com.shiftyjelly.pocketcasts.account.deviceapprove.DeviceApproveFragment
 import au.com.shiftyjelly.pocketcasts.account.onboarding.AccountBenefitsFragment
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivity
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivityContract
@@ -87,6 +88,7 @@ import au.com.shiftyjelly.pocketcasts.deeplink.DownloadsDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ImportDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.NativeShareDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.OpmlImportDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.PairDeviceDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.PlayFromSearchDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.PocketCastsWebsiteGetDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.PromoCodeDeepLink
@@ -115,6 +117,7 @@ import au.com.shiftyjelly.pocketcasts.discover.util.DiscoverDeepLinkManager
 import au.com.shiftyjelly.pocketcasts.discover.util.DiscoverDeepLinkManager.Companion.RECOMMENDATIONS_USER
 import au.com.shiftyjelly.pocketcasts.discover.util.DiscoverDeepLinkManager.Companion.STAFF_PICKS_LIST_ID
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment
+import au.com.shiftyjelly.pocketcasts.discover.view.PodcastGridFragment
 import au.com.shiftyjelly.pocketcasts.discover.view.PodcastGridListFragment
 import au.com.shiftyjelly.pocketcasts.discover.view.PodcastListFragment
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesActivity
@@ -188,6 +191,7 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.NavigationBarColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.AccountEncouragement
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
@@ -229,6 +233,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
+import java.time.Instant
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -354,6 +359,9 @@ class MainActivity :
         get() = binding.bottomContainer.height - binding.bottomContainer.paddingBottom
 
     private var bottomSheetTag: String? = null
+
+    // hasCompletedOnboarding() flips true as onboarding finishes, which would chain the modal onto the same launch.
+    private var launchedInitialOnboarding: Boolean = false
     private var pendingBottomSheetFragment: Fragment? = null
 
     override val coroutineContext: CoroutineContext
@@ -476,10 +484,12 @@ class MainActivity :
 
         val hasCompletedOnboarding = settings.hasCompletedOnboarding()
         val isLoggedIn = syncManager.isLoggedIn()
-        val showOnboarding = !hasCompletedOnboarding && !isLoggedIn
+        val isPairingDeepLink = deepLinkFactory.create(intent) is PairDeviceDeepLink
+        val showOnboarding = !hasCompletedOnboarding && !isLoggedIn && !isPairingDeepLink
         val needsLoginPromptAfterRestore = settings.getNeedsLoginPromptAfterRestore()
         // Only show if savedInstanceState is null in order to avoid creating onboarding activity twice.
         if (showOnboarding && savedInstanceState == null) {
+            launchedInitialOnboarding = true
             openOnboardingFlow(OnboardingFlow.InitialOnboarding)
         }
 
@@ -489,7 +499,8 @@ class MainActivity :
         if (savedInstanceState == null && needsLoginPromptAfterRestore) {
             settings.setNeedsLoginPromptAfterRestore(false)
             if (!showOnboarding && !isLoggedIn) {
-                settings.showFreeAccountEncouragement.set(false, updateModifiedAt = true)
+                // Anchor the clock so encourageAccountCreation() doesn't also show the modal this launch.
+                settings.freeAccountEncouragementLastShown.set(Instant.now(), updateModifiedAt = true)
                 openOnboardingFlow(OnboardingFlow.AccountEncouragement)
             }
         }
@@ -683,21 +694,38 @@ class MainActivity :
     private fun encourageAccountCreation() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                val encourageAccountCreation = settings.showFreeAccountEncouragement.value
-                if (!encourageAccountCreation) {
+                if (!FeatureFlag.isEnabled(Feature.ENCOURAGE_ACCOUNT_CREATION)) {
                     return@repeatOnLifecycle
                 }
-                settings.showFreeAccountEncouragement.set(false, updateModifiedAt = true)
+
+                if (launchedInitialOnboarding) {
+                    return@repeatOnLifecycle
+                }
 
                 val isSignedIn = viewModel.signInState.asFlow().first().isSignedIn
-                if (isSignedIn) {
-                    return@repeatOnLifecycle
-                }
+                val isEligible = !isSignedIn && settings.hasCompletedOnboarding()
 
-                if (Util.isTablet(this@MainActivity)) {
-                    AccountBenefitsFragment().show(supportFragmentManager, "account_benefits_fragment")
-                } else {
-                    openOnboardingFlow(OnboardingFlow.AccountEncouragement)
+                val decision = AccountEncouragement.decide(
+                    isEligible = isEligible,
+                    lastShown = settings.freeAccountEncouragementLastShown.value,
+                    now = Instant.now(),
+                )
+                when (decision) {
+                    AccountEncouragement.Decision.Wait -> return@repeatOnLifecycle
+
+                    AccountEncouragement.Decision.Show -> {
+                        if (bottomSheetTag != null || pendingBottomSheetFragment != null) {
+                            return@repeatOnLifecycle
+                        }
+
+                        settings.freeAccountEncouragementLastShown.set(Instant.now(), updateModifiedAt = true)
+
+                        if (Util.isTablet(this@MainActivity)) {
+                            AccountBenefitsFragment().show(supportFragmentManager, "account_benefits_fragment")
+                        } else {
+                            openOnboardingFlow(OnboardingFlow.AccountEncouragement)
+                        }
+                    }
                 }
             }
         }
@@ -1811,6 +1839,12 @@ class MainActivity :
                     openOnboardingFlow(onboardingFlow)
                 }
 
+                is PairDeviceDeepLink -> {
+                    if (supportFragmentManager.findFragmentByTag("device_approve") == null) {
+                        DeviceApproveFragment.newInstance(deepLink.userCode).show(supportFragmentManager, "device_approve")
+                    }
+                }
+
                 is ThemesDeepLink -> {
                     closePlayer()
                     addFragment(AppearanceSettingsFragment.newInstance())
@@ -1866,6 +1900,15 @@ class MainActivity :
         val currentFragment = navigator.currentFragment()
         if (currentFragment is PodcastFragment && uuid == currentFragment.podcastUuid) return // We are already showing it
         addFragment(PodcastFragment.newInstance(podcastUuid = uuid, sourceView = SourceView.fromString(sourceView)))
+    }
+
+    override fun openNetworkPage(listId: String, title: String?, sourceView: SourceView?) {
+        closePlayer()
+        frameBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+
+        val currentFragment = navigator.currentFragment()
+        if (currentFragment is PodcastGridFragment && listId == currentFragment.listUuid) return // We are already showing it
+        addFragment(PodcastGridFragment.newInstance(listId = listId, title = title, sourceView = sourceView))
     }
 
     @Suppress("DEPRECATION")

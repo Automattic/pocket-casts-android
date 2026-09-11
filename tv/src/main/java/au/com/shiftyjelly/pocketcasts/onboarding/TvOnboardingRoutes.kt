@@ -5,5 +5,6 @@ object TvOnboardingRoutes {
     const val CREATE_ACCOUNT = "tv_create_account"
     const val SIGN_IN = "tv_sign_in"
     const val SYNCING = "tv_syncing"
+    const val SIGNED_OUT = "tv_signed_out"
     const val HOME = "tv_home"
 }

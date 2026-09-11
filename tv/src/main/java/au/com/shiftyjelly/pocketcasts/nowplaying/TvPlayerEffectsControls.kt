@@ -24,9 +24,9 @@ import kotlin.math.abs
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-internal val TvControlBarButtonSize = 52.dp
+internal val TvControlBarButtonSize = 48.dp
 internal val TvControlBarIconSize = 24.dp
-internal val TvControlBarButtonSpacing = 11.dp
+internal val TvControlBarButtonSpacing = 8.dp
 
 internal val tvPlaybackSpeedOptions: List<Double> = (5..30).map { it / 10.0 }
 
@@ -63,7 +63,7 @@ internal fun TvPlaybackSpeedButton(
             TvDropdownMenu(
                 title = stringResource(LR.string.playback_speed),
                 onDismissRequest = { onMenuVisibleChange(false) },
-                maxHeight = 320.dp,
+                maxHeight = 240.dp,
                 alignment = Alignment.BottomCenter,
                 offset = DpOffset(x = 0.dp, y = (-64).dp),
             ) {
@@ -118,19 +118,31 @@ internal fun TvPlayerEffectsButton(
             val trimChangedTemplate = stringResource(LR.string.tv_trim_silence_changed)
             val trimOffToast = stringResource(LR.string.tv_trim_silence_off)
             TvDropdownMenu(
-                title = stringResource(LR.string.player_effects),
+                title = stringResource(LR.string.player_effects_volume_boost),
                 onDismissRequest = { onMenuVisibleChange(false) },
                 alignment = Alignment.BottomCenter,
                 offset = DpOffset(x = 0.dp, y = (-64).dp),
             ) {
                 TvDropdownMenuItem(
-                    label = stringResource(LR.string.player_effects_volume_boost),
-                    isSelected = isVolumeBoosted,
-                    requestInitialFocus = true,
+                    label = stringResource(LR.string.off),
+                    isSelected = !isVolumeBoosted,
                     onClick = {
-                        val isBoosted = !isVolumeBoosted
-                        onSetVolumeBoost(isBoosted)
-                        toastHostState.show(if (isBoosted) boostOnToast else boostOffToast)
+                        onMenuVisibleChange(false)
+                        if (isVolumeBoosted) {
+                            onSetVolumeBoost(false)
+                            toastHostState.show(boostOffToast)
+                        }
+                    },
+                )
+                TvDropdownMenuItem(
+                    label = stringResource(LR.string.on),
+                    isSelected = isVolumeBoosted,
+                    onClick = {
+                        onMenuVisibleChange(false)
+                        if (!isVolumeBoosted) {
+                            onSetVolumeBoost(true)
+                            toastHostState.show(boostOnToast)
+                        }
                     },
                 )
                 TvDropdownMenuSectionTitle(text = stringResource(LR.string.player_effects_trim_silence))

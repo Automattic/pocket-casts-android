@@ -14,6 +14,16 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.Player
 import au.com.shiftyjelly.pocketcasts.repositories.playback.StreamVideoState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.PlaybackContentType
+import com.automattic.eventhorizon.PlaybackEffectSpeedChangedEvent
+import com.automattic.eventhorizon.PlaybackEffectTrimSilenceAmountChangedEvent
+import com.automattic.eventhorizon.PlaybackEffectVolumeBoostToggledEvent
+import com.automattic.eventhorizon.PlayerDismissedEvent
+import com.automattic.eventhorizon.PlayerShownEvent
+import com.automattic.eventhorizon.SettingType
+import com.automattic.eventhorizon.SourceViewType
+import com.automattic.eventhorizon.Trackable
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
@@ -32,6 +42,7 @@ class TvNowPlayingViewModel @Inject constructor(
     private val playbackManager: PlaybackManager,
     private val podcastManager: PodcastManager,
     private val settings: Settings,
+    private val eventHorizon: EventHorizon,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
@@ -71,6 +82,14 @@ class TvNowPlayingViewModel @Inject constructor(
         initialValue = TvNowPlayingUiState.Empty,
     )
 
+    fun trackPlayerShown() {
+        eventHorizon.track(PlayerShownEvent)
+    }
+
+    fun trackPlayerDismissed() {
+        eventHorizon.track(PlayerDismissedEvent)
+    }
+
     fun playPause() {
         playbackManager.playPause(sourceView = SourceView.PLAYER)
     }
@@ -89,18 +108,41 @@ class TvNowPlayingViewModel @Inject constructor(
         )
     }
 
-    fun setPlaybackSpeed(speed: Double) = updateEffects { it.copy(playbackSpeed = speed) }
+    fun setPlaybackSpeed(speed: Double) = updateEffects(
+        update = { it.copy(playbackSpeed = speed) },
+        event = { setting, source, contentType ->
+            PlaybackEffectSpeedChangedEvent(speed = speed, settings = setting, source = source, contentType = contentType)
+        },
+    )
 
-    fun setTrimMode(trimMode: TrimMode) = updateEffects { it.copy(trimMode = trimMode) }
+    fun setTrimMode(trimMode: TrimMode) = updateEffects(
+        update = { it.copy(trimMode = trimMode) },
+        event = { setting, source, contentType ->
+            PlaybackEffectTrimSilenceAmountChangedEvent(
+                amount = trimMode.analyticsValue,
+                settings = setting,
+                source = source,
+                contentType = contentType,
+            )
+        },
+    )
 
-    fun setVolumeBoost(isBoosted: Boolean) = updateEffects { it.copy(isVolumeBoosted = isBoosted) }
+    fun setVolumeBoost(isBoosted: Boolean) = updateEffects(
+        update = { it.copy(isVolumeBoosted = isBoosted) },
+        event = { setting, source, contentType ->
+            PlaybackEffectVolumeBoostToggledEvent(enabled = isBoosted, settings = setting, source = source, contentType = contentType)
+        },
+    )
 
     private val effectsMutex = Mutex()
     private var pendingEffects: PlaybackEffectsData? = null
     private var pendingEffectsBaseline: PlaybackEffectsData? = null
     private var pendingEffectsEpisodeUuid: String? = null
 
-    private fun updateEffects(update: (PlaybackEffectsData) -> PlaybackEffectsData) {
+    private fun updateEffects(
+        update: (PlaybackEffectsData) -> PlaybackEffectsData,
+        event: (SettingType, SourceViewType, PlaybackContentType) -> Trackable,
+    ) {
         viewModelScope.launch(ioDispatcher) {
             effectsMutex.withLock {
                 val playbackState = playbackManager.playbackStateFlow.first()
@@ -123,14 +165,19 @@ class TvNowPlayingViewModel @Inject constructor(
                 pendingEffectsBaseline = stateEffects
                 pendingEffectsEpisodeUuid = currentEpisode.uuid
                 val effects = updatedEffects.toEffects()
-                val podcast = (currentEpisode as? PodcastEpisode)
+                val overridingPodcast = (currentEpisode as? PodcastEpisode)
                     ?.let { podcastManager.findPodcastByUuid(it.podcastUuid) }
-                if (podcast != null && podcast.overrideGlobalEffects) {
-                    podcastManager.updateEffectsBlocking(podcast, effects)
+                    ?.takeIf { it.overrideGlobalEffects }
+                if (overridingPodcast != null) {
+                    podcastManager.updateEffectsBlocking(overridingPodcast, effects)
                 } else {
                     settings.globalPlaybackEffects.set(effects, updateModifiedAt = true)
                 }
                 playbackManager.updatePlayerEffects(effects)
+                val setting = if (overridingPodcast != null) SettingType.Local else SettingType.Global
+                playbackManager.trackPlaybackEvent(SourceView.PLAYER_PLAYBACK_EFFECTS) { source, contentType ->
+                    event(setting, source.analyticsValue, contentType)
+                }
             }
         }
     }

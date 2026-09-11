@@ -16,6 +16,15 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.StreamVideoState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.PlaybackContentType
+import com.automattic.eventhorizon.PlaybackEffectSpeedChangedEvent
+import com.automattic.eventhorizon.PlaybackEffectTrimSilenceAmountChangedEvent
+import com.automattic.eventhorizon.PlaybackEffectVolumeBoostToggledEvent
+import com.automattic.eventhorizon.PlayerDismissedEvent
+import com.automattic.eventhorizon.PlayerShownEvent
+import com.automattic.eventhorizon.SettingType
+import com.automattic.eventhorizon.Trackable
 import io.reactivex.subjects.BehaviorSubject
 import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -27,6 +36,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argThat
+import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
@@ -59,6 +69,19 @@ class TvNowPlayingViewModelTest {
     }
 
     private val podcastManager = mock<PodcastManager>()
+    private val eventHorizon = mock<EventHorizon>()
+
+    private var trackedEffectEvent: Trackable? = null
+
+    init {
+        // The stub supplies the content type; the real derivation lives in PlaybackManager.playbackContentTypeFor.
+        doAnswer { invocation ->
+            @Suppress("UNCHECKED_CAST")
+            val builder = invocation.arguments[1] as (SourceView, PlaybackContentType) -> Trackable
+            trackedEffectEvent = builder(invocation.arguments[0] as SourceView, PlaybackContentType.Audio)
+            null
+        }.whenever(playbackManager).trackPlaybackEvent(any(), any())
+    }
 
     private val skipForwardSetting = mock<UserSetting<Int>> { on { value } doReturn 30 }
     private val skipBackSetting = mock<UserSetting<Int>> { on { value } doReturn 10 }
@@ -73,7 +96,7 @@ class TvNowPlayingViewModelTest {
     private val videoEpisode = PodcastEpisode(uuid = "video", publishedDate = Date(0), fileType = "video/mp4")
 
     private val viewModel by lazy {
-        TvNowPlayingViewModel(playbackManager, podcastManager, settings, coroutineRule.testDispatcher)
+        TvNowPlayingViewModel(playbackManager, podcastManager, settings, eventHorizon, coroutineRule.testDispatcher)
     }
 
     @Test
@@ -344,6 +367,101 @@ class TvNowPlayingViewModelTest {
         verify(playbackManager, never()).updatePlayerEffects(any())
         verifyNoInteractions(podcastManager)
         verify(globalPlaybackEffectsSetting, never()).set(any(), any(), any(), any())
+    }
+
+    @Test
+    fun `showing the player tracks a player shown event`() = runTest {
+        viewModel.trackPlayerShown()
+
+        verify(eventHorizon).track(PlayerShownEvent)
+    }
+
+    @Test
+    fun `dismissing the player tracks a player dismissed event`() = runTest {
+        viewModel.trackPlayerDismissed()
+
+        verify(eventHorizon).track(PlayerDismissedEvent)
+    }
+
+    @Test
+    fun `a global speed change tracks a speed changed event with global settings`() = runTest {
+        playbackStates.value = PlaybackState(episodeUuid = audioEpisode.uuid)
+        whenever(playbackManager.getCurrentEpisode()).thenReturn(audioEpisode)
+        whenever(podcastManager.findPodcastByUuid(audioEpisode.podcastUuid)).thenReturn(Podcast(uuid = "podcast"))
+
+        viewModel.setPlaybackSpeed(1.5)
+        runCurrent()
+
+        assertEquals(
+            PlaybackEffectSpeedChangedEvent(
+                speed = 1.5,
+                settings = SettingType.Global,
+                source = SourceView.PLAYER_PLAYBACK_EFFECTS.analyticsValue,
+                contentType = PlaybackContentType.Audio,
+            ),
+            trackedEffectEvent,
+        )
+    }
+
+    @Test
+    fun `a podcast override speed change tracks local settings`() = runTest {
+        playbackStates.value = PlaybackState(episodeUuid = audioEpisode.uuid)
+        whenever(playbackManager.getCurrentEpisode()).thenReturn(audioEpisode)
+        whenever(podcastManager.findPodcastByUuid(audioEpisode.podcastUuid)).thenReturn(Podcast(uuid = "podcast", overrideGlobalEffects = true))
+
+        viewModel.setPlaybackSpeed(2.0)
+        runCurrent()
+
+        assertEquals(SettingType.Local, (trackedEffectEvent as PlaybackEffectSpeedChangedEvent).settings)
+    }
+
+    @Test
+    fun `a trim change tracks a trim silence amount changed event`() = runTest {
+        playbackStates.value = PlaybackState(episodeUuid = audioEpisode.uuid)
+        whenever(playbackManager.getCurrentEpisode()).thenReturn(audioEpisode)
+
+        viewModel.setTrimMode(TrimMode.HIGH)
+        runCurrent()
+
+        assertEquals(
+            PlaybackEffectTrimSilenceAmountChangedEvent(
+                amount = TrimMode.HIGH.analyticsValue,
+                settings = SettingType.Global,
+                source = SourceView.PLAYER_PLAYBACK_EFFECTS.analyticsValue,
+                contentType = PlaybackContentType.Audio,
+            ),
+            trackedEffectEvent,
+        )
+    }
+
+    @Test
+    fun `a volume boost change tracks a volume boost toggled event`() = runTest {
+        playbackStates.value = PlaybackState(episodeUuid = audioEpisode.uuid)
+        whenever(playbackManager.getCurrentEpisode()).thenReturn(audioEpisode)
+
+        viewModel.setVolumeBoost(true)
+        runCurrent()
+
+        assertEquals(
+            PlaybackEffectVolumeBoostToggledEvent(
+                enabled = true,
+                settings = SettingType.Global,
+                source = SourceView.PLAYER_PLAYBACK_EFFECTS.analyticsValue,
+                contentType = PlaybackContentType.Audio,
+            ),
+            trackedEffectEvent,
+        )
+    }
+
+    @Test
+    fun `a skipped effect change does not track an effect event`() = runTest {
+        playbackStates.value = PlaybackState(episodeUuid = "previous")
+        whenever(playbackManager.getCurrentEpisode()).thenReturn(audioEpisode)
+
+        viewModel.setPlaybackSpeed(2.0)
+        runCurrent()
+
+        assertEquals(null, trackedEffectEvent)
     }
 
     private fun effectsWith(speed: Double, trimMode: TrimMode, isVolumeBoosted: Boolean) = argThat<PlaybackEffects> {

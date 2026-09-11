@@ -19,6 +19,7 @@ import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -44,6 +45,26 @@ class PodcastDaoTest {
     @After
     fun closeDb() {
         testDb.close()
+    }
+
+    @Test
+    fun updateRefreshPersistsTheNetworkListId() = runTest {
+        val uuid = UUID.randomUUID().toString()
+        podcastDao.insertSuspend(Podcast(uuid = uuid, isSubscribed = true))
+
+        podcastDao.updateRefreshFor(uuid, networkListId = "cdb75bc0-9f5a-4217-b1ca-f573821a7913")
+
+        assertEquals("cdb75bc0-9f5a-4217-b1ca-f573821a7913", podcastDao.findByUuidBlocking(uuid)?.networkListId)
+    }
+
+    @Test
+    fun updateRefreshClearsTheNetworkListIdWhenThePodcastLeavesItsNetwork() = runTest {
+        val uuid = UUID.randomUUID().toString()
+        podcastDao.insertSuspend(Podcast(uuid = uuid, isSubscribed = true, networkListId = "cdb75bc0-9f5a-4217-b1ca-f573821a7913"))
+
+        podcastDao.updateRefreshFor(uuid, networkListId = null)
+
+        assertNull(podcastDao.findByUuidBlocking(uuid)?.networkListId)
     }
 
     @Test
@@ -195,4 +216,19 @@ class PodcastDaoTest {
 
         return Triple(podcast1, podcast2, unsubscribed)
     }
+
+    private suspend fun PodcastDao.updateRefreshFor(uuid: String, networkListId: String?) = updateRefresh(
+        uuid = uuid,
+        title = "Analog(ue)",
+        author = "Relay",
+        podcastCategory = "Technology",
+        podcastDescription = "",
+        estimatedNextEpisode = null,
+        episodeFrequency = null,
+        refreshAvailable = false,
+        fundingUrl = null,
+        explicit = null,
+        webFeed = false,
+        networkListId = networkListId,
+    )
 }

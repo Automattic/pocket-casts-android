@@ -102,6 +102,7 @@ import com.automattic.eventhorizon.FolderPodcastModalOptionTappedEvent
 import com.automattic.eventhorizon.FolderPodcastModalOptionType
 import com.automattic.eventhorizon.PodcastScreenCategoryTappedEvent
 import com.automattic.eventhorizon.PodcastScreenFolderTappedEvent
+import com.automattic.eventhorizon.PodcastScreenNetworkTappedEvent
 import com.automattic.eventhorizon.PodcastScreenOptionsTappedEvent
 import com.automattic.eventhorizon.PodcastScreenPodcastDetailsLinkTappedEvent
 import com.automattic.eventhorizon.PodcastScreenSettingsTappedEvent
@@ -785,6 +786,22 @@ class PodcastFragment : BaseFragment() {
                     hostListener.openTab(VR.id.navigation_discover)
                 }
             },
+            onClickNetwork = { podcast ->
+                val listId = podcast.networkListId
+                if (listId != null) {
+                    eventHorizon.track(
+                        PodcastScreenNetworkTappedEvent(
+                            podcastUuid = podcast.uuid,
+                            listId = listId,
+                        ),
+                    )
+                    (requireActivity() as FragmentHostListener).openNetworkPage(
+                        listId = listId,
+                        title = podcast.author,
+                        sourceView = SourceView.PODCAST_SCREEN,
+                    )
+                }
+            },
             onClickWebsite = { podcast ->
                 podcast.podcastUrl?.let { url ->
                     if (url.isNotBlank()) {
@@ -941,8 +958,10 @@ class PodcastFragment : BaseFragment() {
 
     override fun onPause() {
         super.onPause()
-        viewModel.multiSelectEpisodesHelper.isMultiSelecting = false
-        viewModel.multiSelectBookmarksHelper.isMultiSelecting = false
+        if (!requireActivity().isChangingConfigurations) {
+            viewModel.multiSelectEpisodesHelper.isMultiSelecting = false
+            viewModel.multiSelectBookmarksHelper.isMultiSelecting = false
+        }
     }
 
     private fun onShareBookmarkClick() {

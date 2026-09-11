@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -61,6 +62,7 @@ import androidx.tv.material3.Icon
 import androidx.tv.material3.IconButton
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.component.HideTvTopBar
 import au.com.shiftyjelly.pocketcasts.component.LocalFocusTvTopBar
 import au.com.shiftyjelly.pocketcasts.component.TvArtworkImage
@@ -99,12 +101,24 @@ fun TvNowPlayingScreen(
     var openedPodcastUuid by rememberSaveable { mutableStateOf<String?>(null) }
     val currentOnConsumeOpenRequest by rememberUpdatedState(onConsumeOpenRequest)
 
+    // Keep this above the podcast-details early return, so opening a podcast from the player
+    // does not re-fire shown/dismissed on the way back.
+    if (uiState is TvNowPlayingUiState.Loaded) {
+        DisposableEffect(Unit) {
+            viewModel.trackPlayerShown()
+            onDispose {
+                viewModel.trackPlayerDismissed()
+            }
+        }
+    }
+
     val podcastUuid = openedPodcastUuid.takeUnless { isOpenRequested }
     if (podcastUuid != null) {
         HideTvTopBar()
         BackHandler { openedPodcastUuid = null }
         TvPodcastDetailsScreen(
             podcastUuid = podcastUuid,
+            source = SourceView.PLAYER,
             onClose = { openedPodcastUuid = null },
             modifier = modifier,
         )
@@ -274,14 +288,22 @@ private fun TvNowPlayingContent(
                 }
             }
         }
+        if (state.isVideo) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .graphicsLayer { alpha = chromeAlpha }
+                    .background(VideoControlsScrimBrush),
+            )
+        }
         Column(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
                 .graphicsLayer { alpha = chromeAlpha }
-                .background(ChromeScrimBrush)
+                .then(if (state.isVideo) Modifier else Modifier.background(ChromeScrimBrush))
                 .padding(horizontal = ChromeHorizontalInset)
-                .padding(top = ChromeScrimTopInset, bottom = 24.dp),
+                .padding(top = ChromeScrimTopInset, bottom = 18.dp),
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -292,7 +314,7 @@ private fun TvNowPlayingContent(
                     podcastTitle = state.podcastTitle,
                     modifier = Modifier.weight(1f),
                 )
-                Spacer(modifier = Modifier.width(24.dp))
+                Spacer(modifier = Modifier.width(18.dp))
                 ControlBar(
                     playbackSpeed = state.playbackSpeed,
                     trimMode = state.trimMode,
@@ -316,7 +338,7 @@ private fun TvNowPlayingContent(
                     },
                 )
             }
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(9.dp))
             state.errorMessage?.let { errorMessage ->
                 Text(
                     text = errorMessage,
@@ -325,7 +347,7 @@ private fun TvNowPlayingContent(
                     textAlign = TextAlign.Start,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 16.dp),
+                        .padding(bottom = 12.dp),
                 )
             }
             TvSeekBar(
@@ -356,6 +378,7 @@ private fun TvNowPlayingContent(
         if (isDetailsModalVisible) {
             TvEpisodeInfoModal(
                 episode = episode,
+                actionContext = TvEpisodeActionContext.NowPlaying,
                 onDismissRequest = { isDetailsModalVisible = false },
             )
         }
@@ -388,7 +411,6 @@ private fun EpisodeArtwork(
             model = episode.artworkModel(),
             modifier = Modifier
                 .requiredSize(ArtworkSize * BlurredArtworkScale)
-                .offset(x = BlurredArtworkOffset, y = BlurredArtworkOffset)
                 .blur(BlurredArtworkRadius, BlurredEdgeTreatment.Unbounded)
                 .alpha(0.7f),
         )
@@ -396,7 +418,7 @@ private fun EpisodeArtwork(
             model = episode.artworkModel(),
             modifier = Modifier
                 .size(ArtworkSize)
-                .clip(RoundedCornerShape(8.dp)),
+                .clip(RoundedCornerShape(6.dp)),
         )
     }
 }
@@ -423,7 +445,7 @@ private fun EpisodeTitles(
         }
         Text(
             text = episode.title,
-            style = MaterialTheme.tvTypography.headline,
+            style = MaterialTheme.tvTypography.title2,
             color = MaterialTheme.tvColors.textPrimary,
             textAlign = TextAlign.Start,
             maxLines = 1,
@@ -499,20 +521,25 @@ private fun InfoButton(
     }
 }
 
-private val ArtworkSize = 240.dp
-private val ArtworkTopLift = 24.dp
+private val ArtworkSize = 210.dp
+private val ArtworkTopLift = 18.dp
 private val BlurredArtworkScale = 1.25f
-private val BlurredArtworkOffset = -ArtworkSize * 0.2f
-private val BlurredArtworkRadius = 66.dp
+private val BlurredArtworkRadius = 49.5.dp
 
 private val CHROME_HIDE_DELAY = 5.seconds
 private const val VIDEO_OVERLAY_FADE_MILLIS = 200
 
-private val ChromeHorizontalInset = 56.dp
-private val ChromeScrimTopInset = 48.dp
+private val ChromeHorizontalInset = 42.dp
+private val ChromeScrimTopInset = 36.dp
 private val ChromeScrimBrush = Brush.verticalGradient(
     0f to Color.Transparent,
     1f to Color.Black.copy(alpha = 0.8f),
+)
+
+private val VideoControlsScrimBrush = Brush.verticalGradient(
+    0f to Color.Transparent,
+    0.5f to Color.Black.copy(alpha = 0.5f),
+    1f to Color.Black,
 )
 
 private val chromeRevealConsumedKeys = setOf(

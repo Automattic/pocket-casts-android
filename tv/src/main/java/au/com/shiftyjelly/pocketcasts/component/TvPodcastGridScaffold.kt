@@ -4,8 +4,11 @@ import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.runtime.Composable
@@ -25,6 +28,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import au.com.shiftyjelly.pocketcasts.theme.TvTopBarHeight
 import au.com.shiftyjelly.pocketcasts.theme.tvColors
 import au.com.shiftyjelly.pocketcasts.theme.tvTypography
 import kotlinx.coroutines.flow.first
@@ -34,21 +38,31 @@ internal fun TvPodcastGridScaffold(
     itemKeys: List<Any>,
     modifier: Modifier = Modifier,
     title: String? = null,
-    horizontalContentPadding: Dp = 32.dp,
+    horizontalContentPadding: Dp = 42.dp,
     autoFocusFirstItem: Boolean = false,
     restoreFocusTrigger: Int = 0,
+    scrollsTopBar: Boolean = false,
+    scrollsTitle: Boolean = false,
     itemContent: @Composable (index: Int, itemModifier: Modifier) -> Unit,
 ) {
+    val titleScrolls = scrollsTopBar || scrollsTitle
+    val headerCount = if (title != null && titleScrolls) 1 else 0
+    val gridModifier = if (scrollsTopBar) Modifier.scrollAwayTopBar() else Modifier
+
     Column(modifier = modifier) {
-        if (title != null) {
+        if (title != null && !titleScrolls) {
             Text(
                 text = title,
-                style = MaterialTheme.tvTypography.title3,
+                style = MaterialTheme.tvTypography.title2,
                 color = MaterialTheme.tvColors.textPrimary,
-                modifier = Modifier.padding(start = horizontalContentPadding, top = 8.dp, bottom = 10.dp),
+                modifier = Modifier.padding(start = horizontalContentPadding, top = 40.dp, bottom = 0.dp),
             )
         }
         val gridState = rememberLazyGridState()
+        ScrollToTopEffect { gridState.scrollToItem(0) }
+        if (scrollsTopBar) {
+            TopBarScrollReporter(gridState)
+        }
         var lastFocusedKey by rememberSaveable { mutableStateOf<String?>(null) }
         val focusRequesters = remember(itemKeys.size) { List(itemKeys.size) { FocusRequester() } }
         val gridFocusRequester = remember { FocusRequester() }
@@ -74,22 +88,39 @@ internal fun TvPodcastGridScaffold(
         LazyVerticalGrid(
             state = gridState,
             columns = GridCells.Fixed(GRID_COLUMNS),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            contentPadding = PaddingValues(start = horizontalContentPadding, top = 16.dp, end = horizontalContentPadding, bottom = 32.dp),
-            modifier = Modifier
+            horizontalArrangement = Arrangement.spacedBy(TvTileSpacing),
+            verticalArrangement = Arrangement.spacedBy(TvTileSpacing),
+            contentPadding = PaddingValues(
+                start = horizontalContentPadding,
+                // A scrolling title sits inside the grid and carries its own top padding, so it
+                // aligns with the other screens; a fixed title needs a gap above the first row.
+                top = if (titleScrolls) 0.dp else 20.dp,
+                end = horizontalContentPadding,
+                bottom = 32.dp,
+            ),
+            modifier = gridModifier
                 .focusRequester(gridFocusRequester)
                 .focusGroup()
                 .focusProperties {
                     onEnter = {
                         val visible = gridState.layoutInfo.visibleItemsInfo
                         val target = itemKeys.indexOfFirst { it.toString() == lastFocusedKey }
-                            .takeIf { index -> index >= 0 && visible.any { it.index == index } }
-                            ?: visible.firstOrNull()?.index
+                            .takeIf { index -> index >= 0 && visible.any { it.index == index + headerCount } }
+                            ?: visible.firstOrNull { it.index >= headerCount }?.index?.minus(headerCount)
                         target?.let { runCatching { focusRequesters.getOrNull(it)?.requestFocus() } }
                     }
                 },
         ) {
+            if (titleScrolls && title != null) {
+                item(span = { GridItemSpan(maxLineSpan) }) {
+                    Text(
+                        text = title,
+                        style = MaterialTheme.tvTypography.title2,
+                        color = MaterialTheme.tvColors.textPrimary,
+                        modifier = Modifier.padding(top = 40.dp),
+                    )
+                }
+            }
             items(
                 count = itemKeys.size,
                 key = { index -> itemKeys[index] },

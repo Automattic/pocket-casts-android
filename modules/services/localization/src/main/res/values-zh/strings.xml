@@ -1,13 +1,78 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-08-11 11:57:45+0000
+Translation-Revision-Date: 2026-09-10 11:55:24+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="search_filters_networks">网络</string>
+    <string name="discover_networks">网络</string>
+    <string name="discover_network">网络</string>
+    <string name="device_approve_login_required">要连接您的设备，您需要有一个账户。 请登录或创建一个账户，然后重试。</string>
+    <string name="device_approve_error_message">请稍后重试。</string>
+    <string name="device_approve_error_title">设备审批失败</string>
+    <string name="device_approve_expired_message">请返回您的 TV 生成一个新的二维码。</string>
+    <string name="device_approve_expired_title">您的二维码已过期</string>
+    <string name="device_approve_success_message">您的 TV 现已连接到您的账户。</string>
+    <string name="device_approve_success_title">TV 已连接</string>
+    <string name="device_approve_connect">连接</string>
+    <string name="device_approve_signing_in_as">正在以…身份登录</string>
+    <string name="device_approve_description">您的收听进度将自动同步。\n您可以随时在“设置”中断开连接。</string>
+    <string name="device_approve_title">连接到您的 TV</string>
+    <string name="tv_settings_subscription_plan">套餐</string>
+    <string name="tv_settings_subscription_next_renewal">下次续订时间</string>
+    <string name="tv_settings_subscription_lifetime">使用期限</string>
+    <string name="tv_settings_subscription_other_platform">此订阅是在另一个平台上进行的。 请使用该平台管理订阅。</string>
+    <string name="tv_settings_privacy_policy_qr_message">扫描下方的二维码，或在手机上打开该 URL，即可查看隐私政策。</string>
+    <string name="tv_settings_terms_of_use_qr_message">扫描下方的二维码，或在手机上打开该 URL，即可查看使用条款。</string>
+    <string name="tv_history_empty_title">无收听历史记录</string>
+    <string name="tv_history_empty_subtitle">您播放的剧集将显示在此处</string>
+    <string name="tv_settings_subscription_expires">到期日期</string>
+    <string name="tv_settings_subscription_title">订阅</string>
+    <string name="tv_profile_log_out_confirmation_message">此操作将从此设备上删除所有已下载的播客和数据。 您可以重新登录，以将您的播客同步回来。</string>
+    <string name="tv_profile_log_out_confirmation_title">退出登录？</string>
+    <string name="tv_starred_empty_title">无星标剧集</string>
+    <string name="tv_starred_empty_subtitle">为剧集加星标以便随时查看，星标剧集将显示在此处</string>
+    <string name="tv_onboarding_syncing_subtitle">正在加载您的播客。</string>
+    <string name="tv_onboarding_welcome_back">很高兴见到您</string>
+    <string name="tv_onboarding_subtitle">您的播客。 大屏呈现。 很明显。</string>
+    <string name="tv_sign_in_signing_in">正在登录</string>
+    <string name="tv_sign_in_tab_email">电子邮件地址</string>
+    <string name="tv_sign_in_tab_qr_code">二维码</string>
+    <string name="tv_sign_in_qr_error">无法获取您的登录代码</string>
+    <string name="tv_account_signed_out_alert_title">您已退出登录。</string>
+    <string name="tv_account_signed_out_alert_message">出了点问题，您已退出登录。\n请选择下方按钮再次登录您的 Pocket Casts 账户。</string>
+    <string name="tv_search_prompt">播客、节目、作者</string>
+    <string name="tv_search_no_results_for_title">未找到“%1$s”的相关结果</string>
+    <string name="tv_search_featured">精选</string>
+    <string name="tv_search_recent">最近搜索</string>
+    <string name="tv_banner_discover_more_title">这还只是冰山一角。</string>
+    <string name="tv_banner_discover_more_subtitle">您的下一个心头好，就在这里等着您。</string>
+    <string name="tv_banner_discover_more_action_title">探索更多节目</string>
+    <string name="tv_search_searching">正在搜索…</string>
+    <string name="tv_sponsored_podcast_section_title">Pocket Casts 推荐</string>
+    <string name="tv_banner_create_account_title">一个账户。 适配所有屏幕</string>
+    <string name="tv_banner_create_account_subtitle">您的关注和进度都保持原样</string>
+    <string name="tv_banner_create_account_action_title">创建一个免费账户</string>
+    <string name="tv_search_error_subtitle">请检查您的连接，然后重试。</string>
+    <string name="tv_search_no_results_subtitle">尝试更多常规或不同的关键字。</string>
+    <string name="tv_search_no_results_title">无结果</string>
+    <string name="tv_search_browse_categories">浏览分类</string>
     <string name="tv_playlist_play_all_save_and_play">保存并播放</string>
     <string name="tv_playlist_play_all_play_without_saving">播放但不保存</string>
+    <string name="tv_playlist_play_all_clear_up_next_message">我们可以将您当前的“接下来播放”保存为播放列表</string>
+    <string name="tv_playlist_play_all_clear_up_next_title">这将清除您的“接下来播放”</string>
+    <string name="tv_stop_playback_confirmation_message">这将停止当前的播放。</string>
+    <string name="tv_archive_confirmation_title">存档剧集？</string>
+    <string name="tv_mark_played_confirmation_title">标记为已播放？</string>
+    <string name="tv_trim_silence_off">剪裁静音关闭</string>
+    <string name="tv_trim_silence_changed">剪裁静音已设为 %1$s</string>
+    <string name="tv_volume_boost_off">音量增强关闭</string>
+    <string name="tv_volume_boost_on">音量增强开启</string>
+    <string name="tv_playback_speed_changed">播放速度已设为 %1$s</string>
+    <string name="tv_nothing_playing_subtitle">播放一集后，它就会显示在此处。</string>
+    <string name="tv_nothing_playing_title">未播放任何内容</string>
     <string name="tv_episode_removed_from_up_next">已从“接下来播放”中移除</string>
     <string name="tv_sign_in_title">登录 Pocket Casts</string>
     <string name="tv_create_account_modal_title">您的播客值得一个归宿</string>
@@ -30,9 +95,9 @@ Language: zh_CN
     <string name="tv_podcast_info_website">网站</string>
     <string name="tv_podcast_info_network">网络</string>
     <string name="tv_create_account_modal_step_create">创建您的账户或登录</string>
-    <string name="tv_sign_in_step_confirm_code">如有要求，请使用下方代码进行确认</string>
     <string name="tv_sign_in_step_login">登录您的账户</string>
     <string name="tv_sign_in_step_scan">扫描二维码或转到 %1$s</string>
+    <string name="tv_sign_in_step_confirm_code">如果系统询问，请确认下方的代码</string>
     <string name="tv_podcast_more_info">更多信息</string>
     <string name="tv_podcast_follow">关注此播客</string>
     <string name="tv_folder_empty_message">在移动应用程序中将播客添加到此文件夹，它们将会显示在此处。</string>
@@ -73,17 +138,12 @@ Language: zh_CN
     <string name="bookmark_play_from">从 %s 播放</string>
     <string name="summary_upsell_description">订阅 Plus 以使用此功能和其他高级功能（如书签和文件夹）。</string>
     <string name="summary_upsell_title">AI 驱动的摘要</string>
-    <string name="tv_create_account_subtitle">扫描此二维码即可在手机上开始使用，整个过程只需一分钟。</string>
-    <string name="tv_create_account_come_back">创建账户后，请返回并登录</string>
     <string name="tv_create_account_title">创建您的免费账户</string>
-    <string name="tv_onboarding_syncing_subtitle">您的播客正在同步，我们很快就会为您登录！</string>
-    <string name="tv_onboarding_welcome_back">欢迎回来！</string>
     <string name="tv_onboarding_sign_in_instructions">打开摄像头，对准此二维码</string>
     <string name="tv_onboarding_sign_in_title">使用手机登录</string>
     <string name="tv_onboarding_syncing">正在同步您的播客\u2026</string>
     <string name="tv_onboarding_browse_without_account">无需账户即可浏览</string>
     <string name="tv_onboarding_create_free_account">创建免费账户</string>
-    <string name="tv_onboarding_subtitle">您的播客，大屏呈现</string>
     <string name="tv_onboarding_welcome_tv">欢迎使用 Pocket Casts TV</string>
     <string name="tv_onboarding_welcome">欢迎使用 Pocket Casts</string>
     <string name="sort_longest_to_shortest">最长到最短</string>

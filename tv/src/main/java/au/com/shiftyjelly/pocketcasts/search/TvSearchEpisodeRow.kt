@@ -18,8 +18,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
@@ -30,37 +28,17 @@ import androidx.tv.material3.CardDefaults
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.component.TvArtworkImage
-import au.com.shiftyjelly.pocketcasts.component.TvEpisodeListItemContainer
+import au.com.shiftyjelly.pocketcasts.component.TvFocusedWideCardScale
 import au.com.shiftyjelly.pocketcasts.component.TvTile
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.to.ImprovedSearchResultItem
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
+import au.com.shiftyjelly.pocketcasts.theme.TvCardShape
 import au.com.shiftyjelly.pocketcasts.theme.TvTheme
 import au.com.shiftyjelly.pocketcasts.theme.tvColors
 import au.com.shiftyjelly.pocketcasts.theme.tvTypography
 import java.util.Date
 import kotlin.time.Duration.Companion.seconds
-
-@Composable
-internal fun TvSearchEpisodeRow(
-    episode: ImprovedSearchResultItem.EpisodeItem,
-    onClick: () -> Unit,
-    onOpenActions: () -> Unit,
-    modifier: Modifier = Modifier,
-    episodeFocusRequester: FocusRequester? = null,
-) {
-    TvEpisodeListItemContainer(
-        onOpenActions = onOpenActions,
-        modifier = modifier,
-    ) { rowModifier ->
-        TvSearchEpisodeCard(
-            episode = episode,
-            onClick = onClick,
-            modifier = rowModifier
-                .then(if (episodeFocusRequester != null) Modifier.focusRequester(episodeFocusRequester) else Modifier),
-        )
-    }
-}
 
 @Composable
 internal fun TvSearchEpisodeCard(
@@ -81,8 +59,8 @@ internal fun TvSearchEpisodeCard(
     TvTile(
         onClick = onClick,
         onLongClick = onLongClick,
-        scale = CardDefaults.scale(focusedScale = 1.02f),
-        shape = CardDefaults.shape(shape = RoundedCornerShape(12.dp)),
+        scale = CardDefaults.scale(focusedScale = TvFocusedWideCardScale),
+        shape = CardDefaults.shape(shape = TvCardShape),
         colors = CardDefaults.colors(
             containerColor = MaterialTheme.tvColors.backgroundSunken,
             focusedContainerColor = MaterialTheme.tvColors.backgroundActive,
@@ -92,19 +70,19 @@ internal fun TvSearchEpisodeCard(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(24.dp),
+                .padding(18.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             TvArtworkImage(
                 model = PodcastImage.getMediumArtworkUrl(episode.podcastUuid),
                 modifier = Modifier
-                    .size(96.dp)
-                    .clip(RoundedCornerShape(6.dp)),
+                    .size(72.dp)
+                    .clip(RoundedCornerShape(4.5.dp)),
             )
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(start = 24.dp),
+                    .padding(start = 18.dp),
             ) {
                 if (episode.podcastTitle.isNotBlank()) {
                     Text(
@@ -114,7 +92,7 @@ internal fun TvSearchEpisodeCard(
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(3.dp))
                 }
                 Text(
                     text = episode.title,
@@ -124,7 +102,7 @@ internal fun TvSearchEpisodeCard(
                     overflow = TextOverflow.Ellipsis,
                 )
                 if (duration.isNotBlank()) {
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(3.dp))
                     Text(
                         text = duration,
                         style = MaterialTheme.tvTypography.caption1,
@@ -139,10 +117,10 @@ internal fun TvSearchEpisodeCard(
 
 @Preview(device = Devices.TV_1080p)
 @Composable
-private fun TvSearchEpisodeRowPreview() {
+private fun TvSearchEpisodeCardPreview() {
     TvTheme {
-        Box(modifier = Modifier.background(MaterialTheme.tvColors.backgroundSunken).padding(48.dp)) {
-            TvSearchEpisodeRow(
+        Box(modifier = Modifier.background(MaterialTheme.tvColors.backgroundSunken).padding(36.dp)) {
+            TvSearchEpisodeCard(
                 episode = ImprovedSearchResultItem.EpisodeItem(
                     uuid = "episode-1",
                     title = "The real cost of sugar and how it shapes the food we eat",
@@ -152,7 +130,6 @@ private fun TvSearchEpisodeRowPreview() {
                     duration = 1440.seconds,
                 ),
                 onClick = {},
-                onOpenActions = {},
             )
         }
     }

@@ -7,10 +7,13 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.discover.TvCategoryPodcasts
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverBanner
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverEpisode
+import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverFeedAnalytics
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverFeedLoader
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverPodcast
+import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverPodcastAttribution
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverRow
 import au.com.shiftyjelly.pocketcasts.discover.TvOpenedCategory
+import au.com.shiftyjelly.pocketcasts.discover.TvProgressCardStyle
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PodcastDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextDao
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -23,20 +26,13 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
-import com.automattic.eventhorizon.BannerRowTappedEvent
-import com.automattic.eventhorizon.DiscoverAdCategoryTappedEvent
-import com.automattic.eventhorizon.DiscoverCategoriesPillTappedEvent
-import com.automattic.eventhorizon.DiscoverFeaturedPodcastTappedEvent
-import com.automattic.eventhorizon.DiscoverListEpisodePlayEvent
-import com.automattic.eventhorizon.DiscoverListEpisodeTappedEvent
-import com.automattic.eventhorizon.DiscoverListImpressionEvent
-import com.automattic.eventhorizon.DiscoverListPodcastTappedEvent
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.HomeShownEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -46,8 +42,13 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlow
 import kotlinx.coroutines.rx2.await
@@ -66,6 +67,7 @@ class TvHomeViewModel @Inject constructor(
     private val playbackManager: PlaybackManager,
     private val eventHorizon: EventHorizon,
     private val settings: Settings,
+    private val discoverPodcastAttribution: TvDiscoverPodcastAttribution,
     @ApplicationContext private val context: Context,
 ) : ViewModel() {
 
@@ -78,13 +80,50 @@ class TvHomeViewModel @Inject constructor(
     private val _playFailures = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     val playFailures: SharedFlow<Unit> = _playFailures.asSharedFlow()
 
+    private val discoverFeedAnalytics = TvDiscoverFeedAnalytics(eventHorizon, settings, SOURCE_HOME, LOCAL_ROW_IDS, discoverPodcastAttribution)
+
     private var loadJob: Job? = null
+
+    @Volatile
+    private var playbackStartedThisSession = false
 
     init {
         viewModelScope.launch {
             syncManager.isLoggedInObservable.asFlow()
                 .distinctUntilChanged()
                 .collect { load() }
+        }
+        observeLocalRowSignals()
+    }
+
+    @OptIn(FlowPreview::class)
+    private fun observeLocalRowSignals() {
+        viewModelScope.launch {
+            merge(
+                playbackManager.upNextQueue.changesObservable.asFlow().map {},
+                playbackManager.playbackStateFlow
+                    .onEach { if (it.isPlaying) playbackStartedThisSession = true }
+                    .map { it.isPlaying to it.episodeUuid }
+                    .distinctUntilChanged()
+                    .map {},
+                playlistManager.smartEpisodesFlow(NEW_RELEASES_RULES).distinctUntilChanged().map {},
+            )
+                .debounce(LOCAL_ROWS_DEBOUNCE_MS)
+                .collect { refreshLocalRows() }
+        }
+    }
+
+    private suspend fun refreshLocalRows() {
+        if (_uiState.value !is TvHomeUiState.Ready) return
+        val isLoggedIn = syncManager.isLoggedIn()
+        val localRows = loadLocalRows(isLoggedIn)
+        _uiState.update { current ->
+            if (current is TvHomeUiState.Ready && isLoggedIn == syncManager.isLoggedIn()) {
+                val nonLocalRows = current.rows.filterNot { it.id in LOCAL_ROW_IDS }
+                TvHomeUiState.Ready((localRows + nonLocalRows).distinctBy(TvDiscoverRow::id))
+            } else {
+                current
+            }
         }
     }
 
@@ -144,23 +183,27 @@ class TvHomeViewModel @Inject constructor(
         val podcastTitles = findPodcastTitles(upNextEpisodes + newReleases)
 
         buildList {
-            upNextEpisodes.firstOrNull()?.let { current ->
-                add(
-                    TvDiscoverRow.Episodes(
-                        id = KEEP_LISTENING_ROW_ID,
-                        title = context.getString(LR.string.tv_home_keep_listening),
-                        episodes = listOf(current.toTvDiscoverEpisode(podcastTitles)),
-                    ),
-                )
+            if (!playbackStartedThisSession) {
+                upNextEpisodes.firstOrNull()?.let { current ->
+                    add(
+                        TvDiscoverRow.Episodes(
+                            id = KEEP_LISTENING_ROW_ID,
+                            title = context.getString(LR.string.tv_home_keep_listening),
+                            episodes = listOf(current.toTvDiscoverEpisode(podcastTitles)),
+                            progressCardStyle = TvProgressCardStyle.Resume,
+                        ),
+                    )
+                }
             }
             if (isLoggedIn) {
                 val queue = upNextEpisodes.drop(1)
-                if (queue.isNotEmpty()) {
+                if (queue.size >= UP_NEXT_ROW_MIN) {
                     add(
                         TvDiscoverRow.Episodes(
                             id = UP_NEXT_ROW_ID,
                             title = context.getString(LR.string.up_next),
                             episodes = queue.map { it.toTvDiscoverEpisode(podcastTitles) },
+                            progressCardStyle = TvProgressCardStyle.Queue,
                         ),
                     )
                 }
@@ -177,94 +220,64 @@ class TvHomeViewModel @Inject constructor(
         }
     }
 
+    fun retryDiscoverRow(row: TvDiscoverRow) {
+        viewModelScope.launch {
+            val reloaded = try {
+                discoverFeedLoader.reloadHomeRow(row.id, syncManager.isLoggedIn()) ?: row
+            } catch (exception: CancellationException) {
+                throw exception
+            } catch (exception: Exception) {
+                Timber.e(exception, "Failed to reload TV home row ${row.id}")
+                row
+            }
+            replaceRow(row.id, reloaded)
+        }
+    }
+
+    private fun replaceRow(rowId: String, newRow: TvDiscoverRow?) {
+        val current = _uiState.value as? TvHomeUiState.Ready ?: return
+        _uiState.value = TvHomeUiState.Ready(current.rows.mapNotNull { if (it.id == rowId) newRow else it })
+    }
+
     suspend fun categoryPodcasts(categoryId: Int, source: String): TvCategoryPodcasts {
         return discoverFeedLoader.loadCategoryPodcasts(source, categoryId, syncManager.isLoggedIn())
+    }
+
+    suspend fun categoryCoverUrls(category: DiscoverCategory): List<String> {
+        return discoverFeedLoader.loadCategoryCoverUrls(category.source)
     }
 
     fun trackHomeShown() {
         eventHorizon.track(HomeShownEvent)
     }
 
-    fun trackDiscoverListShown(row: TvDiscoverRow) {
-        val listId = row.discoverListId() ?: return
-        eventHorizon.track(DiscoverListImpressionEvent(listId = listId, source = SOURCE_HOME))
-    }
+    fun trackDiscoverListShown(row: TvDiscoverRow) = discoverFeedAnalytics.trackListImpression(row)
 
-    fun trackDiscoverPodcastTapped(row: TvDiscoverRow, podcast: TvDiscoverPodcast) {
-        val listId = row.discoverListId() ?: return
-        eventHorizon.track(DiscoverListPodcastTappedEvent(listId = listId, podcastUuid = podcast.uuid, source = SOURCE_HOME))
-        if (row is TvDiscoverRow.FeaturedPodcasts) {
-            eventHorizon.track(DiscoverFeaturedPodcastTappedEvent(podcastUuid = podcast.uuid))
-        } else if (podcast.isSponsored) {
-            trackSponsoredPodcastTapped(podcast.uuid)
-        }
-    }
+    fun trackDiscoverPodcastTapped(row: TvDiscoverRow, podcast: TvDiscoverPodcast) = discoverFeedAnalytics.trackPodcastTapped(row, podcast)
 
-    fun trackDiscoverEpisodePlayed(row: TvDiscoverRow, episode: TvDiscoverEpisode) {
-        val listId = row.discoverListId() ?: return
-        eventHorizon.track(DiscoverListEpisodeTappedEvent(listId = listId, podcastUuid = episode.podcastUuid, episodeUuid = episode.episodeUuid, source = SOURCE_HOME))
-        eventHorizon.track(DiscoverListEpisodePlayEvent(listId = listId, podcastUuid = episode.podcastUuid))
-    }
+    fun trackDiscoverEpisodePlayed(row: TvDiscoverRow, episode: TvDiscoverEpisode) = discoverFeedAnalytics.trackEpisodePlayed(row, episode)
 
-    fun trackDiscoverEpisodePodcastTapped(row: TvDiscoverRow, episode: TvDiscoverEpisode) {
-        val listId = row.discoverListId() ?: return
-        eventHorizon.track(DiscoverListPodcastTappedEvent(listId = listId, podcastUuid = episode.podcastUuid, source = SOURCE_HOME))
-    }
+    fun trackDiscoverEpisodePodcastTapped(row: TvDiscoverRow, episode: TvDiscoverEpisode) = discoverFeedAnalytics.trackEpisodePodcastTapped(row, episode)
 
-    fun trackCategoryPodcastTapped(category: TvOpenedCategory, listId: String?, podcast: TvDiscoverPodcast) {
-        if (listId != null) {
-            eventHorizon.track(DiscoverListPodcastTappedEvent(listId = listId, podcastUuid = podcast.uuid, source = SOURCE_HOME))
-        }
-        if (podcast.isSponsored) {
-            eventHorizon.track(
-                DiscoverAdCategoryTappedEvent(name = category.name, region = discoverRegion(), id = category.id.toLong(), podcastId = podcast.uuid),
-            )
-        }
-    }
+    fun trackCategoryPodcastTapped(category: TvOpenedCategory, listId: String?, podcast: TvDiscoverPodcast) = discoverFeedAnalytics.trackCategoryPodcastTapped(category, listId, podcast)
 
-    fun trackCategoryPillTapped(category: DiscoverCategory, index: Int) {
-        eventHorizon.track(
-            DiscoverCategoriesPillTappedEvent(
-                name = category.name,
-                region = discoverRegion(),
-                index = index.toLong(),
-                visits = category.totalVisits.toLong(),
-                sponsored = category.isSponsored ?: false,
-                source = SOURCE_HOME,
-            ),
-        )
-    }
+    fun trackCategoryPillTapped(category: DiscoverCategory, index: Int) = discoverFeedAnalytics.trackCategoryPillTapped(category, index)
 
-    fun trackBannerTapped(banner: TvDiscoverBanner) {
-        eventHorizon.track(BannerRowTappedEvent(type = banner.id))
-    }
+    fun trackBannerTapped(banner: TvDiscoverBanner) = discoverFeedAnalytics.trackBannerTapped(banner)
 
-    private fun trackSponsoredPodcastTapped(podcastUuid: String) {
-        eventHorizon.track(
-            DiscoverAdCategoryTappedEvent(name = UNKNOWN_VALUE, region = discoverRegion(), id = 0, podcastId = podcastUuid),
-        )
-    }
-
-    private fun discoverRegion(): String = settings.discoverCountryCode.value
-
-    private fun TvDiscoverRow.discoverListId(): String? = when (this) {
-        is TvDiscoverRow.FeaturedPodcasts,
-        is TvDiscoverRow.SinglePodcast,
-        is TvDiscoverRow.Podcasts,
-        is TvDiscoverRow.Episodes,
-        -> id.takeUnless { it in LOCAL_ROW_IDS }
-
-        is TvDiscoverRow.Banner,
-        is TvDiscoverRow.Categories,
-        -> null
-    }
+    fun isPlaying(): Boolean = playbackManager.isPlaying()
 
     fun playEpisode(episode: TvDiscoverEpisode) {
         viewModelScope.launch {
             try {
                 val found = episodeManager.findByUuid(episode.episodeUuid)
-                    ?: run {
+                    ?: runCatching {
                         podcastManager.findOrDownloadPodcastRxSingle(episode.podcastUuid).await()
+                        episodeManager.findByUuid(episode.episodeUuid)
+                            ?: episodeManager.downloadMissingPodcastEpisode(episode.episodeUuid, episode.podcastUuid)
+                    }.getOrElse { if (it is CancellationException) throw it else null }
+                    ?: episode.toPlayableEpisode()?.let { playable ->
+                        episodeManager.add(listOf(playable), playable.podcastUuid, downloadMetaData = false)
                         episodeManager.findByUuid(episode.episodeUuid)
                     }
                 if (found != null) {
@@ -283,6 +296,29 @@ class TvHomeViewModel @Inject constructor(
         }
     }
 
+    fun playLatestEpisode(row: TvDiscoverRow, podcast: TvDiscoverPodcast) {
+        viewModelScope.launch {
+            try {
+                val loadedPodcast = podcastManager.findOrDownloadPodcastRxSingle(podcast.uuid).await()
+                podcastManager.refreshPodcast(loadedPodcast, playbackManager)
+                val latest = episodeManager.findEpisodesByPodcastOrderedByPublishDate(loadedPodcast).firstOrNull()
+                if (latest != null) {
+                    discoverFeedAnalytics.trackEpisodePlayed(row, latest.toTvDiscoverEpisode(podcast))
+                    playbackManager.playNowSuspend(episode = latest, sourceView = SourceView.DISCOVER)
+                    _playStarted.tryEmit(Unit)
+                } else {
+                    Timber.e("No episode found to play from featured podcast %s on TV home", podcast.uuid)
+                    _playFailures.tryEmit(Unit)
+                }
+            } catch (exception: CancellationException) {
+                throw exception
+            } catch (exception: Exception) {
+                Timber.e(exception, "Failed to play latest episode from TV home")
+                _playFailures.tryEmit(Unit)
+            }
+        }
+    }
+
     private suspend fun findPodcastTitles(episodes: List<PodcastEpisode>): Map<String, String> {
         val uuids = episodes.map(PodcastEpisode::podcastUuid).distinct()
         if (uuids.isEmpty()) return emptyMap()
@@ -294,10 +330,17 @@ class TvHomeViewModel @Inject constructor(
         episodeTitle = title,
         podcastUuid = podcastUuid,
         podcastTitle = podcastTitles[podcastUuid].orEmpty(),
+        episode = this,
+    )
+
+    private fun PodcastEpisode.toTvDiscoverEpisode(podcast: TvDiscoverPodcast) = TvDiscoverEpisode(
+        episodeUuid = uuid,
+        episodeTitle = title,
+        podcastUuid = podcast.uuid,
+        podcastTitle = podcast.title,
     )
 
     companion object {
-        private const val UNKNOWN_VALUE = "unknown"
         private const val SOURCE_HOME = "home"
 
         const val KEEP_LISTENING_ROW_ID = "keep_listening"
@@ -307,7 +350,9 @@ class TvHomeViewModel @Inject constructor(
         private val LOCAL_ROW_IDS = setOf(KEEP_LISTENING_ROW_ID, UP_NEXT_ROW_ID, NEW_RELEASES_ROW_ID)
 
         private const val UP_NEXT_LIMIT = 12
+        private const val UP_NEXT_ROW_MIN = 2
         private const val NEW_RELEASES_LIMIT = 12
+        private const val LOCAL_ROWS_DEBOUNCE_MS = 1000L
 
         private val NEW_RELEASES_RULES = SmartPlaylistDraft.NewReleases.rules.copy(
             episodeStatus = SmartRules.EpisodeStatusRule(unplayed = true, inProgress = false, completed = false),

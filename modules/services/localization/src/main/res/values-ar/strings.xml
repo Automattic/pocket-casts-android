@@ -1,11 +1,78 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-08-10 21:58:08+0000
+Translation-Revision-Date: 2026-09-10 09:55:43+0000
 Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;
 Generator: GlotPress/2.4.0-alpha
 Language: ar
 -->
 <resources>
+    <string name="search_filters_networks">الشبكات</string>
+    <string name="discover_networks">الشبكات</string>
+    <string name="discover_network">الشبكة</string>
+    <string name="device_approve_error_message">يُرجى المحاولة مرة أخرى لاحقًا.</string>
+    <string name="device_approve_error_title">فشلت الموافقة على ربط الجهاز</string>
+    <string name="device_approve_expired_message">يُرجى الرجوع إلى التلفاز الخاص بك لإنشاء رمز جديد.</string>
+    <string name="device_approve_expired_title">انتهت صلاحية رمز الاستجابة السريعة الخاص بك</string>
+    <string name="device_approve_success_message">تم الآن ربط التلفاز الخاص بك بحسابك.</string>
+    <string name="device_approve_success_title">التلفزيون متصل</string>
+    <string name="device_approve_connect">ربط</string>
+    <string name="device_approve_signing_in_as">جارٍ تسجيل الدخول باسم…</string>
+    <string name="device_approve_login_required">لربط جهازك، يجب أن يكون لديك حساب. يُرجى تسجيل الدخول أو إنشاء حساب والمحاولة مرة أخرى.</string>
+    <string name="device_approve_description">ستتم مزامنة سجل الاستماع الخاص بك تلقائيًا.\nيمكنك قطع الاتصال في أي وقت من الإعدادات.</string>
+    <string name="device_approve_title">الربط بالتلفاز الخاص بك</string>
+    <string name="tv_history_empty_subtitle">ستظهر الحلقات التي تقوم بتشغيلها هنا</string>
+    <string name="tv_history_empty_title">لا يوجد سجل استماع</string>
+    <string name="tv_settings_terms_of_use_qr_message">امسح رمز الاستجابة السريعة أدناه، أو افتح عنوان الموقع الموجود على هاتفك للاطلاع على شروط الاستخدام.</string>
+    <string name="tv_settings_privacy_policy_qr_message">امسح رمز الاستجابة السريعة أدناه، أو افتح عنوان الموقع الموجود على هاتفك للاطلاع على سياسة الخصوصية.</string>
+    <string name="tv_settings_subscription_other_platform">تم إجراء هذا الاشتراك على منصة أخرى. يُرجى استخدام تلك المنصة لإدارة الاشتراك.</string>
+    <string name="tv_settings_subscription_lifetime">مدى الحياة</string>
+    <string name="tv_settings_subscription_expires">انتهاء الصلاحية</string>
+    <string name="tv_settings_subscription_next_renewal">التجديد التالي</string>
+    <string name="tv_settings_subscription_plan">الخطة</string>
+    <string name="tv_settings_subscription_title">الاشتراك</string>
+    <string name="tv_profile_log_out_confirmation_message">يؤدي هذا إلى إزالة جميع حلقات البث الصوتي التي تم تنزيلها والبيانات من هذا الجهاز. يمكنك تسجيل الدخول مجددًا لمزامنة حلقات البث الصوتي الخاصة بك مرة أخرى.</string>
+    <string name="tv_profile_log_out_confirmation_title">هل ترغب في تسجيل الخروج؟</string>
+    <string name="tv_starred_empty_subtitle">ميز الحلقات بنجمة لتسهيل الوصول إليها، وستظهر هنا</string>
+    <string name="tv_starred_empty_title">لا توجد حلقات مميزة بنجمة</string>
+    <string name="tv_onboarding_syncing_subtitle">جارٍ تحميل حلقات البث الصوتي الخاصة بك الآن.</string>
+    <string name="tv_onboarding_welcome_back">سعدنا برؤيتك</string>
+    <string name="tv_onboarding_subtitle">حلقات البث الصوتي الخاصة بك. على الشاشة الكبيرة. بالتأكيد.</string>
+    <string name="tv_sign_in_signing_in">تسجيل الدخول</string>
+    <string name="tv_sign_in_tab_email">البريد الإلكتروني</string>
+    <string name="tv_sign_in_tab_qr_code">رمز الاستجابة السريعة</string>
+    <string name="tv_sign_in_qr_error">يتعذر الحصول على كود تسجيل الدخول الخاص بك</string>
+    <string name="tv_account_signed_out_alert_message">حدثت مشكلة، وتم تسجيل خروجك.\nحدد الزر أدناه لتسجيل الدخول إلى حسابك على Pocket Casts مجددًا.</string>
+    <string name="tv_account_signed_out_alert_title">لقد تم تسجيل خروجك</string>
+    <string name="tv_search_no_results_for_title">لا توجد نتائج لـ \"⁦%1$s⁩\"</string>
+    <string name="tv_search_featured">مميز</string>
+    <string name="tv_search_recent">عمليات البحث الأخيرة</string>
+    <string name="tv_search_prompt">حلقات البث الصوتي، العروض، المؤلفون</string>
+    <string name="tv_search_searching">جارٍ البحث…</string>
+    <string name="tv_banner_discover_more_action_title">اكتشف المزيد من العروض</string>
+    <string name="tv_banner_discover_more_subtitle">هنا ستجد ما قد يصبح شغفك الجديد</string>
+    <string name="tv_banner_discover_more_title">ما زال هناك الكثير لتكتشفه</string>
+    <string name="tv_banner_create_account_action_title">أنشئ حسابًا مجانيًا</string>
+    <string name="tv_banner_create_account_subtitle">ستجد متابعاتك وتقدمك كما تركتهما تمامًا</string>
+    <string name="tv_banner_create_account_title">حساب واحد. لجميع الشاشات</string>
+    <string name="tv_sponsored_podcast_section_title">توصيات Pocket Casts</string>
+    <string name="tv_search_error_subtitle">تحقق من اتصالك وحاول مرة أخرى.</string>
+    <string name="tv_search_no_results_subtitle">جرب استخدام كلمات مفتاحية أكثر عمومية أو مختلفة.</string>
+    <string name="tv_search_no_results_title">لا توجد نتائج</string>
+    <string name="tv_search_browse_categories">تصفح التصنيفات</string>
+    <string name="tv_playlist_play_all_play_without_saving">التشغيل من دون حفظ</string>
+    <string name="tv_playlist_play_all_save_and_play">حفظ وتشغيل</string>
+    <string name="tv_playlist_play_all_clear_up_next_message">يمكنك حفظ المحتوى الموجود حاليًا في \"التالي\"\u00A0كقائمة تشغيل</string>
+    <string name="tv_playlist_play_all_clear_up_next_title">سيؤدي ذلك إلى مسح المحتوى الموجود في \"التالي\"\u00A0لديك</string>
+    <string name="tv_stop_playback_confirmation_message">سيؤدي ذلك إلى إيقاف التشغيل الحالي.</string>
+    <string name="tv_archive_confirmation_title">هل تريد أرشفة الحلقة؟</string>
+    <string name="tv_mark_played_confirmation_title">هل تريد وضع علامة \"تم التشغيل\"؟</string>
+    <string name="tv_trim_silence_off">إيقاف قص فترات الصمت</string>
+    <string name="tv_trim_silence_changed">تم تعيين خيار قص فترات الصمت على ⁦%1$s⁩</string>
+    <string name="tv_volume_boost_off">إيقاف تشغيل تعزيز مستوى الصوت</string>
+    <string name="tv_volume_boost_on">تشغيل تعزيز مستوى الصوت</string>
+    <string name="tv_playback_speed_changed">تم تعيين سرعة التشغيل على ⁦%1$s⁩</string>
+    <string name="tv_nothing_playing_subtitle">شغل حلقة، وستظهر هنا.</string>
+    <string name="tv_nothing_playing_title">لا يوجد شيء قيد التشغيل</string>
     <string name="tv_episode_removed_from_up_next">تمت الإزالة من \"التالي\"</string>
     <string name="tv_podcast_schedule_monthly">شهريًا</string>
     <string name="tv_podcast_schedule_fortnightly">مرة كل أسبوعين</string>
@@ -27,10 +94,10 @@ Language: ar
     <string name="tv_create_account_modal_step_create">أنشئ حسابك أو سجّل الدخول</string>
     <string name="tv_create_account_modal_subtitle">أنشئ حسابًا مجّانيًا لمتابعة برامج البث الصوتي، وبناء قائمة \"التالي\" الخاصة بك، ومتابعة الاستماع من حيث توقفت، على أي جهاز.</string>
     <string name="tv_create_account_modal_title">تستحق برامج البث الصوتي التي تتابعها مكانًا خاصًا بها</string>
-    <string name="tv_sign_in_step_confirm_code">إذا طُلِب منك ذلك، فقم بالتأكيد باستخدام الكود أدناه</string>
     <string name="tv_sign_in_step_login">تسجيل الدخول إلى حسابك</string>
     <string name="tv_sign_in_step_scan">امسح رمز الاستجابة السريعة ضوئيًا أو انتقل إلى ⁦%1$s⁩</string>
     <string name="tv_sign_in_title">تسجيل الدخول إلى Pocket Casts</string>
+    <string name="tv_sign_in_step_confirm_code">عند الطلب، قم بتأكيد الكود أدناه</string>
     <string name="tv_podcast_more_info">المزيد من المعلومات</string>
     <string name="tv_podcast_follow">متابعة هذا البث الصوتي</string>
     <string name="tv_folder_empty_message">أضف برامج البث الصوتي إلى هذا المجلد من تطبيق الهاتف، وستظهر هنا.</string>
@@ -71,17 +138,12 @@ Language: ar
     <string name="bookmark_play_from">تشغيل من %s</string>
     <string name="summary_upsell_description">اشترك في خطة Plus للحصول على حق الوصول إليها وإلى الميزات الأخرى للخطة المميزة، مثل: الإشارات المرجعية والمجلدات.</string>
     <string name="summary_upsell_title">ملخصات مدعومة بالذكاء الاصطناعي</string>
-    <string name="tv_create_account_come_back">بمجرد أن يتم إنشاء حسابك، يمكنك الرجوع وتسجيل الدخول</string>
-    <string name="tv_create_account_subtitle">امسح هذا الكود ضوئيًا للبدء على هاتفك، فالأمر لن يستغرق سوى دقيقة واحدة.</string>
     <string name="tv_create_account_title">إنشاء حساب مجّاني لك</string>
-    <string name="tv_onboarding_syncing_subtitle">تتم مزامنة حلقات البث الصوتي لديك، وسنُسجِّل دخولك قريبًا!</string>
-    <string name="tv_onboarding_welcome_back">مرحبًا بك مرة أخرى!</string>
     <string name="tv_onboarding_sign_in_instructions">افتح الكاميرا ووجّهها إلى كود الاستجابة السريعة (QR) هذا</string>
     <string name="tv_onboarding_sign_in_title">تسجيل الدخول باستخدام هاتفك</string>
     <string name="tv_onboarding_syncing">جارٍ مزامنة حلقات البث الصوتي لديك\u2026</string>
     <string name="tv_onboarding_browse_without_account">تصفح من دون حساب</string>
     <string name="tv_onboarding_create_free_account">إنشاء حساب مجّاني</string>
-    <string name="tv_onboarding_subtitle">شاهد حلقات البث الصوتي لديك على الشاشة الكبيرة</string>
     <string name="tv_onboarding_welcome_tv">مرحبًا بك في تطبيق Pocket Casts على التلفاز</string>
     <string name="tv_onboarding_welcome">مرحبًا بك في تطبيق Pocket Casts</string>
     <string name="sort_longest_to_shortest">من الأطول إلى الأقصر</string>

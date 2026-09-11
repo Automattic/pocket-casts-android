@@ -31,6 +31,7 @@ dependencies {
     implementation(platform(libs.compose.bom))
 
     implementation(libs.androidx.webkit)
+    implementation(libs.compose.activity)
     implementation(libs.compose.material)
     implementation(libs.compose.material.icons.core)
     implementation(libs.compose.foundation)

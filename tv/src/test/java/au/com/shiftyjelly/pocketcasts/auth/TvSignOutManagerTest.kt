@@ -72,6 +72,23 @@ class TvSignOutManagerTest {
     }
 
     @Test
+    fun `a server-initiated wipe does not re-run the sign out analytics`() = runTest {
+        val manager = createManager(fileStorage = mock<FileStorage>())
+
+        manager.signOutAndWipeData(wasInitiatedByUser = false)
+        advanceUntilIdle()
+
+        verify(userManager).signOutAndClearData(
+            playbackManager = eq(playbackManager),
+            upNextQueue = eq(upNextQueue),
+            folderManager = eq(folderManager),
+            searchHistoryManager = eq(searchHistoryManager),
+            episodeManager = eq(episodeManager),
+            wasInitiatedByUser = eq(false),
+        )
+    }
+
+    @Test
     fun `sign out deletes the downloaded files`() = runTest {
         val episodesDir = temporaryFolder.newFolder("episodes")
         val imagesDir = temporaryFolder.newFolder("network_images")

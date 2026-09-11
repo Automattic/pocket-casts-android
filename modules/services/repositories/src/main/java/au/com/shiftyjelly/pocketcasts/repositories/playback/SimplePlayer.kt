@@ -29,6 +29,8 @@ import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.utils.fingerprint.FingerprintDecodePolicy
+import au.com.shiftyjelly.pocketcasts.utils.fingerprint.FingerprintPolicy
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
@@ -42,6 +44,7 @@ class SimplePlayer(
     private val context: Context,
     private val dataSourceFactory: ExoPlayerDataSourceFactory,
     private val fingerprintPcmTap: FingerprintPcmTap? = null,
+    private val fingerprintDecodePolicy: FingerprintDecodePolicy,
     override val onPlayerEvent: (au.com.shiftyjelly.pocketcasts.repositories.playback.Player, PlayerEvent) -> Unit,
 ) : LocalPlayer(onPlayerEvent) {
     private val reducedBufferManufacturers = listOf("mercedes-benz")
@@ -73,6 +76,8 @@ class SimplePlayer(
     private val mainHandler = Handler(Looper.getMainLooper())
 
     private var hasVideoSurface = false
+
+    private var pendingSurface: SurfaceView? = null
 
     @Volatile
     private var prepared = false
@@ -134,6 +139,7 @@ class SimplePlayer(
 
         player = null
         prepared = false
+        pendingSurface = null
 
         videoChangedListener?.videoNeedsReset()
     }
@@ -237,8 +243,18 @@ class SimplePlayer(
         player.addListener(PlayPauseListener(playbackStatsCollector))
         player.addAnalyticsListener(renderer)
 
+        val surfaceToAttach = pendingSurface
         handleStop()
         this.player = player
+        surfaceToAttach?.let { surface ->
+            try {
+                player.setVideoSurfaceHolder(surface.holder)
+                hasVideoSurface = true
+                applyVideoTrackSelection()
+            } catch (e: Exception) {
+                Timber.e(e)
+            }
+        }
 
         setPlayerEffects()
         player.addListener(object : Player.Listener {
@@ -370,14 +386,21 @@ class SimplePlayer(
             boostVolume = playbackEffects?.isVolumeBoosted ?: false,
             fingerprintPcmTap = fingerprintPcmTap,
             fingerprintTapEnabled = {
-                FeatureFlag.isEnabled(Feature.SYNCED_TRANSCRIPTS) && Util.getAppPlatform(context) == AppPlatform.Phone
+                FeatureFlag.isEnabled(Feature.SYNCED_TRANSCRIPTS) &&
+                    Util.getAppPlatform(context) == AppPlatform.Phone &&
+                    fingerprintDecodePolicy.current() != FingerprintPolicy.DISABLED
             },
             audioLevelMeterEnabled = { isTv },
         )
     }
 
     fun setDisplay(surfaceView: SurfaceView?): Boolean {
-        val player = player ?: return false
+        val player = player
+        if (player == null) {
+            pendingSurface = surfaceView
+            return false
+        }
+        pendingSurface = null
 
         return try {
             player.setVideoSurfaceHolder(surfaceView?.holder)

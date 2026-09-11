@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -30,9 +31,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.OutlinedButton
 import androidx.tv.material3.Text
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.component.LocalOpenNowPlaying
 import au.com.shiftyjelly.pocketcasts.component.LocalTvToastHostState
+import au.com.shiftyjelly.pocketcasts.component.ScrollToTopEffect
+import au.com.shiftyjelly.pocketcasts.component.TopBarScrollReporter
 import au.com.shiftyjelly.pocketcasts.component.TvDetailOverlay
+import au.com.shiftyjelly.pocketcasts.component.scrollAwayTopBar
 import au.com.shiftyjelly.pocketcasts.component.tvFocusInactiveWhen
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
@@ -101,6 +106,7 @@ fun TvHomeScreen(
                 viewModel.trackDiscoverEpisodePlayed(row, episode)
                 viewModel.playEpisode(episode)
             },
+            onPlayLatestEpisode = viewModel::playLatestEpisode,
             onEpisodePodcastClick = { row, episode ->
                 viewModel.trackDiscoverEpisodePodcastTapped(row, episode)
                 openedPodcastUuid = episode.podcastUuid
@@ -110,9 +116,11 @@ fun TvHomeScreen(
                 openedCategory = TvOpenedCategory(category.id, category.name, category.source)
             },
             onListImpression = viewModel::trackDiscoverListShown,
+            onRetryRow = viewModel::retryDiscoverRow,
+            loadCategoryCovers = viewModel::categoryCoverUrls,
+            isPodcastPlaying = viewModel::isPlaying,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = TvTopBarHeight)
                 .tvFocusInactiveWhen(category != null || podcastUuid != null),
             restoreFocusTrigger = restoreFocusTrigger,
         )
@@ -139,6 +147,7 @@ fun TvHomeScreen(
         ) { uuid ->
             TvPodcastDetailsScreen(
                 podcastUuid = uuid,
+                source = SourceView.DISCOVER,
                 onClose = { openedPodcastUuid = null },
             )
         }
@@ -153,27 +162,38 @@ private fun TvHomeContent(
     onTapBanner: (TvDiscoverBanner) -> Unit = {},
     onPodcastClick: (TvDiscoverRow, TvDiscoverPodcast) -> Unit = { _, _ -> },
     onEpisodePlay: (TvDiscoverRow, TvDiscoverEpisode) -> Unit = { _, _ -> },
+    onPlayLatestEpisode: (TvDiscoverRow, TvDiscoverPodcast) -> Unit = { _, _ -> },
     onEpisodePodcastClick: (TvDiscoverRow, TvDiscoverEpisode) -> Unit = { _, _ -> },
     onCategoryClick: (DiscoverCategory, Int) -> Unit = { _, _ -> },
     onListImpression: (TvDiscoverRow) -> Unit = {},
+    onRetryRow: (TvDiscoverRow) -> Unit = {},
+    loadCategoryCovers: (suspend (DiscoverCategory) -> List<String>)? = null,
+    isPodcastPlaying: () -> Boolean = { false },
     restoreFocusTrigger: Int = 0,
 ) {
     when (uiState) {
-        is TvHomeUiState.Loading -> LoadingView(color = MaterialTheme.tvColors.textPrimary, modifier = modifier)
+        is TvHomeUiState.Loading -> LoadingView(
+            color = MaterialTheme.tvColors.textPrimary,
+            modifier = modifier.padding(top = TvTopBarHeight),
+        )
 
-        is TvHomeUiState.Error -> TvHomeError(onRetry = onRetry, modifier = modifier)
+        is TvHomeUiState.Error -> TvHomeError(onRetry = onRetry, modifier = modifier.padding(top = TvTopBarHeight))
 
         is TvHomeUiState.Ready -> if (uiState.rows.isEmpty()) {
-            TvHomeError(onRetry = onRetry, modifier = modifier)
+            TvHomeError(onRetry = onRetry, modifier = modifier.padding(top = TvTopBarHeight))
         } else {
             TvHomeRows(
                 rows = uiState.rows,
                 onTapBanner = onTapBanner,
                 onPodcastClick = onPodcastClick,
                 onEpisodePlay = onEpisodePlay,
+                onPlayLatestEpisode = onPlayLatestEpisode,
                 onEpisodePodcastClick = onEpisodePodcastClick,
                 onCategoryClick = onCategoryClick,
                 onListImpression = onListImpression,
+                onRetryRow = onRetryRow,
+                loadCategoryCovers = loadCategoryCovers,
+                isPodcastPlaying = isPodcastPlaying,
                 modifier = modifier,
                 restoreFocusTrigger = restoreFocusTrigger,
             )
@@ -196,7 +216,7 @@ private fun TvHomeError(
                 color = MaterialTheme.tvColors.textPrimary,
                 style = MaterialTheme.tvTypography.caption1,
             )
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(18.dp))
             OutlinedButton(onClick = onRetry) {
                 Text(stringResource(LR.string.retry))
             }
@@ -211,13 +231,20 @@ private fun TvHomeRows(
     onTapBanner: (TvDiscoverBanner) -> Unit = {},
     onPodcastClick: (TvDiscoverRow, TvDiscoverPodcast) -> Unit = { _, _ -> },
     onEpisodePlay: (TvDiscoverRow, TvDiscoverEpisode) -> Unit = { _, _ -> },
+    onPlayLatestEpisode: (TvDiscoverRow, TvDiscoverPodcast) -> Unit = { _, _ -> },
     onEpisodePodcastClick: (TvDiscoverRow, TvDiscoverEpisode) -> Unit = { _, _ -> },
     onCategoryClick: (DiscoverCategory, Int) -> Unit = { _, _ -> },
     onListImpression: (TvDiscoverRow) -> Unit = {},
+    onRetryRow: (TvDiscoverRow) -> Unit = {},
+    loadCategoryCovers: (suspend (DiscoverCategory) -> List<String>)? = null,
+    isPodcastPlaying: () -> Boolean = { false },
     restoreFocusTrigger: Int = 0,
 ) {
     var lastFocusedRowIndex by rememberSaveable(rows.size) { mutableIntStateOf(0) }
     val rowFocusRequesters = remember(rows.size) { List(rows.size) { FocusRequester() } }
+    val listState = rememberLazyListState()
+    ScrollToTopEffect { listState.scrollToItem(0) }
+    TopBarScrollReporter(listState)
 
     var isInitialComposition by remember { mutableStateOf(true) }
     LaunchedEffect(restoreFocusTrigger) {
@@ -230,10 +257,11 @@ private fun TvHomeRows(
     }
 
     LazyColumn(
-        modifier = modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(24.dp),
+        state = listState,
+        modifier = modifier.fillMaxSize().scrollAwayTopBar(),
+        verticalArrangement = Arrangement.spacedBy(40.dp),
     ) {
-        item { Spacer(modifier = Modifier.height(8.dp)) }
+        item { Spacer(modifier = Modifier.height(6.dp)) }
 
         rows.forEachIndexed { rowIndex, row ->
             val rowModifier = Modifier.onFocusChanged { focusState ->
@@ -248,14 +276,18 @@ private fun TvHomeRows(
                 onEpisodePlay = onEpisodePlay,
                 onEpisodePodcastClick = onEpisodePodcastClick,
                 onCategoryClick = onCategoryClick,
+                onPlayLatestEpisode = onPlayLatestEpisode,
                 modifier = rowModifier,
                 focusRequester = rowFocusRequester,
                 onTapBanner = onTapBanner,
                 onListImpression = onListImpression,
+                onRetryRow = onRetryRow,
+                loadCategoryCovers = loadCategoryCovers,
+                isPodcastPlaying = isPodcastPlaying,
             )
         }
 
-        item { Spacer(modifier = Modifier.height(8.dp)) }
+        item { Spacer(modifier = Modifier.height(6.dp)) }
     }
 }
 

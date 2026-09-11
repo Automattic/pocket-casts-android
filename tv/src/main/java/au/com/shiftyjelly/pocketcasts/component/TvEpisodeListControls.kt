@@ -52,8 +52,8 @@ fun TvArchivedFilterButton(
                 painter = painterResource(IR.drawable.ic_chevron_small_up),
                 contentDescription = null,
                 modifier = Modifier
-                    .padding(start = 6.dp)
-                    .size(16.dp)
+                    .padding(start = 4.5.dp)
+                    .size(12.dp)
                     .rotate(180f),
             )
         }
@@ -108,7 +108,7 @@ fun <T> TvSortButton(
             Icon(
                 painter = painterResource(IR.drawable.ic_sort),
                 contentDescription = stringResource(LR.string.sort_by),
-                modifier = Modifier.size(20.dp),
+                modifier = Modifier.size(15.dp),
             )
         }
         if (isExpanded) {
