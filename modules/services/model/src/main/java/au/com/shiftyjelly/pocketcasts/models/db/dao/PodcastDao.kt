@@ -116,7 +116,7 @@ abstract class PodcastDao {
 
     @Transaction
     @Query("SELECT * FROM podcasts WHERE subscribed = 1 AND auto_add_to_up_next > 0 ORDER BY LOWER(title) ASC")
-    abstract fun findAutoAddToUpNextPodcastsRxFlowable(): Flowable<List<Podcast>>
+    abstract fun findAutoAddToUpNextPodcastsFlow(): Flow<List<Podcast>>
 
     @Transaction
     @Query("SELECT * FROM podcasts WHERE auto_add_to_up_next > 0")

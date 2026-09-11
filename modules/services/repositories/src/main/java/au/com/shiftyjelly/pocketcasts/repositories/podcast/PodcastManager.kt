@@ -129,7 +129,7 @@ interface PodcastManager {
     fun updateGroupingForAllBlocking(grouping: PodcastGrouping)
 
     fun buildUserEpisodePodcast(episode: UserEpisode): Podcast
-    fun autoAddToUpNextPodcastsRxFlowable(): Flowable<List<Podcast>>
+    fun autoAddToUpNextPodcastsFlow(): Flow<List<Podcast>>
     suspend fun findAutoAddToUpNextPodcasts(): List<Podcast>
 
     suspend fun refreshPodcastFeed(podcast: Podcast): Boolean
