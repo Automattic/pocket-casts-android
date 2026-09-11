@@ -109,6 +109,22 @@ class BookmarkTranscriptTest {
     }
 
     @Test
+    fun `passage span picks the occurrence nearest a drifted location`() {
+        val repeated = "The lottery idea comes up again and again."
+        val duplicated = bookmarkTranscript(
+            TranscriptEntry.Text(repeated),
+            TranscriptEntry.Text("Some filler in between to keep the two mentions apart."),
+            TranscriptEntry.Text(repeated),
+        )
+        val flat = "The lottery idea comes up again and again. Some filler in between to keep the two mentions apart. The lottery idea comes up again and again."
+        val second = flat.lastIndexOf(repeated)
+
+        val drifted = duplicated.passageDisplaySpan(repeated, second + 2)!!
+
+        assertEquals(second, duplicated.passage(drifted).location)
+    }
+
+    @Test
     fun `passage span is null when the passage is absent`() {
         assertNull(transcript.passageDisplaySpan("a passage no transcript would ever contain", location = null))
     }

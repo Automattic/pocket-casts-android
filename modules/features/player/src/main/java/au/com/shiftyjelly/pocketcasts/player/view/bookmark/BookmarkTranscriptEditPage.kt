@@ -45,6 +45,7 @@ fun BookmarkTranscriptEditPage(
         Header(
             playerColors = playerColors,
             showDone = uiState is BookmarkTranscriptEditViewModel.UiState.Loaded,
+            doneEnabled = (uiState as? BookmarkTranscriptEditViewModel.UiState.Loaded)?.canSave == true,
             onSave = onSave,
             onClose = onClose,
         )
@@ -98,6 +99,7 @@ fun BookmarkTranscriptEditPage(
 private fun Header(
     playerColors: PlayerColors,
     showDone: Boolean,
+    doneEnabled: Boolean,
     onSave: () -> Unit,
     onClose: () -> Unit,
 ) {
@@ -125,7 +127,7 @@ private fun Header(
                 modifier = Modifier.weight(1f),
             )
             if (showDone) {
-                TextButton(onClick = onSave) {
+                TextButton(onClick = onSave, enabled = doneEnabled) {
                     Text(
                         text = stringResource(LR.string.done),
                         fontSize = 16.sp,

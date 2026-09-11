@@ -98,25 +98,27 @@ fun BookmarkTranscriptView(
                         Modifier
                             .pointerInput(transcript) {
                                 detectTapGestures { position ->
-                                    currentLayout?.let { result ->
-                                        currentPassageChange(transcript.sentenceDisplaySpan(result.getOffsetForPosition(position)))
+                                    val result = currentLayout ?: return@detectTapGestures
+                                    val offset = result.getOffsetForPosition(position)
+                                    if (!transcript.isSpeakerOffset(offset)) {
+                                        currentPassageChange(transcript.sentenceDisplaySpan(offset))
                                     }
                                 }
                             }
                             .pointerInput(transcript) {
-                                var anchor = TextSpan(0, 0)
+                                var anchor: TextSpan? = null
                                 detectDragGesturesAfterLongPress(
                                     onDragStart = { position ->
-                                        currentLayout?.let { result ->
-                                            anchor = transcript.sentenceDisplaySpan(result.getOffsetForPosition(position))
-                                            currentPassageChange(anchor)
-                                        }
+                                        val result = currentLayout ?: return@detectDragGesturesAfterLongPress
+                                        val offset = result.getOffsetForPosition(position)
+                                        anchor = if (transcript.isSpeakerOffset(offset)) null else transcript.sentenceDisplaySpan(offset)
+                                        anchor?.let(currentPassageChange)
                                     },
                                     onDrag = { change, _ ->
-                                        currentLayout?.let { result ->
-                                            val focus = transcript.sentenceDisplaySpan(result.getOffsetForPosition(change.position))
-                                            currentPassageChange(TextSpan(min(anchor.start, focus.start), max(anchor.end, focus.end)))
-                                        }
+                                        val result = currentLayout ?: return@detectDragGesturesAfterLongPress
+                                        val start = anchor ?: return@detectDragGesturesAfterLongPress
+                                        val focus = transcript.sentenceDisplaySpan(result.getOffsetForPosition(change.position))
+                                        currentPassageChange(TextSpan(min(start.start, focus.start), max(start.end, focus.end)))
                                     },
                                 )
                             }
@@ -136,6 +138,8 @@ fun BookmarkTranscriptView(
         hasScrolled = true
     }
 }
+
+private fun BookmarkTranscript.isSpeakerOffset(index: Int) = speakerSpans.any { index >= it.start && index < it.end }
 
 private val SimpleTextStyle = TextStyle(
     fontSize = 16.sp,

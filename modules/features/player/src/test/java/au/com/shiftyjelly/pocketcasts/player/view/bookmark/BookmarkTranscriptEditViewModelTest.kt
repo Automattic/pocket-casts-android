@@ -6,11 +6,14 @@ import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptEntry
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptType
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
+import au.com.shiftyjelly.pocketcasts.repositories.shownotes.ShowNotesManager
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -33,8 +36,12 @@ class BookmarkTranscriptEditViewModelTest {
     @Mock
     private lateinit var transcriptManager: TranscriptManager
 
+    @Mock
+    private lateinit var showNotesManager: ShowNotesManager
+
     private val bookmarkUuid = "bookmark-uuid"
     private val episodeUuid = "episode-uuid"
+    private val podcastUuid = "podcast-uuid"
     private val firstSentence = "that's the thing about selective admissions."
     private val secondSentence = "The difference between the kid who gets in and the kid who doesn't is often basically noise."
 
@@ -64,6 +71,29 @@ class BookmarkTranscriptEditViewModelTest {
         assertTrue(state is BookmarkTranscriptEditViewModel.UiState.Loaded)
         state as BookmarkTranscriptEditViewModel.UiState.Loaded
         assertEquals(firstSentence, state.transcript.displaySubstring(state.passage!!))
+        verify(showNotesManager).loadShowNotes(podcastUuid, episodeUuid)
+    }
+
+    @Test
+    fun `can save when the stored passage relocates`() = runTest {
+        whenever(bookmarkManager.findBookmark(bookmarkUuid)).thenReturn(bookmark(passage = firstSentence, location = 0))
+        whenever(transcriptManager.loadGeneratedTranscript(episodeUuid)).thenReturn(transcript)
+
+        val viewModel = viewModel().apply { load(arguments) }
+
+        assertTrue((viewModel.uiState.value as BookmarkTranscriptEditViewModel.UiState.Loaded).canSave)
+    }
+
+    @Test
+    fun `cannot save when the stored passage is absent from the transcript`() = runTest {
+        whenever(bookmarkManager.findBookmark(bookmarkUuid)).thenReturn(bookmark(passage = "a passage no transcript would ever contain", location = null))
+        whenever(transcriptManager.loadGeneratedTranscript(episodeUuid)).thenReturn(transcript)
+
+        val viewModel = viewModel().apply { load(arguments) }
+
+        val loaded = viewModel.uiState.value as BookmarkTranscriptEditViewModel.UiState.Loaded
+        assertNull(loaded.passage)
+        assertFalse(loaded.canSave)
     }
 
     @Test
@@ -100,10 +130,11 @@ class BookmarkTranscriptEditViewModelTest {
         verify(bookmarkManager).updatePassage(bookmarkUuid, secondSentence, firstSentence.length + 1)
     }
 
-    private fun viewModel() = BookmarkTranscriptEditViewModel(bookmarkManager, transcriptManager)
+    private fun viewModel() = BookmarkTranscriptEditViewModel(bookmarkManager, transcriptManager, showNotesManager)
 
     private fun bookmark(passage: String?, location: Int?) = Bookmark(
         uuid = bookmarkUuid,
+        podcastUuid = podcastUuid,
         episodeUuid = episodeUuid,
         passage = passage,
         passageLocation = location,

@@ -3,11 +3,13 @@ package au.com.shiftyjelly.pocketcasts.player.view.bookmark
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
+import au.com.shiftyjelly.pocketcasts.repositories.shownotes.ShowNotesManager
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.BookmarkTranscript
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TextSpan
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -17,6 +19,7 @@ import kotlinx.coroutines.launch
 class BookmarkTranscriptEditViewModel @Inject constructor(
     private val bookmarkManager: BookmarkManager,
     private val transcriptManager: TranscriptManager,
+    private val showNotesManager: ShowNotesManager,
 ) : ViewModel() {
 
     private lateinit var arguments: BookmarkTranscriptEditArguments
@@ -27,7 +30,9 @@ class BookmarkTranscriptEditViewModel @Inject constructor(
         data class Loaded(
             val transcript: BookmarkTranscript,
             val passage: TextSpan?,
-        ) : UiState
+        ) : UiState {
+            val canSave: Boolean get() = passage?.let { transcript.passage(it).text.isNotEmpty() } == true
+        }
     }
 
     private val mutableUiState = MutableStateFlow<UiState>(UiState.Loading)
@@ -41,6 +46,11 @@ class BookmarkTranscriptEditViewModel @Inject constructor(
             if (bookmark == null || storedPassage == null) {
                 mutableUiState.value = UiState.NotAvailable
                 return@launch
+            }
+            runCatching {
+                showNotesManager.loadShowNotes(bookmark.podcastUuid, bookmark.episodeUuid)
+            }.onFailure {
+                if (it is CancellationException) throw it
             }
             val transcript = transcriptManager.loadGeneratedTranscript(arguments.episodeUuid)
             if (transcript == null) {

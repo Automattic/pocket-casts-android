@@ -16,7 +16,6 @@
             android:configChanges="orientation|layoutDirection|screenSize" />
         <activity
             android:name=".view.bookmark.BookmarkTranscriptEditActivity"
-            android:launchMode="singleTask"
             android:configChanges="orientation|layoutDirection|screenSize" />
     </application>
 

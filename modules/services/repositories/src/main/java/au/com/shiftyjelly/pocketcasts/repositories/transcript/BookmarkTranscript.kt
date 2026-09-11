@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.transcript
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptEntry
 import java.text.BreakIterator
+import kotlin.math.abs
 
 data class TextSpan(val start: Int, val end: Int) {
     val length get() = end - start
@@ -57,8 +58,24 @@ class BookmarkTranscript private constructor(
         if (location != null && location in 0..flatText.length && flatText.startsWith(normalized, location)) {
             return TextSpan(location, location + normalized.length)
         }
-        val index = flatText.indexOf(normalized)
-        return if (index >= 0) TextSpan(index, index + normalized.length) else null
+        val start = if (location == null) flatText.indexOf(normalized) else nearestOccurrence(normalized, location)
+        if (start < 0) return null
+        return TextSpan(start, start + normalized.length)
+    }
+
+    private fun nearestOccurrence(value: String, location: Int): Int {
+        var nearest = -1
+        var nearestDistance = Int.MAX_VALUE
+        var index = flatText.indexOf(value)
+        while (index >= 0) {
+            val distance = abs(index - location)
+            if (distance < nearestDistance) {
+                nearest = index
+                nearestDistance = distance
+            }
+            index = flatText.indexOf(value, index + 1)
+        }
+        return nearest
     }
 
     companion object {
