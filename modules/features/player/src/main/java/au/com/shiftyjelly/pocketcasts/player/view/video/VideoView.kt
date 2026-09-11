@@ -94,6 +94,11 @@ class VideoView @JvmOverloads constructor(
         }, SURFACE_CONNECT_DELAY_MS)
     }
 
+    fun reconnect() {
+        isSurfaceConnected = false
+        connectWithDelay()
+    }
+
     private fun connect() {
         if (!isSurfaceCreated || isSurfaceConnected || !isSurfaceConnectionPending) {
             return
