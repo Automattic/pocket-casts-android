@@ -518,6 +518,7 @@ class MediaSessionManager(
             it.previousMediaId = currentPlayer.previousMediaId
             it.isTransientLoss = currentPlayer.isTransientLoss
         }
+        applyCurrentEpisodeMetadata(swapped)
         forwardingPlayer = swapped
         media3Session?.player = swapped
         placeholderPlayer?.release()
