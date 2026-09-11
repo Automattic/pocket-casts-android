@@ -8,6 +8,8 @@ import android.view.LayoutInflater
 import android.view.SurfaceHolder
 import android.widget.FrameLayout
 import androidx.annotation.OptIn
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.media3.common.util.UnstableApi
 import au.com.shiftyjelly.pocketcasts.player.databinding.VideoViewBinding
 import au.com.shiftyjelly.pocketcasts.repositories.playback.Player
@@ -53,6 +55,15 @@ class VideoView @JvmOverloads constructor(
         super.onDetachedFromWindow()
     }
 
+    override fun onWindowVisibilityChanged(visibility: Int) {
+        super.onWindowVisibilityChanged(visibility)
+        // The fullscreen player may have taken the video output while this window was hidden.
+        if (visibility == VISIBLE && isSurfaceCreated) {
+            isSurfaceConnected = false
+            connectWithDelay()
+        }
+    }
+
     /** Detach the surface from the player so no frozen frame lingers once video is no longer shown. */
     fun releaseSurface() {
         (player as? SimplePlayer)?.setDisplay(null)
@@ -83,6 +94,12 @@ class VideoView @JvmOverloads constructor(
 
     private fun connect() {
         if (!isSurfaceCreated || isSurfaceConnected || !isSurfaceConnectionPending) {
+            return
+        }
+
+        // A backgrounded host must not steal the video output from the fullscreen player.
+        val lifecycleState = findViewTreeLifecycleOwner()?.lifecycle?.currentState
+        if (lifecycleState != null && !lifecycleState.isAtLeast(Lifecycle.State.RESUMED)) {
             return
         }
 
