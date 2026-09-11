@@ -269,7 +269,6 @@ fun TvSearchScreen(
                 },
                 onGoToPodcast = {
                     viewModel.trackEpisodeResultTapped(episode.uuid)
-                    viewModel.dismissEpisodeActions()
                     openedPodcastUuid = episode.podcastUuid
                 },
             )

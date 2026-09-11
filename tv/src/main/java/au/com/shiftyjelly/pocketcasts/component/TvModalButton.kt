@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.tv.material3.Button
+import androidx.tv.material3.ButtonDefaults
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.theme.TvButtonDefaults
@@ -19,6 +20,7 @@ fun TvModalButton(
     Button(
         onClick = onClick,
         colors = TvButtonDefaults.filledButtonColors(),
+        scale = ButtonDefaults.scale(focusedScale = 1f),
         modifier = modifier.fillMaxWidth(),
     ) {
         Text(

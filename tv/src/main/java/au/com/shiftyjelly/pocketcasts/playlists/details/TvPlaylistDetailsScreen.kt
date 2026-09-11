@@ -144,18 +144,10 @@ fun TvPlaylistDetailsScreen(
 
     if (isReplaceUpNextConfirmationVisible) {
         TvPlayAllReplaceUpNextModal(
-            onPlayWithoutSaving = {
-                isReplaceUpNextConfirmationVisible = false
-                viewModel.replaceUpNextAndPlay(saveUpNext = false, upNextName = upNextName)
-            },
-            onSaveAndPlay = {
-                isReplaceUpNextConfirmationVisible = false
-                viewModel.replaceUpNextAndPlay(saveUpNext = true, upNextName = upNextName)
-            },
-            onCancel = {
-                isReplaceUpNextConfirmationVisible = false
-                viewModel.trackPlayAllDismissed()
-            },
+            onPlayWithoutSaving = { viewModel.replaceUpNextAndPlay(saveUpNext = false, upNextName = upNextName) },
+            onSaveAndPlay = { viewModel.replaceUpNextAndPlay(saveUpNext = true, upNextName = upNextName) },
+            onCancel = { viewModel.trackPlayAllDismissed() },
+            onDismiss = { isReplaceUpNextConfirmationVisible = false },
         )
     }
 }
@@ -449,12 +441,29 @@ private fun TvPlayAllReplaceUpNextModal(
     onPlayWithoutSaving: () -> Unit,
     onSaveAndPlay: () -> Unit,
     onCancel: () -> Unit,
+    onDismiss: () -> Unit,
 ) {
-    TvModal(onDismissRequest = onCancel) {
+    var isActionTaken by remember { mutableStateOf(false) }
+    TvModal(
+        onDismissRequest = {
+            if (!isActionTaken) {
+                onCancel()
+            }
+            onDismiss()
+        },
+    ) {
         TvPlayAllReplaceUpNextContent(
-            onPlayWithoutSaving = onPlayWithoutSaving,
-            onSaveAndPlay = onSaveAndPlay,
-            onCancel = onCancel,
+            onPlayWithoutSaving = {
+                isActionTaken = true
+                onPlayWithoutSaving()
+                dismiss()
+            },
+            onSaveAndPlay = {
+                isActionTaken = true
+                onSaveAndPlay()
+                dismiss()
+            },
+            onCancel = { dismiss() },
         )
     }
 }
