@@ -1056,9 +1056,21 @@
     <string name="add_to_playlist_failure_message">This playlist is full. Remove a few episodes or start a new one.</string>
     <!-- %1$s is a playlist title  -->
     <string name="added_to_playlist_single">Added to %1$s</string>
+    <!-- %d is a playlist count of 2 or more. Keep all quantity forms for locale-specific plural rules. -->
     <plurals name="added_to_playlist_single_multiple">
         <item quantity="one">Added to %d playlist</item>
         <item quantity="other">Added to %d playlists</item>
+    </plurals>
+    <string name="removed_from_playlist_feedback">Removed from playlist</string>
+    <!-- %d is a playlist count of 2 or more. Keep all quantity forms for locale-specific plural rules. -->
+    <plurals name="removed_from_playlists">
+        <item quantity="one">Removed from %d playlist</item>
+        <item quantity="other">Removed from %d playlists</item>
+    </plurals>
+    <!-- %d is a playlist count of 2 or more. Keep all quantity forms for locale-specific plural rules. -->
+    <plurals name="changed_playlists">
+        <item quantity="one">Changed %d playlist</item>
+        <item quantity="other">Changed %d playlists</item>
     </plurals>
     <string name="create_playlist">Create playlist</string>
     <string name="create_smart_playlist">Create smart playlist</string>
