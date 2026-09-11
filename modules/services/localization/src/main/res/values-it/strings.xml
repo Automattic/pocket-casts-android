@@ -1,23 +1,78 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-08-28 10:10:11+0000
+Translation-Revision-Date: 2026-09-10 14:58:41+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: it
 -->
 <resources>
+    <string name="search_filters_networks">Reti</string>
+    <string name="discover_networks">Reti</string>
+    <string name="discover_network">Rete</string>
+    <string name="device_approve_login_required">Per connettere il dispositivo, devi avere un account. Accedi o crea un account e riprova.</string>
+    <string name="device_approve_error_message">Riprova più tardi.</string>
+    <string name="device_approve_error_title">Approvazione del dispositivo non riuscita</string>
+    <string name="device_approve_expired_message">Torna alla TV per generarne una nuova.</string>
+    <string name="device_approve_expired_title">Il codice QR è scaduto</string>
+    <string name="device_approve_success_message">La TV è ora connessa al tuo account.</string>
+    <string name="device_approve_success_title">TV connessa</string>
+    <string name="device_approve_connect">Connetti</string>
+    <string name="device_approve_signing_in_as">Accesso come…</string>
+    <string name="device_approve_description">L\'ascolto verrà sincronizzato automaticamente.\nPuoi disconnetterti in qualsiasi momento da Impostazioni.</string>
+    <string name="device_approve_title">Connettiti alla TV</string>
+    <string name="tv_settings_subscription_plan">Piano</string>
+    <string name="tv_settings_subscription_next_renewal">Prossimo rinnovo</string>
+    <string name="tv_settings_subscription_lifetime">A vita</string>
+    <string name="tv_settings_subscription_other_platform">Questo abbonamento è stato sottoscritto su un\'altra piattaforma. Usa questa piattaforma per gestire l\'abbonamento.</string>
+    <string name="tv_settings_privacy_policy_qr_message">Scansiona il codice QR sottostante o apri l\'URL sul tuo telefono per accedere all\'Informativa sulla privacy.</string>
+    <string name="tv_settings_terms_of_use_qr_message">Scansiona il codice QR sottostante o apri l\'URL sul tuo telefono per accedere ai Termini d\'uso.</string>
+    <string name="tv_history_empty_title">Nessuna cronologia degli ascolti</string>
+    <string name="tv_history_empty_subtitle">Gli episodi riprodotti verranno visualizzati qui</string>
+    <string name="tv_settings_subscription_expires">Scade il giorno</string>
+    <string name="tv_settings_subscription_title">Abbonamento</string>
+    <string name="tv_profile_log_out_confirmation_message">Questo rimuove tutti i podcast e i dati scaricati da questo dispositivo. Puoi accedere di nuovo per sincronizzare i tuoi podcast.</string>
+    <string name="tv_profile_log_out_confirmation_title">Vuoi uscire?</string>
     <string name="tv_starred_empty_title">Nessun episodio tra i preferiti</string>
+    <string name="tv_starred_empty_subtitle">Aggiungi gli episodi ai preferiti per averli sempre a portata di mano: li troverai qui</string>
+    <string name="tv_onboarding_syncing_subtitle">Caricamento dei podcast in corso.</string>
+    <string name="tv_onboarding_welcome_back">È bello vederti</string>
+    <string name="tv_onboarding_subtitle">I tuoi podcast. Sul grande schermo. Ovviamente.</string>
+    <string name="tv_sign_in_signing_in">Accesso</string>
+    <string name="tv_sign_in_tab_email">E-mail</string>
+    <string name="tv_sign_in_tab_qr_code">Codice QR</string>
+    <string name="tv_sign_in_qr_error">Impossibile ottenere il codice di accesso</string>
     <string name="tv_account_signed_out_alert_title">Sei stato disconnesso.</string>
+    <string name="tv_account_signed_out_alert_message">Si è verificato un problema e sei stato disconnesso.\nSeleziona il pulsante in basso per accedere nuovamente al tuo account Pocket Casts.</string>
     <string name="tv_search_prompt">Podcast, spettacoli, autori</string>
+    <string name="tv_search_no_results_for_title">Nessun risultato per \"%1$s\"</string>
+    <string name="tv_search_featured">In primo piano</string>
+    <string name="tv_search_recent">Ricerche recenti</string>
     <string name="tv_banner_discover_more_title">Non hai ancora visto nulla.</string>
     <string name="tv_banner_discover_more_subtitle">La tua prossima ossessione è qui da qualche parte.</string>
     <string name="tv_banner_discover_more_action_title">Scopri più show</string>
+    <string name="tv_search_searching">Ricerca in corso…</string>
     <string name="tv_sponsored_podcast_section_title">Pocket Casts consiglia</string>
     <string name="tv_banner_create_account_title">Un account. Ogni schermo</string>
     <string name="tv_banner_create_account_subtitle">I tuoi follower e i tuoi progressi sono esattamente dove li avevi lasciati</string>
     <string name="tv_banner_create_account_action_title">Crea un account gratuito</string>
+    <string name="tv_search_error_subtitle">Controlla la connessione e riprova.</string>
+    <string name="tv_search_no_results_subtitle">Prova parole chiave più generiche o diverse.</string>
+    <string name="tv_search_no_results_title">Nessun risultato</string>
+    <string name="tv_search_browse_categories">Sfoglia le categorie</string>
     <string name="tv_playlist_play_all_save_and_play">Salva e riproduci</string>
     <string name="tv_playlist_play_all_play_without_saving">Riproduci senza salvare</string>
+    <string name="tv_playlist_play_all_clear_up_next_message">Possiamo salvare la tua riproduzione attuale come \u00A0playlist</string>
+    <string name="tv_playlist_play_all_clear_up_next_title">Questa azione cancellerà la tua \u00A0riproduzione</string>
+    <string name="tv_stop_playback_confirmation_message">Questa azione interromperà la riproduzione attuale.</string>
+    <string name="tv_archive_confirmation_title">Archiviare l\'episodio?</string>
+    <string name="tv_mark_played_confirmation_title">Contrassegnare come riprodotto?</string>
+    <string name="tv_trim_silence_off">Taglia i silenzi disattivato</string>
+    <string name="tv_trim_silence_changed">Taglia i silenzi impostato su %1$s</string>
+    <string name="tv_volume_boost_off">Aumenta il volume disattivato</string>
+    <string name="tv_volume_boost_on">Aumenta il volume attivato</string>
+    <string name="tv_playback_speed_changed">Velocità di riproduzione impostata su %1$s</string>
+    <string name="tv_nothing_playing_subtitle">Riproduci un episodio e verrà visualizzato qui.</string>
+    <string name="tv_nothing_playing_title">Nessuna riproduzione</string>
     <string name="tv_episode_removed_from_up_next">Rimosso da Successivo</string>
     <string name="tv_sign_in_title">Accesso a Pocket Casts</string>
     <string name="tv_create_account_modal_title">I tuoi podcast meritano una casa</string>
@@ -42,6 +97,7 @@ Language: it
     <string name="tv_create_account_modal_step_create">Crea un account o accedi</string>
     <string name="tv_sign_in_step_login">Accedi al tuo account</string>
     <string name="tv_sign_in_step_scan">Scansiona il codice QR o vai a %1$s</string>
+    <string name="tv_sign_in_step_confirm_code">Se richiesto, conferma il codice di seguito</string>
     <string name="tv_podcast_more_info">Maggiori info</string>
     <string name="tv_podcast_follow">Segui questo podcast</string>
     <string name="tv_folder_empty_message">Aggiungi i podcast a questa cartella nell\'app per dispositivi mobili e verranno visualizzati qui.</string>

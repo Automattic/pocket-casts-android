@@ -1,23 +1,78 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-08-28 10:10:11+0000
+Translation-Revision-Date: 2026-09-10 11:56:41+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="search_filters_networks">Netwerken</string>
+    <string name="discover_networks">Netwerken</string>
+    <string name="discover_network">Netwerk</string>
+    <string name="device_approve_login_required">Om je apparaat te verbinden, moet je een account hebben. Log in of maak een account aan en probeer het opnieuw.</string>
+    <string name="device_approve_error_message">Probeer het later opnieuw.</string>
+    <string name="device_approve_error_title">Apparaatgoedkeuring mislukt</string>
+    <string name="device_approve_expired_message">Ga terug naar je tv om een nieuwe te genereren.</string>
+    <string name="device_approve_expired_title">Je QR-code is verlopen</string>
+    <string name="device_approve_success_message">Je tv is nu verbonden met je account.</string>
+    <string name="device_approve_success_title">Tv verbonden</string>
+    <string name="device_approve_connect">Verbinden</string>
+    <string name="device_approve_signing_in_as">Inloggen als …</string>
+    <string name="device_approve_description">Je luistergedrag wordt automatisch gesynchroniseerd.\nJe kunt op elk moment de verbinding met Instellingen verbreken.</string>
+    <string name="device_approve_title">Maak verbinding met je tv</string>
+    <string name="tv_settings_subscription_plan">Abonnement</string>
+    <string name="tv_settings_subscription_next_renewal">Volgende verlenging</string>
+    <string name="tv_settings_subscription_lifetime">Levenslang</string>
+    <string name="tv_settings_subscription_other_platform">Dit abonnement is op een ander platform gemaakt. Gebruik dat platform om het abonnement te beheren.</string>
+    <string name="tv_settings_privacy_policy_qr_message">Scan de onderstaande QR-code of open de URL op je telefoon om toegang te krijgen tot het Privacybeleid.</string>
+    <string name="tv_settings_terms_of_use_qr_message">Scan de onderstaande QR-code of open de URL op je telefoon om toegang te krijgen tot de Gebruiksvoorwaarden.</string>
+    <string name="tv_history_empty_title">Geen luistergeschiedenis</string>
+    <string name="tv_history_empty_subtitle">Afleveringen die je afspeelt, worden hier weergegeven</string>
+    <string name="tv_settings_subscription_expires">Verloopt</string>
+    <string name="tv_settings_subscription_title">Abonnement</string>
+    <string name="tv_profile_log_out_confirmation_message">Hierdoor worden alle gedownloade podcasts en gegevens van dit apparaat verwijderd. Je kan opnieuw inloggen om je podcasts terug te synchroniseren.</string>
+    <string name="tv_profile_log_out_confirmation_title">Uitloggen?</string>
     <string name="tv_starred_empty_title">Geen favoriete afleveringen</string>
+    <string name="tv_starred_empty_subtitle">Markeer afleveringen met een ster om ze bij de hand te houden, en ze zullen hier verschijnen</string>
+    <string name="tv_onboarding_syncing_subtitle">Je podcasts nu laden.</string>
+    <string name="tv_onboarding_welcome_back">Goed je te zien</string>
+    <string name="tv_onboarding_subtitle">Je podcasts. Op het grote scherm. Duidelijk.</string>
+    <string name="tv_sign_in_signing_in">Inloggen</string>
+    <string name="tv_sign_in_tab_email">E-mailadres</string>
+    <string name="tv_sign_in_tab_qr_code">QR-code</string>
+    <string name="tv_sign_in_qr_error">Kon je inlogcode niet ophalen</string>
     <string name="tv_account_signed_out_alert_title">Je bent uitgelogd.</string>
+    <string name="tv_account_signed_out_alert_message">Er is een probleem opgetreden. Je bent uitgelogd.\nSelecteer de onderstaande knop om opnieuw in te loggen bij je Pocket Casts-account.</string>
     <string name="tv_search_prompt">Podcasts, shows, auteurs</string>
+    <string name="tv_search_no_results_for_title">Geen resultaten voor \'%1$s\'</string>
+    <string name="tv_search_featured">Uitgelicht</string>
+    <string name="tv_search_recent">Recente zoekopdrachten</string>
     <string name="tv_banner_discover_more_title">Je hebt nog lang niet alles gezien.</string>
     <string name="tv_banner_discover_more_subtitle">Je volgende obsessie zit hier ergens.</string>
     <string name="tv_banner_discover_more_action_title">Ontdek meer shows</string>
+    <string name="tv_search_searching">Zoeken …</string>
     <string name="tv_sponsored_podcast_section_title">Aanbevolen door Pocket Casts</string>
     <string name="tv_banner_create_account_title">Eén account. Elk scherm</string>
     <string name="tv_banner_create_account_subtitle">Je volgt en ontwikkelt precies waar je ze hebt achtergelaten</string>
     <string name="tv_banner_create_account_action_title">Een gratis account aanmaken</string>
+    <string name="tv_search_error_subtitle">Controleer je netwerkverbinding en probeer het nogmaals.</string>
+    <string name="tv_search_no_results_subtitle">Probeer meer algemene of verschillende trefwoorden.</string>
+    <string name="tv_search_no_results_title">Geen resultaten</string>
+    <string name="tv_search_browse_categories">Door categorieën bladeren</string>
     <string name="tv_playlist_play_all_save_and_play">Opslaan en afspelen</string>
     <string name="tv_playlist_play_all_play_without_saving">Afspelen zonder op te slaan</string>
+    <string name="tv_playlist_play_all_clear_up_next_message">We kunnen je huidige Hierna opslaan als een\u00A0playlist</string>
+    <string name="tv_playlist_play_all_clear_up_next_title">Hiermee wordt je Hiernau00A0gewist</string>
+    <string name="tv_stop_playback_confirmation_message">Dit stopt het huidige afspelen.</string>
+    <string name="tv_archive_confirmation_title">Aflevering archiveren?</string>
+    <string name="tv_mark_played_confirmation_title">Markeren als afgespeeld?</string>
+    <string name="tv_trim_silence_off">Stiltes wegfilteren uit</string>
+    <string name="tv_trim_silence_changed">Stilts wegfilteren ingesteld op %1$s</string>
+    <string name="tv_volume_boost_off">Volumeboost uit</string>
+    <string name="tv_volume_boost_on">Volumeboost aan</string>
+    <string name="tv_playback_speed_changed">Afspeelsnelheid ingesteld op %1$s</string>
+    <string name="tv_nothing_playing_subtitle">Speel een aflevering af en deze wordt hier weergegeven.</string>
+    <string name="tv_nothing_playing_title">Er wordt niets afgespeeld</string>
     <string name="tv_episode_removed_from_up_next">Verwijderd uit Hierna</string>
     <string name="tv_sign_in_title">Log in bij Pocket Casts</string>
     <string name="tv_create_account_modal_title">Je podcasts verdienen een thuis</string>
@@ -42,6 +97,7 @@ Language: nl
     <string name="tv_podcast_info_website">Website</string>
     <string name="tv_podcast_info_network">Netwerk</string>
     <string name="tv_sign_in_step_login">Log in bij je account.</string>
+    <string name="tv_sign_in_step_confirm_code">Bevestig de code hieronder indien hierom wordt gevraagd</string>
     <string name="tv_podcast_more_info">Meer informatie</string>
     <string name="tv_podcast_follow">Volg deze podcast</string>
     <string name="tv_folder_empty_message">Voeg podcasts toe aan deze map in de mobiele app en ze worden hier weergegeven.</string>
