@@ -1,11 +1,19 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playback
 
+import java.util.concurrent.CyclicBarrier
+import java.util.concurrent.Executors
+import java.util.concurrent.atomic.AtomicInteger
+import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.yield
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class MediaEventQueueTest {
@@ -73,6 +81,94 @@ class MediaEventQueueTest {
         }
 
         assertEquals(MediaEvent.TripleTap, firstEvent.await())
+    }
+
+    @Test
+    fun `handle an immediate single tap before the multi tap window expires`() = runTest {
+        val handler = MediaEventQueue(scopeProvider = { this })
+        var isHandled = false
+
+        val event = async {
+            handler.consumeEvent(MediaEvent.SingleTap) {
+                isHandled = true
+            }
+        }
+
+        yield()
+        assertTrue(isHandled)
+        assertNull(event.await())
+    }
+
+    @Test
+    fun `map immediate single taps to multi tap events`() = runTest {
+        val handler = MediaEventQueue(scopeProvider = { this })
+        var immediateTapCount = 0
+
+        val firstEvent = async {
+            handler.consumeEvent(MediaEvent.SingleTap) {
+                immediateTapCount++
+            }
+        }
+
+        yield()
+        assertNull(
+            handler.consumeEvent(MediaEvent.SingleTap) {
+                immediateTapCount++
+            },
+        )
+
+        assertEquals(1, immediateTapCount)
+        assertEquals(MediaEvent.DoubleTap, firstEvent.await())
+    }
+
+    @Test
+    fun `immediate single tap failure does not orphan the tap window`() = runTest {
+        val handler = MediaEventQueue(scopeProvider = { this })
+        val failure = IllegalStateException("Immediate action failed")
+
+        val thrown = runCatching {
+            handler.consumeEvent(MediaEvent.SingleTap) { throw failure }
+        }.exceptionOrNull()
+
+        assertEquals(failure, thrown)
+        assertEquals(MediaEvent.SingleTap, handler.consumeEvent(MediaEvent.SingleTap))
+    }
+
+    @Test
+    fun `handle concurrent immediate single taps exactly once`() = runBlocking {
+        val handler = MediaEventQueue(scopeProvider = { this })
+        val immediateTapCount = AtomicInteger()
+        val eventCount = 8
+        val startBarrier = CyclicBarrier(eventCount)
+        val dispatcher = Executors.newFixedThreadPool(eventCount).asCoroutineDispatcher()
+
+        dispatcher.use {
+            List(eventCount) {
+                async(dispatcher) {
+                    startBarrier.await()
+                    handler.consumeEvent(MediaEvent.SingleTap) {
+                        immediateTapCount.incrementAndGet()
+                    }
+                }
+            }.awaitAll()
+        }
+
+        assertEquals(1, immediateTapCount.get())
+    }
+
+    @Test
+    fun `do not handle immediate single tap while multi tap window is active`() = runTest {
+        val handler = MediaEventQueue(scopeProvider = { this })
+        var isHandled = false
+
+        handler.consumeEvent(MediaEvent.DoubleTap)
+
+        assertNull(
+            handler.consumeEvent(MediaEvent.SingleTap) {
+                isHandled = true
+            },
+        )
+        assertFalse(isHandled)
     }
 
     @Test
