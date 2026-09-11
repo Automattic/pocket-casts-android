@@ -14,6 +14,8 @@
         ([#5868](https://github.com/Automattic/pocket-casts-android/pull/5868))
     *   Keep the Playback Effects icon visible on the Now Playing screen when a podcast's colours haven't loaded yet
         ([#5877](https://github.com/Automattic/pocket-casts-android/pull/5877))
+    *   Show the correct episode artwork on the media notification and lock screen when the next queued episode starts
+        ([#5911](https://github.com/Automattic/pocket-casts-android/pull/5911))
 
 8.20
 -----
