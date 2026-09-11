@@ -20,11 +20,14 @@ import com.automattic.eventhorizon.SourceViewType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import timber.log.Timber
 
 @HiltViewModel
@@ -40,9 +43,11 @@ class BookmarkViewModel
     private lateinit var arguments: BookmarkArguments
     private var capturedSuggestion: BookmarkSuggestion? = null
     private var titleEdited = false
+    private var loadJob: Job? = null
 
     companion object {
         private const val DEFAULT_TITLE = "Bookmark"
+        private val SUGGESTION_TIMEOUT = 10.seconds
 
         private fun buildSelectedTextFieldValue(text: String): TextFieldValue {
             return TextFieldValue(text = text, selection = TextRange(0, text.length))
@@ -69,6 +74,7 @@ class BookmarkViewModel
     val uiState: StateFlow<UiState> = mutableUiState
 
     fun load(arguments: BookmarkArguments) {
+        if (loadJob != null) return
         this.arguments = arguments
         val bookmarkUuid = arguments.bookmarkUuid
         val editingExisting = bookmarkUuid != null && !arguments.isNewBookmark
@@ -76,7 +82,7 @@ class BookmarkViewModel
             bookmarkUuid = bookmarkUuid,
             isNewBookmark = !editingExisting,
         )
-        viewModelScope.launch {
+        loadJob = viewModelScope.launch {
             // load the existing bookmark
             val bookmark = if (bookmarkUuid == null) {
                 val episode = episodeManager.findEpisodeByUuid(arguments.episodeUuid) ?: return@launch
@@ -110,7 +116,9 @@ class BookmarkViewModel
 
     private suspend fun generateTitleSuggestion(episodeUuid: String, timeSecs: Int) {
         mutableUiState.value = mutableUiState.value.copy(titleSuggestion = TitleSuggestion.Generating)
-        val suggestion = bookmarkManager.suggestBookmark(episodeUuid, timeSecs)
+        val suggestion = withTimeoutOrNull(SUGGESTION_TIMEOUT) {
+            bookmarkManager.suggestBookmark(episodeUuid, timeSecs)
+        }
         capturedSuggestion = suggestion
         val suggestedTitle = suggestion?.title?.takeIf { it.isNotBlank() }
         when {
@@ -158,6 +166,7 @@ class BookmarkViewModel
                     val episode = episodeManager.findByUuid(episodeUuid)
                         ?: userEpisodeManager.findEpisodeByUuid(episodeUuid)
                         ?: return@launch
+                    loadJob?.join()
                     val suggestion = capturedSuggestion
                     bookmarkManager.add(
                         episode = episode,
