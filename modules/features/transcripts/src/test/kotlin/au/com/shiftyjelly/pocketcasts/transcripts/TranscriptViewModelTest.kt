@@ -1,15 +1,19 @@
 package au.com.shiftyjelly.pocketcasts.transcripts
 
+import android.content.Context
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
+import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptEntry
+import au.com.shiftyjelly.pocketcasts.models.to.TranscriptType
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
+import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.ChapterSeekResult
 import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintTimingManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -77,12 +81,17 @@ class TranscriptViewModelTest {
         on { userSeeks } doReturn userSeeksFlow
     }
     private val episodeManager = mock<EpisodeManager>()
+    private val bookmarkManager = mock<BookmarkManager>()
+    private val context = mock<Context> {
+        on { getString(any()) } doReturn "Bookmark"
+    }
 
     lateinit var viewModel: TranscriptViewModel
 
     @Before
     fun setUp() {
         viewModel = TranscriptViewModel(
+            context = context,
             transcriptManager = transcriptManager,
             episodeManager = episodeManager,
             userManager = mock {
@@ -97,9 +106,71 @@ class TranscriptViewModelTest {
                     return SharingResponse(isSuccessful = true, feedbackMessage = null, error = null)
                 }
             },
+            bookmarkManager = bookmarkManager,
             fingerprintTimingManager = fingerprintTimingManager,
             playbackManager = playbackManager,
         )
+    }
+
+    @Test
+    fun `create bookmark from a transcript selection`() = runTest {
+        val selected = "The AI revolution is underhyped."
+        transcriptManager.avaiableTranscript = Transcript.Text(
+            entries = listOf(TranscriptEntry.Text(selected, startTimeMs = 10_000)),
+            type = TranscriptType.Vtt,
+            url = "https://example.com/transcript.vtt",
+            isGenerated = true,
+            episodeUuid = "episode-id",
+            podcastUuid = "podcast-id",
+        )
+        whenever(episodeManager.findByUuid("episode-id"))
+            .thenReturn(PodcastEpisode(uuid = "episode-id", podcastUuid = "podcast-id", publishedDate = Date()))
+        whenever(fingerprintTimingManager.playbackTimeMs(any())).thenReturn(12_000)
+        whenever(
+            bookmarkManager.add(any(), any(), any(), any(), any(), anyOrNull(), anyOrNull(), anyOrNull()),
+        ).thenReturn(Bookmark(uuid = "bookmark-id"))
+
+        viewModel.loadTranscript("episode-id")
+        runCurrent()
+
+        viewModel.messages.test {
+            viewModel.createBookmarkFromSelection(selected)
+            assertEquals(TranscriptMessage.OpenBookmarkEditor("bookmark-id"), awaitItem())
+        }
+
+        // Generated transcript: reference time (10s) is mapped to the 12s playback time and kept.
+        verify(bookmarkManager).add(
+            episode = any(),
+            timeSecs = eq(12),
+            title = any(),
+            creationSource = any(),
+            addedAt = any(),
+            passage = eq(selected),
+            passageLocation = eq(0),
+            referenceTime = eq(10),
+        )
+    }
+
+    @Test
+    fun `emit bookmark failed when the selection cannot be located`() = runTest {
+        transcriptManager.avaiableTranscript = Transcript.Text(
+            entries = listOf(TranscriptEntry.Text("The AI revolution is underhyped.", startTimeMs = 10_000)),
+            type = TranscriptType.Vtt,
+            url = "https://example.com/transcript.vtt",
+            isGenerated = true,
+            episodeUuid = "episode-id",
+            podcastUuid = "podcast-id",
+        )
+
+        viewModel.loadTranscript("episode-id")
+        runCurrent()
+
+        viewModel.messages.test {
+            viewModel.createBookmarkFromSelection("text that is not in the transcript")
+            assertEquals(TranscriptMessage.BookmarkFailed, awaitItem())
+        }
+
+        verify(bookmarkManager, never()).add(any(), any(), any(), any(), any(), anyOrNull(), anyOrNull(), anyOrNull())
     }
 
     @Test

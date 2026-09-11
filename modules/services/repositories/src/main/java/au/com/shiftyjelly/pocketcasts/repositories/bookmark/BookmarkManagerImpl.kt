@@ -58,10 +58,17 @@ class BookmarkManagerImpl @Inject constructor(
         title: String,
         creationSource: BookmarkSourceType,
         addedAt: Instant,
+        passage: String?,
+        passageLocation: Int?,
+        referenceTime: Int?,
     ): Bookmark {
         // Prevent adding more than one bookmark at the same place
         val existingBookmark = findByEpisodeTime(episode = episode, timeSecs = timeSecs)
         if (existingBookmark != null) {
+            if (passage != null && passageLocation != null && existingBookmark.passage != passage) {
+                updatePassage(existingBookmark.uuid, passage, passageLocation)
+                return findBookmark(existingBookmark.uuid) ?: existingBookmark
+            }
             return existingBookmark
         }
         val addedAtMs = addedAt.toEpochMilli()
@@ -75,6 +82,11 @@ class BookmarkManagerImpl @Inject constructor(
             titleModified = addedAtMs,
             deleted = false,
             deletedModified = addedAtMs,
+            passage = passage,
+            passageLocation = passageLocation,
+            passageModified = addedAtMs.takeIf { passage != null },
+            referenceTime = referenceTime,
+            referenceTimeModified = addedAtMs.takeIf { referenceTime != null },
             syncStatus = SyncStatus.NOT_SYNCED,
         )
         bookmarkDao.insert(bookmark)

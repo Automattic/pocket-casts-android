@@ -16,8 +16,18 @@ class BookmarkTranscript private constructor(
     private val flatText: String,
     private val flatToDisplayStart: IntArray,
     private val flatToDisplayEnd: IntArray,
+    private val textEntrySpans: List<TimedSpan>,
 ) {
     data class Passage(val text: String, val location: Int)
+
+    private data class TimedSpan(val start: Int, val end: Int, val startTimeMs: Long)
+
+    /** The start time of the transcript entry a display offset lands in, in milliseconds. */
+    fun referenceTimeMsAt(displayOffset: Int): Long? {
+        val entry = textEntrySpans.firstOrNull { displayOffset in it.start until it.end }
+            ?: textEntrySpans.firstOrNull { it.start >= displayOffset }
+        return entry?.startTimeMs?.takeIf { it >= 0 }
+    }
 
     fun passageDisplaySpan(passage: String, location: Int?): TextSpan? {
         val flat = passageFlatSpan(passage, location) ?: return null
@@ -82,6 +92,7 @@ class BookmarkTranscript private constructor(
         fun from(transcript: Transcript.Text): BookmarkTranscript {
             val display = StringBuilder()
             val speakerSpans = mutableListOf<TextSpan>()
+            val textEntrySpans = mutableListOf<TimedSpan>()
             val flat = StringBuilder()
             val flatStart = mutableListOf<Int>()
             val flatEnd = mutableListOf<Int>()
@@ -102,6 +113,7 @@ class BookmarkTranscript private constructor(
                         if (flat.isNotEmpty()) pendingSpace = true
                         val valueStart = display.length
                         display.append(entry.value)
+                        textEntrySpans.add(TimedSpan(valueStart, display.length, entry.startTimeMs))
                         var i = 0
                         while (i < entry.value.length) {
                             val char = entry.value[i]
@@ -131,6 +143,7 @@ class BookmarkTranscript private constructor(
                 flatText = flat.toString(),
                 flatToDisplayStart = flatStart.toIntArray(),
                 flatToDisplayEnd = flatEnd.toIntArray(),
+                textEntrySpans = textEntrySpans,
             )
         }
 
