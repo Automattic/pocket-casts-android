@@ -8,11 +8,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -34,7 +36,6 @@ import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
-import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
@@ -44,13 +45,13 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 internal fun BookmarkDetailPage(
-    displayTitle: String,
-    aiSummary: String?,
+    title: String,
     episodeTitle: String,
     podcastUuid: String,
     podcastTitle: String,
     timeSecs: Int,
     createdAtText: String,
+    isResolving: Boolean,
     onPlayClick: () -> Unit,
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
@@ -127,7 +128,7 @@ internal fun BookmarkDetailPage(
             Spacer(modifier = Modifier.height(8.dp))
 
             TextH30(
-                text = displayTitle,
+                text = title,
                 color = colors.primaryText,
             )
 
@@ -139,14 +140,6 @@ internal fun BookmarkDetailPage(
                 color = colors.secondaryText,
             )
 
-            if (!aiSummary.isNullOrEmpty()) {
-                Spacer(modifier = Modifier.height(16.dp))
-                TextP40(
-                    text = aiSummary,
-                    color = colors.secondaryText,
-                )
-            }
-
             Spacer(modifier = Modifier.height(12.dp))
 
             TextH70(
@@ -155,16 +148,31 @@ internal fun BookmarkDetailPage(
             )
 
             Spacer(modifier = Modifier.height(20.dp))
-            RowButton(
-                text = stringResource(LR.string.bookmark_play_from, formattedTime),
-                onClick = onPlayClick,
-                includePadding = false,
-                textIcon = IR.drawable.ic_play,
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = playButtonBackground,
-                ),
-                textColor = playButtonText,
-            )
+            if (isResolving) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp),
+                ) {
+                    CircularProgressIndicator(
+                        color = playButtonBackground,
+                        strokeWidth = 2.dp,
+                        modifier = Modifier.size(24.dp),
+                    )
+                }
+            } else {
+                RowButton(
+                    text = stringResource(LR.string.bookmark_play_from, formattedTime),
+                    onClick = onPlayClick,
+                    includePadding = false,
+                    textIcon = IR.drawable.ic_play,
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = playButtonBackground,
+                    ),
+                    textColor = playButtonText,
+                )
+            }
         }
     }
 }
@@ -210,13 +218,13 @@ private fun BookmarkDetailPagePreview(
 ) {
     AppThemeWithBackground(themeType) {
         BookmarkDetailPage(
-            displayTitle = "Latency vs throughput tradeoff",
-            aiSummary = "Why optimizing for low latency often means sacrificing batch throughput.",
+            title = "Latency vs throughput tradeoff",
             episodeTitle = "Can the U.S. Rein in Prediction Markets?",
             podcastUuid = "",
             podcastTitle = "Hard Fork",
             timeSecs = 340,
             createdAtText = "May 7, 2024 - 6:40 PM",
+            isResolving = false,
             onPlayClick = {},
             onClose = {},
         )

@@ -137,6 +137,11 @@ message SyncUserBookmark {
   google.protobuf.Int64Value ai_title_modified = 11;
   google.protobuf.StringValue ai_summary = 12;
   google.protobuf.Int64Value ai_summary_modified = 13;
+  google.protobuf.StringValue passage = 14;
+  google.protobuf.Int32Value passage_location = 15;
+  google.protobuf.Int64Value passage_modified = 16;
+  google.protobuf.Int32Value reference_time = 17;
+  google.protobuf.Int64Value reference_time_modified = 18;
 }
 
 message BookmarkRequest {

@@ -5,6 +5,8 @@ import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.lifecycleScope
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
@@ -19,7 +21,11 @@ import com.automattic.eventhorizon.BookmarkPlayTappedEvent
 import com.automattic.eventhorizon.EventHorizon
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -55,8 +61,8 @@ class BookmarkDetailFragment : BaseDialogFragment() {
                 putParcelable(
                     NEW_INSTANCE_ARG,
                     Args(
-                        displayTitle = bookmark.displayTitle,
-                        aiSummary = bookmark.aiSummary,
+                        title = bookmark.title,
+                        referenceTime = bookmark.referenceTime,
                         episodeTitle = episodeTitle,
                         episodeUuid = bookmark.episodeUuid,
                         podcastUuid = podcastUuid,
@@ -72,8 +78,8 @@ class BookmarkDetailFragment : BaseDialogFragment() {
 
     @Parcelize
     private data class Args(
-        val displayTitle: String,
-        val aiSummary: String?,
+        val title: String,
+        val referenceTime: Int?,
         val episodeTitle: String,
         val episodeUuid: String,
         val podcastUuid: String,
@@ -92,6 +98,11 @@ class BookmarkDetailFragment : BaseDialogFragment() {
     @Inject
     internal lateinit var eventHorizon: EventHorizon
 
+    @Inject
+    internal lateinit var bookmarkPlaybackTimeResolver: BookmarkPlaybackTimeResolver
+
+    private val isResolving = MutableStateFlow(false)
+
     private val args get() = requireArguments().requireParcelable<Args>(NEW_INSTANCE_ARG)
 
     override fun onCreateView(
@@ -100,14 +111,15 @@ class BookmarkDetailFragment : BaseDialogFragment() {
         savedInstanceState: Bundle?,
     ) = contentWithoutConsumedInsets {
         DialogBox(fillMaxHeight = false) {
+            val resolving by isResolving.collectAsState()
             BookmarkDetailPage(
-                displayTitle = args.displayTitle,
-                aiSummary = args.aiSummary,
+                title = args.title,
                 episodeTitle = args.episodeTitle,
                 podcastUuid = args.podcastUuid,
                 podcastTitle = args.podcastTitle,
                 timeSecs = args.timeSecs,
                 createdAtText = args.createdAtText,
+                isResolving = resolving,
                 onPlayClick = ::onPlayClick,
                 onClose = { dismiss() },
             )
@@ -126,8 +138,37 @@ class BookmarkDetailFragment : BaseDialogFragment() {
                 dismiss()
                 return@launch
             }
+            val hasReferenceTime = args.referenceTime != null
+            val pausedForResolve = hasReferenceTime &&
+                playbackManager.isPlaying() &&
+                playbackManager.getCurrentEpisode()?.uuid == args.episodeUuid
+            if (pausedForResolve) {
+                playbackManager.pauseSuspend()
+            }
+            if (hasReferenceTime) {
+                isResolving.value = true
+            }
+            val seekToMs = try {
+                bookmarkPlaybackTimeResolver.playbackTimeMs(
+                    episode = episode,
+                    referenceTimeSecs = args.referenceTime,
+                    fallbackTimeSecs = args.timeSecs,
+                )
+            } catch (e: CancellationException) {
+                if (pausedForResolve) {
+                    withContext(NonCancellable) {
+                        val stillOurEpisode = playbackManager.getCurrentEpisode()?.uuid == args.episodeUuid
+                        if (stillOurEpisode && !playbackManager.isPlaying()) {
+                            playbackManager.playNowSuspend(episode, sourceView = args.sourceView)
+                        }
+                    }
+                }
+                throw e
+            } finally {
+                isResolving.value = false
+            }
             playbackManager.playNowSuspend(episode, sourceView = args.sourceView)
-            playbackManager.seekToTimeMs(positionMs = args.timeSecs * 1000)
+            playbackManager.seekToTimeMs(positionMs = seekToMs)
             eventHorizon.track(
                 BookmarkPlayTappedEvent(
                     source = args.sourceView.analyticsValue,

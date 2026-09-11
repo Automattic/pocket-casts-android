@@ -14,14 +14,15 @@ import com.google.protobuf.stringValue
 import com.pocketcasts.service.api.BookmarkResponse
 import com.pocketcasts.service.api.Record
 import com.pocketcasts.service.api.SyncUserBookmark
-import com.pocketcasts.service.api.aiSummaryModifiedOrNull
-import com.pocketcasts.service.api.aiSummaryOrNull
-import com.pocketcasts.service.api.aiTitleModifiedOrNull
-import com.pocketcasts.service.api.aiTitleOrNull
 import com.pocketcasts.service.api.createdAtOrNull
 import com.pocketcasts.service.api.isDeletedModifiedOrNull
 import com.pocketcasts.service.api.isDeletedOrNull
+import com.pocketcasts.service.api.passageLocationOrNull
+import com.pocketcasts.service.api.passageModifiedOrNull
+import com.pocketcasts.service.api.passageOrNull
 import com.pocketcasts.service.api.record
+import com.pocketcasts.service.api.referenceTimeModifiedOrNull
+import com.pocketcasts.service.api.referenceTimeOrNull
 import com.pocketcasts.service.api.syncUserBookmark
 import com.pocketcasts.service.api.timeOrNull
 import com.pocketcasts.service.api.titleModifiedOrNull
@@ -82,24 +83,23 @@ internal class BookmarkSync(
                                 value = modifiedAt
                             }
                         }
-                        localBookmark.aiTitleModified?.let { modifiedAt ->
-                            localBookmark.aiTitle?.let { value ->
-                                aiTitle = stringValue {
-                                    this.value = value
-                                }
-                                aiTitleModified = int64Value {
-                                    this.value = modifiedAt
-                                }
+                        localBookmark.passageModified?.let { modifiedAt ->
+                            passage = stringValue {
+                                value = localBookmark.passage.orEmpty()
+                            }
+                            passageLocation = int32Value {
+                                value = localBookmark.passageLocation ?: 0
+                            }
+                            passageModified = int64Value {
+                                value = modifiedAt
                             }
                         }
-                        localBookmark.aiSummaryModified?.let { modifiedAt ->
-                            localBookmark.aiSummary?.let { value ->
-                                aiSummary = stringValue {
-                                    this.value = value
-                                }
-                                aiSummaryModified = int64Value {
-                                    this.value = modifiedAt
-                                }
+                        localBookmark.referenceTimeModified?.let { modifiedAt ->
+                            referenceTime = int32Value {
+                                value = localBookmark.referenceTime ?: 0
+                            }
+                            referenceTimeModified = int64Value {
+                                value = modifiedAt
                             }
                         }
                     }
@@ -162,17 +162,15 @@ private fun Bookmark.applyServerBookmark(serverBookmark: SyncUserBookmark) = app
             deletedModified = modifiedAt
         }
     }
-    serverBookmark.aiTitleModifiedOrNull?.value?.let { modifiedAt ->
-        serverBookmark.aiTitleOrNull?.value?.let { value ->
-            aiTitle = value
-            aiTitleModified = modifiedAt
-        }
+    serverBookmark.passageModifiedOrNull?.value?.let { modifiedAt ->
+        val passageValue = serverBookmark.passageOrNull?.value?.takeIf { it.isNotEmpty() }
+        passage = passageValue
+        passageLocation = passageValue?.let { serverBookmark.passageLocationOrNull?.value }
+        passageModified = modifiedAt
     }
-    serverBookmark.aiSummaryModifiedOrNull?.value?.let { modifiedAt ->
-        serverBookmark.aiSummaryOrNull?.value?.let { value ->
-            aiSummary = value
-            aiSummaryModified = modifiedAt
-        }
+    serverBookmark.referenceTimeModifiedOrNull?.value?.let { modifiedAt ->
+        referenceTime = serverBookmark.referenceTimeOrNull?.value
+        referenceTimeModified = modifiedAt
     }
 }
 
