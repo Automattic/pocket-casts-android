@@ -55,6 +55,8 @@
         ([#5877](https://github.com/Automattic/pocket-casts-android/pull/5877))
     *   Show the bookmark details play control as a time button in the header and open the episode when its artwork or title is tapped
         ([#5946](https://github.com/Automattic/pocket-casts-android/pull/5946))
+    *   Show the correct episode artwork on the media notification and lock screen when the next queued episode starts
+        ([#5911](https://github.com/Automattic/pocket-casts-android/pull/5911))
 
 8.20
 -----
