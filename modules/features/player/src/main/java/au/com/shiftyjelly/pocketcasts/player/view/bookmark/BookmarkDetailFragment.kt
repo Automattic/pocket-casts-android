@@ -157,7 +157,10 @@ class BookmarkDetailFragment : BaseDialogFragment() {
             } catch (e: CancellationException) {
                 if (pausedForResolve) {
                     withContext(NonCancellable) {
-                        playbackManager.playNowSuspend(episode, sourceView = args.sourceView)
+                        val stillOurEpisode = playbackManager.getCurrentEpisode()?.uuid == args.episodeUuid
+                        if (stillOurEpisode && !playbackManager.isPlaying()) {
+                            playbackManager.playNowSuspend(episode, sourceView = args.sourceView)
+                        }
                     }
                 }
                 throw e

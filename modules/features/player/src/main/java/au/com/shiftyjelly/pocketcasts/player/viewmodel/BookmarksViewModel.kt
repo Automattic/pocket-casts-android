@@ -352,7 +352,10 @@ class BookmarksViewModel
             } catch (e: CancellationException) {
                 if (pausedForResolve) {
                     withContext(NonCancellable) {
-                        playbackManager.playNowSync(bookmarkEpisode, sourceView = sourceView)
+                        val stillOurEpisode = playbackManager.getCurrentEpisode()?.uuid == bookmarkEpisode.uuid
+                        if (stillOurEpisode && !playbackManager.isPlaying()) {
+                            playbackManager.playNowSync(bookmarkEpisode, sourceView = sourceView)
+                        }
                     }
                 }
                 throw e
