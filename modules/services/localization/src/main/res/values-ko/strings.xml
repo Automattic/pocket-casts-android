@@ -1,23 +1,78 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-08-28 10:10:11+0000
+Translation-Revision-Date: 2026-09-09 10:56:42+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="search_filters_networks">네트워크</string>
+    <string name="discover_networks">네트워크</string>
+    <string name="discover_network">네트워크</string>
+    <string name="device_approve_login_required">기기를 연결하려면 계정이 있어야 합니다. 로그인하거나 계정을 생성하고 다시 시도하세요.</string>
+    <string name="device_approve_error_message">나중에 다시 시도해 보세요.</string>
+    <string name="device_approve_error_title">기기 승인 실패</string>
+    <string name="device_approve_expired_message">TV로 돌아가서 새로 하나를 생성하세요.</string>
+    <string name="device_approve_expired_title">QR 코드 만료됨</string>
+    <string name="device_approve_success_message">이제 TV가 계정에 연결되었습니다.</string>
+    <string name="device_approve_success_title">TV 연결됨</string>
+    <string name="device_approve_connect">연결</string>
+    <string name="device_approve_signing_in_as">다음으로 로그인 중…</string>
+    <string name="device_approve_description">청취가 자동으로 동기화됩니다.\n언제든지 설정에서 연결을 해제할 수 있습니다.</string>
+    <string name="device_approve_title">TV에 연결</string>
+    <string name="tv_settings_subscription_plan">요금제</string>
+    <string name="tv_settings_subscription_next_renewal">다음 갱신</string>
+    <string name="tv_settings_subscription_lifetime">평생</string>
+    <string name="tv_settings_subscription_other_platform">이 구독은 다른 플랫폼에서 구매되었습니다. 구독을 관리하려면 해당 플랫폼을 이용하세요.</string>
+    <string name="tv_settings_privacy_policy_qr_message">아래 QR 코드를 스캔하거나 휴대폰에서 URL을 열어 개인정보 처리 방침을 확인하세요.</string>
+    <string name="tv_settings_terms_of_use_qr_message">아래 QR 코드를 스캔하거나 휴대폰에서 URL을 열어 이용 약관을 확인하세요.</string>
+    <string name="tv_history_empty_title">청취 기록 없음</string>
+    <string name="tv_history_empty_subtitle">재생하는 에피소드가 여기에 표시됩니다.</string>
+    <string name="tv_settings_subscription_expires">만료</string>
+    <string name="tv_settings_subscription_title">구독</string>
+    <string name="tv_profile_log_out_confirmation_message">다운로드한 모든 팟캐스트와 데이터가 이 기기에서 제거됩니다. 다시 로그인하여 팟캐스트를 다시 동기화할 수 있습니다.</string>
+    <string name="tv_profile_log_out_confirmation_title">로그아웃할까요?</string>
     <string name="tv_starred_empty_title">별 표시 에피소드 없음</string>
+    <string name="tv_starred_empty_subtitle">간편하게 별 표시를 하면 에피소드가 보존되며 여기에 표시됨</string>
+    <string name="tv_onboarding_syncing_subtitle">지금 팟캐스트를 로드하는 중입니다.</string>
+    <string name="tv_onboarding_welcome_back">반갑습니다</string>
+    <string name="tv_onboarding_subtitle">회원님의 팟캐스트입니다. 큰 화면에서. 뚜렷하게.</string>
+    <string name="tv_sign_in_signing_in">로그인 중</string>
+    <string name="tv_sign_in_tab_email">이메일</string>
+    <string name="tv_sign_in_tab_qr_code">QR 코드</string>
+    <string name="tv_sign_in_qr_error">로그인 코드를 가져올 수 없음</string>
     <string name="tv_account_signed_out_alert_title">로그아웃되었습니다.</string>
+    <string name="tv_account_signed_out_alert_message">문제가 발생했으며, 로그아웃되었습니다.\nPocket Casts 계정에 다시 로그인하려면 아래 버튼을 선택하세요.</string>
     <string name="tv_search_prompt">팟캐스트, 프로그램, 제작자</string>
+    <string name="tv_search_no_results_for_title">\"%1$s\"에 대한 결과 없음</string>
+    <string name="tv_search_featured">추천</string>
+    <string name="tv_search_recent">최근 검색 항목</string>
     <string name="tv_banner_discover_more_title">아직 반도 못 봤습니다.</string>
     <string name="tv_banner_discover_more_subtitle">이 중에 맘에 드는 게 있을 거예요.</string>
     <string name="tv_banner_discover_more_action_title">더 많은 프로그램 보기</string>
+    <string name="tv_search_searching">검색 중…</string>
     <string name="tv_sponsored_podcast_section_title">Pocket Casts 추천</string>
     <string name="tv_banner_create_account_title">계정 1개만 있으면 돼요. 모든 화면</string>
     <string name="tv_banner_create_account_subtitle">팔로우 목록과 진행률이 정확히 이전 상태 그대로 유지됩니다</string>
     <string name="tv_banner_create_account_action_title">무료 계정 생성</string>
+    <string name="tv_search_error_subtitle">연결 상태를 확인하고 다시 시도하세요.</string>
+    <string name="tv_search_no_results_subtitle">더 일반적이나 다른 키워드를 사용해 보세요.</string>
+    <string name="tv_search_no_results_title">결과 없음</string>
+    <string name="tv_search_browse_categories">카테고리 둘러보기</string>
     <string name="tv_playlist_play_all_save_and_play">저장하고 재생</string>
     <string name="tv_playlist_play_all_play_without_saving">저장하지 않고 재생</string>
+    <string name="tv_playlist_play_all_clear_up_next_message">현재 표시되는 다음 차례를 재생목록으로 저장할 수\u00A0있음</string>
+    <string name="tv_playlist_play_all_clear_up_next_title">그러면 다음 차례가\u00A0지워짐</string>
+    <string name="tv_stop_playback_confirmation_message">그러면 현재 재생이 중지됩니다.</string>
+    <string name="tv_archive_confirmation_title">에피소드를 아카이빙할까요?</string>
+    <string name="tv_mark_played_confirmation_title">재생됨으로 표시할까요?</string>
+    <string name="tv_trim_silence_off">Trim Silence 끄기</string>
+    <string name="tv_trim_silence_changed">%1$s(으)로 Trim Silence 설정됨</string>
+    <string name="tv_volume_boost_off">Volume Boost 끄기</string>
+    <string name="tv_volume_boost_on">Volume Boost 켜기</string>
+    <string name="tv_playback_speed_changed">%1$s(으)로 재생 속도 설정됨</string>
+    <string name="tv_nothing_playing_subtitle">에피소드를 재생하면 여기에 표시됩니다.</string>
+    <string name="tv_nothing_playing_title">재생 중인 내용 없음</string>
     <string name="tv_episode_removed_from_up_next">다음 순서에서 제거됨</string>
     <string name="tv_sign_in_title">Pocket Casts에 로그인</string>
     <string name="tv_create_account_modal_title">보관 가치가 있는 회원님의 팟캐스트</string>
@@ -42,6 +97,7 @@ Language: ko_KR
     <string name="tv_create_account_modal_step_create">계정 생성 또는 로그인</string>
     <string name="tv_sign_in_step_login">계정 로그인</string>
     <string name="tv_sign_in_step_scan">QR 코드를 스캔하거나 %1$s(으)로 이동 </string>
+    <string name="tv_sign_in_step_confirm_code">메시지가 표시되면 아래 코드 확인</string>
     <string name="tv_podcast_more_info">자세한 정보</string>
     <string name="tv_podcast_follow">이 팟캐스트 팔로우하기</string>
     <string name="tv_folder_empty_message">모바일 앱의 이 폴더에 팟캐스트를 추가하면 여기에 표시됩니다.</string>
