@@ -1,14 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-08-28 10:10:11+0000
+Translation-Revision-Date: 2026-09-08 23:29:41+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: ca
 -->
 <resources>
+    <string name="search_filters_networks">Xarxes</string>
+    <string name="discover_networks">Xarxes</string>
+    <string name="discover_network">Xarxa</string>
+    <string name="device_approve_login_required">Per connectar el teu dispositiu necessites tenir un compte. Inicia sessió o crea un compte i torna-ho a provar.</string>
+    <string name="device_approve_error_message">Torna-ho a intentar més tard.</string>
+    <string name="device_approve_error_title">No s\'ha pogut aprovar el dispositiu</string>
+    <string name="device_approve_expired_message">Torna a la teva TV per generar-ne un de nou.</string>
+    <string name="device_approve_expired_title">El teu codi QR ha caducat</string>
+    <string name="device_approve_success_message">La teva TV ja està connectada al teu compte.</string>
+    <string name="device_approve_success_title">TV connectada</string>
+    <string name="device_approve_connect">Connecta</string>
+    <string name="device_approve_signing_in_as">Iniciant la sessió com a…</string>
+    <string name="device_approve_description">L\'escolta se sincronitzarà automàticament.\nPots desconnectar-te en qualsevol moment des d\'Ajustos.</string>
+    <string name="device_approve_title">Connecta la teva TV</string>
+    <string name="tv_settings_subscription_plan">Pla</string>
+    <string name="tv_settings_subscription_next_renewal">Pròxima renovació</string>
+    <string name="tv_settings_subscription_lifetime">De per vida</string>
+    <string name="tv_settings_subscription_other_platform">Aquesta subscripció es va contractar en una altra plataforma. Utilitza aquesta plataforma per gestionar-la.</string>
+    <string name="tv_settings_privacy_policy_qr_message">Escaneja el codi QR de baix, o obre l\'URL al telèfon per accedir a la política de privadesa.</string>
+    <string name="tv_settings_terms_of_use_qr_message">Escaneja el codi QR de baix, o obre l\'URL al telèfon per accedir a les condicions d\'ús.</string>
+    <string name="tv_history_empty_title">Sense historial d\'escolta</string>
+    <string name="tv_history_empty_subtitle">Els episodis que reprodueixis apareixeran aquí</string>
+    <string name="tv_settings_subscription_expires">Caduca</string>
+    <string name="tv_settings_subscription_title">Subscripció</string>
+    <string name="tv_profile_log_out_confirmation_message">Això elimina tots els pòdcasts baixats i les dades d\'aquest dispositiu. Pots tornar a iniciar sessió per sincronitzar de nou els teus pòdcasts.</string>
+    <string name="tv_profile_log_out_confirmation_title">Vols tancar la sessió?</string>
     <string name="tv_starred_empty_title">Sense episodis destacats</string>
+    <string name="tv_starred_empty_subtitle">Marca episodis amb estrella per tenir-los a mà, i apareixeran aquí</string>
+    <string name="tv_onboarding_syncing_subtitle">S\'estan carregant els teus pòdcasts.</string>
+    <string name="tv_onboarding_welcome_back">Ens alegrem de tornar-te a veure</string>
+    <string name="tv_onboarding_subtitle">Els teus pòdcasts. A la pantalla gran. És clar.</string>
+    <string name="tv_sign_in_signing_in">S\'està iniciant la sessió</string>
+    <string name="tv_sign_in_tab_email">Correu electrònic</string>
+    <string name="tv_sign_in_tab_qr_code">Codi QR</string>
+    <string name="tv_sign_in_qr_error">No s\'ha pogut obtenir el codi d\'inici de sessió</string>
     <string name="tv_account_signed_out_alert_title">Has tancat la sessió.</string>
+    <string name="tv_account_signed_out_alert_message">Hi ha hagut un problema i s\'ha tancat la teva sessió.\nSelecciona el botó de sota per tornar a iniciar sessió al teu compte de Pocket Casts.</string>
     <string name="tv_search_prompt">Pòdcasts, programes, autors</string>
+    <string name="tv_search_no_results_for_title">Cap resultat per a «%1$s»</string>
+    <string name="tv_search_featured">Destacats</string>
+    <string name="tv_search_recent">Cerques recents</string>
     <string name="tv_banner_discover_more_title">Encara no n\'has vist ni la meitat.</string>
     <string name="tv_banner_discover_more_subtitle">La teva pròxima obsessió és aquí, en algun lloc.</string>
     <string name="tv_banner_discover_more_action_title">Descobreix més programes</string>
@@ -59,6 +97,7 @@ Language: ca
     <string name="tv_create_account_modal_step_create">Crea el compte o inicia la sessió</string>
     <string name="tv_sign_in_step_login">Inicia la sessió al teu compte</string>
     <string name="tv_sign_in_step_scan">Escaneja el codi QR o ves a %1$s</string>
+    <string name="tv_sign_in_step_confirm_code">Si se\'t demana, confirma amb el codi següent</string>
     <string name="tv_podcast_more_info">Més informació</string>
     <string name="tv_podcast_follow">Segueix aquest pòdcast</string>
     <string name="tv_folder_empty_message">Afegeix pòdcasts a aquesta carpeta des de l\'aplicació mòbil i apareixeran aquí.</string>
