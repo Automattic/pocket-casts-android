@@ -526,6 +526,13 @@ class EpisodeManagerImpl @Inject constructor(
         episodeDao.updateAllSyncFields(episodes)
     }
 
+    override suspend fun updateHasGeneratedTranscript(
+        episodeUuid: String,
+        hasGeneratedTranscript: Boolean,
+    ) {
+        episodeDao.updateHasGeneratedTranscript(hasGeneratedTranscript, episodeUuid)
+    }
+
     override fun clearPlaybackErrorBlocking(episode: BaseEpisode?) {
         if (episode?.playErrorDetails == null) {
             return

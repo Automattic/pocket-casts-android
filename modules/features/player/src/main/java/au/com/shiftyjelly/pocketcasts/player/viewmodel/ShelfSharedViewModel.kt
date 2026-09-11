@@ -8,6 +8,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
+import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.ChromeCastAnalytics
@@ -19,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
+import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
@@ -46,7 +48,8 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.rx2.asFlow
+import kotlinx.coroutines.reactive.asFlow as asReactiveFlow
+import kotlinx.coroutines.rx2.asFlow as asRxFlow
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
@@ -60,6 +63,7 @@ class ShelfSharedViewModel @Inject constructor(
     private val settings: Settings,
     private val userEpisodeManager: UserEpisodeManager,
     private val transcriptManager: TranscriptManager,
+    private val userManager: UserManager,
     private val downloadQueue: DownloadQueue,
 ) : ViewModel() {
     private val upNextStateObservable: Observable<UpNextQueue.State> =
@@ -102,11 +106,12 @@ class ShelfSharedViewModel @Inject constructor(
 
     val uiState = combine(
         settings.shelfItems.flow,
-        shelfUpNextObservable.asFlow(),
-        shelfUpNextObservable.asFlow()
+        shelfUpNextObservable.asRxFlow(),
+        shelfUpNextObservable.asRxFlow()
             .mapNotNull { state -> (state as? UpNextQueue.State.Loaded)?.episode?.uuid }
             .flatMapLatest { episodeUuid -> transcriptManager.observeIsTranscriptAvailable(episodeUuid) },
         videoStateFlow,
+        userManager.getSignInState().asReactiveFlow(),
         ::createUiState,
     ).stateIn(
         viewModelScope,
@@ -119,6 +124,7 @@ class ShelfSharedViewModel @Inject constructor(
         shelfUpNext: UpNextQueue.State,
         isTranscriptAvailable: Boolean,
         videoState: VideoState,
+        signInState: SignInState,
     ): UiState {
         val episode = (shelfUpNext as? UpNextQueue.State.Loaded)?.episode
         val streamHasVideo = videoState.streamVideoState == StreamVideoState.HasVideo || videoState.streamVideoState == StreamVideoState.Unknown
@@ -129,7 +135,12 @@ class ShelfSharedViewModel @Inject constructor(
         return uiState.value.copy(
             shelfItems = shelfItems.filter { it.showIf(episode) && (it != ShelfItem.StreamSelector || canToggleVideo) },
             episode = episode,
-            isTranscriptAvailable = isTranscriptAvailable,
+            isTranscriptAvailable = isTranscriptAvailable ||
+                (
+                    episode is PodcastEpisode &&
+                        signInState.isSignedInAsPlusOrPatron &&
+                        FeatureFlag.isEnabled(Feature.ON_DEMAND_TRANSCRIPTS)
+                    ),
             isVideoRenderingEnabled = videoState.renderingEnabled && streamHasVideo,
         )
     }

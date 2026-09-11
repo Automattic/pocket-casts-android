@@ -4,6 +4,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.models.converter.SafeDate
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfViewModel.Companion.ERROR_MINIMUM_SHELF_ITEMS
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfViewModel.Companion.ERROR_SHELF_ITEM_INVALID_MOVE_POSITION
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -11,12 +12,14 @@ import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfRowItem
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
+import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.PlayerShelfOverflowMenuRearrangeActionMovedEvent
 import com.automattic.eventhorizon.ShelfActionSourceType
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.rx2.asFlowable
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -41,6 +44,9 @@ class ShelfViewModelTest {
 
     @Mock
     private lateinit var settings: Settings
+
+    @Mock
+    private lateinit var userManager: UserManager
 
     private val eventSink = TestEventSink()
 
@@ -215,11 +221,13 @@ class ShelfViewModelTest {
         whenever(transcriptManager.observeIsTranscriptAvailable(episodeId)).thenReturn(flowOf(true))
         val userSetting = mock<UserSetting<List<ShelfItem>>>()
         whenever(settings.shelfItems).thenReturn(userSetting)
+        whenever(userManager.getSignInState()).thenReturn(flowOf<SignInState>(SignInState.SignedOut).asFlowable())
 
         shelfViewModel = ShelfViewModel(
             episodeId = episodeId,
             isEditable = isEditable,
             transcriptManager = transcriptManager,
+            userManager = userManager,
             eventHorizon = EventHorizon(eventSink),
             settings = settings,
         )

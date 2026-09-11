@@ -9,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.models.to.Chapters
+import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
 import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
@@ -28,6 +29,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
+import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
@@ -41,7 +43,9 @@ import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.rx2.asFlowable
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -85,6 +89,9 @@ class ShelfSharedViewModelTest {
 
     @Mock
     private lateinit var settings: Settings
+
+    @Mock
+    private lateinit var userManager: UserManager
 
     @Mock
     private lateinit var upNextQueue: UpNextQueue
@@ -186,6 +193,28 @@ class ShelfSharedViewModelTest {
             shelfSharedViewModel.onTranscriptClick(false, ShelfItemSource.Shelf)
             assertEquals(SnackbarMessage.TranscriptNotAvailable, awaitItem())
         }
+    }
+
+    @Test
+    fun `paid listener can open missing podcast transcript when feature is enabled`() = runTest {
+        FeatureFlag.setEnabled(Feature.ON_DEMAND_TRANSCRIPTS, true)
+        val episode = PodcastEpisode("uuid", publishedDate = Date())
+        initViewModel(subscription = plusSubscription, currentEpisode = episode)
+
+        val state = shelfSharedViewModel.uiState.first { it.episode != null }
+
+        assertTrue(state.isTranscriptAvailable)
+    }
+
+    @Test
+    fun `free listener cannot open missing podcast transcript`() = runTest {
+        FeatureFlag.setEnabled(Feature.ON_DEMAND_TRANSCRIPTS, true)
+        val episode = PodcastEpisode("uuid", publishedDate = Date())
+        initViewModel(subscription = null, currentEpisode = episode)
+
+        val state = shelfSharedViewModel.uiState.first { it.episode != null }
+
+        assertFalse(state.isTranscriptAvailable)
     }
 
     @Test
@@ -450,6 +479,9 @@ class ShelfSharedViewModelTest {
         val userSubscriptionSetting = mock<UserSetting<Subscription?>>()
         whenever(userSubscriptionSetting.value).thenReturn(subscription)
         whenever(settings.cachedSubscription).thenReturn(userSubscriptionSetting)
+        whenever(userManager.getSignInState()).thenReturn(
+            flowOf<SignInState>(SignInState.SignedIn("email", subscription)).asFlowable(),
+        )
 
         whenever(playbackManager.streamVideoState).thenReturn(MutableStateFlow(streamVideoState))
         whenever(playbackManager.streamHlsAvailable).thenReturn(MutableStateFlow(hlsAvailable))
@@ -469,6 +501,7 @@ class ShelfSharedViewModelTest {
             settings = settings,
             userEpisodeManager = userEpisodeManager,
             transcriptManager = transcriptManager,
+            userManager = userManager,
             downloadQueue = mock(),
         )
     }
