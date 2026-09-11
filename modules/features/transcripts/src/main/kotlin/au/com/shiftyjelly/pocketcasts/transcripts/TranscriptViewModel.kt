@@ -1,9 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.transcripts
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptEntry
 import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
@@ -40,6 +42,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -54,10 +57,12 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel(assistedFactory = TranscriptViewModel.Factory::class)
 class TranscriptViewModel @AssistedInject constructor(
     @Assisted private val source: Source,
+    @ApplicationContext private val context: Context,
     private val transcriptManager: TranscriptManager,
     private val episodeManager: EpisodeManager,
     private val userManager: UserManager,
@@ -443,35 +448,43 @@ class TranscriptViewModel @AssistedInject constructor(
     fun createBookmarkFromSelection(selectedText: String) {
         val transcript = (uiState.value.transcriptState as? TranscriptState.Loaded)?.transcript as? Transcript.Text ?: return
         viewModelScope.launch {
-            val model = BookmarkTranscript.from(transcript)
-            val span = model.passageDisplaySpan(selectedText, location = null) ?: return@launch
-            val passage = model.passage(span)
-            if (passage.text.isEmpty()) return@launch
-            val referenceTimeMs = model.referenceTimeMsAt(span.start) ?: return@launch
-            val episode = episodeManager.findByUuid(transcript.episodeUuid) ?: return@launch
-
-            val timeSecs: Int
-            val referenceTimeSecs: Int?
-            if (transcript.isGenerated) {
-                val playbackMs = fingerprintTimingManager.playbackTimeMs(forReferenceTime = referenceTimeMs / 1000.0) ?: return@launch
-                timeSecs = playbackMs / 1000
-                referenceTimeSecs = (referenceTimeMs / 1000).toInt()
+            val bookmark = buildBookmarkFromSelection(transcript, selectedText)
+            if (bookmark == null) {
+                _messages.send(TranscriptMessage.BookmarkFailed)
             } else {
-                timeSecs = (referenceTimeMs / 1000).toInt()
-                referenceTimeSecs = null
+                _messages.send(TranscriptMessage.OpenBookmarkEditor(bookmark.uuid))
             }
-
-            val bookmark = bookmarkManager.add(
-                episode = episode,
-                timeSecs = timeSecs,
-                title = DEFAULT_BOOKMARK_TITLE,
-                creationSource = BookmarkSourceType.Player,
-                passage = passage.text,
-                passageLocation = passage.location,
-                referenceTime = referenceTimeSecs,
-            )
-            _messages.send(TranscriptMessage.OpenBookmarkEditor(bookmark.uuid))
         }
+    }
+
+    private suspend fun buildBookmarkFromSelection(transcript: Transcript.Text, selectedText: String): Bookmark? {
+        val model = BookmarkTranscript.from(transcript)
+        val span = model.passageDisplaySpan(selectedText, location = null) ?: return null
+        val passage = model.passage(span)
+        if (passage.text.isEmpty()) return null
+        val referenceTimeMs = model.referenceTimeMsAt(span.start) ?: return null
+        val episode = episodeManager.findByUuid(transcript.episodeUuid) ?: return null
+
+        val timeSecs: Int
+        val referenceTimeSecs: Int?
+        if (transcript.isGenerated) {
+            val playbackMs = fingerprintTimingManager.playbackTimeMs(forReferenceTime = referenceTimeMs / 1000.0) ?: return null
+            timeSecs = playbackMs / 1000
+            referenceTimeSecs = (referenceTimeMs / 1000).toInt()
+        } else {
+            timeSecs = (referenceTimeMs / 1000).toInt()
+            referenceTimeSecs = null
+        }
+
+        return bookmarkManager.add(
+            episode = episode,
+            timeSecs = timeSecs,
+            title = context.getString(LR.string.bookmark),
+            creationSource = BookmarkSourceType.Player,
+            passage = passage.text,
+            passageLocation = passage.location,
+            referenceTime = referenceTimeSecs,
+        )
     }
 
     private fun trackTranscriptShown(transcript: Transcript) {
@@ -545,14 +558,11 @@ class TranscriptViewModel @AssistedInject constructor(
     interface Factory {
         fun create(source: Source): TranscriptViewModel
     }
-
-    companion object {
-        private const val DEFAULT_BOOKMARK_TITLE = "Bookmark"
-    }
 }
 
 sealed interface TranscriptMessage {
     data object TapToSeekStreamingUnavailable : TranscriptMessage
+    data object BookmarkFailed : TranscriptMessage
     data class OpenBookmarkEditor(val bookmarkUuid: String) : TranscriptMessage
 }
 

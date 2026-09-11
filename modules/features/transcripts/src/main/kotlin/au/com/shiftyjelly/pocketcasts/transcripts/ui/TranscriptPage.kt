@@ -275,11 +275,16 @@ private fun TranscriptMessageEffect(viewModel: TranscriptViewModel?) {
     if (viewModel == null) return
     val context = LocalContext.current
     val tapToSeekUnavailableMessage = stringResource(LR.string.transcript_tap_to_seek_streaming_unavailable)
+    val bookmarkFailedMessage = stringResource(LR.string.bookmark_create_failed)
     LaunchedEffect(viewModel) {
         viewModel.messages.collect { message ->
             when (message) {
                 TranscriptMessage.TapToSeekStreamingUnavailable -> {
                     Toast.makeText(context, tapToSeekUnavailableMessage, Toast.LENGTH_SHORT).show()
+                }
+
+                TranscriptMessage.BookmarkFailed -> {
+                    Toast.makeText(context, bookmarkFailedMessage, Toast.LENGTH_SHORT).show()
                 }
 
                 is TranscriptMessage.OpenBookmarkEditor -> {

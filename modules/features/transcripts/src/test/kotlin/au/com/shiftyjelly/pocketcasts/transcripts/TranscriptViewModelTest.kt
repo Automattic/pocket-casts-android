@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.transcripts
 
+import android.content.Context
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
@@ -81,12 +82,16 @@ class TranscriptViewModelTest {
     }
     private val episodeManager = mock<EpisodeManager>()
     private val bookmarkManager = mock<BookmarkManager>()
+    private val context = mock<Context> {
+        on { getString(any()) } doReturn "Bookmark"
+    }
 
     lateinit var viewModel: TranscriptViewModel
 
     @Before
     fun setUp() {
         viewModel = TranscriptViewModel(
+            context = context,
             transcriptManager = transcriptManager,
             episodeManager = episodeManager,
             userManager = mock {
@@ -144,6 +149,28 @@ class TranscriptViewModelTest {
             passageLocation = eq(0),
             referenceTime = eq(10),
         )
+    }
+
+    @Test
+    fun `emit bookmark failed when the selection cannot be located`() = runTest {
+        transcriptManager.avaiableTranscript = Transcript.Text(
+            entries = listOf(TranscriptEntry.Text("The AI revolution is underhyped.", startTimeMs = 10_000)),
+            type = TranscriptType.Vtt,
+            url = "https://example.com/transcript.vtt",
+            isGenerated = true,
+            episodeUuid = "episode-id",
+            podcastUuid = "podcast-id",
+        )
+
+        viewModel.loadTranscript("episode-id")
+        runCurrent()
+
+        viewModel.messages.test {
+            viewModel.createBookmarkFromSelection("text that is not in the transcript")
+            assertEquals(TranscriptMessage.BookmarkFailed, awaitItem())
+        }
+
+        verify(bookmarkManager, never()).add(any(), any(), any(), any(), any(), anyOrNull(), anyOrNull(), anyOrNull())
     }
 
     @Test
