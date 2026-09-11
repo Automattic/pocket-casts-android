@@ -115,18 +115,18 @@ private fun HistoryList(
         modifier = modifier
             .fillMaxHeight()
             .fillMaxWidth(ROW_WIDTH_FRACTION)
-            .padding(start = 32.dp, top = 8.dp),
+            .padding(start = 42.dp, top = 6.dp),
     ) {
         Text(
             text = stringResource(LR.string.profile_navigation_listening_history),
             style = MaterialTheme.tvTypography.title3,
             color = MaterialTheme.tvColors.textPrimary,
         )
-        Spacer(Modifier.height(26.dp))
+        Spacer(Modifier.height(19.5.dp))
         LazyColumn(
             state = listState,
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            contentPadding = PaddingValues(bottom = 32.dp),
+            verticalArrangement = Arrangement.spacedBy(9.dp),
+            contentPadding = PaddingValues(bottom = 24.dp),
             modifier = Modifier.weight(1f),
         ) {
             itemsIndexed(

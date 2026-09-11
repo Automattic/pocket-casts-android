@@ -109,7 +109,7 @@ private fun ColumnScope.TvProfileModalContent(
                     text = profile.email,
                     color = MaterialTheme.tvColors.textPrimary,
                     style = MaterialTheme.tvTypography.callout.copy(textAlign = TextAlign.Center),
-                    modifier = Modifier.padding(bottom = 16.dp),
+                    modifier = Modifier.padding(bottom = 12.dp),
                 )
             }
             TvModalButton(
@@ -157,7 +157,7 @@ private fun ColumnScope.TvProfileModalContent(
         ),
         color = MaterialTheme.tvColors.textSecondary,
         style = MaterialTheme.tvTypography.caption1,
-        modifier = Modifier.padding(top = 8.dp),
+        modifier = Modifier.padding(top = 6.dp),
     )
 }
 
@@ -189,12 +189,12 @@ private fun TvProfileModalAvatarPlaceholder(modifier: Modifier = Modifier) {
             painter = painterResource(IR.drawable.ic_profile),
             contentDescription = null,
             tint = MaterialTheme.tvColors.textPrimary,
-            modifier = Modifier.size(36.dp),
+            modifier = Modifier.size(27.dp),
         )
     }
 }
 
-private val AvatarSize = 80.dp
+private val AvatarSize = 60.dp
 
 @Preview
 @Composable

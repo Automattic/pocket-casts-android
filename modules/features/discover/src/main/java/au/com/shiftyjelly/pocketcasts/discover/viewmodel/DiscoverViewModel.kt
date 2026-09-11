@@ -19,6 +19,7 @@ import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverEpisode
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverFeedImage
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverFeedTintColors
+import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverListSummary
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRegion
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRow
@@ -173,6 +174,16 @@ class DiscoverViewModel @Inject constructor(
             .flatMap {
                 addPlaybackStateToList(it)
             }
+    }
+
+    /** The row draws from the `lists` entries alone, so no network's own feed is fetched here. */
+    fun loadNetworkList(source: String, authenticated: Boolean?): Flowable<NetworkList> {
+        return rxMaybe { repository.getListFeed(source, authenticated) }
+            .toSingle()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .map { NetworkList(listId = it.listId, date = it.date, networks = it.networks) }
+            .toFlowable()
     }
 
     fun loadCategory(category: DiscoverCategory, resources: Resources) {
@@ -406,6 +417,12 @@ data class PodcastList(
     val images: List<DiscoverFeedImage>?,
     val listId: String? = null,
     val date: String? = null,
+)
+
+data class NetworkList(
+    val listId: String?,
+    val date: String?,
+    val networks: List<DiscoverListSummary>,
 )
 
 data class CarouselSponsoredPodcast(

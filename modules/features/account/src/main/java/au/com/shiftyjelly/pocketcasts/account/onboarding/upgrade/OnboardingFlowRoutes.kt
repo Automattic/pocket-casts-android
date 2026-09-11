@@ -77,6 +77,7 @@ object OnboardingFlowRoutes {
         is OnboardingFlow.AccountEncouragement -> ENCOURAGE_FREE_ACCOUNT
 
         is OnboardingFlow.LoggedOut,
+        is OnboardingFlow.DeviceApproval,
         -> ROUTE_SIGN_UP
 
         // Cannot use OnboardingNavRoute.PlusUpgrade.routeWithSource here, it is set as a defaultValue in the PlusUpgrade composable,
@@ -128,6 +129,7 @@ object OnboardingFlowRoutes {
 
                         is OnboardingFlow.InitialOnboarding,
                         is OnboardingFlow.LoggedOut,
+                        is OnboardingFlow.DeviceApproval,
                         is OnboardingFlow.EngageSdk,
                         is OnboardingFlow.ReferralLoginOrSignUp,
                         -> exitOnboarding(OnboardingExitInfo.Simple)
@@ -305,6 +307,7 @@ object OnboardingFlowRoutes {
                         // Not a startDestination, default value should not be set.
                         is OnboardingFlow.AccountEncouragement,
                         is OnboardingFlow.EngageSdk,
+                        is OnboardingFlow.DeviceApproval,
                         is OnboardingFlow.InitialOnboarding,
                         is OnboardingFlow.LoggedOut,
                         is OnboardingFlow.PlusAccountUpgradeNeedsLogin,

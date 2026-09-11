@@ -2039,6 +2039,8 @@
 
     <string name="discover">Discover</string>
     <string name="discover_error">There was an error loading the content.</string>
+    <string name="discover_network">Network</string>
+    <string name="discover_networks">Networks</string>
     <string name="discover_error_try_again">Could not load content. Please check your internet connection and try again.</string>
     <string name="discover_retry" translatable="false">@string/retry</string>
     <string name="discover_row_fresh_pick">FRESH PICK</string>
@@ -2904,6 +2906,7 @@
     <string name="search_filters_podcasts" translatable="false">@string/podcasts</string>
     <string name="search_filters_episodes" translatable="false">@string/episodes</string>
     <string name="search_filters_folders" translatable="false">@string/folders</string>
+    <string name="search_filters_networks">Networks</string>
     <string name="search_suggestions_view_all">View all for \"%1$s\"</string>
     <string name="search_suggestions_no_results_title">No Results</string>
     <string name="search_suggestions_no_results_message">Try a new search, or by adding a podcast feed URL</string>
@@ -2953,4 +2956,15 @@
     <string name="tv_onboarding_welcome_back">Good to see you</string>
     <string name="tv_onboarding_syncing_subtitle">Loading your podcasts now.</string>
     <string name="tv_create_account_title">Create your free account</string>
+    <string name="device_approve_title">Connect to your TV</string>
+    <string name="device_approve_description">Your listening will sync automatically.\nYou can disconnect at any time from Settings.</string>
+    <string name="device_approve_login_required">In order to connect your device you need to have an account. Please sign in or create an account and try again.</string>
+    <string name="device_approve_signing_in_as">Signing in as…</string>
+    <string name="device_approve_connect">Connect</string>
+    <string name="device_approve_success_title">TV connected</string>
+    <string name="device_approve_success_message">Your TV is now connected to your account.</string>
+    <string name="device_approve_expired_title">Your QR code expired</string>
+    <string name="device_approve_expired_message">Please go back to your TV to generate a new one.</string>
+    <string name="device_approve_error_title">Device approval failed</string>
+    <string name="device_approve_error_message">Please try again later.</string>
 </resources>

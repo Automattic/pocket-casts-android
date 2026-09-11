@@ -11,7 +11,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -40,8 +42,8 @@ import au.com.shiftyjelly.pocketcasts.theme.GoogleSansFontFamily
 import au.com.shiftyjelly.pocketcasts.theme.TvTheme
 import au.com.shiftyjelly.pocketcasts.theme.tvColors
 
-private const val TITLE_UNFOCUSED_SIZE = 17f
-private const val TITLE_FOCUSED_SIZE = 21f
+private const val TITLE_UNFOCUSED_SIZE = 19f
+private const val TITLE_FOCUSED_SIZE = 23f
 
 @Composable
 fun TvSectionTitle(
@@ -67,10 +69,11 @@ fun <T> TvRow(
     title: String,
     items: List<T>,
     modifier: Modifier = Modifier,
-    contentPadding: PaddingValues = PaddingValues(horizontal = 32.dp),
-    itemSpacing: Dp = 16.dp,
+    contentPadding: PaddingValues = PaddingValues(horizontal = 42.dp),
+    itemSpacing: Dp = TvTileSpacing,
     key: ((T) -> Any)? = null,
     focusRequester: FocusRequester? = null,
+    leftAlignFocusedItem: Boolean = false,
     content: @Composable (T) -> Unit,
 ) {
     var hasFocus by remember { mutableStateOf(false) }
@@ -89,15 +92,24 @@ fun <T> TvRow(
             fontSize = titleSize.sp,
             modifier = Modifier
                 .padding(contentPadding)
-                .padding(bottom = 17.dp),
+                .padding(bottom = 16.dp),
         )
 
         var lastFocusedIndex by rememberSaveable(items) { mutableIntStateOf(0) }
         val focusRequesters = remember(items) { List(items.size) { FocusRequester() } }
+        val listState = rememberLazyListState()
+
+        if (leftAlignFocusedItem) {
+            LaunchedEffect(lastFocusedIndex) {
+                listState.animateScrollToItem(lastFocusedIndex)
+            }
+        }
 
         LazyRow(
+            state = listState,
             contentPadding = contentPadding,
             horizontalArrangement = Arrangement.spacedBy(itemSpacing),
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .then(if (focusRequester != null) Modifier.focusRequester(focusRequester) else Modifier)
                 .focusGroup()
@@ -139,8 +151,8 @@ private fun TvRowPreview() {
                 TvTile(onClick = {}) {
                     Box(
                         modifier = Modifier
-                            .size(160.dp, 100.dp)
-                            .padding(12.dp),
+                            .size(120.dp, 75.dp)
+                            .padding(9.dp),
                         contentAlignment = Alignment.BottomStart,
                     ) {
                         Text(

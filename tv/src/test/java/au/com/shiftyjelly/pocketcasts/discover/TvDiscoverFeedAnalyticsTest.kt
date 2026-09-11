@@ -12,6 +12,8 @@ import com.automattic.eventhorizon.DiscoverListEpisodeTappedEvent
 import com.automattic.eventhorizon.DiscoverListImpressionEvent
 import com.automattic.eventhorizon.DiscoverListPodcastTappedEvent
 import com.automattic.eventhorizon.EventHorizon
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
@@ -29,8 +31,9 @@ class TvDiscoverFeedAnalyticsTest {
     private val settings = mock<Settings> {
         whenever(it.discoverCountryCode).thenReturn(discoverCountryCode)
     }
+    private val attribution = TvDiscoverPodcastAttribution()
 
-    private fun analytics(source: String = "home", localRowIds: Set<String> = emptySet()) = TvDiscoverFeedAnalytics(eventHorizon, settings, source, localRowIds)
+    private fun analytics(source: String = "home", localRowIds: Set<String> = emptySet()) = TvDiscoverFeedAnalytics(eventHorizon, settings, source, localRowIds, attribution)
 
     @Test
     fun `list impression is tracked with the row id and source`() {
@@ -100,6 +103,27 @@ class TvDiscoverFeedAnalyticsTest {
 
         verify(eventHorizon).track(DiscoverListPodcastTappedEvent(listId = "featured", podcastUuid = "podcast-1", source = "home"))
         verify(eventHorizon).track(DiscoverFeaturedPodcastTappedEvent(podcastUuid = "podcast-1"))
+    }
+
+    @Test
+    fun `a featured podcast tap records the podcast attribution`() {
+        val row = TvDiscoverRow.FeaturedPodcasts(id = "featured", title = "Featured", podcasts = emptyList(), listId = "featured", listDatetime = "2026-08-27")
+
+        analytics().trackPodcastTapped(row, podcast("podcast-1"))
+
+        assertEquals(
+            TvDiscoverPodcastAttribution.Attribution(listId = "featured", listDatetime = "2026-08-27", isFeatured = true),
+            attribution.consume("podcast-1"),
+        )
+    }
+
+    @Test
+    fun `a local row podcast tap clears any recorded attribution`() {
+        attribution.record("podcast-1", listId = "stale", listDatetime = null, isFeatured = false)
+
+        analytics(localRowIds = setOf("trending")).trackPodcastTapped(podcastsRow(id = "trending"), podcast("podcast-1"))
+
+        assertNull(attribution.consume("podcast-1"))
     }
 
     @Test

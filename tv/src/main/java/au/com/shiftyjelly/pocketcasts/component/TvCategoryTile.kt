@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.component
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
@@ -19,6 +20,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -30,6 +32,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.style.TextOverflow
@@ -42,14 +47,19 @@ import androidx.tv.material3.Glow
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
+import au.com.shiftyjelly.pocketcasts.theme.TvCardShape
 import au.com.shiftyjelly.pocketcasts.theme.TvTheme
 import au.com.shiftyjelly.pocketcasts.theme.tvColors
 import au.com.shiftyjelly.pocketcasts.theme.tvTypography
 import coil3.compose.AsyncImage
+import coil3.compose.AsyncImagePainter
+import coil3.compose.rememberAsyncImagePainter
+import coil3.request.ImageRequest
+import coil3.request.crossfade
+import coil3.size.Size
 
-private val CardShape = RoundedCornerShape(12.dp)
-private val CoverSize = 80.dp
-private val CoverShape = RoundedCornerShape(8.dp)
+private val CoverSize = 78.dp
+private val CoverShape = RoundedCornerShape(6.dp)
 private const val COVER_VISIBLE_FRACTION = 0.55f
 private const val COVER_RESTING_SCALE = 0.85f
 
@@ -81,22 +91,32 @@ fun TvCategoryTile(
     val coverSizePx = with(LocalDensity.current) { CoverSize.toPx() }
     val directionSign = if (LocalLayoutDirection.current == LayoutDirection.Rtl) -1f else 1f
 
+    val firstCover = coverUrls.firstOrNull()?.let { rememberCoverState(it) }
+    val secondCover = coverUrls.getOrNull(1)?.let { rememberCoverState(it) }
+    val covers = listOfNotNull(firstCover, secondCover)
+    val coversReady = covers.isNotEmpty() && covers.all { it.isReady }
+    val coverReveal = animateFloatAsState(
+        targetValue = if (isFocused && coversReady) 1f else 0f,
+        animationSpec = spring(dampingRatio = 0.6f, stiffness = Spring.StiffnessMediumLow),
+        label = "TvCategoryCoverReveal",
+    )
+
     TvTile(
         onClick = onClick,
-        shape = CardDefaults.shape(shape = CardShape),
+        shape = CardDefaults.shape(shape = TvCardShape),
         colors = CardDefaults.colors(
             containerColor = MaterialTheme.tvColors.backgroundOverlay,
             focusedContainerColor = MaterialTheme.tvColors.backgroundOverlay,
         ),
         glow = CardDefaults.glow(
-            focusedGlow = Glow(elevationColor = Color.Black.copy(alpha = 0.5f), elevation = 8.dp),
+            focusedGlow = Glow(elevationColor = Color.Black.copy(alpha = 0.5f), elevation = 6.dp),
         ),
         interactionSource = interactionSource,
         modifier = modifier
-            .width(280.dp)
-            .height(128.dp),
+            .width(284.dp)
+            .height(129.dp),
     ) {
-        Box(modifier = Modifier.fillMaxSize()) {
+        Box(modifier = Modifier.fillMaxSize().clip(TvCardShape)) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -104,21 +124,21 @@ fun TvCategoryTile(
                     .background(TvCategoryStyle.gradient(colorIndex)),
             )
 
-            coverUrls.firstOrNull()?.let { url ->
+            firstCover?.let { cover ->
                 CategoryCover(
-                    url = url,
+                    painter = cover.painter,
                     alignment = Alignment.CenterStart,
                     edgeSign = -1f * directionSign,
-                    focusProgress = { focusProgress.value },
+                    reveal = { coverReveal.value },
                     coverSizePx = coverSizePx,
                 )
             }
-            coverUrls.getOrNull(1)?.let { url ->
+            secondCover?.let { cover ->
                 CategoryCover(
-                    url = url,
+                    painter = cover.painter,
                     alignment = Alignment.CenterEnd,
                     edgeSign = 1f * directionSign,
-                    focusProgress = { focusProgress.value },
+                    reveal = { coverReveal.value },
                     coverSizePx = coverSizePx,
                 )
             }
@@ -132,28 +152,47 @@ fun TvCategoryTile(
                     model = category.icon,
                     contentDescription = null,
                     colorFilter = ColorFilter.tint(contentColor),
-                    modifier = Modifier.size(28.dp),
+                    modifier = Modifier.size(24.dp),
                 )
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = category.name,
-                    style = MaterialTheme.tvTypography.body,
+                    style = MaterialTheme.tvTypography.headline,
                     color = contentColor,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.padding(horizontal = 12.dp),
+                    modifier = Modifier.padding(horizontal = 9.dp),
                 )
             }
         }
     }
 }
 
+private data class CoverState(
+    val painter: AsyncImagePainter,
+    val isReady: Boolean,
+)
+
+@Composable
+private fun rememberCoverState(url: String): CoverState {
+    val painter = rememberAsyncImagePainter(
+        model = ImageRequest.Builder(LocalContext.current)
+            .data(url)
+            .crossfade(true)
+            .size(Size.ORIGINAL)
+            .build(),
+        contentScale = ContentScale.Crop,
+    )
+    val state by painter.state.collectAsState()
+    return CoverState(painter, isReady = state is AsyncImagePainter.State.Success)
+}
+
 @Composable
 private fun BoxScope.CategoryCover(
-    url: String,
+    painter: Painter,
     alignment: Alignment,
     edgeSign: Float,
-    focusProgress: () -> Float,
+    reveal: () -> Float,
     coverSizePx: Float,
 ) {
     Box(
@@ -161,7 +200,7 @@ private fun BoxScope.CategoryCover(
             .align(alignment)
             .size(CoverSize)
             .graphicsLayer {
-                val progress = focusProgress().coerceIn(0f, 1f)
+                val progress = reveal().coerceIn(0f, 1f)
                 alpha = progress
                 val scale = COVER_RESTING_SCALE + (1f - COVER_RESTING_SCALE) * progress
                 scaleX = scale
@@ -169,8 +208,10 @@ private fun BoxScope.CategoryCover(
                 translationX = edgeSign * coverSizePx * (1f - COVER_VISIBLE_FRACTION * progress)
             },
     ) {
-        TvArtworkImage(
-            model = url,
+        Image(
+            painter = painter,
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
             modifier = Modifier
                 .fillMaxSize()
                 .clip(CoverShape),
@@ -185,7 +226,7 @@ private fun TvCategoryTilePreview() {
         Column(
             modifier = Modifier
                 .background(MaterialTheme.tvColors.backgroundSunken)
-                .padding(48.dp),
+                .padding(36.dp),
         ) {
             TvCategoryTile(
                 category = DiscoverCategory(id = 1, name = "Comedy", icon = "", source = ""),

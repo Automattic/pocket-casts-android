@@ -8,10 +8,12 @@ import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverBanner
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverEpisode
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverFeedLoader
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverPodcast
+import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverPodcastAttribution
 import au.com.shiftyjelly.pocketcasts.discover.TvDiscoverRow
 import au.com.shiftyjelly.pocketcasts.discover.TvOpenedCategory
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PodcastDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextDao
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -20,6 +22,8 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -47,11 +51,17 @@ import com.automattic.eventhorizon.DiscoverListPodcastTappedEvent
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.HomeShownEvent
 import com.jakewharton.rxrelay2.BehaviorRelay
+import com.jakewharton.rxrelay2.PublishRelay
+import io.reactivex.Observable
 import io.reactivex.Single
 import java.util.Date
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -59,10 +69,13 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.argThat
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyBlocking
 import org.mockito.kotlin.verifyNoInteractions
@@ -75,7 +88,11 @@ class TvHomeViewModelTest {
     @get:Rule
     val coroutineRule = MainCoroutineRule()
 
-    private val listRepository = mock<ListRepository>()
+    private val listRepository = mock<ListRepository> {
+        on { getListFeedResult(any(), anyOrNull()) } doSuspendableAnswer { invocation ->
+            Result.success((invocation.mock as ListRepository).getListFeed(invocation.getArgument(0), invocation.getArgument(1)))
+        }
+    }
     private val syncManager = mock<SyncManager> {
         on { isLoggedInObservable } doReturn BehaviorRelay.createDefault(false)
     }
@@ -105,7 +122,13 @@ class TvHomeViewModelTest {
     }
     private val episodeManager = mock<EpisodeManager>()
     private val podcastManager = mock<PodcastManager>()
-    private val playbackManager = mock<PlaybackManager>()
+    private val upNextQueue = mock<UpNextQueue> {
+        on { changesObservable } doReturn Observable.never()
+    }
+    private val playbackManager = mock<PlaybackManager> {
+        on { upNextQueue } doReturn this@TvHomeViewModelTest.upNextQueue
+        on { playbackStateFlow } doReturn emptyFlow()
+    }
     private val eventHorizon = mock<EventHorizon>()
 
     @Test
@@ -822,6 +845,76 @@ class TvHomeViewModelTest {
     }
 
     @Test
+    fun `up next row is hidden when only one episode is queued beyond the current one`() = runTest {
+        whenever(syncManager.isLoggedIn()).thenReturn(true)
+        whenever(listRepository.getHomeDiscoverFeed(isLoggedIn = true)).thenReturn(discover())
+        whenever(upNextDao.getUpNextBaseEpisodes(any())).thenReturn(
+            listOf(
+                episode(uuid = "episode-1", podcastUuid = "podcast-1"),
+                episode(uuid = "episode-2", podcastUuid = "podcast-1"),
+            ),
+        )
+
+        val viewModel = createViewModel()
+
+        viewModel.uiState.test {
+            val state = awaitItem() as TvHomeUiState.Ready
+            assertEquals(listOf(TvHomeViewModel.KEEP_LISTENING_ROW_ID), state.rows.map { it.id })
+        }
+    }
+
+    @Test
+    fun `keep listening row is hidden after playback starts in the session`() = runTest {
+        whenever(syncManager.isLoggedIn()).thenReturn(false)
+        whenever(listRepository.getHomeDiscoverFeed(isLoggedIn = false)).thenReturn(discover())
+        whenever(upNextDao.getUpNextBaseEpisodes(any())).thenReturn(
+            listOf(episode(uuid = "episode-1", podcastUuid = "podcast-1")),
+        )
+        val playingState = mock<PlaybackState> {
+            on { isPlaying } doReturn true
+        }
+        whenever(playbackManager.playbackStateFlow).thenReturn(flowOf(playingState))
+
+        val viewModel = createViewModel()
+
+        viewModel.uiState.test {
+            assertEquals(
+                listOf(TvHomeViewModel.KEEP_LISTENING_ROW_ID),
+                (awaitItem() as TvHomeUiState.Ready).rows.map { it.id },
+            )
+            assertEquals(
+                emptyList<String>(),
+                (awaitItem() as TvHomeUiState.Ready).rows.map { it.id },
+            )
+        }
+    }
+
+    @Test
+    fun `an up next queue change rebuilds the local rows`() = runTest {
+        val changes = PublishRelay.create<UpNextQueue.State>()
+        whenever(upNextQueue.changesObservable).thenReturn(changes)
+        whenever(syncManager.isLoggedIn()).thenReturn(false)
+        whenever(listRepository.getHomeDiscoverFeed(isLoggedIn = false)).thenReturn(discover())
+        whenever(upNextDao.getUpNextBaseEpisodes(any())).thenReturn(emptyList())
+
+        val viewModel = createViewModel()
+
+        viewModel.uiState.test {
+            assertEquals(emptyList<String>(), (awaitItem() as TvHomeUiState.Ready).rows.map { it.id })
+
+            whenever(upNextDao.getUpNextBaseEpisodes(any())).thenReturn(
+                listOf(episode(uuid = "episode-1", podcastUuid = "podcast-1")),
+            )
+            changes.accept(UpNextQueue.State.Empty)
+
+            assertEquals(
+                listOf(TvHomeViewModel.KEEP_LISTENING_ROW_ID),
+                (awaitItem() as TvHomeUiState.Ready).rows.map { it.id },
+            )
+        }
+    }
+
+    @Test
     fun `up next and new releases rows are hidden when signed out`() = runTest {
         whenever(syncManager.isLoggedIn()).thenReturn(false)
         whenever(listRepository.getHomeDiscoverFeed(isLoggedIn = false)).thenReturn(discover())
@@ -837,6 +930,119 @@ class TvHomeViewModelTest {
         viewModel.uiState.test {
             val state = awaitItem() as TvHomeUiState.Ready
             assertEquals(listOf(TvHomeViewModel.KEEP_LISTENING_ROW_ID), state.rows.map { it.id })
+        }
+    }
+
+    @Test
+    fun `discover feed falls back to a default region when the country cannot be resolved`() = runTest {
+        whenever(discoverCountryCode.value).thenReturn("zz")
+        whenever(syncManager.isLoggedIn()).thenReturn(false)
+        whenever(listRepository.getHomeDiscoverFeed(isLoggedIn = false)).thenReturn(
+            Discover(
+                layout = listOf(row(id = "trending", title = "Row Trending", source = "https://lists/trending.json")),
+                regions = mapOf("us" to DiscoverRegion(name = "United States", flag = "flag", code = "us")),
+                regionCodeToken = "[regionCode]",
+                regionNameToken = "[regionName]",
+                defaultRegionCode = "unknown",
+            ),
+        )
+        whenever(listRepository.getListFeed(eq("https://lists/trending.json"), any()))
+            .thenReturn(podcastFeed("podcast-trending"))
+
+        val viewModel = createViewModel()
+
+        viewModel.uiState.test {
+            val state = awaitItem() as TvHomeUiState.Ready
+            assertEquals(listOf("trending"), state.rows.map { it.id })
+        }
+    }
+
+    @Test
+    fun `a discover row whose feed fails to load becomes a failed row instead of being dropped`() = runTest {
+        whenever(syncManager.isLoggedIn()).thenReturn(false)
+        whenever(listRepository.getHomeDiscoverFeed(isLoggedIn = false)).thenReturn(
+            discover(row(id = "trending", title = "Row Trending", source = "https://lists/trending.json")),
+        )
+        whenever(listRepository.getListFeedResult(eq("https://lists/trending.json"), any()))
+            .thenReturn(Result.failure(RuntimeException("boom")))
+
+        val viewModel = createViewModel()
+
+        viewModel.uiState.test {
+            val row = (awaitItem() as TvHomeUiState.Ready).rows.single { it.id == "trending" }
+            assertTrue(row is TvDiscoverRow.Failed)
+        }
+    }
+
+    @Test
+    fun `retrying a failed discover row reloads it`() = runTest {
+        whenever(syncManager.isLoggedIn()).thenReturn(false)
+        whenever(listRepository.getHomeDiscoverFeed(isLoggedIn = false)).thenReturn(
+            discover(row(id = "trending", title = "Row Trending", source = "https://lists/trending.json")),
+        )
+        whenever(listRepository.getListFeedResult(eq("https://lists/trending.json"), any()))
+            .thenReturn(Result.failure(RuntimeException("boom")))
+            .thenReturn(Result.success(podcastFeed("podcast-trending")))
+
+        val viewModel = createViewModel()
+
+        viewModel.uiState.test {
+            val failedRow = (awaitItem() as TvHomeUiState.Ready).rows.single { it.id == "trending" }
+            assertTrue(failedRow is TvDiscoverRow.Failed)
+
+            viewModel.retryDiscoverRow(failedRow)
+
+            val reloaded = (awaitItem() as TvHomeUiState.Ready).rows.single { it.id == "trending" }
+            assertTrue(reloaded is TvDiscoverRow.Podcasts)
+        }
+    }
+
+    @Test
+    fun `repeated playback updates for the same episode rebuild local rows only once`() = runTest {
+        whenever(syncManager.isLoggedIn()).thenReturn(false)
+        whenever(listRepository.getHomeDiscoverFeed(isLoggedIn = false)).thenReturn(discover())
+        whenever(upNextDao.getUpNextBaseEpisodes(any())).thenReturn(
+            listOf(episode(uuid = "episode-1", podcastUuid = "podcast-1")),
+        )
+        val playing = mock<PlaybackState> {
+            on { isPlaying } doReturn true
+            on { episodeUuid } doReturn "episode-1"
+        }
+        whenever(playbackManager.playbackStateFlow).thenReturn(
+            flow {
+                emit(playing)
+                delay(2_000)
+                emit(playing)
+                delay(2_000)
+                emit(playing)
+            },
+        )
+
+        createViewModel()
+        advanceUntilIdle()
+
+        verify(upNextDao, times(2)).getUpNextBaseEpisodes(any())
+    }
+
+    @Test
+    fun `a failed row does not shadow a populated row with the same id`() = runTest {
+        whenever(syncManager.isLoggedIn()).thenReturn(false)
+        whenever(listRepository.getHomeDiscoverFeed(isLoggedIn = false)).thenReturn(
+            discover(
+                row(id = "trending", title = "Row Trending", source = "https://lists/trending.json"),
+                row(id = "trending", title = "Row Trending Again", source = "https://lists/trending-2.json"),
+            ),
+        )
+        whenever(listRepository.getListFeedResult(eq("https://lists/trending.json"), any()))
+            .thenReturn(Result.failure(RuntimeException("boom")))
+        whenever(listRepository.getListFeed(eq("https://lists/trending-2.json"), any()))
+            .thenReturn(podcastFeed("podcast-2"))
+
+        val viewModel = createViewModel()
+
+        viewModel.uiState.test {
+            val row = (awaitItem() as TvHomeUiState.Ready).rows.single { it.id == "trending" }
+            assertTrue(row is TvDiscoverRow.Podcasts)
         }
     }
 
@@ -885,7 +1091,49 @@ class TvHomeViewModelTest {
             viewModel.playEpisode(homeEpisode())
 
             awaitItem()
-            verifyNoInteractions(playbackManager)
+            verifyBlocking(playbackManager, never()) { playNowSuspend(any<BaseEpisode>(), any(), any(), any()) }
+        }
+    }
+
+    @Test
+    fun `playEpisode streams a curated clip from the feed url when the episode cannot be resolved`() = runTest {
+        val playable = episode("episode-1", podcastUuid = "podcast-1")
+        whenever(episodeManager.findByUuid("episode-1")).thenReturn(null, null, playable)
+        whenever(podcastManager.findOrDownloadPodcastRxSingle("podcast-1")).thenReturn(Single.just(Podcast(uuid = "podcast-1")))
+
+        createViewModel().playEpisode(madeForTvEpisode())
+
+        verifyBlocking(episodeManager) {
+            add(argThat { size == 1 && first().downloadUrl == "https://example.com/clip.mp4" }, eq("podcast-1"), eq(false))
+        }
+        verifyBlocking(playbackManager) { playNowSuspend(episode = playable, sourceView = SourceView.DISCOVER) }
+    }
+
+    @Test
+    fun `playEpisode streams a curated clip from the feed url when the lookup throws`() = runTest {
+        val playable = episode("episode-1", podcastUuid = "podcast-1")
+        whenever(episodeManager.findByUuid("episode-1")).thenReturn(null, playable)
+        whenever(podcastManager.findOrDownloadPodcastRxSingle("podcast-1")).thenReturn(Single.error(RuntimeException("boom")))
+
+        createViewModel().playEpisode(madeForTvEpisode())
+
+        verifyBlocking(episodeManager) {
+            add(argThat { size == 1 && first().downloadUrl == "https://example.com/clip.mp4" }, eq("podcast-1"), eq(false))
+        }
+        verifyBlocking(playbackManager) { playNowSuspend(episode = playable, sourceView = SourceView.DISCOVER) }
+    }
+
+    @Test
+    fun `playEpisode reports a failure when the episode carries no playable url`() = runTest {
+        whenever(episodeManager.findByUuid("episode-1")).thenReturn(null)
+        whenever(podcastManager.findOrDownloadPodcastRxSingle("podcast-1")).thenReturn(Single.just(Podcast(uuid = "podcast-1")))
+        val viewModel = createViewModel()
+
+        viewModel.playFailures.test {
+            viewModel.playEpisode(homeEpisode())
+
+            awaitItem()
+            verifyBlocking(playbackManager, never()) { playNowSuspend(any<BaseEpisode>(), any(), any(), any()) }
         }
     }
 
@@ -917,7 +1165,7 @@ class TvHomeViewModelTest {
             viewModel.playLatestEpisode(featuredRow(), discoverPodcast("podcast-1"))
 
             awaitItem()
-            verifyNoInteractions(playbackManager)
+            verifyBlocking(playbackManager, never()) { playNowSuspend(any<BaseEpisode>(), any(), any(), any()) }
         }
     }
 
@@ -950,6 +1198,11 @@ class TvHomeViewModelTest {
         episodeTitle = "Episode",
         podcastUuid = "podcast-1",
         podcastTitle = "Podcast",
+    )
+
+    private fun madeForTvEpisode() = homeEpisode().copy(
+        mediaUrl = "https://example.com/clip.mp4",
+        mediaType = "video/mp4",
     )
 
     @Test
@@ -1103,6 +1356,7 @@ class TvHomeViewModelTest {
         playbackManager = playbackManager,
         eventHorizon = eventHorizon,
         settings = settings,
+        discoverPodcastAttribution = TvDiscoverPodcastAttribution(),
         context = context,
     )
 

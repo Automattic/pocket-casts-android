@@ -125,7 +125,7 @@ class TvSignInViewModelTest {
     fun `non-pending error stops polling`() = runTest {
         whenever(syncManager.deviceAuthorize()).thenReturn(createDeviceAuthorizeResponse())
         whenever(syncManager.loginWithDeviceAuth(eq("device-code-123"), any(), any()))
-            .thenReturn(LoginResult.Failed(message = "Token expired", messageId = "expired_token"))
+            .thenReturn(LoginResult.Failed(message = "Access denied", messageId = "access_denied"))
 
         val viewModel = createViewModel()
 
@@ -137,6 +137,27 @@ class TvSignInViewModelTest {
             assertTrue(states.any { it is TvSignInUiState.Ready })
             assertEquals(TvSignInUiState.Error, states.last())
         }
+    }
+
+    @Test
+    fun `expired code requests a fresh code and keeps polling`() = runTest {
+        whenever(syncManager.deviceAuthorize()).thenReturn(createDeviceAuthorizeResponse())
+        whenever(syncManager.loginWithDeviceAuth(eq("device-code-123"), any(), any()))
+            .thenReturn(LoginResult.Failed(message = "Token expired", messageId = "expired_token"))
+            .thenReturn(createLoginSuccess())
+
+        val viewModel = createViewModel()
+
+        viewModel.uiState.test {
+            val states = mutableListOf(awaitItem())
+            while (states.last() !is TvSignInUiState.Complete) {
+                states.add(awaitItem())
+            }
+            assertFalse(states.any { it is TvSignInUiState.Error })
+            assertEquals(TvSignInUiState.Complete, states.last())
+        }
+
+        verify(syncManager, times(2)).deviceAuthorize()
     }
 
     @Test

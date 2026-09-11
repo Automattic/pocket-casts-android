@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -39,6 +40,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.Button
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.component.LocalOpenNowPlaying
 import au.com.shiftyjelly.pocketcasts.component.LocalTvToastHostState
 import au.com.shiftyjelly.pocketcasts.component.TvArchivedFilterButton
@@ -120,6 +122,7 @@ fun TvPlaylistDetailsScreen(
         BackHandler { openedPodcastUuid = null }
         TvPodcastDetailsScreen(
             podcastUuid = podcastUuid,
+            source = SourceView.FILTERS,
             onClose = { openedPodcastUuid = null },
             modifier = modifier,
         )
@@ -177,10 +180,10 @@ private fun TvPlaylistDetailsContent(
             is TvPlaylistDetailsUiState.Loaded -> {
                 val playAllFocusRequester = remember { FocusRequester() }
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(80.dp),
+                    horizontalArrangement = Arrangement.spacedBy(60.dp),
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(start = 32.dp, top = 16.dp, end = 32.dp),
+                        .padding(start = 42.dp, top = 12.dp, end = 42.dp),
                 ) {
                     PlaylistInfo(
                         playlist = uiState.playlist,
@@ -235,32 +238,33 @@ private fun SortableEpisodeList(
     val isManual = uiState.playlist.type == Playlist.Type.Manual
     val leftFocusRequester = playAllFocusRequester.takeIf { uiState.episodes.isNotEmpty() }
     Column(modifier = modifier) {
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .align(Alignment.End)
-                .padding(bottom = 12.dp),
-        ) {
-            if (isManual) {
-                TvArchivedFilterButton(
-                    isShowingArchived = uiState.isShowingArchivedOnDevice,
-                    onToggleArchiveFilter = onToggleArchiveFilter,
-                    leftFocusRequester = leftFocusRequester,
+        val header: @Composable (Modifier) -> Unit = { headerModifier ->
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(9.dp, Alignment.End),
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = headerModifier.fillMaxWidth(),
+            ) {
+                if (isManual) {
+                    TvArchivedFilterButton(
+                        isShowingArchived = uiState.isShowingArchivedOnDevice,
+                        onToggleArchiveFilter = onToggleArchiveFilter,
+                        leftFocusRequester = leftFocusRequester,
+                    )
+                }
+                TvSortButton(
+                    selected = sortType,
+                    options = uiState.playlist.availableSortTypes,
+                    label = { it.displayLabel() },
+                    onSelect = onChangeSortType,
+                    onExpand = onSortTap,
+                    leftFocusRequester = if (isManual) null else leftFocusRequester,
                 )
             }
-            TvSortButton(
-                selected = sortType,
-                options = uiState.playlist.availableSortTypes,
-                label = { it.displayLabel() },
-                onSelect = onChangeSortType,
-                onExpand = onSortTap,
-                leftFocusRequester = if (isManual) null else leftFocusRequester,
-            )
         }
         if (uiState.episodes.isNotEmpty()) {
             EpisodeList(
                 episodes = uiState.episodes,
+                header = header,
                 onOpenPodcast = onOpenPodcast,
                 onPlayEpisode = onPlayEpisode,
                 playAllFocusRequester = playAllFocusRequester,
@@ -268,6 +272,7 @@ private fun SortableEpisodeList(
                 modifier = Modifier.weight(1f),
             )
         } else {
+            header(Modifier.padding(bottom = 9.dp))
             AllEpisodesArchived(
                 episodeCount = uiState.availableEpisodeCount,
                 modifier = Modifier.weight(1f).fillMaxWidth(),
@@ -290,7 +295,7 @@ private fun AllEpisodesArchived(
             style = MaterialTheme.tvTypography.caption1,
             color = MaterialTheme.tvColors.textSecondary,
             textAlign = TextAlign.Center,
-            modifier = Modifier.widthIn(max = 400.dp),
+            modifier = Modifier.widthIn(max = 300.dp),
         )
     }
 }
@@ -298,6 +303,7 @@ private fun AllEpisodesArchived(
 @Composable
 private fun EpisodeList(
     episodes: List<PodcastEpisode>,
+    header: @Composable (Modifier) -> Unit,
     onOpenPodcast: (String) -> Unit,
     onPlayEpisode: (PodcastEpisode) -> Unit,
     playAllFocusRequester: FocusRequester,
@@ -306,14 +312,18 @@ private fun EpisodeList(
 ) {
     val context = LocalContext.current
     val dateFormatter = remember(context) { RelativeDateFormatter(context) }
-    val focus = rememberTvEpisodeListFocus(episodes, listState, requestInitialFocus = true)
+    val focus = rememberTvEpisodeListFocus(episodes, listState, requestInitialFocus = true, leadingItemCount = 1)
     var actionsEpisode by remember { mutableStateOf<PodcastEpisode?>(null) }
     var detailsEpisode by remember { mutableStateOf<PodcastEpisode?>(null) }
     LazyColumn(
         state = listState,
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        verticalArrangement = Arrangement.spacedBy(9.dp),
+        contentPadding = PaddingValues(top = 8.dp, end = 8.dp, bottom = 24.dp),
         modifier = modifier,
     ) {
+        item(key = "sort-filter-header") {
+            header(Modifier)
+        }
         itemsIndexed(
             items = episodes,
             key = { _, episode -> episode.uuid },
@@ -363,7 +373,7 @@ private fun NoEpisodes(
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(9.dp),
         ) {
             Text(
                 text = stringResource(LR.string.tv_playlist_empty_title),
@@ -379,7 +389,7 @@ private fun NoEpisodes(
                 style = MaterialTheme.tvTypography.caption1,
                 color = MaterialTheme.tvColors.textSecondary,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.widthIn(max = 400.dp),
+                modifier = Modifier.widthIn(max = 300.dp),
             )
         }
     }
@@ -394,15 +404,15 @@ private fun PlaylistInfo(
     modifier: Modifier = Modifier,
 ) {
     Column(
-        verticalArrangement = Arrangement.spacedBy(28.dp),
+        verticalArrangement = Arrangement.spacedBy(21.dp),
         modifier = modifier,
     ) {
         PlaylistArtwork(
             podcastUuids = playlist.metadata.artworkUuids,
             artworkSize = TvDetailsArtworkSize,
-            cornerSize = 8.dp,
+            cornerSize = 6.dp,
         )
-        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(4.5.dp)) {
             Text(
                 text = when (playlist.type) {
                     Playlist.Type.Manual -> stringResource(LR.string.playlist)
@@ -497,7 +507,7 @@ private fun episodeSummaryText(episodes: List<PodcastEpisode>): String {
     }
 }
 
-private val InfoPaneWidth = 200.dp
+private val InfoPaneWidth = TvDetailsArtworkSize
 
 @Preview(device = Devices.TV_1080p)
 @Composable

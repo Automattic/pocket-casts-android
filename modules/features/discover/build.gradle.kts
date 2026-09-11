@@ -42,6 +42,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.preference.ktx)
     implementation(libs.coil)
+    implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.tooling.preview)
@@ -64,6 +65,7 @@ dependencies {
     implementation(projects.modules.services.localization)
     implementation(projects.modules.services.utils)
 
+    testImplementation(libs.androidx.arch.core)
     testImplementation(libs.coroutines.test)
     testImplementation(libs.junit)
     testImplementation(libs.moshi)

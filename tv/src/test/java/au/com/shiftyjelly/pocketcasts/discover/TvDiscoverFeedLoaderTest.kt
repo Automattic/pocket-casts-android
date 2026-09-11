@@ -1,11 +1,19 @@
 package au.com.shiftyjelly.pocketcasts.discover
 
 import android.content.Context
+import android.content.res.Resources
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
 import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
+import au.com.shiftyjelly.pocketcasts.servers.model.Discover
+import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverEpisode
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
+import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRegion
+import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRow
+import au.com.shiftyjelly.pocketcasts.servers.model.DisplayStyle
 import au.com.shiftyjelly.pocketcasts.servers.model.ListFeed
+import au.com.shiftyjelly.pocketcasts.servers.model.ListType
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -19,6 +27,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
@@ -33,7 +42,11 @@ class TvDiscoverFeedLoaderTest {
     @get:Rule
     val coroutineRule = MainCoroutineRule()
 
-    private val listRepository = mock<ListRepository>()
+    private val listRepository = mock<ListRepository> {
+        on { getListFeedResult(any(), anyOrNull()) } doSuspendableAnswer { invocation ->
+            Result.success((invocation.mock as ListRepository).getListFeed(invocation.getArgument(0), invocation.getArgument(1)))
+        }
+    }
     private val settings = mock<Settings>()
     private val context = mock<Context>()
 
@@ -104,6 +117,82 @@ class TvDiscoverFeedLoaderTest {
         verify(listRepository, times(1)).getListFeed(eq(SOURCE), any())
     }
 
+    @Test
+    fun `video preview list episodes carry a preview url`() = runTest {
+        stubCountry()
+        val feed = mock<ListFeed> { on { episodes } doReturn listOf(videoEpisode()) }
+        whenever(listRepository.getListFeed(eq(SOURCE), any())).doReturn(feed)
+
+        val rows = loader().buildRows(discoverWith(DisplayStyle.VideoPreviewList()), isLoggedIn = true)
+
+        val episodes = (rows.single() as TvDiscoverRow.Episodes).episodes
+        assertEquals("https://example.com/video.mp4", episodes.single().videoPreviewUrl)
+    }
+
+    @Test
+    fun `non video preview episode lists do not carry a preview url`() = runTest {
+        stubCountry()
+        val feed = mock<ListFeed> { on { episodes } doReturn listOf(videoEpisode()) }
+        whenever(listRepository.getListFeed(eq(SOURCE), any())).doReturn(feed)
+
+        val rows = loader().buildRows(discoverWith(DisplayStyle.SmallList()), isLoggedIn = true)
+
+        val episodes = (rows.single() as TvDiscoverRow.Episodes).episodes
+        assertEquals(null, episodes.single().videoPreviewUrl)
+    }
+
+    @Test
+    fun `a networks row is dropped because tv has nowhere to render it`() = runTest {
+        stubCountry()
+
+        val rows = loader().buildRows(discoverWith(DisplayStyle.LargeList(), type = ListType.ListsList), isLoggedIn = true)
+
+        assertEquals(emptyList<TvDiscoverRow>(), rows)
+    }
+
+    private fun stubCountry() {
+        val countrySetting = mock<UserSetting<String>> { on { value } doReturn REGION }
+        whenever(settings.discoverCountryCode).doReturn(countrySetting)
+        whenever(context.resources).doReturn(mock<Resources>())
+    }
+
+    private fun discoverWith(displayStyle: DisplayStyle, type: ListType = ListType.EpisodeList) = Discover(
+        layout = listOf(
+            DiscoverRow(
+                id = "made-for-tv",
+                type = type,
+                displayStyle = displayStyle,
+                expandedTopItemLabel = null,
+                title = "Made for TV",
+                source = SOURCE,
+                listUuid = null,
+                categoryId = null,
+                regions = listOf(REGION),
+                mostPopularCategoriesId = null,
+                sponsoredCategoryIds = null,
+            ),
+        ),
+        regions = mapOf(REGION to DiscoverRegion(name = "Region", flag = "flag", code = REGION)),
+        regionCodeToken = "[regionCode]",
+        regionNameToken = "[regionName]",
+        defaultRegionCode = REGION,
+    )
+
+    private fun videoEpisode() = DiscoverEpisode(
+        uuid = "episode-uuid",
+        title = "Episode",
+        url = "https://example.com/video.mp4",
+        published = null,
+        duration = null,
+        fileType = "video/mp4",
+        size = null,
+        podcast_uuid = "podcast-uuid",
+        podcast_title = "Podcast",
+        type = null,
+        season = null,
+        number = null,
+    )
+
     private fun feedOf(vararg uuids: String) = mock<ListFeed> {
         on { podcasts } doReturn uuids.map { uuid ->
             DiscoverPodcast(
@@ -123,5 +212,6 @@ class TvDiscoverFeedLoaderTest {
 
     private companion object {
         const val SOURCE = "https://category/us.json"
+        const val REGION = "zz"
     }
 }

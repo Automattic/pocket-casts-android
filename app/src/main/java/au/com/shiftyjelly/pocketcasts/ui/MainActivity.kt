@@ -61,6 +61,7 @@ import androidx.transition.Slide
 import au.com.shiftyjelly.pocketcasts.R
 import au.com.shiftyjelly.pocketcasts.account.AccountActivity
 import au.com.shiftyjelly.pocketcasts.account.PromoCodeUpgradedFragment
+import au.com.shiftyjelly.pocketcasts.account.deviceapprove.DeviceApproveFragment
 import au.com.shiftyjelly.pocketcasts.account.onboarding.AccountBenefitsFragment
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivity
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivityContract
@@ -87,6 +88,7 @@ import au.com.shiftyjelly.pocketcasts.deeplink.DownloadsDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ImportDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.NativeShareDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.OpmlImportDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.PairDeviceDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.PlayFromSearchDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.PocketCastsWebsiteGetDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.PromoCodeDeepLink
@@ -115,6 +117,7 @@ import au.com.shiftyjelly.pocketcasts.discover.util.DiscoverDeepLinkManager
 import au.com.shiftyjelly.pocketcasts.discover.util.DiscoverDeepLinkManager.Companion.RECOMMENDATIONS_USER
 import au.com.shiftyjelly.pocketcasts.discover.util.DiscoverDeepLinkManager.Companion.STAFF_PICKS_LIST_ID
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment
+import au.com.shiftyjelly.pocketcasts.discover.view.PodcastGridFragment
 import au.com.shiftyjelly.pocketcasts.discover.view.PodcastGridListFragment
 import au.com.shiftyjelly.pocketcasts.discover.view.PodcastListFragment
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesActivity
@@ -481,7 +484,8 @@ class MainActivity :
 
         val hasCompletedOnboarding = settings.hasCompletedOnboarding()
         val isLoggedIn = syncManager.isLoggedIn()
-        val showOnboarding = !hasCompletedOnboarding && !isLoggedIn
+        val isPairingDeepLink = deepLinkFactory.create(intent) is PairDeviceDeepLink
+        val showOnboarding = !hasCompletedOnboarding && !isLoggedIn && !isPairingDeepLink
         val needsLoginPromptAfterRestore = settings.getNeedsLoginPromptAfterRestore()
         // Only show if savedInstanceState is null in order to avoid creating onboarding activity twice.
         if (showOnboarding && savedInstanceState == null) {
@@ -1835,6 +1839,12 @@ class MainActivity :
                     openOnboardingFlow(onboardingFlow)
                 }
 
+                is PairDeviceDeepLink -> {
+                    if (supportFragmentManager.findFragmentByTag("device_approve") == null) {
+                        DeviceApproveFragment.newInstance(deepLink.userCode).show(supportFragmentManager, "device_approve")
+                    }
+                }
+
                 is ThemesDeepLink -> {
                     closePlayer()
                     addFragment(AppearanceSettingsFragment.newInstance())
@@ -1890,6 +1900,15 @@ class MainActivity :
         val currentFragment = navigator.currentFragment()
         if (currentFragment is PodcastFragment && uuid == currentFragment.podcastUuid) return // We are already showing it
         addFragment(PodcastFragment.newInstance(podcastUuid = uuid, sourceView = SourceView.fromString(sourceView)))
+    }
+
+    override fun openNetworkPage(listId: String, title: String?, sourceView: SourceView?) {
+        closePlayer()
+        frameBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+
+        val currentFragment = navigator.currentFragment()
+        if (currentFragment is PodcastGridFragment && listId == currentFragment.listUuid) return // We are already showing it
+        addFragment(PodcastGridFragment.newInstance(listId = listId, title = title, sourceView = sourceView))
     }
 
     @Suppress("DEPRECATION")

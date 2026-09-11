@@ -46,14 +46,14 @@ internal fun TvSearchFilters(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         FilterDivider(modifier = Modifier.weight(1f))
-        Spacer(modifier = Modifier.width(20.dp))
+        Spacer(modifier = Modifier.width(15.dp))
         TvSearchFilterPills(
             filters = filters,
             selected = selected,
             onFilterSelect = onFilterSelect,
             upFocusRequester = upFocusRequester,
         )
-        Spacer(modifier = Modifier.width(20.dp))
+        Spacer(modifier = Modifier.width(15.dp))
         FilterDivider(modifier = Modifier.weight(1f))
     }
 }
@@ -70,7 +70,7 @@ private fun TvSearchFilterPills(
     Box(
         modifier = Modifier
             .background(MaterialTheme.tvColors.backgroundSunken, RoundedCornerShape(percent = 50))
-            .padding(3.dp),
+            .padding(2.dp),
     ) {
         TabRow(
             selectedTabIndex = selectedIndex,
@@ -95,8 +95,8 @@ private fun TvSearchFilterPills(
                     onFocus = { onFilterSelect(filter) },
                     onClick = { onFilterSelect(filter) },
                     modifier = Modifier
-                        .height(44.dp)
-                        .padding(horizontal = 21.dp)
+                        .height(33.dp)
+                        .padding(horizontal = 16.dp)
                         .focusProperties { upFocusRequester?.let { up = it } }
                         .then(if (index == selectedIndex) Modifier.focusRequester(focusRequester) else Modifier),
                     colors = TabDefaults.pillIndicatorTabColors(
@@ -141,7 +141,7 @@ private fun TvSearchFiltersPreview() {
             onFilterSelect = {},
             modifier = Modifier
                 .background(MaterialTheme.tvColors.backgroundSunken)
-                .padding(48.dp),
+                .padding(36.dp),
         )
     }
 }

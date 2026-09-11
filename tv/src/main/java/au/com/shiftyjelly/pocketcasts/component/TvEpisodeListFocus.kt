@@ -30,13 +30,16 @@ internal fun rememberTvEpisodeListFocus(
     episodes: List<PodcastEpisode>,
     listState: LazyListState,
     requestInitialFocus: Boolean,
+    leadingItemCount: Int = 0,
 ): TvEpisodeListFocus {
     val focus = remember { TvEpisodeListFocus() }
 
     if (requestInitialFocus) {
         LaunchedEffect(episodes.isNotEmpty()) {
             if (episodes.isNotEmpty() && !focus.hasRequestedInitialFocus) {
-                val index = Snapshot.withoutReadObservation { listState.firstVisibleItemIndex }
+                // The list may lead with non-episode items (e.g. a scrolling header), so shift the
+                // first-visible list index back into episode space before indexing.
+                val index = (Snapshot.withoutReadObservation { listState.firstVisibleItemIndex } - leadingItemCount)
                     .coerceIn(0, episodes.lastIndex)
                 focus.focusRow(listState, targetUuid = episodes[index].uuid, removedUuid = null)
                 focus.hasRequestedInitialFocus = true

@@ -173,9 +173,9 @@ private fun TvSearchFieldContent(
             painter = painterResource(IR.drawable.ic_search),
             contentDescription = null,
             tint = contentColor,
-            modifier = Modifier.size(32.dp),
+            modifier = Modifier.size(24.dp),
         )
-        Spacer(modifier = Modifier.width(16.dp))
+        Spacer(modifier = Modifier.width(12.dp))
         Box(contentAlignment = Alignment.CenterStart) {
             if (query.isEmpty()) {
                 Text(
@@ -204,7 +204,7 @@ private fun TvSearchFieldPreview() {
         Box(
             modifier = Modifier
                 .background(MaterialTheme.tvColors.backgroundSunken)
-                .padding(48.dp),
+                .padding(36.dp),
         ) {
             TvSearchField(query = "", onQueryChange = {})
         }

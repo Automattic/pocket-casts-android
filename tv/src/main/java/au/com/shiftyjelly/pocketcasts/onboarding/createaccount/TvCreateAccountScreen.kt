@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.onboarding.createaccount
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -34,6 +33,7 @@ import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.onboarding.signin.TvSignInQrContent
 import au.com.shiftyjelly.pocketcasts.onboarding.signin.TvSignInUiState
 import au.com.shiftyjelly.pocketcasts.onboarding.signin.verificationDisplayUrl
+import au.com.shiftyjelly.pocketcasts.onboarding.tvOnboardingBackground
 import au.com.shiftyjelly.pocketcasts.theme.TvButtonDefaults
 import au.com.shiftyjelly.pocketcasts.theme.TvTheme
 import au.com.shiftyjelly.pocketcasts.theme.tvColors
@@ -80,7 +80,7 @@ private fun TvCreateAccountLoading(modifier: Modifier = Modifier) {
         contentAlignment = Alignment.Center,
         modifier = modifier
             .fillMaxSize()
-            .background(MaterialTheme.tvColors.backgroundSunken)
+            .tvOnboardingBackground(MaterialTheme.tvColors.backgroundBase, MaterialTheme.tvColors.backgroundSunken)
             .focusRequester(focusRequester)
             .focusable(),
     ) {
@@ -94,7 +94,7 @@ private fun TvCreateAccountLoading(modifier: Modifier = Modifier) {
             Text(
                 text = stringResource(LR.string.tv_create_account_title),
                 color = MaterialTheme.tvColors.textPrimary,
-                style = MaterialTheme.tvTypography.title2.copy(textAlign = TextAlign.Center),
+                style = MaterialTheme.tvTypography.title3.copy(textAlign = TextAlign.Center),
             )
         }
     }
@@ -115,7 +115,7 @@ private fun TvCreateAccountError(
         contentAlignment = Alignment.Center,
         modifier = modifier
             .fillMaxSize()
-            .background(MaterialTheme.tvColors.backgroundSunken),
+            .tvOnboardingBackground(MaterialTheme.tvColors.backgroundBase, MaterialTheme.tvColors.backgroundSunken),
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Image(
@@ -159,18 +159,18 @@ private fun TvCreateAccountContent(
         contentAlignment = Alignment.Center,
         modifier = modifier
             .fillMaxSize()
-            .background(MaterialTheme.tvColors.backgroundSunken)
+            .tvOnboardingBackground(MaterialTheme.tvColors.backgroundBase, MaterialTheme.tvColors.backgroundSunken)
             .focusRequester(focusRequester)
             .focusable(),
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(48.dp),
+            verticalArrangement = Arrangement.spacedBy(40.dp),
         ) {
             Text(
                 text = stringResource(LR.string.tv_create_account_title),
                 color = MaterialTheme.tvColors.textPrimary,
-                style = MaterialTheme.tvTypography.title2.copy(textAlign = TextAlign.Center),
+                style = MaterialTheme.tvTypography.title3.copy(textAlign = TextAlign.Center),
             )
             TvSignInQrContent(
                 userCode = userCode,

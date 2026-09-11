@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.onboarding.signedout
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,7 +16,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
@@ -32,7 +30,6 @@ import au.com.shiftyjelly.pocketcasts.theme.TvButtonDefaults
 import au.com.shiftyjelly.pocketcasts.theme.TvTheme
 import au.com.shiftyjelly.pocketcasts.theme.tvColors
 import au.com.shiftyjelly.pocketcasts.theme.tvTypography
-import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -67,14 +64,9 @@ private fun TvSignedOutContent(
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier.padding(horizontal = 48.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier.padding(horizontal = 36.dp),
         ) {
-            Image(
-                painter = painterResource(IR.drawable.ic_pocket_casts_logo),
-                contentDescription = null,
-                modifier = Modifier.size(36.dp),
-            )
             Text(
                 text = stringResource(LR.string.tv_account_signed_out_alert_title),
                 color = MaterialTheme.tvColors.textPrimary,
@@ -85,7 +77,7 @@ private fun TvSignedOutContent(
                 color = MaterialTheme.tvColors.textSecondary,
                 style = MaterialTheme.tvTypography.body.copy(textAlign = TextAlign.Center),
             )
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
             Button(
                 onClick = onLogIn,
                 colors = TvButtonDefaults.filledButtonColors(),

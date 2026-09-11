@@ -103,6 +103,7 @@ private fun TvFolderDetailContent(
                 itemKeys = state.podcasts.map(Podcast::uuid),
                 autoFocusFirstItem = true,
                 restoreFocusTrigger = restoreFocusTrigger,
+                scrollsTitle = true,
                 modifier = Modifier.fillMaxSize(),
             ) { index, itemModifier ->
                 val podcast = state.podcasts[index]

@@ -25,6 +25,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
@@ -47,8 +48,8 @@ import au.com.shiftyjelly.pocketcasts.theme.tvColors
 import au.com.shiftyjelly.pocketcasts.theme.tvTypography
 import kotlin.math.roundToInt
 
-private val LabelGap = 8.dp
-private val LabelFadeRange = 16.dp
+private val LabelGap = 6.dp
+private val LabelFadeRange = 12.dp
 
 @Composable
 fun TvSeekBar(
@@ -133,7 +134,7 @@ fun TvSeekBar(
         BoxWithConstraints(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 8.dp),
+                .padding(top = 6.dp),
         ) {
             val maxWidthPx = constraints.maxWidth.toFloat()
             var positionLabelWidth by remember { mutableIntStateOf(0) }
@@ -147,6 +148,7 @@ fun TvSeekBar(
 
             SeekBarLabel(
                 text = TimeHelper.formattedSeconds(positionMs / 1000.0),
+                color = if (isFocused) MaterialTheme.tvColors.textPrimary else MaterialTheme.tvColors.textTertiary,
                 modifier = Modifier
                     .align(Alignment.CenterStart)
                     .onSizeChanged { positionLabelWidth = it.width }
@@ -170,11 +172,12 @@ fun TvSeekBar(
 private fun SeekBarLabel(
     text: String,
     modifier: Modifier = Modifier,
+    color: Color = MaterialTheme.tvColors.textTertiary,
 ) {
     Text(
         text = text,
         style = MaterialTheme.tvTypography.caption1,
-        color = MaterialTheme.tvColors.textTertiary,
+        color = color,
         modifier = modifier,
     )
 }
