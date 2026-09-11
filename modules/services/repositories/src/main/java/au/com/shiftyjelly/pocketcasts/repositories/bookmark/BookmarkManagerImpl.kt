@@ -31,6 +31,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 class BookmarkManagerImpl @Inject constructor(
@@ -256,25 +257,16 @@ class BookmarkManagerImpl @Inject constructor(
     override fun enrichBookmark(bookmark: Bookmark) {
         launch(Dispatchers.IO) {
             try {
-                val window = transcriptWindowExtractor.extractWindow(
-                    episodeUuid = bookmark.episodeUuid,
-                    timeSecs = bookmark.timeSecs,
-                ) ?: return@launch
-
-                val response = callEnrichApi(window.passage)
-                if (response.error != null) {
-                    Timber.w("Smart bookmark enrichment returned error for ${bookmark.uuid}: ${response.error}")
-                }
-                val title = response.title?.takeIf { it.isNotEmpty() }
+                val suggestion = suggestBookmark(bookmark.episodeUuid, bookmark.timeSecs) ?: return@launch
                 val now = System.currentTimeMillis()
                 bookmarkDao.updateGeneratedData(
                     bookmarkUuid = bookmark.uuid,
-                    title = title,
-                    titleModified = now.takeIf { title != null },
-                    passage = window.passage,
-                    passageLocation = window.location,
+                    title = suggestion.title,
+                    titleModified = now.takeIf { suggestion.title != null },
+                    passage = suggestion.passage,
+                    passageLocation = suggestion.passageLocation,
                     passageModified = now,
-                    referenceTime = window.referenceTimeSecs,
+                    referenceTime = suggestion.referenceTimeSecs,
                     referenceTimeModified = now,
                     syncStatus = SyncStatus.NOT_SYNCED,
                 )
@@ -284,6 +276,25 @@ class BookmarkManagerImpl @Inject constructor(
                 Timber.e(e, "Smart bookmark enrichment failed for ${bookmark.uuid}")
             }
         }
+    }
+
+    override suspend fun suggestBookmark(episodeUuid: String, timeSecs: Int): BookmarkSuggestion? = withContext(Dispatchers.IO) {
+        val window = transcriptWindowExtractor.extractWindow(episodeUuid = episodeUuid, timeSecs = timeSecs) ?: return@withContext null
+        val response = try {
+            callEnrichApi(window.passage)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Timber.e(e, "Smart bookmark title suggestion failed for $episodeUuid")
+            null
+        }
+        response?.error?.let { Timber.w("Smart bookmark enrichment returned error for $episodeUuid: $it") }
+        BookmarkSuggestion(
+            passage = window.passage,
+            passageLocation = window.location,
+            referenceTimeSecs = window.referenceTimeSecs,
+            title = response?.title?.takeIf { it.isNotEmpty() },
+        )
     }
 
     private suspend fun callEnrichApi(snippet: String): BookmarkEnrichResponse {

@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
+import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkSuggestion
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
@@ -19,11 +20,14 @@ import com.automattic.eventhorizon.SourceViewType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import timber.log.Timber
 
 @HiltViewModel
@@ -37,9 +41,13 @@ class BookmarkViewModel
     CoroutineScope {
 
     private lateinit var arguments: BookmarkArguments
+    private var capturedSuggestion: BookmarkSuggestion? = null
+    private var titleEdited = false
+    private var loadJob: Job? = null
 
     companion object {
         private const val DEFAULT_TITLE = "Bookmark"
+        private val SUGGESTION_TIMEOUT = 10.seconds
 
         private fun buildSelectedTextFieldValue(text: String): TextFieldValue {
             return TextFieldValue(text = text, selection = TextRange(0, text.length))
@@ -50,8 +58,15 @@ class BookmarkViewModel
         val bookmarkUuid: String? = null,
         val title: TextFieldValue = buildSelectedTextFieldValue(DEFAULT_TITLE),
         val passage: String? = null,
+        val titleSuggestion: TitleSuggestion = TitleSuggestion.None,
     ) {
         val isNewBookmark: Boolean = bookmarkUuid == null
+    }
+
+    sealed interface TitleSuggestion {
+        data object None : TitleSuggestion
+        data object Generating : TitleSuggestion
+        data class Available(val title: String) : TitleSuggestion
     }
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
@@ -60,12 +75,13 @@ class BookmarkViewModel
     val uiState: StateFlow<UiState> = mutableUiState
 
     fun load(arguments: BookmarkArguments) {
+        if (loadJob != null) return
         this.arguments = arguments
         val bookmarkUuid = arguments.bookmarkUuid
         mutableUiState.value = mutableUiState.value.copy(
             bookmarkUuid = bookmarkUuid,
         )
-        viewModelScope.launch {
+        loadJob = viewModelScope.launch {
             // load the existing bookmark
             val bookmark = if (bookmarkUuid == null) {
                 val episode = episodeManager.findEpisodeByUuid(arguments.episodeUuid) ?: return@launch
@@ -82,7 +98,23 @@ class BookmarkViewModel
                     title = buildSelectedTextFieldValue(bookmark.title),
                     passage = displayPassage(bookmark),
                 )
+            } else if (bookmarkUuid == null && FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS)) {
+                generateTitleSuggestion(arguments.episodeUuid, arguments.timeSecs)
             }
+        }
+    }
+
+    private suspend fun generateTitleSuggestion(episodeUuid: String, timeSecs: Int) {
+        mutableUiState.value = mutableUiState.value.copy(titleSuggestion = TitleSuggestion.Generating)
+        val suggestion = withTimeoutOrNull(SUGGESTION_TIMEOUT) {
+            bookmarkManager.suggestBookmark(episodeUuid, timeSecs)
+        }
+        capturedSuggestion = suggestion
+        val suggestedTitle = suggestion?.title?.takeIf { it.isNotBlank() }
+        when {
+            suggestedTitle == null -> mutableUiState.value = mutableUiState.value.copy(titleSuggestion = TitleSuggestion.None)
+            !titleEdited -> applySuggestion(suggestedTitle)
+            else -> mutableUiState.value = mutableUiState.value.copy(titleSuggestion = TitleSuggestion.Available(suggestedTitle))
         }
     }
 
@@ -97,9 +129,20 @@ class BookmarkViewModel
     private fun displayPassage(bookmark: Bookmark) = bookmark.passage?.takeIf { FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS) }
 
     fun changeTitle(title: TextFieldValue) {
-        // limit the title to 100 characters
+        titleEdited = true
         val titleLimited = title.copy(text = title.text.take(100))
-        mutableUiState.value = mutableUiState.value.copy(title = titleLimited)
+        val suggestion = uiState.value.titleSuggestion
+        mutableUiState.value = mutableUiState.value.copy(
+            title = titleLimited,
+            titleSuggestion = if (suggestion is TitleSuggestion.Generating) TitleSuggestion.None else suggestion,
+        )
+    }
+
+    fun applySuggestion(title: String) {
+        mutableUiState.value = mutableUiState.value.copy(
+            title = buildSelectedTextFieldValue(title),
+            titleSuggestion = TitleSuggestion.None,
+        )
     }
 
     fun saveBookmark(onSaved: (Bookmark, isExistingBookmark: Boolean) -> Unit) {
@@ -113,11 +156,16 @@ class BookmarkViewModel
                     val episode = episodeManager.findByUuid(episodeUuid)
                         ?: userEpisodeManager.findEpisodeByUuid(episodeUuid)
                         ?: return@launch
+                    loadJob?.join()
+                    val suggestion = capturedSuggestion
                     bookmarkManager.add(
                         episode = episode,
                         timeSecs = arguments.timeSecs,
                         title = state.title.text,
                         creationSource = BookmarkSourceType.Player,
+                        passage = suggestion?.passage,
+                        passageLocation = suggestion?.passageLocation,
+                        referenceTime = suggestion?.referenceTimeSecs,
                     )
                 } else {
                     bookmarkManager.updateTitle(bookmarkUuid, state.title.text)
