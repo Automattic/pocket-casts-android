@@ -34,6 +34,8 @@ import au.com.shiftyjelly.pocketcasts.utils.fingerprint.FingerprintPolicy
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -73,7 +75,13 @@ class SimplePlayer(
     private var videoChangedListener: VideoChangedListener? = null
     private val mainHandler = Handler(Looper.getMainLooper())
 
-    private var hasVideoSurface = false
+    private val _hasVideoSurfaceFlow = MutableStateFlow(false)
+    val hasVideoSurfaceFlow = _hasVideoSurfaceFlow.asStateFlow()
+    private var hasVideoSurface: Boolean
+        get() = _hasVideoSurfaceFlow.value
+        set(value) {
+            _hasVideoSurfaceFlow.value = value
+        }
     private var videoTrackDisableRunnable: Runnable? = null
 
     private var pendingSurface: SurfaceView? = null
