@@ -632,8 +632,8 @@ class PodcastManagerImpl @Inject constructor(
         return Podcast.userPodcast.copy(thumbnailUrl = episode.getUrlForArtwork())
     }
 
-    override fun autoAddToUpNextPodcastsRxFlowable(): Flowable<List<Podcast>> {
-        return podcastDao.findAutoAddToUpNextPodcastsRxFlowable()
+    override fun autoAddToUpNextPodcastsFlow(): Flow<List<Podcast>> {
+        return podcastDao.findAutoAddToUpNextPodcastsFlow()
     }
 
     override suspend fun findAutoAddToUpNextPodcasts(): List<Podcast> {
