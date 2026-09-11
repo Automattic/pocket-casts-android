@@ -7,7 +7,7 @@
     *   Fix video freezing when rotating into landscape fullscreen and stuttering when resuming from the background
         ([#5844](https://github.com/Automattic/pocket-casts-android/pull/5844))
     *   Keep Picture-in-Picture video playing across rotation and config changes, and restore the inline video after closing PiP
-        ([#PENDING](https://github.com/Automattic/pocket-casts-android/pull/PENDING))
+        ([#5912](https://github.com/Automattic/pocket-casts-android/pull/5912))
     *   Keep the multi-select episode selection when rotating the device on the podcast screen
         ([#5836](https://github.com/Automattic/pocket-casts-android/pull/5836))
     *   Prevent the app from being killed in the background on low-memory devices by pausing player UI updates while playing
