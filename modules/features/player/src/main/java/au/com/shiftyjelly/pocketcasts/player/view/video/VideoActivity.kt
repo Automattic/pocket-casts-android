@@ -128,21 +128,31 @@ class VideoActivity : AppCompatActivity() {
 
     override fun onStop() {
         super.onStop()
-        // Close-X (mode-changed(false) precedes onStop) and fullscreen finish both land here without PiP.
-        if (!isInPictureInPictureMode) {
+        // Backgrounding from fullscreen (not PiP, not a config change) hands the surface back to the inline player.
+        if (!isInPictureInPictureMode && !isChangingConfigurations) {
             playbackManager.setVideoSurfaceState(VideoSurfaceState.NONE)
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        // Closing the PiP delivers onPictureInPictureModeChanged(false) before the finish is visible, so
+        // hand the surface back here where isFinishing is reliably set.
+        if (isFinishing) {
+            playbackManager.setVideoSurfaceState(VideoSurfaceState.NONE)
+        }
         unregisterReceiver(pipReceiver)
     }
 
     override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean, newConfig: Configuration) {
         super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
 
-        playbackManager.setVideoSurfaceState(if (isInPictureInPictureMode) VideoSurfaceState.PIP else VideoSurfaceState.FULLSCREEN)
+        val state = when {
+            isInPictureInPictureMode -> VideoSurfaceState.PIP
+            isFinishing -> VideoSurfaceState.NONE
+            else -> VideoSurfaceState.FULLSCREEN
+        }
+        playbackManager.setVideoSurfaceState(state)
     }
 
     override fun onNewIntent(intent: Intent) {
