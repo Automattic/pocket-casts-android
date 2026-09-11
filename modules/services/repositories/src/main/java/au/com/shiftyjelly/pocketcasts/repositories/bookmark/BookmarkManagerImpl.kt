@@ -31,6 +31,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 class BookmarkManagerImpl @Inject constructor(
@@ -277,8 +278,8 @@ class BookmarkManagerImpl @Inject constructor(
         }
     }
 
-    override suspend fun suggestBookmark(episodeUuid: String, timeSecs: Int): BookmarkSuggestion? {
-        val window = transcriptWindowExtractor.extractWindow(episodeUuid = episodeUuid, timeSecs = timeSecs) ?: return null
+    override suspend fun suggestBookmark(episodeUuid: String, timeSecs: Int): BookmarkSuggestion? = withContext(Dispatchers.IO) {
+        val window = transcriptWindowExtractor.extractWindow(episodeUuid = episodeUuid, timeSecs = timeSecs) ?: return@withContext null
         val response = try {
             callEnrichApi(window.passage)
         } catch (e: CancellationException) {
@@ -288,7 +289,7 @@ class BookmarkManagerImpl @Inject constructor(
             null
         }
         response?.error?.let { Timber.w("Smart bookmark enrichment returned error for $episodeUuid: $it") }
-        return BookmarkSuggestion(
+        BookmarkSuggestion(
             passage = window.passage,
             passageLocation = window.location,
             referenceTimeSecs = window.referenceTimeSecs,

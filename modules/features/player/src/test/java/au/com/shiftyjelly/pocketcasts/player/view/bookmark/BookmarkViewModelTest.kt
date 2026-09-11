@@ -115,6 +115,43 @@ class BookmarkViewModelTest {
         )
     }
 
+    @Test
+    fun `save awaits the in-flight suggestion so the passage is captured`() = runTest {
+        stubNewBookmark()
+        val gate = CompletableDeferred<BookmarkSuggestion?>()
+        doSuspendableAnswer { gate.await() }.whenever(bookmarkManager).suggestBookmark(episodeUuid, timeSecs)
+        whenever(episodeManager.findByUuid(episodeUuid)).thenReturn(PodcastEpisode(uuid = episodeUuid, publishedDate = Date()))
+        whenever(bookmarkManager.add(any(), any(), any(), any(), any(), anyOrNull(), anyOrNull(), anyOrNull())).thenReturn(Bookmark(uuid = "new-id"))
+
+        viewModel.load(arguments)
+        val saved = CompletableDeferred<Unit>()
+        viewModel.saveBookmark { _, _ -> saved.complete(Unit) }
+        gate.complete(suggestion)
+        saved.await()
+
+        verify(bookmarkManager).add(
+            episode = any(),
+            timeSecs = eq(timeSecs),
+            title = any(),
+            creationSource = any(),
+            addedAt = any(),
+            passage = eq("the passage"),
+            passageLocation = eq(5),
+            referenceTime = eq(118),
+        )
+    }
+
+    @Test
+    fun `ignores a repeated load so the suggestion is generated once`() = runTest {
+        stubNewBookmark()
+        whenever(bookmarkManager.suggestBookmark(episodeUuid, timeSecs)).thenReturn(suggestion)
+
+        viewModel.load(arguments)
+        viewModel.load(arguments)
+
+        verify(bookmarkManager).suggestBookmark(episodeUuid, timeSecs)
+    }
+
     private suspend fun stubNewBookmark() {
         whenever(episodeManager.findEpisodeByUuid(episodeUuid)).thenReturn(PodcastEpisode(uuid = episodeUuid, publishedDate = Date()))
         whenever(bookmarkManager.findByEpisodeTime(any(), eq(timeSecs))).thenReturn(null)
