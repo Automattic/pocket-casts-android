@@ -280,7 +280,7 @@ internal class CustomTextContextMenuProvider(
             customMenuItems.fastForEach { item ->
                 val menuItem = menu.add(groupId, order, order, item.titleResource)
                 order++
-                menuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
+                menuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
                 menuItem.setOnMenuItemClickListener {
                     onCustomMenuItemClicked(item, data, session)
                     session.close()

@@ -13,6 +13,7 @@
     <string name="add_bookmark">Add bookmark</string>
     <string name="add_bookmark_title">Add Bookmark</string>
     <string name="bookmark_added">Bookmark \"%s\" added</string>
+    <string name="bookmark_create_failed">Couldn\'t add bookmark</string>
     <string name="bookmark_edit_transcript_subtitle">Select a transcript passage for this bookmark</string>
     <string name="bookmark_edit_transcript_title">Edit transcript</string>
     <string name="bookmark_updated">Bookmark \"%s\" updated</string>
