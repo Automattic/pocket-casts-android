@@ -224,10 +224,6 @@ private fun PlusFeaturesSection(
     }
 }
 
-/**
- * Mirrors the layout of the `upgradeLayout` block from the deleted `fragment_cloud_settings.xml`:
- * a divider, a centred themed Plus wordmark, the upsell copy, and a close affordance top-end.
- */
 @Composable
 private fun UpgradeBanner(
     onUpgradeClick: () -> Unit,
