@@ -191,11 +191,6 @@ class EpisodeManagerImpl @Inject constructor(
         return episodeDao.findPlaybackHistoryEpisodes()
     }
 
-    @Suppress("USELESS_CAST")
-    override fun findDownloadingEpisodesRxFlowable(): Flowable<List<BaseEpisode>> {
-        return episodeDao.findDownloadingEpisodesRxFlowable().map { it as List<BaseEpisode> }.mergeWith(userEpisodeManager.downloadUserEpisodesRxFlowable())
-    }
-
     override fun updatePlayedUpToBlocking(episode: BaseEpisode?, playedUpTo: Double, forceUpdate: Boolean) {
         if (playedUpTo < 0 || episode == null) {
             return

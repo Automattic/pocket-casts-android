@@ -79,7 +79,6 @@ interface UserEpisodeManager {
     suspend fun syncFiles(playbackManager: PlaybackManager)
     fun getPlaybackUrl(userEpisode: UserEpisode): String
     suspend fun getSignedPlaybackUrl(userEpisode: UserEpisode): String
-    fun downloadUserEpisodesRxFlowable(): Flowable<List<UserEpisode>>
     suspend fun updateDownloadedFilePath(episode: UserEpisode, filePath: String)
     suspend fun updateFileType(episode: UserEpisode, fileType: String)
     suspend fun updateSizeInBytes(episode: UserEpisode, sizeInBytes: Long)
@@ -216,10 +215,6 @@ class UserEpisodeManagerImpl @Inject constructor(
             Settings.CloudSortOrder.SHORT_LONG -> userEpisodeDao.findUserEpisodesDurationAscFlow()
             Settings.CloudSortOrder.LONG_SHORT -> userEpisodeDao.findUserEpisodesDurationDescFlow()
         }.map { it.filterNot { episode -> episode.serverStatus == UserEpisodeServerStatus.MISSING } }
-    }
-
-    override fun downloadUserEpisodesRxFlowable(): Flowable<List<UserEpisode>> {
-        return userEpisodeDao.findDownloadingUserEpisodesRxFlowable()
     }
 
     override fun episodeRxFlowable(uuid: String): Flowable<UserEpisode> {
