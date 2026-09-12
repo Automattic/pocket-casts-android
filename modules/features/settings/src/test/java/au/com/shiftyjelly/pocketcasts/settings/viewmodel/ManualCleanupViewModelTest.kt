@@ -5,11 +5,11 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import com.automattic.eventhorizon.EventHorizon
-import io.reactivex.Flowable
 import java.util.Date
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.emptyFlow
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -33,8 +33,7 @@ class ManualCleanupViewModelTest {
     @Before
     fun setUp() {
         episodeManager = mock()
-        whenever(episodeManager.findDownloadedEpisodesRxFlowable())
-            .thenReturn(Flowable.generate { listOf(episodes) })
+        whenever(episodeManager.findDownloadedEpisodesFlow()).thenReturn(emptyFlow())
         viewModel = ManualCleanupViewModel(episodeManager, mock(), EventHorizon(TestEventSink()))
     }
 
@@ -64,8 +63,7 @@ class ManualCleanupViewModelTest {
 
     @Test
     fun `given episodes selected, when delete button clicked, then delete action invoked`() {
-        whenever(episodeManager.findDownloadedEpisodesRxFlowable())
-            .thenReturn(Flowable.generate { listOf(episode) })
+        whenever(episodeManager.findDownloadedEpisodesFlow()).thenReturn(emptyFlow())
         val deleteButtonClickAction = mock<() -> Unit>()
         viewModel.setup(deleteButtonClickAction)
         viewModel.onDiskSpaceCheckedChanged(isChecked = true, diskSpaceView = diskSpaceView)

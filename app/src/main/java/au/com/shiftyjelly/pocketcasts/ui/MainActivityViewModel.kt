@@ -39,7 +39,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
-import kotlinx.coroutines.reactive.collect
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -92,7 +91,7 @@ class MainActivityViewModel
         }
 
         viewModelScope.launch {
-            episodeManager.findDownloadedEpisodesRxFlowable()
+            episodeManager.findDownloadedEpisodesFlow()
                 .collect { result ->
                     _downloadedEpisodeState.update { state -> state.copy(downloadedEpisodes = result.sumOf { it.sizeInBytes }) }
                 }

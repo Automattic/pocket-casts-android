@@ -25,6 +25,7 @@ import io.reactivex.Flowable
 import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -229,7 +230,7 @@ class MainActivityViewModelTest {
             ),
         )
 
-        whenever(episodeManager.findDownloadedEpisodesRxFlowable()).thenReturn(Flowable.just(downloadedEpisodes))
+        whenever(episodeManager.findDownloadedEpisodesFlow()).thenReturn(flowOf(downloadedEpisodes))
 
         viewModel = MainActivityViewModel(
             episodeManager = episodeManager,
