@@ -61,7 +61,7 @@ class UpNextQueueImpl @Inject constructor(
         onBufferOverflow = BufferOverflow.DROP_OLDEST,
     ).apply { tryEmit(UpNextQueue.State.Empty) }
 
-    private val currentState get() = changesFlow.replayCache.last()
+    private val currentState get() = changesFlow.replayCache.firstOrNull() ?: UpNextQueue.State.Empty
 
     override val changesObservable: Observable<UpNextQueue.State> = changesFlow.asObservable()
 
