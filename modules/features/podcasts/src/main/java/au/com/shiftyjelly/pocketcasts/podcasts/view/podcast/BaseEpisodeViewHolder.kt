@@ -25,9 +25,11 @@ import au.com.shiftyjelly.pocketcasts.views.buttons.PlayButton
 import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeAction
 import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeRowActions
 import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeRowLayout
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.plusAssign
-import io.reactivex.rxkotlin.subscribeBy
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -60,7 +62,8 @@ abstract class BaseEpisodeViewHolder<T : Any>(
 
     private val dateFormatter = RelativeDateFormatter(context)
 
-    private val disposable = CompositeDisposable()
+    private val holderScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
+    private var rowDataJob: Job? = null
 
     private var isMultiSelectEnabled = false
 
@@ -158,17 +161,18 @@ abstract class BaseEpisodeViewHolder<T : Any>(
     }
 
     fun unbind() {
-        disposable.clear()
+        rowDataJob?.cancel()
+        rowDataJob = null
+        isObservingRowData = false
         binding.episodeRow.handler?.removeCallbacksAndMessages(null)
     }
 
     private fun observeRowData() {
-        disposable.clear()
+        rowDataJob?.cancel()
         hasHlsAlternateEnclosure = false
-        disposable += rowDataProvider.episodeRowDataObservable(episode.uuid)
-            .doOnSubscribe { isObservingRowData = true }
-            .doOnDispose { isObservingRowData = false }
-            .subscribeBy(onNext = { data ->
+        isObservingRowData = true
+        rowDataJob = holderScope.launch {
+            rowDataProvider.episodeRowDataFlow(episode.uuid).collect { data ->
                 hasHlsAlternateEnclosure = data.hasHlsAlternateEnclosure
                 isPlaying = data.playbackState.isPlaying && data.playbackState.episodeUuid == episode.uuid
                 bindPlaybackButton()
@@ -184,7 +188,8 @@ abstract class BaseEpisodeViewHolder<T : Any>(
                 }
                 bindSwipeActions()
                 bindContentDescription(isInUpNext = data.isInUpNext)
-            })
+            }
+        }
     }
 
     private fun bindArtwork(useEpisodeArtwork: Boolean) {
