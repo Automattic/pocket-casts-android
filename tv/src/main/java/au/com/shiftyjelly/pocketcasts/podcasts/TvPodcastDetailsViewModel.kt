@@ -51,7 +51,6 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.rx2.asFlow
 import kotlinx.coroutines.rx2.await
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -92,9 +91,8 @@ class TvPodcastDetailsViewModel @AssistedInject constructor(
             val episodesFlow = podcastFlow
                 .distinctUntilChangedBy { it.episodesSortType }
                 .flatMapLatest { episodeManager.findEpisodesByPodcastOrderedFlow(it) }
-            val isLoggedInFlow = syncManager.isLoggedInObservable.asFlow()
             emitAll(
-                combine(podcastFlow, episodesFlow, isShowingArchivedFlow, isLoggedInFlow) { loadedPodcast, episodes, isShowingArchived, isLoggedIn ->
+                combine(podcastFlow, episodesFlow, isShowingArchivedFlow, syncManager.isLoggedInFlow) { loadedPodcast, episodes, isShowingArchived, isLoggedIn ->
                     TvPodcastDetailsUiState.Loaded(
                         podcast = loadedPodcast,
                         episodes = if (isShowingArchived) episodes else episodes.filterNot(PodcastEpisode::isArchived),

@@ -17,7 +17,6 @@ import com.automattic.eventhorizon.AccountDetailsSubscriptionEvent
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.SettingsAppearanceUseEpisodeArtworkToggledEvent
 import com.automattic.eventhorizon.SettingsGeneralShownEvent
-import com.jakewharton.rxrelay2.BehaviorRelay
 import java.time.Instant
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -38,7 +37,7 @@ class TvSettingsViewModelTest {
     @get:Rule
     val coroutineRule = MainCoroutineRule()
 
-    private val isLoggedIn = BehaviorRelay.createDefault(false)
+    private val isLoggedIn = MutableStateFlow(false)
     private val subscriptionFlow = MutableStateFlow<Subscription?>(null)
     private val artworkConfigurationFlow = MutableStateFlow(ArtworkConfiguration(useEpisodeArtwork = false))
 
@@ -60,7 +59,7 @@ class TvSettingsViewModelTest {
     }
     private val syncManager = mock<SyncManager> {
         on { isLoggedIn() } doReturn false
-        on { isLoggedInObservable } doReturn isLoggedIn
+        on { isLoggedInFlow } doReturn isLoggedIn
     }
     private val eventHorizon = mock<EventHorizon>()
 
@@ -82,7 +81,7 @@ class TvSettingsViewModelTest {
         viewModel.uiState.test {
             skipItems(1)
 
-            isLoggedIn.accept(true)
+            isLoggedIn.value = true
             assertEquals(true, awaitItem().isSignedIn)
 
             viewModel.setUseEpisodeArtwork(true)

@@ -27,7 +27,6 @@ import com.automattic.eventhorizon.PodcastScreenUnsubscribeTappedEvent
 import com.automattic.eventhorizon.PodcastSubscribedEvent
 import com.automattic.eventhorizon.PodcastUnsubscribedEvent
 import com.automattic.eventhorizon.PodcastsScreenSortOrderChangedEvent
-import com.jakewharton.rxrelay2.BehaviorRelay
 import io.reactivex.Single
 import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -68,9 +67,9 @@ class TvPodcastDetailsViewModelTest {
         on { findEpisodesByPodcastOrderedFlow(any()) } doReturn episodes
     }
     private val preferences = mock<TvPreferences>()
-    private val loggedIn = BehaviorRelay.createDefault(false)
+    private val loggedIn = MutableStateFlow(false)
     private val syncManager = mock<SyncManager> {
-        on { isLoggedInObservable } doReturn loggedIn
+        on { isLoggedInFlow } doReturn loggedIn
     }
     private val eventHorizon = mock<EventHorizon>()
     private val discoverPodcastAttribution = TvDiscoverPodcastAttribution()
@@ -239,7 +238,7 @@ class TvPodcastDetailsViewModelTest {
 
     @Test
     fun `the logged in state is reflected in the loaded state`() = runTest {
-        loggedIn.accept(true)
+        loggedIn.value = true
         val viewModel = createViewModel()
 
         viewModel.uiState.test {

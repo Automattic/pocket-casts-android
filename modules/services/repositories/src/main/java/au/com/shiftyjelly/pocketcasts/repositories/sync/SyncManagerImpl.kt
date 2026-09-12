@@ -59,7 +59,6 @@ import com.automattic.eventhorizon.UserSignedInEvent
 import com.automattic.eventhorizon.UserSignedInWatchFromPhoneEvent
 import com.automattic.eventhorizon.UserSigninFailedEvent
 import com.automattic.eventhorizon.UserSigninWatchFromPhoneFailedEvent
-import com.jakewharton.rxrelay2.BehaviorRelay
 import com.pocketcasts.service.api.BookmarksResponse
 import com.pocketcasts.service.api.EpisodesResponse
 import com.pocketcasts.service.api.PodcastRatingResponse
@@ -88,6 +87,9 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.rx2.rxSingle
 import retrofit2.HttpException
@@ -113,9 +115,8 @@ class SyncManagerImpl @Inject constructor(
         const val NO_REDIRECT_PATH = "none"
     }
 
-    override val isLoggedInObservable = BehaviorRelay.create<Boolean>().apply {
-        accept(isLoggedIn())
-    }
+    private val _isLoggedInFlow = MutableStateFlow(isLoggedIn())
+    override val isLoggedInFlow: StateFlow<Boolean> = _isLoggedInFlow.asStateFlow()
 
 // Account
 
@@ -195,7 +196,7 @@ class SyncManagerImpl @Inject constructor(
         syncServiceManager.signOut()
         action()
         syncAccountManager.signOut()
-        isLoggedInObservable.accept(false)
+        _isLoggedInFlow.value = false
     }
 
     override suspend fun loginWithGoogle(
@@ -245,7 +246,7 @@ class SyncManagerImpl @Inject constructor(
                 accessToken = response.accessToken,
                 loginIdentity = LoginIdentity.QrCode,
             )
-            isLoggedInObservable.accept(true)
+            _isLoggedInFlow.value = true
             settings.setFullySignedOut(false)
             settings.setLastModified(null)
             val result = AuthResultModel(
@@ -748,7 +749,7 @@ class SyncManagerImpl @Inject constructor(
             accessToken = response.accessToken,
             loginIdentity = loginIdentity,
         )
-        isLoggedInObservable.accept(true)
+        _isLoggedInFlow.value = true
 
         settings.setFullySignedOut(false)
         settings.setLastModified(null)

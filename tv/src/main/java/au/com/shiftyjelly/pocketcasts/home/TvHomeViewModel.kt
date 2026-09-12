@@ -89,9 +89,7 @@ class TvHomeViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            syncManager.isLoggedInObservable.asFlow()
-                .distinctUntilChanged()
-                .collect { load() }
+            syncManager.isLoggedInFlow.collect { load() }
         }
         observeLocalRowSignals()
     }
