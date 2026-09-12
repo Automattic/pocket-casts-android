@@ -19,6 +19,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadQueue
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.getUrlForArtwork
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -41,14 +42,21 @@ import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.rx2.asFlow
 import kotlinx.coroutines.rx2.asFlowable
 import kotlinx.coroutines.rx2.await
 import kotlinx.coroutines.rx2.rxMaybe
@@ -64,6 +72,7 @@ class PodcastManagerImpl @Inject constructor(
     private val podcastRefresher: PodcastRefresher,
     private val downloadQueue: DownloadQueue,
     @ApplicationScope private val applicationScope: CoroutineScope,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     appDatabase: AppDatabase,
 ) : PodcastManager,
     CoroutineScope {
@@ -192,6 +201,20 @@ class PodcastManagerImpl @Inject constructor(
             .flatMap { getSubscribedPodcastUuidsRxSingle().toObservable() } // Every time the subscriptions change, reload the subscribed list and pass it on
             .subscribeOn(Schedulers.io())
             .toFlowable(BackpressureStrategy.LATEST)
+    }
+
+    override fun podcastSubscriptionsFlow(): Flow<List<String>> {
+        val subscriptionChanges = merge(subscribeManager.subscriptionChangedRelay.asFlow(), unsubscribeRelay.asFlow())
+        // The first load is merged in rather than added with onStart so the relays are attached concurrently with it.
+        return merge(flowOf(Unit), subscriptionChanges.map {})
+            .conflate() // A burst of changes collapses into one reload, like BackpressureStrategy.LATEST did
+            .map { subscribedPodcastUuids() }
+            .flowOn(ioDispatcher)
+    }
+
+    // The subscribed uuids as an unordered set: the ones in the database plus any subscribe not yet written to it.
+    private suspend fun subscribedPodcastUuids(): List<String> {
+        return (podcastDao.findSubscribedUuids() + subscribeManager.getSubscribingPodcastUuids()).distinct()
     }
 
     override suspend fun findPodcastsToSync(): List<Podcast> {
