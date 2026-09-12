@@ -854,7 +854,7 @@ class MainActivity :
     private fun setupBackPressedCallbacks() {
         val bottomNavigatorCallback = object : OnBackPressedCallback(false) {
             override fun handleOnBackPressed() {
-                navigator.pop()
+                popOrDelegateBack()
             }
         }
         onBackPressedDispatcher.addCallback(this, bottomNavigatorCallback)
@@ -899,15 +899,7 @@ class MainActivity :
 
         val modalFragmentCallback = object : OnBackPressedCallback(false) {
             override fun handleOnBackPressed() {
-                val currentFragment = navigator.currentFragment()
-                if (currentFragment is HasBackstack) {
-                    val handled = currentFragment.onBackPressed()
-                    if (!handled) {
-                        navigator.pop()
-                    }
-                } else {
-                    navigator.pop()
-                }
+                popOrDelegateBack()
             }
         }
         onBackPressedDispatcher.addCallback(this, modalFragmentCallback)
@@ -948,6 +940,15 @@ class MainActivity :
         this.playerContainerBackCallback = playerContainerBackstackCallback
         this.modalFragmentBackCallback = modalFragmentCallback
         this.frameBottomSheetBackCallback = frameBottomSheetCallback
+    }
+
+    // Give the current fragment a chance to unwind its own back stack before popping it off the navigator.
+    private fun popOrDelegateBack() {
+        val currentFragment = navigator.currentFragment()
+        if (currentFragment is HasBackstack && currentFragment.onBackPressed()) {
+            return
+        }
+        navigator.pop()
     }
 
     private var playerBottomSheetBackCallback: OnBackPressedCallback? = null
