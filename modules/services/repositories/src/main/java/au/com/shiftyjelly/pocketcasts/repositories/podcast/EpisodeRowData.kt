@@ -55,6 +55,7 @@ class EpisodeRowDataProvider @Inject constructor(
     private val settings: Settings,
 ) {
 
+    /** Collect on the main dispatcher, the row data is bound straight into views. */
     fun userEpisodeRowDataFlow(episodeUuid: String): Flow<UserEpisodeRowData> {
         // combine has no typed overload for six sources, hence the nested combine for the two flags
         return combine(
@@ -75,6 +76,7 @@ class EpisodeRowDataProvider @Inject constructor(
         }.flowOn(Dispatchers.IO)
     }
 
+    /** Collect on the main dispatcher, the row data is bound straight into views. */
     fun episodeRowDataFlow(episodeUuid: String): Flow<EpisodeRowData> {
         return flow {
             // an episode that is not in the database has no row data, so emit nothing

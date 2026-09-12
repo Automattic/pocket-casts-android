@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import io.reactivex.Observable
 import java.util.Date
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
@@ -132,19 +133,25 @@ class EpisodeRowDataProviderTest {
     }
 
     @Test
-    fun `user episode row data follows upload progress`() = runTest {
+    fun `user episode row data emits the first upload progress immediately and then the latest per window`() = runTest {
         val episode = UserEpisode(uuid = EPISODE_UUID, publishedDate = Date())
         userEpisodeManager.stub {
             on { episodeFlow(EPISODE_UUID) } doReturn flowOf(episode)
         }
 
         try {
-            provider.userEpisodeRowDataFlow(EPISODE_UUID).test {
+            provider.userEpisodeRowDataFlow(EPISODE_UUID).test(timeout = 10.seconds) {
                 assertEquals(0, awaitItem().uploadProgress)
 
-                UploadProgressManager.pushProgress(EPISODE_UUID, 0.42f)
+                UploadProgressManager.pushProgress(EPISODE_UUID, 0.1f)
 
-                assertEquals(42, awaitItem().uploadProgress)
+                assertEquals(10, awaitItem().uploadProgress)
+
+                UploadProgressManager.pushProgress(EPISODE_UUID, 0.2f)
+                UploadProgressManager.pushProgress(EPISODE_UUID, 0.3f)
+
+                // 20 is dropped, the window only lets the latest value through
+                assertEquals(30, awaitItem().uploadProgress)
                 cancelAndIgnoreRemainingEvents()
             }
         } finally {
