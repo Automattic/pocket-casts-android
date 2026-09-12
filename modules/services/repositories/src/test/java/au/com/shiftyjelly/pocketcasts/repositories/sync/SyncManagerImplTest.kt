@@ -25,6 +25,7 @@ import java.util.Date
 import kotlinx.coroutines.test.runTest
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -68,15 +69,7 @@ class SyncManagerImplTest {
     fun setUp() {
         MockitoAnnotations.openMocks(this)
 
-        syncManager = SyncManagerImpl(
-            eventHorizon = EventHorizon(eventSink),
-            context = context,
-            settings = settings,
-            syncAccountManager = syncAccountManager,
-            syncServiceManager = syncServiceManager,
-            moshi = moshi,
-            notificationManager = notificationManager,
-        )
+        syncManager = createSyncManager()
     }
 
     @Test
@@ -176,6 +169,51 @@ class SyncManagerImplTest {
         assertEquals("https://files.example.com/signed", syncManager.getSignedPlaybackUrl(episode))
         verify(syncAccountManager).invalidateAccessToken()
     }
+
+    @Test
+    fun `isLoggedInFlow is seeded from the account manager`() {
+        whenever(syncAccountManager.isLoggedIn()).thenReturn(true)
+
+        assertTrue(createSyncManager().isLoggedInFlow.value)
+    }
+
+    @Test
+    fun `isLoggedInFlow turns true after a device auth login`() = runTest {
+        whenever(syncServiceManager.deviceToken(any(), any())).thenReturn(createDeviceTokenResponse())
+
+        syncManager.loginWithDeviceAuth("device-code", SignInSource.UserInitiated.Onboarding, isNewAccount = false)
+
+        assertTrue(syncManager.isLoggedInFlow.value)
+    }
+
+    @Test
+    fun `isLoggedInFlow turns true after creating an account`() = runTest {
+        whenever(syncServiceManager.register(any(), any())).thenReturn(createMockLoginResponse(isNew = true))
+
+        syncManager.createUserWithEmailAndPassword("test@example.com", "password123", SignInSource.UserInitiated.Onboarding)
+
+        assertTrue(syncManager.isLoggedInFlow.value)
+    }
+
+    @Test
+    fun `isLoggedInFlow turns false after signing out`() = runTest {
+        whenever(syncAccountManager.isLoggedIn()).thenReturn(true)
+        val syncManager = createSyncManager()
+
+        syncManager.signOut()
+
+        assertFalse(syncManager.isLoggedInFlow.value)
+    }
+
+    private fun createSyncManager() = SyncManagerImpl(
+        eventHorizon = EventHorizon(eventSink),
+        context = context,
+        settings = settings,
+        syncAccountManager = syncAccountManager,
+        syncServiceManager = syncServiceManager,
+        moshi = moshi,
+        notificationManager = notificationManager,
+    )
 
     private fun stubResources() {
         val resources = mock<Resources>()

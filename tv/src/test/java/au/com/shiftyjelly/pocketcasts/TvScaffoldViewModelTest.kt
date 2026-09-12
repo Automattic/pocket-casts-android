@@ -238,8 +238,9 @@ class TvScaffoldViewModelTest {
 
     @Test
     fun `profile is seeded from the sync manager before the streams emit`() = runTest {
-        whenever(syncManager.isLoggedInFlow).doReturn(MutableStateFlow(true))
-        // emailFlow never emits, so the combine stays silent and the assertion lands on the stateIn seed
+        // emailFlow never emits so the combine stays silent, and the signed-out login stub means any
+        // leaked combine emission would assert as SignedOut rather than matching the stateIn seed
+        whenever(syncManager.isLoggedInFlow).doReturn(MutableStateFlow(false))
         whenever(syncManager.emailFlow()).doReturn(MutableSharedFlow())
         whenever(syncManager.isLoggedIn()).doReturn(true)
         whenever(syncManager.getEmail()).doReturn("user@example.com")
