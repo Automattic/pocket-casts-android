@@ -1,8 +1,12 @@
 package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
+import android.content.Context
+import android.content.pm.PackageManager
 import app.cash.turbine.test
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PodcastDao
+import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import com.jakewharton.rxrelay2.PublishRelay
 import kotlinx.coroutines.CoroutineScope
@@ -14,6 +18,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
@@ -31,6 +36,12 @@ class PodcastManagerImplTest {
     @Mock
     lateinit var subscribeManager: SubscribeManager
 
+    @Mock
+    lateinit var context: Context
+
+    @Mock
+    lateinit var packageManager: PackageManager
+
     private val subscriptionChangedRelay = PublishRelay.create<String>()
 
     private lateinit var podcastManager: PodcastManagerImpl
@@ -44,7 +55,7 @@ class PodcastManagerImplTest {
         podcastManager = PodcastManagerImpl(
             episodeManager = mock(),
             settings = mock(),
-            context = mock(),
+            context = context,
             subscribeManager = subscribeManager,
             refreshServiceManager = mock(),
             syncManager = mock(),
@@ -57,13 +68,13 @@ class PodcastManagerImplTest {
     }
 
     @Test
-    fun `podcast subscriptions emit the current uuids before any change`() = runTest {
+    fun `podcast subscriptions emit the current uuids once before any change`() = runTest {
         whenever(podcastDao.findSubscribedUuids()).thenReturn(listOf("uuid-1", "uuid-2"))
         whenever(subscribeManager.getSubscribingPodcastUuids()).thenReturn(emptySet())
 
         podcastManager.podcastSubscriptionsFlow().test {
             assertEquals(listOf("uuid-1", "uuid-2"), awaitItem())
-            cancelAndIgnoreRemainingEvents()
+            expectNoEvents()
         }
     }
 
@@ -90,7 +101,27 @@ class PodcastManagerImplTest {
             subscriptionChangedRelay.accept("uuid-2")
 
             assertEquals(listOf("uuid-1", "uuid-2"), awaitItem())
-            cancelAndIgnoreRemainingEvents()
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun `podcast subscriptions reload when a podcast is unsubscribed`() = runTest {
+        whenever(podcastDao.findSubscribedUuids()).thenReturn(listOf("uuid-1", "uuid-2"))
+        whenever(subscribeManager.getSubscribingPodcastUuids()).thenReturn(emptySet())
+        whenever(podcastDao.findPodcastByUuid("uuid-2")).thenReturn(Podcast(uuid = "uuid-2"))
+        whenever(context.packageName).thenReturn("au.com.shiftyjelly.pocketcasts")
+        whenever(context.packageManager).thenReturn(packageManager)
+        whenever(packageManager.getApplicationInfo(any(), any<Int>())).thenReturn(mock())
+
+        podcastManager.podcastSubscriptionsFlow().test {
+            assertEquals(listOf("uuid-1", "uuid-2"), awaitItem())
+
+            whenever(podcastDao.findSubscribedUuids()).thenReturn(listOf("uuid-1"))
+            podcastManager.unsubscribe("uuid-2", SourceView.UNKNOWN)
+
+            assertEquals(listOf("uuid-1"), awaitItem())
+            expectNoEvents()
         }
     }
 }

@@ -47,6 +47,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
@@ -204,9 +205,10 @@ class PodcastManagerImpl @Inject constructor(
 
     override fun podcastSubscriptionsFlow(): Flow<List<String>> {
         val subscriptionChanges = merge(subscribeManager.subscriptionChangedRelay.asFlow(), unsubscribeRelay.asFlow())
-        // The first load is merged in rather than an onStart so the relays are already attached while it runs.
+        // The first load is merged in rather than added with onStart so the relays are attached concurrently with it.
         return merge(flowOf(Unit), subscriptionChanges.map {})
-            .map { subscribedPodcastUuids() } // Every time the subscriptions change, reload the subscribed list and pass it on
+            .conflate() // A burst of changes collapses into one reload, like BackpressureStrategy.LATEST did
+            .map { subscribedPodcastUuids() }
             .flowOn(ioDispatcher)
     }
 
