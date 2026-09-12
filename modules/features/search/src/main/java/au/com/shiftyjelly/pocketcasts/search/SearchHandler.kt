@@ -249,8 +249,8 @@ class SearchHandler @Inject constructor(
             }
         }
         .map { it.term }
-        .switchMap {
-            if (it.length <= 1) {
+        .switchMap { searchTerm ->
+            if (searchTerm.length <= 1) {
                 Observable.just(GlobalServerSearch())
             } else {
                 eventHorizon.track(
@@ -260,17 +260,17 @@ class SearchHandler @Inject constructor(
                 )
                 loadingObservable.accept(true)
 
-                var globalSearch = GlobalServerSearch(searchTerm = it)
-                val podcastServerSearch = rxSingle { serviceManager.searchForPodcasts(searchTerm = it).getOrThrow() }
+                var globalSearch = GlobalServerSearch(searchTerm = searchTerm)
+                val podcastServerSearch = rxSingle { serviceManager.searchForPodcasts(searchTerm).getOrThrow() }
                     .map { podcastSearch ->
                         globalSearch = globalSearch.copy(podcastSearch = podcastSearch)
                         globalSearch
                     }
                     .toObservable()
 
-                if (!it.startsWith("http")) {
+                if (!searchTerm.startsWith("http")) {
                     val episodesServerSearch = cacheServiceManager
-                        .searchEpisodes(it)
+                        .searchEpisodes(searchTerm)
                         .map { episodeSearch ->
                             globalSearch = globalSearch.copy(episodeSearch = episodeSearch)
                             globalSearch
