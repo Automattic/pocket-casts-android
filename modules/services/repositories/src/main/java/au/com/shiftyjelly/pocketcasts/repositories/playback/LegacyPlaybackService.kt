@@ -27,12 +27,12 @@ import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -195,17 +195,19 @@ open class LegacyPlaybackService :
     }
 
     private inner class MediaControllerCallback(currentMetadataCompat: MediaMetadataCompat?) : MediaControllerCompat.Callback() {
-        private val playbackStatusFlow = MutableStateFlow<PlaybackStateCompat?>(null)
-        private val mediaMetadataFlow = MutableStateFlow(currentMetadataCompat)
+        // not StateFlow: isForeground accumulates across transitions, so conflating them would skip foreground handling
+        private val playbackStatusFlow = bufferedReplayFlow<PlaybackStateCompat>()
+        private val mediaMetadataFlow = bufferedReplayFlow<MediaMetadataCompat>().apply {
+            if (currentMetadataCompat != null) {
+                tryEmit(currentMetadataCompat)
+            }
+        }
 
         init {
             // the consumer calls startForeground/notify, so it has to stay on the main thread
             launch(Dispatchers.Main) {
-                combine(playbackStatusFlow, mediaMetadataFlow, settings.artworkConfiguration.flow) { playbackState, metadata, artworkConfiguration ->
-                    // nothing is emitted until a playback state and metadata have both arrived
-                    if (playbackState != null && metadata != null) Triple(playbackState, metadata, artworkConfiguration) else null
-                }
-                    .filterNotNull()
+                // neither flow replays a value until its first emission, so this waits for both, as combineLatest did
+                combine(playbackStatusFlow, mediaMetadataFlow, settings.artworkConfiguration.flow, ::Triple)
                     .distinctUntilChanged { (state1, metadata1, artworkConfiguration1), (state2, metadata2, artworkConfiguration2) ->
                         val isForegroundService = isForegroundService()
                         (state1.state == state2.state && metadata1.getString(METADATA_KEY_MEDIA_ID) == metadata2.getString(METADATA_KEY_MEDIA_ID) && artworkConfiguration1 == artworkConfiguration2) &&
@@ -224,7 +226,7 @@ open class LegacyPlaybackService :
 
         override fun onMetadataChanged(metadata: MediaMetadataCompat?) {
             metadata ?: return
-            mediaMetadataFlow.value = metadata
+            mediaMetadataFlow.tryEmit(metadata)
         }
 
         override fun onQueueChanged(queue: MutableList<MediaSessionCompat.QueueItem>) {
@@ -233,11 +235,11 @@ open class LegacyPlaybackService :
 
         override fun onPlaybackStateChanged(state: PlaybackStateCompat?) {
             state ?: return
-            // logged here rather than off the notification pipeline, which conflates and can skip a superseded error
+            // logged here, not in the handler, where the transient-loss early return could skip it
             if (state.state == PlaybackStateCompat.STATE_ERROR) {
                 LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Playback state error: ${state.errorCode} ${state.errorMessage ?: "Unknown error"}")
             }
-            playbackStatusFlow.value = state
+            playbackStatusFlow.tryEmit(state)
         }
 
         private fun onPlaybackStateChangedWithNotification(playbackState: PlaybackStateCompat, notification: Notification?) {
@@ -321,3 +323,10 @@ open class LegacyPlaybackService :
         }
     }
 }
+
+// stands in for a BehaviorRelay: replays the latest value and queues the rest, so tryEmit never fails or conflates
+private fun <T> bufferedReplayFlow() = MutableSharedFlow<T>(
+    replay = 1,
+    extraBufferCapacity = 64,
+    onBufferOverflow = BufferOverflow.DROP_OLDEST,
+)
