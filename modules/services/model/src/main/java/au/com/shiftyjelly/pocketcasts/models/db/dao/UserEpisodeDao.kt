@@ -46,25 +46,25 @@ abstract class UserEpisodeDao {
     abstract suspend fun findAllUuids(): List<String>
 
     @Query("SELECT * FROM user_episodes ORDER BY added_date DESC")
-    abstract fun findUserEpisodesDescRxFlowable(): Flowable<List<UserEpisode>>
+    abstract fun findUserEpisodesDescFlow(): Flow<List<UserEpisode>>
 
     @Query("SELECT * FROM user_episodes ORDER BY added_date DESC")
     abstract suspend fun findUserEpisodesDesc(): List<UserEpisode>
 
     @Query("SELECT * FROM user_episodes ORDER BY added_date ASC")
-    abstract fun findUserEpisodesAscRxFlowable(): Flowable<List<UserEpisode>>
+    abstract fun findUserEpisodesAscFlow(): Flow<List<UserEpisode>>
 
     @Query("SELECT * FROM user_episodes ORDER BY title ASC")
-    abstract fun findUserEpisodesTitleAscRxFlowable(): Flowable<List<UserEpisode>>
+    abstract fun findUserEpisodesTitleAscFlow(): Flow<List<UserEpisode>>
 
     @Query("SELECT * FROM user_episodes ORDER BY title DESC")
-    abstract fun findUserEpisodesTitleDescRxFlowable(): Flowable<List<UserEpisode>>
+    abstract fun findUserEpisodesTitleDescFlow(): Flow<List<UserEpisode>>
 
     @Query("SELECT * FROM user_episodes ORDER BY duration ASC")
-    abstract fun findUserEpisodesDurationAscRxFlowable(): Flowable<List<UserEpisode>>
+    abstract fun findUserEpisodesDurationAscFlow(): Flow<List<UserEpisode>>
 
     @Query("SELECT * FROM user_episodes ORDER BY duration DESC")
-    abstract fun findUserEpisodesDurationDescRxFlowable(): Flowable<List<UserEpisode>>
+    abstract fun findUserEpisodesDurationDescFlow(): Flow<List<UserEpisode>>
 
     @Query("SELECT * FROM user_episodes WHERE download_task_id IS NOT NULL")
     abstract fun findDownloadingUserEpisodesRxFlowable(): Flowable<List<UserEpisode>>
