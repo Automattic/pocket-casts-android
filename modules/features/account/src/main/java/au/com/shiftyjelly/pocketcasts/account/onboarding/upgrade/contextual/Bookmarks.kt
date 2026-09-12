@@ -28,9 +28,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -70,20 +70,24 @@ fun BookmarksAnimation(modifier: Modifier = Modifier) {
         StackedCard(gradient = backGradient, inset = 34.dp, revealedOffset = (-22).dp, revealed = revealed, delayMillis = 100)
         StackedCard(gradient = middleGradient, inset = 17.dp, revealedOffset = (-11).dp, revealed = revealed, delayMillis = 300)
 
-        val offset by animateDpAsState(
+        val frontOffset by animateDpAsState(
             targetValue = if (revealed) 0.dp else 24.dp,
             animationSpec = tween(REVEAL_DURATION, delayMillis = 500, easing = LinearOutSlowInEasing),
             label = "frontOffset",
         )
-        val alpha by animateFloatAsState(
+        val frontAlpha by animateFloatAsState(
             targetValue = if (revealed) 1f else 0f,
             animationSpec = tween(REVEAL_DURATION, delayMillis = 500, easing = LinearOutSlowInEasing),
             label = "frontAlpha",
         )
         BookmarkUpgradeCard(
-            modifier = Modifier
-                .offset(y = offset)
-                .alpha(alpha),
+            modifier = Modifier.graphicsLayer {
+                translationY = frontOffset.toPx()
+                alpha = frontAlpha
+                shadowElevation = 8.dp.toPx()
+                shape = RoundedCornerShape(CARD_CORNER.dp)
+                clip = false
+            },
         )
     }
 }
@@ -122,7 +126,6 @@ private fun BookmarkUpgradeCard(modifier: Modifier = Modifier) {
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .shadow(elevation = 8.dp, shape = RoundedCornerShape(CARD_CORNER.dp))
             .clip(RoundedCornerShape(CARD_CORNER.dp))
             .background(Brush.linearGradient(frontGradient))
             .padding(12.dp),
