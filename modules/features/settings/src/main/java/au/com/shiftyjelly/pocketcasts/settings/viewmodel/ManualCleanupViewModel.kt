@@ -15,18 +15,15 @@ import com.automattic.eventhorizon.DownloadsCleanUpButtonTappedEvent
 import com.automattic.eventhorizon.DownloadsCleanUpCompletedEvent
 import com.automattic.eventhorizon.DownloadsCleanUpShownEvent
 import com.automattic.eventhorizon.EventHorizon
-import com.jakewharton.rxrelay2.BehaviorRelay
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.BackpressureStrategy
-import io.reactivex.rxkotlin.combineLatest
 import javax.inject.Inject
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.reactive.collect
 import kotlinx.coroutines.withContext
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -76,17 +73,18 @@ class ManualCleanupViewModel
         get() = State.DeleteButton(isEnabled = episodesToDelete.isNotEmpty())
 
     private val episodesToDelete: MutableList<PodcastEpisode> = mutableListOf()
-    private val switchState: BehaviorRelay<Boolean> = BehaviorRelay.createDefault(false)
+    private val switchState = MutableStateFlow(false)
     private var deleteButtonAction: (() -> Unit)? = null
 
     init {
         viewModelScope.launch {
-            episodeManager.findDownloadedEpisodesRxFlowable()
-                .combineLatest(switchState.toFlowable(BackpressureStrategy.LATEST))
-                .collect { result ->
-                    val (downloadedEpisodes, isStarredSwitchChecked) = result
-                    val downloadedAdjustedForStarred =
-                        downloadedEpisodes.filter { !it.isStarred || isStarredSwitchChecked }
+            combine(
+                episodeManager.findDownloadedEpisodesFlow(),
+                switchState,
+            ) { downloadedEpisodes, isStarredSwitchChecked ->
+                downloadedEpisodes.filter { !it.isStarred || isStarredSwitchChecked }
+            }
+                .collect { downloadedAdjustedForStarred ->
                     episodesToDelete.clear()
                     val updatedDiskSpaceViews = EpisodePlayingStatus.values()
                         .mapToDiskSpaceViewsForEpisodes(downloadedAdjustedForStarred)
@@ -118,7 +116,7 @@ class ManualCleanupViewModel
     }
 
     fun onStarredSwitchClicked(isChecked: Boolean) {
-        switchState.accept(isChecked)
+        switchState.value = isChecked
     }
 
     fun onDeleteButtonClicked() {
@@ -196,7 +194,7 @@ class ManualCleanupViewModel
                 unplayed = state.value.unplayed?.isChecked == true,
                 inProgress = state.value.inProgress?.isChecked == true,
                 played = state.value.played?.isChecked == true,
-                includeStarred = switchState.value == true,
+                includeStarred = switchState.value,
             ),
         )
     }

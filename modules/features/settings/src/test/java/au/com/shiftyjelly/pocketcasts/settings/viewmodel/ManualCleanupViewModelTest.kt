@@ -5,11 +5,13 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import com.automattic.eventhorizon.EventHorizon
-import io.reactivex.Flowable
 import java.util.Date
+import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flowOf
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -33,8 +35,7 @@ class ManualCleanupViewModelTest {
     @Before
     fun setUp() {
         episodeManager = mock()
-        whenever(episodeManager.findDownloadedEpisodesRxFlowable())
-            .thenReturn(Flowable.generate { listOf(episodes) })
+        whenever(episodeManager.findDownloadedEpisodesFlow()).thenReturn(emptyFlow())
         viewModel = ManualCleanupViewModel(episodeManager, mock(), EventHorizon(TestEventSink()))
     }
 
@@ -64,8 +65,6 @@ class ManualCleanupViewModelTest {
 
     @Test
     fun `given episodes selected, when delete button clicked, then delete action invoked`() {
-        whenever(episodeManager.findDownloadedEpisodesRxFlowable())
-            .thenReturn(Flowable.generate { listOf(episode) })
         val deleteButtonClickAction = mock<() -> Unit>()
         viewModel.setup(deleteButtonClickAction)
         viewModel.onDiskSpaceCheckedChanged(isChecked = true, diskSpaceView = diskSpaceView)
@@ -73,5 +72,18 @@ class ManualCleanupViewModelTest {
         viewModel.onDeleteButtonClicked()
 
         verify(deleteButtonClickAction).invoke()
+    }
+
+    @Test
+    fun `given downloaded episodes, when starred switch toggled, then starred episodes are included`() {
+        val starredEpisode = PodcastEpisode(uuid = "2", publishedDate = Date(), isStarred = true)
+        whenever(episodeManager.findDownloadedEpisodesFlow()).thenReturn(flowOf(listOf(episode, starredEpisode)))
+        viewModel = ManualCleanupViewModel(episodeManager, mock(), EventHorizon(TestEventSink()))
+
+        assertEquals(listOf(episode), viewModel.state.value.unplayed?.episodes)
+
+        viewModel.onStarredSwitchClicked(true)
+
+        assertEquals(listOf(episode, starredEpisode), viewModel.state.value.unplayed?.episodes)
     }
 }

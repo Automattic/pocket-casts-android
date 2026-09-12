@@ -266,7 +266,7 @@ abstract class EpisodeDao {
 
     @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE episode_status == :downloadEpisodeDownloadStatus ORDER BY last_download_attempt_date DESC")
-    abstract fun findDownloadedEpisodesRxFlowable(downloadEpisodeDownloadStatus: EpisodeDownloadStatus = EpisodeDownloadStatus.Downloaded): Flowable<List<PodcastEpisode>>
+    abstract fun findDownloadedEpisodesFlow(downloadEpisodeDownloadStatus: EpisodeDownloadStatus = EpisodeDownloadStatus.Downloaded): Flow<List<PodcastEpisode>>
 
     @Query("SELECT COUNT(*) FROM podcast_episodes WHERE episode_status == :downloadEpisodeDownloadStatus AND playing_status == :playingStatus")
     abstract suspend fun downloadedEpisodesThatHaveNotBeenPlayedCount(

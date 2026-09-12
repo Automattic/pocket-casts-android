@@ -11,12 +11,12 @@ import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.utils.FileUtilWrapper
 import com.automattic.eventhorizon.EventHorizon
 import dagger.hilt.android.qualifiers.ApplicationContext
-import io.reactivex.Flowable
 import java.io.File
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -71,7 +71,7 @@ class StorageSettingsViewModelTest {
         whenever(settings.getStorageChoiceName()).thenReturn("")
         whenever(settings.backgroundRefreshPodcasts).thenReturn(UserSetting.Mock(true, mock()))
         whenever(settings.warnOnMeteredNetwork).thenReturn(UserSetting.Mock(true, mock()))
-        whenever(episodeManager.findDownloadedEpisodesRxFlowable()).thenReturn(Flowable.empty())
+        whenever(episodeManager.findDownloadedEpisodesFlow()).thenReturn(emptyFlow())
         viewModel = StorageSettingsViewModel(
             episodeManager = episodeManager,
             fileStorage = fileStorage,

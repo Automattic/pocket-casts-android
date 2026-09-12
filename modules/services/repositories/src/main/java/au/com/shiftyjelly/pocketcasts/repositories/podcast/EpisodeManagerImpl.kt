@@ -673,8 +673,8 @@ class EpisodeManagerImpl @Inject constructor(
         return episodeDao.findDownloadingEpisodesIncludingFailedFlow(failedDownloadCutoff)
     }
 
-    override fun findDownloadedEpisodesRxFlowable(): Flowable<List<PodcastEpisode>> {
-        return episodeDao.findDownloadedEpisodesRxFlowable()
+    override fun findDownloadedEpisodesFlow(): Flow<List<PodcastEpisode>> {
+        return episodeDao.findDownloadedEpisodesFlow()
     }
 
     override suspend fun downloadedEpisodesThatHaveNotBeenPlayedCount(): Int {
