@@ -4,7 +4,10 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
+import au.com.shiftyjelly.pocketcasts.preferences.ReadSetting
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -12,6 +15,7 @@ import com.automattic.eventhorizon.EpisodeArchivedEvent
 import com.automattic.eventhorizon.EpisodeMarkedAsPlayedEvent
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.Trackable
+import com.automattic.eventhorizon.UpNextShuffleEnabledEvent
 import java.util.Date
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -297,6 +301,61 @@ class MediaSessionActionsTest {
 
         verify(episodeManager, never()).archiveBlocking(any(), any(), any(), any())
         verify(eventHorizon, never()).track(any())
+    }
+
+    // --- toggleUpNextShuffle ---
+
+    @Test
+    fun `toggleUpNextShuffle enables shuffle when currently disabled and tracks analytics`() = runTest {
+        stubSubscription(isPaid = true)
+        val upNextShuffle = mock<UserSetting<Boolean>>()
+        whenever(upNextShuffle.value).thenReturn(false)
+        whenever(settings.upNextShuffle).thenReturn(upNextShuffle)
+
+        actions.toggleUpNextShuffleSuspend()
+
+        verify(upNextShuffle).set(eq(true), eq(false), any(), any())
+        verify(eventHorizon).track(
+            argThat<Trackable> { event ->
+                event is UpNextShuffleEnabledEvent && event.value
+            },
+        )
+    }
+
+    @Test
+    fun `toggleUpNextShuffle disables shuffle when currently enabled and tracks analytics`() = runTest {
+        stubSubscription(isPaid = true)
+        val upNextShuffle = mock<UserSetting<Boolean>>()
+        whenever(upNextShuffle.value).thenReturn(true)
+        whenever(settings.upNextShuffle).thenReturn(upNextShuffle)
+
+        actions.toggleUpNextShuffleSuspend()
+
+        verify(upNextShuffle).set(eq(false), eq(false), any(), any())
+        verify(eventHorizon).track(
+            argThat<Trackable> { event ->
+                event is UpNextShuffleEnabledEvent && !event.value
+            },
+        )
+    }
+
+    @Test
+    fun `toggleUpNextShuffle does nothing for a non-subscriber even if invoked directly`() = runTest {
+        stubSubscription(isPaid = false)
+        val upNextShuffle = mock<UserSetting<Boolean>>()
+        whenever(upNextShuffle.value).thenReturn(false)
+        whenever(settings.upNextShuffle).thenReturn(upNextShuffle)
+
+        actions.toggleUpNextShuffleSuspend()
+
+        verify(upNextShuffle, never()).set(any(), any(), any(), any())
+        verify(eventHorizon, never()).track(any())
+    }
+
+    private fun stubSubscription(isPaid: Boolean) {
+        val cachedSubscription = mock<ReadSetting<Subscription?>>()
+        whenever(cachedSubscription.value).thenReturn(if (isPaid) mock<Subscription>() else null)
+        whenever(settings.cachedSubscription).thenReturn(cachedSubscription)
     }
 
     private fun createPodcastEpisode(uuid: String): PodcastEpisode {
