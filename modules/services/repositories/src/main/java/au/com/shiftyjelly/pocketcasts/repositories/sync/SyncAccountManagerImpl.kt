@@ -49,7 +49,13 @@ open class SyncAccountManagerImpl @Inject constructor(
             }
         }
         trySend(getEmail())
-        accountManager.addOnAccountsUpdatedListener(listener, null, true)
+        try {
+            accountManager.addOnAccountsUpdatedListener(listener, null, true)
+        } catch (e: Exception) {
+            // AccountManager stores the listener before the calls that can throw, so it stays registered unless we remove it here
+            accountManager.removeOnAccountsUpdatedListener(listener)
+            throw e
+        }
         awaitClose {
             accountManager.removeOnAccountsUpdatedListener(listener)
         }
