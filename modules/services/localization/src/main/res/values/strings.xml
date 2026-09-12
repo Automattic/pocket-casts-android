@@ -13,6 +13,9 @@
     <string name="add_bookmark">Add bookmark</string>
     <string name="add_bookmark_title">Add Bookmark</string>
     <string name="bookmark_added">Bookmark \"%s\" added</string>
+    <string name="bookmark_new_badge">New</string>
+    <string name="bookmark_player_tip_title">Add bookmark</string>
+    <string name="bookmark_player_tip_message">Keep the part you wanted</string>
     <string name="bookmark_updated">Bookmark \"%s\" updated</string>
     <string name="change_title">Change title</string>
     <string name="add_bookmark_title_hint">Add an optional title to identify this bookmark</string>
@@ -2656,6 +2659,9 @@
     <string name="synced_transcripts_whats_new_title">Read along. Even at&#160;2x.</string>
     <string name="synced_transcripts_whats_new_message">Read fast, miss nothing. The name you blew past, the book they recommended, the stat you wanted — tap the word, jump&#160;back.</string>
     <string name="synced_transcripts_whats_new_button_note">Synced transcripts available for recent episodes only.</string>
+    <string name="smart_bookmarks_whats_new_title">Save the parts worth keeping</string>
+    <string name="smart_bookmarks_whats_new_message">One tap. It\'s named, and the words come with it.</string>
+    <string name="smart_bookmarks_whats_new_button">Get Bookmarks</string>
 
     <!-- Pocket Casts Champion -->
     <string name="pocket_casts_champion_dialog_title">You’re a true champion of Pocket Casts!</string>

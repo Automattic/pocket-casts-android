@@ -5,7 +5,10 @@ import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.ReadSetting
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
+import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -26,6 +29,9 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 class WhatsNewViewModelTest {
     @get:Rule
     val coroutineRule = MainCoroutineRule()
+
+    @get:Rule
+    val featureFlagRule = InMemoryFeatureFlagRule()
 
     @Mock
     private lateinit var settings: Settings
@@ -59,6 +65,7 @@ class WhatsNewViewModelTest {
 
     @Test
     fun `free user sees Start Free Trial button`() = runTest {
+        FeatureFlag.setEnabled(Feature.SMART_BOOKMARKS, false)
         val viewModel = createViewModel(subscription = null)
 
         val state = viewModel.state.value as WhatsNewViewModel.UiState.Loaded
@@ -68,12 +75,34 @@ class WhatsNewViewModelTest {
 
     @Test
     fun `free user confirm starts upsell flow`() = runTest {
+        FeatureFlag.setEnabled(Feature.SMART_BOOKMARKS, false)
         val viewModel = createViewModel(subscription = null)
 
         viewModel.navigationState.test {
             viewModel.onConfirm()
             val target = awaitItem() as WhatsNewViewModel.NavigationState.StartUpsellFlow
             assertEquals(OnboardingUpgradeSource.SYNCED_TRANSCRIPTS, target.source)
+        }
+    }
+
+    @Test
+    fun `free user sees Get Bookmarks button when smart bookmarks enabled`() = runTest {
+        FeatureFlag.setEnabled(Feature.SMART_BOOKMARKS, true)
+        val viewModel = createViewModel(subscription = null)
+
+        val state = viewModel.state.value as WhatsNewViewModel.UiState.Loaded
+        assertEquals(LR.string.smart_bookmarks_whats_new_button, state.feature.confirmButtonTitle)
+    }
+
+    @Test
+    fun `free user confirm starts bookmarks upsell when smart bookmarks enabled`() = runTest {
+        FeatureFlag.setEnabled(Feature.SMART_BOOKMARKS, true)
+        val viewModel = createViewModel(subscription = null)
+
+        viewModel.navigationState.test {
+            viewModel.onConfirm()
+            val target = awaitItem() as WhatsNewViewModel.NavigationState.StartUpsellFlow
+            assertEquals(OnboardingUpgradeSource.BOOKMARKS, target.source)
         }
     }
 }

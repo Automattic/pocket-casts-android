@@ -68,6 +68,7 @@ fun WhatsNewPage(
                 header = {
                     when (uiState.feature) {
                         is WhatsNewFeature.SyncedTranscripts -> SyncedTranscriptsHeader()
+                        is WhatsNewFeature.SmartBookmarks -> SmartBookmarksHeader()
                     }
                 },
                 onConfirm = { viewModel.onConfirm() },
