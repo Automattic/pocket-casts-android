@@ -5,7 +5,7 @@ import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.toLiveData
+import androidx.lifecycle.asLiveData
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.SimpleItemAnimator
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
@@ -22,7 +22,6 @@ import com.automattic.eventhorizon.MultiSelectViewOverflowMenuRearrangeActionMov
 import com.automattic.eventhorizon.MultiSelectViewOverflowMenuRearrangeFinishedEvent
 import com.automattic.eventhorizon.ShelfActionSourceType
 import dagger.hilt.android.AndroidEntryPoint
-import io.reactivex.BackpressureStrategy
 import java.util.Collections
 import javax.inject.Inject
 import kotlinx.parcelize.Parcelize
@@ -85,7 +84,7 @@ class MultiSelectFragment :
         itemTouchHelper = ItemTouchHelper(callback)
         itemTouchHelper.attachToRecyclerView(recyclerView)
 
-        settings.multiSelectItemsObservable.toFlowable(BackpressureStrategy.LATEST).toLiveData()
+        settings.multiSelectItemsFlow.asLiveData()
             .observe(viewLifecycleOwner) {
                 val multiSelectActions: MutableList<Any> = MultiSelectEpisodeAction.listFromIds(it).toMutableList()
 
