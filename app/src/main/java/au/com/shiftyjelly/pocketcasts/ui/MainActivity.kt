@@ -854,6 +854,11 @@ class MainActivity :
     private fun setupBackPressedCallbacks() {
         val bottomNavigatorCallback = object : OnBackPressedCallback(false) {
             override fun handleOnBackPressed() {
+                // Give the current fragment a chance to unwind its own back stack before popping it.
+                val currentFragment = navigator.currentFragment()
+                if (currentFragment is HasBackstack && currentFragment.onBackPressed()) {
+                    return
+                }
                 navigator.pop()
             }
         }

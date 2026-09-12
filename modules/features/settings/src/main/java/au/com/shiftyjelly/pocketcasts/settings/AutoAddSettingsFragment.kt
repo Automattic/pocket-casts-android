@@ -53,8 +53,6 @@ class AutoAddSettingsFragment :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel.onShown()
-        // The back callback is seeded at attach, before the podcast selector is on the child back stack.
-        childFragmentManager.addOnBackStackChangedListener { notifyBackstackChanged() }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
