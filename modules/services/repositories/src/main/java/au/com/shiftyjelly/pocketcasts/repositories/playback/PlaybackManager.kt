@@ -8,6 +8,7 @@ import android.media.MediaPlayer
 import android.widget.Toast
 import androidx.annotation.MainThread
 import androidx.annotation.OptIn
+import androidx.annotation.VisibleForTesting
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
@@ -246,6 +247,29 @@ open class PlaybackManager @Inject constructor(
     private val resumptionHelper = ResumptionHelper(settings)
 
     private val errorClassifier = PlaybackErrorClassifier()
+
+    @VisibleForTesting
+    internal var isAndroidAutoConnected = false
+
+    fun isCarConnected(): Boolean {
+        return Util.isAutomotive(application) || Util.isCarUiMode(application) || isAndroidAutoConnected
+    }
+
+    init {
+        try {
+            Util.isAndroidAutoConnectedFlow(application)
+                .distinctUntilChanged()
+                .onEach { isConnected ->
+                    isAndroidAutoConnected = isConnected
+                    if (!isConnected && !isPlaying()) {
+                        focusManager.giveUpAudioFocus()
+                    }
+                }
+                .launchIn(applicationScope)
+        } catch (e: Exception) {
+            Timber.e(e, "Failed to observe CarConnection")
+        }
+    }
 
     var episodeSubscription: Disposable? = null
 
@@ -1001,7 +1025,9 @@ open class PlaybackManager @Inject constructor(
 
     suspend fun pauseSuspend(transientLoss: Boolean = false, sourceView: SourceView = SourceView.UNKNOWN) {
         if (!transientLoss) {
-            focusManager.giveUpAudioFocus()
+            if (!isCarConnected()) {
+                focusManager.giveUpAudioFocus()
+            }
             playbackStateRelay.blockingFirst().let { playbackState ->
                 playbackStateRelay.accept(playbackState.copy(transientLoss = false))
             }
@@ -1058,6 +1084,8 @@ open class PlaybackManager @Inject constructor(
                 player = null
             }
         }
+
+        focusManager.giveUpAudioFocus()
 
         playbackStateRelay.blockingFirst().let {
             playbackStateRelay.accept(
@@ -2009,6 +2037,8 @@ open class PlaybackManager @Inject constructor(
             focusWasPlaying = Date()
 
             pause(transientLoss = transientLoss, sourceView = SourceView.AUTO_PAUSE)
+        } else if (focusWasPlaying != null) {
+            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Focus lost while already paused from prior focus loss")
         } else {
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Focus lost not playing")
             focusWasPlaying = null
