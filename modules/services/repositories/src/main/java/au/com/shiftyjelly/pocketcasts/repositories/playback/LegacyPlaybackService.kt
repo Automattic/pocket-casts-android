@@ -19,22 +19,24 @@ import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationDraw
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.MediaItemCompatConverter
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.PackageValidator
-import au.com.shiftyjelly.pocketcasts.utils.SchedulerProvider
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
-import com.jakewharton.rxrelay2.BehaviorRelay
 import dagger.hilt.android.AndroidEntryPoint
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.Observables
-import io.reactivex.rxkotlin.addTo
-import io.reactivex.rxkotlin.subscribeBy
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.rx2.asObservable
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -69,8 +71,6 @@ open class LegacyPlaybackService :
 
     private var mediaControllerCallback: MediaControllerCallback? = null
     lateinit var notificationManager: PlayerNotificationManager
-
-    private val disposables = CompositeDisposable()
 
     @Volatile
     private var isForeground: Boolean = false
@@ -125,7 +125,6 @@ open class LegacyPlaybackService :
         super.onDestroy()
         isForeground = false
 
-        disposables.clear()
         sleepTimerHandler?.dispose()
         job.cancel()
 
@@ -196,39 +195,36 @@ open class LegacyPlaybackService :
     }
 
     private inner class MediaControllerCallback(currentMetadataCompat: MediaMetadataCompat?) : MediaControllerCompat.Callback() {
-        private val playbackStatusRelay = BehaviorRelay.create<PlaybackStateCompat>()
-        private val mediaMetadataRelay = BehaviorRelay.create<MediaMetadataCompat>().apply {
-            if (currentMetadataCompat != null) {
-                accept(currentMetadataCompat)
-            }
-        }
-        private val artworkConfiguration = settings.artworkConfiguration.flow.asObservable()
+        private val playbackStatusFlow = MutableStateFlow<PlaybackStateCompat?>(null)
+        private val mediaMetadataFlow = MutableStateFlow(currentMetadataCompat)
 
         init {
-            Observables.combineLatest(playbackStatusRelay, mediaMetadataRelay, artworkConfiguration)
-                .observeOn(SchedulerProvider.io)
-                .distinctUntilChanged { (state1, metadata1, artworkConfiguration1), (state2, metadata2, artworkConfiguration2) ->
-                    val isForegroundService = isForegroundService()
-                    (state1.state == state2.state && metadata1.getString(METADATA_KEY_MEDIA_ID) == metadata2.getString(METADATA_KEY_MEDIA_ID) && artworkConfiguration1 == artworkConfiguration2) &&
-                        (isForegroundService && (state2.state == PlaybackStateCompat.STATE_PLAYING || state2.state == PlaybackStateCompat.STATE_BUFFERING))
+            // the consumer calls startForeground/notify, so it has to stay on the main thread
+            launch(Dispatchers.Main) {
+                combine(playbackStatusFlow, mediaMetadataFlow, settings.artworkConfiguration.flow) { playbackState, metadata, artworkConfiguration ->
+                    // nothing is emitted until a playback state and metadata have both arrived
+                    if (playbackState != null && metadata != null) Triple(playbackState, metadata, artworkConfiguration) else null
                 }
-                .map { (playbackState, metadata, artworkConfiguration) -> playbackState to buildNotification(playbackState.state, metadata, artworkConfiguration.useEpisodeArtwork) }
-                .observeOn(SchedulerProvider.mainThread)
-                .subscribeBy(
-                    onNext = { (state: PlaybackStateCompat, notification: Notification?) ->
-                        onPlaybackStateChangedWithNotification(state, notification)
-                    },
-                    onError = { throwable ->
+                    .filterNotNull()
+                    .distinctUntilChanged { (state1, metadata1, artworkConfiguration1), (state2, metadata2, artworkConfiguration2) ->
+                        val isForegroundService = isForegroundService()
+                        (state1.state == state2.state && metadata1.getString(METADATA_KEY_MEDIA_ID) == metadata2.getString(METADATA_KEY_MEDIA_ID) && artworkConfiguration1 == artworkConfiguration2) &&
+                            (isForegroundService && (state2.state == PlaybackStateCompat.STATE_PLAYING || state2.state == PlaybackStateCompat.STATE_BUFFERING))
+                    }
+                    .map { (playbackState, metadata, artworkConfiguration) -> playbackState to buildNotification(playbackState.state, metadata, artworkConfiguration.useEpisodeArtwork) }
+                    .flowOn(Dispatchers.IO)
+                    .onEach { (state, notification) -> onPlaybackStateChangedWithNotification(state, notification) }
+                    .catch { throwable ->
                         Timber.e(throwable)
                         LogBuffer.e(LogBuffer.TAG_PLAYBACK, throwable, "Legacy playback service error")
-                    },
-                )
-                .addTo(disposables)
+                    }
+                    .collect()
+            }
         }
 
         override fun onMetadataChanged(metadata: MediaMetadataCompat?) {
             metadata ?: return
-            mediaMetadataRelay.accept(metadata)
+            mediaMetadataFlow.value = metadata
         }
 
         override fun onQueueChanged(queue: MutableList<MediaSessionCompat.QueueItem>) {
@@ -237,7 +233,11 @@ open class LegacyPlaybackService :
 
         override fun onPlaybackStateChanged(state: PlaybackStateCompat?) {
             state ?: return
-            playbackStatusRelay.accept(state)
+            // logged here rather than off the notification pipeline, which conflates and can skip a superseded error
+            if (state.state == PlaybackStateCompat.STATE_ERROR) {
+                LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Playback state error: ${state.errorCode} ${state.errorMessage ?: "Unknown error"}")
+            }
+            playbackStatusFlow.value = state
         }
 
         private fun onPlaybackStateChangedWithNotification(playbackState: PlaybackStateCompat, notification: Notification?) {
@@ -299,13 +299,6 @@ open class LegacyPlaybackService :
                         if (removeNotification) {
                             notificationManager.cancel(Settings.NotificationId.PLAYING.value)
                         }
-                    }
-
-                    if (state == PlaybackStateCompat.STATE_ERROR) {
-                        LogBuffer.e(
-                            LogBuffer.TAG_PLAYBACK,
-                            "Playback state error: ${playbackStatusRelay.value?.errorCode ?: -1} ${playbackStatusRelay.value?.errorMessage ?: "Unknown error"}",
-                        )
                     }
                 }
             }
