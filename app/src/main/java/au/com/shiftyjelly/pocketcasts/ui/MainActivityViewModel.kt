@@ -59,9 +59,6 @@ class MainActivityViewModel
     private val _state = MutableStateFlow(State())
     val state = _state.asStateFlow()
 
-    private val _downloadedEpisodeState = MutableStateFlow(DownloadedEpisodesState())
-    val downloadedEpisodeState = _downloadedEpisodeState.asStateFlow()
-
     private val _snackbarMessage = MutableSharedFlow<Int>()
     val snackbarMessage = _snackbarMessage.asSharedFlow()
 
@@ -88,13 +85,6 @@ class MainActivityViewModel
             if (!state.value.shouldShowWhatsNew) {
                 updateStoriesModalShowState(settings.getEndOfYearShowModal())
             }
-        }
-
-        viewModelScope.launch {
-            episodeManager.findDownloadedEpisodesFlow()
-                .collect { result ->
-                    _downloadedEpisodeState.update { state -> state.copy(downloadedEpisodes = result.sumOf { it.sizeInBytes }) }
-                }
         }
     }
 
