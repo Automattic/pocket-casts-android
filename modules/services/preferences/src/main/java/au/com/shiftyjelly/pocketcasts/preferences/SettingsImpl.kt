@@ -47,7 +47,6 @@ import au.com.shiftyjelly.pocketcasts.utils.config.FirebaseConfig
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getString
 import au.com.shiftyjelly.pocketcasts.utils.extensions.splitIgnoreEmpty
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
-import com.jakewharton.rxrelay2.BehaviorRelay
 import com.squareup.moshi.Moshi
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.nio.charset.Charset
@@ -115,8 +114,8 @@ class SettingsImpl @Inject constructor(
 
     override val sessionIds get() = sessionIdsSetting.value
 
-    override val selectPodcastSortTypeObservable = BehaviorRelay.create<PodcastsSortType>().apply { accept(getSelectPodcastsSortType()) }
-    override val multiSelectItemsObservable = BehaviorRelay.create<List<String>>().apply { accept(getMultiSelectItems()) }
+    override val selectPodcastSortTypeFlow = MutableStateFlow(getSelectPodcastsSortType())
+    override val multiSelectItemsFlow = MutableStateFlow(getMultiSelectItems())
 
     override val shelfItems = UserSetting.PrefFromString(
         sharedPrefKey = "shelfItems",
@@ -261,7 +260,7 @@ class SettingsImpl @Inject constructor(
             putString(Settings.PREFERENCE_SELECT_PODCAST_LIBRARY_SORT, sortType.clientId.toString())
             apply()
         }
-        selectPodcastSortTypeObservable.accept(sortType)
+        selectPodcastSortTypeFlow.value = sortType
     }
 
     override fun getSelectPodcastsSortType(): PodcastsSortType {
@@ -1341,7 +1340,7 @@ class SettingsImpl @Inject constructor(
 
     override fun setMultiSelectItems(items: List<String>) {
         setStringList("multi_select_items", items)
-        multiSelectItemsObservable.accept(items)
+        multiSelectItemsFlow.value = items
     }
 
     override val autoAddUpNextLimit = UserSetting.IntPref(
