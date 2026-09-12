@@ -42,6 +42,7 @@ class ManualCleanupViewModel
         ),
         val totalSelectedDownloadSize: Long = 0L,
         val deleteButton: DeleteButton = DeleteButton(),
+        val includeStarred: Boolean = false,
     ) {
         val unplayed get() = diskSpaceViews.find { it.title == LR.string.unplayed }
         val inProgress get() = diskSpaceViews.find { it.title == LR.string.in_progress }
@@ -94,6 +95,7 @@ class ManualCleanupViewModel
                         diskSpaceViews = updatedDiskSpaceViews,
                         totalSelectedDownloadSize = downloadSize,
                         deleteButton = deleteButton,
+                        includeStarred = switchState.value,
                     )
                 }
         }
@@ -117,6 +119,7 @@ class ManualCleanupViewModel
 
     fun onStarredSwitchClicked(isChecked: Boolean) {
         switchState.value = isChecked
+        _state.value = _state.value.copy(includeStarred = isChecked)
     }
 
     fun onDeleteButtonClicked() {

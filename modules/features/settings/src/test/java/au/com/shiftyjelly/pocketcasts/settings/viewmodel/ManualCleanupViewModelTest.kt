@@ -81,9 +81,22 @@ class ManualCleanupViewModelTest {
         viewModel = ManualCleanupViewModel(episodeManager, mock(), EventHorizon(TestEventSink()))
 
         assertEquals(listOf(episode), viewModel.state.value.unplayed?.episodes)
+        assertFalse(viewModel.state.value.includeStarred)
 
         viewModel.onStarredSwitchClicked(true)
 
         assertEquals(listOf(episode, starredEpisode), viewModel.state.value.unplayed?.episodes)
+        assertTrue(viewModel.state.value.includeStarred)
+    }
+
+    @Test
+    fun `when starred switch toggled, then include starred state follows the switch`() {
+        assertFalse(viewModel.state.value.includeStarred)
+
+        viewModel.onStarredSwitchClicked(true)
+        assertTrue(viewModel.state.value.includeStarred)
+
+        viewModel.onStarredSwitchClicked(false)
+        assertFalse(viewModel.state.value.includeStarred)
     }
 }
