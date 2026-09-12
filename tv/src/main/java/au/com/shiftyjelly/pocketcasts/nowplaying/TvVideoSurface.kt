@@ -68,7 +68,7 @@ private class TvVideoView(
     }
 
     fun releaseSurface() {
-        (player as? SimplePlayer)?.setDisplay(null)
+        (player as? SimplePlayer)?.clearDisplay(surfaceView)
         isSurfaceConnected = false
         isSurfaceConnectionPending = false
     }
@@ -99,7 +99,7 @@ private class TvVideoView(
         }
 
         val player = this.player as? SimplePlayer
-        if (player == null || !player.supportsVideo() || player.isRemote || player.isPip) {
+        if (player == null || !player.supportsVideo() || player.isRemote) {
             return
         }
 

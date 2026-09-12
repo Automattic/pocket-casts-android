@@ -52,7 +52,6 @@ enum class StreamVideoState {
 }
 
 interface Player {
-    var isPip: Boolean
     val isRemote: Boolean
     val isStreaming: Boolean
     val filePath: String?
