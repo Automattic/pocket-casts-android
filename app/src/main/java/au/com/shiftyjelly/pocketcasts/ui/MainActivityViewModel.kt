@@ -208,10 +208,6 @@ class MainActivityViewModel
         val shouldShowWhatsNew: Boolean = false,
     )
 
-    data class DownloadedEpisodesState(
-        val downloadedEpisodes: Long = 0L,
-    )
-
     sealed class NavigationState {
         object BookmarksForCurrentlyPlaying : NavigationState()
         data class BookmarksForPodcastEpisode(val episode: PodcastEpisode) : NavigationState()
