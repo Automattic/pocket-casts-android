@@ -13,7 +13,6 @@ import au.com.shiftyjelly.pocketcasts.servers.refresh.RefreshPodcastBatcher
 import au.com.shiftyjelly.pocketcasts.utils.extensions.await
 import dagger.Lazy
 import dagger.hilt.android.qualifiers.ApplicationContext
-import io.reactivex.Single
 import java.io.IOException
 import java.util.Locale
 import javax.inject.Inject
@@ -22,7 +21,6 @@ import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.rx2.rxSingle
 import kotlinx.coroutines.withContext
 import okhttp3.FormBody
 import okhttp3.OkHttpClient
@@ -47,10 +45,6 @@ open class ServiceManager @Inject constructor(
                 DataParser.parsePodcastSearch(response.data, searchTerm)
             }
         }
-    }
-
-    fun searchForPodcastsRx(searchTerm: String): Single<PodcastSearch> {
-        return rxSingle { searchForPodcasts(searchTerm).getOrThrow() }
     }
 
     suspend fun exportFeedUrls(uuids: List<String>): Result<Map<String, String>?> {
