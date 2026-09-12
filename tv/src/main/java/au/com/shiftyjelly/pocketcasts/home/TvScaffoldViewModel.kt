@@ -43,7 +43,7 @@ class TvScaffoldViewModel @Inject constructor(
     val uiState: StateFlow<TvScaffoldUiState> = combine(
         selectedTab,
         hasCurrentEpisode,
-        syncManager.isLoggedInObservable.asFlow(),
+        syncManager.isLoggedInFlow,
         syncManager.emailFlow(),
         settings.artworkConfiguration.flow,
     ) { tab, hasEpisode, isLoggedIn, email, artworkConfiguration ->

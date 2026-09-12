@@ -27,7 +27,6 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.DeviceAuthorizeResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.ExchangeSonosResponse
 import au.com.shiftyjelly.pocketcasts.utils.Optional
-import com.jakewharton.rxrelay2.BehaviorRelay
 import com.pocketcasts.service.api.BookmarksResponse
 import com.pocketcasts.service.api.EpisodesResponse
 import com.pocketcasts.service.api.PodcastRatingResponse
@@ -50,13 +49,14 @@ import io.reactivex.Maybe
 import io.reactivex.Single
 import java.io.File
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 import retrofit2.Response
 import com.pocketcasts.service.api.UpNextSyncRequest as UpNextSyncRequestProtobuf
 
 interface SyncManager : NamedSettingsCaller {
 
     // Account
-    val isLoggedInObservable: BehaviorRelay<Boolean>
+    val isLoggedInFlow: StateFlow<Boolean>
     fun isGoogleLogin(): Boolean
     fun isLoggedIn(): Boolean
     fun getLoginIdentity(): LoginIdentity?
