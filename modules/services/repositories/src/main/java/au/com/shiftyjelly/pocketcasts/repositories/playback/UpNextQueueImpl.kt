@@ -17,22 +17,24 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.UpNextSyncWorker
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
-import com.jakewharton.rxrelay2.BehaviorRelay
-import com.jakewharton.rxrelay2.Relay
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.Observable
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.addTo
-import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.schedulers.Schedulers
 import java.util.Collections
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlin.random.Random
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.rx2.asObservable
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -52,22 +54,25 @@ class UpNextQueueImpl @Inject constructor(
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
 
-    override val changesObservable: Observable<UpNextQueue.State> by lazy {
-        val relay = BehaviorRelay.create<UpNextQueue.State>().toSerialized()
-        relay.accept(UpNextQueue.State.Empty)
-        return@lazy relay
-    }
+    // Not a StateFlow: it would drop equal writes, and the debounced server sync below is driven off this flow.
+    private val changesFlow = MutableSharedFlow<UpNextQueue.State>(
+        replay = 1,
+        extraBufferCapacity = 64,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST,
+    ).apply { tryEmit(UpNextQueue.State.Empty) }
 
-    private val disposables = CompositeDisposable()
+    private val currentState get() = changesFlow.replayCache.last()
+
+    override val changesObservable: Observable<UpNextQueue.State> = changesFlow.asObservable()
 
     override val currentEpisode: BaseEpisode?
-        get() = (changesObservable.blockingFirst() as? UpNextQueue.State.Loaded)?.episode
+        get() = (currentState as? UpNextQueue.State.Loaded)?.episode
 
     override val queueEpisodes: List<BaseEpisode>
-        get() = (changesObservable.blockingFirst() as? UpNextQueue.State.Loaded)?.queue ?: emptyList()
+        get() = (currentState as? UpNextQueue.State.Loaded)?.queue ?: emptyList()
 
     override val isEmpty: Boolean
-        get() = changesObservable.blockingFirst() is UpNextQueue.State.Empty
+        get() = currentState is UpNextQueue.State.Empty
 
     sealed class UpNextAction(val _onAdd: (() -> Unit)?) {
         data class PlayNow(val episode: BaseEpisode, val onAdd: (() -> Unit)? = null) : UpNextAction(onAdd)
@@ -83,17 +88,17 @@ class UpNextQueueImpl @Inject constructor(
         object ClearUpNext : UpNextAction(null)
     }
 
+    @OptIn(FlowPreview::class)
     override fun setupBlocking() {
         val initState = updateStateBlocking()
         updateCurrentEpisodeState(initState)
 
-        // listen for user changes and send to server
-        changesObservable.observeOn(Schedulers.io())
-            // send server changes in bulk
-            .debounce(5, TimeUnit.SECONDS)
-            .doOnNext { sendToServerBlocking() }
-            .subscribeBy(onError = { Timber.e(it) })
-            .addTo(disposables)
+        // listen for user changes and send them to the server in bulk
+        changesFlow
+            .debounce(SERVER_SYNC_DEBOUNCE)
+            .onEach { sendToServerBlocking() }
+            .catch { Timber.e(it) }
+            .launchIn(this)
     }
 
     private fun updateStateBlocking(shouldShuffleUpNext: Boolean = false): UpNextQueue.State {
@@ -104,7 +109,7 @@ class UpNextQueueImpl @Inject constructor(
         } else {
             val index = if (shouldShuffleUpNext) Random.nextInt(episodes.size) else 0
             val episode: BaseEpisode = episodes.removeAt(index)
-            val previousState: UpNextQueue.State = changesObservable.blockingFirst()
+            val previousState: UpNextQueue.State = currentState
             val podcastUuid = if (episode is PodcastEpisode) episode.podcastUuid else null
             val podcast: Podcast? = if (previousState is UpNextQueue.State.Loaded && previousState.podcast?.uuid == podcastUuid) {
                 previousState.podcast
@@ -120,7 +125,7 @@ class UpNextQueueImpl @Inject constructor(
     }
 
     override fun updateCurrentEpisodeState(state: UpNextQueue.State) {
-        (changesObservable as Relay).accept(state)
+        changesFlow.tryEmit(state)
     }
 
     private fun saveChangesBlocking(action: UpNextAction) {
@@ -449,5 +454,9 @@ class UpNextQueueImpl @Inject constructor(
             return
         }
         UpNextSyncWorker.enqueue(syncManager, application)
+    }
+
+    private companion object {
+        val SERVER_SYNC_DEBOUNCE = 5.seconds
     }
 }
