@@ -4,6 +4,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
+import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadProgressCache
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
@@ -13,7 +14,7 @@ import javax.inject.Inject
 import kotlin.math.roundToInt
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -53,6 +54,7 @@ class EpisodeRowDataProvider @Inject constructor(
     private val userEpisodeManager: UserEpisodeManager,
     private val alternateEnclosureManager: AlternateEnclosureManager,
     private val settings: Settings,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {
 
     /** Collect on the main dispatcher, the row data is bound straight into views. */
@@ -73,7 +75,7 @@ class EpisodeRowDataProvider @Inject constructor(
                 isInUpNext = isInUpNext,
                 hasBookmarks = hasBookmarks,
             )
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
     }
 
     /** Collect on the main dispatcher, the row data is bound straight into views. */
@@ -93,7 +95,7 @@ class EpisodeRowDataProvider @Inject constructor(
                     ::EpisodeRowData,
                 ),
             )
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
     }
 
     private fun downloadProgressFlow(episodeUuid: String): Flow<Int> {

@@ -14,14 +14,17 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import io.reactivex.Observable
 import java.util.Date
 import kotlin.time.Duration.Companion.seconds
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -34,6 +37,7 @@ import org.mockito.kotlin.stub
 
 private const val EPISODE_UUID = "episode-uuid"
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class EpisodeRowDataProviderTest {
     private val episodeManager = mock<EpisodeManager>()
     private val userEpisodeManager = mock<UserEpisodeManager>()
@@ -62,7 +66,7 @@ class EpisodeRowDataProviderTest {
         on { this.cachedSubscription } doReturn cachedSubscription
     }
 
-    private val provider = EpisodeRowDataProvider(
+    private fun TestScope.createProvider(dispatcher: CoroutineDispatcher = StandardTestDispatcher(testScheduler)) = EpisodeRowDataProvider(
         episodeManager = episodeManager,
         downloadProgressCache = downloadProgressCache,
         playbackManager = playbackManager,
@@ -71,6 +75,7 @@ class EpisodeRowDataProviderTest {
         userEpisodeManager = userEpisodeManager,
         alternateEnclosureManager = alternateEnclosureManager,
         settings = settings,
+        ioDispatcher = dispatcher,
     )
 
     @Test
@@ -79,7 +84,7 @@ class EpisodeRowDataProviderTest {
             on { findEpisodeByUuid(EPISODE_UUID) } doReturn null
         }
 
-        val rowData = provider.episodeRowDataFlow(EPISODE_UUID).toList()
+        val rowData = createProvider().episodeRowDataFlow(EPISODE_UUID).toList()
 
         assertTrue(rowData.isEmpty())
     }
@@ -90,7 +95,7 @@ class EpisodeRowDataProviderTest {
             on { findEpisodeByUuid(EPISODE_UUID) } doReturn PodcastEpisode(uuid = EPISODE_UUID, publishedDate = Date())
         }
 
-        provider.episodeRowDataFlow(EPISODE_UUID).test {
+        createProvider().episodeRowDataFlow(EPISODE_UUID).test {
             val rowData = awaitItem()
 
             assertEquals(0, rowData.downloadProgress)
@@ -108,7 +113,7 @@ class EpisodeRowDataProviderTest {
             on { findEpisodeByUuid(EPISODE_UUID) } doReturn PodcastEpisode(uuid = EPISODE_UUID, publishedDate = Date())
         }
 
-        provider.episodeRowDataFlow(EPISODE_UUID).test {
+        createProvider().episodeRowDataFlow(EPISODE_UUID).test {
             assertEquals(0, awaitItem().downloadProgress)
 
             downloadProgressCache.updateProgress(EPISODE_UUID, downloadedByteCount = 25, contentLength = 100)
@@ -124,10 +129,7 @@ class EpisodeRowDataProviderTest {
             on { episodeFlow(EPISODE_UUID) } doReturn flowOf(null)
         }
 
-        // real time, because the provider emits on Dispatchers.IO and would outrun the test scheduler
-        val rowData = withContext(Dispatchers.Default) {
-            withTimeoutOrNull(300) { provider.userEpisodeRowDataFlow(EPISODE_UUID).first() }
-        }
+        val rowData = withTimeoutOrNull(300) { createProvider().userEpisodeRowDataFlow(EPISODE_UUID).first() }
 
         assertNull(rowData)
     }
@@ -140,7 +142,7 @@ class EpisodeRowDataProviderTest {
         }
 
         try {
-            provider.userEpisodeRowDataFlow(EPISODE_UUID).test(timeout = 10.seconds) {
+            createProvider().userEpisodeRowDataFlow(EPISODE_UUID).test(timeout = 10.seconds) {
                 assertEquals(0, awaitItem().uploadProgress)
 
                 UploadProgressManager.pushProgress(EPISODE_UUID, 0.1f)
@@ -149,6 +151,7 @@ class EpisodeRowDataProviderTest {
 
                 UploadProgressManager.pushProgress(EPISODE_UUID, 0.2f)
                 UploadProgressManager.pushProgress(EPISODE_UUID, 0.3f)
+                advanceTimeBy(1.seconds)
 
                 // 20 is dropped, the window only lets the latest value through
                 assertEquals(30, awaitItem().uploadProgress)
@@ -166,7 +169,7 @@ class EpisodeRowDataProviderTest {
             on { episodeFlow(EPISODE_UUID) } doReturn flowOf(episode)
         }
 
-        provider.userEpisodeRowDataFlow(EPISODE_UUID).test {
+        createProvider().userEpisodeRowDataFlow(EPISODE_UUID).test {
             val rowData = awaitItem()
 
             assertEquals(episode, rowData.episode)
