@@ -32,6 +32,9 @@ interface PodcastManager {
     fun podcastByEpisodeUuidFlow(uuid: String): Flow<Podcast>
     fun podcastSubscriptionsRxFlowable(): Flowable<List<String>>
 
+    // Emits the subscribed uuids, including subscribes still in flight, then again on every subscription change.
+    fun podcastSubscriptionsFlow(): Flow<List<String>>
+
     fun findSubscribedBlocking(): List<Podcast>
     fun findSubscribedRxSingle(): Single<List<Podcast>>
     fun findSubscribedFlow(searchTerm: String? = null): Flow<List<Podcast>>
