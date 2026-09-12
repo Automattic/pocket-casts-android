@@ -135,10 +135,10 @@ class UserManagerImpl @Inject constructor(
                                 rxSingle { Optional.of(fetchSubscriptionForSignIn()) }
                             }
                         }
-                        .combineLatest(syncManager.emailFlowable())
-                        .map { (maybeSubscription, maybeEmail) ->
+                        .combineLatest(syncManager.emailFlow().map { it.orEmpty() }.asFlowable())
+                        .map { (maybeSubscription, email) ->
                             analyticsController.refreshMetadata()
-                            SignInState.SignedIn(email = maybeEmail.get() ?: "", subscription = maybeSubscription.get())
+                            SignInState.SignedIn(email = email, subscription = maybeSubscription.get())
                         }
                         .onErrorReturn {
                             Timber.e(it, "Error getting subscription state")

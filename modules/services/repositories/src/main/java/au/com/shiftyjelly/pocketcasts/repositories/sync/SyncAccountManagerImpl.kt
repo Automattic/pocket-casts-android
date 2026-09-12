@@ -13,12 +13,9 @@ import au.com.shiftyjelly.pocketcasts.preferences.RefreshToken
 import au.com.shiftyjelly.pocketcasts.servers.sync.LoginIdentity
 import au.com.shiftyjelly.pocketcasts.servers.sync.TokenHandler
 import au.com.shiftyjelly.pocketcasts.servers.sync.exception.RefreshTokenExpiredException
-import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.extensions.findParcelable
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.eventhorizon.SignInSourceType
-import io.reactivex.BackpressureStrategy
-import io.reactivex.Flowable
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
@@ -52,28 +49,16 @@ open class SyncAccountManagerImpl @Inject constructor(
             }
         }
         trySend(getEmail())
-        accountManager.addOnAccountsUpdatedListener(listener, null, true)
+        try {
+            accountManager.addOnAccountsUpdatedListener(listener, null, true)
+        } catch (e: Exception) {
+            // AccountManager stores the listener before the calls that can throw, so it stays registered unless we remove it here
+            accountManager.removeOnAccountsUpdatedListener(listener)
+            throw e
+        }
         awaitClose {
             accountManager.removeOnAccountsUpdatedListener(listener)
         }
-    }
-
-    override fun emailFlowable(): Flowable<Optional<String>> {
-        return Flowable.create({ emitter ->
-            try {
-                val listener = OnAccountsUpdateListener { accounts ->
-                    val email = accounts?.find { it.type == AccountConstants.ACCOUNT_TYPE }?.name
-                    emitter.onNext(Optional.of(email))
-                }
-                emitter.onNext(Optional.of(getEmail()))
-                accountManager.addOnAccountsUpdatedListener(listener, null, true)
-                emitter.setCancellable {
-                    accountManager.removeOnAccountsUpdatedListener(listener)
-                }
-            } catch (e: Exception) {
-                emitter.tryOnError(e)
-            }
-        }, BackpressureStrategy.BUFFER)
     }
 
     override fun getUuid(): String? = getAccount()?.let { account ->
