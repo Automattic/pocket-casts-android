@@ -29,7 +29,6 @@ dependencies {
     api(libs.rx2.java)
     api(libs.rx2.relay)
     api(libs.work.runtime)
-    api(libs.work.rx2)
 
     api(projects.modules.services.analytics)
     api(projects.modules.services.coroutines)
