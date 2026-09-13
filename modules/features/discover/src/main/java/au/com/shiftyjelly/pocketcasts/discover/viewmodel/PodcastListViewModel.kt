@@ -25,7 +25,9 @@ import io.reactivex.rxkotlin.combineLatest
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.rx2.rxMaybe
+import kotlinx.coroutines.rx2.rxSingle
 import timber.log.Timber
 
 @HiltViewModel
@@ -122,16 +124,10 @@ class PodcastListViewModel @Inject constructor(
     private fun addColorsToFeed(feed: ListFeed): Single<ListFeed> {
         val podcast = feed.podcasts?.firstOrNull()
         val podcastUuid = podcast?.uuid ?: return Single.just(feed)
-        return colorManager.downloadColors(podcastUuid)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .flatMap {
-                it.ifPresent {
-                    podcast.color = it.background
-                }
-
-                return@flatMap Single.just(feed)
-            }
+        return rxSingle(Dispatchers.Main) {
+            colorManager.downloadColors(podcastUuid)?.let { colors -> podcast.color = colors.background }
+            feed
+        }
     }
 
     private fun addSubscriptionStateToFeed(feed: ListFeed): Flowable<ListFeed> {
