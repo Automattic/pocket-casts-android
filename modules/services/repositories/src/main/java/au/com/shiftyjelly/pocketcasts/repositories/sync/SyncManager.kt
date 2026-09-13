@@ -110,7 +110,6 @@ interface SyncManager : NamedSettingsCaller {
     fun validatePromoCodeRxSingle(code: String): Single<PromoCodeResponse>
 
     // Sync
-    fun getLastSyncAtRxSingle(): Single<String>
     suspend fun getLastSyncAtOrThrow(): String
     suspend fun getHomeFolderOrThrow(): UserPodcastListResponse
     suspend fun getPlaylistsOrThrow(): UserPlaylistListResponse
