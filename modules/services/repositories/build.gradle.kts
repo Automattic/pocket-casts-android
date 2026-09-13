@@ -81,6 +81,7 @@ dependencies {
     testImplementation(libs.okHttp.mockwebserver)
     testImplementation(libs.robolectric)
     testImplementation(libs.turbine)
+    testImplementation(libs.work.test)
 
     testImplementation(projects.modules.services.sharedtest)
     testImplementation(projects.modules.services.analytics.testing)

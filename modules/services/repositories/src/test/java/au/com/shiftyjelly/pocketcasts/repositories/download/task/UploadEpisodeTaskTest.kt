@@ -3,17 +3,17 @@ package au.com.shiftyjelly.pocketcasts.repositories.download.task
 import android.content.Context
 import androidx.work.Data
 import androidx.work.ListenableWorker.Result
+import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
-import androidx.work.impl.utils.taskexecutor.SerialExecutor
-import androidx.work.impl.utils.taskexecutor.TaskExecutor
+import androidx.work.testing.TestListenableWorkerBuilder
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import com.squareup.moshi.Moshi
 import io.reactivex.Completable
 import java.util.Date
-import java.util.concurrent.Executor
-import kotlinx.coroutines.Dispatchers
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertEquals
@@ -32,6 +32,7 @@ import retrofit2.Response
 class UploadEpisodeTaskTest {
     private val userEpisodeManager = mock<UserEpisodeManager>()
     private val playbackManager = mock<PlaybackManager>()
+    private val moshi = Moshi.Builder().build()
     private val context = mock<Context> {
         on { resources } doReturn mock()
     }
@@ -137,15 +138,17 @@ class UploadEpisodeTaskTest {
 
     @Test
     fun `stopping the worker disposes the upload`() {
-        var disposed = false
+        val subscribed = CountDownLatch(1)
+        val disposed = CountDownLatch(1)
         givenEpisode(userEpisode)
-        givenUpload(Completable.never().doOnDispose { disposed = true })
+        givenUpload(Completable.never().doOnSubscribe { subscribed.countDown() }.doOnDispose { disposed.countDown() })
 
         val future = createTask().startWork()
+        assertTrue(subscribed.await(5, TimeUnit.SECONDS))
         future.cancel(true)
 
         assertTrue(future.isCancelled)
-        assertTrue(disposed)
+        assertTrue(disposed.await(5, TimeUnit.SECONDS))
     }
 
     private fun givenEpisode(episode: UserEpisode?) {
@@ -166,23 +169,21 @@ class UploadEpisodeTaskTest {
 
     private fun createTask(episodeUuid: String? = EPISODE_UUID, runAttemptCount: Int = 0): UploadEpisodeTask {
         val inputData = Data.Builder().putString(UploadEpisodeTask.INPUT_EPISODE_UUID, episodeUuid).build()
-        val directExecutor = Executor { it.run() }
-        val serialExecutor = object : SerialExecutor {
-            override fun execute(command: Runnable) = command.run()
-            override fun hasPendingTasks() = false
+        val workerFactory = object : WorkerFactory() {
+            override fun createWorker(
+                appContext: Context,
+                workerClassName: String,
+                workerParameters: WorkerParameters,
+            ): UploadEpisodeTask {
+                return UploadEpisodeTask(appContext, workerParameters, userEpisodeManager, playbackManager, moshi)
+            }
         }
-        val taskExecutor = mock<TaskExecutor> {
-            on { mainThreadExecutor } doReturn directExecutor
-            on { serialTaskExecutor } doReturn serialExecutor
-        }
-        val params = mock<WorkerParameters> {
-            on { this.inputData } doReturn inputData
-            on { this.runAttemptCount } doReturn runAttemptCount
-            on { backgroundExecutor } doReturn directExecutor
-            on { this.taskExecutor } doReturn taskExecutor
-            on { workerContext } doReturn Dispatchers.Unconfined
-        }
-        return UploadEpisodeTask(context, params, userEpisodeManager, playbackManager, Moshi.Builder().build())
+        whenever(context.applicationContext) doReturn context
+        return TestListenableWorkerBuilder.from(context, UploadEpisodeTask::class.java)
+            .setInputData(inputData)
+            .setRunAttemptCount(runAttemptCount)
+            .setWorkerFactory(workerFactory)
+            .build()
     }
 
     private fun successOutput() = Data.Builder()
