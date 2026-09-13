@@ -69,8 +69,6 @@ abstract class BaseEpisodeViewHolder<T : Any>(
 
     private var streamByDefault = false
 
-    private var isObservingRowData = false
-
     private var hasHlsAlternateEnclosure = false
 
     @Suppress("UNCHECKED_CAST")
@@ -122,7 +120,7 @@ abstract class BaseEpisodeViewHolder<T : Any>(
         val previousUuid = boundItem?.let(::toPodcastEpisode)?.uuid
         setupInitialState(item, tint, isMultiSelectEnabled, streamByDefault)
 
-        val isNewEpisode = previousUuid != episode.uuid || !isObservingRowData
+        val isNewEpisode = previousUuid != episode.uuid || rowDataJob?.isActive != true
         if (isNewEpisode) {
             observeRowData()
         }
@@ -163,14 +161,12 @@ abstract class BaseEpisodeViewHolder<T : Any>(
     fun unbind() {
         rowDataJob?.cancel()
         rowDataJob = null
-        isObservingRowData = false
         binding.episodeRow.handler?.removeCallbacksAndMessages(null)
     }
 
     private fun observeRowData() {
         rowDataJob?.cancel()
         hasHlsAlternateEnclosure = false
-        isObservingRowData = true
         rowDataJob = holderScope.launch {
             rowDataProvider.episodeRowDataFlow(episode.uuid).collect { data ->
                 hasHlsAlternateEnclosure = data.hasHlsAlternateEnclosure

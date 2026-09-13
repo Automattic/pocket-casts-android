@@ -62,7 +62,6 @@ class UserEpisodeViewHolder(
     private val episode get() = requireNotNull(boundEpisode)
     private var isMultiSelectEnabled = false
     private var streamByDefault = false
-    private var isObservingRowData = false
 
     init {
         binding.episodeRow.setOnClickListener {
@@ -97,7 +96,7 @@ class UserEpisodeViewHolder(
         val previousUuid = boundEpisode?.uuid
         setupInitialState(episode, tint, isMultiSelectEnabled, streamByDefault)
 
-        if (previousUuid != episode.uuid || !isObservingRowData) {
+        if (previousUuid != episode.uuid || rowDataJob?.isActive != true) {
             observeRowData()
         }
         bindFileStatus()
@@ -138,13 +137,11 @@ class UserEpisodeViewHolder(
     fun unbind() {
         rowDataJob?.cancel()
         rowDataJob = null
-        isObservingRowData = false
         binding.episodeRow.handler?.removeCallbacksAndMessages(null)
     }
 
     private fun observeRowData() {
         rowDataJob?.cancel()
-        isObservingRowData = true
         rowDataJob = holderScope.launch {
             rowDataProvider.userEpisodeRowDataFlow(episode.uuid).collect { data ->
                 bindPlaybackButton()
