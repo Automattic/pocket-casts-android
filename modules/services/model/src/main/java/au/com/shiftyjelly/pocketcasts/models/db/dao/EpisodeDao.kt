@@ -37,12 +37,6 @@ abstract class EpisodeDao {
     @RawQuery(observedEntities = [PodcastEpisode::class, Podcast::class])
     abstract fun findEpisodesBlocking(query: SupportSQLiteQuery): List<PodcastEpisode>
 
-    @RawQuery(observedEntities = [PodcastEpisode::class, Podcast::class])
-    abstract fun findEpisodesRxFlowable(query: SupportSQLiteQuery): Flowable<List<PodcastEpisode>>
-
-    @RawQuery(observedEntities = [PodcastEpisode::class, Podcast::class])
-    abstract fun countRxFlowable(query: SupportSQLiteQuery): Flowable<Int>
-
     @Query("SELECT * FROM podcast_episodes WHERE uuid = :uuid")
     abstract suspend fun findByUuid(uuid: String): PodcastEpisode?
 
