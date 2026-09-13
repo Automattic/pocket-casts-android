@@ -39,7 +39,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
-import kotlinx.coroutines.rx2.asFlow
 import kotlinx.coroutines.rx2.asObservable
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -111,7 +110,7 @@ class FolderEditViewModel
                     .asFlow<List<Podcast>>(),
                 searchText,
                 selectedUuids,
-                settings.selectPodcastSortTypeObservable.asFlow(),
+                settings.selectPodcastSortTypeFlow,
                 folderManager.observeFolders().combine(folderUuid) { folders, uuidOptional ->
                     val foldersSorted = folders.sortedBy { it.name.lowercase(Locale.getDefault()) }
                     // find the current open folder

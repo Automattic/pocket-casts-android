@@ -31,7 +31,6 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.preferences.model.ThemeSetting
 import com.automattic.eventhorizon.UpNextSwipeActionType
 import com.automattic.eventhorizon.UploadedFilesSortType
-import io.reactivex.Observable
 import java.time.Instant
 import java.util.Date
 import kotlinx.coroutines.flow.Flow
@@ -296,8 +295,8 @@ interface Settings {
     val currentSessionId: String
     val sessionIds: List<String>
 
-    val selectPodcastSortTypeObservable: Observable<PodcastsSortType>
-    val multiSelectItemsObservable: Observable<List<String>>
+    val selectPodcastSortTypeFlow: StateFlow<PodcastsSortType>
+    val multiSelectItemsFlow: StateFlow<List<String>>
     val refreshStateFlow: StateFlow<RefreshState>
 
     val shelfItems: UserSetting<List<ShelfItem>>
