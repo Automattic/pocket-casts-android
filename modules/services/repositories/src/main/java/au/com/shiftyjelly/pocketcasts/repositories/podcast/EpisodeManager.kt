@@ -117,7 +117,6 @@ interface EpisodeManager {
     fun markAsUnplayed(episodes: List<BaseEpisode>)
     suspend fun findEpisodeByUuid(uuid: String): BaseEpisode?
     suspend fun findEpisodesByUuids(uuids: List<String>): List<BaseEpisode>
-    fun findDownloadingEpisodesRxFlowable(): Flowable<List<BaseEpisode>>
     suspend fun updatePlaybackInteractionDate(episode: BaseEpisode?)
     suspend fun updatePlaybackInteraction(episodeUuid: String, interactionDate: Long, syncStatus: Long)
     suspend fun findStaleDownloads(): List<PodcastEpisode>

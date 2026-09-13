@@ -68,10 +68,6 @@ abstract class EpisodeDao {
     @Query("SELECT * FROM podcast_episodes WHERE uuid = :uuid")
     abstract fun findByUuidFlow(uuid: String): Flow<PodcastEpisode?>
 
-    @Transaction
-    @Query("SELECT * FROM podcast_episodes WHERE download_task_id IS NOT NULL")
-    abstract fun findDownloadingEpisodesRxFlowable(): Flowable<List<PodcastEpisode>>
-
     @Query("SELECT * FROM podcast_episodes WHERE UPPER(title) = UPPER(:query) LIMIT 1")
     abstract suspend fun findFirstBySearchQuery(query: String): PodcastEpisode?
 
