@@ -26,6 +26,7 @@ import io.reactivex.rxkotlin.Observables
 import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -38,7 +39,8 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.rx2.asFlow
-import kotlinx.coroutines.rx2.await
+import kotlinx.coroutines.rx2.rxSingle
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 class SearchHandler @Inject constructor(
@@ -247,8 +249,8 @@ class SearchHandler @Inject constructor(
             }
         }
         .map { it.term }
-        .switchMap {
-            if (it.length <= 1) {
+        .switchMap { searchTerm ->
+            if (searchTerm.length <= 1) {
                 Observable.just(GlobalServerSearch())
             } else {
                 eventHorizon.track(
@@ -258,18 +260,17 @@ class SearchHandler @Inject constructor(
                 )
                 loadingObservable.accept(true)
 
-                var globalSearch = GlobalServerSearch(searchTerm = it)
-                val podcastServerSearch = serviceManager
-                    .searchForPodcastsRx(it)
+                var globalSearch = GlobalServerSearch(searchTerm = searchTerm)
+                val podcastServerSearch = rxSingle { serviceManager.searchForPodcasts(searchTerm).getOrThrow() }
                     .map { podcastSearch ->
                         globalSearch = globalSearch.copy(podcastSearch = podcastSearch)
                         globalSearch
                     }
                     .toObservable()
 
-                if (!it.startsWith("http")) {
+                if (!searchTerm.startsWith("http")) {
                     val episodesServerSearch = cacheServiceManager
-                        .searchEpisodes(it)
+                        .searchEpisodes(searchTerm)
                         .map { episodeSearch ->
                             globalSearch = globalSearch.copy(episodeSearch = episodeSearch)
                             globalSearch
@@ -365,10 +366,12 @@ class SearchHandler @Inject constructor(
                     emit(SearchUiState.SearchOperation.Loading(searchTerm = query))
                     val subscribedUuids = podcastManager.findSubscribedUuids()
                     if (query.startsWith("http")) {
-                        val podcastSearch = serviceManager
-                            .searchForPodcastsRx(query)
-                            .map { list -> list.searchResults.map { ImprovedSearchResultItem.PodcastItem(uuid = it.uuid, title = it.title, author = it.author, isFollowed = subscribedUuids.contains(it.uuid)) } }
-                            .await()
+                        // collected on the main thread, so the blocking body read, the parse and the mapping all have to happen off it
+                        val podcastSearch = withContext(Dispatchers.IO) {
+                            serviceManager.searchForPodcasts(query).getOrThrow()
+                                .searchResults
+                                .map { ImprovedSearchResultItem.PodcastItem(uuid = it.uuid, title = it.title, author = it.author, isFollowed = subscribedUuids.contains(it.uuid)) }
+                        }
                         eventHorizon.track(
                             SearchPerformedEvent(
                                 source = source.analyticsValue,
