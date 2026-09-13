@@ -11,7 +11,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import com.squareup.moshi.Moshi
 import io.reactivex.Completable
-import io.reactivex.Maybe
 import java.util.Date
 import java.util.concurrent.Executor
 import kotlinx.coroutines.Dispatchers
@@ -150,13 +149,10 @@ class UploadEpisodeTaskTest {
     }
 
     private fun givenEpisode(episode: UserEpisode?) {
-        val maybe = if (episode == null) Maybe.empty() else Maybe.just(episode)
-        whenever(userEpisodeManager.findEpisodeByUuidRxMaybe(EPISODE_UUID)) doReturn maybe
         whenever { userEpisodeManager.findEpisodeByUuid(EPISODE_UUID) } doReturn episode
     }
 
     private fun givenEpisodeLookupFails(error: RuntimeException) {
-        whenever(userEpisodeManager.findEpisodeByUuidRxMaybe(EPISODE_UUID)) doReturn Maybe.error(error)
         whenever { userEpisodeManager.findEpisodeByUuid(EPISODE_UUID) } doThrow error
     }
 
