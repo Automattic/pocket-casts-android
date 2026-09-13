@@ -426,10 +426,6 @@ class SyncManagerImpl @Inject constructor(
         syncServiceManager.syncUpdateOrThrow(token, request)
     }
 
-    override fun getLastSyncAtRxSingle(): Single<String> = getCacheTokenOrLoginRxSingle { token ->
-        syncServiceManager.getLastSyncAtRx(token)
-    }
-
     override suspend fun getLastSyncAtOrThrow(): String = getCacheTokenOrLogin { token ->
         syncServiceManager.getLastSyncAtOrThrow(token)
     }

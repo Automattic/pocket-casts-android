@@ -110,9 +110,6 @@ interface SyncService {
     suspend fun upNextSyncProtobuf(@Header("Authorization") authorization: String, @Body request: UpNextSyncRequestProtobuf): UpNextResponse
 
     @POST("/user/last_sync_at")
-    fun getLastSyncAtRx(@Header("Authorization") authorization: String, @Body request: BasicRequest): Single<LastSyncAtResponse>
-
-    @POST("/user/last_sync_at")
     suspend fun getLastSyncAt(@Header("Authorization") authorization: String, @Body request: BasicRequest): LastSyncAtResponse
 
     @POST("/user/podcast/episodes")

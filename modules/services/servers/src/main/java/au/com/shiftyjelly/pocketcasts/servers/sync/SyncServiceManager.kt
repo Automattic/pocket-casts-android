@@ -177,9 +177,6 @@ open class SyncServiceManager @Inject constructor(
 
     suspend fun upNextSyncProtobuf(request: com.pocketcasts.service.api.UpNextSyncRequest, token: AccessToken): UpNextResponse = service.upNextSyncProtobuf(addBearer(token), request)
 
-    fun getLastSyncAtRx(token: AccessToken): Single<String> = service.getLastSyncAtRx(addBearer(token), buildBasicRequest())
-        .map { response -> response.lastSyncAt ?: "" }
-
     suspend fun getLastSyncAtOrThrow(token: AccessToken): String = service.getLastSyncAt(addBearer(token), buildBasicRequest()).lastSyncAt ?: ""
 
     suspend fun getHomeFolder(token: AccessToken): UserPodcastListResponse = service.getPodcastList(addBearer(token), userPodcastListRequest)
