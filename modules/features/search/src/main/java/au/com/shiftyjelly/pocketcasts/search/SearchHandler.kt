@@ -79,8 +79,7 @@ class SearchHandler @Inject constructor(
                 val folderSearch =
                     if (signInState.isSignedInAsPlusOrPatron) {
                         // only show folders if the user has Plus
-                        folderManager.findFoldersSingle()
-                            .subscribeOn(Schedulers.io())
+                        rxSingle { folderManager.getAll() }
                             .flatMapObservable { Observable.fromIterable(it) }
                             .filter { it.name.contains(query, ignoreCase = true) }
                             .switchMapSingle { folder ->
