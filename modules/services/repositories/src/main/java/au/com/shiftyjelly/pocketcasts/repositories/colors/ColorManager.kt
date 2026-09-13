@@ -7,8 +7,6 @@ import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServiceManager
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.math.abs
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 @Singleton
@@ -22,8 +20,8 @@ class ColorManager @Inject constructor(
         private const val MIN_TIME_BETWEEN_REFRESH_ATTEMPTS = (30 * 60 * 1000).toLong()
     }
 
-    suspend fun downloadColors(podcastUuid: String): ArtworkColors? = withContext(Dispatchers.IO) {
-        staticServiceManager.getColors(podcastUuid)
+    suspend fun downloadColors(podcastUuid: String): ArtworkColors? {
+        return staticServiceManager.getColors(podcastUuid)
     }
 
     suspend fun updateColors(podcasts: List<Podcast>) {
