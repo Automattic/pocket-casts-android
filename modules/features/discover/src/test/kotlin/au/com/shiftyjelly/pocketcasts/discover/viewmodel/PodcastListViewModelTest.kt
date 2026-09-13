@@ -11,15 +11,18 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import au.com.shiftyjelly.pocketcasts.servers.cdn.ArtworkColors
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.servers.model.ExpandedStyle
 import au.com.shiftyjelly.pocketcasts.servers.model.ListFeed
+import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import com.jakewharton.rxrelay2.BehaviorRelay
 import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.android.plugins.RxAndroidPlugins
 import io.reactivex.plugins.RxJavaPlugins
 import io.reactivex.schedulers.Schedulers
+import java.io.IOException
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import org.junit.After
@@ -31,8 +34,10 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
+import org.mockito.kotlin.verifyBlocking
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
@@ -40,6 +45,9 @@ class PodcastListViewModelTest {
 
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
+
+    @get:Rule
+    val coroutineRule = MainCoroutineRule()
 
     private val listRepository = mock<ListRepository>()
     private val colorManager = mock<ColorManager>()
@@ -149,6 +157,42 @@ class PodcastListViewModelTest {
     }
 
     @Test
+    fun `a ranked list colours its first podcast with the downloaded artwork colour`() {
+        listRepository.stub { on { getListFeed(any(), anyOrNull()) } doReturn listFeed(RELAY_PODCAST.copy()) }
+        colorManager.stub { on { downloadColors(RELAY_PODCAST.uuid) } doReturn ArtworkColors(background = ARTWORK_BACKGROUND) }
+        val viewModel = createViewModel()
+
+        viewModel.load(sourceUrl = RELAY_URL, listStyle = ExpandedStyle.RankedList(), authenticated = false)
+
+        val state = viewModel.awaitState<PodcastListViewState.ListLoaded>()
+        assertEquals(ARTWORK_BACKGROUND, state.feed.podcasts?.first()?.color)
+    }
+
+    @Test
+    fun `a ranked list without artwork colours loads with the default colour`() {
+        listRepository.stub { on { getListFeed(any(), anyOrNull()) } doReturn listFeed(RELAY_PODCAST.copy()) }
+        colorManager.stub { on { downloadColors(RELAY_PODCAST.uuid) } doReturn null }
+        val viewModel = createViewModel()
+
+        viewModel.load(sourceUrl = RELAY_URL, listStyle = ExpandedStyle.RankedList(), authenticated = false)
+
+        val state = viewModel.awaitState<PodcastListViewState.ListLoaded>()
+        assertEquals(0, state.feed.podcasts?.first()?.color)
+        verifyBlocking(colorManager) { downloadColors(RELAY_PODCAST.uuid) }
+    }
+
+    @Test
+    fun `a ranked list whose artwork colours fail to download moves to the error state`() {
+        listRepository.stub { on { getListFeed(any(), anyOrNull()) } doReturn listFeed(RELAY_PODCAST.copy()) }
+        colorManager.stub { on { downloadColors(RELAY_PODCAST.uuid) } doSuspendableAnswer { throw IOException("offline") } }
+        val viewModel = createViewModel()
+
+        viewModel.load(sourceUrl = RELAY_URL, listStyle = ExpandedStyle.RankedList(), authenticated = false)
+
+        viewModel.awaitState<PodcastListViewState.Error>()
+    }
+
+    @Test
     fun `a list id becomes a list feed url`() {
         assertEquals("${Settings.SERVER_LIST_URL}/$RELAY_LIST_ID.json", PodcastGridListFragment.listUrl(RELAY_LIST_ID))
     }
@@ -204,6 +248,7 @@ class PodcastListViewModelTest {
     )
 
     companion object {
+        private const val ARTWORK_BACKGROUND = 0xFF123456.toInt()
         private const val RELAY_LIST_ID = "cdb75bc0-9f5a-4217-b1ca-f573821a7913"
         private val RELAY_URL = "https://lists.pocketcasts.net/$RELAY_LIST_ID.json"
         private val RELAY_PODCAST = DiscoverPodcast(
