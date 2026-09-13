@@ -26,7 +26,6 @@ import io.reactivex.rxkotlin.Observables
 import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -40,7 +39,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.rx2.asFlow
 import kotlinx.coroutines.rx2.rxSingle
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 class SearchHandler @Inject constructor(
@@ -366,12 +364,9 @@ class SearchHandler @Inject constructor(
                     emit(SearchUiState.SearchOperation.Loading(searchTerm = query))
                     val subscribedUuids = podcastManager.findSubscribedUuids()
                     if (query.startsWith("http")) {
-                        // collected on the main thread, so the blocking body read, the parse and the mapping all have to happen off it
-                        val podcastSearch = withContext(Dispatchers.IO) {
-                            serviceManager.searchForPodcasts(query).getOrThrow()
-                                .searchResults
-                                .map { ImprovedSearchResultItem.PodcastItem(uuid = it.uuid, title = it.title, author = it.author, isFollowed = subscribedUuids.contains(it.uuid)) }
-                        }
+                        val podcastSearch = serviceManager.searchForPodcasts(query).getOrThrow()
+                            .searchResults
+                            .map { ImprovedSearchResultItem.PodcastItem(uuid = it.uuid, title = it.title, author = it.author, isFollowed = subscribedUuids.contains(it.uuid)) }
                         eventHorizon.track(
                             SearchPerformedEvent(
                                 source = source.analyticsValue,

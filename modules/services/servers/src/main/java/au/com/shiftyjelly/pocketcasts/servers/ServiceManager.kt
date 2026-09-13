@@ -37,8 +37,8 @@ open class ServiceManager @Inject constructor(
         private const val NO_INTERNET_CONNECTION_MSG = "Check your connection and try again."
     }
 
-    suspend fun searchForPodcasts(searchTerm: String): Result<PodcastSearch> {
-        return if (searchTerm.isBlank()) {
+    suspend fun searchForPodcasts(searchTerm: String): Result<PodcastSearch> = withContext(Dispatchers.IO) {
+        if (searchTerm.isBlank()) {
             Result.success(PodcastSearch(searchTerm = searchTerm))
         } else {
             postToMainServer("/podcasts/search", Parameters("q", searchTerm)).map { response ->
@@ -47,23 +47,23 @@ open class ServiceManager @Inject constructor(
         }
     }
 
-    suspend fun exportFeedUrls(uuids: List<String>): Result<Map<String, String>?> {
+    suspend fun exportFeedUrls(uuids: List<String>): Result<Map<String, String>?> = withContext(Dispatchers.IO) {
         val uuidsJoined = TextUtils.join(LIST_SEPARATOR, uuids)
-        return postToMainServer("/import/export_feed_urls", Parameters("uuids", uuidsJoined)).map { response ->
+        postToMainServer("/import/export_feed_urls", Parameters("uuids", uuidsJoined)).map { response ->
             DataParser.parseExportFeedUrls(response.data)
         }
     }
 
-    suspend fun getSharedItemDetails(strippedUrl: String): Result<Share?> {
-        return postToMainServer(strippedUrl).map { response ->
+    suspend fun getSharedItemDetails(strippedUrl: String): Result<Share?> = withContext(Dispatchers.IO) {
+        postToMainServer(strippedUrl).map { response ->
             DataParser.parseShareItem(response.data)
         }
     }
 
-    suspend fun refreshPodcastsSync(podcasts: List<Podcast>): Result<RefreshResponse?> {
+    suspend fun refreshPodcastsSync(podcasts: List<Podcast>): Result<RefreshResponse?> = withContext(Dispatchers.IO) {
         val batchSize = settings.getRefreshPodcastsBatchSize().coerceIn(100L, Int.MAX_VALUE.toLong()).toInt()
         val batcher = RefreshPodcastBatcher(batchSize)
-        return batcher.refreshPodcasts(podcasts) { parameters ->
+        batcher.refreshPodcasts(podcasts) { parameters ->
             val response = postToMainServer("/user/update", parameters).getOrThrow()
             DataParser.parseRefreshPodcasts(response.data)
         }
@@ -78,8 +78,8 @@ open class ServiceManager @Inject constructor(
                 .post(requestParams.toFormBody())
                 .build()
 
-            val client = withContext(Dispatchers.Default) { httpClient.get() }
-            val response = client.newCall(request).await()
+            // await() resumes on the caller's dispatcher, so callers must switch to IO for the blocking body read
+            val response = httpClient.get().newCall(request).await()
             val serverResponse = DataParser.parseServerResponse(response.body.string())
 
             when {
