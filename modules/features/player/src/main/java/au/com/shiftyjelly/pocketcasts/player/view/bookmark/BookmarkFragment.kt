@@ -4,6 +4,7 @@ import android.app.Activity
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.ime
@@ -44,6 +45,12 @@ class BookmarkFragment : BaseFragment() {
 
     private val args get() = requireArguments().requireParcelable<BookmarkArguments>(NEW_INSTANCE_KEY)
 
+    private val editTranscriptLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            viewModel.refreshPassage()
+        }
+    }
+
     override var statusBarIconColor: StatusBarIconColor = StatusBarIconColor.Light
 
     override fun onCreateView(
@@ -71,6 +78,8 @@ class BookmarkFragment : BaseFragment() {
                     onTitleChange = { viewModel.changeTitle(it) },
                     onSave = ::saveBookmark,
                     onClose = ::close,
+                    passage = uiState.passage,
+                    onEditTranscript = ::editTranscript,
                     modifier = Modifier
                         .background(playerColors.background01)
                         .windowInsetsPadding(WindowInsets.ime.union(WindowInsets.systemBars)),
@@ -97,6 +106,19 @@ class BookmarkFragment : BaseFragment() {
             setResult(Activity.RESULT_OK, intent)
             finish()
         }
+    }
+
+    private fun editTranscript() {
+        val bookmarkUuid = viewModel.uiState.value.bookmarkUuid ?: return
+        val intent = BookmarkTranscriptEditActivity.launchIntent(
+            context = requireContext(),
+            args = BookmarkTranscriptEditArguments(
+                bookmarkUuid = bookmarkUuid,
+                episodeUuid = args.episodeUuid,
+                podcastColors = args.podcastColors,
+            ),
+        )
+        editTranscriptLauncher.launch(intent)
     }
 
     private fun close() {

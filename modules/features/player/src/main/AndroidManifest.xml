@@ -14,6 +14,9 @@
             android:launchMode="singleTask"
             android:windowSoftInputMode="adjustResize"
             android:configChanges="orientation|layoutDirection|screenSize" />
+        <activity
+            android:name=".view.bookmark.BookmarkTranscriptEditActivity"
+            android:configChanges="orientation|layoutDirection|screenSize" />
     </application>
 
 </manifest>
