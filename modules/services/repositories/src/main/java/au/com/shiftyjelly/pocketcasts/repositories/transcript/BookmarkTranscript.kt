@@ -185,6 +185,15 @@ class BookmarkTranscript private constructor(
             )
         }
 
+        fun fromPassage(passage: String) = BookmarkTranscript(
+            displayText = passage,
+            speakerSpans = emptyList(),
+            flatText = "",
+            flatToDisplayStart = IntArray(0),
+            flatToDisplayEnd = IntArray(0),
+            textEntrySpans = emptyList(),
+        )
+
         private val Whitespace = """\s+""".toRegex()
 
         private fun String.collapseWhitespace() = trim().replace(Whitespace, " ")
