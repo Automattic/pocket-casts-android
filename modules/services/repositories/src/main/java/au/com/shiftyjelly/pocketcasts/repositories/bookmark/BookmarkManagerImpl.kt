@@ -275,6 +275,33 @@ class BookmarkManagerImpl @Inject constructor(
         }
     }
 
+    override fun enrichBookmarkPassage(bookmark: Bookmark) {
+        launch(Dispatchers.IO) {
+            try {
+                val window = transcriptWindowExtractor.extractWindow(
+                    episodeUuid = bookmark.episodeUuid,
+                    timeSecs = bookmark.timeSecs,
+                ) ?: return@launch
+                val now = System.currentTimeMillis()
+                bookmarkDao.updateGeneratedData(
+                    bookmarkUuid = bookmark.uuid,
+                    title = null,
+                    titleModified = null,
+                    passage = window.passage,
+                    passageLocation = window.location,
+                    passageModified = now,
+                    referenceTime = window.referenceTimeSecs,
+                    referenceTimeModified = now,
+                    syncStatus = SyncStatus.NOT_SYNCED,
+                )
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Timber.e(e, "Smart bookmark passage enrichment failed for ${bookmark.uuid}")
+            }
+        }
+    }
+
     override suspend fun suggestBookmark(episodeUuid: String, timeSecs: Int): BookmarkSuggestion? = withContext(Dispatchers.IO) {
         val window = transcriptWindowExtractor.extractWindow(episodeUuid = episodeUuid, timeSecs = timeSecs) ?: return@withContext null
         val response = try {

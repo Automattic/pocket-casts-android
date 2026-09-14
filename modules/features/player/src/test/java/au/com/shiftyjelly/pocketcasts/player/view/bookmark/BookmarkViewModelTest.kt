@@ -168,6 +168,7 @@ class BookmarkViewModelTest {
             passageLocation = eq(5),
             referenceTime = eq(118),
         )
+        verify(bookmarkManager, never()).enrichBookmarkPassage(any())
     }
 
     @Test
@@ -193,6 +194,7 @@ class BookmarkViewModelTest {
             passageLocation = isNull(),
             referenceTime = isNull(),
         )
+        verify(bookmarkManager).enrichBookmarkPassage(any())
     }
 
     @Test

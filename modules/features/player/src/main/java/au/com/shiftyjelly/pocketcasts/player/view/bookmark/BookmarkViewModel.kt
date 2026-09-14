@@ -169,7 +169,7 @@ class BookmarkViewModel
                         ?: return@launch
                     loadJob?.cancel()
                     val suggestion = capturedSuggestion
-                    bookmarkManager.add(
+                    val created = bookmarkManager.add(
                         episode = episode,
                         timeSecs = arguments.timeSecs,
                         title = title,
@@ -178,6 +178,10 @@ class BookmarkViewModel
                         passageLocation = suggestion?.passageLocation,
                         referenceTime = suggestion?.referenceTimeSecs,
                     )
+                    if (suggestion == null) {
+                        bookmarkManager.enrichBookmarkPassage(created)
+                    }
+                    created
                 } else {
                     bookmarkManager.updateTitle(bookmarkUuid, title)
                     bookmarkManager.findBookmark(bookmarkUuid)
