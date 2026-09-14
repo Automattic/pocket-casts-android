@@ -140,6 +140,12 @@ class BookmarkViewModel
             bookmarkManager.suggestBookmark(episodeUuid, timeSecs)
         }
         capturedSuggestion = suggestion
+        if (suggestion != null) {
+            mutableUiState.value = mutableUiState.value.copy(
+                passage = suggestion.passage,
+                passageLocation = suggestion.passageLocation,
+            )
+        }
         val suggestedTitle = suggestion?.title?.takeIf { it.isNotBlank() }
         when {
             suggestedTitle == null -> mutableUiState.value = mutableUiState.value.copy(titleSuggestion = TitleSuggestion.None)
@@ -202,8 +208,8 @@ class BookmarkViewModel
                         timeSecs = arguments.timeSecs,
                         title = title,
                         creationSource = BookmarkSourceType.Player,
-                        passage = suggestion?.passage,
-                        passageLocation = suggestion?.passageLocation,
+                        passage = if (passageEdited) state.passage else suggestion?.passage,
+                        passageLocation = if (passageEdited) state.passageLocation else suggestion?.passageLocation,
                         referenceTime = suggestion?.referenceTimeSecs,
                     )
                     if (suggestion == null && FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS)) {
