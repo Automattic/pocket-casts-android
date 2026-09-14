@@ -1,10 +1,12 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.podcast
 
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.servers.model.ListFeed
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,6 +16,7 @@ import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
@@ -29,6 +32,7 @@ class RecommendationsHandler @Inject constructor(
     private val listRepository: ListRepository,
     private val podcastManager: PodcastManager,
     private val settings: Settings,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {
     private val enabled = MutableStateFlow(false)
     private val retryCount = MutableStateFlow(0)
@@ -53,7 +57,7 @@ class RecommendationsHandler @Inject constructor(
 
     private fun recommendationsFlow(podcastUuid: String): Flow<RecommendationsResult> {
         return flow {
-            // A failed request returns null and emits nothing, leaving the previous result in place.
+            // A failed request returns null and emits nothing, so the first load stays on Loading.
             val listFeed = listRepository.getPodcastRecommendations(
                 podcastUuid = podcastUuid,
                 countryCode = settings.discoverCountryCode.value,
@@ -71,7 +75,7 @@ class RecommendationsHandler @Inject constructor(
         }.catch { error ->
             Timber.e(error, "Error loading recommendations")
             emit(RecommendationsResult.Empty)
-        }
+        }.flowOn(ioDispatcher)
     }
 
     private fun ListFeed.withSubscribedStatus(subscribedUuids: List<String>): ListFeed {

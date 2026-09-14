@@ -9,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.servers.model.ListFeed
 import au.com.shiftyjelly.pocketcasts.servers.server.ListWebService
 import java.util.UUID
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -40,7 +41,7 @@ class RecommendationsHandlerTest {
         val settings = mock<Settings>()
         whenever(settings.discoverCountryCode).thenReturn(discoverCountryCode)
 
-        recommendations = RecommendationsHandler(listRepository, podcastManager, settings)
+        recommendations = RecommendationsHandler(listRepository, podcastManager, settings, Dispatchers.Unconfined)
 
         testPodcastUuid = UUID.randomUUID().toString()
         testDiscoverPodcasts = listOf(
@@ -133,6 +134,26 @@ class RecommendationsHandlerTest {
             assertEquals(RecommendationsResult.Loading, awaitItem())
             // no podcasts should be found
             assertEquals(RecommendationsResult.Empty, awaitItem())
+        }
+    }
+
+    @Test
+    fun `update subscribed status when subscriptions change`() = runTest {
+        recommendations.setEnabled(true)
+
+        val listUrl = "${Settings.SERVER_API_URL}/recommendations/podcast/$testPodcastUuid?country=us"
+        whenever(listWebService.getListFeed(listUrl)).thenReturn(testListFeed.copy(podroll = null))
+        val subscribedUuid = testDiscoverPodcasts.first().uuid
+        whenever(podcastManager.podcastSubscriptionsFlow()).thenReturn(flowOf(emptyList(), listOf(subscribedUuid)))
+
+        recommendations.getRecommendationsFlow(testPodcastUuid).test {
+            assertEquals(RecommendationsResult.Loading, awaitItem())
+
+            val before = (awaitItem() as RecommendationsResult.Success).listFeed.podcasts
+            assertTrue(before?.none { it.isSubscribed } == true)
+
+            val after = (awaitItem() as RecommendationsResult.Success).listFeed.podcasts
+            assertTrue(after?.find { it.uuid == subscribedUuid }?.isSubscribed == true)
         }
     }
 
