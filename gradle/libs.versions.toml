@@ -264,7 +264,6 @@ androidx-webkit = { group = "androidx.webkit", name = "webkit", version.ref = "w
 
 # Work Manager
 work-runtime = { module = "androidx.work:work-runtime-ktx", version.ref = "work" }
-work-rx2 = { module = "androidx.work:work-rxjava2", version.ref = "work" }
 work-test = { module = "androidx.work:work-testing", version.ref = "work" }
 
 # Credentials
