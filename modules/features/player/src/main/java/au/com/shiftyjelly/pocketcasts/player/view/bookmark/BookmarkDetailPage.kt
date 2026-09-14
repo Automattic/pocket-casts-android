@@ -135,7 +135,7 @@ internal fun BookmarkDetailPage(
                 ) {
                     if (podcastTitle.isNotEmpty()) {
                         TextH70(
-                            text = podcastTitle.uppercase(),
+                            text = podcastTitle,
                             color = colors.secondaryText,
                         )
                         Spacer(modifier = Modifier.height(4.dp))
