@@ -105,6 +105,7 @@ fun ShelfItemRow(
                     TextH40(
                         text = stringResource(titleResId),
                         color = MaterialTheme.theme.colors.playerContrast01,
+                        modifier = Modifier.weight(1f, fill = false),
                     )
                     if (showNewBadge) {
                         Spacer(modifier = Modifier.width(8.dp))

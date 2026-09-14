@@ -261,6 +261,11 @@ class VersionMigrationsWorker @AssistedInject constructor(
         if (previousVersionCode < 9437) {
             settings.showUpNextSortDurationTooltip.set(true, updateModifiedAt = false)
         }
+
+        // Show the smart bookmarks "New" badge and player tip to users upgrading into this release, but not to fresh installs.
+        if (previousVersionCode < 9452) {
+            settings.showSmartBookmarksTooltip.set(true, updateModifiedAt = false)
+        }
     }
 
     private fun removeOldTempPodcastDirectory() {

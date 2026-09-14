@@ -263,6 +263,7 @@ private fun PlayerShelfContent(
                             title = stringResource(LR.string.bookmark_player_tip_title),
                             body = stringResource(LR.string.bookmark_player_tip_message),
                             tipPosition = TipPosition.BottomCenter,
+                            maxWidth = 300.dp,
                             anchorOffset = DpOffset(0.dp, (-4).dp),
                             clickableElevationPadding = true,
                             onClick = onBookmarkTooltipDismiss,
@@ -298,9 +299,13 @@ private fun PlayerShelfContent(
                     title = stringResource(LR.string.bookmark_player_tip_title),
                     body = stringResource(LR.string.bookmark_player_tip_message),
                     tipPosition = TipPosition.BottomEnd,
+                    maxWidth = 300.dp,
                     anchorOffset = DpOffset(0.dp, (-4).dp),
                     clickableElevationPadding = true,
-                    onClick = onBookmarkTooltipDismiss,
+                    onClick = {
+                        onBookmarkTooltipDismiss()
+                        onMoreClick()
+                    },
                 )
             }
         }

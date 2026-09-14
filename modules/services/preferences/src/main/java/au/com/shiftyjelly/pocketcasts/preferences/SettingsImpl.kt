@@ -1611,7 +1611,8 @@ class SettingsImpl @Inject constructor(
 
     override val showSmartBookmarksTooltip: UserSetting<Boolean> = UserSetting.BoolPref(
         sharedPrefKey = Settings.SHOW_SMART_BOOKMARKS_TOOLTIP,
-        defaultValue = true,
+        // Defaults to false so fresh installs never see the tooltip, VersionMigrationsWorker enables it for upgrading users.
+        defaultValue = false,
         sharedPrefs = sharedPreferences,
     )
 
