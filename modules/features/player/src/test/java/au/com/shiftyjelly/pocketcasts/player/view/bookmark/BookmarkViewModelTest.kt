@@ -258,6 +258,56 @@ class BookmarkViewModelTest {
         assertEquals(100, viewModel.uiState.value.title.text.length)
     }
 
+    @Test
+    fun `captures the suggested passage into the state`() = runTest {
+        stubNewBookmark()
+        whenever(bookmarkManager.suggestBookmark(episodeUuid, timeSecs)).thenReturn(suggestion)
+
+        viewModel.load(arguments)
+
+        val state = viewModel.uiState.value
+        assertEquals("the passage", state.passage)
+        assertEquals(5, state.passageLocation)
+    }
+
+    @Test
+    fun `saves the edited passage instead of the suggestion`() = runTest {
+        stubNewBookmark()
+        whenever(bookmarkManager.suggestBookmark(episodeUuid, timeSecs)).thenReturn(suggestion)
+        whenever(episodeManager.findByUuid(episodeUuid)).thenReturn(PodcastEpisode(uuid = episodeUuid, publishedDate = Date()))
+        whenever(bookmarkManager.add(any(), any(), any(), any(), any(), anyOrNull(), anyOrNull(), anyOrNull())).thenReturn(Bookmark(uuid = "new-id"))
+
+        viewModel.load(arguments)
+        viewModel.onPassageEdited("a hand-picked passage", 9)
+        val saved = CompletableDeferred<Unit>()
+        viewModel.saveBookmark { _, _ -> saved.complete(Unit) }
+        saved.await()
+
+        verify(bookmarkManager).add(
+            episode = any(),
+            timeSecs = eq(timeSecs),
+            title = any(),
+            creationSource = any(),
+            addedAt = any(),
+            passage = eq("a hand-picked passage"),
+            passageLocation = eq(9),
+            referenceTime = eq(118),
+        )
+    }
+
+    @Test
+    fun `updates the passage when saving an existing bookmark`() = runTest {
+        whenever(bookmarkManager.findBookmark("existing-id")).thenReturn(Bookmark(uuid = "existing-id", title = "Kept"))
+
+        viewModel.load(existingBookmarkArguments("existing-id"))
+        viewModel.onPassageEdited("a hand-picked passage", 9)
+        val saved = CompletableDeferred<Unit>()
+        viewModel.saveBookmark { _, _ -> saved.complete(Unit) }
+        saved.await()
+
+        verify(bookmarkManager).updatePassage("existing-id", "a hand-picked passage", 9)
+    }
+
     private suspend fun stubNewBookmark() {
         whenever(episodeManager.findEpisodeByUuid(episodeUuid)).thenReturn(PodcastEpisode(uuid = episodeUuid, publishedDate = Date()))
         whenever(bookmarkManager.findByEpisodeTime(any(), eq(timeSecs))).thenReturn(null)
