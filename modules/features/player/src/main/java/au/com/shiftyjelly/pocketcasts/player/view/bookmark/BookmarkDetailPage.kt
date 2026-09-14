@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.player.view.bookmark
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -38,11 +40,12 @@ import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.bookmark.BookmarkRowColors
 import au.com.shiftyjelly.pocketcasts.compose.buttons.TimePlayButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.TimePlayButtonColors
-import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
+import au.com.shiftyjelly.pocketcasts.compose.components.EpisodeImage
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.BookmarkTranscript
 import au.com.shiftyjelly.pocketcasts.transcripts.ui.BookmarkTranscriptView
@@ -54,7 +57,6 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 internal fun BookmarkDetailPage(
     title: String,
     episodeTitle: String,
-    podcastUuid: String,
     podcastTitle: String,
     timeSecs: Int,
     createdAtText: String,
@@ -64,6 +66,8 @@ internal fun BookmarkDetailPage(
     onArtworkClick: () -> Unit,
     onMoreClick: () -> Unit,
     modifier: Modifier = Modifier,
+    episode: BaseEpisode? = null,
+    useEpisodeArtwork: Boolean = false,
     passage: String? = null,
     transcriptState: BookmarkDetailViewModel.TranscriptState = BookmarkDetailViewModel.TranscriptState.None,
 ) {
@@ -125,15 +129,34 @@ internal fun BookmarkDetailPage(
             Row(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                PodcastImage(
-                    uuid = podcastUuid,
-                    imageSize = 56.dp,
-                    cornerSize = 8.dp,
-                    elevation = null,
+                Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(8.dp))
-                        .clickable(onClickLabel = stringResource(LR.string.go_to_episode), onClick = onArtworkClick),
-                )
+                        .then(
+                            if (episode != null) {
+                                Modifier.clickable(onClickLabel = stringResource(LR.string.go_to_episode), onClick = onArtworkClick)
+                            } else {
+                                Modifier
+                            },
+                        ),
+                ) {
+                    if (episode != null) {
+                        EpisodeImage(
+                            episode = episode,
+                            corners = 8.dp,
+                            useEpisodeArtwork = useEpisodeArtwork,
+                            modifier = Modifier.size(56.dp),
+                        )
+                    } else {
+                        Image(
+                            painter = painterResource(if (theme.isDark) IR.drawable.defaultartwork_dark else IR.drawable.defaultartwork),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(56.dp)
+                                .clip(RoundedCornerShape(8.dp)),
+                        )
+                    }
+                }
 
                 Spacer(modifier = Modifier.width(12.dp))
 
@@ -325,7 +348,6 @@ private fun BookmarkDetailPagePreview(
         BookmarkDetailPage(
             title = "Latency vs throughput tradeoff",
             episodeTitle = "Can the U.S. Rein in Prediction Markets?",
-            podcastUuid = "",
             podcastTitle = "Hard Fork",
             timeSecs = 340,
             createdAtText = "May 7, 2024 - 6:40 PM",
@@ -348,7 +370,6 @@ private fun BookmarkDetailPageTranscriptPreview(
         BookmarkDetailPage(
             title = "Why admissions feel like a lottery",
             episodeTitle = "Higher Education's Identity Crisis",
-            podcastUuid = "",
             podcastTitle = "Radio Atlantic",
             timeSecs = 1390,
             createdAtText = "May 7, 2024 - 6:40 PM",

@@ -166,7 +166,6 @@ class BookmarkDetailFragment : BaseDialogFragment() {
             BookmarkDetailPage(
                 title = uiState.title,
                 episodeTitle = args.episodeTitle,
-                podcastUuid = args.podcastUuid,
                 podcastTitle = args.podcastTitle,
                 timeSecs = args.timeSecs,
                 createdAtText = args.createdAtText,
@@ -175,6 +174,8 @@ class BookmarkDetailFragment : BaseDialogFragment() {
                 onClose = { dismiss() },
                 onArtworkClick = ::onArtworkClick,
                 onMoreClick = ::onMoreClick,
+                episode = uiState.episode,
+                useEpisodeArtwork = uiState.useEpisodeArtwork,
                 passage = uiState.passage,
                 transcriptState = uiState.transcriptState,
             )

@@ -2,7 +2,11 @@ package au.com.shiftyjelly.pocketcasts.player.view.bookmark
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration.Element
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.shownotes.ShowNotesManager
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.BookmarkTranscript
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TextSpan
@@ -19,8 +23,10 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class BookmarkDetailViewModel @Inject constructor(
     private val bookmarkManager: BookmarkManager,
+    private val episodeManager: EpisodeManager,
     private val transcriptManager: TranscriptManager,
     private val showNotesManager: ShowNotesManager,
+    private val settings: Settings,
 ) : ViewModel() {
 
     sealed interface TranscriptState {
@@ -36,6 +42,8 @@ class BookmarkDetailViewModel @Inject constructor(
     data class UiState(
         val title: String = "",
         val passage: String? = null,
+        val episode: BaseEpisode? = null,
+        val useEpisodeArtwork: Boolean = false,
         val transcriptState: TranscriptState = TranscriptState.None,
     )
 
@@ -61,8 +69,20 @@ class BookmarkDetailViewModel @Inject constructor(
         this.bookmarkUuid = bookmarkUuid
         this.episodeUuid = episodeUuid
         this.podcastUuid = podcastUuid
-        mutableState.value = UiState(title = title, passage = passage)
+        mutableState.value = UiState(
+            title = title,
+            passage = passage,
+            useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork(Element.Bookmarks),
+        )
+        loadEpisode()
         loadTranscript(passage, passageLocation)
+    }
+
+    private fun loadEpisode() {
+        viewModelScope.launch {
+            val episode = episodeManager.findEpisodeByUuid(episodeUuid)
+            mutableState.value = mutableState.value.copy(episode = episode)
+        }
     }
 
     fun refresh() {
