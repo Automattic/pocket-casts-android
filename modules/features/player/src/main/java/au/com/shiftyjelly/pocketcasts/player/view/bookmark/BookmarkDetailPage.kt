@@ -270,6 +270,7 @@ private fun TranscriptSection(
             passage = transcriptState.passage,
             editable = false,
             anchorFraction = 0.4f,
+            referenceOffset = transcriptState.referenceOffset,
             modifier = modifier,
         )
     }

@@ -157,6 +157,7 @@ class BookmarkDetailFragment : BaseDialogFragment() {
                 episodeUuid = args.episodeUuid,
                 podcastUuid = args.podcastUuid,
                 podcastTitle = args.podcastTitle,
+                referenceTimeSecs = args.referenceTime ?: args.timeSecs,
                 passage = args.passage,
                 passageLocation = args.passageLocation,
             )

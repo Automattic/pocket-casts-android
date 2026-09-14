@@ -166,6 +166,7 @@ class BookmarkDetailViewModelTest {
             episodeUuid = episodeUuid,
             podcastUuid = podcastUuid,
             podcastTitle = "Podcast",
+            referenceTimeSecs = 0,
             passage = passage,
             passageLocation = passageLocation,
         )
