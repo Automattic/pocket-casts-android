@@ -6,6 +6,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkSuggestion
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -46,6 +47,7 @@ class BookmarkViewModel
 
     private lateinit var arguments: BookmarkArguments
     private var capturedSuggestion: BookmarkSuggestion? = null
+    private var passageEdited = false
     private var loadJob: Job? = null
 
     private val defaultTitle: String get() = context.getString(LR.string.bookmark)
@@ -64,6 +66,8 @@ class BookmarkViewModel
         val bookmarkUuid: String? = null,
         val title: TextFieldValue = buildSelectedTextFieldValue(DEFAULT_TITLE),
         val passage: String? = null,
+        val passageLocation: Int? = null,
+        val podcastUuid: String? = null,
         val titleSuggestion: TitleSuggestion = TitleSuggestion.None,
         val isNewBookmark: Boolean = true,
     )
@@ -90,8 +94,9 @@ class BookmarkViewModel
         )
         loadJob = viewModelScope.launch {
             // load the existing bookmark
+            val episode = episodeManager.findEpisodeByUuid(arguments.episodeUuid)
             val bookmark = if (bookmarkUuid == null) {
-                val episode = episodeManager.findEpisodeByUuid(arguments.episodeUuid) ?: return@launch
+                if (episode == null) return@launch
                 bookmarkManager.findByEpisodeTime(
                     episode = episode,
                     timeSecs = arguments.timeSecs,
@@ -99,12 +104,15 @@ class BookmarkViewModel
             } else {
                 bookmarkManager.findBookmark(bookmarkUuid)
             }
+            val podcastUuid = bookmark?.podcastUuid ?: (episode as? PodcastEpisode)?.podcastUuid
             if (bookmark != null) {
                 originalTitle = bookmark.title
                 mutableUiState.value = mutableUiState.value.copy(
                     bookmarkUuid = bookmark.uuid,
                     title = buildSelectedTextFieldValue(bookmark.title),
                     passage = displayPassage(bookmark),
+                    passageLocation = bookmark.passageLocation,
+                    podcastUuid = podcastUuid,
                     isNewBookmark = mutableUiState.value.isNewBookmark && bookmarkUuid != null,
                 )
                 val passage = bookmark.passage
@@ -112,6 +120,7 @@ class BookmarkViewModel
                     generateTitleSuggestionFromPassage(passage)
                 }
             } else if (bookmarkUuid == null && FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS)) {
+                mutableUiState.value = mutableUiState.value.copy(podcastUuid = podcastUuid)
                 generateTitleSuggestion(arguments.episodeUuid, arguments.timeSecs)
             }
         }
@@ -151,12 +160,9 @@ class BookmarkViewModel
         }
     }
 
-    fun refreshPassage() {
-        val bookmarkUuid = uiState.value.bookmarkUuid ?: return
-        viewModelScope.launch {
-            val bookmark = bookmarkManager.findBookmark(bookmarkUuid) ?: return@launch
-            mutableUiState.value = mutableUiState.value.copy(passage = displayPassage(bookmark))
-        }
+    fun onPassageEdited(passage: String, passageLocation: Int) {
+        passageEdited = true
+        mutableUiState.value = mutableUiState.value.copy(passage = passage, passageLocation = passageLocation)
     }
 
     private fun displayPassage(bookmark: Bookmark) = bookmark.passage?.takeIf { FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS) }
@@ -206,6 +212,11 @@ class BookmarkViewModel
                     created
                 } else {
                     bookmarkManager.updateTitle(bookmarkUuid, title)
+                    val passage = state.passage
+                    val passageLocation = state.passageLocation
+                    if (passageEdited && passage != null && passageLocation != null) {
+                        bookmarkManager.updatePassage(bookmarkUuid, passage, passageLocation)
+                    }
                     bookmarkManager.findBookmark(bookmarkUuid)
                 }
                 if (bookmark != null) {
