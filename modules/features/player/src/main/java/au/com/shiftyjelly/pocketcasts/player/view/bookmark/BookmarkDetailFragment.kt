@@ -15,17 +15,22 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkEpisodeResolver
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkPlaybackTimeResolver
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toLocalizedFormatPattern
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import com.automattic.eventhorizon.BookmarkPlayTappedEvent
 import com.automattic.eventhorizon.EventHorizon
@@ -110,6 +115,12 @@ class BookmarkDetailFragment : BaseDialogFragment() {
     internal lateinit var playbackManager: PlaybackManager
 
     @Inject
+    internal lateinit var episodeManager: EpisodeManager
+
+    @Inject
+    internal lateinit var podcastManager: PodcastManager
+
+    @Inject
     internal lateinit var eventHorizon: EventHorizon
 
     @Inject
@@ -123,6 +134,12 @@ class BookmarkDetailFragment : BaseDialogFragment() {
     private val args get() = requireArguments().requireParcelable<Args>(NEW_INSTANCE_ARG)
 
     private val viewModel: BookmarkDetailViewModel by viewModels()
+
+    private val editBookmarkLauncher = registerForActivityResult(BookmarkActivityContract()) { result ->
+        if (result != null) {
+            viewModel.refresh()
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -157,7 +174,7 @@ class BookmarkDetailFragment : BaseDialogFragment() {
                 onPlayClick = ::onPlayClick,
                 onClose = { dismiss() },
                 onEpisodeClick = ::onEpisodeClick,
-                onMoreClick = {},
+                onMoreClick = ::onMoreClick,
                 passage = uiState.passage,
                 transcriptState = uiState.transcriptState,
             )
@@ -176,6 +193,31 @@ class BookmarkDetailFragment : BaseDialogFragment() {
             forceDark = args.sourceView == SourceView.PLAYER,
             autoPlay = false,
         )
+    }
+
+    private fun onMoreClick() {
+        val fragmentManager = activity?.supportFragmentManager ?: return
+        OptionsDialog()
+            .setForceDarkTheme(args.sourceView == SourceView.PLAYER)
+            .addTextOption(
+                titleId = LR.string.edit,
+                imageId = IR.drawable.ic_edit,
+                click = ::onEditClick,
+            )
+            .show(fragmentManager, "bookmark_detail_options")
+    }
+
+    private fun onEditClick() {
+        lifecycleScope.launch {
+            val podcast = podcastManager.findPodcastByUuid(args.podcastUuid)
+            val arguments = BookmarkArguments(
+                bookmarkUuid = args.bookmarkUuid,
+                episodeUuid = args.episodeUuid,
+                timeSecs = args.timeSecs,
+                podcastColors = podcast?.let(::PodcastColors) ?: PodcastColors.ForUserEpisode,
+            )
+            editBookmarkLauncher.launch(BookmarkActivity.launchIntent(requireContext(), arguments))
+        }
     }
 
     private fun onPlayClick() {
