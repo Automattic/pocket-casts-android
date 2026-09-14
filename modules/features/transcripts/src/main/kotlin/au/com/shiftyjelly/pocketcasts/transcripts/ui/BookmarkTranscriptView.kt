@@ -19,6 +19,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.CompositingStrategy
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.text.SpanStyle
@@ -84,6 +90,7 @@ fun BookmarkTranscriptView(
     Column(
         modifier = modifier
             .onSizeChanged { viewportHeight = it.height }
+            .fadingEdges()
             .verticalScroll(scrollState),
     ) {
         Text(
@@ -154,6 +161,31 @@ private val SpeakerSpanStyle = SpanStyle(
 )
 
 private val ContentPadding = PaddingValues(horizontal = 16.dp, vertical = 24.dp)
+
+private val TopFade = 48.dp
+private val BottomFade = 64.dp
+
+private fun Modifier.fadingEdges() = this
+    .graphicsLayer(compositingStrategy = CompositingStrategy.Offscreen)
+    .drawWithContent {
+        drawContent()
+        drawRect(
+            brush = Brush.verticalGradient(
+                colors = listOf(Color.Transparent, Color.Black),
+                startY = 0f,
+                endY = TopFade.toPx(),
+            ),
+            blendMode = BlendMode.DstIn,
+        )
+        drawRect(
+            brush = Brush.verticalGradient(
+                colors = listOf(Color.Black, Color.Transparent),
+                startY = size.height - BottomFade.toPx(),
+                endY = size.height,
+            ),
+            blendMode = BlendMode.DstIn,
+        )
+    }
 
 @Preview
 @Composable
