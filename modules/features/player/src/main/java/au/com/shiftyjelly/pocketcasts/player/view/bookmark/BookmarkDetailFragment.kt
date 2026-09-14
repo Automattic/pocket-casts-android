@@ -208,7 +208,6 @@ class BookmarkDetailFragment : BaseDialogFragment() {
                     podcastUuid = args.podcastUuid,
                 ),
             )
-            dismiss()
         }
     }
 }
