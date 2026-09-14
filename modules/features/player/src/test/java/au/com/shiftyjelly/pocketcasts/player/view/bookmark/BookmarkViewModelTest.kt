@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.player.view.bookmark
 
+import android.content.Context
 import androidx.compose.ui.text.input.TextFieldValue
 import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
@@ -26,6 +27,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.isNull
@@ -33,6 +35,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class BookmarkViewModelTest {
@@ -47,7 +50,10 @@ class BookmarkViewModelTest {
     private val userEpisodeManager = mock<UserEpisodeManager>()
     private val bookmarkManager = mock<BookmarkManager>()
 
-    private val viewModel = BookmarkViewModel(episodeManager, userEpisodeManager, bookmarkManager, EventHorizon(TestEventSink()))
+    private val context = mock<Context> {
+        on { getString(LR.string.bookmark) } doReturn "Bookmark"
+    }
+    private val viewModel = BookmarkViewModel(episodeManager, userEpisodeManager, bookmarkManager, EventHorizon(TestEventSink()), context)
 
     private val episodeUuid = "episode-id"
     private val timeSecs = 120
@@ -73,6 +79,18 @@ class BookmarkViewModelTest {
         val state = viewModel.uiState.value
         assertTrue(state.isNewBookmark)
         assertEquals("Bookmark", state.title.text)
+    }
+
+    @Test
+    fun `suggests a title for a transcript bookmark from its stored passage`() = runTest {
+        whenever(bookmarkManager.findBookmark("new-id")).thenReturn(Bookmark(uuid = "new-id", title = "Bookmark", passage = "a captured passage"))
+        whenever(bookmarkManager.suggestTitle("a captured passage")).thenReturn("A great moment")
+
+        viewModel.load(newBookmarkArguments("new-id"))
+
+        val state = viewModel.uiState.value
+        assertEquals("A great moment", state.title.text)
+        assertEquals(BookmarkViewModel.TitleSuggestion.None, state.titleSuggestion)
     }
 
     @Test

@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.player.view.bookmark
 
+import android.content.Context
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
@@ -18,6 +19,7 @@ import com.automattic.eventhorizon.BookmarkSourceType
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.SourceViewType
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration.Companion.seconds
@@ -29,6 +31,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 import timber.log.Timber
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
 class BookmarkViewModel
@@ -37,13 +40,16 @@ class BookmarkViewModel
     private val userEpisodeManager: UserEpisodeManager,
     private val bookmarkManager: BookmarkManager,
     private val eventHorizon: EventHorizon,
+    @ApplicationContext private val context: Context,
 ) : ViewModel(),
     CoroutineScope {
 
     private lateinit var arguments: BookmarkArguments
     private var capturedSuggestion: BookmarkSuggestion? = null
-    private var titleEdited = false
     private var loadJob: Job? = null
+
+    private val defaultTitle: String get() = context.getString(LR.string.bookmark)
+    private var originalTitle: String = defaultTitle
 
     companion object {
         private const val DEFAULT_TITLE = "Bookmark"
@@ -70,7 +76,7 @@ class BookmarkViewModel
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
 
-    private var mutableUiState: MutableStateFlow<UiState> = MutableStateFlow(UiState())
+    private var mutableUiState: MutableStateFlow<UiState> = MutableStateFlow(UiState(title = buildSelectedTextFieldValue(defaultTitle)))
     val uiState: StateFlow<UiState> = mutableUiState
 
     fun load(arguments: BookmarkArguments) {
@@ -94,12 +100,17 @@ class BookmarkViewModel
                 bookmarkManager.findBookmark(bookmarkUuid)
             }
             if (bookmark != null) {
+                originalTitle = bookmark.title
                 mutableUiState.value = mutableUiState.value.copy(
                     bookmarkUuid = bookmark.uuid,
                     title = buildSelectedTextFieldValue(bookmark.title),
                     passage = displayPassage(bookmark),
                     isNewBookmark = mutableUiState.value.isNewBookmark && bookmarkUuid != null,
                 )
+                val passage = bookmark.passage
+                if (mutableUiState.value.isNewBookmark && passage != null && FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS)) {
+                    generateTitleSuggestionFromPassage(passage)
+                }
             } else if (bookmarkUuid == null && FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS)) {
                 generateTitleSuggestion(arguments.episodeUuid, arguments.timeSecs)
             }
@@ -123,7 +134,19 @@ class BookmarkViewModel
         val suggestedTitle = suggestion?.title?.takeIf { it.isNotBlank() }
         when {
             suggestedTitle == null -> mutableUiState.value = mutableUiState.value.copy(titleSuggestion = TitleSuggestion.None)
-            !titleEdited -> applySuggestion(suggestedTitle)
+            uiState.value.title.text == originalTitle -> applySuggestion(suggestedTitle)
+            else -> mutableUiState.value = mutableUiState.value.copy(titleSuggestion = TitleSuggestion.Available(suggestedTitle))
+        }
+    }
+
+    private suspend fun generateTitleSuggestionFromPassage(passage: String) {
+        mutableUiState.value = mutableUiState.value.copy(titleSuggestion = TitleSuggestion.Generating)
+        val suggestedTitle = withTimeoutOrNull(SUGGESTION_TIMEOUT) {
+            bookmarkManager.suggestTitle(passage)
+        }?.takeIf { it.isNotBlank() }
+        when {
+            suggestedTitle == null -> mutableUiState.value = mutableUiState.value.copy(titleSuggestion = TitleSuggestion.None)
+            uiState.value.title.text == originalTitle -> applySuggestion(suggestedTitle)
             else -> mutableUiState.value = mutableUiState.value.copy(titleSuggestion = TitleSuggestion.Available(suggestedTitle))
         }
     }
@@ -139,7 +162,6 @@ class BookmarkViewModel
     private fun displayPassage(bookmark: Bookmark) = bookmark.passage?.takeIf { FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS) }
 
     fun changeTitle(title: TextFieldValue) {
-        titleEdited = true
         val titleLimited = title.copy(text = title.text.take(100))
         val suggestion = uiState.value.titleSuggestion
         mutableUiState.value = mutableUiState.value.copy(
@@ -162,7 +184,7 @@ class BookmarkViewModel
                 val bookmarkUuid = state.bookmarkUuid
                 val episodeUuid = arguments.episodeUuid
                 val isExistingBookmark = !state.isNewBookmark
-                val title = state.title.text.ifBlank { DEFAULT_TITLE }
+                val title = state.title.text.replace('\n', ' ').trim().ifBlank { defaultTitle }
                 val bookmark = if (bookmarkUuid == null) {
                     val episode = episodeManager.findByUuid(episodeUuid)
                         ?: userEpisodeManager.findEpisodeByUuid(episodeUuid)
