@@ -48,6 +48,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.cancelChildren
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -58,7 +59,10 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.rx2.await
 import kotlinx.coroutines.withContext
+
+private const val PLAY_SPINNER_DELAY_MS = 250L
 
 @HiltViewModel
 class BookmarksViewModel
@@ -329,7 +333,7 @@ class BookmarksViewModel
     fun play(bookmark: Bookmark) {
         playJob?.cancel()
         playJob = viewModelScope.launch {
-            val bookmarkEpisode = episodeManager.findEpisodeByUuid(bookmark.episodeUuid) ?: run {
+            val bookmarkEpisode = resolveBookmarkEpisode(bookmark) ?: run {
                 _message.emit(BookmarkMessage.BookmarkEpisodeNotFound)
                 return@launch
             }
@@ -340,8 +344,13 @@ class BookmarksViewModel
             if (pausedForResolve) {
                 playbackManager.pauseSuspend()
             }
-            if (hasReferenceTime) {
-                _resolvingBookmarkUuid.value = bookmark.uuid
+            val spinnerJob = if (hasReferenceTime) {
+                launch {
+                    delay(PLAY_SPINNER_DELAY_MS)
+                    _resolvingBookmarkUuid.value = bookmark.uuid
+                }
+            } else {
+                null
             }
             val seekToMs = try {
                 bookmarkPlaybackTimeResolver.playbackTimeMs(
@@ -360,6 +369,7 @@ class BookmarksViewModel
                 }
                 throw e
             } finally {
+                spinnerJob?.cancel()
                 if (_resolvingBookmarkUuid.value == bookmark.uuid) {
                     _resolvingBookmarkUuid.value = null
                 }
@@ -376,6 +386,16 @@ class BookmarksViewModel
                     podcastUuid = bookmark.podcastUuid,
                 ),
             )
+        }
+    }
+
+    private suspend fun resolveBookmarkEpisode(bookmark: Bookmark): BaseEpisode? {
+        episodeManager.findEpisodeByUuid(bookmark.episodeUuid)?.let { return it }
+        val podcast = runCatching { podcastManager.findOrDownloadPodcastRxSingle(bookmark.podcastUuid).await() }.getOrNull() ?: return null
+        return if (!podcast.isSubscribed) {
+            episodeManager.downloadMissingPodcastEpisode(bookmark.episodeUuid, bookmark.podcastUuid)
+        } else {
+            episodeManager.findEpisodeByUuid(bookmark.episodeUuid)
         }
     }
 

@@ -6,6 +6,8 @@ import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
+import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
@@ -28,6 +30,7 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
 import com.automattic.eventhorizon.EventHorizon
+import io.reactivex.Single
 import java.time.Instant
 import java.util.Date
 import java.util.UUID
@@ -258,6 +261,23 @@ class BookmarksViewModelTest {
         bookmarksViewModel.play(bookmark)
 
         verifyBlocking(playbackManager, never()) { pauseSuspend(any(), any()) }
+        verify(playbackManager).seekToTimeMs(eq(10_000), anyOrNull())
+    }
+
+    @Test
+    fun `play fetches a missing episode from the server before playing`() = runTest {
+        val missingEpisodeUuid = "missing-episode"
+        val podcastUuid = "podcast-1"
+        val bookmark = Bookmark("uuid1", episodeUuid = missingEpisodeUuid, podcastUuid = podcastUuid, timeSecs = 10)
+        val fetchedEpisode = PodcastEpisode(uuid = missingEpisodeUuid, podcastUuid = podcastUuid, publishedDate = Date())
+        whenever(episodeManager.findEpisodeByUuid(missingEpisodeUuid)).thenReturn(null)
+        whenever(podcastManager.findOrDownloadPodcastRxSingle(podcastUuid)).thenReturn(Single.just(Podcast(uuid = podcastUuid, isSubscribed = false)))
+        whenever(episodeManager.downloadMissingPodcastEpisode(missingEpisodeUuid, podcastUuid)).thenReturn(fetchedEpisode)
+        whenever(bookmarkPlaybackTimeResolver.playbackTimeMs(any(), anyOrNull(), any())).thenReturn(10_000)
+
+        bookmarksViewModel.play(bookmark)
+
+        verifyBlocking(episodeManager) { downloadMissingPodcastEpisode(missingEpisodeUuid, podcastUuid) }
         verify(playbackManager).seekToTimeMs(eq(10_000), anyOrNull())
     }
 }
