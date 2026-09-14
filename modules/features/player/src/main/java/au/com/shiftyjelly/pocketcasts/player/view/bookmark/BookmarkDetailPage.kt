@@ -137,6 +137,7 @@ internal fun BookmarkDetailPage(
                         TextH70(
                             text = podcastTitle,
                             color = colors.secondaryText,
+                            maxLines = 1,
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                     }
