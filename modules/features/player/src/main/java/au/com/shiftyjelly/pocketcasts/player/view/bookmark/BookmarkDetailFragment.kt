@@ -18,7 +18,9 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
+import au.com.shiftyjelly.pocketcasts.reimagine.timestamp.ShareEpisodeTimestampFragment
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkEpisodeResolver
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkPlaybackTimeResolver
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -36,6 +38,7 @@ import com.automattic.eventhorizon.BookmarkPlayTappedEvent
 import com.automattic.eventhorizon.EventHorizon
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.delay
@@ -197,14 +200,33 @@ class BookmarkDetailFragment : BaseDialogFragment() {
 
     private fun onMoreClick() {
         val fragmentManager = activity?.supportFragmentManager ?: return
-        OptionsDialog()
-            .setForceDarkTheme(args.sourceView == SourceView.PLAYER)
-            .addTextOption(
-                titleId = LR.string.edit,
-                imageId = IR.drawable.ic_edit,
-                click = ::onEditClick,
-            )
-            .show(fragmentManager, "bookmark_detail_options")
+        lifecycleScope.launch {
+            val episode = episodeManager.findEpisodeByUuid(args.episodeUuid)
+            val dialog = OptionsDialog()
+                .setForceDarkTheme(args.sourceView == SourceView.PLAYER)
+                .addTextOption(
+                    titleId = LR.string.edit,
+                    imageId = IR.drawable.ic_edit,
+                    click = ::onEditClick,
+                )
+            if (episode is PodcastEpisode) {
+                dialog.addTextOption(
+                    titleId = LR.string.share,
+                    imageId = IR.drawable.ic_share,
+                    click = { onShareClick(episode) },
+                )
+            }
+            dialog.show(fragmentManager, "bookmark_detail_options")
+        }
+    }
+
+    private fun onShareClick(episode: PodcastEpisode) {
+        lifecycleScope.launch {
+            val podcast = podcastManager.findPodcastByUuid(args.podcastUuid) ?: return@launch
+            ShareEpisodeTimestampFragment
+                .forBookmark(episode, args.timeSecs.seconds, podcast.backgroundColor, args.sourceView)
+                .show(parentFragmentManager, "share_screen")
+        }
     }
 
     private fun onEditClick() {
