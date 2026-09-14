@@ -448,16 +448,17 @@ class TranscriptViewModel @AssistedInject constructor(
     fun createBookmarkFromSelection(selectedText: String) {
         val transcript = (uiState.value.transcriptState as? TranscriptState.Loaded)?.transcript as? Transcript.Text ?: return
         viewModelScope.launch {
-            val bookmark = buildBookmarkFromSelection(transcript, selectedText)
-            if (bookmark == null) {
+            val result = buildBookmarkFromSelection(transcript, selectedText)
+            if (result == null) {
                 _messages.send(TranscriptMessage.BookmarkFailed)
             } else {
-                _messages.send(TranscriptMessage.OpenBookmarkEditor(bookmark.uuid))
+                val (bookmark, isNew) = result
+                _messages.send(TranscriptMessage.OpenBookmarkEditor(bookmark.uuid, isNewBookmark = isNew))
             }
         }
     }
 
-    private suspend fun buildBookmarkFromSelection(transcript: Transcript.Text, selectedText: String): Bookmark? {
+    private suspend fun buildBookmarkFromSelection(transcript: Transcript.Text, selectedText: String): Pair<Bookmark, Boolean>? {
         val model = BookmarkTranscript.from(transcript)
         val span = model.passageDisplaySpan(selectedText, location = null) ?: return null
         val passage = model.passage(span)
@@ -476,7 +477,8 @@ class TranscriptViewModel @AssistedInject constructor(
             referenceTimeSecs = null
         }
 
-        return bookmarkManager.add(
+        val isNew = bookmarkManager.findByEpisodeTime(episode, timeSecs) == null
+        val bookmark = bookmarkManager.add(
             episode = episode,
             timeSecs = timeSecs,
             title = context.getString(LR.string.bookmark),
@@ -485,6 +487,7 @@ class TranscriptViewModel @AssistedInject constructor(
             passageLocation = passage.location,
             referenceTime = referenceTimeSecs,
         )
+        return bookmark to isNew
     }
 
     private fun trackTranscriptShown(transcript: Transcript) {
@@ -563,7 +566,7 @@ class TranscriptViewModel @AssistedInject constructor(
 sealed interface TranscriptMessage {
     data object TapToSeekStreamingUnavailable : TranscriptMessage
     data object BookmarkFailed : TranscriptMessage
-    data class OpenBookmarkEditor(val bookmarkUuid: String) : TranscriptMessage
+    data class OpenBookmarkEditor(val bookmarkUuid: String, val isNewBookmark: Boolean) : TranscriptMessage
 }
 
 data class UiState(

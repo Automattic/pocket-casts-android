@@ -56,6 +56,8 @@ class BookmarkFragment : BaseFragment() {
 
     override var statusBarIconColor: StatusBarIconColor = StatusBarIconColor.Light
 
+    private var isClosing = false
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -127,6 +129,8 @@ class BookmarkFragment : BaseFragment() {
     }
 
     private fun close() {
+        if (isClosing) return
+        isClosing = true
         viewModel.onClose()
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.discardNewBookmarkIfNeeded()

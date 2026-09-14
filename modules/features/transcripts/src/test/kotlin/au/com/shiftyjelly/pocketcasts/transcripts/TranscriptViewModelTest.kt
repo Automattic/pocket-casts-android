@@ -135,7 +135,7 @@ class TranscriptViewModelTest {
 
         viewModel.messages.test {
             viewModel.createBookmarkFromSelection(selected)
-            assertEquals(TranscriptMessage.OpenBookmarkEditor("bookmark-id"), awaitItem())
+            assertEquals(TranscriptMessage.OpenBookmarkEditor("bookmark-id", isNewBookmark = true), awaitItem())
         }
 
         // Generated transcript: reference time (10s) is mapped to the 12s playback time and kept.
@@ -149,6 +149,34 @@ class TranscriptViewModelTest {
             passageLocation = eq(0),
             referenceTime = eq(10),
         )
+    }
+
+    @Test
+    fun `flag the editor as existing when a bookmark already sits at that time`() = runTest {
+        val selected = "The AI revolution is underhyped."
+        transcriptManager.avaiableTranscript = Transcript.Text(
+            entries = listOf(TranscriptEntry.Text(selected, startTimeMs = 10_000)),
+            type = TranscriptType.Vtt,
+            url = "https://example.com/transcript.vtt",
+            isGenerated = true,
+            episodeUuid = "episode-id",
+            podcastUuid = "podcast-id",
+        )
+        whenever(episodeManager.findByUuid("episode-id"))
+            .thenReturn(PodcastEpisode(uuid = "episode-id", podcastUuid = "podcast-id", publishedDate = Date()))
+        whenever(fingerprintTimingManager.playbackTimeMs(any())).thenReturn(12_000)
+        whenever(bookmarkManager.findByEpisodeTime(any(), eq(12))).thenReturn(Bookmark(uuid = "bookmark-id"))
+        whenever(
+            bookmarkManager.add(any(), any(), any(), any(), any(), anyOrNull(), anyOrNull(), anyOrNull()),
+        ).thenReturn(Bookmark(uuid = "bookmark-id"))
+
+        viewModel.loadTranscript("episode-id")
+        runCurrent()
+
+        viewModel.messages.test {
+            viewModel.createBookmarkFromSelection(selected)
+            assertEquals(TranscriptMessage.OpenBookmarkEditor("bookmark-id", isNewBookmark = false), awaitItem())
+        }
     }
 
     @Test
