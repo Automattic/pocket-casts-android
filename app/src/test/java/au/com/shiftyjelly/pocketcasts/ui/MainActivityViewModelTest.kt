@@ -20,12 +20,13 @@ import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.ui.MainActivityViewModel.NavigationState
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
 import com.automattic.eventhorizon.EventHorizon
-import com.jakewharton.rxrelay2.BehaviorRelay
 import io.reactivex.Flowable
 import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -81,7 +82,7 @@ class MainActivityViewModelTest {
 
     @Before
     fun setup() = runTest {
-        whenever(playbackManager.playbackStateRelay).thenReturn(BehaviorRelay.create<PlaybackState>().toSerialized())
+        whenever(playbackManager.playbackStateFlow).thenReturn(emptyFlow())
         whenever(playbackNoticeManager.playbackNotice).thenReturn(emptyFlow())
     }
 
@@ -111,6 +112,21 @@ class MainActivityViewModelTest {
 
         viewModel.state.test {
             assertFalse(awaitItem().shouldShowWhatsNew)
+        }
+    }
+
+    /* Playback state tests */
+
+    @Test
+    fun `given playback state changes, then playback state emits each update`() = runTest {
+        val playbackStateFlow = MutableStateFlow(PlaybackState(episodeUuid = "first"))
+        whenever(playbackManager.playbackStateFlow).thenReturn(playbackStateFlow)
+        initViewModel()
+
+        viewModel.playbackState.test {
+            assertEquals("first", awaitItem().episodeUuid)
+            playbackStateFlow.value = PlaybackState(episodeUuid = "second")
+            assertEquals("second", awaitItem().episodeUuid)
         }
     }
 

@@ -26,19 +26,20 @@ import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelp
 import com.automattic.eventhorizon.BookmarkDeletedEvent
 import com.automattic.eventhorizon.EventHorizon
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.BackpressureStrategy
 import java.time.Instant
 import javax.inject.Inject
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.buffer
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.reactive.asFlow
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -102,12 +103,12 @@ class MainActivityViewModel
         _state.update { state -> state.copy(shouldShowWhatsNew = false) }
     }
 
-    private val playbackStateRx = playbackManager.playbackStateRelay
-        .doOnNext {
+    val playbackState = playbackManager.playbackStateFlow
+        // Drop rather than suspend so a slow collector never blocks the relay's emitting thread
+        .buffer(onBufferOverflow = BufferOverflow.DROP_OLDEST)
+        .onEach {
             Timber.d("Updated playback state from ${it.lastChangeFrom} is playing ${it.isPlaying}")
         }
-        .toFlowable(BackpressureStrategy.LATEST)
-    val playbackState = playbackStateRx.asFlow()
 
     val signInState: LiveData<SignInState> = userManager.getSignInState().toLiveData()
     val isSignedIn: Boolean
