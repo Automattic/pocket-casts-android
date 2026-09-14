@@ -25,7 +25,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.reactive.asFlow
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
@@ -61,8 +60,7 @@ class OnboardingRecommendationsSearchViewModel @Inject constructor(
         viewModelScope.launch {
 
             val subscribedUuidFlow = podcastManager
-                .subscribedRxFlowable()
-                .asFlow()
+                .findSubscribedNoOrderFlow()
                 .map { ls ->
                     ls.map { it.uuid }
                 }

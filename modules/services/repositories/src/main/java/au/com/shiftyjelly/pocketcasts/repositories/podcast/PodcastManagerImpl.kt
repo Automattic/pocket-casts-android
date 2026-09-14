@@ -57,7 +57,6 @@ import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.rx2.asFlow
-import kotlinx.coroutines.rx2.asFlowable
 import kotlinx.coroutines.rx2.await
 import kotlinx.coroutines.rx2.rxMaybe
 import timber.log.Timber
@@ -395,14 +394,6 @@ class PodcastManagerImpl @Inject constructor(
         return podcastDao.observeSubscribedWebFeedPodcasts()
     }
 
-    override fun podcastsOrderByLatestEpisodeRxFlowable(): Flowable<List<Podcast>> {
-        return observePodcastsSortedByLatestEpisode().asFlowable()
-    }
-
-    override fun podcastsOrderByRecentlyPlayedEpisodeRxFlowable(): Flowable<List<Podcast>> {
-        return observePodcastsBySortedRecentlyPlayed().asFlowable()
-    }
-
     override fun observePodcastsSortedByUserChoice(folder: Folder): Flow<List<Podcast>> {
         val sort = folder.podcastsSortType
         return when (sort) {
@@ -414,8 +405,8 @@ class PodcastManagerImpl @Inject constructor(
         }
     }
 
-    override fun subscribedRxFlowable(): Flowable<List<Podcast>> {
-        return podcastDao.findSubscribedRxFlowable()
+    override fun findSubscribedNoOrderFlow(): Flow<List<Podcast>> {
+        return podcastDao.findSubscribedNoOrderFlow()
     }
 
     override suspend fun findPodcastsOrderByLatestEpisode(orderAsc: Boolean): List<Podcast> {

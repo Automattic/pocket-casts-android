@@ -23,10 +23,10 @@ import au.com.shiftyjelly.pocketcasts.servers.model.ListType
 import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import com.automattic.eventhorizon.EventHorizon
-import io.reactivex.Flowable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -52,7 +52,7 @@ class OnboardingRecommendationsStartPageViewModelTest {
 
     @Before
     fun setup() = runTest {
-        whenever(podcastManager.subscribedRxFlowable()).thenReturn(Flowable.just(emptyList()))
+        whenever(podcastManager.findSubscribedNoOrderFlow()).thenReturn(flowOf(emptyList()))
         whenever(repository.getDiscoverFeed()).thenReturn(mockDiscover)
         whenever(repository.getCategoriesList(any())).thenReturn(mockCategories)
         whenever(repository.getListFeed(any(), any())).thenReturn(mockListFeed)
