@@ -267,4 +267,63 @@ class TranscriptWindowExtractorTest {
             result?.passage,
         )
     }
+
+    @Test
+    fun `snap the window to whole sentences`() {
+        val vtt = """
+            |WEBVTT
+            |
+            |00:00:00.000 --> 00:00:05.000
+            |The first sentence starts here and
+            |
+            |00:00:05.000 --> 00:00:15.000
+            |runs into the second cue before it stops.
+            |
+            |00:00:15.000 --> 00:00:25.000
+            |A whole middle sentence lives entirely inside the window without any trouble at all here.
+            |
+            |00:00:25.000 --> 00:00:35.000
+            |The final sentence begins in this cue and
+            |
+            |00:00:35.000 --> 00:00:45.000
+            |then extends beyond the window edge to finish.
+        """.trimMargin()
+
+        val result = TranscriptWindowExtractor.parseVttWindow(vtt, centerSecs = 30)
+
+        assertEquals(
+            "A whole middle sentence lives entirely inside the window without any trouble at all here.",
+            result?.passage,
+        )
+    }
+
+    @Test
+    fun `keep the unsnapped window when snapping drops below the minimum words`() {
+        val vtt = """
+            |WEBVTT
+            |
+            |00:00:00.000 --> 00:00:05.000
+            |The introduction sentence spans across the first two cues and
+            |
+            |00:00:05.000 --> 00:00:15.000
+            |continues here until it reaches its natural stopping point at last.
+            |
+            |00:00:15.000 --> 00:00:25.000
+            |It works.
+            |
+            |00:00:25.000 --> 00:00:35.000
+            |Then a long closing sentence begins right here and
+            |
+            |00:00:35.000 --> 00:00:45.000
+            |carries on well past the window to its eventual end.
+        """.trimMargin()
+
+        val result = TranscriptWindowExtractor.parseVttWindow(vtt, centerSecs = 30)
+
+        assertEquals(
+            "continues here until it reaches its natural stopping point at last. It works. " +
+                "Then a long closing sentence begins right here and",
+            result?.passage,
+        )
+    }
 }
