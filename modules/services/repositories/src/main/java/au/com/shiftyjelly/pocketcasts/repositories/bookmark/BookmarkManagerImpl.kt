@@ -321,6 +321,18 @@ class BookmarkManagerImpl @Inject constructor(
         )
     }
 
+    override suspend fun suggestTitle(passage: String): String? = withContext(Dispatchers.IO) {
+        val response = try {
+            callEnrichApi(passage)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Timber.e(e, "Smart bookmark title suggestion failed")
+            null
+        }
+        response?.title?.takeIf { it.isNotEmpty() }
+    }
+
     private suspend fun callEnrichApi(snippet: String): BookmarkEnrichResponse {
         return syncManager.getCacheTokenOrLogin { token ->
             podcastCacheServiceManager.enrichBookmark(
