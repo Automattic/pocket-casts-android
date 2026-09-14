@@ -4,6 +4,7 @@ import android.app.Activity
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.activity.compose.BackHandler
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.WindowInsets
@@ -61,6 +62,8 @@ class BookmarkFragment : BaseFragment() {
         savedInstanceState: Bundle?,
     ) = contentWithoutConsumedInsets {
         LaunchedEffect(Unit) { viewModel.load(args) }
+
+        BackHandler(onBack = ::close)
 
         AppThemeWithBackground(theme.activeTheme) {
             val uiState: BookmarkViewModel.UiState by viewModel.uiState.collectAsState()
