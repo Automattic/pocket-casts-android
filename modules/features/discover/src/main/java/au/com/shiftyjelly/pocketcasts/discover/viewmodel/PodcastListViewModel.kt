@@ -83,7 +83,7 @@ class PodcastListViewModel @Inject constructor(
     }
 
     private fun decoratedFeedFlow(sourceUrl: String, listStyle: ExpandedStyle, authenticated: Boolean?): Flow<ListFeed> = flow {
-        val feed = withContext(ioDispatcher) { listRepository.getListFeed(url = sourceUrl, authenticated = authenticated) }
+        val feed = listRepository.getListFeed(url = sourceUrl, authenticated = authenticated)
         // the repository turns a cancelled request into null, which must not surface as an error after a reload
         currentCoroutineContext().ensureActive()
         if (feed == null) throw NoSuchElementException("Could not load the list feed $sourceUrl")
