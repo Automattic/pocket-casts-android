@@ -150,7 +150,7 @@ class BookmarkViewModel
 
     fun applySuggestion(title: String) {
         mutableUiState.value = mutableUiState.value.copy(
-            title = buildSelectedTextFieldValue(title),
+            title = buildSelectedTextFieldValue(title.take(100)),
             titleSuggestion = TitleSuggestion.None,
         )
     }
@@ -162,23 +162,24 @@ class BookmarkViewModel
                 val bookmarkUuid = state.bookmarkUuid
                 val episodeUuid = arguments.episodeUuid
                 val isExistingBookmark = !state.isNewBookmark
+                val title = state.title.text.ifBlank { DEFAULT_TITLE }
                 val bookmark = if (bookmarkUuid == null) {
                     val episode = episodeManager.findByUuid(episodeUuid)
                         ?: userEpisodeManager.findEpisodeByUuid(episodeUuid)
                         ?: return@launch
-                    loadJob?.join()
+                    loadJob?.cancel()
                     val suggestion = capturedSuggestion
                     bookmarkManager.add(
                         episode = episode,
                         timeSecs = arguments.timeSecs,
-                        title = state.title.text,
+                        title = title,
                         creationSource = BookmarkSourceType.Player,
                         passage = suggestion?.passage,
                         passageLocation = suggestion?.passageLocation,
                         referenceTime = suggestion?.referenceTimeSecs,
                     )
                 } else {
-                    bookmarkManager.updateTitle(bookmarkUuid, state.title.text)
+                    bookmarkManager.updateTitle(bookmarkUuid, title)
                     bookmarkManager.findBookmark(bookmarkUuid)
                 }
                 if (bookmark != null) {
