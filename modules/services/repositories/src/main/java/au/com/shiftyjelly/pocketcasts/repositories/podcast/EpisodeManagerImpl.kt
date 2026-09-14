@@ -44,6 +44,7 @@ import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flow
@@ -866,9 +867,12 @@ class EpisodeManagerImpl @Inject constructor(
                 return@rxMaybe findEpisodeByUuid(episodeUuid)
             }
             val response = podcastCacheServiceManager.getPodcastAndEpisode(podcastUuid, episodeUuid)
-            val episode = response.episodes.firstOrNull() ?: skeletonEpisode
-            add(listOf(episode), episode.podcastUuid, downloadMetaData)
-            findByUuid(episodeUuid)
+            // A dispose mid-insert must not leave an episode row without its details task enqueued
+            withContext(NonCancellable) {
+                val episode = response.episodes.firstOrNull() ?: skeletonEpisode
+                add(listOf(episode), episode.podcastUuid, downloadMetaData)
+                findByUuid(episodeUuid)
+            }
         }
     }
 
