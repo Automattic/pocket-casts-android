@@ -23,8 +23,13 @@ import com.automattic.eventhorizon.EventHorizon
 import io.reactivex.Flowable
 import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -128,6 +133,30 @@ class MainActivityViewModelTest {
             playbackStateFlow.value = PlaybackState(episodeUuid = "second")
             assertEquals("second", awaitItem().episodeUuid)
         }
+    }
+
+    @Test
+    fun `given a slow collector, then playback state skips to the latest update`() = runTest {
+        val playbackStateFlow = MutableSharedFlow<PlaybackState>(extraBufferCapacity = 10)
+        whenever(playbackManager.playbackStateFlow).thenReturn(playbackStateFlow)
+        initViewModel()
+        val receivedEpisodeUuids = mutableListOf<String>()
+
+        val job = launch {
+            viewModel.playbackState.collect { state ->
+                receivedEpisodeUuids += state.episodeUuid
+                delay(1_000)
+            }
+        }
+        runCurrent()
+        playbackStateFlow.emit(PlaybackState(episodeUuid = "first"))
+        runCurrent()
+        playbackStateFlow.emit(PlaybackState(episodeUuid = "second"))
+        playbackStateFlow.emit(PlaybackState(episodeUuid = "third"))
+        advanceUntilIdle()
+        job.cancel()
+
+        assertEquals(listOf("first", "third"), receivedEpisodeUuids)
     }
 
     /* Bookmark added notification tests */

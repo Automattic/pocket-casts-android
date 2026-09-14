@@ -28,19 +28,16 @@ import com.automattic.eventhorizon.EventHorizon
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.Instant
 import javax.inject.Inject
-import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.buffer
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
@@ -103,12 +100,7 @@ class MainActivityViewModel
         _state.update { state -> state.copy(shouldShowWhatsNew = false) }
     }
 
-    val playbackState = playbackManager.playbackStateFlow
-        // Old LATEST window of 64; never blocks the relay's emitting thread (BUFFERED would conflate to 1)
-        .buffer(capacity = 64, onBufferOverflow = BufferOverflow.DROP_OLDEST)
-        .onEach {
-            Timber.d("Updated playback state from ${it.lastChangeFrom} is playing ${it.isPlaying}")
-        }
+    val playbackState = playbackManager.playbackStateFlow.conflate()
 
     val signInState: LiveData<SignInState> = userManager.getSignInState().toLiveData()
     val isSignedIn: Boolean
