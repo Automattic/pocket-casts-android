@@ -78,6 +78,7 @@ fun BookmarksPage(
     onHeadphoneControlsButtonClick: () -> Unit,
     onBookmarkDetailClick: (BookmarksViewModel.BookmarkDetailData) -> Unit,
     modifier: Modifier = Modifier,
+    onBookmarkArtworkClick: ((Bookmark) -> Unit)? = null,
 ) {
     val context = LocalContext.current
     val state by bookmarksViewModel.uiState.collectAsStateWithLifecycle()
@@ -94,6 +95,7 @@ fun BookmarksPage(
         onPlayClick = { bookmark ->
             bookmarksViewModel.play(bookmark)
         },
+        onBookmarkArtworkClick = onBookmarkArtworkClick?.takeIf { sourceView != SourceView.PLAYER },
         onSearchTextChange = { bookmarksViewModel.onSearchTextChanged(it) },
         onUpgradeClick = onUpgradeClick,
         openFragment = openFragment,
@@ -152,6 +154,7 @@ private fun Content(
     onPlayClick: (Bookmark) -> Unit,
     onBookmarksOptionsMenuClick: () -> Unit,
     onSearchTextChange: (String) -> Unit,
+    onBookmarkArtworkClick: ((Bookmark) -> Unit)? = null,
     onUpgradeClick: () -> Unit,
     openFragment: (Fragment) -> Unit,
     onSearchBarClearButtonClick: () -> Unit,
@@ -176,6 +179,7 @@ private fun Content(
                 onRowLongClick = onRowLongClick,
                 onOptionsMenuClick = onBookmarksOptionsMenuClick,
                 onPlayClick = onPlayClick,
+                onArtworkClick = onBookmarkArtworkClick,
                 onSearchTextChange = onSearchTextChange,
                 onSearchBarClearButtonClick = onSearchBarClearButtonClick,
             )
@@ -228,6 +232,7 @@ private fun BookmarksView(
     onPlayClick: (Bookmark) -> Unit,
     onSearchTextChange: (String) -> Unit,
     onSearchBarClearButtonClick: () -> Unit,
+    onArtworkClick: ((Bookmark) -> Unit)? = null,
 ) {
     val focusRequester = remember { FocusRequester() }
     LazyColumn(
@@ -291,6 +296,7 @@ private fun BookmarksView(
                 isLoading = bookmark.uuid == resolvingBookmarkUuid,
                 colors = colors,
                 onPlayClick = { onPlayClick(bookmark) },
+                onArtworkClick = onArtworkClick?.let { handler -> { handler(bookmark) } },
                 modifier = Modifier.pointerInput(bookmark.adapterId) {
                     detectTapGestures(
                         onLongPress = { onRowLongClick(bookmark) },
