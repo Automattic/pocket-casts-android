@@ -139,7 +139,7 @@ fun BookmarkTranscriptView(
     }
 }
 
-private fun BookmarkTranscript.isSpeakerOffset(index: Int) = speakerSpans.any { index >= it.start && index < it.end }
+private fun BookmarkTranscript.isSpeakerOffset(index: Int) = speakerSpans.any { index >= it.start && index <= it.end }
 
 private val SimpleTextStyle = TextStyle(
     fontSize = 16.sp,
