@@ -120,8 +120,8 @@ abstract class BaseEpisodeViewHolder<T : Any>(
         val previousUuid = boundItem?.let(::toPodcastEpisode)?.uuid
         setupInitialState(item, tint, isMultiSelectEnabled, streamByDefault)
 
-        val isNewEpisode = previousUuid != episode.uuid || rowDataJob?.isActive != true
-        if (isNewEpisode) {
+        val shouldObserveRowData = previousUuid != episode.uuid || rowDataJob?.isActive != true
+        if (shouldObserveRowData) {
             observeRowData()
         }
         bindArtwork(useEpisodeArtwork)
