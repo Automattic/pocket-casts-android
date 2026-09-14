@@ -125,7 +125,7 @@ internal fun BookmarkDetailPage(
                     elevation = null,
                     modifier = Modifier
                         .clip(RoundedCornerShape(8.dp))
-                        .clickable(onClick = onArtworkClick),
+                        .clickable(onClickLabel = stringResource(LR.string.go_to_episode), onClick = onArtworkClick),
                 )
 
                 Spacer(modifier = Modifier.width(12.dp))
@@ -145,6 +145,7 @@ internal fun BookmarkDetailPage(
                         TextH70(
                             text = episodeTitle,
                             color = colors.primaryText,
+                            maxLines = 2,
                         )
                     }
                 }

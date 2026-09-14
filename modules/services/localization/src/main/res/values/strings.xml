@@ -54,6 +54,7 @@
     <string name="effects">Effects</string>
     <string name="episode_not_found">Episode not found</string>
     <string name="go_to_podcast">Go to podcast</string>
+    <string name="go_to_episode">Go to episode</string>
     <string name="go_to_files">Go to files</string>
     <string name="in_progress">In progress</string>
     <string name="in_progress_uppercase">In Progress</string>
