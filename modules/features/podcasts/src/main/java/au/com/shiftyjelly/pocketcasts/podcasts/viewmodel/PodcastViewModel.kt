@@ -88,6 +88,7 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.flatMapLatest
@@ -475,8 +476,11 @@ class PodcastViewModel @Inject constructor(
         )
     }
 
+    private var playJob: Job? = null
+
     fun play(bookmark: Bookmark) {
-        launch {
+        playJob?.cancel()
+        playJob = launch {
             val bookmarkEpisode = resolveEpisode(bookmark) ?: return@launch
             val hasReferenceTime = bookmark.referenceTime != null
             val isPlayingBookmarkEpisode = playbackManager.isPlaying() &&
