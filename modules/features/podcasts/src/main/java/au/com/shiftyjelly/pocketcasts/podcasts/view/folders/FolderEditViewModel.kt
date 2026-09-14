@@ -30,9 +30,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import java.util.Locale
 import java.util.Optional
 import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -50,8 +47,7 @@ class FolderEditViewModel
     private val settings: Settings,
     private val eventHorizon: EventHorizon,
     private val notificationManager: NotificationManager,
-) : ViewModel(),
-    CoroutineScope {
+) : ViewModel() {
 
     data class State(
         val podcastsWithFolders: List<PodcastFolder> = emptyList(),
@@ -164,9 +160,6 @@ class FolderEditViewModel
             PodcastsSortType.RECENTLY_PLAYED -> defaultSortedPodcasts
         }
     }
-
-    override val coroutineContext: CoroutineContext
-        get() = Dispatchers.Default
 
     fun addPodcast(uuid: String) {
         val uuids = selectedUuids.value.toMutableSet().apply {
