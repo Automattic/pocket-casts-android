@@ -12,12 +12,10 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -26,7 +24,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -37,13 +34,13 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -57,8 +54,8 @@ private const val REVEAL_DURATION = 500
 private const val CARD_CORNER = 12
 
 @Composable
-fun BookmarksAnimation(modifier: Modifier = Modifier) {
-    var revealed by remember { mutableStateOf(false) }
+fun BookmarksAnimation(modifier: Modifier = Modifier, initiallyRevealed: Boolean = false) {
+    var revealed by remember { mutableStateOf(initiallyRevealed) }
     LaunchedEffect(Unit) { revealed = true }
 
     Box(
@@ -114,8 +111,10 @@ private fun BoxScope.StackedCard(
         modifier = Modifier
             .matchParentSize()
             .padding(horizontal = inset)
-            .offset(y = offset)
-            .alpha(alpha)
+            .graphicsLayer {
+                translationY = offset.toPx()
+                this.alpha = alpha
+            }
             .clip(RoundedCornerShape(CARD_CORNER.dp))
             .background(Brush.linearGradient(gradient)),
     )
@@ -143,21 +142,21 @@ private fun BookmarkUpgradeCard(modifier: Modifier = Modifier) {
             modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(2.dp),
         ) {
-            Text(
+            TextP40(
                 text = stringResource(LR.string.bookmarks_upgrade_example_title),
                 color = Color.White,
                 fontSize = 15.sp,
                 fontWeight = FontWeight.W600,
                 maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
+                disableAutoScale = true,
             )
-            Text(
+            TextP40(
                 text = stringResource(LR.string.bookmarks_upgrade_example_passage),
                 color = Color.White.copy(alpha = 0.8f),
                 fontSize = 12.sp,
                 lineHeight = 16.sp,
                 maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
+                disableAutoScale = true,
             )
         }
         TimestampPill()
@@ -174,11 +173,12 @@ private fun TimestampPill() {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(4.dp),
     ) {
-        Text(
+        TextP40(
             text = "6:45",
             color = Color.Black,
             fontSize = 13.sp,
             fontWeight = FontWeight.W500,
+            disableAutoScale = true,
         )
         Icon(
             painter = painterResource(IR.drawable.ic_play),
@@ -195,6 +195,6 @@ private fun BookmarksAnimationPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) theme: Theme.ThemeType,
 ) = AppTheme(theme) {
     Box(modifier = Modifier.padding(vertical = 40.dp)) {
-        BookmarkUpgradeCard()
+        BookmarksAnimation(initiallyRevealed = true)
     }
 }
