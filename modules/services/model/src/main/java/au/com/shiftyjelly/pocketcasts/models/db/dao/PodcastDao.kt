@@ -83,10 +83,6 @@ abstract class PodcastDao {
     abstract fun findUnsubscribedBlocking(): List<Podcast>
 
     @Transaction
-    @Query("SELECT podcasts.uuid FROM podcasts WHERE subscribed = 0")
-    abstract fun findUnsubscribedUuidRxFlowable(): Flowable<List<String>>
-
-    @Transaction
     @Query("SELECT * FROM podcasts WHERE subscribed = 1")
     abstract fun findSubscribedRxFlowable(): Flowable<List<Podcast>>
 
