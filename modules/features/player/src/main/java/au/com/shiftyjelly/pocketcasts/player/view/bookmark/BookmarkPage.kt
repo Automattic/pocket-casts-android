@@ -233,6 +233,7 @@ private fun Content(
 
         RowButton(
             text = stringResource(if (isNewBookmark) R.string.save_bookmark else R.string.change_title),
+            enabled = isNewBookmark || title.text.isNotBlank(),
             colors = ButtonDefaults.buttonColors(backgroundColor = colors.highlight01),
             textColor = textColor,
             includePadding = false,
