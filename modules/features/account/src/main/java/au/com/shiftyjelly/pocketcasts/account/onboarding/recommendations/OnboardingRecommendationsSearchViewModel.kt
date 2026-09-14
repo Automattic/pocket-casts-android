@@ -21,7 +21,6 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -59,14 +58,8 @@ class OnboardingRecommendationsSearchViewModel @Inject constructor(
         searchHandler.setOnlySearchRemote(true)
         viewModelScope.launch {
 
-            val subscribedUuidFlow = podcastManager
-                .findSubscribedNoOrderFlow()
-                .map { ls ->
-                    ls.map { it.uuid }
-                }
-
             combine(
-                subscribedUuidFlow,
+                podcastManager.podcastSubscriptionsFlow(),
                 searchHandler.searchResults,
             ) { subscribedUuids, searchState ->
                 val podcasts = when (searchState) {

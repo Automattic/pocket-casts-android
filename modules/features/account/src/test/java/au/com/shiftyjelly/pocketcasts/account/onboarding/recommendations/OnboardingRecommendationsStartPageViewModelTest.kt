@@ -52,7 +52,7 @@ class OnboardingRecommendationsStartPageViewModelTest {
 
     @Before
     fun setup() = runTest {
-        whenever(podcastManager.findSubscribedNoOrderFlow()).thenReturn(flowOf(emptyList()))
+        whenever(podcastManager.podcastSubscriptionsFlow()).thenReturn(flowOf(emptyList()))
         whenever(repository.getDiscoverFeed()).thenReturn(mockDiscover)
         whenever(repository.getCategoriesList(any())).thenReturn(mockCategories)
         whenever(repository.getListFeed(any(), any())).thenReturn(mockListFeed)
