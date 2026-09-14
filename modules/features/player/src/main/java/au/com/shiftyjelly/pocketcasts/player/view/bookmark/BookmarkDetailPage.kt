@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.player.view.bookmark
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -55,6 +56,7 @@ internal fun BookmarkDetailPage(
     isResolving: Boolean,
     onPlayClick: () -> Unit,
     onClose: () -> Unit,
+    onArtworkClick: () -> Unit,
     modifier: Modifier = Modifier,
     passage: String? = null,
     transcriptState: BookmarkDetailViewModel.TranscriptState = BookmarkDetailViewModel.TranscriptState.None,
@@ -121,6 +123,9 @@ internal fun BookmarkDetailPage(
                     imageSize = 56.dp,
                     cornerSize = 8.dp,
                     elevation = null,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(8.dp))
+                        .clickable(onClick = onArtworkClick),
                 )
 
                 Spacer(modifier = Modifier.width(12.dp))
@@ -299,6 +304,7 @@ private fun BookmarkDetailPagePreview(
             isResolving = false,
             onPlayClick = {},
             onClose = {},
+            onArtworkClick = {},
         )
     }
 }
@@ -320,6 +326,7 @@ private fun BookmarkDetailPageTranscriptPreview(
             isResolving = false,
             onPlayClick = {},
             onClose = {},
+            onArtworkClick = {},
             passage = "Lorem ipsum",
             transcriptState = BookmarkDetailViewModel.TranscriptState.Loaded(
                 transcript = transcript,
