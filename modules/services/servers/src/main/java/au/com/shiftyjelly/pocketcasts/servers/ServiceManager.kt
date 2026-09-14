@@ -69,8 +69,12 @@ open class ServiceManager @Inject constructor(
         }
     }
 
-    private suspend fun postToMainServer(path: String, parameters: Parameters? = null, attemptCount: Int = 1): Result<ServerResponse> {
-        return try {
+    private suspend fun postToMainServer(
+        path: String,
+        parameters: Parameters? = null,
+        attemptCount: Int = 1,
+    ): Result<ServerResponse> = withContext(Dispatchers.IO) {
+        try {
             val requestParams = parameters ?: Parameters()
             addDeviceParameters(requestParams)
             val request = Request.Builder()
@@ -78,7 +82,6 @@ open class ServiceManager @Inject constructor(
                 .post(requestParams.toFormBody())
                 .build()
 
-            // await() resumes on the caller's dispatcher, so callers must switch to IO for the blocking body read
             val response = httpClient.get().newCall(request).await()
             val serverResponse = DataParser.parseServerResponse(response.body.string())
 
