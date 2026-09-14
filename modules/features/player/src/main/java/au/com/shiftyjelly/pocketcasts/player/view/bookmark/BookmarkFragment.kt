@@ -4,6 +4,7 @@ import android.app.Activity
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.activity.compose.BackHandler
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.WindowInsets
@@ -18,6 +19,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.LocalPodcastColors
@@ -28,6 +30,7 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class BookmarkFragment : BaseFragment() {
@@ -53,6 +56,8 @@ class BookmarkFragment : BaseFragment() {
 
     override var statusBarIconColor: StatusBarIconColor = StatusBarIconColor.Light
 
+    private var isClosing = false
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -60,11 +65,13 @@ class BookmarkFragment : BaseFragment() {
     ) = contentWithoutConsumedInsets {
         LaunchedEffect(Unit) { viewModel.load(args) }
 
+        BackHandler(onBack = ::close)
+
         AppThemeWithBackground(theme.activeTheme) {
             val uiState: BookmarkViewModel.UiState by viewModel.uiState.collectAsState()
 
             CallOnce {
-                viewModel.onShown(isNewBookmark = args.bookmarkUuid == null)
+                viewModel.onShown(isNewBookmark = args.isNewBookmark || args.bookmarkUuid == null)
             }
 
             CompositionLocalProvider(
@@ -122,10 +129,15 @@ class BookmarkFragment : BaseFragment() {
     }
 
     private fun close() {
+        if (isClosing) return
+        isClosing = true
         viewModel.onClose()
-        requireActivity().run {
-            setResult(Activity.RESULT_CANCELED)
-            finish()
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.discardNewBookmarkIfNeeded()
+            requireActivity().run {
+                setResult(Activity.RESULT_CANCELED)
+                finish()
+            }
         }
     }
 }

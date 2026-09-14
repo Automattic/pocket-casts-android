@@ -129,6 +129,24 @@ class BookmarkTranscriptTest {
         assertNull(transcript.passageDisplaySpan("a passage no transcript would ever contain", location = null))
     }
 
+    @Test
+    fun `reference time maps a display offset to its entry start time`() {
+        val timed = bookmarkTranscript(
+            TranscriptEntry.Text("First line.", startTimeMs = 1000),
+            TranscriptEntry.Text("Second line.", startTimeMs = 5000),
+        )
+
+        assertEquals(1000L, timed.referenceTimeMsAt(0))
+        assertEquals(5000L, timed.referenceTimeMsAt(timed.displayText.indexOf("Second")))
+    }
+
+    @Test
+    fun `reference time is null for an untimed entry`() {
+        val untimed = bookmarkTranscript(TranscriptEntry.Text("No timing here."))
+
+        assertNull(untimed.referenceTimeMsAt(0))
+    }
+
     private fun flatText() = listOf(firstSentence, secondSentence, thirdSentence).joinToString(" ")
 
     private fun bookmarkTranscript(vararg entries: TranscriptEntry) = BookmarkTranscript.from(

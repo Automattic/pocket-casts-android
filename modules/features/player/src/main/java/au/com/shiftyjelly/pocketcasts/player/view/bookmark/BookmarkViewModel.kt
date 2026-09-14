@@ -50,9 +50,8 @@ class BookmarkViewModel
         val bookmarkUuid: String? = null,
         val title: TextFieldValue = buildSelectedTextFieldValue(DEFAULT_TITLE),
         val passage: String? = null,
-    ) {
-        val isNewBookmark: Boolean = bookmarkUuid == null
-    }
+        val isNewBookmark: Boolean = true,
+    )
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
 
@@ -62,8 +61,10 @@ class BookmarkViewModel
     fun load(arguments: BookmarkArguments) {
         this.arguments = arguments
         val bookmarkUuid = arguments.bookmarkUuid
+        val editingExisting = bookmarkUuid != null && !arguments.isNewBookmark
         mutableUiState.value = mutableUiState.value.copy(
             bookmarkUuid = bookmarkUuid,
+            isNewBookmark = !editingExisting,
         )
         viewModelScope.launch {
             // load the existing bookmark
@@ -81,8 +82,17 @@ class BookmarkViewModel
                     bookmarkUuid = bookmark.uuid,
                     title = buildSelectedTextFieldValue(bookmark.title),
                     passage = displayPassage(bookmark),
+                    isNewBookmark = mutableUiState.value.isNewBookmark && bookmarkUuid != null,
                 )
             }
+        }
+    }
+
+    suspend fun discardNewBookmarkIfNeeded() {
+        val state = uiState.value
+        val bookmarkUuid = state.bookmarkUuid
+        if (state.isNewBookmark && bookmarkUuid != null) {
+            bookmarkManager.deleteToSync(bookmarkUuid)
         }
     }
 
@@ -108,7 +118,7 @@ class BookmarkViewModel
                 val state = uiState.value
                 val bookmarkUuid = state.bookmarkUuid
                 val episodeUuid = arguments.episodeUuid
-                val isExistingBookmark = bookmarkUuid != null
+                val isExistingBookmark = !state.isNewBookmark
                 val bookmark = if (bookmarkUuid == null) {
                     val episode = episodeManager.findByUuid(episodeUuid)
                         ?: userEpisodeManager.findEpisodeByUuid(episodeUuid)
