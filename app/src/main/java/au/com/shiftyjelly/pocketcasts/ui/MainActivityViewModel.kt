@@ -104,8 +104,8 @@ class MainActivityViewModel
     }
 
     val playbackState = playbackManager.playbackStateFlow
-        // Drop rather than suspend so a slow collector never blocks the relay's emitting thread
-        .buffer(onBufferOverflow = BufferOverflow.DROP_OLDEST)
+        // Old LATEST window of 64; never blocks the relay's emitting thread (BUFFERED would conflate to 1)
+        .buffer(capacity = 64, onBufferOverflow = BufferOverflow.DROP_OLDEST)
         .onEach {
             Timber.d("Updated playback state from ${it.lastChangeFrom} is playing ${it.isPlaying}")
         }
