@@ -1,6 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.player.view.bookmark
 
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
+import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptEntry
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptType
@@ -16,9 +18,12 @@ import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import io.reactivex.Single
+import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -183,14 +188,78 @@ class BookmarkDetailViewModelTest {
         assertEquals(secondSentence, transcriptState.transcript.displaySubstring(transcriptState.passage!!))
     }
 
-    private fun load(passage: String?, passageLocation: Int?, timeSecs: Int = 0, referenceTime: Int? = null) {
+    @Test
+    fun `loads the bookmark episode into the state`() = runTest {
+        val episode = PodcastEpisode(uuid = episodeUuid, publishedDate = Date())
+        whenever(episodeManager.findEpisodeByUuid(episodeUuid)).thenReturn(episode)
+
+        load(passage = null, passageLocation = null)
+
+        assertEquals(episode, viewModel.uiState.value.episode)
+    }
+
+    @Test
+    fun `reads use episode artwork from the artwork configuration`() = runTest {
+        val artworkConfiguration = mock<UserSetting<ArtworkConfiguration>> {
+            on { value } doReturn ArtworkConfiguration(useEpisodeArtwork = true)
+        }
+        whenever(settings.artworkConfiguration).thenReturn(artworkConfiguration)
+
+        load(passage = null, passageLocation = null)
+
+        assertTrue(viewModel.uiState.value.useEpisodeArtwork)
+    }
+
+    @Test
+    fun `fetches the podcast title when it is missing`() = runTest {
+        whenever(podcastManager.findOrDownloadPodcastRxSingle(podcastUuid, false))
+            .thenReturn(Single.just(Podcast(uuid = podcastUuid, title = "Fetched")))
+
+        load(passage = null, passageLocation = null, podcastTitle = "")
+
+        val state = viewModel.uiState.value
+        assertEquals("Fetched", state.podcastTitle)
+        assertFalse(state.isPodcastTitleLoading)
+    }
+
+    @Test
+    fun `computes the reference offset at the bookmark time`() = runTest {
+        val timed = Transcript.Text(
+            entries = listOf(
+                TranscriptEntry.Text(firstSentence, startTimeMs = 0),
+                TranscriptEntry.Text(secondSentence, startTimeMs = 10_000),
+            ),
+            type = TranscriptType.Vtt,
+            url = "https://example.com/transcript.vtt",
+            isGenerated = true,
+            episodeUuid = episodeUuid,
+            podcastUuid = podcastUuid,
+        )
+        whenever(transcriptManager.loadGeneratedTranscript(episodeUuid)).thenReturn(timed)
+
+        load(passage = secondSentence, passageLocation = firstSentence.length + 1, referenceTimeSecs = 10)
+
+        val state = viewModel.uiState.value.transcriptState
+        assertTrue(state is BookmarkDetailViewModel.TranscriptState.Loaded)
+        state as BookmarkDetailViewModel.TranscriptState.Loaded
+        assertEquals(state.transcript.displayText.indexOf(secondSentence), state.referenceOffset)
+    }
+
+    private fun load(
+        passage: String?,
+        passageLocation: Int?,
+        podcastTitle: String = "Podcast",
+        referenceTimeSecs: Int = 0,
+        timeSecs: Int = 0,
+        referenceTime: Int? = null,
+    ) {
         viewModel.load(
             bookmarkUuid = bookmarkUuid,
             title = "Title",
             episodeUuid = episodeUuid,
             podcastUuid = podcastUuid,
-            podcastTitle = "Podcast",
-            referenceTimeSecs = 0,
+            podcastTitle = podcastTitle,
+            referenceTimeSecs = referenceTimeSecs,
             passage = passage,
             passageLocation = passageLocation,
             timeSecs = timeSecs,
