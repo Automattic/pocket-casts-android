@@ -71,6 +71,7 @@ fun BookmarkTranscriptView(
     editable: Boolean = false,
     scrollToPassage: Boolean = true,
     anchorFraction: Float = 0.5f,
+    referenceOffset: Int? = null,
     onPassageChange: (TextSpan) -> Unit = {},
 ) {
     val theme = rememberTranscriptTheme()
@@ -161,14 +162,14 @@ fun BookmarkTranscriptView(
                 SelectionContainer(content = renderText)
             }
             if (!editable && passage != null) {
-                val glyphBox = layout?.getBoundingBox(
-                    passage.start.coerceIn(0, transcript.displayText.length.coerceAtLeast(1) - 1),
-                )
+                val glyphOffset = (referenceOffset ?: passage.start)
+                    .coerceIn(0, transcript.displayText.length.coerceAtLeast(1) - 1)
+                val glyphBox = layout?.getBoundingBox(glyphOffset)
                 if (glyphBox != null) {
                     Icon(
                         painter = painterResource(IR.drawable.ic_bookmark),
                         contentDescription = null,
-                        tint = theme.highlightText,
+                        tint = theme.primaryText,
                         modifier = Modifier
                             .size(GlyphSize)
                             .offset {
@@ -210,7 +211,7 @@ private val SpeakerSpanStyle = SpanStyle(
 
 private val ContentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 48.dp, bottom = 64.dp)
 
-private val GlyphSize = 14.dp
+private val GlyphSize = 16.dp
 private val GutterInset = 2.dp
 
 private val TopFade = 48.dp
