@@ -136,6 +136,8 @@ class PodcastAdapter(
     private val ratingsViewModel: PodcastRatingsViewModel,
     private val onTabClicked: (PodcastTab) -> Unit,
     private val onBookmarkPlayClicked: (Bookmark) -> Unit,
+    private val onBookmarkClick: (Bookmark, BaseEpisode) -> Unit,
+    private val onBookmarkArtworkClick: (Bookmark) -> Unit,
     private val onHeadsetSettingsClicked: () -> Unit,
     private val onGetBookmarksClicked: () -> Unit,
     private val onChangeHeaderExpanded: (String, Boolean) -> Unit,
@@ -177,6 +179,7 @@ class PodcastAdapter(
         val onBookmarkPlayClicked: (Bookmark) -> Unit,
         val onBookmarkRowLongPress: (Bookmark) -> Unit,
         val onBookmarkRowClick: (Bookmark, Int) -> Unit,
+        val onBookmarkArtworkClick: () -> Unit,
         val isMultiSelecting: () -> Boolean,
         val isSelected: (Bookmark) -> Boolean,
     )
@@ -604,20 +607,26 @@ class PodcastAdapter(
                     )
                 } else {
                     addAll(
-                        bookmarks.map {
+                        bookmarks.map { bookmark ->
+                            val episode = episodes.find { it.uuid == bookmark.episodeUuid } ?: noOpEpisode
                             BookmarkItemData(
-                                bookmark = it,
-                                episode = episodes.find { episode -> episode.uuid == it.episodeUuid } ?: noOpEpisode,
+                                bookmark = bookmark,
+                                episode = episode,
                                 onBookmarkPlayClicked = onBookmarkPlayClicked,
                                 onBookmarkRowLongPress = onBookmarkRowLongPress,
-                                onBookmarkRowClick = { bookmark, adapterPosition ->
-                                    multiSelectBookmarksHelper.toggle(bookmark)
-                                    notifyItemChanged(adapterPosition)
+                                onBookmarkRowClick = { clickedBookmark, adapterPosition ->
+                                    if (multiSelectBookmarksHelper.isMultiSelecting) {
+                                        multiSelectBookmarksHelper.toggle(clickedBookmark)
+                                        notifyItemChanged(adapterPosition)
+                                    } else {
+                                        onBookmarkClick(clickedBookmark, episode)
+                                    }
                                 },
+                                onBookmarkArtworkClick = { onBookmarkArtworkClick(bookmark) },
                                 isMultiSelecting = { multiSelectBookmarksHelper.isMultiSelecting },
-                                isSelected = { bookmark ->
+                                isSelected = { selectedBookmark ->
                                     multiSelectBookmarksHelper.isSelected(
-                                        bookmark,
+                                        selectedBookmark,
                                     )
                                 },
                                 useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork(Element.Bookmarks),
