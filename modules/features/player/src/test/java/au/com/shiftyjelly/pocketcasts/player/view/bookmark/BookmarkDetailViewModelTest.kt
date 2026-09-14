@@ -4,7 +4,11 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptEntry
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptType
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.shownotes.ShowNotesManager
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
@@ -18,6 +22,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verifyBlocking
@@ -33,9 +38,11 @@ class BookmarkDetailViewModelTest {
     val featureFlagRule = InMemoryFeatureFlagRule()
 
     private val bookmarkManager = mock<BookmarkManager>()
+    private val episodeManager = mock<EpisodeManager>()
     private val transcriptManager = mock<TranscriptManager>()
     private val showNotesManager = mock<ShowNotesManager>()
-    private val viewModel = BookmarkDetailViewModel(bookmarkManager, transcriptManager, showNotesManager)
+    private val settings = mock<Settings>()
+    private val viewModel = BookmarkDetailViewModel(bookmarkManager, episodeManager, transcriptManager, showNotesManager, settings)
 
     private val bookmarkUuid = "bookmark-id"
     private val episodeUuid = "episode-id"
@@ -54,6 +61,10 @@ class BookmarkDetailViewModelTest {
     @Before
     fun setUp() {
         FeatureFlag.setEnabled(Feature.SMART_BOOKMARKS, true)
+        val artworkConfiguration = mock<UserSetting<ArtworkConfiguration>> {
+            on { value } doReturn ArtworkConfiguration(useEpisodeArtwork = false)
+        }
+        whenever(settings.artworkConfiguration).thenReturn(artworkConfiguration)
     }
 
     @Test
