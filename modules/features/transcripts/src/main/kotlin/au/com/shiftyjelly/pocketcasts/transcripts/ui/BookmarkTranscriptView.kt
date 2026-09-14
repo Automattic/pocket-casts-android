@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -93,47 +94,54 @@ fun BookmarkTranscriptView(
             .fadingEdges()
             .verticalScroll(scrollState),
     ) {
-        Text(
-            text = text,
-            style = SimpleTextStyle,
-            onTextLayout = { layout = it },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(ContentPadding)
-                .then(
-                    if (editable) {
-                        Modifier
-                            .pointerInput(transcript) {
-                                detectTapGestures { position ->
-                                    val result = currentLayout ?: return@detectTapGestures
-                                    val offset = result.getOffsetForPosition(position)
-                                    if (!transcript.isSpeakerOffset(offset)) {
-                                        currentPassageChange(transcript.sentenceDisplaySpan(offset))
+        val renderText: @Composable () -> Unit = {
+            Text(
+                text = text,
+                style = SimpleTextStyle,
+                onTextLayout = { layout = it },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(ContentPadding)
+                    .then(
+                        if (editable) {
+                            Modifier
+                                .pointerInput(transcript) {
+                                    detectTapGestures { position ->
+                                        val result = currentLayout ?: return@detectTapGestures
+                                        val offset = result.getOffsetForPosition(position)
+                                        if (!transcript.isSpeakerOffset(offset)) {
+                                            currentPassageChange(transcript.sentenceDisplaySpan(offset))
+                                        }
                                     }
                                 }
-                            }
-                            .pointerInput(transcript) {
-                                var anchor: TextSpan? = null
-                                detectDragGesturesAfterLongPress(
-                                    onDragStart = { position ->
-                                        val result = currentLayout ?: return@detectDragGesturesAfterLongPress
-                                        val offset = result.getOffsetForPosition(position)
-                                        anchor = if (transcript.isSpeakerOffset(offset)) null else transcript.sentenceDisplaySpan(offset)
-                                        anchor?.let(currentPassageChange)
-                                    },
-                                    onDrag = { change, _ ->
-                                        val result = currentLayout ?: return@detectDragGesturesAfterLongPress
-                                        val start = anchor ?: return@detectDragGesturesAfterLongPress
-                                        val focus = transcript.sentenceDisplaySpan(result.getOffsetForPosition(change.position))
-                                        currentPassageChange(TextSpan(min(start.start, focus.start), max(start.end, focus.end)))
-                                    },
-                                )
-                            }
-                    } else {
-                        Modifier
-                    },
-                ),
-        )
+                                .pointerInput(transcript) {
+                                    var anchor: TextSpan? = null
+                                    detectDragGesturesAfterLongPress(
+                                        onDragStart = { position ->
+                                            val result = currentLayout ?: return@detectDragGesturesAfterLongPress
+                                            val offset = result.getOffsetForPosition(position)
+                                            anchor = if (transcript.isSpeakerOffset(offset)) null else transcript.sentenceDisplaySpan(offset)
+                                            anchor?.let(currentPassageChange)
+                                        },
+                                        onDrag = { change, _ ->
+                                            val result = currentLayout ?: return@detectDragGesturesAfterLongPress
+                                            val start = anchor ?: return@detectDragGesturesAfterLongPress
+                                            val focus = transcript.sentenceDisplaySpan(result.getOffsetForPosition(change.position))
+                                            currentPassageChange(TextSpan(min(start.start, focus.start), max(start.end, focus.end)))
+                                        },
+                                    )
+                                }
+                        } else {
+                            Modifier
+                        },
+                    ),
+            )
+        }
+        if (editable) {
+            renderText()
+        } else {
+            SelectionContainer(content = renderText)
+        }
     }
 
     LaunchedEffect(layout, viewportHeight) {
