@@ -11,9 +11,11 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.lifecycleScope
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toLocalizedFormatPattern
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
@@ -23,8 +25,10 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.rx2.await
 import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -96,6 +100,9 @@ class BookmarkDetailFragment : BaseDialogFragment() {
     internal lateinit var episodeManager: EpisodeManager
 
     @Inject
+    internal lateinit var podcastManager: PodcastManager
+
+    @Inject
     internal lateinit var eventHorizon: EventHorizon
 
     @Inject
@@ -128,7 +135,7 @@ class BookmarkDetailFragment : BaseDialogFragment() {
 
     private fun onPlayClick() {
         lifecycleScope.launch {
-            val episode = episodeManager.findEpisodeByUuid(args.episodeUuid)
+            val episode = resolveEpisode()
             if (episode == null) {
                 Toast.makeText(
                     requireContext(),
@@ -145,8 +152,13 @@ class BookmarkDetailFragment : BaseDialogFragment() {
             if (pausedForResolve) {
                 playbackManager.pauseSuspend()
             }
-            if (hasReferenceTime) {
-                isResolving.value = true
+            val spinnerJob = if (hasReferenceTime) {
+                launch {
+                    delay(PLAY_SPINNER_DELAY_MS)
+                    isResolving.value = true
+                }
+            } else {
+                null
             }
             val seekToMs = try {
                 bookmarkPlaybackTimeResolver.playbackTimeMs(
@@ -165,6 +177,7 @@ class BookmarkDetailFragment : BaseDialogFragment() {
                 }
                 throw e
             } finally {
+                spinnerJob?.cancel()
                 isResolving.value = false
             }
             playbackManager.playNowSuspend(episode, sourceView = args.sourceView)
@@ -179,4 +192,16 @@ class BookmarkDetailFragment : BaseDialogFragment() {
             dismiss()
         }
     }
+
+    private suspend fun resolveEpisode(): BaseEpisode? {
+        episodeManager.findEpisodeByUuid(args.episodeUuid)?.let { return it }
+        val podcast = runCatching { podcastManager.findOrDownloadPodcastRxSingle(args.podcastUuid).await() }.getOrNull() ?: return null
+        return if (!podcast.isSubscribed) {
+            episodeManager.downloadMissingPodcastEpisode(args.episodeUuid, args.podcastUuid)
+        } else {
+            episodeManager.findEpisodeByUuid(args.episodeUuid)
+        }
+    }
 }
+
+private const val PLAY_SPINNER_DELAY_MS = 250L
