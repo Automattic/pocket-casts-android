@@ -7,6 +7,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration.Element
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.shownotes.ShowNotesManager
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.BookmarkTranscript
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TextSpan
@@ -19,11 +20,13 @@ import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.rx2.await
 
 @HiltViewModel
 class BookmarkDetailViewModel @Inject constructor(
     private val bookmarkManager: BookmarkManager,
     private val episodeManager: EpisodeManager,
+    private val podcastManager: PodcastManager,
     private val transcriptManager: TranscriptManager,
     private val showNotesManager: ShowNotesManager,
     private val settings: Settings,
@@ -46,6 +49,8 @@ class BookmarkDetailViewModel @Inject constructor(
         val referenceTime: Int? = null,
         val episode: BaseEpisode? = null,
         val useEpisodeArtwork: Boolean = false,
+        val podcastTitle: String = "",
+        val isPodcastTitleLoading: Boolean = false,
         val transcriptState: TranscriptState = TranscriptState.None,
     )
 
@@ -63,6 +68,7 @@ class BookmarkDetailViewModel @Inject constructor(
         title: String,
         episodeUuid: String,
         podcastUuid: String,
+        podcastTitle: String,
         passage: String?,
         passageLocation: Int?,
         timeSecs: Int,
@@ -79,8 +85,10 @@ class BookmarkDetailViewModel @Inject constructor(
             timeSecs = timeSecs,
             referenceTime = referenceTime,
             useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork(Element.Bookmarks),
+            podcastTitle = podcastTitle,
         )
         loadEpisode()
+        loadPodcastTitle(podcastTitle)
         loadTranscript(passage, passageLocation)
     }
 
@@ -88,6 +96,22 @@ class BookmarkDetailViewModel @Inject constructor(
         viewModelScope.launch {
             val episode = episodeManager.findEpisodeByUuid(episodeUuid)
             mutableState.value = mutableState.value.copy(episode = episode)
+        }
+    }
+
+    private fun loadPodcastTitle(current: String) {
+        if (current.isNotBlank()) return
+        mutableState.value = mutableState.value.copy(isPodcastTitleLoading = true)
+        viewModelScope.launch {
+            val podcast = runCatching {
+                podcastManager.findOrDownloadPodcastRxSingle(podcastUuid, waitForSubscribe = false).await()
+            }.onFailure {
+                if (it is CancellationException) throw it
+            }.getOrNull()
+            mutableState.value = mutableState.value.copy(
+                podcastTitle = podcast?.title.orEmpty(),
+                isPodcastTitleLoading = false,
+            )
         }
     }
 

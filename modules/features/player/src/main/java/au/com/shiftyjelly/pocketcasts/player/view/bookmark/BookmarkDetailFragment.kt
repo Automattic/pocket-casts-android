@@ -163,6 +163,7 @@ class BookmarkDetailFragment : BaseDialogFragment() {
             title = args.title,
             episodeUuid = args.episodeUuid,
             podcastUuid = args.podcastUuid,
+            podcastTitle = args.podcastTitle,
             passage = args.passage,
             passageLocation = args.passageLocation,
             timeSecs = args.timeSecs,
@@ -179,7 +180,7 @@ class BookmarkDetailFragment : BaseDialogFragment() {
                 BookmarkDetailPage(
                     title = uiState.title,
                     episodeTitle = args.episodeTitle,
-                    podcastTitle = args.podcastTitle,
+                    podcastTitle = uiState.podcastTitle,
                     timeSecs = uiState.timeSecs,
                     createdAtText = args.createdAtText,
                     isResolving = resolving,
@@ -189,6 +190,7 @@ class BookmarkDetailFragment : BaseDialogFragment() {
                     onMoreClick = ::onMoreClick,
                     episode = uiState.episode,
                     useEpisodeArtwork = uiState.useEpisodeArtwork,
+                    isPodcastTitleLoading = uiState.isPodcastTitleLoading,
                     passage = uiState.passage,
                     transcriptState = uiState.transcriptState,
                 )
