@@ -20,6 +20,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -92,9 +93,11 @@ fun BookmarkRow(
     onFetchEpisode: (suspend () -> BaseEpisode?)? = null,
 ) {
     var fetchedEpisode by remember(bookmark.uuid) { mutableStateOf<BaseEpisode?>(null) }
+    val latestEpisode by rememberUpdatedState(episode)
+    val latestFetch by rememberUpdatedState(onFetchEpisode)
     LaunchedEffect(bookmark.uuid) {
-        if (episode == null && onFetchEpisode != null) {
-            fetchedEpisode = onFetchEpisode()
+        if (latestEpisode == null) {
+            fetchedEpisode = latestFetch?.invoke()
         }
     }
     val displayEpisode = episode ?: fetchedEpisode
