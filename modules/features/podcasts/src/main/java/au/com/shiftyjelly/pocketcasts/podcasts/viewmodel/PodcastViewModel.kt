@@ -185,7 +185,7 @@ class PodcastViewModel @Inject constructor(
                 podcast.postValue(newPodcast)
             }
 
-        val recommendationsFlowable = recommendationsHandler.getRecommendationsFlowable(uuid)
+        val recommendationsFlowable = recommendationsHandler.getRecommendationsFlow(uuid).asFlowable()
 
         Flowable.combineLatest(
             podcastFlowable,

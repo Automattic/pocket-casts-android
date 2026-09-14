@@ -4,12 +4,19 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.servers.model.ListFeed
-import io.reactivex.BackpressureStrategy
-import io.reactivex.Flowable
-import io.reactivex.Maybe
-import io.reactivex.subjects.BehaviorSubject
 import javax.inject.Inject
-import kotlinx.coroutines.rx2.rxMaybe
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.update
 import timber.log.Timber
 
 sealed class RecommendationsResult {
@@ -23,74 +30,58 @@ class RecommendationsHandler @Inject constructor(
     private val podcastManager: PodcastManager,
     private val settings: Settings,
 ) {
-    private val enabledObservable = BehaviorSubject.createDefault(false)
-    private val retryCountObservable = BehaviorSubject.createDefault(0)
+    private val enabled = MutableStateFlow(false)
+    private val retryCount = MutableStateFlow(0)
 
     fun setEnabled(enabled: Boolean) {
-        enabledObservable.onNext(enabled)
+        this.enabled.value = enabled
     }
 
-    fun getRecommendationsFlowable(podcastUuid: String): Flowable<RecommendationsResult> {
-        return Flowable
-            .combineLatest(
-                enabledObservable.toFlowable(BackpressureStrategy.LATEST).distinctUntilChanged(),
-                retryCountObservable.toFlowable(BackpressureStrategy.LATEST).distinctUntilChanged(),
-            ) { enabled, _ -> enabled }
-            .switchMap { enabled ->
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun getRecommendationsFlow(podcastUuid: String): Flow<RecommendationsResult> {
+        // Each retry re-emits the enabled value so flatMapLatest restarts the request.
+        return combine(enabled, retryCount) { enabled, _ -> enabled }
+            .flatMapLatest { enabled ->
                 if (enabled) {
-                    getRecommendationsMaybe(podcastUuid)
-                        .toFlowable()
-                        .removePodcast(podcastUuid)
-                        .addSubscribedStatusFlowable()
-                        .map { listFeed ->
-                            if (listFeed.podcasts.isNullOrEmpty() && listFeed.podroll.isNullOrEmpty()) {
-                                RecommendationsResult.Empty
-                            } else {
-                                RecommendationsResult.Success(listFeed)
-                            }
-                        }
-                        .onErrorReturn { error ->
-                            Timber.e(error, "Error loading recommendations")
-                            RecommendationsResult.Empty
-                        }
+                    recommendationsFlow(podcastUuid)
                 } else {
-                    Flowable.just(RecommendationsResult.Empty)
+                    flowOf(RecommendationsResult.Empty)
                 }
-            }.startWith(RecommendationsResult.Loading)
+            }
+            .onStart { emit(RecommendationsResult.Loading) }
     }
 
-    private fun getRecommendationsMaybe(podcastUuid: String): Maybe<ListFeed> = rxMaybe {
-        listRepository.getPodcastRecommendations(
-            podcastUuid = podcastUuid,
-            countryCode = settings.discoverCountryCode.value,
+    private fun recommendationsFlow(podcastUuid: String): Flow<RecommendationsResult> {
+        return flow {
+            // A failed request returns null and emits nothing, leaving the previous result in place.
+            val listFeed = listRepository.getPodcastRecommendations(
+                podcastUuid = podcastUuid,
+                countryCode = settings.discoverCountryCode.value,
+            ) ?: return@flow
+            val feedWithoutPodcast = listFeed.copy(podcasts = listFeed.podcasts?.filter { it.uuid != podcastUuid })
+            val results = podcastManager.podcastSubscriptionsFlow().map { subscribedUuids ->
+                val feed = feedWithoutPodcast.withSubscribedStatus(subscribedUuids)
+                if (feed.podcasts.isNullOrEmpty() && feed.podroll.isNullOrEmpty()) {
+                    RecommendationsResult.Empty
+                } else {
+                    RecommendationsResult.Success(feed)
+                }
+            }
+            emitAll(results)
+        }.catch { error ->
+            Timber.e(error, "Error loading recommendations")
+            emit(RecommendationsResult.Empty)
+        }
+    }
+
+    private fun ListFeed.withSubscribedStatus(subscribedUuids: List<String>): ListFeed {
+        return copy(
+            podcasts = podcasts?.map { podcast -> podcast.copy(isSubscribed = subscribedUuids.contains(podcast.uuid)) },
+            podroll = podroll?.map { podcast -> podcast.copy(isSubscribed = subscribedUuids.contains(podcast.uuid)) },
         )
     }
 
-    private fun Flowable<ListFeed>.removePodcast(podcastUuid: String): Flowable<ListFeed> {
-        return map { list ->
-            val filteredPodcasts = list.podcasts?.filter { it.uuid != podcastUuid }
-            list.copy(podcasts = filteredPodcasts)
-        }
-    }
-
-    private fun Flowable<ListFeed>.addSubscribedStatusFlowable(): Flowable<ListFeed> {
-        return switchMap { list ->
-            podcastManager.getSubscribedPodcastUuidsRxSingle()
-                .toFlowable()
-                .mergeWith(podcastManager.podcastSubscriptionsRxFlowable())
-                .map { subscribedList ->
-                    val podcasts = list.podcasts?.map { podcast ->
-                        podcast.copy(isSubscribed = subscribedList.contains(podcast.uuid))
-                    }
-                    val podroll = list.podroll?.map { podcast ->
-                        podcast.copy(isSubscribed = subscribedList.contains(podcast.uuid))
-                    }
-                    list.copy(podcasts = podcasts, podroll = podroll)
-                }
-        }
-    }
-
     fun retry() {
-        retryCountObservable.onNext((retryCountObservable.value ?: 0) + 1)
+        retryCount.update { it + 1 }
     }
 }
