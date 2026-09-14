@@ -288,7 +288,7 @@ private fun TranscriptMessageEffect(viewModel: TranscriptViewModel?) {
                 }
 
                 is TranscriptMessage.OpenBookmarkEditor -> {
-                    context.startActivity(ChangeBookmarkTitleDeepLink(message.bookmarkUuid).toIntent(context))
+                    context.startActivity(ChangeBookmarkTitleDeepLink(message.bookmarkUuid, isNewBookmark = true).toIntent(context))
                 }
             }
         }
