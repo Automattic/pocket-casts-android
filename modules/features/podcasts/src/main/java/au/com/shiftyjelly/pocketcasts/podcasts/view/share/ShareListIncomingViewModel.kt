@@ -2,7 +2,7 @@ package au.com.shiftyjelly.pocketcasts.podcasts.view.share
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.toLiveData
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -15,7 +15,6 @@ import com.automattic.eventhorizon.IncomingShareListSubscribedAllEvent
 import com.automattic.eventhorizon.PodcastSubscribedEvent
 import com.automattic.eventhorizon.PodcastUnsubscribedEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
@@ -33,12 +32,7 @@ class ShareListIncomingViewModel
     CoroutineScope {
     var isFragmentChangingConfigurations: Boolean = false
     val share = MutableLiveData<ShareState>()
-    val subscribedUuids =
-        podcastManager.getSubscribedPodcastUuidsRxSingle()
-            .subscribeOn(Schedulers.io())
-            .toFlowable()
-            .mergeWith(podcastManager.podcastSubscriptionsRxFlowable())
-            .toLiveData()
+    val subscribedUuids = podcastManager.podcastSubscriptionsFlow().asLiveData()
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
