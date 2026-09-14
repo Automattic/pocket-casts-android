@@ -46,6 +46,7 @@ interface BookmarkManager {
     fun enrichBookmark(bookmark: Bookmark)
     fun enrichBookmarkPassage(bookmark: Bookmark)
     suspend fun suggestBookmark(episodeUuid: String, timeSecs: Int): BookmarkSuggestion?
+    suspend fun suggestTitle(passage: String): String?
 
     var sourceView: SourceView
 }
