@@ -377,6 +377,8 @@ class ShelfSharedViewModel @Inject constructor(
             get() = shelfItems.drop(MIN_SHELF_ITEMS_SIZE)
         val showBookmarkTooltip: Boolean
             get() = isSmartBookmarksPromoActive && ShelfItem.Bookmark in playerShelfItems
+        val showBookmarkOverflowTooltip: Boolean
+            get() = isSmartBookmarksPromoActive && ShelfItem.Bookmark in playerBottomSheetShelfItems
     }
 
     data class PlayerShelfData(
