@@ -121,7 +121,7 @@ class BookmarkDetailFragment : BaseDialogFragment() {
         savedInstanceState: Bundle?,
     ) = contentWithoutConsumedInsets {
         val hasTranscript = args.passage != null && FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS)
-        LaunchedEffect(Unit) { viewModel.load(args.episodeUuid, args.passage, args.passageLocation) }
+        LaunchedEffect(Unit) { viewModel.load(args.episodeUuid, args.podcastUuid, args.passage, args.passageLocation) }
         DialogBox(fillMaxHeight = hasTranscript) {
             val resolving by isResolving.collectAsState()
             val transcriptState by viewModel.transcriptState.collectAsState()
