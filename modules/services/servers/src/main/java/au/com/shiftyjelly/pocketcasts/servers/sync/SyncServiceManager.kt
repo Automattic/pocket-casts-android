@@ -362,8 +362,7 @@ open class SyncServiceManager @Inject constructor(
     }
 
     suspend fun signOut() {
-        val cache = withContext(Dispatchers.Default) { cache.get() }
-        cache.evictAll()
+        withContext(Dispatchers.IO) { cache.get().evictAll() }
     }
 
     private fun buildBasicRequest(): BasicRequest {
