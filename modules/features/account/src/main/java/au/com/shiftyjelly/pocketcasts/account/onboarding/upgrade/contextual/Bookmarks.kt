@@ -146,6 +146,7 @@ private fun BookmarkUpgradeCard(modifier: Modifier = Modifier) {
                 text = stringResource(LR.string.bookmarks_upgrade_example_title),
                 color = Color.White,
                 fontSize = 15.sp,
+                lineHeight = 20.sp,
                 fontWeight = FontWeight.W600,
                 maxLines = 1,
                 disableAutoScale = true,
