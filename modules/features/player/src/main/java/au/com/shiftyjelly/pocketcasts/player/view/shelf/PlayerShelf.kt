@@ -157,6 +157,7 @@ fun PlayerShelf(
             )
         },
         showBookmarkTooltip = shelfItemsState.showBookmarkTooltip,
+        showBookmarkOverflowTooltip = shelfItemsState.showBookmarkOverflowTooltip,
         onBookmarkTooltipDismiss = { shelfSharedViewModel.dismissBookmarkTooltip() },
         modifier = modifier,
     )
@@ -184,6 +185,7 @@ private fun PlayerShelfContent(
     onMoreClick: () -> Unit,
     modifier: Modifier = Modifier,
     showBookmarkTooltip: Boolean = false,
+    showBookmarkOverflowTooltip: Boolean = false,
     onBookmarkTooltipDismiss: () -> Unit = {},
     playerColors: PlayerColors = MaterialTheme.theme.rememberPlayerColorsOrDefault(),
 ) {
@@ -286,10 +288,22 @@ private fun PlayerShelfContent(
                 )
             }
         }
-        MoreButton(
-            playerColors = playerColors,
-            onClick = onMoreClick,
-        )
+        Box {
+            MoreButton(
+                playerColors = playerColors,
+                onClick = onMoreClick,
+            )
+            if (showBookmarkOverflowTooltip) {
+                TooltipPopup(
+                    title = stringResource(LR.string.bookmark_player_tip_title),
+                    body = stringResource(LR.string.bookmark_player_tip_message),
+                    tipPosition = TipPosition.BottomEnd,
+                    anchorOffset = DpOffset(0.dp, (-4).dp),
+                    clickableElevationPadding = true,
+                    onClick = onBookmarkTooltipDismiss,
+                )
+            }
+        }
     }
 }
 
