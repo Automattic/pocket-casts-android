@@ -166,8 +166,8 @@ fun BookmarkTranscriptView(
             } else {
                 SelectionContainer(content = renderText)
             }
-            if (!editable && passage != null) {
-                val glyphOffset = (referenceOffset ?: passage.start)
+            if (!editable && referenceOffset != null) {
+                val glyphOffset = referenceOffset
                     .coerceIn(0, transcript.displayText.length.coerceAtLeast(1) - 1)
                 val glyphBox = layout?.getBoundingBox(glyphOffset)
                 if (glyphBox != null) {
@@ -223,7 +223,7 @@ private val GutterInset = 2.dp
 private val TopFade = 48.dp
 private val BottomFade = 64.dp
 
-private const val FadeInThresholdMs = 200L
+private val FadeInThresholdMs = 200L
 
 private fun Modifier.fadingEdges() = this
     .graphicsLayer(compositingStrategy = CompositingStrategy.Offscreen)
