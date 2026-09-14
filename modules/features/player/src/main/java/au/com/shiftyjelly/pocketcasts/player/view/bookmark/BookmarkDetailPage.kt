@@ -247,17 +247,25 @@ private fun TranscriptLoadingPlaceholder(
     modifier: Modifier = Modifier,
 ) {
     Column(
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        verticalArrangement = Arrangement.spacedBy(20.dp),
         modifier = modifier.padding(horizontal = 20.dp, vertical = 24.dp),
     ) {
-        listOf(0.9f, 0.75f, 0.95f, 0.6f, 0.85f, 0.7f, 0.9f, 0.5f).forEach { fraction ->
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth(fraction)
-                    .height(16.dp)
-                    .clip(RoundedCornerShape(4.dp))
-                    .background(colors.primaryText.copy(alpha = 0.12f)),
-            )
+        listOf(
+            listOf(0.95f, 0.88f, 0.5f),
+            listOf(0.9f, 0.72f),
+            listOf(0.93f, 0.85f, 0.6f),
+        ).forEach { turn ->
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                turn.forEach { fraction ->
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth(fraction)
+                            .height(14.dp)
+                            .clip(RoundedCornerShape(4.dp))
+                            .background(colors.primaryText.copy(alpha = 0.12f)),
+                    )
+                }
+            }
         }
     }
 }
