@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.servers.sync
 
-import android.content.Context
 import android.os.Build
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -27,7 +26,6 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.register.RegisterRequest
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
-import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
 import com.google.protobuf.StringValue
 import com.pocketcasts.service.api.BookmarksResponse
@@ -55,7 +53,6 @@ import com.pocketcasts.service.api.bookmarkRequest
 import com.pocketcasts.service.api.userPlaylistListRequest
 import com.pocketcasts.service.api.userPodcastListRequest
 import dagger.Lazy
-import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Completable
 import io.reactivex.Flowable
@@ -80,7 +77,7 @@ open class SyncServiceManager @Inject constructor(
     private val service: SyncService,
     val settings: Settings,
     @Cached val cache: Lazy<Cache>,
-    @ApplicationContext context: Context,
+    appPlatform: AppPlatform,
 ) {
 
     companion object {
@@ -101,7 +98,7 @@ open class SyncServiceManager @Inject constructor(
         }
     }
 
-    private val scope = when (Util.getAppPlatform(context)) {
+    private val scope = when (appPlatform) {
         AppPlatform.Tv -> SCOPE_TV
         AppPlatform.Phone, AppPlatform.WearOs, AppPlatform.Automotive -> SCOPE_MOBILE
     }

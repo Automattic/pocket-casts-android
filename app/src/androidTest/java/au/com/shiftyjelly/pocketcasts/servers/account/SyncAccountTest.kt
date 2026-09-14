@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManagerImpl
 import au.com.shiftyjelly.pocketcasts.servers.di.NetworkModule
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServiceManager
+import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import com.automattic.eventhorizon.EventHorizon
 import dagger.Lazy
 import java.net.HttpURLConnection
@@ -49,7 +50,7 @@ internal class SyncAccountTest {
         val okhttpCache = NetworkModule.createCache(folder = "TestCache", context = context, cacheSizeInMB = 10)
 
         val accountManager = AccountManager.get(context)
-        val syncServiceManager = SyncServiceManager(retrofit.create(), mock(), Lazy { okhttpCache }, context)
+        val syncServiceManager = SyncServiceManager(retrofit.create(), mock(), Lazy { okhttpCache }, AppPlatform.Phone)
         val syncAccountManager = SyncAccountManagerImpl(mock(), accountManager)
 
         syncManager = SyncManagerImpl(
