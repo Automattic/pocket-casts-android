@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.player.view.bookmark
+package au.com.shiftyjelly.pocketcasts.repositories.bookmark
 
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.ChapterSeekResult

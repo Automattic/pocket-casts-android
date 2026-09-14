@@ -15,7 +15,8 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkArguments
-import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkPlaybackTimeResolver
+import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkEpisodeResolver
+import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkPlaybackTimeResolver
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.search.BookmarkSearchHandler
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
@@ -77,6 +78,7 @@ class BookmarksViewModel
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val bookmarkSearchHandler: BookmarkSearchHandler,
     private val bookmarkPlaybackTimeResolver: BookmarkPlaybackTimeResolver,
+    private val bookmarkEpisodeResolver: BookmarkEpisodeResolver,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
@@ -333,7 +335,7 @@ class BookmarksViewModel
     fun play(bookmark: Bookmark) {
         playJob?.cancel()
         playJob = viewModelScope.launch {
-            val bookmarkEpisode = resolveBookmarkEpisode(bookmark) ?: run {
+            val bookmarkEpisode = resolveEpisode(bookmark) ?: run {
                 _message.emit(BookmarkMessage.BookmarkEpisodeNotFound)
                 return@launch
             }
@@ -389,15 +391,7 @@ class BookmarksViewModel
         }
     }
 
-    private suspend fun resolveBookmarkEpisode(bookmark: Bookmark): BaseEpisode? {
-        episodeManager.findEpisodeByUuid(bookmark.episodeUuid)?.let { return it }
-        val podcast = runCatching { podcastManager.findOrDownloadPodcastRxSingle(bookmark.podcastUuid).await() }.getOrNull() ?: return null
-        return if (!podcast.isSubscribed) {
-            episodeManager.downloadMissingPodcastEpisode(bookmark.episodeUuid, bookmark.podcastUuid)
-        } else {
-            episodeManager.findEpisodeByUuid(bookmark.episodeUuid)
-        }
-    }
+    suspend fun resolveEpisode(bookmark: Bookmark): BaseEpisode? = bookmarkEpisodeResolver.resolve(bookmark)
 
     suspend fun createBookmarkArguments(): BookmarkArguments? {
         val loadedState = _uiState.value as? UiState.Loaded ?: return null
