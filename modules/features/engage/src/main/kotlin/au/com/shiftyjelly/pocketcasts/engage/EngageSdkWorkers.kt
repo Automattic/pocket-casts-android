@@ -116,7 +116,7 @@ internal class FeaturedWorker @AssistedInject constructor(
 
 private suspend fun getEngageData(dataManager: ExternalDataManager, syncManager: SyncManager): EngageData {
     // Do not use isLoggedIn() method https://github.com/Automattic/pocket-casts-android/issues/2409
-    val isSignedIn = syncManager.isLoggedInObservable.value == true
+    val isSignedIn = syncManager.isLoggedInFlow.value
     return dataManager.getEngageData(isSignedIn)
 }
 

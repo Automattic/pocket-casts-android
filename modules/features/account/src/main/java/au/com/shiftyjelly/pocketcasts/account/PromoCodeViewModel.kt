@@ -11,13 +11,13 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.PromoCodeResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.parseErrorResponse
 import com.squareup.moshi.Moshi
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.BackpressureStrategy
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Function
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
+import kotlinx.coroutines.rx2.asFlowable
 import kotlinx.coroutines.rx2.rxCompletable
 import retrofit2.HttpException
 
@@ -54,7 +54,7 @@ class PromoCodeViewModel @Inject constructor(
             .toFlowable()
 
         disposable?.dispose()
-        disposable = syncManager.isLoggedInObservable.toFlowable(BackpressureStrategy.LATEST)
+        disposable = syncManager.isLoggedInFlow.asFlowable()
             .observeOn(Schedulers.io())
             .takeUntil { it } // Once we are signed in we don't want to be notified for other changes to the account like being upgraded to plus
             .switchMap { signedIn ->

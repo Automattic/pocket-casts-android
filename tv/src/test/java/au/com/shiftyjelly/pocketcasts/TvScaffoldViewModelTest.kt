@@ -14,7 +14,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.ProfileShownEvent
-import com.jakewharton.rxrelay2.BehaviorRelay
 import io.reactivex.subjects.BehaviorSubject
 import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -35,12 +34,12 @@ class TvScaffoldViewModelTest {
     @get:Rule
     val coroutineRule = MainCoroutineRule()
 
-    private val isLoggedIn = BehaviorRelay.createDefault(false)
+    private val isLoggedIn = MutableStateFlow(false)
     private val email = MutableStateFlow<String?>(null)
 
     private val syncManager = mock<SyncManager> {
         on { isLoggedIn() } doReturn false
-        on { isLoggedInObservable } doReturn isLoggedIn
+        on { isLoggedInFlow } doReturn isLoggedIn
         on { emailFlow() } doReturn email
     }
     private val signOutManager = mock<TvSignOutManager>()
@@ -217,7 +216,7 @@ class TvScaffoldViewModelTest {
     fun `profile has the account email when signed in`() = runTest {
         whenever(syncManager.isLoggedIn()).doReturn(true)
         whenever(syncManager.getEmail()).doReturn("user@example.com")
-        isLoggedIn.accept(true)
+        isLoggedIn.value = true
         email.value = "user@example.com"
 
         viewModel.uiState.test {
@@ -229,7 +228,7 @@ class TvScaffoldViewModelTest {
     fun `profile email is null when signed in with a blank email`() = runTest {
         whenever(syncManager.isLoggedIn()).doReturn(true)
         whenever(syncManager.getEmail()).doReturn("")
-        isLoggedIn.accept(true)
+        isLoggedIn.value = true
         email.value = ""
 
         viewModel.uiState.test {
@@ -239,7 +238,9 @@ class TvScaffoldViewModelTest {
 
     @Test
     fun `profile is seeded from the sync manager before the streams emit`() = runTest {
-        whenever(syncManager.isLoggedInObservable).doReturn(BehaviorRelay.create())
+        // emailFlow never emits so the combine stays silent, and the signed-out login stub means any
+        // leaked combine emission would assert as SignedOut rather than matching the stateIn seed
+        whenever(syncManager.isLoggedInFlow).doReturn(MutableStateFlow(false))
         whenever(syncManager.emailFlow()).doReturn(MutableSharedFlow())
         whenever(syncManager.isLoggedIn()).doReturn(true)
         whenever(syncManager.getEmail()).doReturn("user@example.com")
@@ -255,10 +256,10 @@ class TvScaffoldViewModelTest {
             assertEquals(TvProfileState.SignedOut, awaitItem().profile)
 
             email.value = "user@example.com"
-            isLoggedIn.accept(true)
+            isLoggedIn.value = true
             assertEquals(TvProfileState.SignedIn(email = "user@example.com"), awaitItem().profile)
 
-            isLoggedIn.accept(false)
+            isLoggedIn.value = false
             assertEquals(TvProfileState.SignedOut, awaitItem().profile)
         }
     }

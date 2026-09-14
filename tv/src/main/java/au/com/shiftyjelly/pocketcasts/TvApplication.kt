@@ -29,7 +29,6 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.rx2.asFlow
 import timber.log.Timber
 
 @HiltAndroidApp
@@ -98,7 +97,7 @@ class TvApplication :
         analyticsController.refreshMetadata()
         applicationScope.launch {
             combine(
-                syncManager.isLoggedInObservable.asFlow(),
+                syncManager.isLoggedInFlow,
                 settings.cachedSubscription.flow,
             ) { isLoggedIn, subscription -> isLoggedIn to subscription }
                 .distinctUntilChanged()

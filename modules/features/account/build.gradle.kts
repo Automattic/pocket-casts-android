@@ -74,7 +74,6 @@ dependencies {
     implementation(libs.rx2.android)
     implementation(libs.rx2.java)
     implementation(libs.rx2.kotlin)
-    implementation(libs.rx2.relay)
     implementation(libs.timber)
     implementation(libs.credentials)
     implementation(libs.credentials.google.play)

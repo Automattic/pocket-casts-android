@@ -32,7 +32,6 @@ import com.automattic.android.tracks.crashlogging.CrashLogging
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.UserSignedOutEvent
 import dagger.hilt.android.qualifiers.ApplicationContext
-import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.combineLatest
@@ -118,7 +117,7 @@ class UserManagerImpl @Inject constructor(
     }
 
     override fun getSignInState(): Flowable<SignInState> {
-        return syncManager.isLoggedInObservable.toFlowable(BackpressureStrategy.LATEST)
+        return syncManager.isLoggedInFlow.asFlowable()
             .switchMap { isLoggedIn ->
                 if (isLoggedIn) {
                     launch(coroutineContext) {

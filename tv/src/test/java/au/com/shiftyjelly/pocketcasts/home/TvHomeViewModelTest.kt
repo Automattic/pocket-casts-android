@@ -50,7 +50,6 @@ import com.automattic.eventhorizon.DiscoverListImpressionEvent
 import com.automattic.eventhorizon.DiscoverListPodcastTappedEvent
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.HomeShownEvent
-import com.jakewharton.rxrelay2.BehaviorRelay
 import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -58,6 +57,7 @@ import java.util.Date
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
@@ -94,7 +94,7 @@ class TvHomeViewModelTest {
         }
     }
     private val syncManager = mock<SyncManager> {
-        on { isLoggedInObservable } doReturn BehaviorRelay.createDefault(false)
+        on { isLoggedInFlow } doReturn MutableStateFlow(false)
     }
     private val podcastDao = mock<PodcastDao> {
         on { findAllIn(any()) }.thenReturn(emptyList())

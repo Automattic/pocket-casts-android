@@ -46,6 +46,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.rx2.asObservable
 import kotlinx.coroutines.rx2.rxMaybe
 import kotlinx.coroutines.rx2.rxSingle
 import timber.log.Timber
@@ -90,7 +91,7 @@ class DiscoverViewModel @Inject constructor(
     }
 
     fun loadFeed(resources: Resources) {
-        val loggedInObservable = syncManager.isLoggedInObservable
+        val loggedInObservable = syncManager.isLoggedInFlow.asObservable()
         Observables.combineLatest(loadDiscoverFeedRxSingle(resources).toObservable(), loggedInObservable)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())

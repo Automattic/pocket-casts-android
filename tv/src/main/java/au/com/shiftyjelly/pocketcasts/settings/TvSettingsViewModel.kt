@@ -17,7 +17,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.rx2.asFlow
 
 @HiltViewModel
 class TvSettingsViewModel @Inject constructor(
@@ -27,7 +26,7 @@ class TvSettingsViewModel @Inject constructor(
 ) : ViewModel() {
 
     val uiState: StateFlow<TvSettingsUiState> = combine(
-        syncManager.isLoggedInObservable.asFlow(),
+        syncManager.isLoggedInFlow,
         settings.artworkConfiguration.flow,
         settings.cachedSubscription.flow,
     ) { isSignedIn, artworkConfiguration, subscription ->

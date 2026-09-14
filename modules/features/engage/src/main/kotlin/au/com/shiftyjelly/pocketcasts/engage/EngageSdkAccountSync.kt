@@ -11,7 +11,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.rx2.asFlow
 import kotlinx.coroutines.tasks.await
 
 class EngageSdkAccountSync(
@@ -29,7 +28,7 @@ class EngageSdkAccountSync(
             return
         }
         syncJob = coroutineScope.launch {
-            syncManager.isLoggedInObservable.asFlow().collectLatest { isSignedIn ->
+            syncManager.isLoggedInFlow.collectLatest { isSignedIn ->
                 try {
                     val request = ServiceAvailabilityRequest.Builder()
                         .addIntendedClusterType(ClusterType.TYPE_ENGAGEMENT)
