@@ -22,7 +22,6 @@ import au.com.shiftyjelly.pocketcasts.models.to.EpisodeWithTitle
 import au.com.shiftyjelly.pocketcasts.models.type.DownloadStatusUpdate
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
-import io.reactivex.Flowable
 import io.reactivex.Maybe
 import java.time.Instant
 import java.util.Date
