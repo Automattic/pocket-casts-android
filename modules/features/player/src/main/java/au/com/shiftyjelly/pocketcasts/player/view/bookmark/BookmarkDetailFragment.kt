@@ -146,6 +146,7 @@ class BookmarkDetailFragment : BaseDialogFragment() {
                 onPlayClick = ::onPlayClick,
                 onClose = { dismiss() },
                 onEpisodeClick = ::onEpisodeClick,
+                onMoreClick = {},
                 passage = args.passage,
                 transcriptState = transcriptState,
             )
