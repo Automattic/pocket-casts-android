@@ -9,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.shownotes.ShowNotesManager
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
@@ -39,10 +40,11 @@ class BookmarkDetailViewModelTest {
 
     private val bookmarkManager = mock<BookmarkManager>()
     private val episodeManager = mock<EpisodeManager>()
+    private val podcastManager = mock<PodcastManager>()
     private val transcriptManager = mock<TranscriptManager>()
     private val showNotesManager = mock<ShowNotesManager>()
     private val settings = mock<Settings>()
-    private val viewModel = BookmarkDetailViewModel(bookmarkManager, episodeManager, transcriptManager, showNotesManager, settings)
+    private val viewModel = BookmarkDetailViewModel(bookmarkManager, episodeManager, podcastManager, transcriptManager, showNotesManager, settings)
 
     private val bookmarkUuid = "bookmark-id"
     private val episodeUuid = "episode-id"
@@ -163,6 +165,7 @@ class BookmarkDetailViewModelTest {
             title = "Title",
             episodeUuid = episodeUuid,
             podcastUuid = podcastUuid,
+            podcastTitle = "Podcast",
             passage = passage,
             passageLocation = passageLocation,
         )

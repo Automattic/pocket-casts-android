@@ -68,6 +68,7 @@ internal fun BookmarkDetailPage(
     modifier: Modifier = Modifier,
     episode: BaseEpisode? = null,
     useEpisodeArtwork: Boolean = false,
+    isPodcastTitleLoading: Boolean = false,
     passage: String? = null,
     transcriptState: BookmarkDetailViewModel.TranscriptState = BookmarkDetailViewModel.TranscriptState.None,
 ) {
@@ -163,7 +164,17 @@ internal fun BookmarkDetailPage(
                 Column(
                     modifier = Modifier.weight(1f),
                 ) {
-                    if (podcastTitle.isNotEmpty()) {
+                    if (isPodcastTitleLoading) {
+                        Box(
+                            modifier = Modifier
+                                .padding(vertical = 3.dp)
+                                .width(120.dp)
+                                .height(12.dp)
+                                .clip(RoundedCornerShape(4.dp))
+                                .background(colors.secondaryText.copy(alpha = 0.12f)),
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                    } else if (podcastTitle.isNotEmpty()) {
                         TextH70(
                             text = podcastTitle,
                             color = colors.secondaryText,
