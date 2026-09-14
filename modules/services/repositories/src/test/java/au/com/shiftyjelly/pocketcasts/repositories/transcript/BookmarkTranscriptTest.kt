@@ -198,6 +198,16 @@ class BookmarkTranscriptTest {
         assertNull(untimed.referenceOffsetAt(1000))
     }
 
+    @Test
+    fun `passage-only transcript exposes the passage as its display text without timing`() {
+        val passage = "A captured line with no surrounding transcript."
+
+        val model = BookmarkTranscript.fromPassage(passage)
+
+        assertEquals(passage, model.displayText)
+        assertNull(model.referenceOffsetAt(0))
+    }
+
     private fun flatText() = listOf(firstSentence, secondSentence, thirdSentence).joinToString(" ")
 
     private fun bookmarkTranscript(vararg entries: TranscriptEntry) = BookmarkTranscript.from(
