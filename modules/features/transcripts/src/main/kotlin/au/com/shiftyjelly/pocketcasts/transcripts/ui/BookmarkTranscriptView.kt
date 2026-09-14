@@ -205,7 +205,7 @@ private val SpeakerSpanStyle = SpanStyle(
     fontWeight = FontWeight.Bold,
 )
 
-private val ContentPadding = PaddingValues(horizontal = 16.dp, vertical = 24.dp)
+private val ContentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 48.dp, bottom = 64.dp)
 
 private val GlyphSize = 14.dp
 private val GutterInset = 2.dp
