@@ -4,13 +4,17 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -30,6 +34,7 @@ import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
@@ -37,6 +42,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
@@ -48,6 +54,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 /**
  * Renders a [BookmarkTranscript] with the bookmarked [passage] highlighted in the primary text
@@ -145,10 +152,32 @@ fun BookmarkTranscriptView(
                     ),
             )
         }
-        if (editable) {
-            renderText()
-        } else {
-            SelectionContainer(content = renderText)
+        Box(modifier = Modifier.fillMaxWidth()) {
+            if (editable) {
+                renderText()
+            } else {
+                SelectionContainer(content = renderText)
+            }
+            if (!editable && passage != null) {
+                val glyphBox = layout?.getBoundingBox(
+                    passage.start.coerceIn(0, transcript.displayText.length.coerceAtLeast(1) - 1),
+                )
+                if (glyphBox != null) {
+                    Icon(
+                        painter = painterResource(IR.drawable.ic_bookmark),
+                        contentDescription = null,
+                        tint = theme.highlightText,
+                        modifier = Modifier
+                            .size(GlyphSize)
+                            .offset {
+                                IntOffset(
+                                    x = GutterInset.roundToPx(),
+                                    y = (ContentPadding.calculateTopPadding().toPx() + glyphBox.top + (glyphBox.height - GlyphSize.toPx()) / 2f).roundToInt(),
+                                )
+                            },
+                    )
+                }
+            }
         }
     }
 
@@ -177,6 +206,9 @@ private val SpeakerSpanStyle = SpanStyle(
 )
 
 private val ContentPadding = PaddingValues(horizontal = 16.dp, vertical = 24.dp)
+
+private val GlyphSize = 14.dp
+private val GutterInset = 2.dp
 
 private val TopFade = 48.dp
 private val BottomFade = 64.dp
