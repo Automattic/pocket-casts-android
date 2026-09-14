@@ -18,6 +18,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.reimagine.timestamp.ShareEpisodeTimestampFragment
+import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -27,6 +28,8 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.toLocalizedFormatPattern
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
+import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog.ButtonType.Danger
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import com.automattic.eventhorizon.BookmarkPlayTappedEvent
@@ -118,6 +121,9 @@ class BookmarkDetailFragment : BaseDialogFragment() {
     internal lateinit var podcastManager: PodcastManager
 
     @Inject
+    internal lateinit var bookmarkManager: BookmarkManager
+
+    @Inject
     internal lateinit var eventHorizon: EventHorizon
 
     @Inject
@@ -204,6 +210,11 @@ class BookmarkDetailFragment : BaseDialogFragment() {
                     click = { onShareClick(episode) },
                 )
             }
+            dialog.addTextOption(
+                titleId = LR.string.bookmarks_delete_singular,
+                imageId = IR.drawable.ic_delete,
+                click = ::onDeleteClick,
+            )
             dialog.show(fragmentManager, "bookmark_detail_options")
         }
     }
@@ -214,6 +225,25 @@ class BookmarkDetailFragment : BaseDialogFragment() {
             ShareEpisodeTimestampFragment
                 .forBookmark(episode, args.timeSecs.seconds, podcast.backgroundColor, args.sourceView)
                 .show(parentFragmentManager, "share_screen")
+        }
+    }
+
+    private fun onDeleteClick() {
+        val fragmentManager = activity?.supportFragmentManager ?: return
+        ConfirmationDialog()
+            .setForceDarkTheme(args.sourceView == SourceView.PLAYER)
+            .setTitle(getString(LR.string.bookmarks_delete_singular))
+            .setSummary(getString(LR.string.bookmarks_delete_summary_singular))
+            .setIconId(IR.drawable.ic_delete)
+            .setButtonType(Danger(getString(LR.string.delete)))
+            .setOnConfirm { onDeleteConfirmed() }
+            .show(fragmentManager, "bookmark_detail_delete")
+    }
+
+    private fun onDeleteConfirmed() {
+        lifecycleScope.launch {
+            bookmarkManager.deleteToSync(args.bookmarkUuid)
+            dismiss()
         }
     }
 
