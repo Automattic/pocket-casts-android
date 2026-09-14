@@ -2,11 +2,14 @@ package au.com.shiftyjelly.pocketcasts.discover.viewmodel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.colors.ColorManager
+import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
@@ -14,20 +17,21 @@ import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverEpisode
 import au.com.shiftyjelly.pocketcasts.servers.model.ExpandedStyle
 import au.com.shiftyjelly.pocketcasts.servers.model.ListFeed
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.BackpressureStrategy
-import io.reactivex.Flowable
-import io.reactivex.Single
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
-import io.reactivex.rxkotlin.addTo
-import io.reactivex.rxkotlin.combineLatest
-import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.rx2.rxMaybe
-import kotlinx.coroutines.rx2.rxSingle
+import kotlin.coroutines.cancellation.CancellationException
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.rx2.await
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 @HiltViewModel
@@ -38,24 +42,18 @@ class PodcastListViewModel @Inject constructor(
     val userManager: UserManager,
     val episodeManager: EpisodeManager,
     val playbackManager: PlaybackManager,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     val state: MutableLiveData<PodcastListViewState> = MutableLiveData()
-    val disposables: CompositeDisposable = CompositeDisposable()
 
     private var lastLoad: LoadRequest? = null
-    private var feedDisposable: Disposable? = null
+    private var feedJob: Job? = null
 
     val listFeed: ListFeed?
         get() = (state.value as? PodcastListViewState.ListLoaded)?.feed
 
     init {
         state.value = PodcastListViewState.Loading()
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        feedDisposable?.dispose()
-        disposables.clear()
     }
 
     fun load(sourceUrl: String?, listStyle: ExpandedStyle, authenticated: Boolean?) {
@@ -71,33 +69,12 @@ class PodcastListViewModel @Inject constructor(
             state.value = PodcastListViewState.Loading()
         }
 
-        feedDisposable?.dispose()
-        feedDisposable = rxMaybe { listRepository.getListFeed(url = sourceUrl, authenticated = authenticated) }
-            .toSingle()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .flatMap {
-                return@flatMap if (listStyle is ExpandedStyle.RankedList) {
-                    addColorsToFeed(it)
-                } else {
-                    Single.just(it)
-                }
-            }
-            .toFlowable()
-            .switchMap { feed ->
-                addSubscriptionStateToFeed(feed)
-            }
-            .flatMap { feed ->
-                addPlaybackStateToList(feed)
-            }
-            .subscribeBy(
-                onNext = {
-                    state.postValue(PodcastListViewState.ListLoaded(it))
-                },
-                onError = {
-                    state.postValue(PodcastListViewState.Error(it))
-                },
-            )
+        feedJob?.cancel()
+        feedJob = viewModelScope.launch {
+            decoratedFeedFlow(sourceUrl, listStyle, authenticated)
+                .catch { error -> state.value = PodcastListViewState.Error(error) }
+                .collect { feed -> state.value = PodcastListViewState.ListLoaded(feed) }
+        }
     }
 
     fun retry() {
@@ -105,73 +82,60 @@ class PodcastListViewModel @Inject constructor(
         load(request.sourceUrl, request.listStyle, request.authenticated)
     }
 
-    private fun addPlaybackStateToList(list: ListFeed): Flowable<ListFeed> {
-        return Flowable.just(list)
-            .combineLatest(
-                // monitor the playing episode
-                playbackManager
-                    .playbackStateRelay
-                    .toFlowable(BackpressureStrategy.LATEST)
-                    // ignore the episode progress
-                    .distinctUntilChanged { t1, t2 -> t1.episodeUuid == t2.episodeUuid && t1.isPlaying == t2.isPlaying },
-            )
-            .map { (list, playbackState) ->
-                val updatedEpisodes = list.episodes?.map { episode -> episode.copy(isPlaying = playbackState.isPlaying && playbackState.episodeUuid == episode.uuid) }
-                list.copy(episodes = updatedEpisodes)
-            }
-    }
-
-    private fun addColorsToFeed(feed: ListFeed): Single<ListFeed> {
-        val podcast = feed.podcasts?.firstOrNull()
-        val podcastUuid = podcast?.uuid ?: return Single.just(feed)
-        return rxSingle(Dispatchers.Main) {
-            colorManager.downloadColors(podcastUuid)?.let { colors -> podcast.color = colors.background }
-            feed
+    private fun decoratedFeedFlow(sourceUrl: String, listStyle: ExpandedStyle, authenticated: Boolean?): Flow<ListFeed> = flow {
+        val feed = withContext(ioDispatcher) { listRepository.getListFeed(url = sourceUrl, authenticated = authenticated) }
+        // the repository turns a cancelled request into null, which must not surface as an error after a reload
+        currentCoroutineContext().ensureActive()
+        if (feed == null) throw NoSuchElementException("Could not load the list feed $sourceUrl")
+        val coloredFeed = if (listStyle is ExpandedStyle.RankedList) addColorsToFeed(feed) else feed
+        val feedUpdates = combine(podcastManager.podcastSubscriptionsFlow(), playingEpisodeFlow()) { subscribedUuids, playbackState ->
+            coloredFeed.withSubscriptionState(subscribedUuids).withPlaybackState(playbackState)
         }
+        emitAll(feedUpdates)
     }
 
-    private fun addSubscriptionStateToFeed(feed: ListFeed): Flowable<ListFeed> {
-        return podcastManager.getSubscribedPodcastUuidsRxSingle().toFlowable() // Get the current subscribed list
-            .mergeWith(podcastManager.podcastSubscriptionsRxFlowable()) // Get updated when it changes
-            .flatMap { subscribedList ->
-                val newPodcastList = feed.podcasts?.map { podcast ->
-                    podcast.updateIsSubscribed(subscribedList.contains(podcast.uuid))
-                }
+    // Progress updates are ignored, only a change of episode or play/pause redraws the list
+    private fun playingEpisodeFlow(): Flow<PlaybackState> {
+        return playbackManager.playbackStateFlow
+            .distinctUntilChanged { old, new -> old.episodeUuid == new.episodeUuid && old.isPlaying == new.isPlaying }
+    }
 
-                feed.podcasts = newPodcastList
+    private suspend fun addColorsToFeed(feed: ListFeed): ListFeed {
+        val podcast = feed.podcasts?.firstOrNull() ?: return feed
+        colorManager.downloadColors(podcast.uuid)?.let { colors -> podcast.color = colors.background }
+        return feed
+    }
 
-                val newPromotion = feed.promotion?.let {
-                    it.copy(isSubscribed = subscribedList.contains(it.podcastUuid))
-                }
+    private fun ListFeed.withSubscriptionState(subscribedUuids: List<String>): ListFeed {
+        return copy(
+            podcasts = podcasts?.map { podcast -> podcast.updateIsSubscribed(subscribedUuids.contains(podcast.uuid)) },
+            promotion = promotion?.let { promotion -> promotion.copy(isSubscribed = subscribedUuids.contains(promotion.podcastUuid)) },
+        )
+    }
 
-                feed.promotion = newPromotion
-
-                return@flatMap Flowable.just(feed)
-            }
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
+    private fun ListFeed.withPlaybackState(playbackState: PlaybackState): ListFeed {
+        return copy(
+            episodes = episodes?.map { episode ->
+                episode.copy(isPlaying = playbackState.isPlaying && playbackState.episodeUuid == episode.uuid)
+            },
+        )
     }
 
     fun findOrDownloadEpisode(discoverEpisode: DiscoverEpisode, success: (episode: PodcastEpisode) -> Unit) {
-        podcastManager.findOrDownloadPodcastRxSingle(discoverEpisode.podcast_uuid)
-            .flatMapMaybe {
-                rxMaybe {
+        viewModelScope.launch {
+            val episode = try {
+                withContext(ioDispatcher) {
+                    podcastManager.findOrDownloadPodcastRxSingle(discoverEpisode.podcast_uuid).await()
                     episodeManager.findByUuid(discoverEpisode.uuid)
                 }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Timber.e(e)
+                null
             }
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onSuccess = { episode ->
-                    if (episode != null) {
-                        success(episode)
-                    }
-                },
-                onError = { throwable ->
-                    Timber.e(throwable)
-                },
-            )
-            .addTo(disposables)
+            episode?.let(success)
+        }
     }
 
     fun playEpisode(episode: PodcastEpisode) {
