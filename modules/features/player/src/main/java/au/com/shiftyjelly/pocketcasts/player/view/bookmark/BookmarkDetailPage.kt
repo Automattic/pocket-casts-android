@@ -232,6 +232,7 @@ private fun TranscriptSection(
             transcript = transcriptState.transcript,
             passage = transcriptState.passage,
             editable = false,
+            anchorFraction = 0.4f,
             modifier = modifier,
         )
     }

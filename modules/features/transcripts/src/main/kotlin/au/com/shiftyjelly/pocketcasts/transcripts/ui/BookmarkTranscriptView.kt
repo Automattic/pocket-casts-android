@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.transcripts.ui
 
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -20,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
@@ -60,6 +62,7 @@ fun BookmarkTranscriptView(
     modifier: Modifier = Modifier,
     editable: Boolean = false,
     scrollToPassage: Boolean = true,
+    anchorFraction: Float = 0.5f,
     onPassageChange: (TextSpan) -> Unit = {},
 ) {
     val theme = rememberTranscriptTheme()
@@ -67,6 +70,10 @@ fun BookmarkTranscriptView(
     var layout by remember { mutableStateOf<TextLayoutResult?>(null) }
     var viewportHeight by remember { mutableIntStateOf(0) }
     var hasScrolled by remember { mutableStateOf(false) }
+    val contentAlpha by animateFloatAsState(
+        targetValue = if (!scrollToPassage || passage == null || hasScrolled) 1f else 0f,
+        label = "transcriptFade",
+    )
     val currentLayout by rememberUpdatedState(layout)
     val currentPassageChange by rememberUpdatedState(onPassageChange)
 
@@ -91,6 +98,7 @@ fun BookmarkTranscriptView(
     Column(
         modifier = modifier
             .onSizeChanged { viewportHeight = it.height }
+            .alpha(contentAlpha)
             .fadingEdges()
             .verticalScroll(scrollState),
     ) {
@@ -148,7 +156,7 @@ fun BookmarkTranscriptView(
         val result = layout ?: return@LaunchedEffect
         if (hasScrolled || !scrollToPassage || passage == null || viewportHeight == 0) return@LaunchedEffect
         val box = result.getBoundingBox(passage.start.coerceIn(0, transcript.displayText.length.coerceAtLeast(1) - 1))
-        val target = (box.top - viewportHeight / 2 + box.height / 2).roundToInt()
+        val target = (box.top - viewportHeight * anchorFraction + box.height / 2).roundToInt()
         scrollState.scrollTo(target.coerceIn(0, scrollState.maxValue))
         hasScrolled = true
     }
