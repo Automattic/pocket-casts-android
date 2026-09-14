@@ -51,6 +51,7 @@ import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.rx2.asFlowable
+import kotlinx.coroutines.rx2.rxMaybe
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -860,20 +861,15 @@ class EpisodeManagerImpl @Inject constructor(
      * Try downloading the episode if it is missing. If the server doesn't know about it insert the skeleton episode.
      */
     override fun downloadMissingEpisodeRxMaybe(episodeUuid: String, podcastUuid: String, skeletonEpisode: PodcastEpisode, podcastManager: PodcastManager, downloadMetaData: Boolean, source: SourceView): Maybe<BaseEpisode> {
-        return episodeDao.existsRxSingle(episodeUuid)
-            .flatMapMaybe { episodeExists ->
-                if (episodeExists || podcastUuid == Podcast.userPodcast.uuid) {
-                    findEpisodeByUuidRxFlowable(episodeUuid).firstElement()
-                } else {
-                    podcastCacheServiceManager.getPodcastAndEpisodeSingle(podcastUuid, episodeUuid).flatMapMaybe { response ->
-                        val episode = response.episodes.firstOrNull() ?: skeletonEpisode
-                        addBlocking(episode, downloadMetaData = downloadMetaData)
-
-                        @Suppress("DEPRECATION")
-                        findByUuidRxMaybe(episodeUuid)
-                    }
-                }
+        return rxMaybe(ioDispatcher) {
+            if (episodeDao.exists(episodeUuid) || podcastUuid == Podcast.userPodcast.uuid) {
+                return@rxMaybe findEpisodeByUuid(episodeUuid)
             }
+            val response = podcastCacheServiceManager.getPodcastAndEpisode(podcastUuid, episodeUuid)
+            val episode = response.episodes.firstOrNull() ?: skeletonEpisode
+            add(listOf(episode), episode.podcastUuid, downloadMetaData)
+            findByUuid(episodeUuid)
+        }
     }
 
     override suspend fun downloadMissingPodcastEpisode(episodeUuid: String, podcastUuid: String): PodcastEpisode? {
