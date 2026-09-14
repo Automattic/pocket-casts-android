@@ -67,6 +67,7 @@ class BookmarkDetailFragment : BaseDialogFragment() {
                 putParcelable(
                     NEW_INSTANCE_ARG,
                     Args(
+                        bookmarkUuid = bookmark.uuid,
                         title = bookmark.title,
                         referenceTime = bookmark.referenceTime,
                         episodeTitle = episodeTitle,
@@ -86,6 +87,7 @@ class BookmarkDetailFragment : BaseDialogFragment() {
 
     @Parcelize
     private data class Args(
+        val bookmarkUuid: String,
         val title: String,
         val referenceTime: Int?,
         val episodeTitle: String,
@@ -123,12 +125,21 @@ class BookmarkDetailFragment : BaseDialogFragment() {
         savedInstanceState: Bundle?,
     ) = contentWithoutConsumedInsets {
         val hasTranscript = args.passage != null && FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS)
-        LaunchedEffect(Unit) { viewModel.load(args.episodeUuid, args.podcastUuid, args.passage, args.passageLocation) }
+        LaunchedEffect(Unit) {
+            viewModel.load(
+                bookmarkUuid = args.bookmarkUuid,
+                title = args.title,
+                episodeUuid = args.episodeUuid,
+                podcastUuid = args.podcastUuid,
+                passage = args.passage,
+                passageLocation = args.passageLocation,
+            )
+        }
         DialogBox(fillMaxHeight = hasTranscript) {
             val resolving by isResolving.collectAsState()
-            val transcriptState by viewModel.transcriptState.collectAsState()
+            val uiState by viewModel.uiState.collectAsState()
             BookmarkDetailPage(
-                title = args.title,
+                title = uiState.title,
                 episodeTitle = args.episodeTitle,
                 podcastUuid = args.podcastUuid,
                 podcastTitle = args.podcastTitle,
@@ -139,8 +150,8 @@ class BookmarkDetailFragment : BaseDialogFragment() {
                 onClose = { dismiss() },
                 onArtworkClick = ::onArtworkClick,
                 onMoreClick = {},
-                passage = args.passage,
-                transcriptState = transcriptState,
+                passage = uiState.passage,
+                transcriptState = uiState.transcriptState,
             )
         }
     }
