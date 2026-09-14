@@ -248,7 +248,35 @@ class Media3LibrarySessionCallbackTest {
         assertTrue(playerCommands.contains(Player.COMMAND_PLAY_PAUSE))
         assertTrue(playerCommands.contains(Player.COMMAND_STOP))
         assertTrue(playerCommands.contains(Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM))
+        assertFalse(playerCommands.contains(Player.COMMAND_SEEK_TO_NEXT))
+        assertFalse(playerCommands.contains(Player.COMMAND_SEEK_TO_PREVIOUS))
         // Should NOT delegate to sessionCallback (which adds full session commands)
+        verify(sessionCallback, never()).onConnect(any(), any())
+    }
+
+    @Test
+    fun `onConnect gives unknown automotive caller directional skip commands`() {
+        val packageValidator: PackageValidator = mock()
+        whenever(mockController.packageName).thenReturn("com.unknown.app")
+        whenever(mockController.uid).thenReturn(12345)
+        whenever(packageValidator.isKnownCaller("com.unknown.app", 12345)).thenReturn(false)
+
+        val callbackWithValidator = Media3LibrarySessionCallback(
+            sessionCallback = sessionCallback,
+            browseTreeProvider = browseTreeProvider,
+            playbackManager = playbackManager,
+            episodeManager = episodeManager,
+            podcastManager = podcastManager,
+            settings = mockSettings,
+            packageValidator = packageValidator,
+            scopeProvider = { testScope },
+            contextProvider = { createAutomotiveContext() },
+        )
+
+        val playerCommands = callbackWithValidator.onConnect(mockSession, mockController).availablePlayerCommands
+
+        assertTrue(playerCommands.contains(Player.COMMAND_SEEK_TO_NEXT))
+        assertTrue(playerCommands.contains(Player.COMMAND_SEEK_TO_PREVIOUS))
         verify(sessionCallback, never()).onConnect(any(), any())
     }
 
@@ -358,13 +386,7 @@ class Media3LibrarySessionCallbackTest {
 
     @Test
     fun `onPlaybackResumption sets automotive connected flag on automotive`() = runTest {
-        val automotiveContext: Context = mock()
-        val automotivePackageManager: PackageManager = mock()
-        val metaData = Bundle().apply { putBoolean("pocketcasts_automotive", true) }
-        val appInfo = ApplicationInfo().apply { this.metaData = metaData }
-        whenever(automotivePackageManager.getApplicationInfo(any<String>(), any<Int>())).thenReturn(appInfo)
-        whenever(automotiveContext.packageManager).thenReturn(automotivePackageManager)
-        whenever(automotiveContext.packageName).thenReturn("au.com.shiftyjelly.pocketcasts.debug")
+        val automotiveContext = createAutomotiveContext()
 
         val automotiveCallback = Media3LibrarySessionCallback(
             sessionCallback = sessionCallback,
@@ -413,6 +435,17 @@ class Media3LibrarySessionCallbackTest {
         callback.onSearch(mockSession, mockController, "empty", null)
 
         verify(mockSession).notifySearchResultChanged(eq(mockController), eq("empty"), eq(0), anyOrNull())
+    }
+
+    private fun createAutomotiveContext(): Context {
+        val context: Context = mock()
+        val packageManager: PackageManager = mock()
+        val metaData = Bundle().apply { putBoolean("pocketcasts_automotive", true) }
+        val appInfo = ApplicationInfo().apply { this.metaData = metaData }
+        whenever(packageManager.getApplicationInfo(any<String>(), any<Int>())).thenReturn(appInfo)
+        whenever(context.packageManager).thenReturn(packageManager)
+        whenever(context.packageName).thenReturn("au.com.shiftyjelly.pocketcasts.debug")
+        return context
     }
 
     private fun createMediaItem(

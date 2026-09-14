@@ -180,6 +180,17 @@ class PocketCastsForwardingPlayerTest {
     }
 
     @Test
+    fun `automotive available commands expose seek to next and previous`() {
+        val player = SeedStatePlayer(Looper.getMainLooper()).apply { seed(positionMs = 0L) }
+        shadowOf(Looper.getMainLooper()).idle()
+
+        val commands = PocketCastsForwardingPlayer(player, isAutomotive = true).availableCommands
+
+        assertTrue(commands.contains(Player.COMMAND_SEEK_TO_NEXT))
+        assertTrue(commands.contains(Player.COMMAND_SEEK_TO_PREVIOUS))
+    }
+
+    @Test
     fun `available commands include SET_MEDIA_ITEM for playback initiation`() {
         val player = PocketCastsForwardingPlayer(mockPlayer)
         val commands = player.availableCommands
@@ -197,6 +208,8 @@ class PocketCastsForwardingPlayerTest {
 
         assertFalse(commands.contains(Player.COMMAND_PLAY_PAUSE))
         assertFalse(commands.contains(Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM))
+        assertFalse(commands.contains(Player.COMMAND_SEEK_TO_NEXT))
+        assertFalse(commands.contains(Player.COMMAND_SEEK_TO_PREVIOUS))
         assertFalse(commands.contains(Player.COMMAND_STOP))
         assertTrue(commands.contains(Player.COMMAND_SET_MEDIA_ITEM))
         assertTrue(commands.contains(Player.COMMAND_GET_CURRENT_MEDIA_ITEM))
