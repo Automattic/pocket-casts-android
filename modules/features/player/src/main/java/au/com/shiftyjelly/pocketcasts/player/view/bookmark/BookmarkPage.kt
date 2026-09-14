@@ -279,7 +279,9 @@ private fun TitleSuggestionRow(
             }
         }
 
-        else -> Unit
+        BookmarkViewModel.TitleSuggestion.None,
+        BookmarkViewModel.TitleSuggestion.Generating,
+        -> Unit
     }
 }
 
