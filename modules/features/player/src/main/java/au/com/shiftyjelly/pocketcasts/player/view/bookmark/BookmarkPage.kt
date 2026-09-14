@@ -39,6 +39,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
@@ -163,6 +164,7 @@ private fun Content(
             handleColor = colors.highlight01,
             backgroundColor = colors.highlight01.copy(alpha = 0.4f),
         )
+        val suggestingTitleDescription = stringResource(LR.string.bookmark_suggesting_title)
         CompositionLocalProvider(LocalTextSelectionColors provides tintTextSelectionColors) {
             TextField(
                 value = title,
@@ -172,6 +174,19 @@ private fun Content(
                     fontSize = if (title.text.length > 20) 18.sp else 26.sp,
                     fontWeight = FontWeight.Bold,
                 ),
+                trailingIcon = if (titleSuggestion is BookmarkViewModel.TitleSuggestion.Generating) {
+                    {
+                        CircularProgressIndicator(
+                            color = colors.contrast02,
+                            strokeWidth = 2.dp,
+                            modifier = Modifier
+                                .size(16.dp)
+                                .semantics { contentDescription = suggestingTitleDescription },
+                        )
+                    }
+                } else {
+                    null
+                },
                 colors = TextFieldDefaults.textFieldColors(
                     textColor = colors.contrast01,
                     backgroundColor = Color.Transparent,
@@ -239,28 +254,6 @@ private fun TitleSuggestionRow(
     modifier: Modifier = Modifier,
 ) {
     when (titleSuggestion) {
-        BookmarkViewModel.TitleSuggestion.None -> Unit
-
-        BookmarkViewModel.TitleSuggestion.Generating -> {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = modifier
-                    .fillMaxWidth()
-                    .padding(top = 12.dp),
-            ) {
-                CircularProgressIndicator(
-                    color = colors.contrast02,
-                    strokeWidth = 2.dp,
-                    modifier = Modifier.size(16.dp),
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                TextP40(
-                    text = stringResource(LR.string.bookmark_suggesting_title),
-                    color = colors.contrast02,
-                )
-            }
-        }
-
         is BookmarkViewModel.TitleSuggestion.Available -> {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -285,6 +278,8 @@ private fun TitleSuggestionRow(
                 )
             }
         }
+
+        else -> Unit
     }
 }
 
