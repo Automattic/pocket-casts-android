@@ -49,7 +49,7 @@ internal class SyncAccountTest {
         val okhttpCache = NetworkModule.createCache(folder = "TestCache", context = context, cacheSizeInMB = 10)
 
         val accountManager = AccountManager.get(context)
-        val syncServiceManager = SyncServiceManager(retrofit.create(), mock(), Lazy { okhttpCache })
+        val syncServiceManager = SyncServiceManager(retrofit.create(), mock(), Lazy { okhttpCache }, context)
         val syncAccountManager = SyncAccountManagerImpl(mock(), accountManager)
 
         syncManager = SyncManagerImpl(

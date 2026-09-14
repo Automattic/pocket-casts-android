@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.servers.sync
 
+import android.content.Context
 import android.os.Build
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -25,6 +26,8 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginPocketCastsRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.register.RegisterRequest
+import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
+import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
 import com.google.protobuf.StringValue
 import com.pocketcasts.service.api.BookmarksResponse
@@ -52,6 +55,7 @@ import com.pocketcasts.service.api.bookmarkRequest
 import com.pocketcasts.service.api.userPlaylistListRequest
 import com.pocketcasts.service.api.userPodcastListRequest
 import dagger.Lazy
+import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Completable
 import io.reactivex.Flowable
@@ -76,6 +80,7 @@ open class SyncServiceManager @Inject constructor(
     private val service: SyncService,
     val settings: Settings,
     @Cached val cache: Lazy<Cache>,
+    @ApplicationContext context: Context,
 ) {
 
     companion object {
@@ -96,18 +101,23 @@ open class SyncServiceManager @Inject constructor(
         }
     }
 
+    private val scope = when (Util.getAppPlatform(context)) {
+        AppPlatform.Tv -> SCOPE_TV
+        AppPlatform.Phone, AppPlatform.WearOs, AppPlatform.Automotive -> SCOPE_MOBILE
+    }
+
     suspend fun register(email: String, password: String): LoginTokenResponse {
-        val request = RegisterRequest(email = email, password = password, scope = SCOPE_MOBILE)
+        val request = RegisterRequest(email = email, password = password, scope = scope)
         return service.register(request)
     }
 
     suspend fun login(email: String, password: String): LoginTokenResponse {
-        val request = LoginPocketCastsRequest(email = email, password = password, scope = SCOPE_MOBILE)
+        val request = LoginPocketCastsRequest(email = email, password = password, scope = scope)
         return service.loginPocketCasts(request)
     }
 
     suspend fun loginGoogle(idToken: String): LoginTokenResponse {
-        val request = LoginGoogleRequest(idToken = idToken, scope = SCOPE_MOBILE)
+        val request = LoginGoogleRequest(idToken = idToken, scope = scope)
         return service.loginGoogle(request)
     }
 
@@ -116,17 +126,17 @@ open class SyncServiceManager @Inject constructor(
      * If any 4xx is returned the user should be logged out and asked to login.
      */
     suspend fun loginToken(refreshToken: RefreshToken): LoginTokenResponse {
-        val request = LoginTokenRequest(refreshToken = refreshToken, scope = SCOPE_MOBILE)
+        val request = LoginTokenRequest(refreshToken = refreshToken)
         return service.loginToken(request)
     }
 
-    suspend fun deviceAuthorize(scope: String = SCOPE_TV): DeviceAuthorizeResponse {
+    suspend fun deviceAuthorize(): DeviceAuthorizeResponse {
         val request = DeviceAuthorizeRequest(scope = scope)
         return service.deviceAuthorize(request)
     }
 
-    suspend fun deviceToken(deviceCode: String, scope: String = SCOPE_TV): DeviceTokenResponse {
-        val request = DeviceTokenRequest(deviceCode = deviceCode, scope = scope)
+    suspend fun deviceToken(deviceCode: String): DeviceTokenResponse {
+        val request = DeviceTokenRequest(deviceCode = deviceCode)
         return service.deviceToken(request)
     }
 
@@ -148,7 +158,7 @@ open class SyncServiceManager @Inject constructor(
         val request = EmailChangeRequest(
             newEmail,
             password,
-            SCOPE_MOBILE,
+            scope,
         )
         return service.emailChange(addBearer(token), request)
     }
@@ -156,7 +166,7 @@ open class SyncServiceManager @Inject constructor(
     fun deleteAccount(token: AccessToken): Single<UserChangeResponse> = service.deleteAccount(addBearer(token))
 
     suspend fun updatePassword(newPassword: String, oldPassword: String, token: AccessToken): LoginTokenResponse {
-        val request = UpdatePasswordRequest(newPassword = newPassword, oldPassword = oldPassword, scope = SCOPE_MOBILE)
+        val request = UpdatePasswordRequest(newPassword = newPassword, oldPassword = oldPassword, scope = scope)
         return service.updatePassword(authorization = addBearer(token), request = request)
     }
 

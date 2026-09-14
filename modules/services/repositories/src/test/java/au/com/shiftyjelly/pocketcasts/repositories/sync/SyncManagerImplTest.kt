@@ -105,7 +105,7 @@ class SyncManagerImplTest {
 
     @Test
     fun `device auth login as new account fires account created event`() = runTest {
-        whenever(syncServiceManager.deviceToken(any(), any())).thenReturn(createDeviceTokenResponse())
+        whenever(syncServiceManager.deviceToken(any())).thenReturn(createDeviceTokenResponse())
         syncManager.loginWithDeviceAuth("device-code", SignInSource.UserInitiated.Onboarding, isNewAccount = true)
         assertEquals(
             UserAccountCreatedEvent(
@@ -122,7 +122,7 @@ class SyncManagerImplTest {
 
     @Test
     fun `device auth login as existing account fires signed in event`() = runTest {
-        whenever(syncServiceManager.deviceToken(any(), any())).thenReturn(createDeviceTokenResponse())
+        whenever(syncServiceManager.deviceToken(any())).thenReturn(createDeviceTokenResponse())
         syncManager.loginWithDeviceAuth("device-code", SignInSource.UserInitiated.Onboarding, isNewAccount = false)
         assertEquals(
             UserSignedInEvent(
@@ -139,7 +139,7 @@ class SyncManagerImplTest {
     @Test
     fun `device auth failure as new account fires account creation failed event`() = runTest {
         stubResources()
-        whenever(syncServiceManager.deviceToken(any(), any())).thenThrow(RuntimeException("boom"))
+        whenever(syncServiceManager.deviceToken(any())).thenThrow(RuntimeException("boom"))
         syncManager.loginWithDeviceAuth("device-code", SignInSource.UserInitiated.Onboarding, isNewAccount = true)
         assertTrue(eventSink.pollEvent() is UserAccountCreationFailedEvent)
     }
@@ -147,7 +147,7 @@ class SyncManagerImplTest {
     @Test
     fun `device auth failure as existing account fires signin failed event`() = runTest {
         stubResources()
-        whenever(syncServiceManager.deviceToken(any(), any())).thenThrow(RuntimeException("boom"))
+        whenever(syncServiceManager.deviceToken(any())).thenThrow(RuntimeException("boom"))
         syncManager.loginWithDeviceAuth("device-code", SignInSource.UserInitiated.Onboarding, isNewAccount = false)
         assertTrue(eventSink.pollEvent() is UserSigninFailedEvent)
     }
