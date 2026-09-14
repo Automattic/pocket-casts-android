@@ -14,8 +14,10 @@ import androidx.lifecycle.lifecycleScope
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toLocalizedFormatPattern
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
@@ -135,10 +137,21 @@ class BookmarkDetailFragment : BaseDialogFragment() {
                 isResolving = resolving,
                 onPlayClick = ::onPlayClick,
                 onClose = { dismiss() },
+                onArtworkClick = ::onArtworkClick,
                 passage = args.passage,
                 transcriptState = transcriptState,
             )
         }
+    }
+
+    private fun onArtworkClick() {
+        (activity as? FragmentHostListener)?.openEpisodeDialog(
+            episodeUuid = args.episodeUuid,
+            source = EpisodeViewSource.UNKNOWN,
+            podcastUuid = args.podcastUuid,
+            forceDark = args.sourceView == SourceView.PLAYER,
+            autoPlay = false,
+        )
     }
 
     private fun onPlayClick() {
