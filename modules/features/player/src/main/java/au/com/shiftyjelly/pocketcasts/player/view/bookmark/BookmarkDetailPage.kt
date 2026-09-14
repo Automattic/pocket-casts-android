@@ -20,7 +20,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
@@ -31,11 +30,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.bookmark.BookmarkRowColors
 import au.com.shiftyjelly.pocketcasts.compose.buttons.TimePlayButton
@@ -49,6 +46,7 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.BookmarkTranscript
+import au.com.shiftyjelly.pocketcasts.repositories.transcript.TextSpan
 import au.com.shiftyjelly.pocketcasts.transcripts.ui.BookmarkTranscriptView
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -245,19 +243,14 @@ private fun TranscriptSection(
 
         BookmarkDetailViewModel.TranscriptState.Unavailable -> {
             if (passage != null) {
-                Column(
-                    modifier = modifier
-                        .verticalScroll(rememberScrollState())
-                        .padding(horizontal = 20.dp),
-                ) {
-                    Text(
-                        text = passage,
-                        color = colors.primaryText,
-                        fontFamily = FontFamily.Serif,
-                        fontSize = 16.sp,
-                        lineHeight = 24.sp,
-                    )
-                }
+                val transcript = remember(passage) { BookmarkTranscript.fromPassage(passage) }
+                BookmarkTranscriptView(
+                    transcript = transcript,
+                    passage = remember(transcript) { TextSpan(0, transcript.displayText.length) },
+                    editable = false,
+                    scrollToPassage = false,
+                    modifier = modifier,
+                )
             }
         }
 
