@@ -70,7 +70,16 @@ class BookmarkDetailViewModel @Inject constructor(
         viewModelScope.launch {
             val bookmark = bookmarkManager.findBookmark(uuid) ?: return@launch
             mutableState.value = mutableState.value.copy(title = bookmark.title, passage = bookmark.passage)
-            loadTranscript(bookmark.passage, bookmark.passageLocation)
+            val loaded = mutableState.value.transcriptState as? TranscriptState.Loaded
+            val passage = bookmark.passage
+            if (loaded != null && passage != null) {
+                val span = loaded.transcript.passageDisplaySpan(passage, bookmark.passageLocation)
+                mutableState.value = mutableState.value.copy(
+                    transcriptState = if (span == null) TranscriptState.Unavailable else loaded.copy(passage = span),
+                )
+            } else {
+                loadTranscript(passage, bookmark.passageLocation)
+            }
         }
     }
 
