@@ -16,6 +16,11 @@ import androidx.compose.material.Checkbox
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -84,7 +89,15 @@ fun BookmarkRow(
     onArtworkClick: (() -> Unit)? = null,
     isLoading: Boolean = false,
     colors: BookmarkColors = rememberBookmarkColors(),
+    onFetchEpisode: (suspend () -> BaseEpisode?)? = null,
 ) {
+    var fetchedEpisode by remember(bookmark.uuid) { mutableStateOf<BaseEpisode?>(null) }
+    LaunchedEffect(bookmark.uuid) {
+        if (episode == null && onFetchEpisode != null) {
+            fetchedEpisode = onFetchEpisode()
+        }
+    }
+    val displayEpisode = episode ?: fetchedEpisode
     Column(
         modifier = modifier,
     ) {
@@ -122,9 +135,9 @@ fun BookmarkRow(
                             },
                         ),
                 ) {
-                    if (episode != null) {
+                    if (displayEpisode != null) {
                         EpisodeImage(
-                            episode = episode,
+                            episode = displayEpisode,
                             corners = 8.dp,
                             useEpisodeArtwork = useEpisodeArtwork,
                             modifier = Modifier.size(56.dp),
@@ -146,10 +159,11 @@ fun BookmarkRow(
                     .weight(1f)
                     .padding(horizontal = 16.dp),
             ) {
-                val shouldShowEpisodeTitle = showEpisodeTitle && bookmark.episodeTitle.isNotEmpty()
+                val episodeTitle = bookmark.episodeTitle.ifEmpty { displayEpisode?.title.orEmpty() }
+                val shouldShowEpisodeTitle = showEpisodeTitle && episodeTitle.isNotEmpty()
                 if (shouldShowEpisodeTitle) {
                     TextH70(
-                        text = bookmark.episodeTitle,
+                        text = episodeTitle,
                         color = colors.bookmarkRow.secondaryText,
                         maxLines = 1,
                         modifier = Modifier.padding(top = 8.dp),

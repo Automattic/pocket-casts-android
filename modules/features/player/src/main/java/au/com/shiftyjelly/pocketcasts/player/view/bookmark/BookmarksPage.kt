@@ -42,6 +42,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.NoContentBanner
 import au.com.shiftyjelly.pocketcasts.compose.components.SearchBar
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
@@ -96,6 +97,7 @@ fun BookmarksPage(
             bookmarksViewModel.play(bookmark)
         },
         onBookmarkArtworkClick = onBookmarkArtworkClick?.takeIf { sourceView != SourceView.PLAYER && FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS) },
+        onFetchEpisode = bookmarksViewModel::resolveEpisode,
         onSearchTextChange = { bookmarksViewModel.onSearchTextChanged(it) },
         onUpgradeClick = onUpgradeClick,
         openFragment = openFragment,
@@ -152,6 +154,7 @@ private fun Content(
     bottomInset: Dp,
     onRowLongClick: (Bookmark) -> Unit,
     onPlayClick: (Bookmark) -> Unit,
+    onFetchEpisode: suspend (Bookmark) -> BaseEpisode?,
     onBookmarksOptionsMenuClick: () -> Unit,
     onSearchTextChange: (String) -> Unit,
     onBookmarkArtworkClick: ((Bookmark) -> Unit)? = null,
@@ -180,6 +183,7 @@ private fun Content(
                 onOptionsMenuClick = onBookmarksOptionsMenuClick,
                 onPlayClick = onPlayClick,
                 onArtworkClick = onBookmarkArtworkClick,
+                onFetchEpisode = onFetchEpisode,
                 onSearchTextChange = onSearchTextChange,
                 onSearchBarClearButtonClick = onSearchBarClearButtonClick,
             )
@@ -230,6 +234,7 @@ private fun BookmarksView(
     onRowLongClick: (Bookmark) -> Unit,
     onOptionsMenuClick: () -> Unit,
     onPlayClick: (Bookmark) -> Unit,
+    onFetchEpisode: suspend (Bookmark) -> BaseEpisode?,
     onSearchTextChange: (String) -> Unit,
     onSearchBarClearButtonClick: () -> Unit,
     onArtworkClick: ((Bookmark) -> Unit)? = null,
@@ -297,6 +302,7 @@ private fun BookmarksView(
                 colors = colors,
                 onPlayClick = { onPlayClick(bookmark) },
                 onArtworkClick = onArtworkClick?.let { handler -> { handler(bookmark) } },
+                onFetchEpisode = { onFetchEpisode(bookmark) },
                 modifier = Modifier.pointerInput(bookmark.adapterId) {
                     detectTapGestures(
                         onLongPress = { onRowLongClick(bookmark) },
@@ -344,6 +350,7 @@ private fun BookmarksPreview(
             bottomInset = 0.dp,
             colors = rememberBookmarkColors(),
             onPlayClick = {},
+            onFetchEpisode = { null },
             onRowLongClick = {},
             onBookmarksOptionsMenuClick = {},
             onSearchTextChange = {},
