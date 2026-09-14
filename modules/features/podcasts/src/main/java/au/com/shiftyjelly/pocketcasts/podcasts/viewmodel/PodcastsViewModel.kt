@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.SuggestedFoldersPopu
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
 import au.com.shiftyjelly.pocketcasts.repositories.ads.BlazeAdsManager
+import au.com.shiftyjelly.pocketcasts.repositories.di.DefaultDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
@@ -29,7 +30,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
@@ -60,6 +61,7 @@ class PodcastsViewModel @AssistedInject constructor(
     private val suggestedFoldersPopupPolicy: SuggestedFoldersPopupPolicy,
     private val userManager: UserManager,
     private val notificationHelper: NotificationHelper,
+    @DefaultDispatcher private val computationDispatcher: CoroutineDispatcher,
     blazeAdsManager: BlazeAdsManager,
     @Assisted private val folderUuid: String?,
 ) : ViewModel() {
@@ -99,7 +101,7 @@ class PodcastsViewModel @AssistedInject constructor(
                 when (sortType) {
                     PodcastsSortType.RECENTLY_PLAYED -> podcastManager.observePodcastsBySortedRecentlyPlayed()
                     else -> podcastManager.observePodcastsSortedByLatestEpisode()
-                }
+                }.map { podcasts -> sortType to podcasts }
             }
 
         val foldersFlow: Flow<List<FolderItem.Folder>> = folderManager.observeFolders()
@@ -124,10 +126,9 @@ class PodcastsViewModel @AssistedInject constructor(
         return combine(
             podcastsFlow,
             foldersFlow,
-            settings.podcastsSortType.flow,
             userManager.getSignInState().asFlow(),
-        ) { podcasts, folders, sortType, signInState ->
-            withContext(Dispatchers.Default) {
+        ) { (sortType, podcasts), folders, signInState ->
+            withContext(computationDispatcher) {
                 buildUiState(podcasts, folders, sortType, signInState)
             }
         }
@@ -139,6 +140,7 @@ class PodcastsViewModel @AssistedInject constructor(
         sortType: PodcastsSortType,
         signInState: SignInState,
     ) = UiState(
+        sortType = sortType,
         items = when {
             signInState.isNoAccountOrFree -> buildPodcastItems(podcasts, sortType)
 
@@ -231,7 +233,7 @@ class PodcastsViewModel @AssistedInject constructor(
         // Wait until the UI state is synchronized with the ordered items.
         // This ensures smoother transitions — items won’t jump around
         // if an intermediate state is emitted during ordering.
-        return withContext(Dispatchers.Default) {
+        return withContext(computationDispatcher) {
             val sortedUuids = items.map(FolderItem::uuid)
             uiState
                 .map { state -> state.items.map(FolderItem::uuid) }
@@ -319,6 +321,7 @@ class PodcastsViewModel @AssistedInject constructor(
 
     data class UiState(
         val isLoadingItems: Boolean = false,
+        val sortType: PodcastsSortType = PodcastsSortType.default,
         val items: List<FolderItem> = emptyList(),
         val folder: Folder? = null,
         val isSignedInAsPlusOrPatron: Boolean = false,

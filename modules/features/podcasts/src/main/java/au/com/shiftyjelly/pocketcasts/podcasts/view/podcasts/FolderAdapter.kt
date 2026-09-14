@@ -139,9 +139,9 @@ class FolderAdapter(
         notifyDataSetChanged()
     }
 
-    fun setFolderItems(items: List<FolderItem>) {
+    fun setFolderItems(items: List<FolderItem>, commitCallback: (() -> Unit)? = null) {
         applyBadgesToNewPodcasts(items.mapNotNull { (it as? FolderItem.Podcast)?.podcast })
-        submitList(items)
+        submitList(items, commitCallback?.let { callback -> Runnable { callback() } })
     }
 
     private fun applyBadgesToExistingPodcasts() {
