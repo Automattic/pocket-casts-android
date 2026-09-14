@@ -34,6 +34,7 @@ import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLayoutResult
@@ -74,6 +75,7 @@ fun BookmarkTranscriptView(
 ) {
     val theme = rememberTranscriptTheme()
     val scrollState = rememberScrollState()
+    val density = LocalDensity.current
     var layout by remember { mutableStateOf<TextLayoutResult?>(null) }
     var viewportHeight by remember { mutableIntStateOf(0) }
     var hasScrolled by remember { mutableStateOf(false) }
@@ -185,7 +187,8 @@ fun BookmarkTranscriptView(
         val result = layout ?: return@LaunchedEffect
         if (hasScrolled || !scrollToPassage || passage == null || viewportHeight == 0) return@LaunchedEffect
         val box = result.getBoundingBox(passage.start.coerceIn(0, transcript.displayText.length.coerceAtLeast(1) - 1))
-        val target = (box.top - viewportHeight * anchorFraction + box.height / 2).roundToInt()
+        val topPadding = with(density) { ContentPadding.calculateTopPadding().toPx() }
+        val target = (box.top + topPadding - viewportHeight * anchorFraction + box.height / 2).roundToInt()
         scrollState.scrollTo(target.coerceIn(0, scrollState.maxValue))
         hasScrolled = true
     }
