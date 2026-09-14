@@ -44,7 +44,6 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.login.ExchangeSonosResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.parseErrorResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.parseTokenErrorResponse
-import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.LoginIdentityType
@@ -79,7 +78,6 @@ import com.pocketcasts.service.api.WinbackResponse
 import com.squareup.moshi.Moshi
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.Completable
-import io.reactivex.Flowable
 import io.reactivex.Maybe
 import io.reactivex.Single
 import java.io.File
@@ -157,8 +155,6 @@ class SyncManagerImpl @Inject constructor(
     override fun getEmail(): String? = syncAccountManager.getEmail()
 
     override fun emailFlow() = syncAccountManager.emailFlow().distinctUntilChanged()
-
-    override fun emailFlowable(): Flowable<Optional<String>> = syncAccountManager.emailFlowable().distinctUntilChanged()
 
     override suspend fun getAccessToken(account: Account): AccessToken = syncAccountManager.peekAccessToken(account)
         ?: fetchAccessToken(account)
