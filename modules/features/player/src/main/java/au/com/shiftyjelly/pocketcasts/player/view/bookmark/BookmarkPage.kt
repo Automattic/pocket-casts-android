@@ -221,7 +221,6 @@ private fun Content(
             modifier = Modifier.weight(1f),
         )
 
-        val isTitleBlank = title.text.isBlank()
         val textColor = remember(colors) {
             val backgroundForContrast = colors.background01.copy(alpha = 1f)
             val highlightForContrast = colors.highlight01.copy(alpha = 1f)
@@ -235,7 +234,6 @@ private fun Content(
         RowButton(
             text = stringResource(if (isNewBookmark) R.string.save_bookmark else R.string.change_title),
             colors = ButtonDefaults.buttonColors(backgroundColor = colors.highlight01),
-            enabled = !isTitleBlank,
             textColor = textColor,
             includePadding = false,
             onClick = onSave,
