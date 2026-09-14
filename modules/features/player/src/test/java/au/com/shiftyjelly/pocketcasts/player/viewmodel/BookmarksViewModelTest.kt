@@ -13,7 +13,8 @@ import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
 import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
-import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkPlaybackTimeResolver
+import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkEpisodeResolver
+import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkPlaybackTimeResolver
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.search.BookmarkSearchHandler
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
@@ -92,6 +93,9 @@ class BookmarksViewModelTest {
     @Mock
     private lateinit var bookmarkPlaybackTimeResolver: BookmarkPlaybackTimeResolver
 
+    @Mock
+    private lateinit var bookmarkEpisodeResolver: BookmarkEpisodeResolver
+
     private lateinit var bookmarkSearchHandler: BookmarkSearchHandler
 
     private lateinit var bookmarksViewModel: BookmarksViewModel
@@ -145,6 +149,7 @@ class BookmarksViewModelTest {
             ioDispatcher = UnconfinedTestDispatcher(),
             bookmarkSearchHandler = bookmarkSearchHandler,
             bookmarkPlaybackTimeResolver = bookmarkPlaybackTimeResolver,
+            bookmarkEpisodeResolver = bookmarkEpisodeResolver,
         )
     }
 
@@ -231,6 +236,7 @@ class BookmarksViewModelTest {
     @Test
     fun `play seeks to the resolved reference time`() = runTest {
         val bookmark = Bookmark("uuid1", episodeUuid = episodeUuid, timeSecs = 10)
+        whenever(bookmarkEpisodeResolver.resolve(bookmark)).thenReturn(episode)
         whenever(bookmarkPlaybackTimeResolver.playbackTimeMs(any(), anyOrNull(), any())).thenReturn(42_000)
 
         bookmarksViewModel.play(bookmark)
@@ -244,6 +250,7 @@ class BookmarksViewModelTest {
         whenever(playbackManager.getCurrentEpisode()).thenReturn(episode)
         whenever(bookmarkPlaybackTimeResolver.playbackTimeMs(any(), anyOrNull(), any())).thenReturn(42_000)
         val bookmark = Bookmark("uuid1", episodeUuid = episodeUuid, timeSecs = 10, referenceTime = 25)
+        whenever(bookmarkEpisodeResolver.resolve(bookmark)).thenReturn(episode)
 
         bookmarksViewModel.play(bookmark)
 
@@ -257,6 +264,7 @@ class BookmarksViewModelTest {
         whenever(playbackManager.getCurrentEpisode()).thenReturn(episode)
         whenever(bookmarkPlaybackTimeResolver.playbackTimeMs(any(), anyOrNull(), any())).thenReturn(10_000)
         val bookmark = Bookmark("uuid1", episodeUuid = episodeUuid, timeSecs = 10)
+        whenever(bookmarkEpisodeResolver.resolve(bookmark)).thenReturn(episode)
 
         bookmarksViewModel.play(bookmark)
 
@@ -265,19 +273,15 @@ class BookmarksViewModelTest {
     }
 
     @Test
-    fun `play fetches a missing episode from the server before playing`() = runTest {
-        val missingEpisodeUuid = "missing-episode"
-        val podcastUuid = "podcast-1"
-        val bookmark = Bookmark("uuid1", episodeUuid = missingEpisodeUuid, podcastUuid = podcastUuid, timeSecs = 10)
-        val fetchedEpisode = PodcastEpisode(uuid = missingEpisodeUuid, podcastUuid = podcastUuid, publishedDate = Date())
-        whenever(episodeManager.findEpisodeByUuid(missingEpisodeUuid)).thenReturn(null)
-        whenever(podcastManager.findOrDownloadPodcastRxSingle(podcastUuid)).thenReturn(Single.just(Podcast(uuid = podcastUuid, isSubscribed = false)))
-        whenever(episodeManager.downloadMissingPodcastEpisode(missingEpisodeUuid, podcastUuid)).thenReturn(fetchedEpisode)
+    fun `play resolves the episode before playing`() = runTest {
+        val bookmark = Bookmark("uuid1", episodeUuid = "missing-episode", podcastUuid = "podcast-1", timeSecs = 10)
+        val fetchedEpisode = PodcastEpisode(uuid = "missing-episode", podcastUuid = "podcast-1", publishedDate = Date())
+        whenever(bookmarkEpisodeResolver.resolve(bookmark)).thenReturn(fetchedEpisode)
         whenever(bookmarkPlaybackTimeResolver.playbackTimeMs(any(), anyOrNull(), any())).thenReturn(10_000)
 
         bookmarksViewModel.play(bookmark)
 
-        verifyBlocking(episodeManager) { downloadMissingPodcastEpisode(missingEpisodeUuid, podcastUuid) }
+        verifyBlocking(bookmarkEpisodeResolver) { resolve(bookmark) }
         verify(playbackManager).seekToTimeMs(eq(10_000), anyOrNull())
     }
 }
