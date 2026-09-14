@@ -2485,6 +2485,8 @@
     <string name="bookmarks_free_user_empty_state_message">You can save timestamps of important moments in an episode.</string>
     <string name="bookmarks_free_user_empty_state_button">Get Bookmarks</string>
     <string name="bookmarks_paid_user_empty_state_message">You can save timestamps of episodes from the actions menu in the player or by configuring an action with your headphones.</string>
+    <string name="smart_bookmarks_upsell_title">Save the parts worth keeping</string>
+    <string name="smart_bookmarks_upsell_message">One tap. It\'s named, and the words come with it.</string>
 
     <!-- Transcripts -->
     <string name="error_transcript_failed_to_load">Sorry, but something went wrong while loading this transcript.</string>
