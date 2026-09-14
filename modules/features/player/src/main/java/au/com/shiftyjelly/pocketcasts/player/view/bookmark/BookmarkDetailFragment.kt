@@ -145,6 +145,10 @@ class BookmarkDetailFragment : BaseDialogFragment() {
     }
 
     private fun onArtworkClick() {
+        if (args.sourceView == SourceView.EPISODE_DETAILS) {
+            dismiss()
+            return
+        }
         (activity as? FragmentHostListener)?.openEpisodeDialog(
             episodeUuid = args.episodeUuid,
             source = EpisodeViewSource.UNKNOWN,
