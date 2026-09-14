@@ -6,8 +6,6 @@ import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -25,13 +23,8 @@ class WhatsNewViewModel @Inject constructor(
 ) : ViewModel() {
     val state: StateFlow<UiState> = settings.cachedSubscription.flow
         .map { subscription ->
-            val isUserEntitled = subscription != null
             UiState.Loaded(
-                feature = if (FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS)) {
-                    WhatsNewFeature.SmartBookmarks(isUserEntitled = isUserEntitled)
-                } else {
-                    WhatsNewFeature.SyncedTranscripts(isUserEntitled = isUserEntitled)
-                },
+                feature = WhatsNewFeature.SyncedTranscripts(isUserEntitled = subscription != null),
             )
         }
         .stateIn(
@@ -49,7 +42,7 @@ class WhatsNewViewModel @Inject constructor(
             val target = if (feature.isUserEntitled) {
                 NavigationState.ForceClose
             } else {
-                NavigationState.StartUpsellFlow(source = feature.upgradeSource)
+                NavigationState.StartUpsellFlow(source = OnboardingUpgradeSource.SYNCED_TRANSCRIPTS)
             }
             _navigationState.emit(target)
         }
@@ -75,7 +68,6 @@ class WhatsNewViewModel @Inject constructor(
         @get:StringRes val confirmButtonNote: Int? get() = null
         val isUserEntitled: Boolean
         val subscriptionTier: SubscriptionTier? get() = null
-        val upgradeSource: OnboardingUpgradeSource
 
         data class SyncedTranscripts(
             override val isUserEntitled: Boolean,
@@ -86,18 +78,6 @@ class WhatsNewViewModel @Inject constructor(
                 get() = if (isUserEntitled) LR.string.got_it else LR.string.profile_start_free_trial
             override val confirmButtonNote = LR.string.synced_transcripts_whats_new_button_note
             override val subscriptionTier get() = SubscriptionTier.Plus
-            override val upgradeSource = OnboardingUpgradeSource.SYNCED_TRANSCRIPTS
-        }
-
-        data class SmartBookmarks(
-            override val isUserEntitled: Boolean,
-        ) : WhatsNewFeature {
-            override val title = LR.string.smart_bookmarks_whats_new_title
-            override val message = LR.string.smart_bookmarks_whats_new_message
-            override val confirmButtonTitle
-                get() = if (isUserEntitled) LR.string.got_it else LR.string.smart_bookmarks_whats_new_button
-            override val subscriptionTier get() = SubscriptionTier.Plus
-            override val upgradeSource = OnboardingUpgradeSource.BOOKMARKS
         }
     }
 
