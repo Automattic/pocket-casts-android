@@ -1,6 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.transcripts.ui
 
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.snap
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -80,8 +82,11 @@ fun BookmarkTranscriptView(
     var layout by remember { mutableStateOf<TextLayoutResult?>(null) }
     var viewportHeight by remember { mutableIntStateOf(0) }
     var hasScrolled by remember { mutableStateOf(false) }
+    var skipFade by remember { mutableStateOf(false) }
+    val startTimeMs = remember { System.currentTimeMillis() }
     val contentAlpha by animateFloatAsState(
         targetValue = if (!scrollToPassage || passage == null || hasScrolled) 1f else 0f,
+        animationSpec = if (skipFade) snap() else tween(),
         label = "transcriptFade",
     )
     val currentLayout by rememberUpdatedState(layout)
@@ -191,6 +196,7 @@ fun BookmarkTranscriptView(
         val topPadding = with(density) { ContentPadding.calculateTopPadding().toPx() }
         val target = (box.top + topPadding - viewportHeight * anchorFraction + box.height / 2).roundToInt()
         scrollState.scrollTo(target.coerceIn(0, scrollState.maxValue))
+        skipFade = System.currentTimeMillis() - startTimeMs < FadeInThresholdMs
         hasScrolled = true
     }
 }
@@ -216,6 +222,8 @@ private val GutterInset = 2.dp
 
 private val TopFade = 48.dp
 private val BottomFade = 64.dp
+
+private const val FadeInThresholdMs = 200L
 
 private fun Modifier.fadingEdges() = this
     .graphicsLayer(compositingStrategy = CompositingStrategy.Offscreen)
