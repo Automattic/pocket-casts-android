@@ -12,8 +12,7 @@ import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.squareup.moshi.Moshi
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.ensureActive
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.rx2.await
 import retrofit2.HttpException
 
@@ -32,26 +31,26 @@ class UploadEpisodeTask @AssistedInject constructor(
         const val OUTPUT_ERROR_MESSAGE = "error_message"
     }
 
-    private val episodeUUID: String? = inputData.getString(INPUT_EPISODE_UUID)
+    private val episodeUuid: String? = inputData.getString(INPUT_EPISODE_UUID)
 
     override suspend fun doWork(): Result {
-        val outputData = Data.Builder().putString(OUTPUT_EPISODE_UUID, episodeUUID)
+        val outputData = Data.Builder().putString(OUTPUT_EPISODE_UUID, episodeUuid)
 
-        if (episodeUUID == null) {
-            outputData.putString(OUTPUT_ERROR_MESSAGE, "Could not find episode $episodeUUID for upload")
+        if (episodeUuid == null) {
+            outputData.putString(OUTPUT_ERROR_MESSAGE, "Could not find episode $episodeUuid for upload")
             return Result.failure(outputData.build())
         }
 
         return try {
             // A missing episode skips the upload and still succeeds
-            val userEpisode = userEpisodeManager.findEpisodeByUuid(episodeUUID)
+            val userEpisode = userEpisodeManager.findEpisodeByUuid(episodeUuid)
             if (userEpisode != null) {
                 userEpisodeManager.performUploadToServerRxCompletable(userEpisode, playbackManager).await()
             }
             Result.success(outputData.build())
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Throwable) {
-            // Rethrows only when the worker was stopped, so any other error still maps to a retry or failure
-            currentCoroutineContext().ensureActive()
             LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, e, "Could not upload file")
             val errorMessage: String
             val retry: Boolean
