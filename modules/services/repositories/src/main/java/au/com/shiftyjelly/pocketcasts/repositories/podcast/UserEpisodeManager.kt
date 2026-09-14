@@ -29,9 +29,7 @@ import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.eventhorizon.EpisodeUploadFailedEvent
 import com.automattic.eventhorizon.EpisodeUploadFinishedEvent
 import com.automattic.eventhorizon.EventHorizon
-import com.jakewharton.rxrelay2.BehaviorRelay
 import dagger.hilt.android.qualifiers.ApplicationContext
-import io.reactivex.BackpressureStrategy
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Maybe
@@ -51,6 +49,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.update
@@ -86,7 +85,7 @@ interface UserEpisodeManager {
     suspend fun updateEpisodeStatus(episode: UserEpisode, status: EpisodeDownloadStatus)
     suspend fun updateDownloadErrorDetails(episode: UserEpisode, errorDetails: String?)
     suspend fun updateDownloadTaskId(episode: UserEpisode, taskId: String?)
-    fun accountUsageRxFlowable(): Flowable<Optional<FileAccount>>
+    fun accountUsageFlow(): Flow<Optional<FileAccount>>
     fun userEpisodesSortedFlow(sortOrder: Settings.CloudSortOrder): Flow<List<UserEpisode>>
     suspend fun deletePlayedEpisodeIfReq(episode: UserEpisode, playbackManager: PlaybackManager)
     fun autoUploadToCloudIfReq(episode: UserEpisode)
@@ -135,7 +134,8 @@ class UserEpisodeManagerImpl @Inject constructor(
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.IO
 
-    private val usageRelay = BehaviorRelay.create<Optional<FileAccount>>()
+    // Null until the first usage load; Optional has identity equality so every write still re-emits
+    private val usageState = MutableStateFlow<Optional<FileAccount>?>(null)
     private val userEpisodeDao = appDatabase.userEpisodeDao()
     private val upNextDao = appDatabase.upNextDao()
 
@@ -301,7 +301,7 @@ class UserEpisodeManagerImpl @Inject constructor(
         }
         val responseBody = response.body() ?: return
 
-        usageRelay.accept(Optional.of(responseBody.account))
+        usageState.value = Optional.of(responseBody.account)
 
         val playingEpisodeUUID = (playbackManager.getCurrentEpisode() as? UserEpisode)?.uuid
         val existingFiles = userEpisodeDao.findAllUuids().toMutableList()
@@ -497,7 +497,7 @@ class UserEpisodeManagerImpl @Inject constructor(
         syncManager.deleteFromServerRxSingle(userEpisode)
             .doOnSubscribe { UploadProgressManager.clearProgress(userEpisode.uuid) }
             .flatMapCompletable { userEpisodeDao.updateServerStatusRxCompletable(userEpisode.uuid, UserEpisodeServerStatus.LOCAL) }
-            .andThen(syncManager.getFileUsageRxSingle().doOnSuccess { usageRelay.accept(Optional.of(it)) }.ignoreElement())
+            .andThen(syncManager.getFileUsageRxSingle().doOnSuccess { usageState.value = Optional.of(it) }.ignoreElement())
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -546,8 +546,8 @@ class UserEpisodeManagerImpl @Inject constructor(
         userEpisodeDao.updateDownloadTaskId(episode.uuid, taskId)
     }
 
-    override fun accountUsageRxFlowable(): Flowable<Optional<FileAccount>> {
-        return usageRelay.toFlowable(BackpressureStrategy.LATEST)
+    override fun accountUsageFlow(): Flow<Optional<FileAccount>> {
+        return usageState.filterNotNull()
     }
 
     override suspend fun deletePlayedEpisodeIfReq(episode: UserEpisode, playbackManager: PlaybackManager) {
@@ -586,7 +586,7 @@ class UserEpisodeManagerImpl @Inject constructor(
         WorkManager.getInstance(context).cancelAllWorkByTag(WORK_MANAGER_UPLOAD_TASK)
 
         // Clear usage
-        usageRelay.accept(Optional.empty())
+        usageState.value = Optional.empty()
 
         return@withContext // Need this to satisfy the type for implicit return (which is dumb)
     }
