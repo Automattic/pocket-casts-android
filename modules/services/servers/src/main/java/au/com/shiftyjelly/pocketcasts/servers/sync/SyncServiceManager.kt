@@ -244,7 +244,7 @@ open class SyncServiceManager @Inject constructor(
         return Flowable.create(
             { emitter ->
                 try {
-                    val requestBody = ProgressRequestBody.create((episode.fileType ?: "audio/mp3").toMediaType(), file, emitter)
+                    val requestBody = ProgressRequestBody.create((episode.fileType ?: "audio/mp3").toMediaType(), file, emitter::onNext)
                     val call = service.uploadFile(url, requestBody)
                     emitter.setCancellable { call.cancel() }
 
