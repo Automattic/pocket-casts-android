@@ -28,6 +28,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.isNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -170,7 +171,7 @@ class BookmarkViewModelTest {
     }
 
     @Test
-    fun `save awaits the in-flight suggestion so the passage is captured`() = runTest {
+    fun `saves without waiting for an in-flight suggestion`() = runTest {
         stubNewBookmark()
         val gate = CompletableDeferred<BookmarkSuggestion?>()
         doSuspendableAnswer { gate.await() }.whenever(bookmarkManager).suggestBookmark(episodeUuid, timeSecs)
@@ -180,7 +181,6 @@ class BookmarkViewModelTest {
         viewModel.load(arguments)
         val saved = CompletableDeferred<Unit>()
         viewModel.saveBookmark { _, _ -> saved.complete(Unit) }
-        gate.complete(suggestion)
         saved.await()
 
         verify(bookmarkManager).add(
@@ -189,9 +189,9 @@ class BookmarkViewModelTest {
             title = any(),
             creationSource = any(),
             addedAt = any(),
-            passage = eq("the passage"),
-            passageLocation = eq(5),
-            referenceTime = eq(118),
+            passage = isNull(),
+            passageLocation = isNull(),
+            referenceTime = isNull(),
         )
     }
 
@@ -204,6 +204,38 @@ class BookmarkViewModelTest {
         viewModel.load(arguments)
 
         verify(bookmarkManager).suggestBookmark(episodeUuid, timeSecs)
+    }
+
+    @Test
+    fun `saves a blank title as the default`() = runTest {
+        stubNewBookmark()
+        whenever(bookmarkManager.suggestBookmark(episodeUuid, timeSecs)).thenReturn(null)
+        whenever(episodeManager.findByUuid(episodeUuid)).thenReturn(PodcastEpisode(uuid = episodeUuid, publishedDate = Date()))
+        whenever(bookmarkManager.add(any(), any(), any(), any(), any(), anyOrNull(), anyOrNull(), anyOrNull())).thenReturn(Bookmark(uuid = "new-id"))
+
+        viewModel.load(arguments)
+        viewModel.changeTitle(TextFieldValue("   "))
+        val saved = CompletableDeferred<Unit>()
+        viewModel.saveBookmark { _, _ -> saved.complete(Unit) }
+        saved.await()
+
+        verify(bookmarkManager).add(
+            episode = any(),
+            timeSecs = eq(timeSecs),
+            title = eq("Bookmark"),
+            creationSource = any(),
+            addedAt = any(),
+            passage = isNull(),
+            passageLocation = isNull(),
+            referenceTime = isNull(),
+        )
+    }
+
+    @Test
+    fun `caps an applied suggestion at 100 characters`() = runTest {
+        viewModel.applySuggestion("a".repeat(150))
+
+        assertEquals(100, viewModel.uiState.value.title.text.length)
     }
 
     private suspend fun stubNewBookmark() {
