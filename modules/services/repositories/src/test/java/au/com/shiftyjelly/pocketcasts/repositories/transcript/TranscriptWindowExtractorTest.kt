@@ -292,38 +292,36 @@ class TranscriptWindowExtractorTest {
         val result = TranscriptWindowExtractor.parseVttWindow(vtt, centerSecs = 30)
 
         assertEquals(
-            "A whole middle sentence lives entirely inside the window without any trouble at all here.",
+            "The first sentence starts here and runs into the second cue before it stops. " +
+                "A whole middle sentence lives entirely inside the window without any trouble at all here. " +
+                "The final sentence begins in this cue and then extends beyond the window edge to finish.",
             result?.passage,
         )
     }
 
     @Test
-    fun `keep the unsnapped window when snapping drops below the minimum words`() {
+    fun `return null when the snapped window is below the minimum words`() {
         val vtt = """
             |WEBVTT
             |
             |00:00:00.000 --> 00:00:05.000
-            |The introduction sentence spans across the first two cues and
+            |Intro sentence here.
             |
             |00:00:05.000 --> 00:00:15.000
-            |continues here until it reaches its natural stopping point at last.
+            |Short one.
             |
             |00:00:15.000 --> 00:00:25.000
-            |It works.
+            |Tiny bit.
             |
             |00:00:25.000 --> 00:00:35.000
-            |Then a long closing sentence begins right here and
+            |Last short.
             |
             |00:00:35.000 --> 00:00:45.000
-            |carries on well past the window to its eventual end.
+            |Beyond the edge.
         """.trimMargin()
 
         val result = TranscriptWindowExtractor.parseVttWindow(vtt, centerSecs = 30)
 
-        assertEquals(
-            "continues here until it reaches its natural stopping point at last. It works. " +
-                "Then a long closing sentence begins right here and",
-            result?.passage,
-        )
+        assertNull(result)
     }
 }

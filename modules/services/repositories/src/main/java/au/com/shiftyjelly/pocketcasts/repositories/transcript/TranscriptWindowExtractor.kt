@@ -113,24 +113,19 @@ class TranscriptWindowExtractor @Inject constructor(
             val windowStart = texts.take(firstIndex).sumOf { it.value.trim().length + 1 }
             val windowPassage = inWindow.joinToString(" ") { it.value.trim() }.trim()
 
-            val snapped = snapToSentences(fullText, windowStart, windowStart + windowPassage.length)
-                ?.takeIf { (start, end) -> wordCount(fullText.substring(start, end)) >= MIN_WORDS }
-            if (snapped != null) {
-                val (start, end) = snapped
-                val raw = fullText.substring(start, end)
-                val location = start + (raw.length - raw.trimStart().length)
-                return TranscriptWindow(passage = raw.trim(), location = location, referenceTimeSecs = centerSecs)
-            }
-
-            if (wordCount(windowPassage) < MIN_WORDS) return null
-            return TranscriptWindow(passage = windowPassage, location = windowStart, referenceTimeSecs = centerSecs)
+            val (start, end) = snapToSentences(fullText, windowStart, windowStart + windowPassage.length)
+                ?.takeIf { (snapStart, snapEnd) -> wordCount(fullText.substring(snapStart, snapEnd)) >= MIN_WORDS }
+                ?: return null
+            val raw = fullText.substring(start, end)
+            val location = start + (raw.length - raw.trimStart().length)
+            return TranscriptWindow(passage = raw.trim(), location = location, referenceTimeSecs = centerSecs)
         }
 
         private fun snapToSentences(text: String, start: Int, end: Int): Pair<Int, Int>? {
             val iterator = BreakIterator.getSentenceInstance(Locale.getDefault())
             iterator.setText(text)
-            val snappedStart = if (isSentenceStart(iterator, text, start)) start else iterator.following(start)
-            val snappedEnd = if (isSentenceEnd(iterator, text, end)) end else iterator.preceding(end)
+            val snappedStart = if (isSentenceStart(iterator, text, start)) start else iterator.preceding(start)
+            val snappedEnd = if (isSentenceEnd(iterator, text, end)) end else iterator.following(end)
             if (snappedStart == BreakIterator.DONE || snappedEnd == BreakIterator.DONE || snappedStart >= snappedEnd) {
                 return null
             }
