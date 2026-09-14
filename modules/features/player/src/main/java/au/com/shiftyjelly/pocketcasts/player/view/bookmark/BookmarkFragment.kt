@@ -18,6 +18,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.LocalPodcastColors
@@ -28,6 +29,7 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class BookmarkFragment : BaseFragment() {
@@ -64,7 +66,7 @@ class BookmarkFragment : BaseFragment() {
             val uiState: BookmarkViewModel.UiState by viewModel.uiState.collectAsState()
 
             CallOnce {
-                viewModel.onShown(isNewBookmark = args.bookmarkUuid == null)
+                viewModel.onShown(isNewBookmark = args.isNewBookmark || args.bookmarkUuid == null)
             }
 
             CompositionLocalProvider(
@@ -123,9 +125,12 @@ class BookmarkFragment : BaseFragment() {
 
     private fun close() {
         viewModel.onClose()
-        requireActivity().run {
-            setResult(Activity.RESULT_CANCELED)
-            finish()
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.discardNewBookmarkIfNeeded()
+            requireActivity().run {
+                setResult(Activity.RESULT_CANCELED)
+                finish()
+            }
         }
     }
 }
