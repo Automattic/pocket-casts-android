@@ -2,8 +2,13 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
+    alias(libs.plugins.sentry)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.google.services)
+}
+
+sentry {
+    projectName = "pocket-casts-tv"
 }
 
 android {
