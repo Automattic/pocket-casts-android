@@ -100,6 +100,15 @@ class ShelfSharedViewModel @Inject constructor(
         VideoState(streamVideoState, hlsAvailable, renderingEnabled, audioOnly)
     }
 
+    private val playerOpenState = MutableStateFlow(false)
+
+    private val smartBookmarksPromoActiveFlow = combine(
+        settings.showSmartBookmarksTooltip.flow,
+        playerOpenState,
+    ) { showTooltip, isPlayerOpen ->
+        showTooltip && isPlayerOpen && FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS)
+    }
+
     val uiState = combine(
         settings.shelfItems.flow,
         shelfUpNextObservable.asFlow(),
@@ -107,7 +116,7 @@ class ShelfSharedViewModel @Inject constructor(
             .mapNotNull { state -> (state as? UpNextQueue.State.Loaded)?.episode?.uuid }
             .flatMapLatest { episodeUuid -> transcriptManager.observeIsTranscriptAvailable(episodeUuid) },
         videoStateFlow,
-        settings.showSmartBookmarksTooltip.flow,
+        smartBookmarksPromoActiveFlow,
         ::createUiState,
     ).stateIn(
         viewModelScope,
@@ -120,7 +129,7 @@ class ShelfSharedViewModel @Inject constructor(
         shelfUpNext: UpNextQueue.State,
         isTranscriptAvailable: Boolean,
         videoState: VideoState,
-        showSmartBookmarksTooltip: Boolean,
+        isSmartBookmarksPromoActive: Boolean,
     ): UiState {
         val episode = (shelfUpNext as? UpNextQueue.State.Loaded)?.episode
         val streamHasVideo = videoState.streamVideoState == StreamVideoState.HasVideo || videoState.streamVideoState == StreamVideoState.Unknown
@@ -133,7 +142,7 @@ class ShelfSharedViewModel @Inject constructor(
             episode = episode,
             isTranscriptAvailable = isTranscriptAvailable,
             isVideoRenderingEnabled = videoState.renderingEnabled && streamHasVideo,
-            isSmartBookmarksPromoActive = showSmartBookmarksTooltip && FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS),
+            isSmartBookmarksPromoActive = isSmartBookmarksPromoActive,
         )
     }
 
@@ -267,6 +276,10 @@ class ShelfSharedViewModel @Inject constructor(
 
     fun dismissBookmarkTooltip() {
         settings.showSmartBookmarksTooltip.set(false, updateModifiedAt = false)
+    }
+
+    fun setPlayerOpen(isOpen: Boolean) {
+        playerOpenState.value = isOpen
     }
 
     fun onAddBookmarkClick(
