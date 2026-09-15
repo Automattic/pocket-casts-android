@@ -68,7 +68,6 @@ import com.automattic.eventhorizon.PodcastsScreenEpisodeGroupingChangedEvent
 import com.automattic.eventhorizon.PodcastsScreenSortOrderChangedEvent
 import com.automattic.eventhorizon.PodcastsScreenTabTappedEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.Maybe
 import io.reactivex.Single
@@ -146,8 +145,8 @@ class PodcastViewModel @Inject constructor(
 
     fun loadPodcast(uuid: String, resources: Resources) {
         this@PodcastViewModel.podcastUuid = uuid
-        val episodeSearchResults = episodeSearchHandler.getSearchResultsObservable(uuid)
-        val bookmarkSearchResults = bookmarkSearchHandler.getSearchResultsObservable(uuid)
+        val episodeSearchResults = episodeSearchHandler.getSearchResultsFlow(uuid).asFlowable()
+        val bookmarkSearchResults = bookmarkSearchHandler.getSearchResultsFlow(uuid).asFlowable()
 
         disposables.clear()
 
@@ -189,8 +188,8 @@ class PodcastViewModel @Inject constructor(
 
         Flowable.combineLatest(
             podcastFlowable,
-            episodeSearchResults.toFlowable(BackpressureStrategy.LATEST),
-            bookmarkSearchResults.toFlowable(BackpressureStrategy.LATEST),
+            episodeSearchResults,
+            bookmarkSearchResults,
             recommendationsFlowable,
         ) { podcast, episodeSearch, bookmarkSearch, recommendations ->
             CombinedData(
