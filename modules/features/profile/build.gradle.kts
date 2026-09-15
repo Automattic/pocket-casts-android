@@ -64,8 +64,6 @@ dependencies {
     implementation(libs.navigation.compose)
     implementation(libs.play.cast)
     implementation(libs.rx2.java)
-    implementation(libs.rx2.kotlin)
-    implementation(libs.rx2.relay)
     implementation(libs.timber)
 
     implementation(projects.modules.features.cartheme)
