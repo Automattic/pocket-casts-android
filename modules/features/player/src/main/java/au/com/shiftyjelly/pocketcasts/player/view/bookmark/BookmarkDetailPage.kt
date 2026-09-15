@@ -38,6 +38,7 @@ import au.com.shiftyjelly.pocketcasts.compose.bookmark.BookmarkRowColors
 import au.com.shiftyjelly.pocketcasts.compose.buttons.TimePlayButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.TimePlayButtonColors
 import au.com.shiftyjelly.pocketcasts.compose.components.EpisodeImage
+import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
@@ -57,6 +58,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 internal fun BookmarkDetailPage(
     title: String,
     episodeTitle: String,
+    podcastUuid: String,
     podcastTitle: String,
     timeSecs: Int,
     createdAtText: String,
@@ -150,12 +152,11 @@ internal fun BookmarkDetailPage(
                             modifier = Modifier.size(56.dp),
                         )
                     } else {
-                        Image(
-                            painter = painterResource(if (theme.isDark) IR.drawable.defaultartwork_dark else IR.drawable.defaultartwork),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .size(56.dp)
-                                .clip(RoundedCornerShape(8.dp)),
+                        PodcastImage(
+                            uuid = podcastUuid,
+                            imageSize = 56.dp,
+                            cornerSize = 8.dp,
+                            elevation = null,
                         )
                     }
 
@@ -360,6 +361,7 @@ private fun BookmarkDetailPagePreview(
         BookmarkDetailPage(
             title = "Latency vs throughput tradeoff",
             episodeTitle = "Can the U.S. Rein in Prediction Markets?",
+            podcastUuid = "",
             podcastTitle = "Hard Fork",
             timeSecs = 340,
             createdAtText = "May 7, 2024 - 6:40 PM",
@@ -382,6 +384,7 @@ private fun BookmarkDetailPageTranscriptPreview(
         BookmarkDetailPage(
             title = "Why admissions feel like a lottery",
             episodeTitle = "Higher Education's Identity Crisis",
+            podcastUuid = "",
             podcastTitle = "Radio Atlantic",
             timeSecs = 1390,
             createdAtText = "May 7, 2024 - 6:40 PM",

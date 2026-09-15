@@ -3,15 +3,16 @@ package au.com.shiftyjelly.pocketcasts.player.view.bookmark
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration.Element
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.shownotes.ShowNotesManager
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.BookmarkTranscript
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TextSpan
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
+import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -26,7 +27,7 @@ import kotlinx.coroutines.rx2.await
 class BookmarkDetailViewModel @Inject constructor(
     private val bookmarkManager: BookmarkManager,
     private val episodeManager: EpisodeManager,
-    private val podcastManager: PodcastManager,
+    private val podcastCacheServiceManager: PodcastCacheServiceManager,
     private val transcriptManager: TranscriptManager,
     private val showNotesManager: ShowNotesManager,
     private val settings: Settings,
@@ -104,11 +105,11 @@ class BookmarkDetailViewModel @Inject constructor(
     }
 
     private fun loadPodcastTitle(current: String) {
-        if (current.isNotBlank()) return
+        if (current.isNotBlank() || podcastUuid == Podcast.userPodcast.uuid) return
         mutableState.value = mutableState.value.copy(isPodcastTitleLoading = true)
         viewModelScope.launch {
             val podcast = runCatching {
-                podcastManager.findOrDownloadPodcastRxSingle(podcastUuid, waitForSubscribe = false).await()
+                podcastCacheServiceManager.getPodcast(podcastUuid).await()
             }.onFailure {
                 if (it is CancellationException) throw it
             }.getOrNull()
@@ -161,7 +162,12 @@ class BookmarkDetailViewModel @Inject constructor(
             }
             val model = BookmarkTranscript.from(transcript)
             val span = model.passageDisplaySpan(passage, passageLocation)
-            val referenceOffset = referenceTimeSecs?.let { model.referenceOffsetAt(it * 1000L) } ?: span?.start
+            val rawOffset = referenceTimeSecs?.let { model.referenceOffsetAt(it * 1000L) } ?: span?.start
+            val referenceOffset = if (span != null && rawOffset != null) {
+                rawOffset.coerceIn(span.start, (span.end - 1).coerceAtLeast(span.start))
+            } else {
+                rawOffset
+            }
             mutableState.value = mutableState.value.copy(
                 transcriptState = if (span == null) TranscriptState.Unavailable else TranscriptState.Loaded(model, span, referenceOffset),
             )

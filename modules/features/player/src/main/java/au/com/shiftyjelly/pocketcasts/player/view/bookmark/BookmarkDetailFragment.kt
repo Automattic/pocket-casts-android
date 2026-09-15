@@ -181,6 +181,7 @@ class BookmarkDetailFragment : BaseDialogFragment() {
                 BookmarkDetailPage(
                     title = uiState.title,
                     episodeTitle = args.episodeTitle,
+                    podcastUuid = args.podcastUuid,
                     podcastTitle = uiState.podcastTitle,
                     timeSecs = uiState.timeSecs,
                     createdAtText = args.createdAtText,
