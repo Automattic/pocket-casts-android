@@ -161,6 +161,27 @@ class EpisodeManagerImplTest {
         verify(podcastCacheServiceManager, never()).getPodcastAndEpisode(any(), any())
     }
 
+    @Test
+    fun `find by uuid maybe emits the local episode`() = runTest {
+        val episode = createEpisode()
+        whenever(episodeDao.findByUuid("episode1")).thenReturn(episode)
+
+        @Suppress("DEPRECATION")
+        val result = episodeManagerImpl.findByUuidRxMaybe("episode1").awaitSingleOrNull()
+
+        assertEquals(episode, result)
+    }
+
+    @Test
+    fun `find by uuid maybe completes empty when the episode is missing`() = runTest {
+        whenever(episodeDao.findByUuid("episode1")).thenReturn(null)
+
+        @Suppress("DEPRECATION")
+        val result = episodeManagerImpl.findByUuidRxMaybe("episode1").awaitSingleOrNull()
+
+        assertNull(result)
+    }
+
     private fun createEpisode() = PodcastEpisode(uuid = "episode1", podcastUuid = "podcast1", publishedDate = Date())
 
     private suspend fun downloadMissingEpisode(

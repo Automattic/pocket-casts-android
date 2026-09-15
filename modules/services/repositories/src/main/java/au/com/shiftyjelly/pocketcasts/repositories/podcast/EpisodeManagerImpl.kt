@@ -97,7 +97,9 @@ class EpisodeManagerImpl @Inject constructor(
     override suspend fun findByUuids(uuids: Collection<String>): List<PodcastEpisode> = episodeDao.findByUuids(uuids)
 
     @Deprecated("Use findByUuid suspended method instead")
-    override fun findByUuidRxMaybe(uuid: String): Maybe<PodcastEpisode> = episodeDao.findByUuidRxMaybe(uuid)
+    override fun findByUuidRxMaybe(uuid: String): Maybe<PodcastEpisode> = rxMaybe(ioDispatcher) {
+        episodeDao.findByUuid(uuid)
+    }
 
     override fun findByUuidFlow(uuid: String): Flow<PodcastEpisode> = episodeDao.findByUuidFlow(uuid).filterNotNull()
 
