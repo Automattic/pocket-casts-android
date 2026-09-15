@@ -94,6 +94,7 @@ class Media3SessionCallbackTest {
         assertTrue(sessionCommands.contains(SessionCommand(APP_ACTION_CHANGE_SPEED, Bundle.EMPTY)))
         assertTrue(sessionCommands.contains(SessionCommand(APP_ACTION_ARCHIVE, Bundle.EMPTY)))
         assertTrue(sessionCommands.contains(SessionCommand(APP_ACTION_PLAY_NEXT, Bundle.EMPTY)))
+        assertTrue(sessionCommands.contains(SessionCommand(APP_ACTION_SHUFFLE, Bundle.EMPTY)))
     }
 
     @Test
@@ -176,6 +177,19 @@ class Media3SessionCallbackTest {
         testScope.advanceUntilIdle()
 
         verify(actions).archiveSuspend()
+    }
+
+    @Test
+    fun `onCustomCommand routes toggle up next shuffle`() = runTest {
+        callback.onCustomCommand(
+            mockSession,
+            mockController,
+            SessionCommand(APP_ACTION_SHUFFLE, Bundle.EMPTY),
+            Bundle.EMPTY,
+        )
+        testScope.advanceUntilIdle()
+
+        verify(actions).toggleUpNextShuffleSuspend()
     }
 
     @Test
