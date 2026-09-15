@@ -66,7 +66,7 @@ class BookmarkHelper(
             }
 
             if (isNew && FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS)) {
-                bookmarkManager.enrichBookmark(bookmark)
+                bookmarkManager.enrichBookmark(bookmark, SourceView.HEADPHONES.analyticsValue)
             }
             if (settings.headphoneControlsPlayBookmarkConfirmationSound.value) {
                 playbackManager.playBookmarkTone()

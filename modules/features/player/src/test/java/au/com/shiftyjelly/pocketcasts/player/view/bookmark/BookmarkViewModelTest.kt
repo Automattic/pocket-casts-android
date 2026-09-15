@@ -7,8 +7,10 @@ import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkGenerationAnalytics
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkSuggestion
+import au.com.shiftyjelly.pocketcasts.repositories.bookmark.TitleGeneration
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.shownotes.ShowNotesManager
@@ -63,7 +65,8 @@ class BookmarkViewModelTest {
         on { getString(LR.string.bookmark) } doReturn "Bookmark"
     }
     private val eventSink = TestEventSink()
-    private val viewModel = BookmarkViewModel(episodeManager, userEpisodeManager, bookmarkManager, transcriptManager, showNotesManager, EventHorizon(eventSink), context)
+    private val bookmarkGenerationAnalytics = mock<BookmarkGenerationAnalytics>()
+    private val viewModel = BookmarkViewModel(episodeManager, userEpisodeManager, bookmarkManager, transcriptManager, showNotesManager, EventHorizon(eventSink), bookmarkGenerationAnalytics, context)
 
     private val episodeUuid = "episode-id"
     private val timeSecs = 120
@@ -73,7 +76,7 @@ class BookmarkViewModelTest {
         timeSecs = timeSecs,
         podcastColors = PodcastColors.ForUserEpisode,
     )
-    private val suggestion = BookmarkSuggestion(passage = "the passage", passageLocation = 5, referenceTimeSecs = 118, title = "A great moment")
+    private val suggestion = BookmarkSuggestion(passage = "the passage", passageLocation = 5, referenceTimeSecs = 118, generation = TitleGeneration("A great moment", 0, null))
 
     @Before
     fun setUp() {
@@ -127,7 +130,7 @@ class BookmarkViewModelTest {
     @Test
     fun `suggests a title for a transcript bookmark from its stored passage`() = runTest {
         whenever(bookmarkManager.findBookmark("new-id")).thenReturn(Bookmark(uuid = "new-id", title = "Bookmark", passage = "a captured passage"))
-        whenever(bookmarkManager.suggestTitle("a captured passage")).thenReturn("A great moment")
+        whenever(bookmarkManager.suggestTitle("a captured passage")).thenReturn(TitleGeneration("A great moment", 0, null))
 
         viewModel.load(newBookmarkArguments("new-id"))
 

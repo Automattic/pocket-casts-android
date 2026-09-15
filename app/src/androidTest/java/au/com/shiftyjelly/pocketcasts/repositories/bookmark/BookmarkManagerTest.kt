@@ -56,6 +56,7 @@ class BookmarkManagerTest {
                 fingerprintTimingManager = { mock<FingerprintTimingManager>() },
                 playbackManager = { mock<PlaybackManager>() },
             ),
+            bookmarkGenerationAnalytics = BookmarkGenerationAnalytics(EventHorizon(TestEventSink())),
         )
         episodeDao = appDatabase.episodeDao()
     }
