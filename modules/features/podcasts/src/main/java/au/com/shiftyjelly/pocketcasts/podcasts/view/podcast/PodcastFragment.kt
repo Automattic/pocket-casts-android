@@ -38,6 +38,7 @@ import androidx.recyclerview.widget.SimpleItemAnimator
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPlural
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -46,6 +47,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivity
+import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkDetailFragment
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksSortByDialog
 import au.com.shiftyjelly.pocketcasts.podcasts.BuildConfig
 import au.com.shiftyjelly.pocketcasts.podcasts.R
@@ -651,6 +653,27 @@ class PodcastFragment : BaseFragment() {
         viewModel.play(bookmark)
     }
 
+    private val onBookmarkClick: (bookmark: Bookmark, episode: BaseEpisode) -> Unit = { bookmark, episode ->
+        BookmarkDetailFragment.show(
+            fragmentManager = parentFragmentManager,
+            bookmark = bookmark,
+            episodeTitle = episode.title,
+            podcastUuid = viewModel.podcastUuid,
+            podcastTitle = viewModel.podcast.value?.title.orEmpty(),
+            sourceView = SourceView.PODCAST_SCREEN,
+        )
+    }
+
+    private val onBookmarkArtworkClick: (bookmark: Bookmark) -> Unit = { bookmark ->
+        (activity as? FragmentHostListener)?.openEpisodeDialog(
+            episodeUuid = bookmark.episodeUuid,
+            source = EpisodeViewSource.UNKNOWN,
+            podcastUuid = bookmark.podcastUuid,
+            forceDark = false,
+            autoPlay = false,
+        )
+    }
+
     private fun onHeadsetSettingsClicked() {
         val fragmentHostListener = (activity as? FragmentHostListener)
         viewModel.onHeadsetSettingsClicked()
@@ -753,6 +776,8 @@ class PodcastFragment : BaseFragment() {
             onArtworkLongClicked = onArtworkLongClicked,
             onTabClicked = onTabClicked,
             onBookmarkPlayClicked = onBookmarkPlayClicked,
+            onBookmarkClick = onBookmarkClick,
+            onBookmarkArtworkClick = onBookmarkArtworkClick,
             ratingsViewModel = ratingsViewModel,
             onHeadsetSettingsClicked = ::onHeadsetSettingsClicked,
             onGetBookmarksClicked = ::onGetBookmarksClicked,

@@ -27,6 +27,7 @@ import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.LocalPodcastColors
 import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -161,6 +162,15 @@ class BookmarksFragment : BaseFragment() {
                                 podcastUuid = data.podcastUuid,
                                 podcastTitle = data.podcastTitle,
                                 sourceView = sourceView,
+                            )
+                        },
+                        onBookmarkArtworkClick = { bookmark ->
+                            (activity as? FragmentHostListener)?.openEpisodeDialog(
+                                episodeUuid = bookmark.episodeUuid,
+                                source = EpisodeViewSource.UNKNOWN,
+                                podcastUuid = bookmark.podcastUuid,
+                                forceDark = false,
+                                autoPlay = false,
                             )
                         },
                         onSearchBarClearButtonClick = {

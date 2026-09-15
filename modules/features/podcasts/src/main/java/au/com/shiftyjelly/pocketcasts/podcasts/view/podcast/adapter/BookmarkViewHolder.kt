@@ -27,6 +27,7 @@ class BookmarkViewHolder(
                     useEpisodeArtwork = data.useEpisodeArtwork,
                     showEpisodeTitle = true,
                     onPlayClick = { data.onBookmarkPlayClicked(data.bookmark) },
+                    onArtworkClick = { data.onBookmarkArtworkClick() },
                     modifier = Modifier
                         .pointerInput(data.bookmark.adapterId) {
                             detectTapGestures(
