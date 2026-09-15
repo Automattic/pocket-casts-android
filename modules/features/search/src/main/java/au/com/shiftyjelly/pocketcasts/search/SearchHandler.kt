@@ -41,6 +41,8 @@ import kotlinx.coroutines.rx2.asFlow
 import kotlinx.coroutines.rx2.rxSingle
 import timber.log.Timber
 
+private typealias SearchUpdate = (GlobalServerSearch) -> GlobalServerSearch
+
 class SearchHandler @Inject constructor(
     val serviceManager: ServiceManager,
     val podcastManager: PodcastManager,
@@ -256,26 +258,22 @@ class SearchHandler @Inject constructor(
                 )
                 loadingObservable.accept(true)
 
-                var globalSearch = GlobalServerSearch(searchTerm = searchTerm)
                 val podcastServerSearch = rxSingle { serviceManager.searchForPodcasts(searchTerm).getOrThrow() }
-                    .map { podcastSearch ->
-                        globalSearch = globalSearch.copy(podcastSearch = podcastSearch)
-                        globalSearch
-                    }
+                    .map<SearchUpdate> { podcastSearch -> { search -> search.copy(podcastSearch = podcastSearch) } }
                     .toObservable()
 
                 if (!searchTerm.startsWith("http")) {
                     val episodesServerSearch = cacheServiceManager
                         .searchEpisodes(searchTerm)
-                        .map { episodeSearch ->
-                            globalSearch = globalSearch.copy(episodeSearch = episodeSearch)
-                            globalSearch
-                        }
+                        .map<SearchUpdate> { episodeSearch -> { search -> search.copy(episodeSearch = episodeSearch) } }
 
                     podcastServerSearch.mergeWith(episodesServerSearch)
                 } else {
                     podcastServerSearch
                 }
+                    // Folding in scan keeps both results when the requests finish at the same time
+                    .scan(GlobalServerSearch(searchTerm = searchTerm)) { search, update -> update(search) }
+                    .skip(1)
                     .subscribeOn(Schedulers.io())
                     .onErrorReturn { exception ->
                         GlobalServerSearch(error = exception)
