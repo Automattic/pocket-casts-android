@@ -17,6 +17,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -76,7 +77,7 @@ internal class SleepTimerHandler(
                 try {
                     val start = timeSource.markNow()
                     var tickCount = 0
-                    while (true) {
+                    while (isActive) {
                         tickCount++
                         // Fixed rate, so a slow tick does not push back the ticks after it
                         delay(-(start + tickCount.seconds).elapsedNow())
