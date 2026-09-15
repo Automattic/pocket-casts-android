@@ -8,6 +8,7 @@ import android.content.pm.PackageManager
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.deeplink.AddBookmarkDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ChangeBookmarkTitleDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.DeleteBookmarkDeepLink
@@ -85,7 +86,7 @@ private fun buildAndShowNotification(
     val changeTitleAction = NotificationCompat.Action(
         IR.drawable.ic_notification_edit,
         context.getString(LR.string.bookmark_notification_action_change_title),
-        buildPendingIntent(context, ChangeBookmarkTitleDeepLink(bookmarkUuid).toIntent(context)),
+        buildPendingIntent(context, ChangeBookmarkTitleDeepLink(bookmarkUuid, sourceView = SourceView.NOTIFICATION_BOOKMARK.key).toIntent(context)),
     )
 
     val deleteAction = NotificationCompat.Action(
