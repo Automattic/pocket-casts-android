@@ -35,7 +35,6 @@ import com.jakewharton.rxrelay2.PublishRelay
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
-import io.reactivex.Maybe
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
@@ -319,10 +318,6 @@ class PodcastManagerImpl @Inject constructor(
 
     override suspend fun findPodcastByUuid(uuid: String): Podcast? {
         return podcastDao.findPodcastByUuid(uuid)
-    }
-
-    override fun findPodcastByUuidRxMaybe(uuid: String): Maybe<Podcast> {
-        return Maybe.fromCallable { findPodcastByUuidBlocking(uuid) }
     }
 
     override fun podcastByUuidRxFlowable(uuid: String): Flowable<Podcast> {
