@@ -66,9 +66,6 @@ abstract class UserEpisodeDao {
     @Query("SELECT * FROM user_episodes ORDER BY duration DESC")
     abstract fun findUserEpisodesDurationDescFlow(): Flow<List<UserEpisode>>
 
-    @Query("SELECT * FROM user_episodes WHERE download_task_id IS NOT NULL")
-    abstract fun findDownloadingUserEpisodesRxFlowable(): Flowable<List<UserEpisode>>
-
     @Query("SELECT * FROM user_episodes WHERE uuid = :uuid")
     abstract fun findEpisodeRxFlowable(uuid: String): Flowable<UserEpisode>
 
