@@ -90,7 +90,7 @@ interface SyncService {
     suspend fun emailChange(@Header("Authorization") authorization: String, @Body request: EmailChangeRequest): UserChangeResponse
 
     @POST("/user/delete_account")
-    fun deleteAccount(@Header("Authorization") authorization: String): Single<UserChangeResponse>
+    suspend fun deleteAccount(@Header("Authorization") authorization: String): UserChangeResponse
 
     @POST("/user/update_password")
     suspend fun updatePassword(@Header("Authorization") authorization: String, @Body request: UpdatePasswordRequest): LoginTokenResponse

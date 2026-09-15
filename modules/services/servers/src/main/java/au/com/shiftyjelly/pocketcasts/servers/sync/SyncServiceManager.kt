@@ -160,7 +160,7 @@ open class SyncServiceManager @Inject constructor(
         return service.emailChange(addBearer(token), request)
     }
 
-    fun deleteAccount(token: AccessToken): Single<UserChangeResponse> = service.deleteAccount(addBearer(token))
+    suspend fun deleteAccount(token: AccessToken): UserChangeResponse = service.deleteAccount(addBearer(token))
 
     suspend fun updatePassword(newPassword: String, oldPassword: String, token: AccessToken): LoginTokenResponse {
         val request = UpdatePasswordRequest(newPassword = newPassword, oldPassword = oldPassword, scope = scope)

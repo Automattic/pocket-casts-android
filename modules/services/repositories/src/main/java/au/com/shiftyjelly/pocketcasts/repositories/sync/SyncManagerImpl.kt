@@ -128,12 +128,14 @@ class SyncManagerImpl @Inject constructor(
         return result
     }
 
-    override fun deleteAccountRxSingle(): Single<UserChangeResponse> = getCacheTokenOrLoginRxSingle { token ->
-        syncServiceManager.deleteAccount(token)
-    }.doOnSuccess {
-        if (it.success == true) {
+    override suspend fun deleteAccount(): UserChangeResponse {
+        val result = getCacheTokenOrLogin { token ->
+            syncServiceManager.deleteAccount(token)
+        }
+        if (result.success == true) {
             eventHorizon.track(UserAccountDeletedEvent)
         }
+        return result
     }
 
     override suspend fun updatePassword(newPassword: String, oldPassword: String) {
