@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.player.view.bookmark
 
 import android.content.Context
 import androidx.compose.ui.text.input.TextFieldValue
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
@@ -16,7 +17,9 @@ import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import com.automattic.eventhorizon.BookmarkEditFormShownEvent
 import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.SourceViewType
 import java.util.Date
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -57,7 +60,8 @@ class BookmarkViewModelTest {
     private val context = mock<Context> {
         on { getString(LR.string.bookmark) } doReturn "Bookmark"
     }
-    private val viewModel = BookmarkViewModel(episodeManager, userEpisodeManager, bookmarkManager, transcriptManager, showNotesManager, EventHorizon(TestEventSink()), context)
+    private val eventSink = TestEventSink()
+    private val viewModel = BookmarkViewModel(episodeManager, userEpisodeManager, bookmarkManager, transcriptManager, showNotesManager, EventHorizon(eventSink), context)
 
     private val episodeUuid = "episode-id"
     private val timeSecs = 120
@@ -72,6 +76,17 @@ class BookmarkViewModelTest {
     @Before
     fun setUp() {
         FeatureFlag.setEnabled(Feature.SMART_BOOKMARKS, true)
+    }
+
+    @Test
+    fun `edit form events use the source the sheet was opened from`() = runTest {
+        viewModel.load(arguments.copy(source = SourceView.TRANSCRIPT))
+
+        viewModel.onShown(isNewBookmark = true)
+
+        val event = eventSink.pollEvent()
+        assertTrue(event is BookmarkEditFormShownEvent)
+        assertEquals(SourceViewType.Transcript, (event as BookmarkEditFormShownEvent).source)
     }
 
     @Test

@@ -388,6 +388,7 @@ class BookmarksViewModel
             episodeUuid = bookmark.episodeUuid,
             timeSecs = bookmark.timeSecs,
             podcastColors = podcast?.let(::PodcastColors) ?: PodcastColors.ForUserEpisode,
+            source = sourceView,
         )
     }
 
