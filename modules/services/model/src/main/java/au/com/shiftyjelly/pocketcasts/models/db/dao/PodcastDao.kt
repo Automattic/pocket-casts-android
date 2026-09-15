@@ -233,10 +233,6 @@ abstract class PodcastDao {
     abstract suspend fun findPodcastsInFolder(folderUuid: String): List<Podcast>
 
     @Transaction
-    @Query("SELECT * FROM podcasts WHERE folder_uuid = :folderUuid")
-    abstract fun findPodcastsInFolderRxSingle(folderUuid: String): Single<List<Podcast>>
-
-    @Transaction
     @Query("SELECT * FROM podcasts WHERE folder_uuid IS NULL")
     abstract suspend fun findPodcastsNotInFolder(): List<Podcast>
 

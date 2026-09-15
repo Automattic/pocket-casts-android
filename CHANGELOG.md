@@ -1,5 +1,8 @@
 8.22
 -----
+*   Bug Fixes
+    *   Show every matching folder in search results instead of only the last one
+        ([#5953](https://github.com/Automattic/pocket-casts-android/pull/5953))
 
 
 8.21
