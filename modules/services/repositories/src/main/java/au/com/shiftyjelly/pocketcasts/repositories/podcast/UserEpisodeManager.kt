@@ -41,6 +41,7 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlin.math.roundToInt
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -490,7 +491,6 @@ class UserEpisodeManagerImpl @Inject constructor(
     }
 
     override fun removeFromCloud(userEpisode: UserEpisode) {
-        // Built before launching, as the Rx chain did, because building a request while signed out invalidates the token
         val deleteFromServer = syncManager.deleteFromServerRxSingle(userEpisode)
         val fileUsage = syncManager.getFileUsageRxSingle()
         launch {
@@ -499,8 +499,10 @@ class UserEpisodeManagerImpl @Inject constructor(
                 deleteFromServer.await()
                 userEpisodeDao.updateServerStatus(userEpisode.uuid, UserEpisodeServerStatus.LOCAL)
                 usageState.value = Optional.of(fileUsage.await())
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
-                LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, e, "Could not upload file ${userEpisode.uuid} - ${userEpisode.title}")
+                LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, e, "Could not remove file from cloud ${userEpisode.uuid} - ${userEpisode.title}")
             }
         }
     }
