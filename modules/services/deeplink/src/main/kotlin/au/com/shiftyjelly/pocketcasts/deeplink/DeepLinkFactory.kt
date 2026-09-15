@@ -143,6 +143,7 @@ private class ChangeBookmarkTitleAdapter : DeepLinkAdapter {
                 uuid,
                 intent.getBooleanExtra(EXTRA_BOOKMARK_IS_NEW, false),
                 intent.getBooleanExtra(EXTRA_BOOKMARK_FROM_EPISODE, false),
+                intent.getStringExtra(EXTRA_SOURCE_VIEW),
             )
         }
     } else {
