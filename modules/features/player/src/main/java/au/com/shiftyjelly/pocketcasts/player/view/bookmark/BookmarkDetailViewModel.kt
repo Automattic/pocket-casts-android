@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.player.view.bookmark
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.shownotes.ShowNotesManager
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.BookmarkTranscript
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TextSpan
@@ -17,6 +18,7 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class BookmarkDetailViewModel @Inject constructor(
+    private val bookmarkManager: BookmarkManager,
     private val transcriptManager: TranscriptManager,
     private val showNotesManager: ShowNotesManager,
 ) : ViewModel() {
@@ -31,19 +33,62 @@ class BookmarkDetailViewModel @Inject constructor(
         ) : TranscriptState
     }
 
-    private val mutableState = MutableStateFlow<TranscriptState>(TranscriptState.None)
-    val transcriptState: StateFlow<TranscriptState> = mutableState
+    data class UiState(
+        val title: String = "",
+        val passage: String? = null,
+        val transcriptState: TranscriptState = TranscriptState.None,
+    )
+
+    private var bookmarkUuid: String? = null
+    private lateinit var episodeUuid: String
+    private lateinit var podcastUuid: String
+
+    private val mutableState = MutableStateFlow(UiState())
+    val uiState: StateFlow<UiState> = mutableState
 
     private var loaded = false
 
-    fun load(episodeUuid: String, podcastUuid: String, passage: String?, passageLocation: Int?) {
+    fun load(
+        bookmarkUuid: String,
+        title: String,
+        episodeUuid: String,
+        podcastUuid: String,
+        passage: String?,
+        passageLocation: Int?,
+    ) {
         if (loaded) return
         loaded = true
+        this.bookmarkUuid = bookmarkUuid
+        this.episodeUuid = episodeUuid
+        this.podcastUuid = podcastUuid
+        mutableState.value = UiState(title = title, passage = passage)
+        loadTranscript(passage, passageLocation)
+    }
+
+    fun refresh() {
+        val uuid = bookmarkUuid ?: return
+        viewModelScope.launch {
+            val bookmark = bookmarkManager.findBookmark(uuid) ?: return@launch
+            mutableState.value = mutableState.value.copy(title = bookmark.title, passage = bookmark.passage)
+            val loaded = mutableState.value.transcriptState as? TranscriptState.Loaded
+            val passage = bookmark.passage
+            if (loaded != null && passage != null) {
+                val span = loaded.transcript.passageDisplaySpan(passage, bookmark.passageLocation)
+                mutableState.value = mutableState.value.copy(
+                    transcriptState = if (span == null) TranscriptState.Unavailable else loaded.copy(passage = span),
+                )
+            } else {
+                loadTranscript(passage, bookmark.passageLocation)
+            }
+        }
+    }
+
+    private fun loadTranscript(passage: String?, passageLocation: Int?) {
         if (passage == null || !FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS)) {
-            mutableState.value = TranscriptState.None
+            mutableState.value = mutableState.value.copy(transcriptState = TranscriptState.None)
             return
         }
-        mutableState.value = TranscriptState.Loading
+        mutableState.value = mutableState.value.copy(transcriptState = TranscriptState.Loading)
         viewModelScope.launch {
             runCatching {
                 showNotesManager.loadShowNotes(podcastUuid, episodeUuid)
@@ -52,16 +97,14 @@ class BookmarkDetailViewModel @Inject constructor(
             }
             val transcript = transcriptManager.loadGeneratedTranscript(episodeUuid)
             if (transcript == null) {
-                mutableState.value = TranscriptState.Unavailable
+                mutableState.value = mutableState.value.copy(transcriptState = TranscriptState.Unavailable)
                 return@launch
             }
             val model = BookmarkTranscript.from(transcript)
             val span = model.passageDisplaySpan(passage, passageLocation)
-            mutableState.value = if (span == null) {
-                TranscriptState.Unavailable
-            } else {
-                TranscriptState.Loaded(model, span)
-            }
+            mutableState.value = mutableState.value.copy(
+                transcriptState = if (span == null) TranscriptState.Unavailable else TranscriptState.Loaded(model, span),
+            )
         }
     }
 }

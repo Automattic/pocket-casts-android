@@ -9,7 +9,9 @@ import kotlinx.parcelize.Parcelize
  */
 @Parcelize
 data class BookmarkTranscriptEditArguments(
-    val bookmarkUuid: String,
     val episodeUuid: String,
+    val podcastUuid: String?,
+    val passage: String?,
+    val passageLocation: Int?,
     val podcastColors: PodcastColors,
 ) : Parcelable

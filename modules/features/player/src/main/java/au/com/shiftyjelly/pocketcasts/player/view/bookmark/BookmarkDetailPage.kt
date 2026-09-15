@@ -18,6 +18,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
@@ -26,10 +27,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.bookmark.BookmarkRowColors
 import au.com.shiftyjelly.pocketcasts.compose.buttons.TimePlayButton
@@ -43,6 +47,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.BookmarkTranscript
 import au.com.shiftyjelly.pocketcasts.transcripts.ui.BookmarkTranscriptView
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -57,6 +62,7 @@ internal fun BookmarkDetailPage(
     onPlayClick: () -> Unit,
     onClose: () -> Unit,
     onArtworkClick: () -> Unit,
+    onMoreClick: () -> Unit,
     modifier: Modifier = Modifier,
     passage: String? = null,
     transcriptState: BookmarkDetailViewModel.TranscriptState = BookmarkDetailViewModel.TranscriptState.None,
@@ -110,6 +116,7 @@ internal fun BookmarkDetailPage(
         Header(
             buttonColor = colors.primaryText,
             onClose = onClose,
+            onMoreClick = onMoreClick,
         )
 
         Column(
@@ -213,7 +220,13 @@ private fun TranscriptSection(
                         .verticalScroll(rememberScrollState())
                         .padding(horizontal = 20.dp),
                 ) {
-                    TextH70(text = passage, color = colors.primaryText)
+                    Text(
+                        text = passage,
+                        color = colors.primaryText,
+                        fontFamily = FontFamily.Serif,
+                        fontSize = 16.sp,
+                        lineHeight = 24.sp,
+                    )
                 }
             }
         }
@@ -222,6 +235,7 @@ private fun TranscriptSection(
             transcript = transcriptState.transcript,
             passage = transcriptState.passage,
             editable = false,
+            anchorFraction = 0.4f,
             modifier = modifier,
         )
     }
@@ -271,12 +285,14 @@ private fun DragHandle(modifier: Modifier = Modifier) {
 private fun Header(
     buttonColor: Color,
     onClose: () -> Unit,
+    onMoreClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
+        verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
             .fillMaxWidth()
-            .padding(start = 4.dp, end = 20.dp, top = 4.dp, bottom = 8.dp),
+            .padding(start = 4.dp, end = 4.dp, top = 4.dp, bottom = 8.dp),
     ) {
         IconButton(
             onClick = onClose,
@@ -284,6 +300,16 @@ private fun Header(
             Icon(
                 imageVector = Icons.Default.Close,
                 contentDescription = stringResource(LR.string.close),
+                tint = buttonColor,
+            )
+        }
+        Spacer(modifier = Modifier.weight(1f))
+        IconButton(
+            onClick = onMoreClick,
+        ) {
+            Icon(
+                painter = painterResource(IR.drawable.ic_ellipsis_horizontal),
+                contentDescription = stringResource(LR.string.more_options),
                 tint = buttonColor,
             )
         }
@@ -307,6 +333,7 @@ private fun BookmarkDetailPagePreview(
             onPlayClick = {},
             onClose = {},
             onArtworkClick = {},
+            onMoreClick = {},
         )
     }
 }
@@ -329,6 +356,7 @@ private fun BookmarkDetailPageTranscriptPreview(
             onPlayClick = {},
             onClose = {},
             onArtworkClick = {},
+            onMoreClick = {},
             passage = "Lorem ipsum",
             transcriptState = BookmarkDetailViewModel.TranscriptState.Loaded(
                 transcript = transcript,
