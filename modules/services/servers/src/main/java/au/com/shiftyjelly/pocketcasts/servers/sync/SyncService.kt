@@ -131,7 +131,7 @@ interface SyncService {
     suspend fun getEpisodes(@Header("Authorization") authorization: String, @Body request: PodcastsEpisodesRequest): EpisodesResponse
 
     @POST("/history/sync")
-    fun historySync(@Header("Authorization") authorization: String, @Body request: HistorySyncRequest): Single<HistorySyncResponse>
+    suspend fun historySync(@Header("Authorization") authorization: String, @Body request: HistorySyncRequest): HistorySyncResponse
 
     @POST("/history/year")
     suspend fun historyYear(@Header("Authorization") authorization: String, @Body request: HistoryYearSyncRequest): HistoryYearResponse
