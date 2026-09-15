@@ -246,8 +246,10 @@ class BookmarksViewModelTest {
 
     @Test
     fun `play pauses the current episode for a reference-timed bookmark`() = runTest {
-        whenever(playbackManager.isPlaying()).thenReturn(true)
+        // Playing before the pause, then paused while we resolve.
+        whenever(playbackManager.isPlaying()).thenReturn(true, false)
         whenever(playbackManager.getCurrentEpisode()).thenReturn(episode)
+        whenever(playbackManager.getCurrentTimeMs(any())).thenReturn(10_000)
         whenever(bookmarkPlaybackTimeResolver.playbackTimeMs(any(), anyOrNull(), any())).thenReturn(42_000)
         val bookmark = Bookmark("uuid1", episodeUuid = episodeUuid, timeSecs = 10, referenceTime = 25)
         whenever(bookmarkEpisodeResolver.resolve(bookmark)).thenReturn(episode)
@@ -256,6 +258,22 @@ class BookmarksViewModelTest {
 
         verifyBlocking(playbackManager) { pauseSuspend(any(), any()) }
         verify(playbackManager).seekToTimeMs(eq(42_000), anyOrNull())
+    }
+
+    @Test
+    fun `play abandons the seek when the listener takes over while resolving`() = runTest {
+        // We pause our episode to resolve, but it is still playing afterwards: the listener took over.
+        whenever(playbackManager.isPlaying()).thenReturn(true)
+        whenever(playbackManager.getCurrentEpisode()).thenReturn(episode)
+        whenever(playbackManager.getCurrentTimeMs(any())).thenReturn(10_000)
+        whenever(bookmarkPlaybackTimeResolver.playbackTimeMs(any(), anyOrNull(), any())).thenReturn(42_000)
+        val bookmark = Bookmark("uuid1", episodeUuid = episodeUuid, timeSecs = 10, referenceTime = 25)
+        whenever(bookmarkEpisodeResolver.resolve(bookmark)).thenReturn(episode)
+
+        bookmarksViewModel.play(bookmark)
+
+        verifyBlocking(playbackManager) { pauseSuspend(any(), any()) }
+        verify(playbackManager, never()).seekToTimeMs(any(), anyOrNull())
     }
 
     @Test

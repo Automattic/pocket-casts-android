@@ -82,6 +82,7 @@ import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
+import kotlin.math.abs
 import kotlin.math.min
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
@@ -97,6 +98,8 @@ import kotlinx.coroutines.rx2.asFlowable
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+
+private const val LISTENER_TAKEOVER_TOLERANCE_MS = 1000
 
 @HiltViewModel
 class PodcastViewModel @Inject constructor(
@@ -487,6 +490,11 @@ class PodcastViewModel @Inject constructor(
             val isPlayingBookmarkEpisode = playbackManager.isPlaying() &&
                 playbackManager.getCurrentEpisode()?.uuid == bookmarkEpisode.uuid
             val pausedForResolve = hasReferenceTime && isPlayingBookmarkEpisode
+            val positionBeforeResolveMs = if (pausedForResolve) {
+                playbackManager.getCurrentTimeMs(bookmarkEpisode)
+            } else {
+                0
+            }
             if (pausedForResolve) {
                 playbackManager.pauseSuspend()
             }
@@ -507,11 +515,22 @@ class PodcastViewModel @Inject constructor(
                 }
                 throw e
             }
-            if (hasReferenceTime || !isPlayingBookmarkEpisode) {
+            if (pausedForResolve) {
+                if (listenerTookOver(bookmarkEpisode, positionBeforeResolveMs)) {
+                    return@launch
+                }
+                playbackManager.playNowSync(bookmarkEpisode, sourceView = SourceView.PODCAST_SCREEN)
+            } else if (!isPlayingBookmarkEpisode) {
                 playbackManager.playNowSync(bookmarkEpisode, sourceView = SourceView.PODCAST_SCREEN)
             }
             playbackManager.seekToTimeMs(positionMs = seekToMs)
         }
+    }
+
+    private suspend fun listenerTookOver(episode: BaseEpisode, positionBeforeResolveMs: Int): Boolean {
+        if (playbackManager.getCurrentEpisode()?.uuid != episode.uuid) return true
+        if (playbackManager.isPlaying()) return true
+        return abs(playbackManager.getCurrentTimeMs(episode) - positionBeforeResolveMs) >= LISTENER_TAKEOVER_TOLERANCE_MS
     }
 
     suspend fun resolveEpisode(bookmark: Bookmark): BaseEpisode? = bookmarkEpisodeResolver.resolve(bookmark)

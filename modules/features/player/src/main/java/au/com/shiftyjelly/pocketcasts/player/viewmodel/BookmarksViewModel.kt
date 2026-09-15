@@ -43,6 +43,7 @@ import com.automattic.eventhorizon.BookmarksSortByChangedEvent
 import com.automattic.eventhorizon.EventHorizon
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlin.math.abs
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -64,6 +65,7 @@ import kotlinx.coroutines.rx2.await
 import kotlinx.coroutines.withContext
 
 private const val PLAY_SPINNER_DELAY_MS = 250L
+private const val LISTENER_TAKEOVER_TOLERANCE_MS = 1000
 
 @HiltViewModel
 class BookmarksViewModel
@@ -343,6 +345,11 @@ class BookmarksViewModel
             val isPlayingBookmarkEpisode = playbackManager.isPlaying() &&
                 playbackManager.getCurrentEpisode()?.uuid == bookmarkEpisode.uuid
             val pausedForResolve = hasReferenceTime && isPlayingBookmarkEpisode
+            val positionBeforeResolveMs = if (pausedForResolve) {
+                playbackManager.getCurrentTimeMs(bookmarkEpisode)
+            } else {
+                0
+            }
             if (pausedForResolve) {
                 playbackManager.pauseSuspend()
             }
@@ -376,7 +383,12 @@ class BookmarksViewModel
                     _resolvingBookmarkUuid.value = null
                 }
             }
-            if (hasReferenceTime || !isPlayingBookmarkEpisode) {
+            if (pausedForResolve) {
+                if (listenerTookOver(bookmarkEpisode, positionBeforeResolveMs)) {
+                    return@launch
+                }
+                playbackManager.playNowSync(bookmarkEpisode, sourceView = sourceView)
+            } else if (!isPlayingBookmarkEpisode) {
                 playbackManager.playNowSync(bookmarkEpisode, sourceView = sourceView)
             }
             _message.emit(BookmarkMessage.PlayingBookmark(bookmark.title))
@@ -389,6 +401,12 @@ class BookmarksViewModel
                 ),
             )
         }
+    }
+
+    private suspend fun listenerTookOver(episode: BaseEpisode, positionBeforeResolveMs: Int): Boolean {
+        if (playbackManager.getCurrentEpisode()?.uuid != episode.uuid) return true
+        if (playbackManager.isPlaying()) return true
+        return abs(playbackManager.getCurrentTimeMs(episode) - positionBeforeResolveMs) >= LISTENER_TAKEOVER_TOLERANCE_MS
     }
 
     suspend fun resolveEpisode(bookmark: Bookmark): BaseEpisode? = bookmarkEpisodeResolver.resolve(bookmark)
