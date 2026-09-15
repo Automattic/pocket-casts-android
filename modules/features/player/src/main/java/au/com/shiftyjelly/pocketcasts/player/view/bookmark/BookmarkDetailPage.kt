@@ -44,6 +44,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.BookmarkTranscript
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TextSpan
@@ -133,7 +134,13 @@ internal fun BookmarkDetailPage(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .weight(1f)
-                        .clickable(onClickLabel = stringResource(LR.string.go_to_episode), onClick = onEpisodeClick),
+                        .then(
+                            if (episode is PodcastEpisode) {
+                                Modifier.clickable(onClickLabel = stringResource(LR.string.go_to_episode), onClick = onEpisodeClick)
+                            } else {
+                                Modifier
+                            },
+                        ),
                 ) {
                     if (episode != null) {
                         EpisodeImage(
@@ -249,6 +256,7 @@ private fun TranscriptSection(
                     passage = remember(transcript) { TextSpan(0, transcript.displayText.length) },
                     editable = false,
                     scrollToPassage = false,
+                    referenceOffset = if (passage.isNotEmpty()) 0 else null,
                     modifier = modifier,
                 )
             }
@@ -277,7 +285,10 @@ private fun TranscriptLoadingPlaceholder(
         listOf(
             listOf(0.95f, 0.88f, 0.5f),
             listOf(0.9f, 0.72f),
+            listOf(0.6f),
             listOf(0.93f, 0.85f, 0.6f),
+            listOf(0.82f, 0.55f),
+            listOf(0.9f, 0.78f, 0.45f),
         ).forEach { turn ->
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 turn.forEach { fraction ->
