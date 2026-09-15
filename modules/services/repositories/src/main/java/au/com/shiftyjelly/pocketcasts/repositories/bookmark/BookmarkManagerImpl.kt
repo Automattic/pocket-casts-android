@@ -62,13 +62,10 @@ class BookmarkManagerImpl @Inject constructor(
         passageLocation: Int?,
         referenceTime: Int?,
     ): Bookmark {
-        // Prevent adding more than one bookmark at the same place
+        // Prevent adding more than one bookmark at the same place. A passage from a new selection is
+        // persisted only when the user confirms it in the editor, not here.
         val existingBookmark = findByEpisodeTime(episode = episode, timeSecs = timeSecs)
         if (existingBookmark != null) {
-            if (passage != null && passageLocation != null && existingBookmark.passage != passage) {
-                updatePassage(existingBookmark.uuid, passage, passageLocation)
-                return findBookmark(existingBookmark.uuid) ?: existingBookmark
-            }
             return existingBookmark
         }
         val addedAtMs = addedAt.toEpochMilli()

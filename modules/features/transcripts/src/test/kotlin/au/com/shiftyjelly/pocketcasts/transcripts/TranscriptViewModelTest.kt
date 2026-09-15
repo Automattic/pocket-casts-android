@@ -202,6 +202,22 @@ class TranscriptViewModelTest {
     }
 
     @Test
+    fun `bookmark from selection is unavailable for an author transcript`() = runTest {
+        setUpTapToSeek()
+        transcriptManager.avaiableTranscript = Transcript.TextPreview
+        syncedStateFlow.value = FingerprintTimingManager.State.Active(coverage = 1)
+
+        viewModel.uiState.test {
+            viewModel.loadTranscript("episode-uuid")
+            var state = awaitItem()
+            while (!state.isSyncedActive) {
+                state = awaitItem()
+            }
+            assertFalse(state.isBookmarkFromSelectionAvailable)
+        }
+    }
+
+    @Test
     fun `start with empty state`() = runTest {
         viewModel.uiState.test {
             val state = awaitItem()

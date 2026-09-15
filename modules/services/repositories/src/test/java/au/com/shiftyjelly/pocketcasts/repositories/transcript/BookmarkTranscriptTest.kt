@@ -130,6 +130,36 @@ class BookmarkTranscriptTest {
     }
 
     @Test
+    fun `selection span skips a speaker name inside the selection`() {
+        val selection = "$secondSentence\nSpeaker 2\n$thirdSentence"
+
+        val span = transcript.selectionDisplaySpan(selection)!!
+
+        assertEquals("$secondSentence $thirdSentence", transcript.passage(span).text)
+    }
+
+    @Test
+    fun `selection span ignores a leading speaker name`() {
+        val selection = "Speaker 2\n$thirdSentence"
+
+        val span = transcript.selectionDisplaySpan(selection)!!
+
+        assertEquals(thirdSentence, transcript.passage(span).text)
+    }
+
+    @Test
+    fun `selection span across a speaker change is not found by the flat passage matcher`() {
+        val selection = "$secondSentence\nSpeaker 2\n$thirdSentence"
+
+        assertNull(transcript.passageDisplaySpan(selection, location = null))
+    }
+
+    @Test
+    fun `selection span is null for absent text`() {
+        assertNull(transcript.selectionDisplaySpan("nothing like this appears in the transcript"))
+    }
+
+    @Test
     fun `reference time maps a display offset to its entry start time`() {
         val timed = bookmarkTranscript(
             TranscriptEntry.Text("First line.", startTimeMs = 1000),

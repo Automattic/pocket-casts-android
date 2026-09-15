@@ -34,6 +34,30 @@ class BookmarkTranscript private constructor(
         return TextSpan(flatToDisplayStart[flat.start], flatToDisplayEnd[flat.end - 1])
     }
 
+    fun selectionDisplaySpan(selection: String): TextSpan? {
+        val normalized = selection.collapseWhitespace()
+        if (normalized.isEmpty()) return null
+        val collapsed = StringBuilder()
+        val displayOffsets = mutableListOf<Int>()
+        var pendingSpace = false
+        for (i in displayText.indices) {
+            if (displayText[i].isWhitespace()) {
+                if (collapsed.isNotEmpty()) pendingSpace = true
+            } else {
+                if (pendingSpace) {
+                    collapsed.append(' ')
+                    displayOffsets.add(i)
+                    pendingSpace = false
+                }
+                collapsed.append(displayText[i])
+                displayOffsets.add(i)
+            }
+        }
+        val start = collapsed.indexOf(normalized)
+        if (start < 0) return null
+        return TextSpan(displayOffsets[start], displayOffsets[start + normalized.length - 1] + 1)
+    }
+
     fun sentenceDisplaySpan(index: Int): TextSpan {
         if (displayText.isEmpty()) return TextSpan(0, 0)
         val clamped = index.coerceIn(0, displayText.length - 1)

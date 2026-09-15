@@ -459,23 +459,17 @@ class TranscriptViewModel @AssistedInject constructor(
     }
 
     private suspend fun buildBookmarkFromSelection(transcript: Transcript.Text, selectedText: String): Pair<Bookmark, Boolean>? {
+        if (!transcript.isGenerated) return null
         val model = BookmarkTranscript.from(transcript)
-        val span = model.passageDisplaySpan(selectedText, location = null) ?: return null
+        val span = model.selectionDisplaySpan(selectedText) ?: return null
         val passage = model.passage(span)
         if (passage.text.isEmpty()) return null
         val referenceTimeMs = model.referenceTimeMsAt(span.start) ?: return null
         val episode = episodeManager.findByUuid(transcript.episodeUuid) ?: return null
 
-        val timeSecs: Int
-        val referenceTimeSecs: Int?
-        if (transcript.isGenerated) {
-            val playbackMs = fingerprintTimingManager.playbackTimeMs(forReferenceTime = referenceTimeMs / 1000.0) ?: return null
-            timeSecs = playbackMs / 1000
-            referenceTimeSecs = (referenceTimeMs / 1000).toInt()
-        } else {
-            timeSecs = (referenceTimeMs / 1000).toInt()
-            referenceTimeSecs = null
-        }
+        val playbackMs = fingerprintTimingManager.playbackTimeMs(forReferenceTime = referenceTimeMs / 1000.0) ?: return null
+        val timeSecs = playbackMs / 1000
+        val referenceTimeSecs = (referenceTimeMs / 1000).toInt()
 
         val isNew = bookmarkManager.findByEpisodeTime(episode, timeSecs) == null
         val bookmark = bookmarkManager.add(
@@ -594,11 +588,11 @@ data class UiState(
         transcriptEpisodeUuid != null &&
         transcriptEpisodeUuid == playingEpisodeUuid
 
-    // A generated transcript needs the fingerprint mapping (playing + synced) to place the bookmark;
-    // an external transcript is already cued against the audio.
+    // Passages only exist against the generated transcript, which needs the fingerprint mapping
+    // (playing + synced) to place the bookmark on the audio.
     val isBookmarkFromSelectionAvailable get() = isPlusUser &&
-        isTextTranscriptLoaded &&
-        (!isGeneratedTextTranscript || isSyncedActive)
+        isGeneratedTextTranscript &&
+        isSyncedActive
 
     companion object {
         val Empty = UiState(
