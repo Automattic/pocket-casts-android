@@ -167,10 +167,10 @@ interface SyncService {
     fun getFileUploadStatus(@Header("Authorization") authorization: String, @Path("uuid") uuid: String): Single<FileUploadStatusResponse>
 
     @DELETE("/files/{uuid}")
-    fun deleteFile(@Header("Authorization") authorization: String, @Path("uuid") uuid: String): Single<Response<Void>>
+    suspend fun deleteFile(@Header("Authorization") authorization: String, @Path("uuid") uuid: String): Response<Void>
 
     @DELETE("/files/image/{uuid}")
-    fun deleteImageFile(@Header("Authorization") authorization: String, @Path("uuid") uuid: String): Single<Response<Void>>
+    suspend fun deleteImageFile(@Header("Authorization") authorization: String, @Path("uuid") uuid: String): Response<Void>
 
     @GET("/files/{uuid}")
     fun getFile(@Header("Authorization") authorization: String, @Path("uuid") uuid: String): Single<Response<ServerFile>>

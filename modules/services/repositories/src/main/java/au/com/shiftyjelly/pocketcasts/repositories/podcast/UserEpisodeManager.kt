@@ -492,14 +492,12 @@ class UserEpisodeManagerImpl @Inject constructor(
     }
 
     override fun removeFromCloud(userEpisode: UserEpisode) {
-        val deleteFromServer = syncManager.deleteFromServerRxSingle(userEpisode)
-        val fileUsage = syncManager.getFileUsageRxSingle()
         launch {
             try {
                 UploadProgressManager.clearProgress(userEpisode.uuid)
-                deleteFromServer.await()
+                syncManager.deleteFromServer(userEpisode)
                 userEpisodeDao.updateServerStatus(userEpisode.uuid, UserEpisodeServerStatus.LOCAL)
-                usageState.value = Optional.of(fileUsage.await())
+                usageState.value = Optional.of(syncManager.getFileUsageRxSingle().await())
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
@@ -509,7 +507,7 @@ class UserEpisodeManagerImpl @Inject constructor(
     }
 
     override suspend fun deleteImageFromServer(userEpisode: UserEpisode) = withContext(Dispatchers.IO) {
-        syncManager.deleteImageFromServerRxSingle(userEpisode).await()
+        syncManager.deleteImageFromServer(userEpisode)
         userEpisode.hasCustomImage = false
         userEpisode.artworkUrl = null
         update(userEpisode)

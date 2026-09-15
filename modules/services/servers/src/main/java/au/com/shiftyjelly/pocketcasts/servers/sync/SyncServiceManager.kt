@@ -272,9 +272,9 @@ open class SyncServiceManager @Inject constructor(
         return service.uploadFileNoProgress(url, requestBody)
     }
 
-    fun deleteImageFromServer(episode: UserEpisode, token: AccessToken): Single<Response<Void>> = service.deleteImageFile(addBearer(token), episode.uuid)
+    suspend fun deleteImageFromServer(episode: UserEpisode, token: AccessToken): Response<Void> = service.deleteImageFile(addBearer(token), episode.uuid)
 
-    fun deleteFromServer(episode: UserEpisode, token: AccessToken): Single<Response<Void>> = service.deleteFile(addBearer(token), episode.uuid)
+    suspend fun deleteFromServer(episode: UserEpisode, token: AccessToken): Response<Void> = service.deleteFile(addBearer(token), episode.uuid)
 
     fun getPlaybackUrl(episode: UserEpisode): String = "${Settings.SERVER_API_URL}$USER_FILE_PLAYBACK_PATH${episode.uuid}"
 
