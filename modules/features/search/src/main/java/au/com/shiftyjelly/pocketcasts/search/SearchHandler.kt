@@ -80,7 +80,7 @@ class SearchHandler @Inject constructor(
                         rxSingle { folderManager.getAll() }
                             .flatMapObservable { Observable.fromIterable(it) }
                             .filter { it.name.contains(query, ignoreCase = true) }
-                            .switchMapSingle { folder ->
+                            .concatMapSingle { folder ->
                                 rxSingle { podcastManager.findPodcastsInFolder(folderUuid = folder.uuid) }
                                     .map { podcasts -> FolderItem.Folder(folder = folder, podcasts = podcasts) }
                             }
