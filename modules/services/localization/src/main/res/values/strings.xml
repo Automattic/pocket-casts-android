@@ -2314,6 +2314,8 @@
     <string name="onboarding_sign_up">Sign up</string>
     <string name="onboarding_continue_with_google">Continue with Google</string>
     <string name="onboarding_continue_with_google_error">Unable to launch Google sign in.</string>
+    <string name="onboarding_continue_with_google_no_credential">No Google account available to sign in.</string>
+    <string name="onboarding_continue_with_google_failed">Couldn\'t sign in with Google. Please try again.</string>
     <string name="log_in_no_network" translatable="false">@string/error_no_network</string>
     <string name="log_in_with_google">Log in with Google</string>
     <string name="log_in_on_phone">Log in on phone</string>
