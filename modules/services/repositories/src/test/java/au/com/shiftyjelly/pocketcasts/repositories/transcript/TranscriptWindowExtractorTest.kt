@@ -14,6 +14,8 @@ import kotlinx.coroutines.test.runTest
 import okhttp3.CacheControl
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -297,6 +299,34 @@ class TranscriptWindowExtractorTest {
                 "The final sentence begins in this cue and then extends beyond the window edge to finish.",
             result?.passage,
         )
+    }
+
+    @Test
+    fun `bound the passage when the transcript has no sentence boundaries`() {
+        val filler = "word ".repeat(30).trim()
+        val vtt = buildString {
+            appendLine("WEBVTT")
+            appendLine()
+            for (i in 0 until 13) {
+                val start = i * 10
+                val end = start + 10
+                appendLine("00:%02d:%02d.000 --> 00:%02d:%02d.000".format(start / 60, start % 60, end / 60, end % 60))
+                appendLine(
+                    when (i) {
+                        0 -> "zzzstart $filler"
+                        12 -> "$filler zzzend"
+                        else -> filler
+                    },
+                )
+                appendLine()
+            }
+        }
+
+        val result = TranscriptWindowExtractor.parseVttWindow(vtt, centerSecs = 60)
+
+        assertNotNull(result)
+        assertFalse(result!!.passage.contains("zzzstart"))
+        assertFalse(result.passage.contains("zzzend"))
     }
 
     @Test

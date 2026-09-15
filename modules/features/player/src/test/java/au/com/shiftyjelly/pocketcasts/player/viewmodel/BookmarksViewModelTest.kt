@@ -246,8 +246,9 @@ class BookmarksViewModelTest {
 
     @Test
     fun `play pauses the current episode for a reference-timed bookmark`() = runTest {
-        // Playing before the pause, then paused while we resolve.
-        whenever(playbackManager.isPlaying()).thenReturn(true, false)
+        // pauseSuspend does not flip isPlaying() synchronously, so it can still report playing after the pause;
+        // the position has not moved, so this is not a takeover and the seek must still happen.
+        whenever(playbackManager.isPlaying()).thenReturn(true)
         whenever(playbackManager.getCurrentEpisode()).thenReturn(episode)
         whenever(playbackManager.getCurrentTimeMs(any())).thenReturn(10_000)
         whenever(bookmarkPlaybackTimeResolver.playbackTimeMs(any(), anyOrNull(), any())).thenReturn(42_000)
@@ -262,10 +263,10 @@ class BookmarksViewModelTest {
 
     @Test
     fun `play abandons the seek when the listener takes over while resolving`() = runTest {
-        // We pause our episode to resolve, but it is still playing afterwards: the listener took over.
+        // We pause to resolve, but the position advanced past the tolerance meanwhile: the listener took over.
         whenever(playbackManager.isPlaying()).thenReturn(true)
         whenever(playbackManager.getCurrentEpisode()).thenReturn(episode)
-        whenever(playbackManager.getCurrentTimeMs(any())).thenReturn(10_000)
+        whenever(playbackManager.getCurrentTimeMs(any())).thenReturn(10_000, 20_000)
         whenever(bookmarkPlaybackTimeResolver.playbackTimeMs(any(), anyOrNull(), any())).thenReturn(42_000)
         val bookmark = Bookmark("uuid1", episodeUuid = episodeUuid, timeSecs = 10, referenceTime = 25)
         whenever(bookmarkEpisodeResolver.resolve(bookmark)).thenReturn(episode)
