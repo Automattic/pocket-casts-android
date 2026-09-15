@@ -19,7 +19,10 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.automattic.eventhorizon.BookmarkEditFormDismissedEvent
 import com.automattic.eventhorizon.BookmarkEditFormShownEvent
 import com.automattic.eventhorizon.BookmarkEditFormSubmittedEvent
+import com.automattic.eventhorizon.BookmarkPassageEditorDismissedEvent
+import com.automattic.eventhorizon.BookmarkPassageEditorShownEvent
 import com.automattic.eventhorizon.BookmarkSourceType
+import com.automattic.eventhorizon.BookmarkTitleSuggestionTappedEvent
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.SourceViewType
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -298,11 +301,51 @@ class BookmarkViewModel
     }
 
     fun onSubmitBookmark() {
+        val state = uiState.value
         eventHorizon.track(
             BookmarkEditFormSubmittedEvent(
                 source = analyticsSource,
-                isNewBookmark = uiState.value.isNewBookmark,
+                isNewBookmark = state.isNewBookmark,
+                hasPassage = state.passage?.isNotEmpty() == true,
+                passageChanged = passageEdited,
             ),
         )
     }
+
+    fun onSuggestionTapped(title: String) {
+        eventHorizon.track(
+            BookmarkTitleSuggestionTappedEvent(
+                source = analyticsSource,
+                episodeUuid = arguments.episodeUuid,
+                podcastUuid = uiState.value.podcastUuid,
+            ),
+        )
+        applySuggestion(title)
+    }
+
+    fun onPassageEditorShown() {
+        eventHorizon.track(
+            BookmarkPassageEditorShownEvent(
+                source = analyticsSource,
+                episodeUuid = arguments.episodeUuid,
+                podcastUuid = uiState.value.podcastUuid,
+            ),
+        )
+    }
+
+    fun onPassageEditorDismissed(newPassage: String?) {
+        val currentPassage = uiState.value.passage
+        val counted = newPassage ?: currentPassage
+        eventHorizon.track(
+            BookmarkPassageEditorDismissedEvent(
+                passageChanged = newPassage != null && newPassage != currentPassage,
+                wordCount = counted?.let(::countWords)?.toLong() ?: 0L,
+                source = analyticsSource,
+                episodeUuid = arguments.episodeUuid,
+                podcastUuid = uiState.value.podcastUuid,
+            ),
+        )
+    }
+
+    private fun countWords(text: String) = text.split(Regex("\\s+")).count { it.isNotBlank() }
 }
