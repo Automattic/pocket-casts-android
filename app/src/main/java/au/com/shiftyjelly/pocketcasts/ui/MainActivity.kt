@@ -1666,7 +1666,7 @@ class MainActivity :
 
                 is AddBookmarkDeepLink -> {
                     launch {
-                        val bookmarkArguments = viewModel.createBookmarkArguments(bookmarkUuid = null, source = SourceView.NOTIFICATION_BOOKMARK)
+                        val bookmarkArguments = viewModel.createBookmarkArguments(bookmarkUuid = null)
                         if (bookmarkArguments != null) {
                             bookmarkActivityLauncher.launch(BookmarkActivity.launchIntent(this@MainActivity, bookmarkArguments))
                         }
