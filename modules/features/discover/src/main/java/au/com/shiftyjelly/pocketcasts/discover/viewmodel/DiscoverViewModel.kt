@@ -50,6 +50,8 @@ import kotlinx.coroutines.rx2.rxMaybe
 import kotlinx.coroutines.rx2.rxSingle
 import timber.log.Timber
 
+private const val MAX_NETWORKS_ROW = 10
+
 @HiltViewModel
 class DiscoverViewModel @Inject constructor(
     val repository: ListRepository,
@@ -182,7 +184,7 @@ class DiscoverViewModel @Inject constructor(
             .toSingle()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .map { NetworkList(listId = it.listId, date = it.date, networks = it.networks) }
+            .map { NetworkList(listId = it.listId, date = it.date, networks = it.networks.take(MAX_NETWORKS_ROW)) }
             .toFlowable()
     }
 
