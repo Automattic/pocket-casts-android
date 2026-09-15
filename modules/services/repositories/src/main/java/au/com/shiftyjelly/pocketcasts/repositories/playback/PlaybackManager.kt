@@ -790,6 +790,7 @@ open class PlaybackManager @Inject constructor(
         SourceView.APPEARANCE,
         SourceView.STORAGE_AND_DATA_USAGE,
         SourceView.NOTIFICATION_BOOKMARK,
+        SourceView.TRANSCRIPT,
         SourceView.METERED_NETWORK_CHANGE,
         SourceView.WIDGET_PLAYER_SMALL,
         SourceView.WIDGET_PLAYER_MEDIUM,

@@ -194,6 +194,10 @@ enum class SourceView(
         key = "tasker",
         analyticsValue = SourceViewType.Tasker,
     ),
+    TRANSCRIPT(
+        key = "transcript",
+        analyticsValue = SourceViewType.Transcript,
+    ),
     UNKNOWN(
         key = "unknown",
         analyticsValue = SourceViewType.Unknown,
