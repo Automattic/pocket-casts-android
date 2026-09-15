@@ -110,6 +110,7 @@ class BookmarkFragment : BaseFragment() {
             title = bookmark.title,
             tintColor = args.podcastColors.playerTint,
             isExistingBookmark = isExistingBookmark,
+            fromEpisode = args.fromEpisode,
         )
         requireActivity().run {
             setResult(Activity.RESULT_OK, intent)
