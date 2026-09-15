@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_DE
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_EPISODE
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_PODCAST
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_AUTO_PLAY
+import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_BOOKMARK_IS_NEW
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_BOOKMARK_UUID
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_EPISODE_UUID
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_NOTIFICATION_TAG
@@ -32,6 +33,7 @@ sealed interface DeepLink {
         const val ACTION_OPEN_EPISODE = "INTENT_OPEN_APP_EPISODE_UUID"
 
         const val EXTRA_BOOKMARK_UUID = "bookmark_uuid"
+        const val EXTRA_BOOKMARK_IS_NEW = "bookmark_is_new"
         const val EXTRA_PODCAST_UUID = "podcast_uuid"
         const val EXTRA_EPISODE_UUID = "episode_uuid"
         const val EXTRA_AUTO_PLAY = "auto_play"
@@ -66,10 +68,12 @@ data object AddBookmarkDeepLink : IntentableDeepLink {
 
 data class ChangeBookmarkTitleDeepLink(
     val bookmarkUuid: String,
+    val isNewBookmark: Boolean = false,
 ) : IntentableDeepLink {
     override fun toIntent(context: Context) = context.launcherIntent
         .setAction(ACTION_OPEN_CHANGE_BOOKMARK_TITLE)
         .putExtra(EXTRA_BOOKMARK_UUID, bookmarkUuid)
+        .putExtra(EXTRA_BOOKMARK_IS_NEW, isNewBookmark)
         .putExtra(EXTRA_NOTIFICATION_TAG, "${EXTRA_BOOKMARK_UUID}_$bookmarkUuid")
 }
 

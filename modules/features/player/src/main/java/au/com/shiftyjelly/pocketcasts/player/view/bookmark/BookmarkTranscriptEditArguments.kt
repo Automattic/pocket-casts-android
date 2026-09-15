@@ -5,13 +5,11 @@ import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
 import kotlinx.parcelize.Parcelize
 
 /**
- * Arguments for [BookmarkActivity] and [BookmarkFragment].
+ * Arguments for [BookmarkTranscriptEditActivity] and [BookmarkTranscriptEditFragment].
  */
 @Parcelize
-data class BookmarkArguments(
-    val bookmarkUuid: String?,
+data class BookmarkTranscriptEditArguments(
+    val bookmarkUuid: String,
     val episodeUuid: String,
-    val timeSecs: Int,
     val podcastColors: PodcastColors,
-    val isNewBookmark: Boolean = false,
 ) : Parcelable
