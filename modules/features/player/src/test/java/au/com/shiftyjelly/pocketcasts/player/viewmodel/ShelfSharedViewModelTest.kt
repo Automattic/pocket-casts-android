@@ -469,6 +469,7 @@ class ShelfSharedViewModelTest {
             userEpisodeManager = userEpisodeManager,
             transcriptManager = transcriptManager,
             downloadQueue = mock(),
+            ioDispatcher = coroutineRule.testDispatcher,
         )
     }
 }

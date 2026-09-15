@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.ChromeCastAnalytics
+import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadQueue
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.StreamVideoState
@@ -31,8 +32,8 @@ import com.automattic.eventhorizon.PlayerShelfOverflowMenuShownEvent
 import com.automattic.eventhorizon.ShelfActionSourceType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -62,6 +63,7 @@ class ShelfSharedViewModel @Inject constructor(
     private val userEpisodeManager: UserEpisodeManager,
     private val transcriptManager: TranscriptManager,
     private val downloadQueue: DownloadQueue,
+    @IoDispatcher ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     private val shelfUpNextFlow: Flow<UpNextQueue.State> = playbackManager.upNextQueue
         .getChangesFlowWithLiveCurrentEpisode(episodeManager, podcastManager)
@@ -76,7 +78,7 @@ class ShelfSharedViewModel @Inject constructor(
                 oldLoaded.episode.downloadStatus == newLoaded.episode.downloadStatus &&
                 oldLoaded.podcast?.isUsingEffects == newLoaded.podcast?.isUsingEffects
         }
-        .flowOn(Dispatchers.IO)
+        .flowOn(ioDispatcher)
 
     private val _navigationState: MutableSharedFlow<NavigationState> = MutableSharedFlow()
     val navigationState = _navigationState.asSharedFlow()
