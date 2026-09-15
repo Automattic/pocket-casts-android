@@ -19,7 +19,6 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.rx2.await
 
 class EpisodeSearchHandler @Inject constructor(
     settings: Settings,
@@ -36,7 +35,7 @@ class EpisodeSearchHandler @Inject constructor(
         .flatMapLatest { searchTerm ->
             if (searchTerm.length > 1) {
                 flow {
-                    val episodeUuids = cacheServiceManager.searchEpisodes(podcastUuid, searchTerm).await()
+                    val episodeUuids = cacheServiceManager.searchEpisodes(podcastUuid, searchTerm)
                     emit(SearchResult(searchTerm, episodeUuids))
                 }.catch { emit(noSearchResult) }
             } else {

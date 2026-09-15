@@ -31,14 +31,13 @@ class PodcastCacheServiceManagerImpl @Inject constructor(
         return service.getPodcastAndEpisode(podcastUuid, episodeUuid).toPodcast()
     }
 
-    override fun searchEpisodes(podcastUuid: String, searchTerm: String): Single<List<String>> {
-        return service.searchPodcastForEpisodes(SearchBody(podcastUuid, searchTerm)).map { it.episodes.map { it.uuid } }
+    override suspend fun searchEpisodes(podcastUuid: String, searchTerm: String): List<String> {
+        return service.searchPodcastForEpisodes(SearchBody(podcastUuid, searchTerm)).episodes.map { it.uuid }
     }
 
-    override fun searchEpisodes(searchTerm: String): Single<EpisodeSearch> {
-        return service.searchEpisodes(SearchEpisodesBody(searchTerm)).map {
-            EpisodeSearch(it.episodes.map { result -> result.toEpisodeItem() })
-        }
+    override suspend fun searchEpisodes(searchTerm: String): EpisodeSearch {
+        val response = service.searchEpisodes(SearchEpisodesBody(searchTerm))
+        return EpisodeSearch(response.episodes.map { result -> result.toEpisodeItem() })
     }
 
     override suspend fun getPodcastRatings(podcastUuid: String, useCache: Boolean): PodcastRatings {

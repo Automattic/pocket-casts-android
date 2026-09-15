@@ -13,8 +13,8 @@ import retrofit2.Response
 interface PodcastCacheServiceManager {
     fun getPodcast(podcastUuid: String): Single<Podcast>
     suspend fun getPodcastAndEpisode(podcastUuid: String, episodeUuid: String): Podcast
-    fun searchEpisodes(podcastUuid: String, searchTerm: String): Single<List<String>>
-    fun searchEpisodes(searchTerm: String): Single<EpisodeSearch>
+    suspend fun searchEpisodes(podcastUuid: String, searchTerm: String): List<String>
+    suspend fun searchEpisodes(searchTerm: String): EpisodeSearch
     suspend fun getPodcastResponse(podcastUuid: String): Response<PodcastResponse>
     suspend fun getPodcastRatings(podcastUuid: String, useCache: Boolean): PodcastRatings
     suspend fun getShowNotes(podcastUuid: String): ShowNotesResponse
