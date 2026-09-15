@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.player.view.bookmark
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -15,6 +16,15 @@ import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import com.automattic.eventhorizon.BookmarkDeleteFormDismissedEvent
+import com.automattic.eventhorizon.BookmarkDeleteFormShownEvent
+import com.automattic.eventhorizon.BookmarkDeleteFormSubmittedEvent
+import com.automattic.eventhorizon.BookmarkDeletedEvent
+import com.automattic.eventhorizon.BookmarkDetailsShownEvent
+import com.automattic.eventhorizon.BookmarkPlayTappedEvent
+import com.automattic.eventhorizon.BookmarkShareTappedEvent
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.SourceViewType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlin.coroutines.cancellation.CancellationException
@@ -31,6 +41,7 @@ class BookmarkDetailViewModel @Inject constructor(
     private val transcriptManager: TranscriptManager,
     private val showNotesManager: ShowNotesManager,
     private val settings: Settings,
+    private val eventHorizon: EventHorizon,
 ) : ViewModel() {
 
     sealed interface TranscriptState {
@@ -58,6 +69,7 @@ class BookmarkDetailViewModel @Inject constructor(
     private lateinit var episodeUuid: String
     private lateinit var podcastUuid: String
     private var referenceTimeSecs: Int? = null
+    private var analyticsSource: SourceViewType = SourceViewType.Unknown
 
     private val mutableState = MutableStateFlow(UiState())
     val uiState: StateFlow<UiState> = mutableState
@@ -73,6 +85,7 @@ class BookmarkDetailViewModel @Inject constructor(
         referenceTimeSecs: Int?,
         passage: String?,
         passageLocation: Int?,
+        source: SourceView,
     ) {
         if (loaded) return
         loaded = true
@@ -80,11 +93,20 @@ class BookmarkDetailViewModel @Inject constructor(
         this.episodeUuid = episodeUuid
         this.podcastUuid = podcastUuid
         this.referenceTimeSecs = referenceTimeSecs
+        this.analyticsSource = source.analyticsValue
         mutableState.value = UiState(
             title = title,
             passage = passage,
             useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork(Element.Bookmarks),
             podcastTitle = podcastTitle,
+        )
+        eventHorizon.track(
+            BookmarkDetailsShownEvent(
+                source = analyticsSource,
+                hasPassage = !passage.isNullOrEmpty(),
+                episodeUuid = episodeUuid,
+                podcastUuid = analyticsPodcastUuid(),
+            ),
         )
         loadEpisode()
         loadPodcastTitle(podcastTitle)
@@ -165,4 +187,41 @@ class BookmarkDetailViewModel @Inject constructor(
             rawOffset
         }
     }
+
+    fun onPlayTapped() {
+        eventHorizon.track(
+            BookmarkPlayTappedEvent(
+                source = analyticsSource,
+                episodeUuid = episodeUuid,
+                podcastUuid = podcastUuid,
+            ),
+        )
+    }
+
+    fun onShareTapped() {
+        eventHorizon.track(
+            BookmarkShareTappedEvent(
+                source = analyticsSource,
+                episodeUuid = episodeUuid,
+                podcastUuid = podcastUuid,
+            ),
+        )
+    }
+
+    fun onDeleteFormShown() {
+        eventHorizon.track(BookmarkDeleteFormShownEvent(source = analyticsSource))
+    }
+
+    fun onDeleteFormDismissed() {
+        eventHorizon.track(BookmarkDeleteFormDismissedEvent(source = analyticsSource))
+    }
+
+    suspend fun deleteBookmark() {
+        val uuid = bookmarkUuid ?: return
+        eventHorizon.track(BookmarkDeleteFormSubmittedEvent(source = analyticsSource))
+        bookmarkManager.deleteToSync(uuid)
+        eventHorizon.track(BookmarkDeletedEvent(source = analyticsSource))
+    }
+
+    private fun analyticsPodcastUuid() = podcastUuid.takeIf { it.isNotBlank() && it != Podcast.userPodcast.uuid }
 }
