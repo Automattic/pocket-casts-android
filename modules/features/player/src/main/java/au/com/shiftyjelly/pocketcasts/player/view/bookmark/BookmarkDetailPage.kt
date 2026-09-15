@@ -45,7 +45,6 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
-import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.BookmarkTranscript
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TextSpan
@@ -137,7 +136,7 @@ internal fun BookmarkDetailPage(
                     modifier = Modifier
                         .weight(1f)
                         .then(
-                            if (episode is PodcastEpisode) {
+                            if (episode != null) {
                                 Modifier.clickable(onClickLabel = stringResource(LR.string.go_to_episode), onClick = onEpisodeClick)
                             } else {
                                 Modifier

@@ -125,15 +125,17 @@ class DataSyncProcess(
             logProcess("playlists-data-full") {
                 playlistSync.fullSync()
             }
-            logProcess("bookmarks-data-full") {
+            val hasBookmarks = logProcess("bookmarks-data-full") {
                 bookmarkSync.fullSync()
             }
-            logProcess("bookmarks-passages-full") {
-                runCatching { rehydrateBookmarkPassages() }
-                    .onFailure { error ->
-                        if (error is CancellationException) throw error
-                        logError("bookmark passage rehydration failed", error)
-                    }
+            if (hasBookmarks) {
+                logProcess("bookmarks-passages-full") {
+                    runCatching { rehydrateBookmarkPassages() }
+                        .onFailure { error ->
+                            if (error is CancellationException) throw error
+                            logError("bookmark passage rehydration failed", error)
+                        }
+                }
             }
             runCatching { Instant.parse(lastSyncAt) }.getOrDefault(Instant.now())
         }
