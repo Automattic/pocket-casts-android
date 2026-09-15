@@ -30,23 +30,24 @@ import com.automattic.eventhorizon.PlayerShelfActionTappedEvent
 import com.automattic.eventhorizon.PlayerShelfOverflowMenuShownEvent
 import com.automattic.eventhorizon.ShelfActionSourceType
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.Observable
-import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.rx2.asFlow
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
@@ -62,14 +63,8 @@ class ShelfSharedViewModel @Inject constructor(
     private val transcriptManager: TranscriptManager,
     private val downloadQueue: DownloadQueue,
 ) : ViewModel() {
-    private val upNextStateObservable: Observable<UpNextQueue.State> =
-        playbackManager.upNextQueue.getChangesObservableWithLiveCurrentEpisode(
-            episodeManager,
-            podcastManager,
-        )
-            .observeOn(Schedulers.io())
-
-    private val shelfUpNextObservable = upNextStateObservable
+    private val shelfUpNextFlow: Flow<UpNextQueue.State> = playbackManager.upNextQueue
+        .getChangesFlowWithLiveCurrentEpisode(episodeManager, podcastManager)
         .distinctUntilChanged { oldState, newState ->
             val oldLoaded = oldState as? UpNextQueue.State.Loaded ?: return@distinctUntilChanged false
             val newLoaded = newState as? UpNextQueue.State.Loaded ?: return@distinctUntilChanged false
@@ -81,6 +76,7 @@ class ShelfSharedViewModel @Inject constructor(
                 oldLoaded.episode.downloadStatus == newLoaded.episode.downloadStatus &&
                 oldLoaded.podcast?.isUsingEffects == newLoaded.podcast?.isUsingEffects
         }
+        .flowOn(Dispatchers.IO)
 
     private val _navigationState: MutableSharedFlow<NavigationState> = MutableSharedFlow()
     val navigationState = _navigationState.asSharedFlow()
@@ -102,8 +98,8 @@ class ShelfSharedViewModel @Inject constructor(
 
     val uiState = combine(
         settings.shelfItems.flow,
-        shelfUpNextObservable.asFlow(),
-        shelfUpNextObservable.asFlow()
+        shelfUpNextFlow,
+        shelfUpNextFlow
             .mapNotNull { state -> (state as? UpNextQueue.State.Loaded)?.episode?.uuid }
             .flatMapLatest { episodeUuid -> transcriptManager.observeIsTranscriptAvailable(episodeUuid) },
         videoStateFlow,

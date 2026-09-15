@@ -34,7 +34,6 @@ import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.automattic.eventhorizon.EventHorizon
-import io.reactivex.Observable
 import java.time.Instant
 import java.util.Date
 import kotlin.time.Duration.Companion.seconds
@@ -433,11 +432,11 @@ class ShelfSharedViewModelTest {
             UpNextQueue.State.Empty
         }
         whenever(
-            upNextQueue.getChangesObservableWithLiveCurrentEpisode(
+            upNextQueue.getChangesFlowWithLiveCurrentEpisode(
                 episodeManager,
                 podcastManager,
             ),
-        ).thenReturn(Observable.just(upNextState))
+        ).thenReturn(flowOf(upNextState))
 
         if (currentEpisode != null) {
             whenever(transcriptManager.observeIsTranscriptAvailable(currentEpisode.uuid)).thenReturn(flowOf(false))
