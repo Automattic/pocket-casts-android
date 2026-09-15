@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.refresh.RefreshPodcastsTask
+import au.com.shiftyjelly.pocketcasts.ui.worker.PrefetchArtworkWorker
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.SettingsAdvancedCacheEntirePlayingEpisodeEvent
 import com.automattic.eventhorizon.SettingsAdvancedPrioritizeSeekAccuracyEvent
@@ -71,8 +72,9 @@ class AdvancedSettingsViewModel @Inject constructor(
         settings.setSyncOnMeteredNetwork(isChecked)
         updateSyncOnMeteredState()
 
-        // Update worker to take sync setting into account
+        // Update workers to take sync setting into account
         RefreshPodcastsTask.scheduleOrCancel(context, settings)
+        PrefetchArtworkWorker.enqueuePeriodicWork(context, settings)
     }
 
     private fun updateSyncOnMeteredState() {

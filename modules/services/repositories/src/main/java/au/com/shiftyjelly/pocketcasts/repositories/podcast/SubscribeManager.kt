@@ -40,6 +40,7 @@ import java.util.Date
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.rx2.rxCompletable
 import timber.log.Timber
 
@@ -141,6 +142,8 @@ class SubscribeManager @Inject constructor(
             urls.forEach { url ->
                 val request = ImageRequest.Builder(context)
                     .data(url)
+                    // The original bytes are still cached; only the discarded decode is sampled.
+                    .size(1, 1)
                     .memoryCachePolicy(CachePolicy.DISABLED)
                     .build()
                 val result = context.imageLoader.execute(request)
@@ -148,6 +151,8 @@ class SubscribeManager @Inject constructor(
                     Timber.i("Could not cache artwork for podcast ${podcast.uuid} from $url. ${result.throwable.message}")
                 }
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             Timber.e(e, "Error caching artwork for podcast ${podcast.uuid}")
         }
