@@ -15,6 +15,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -53,6 +54,23 @@ class EpisodeSearchHandlerTest {
             testScheduler.advanceTimeBy(2)
             assertEquals(SearchResult("abc", listOf("uuid")), awaitItem())
             verify(cacheServiceManager, never()).searchEpisodes(PODCAST_UUID, "ab")
+        }
+    }
+
+    @Test
+    fun `repeating the same query does not search again`() = runTest {
+        whenever(cacheServiceManager.searchEpisodes(PODCAST_UUID, "abc")).thenReturn(Single.just(listOf("uuid")))
+
+        handler.getSearchResultsFlow(PODCAST_UUID).test {
+            skipItems(1)
+            handler.searchQueryUpdated("abc")
+            assertEquals(SearchResult("abc", listOf("uuid")), awaitItem())
+
+            handler.searchQueryUpdated("abc")
+            testScheduler.advanceTimeBy(DEBOUNCE_MS * 2)
+            testScheduler.runCurrent()
+            expectNoEvents()
+            verify(cacheServiceManager, times(1)).searchEpisodes(PODCAST_UUID, "abc")
         }
     }
 

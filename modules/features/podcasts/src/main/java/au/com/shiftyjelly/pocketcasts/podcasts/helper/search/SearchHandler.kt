@@ -4,7 +4,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 
 abstract class SearchHandler<T> {
-    private var searchTerm = ""
     protected val searchQueryFlow = MutableStateFlow("")
 
     protected val noSearchResult = SearchResult("", null)
@@ -13,7 +12,6 @@ abstract class SearchHandler<T> {
 
     fun searchQueryUpdated(newValue: String) {
         val oldValue = searchQueryFlow.value
-        searchTerm = newValue
         searchQueryFlow.value = newValue
         trackSearchIfNeeded(oldValue, newValue)
     }
