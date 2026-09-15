@@ -10,6 +10,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkSuggestion
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.shownotes.ShowNotesManager
+import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
@@ -49,11 +51,13 @@ class BookmarkViewModelTest {
     private val episodeManager = mock<EpisodeManager>()
     private val userEpisodeManager = mock<UserEpisodeManager>()
     private val bookmarkManager = mock<BookmarkManager>()
+    private val transcriptManager = mock<TranscriptManager>()
+    private val showNotesManager = mock<ShowNotesManager>()
 
     private val context = mock<Context> {
         on { getString(LR.string.bookmark) } doReturn "Bookmark"
     }
-    private val viewModel = BookmarkViewModel(episodeManager, userEpisodeManager, bookmarkManager, EventHorizon(TestEventSink()), context)
+    private val viewModel = BookmarkViewModel(episodeManager, userEpisodeManager, bookmarkManager, transcriptManager, showNotesManager, EventHorizon(TestEventSink()), context)
 
     private val episodeUuid = "episode-id"
     private val timeSecs = 120
@@ -143,6 +147,16 @@ class BookmarkViewModelTest {
         val state = viewModel.uiState.value
         assertEquals("A great moment", state.title.text)
         assertEquals(BookmarkViewModel.TitleSuggestion.None, state.titleSuggestion)
+    }
+
+    @Test
+    fun `offers to edit the transcript once a passage is suggested`() = runTest {
+        stubNewBookmark()
+        whenever(bookmarkManager.suggestBookmark(episodeUuid, timeSecs)).thenReturn(suggestion)
+
+        viewModel.load(arguments)
+
+        assertTrue(viewModel.uiState.value.canEditTranscript)
     }
 
     @Test

@@ -81,6 +81,7 @@ fun BookmarkPage(
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
     passage: String? = null,
+    canEditTranscript: Boolean = false,
     onEditTranscript: () -> Unit = {},
     titleSuggestion: BookmarkViewModel.TitleSuggestion = BookmarkViewModel.TitleSuggestion.None,
     onApplySuggestion: (String) -> Unit = {},
@@ -122,6 +123,7 @@ fun BookmarkPage(
             title = title,
             colors = playerColors,
             passage = passage,
+            canEditTranscript = canEditTranscript,
             onTitleChange = onTitleChange,
             onSave = onSave,
             onEditTranscript = onEditTranscript,
@@ -137,6 +139,7 @@ private fun Content(
     title: TextFieldValue,
     colors: PlayerColors,
     passage: String?,
+    canEditTranscript: Boolean,
     onTitleChange: (TextFieldValue) -> Unit,
     onSave: () -> Unit,
     onEditTranscript: () -> Unit,
@@ -216,6 +219,7 @@ private fun Content(
             passage != null -> TranscriptSection(
                 passage = passage,
                 colors = colors,
+                canEdit = canEditTranscript,
                 onEdit = onEditTranscript,
             )
 
@@ -294,6 +298,7 @@ private fun TitleSuggestionRow(
 private fun TranscriptSection(
     passage: String,
     colors: PlayerColors,
+    canEdit: Boolean,
     onEdit: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -308,12 +313,14 @@ private fun TranscriptSection(
                 color = colors.contrast02,
                 modifier = Modifier.weight(1f),
             )
-            TextButton(onClick = onEdit) {
-                Text(
-                    text = stringResource(LR.string.edit),
-                    color = colors.highlight01,
-                    fontWeight = FontWeight.Bold,
-                )
+            if (canEdit) {
+                TextButton(onClick = onEdit) {
+                    Text(
+                        text = stringResource(LR.string.edit),
+                        color = colors.highlight01,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
             }
         }
         Spacer(modifier = Modifier.height(4.dp))
@@ -321,7 +328,7 @@ private fun TranscriptSection(
             text = passage,
             color = colors.contrast01,
             fontFamily = FontFamily.Serif,
-            fontSize = 14.sp,
+            fontSize = 16.sp,
             maxLines = 4,
             overflow = TextOverflow.Ellipsis,
         )
@@ -374,6 +381,7 @@ private fun BookmarkPagePreview(
                 onSave = {},
                 onClose = {},
                 passage = "The difference between the kid who gets in and the kid who doesn't is often basically noise.",
+                canEditTranscript = true,
                 onEditTranscript = {},
                 modifier = Modifier.background(colors.background01),
             )
