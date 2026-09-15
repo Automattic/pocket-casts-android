@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.transcripts.ui
 
+import android.os.SystemClock
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.snap
 import androidx.compose.animation.core.tween
@@ -83,7 +84,7 @@ fun BookmarkTranscriptView(
     var viewportHeight by remember { mutableIntStateOf(0) }
     var hasScrolled by remember { mutableStateOf(false) }
     var skipFade by remember { mutableStateOf(false) }
-    val startTimeMs = remember { System.currentTimeMillis() }
+    val startTimeMs = remember { SystemClock.elapsedRealtime() }
     val contentAlpha by animateFloatAsState(
         targetValue = if (!scrollToPassage || passage == null || hasScrolled) 1f else 0f,
         animationSpec = if (skipFade) snap() else tween(),
@@ -172,14 +173,14 @@ fun BookmarkTranscriptView(
                 val glyphBox = layout?.getBoundingBox(glyphOffset)
                 if (glyphBox != null) {
                     Icon(
-                        painter = painterResource(IR.drawable.ic_bookmark),
+                        painter = painterResource(IR.drawable.ic_bookmark_fill),
                         contentDescription = null,
                         tint = theme.primaryText,
                         modifier = Modifier
                             .size(GlyphSize)
                             .offset {
                                 IntOffset(
-                                    x = GutterInset.roundToPx(),
+                                    x = ((Gutter - GlyphSize) / 2).roundToPx(),
                                     y = (ContentPadding.calculateTopPadding().toPx() + glyphBox.top + (glyphBox.height - GlyphSize.toPx()) / 2f).roundToInt(),
                                 )
                             },
@@ -196,7 +197,7 @@ fun BookmarkTranscriptView(
         val topPadding = with(density) { ContentPadding.calculateTopPadding().toPx() }
         val target = (box.top + topPadding - viewportHeight * anchorFraction + box.height / 2).roundToInt()
         scrollState.scrollTo(target.coerceIn(0, scrollState.maxValue))
-        skipFade = System.currentTimeMillis() - startTimeMs < FadeInThresholdMs
+        skipFade = SystemClock.elapsedRealtime() - startTimeMs < FadeInThresholdMs
         hasScrolled = true
     }
 }
@@ -215,10 +216,10 @@ private val SpeakerSpanStyle = SpanStyle(
     fontWeight = FontWeight.Bold,
 )
 
-private val ContentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 48.dp, bottom = 64.dp)
-
+private val Gutter = 28.dp
 private val GlyphSize = 16.dp
-private val GutterInset = 2.dp
+
+private val ContentPadding = PaddingValues(start = Gutter, end = Gutter, top = 48.dp, bottom = 64.dp)
 
 private val TopFade = 48.dp
 private val BottomFade = 64.dp
@@ -258,6 +259,7 @@ private fun BookmarkTranscriptViewPreview(
         BookmarkTranscriptView(
             transcript = transcript,
             passage = passage,
+            referenceOffset = passage.start,
             modifier = Modifier.background(rememberTranscriptTheme().background),
         )
     }

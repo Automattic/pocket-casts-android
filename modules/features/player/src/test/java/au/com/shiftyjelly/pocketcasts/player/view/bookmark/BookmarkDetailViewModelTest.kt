@@ -11,9 +11,9 @@ import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.shownotes.ShowNotesManager
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
+import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
@@ -28,9 +28,12 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyBlocking
 import org.mockito.kotlin.whenever
 
@@ -45,11 +48,11 @@ class BookmarkDetailViewModelTest {
 
     private val bookmarkManager = mock<BookmarkManager>()
     private val episodeManager = mock<EpisodeManager>()
-    private val podcastManager = mock<PodcastManager>()
+    private val podcastCacheServiceManager = mock<PodcastCacheServiceManager>()
     private val transcriptManager = mock<TranscriptManager>()
     private val showNotesManager = mock<ShowNotesManager>()
     private val settings = mock<Settings>()
-    private val viewModel = BookmarkDetailViewModel(bookmarkManager, episodeManager, podcastManager, transcriptManager, showNotesManager, settings)
+    private val viewModel = BookmarkDetailViewModel(bookmarkManager, episodeManager, podcastCacheServiceManager, transcriptManager, showNotesManager, settings)
 
     private val bookmarkUuid = "bookmark-id"
     private val episodeUuid = "episode-id"
@@ -188,7 +191,7 @@ class BookmarkDetailViewModelTest {
 
     @Test
     fun `fetches the podcast title when it is missing`() = runTest {
-        whenever(podcastManager.findOrDownloadPodcastRxSingle(podcastUuid, false))
+        whenever(podcastCacheServiceManager.getPodcast(podcastUuid))
             .thenReturn(Single.just(Podcast(uuid = podcastUuid, title = "Fetched")))
 
         load(passage = null, passageLocation = null, podcastTitle = "")
@@ -196,6 +199,25 @@ class BookmarkDetailViewModelTest {
         val state = viewModel.uiState.value
         assertEquals("Fetched", state.podcastTitle)
         assertFalse(state.isPodcastTitleLoading)
+    }
+
+    @Test
+    fun `does not fetch the podcast title for uploaded files`() = runTest {
+        viewModel.load(
+            bookmarkUuid = bookmarkUuid,
+            title = "Title",
+            episodeUuid = episodeUuid,
+            podcastUuid = Podcast.userPodcast.uuid,
+            podcastTitle = "",
+            referenceTimeSecs = null,
+            passage = null,
+            passageLocation = null,
+        )
+
+        val state = viewModel.uiState.value
+        assertEquals("", state.podcastTitle)
+        assertFalse(state.isPodcastTitleLoading)
+        verify(podcastCacheServiceManager, never()).getPodcast(any())
     }
 
     @Test
@@ -219,6 +241,29 @@ class BookmarkDetailViewModelTest {
         assertTrue(state is BookmarkDetailViewModel.TranscriptState.Loaded)
         state as BookmarkDetailViewModel.TranscriptState.Loaded
         assertEquals(state.transcript.displayText.indexOf(secondSentence), state.referenceOffset)
+    }
+
+    @Test
+    fun `clamps the reference offset to the passage when the reference time precedes it`() = runTest {
+        val timed = Transcript.Text(
+            entries = listOf(
+                TranscriptEntry.Text(firstSentence, startTimeMs = 0),
+                TranscriptEntry.Text(secondSentence, startTimeMs = 10_000),
+            ),
+            type = TranscriptType.Vtt,
+            url = "https://example.com/transcript.vtt",
+            isGenerated = true,
+            episodeUuid = episodeUuid,
+            podcastUuid = podcastUuid,
+        )
+        whenever(transcriptManager.loadGeneratedTranscript(episodeUuid)).thenReturn(timed)
+
+        load(passage = secondSentence, passageLocation = firstSentence.length + 1, referenceTimeSecs = 0)
+
+        val state = viewModel.uiState.value.transcriptState
+        assertTrue(state is BookmarkDetailViewModel.TranscriptState.Loaded)
+        state as BookmarkDetailViewModel.TranscriptState.Loaded
+        assertEquals(state.passage!!.start, state.referenceOffset)
     }
 
     @Test
