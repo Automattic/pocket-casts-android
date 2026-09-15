@@ -3,7 +3,7 @@ package au.com.shiftyjelly.pocketcasts.onboarding.createaccount
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.onboarding.signin.TvSignInUiState
-import au.com.shiftyjelly.pocketcasts.onboarding.signin.deviceAuthFlow
+import au.com.shiftyjelly.pocketcasts.onboarding.signin.tvDeviceAuthFlow
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import com.automattic.eventhorizon.CreateAccountShownEvent
 import com.automattic.eventhorizon.EventHorizon
@@ -39,7 +39,7 @@ class TvCreateAccountViewModel @Inject constructor(
         pollingJob?.cancel()
         _uiState.value = TvSignInUiState.Loading
         pollingJob = viewModelScope.launch {
-            deviceAuthFlow(syncManager, isNewAccount = true).collect { _uiState.value = it }
+            tvDeviceAuthFlow(syncManager, isNewAccount = true).collect { _uiState.value = it }
         }
     }
 

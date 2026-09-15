@@ -28,6 +28,7 @@ private object AuthenticationNavRoutes {
     const val LOGIN_WITH_GOOGLE_LEGACY = "login_with_google_legacy"
     const val LOGIN_WITH_PHONE = "login_with_phone"
     const val LOGIN_WITH_EMAIL = "login_with_email"
+    const val LOGIN_WITH_CODE = "login_with_code"
 }
 
 data class GoogleAccountData(
@@ -62,8 +63,8 @@ fun NavGraphBuilder.authenticationNavGraph(
                 onLoginWithPhoneClick = {
                     navController.navigate(AuthenticationNavRoutes.LOGIN_WITH_PHONE)
                 },
-                onLoginWithEmailClick = {
-                    navController.navigate(AuthenticationNavRoutes.LOGIN_WITH_EMAIL)
+                onLoginWithCodeClick = {
+                    navController.navigate(AuthenticationNavRoutes.LOGIN_WITH_CODE)
                 },
             )
         }
@@ -74,6 +75,13 @@ fun NavGraphBuilder.authenticationNavGraph(
             LoginWithEmailScreen(
                 onSignInSuccess = onEmailSignInSuccess,
             )
+        }
+
+        composable(
+            route = AuthenticationNavRoutes.LOGIN_WITH_CODE,
+        ) {
+            // The activity navigates to the logging in screen once the signed in account is confirmed as Plus.
+            LoginWithCodeScreen()
         }
 
         composable(
