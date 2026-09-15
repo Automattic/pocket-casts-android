@@ -870,7 +870,7 @@ class EpisodeManagerImpl @Inject constructor(
             // A dispose mid-insert must not leave an episode row without its details task enqueued
             withContext(NonCancellable) {
                 val episode = response.episodes.firstOrNull() ?: skeletonEpisode
-                add(listOf(episode), episode.podcastUuid, downloadMetaData)
+                add(listOf(episode), podcastUuid, downloadMetaData)
                 findByUuid(episodeUuid)
             }
         }
