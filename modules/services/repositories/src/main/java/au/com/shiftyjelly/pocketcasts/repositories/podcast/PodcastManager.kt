@@ -41,7 +41,6 @@ interface PodcastManager {
     suspend fun findSubscribedSorted(): List<Podcast>
     suspend fun findSubscribedNoOrder(): List<Podcast>
     suspend fun findPodcastsInFolder(folderUuid: String): List<Podcast>
-    fun findPodcastsInFolderRxSingle(folderUuid: String): Single<List<Podcast>>
     suspend fun findPodcastsNotInFolder(): List<Podcast>
     suspend fun findSubscribedUuids(): List<String>
 

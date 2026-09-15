@@ -81,8 +81,7 @@ class SearchHandler @Inject constructor(
                             .flatMapObservable { Observable.fromIterable(it) }
                             .filter { it.name.contains(query, ignoreCase = true) }
                             .switchMapSingle { folder ->
-                                podcastManager
-                                    .findPodcastsInFolderRxSingle(folderUuid = folder.uuid)
+                                rxSingle { podcastManager.findPodcastsInFolder(folderUuid = folder.uuid) }
                                     .map { podcasts -> FolderItem.Folder(folder = folder, podcasts = podcasts) }
                             }
                             .toList()

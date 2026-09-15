@@ -346,10 +346,6 @@ class PodcastManagerImpl @Inject constructor(
         return podcastDao.findPodcastsInFolder(folderUuid)
     }
 
-    override fun findPodcastsInFolderRxSingle(folderUuid: String): Single<List<Podcast>> {
-        return podcastDao.findPodcastsInFolderRxSingle(folderUuid)
-    }
-
     override suspend fun findPodcastsNotInFolder(): List<Podcast> {
         return podcastDao.findPodcastsNotInFolder()
     }
