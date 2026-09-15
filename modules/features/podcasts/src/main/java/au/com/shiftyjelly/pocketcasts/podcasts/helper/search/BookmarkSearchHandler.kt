@@ -2,8 +2,9 @@ package au.com.shiftyjelly.pocketcasts.podcasts.helper.search
 
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
+import au.com.shiftyjelly.pocketcasts.repositories.di.DefaultDispatcher
 import javax.inject.Inject
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -15,6 +16,7 @@ import kotlinx.coroutines.flow.flowOn
 
 class BookmarkSearchHandler @Inject constructor(
     private val bookmarkManager: BookmarkManager,
+    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : SearchHandler<Bookmark>() {
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -29,8 +31,8 @@ class BookmarkSearchHandler @Inject constructor(
                 flowOf(noSearchResult)
             }
         }
-        // Results used to come from rxSingle on Dispatchers.Default, keep them off the caller's thread
-        .flowOn(Dispatchers.Default)
+        // asFlowable() doesn't pick a thread, so keep results and the combineLatest downstream off the main thread
+        .flowOn(defaultDispatcher)
         .distinctUntilChanged()
 
     override fun trackSearchIfNeeded(oldValue: String, newValue: String) {

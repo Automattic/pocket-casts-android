@@ -2,11 +2,13 @@ package au.com.shiftyjelly.pocketcasts.podcasts.helper.search
 
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.di.DefaultDispatcher
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManagerImpl
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.PodcastScreenSearchClearedEvent
 import com.automattic.eventhorizon.PodcastScreenSearchPerformedEvent
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
@@ -16,14 +18,15 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.rx2.await
 
 class EpisodeSearchHandler @Inject constructor(
     settings: Settings,
     private val cacheServiceManager: PodcastCacheServiceManagerImpl,
     private val eventHorizon: EventHorizon,
+    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : SearchHandler<BaseEpisode>() {
-    // Flow's debounce throws on a negative timeout, where Rx's timer treated it as zero
     private val searchDebounce = settings.getEpisodeSearchDebounceMs().coerceAtLeast(0L)
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
@@ -40,6 +43,8 @@ class EpisodeSearchHandler @Inject constructor(
                 flowOf(noSearchResult)
             }
         }
+        // asFlowable() doesn't pick a thread, so keep results and the combineLatest downstream off the main thread
+        .flowOn(defaultDispatcher)
         .distinctUntilChanged()
 
     override fun trackSearchIfNeeded(oldValue: String, newValue: String) {

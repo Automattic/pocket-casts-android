@@ -8,6 +8,7 @@ import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
 import com.automattic.eventhorizon.EventHorizon
 import io.reactivex.Single
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -25,12 +26,13 @@ class EpisodeSearchHandlerTest {
     private val settings = mock<Settings> {
         on { getEpisodeSearchDebounceMs() } doReturn DEBOUNCE_MS
     }
-    private val handler = EpisodeSearchHandler(settings, cacheServiceManager, EventHorizon(TestEventSink()))
+    private val testDispatcher = StandardTestDispatcher()
+    private val handler = EpisodeSearchHandler(settings, cacheServiceManager, EventHorizon(TestEventSink()), testDispatcher)
 
     private val noSearchResult = SearchResult("", null)
 
     @Test
-    fun `empty query emits no search result without debounce`() = runTest {
+    fun `empty query emits no search result without debounce`() = runTest(testDispatcher) {
         handler.getSearchResultsFlow(PODCAST_UUID).test {
             assertEquals(noSearchResult, awaitItem())
             assertEquals(0L, testScheduler.currentTime)
@@ -38,7 +40,7 @@ class EpisodeSearchHandlerTest {
     }
 
     @Test
-    fun `query is searched only after the debounce window`() = runTest {
+    fun `query is searched only after the debounce window`() = runTest(testDispatcher) {
         whenever(cacheServiceManager.searchEpisodes(PODCAST_UUID, "abc")).thenReturn(Single.just(listOf("uuid")))
 
         handler.getSearchResultsFlow(PODCAST_UUID).test {
@@ -58,7 +60,7 @@ class EpisodeSearchHandlerTest {
     }
 
     @Test
-    fun `repeating the same query does not search again`() = runTest {
+    fun `repeating the same query does not search again`() = runTest(testDispatcher) {
         whenever(cacheServiceManager.searchEpisodes(PODCAST_UUID, "abc")).thenReturn(Single.just(listOf("uuid")))
 
         handler.getSearchResultsFlow(PODCAST_UUID).test {
@@ -75,7 +77,7 @@ class EpisodeSearchHandlerTest {
     }
 
     @Test
-    fun `clearing the query emits no search result without debounce`() = runTest {
+    fun `clearing the query emits no search result without debounce`() = runTest(testDispatcher) {
         whenever(cacheServiceManager.searchEpisodes(any(), any())).thenReturn(Single.just(listOf("uuid")))
 
         handler.getSearchResultsFlow(PODCAST_UUID).test {
@@ -91,7 +93,7 @@ class EpisodeSearchHandlerTest {
     }
 
     @Test
-    fun `search error falls back to no search result`() = runTest {
+    fun `search error falls back to no search result`() = runTest(testDispatcher) {
         whenever(cacheServiceManager.searchEpisodes(PODCAST_UUID, "xyz")).thenReturn(Single.just(listOf("uuid")))
         whenever(cacheServiceManager.searchEpisodes(PODCAST_UUID, "abc")).thenReturn(Single.error(RuntimeException()))
 
