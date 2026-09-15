@@ -64,6 +64,7 @@ fun MenuShelfItems(
                                     isEditable = state.isEditable,
                                     isTranscriptAvailable = state.isTranscriptAvailable,
                                     isVideoEnabled = isVideoEnabled,
+                                    showNewBadge = !state.isEditable && state.showBookmarkNewBadge && listItem == ShelfItem.Bookmark,
                                     onClick = onClick,
                                     modifier = rowDraggableModifier,
                                 )
