@@ -16,7 +16,6 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import io.reactivex.Flowable
-import io.reactivex.Maybe
 import io.reactivex.Single
 import kotlinx.coroutines.flow.Flow
 
@@ -26,7 +25,6 @@ interface PodcastManager {
     fun searchPodcastByTitleBlocking(title: String): Podcast?
     fun findPodcastByUuidBlocking(uuid: String): Podcast?
     suspend fun findPodcastByUuid(uuid: String): Podcast?
-    fun findPodcastByUuidRxMaybe(uuid: String): Maybe<Podcast>
     fun podcastByUuidRxFlowable(uuid: String): Flowable<Podcast>
     fun podcastByUuidFlow(uuid: String): Flow<Podcast>
     fun podcastByEpisodeUuidFlow(uuid: String): Flow<Podcast>

@@ -87,6 +87,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlowable
+import kotlinx.coroutines.rx2.rxMaybe
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -150,8 +151,7 @@ class PodcastViewModel @Inject constructor(
 
         disposables.clear()
 
-        val podcastFlowable = podcastManager.findPodcastByUuidRxMaybe(uuid)
-            .subscribeOn(Schedulers.io())
+        val podcastFlowable = rxMaybe(Dispatchers.IO) { podcastManager.findPodcastByUuid(uuid) }
             .flatMap {
                 LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Loaded podcast $uuid from database")
                 if (it.isSubscribed) {
