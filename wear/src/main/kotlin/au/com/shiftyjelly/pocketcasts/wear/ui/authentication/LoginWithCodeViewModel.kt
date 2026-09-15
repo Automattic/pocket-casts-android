@@ -48,7 +48,7 @@ class LoginWithCodeViewModel @Inject constructor(
         }
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.Eagerly,
+            started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5_000),
             initialValue = DeviceAuthState.Loading,
         )
 
