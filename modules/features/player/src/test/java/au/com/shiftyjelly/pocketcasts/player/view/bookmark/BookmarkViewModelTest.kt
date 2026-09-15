@@ -85,13 +85,18 @@ class BookmarkViewModelTest {
 
     @Test
     fun `edit form events use the source the sheet was opened from`() = runTest {
-        viewModel.load(arguments.copy(source = SourceView.TRANSCRIPT))
-
-        viewModel.onShown(isNewBookmark = true)
+        viewModel.onShown(isNewBookmark = true, source = SourceView.TRANSCRIPT)
 
         val event = eventSink.pollEvent()
         assertTrue(event is BookmarkEditFormShownEvent)
         assertEquals(SourceViewType.Transcript, (event as BookmarkEditFormShownEvent).source)
+    }
+
+    @Test
+    fun `passage editor dismissal is ignored before the view model is loaded`() = runTest {
+        viewModel.onPassageEditorDismissed("new passage")
+
+        assertTrue(eventSink.isEmpty())
     }
 
     @Test
