@@ -119,6 +119,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 private const val MAX_ROWS_SMALL_LIST = 20
+private const val MAX_NETWORKS_ROW = 10
 private const val INITIAL_PREFETCH_COUNT = 1
 
 internal data class ChangeRegionRow(val region: DiscoverRegion)
@@ -955,7 +956,8 @@ internal class DiscoverAdapter(
                     holder.loadFlowable(
                         loadNetworkList(row.source, row.authenticated),
                         onNext = { list ->
-                            holder.bind(list, row)
+                            val truncatedList = list.copy(networks = list.networks.take(MAX_NETWORKS_ROW))
+                            holder.bind(truncatedList, row)
                         },
                         onError = { error ->
                             Timber.e(error, "Could not load feed ${row.source}")
