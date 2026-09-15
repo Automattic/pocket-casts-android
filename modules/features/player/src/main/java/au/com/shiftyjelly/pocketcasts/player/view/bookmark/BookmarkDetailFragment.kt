@@ -234,11 +234,17 @@ class BookmarkDetailFragment : BaseDialogFragment() {
 
     private suspend fun resolveEpisode(): BaseEpisode? {
         episodeManager.findEpisodeByUuid(args.episodeUuid)?.let { return it }
-        val podcast = runCatching { podcastManager.findOrDownloadPodcastRxSingle(args.podcastUuid).await() }.getOrNull() ?: return null
-        return if (!podcast.isSubscribed) {
-            episodeManager.downloadMissingPodcastEpisode(args.episodeUuid, args.podcastUuid)
-        } else {
-            episodeManager.findEpisodeByUuid(args.episodeUuid)
+        return try {
+            val podcast = podcastManager.findOrDownloadPodcastRxSingle(args.podcastUuid).await()
+            if (!podcast.isSubscribed) {
+                episodeManager.downloadMissingPodcastEpisode(args.episodeUuid, args.podcastUuid)
+            } else {
+                episodeManager.findEpisodeByUuid(args.episodeUuid)
+            }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            null
         }
     }
 }

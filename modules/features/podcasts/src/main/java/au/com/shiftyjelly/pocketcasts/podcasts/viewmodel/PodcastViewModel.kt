@@ -528,7 +528,6 @@ class PodcastViewModel @Inject constructor(
 
     private suspend fun listenerTookOver(episode: BaseEpisode, positionBeforeResolveMs: Int): Boolean {
         if (playbackManager.getCurrentEpisode()?.uuid != episode.uuid) return true
-        if (playbackManager.isPlaying()) return true
         return abs(playbackManager.getCurrentTimeMs(episode) - positionBeforeResolveMs) >= LISTENER_TAKEOVER_TOLERANCE_MS
     }
 

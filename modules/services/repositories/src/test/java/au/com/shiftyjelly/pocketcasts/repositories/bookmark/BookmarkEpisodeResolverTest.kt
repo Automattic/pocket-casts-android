@@ -47,4 +47,13 @@ class BookmarkEpisodeResolverTest {
 
         assertNull(resolver.resolve(bookmark))
     }
+
+    @Test
+    fun `returns null when the missing episode fetch fails`() = runTest {
+        whenever(episodeManager.findEpisodeByUuid("episode")).thenReturn(null)
+        whenever(podcastManager.findOrDownloadPodcastRxSingle("podcast")).thenReturn(Single.just(Podcast(uuid = "podcast", isSubscribed = false)))
+        whenever(episodeManager.downloadMissingPodcastEpisode("episode", "podcast")).thenThrow(RuntimeException("offline"))
+
+        assertNull(resolver.resolve(bookmark))
+    }
 }

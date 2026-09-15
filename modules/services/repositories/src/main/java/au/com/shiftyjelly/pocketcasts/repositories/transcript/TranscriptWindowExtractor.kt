@@ -90,6 +90,7 @@ class TranscriptWindowExtractor @Inject constructor(
         private const val MIN_WORDS = 10
         private const val BACKWARD_WINDOW_SECS = 25
         private const val FORWARD_WINDOW_SECS = 5
+        private const val MAX_SNAP_EXPANSION = 300
         private val WORD_SEPARATOR = "\\s+".toRegex()
 
         // The tap-built map lags the playhead by a full fingerprint window, so cover that plus slack.
@@ -124,9 +125,17 @@ class TranscriptWindowExtractor @Inject constructor(
         private fun snapToSentences(text: String, start: Int, end: Int): Pair<Int, Int>? {
             val iterator = BreakIterator.getSentenceInstance(Locale.getDefault())
             iterator.setText(text)
-            val snappedStart = if (isSentenceStart(iterator, text, start)) start else iterator.preceding(start)
-            val snappedEnd = if (isSentenceEnd(iterator, text, end)) end else iterator.following(end)
-            if (snappedStart == BreakIterator.DONE || snappedEnd == BreakIterator.DONE || snappedStart >= snappedEnd) {
+            val snappedStart = if (isSentenceStart(iterator, text, start)) {
+                start
+            } else {
+                iterator.preceding(start).takeIf { it != BreakIterator.DONE && start - it <= MAX_SNAP_EXPANSION } ?: start
+            }
+            val snappedEnd = if (isSentenceEnd(iterator, text, end)) {
+                end
+            } else {
+                iterator.following(end).takeIf { it != BreakIterator.DONE && it - end <= MAX_SNAP_EXPANSION } ?: end
+            }
+            if (snappedStart >= snappedEnd) {
                 return null
             }
             return snappedStart to snappedEnd
