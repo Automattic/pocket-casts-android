@@ -80,7 +80,8 @@ internal class SleepTimerHandler(
                     while (isActive) {
                         tickCount++
                         // Fixed rate, so a slow tick does not push back the ticks after it
-                        delay(-(start + tickCount.seconds).elapsedNow())
+                        val nextTick = start + tickCount.seconds
+                        delay(-nextTick.elapsedNow())
                         if (currentTimeLeft <= ZERO) break
                         onSleepTimerTick()
                     }
