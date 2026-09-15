@@ -18,6 +18,8 @@ import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.automattic.eventhorizon.BookmarkEditFormShownEvent
+import com.automattic.eventhorizon.BookmarkEditFormSubmittedEvent
+import com.automattic.eventhorizon.BookmarkTitleSuggestionTappedEvent
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.SourceViewType
 import java.util.Date
@@ -87,6 +89,28 @@ class BookmarkViewModelTest {
         val event = eventSink.pollEvent()
         assertTrue(event is BookmarkEditFormShownEvent)
         assertEquals(SourceViewType.Transcript, (event as BookmarkEditFormShownEvent).source)
+    }
+
+    @Test
+    fun `tapping the suggested title tracks it and applies the title`() = runTest {
+        viewModel.load(arguments)
+
+        viewModel.onSuggestionTapped("A great moment")
+
+        assertEquals("A great moment", viewModel.uiState.value.title.text)
+        assertTrue(eventSink.pollEvent() is BookmarkTitleSuggestionTappedEvent)
+    }
+
+    @Test
+    fun `submitting reports whether a passage was saved and changed`() = runTest {
+        viewModel.load(arguments)
+        viewModel.onPassageEdited("a chosen passage", 3)
+
+        viewModel.onSubmitBookmark()
+
+        val event = eventSink.pollEvent() as BookmarkEditFormSubmittedEvent
+        assertEquals(true, event.hasPassage)
+        assertEquals(true, event.passageChanged)
     }
 
     @Test
