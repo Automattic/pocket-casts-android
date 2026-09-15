@@ -55,6 +55,7 @@ class BookmarkViewModel
     private var capturedSuggestion: BookmarkSuggestion? = null
     private var passageEdited = false
     private var loadJob: Job? = null
+    private var analyticsSource: SourceViewType = SourceViewType.Player
 
     private val defaultTitle: String get() = context.getString(LR.string.bookmark)
     private var originalTitle: String = defaultTitle
@@ -94,6 +95,7 @@ class BookmarkViewModel
     fun load(arguments: BookmarkArguments) {
         if (loadJob != null) return
         this.arguments = arguments
+        analyticsSource = arguments.source.analyticsValue
         val bookmarkUuid = arguments.bookmarkUuid
         val editingExisting = bookmarkUuid != null && !arguments.isNewBookmark
         mutableUiState.value = mutableUiState.value.copy(
@@ -280,7 +282,7 @@ class BookmarkViewModel
     fun onShown(isNewBookmark: Boolean) {
         eventHorizon.track(
             BookmarkEditFormShownEvent(
-                source = SourceViewType.Player,
+                source = analyticsSource,
                 isNewBookmark = isNewBookmark,
             ),
         )
@@ -289,7 +291,7 @@ class BookmarkViewModel
     fun onClose() {
         eventHorizon.track(
             BookmarkEditFormDismissedEvent(
-                source = SourceViewType.Player,
+                source = analyticsSource,
                 isNewBookmark = uiState.value.isNewBookmark,
             ),
         )
@@ -298,7 +300,7 @@ class BookmarkViewModel
     fun onSubmitBookmark() {
         eventHorizon.track(
             BookmarkEditFormSubmittedEvent(
-                source = SourceViewType.Player,
+                source = analyticsSource,
                 isNewBookmark = uiState.value.isNewBookmark,
             ),
         )

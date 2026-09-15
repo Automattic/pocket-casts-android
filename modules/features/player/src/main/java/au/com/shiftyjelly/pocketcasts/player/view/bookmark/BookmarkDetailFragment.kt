@@ -276,6 +276,7 @@ class BookmarkDetailFragment : BaseDialogFragment() {
                 episodeUuid = args.episodeUuid,
                 timeSecs = viewModel.uiState.value.timeSecs,
                 podcastColors = podcast?.let(::PodcastColors) ?: PodcastColors.ForUserEpisode,
+                source = args.sourceView,
             )
             editBookmarkLauncher.launch(BookmarkActivity.launchIntent(requireContext(), arguments))
         }
