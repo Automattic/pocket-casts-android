@@ -12,7 +12,6 @@ import retrofit2.Response
 
 interface PodcastCacheServiceManager {
     fun getPodcast(podcastUuid: String): Single<Podcast>
-    fun getPodcastAndEpisodeSingle(podcastUuid: String, episodeUuid: String): Single<Podcast>
     suspend fun getPodcastAndEpisode(podcastUuid: String, episodeUuid: String): Podcast
     fun searchEpisodes(podcastUuid: String, searchTerm: String): Single<List<String>>
     fun searchEpisodes(searchTerm: String): Single<EpisodeSearch>

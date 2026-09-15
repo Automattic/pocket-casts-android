@@ -101,9 +101,6 @@ interface PodcastCacheService {
     suspend fun getShowNotesChapters(@Url url: String): RawChaptersResponse
 
     @GET("/mobile/podcast/findbyepisode/{podcastUuid}/{episodeUuid}")
-    fun getPodcastAndEpisodeSingle(@Path("podcastUuid") podcastUuid: String, @Path("episodeUuid") episodeUuid: String): Single<PodcastResponse>
-
-    @GET("/mobile/podcast/findbyepisode/{podcastUuid}/{episodeUuid}")
     suspend fun getPodcastAndEpisode(@Path("podcastUuid") podcastUuid: String, @Path("episodeUuid") episodeUuid: String): PodcastResponse
 
     @GET("/mobile/episode/url/{podcastUuid}/{episodeUuid}")

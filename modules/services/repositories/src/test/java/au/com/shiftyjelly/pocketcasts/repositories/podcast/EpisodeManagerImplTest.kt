@@ -2,16 +2,23 @@ package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
 import android.content.Context
 import app.cash.turbine.test
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
+import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import com.automattic.eventhorizon.EventHorizon
 import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.rx2.awaitSingleOrNull
 import kotlinx.coroutines.test.runTest
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -22,8 +29,11 @@ import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturnConsecutively
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.whenever
+import retrofit2.HttpException
+import retrofit2.Response
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(MockitoJUnitRunner::class)
@@ -40,6 +50,12 @@ class EpisodeManagerImplTest {
     @Mock
     lateinit var context: Context
 
+    @Mock
+    lateinit var podcastCacheServiceManager: PodcastCacheServiceManager
+
+    @Mock
+    lateinit var userEpisodeManager: UserEpisodeManager
+
     private lateinit var episodeManagerImpl: EpisodeManagerImpl
 
     @Before
@@ -51,8 +67,8 @@ class EpisodeManagerImplTest {
             settings = mock(),
             downloadQueue = mock(),
             context = context,
-            podcastCacheServiceManager = mock(),
-            userEpisodeManager = mock(),
+            podcastCacheServiceManager = podcastCacheServiceManager,
+            userEpisodeManager = userEpisodeManager,
             ioDispatcher = coroutineRule.testDispatcher,
             eventHorizon = EventHorizon(TestEventSink()),
         )
@@ -77,4 +93,85 @@ class EpisodeManagerImplTest {
         verify(episodeDao).getAllPodcastEpisodes(10, 10)
         verify(episodeDao).getAllPodcastEpisodes(10, 20)
     }
+
+    @Test
+    fun `download missing episode returns the local episode without calling the server`() = runTest {
+        val episode = createEpisode()
+        whenever(episodeDao.exists("episode1")).thenReturn(true)
+        whenever(episodeDao.findByUuid("episode1")).thenReturn(episode)
+
+        val result = downloadMissingEpisode(podcastUuid = "podcast1")
+
+        assertEquals(episode, result)
+        verify(podcastCacheServiceManager, never()).getPodcastAndEpisode(any(), any())
+    }
+
+    @Test
+    fun `download missing episode inserts the server episode`() = runTest {
+        val serverEpisode = createEpisode()
+        val podcast = Podcast(uuid = "podcast1").apply { episodes.add(serverEpisode) }
+        whenever(episodeDao.exists("episode1")).thenReturn(false)
+        whenever(podcastCacheServiceManager.getPodcastAndEpisode("podcast1", "episode1")).thenReturn(podcast)
+        episodeDao.stub {
+            on { findByUuid("episode1") } doReturnConsecutively listOf(null, serverEpisode)
+        }
+
+        val result = downloadMissingEpisode(podcastUuid = "podcast1")
+
+        assertEquals(serverEpisode, result)
+        verify(episodeDao).insertAllOrIgnore(listOf(serverEpisode))
+    }
+
+    @Test
+    fun `download missing episode inserts the skeleton when the server does not know the episode`() = runTest {
+        val skeletonEpisode = PodcastEpisode(uuid = "episode1", publishedDate = Date())
+        whenever(episodeDao.exists("episode1")).thenReturn(false)
+        whenever(podcastCacheServiceManager.getPodcastAndEpisode("podcast1", "episode1")).thenReturn(Podcast(uuid = "podcast1"))
+        episodeDao.stub {
+            on { findByUuid("episode1") } doReturnConsecutively listOf(null, skeletonEpisode)
+        }
+
+        val result = downloadMissingEpisode(podcastUuid = "podcast1", skeletonEpisode = skeletonEpisode)
+
+        assertEquals(skeletonEpisode, result)
+        assertEquals("podcast1", skeletonEpisode.podcastUuid)
+        verify(episodeDao).insertAllOrIgnore(listOf(skeletonEpisode))
+    }
+
+    @Test
+    fun `download missing episode propagates server errors`() = runTest {
+        whenever(episodeDao.exists("episode1")).thenReturn(false)
+        whenever(podcastCacheServiceManager.getPodcastAndEpisode("podcast1", "episode1"))
+            .thenThrow(HttpException(Response.error<Any>(404, "".toResponseBody())))
+
+        val result = runCatching { downloadMissingEpisode(podcastUuid = "podcast1") }
+
+        assertTrue(result.exceptionOrNull() is HttpException)
+    }
+
+    @Test
+    fun `download missing episode completes empty when a user episode cannot be found`() = runTest {
+        whenever(episodeDao.exists("episode1")).thenReturn(false)
+        whenever(episodeDao.findByUuid("episode1")).thenReturn(null)
+        whenever(userEpisodeManager.findEpisodeByUuid("episode1")).thenReturn(null)
+
+        val result = downloadMissingEpisode(podcastUuid = Podcast.userPodcast.uuid)
+
+        assertNull(result)
+        verify(podcastCacheServiceManager, never()).getPodcastAndEpisode(any(), any())
+    }
+
+    private fun createEpisode() = PodcastEpisode(uuid = "episode1", podcastUuid = "podcast1", publishedDate = Date())
+
+    private suspend fun downloadMissingEpisode(
+        podcastUuid: String,
+        skeletonEpisode: PodcastEpisode = createEpisode(),
+    ) = episodeManagerImpl.downloadMissingEpisodeRxMaybe(
+        episodeUuid = "episode1",
+        podcastUuid = podcastUuid,
+        skeletonEpisode = skeletonEpisode,
+        podcastManager = mock(),
+        downloadMetaData = false,
+        source = SourceView.UNKNOWN,
+    ).awaitSingleOrNull()
 }

@@ -27,10 +27,6 @@ class PodcastCacheServiceManagerImpl @Inject constructor(
             .map(PodcastResponse::toPodcast)
     }
 
-    override fun getPodcastAndEpisodeSingle(podcastUuid: String, episodeUuid: String): Single<Podcast> {
-        return service.getPodcastAndEpisodeSingle(podcastUuid, episodeUuid).map(PodcastResponse::toPodcast)
-    }
-
     override suspend fun getPodcastAndEpisode(podcastUuid: String, episodeUuid: String): Podcast {
         return service.getPodcastAndEpisode(podcastUuid, episodeUuid).toPodcast()
     }
