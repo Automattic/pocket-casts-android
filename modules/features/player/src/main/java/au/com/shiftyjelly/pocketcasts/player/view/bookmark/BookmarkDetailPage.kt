@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.player.view.bookmark
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -18,7 +20,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
@@ -29,22 +30,23 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.bookmark.BookmarkRowColors
 import au.com.shiftyjelly.pocketcasts.compose.buttons.TimePlayButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.TimePlayButtonColors
+import au.com.shiftyjelly.pocketcasts.compose.components.EpisodeImage
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.BookmarkTranscript
+import au.com.shiftyjelly.pocketcasts.repositories.transcript.TextSpan
 import au.com.shiftyjelly.pocketcasts.transcripts.ui.BookmarkTranscriptView
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -64,6 +66,9 @@ internal fun BookmarkDetailPage(
     onArtworkClick: () -> Unit,
     onMoreClick: () -> Unit,
     modifier: Modifier = Modifier,
+    episode: BaseEpisode? = null,
+    useEpisodeArtwork: Boolean = false,
+    isPodcastTitleLoading: Boolean = false,
     passage: String? = null,
     transcriptState: BookmarkDetailViewModel.TranscriptState = BookmarkDetailViewModel.TranscriptState.None,
 ) {
@@ -125,22 +130,50 @@ internal fun BookmarkDetailPage(
             Row(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                PodcastImage(
-                    uuid = podcastUuid,
-                    imageSize = 56.dp,
-                    cornerSize = 8.dp,
-                    elevation = null,
+                Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(8.dp))
-                        .clickable(onClickLabel = stringResource(LR.string.go_to_episode), onClick = onArtworkClick),
-                )
+                        .then(
+                            if (episode != null) {
+                                Modifier.clickable(onClickLabel = stringResource(LR.string.go_to_episode), onClick = onArtworkClick)
+                            } else {
+                                Modifier
+                            },
+                        ),
+                ) {
+                    if (episode != null) {
+                        EpisodeImage(
+                            episode = episode,
+                            corners = 8.dp,
+                            useEpisodeArtwork = useEpisodeArtwork,
+                            modifier = Modifier.size(56.dp),
+                        )
+                    } else {
+                        PodcastImage(
+                            uuid = podcastUuid,
+                            imageSize = 56.dp,
+                            cornerSize = 8.dp,
+                            elevation = null,
+                        )
+                    }
+                }
 
                 Spacer(modifier = Modifier.width(12.dp))
 
                 Column(
                     modifier = Modifier.weight(1f),
                 ) {
-                    if (podcastTitle.isNotEmpty()) {
+                    if (isPodcastTitleLoading) {
+                        Box(
+                            modifier = Modifier
+                                .padding(vertical = 3.dp)
+                                .width(120.dp)
+                                .height(12.dp)
+                                .clip(RoundedCornerShape(4.dp))
+                                .background(colors.secondaryText.copy(alpha = 0.12f)),
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                    } else if (podcastTitle.isNotEmpty()) {
                         TextH70(
                             text = podcastTitle,
                             color = colors.secondaryText,
@@ -215,19 +248,15 @@ private fun TranscriptSection(
 
         BookmarkDetailViewModel.TranscriptState.Unavailable -> {
             if (passage != null) {
-                Column(
-                    modifier = modifier
-                        .verticalScroll(rememberScrollState())
-                        .padding(horizontal = 20.dp),
-                ) {
-                    Text(
-                        text = passage,
-                        color = colors.primaryText,
-                        fontFamily = FontFamily.Serif,
-                        fontSize = 16.sp,
-                        lineHeight = 24.sp,
-                    )
-                }
+                val transcript = remember(passage) { BookmarkTranscript.fromPassage(passage) }
+                BookmarkTranscriptView(
+                    transcript = transcript,
+                    passage = remember(transcript) { TextSpan(0, transcript.displayText.length) },
+                    editable = false,
+                    scrollToPassage = false,
+                    referenceOffset = if (passage.isNotEmpty()) 0 else null,
+                    modifier = modifier,
+                )
             }
         }
 
@@ -236,6 +265,7 @@ private fun TranscriptSection(
             passage = transcriptState.passage,
             editable = false,
             anchorFraction = 0.4f,
+            referenceOffset = transcriptState.referenceOffset,
             modifier = modifier,
         )
     }
@@ -253,7 +283,10 @@ private fun TranscriptLoadingPlaceholder(
         listOf(
             listOf(0.95f, 0.88f, 0.5f),
             listOf(0.9f, 0.72f),
+            listOf(0.6f),
             listOf(0.93f, 0.85f, 0.6f),
+            listOf(0.82f, 0.55f),
+            listOf(0.9f, 0.78f, 0.45f),
         ).forEach { turn ->
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 turn.forEach { fraction ->

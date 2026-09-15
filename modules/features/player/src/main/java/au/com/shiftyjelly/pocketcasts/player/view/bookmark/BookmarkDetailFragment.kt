@@ -156,6 +156,8 @@ class BookmarkDetailFragment : BaseDialogFragment() {
                 title = args.title,
                 episodeUuid = args.episodeUuid,
                 podcastUuid = args.podcastUuid,
+                podcastTitle = args.podcastTitle,
+                referenceTimeSecs = args.referenceTime,
                 passage = args.passage,
                 passageLocation = args.passageLocation,
             )
@@ -167,7 +169,7 @@ class BookmarkDetailFragment : BaseDialogFragment() {
                 title = uiState.title,
                 episodeTitle = args.episodeTitle,
                 podcastUuid = args.podcastUuid,
-                podcastTitle = args.podcastTitle,
+                podcastTitle = uiState.podcastTitle,
                 timeSecs = args.timeSecs,
                 createdAtText = args.createdAtText,
                 isResolving = resolving,
@@ -175,6 +177,9 @@ class BookmarkDetailFragment : BaseDialogFragment() {
                 onClose = { dismiss() },
                 onArtworkClick = ::onArtworkClick,
                 onMoreClick = ::onMoreClick,
+                episode = uiState.episode,
+                useEpisodeArtwork = uiState.useEpisodeArtwork,
+                isPodcastTitleLoading = uiState.isPodcastTitleLoading,
                 passage = uiState.passage,
                 transcriptState = uiState.transcriptState,
             )
