@@ -97,7 +97,7 @@ interface SyncManager : NamedSettingsCaller {
     suspend fun getSignedPlaybackUrl(episode: UserEpisode): String
 
     // History
-    fun historySyncRxSingle(request: HistorySyncRequest): Single<HistorySyncResponse>
+    suspend fun historySync(request: HistorySyncRequest): HistorySyncResponse
     suspend fun historyYear(year: Int, count: Boolean): HistoryYearResponse
 
     // Subscription

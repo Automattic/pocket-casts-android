@@ -87,11 +87,12 @@ class SyncHistoryTask @AssistedInject constructor(
         )
 
         try {
-            val response = syncManager
-                .historySyncRxSingle(request)
-                .toMaybe()
-                .onErrorComplete { it is HttpException && it.code() == 304 }
-                .blockingGet()
+            val response = try {
+                syncManager.historySync(request)
+            } catch (e: HttpException) {
+                if (e.code() != 304) throw e
+                null
+            }
 
             if (response != null) {
                 historyManager.processServerResponse(

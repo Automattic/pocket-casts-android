@@ -394,7 +394,7 @@ class SyncManagerImpl @Inject constructor(
 
 // History
 
-    override fun historySyncRxSingle(request: HistorySyncRequest): Single<HistorySyncResponse> = getCacheTokenOrLoginRxSingle { token ->
+    override suspend fun historySync(request: HistorySyncRequest): HistorySyncResponse = getCacheTokenOrLogin { token ->
         syncServiceManager.historySync(request, token)
     }
 

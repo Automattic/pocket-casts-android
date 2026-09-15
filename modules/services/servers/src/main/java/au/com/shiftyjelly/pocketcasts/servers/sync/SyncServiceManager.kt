@@ -210,7 +210,7 @@ open class SyncServiceManager @Inject constructor(
         return service.getEpisodes(addBearer(token), request)
     }
 
-    fun historySync(request: HistorySyncRequest, token: AccessToken): Single<HistorySyncResponse> = service.historySync(addBearer(token), request)
+    suspend fun historySync(request: HistorySyncRequest, token: AccessToken): HistorySyncResponse = service.historySync(addBearer(token), request)
 
     /**
      * Retrieve listening history for a year.
