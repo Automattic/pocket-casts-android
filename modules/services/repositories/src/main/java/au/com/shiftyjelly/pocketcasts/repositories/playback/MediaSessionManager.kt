@@ -51,11 +51,9 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.eventhorizon.EventHorizon
-import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.Observables
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
@@ -1227,7 +1225,6 @@ class MediaSessionManager(
         val enqueueCommand: (String, suspend () -> Unit) -> Unit,
     ) : MediaSessionCompat.Callback() {
 
-        private var playFromSearchDisposable: Disposable? = null
         private val mediaEventQueue = MediaEventQueue(scopeProvider = { this@MediaSessionManager.scope })
 
         override fun onMediaButtonEvent(mediaButtonEvent: Intent): Boolean {
@@ -1344,10 +1341,7 @@ class MediaSessionManager(
 
         override fun onPlayFromSearch(query: String?, extras: Bundle?) {
             logEvent("play from search")
-            playFromSearchDisposable?.dispose()
-            playFromSearchDisposable = performPlayFromSearchRx(query)
-                .subscribeOn(Schedulers.io())
-                .subscribeBy(onError = { Timber.e(it) })
+            actions.performPlayFromSearch(query)
         }
 
         override fun onStop() {
@@ -1451,10 +1445,6 @@ class MediaSessionManager(
 
     fun playFromSearchExternal(query: String) {
         actions.performPlayFromSearch(query)
-    }
-
-    private fun performPlayFromSearchRx(searchTerm: String?): Completable {
-        return actions.performPlayFromSearchRx(searchTerm)
     }
 
     @DrawableRes
