@@ -11,6 +11,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkSuggestion
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.shownotes.ShowNotesManager
+import au.com.shiftyjelly.pocketcasts.repositories.transcript.BookmarkTranscript
+import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.automattic.eventhorizon.BookmarkEditFormDismissedEvent
@@ -24,6 +27,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -40,6 +44,8 @@ class BookmarkViewModel
     private val episodeManager: EpisodeManager,
     private val userEpisodeManager: UserEpisodeManager,
     private val bookmarkManager: BookmarkManager,
+    private val transcriptManager: TranscriptManager,
+    private val showNotesManager: ShowNotesManager,
     private val eventHorizon: EventHorizon,
     @ApplicationContext private val context: Context,
 ) : ViewModel(),
@@ -70,6 +76,7 @@ class BookmarkViewModel
         val podcastUuid: String? = null,
         val titleSuggestion: TitleSuggestion = TitleSuggestion.None,
         val isNewBookmark: Boolean = true,
+        val canEditTranscript: Boolean = false,
     )
 
     sealed interface TitleSuggestion {
@@ -119,6 +126,9 @@ class BookmarkViewModel
                 if (mutableUiState.value.isNewBookmark && passage != null && FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS)) {
                     generateTitleSuggestionFromPassage(passage)
                 }
+                if (displayPassage(bookmark) != null) {
+                    updateCanEditTranscript()
+                }
             } else if (bookmarkUuid == null && FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS)) {
                 mutableUiState.value = mutableUiState.value.copy(podcastUuid = podcastUuid)
                 generateTitleSuggestion(arguments.episodeUuid, arguments.timeSecs)
@@ -144,6 +154,7 @@ class BookmarkViewModel
             mutableUiState.value = mutableUiState.value.copy(
                 passage = suggestion.passage,
                 passageLocation = suggestion.passageLocation,
+                canEditTranscript = true,
             )
         }
         val suggestedTitle = suggestion?.title?.takeIf { it.isNotBlank() }
@@ -168,10 +179,22 @@ class BookmarkViewModel
 
     fun onPassageEdited(passage: String, passageLocation: Int) {
         passageEdited = true
-        mutableUiState.value = mutableUiState.value.copy(passage = passage, passageLocation = passageLocation)
+        mutableUiState.value = mutableUiState.value.copy(passage = passage, passageLocation = passageLocation, canEditTranscript = true)
     }
 
     private fun displayPassage(bookmark: Bookmark) = bookmark.passage?.takeIf { FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS) }
+
+    private suspend fun updateCanEditTranscript() {
+        val state = mutableUiState.value
+        val passage = state.passage ?: return
+        state.podcastUuid?.takeIf { it.isNotBlank() }?.let { podcastUuid ->
+            runCatching { showNotesManager.loadShowNotes(podcastUuid, arguments.episodeUuid) }
+                .onFailure { if (it is CancellationException) throw it }
+        }
+        val transcript = transcriptManager.loadGeneratedTranscript(arguments.episodeUuid) ?: return
+        val located = BookmarkTranscript.from(transcript).passageDisplaySpan(passage, state.passageLocation) != null
+        mutableUiState.value = mutableUiState.value.copy(canEditTranscript = located)
+    }
 
     fun changeTitle(title: TextFieldValue) {
         val titleLimited = title.copy(text = title.text.take(100))
