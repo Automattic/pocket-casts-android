@@ -124,7 +124,7 @@ class BookmarkDetailViewModel @Inject constructor(
             if (loaded != null && passage != null) {
                 val span = loaded.transcript.passageDisplaySpan(passage, bookmark.passageLocation)
                 mutableState.value = mutableState.value.copy(
-                    transcriptState = if (span == null) TranscriptState.Unavailable else loaded.copy(passage = span),
+                    transcriptState = if (span == null) TranscriptState.Unavailable else loaded.copy(passage = span, referenceOffset = referenceOffsetFor(loaded.transcript, span)),
                 )
             } else {
                 loadTranscript(passage, bookmark.passageLocation)
@@ -151,15 +151,18 @@ class BookmarkDetailViewModel @Inject constructor(
             }
             val model = BookmarkTranscript.from(transcript)
             val span = model.passageDisplaySpan(passage, passageLocation)
-            val rawOffset = referenceTimeSecs?.let { model.referenceOffsetAt(it * 1000L) } ?: span?.start
-            val referenceOffset = if (span != null && rawOffset != null) {
-                rawOffset.coerceIn(span.start, (span.end - 1).coerceAtLeast(span.start))
-            } else {
-                rawOffset
-            }
             mutableState.value = mutableState.value.copy(
-                transcriptState = if (span == null) TranscriptState.Unavailable else TranscriptState.Loaded(model, span, referenceOffset),
+                transcriptState = if (span == null) TranscriptState.Unavailable else TranscriptState.Loaded(model, span, referenceOffsetFor(model, span)),
             )
+        }
+    }
+
+    private fun referenceOffsetFor(model: BookmarkTranscript, span: TextSpan?): Int? {
+        val rawOffset = referenceTimeSecs?.let { model.referenceOffsetAt(it * 1000L) } ?: span?.start
+        return if (span != null && rawOffset != null) {
+            rawOffset.coerceIn(span.start, (span.end - 1).coerceAtLeast(span.start))
+        } else {
+            rawOffset
         }
     }
 }
