@@ -33,10 +33,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Maybe
-import io.reactivex.Single
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.schedulers.Schedulers
 import java.io.File
 import java.net.HttpURLConnection
 import java.util.Date
@@ -45,6 +41,7 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlin.math.roundToInt
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -268,7 +265,7 @@ class UserEpisodeManagerImpl @Inject constructor(
     }
 
     override suspend fun updateFiles(files: List<UserEpisode>) = withContext(Dispatchers.IO) {
-        val response = syncManager.postFilesRxSingle(files.toServerPost()).blockingGet()
+        val response = syncManager.postFilesRxSingle(files.toServerPost()).await()
         if (!response.isSuccessful) {
             throw HttpException(response)
         }
@@ -278,7 +275,7 @@ class UserEpisodeManagerImpl @Inject constructor(
         val episodesToSync = userEpisodeDao.findUserEpisodesToSyncBlocking()
         if (episodesToSync.isNotEmpty()) {
             val response = withContext(Dispatchers.IO) {
-                syncManager.postFilesRxSingle(episodesToSync.toServerPost()).blockingGet()
+                syncManager.postFilesRxSingle(episodesToSync.toServerPost()).await()
             }
             if (response.isSuccessful) {
                 LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Synced cloud files successfully")
@@ -290,7 +287,7 @@ class UserEpisodeManagerImpl @Inject constructor(
         }
 
         val response = withContext(Dispatchers.IO) {
-            syncManager.getFilesRxSingle().blockingGet()
+            syncManager.getFilesRxSingle().await()
         }
         if (!response.isSuccessful) {
             throw HttpException(response)
@@ -494,17 +491,20 @@ class UserEpisodeManagerImpl @Inject constructor(
     }
 
     override fun removeFromCloud(userEpisode: UserEpisode) {
-        syncManager.deleteFromServerRxSingle(userEpisode)
-            .doOnSubscribe { UploadProgressManager.clearProgress(userEpisode.uuid) }
-            .flatMapCompletable { userEpisodeDao.updateServerStatusRxCompletable(userEpisode.uuid, UserEpisodeServerStatus.LOCAL) }
-            .andThen(syncManager.getFileUsageRxSingle().doOnSuccess { usageState.value = Optional.of(it) }.ignoreElement())
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onError = {
-                    LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, it, "Could not upload file ${userEpisode.uuid} - ${userEpisode.title}")
-                },
-            )
+        val deleteFromServer = syncManager.deleteFromServerRxSingle(userEpisode)
+        val fileUsage = syncManager.getFileUsageRxSingle()
+        launch {
+            try {
+                UploadProgressManager.clearProgress(userEpisode.uuid)
+                deleteFromServer.await()
+                userEpisodeDao.updateServerStatus(userEpisode.uuid, UserEpisodeServerStatus.LOCAL)
+                usageState.value = Optional.of(fileUsage.await())
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, e, "Could not remove file from cloud ${userEpisode.uuid} - ${userEpisode.title}")
+            }
+        }
     }
 
     override suspend fun deleteImageFromServer(userEpisode: UserEpisode) = withContext(Dispatchers.IO) {
