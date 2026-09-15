@@ -44,6 +44,7 @@ dependencies {
     implementation(libs.coroutines.reactive)
     implementation(libs.coroutines.rx2)
     implementation(libs.fragment.ktx)
+    implementation(libs.lifecycle.runtime.compose)
     implementation(libs.rx2.java)
 
     implementation(projects.modules.features.settings)

@@ -118,6 +118,9 @@ class EpisodeFragmentViewModel @Inject constructor(
         val episodePublishedDate: Date? = null,
         val episodeDurationMs: Long? = null,
     ) {
+        val canRequestOnDemandTranscript
+            get() = isPlusUser && FeatureFlag.isEnabled(Feature.ON_DEMAND_TRANSCRIPTS)
+
         internal fun selectContentTab(tab: EpisodeContentTab): EpisodePageState {
             val contentTab = when (tab) {
                 EpisodeContentTab.DESCRIPTION -> EpisodeContentTab.DESCRIPTION
@@ -138,7 +141,11 @@ class EpisodeFragmentViewModel @Inject constructor(
         }
 
         internal fun withTranscript(transcript: Transcript?): EpisodePageState {
-            val contentTab = if (transcript == null && selectedContentTab == EpisodeContentTab.TRANSCRIPT) {
+            val contentTab = if (
+                transcript == null &&
+                selectedContentTab == EpisodeContentTab.TRANSCRIPT &&
+                !canRequestOnDemandTranscript
+            ) {
                 EpisodeContentTab.DESCRIPTION
             } else {
                 selectedContentTab

@@ -62,6 +62,7 @@ interface EpisodeManager {
     suspend fun update(episode: PodcastEpisode?)
     suspend fun updateAll(episodes: Collection<PodcastEpisode>)
     suspend fun updateAllSyncFields(episodes: Collection<PodcastEpisode>)
+    suspend fun updateHasGeneratedTranscript(episodeUuid: String, hasGeneratedTranscript: Boolean)
 
     fun updatePlayedUpToBlocking(episode: BaseEpisode?, playedUpTo: Double, forceUpdate: Boolean)
     fun updateDurationBlocking(episode: BaseEpisode?, durationInSecs: Double, syncChanges: Boolean)
