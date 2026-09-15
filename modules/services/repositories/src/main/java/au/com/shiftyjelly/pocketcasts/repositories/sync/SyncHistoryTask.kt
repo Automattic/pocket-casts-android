@@ -21,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import java.util.Date
+import kotlin.coroutines.cancellation.CancellationException
 import retrofit2.HttpException
 
 private const val TAG = "SyncHistoryTask"
@@ -113,6 +114,8 @@ class SyncHistoryTask @AssistedInject constructor(
             }
 
             LogBuffer.i(TAG, "Sync history completed successfully")
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             LogBuffer.e(TAG, "Sync history failed: ${e.message}")
             return Result.failure()
