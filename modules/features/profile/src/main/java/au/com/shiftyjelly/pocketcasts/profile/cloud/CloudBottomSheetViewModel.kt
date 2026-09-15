@@ -34,6 +34,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
@@ -64,7 +65,9 @@ class CloudBottomSheetViewModel @Inject constructor(
         val inUpNextFlow = playbackManager.upNextQueue.changesObservable.asFlow().containsUuid(uuid)
         // Room emits null once the file is deleted, keep showing the last known episode instead
         val episodeFlow = userEpisodeManager.episodeFlow(uuid).filterNotNull()
-        state = combine(episodeFlow, inUpNextFlow, isPlayingFlow, ::BottomSheetState).asLiveData()
+        state = combine(episodeFlow, inUpNextFlow, isPlayingFlow, ::BottomSheetState)
+            .distinctUntilChanged()
+            .asLiveData()
     }
 
     fun getDeleteStateOnDeleteClick(episode: UserEpisode): DeleteState {
