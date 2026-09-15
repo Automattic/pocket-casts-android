@@ -52,6 +52,20 @@ class DeviceAuthStateTest {
     }
 
     @Test
+    fun `emits an error once the maximum number of codes have expired`() = runTest {
+        whenever(syncManager.deviceAuthorize()).thenReturn(authorizeResponse(deviceCode = "code-1", userCode = "ABC123"))
+        whenever(syncManager.loginWithDeviceAuth(eq("code-1"), any(), any())).thenReturn(failed("expired_token"))
+
+        createFlow(maxCodeRequests = 1).test {
+            assertEquals(DeviceAuthState.Loading, awaitItem())
+            assertEquals(readyState(userCode = "ABC123"), awaitItem())
+            assertEquals(DeviceAuthState.Error, awaitItem())
+            awaitComplete()
+        }
+        verify(syncManager, times(1)).deviceAuthorize()
+    }
+
+    @Test
     fun `emits an error when a code can't be requested`() = runTest {
         whenever(syncManager.deviceAuthorize()).thenThrow(RuntimeException("offline"))
 
@@ -75,10 +89,11 @@ class DeviceAuthStateTest {
         }
     }
 
-    private fun createFlow() = deviceAuthFlow(
+    private fun createFlow(maxCodeRequests: Int = Int.MAX_VALUE) = deviceAuthFlow(
         syncManager = syncManager,
         signInSource = SignInSource.UserInitiated.Watch,
         isNewAccount = false,
+        maxCodeRequests = maxCodeRequests,
     )
 
     private fun authorizeResponse(deviceCode: String, userCode: String) = DeviceAuthorizeResponse(

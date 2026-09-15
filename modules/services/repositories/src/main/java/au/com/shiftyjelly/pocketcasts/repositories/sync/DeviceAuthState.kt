@@ -24,14 +24,16 @@ sealed interface DeviceAuthState {
 
 /**
  * Requests a device code and polls until the user approves it on another device, rotating the code when it expires.
+ * Emits [DeviceAuthState.Error] once [maxCodeRequests] codes have expired.
  */
 fun deviceAuthFlow(
     syncManager: SyncManager,
     signInSource: SignInSource,
     isNewAccount: Boolean,
+    maxCodeRequests: Int = Int.MAX_VALUE,
 ): Flow<DeviceAuthState> = flow {
     emit(DeviceAuthState.Loading)
-    while (true) {
+    repeat(maxCodeRequests) {
         val response = try {
             syncManager.deviceAuthorize()
         } catch (e: CancellationException) {
@@ -75,4 +77,6 @@ fun deviceAuthFlow(
             }
         }
     }
+    Timber.i("Device auth polling stopped after $maxCodeRequests expired codes")
+    emit(DeviceAuthState.Error)
 }

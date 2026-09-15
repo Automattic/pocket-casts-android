@@ -9,13 +9,20 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.model.AuthResultModel
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.DeviceAuthorizeResponse
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.clearInvocations
 import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 class LoginWithCodeViewModelTest {
@@ -53,7 +60,6 @@ class LoginWithCodeViewModelTest {
 
             viewModel.retry()
 
-            assertEquals(DeviceAuthState.Loading, awaitItem())
             assertEquals(readyState, awaitItem())
             cancelAndIgnoreRemainingEvents()
         }
@@ -76,5 +82,25 @@ class LoginWithCodeViewModelTest {
                 verify(podcastManager).refreshPodcastsAfterSignIn()
             }
         }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `stops polling once the screen stops collecting`() = runTest {
+        whenever(syncManager.deviceAuthorize()).thenReturn(readyResponse)
+        whenever(syncManager.loginWithDeviceAuth(any(), any(), any()))
+            .thenReturn(LoginResult.Failed(message = "authorization_pending", messageId = "authorization_pending"))
+
+        val viewModel = LoginWithCodeViewModel(syncManager, podcastManager)
+
+        viewModel.state.test {
+            assertEquals(readyState, awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+        advanceTimeBy(6.seconds)
+        clearInvocations(syncManager)
+        advanceTimeBy(1.minutes)
+
+        verify(syncManager, never()).loginWithDeviceAuth(any(), any(), any())
     }
 }

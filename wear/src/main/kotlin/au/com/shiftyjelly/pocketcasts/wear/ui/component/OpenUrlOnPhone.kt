@@ -7,8 +7,9 @@ import androidx.concurrent.futures.await
 import androidx.core.net.toUri
 import androidx.wear.remote.interactions.RemoteActivityHelper
 import au.com.shiftyjelly.pocketcasts.wear.WearLogging
-import java.util.concurrent.Executors
 import kotlin.coroutines.cancellation.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.asExecutor
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -17,7 +18,7 @@ suspend fun openUrlOnPhone(url: String, context: Context) {
         val intent = Intent(Intent.ACTION_VIEW)
             .addCategory(Intent.CATEGORY_BROWSABLE)
             .setData(url.toUri())
-        RemoteActivityHelper(context, Executors.newSingleThreadExecutor())
+        RemoteActivityHelper(context, Dispatchers.IO.asExecutor())
             .startRemoteActivity(intent)
             .await()
     } catch (e: CancellationException) {
