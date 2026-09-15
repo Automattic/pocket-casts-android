@@ -22,8 +22,9 @@ suspend fun openUrlOnPhone(url: String, context: Context) {
             .await()
     } catch (e: CancellationException) {
         throw e
-    } catch (e: Exception) {
-        Timber.i("${WearLogging.PREFIX} Failed to open url $url on phone")
+    } catch (e: Throwable) {
+        // On Wear SDK 6+ (API 36) RemoteActivityHelper fails with a bare Throwable rather than an Exception.
+        Timber.i(e, "${WearLogging.PREFIX} Failed to open url $url on phone")
         Toast.makeText(context, LR.string.settings_could_not_open_on_phone, Toast.LENGTH_SHORT)
             .show()
     }
