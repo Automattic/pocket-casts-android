@@ -361,11 +361,11 @@ class SyncManagerImpl @Inject constructor(
             .ignoreElement()
     }
 
-    override fun deleteImageFromServerRxSingle(episode: UserEpisode): Single<Response<Void>> = getCacheTokenOrLoginRxSingle { token ->
+    override suspend fun deleteImageFromServer(episode: UserEpisode): Response<Void> = getCacheTokenOrLogin { token ->
         syncServiceManager.deleteImageFromServer(episode, token)
     }
 
-    override fun deleteFromServerRxSingle(episode: UserEpisode): Single<Response<Void>> = getCacheTokenOrLoginRxSingle { token ->
+    override suspend fun deleteFromServer(episode: UserEpisode): Response<Void> = getCacheTokenOrLogin { token ->
         syncServiceManager.deleteFromServer(episode, token)
     }
 
