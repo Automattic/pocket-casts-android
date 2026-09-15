@@ -46,5 +46,9 @@ class BookmarkGenerationAnalytics @Inject constructor(
         }
     }
 
-    private fun countWords(text: String) = text.split(Regex("\\s+")).count { it.isNotBlank() }
+    private fun countWords(text: String) = text.split(WORD_SEPARATOR).count { it.isNotBlank() }
+
+    private companion object {
+        private val WORD_SEPARATOR = Regex("\\s+")
+    }
 }

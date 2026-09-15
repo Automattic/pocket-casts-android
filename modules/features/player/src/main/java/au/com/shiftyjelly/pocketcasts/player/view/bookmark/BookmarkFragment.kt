@@ -76,7 +76,7 @@ class BookmarkFragment : BaseFragment() {
             val uiState: BookmarkViewModel.UiState by viewModel.uiState.collectAsState()
 
             CallOnce {
-                viewModel.onShown(isNewBookmark = args.isNewBookmark || args.bookmarkUuid == null)
+                viewModel.onShown(isNewBookmark = args.isNewBookmark || args.bookmarkUuid == null, source = args.source)
             }
 
             CompositionLocalProvider(
