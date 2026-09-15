@@ -14,6 +14,7 @@ import androidx.lifecycle.lifecycleScope
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
@@ -35,6 +36,7 @@ import com.automattic.eventhorizon.BookmarkPlayTappedEvent
 import com.automattic.eventhorizon.EventHorizon
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import kotlin.math.abs
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.NonCancellable
@@ -49,6 +51,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 class BookmarkDetailFragment : BaseDialogFragment() {
 
     companion object {
+        private const val LISTENER_TAKEOVER_TOLERANCE_MS = 1000
         private const val TAG = "bookmark_detail"
         private const val NEW_INSTANCE_ARG = "bookmark_detail_args"
 
@@ -276,6 +279,11 @@ class BookmarkDetailFragment : BaseDialogFragment() {
             val pausedForResolve = hasReferenceTime &&
                 playbackManager.isPlaying() &&
                 playbackManager.getCurrentEpisode()?.uuid == args.episodeUuid
+            val positionBeforeResolveMs = if (pausedForResolve) {
+                playbackManager.getCurrentTimeMs(episode)
+            } else {
+                0
+            }
             if (pausedForResolve) {
                 playbackManager.pauseSuspend()
             }
@@ -301,6 +309,9 @@ class BookmarkDetailFragment : BaseDialogFragment() {
             } finally {
                 isResolving.value = false
             }
+            if (pausedForResolve && listenerTookOver(episode, positionBeforeResolveMs)) {
+                return@launch
+            }
             playbackManager.playNowSuspend(episode, sourceView = args.sourceView)
             playbackManager.seekToTimeMs(positionMs = seekToMs)
             eventHorizon.track(
@@ -311,5 +322,11 @@ class BookmarkDetailFragment : BaseDialogFragment() {
                 ),
             )
         }
+    }
+
+    private suspend fun listenerTookOver(episode: BaseEpisode, positionBeforeResolveMs: Int): Boolean {
+        if (playbackManager.getCurrentEpisode()?.uuid != episode.uuid) return true
+        if (playbackManager.isPlaying()) return true
+        return abs(playbackManager.getCurrentTimeMs(episode) - positionBeforeResolveMs) >= LISTENER_TAKEOVER_TOLERANCE_MS
     }
 }
