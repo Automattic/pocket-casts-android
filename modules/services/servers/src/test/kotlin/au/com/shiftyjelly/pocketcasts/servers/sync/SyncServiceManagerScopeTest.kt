@@ -31,14 +31,21 @@ class SyncServiceManagerScopeTest {
     }
 
     @Test
-    fun `other apps sign in with the mobile scope`() = runTest {
-        listOf(AppPlatform.Phone, AppPlatform.WearOs, AppPlatform.Automotive).forEach { appPlatform ->
+    fun `wear app signs in with the watch scope`() = runTest {
+        createManager(AppPlatform.WearOs).login(email = "test@pocketcasts.com", password = "password")
+
+        assertEquals("watch", captureLoginScope())
+    }
+
+    @Test
+    fun `phone and automotive apps sign in with the mobile scope`() = runTest {
+        listOf(AppPlatform.Phone, AppPlatform.Automotive).forEach { appPlatform ->
             createManager(appPlatform).login(email = "test@pocketcasts.com", password = "password")
         }
 
         val captor = argumentCaptor<LoginPocketCastsRequest>()
-        verify(service, times(3)).loginPocketCasts(captor.capture())
-        assertEquals(listOf("mobile", "mobile", "mobile"), captor.allValues.map { it.scope })
+        verify(service, times(2)).loginPocketCasts(captor.capture())
+        assertEquals(listOf("mobile", "mobile"), captor.allValues.map { it.scope })
     }
 
     @Test

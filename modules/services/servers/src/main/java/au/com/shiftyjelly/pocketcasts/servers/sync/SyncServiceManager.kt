@@ -83,6 +83,7 @@ open class SyncServiceManager @Inject constructor(
     companion object {
         const val SCOPE_MOBILE = "mobile"
         const val SCOPE_TV = "tv"
+        const val SCOPE_WATCH = "watch"
 
         // Credentials come from UserFileAuthInterceptor, not from the URL.
         internal const val USER_FILE_PLAYBACK_PATH = "/files/url/token/"
@@ -100,7 +101,8 @@ open class SyncServiceManager @Inject constructor(
 
     private val scope = when (appPlatform) {
         AppPlatform.Tv -> SCOPE_TV
-        AppPlatform.Phone, AppPlatform.WearOs, AppPlatform.Automotive -> SCOPE_MOBILE
+        AppPlatform.WearOs -> SCOPE_WATCH
+        AppPlatform.Phone, AppPlatform.Automotive -> SCOPE_MOBILE
     }
 
     suspend fun register(email: String, password: String): LoginTokenResponse {
