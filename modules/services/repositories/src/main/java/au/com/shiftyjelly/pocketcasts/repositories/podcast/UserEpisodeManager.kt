@@ -492,13 +492,12 @@ class UserEpisodeManagerImpl @Inject constructor(
     }
 
     override fun removeFromCloud(userEpisode: UserEpisode) {
-        val fileUsage = syncManager.getFileUsageRxSingle()
         launch {
             try {
                 UploadProgressManager.clearProgress(userEpisode.uuid)
                 syncManager.deleteFromServer(userEpisode)
                 userEpisodeDao.updateServerStatus(userEpisode.uuid, UserEpisodeServerStatus.LOCAL)
-                usageState.value = Optional.of(fileUsage.await())
+                usageState.value = Optional.of(syncManager.getFileUsageRxSingle().await())
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
