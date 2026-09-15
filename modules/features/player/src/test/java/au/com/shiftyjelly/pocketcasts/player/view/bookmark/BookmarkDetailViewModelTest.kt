@@ -221,11 +221,34 @@ class BookmarkDetailViewModelTest {
         assertEquals(state.transcript.displayText.indexOf(secondSentence), state.referenceOffset)
     }
 
+    @Test
+    fun `falls back to the passage start when there is no reference time`() = runTest {
+        val timed = Transcript.Text(
+            entries = listOf(
+                TranscriptEntry.Text(firstSentence, startTimeMs = 0),
+                TranscriptEntry.Text(secondSentence, startTimeMs = 10_000),
+            ),
+            type = TranscriptType.Vtt,
+            url = "https://example.com/transcript.vtt",
+            isGenerated = true,
+            episodeUuid = episodeUuid,
+            podcastUuid = podcastUuid,
+        )
+        whenever(transcriptManager.loadGeneratedTranscript(episodeUuid)).thenReturn(timed)
+
+        load(passage = secondSentence, passageLocation = firstSentence.length + 1, referenceTimeSecs = null)
+
+        val state = viewModel.uiState.value.transcriptState
+        assertTrue(state is BookmarkDetailViewModel.TranscriptState.Loaded)
+        state as BookmarkDetailViewModel.TranscriptState.Loaded
+        assertEquals(state.passage!!.start, state.referenceOffset)
+    }
+
     private fun load(
         passage: String?,
         passageLocation: Int?,
         podcastTitle: String = "Podcast",
-        referenceTimeSecs: Int = 0,
+        referenceTimeSecs: Int? = 0,
     ) {
         viewModel.load(
             bookmarkUuid = bookmarkUuid,
