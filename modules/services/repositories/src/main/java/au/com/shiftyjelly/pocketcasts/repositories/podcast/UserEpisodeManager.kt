@@ -51,6 +51,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.rx2.asFlowable
 import kotlinx.coroutines.rx2.await
 import kotlinx.coroutines.rx2.rxCompletable
 import kotlinx.coroutines.withContext
@@ -215,7 +216,7 @@ class UserEpisodeManagerImpl @Inject constructor(
     }
 
     override fun episodeRxFlowable(uuid: String): Flowable<UserEpisode> {
-        return userEpisodeDao.findEpisodeRxFlowable(uuid)
+        return userEpisodeDao.findEpisodeFlow(uuid).filterNotNull().asFlowable()
     }
 
     override fun episodeFlow(uuid: String): Flow<UserEpisode?> {

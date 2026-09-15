@@ -15,7 +15,6 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.UserEpisodeServerStatus
 import io.reactivex.Completable
-import io.reactivex.Flowable
 import io.reactivex.Maybe
 import java.time.Instant
 import java.util.Date
@@ -65,9 +64,6 @@ abstract class UserEpisodeDao {
 
     @Query("SELECT * FROM user_episodes ORDER BY duration DESC")
     abstract fun findUserEpisodesDurationDescFlow(): Flow<List<UserEpisode>>
-
-    @Query("SELECT * FROM user_episodes WHERE uuid = :uuid")
-    abstract fun findEpisodeRxFlowable(uuid: String): Flowable<UserEpisode>
 
     @Query("SELECT * FROM user_episodes WHERE uuid = :uuid")
     abstract fun findEpisodeFlow(uuid: String): Flow<UserEpisode?>
