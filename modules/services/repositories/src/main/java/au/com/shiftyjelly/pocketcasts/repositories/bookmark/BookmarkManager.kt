@@ -44,6 +44,16 @@ interface BookmarkManager {
     ): Flow<List<Bookmark>>
     fun hasBookmarksFlow(episodeUuid: String): Flow<Boolean>
     fun enrichBookmark(bookmark: Bookmark)
+    fun enrichBookmarkPassage(bookmark: Bookmark)
+    suspend fun suggestBookmark(episodeUuid: String, timeSecs: Int): BookmarkSuggestion?
+    suspend fun suggestTitle(passage: String): String?
 
     var sourceView: SourceView
 }
+
+data class BookmarkSuggestion(
+    val passage: String,
+    val passageLocation: Int,
+    val referenceTimeSecs: Int,
+    val title: String?,
+)
