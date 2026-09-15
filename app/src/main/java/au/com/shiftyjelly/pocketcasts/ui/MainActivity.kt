@@ -1671,7 +1671,7 @@ class MainActivity :
 
                 is ChangeBookmarkTitleDeepLink -> {
                     launch {
-                        val bookmarkArguments = viewModel.createBookmarkArguments(deepLink.bookmarkUuid, isNewBookmark = deepLink.isNewBookmark)
+                        val bookmarkArguments = viewModel.createBookmarkArguments(deepLink.bookmarkUuid, isNewBookmark = deepLink.isNewBookmark, fromEpisode = deepLink.fromEpisode)
                         if (bookmarkArguments != null) {
                             bookmarkActivityLauncher.launch(BookmarkActivity.launchIntent(this@MainActivity, bookmarkArguments))
                         }
@@ -2132,13 +2132,11 @@ class MainActivity :
             getString(LR.string.bookmark_added, result.title)
         }
 
-        val action = View.OnClickListener {
-            showPlayerBookmarks()
+        val snackbar = Snackbar.make(view, snackbarMessage, Snackbar.LENGTH_LONG)
+        if (!result.fromEpisode) {
+            snackbar.setAction(LR.string.settings_view) { showPlayerBookmarks() }
         }
-
-        Snackbar.make(view, snackbarMessage, Snackbar.LENGTH_LONG)
-            .setAction(LR.string.settings_view, action)
-            .show()
+        snackbar.show()
     }
 
     private fun openImport() {

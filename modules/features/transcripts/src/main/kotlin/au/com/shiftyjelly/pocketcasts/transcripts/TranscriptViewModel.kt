@@ -453,7 +453,7 @@ class TranscriptViewModel @AssistedInject constructor(
                 _messages.send(TranscriptMessage.BookmarkFailed)
             } else {
                 val (bookmark, isNew) = result
-                _messages.send(TranscriptMessage.OpenBookmarkEditor(bookmark.uuid, isNewBookmark = isNew))
+                _messages.send(TranscriptMessage.OpenBookmarkEditor(bookmark.uuid, isNewBookmark = isNew, fromEpisode = source == Source.Episode))
             }
         }
     }
@@ -560,7 +560,7 @@ class TranscriptViewModel @AssistedInject constructor(
 sealed interface TranscriptMessage {
     data object TapToSeekStreamingUnavailable : TranscriptMessage
     data object BookmarkFailed : TranscriptMessage
-    data class OpenBookmarkEditor(val bookmarkUuid: String, val isNewBookmark: Boolean) : TranscriptMessage
+    data class OpenBookmarkEditor(val bookmarkUuid: String, val isNewBookmark: Boolean, val fromEpisode: Boolean) : TranscriptMessage
 }
 
 data class UiState(

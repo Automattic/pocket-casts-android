@@ -151,7 +151,7 @@ class MainActivityViewModel
         multiSelectBookmarksHelper.closeMultiSelect()
     }
 
-    suspend fun createBookmarkArguments(bookmarkUuid: String?, isNewBookmark: Boolean = false): BookmarkArguments? {
+    suspend fun createBookmarkArguments(bookmarkUuid: String?, isNewBookmark: Boolean = false, fromEpisode: Boolean = false): BookmarkArguments? {
         val bookmark = if (bookmarkUuid != null) {
             val existingBookmark = bookmarkManager.findBookmark(bookmarkUuid)
             if (existingBookmark == null) {
@@ -174,6 +174,7 @@ class MainActivityViewModel
             timeSecs = timeInSecs,
             podcastColors = podcast?.let(::PodcastColors) ?: PodcastColors.ForUserEpisode,
             isNewBookmark = isNewBookmark,
+            fromEpisode = fromEpisode,
         )
     }
 
