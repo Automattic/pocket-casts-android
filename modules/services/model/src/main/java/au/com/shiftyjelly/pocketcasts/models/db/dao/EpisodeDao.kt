@@ -55,9 +55,6 @@ abstract class EpisodeDao {
     abstract suspend fun countEpisodesByPodcast(podcastUuid: String): Int
 
     @Query("SELECT * FROM podcast_episodes WHERE uuid = :uuid")
-    abstract fun findByUuidRxMaybe(uuid: String): Maybe<PodcastEpisode>
-
-    @Query("SELECT * FROM podcast_episodes WHERE uuid = :uuid")
     abstract fun findByUuidFlow(uuid: String): Flow<PodcastEpisode?>
 
     @Query("SELECT * FROM podcast_episodes WHERE UPPER(title) = UPPER(:query) LIMIT 1")
