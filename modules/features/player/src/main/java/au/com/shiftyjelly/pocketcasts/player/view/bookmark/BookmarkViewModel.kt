@@ -5,6 +5,7 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkGenerationAnalytics
@@ -69,6 +70,7 @@ class BookmarkViewModel
     companion object {
         private const val DEFAULT_TITLE = "Bookmark"
         private val SUGGESTION_TIMEOUT = 10.seconds
+        private val WORD_SEPARATOR = Regex("\\s+")
 
         private fun buildSelectedTextFieldValue(text: String): TextFieldValue {
             return TextFieldValue(text = text, selection = TextRange(0, text.length))
@@ -272,10 +274,10 @@ class BookmarkViewModel
         }
     }
 
-    fun onShown(isNewBookmark: Boolean) {
+    fun onShown(isNewBookmark: Boolean, source: SourceView) {
         eventHorizon.track(
             BookmarkEditFormShownEvent(
-                source = analyticsSource,
+                source = source.analyticsValue,
                 isNewBookmark = isNewBookmark,
             ),
         )
@@ -324,6 +326,7 @@ class BookmarkViewModel
     }
 
     fun onPassageEditorDismissed(newPassage: String?) {
+        if (!::arguments.isInitialized) return
         val currentPassage = uiState.value.passage
         val counted = newPassage ?: currentPassage
         eventHorizon.track(
@@ -337,5 +340,5 @@ class BookmarkViewModel
         )
     }
 
-    private fun countWords(text: String) = text.split(Regex("\\s+")).count { it.isNotBlank() }
+    private fun countWords(text: String) = text.split(WORD_SEPARATOR).count { it.isNotBlank() }
 }
