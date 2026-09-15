@@ -61,6 +61,8 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.buttons.PlayButton
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
@@ -615,11 +617,11 @@ class PodcastAdapter(
                                 onBookmarkPlayClicked = onBookmarkPlayClicked,
                                 onBookmarkRowLongPress = onBookmarkRowLongPress,
                                 onBookmarkRowClick = { clickedBookmark, adapterPosition ->
-                                    if (multiSelectBookmarksHelper.isMultiSelecting) {
+                                    if (!multiSelectBookmarksHelper.isMultiSelecting && FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS)) {
+                                        onBookmarkClick(clickedBookmark, episode)
+                                    } else {
                                         multiSelectBookmarksHelper.toggle(clickedBookmark)
                                         notifyItemChanged(adapterPosition)
-                                    } else {
-                                        onBookmarkClick(clickedBookmark, episode)
                                     }
                                 },
                                 onBookmarkArtworkClick = { onBookmarkArtworkClick(bookmark) },
