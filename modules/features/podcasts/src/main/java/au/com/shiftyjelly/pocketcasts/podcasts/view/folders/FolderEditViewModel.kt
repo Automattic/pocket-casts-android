@@ -27,21 +27,18 @@ import com.automattic.eventhorizon.FolderPodcastPickerSearchPerformedEvent
 import com.automattic.eventhorizon.FolderSavedEvent
 import com.automattic.eventhorizon.Trackable
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.BackpressureStrategy
 import java.util.Locale
 import java.util.Optional
 import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.reactive.asFlow
-import kotlinx.coroutines.rx2.asObservable
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class FolderEditViewModel
 @Inject constructor(
@@ -50,8 +47,7 @@ class FolderEditViewModel
     private val settings: Settings,
     private val eventHorizon: EventHorizon,
     private val notificationManager: NotificationManager,
-) : ViewModel(),
-    CoroutineScope {
+) : ViewModel() {
 
     data class State(
         val podcastsWithFolders: List<PodcastFolder> = emptyList(),
@@ -97,17 +93,13 @@ class FolderEditViewModel
     init {
         viewModelScope.launch {
             combine(
-                settings.podcastsSortType.flow
-                    .asObservable(coroutineContext)
-                    .toFlowable(BackpressureStrategy.LATEST)
-                    .switchMap { podcastSortOrder ->
-                        when (podcastSortOrder) {
-                            PodcastsSortType.EPISODE_DATE_NEWEST_TO_OLDEST -> podcastManager.podcastsOrderByLatestEpisodeRxFlowable()
-                            PodcastsSortType.RECENTLY_PLAYED -> podcastManager.podcastsOrderByRecentlyPlayedEpisodeRxFlowable()
-                            else -> podcastManager.subscribedRxFlowable()
-                        }
+                settings.podcastsSortType.flow.flatMapLatest { podcastSortOrder ->
+                    when (podcastSortOrder) {
+                        PodcastsSortType.EPISODE_DATE_NEWEST_TO_OLDEST -> podcastManager.observePodcastsSortedByLatestEpisode()
+                        PodcastsSortType.RECENTLY_PLAYED -> podcastManager.observePodcastsBySortedRecentlyPlayed()
+                        else -> podcastManager.findSubscribedNoOrderFlow()
                     }
-                    .asFlow<List<Podcast>>(),
+                },
                 searchText,
                 selectedUuids,
                 settings.selectPodcastSortTypeFlow,
@@ -168,9 +160,6 @@ class FolderEditViewModel
             PodcastsSortType.RECENTLY_PLAYED -> defaultSortedPodcasts
         }
     }
-
-    override val coroutineContext: CoroutineContext
-        get() = Dispatchers.Default
 
     fun addPodcast(uuid: String) {
         val uuids = selectedUuids.value.toMutableSet().apply {

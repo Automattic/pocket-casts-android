@@ -49,10 +49,7 @@ interface PodcastManager {
     fun observePodcastsBySortedRecentlyPlayed(): Flow<List<Podcast>>
     fun observePodcastsSortedByUserChoice(folder: Folder): Flow<List<Podcast>>
     fun observeSubscribedWebFeedPodcasts(): Flow<List<Podcast>>
-    fun podcastsOrderByLatestEpisodeRxFlowable(): Flowable<List<Podcast>>
-    fun podcastsOrderByRecentlyPlayedEpisodeRxFlowable(): Flowable<List<Podcast>>
-
-    fun subscribedRxFlowable(): Flowable<List<Podcast>>
+    fun findSubscribedNoOrderFlow(): Flow<List<Podcast>>
     suspend fun findPodcastsOrderByTitle(): List<Podcast>
     suspend fun findPodcastsToSync(): List<Podcast>
     suspend fun findPodcastsOrderByLatestEpisode(orderAsc: Boolean): List<Podcast>
