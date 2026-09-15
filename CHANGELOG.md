@@ -3,7 +3,8 @@
 *   Bug Fixes
     *   Show every matching folder in search results instead of only the last one
         ([#5953](https://github.com/Automattic/pocket-casts-android/pull/5953))
-
+    *   Show the correct play or pause button for User Files
+        ([#5963](https://github.com/Automattic/pocket-casts-android/pull/5963))
 
 8.21
 -----
