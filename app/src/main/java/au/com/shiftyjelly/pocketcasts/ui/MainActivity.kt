@@ -228,14 +228,10 @@ import com.automattic.eventhorizon.UpNextTabOpenedEvent
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
-import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.schedulers.Schedulers
 import java.time.Instant
 import java.util.Locale
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration
@@ -806,12 +802,14 @@ class MainActivity :
                 overrideNextRefreshTimer = false
             } else {
                 // delay the refresh to allow the UI to load
-                Observable.timer(1, TimeUnit.SECONDS, Schedulers.io())
-                    .doOnNext {
+                lifecycleScope.launch(Dispatchers.IO) {
+                    delay(1.seconds)
+                    try {
                         podcastManager.refreshPodcastsIfRequired(fromLog = "open app")
+                    } catch (e: Exception) {
+                        Timber.e(e)
                     }
-                    .subscribeBy(onError = { Timber.e(it) })
-                    .addTo(disposables)
+                }
             }
         }
 
