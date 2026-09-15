@@ -124,7 +124,7 @@ class EpisodeManagerImplTest {
 
     @Test
     fun `download missing episode inserts the skeleton when the server does not know the episode`() = runTest {
-        val skeletonEpisode = createEpisode()
+        val skeletonEpisode = PodcastEpisode(uuid = "episode1", publishedDate = Date())
         whenever(episodeDao.exists("episode1")).thenReturn(false)
         whenever(podcastCacheServiceManager.getPodcastAndEpisode("podcast1", "episode1")).thenReturn(Podcast(uuid = "podcast1"))
         episodeDao.stub {
@@ -134,6 +134,7 @@ class EpisodeManagerImplTest {
         val result = downloadMissingEpisode(podcastUuid = "podcast1", skeletonEpisode = skeletonEpisode)
 
         assertEquals(skeletonEpisode, result)
+        assertEquals("podcast1", skeletonEpisode.podcastUuid)
         verify(episodeDao).insertAllOrIgnore(listOf(skeletonEpisode))
     }
 
