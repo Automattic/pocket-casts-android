@@ -49,13 +49,13 @@ class BookmarkFragment : BaseFragment() {
     private val args get() = requireArguments().requireParcelable<BookmarkArguments>(NEW_INSTANCE_KEY)
 
     private val editTranscriptLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            val data = result.data
-            val passage = data?.getStringExtra(BookmarkTranscriptEditActivity.RESULT_PASSAGE)
-            val passageLocation = data?.getIntExtra(BookmarkTranscriptEditActivity.RESULT_PASSAGE_LOCATION, -1) ?: -1
-            if (passage != null && passageLocation >= 0) {
-                viewModel.onPassageEdited(passage, passageLocation)
-            }
+        val data = result.data
+        val passage = data?.getStringExtra(BookmarkTranscriptEditActivity.RESULT_PASSAGE)?.takeIf { result.resultCode == Activity.RESULT_OK }
+        val passageLocation = data?.getIntExtra(BookmarkTranscriptEditActivity.RESULT_PASSAGE_LOCATION, -1) ?: -1
+        val editedPassage = passage?.takeIf { passageLocation >= 0 }
+        viewModel.onPassageEditorDismissed(editedPassage)
+        if (editedPassage != null) {
+            viewModel.onPassageEdited(editedPassage, passageLocation)
         }
     }
 
@@ -76,7 +76,7 @@ class BookmarkFragment : BaseFragment() {
             val uiState: BookmarkViewModel.UiState by viewModel.uiState.collectAsState()
 
             CallOnce {
-                viewModel.onShown(isNewBookmark = args.isNewBookmark || args.bookmarkUuid == null)
+                viewModel.onShown(isNewBookmark = args.isNewBookmark || args.bookmarkUuid == null, source = args.source)
             }
 
             CompositionLocalProvider(
@@ -94,7 +94,7 @@ class BookmarkFragment : BaseFragment() {
                     canEditTranscript = uiState.canEditTranscript,
                     onEditTranscript = ::editTranscript,
                     titleSuggestion = uiState.titleSuggestion,
-                    onApplySuggestion = { viewModel.applySuggestion(it) },
+                    onApplySuggestion = { viewModel.onSuggestionTapped(it) },
                     modifier = Modifier
                         .background(playerColors.background01)
                         .windowInsetsPadding(WindowInsets.ime.union(WindowInsets.systemBars)),
@@ -136,6 +136,7 @@ class BookmarkFragment : BaseFragment() {
                 podcastColors = args.podcastColors,
             ),
         )
+        viewModel.onPassageEditorShown()
         editTranscriptLauncher.launch(intent)
     }
 

@@ -5,8 +5,10 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkGenerationAnalytics
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkSuggestion
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -19,7 +21,11 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.automattic.eventhorizon.BookmarkEditFormDismissedEvent
 import com.automattic.eventhorizon.BookmarkEditFormShownEvent
 import com.automattic.eventhorizon.BookmarkEditFormSubmittedEvent
+import com.automattic.eventhorizon.BookmarkEnrichmentTriggerType
+import com.automattic.eventhorizon.BookmarkPassageEditorDismissedEvent
+import com.automattic.eventhorizon.BookmarkPassageEditorShownEvent
 import com.automattic.eventhorizon.BookmarkSourceType
+import com.automattic.eventhorizon.BookmarkTitleSuggestionTappedEvent
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.SourceViewType
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -47,6 +53,7 @@ class BookmarkViewModel
     private val transcriptManager: TranscriptManager,
     private val showNotesManager: ShowNotesManager,
     private val eventHorizon: EventHorizon,
+    private val bookmarkGenerationAnalytics: BookmarkGenerationAnalytics,
     @ApplicationContext private val context: Context,
 ) : ViewModel(),
     CoroutineScope {
@@ -55,6 +62,7 @@ class BookmarkViewModel
     private var capturedSuggestion: BookmarkSuggestion? = null
     private var passageEdited = false
     private var loadJob: Job? = null
+    private var analyticsSource: SourceViewType = SourceViewType.Player
 
     private val defaultTitle: String get() = context.getString(LR.string.bookmark)
     private var originalTitle: String = defaultTitle
@@ -62,6 +70,7 @@ class BookmarkViewModel
     companion object {
         private const val DEFAULT_TITLE = "Bookmark"
         private val SUGGESTION_TIMEOUT = 10.seconds
+        private val WORD_SEPARATOR = Regex("\\s+")
 
         private fun buildSelectedTextFieldValue(text: String): TextFieldValue {
             return TextFieldValue(text = text, selection = TextRange(0, text.length))
@@ -93,6 +102,7 @@ class BookmarkViewModel
     fun load(arguments: BookmarkArguments) {
         if (loadJob != null) return
         this.arguments = arguments
+        analyticsSource = arguments.source.analyticsValue
         val bookmarkUuid = arguments.bookmarkUuid
         val editingExisting = bookmarkUuid != null && !arguments.isNewBookmark
         mutableUiState.value = mutableUiState.value.copy(
@@ -150,6 +160,9 @@ class BookmarkViewModel
             bookmarkManager.suggestBookmark(episodeUuid, timeSecs)
         }
         capturedSuggestion = suggestion
+        suggestion?.let {
+            bookmarkGenerationAnalytics.report(it.generation, episodeUuid, uiState.value.podcastUuid, BookmarkEnrichmentTriggerType.EditSheet, analyticsSource)
+        }
         if (suggestion != null) {
             mutableUiState.value = mutableUiState.value.copy(
                 passage = suggestion.passage,
@@ -157,7 +170,7 @@ class BookmarkViewModel
                 canEditTranscript = true,
             )
         }
-        val suggestedTitle = suggestion?.title?.takeIf { it.isNotBlank() }
+        val suggestedTitle = suggestion?.generation?.title?.takeIf { it.isNotBlank() }
         when {
             suggestedTitle == null -> mutableUiState.value = mutableUiState.value.copy(titleSuggestion = TitleSuggestion.None)
             uiState.value.title.text == originalTitle -> applySuggestion(suggestedTitle)
@@ -167,9 +180,13 @@ class BookmarkViewModel
 
     private suspend fun generateTitleSuggestionFromPassage(passage: String) {
         mutableUiState.value = mutableUiState.value.copy(titleSuggestion = TitleSuggestion.Generating)
-        val suggestedTitle = withTimeoutOrNull(SUGGESTION_TIMEOUT) {
+        val generation = withTimeoutOrNull(SUGGESTION_TIMEOUT) {
             bookmarkManager.suggestTitle(passage)
-        }?.takeIf { it.isNotBlank() }
+        }
+        generation?.let {
+            bookmarkGenerationAnalytics.report(it, arguments.episodeUuid, uiState.value.podcastUuid, BookmarkEnrichmentTriggerType.EditSheet, analyticsSource)
+        }
+        val suggestedTitle = generation?.title?.takeIf { it.isNotBlank() }
         when {
             suggestedTitle == null -> mutableUiState.value = mutableUiState.value.copy(titleSuggestion = TitleSuggestion.None)
             uiState.value.title.text == originalTitle -> applySuggestion(suggestedTitle)
@@ -257,10 +274,10 @@ class BookmarkViewModel
         }
     }
 
-    fun onShown(isNewBookmark: Boolean) {
+    fun onShown(isNewBookmark: Boolean, source: SourceView) {
         eventHorizon.track(
             BookmarkEditFormShownEvent(
-                source = SourceViewType.Player,
+                source = source.analyticsValue,
                 isNewBookmark = isNewBookmark,
             ),
         )
@@ -269,18 +286,59 @@ class BookmarkViewModel
     fun onClose() {
         eventHorizon.track(
             BookmarkEditFormDismissedEvent(
-                source = SourceViewType.Player,
+                source = analyticsSource,
                 isNewBookmark = uiState.value.isNewBookmark,
             ),
         )
     }
 
     fun onSubmitBookmark() {
+        val state = uiState.value
         eventHorizon.track(
             BookmarkEditFormSubmittedEvent(
-                source = SourceViewType.Player,
-                isNewBookmark = uiState.value.isNewBookmark,
+                source = analyticsSource,
+                isNewBookmark = state.isNewBookmark,
+                hasPassage = state.passage?.isNotEmpty() == true,
+                passageChanged = passageEdited,
             ),
         )
     }
+
+    fun onSuggestionTapped(title: String) {
+        eventHorizon.track(
+            BookmarkTitleSuggestionTappedEvent(
+                source = analyticsSource,
+                episodeUuid = arguments.episodeUuid,
+                podcastUuid = uiState.value.podcastUuid,
+            ),
+        )
+        applySuggestion(title)
+    }
+
+    fun onPassageEditorShown() {
+        eventHorizon.track(
+            BookmarkPassageEditorShownEvent(
+                source = analyticsSource,
+                episodeUuid = arguments.episodeUuid,
+                podcastUuid = uiState.value.podcastUuid,
+            ),
+        )
+    }
+
+    fun onPassageEditorDismissed(newPassage: String?) {
+        if (!::arguments.isInitialized) return
+        val currentPassage = uiState.value.passage
+        val counted = newPassage ?: currentPassage
+        eventHorizon.track(
+            BookmarkPassageEditorDismissedEvent(
+                passageChanged = newPassage != null && newPassage != currentPassage,
+                wordCount = counted?.let(::countWords)?.toLong() ?: 0L,
+                source = analyticsSource,
+                episodeUuid = arguments.episodeUuid,
+                podcastUuid = uiState.value.podcastUuid,
+            ),
+        )
+    }
+
+    private fun countWords(text: String) = text.split(WORD_SEPARATOR).count { it.isNotBlank() }
 }

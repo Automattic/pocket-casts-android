@@ -476,7 +476,7 @@ class TranscriptViewModel @AssistedInject constructor(
             episode = episode,
             timeSecs = timeSecs,
             title = context.getString(LR.string.bookmark),
-            creationSource = BookmarkSourceType.Player,
+            creationSource = BookmarkSourceType.Transcript,
             passage = passage.text,
             passageLocation = passage.location,
             referenceTime = referenceTimeSecs,

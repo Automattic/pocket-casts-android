@@ -69,11 +69,13 @@ data object AddBookmarkDeepLink : IntentableDeepLink {
 data class ChangeBookmarkTitleDeepLink(
     val bookmarkUuid: String,
     val isNewBookmark: Boolean = false,
+    val sourceView: String? = null,
 ) : IntentableDeepLink {
     override fun toIntent(context: Context) = context.launcherIntent
         .setAction(ACTION_OPEN_CHANGE_BOOKMARK_TITLE)
         .putExtra(EXTRA_BOOKMARK_UUID, bookmarkUuid)
         .putExtra(EXTRA_BOOKMARK_IS_NEW, isNewBookmark)
+        .putExtra(EXTRA_SOURCE_VIEW, sourceView)
         .putExtra(EXTRA_NOTIFICATION_TAG, "${EXTRA_BOOKMARK_UUID}_$bookmarkUuid")
 }
 

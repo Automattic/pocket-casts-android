@@ -7,6 +7,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeDefault
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForPodcast
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForProfile
 import com.automattic.eventhorizon.BookmarkSourceType
+import com.automattic.eventhorizon.SourceViewType
 import java.time.Instant
 import kotlinx.coroutines.flow.Flow
 
@@ -43,10 +44,10 @@ interface BookmarkManager {
         sortType: BookmarksSortTypeForProfile,
     ): Flow<List<Bookmark>>
     fun hasBookmarksFlow(episodeUuid: String): Flow<Boolean>
-    fun enrichBookmark(bookmark: Bookmark)
+    fun enrichBookmark(bookmark: Bookmark, source: SourceViewType)
     fun enrichBookmarkPassage(bookmark: Bookmark)
     suspend fun suggestBookmark(episodeUuid: String, timeSecs: Int): BookmarkSuggestion?
-    suspend fun suggestTitle(passage: String): String?
+    suspend fun suggestTitle(passage: String): TitleGeneration
 
     var sourceView: SourceView
 }
@@ -55,5 +56,11 @@ data class BookmarkSuggestion(
     val passage: String,
     val passageLocation: Int,
     val referenceTimeSecs: Int,
+    val generation: TitleGeneration,
+)
+
+data class TitleGeneration(
     val title: String?,
+    val durationMs: Long,
+    val failureReason: String?,
 )

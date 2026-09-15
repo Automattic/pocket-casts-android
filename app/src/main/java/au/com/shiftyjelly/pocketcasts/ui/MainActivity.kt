@@ -1671,7 +1671,7 @@ class MainActivity :
 
                 is ChangeBookmarkTitleDeepLink -> {
                     launch {
-                        val bookmarkArguments = viewModel.createBookmarkArguments(deepLink.bookmarkUuid, isNewBookmark = deepLink.isNewBookmark)
+                        val bookmarkArguments = viewModel.createBookmarkArguments(deepLink.bookmarkUuid, isNewBookmark = deepLink.isNewBookmark, source = SourceView.fromString(deepLink.sourceView))
                         if (bookmarkArguments != null) {
                             bookmarkActivityLauncher.launch(BookmarkActivity.launchIntent(this@MainActivity, bookmarkArguments))
                         }
