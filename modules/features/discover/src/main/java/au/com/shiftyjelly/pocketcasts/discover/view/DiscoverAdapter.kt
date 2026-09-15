@@ -63,7 +63,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.categories.CategoriesManager
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
-import au.com.shiftyjelly.pocketcasts.servers.cdn.ArtworkColors
 import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverEpisode
@@ -79,7 +78,6 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeDrawable
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toLocalizedFormatPattern
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
@@ -103,17 +101,16 @@ import com.automattic.eventhorizon.DiscoverListPodcastSubscribedEvent
 import com.automattic.eventhorizon.DiscoverListPodcastTappedEvent
 import com.automattic.eventhorizon.EventHorizon
 import io.reactivex.Flowable
-import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
-import io.reactivex.functions.BiFunction
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.rxkotlin.zipWith
-import io.reactivex.schedulers.Schedulers
 import kotlin.math.ceil
 import kotlin.math.min
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.rx2.rxSingle
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -919,12 +916,10 @@ internal class DiscoverAdapter(
                             Flowable.fromIterable(mutableList.toList())
                                 .concatMap { discoverPodcast ->
                                     // For each podcast, we need to load its background color.
-                                    val zipper: BiFunction<DiscoverPodcast, Optional<ArtworkColors>, DiscoverPodcast> = BiFunction { podcast: DiscoverPodcast, colors: Optional<ArtworkColors> ->
-                                        val backgroundColor = colors.get()?.tintForDarkBg ?: 0
-                                        podcast.color = backgroundColor
-                                        podcast
-                                    }
-                                    Single.zip(Single.just(discoverPodcast), staticServiceManager.getColorsSingle(discoverPodcast.uuid).subscribeOn(Schedulers.io()), zipper).toFlowable()
+                                    rxSingle(Dispatchers.IO) {
+                                        discoverPodcast.color = staticServiceManager.getColors(discoverPodcast.uuid)?.tintForDarkBg ?: 0
+                                        discoverPodcast
+                                    }.toFlowable()
                                 }
                                 .toList().toFlowable()
                         }
