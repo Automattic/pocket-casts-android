@@ -79,7 +79,7 @@ interface SyncManager : NamedSettingsCaller {
     suspend fun getAccessToken(account: Account): AccessToken
     fun getRefreshToken(): RefreshToken?
     suspend fun emailChange(newEmail: String, password: String): UserChangeResponse
-    fun deleteAccountRxSingle(): Single<UserChangeResponse>
+    suspend fun deleteAccount(): UserChangeResponse
     suspend fun updatePassword(newPassword: String, oldPassword: String)
     suspend fun <T> getCacheTokenOrLogin(serverCall: suspend (token: AccessToken) -> T): T
 
