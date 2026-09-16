@@ -105,8 +105,9 @@ class ShelfSharedViewModel @Inject constructor(
     private val smartBookmarksPromoActiveFlow = combine(
         settings.showSmartBookmarksTooltip.flow,
         playerOpenState,
-    ) { showTooltip, isPlayerOpen ->
-        showTooltip && isPlayerOpen && FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS)
+        settings.smartBookmarksTooltipDismissed.flow,
+    ) { showTooltip, isPlayerOpen, isDismissed ->
+        showTooltip && isPlayerOpen && !isDismissed && FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS)
     }
 
     val uiState = combine(
@@ -275,7 +276,7 @@ class ShelfSharedViewModel @Inject constructor(
     }
 
     fun dismissBookmarkTooltip() {
-        settings.showSmartBookmarksTooltip.set(false, updateModifiedAt = false)
+        settings.smartBookmarksTooltipDismissed.set(true, updateModifiedAt = false)
     }
 
     fun setPlayerOpen(isOpen: Boolean) {
@@ -286,7 +287,7 @@ class ShelfSharedViewModel @Inject constructor(
         onboardingUpgradeSource: OnboardingUpgradeSource,
         source: ShelfItemSource,
     ) {
-        dismissBookmarkTooltip()
+        settings.showSmartBookmarksTooltip.set(false, updateModifiedAt = false)
         trackShelfAction(ShelfItem.Bookmark, source)
         viewModelScope.launch {
             val isPaidUser = settings.cachedSubscription.value != null

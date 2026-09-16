@@ -302,10 +302,7 @@ private fun PlayerShelfContent(
                     maxWidth = 300.dp,
                     anchorOffset = DpOffset(0.dp, (-4).dp),
                     clickableElevationPadding = true,
-                    onClick = {
-                        onBookmarkTooltipDismiss()
-                        onMoreClick()
-                    },
+                    onClick = onBookmarkTooltipDismiss,
                 )
             }
         }

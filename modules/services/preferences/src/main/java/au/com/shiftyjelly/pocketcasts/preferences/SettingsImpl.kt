@@ -1616,6 +1616,12 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
+    override val smartBookmarksTooltipDismissed: UserSetting<Boolean> = UserSetting.BoolPref(
+        sharedPrefKey = Settings.SMART_BOOKMARKS_TOOLTIP_DISMISSED,
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
+
     override val showUpNextSortDurationTooltip: UserSetting<Boolean> = UserSetting.BoolPref(
         sharedPrefKey = Settings.SHOW_UP_NEXT_SORT_DURATION_TOOLTIP,
         // Defaults to false so fresh installs never see the tooltip, VersionMigrationsWorker enables it for upgrading users.

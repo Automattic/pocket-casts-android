@@ -451,6 +451,10 @@ class ShelfSharedViewModelTest {
         whenever(smartBookmarksTooltipSetting.flow).thenReturn(MutableStateFlow(false))
         whenever(settings.showSmartBookmarksTooltip).thenReturn(smartBookmarksTooltipSetting)
 
+        val smartBookmarksTooltipDismissedSetting = mock<UserSetting<Boolean>>()
+        whenever(smartBookmarksTooltipDismissedSetting.flow).thenReturn(MutableStateFlow(false))
+        whenever(settings.smartBookmarksTooltipDismissed).thenReturn(smartBookmarksTooltipDismissedSetting)
+
         val userSubscriptionSetting = mock<UserSetting<Subscription?>>()
         whenever(userSubscriptionSetting.value).thenReturn(subscription)
         whenever(settings.cachedSubscription).thenReturn(userSubscriptionSetting)
