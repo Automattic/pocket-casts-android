@@ -40,7 +40,9 @@ import java.util.Date
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.rx2.rxCompletable
+import kotlinx.coroutines.rx2.rxSingle
 import timber.log.Timber
 
 @Singleton
@@ -225,8 +227,7 @@ class SubscribeManager @Inject constructor(
             .subscribeOn(Schedulers.io())
             .doOnSuccess { Timber.i("Downloaded episodes success podcast $podcastUuid") }
         // download the colors
-        val colorObservable = staticServiceManager.getColorsSingle(podcastUuid)
-            .subscribeOn(Schedulers.io())
+        val colorObservable = rxSingle(Dispatchers.IO) { Optional.of(staticServiceManager.getColors(podcastUuid)) }
             .doOnSuccess { Timber.i("Downloaded colors success podcast $podcastUuid") }
             .onErrorReturn { Optional.empty() }
         // keep expanded or collapsed header state

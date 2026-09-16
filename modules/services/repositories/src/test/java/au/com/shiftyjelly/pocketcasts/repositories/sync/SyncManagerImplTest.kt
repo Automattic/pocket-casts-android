@@ -10,6 +10,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationManager
 import au.com.shiftyjelly.pocketcasts.repositories.notification.OnboardingNotificationType
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServiceManager
+import au.com.shiftyjelly.pocketcasts.servers.sync.UserChangeResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.DeviceTokenResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenResponse
 import com.automattic.eventhorizon.EventHorizon
@@ -18,6 +19,7 @@ import com.automattic.eventhorizon.OnboardingFlowType
 import com.automattic.eventhorizon.SignInSourceType
 import com.automattic.eventhorizon.UserAccountCreatedEvent
 import com.automattic.eventhorizon.UserAccountCreationFailedEvent
+import com.automattic.eventhorizon.UserAccountDeletedEvent
 import com.automattic.eventhorizon.UserSignedInEvent
 import com.automattic.eventhorizon.UserSigninFailedEvent
 import com.squareup.moshi.Moshi
@@ -105,7 +107,7 @@ class SyncManagerImplTest {
 
     @Test
     fun `device auth login as new account fires account created event`() = runTest {
-        whenever(syncServiceManager.deviceToken(any(), any())).thenReturn(createDeviceTokenResponse())
+        whenever(syncServiceManager.deviceToken(any())).thenReturn(createDeviceTokenResponse())
         syncManager.loginWithDeviceAuth("device-code", SignInSource.UserInitiated.Onboarding, isNewAccount = true)
         assertEquals(
             UserAccountCreatedEvent(
@@ -122,7 +124,7 @@ class SyncManagerImplTest {
 
     @Test
     fun `device auth login as existing account fires signed in event`() = runTest {
-        whenever(syncServiceManager.deviceToken(any(), any())).thenReturn(createDeviceTokenResponse())
+        whenever(syncServiceManager.deviceToken(any())).thenReturn(createDeviceTokenResponse())
         syncManager.loginWithDeviceAuth("device-code", SignInSource.UserInitiated.Onboarding, isNewAccount = false)
         assertEquals(
             UserSignedInEvent(
@@ -139,7 +141,7 @@ class SyncManagerImplTest {
     @Test
     fun `device auth failure as new account fires account creation failed event`() = runTest {
         stubResources()
-        whenever(syncServiceManager.deviceToken(any(), any())).thenThrow(RuntimeException("boom"))
+        whenever(syncServiceManager.deviceToken(any())).thenThrow(RuntimeException("boom"))
         syncManager.loginWithDeviceAuth("device-code", SignInSource.UserInitiated.Onboarding, isNewAccount = true)
         assertTrue(eventSink.pollEvent() is UserAccountCreationFailedEvent)
     }
@@ -147,9 +149,32 @@ class SyncManagerImplTest {
     @Test
     fun `device auth failure as existing account fires signin failed event`() = runTest {
         stubResources()
-        whenever(syncServiceManager.deviceToken(any(), any())).thenThrow(RuntimeException("boom"))
+        whenever(syncServiceManager.deviceToken(any())).thenThrow(RuntimeException("boom"))
         syncManager.loginWithDeviceAuth("device-code", SignInSource.UserInitiated.Onboarding, isNewAccount = false)
         assertTrue(eventSink.pollEvent() is UserSigninFailedEvent)
+    }
+
+    @Test
+    fun `deleting the account fires account deleted event when the server reports success`() = runTest {
+        val response = UserChangeResponse(success = true, message = null)
+        whenever(syncAccountManager.isLoggedIn()).thenReturn(true)
+        whenever(syncAccountManager.getAccessToken()).thenReturn(AccessToken("access-token"))
+        whenever(syncServiceManager.deleteAccount(AccessToken("access-token"))).thenReturn(response)
+
+        assertEquals(response, syncManager.deleteAccount())
+        assertEquals(UserAccountDeletedEvent, eventSink.pollEvent())
+        assertTrue(eventSink.isEmpty())
+    }
+
+    @Test
+    fun `deleting the account fires no event when the server reports failure`() = runTest {
+        val response = UserChangeResponse(success = false, message = "error")
+        whenever(syncAccountManager.isLoggedIn()).thenReturn(true)
+        whenever(syncAccountManager.getAccessToken()).thenReturn(AccessToken("access-token"))
+        whenever(syncServiceManager.deleteAccount(AccessToken("access-token"))).thenReturn(response)
+
+        assertEquals(response, syncManager.deleteAccount())
+        assertTrue(eventSink.isEmpty())
     }
 
     @Test
@@ -175,6 +200,40 @@ class SyncManagerImplTest {
 
         assertEquals("https://files.example.com/signed", syncManager.getSignedPlaybackUrl(episode))
         verify(syncAccountManager).invalidateAccessToken()
+    }
+
+    @Test
+    fun `file is deleted from the server with the cached token`() = runTest {
+        val episode = UserEpisode(uuid = "episode-uuid", publishedDate = Date())
+        val response = Response.success<Void>(null)
+        whenever(syncAccountManager.isLoggedIn()).thenReturn(true)
+        whenever(syncAccountManager.getAccessToken()).thenReturn(AccessToken("access-token"))
+        whenever(syncServiceManager.deleteFromServer(episode, AccessToken("access-token"))).thenReturn(response)
+
+        assertEquals(response, syncManager.deleteFromServer(episode))
+    }
+
+    @Test
+    fun `file image is deleted from the server with the cached token`() = runTest {
+        val episode = UserEpisode(uuid = "episode-uuid", publishedDate = Date())
+        val response = Response.success<Void>(null)
+        whenever(syncAccountManager.isLoggedIn()).thenReturn(true)
+        whenever(syncAccountManager.getAccessToken()).thenReturn(AccessToken("access-token"))
+        whenever(syncServiceManager.deleteImageFromServer(episode, AccessToken("access-token"))).thenReturn(response)
+
+        assertEquals(response, syncManager.deleteImageFromServer(episode))
+    }
+
+    @Test
+    fun `unauthorized file delete response is returned without refreshing the token`() = runTest {
+        val episode = UserEpisode(uuid = "episode-uuid", publishedDate = Date())
+        val response = Response.error<Void>(401, "".toResponseBody())
+        whenever(syncAccountManager.isLoggedIn()).thenReturn(true)
+        whenever(syncAccountManager.getAccessToken()).thenReturn(AccessToken("access-token"))
+        whenever(syncServiceManager.deleteFromServer(episode, AccessToken("access-token"))).thenReturn(response)
+
+        assertEquals(response, syncManager.deleteFromServer(episode))
+        verify(syncAccountManager, never()).invalidateAccessToken()
     }
 
     private fun stubResources() {

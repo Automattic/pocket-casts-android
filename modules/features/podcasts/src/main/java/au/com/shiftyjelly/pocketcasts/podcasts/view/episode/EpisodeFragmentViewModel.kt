@@ -67,6 +67,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.rx2.asFlowable
+import kotlinx.coroutines.rx2.rxMaybe
 
 @HiltViewModel
 class EpisodeFragmentViewModel @Inject constructor(
@@ -253,7 +254,7 @@ class EpisodeFragmentViewModel @Inject constructor(
                 }
                 return@flatMapPublisher Flowable.combineLatest(
                     episodeManager.findByUuidFlow(episodeUuid).asFlowable(),
-                    podcastManager.findPodcastByUuidRxMaybe(episode.podcastUuid).toFlowable(),
+                    rxMaybe(Dispatchers.IO) { podcastManager.findPodcastByUuid(episode.podcastUuid) }.toFlowable(),
                     showNotesManager.loadShowNotesFlow(podcastUuid = episode.podcastUuid, episodeUuid = episode.uuid).asFlowable(),
                     progressUpdatesObservable,
                     zipper,

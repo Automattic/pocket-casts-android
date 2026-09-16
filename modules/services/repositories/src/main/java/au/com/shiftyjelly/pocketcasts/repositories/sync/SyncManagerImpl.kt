@@ -44,7 +44,6 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.login.ExchangeSonosResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.parseErrorResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.parseTokenErrorResponse
-import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.LoginIdentityType
@@ -79,7 +78,6 @@ import com.pocketcasts.service.api.WinbackResponse
 import com.squareup.moshi.Moshi
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.Completable
-import io.reactivex.Flowable
 import io.reactivex.Maybe
 import io.reactivex.Single
 import java.io.File
@@ -130,12 +128,14 @@ class SyncManagerImpl @Inject constructor(
         return result
     }
 
-    override fun deleteAccountRxSingle(): Single<UserChangeResponse> = getCacheTokenOrLoginRxSingle { token ->
-        syncServiceManager.deleteAccount(token)
-    }.doOnSuccess {
-        if (it.success == true) {
+    override suspend fun deleteAccount(): UserChangeResponse {
+        val result = getCacheTokenOrLogin { token ->
+            syncServiceManager.deleteAccount(token)
+        }
+        if (result.success == true) {
             eventHorizon.track(UserAccountDeletedEvent)
         }
+        return result
     }
 
     override suspend fun updatePassword(newPassword: String, oldPassword: String) {
@@ -157,8 +157,6 @@ class SyncManagerImpl @Inject constructor(
     override fun getEmail(): String? = syncAccountManager.getEmail()
 
     override fun emailFlow() = syncAccountManager.emailFlow().distinctUntilChanged()
-
-    override fun emailFlowable(): Flowable<Optional<String>> = syncAccountManager.emailFlowable().distinctUntilChanged()
 
     override suspend fun getAccessToken(account: Account): AccessToken = syncAccountManager.peekAccessToken(account)
         ?: fetchAccessToken(account)
@@ -363,11 +361,11 @@ class SyncManagerImpl @Inject constructor(
             .ignoreElement()
     }
 
-    override fun deleteImageFromServerRxSingle(episode: UserEpisode): Single<Response<Void>> = getCacheTokenOrLoginRxSingle { token ->
+    override suspend fun deleteImageFromServer(episode: UserEpisode): Response<Void> = getCacheTokenOrLogin { token ->
         syncServiceManager.deleteImageFromServer(episode, token)
     }
 
-    override fun deleteFromServerRxSingle(episode: UserEpisode): Single<Response<Void>> = getCacheTokenOrLoginRxSingle { token ->
+    override suspend fun deleteFromServer(episode: UserEpisode): Response<Void> = getCacheTokenOrLogin { token ->
         syncServiceManager.deleteFromServer(episode, token)
     }
 
@@ -396,7 +394,7 @@ class SyncManagerImpl @Inject constructor(
 
 // History
 
-    override fun historySyncRxSingle(request: HistorySyncRequest): Single<HistorySyncResponse> = getCacheTokenOrLoginRxSingle { token ->
+    override suspend fun historySync(request: HistorySyncRequest): HistorySyncResponse = getCacheTokenOrLogin { token ->
         syncServiceManager.historySync(request, token)
     }
 
@@ -424,10 +422,6 @@ class SyncManagerImpl @Inject constructor(
 
     override suspend fun syncUpdateOrThrow(request: SyncUpdateRequest): SyncUpdateResponse = getCacheTokenOrLogin { token ->
         syncServiceManager.syncUpdateOrThrow(token, request)
-    }
-
-    override fun getLastSyncAtRxSingle(): Single<String> = getCacheTokenOrLoginRxSingle { token ->
-        syncServiceManager.getLastSyncAtRx(token)
     }
 
     override suspend fun getLastSyncAtOrThrow(): String = getCacheTokenOrLogin { token ->

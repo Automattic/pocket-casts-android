@@ -38,7 +38,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.rx2.asFlow
-import kotlinx.coroutines.rx2.await
+import kotlinx.coroutines.rx2.rxSingle
 import timber.log.Timber
 
 class SearchHandler @Inject constructor(
@@ -77,13 +77,11 @@ class SearchHandler @Inject constructor(
                 val folderSearch =
                     if (signInState.isSignedInAsPlusOrPatron) {
                         // only show folders if the user has Plus
-                        folderManager.findFoldersSingle()
-                            .subscribeOn(Schedulers.io())
+                        rxSingle { folderManager.getAll() }
                             .flatMapObservable { Observable.fromIterable(it) }
                             .filter { it.name.contains(query, ignoreCase = true) }
-                            .switchMapSingle { folder ->
-                                podcastManager
-                                    .findPodcastsInFolderRxSingle(folderUuid = folder.uuid)
+                            .concatMapSingle { folder ->
+                                rxSingle { podcastManager.findPodcastsInFolder(folderUuid = folder.uuid) }
                                     .map { podcasts -> FolderItem.Folder(folder = folder, podcasts = podcasts) }
                             }
                             .toList()
@@ -247,8 +245,8 @@ class SearchHandler @Inject constructor(
             }
         }
         .map { it.term }
-        .switchMap {
-            if (it.length <= 1) {
+        .switchMap { searchTerm ->
+            if (searchTerm.length <= 1) {
                 Observable.just(GlobalServerSearch())
             } else {
                 eventHorizon.track(
@@ -258,18 +256,16 @@ class SearchHandler @Inject constructor(
                 )
                 loadingObservable.accept(true)
 
-                var globalSearch = GlobalServerSearch(searchTerm = it)
-                val podcastServerSearch = serviceManager
-                    .searchForPodcastsRx(it)
+                var globalSearch = GlobalServerSearch(searchTerm = searchTerm)
+                val podcastServerSearch = rxSingle { serviceManager.searchForPodcasts(searchTerm).getOrThrow() }
                     .map { podcastSearch ->
                         globalSearch = globalSearch.copy(podcastSearch = podcastSearch)
                         globalSearch
                     }
                     .toObservable()
 
-                if (!it.startsWith("http")) {
-                    val episodesServerSearch = cacheServiceManager
-                        .searchEpisodes(it)
+                if (!searchTerm.startsWith("http")) {
+                    val episodesServerSearch = rxSingle { cacheServiceManager.searchEpisodes(searchTerm) }
                         .map { episodeSearch ->
                             globalSearch = globalSearch.copy(episodeSearch = episodeSearch)
                             globalSearch
@@ -365,10 +361,9 @@ class SearchHandler @Inject constructor(
                     emit(SearchUiState.SearchOperation.Loading(searchTerm = query))
                     val subscribedUuids = podcastManager.findSubscribedUuids()
                     if (query.startsWith("http")) {
-                        val podcastSearch = serviceManager
-                            .searchForPodcastsRx(query)
-                            .map { list -> list.searchResults.map { ImprovedSearchResultItem.PodcastItem(uuid = it.uuid, title = it.title, author = it.author, isFollowed = subscribedUuids.contains(it.uuid)) } }
-                            .await()
+                        val podcastSearch = serviceManager.searchForPodcasts(query).getOrThrow()
+                            .searchResults
+                            .map { ImprovedSearchResultItem.PodcastItem(uuid = it.uuid, title = it.title, author = it.author, isFollowed = subscribedUuids.contains(it.uuid)) }
                         eventHorizon.track(
                             SearchPerformedEvent(
                                 source = source.analyticsValue,

@@ -169,6 +169,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackNoticeType
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.StreamVideoState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
+import au.com.shiftyjelly.pocketcasts.repositories.playback.VideoSurfaceState
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -228,14 +229,10 @@ import com.automattic.eventhorizon.UpNextTabOpenedEvent
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
-import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.schedulers.Schedulers
 import java.time.Instant
 import java.util.Locale
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration
@@ -779,6 +776,10 @@ class MainActivity :
     }
 
     private fun openFullscreenViewPlayer() {
+        // A live fullscreen or PiP VideoActivity already owns the surface; don't launch another over it.
+        if (playbackManager.videoSurfaceState.value != VideoSurfaceState.NONE) {
+            return
+        }
         videoPlayerShown = true
         startActivity(VideoActivity.buildIntent(context = this))
     }
@@ -806,12 +807,14 @@ class MainActivity :
                 overrideNextRefreshTimer = false
             } else {
                 // delay the refresh to allow the UI to load
-                Observable.timer(1, TimeUnit.SECONDS, Schedulers.io())
-                    .doOnNext {
+                lifecycleScope.launch(Dispatchers.IO) {
+                    delay(1.seconds)
+                    try {
                         podcastManager.refreshPodcastsIfRequired(fromLog = "open app")
+                    } catch (e: Exception) {
+                        Timber.e(e)
                     }
-                    .subscribeBy(onError = { Timber.e(it) })
-                    .addTo(disposables)
+                }
             }
         }
 
@@ -854,7 +857,7 @@ class MainActivity :
     private fun setupBackPressedCallbacks() {
         val bottomNavigatorCallback = object : OnBackPressedCallback(false) {
             override fun handleOnBackPressed() {
-                navigator.pop()
+                popOrDelegateBack()
             }
         }
         onBackPressedDispatcher.addCallback(this, bottomNavigatorCallback)
@@ -899,15 +902,7 @@ class MainActivity :
 
         val modalFragmentCallback = object : OnBackPressedCallback(false) {
             override fun handleOnBackPressed() {
-                val currentFragment = navigator.currentFragment()
-                if (currentFragment is HasBackstack) {
-                    val handled = currentFragment.onBackPressed()
-                    if (!handled) {
-                        navigator.pop()
-                    }
-                } else {
-                    navigator.pop()
-                }
+                popOrDelegateBack()
             }
         }
         onBackPressedDispatcher.addCallback(this, modalFragmentCallback)
@@ -948,6 +943,15 @@ class MainActivity :
         this.playerContainerBackCallback = playerContainerBackstackCallback
         this.modalFragmentBackCallback = modalFragmentCallback
         this.frameBottomSheetBackCallback = frameBottomSheetCallback
+    }
+
+    // Give the current fragment a chance to unwind its own back stack before popping it off the navigator.
+    private fun popOrDelegateBack() {
+        val currentFragment = navigator.currentFragment()
+        if (currentFragment is HasBackstack && currentFragment.onBackPressed()) {
+            return
+        }
+        navigator.pop()
     }
 
     private var playerBottomSheetBackCallback: OnBackPressedCallback? = null

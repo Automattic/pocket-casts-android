@@ -34,7 +34,6 @@ import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.automattic.eventhorizon.EventHorizon
-import io.reactivex.Observable
 import java.time.Instant
 import java.util.Date
 import kotlin.time.Duration.Companion.seconds
@@ -433,11 +432,11 @@ class ShelfSharedViewModelTest {
             UpNextQueue.State.Empty
         }
         whenever(
-            upNextQueue.getChangesObservableWithLiveCurrentEpisode(
+            upNextQueue.getChangesFlowWithLiveCurrentEpisode(
                 episodeManager,
                 podcastManager,
             ),
-        ).thenReturn(Observable.just(upNextState))
+        ).thenReturn(flowOf(upNextState))
 
         if (currentEpisode != null) {
             whenever(transcriptManager.observeIsTranscriptAvailable(currentEpisode.uuid)).thenReturn(flowOf(false))
@@ -446,6 +445,14 @@ class ShelfSharedViewModelTest {
         val userSetting = mock<UserSetting<List<ShelfItem>>>()
         whenever(userSetting.flow).thenReturn(MutableStateFlow(ShelfItem.entries))
         whenever(settings.shelfItems).thenReturn(userSetting)
+
+        val smartBookmarksTooltipSetting = mock<UserSetting<Boolean>>()
+        whenever(smartBookmarksTooltipSetting.flow).thenReturn(MutableStateFlow(false))
+        whenever(settings.showSmartBookmarksTooltip).thenReturn(smartBookmarksTooltipSetting)
+
+        val smartBookmarksTooltipDismissedSetting = mock<UserSetting<Boolean>>()
+        whenever(smartBookmarksTooltipDismissedSetting.flow).thenReturn(MutableStateFlow(false))
+        whenever(settings.smartBookmarksTooltipDismissed).thenReturn(smartBookmarksTooltipDismissedSetting)
 
         val userSubscriptionSetting = mock<UserSetting<Subscription?>>()
         whenever(userSubscriptionSetting.value).thenReturn(subscription)
@@ -470,6 +477,7 @@ class ShelfSharedViewModelTest {
             userEpisodeManager = userEpisodeManager,
             transcriptManager = transcriptManager,
             downloadQueue = mock(),
+            ioDispatcher = coroutineRule.testDispatcher,
         )
     }
 }

@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.settings.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.toLiveData
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -13,11 +13,9 @@ import com.automattic.eventhorizon.SettingsAutoAddUpNextLimitReachedChangedEvent
 import com.automattic.eventhorizon.SettingsAutoAddUpNextPodcastPositionOptionChangedEvent
 import com.automattic.eventhorizon.SettingsAutoAddUpNextShownEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.BackpressureStrategy
-import io.reactivex.rxkotlin.combineLatest
 import javax.inject.Inject
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.rx2.asObservable
 import timber.log.Timber
 
 data class AutoAddSettingsState(val autoAddPodcasts: List<Podcast>, val limit: Int, val behaviour: AutoAddUpNextLimitBehaviour)
@@ -41,18 +39,13 @@ class AutoAddSettingsViewModel @Inject constructor(
         isFragmentChangingConfigurations = isChangingConfigurations ?: false
     }
 
-    val autoAddPodcasts =
-        podcastManager.autoAddToUpNextPodcastsRxFlowable()
-            .combineLatest(
-                settings.autoAddUpNextLimit.flow
-                    .asObservable(viewModelScope.coroutineContext)
-                    .toFlowable(BackpressureStrategy.LATEST),
-                settings.autoAddUpNextLimitBehaviour.flow
-                    .asObservable(viewModelScope.coroutineContext)
-                    .toFlowable(BackpressureStrategy.LATEST),
-            )
-            .map { AutoAddSettingsState(it.first, it.second, it.third) }
-            .toLiveData()
+    val autoAddPodcasts = combine(
+        podcastManager.autoAddToUpNextPodcastsFlow(),
+        settings.autoAddUpNextLimit.flow,
+        settings.autoAddUpNextLimitBehaviour.flow,
+    ) { podcasts, limit, behaviour ->
+        AutoAddSettingsState(podcasts, limit, behaviour)
+    }.asLiveData()
 
     fun updatePodcast(podcast: Podcast, autoAddOption: Podcast.AutoAddUpNext) {
         viewModelScope.launch {

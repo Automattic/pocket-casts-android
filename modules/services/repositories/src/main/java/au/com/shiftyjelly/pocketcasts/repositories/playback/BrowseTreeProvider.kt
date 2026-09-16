@@ -275,7 +275,7 @@ class BrowseTreeProvider @Inject constructor(
 
         val episodesWithSource = if (DOWNLOADS_ROOT == parentId) {
             autoPlaySource = AutoPlaySource.Predefined.Downloads
-            episodeManager.findDownloadedEpisodesRxFlowable().blockingFirst() to ""
+            episodeManager.findDownloadedEpisodesFlow().first() to ""
         } else {
             autoPlaySource = AutoPlaySource.fromId(parentId)
             val episodes = getPlaylistEpisodes(

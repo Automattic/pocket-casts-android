@@ -31,7 +31,6 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.preferences.model.ThemeSetting
 import com.automattic.eventhorizon.UpNextSwipeActionType
 import com.automattic.eventhorizon.UploadedFilesSortType
-import io.reactivex.Observable
 import java.time.Instant
 import java.util.Date
 import kotlinx.coroutines.flow.Flow
@@ -131,6 +130,10 @@ interface Settings {
         const val SHOW_REFERRALS_TOOLTIP = "show_referrals_tooltip"
 
         const val SHOW_UP_NEXT_SORT_DURATION_TOOLTIP = "show_up_next_sort_duration_tooltip"
+
+        const val SHOW_SMART_BOOKMARKS_TOOLTIP = "show_smart_bookmarks_tooltip"
+
+        const val SMART_BOOKMARKS_TOOLTIP_DISMISSED = "smart_bookmarks_tooltip_dismissed"
     }
 
     enum class NotificationChannel(val id: String) {
@@ -296,8 +299,8 @@ interface Settings {
     val currentSessionId: String
     val sessionIds: List<String>
 
-    val selectPodcastSortTypeObservable: Observable<PodcastsSortType>
-    val multiSelectItemsObservable: Observable<List<String>>
+    val selectPodcastSortTypeFlow: StateFlow<PodcastsSortType>
+    val multiSelectItemsFlow: StateFlow<List<String>>
     val refreshStateFlow: StateFlow<RefreshState>
 
     val shelfItems: UserSetting<List<ShelfItem>>
@@ -597,6 +600,10 @@ interface Settings {
     fun setAutomotiveConnectedToMediaSession(isLoaded: Boolean)
 
     val showReferralsTooltip: UserSetting<Boolean>
+
+    val showSmartBookmarksTooltip: UserSetting<Boolean>
+
+    val smartBookmarksTooltipDismissed: UserSetting<Boolean>
 
     val showUpNextSortDurationTooltip: UserSetting<Boolean>
 

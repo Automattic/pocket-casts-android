@@ -232,6 +232,9 @@ class PlayerHeaderFragment :
         val playbackNotice by viewModel.playbackNotice.collectAsStateWithLifecycle()
 
         val isPlayerOpen by remember { isPlayerOpenFlow() }.collectAsStateWithLifecycle(false)
+        LaunchedEffect(isPlayerOpen) {
+            shelfSharedViewModel.setPlayerOpen(isPlayerOpen)
+        }
         val isTranscriptOpen by shelfSharedViewModel.isTranscriptOpen.collectAsStateWithLifecycle()
         val transcriptUiState by transcriptViewModel.uiState.collectAsStateWithLifecycle()
 
@@ -961,6 +964,7 @@ class PlayerHeaderFragment :
                 ArtworkOrVideo(
                     state = artworkOrVideoState,
                     onChapterUrlClick = {},
+                    videoSurfaceState = playbackManager.videoSurfaceState,
                     configureVideoView = { videoView ->
                         videoView.setOnClickListener { onFullScreenVideoClick() }
                     },
@@ -1110,6 +1114,7 @@ class PlayerHeaderFragment :
                         state = artworkOrVideoState,
                         artworkCornerRadius = if (availableHeightDp > 120.dp) 16.dp else 8.dp,
                         onChapterUrlClick = viewModel::onChapterUrlClick,
+                        videoSurfaceState = playbackManager.videoSurfaceState,
                         configureVideoView = { videoView ->
                             videoView.setOnClickListener { onFullScreenVideoClick() }
                         },
@@ -1167,6 +1172,7 @@ class PlayerHeaderFragment :
                 ) {
                     VideoBox(
                         player = artworkOrVideoState.player,
+                        videoSurfaceState = playbackManager.videoSurfaceState,
                         configureVideoView = { videoView ->
                             videoView.setOnClickListener { onFullScreenVideoClick() }
                         },
