@@ -49,8 +49,6 @@ class CastPlayer(
     private val remoteMediaClientListener = RemoteMediaClientListener()
     private val playPauseCallback = PlayPauseCallback(playbackStatsCollector, currentClient = { remoteMediaClient })
 
-    override var isPip: Boolean = false
-
     private val sessionManager: SessionManager?
         get() = CastContext.getSharedInstance()?.sessionManager
 
