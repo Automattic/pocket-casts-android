@@ -46,7 +46,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-private val frontGradient = listOf(Color(0xFF0202FE), Color(0xFF27D9E9))
+private val frontGradient = listOf(Color(0xFF27D9E9), Color(0xFF0202FE))
 private val middleGradient = listOf(Color(0xFFEC4034), Color(0xFFFF9D00))
 private val backGradient = listOf(Color(0xFFE8A92C), Color(0xFFE4D820))
 
