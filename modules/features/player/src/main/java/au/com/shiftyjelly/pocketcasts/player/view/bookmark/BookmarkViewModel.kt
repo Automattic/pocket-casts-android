@@ -200,7 +200,7 @@ class BookmarkViewModel
                         passageLocation = suggestion?.passageLocation,
                         referenceTime = suggestion?.referenceTimeSecs,
                     )
-                    if (suggestion == null) {
+                    if (suggestion == null && FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS)) {
                         bookmarkManager.enrichBookmarkPassage(created)
                     }
                     created
