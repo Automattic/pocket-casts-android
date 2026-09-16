@@ -56,8 +56,10 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -615,6 +617,9 @@ class MediaSessionManager(
         }
 
         val episodeAndState = playbackManager.playbackStateFlow
+            // The artwork load below blocks, and the asFlow() bridge only buffers 64 states before it
+            // back-pressures whichever thread pushed one. Rx's observeOn queue here was unbounded.
+            .buffer(Channel.UNLIMITED)
             .distinctUntilChanged { old, new ->
                 old.episodeUuid == new.episodeUuid &&
                     old.state == new.state &&
