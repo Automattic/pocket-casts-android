@@ -169,6 +169,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackNoticeType
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.StreamVideoState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
+import au.com.shiftyjelly.pocketcasts.repositories.playback.VideoSurfaceState
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -779,6 +780,10 @@ class MainActivity :
     }
 
     private fun openFullscreenViewPlayer() {
+        // A live fullscreen or PiP VideoActivity already owns the surface; don't launch another over it.
+        if (playbackManager.videoSurfaceState.value != VideoSurfaceState.NONE) {
+            return
+        }
         videoPlayerShown = true
         startActivity(VideoActivity.buildIntent(context = this))
     }

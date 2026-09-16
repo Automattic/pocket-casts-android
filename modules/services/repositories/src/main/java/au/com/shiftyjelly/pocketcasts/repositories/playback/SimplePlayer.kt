@@ -34,6 +34,8 @@ import au.com.shiftyjelly.pocketcasts.utils.fingerprint.FingerprintPolicy
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -68,14 +70,18 @@ class SimplePlayer(
     var videoWidth: Int = 0
     var videoHeight: Int = 0
 
-    override var isPip: Boolean = false
-
     override val currentAudioLevel: Float get() = renderersFactory?.currentAudioLevel ?: 0f
 
     private var videoChangedListener: VideoChangedListener? = null
     private val mainHandler = Handler(Looper.getMainLooper())
 
-    private var hasVideoSurface = false
+    private val _hasVideoSurfaceFlow = MutableStateFlow(false)
+    val hasVideoSurfaceFlow = _hasVideoSurfaceFlow.asStateFlow()
+    private var hasVideoSurface: Boolean
+        get() = _hasVideoSurfaceFlow.value
+        set(value) {
+            _hasVideoSurfaceFlow.value = value
+        }
     private var videoTrackDisableRunnable: Runnable? = null
 
     private var pendingSurface: SurfaceView? = null
@@ -418,7 +424,7 @@ class SimplePlayer(
         )
     }
 
-    fun setDisplay(surfaceView: SurfaceView?): Boolean {
+    fun setDisplay(surfaceView: SurfaceView): Boolean {
         val player = player
         if (player == null) {
             pendingSurface = surfaceView
@@ -427,11 +433,27 @@ class SimplePlayer(
         pendingSurface = null
 
         return try {
-            player.setVideoSurfaceHolder(surfaceView?.holder)
+            player.setVideoSurfaceHolder(surfaceView.holder)
             true
         } catch (e: Exception) {
             Timber.e(e)
             false
+        }
+    }
+
+    fun clearDisplay(surfaceView: SurfaceView) {
+        val player = player
+        if (player == null) {
+            if (pendingSurface == surfaceView) {
+                pendingSurface = null
+            }
+            return
+        }
+
+        try {
+            player.clearVideoSurfaceHolder(surfaceView.holder)
+        } catch (e: Exception) {
+            Timber.e(e)
         }
     }
 
