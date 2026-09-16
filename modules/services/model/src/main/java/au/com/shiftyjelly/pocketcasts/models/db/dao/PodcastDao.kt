@@ -84,7 +84,7 @@ abstract class PodcastDao {
 
     @Transaction
     @Query("SELECT * FROM podcasts WHERE subscribed = 1")
-    abstract fun findSubscribedRxFlowable(): Flowable<List<Podcast>>
+    abstract fun findSubscribedNoOrderFlow(): Flow<List<Podcast>>
 
     @Transaction
     @Query("SELECT * FROM podcasts WHERE subscribed = 1 AND folder_uuid = :folderUuid ORDER BY CASE WHEN LOWER(SUBSTR(title,1,4)) = 'the ' THEN LOWER(SUBSTR(title,5)) ELSE LOWER(title) END ASC")
@@ -231,10 +231,6 @@ abstract class PodcastDao {
     @Transaction
     @Query("SELECT * FROM podcasts WHERE folder_uuid = :folderUuid")
     abstract suspend fun findPodcastsInFolder(folderUuid: String): List<Podcast>
-
-    @Transaction
-    @Query("SELECT * FROM podcasts WHERE folder_uuid = :folderUuid")
-    abstract fun findPodcastsInFolderRxSingle(folderUuid: String): Single<List<Podcast>>
 
     @Transaction
     @Query("SELECT * FROM podcasts WHERE folder_uuid IS NULL")

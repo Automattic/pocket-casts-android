@@ -80,9 +80,8 @@ class SearchHandler @Inject constructor(
                         rxSingle { folderManager.getAll() }
                             .flatMapObservable { Observable.fromIterable(it) }
                             .filter { it.name.contains(query, ignoreCase = true) }
-                            .switchMapSingle { folder ->
-                                podcastManager
-                                    .findPodcastsInFolderRxSingle(folderUuid = folder.uuid)
+                            .concatMapSingle { folder ->
+                                rxSingle { podcastManager.findPodcastsInFolder(folderUuid = folder.uuid) }
                                     .map { podcasts -> FolderItem.Folder(folder = folder, podcasts = podcasts) }
                             }
                             .toList()
@@ -266,8 +265,7 @@ class SearchHandler @Inject constructor(
                     .toObservable()
 
                 if (!searchTerm.startsWith("http")) {
-                    val episodesServerSearch = cacheServiceManager
-                        .searchEpisodes(searchTerm)
+                    val episodesServerSearch = rxSingle { cacheServiceManager.searchEpisodes(searchTerm) }
                         .map { episodeSearch ->
                             globalSearch = globalSearch.copy(episodeSearch = episodeSearch)
                             globalSearch

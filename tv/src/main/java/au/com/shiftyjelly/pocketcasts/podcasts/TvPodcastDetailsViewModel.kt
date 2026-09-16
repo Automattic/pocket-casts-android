@@ -8,7 +8,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.onboarding.signin.TvSignInUiState
-import au.com.shiftyjelly.pocketcasts.onboarding.signin.deviceAuthFlow
+import au.com.shiftyjelly.pocketcasts.onboarding.signin.tvDeviceAuthFlow
 import au.com.shiftyjelly.pocketcasts.preferences.TvPreferences
 import au.com.shiftyjelly.pocketcasts.repositories.di.DefaultDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
@@ -130,7 +130,7 @@ class TvPodcastDetailsViewModel @AssistedInject constructor(
         accountAuthJob?.cancel()
         _accountAuthState.value = TvSignInUiState.Loading
         accountAuthJob = viewModelScope.launch {
-            deviceAuthFlow(syncManager, isNewAccount = false).collect { state ->
+            tvDeviceAuthFlow(syncManager, isNewAccount = false).collect { state ->
                 _accountAuthState.value = state
                 if (state is TvSignInUiState.Complete) {
                     podcastManager.subscribeToPodcast(podcastUuid, sync = true)

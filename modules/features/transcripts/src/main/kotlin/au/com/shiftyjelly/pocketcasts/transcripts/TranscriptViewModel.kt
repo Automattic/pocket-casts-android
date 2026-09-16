@@ -1,9 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.transcripts
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptEntry
 import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
@@ -11,16 +13,19 @@ import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionOffer
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.payment.getOrNull
+import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.ChapterSeekResult
 import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintTimingManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.transcript.BookmarkTranscript
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.sharing.SharingRequest
 import au.com.shiftyjelly.pocketcasts.utils.search.SearchCoordinates
 import au.com.shiftyjelly.pocketcasts.utils.search.SearchMatches
 import au.com.shiftyjelly.pocketcasts.utils.search.kmpSearch
+import com.automattic.eventhorizon.BookmarkSourceType
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.SyncedTranscriptsAutoScrollResumedEvent
 import com.automattic.eventhorizon.SyncedTranscriptsSeekFailedEvent
@@ -37,6 +42,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -51,16 +57,19 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel(assistedFactory = TranscriptViewModel.Factory::class)
 class TranscriptViewModel @AssistedInject constructor(
     @Assisted private val source: Source,
+    @ApplicationContext private val context: Context,
     private val transcriptManager: TranscriptManager,
     private val episodeManager: EpisodeManager,
     private val userManager: UserManager,
     private val paymentClient: PaymentClient,
     private val eventHorizon: EventHorizon,
     private val sharingClient: TranscriptSharingClient,
+    private val bookmarkManager: BookmarkManager,
     val fingerprintTimingManager: FingerprintTimingManager,
     val playbackManager: PlaybackManager,
 ) : ViewModel() {
@@ -436,6 +445,45 @@ class TranscriptViewModel @AssistedInject constructor(
         }
     }
 
+    fun createBookmarkFromSelection(selectedText: String) {
+        val transcript = (uiState.value.transcriptState as? TranscriptState.Loaded)?.transcript as? Transcript.Text ?: return
+        viewModelScope.launch {
+            val result = buildBookmarkFromSelection(transcript, selectedText)
+            if (result == null) {
+                _messages.send(TranscriptMessage.BookmarkFailed)
+            } else {
+                val (bookmark, isNew) = result
+                _messages.send(TranscriptMessage.OpenBookmarkEditor(bookmark.uuid, isNewBookmark = isNew))
+            }
+        }
+    }
+
+    private suspend fun buildBookmarkFromSelection(transcript: Transcript.Text, selectedText: String): Pair<Bookmark, Boolean>? {
+        if (!transcript.isGenerated) return null
+        val model = BookmarkTranscript.from(transcript)
+        val span = model.selectionDisplaySpan(selectedText) ?: return null
+        val passage = model.passage(span)
+        if (passage.text.isEmpty()) return null
+        val referenceTimeMs = model.referenceTimeMsAt(span.start) ?: return null
+        val episode = episodeManager.findByUuid(transcript.episodeUuid) ?: return null
+
+        val playbackMs = fingerprintTimingManager.playbackTimeMs(forReferenceTime = referenceTimeMs / 1000.0) ?: return null
+        val timeSecs = playbackMs / 1000
+        val referenceTimeSecs = (referenceTimeMs / 1000).toInt()
+
+        val isNew = bookmarkManager.findByEpisodeTime(episode, timeSecs) == null
+        val bookmark = bookmarkManager.add(
+            episode = episode,
+            timeSecs = timeSecs,
+            title = context.getString(LR.string.bookmark),
+            creationSource = BookmarkSourceType.Player,
+            passage = passage.text,
+            passageLocation = passage.location,
+            referenceTime = referenceTimeSecs,
+        )
+        return bookmark to isNew
+    }
+
     private fun trackTranscriptShown(transcript: Transcript) {
         val isPaywallVisible = !_uiState.value.isPlusUser && transcript.isGenerated
         if (isPaywallVisible) {
@@ -511,6 +559,8 @@ class TranscriptViewModel @AssistedInject constructor(
 
 sealed interface TranscriptMessage {
     data object TapToSeekStreamingUnavailable : TranscriptMessage
+    data object BookmarkFailed : TranscriptMessage
+    data class OpenBookmarkEditor(val bookmarkUuid: String, val isNewBookmark: Boolean) : TranscriptMessage
 }
 
 data class UiState(
@@ -537,6 +587,12 @@ data class UiState(
         !isPaywallVisible &&
         transcriptEpisodeUuid != null &&
         transcriptEpisodeUuid == playingEpisodeUuid
+
+    // Passages only exist against the generated transcript, which needs the fingerprint mapping
+    // (playing + synced) to place the bookmark on the audio.
+    val isBookmarkFromSelectionAvailable get() = isPlusUser &&
+        isGeneratedTextTranscript &&
+        isSyncedActive
 
     companion object {
         val Empty = UiState(

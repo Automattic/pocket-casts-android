@@ -35,7 +35,6 @@ import com.jakewharton.rxrelay2.PublishRelay
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
-import io.reactivex.Maybe
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
@@ -57,7 +56,6 @@ import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.rx2.asFlow
-import kotlinx.coroutines.rx2.asFlowable
 import kotlinx.coroutines.rx2.await
 import kotlinx.coroutines.rx2.rxMaybe
 import timber.log.Timber
@@ -322,10 +320,6 @@ class PodcastManagerImpl @Inject constructor(
         return podcastDao.findPodcastByUuid(uuid)
     }
 
-    override fun findPodcastByUuidRxMaybe(uuid: String): Maybe<Podcast> {
-        return Maybe.fromCallable { findPodcastByUuidBlocking(uuid) }
-    }
-
     override fun podcastByUuidRxFlowable(uuid: String): Flowable<Podcast> {
         return podcastDao.findByUuidRxFlowable(uuid)
     }
@@ -345,10 +339,6 @@ class PodcastManagerImpl @Inject constructor(
 
     override suspend fun findPodcastsInFolder(folderUuid: String): List<Podcast> {
         return podcastDao.findPodcastsInFolder(folderUuid)
-    }
-
-    override fun findPodcastsInFolderRxSingle(folderUuid: String): Single<List<Podcast>> {
-        return podcastDao.findPodcastsInFolderRxSingle(folderUuid)
     }
 
     override suspend fun findPodcastsNotInFolder(): List<Podcast> {
@@ -395,14 +385,6 @@ class PodcastManagerImpl @Inject constructor(
         return podcastDao.observeSubscribedWebFeedPodcasts()
     }
 
-    override fun podcastsOrderByLatestEpisodeRxFlowable(): Flowable<List<Podcast>> {
-        return observePodcastsSortedByLatestEpisode().asFlowable()
-    }
-
-    override fun podcastsOrderByRecentlyPlayedEpisodeRxFlowable(): Flowable<List<Podcast>> {
-        return observePodcastsBySortedRecentlyPlayed().asFlowable()
-    }
-
     override fun observePodcastsSortedByUserChoice(folder: Folder): Flow<List<Podcast>> {
         val sort = folder.podcastsSortType
         return when (sort) {
@@ -414,8 +396,8 @@ class PodcastManagerImpl @Inject constructor(
         }
     }
 
-    override fun subscribedRxFlowable(): Flowable<List<Podcast>> {
-        return podcastDao.findSubscribedRxFlowable()
+    override fun findSubscribedNoOrderFlow(): Flow<List<Podcast>> {
+        return podcastDao.findSubscribedNoOrderFlow()
     }
 
     override suspend fun findPodcastsOrderByLatestEpisode(orderAsc: Boolean): List<Podcast> {

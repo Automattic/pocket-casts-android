@@ -57,6 +57,7 @@ class UserEpisodeViewHolder(
 
     private val holderScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private var rowDataJob: Job? = null
+    private var rowData: UserEpisodeRowData? = null
 
     private var boundEpisode: UserEpisode? = null
     private val episode get() = requireNotNull(boundEpisode)
@@ -116,6 +117,7 @@ class UserEpisodeViewHolder(
     private fun setupInitialState(episode: UserEpisode, tint: Int?, isMultiSelectEnabled: Boolean, streamByDefault: Boolean) {
         if (episode.uuid != this.boundEpisode?.uuid) {
             swipeLayout.clearTranslation()
+            rowData = null
         }
         this.boundEpisode = episode
         this.streamByDefault = streamByDefault
@@ -144,6 +146,7 @@ class UserEpisodeViewHolder(
         rowDataJob?.cancel()
         rowDataJob = holderScope.launch {
             rowDataProvider.userEpisodeRowDataFlow(episode.uuid).collect { data ->
+                rowData = data
                 bindPlaybackButton()
                 bindDate()
                 bindSwipeActions()
@@ -184,6 +187,8 @@ class UserEpisodeViewHolder(
     }
 
     private fun bindPlaybackButton() {
+        val playbackState = rowData?.playbackState
+        episode.playing = playbackState != null && playbackState.isPlaying && playbackState.episodeUuid == episode.uuid
         val buttonType = PlayButton.calculateButtonType(episode, streamByDefault)
         binding.playButton.setButtonType(episode, buttonType, tint, fromListUuid = null)
     }

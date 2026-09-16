@@ -58,8 +58,12 @@ class BookmarkManagerImpl @Inject constructor(
         title: String,
         creationSource: BookmarkSourceType,
         addedAt: Instant,
+        passage: String?,
+        passageLocation: Int?,
+        referenceTime: Int?,
     ): Bookmark {
-        // Prevent adding more than one bookmark at the same place
+        // Prevent adding more than one bookmark at the same place. A passage from a new selection is
+        // persisted only when the user confirms it in the editor, not here.
         val existingBookmark = findByEpisodeTime(episode = episode, timeSecs = timeSecs)
         if (existingBookmark != null) {
             return existingBookmark
@@ -75,6 +79,11 @@ class BookmarkManagerImpl @Inject constructor(
             titleModified = addedAtMs,
             deleted = false,
             deletedModified = addedAtMs,
+            passage = passage,
+            passageLocation = passageLocation,
+            passageModified = addedAtMs.takeIf { passage != null },
+            referenceTime = referenceTime,
+            referenceTimeModified = addedAtMs.takeIf { referenceTime != null },
             syncStatus = SyncStatus.NOT_SYNCED,
         )
         bookmarkDao.insert(bookmark)
@@ -101,6 +110,16 @@ class BookmarkManagerImpl @Inject constructor(
             BookmarkUpdateTitleEvent(
                 source = sourceView.analyticsValue,
             ),
+        )
+    }
+
+    override suspend fun updatePassage(bookmarkUuid: String, passage: String, passageLocation: Int) {
+        bookmarkDao.updatePassage(
+            bookmarkUuid = bookmarkUuid,
+            passage = passage,
+            passageLocation = passageLocation,
+            passageModified = System.currentTimeMillis(),
+            syncStatus = SyncStatus.NOT_SYNCED,
         )
     }
 

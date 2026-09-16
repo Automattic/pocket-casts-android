@@ -8,6 +8,8 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.automattic.eventhorizon.BookmarkEditFormDismissedEvent
 import com.automattic.eventhorizon.BookmarkEditFormShownEvent
 import com.automattic.eventhorizon.BookmarkEditFormSubmittedEvent
@@ -47,9 +49,9 @@ class BookmarkViewModel
     data class UiState(
         val bookmarkUuid: String? = null,
         val title: TextFieldValue = buildSelectedTextFieldValue(DEFAULT_TITLE),
-    ) {
-        val isNewBookmark: Boolean = bookmarkUuid == null
-    }
+        val passage: String? = null,
+        val isNewBookmark: Boolean = true,
+    )
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
 
@@ -59,8 +61,10 @@ class BookmarkViewModel
     fun load(arguments: BookmarkArguments) {
         this.arguments = arguments
         val bookmarkUuid = arguments.bookmarkUuid
+        val editingExisting = bookmarkUuid != null && !arguments.isNewBookmark
         mutableUiState.value = mutableUiState.value.copy(
             bookmarkUuid = bookmarkUuid,
+            isNewBookmark = !editingExisting,
         )
         viewModelScope.launch {
             // load the existing bookmark
@@ -77,10 +81,30 @@ class BookmarkViewModel
                 mutableUiState.value = mutableUiState.value.copy(
                     bookmarkUuid = bookmark.uuid,
                     title = buildSelectedTextFieldValue(bookmark.title),
+                    passage = displayPassage(bookmark),
+                    isNewBookmark = mutableUiState.value.isNewBookmark && bookmarkUuid != null,
                 )
             }
         }
     }
+
+    suspend fun discardNewBookmarkIfNeeded() {
+        val state = uiState.value
+        val bookmarkUuid = state.bookmarkUuid
+        if (state.isNewBookmark && bookmarkUuid != null) {
+            bookmarkManager.deleteToSync(bookmarkUuid)
+        }
+    }
+
+    fun refreshPassage() {
+        val bookmarkUuid = uiState.value.bookmarkUuid ?: return
+        viewModelScope.launch {
+            val bookmark = bookmarkManager.findBookmark(bookmarkUuid) ?: return@launch
+            mutableUiState.value = mutableUiState.value.copy(passage = displayPassage(bookmark))
+        }
+    }
+
+    private fun displayPassage(bookmark: Bookmark) = bookmark.passage?.takeIf { FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS) }
 
     fun changeTitle(title: TextFieldValue) {
         // limit the title to 100 characters
@@ -94,7 +118,7 @@ class BookmarkViewModel
                 val state = uiState.value
                 val bookmarkUuid = state.bookmarkUuid
                 val episodeUuid = arguments.episodeUuid
-                val isExistingBookmark = bookmarkUuid != null
+                val isExistingBookmark = !state.isNewBookmark
                 val bookmark = if (bookmarkUuid == null) {
                     val episode = episodeManager.findByUuid(episodeUuid)
                         ?: userEpisodeManager.findEpisodeByUuid(episodeUuid)

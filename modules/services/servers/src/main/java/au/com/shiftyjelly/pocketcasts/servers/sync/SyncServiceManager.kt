@@ -83,6 +83,7 @@ open class SyncServiceManager @Inject constructor(
     companion object {
         const val SCOPE_MOBILE = "mobile"
         const val SCOPE_TV = "tv"
+        const val SCOPE_WATCH = "watch"
 
         // Credentials come from UserFileAuthInterceptor, not from the URL.
         internal const val USER_FILE_PLAYBACK_PATH = "/files/url/token/"
@@ -100,7 +101,8 @@ open class SyncServiceManager @Inject constructor(
 
     private val scope = when (appPlatform) {
         AppPlatform.Tv -> SCOPE_TV
-        AppPlatform.Phone, AppPlatform.WearOs, AppPlatform.Automotive -> SCOPE_MOBILE
+        AppPlatform.WearOs -> SCOPE_WATCH
+        AppPlatform.Phone, AppPlatform.Automotive -> SCOPE_MOBILE
     }
 
     suspend fun register(email: String, password: String): LoginTokenResponse {
@@ -160,7 +162,7 @@ open class SyncServiceManager @Inject constructor(
         return service.emailChange(addBearer(token), request)
     }
 
-    fun deleteAccount(token: AccessToken): Single<UserChangeResponse> = service.deleteAccount(addBearer(token))
+    suspend fun deleteAccount(token: AccessToken): UserChangeResponse = service.deleteAccount(addBearer(token))
 
     suspend fun updatePassword(newPassword: String, oldPassword: String, token: AccessToken): LoginTokenResponse {
         val request = UpdatePasswordRequest(newPassword = newPassword, oldPassword = oldPassword, scope = scope)
@@ -210,7 +212,7 @@ open class SyncServiceManager @Inject constructor(
         return service.getEpisodes(addBearer(token), request)
     }
 
-    fun historySync(request: HistorySyncRequest, token: AccessToken): Single<HistorySyncResponse> = service.historySync(addBearer(token), request)
+    suspend fun historySync(request: HistorySyncRequest, token: AccessToken): HistorySyncResponse = service.historySync(addBearer(token), request)
 
     /**
      * Retrieve listening history for a year.
@@ -251,7 +253,7 @@ open class SyncServiceManager @Inject constructor(
         return Flowable.create(
             { emitter ->
                 try {
-                    val requestBody = ProgressRequestBody.create((episode.fileType ?: "audio/mp3").toMediaType(), file, emitter)
+                    val requestBody = ProgressRequestBody.create((episode.fileType ?: "audio/mp3").toMediaType(), file, emitter::onNext)
                     val call = service.uploadFile(url, requestBody)
                     emitter.setCancellable { call.cancel() }
 
@@ -272,9 +274,9 @@ open class SyncServiceManager @Inject constructor(
         return service.uploadFileNoProgress(url, requestBody)
     }
 
-    fun deleteImageFromServer(episode: UserEpisode, token: AccessToken): Single<Response<Void>> = service.deleteImageFile(addBearer(token), episode.uuid)
+    suspend fun deleteImageFromServer(episode: UserEpisode, token: AccessToken): Response<Void> = service.deleteImageFile(addBearer(token), episode.uuid)
 
-    fun deleteFromServer(episode: UserEpisode, token: AccessToken): Single<Response<Void>> = service.deleteFile(addBearer(token), episode.uuid)
+    suspend fun deleteFromServer(episode: UserEpisode, token: AccessToken): Response<Void> = service.deleteFile(addBearer(token), episode.uuid)
 
     fun getPlaybackUrl(episode: UserEpisode): String = "${Settings.SERVER_API_URL}$USER_FILE_PLAYBACK_PATH${episode.uuid}"
 

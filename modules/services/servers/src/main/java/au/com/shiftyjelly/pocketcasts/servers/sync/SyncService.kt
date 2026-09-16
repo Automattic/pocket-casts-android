@@ -90,7 +90,7 @@ interface SyncService {
     suspend fun emailChange(@Header("Authorization") authorization: String, @Body request: EmailChangeRequest): UserChangeResponse
 
     @POST("/user/delete_account")
-    fun deleteAccount(@Header("Authorization") authorization: String): Single<UserChangeResponse>
+    suspend fun deleteAccount(@Header("Authorization") authorization: String): UserChangeResponse
 
     @POST("/user/update_password")
     suspend fun updatePassword(@Header("Authorization") authorization: String, @Body request: UpdatePasswordRequest): LoginTokenResponse
@@ -131,7 +131,7 @@ interface SyncService {
     suspend fun getEpisodes(@Header("Authorization") authorization: String, @Body request: PodcastsEpisodesRequest): EpisodesResponse
 
     @POST("/history/sync")
-    fun historySync(@Header("Authorization") authorization: String, @Body request: HistorySyncRequest): Single<HistorySyncResponse>
+    suspend fun historySync(@Header("Authorization") authorization: String, @Body request: HistorySyncRequest): HistorySyncResponse
 
     @POST("/history/year")
     suspend fun historyYear(@Header("Authorization") authorization: String, @Body request: HistoryYearSyncRequest): HistoryYearResponse
@@ -167,10 +167,10 @@ interface SyncService {
     fun getFileUploadStatus(@Header("Authorization") authorization: String, @Path("uuid") uuid: String): Single<FileUploadStatusResponse>
 
     @DELETE("/files/{uuid}")
-    fun deleteFile(@Header("Authorization") authorization: String, @Path("uuid") uuid: String): Single<Response<Void>>
+    suspend fun deleteFile(@Header("Authorization") authorization: String, @Path("uuid") uuid: String): Response<Void>
 
     @DELETE("/files/image/{uuid}")
-    fun deleteImageFile(@Header("Authorization") authorization: String, @Path("uuid") uuid: String): Single<Response<Void>>
+    suspend fun deleteImageFile(@Header("Authorization") authorization: String, @Path("uuid") uuid: String): Response<Void>
 
     @GET("/files/{uuid}")
     fun getFile(@Header("Authorization") authorization: String, @Path("uuid") uuid: String): Single<Response<ServerFile>>

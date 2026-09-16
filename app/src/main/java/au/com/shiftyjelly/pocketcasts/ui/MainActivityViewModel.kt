@@ -26,7 +26,6 @@ import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelp
 import com.automattic.eventhorizon.BookmarkDeletedEvent
 import com.automattic.eventhorizon.EventHorizon
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.BackpressureStrategy
 import java.time.Instant
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -35,11 +34,10 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.reactive.asFlow
-import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
@@ -102,12 +100,7 @@ class MainActivityViewModel
         _state.update { state -> state.copy(shouldShowWhatsNew = false) }
     }
 
-    private val playbackStateRx = playbackManager.playbackStateRelay
-        .doOnNext {
-            Timber.d("Updated playback state from ${it.lastChangeFrom} is playing ${it.isPlaying}")
-        }
-        .toFlowable(BackpressureStrategy.LATEST)
-    val playbackState = playbackStateRx.asFlow()
+    val playbackState = playbackManager.playbackStateFlow.conflate()
 
     val signInState: LiveData<SignInState> = userManager.getSignInState().toLiveData()
     val isSignedIn: Boolean
@@ -140,7 +133,7 @@ class MainActivityViewModel
         multiSelectBookmarksHelper.closeMultiSelect()
     }
 
-    suspend fun createBookmarkArguments(bookmarkUuid: String?): BookmarkArguments? {
+    suspend fun createBookmarkArguments(bookmarkUuid: String?, isNewBookmark: Boolean = false): BookmarkArguments? {
         val bookmark = if (bookmarkUuid != null) {
             val existingBookmark = bookmarkManager.findBookmark(bookmarkUuid)
             if (existingBookmark == null) {
@@ -162,6 +155,7 @@ class MainActivityViewModel
             episodeUuid = episodeUuid,
             timeSecs = timeInSecs,
             podcastColors = podcast?.let(::PodcastColors) ?: PodcastColors.ForUserEpisode,
+            isNewBookmark = isNewBookmark,
         )
     }
 

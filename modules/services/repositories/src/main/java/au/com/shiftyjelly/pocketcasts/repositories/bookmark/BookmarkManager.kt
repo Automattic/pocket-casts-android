@@ -17,8 +17,12 @@ interface BookmarkManager {
         title: String,
         creationSource: BookmarkSourceType,
         addedAt: Instant = Instant.now(),
+        passage: String? = null,
+        passageLocation: Int? = null,
+        referenceTime: Int? = null,
     ): Bookmark
     suspend fun updateTitle(bookmarkUuid: String, title: String)
+    suspend fun updatePassage(bookmarkUuid: String, passage: String, passageLocation: Int)
     suspend fun findBookmark(bookmarkUuid: String, deleted: Boolean = false): Bookmark?
     suspend fun findByEpisodeTime(episode: BaseEpisode, timeSecs: Int): Bookmark?
     suspend fun findEpisodeBookmarksFlow(

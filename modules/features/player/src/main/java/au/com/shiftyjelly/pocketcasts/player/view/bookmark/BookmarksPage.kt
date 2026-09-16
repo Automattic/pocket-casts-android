@@ -51,6 +51,8 @@ import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel.Bookma
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.settings.HeadphoneControlsSettingsFragment
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper.NavigationState
 import java.util.Date
@@ -197,9 +199,14 @@ private fun Content(
             is UiState.Upsell -> Column(
                 modifier = Modifier.verticalScroll(rememberScrollState()),
             ) {
+                val smartBookmarksPromo = FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS)
                 NoContentBanner(
-                    title = stringResource(LR.string.bookmarks_empty_state_title),
-                    body = stringResource(LR.string.bookmarks_free_user_empty_state_message),
+                    title = stringResource(
+                        if (smartBookmarksPromo) LR.string.smart_bookmarks_upsell_title else LR.string.bookmarks_empty_state_title,
+                    ),
+                    body = stringResource(
+                        if (smartBookmarksPromo) LR.string.smart_bookmarks_upsell_message else LR.string.bookmarks_free_user_empty_state_message,
+                    ),
                     iconResourceId = IR.drawable.ic_bookmark,
                     primaryButtonText = stringResource(LR.string.bookmarks_free_user_empty_state_button),
                     colors = colors.noContent,

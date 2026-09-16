@@ -22,9 +22,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.EpisodeWithTitle
 import au.com.shiftyjelly.pocketcasts.models.type.DownloadStatusUpdate
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
-import io.reactivex.Flowable
 import io.reactivex.Maybe
-import io.reactivex.Single
 import java.time.Instant
 import java.util.Date
 import java.util.UUID
@@ -55,9 +53,6 @@ abstract class EpisodeDao {
 
     @Query("SELECT count(*) FROM podcast_episodes WHERE podcast_id = :podcastUuid")
     abstract suspend fun countEpisodesByPodcast(podcastUuid: String): Int
-
-    @Query("SELECT * FROM podcast_episodes WHERE uuid = :uuid")
-    abstract fun findByUuidRxMaybe(uuid: String): Maybe<PodcastEpisode>
 
     @Query("SELECT * FROM podcast_episodes WHERE uuid = :uuid")
     abstract fun findByUuidFlow(uuid: String): Flow<PodcastEpisode?>
@@ -436,14 +431,10 @@ abstract class EpisodeDao {
     abstract suspend fun count(): Int
 
     @Query("SELECT COUNT(*) FROM podcast_episodes WHERE uuid = :uuid")
-    abstract fun countByUuidBlocking(uuid: String): Int
+    abstract suspend fun countByUuid(uuid: String): Int
 
-    fun existsBlocking(uuid: String): Boolean {
-        return countByUuidBlocking(uuid) != 0
-    }
-
-    fun existsRxSingle(uuid: String): Single<Boolean> {
-        return Single.fromCallable { existsBlocking(uuid) }
+    suspend fun exists(uuid: String): Boolean {
+        return countByUuid(uuid) != 0
     }
 
     @Query("SELECT podcasts.uuid AS uuid, count(podcast_episodes.uuid) AS count FROM podcast_episodes, podcasts WHERE podcast_episodes.podcast_id = podcasts.uuid AND (podcast_episodes.playing_status = :playingStatusNotPlayed OR podcast_episodes.playing_status = :playingStatusInProgress) AND podcast_episodes.archived = 0 GROUP BY podcasts.uuid")
