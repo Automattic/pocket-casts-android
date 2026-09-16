@@ -175,6 +175,9 @@ private fun Bookmark.applyServerBookmark(serverBookmark: SyncUserBookmark) = app
 }
 
 private fun Bookmark.applyServerBookmark(serverBookmark: BookmarkResponse) = apply {
+    val localPassageModified = passageModified
+    val localReferenceTimeModified = referenceTimeModified
+
     syncStatus = SyncStatus.SYNCED
     uuid = serverBookmark.bookmarkUuid
     podcastUuid = serverBookmark.podcastUuid
@@ -184,4 +187,19 @@ private fun Bookmark.applyServerBookmark(serverBookmark: BookmarkResponse) = app
         createdAt = value
     }
     title = serverBookmark.title
+
+    serverBookmark.passageModifiedOrNull?.value
+        ?.takeIf { it >= (localPassageModified ?: Long.MIN_VALUE) }
+        ?.let { modifiedAt ->
+            val passageValue = serverBookmark.passageOrNull?.value?.takeIf { it.isNotEmpty() }
+            passage = passageValue
+            passageLocation = passageValue?.let { serverBookmark.passageLocationOrNull?.value }
+            passageModified = modifiedAt
+        }
+    serverBookmark.referenceTimeModifiedOrNull?.value
+        ?.takeIf { it >= (localReferenceTimeModified ?: Long.MIN_VALUE) }
+        ?.let { modifiedAt ->
+            referenceTime = serverBookmark.referenceTimeOrNull?.value
+            referenceTimeModified = modifiedAt
+        }
 }
