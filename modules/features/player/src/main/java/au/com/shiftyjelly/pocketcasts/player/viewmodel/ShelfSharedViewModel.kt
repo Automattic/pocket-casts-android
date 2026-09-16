@@ -35,9 +35,9 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -47,6 +47,7 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -65,7 +66,7 @@ class ShelfSharedViewModel @Inject constructor(
     private val downloadQueue: DownloadQueue,
     @IoDispatcher ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
-    private val shelfUpNextFlow: Flow<UpNextQueue.State> = playbackManager.upNextQueue
+    private val shelfUpNextFlow: SharedFlow<UpNextQueue.State> = playbackManager.upNextQueue
         .getChangesFlowWithLiveCurrentEpisode(episodeManager, podcastManager)
         .distinctUntilChanged { oldState, newState ->
             val oldLoaded = oldState as? UpNextQueue.State.Loaded ?: return@distinctUntilChanged false
@@ -79,6 +80,8 @@ class ShelfSharedViewModel @Inject constructor(
                 oldLoaded.podcast?.isUsingEffects == newLoaded.podcast?.isUsingEffects
         }
         .flowOn(ioDispatcher)
+        // replay = 1 caches the last state so a collector that subscribes later starts from it rather than waiting for the next Up Next change
+        .shareIn(viewModelScope, SharingStarted.WhileSubscribed(), replay = 1)
 
     private val _navigationState: MutableSharedFlow<NavigationState> = MutableSharedFlow()
     val navigationState = _navigationState.asSharedFlow()
