@@ -8,6 +8,8 @@
         ([#5953](https://github.com/Automattic/pocket-casts-android/pull/5953))
     *   Show the correct play or pause button for User Files
         ([#5963](https://github.com/Automattic/pocket-casts-android/pull/5963))
+    *   Enable the transcript button on the full screen player without having to start playback or open the episode details first
+        ([#5981](https://github.com/Automattic/pocket-casts-android/pull/5981))
 
 8.21
 -----
