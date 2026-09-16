@@ -91,8 +91,8 @@ interface SyncManager : NamedSettingsCaller {
     fun postFilesRxSingle(files: List<FilePost>): Single<Response<Void>>
     fun getUserEpisodeRxMaybe(uuid: String): Maybe<ServerFile>
     fun getFileUsageRxSingle(): Single<FileAccount>
-    fun deleteImageFromServerRxSingle(episode: UserEpisode): Single<Response<Void>>
-    fun deleteFromServerRxSingle(episode: UserEpisode): Single<Response<Void>>
+    suspend fun deleteImageFromServer(episode: UserEpisode): Response<Void>
+    suspend fun deleteFromServer(episode: UserEpisode): Response<Void>
     fun getPlaybackUrl(episode: UserEpisode): String
     suspend fun getSignedPlaybackUrl(episode: UserEpisode): String
 

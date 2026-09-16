@@ -202,6 +202,40 @@ class SyncManagerImplTest {
         verify(syncAccountManager).invalidateAccessToken()
     }
 
+    @Test
+    fun `file is deleted from the server with the cached token`() = runTest {
+        val episode = UserEpisode(uuid = "episode-uuid", publishedDate = Date())
+        val response = Response.success<Void>(null)
+        whenever(syncAccountManager.isLoggedIn()).thenReturn(true)
+        whenever(syncAccountManager.getAccessToken()).thenReturn(AccessToken("access-token"))
+        whenever(syncServiceManager.deleteFromServer(episode, AccessToken("access-token"))).thenReturn(response)
+
+        assertEquals(response, syncManager.deleteFromServer(episode))
+    }
+
+    @Test
+    fun `file image is deleted from the server with the cached token`() = runTest {
+        val episode = UserEpisode(uuid = "episode-uuid", publishedDate = Date())
+        val response = Response.success<Void>(null)
+        whenever(syncAccountManager.isLoggedIn()).thenReturn(true)
+        whenever(syncAccountManager.getAccessToken()).thenReturn(AccessToken("access-token"))
+        whenever(syncServiceManager.deleteImageFromServer(episode, AccessToken("access-token"))).thenReturn(response)
+
+        assertEquals(response, syncManager.deleteImageFromServer(episode))
+    }
+
+    @Test
+    fun `unauthorized file delete response is returned without refreshing the token`() = runTest {
+        val episode = UserEpisode(uuid = "episode-uuid", publishedDate = Date())
+        val response = Response.error<Void>(401, "".toResponseBody())
+        whenever(syncAccountManager.isLoggedIn()).thenReturn(true)
+        whenever(syncAccountManager.getAccessToken()).thenReturn(AccessToken("access-token"))
+        whenever(syncServiceManager.deleteFromServer(episode, AccessToken("access-token"))).thenReturn(response)
+
+        assertEquals(response, syncManager.deleteFromServer(episode))
+        verify(syncAccountManager, never()).invalidateAccessToken()
+    }
+
     private fun stubResources() {
         val resources = mock<Resources>()
         whenever(context.resources).thenReturn(resources)
