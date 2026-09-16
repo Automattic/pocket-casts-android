@@ -265,8 +265,7 @@ class SearchHandler @Inject constructor(
                     .toObservable()
 
                 if (!searchTerm.startsWith("http")) {
-                    val episodesServerSearch = cacheServiceManager
-                        .searchEpisodes(searchTerm)
+                    val episodesServerSearch = rxSingle { cacheServiceManager.searchEpisodes(searchTerm) }
                         .map { episodeSearch ->
                             globalSearch = globalSearch.copy(episodeSearch = episodeSearch)
                             globalSearch

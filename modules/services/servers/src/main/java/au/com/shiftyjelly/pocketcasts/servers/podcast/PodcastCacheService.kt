@@ -107,10 +107,10 @@ interface PodcastCacheService {
     suspend fun getEpisodeUrl(@Path("podcastUuid") podcastUuid: String, @Path("episodeUuid") episodeUuid: String): Response<ResponseBody>
 
     @POST("/mobile/podcast/episode/search")
-    fun searchPodcastForEpisodes(@Body searchBody: SearchBody): Single<SearchResultBody>
+    suspend fun searchPodcastForEpisodes(@Body searchBody: SearchBody): SearchResultBody
 
     @POST("/episode/search")
-    fun searchEpisodes(@Body body: SearchEpisodesBody): Single<SearchEpisodesResultBody>
+    suspend fun searchEpisodes(@Body body: SearchEpisodesBody): SearchEpisodesResultBody
 
     @GET("/podcast/rating/{podcastUuid}")
     suspend fun getPodcastRatings(@Path("podcastUuid") podcastUuid: String): PodcastRatingsResponse

@@ -6,7 +6,6 @@ import au.com.shiftyjelly.pocketcasts.podcasts.helper.search.SearchHandler.Searc
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManagerImpl
 import com.automattic.eventhorizon.EventHorizon
-import io.reactivex.Single
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -41,7 +40,7 @@ class EpisodeSearchHandlerTest {
 
     @Test
     fun `query is searched only after the debounce window`() = runTest(testDispatcher) {
-        whenever(cacheServiceManager.searchEpisodes(PODCAST_UUID, "abc")).thenReturn(Single.just(listOf("uuid")))
+        whenever(cacheServiceManager.searchEpisodes(PODCAST_UUID, "abc")).thenReturn(listOf("uuid"))
 
         handler.getSearchResultsFlow(PODCAST_UUID).test {
             assertEquals(noSearchResult, awaitItem())
@@ -61,7 +60,7 @@ class EpisodeSearchHandlerTest {
 
     @Test
     fun `repeating the same query does not search again`() = runTest(testDispatcher) {
-        whenever(cacheServiceManager.searchEpisodes(PODCAST_UUID, "abc")).thenReturn(Single.just(listOf("uuid")))
+        whenever(cacheServiceManager.searchEpisodes(PODCAST_UUID, "abc")).thenReturn(listOf("uuid"))
 
         handler.getSearchResultsFlow(PODCAST_UUID).test {
             skipItems(1)
@@ -78,7 +77,7 @@ class EpisodeSearchHandlerTest {
 
     @Test
     fun `clearing the query emits no search result without debounce`() = runTest(testDispatcher) {
-        whenever(cacheServiceManager.searchEpisodes(any(), any())).thenReturn(Single.just(listOf("uuid")))
+        whenever(cacheServiceManager.searchEpisodes(any(), any())).thenReturn(listOf("uuid"))
 
         handler.getSearchResultsFlow(PODCAST_UUID).test {
             skipItems(1)
@@ -94,8 +93,8 @@ class EpisodeSearchHandlerTest {
 
     @Test
     fun `search error falls back to no search result`() = runTest(testDispatcher) {
-        whenever(cacheServiceManager.searchEpisodes(PODCAST_UUID, "xyz")).thenReturn(Single.just(listOf("uuid")))
-        whenever(cacheServiceManager.searchEpisodes(PODCAST_UUID, "abc")).thenReturn(Single.error(RuntimeException()))
+        whenever(cacheServiceManager.searchEpisodes(PODCAST_UUID, "xyz")).thenReturn(listOf("uuid"))
+        whenever(cacheServiceManager.searchEpisodes(PODCAST_UUID, "abc")).thenThrow(RuntimeException())
 
         handler.getSearchResultsFlow(PODCAST_UUID).test {
             skipItems(1)
