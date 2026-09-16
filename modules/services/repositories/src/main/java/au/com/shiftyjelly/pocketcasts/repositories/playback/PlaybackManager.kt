@@ -134,6 +134,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlow
@@ -370,6 +371,16 @@ open class PlaybackManager @Inject constructor(
                 .distinctUntilChanged()
                 .collect { uuid ->
                     _streamHlsAvailable.value = uuid != null && alternateEnclosureManager.findForEpisode(uuid).firstHlsStreamUrl() != null
+                }
+        }
+
+        // Preload the current episode's show notes and transcripts rather than waiting for playback to start
+        launch {
+            upNextQueue.changesObservable.asFlow()
+                .mapNotNull { state -> (state as? UpNextQueue.State.Loaded)?.episode as? PodcastEpisode }
+                .distinctUntilChanged { oldEpisode, newEpisode -> oldEpisode.uuid == newEpisode.uuid }
+                .collect { episode ->
+                    showNotesManager.loadShowNotes(podcastUuid = episode.podcastUuid, episodeUuid = episode.uuid)
                 }
         }
     }
