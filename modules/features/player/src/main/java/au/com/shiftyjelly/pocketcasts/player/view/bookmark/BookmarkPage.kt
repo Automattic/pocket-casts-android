@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -19,6 +20,7 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -68,6 +70,8 @@ fun BookmarkPage(
     onSave: () -> Unit,
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
+    passage: String? = null,
+    onEditTranscript: () -> Unit = {},
 ) {
     Column(
         modifier = modifier,
@@ -105,8 +109,10 @@ fun BookmarkPage(
             isNewBookmark = isNewBookmark,
             title = title,
             colors = playerColors,
+            passage = passage,
             onTitleChange = onTitleChange,
             onSave = onSave,
+            onEditTranscript = onEditTranscript,
         )
     }
 }
@@ -116,8 +122,10 @@ private fun Content(
     isNewBookmark: Boolean,
     title: TextFieldValue,
     colors: PlayerColors,
+    passage: String?,
     onTitleChange: (TextFieldValue) -> Unit,
     onSave: () -> Unit,
+    onEditTranscript: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val focusRequester = remember { FocusRequester() }
@@ -168,6 +176,14 @@ private fun Content(
             )
         }
 
+        if (passage != null) {
+            TranscriptSection(
+                passage = passage,
+                colors = colors,
+                onEdit = onEditTranscript,
+            )
+        }
+
         Spacer(
             modifier = Modifier.weight(1f),
         )
@@ -197,6 +213,43 @@ private fun Content(
     }
 }
 
+@Composable
+private fun TranscriptSection(
+    passage: String,
+    colors: PlayerColors,
+    onEdit: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(top = 24.dp),
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            TextP40(
+                text = stringResource(LR.string.transcript),
+                color = colors.contrast02,
+                modifier = Modifier.weight(1f),
+            )
+            TextButton(onClick = onEdit) {
+                Text(
+                    text = stringResource(LR.string.edit),
+                    color = colors.highlight01,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
+        }
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = passage,
+            color = colors.contrast01,
+            fontSize = 14.sp,
+            maxLines = 3,
+            overflow = TextOverflow.Ellipsis,
+        )
+    }
+}
+
 @Preview
 @Composable
 private fun BookmarkPagePreview(
@@ -208,12 +261,14 @@ private fun BookmarkPagePreview(
         ) {
             val colors = MaterialTheme.theme.rememberPlayerColorsOrDefault()
             BookmarkPage(
-                isNewBookmark = true,
-                title = TextFieldValue(""),
+                isNewBookmark = false,
+                title = TextFieldValue("Selective admissions"),
                 playerColors = colors,
                 onTitleChange = {},
                 onSave = {},
                 onClose = {},
+                passage = "The difference between the kid who gets in and the kid who doesn't is often basically noise.",
+                onEditTranscript = {},
                 modifier = Modifier.background(colors.background01),
             )
         }
