@@ -1420,13 +1420,10 @@ class MediaSessionManager(
         }
 
         override fun onSkipToQueueItem(id: Long) {
-            val state = playbackManager.upNextQueue.changesObservable.blockingFirst()
-            if (state is UpNextQueue.State.Loaded) {
-                state.queue.find { it.adapterId == id }?.let { episode ->
-                    logEvent("play from skip to queue item")
-                    enqueueCommand("skip to queue item") {
-                        playbackManager.playNowSuspend(episode = episode, sourceView = source)
-                    }
+            playbackManager.upNextQueue.queueEpisodes.find { it.adapterId == id }?.let { episode ->
+                logEvent("play from skip to queue item")
+                enqueueCommand("skip to queue item") {
+                    playbackManager.playNowSuspend(episode = episode, sourceView = source)
                 }
             }
         }
