@@ -5,8 +5,10 @@ import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UserEpisodeDao
 import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.UserEpisodeServerStatus
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
+import au.com.shiftyjelly.pocketcasts.servers.sync.ServerFile
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import com.automattic.eventhorizon.EventHorizon
 import io.reactivex.Maybe
@@ -122,6 +124,17 @@ class UserEpisodeManagerImplTest {
     }
 
     @Test
+    fun `download missing user episode replaces a missing episode with the server copy`() = runTest {
+        val missingEpisode = UserEpisode(uuid = "uuid", publishedDate = Date(), serverStatus = UserEpisodeServerStatus.MISSING)
+        whenever(userEpisodeDao.findEpisodeByUuid("uuid")).thenReturn(missingEpisode)
+        whenever(syncManager.getUserEpisodeRxMaybe("uuid")).thenReturn(Maybe.just(serverFile("uuid", "Server title")))
+
+        userEpisodeManagerImpl.downloadMissingUserEpisodeRxMaybe("uuid", placeholderTitle = "Placeholder", placeholderPublished = null).awaitSingleOrNull()
+
+        verify(userEpisodeDao).insertOrReplace(argThat { title == "Server title" && serverStatus == UserEpisodeServerStatus.UPLOADED })
+    }
+
+    @Test
     fun `download missing user episode substitutes a placeholder when the server does not have the file`() = runTest {
         val missingEpisode = UserEpisode(uuid = "uuid", publishedDate = Date(), serverStatus = UserEpisodeServerStatus.MISSING)
         whenever(userEpisodeDao.findEpisodeByUuid("uuid")).thenReturn(missingEpisode)
@@ -144,4 +157,20 @@ class UserEpisodeManagerImplTest {
         assertEquals("Server unavailable", failure?.message)
         verify(userEpisodeDao, never()).insertOrReplace(any())
     }
+
+    private fun serverFile(uuid: String, title: String) = ServerFile(
+        uuid = uuid,
+        colour = 0,
+        contentType = "audio/mp3",
+        duration = 100,
+        hasCustomImage = false,
+        imageUrl = "imageUrl",
+        playedUpTo = 0,
+        playedUpToModified = 0,
+        playingStatus = EpisodePlayingStatus.NOT_PLAYED,
+        playingStatusModified = 0,
+        publishedDate = Date(),
+        size = 1000,
+        title = title,
+    )
 }
