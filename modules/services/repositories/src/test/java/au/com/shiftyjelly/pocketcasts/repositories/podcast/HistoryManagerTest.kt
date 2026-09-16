@@ -1,15 +1,21 @@
 package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
+import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.HistorySyncChange
 import au.com.shiftyjelly.pocketcasts.models.to.HistorySyncResponse
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import java.util.Date
+import java.util.concurrent.atomic.AtomicInteger
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.rx2.rxSingle
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -71,6 +77,53 @@ class HistoryManagerTest {
         verify(episodeManager, never()).updateBlocking(anyOrNull())
     }
 
+    @Test
+    fun `missing podcasts are added at most five at a time`() = runTest {
+        val missingPodcastUuids = (1..12).map { index -> "missing-podcast-$index" }
+        val activeAdds = AtomicInteger()
+        val maxActiveAdds = AtomicInteger()
+        val podcastManager = mock<PodcastManager> {
+            on { findSubscribedUuids() } doReturn emptyList()
+            on { addPodcastRxSingle(any(), any(), any(), any()) } doAnswer { invocation ->
+                rxSingle {
+                    maxActiveAdds.accumulateAndGet(activeAdds.incrementAndGet(), ::maxOf)
+                    delay(20)
+                    activeAdds.decrementAndGet()
+                    Podcast(uuid = invocation.getArgument(0))
+                }
+            }
+        }
+
+        HistoryManager(podcastManager, episodeManager(storedInteractionDate = 50L), settings).processServerResponse(
+            response = response(action = HistoryManager.ACTION_ADD, podcastUuids = missingPodcastUuids),
+            updateServerModified = false,
+        )
+
+        missingPodcastUuids.forEach { podcastUuid ->
+            verify(podcastManager).addPodcastRxSingle(podcastUuid, sync = false, subscribed = false, shouldAutoDownload = false)
+        }
+        assertTrue(maxActiveAdds.get() in 1..HistoryManager.ADD_PODCAST_CONCURRENCY)
+    }
+
+    @Test
+    fun `a podcast that fails to add does not stop the history being processed`() = runTest {
+        val episodeManager = episodeManager(storedInteractionDate = 50L)
+        val podcastManager = mock<PodcastManager> {
+            on { findSubscribedUuids() } doReturn emptyList()
+            on { addPodcastRxSingle(any(), any(), any(), any()) } doReturn rxSingle<Podcast> { throw IllegalStateException("boom") }
+        }
+
+        HistoryManager(podcastManager, episodeManager, settings).processServerResponse(
+            response = response(action = HistoryManager.ACTION_ADD),
+            updateServerModified = true,
+        )
+
+        verifyBlocking(episodeManager) {
+            updatePlaybackInteraction(EPISODE_UUID, INTERACTION_DATE, PodcastEpisode.LAST_PLAYBACK_INTERACTION_SYNCED)
+        }
+        verify(settings).setHistoryServerModified(100L)
+    }
+
     private fun historyManager(episodeManager: EpisodeManager): HistoryManager {
         val podcastManager = mock<PodcastManager> {
             on { findSubscribedUuids() } doReturn listOf(PODCAST_UUID)
@@ -90,17 +143,17 @@ class HistoryManagerTest {
         }
     }
 
-    private fun response(action: Int) = HistorySyncResponse(
+    private fun response(action: Int, podcastUuids: List<String> = listOf(PODCAST_UUID)) = HistorySyncResponse(
         serverModified = 100L,
         lastCleared = 0L,
-        changes = listOf(
+        changes = podcastUuids.map { podcastUuid ->
             HistorySyncChange(
                 action = action,
                 episode = EPISODE_UUID,
                 modifiedAt = INTERACTION_DATE.toString(),
-                podcast = PODCAST_UUID,
-            ),
-        ),
+                podcast = podcastUuid,
+            )
+        },
     )
 
     companion object {
