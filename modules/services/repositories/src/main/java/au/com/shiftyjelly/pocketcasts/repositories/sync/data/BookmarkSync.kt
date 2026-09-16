@@ -174,7 +174,7 @@ private fun Bookmark.applyServerBookmark(serverBookmark: SyncUserBookmark) = app
     }
 }
 
-private fun Bookmark.applyServerBookmark(serverBookmark: BookmarkResponse) = apply {
+internal fun Bookmark.applyServerBookmark(serverBookmark: BookmarkResponse) = apply {
     val localPassageModified = passageModified
     val localReferenceTimeModified = referenceTimeModified
 
