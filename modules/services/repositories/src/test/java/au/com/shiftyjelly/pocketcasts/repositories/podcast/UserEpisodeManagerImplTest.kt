@@ -5,13 +5,17 @@ import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UserEpisodeDao
 import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
+import au.com.shiftyjelly.pocketcasts.models.type.UserEpisodeServerStatus
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import com.automattic.eventhorizon.EventHorizon
+import io.reactivex.Maybe
 import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.reactive.asFlow
+import kotlinx.coroutines.rx2.awaitSingleOrNull
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -20,7 +24,11 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
+import org.mockito.kotlin.any
+import org.mockito.kotlin.argThat
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -35,6 +43,9 @@ class UserEpisodeManagerImplTest {
     @Mock
     lateinit var userEpisodeDao: UserEpisodeDao
 
+    @Mock
+    lateinit var syncManager: SyncManager
+
     private lateinit var userEpisodeManagerImpl: UserEpisodeManagerImpl
 
     @Before
@@ -43,7 +54,7 @@ class UserEpisodeManagerImplTest {
         userEpisodeManagerImpl = UserEpisodeManagerImpl(
             appDatabase = appDatabase,
             settings = mock(),
-            syncManager = mock(),
+            syncManager = syncManager,
             downloadQueue = mock(),
             context = mock(),
             eventHorizon = EventHorizon(TestEventSink()),
@@ -97,5 +108,40 @@ class UserEpisodeManagerImplTest {
         val emissions = userEpisodeManagerImpl.episodeRxFlowable("uuid").asFlow().toList()
 
         assertEquals(listOf(userEpisode), emissions)
+    }
+
+    @Test
+    fun `download missing user episode keeps an episode that is already on the server`() = runTest {
+        val userEpisode = UserEpisode(uuid = "uuid", publishedDate = Date(), serverStatus = UserEpisodeServerStatus.UPLOADED)
+        whenever(userEpisodeDao.findEpisodeByUuid("uuid")).thenReturn(userEpisode)
+
+        val episode = userEpisodeManagerImpl.downloadMissingUserEpisodeRxMaybe("uuid", placeholderTitle = null, placeholderPublished = null).awaitSingleOrNull()
+
+        assertEquals(userEpisode, episode)
+        verify(userEpisodeDao, never()).insertOrReplace(any())
+    }
+
+    @Test
+    fun `download missing user episode substitutes a placeholder when the server does not have the file`() = runTest {
+        val missingEpisode = UserEpisode(uuid = "uuid", publishedDate = Date(), serverStatus = UserEpisodeServerStatus.MISSING)
+        whenever(userEpisodeDao.findEpisodeByUuid("uuid")).thenReturn(missingEpisode)
+        whenever(syncManager.getUserEpisodeRxMaybe("uuid")).thenReturn(Maybe.empty())
+
+        userEpisodeManagerImpl.downloadMissingUserEpisodeRxMaybe("uuid", placeholderTitle = "Placeholder", placeholderPublished = null).awaitSingleOrNull()
+
+        verify(userEpisodeDao).insertOrReplace(argThat { uuid == "uuid" && title == "Placeholder" && serverStatus == UserEpisodeServerStatus.MISSING })
+    }
+
+    @Test
+    fun `download missing user episode writes nothing when the server request fails`() = runTest {
+        whenever(userEpisodeDao.findEpisodeByUuid("uuid")).thenReturn(null)
+        whenever(syncManager.getUserEpisodeRxMaybe("uuid")).thenReturn(Maybe.error(RuntimeException("Server unavailable")))
+
+        val failure = runCatching {
+            userEpisodeManagerImpl.downloadMissingUserEpisodeRxMaybe("uuid", placeholderTitle = null, placeholderPublished = null).awaitSingleOrNull()
+        }.exceptionOrNull()
+
+        assertEquals("Server unavailable", failure?.message)
+        verify(userEpisodeDao, never()).insertOrReplace(any())
     }
 }
