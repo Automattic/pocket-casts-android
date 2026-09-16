@@ -122,6 +122,7 @@ import kotlin.math.min
 import kotlin.math.roundToInt
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.TimeSource
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -138,6 +139,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlow
 import kotlinx.coroutines.rx2.asFlowable
@@ -2706,23 +2708,35 @@ open class PlaybackManager @Inject constructor(
         episodeLastBufferStatus = episodeNewBufferStatus
     }
 
+    // Mirrors the Observable.interval(period, period, io).switchMapCompletable these timers replaced: the first
+    // tick lands a period in, ticks hold a fixed rate rather than drifting, and each tick cancels the last work.
+    private fun launchTimer(periodMs: Long, onTick: () -> Unit = {}, work: suspend () -> Unit) = timerScope.launch {
+        val started = TimeSource.Monotonic.markNow()
+        var elapsedPeriods = 0L
+        var workJob: Job? = null
+        while (isActive) {
+            elapsedPeriods++
+            delay(periodMs * elapsedPeriods - started.elapsedNow().inWholeMilliseconds)
+            onTick()
+            workJob?.cancel()
+            workJob = launch { work() }
+        }
+    }
+
     private fun setupUpdateTimer() {
         setupProgressSync()
 
         updateTimerJob?.cancel()
-        updateTimerJob = timerScope.launch {
-            // Cancelling the previous update on each tick is what the Rx switchMapCompletable did.
-            var positionUpdateJob: Job? = null
-            while (true) {
-                delay(UPDATE_TIMER_POLL_TIME)
+        updateTimerJob = launchTimer(
+            periodMs = UPDATE_TIMER_POLL_TIME,
+            onTick = {
                 if (isPlaying()) {
                     statsManager.addTotalListeningTime(UPDATE_TIMER_POLL_TIME)
                 }
                 verifySleepTimeForEndOfChapter()
-                positionUpdateJob?.cancel()
-                positionUpdateJob = launch { updateCurrentPosition() }
-            }
-        }
+            },
+            work = { updateCurrentPosition() },
+        )
     }
 
     private fun verifySleepTimeForEndOfChapter() {
@@ -2769,14 +2783,7 @@ open class PlaybackManager @Inject constructor(
 
         episodeLastBufferStatus = null
         bufferUpdateTimerJob?.cancel()
-        bufferUpdateTimerJob = timerScope.launch {
-            var bufferUpdateJob: Job? = null
-            while (true) {
-                delay(UPDATE_TIMER_POLL_TIME)
-                bufferUpdateJob?.cancel()
-                bufferUpdateJob = launch { updateBufferPosition() }
-            }
-        }
+        bufferUpdateTimerJob = launchTimer(UPDATE_TIMER_POLL_TIME) { updateBufferPosition() }
     }
 
     private fun cancelBufferUpdateTimer() {
