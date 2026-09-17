@@ -115,7 +115,7 @@ fun BookmarkRow(
                     modifier = Modifier
                         .padding(start = 16.dp)
                         .then(
-                            if (onArtworkClick != null) {
+                            if (!isSelecting && onArtworkClick != null) {
                                 Modifier.clickable(role = Role.Button, onClick = onArtworkClick)
                             } else {
                                 Modifier

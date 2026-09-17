@@ -95,7 +95,7 @@ fun BookmarksPage(
         onPlayClick = { bookmark ->
             bookmarksViewModel.play(bookmark)
         },
-        onBookmarkArtworkClick = onBookmarkArtworkClick?.takeIf { sourceView != SourceView.PLAYER },
+        onBookmarkArtworkClick = onBookmarkArtworkClick?.takeIf { sourceView != SourceView.PLAYER && FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS) },
         onSearchTextChange = { bookmarksViewModel.onSearchTextChanged(it) },
         onUpgradeClick = onUpgradeClick,
         openFragment = openFragment,
