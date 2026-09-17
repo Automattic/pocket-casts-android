@@ -11,7 +11,10 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 class BookmarkEpisodeResolverTest {
@@ -38,6 +41,16 @@ class BookmarkEpisodeResolverTest {
         whenever(episodeManager.downloadMissingPodcastEpisode("episode", "podcast")).thenReturn(fetched)
 
         assertEquals(fetched, resolver.resolve(bookmark))
+    }
+
+    @Test
+    fun `skips the server fetch when adding the podcast inserts the episode`() = runTest {
+        val inserted = PodcastEpisode(uuid = "episode", podcastUuid = "podcast", publishedDate = Date())
+        whenever(episodeManager.findEpisodeByUuid("episode")).thenReturn(null, inserted)
+        whenever(podcastManager.findOrDownloadPodcastRxSingle("podcast")).thenReturn(Single.just(Podcast(uuid = "podcast", isSubscribed = false)))
+
+        assertEquals(inserted, resolver.resolve(bookmark))
+        verify(episodeManager, never()).downloadMissingPodcastEpisode(any(), any())
     }
 
     @Test

@@ -16,13 +16,11 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
-import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
+import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkEpisodeResolver
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkPlaybackTimeResolver
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toLocalizedFormatPattern
@@ -38,7 +36,6 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.rx2.await
 import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -111,16 +108,13 @@ class BookmarkDetailFragment : BaseDialogFragment() {
     internal lateinit var playbackManager: PlaybackManager
 
     @Inject
-    internal lateinit var episodeManager: EpisodeManager
-
-    @Inject
-    internal lateinit var podcastManager: PodcastManager
-
-    @Inject
     internal lateinit var eventHorizon: EventHorizon
 
     @Inject
     internal lateinit var bookmarkPlaybackTimeResolver: BookmarkPlaybackTimeResolver
+
+    @Inject
+    internal lateinit var bookmarkEpisodeResolver: BookmarkEpisodeResolver
 
     private val isResolving = MutableStateFlow(false)
 
@@ -232,21 +226,10 @@ class BookmarkDetailFragment : BaseDialogFragment() {
         }
     }
 
-    private suspend fun resolveEpisode(): BaseEpisode? {
-        episodeManager.findEpisodeByUuid(args.episodeUuid)?.let { return it }
-        return try {
-            val podcast = podcastManager.findOrDownloadPodcastRxSingle(args.podcastUuid).await()
-            if (!podcast.isSubscribed) {
-                episodeManager.downloadMissingPodcastEpisode(args.episodeUuid, args.podcastUuid)
-            } else {
-                episodeManager.findEpisodeByUuid(args.episodeUuid)
-            }
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            null
-        }
-    }
+    private suspend fun resolveEpisode() = bookmarkEpisodeResolver.resolve(
+        episodeUuid = args.episodeUuid,
+        podcastUuid = args.podcastUuid,
+    )
 }
 
 private const val PLAY_SPINNER_DELAY_MS = 250L

@@ -12,14 +12,21 @@ class BookmarkEpisodeResolver @Inject constructor(
     private val episodeManager: EpisodeManager,
     private val podcastManager: PodcastManager,
 ) {
-    suspend fun resolve(bookmark: Bookmark): BaseEpisode? {
-        episodeManager.findEpisodeByUuid(bookmark.episodeUuid)?.let { return it }
+    suspend fun resolve(bookmark: Bookmark) = resolve(
+        episodeUuid = bookmark.episodeUuid,
+        podcastUuid = bookmark.podcastUuid,
+    )
+
+    suspend fun resolve(episodeUuid: String, podcastUuid: String): BaseEpisode? {
+        episodeManager.findEpisodeByUuid(episodeUuid)?.let { return it }
         return try {
-            val podcast = podcastManager.findOrDownloadPodcastRxSingle(bookmark.podcastUuid).await()
-            if (!podcast.isSubscribed) {
-                episodeManager.downloadMissingPodcastEpisode(bookmark.episodeUuid, bookmark.podcastUuid)
+            // Adding a podcast that wasn't local yet also inserts its feed episodes.
+            val podcast = podcastManager.findOrDownloadPodcastRxSingle(podcastUuid).await()
+            val localEpisode = episodeManager.findEpisodeByUuid(episodeUuid)
+            if (localEpisode == null && !podcast.isSubscribed) {
+                episodeManager.downloadMissingPodcastEpisode(episodeUuid, podcastUuid)
             } else {
-                episodeManager.findEpisodeByUuid(bookmark.episodeUuid)
+                localEpisode
             }
         } catch (e: CancellationException) {
             throw e
