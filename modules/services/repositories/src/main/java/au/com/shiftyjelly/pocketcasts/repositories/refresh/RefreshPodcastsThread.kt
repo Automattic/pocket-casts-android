@@ -233,11 +233,15 @@ class RefreshPodcastsThread(
             for (uuid in addedEpisodes.episodeUuidsAdded) {
                 LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "New podcast episode received: $uuid")
             }
-            runBlocking {
+            val isEnqueued = runBlocking {
                 val episodes = autoDownloadProvider.getAll(pendingAutoDownloadEpisodes.all())
-                downloadQueue.enqueueAll(episodes, DownloadType.Automatic(bypassAutoDownloadStatus = false), SourceView.AUTO_DOWNLOAD).join()
+                val enqueueJob = downloadQueue.enqueueAll(episodes, DownloadType.Automatic(bypassAutoDownloadStatus = false), SourceView.AUTO_DOWNLOAD)
+                enqueueJob.join()
+                !enqueueJob.isCancelled
             }
-            pendingAutoDownloadEpisodes.clear()
+            if (isEnqueued) {
+                pendingAutoDownloadEpisodes.clear()
+            }
         }
         LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh - auto download check - $autoDownloadDuration")
 
