@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.player.view.bookmark
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,13 +11,10 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -34,18 +32,18 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.bookmark.BookmarkRowColors
-import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
+import au.com.shiftyjelly.pocketcasts.compose.buttons.TimePlayButton
+import au.com.shiftyjelly.pocketcasts.compose.buttons.TimePlayButtonColors
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.BookmarkTranscript
 import au.com.shiftyjelly.pocketcasts.transcripts.ui.BookmarkTranscriptView
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -59,6 +57,7 @@ internal fun BookmarkDetailPage(
     isResolving: Boolean,
     onPlayClick: () -> Unit,
     onClose: () -> Unit,
+    onEpisodeClick: () -> Unit,
     modifier: Modifier = Modifier,
     passage: String? = null,
     transcriptState: BookmarkDetailViewModel.TranscriptState = BookmarkDetailViewModel.TranscriptState.None,
@@ -82,6 +81,11 @@ internal fun BookmarkDetailPage(
     } else {
         theme.colors.primaryInteractive02
     }
+    val playButtonColors = TimePlayButtonColors(
+        text = playButtonText,
+        border = playButtonBackground,
+        background = playButtonBackground,
+    )
 
     val showTranscript = transcriptState !is BookmarkDetailViewModel.TranscriptState.None
 
@@ -115,80 +119,68 @@ internal fun BookmarkDetailPage(
             Row(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                PodcastImage(
-                    uuid = podcastUuid,
-                    imageSize = 48.dp,
-                    elevation = null,
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .weight(1f)
+                        .clickable(onClickLabel = stringResource(LR.string.go_to_episode), onClick = onEpisodeClick),
+                ) {
+                    PodcastImage(
+                        uuid = podcastUuid,
+                        imageSize = 56.dp,
+                        cornerSize = 8.dp,
+                        elevation = null,
+                        modifier = Modifier.clip(RoundedCornerShape(8.dp)),
+                    )
+
+                    Spacer(modifier = Modifier.width(12.dp))
+
+                    Column(
+                        modifier = Modifier.weight(1f),
+                    ) {
+                        if (podcastTitle.isNotEmpty()) {
+                            TextH70(
+                                text = podcastTitle,
+                                color = colors.secondaryText,
+                                maxLines = 1,
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                        }
+
+                        if (episodeTitle.isNotEmpty()) {
+                            TextH50(
+                                text = episodeTitle,
+                                color = colors.primaryText,
+                                maxLines = 2,
+                            )
+                        }
+                    }
+                }
 
                 Spacer(modifier = Modifier.width(12.dp))
 
-                Column {
-                    if (podcastTitle.isNotEmpty()) {
-                        TextH70(
-                            text = podcastTitle.uppercase(),
-                            color = colors.secondaryText,
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                    }
-
-                    if (episodeTitle.isNotEmpty()) {
-                        TextH70(
-                            text = episodeTitle,
-                            color = colors.primaryText,
-                        )
-                    }
-                }
+                TimePlayButton(
+                    timeSecs = timeSecs,
+                    contentDescriptionId = LR.string.bookmark_play,
+                    onClick = onPlayClick,
+                    isLoading = isResolving,
+                    colors = playButtonColors,
+                )
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
-
-            TextH30(
-                text = title,
-                color = colors.primaryText,
-            )
-
-            Spacer(modifier = Modifier.height(4.dp))
-
-            val formattedTime = TimeHelper.formattedSeconds(timeSecs.toDouble())
-            TextH70(
-                text = formattedTime,
-                color = colors.secondaryText,
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             TextH70(
                 text = createdAtText,
                 color = colors.secondaryText,
             )
 
-            Spacer(modifier = Modifier.height(20.dp))
-            if (isResolving) {
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(48.dp),
-                ) {
-                    CircularProgressIndicator(
-                        color = playButtonBackground,
-                        strokeWidth = 2.dp,
-                        modifier = Modifier.size(24.dp),
-                    )
-                }
-            } else {
-                RowButton(
-                    text = stringResource(LR.string.bookmark_play_from, formattedTime),
-                    onClick = onPlayClick,
-                    includePadding = false,
-                    textIcon = IR.drawable.ic_play,
-                    colors = ButtonDefaults.buttonColors(
-                        backgroundColor = playButtonBackground,
-                    ),
-                    textColor = playButtonText,
-                )
-            }
+            Spacer(modifier = Modifier.height(4.dp))
+
+            TextH30(
+                text = title,
+                color = colors.primaryText,
+            )
         }
 
         if (showTranscript) {
@@ -320,6 +312,7 @@ private fun BookmarkDetailPagePreview(
             isResolving = false,
             onPlayClick = {},
             onClose = {},
+            onEpisodeClick = {},
         )
     }
 }
@@ -341,6 +334,7 @@ private fun BookmarkDetailPageTranscriptPreview(
             isResolving = false,
             onPlayClick = {},
             onClose = {},
+            onEpisodeClick = {},
             passage = "Lorem ipsum",
             transcriptState = BookmarkDetailViewModel.TranscriptState.Loaded(
                 transcript = transcript,

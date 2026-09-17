@@ -9,6 +9,8 @@ import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.bookmark.BookmarkRow
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.PodcastAdapter
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 
 class BookmarkViewHolder(
     private val composeView: ComposeView,
@@ -27,6 +29,11 @@ class BookmarkViewHolder(
                     useEpisodeArtwork = data.useEpisodeArtwork,
                     showEpisodeTitle = true,
                     onPlayClick = { data.onBookmarkPlayClicked(data.bookmark) },
+                    onArtworkClick = if (FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS)) {
+                        { data.onBookmarkArtworkClick() }
+                    } else {
+                        null
+                    },
                     modifier = Modifier
                         .pointerInput(data.bookmark.adapterId) {
                             detectTapGestures(

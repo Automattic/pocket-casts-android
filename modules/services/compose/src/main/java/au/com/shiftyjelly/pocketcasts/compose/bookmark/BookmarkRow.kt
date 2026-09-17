@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.compose.bookmark
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -79,6 +81,7 @@ fun BookmarkRow(
     useEpisodeArtwork: Boolean,
     onPlayClick: () -> Unit,
     modifier: Modifier = Modifier,
+    onArtworkClick: (() -> Unit)? = null,
     isLoading: Boolean = false,
     colors: BookmarkColors = rememberBookmarkColors(),
 ) {
@@ -108,7 +111,17 @@ fun BookmarkRow(
             }
 
             if (showIcon) {
-                Box(modifier = Modifier.padding(start = 16.dp)) {
+                Box(
+                    modifier = Modifier
+                        .padding(start = 16.dp)
+                        .then(
+                            if (!isSelecting && onArtworkClick != null) {
+                                Modifier.clickable(role = Role.Button, onClick = onArtworkClick)
+                            } else {
+                                Modifier
+                            },
+                        ),
+                ) {
                     if (episode != null) {
                         EpisodeImage(
                             episode = episode,

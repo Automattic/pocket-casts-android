@@ -8,14 +8,19 @@ import android.widget.Toast
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toLocalizedFormatPattern
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
@@ -122,7 +127,10 @@ class BookmarkDetailFragment : BaseDialogFragment() {
     ) = contentWithoutConsumedInsets {
         val hasTranscript = args.passage != null && FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS)
         LaunchedEffect(Unit) { viewModel.load(args.episodeUuid, args.podcastUuid, args.passage, args.passageLocation) }
-        DialogBox(fillMaxHeight = hasTranscript) {
+        DialogBox(
+            fillMaxHeight = hasTranscript,
+            modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection()),
+        ) {
             val resolving by isResolving.collectAsState()
             val transcriptState by viewModel.transcriptState.collectAsState()
             BookmarkDetailPage(
@@ -135,10 +143,25 @@ class BookmarkDetailFragment : BaseDialogFragment() {
                 isResolving = resolving,
                 onPlayClick = ::onPlayClick,
                 onClose = { dismiss() },
+                onEpisodeClick = ::onEpisodeClick,
                 passage = args.passage,
                 transcriptState = transcriptState,
             )
         }
+    }
+
+    private fun onEpisodeClick() {
+        if (args.sourceView == SourceView.EPISODE_DETAILS) {
+            dismiss()
+            return
+        }
+        (activity as? FragmentHostListener)?.openEpisodeDialog(
+            episodeUuid = args.episodeUuid,
+            source = EpisodeViewSource.UNKNOWN,
+            podcastUuid = args.podcastUuid,
+            forceDark = args.sourceView == SourceView.PLAYER,
+            autoPlay = false,
+        )
     }
 
     private fun onPlayClick() {
