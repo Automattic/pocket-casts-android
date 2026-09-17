@@ -248,6 +248,27 @@ class TranscriptViewModelTest {
     }
 
     @Test
+    fun `bookmark from selection becomes available when playback starts after the transcript is loaded`() = runTest {
+        transcriptManager.avaiableTranscript = Transcript.TextPreview.copy(isGenerated = true)
+        signInStateFlow.value = SignInState.SignedIn("email", Subscription.PlusPreview)
+
+        viewModel.uiState.test {
+            viewModel.loadTranscript("episode-uuid")
+            runCurrent()
+
+            whenever(playbackManager.getCurrentEpisode()).thenReturn(PodcastEpisode(uuid = "episode-uuid", publishedDate = Date()))
+            playbackStateFlow.value = PlaybackState(episodeUuid = "episode-uuid", positionMs = 10_000)
+            syncedStateFlow.value = FingerprintTimingManager.State.Active(coverage = 1)
+
+            var state = awaitItem()
+            while (!state.isBookmarkFromSelectionAvailable) {
+                state = awaitItem()
+            }
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun `start with empty state`() = runTest {
         viewModel.uiState.test {
             val state = awaitItem()

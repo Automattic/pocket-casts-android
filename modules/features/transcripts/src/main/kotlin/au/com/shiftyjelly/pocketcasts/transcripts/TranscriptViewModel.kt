@@ -52,6 +52,8 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.job
@@ -110,6 +112,7 @@ class TranscriptViewModel @AssistedInject constructor(
     fun loadTranscript(episodeUuid: String) {
         loadTranscriptJob?.cancel()
         syncedStateJob?.cancel()
+        syncedPlaybackJob?.cancel()
         loadTranscriptJob = viewModelScope.launch {
             searchJob?.cancelAndJoin()
 
@@ -158,17 +161,15 @@ class TranscriptViewModel @AssistedInject constructor(
             }
 
             if (transcriptState is TranscriptState.Loaded && transcriptState.transcript is Transcript.Text) {
-                val currentPlayingUuid = playbackManager.getCurrentEpisode()?.uuid
-                if (currentPlayingUuid == episodeUuid) {
-                    fingerprintTimingManager.prepareForCurrentEpisode(FingerprintTimingManager.PrepareTrigger.TRANSCRIPT_VIEW)
-                    _uiState.update { state -> state.copy(syncedState = fingerprintTimingManager.state) }
-                    observeSyncedState()
-                }
+                observeSyncedState()
+                // Playback can start after the transcript is shown, for example from the episode details toolbar.
+                observePlaybackForSyncing(episodeUuid)
             }
         }
     }
 
     private var syncedStateJob: Job? = null
+    private var syncedPlaybackJob: Job? = null
 
     private fun observeSyncedState() {
         syncedStateJob?.cancel()
@@ -176,6 +177,20 @@ class TranscriptViewModel @AssistedInject constructor(
             fingerprintTimingManager.stateFlow.collect { syncedState ->
                 _uiState.update { state -> state.copy(syncedState = syncedState) }
             }
+        }
+    }
+
+    private fun observePlaybackForSyncing(episodeUuid: String) {
+        syncedPlaybackJob?.cancel()
+        syncedPlaybackJob = viewModelScope.launch {
+            playbackManager.playbackStateFlow
+                .map { it.episodeUuid }
+                .distinctUntilChanged()
+                .collect { playingEpisodeUuid ->
+                    if (playingEpisodeUuid == episodeUuid) {
+                        fingerprintTimingManager.onTranscriptShown(episodeUuid)
+                    }
+                }
         }
     }
 
@@ -306,6 +321,7 @@ class TranscriptViewModel @AssistedInject constructor(
         super.onCleared()
         loadTranscriptJob?.cancel()
         syncedStateJob?.cancel()
+        syncedPlaybackJob?.cancel()
     }
 
     fun reloadTranscript() {
