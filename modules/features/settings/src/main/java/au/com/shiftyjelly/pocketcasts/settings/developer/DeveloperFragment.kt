@@ -46,6 +46,7 @@ class DeveloperFragment : BaseFragment() {
                 onShowNotificationsTestingClick = ::onShowNotificationsTestingClick,
                 onResetPlaylistsOnboarding = viewModel::resetPlaylistsOnboarding,
                 onResetUpNextSortTooltip = viewModel::resetUpNextSortTooltip,
+                onShowGiftTooltip = viewModel::showGiftTooltip,
                 onResetNotificationsPrompt = viewModel::resetNotificationsPrompt,
                 onShowAppReviewPrompt = viewModel::showAppReviewPrompt,
                 onClearAppReviewSettings = viewModel::clearAppReviewSettings,
