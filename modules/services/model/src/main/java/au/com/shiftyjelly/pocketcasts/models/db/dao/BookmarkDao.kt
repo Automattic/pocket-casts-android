@@ -292,14 +292,6 @@ abstract class BookmarkDao {
         }
     }
 
-    @Query(
-        """SELECT bookmarks.*
-            FROM bookmarks
-            JOIN user_episodes ON bookmarks.episode_uuid = user_episodes.uuid 
-            AND deleted = :deleted""",
-    )
-    abstract fun findUserEpisodesBookmarksFlow(deleted: Boolean = false): Flow<List<Bookmark>>
-
-    @Query("SELECT EXISTS(SELECT 1 FROM bookmarks WHERE episode_uuid IS :episodeUuid)")
-    abstract fun hasBookmarksFlow(episodeUuid: String): Flow<Boolean>
+    @Query("SELECT EXISTS(SELECT 1 FROM bookmarks WHERE episode_uuid = :episodeUuid AND deleted = :deleted)")
+    abstract fun hasBookmarksFlow(episodeUuid: String, deleted: Boolean = false): Flow<Boolean>
 }

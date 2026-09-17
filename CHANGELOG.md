@@ -8,6 +8,10 @@
         ([#5953](https://github.com/Automattic/pocket-casts-android/pull/5953))
     *   Show the correct play or pause button for User Files
         ([#5963](https://github.com/Automattic/pocket-casts-android/pull/5963))
+    *   Remove the bookmark icon from an episode as soon as its last bookmark is deleted, instead of waiting for the next sync
+        ([#6005](https://github.com/Automattic/pocket-casts-android/pull/6005))
+    *   Keep a newly uploaded file in view instead of letting the Files list jump past it
+        ([#6005](https://github.com/Automattic/pocket-casts-android/pull/6005))
 
 8.21
 -----
