@@ -90,27 +90,29 @@ class TranscriptViewModelTest {
 
     @Before
     fun setUp() {
-        viewModel = TranscriptViewModel(
-            context = context,
-            transcriptManager = transcriptManager,
-            episodeManager = episodeManager,
-            userManager = mock {
-                on { getSignInState() } doReturn signInStateFlow.asFlowable()
-            },
-            paymentClient = PaymentClient.test(),
-            eventHorizon = EventHorizon(eventSink),
-            source = TranscriptViewModel.Source.Player,
-            sharingClient = object : TranscriptSharingClient {
-                override suspend fun shareTranscript(request: SharingRequest): SharingResponse {
-                    Timber.i("Sharing transcript with request: $request")
-                    return SharingResponse(isSuccessful = true, feedbackMessage = null, error = null)
-                }
-            },
-            bookmarkManager = bookmarkManager,
-            fingerprintTimingManager = fingerprintTimingManager,
-            playbackManager = playbackManager,
-        )
+        viewModel = createViewModel()
     }
+
+    private fun createViewModel(source: TranscriptViewModel.Source = TranscriptViewModel.Source.Player) = TranscriptViewModel(
+        context = context,
+        transcriptManager = transcriptManager,
+        episodeManager = episodeManager,
+        userManager = mock {
+            on { getSignInState() } doReturn signInStateFlow.asFlowable()
+        },
+        paymentClient = PaymentClient.test(),
+        eventHorizon = EventHorizon(eventSink),
+        source = source,
+        sharingClient = object : TranscriptSharingClient {
+            override suspend fun shareTranscript(request: SharingRequest): SharingResponse {
+                Timber.i("Sharing transcript with request: $request")
+                return SharingResponse(isSuccessful = true, feedbackMessage = null, error = null)
+            }
+        },
+        bookmarkManager = bookmarkManager,
+        fingerprintTimingManager = fingerprintTimingManager,
+        playbackManager = playbackManager,
+    )
 
     @Test
     fun `create bookmark from a transcript selection`() = runTest {
@@ -135,7 +137,7 @@ class TranscriptViewModelTest {
 
         viewModel.messages.test {
             viewModel.createBookmarkFromSelection(selected)
-            assertEquals(TranscriptMessage.OpenBookmarkEditor("bookmark-id", isNewBookmark = true), awaitItem())
+            assertEquals(TranscriptMessage.OpenBookmarkEditor("bookmark-id", isNewBookmark = true, fromEpisode = false), awaitItem())
         }
 
         // Generated transcript: reference time (10s) is mapped to the 12s playback time and kept.
@@ -175,7 +177,35 @@ class TranscriptViewModelTest {
 
         viewModel.messages.test {
             viewModel.createBookmarkFromSelection(selected)
-            assertEquals(TranscriptMessage.OpenBookmarkEditor("bookmark-id", isNewBookmark = false), awaitItem())
+            assertEquals(TranscriptMessage.OpenBookmarkEditor("bookmark-id", isNewBookmark = false, fromEpisode = false), awaitItem())
+        }
+    }
+
+    @Test
+    fun `flag the bookmark as created from the episode when the transcript is shown there`() = runTest {
+        viewModel = createViewModel(TranscriptViewModel.Source.Episode)
+        val selected = "The AI revolution is underhyped."
+        transcriptManager.avaiableTranscript = Transcript.Text(
+            entries = listOf(TranscriptEntry.Text(selected, startTimeMs = 10_000)),
+            type = TranscriptType.Vtt,
+            url = "https://example.com/transcript.vtt",
+            isGenerated = true,
+            episodeUuid = "episode-id",
+            podcastUuid = "podcast-id",
+        )
+        whenever(episodeManager.findByUuid("episode-id"))
+            .thenReturn(PodcastEpisode(uuid = "episode-id", podcastUuid = "podcast-id", publishedDate = Date()))
+        whenever(fingerprintTimingManager.playbackTimeMs(any())).thenReturn(12_000)
+        whenever(
+            bookmarkManager.add(any(), any(), any(), any(), any(), anyOrNull(), anyOrNull(), anyOrNull()),
+        ).thenReturn(Bookmark(uuid = "bookmark-id"))
+
+        viewModel.loadTranscript("episode-id")
+        runCurrent()
+
+        viewModel.messages.test {
+            viewModel.createBookmarkFromSelection(selected)
+            assertEquals(TranscriptMessage.OpenBookmarkEditor("bookmark-id", isNewBookmark = true, fromEpisode = true), awaitItem())
         }
     }
 
@@ -214,6 +244,27 @@ class TranscriptViewModelTest {
                 state = awaitItem()
             }
             assertFalse(state.isBookmarkFromSelectionAvailable)
+        }
+    }
+
+    @Test
+    fun `bookmark from selection becomes available when playback starts after the transcript is loaded`() = runTest {
+        transcriptManager.avaiableTranscript = Transcript.TextPreview.copy(isGenerated = true)
+        signInStateFlow.value = SignInState.SignedIn("email", Subscription.PlusPreview)
+
+        viewModel.uiState.test {
+            viewModel.loadTranscript("episode-uuid")
+            runCurrent()
+
+            whenever(playbackManager.getCurrentEpisode()).thenReturn(PodcastEpisode(uuid = "episode-uuid", publishedDate = Date()))
+            playbackStateFlow.value = PlaybackState(episodeUuid = "episode-uuid", positionMs = 10_000)
+            syncedStateFlow.value = FingerprintTimingManager.State.Active(coverage = 1)
+
+            var state = awaitItem()
+            while (!state.isBookmarkFromSelectionAvailable) {
+                state = awaitItem()
+            }
+            cancelAndIgnoreRemainingEvents()
         }
     }
 

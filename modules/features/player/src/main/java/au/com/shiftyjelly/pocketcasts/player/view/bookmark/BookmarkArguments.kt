@@ -14,4 +14,5 @@ data class BookmarkArguments(
     val timeSecs: Int,
     val podcastColors: PodcastColors,
     val isNewBookmark: Boolean = false,
+    val fromEpisode: Boolean = false,
 ) : Parcelable

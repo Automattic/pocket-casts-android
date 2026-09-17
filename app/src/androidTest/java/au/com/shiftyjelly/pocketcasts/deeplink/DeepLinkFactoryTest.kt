@@ -55,6 +55,18 @@ class DeepLinkFactoryTest {
     }
 
     @Test
+    fun changeBookmarkTitleFromEpisode() {
+        val intent = Intent()
+            .setAction("INTENT_OPEN_APP_CHANGE_BOOKMARK_TITLE")
+            .putExtra("bookmark_uuid", "bookmark-id")
+            .putExtra("bookmark_from_episode", true)
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(ChangeBookmarkTitleDeepLink("bookmark-id", fromEpisode = true), deepLink)
+    }
+
+    @Test
     fun changeBookmarkTitleWithoutBookmarkUuid() {
         val intent = Intent()
             .setAction("INTENT_OPEN_APP_CHANGE_BOOKMARK_TITLE")
