@@ -168,7 +168,6 @@ class BookmarkDetailFragment : BaseDialogFragment() {
             passageLocation = args.passageLocation,
             timeSecs = args.timeSecs,
             referenceTime = args.referenceTime,
-            referenceTimeSecs = args.referenceTime,
         )
         return contentWithoutConsumedInsets {
             val hasTranscript = args.passage != null && FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS)

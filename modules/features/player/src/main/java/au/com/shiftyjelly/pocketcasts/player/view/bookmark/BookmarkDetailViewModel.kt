@@ -59,7 +59,6 @@ class BookmarkDetailViewModel @Inject constructor(
     private var bookmarkUuid: String? = null
     private lateinit var episodeUuid: String
     private lateinit var podcastUuid: String
-    private var referenceTimeSecs: Int? = null
 
     private val mutableState = MutableStateFlow(UiState())
     val uiState: StateFlow<UiState> = mutableState
@@ -72,7 +71,6 @@ class BookmarkDetailViewModel @Inject constructor(
         episodeUuid: String,
         podcastUuid: String,
         podcastTitle: String,
-        referenceTimeSecs: Int?,
         passage: String?,
         passageLocation: Int?,
         timeSecs: Int,
@@ -83,7 +81,6 @@ class BookmarkDetailViewModel @Inject constructor(
         this.bookmarkUuid = bookmarkUuid
         this.episodeUuid = episodeUuid
         this.podcastUuid = podcastUuid
-        this.referenceTimeSecs = referenceTimeSecs
         mutableState.value = UiState(
             title = title,
             passage = passage,
@@ -169,7 +166,7 @@ class BookmarkDetailViewModel @Inject constructor(
     }
 
     private fun referenceOffsetFor(model: BookmarkTranscript, span: TextSpan?): Int? {
-        val rawOffset = referenceTimeSecs?.let { model.referenceOffsetAt(it * 1000L) } ?: span?.start
+        val rawOffset = mutableState.value.referenceTime?.let { model.referenceOffsetAt(it * 1000L) } ?: span?.start
         return if (span != null && rawOffset != null) {
             rawOffset.coerceIn(span.start, (span.end - 1).coerceAtLeast(span.start))
         } else {

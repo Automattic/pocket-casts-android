@@ -233,9 +233,10 @@ class BookmarkDetailViewModelTest {
             episodeUuid = episodeUuid,
             podcastUuid = Podcast.userPodcast.uuid,
             podcastTitle = "",
-            referenceTimeSecs = null,
             passage = null,
             passageLocation = null,
+            timeSecs = 0,
+            referenceTime = null,
         )
 
         val state = viewModel.uiState.value
@@ -259,7 +260,7 @@ class BookmarkDetailViewModelTest {
         )
         whenever(transcriptManager.loadGeneratedTranscript(episodeUuid)).thenReturn(timed)
 
-        load(passage = secondSentence, passageLocation = firstSentence.length + 1, referenceTimeSecs = 10)
+        load(passage = secondSentence, passageLocation = firstSentence.length + 1, referenceTime = 10)
 
         val state = viewModel.uiState.value.transcriptState
         assertTrue(state is BookmarkDetailViewModel.TranscriptState.Loaded)
@@ -282,7 +283,7 @@ class BookmarkDetailViewModelTest {
         )
         whenever(transcriptManager.loadGeneratedTranscript(episodeUuid)).thenReturn(timed)
 
-        load(passage = secondSentence, passageLocation = firstSentence.length + 1, referenceTimeSecs = 0)
+        load(passage = secondSentence, passageLocation = firstSentence.length + 1, referenceTime = 0)
 
         val state = viewModel.uiState.value.transcriptState
         assertTrue(state is BookmarkDetailViewModel.TranscriptState.Loaded)
@@ -305,7 +306,7 @@ class BookmarkDetailViewModelTest {
         )
         whenever(transcriptManager.loadGeneratedTranscript(episodeUuid)).thenReturn(timed)
 
-        load(passage = secondSentence, passageLocation = firstSentence.length + 1, referenceTimeSecs = null)
+        load(passage = secondSentence, passageLocation = firstSentence.length + 1, referenceTime = null)
 
         val state = viewModel.uiState.value.transcriptState
         assertTrue(state is BookmarkDetailViewModel.TranscriptState.Loaded)
@@ -317,7 +318,6 @@ class BookmarkDetailViewModelTest {
         passage: String?,
         passageLocation: Int?,
         podcastTitle: String = "Podcast",
-        referenceTimeSecs: Int? = 0,
         timeSecs: Int = 0,
         referenceTime: Int? = null,
     ) {
@@ -327,7 +327,6 @@ class BookmarkDetailViewModelTest {
             episodeUuid = episodeUuid,
             podcastUuid = podcastUuid,
             podcastTitle = podcastTitle,
-            referenceTimeSecs = referenceTimeSecs,
             passage = passage,
             passageLocation = passageLocation,
             timeSecs = timeSecs,
