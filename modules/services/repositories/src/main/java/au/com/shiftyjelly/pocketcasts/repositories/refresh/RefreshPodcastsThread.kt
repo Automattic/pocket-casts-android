@@ -382,7 +382,7 @@ class RefreshPodcastsThread(
             episodesToAddToUpNext
                 .groupBy { it.second.podcastUuid }
                 .forEach { (podcastUuid, pairs) ->
-                    val currentPodcast = podcastManager.findPodcastByUuidBlocking(podcastUuid) ?: return@forEach
+                    val currentPodcast = podcastManager.findPodcastByUuid(podcastUuid) ?: return@forEach
                     val queuedModes = pairs.map { it.first }.toSet()
                     if (currentPodcast.autoAddToUpNext !in queuedModes) {
                         val message = "Auto add to Up Next: podcast=$podcastUuid (${currentPodcast.title}) " +
