@@ -25,30 +25,40 @@ class BumpStatsTask @AssistedInject constructor(
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
-        val bumpStatsDao = appDatabase.bumpStatsDao()
-        val bumpStats = bumpStatsDao.get()
+        return run(appDatabase, wpComServiceManager)
+    }
 
-        return if (bumpStats.isNotEmpty()) {
-            val response = wpComServiceManager.bumpStatAnonymously(bumpStats)
-            if (response.isSuccessful && response.body() == "Accepted") {
+    companion object {
+        private const val TAG = "BumpStatsTask"
+        private val VALID_EVENT_NAME_REGEX = Regex("^[a-z_][a-z0-9_]*$")
+
+        suspend fun run(
+            appDatabase: AppDatabase,
+            wpComServiceManager: WpComServiceManager,
+        ): Result {
+            val bumpStatsDao = appDatabase.bumpStatsDao()
+            val bumpStats = bumpStatsDao.get()
+
+            val (validBumpStats, invalidBumpStats) = bumpStats.partition { VALID_EVENT_NAME_REGEX.matches(it.name) }
+            if (invalidBumpStats.isNotEmpty()) {
+                Timber.w("$TAG, removing ${invalidBumpStats.size} bump stats with invalid event names")
+                bumpStatsDao.deleteAll(invalidBumpStats)
+            }
+            if (validBumpStats.isEmpty()) {
+                Timber.i("$TAG, no bump stat events to send")
+                return Result.success()
+            }
+
+            val response = wpComServiceManager.bumpStatAnonymously(validBumpStats)
+            return if (response.isSuccessful && response.body() == "Accepted") {
                 Timber.i("$TAG, successfully sent bump stats")
-
-                // Remove the bump stat events that were successfully sent from the db
-                bumpStatsDao.deleteAll(bumpStats)
-
+                bumpStatsDao.deleteAll(validBumpStats)
                 Result.success()
             } else {
                 LogBuffer.i(TAG, "Failed to send bump stats")
                 Result.failure()
             }
-        } else {
-            Timber.i("$TAG, no bump stat events to send")
-            Result.success()
         }
-    }
-
-    companion object {
-        private const val TAG = "BumpStatsTask"
 
         fun scheduleToRun(context: Context) {
             val constraints = Constraints.Builder()
