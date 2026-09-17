@@ -214,8 +214,9 @@ class CloudFilesFragment :
             // a row inserted at the top leaves the list anchored below it, so re-pin to 0 to keep the new file on screen
             val isLaidOutAtTop = recyclerView.isNotEmpty() && !recyclerView.canScrollVertically(-1)
             binding.emptyLayout.isVisible = uiState.userEpisodes.isEmpty()
+            val previousFirstUuid = adapter.currentList.firstOrNull()?.uuid
             adapter.submitList(uiState.userEpisodes) {
-                if (isLaidOutAtTop) {
+                if (isLaidOutAtTop && uiState.userEpisodes.firstOrNull()?.uuid != previousFirstUuid) {
                     recyclerView.scrollToPosition(0)
                 }
             }
