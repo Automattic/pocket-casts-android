@@ -330,7 +330,7 @@ class SyncManagerImpl @Inject constructor(
         syncServiceManager.getFiles(token)
     }
 
-    override fun getFileUsageRxSingle(): Single<FileAccount> = getCacheTokenOrLoginRxSingle { token ->
+    override suspend fun getFileUsage(): FileAccount = getCacheTokenOrLogin { token ->
         syncServiceManager.getFileUsage(token)
     }
 

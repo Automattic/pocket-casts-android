@@ -499,7 +499,7 @@ class UserEpisodeManagerImpl @Inject constructor(
                 UploadProgressManager.clearProgress(userEpisode.uuid)
                 syncManager.deleteFromServer(userEpisode)
                 userEpisodeDao.updateServerStatus(userEpisode.uuid, UserEpisodeServerStatus.LOCAL)
-                usageState.value = Optional.of(syncManager.getFileUsageRxSingle().await())
+                usageState.value = Optional.of(syncManager.getFileUsage())
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {

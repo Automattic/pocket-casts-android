@@ -292,7 +292,7 @@ open class SyncServiceManager @Inject constructor(
         return StatsBundle(values, startedAt)
     }
 
-    fun getFileUsage(token: AccessToken): Single<FileAccount> = service.getFilesUsage(addBearer(token))
+    suspend fun getFileUsage(token: AccessToken): FileAccount = service.getFilesUsage(addBearer(token))
 
     suspend fun addPodcastRating(podcastUuid: String, rate: Int, token: AccessToken): PodcastRatingResponse {
         val request = PodcastRatingAddRequest.newBuilder()

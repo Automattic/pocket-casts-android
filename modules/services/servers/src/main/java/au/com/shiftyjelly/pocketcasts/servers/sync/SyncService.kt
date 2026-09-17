@@ -183,7 +183,7 @@ interface SyncService {
     suspend fun loadStats(@Header("Authorization") authorization: String, @Body request: StatsSummaryRequest): Map<String, Any>
 
     @GET("/files/usage")
-    fun getFilesUsage(@Header("Authorization") authorization: String): Single<FileAccount>
+    suspend fun getFilesUsage(@Header("Authorization") authorization: String): FileAccount
 
     @POST("/subscription/promo/redeem")
     fun redeemPromoCode(@Header("Authorization") authorization: String, @Body request: PromoCodeRequest): Single<PromoCodeResponse>
