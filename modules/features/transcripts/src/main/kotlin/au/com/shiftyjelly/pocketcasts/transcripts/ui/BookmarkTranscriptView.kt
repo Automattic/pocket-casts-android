@@ -79,6 +79,7 @@ fun BookmarkTranscriptView(
     var layout by remember { mutableStateOf<TextLayoutResult?>(null) }
     var viewportHeight by remember { mutableIntStateOf(0) }
     var hasScrolled by remember { mutableStateOf(false) }
+    var scrolledPassage by remember { mutableStateOf<TextSpan?>(null) }
     val contentAlpha by animateFloatAsState(
         targetValue = if (!scrollToPassage || passage == null || hasScrolled) 1f else 0f,
         label = "transcriptFade",
@@ -183,13 +184,14 @@ fun BookmarkTranscriptView(
         }
     }
 
-    LaunchedEffect(layout, viewportHeight) {
+    LaunchedEffect(layout, viewportHeight, passage) {
         val result = layout ?: return@LaunchedEffect
-        if (hasScrolled || !scrollToPassage || passage == null || viewportHeight == 0) return@LaunchedEffect
+        if (!scrollToPassage || passage == null || viewportHeight == 0 || passage == scrolledPassage) return@LaunchedEffect
         val box = result.getBoundingBox(passage.start.coerceIn(0, transcript.displayText.length.coerceAtLeast(1) - 1))
         val topPadding = with(density) { ContentPadding.calculateTopPadding().toPx() }
         val target = (box.top + topPadding - viewportHeight * anchorFraction + box.height / 2).roundToInt()
         scrollState.scrollTo(target.coerceIn(0, scrollState.maxValue))
+        scrolledPassage = passage
         hasScrolled = true
     }
 }

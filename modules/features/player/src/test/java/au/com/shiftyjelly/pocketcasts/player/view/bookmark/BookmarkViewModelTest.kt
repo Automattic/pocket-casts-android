@@ -319,7 +319,7 @@ class BookmarkViewModelTest {
         viewModel.saveBookmark { _, _ -> saved.complete(Unit) }
         saved.await()
 
-        verify(bookmarkManager).updatePassage("existing-id", "a hand-picked passage", 9)
+        verify(bookmarkManager).updatePassage("existing-id", "a hand-picked passage", 9, null)
     }
 
     private suspend fun stubNewBookmark() {

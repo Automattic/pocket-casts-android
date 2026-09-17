@@ -196,6 +196,14 @@ class BookmarkViewModel
         mutableUiState.value = mutableUiState.value.copy(canEditTranscript = located)
     }
 
+    private suspend fun resolveEditedReferenceTimeSecs(passage: String, passageLocation: Int?): Int? {
+        val transcript = transcriptManager.loadGeneratedTranscript(arguments.episodeUuid) ?: return null
+        val model = BookmarkTranscript.from(transcript)
+        val span = model.passageDisplaySpan(passage, passageLocation) ?: return null
+        val referenceTimeMs = model.referenceTimeMsAt(span.start) ?: return null
+        return (referenceTimeMs / 1000).toInt()
+    }
+
     fun changeTitle(title: TextFieldValue) {
         val titleLimited = title.copy(text = title.text.take(100))
         val suggestion = uiState.value.titleSuggestion
@@ -220,6 +228,11 @@ class BookmarkViewModel
                 val episodeUuid = arguments.episodeUuid
                 val isExistingBookmark = !state.isNewBookmark
                 val title = state.title.text.replace('\n', ' ').trim().ifBlank { defaultTitle }
+                val editedReferenceTimeSecs = if (passageEdited) {
+                    state.passage?.let { resolveEditedReferenceTimeSecs(it, state.passageLocation) }
+                } else {
+                    null
+                }
                 val bookmark = if (bookmarkUuid == null) {
                     val episode = episodeManager.findByUuid(episodeUuid)
                         ?: userEpisodeManager.findEpisodeByUuid(episodeUuid)
@@ -233,7 +246,7 @@ class BookmarkViewModel
                         creationSource = BookmarkSourceType.Player,
                         passage = if (passageEdited) state.passage else suggestion?.passage,
                         passageLocation = if (passageEdited) state.passageLocation else suggestion?.passageLocation,
-                        referenceTime = suggestion?.referenceTimeSecs,
+                        referenceTime = editedReferenceTimeSecs ?: suggestion?.referenceTimeSecs,
                     )
                     if (suggestion == null && FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS)) {
                         bookmarkManager.enrichBookmarkPassage(created)
@@ -244,7 +257,7 @@ class BookmarkViewModel
                     val passage = state.passage
                     val passageLocation = state.passageLocation
                     if (passageEdited && passage != null && passageLocation != null) {
-                        bookmarkManager.updatePassage(bookmarkUuid, passage, passageLocation)
+                        bookmarkManager.updatePassage(bookmarkUuid, passage, passageLocation, editedReferenceTimeSecs)
                     }
                     bookmarkManager.findBookmark(bookmarkUuid)
                 }

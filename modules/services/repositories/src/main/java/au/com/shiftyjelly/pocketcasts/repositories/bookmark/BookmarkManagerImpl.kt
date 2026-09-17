@@ -114,12 +114,15 @@ class BookmarkManagerImpl @Inject constructor(
         )
     }
 
-    override suspend fun updatePassage(bookmarkUuid: String, passage: String, passageLocation: Int) {
+    override suspend fun updatePassage(bookmarkUuid: String, passage: String, passageLocation: Int, referenceTime: Int?) {
+        val modifiedAt = System.currentTimeMillis()
         bookmarkDao.updatePassage(
             bookmarkUuid = bookmarkUuid,
             passage = passage,
             passageLocation = passageLocation,
-            passageModified = System.currentTimeMillis(),
+            passageModified = modifiedAt,
+            referenceTime = referenceTime,
+            referenceTimeModified = referenceTime?.let { modifiedAt },
             syncStatus = SyncStatus.NOT_SYNCED,
         )
     }
