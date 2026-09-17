@@ -38,7 +38,6 @@ interface BookmarkManager {
     suspend fun upsertSynced(bookmark: Bookmark): Bookmark
     suspend fun searchInPodcastByTitle(podcastUuid: String, title: String): List<String>
     suspend fun searchByBookmarkOrEpisodeTitle(title: String): List<String>
-    fun findUserEpisodesBookmarksFlow(): Flow<List<Bookmark>>
     fun findBookmarksFlow(
         sortType: BookmarksSortTypeForProfile,
     ): Flow<List<Bookmark>>
