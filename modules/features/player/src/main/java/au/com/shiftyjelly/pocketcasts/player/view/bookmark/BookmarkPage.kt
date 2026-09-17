@@ -82,6 +82,7 @@ fun BookmarkPage(
     modifier: Modifier = Modifier,
     passage: String? = null,
     canEditTranscript: Boolean = false,
+    isCapturingPassage: Boolean = false,
     onEditTranscript: () -> Unit = {},
     titleSuggestion: BookmarkViewModel.TitleSuggestion = BookmarkViewModel.TitleSuggestion.None,
     onApplySuggestion: (String) -> Unit = {},
@@ -124,6 +125,7 @@ fun BookmarkPage(
             colors = playerColors,
             passage = passage,
             canEditTranscript = canEditTranscript,
+            isCapturingPassage = isCapturingPassage,
             onTitleChange = onTitleChange,
             onSave = onSave,
             onEditTranscript = onEditTranscript,
@@ -140,6 +142,7 @@ private fun Content(
     colors: PlayerColors,
     passage: String?,
     canEditTranscript: Boolean,
+    isCapturingPassage: Boolean,
     onTitleChange: (TextFieldValue) -> Unit,
     onSave: () -> Unit,
     onEditTranscript: () -> Unit,
@@ -223,7 +226,7 @@ private fun Content(
                 onEdit = onEditTranscript,
             )
 
-            titleSuggestion is BookmarkViewModel.TitleSuggestion.Generating -> TranscriptLoadingSection(
+            isCapturingPassage -> TranscriptLoadingSection(
                 colors = colors,
             )
         }

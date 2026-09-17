@@ -92,6 +92,7 @@ class BookmarkFragment : BaseFragment() {
                     onClose = ::close,
                     passage = uiState.passage,
                     canEditTranscript = uiState.canEditTranscript,
+                    isCapturingPassage = uiState.isCapturingPassage,
                     onEditTranscript = ::editTranscript,
                     titleSuggestion = uiState.titleSuggestion,
                     onApplySuggestion = { viewModel.applySuggestion(it) },

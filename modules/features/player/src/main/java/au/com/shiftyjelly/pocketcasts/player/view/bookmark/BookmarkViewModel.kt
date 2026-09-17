@@ -77,6 +77,7 @@ class BookmarkViewModel
         val titleSuggestion: TitleSuggestion = TitleSuggestion.None,
         val isNewBookmark: Boolean = true,
         val canEditTranscript: Boolean = false,
+        val isCapturingPassage: Boolean = false,
     )
 
     sealed interface TitleSuggestion {
@@ -145,17 +146,23 @@ class BookmarkViewModel
     }
 
     private suspend fun generateTitleSuggestion(episodeUuid: String, timeSecs: Int) {
-        mutableUiState.value = mutableUiState.value.copy(titleSuggestion = TitleSuggestion.Generating)
+        mutableUiState.value = mutableUiState.value.copy(
+            titleSuggestion = TitleSuggestion.Generating,
+            isCapturingPassage = true,
+        )
         val suggestion = withTimeoutOrNull(SUGGESTION_TIMEOUT) {
             bookmarkManager.suggestBookmark(episodeUuid, timeSecs)
         }
         capturedSuggestion = suggestion
-        if (suggestion != null) {
-            mutableUiState.value = mutableUiState.value.copy(
+        mutableUiState.value = if (suggestion != null) {
+            mutableUiState.value.copy(
                 passage = suggestion.passage,
                 passageLocation = suggestion.passageLocation,
                 canEditTranscript = true,
+                isCapturingPassage = false,
             )
+        } else {
+            mutableUiState.value.copy(isCapturingPassage = false)
         }
         val suggestedTitle = suggestion?.title?.takeIf { it.isNotBlank() }
         when {

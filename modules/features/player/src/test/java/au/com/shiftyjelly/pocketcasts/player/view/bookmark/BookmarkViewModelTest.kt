@@ -179,6 +179,23 @@ class BookmarkViewModelTest {
     }
 
     @Test
+    fun `keeps capturing the passage when the title is edited`() = runTest {
+        stubNewBookmark()
+        val gate = CompletableDeferred<BookmarkSuggestion?>()
+        doSuspendableAnswer { gate.await() }.whenever(bookmarkManager).suggestBookmark(episodeUuid, timeSecs)
+
+        viewModel.load(arguments)
+        assertTrue(viewModel.uiState.value.isCapturingPassage)
+
+        viewModel.changeTitle(TextFieldValue("My own title"))
+        assertTrue(viewModel.uiState.value.isCapturingPassage)
+
+        gate.complete(suggestion)
+
+        assertFalse(viewModel.uiState.value.isCapturingPassage)
+    }
+
+    @Test
     fun `saves the captured passage with the bookmark`() = runTest {
         stubNewBookmark()
         whenever(bookmarkManager.suggestBookmark(episodeUuid, timeSecs)).thenReturn(suggestion)

@@ -122,6 +122,30 @@ class BookmarkDetailViewModelTest {
     }
 
     @Test
+    fun `refresh re-reads the bookmark play times`() = runTest {
+        whenever(transcriptManager.loadGeneratedTranscript(episodeUuid)).thenReturn(transcript)
+        load(passage = firstSentence, passageLocation = 0, timeSecs = 10, referenceTime = 12)
+        whenever(bookmarkManager.findBookmark(bookmarkUuid)).thenReturn(
+            Bookmark(
+                uuid = bookmarkUuid,
+                podcastUuid = podcastUuid,
+                episodeUuid = episodeUuid,
+                title = "Renamed",
+                passage = secondSentence,
+                passageLocation = firstSentence.length + 1,
+                timeSecs = 42,
+                referenceTime = 44,
+            ),
+        )
+
+        viewModel.refresh()
+
+        val state = viewModel.uiState.value
+        assertEquals(42, state.timeSecs)
+        assertEquals(44, state.referenceTime)
+    }
+
+    @Test
     fun `refresh re-reads the bookmark and relocates the passage`() = runTest {
         whenever(transcriptManager.loadGeneratedTranscript(episodeUuid)).thenReturn(transcript)
         load(passage = firstSentence, passageLocation = 0)
@@ -146,7 +170,7 @@ class BookmarkDetailViewModelTest {
         assertEquals(secondSentence, transcriptState.transcript.displaySubstring(transcriptState.passage!!))
     }
 
-    private fun load(passage: String?, passageLocation: Int?) {
+    private fun load(passage: String?, passageLocation: Int?, timeSecs: Int = 0, referenceTime: Int? = null) {
         viewModel.load(
             bookmarkUuid = bookmarkUuid,
             title = "Title",
@@ -154,6 +178,8 @@ class BookmarkDetailViewModelTest {
             podcastUuid = podcastUuid,
             passage = passage,
             passageLocation = passageLocation,
+            timeSecs = timeSecs,
+            referenceTime = referenceTime,
         )
     }
 }

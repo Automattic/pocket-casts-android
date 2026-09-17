@@ -81,7 +81,7 @@ fun BookmarkTranscriptView(
     var hasScrolled by remember { mutableStateOf(false) }
     var scrolledPassage by remember { mutableStateOf<TextSpan?>(null) }
     val contentAlpha by animateFloatAsState(
-        targetValue = if (!scrollToPassage || passage == null || hasScrolled) 1f else 0f,
+        targetValue = if (editable || !scrollToPassage || passage == null || hasScrolled) 1f else 0f,
         label = "transcriptFade",
     )
     val currentLayout by rememberUpdatedState(layout)
@@ -109,7 +109,7 @@ fun BookmarkTranscriptView(
         modifier = modifier
             .onSizeChanged { viewportHeight = it.height }
             .alpha(contentAlpha)
-            .fadingEdges()
+            .fadingEdges(enabled = !editable)
             .verticalScroll(scrollState),
     ) {
         val renderText: @Composable () -> Unit = {
@@ -187,6 +187,7 @@ fun BookmarkTranscriptView(
     LaunchedEffect(layout, viewportHeight, passage) {
         val result = layout ?: return@LaunchedEffect
         if (!scrollToPassage || passage == null || viewportHeight == 0 || passage == scrolledPassage) return@LaunchedEffect
+        if (editable && hasScrolled) return@LaunchedEffect
         val box = result.getBoundingBox(passage.start.coerceIn(0, transcript.displayText.length.coerceAtLeast(1) - 1))
         val topPadding = with(density) { ContentPadding.calculateTopPadding().toPx() }
         val target = (box.top + topPadding - viewportHeight * anchorFraction + box.height / 2).roundToInt()
@@ -218,27 +219,34 @@ private val GutterInset = 2.dp
 private val TopFade = 48.dp
 private val BottomFade = 64.dp
 
-private fun Modifier.fadingEdges() = this
-    .graphicsLayer(compositingStrategy = CompositingStrategy.Offscreen)
-    .drawWithContent {
-        drawContent()
-        drawRect(
-            brush = Brush.verticalGradient(
-                colors = listOf(Color.Transparent, Color.Black),
-                startY = 0f,
-                endY = TopFade.toPx(),
-            ),
-            blendMode = BlendMode.DstIn,
-        )
-        drawRect(
-            brush = Brush.verticalGradient(
-                colors = listOf(Color.Black, Color.Transparent),
-                startY = size.height - BottomFade.toPx(),
-                endY = size.height,
-            ),
-            blendMode = BlendMode.DstIn,
-        )
-    }
+private fun Modifier.fadingEdges(enabled: Boolean) = if (!enabled) {
+    this
+} else {
+    this
+        .graphicsLayer(compositingStrategy = CompositingStrategy.Offscreen)
+        .drawWithContent {
+            drawContent()
+            val scale = min(1f, size.height / (TopFade.toPx() + BottomFade.toPx()))
+            val topFade = TopFade.toPx() * scale
+            val bottomFade = BottomFade.toPx() * scale
+            drawRect(
+                brush = Brush.verticalGradient(
+                    colors = listOf(Color.Transparent, Color.Black),
+                    startY = 0f,
+                    endY = topFade,
+                ),
+                blendMode = BlendMode.DstIn,
+            )
+            drawRect(
+                brush = Brush.verticalGradient(
+                    colors = listOf(Color.Black, Color.Transparent),
+                    startY = size.height - bottomFade,
+                    endY = size.height,
+                ),
+                blendMode = BlendMode.DstIn,
+            )
+        }
+}
 
 @Preview
 @Composable
@@ -251,6 +259,7 @@ private fun BookmarkTranscriptViewPreview(
         BookmarkTranscriptView(
             transcript = transcript,
             passage = passage,
+            scrollToPassage = false,
             modifier = Modifier.background(rememberTranscriptTheme().background),
         )
     }

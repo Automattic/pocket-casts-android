@@ -3,9 +3,9 @@ package au.com.shiftyjelly.pocketcasts.player.view.bookmark
 import android.os.Bundle
 import android.os.Parcelable
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -157,39 +157,41 @@ class BookmarkDetailFragment : BaseDialogFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ) = contentWithoutConsumedInsets {
-        val hasTranscript = args.passage != null && FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS)
-        LaunchedEffect(Unit) {
-            viewModel.load(
-                bookmarkUuid = args.bookmarkUuid,
-                title = args.title,
-                episodeUuid = args.episodeUuid,
-                podcastUuid = args.podcastUuid,
-                passage = args.passage,
-                passageLocation = args.passageLocation,
-            )
-        }
-        DialogBox(
-            fillMaxHeight = hasTranscript,
-            modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection()),
-        ) {
-            val resolving by isResolving.collectAsState()
-            val uiState by viewModel.uiState.collectAsState()
-            BookmarkDetailPage(
-                title = uiState.title,
-                episodeTitle = args.episodeTitle,
-                podcastUuid = args.podcastUuid,
-                podcastTitle = args.podcastTitle,
-                timeSecs = args.timeSecs,
-                createdAtText = args.createdAtText,
-                isResolving = resolving,
-                onPlayClick = ::onPlayClick,
-                onClose = { dismiss() },
-                onEpisodeClick = ::onEpisodeClick,
-                onMoreClick = ::onMoreClick,
-                passage = uiState.passage,
-                transcriptState = uiState.transcriptState,
-            )
+    ): View {
+        viewModel.load(
+            bookmarkUuid = args.bookmarkUuid,
+            title = args.title,
+            episodeUuid = args.episodeUuid,
+            podcastUuid = args.podcastUuid,
+            passage = args.passage,
+            passageLocation = args.passageLocation,
+            timeSecs = args.timeSecs,
+            referenceTime = args.referenceTime,
+        )
+        return contentWithoutConsumedInsets {
+            val hasTranscript = args.passage != null && FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS)
+            DialogBox(
+                fillMaxHeight = hasTranscript,
+                modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection()),
+            ) {
+                val resolving by isResolving.collectAsState()
+                val uiState by viewModel.uiState.collectAsState()
+                BookmarkDetailPage(
+                    title = uiState.title,
+                    episodeTitle = args.episodeTitle,
+                    podcastUuid = args.podcastUuid,
+                    podcastTitle = args.podcastTitle,
+                    timeSecs = uiState.timeSecs,
+                    createdAtText = args.createdAtText,
+                    isResolving = resolving,
+                    onPlayClick = ::onPlayClick,
+                    onClose = { dismiss() },
+                    onEpisodeClick = ::onEpisodeClick,
+                    onMoreClick = ::onMoreClick,
+                    passage = uiState.passage,
+                    transcriptState = uiState.transcriptState,
+                )
+            }
         }
     }
 
@@ -238,7 +240,7 @@ class BookmarkDetailFragment : BaseDialogFragment() {
         lifecycleScope.launch {
             val podcast = podcastManager.findPodcastByUuid(args.podcastUuid) ?: return@launch
             ShareEpisodeTimestampFragment
-                .forBookmark(episode, args.timeSecs.seconds, podcast.backgroundColor, args.sourceView)
+                .forBookmark(episode, viewModel.uiState.value.timeSecs.seconds, podcast.backgroundColor, args.sourceView)
                 .show(parentFragmentManager, "share_screen")
         }
     }
@@ -268,7 +270,7 @@ class BookmarkDetailFragment : BaseDialogFragment() {
             val arguments = BookmarkArguments(
                 bookmarkUuid = args.bookmarkUuid,
                 episodeUuid = args.episodeUuid,
-                timeSecs = args.timeSecs,
+                timeSecs = viewModel.uiState.value.timeSecs,
                 podcastColors = podcast?.let(::PodcastColors) ?: PodcastColors.ForUserEpisode,
             )
             editBookmarkLauncher.launch(BookmarkActivity.launchIntent(requireContext(), arguments))
@@ -287,7 +289,8 @@ class BookmarkDetailFragment : BaseDialogFragment() {
                 dismiss()
                 return@launch
             }
-            val hasReferenceTime = args.referenceTime != null
+            val state = viewModel.uiState.value
+            val hasReferenceTime = state.referenceTime != null
             val pausedForResolve = hasReferenceTime &&
                 playbackManager.isPlaying() &&
                 playbackManager.getCurrentEpisode()?.uuid == args.episodeUuid
@@ -310,8 +313,8 @@ class BookmarkDetailFragment : BaseDialogFragment() {
             val seekToMs = try {
                 bookmarkPlaybackTimeResolver.playbackTimeMs(
                     episode = episode,
-                    referenceTimeSecs = args.referenceTime,
-                    fallbackTimeSecs = args.timeSecs,
+                    referenceTimeSecs = state.referenceTime,
+                    fallbackTimeSecs = state.timeSecs,
                 )
             } catch (e: CancellationException) {
                 if (pausedForResolve) {

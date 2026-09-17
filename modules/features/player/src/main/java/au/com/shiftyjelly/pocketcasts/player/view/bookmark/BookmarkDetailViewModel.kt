@@ -36,6 +36,8 @@ class BookmarkDetailViewModel @Inject constructor(
     data class UiState(
         val title: String = "",
         val passage: String? = null,
+        val timeSecs: Int = 0,
+        val referenceTime: Int? = null,
         val transcriptState: TranscriptState = TranscriptState.None,
     )
 
@@ -55,13 +57,15 @@ class BookmarkDetailViewModel @Inject constructor(
         podcastUuid: String,
         passage: String?,
         passageLocation: Int?,
+        timeSecs: Int,
+        referenceTime: Int?,
     ) {
         if (loaded) return
         loaded = true
         this.bookmarkUuid = bookmarkUuid
         this.episodeUuid = episodeUuid
         this.podcastUuid = podcastUuid
-        mutableState.value = UiState(title = title, passage = passage)
+        mutableState.value = UiState(title = title, passage = passage, timeSecs = timeSecs, referenceTime = referenceTime)
         loadTranscript(passage, passageLocation)
     }
 
@@ -69,7 +73,12 @@ class BookmarkDetailViewModel @Inject constructor(
         val uuid = bookmarkUuid ?: return
         viewModelScope.launch {
             val bookmark = bookmarkManager.findBookmark(uuid) ?: return@launch
-            mutableState.value = mutableState.value.copy(title = bookmark.title, passage = bookmark.passage)
+            mutableState.value = mutableState.value.copy(
+                title = bookmark.title,
+                passage = bookmark.passage,
+                timeSecs = bookmark.timeSecs,
+                referenceTime = bookmark.referenceTime,
+            )
             val loaded = mutableState.value.transcriptState as? TranscriptState.Loaded
             val passage = bookmark.passage
             if (loaded != null && passage != null) {
