@@ -435,10 +435,6 @@ abstract class PodcastDao {
     @Query("UPDATE podcasts SET latest_episode_uuid = :episodeUuid, latest_episode_date = :publishedDate WHERE uuid = :podcastUuid")
     abstract fun updateLatestEpisodeBlocking(episodeUuid: String, publishedDate: Date, podcastUuid: String)
 
-    fun updateLatestEpisodeRxCompletable(episodeUuid: String, publishedDate: Date, podcastUuid: String): Completable {
-        return Completable.fromAction { updateLatestEpisodeBlocking(episodeUuid, publishedDate, podcastUuid) }
-    }
-
     @Query("UPDATE podcasts SET show_notifications = :showNotifications, show_notifications_modified = :modified, sync_status = 0")
     abstract suspend fun updateAllShowNotifications(showNotifications: Boolean, modified: Date = Date())
 

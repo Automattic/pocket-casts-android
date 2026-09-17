@@ -334,9 +334,9 @@ class SubscribeManager @Inject constructor(
     }
 
     // WARNING: only call this when NEW episodes are added, not old ones
-    private fun updateLatestEpisodeUuidRxCompletable(podcastUuid: String): Completable {
-        return episodeDao.findLatestRxMaybe(podcastUuid)
-            .flatMapCompletable { episode -> podcastDao.updateLatestEpisodeRxCompletable(episode.uuid, episode.publishedDate, podcastUuid) }
+    private fun updateLatestEpisodeUuidRxCompletable(podcastUuid: String): Completable = rxCompletable(Dispatchers.IO) {
+        val episode = episodeDao.findLatestBlocking(podcastUuid) ?: return@rxCompletable
+        podcastDao.updateLatestEpisodeBlocking(episode.uuid, episode.publishedDate, podcastUuid)
     }
 
     /**
