@@ -33,10 +33,8 @@ import au.com.shiftyjelly.pocketcasts.servers.refresh.UpdatePodcastResponse.Retr
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.jakewharton.rxrelay2.PublishRelay
 import dagger.hilt.android.qualifiers.ApplicationContext
-import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.Single
-import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration.Companion.days
@@ -179,33 +177,11 @@ class PodcastManagerImpl @Inject constructor(
         return subscribeManager.getSubscribingPodcastUuids().isNotEmpty()
     }
 
-    override fun getSubscribedPodcastUuidsRxSingle(): Single<List<String>> {
-        // get the podcasts from the database
-        val databasePodcasts = podcastDao.findSubscribedRxSingle()
-        // use just the uuids
-        val databaseUuids = databasePodcasts.map { podcasts -> podcasts.map { it.uuid } }
-        // add the uuids of podcasts currently being added
-        val addQueuedUuids = databaseUuids.map { uuids ->
-            val allUuids = HashSet(uuids)
-            allUuids.addAll(subscribeManager.getSubscribingPodcastUuids())
-            allUuids.toList()
-        }
-        return addQueuedUuids
-    }
-
-    override fun podcastSubscriptionsRxFlowable(): Flowable<List<String>> {
-        return subscribeManager.subscriptionChangedRelay
-            .mergeWith(unsubscribeRelay)
-            .flatMap { getSubscribedPodcastUuidsRxSingle().toObservable() } // Every time the subscriptions change, reload the subscribed list and pass it on
-            .subscribeOn(Schedulers.io())
-            .toFlowable(BackpressureStrategy.LATEST)
-    }
-
     override fun podcastSubscriptionsFlow(): Flow<List<String>> {
         val subscriptionChanges = merge(subscribeManager.subscriptionChangedRelay.asFlow(), unsubscribeRelay.asFlow())
         // The first load is merged in rather than added with onStart so the relays are attached concurrently with it.
         return merge(flowOf(Unit), subscriptionChanges.map {})
-            .conflate() // A burst of changes collapses into one reload, like BackpressureStrategy.LATEST did
+            .conflate()
             .map { subscribedPodcastUuids() }
             .flowOn(ioDispatcher)
     }

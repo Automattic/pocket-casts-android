@@ -46,6 +46,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.rx2.asFlowable
 import kotlinx.coroutines.rx2.rxMaybe
 import kotlinx.coroutines.rx2.rxSingle
 import timber.log.Timber
@@ -260,8 +261,7 @@ class DiscoverViewModel @Inject constructor(
     }
 
     private fun addSubscriptionStateToPodcasts(list: PodcastList): Flowable<PodcastList> {
-        return podcastManager.getSubscribedPodcastUuidsRxSingle().toFlowable() // Get the current subscribed list
-            .mergeWith(podcastManager.podcastSubscriptionsRxFlowable()) // Get updated when it changes
+        return podcastManager.podcastSubscriptionsFlow().asFlowable()
             .map { subscribedList ->
                 val updatedPodcasts = list.podcasts.map { podcast ->
                     val isSubscribed = subscribedList.contains(podcast.uuid)
