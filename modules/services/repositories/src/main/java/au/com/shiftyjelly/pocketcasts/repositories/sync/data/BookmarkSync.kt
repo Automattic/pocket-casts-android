@@ -178,7 +178,6 @@ internal fun Bookmark.applyServerBookmark(serverBookmark: BookmarkResponse) = ap
     val localPassageModified = passageModified
     val localReferenceTimeModified = referenceTimeModified
 
-    syncStatus = SyncStatus.SYNCED
     uuid = serverBookmark.bookmarkUuid
     podcastUuid = serverBookmark.podcastUuid
     episodeUuid = serverBookmark.episodeUuid
@@ -188,18 +187,23 @@ internal fun Bookmark.applyServerBookmark(serverBookmark: BookmarkResponse) = ap
     }
     title = serverBookmark.title
 
-    serverBookmark.passageModifiedOrNull?.value
+    val serverPassageApplied = serverBookmark.passageModifiedOrNull?.value
         ?.takeIf { it >= (localPassageModified ?: Long.MIN_VALUE) }
         ?.let { modifiedAt ->
             val passageValue = serverBookmark.passageOrNull?.value?.takeIf { it.isNotEmpty() }
             passage = passageValue
             passageLocation = passageValue?.let { serverBookmark.passageLocationOrNull?.value }
             passageModified = modifiedAt
-        }
-    serverBookmark.referenceTimeModifiedOrNull?.value
+        } != null
+    val serverReferenceTimeApplied = serverBookmark.referenceTimeModifiedOrNull?.value
         ?.takeIf { it >= (localReferenceTimeModified ?: Long.MIN_VALUE) }
         ?.let { modifiedAt ->
             referenceTime = serverBookmark.referenceTimeOrNull?.value
             referenceTimeModified = modifiedAt
-        }
+        } != null
+
+    // When a locally-newer passage or reference time is kept, stay unsynced so the local value still uploads.
+    val localPassageKept = localPassageModified != null && !serverPassageApplied
+    val localReferenceTimeKept = localReferenceTimeModified != null && !serverReferenceTimeApplied
+    syncStatus = if (localPassageKept || localReferenceTimeKept) SyncStatus.NOT_SYNCED else SyncStatus.SYNCED
 }

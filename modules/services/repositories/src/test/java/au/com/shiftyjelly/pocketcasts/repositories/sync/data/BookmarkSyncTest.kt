@@ -103,6 +103,7 @@ class BookmarkSyncTest {
         assertEquals(4000L, restored.passageModified)
         assertEquals(42, restored.referenceTime)
         assertEquals(5000L, restored.referenceTimeModified)
+        assertEquals(SyncStatus.SYNCED, restored.syncStatus)
     }
 
     @Test
@@ -116,6 +117,7 @@ class BookmarkSyncTest {
         assertEquals("local passage", merged.passage)
         assertEquals(1, merged.passageLocation)
         assertEquals(9000L, merged.passageModified)
+        assertEquals(SyncStatus.NOT_SYNCED, merged.syncStatus)
     }
 
     @Test
@@ -129,6 +131,7 @@ class BookmarkSyncTest {
         assertEquals("server passage", merged.passage)
         assertEquals(5, merged.passageLocation)
         assertEquals(4000L, merged.passageModified)
+        assertEquals(SyncStatus.SYNCED, merged.syncStatus)
     }
 
     @Test
@@ -150,6 +153,7 @@ class BookmarkSyncTest {
         assertEquals(4000L, merged.passageModified)
         assertEquals(7, merged.referenceTime)
         assertEquals(5000L, merged.referenceTimeModified)
+        assertEquals(SyncStatus.NOT_SYNCED, merged.syncStatus)
     }
 
     private fun bookmark(
