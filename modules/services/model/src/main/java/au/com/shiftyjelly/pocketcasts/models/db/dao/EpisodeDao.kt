@@ -22,7 +22,6 @@ import au.com.shiftyjelly.pocketcasts.models.to.EpisodeWithTitle
 import au.com.shiftyjelly.pocketcasts.models.type.DownloadStatusUpdate
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
-import io.reactivex.Maybe
 import java.time.Instant
 import java.util.Date
 import java.util.UUID
@@ -237,9 +236,6 @@ abstract class EpisodeDao {
 
     @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY published_date DESC, added_date DESC LIMIT 1")
     abstract fun findLatestBlocking(podcastUuid: String): PodcastEpisode?
-
-    @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY published_date DESC, added_date DESC LIMIT 1")
-    abstract fun findLatestRxMaybe(podcastUuid: String): Maybe<PodcastEpisode>
 
     @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE (download_task_id IS NOT NULL OR episode_status == :downloadEpisodeDownloadStatus OR (episode_status == :failedEpisodeDownloadStatus AND last_download_attempt_date > :failedDownloadCutoff AND archived == 0)) ORDER BY last_download_attempt_date DESC")
