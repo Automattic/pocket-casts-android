@@ -28,7 +28,6 @@ interface PodcastManager {
     fun podcastByUuidRxFlowable(uuid: String): Flowable<Podcast>
     fun podcastByUuidFlow(uuid: String): Flow<Podcast>
     fun podcastByEpisodeUuidFlow(uuid: String): Flow<Podcast>
-    fun podcastSubscriptionsRxFlowable(): Flowable<List<String>>
 
     // The subscribed uuids, including in-flight subscribes, re-emitted when one subscribes or unsubscribes.
     fun podcastSubscriptionsFlow(): Flow<List<String>>
@@ -62,7 +61,6 @@ interface PodcastManager {
     suspend fun subscribeToPodcastOrThrow(podcastUuid: String, sync: Boolean = false, shouldAutoDownload: Boolean = true): Podcast
     fun findOrDownloadPodcastRxSingle(podcastUuid: String, waitForSubscribe: Boolean = false): Single<Podcast>
     fun isSubscribingToPodcasts(): Boolean
-    fun getSubscribedPodcastUuidsRxSingle(): Single<List<String>>
     fun isSubscribingToPodcast(podcastUuid: String): Boolean
     fun addPodcastRxSingle(podcastUuid: String, sync: Boolean, subscribed: Boolean, shouldAutoDownload: Boolean): Single<Podcast>
 
