@@ -261,7 +261,7 @@ class DiscoverViewModel @Inject constructor(
     }
 
     private fun addSubscriptionStateToPodcasts(list: PodcastList): Flowable<PodcastList> {
-        return podcastManager.podcastSubscriptionsFlow().asFlowable() // The current subscribed list, re-emitted when it changes
+        return podcastManager.podcastSubscriptionsFlow().asFlowable()
             .map { subscribedList ->
                 val updatedPodcasts = list.podcasts.map { podcast ->
                     val isSubscribed = subscribedList.contains(podcast.uuid)

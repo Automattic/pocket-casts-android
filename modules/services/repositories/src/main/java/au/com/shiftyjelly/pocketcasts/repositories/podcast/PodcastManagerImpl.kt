@@ -181,7 +181,7 @@ class PodcastManagerImpl @Inject constructor(
         val subscriptionChanges = merge(subscribeManager.subscriptionChangedRelay.asFlow(), unsubscribeRelay.asFlow())
         // The first load is merged in rather than added with onStart so the relays are attached concurrently with it.
         return merge(flowOf(Unit), subscriptionChanges.map {})
-            .conflate() // A burst of changes collapses into one reload
+            .conflate()
             .map { subscribedPodcastUuids() }
             .flowOn(ioDispatcher)
     }
