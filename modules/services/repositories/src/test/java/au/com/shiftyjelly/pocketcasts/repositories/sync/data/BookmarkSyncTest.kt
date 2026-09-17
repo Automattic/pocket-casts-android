@@ -13,6 +13,7 @@ import java.util.Date
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.kotlin.doReturn
@@ -135,6 +136,48 @@ class BookmarkSyncTest {
     }
 
     @Test
+    fun `full sync restores a legacy passage that carries no modified timestamp`() {
+        val local = bookmark(
+            passage = null,
+            passageLocation = null,
+            passageModified = null,
+            referenceTime = null,
+            referenceTimeModified = null,
+        )
+
+        val restored = local.applyServerBookmark(
+            serverBookmarkResponse(
+                passage = "the captured passage",
+                passageLocation = 5,
+                passageModified = null,
+                referenceTime = 42,
+                referenceTimeModified = null,
+            ),
+        )
+
+        assertEquals("the captured passage", restored.passage)
+        assertEquals(5, restored.passageLocation)
+        assertNull(restored.passageModified)
+        assertEquals(42, restored.referenceTime)
+        assertNull(restored.referenceTimeModified)
+        assertEquals(SyncStatus.SYNCED, restored.syncStatus)
+    }
+
+    @Test
+    fun `full sync keeps a local passage over a legacy one that carries no modified timestamp`() {
+        val local = bookmark(passage = "local passage", passageLocation = 1, passageModified = 9000)
+
+        val merged = local.applyServerBookmark(
+            serverBookmarkResponse(passage = "server passage", passageLocation = 5, passageModified = null),
+        )
+
+        assertEquals("local passage", merged.passage)
+        assertEquals(1, merged.passageLocation)
+        assertEquals(9000L, merged.passageModified)
+        assertEquals(SyncStatus.NOT_SYNCED, merged.syncStatus)
+    }
+
+    @Test
     fun `full sync leaves local values untouched when the response omits the groups`() {
         val local = bookmark(
             passage = "local passage",
@@ -145,7 +188,7 @@ class BookmarkSyncTest {
         )
 
         val merged = local.applyServerBookmark(
-            serverBookmarkResponse(passageModified = null, referenceTimeModified = null),
+            serverBookmarkResponse(passage = null, passageModified = null, referenceTime = null, referenceTimeModified = null),
         )
 
         assertEquals("local passage", merged.passage)
@@ -192,13 +235,17 @@ class BookmarkSyncTest {
         episodeUuid = "episode1"
         time = 10
         title = "Title"
-        passageModified?.let { modifiedAt ->
-            this.passage = stringValue { value = passage.orEmpty() }
+        passage?.let { passageText ->
+            this.passage = stringValue { value = passageText }
             this.passageLocation = int32Value { value = passageLocation ?: 0 }
+        }
+        passageModified?.let { modifiedAt ->
             this.passageModified = int64Value { value = modifiedAt }
         }
+        referenceTime?.let { referenceTimeSecs ->
+            this.referenceTime = int32Value { value = referenceTimeSecs }
+        }
         referenceTimeModified?.let { modifiedAt ->
-            this.referenceTime = int32Value { value = referenceTime ?: 0 }
             this.referenceTimeModified = int64Value { value = modifiedAt }
         }
     }
