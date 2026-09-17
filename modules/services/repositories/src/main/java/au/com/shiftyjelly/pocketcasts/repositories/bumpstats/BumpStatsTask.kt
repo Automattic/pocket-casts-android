@@ -32,7 +32,7 @@ class BumpStatsTask @AssistedInject constructor(
         private const val TAG = "BumpStatsTask"
         private val VALID_EVENT_NAME_REGEX = Regex("^[a-z_][a-z0-9_]*$")
 
-        suspend fun run(
+        internal suspend fun run(
             appDatabase: AppDatabase,
             wpComServiceManager: WpComServiceManager,
         ): Result {
@@ -41,7 +41,7 @@ class BumpStatsTask @AssistedInject constructor(
 
             val (validBumpStats, invalidBumpStats) = bumpStats.partition { VALID_EVENT_NAME_REGEX.matches(it.name) }
             if (invalidBumpStats.isNotEmpty()) {
-                Timber.w("$TAG, removing ${invalidBumpStats.size} bump stats with invalid event names")
+                LogBuffer.i(TAG, "removing ${invalidBumpStats.size} bump stats with invalid event names")
                 bumpStatsDao.deleteAll(invalidBumpStats)
             }
             if (validBumpStats.isEmpty()) {
