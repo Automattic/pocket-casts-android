@@ -9,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.RefreshToken
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationManager
 import au.com.shiftyjelly.pocketcasts.repositories.notification.OnboardingNotificationType
+import au.com.shiftyjelly.pocketcasts.servers.sync.FileAccount
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.UserChangeResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.DeviceTokenResponse
@@ -234,6 +235,29 @@ class SyncManagerImplTest {
 
         assertEquals(response, syncManager.deleteFromServer(episode))
         verify(syncAccountManager, never()).invalidateAccessToken()
+    }
+
+    @Test
+    fun `file usage is fetched with the cached token`() = runTest {
+        val usage = FileAccount(totalFiles = 2, totalSize = 1024, usedSize = 512)
+        whenever(syncAccountManager.isLoggedIn()).thenReturn(true)
+        whenever(syncAccountManager.getAccessToken()).thenReturn(AccessToken("access-token"))
+        whenever(syncServiceManager.getFileUsage(AccessToken("access-token"))).thenReturn(usage)
+
+        assertEquals(usage, syncManager.getFileUsage())
+        verify(syncAccountManager, never()).invalidateAccessToken()
+    }
+
+    @Test
+    fun `file usage is fetched with a refreshed token when nothing is cached`() = runTest {
+        val usage = FileAccount(totalFiles = 2, totalSize = 1024, usedSize = 512)
+        val freshToken = AccessToken("fresh-access-token")
+        whenever(syncAccountManager.isLoggedIn()).thenReturn(true)
+        whenever(syncAccountManager.getAccessToken()).thenReturn(null, freshToken)
+        whenever(syncServiceManager.getFileUsage(freshToken)).thenReturn(usage)
+
+        assertEquals(usage, syncManager.getFileUsage())
+        verify(syncAccountManager).invalidateAccessToken()
     }
 
     private fun stubResources() {

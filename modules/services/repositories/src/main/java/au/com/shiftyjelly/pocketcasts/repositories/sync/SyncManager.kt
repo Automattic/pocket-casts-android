@@ -90,7 +90,7 @@ interface SyncManager : NamedSettingsCaller {
     fun uploadImageToServerRxCompletable(episode: UserEpisode, imageFile: File): Completable
     fun postFilesRxSingle(files: List<FilePost>): Single<Response<Void>>
     fun getUserEpisodeRxMaybe(uuid: String): Maybe<ServerFile>
-    fun getFileUsageRxSingle(): Single<FileAccount>
+    suspend fun getFileUsage(): FileAccount
     suspend fun deleteImageFromServer(episode: UserEpisode): Response<Void>
     suspend fun deleteFromServer(episode: UserEpisode): Response<Void>
     fun getPlaybackUrl(episode: UserEpisode): String
