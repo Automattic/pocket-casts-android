@@ -5,6 +5,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.ReadSetting
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationScheduler
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
@@ -18,6 +19,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.reactive.awaitFirst
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -46,6 +48,7 @@ class UserManagerImplTest {
         on { emailFlow() } doReturn flowOf("user@pocketcasts.com")
     }
     private val subscriptionManager = mock<SubscriptionManager>()
+    private val notificationScheduler = mock<NotificationScheduler>()
     private val playbackManager = mock<PlaybackManager>()
 
     @Test
@@ -103,6 +106,8 @@ class UserManagerImplTest {
             expectNoEvents()
             verify(subscriptionManager, never()).fetchFreshSubscriptionResult()
         }
+        advanceUntilIdle()
+        verify(notificationScheduler).setupTrendingAndRecommendationsNotifications()
     }
 
     @Test
@@ -185,7 +190,7 @@ class UserManagerImplTest {
         crashLogging = mock(),
         experimentProvider = mock(),
         endOfYearSync = mock(),
-        notificationScheduler = mock(),
+        notificationScheduler = notificationScheduler,
         defaultDispatcher = StandardTestDispatcher(testScheduler),
     )
 }

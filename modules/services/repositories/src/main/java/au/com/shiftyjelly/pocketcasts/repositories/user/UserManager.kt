@@ -105,7 +105,7 @@ class UserManagerImpl @Inject constructor(
     }
 
     override val coroutineContext: CoroutineContext
-        get() = Dispatchers.Default
+        get() = defaultDispatcher
 
     private val _onServerSignOut = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     override val onServerSignOut: SharedFlow<Unit> = _onServerSignOut.asSharedFlow()
