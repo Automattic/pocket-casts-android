@@ -18,8 +18,9 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
+import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkEpisodeResolver
+import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkPlaybackTimeResolver
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toLocalizedFormatPattern
@@ -32,6 +33,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -106,13 +108,13 @@ class BookmarkDetailFragment : BaseDialogFragment() {
     internal lateinit var playbackManager: PlaybackManager
 
     @Inject
-    internal lateinit var episodeManager: EpisodeManager
-
-    @Inject
     internal lateinit var eventHorizon: EventHorizon
 
     @Inject
     internal lateinit var bookmarkPlaybackTimeResolver: BookmarkPlaybackTimeResolver
+
+    @Inject
+    internal lateinit var bookmarkEpisodeResolver: BookmarkEpisodeResolver
 
     private val isResolving = MutableStateFlow(false)
 
@@ -166,7 +168,7 @@ class BookmarkDetailFragment : BaseDialogFragment() {
 
     private fun onPlayClick() {
         lifecycleScope.launch {
-            val episode = episodeManager.findEpisodeByUuid(args.episodeUuid)
+            val episode = resolveEpisode()
             if (episode == null) {
                 Toast.makeText(
                     requireContext(),
@@ -183,8 +185,13 @@ class BookmarkDetailFragment : BaseDialogFragment() {
             if (pausedForResolve) {
                 playbackManager.pauseSuspend()
             }
-            if (hasReferenceTime) {
-                isResolving.value = true
+            val spinnerJob = if (hasReferenceTime) {
+                launch {
+                    delay(PLAY_SPINNER_DELAY_MS)
+                    isResolving.value = true
+                }
+            } else {
+                null
             }
             val seekToMs = try {
                 bookmarkPlaybackTimeResolver.playbackTimeMs(
@@ -203,6 +210,7 @@ class BookmarkDetailFragment : BaseDialogFragment() {
                 }
                 throw e
             } finally {
+                spinnerJob?.cancel()
                 isResolving.value = false
             }
             playbackManager.playNowSuspend(episode, sourceView = args.sourceView)
@@ -217,4 +225,11 @@ class BookmarkDetailFragment : BaseDialogFragment() {
             dismiss()
         }
     }
+
+    private suspend fun resolveEpisode() = bookmarkEpisodeResolver.resolve(
+        episodeUuid = args.episodeUuid,
+        podcastUuid = args.podcastUuid,
+    )
 }
+
+private const val PLAY_SPINNER_DELAY_MS = 250L
