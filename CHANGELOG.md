@@ -33,7 +33,7 @@
         ([#5868](https://github.com/Automattic/pocket-casts-android/pull/5868))
     *   Keep the Playback Effects icon visible on the Now Playing screen when a podcast's colours haven't loaded yet
         ([#5877](https://github.com/Automattic/pocket-casts-android/pull/5877))
-    *   Show the bookmark details play control as a time button in the header and open the episode when its artwork is tapped
+    *   Show the bookmark details play control as a time button in the header and open the episode when its artwork or title is tapped
         ([#5946](https://github.com/Automattic/pocket-casts-android/pull/5946))
 
 8.20

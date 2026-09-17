@@ -8,6 +8,9 @@ import android.widget.Toast
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -124,7 +127,10 @@ class BookmarkDetailFragment : BaseDialogFragment() {
     ) = contentWithoutConsumedInsets {
         val hasTranscript = args.passage != null && FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS)
         LaunchedEffect(Unit) { viewModel.load(args.episodeUuid, args.podcastUuid, args.passage, args.passageLocation) }
-        DialogBox(fillMaxHeight = hasTranscript) {
+        DialogBox(
+            fillMaxHeight = hasTranscript,
+            modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection()),
+        ) {
             val resolving by isResolving.collectAsState()
             val transcriptState by viewModel.transcriptState.collectAsState()
             BookmarkDetailPage(
@@ -137,14 +143,14 @@ class BookmarkDetailFragment : BaseDialogFragment() {
                 isResolving = resolving,
                 onPlayClick = ::onPlayClick,
                 onClose = { dismiss() },
-                onArtworkClick = ::onArtworkClick,
+                onEpisodeClick = ::onEpisodeClick,
                 passage = args.passage,
                 transcriptState = transcriptState,
             )
         }
     }
 
-    private fun onArtworkClick() {
+    private fun onEpisodeClick() {
         if (args.sourceView == SourceView.EPISODE_DETAILS) {
             dismiss()
             return

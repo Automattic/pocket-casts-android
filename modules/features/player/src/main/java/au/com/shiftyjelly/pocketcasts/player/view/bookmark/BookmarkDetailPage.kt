@@ -36,6 +36,7 @@ import au.com.shiftyjelly.pocketcasts.compose.buttons.TimePlayButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.TimePlayButtonColors
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
@@ -56,7 +57,7 @@ internal fun BookmarkDetailPage(
     isResolving: Boolean,
     onPlayClick: () -> Unit,
     onClose: () -> Unit,
-    onArtworkClick: () -> Unit,
+    onEpisodeClick: () -> Unit,
     modifier: Modifier = Modifier,
     passage: String? = null,
     transcriptState: BookmarkDetailViewModel.TranscriptState = BookmarkDetailViewModel.TranscriptState.None,
@@ -118,36 +119,41 @@ internal fun BookmarkDetailPage(
             Row(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                PodcastImage(
-                    uuid = podcastUuid,
-                    imageSize = 56.dp,
-                    cornerSize = 8.dp,
-                    elevation = null,
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
-                        .clip(RoundedCornerShape(8.dp))
-                        .clickable(onClickLabel = stringResource(LR.string.go_to_episode), onClick = onArtworkClick),
-                )
-
-                Spacer(modifier = Modifier.width(12.dp))
-
-                Column(
-                    modifier = Modifier.weight(1f),
+                        .weight(1f)
+                        .clickable(onClickLabel = stringResource(LR.string.go_to_episode), onClick = onEpisodeClick),
                 ) {
-                    if (podcastTitle.isNotEmpty()) {
-                        TextH70(
-                            text = podcastTitle,
-                            color = colors.secondaryText,
-                            maxLines = 1,
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                    }
+                    PodcastImage(
+                        uuid = podcastUuid,
+                        imageSize = 56.dp,
+                        cornerSize = 8.dp,
+                        elevation = null,
+                        modifier = Modifier.clip(RoundedCornerShape(8.dp)),
+                    )
 
-                    if (episodeTitle.isNotEmpty()) {
-                        TextH70(
-                            text = episodeTitle,
-                            color = colors.primaryText,
-                            maxLines = 2,
-                        )
+                    Spacer(modifier = Modifier.width(12.dp))
+
+                    Column(
+                        modifier = Modifier.weight(1f),
+                    ) {
+                        if (podcastTitle.isNotEmpty()) {
+                            TextH70(
+                                text = podcastTitle,
+                                color = colors.secondaryText,
+                                maxLines = 1,
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                        }
+
+                        if (episodeTitle.isNotEmpty()) {
+                            TextH50(
+                                text = episodeTitle,
+                                color = colors.primaryText,
+                                maxLines = 2,
+                            )
+                        }
                     }
                 }
 
@@ -306,7 +312,7 @@ private fun BookmarkDetailPagePreview(
             isResolving = false,
             onPlayClick = {},
             onClose = {},
-            onArtworkClick = {},
+            onEpisodeClick = {},
         )
     }
 }
@@ -328,7 +334,7 @@ private fun BookmarkDetailPageTranscriptPreview(
             isResolving = false,
             onPlayClick = {},
             onClose = {},
-            onArtworkClick = {},
+            onEpisodeClick = {},
             passage = "Lorem ipsum",
             transcriptState = BookmarkDetailViewModel.TranscriptState.Loaded(
                 transcript = transcript,
