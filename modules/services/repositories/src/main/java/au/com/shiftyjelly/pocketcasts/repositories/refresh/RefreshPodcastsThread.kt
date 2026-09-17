@@ -233,14 +233,23 @@ class RefreshPodcastsThread(
             for (uuid in addedEpisodes.episodeUuidsAdded) {
                 LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "New podcast episode received: $uuid")
             }
-            val isEnqueued = runBlocking {
-                val episodes = autoDownloadProvider.getAll(pendingAutoDownloadEpisodes.all())
-                val enqueueJob = downloadQueue.enqueueAll(episodes, DownloadType.Automatic(bypassAutoDownloadStatus = false), SourceView.AUTO_DOWNLOAD)
-                enqueueJob.join()
-                !enqueueJob.isCancelled
+            val interruptedEpisodeUuids = if (emptyResponse) {
+                emptyList()
+            } else {
+                pendingAutoDownloadEpisodes.all() - addedEpisodes.episodeUuidsAdded.toSet()
             }
-            if (isEnqueued) {
-                pendingAutoDownloadEpisodes.clear()
+            if (interruptedEpisodeUuids.isNotEmpty()) {
+                LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Auto downloading ${interruptedEpisodeUuids.size} episodes missed by an interrupted refresh")
+            }
+            val episodeUuids = interruptedEpisodeUuids + addedEpisodes.episodeUuidsAdded
+            runBlocking {
+                val episodes = autoDownloadProvider.getAll(episodeUuids)
+                downloadQueue.enqueueAll(episodes, DownloadType.Automatic(bypassAutoDownloadStatus = false), SourceView.AUTO_DOWNLOAD)
+                    .invokeOnCompletion { error ->
+                        if (error == null) {
+                            pendingAutoDownloadEpisodes.remove(episodeUuids)
+                        }
+                    }
             }
         }
         LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh - auto download check - $autoDownloadDuration")
