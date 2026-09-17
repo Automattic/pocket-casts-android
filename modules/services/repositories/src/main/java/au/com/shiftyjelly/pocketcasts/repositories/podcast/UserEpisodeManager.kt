@@ -53,7 +53,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlowable
 import kotlinx.coroutines.rx2.await
+import kotlinx.coroutines.rx2.awaitSingleOrNull
 import kotlinx.coroutines.rx2.rxCompletable
+import kotlinx.coroutines.rx2.rxMaybe
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import timber.log.Timber
@@ -223,8 +225,8 @@ class UserEpisodeManagerImpl @Inject constructor(
         return userEpisodeDao.findEpisodeFlow(uuid)
     }
 
-    override fun findEpisodeByUuidRxMaybe(uuid: String): Maybe<UserEpisode> {
-        return userEpisodeDao.findEpisodeByUuidRxMaybe(uuid)
+    override fun findEpisodeByUuidRxMaybe(uuid: String): Maybe<UserEpisode> = rxMaybe(Dispatchers.IO) {
+        userEpisodeDao.findEpisodeByUuid(uuid)
     }
 
     override suspend fun findEpisodeByUuid(uuid: String): UserEpisode? {
@@ -235,24 +237,18 @@ class UserEpisodeManagerImpl @Inject constructor(
         return userEpisodeDao.findEpisodesByUuids(episodeUuids)
     }
 
-    override fun downloadMissingUserEpisodeRxMaybe(uuid: String, placeholderTitle: String?, placeholderPublished: Date?): Maybe<UserEpisode> {
-        val missingEpisode = UserEpisode(uuid = uuid, title = placeholderTitle ?: "Unable to find episode", publishedDate = placeholderPublished ?: Date(), serverStatus = UserEpisodeServerStatus.MISSING)
-        val replaceEpisodeWithSubstitute = userEpisodeDao.insertRxCompletable(missingEpisode).andThen(userEpisodeDao.findEpisodeByUuidRxMaybe(uuid))
+    override fun downloadMissingUserEpisodeRxMaybe(uuid: String, placeholderTitle: String?, placeholderPublished: Date?): Maybe<UserEpisode> = rxMaybe(Dispatchers.IO) {
+        val existingEpisode = userEpisodeDao.findEpisodeByUuid(uuid)
+        // A file already marked as missing is worth re-downloading, so treat it as if it were absent
+        if (existingEpisode != null && existingEpisode.serverStatus != UserEpisodeServerStatus.MISSING) {
+            return@rxMaybe existingEpisode
+        }
 
-        val downloadMissingEpisode = syncManager.getUserEpisodeRxMaybe(uuid)
-            .flatMap {
-                userEpisodeDao.insertRxCompletable(it.toUserEpisode()).andThen(userEpisodeDao.findEpisodeByUuidRxMaybe(uuid))
-            }.switchIfEmpty(replaceEpisodeWithSubstitute)
-
-        return userEpisodeDao.findEpisodeByUuidRxMaybe(uuid)
-            .flatMap {
-                if (it.serverStatus == UserEpisodeServerStatus.MISSING) {
-                    Maybe.empty() // We want to attempt to redownload missing files so we mark as not found
-                } else {
-                    Maybe.just(it)
-                }
-            }
-            .switchIfEmpty(downloadMissingEpisode)
+        val serverFile = syncManager.getUserEpisodeRxMaybe(uuid).awaitSingleOrNull()
+        val episode = serverFile?.toUserEpisode()
+            ?: UserEpisode(uuid = uuid, title = placeholderTitle ?: "Unable to find episode", publishedDate = placeholderPublished ?: Date(), serverStatus = UserEpisodeServerStatus.MISSING)
+        userEpisodeDao.insertOrReplace(episode)
+        userEpisodeDao.findEpisodeByUuid(uuid)
     }
 
     override fun syncFilesInBackground(playbackManager: PlaybackManager) {
@@ -440,8 +436,10 @@ class UserEpisodeManagerImpl @Inject constructor(
             Completable.complete()
         }
 
-        return userEpisodeDao.updateServerStatusRxCompletable(userEpisode.uuid, UserEpisodeServerStatus.UPLOADING)
-            .andThen(userEpisodeDao.updateUploadErrorRxCompetable(userEpisode.uuid, null))
+        return rxCompletable {
+            userEpisodeDao.updateServerStatus(userEpisode.uuid, UserEpisodeServerStatus.UPLOADING)
+            userEpisodeDao.updateUploadError(userEpisode.uuid, null)
+        }
             .andThen(syncManager.uploadFileToServerRxCompletable(userEpisode))
             .andThen(imageUploadTask)
             // let the file upload report to upload to the api server
@@ -460,14 +458,18 @@ class UserEpisodeManagerImpl @Inject constructor(
                                     episodeUuid = userEpisode.uuid,
                                 ),
                             )
-                            userEpisodeDao.updateServerStatusRxCompletable(userEpisode.uuid, serverStatus = UserEpisodeServerStatus.UPLOADED)
+                            rxCompletable {
+                                userEpisodeDao.updateServerStatus(userEpisode.uuid, serverStatus = UserEpisodeServerStatus.UPLOADED)
+                            }
                         } else {
                             eventHorizon.track(
                                 EpisodeUploadFailedEvent(
                                     episodeUuid = userEpisode.uuid,
                                 ),
                             )
-                            userEpisodeDao.updateUploadErrorRxCompetable(userEpisode.uuid, "Upload failed")
+                            rxCompletable {
+                                userEpisodeDao.updateUploadError(userEpisode.uuid, "Upload failed")
+                            }
                         }
                     },
             )
