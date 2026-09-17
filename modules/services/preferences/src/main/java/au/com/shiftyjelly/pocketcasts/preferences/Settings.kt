@@ -400,6 +400,7 @@ interface Settings {
     val autoDownloadUpNext: ReadWriteSetting<Boolean>
     val autoDownloadOnFollowPodcast: UserSetting<Boolean>
     val autoDownloadNewEpisodes: ReadWriteSetting<Int>
+    val pendingAutoDownloadEpisodeUuids: ReadWriteSetting<List<String>>
 
     val artworkConfiguration: UserSetting<ArtworkConfiguration>
 
