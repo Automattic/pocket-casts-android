@@ -30,6 +30,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.R
 import au.com.shiftyjelly.pocketcasts.repositories.download.AutoDownloadEpisodeProvider
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadQueue
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadType
+import au.com.shiftyjelly.pocketcasts.repositories.download.PendingAutoDownloadEpisodes
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
@@ -88,6 +89,7 @@ class RefreshPodcastsThread(
         fun playbackManager(): PlaybackManager
         fun episodeManager(): EpisodeManager
         fun autoDownloadProvider(): AutoDownloadEpisodeProvider
+        fun pendingAutoDownloadEpisodes(): PendingAutoDownloadEpisodes
         fun downloadQueue(): DownloadQueue
         fun notificationHelper(): NotificationHelper
         fun userManager(): UserManager
@@ -196,6 +198,7 @@ class RefreshPodcastsThread(
         val playbackManager = entryPoint.playbackManager()
         val episodeManager = entryPoint.episodeManager()
         val autoDownloadProvider = entryPoint.autoDownloadProvider()
+        val pendingAutoDownloadEpisodes = entryPoint.pendingAutoDownloadEpisodes()
         val downloadQueue = entryPoint.downloadQueue()
         val settings = entryPoint.settings()
         val notificationHelper = entryPoint.notificationHelper()
@@ -203,6 +206,7 @@ class RefreshPodcastsThread(
         val emptyResponse = result == null
         val notificationLastSeen = getNotificationLastSeen(entryPoint.settings())
         val addedEpisodes = updatePodcasts(result)
+        pendingAutoDownloadEpisodes.record(addedEpisodes.episodeUuidsAdded)
 
         val syncRefreshState = sync()
 
@@ -229,10 +233,11 @@ class RefreshPodcastsThread(
             for (uuid in addedEpisodes.episodeUuidsAdded) {
                 LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "New podcast episode received: $uuid")
             }
-            val episodes = runBlocking {
-                autoDownloadProvider.getAll(addedEpisodes.episodeUuidsAdded)
+            runBlocking {
+                val episodes = autoDownloadProvider.getAll(pendingAutoDownloadEpisodes.all())
+                downloadQueue.enqueueAll(episodes, DownloadType.Automatic(bypassAutoDownloadStatus = false), SourceView.AUTO_DOWNLOAD).join()
             }
-            downloadQueue.enqueueAll(episodes, DownloadType.Automatic(bypassAutoDownloadStatus = false), SourceView.AUTO_DOWNLOAD)
+            pendingAutoDownloadEpisodes.clear()
         }
         LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh - auto download check - $autoDownloadDuration")
 
