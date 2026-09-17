@@ -88,7 +88,6 @@ class ProfileFragment :
             },
             onReferralsTooltipClick = {
                 referralsViewModel.onTooltipClick()
-                fragmentHostListener.showBottomSheet(ReferralsGuestPassFragment.newInstance(ReferralsPageType.Send))
             },
             onReferralsTooltipShow = {
                 referralsViewModel.onTooltipShown()

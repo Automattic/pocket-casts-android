@@ -20,6 +20,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.PlaylistPlay
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.outlined.BugReport
+import androidx.compose.material.icons.outlined.CardGiftcard
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Downloading
 import androidx.compose.material.icons.outlined.EditCalendar
@@ -64,6 +65,7 @@ fun DeveloperPage(
     onResetSuggestedFoldersSuggestion: () -> Unit,
     onResetPlaylistsOnboarding: () -> Unit,
     onResetUpNextSortTooltip: () -> Unit,
+    onShowGiftTooltip: () -> Unit,
     onResetNotificationsPrompt: () -> Unit,
     onShowAppReviewPrompt: () -> Unit,
     onClearAppReviewSettings: () -> Unit,
@@ -128,6 +130,9 @@ fun DeveloperPage(
         }
         item {
             ResetUpNextSortTooltip(onClick = onResetUpNextSortTooltip)
+        }
+        item {
+            ShowGiftTooltip(onClick = onShowGiftTooltip)
         }
         item {
             TriggerPlaybackError(onClick = onTriggerPlaybackError)
@@ -382,6 +387,19 @@ private fun ResetUpNextSortTooltip(
 }
 
 @Composable
+private fun ShowGiftTooltip(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    SettingRow(
+        primaryText = "Show gift tooltip",
+        secondaryText = "Show the referrals tooltip on the gift icon again",
+        icon = rememberVectorPainter(Icons.Outlined.CardGiftcard),
+        modifier = modifier.clickable { onClick() },
+    )
+}
+
+@Composable
 private fun TriggerPlaybackError(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -466,6 +484,7 @@ private fun DeveloperPagePreview() {
         onShowNotificationsTestingClick = {},
         onResetPlaylistsOnboarding = {},
         onResetUpNextSortTooltip = {},
+        onShowGiftTooltip = {},
         onResetNotificationsPrompt = {},
         onShowAppReviewPrompt = {},
         onClearAppReviewSettings = {},
