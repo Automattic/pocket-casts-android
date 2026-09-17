@@ -81,7 +81,6 @@ fun TooltipPopup(
                         Modifier
                     },
                 )
-                // The anchor facing side has no padding so the popup window doesn't cover the anchor and eat its taps.
                 .padding(
                     start = elevationPadding,
                     top = if (isBelowAnchor) 0.dp else elevationPadding,
