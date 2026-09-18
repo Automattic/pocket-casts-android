@@ -238,7 +238,12 @@ class AppIcon @Inject constructor(
 
     val allAppIconTypes get() = AppIconType.entries
 
+    private var enabledAlias: AppIconType? = null
+
     fun enableSelectedAlias(selectedIconType: AppIconType) {
+        if (enabledAlias == selectedIconType) {
+            return
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             enableSelectedAliasAtomically(selectedIconType)
         } else {
@@ -248,6 +253,7 @@ class AppIcon @Inject constructor(
                 .filterNot { it == selectedIconType }
                 .forEach { setAliasState(it, PackageManager.COMPONENT_ENABLED_STATE_DISABLED) }
         }
+        enabledAlias = selectedIconType
     }
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
