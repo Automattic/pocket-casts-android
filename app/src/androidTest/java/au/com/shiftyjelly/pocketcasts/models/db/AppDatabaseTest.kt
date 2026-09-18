@@ -30,6 +30,7 @@ class AppDatabaseTest {
         private const val MIGRATION_DB_135_136 = "migration-test-135-136"
         private const val MIGRATION_DB_136_137 = "migration-test-136-137"
         private const val MIGRATION_DB_137_138 = "migration-test-137-138"
+        private const val MIGRATION_DB_138_139 = "migration-test-138-139"
     }
 
     @Rule @JvmField
@@ -263,6 +264,21 @@ class AppDatabaseTest {
         assertEquals("Every unedited title is backfilled from ai_title", 100000, countWhere(db, "bookmarks", "title LIKE 'AI Title %'"))
     }
 
+    @Test
+    fun migrate138To139RecreatesBumpStatsWithId() {
+        migrationTestHelper.createDatabase(MIGRATION_DB_138_139, 138).use {
+            it.execSQL(
+                "INSERT INTO bump_stats (name, event_time, custom_event_props) " +
+                    "VALUES ('pcandroid_discover_list_impression_bump', 100, '{\"list_id\":\"a\",\"category\":5}')",
+            )
+        }
+
+        val db = migrationTestHelper.runMigrationsAndValidate(MIGRATION_DB_138_139, 139, true, AppDatabase.MIGRATION_138_139)
+
+        assertEquals("id column should exist", true, tableColumns(db, "bump_stats").contains("id"))
+        assertEquals("Existing bump stats should be discarded", 0, countRows(db, "bump_stats"))
+    }
+
     private fun tableColumns(db: SupportSQLiteDatabase?, tableName: String): List<String> {
         val columns = mutableListOf<String>()
         db?.query("PRAGMA table_info($tableName)")?.use { cursor ->
@@ -380,6 +396,7 @@ class AppDatabaseTest {
                 AppDatabase.MIGRATION_135_136,
                 AppDatabase.MIGRATION_136_137,
                 AppDatabase.MIGRATION_137_138,
+                AppDatabase.MIGRATION_138_139,
             )
             .build()
         // close the database and release any stream resources when the test finishes
