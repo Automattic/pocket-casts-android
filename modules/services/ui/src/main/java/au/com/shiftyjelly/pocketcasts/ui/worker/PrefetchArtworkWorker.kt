@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.ui.worker
 
 import android.content.Context
 import androidx.hilt.work.HiltWorker
-import androidx.work.BackoffPolicy
 import androidx.work.Constraints
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingPeriodicWorkPolicy
@@ -43,7 +42,6 @@ class PrefetchArtworkWorker @AssistedInject constructor(
 ) : CoroutineWorker(context, params) {
 
     companion object {
-        private const val MAX_RETRY_ATTEMPTS = 5
         private const val WORK_NAME = "PrefetchArtworkWorkerPeriodic"
 
         fun enqueuePeriodicWork(context: Context, settings: Settings) {
@@ -64,7 +62,6 @@ class PrefetchArtworkWorker @AssistedInject constructor(
                         .setRequiresStorageNotLow(true)
                         .build(),
                 )
-                .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 10, TimeUnit.MINUTES)
                 .build()
         }
     }
@@ -109,27 +106,17 @@ class PrefetchArtworkWorker @AssistedInject constructor(
             throw e
         } catch (e: Exception) {
             LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, e, "Failed to prefetch podcast artwork.")
-            return retryOrResumeDailySchedule()
+            return Result.success()
         }
+        // Artwork that stays missing is retried by the next daily run. Backing off within a run
+        // would re-walk the whole library every day for any podcast whose artwork is simply gone.
         LogBuffer.i(
             LogBuffer.TAG_BACKGROUND_TASKS,
-            "Prefetched $fetched missing podcast artwork images ($failed failed).",
+            "Prefetched $fetched missing podcast artwork images ($failed failed). " +
+                "Cache ${diskCache.size / BYTES_PER_MB}MB of ${diskCache.maxSize / BYTES_PER_MB}MB.",
         )
-        // Retry with backoff so the cache heals shortly after connectivity or the CDN recovers,
-        // instead of waiting for the next periodic run. Stop retrying after a few attempts so a
-        // permanently missing image doesn't prevent the normal daily schedule from resuming.
-        return if (failed > 0) retryOrResumeDailySchedule() else Result.success()
-    }
-
-    private fun retryOrResumeDailySchedule(): Result {
-        return if (runAttemptCount < MAX_RETRY_ATTEMPTS) {
-            Result.retry()
-        } else {
-            LogBuffer.w(
-                LogBuffer.TAG_BACKGROUND_TASKS,
-                "Artwork prefetch failed after $MAX_RETRY_ATTEMPTS retries. Resuming the daily schedule.",
-            )
-            Result.success()
-        }
+        return Result.success()
     }
 }
+
+private const val BYTES_PER_MB = 1024 * 1024

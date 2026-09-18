@@ -37,7 +37,6 @@ class RefreshArtworkWorker @AssistedInject constructor(
 ) : CoroutineWorker(context, params) {
 
     companion object {
-        private const val MAX_RETRY_ATTEMPTS = 5
         private const val WORK_NAME = "RefreshArtworkWorker"
 
         fun start(context: Context) {
@@ -57,7 +56,6 @@ class RefreshArtworkWorker @AssistedInject constructor(
         var failed = 0
         withContext(Dispatchers.IO) {
             val podcasts = podcastManager.findSubscribedNoOrder()
-            colorManager.updateColors(podcasts)
             val isWearOs = Util.isWearOs(applicationContext)
             for (podcast in podcasts) {
                 for (url in PodcastImage.getArtworkUrls(uuid = podcast.uuid, isWearOS = isWearOs)) {
@@ -87,28 +85,14 @@ class RefreshArtworkWorker @AssistedInject constructor(
             }
             // Cleared last so live screens cannot repopulate it from the entries being replaced.
             coilManager.clearMemoryCache()
+            colorManager.updateColors(podcasts)
         }
 
-        val summary =
-            "Artwork refresh attempt ${runAttemptCount + 1}: $successful image requests succeeded ($failed failed)."
-        return when {
-            failed == 0 || successful > 0 -> {
-                LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, summary)
-                Result.success()
-            }
-
-            runAttemptCount < MAX_RETRY_ATTEMPTS -> {
-                LogBuffer.w(LogBuffer.TAG_BACKGROUND_TASKS, "$summary Retrying.")
-                Result.retry()
-            }
-
-            else -> {
-                LogBuffer.w(
-                    LogBuffer.TAG_BACKGROUND_TASKS,
-                    "$summary Giving up after $MAX_RETRY_ATTEMPTS retries.",
-                )
-                Result.failure()
-            }
-        }
+        // Nothing is lost when a request fails, so there is nothing to retry; the user can refresh again.
+        LogBuffer.i(
+            LogBuffer.TAG_BACKGROUND_TASKS,
+            "Artwork refresh: $successful image requests succeeded ($failed failed).",
+        )
+        return Result.success()
     }
 }

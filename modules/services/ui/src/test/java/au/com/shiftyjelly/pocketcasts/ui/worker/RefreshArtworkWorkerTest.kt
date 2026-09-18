@@ -125,17 +125,15 @@ class RefreshArtworkWorkerTest {
     }
 
     @Test
-    fun `persistent artwork failure stops retrying at the limit`() = runTest {
+    fun `a total artwork outage still finishes instead of retrying`() = runTest {
         val podcast = Podcast(uuid = "podcast-uuid")
         whenever(podcastManager.findSubscribedNoOrder()).doReturn(listOf(podcast))
         whenever(imageLoader.execute(any())).thenThrow(IllegalStateException("Artwork loader unavailable"))
 
-        val retryResult = buildWorker(runAttemptCount = 4).doWork()
-        val finalResult = buildWorker(runAttemptCount = 5).doWork()
+        val result = buildWorker().doWork()
 
-        assertTrue(retryResult is ListenableWorker.Result.Retry)
-        assertTrue(finalResult is ListenableWorker.Result.Failure)
-        verify(imageLoader, times(6)).execute(any())
+        assertTrue(result is ListenableWorker.Result.Success)
+        verify(imageLoader, times(3)).execute(any())
     }
 
     @Test

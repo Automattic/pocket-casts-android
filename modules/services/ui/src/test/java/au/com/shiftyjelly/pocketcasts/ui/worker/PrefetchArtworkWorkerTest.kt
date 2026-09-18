@@ -69,7 +69,7 @@ class PrefetchArtworkWorkerTest {
     }
 
     @Test
-    fun `selective network failure retries only the missing artwork`() = runTest {
+    fun `the next run fetches only the artwork that is still missing`() = runTest {
         val urls = setUpPodcast()
         val failedUrl = urls.first()
         val snapshot = mock<DiskCache.Snapshot>()
@@ -92,7 +92,7 @@ class PrefetchArtworkWorkerTest {
 
         val firstResult = buildWorker().doWork()
 
-        assertTrue(firstResult is ListenableWorker.Result.Retry)
+        assertTrue(firstResult is ListenableWorker.Result.Success)
         val requestCaptor = argumentCaptor<ImageRequest>()
         verify(imageLoader, times(urls.size)).execute(requestCaptor.capture())
         assertEquals(urls, requestCaptor.allValues.map { it.data.toString() })
@@ -112,48 +112,37 @@ class PrefetchArtworkWorkerTest {
     }
 
     @Test
-    fun `successful network result retries when disk write failed`() = runTest {
+    fun `a successful fetch that never reached disk is counted as failed`() = runTest {
         val urls = setUpPodcast()
         whenever(diskCache.openSnapshot(any())).thenReturn(null)
         whenever(imageLoader.execute(any())).thenReturn(mock())
 
         val result = buildWorker().doWork()
 
-        assertTrue(result is ListenableWorker.Result.Retry)
+        assertTrue(result is ListenableWorker.Result.Success)
         verify(imageLoader, times(urls.size)).execute(any())
         verify(diskCache, times(urls.size * 2)).openSnapshot(any())
     }
 
     @Test
-    fun `permanent failures stop retrying after the limit`() = runTest {
+    fun `artwork that is permanently gone waits for the next daily run`() = runTest {
         val urls = setUpPodcast()
         whenever(diskCache.openSnapshot(any())).thenReturn(null)
         whenever(imageLoader.execute(any())).thenAnswer { invocation ->
             errorResult(invocation.getArgument(0))
         }
 
-        val retryResult = buildWorker(runAttemptCount = 4).doWork()
-        val finalResult = buildWorker(runAttemptCount = 5).doWork()
+        val result = buildWorker().doWork()
 
-        assertTrue(retryResult is ListenableWorker.Result.Retry)
-        assertTrue(finalResult is ListenableWorker.Result.Success)
-        verify(imageLoader, times(urls.size * 2)).execute(any())
+        assertTrue(result is ListenableWorker.Result.Success)
+        verify(imageLoader, times(urls.size)).execute(any())
     }
 
     @Test
-    fun `unexpected failure is retried`() = runTest {
+    fun `unexpected failure waits for the next daily run`() = runTest {
         whenever(podcastManager.findSubscribedNoOrder()).doThrow(IOException("Database unavailable"))
 
-        val result = buildWorker(runAttemptCount = 4).doWork()
-
-        assertTrue(result is ListenableWorker.Result.Retry)
-    }
-
-    @Test
-    fun `unexpected failure stops retrying after the limit`() = runTest {
-        whenever(podcastManager.findSubscribedNoOrder()).doThrow(IOException("Database unavailable"))
-
-        val result = buildWorker(runAttemptCount = 5).doWork()
+        val result = buildWorker().doWork()
 
         assertTrue(result is ListenableWorker.Result.Success)
     }
