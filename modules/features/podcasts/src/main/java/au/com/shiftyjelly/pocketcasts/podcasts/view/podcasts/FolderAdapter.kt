@@ -79,7 +79,7 @@ class FolderAdapter(
                 val podcastGridLayout = settings.podcastGridLayout.value
                 PodcastViewHolder(
                     view,
-                    imageRequestFactory.copy(cornerRadius = 4, showErrorPlaceholder = isLayoutListView),
+                    imageRequestFactory.copy(cornerRadius = 4, showErrorPlaceholder = true),
                     podcastGridLayout,
                     theme,
                 )
