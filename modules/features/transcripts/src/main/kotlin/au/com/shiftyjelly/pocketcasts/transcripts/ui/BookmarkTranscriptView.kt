@@ -39,6 +39,11 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
@@ -60,6 +65,7 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
 import au.com.shiftyjelly.pocketcasts.images.R as IR
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 /**
  * Renders a [BookmarkTranscript] with the bookmarked [passage] highlighted in the primary text
@@ -113,6 +119,12 @@ fun BookmarkTranscriptView(
         }
     }
 
+    val selectionDescription = if (passage != null) {
+        stringResource(LR.string.bookmark_edit_transcript_selection, transcript.displaySubstring(passage))
+    } else {
+        stringResource(LR.string.bookmark_edit_transcript_subtitle)
+    }
+
     Column(
         modifier = modifier
             .onSizeChanged { viewportHeight = it.height }
@@ -127,10 +139,14 @@ fun BookmarkTranscriptView(
                 onTextLayout = { layout = it },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(ContentPadding)
+                    .padding(if (editable) EditContentPadding else ContentPadding)
                     .then(
                         if (editable) {
                             Modifier
+                                .semantics {
+                                    stateDescription = selectionDescription
+                                    liveRegion = LiveRegionMode.Polite
+                                }
                                 .pointerInput(transcript) {
                                     detectTapGestures { position ->
                                         val result = currentLayout ?: return@detectTapGestures
@@ -183,7 +199,7 @@ fun BookmarkTranscriptView(
                             .offset {
                                 IntOffset(
                                     x = ((Gutter - GlyphBox) / 2).roundToPx(),
-                                    y = (ContentPadding.calculateTopPadding().toPx() + glyphBox.top + (glyphBox.height - GlyphBox.toPx()) / 2f).roundToInt(),
+                                    y = (TopFade.toPx() + glyphBox.top + (glyphBox.height - GlyphBox.toPx()) / 2f).roundToInt(),
                                 )
                             },
                     )
@@ -197,7 +213,7 @@ fun BookmarkTranscriptView(
         if (!scrollToPassage || passage == null || viewportHeight == 0 || passage == scrolledPassage) return@LaunchedEffect
         if (editable && hasScrolled) return@LaunchedEffect
         val box = result.getBoundingBox(passage.start.coerceIn(0, transcript.displayText.length.coerceAtLeast(1) - 1))
-        val topPadding = with(density) { ContentPadding.calculateTopPadding().toPx() }
+        val topPadding = with(density) { TopFade.toPx() }
         val target = (box.top + topPadding - viewportHeight * anchorFraction + box.height / 2).roundToInt()
         scrollState.scrollTo(target.coerceIn(0, scrollState.maxValue))
         scrolledPassage = passage
@@ -223,10 +239,11 @@ private val SpeakerSpanStyle = SpanStyle(
 private val Gutter = 28.dp
 private val GlyphBox = 24.dp
 
-private val ContentPadding = PaddingValues(start = Gutter, end = Gutter, top = 48.dp, bottom = 64.dp)
-
 private val TopFade = 48.dp
 private val BottomFade = 64.dp
+
+private val ContentPadding = PaddingValues(start = Gutter, end = Gutter, top = TopFade, bottom = BottomFade)
+private val EditContentPadding = PaddingValues(start = Gutter, end = Gutter, top = TopFade, bottom = 0.dp)
 
 private val FadeInThresholdMs = 200L
 
