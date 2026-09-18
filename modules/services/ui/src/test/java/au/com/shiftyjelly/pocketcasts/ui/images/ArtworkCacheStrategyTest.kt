@@ -28,9 +28,9 @@ class ArtworkCacheStrategyTest {
     }
 
     @Test
-    fun `responses coil would otherwise cache are not allowed to replace artwork`() = runTest {
-        for (code in listOf(300, 301, 404, 405, 410, 414, 501)) {
-            val result = strategy.write(NetworkResponse(code = 200), request, NetworkResponse(code = code), options)
+    fun `error codes coil would otherwise cache are never written`() = runTest {
+        for (code in COIL_CACHEABLE_ERROR_CODES) {
+            val result = strategy.write(null, request, NetworkResponse(code = code), options)
 
             assertEquals("HTTP $code must not be written to the disk cache", CacheStrategy.WriteResult.DISABLED, result)
         }
@@ -51,5 +51,19 @@ class ArtworkCacheStrategyTest {
 
         assertSame(cached, result.response)
         assertEquals(null, result.request)
+    }
+
+    @Test
+    fun `errors cached by an earlier version are re-requested instead of replayed`() = runTest {
+        for (code in COIL_CACHEABLE_ERROR_CODES) {
+            val result = strategy.read(NetworkResponse(code = code), request, options)
+
+            assertSame("HTTP $code must be re-requested, not served from disk", request, result.request)
+            assertEquals(null, result.response)
+        }
+    }
+
+    private companion object {
+        val COIL_CACHEABLE_ERROR_CODES = listOf(300, 301, 404, 405, 410, 414, 501)
     }
 }

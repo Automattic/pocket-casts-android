@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.ui.worker
 
 import android.content.Context
 import androidx.hilt.work.HiltWorker
-import androidx.work.BackoffPolicy
 import androidx.work.Constraints
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingPeriodicWorkPolicy
@@ -64,9 +63,6 @@ class PrefetchArtworkWorker @AssistedInject constructor(
                         .setRequiresStorageNotLow(true)
                         .build(),
                 )
-                // Nothing returns Result.retry(), but this also paces the reschedule after the
-                // system interrupts a run, where the default is 30 seconds.
-                .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 10, TimeUnit.MINUTES)
                 .build()
         }
     }

@@ -7,23 +7,23 @@ import coil3.network.NetworkResponse
 import coil3.request.Options
 
 /**
- * Coil caches 404, 410 and other error responses by default, which replaces a good cover with an
- * error that is then replayed from disk on every later load. Only successful responses are stored,
- * so a failing artwork server can never evict artwork the app already has.
+ * Coil caches 404, 410 and a few other error codes by default and then replays them from disk on
+ * every later load, so a cover that failed once stays broken even after the server recovers. Error
+ * responses are not stored, and any that a previous version already stored are re-requested.
  */
 @OptIn(ExperimentalCoilApi::class)
 internal class ArtworkCacheStrategy : CacheStrategy {
 
-    // Unconditional, so Coil never sends a validator and [write] can never see a 304. Adding
-    // revalidation here obliges [write] to return the 304 with a null body, otherwise Coil re-runs
-    // the request and then fails to decode the empty body.
     override suspend fun read(
         cacheResponse: NetworkResponse,
         networkRequest: NetworkRequest,
         options: Options,
-    ) = CacheStrategy.ReadResult(cacheResponse)
+    ) = if (cacheResponse.code in HTTP_SUCCESS_RANGE) {
+        CacheStrategy.ReadResult(cacheResponse)
+    } else {
+        CacheStrategy.ReadResult(networkRequest)
+    }
 
-    // Only reached for codes Coil obtained from the network; see [read] before widening this set.
     override suspend fun write(
         cacheResponse: NetworkResponse?,
         networkRequest: NetworkRequest,
