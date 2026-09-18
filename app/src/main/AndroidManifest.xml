@@ -343,7 +343,6 @@
                 <data android:path="/get"/>
                 <data android:pathPrefix="/get/"/>
             </intent-filter>
-
         </activity>
 
         <activity-alias
