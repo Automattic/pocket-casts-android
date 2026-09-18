@@ -36,7 +36,7 @@ class DeviceApproveFragment : BaseDialogFragment() {
             viewModel.onShown()
         }
 
-        DialogBox(fillMaxHeight = false) {
+        DialogBox {
             DeviceApprovePage(
                 state = state,
                 onConnect = viewModel::connect,
@@ -44,6 +44,7 @@ class DeviceApproveFragment : BaseDialogFragment() {
                     viewModel.onSetupAccountTapped()
                     OnboardingLauncher.openOnboardingFlow(requireActivity(), OnboardingFlow.DeviceApproval)
                 },
+                onSwitchAccount = {},
                 onDone = ::finishAfterApproval,
                 onClose = ::dismiss,
             )

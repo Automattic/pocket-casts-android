@@ -3,12 +3,14 @@ package au.com.shiftyjelly.pocketcasts.account.deviceapprove
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -32,7 +34,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.bottomsheet.Pill
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
@@ -55,6 +56,7 @@ fun DeviceApprovePage(
     state: DeviceApproveUiState,
     onConnect: () -> Unit,
     onSetUpAccount: () -> Unit,
+    onSwitchAccount: () -> Unit,
     onDone: () -> Unit,
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
@@ -62,14 +64,10 @@ fun DeviceApprovePage(
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
-            .fillMaxWidth()
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = 24.dp, vertical = 16.dp),
+            .fillMaxSize()
+            .padding(top = 16.dp),
     ) {
         Pill()
-        Spacer(Modifier.height(24.dp))
-        PairingBadges()
-        Spacer(Modifier.height(24.dp))
         when (state.status) {
             DeviceApproveStatus.Approved -> ResultContent(
                 title = stringResource(LR.string.device_approve_success_title),
@@ -96,6 +94,7 @@ fun DeviceApprovePage(
                 state = state,
                 onConnect = onConnect,
                 onSetUpAccount = onSetUpAccount,
+                onSwitchAccount = onSwitchAccount,
             )
         }
     }
@@ -106,25 +105,22 @@ private fun ColumnScope.ApproveContent(
     state: DeviceApproveUiState,
     onConnect: () -> Unit,
     onSetUpAccount: () -> Unit,
+    onSwitchAccount: () -> Unit,
 ) {
-    TextH20(
-        text = stringResource(LR.string.device_approve_title),
-        textAlign = TextAlign.Center,
-    )
-    Spacer(Modifier.height(8.dp))
-    TextP40(
-        text = stringResource(
+    PairingBody(
+        title = stringResource(LR.string.device_approve_title),
+        message = stringResource(
             if (state.isLoggedIn) LR.string.device_approve_description else LR.string.device_approve_login_required,
         ),
-        color = MaterialTheme.theme.colors.primaryText02,
-        textAlign = TextAlign.Center,
-    )
-    Spacer(Modifier.height(24.dp))
+    ) {
+        if (state.isLoggedIn) {
+            Spacer(Modifier.height(24.dp))
+            AccountCard(email = state.email.orEmpty())
+            Spacer(Modifier.height(16.dp))
+            SwitchAccountLink(onClick = onSwitchAccount)
+        }
+    }
     if (state.isLoggedIn) {
-        AccountCard(email = state.email.orEmpty())
-        Spacer(Modifier.height(16.dp))
-        CodeChip(code = state.userCode)
-        Spacer(Modifier.height(24.dp))
         RowLoadingButton(
             text = stringResource(LR.string.device_approve_connect),
             isLoading = state.status == DeviceApproveStatus.Submitting,
@@ -136,6 +132,47 @@ private fun ColumnScope.ApproveContent(
             onClick = onSetUpAccount,
         )
     }
+}
+
+@Composable
+private fun ColumnScope.PairingBody(
+    title: String,
+    message: String,
+    content: @Composable ColumnScope.() -> Unit = {},
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+        modifier = Modifier
+            .weight(1f)
+            .fillMaxWidth()
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 16.dp),
+    ) {
+        PairingBadges()
+        Spacer(Modifier.height(24.dp))
+        TextH20(text = title, textAlign = TextAlign.Center)
+        Spacer(Modifier.height(8.dp))
+        TextP40(
+            text = message,
+            color = MaterialTheme.theme.colors.primaryText02,
+            textAlign = TextAlign.Center,
+        )
+        content()
+    }
+}
+
+@Composable
+private fun SwitchAccountLink(onClick: () -> Unit) {
+    TextP40(
+        text = stringResource(LR.string.device_approve_switch_account),
+        color = MaterialTheme.theme.colors.primaryInteractive01,
+        textAlign = TextAlign.Center,
+        modifier = Modifier
+            .clip(RoundedCornerShape(8.dp))
+            .clickable(onClick = onClick)
+            .padding(horizontal = 12.dp, vertical = 8.dp),
+    )
 }
 
 @Composable
@@ -198,7 +235,7 @@ private fun AccountCard(email: String) {
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .background(MaterialTheme.theme.colors.primaryUi06)
+            .background(MaterialTheme.theme.colors.primaryUi02)
             .border(1.dp, MaterialTheme.theme.colors.primaryUi05, RoundedCornerShape(12.dp))
             .padding(16.dp),
     ) {
@@ -219,35 +256,13 @@ private fun AccountCard(email: String) {
 }
 
 @Composable
-private fun CodeChip(code: String) {
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
-            .background(MaterialTheme.theme.colors.primaryUi06)
-            .border(1.dp, MaterialTheme.theme.colors.primaryUi05, RoundedCornerShape(12.dp))
-            .padding(vertical = 16.dp),
-    ) {
-        TextH20(text = code, letterSpacing = 4.sp)
-    }
-}
-
-@Composable
 private fun ColumnScope.ResultContent(
     title: String,
     message: String,
     buttonText: String,
     onButtonClick: () -> Unit,
 ) {
-    TextH20(text = title, textAlign = TextAlign.Center)
-    Spacer(Modifier.height(8.dp))
-    TextP40(
-        text = message,
-        color = MaterialTheme.theme.colors.primaryText02,
-        textAlign = TextAlign.Center,
-    )
-    Spacer(Modifier.height(24.dp))
+    PairingBody(title = title, message = message)
     RowButton(text = buttonText, onClick = onButtonClick)
 }
 
@@ -261,6 +276,7 @@ private fun DeviceApprovePageLoggedInPreview(
             state = DeviceApproveUiState(userCode = "ABCD12", isLoggedIn = true, email = "user@example.com"),
             onConnect = {},
             onSetUpAccount = {},
+            onSwitchAccount = {},
             onDone = {},
             onClose = {},
         )
@@ -277,6 +293,7 @@ private fun DeviceApprovePageLoggedOutPreview(
             state = DeviceApproveUiState(userCode = "ABCD12", isLoggedIn = false),
             onConnect = {},
             onSetUpAccount = {},
+            onSwitchAccount = {},
             onDone = {},
             onClose = {},
         )
