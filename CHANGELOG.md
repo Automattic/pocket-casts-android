@@ -4,6 +4,8 @@
     *   Log in to the Wear OS app by scanning a QR code with your phone or entering a code on the web
         ([#5964](https://github.com/Automattic/pocket-casts-android/pull/5964))
 *   Bug Fixes
+    *   Name Google TV on the screen that appears when you pair a TV by scanning its QR code
+        ([#6019](https://github.com/Automattic/pocket-casts-android/pull/6019))
     *   Show every matching folder in search results instead of only the last one
         ([#5953](https://github.com/Automattic/pocket-casts-android/pull/5953))
     *   Show the correct play or pause button for User Files
