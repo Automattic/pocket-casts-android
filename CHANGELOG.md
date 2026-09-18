@@ -14,6 +14,8 @@
         ([#6005](https://github.com/Automattic/pocket-casts-android/pull/6005))
     *   Confirm playlist removals and mixed changes after adding episodes to playlists, not only additions
         ([#5632](https://github.com/Automattic/pocket-casts-android/pull/5632))
+    *   Show a single launcher icon after choosing a custom app icon
+        ([#5609](https://github.com/Automattic/pocket-casts-android/pull/5609))
 
 8.21
 -----

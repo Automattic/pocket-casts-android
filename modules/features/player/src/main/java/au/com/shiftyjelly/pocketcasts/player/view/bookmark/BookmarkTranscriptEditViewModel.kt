@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.player.view.bookmark
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.shownotes.ShowNotesManager
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.BookmarkTranscript
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TextSpan
@@ -17,12 +16,9 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class BookmarkTranscriptEditViewModel @Inject constructor(
-    private val bookmarkManager: BookmarkManager,
     private val transcriptManager: TranscriptManager,
     private val showNotesManager: ShowNotesManager,
 ) : ViewModel() {
-
-    private lateinit var arguments: BookmarkTranscriptEditArguments
 
     sealed interface UiState {
         data object Loading : UiState
@@ -39,18 +35,19 @@ class BookmarkTranscriptEditViewModel @Inject constructor(
     val uiState: StateFlow<UiState> = mutableUiState
 
     fun load(arguments: BookmarkTranscriptEditArguments) {
-        this.arguments = arguments
+        val storedPassage = arguments.passage
+        if (storedPassage == null) {
+            mutableUiState.value = UiState.NotAvailable
+            return
+        }
         viewModelScope.launch {
-            val bookmark = bookmarkManager.findBookmark(arguments.bookmarkUuid)
-            val storedPassage = bookmark?.passage
-            if (bookmark == null || storedPassage == null) {
-                mutableUiState.value = UiState.NotAvailable
-                return@launch
-            }
-            runCatching {
-                showNotesManager.loadShowNotes(bookmark.podcastUuid, bookmark.episodeUuid)
-            }.onFailure {
-                if (it is CancellationException) throw it
+            val podcastUuid = arguments.podcastUuid
+            if (podcastUuid != null) {
+                runCatching {
+                    showNotesManager.loadShowNotes(podcastUuid, arguments.episodeUuid)
+                }.onFailure {
+                    if (it is CancellationException) throw it
+                }
             }
             val transcript = transcriptManager.loadGeneratedTranscript(arguments.episodeUuid)
             if (transcript == null) {
@@ -60,7 +57,7 @@ class BookmarkTranscriptEditViewModel @Inject constructor(
             val model = BookmarkTranscript.from(transcript)
             mutableUiState.value = UiState.Loaded(
                 transcript = model,
-                passage = model.passageDisplaySpan(storedPassage, bookmark.passageLocation),
+                passage = model.passageDisplaySpan(storedPassage, arguments.passageLocation),
             )
         }
     }
@@ -71,23 +68,18 @@ class BookmarkTranscriptEditViewModel @Inject constructor(
         }
     }
 
-    fun save(onSaved: () -> Unit) {
+    fun save(onSaved: (passage: String?, passageLocation: Int?) -> Unit) {
         val state = uiState.value as? UiState.Loaded
         val passage = state?.passage
         if (state == null || passage == null) {
-            onSaved()
+            onSaved(null, null)
             return
         }
-        viewModelScope.launch {
-            val selected = state.transcript.passage(passage)
-            if (selected.text.isNotEmpty()) {
-                bookmarkManager.updatePassage(
-                    bookmarkUuid = arguments.bookmarkUuid,
-                    passage = selected.text,
-                    passageLocation = selected.location,
-                )
-            }
-            onSaved()
+        val selected = state.transcript.passage(passage)
+        if (selected.text.isEmpty()) {
+            onSaved(null, null)
+        } else {
+            onSaved(selected.text, selected.location)
         }
     }
 }

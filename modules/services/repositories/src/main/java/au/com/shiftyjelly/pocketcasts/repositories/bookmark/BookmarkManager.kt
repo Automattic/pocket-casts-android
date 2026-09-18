@@ -22,7 +22,7 @@ interface BookmarkManager {
         referenceTime: Int? = null,
     ): Bookmark
     suspend fun updateTitle(bookmarkUuid: String, title: String)
-    suspend fun updatePassage(bookmarkUuid: String, passage: String, passageLocation: Int)
+    suspend fun updatePassage(bookmarkUuid: String, passage: String, passageLocation: Int, referenceTime: Int?)
     suspend fun findBookmark(bookmarkUuid: String, deleted: Boolean = false): Bookmark?
     suspend fun findByEpisodeTime(episode: BaseEpisode, timeSecs: Int): Bookmark?
     suspend fun findEpisodeBookmarksFlow(

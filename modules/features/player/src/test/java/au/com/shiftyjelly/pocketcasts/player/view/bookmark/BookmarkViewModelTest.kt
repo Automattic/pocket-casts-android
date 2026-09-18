@@ -10,6 +10,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkSuggestion
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.shownotes.ShowNotesManager
+import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
@@ -49,11 +51,13 @@ class BookmarkViewModelTest {
     private val episodeManager = mock<EpisodeManager>()
     private val userEpisodeManager = mock<UserEpisodeManager>()
     private val bookmarkManager = mock<BookmarkManager>()
+    private val transcriptManager = mock<TranscriptManager>()
+    private val showNotesManager = mock<ShowNotesManager>()
 
     private val context = mock<Context> {
         on { getString(LR.string.bookmark) } doReturn "Bookmark"
     }
-    private val viewModel = BookmarkViewModel(episodeManager, userEpisodeManager, bookmarkManager, EventHorizon(TestEventSink()), context)
+    private val viewModel = BookmarkViewModel(episodeManager, userEpisodeManager, bookmarkManager, transcriptManager, showNotesManager, EventHorizon(TestEventSink()), context)
 
     private val episodeUuid = "episode-id"
     private val timeSecs = 120
@@ -146,6 +150,16 @@ class BookmarkViewModelTest {
     }
 
     @Test
+    fun `offers to edit the transcript once a passage is suggested`() = runTest {
+        stubNewBookmark()
+        whenever(bookmarkManager.suggestBookmark(episodeUuid, timeSecs)).thenReturn(suggestion)
+
+        viewModel.load(arguments)
+
+        assertTrue(viewModel.uiState.value.canEditTranscript)
+    }
+
+    @Test
     fun `offers the suggestion and cancels generating when the title is edited`() = runTest {
         stubNewBookmark()
         val gate = CompletableDeferred<BookmarkSuggestion?>()
@@ -162,6 +176,23 @@ class BookmarkViewModelTest {
         val state = viewModel.uiState.value
         assertEquals(BookmarkViewModel.TitleSuggestion.Available("A great moment"), state.titleSuggestion)
         assertEquals("My own title", state.title.text)
+    }
+
+    @Test
+    fun `keeps capturing the passage when the title is edited`() = runTest {
+        stubNewBookmark()
+        val gate = CompletableDeferred<BookmarkSuggestion?>()
+        doSuspendableAnswer { gate.await() }.whenever(bookmarkManager).suggestBookmark(episodeUuid, timeSecs)
+
+        viewModel.load(arguments)
+        assertTrue(viewModel.uiState.value.isCapturingPassage)
+
+        viewModel.changeTitle(TextFieldValue("My own title"))
+        assertTrue(viewModel.uiState.value.isCapturingPassage)
+
+        gate.complete(suggestion)
+
+        assertFalse(viewModel.uiState.value.isCapturingPassage)
     }
 
     @Test
@@ -256,6 +287,56 @@ class BookmarkViewModelTest {
         viewModel.applySuggestion("a".repeat(150))
 
         assertEquals(100, viewModel.uiState.value.title.text.length)
+    }
+
+    @Test
+    fun `captures the suggested passage into the state`() = runTest {
+        stubNewBookmark()
+        whenever(bookmarkManager.suggestBookmark(episodeUuid, timeSecs)).thenReturn(suggestion)
+
+        viewModel.load(arguments)
+
+        val state = viewModel.uiState.value
+        assertEquals("the passage", state.passage)
+        assertEquals(5, state.passageLocation)
+    }
+
+    @Test
+    fun `saves the edited passage instead of the suggestion`() = runTest {
+        stubNewBookmark()
+        whenever(bookmarkManager.suggestBookmark(episodeUuid, timeSecs)).thenReturn(suggestion)
+        whenever(episodeManager.findByUuid(episodeUuid)).thenReturn(PodcastEpisode(uuid = episodeUuid, publishedDate = Date()))
+        whenever(bookmarkManager.add(any(), any(), any(), any(), any(), anyOrNull(), anyOrNull(), anyOrNull())).thenReturn(Bookmark(uuid = "new-id"))
+
+        viewModel.load(arguments)
+        viewModel.onPassageEdited("a hand-picked passage", 9)
+        val saved = CompletableDeferred<Unit>()
+        viewModel.saveBookmark { _, _ -> saved.complete(Unit) }
+        saved.await()
+
+        verify(bookmarkManager).add(
+            episode = any(),
+            timeSecs = eq(timeSecs),
+            title = any(),
+            creationSource = any(),
+            addedAt = any(),
+            passage = eq("a hand-picked passage"),
+            passageLocation = eq(9),
+            referenceTime = eq(118),
+        )
+    }
+
+    @Test
+    fun `updates the passage when saving an existing bookmark`() = runTest {
+        whenever(bookmarkManager.findBookmark("existing-id")).thenReturn(Bookmark(uuid = "existing-id", title = "Kept"))
+
+        viewModel.load(existingBookmarkArguments("existing-id"))
+        viewModel.onPassageEdited("a hand-picked passage", 9)
+        val saved = CompletableDeferred<Unit>()
+        viewModel.saveBookmark { _, _ -> saved.complete(Unit) }
+        saved.await()
+
+        verify(bookmarkManager).updatePassage("existing-id", "a hand-picked passage", 9, null)
     }
 
     private suspend fun stubNewBookmark() {
