@@ -339,8 +339,16 @@ class RefreshPodcastsThread(
                 // prepare to add to up next
                 when (podcast.autoAddToUpNext) {
                     AutoAddUpNext.OFF -> {}
-                    AutoAddUpNext.PLAY_LAST -> episodesToAddToUpNext.addAll(episodes.map { Pair(AutoAddUpNext.PLAY_LAST, it) })
-                    AutoAddUpNext.PLAY_NEXT -> episodesToAddToUpNext.addAll(episodes.map { Pair(AutoAddUpNext.PLAY_NEXT, it) })
+
+                    AutoAddUpNext.PLAY_LAST -> {
+                        logAutoAddToUpNext(podcast, episodes)
+                        episodesToAddToUpNext.addAll(episodes.map { Pair(AutoAddUpNext.PLAY_LAST, it) })
+                    }
+
+                    AutoAddUpNext.PLAY_NEXT -> {
+                        logAutoAddToUpNext(podcast, episodes)
+                        episodesToAddToUpNext.addAll(episodes.map { Pair(AutoAddUpNext.PLAY_NEXT, it) })
+                    }
                 }
             }
 
@@ -348,6 +356,13 @@ class RefreshPodcastsThread(
         }
 
         return AddedEpisodes(episodeUuidsAdded, episodesToAddToUpNext)
+    }
+
+    private fun logAutoAddToUpNext(podcast: Podcast, episodes: List<PodcastEpisode>) {
+        val episodeList = episodes.joinToString(separator = ", ") { "${it.uuid} (${it.title})" }
+        val message = "Auto add to Up Next: podcast=${podcast.uuid} (${podcast.title}) " +
+            "mode=${podcast.autoAddToUpNext} modified=${podcast.autoAddToUpNextModified} episodes=$episodeList"
+        LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, message)
     }
 
     private fun addNewEpisodesToUpNext(episodesToAddToUpNext: List<Pair<AutoAddUpNext, PodcastEpisode>>) {
@@ -358,11 +373,25 @@ class RefreshPodcastsThread(
         val entryPoint = getEntryPoint()
         val playbackManager = entryPoint.playbackManager()
         val episodeManager = entryPoint.episodeManager()
+        val podcastManager = entryPoint.podcastManager()
 
         // Because we may not have refreshed for a while, we collect all the auto add to up next episodes
         // and run through them one by one sorted by their publish date. They are added to up next as if the action
         // was run right as they were published magically
         runBlocking {
+            episodesToAddToUpNext
+                .groupBy { it.second.podcastUuid }
+                .forEach { (podcastUuid, pairs) ->
+                    val currentPodcast = podcastManager.findPodcastByUuid(podcastUuid) ?: return@forEach
+                    val queuedModes = pairs.map { it.first }.toSet()
+                    if (currentPodcast.autoAddToUpNext !in queuedModes) {
+                        val message = "Auto add to Up Next: podcast=$podcastUuid (${currentPodcast.title}) " +
+                            "was collected with mode=$queuedModes but now has mode=${currentPodcast.autoAddToUpNext} " +
+                            "modified=${currentPodcast.autoAddToUpNextModified}"
+                        LogBuffer.w(LogBuffer.TAG_BACKGROUND_TASKS, message)
+                    }
+                }
+
             val alreadyProcessedEpisodes = episodeManager.findEpisodesByUuids(episodesToAddToUpNext.map { it.second.uuid })
                 .filter { it.isFinished || it.isArchived }
                 .map { it.uuid }

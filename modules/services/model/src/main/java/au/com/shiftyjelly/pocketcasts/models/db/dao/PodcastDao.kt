@@ -360,8 +360,8 @@ abstract class PodcastDao {
         }
     }
 
-    @Query("UPDATE podcasts SET auto_add_to_up_next = :newValue WHERE uuid = :uuid AND auto_add_to_up_next = :onlyIfValue")
-    abstract suspend fun updateAutoAddToUpNextIf(uuid: String, newValue: Int, onlyIfValue: Int)
+    @Query("UPDATE podcasts SET auto_add_to_up_next = :newValue, auto_add_to_up_next_modified = :modified WHERE uuid = :uuid AND auto_add_to_up_next = :onlyIfValue")
+    abstract suspend fun updateAutoAddToUpNextIf(uuid: String, newValue: Int, onlyIfValue: Int, modified: Date = Date())
 
     @Transaction
     open suspend fun updateAutoAddToUpNextsIf(podcastUuids: List<String>, newValue: Int, onlyIfValue: Int) {
