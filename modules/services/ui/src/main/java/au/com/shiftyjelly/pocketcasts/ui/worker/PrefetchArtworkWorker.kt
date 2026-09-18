@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.ui.worker
 
 import android.content.Context
 import androidx.hilt.work.HiltWorker
+import androidx.work.BackoffPolicy
 import androidx.work.Constraints
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingPeriodicWorkPolicy
@@ -62,6 +63,9 @@ class PrefetchArtworkWorker @AssistedInject constructor(
                         .setRequiresStorageNotLow(true)
                         .build(),
                 )
+                // Nothing returns Result.retry(), but this also paces the reschedule after the
+                // system interrupts a run, where the default is 30 seconds.
+                .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 10, TimeUnit.MINUTES)
                 .build()
         }
     }
@@ -71,6 +75,7 @@ class PrefetchArtworkWorker @AssistedInject constructor(
         val isWearOs = Util.isWearOs(applicationContext)
         var fetched = 0
         var failed = 0
+        var cacheSizeMb = 0L
         try {
             withContext(Dispatchers.IO) {
                 for (podcast in podcastManager.findSubscribedNoOrder()) {
@@ -101,6 +106,7 @@ class PrefetchArtworkWorker @AssistedInject constructor(
                         }
                     }
                 }
+                cacheSizeMb = diskCache.size / BYTES_PER_MB
             }
         } catch (e: CancellationException) {
             throw e
@@ -113,7 +119,7 @@ class PrefetchArtworkWorker @AssistedInject constructor(
         LogBuffer.i(
             LogBuffer.TAG_BACKGROUND_TASKS,
             "Prefetched $fetched missing podcast artwork images ($failed failed). " +
-                "Cache ${diskCache.size / BYTES_PER_MB}MB of ${diskCache.maxSize / BYTES_PER_MB}MB.",
+                "Cache ${cacheSizeMb}MB of ${diskCache.maxSize / BYTES_PER_MB}MB.",
         )
         return Result.success()
     }

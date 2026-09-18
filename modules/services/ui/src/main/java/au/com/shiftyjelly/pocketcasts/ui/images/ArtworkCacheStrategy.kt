@@ -15,13 +15,15 @@ import coil3.request.Options
 internal class ArtworkCacheStrategy : CacheStrategy {
 
     // Unconditional, so Coil never sends a validator and [write] can never see a 304. Adding
-    // revalidation here means [write] has to handle 304 as well, or Coil re-requests the image.
+    // revalidation here obliges [write] to return the 304 with a null body, otherwise Coil re-runs
+    // the request and then fails to decode the empty body.
     override suspend fun read(
         cacheResponse: NetworkResponse,
         networkRequest: NetworkRequest,
         options: Options,
     ) = CacheStrategy.ReadResult(cacheResponse)
 
+    // Only reached for codes Coil obtained from the network; see [read] before widening this set.
     override suspend fun write(
         cacheResponse: NetworkResponse?,
         networkRequest: NetworkRequest,
