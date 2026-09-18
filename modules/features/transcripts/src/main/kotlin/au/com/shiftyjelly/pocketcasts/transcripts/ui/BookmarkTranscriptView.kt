@@ -179,11 +179,11 @@ fun BookmarkTranscriptView(
                         contentDescription = null,
                         tint = theme.primaryText,
                         modifier = Modifier
-                            .size(GlyphSize)
+                            .size(GlyphBox)
                             .offset {
                                 IntOffset(
-                                    x = ((Gutter - GlyphSize) / 2).roundToPx(),
-                                    y = (ContentPadding.calculateTopPadding().toPx() + glyphBox.top + (glyphBox.height - GlyphSize.toPx()) / 2f).roundToInt(),
+                                    x = ((Gutter - GlyphBox) / 2).roundToPx(),
+                                    y = (ContentPadding.calculateTopPadding().toPx() + glyphBox.top + (glyphBox.height - GlyphBox.toPx()) / 2f).roundToInt(),
                                 )
                             },
                     )
@@ -221,7 +221,7 @@ private val SpeakerSpanStyle = SpanStyle(
 )
 
 private val Gutter = 28.dp
-private val GlyphSize = 16.dp
+private val GlyphBox = 24.dp
 
 private val ContentPadding = PaddingValues(start = Gutter, end = Gutter, top = 48.dp, bottom = 64.dp)
 
