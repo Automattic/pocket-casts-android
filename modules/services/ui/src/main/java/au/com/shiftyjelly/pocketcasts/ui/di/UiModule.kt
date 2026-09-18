@@ -45,8 +45,8 @@ class UiModule {
                 DiskCache.Builder()
                     .directory(context.cacheDir.resolve("ImageCache"))
                     .apply {
-                        // Coil's 2% default falls to its 10MB floor on a full phone, which evicts artwork almost immediately.
-                        if (Util.getAppPlatform(context) == AppPlatform.Phone && !Util.isTv(context)) {
+                        // Coil's default floor of 10MB holds only a handful of covers.
+                        if (Util.getAppPlatform(context) == AppPlatform.Phone) {
                             maxSizePercent(ARTWORK_DISK_CACHE_FREE_SPACE_PERCENT)
                             minimumMaxSizeBytes(ARTWORK_DISK_CACHE_MINIMUM_BYTES)
                         }
