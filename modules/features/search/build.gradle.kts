@@ -35,6 +35,7 @@ dependencies {
     implementation(libs.compose.material)
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.tooling.preview)
+    implementation(libs.coil.compose)
     implementation(libs.coroutines.core)
     implementation(libs.coroutines.reactive)
     implementation(libs.fragment.compose)
