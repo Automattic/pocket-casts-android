@@ -154,7 +154,8 @@ private fun ImprovedSearchResultsView(
                     .background(
                         color = MaterialTheme.colors.background,
                     )
-                    .padding(16.dp),
+                    .padding(vertical = 16.dp),
+                contentPadding = PaddingValues(horizontal = 16.dp),
                 items = filterOptions.map { stringResource(it.resId) },
                 selectedIndex = selectedFilterIndex,
                 onFilterSelect = { onFilterSelect(filterOptions[it]) },
