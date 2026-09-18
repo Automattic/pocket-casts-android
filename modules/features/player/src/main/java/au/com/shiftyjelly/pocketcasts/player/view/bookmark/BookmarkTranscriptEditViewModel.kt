@@ -26,6 +26,7 @@ class BookmarkTranscriptEditViewModel @Inject constructor(
         data class Loaded(
             val transcript: BookmarkTranscript,
             val passage: TextSpan?,
+            val referenceOffset: Int? = null,
         ) : UiState {
             val canSave: Boolean get() = passage?.let { transcript.passage(it).text.isNotEmpty() } == true
         }
@@ -58,6 +59,7 @@ class BookmarkTranscriptEditViewModel @Inject constructor(
             mutableUiState.value = UiState.Loaded(
                 transcript = model,
                 passage = model.passageDisplaySpan(storedPassage, arguments.passageLocation),
+                referenceOffset = arguments.referenceTime?.let { model.referenceOffsetAt(it * 1000L) },
             )
         }
     }

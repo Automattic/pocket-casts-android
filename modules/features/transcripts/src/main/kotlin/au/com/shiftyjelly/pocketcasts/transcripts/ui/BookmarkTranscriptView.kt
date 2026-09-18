@@ -168,7 +168,7 @@ fun BookmarkTranscriptView(
             } else {
                 SelectionContainer(content = renderText)
             }
-            if (!editable && referenceOffset != null) {
+            if (referenceOffset != null) {
                 val glyphOffset = referenceOffset
                     .coerceIn(0, transcript.displayText.length.coerceAtLeast(1) - 1)
                 val glyphBox = layout?.getBoundingBox(glyphOffset)

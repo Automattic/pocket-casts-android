@@ -135,6 +135,7 @@ class BookmarkFragment : BaseFragment() {
                 podcastUuid = state.podcastUuid,
                 passage = passage,
                 passageLocation = state.passageLocation,
+                referenceTime = state.referenceTime,
                 podcastColors = args.podcastColors,
             ),
         )

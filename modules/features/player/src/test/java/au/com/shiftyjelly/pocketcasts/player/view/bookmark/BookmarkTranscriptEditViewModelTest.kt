@@ -115,13 +115,44 @@ class BookmarkTranscriptEditViewModelTest {
         assertEquals(firstSentence.length + 1, savedLocation)
     }
 
+    @Test
+    fun `computes the reference offset at the bookmark time`() = runTest {
+        val timed = Transcript.Text(
+            entries = listOf(
+                TranscriptEntry.Text(firstSentence, startTimeMs = 0),
+                TranscriptEntry.Text(secondSentence, startTimeMs = 10_000),
+            ),
+            type = TranscriptType.Vtt,
+            url = "https://example.com/transcript.vtt",
+            isGenerated = true,
+            episodeUuid = episodeUuid,
+            podcastUuid = podcastUuid,
+        )
+        whenever(transcriptManager.loadGeneratedTranscript(episodeUuid)).thenReturn(timed)
+
+        val viewModel = viewModel().apply { load(arguments(firstSentence, 0, referenceTime = 10)) }
+
+        val state = viewModel.uiState.value as BookmarkTranscriptEditViewModel.UiState.Loaded
+        assertEquals(state.transcript.displayText.indexOf(secondSentence), state.referenceOffset)
+    }
+
+    @Test
+    fun `has no reference offset without a bookmark reference time`() = runTest {
+        whenever(transcriptManager.loadGeneratedTranscript(episodeUuid)).thenReturn(transcript)
+
+        val viewModel = viewModel().apply { load(arguments(firstSentence, 0)) }
+
+        assertNull((viewModel.uiState.value as BookmarkTranscriptEditViewModel.UiState.Loaded).referenceOffset)
+    }
+
     private fun viewModel() = BookmarkTranscriptEditViewModel(transcriptManager, showNotesManager)
 
-    private fun arguments(passage: String?, passageLocation: Int?) = BookmarkTranscriptEditArguments(
+    private fun arguments(passage: String?, passageLocation: Int?, referenceTime: Int? = null) = BookmarkTranscriptEditArguments(
         episodeUuid = episodeUuid,
         podcastUuid = podcastUuid,
         passage = passage,
         passageLocation = passageLocation,
+        referenceTime = referenceTime,
         podcastColors = PodcastColors.ForUserEpisode,
     )
 }

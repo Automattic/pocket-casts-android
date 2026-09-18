@@ -13,5 +13,6 @@ data class BookmarkTranscriptEditArguments(
     val podcastUuid: String?,
     val passage: String?,
     val passageLocation: Int?,
+    val referenceTime: Int?,
     val podcastColors: PodcastColors,
 ) : Parcelable
