@@ -57,7 +57,6 @@ class UpNextQueueImpl @Inject constructor(
     // Not a StateFlow: it would drop equal writes, and the debounced server sync below is driven off this flow.
     private val changesFlow = MutableSharedFlow<UpNextQueue.State>(
         replay = 1,
-        extraBufferCapacity = 64,
         onBufferOverflow = BufferOverflow.DROP_OLDEST,
     ).apply { tryEmit(UpNextQueue.State.Empty) }
 
