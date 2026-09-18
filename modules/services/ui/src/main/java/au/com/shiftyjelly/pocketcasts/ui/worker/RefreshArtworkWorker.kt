@@ -50,10 +50,7 @@ class RefreshArtworkWorker @AssistedInject constructor(
         var successful = 0
         var failed = 0
         withContext(Dispatchers.IO) {
-            // Do not clear entries restored before a prior attempt returned Result.retry().
-            if (runAttemptCount == 0) {
-                coilManager.clearAll()
-            }
+            coilManager.clearMemoryCache()
             val podcasts = podcastManager.findSubscribedNoOrder()
             val isWearOs = Util.isWearOs(applicationContext)
             for (podcast in podcasts) {
@@ -64,6 +61,8 @@ class RefreshArtworkWorker @AssistedInject constructor(
                             // The original bytes are still cached; only the discarded decode is sampled.
                             .size(1, 1)
                             .memoryCachePolicy(CachePolicy.DISABLED)
+                            // Replaces the cached copy only once the new one arrives.
+                            .diskCachePolicy(CachePolicy.WRITE_ONLY)
                             .build()
                         val result = coilManager.imageLoader.execute(request)
                         if (result is ErrorResult) {

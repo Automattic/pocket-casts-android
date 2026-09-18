@@ -72,7 +72,7 @@ class RefreshArtworkWorkerTest {
             requests.map { it.data.toString() },
         )
         assertTrue(requests.all { it.memoryCachePolicy == CachePolicy.DISABLED })
-        assertTrue(requests.all { it.diskCachePolicy == CachePolicy.ENABLED })
+        assertTrue(requests.all { it.diskCachePolicy == CachePolicy.WRITE_ONLY })
         for (request in requests) {
             assertEquals(Size(1, 1), request.sizeResolver.size())
         }
@@ -94,7 +94,7 @@ class RefreshArtworkWorkerTest {
     }
 
     @Test
-    fun `first attempt clears the cache before loading podcasts`() = runTest {
+    fun `refreshing never discards the cached artwork it may fail to replace`() = runTest {
         val podcast = Podcast(uuid = "podcast-uuid")
         whenever(podcastManager.findSubscribedNoOrder()).doReturn(listOf(podcast))
         whenever(imageLoader.execute(any())).thenReturn(mock<ImageResult>())
@@ -104,24 +104,11 @@ class RefreshArtworkWorkerTest {
         val result = buildWorker(runAttemptCount = 0).doWork()
 
         assertTrue(result is ListenableWorker.Result.Success)
+        verify(coilManager, never()).clearAll()
         inOrder(coilManager, podcastManager) {
-            verify(coilManager).clearAll()
+            verify(coilManager).clearMemoryCache()
             verify(podcastManager).findSubscribedNoOrder()
         }
-    }
-
-    @Test
-    fun `retry preserves artwork restored by the previous attempt`() = runTest {
-        val podcast = Podcast(uuid = "podcast-uuid")
-        whenever(podcastManager.findSubscribedNoOrder()).doReturn(listOf(podcast))
-        whenever(imageLoader.execute(any())).thenReturn(mock<ImageResult>())
-        coilManager = mock()
-        whenever(coilManager.imageLoader).thenReturn(imageLoader)
-
-        val result = buildWorker(runAttemptCount = 1).doWork()
-
-        assertTrue(result is ListenableWorker.Result.Success)
-        verify(coilManager, never()).clearAll()
     }
 
     @Test
