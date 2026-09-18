@@ -12,6 +12,8 @@
         ([#6005](https://github.com/Automattic/pocket-casts-android/pull/6005))
     *   Keep a newly uploaded file in view instead of letting the Files list jump past it
         ([#6005](https://github.com/Automattic/pocket-casts-android/pull/6005))
+    *   Show a single launcher icon after choosing a custom app icon
+        ([#5609](https://github.com/Automattic/pocket-casts-android/pull/5609))
 
 8.21
 -----
