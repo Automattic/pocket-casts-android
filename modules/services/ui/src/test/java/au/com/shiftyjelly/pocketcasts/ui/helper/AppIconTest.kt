@@ -83,6 +83,23 @@ class AppIconTest {
 
     @Test
     @Config(sdk = [33])
+    fun `default icon enables only the default alias when updated atomically`() {
+        appIcon.enableSelectedAlias(AppIconType.DEFAULT)
+
+        val settingsCaptor = argumentCaptor<List<PackageManager.ComponentEnabledSetting>>()
+        verify(packageManager).setComponentEnabledSettings(settingsCaptor.capture())
+        verify(packageManager, never()).setComponentEnabledSetting(any(), any(), any())
+
+        val states = settingsCaptor.firstValue.associate { setting ->
+            requireNotNull(setting.componentName).className to setting.enabledState
+        }
+        assertEquals(AppIconType.entries.size, states.size)
+        assertEquals(PackageManager.COMPONENT_ENABLED_STATE_ENABLED, states[DEFAULT_ALIAS])
+        assertEquals(1, states.values.count { it == PackageManager.COMPONENT_ENABLED_STATE_ENABLED })
+    }
+
+    @Test
+    @Config(sdk = [33])
     fun `aliases are updated atomically when supported`() {
         appIcon.enableSelectedAlias(AppIconType.DARK)
 
