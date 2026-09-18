@@ -4,16 +4,20 @@ import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.fragment.app.viewModels
 import androidx.fragment.compose.content
+import androidx.lifecycle.lifecycleScope
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
 class DeviceApproveFragment : BaseDialogFragment() {
@@ -36,7 +40,7 @@ class DeviceApproveFragment : BaseDialogFragment() {
             viewModel.onShown()
         }
 
-        DialogBox(fillMaxHeight = false) {
+        DialogBox {
             DeviceApprovePage(
                 state = state,
                 onConnect = viewModel::connect,
@@ -44,6 +48,7 @@ class DeviceApproveFragment : BaseDialogFragment() {
                     viewModel.onSetupAccountTapped()
                     OnboardingLauncher.openOnboardingFlow(requireActivity(), OnboardingFlow.DeviceApproval)
                 },
+                onSwitchAccount = ::confirmSwitchAccount,
                 onDone = ::finishAfterApproval,
                 onClose = ::dismiss,
             )
@@ -60,6 +65,22 @@ class DeviceApproveFragment : BaseDialogFragment() {
     override fun onResume() {
         super.onResume()
         viewModel.refreshAccountState()
+    }
+
+    private fun confirmSwitchAccount() {
+        AlertDialog.Builder(requireContext())
+            .setTitle(LR.string.device_approve_switch_account_title)
+            .setMessage(LR.string.device_approve_switch_account_message)
+            .setPositiveButton(LR.string.device_approve_switch_account_confirm) { _, _ -> switchAccount() }
+            .setNegativeButton(LR.string.cancel, null)
+            .show()
+    }
+
+    private fun switchAccount() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.switchAccount()
+            OnboardingLauncher.openOnboardingFlow(requireActivity(), OnboardingFlow.DeviceApproval)
+        }
     }
 
     private fun finishAfterApproval() {
