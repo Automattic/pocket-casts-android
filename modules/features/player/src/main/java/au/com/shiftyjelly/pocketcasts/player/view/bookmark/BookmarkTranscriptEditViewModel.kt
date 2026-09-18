@@ -35,7 +35,10 @@ class BookmarkTranscriptEditViewModel @Inject constructor(
     private val mutableUiState = MutableStateFlow<UiState>(UiState.Loading)
     val uiState: StateFlow<UiState> = mutableUiState
 
+    private var referenceTime: Int? = null
+
     fun load(arguments: BookmarkTranscriptEditArguments) {
+        referenceTime = arguments.referenceTime
         val storedPassage = arguments.passage
         if (storedPassage == null) {
             mutableUiState.value = UiState.NotAvailable
@@ -56,17 +59,22 @@ class BookmarkTranscriptEditViewModel @Inject constructor(
                 return@launch
             }
             val model = BookmarkTranscript.from(transcript)
+            val span = model.passageDisplaySpan(storedPassage, arguments.passageLocation)
             mutableUiState.value = UiState.Loaded(
                 transcript = model,
-                passage = model.passageDisplaySpan(storedPassage, arguments.passageLocation),
-                referenceOffset = arguments.referenceTime?.let { model.referenceOffsetAt(it * 1000L) },
+                passage = span,
+                referenceOffset = model.glyphOffsetIn(span, referenceTime),
             )
         }
     }
 
     fun onPassageChange(passage: TextSpan) {
         mutableUiState.update { state ->
-            if (state is UiState.Loaded) state.copy(passage = passage) else state
+            if (state is UiState.Loaded) {
+                state.copy(passage = passage, referenceOffset = state.transcript.glyphOffsetIn(passage, referenceTime))
+            } else {
+                state
+            }
         }
     }
 

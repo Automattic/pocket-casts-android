@@ -30,6 +30,16 @@ class BookmarkTranscript private constructor(
         return entry?.startTimeMs?.takeIf { it >= 0 }
     }
 
+    /**
+     * The display offset the bookmark glyph marks: where [referenceTimeSecs] lands, kept inside
+     * [span] so the glyph never sits outside the passage, or the start of the passage without one.
+     */
+    fun glyphOffsetIn(span: TextSpan?, referenceTimeSecs: Int?): Int? {
+        val offset = referenceTimeSecs?.let { referenceOffsetAt(it * 1000L) } ?: span?.start ?: return null
+        if (span == null) return offset
+        return offset.coerceIn(span.start, (span.end - 1).coerceAtLeast(span.start))
+    }
+
     /** The display offset a reference time in milliseconds lands on, interpolating between entries. */
     fun referenceOffsetAt(timeMs: Long): Int? {
         val timed = textEntrySpans.filter { it.startTimeMs >= 0 }

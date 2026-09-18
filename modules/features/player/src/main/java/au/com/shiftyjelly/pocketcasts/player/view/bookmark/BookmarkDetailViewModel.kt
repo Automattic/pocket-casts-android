@@ -166,11 +166,6 @@ class BookmarkDetailViewModel @Inject constructor(
     }
 
     private fun referenceOffsetFor(model: BookmarkTranscript, span: TextSpan?): Int? {
-        val rawOffset = mutableState.value.referenceTime?.let { model.referenceOffsetAt(it * 1000L) } ?: span?.start
-        return if (span != null && rawOffset != null) {
-            rawOffset.coerceIn(span.start, (span.end - 1).coerceAtLeast(span.start))
-        } else {
-            rawOffset
-        }
+        return model.glyphOffsetIn(span, mutableState.value.referenceTime)
     }
 }
