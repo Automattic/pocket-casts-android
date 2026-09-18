@@ -31,6 +31,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.deeplink.ChangeBookmarkTitleDeepLink
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
@@ -288,7 +289,14 @@ private fun TranscriptMessageEffect(viewModel: TranscriptViewModel?) {
                 }
 
                 is TranscriptMessage.OpenBookmarkEditor -> {
-                    context.startActivity(ChangeBookmarkTitleDeepLink(message.bookmarkUuid, isNewBookmark = message.isNewBookmark, fromEpisode = message.fromEpisode).toIntent(context))
+                    context.startActivity(
+                        ChangeBookmarkTitleDeepLink(
+                            message.bookmarkUuid,
+                            isNewBookmark = message.isNewBookmark,
+                            fromEpisode = message.fromEpisode,
+                            sourceView = SourceView.TRANSCRIPT.key,
+                        ).toIntent(context),
+                    )
                 }
             }
         }

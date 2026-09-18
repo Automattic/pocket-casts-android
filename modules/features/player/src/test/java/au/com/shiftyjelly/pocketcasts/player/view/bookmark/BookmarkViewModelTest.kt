@@ -2,12 +2,15 @@ package au.com.shiftyjelly.pocketcasts.player.view.bookmark
 
 import android.content.Context
 import androidx.compose.ui.text.input.TextFieldValue
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkGenerationAnalytics
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkSuggestion
+import au.com.shiftyjelly.pocketcasts.repositories.bookmark.TitleGeneration
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.shownotes.ShowNotesManager
@@ -16,7 +19,11 @@ import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import com.automattic.eventhorizon.BookmarkEditFormShownEvent
+import com.automattic.eventhorizon.BookmarkEditFormSubmittedEvent
+import com.automattic.eventhorizon.BookmarkTitleSuggestionTappedEvent
 import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.SourceViewType
 import java.util.Date
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -57,7 +64,9 @@ class BookmarkViewModelTest {
     private val context = mock<Context> {
         on { getString(LR.string.bookmark) } doReturn "Bookmark"
     }
-    private val viewModel = BookmarkViewModel(episodeManager, userEpisodeManager, bookmarkManager, transcriptManager, showNotesManager, EventHorizon(TestEventSink()), context)
+    private val eventSink = TestEventSink()
+    private val bookmarkGenerationAnalytics = mock<BookmarkGenerationAnalytics>()
+    private val viewModel = BookmarkViewModel(episodeManager, userEpisodeManager, bookmarkManager, transcriptManager, showNotesManager, EventHorizon(eventSink), bookmarkGenerationAnalytics, context)
 
     private val episodeUuid = "episode-id"
     private val timeSecs = 120
@@ -67,11 +76,49 @@ class BookmarkViewModelTest {
         timeSecs = timeSecs,
         podcastColors = PodcastColors.ForUserEpisode,
     )
-    private val suggestion = BookmarkSuggestion(passage = "the passage", passageLocation = 5, referenceTimeSecs = 118, title = "A great moment")
+    private val suggestion = BookmarkSuggestion(passage = "the passage", passageLocation = 5, referenceTimeSecs = 118, generation = TitleGeneration("A great moment", 0, null))
 
     @Before
     fun setUp() {
         FeatureFlag.setEnabled(Feature.SMART_BOOKMARKS, true)
+    }
+
+    @Test
+    fun `edit form events use the source the sheet was opened from`() = runTest {
+        viewModel.onShown(isNewBookmark = true, source = SourceView.TRANSCRIPT)
+
+        val event = eventSink.pollEvent()
+        assertTrue(event is BookmarkEditFormShownEvent)
+        assertEquals(SourceViewType.Transcript, (event as BookmarkEditFormShownEvent).source)
+    }
+
+    @Test
+    fun `passage editor dismissal is ignored before the view model is loaded`() = runTest {
+        viewModel.onPassageEditorDismissed("new passage")
+
+        assertTrue(eventSink.isEmpty())
+    }
+
+    @Test
+    fun `tapping the suggested title tracks it and applies the title`() = runTest {
+        viewModel.load(arguments)
+
+        viewModel.onSuggestionTapped("A great moment")
+
+        assertEquals("A great moment", viewModel.uiState.value.title.text)
+        assertTrue(eventSink.pollEvent() is BookmarkTitleSuggestionTappedEvent)
+    }
+
+    @Test
+    fun `submitting reports whether a passage was saved and changed`() = runTest {
+        viewModel.load(arguments)
+        viewModel.onPassageEdited("a chosen passage", 3)
+
+        viewModel.onSubmitBookmark()
+
+        val event = eventSink.pollEvent() as BookmarkEditFormSubmittedEvent
+        assertEquals(true, event.hasPassage)
+        assertEquals(true, event.passageChanged)
     }
 
     @Test
@@ -88,7 +135,7 @@ class BookmarkViewModelTest {
     @Test
     fun `suggests a title for a transcript bookmark from its stored passage`() = runTest {
         whenever(bookmarkManager.findBookmark("new-id")).thenReturn(Bookmark(uuid = "new-id", title = "Bookmark", passage = "a captured passage"))
-        whenever(bookmarkManager.suggestTitle("a captured passage")).thenReturn("A great moment")
+        whenever(bookmarkManager.suggestTitle("a captured passage")).thenReturn(TitleGeneration("A great moment", 0, null))
 
         viewModel.load(newBookmarkArguments("new-id"))
 
