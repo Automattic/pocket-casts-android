@@ -1531,7 +1531,7 @@ abstract class AppDatabase : RoomDatabase() {
         }
 
         val MIGRATION_138_139 = addMigration(138, 139) { database ->
-            // Existing rows aren't copied, a bug caused not all rows to be deleted, so events will be sent multiple times.
+            // Existing rows are dropped because the old composite key left some undeletable, so they were resent on every run.
             database.execSQL("DROP TABLE `bump_stats`")
             database.execSQL(
                 "CREATE TABLE `bump_stats` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `event_time` INTEGER NOT NULL, `custom_event_props` TEXT NOT NULL)",
