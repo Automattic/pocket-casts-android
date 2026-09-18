@@ -174,8 +174,10 @@ private fun Bookmark.applyServerBookmark(serverBookmark: SyncUserBookmark) = app
     }
 }
 
-private fun Bookmark.applyServerBookmark(serverBookmark: BookmarkResponse) = apply {
-    syncStatus = SyncStatus.SYNCED
+internal fun Bookmark.applyServerBookmark(serverBookmark: BookmarkResponse) = apply {
+    val localPassageModified = passageModified
+    val localReferenceTimeModified = referenceTimeModified
+
     uuid = serverBookmark.bookmarkUuid
     podcastUuid = serverBookmark.podcastUuid
     episodeUuid = serverBookmark.episodeUuid
@@ -184,4 +186,35 @@ private fun Bookmark.applyServerBookmark(serverBookmark: BookmarkResponse) = app
         createdAt = value
     }
     title = serverBookmark.title
+
+    val serverPassage = serverBookmark.passageOrNull?.value?.takeIf { it.isNotEmpty() }
+    val serverPassageModified = serverBookmark.passageModifiedOrNull?.value
+    val serverPassageApplied = if (serverPassageModified != null) {
+        serverPassageModified >= (localPassageModified ?: Long.MIN_VALUE)
+    } else {
+        // Legacy rows carry a passage without a modified timestamp; take it when there is no local edit to protect.
+        serverPassage != null && localPassageModified == null
+    }
+    if (serverPassageApplied) {
+        passage = serverPassage
+        passageLocation = serverPassage?.let { serverBookmark.passageLocationOrNull?.value }
+        passageModified = serverPassageModified ?: passageModified
+    }
+
+    val serverReferenceTime = serverBookmark.referenceTimeOrNull?.value
+    val serverReferenceTimeModified = serverBookmark.referenceTimeModifiedOrNull?.value
+    val serverReferenceTimeApplied = if (serverReferenceTimeModified != null) {
+        serverReferenceTimeModified >= (localReferenceTimeModified ?: Long.MIN_VALUE)
+    } else {
+        serverReferenceTime != null && localReferenceTimeModified == null
+    }
+    if (serverReferenceTimeApplied) {
+        referenceTime = serverReferenceTime
+        referenceTimeModified = serverReferenceTimeModified ?: referenceTimeModified
+    }
+
+    // When a locally-newer passage or reference time is kept, stay unsynced so the local value still uploads.
+    val localPassageKept = localPassageModified != null && !serverPassageApplied
+    val localReferenceTimeKept = localReferenceTimeModified != null && !serverReferenceTimeApplied
+    syncStatus = if (localPassageKept || localReferenceTimeKept) SyncStatus.NOT_SYNCED else SyncStatus.SYNCED
 }

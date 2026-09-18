@@ -158,6 +158,11 @@ message BookmarkResponse {
   int32 time = 5;
   string title = 6;
   google.protobuf.Timestamp createdAt = 7;
+  google.protobuf.StringValue passage = 8;
+  google.protobuf.Int32Value passage_location = 9;
+  google.protobuf.Int64Value passage_modified = 10;
+  google.protobuf.Int32Value reference_time = 11;
+  google.protobuf.Int64Value reference_time_modified = 12;
 }
 
 message BookmarksResponse {
