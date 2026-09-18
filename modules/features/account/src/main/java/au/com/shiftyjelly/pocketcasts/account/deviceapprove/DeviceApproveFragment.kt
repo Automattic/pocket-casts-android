@@ -44,7 +44,10 @@ class DeviceApproveFragment : BaseDialogFragment() {
                     viewModel.onSetupAccountTapped()
                     OnboardingLauncher.openOnboardingFlow(requireActivity(), OnboardingFlow.DeviceApproval)
                 },
-                onSwitchAccount = {},
+                onSwitchAccount = {
+                    viewModel.switchAccount()
+                    OnboardingLauncher.openOnboardingFlow(requireActivity(), OnboardingFlow.DeviceApproval)
+                },
                 onDone = ::finishAfterApproval,
                 onClose = ::dismiss,
             )

@@ -3,7 +3,9 @@ package au.com.shiftyjelly.pocketcasts.account.deviceapprove
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
+import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import com.automattic.eventhorizon.DeviceApproveConnectTappedEvent
 import com.automattic.eventhorizon.DeviceApproveDismissedEvent
 import com.automattic.eventhorizon.DeviceApproveFailedEvent
@@ -25,6 +27,8 @@ import timber.log.Timber
 @HiltViewModel
 class DeviceApproveViewModel @Inject constructor(
     private val syncManager: SyncManager,
+    private val userManager: UserManager,
+    private val playbackManager: PlaybackManager,
     private val settings: Settings,
     private val eventHorizon: EventHorizon,
 ) : ViewModel() {
@@ -54,6 +58,13 @@ class DeviceApproveViewModel @Inject constructor(
 
     fun onSetupAccountTapped() {
         eventHorizon.track(DeviceSetupAccountTappedEvent)
+    }
+
+    fun switchAccount() {
+        viewModelScope.launch {
+            userManager.signOut(playbackManager, wasInitiatedByUser = true)?.join()
+            refreshAccountState()
+        }
     }
 
     fun onDismissed() {
