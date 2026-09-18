@@ -50,7 +50,6 @@ class RefreshArtworkWorker @AssistedInject constructor(
         var successful = 0
         var failed = 0
         withContext(Dispatchers.IO) {
-            coilManager.clearMemoryCache()
             val podcasts = podcastManager.findSubscribedNoOrder()
             val isWearOs = Util.isWearOs(applicationContext)
             for (podcast in podcasts) {
@@ -79,6 +78,8 @@ class RefreshArtworkWorker @AssistedInject constructor(
                     }
                 }
             }
+            // Cleared last so live screens cannot repopulate it from the entries being replaced.
+            coilManager.clearMemoryCache()
             colorManager.updateColors(podcasts)
         }
 

@@ -2,9 +2,11 @@ package au.com.shiftyjelly.pocketcasts.ui.di
 
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.servers.di.Artwork
+import au.com.shiftyjelly.pocketcasts.ui.images.ArtworkCacheStrategy
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import coil3.ImageLoader
+import coil3.annotation.ExperimentalCoilApi
 import coil3.disk.DiskCache
 import coil3.disk.directory
 import coil3.network.okhttp.OkHttpNetworkFetcherFactory
@@ -22,6 +24,7 @@ import okhttp3.OkHttpClient
 @InstallIn(SingletonComponent::class)
 class UiModule {
 
+    @OptIn(ExperimentalCoilApi::class)
     @Provides
     @Singleton
     internal fun provideCoilImageLoader(
@@ -34,6 +37,7 @@ class UiModule {
                 add(
                     OkHttpNetworkFetcherFactory(
                         callFactory = { httpClient.get() },
+                        cacheStrategy = { ArtworkCacheStrategy() },
                     ),
                 )
             }

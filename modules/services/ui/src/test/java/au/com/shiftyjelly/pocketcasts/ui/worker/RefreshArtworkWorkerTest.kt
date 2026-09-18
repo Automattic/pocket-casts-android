@@ -105,9 +105,9 @@ class RefreshArtworkWorkerTest {
 
         assertTrue(result is ListenableWorker.Result.Success)
         verify(coilManager, never()).clearAll()
-        inOrder(coilManager, podcastManager) {
+        inOrder(imageLoader, coilManager) {
+            verify(imageLoader, times(3)).execute(any())
             verify(coilManager).clearMemoryCache()
-            verify(podcastManager).findSubscribedNoOrder()
         }
     }
 
