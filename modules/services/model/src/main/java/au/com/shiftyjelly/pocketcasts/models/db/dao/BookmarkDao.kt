@@ -265,6 +265,8 @@ abstract class BookmarkDao {
             passage = :passage,
             passage_location = :passageLocation,
             passage_modified = :passageModified,
+            reference_time = CASE WHEN :referenceTime IS NOT NULL THEN :referenceTime ELSE reference_time END,
+            reference_time_modified = CASE WHEN :referenceTime IS NOT NULL THEN :referenceTimeModified ELSE reference_time_modified END,
             sync_status = :syncStatus
             WHERE uuid = :bookmarkUuid""",
     )
@@ -273,6 +275,8 @@ abstract class BookmarkDao {
         passage: String,
         passageLocation: Int,
         passageModified: Long,
+        referenceTime: Int?,
+        referenceTimeModified: Long?,
         syncStatus: SyncStatus,
     )
 

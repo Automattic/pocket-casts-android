@@ -50,7 +50,12 @@ class BookmarkFragment : BaseFragment() {
 
     private val editTranscriptLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
-            viewModel.refreshPassage()
+            val data = result.data
+            val passage = data?.getStringExtra(BookmarkTranscriptEditActivity.RESULT_PASSAGE)
+            val passageLocation = data?.getIntExtra(BookmarkTranscriptEditActivity.RESULT_PASSAGE_LOCATION, -1) ?: -1
+            if (passage != null && passageLocation >= 0) {
+                viewModel.onPassageEdited(passage, passageLocation)
+            }
         }
     }
 
@@ -86,6 +91,8 @@ class BookmarkFragment : BaseFragment() {
                     onSave = ::saveBookmark,
                     onClose = ::close,
                     passage = uiState.passage,
+                    canEditTranscript = uiState.canEditTranscript,
+                    isCapturingPassage = uiState.isCapturingPassage,
                     onEditTranscript = ::editTranscript,
                     titleSuggestion = uiState.titleSuggestion,
                     onApplySuggestion = { viewModel.applySuggestion(it) },
@@ -119,12 +126,15 @@ class BookmarkFragment : BaseFragment() {
     }
 
     private fun editTranscript() {
-        val bookmarkUuid = viewModel.uiState.value.bookmarkUuid ?: return
+        val state = viewModel.uiState.value
+        val passage = state.passage ?: return
         val intent = BookmarkTranscriptEditActivity.launchIntent(
             context = requireContext(),
             args = BookmarkTranscriptEditArguments(
-                bookmarkUuid = bookmarkUuid,
                 episodeUuid = args.episodeUuid,
+                podcastUuid = state.podcastUuid,
+                passage = passage,
+                passageLocation = state.passageLocation,
                 podcastColors = args.podcastColors,
             ),
         )

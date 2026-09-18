@@ -71,14 +71,16 @@ class BookmarkTranscriptEditFragment : BaseFragment() {
     }
 
     private fun save() {
-        viewModel.save(
-            onSaved = {
-                requireActivity().run {
+        viewModel.save { passage, passageLocation ->
+            requireActivity().run {
+                if (passage != null && passageLocation != null) {
+                    setResult(Activity.RESULT_OK, BookmarkTranscriptEditActivity.resultIntent(passage, passageLocation))
+                } else {
                     setResult(Activity.RESULT_OK)
-                    finish()
                 }
-            },
-        )
+                finish()
+            }
+        }
     }
 
     private fun close() {

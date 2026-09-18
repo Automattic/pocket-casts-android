@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.foundation.verticalScroll
@@ -33,6 +34,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
@@ -41,6 +43,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
@@ -78,6 +81,8 @@ fun BookmarkPage(
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
     passage: String? = null,
+    canEditTranscript: Boolean = false,
+    isCapturingPassage: Boolean = false,
     onEditTranscript: () -> Unit = {},
     titleSuggestion: BookmarkViewModel.TitleSuggestion = BookmarkViewModel.TitleSuggestion.None,
     onApplySuggestion: (String) -> Unit = {},
@@ -119,6 +124,8 @@ fun BookmarkPage(
             title = title,
             colors = playerColors,
             passage = passage,
+            canEditTranscript = canEditTranscript,
+            isCapturingPassage = isCapturingPassage,
             onTitleChange = onTitleChange,
             onSave = onSave,
             onEditTranscript = onEditTranscript,
@@ -134,6 +141,8 @@ private fun Content(
     title: TextFieldValue,
     colors: PlayerColors,
     passage: String?,
+    canEditTranscript: Boolean,
+    isCapturingPassage: Boolean,
     onTitleChange: (TextFieldValue) -> Unit,
     onSave: () -> Unit,
     onEditTranscript: () -> Unit,
@@ -209,11 +218,16 @@ private fun Content(
             onApplySuggestion = onApplySuggestion,
         )
 
-        if (passage != null) {
-            TranscriptSection(
+        when {
+            passage != null -> TranscriptSection(
                 passage = passage,
                 colors = colors,
+                canEdit = canEditTranscript,
                 onEdit = onEditTranscript,
+            )
+
+            isCapturingPassage -> TranscriptLoadingSection(
+                colors = colors,
             )
         }
 
@@ -288,6 +302,7 @@ private fun TitleSuggestionRow(
 private fun TranscriptSection(
     passage: String,
     colors: PlayerColors,
+    canEdit: Boolean,
     onEdit: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -302,22 +317,53 @@ private fun TranscriptSection(
                 color = colors.contrast02,
                 modifier = Modifier.weight(1f),
             )
-            TextButton(onClick = onEdit) {
-                Text(
-                    text = stringResource(LR.string.edit),
-                    color = colors.highlight01,
-                    fontWeight = FontWeight.Bold,
-                )
+            if (canEdit) {
+                TextButton(onClick = onEdit) {
+                    Text(
+                        text = stringResource(LR.string.edit),
+                        color = colors.highlight01,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
             }
         }
         Spacer(modifier = Modifier.height(4.dp))
         Text(
             text = passage,
             color = colors.contrast01,
-            fontSize = 14.sp,
-            maxLines = 3,
+            fontFamily = FontFamily.Serif,
+            fontSize = 16.sp,
+            maxLines = 4,
             overflow = TextOverflow.Ellipsis,
         )
+    }
+}
+
+@Composable
+private fun TranscriptLoadingSection(
+    colors: PlayerColors,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(top = 24.dp),
+    ) {
+        TextP40(
+            text = stringResource(LR.string.bookmark_adding_transcript),
+            color = colors.contrast02,
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        listOf(0.9f, 0.75f, 0.85f).forEach { fraction ->
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(fraction)
+                    .height(12.dp)
+                    .clip(RoundedCornerShape(4.dp))
+                    .background(colors.contrast01.copy(alpha = 0.12f)),
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+        }
     }
 }
 
@@ -339,6 +385,7 @@ private fun BookmarkPagePreview(
                 onSave = {},
                 onClose = {},
                 passage = "The difference between the kid who gets in and the kid who doesn't is often basically noise.",
+                canEditTranscript = true,
                 onEditTranscript = {},
                 modifier = Modifier.background(colors.background01),
             )

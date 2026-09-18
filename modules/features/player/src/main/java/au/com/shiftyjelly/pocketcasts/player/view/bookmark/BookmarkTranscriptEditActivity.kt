@@ -13,9 +13,17 @@ import au.com.shiftyjelly.pocketcasts.views.R as VR
 class BookmarkTranscriptEditActivity : AppCompatActivity() {
     companion object {
         private const val NEW_INSTANCE_KEY = "new_instance_key"
+        const val RESULT_PASSAGE = "result_passage"
+        const val RESULT_PASSAGE_LOCATION = "result_passage_location"
 
         fun launchIntent(context: Context, args: BookmarkTranscriptEditArguments): Intent {
             return Intent(context, BookmarkTranscriptEditActivity::class.java).putExtra(NEW_INSTANCE_KEY, args)
+        }
+
+        fun resultIntent(passage: String, passageLocation: Int): Intent {
+            return Intent()
+                .putExtra(RESULT_PASSAGE, passage)
+                .putExtra(RESULT_PASSAGE_LOCATION, passageLocation)
         }
     }
 
