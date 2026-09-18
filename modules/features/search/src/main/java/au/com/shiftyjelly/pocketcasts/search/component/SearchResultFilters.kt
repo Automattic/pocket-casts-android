@@ -95,6 +95,7 @@ private fun PreviewSearchResultFilters(
             items = listOf("Top Results", "Podcasts", "Episodes", "Networks"),
             selectedIndex = 1,
             onFilterSelect = {},
+            contentPadding = PaddingValues(horizontal = 16.dp),
         )
     }
 }
