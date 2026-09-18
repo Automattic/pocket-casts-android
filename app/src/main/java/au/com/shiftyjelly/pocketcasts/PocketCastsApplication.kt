@@ -234,7 +234,6 @@ class PocketCastsApplication :
         }
 
         runBlocking {
-            appIcon.enableSelectedAlias(appIcon.activeAppIcon)
             applySelectedAppIconWhenBackgrounded()
 
             notificationHelper.setupNotificationChannels()
