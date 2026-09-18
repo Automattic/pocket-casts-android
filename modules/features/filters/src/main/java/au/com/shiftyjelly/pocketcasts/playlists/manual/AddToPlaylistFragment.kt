@@ -102,7 +102,10 @@ internal class AddToPlaylistFragment : BaseDialogFragment() {
                         if (playlist.canAddOrRemoveEpisodes(uiState.episodeLimit, newEpisodeUuids)) {
                             if (playlist.hasAllEpisodes(newEpisodeUuids)) {
                                 viewModel.trackEpisodeRemoveTapped(playlist)
-                                viewModel.removeFromPlaylist(playlist.uuid)
+                                viewModel.removeFromPlaylist(
+                                    playlistUuid = playlist.uuid,
+                                    playlistTitle = playlist.title,
+                                )
                             } else {
                                 viewModel.trackEpisodeAddTapped(playlist, isPlaylistFull = false)
                                 viewModel.addToPlaylist(

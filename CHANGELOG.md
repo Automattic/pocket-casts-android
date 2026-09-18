@@ -12,6 +12,8 @@
         ([#6005](https://github.com/Automattic/pocket-casts-android/pull/6005))
     *   Keep a newly uploaded file in view instead of letting the Files list jump past it
         ([#6005](https://github.com/Automattic/pocket-casts-android/pull/6005))
+    *   Confirm playlist removals and mixed changes after adding episodes to playlists, not only additions
+        ([#5632](https://github.com/Automattic/pocket-casts-android/pull/5632))
 
 8.21
 -----

@@ -101,7 +101,7 @@ class AddToPlaylistViewModel @AssistedInject constructor(
     private fun cachePlaylistChange(
         uuid: String,
         shouldAdd: Boolean,
-        playlistTitle: String? = null,
+        playlistTitle: String,
     ) {
         val change = PlaylistChange(
             shouldAdd = shouldAdd,
@@ -133,7 +133,7 @@ class AddToPlaylistViewModel @AssistedInject constructor(
             ?.let { (uuid, change) ->
                 AddedPlaylist(
                     uuid = uuid,
-                    title = requireNotNull(change.playlistTitle),
+                    title = change.playlistTitle,
                 )
             }
         return PlaylistChangeFeedback.from(
@@ -193,8 +193,15 @@ class AddToPlaylistViewModel @AssistedInject constructor(
         }
     }
 
-    fun removeFromPlaylist(playlistUuid: String) {
-        cachePlaylistChange(playlistUuid, shouldAdd = false)
+    fun removeFromPlaylist(
+        playlistUuid: String,
+        playlistTitle: String,
+    ) {
+        cachePlaylistChange(
+            uuid = playlistUuid,
+            shouldAdd = false,
+            playlistTitle = playlistTitle,
+        )
 
         viewModelScope.launch(Dispatchers.Default) {
             previewsFlow.update { previews ->
@@ -338,7 +345,7 @@ class AddToPlaylistViewModel @AssistedInject constructor(
 
     private data class PlaylistChange(
         val shouldAdd: Boolean,
-        val playlistTitle: String?,
+        val playlistTitle: String,
     )
 
     sealed interface PlaylistChangeFeedback {

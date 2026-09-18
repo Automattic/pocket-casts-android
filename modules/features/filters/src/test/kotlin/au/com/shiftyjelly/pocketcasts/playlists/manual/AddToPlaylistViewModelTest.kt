@@ -49,14 +49,14 @@ class AddToPlaylistViewModelTest {
 
         viewModel.addToPlaylist("playlist-uuid-1", "Playlist 1")
         viewModel.addToPlaylist("playlist-uuid-2", "Playlist 2")
-        viewModel.removeFromPlaylist("playlist-uuid-3")
+        viewModel.removeFromPlaylist("playlist-uuid-3", "Playlist 3")
 
         assertEquals(
             PlaylistChangeSummary(addedCount = 2, removedCount = 1),
             viewModel.getPlaylistChangeSummary(),
         )
 
-        viewModel.removeFromPlaylist("playlist-uuid-2")
+        viewModel.removeFromPlaylist("playlist-uuid-2", "Playlist 2")
         viewModel.addToPlaylist("playlist-uuid-3", "Playlist 3")
 
         assertEquals(
@@ -129,7 +129,10 @@ class AddToPlaylistViewModelTest {
             playlistUuid = "other-playlist-uuid",
             playlistTitle = "Other playlist",
         )
-        viewModel.removeFromPlaylist("other-playlist-uuid")
+        viewModel.removeFromPlaylist(
+            playlistUuid = "other-playlist-uuid",
+            playlistTitle = "Other playlist",
+        )
 
         assertEquals(
             SinglePlaylistAddition(
@@ -146,15 +149,15 @@ class AddToPlaylistViewModelTest {
     @Test
     fun `submit playlist changes only when committing`() = runTest(coroutineRule.testDispatcher) {
         viewModel.addToPlaylist("playlist-uuid-1", "Playlist 1")
-        viewModel.removeFromPlaylist("playlist-uuid-1")
+        viewModel.removeFromPlaylist("playlist-uuid-1", "Playlist 1")
         viewModel.addToPlaylist("playlist-uuid-1", "Playlist 1")
 
         viewModel.addToPlaylist("playlist-uuid-2", "Playlist 2")
-        viewModel.removeFromPlaylist("playlist-uuid-2")
+        viewModel.removeFromPlaylist("playlist-uuid-2", "Playlist 2")
 
         viewModel.addToPlaylist("playlist-uuid-3", "Playlist 3")
 
-        viewModel.removeFromPlaylist("playlist-uuid-4")
+        viewModel.removeFromPlaylist("playlist-uuid-4", "Playlist 4")
 
         playlistManager.addManualEpisodeTurbine.expectNoEvents()
         playlistManager.deleteManualEpisodeTurbine.expectNoEvents()
