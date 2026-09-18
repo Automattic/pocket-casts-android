@@ -44,6 +44,7 @@ class PrefetchArtworkWorker @AssistedInject constructor(
 
     companion object {
         private const val WORK_NAME = "PrefetchArtworkWorkerPeriodic"
+        private const val BYTES_PER_MB = 1024 * 1024
 
         fun enqueuePeriodicWork(context: Context, settings: Settings) {
             val request = buildPeriodicWorkRequest(settings)
@@ -124,5 +125,3 @@ class PrefetchArtworkWorker @AssistedInject constructor(
         return Result.success()
     }
 }
-
-private const val BYTES_PER_MB = 1024 * 1024
