@@ -15,7 +15,7 @@
     *   Show a single launcher icon after choosing a custom app icon
         ([#5609](https://github.com/Automattic/pocket-casts-android/pull/5609))
     *   Stay in Pocket Casts after changing the app icon instead of closing to the home screen
-        ([#6013](https://github.com/Automattic/pocket-casts-android/pull/6013))
+        ([#6017](https://github.com/Automattic/pocket-casts-android/pull/6017))
 
 8.21
 -----
