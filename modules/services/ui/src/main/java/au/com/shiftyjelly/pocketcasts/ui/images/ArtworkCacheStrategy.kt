@@ -14,6 +14,8 @@ import coil3.request.Options
 @OptIn(ExperimentalCoilApi::class)
 internal class ArtworkCacheStrategy : CacheStrategy {
 
+    // Unconditional, so Coil never sends a validator and [write] can never see a 304. Adding
+    // revalidation here means [write] has to handle 304 as well, or Coil re-requests the image.
     override suspend fun read(
         cacheResponse: NetworkResponse,
         networkRequest: NetworkRequest,
