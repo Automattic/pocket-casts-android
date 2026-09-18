@@ -14,6 +14,8 @@
         ([#6005](https://github.com/Automattic/pocket-casts-android/pull/6005))
     *   Show a single launcher icon after choosing a custom app icon
         ([#5609](https://github.com/Automattic/pocket-casts-android/pull/5609))
+    *   Keep podcast artwork visible when the network or artwork server is unavailable
+        ([#5549](https://github.com/Automattic/pocket-casts-android/pull/5549))
 
 8.21
 -----
@@ -69,6 +71,7 @@
 *   New Features
     *   Add Audio only playback setting
         ([#5572](https://github.com/Automattic/pocket-casts-android/pull/5572))
+    *   Add support for Flightcast transcripts
         ([#5544](https://github.com/Automattic/pocket-casts-android/pull/5544))
     *   Stats Heatmap
         ([#5536](https://github.com/Automattic/pocket-casts-android/pull/5536))
