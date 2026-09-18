@@ -148,15 +148,15 @@ private fun PairingBadges(modifier: Modifier = Modifier) {
             Image(
                 painter = painterResource(IR.drawable.ic_pocket_casts_logo),
                 contentDescription = null,
-                modifier = Modifier.size(28.dp),
+                modifier = Modifier.size(24.dp),
             )
         }
-        BadgeDots(Modifier.padding(horizontal = 12.dp))
+        BadgeDots(Modifier.padding(horizontal = 16.dp))
         LogoBadge {
             Image(
-                painter = painterResource(IR.drawable.ic_android_robot),
+                painter = painterResource(IR.drawable.ic_google_tv),
                 contentDescription = null,
-                modifier = Modifier.size(34.dp),
+                modifier = Modifier.width(32.dp),
             )
         }
     }
@@ -167,9 +167,9 @@ private fun LogoBadge(content: @Composable () -> Unit) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
-            .size(64.dp)
+            .size(80.dp)
             .clip(CircleShape)
-            .background(Brush.linearGradient(listOf(Color(0xFF03161F), Color(0xFF08354F)))),
+            .background(Brush.linearGradient(listOf(Color(0xFF010609), Color(0xFF0C4A6F)))),
         content = { content() },
     )
 }
@@ -177,7 +177,7 @@ private fun LogoBadge(content: @Composable () -> Unit) {
 @Composable
 private fun BadgeDots(modifier: Modifier = Modifier) {
     Row(
-        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        horizontalArrangement = Arrangement.spacedBy(2.dp),
         modifier = modifier,
     ) {
         repeat(3) {
@@ -185,7 +185,7 @@ private fun BadgeDots(modifier: Modifier = Modifier) {
                 Modifier
                     .size(4.dp)
                     .clip(CircleShape)
-                    .background(MaterialTheme.theme.colors.primaryText02),
+                    .background(MaterialTheme.theme.colors.primaryUi05),
             )
         }
     }
