@@ -12,6 +12,8 @@
         ([#6005](https://github.com/Automattic/pocket-casts-android/pull/6005))
     *   Keep a newly uploaded file in view instead of letting the Files list jump past it
         ([#6005](https://github.com/Automattic/pocket-casts-android/pull/6005))
+    *   Download new episodes that were missed when a podcast refresh was interrupted
+        ([#6010](https://github.com/Automattic/pocket-casts-android/pull/6010))
 
 8.21
 -----
