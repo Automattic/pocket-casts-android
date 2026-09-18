@@ -4,6 +4,10 @@ import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.ReadSetting
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
+import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
@@ -41,6 +45,10 @@ class DeviceApproveViewModelTest {
     private val syncManager = mock<SyncManager>()
     private val userManager = mock<UserManager>()
     private val playbackManager = mock<PlaybackManager>()
+    private val upNextQueue = mock<UpNextQueue>()
+    private val folderManager = mock<FolderManager>()
+    private val searchHistoryManager = mock<SearchHistoryManager>()
+    private val episodeManager = mock<EpisodeManager>()
     private val cachedSubscription = mock<ReadSetting<Subscription?>> {
         on { value } doReturn null
     }
@@ -153,7 +161,14 @@ class DeviceApproveViewModelTest {
         viewModel.switchAccount()
         advanceUntilIdle()
 
-        verify(userManager).signOut(playbackManager, wasInitiatedByUser = true)
+        verify(userManager).signOutAndClearData(
+            playbackManager = playbackManager,
+            upNextQueue = upNextQueue,
+            folderManager = folderManager,
+            searchHistoryManager = searchHistoryManager,
+            episodeManager = episodeManager,
+            wasInitiatedByUser = true,
+        )
         assertFalse(viewModel.uiState.value.isLoggedIn)
         assertNull(viewModel.uiState.value.email)
     }
@@ -169,7 +184,17 @@ class DeviceApproveViewModelTest {
         assertFalse(viewModel.shouldPromptUpsellAfterApproval)
     }
 
-    private fun createViewModel(userCode: String) = DeviceApproveViewModel(syncManager, userManager, playbackManager, settings, eventHorizon).apply {
+    private fun createViewModel(userCode: String) = DeviceApproveViewModel(
+        syncManager,
+        userManager,
+        playbackManager,
+        upNextQueue,
+        folderManager,
+        searchHistoryManager,
+        episodeManager,
+        settings,
+        eventHorizon,
+    ).apply {
         setUserCode(userCode)
     }
 

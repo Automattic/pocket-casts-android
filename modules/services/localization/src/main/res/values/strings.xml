@@ -2990,6 +2990,9 @@
     <string name="device_approve_login_required">In order to connect your device you need to have an account. Please sign in or create an account and try again.</string>
     <string name="device_approve_signing_in_as">Signing in as…</string>
     <string name="device_approve_switch_account">Not you? Switch account</string>
+    <string name="device_approve_switch_account_title">Switch account?</string>
+    <string name="device_approve_switch_account_message">This signs you out and removes the podcasts, filters and listening history on this device.</string>
+    <string name="device_approve_switch_account_confirm">Switch account</string>
     <string name="device_approve_connect">Connect</string>
     <string name="device_approve_success_title">Google TV connected</string>
     <string name="device_approve_success_message">Your Google TV is now connected to your account.</string>

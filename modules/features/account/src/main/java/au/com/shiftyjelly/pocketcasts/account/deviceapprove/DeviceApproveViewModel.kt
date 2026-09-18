@@ -4,8 +4,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
+import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.eventhorizon.DeviceApproveConnectTappedEvent
 import com.automattic.eventhorizon.DeviceApproveDismissedEvent
 import com.automattic.eventhorizon.DeviceApproveFailedEvent
@@ -29,6 +34,10 @@ class DeviceApproveViewModel @Inject constructor(
     private val syncManager: SyncManager,
     private val userManager: UserManager,
     private val playbackManager: PlaybackManager,
+    private val upNextQueue: UpNextQueue,
+    private val folderManager: FolderManager,
+    private val searchHistoryManager: SearchHistoryManager,
+    private val episodeManager: EpisodeManager,
     private val settings: Settings,
     private val eventHorizon: EventHorizon,
 ) : ViewModel() {
@@ -36,7 +45,7 @@ class DeviceApproveViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(DeviceApproveUiState())
     val uiState: StateFlow<DeviceApproveUiState> = _uiState.asStateFlow()
 
-    private val wasSignedOutInitially = !syncManager.isLoggedIn()
+    private var wasSignedOutInitially = !syncManager.isLoggedIn()
 
     val shouldPromptUpsellAfterApproval get() = wasSignedOutInitially && settings.cachedSubscription.value == null
 
@@ -60,11 +69,18 @@ class DeviceApproveViewModel @Inject constructor(
         eventHorizon.track(DeviceSetupAccountTappedEvent)
     }
 
-    fun switchAccount() {
-        viewModelScope.launch {
-            userManager.signOut(playbackManager, wasInitiatedByUser = true)?.join()
-            refreshAccountState()
-        }
+    suspend fun switchAccount() {
+        LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "User requested to switch accounts while approving a device")
+        userManager.signOutAndClearData(
+            playbackManager = playbackManager,
+            upNextQueue = upNextQueue,
+            folderManager = folderManager,
+            searchHistoryManager = searchHistoryManager,
+            episodeManager = episodeManager,
+            wasInitiatedByUser = true,
+        )?.join()
+        wasSignedOutInitially = true
+        refreshAccountState()
     }
 
     fun onDismissed() {
