@@ -46,6 +46,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -116,7 +117,7 @@ fun BookmarkTranscriptView(
         modifier = modifier
             .onSizeChanged { viewportHeight = it.height }
             .alpha(contentAlpha)
-            .fadingEdges(enabled = !editable)
+            .fadingEdges(top = TopFade, bottom = if (editable) 0.dp else BottomFade)
             .verticalScroll(scrollState),
     ) {
         val renderText: @Composable () -> Unit = {
@@ -205,7 +206,7 @@ fun BookmarkTranscriptView(
     }
 }
 
-private fun BookmarkTranscript.isSpeakerOffset(index: Int) = speakerSpans.any { index >= it.start && index <= it.end }
+private fun BookmarkTranscript.isSpeakerOffset(index: Int) = speakerSpans.any { index in it.start until it.end }
 
 private val SimpleTextStyle = TextStyle(
     fontSize = 16.sp,
@@ -229,32 +230,36 @@ private val BottomFade = 64.dp
 
 private val FadeInThresholdMs = 200L
 
-private fun Modifier.fadingEdges(enabled: Boolean) = if (!enabled) {
+private fun Modifier.fadingEdges(top: Dp, bottom: Dp) = if (top == 0.dp && bottom == 0.dp) {
     this
 } else {
     this
         .graphicsLayer(compositingStrategy = CompositingStrategy.Offscreen)
         .drawWithContent {
             drawContent()
-            val scale = min(1f, size.height / (TopFade.toPx() + BottomFade.toPx()))
-            val topFade = TopFade.toPx() * scale
-            val bottomFade = BottomFade.toPx() * scale
-            drawRect(
-                brush = Brush.verticalGradient(
-                    colors = listOf(Color.Transparent, Color.Black),
-                    startY = 0f,
-                    endY = topFade,
-                ),
-                blendMode = BlendMode.DstIn,
-            )
-            drawRect(
-                brush = Brush.verticalGradient(
-                    colors = listOf(Color.Black, Color.Transparent),
-                    startY = size.height - bottomFade,
-                    endY = size.height,
-                ),
-                blendMode = BlendMode.DstIn,
-            )
+            val scale = min(1f, size.height / (top.toPx() + bottom.toPx()))
+            val topFade = top.toPx() * scale
+            val bottomFade = bottom.toPx() * scale
+            if (topFade > 0f) {
+                drawRect(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(Color.Transparent, Color.Black),
+                        startY = 0f,
+                        endY = topFade,
+                    ),
+                    blendMode = BlendMode.DstIn,
+                )
+            }
+            if (bottomFade > 0f) {
+                drawRect(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(Color.Black, Color.Transparent),
+                        startY = size.height - bottomFade,
+                        endY = size.height,
+                    ),
+                    blendMode = BlendMode.DstIn,
+                )
+            }
         }
 }
 
