@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.hilt.work.HiltWorker
 import androidx.work.Constraints
 import androidx.work.CoroutineWorker
+import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
@@ -37,12 +38,17 @@ class RefreshArtworkWorker @AssistedInject constructor(
 
     companion object {
         private const val MAX_RETRY_ATTEMPTS = 5
+        private const val WORK_NAME = "RefreshArtworkWorker"
 
         fun start(context: Context) {
             val workRequest = OneTimeWorkRequestBuilder<RefreshArtworkWorker>()
                 .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
                 .build()
-            WorkManager.getInstance(context).enqueue(workRequest)
+            WorkManager.getInstance(context).enqueueUniqueWork(
+                WORK_NAME,
+                ExistingWorkPolicy.KEEP,
+                workRequest,
+            )
         }
     }
 
@@ -51,6 +57,7 @@ class RefreshArtworkWorker @AssistedInject constructor(
         var failed = 0
         withContext(Dispatchers.IO) {
             val podcasts = podcastManager.findSubscribedNoOrder()
+            colorManager.updateColors(podcasts)
             val isWearOs = Util.isWearOs(applicationContext)
             for (podcast in podcasts) {
                 for (url in PodcastImage.getArtworkUrls(uuid = podcast.uuid, isWearOS = isWearOs)) {
@@ -80,13 +87,12 @@ class RefreshArtworkWorker @AssistedInject constructor(
             }
             // Cleared last so live screens cannot repopulate it from the entries being replaced.
             coilManager.clearMemoryCache()
-            colorManager.updateColors(podcasts)
         }
 
         val summary =
             "Artwork refresh attempt ${runAttemptCount + 1}: $successful image requests succeeded ($failed failed)."
         return when {
-            failed == 0 -> {
+            failed == 0 || successful > 0 -> {
                 LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, summary)
                 Result.success()
             }

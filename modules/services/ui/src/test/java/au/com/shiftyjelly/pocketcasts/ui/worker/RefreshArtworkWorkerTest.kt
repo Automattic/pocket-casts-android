@@ -89,8 +89,22 @@ class RefreshArtworkWorkerTest {
 
         val result = buildWorker().doWork()
 
-        assertTrue(result is ListenableWorker.Result.Retry)
+        assertTrue(result is ListenableWorker.Result.Success)
         verify(imageLoader, times(3)).execute(any())
+    }
+
+    @Test
+    fun `a single missing image does not re-download the podcasts that succeeded`() = runTest {
+        val podcasts = List(3) { Podcast(uuid = "podcast-uuid-$it") }
+        whenever(podcastManager.findSubscribedNoOrder()).doReturn(podcasts)
+        whenever(imageLoader.execute(any()))
+            .thenThrow(IllegalStateException("Artwork is gone"))
+            .thenReturn(mock<ImageResult>())
+
+        val result = buildWorker().doWork()
+
+        assertTrue(result is ListenableWorker.Result.Success)
+        verify(imageLoader, times(9)).execute(any())
     }
 
     @Test
@@ -104,7 +118,6 @@ class RefreshArtworkWorkerTest {
         val result = buildWorker(runAttemptCount = 0).doWork()
 
         assertTrue(result is ListenableWorker.Result.Success)
-        verify(coilManager, never()).clearAll()
         inOrder(imageLoader, coilManager) {
             verify(imageLoader, times(3)).execute(any())
             verify(coilManager).clearMemoryCache()

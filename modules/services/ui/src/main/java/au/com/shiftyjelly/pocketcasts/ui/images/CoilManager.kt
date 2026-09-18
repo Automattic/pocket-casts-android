@@ -19,11 +19,6 @@ class CoilManager @Inject constructor(val imageLoader: ImageLoader) {
         imageLoader.memoryCache?.clear()
     }
 
-    fun clearAll() {
-        imageLoader.memoryCache?.clear()
-        imageLoader.diskCache?.clear()
-    }
-
     fun clearMemoryCache() {
         imageLoader.memoryCache?.clear()
     }
