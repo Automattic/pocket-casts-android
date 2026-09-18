@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -30,10 +31,12 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.bottomsheet.Pill
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
@@ -117,7 +120,12 @@ private fun ColumnScope.ApproveContent(
             Spacer(Modifier.height(24.dp))
             AccountCard(email = state.email.orEmpty())
             Spacer(Modifier.height(16.dp))
-            SwitchAccountLink(onClick = onSwitchAccount)
+            CodeChip(code = state.userCode)
+            Spacer(Modifier.height(16.dp))
+            SwitchAccountLink(
+                onClick = onSwitchAccount,
+                enabled = state.status == DeviceApproveStatus.Idle,
+            )
         }
     }
     if (state.isLoggedIn) {
@@ -163,16 +171,24 @@ private fun ColumnScope.PairingBody(
 }
 
 @Composable
-private fun SwitchAccountLink(onClick: () -> Unit) {
-    TextP40(
-        text = stringResource(LR.string.device_approve_switch_account),
-        color = MaterialTheme.theme.colors.primaryInteractive01,
-        textAlign = TextAlign.Center,
+private fun SwitchAccountLink(
+    onClick: () -> Unit,
+    enabled: Boolean,
+) {
+    Box(
+        contentAlignment = Alignment.Center,
         modifier = Modifier
             .clip(RoundedCornerShape(8.dp))
-            .clickable(onClick = onClick)
-            .padding(horizontal = 12.dp, vertical = 8.dp),
-    )
+            .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
+            .sizeIn(minWidth = 48.dp, minHeight = 48.dp)
+            .padding(horizontal = 12.dp),
+    ) {
+        TextP40(
+            text = stringResource(LR.string.device_approve_switch_account),
+            color = MaterialTheme.theme.colors.primaryInteractive01.copy(alpha = if (enabled) 1f else 0.5f),
+            textAlign = TextAlign.Center,
+        )
+    }
 }
 
 @Composable
@@ -252,6 +268,21 @@ private fun AccountCard(email: String) {
             )
             TextH40(text = email)
         }
+    }
+}
+
+@Composable
+private fun CodeChip(code: String) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .background(MaterialTheme.theme.colors.primaryUi02)
+            .border(1.dp, MaterialTheme.theme.colors.primaryUi05, RoundedCornerShape(12.dp))
+            .padding(vertical = 16.dp),
+    ) {
+        TextH20(text = code, letterSpacing = 4.sp)
     }
 }
 
