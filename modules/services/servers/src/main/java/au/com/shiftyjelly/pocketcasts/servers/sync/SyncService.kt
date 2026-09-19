@@ -113,7 +113,7 @@ interface SyncService {
     suspend fun getLastSyncAt(@Header("Authorization") authorization: String, @Body request: BasicRequest): LastSyncAtResponse
 
     @POST("/user/podcast/episodes")
-    fun getPodcastEpisodes(@Header("Authorization") authorization: String, @Body request: PodcastEpisodesRequest): Single<PodcastEpisodesResponse>
+    suspend fun getPodcastEpisodes(@Header("Authorization") authorization: String, @Body request: PodcastEpisodesRequest): PodcastEpisodesResponse
 
     @Headers("Content-Type: application/octet-stream")
     @POST("/user/podcast/list")

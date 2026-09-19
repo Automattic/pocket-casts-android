@@ -190,7 +190,7 @@ open class SyncServiceManager @Inject constructor(
 
     suspend fun getHomeFolder(token: AccessToken): UserPodcastListResponse = service.getPodcastList(addBearer(token), userPodcastListRequest)
 
-    fun getPodcastEpisodes(podcastUuid: String, token: AccessToken): Single<PodcastEpisodesResponse> {
+    suspend fun getPodcastEpisodes(podcastUuid: String, token: AccessToken): PodcastEpisodesResponse {
         val request = PodcastEpisodesRequest(podcastUuid)
         return service.getPodcastEpisodes(addBearer(token), request)
     }
