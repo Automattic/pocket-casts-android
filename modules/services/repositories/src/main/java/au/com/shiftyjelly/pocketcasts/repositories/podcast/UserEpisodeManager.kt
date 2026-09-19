@@ -37,13 +37,14 @@ import java.io.File
 import java.net.HttpURLConnection
 import java.util.Date
 import java.util.UUID
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlin.math.roundToInt
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterNotNull
@@ -54,7 +55,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlowable
 import kotlinx.coroutines.rx2.await
 import kotlinx.coroutines.rx2.awaitSingleOrNull
-import kotlinx.coroutines.rx2.rxCompletable
 import kotlinx.coroutines.rx2.rxMaybe
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
@@ -72,7 +72,7 @@ interface UserEpisodeManager {
     suspend fun findEpisodeByUuid(uuid: String): UserEpisode?
     suspend fun findEpisodesByUuids(episodeUuids: List<String>): List<UserEpisode>
     fun uploadToServer(userEpisode: UserEpisode, waitForWifi: Boolean)
-    fun performUploadToServerRxCompletable(userEpisode: UserEpisode, playbackManager: PlaybackManager): Completable
+    suspend fun performUploadToServer(userEpisode: UserEpisode, playbackManager: PlaybackManager)
     fun removeFromCloud(userEpisode: UserEpisode)
     fun cancelUpload(userEpisode: UserEpisode)
     suspend fun syncFiles(playbackManager: PlaybackManager)
@@ -426,63 +426,54 @@ class UserEpisodeManagerImpl @Inject constructor(
         }
     }
 
-    override fun performUploadToServerRxCompletable(userEpisode: UserEpisode, playbackManager: PlaybackManager): Completable {
+    override suspend fun performUploadToServer(userEpisode: UserEpisode, playbackManager: PlaybackManager) {
         Timber.d("Starting upload of ${userEpisode.uuid}")
         val artworkUrl = userEpisode.artworkUrl
         val imageFile = if (artworkUrl != null && userEpisode.artworkUrl?.startsWith("/") == true) File(artworkUrl) else null
-        val imageUploadTask = if (imageFile != null) {
-            uploadImageToServerRxCompletable(userEpisode, imageFile)
+
+        userEpisodeDao.updateServerStatus(userEpisode.uuid, UserEpisodeServerStatus.UPLOADING)
+        userEpisodeDao.updateUploadError(userEpisode.uuid, null)
+        syncManager.uploadFileToServerRxCompletable(userEpisode).await()
+        if (imageFile != null) {
+            uploadImageToServerRxCompletable(userEpisode, imageFile).await()
+        }
+        // let the file upload report to upload to the api server
+        delay(1.seconds)
+        // the api server will call S3 to check the file exists if it doesn't know
+        val success = try {
+            syncManager.getFileUploadStatusRxSingle(userEpisode.uuid).await()
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Throwable) {
+            Timber.e(e)
+            false
+        }
+        if (success) {
+            eventHorizon.track(
+                EpisodeUploadFinishedEvent(
+                    episodeUuid = userEpisode.uuid,
+                ),
+            )
+            userEpisodeDao.updateServerStatus(userEpisode.uuid, serverStatus = UserEpisodeServerStatus.UPLOADED)
         } else {
-            Completable.complete()
+            eventHorizon.track(
+                EpisodeUploadFailedEvent(
+                    episodeUuid = userEpisode.uuid,
+                ),
+            )
+            userEpisodeDao.updateUploadError(userEpisode.uuid, "Upload failed")
         }
 
-        return rxCompletable {
-            userEpisodeDao.updateServerStatus(userEpisode.uuid, UserEpisodeServerStatus.UPLOADING)
-            userEpisodeDao.updateUploadError(userEpisode.uuid, null)
+        try {
+            syncFiles(
+                playbackManager = playbackManager,
+                syncArtworkChanges = false,
+            )
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Throwable) {
+            Timber.e(e)
         }
-            .andThen(syncManager.uploadFileToServerRxCompletable(userEpisode))
-            .andThen(imageUploadTask)
-            // let the file upload report to upload to the api server
-            .delay(1, TimeUnit.SECONDS)
-            // the api server will call S3 to check the file exists if it doesn't know
-            .andThen(
-                syncManager.getFileUploadStatusRxSingle(userEpisode.uuid)
-                    .onErrorReturn {
-                        Timber.e(it)
-                        false
-                    }
-                    .flatMapCompletable { success ->
-                        if (success) {
-                            eventHorizon.track(
-                                EpisodeUploadFinishedEvent(
-                                    episodeUuid = userEpisode.uuid,
-                                ),
-                            )
-                            rxCompletable {
-                                userEpisodeDao.updateServerStatus(userEpisode.uuid, serverStatus = UserEpisodeServerStatus.UPLOADED)
-                            }
-                        } else {
-                            eventHorizon.track(
-                                EpisodeUploadFailedEvent(
-                                    episodeUuid = userEpisode.uuid,
-                                ),
-                            )
-                            rxCompletable {
-                                userEpisodeDao.updateUploadError(userEpisode.uuid, "Upload failed")
-                            }
-                        }
-                    },
-            )
-            .andThen(
-                rxCompletable {
-                    syncFiles(
-                        playbackManager = playbackManager,
-                        syncArtworkChanges = false,
-                    )
-                }.doOnError {
-                    Timber.e(it)
-                }.onErrorComplete(),
-            )
     }
 
     override fun uploadImageToServerRxCompletable(userEpisode: UserEpisode, imageFile: File): Completable = syncManager.uploadImageToServerRxCompletable(userEpisode, imageFile)
