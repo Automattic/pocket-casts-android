@@ -341,10 +341,6 @@ class PodcastManagerImpl @Inject constructor(
         }
     }
 
-    override fun findSubscribedRxSingle(): Single<List<Podcast>> {
-        return Single.fromCallable { findSubscribedBlocking() }
-    }
-
     override fun findSubscribedFlow(searchTerm: String?): Flow<List<Podcast>> {
         return podcastDao.findSubscribedFlow(searchTerm.orEmpty())
     }
