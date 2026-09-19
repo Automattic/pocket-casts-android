@@ -53,6 +53,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlowable
 import kotlinx.coroutines.rx2.await
+import kotlinx.coroutines.rx2.rxCompletable
 import kotlinx.coroutines.rx2.awaitSingleOrNull
 import kotlinx.coroutines.rx2.rxMaybe
 import kotlinx.coroutines.withContext
@@ -243,7 +244,7 @@ class UserEpisodeManagerImpl @Inject constructor(
             return@rxMaybe existingEpisode
         }
 
-        val serverFile = syncManager.getUserEpisodeRxMaybe(uuid).awaitSingleOrNull()
+        val serverFile = syncManager.getUserEpisode(uuid)
         val episode = serverFile?.toUserEpisode()
             ?: UserEpisode(uuid = uuid, title = placeholderTitle ?: "Unable to find episode", publishedDate = placeholderPublished ?: Date(), serverStatus = UserEpisodeServerStatus.MISSING)
         userEpisodeDao.insertOrReplace(episode)

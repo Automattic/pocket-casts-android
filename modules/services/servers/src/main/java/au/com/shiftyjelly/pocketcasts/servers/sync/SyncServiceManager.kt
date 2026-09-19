@@ -264,7 +264,7 @@ open class SyncServiceManager @Inject constructor(
 
     suspend fun getSignedPlaybackUrl(episode: UserEpisode, token: AccessToken): String = service.getFilePlaybackUrl(addBearer(token), episode.uuid).url
 
-    fun getUserEpisode(uuid: String, token: AccessToken): Single<Response<ServerFile>> = service.getFile(addBearer(token), uuid)
+    suspend fun getUserEpisode(uuid: String, token: AccessToken): Response<ServerFile> = service.getFile(addBearer(token), uuid)
 
     suspend fun loadStats(token: AccessToken): StatsBundle {
         val response = service.loadStats(addBearer(token), StatsSummaryRequest(deviceId = settings.getUniqueDeviceId()))

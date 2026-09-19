@@ -44,7 +44,6 @@ import com.pocketcasts.service.api.UserPodcastListResponse
 import com.pocketcasts.service.api.WebFeedCreateResponse
 import com.pocketcasts.service.api.WinbackResponse
 import io.reactivex.Completable
-import io.reactivex.Maybe
 import io.reactivex.Single
 import java.io.File
 import kotlinx.coroutines.flow.Flow
@@ -89,7 +88,7 @@ interface SyncManager : NamedSettingsCaller {
     suspend fun uploadFileToServer(episode: UserEpisode)
     suspend fun uploadImageToServer(episode: UserEpisode, imageFile: File)
     fun postFilesRxSingle(files: List<FilePost>): Single<Response<Void>>
-    fun getUserEpisodeRxMaybe(uuid: String): Maybe<ServerFile>
+    suspend fun getUserEpisode(uuid: String): ServerFile?
     suspend fun getFileUsage(): FileAccount
     suspend fun deleteImageFromServer(episode: UserEpisode): Response<Void>
     suspend fun deleteFromServer(episode: UserEpisode): Response<Void>
