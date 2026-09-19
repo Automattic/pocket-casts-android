@@ -10,6 +10,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationManager
 import au.com.shiftyjelly.pocketcasts.repositories.notification.OnboardingNotificationType
 import au.com.shiftyjelly.pocketcasts.servers.sync.FileAccount
+import au.com.shiftyjelly.pocketcasts.servers.sync.PodcastEpisodesResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.UserChangeResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.DeviceTokenResponse
@@ -234,6 +235,17 @@ class SyncManagerImplTest {
         whenever(syncServiceManager.deleteFromServer(episode, AccessToken("access-token"))).thenReturn(response)
 
         assertEquals(response, syncManager.deleteFromServer(episode))
+        verify(syncAccountManager, never()).invalidateAccessToken()
+    }
+
+    @Test
+    fun `podcast episodes are fetched with the cached token`() = runTest {
+        val response = PodcastEpisodesResponse(episodesSortOrder = 1, autoStartFrom = 0, subscribed = true, episodes = emptyList())
+        whenever(syncAccountManager.isLoggedIn()).thenReturn(true)
+        whenever(syncAccountManager.getAccessToken()).thenReturn(AccessToken("access-token"))
+        whenever(syncServiceManager.getPodcastEpisodes("podcast-uuid", AccessToken("access-token"))).thenReturn(response)
+
+        assertEquals(response, syncManager.getPodcastEpisodes("podcast-uuid"))
         verify(syncAccountManager, never()).invalidateAccessToken()
     }
 

@@ -249,7 +249,7 @@ class SubscribeManager @Inject constructor(
         )
         // add sync information
         if (syncManager.isLoggedIn()) {
-            val syncPodcastObservable = syncManager.getPodcastEpisodesRxSingle(podcastUuid).subscribeOn(Schedulers.io())
+            val syncPodcastObservable = rxSingle(Dispatchers.IO) { syncManager.getPodcastEpisodes(podcastUuid) }
             return Single.zip(cleanPodcastObservable, syncPodcastObservable, BiFunction<Podcast, PodcastEpisodesResponse, Podcast>(this::mergeSyncPodcast))
                 .onErrorResumeNext(cleanPodcastObservable)
         } else {
