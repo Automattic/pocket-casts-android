@@ -173,7 +173,7 @@ interface SyncService {
     suspend fun deleteImageFile(@Header("Authorization") authorization: String, @Path("uuid") uuid: String): Response<Void>
 
     @GET("/files/{uuid}")
-    fun getFile(@Header("Authorization") authorization: String, @Path("uuid") uuid: String): Single<Response<ServerFile>>
+    suspend fun getFile(@Header("Authorization") authorization: String, @Path("uuid") uuid: String): Response<ServerFile>
 
     @Headers("Cache-Control: no-store")
     @GET("/files/play/{uuid}")
