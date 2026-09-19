@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.models.db.dao.PlaylistDao
 import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.di.DefaultDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearSync
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationScheduler
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationSchedulerImpl.Companion.TAG_TRENDING_RECOMMENDATIONS
@@ -26,35 +27,43 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
-import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.android.tracks.crashlogging.CrashLogging
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.UserSignedOutEvent
 import dagger.hilt.android.qualifiers.ApplicationContext
-import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
-import io.reactivex.Single
-import io.reactivex.rxkotlin.combineLatest
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.rx2.asFlow
 import kotlinx.coroutines.rx2.asFlowable
-import kotlinx.coroutines.rx2.rxSingle
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import timber.log.Timber
 
 interface UserManager {
     fun beginMonitoringAccountManager(playbackManager: PlaybackManager)
+
+    fun signInStateFlow(): Flow<SignInState>
+
+    /** Rx bridge for consumers that have not yet moved to [signInStateFlow]. */
     fun getSignInState(): Flowable<SignInState>
 
     /** Emits when the user is signed out by the server rather than by their own action. */
@@ -84,6 +93,7 @@ class UserManagerImpl @Inject constructor(
     private val experimentProvider: ExperimentProvider,
     private val endOfYearSync: EndOfYearSync,
     private val notificationScheduler: NotificationScheduler,
+    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : UserManager,
     CoroutineScope {
 
@@ -95,7 +105,7 @@ class UserManagerImpl @Inject constructor(
     }
 
     override val coroutineContext: CoroutineContext
-        get() = Dispatchers.Default
+        get() = defaultDispatcher
 
     private val _onServerSignOut = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     override val onServerSignOut: SharedFlow<Unit> = _onServerSignOut.asSharedFlow()
@@ -117,40 +127,39 @@ class UserManagerImpl @Inject constructor(
         accountManager.addOnAccountsUpdatedListener(accountListener, null, true)
     }
 
-    override fun getSignInState(): Flowable<SignInState> {
-        return syncManager.isLoggedInObservable.toFlowable(BackpressureStrategy.LATEST)
-            .switchMap { isLoggedIn ->
+    @OptIn(ExperimentalCoroutinesApi::class)
+    override fun signInStateFlow(): Flow<SignInState> {
+        return syncManager.isLoggedInObservable.asFlow()
+            .flatMapLatest { isLoggedIn ->
                 if (isLoggedIn) {
-                    launch(coroutineContext) {
+                    launch {
                         notificationScheduler.setupTrendingAndRecommendationsNotifications()
                     }
-
-                    settings.cachedSubscription.flow
-                        .map { Optional.of(it) }
-                        .asFlowable()
-                        .flatMapSingle { maybeSubscription ->
-                            if (maybeSubscription.isPresent()) {
-                                Single.just(maybeSubscription)
-                            } else {
-                                rxSingle { Optional.of(fetchSubscriptionForSignIn()) }
-                            }
-                        }
-                        .combineLatest(syncManager.emailFlow().map { it.orEmpty() }.asFlowable())
-                        .map { (maybeSubscription, email) ->
-                            analyticsController.refreshMetadata()
-                            SignInState.SignedIn(email = email, subscription = maybeSubscription.get())
-                        }
-                        .onErrorReturn {
-                            Timber.e(it, "Error getting subscription state")
-                            SignInState.SignedIn(syncManager.getEmail() ?: "", subscription = null)
-                        }
+                    signedInStateFlow()
                 } else {
-                    launch(coroutineContext) {
+                    launch {
                         notificationScheduler.cancelScheduledWorksByTag(listOf("$TAG_TRENDING_RECOMMENDATIONS-${TrendingAndRecommendationsNotificationType.Recommendations.subcategory}"))
                     }
-                    Flowable.just(SignInState.SignedOut)
+                    flowOf(SignInState.SignedOut)
                 }
             }
+    }
+
+    override fun getSignInState(): Flowable<SignInState> = signInStateFlow().asFlowable()
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private fun signedInStateFlow(): Flow<SignInState> {
+        val subscriptionFlow = settings.cachedSubscription.flow.mapLatest { subscription ->
+            // Keeps the fetch off the collector's thread, where the rxSingle bridge used to put it.
+            subscription ?: withContext(defaultDispatcher) { fetchSubscriptionForSignIn() }
+        }
+        return combine(subscriptionFlow, syncManager.emailFlow()) { subscription, email ->
+            analyticsController.refreshMetadata()
+            SignInState.SignedIn(email = email.orEmpty(), subscription = subscription)
+        }.catch { error ->
+            Timber.e(error, "Error getting subscription state")
+            emit(SignInState.SignedIn(email = syncManager.getEmail().orEmpty(), subscription = null))
+        }
     }
 
     private suspend fun fetchSubscriptionForSignIn(): Subscription? {
