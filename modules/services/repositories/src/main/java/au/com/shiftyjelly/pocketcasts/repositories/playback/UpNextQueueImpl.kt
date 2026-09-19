@@ -6,7 +6,6 @@ import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.models.entity.UpNextChange
 import au.com.shiftyjelly.pocketcasts.models.entity.toUpNextEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.UpNextSortType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -95,7 +94,7 @@ class UpNextQueueImpl @Inject constructor(
         // listen for user changes and send them to the server in bulk
         changesFlow
             .debounce(SERVER_SYNC_DEBOUNCE)
-            .onEach { sendToServerBlocking() }
+            .onEach { sendToServer() }
             .catch { Timber.e(it) }
             .launchIn(this)
     }
@@ -447,9 +446,8 @@ class UpNextQueueImpl @Inject constructor(
         }
     }
 
-    private fun sendToServerBlocking() {
-        val changes: List<UpNextChange> = upNextChangeDao.findAllBlocking()
-        if (changes.isEmpty()) {
+    private suspend fun sendToServer() {
+        if (upNextChangeDao.count() == 0) {
             return
         }
         UpNextSyncWorker.enqueue(syncManager, application)
