@@ -16,6 +16,8 @@
         ([#5632](https://github.com/Automattic/pocket-casts-android/pull/5632))
     *   Show a single launcher icon after choosing a custom app icon
         ([#5609](https://github.com/Automattic/pocket-casts-android/pull/5609))
+    *   Cache podcast artwork so it stays available offline
+        ([#5549](https://github.com/Automattic/pocket-casts-android/pull/5549))
 
 8.21
 -----
