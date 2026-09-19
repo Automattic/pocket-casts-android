@@ -10,10 +10,10 @@ import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import com.squareup.moshi.Moshi
-import io.reactivex.Completable
 import java.util.Date
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.awaitCancellation
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertEquals
@@ -21,10 +21,11 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
-import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyBlocking
 import org.mockito.kotlin.whenever
 import retrofit2.HttpException
 import retrofit2.Response
@@ -52,24 +53,24 @@ class UploadEpisodeTaskTest {
         val result = runTask()
 
         assertEquals(Result.success(successOutput()), result)
-        verify(userEpisodeManager, never()).performUploadToServerRxCompletable(any(), any())
+        verifyBlocking(userEpisodeManager, never()) { performUploadToServer(any(), any()) }
     }
 
     @Test
     fun `succeeds when the upload completes`() {
         givenEpisode(userEpisode)
-        givenUpload(Completable.complete())
+        givenUpload {}
 
         val result = runTask()
 
         assertEquals(Result.success(successOutput()), result)
-        verify(userEpisodeManager).performUploadToServerRxCompletable(userEpisode, playbackManager)
+        verifyBlocking(userEpisodeManager) { performUploadToServer(userEpisode, playbackManager) }
     }
 
     @Test
     fun `fails without retrying on a 400`() {
         givenEpisode(userEpisode)
-        givenUpload(Completable.error(httpException(400)))
+        givenUpload { throw httpException(400) }
 
         val result = runTask(runAttemptCount = 0)
 
@@ -80,7 +81,7 @@ class UploadEpisodeTaskTest {
     fun `uses the server error message when the response has one`() {
         givenEpisode(userEpisode)
         val body = """{"errorMessage":"Server message","errorMessageId":"unknown_id"}"""
-        givenUpload(Completable.error(httpException(400, body)))
+        givenUpload { throw httpException(400, body) }
 
         val result = runTask()
 
@@ -90,7 +91,7 @@ class UploadEpisodeTaskTest {
     @Test
     fun `retries other http errors while attempts remain`() {
         givenEpisode(userEpisode)
-        givenUpload(Completable.error(httpException(500)))
+        givenUpload { throw httpException(500) }
 
         val result = runTask(runAttemptCount = 2)
 
@@ -100,7 +101,7 @@ class UploadEpisodeTaskTest {
     @Test
     fun `fails other http errors once attempts run out`() {
         givenEpisode(userEpisode)
-        givenUpload(Completable.error(httpException(500)))
+        givenUpload { throw httpException(500) }
 
         val result = runTask(runAttemptCount = 3)
 
@@ -110,7 +111,7 @@ class UploadEpisodeTaskTest {
     @Test
     fun `retries non http upload errors while attempts remain`() {
         givenEpisode(userEpisode)
-        givenUpload(Completable.error(IllegalStateException("Upload failed")))
+        givenUpload { throw IllegalStateException("Upload failed") }
 
         val result = runTask(runAttemptCount = 0)
 
@@ -120,7 +121,7 @@ class UploadEpisodeTaskTest {
     @Test
     fun `fails non http upload errors once attempts run out`() {
         givenEpisode(userEpisode)
-        givenUpload(Completable.error(IllegalStateException("Upload failed")))
+        givenUpload { throw IllegalStateException("Upload failed") }
 
         val result = runTask(runAttemptCount = 3)
 
@@ -137,18 +138,25 @@ class UploadEpisodeTaskTest {
     }
 
     @Test
-    fun `stopping the worker disposes the upload`() {
-        val subscribed = CountDownLatch(1)
-        val disposed = CountDownLatch(1)
+    fun `stopping the worker cancels the upload`() {
+        val started = CountDownLatch(1)
+        val cancelled = CountDownLatch(1)
         givenEpisode(userEpisode)
-        givenUpload(Completable.never().doOnSubscribe { subscribed.countDown() }.doOnDispose { disposed.countDown() })
+        givenUpload {
+            started.countDown()
+            try {
+                awaitCancellation()
+            } finally {
+                cancelled.countDown()
+            }
+        }
 
         val future = createTask().startWork()
-        assertTrue(subscribed.await(5, TimeUnit.SECONDS))
+        assertTrue(started.await(5, TimeUnit.SECONDS))
         future.cancel(true)
 
         assertTrue(future.isCancelled)
-        assertTrue(disposed.await(5, TimeUnit.SECONDS))
+        assertTrue(cancelled.await(5, TimeUnit.SECONDS))
     }
 
     private fun givenEpisode(episode: UserEpisode?) {
@@ -159,8 +167,8 @@ class UploadEpisodeTaskTest {
         whenever { userEpisodeManager.findEpisodeByUuid(EPISODE_UUID) } doThrow error
     }
 
-    private fun givenUpload(upload: Completable) {
-        whenever(userEpisodeManager.performUploadToServerRxCompletable(userEpisode, playbackManager)) doReturn upload
+    private fun givenUpload(upload: suspend () -> Unit) {
+        whenever { userEpisodeManager.performUploadToServer(userEpisode, playbackManager) } doSuspendableAnswer { upload() }
     }
 
     private fun runTask(episodeUuid: String? = EPISODE_UUID, runAttemptCount: Int = 0): Result {
