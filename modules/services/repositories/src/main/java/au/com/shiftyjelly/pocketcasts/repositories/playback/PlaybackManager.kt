@@ -122,10 +122,14 @@ import kotlin.math.min
 import kotlin.math.roundToInt
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.TimeSource
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -135,6 +139,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlow
 import kotlinx.coroutines.rx2.asFlowable
@@ -233,9 +238,9 @@ open class PlaybackManager @Inject constructor(
     private var episodeLastBufferStatus: EpisodeBufferStatus? = null
     private var focusWasPlaying: Date? = null
     private var forcePlayerSwitch = false
-    private var updateTimerDisposable: Disposable? = null
-    private var bufferUpdateTimerDisposable: Disposable? = null
-    private var pauseTimerDisposable: Disposable? = null
+    private var updateTimerJob: Job? = null
+    private var bufferUpdateTimerJob: Job? = null
+    private var pauseTimerJob: Job? = null
     private var syncTimerDisposable: Disposable? = null
     private var lastWarnedPlayedEpisodeUuid: String? = null
     private var lastPlayedEpisodeUuid: String? = null
@@ -246,6 +251,11 @@ open class PlaybackManager @Inject constructor(
     private val resumptionHelper = ResumptionHelper(settings)
 
     private val errorClassifier = PlaybackErrorClassifier()
+
+    // Supervised so a failing timer logs and stops on its own, as the Rx subscribeBy(onError) did.
+    private val timerScope = CoroutineScope(
+        SupervisorJob() + Dispatchers.IO + CoroutineExceptionHandler { _, throwable -> Timber.e(throwable) },
+    )
 
     var episodeSubscription: Disposable? = null
 
@@ -1935,7 +1945,7 @@ open class PlaybackManager @Inject constructor(
         episode?.takeIf { it.uuid == episodeUuid }
             ?.let {
                 updateBufferPosition(EpisodeBufferStatus(episodeUuid, episode.durationMs))
-                bufferUpdateTimerDisposable?.dispose()
+                bufferUpdateTimerJob?.cancel()
             }
     }
 
@@ -2624,12 +2634,6 @@ open class PlaybackManager @Inject constructor(
         statsManager.persistTimes()
     }
 
-    private fun updateCurrentPositionRx(): Completable {
-        return rxCompletable {
-            updateCurrentPosition()
-        }
-    }
-
     private suspend fun updateCurrentPosition() {
         val episode = getCurrentEpisode() ?: return
         if (episode.uuid != playbackStateRelay.blockingFirst().episodeUuid) {
@@ -2711,19 +2715,35 @@ open class PlaybackManager @Inject constructor(
         episodeLastBufferStatus = episodeNewBufferStatus
     }
 
+    // Mirrors the Observable.interval(period, period, io).switchMapCompletable these timers replaced: the first
+    // tick lands a period in, ticks hold a fixed rate rather than drifting, and each tick cancels the last work.
+    private fun launchTimer(periodMs: Long, onTick: () -> Unit = {}, work: suspend () -> Unit) = timerScope.launch {
+        val started = TimeSource.Monotonic.markNow()
+        var elapsedPeriods = 0L
+        var workJob: Job? = null
+        while (isActive) {
+            elapsedPeriods++
+            delay(periodMs * elapsedPeriods - started.elapsedNow().inWholeMilliseconds)
+            onTick()
+            workJob?.cancel()
+            workJob = launch { work() }
+        }
+    }
+
     private fun setupUpdateTimer() {
         setupProgressSync()
 
-        updateTimerDisposable?.dispose()
-        updateTimerDisposable = Observable.interval(UPDATE_TIMER_POLL_TIME, UPDATE_TIMER_POLL_TIME, TimeUnit.MILLISECONDS, Schedulers.io())
-            .doOnNext {
+        updateTimerJob?.cancel()
+        updateTimerJob = launchTimer(
+            periodMs = UPDATE_TIMER_POLL_TIME,
+            onTick = {
                 if (isPlaying()) {
                     statsManager.addTotalListeningTime(UPDATE_TIMER_POLL_TIME)
                 }
                 verifySleepTimeForEndOfChapter()
-            }
-            .switchMapCompletable { updateCurrentPositionRx() }
-            .subscribeBy(onError = { Timber.e(it) })
+            },
+            work = { updateCurrentPosition() },
+        )
     }
 
     private fun verifySleepTimeForEndOfChapter() {
@@ -2755,7 +2775,7 @@ open class PlaybackManager @Inject constructor(
     }
 
     private fun cancelUpdateTimer() {
-        updateTimerDisposable?.dispose()
+        updateTimerJob?.cancel()
         syncTimerDisposable?.dispose()
         episodeSubscription?.dispose()
     }
@@ -2769,44 +2789,32 @@ open class PlaybackManager @Inject constructor(
         if (isEpisodeFullyBuffered) return
 
         episodeLastBufferStatus = null
-        bufferUpdateTimerDisposable?.dispose()
-        bufferUpdateTimerDisposable = Observable.interval(UPDATE_TIMER_POLL_TIME, UPDATE_TIMER_POLL_TIME, TimeUnit.MILLISECONDS, Schedulers.io())
-            .switchMapCompletable {
-                rxCompletable {
-                    launch {
-                        updateBufferPosition()
-                    }
-                }
-            }
-            .subscribeBy(onError = { Timber.e(it) })
+        bufferUpdateTimerJob?.cancel()
+        bufferUpdateTimerJob = launchTimer(UPDATE_TIMER_POLL_TIME) { updateBufferPosition() }
     }
 
     private fun cancelBufferUpdateTimer() {
-        bufferUpdateTimerDisposable?.dispose()
+        bufferUpdateTimerJob?.cancel()
     }
 
     /**
      * After the episode is paused wait and then stop the player.
      */
     private fun setupPauseTimer() {
-        pauseTimerDisposable?.dispose()
+        pauseTimerJob?.cancel()
         if (player != null && !isPlaybackRemote()) {
-            pauseTimerDisposable = Observable.interval(PAUSE_TIMER_DELAY, TimeUnit.MILLISECONDS, Schedulers.io())
-                .firstOrError()
-                .flatMapCompletable {
-                    rxCompletable {
-                        if (!playbackStateRelay.blockingFirst().isPlaying) {
-                            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Hibernating playback from Pause timer.")
-                            hibernatePlayback()
-                        }
-                    }
+            pauseTimerJob = timerScope.launch {
+                delay(PAUSE_TIMER_DELAY)
+                if (!playbackStateRelay.blockingFirst().isPlaying) {
+                    LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Hibernating playback from Pause timer.")
+                    hibernatePlayback()
                 }
-                .subscribeBy(onError = { Timber.e(it) })
+            }
         }
     }
 
     private fun cancelPauseTimer() {
-        pauseTimerDisposable?.dispose()
+        pauseTimerJob?.cancel()
     }
 
     private fun prefetchNextEpisodeIfNeeded() {
