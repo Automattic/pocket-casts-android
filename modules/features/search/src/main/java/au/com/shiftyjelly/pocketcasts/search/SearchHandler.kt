@@ -26,6 +26,7 @@ import io.reactivex.rxkotlin.Observables
 import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -90,8 +91,7 @@ class SearchHandler @Inject constructor(
                     }
 
                 // search podcasts
-                val podcastSearch = podcastManager.findSubscribedRxSingle()
-                    .subscribeOn(Schedulers.io())
+                val podcastSearch = rxSingle(Dispatchers.IO) { podcastManager.findSubscribedBlocking() }
                     .flatMapObservable { Observable.fromIterable(it) }
                     .filter { it.title.contains(query, ignoreCase = true) || it.author.contains(query, ignoreCase = true) }
                     .map { podcast ->
@@ -108,9 +108,7 @@ class SearchHandler @Inject constructor(
             }
         }
 
-    private val subscribedPodcastUuids = podcastManager
-        .findSubscribedRxSingle()
-        .subscribeOn(Schedulers.io())
+    private val subscribedPodcastUuids = rxSingle(Dispatchers.IO) { podcastManager.findSubscribedBlocking() }
         .map { podcasts -> podcasts.map(Podcast::uuid).toHashSet() }
         .toObservable()
 
