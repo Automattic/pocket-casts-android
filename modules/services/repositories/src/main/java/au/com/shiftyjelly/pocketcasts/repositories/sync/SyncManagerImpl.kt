@@ -78,7 +78,6 @@ import com.pocketcasts.service.api.WinbackResponse
 import com.squareup.moshi.Moshi
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.Completable
-import io.reactivex.Maybe
 import io.reactivex.Single
 import java.io.File
 import java.net.HttpURLConnection
@@ -375,21 +374,19 @@ class SyncManagerImpl @Inject constructor(
         syncServiceManager.getSignedPlaybackUrl(episode, token)
     }
 
-    override fun getUserEpisodeRxMaybe(uuid: String): Maybe<ServerFile> = if (settings.cachedMembership.value.subscription != null) {
-        getCacheTokenOrLoginRxSingle { token ->
-            syncServiceManager.getUserEpisode(uuid, token)
-        }.flatMapMaybe {
-            if (it.isSuccessful) {
-                Maybe.just(it.body())
-            } else if (it.code() == HttpURLConnection.HTTP_NOT_FOUND) {
-                Maybe.empty()
-            } else {
-                Maybe.error(HttpException(it))
-            }
-        }
-    } else {
+    override suspend fun getUserEpisode(uuid: String): ServerFile? {
         // If the user doesn't have an active subscription, do not bother grabbing the file
-        Maybe.empty()
+        if (settings.cachedMembership.value.subscription == null) {
+            return null
+        }
+        val response = getCacheTokenOrLogin { token ->
+            syncServiceManager.getUserEpisode(uuid, token)
+        }
+        return when {
+            response.isSuccessful -> checkNotNull(response.body())
+            response.code() == HttpURLConnection.HTTP_NOT_FOUND -> null
+            else -> throw HttpException(response)
+        }
     }
 
 // History

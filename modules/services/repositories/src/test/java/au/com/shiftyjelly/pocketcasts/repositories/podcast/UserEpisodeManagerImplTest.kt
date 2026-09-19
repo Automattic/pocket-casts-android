@@ -11,7 +11,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.ServerFile
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import com.automattic.eventhorizon.EventHorizon
-import io.reactivex.Maybe
 import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
@@ -127,7 +126,7 @@ class UserEpisodeManagerImplTest {
     fun `download missing user episode replaces a missing episode with the server copy`() = runTest {
         val missingEpisode = UserEpisode(uuid = "uuid", publishedDate = Date(), serverStatus = UserEpisodeServerStatus.MISSING)
         whenever(userEpisodeDao.findEpisodeByUuid("uuid")).thenReturn(missingEpisode)
-        whenever(syncManager.getUserEpisodeRxMaybe("uuid")).thenReturn(Maybe.just(serverFile("uuid", "Server title")))
+        whenever(syncManager.getUserEpisode("uuid")).thenReturn(serverFile("uuid", "Server title"))
 
         userEpisodeManagerImpl.downloadMissingUserEpisodeRxMaybe("uuid", placeholderTitle = "Placeholder", placeholderPublished = null).awaitSingleOrNull()
 
@@ -138,7 +137,7 @@ class UserEpisodeManagerImplTest {
     fun `download missing user episode substitutes a placeholder when the server does not have the file`() = runTest {
         val missingEpisode = UserEpisode(uuid = "uuid", publishedDate = Date(), serverStatus = UserEpisodeServerStatus.MISSING)
         whenever(userEpisodeDao.findEpisodeByUuid("uuid")).thenReturn(missingEpisode)
-        whenever(syncManager.getUserEpisodeRxMaybe("uuid")).thenReturn(Maybe.empty())
+        whenever(syncManager.getUserEpisode("uuid")).thenReturn(null)
 
         userEpisodeManagerImpl.downloadMissingUserEpisodeRxMaybe("uuid", placeholderTitle = "Placeholder", placeholderPublished = null).awaitSingleOrNull()
 
@@ -148,7 +147,7 @@ class UserEpisodeManagerImplTest {
     @Test
     fun `download missing user episode writes nothing when the server request fails`() = runTest {
         whenever(userEpisodeDao.findEpisodeByUuid("uuid")).thenReturn(null)
-        whenever(syncManager.getUserEpisodeRxMaybe("uuid")).thenReturn(Maybe.error(RuntimeException("Server unavailable")))
+        whenever(syncManager.getUserEpisode("uuid")).thenThrow(RuntimeException("Server unavailable"))
 
         val failure = runCatching {
             userEpisodeManagerImpl.downloadMissingUserEpisodeRxMaybe("uuid", placeholderTitle = null, placeholderPublished = null).awaitSingleOrNull()
