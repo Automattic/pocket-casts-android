@@ -73,6 +73,7 @@ class BookmarkViewModel
         val title: TextFieldValue = buildSelectedTextFieldValue(DEFAULT_TITLE),
         val passage: String? = null,
         val passageLocation: Int? = null,
+        val referenceTime: Int? = null,
         val podcastUuid: String? = null,
         val titleSuggestion: TitleSuggestion = TitleSuggestion.None,
         val isNewBookmark: Boolean = true,
@@ -120,6 +121,7 @@ class BookmarkViewModel
                     title = buildSelectedTextFieldValue(bookmark.title),
                     passage = displayPassage(bookmark),
                     passageLocation = bookmark.passageLocation,
+                    referenceTime = bookmark.referenceTime,
                     podcastUuid = podcastUuid,
                     isNewBookmark = mutableUiState.value.isNewBookmark && bookmarkUuid != null,
                 )
@@ -158,6 +160,7 @@ class BookmarkViewModel
             mutableUiState.value.copy(
                 passage = suggestion.passage,
                 passageLocation = suggestion.passageLocation,
+                referenceTime = suggestion.referenceTimeSecs,
                 canEditTranscript = true,
                 isCapturingPassage = false,
             )

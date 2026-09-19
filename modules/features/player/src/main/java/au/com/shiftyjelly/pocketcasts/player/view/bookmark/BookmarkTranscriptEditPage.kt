@@ -88,6 +88,7 @@ fun BookmarkTranscriptEditPage(
                     transcript = uiState.transcript,
                     passage = uiState.passage,
                     editable = true,
+                    referenceOffset = uiState.referenceOffset,
                     onPassageChange = onPassageChange,
                     modifier = Modifier.fillMaxSize(),
                 )

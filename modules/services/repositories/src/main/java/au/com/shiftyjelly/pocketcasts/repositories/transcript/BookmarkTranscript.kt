@@ -4,6 +4,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptEntry
 import java.text.BreakIterator
 import kotlin.math.abs
+import kotlin.math.roundToInt
 
 data class TextSpan(val start: Int, val end: Int) {
     val length get() = end - start
@@ -27,6 +28,29 @@ class BookmarkTranscript private constructor(
         val entry = textEntrySpans.firstOrNull { displayOffset in it.start until it.end }
             ?: textEntrySpans.firstOrNull { it.start >= displayOffset }
         return entry?.startTimeMs?.takeIf { it >= 0 }
+    }
+
+    /**
+     * The display offset the bookmark glyph marks: where [referenceTimeSecs] lands, kept inside
+     * [span] so the glyph never sits outside the passage, or the start of the passage without one.
+     */
+    fun glyphOffsetIn(span: TextSpan?, referenceTimeSecs: Int?): Int? {
+        val offset = referenceTimeSecs?.let { referenceOffsetAt(it * 1000L) } ?: span?.start ?: return null
+        if (span == null) return offset
+        return offset.coerceIn(span.start, (span.end - 1).coerceAtLeast(span.start))
+    }
+
+    /** The display offset a reference time in milliseconds lands on, interpolating between entries. */
+    fun referenceOffsetAt(timeMs: Long): Int? {
+        val timed = textEntrySpans.filter { it.startTimeMs >= 0 }
+        if (timed.isEmpty()) return null
+        val index = timed.indexOfLast { it.startTimeMs <= timeMs }.coerceAtLeast(0)
+        val entry = timed[index]
+        val next = timed.getOrNull(index + 1) ?: return entry.start
+        val span = next.startTimeMs - entry.startTimeMs
+        if (span <= 0) return entry.start
+        val fraction = ((timeMs - entry.startTimeMs).toDouble() / span).coerceIn(0.0, 1.0)
+        return entry.start + (fraction * (next.start - entry.start)).roundToInt()
     }
 
     fun passageDisplaySpan(passage: String, location: Int?): TextSpan? {
@@ -170,6 +194,15 @@ class BookmarkTranscript private constructor(
                 textEntrySpans = textEntrySpans,
             )
         }
+
+        fun fromPassage(passage: String) = BookmarkTranscript(
+            displayText = passage,
+            speakerSpans = emptyList(),
+            flatText = "",
+            flatToDisplayStart = IntArray(0),
+            flatToDisplayEnd = IntArray(0),
+            textEntrySpans = emptyList(),
+        )
 
         private val Whitespace = """\s+""".toRegex()
 
