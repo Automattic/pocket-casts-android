@@ -43,7 +43,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.asAlbumArtConte
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getLaunchActivityPendingIntent
 import au.com.shiftyjelly.pocketcasts.utils.extensions.roundedSpeed
@@ -51,26 +50,31 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.eventhorizon.EventHorizon
-import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.Observables
-import io.reactivex.rxkotlin.addTo
-import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.rx2.asObservable
+import kotlinx.coroutines.plus
+import kotlinx.coroutines.rx2.asFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -93,6 +97,8 @@ class MediaSessionManager(
     companion object {
         const val EXTRA_TRANSIENT = "pocketcasts_transient_loss"
         const val ACTION_NOT_SUPPORTED = "action_not_supported"
+
+        private const val MEDIA_SESSION_UPDATE_RETRIES = 3
 
         // These manufacturers have issues when the skip to next/previous track are missing from the media session.
         private val MANUFACTURERS_TO_HIDE_CUSTOM_SKIP_BUTTONS = listOf("mercedes-benz")
@@ -148,7 +154,6 @@ class MediaSessionManager(
         }
     }
 
-    val disposables = CompositeDisposable()
     private val source = SourceView.MEDIA_BUTTON_BROADCAST_ACTION
 
     @Volatile
@@ -600,21 +605,21 @@ class MediaSessionManager(
     @OptIn(UnstableApi::class)
     private fun observeForMedia3Updates() {
         if (isAutomotive) {
-            playbackManager.playbackStateRelay
+            playbackManager.playbackStateFlow
                 .map { it.isError }
                 .distinctUntilChanged()
-                // Skip the BehaviorRelay's initial replay so we don't detach the session that
+                // Skip the relay's replayed value so we don't detach the session that
                 // PlaybackService.onCreate just attached; only react to genuine transitions after startup.
-                .skip(1)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                    onNext = { hasError -> setMedia3SessionAttached(!hasError) },
-                    onError = { Timber.e(it, "Error observing automotive active state") },
-                )
-                .addTo(disposables)
+                .drop(1)
+                .onEach { hasError -> setMedia3SessionAttached(!hasError) }
+                .catch { Timber.e(it, "Error observing automotive active state") }
+                .launchIn(scope + Dispatchers.Main)
         }
 
-        val episodeAndState = playbackManager.playbackStateRelay
+        val episodeAndState = playbackManager.playbackStateFlow
+            // The artwork load below blocks, and the asFlow() bridge only buffers 64 states before it
+            // back-pressures whichever thread pushed one. Rx's observeOn queue here was unbounded.
+            .buffer(Channel.UNLIMITED)
             .distinctUntilChanged { old, new ->
                 old.episodeUuid == new.episodeUuid &&
                     old.state == new.state &&
@@ -622,94 +627,26 @@ class MediaSessionManager(
                     old.transientLoss == new.transientLoss &&
                     old.isBuffering == new.isBuffering
             }
-            .observeOn(Schedulers.io())
-            .switchMap { state ->
-                if (state.isEmpty) {
-                    Observable.just(Optional.empty<BaseEpisode>() to state)
-                } else {
-                    episodeManager.findEpisodeByUuidRxFlowable(state.episodeUuid)
-                        .distinctUntilChanged(BaseEpisode.isMediaSessionEqual)
-                        .map { Optional.of(it) to state }
-                        .onErrorReturn { Optional.empty<BaseEpisode>() to state }
-                        .toObservable()
-                }
-            }
+            .withCurrentEpisode()
 
-        val artworkConfig = settings.artworkConfiguration.flow.asObservable()
-        val showArtworkOnLockScreen = settings.showArtworkOnLockScreen.flow.asObservable()
-
-        Observables.combineLatest(episodeAndState, artworkConfig, showArtworkOnLockScreen) { episodeState, config, showArtwork ->
-            Triple(episodeState, config.useEpisodeArtwork, showArtwork)
+        combine(
+            episodeAndState,
+            settings.artworkConfiguration.flow,
+            settings.showArtworkOnLockScreen.flow,
+        ) { (state, episode), artworkConfiguration, showArtwork ->
+            buildMediaUpdateData(state, episode, artworkConfiguration.useEpisodeArtwork, showArtwork)
         }
-            .observeOn(Schedulers.io())
-            .map<Optional<MediaUpdateData>> { (episodeState, useEpisodeArtwork, showArtwork) ->
-                val (episodeOpt, state) = episodeState
-                if (!episodeOpt.isPresent()) {
-                    return@map Optional.empty()
-                }
-                val episode = episodeOpt.get()!!
-                val podcast = when (episode) {
-                    is PodcastEpisode -> podcastManager.findPodcastByUuidBlocking(episode.podcastUuid)
-                    else -> null
-                }
-                val artworkData = if (showArtwork && !Util.isWearOs(context) && !Util.isAutomotive(context)) {
-                    AutoConverter.getPodcastArtworkBitmap(
-                        episode,
-                        context,
-                        useEpisodeArtwork,
-                    )?.let { bitmap ->
-                        java.io.ByteArrayOutputStream().use { stream ->
-                            val format = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                                android.graphics.Bitmap.CompressFormat.WEBP_LOSSY
-                            } else {
-                                @Suppress("DEPRECATION")
-                                android.graphics.Bitmap.CompressFormat.WEBP
-                            }
-                            bitmap.compress(format, 80, stream)
-                            stream.toByteArray()
-                        }
-                    }
-                } else {
-                    null
-                }
-                Optional.of(MediaUpdateData(episode, podcast, state, showArtwork, useEpisodeArtwork, artworkData))
-            }
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onNext = { dataOpt ->
-                    val player = forwardingPlayer ?: return@subscribeBy
-                    val data = dataOpt.get()
-                    if (data == null) {
-                        if (isAutomotive) {
-                            resetToEmptyState()
-                            updateMedia3CustomLayout()
-                        } else {
-                            player.clearMetadata()
-                        }
-                        return@subscribeBy
-                    }
-                    val wrappedUri = if (data.showArtwork) {
-                        resolveAndWrapArtworkUri(data.episode, data.podcast, data.useEpisodeArtwork)
-                    } else {
-                        null
-                    }
-                    player.updateMetadata(data.episode, data.podcast, data.showArtwork, data.useEpisodeArtwork, data.artworkData, artworkUri = wrappedUri, showRating = !isAutomotive)
-                    player.isTransientLoss = data.state.transientLoss
-                    updateMedia3CustomLayout()
-                },
-                onError = { Timber.e(it, "Error observing Media3 updates") },
-            )
-            .addTo(disposables)
+            .flowOn(Dispatchers.IO)
+            .onEach(::applyMediaUpdate)
+            .catch { Timber.e(it, "Error observing Media3 updates") }
+            .launchIn(scope + Dispatchers.Main)
 
-        playbackManager.playbackStateRelay
+        playbackManager.playbackStateFlow
             .map { it.playbackSpeed }
             .distinctUntilChanged()
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onNext = { updateMedia3CustomLayout() },
-                onError = { Timber.e(it, "Error observing speed changes") },
-            )
-            .addTo(disposables)
+            .onEach { updateMedia3CustomLayout() }
+            .catch { Timber.e(it, "Error observing speed changes") }
+            .launchIn(scope + Dispatchers.Main)
 
         combine(
             settings.customMediaActionsVisibility.flow,
@@ -719,15 +656,85 @@ class MediaSessionManager(
             .catch { Timber.e(it) }
             .launchIn(scope)
 
-        playbackManager.upNextQueue.changesObservable
-            .observeOn(Schedulers.io())
-            .subscribeBy(
-                onNext = {
-                    media3Session?.notifyChildrenChanged(UP_NEXT_ROOT, Int.MAX_VALUE, null)
-                },
-                onError = { Timber.e(it, "Error observing Up Next changes") },
-            )
-            .addTo(disposables)
+        playbackManager.upNextQueue.changesObservable.asFlow()
+            .onEach { media3Session?.notifyChildrenChanged(UP_NEXT_ROOT, Int.MAX_VALUE, null) }
+            .catch { Timber.e(it, "Error observing Up Next changes") }
+            .launchIn(scope + Dispatchers.IO)
+    }
+
+    /**
+     * Pairs each playback state with the live episode it refers to, null while nothing is playing.
+     * A failure reading the episode yields a null episode rather than ending the stream.
+     */
+    @kotlin.OptIn(ExperimentalCoroutinesApi::class)
+    private fun Flow<PlaybackState>.withCurrentEpisode(): Flow<Pair<PlaybackState, BaseEpisode?>> {
+        return flatMapLatest { state ->
+            val episodeFlow: Flow<BaseEpisode?> = if (state.isEmpty) {
+                flowOf(null)
+            } else {
+                episodeManager.findEpisodeByUuidFlow(state.episodeUuid)
+                    .distinctUntilChanged(BaseEpisode.isMediaSessionEqual)
+                    .catch<BaseEpisode?> { emit(null) }
+            }
+            episodeFlow.map { episode -> state to episode }
+        }
+    }
+
+    private fun buildMediaUpdateData(
+        state: PlaybackState,
+        episode: BaseEpisode?,
+        useEpisodeArtwork: Boolean,
+        showArtwork: Boolean,
+    ): MediaUpdateData? {
+        val currentEpisode = episode ?: return null
+        val podcast = when (currentEpisode) {
+            is PodcastEpisode -> podcastManager.findPodcastByUuidBlocking(currentEpisode.podcastUuid)
+            else -> null
+        }
+        val artworkData = if (showArtwork && !Util.isWearOs(context) && !Util.isAutomotive(context)) {
+            AutoConverter.getPodcastArtworkBitmap(
+                currentEpisode,
+                context,
+                useEpisodeArtwork,
+            )?.let { bitmap ->
+                java.io.ByteArrayOutputStream().use { stream ->
+                    val format = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                        android.graphics.Bitmap.CompressFormat.WEBP_LOSSY
+                    } else {
+                        @Suppress("DEPRECATION")
+                        android.graphics.Bitmap.CompressFormat.WEBP
+                    }
+                    bitmap.compress(format, 80, stream)
+                    stream.toByteArray()
+                }
+            }
+        } else {
+            null
+        }
+        return MediaUpdateData(currentEpisode, podcast, state, showArtwork, useEpisodeArtwork, artworkData)
+    }
+
+    @OptIn(UnstableApi::class)
+    @MainThread
+    private fun applyMediaUpdate(data: MediaUpdateData?) {
+        val player = forwardingPlayer ?: return
+        if (data == null) {
+            if (isAutomotive) {
+                resetToEmptyState()
+                updateMedia3CustomLayout()
+            } else {
+                player.clearMetadata()
+            }
+            return
+        }
+        val wrappedUri = if (data.showArtwork) {
+            resolveAndWrapArtworkUri(data.episode, data.podcast, data.useEpisodeArtwork)
+        } else {
+            null
+        }
+        player.updateMetadata(data.episode, data.podcast, data.showArtwork, data.useEpisodeArtwork, data.artworkData, artworkUri = wrappedUri, showRating = !isAutomotive)
+        player.isTransientLoss = data.state.transientLoss
+        updateMedia3CustomLayout()
     }
 
     @OptIn(UnstableApi::class)
@@ -894,7 +901,6 @@ class MediaSessionManager(
     }
 
     fun release() {
-        disposables.clear()
         scope.cancel()
         if (needsMedia3Session) {
             lastCustomLayout = emptyList()
@@ -962,12 +968,6 @@ class MediaSessionManager(
         val services = context.packageManager.queryIntentServices(intent, 0)
         return services.firstOrNull()?.serviceInfo?.let {
             ComponentName(it.packageName, it.name)
-        }
-    }
-
-    private fun getPlaybackStateRx(playbackState: PlaybackState, currentEpisode: Optional<BaseEpisode>): io.reactivex.Single<PlaybackStateCompat> {
-        return io.reactivex.Single.fromCallable {
-            getPlaybackStateCompat(playbackState, currentEpisode.get())
         }
     }
 
@@ -1093,39 +1093,41 @@ class MediaSessionManager(
 
         var previousEpisode: BaseEpisode? = null
 
-        playbackManager.playbackStateRelay
-            .observeOn(Schedulers.io())
-            .switchMap { state ->
-                val episodeSource =
-                    if (state.isEmpty) {
-                        Observable.just(Optional.empty())
-                    } else {
-                        episodeManager.findEpisodeByUuidRxFlowable(state.episodeUuid)
-                            .distinctUntilChanged(BaseEpisode.isMediaSessionEqual)
-                            .map { Optional.of(it) }
-                            .onErrorReturn { Optional.empty() }
-                            .toObservable()
-                    }
-                Observables.combineLatest(Observable.just(state), episodeSource)
+        playbackManager.playbackStateFlow
+            .withCurrentEpisode()
+            .filter { (state, episode) ->
+                !ignoreStates.contains(state.lastChangeFrom) || !BaseEpisode.isMediaSessionEqual(episode, previousEpisode)
             }
-            .filter {
-                !ignoreStates.contains(it.first.lastChangeFrom) || !BaseEpisode.isMediaSessionEqual(it.second.get(), previousEpisode)
+            .onEach { (_, episode) -> previousEpisode = episode }
+            .mapNotNull { (state, episode) ->
+                // A failure building the state skips that update instead of ending the stream.
+                try {
+                    getPlaybackStateCompat(state, episode)
+                } catch (e: Exception) {
+                    null
+                }
             }
-            .doOnNext {
-                previousEpisode = it.second.get()
+            .onEach(::updatePlaybackStateWithRetries)
+            .catch { throwable ->
+                LogBuffer.e(LogBuffer.TAG_PLAYBACK, "MEDIA SESSION ERROR: Error updating playback state: ${throwable.message}")
             }
-            .switchMap { (state, episode) -> getPlaybackStateRx(state, episode).toObservable().onErrorResumeNext(Observable.empty()) }
-            .switchMap {
-                Observable.fromCallable { updatePlaybackState(it) }
-                    .doOnError { LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Error updating playback state in media session: ${it.message}") }.retry(3)
+            .launchIn(scope + Dispatchers.IO)
+    }
+
+    private fun updatePlaybackStateWithRetries(playbackState: PlaybackStateCompat) {
+        var failures = 0
+        while (true) {
+            try {
+                updatePlaybackState(playbackState)
+                return
+            } catch (e: Exception) {
+                LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Error updating playback state in media session: ${e.message}")
+                failures++
+                if (failures > MEDIA_SESSION_UPDATE_RETRIES) {
+                    throw e
+                }
             }
-            .ignoreElements()
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onError = { throwable ->
-                    LogBuffer.e(LogBuffer.TAG_PLAYBACK, "MEDIA SESSION ERROR: Error updating playback state: ${throwable.message}")
-                },
-            ).addTo(disposables)
+        }
     }
 
     private fun updateMetadata(episode: BaseEpisode?, useEpisodeArtwork: Boolean) {
@@ -1423,13 +1425,10 @@ class MediaSessionManager(
         }
 
         override fun onSkipToQueueItem(id: Long) {
-            val state = playbackManager.upNextQueue.changesObservable.blockingFirst()
-            if (state is UpNextQueue.State.Loaded) {
-                state.queue.find { it.adapterId == id }?.let { episode ->
-                    logEvent("play from skip to queue item")
-                    enqueueCommand("skip to queue item") {
-                        playbackManager.playNowSuspend(episode = episode, sourceView = source)
-                    }
+            playbackManager.upNextQueue.queueEpisodes.find { it.adapterId == id }?.let { episode ->
+                logEvent("play from skip to queue item")
+                enqueueCommand("skip to queue item") {
+                    playbackManager.playNowSuspend(episode = episode, sourceView = source)
                 }
             }
         }
