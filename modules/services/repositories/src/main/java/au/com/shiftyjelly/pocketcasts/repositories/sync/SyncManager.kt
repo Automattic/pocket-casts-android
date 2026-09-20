@@ -111,7 +111,7 @@ interface SyncManager : NamedSettingsCaller {
     suspend fun getPlaylistsOrThrow(): UserPlaylistListResponse
     suspend fun getBookmarksOrThrow(): BookmarksResponse
     suspend fun getEpisodesOrThrow(request: PodcastsEpisodesRequest): EpisodesResponse
-    fun getPodcastEpisodesRxSingle(podcastUuid: String): Single<PodcastEpisodesResponse>
+    suspend fun getPodcastEpisodes(podcastUuid: String): PodcastEpisodesResponse
     suspend fun getStarredEpisodesOrThrow(): StarredEpisodesResponse
     suspend fun createWebFeedPodcast(url: String): WebFeedCreateResponse
 

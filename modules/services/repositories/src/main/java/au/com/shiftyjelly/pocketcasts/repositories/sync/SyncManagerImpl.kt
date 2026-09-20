@@ -439,7 +439,7 @@ class SyncManagerImpl @Inject constructor(
         syncServiceManager.getEpisodes(request, token)
     }
 
-    override fun getPodcastEpisodesRxSingle(podcastUuid: String): Single<PodcastEpisodesResponse> = getCacheTokenOrLoginRxSingle { token ->
+    override suspend fun getPodcastEpisodes(podcastUuid: String): PodcastEpisodesResponse = getCacheTokenOrLogin { token ->
         syncServiceManager.getPodcastEpisodes(podcastUuid, token)
     }
 
