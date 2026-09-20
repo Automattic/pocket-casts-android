@@ -244,16 +244,16 @@ open class SyncServiceManager @Inject constructor(
 
     suspend fun getFileImageUploadUrl(imageData: FileImageUploadData, token: AccessToken): String = service.getFileImageUploadUrl(addBearer(token), imageData).url
 
-    suspend fun uploadToServer(episode: UserEpisode, url: String, onProgress: (Float) -> Unit): Response<Void> {
+    suspend fun uploadToServer(episode: UserEpisode, url: String, onProgress: (Float) -> Unit) {
         val path = episode.downloadedFilePath ?: throw IllegalStateException("File is not downloaded")
         val file = File(path)
         val requestBody = ProgressRequestBody.create((episode.fileType ?: "audio/mp3").toMediaType(), file, onProgress)
-        return service.uploadFile(url, requestBody)
+        service.uploadFile(url, requestBody)
     }
 
-    suspend fun uploadImageToServer(imageFile: File, url: String): Response<Void> {
+    suspend fun uploadImageToServer(imageFile: File, url: String) {
         val requestBody = imageFile.asRequestBody("image/png".toMediaType())
-        return service.uploadFile(url, requestBody)
+        service.uploadFile(url, requestBody)
     }
 
     suspend fun deleteImageFromServer(episode: UserEpisode, token: AccessToken): Response<Void> = service.deleteImageFile(addBearer(token), episode.uuid)
