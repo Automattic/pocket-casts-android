@@ -83,7 +83,7 @@ interface SyncManager : NamedSettingsCaller {
     suspend fun <T> getCacheTokenOrLogin(serverCall: suspend (token: AccessToken) -> T): T
 
     // User Episodes / Files
-    fun getFilesRxSingle(): Single<Response<FilesResponse>>
+    suspend fun getFiles(): Response<FilesResponse>
     suspend fun getFileUploadStatus(episodeUuid: String): Boolean
     suspend fun uploadFileToServer(episode: UserEpisode)
     suspend fun uploadImageToServer(episode: UserEpisode, imageFile: File)

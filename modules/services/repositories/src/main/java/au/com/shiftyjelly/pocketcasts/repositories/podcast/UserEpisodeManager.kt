@@ -282,7 +282,7 @@ class UserEpisodeManagerImpl @Inject constructor(
         }
 
         val response = withContext(Dispatchers.IO) {
-            syncManager.getFilesRxSingle().await()
+            syncManager.getFiles()
         }
         if (!response.isSuccessful) {
             throw HttpException(response)

@@ -325,7 +325,7 @@ class SyncManagerImpl @Inject constructor(
 
 // User Episodes / Files
 
-    override fun getFilesRxSingle(): Single<Response<FilesResponse>> = getCacheTokenOrLoginRxSingle { token ->
+    override suspend fun getFiles(): Response<FilesResponse> = getCacheTokenOrLogin { token ->
         syncServiceManager.getFiles(token)
     }
 
