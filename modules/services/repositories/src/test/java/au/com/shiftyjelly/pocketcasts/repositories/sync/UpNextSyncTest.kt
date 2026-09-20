@@ -448,7 +448,7 @@ class UpNextSyncTest {
         ) { createPodcastEpisode() }
 
         assertEquals(null, result)
-        verify(userEpisodeManager, never()).downloadMissingUserEpisodeRxMaybe(any(), anyOrNull(), anyOrNull())
+        verify(userEpisodeManager, never()).downloadMissingUserEpisode(any(), anyOrNull(), anyOrNull())
         verify(episodeManager, never()).downloadMissingEpisodeRxMaybe(any(), any(), any(), any(), any(), any())
     }
 
@@ -458,12 +458,12 @@ class UpNextSyncTest {
         val published = Date()
 
         whenever(
-            userEpisodeManager.downloadMissingUserEpisodeRxMaybe(
+            userEpisodeManager.downloadMissingUserEpisode(
                 uuid = "episode1",
                 placeholderTitle = "Test Episode",
                 placeholderPublished = published,
             ),
-        ).thenReturn(Maybe.just(userEpisode))
+        ).thenReturn(userEpisode)
 
         val result = upNextSync.importMissingEpisode(
             podcastUuid = Podcast.userPodcast.uuid,
@@ -473,7 +473,7 @@ class UpNextSyncTest {
         ) { createPodcastEpisode() }
 
         assertEquals(userEpisode, result)
-        verify(userEpisodeManager).downloadMissingUserEpisodeRxMaybe(
+        verify(userEpisodeManager).downloadMissingUserEpisode(
             uuid = eq("episode1"),
             placeholderTitle = eq("Test Episode"),
             placeholderPublished = any(),

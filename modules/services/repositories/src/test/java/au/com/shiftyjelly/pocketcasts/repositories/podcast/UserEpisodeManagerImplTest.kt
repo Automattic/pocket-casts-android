@@ -16,7 +16,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.reactive.asFlow
-import kotlinx.coroutines.rx2.awaitSingleOrNull
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -116,7 +115,7 @@ class UserEpisodeManagerImplTest {
         val userEpisode = UserEpisode(uuid = "uuid", publishedDate = Date(), serverStatus = UserEpisodeServerStatus.UPLOADED)
         whenever(userEpisodeDao.findEpisodeByUuid("uuid")).thenReturn(userEpisode)
 
-        val episode = userEpisodeManagerImpl.downloadMissingUserEpisodeRxMaybe("uuid", placeholderTitle = null, placeholderPublished = null).awaitSingleOrNull()
+        val episode = userEpisodeManagerImpl.downloadMissingUserEpisode("uuid", placeholderTitle = null, placeholderPublished = null)
 
         assertEquals(userEpisode, episode)
         verify(userEpisodeDao, never()).insertOrReplace(any())
@@ -128,7 +127,7 @@ class UserEpisodeManagerImplTest {
         whenever(userEpisodeDao.findEpisodeByUuid("uuid")).thenReturn(missingEpisode)
         whenever(syncManager.getUserEpisode("uuid")).thenReturn(serverFile("uuid", "Server title"))
 
-        userEpisodeManagerImpl.downloadMissingUserEpisodeRxMaybe("uuid", placeholderTitle = "Placeholder", placeholderPublished = null).awaitSingleOrNull()
+        userEpisodeManagerImpl.downloadMissingUserEpisode("uuid", placeholderTitle = "Placeholder", placeholderPublished = null)
 
         verify(userEpisodeDao).insertOrReplace(argThat { title == "Server title" && serverStatus == UserEpisodeServerStatus.UPLOADED })
     }
@@ -139,7 +138,7 @@ class UserEpisodeManagerImplTest {
         whenever(userEpisodeDao.findEpisodeByUuid("uuid")).thenReturn(missingEpisode)
         whenever(syncManager.getUserEpisode("uuid")).thenReturn(null)
 
-        userEpisodeManagerImpl.downloadMissingUserEpisodeRxMaybe("uuid", placeholderTitle = "Placeholder", placeholderPublished = null).awaitSingleOrNull()
+        userEpisodeManagerImpl.downloadMissingUserEpisode("uuid", placeholderTitle = "Placeholder", placeholderPublished = null)
 
         verify(userEpisodeDao).insertOrReplace(argThat { uuid == "uuid" && title == "Placeholder" && serverStatus == UserEpisodeServerStatus.MISSING })
     }
@@ -150,7 +149,7 @@ class UserEpisodeManagerImplTest {
         whenever(syncManager.getUserEpisode("uuid")).thenThrow(RuntimeException("Server unavailable"))
 
         val failure = runCatching {
-            userEpisodeManagerImpl.downloadMissingUserEpisodeRxMaybe("uuid", placeholderTitle = null, placeholderPublished = null).awaitSingleOrNull()
+            userEpisodeManagerImpl.downloadMissingUserEpisode("uuid", placeholderTitle = null, placeholderPublished = null)
         }.exceptionOrNull()
 
         assertEquals("Server unavailable", failure?.message)
