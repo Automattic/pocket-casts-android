@@ -30,7 +30,6 @@ import com.automattic.eventhorizon.EpisodeUploadFailedEvent
 import com.automattic.eventhorizon.EpisodeUploadFinishedEvent
 import com.automattic.eventhorizon.EventHorizon
 import dagger.hilt.android.qualifiers.ApplicationContext
-import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Maybe
 import java.io.File
@@ -91,7 +90,7 @@ interface UserEpisodeManager {
     fun autoUploadToCloudIfReq(episode: UserEpisode)
     fun downloadMissingUserEpisodeRxMaybe(uuid: String, placeholderTitle: String?, placeholderPublished: Date?): Maybe<UserEpisode>
     fun syncFilesInBackground(playbackManager: PlaybackManager)
-    fun uploadImageToServerRxCompletable(userEpisode: UserEpisode, imageFile: File): Completable
+    suspend fun uploadImageToServer(userEpisode: UserEpisode, imageFile: File)
     suspend fun updateFiles(files: List<UserEpisode>)
     suspend fun deleteImageFromServer(userEpisode: UserEpisode)
     fun monitorUploads(context: Context)
@@ -433,15 +432,15 @@ class UserEpisodeManagerImpl @Inject constructor(
 
         userEpisodeDao.updateServerStatus(userEpisode.uuid, UserEpisodeServerStatus.UPLOADING)
         userEpisodeDao.updateUploadError(userEpisode.uuid, null)
-        syncManager.uploadFileToServerRxCompletable(userEpisode).await()
+        syncManager.uploadFileToServer(userEpisode)
         if (imageFile != null) {
-            uploadImageToServerRxCompletable(userEpisode, imageFile).await()
+            uploadImageToServer(userEpisode, imageFile)
         }
         // let the file upload report to upload to the api server
         delay(1.seconds)
         // the api server will call S3 to check the file exists if it doesn't know
         val success = try {
-            syncManager.getFileUploadStatusRxSingle(userEpisode.uuid).await()
+            syncManager.getFileUploadStatus(userEpisode.uuid)
         } catch (e: CancellationException) {
             throw e
         } catch (e: Throwable) {
@@ -449,26 +448,15 @@ class UserEpisodeManagerImpl @Inject constructor(
             false
         }
         if (success) {
-            eventHorizon.track(
-                EpisodeUploadFinishedEvent(
-                    episodeUuid = userEpisode.uuid,
-                ),
-            )
+            eventHorizon.track(EpisodeUploadFinishedEvent(episodeUuid = userEpisode.uuid))
             userEpisodeDao.updateServerStatus(userEpisode.uuid, serverStatus = UserEpisodeServerStatus.UPLOADED)
         } else {
-            eventHorizon.track(
-                EpisodeUploadFailedEvent(
-                    episodeUuid = userEpisode.uuid,
-                ),
-            )
+            eventHorizon.track(EpisodeUploadFailedEvent(episodeUuid = userEpisode.uuid))
             userEpisodeDao.updateUploadError(userEpisode.uuid, "Upload failed")
         }
 
         try {
-            syncFiles(
-                playbackManager = playbackManager,
-                syncArtworkChanges = false,
-            )
+            syncFiles(playbackManager = playbackManager, syncArtworkChanges = false)
         } catch (e: CancellationException) {
             throw e
         } catch (e: Throwable) {
@@ -476,7 +464,7 @@ class UserEpisodeManagerImpl @Inject constructor(
         }
     }
 
-    override fun uploadImageToServerRxCompletable(userEpisode: UserEpisode, imageFile: File): Completable = syncManager.uploadImageToServerRxCompletable(userEpisode, imageFile)
+    override suspend fun uploadImageToServer(userEpisode: UserEpisode, imageFile: File) = syncManager.uploadImageToServer(userEpisode, imageFile)
 
     override fun cancelUpload(userEpisode: UserEpisode) {
         if (userEpisode.uploadTaskId == null) return

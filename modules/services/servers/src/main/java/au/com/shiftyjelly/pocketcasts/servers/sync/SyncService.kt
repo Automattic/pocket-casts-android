@@ -44,7 +44,6 @@ import com.pocketcasts.service.api.WinbackResponse
 import io.reactivex.Completable
 import io.reactivex.Single
 import okhttp3.RequestBody
-import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -152,19 +151,16 @@ interface SyncService {
     fun postFiles(@Header("Authorization") authorization: String, @Body body: FilePostBody): Single<Response<Void>>
 
     @POST("/files/upload/request")
-    fun getFileUploadUrl(@Header("Authorization") authorization: String, @Body body: FileUploadData): Single<FileUploadResponse>
+    suspend fun getFileUploadUrl(@Header("Authorization") authorization: String, @Body body: FileUploadData): FileUploadResponse
 
     @POST("/files/upload/image")
-    fun getFileImageUploadUrl(@Header("Authorization") authorization: String, @Body body: FileImageUploadData): Single<FileUrlResponse>
+    suspend fun getFileImageUploadUrl(@Header("Authorization") authorization: String, @Body body: FileImageUploadData): FileUrlResponse
 
     @PUT
-    fun uploadFile(@Url url: String, @Body requestBody: RequestBody): Call<Void>
-
-    @PUT
-    fun uploadFileNoProgress(@Url url: String, @Body requestBody: RequestBody): Single<Response<Void>>
+    suspend fun uploadFile(@Url url: String, @Body requestBody: RequestBody): Response<Void>
 
     @GET("/files/upload/status/{uuid}")
-    fun getFileUploadStatus(@Header("Authorization") authorization: String, @Path("uuid") uuid: String): Single<FileUploadStatusResponse>
+    suspend fun getFileUploadStatus(@Header("Authorization") authorization: String, @Path("uuid") uuid: String): FileUploadStatusResponse
 
     @DELETE("/files/{uuid}")
     suspend fun deleteFile(@Header("Authorization") authorization: String, @Path("uuid") uuid: String): Response<Void>

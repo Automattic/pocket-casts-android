@@ -338,27 +338,25 @@ class SyncManagerImpl @Inject constructor(
         syncServiceManager.postFiles(files, token)
     }
 
-    override fun getFileUploadStatusRxSingle(episodeUuid: String): Single<Boolean> = getCacheTokenOrLoginRxSingle { token ->
+    override suspend fun getFileUploadStatus(episodeUuid: String): Boolean = getCacheTokenOrLogin { token ->
         syncServiceManager.getFileUploadStatus(episodeUuid, token)
     }
 
-    override fun uploadFileToServerRxCompletable(episode: UserEpisode): Completable = getCacheTokenOrLoginRxSingle { token ->
-        syncServiceManager.getFileUploadUrl(episode.toUploadData(), token)
-    }.flatMapCompletable { url ->
-        syncServiceManager.uploadToServer(episode, url)
-            .doOnNext { progress -> UploadProgressManager.pushProgress(episode.uuid, progress) }
-            .ignoreElements()
+    override suspend fun uploadFileToServer(episode: UserEpisode) {
+        val url = getCacheTokenOrLogin { token ->
+            syncServiceManager.getFileUploadUrl(episode.toUploadData(), token)
+        }
+        syncServiceManager.uploadToServer(episode, url) { progress ->
+            UploadProgressManager.pushProgress(episode.uuid, progress)
+        }
     }
 
-    override fun uploadImageToServerRxCompletable(
-        episode: UserEpisode,
-        imageFile: File,
-    ): Completable = getCacheTokenOrLoginRxSingle { token ->
-        val imageData = FileImageUploadData(episode.uuid, imageFile.length(), "image/png")
-        syncServiceManager.getFileImageUploadUrl(imageData, token)
-    }.flatMapCompletable { uploadUrl ->
+    override suspend fun uploadImageToServer(episode: UserEpisode, imageFile: File) {
+        val uploadUrl = getCacheTokenOrLogin { token ->
+            val imageData = FileImageUploadData(episode.uuid, imageFile.length(), "image/png")
+            syncServiceManager.getFileImageUploadUrl(imageData, token)
+        }
         syncServiceManager.uploadImageToServer(imageFile, uploadUrl)
-            .ignoreElement()
     }
 
     override suspend fun deleteImageFromServer(episode: UserEpisode): Response<Void> = getCacheTokenOrLogin { token ->
