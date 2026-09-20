@@ -231,7 +231,7 @@ open class SyncServiceManager @Inject constructor(
         token: AccessToken,
     ): SubscriptionStatusResponse = service.subscriptionPurchase(addBearer(token), request)
 
-    fun getFiles(token: AccessToken): Single<Response<FilesResponse>> = service.getFiles(addBearer(token))
+    suspend fun getFiles(token: AccessToken): Response<FilesResponse> = service.getFiles(addBearer(token))
 
     fun postFiles(files: List<FilePost>, token: AccessToken): Single<Response<Void>> {
         val body = FilePostBody(files)
