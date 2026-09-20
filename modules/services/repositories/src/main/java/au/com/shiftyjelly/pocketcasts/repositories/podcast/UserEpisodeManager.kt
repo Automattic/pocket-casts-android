@@ -53,8 +53,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlowable
 import kotlinx.coroutines.rx2.await
-import kotlinx.coroutines.rx2.rxCompletable
-import kotlinx.coroutines.rx2.awaitSingleOrNull
 import kotlinx.coroutines.rx2.rxMaybe
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
