@@ -87,7 +87,7 @@ interface SyncManager : NamedSettingsCaller {
     suspend fun getFileUploadStatus(episodeUuid: String): Boolean
     suspend fun uploadFileToServer(episode: UserEpisode)
     suspend fun uploadImageToServer(episode: UserEpisode, imageFile: File)
-    fun postFilesRxSingle(files: List<FilePost>): Single<Response<Void>>
+    suspend fun postFiles(files: List<FilePost>): Response<Void>
     suspend fun getUserEpisode(uuid: String): ServerFile?
     suspend fun getFileUsage(): FileAccount
     suspend fun deleteImageFromServer(episode: UserEpisode): Response<Void>

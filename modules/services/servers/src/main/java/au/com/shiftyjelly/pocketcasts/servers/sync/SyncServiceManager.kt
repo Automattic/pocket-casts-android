@@ -233,7 +233,7 @@ open class SyncServiceManager @Inject constructor(
 
     suspend fun getFiles(token: AccessToken): Response<FilesResponse> = service.getFiles(addBearer(token))
 
-    fun postFiles(files: List<FilePost>, token: AccessToken): Single<Response<Void>> {
+    suspend fun postFiles(files: List<FilePost>, token: AccessToken): Response<Void> {
         val body = FilePostBody(files)
         return service.postFiles(addBearer(token), body)
     }

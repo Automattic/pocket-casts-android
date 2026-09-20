@@ -253,7 +253,7 @@ class UserEpisodeManagerImpl @Inject constructor(
     }
 
     override suspend fun updateFiles(files: List<UserEpisode>) = withContext(Dispatchers.IO) {
-        val response = syncManager.postFilesRxSingle(files.toServerPost()).await()
+        val response = syncManager.postFiles(files.toServerPost())
         if (!response.isSuccessful) {
             throw HttpException(response)
         }
@@ -263,7 +263,7 @@ class UserEpisodeManagerImpl @Inject constructor(
         val episodesToSync = userEpisodeDao.findUserEpisodesToSyncBlocking()
         if (episodesToSync.isNotEmpty()) {
             val response = withContext(Dispatchers.IO) {
-                syncManager.postFilesRxSingle(episodesToSync.toServerPost()).await()
+                syncManager.postFiles(episodesToSync.toServerPost())
             }
             if (response.isSuccessful) {
                 LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Synced cloud files successfully")
