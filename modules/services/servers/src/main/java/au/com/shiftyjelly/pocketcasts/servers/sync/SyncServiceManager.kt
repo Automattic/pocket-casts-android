@@ -53,9 +53,7 @@ import com.pocketcasts.service.api.bookmarkRequest
 import com.pocketcasts.service.api.userPlaylistListRequest
 import com.pocketcasts.service.api.userPodcastListRequest
 import dagger.Lazy
-import io.reactivex.BackpressureStrategy
 import io.reactivex.Completable
-import io.reactivex.Flowable
 import io.reactivex.Single
 import java.io.File
 import java.util.Locale
@@ -240,38 +238,22 @@ open class SyncServiceManager @Inject constructor(
         return service.postFiles(addBearer(token), body)
     }
 
-    fun getFileUploadUrl(file: FileUploadData, token: AccessToken): Single<String> = service.getFileUploadUrl(addBearer(token), file).map { it.url }
+    suspend fun getFileUploadUrl(file: FileUploadData, token: AccessToken): String = service.getFileUploadUrl(addBearer(token), file).url
 
-    fun getFileUploadStatus(episodeUuid: String, token: AccessToken): Single<Boolean> = service.getFileUploadStatus(addBearer(token), episodeUuid).map { it.success }
+    suspend fun getFileUploadStatus(episodeUuid: String, token: AccessToken): Boolean = service.getFileUploadStatus(addBearer(token), episodeUuid).success
 
-    fun getFileImageUploadUrl(imageData: FileImageUploadData, token: AccessToken): Single<String> = service.getFileImageUploadUrl(addBearer(token), imageData).map { it.url }
+    suspend fun getFileImageUploadUrl(imageData: FileImageUploadData, token: AccessToken): String = service.getFileImageUploadUrl(addBearer(token), imageData).url
 
-    fun uploadToServer(episode: UserEpisode, url: String): Flowable<Float> {
+    suspend fun uploadToServer(episode: UserEpisode, url: String, onProgress: (Float) -> Unit) {
         val path = episode.downloadedFilePath ?: throw IllegalStateException("File is not downloaded")
         val file = File(path)
-
-        return Flowable.create(
-            { emitter ->
-                try {
-                    val requestBody = ProgressRequestBody.create((episode.fileType ?: "audio/mp3").toMediaType(), file, emitter::onNext)
-                    val call = service.uploadFile(url, requestBody)
-                    emitter.setCancellable { call.cancel() }
-
-                    call.execute()
-                    if (!emitter.isCancelled) {
-                        emitter.onComplete()
-                    }
-                } catch (e: java.lang.Exception) {
-                    emitter.tryOnError(e)
-                }
-            },
-            BackpressureStrategy.LATEST,
-        )
+        val requestBody = ProgressRequestBody.create((episode.fileType ?: "audio/mp3").toMediaType(), file, onProgress)
+        service.uploadFile(url, requestBody)
     }
 
-    fun uploadImageToServer(imageFile: File, url: String): Single<Response<Void>> {
+    suspend fun uploadImageToServer(imageFile: File, url: String) {
         val requestBody = imageFile.asRequestBody("image/png".toMediaType())
-        return service.uploadFileNoProgress(url, requestBody)
+        service.uploadFile(url, requestBody)
     }
 
     suspend fun deleteImageFromServer(episode: UserEpisode, token: AccessToken): Response<Void> = service.deleteImageFile(addBearer(token), episode.uuid)

@@ -13,7 +13,6 @@ import com.squareup.moshi.Moshi
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlin.coroutines.cancellation.CancellationException
-import kotlinx.coroutines.rx2.await
 import retrofit2.HttpException
 
 @HiltWorker
@@ -45,7 +44,7 @@ class UploadEpisodeTask @AssistedInject constructor(
             // A missing episode skips the upload and still succeeds
             val userEpisode = userEpisodeManager.findEpisodeByUuid(episodeUuid)
             if (userEpisode != null) {
-                userEpisodeManager.performUploadToServerRxCompletable(userEpisode, playbackManager).await()
+                userEpisodeManager.performUploadToServer(userEpisode, playbackManager)
             }
             Result.success(outputData.build())
         } catch (e: CancellationException) {

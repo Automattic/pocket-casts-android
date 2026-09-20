@@ -85,9 +85,9 @@ interface SyncManager : NamedSettingsCaller {
 
     // User Episodes / Files
     fun getFilesRxSingle(): Single<Response<FilesResponse>>
-    fun getFileUploadStatusRxSingle(episodeUuid: String): Single<Boolean>
-    fun uploadFileToServerRxCompletable(episode: UserEpisode): Completable
-    fun uploadImageToServerRxCompletable(episode: UserEpisode, imageFile: File): Completable
+    suspend fun getFileUploadStatus(episodeUuid: String): Boolean
+    suspend fun uploadFileToServer(episode: UserEpisode)
+    suspend fun uploadImageToServer(episode: UserEpisode, imageFile: File)
     fun postFilesRxSingle(files: List<FilePost>): Single<Response<Void>>
     fun getUserEpisodeRxMaybe(uuid: String): Maybe<ServerFile>
     suspend fun getFileUsage(): FileAccount
