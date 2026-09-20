@@ -1775,8 +1775,12 @@ open class PlaybackManager @Inject constructor(
                         // Fire and forget so completion handling does not wait on the network before auto play
                         applicationScope.launch(Dispatchers.IO) {
                             try {
-                                syncManager.postFiles(listOf(userEpisode.toServerPostFile()))
-                                Timber.d("Synced user episode completion")
+                                val response = syncManager.postFiles(listOf(userEpisode.toServerPostFile()))
+                                if (response.isSuccessful) {
+                                    Timber.d("Synced user episode completion")
+                                } else {
+                                    Timber.e("Could not sync user episode completion ${response.code()}")
+                                }
                             } catch (e: Exception) {
                                 Timber.e("Could not sync user episode completion ${e.message}")
                             }
