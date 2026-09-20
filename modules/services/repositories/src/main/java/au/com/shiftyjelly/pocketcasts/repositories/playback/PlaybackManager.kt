@@ -1772,14 +1772,15 @@ open class PlaybackManager @Inject constructor(
                         .subscribe()
                 } else if (episode is UserEpisode) {
                     userEpisodeManager.findEpisodeByUuid(episode.uuid)?.let { userEpisode ->
-                        syncManager.postFilesRxSingle(listOf(userEpisode.toServerPostFile()))
-                            .ignoreElement()
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .doOnComplete { Timber.d("Synced user episode completion") }
-                            .doOnError { Timber.e("Could not sync user episode completion ${it.message}") }
-                            .onErrorComplete()
-                            .subscribe()
+                        // Fire and forget so completion handling does not wait on the network before auto play
+                        applicationScope.launch(Dispatchers.IO) {
+                            try {
+                                syncManager.postFiles(listOf(userEpisode.toServerPostFile()))
+                                Timber.d("Synced user episode completion")
+                            } catch (e: Exception) {
+                                Timber.e("Could not sync user episode completion ${e.message}")
+                            }
+                        }
                     }
                 }
             }

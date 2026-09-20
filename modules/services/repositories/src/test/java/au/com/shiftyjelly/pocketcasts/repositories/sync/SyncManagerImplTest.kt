@@ -10,6 +10,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationManager
 import au.com.shiftyjelly.pocketcasts.repositories.notification.OnboardingNotificationType
 import au.com.shiftyjelly.pocketcasts.servers.sync.FileAccount
+import au.com.shiftyjelly.pocketcasts.servers.sync.FilePost
 import au.com.shiftyjelly.pocketcasts.servers.sync.PodcastEpisodesResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.UserChangeResponse
@@ -235,6 +236,18 @@ class SyncManagerImplTest {
         whenever(syncServiceManager.deleteFromServer(episode, AccessToken("access-token"))).thenReturn(response)
 
         assertEquals(response, syncManager.deleteFromServer(episode))
+        verify(syncAccountManager, never()).invalidateAccessToken()
+    }
+
+    @Test
+    fun `files are posted with the cached token`() = runTest {
+        val files = listOf(FilePost(uuid = "episode-uuid", title = "title", colour = 0, playedUpTo = 0, playingStatus = 1, duration = 60, hasCustomImage = false))
+        val response = Response.success<Void>(null)
+        whenever(syncAccountManager.isLoggedIn()).thenReturn(true)
+        whenever(syncAccountManager.getAccessToken()).thenReturn(AccessToken("access-token"))
+        whenever(syncServiceManager.postFiles(files, AccessToken("access-token"))).thenReturn(response)
+
+        assertEquals(response, syncManager.postFiles(files))
         verify(syncAccountManager, never()).invalidateAccessToken()
     }
 

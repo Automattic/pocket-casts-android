@@ -333,7 +333,7 @@ class SyncManagerImpl @Inject constructor(
         syncServiceManager.getFileUsage(token)
     }
 
-    override fun postFilesRxSingle(files: List<FilePost>): Single<Response<Void>> = getCacheTokenOrLoginRxSingle { token ->
+    override suspend fun postFiles(files: List<FilePost>): Response<Void> = getCacheTokenOrLogin { token ->
         syncServiceManager.postFiles(files, token)
     }
 

@@ -148,7 +148,7 @@ interface SyncService {
     fun getFiles(@Header("Authorization") authorization: String): Single<Response<FilesResponse>>
 
     @POST("/files")
-    fun postFiles(@Header("Authorization") authorization: String, @Body body: FilePostBody): Single<Response<Void>>
+    suspend fun postFiles(@Header("Authorization") authorization: String, @Body body: FilePostBody): Response<Void>
 
     @POST("/files/upload/request")
     suspend fun getFileUploadUrl(@Header("Authorization") authorization: String, @Body body: FileUploadData): FileUploadResponse
