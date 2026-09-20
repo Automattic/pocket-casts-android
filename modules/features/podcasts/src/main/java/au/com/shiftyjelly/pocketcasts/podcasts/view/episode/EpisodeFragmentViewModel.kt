@@ -50,6 +50,7 @@ import kotlin.time.Duration
 import kotlin.time.DurationUnit
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.cancelAndJoin
@@ -59,7 +60,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
@@ -203,6 +205,7 @@ class EpisodeFragmentViewModel @Inject constructor(
         }
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     fun setup(
         episodeUuid: String,
         podcastUuid: String?,
@@ -219,9 +222,9 @@ class EpisodeFragmentViewModel @Inject constructor(
             .distinctUntilChanged()
 
         // A missing episode emits no state, leaving the screen on its loading placeholder
-        val stateFlow = flow<EpisodeFragmentState> {
-            val episode = findEpisode(episodeUuid, podcastUuid) ?: return@flow
-            emitAll(
+        val stateFlow = flow { emit(findEpisode(episodeUuid, podcastUuid)) }
+            .filterNotNull()
+            .flatMapLatest<PodcastEpisode, EpisodeFragmentState> { episode ->
                 combine(
                     episodeManager.findByUuidFlow(episodeUuid),
                     podcastFlow(episode.podcastUuid),
@@ -237,9 +240,8 @@ class EpisodeFragmentViewModel @Inject constructor(
                         podcastColor = tintColor,
                         downloadProgress = downloadProgress,
                     )
-                },
-            )
-        }
+                }
+            }
             .onEach(::onStateLoaded)
             .catch { error -> emit(EpisodeFragmentState.Error(error)) }
             .flowOn(Dispatchers.IO)
