@@ -101,7 +101,6 @@ import dagger.Lazy
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Completable
-import io.reactivex.Maybe
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -138,7 +137,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlow
 import kotlinx.coroutines.rx2.asFlowable
-import kotlinx.coroutines.rx2.awaitSingleOrNull
 import kotlinx.coroutines.rx2.rxCompletable
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -2098,15 +2096,12 @@ open class PlaybackManager @Inject constructor(
             }
 
             is UserEpisode -> {
-                userEpisodeManager.findEpisodeByUuidRxMaybe(currentUpNextEpisode.uuid)
-                    .flatMap {
-                        if (it.serverStatus == UserEpisodeServerStatus.MISSING) {
-                            userEpisodeManager.downloadMissingUserEpisodeRxMaybe(currentUpNextEpisode.uuid, placeholderTitle = currentUpNextEpisode.title, placeholderPublished = null)
-                        } else {
-                            Maybe.just(it)
-                        }
-                    }
-                    .awaitSingleOrNull()
+                val userEpisode = userEpisodeManager.findEpisodeByUuid(currentUpNextEpisode.uuid)
+                if (userEpisode?.serverStatus == UserEpisodeServerStatus.MISSING) {
+                    userEpisodeManager.downloadMissingUserEpisode(currentUpNextEpisode.uuid, placeholderTitle = currentUpNextEpisode.title, placeholderPublished = null)
+                } else {
+                    userEpisode
+                }
             }
 
             else -> {

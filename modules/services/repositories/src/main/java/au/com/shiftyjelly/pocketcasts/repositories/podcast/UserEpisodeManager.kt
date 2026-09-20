@@ -31,7 +31,6 @@ import com.automattic.eventhorizon.EpisodeUploadFinishedEvent
 import com.automattic.eventhorizon.EventHorizon
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.Flowable
-import io.reactivex.Maybe
 import java.io.File
 import java.net.HttpURLConnection
 import java.util.Date
@@ -53,7 +52,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlowable
 import kotlinx.coroutines.rx2.await
-import kotlinx.coroutines.rx2.rxMaybe
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import timber.log.Timber
@@ -66,7 +64,6 @@ interface UserEpisodeManager {
     suspend fun findUserEpisodes(): List<UserEpisode>
     fun episodeRxFlowable(uuid: String): Flowable<UserEpisode>
     fun episodeFlow(uuid: String): Flow<UserEpisode?>
-    fun findEpisodeByUuidRxMaybe(uuid: String): Maybe<UserEpisode>
     suspend fun findEpisodeByUuid(uuid: String): UserEpisode?
     suspend fun findEpisodesByUuids(episodeUuids: List<String>): List<UserEpisode>
     fun uploadToServer(userEpisode: UserEpisode, waitForWifi: Boolean)
@@ -87,7 +84,7 @@ interface UserEpisodeManager {
     fun userEpisodesSortedFlow(sortOrder: Settings.CloudSortOrder): Flow<List<UserEpisode>>
     suspend fun deletePlayedEpisodeIfReq(episode: UserEpisode, playbackManager: PlaybackManager)
     fun autoUploadToCloudIfReq(episode: UserEpisode)
-    fun downloadMissingUserEpisodeRxMaybe(uuid: String, placeholderTitle: String?, placeholderPublished: Date?): Maybe<UserEpisode>
+    suspend fun downloadMissingUserEpisode(uuid: String, placeholderTitle: String?, placeholderPublished: Date?): UserEpisode?
     fun syncFilesInBackground(playbackManager: PlaybackManager)
     suspend fun uploadImageToServer(userEpisode: UserEpisode, imageFile: File)
     suspend fun updateFiles(files: List<UserEpisode>)
@@ -223,10 +220,6 @@ class UserEpisodeManagerImpl @Inject constructor(
         return userEpisodeDao.findEpisodeFlow(uuid)
     }
 
-    override fun findEpisodeByUuidRxMaybe(uuid: String): Maybe<UserEpisode> = rxMaybe(Dispatchers.IO) {
-        userEpisodeDao.findEpisodeByUuid(uuid)
-    }
-
     override suspend fun findEpisodeByUuid(uuid: String): UserEpisode? {
         return userEpisodeDao.findEpisodeByUuid(uuid)
     }
@@ -235,11 +228,11 @@ class UserEpisodeManagerImpl @Inject constructor(
         return userEpisodeDao.findEpisodesByUuids(episodeUuids)
     }
 
-    override fun downloadMissingUserEpisodeRxMaybe(uuid: String, placeholderTitle: String?, placeholderPublished: Date?): Maybe<UserEpisode> = rxMaybe(Dispatchers.IO) {
+    override suspend fun downloadMissingUserEpisode(uuid: String, placeholderTitle: String?, placeholderPublished: Date?): UserEpisode? = withContext(Dispatchers.IO) {
         val existingEpisode = userEpisodeDao.findEpisodeByUuid(uuid)
         // A file already marked as missing is worth re-downloading, so treat it as if it were absent
         if (existingEpisode != null && existingEpisode.serverStatus != UserEpisodeServerStatus.MISSING) {
-            return@rxMaybe existingEpisode
+            return@withContext existingEpisode
         }
 
         val serverFile = syncManager.getUserEpisode(uuid)
