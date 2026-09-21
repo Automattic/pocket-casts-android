@@ -72,7 +72,7 @@ class SignInFragment : BaseFragment() {
             false
         }
 
-        if (!Util.isAutomotive(view.context)) {
+        if (!Util.isCarUiMode(view.context)) {
             txtEmail.showKeyboard()
         }
         txtEmail.addOnTextChanged {

@@ -44,7 +44,7 @@ class ResetPasswordFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding?.progress?.isVisible = false
-        if (!Util.isAutomotive(view.context)) {
+        if (!Util.isCarUiMode(view.context)) {
             binding?.txtEmail?.showKeyboard()
         }
 

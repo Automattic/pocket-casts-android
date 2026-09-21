@@ -70,7 +70,7 @@ class CreateEmailFragment : BaseFragment() {
         txtEmail.setText(viewModel.email.value)
         txtPassword.setText(viewModel.password.value)
 
-        if (!Util.isAutomotive(view.context)) {
+        if (!Util.isCarUiMode(view.context)) {
             txtEmail.showKeyboard()
         }
         currentEditText = txtEmail
