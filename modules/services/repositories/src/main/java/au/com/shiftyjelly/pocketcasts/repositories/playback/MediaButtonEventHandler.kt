@@ -83,13 +83,16 @@ internal class MediaButtonEventHandler(
         return true
     }
 
-    private fun handleImmediatePlay() {
-        try {
+    private fun handleImmediatePlay(): Boolean {
+        return try {
             onImmediatePlay()
+            true
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
+            // Report and decline the tap so it still resolves to the normal single tap action.
             onError(e)
+            false
         }
     }
 }

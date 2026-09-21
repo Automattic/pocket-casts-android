@@ -93,6 +93,7 @@ class MediaEventQueueTest {
         val event = async {
             handler.consumeEvent(MediaEvent.SingleTap) {
                 isHandled = true
+                true
             }
         }
 
@@ -109,6 +110,7 @@ class MediaEventQueueTest {
         val firstEvent = async {
             handler.consumeEvent(MediaEvent.SingleTap) {
                 immediateTapCount++
+                true
             }
         }
 
@@ -116,6 +118,7 @@ class MediaEventQueueTest {
         assertNull(
             handler.consumeEvent(MediaEvent.SingleTap) {
                 immediateTapCount++
+                true
             },
         )
 
@@ -150,6 +153,7 @@ class MediaEventQueueTest {
                     startBarrier.await()
                     handler.consumeEvent(MediaEvent.SingleTap) {
                         immediateTapCount.incrementAndGet()
+                        true
                     }
                 }
             }.awaitAll()
@@ -168,6 +172,7 @@ class MediaEventQueueTest {
         assertNull(
             handler.consumeEvent(MediaEvent.SingleTap) {
                 isHandled = true
+                true
             },
         )
         assertFalse(isHandled)
