@@ -238,6 +238,8 @@ open class PlaybackManager @Inject constructor(
     private var syncTimerDisposable: Disposable? = null
     private var lastWarnedPlayedEpisodeUuid: String? = null
     private var lastPlayedEpisodeUuid: String? = null
+
+    @Volatile
     private var replayableEpisodeUuid: String? = null
     private var lastTrackedAutoPlaySource: AutoPlaySource? = null
 
@@ -702,8 +704,14 @@ open class PlaybackManager @Inject constructor(
     private suspend fun replayFinishedEpisode(sourceView: SourceView, showedStreamWarning: Boolean) {
         val uuid = replayableEpisodeUuid ?: return
         replayableEpisodeUuid = null
-        val episode = episodeManager.findEpisodeByUuid(uuid) ?: return
-        episodeManager.updatePlayedUpToBlocking(episode, 0.0, true)
+        if (!Util.isCarUiMode(application)) {
+            return
+        }
+        val episode = episodeManager.findEpisodeByUuid(uuid)
+        if (episode == null) {
+            shutdown()
+            return
+        }
         playNowSuspend(episode = episode, showedStreamWarning = showedStreamWarning, sourceView = sourceView)
     }
 
