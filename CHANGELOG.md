@@ -3,6 +3,8 @@
 *   Bug Fixes
     *   Fix tapping the media player or a notification not opening the app after changing the app icon
         ([#6181](https://github.com/Automattic/pocket-casts-android/pull/6181))
+    *   Keep the episode on screen in the car when the Up Next queue runs out
+        ([#6031](https://github.com/Automattic/pocket-casts-android/pull/6031))
 
 
 8.23
