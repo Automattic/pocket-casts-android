@@ -11,11 +11,12 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.coroutineContext
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.sync.Mutex
@@ -30,14 +31,23 @@ class FingerprintReferenceRetriever @Inject constructor(
     @NoCache private val okHttpClient: OkHttpClient,
     @ApplicationContext private val context: Context,
 ) {
-    private val inFlightRequests = mutableMapOf<String, Deferred<ByteArray?>>()
+    sealed interface FetchResult {
+        class Success(val data: ByteArray) : FetchResult
+        data object NotFound : FetchResult
+        data object Error : FetchResult
+    }
+
+    private val fetchScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private val inFlightRequests = mutableMapOf<String, Deferred<FetchResult>>()
     private val requestMutex = Mutex()
 
+    // The shared fetch runs in the retriever's own scope, so cancelling one awaiting caller
+    // cannot cancel the request out from under another.
     suspend fun fetchReferenceData(
         baseUrl: String,
         podcastUuid: String,
         episodeUuid: String,
-    ): ByteArray? = coroutineScope {
+    ): FetchResult {
         val key = "$podcastUuid/$episodeUuid"
 
         val deferred = requestMutex.withLock {
@@ -45,7 +55,7 @@ class FingerprintReferenceRetriever @Inject constructor(
             if (existing != null && existing.isActive) {
                 existing
             } else {
-                async {
+                fetchScope.async {
                     try {
                         performFetch(baseUrl, podcastUuid, episodeUuid)
                     } finally {
@@ -54,14 +64,14 @@ class FingerprintReferenceRetriever @Inject constructor(
                 }.also { inFlightRequests[key] = it }
             }
         }
-        deferred.await()
+        return deferred.await()
     }
 
     private suspend fun performFetch(
         baseUrl: String,
         podcastUuid: String,
         episodeUuid: String,
-    ): ByteArray? = withContext(Dispatchers.IO) {
+    ): FetchResult = withContext(Dispatchers.IO) {
         val url = "${baseUrl}$podcastUuid/$episodeUuid-fingerprints.json.gz"
 
         for (attempt in 0 until MAX_RETRIES) {
@@ -79,7 +89,7 @@ class FingerprintReferenceRetriever @Inject constructor(
 
                     if (statusCode == 404 || statusCode == 403) {
                         Timber.d("FingerprintReferenceRetriever: no reference for $episodeUuid ($statusCode)")
-                        return@withContext null
+                        return@withContext FetchResult.NotFound
                     }
 
                     if (statusCode != 200) {
@@ -88,25 +98,25 @@ class FingerprintReferenceRetriever @Inject constructor(
                             continue
                         }
                         Timber.w("FingerprintReferenceRetriever: unexpected status $statusCode for $episodeUuid")
-                        return@withContext null
+                        return@withContext FetchResult.Error
                     }
 
                     val body = response.body.bytes()
                     val jsonData = decompressGzipIfNeeded(body)
 
                     Timber.d("FingerprintReferenceRetriever: reference fetched for $episodeUuid (${jsonData.size} bytes)")
-                    return@withContext jsonData
+                    return@withContext FetchResult.Success(jsonData)
                 }
             } catch (e: CancellationException) {
                 throw e
             } catch (e: IOException) {
                 Timber.w("FingerprintReferenceRetriever: fetch failed for $episodeUuid, attempt ${attempt + 1}/$MAX_RETRIES — ${e.message}")
-                if (attempt == MAX_RETRIES - 1) return@withContext null
+                if (attempt == MAX_RETRIES - 1) return@withContext FetchResult.Error
             }
         }
 
         Timber.w("FingerprintReferenceRetriever: exhausted retries for $episodeUuid")
-        null
+        FetchResult.Error
     }
 
     suspend fun saveReferenceData(data: ByteArray, audioFilePath: String) = withContext(Dispatchers.IO) {

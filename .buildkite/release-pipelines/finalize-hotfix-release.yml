@@ -3,13 +3,15 @@
 
 # This pipeline is meant to be triggered by the MC scenario in ReleasesV2
 
+priority: 1
+
 steps:
   - label: "🚂 Finalize Hotfix Release"
     command: |
       echo '--- 🤖 Use bot for Git operations'
       source use-bot-for-git
 
-      .buildkite/commands/checkout-release-branch.sh "${RELEASE_VERSION}"
+      checkout_release_branch "${RELEASE_VERSION}"
 
       echo '--- :ruby: Setup Ruby Tools'
       install_gems

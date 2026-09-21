@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.podcast
 
+import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
@@ -7,26 +8,19 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.servers.model.ListFeed
 import au.com.shiftyjelly.pocketcasts.servers.server.ListWebService
-import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
-import io.reactivex.Flowable
-import io.reactivex.Single
 import java.util.UUID
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 class RecommendationsHandlerTest {
-
-    @get:Rule
-    val featureFlagRule = InMemoryFeatureFlagRule()
 
     private lateinit var listWebService: ListWebService
     private lateinit var podcastManager: PodcastManager
@@ -47,7 +41,7 @@ class RecommendationsHandlerTest {
         val settings = mock<Settings>()
         whenever(settings.discoverCountryCode).thenReturn(discoverCountryCode)
 
-        recommendations = RecommendationsHandler(listRepository, podcastManager, settings)
+        recommendations = RecommendationsHandler(listRepository, podcastManager, settings, Dispatchers.Unconfined)
 
         testPodcastUuid = UUID.randomUUID().toString()
         testDiscoverPodcasts = listOf(
@@ -62,46 +56,20 @@ class RecommendationsHandlerTest {
     }
 
     @Test
-    fun `do not load recommendations when feature flag is disabled`() = runTest {
-        // feature flag is disabled
-        FeatureFlag.setEnabled(feature = Feature.RECOMMENDATIONS, enabled = false)
-        recommendations.setEnabled(true)
-
-        whenever(listWebService.getListFeed(any())).thenReturn(testListFeed)
-
-        val values = recommendations.getRecommendationsFlowable(testPodcastUuid)
-            .test()
-            .awaitCount(2)
-            .assertNoErrors()
-            .values()
-
-        // no podcasts should be found
-        assertTrue(values[0] is RecommendationsResult.Loading)
-        assertTrue(values[1] is RecommendationsResult.Empty)
-    }
-
-    @Test
     fun `do not load recommendations when recommendations are disabled`() = runTest {
-        // feature flag is disabled
-        FeatureFlag.setEnabled(feature = Feature.RECOMMENDATIONS, enabled = true)
         recommendations.setEnabled(false)
 
         whenever(listWebService.getListFeed(any())).thenReturn(testListFeed)
 
-        val values = recommendations.getRecommendationsFlowable(testPodcastUuid)
-            .test()
-            .awaitCount(2)
-            .assertNoErrors()
-            .values()
-
-        // no podcasts should be found
-        assertTrue(values[0] is RecommendationsResult.Loading)
-        assertTrue(values[1] is RecommendationsResult.Empty)
+        recommendations.getRecommendationsFlow(testPodcastUuid).test {
+            assertEquals(RecommendationsResult.Loading, awaitItem())
+            // no podcasts should be found
+            assertEquals(RecommendationsResult.Empty, awaitItem())
+        }
     }
 
     @Test
     fun `load recommendations when podcasts are available`() = runTest {
-        FeatureFlag.setEnabled(feature = Feature.RECOMMENDATIONS, enabled = true)
         recommendations.setEnabled(true)
 
         // expected URL for the list recommendation
@@ -110,34 +78,24 @@ class RecommendationsHandlerTest {
 
         // mark the first podcast as subscribed
         val subscribedUuid = testDiscoverPodcasts.first().uuid
-        whenever(podcastManager.getSubscribedPodcastUuidsRxSingle()).thenReturn(Single.just(listOf(subscribedUuid)))
-        whenever(podcastManager.podcastSubscriptionsRxFlowable()).thenReturn(Flowable.empty())
+        whenever(podcastManager.podcastSubscriptionsFlow()).thenReturn(flowOf(listOf(subscribedUuid)))
 
-        // call the method to test
-        val values = recommendations.getRecommendationsFlowable(testPodcastUuid)
-            .test()
-            .awaitCount(2)
-            .assertNoErrors()
-            .values()
+        recommendations.getRecommendationsFlow(testPodcastUuid).test {
+            assertEquals(RecommendationsResult.Loading, awaitItem())
 
-        // check that the podcasts are fetched correctly
-        assertTrue(values[0] is RecommendationsResult.Loading)
-        assertTrue(values[1] is RecommendationsResult.Success)
+            val result = awaitItem()
+            assertTrue(result is RecommendationsResult.Success)
+            val podcasts = (result as RecommendationsResult.Success).listFeed.podcasts
+            assertEquals(2, podcasts?.size)
 
-        val podcasts = (values[1] as RecommendationsResult.Success).listFeed.podcasts
-        assertEquals(2, podcasts?.size)
-
-        // check that the subscribed status is set correctly
-        val subscribedPodcast = podcasts?.find { it.uuid == subscribedUuid }
-        val unsubscribedPodcast = podcasts?.find { it.uuid != subscribedUuid }
-
-        assertTrue(subscribedPodcast?.isSubscribed == true)
-        assertTrue(unsubscribedPodcast?.isSubscribed == false)
+            // check that the subscribed status is set correctly
+            assertTrue(podcasts?.find { it.uuid == subscribedUuid }?.isSubscribed == true)
+            assertTrue(podcasts?.find { it.uuid != subscribedUuid }?.isSubscribed == false)
+        }
     }
 
     @Test
     fun `load recommendations when podroll is available`() = runTest {
-        FeatureFlag.setEnabled(feature = Feature.RECOMMENDATIONS, enabled = true)
         recommendations.setEnabled(true)
 
         // expected URL for the list recommendation
@@ -146,52 +104,74 @@ class RecommendationsHandlerTest {
 
         // mark the first podcast as subscribed
         val subscribedUuid = testPodrollPodcasts.first().uuid
-        whenever(podcastManager.getSubscribedPodcastUuidsRxSingle()).thenReturn(Single.just(listOf(subscribedUuid)))
-        whenever(podcastManager.podcastSubscriptionsRxFlowable()).thenReturn(Flowable.empty())
+        whenever(podcastManager.podcastSubscriptionsFlow()).thenReturn(flowOf(listOf(subscribedUuid)))
 
-        // call the method to test
-        val values = recommendations.getRecommendationsFlowable(testPodcastUuid)
-            .test()
-            .awaitCount(2)
-            .assertNoErrors()
-            .values()
+        recommendations.getRecommendationsFlow(testPodcastUuid).test {
+            assertEquals(RecommendationsResult.Loading, awaitItem())
 
-        // check that the podcasts are fetched correctly
-        assertTrue(values[0] is RecommendationsResult.Loading)
-        assertTrue(values[1] is RecommendationsResult.Success)
+            val result = awaitItem()
+            assertTrue(result is RecommendationsResult.Success)
+            val podroll = (result as RecommendationsResult.Success).listFeed.podroll
+            assertEquals(2, podroll?.size)
 
-        val podcasts = (values[1] as RecommendationsResult.Success).listFeed.podroll
-        assertEquals(2, podcasts?.size)
-
-        // check that the subscribed status is set correctly
-        val subscribedPodcast = podcasts?.find { it.uuid == subscribedUuid }
-        val unsubscribedPodcast = podcasts?.find { it.uuid != subscribedUuid }
-
-        assertTrue(subscribedPodcast?.isSubscribed == true)
-        assertTrue(unsubscribedPodcast?.isSubscribed == false)
+            // check that the subscribed status is set correctly
+            assertTrue(podroll?.find { it.uuid == subscribedUuid }?.isSubscribed == true)
+            assertTrue(podroll?.find { it.uuid != subscribedUuid }?.isSubscribed == false)
+        }
     }
 
     @Test
     fun `do not load recommendations when neither podcasts or podroll are available`() = runTest {
-        FeatureFlag.setEnabled(feature = Feature.RECOMMENDATIONS, enabled = true)
         recommendations.setEnabled(true)
 
         // expected URL for the list recommendation
         val listUrl = "${Settings.SERVER_API_URL}/recommendations/podcast/$testPodcastUuid?country=us"
         whenever(listWebService.getListFeed(listUrl)).thenReturn(testListFeed.copy(podroll = null, podcasts = null))
 
-        whenever(podcastManager.getSubscribedPodcastUuidsRxSingle()).thenReturn(Single.just(emptyList()))
-        whenever(podcastManager.podcastSubscriptionsRxFlowable()).thenReturn(Flowable.just(emptyList()))
+        whenever(podcastManager.podcastSubscriptionsFlow()).thenReturn(flowOf(emptyList()))
 
-        // call the method to test
-        val values = recommendations.getRecommendationsFlowable(testPodcastUuid)
-            .test()
-            .awaitCount(2)
-            .assertNoErrors()
-            .values()
+        recommendations.getRecommendationsFlow(testPodcastUuid).test {
+            assertEquals(RecommendationsResult.Loading, awaitItem())
+            // no podcasts should be found
+            assertEquals(RecommendationsResult.Empty, awaitItem())
+        }
+    }
 
-        // no podcasts should be found
-        assertTrue(values[0] is RecommendationsResult.Loading)
-        assertTrue(values[1] is RecommendationsResult.Empty)
+    @Test
+    fun `update subscribed status when subscriptions change`() = runTest {
+        recommendations.setEnabled(true)
+
+        val listUrl = "${Settings.SERVER_API_URL}/recommendations/podcast/$testPodcastUuid?country=us"
+        whenever(listWebService.getListFeed(listUrl)).thenReturn(testListFeed.copy(podroll = null))
+        val subscribedUuid = testDiscoverPodcasts.first().uuid
+        whenever(podcastManager.podcastSubscriptionsFlow()).thenReturn(flowOf(emptyList(), listOf(subscribedUuid)))
+
+        recommendations.getRecommendationsFlow(testPodcastUuid).test {
+            assertEquals(RecommendationsResult.Loading, awaitItem())
+
+            val before = (awaitItem() as RecommendationsResult.Success).listFeed.podcasts
+            assertTrue(before?.none { it.isSubscribed } == true)
+
+            val after = (awaitItem() as RecommendationsResult.Success).listFeed.podcasts
+            assertTrue(after?.find { it.uuid == subscribedUuid }?.isSubscribed == true)
+        }
+    }
+
+    @Test
+    fun `retry reloads recommendations`() = runTest {
+        recommendations.setEnabled(true)
+
+        val listUrl = "${Settings.SERVER_API_URL}/recommendations/podcast/$testPodcastUuid?country=us"
+        whenever(listWebService.getListFeed(listUrl)).thenReturn(testListFeed.copy(podroll = null, podcasts = null), testListFeed)
+        whenever(podcastManager.podcastSubscriptionsFlow()).thenReturn(flowOf(emptyList()))
+
+        recommendations.getRecommendationsFlow(testPodcastUuid).test {
+            assertEquals(RecommendationsResult.Loading, awaitItem())
+            assertEquals(RecommendationsResult.Empty, awaitItem())
+
+            recommendations.retry()
+
+            assertTrue(awaitItem() is RecommendationsResult.Success)
+        }
     }
 }

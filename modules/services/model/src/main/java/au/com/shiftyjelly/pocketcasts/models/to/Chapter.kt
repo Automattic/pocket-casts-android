@@ -14,6 +14,8 @@ data class Chapter(
     val imagePath: String? = null,
     val selected: Boolean = true,
     val origin: ChapterOrigin = ChapterOrigin.Unknown,
+    // Original reference-timeline start for generated chapters, kept when startTime is aligned to the stream.
+    val referenceStartTime: Duration? = null,
 ) {
 
     val isGenerated: Boolean

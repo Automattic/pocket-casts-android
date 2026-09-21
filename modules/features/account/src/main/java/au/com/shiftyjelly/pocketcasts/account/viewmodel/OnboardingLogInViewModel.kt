@@ -125,7 +125,7 @@ class OnboardingLogInViewModel @Inject constructor(
     }
 
     fun onShown() {
-        eventHorizon.track(SigninShownEvent)
+        eventHorizon.track(SigninShownEvent(redirectPath = "none"))
     }
 
     fun onBackPressed() {

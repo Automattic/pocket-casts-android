@@ -378,6 +378,24 @@ class TranscriptCueHelperTest {
         assertFalse(TranscriptCueHelper.isSeekSettled(posMs = 60_000, seekTargetMs = 30_000))
     }
 
+    // --- isHeldTapStale ---
+
+    @Test
+    fun `isHeldTapStale is false while the position sits at the seek target`() {
+        assertFalse(TranscriptCueHelper.isHeldTapStale(posMs = 30_500, seekTargetMs = 30_000))
+    }
+
+    @Test
+    fun `isHeldTapStale is false while the target is still resolving`() {
+        assertFalse(TranscriptCueHelper.isHeldTapStale(posMs = 90_000, seekTargetMs = null))
+    }
+
+    @Test
+    fun `isHeldTapStale is true once the position moves away from the seek target`() {
+        assertTrue(TranscriptCueHelper.isHeldTapStale(posMs = 90_000, seekTargetMs = 30_000))
+        assertTrue(TranscriptCueHelper.isHeldTapStale(posMs = 5_000, seekTargetMs = 30_000))
+    }
+
     // --- hasReachedTappedRow ---
 
     @Test

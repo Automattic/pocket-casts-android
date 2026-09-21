@@ -273,6 +273,7 @@ class Support @Inject constructor(
                         podcastsOutput.append("Archive inactive: ").append(podcast.autoArchiveInactive?.analyticsValue).append(eol)
                     }
                     podcastsOutput.append("Auto add to up next: ").append(autoAddToUpNextToString(podcast.autoAddToUpNext)).append(eol)
+                    podcastsOutput.append("Auto add to up next modified: ").append(podcast.autoAddToUpNextModified).append(eol)
                     podcastsOutput.append(eol)
 
                     uuidToPodcast[podcast.uuid] = podcast

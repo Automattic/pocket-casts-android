@@ -17,7 +17,9 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -43,6 +45,26 @@ class PodcastDaoTest {
     @After
     fun closeDb() {
         testDb.close()
+    }
+
+    @Test
+    fun updateRefreshPersistsTheNetworkListId() = runTest {
+        val uuid = UUID.randomUUID().toString()
+        podcastDao.insertSuspend(Podcast(uuid = uuid, isSubscribed = true))
+
+        podcastDao.updateRefreshFor(uuid, networkListId = "cdb75bc0-9f5a-4217-b1ca-f573821a7913")
+
+        assertEquals("cdb75bc0-9f5a-4217-b1ca-f573821a7913", podcastDao.findByUuidBlocking(uuid)?.networkListId)
+    }
+
+    @Test
+    fun updateRefreshClearsTheNetworkListIdWhenThePodcastLeavesItsNetwork() = runTest {
+        val uuid = UUID.randomUUID().toString()
+        podcastDao.insertSuspend(Podcast(uuid = uuid, isSubscribed = true, networkListId = "cdb75bc0-9f5a-4217-b1ca-f573821a7913"))
+
+        podcastDao.updateRefreshFor(uuid, networkListId = null)
+
+        assertNull(podcastDao.findByUuidBlocking(uuid)?.networkListId)
     }
 
     @Test
@@ -148,6 +170,18 @@ class PodcastDaoTest {
         assertEquals("Second podcast should be least recently played", podcast1.uuid, folderPodcasts[1].uuid)
     }
 
+    @Test
+    fun testUpdateShowNotificationsForSubscribed() = runTest {
+        val (podcast1, podcast2, unsubscribed) = insertTestPodcastsAndEpisodes()
+        podcastDao.updateShowNotifications(podcast2.uuid, true)
+
+        podcastDao.updateShowNotificationsForSubscribed(listOf(podcast1.uuid, unsubscribed.uuid))
+
+        assertTrue("Selected podcast should be enabled", podcastDao.findPodcastByUuid(podcast1.uuid)!!.isShowNotifications)
+        assertFalse("Deselected podcast should be disabled", podcastDao.findPodcastByUuid(podcast2.uuid)!!.isShowNotifications)
+        assertFalse("Unsubscribed podcast should be left alone", podcastDao.findPodcastByUuid(unsubscribed.uuid)!!.isShowNotifications)
+    }
+
     private suspend fun insertTestPodcastsAndEpisodes(folderId: String? = null): Triple<Podcast, Podcast, Podcast> {
         val podcast1 = Podcast(uuid = UUID.randomUUID().toString(), rawFolderUuid = folderId, isSubscribed = true)
         val podcast2 = Podcast(uuid = UUID.randomUUID().toString(), rawFolderUuid = folderId, isSubscribed = true)
@@ -182,4 +216,19 @@ class PodcastDaoTest {
 
         return Triple(podcast1, podcast2, unsubscribed)
     }
+
+    private suspend fun PodcastDao.updateRefreshFor(uuid: String, networkListId: String?) = updateRefresh(
+        uuid = uuid,
+        title = "Analog(ue)",
+        author = "Relay",
+        podcastCategory = "Technology",
+        podcastDescription = "",
+        estimatedNextEpisode = null,
+        episodeFrequency = null,
+        refreshAvailable = false,
+        fundingUrl = null,
+        explicit = null,
+        webFeed = false,
+        networkListId = networkListId,
+    )
 }

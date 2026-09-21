@@ -1,14 +1,73 @@
-8.18
+8.22
 -----
 *   New Features
-    *   Add option to switch to the HLS video stream when playing a downloaded episode
-        ([#5620](https://github.com/Automattic/pocket-casts-android/pull/5620))
+    *   Log in to the Wear OS app by scanning a QR code with your phone or entering a code on the web
+        ([#5964](https://github.com/Automattic/pocket-casts-android/pull/5964))
 *   Bug Fixes
+    *   Show every matching folder in search results instead of only the last one
+        ([#5953](https://github.com/Automattic/pocket-casts-android/pull/5953))
+    *   Show the correct play or pause button for User Files
+        ([#5963](https://github.com/Automattic/pocket-casts-android/pull/5963))
+    *   Remove the bookmark icon from an episode as soon as its last bookmark is deleted, instead of waiting for the next sync
+        ([#6005](https://github.com/Automattic/pocket-casts-android/pull/6005))
+    *   Keep a newly uploaded file in view instead of letting the Files list jump past it
+        ([#6005](https://github.com/Automattic/pocket-casts-android/pull/6005))
+    *   Confirm playlist removals and mixed changes after adding episodes to playlists, not only additions
+        ([#5632](https://github.com/Automattic/pocket-casts-android/pull/5632))
+    *   Show a single launcher icon after choosing a custom app icon
+        ([#5609](https://github.com/Automattic/pocket-casts-android/pull/5609))
     *   Resume immediately when a headphone or car play button is pressed, instead of waiting for the multi-tap
         window, and stop wireless Android Auto from pausing playback
         ([#5645](https://github.com/Automattic/pocket-casts-android/pull/5645))
+
+8.21
+-----
+*   New Features
+    *   Browse podcast networks from Discover, search and the podcast page
+        ([#5865](https://github.com/Automattic/pocket-casts-android/pull/5865))
+*   Bug Fixes
+    *   Fix video freezing when rotating into landscape fullscreen and stuttering when resuming from the background
+        ([#5844](https://github.com/Automattic/pocket-casts-android/pull/5844))
+    *   Keep Picture-in-Picture video playing across rotation and config changes, and restore the inline video after closing PiP
+        ([#5912](https://github.com/Automattic/pocket-casts-android/pull/5912))
+    *   Keep the multi-select episode selection when rotating the device on the podcast screen
+        ([#5836](https://github.com/Automattic/pocket-casts-android/pull/5836))
+    *   Prevent the app from being killed in the background on low-memory devices by pausing player UI updates while playing
+        ([#5843](https://github.com/Automattic/pocket-casts-android/pull/5843))
+    *   Closing the transcript search bar now keeps the transcript open at the same scroll position instead of exiting the transcript
+        ([#5835](https://github.com/Automattic/pocket-casts-android/pull/5835))
+    *   Stop "Cache entire playing episode" from silently downloading oversized or video enclosures in the background
+        ([#5868](https://github.com/Automattic/pocket-casts-android/pull/5868))
+    *   Keep the Playback Effects icon visible on the Now Playing screen when a podcast's colours haven't loaded yet
+        ([#5877](https://github.com/Automattic/pocket-casts-android/pull/5877))
+    *   Show the bookmark details play control as a time button in the header and open the episode when its artwork or title is tapped
+        ([#5946](https://github.com/Automattic/pocket-casts-android/pull/5946))
+
+8.20
+-----
+*   Updates 
+    *   Allow the skip forward and skip back intents to specify a custom number of seconds
+
+8.19
+-----
+*   New Features
+    *   Add the delete account option to the Automotive account screen
+        ([#5757](https://github.com/Automattic/pocket-casts-android/pull/5757))
+*   Bug Fixes
+    *   Fix a crash when showing a bottom sheet after the app is sent to the background
+        ([#5709](https://github.com/Automattic/pocket-casts-android/pull/5709))
+    *   Fix truncated dialog button labels in the Automotive app
+        ([#5751](https://github.com/Automattic/pocket-casts-android/pull/5751))
+
+8.18
+-----
+*   Bug Fixes
     *   Allow copying description and show notes links with a long press
         ([#5628](https://github.com/Automattic/pocket-casts-android/pull/5628))
+    *   Fix the app briefly freezing when showing the default podcast artwork
+        ([#5634](https://github.com/Automattic/pocket-casts-android/pull/5634))
+    *   Fix audio stuttering when playing video episodes at high speed in the background
+        ([#5707](https://github.com/Automattic/pocket-casts-android/pull/5707))
 
 8.17
 -----
@@ -21,6 +80,15 @@
         ([#5536](https://github.com/Automattic/pocket-casts-android/pull/5536))
     *   HLS support
         ([#5602](https://github.com/Automattic/pocket-casts-android/pull/5602))
+    *   Add option to switch to the HLS video stream when playing a downloaded episode
+        ([#5620](https://github.com/Automattic/pocket-casts-android/pull/5620))
+*   Updates
+    *   Respect Audio only toggle when playing progressive mp4 episodes
+        ([#5627](https://github.com/Automattic/pocket-casts-android/pull/5627))
+    *   Tap into ExoPlayer's cache instead of a standalone MediaSource for fingerprinting
+        ([#5618](https://github.com/Automattic/pocket-casts-android/pull/5618))
+    *   Resolve generated chapter seeks through on-demand audio fingerprinting
+        ([#5613](https://github.com/Automattic/pocket-casts-android/pull/5613))
 *   Bug Fixes
     *   Fix episodes being cached over mobile data when Warn before using data is enabled
         ([#5567](https://github.com/Automattic/pocket-casts-android/pull/5567))

@@ -305,8 +305,7 @@ class UpNextSync @Inject constructor(
             return null
         }
         return if (podcastUuid == Podcast.userPodcast.uuid) {
-            userEpisodeManager.downloadMissingUserEpisodeRxMaybe(uuid = episodeUuid, placeholderTitle = title, placeholderPublished = published)
-                .awaitSingleOrNull()
+            userEpisodeManager.downloadMissingUserEpisode(uuid = episodeUuid, placeholderTitle = title, placeholderPublished = published)
         } else {
             val skeletonEpisode = buildSkeletonPodcastEpisode(podcastUuid)
             episodeManager.downloadMissingEpisodeRxMaybe(episodeUuid = episodeUuid, podcastUuid = podcastUuid, skeletonEpisode = skeletonEpisode, podcastManager = podcastManager, downloadMetaData = false, source = SourceView.UP_NEXT)

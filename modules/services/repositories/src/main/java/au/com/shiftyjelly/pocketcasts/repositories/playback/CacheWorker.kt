@@ -18,6 +18,7 @@ import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import au.com.shiftyjelly.pocketcasts.utils.config.FirebaseConfig
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -33,10 +34,13 @@ class CacheWorker @AssistedInject constructor(
     private val sourceFactory: ExoPlayerDataSourceFactory,
 ) : Worker(context, params) {
     private var cacheWriter: CacheWriter? = null
+    private var cancelledForCap = false
     private val episodeUuid get() = inputData.getString(EPISODE_UUID_KEY)
     private val downloadUrl get() = inputData.getString(URL_KEY)
 
     override fun doWork(): Result {
+        val maxCacheBytes = inputData.getLong(MAX_CACHE_BYTES_KEY, DEFAULT_MAX_CACHE_BYTES)
+            .takeIf { it > 0 } ?: DEFAULT_MAX_CACHE_BYTES
         try {
             if (downloadUrl == null || episodeUuid == null) {
                 Timber.tag(TAG).e("Error: Episode download url or uuid is null, downloadUrl: '$downloadUrl' episodeUuid: '$episodeUuid' worker id: '$id'")
@@ -52,14 +56,22 @@ class CacheWorker @AssistedInject constructor(
                 cacheDataSourceFactory.createDataSource(),
                 dataSpec,
                 null,
-                null,
-            )
+            ) { _, bytesCached, _ ->
+                if (bytesCached >= maxCacheBytes) {
+                    cancelledForCap = true
+                    cacheWriter?.cancel()
+                }
+            }
             cacheWriter?.cache()
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Caching complete for episode id: $episodeUuid worker id: '$id'")
 
             val outputData = Data.Builder().putString(EPISODE_UUID_KEY, episodeUuid).build()
             return Result.success(outputData)
         } catch (exception: Exception) {
+            if (cancelledForCap) {
+                LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Caching stopped after reaching the $maxCacheBytes byte cap for episode id: $episodeUuid worker id: '$id'")
+                return Result.failure()
+            }
             val errorMessage = "Failed to cache episode '$episodeUuid' for url '$downloadUrl' worker id: '$id'"
             Timber.tag(TAG).e(exception, errorMessage)
             LogBuffer.e(LogBuffer.TAG_PLAYBACK, exception, errorMessage)
@@ -81,15 +93,18 @@ class CacheWorker @AssistedInject constructor(
         private const val CACHE_WORKER_TAG = "pocket_casts_cache_worker_tag"
         private const val URL_KEY = "url_key"
         private const val EPISODE_UUID_KEY = "episode_uuid_key"
+        private const val MAX_CACHE_BYTES_KEY = "max_cache_bytes_key"
+        private val DEFAULT_MAX_CACHE_BYTES = (FirebaseConfig.defaults[FirebaseConfig.EXOPLAYER_CACHE_ENTIRE_PLAYING_EPISODE_SIZE_IN_MB] as Long) * 1024 * 1024
 
         fun startCachingEntireEpisode(
             context: Context,
             url: String,
             episodeUuid: String,
             networkConstraint: NetworkType,
+            maxCacheBytes: Long,
             onCachingComplete: (String) -> Unit,
         ) {
-            val cacheWorkRequest = buildCacheWorkRequest(url, episodeUuid, networkConstraint)
+            val cacheWorkRequest = buildCacheWorkRequest(url, episodeUuid, networkConstraint, maxCacheBytes)
 
             observeWorkerInfo(context, cacheWorkRequest, episodeUuid, onCachingComplete)
 
@@ -101,10 +116,12 @@ class CacheWorker @AssistedInject constructor(
             url: String,
             episodeUuid: String,
             networkConstraint: NetworkType,
+            maxCacheBytes: Long,
         ): OneTimeWorkRequest {
             val inputData = Data.Builder()
                 .putString(URL_KEY, url)
                 .putString(EPISODE_UUID_KEY, episodeUuid)
+                .putLong(MAX_CACHE_BYTES_KEY, maxCacheBytes)
                 .build()
 
             val constraints = Constraints.Builder()

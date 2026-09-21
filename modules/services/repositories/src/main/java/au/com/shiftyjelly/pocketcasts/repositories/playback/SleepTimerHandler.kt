@@ -5,19 +5,19 @@ import android.widget.Toast
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
-import io.reactivex.Observable
-import io.reactivex.disposables.Disposable
-import io.reactivex.schedulers.Schedulers
-import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.ZERO
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.TimeSource
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -29,8 +29,9 @@ internal class SleepTimerHandler(
     private val playbackManager: PlaybackManager,
     private val contextProvider: () -> Context,
     private val scope: CoroutineScope,
+    private val timeSource: TimeSource = TimeSource.Monotonic,
 ) {
-    private var sleepTimerDisposable: Disposable? = null
+    private var sleepTimerJob: Job? = null
     private var observeJob: Job? = null
 
     @Volatile
@@ -51,8 +52,8 @@ internal class SleepTimerHandler(
     }
 
     private fun cancelTimer() {
-        sleepTimerDisposable?.dispose()
-        sleepTimerDisposable = null
+        sleepTimerJob?.cancel()
+        sleepTimerJob = null
         currentTimeLeft = ZERO
     }
 
@@ -69,34 +70,50 @@ internal class SleepTimerHandler(
             return
         }
 
-        if (sleepTimerDisposable == null || sleepTimerDisposable!!.isDisposed) {
+        if (sleepTimerJob?.isActive != true) {
             currentTimeLeft = newTimeLeft
 
-            sleepTimerDisposable = Observable.interval(1, TimeUnit.SECONDS, Schedulers.computation())
-                .takeWhile { currentTimeLeft > ZERO }
-                .doOnNext {
-                    currentTimeLeft = currentTimeLeft.minus(1.seconds)
-                    sleepTimer.updateSleepTimerStatus(sleepTimeRunning = currentTimeLeft != ZERO, timeLeft = currentTimeLeft)
-
-                    if (currentTimeLeft == 5.seconds) {
-                        playbackManager.performVolumeFadeOut(5.0)
+            sleepTimerJob = scope.launch {
+                try {
+                    val start = timeSource.markNow()
+                    var tickCount = 0
+                    while (isActive) {
+                        tickCount++
+                        // Fixed rate, so a slow tick does not push back the ticks after it
+                        val nextTick = start + tickCount.seconds
+                        delay(-nextTick.elapsedNow())
+                        if (currentTimeLeft <= ZERO) break
+                        onSleepTimerTick()
                     }
-
-                    if (currentTimeLeft <= ZERO) {
-                        LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Paused from sleep timer.")
-                        val context = contextProvider()
-                        scope.launch(Dispatchers.Main) {
-                            Toast.makeText(context, context.getString(R.string.player_sleep_timer_stopped_your_podcast), Toast.LENGTH_LONG).show()
-                            playbackManager.restorePlayerVolume()
-                        }
-                        playbackManager.pause(sourceView = SourceView.AUTO_PAUSE)
-                        sleepTimer.updateSleepTimerStatus(sleepTimeRunning = false)
-                        cancelTimer()
-                    }
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Throwable) {
+                    Timber.e(e, "Sleep timer interval error")
                 }
-                .subscribe({}, { e -> Timber.e(e, "Sleep timer interval error") })
+            }
         } else {
             currentTimeLeft = newTimeLeft
+        }
+    }
+
+    private fun onSleepTimerTick() {
+        currentTimeLeft = currentTimeLeft.minus(1.seconds)
+        sleepTimer.updateSleepTimerStatus(sleepTimeRunning = currentTimeLeft != ZERO, timeLeft = currentTimeLeft)
+
+        if (currentTimeLeft == 5.seconds) {
+            playbackManager.performVolumeFadeOut(5.0)
+        }
+
+        if (currentTimeLeft <= ZERO) {
+            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Paused from sleep timer.")
+            val context = contextProvider()
+            scope.launch(Dispatchers.Main) {
+                Toast.makeText(context, context.getString(R.string.player_sleep_timer_stopped_your_podcast), Toast.LENGTH_LONG).show()
+                playbackManager.restorePlayerVolume()
+            }
+            playbackManager.pause(sourceView = SourceView.AUTO_PAUSE)
+            sleepTimer.updateSleepTimerStatus(sleepTimeRunning = false)
+            cancelTimer()
         }
     }
 }

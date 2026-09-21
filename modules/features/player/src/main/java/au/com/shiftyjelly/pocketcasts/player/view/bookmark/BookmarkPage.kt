@@ -1,24 +1,31 @@
 package au.com.shiftyjelly.pocketcasts.player.view.bookmark
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -27,11 +34,16 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
@@ -68,6 +80,12 @@ fun BookmarkPage(
     onSave: () -> Unit,
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
+    passage: String? = null,
+    canEditTranscript: Boolean = false,
+    isCapturingPassage: Boolean = false,
+    onEditTranscript: () -> Unit = {},
+    titleSuggestion: BookmarkViewModel.TitleSuggestion = BookmarkViewModel.TitleSuggestion.None,
+    onApplySuggestion: (String) -> Unit = {},
 ) {
     Column(
         modifier = modifier,
@@ -105,8 +123,14 @@ fun BookmarkPage(
             isNewBookmark = isNewBookmark,
             title = title,
             colors = playerColors,
+            passage = passage,
+            canEditTranscript = canEditTranscript,
+            isCapturingPassage = isCapturingPassage,
             onTitleChange = onTitleChange,
             onSave = onSave,
+            onEditTranscript = onEditTranscript,
+            titleSuggestion = titleSuggestion,
+            onApplySuggestion = onApplySuggestion,
         )
     }
 }
@@ -116,8 +140,14 @@ private fun Content(
     isNewBookmark: Boolean,
     title: TextFieldValue,
     colors: PlayerColors,
+    passage: String?,
+    canEditTranscript: Boolean,
+    isCapturingPassage: Boolean,
     onTitleChange: (TextFieldValue) -> Unit,
     onSave: () -> Unit,
+    onEditTranscript: () -> Unit,
+    titleSuggestion: BookmarkViewModel.TitleSuggestion,
+    onApplySuggestion: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val focusRequester = remember { FocusRequester() }
@@ -143,6 +173,7 @@ private fun Content(
             handleColor = colors.highlight01,
             backgroundColor = colors.highlight01.copy(alpha = 0.4f),
         )
+        val suggestingTitleDescription = stringResource(LR.string.bookmark_suggesting_title)
         CompositionLocalProvider(LocalTextSelectionColors provides tintTextSelectionColors) {
             TextField(
                 value = title,
@@ -152,6 +183,19 @@ private fun Content(
                     fontSize = if (title.text.length > 20) 18.sp else 26.sp,
                     fontWeight = FontWeight.Bold,
                 ),
+                trailingIcon = if (titleSuggestion is BookmarkViewModel.TitleSuggestion.Generating) {
+                    {
+                        CircularProgressIndicator(
+                            color = colors.contrast02,
+                            strokeWidth = 2.dp,
+                            modifier = Modifier
+                                .size(16.dp)
+                                .semantics { contentDescription = suggestingTitleDescription },
+                        )
+                    }
+                } else {
+                    null
+                },
                 colors = TextFieldDefaults.textFieldColors(
                     textColor = colors.contrast01,
                     backgroundColor = Color.Transparent,
@@ -168,11 +212,29 @@ private fun Content(
             )
         }
 
+        TitleSuggestionRow(
+            titleSuggestion = titleSuggestion,
+            colors = colors,
+            onApplySuggestion = onApplySuggestion,
+        )
+
+        when {
+            passage != null -> TranscriptSection(
+                passage = passage,
+                colors = colors,
+                canEdit = canEditTranscript,
+                onEdit = onEditTranscript,
+            )
+
+            isCapturingPassage -> TranscriptLoadingSection(
+                colors = colors,
+            )
+        }
+
         Spacer(
             modifier = Modifier.weight(1f),
         )
 
-        val isTitleBlank = title.text.isBlank()
         val textColor = remember(colors) {
             val backgroundForContrast = colors.background01.copy(alpha = 1f)
             val highlightForContrast = colors.highlight01.copy(alpha = 1f)
@@ -185,8 +247,8 @@ private fun Content(
 
         RowButton(
             text = stringResource(if (isNewBookmark) R.string.save_bookmark else R.string.change_title),
+            enabled = isNewBookmark || title.text.isNotBlank(),
             colors = ButtonDefaults.buttonColors(backgroundColor = colors.highlight01),
-            enabled = !isTitleBlank,
             textColor = textColor,
             includePadding = false,
             onClick = onSave,
@@ -194,6 +256,114 @@ private fun Content(
     }
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
+    }
+}
+
+@Composable
+private fun TitleSuggestionRow(
+    titleSuggestion: BookmarkViewModel.TitleSuggestion,
+    colors: PlayerColors,
+    onApplySuggestion: (String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    when (titleSuggestion) {
+        is BookmarkViewModel.TitleSuggestion.Available -> {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 48.dp)
+                    .clickable(role = Role.Button) { onApplySuggestion(titleSuggestion.title) }
+                    .semantics(mergeDescendants = true) {}
+                    .padding(top = 12.dp),
+            ) {
+                TextP40(
+                    text = stringResource(LR.string.bookmark_suggestion_prefix),
+                    color = colors.contrast02,
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = titleSuggestion.title,
+                    color = colors.highlight01,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+        }
+
+        BookmarkViewModel.TitleSuggestion.None,
+        BookmarkViewModel.TitleSuggestion.Generating,
+        -> Unit
+    }
+}
+
+@Composable
+private fun TranscriptSection(
+    passage: String,
+    colors: PlayerColors,
+    canEdit: Boolean,
+    onEdit: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(top = 24.dp),
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            TextP40(
+                text = stringResource(LR.string.transcript),
+                color = colors.contrast02,
+                modifier = Modifier.weight(1f),
+            )
+            if (canEdit) {
+                TextButton(onClick = onEdit) {
+                    Text(
+                        text = stringResource(LR.string.edit),
+                        color = colors.highlight01,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
+            }
+        }
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = passage,
+            color = colors.contrast01,
+            fontFamily = FontFamily.Serif,
+            fontSize = 16.sp,
+            maxLines = 4,
+            overflow = TextOverflow.Ellipsis,
+        )
+    }
+}
+
+@Composable
+private fun TranscriptLoadingSection(
+    colors: PlayerColors,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(top = 24.dp),
+    ) {
+        TextP40(
+            text = stringResource(LR.string.bookmark_adding_transcript),
+            color = colors.contrast02,
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        listOf(0.9f, 0.75f, 0.85f).forEach { fraction ->
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(fraction)
+                    .height(12.dp)
+                    .clip(RoundedCornerShape(4.dp))
+                    .background(colors.contrast01.copy(alpha = 0.12f)),
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+        }
     }
 }
 
@@ -208,12 +378,15 @@ private fun BookmarkPagePreview(
         ) {
             val colors = MaterialTheme.theme.rememberPlayerColorsOrDefault()
             BookmarkPage(
-                isNewBookmark = true,
-                title = TextFieldValue(""),
+                isNewBookmark = false,
+                title = TextFieldValue("Selective admissions"),
                 playerColors = colors,
                 onTitleChange = {},
                 onSave = {},
                 onClose = {},
+                passage = "The difference between the kid who gets in and the kid who doesn't is often basically noise.",
+                canEditTranscript = true,
+                onEditTranscript = {},
                 modifier = Modifier.background(colors.background01),
             )
         }

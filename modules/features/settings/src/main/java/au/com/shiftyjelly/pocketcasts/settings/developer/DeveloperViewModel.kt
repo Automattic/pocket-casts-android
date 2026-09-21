@@ -136,7 +136,7 @@ class DeveloperViewModel
                     .shuffled()
                     .asFlow()
                     .flatMapConcat {
-                        episodeManager.findEpisodesByPodcastOrderedSuspend(it).asFlow()
+                        episodeManager.findEpisodesByPodcastOrdered(it).asFlow()
                     }
                     .take(5)
                     .toList()
@@ -184,6 +184,15 @@ class DeveloperViewModel
 
     fun resetUpNextSortTooltip() {
         settings.showUpNextSortDurationTooltip.set(true, updateModifiedAt = false)
+    }
+
+    fun showGiftTooltip() {
+        settings.showReferralsTooltip.set(true, updateModifiedAt = false)
+    }
+
+    fun showPlaylistTooltips() {
+        settings.showPremadePlaylistsTooltip.set(true, updateModifiedAt = false)
+        settings.showRearrangePlaylistsTooltip.set(true, updateModifiedAt = false)
     }
 
     fun resetNotificationsPrompt() {

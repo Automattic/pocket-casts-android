@@ -53,6 +53,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.withResumed
 import androidx.mediarouter.media.MediaControlIntent
 import androidx.mediarouter.media.MediaRouteSelector
 import androidx.mediarouter.media.MediaRouter
@@ -60,6 +61,7 @@ import androidx.transition.Slide
 import au.com.shiftyjelly.pocketcasts.R
 import au.com.shiftyjelly.pocketcasts.account.AccountActivity
 import au.com.shiftyjelly.pocketcasts.account.PromoCodeUpgradedFragment
+import au.com.shiftyjelly.pocketcasts.account.deviceapprove.DeviceApproveFragment
 import au.com.shiftyjelly.pocketcasts.account.onboarding.AccountBenefitsFragment
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivity
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivityContract
@@ -86,6 +88,7 @@ import au.com.shiftyjelly.pocketcasts.deeplink.DownloadsDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ImportDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.NativeShareDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.OpmlImportDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.PairDeviceDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.PlayFromSearchDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.PocketCastsWebsiteGetDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.PromoCodeDeepLink
@@ -114,6 +117,7 @@ import au.com.shiftyjelly.pocketcasts.discover.util.DiscoverDeepLinkManager
 import au.com.shiftyjelly.pocketcasts.discover.util.DiscoverDeepLinkManager.Companion.RECOMMENDATIONS_USER
 import au.com.shiftyjelly.pocketcasts.discover.util.DiscoverDeepLinkManager.Companion.STAFF_PICKS_LIST_ID
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment
+import au.com.shiftyjelly.pocketcasts.discover.view.PodcastGridFragment
 import au.com.shiftyjelly.pocketcasts.discover.view.PodcastGridListFragment
 import au.com.shiftyjelly.pocketcasts.discover.view.PodcastListFragment
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesActivity
@@ -163,7 +167,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.opml.OpmlImportTask
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackNoticeType
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
+import au.com.shiftyjelly.pocketcasts.repositories.playback.StreamVideoState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
+import au.com.shiftyjelly.pocketcasts.repositories.playback.VideoSurfaceState
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -186,6 +192,7 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.NavigationBarColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.AccountEncouragement
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
@@ -222,13 +229,10 @@ import com.automattic.eventhorizon.UpNextTabOpenedEvent
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
-import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.schedulers.Schedulers
+import java.time.Instant
 import java.util.Locale
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration
@@ -352,7 +356,10 @@ class MainActivity :
         get() = binding.bottomContainer.height - binding.bottomContainer.paddingBottom
 
     private var bottomSheetTag: String? = null
-    private val bottomSheetQueue: MutableList<(() -> Unit)?> = mutableListOf()
+
+    // hasCompletedOnboarding() flips true as onboarding finishes, which would chain the modal onto the same launch.
+    private var launchedInitialOnboarding: Boolean = false
+    private var pendingBottomSheetFragment: Fragment? = null
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
@@ -474,10 +481,12 @@ class MainActivity :
 
         val hasCompletedOnboarding = settings.hasCompletedOnboarding()
         val isLoggedIn = syncManager.isLoggedIn()
-        val showOnboarding = !hasCompletedOnboarding && !isLoggedIn
+        val isPairingDeepLink = deepLinkFactory.create(intent) is PairDeviceDeepLink
+        val showOnboarding = !hasCompletedOnboarding && !isLoggedIn && !isPairingDeepLink
         val needsLoginPromptAfterRestore = settings.getNeedsLoginPromptAfterRestore()
         // Only show if savedInstanceState is null in order to avoid creating onboarding activity twice.
         if (showOnboarding && savedInstanceState == null) {
+            launchedInitialOnboarding = true
             openOnboardingFlow(OnboardingFlow.InitialOnboarding)
         }
 
@@ -487,7 +496,8 @@ class MainActivity :
         if (savedInstanceState == null && needsLoginPromptAfterRestore) {
             settings.setNeedsLoginPromptAfterRestore(false)
             if (!showOnboarding && !isLoggedIn) {
-                settings.showFreeAccountEncouragement.set(false, updateModifiedAt = true)
+                // Anchor the clock so encourageAccountCreation() doesn't also show the modal this launch.
+                settings.freeAccountEncouragementLastShown.set(Instant.now(), updateModifiedAt = true)
                 openOnboardingFlow(OnboardingFlow.AccountEncouragement)
             }
         }
@@ -681,21 +691,38 @@ class MainActivity :
     private fun encourageAccountCreation() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                val encourageAccountCreation = settings.showFreeAccountEncouragement.value
-                if (!encourageAccountCreation) {
+                if (!FeatureFlag.isEnabled(Feature.ENCOURAGE_ACCOUNT_CREATION)) {
                     return@repeatOnLifecycle
                 }
-                settings.showFreeAccountEncouragement.set(false, updateModifiedAt = true)
+
+                if (launchedInitialOnboarding) {
+                    return@repeatOnLifecycle
+                }
 
                 val isSignedIn = viewModel.signInState.asFlow().first().isSignedIn
-                if (isSignedIn) {
-                    return@repeatOnLifecycle
-                }
+                val isEligible = !isSignedIn && settings.hasCompletedOnboarding()
 
-                if (Util.isTablet(this@MainActivity)) {
-                    AccountBenefitsFragment().show(supportFragmentManager, "account_benefits_fragment")
-                } else {
-                    openOnboardingFlow(OnboardingFlow.AccountEncouragement)
+                val decision = AccountEncouragement.decide(
+                    isEligible = isEligible,
+                    lastShown = settings.freeAccountEncouragementLastShown.value,
+                    now = Instant.now(),
+                )
+                when (decision) {
+                    AccountEncouragement.Decision.Wait -> return@repeatOnLifecycle
+
+                    AccountEncouragement.Decision.Show -> {
+                        if (bottomSheetTag != null || pendingBottomSheetFragment != null) {
+                            return@repeatOnLifecycle
+                        }
+
+                        settings.freeAccountEncouragementLastShown.set(Instant.now(), updateModifiedAt = true)
+
+                        if (Util.isTablet(this@MainActivity)) {
+                            AccountBenefitsFragment().show(supportFragmentManager, "account_benefits_fragment")
+                        } else {
+                            openOnboardingFlow(OnboardingFlow.AccountEncouragement)
+                        }
+                    }
                 }
             }
         }
@@ -716,7 +743,12 @@ class MainActivity :
     override fun onStart() {
         super.onStart()
         if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            if (!videoPlayerShown && playbackManager.getCurrentEpisode()?.isVideo == true && playbackManager.isPlaybackLocal() && playbackManager.isPlaying() && viewModel.isPlayerOpen) {
+            val isPlayingVideo = playbackManager.videoRenderingEnabled.value &&
+                (
+                    (playbackManager.getCurrentEpisode()?.isVideo == true && !settings.audioOnly.value) ||
+                        playbackManager.streamVideoState.value == StreamVideoState.HasVideo
+                    )
+            if (!videoPlayerShown && isPlayingVideo && playbackManager.isPlaybackLocal() && playbackManager.isPlaying() && viewModel.isPlayerOpen) {
                 openFullscreenViewPlayer()
             } else {
                 videoPlayerShown = false
@@ -735,7 +767,19 @@ class MainActivity :
         mediaRouter?.addCallback(mediaRouteSelector, mediaRouterCallback, 0)
     }
 
+    private fun openVideoPlayer() {
+        if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            binding.playerBottomSheet.openPlayer()
+        } else {
+            openFullscreenViewPlayer()
+        }
+    }
+
     private fun openFullscreenViewPlayer() {
+        // A live fullscreen or PiP VideoActivity already owns the surface; don't launch another over it.
+        if (playbackManager.videoSurfaceState.value != VideoSurfaceState.NONE) {
+            return
+        }
         videoPlayerShown = true
         startActivity(VideoActivity.buildIntent(context = this))
     }
@@ -763,12 +807,14 @@ class MainActivity :
                 overrideNextRefreshTimer = false
             } else {
                 // delay the refresh to allow the UI to load
-                Observable.timer(1, TimeUnit.SECONDS, Schedulers.io())
-                    .doOnNext {
+                lifecycleScope.launch(Dispatchers.IO) {
+                    delay(1.seconds)
+                    try {
                         podcastManager.refreshPodcastsIfRequired(fromLog = "open app")
+                    } catch (e: Exception) {
+                        Timber.e(e)
                     }
-                    .subscribeBy(onError = { Timber.e(it) })
-                    .addTo(disposables)
+                }
             }
         }
 
@@ -811,7 +857,7 @@ class MainActivity :
     private fun setupBackPressedCallbacks() {
         val bottomNavigatorCallback = object : OnBackPressedCallback(false) {
             override fun handleOnBackPressed() {
-                navigator.pop()
+                popOrDelegateBack()
             }
         }
         onBackPressedDispatcher.addCallback(this, bottomNavigatorCallback)
@@ -856,15 +902,7 @@ class MainActivity :
 
         val modalFragmentCallback = object : OnBackPressedCallback(false) {
             override fun handleOnBackPressed() {
-                val currentFragment = navigator.currentFragment()
-                if (currentFragment is HasBackstack) {
-                    val handled = currentFragment.onBackPressed()
-                    if (!handled) {
-                        navigator.pop()
-                    }
-                } else {
-                    navigator.pop()
-                }
+                popOrDelegateBack()
             }
         }
         onBackPressedDispatcher.addCallback(this, modalFragmentCallback)
@@ -905,6 +943,15 @@ class MainActivity :
         this.playerContainerBackCallback = playerContainerBackstackCallback
         this.modalFragmentBackCallback = modalFragmentCallback
         this.frameBottomSheetBackCallback = frameBottomSheetCallback
+    }
+
+    // Give the current fragment a chance to unwind its own back stack before popping it off the navigator.
+    private fun popOrDelegateBack() {
+        val currentFragment = navigator.currentFragment()
+        if (currentFragment is HasBackstack && currentFragment.onBackPressed()) {
+            return
+        }
+        navigator.pop()
     }
 
     private var playerBottomSheetBackCallback: OnBackPressedCallback? = null
@@ -1070,12 +1117,8 @@ class MainActivity :
                         val episode = withContext(Dispatchers.Default) {
                             episodeManager.findEpisodeByUuid(state.episodeUuid)
                         }
-                        if (episode?.isVideo == true && state.isPlaying) {
-                            if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
-                                binding.playerBottomSheet.openPlayer()
-                            } else {
-                                openFullscreenViewPlayer()
-                            }
+                        if (episode?.isVideo == true && state.isPlaying && !settings.audioOnly.value && playbackManager.videoRenderingEnabled.value) {
+                            openVideoPlayer()
                         }
                     }
 
@@ -1090,6 +1133,26 @@ class MainActivity :
                     updatePlaybackState(state)
 
                     viewModel.lastPlaybackState = state
+                }
+            }
+        }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                var previousStreamVideoState: StreamVideoState? = null
+                playbackManager.streamVideoState.collect { streamVideoState ->
+                    val didResolveVideoStream = previousStreamVideoState == StreamVideoState.Unknown &&
+                        streamVideoState == StreamVideoState.HasVideo
+                    previousStreamVideoState = streamVideoState
+
+                    if (didResolveVideoStream &&
+                        playbackManager.isPlaying() &&
+                        playbackManager.isPlaybackLocal() &&
+                        playbackManager.videoRenderingEnabled.value &&
+                        playbackManager.getCurrentEpisode()?.isVideo != true
+                    ) {
+                        openVideoPlayer()
+                    }
                 }
             }
         }
@@ -1140,9 +1203,9 @@ class MainActivity :
 
             if (viewModel.shouldShowTrialFinished(signinState)) {
                 val trialFinished = TrialFinishedFragment()
-                showBottomSheet(trialFinished)
-
-                settings.setTrialFinishedSeen(true)
+                showBottomSheet(trialFinished) {
+                    settings.setTrialFinishedSeen(true)
+                }
             }
 
             // Result is intentionally ignored; failures are logged internally by sendAuthToDataLayer
@@ -1153,10 +1216,9 @@ class MainActivity :
             lifecycle.repeatOnLifecycle(Lifecycle.State.CREATED) {
                 viewModel.state.collect { state ->
                     if (state.shouldShowWhatsNew) {
-                        showBottomSheet(
-                            fragment = WhatsNewFragment(),
-                        )
-                        viewModel.onWhatsNewShown()
+                        showBottomSheet(WhatsNewFragment()) {
+                            viewModel.onWhatsNewShown()
+                        }
                     }
                 }
             }
@@ -1374,6 +1436,28 @@ class MainActivity :
     }
 
     override fun showBottomSheet(fragment: Fragment) {
+        showBottomSheet(fragment, onShown = {})
+    }
+
+    private fun showBottomSheet(fragment: Fragment, onShown: () -> Unit) {
+        if (supportFragmentManager.isStateSaved) {
+            pendingBottomSheetFragment = fragment
+            lifecycleScope.launch {
+                withResumed {
+                    if (pendingBottomSheetFragment === fragment) {
+                        commitBottomSheet(fragment)
+                        onShown()
+                    }
+                }
+            }
+        } else {
+            commitBottomSheet(fragment)
+            onShown()
+        }
+    }
+
+    private fun commitBottomSheet(fragment: Fragment) {
+        pendingBottomSheetFragment = null
         supportFragmentManager.commitNow {
             bottomSheetTag = fragment::class.java.name
             replace(R.id.frameBottomSheet, fragment, bottomSheetTag)
@@ -1402,9 +1486,11 @@ class MainActivity :
         }
     }
 
-    override fun isUpNextShowing() = bottomSheetTag == UpNextFragment::class.java.name
+    override fun isUpNextShowing() = isBottomSheetShowing(UpNextFragment::class.java)
 
-    private fun isWhatsNewShowing() = bottomSheetTag == WhatsNewFragment::class.java.name
+    private fun isWhatsNewShowing() = isBottomSheetShowing(WhatsNewFragment::class.java)
+
+    private fun isBottomSheetShowing(fragmentClass: Class<out Fragment>) = bottomSheetTag == fragmentClass.name || pendingBottomSheetFragment?.javaClass == fragmentClass
 
     private fun removeBottomSheetFragment(fragment: Fragment) {
         val tag = fragment::class.java.name
@@ -1414,11 +1500,6 @@ class MainActivity :
 
                 updateStatusBar()
                 bottomSheetTag = null
-
-                if (bottomSheetQueue.isNotEmpty()) {
-                    val next = bottomSheetQueue.removeAt(0)
-                    next?.invoke()
-                }
             }
         }
     }
@@ -1594,7 +1675,12 @@ class MainActivity :
 
                 is ChangeBookmarkTitleDeepLink -> {
                     launch {
-                        val bookmarkArguments = viewModel.createBookmarkArguments(deepLink.bookmarkUuid)
+                        val bookmarkArguments = viewModel.createBookmarkArguments(
+                            deepLink.bookmarkUuid,
+                            isNewBookmark = deepLink.isNewBookmark,
+                            fromEpisode = deepLink.fromEpisode,
+                            source = SourceView.fromString(deepLink.sourceView),
+                        )
                         if (bookmarkArguments != null) {
                             bookmarkActivityLauncher.launch(BookmarkActivity.launchIntent(this@MainActivity, bookmarkArguments))
                         }
@@ -1762,6 +1848,12 @@ class MainActivity :
                     openOnboardingFlow(onboardingFlow)
                 }
 
+                is PairDeviceDeepLink -> {
+                    if (supportFragmentManager.findFragmentByTag("device_approve") == null) {
+                        DeviceApproveFragment.newInstance(deepLink.userCode).show(supportFragmentManager, "device_approve")
+                    }
+                }
+
                 is ThemesDeepLink -> {
                     closePlayer()
                     addFragment(AppearanceSettingsFragment.newInstance())
@@ -1817,6 +1909,15 @@ class MainActivity :
         val currentFragment = navigator.currentFragment()
         if (currentFragment is PodcastFragment && uuid == currentFragment.podcastUuid) return // We are already showing it
         addFragment(PodcastFragment.newInstance(podcastUuid = uuid, sourceView = SourceView.fromString(sourceView)))
+    }
+
+    override fun openNetworkPage(listId: String, title: String?, sourceView: SourceView?) {
+        closePlayer()
+        frameBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+
+        val currentFragment = navigator.currentFragment()
+        if (currentFragment is PodcastGridFragment && listId == currentFragment.listUuid) return // We are already showing it
+        addFragment(PodcastGridFragment.newInstance(listId = listId, title = title, sourceView = sourceView))
     }
 
     @Suppress("DEPRECATION")
@@ -2040,13 +2141,11 @@ class MainActivity :
             getString(LR.string.bookmark_added, result.title)
         }
 
-        val action = View.OnClickListener {
-            showPlayerBookmarks()
+        val snackbar = Snackbar.make(view, snackbarMessage, Snackbar.LENGTH_LONG)
+        if (!result.fromEpisode) {
+            snackbar.setAction(LR.string.settings_view) { showPlayerBookmarks() }
         }
-
-        Snackbar.make(view, snackbarMessage, Snackbar.LENGTH_LONG)
-            .setAction(LR.string.settings_view, action)
-            .show()
+        snackbar.show()
     }
 
     private fun openImport() {

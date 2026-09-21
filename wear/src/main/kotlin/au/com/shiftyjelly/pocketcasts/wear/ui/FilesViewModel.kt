@@ -5,7 +5,6 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
-import kotlinx.coroutines.reactive.asFlow
 
 @HiltViewModel
 class FilesViewModel @Inject constructor(
@@ -14,8 +13,7 @@ class FilesViewModel @Inject constructor(
 ) : ViewModel() {
 
     val userEpisodes = userEpisodeManager
-        .userEpisodesSortedRxFlowable(settings.cloudSortOrder.value)
-        .asFlow()
+        .userEpisodesSortedFlow(settings.cloudSortOrder.value)
 
     val artworkConfiguration = settings.artworkConfiguration.flow
 }
