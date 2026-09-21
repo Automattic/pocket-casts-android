@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playback
 
 import android.os.SystemClock
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -42,7 +43,7 @@ internal class MediaEventQueue(
                     null
                 }
 
-                else -> SingleTapJob(scope).also { singleTapJob = it }
+                else -> SingleTapJob(scope, elapsedRealtime).also { singleTapJob = it }
             }
         } ?: return null
 
@@ -74,14 +75,24 @@ internal class MediaEventQueue(
 
     private class SingleTapJob(
         scope: CoroutineScope,
+        private val elapsedRealtime: () -> Long,
     ) {
         private var counter: Int = 1
 
-        private val job = scope.launch { delay(600) }
+        private val startedAt = elapsedRealtime()
+
+        private val job = scope.launch { delay(SINGLE_TAP_WINDOW_MS) }
 
         val isActive get() = job.isActive
 
-        suspend fun await() = job.join()
+        suspend fun await() {
+            job.join()
+            // The window runs on a timer that stops while the device is suspended, so it can outlast its budget.
+            val waited = elapsedRealtime() - startedAt
+            if (waited > SINGLE_TAP_WINDOW_MS * 2) {
+                LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Media button tap window took ${waited}ms for a ${SINGLE_TAP_WINDOW_MS}ms budget")
+            }
+        }
 
         fun cancel() = job.cancel()
 
@@ -98,6 +109,7 @@ internal class MediaEventQueue(
 
     private companion object {
         const val MULTI_TAP_WINDOW_MS = 250L
+        const val SINGLE_TAP_WINDOW_MS = 600L
     }
 }
 
