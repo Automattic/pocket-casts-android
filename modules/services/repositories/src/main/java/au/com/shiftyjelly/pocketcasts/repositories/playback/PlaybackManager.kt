@@ -1853,7 +1853,7 @@ open class PlaybackManager @Inject constructor(
             nextEpisode = autoLoadEpisode(autoPlay)
             if (nextEpisode == null) {
                 lastTrackedAutoPlaySource = null
-                if (Util.isCarUiMode(application)) {
+                if (episode != null && Util.isCarUiMode(application)) {
                     shutdownKeepingEpisodeVisible()
                 } else {
                     stop()
