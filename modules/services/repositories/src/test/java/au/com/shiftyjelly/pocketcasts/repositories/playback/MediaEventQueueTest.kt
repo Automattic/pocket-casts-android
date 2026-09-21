@@ -145,9 +145,9 @@ class MediaEventQueueTest {
         val immediateTapCount = AtomicInteger()
         val eventCount = 8
         val startBarrier = CyclicBarrier(eventCount)
-        val dispatcher = Executors.newFixedThreadPool(eventCount).asCoroutineDispatcher()
+        val dispatcher = Executors.newCachedThreadPool().asCoroutineDispatcher()
 
-        dispatcher.use {
+        val results = dispatcher.use {
             List(eventCount) {
                 async(dispatcher) {
                     startBarrier.await()
@@ -160,6 +160,7 @@ class MediaEventQueueTest {
         }
 
         assertEquals(1, immediateTapCount.get())
+        assertEquals(listOf(MediaEvent.TripleTap), results.filterNotNull())
     }
 
     @Test

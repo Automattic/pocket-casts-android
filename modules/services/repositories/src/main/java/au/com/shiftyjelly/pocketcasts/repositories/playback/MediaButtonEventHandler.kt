@@ -12,9 +12,9 @@ import kotlinx.coroutines.yield
 /**
  * Serializes media-button key events before dispatching their resolved actions.
  *
- * Event registration starts synchronously to preserve framework callback order. [onImmediatePlay] may therefore run
- * on the caller's stack and must stay fast. [onMediaEvent] runs only after a suspension boundary, outside that
- * synchronous registration section.
+ * Event registration starts synchronously, which preserves framework callback order unless overlapping events
+ * contend on the queue's mutex. [onImmediatePlay] may therefore run on the caller's stack and must stay fast.
+ * [onMediaEvent] runs only after a suspension boundary, outside that synchronous registration section.
  */
 internal class MediaButtonEventHandler(
     private val scopeProvider: () -> CoroutineScope,
@@ -60,8 +60,8 @@ internal class MediaButtonEventHandler(
         }
         val immediateSingleTapHandler = if (resolvesToImmediatePlay) ::handleImmediatePlay else null
 
-        // Register the event before returning to the framework callback. This preserves
-        // delivery order while the queue's timeout still resumes on the provided scope.
+        // Register the event on the caller's stack where possible, so delivery order is usually preserved.
+        // Overlapping events contend on the queue's mutex and finish registering on the provided scope.
         scope.launch(start = CoroutineStart.UNDISPATCHED) {
             try {
                 coroutineContext.ensureActive()

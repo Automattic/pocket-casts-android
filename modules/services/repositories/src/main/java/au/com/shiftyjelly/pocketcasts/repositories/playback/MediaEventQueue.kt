@@ -3,10 +3,12 @@ package au.com.shiftyjelly.pocketcasts.repositories.playback
 import android.os.SystemClock
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 
 internal class MediaEventQueue(
     private val scopeProvider: () -> CoroutineScope,
@@ -23,7 +25,8 @@ internal class MediaEventQueue(
 
     /**
      * [onImmediateSingleTap] returns whether it handled the tap. A tap it declines still resolves through the
-     * window so the caller keeps its normal single tap action.
+     * window so the caller keeps its normal single tap action. A tap it throws on discards the window and
+     * propagates, so callers that want the window to survive a failure must decline instead of throwing.
      */
     suspend fun consumeEvent(
         event: MediaEvent,
@@ -54,10 +57,12 @@ internal class MediaEventQueue(
         val immediateTapHandled = try {
             onImmediateSingleTap?.invoke() == true
         } catch (e: Exception) {
-            stateMutex.withLock {
-                if (singleTapJob === newSingleTapJob) {
-                    singleTapJob = null
-                    newSingleTapJob.cancel()
+            withContext(NonCancellable) {
+                stateMutex.withLock {
+                    if (singleTapJob === newSingleTapJob) {
+                        singleTapJob = null
+                        newSingleTapJob.cancel()
+                    }
                 }
             }
             throw e
