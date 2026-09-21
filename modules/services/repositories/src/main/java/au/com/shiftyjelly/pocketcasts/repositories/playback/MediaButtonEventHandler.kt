@@ -47,7 +47,7 @@ internal class MediaButtonEventHandler(
         } ?: return false
 
         val immediateSingleTapHandler = if (keyEvent.keyCode == KeyEvent.KEYCODE_MEDIA_PLAY) {
-            onImmediatePlay
+            ::handleImmediatePlay
         } else {
             null
         }
@@ -73,5 +73,15 @@ internal class MediaButtonEventHandler(
             }
         }
         return true
+    }
+
+    private fun handleImmediatePlay() {
+        try {
+            onImmediatePlay()
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            onError(e)
+        }
     }
 }

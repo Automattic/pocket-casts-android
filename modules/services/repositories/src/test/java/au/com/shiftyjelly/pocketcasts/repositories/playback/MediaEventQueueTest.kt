@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.playback
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicInteger
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -16,10 +17,11 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class MediaEventQueueTest {
     @Test
     fun `single tap event`() = runTest {
-        val handler = MediaEventQueue(scopeProvider = { this })
+        val handler = MediaEventQueue(scopeProvider = { this }, elapsedRealtime = { testScheduler.currentTime })
 
         val event = handler.consumeEvent(MediaEvent.SingleTap)
 
@@ -28,7 +30,7 @@ class MediaEventQueueTest {
 
     @Test
     fun `double tap event`() = runTest {
-        val handler = MediaEventQueue(scopeProvider = { this })
+        val handler = MediaEventQueue(scopeProvider = { this }, elapsedRealtime = { testScheduler.currentTime })
 
         val event = handler.consumeEvent(MediaEvent.DoubleTap)
 
@@ -37,7 +39,7 @@ class MediaEventQueueTest {
 
     @Test
     fun `triple tap event`() = runTest {
-        val handler = MediaEventQueue(scopeProvider = { this })
+        val handler = MediaEventQueue(scopeProvider = { this }, elapsedRealtime = { testScheduler.currentTime })
 
         val event = handler.consumeEvent(MediaEvent.TripleTap)
 
@@ -46,7 +48,7 @@ class MediaEventQueueTest {
 
     @Test
     fun `map single tap events to double tap event`() = runTest {
-        val handler = MediaEventQueue(scopeProvider = { this })
+        val handler = MediaEventQueue(scopeProvider = { this }, elapsedRealtime = { testScheduler.currentTime })
 
         val firstEvent = async { handler.consumeEvent(MediaEvent.SingleTap) }
 
@@ -58,7 +60,7 @@ class MediaEventQueueTest {
 
     @Test
     fun `map single tap events to triple tap event`() = runTest {
-        val handler = MediaEventQueue(scopeProvider = { this })
+        val handler = MediaEventQueue(scopeProvider = { this }, elapsedRealtime = { testScheduler.currentTime })
 
         val firstEvent = async { handler.consumeEvent(MediaEvent.SingleTap) }
 
@@ -71,7 +73,7 @@ class MediaEventQueueTest {
 
     @Test
     fun `map single tap events to triple tap event when event count is higher`() = runTest {
-        val handler = MediaEventQueue(scopeProvider = { this })
+        val handler = MediaEventQueue(scopeProvider = { this }, elapsedRealtime = { testScheduler.currentTime })
 
         val firstEvent = async { handler.consumeEvent(MediaEvent.SingleTap) }
 
@@ -85,7 +87,7 @@ class MediaEventQueueTest {
 
     @Test
     fun `handle an immediate single tap before the multi tap window expires`() = runTest {
-        val handler = MediaEventQueue(scopeProvider = { this })
+        val handler = MediaEventQueue(scopeProvider = { this }, elapsedRealtime = { testScheduler.currentTime })
         var isHandled = false
 
         val event = async {
@@ -101,7 +103,7 @@ class MediaEventQueueTest {
 
     @Test
     fun `map immediate single taps to multi tap events`() = runTest {
-        val handler = MediaEventQueue(scopeProvider = { this })
+        val handler = MediaEventQueue(scopeProvider = { this }, elapsedRealtime = { testScheduler.currentTime })
         var immediateTapCount = 0
 
         val firstEvent = async {
@@ -122,8 +124,21 @@ class MediaEventQueueTest {
     }
 
     @Test
+    fun `immediate single tap failure does not orphan the tap window`() = runTest {
+        val handler = MediaEventQueue(scopeProvider = { this }, elapsedRealtime = { testScheduler.currentTime })
+        val failure = IllegalStateException("Immediate action failed")
+
+        val thrown = runCatching {
+            handler.consumeEvent(MediaEvent.SingleTap) { throw failure }
+        }.exceptionOrNull()
+
+        assertEquals(failure, thrown)
+        assertEquals(MediaEvent.SingleTap, handler.consumeEvent(MediaEvent.SingleTap))
+    }
+
+    @Test
     fun `handle concurrent immediate single taps exactly once`() = runBlocking {
-        val handler = MediaEventQueue(scopeProvider = { this })
+        val handler = MediaEventQueue(scopeProvider = { this }, elapsedRealtime = { 0L })
         val immediateTapCount = AtomicInteger()
         val eventCount = 8
         val startBarrier = CyclicBarrier(eventCount)
@@ -145,7 +160,7 @@ class MediaEventQueueTest {
 
     @Test
     fun `do not handle immediate single tap while multi tap window is active`() = runTest {
-        val handler = MediaEventQueue(scopeProvider = { this })
+        val handler = MediaEventQueue(scopeProvider = { this }, elapsedRealtime = { testScheduler.currentTime })
         var isHandled = false
 
         handler.consumeEvent(MediaEvent.DoubleTap)
@@ -160,7 +175,7 @@ class MediaEventQueueTest {
 
     @Test
     fun `map single tap events to multi tap event in time window`() = runTest {
-        val handler = MediaEventQueue(scopeProvider = { this })
+        val handler = MediaEventQueue(scopeProvider = { this }, elapsedRealtime = { testScheduler.currentTime })
 
         val firstEvent = async { handler.consumeEvent(MediaEvent.SingleTap) }
 
@@ -172,7 +187,7 @@ class MediaEventQueueTest {
 
     @Test
     fun `map single tap events to single tap events outside of time window`() = runTest {
-        val handler = MediaEventQueue(scopeProvider = { this })
+        val handler = MediaEventQueue(scopeProvider = { this }, elapsedRealtime = { testScheduler.currentTime })
 
         val firstEvent = async { handler.consumeEvent(MediaEvent.SingleTap) }
 
@@ -185,7 +200,7 @@ class MediaEventQueueTest {
 
     @Test
     fun `do not reset single tap time window with each new event`() = runTest {
-        val handler = MediaEventQueue(scopeProvider = { this })
+        val handler = MediaEventQueue(scopeProvider = { this }, elapsedRealtime = { testScheduler.currentTime })
 
         val firstEvent = async { handler.consumeEvent(MediaEvent.SingleTap) }
 
@@ -207,7 +222,7 @@ class MediaEventQueueTest {
 
     @Test
     fun `ignore single tap events while double tap window is active`() = runTest {
-        val handler = MediaEventQueue(scopeProvider = { this })
+        val handler = MediaEventQueue(scopeProvider = { this }, elapsedRealtime = { testScheduler.currentTime })
 
         handler.consumeEvent(MediaEvent.DoubleTap)
 
@@ -221,7 +236,7 @@ class MediaEventQueueTest {
 
     @Test
     fun `ignore single tap events while triple tap window is active`() = runTest {
-        val handler = MediaEventQueue(scopeProvider = { this })
+        val handler = MediaEventQueue(scopeProvider = { this }, elapsedRealtime = { testScheduler.currentTime })
 
         handler.consumeEvent(MediaEvent.TripleTap)
 
@@ -231,5 +246,27 @@ class MediaEventQueueTest {
         delay(1)
         val event = handler.consumeEvent(MediaEvent.SingleTap)
         assertEquals(MediaEvent.SingleTap, event)
+    }
+
+    @Test
+    fun `close the multi tap window on elapsed realtime while coroutine timers are suspended`() = runTest {
+        var elapsedRealtime = 0L
+        val handler = MediaEventQueue(scopeProvider = { this }, elapsedRealtime = { elapsedRealtime })
+
+        handler.consumeEvent(MediaEvent.DoubleTap)
+        elapsedRealtime = 251
+
+        assertEquals(MediaEvent.SingleTap, handler.consumeEvent(MediaEvent.SingleTap))
+    }
+
+    @Test
+    fun `keep the multi tap window open until elapsed realtime passes it`() = runTest {
+        var elapsedRealtime = 0L
+        val handler = MediaEventQueue(scopeProvider = { this }, elapsedRealtime = { elapsedRealtime })
+
+        handler.consumeEvent(MediaEvent.DoubleTap)
+        elapsedRealtime = 250
+
+        assertNull(handler.consumeEvent(MediaEvent.SingleTap))
     }
 }
