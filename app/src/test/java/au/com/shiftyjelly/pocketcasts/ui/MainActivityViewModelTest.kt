@@ -20,11 +20,16 @@ import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.ui.MainActivityViewModel.NavigationState
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
 import com.automattic.eventhorizon.EventHorizon
-import com.jakewharton.rxrelay2.BehaviorRelay
 import io.reactivex.Flowable
 import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -80,15 +85,9 @@ class MainActivityViewModelTest {
 
     private val episode = UserEpisode(uuid = TEST_EPISODE_UUID, publishedDate = Date())
 
-    private val downloadedEpisodes = listOf(
-        PodcastEpisode(sizeInBytes = 1024L, uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
-        PodcastEpisode(sizeInBytes = 2048L, uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
-        PodcastEpisode(sizeInBytes = 512L, uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
-    )
-
     @Before
     fun setup() = runTest {
-        whenever(playbackManager.playbackStateRelay).thenReturn(BehaviorRelay.create<PlaybackState>().toSerialized())
+        whenever(playbackManager.playbackStateFlow).thenReturn(emptyFlow())
         whenever(playbackNoticeManager.playbackNotice).thenReturn(emptyFlow())
     }
 
@@ -121,13 +120,43 @@ class MainActivityViewModelTest {
         }
     }
 
+    /* Playback state tests */
+
     @Test
-    fun `when episodeManager emits episodes, downloadedEpisodeState should update with total size`() = runTest {
+    fun `given playback state changes, then playback state emits each update`() = runTest {
+        val playbackStateFlow = MutableStateFlow(PlaybackState(episodeUuid = "first"))
+        whenever(playbackManager.playbackStateFlow).thenReturn(playbackStateFlow)
         initViewModel()
 
-        viewModel.downloadedEpisodeState.test {
-            assertEquals(downloadedEpisodes.sumOf { it.sizeInBytes }, awaitItem().downloadedEpisodes)
+        viewModel.playbackState.test {
+            assertEquals("first", awaitItem().episodeUuid)
+            playbackStateFlow.value = PlaybackState(episodeUuid = "second")
+            assertEquals("second", awaitItem().episodeUuid)
         }
+    }
+
+    @Test
+    fun `given a slow collector, then playback state skips to the latest update`() = runTest {
+        val playbackStateFlow = MutableSharedFlow<PlaybackState>(extraBufferCapacity = 10)
+        whenever(playbackManager.playbackStateFlow).thenReturn(playbackStateFlow)
+        initViewModel()
+        val receivedEpisodeUuids = mutableListOf<String>()
+
+        val job = launch {
+            viewModel.playbackState.collect { state ->
+                receivedEpisodeUuids += state.episodeUuid
+                delay(1_000)
+            }
+        }
+        runCurrent()
+        playbackStateFlow.emit(PlaybackState(episodeUuid = "first"))
+        runCurrent()
+        playbackStateFlow.emit(PlaybackState(episodeUuid = "second"))
+        playbackStateFlow.emit(PlaybackState(episodeUuid = "third"))
+        advanceUntilIdle()
+        job.cancel()
+
+        assertEquals(listOf("first", "third"), receivedEpisodeUuids)
     }
 
     /* Bookmark added notification tests */
@@ -228,8 +257,6 @@ class MainActivityViewModelTest {
                 SignInState.SignedIn(email = "", subscription = null),
             ),
         )
-
-        whenever(episodeManager.findDownloadedEpisodesRxFlowable()).thenReturn(Flowable.just(downloadedEpisodes))
 
         viewModel = MainActivityViewModel(
             episodeManager = episodeManager,

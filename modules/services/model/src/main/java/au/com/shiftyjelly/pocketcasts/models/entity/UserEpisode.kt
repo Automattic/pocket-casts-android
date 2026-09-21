@@ -66,9 +66,6 @@ data class UserEpisode(
     override var isStarred: Boolean = false
 
     @Ignore
-    var hasBookmark: Boolean = false
-
-    @Ignore
     override var overrideStreamUrl: String? = null
 
     @Ignore

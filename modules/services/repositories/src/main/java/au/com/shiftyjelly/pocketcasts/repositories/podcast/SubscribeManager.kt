@@ -40,7 +40,9 @@ import java.util.Date
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.rx2.rxCompletable
+import kotlinx.coroutines.rx2.rxSingle
 import timber.log.Timber
 
 @Singleton
@@ -225,8 +227,7 @@ class SubscribeManager @Inject constructor(
             .subscribeOn(Schedulers.io())
             .doOnSuccess { Timber.i("Downloaded episodes success podcast $podcastUuid") }
         // download the colors
-        val colorObservable = staticServiceManager.getColorsSingle(podcastUuid)
-            .subscribeOn(Schedulers.io())
+        val colorObservable = rxSingle(Dispatchers.IO) { Optional.of(staticServiceManager.getColors(podcastUuid)) }
             .doOnSuccess { Timber.i("Downloaded colors success podcast $podcastUuid") }
             .onErrorReturn { Optional.empty() }
         // keep expanded or collapsed header state
@@ -248,7 +249,7 @@ class SubscribeManager @Inject constructor(
         )
         // add sync information
         if (syncManager.isLoggedIn()) {
-            val syncPodcastObservable = syncManager.getPodcastEpisodesRxSingle(podcastUuid).subscribeOn(Schedulers.io())
+            val syncPodcastObservable = rxSingle(Dispatchers.IO) { syncManager.getPodcastEpisodes(podcastUuid) }
             return Single.zip(cleanPodcastObservable, syncPodcastObservable, BiFunction<Podcast, PodcastEpisodesResponse, Podcast>(this::mergeSyncPodcast))
                 .onErrorResumeNext(cleanPodcastObservable)
         } else {
@@ -333,9 +334,9 @@ class SubscribeManager @Inject constructor(
     }
 
     // WARNING: only call this when NEW episodes are added, not old ones
-    private fun updateLatestEpisodeUuidRxCompletable(podcastUuid: String): Completable {
-        return episodeDao.findLatestRxMaybe(podcastUuid)
-            .flatMapCompletable { episode -> podcastDao.updateLatestEpisodeRxCompletable(episode.uuid, episode.publishedDate, podcastUuid) }
+    private fun updateLatestEpisodeUuidRxCompletable(podcastUuid: String): Completable = rxCompletable(Dispatchers.IO) {
+        val episode = episodeDao.findLatestBlocking(podcastUuid) ?: return@rxCompletable
+        podcastDao.updateLatestEpisodeBlocking(episode.uuid, episode.publishedDate, podcastUuid)
     }
 
     /**

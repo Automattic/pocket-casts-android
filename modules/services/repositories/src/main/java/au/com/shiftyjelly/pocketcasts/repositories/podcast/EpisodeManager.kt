@@ -34,21 +34,20 @@ interface EpisodeManager {
 
     fun findEpisodesWhereBlocking(queryAfterWhere: String, forSubscribedPodcastsOnly: Boolean = true): List<PodcastEpisode>
     fun findEpisodesByPodcastOrderedBlocking(podcast: Podcast): List<PodcastEpisode>
-    suspend fun findEpisodesByPodcastOrderedSuspend(podcast: Podcast): List<PodcastEpisode>
+    suspend fun findEpisodesByPodcastOrdered(podcast: Podcast): List<PodcastEpisode>
     fun findEpisodesByPodcastOrderedByPublishDateBlocking(podcast: Podcast): List<PodcastEpisode>
     suspend fun findEpisodesByPodcastOrderedByPublishDate(podcast: Podcast): List<PodcastEpisode>
     fun findNotificationEpisodesBlocking(date: Date): List<PodcastEpisode>
     fun findLatestUnfinishedEpisodeByPodcastBlocking(podcast: Podcast): PodcastEpisode?
     fun findLatestEpisodeToPlayBlocking(): PodcastEpisode?
     fun findEpisodesByPodcastOrderedFlow(podcast: Podcast): Flow<List<PodcastEpisode>>
-    fun findEpisodesWhereRxFlowable(queryAfterWhere: String): Flowable<List<PodcastEpisode>>
 
     suspend fun findEpisodesToSync(): List<PodcastEpisode>
     fun findEpisodesForHistorySyncBlocking(): List<PodcastEpisode>
 
     fun findDownloadEpisodesFlow(): Flow<List<PodcastEpisode>>
-    fun findDownloadedEpisodesRxFlowable(): Flowable<List<PodcastEpisode>>
-    fun findStarredEpisodesFlow(): Flow<List<PodcastEpisode>>
+    fun findDownloadedEpisodesFlow(): Flow<List<PodcastEpisode>>
+    fun findStarredEpisodesFlow(limit: Int = Int.MAX_VALUE): Flow<List<PodcastEpisode>>
     suspend fun findStarredEpisodes(): List<PodcastEpisode>
     suspend fun downloadedEpisodesThatHaveNotBeenPlayedCount(): Int
 
@@ -118,8 +117,6 @@ interface EpisodeManager {
     fun markAsUnplayed(episodes: List<BaseEpisode>)
     suspend fun findEpisodeByUuid(uuid: String): BaseEpisode?
     suspend fun findEpisodesByUuids(uuids: List<String>): List<BaseEpisode>
-    fun findDownloadingEpisodesRxFlowable(): Flowable<List<BaseEpisode>>
-    fun episodeCountRxFlowable(queryAfterWhere: String): Flowable<Int>
     suspend fun updatePlaybackInteractionDate(episode: BaseEpisode?)
     suspend fun updatePlaybackInteraction(episodeUuid: String, interactionDate: Long, syncStatus: Long)
     suspend fun findStaleDownloads(): List<PodcastEpisode>

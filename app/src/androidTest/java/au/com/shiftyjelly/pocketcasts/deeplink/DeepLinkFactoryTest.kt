@@ -55,6 +55,18 @@ class DeepLinkFactoryTest {
     }
 
     @Test
+    fun changeBookmarkTitleFromEpisode() {
+        val intent = Intent()
+            .setAction("INTENT_OPEN_APP_CHANGE_BOOKMARK_TITLE")
+            .putExtra("bookmark_uuid", "bookmark-id")
+            .putExtra("bookmark_from_episode", true)
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(ChangeBookmarkTitleDeepLink("bookmark-id", fromEpisode = true), deepLink)
+    }
+
+    @Test
     fun changeBookmarkTitleWithoutBookmarkUuid() {
         val intent = Intent()
             .setAction("INTENT_OPEN_APP_CHANGE_BOOKMARK_TITLE")
@@ -1123,6 +1135,39 @@ class DeepLinkFactoryTest {
         val deepLink = factory.create(intent)
 
         assertEquals(SignInDeepLink(sourceView = "hello"), deepLink)
+    }
+
+    @Test
+    fun pairDevice() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("https://pocketcasts.com/pair?user_code=ABCD12"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(PairDeviceDeepLink(userCode = "ABCD12"), deepLink)
+    }
+
+    @Test
+    fun pairDeviceStagingHost() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("https://pocketcasts.net/pair?user_code=ABCD12"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(PairDeviceDeepLink(userCode = "ABCD12"), deepLink)
+    }
+
+    @Test
+    fun pairDeviceWithoutUserCodeIsNotPairing() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("https://pocketcasts.com/pair"))
+
+        val deepLink = factory.create(intent)
+
+        assertNull(deepLink)
     }
 
     @Test

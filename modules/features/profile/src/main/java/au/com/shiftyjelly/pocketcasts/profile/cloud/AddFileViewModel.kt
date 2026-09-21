@@ -11,7 +11,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import java.io.File
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.rx2.await
 import kotlinx.coroutines.withContext
 
 @HiltViewModel
@@ -23,7 +22,7 @@ class AddFileViewModel @Inject constructor(
     val signInState: LiveData<SignInState> = userManager.getSignInState().toLiveData()
 
     suspend fun updateImageOnServer(userEpisode: UserEpisode, imageFile: File) = withContext(Dispatchers.IO) {
-        userEpisodeManager.uploadImageToServerRxCompletable(userEpisode, imageFile).await()
+        userEpisodeManager.uploadImageToServer(userEpisode, imageFile)
     }
 
     suspend fun updateFileMetadataOnServer(userEpisode: UserEpisode) {

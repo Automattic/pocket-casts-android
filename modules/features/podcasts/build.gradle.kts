@@ -30,7 +30,6 @@ dependencies {
     api(libs.dagger.hilt.android)
     api(libs.material)
     api(libs.rx2.java)
-    api(libs.rx2.relay)
 
     api(projects.modules.features.player)
     api(projects.modules.features.transcripts)

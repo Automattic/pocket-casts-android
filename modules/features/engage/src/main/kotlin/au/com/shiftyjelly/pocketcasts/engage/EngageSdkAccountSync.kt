@@ -3,7 +3,9 @@ package au.com.shiftyjelly.pocketcasts.engage
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.repositories.external.ExternalDataManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
+import com.google.android.engage.common.datamodel.ClusterType
 import com.google.android.engage.service.AppEngagePublishClient
+import com.google.android.engage.service.ServiceAvailabilityRequest
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -29,7 +31,11 @@ class EngageSdkAccountSync(
         syncJob = coroutineScope.launch {
             syncManager.isLoggedInObservable.asFlow().collectLatest { isSignedIn ->
                 try {
-                    if (client.isServiceAvailable.await()) {
+                    val request = ServiceAvailabilityRequest.Builder()
+                        .addIntendedClusterType(ClusterType.TYPE_ENGAGEMENT)
+                        .build()
+                    val isAvailableMap = client.isServiceAvailable(request).await()
+                    if (isAvailableMap[ClusterType.TYPE_ENGAGEMENT] == true) {
                         val data = dataManager.getEngageData(isSignedIn)
                         service.updateUserAccount(data).await()
                     }

@@ -22,6 +22,7 @@ dependencies {
     api(libs.material)
     api(libs.work.runtime)
 
+    api(projects.modules.services.analytics)
     api(projects.modules.services.model)
     api(projects.modules.services.preferences)
     api(projects.modules.services.repositories)
@@ -44,4 +45,9 @@ dependencies {
     implementation(projects.modules.services.images)
     implementation(projects.modules.services.localization)
     implementation(projects.modules.services.utils)
+
+    testImplementation(libs.junit)
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.robolectric)
 }

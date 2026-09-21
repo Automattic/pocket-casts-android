@@ -118,6 +118,7 @@ class ChapterManagerImpl @Inject constructor(
                 uiIndex = -1, // We set any value here as it is updated later in the processing chain
                 selected = firstChapter.index !in episode.deselectedChapters,
                 origin = firstChapter.origin,
+                referenceStartTime = newStartTime.takeIf { firstChapter.origin == ChapterOrigin.Generated },
             )
         }
         .filter { it.duration > Duration.ZERO }

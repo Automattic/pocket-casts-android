@@ -161,7 +161,7 @@ class AccountActivity : AppCompatActivity() {
         val analyticsEvent = when (id) {
             R.id.accountFragment -> SetupAccountShownLegacyEvent
 
-            R.id.signInFragment -> SigninShownEvent
+            R.id.signInFragment -> SigninShownEvent(redirectPath = "none")
 
             R.id.createEmailFragment -> CreateAccountShownLegacyEvent
 

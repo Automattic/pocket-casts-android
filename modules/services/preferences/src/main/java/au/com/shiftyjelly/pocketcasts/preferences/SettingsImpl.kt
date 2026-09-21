@@ -47,7 +47,6 @@ import au.com.shiftyjelly.pocketcasts.utils.config.FirebaseConfig
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getString
 import au.com.shiftyjelly.pocketcasts.utils.extensions.splitIgnoreEmpty
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
-import com.jakewharton.rxrelay2.BehaviorRelay
 import com.squareup.moshi.Moshi
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.nio.charset.Charset
@@ -89,6 +88,7 @@ class SettingsImpl @Inject constructor(
         private const val END_OF_YEAR_SHOW_MODAL_2025_KEY = "EndOfYearModalShowModal2025Key"
         private const val DONE_INITIAL_ONBOARDING_KEY = "CompletedOnboardingKey"
         private const val PROCESSED_SIGNOUT_KEY = "ProcessedSignout"
+        private const val MIGRATED_VERSION_CODE_KEY = "MIGRATED_VERSION_CODE"
         private const val NEEDS_LOGIN_PROMPT_AFTER_RESTORE_KEY = "NeedsLoginPromptAfterRestore"
     }
 
@@ -114,8 +114,8 @@ class SettingsImpl @Inject constructor(
 
     override val sessionIds get() = sessionIdsSetting.value
 
-    override val selectPodcastSortTypeObservable = BehaviorRelay.create<PodcastsSortType>().apply { accept(getSelectPodcastsSortType()) }
-    override val multiSelectItemsObservable = BehaviorRelay.create<List<String>>().apply { accept(getMultiSelectItems()) }
+    override val selectPodcastSortTypeFlow = MutableStateFlow(getSelectPodcastsSortType())
+    override val multiSelectItemsFlow = MutableStateFlow(getMultiSelectItems())
 
     override val shelfItems = UserSetting.PrefFromString(
         sharedPrefKey = "shelfItems",
@@ -260,7 +260,7 @@ class SettingsImpl @Inject constructor(
             putString(Settings.PREFERENCE_SELECT_PODCAST_LIBRARY_SORT, sortType.clientId.toString())
             apply()
         }
-        selectPodcastSortTypeObservable.accept(sortType)
+        selectPodcastSortTypeFlow.value = sortType
     }
 
     override fun getSelectPodcastsSortType(): PodcastsSortType {
@@ -588,6 +588,29 @@ class SettingsImpl @Inject constructor(
         setCancelledAcknowledged(false)
     }
 
+    override fun clearUserPreferences() {
+        val preservedKeys = listOf(collectAnalytics, sendCrashReports, linkCrashReportsToUser)
+            .flatMap { setting -> listOf(setting.sharedPrefKey, "${setting.sharedPrefKey}ModifiedAt") }
+            .toSet() + setOf(
+            PROCESSED_SIGNOUT_KEY,
+            MIGRATED_VERSION_CODE_KEY,
+            AccountConstants.ANON_ID_KEY,
+            Settings.PREFERENCE_STORAGE_CHOICE,
+            Settings.PREFERENCE_STORAGE_CHOICE_NAME,
+            Settings.PREFERENCE_STORAGE_CUSTOM_FOLDER,
+        )
+        val preferenceStores = listOf(sharedPreferences, privatePreferences)
+        preferenceStores.forEach { preferences ->
+            preferences.edit(commit = true) {
+                preferences.all.keys
+                    .filterNot { key -> key in preservedKeys }
+                    .forEach { key -> remove(key) }
+            }
+        }
+        preferenceStores.forEach { preferences -> UserSetting.refreshAll(preferences) }
+        refreshStateFlow.value = RefreshState.Never
+    }
+
     private fun getDefaultCountryCode(): String {
         val languageCode = languageCode
         if (languageCode != null) {
@@ -771,11 +794,11 @@ class SettingsImpl @Inject constructor(
     )
 
     override fun getMigratedVersionCode(): Int {
-        return getInt("MIGRATED_VERSION_CODE", 0)
+        return getInt(MIGRATED_VERSION_CODE_KEY, 0)
     }
 
     override fun setMigratedVersionCode(versionCode: Int) {
-        setInt("MIGRATED_VERSION_CODE", versionCode)
+        setInt(MIGRATED_VERSION_CODE_KEY, versionCode)
     }
 
     override val podcastBadgeType = UserSetting.PrefFromInt<BadgeType>(
@@ -1054,6 +1077,7 @@ class SettingsImpl @Inject constructor(
 
             AppPlatform.Phone,
             AppPlatform.WearOs,
+            AppPlatform.Tv,
             -> false
         },
         sharedPrefs = sharedPreferences,
@@ -1316,7 +1340,7 @@ class SettingsImpl @Inject constructor(
 
     override fun setMultiSelectItems(items: List<String>) {
         setStringList("multi_select_items", items)
-        multiSelectItemsObservable.accept(items)
+        multiSelectItemsFlow.value = items
     }
 
     override val autoAddUpNextLimit = UserSetting.IntPref(
@@ -1584,6 +1608,19 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
+    override val showSmartBookmarksTooltip: UserSetting<Boolean> = UserSetting.BoolPref(
+        sharedPrefKey = Settings.SHOW_SMART_BOOKMARKS_TOOLTIP,
+        // Defaults to false so fresh installs never see the tooltip, VersionMigrationsWorker enables it for upgrading users.
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
+
+    override val smartBookmarksTooltipDismissed: UserSetting<Boolean> = UserSetting.BoolPref(
+        sharedPrefKey = Settings.SMART_BOOKMARKS_TOOLTIP_DISMISSED,
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
+
     override val showUpNextSortDurationTooltip: UserSetting<Boolean> = UserSetting.BoolPref(
         sharedPrefKey = Settings.SHOW_UP_NEXT_SORT_DURATION_TOOLTIP,
         // Defaults to false so fresh installs never see the tooltip, VersionMigrationsWorker enables it for upgrading users.
@@ -1681,9 +1718,11 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override val showFreeAccountEncouragement = UserSetting.BoolPref(
-        sharedPrefKey = "show_free_account_encouragement",
-        defaultValue = true,
+    override val freeAccountEncouragementLastShown = UserSetting.PrefFromString<Instant?>(
+        sharedPrefKey = "free_account_encouragement_last_shown",
+        defaultValue = null,
+        fromString = { value -> runCatching { Instant.parse(value) }.getOrNull() },
+        toString = { value -> value.toString() },
         sharedPrefs = sharedPreferences,
     )
 

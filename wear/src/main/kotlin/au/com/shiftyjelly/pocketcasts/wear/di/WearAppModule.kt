@@ -2,7 +2,10 @@ package au.com.shiftyjelly.pocketcasts.wear.di
 
 import android.content.Context
 import android.net.ConnectivityManager
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.DefaultPlaylistsInitializer
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.DefaultPlaylistsInitializerImpl
 import au.com.shiftyjelly.pocketcasts.views.swipe.AddToPlaylistFragmentFactory
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -11,13 +14,18 @@ import dagger.hilt.components.SingletonComponent
 
 @Module
 @InstallIn(SingletonComponent::class)
-object WearAppModule {
+abstract class WearAppModule {
 
-    @Provides
-    fun connectivityManager(
-        @ApplicationContext application: Context,
-    ): ConnectivityManager = application.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    companion object {
+        @Provides
+        fun connectivityManager(
+            @ApplicationContext application: Context,
+        ): ConnectivityManager = application.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
-    @Provides
-    fun provideShareDialogFactory(): AddToPlaylistFragmentFactory = AddToPlaylistFragmentFactory.Stub
+        @Provides
+        fun provideShareDialogFactory(): AddToPlaylistFragmentFactory = AddToPlaylistFragmentFactory.Stub
+    }
+
+    @Binds
+    abstract fun defaultPlaylistsInitializer(initializer: DefaultPlaylistsInitializerImpl): DefaultPlaylistsInitializer
 }

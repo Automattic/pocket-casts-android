@@ -40,7 +40,7 @@ class AutoDownloadEpisodeProvider @Inject constructor(
                 .filter(Podcast::isAutoDownloadNewEpisodes)
                 .flatMapTo(mutableSetOf()) { podcast ->
                     episodeManager
-                        .findEpisodesByPodcastOrderedSuspend(podcast)
+                        .findEpisodesByPodcastOrdered(podcast)
                         .asSequence()
                         .filter { episode -> episode.uuid in newEpisodeUuidSet }
                         .filter { episode ->

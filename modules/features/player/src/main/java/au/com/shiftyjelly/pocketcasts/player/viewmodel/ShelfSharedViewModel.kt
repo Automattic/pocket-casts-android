@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.ChromeCastAnalytics
+import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadQueue
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.StreamVideoState
@@ -30,23 +31,25 @@ import com.automattic.eventhorizon.PlayerShelfActionTappedEvent
 import com.automattic.eventhorizon.PlayerShelfOverflowMenuShownEvent
 import com.automattic.eventhorizon.ShelfActionSourceType
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.Observable
-import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.rx2.asFlow
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
@@ -61,15 +64,10 @@ class ShelfSharedViewModel @Inject constructor(
     private val userEpisodeManager: UserEpisodeManager,
     private val transcriptManager: TranscriptManager,
     private val downloadQueue: DownloadQueue,
+    @IoDispatcher ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
-    private val upNextStateObservable: Observable<UpNextQueue.State> =
-        playbackManager.upNextQueue.getChangesObservableWithLiveCurrentEpisode(
-            episodeManager,
-            podcastManager,
-        )
-            .observeOn(Schedulers.io())
-
-    private val shelfUpNextObservable = upNextStateObservable
+    private val shelfUpNextFlow: SharedFlow<UpNextQueue.State> = playbackManager.upNextQueue
+        .getChangesFlowWithLiveCurrentEpisode(episodeManager, podcastManager)
         .distinctUntilChanged { oldState, newState ->
             val oldLoaded = oldState as? UpNextQueue.State.Loaded ?: return@distinctUntilChanged false
             val newLoaded = newState as? UpNextQueue.State.Loaded ?: return@distinctUntilChanged false
@@ -81,6 +79,9 @@ class ShelfSharedViewModel @Inject constructor(
                 oldLoaded.episode.downloadStatus == newLoaded.episode.downloadStatus &&
                 oldLoaded.podcast?.isUsingEffects == newLoaded.podcast?.isUsingEffects
         }
+        .flowOn(ioDispatcher)
+        // replay = 1 caches the last state so a collector that subscribes later starts from it rather than waiting for the next Up Next change
+        .shareIn(viewModelScope, SharingStarted.WhileSubscribed(), replay = 1)
 
     private val _navigationState: MutableSharedFlow<NavigationState> = MutableSharedFlow()
     val navigationState = _navigationState.asSharedFlow()
@@ -95,17 +96,29 @@ class ShelfSharedViewModel @Inject constructor(
         playbackManager.streamVideoState,
         playbackManager.streamHlsAvailable,
         playbackManager.videoRenderingEnabled,
-    ) { streamVideoState, hlsAvailable, renderingEnabled ->
-        VideoState(streamVideoState, hlsAvailable, renderingEnabled)
+        settings.audioOnly.flow,
+    ) { streamVideoState, hlsAvailable, renderingEnabled, audioOnly ->
+        VideoState(streamVideoState, hlsAvailable, renderingEnabled, audioOnly)
+    }
+
+    private val playerOpenState = MutableStateFlow(false)
+
+    private val smartBookmarksPromoActiveFlow = combine(
+        settings.showSmartBookmarksTooltip.flow,
+        playerOpenState,
+        settings.smartBookmarksTooltipDismissed.flow,
+    ) { showTooltip, isPlayerOpen, isDismissed ->
+        showTooltip && isPlayerOpen && !isDismissed && FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS)
     }
 
     val uiState = combine(
         settings.shelfItems.flow,
-        shelfUpNextObservable.asFlow(),
-        shelfUpNextObservable.asFlow()
+        shelfUpNextFlow,
+        shelfUpNextFlow
             .mapNotNull { state -> (state as? UpNextQueue.State.Loaded)?.episode?.uuid }
             .flatMapLatest { episodeUuid -> transcriptManager.observeIsTranscriptAvailable(episodeUuid) },
         videoStateFlow,
+        smartBookmarksPromoActiveFlow,
         ::createUiState,
     ).stateIn(
         viewModelScope,
@@ -118,10 +131,12 @@ class ShelfSharedViewModel @Inject constructor(
         shelfUpNext: UpNextQueue.State,
         isTranscriptAvailable: Boolean,
         videoState: VideoState,
+        isSmartBookmarksPromoActive: Boolean,
     ): UiState {
         val episode = (shelfUpNext as? UpNextQueue.State.Loaded)?.episode
         val streamHasVideo = videoState.streamVideoState == StreamVideoState.HasVideo || videoState.streamVideoState == StreamVideoState.Unknown
-        val canToggleVideo = FeatureFlag.isEnabled(Feature.HLS_STREAMING) &&
+        val canToggleVideo = !videoState.audioOnly &&
+            FeatureFlag.isEnabled(Feature.HLS_STREAMING) &&
             episode is PodcastEpisode &&
             (streamHasVideo || videoState.hlsAvailable)
         return uiState.value.copy(
@@ -129,6 +144,7 @@ class ShelfSharedViewModel @Inject constructor(
             episode = episode,
             isTranscriptAvailable = isTranscriptAvailable,
             isVideoRenderingEnabled = videoState.renderingEnabled && streamHasVideo,
+            isSmartBookmarksPromoActive = isSmartBookmarksPromoActive,
         )
     }
 
@@ -136,6 +152,7 @@ class ShelfSharedViewModel @Inject constructor(
         val streamVideoState: StreamVideoState,
         val hlsAvailable: Boolean,
         val renderingEnabled: Boolean,
+        val audioOnly: Boolean,
     )
 
     fun onEffectsClick(source: ShelfItemSource) {
@@ -259,10 +276,19 @@ class ShelfSharedViewModel @Inject constructor(
         }
     }
 
+    fun dismissBookmarkTooltip() {
+        settings.smartBookmarksTooltipDismissed.set(true, updateModifiedAt = false)
+    }
+
+    fun setPlayerOpen(isOpen: Boolean) {
+        playerOpenState.value = isOpen
+    }
+
     fun onAddBookmarkClick(
         onboardingUpgradeSource: OnboardingUpgradeSource,
         source: ShelfItemSource,
     ) {
+        settings.showSmartBookmarksTooltip.set(false, updateModifiedAt = false)
         trackShelfAction(ShelfItem.Bookmark, source)
         viewModelScope.launch {
             val isPaidUser = settings.cachedSubscription.value != null
@@ -358,11 +384,16 @@ class ShelfSharedViewModel @Inject constructor(
         val episode: BaseEpisode? = null,
         val isTranscriptAvailable: Boolean = false,
         val isVideoRenderingEnabled: Boolean = true,
+        val isSmartBookmarksPromoActive: Boolean = false,
     ) {
         val playerShelfItems: List<ShelfItem>
             get() = shelfItems.take(MIN_SHELF_ITEMS_SIZE)
         val playerBottomSheetShelfItems: List<ShelfItem>
             get() = shelfItems.drop(MIN_SHELF_ITEMS_SIZE)
+        val showBookmarkTooltip: Boolean
+            get() = isSmartBookmarksPromoActive && ShelfItem.Bookmark in playerShelfItems
+        val showBookmarkOverflowTooltip: Boolean
+            get() = isSmartBookmarksPromoActive && ShelfItem.Bookmark in playerBottomSheetShelfItems
     }
 
     data class PlayerShelfData(

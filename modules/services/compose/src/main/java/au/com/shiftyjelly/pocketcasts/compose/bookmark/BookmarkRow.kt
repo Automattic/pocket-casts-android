@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.compose.bookmark
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,11 +16,18 @@ import androidx.compose.material.Checkbox
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -79,8 +87,20 @@ fun BookmarkRow(
     useEpisodeArtwork: Boolean,
     onPlayClick: () -> Unit,
     modifier: Modifier = Modifier,
+    onArtworkClick: (() -> Unit)? = null,
+    isLoading: Boolean = false,
     colors: BookmarkColors = rememberBookmarkColors(),
+    onFetchEpisode: (suspend () -> BaseEpisode?)? = null,
 ) {
+    var fetchedEpisode by remember(bookmark.uuid) { mutableStateOf<BaseEpisode?>(null) }
+    val latestEpisode by rememberUpdatedState(episode)
+    val latestFetch by rememberUpdatedState(onFetchEpisode)
+    LaunchedEffect(bookmark.uuid) {
+        if (latestEpisode == null) {
+            fetchedEpisode = latestFetch?.invoke()
+        }
+    }
+    val displayEpisode = episode ?: fetchedEpisode
     Column(
         modifier = modifier,
     ) {
@@ -107,10 +127,20 @@ fun BookmarkRow(
             }
 
             if (showIcon) {
-                Box(modifier = Modifier.padding(start = 16.dp)) {
-                    if (episode != null) {
+                Box(
+                    modifier = Modifier
+                        .padding(start = 16.dp)
+                        .then(
+                            if (!isSelecting && onArtworkClick != null) {
+                                Modifier.clickable(role = Role.Button, onClick = onArtworkClick)
+                            } else {
+                                Modifier
+                            },
+                        ),
+                ) {
+                    if (displayEpisode != null) {
                         EpisodeImage(
-                            episode = episode,
+                            episode = displayEpisode,
                             corners = 8.dp,
                             useEpisodeArtwork = useEpisodeArtwork,
                             modifier = Modifier.size(56.dp),
@@ -118,7 +148,7 @@ fun BookmarkRow(
                     } else {
                         Image(
                             painter = painterResource(if (MaterialTheme.theme.isDark) IR.drawable.defaultartwork_dark else IR.drawable.defaultartwork),
-                            contentDescription = bookmark.displayTitle,
+                            contentDescription = bookmark.title,
                             modifier = Modifier
                                 .size(56.dp)
                                 .clip(RoundedCornerShape(8.dp)),
@@ -132,10 +162,11 @@ fun BookmarkRow(
                     .weight(1f)
                     .padding(horizontal = 16.dp),
             ) {
-                val shouldShowEpisodeTitle = showEpisodeTitle && bookmark.episodeTitle.isNotEmpty()
+                val episodeTitle = bookmark.episodeTitle.ifEmpty { displayEpisode?.title.orEmpty() }
+                val shouldShowEpisodeTitle = showEpisodeTitle && episodeTitle.isNotEmpty()
                 if (shouldShowEpisodeTitle) {
                     TextH70(
-                        text = bookmark.episodeTitle,
+                        text = episodeTitle,
                         color = colors.bookmarkRow.secondaryText,
                         maxLines = 1,
                         modifier = Modifier.padding(top = 8.dp),
@@ -148,10 +179,8 @@ fun BookmarkRow(
                     ),
                 )
 
-                val displayTitle = bookmark.displayTitle
-
                 TextH40(
-                    text = displayTitle,
+                    text = bookmark.title,
                     color = colors.bookmarkRow.primaryText,
                     maxLines = 1,
                     lineHeight = 18.sp,
@@ -176,6 +205,7 @@ fun BookmarkRow(
                     timeSecs = bookmark.timeSecs,
                     contentDescriptionId = LR.string.bookmark_play,
                     onClick = { onPlayClick() },
+                    isLoading = isLoading,
                     colors = colors.playButton,
                 )
             }
