@@ -1126,6 +1126,26 @@ open class PlaybackManager @Inject constructor(
         castManager.endSession()
     }
 
+    private suspend fun shutdownKeepingEpisodeVisible() {
+        stop()
+
+        audioNoisyManager.unregister()
+        focusManager.giveUpAudioFocus()
+
+        withContext(Dispatchers.Main) {
+            playbackStateRelay.blockingFirst().let {
+                playbackStateRelay.accept(
+                    it.copy(
+                        state = PlaybackState.State.PAUSED,
+                        isPrepared = false,
+                        lastChangeFrom = LastChangeFrom.OnShutdown.value,
+                    ),
+                )
+            }
+        }
+        castManager.endSession()
+    }
+
     suspend fun hibernatePlayback() {
         if (isPlaybackRemote()) {
             return
@@ -1837,8 +1857,12 @@ open class PlaybackManager @Inject constructor(
             nextEpisode = autoLoadEpisode(autoPlay)
             if (nextEpisode == null) {
                 lastTrackedAutoPlaySource = null
-                stop()
-                shutdown()
+                if (Util.isCarUiMode(application)) {
+                    shutdownKeepingEpisodeVisible()
+                } else {
+                    stop()
+                    shutdown()
+                }
             }
         } else {
             loadCurrentEpisode(play = autoPlay, sourceView = SourceView.AUTO_PLAY)
