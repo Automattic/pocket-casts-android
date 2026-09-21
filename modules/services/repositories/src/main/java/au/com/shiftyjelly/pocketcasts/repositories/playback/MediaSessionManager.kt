@@ -51,6 +51,7 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.PlaybackServiceType
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -86,6 +87,7 @@ class MediaSessionManager(
     val settings: Settings,
     val context: Context,
     val eventHorizon: EventHorizon,
+    val errorReporter: PlaybackServiceErrorReporter,
     val bookmarkManager: BookmarkManager,
     val browseTreeProvider: BrowseTreeProvider,
     private val applicationScope: CoroutineScope,
@@ -593,7 +595,17 @@ class MediaSessionManager(
         try {
             context.startService(Intent().setComponent(component))
         } catch (e: Exception) {
-            Timber.e(e, "Failed to start ${component.className}")
+            // Android rejects a background startService, so playback is about to run with no service at all.
+            LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Failed to start ${component.className}: $e")
+            errorReporter.trackServiceStartFailed(
+                service = if (component.className == LegacyPlaybackService::class.java.name) {
+                    PlaybackServiceType.Legacy
+                } else {
+                    PlaybackServiceType.Media3
+                },
+                error = e,
+                source = playbackManager.lastPlaybackSource,
+            )
         }
     }
 

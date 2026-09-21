@@ -174,6 +174,7 @@ open class PlaybackManager @Inject constructor(
     private val browseTreeProvider: BrowseTreeProvider,
     private val alternateEnclosureManager: AlternateEnclosureManager,
     private val generatedChapterSeeker: Lazy<GeneratedChapterSeeker>,
+    private val playbackServiceErrorReporter: PlaybackServiceErrorReporter,
 ) : FocusManager.FocusChangeListener,
     AudioNoisyManager.AudioBecomingNoisyListener,
     CoroutineScope {
@@ -255,6 +256,7 @@ open class PlaybackManager @Inject constructor(
         settings = settings,
         context = application,
         eventHorizon = eventHorizon,
+        errorReporter = playbackServiceErrorReporter,
         bookmarkManager = bookmarkManager,
         browseTreeProvider = browseTreeProvider,
         applicationScope = applicationScope,
@@ -288,7 +290,9 @@ open class PlaybackManager @Inject constructor(
     private var videoStreamPreferredEpisodeUuid: String? = null
     private val isVideoToggleReloading = AtomicBoolean(false)
 
-    private var lastPlaybackSource: SourceView? = null
+    @Volatile
+    var lastPlaybackSource: SourceView? = null
+        private set
 
     private class PendingContentTypeEvent(
         val episodeUuid: String,
@@ -2471,6 +2475,8 @@ open class PlaybackManager @Inject constructor(
         if (!hasAudioFocus) {
             return
         }
+
+        playbackServiceErrorReporter.resetFailureCount()
 
         cancelPauseTimer()
         setupBufferUpdateTimer(episode)
