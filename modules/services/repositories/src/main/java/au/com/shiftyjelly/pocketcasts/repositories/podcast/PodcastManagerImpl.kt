@@ -55,7 +55,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.rx2.asFlow
 import kotlinx.coroutines.rx2.await
-import kotlinx.coroutines.rx2.rxMaybe
+import kotlinx.coroutines.rx2.rxSingle
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 class PodcastManagerImpl @Inject constructor(
@@ -129,15 +130,17 @@ class PodcastManagerImpl @Inject constructor(
      * If the podcast isn't already in the database add it as unsubscribed.
      */
     override fun findOrDownloadPodcastRxSingle(podcastUuid: String, waitForSubscribe: Boolean): Single<Podcast> {
-        return rxMaybe {
-            if (waitForSubscribe) {
-                findPodcastOrWaitForSubscribe(podcastUuid)
-            } else {
-                findPodcastByUuid(podcastUuid)
-            }
+        return rxSingle { findOrDownloadPodcast(podcastUuid, waitForSubscribe) }
+    }
+
+    // addPodcastRxSingle has no scheduler and starts with a blocking query, so keep it off the caller's thread.
+    override suspend fun findOrDownloadPodcast(podcastUuid: String, waitForSubscribe: Boolean): Podcast = withContext(Dispatchers.Default) {
+        val existingPodcast = if (waitForSubscribe) {
+            findPodcastOrWaitForSubscribe(podcastUuid)
+        } else {
+            findPodcastByUuid(podcastUuid)
         }
-            .switchIfEmpty(subscribeManager.addPodcastRxSingle(podcastUuid, sync = false, subscribed = false, shouldAutoDownload = false).toMaybe())
-            .toSingle()
+        existingPodcast ?: subscribeManager.addPodcastRxSingle(podcastUuid, sync = false, subscribed = false, shouldAutoDownload = false).await()
     }
 
     private suspend fun findPodcastOrWaitForSubscribe(

@@ -59,6 +59,7 @@ interface PodcastManager {
 
     suspend fun subscribeToPodcastOrThrow(podcastUuid: String, sync: Boolean = false, shouldAutoDownload: Boolean = true): Podcast
     fun findOrDownloadPodcastRxSingle(podcastUuid: String, waitForSubscribe: Boolean = false): Single<Podcast>
+    suspend fun findOrDownloadPodcast(podcastUuid: String, waitForSubscribe: Boolean = false): Podcast
     fun isSubscribingToPodcasts(): Boolean
     fun isSubscribingToPodcast(podcastUuid: String): Boolean
     fun addPodcastRxSingle(podcastUuid: String, sync: Boolean, subscribed: Boolean, shouldAutoDownload: Boolean): Single<Podcast>
