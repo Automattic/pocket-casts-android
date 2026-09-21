@@ -2541,6 +2541,7 @@ open class PlaybackManager @Inject constructor(
 
                 ForegroundStart.Refused -> {
                     LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Foreground service start refused, abandoning playback")
+                    revertToPausedPlaybackState()
                     return
                 }
             }
@@ -2951,6 +2952,19 @@ open class PlaybackManager @Inject constructor(
                 }
             } else if (episode.uuid != currentPlayer.episodeUuid) {
                 loadCurrentEpisode(false)
+            }
+        }
+    }
+
+    private suspend fun revertToPausedPlaybackState() {
+        withContext(Dispatchers.Main) {
+            playbackStateRelay.blockingFirst().let { playbackState ->
+                playbackStateRelay.accept(
+                    playbackState.copy(
+                        state = PlaybackState.State.PAUSED,
+                        lastChangeFrom = LastChangeFrom.OnUpdatePausedPlaybackState.value,
+                    ),
+                )
             }
         }
     }
