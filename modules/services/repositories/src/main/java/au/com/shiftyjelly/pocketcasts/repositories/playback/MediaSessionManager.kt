@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playback
 
-import android.app.ForegroundServiceStartNotAllowedException
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -649,11 +648,7 @@ class MediaSessionManager(
             LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Failed to start foreground service ${component.className}: $e")
             trackServiceStartFailed(component, e)
             setServiceForeground(false)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && e is ForegroundServiceStartNotAllowedException) {
-                ForegroundStart.Refused
-            } else {
-                ForegroundStart.Unconfirmed
-            }
+            ForegroundStart.Refused
         }
     }
 

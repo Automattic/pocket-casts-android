@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.media.AudioAttributes
 import android.media.MediaPlayer
+import android.os.Build
 import android.widget.Toast
 import androidx.annotation.MainThread
 import androidx.annotation.OptIn
@@ -2528,14 +2529,17 @@ open class PlaybackManager @Inject constructor(
                 }
 
                 ForegroundStart.Refused -> {
-                    LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Foreground service start refused, abandoning playback")
-                    revertToPausedPlaybackState()
-                    return
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.CINNAMON_BUN) {
+                        LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Foreground service start refused, abandoning playback")
+                        abandonPlaybackStart()
+                        return
+                    }
+                    LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Foreground service start refused, proceeding with fallback")
                 }
             }
         }
 
-        val hasAudioFocus = focusManager.tryToGetAudioFocus()
+        val hasAudioFocus = player?.isRemote == true || focusManager.tryToGetAudioFocus()
         if (!hasAudioFocus) {
             return
         }
@@ -2944,13 +2948,14 @@ open class PlaybackManager @Inject constructor(
         }
     }
 
-    private suspend fun revertToPausedPlaybackState() {
+    private suspend fun abandonPlaybackStart() {
+        mediaSessionManager.isSwitchingPlayer = false
         withContext(Dispatchers.Main) {
             playbackStateRelay.blockingFirst().let { playbackState ->
                 playbackStateRelay.accept(
                     playbackState.copy(
                         state = PlaybackState.State.PAUSED,
-                        lastChangeFrom = LastChangeFrom.OnUpdatePausedPlaybackState.value,
+                        lastChangeFrom = LastChangeFrom.OnForegroundServiceRefused.value,
                     ),
                 )
             }
@@ -3101,6 +3106,7 @@ open class PlaybackManager @Inject constructor(
         OnCompletion("onCompletion"),
         OnDurationAvailable("onDurationAvailable"),
         OnEffectsChanged("effectsChanged"),
+        OnForegroundServiceRefused("foregroundServiceRefused"),
         OnPlay("play"),
         OnPlayerError("onPlayerError"),
         OnPlayerPaused("onPlayerPaused"),
