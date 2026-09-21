@@ -77,6 +77,7 @@ internal class Media3SessionCallback(
                 MediaEvent.TripleTap -> handleMediaButtonTripleTap()
             }
         },
+        isPlaying = { playbackManager.isPlaying() },
     )
 
     override fun onConnect(

@@ -1240,6 +1240,7 @@ class MediaSessionManager(
                     MediaEvent.TripleTap -> handleMediaButtonTripleTap()
                 }
             },
+            isPlaying = { playbackManager.isPlaying() },
         )
 
         override fun onMediaButtonEvent(mediaButtonEvent: Intent): Boolean {

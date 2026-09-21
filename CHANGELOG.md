@@ -4,8 +4,8 @@
     *   Add option to switch to the HLS video stream when playing a downloaded episode
         ([#5620](https://github.com/Automattic/pocket-casts-android/pull/5620))
 *   Bug Fixes
-    *   Resume immediately when headphones or a car head unit send a dedicated play command, and stop wireless
-        Android Auto from pausing playback
+    *   Resume immediately when a headphone or car play button is pressed, instead of waiting for the multi-tap
+        window, and stop wireless Android Auto from pausing playback
         ([#5645](https://github.com/Automattic/pocket-casts-android/pull/5645))
     *   Allow copying description and show notes links with a long press
         ([#5628](https://github.com/Automattic/pocket-casts-android/pull/5628))

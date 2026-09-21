@@ -424,11 +424,24 @@ class Media3SessionCallbackTest {
     }
 
     @Test
-    fun `KEYCODE_MEDIA_PLAY_PAUSE single tap calls playPause`() {
+    fun `KEYCODE_MEDIA_PLAY_PAUSE single tap calls playPause while playing`() {
+        whenever(playbackManager.isPlaying()).thenReturn(true)
+
         sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE)
         testScope.advanceUntilIdle()
 
         verify(playbackManager).playPause(sourceView = any())
+    }
+
+    @Test
+    fun `KEYCODE_MEDIA_PLAY_PAUSE resumes immediately while paused`() {
+        whenever(playbackManager.isPlaying()).thenReturn(false)
+
+        sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE)
+        testScope.advanceUntilIdle()
+
+        verify(playbackManager).playIfNotPlaying(sourceView = any())
+        verify(playbackManager, never()).playPause(sourceView = any())
     }
 
     @Test

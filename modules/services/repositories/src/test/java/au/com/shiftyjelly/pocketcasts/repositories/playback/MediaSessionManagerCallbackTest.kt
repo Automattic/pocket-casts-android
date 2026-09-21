@@ -72,8 +72,9 @@ class MediaSessionManagerCallbackTest {
     }
 
     @Test
-    fun `legacy KEYCODE_HEADSETHOOK resolves to play pause`() = runTest {
+    fun `legacy KEYCODE_HEADSETHOOK resolves to play pause while playing`() = runTest {
         val playbackManager = mock<PlaybackManager>()
+        whenever(playbackManager.isPlaying()).thenReturn(true)
         val episodeManager = mock<EpisodeManager>()
         val manager = createManager(this, playbackManager, episodeManager)
         val callback = manager.createCallback(this, playbackManager, episodeManager)
@@ -83,6 +84,21 @@ class MediaSessionManagerCallbackTest {
 
         verify(playbackManager).playPause(SourceView.MEDIA_BUTTON_BROADCAST_ACTION)
         verify(playbackManager, never()).playIfNotPlaying(any())
+    }
+
+    @Test
+    fun `legacy KEYCODE_HEADSETHOOK resumes immediately while paused`() = runTest {
+        val playbackManager = mock<PlaybackManager>()
+        whenever(playbackManager.isPlaying()).thenReturn(false)
+        val episodeManager = mock<EpisodeManager>()
+        val manager = createManager(this, playbackManager, episodeManager)
+        val callback = manager.createCallback(this, playbackManager, episodeManager)
+
+        callback.onMediaButtonEvent(mediaButtonIntent(KeyEvent.KEYCODE_HEADSETHOOK))
+        advanceUntilIdle()
+
+        verify(playbackManager).playIfNotPlaying(SourceView.MEDIA_BUTTON_BROADCAST_ACTION)
+        verify(playbackManager, never()).playPause(any())
     }
 
     @Test
