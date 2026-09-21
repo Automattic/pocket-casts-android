@@ -32,6 +32,8 @@
         ([#5645](https://github.com/Automattic/pocket-casts-android/pull/5645))
     *   Prevent Cast connection failures from interrupting local playback or removing playback controls
         ([#5656](https://github.com/Automattic/pocket-casts-android/pull/5656))
+    *   Keep the episode and playback controls on screen in the car when the Up Next queue runs out
+        ([#6031](https://github.com/Automattic/pocket-casts-android/pull/6031))
 
 8.21
 -----
