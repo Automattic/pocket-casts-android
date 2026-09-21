@@ -78,6 +78,28 @@ class MediaButtonEventHandlerTest {
     }
 
     @Test
+    fun `immediate play failure still resolves the single tap action`() = runTest {
+        for (keyCode in listOf(KeyEvent.KEYCODE_MEDIA_PLAY, KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE, KeyEvent.KEYCODE_HEADSETHOOK)) {
+            val failure = IllegalStateException("Immediate action failed")
+            val errors = mutableListOf<Exception>()
+            val events = mutableListOf<MediaEvent>()
+            val handler = MediaButtonEventHandler(
+                scopeProvider = { this },
+                onImmediatePlay = { throw failure },
+                onMediaEvent = events::add,
+                isPlaying = { false },
+                onError = errors::add,
+            )
+
+            assertTrue(handler.handle(keyEvent(keyCode)))
+
+            advanceUntilIdle()
+            assertEquals(listOf(failure), errors)
+            assertEquals(listOf(MediaEvent.SingleTap), events)
+        }
+    }
+
+    @Test
     fun `KEYCODE_MEDIA_NEXT suppresses a following KEYCODE_MEDIA_PLAY`() = runTest {
         var immediatePlayCount = 0
         val events = mutableListOf<MediaEvent>()

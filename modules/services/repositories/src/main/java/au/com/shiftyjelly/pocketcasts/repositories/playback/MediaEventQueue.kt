@@ -21,15 +21,19 @@ internal class MediaEventQueue(
 
     private val isMultiTapWindowOpen get() = elapsedRealtime() <= multiTapWindowEndsAt
 
+    /**
+     * [onImmediateSingleTap] returns whether it handled the tap. A tap it declines still resolves through the
+     * window so the caller keeps its normal single tap action.
+     */
     suspend fun consumeEvent(
         event: MediaEvent,
-        onImmediateSingleTap: (() -> Unit)? = null,
+        onImmediateSingleTap: (() -> Boolean)? = null,
     ) = when (event) {
         MediaEvent.SingleTap -> handleSingleTapEvent(onImmediateSingleTap)
         MediaEvent.DoubleTap, MediaEvent.TripleTap -> handleMultiTapEvent(event)
     }
 
-    private suspend fun handleSingleTapEvent(onImmediateSingleTap: (() -> Unit)?): MediaEvent? {
+    private suspend fun handleSingleTapEvent(onImmediateSingleTap: (() -> Boolean)?): MediaEvent? {
         val newSingleTapJob = stateMutex.withLock {
             val currentSingleTapJob = singleTapJob
             when {
@@ -47,8 +51,8 @@ internal class MediaEventQueue(
             }
         } ?: return null
 
-        try {
-            onImmediateSingleTap?.invoke()
+        val immediateTapHandled = try {
+            onImmediateSingleTap?.invoke() == true
         } catch (e: Exception) {
             stateMutex.withLock {
                 if (singleTapJob === newSingleTapJob) {
@@ -60,10 +64,10 @@ internal class MediaEventQueue(
         }
         newSingleTapJob.await()
         return stateMutex.withLock {
-            // The immediate callback owns a resolved SingleTap. Follow-up taps still
+            // A handled immediate callback owns a resolved SingleTap. Follow-up taps still
             // return their DoubleTap or TripleTap action after the window closes.
             newSingleTapJob.event().takeUnless {
-                it == MediaEvent.SingleTap && onImmediateSingleTap != null
+                it == MediaEvent.SingleTap && immediateTapHandled
             }
         }
     }
