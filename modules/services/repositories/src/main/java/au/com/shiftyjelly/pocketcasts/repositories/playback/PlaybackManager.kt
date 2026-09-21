@@ -2476,8 +2476,7 @@ open class PlaybackManager @Inject constructor(
             return
         }
 
-        // Set before the relay emits PLAYING below, which is what drives the foreground service start
-        // and so decides the source the error reporter sees.
+        // Set before the relay emits playing
         lastPlaybackSource = sourceView
         playbackServiceErrorReporter.resetFailureCount()
 

@@ -525,8 +525,6 @@ interface Settings {
 
     fun setTimesToShowBatteryWarning(value: Int)
     fun getTimesToShowBatteryWarning(): Int
-    fun setBatteryWarningsReset(value: Boolean)
-    fun getBatteryWarningsReset(): Boolean
 
     val collectAnalytics: ReadWriteSetting<Boolean>
     val sendCrashReports: UserSetting<Boolean>

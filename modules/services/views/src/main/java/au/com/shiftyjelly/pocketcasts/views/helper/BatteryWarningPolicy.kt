@@ -23,25 +23,12 @@ class BatteryWarningPolicy @Inject constructor(
         if (shownThisAppOpen || systemBatteryRestrictions.isUnrestricted()) {
             return false
         }
-        resetWarningsOnce()
         return timesLeftToShow > 0
     }
 
     fun onWarningShown() {
         shownThisAppOpen = true
         settings.setTimesToShowBatteryWarning(timesLeftToShow - 1)
-    }
-
-    // Nothing tops the counter up any more, so give installs that exhausted it under the old
-    // unbounded behaviour one fresh allowance under this policy.
-    private fun resetWarningsOnce() {
-        if (settings.getBatteryWarningsReset()) {
-            return
-        }
-        settings.setBatteryWarningsReset(true)
-        if (settings.getTimesToShowBatteryWarning() <= 0) {
-            settings.setTimesToShowBatteryWarning(MAX_WARNINGS)
-        }
     }
 
     private companion object {

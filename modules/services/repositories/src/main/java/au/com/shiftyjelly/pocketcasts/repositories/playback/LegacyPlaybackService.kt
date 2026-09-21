@@ -267,13 +267,11 @@ open class LegacyPlaybackService :
                             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "startForeground state: $state")
                         } catch (e: Exception) {
                             LogBuffer.e(LogBuffer.TAG_PLAYBACK, "attempted startForeground for state: $state, but that threw an exception we caught: $e")
-                            // Anything thrown after startForeground returned is a different failure, not one worth reporting here.
                             if (!reachedForeground) {
                                 errorReporter.trackForegroundStartFailed(
                                     service = PlaybackServiceType.Legacy,
                                     error = e,
                                     source = playbackManager.lastPlaybackSource,
-                                    // The state of the update that failed, rather than a fresh read that may have moved on.
                                     playbackContinued = state == PlaybackStateCompat.STATE_PLAYING,
                                 )
                             }

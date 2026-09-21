@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.views.helper
 
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.utils.SystemBatteryRestrictions
-import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -64,7 +63,6 @@ class BatteryWarningPolicyTest {
     @Test
     fun `no warning is shown once they have all been shown`() {
         whenever(settings.getTimesToShowBatteryWarning()) doReturn 0
-        whenever(settings.getBatteryWarningsReset()) doReturn true
 
         assertFalse(policy.shouldShowWarning())
     }
@@ -76,23 +74,6 @@ class BatteryWarningPolicyTest {
         policy.onWarningShown()
 
         verify(settings).setTimesToShowBatteryWarning(2)
-    }
-
-    @Test
-    fun `an install that exhausted its warnings gets one fresh allowance`() {
-        storeTimesToShowBatteryWarning(0)
-
-        val warningsShown = generateSequence { newAppOpen().showWarningIfAppropriate() }.takeWhile { it }.count()
-
-        assertEquals(3, warningsShown)
-    }
-
-    @Test
-    fun `the fresh allowance is only given once`() {
-        storeTimesToShowBatteryWarning(0)
-        whenever(settings.getBatteryWarningsReset()) doReturn true
-
-        assertFalse(policy.shouldShowWarning())
     }
 
     @Test
@@ -111,13 +92,6 @@ class BatteryWarningPolicyTest {
             timesToShow.set(invocation.getArgument(0))
             Unit
         }.whenever(settings).setTimesToShowBatteryWarning(any())
-
-        val warningsReset = AtomicBoolean(false)
-        whenever(settings.getBatteryWarningsReset()) doAnswer { warningsReset.get() }
-        doAnswer { invocation ->
-            warningsReset.set(invocation.getArgument(0))
-            Unit
-        }.whenever(settings).setBatteryWarningsReset(any())
     }
 
     private fun BatteryWarningPolicy.showWarningIfAppropriate(): Boolean {

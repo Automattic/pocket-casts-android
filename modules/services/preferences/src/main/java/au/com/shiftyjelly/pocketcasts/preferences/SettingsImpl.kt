@@ -84,7 +84,6 @@ class SettingsImpl @Inject constructor(
     companion object {
         private const val DEVICE_ID_KEY = "DeviceIdKey"
         private const val SHOWN_BATTERY_WARNING_KEY = "ShownBetteryWarningKey"
-        private const val BATTERY_WARNINGS_RESET_KEY = "BatteryWarningsResetKey"
         private const val END_OF_YEAR_SHOW_BADGE_2025_KEY = "EndOfYearShowBadge2025Key"
         private const val END_OF_YEAR_SHOW_MODAL_2025_KEY = "EndOfYearModalShowModal2025Key"
         private const val DONE_INITIAL_ONBOARDING_KEY = "CompletedOnboardingKey"
@@ -1406,12 +1405,6 @@ class SettingsImpl @Inject constructor(
     }
 
     override fun getTimesToShowBatteryWarning(): Int = getInt(SHOWN_BATTERY_WARNING_KEY, 3)
-
-    override fun setBatteryWarningsReset(value: Boolean) {
-        setBoolean(BATTERY_WARNINGS_RESET_KEY, value)
-    }
-
-    override fun getBatteryWarningsReset(): Boolean = getBoolean(BATTERY_WARNINGS_RESET_KEY, false)
 
     override val collectAnalytics = UserSetting.BoolPref(
         sharedPrefKey = "SendUsageStatsKey",
