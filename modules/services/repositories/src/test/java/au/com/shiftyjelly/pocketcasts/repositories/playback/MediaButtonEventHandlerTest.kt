@@ -25,6 +25,7 @@ class MediaButtonEventHandlerTest {
             scopeProvider = { this },
             onImmediatePlay = { immediatePlayCount++ },
             onMediaEvent = events::add,
+            isPlaying = { false },
         )
 
         assertTrue(handler.handle(keyEvent(KeyEvent.KEYCODE_MEDIA_PLAY)))
@@ -43,6 +44,7 @@ class MediaButtonEventHandlerTest {
             scopeProvider = { this },
             onImmediatePlay = { immediatePlayCount++ },
             onMediaEvent = events::add,
+            isPlaying = { false },
         )
 
         handler.handle(keyEvent(KeyEvent.KEYCODE_MEDIA_PLAY))
@@ -63,6 +65,7 @@ class MediaButtonEventHandlerTest {
             scopeProvider = { this },
             onImmediatePlay = { throw failure },
             onMediaEvent = events::add,
+            isPlaying = { false },
             onError = errors::add,
         )
 
@@ -82,6 +85,7 @@ class MediaButtonEventHandlerTest {
             scopeProvider = { this },
             onImmediatePlay = { immediatePlayCount++ },
             onMediaEvent = events::add,
+            isPlaying = { false },
         )
 
         handler.handle(keyEvent(KeyEvent.KEYCODE_MEDIA_NEXT))
@@ -100,6 +104,7 @@ class MediaButtonEventHandlerTest {
             scopeProvider = { this },
             onImmediatePlay = {},
             onMediaEvent = events::add,
+            isPlaying = { false },
         )
 
         assertTrue(handler.handle(keyEvent(KeyEvent.KEYCODE_MEDIA_NEXT)))
@@ -119,6 +124,7 @@ class MediaButtonEventHandlerTest {
             scopeProvider = { cancelledScope },
             onImmediatePlay = { immediatePlayCount++ },
             onMediaEvent = events::add,
+            isPlaying = { false },
         )
 
         assertTrue(handler.handle(keyEvent(KeyEvent.KEYCODE_MEDIA_PLAY)))
@@ -132,10 +138,71 @@ class MediaButtonEventHandlerTest {
             scopeProvider = { this },
             onImmediatePlay = {},
             onMediaEvent = {},
+            isPlaying = { false },
         )
 
         assertFalse(handler.handle(keyEvent(KeyEvent.KEYCODE_VOLUME_UP)))
         assertFalse(handler.handle(keyEvent(KeyEvent.KEYCODE_MEDIA_PLAY, KeyEvent.ACTION_UP)))
+    }
+
+    @Test
+    fun `toggle keys run the immediate action while paused`() = runTest {
+        for (keyCode in listOf(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE, KeyEvent.KEYCODE_HEADSETHOOK)) {
+            var immediatePlayCount = 0
+            val events = mutableListOf<MediaEvent>()
+            val handler = MediaButtonEventHandler(
+                scopeProvider = { this },
+                onImmediatePlay = { immediatePlayCount++ },
+                onMediaEvent = events::add,
+                isPlaying = { false },
+            )
+
+            assertTrue(handler.handle(keyEvent(keyCode)))
+            assertEquals(1, immediatePlayCount)
+
+            advanceUntilIdle()
+            assertEquals(emptyList<MediaEvent>(), events)
+        }
+    }
+
+    @Test
+    fun `toggle keys wait for the tap window while playing`() = runTest {
+        for (keyCode in listOf(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE, KeyEvent.KEYCODE_HEADSETHOOK)) {
+            var immediatePlayCount = 0
+            val events = mutableListOf<MediaEvent>()
+            val handler = MediaButtonEventHandler(
+                scopeProvider = { this },
+                onImmediatePlay = { immediatePlayCount++ },
+                onMediaEvent = events::add,
+                isPlaying = { true },
+            )
+
+            assertTrue(handler.handle(keyEvent(keyCode)))
+            assertEquals(0, immediatePlayCount)
+
+            advanceUntilIdle()
+            assertEquals(listOf(MediaEvent.SingleTap), events)
+        }
+    }
+
+    @Test
+    fun `rapid toggle keys while paused run the immediate action once and emit a double tap`() = runTest {
+        var immediatePlayCount = 0
+        val events = mutableListOf<MediaEvent>()
+        val handler = MediaButtonEventHandler(
+            scopeProvider = { this },
+            onImmediatePlay = { immediatePlayCount++ },
+            onMediaEvent = events::add,
+            isPlaying = { false },
+        )
+
+        handler.handle(keyEvent(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE))
+        handler.handle(keyEvent(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE))
+
+        assertEquals(1, immediatePlayCount)
+
+        advanceUntilIdle()
+        assertEquals(listOf(MediaEvent.DoubleTap), events)
     }
 
     private fun keyEvent(

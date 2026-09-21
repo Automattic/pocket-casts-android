@@ -20,6 +20,7 @@ internal class MediaButtonEventHandler(
     private val scopeProvider: () -> CoroutineScope,
     private val onImmediatePlay: () -> Unit,
     private val onMediaEvent: (MediaEvent) -> Unit,
+    private val isPlaying: () -> Boolean,
     private val onError: (Exception) -> Unit = {
         LogBuffer.e(LogBuffer.TAG_PLAYBACK, it, "Media button event handling failed")
     },
@@ -46,11 +47,18 @@ internal class MediaButtonEventHandler(
             else -> null
         } ?: return false
 
-        val immediateSingleTapHandler = if (keyEvent.keyCode == KeyEvent.KEYCODE_MEDIA_PLAY) {
-            ::handleImmediatePlay
-        } else {
-            null
+        // While playback runs the device stays awake and the tap window keeps its timing, so toggle keys can still
+        // wait for it. While paused the device can suspend mid-window, and a toggle tap can only mean play.
+        val resolvesToImmediatePlay = when (keyEvent.keyCode) {
+            KeyEvent.KEYCODE_MEDIA_PLAY -> true
+
+            KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE,
+            KeyEvent.KEYCODE_HEADSETHOOK,
+            -> !isPlaying()
+
+            else -> false
         }
+        val immediateSingleTapHandler = if (resolvesToImmediatePlay) ::handleImmediatePlay else null
 
         // Register the event before returning to the framework callback. This preserves
         // delivery order while the queue's timeout still resumes on the provided scope.
