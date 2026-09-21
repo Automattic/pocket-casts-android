@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.widget.Toast
 import androidx.annotation.MainThread
@@ -203,8 +204,15 @@ open class PlaybackManager @Inject constructor(
 
     private var audioNoisyManager = AudioNoisyManager(application)
 
+    // Usage stays on the media stream so the tones keep the volume they have always had.
+    private val toneAudioAttributes = AudioAttributes.Builder()
+        .setUsage(AudioAttributes.USAGE_MEDIA)
+        .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+        .build()
+
     private val bookmarkTonePlayer: MediaPlayer by lazy {
         MediaPlayer().apply {
+            setAudioAttributes(toneAudioAttributes)
             setDataSource(application, "android.resource://${application.packageName}/${R.raw.bookmark_creation_sound}".toUri())
             prepare()
         }
@@ -212,6 +220,7 @@ open class PlaybackManager @Inject constructor(
 
     private val sleepTimeTonePlayer: MediaPlayer by lazy {
         MediaPlayer().apply {
+            setAudioAttributes(toneAudioAttributes)
             setDataSource(application, "android.resource://${application.packageName}/${R.raw.sleep_time_device_shake_confirmation_sound}".toUri())
             prepare()
         }
