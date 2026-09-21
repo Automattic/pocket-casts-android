@@ -17,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.SubscriptionType
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getTintedDrawable
+import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.views.extensions.addOnTextChanged
 import au.com.shiftyjelly.pocketcasts.views.extensions.showKeyboard
@@ -69,7 +70,9 @@ class CreateEmailFragment : BaseFragment() {
         txtEmail.setText(viewModel.email.value)
         txtPassword.setText(viewModel.password.value)
 
-        txtEmail.showKeyboard()
+        if (!Util.isAutomotive(view.context)) {
+            txtEmail.showKeyboard()
+        }
         currentEditText = txtEmail
 
         scalePasswordToggleWithFontSize()
