@@ -36,13 +36,15 @@ internal class BookmarkSync(
 ) {
     private val bookmarkDao = appDatabase.bookmarkDao()
 
-    suspend fun fullSync() {
+    suspend fun fullSync(): Boolean {
+        val serverBookmarks = syncManager.getBookmarksOrThrow().bookmarksList
         processServerBookmark(
-            serverBookmarks = syncManager.getBookmarksOrThrow().bookmarksList,
+            serverBookmarks = serverBookmarks,
             getUuid = { bookmark -> bookmark.bookmarkUuid },
             isDeleted = { false },
             applyServerBookmark = { localBookmark, serverBookmark -> localBookmark.applyServerBookmark(serverBookmark) },
         )
+        return serverBookmarks.isNotEmpty()
     }
 
     suspend fun processIncrementalResponse(serverBookmarks: List<SyncUserBookmark>) {

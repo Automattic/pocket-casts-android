@@ -5,6 +5,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.TranscriptEntry
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptType
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class BookmarkTranscriptTest {
@@ -175,6 +176,36 @@ class BookmarkTranscriptTest {
         val untimed = bookmarkTranscript(TranscriptEntry.Text("No timing here."))
 
         assertNull(untimed.referenceTimeMsAt(0))
+    }
+
+    @Test
+    fun `reference offset interpolates a time between entry start times`() {
+        val timed = bookmarkTranscript(
+            TranscriptEntry.Text("First line.", startTimeMs = 1000),
+            TranscriptEntry.Text("Second line.", startTimeMs = 5000),
+        )
+        val secondStart = timed.displayText.indexOf("Second")
+
+        assertEquals(0, timed.referenceOffsetAt(1000))
+        assertEquals(secondStart, timed.referenceOffsetAt(5000))
+        assertTrue(timed.referenceOffsetAt(3000)!! in 1 until secondStart)
+    }
+
+    @Test
+    fun `reference offset is null for an untimed transcript`() {
+        val untimed = bookmarkTranscript(TranscriptEntry.Text("No timing here."))
+
+        assertNull(untimed.referenceOffsetAt(1000))
+    }
+
+    @Test
+    fun `passage-only transcript exposes the passage as its display text without timing`() {
+        val passage = "A captured line with no surrounding transcript."
+
+        val model = BookmarkTranscript.fromPassage(passage)
+
+        assertEquals(passage, model.displayText)
+        assertNull(model.referenceOffsetAt(0))
     }
 
     private fun flatText() = listOf(firstSentence, secondSentence, thirdSentence).joinToString(" ")

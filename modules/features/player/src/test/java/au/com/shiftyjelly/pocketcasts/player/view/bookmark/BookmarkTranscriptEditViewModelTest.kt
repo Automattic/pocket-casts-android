@@ -48,6 +48,18 @@ class BookmarkTranscriptEditViewModelTest {
         podcastUuid = podcastUuid,
     )
 
+    private val timedTranscript = Transcript.Text(
+        entries = listOf(
+            TranscriptEntry.Text(firstSentence, startTimeMs = 0),
+            TranscriptEntry.Text(secondSentence, startTimeMs = 10_000),
+        ),
+        type = TranscriptType.Vtt,
+        url = "https://example.com/transcript.vtt",
+        isGenerated = true,
+        episodeUuid = episodeUuid,
+        podcastUuid = podcastUuid,
+    )
+
     @Test
     fun `loads and relocates the stored passage`() = runTest {
         whenever(transcriptManager.loadGeneratedTranscript(episodeUuid)).thenReturn(transcript)
@@ -115,13 +127,56 @@ class BookmarkTranscriptEditViewModelTest {
         assertEquals(firstSentence.length + 1, savedLocation)
     }
 
+    @Test
+    fun `computes the reference offset at the bookmark time`() = runTest {
+        whenever(transcriptManager.loadGeneratedTranscript(episodeUuid)).thenReturn(timedTranscript)
+
+        val viewModel = viewModel().apply { load(arguments(secondSentence, firstSentence.length + 1, referenceTime = 10)) }
+
+        val state = viewModel.uiState.value as BookmarkTranscriptEditViewModel.UiState.Loaded
+        assertEquals(state.transcript.displayText.indexOf(secondSentence), state.referenceOffset)
+    }
+
+    @Test
+    fun `keeps the reference offset inside the passage`() = runTest {
+        whenever(transcriptManager.loadGeneratedTranscript(episodeUuid)).thenReturn(timedTranscript)
+
+        val viewModel = viewModel().apply { load(arguments(firstSentence, 0, referenceTime = 10)) }
+
+        val state = viewModel.uiState.value as BookmarkTranscriptEditViewModel.UiState.Loaded
+        assertEquals(state.passage!!.end - 1, state.referenceOffset)
+    }
+
+    @Test
+    fun `marks the passage start without a bookmark reference time`() = runTest {
+        whenever(transcriptManager.loadGeneratedTranscript(episodeUuid)).thenReturn(transcript)
+
+        val viewModel = viewModel().apply { load(arguments(firstSentence, 0)) }
+
+        val state = viewModel.uiState.value as BookmarkTranscriptEditViewModel.UiState.Loaded
+        assertEquals(state.passage!!.start, state.referenceOffset)
+    }
+
+    @Test
+    fun `keeps the reference offset inside the re-selected passage`() = runTest {
+        whenever(transcriptManager.loadGeneratedTranscript(episodeUuid)).thenReturn(transcript)
+        val viewModel = viewModel().apply { load(arguments(firstSentence, 0)) }
+        val loaded = viewModel.uiState.value as BookmarkTranscriptEditViewModel.UiState.Loaded
+
+        viewModel.onPassageChange(loaded.transcript.sentenceDisplaySpan(loaded.transcript.displayText.indexOf(secondSentence)))
+
+        val state = viewModel.uiState.value as BookmarkTranscriptEditViewModel.UiState.Loaded
+        assertEquals(state.passage!!.start, state.referenceOffset)
+    }
+
     private fun viewModel() = BookmarkTranscriptEditViewModel(transcriptManager, showNotesManager)
 
-    private fun arguments(passage: String?, passageLocation: Int?) = BookmarkTranscriptEditArguments(
+    private fun arguments(passage: String?, passageLocation: Int?, referenceTime: Int? = null) = BookmarkTranscriptEditArguments(
         episodeUuid = episodeUuid,
         podcastUuid = podcastUuid,
         passage = passage,
         passageLocation = passageLocation,
+        referenceTime = referenceTime,
         podcastColors = PodcastColors.ForUserEpisode,
     )
 }
