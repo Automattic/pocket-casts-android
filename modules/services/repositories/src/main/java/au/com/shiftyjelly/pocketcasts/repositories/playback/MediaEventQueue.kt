@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playback
 
+import android.os.SystemClock
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -9,12 +9,16 @@ import kotlinx.coroutines.sync.withLock
 
 internal class MediaEventQueue(
     private val scopeProvider: () -> CoroutineScope,
+    // Deadlines are measured against elapsed realtime so the window still closes while the device is suspended.
+    private val elapsedRealtime: () -> Long = SystemClock::elapsedRealtime,
 ) {
     private var singleTapJob: SingleTapJob? = null
-    private var multiTapJob: Job? = null
+    private var multiTapWindowEndsAt = Long.MIN_VALUE
     private val stateMutex = Mutex()
 
     private val scope: CoroutineScope get() = scopeProvider()
+
+    private val isMultiTapWindowOpen get() = elapsedRealtime() <= multiTapWindowEndsAt
 
     suspend fun consumeEvent(
         event: MediaEvent,
@@ -31,7 +35,7 @@ internal class MediaEventQueue(
                 // Pixel Buds (and possibly other headphones) trigger KEYCODE_MEDIA_PLAY
                 // after KEYCODE_MEDIA_NEXT or KEYCODE_MEDIA_PREVIOUS.
                 // We need to ignore it so the single tap action isn't triggered in such cases.
-                multiTapJob?.isActive == true -> null
+                isMultiTapWindowOpen -> null
 
                 currentSingleTapJob?.isActive == true -> {
                     currentSingleTapJob.incrementTaps()
@@ -64,9 +68,7 @@ internal class MediaEventQueue(
     }
 
     private suspend fun handleMultiTapEvent(event: MediaEvent): MediaEvent = stateMutex.withLock {
-        val currentJob = multiTapJob
-        multiTapJob = scope.launch { delay(250) }
-        currentJob?.cancel()
+        multiTapWindowEndsAt = elapsedRealtime() + MULTI_TAP_WINDOW_MS
         event
     }
 
@@ -92,6 +94,10 @@ internal class MediaEventQueue(
             2 -> MediaEvent.DoubleTap
             else -> MediaEvent.TripleTap
         }
+    }
+
+    private companion object {
+        const val MULTI_TAP_WINDOW_MS = 250L
     }
 }
 
