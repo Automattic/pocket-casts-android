@@ -2090,6 +2090,10 @@ open class PlaybackManager @Inject constructor(
     }
 
     override fun onFocusRequestFailed() {
+        val player = player
+        if (player == null || player.isRemote) {
+            return
+        }
         LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Could not get audio focus, stopping")
         stopAsync(isAudioFocusFailed = true)
     }
