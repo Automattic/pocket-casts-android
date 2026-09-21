@@ -273,7 +273,8 @@ open class LegacyPlaybackService :
                                     service = PlaybackServiceType.Legacy,
                                     error = e,
                                     source = playbackManager.lastPlaybackSource,
-                                    playbackContinued = playbackManager.isPlaying(),
+                                    // The state of the update that failed, rather than a fresh read that may have moved on.
+                                    playbackContinued = state == PlaybackStateCompat.STATE_PLAYING,
                                 )
                             }
                         }

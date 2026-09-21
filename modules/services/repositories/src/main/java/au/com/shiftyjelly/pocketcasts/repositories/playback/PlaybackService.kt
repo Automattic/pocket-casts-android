@@ -115,7 +115,8 @@ open class PlaybackService :
                     service = PlaybackServiceType.Media3,
                     error = e,
                     source = playbackManager.lastPlaybackSource,
-                    playbackContinued = playbackManager.isPlaying(),
+                    // The player's own state, not PlaybackManager's intended state, which is set before playback starts.
+                    playbackContinued = session.player.isPlaying,
                 )
             }
         }

@@ -2476,6 +2476,9 @@ open class PlaybackManager @Inject constructor(
             return
         }
 
+        // Set before the relay emits PLAYING below, which is what drives the foreground service start
+        // and so decides the source the error reporter sees.
+        lastPlaybackSource = sourceView
         playbackServiceErrorReporter.resetFailureCount()
 
         cancelPauseTimer()
@@ -2530,7 +2533,6 @@ open class PlaybackManager @Inject constructor(
 
         sleepTimer.restartSleepTimerIfApplies(currentEpisodeUuid = episode.uuid)
 
-        lastPlaybackSource = sourceView
         trackPlaybackPlay(sourceView, episode)
     }
 
