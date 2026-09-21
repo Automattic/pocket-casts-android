@@ -2516,9 +2516,17 @@ open class PlaybackManager @Inject constructor(
 
         // Android 17: reach the foreground service before requesting audio focus, otherwise focus is denied.
         if (FeatureFlag.isEnabled(Feature.FOREGROUND_BEFORE_PLAYBACK) && !Util.isAutomotive(application) && player?.isRemote != true) {
-            val foreground = mediaSessionManager.ensureForegroundServiceStarted(application)
-            if (!foreground) {
-                LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Foreground service not ready before playback, proceeding with fallback")
+            when (mediaSessionManager.ensureForegroundServiceStarted(application)) {
+                ForegroundStart.Started -> Unit
+
+                ForegroundStart.Unconfirmed -> {
+                    LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Foreground service not ready before playback, proceeding with fallback")
+                }
+
+                ForegroundStart.Refused -> {
+                    LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Foreground service start refused, abandoning playback")
+                    return
+                }
             }
         }
 

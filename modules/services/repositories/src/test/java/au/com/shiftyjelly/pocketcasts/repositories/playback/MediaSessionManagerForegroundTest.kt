@@ -1,7 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playback
 
+import android.app.ForegroundServiceStartNotAllowedException
 import android.content.ComponentName
+import android.content.ContextWrapper
+import android.content.Intent
 import android.content.IntentFilter
+import android.os.Build
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
@@ -16,6 +20,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -26,6 +31,7 @@ import org.mockito.kotlin.mock
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.Shadows.shadowOf
+import org.robolectric.annotation.Config
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(RobolectricTestRunner::class)
@@ -78,7 +84,7 @@ class MediaSessionManagerForegroundTest {
         FeatureFlag.setEnabled(Feature.FOREGROUND_BEFORE_PLAYBACK, true)
         manager.setServiceForeground(true)
 
-        assertTrue(manager.ensureForegroundServiceStarted(context, timeoutMs = 50))
+        assertEquals(ForegroundStart.Started, manager.ensureForegroundServiceStarted(context, timeoutMs = 50))
     }
 
     @Test
@@ -88,13 +94,27 @@ class MediaSessionManagerForegroundTest {
         val result = async { manager.ensureForegroundServiceStarted(context, timeoutMs = 5000) }
         manager.setServiceForeground(true)
 
-        assertTrue(result.await())
+        assertEquals(ForegroundStart.Started, result.await())
     }
 
     @Test
-    fun `ensureForegroundServiceStarted returns false when the service never reaches foreground`() = runTest(testDispatcher) {
+    fun `ensureForegroundServiceStarted is unconfirmed when the service never reaches foreground`() = runTest(testDispatcher) {
         FeatureFlag.setEnabled(Feature.FOREGROUND_BEFORE_PLAYBACK, true)
 
-        assertFalse(manager.ensureForegroundServiceStarted(context, timeoutMs = 50))
+        assertEquals(ForegroundStart.Unconfirmed, manager.ensureForegroundServiceStarted(context, timeoutMs = 50))
+    }
+
+    @Test
+    @Config(sdk = [Build.VERSION_CODES.S])
+    fun `ensureForegroundServiceStarted is refused when the system rejects the start`() = runTest(testDispatcher) {
+        FeatureFlag.setEnabled(Feature.FOREGROUND_BEFORE_PLAYBACK, true)
+
+        val refusingContext = object : ContextWrapper(context) {
+            override fun startForegroundService(service: Intent): ComponentName? {
+                throw ForegroundServiceStartNotAllowedException("denied")
+            }
+        }
+
+        assertEquals(ForegroundStart.Refused, manager.ensureForegroundServiceStarted(refusingContext, timeoutMs = 50))
     }
 }

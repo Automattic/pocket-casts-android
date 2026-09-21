@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playback
 
+import android.app.ForegroundServiceStartNotAllowedException
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -84,6 +85,12 @@ import kotlinx.coroutines.withTimeoutOrNull
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+
+enum class ForegroundStart {
+    Started,
+    Unconfirmed,
+    Refused,
+}
 
 class MediaSessionManager(
     val playbackManager: PlaybackManager,
@@ -632,33 +639,37 @@ class MediaSessionManager(
         )
     }
 
-    private fun startServiceForeground(context: Context, component: ComponentName): Boolean {
-        if (_isServiceForeground.value) return true
+    private fun startServiceForeground(context: Context, component: ComponentName): ForegroundStart {
+        if (_isServiceForeground.value) return ForegroundStart.Started
         val intent = Intent(ACTION_START_PLAYBACK_FOREGROUND).setComponent(component)
         return try {
             ContextCompat.startForegroundService(context, intent)
-            true
+            ForegroundStart.Unconfirmed
         } catch (e: Exception) {
             LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Failed to start foreground service ${component.className}: $e")
             trackServiceStartFailed(component, e)
             setServiceForeground(false)
-            false
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && e is ForegroundServiceStartNotAllowedException) {
+                ForegroundStart.Refused
+            } else {
+                ForegroundStart.Unconfirmed
+            }
         }
     }
 
-    suspend fun ensureForegroundServiceStarted(context: Context, timeoutMs: Long = 2000L): Boolean {
-        if (_isServiceForeground.value) return true
+    suspend fun ensureForegroundServiceStarted(context: Context, timeoutMs: Long = 2000L): ForegroundStart {
+        if (_isServiceForeground.value) return ForegroundStart.Started
         val component = resolveMediaBrowserServiceComponent(context)
         if (component == null) {
             Timber.e("No enabled media browser service found for foreground start")
-            return false
+            return ForegroundStart.Unconfirmed
         }
-        if (!startServiceForeground(context, component)) return false
-        if (_isServiceForeground.value) return true
+        if (startServiceForeground(context, component) == ForegroundStart.Refused) return ForegroundStart.Refused
+        if (_isServiceForeground.value) return ForegroundStart.Started
         return withTimeoutOrNull(timeoutMs) {
             isServiceForeground.first { it }
-            true
-        } ?: false
+            ForegroundStart.Started
+        } ?: ForegroundStart.Unconfirmed
     }
 
     @OptIn(UnstableApi::class)
