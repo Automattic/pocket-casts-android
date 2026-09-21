@@ -50,18 +50,16 @@ import kotlin.time.Duration
 import kotlin.time.DurationUnit
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.cancelAndJoin
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
@@ -205,7 +203,6 @@ class EpisodeFragmentViewModel @Inject constructor(
         }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     fun setup(
         episodeUuid: String,
         podcastUuid: String?,
@@ -221,17 +218,17 @@ class EpisodeFragmentViewModel @Inject constructor(
             .map { progress -> (progress?.percentage?.toFloat() ?: 0f) / 100 }
             .distinctUntilChanged()
 
-        // A missing episode emits no state, leaving the screen on its loading placeholder
-        val stateFlow = flow { emit(findEpisode(episodeUuid, podcastUuid)) }
-            .filterNotNull()
-            .flatMapLatest<PodcastEpisode, EpisodeFragmentState> { episode ->
+        // Without both an episode and a podcast there is no state to emit, so the screen stays blank
+        val stateFlow = flow<EpisodeFragmentState> {
+            val episode = findEpisode(episodeUuid, podcastUuid) ?: return@flow
+            val podcast = podcastManager.findPodcastByUuid(episode.podcastUuid) ?: return@flow
+            val tintColor = podcast.getTintColor(isDarkTheme)
+            emitAll(
                 combine(
                     episodeManager.findByUuidFlow(episodeUuid),
-                    podcastFlow(episode.podcastUuid),
                     showNotesManager.loadShowNotesFlow(podcastUuid = episode.podcastUuid, episodeUuid = episode.uuid),
                     downloadProgressFlow,
-                ) { episodeLoaded, podcast, showNotesState, downloadProgress ->
-                    val tintColor = podcast.getTintColor(isDarkTheme)
+                ) { episodeLoaded, showNotesState, downloadProgress ->
                     EpisodeFragmentState.Loaded(
                         episode = episodeLoaded,
                         podcast = podcast,
@@ -240,14 +237,19 @@ class EpisodeFragmentViewModel @Inject constructor(
                         podcastColor = tintColor,
                         downloadProgress = downloadProgress,
                     )
-                }
-            }
+                },
+            )
+        }
             .onEach(::onStateLoaded)
             .catch { error -> emit(EpisodeFragmentState.Error(error)) }
             .flowOn(Dispatchers.IO)
 
+        // asLiveData won't re-run a completed flow, so keep it open to retry the load on the next onActive
         // No inactive grace period, so a dismissed screen cannot still emit and trigger auto play
-        state = stateFlow.asLiveData(timeoutInMs = 0)
+        state = flow {
+            emitAll(stateFlow)
+            awaitCancellation()
+        }.asLiveData(timeoutInMs = 0)
 
         showNotesState = state
             .map { episodeState ->
@@ -298,7 +300,7 @@ class EpisodeFragmentViewModel @Inject constructor(
         if (episode != null || podcastUuid == null) {
             return episode
         }
-        // Not in the database, so if we know the podcast we can try to load the episode from the server
+        // Not in the database, so try to load the episode from the server
         val podcast = podcastManager.findOrDownloadPodcastRxSingle(podcastUuid).await()
         return podcast.episodes.find { it.uuid == episodeUuid }
             ?: episodeManager.downloadMissingEpisodeRxMaybe(
@@ -309,11 +311,6 @@ class EpisodeFragmentViewModel @Inject constructor(
                 downloadMetaData = true,
                 source = source,
             ).awaitSingleOrNull() as? PodcastEpisode
-    }
-
-    // A missing podcast emits nothing, so the combined state never emits either
-    private fun podcastFlow(podcastUuid: String): Flow<Podcast> = flow {
-        podcastManager.findPodcastByUuid(podcastUuid)?.let { podcast -> emit(podcast) }
     }
 
     private fun onStateLoaded(episodeState: EpisodeFragmentState) {
