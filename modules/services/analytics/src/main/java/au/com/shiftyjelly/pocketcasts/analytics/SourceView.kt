@@ -98,6 +98,10 @@ enum class SourceView(
         key = "full_screen_video",
         analyticsValue = SourceViewType.FullScreenVideo,
     ),
+    HEADPHONES(
+        key = "headphones",
+        analyticsValue = SourceViewType.Headphones,
+    ),
     LISTENING_HISTORY(
         key = "listening_history",
         analyticsValue = SourceViewType.ListeningHistory,
@@ -193,6 +197,10 @@ enum class SourceView(
     TASKER(
         key = "tasker",
         analyticsValue = SourceViewType.Tasker,
+    ),
+    TRANSCRIPT(
+        key = "transcript",
+        analyticsValue = SourceViewType.Transcript,
     ),
     UNKNOWN(
         key = "unknown",
