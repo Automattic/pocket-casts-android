@@ -55,6 +55,7 @@ import coil3.ImageLoader
 import coil3.SingletonImageLoader
 import com.google.firebase.FirebaseApp
 import com.squareup.moshi.Moshi
+import dagger.Lazy
 import dagger.hilt.android.HiltAndroidApp
 import java.io.File
 import java.util.concurrent.Executors
@@ -150,7 +151,7 @@ class PocketCastsApplication :
 
     @Inject lateinit var appReviewExceptionHandler: AppReviewExceptionHandler
 
-    @Inject lateinit var whatsNewManager: WhatsNewManager
+    @Inject lateinit var whatsNewManager: Lazy<WhatsNewManager>
 
     override fun onCreate() {
         if (BuildConfig.DEBUG) {
@@ -217,7 +218,15 @@ class PocketCastsApplication :
         processLifecycleOwner.lifecycle.addObserver(
             object : DefaultLifecycleObserver {
                 override fun onStart(owner: LifecycleOwner) {
-                    applicationScope.launch { whatsNewManager.refreshIfNeeded() }
+                    applicationScope.launch {
+                        try {
+                            whatsNewManager.get().refreshIfNeeded()
+                        } catch (e: CancellationException) {
+                            throw e
+                        } catch (e: Exception) {
+                            LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, e, "Failed to refresh the What's New catalog")
+                        }
+                    }
                 }
             },
         )

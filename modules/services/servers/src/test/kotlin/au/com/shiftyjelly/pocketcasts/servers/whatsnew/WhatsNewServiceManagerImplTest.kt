@@ -24,9 +24,11 @@ class WhatsNewServiceManagerImplTest {
     @get:Rule
     val server = MockWebServer()
 
+    private val moshi = NetworkModule().provideMoshi()
+
     private val service = Retrofit.Builder()
         .baseUrl(server.url("/"))
-        .addConverterFactory(MoshiConverterFactory.create(NetworkModule().provideMoshi()))
+        .addConverterFactory(MoshiConverterFactory.create(moshi))
         .build()
         .create<WhatsNewCatalogService>()
 
@@ -37,7 +39,7 @@ class WhatsNewServiceManagerImplTest {
     fun `asks for the catalog published for the app's locale`() = runTest {
         server.enqueue(catalogResponse())
 
-        val catalog = serviceManager.getCatalog().toCatalog()
+        val catalog = decode(serviceManager.getCatalog())
 
         val request = server.takeRequest()
         assertEquals("/whats-new/v1/android/de.json", request.path)
@@ -51,7 +53,7 @@ class WhatsNewServiceManagerImplTest {
         server.enqueue(MockResponse().setResponseCode(HTTP_FORBIDDEN))
         server.enqueue(catalogResponse())
 
-        val catalog = serviceManager.getCatalog().toCatalog()
+        val catalog = decode(serviceManager.getCatalog())
 
         assertEquals("/whats-new/v1/android/fr.json", server.takeRequest().path)
         assertEquals("/whats-new/v1/android/en.json", server.takeRequest().path)
@@ -64,7 +66,7 @@ class WhatsNewServiceManagerImplTest {
         server.enqueue(MockResponse().setResponseCode(HTTP_NOT_FOUND))
         server.enqueue(catalogResponse())
 
-        val catalog = serviceManager.getCatalog().toCatalog()
+        val catalog = decode(serviceManager.getCatalog())
 
         assertEquals("/whats-new/v1/android/fr.json", server.takeRequest().path)
         assertEquals("/whats-new/v1/android/en.json", server.takeRequest().path)
@@ -90,6 +92,10 @@ class WhatsNewServiceManagerImplTest {
     }
 
     private fun fetchCatalog() = runBlocking { serviceManager.getCatalog() }
+
+    private fun decode(body: String) = requireNotNull(
+        moshi.adapter(WhatsNewCatalogResponse::class.java).fromJson(body),
+    ).toCatalog()
 
     private fun catalogResponse() = MockResponse().setBody(
         """

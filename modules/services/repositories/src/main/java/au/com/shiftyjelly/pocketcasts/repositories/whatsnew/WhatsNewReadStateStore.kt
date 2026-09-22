@@ -16,6 +16,16 @@ class WhatsNewReadStateStore @Inject constructor(
     private val _state = MutableStateFlow(read())
     val state: StateFlow<WhatsNewReadState> = _state.asStateFlow()
 
+    private val preferenceListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+        if (key == null || key in whatsNewKeys) {
+            synchronized(this) { _state.value = read() }
+        }
+    }
+
+    init {
+        preferences.registerOnSharedPreferenceChangeListener(preferenceListener)
+    }
+
     fun markAsRead(messageIds: Collection<String>) = update { state ->
         state.copy(readMessageIds = state.readMessageIds + messageIds)
     }
@@ -35,16 +45,16 @@ class WhatsNewReadStateStore @Inject constructor(
         state.copy(respondedPollIds = state.respondedPollIds + pollId)
     }
 
-    fun reset() {
+    fun reset() = synchronized(this) {
         _state.value = WhatsNewReadState()
         preferences.edit {
-            keys.forEach(::remove)
+            whatsNewKeys.forEach(::remove)
         }
     }
 
-    private fun update(transform: (WhatsNewReadState) -> WhatsNewReadState) {
+    private fun update(transform: (WhatsNewReadState) -> WhatsNewReadState) = synchronized(this) {
         val state = transform(_state.value)
-        if (state == _state.value) return
+        if (state == _state.value) return@synchronized
 
         _state.value = state
         preferences.edit {
@@ -70,6 +80,6 @@ class WhatsNewReadStateStore @Inject constructor(
         const val LISTED_KEY = "whatsNewListedMessageIds"
         const val RESPONDED_KEY = "whatsNewRespondedPollIds"
 
-        val keys = listOf(READ_KEY, SEEN_KEY, LISTED_KEY, RESPONDED_KEY)
+        val whatsNewKeys = setOf(READ_KEY, SEEN_KEY, LISTED_KEY, RESPONDED_KEY)
     }
 }

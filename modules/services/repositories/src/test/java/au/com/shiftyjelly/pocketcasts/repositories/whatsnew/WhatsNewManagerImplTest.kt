@@ -6,7 +6,6 @@ import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.ReadSetting
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.servers.di.NetworkModule
-import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewCatalogResponse
 import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewServiceManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
@@ -14,7 +13,10 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.squareup.moshi.Moshi
 import java.io.File
 import java.io.IOException
+import java.time.Instant
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -30,6 +32,7 @@ import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(RobolectricTestRunner::class)
 class WhatsNewManagerImplTest {
     @get:Rule
@@ -52,7 +55,7 @@ class WhatsNewManagerImplTest {
 
         catalogStore = WhatsNewCatalogStore(context, moshi)
         readStateStore = WhatsNewReadStateStore(preferences)
-        serviceManager = FakeServiceManager(catalog("Browse by network"))
+        serviceManager = FakeServiceManager(catalogJson("Browse by network"))
         val subscription = mock<ReadSetting<Subscription?>>()
         whenever(subscription.flow) doReturn MutableStateFlow(null)
         settings = mock()
@@ -62,7 +65,7 @@ class WhatsNewManagerImplTest {
         FeatureFlag.setEnabled(Feature.WHATS_NEW_FEED, true)
     }
 
-    private fun manager() = WhatsNewManagerImpl(serviceManager, catalogStore, readStateStore, settings)
+    private fun manager() = WhatsNewManagerImpl(serviceManager, catalogStore, readStateStore, settings, UnconfinedTestDispatcher())
 
     @Test
     fun `fetches the catalog when there is nothing on disk`() = runTest {
@@ -99,12 +102,46 @@ class WhatsNewManagerImplTest {
 
     @Test
     fun `refreshing fetches while the copy on disk is current`() = runTest {
-        manager().refreshIfNeeded()
+        val manager = manager()
+        manager.refreshIfNeeded()
         serviceManager.requestCount = 0
 
-        manager().refresh()
+        manager.refresh()
 
         assertEquals(1, serviceManager.requestCount)
+    }
+
+    @Test
+    fun `a message that expires leaves the feed and its dots on the next refresh`() = runTest {
+        serviceManager.catalog = catalogJson("Downloads stalling", expiresAt = Instant.now().plusSeconds(1).toString())
+        val manager = manager()
+        manager.refreshIfNeeded()
+
+        manager.feedMessages.test {
+            assertEquals(listOf("Downloads stalling"), awaitItem().map { it.title })
+        }
+
+        Thread.sleep(1100)
+        manager.refresh()
+
+        manager.feedMessages.test {
+            assertTrue(awaitItem().isEmpty())
+        }
+        manager.hasUnlistedMessages.test {
+            assertFalse(awaitItem())
+        }
+    }
+
+    @Test
+    fun `a message published in the future stays out of the feed until it is due`() = runTest {
+        serviceManager.catalog = catalogJson("Coming soon", publishedAt = Instant.now().plusSeconds(3600).toString())
+        val manager = manager()
+
+        manager.refreshIfNeeded()
+
+        manager.feedMessages.test {
+            assertTrue(awaitItem().isEmpty())
+        }
     }
 
     @Test
@@ -188,7 +225,7 @@ class WhatsNewManagerImplTest {
 
     @Test
     fun `a message this user is not targeted by never reaches the feed or its dots`() = runTest {
-        serviceManager.catalog = catalog("For patrons only", audiences = """["patron"]""")
+        serviceManager.catalog = catalogJson("For patrons only", audiences = """["patron"]""")
         val manager = manager()
 
         manager.refreshIfNeeded()
@@ -206,35 +243,37 @@ class WhatsNewManagerImplTest {
         file.setLastModified(System.currentTimeMillis() - WhatsNewManagerImpl.REFRESH_INTERVAL.toMillis() - 1000)
     }
 
-    private fun catalog(title: String, audiences: String = """["free"]""") = requireNotNull(
-        moshi.adapter(WhatsNewCatalogResponse::class.java).fromJson(
-            """
+    private fun catalogJson(
+        title: String,
+        audiences: String = """["free"]""",
+        publishedAt: String = "2026-09-18T05:11:26Z",
+        expiresAt: String? = null,
+    ) = """
             {
               "schemaVersion": 1,
               "messages": [
                 {
                   "id": "m1",
                   "type": "new_feature",
-                  "publishedAt": "2026-09-18T05:11:26Z",
+                  "publishedAt": "$publishedAt",
+                  "expiresAt": ${expiresAt?.let { "\"$it\"" }},
                   "targeting": { "audiences": $audiences },
                   "title": "$title",
                   "pages": [{ "heading": "h", "description": "d" }]
                 }
               ]
             }
-            """.trimIndent(),
-        ),
-    )
+    """.trimIndent()
 
     private class FakeServiceManager(
-        var catalog: WhatsNewCatalogResponse,
+        var catalog: String,
     ) : WhatsNewServiceManager {
         var requestCount = 0
         var error: Exception? = null
 
         override fun catalogLocale() = "en"
 
-        override suspend fun getCatalog(): WhatsNewCatalogResponse {
+        override suspend fun getCatalog(): String {
             requestCount++
             error?.let { throw it }
             return catalog
