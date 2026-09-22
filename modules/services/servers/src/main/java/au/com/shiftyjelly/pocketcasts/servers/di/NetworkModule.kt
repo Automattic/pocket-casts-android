@@ -16,6 +16,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.servers.OkHttpInterceptor
 import au.com.shiftyjelly.pocketcasts.servers.adapters.ExecutorEnqueueAdapterFactory
 import au.com.shiftyjelly.pocketcasts.servers.adapters.InstantAdapter
+import au.com.shiftyjelly.pocketcasts.servers.adapters.LossyListAdapterFactory
 import au.com.shiftyjelly.pocketcasts.servers.addInterceptors
 import au.com.shiftyjelly.pocketcasts.servers.analytics.AnalyticsLiveService
 import au.com.shiftyjelly.pocketcasts.servers.analytics.EventProperties
@@ -109,6 +110,7 @@ class NetworkModule {
             .add(DisplayStyleMoshiAdapter())
             .add(ExpandedStyleMoshiAdapter())
             .add(EventProperties::class.java, EventPropertiesJsonAdapter())
+            .add(LossyListAdapterFactory())
             .build()
     }
 

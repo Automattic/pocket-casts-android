@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.servers.whatsnew
 
+import au.com.shiftyjelly.pocketcasts.servers.adapters.LossyList
 import com.squareup.moshi.JsonClass
 import java.util.Date
 
@@ -9,14 +10,14 @@ internal data class WhatsNewCatalogResponse(
     val generatedAt: Date? = null,
     val platform: String? = null,
     val locale: String? = null,
-    val messages: List<WhatsNewMessageResponse> = emptyList(),
+    val messages: LossyList<WhatsNewMessageResponse> = LossyList(),
 ) {
     fun toCatalog() = WhatsNewCatalog(
         schemaVersion = schemaVersion,
         generatedAt = generatedAt?.toInstant(),
         platform = platform,
         locale = locale,
-        messages = messages.mapNotNull(WhatsNewMessageResponse::toMessage),
+        messages = messages.values.mapNotNull(WhatsNewMessageResponse::toMessage),
     )
 }
 
@@ -67,11 +68,11 @@ internal data class WhatsNewMessageResponse(
 
 @JsonClass(generateAdapter = true)
 internal data class WhatsNewTargetingResponse(
-    val audiences: List<String> = emptyList(),
+    val audiences: LossyList<String> = LossyList(),
     val minimumAppVersion: String? = null,
 ) {
     fun toTargeting() = WhatsNewTargeting(
-        audiences = audiences,
+        audiences = audiences.values,
         minimumAppVersion = minimumAppVersion.nonBlank(),
     )
 }

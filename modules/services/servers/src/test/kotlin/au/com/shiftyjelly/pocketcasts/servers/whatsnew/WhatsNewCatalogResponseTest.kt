@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.servers.whatsnew
 
+import au.com.shiftyjelly.pocketcasts.servers.adapters.LossyListAdapterFactory
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
 import java.time.Instant
@@ -12,6 +13,7 @@ import org.junit.Test
 class WhatsNewCatalogResponseTest {
     private val adapter = Moshi.Builder()
         .add(Date::class.java, Rfc3339DateJsonAdapter().nullSafe())
+        .add(LossyListAdapterFactory())
         .build()
         .adapter(WhatsNewCatalogResponse::class.java)
 
@@ -265,6 +267,50 @@ class WhatsNewCatalogResponseTest {
         assertTrue(WhatsNewAudience.entries.all(targeting::targets))
     }
 
+    @Test
+    fun `a message that cannot be decoded is dropped without losing its neighbours`() {
+        val catalog = decode(
+            catalogOf(
+                message(title = "Sort your Up Next"),
+                """{ "id": "m2", "type": "tip", "publishedAt": "not a date", "targeting": {}, "title": "Broken", "pages": [] }""",
+                message(title = "Browse by network"),
+            ),
+        )
+
+        assertEquals(listOf("Sort your Up Next", "Browse by network"), catalog.messages.map { it.title })
+    }
+
+    @Test
+    fun `a message whose content is the wrong shape is dropped without losing its neighbours`() {
+        val catalog = decode(
+            catalogOf(
+                message(title = "Sort your Up Next"),
+                """{ "id": "m2", "type": "tip", "publishedAt": "2026-08-12T09:00:00Z", "targeting": {}, "title": "Broken", "pages": "soon" }""",
+            ),
+        )
+
+        assertEquals(listOf("Sort your Up Next"), catalog.messages.map { it.title })
+    }
+
+    @Test
+    fun `an audience this version cannot read is dropped without losing its neighbours`() {
+        val catalog = decode(
+            catalogOf(message(targeting = """{ "audiences": ["free", { "tier": "beta" }, "patron"] }""")),
+        )
+
+        assertEquals(listOf("free", "patron"), catalog.messages.single().targeting.audiences)
+    }
+
+    @Test
+    fun `a message aimed only at an audience this version does not know targets nobody`() {
+        val catalog = decode(
+            catalogOf(message(targeting = """{ "audiences": ["future_audience"] }""")),
+        )
+
+        val targeting = catalog.messages.single().targeting
+        assertTrue(WhatsNewAudience.entries.none(targeting::targets))
+    }
+
     private fun decode(json: String) = requireNotNull(adapter.fromJson(json)).toCatalog()
 
     private fun catalogOf(vararg messages: String) = """{ "schemaVersion": 1, "messages": [${messages.joinToString(",")}] }"""
@@ -274,6 +320,7 @@ class WhatsNewCatalogResponseTest {
         title: String = "Sort your Up Next",
         publishedAt: String = "2026-08-12T09:00:00Z",
         expiresAt: String? = null,
+        targeting: String = "{}",
         body: String = """"pages": [{ "heading": "h", "description": "d" }]""",
     ) = """
         {
@@ -281,7 +328,7 @@ class WhatsNewCatalogResponseTest {
           "type": "$type",
           "publishedAt": "$publishedAt",
           "expiresAt": ${expiresAt?.let { "\"$it\"" }},
-          "targeting": {},
+          "targeting": $targeting,
           "title": "$title",
           $body
         }
