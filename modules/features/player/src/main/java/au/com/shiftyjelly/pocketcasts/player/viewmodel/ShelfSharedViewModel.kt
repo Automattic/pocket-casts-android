@@ -328,7 +328,9 @@ class ShelfSharedViewModel @Inject constructor(
         onboardingUpgradeSource: OnboardingUpgradeSource,
         source: ShelfItemSource,
     ) {
-        settings.showSmartBookmarksTooltip.set(false, updateModifiedAt = false)
+        if (FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS)) {
+            settings.showSmartBookmarksTooltip.set(false, updateModifiedAt = false)
+        }
         trackShelfAction(ShelfItem.Bookmark, source)
         viewModelScope.launch {
             val isPaidUser = settings.cachedSubscription.value != null
