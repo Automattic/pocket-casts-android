@@ -23,7 +23,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.reimagine.timestamp.ShareEpisodeTimestampFragment
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkEpisodeResolver
-import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkPlaybackTimeResolver
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -37,8 +36,6 @@ import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog.ButtonType.Danger
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
-import com.automattic.eventhorizon.BookmarkPlayTappedEvent
-import com.automattic.eventhorizon.EventHorizon
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlin.math.abs
@@ -130,12 +127,6 @@ class BookmarkDetailFragment : BaseDialogFragment() {
     internal lateinit var podcastManager: PodcastManager
 
     @Inject
-    internal lateinit var bookmarkManager: BookmarkManager
-
-    @Inject
-    internal lateinit var eventHorizon: EventHorizon
-
-    @Inject
     internal lateinit var bookmarkPlaybackTimeResolver: BookmarkPlaybackTimeResolver
 
     @Inject
@@ -168,6 +159,7 @@ class BookmarkDetailFragment : BaseDialogFragment() {
             passageLocation = args.passageLocation,
             timeSecs = args.timeSecs,
             referenceTime = args.referenceTime,
+            source = args.sourceView,
         )
         return contentWithoutConsumedInsets {
             val hasTranscript = args.passage != null && FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS)
@@ -206,7 +198,7 @@ class BookmarkDetailFragment : BaseDialogFragment() {
         }
         (activity as? FragmentHostListener)?.openEpisodeDialog(
             episodeUuid = args.episodeUuid,
-            source = EpisodeViewSource.UNKNOWN,
+            source = EpisodeViewSource.BOOKMARKS,
             podcastUuid = args.podcastUuid,
             forceDark = args.sourceView == SourceView.PLAYER,
             autoPlay = false,
@@ -241,6 +233,7 @@ class BookmarkDetailFragment : BaseDialogFragment() {
     }
 
     private fun onShareClick(episode: PodcastEpisode) {
+        viewModel.onShareTapped()
         lifecycleScope.launch {
             val podcast = podcastManager.findPodcastByUuid(args.podcastUuid) ?: return@launch
             ShareEpisodeTimestampFragment
@@ -251,6 +244,7 @@ class BookmarkDetailFragment : BaseDialogFragment() {
 
     private fun onDeleteClick() {
         val fragmentManager = activity?.supportFragmentManager ?: return
+        viewModel.onDeleteFormShown()
         ConfirmationDialog()
             .setForceDarkTheme(args.sourceView == SourceView.PLAYER)
             .setTitle(getString(LR.string.bookmarks_delete_singular))
@@ -258,12 +252,13 @@ class BookmarkDetailFragment : BaseDialogFragment() {
             .setIconId(IR.drawable.ic_delete)
             .setButtonType(Danger(getString(LR.string.delete)))
             .setOnConfirm { onDeleteConfirmed() }
+            .setOnDismiss { withoutAction -> if (withoutAction) viewModel.onDeleteFormDismissed() }
             .show(fragmentManager, "bookmark_detail_delete")
     }
 
     private fun onDeleteConfirmed() {
         lifecycleScope.launch {
-            bookmarkManager.deleteToSync(args.bookmarkUuid)
+            viewModel.deleteBookmark()
             dismiss()
         }
     }
@@ -294,6 +289,7 @@ class BookmarkDetailFragment : BaseDialogFragment() {
                 dismiss()
                 return@launch
             }
+            viewModel.onPlayTapped()
             val state = viewModel.uiState.value
             val hasReferenceTime = state.referenceTime != null
             val pausedForResolve = hasReferenceTime &&
@@ -340,13 +336,6 @@ class BookmarkDetailFragment : BaseDialogFragment() {
             }
             playbackManager.playNowSuspend(episode, sourceView = args.sourceView)
             playbackManager.seekToTimeMs(positionMs = seekToMs)
-            eventHorizon.track(
-                BookmarkPlayTappedEvent(
-                    source = args.sourceView.analyticsValue,
-                    episodeUuid = args.episodeUuid,
-                    podcastUuid = args.podcastUuid,
-                ),
-            )
         }
     }
 
