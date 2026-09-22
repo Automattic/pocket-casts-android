@@ -2,12 +2,14 @@ package au.com.shiftyjelly.pocketcasts.repositories.whatsnew
 
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.servers.di.NetworkModule
-import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewCatalogResponse
+import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewAudience
 import com.squareup.moshi.Moshi
 import java.io.File
+import java.time.Duration
+import java.time.Instant
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -35,36 +37,50 @@ class WhatsNewCatalogStoreTest {
 
     @Test
     fun `a catalog survives being written and read back`() {
-        store.write("en", catalog())
+        store.write("en", catalogJson())
 
-        val messages = store.read("en")?.toCatalog()?.messages
+        val messages = store.read("en")?.messages
         assertEquals(listOf("Browse by network"), messages?.map { it.title })
     }
 
     @Test
+    fun `a message hidden by audiences this version cannot read stays hidden after being cached`() {
+        val audiences = """[{ "key": "plus" }]"""
+        val body = catalogJson(audiences = audiences)
+        val fetched = requireNotNull(store.decode(body)).messages.single().targeting
+
+        store.write("en", body)
+        val cached = store.read("en")?.messages?.single()?.targeting
+
+        assertEquals(false, fetched.targets(WhatsNewAudience.Free))
+        assertEquals(fetched.targets(WhatsNewAudience.Free), cached?.targets(WhatsNewAudience.Free))
+    }
+
+    @Test
     fun `a catalog is kept apart from the one for another locale`() {
-        store.write("en", catalog())
+        store.write("en", catalogJson())
 
         assertNull(store.read("fr"))
     }
 
     @Test
     fun `writing a catalog records when it was written`() {
-        store.write("en", catalog())
+        store.write("en", catalogJson())
 
-        assertNotNull(store.writtenAt("en"))
+        val writtenAt = requireNotNull(store.writtenAt("en"))
+        assertTrue(Duration.between(writtenAt, Instant.now()).abs() < Duration.ofSeconds(5))
     }
 
     @Test
     fun `a cached catalog that cannot be read back is treated as missing`() {
-        store.write("en", catalog())
+        store.write("en", catalogJson())
         File(File(context.cacheDir, "whats-new"), "catalog-en.json").writeText("{ not json")
 
         assertNull(store.read("en"))
     }
 
-    private fun catalog(): WhatsNewCatalogResponse {
-        val json = """
+    private fun catalogJson(audiences: String = """["free"]"""): String {
+        return """
             {
               "schemaVersion": 1,
               "generatedAt": "2026-09-22T11:39:17Z",
@@ -75,13 +91,12 @@ class WhatsNewCatalogStoreTest {
                   "id": "m1",
                   "type": "new_feature",
                   "publishedAt": "2026-09-18T05:11:26Z",
-                  "targeting": { "audiences": ["free"] },
+                  "targeting": { "audiences": $audiences },
                   "title": "Browse by network",
                   "pages": [{ "heading": "h", "description": "d" }]
                 }
               ]
             }
         """.trimIndent()
-        return requireNotNull(moshi.adapter(WhatsNewCatalogResponse::class.java).fromJson(json))
     }
 }

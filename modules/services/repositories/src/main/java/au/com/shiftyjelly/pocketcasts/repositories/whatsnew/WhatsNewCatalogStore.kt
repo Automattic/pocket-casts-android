@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.repositories.whatsnew
 
 import android.content.Context
+import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewCatalog
 import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewCatalogResponse
 import com.squareup.moshi.Moshi
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -17,23 +18,37 @@ class WhatsNewCatalogStore @Inject constructor(
 ) {
     private val adapter = moshi.adapter(WhatsNewCatalogResponse::class.java)
 
-    fun read(locale: String): WhatsNewCatalogResponse? {
+    fun decode(body: String): WhatsNewCatalog? {
+        return try {
+            adapter.fromJson(body)?.toCatalog()
+        } catch (e: Exception) {
+            Timber.w(e, "Could not read a What's New catalog")
+            null
+        }
+    }
+
+    fun read(locale: String): WhatsNewCatalog? {
         val file = catalogFile(locale)
         if (!file.exists()) return null
 
         return try {
-            adapter.fromJson(file.readText())
+            decode(file.readText())
         } catch (e: Exception) {
             Timber.w(e, "Could not read the cached What's New catalog")
             null
         }
     }
 
-    fun write(locale: String, response: WhatsNewCatalogResponse) {
+    fun write(locale: String, body: String) {
+        val file = catalogFile(locale)
         try {
-            val file = catalogFile(locale)
             file.parentFile?.mkdirs()
-            file.writeText(adapter.toJson(response))
+            val temporaryFile = File(file.parentFile, "${file.name}.tmp")
+            temporaryFile.writeText(body)
+            if (!temporaryFile.renameTo(file)) {
+                temporaryFile.delete()
+                Timber.w("Could not replace the cached What's New catalog")
+            }
         } catch (e: Exception) {
             Timber.w(e, "Could not cache the What's New catalog")
         }

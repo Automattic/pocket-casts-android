@@ -12,15 +12,16 @@ class WhatsNewServiceManagerImpl(
 ) : WhatsNewServiceManager {
     override fun catalogLocale() = WhatsNewCatalogLocale.catalogName(provideLocale())
 
-    override suspend fun getCatalog(): WhatsNewCatalogResponse {
+    override suspend fun getCatalog(): String {
         val locale = catalogLocale()
-        return try {
+        val body = try {
             service.getCatalog(locale)
         } catch (e: HttpException) {
             if (e.code() !in unpublishedCodes || locale == WhatsNewCatalogLocale.FALLBACK) throw e
             Timber.i("No What's New catalog published for $locale, falling back to ${WhatsNewCatalogLocale.FALLBACK}")
             service.getCatalog(WhatsNewCatalogLocale.FALLBACK)
         }
+        return body.use { it.string() }
     }
 
     private companion object {

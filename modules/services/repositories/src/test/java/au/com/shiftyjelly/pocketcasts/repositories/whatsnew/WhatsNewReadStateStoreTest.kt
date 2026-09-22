@@ -2,6 +2,9 @@ package au.com.shiftyjelly.pocketcasts.repositories.whatsnew
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.core.content.edit
+import app.cash.turbine.test
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -99,11 +102,30 @@ class WhatsNewReadStateStoreTest {
     }
 
     @Test
-    fun `the state is published to anything watching it`() {
+    fun `the state is published to anything watching it`() = runTest {
         val store = store()
 
+        store.state.test {
+            assertEquals(emptySet<String>(), awaitItem().readMessageIds)
+
+            store.markAsRead(listOf("m1"))
+
+            assertEquals(setOf("m1"), awaitItem().readMessageIds)
+        }
+    }
+
+    @Test
+    fun `read state wiped on sign out does not come back`() {
+        val store = store()
         store.markAsRead(listOf("m1"))
 
-        assertEquals(setOf("m1"), store.state.value.readMessageIds)
+        preferences.edit(commit = true) {
+            preferences.all.keys.forEach(::remove)
+        }
+
+        assertEquals(WhatsNewReadState(), store.state.value)
+
+        store.markAsSeen(listOf("m2"))
+        assertEquals(emptySet<String>(), store.state.value.readMessageIds)
     }
 }
