@@ -45,7 +45,6 @@ import io.reactivex.schedulers.Schedulers
 import java.io.InvalidObjectException
 import javax.inject.Inject
 import kotlin.coroutines.cancellation.CancellationException
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -53,7 +52,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlowable
 import kotlinx.coroutines.rx2.rxMaybe
 import kotlinx.coroutines.rx2.rxSingle
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 @HiltViewModel
@@ -321,10 +319,8 @@ class DiscoverViewModel @Inject constructor(
     fun findOrDownloadEpisode(discoverEpisode: DiscoverEpisode, success: (episode: PodcastEpisode) -> Unit) {
         viewModelScope.launch {
             val episode = try {
-                withContext(Dispatchers.IO) {
-                    podcastManager.findOrDownloadPodcast(discoverEpisode.podcast_uuid)
-                    episodeManager.findByUuid(discoverEpisode.uuid)
-                }
+                podcastManager.findOrDownloadPodcast(discoverEpisode.podcast_uuid)
+                episodeManager.findByUuid(discoverEpisode.uuid)
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
