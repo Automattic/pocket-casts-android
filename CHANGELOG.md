@@ -20,9 +20,7 @@
         ([#5609](https://github.com/Automattic/pocket-casts-android/pull/5609))
     *   Stay in Pocket Casts after changing the app icon instead of closing to the home screen
         ([#6017](https://github.com/Automattic/pocket-casts-android/pull/6017))
-    *   Resume immediately when a headphone or car play button is pressed, instead of waiting for the multi-tap
-        window. A double or triple tap while paused now starts playback as well as running its configured action,
-        and wireless Android Auto no longer pauses playback
+    *   Resume playback immediately when a headphone or car play button is pressed
         ([#5645](https://github.com/Automattic/pocket-casts-android/pull/5645))
 
 8.21
