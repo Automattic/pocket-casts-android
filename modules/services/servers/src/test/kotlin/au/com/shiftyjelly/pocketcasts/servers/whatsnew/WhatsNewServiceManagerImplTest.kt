@@ -37,7 +37,7 @@ class WhatsNewServiceManagerImplTest {
     fun `asks for the catalog published for the app's locale`() = runTest {
         server.enqueue(catalogResponse())
 
-        val catalog = serviceManager.getCatalog()
+        val catalog = serviceManager.getCatalog().toCatalog()
 
         val request = server.takeRequest()
         assertEquals("/whats-new/v1/android/de.json", request.path)
@@ -51,7 +51,7 @@ class WhatsNewServiceManagerImplTest {
         server.enqueue(MockResponse().setResponseCode(HTTP_FORBIDDEN))
         server.enqueue(catalogResponse())
 
-        val catalog = serviceManager.getCatalog()
+        val catalog = serviceManager.getCatalog().toCatalog()
 
         assertEquals("/whats-new/v1/android/fr.json", server.takeRequest().path)
         assertEquals("/whats-new/v1/android/en.json", server.takeRequest().path)
@@ -64,7 +64,7 @@ class WhatsNewServiceManagerImplTest {
         server.enqueue(MockResponse().setResponseCode(HTTP_NOT_FOUND))
         server.enqueue(catalogResponse())
 
-        val catalog = serviceManager.getCatalog()
+        val catalog = serviceManager.getCatalog().toCatalog()
 
         assertEquals("/whats-new/v1/android/fr.json", server.takeRequest().path)
         assertEquals("/whats-new/v1/android/en.json", server.takeRequest().path)
