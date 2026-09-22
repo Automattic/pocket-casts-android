@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.compose.bookmark
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,6 +41,10 @@ import au.com.shiftyjelly.pocketcasts.compose.components.EpisodeImage
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
+import au.com.shiftyjelly.pocketcasts.compose.swipe.SwipeRow
+import au.com.shiftyjelly.pocketcasts.compose.swipe.SwipeRowActionDefaults
+import au.com.shiftyjelly.pocketcasts.compose.swipe.SwipeRowState
+import au.com.shiftyjelly.pocketcasts.compose.swipe.rememberSwipeRowState
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
@@ -91,6 +96,10 @@ fun BookmarkRow(
     isLoading: Boolean = false,
     colors: BookmarkColors = rememberBookmarkColors(),
     onFetchEpisode: (suspend () -> BaseEpisode?)? = null,
+    onClick: (() -> Unit)? = null,
+    onLongClick: (() -> Unit)? = null,
+    onShareClick: ((SwipeRowState) -> Unit)? = null,
+    onDeleteClick: ((SwipeRowState) -> Unit)? = null,
 ) {
     var fetchedEpisode by remember(bookmark.uuid) { mutableStateOf<BaseEpisode?>(null) }
     val latestEpisode by rememberUpdatedState(episode)
@@ -101,6 +110,8 @@ fun BookmarkRow(
         }
     }
     val displayEpisode = episode ?: fetchedEpisode
+    val canShare = displayEpisode is PodcastEpisode && displayEpisode.uuid.isNotEmpty()
+    val swipeState = rememberSwipeRowState()
     Column(
         modifier = modifier,
     ) {
@@ -108,106 +119,124 @@ fun BookmarkRow(
             color = colors.bookmarkRow.divider,
             modifier = Modifier.fillMaxWidth(),
         )
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(if (isSelected) colors.bookmarkRow.selectedBackground else colors.bookmarkRow.background),
+        SwipeRow(
+            state = swipeState,
+            isSwipeEnabled = !isSelecting,
+            leadingAction = onShareClick
+                ?.takeIf { canShare }
+                ?.let { onShare -> SwipeRowActionDefaults.share(onClick = onShare) },
+            trailingAction = onDeleteClick
+                ?.let { onDelete -> SwipeRowActionDefaults.delete(onClick = onDelete) },
         ) {
-            val createdAtText = bookmark.createdAt
-                .toLocalizedFormatPattern(bookmark.createdAtDatePattern())
-
-            if (isSelecting) {
-                Checkbox(
-                    checked = isSelected,
-                    onCheckedChange = null,
-                    modifier = Modifier.padding(start = 16.dp),
-                )
-            }
-
-            if (showIcon) {
-                Box(
-                    modifier = Modifier
-                        .padding(start = 16.dp)
-                        .then(
-                            if (!isSelecting && onArtworkClick != null) {
-                                Modifier.clickable(role = Role.Button, onClick = onArtworkClick)
-                            } else {
-                                Modifier
-                            },
-                        ),
-                ) {
-                    if (displayEpisode != null) {
-                        EpisodeImage(
-                            episode = displayEpisode,
-                            corners = 8.dp,
-                            useEpisodeArtwork = useEpisodeArtwork,
-                            modifier = Modifier.size(56.dp),
-                        )
-                    } else {
-                        Image(
-                            painter = painterResource(if (MaterialTheme.theme.isDark) IR.drawable.defaultartwork_dark else IR.drawable.defaultartwork),
-                            contentDescription = bookmark.title,
-                            modifier = Modifier
-                                .size(56.dp)
-                                .clip(RoundedCornerShape(8.dp)),
-                        )
-                    }
-                }
-            }
-
-            Column(
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
-                    .weight(1f)
-                    .padding(horizontal = 16.dp),
+                    .fillMaxWidth()
+                    .background(if (isSelected) colors.bookmarkRow.selectedBackground else colors.bookmarkRow.background)
+                    .combinedClickable(
+                        enabled = onClick != null || onLongClick != null,
+                        interactionSource = null,
+                        indication = null,
+                        role = Role.Button,
+                        onClick = { onClick?.invoke() },
+                        onLongClick = onLongClick,
+                    ),
             ) {
-                val episodeTitle = bookmark.episodeTitle.ifEmpty { displayEpisode?.title.orEmpty() }
-                val shouldShowEpisodeTitle = showEpisodeTitle && episodeTitle.isNotEmpty()
-                if (shouldShowEpisodeTitle) {
-                    TextH70(
-                        text = episodeTitle,
-                        color = colors.bookmarkRow.secondaryText,
-                        maxLines = 1,
-                        modifier = Modifier.padding(top = 8.dp),
+                val createdAtText = bookmark.createdAt
+                    .toLocalizedFormatPattern(bookmark.createdAtDatePattern())
+
+                if (isSelecting) {
+                    Checkbox(
+                        checked = isSelected,
+                        onCheckedChange = null,
+                        modifier = Modifier.padding(start = 16.dp),
                     )
                 }
 
-                Spacer(
-                    modifier = Modifier.padding(
-                        top = if (shouldShowEpisodeTitle) 4.dp else 16.dp,
-                    ),
-                )
+                if (showIcon) {
+                    Box(
+                        modifier = Modifier
+                            .padding(start = 16.dp)
+                            .then(
+                                if (!isSelecting && onArtworkClick != null) {
+                                    Modifier.clickable(role = Role.Button, onClick = onArtworkClick)
+                                } else {
+                                    Modifier
+                                },
+                            ),
+                    ) {
+                        if (displayEpisode != null) {
+                            EpisodeImage(
+                                episode = displayEpisode,
+                                corners = 8.dp,
+                                useEpisodeArtwork = useEpisodeArtwork,
+                                modifier = Modifier.size(56.dp),
+                            )
+                        } else {
+                            Image(
+                                painter = painterResource(if (MaterialTheme.theme.isDark) IR.drawable.defaultartwork_dark else IR.drawable.defaultartwork),
+                                contentDescription = bookmark.title,
+                                modifier = Modifier
+                                    .size(56.dp)
+                                    .clip(RoundedCornerShape(8.dp)),
+                            )
+                        }
+                    }
+                }
 
-                TextH40(
-                    text = bookmark.title,
-                    color = colors.bookmarkRow.primaryText,
-                    maxLines = 1,
-                    lineHeight = 18.sp,
-                )
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 16.dp),
+                ) {
+                    val episodeTitle = bookmark.episodeTitle.ifEmpty { displayEpisode?.title.orEmpty() }
+                    val shouldShowEpisodeTitle = showEpisodeTitle && episodeTitle.isNotEmpty()
+                    if (shouldShowEpisodeTitle) {
+                        TextH70(
+                            text = episodeTitle,
+                            color = colors.bookmarkRow.secondaryText,
+                            maxLines = 1,
+                            modifier = Modifier.padding(top = 8.dp),
+                        )
+                    }
 
-                TextH70(
-                    text = createdAtText,
-                    color = colors.bookmarkRow.secondaryText,
-                    maxLines = 1,
-                    modifier = Modifier.padding(top = 4.dp),
-                )
+                    Spacer(
+                        modifier = Modifier.padding(
+                            top = if (shouldShowEpisodeTitle) 4.dp else 16.dp,
+                        ),
+                    )
 
-                Spacer(
-                    modifier = Modifier.padding(
-                        bottom = if (shouldShowEpisodeTitle) 8.dp else 16.dp,
-                    ),
-                )
-            }
+                    TextH40(
+                        text = bookmark.title,
+                        color = colors.bookmarkRow.primaryText,
+                        maxLines = 1,
+                        lineHeight = 18.sp,
+                    )
 
-            Box(modifier = Modifier.padding(end = 16.dp)) {
-                TimePlayButton(
-                    timeSecs = bookmark.timeSecs,
-                    contentDescriptionId = LR.string.bookmark_play,
-                    onClick = { onPlayClick() },
-                    isLoading = isLoading,
-                    colors = colors.playButton,
-                )
+                    TextH70(
+                        text = createdAtText,
+                        color = colors.bookmarkRow.secondaryText,
+                        maxLines = 1,
+                        modifier = Modifier.padding(top = 4.dp),
+                    )
+
+                    Spacer(
+                        modifier = Modifier.padding(
+                            bottom = if (shouldShowEpisodeTitle) 8.dp else 16.dp,
+                        ),
+                    )
+                }
+
+                Box(modifier = Modifier.padding(end = 16.dp)) {
+                    TimePlayButton(
+                        timeSecs = bookmark.timeSecs,
+                        contentDescriptionId = LR.string.bookmark_play,
+                        onClick = { onPlayClick() },
+                        isLoading = isLoading,
+                        colors = colors.playButton,
+                    )
+                }
             }
         }
     }
