@@ -1,19 +1,23 @@
 package au.com.shiftyjelly.pocketcasts.servers.whatsnew
 
-import android.content.Context
-import dagger.hilt.android.qualifiers.ApplicationContext
-import javax.inject.Inject
+import java.net.HttpURLConnection.HTTP_NOT_FOUND
+import java.util.Locale
+import retrofit2.HttpException
+import timber.log.Timber
 
-class WhatsNewServiceManagerImpl @Inject constructor(
+class WhatsNewServiceManagerImpl(
     private val service: WhatsNewCatalogService,
-    @ApplicationContext private val context: Context,
+    private val provideLocale: () -> Locale,
 ) : WhatsNewServiceManager {
     override suspend fun getCatalog(): WhatsNewCatalog {
-        return service.getCatalog(catalogLocale()).toCatalog()
-    }
-
-    private fun catalogLocale(): String {
-        val locale = context.resources.configuration.locales[0] ?: return WhatsNewCatalogLocale.FALLBACK
-        return WhatsNewCatalogLocale.catalogName(locale)
+        val locale = WhatsNewCatalogLocale.catalogName(provideLocale())
+        val response = try {
+            service.getCatalog(locale)
+        } catch (e: HttpException) {
+            if (e.code() != HTTP_NOT_FOUND || locale == WhatsNewCatalogLocale.FALLBACK) throw e
+            Timber.i("No What's New catalog published for $locale, falling back to ${WhatsNewCatalogLocale.FALLBACK}")
+            service.getCatalog(WhatsNewCatalogLocale.FALLBACK)
+        }
+        return response.toCatalog()
     }
 }

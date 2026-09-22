@@ -1,21 +1,17 @@
 package au.com.shiftyjelly.pocketcasts.servers.whatsnew
 
-import au.com.shiftyjelly.pocketcasts.servers.adapters.LossyListAdapterFactory
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
+import au.com.shiftyjelly.pocketcasts.servers.di.NetworkModule
 import java.time.Instant
-import java.util.Date
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
 
+@RunWith(RobolectricTestRunner::class)
 class WhatsNewCatalogResponseTest {
-    private val adapter = Moshi.Builder()
-        .add(Date::class.java, Rfc3339DateJsonAdapter().nullSafe())
-        .add(LossyListAdapterFactory())
-        .build()
-        .adapter(WhatsNewCatalogResponse::class.java)
+    private val adapter = NetworkModule().provideMoshi().adapter(WhatsNewCatalogResponse::class.java)
 
     @Test
     fun `decodes the catalog the server publishes`() {
