@@ -307,6 +307,21 @@ class WhatsNewCatalogResponseTest {
         assertTrue(WhatsNewAudience.entries.none(targeting::targets))
     }
 
+    @Test
+    fun `a list the server sends as null is read as an empty one`() {
+        val catalog = decode("""{ "schemaVersion": 1, "messages": null }""")
+
+        assertTrue(catalog.messages.isEmpty())
+    }
+
+    @Test
+    fun `audiences the server sends as null target everyone`() {
+        val catalog = decode(catalogOf(message(targeting = """{ "audiences": null }""")))
+
+        val targeting = catalog.messages.single().targeting
+        assertTrue(WhatsNewAudience.entries.all(targeting::targets))
+    }
+
     private fun decode(json: String) = requireNotNull(adapter.fromJson(json)).toCatalog()
 
     private fun catalogOf(vararg messages: String) = """{ "schemaVersion": 1, "messages": [${messages.joinToString(",")}] }"""

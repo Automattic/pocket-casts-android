@@ -13,8 +13,9 @@ object WhatsNewCatalogLocale {
         val script = locale.script.lowercase()
 
         return when {
-            language != "zh" && language != "pt" -> language.ifEmpty { FALLBACK }
-            language == "pt" -> if (country == "br") "pt-br" else language
+            language.isEmpty() -> FALLBACK
+            language == "pt" && country == "br" -> "pt-br"
+            language != "zh" -> language
             script == "hant" || country in traditionalChineseCountries -> "zh-tw"
             else -> "zh-cn"
         }

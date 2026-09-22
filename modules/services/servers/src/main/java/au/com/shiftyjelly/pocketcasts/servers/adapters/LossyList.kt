@@ -25,6 +25,11 @@ private class LossyListAdapter<T>(
     private val elementAdapter: JsonAdapter<T>,
 ) : JsonAdapter<LossyList<T>>() {
     override fun fromJson(reader: JsonReader): LossyList<T> {
+        if (reader.peek() != JsonReader.Token.BEGIN_ARRAY) {
+            reader.skipValue()
+            return LossyList()
+        }
+
         val values = mutableListOf<T>()
         reader.beginArray()
         while (reader.hasNext()) {
