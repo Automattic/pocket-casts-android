@@ -27,6 +27,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.shownotes.ShowNotesManager
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
@@ -50,6 +51,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -94,6 +96,9 @@ class ShelfSharedViewModelTest {
     @Mock
     private lateinit var transcriptManager: TranscriptManager
 
+    @Mock
+    private lateinit var showNotesManager: ShowNotesManager
+
     private lateinit var shelfSharedViewModel: ShelfSharedViewModel
 
     private val plusSubscription = Subscription(
@@ -104,6 +109,10 @@ class ShelfSharedViewModelTest {
         isAutoRenewing = true,
         giftDays = 0,
     )
+
+    private val transcriptEpisode = PodcastEpisode("episodeUuid", podcastUuid = "podcastUuid", publishedDate = Date())
+    private val transcriptOnShelfItems = listOf(ShelfItem.Transcript) + (ShelfItem.entries - ShelfItem.Transcript)
+    private val transcriptInOverflowItems = (ShelfItem.entries - ShelfItem.Transcript) + ShelfItem.Transcript
 
     @Test
     fun `when effects button clicked, then effects options are shown`() = runTest {
@@ -416,12 +425,58 @@ class ShelfSharedViewModelTest {
         verify(playbackManager).toggleVideoRendering(streamWarningConfirmed = true)
     }
 
+    @Test
+    fun `given transcript button on shelf and not loaded, when player opened, then show notes are loaded`() = runTest {
+        initViewModel(currentEpisode = transcriptEpisode, shelfItems = transcriptOnShelfItems)
+
+        shelfSharedViewModel.setPlayerOpen(true)
+
+        verify(showNotesManager).loadShowNotes(podcastUuid = "podcastUuid", episodeUuid = "episodeUuid")
+    }
+
+    @Test
+    fun `given transcript button on shelf and already loaded, when player opened, then show notes are not loaded`() = runTest {
+        initViewModel(currentEpisode = transcriptEpisode, shelfItems = transcriptOnShelfItems, isTranscriptAvailable = true)
+
+        shelfSharedViewModel.setPlayerOpen(true)
+
+        verify(showNotesManager, never()).loadShowNotes(any(), any())
+    }
+
+    @Test
+    fun `given transcript button in overflow menu, when player opened, then show notes are not loaded`() = runTest {
+        initViewModel(currentEpisode = transcriptEpisode, shelfItems = transcriptInOverflowItems)
+
+        shelfSharedViewModel.setPlayerOpen(true)
+
+        verify(showNotesManager, never()).loadShowNotes(any(), any())
+    }
+
+    @Test
+    fun `given transcript button in overflow menu, when overflow menu opened, then show notes are loaded`() = runTest {
+        initViewModel(currentEpisode = transcriptEpisode, shelfItems = transcriptInOverflowItems)
+
+        shelfSharedViewModel.setPlayerOpen(true)
+        shelfSharedViewModel.setOverflowMenuOpen(true)
+
+        verify(showNotesManager).loadShowNotes(podcastUuid = "podcastUuid", episodeUuid = "episodeUuid")
+    }
+
+    @Test
+    fun `given transcript button on shelf, when player closed, then show notes are not loaded`() = runTest {
+        initViewModel(currentEpisode = transcriptEpisode, shelfItems = transcriptOnShelfItems)
+
+        verify(showNotesManager, never()).loadShowNotes(any(), any())
+    }
+
     private fun initViewModel(
         subscription: Subscription? = plusSubscription,
         currentEpisode: PodcastEpisode? = null,
         hlsAvailable: Boolean = false,
         streamVideoState: StreamVideoState = StreamVideoState.NotVideo,
         audioOnly: Boolean = false,
+        isTranscriptAvailable: Boolean = false,
+        shelfItems: List<ShelfItem> = ShelfItem.entries,
     ) {
         FeatureFlag.setEnabled(Feature.HLS_STREAMING, true)
 
@@ -439,11 +494,11 @@ class ShelfSharedViewModelTest {
         ).thenReturn(flowOf(upNextState))
 
         if (currentEpisode != null) {
-            whenever(transcriptManager.observeIsTranscriptAvailable(currentEpisode.uuid)).thenReturn(flowOf(false))
+            whenever(transcriptManager.observeIsTranscriptAvailable(currentEpisode.uuid)).thenReturn(flowOf(isTranscriptAvailable))
         }
 
         val userSetting = mock<UserSetting<List<ShelfItem>>>()
-        whenever(userSetting.flow).thenReturn(MutableStateFlow(ShelfItem.entries))
+        whenever(userSetting.flow).thenReturn(MutableStateFlow(shelfItems))
         whenever(settings.shelfItems).thenReturn(userSetting)
 
         val smartBookmarksTooltipSetting = mock<UserSetting<Boolean>>()
@@ -476,6 +531,7 @@ class ShelfSharedViewModelTest {
             settings = settings,
             userEpisodeManager = userEpisodeManager,
             transcriptManager = transcriptManager,
+            showNotesManager = showNotesManager,
             downloadQueue = mock(),
             ioDispatcher = coroutineRule.testDispatcher,
         )
