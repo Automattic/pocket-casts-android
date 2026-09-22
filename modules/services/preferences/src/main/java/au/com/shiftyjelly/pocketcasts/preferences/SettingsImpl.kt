@@ -1404,7 +1404,7 @@ class SettingsImpl @Inject constructor(
         setInt(SHOWN_BATTERY_WARNING_KEY, max(0, value))
     }
 
-    override fun getTimesToShowBatteryWarning(): Int = getInt(SHOWN_BATTERY_WARNING_KEY, 4)
+    override fun getTimesToShowBatteryWarning(): Int = getInt(SHOWN_BATTERY_WARNING_KEY, 3)
 
     override val collectAnalytics = UserSetting.BoolPref(
         sharedPrefKey = "SendUsageStatsKey",
