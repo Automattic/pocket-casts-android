@@ -207,9 +207,9 @@ private fun PairingBadges(modifier: Modifier = Modifier) {
         BadgeDots(Modifier.padding(horizontal = 16.dp))
         LogoBadge {
             Image(
-                painter = painterResource(IR.drawable.ic_google_tv),
+                painter = painterResource(IR.drawable.ic_android_robot),
                 contentDescription = null,
-                modifier = Modifier.width(32.dp),
+                modifier = Modifier.size(32.dp),
             )
         }
     }
