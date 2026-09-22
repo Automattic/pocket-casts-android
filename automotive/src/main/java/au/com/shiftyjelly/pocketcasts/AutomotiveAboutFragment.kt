@@ -28,6 +28,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.Fragment
 import au.com.shiftyjelly.pocketcasts.compose.AutomotiveTheme
@@ -153,6 +154,7 @@ private fun TextLinkButton(text: String, onClick: () -> Unit, modifier: Modifier
         Text(
             text = text,
             fontSize = 32.sp,
+            lineHeight = 1.5.em,
             color = MaterialTheme.theme.colors.primaryText01,
         )
     }
