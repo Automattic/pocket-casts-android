@@ -24,9 +24,6 @@ interface EpisodeManager {
     suspend fun findByUuid(uuid: String): PodcastEpisode?
     suspend fun findByUuids(uuids: Collection<String>): List<PodcastEpisode>
 
-    @Deprecated("Use findByUuid suspended function instead")
-    fun findByUuidRxMaybe(uuid: String): Maybe<PodcastEpisode>
-
     fun findByUuidFlow(uuid: String): Flow<PodcastEpisode>
     fun findEpisodeByUuidRxFlowable(uuid: String): Flowable<BaseEpisode>
     fun findEpisodeByUuidFlow(uuid: String): Flow<BaseEpisode>
