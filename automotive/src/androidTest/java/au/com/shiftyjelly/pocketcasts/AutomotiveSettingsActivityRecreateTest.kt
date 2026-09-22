@@ -1,6 +1,6 @@
 package au.com.shiftyjelly.pocketcasts
 
-import android.widget.FrameLayout
+import androidx.fragment.app.FragmentContainerView
 import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.Assert.assertEquals
@@ -29,7 +29,7 @@ class AutomotiveSettingsActivityRecreateTest {
                 activity.supportFragmentManager.popBackStack()
                 activity.supportFragmentManager.executePendingTransactions()
 
-                val frameMain = activity.findViewById<FrameLayout>(R.id.frameMain)
+                val frameMain = activity.findViewById<FragmentContainerView>(R.id.frameMain)
                 assertEquals("frameMain should hold a single fragment after back", 1, frameMain.childCount)
 
                 val visible = activity.supportFragmentManager.findFragmentById(R.id.frameMain)
