@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.servers.whatsnew
 
 import au.com.shiftyjelly.pocketcasts.servers.di.NetworkModule
+import java.net.HttpURLConnection.HTTP_FORBIDDEN
 import java.net.HttpURLConnection.HTTP_NOT_FOUND
 import java.util.Locale
 import kotlinx.coroutines.test.runTest
@@ -42,7 +43,20 @@ class WhatsNewServiceManagerImplTest {
     }
 
     @Test
-    fun `falls back to the english catalog when the locale is not published`() = runTest {
+    fun `falls back to the english catalog when the bucket has no catalog for the locale`() = runTest {
+        locale = Locale.FRENCH
+        server.enqueue(MockResponse().setResponseCode(HTTP_FORBIDDEN))
+        server.enqueue(catalogResponse())
+
+        val catalog = serviceManager.getCatalog()
+
+        assertEquals("/whats-new/v1/android/fr.json", server.takeRequest().path)
+        assertEquals("/whats-new/v1/android/en.json", server.takeRequest().path)
+        assertEquals("Browse by network", catalog.messages.single().title)
+    }
+
+    @Test
+    fun `falls back to the english catalog when the locale is not found`() = runTest {
         locale = Locale.FRENCH
         server.enqueue(MockResponse().setResponseCode(HTTP_NOT_FOUND))
         server.enqueue(catalogResponse())
@@ -65,7 +79,7 @@ class WhatsNewServiceManagerImplTest {
 
     @Test
     fun `a missing english catalog is not asked for twice`() = runTest {
-        server.enqueue(MockResponse().setResponseCode(HTTP_NOT_FOUND))
+        server.enqueue(MockResponse().setResponseCode(HTTP_FORBIDDEN))
 
         assertTrue(catalogError() is HttpException)
         assertEquals(1, server.requestCount)
