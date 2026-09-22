@@ -61,6 +61,9 @@ private val ActionHorizontalPadding = 48.dp
 
 internal const val FULL_SWIPE_ANCHOR_MULTIPLIER = 2
 
+private val SwipeRowState.settledOffset
+    get() = draggableState.offset.let { offset -> if (offset.isNaN()) 0f else offset }
+
 internal fun swipeRowAnchors(
     rowWidthPx: Float,
     leadingWidthPx: Float?,
@@ -175,21 +178,12 @@ fun SwipeRow(
         val actions = listOfNotNull(leadingAction, trailingAction)
         Box(
             modifier = Modifier
-                .graphicsLayer { translationX = state.draggableState.requireOffset() }
+                .graphicsLayer { translationX = state.settledOffset }
                 .anchoredDraggable(
                     state = state.draggableState,
                     orientation = Orientation.Horizontal,
                     enabled = isSwipeEnabled,
                     interactionSource = interactionSource,
-                )
-                .then(
-                    if (state.isOpen) {
-                        Modifier.pointerInput(state) {
-                            detectTapGestures { state.settle() }
-                        }
-                    } else {
-                        Modifier
-                    },
                 )
                 .semantics {
                     customActions = actions.map { action ->
@@ -201,6 +195,15 @@ fun SwipeRow(
                 },
         ) {
             content()
+            if (state.isOpen) {
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .pointerInput(state) {
+                            detectTapGestures { state.settle() }
+                        },
+                )
+            }
         }
     }
 }
@@ -218,7 +221,7 @@ private fun BoxScope.SwipeRowActionSlab(
         modifier = Modifier
             .matchParentSize()
             .graphicsLayer {
-                val offset = state.draggableState.requireOffset()
+                val offset = state.settledOffset
                 translationX = if (isLeading) offset - rowWidthPx else offset + rowWidthPx
             }
             .background(action.backgroundColor)
@@ -233,7 +236,7 @@ private fun BoxScope.SwipeRowActionSlab(
                 .width(ActionIconSize + ActionHorizontalPadding)
                 .fillMaxHeight()
                 .graphicsLayer {
-                    val revealed = state.draggableState.requireOffset().absoluteValue.coerceAtMost(actionWidthPx)
+                    val revealed = state.settledOffset.absoluteValue.coerceAtMost(actionWidthPx)
                     val shift = (actionWidthPx - revealed) / 2f
                     translationX = if (isLeading) shift else -shift
                 },
