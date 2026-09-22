@@ -48,6 +48,7 @@ import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeChatDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.ExternalDataDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.FolderDao
+import au.com.shiftyjelly.pocketcasts.models.db.dao.PendingEpisodeTaskDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PlaybackStatsDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PlaylistDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PodcastDao
@@ -71,6 +72,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeChat
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeChatMessage
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.PendingEpisodeTask
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaybackStatsEvent
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -120,8 +122,9 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         EpisodeChat::class,
         EpisodeChatMessage::class,
         EpisodeAlternateEnclosure::class,
+        PendingEpisodeTask::class,
     ],
-    version = 139,
+    version = 140,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 81, to = 82, spec = AppDatabase.Companion.DeleteSilenceRemovedMigration::class),
@@ -180,6 +183,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun playbackStatsDao(): PlaybackStatsDao
     abstract fun episodeChatDao(): EpisodeChatDao
     abstract fun alternateEnclosureDao(): AlternateEnclosureDao
+    abstract fun pendingEpisodeTaskDao(): PendingEpisodeTaskDao
 
     fun databaseFiles() = openHelper.readableDatabase.path?.let {
         listOf(
@@ -1538,6 +1542,12 @@ abstract class AppDatabase : RoomDatabase() {
             )
         }
 
+        val MIGRATION_139_140 = addMigration(139, 140) { database ->
+            database.execSQL(
+                "CREATE TABLE IF NOT EXISTS `pending_episode_tasks` (`episode_uuid` TEXT NOT NULL, `task` TEXT NOT NULL, `created_at` INTEGER NOT NULL, PRIMARY KEY(`episode_uuid`, `task`), FOREIGN KEY(`episode_uuid`) REFERENCES `podcast_episodes`(`uuid`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+            )
+        }
+
         fun addMigrations(databaseBuilder: Builder<AppDatabase>, context: Context) {
             databaseBuilder.addMigrations(
                 addMigration(1, 2) { },
@@ -1966,6 +1976,7 @@ abstract class AppDatabase : RoomDatabase() {
                 MIGRATION_136_137,
                 MIGRATION_137_138,
                 MIGRATION_138_139,
+                MIGRATION_139_140,
             )
         }
 

@@ -31,6 +31,7 @@ class AppDatabaseTest {
         private const val MIGRATION_DB_136_137 = "migration-test-136-137"
         private const val MIGRATION_DB_137_138 = "migration-test-137-138"
         private const val MIGRATION_DB_138_139 = "migration-test-138-139"
+        private const val MIGRATION_DB_139_140 = "migration-test-139-140"
     }
 
     @Rule @JvmField
@@ -279,6 +280,32 @@ class AppDatabaseTest {
         assertEquals("Existing bump stats should be discarded", 0, countRows(db, "bump_stats"))
     }
 
+    @Test
+    fun migrate139To140AddsPendingEpisodeTasksTable() {
+        migrationTestHelper.createDatabase(MIGRATION_DB_139_140, 139).use {
+            it.execSQL(
+                "INSERT INTO podcast_episodes (uuid, episode_description, published_date, title, size_in_bytes, episode_status, duration, played_up_to, playing_status, podcast_id, added_date, auto_download_status, starred, thumbnail_status, archived, last_playback_interaction_sync_status, exclude_from_episode_limit, deselected_chapters, slug, has_generated_transcript) " +
+                    "VALUES ('episode-1', '', 1000, 'Episode', 0, 0, 0.0, 0.0, 0, 'podcast-1', 1000, 0, 0, 0, 0, 0, 0, '', '', 0)",
+            )
+        }
+
+        val db = migrationTestHelper.runMigrationsAndValidate(MIGRATION_DB_139_140, 140, true, AppDatabase.MIGRATION_139_140)
+
+        assertEquals(
+            "pending_episode_tasks columns should exist",
+            true,
+            tableColumns(db, "pending_episode_tasks").containsAll(listOf("episode_uuid", "task", "created_at")),
+        )
+
+        db.execSQL("PRAGMA foreign_keys = ON")
+        db.execSQL("INSERT INTO pending_episode_tasks (episode_uuid, task, created_at) VALUES ('episode-1', 'AUTO_DOWNLOAD', 1000)")
+        db.execSQL("INSERT INTO pending_episode_tasks (episode_uuid, task, created_at) VALUES ('episode-1', 'UP_NEXT', 1000)")
+        assertEquals("A task per type should be stored", 2, countRows(db, "pending_episode_tasks"))
+
+        db.execSQL("DELETE FROM podcast_episodes WHERE uuid = 'episode-1'")
+        assertEquals("Tasks should be deleted with their episode", 0, countRows(db, "pending_episode_tasks"))
+    }
+
     private fun tableColumns(db: SupportSQLiteDatabase?, tableName: String): List<String> {
         val columns = mutableListOf<String>()
         db?.query("PRAGMA table_info($tableName)")?.use { cursor ->
@@ -397,6 +424,7 @@ class AppDatabaseTest {
                 AppDatabase.MIGRATION_136_137,
                 AppDatabase.MIGRATION_137_138,
                 AppDatabase.MIGRATION_138_139,
+                AppDatabase.MIGRATION_139_140,
             )
             .build()
         // close the database and release any stream resources when the test finishes

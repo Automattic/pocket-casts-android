@@ -715,14 +715,6 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override val pendingAutoDownloadEpisodeUuids = UserSetting.PrefListFromString(
-        sharedPrefKey = "pendingAutoDownloadEpisodeUuids",
-        defaultValue = emptyList<String>(),
-        fromString = { value -> value.takeIf(String::isNotBlank) },
-        toString = { value -> value },
-        sharedPrefs = sharedPreferences,
-    )
-
     override val autoDownloadOnlyWhenCharging = UserSetting.BoolPref(
         sharedPrefKey = "autoDownloadOnlyDownloadWhenCharging",
         defaultValue = false,

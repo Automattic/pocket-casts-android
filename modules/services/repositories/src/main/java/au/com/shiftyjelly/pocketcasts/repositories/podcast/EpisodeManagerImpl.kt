@@ -7,6 +7,7 @@ import androidx.sqlite.db.SimpleSQLiteQuery
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.PendingEpisodeTask
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -36,6 +37,7 @@ import com.automattic.eventhorizon.EventHorizon
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.Flowable
 import java.io.File
+import java.time.Clock
 import java.util.Date
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -65,6 +67,7 @@ class EpisodeManagerImpl @Inject constructor(
     private val userEpisodeManager: UserEpisodeManager,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val eventHorizon: EventHorizon,
+    private val clock: Clock,
 ) : EpisodeManager,
     CoroutineScope {
 
@@ -73,6 +76,7 @@ class EpisodeManagerImpl @Inject constructor(
 
     private val episodeDao = appDatabase.episodeDao()
     private val userEpisodeDao = appDatabase.userEpisodeDao()
+    private val pendingEpisodeTaskDao = appDatabase.pendingEpisodeTaskDao()
 
     private val errorClassifier = PlaybackErrorClassifier()
 
@@ -681,13 +685,13 @@ class EpisodeManagerImpl @Inject constructor(
         return episodeDao.findStarredEpisodes()
     }
 
-    override fun addBlocking(episodes: List<PodcastEpisode>, podcastUuid: String, downloadMetaData: Boolean): List<PodcastEpisode> {
+    override fun addBlocking(episodes: List<PodcastEpisode>, podcastUuid: String, downloadMetaData: Boolean, pendingTasks: List<PendingEpisodeTask.Type>): List<PodcastEpisode> {
         return runBlocking {
-            add(episodes, podcastUuid, downloadMetaData)
+            add(episodes, podcastUuid, downloadMetaData, pendingTasks)
         }
     }
 
-    override suspend fun add(episodes: List<PodcastEpisode>, podcastUuid: String, downloadMetaData: Boolean): List<PodcastEpisode> {
+    override suspend fun add(episodes: List<PodcastEpisode>, podcastUuid: String, downloadMetaData: Boolean, pendingTasks: List<PendingEpisodeTask.Type>): List<PodcastEpisode> {
         val addedEpisodes = mutableListOf<PodcastEpisode>()
         // add the episodes
         val episodesItr = episodes.iterator()
@@ -701,8 +705,18 @@ class EpisodeManagerImpl @Inject constructor(
             }
         }
         if (addedEpisodes.isNotEmpty()) {
-            addedEpisodes.chunked(250).forEach { chunkedEpisodes ->
-                episodeDao.insertAllOrIgnore(chunkedEpisodes)
+            if (pendingTasks.isEmpty()) {
+                insertNewEpisodes(addedEpisodes)
+            } else {
+                val createdAt = clock.instant()
+                appDatabase.withTransaction {
+                    insertNewEpisodes(addedEpisodes)
+                    pendingEpisodeTaskDao.insertAll(
+                        addedEpisodes.flatMap { episode ->
+                            pendingTasks.map { task -> PendingEpisodeTask(episode.uuid, task, createdAt) }
+                        },
+                    )
+                }
             }
         }
 
@@ -711,6 +725,12 @@ class EpisodeManagerImpl @Inject constructor(
         }
 
         return addedEpisodes
+    }
+
+    private suspend fun insertNewEpisodes(episodes: List<PodcastEpisode>) {
+        episodes.chunked(250).forEach { chunkedEpisodes ->
+            episodeDao.insertAllOrIgnore(chunkedEpisodes)
+        }
     }
 
     override fun insertBlocking(episodes: List<PodcastEpisode>) {

@@ -19,6 +19,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowEpisodeDeepLink
 import au.com.shiftyjelly.pocketcasts.localization.BuildConfig
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
+import au.com.shiftyjelly.pocketcasts.models.entity.PendingEpisodeTask
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast.AutoAddUpNext
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -30,7 +31,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.R
 import au.com.shiftyjelly.pocketcasts.repositories.download.AutoDownloadEpisodeProvider
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadQueue
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadType
-import au.com.shiftyjelly.pocketcasts.repositories.download.PendingAutoDownloadEpisodes
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
@@ -61,6 +61,7 @@ import dagger.hilt.EntryPoint
 import dagger.hilt.EntryPoints
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import java.time.Clock
 import java.util.Date
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -89,13 +90,13 @@ class RefreshPodcastsThread(
         fun playbackManager(): PlaybackManager
         fun episodeManager(): EpisodeManager
         fun autoDownloadProvider(): AutoDownloadEpisodeProvider
-        fun pendingAutoDownloadEpisodes(): PendingAutoDownloadEpisodes
         fun downloadQueue(): DownloadQueue
         fun notificationHelper(): NotificationHelper
         fun userManager(): UserManager
         fun syncManager(): SyncManager
         fun ratingsManager(): RatingsManager
         fun appDatabase(): AppDatabase
+        fun clock(): Clock
     }
 
     @Volatile
@@ -197,20 +198,30 @@ class RefreshPodcastsThread(
         val podcastManager = entryPoint.podcastManager()
         val playbackManager = entryPoint.playbackManager()
         val episodeManager = entryPoint.episodeManager()
-        val autoDownloadProvider = entryPoint.autoDownloadProvider()
-        val pendingAutoDownloadEpisodes = entryPoint.pendingAutoDownloadEpisodes()
-        val downloadQueue = entryPoint.downloadQueue()
         val settings = entryPoint.settings()
         val notificationHelper = entryPoint.notificationHelper()
+        val pendingTaskProcessor = PendingEpisodeTaskProcessor(
+            pendingEpisodeTaskDao = entryPoint.appDatabase().pendingEpisodeTaskDao(),
+            episodeManager = episodeManager,
+            podcastManager = podcastManager,
+            playbackManager = playbackManager,
+            autoDownloadProvider = entryPoint.autoDownloadProvider(),
+            downloadQueue = entryPoint.downloadQueue(),
+            clock = entryPoint.clock(),
+        )
 
         val emptyResponse = result == null
         val notificationLastSeen = getNotificationLastSeen(entryPoint.settings())
         val addedEpisodes = updatePodcasts(result)
-        pendingAutoDownloadEpisodes.record(addedEpisodes.episodeUuidsAdded)
 
         val syncRefreshState = sync()
 
-        addNewEpisodesToUpNext(addedEpisodes.episodesToAddToUpNext)
+        runBlocking { pendingTaskProcessor.removeExpiredTasks() }
+
+        val upNextDuration = measureTime {
+            runBlocking { pendingTaskProcessor.processUpNext(addedEpisodes.episodeUuidsAdded) }
+        }
+        LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh - up next check - $upNextDuration")
 
         if (!emptyResponse) {
             val autoArchiveDuration = measureTime {
@@ -233,24 +244,7 @@ class RefreshPodcastsThread(
             for (uuid in addedEpisodes.episodeUuidsAdded) {
                 LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "New podcast episode received: $uuid")
             }
-            val interruptedEpisodeUuids = if (emptyResponse) {
-                emptyList()
-            } else {
-                pendingAutoDownloadEpisodes.all() - addedEpisodes.episodeUuidsAdded.toSet()
-            }
-            if (interruptedEpisodeUuids.isNotEmpty()) {
-                LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Auto downloading ${interruptedEpisodeUuids.size} episodes missed by an interrupted refresh")
-            }
-            val episodeUuids = interruptedEpisodeUuids + addedEpisodes.episodeUuidsAdded
-            runBlocking {
-                val episodes = autoDownloadProvider.getAll(episodeUuids)
-                downloadQueue.enqueueAll(episodes, DownloadType.Automatic(bypassAutoDownloadStatus = false), SourceView.AUTO_DOWNLOAD)
-                    .invokeOnCompletion { error ->
-                        if (error == null) {
-                            pendingAutoDownloadEpisodes.remove(episodeUuids)
-                        }
-                    }
-            }
+            runBlocking { pendingTaskProcessor.processAutoDownload(addedEpisodes.episodeUuidsAdded) }
         }
         LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh - auto download check - $autoDownloadDuration")
 
@@ -305,11 +299,11 @@ class RefreshPodcastsThread(
         settings.setRefreshState(settings.getLastSuccessRefreshState() ?: RefreshState.Never)
     }
 
-    private data class AddedEpisodes(val episodeUuidsAdded: List<String>, val episodesToAddToUpNext: List<Pair<AutoAddUpNext, PodcastEpisode>>)
+    private data class AddedEpisodes(val episodeUuidsAdded: List<String>)
 
     private fun updatePodcasts(result: RefreshResponse?): AddedEpisodes {
         if (result == null) {
-            return AddedEpisodes(emptyList(), emptyList())
+            return AddedEpisodes(emptyList())
         }
 
         val entryPoint = getEntryPoint()
@@ -319,7 +313,6 @@ class RefreshPodcastsThread(
 
         var newEpisodeCount = 0
 
-        val episodesToAddToUpNext = ArrayList<Pair<AutoAddUpNext, PodcastEpisode>>()
         val episodeUuidsAdded = ArrayList<String>()
 
         for (podcastUuid in result.getPodcastsWithUpdates()) {
@@ -336,7 +329,13 @@ class RefreshPodcastsThread(
                 episode.addedDate = addedDate
             }
             val enclosuresByUuid = episodes.associate { it.uuid to it.alternateEnclosures }
-            episodes = episodeManager.addBlocking(episodes, podcast.uuid, downloadMetaData)
+            val pendingTasks = buildList {
+                add(PendingEpisodeTask.Type.AUTO_DOWNLOAD)
+                if (podcast.autoAddToUpNext != AutoAddUpNext.OFF) {
+                    add(PendingEpisodeTask.Type.UP_NEXT)
+                }
+            }
+            episodes = episodeManager.addBlocking(episodes, podcast.uuid, downloadMetaData, pendingTasks)
 
             if (episodes.isEmpty()) {
                 // the server returned episodes, but none were added to the database. Update the podcast when it doesn't have the latest episode information.
@@ -354,26 +353,15 @@ class RefreshPodcastsThread(
                     }
                 }
 
-                // prepare to add to up next
-                when (podcast.autoAddToUpNext) {
-                    AutoAddUpNext.OFF -> {}
-
-                    AutoAddUpNext.PLAY_LAST -> {
-                        logAutoAddToUpNext(podcast, episodes)
-                        episodesToAddToUpNext.addAll(episodes.map { Pair(AutoAddUpNext.PLAY_LAST, it) })
-                    }
-
-                    AutoAddUpNext.PLAY_NEXT -> {
-                        logAutoAddToUpNext(podcast, episodes)
-                        episodesToAddToUpNext.addAll(episodes.map { Pair(AutoAddUpNext.PLAY_NEXT, it) })
-                    }
+                if (podcast.autoAddToUpNext != AutoAddUpNext.OFF) {
+                    logAutoAddToUpNext(podcast, episodes)
                 }
             }
 
             newEpisodeCount += episodes.size
         }
 
-        return AddedEpisodes(episodeUuidsAdded, episodesToAddToUpNext)
+        return AddedEpisodes(episodeUuidsAdded)
     }
 
     private fun logAutoAddToUpNext(podcast: Podcast, episodes: List<PodcastEpisode>) {
@@ -381,43 +369,6 @@ class RefreshPodcastsThread(
         val message = "Auto add to Up Next: podcast=${podcast.uuid} (${podcast.title}) " +
             "mode=${podcast.autoAddToUpNext} modified=${podcast.autoAddToUpNextModified} episodes=$episodeList"
         LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, message)
-    }
-
-    private fun addNewEpisodesToUpNext(episodesToAddToUpNext: List<Pair<AutoAddUpNext, PodcastEpisode>>) {
-        if (episodesToAddToUpNext.isEmpty()) {
-            return
-        }
-
-        val entryPoint = getEntryPoint()
-        val playbackManager = entryPoint.playbackManager()
-        val episodeManager = entryPoint.episodeManager()
-        val podcastManager = entryPoint.podcastManager()
-
-        // Because we may not have refreshed for a while, we collect all the auto add to up next episodes
-        // and run through them one by one sorted by their publish date. They are added to up next as if the action
-        // was run right as they were published magically
-        runBlocking {
-            episodesToAddToUpNext
-                .groupBy { it.second.podcastUuid }
-                .forEach { (podcastUuid, pairs) ->
-                    val currentPodcast = podcastManager.findPodcastByUuid(podcastUuid) ?: return@forEach
-                    val queuedModes = pairs.map { it.first }.toSet()
-                    if (currentPodcast.autoAddToUpNext !in queuedModes) {
-                        val message = "Auto add to Up Next: podcast=$podcastUuid (${currentPodcast.title}) " +
-                            "was collected with mode=$queuedModes but now has mode=${currentPodcast.autoAddToUpNext} " +
-                            "modified=${currentPodcast.autoAddToUpNextModified}"
-                        LogBuffer.w(LogBuffer.TAG_BACKGROUND_TASKS, message)
-                    }
-                }
-
-            val alreadyProcessedEpisodes = episodeManager.findEpisodesByUuids(episodesToAddToUpNext.map { it.second.uuid })
-                .filter { it.isFinished || it.isArchived }
-                .map { it.uuid }
-
-            playbackManager.addEpisodes(
-                episodesToAddToUpNext.filter { !alreadyProcessedEpisodes.contains(it.second.uuid) },
-            )
-        }
     }
 
     private fun getNotificationLastSeen(settings: Settings): Date {
