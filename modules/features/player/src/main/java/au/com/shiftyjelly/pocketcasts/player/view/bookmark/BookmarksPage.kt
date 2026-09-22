@@ -42,6 +42,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.NoContentBanner
 import au.com.shiftyjelly.pocketcasts.compose.components.SearchBar
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPlural
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -132,6 +133,13 @@ fun BookmarksPage(
                 @Suppress("LocalContextGetResourceValueCall")
                 val string = when (message) {
                     is BookmarkMessage.BookmarkEpisodeNotFound -> context.getString(LR.string.episode_not_found)
+
+                    is BookmarkMessage.BookmarksDeleted -> context.resources.getStringPlural(
+                        count = message.count,
+                        singular = LR.string.bookmarks_deleted_singular,
+                        plural = LR.string.bookmarks_deleted_plural,
+                    )
+
                     is BookmarkMessage.PlayingBookmark -> context.getString(LR.string.playing_bookmark, message.bookmarkTitle)
                 }
                 Toast.makeText(context, string, Toast.LENGTH_SHORT).show()

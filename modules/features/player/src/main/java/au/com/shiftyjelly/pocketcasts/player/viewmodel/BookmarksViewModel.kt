@@ -309,11 +309,20 @@ class BookmarksViewModel
     }
 
     suspend fun getSharedBookmark(): Triple<Podcast, PodcastEpisode, Bookmark>? {
-        return (_uiState.value as? UiState.Loaded)?.let {
-            val bookmark = it.bookmarks.firstOrNull { bookmark -> multiSelectHelper.isSelected(bookmark) } ?: return null
-            val podcast = podcastManager.findPodcastByUuid(bookmark.podcastUuid) ?: return null
-            val episode = episodeManager.findEpisodeByUuid(bookmark.episodeUuid) as? PodcastEpisode ?: return null
-            Triple(podcast, episode, bookmark)
+        val loaded = _uiState.value as? UiState.Loaded ?: return null
+        val bookmark = loaded.bookmarks.firstOrNull(multiSelectHelper::isSelected) ?: return null
+        return getSharedBookmark(bookmark)
+    }
+
+    suspend fun getSharedBookmark(bookmark: Bookmark): Triple<Podcast, PodcastEpisode, Bookmark>? {
+        val podcast = podcastManager.findPodcastByUuid(bookmark.podcastUuid) ?: return null
+        val episode = episodeManager.findEpisodeByUuid(bookmark.episodeUuid) as? PodcastEpisode ?: return null
+        return Triple(podcast, episode, bookmark)
+    }
+
+    fun onBookmarksDeleted(count: Int) {
+        viewModelScope.launch {
+            _message.emit(BookmarkMessage.BookmarksDeleted(count))
         }
     }
 
@@ -491,6 +500,7 @@ class BookmarksViewModel
 
     sealed class BookmarkMessage {
         data object BookmarkEpisodeNotFound : BookmarkMessage()
+        data class BookmarksDeleted(val count: Int) : BookmarkMessage()
         data class PlayingBookmark(val bookmarkTitle: String) : BookmarkMessage()
     }
 

@@ -535,11 +535,14 @@ class PodcastViewModel @Inject constructor(
     suspend fun resolveEpisode(bookmark: Bookmark): BaseEpisode? = bookmarkEpisodeResolver.resolve(bookmark)
 
     suspend fun getSharedBookmark(): Triple<Podcast, PodcastEpisode, Bookmark>? {
-        return multiSelectBookmarksHelper.selectedListLive.value?.firstOrNull()?.let { bookmark ->
-            val podcast = podcastManager.findPodcastByUuid(bookmark.podcastUuid) ?: return null
-            val episode = episodeManager.findEpisodeByUuid(bookmark.episodeUuid) as? PodcastEpisode ?: return null
-            Triple(podcast, episode, bookmark)
-        }
+        val bookmark = multiSelectBookmarksHelper.selectedListLive.value?.firstOrNull() ?: return null
+        return getSharedBookmark(bookmark)
+    }
+
+    suspend fun getSharedBookmark(bookmark: Bookmark): Triple<Podcast, PodcastEpisode, Bookmark>? {
+        val podcast = podcastManager.findPodcastByUuid(bookmark.podcastUuid) ?: return null
+        val episode = episodeManager.findEpisodeByUuid(bookmark.episodeUuid) as? PodcastEpisode ?: return null
+        return Triple(podcast, episode, bookmark)
     }
 
     suspend fun createBookmarkArguments(): BookmarkArguments? {
