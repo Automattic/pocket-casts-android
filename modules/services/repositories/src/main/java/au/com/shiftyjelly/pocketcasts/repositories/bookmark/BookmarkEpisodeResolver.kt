@@ -6,7 +6,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import javax.inject.Inject
 import kotlin.coroutines.cancellation.CancellationException
-import kotlinx.coroutines.rx2.await
 
 class BookmarkEpisodeResolver @Inject constructor(
     private val episodeManager: EpisodeManager,
@@ -21,7 +20,7 @@ class BookmarkEpisodeResolver @Inject constructor(
         episodeManager.findEpisodeByUuid(episodeUuid)?.let { return it }
         return try {
             // Adding a podcast that wasn't local yet also inserts its feed episodes.
-            val podcast = podcastManager.findOrDownloadPodcastRxSingle(podcastUuid).await()
+            val podcast = podcastManager.findOrDownloadPodcast(podcastUuid)
             val localEpisode = episodeManager.findEpisodeByUuid(episodeUuid)
             if (localEpisode == null && !podcast.isSubscribed) {
                 episodeManager.downloadMissingPodcastEpisode(episodeUuid, podcastUuid)
