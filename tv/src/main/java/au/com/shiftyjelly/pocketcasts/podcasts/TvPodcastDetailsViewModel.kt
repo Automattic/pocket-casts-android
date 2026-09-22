@@ -52,7 +52,6 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlow
-import kotlinx.coroutines.rx2.await
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel(assistedFactory = TvPodcastDetailsViewModel.Factory::class)
@@ -78,7 +77,7 @@ class TvPodcastDetailsViewModel @AssistedInject constructor(
 
     val uiState: StateFlow<TvPodcastDetailsUiState> = flow {
         val podcast = try {
-            podcastManager.findOrDownloadPodcastRxSingle(podcastUuid, waitForSubscribe = false).await()
+            podcastManager.findOrDownloadPodcast(podcastUuid, waitForSubscribe = false)
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
