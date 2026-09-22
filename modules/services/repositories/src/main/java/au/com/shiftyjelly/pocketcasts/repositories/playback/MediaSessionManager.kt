@@ -595,7 +595,6 @@ class MediaSessionManager(
         try {
             context.startService(Intent().setComponent(component))
         } catch (e: Exception) {
-            // Android rejects a background startService, so playback is about to run with no service at all.
             LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Failed to start ${component.className}: $e")
             errorReporter.trackServiceStartFailed(
                 service = if (component.className == LegacyPlaybackService::class.java.name) {

@@ -109,7 +109,6 @@ open class PlaybackService :
             }
         } catch (e: Exception) {
             LogBuffer.e(LogBuffer.TAG_PLAYBACK, "onUpdateNotification failed: $e")
-            // A plain notification update never promotes the service, so a failure there is not what we track here.
             if (startInForegroundRequired) {
                 errorReporter.trackForegroundStartFailed(
                     service = PlaybackServiceType.Media3,

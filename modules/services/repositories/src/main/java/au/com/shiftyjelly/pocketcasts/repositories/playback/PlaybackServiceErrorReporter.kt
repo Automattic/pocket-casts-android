@@ -12,7 +12,6 @@ import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 import javax.inject.Singleton
 
-// Reports the two ways playback runs with no foreground service: the service failing to start, or to reach foreground.
 @Singleton
 class PlaybackServiceErrorReporter @Inject constructor(
     private val eventHorizon: EventHorizon,
@@ -20,7 +19,6 @@ class PlaybackServiceErrorReporter @Inject constructor(
 ) {
     private val foregroundFailureCount = AtomicInteger()
 
-    // Call when playback starts and whenever the service reaches the foreground, so occurrence counts from 1 again.
     fun resetFailureCount() {
         foregroundFailureCount.set(0)
     }
