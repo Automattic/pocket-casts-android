@@ -349,13 +349,26 @@ class Media3SessionCallbackTest {
     }
 
     @Test
-    fun `KEYCODE_MEDIA_PAUSE calls pauseSuspend`() = runTest {
+    fun `KEYCODE_MEDIA_PAUSE calls pauseSuspend when playing`() = runTest {
+        whenever(playbackManager.isPlaying()).thenReturn(true)
         sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_PAUSE)
         testScope.advanceUntilIdle()
 
         verify(playbackManager).pauseSuspend(
             transientLoss = any(),
             sourceView = any(),
+        )
+    }
+
+    @Test
+    fun `KEYCODE_MEDIA_PAUSE calls playQueueSuspend when already paused`() = runTest {
+        whenever(playbackManager.isPlaying()).thenReturn(false)
+        sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_PAUSE)
+        testScope.advanceUntilIdle()
+
+        verify(playbackManager).playQueueSuspend(
+            sourceView = any(),
+            showedStreamWarning = any(),
         )
     }
 
