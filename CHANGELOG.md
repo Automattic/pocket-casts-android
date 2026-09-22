@@ -16,6 +16,9 @@
         ([#5632](https://github.com/Automattic/pocket-casts-android/pull/5632))
     *   Show a single launcher icon after choosing a custom app icon
         ([#5609](https://github.com/Automattic/pocket-casts-android/pull/5609))
+    *   Resume immediately when a headphone or car play button is pressed, instead of waiting for the multi-tap
+        window, and stop wireless Android Auto from pausing playback
+        ([#5645](https://github.com/Automattic/pocket-casts-android/pull/5645))
 
 8.21
 -----
