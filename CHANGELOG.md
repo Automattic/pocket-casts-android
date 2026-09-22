@@ -16,6 +16,8 @@
         ([#5632](https://github.com/Automattic/pocket-casts-android/pull/5632))
     *   Show a single launcher icon after choosing a custom app icon
         ([#5609](https://github.com/Automattic/pocket-casts-android/pull/5609))
+    *   Enable the transcript button on the full-screen player without playing the episode or opening the details page
+        ([#6034](https://github.com/Automattic/pocket-casts-android/pull/6034))
 
 8.21
 -----
