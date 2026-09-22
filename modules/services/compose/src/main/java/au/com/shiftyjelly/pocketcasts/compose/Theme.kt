@@ -9,6 +9,9 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.isSpecified
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 
@@ -71,23 +74,31 @@ fun AutomotiveTheme(content: @Composable () -> Unit) {
         MaterialTheme(
             colors = buildMaterialColors(colors = theme.colors, isLight = theme.isLight),
             typography = typography.copy(
-                h1 = typography.h1.copy(fontSize = 144.sp),
-                h2 = typography.h2.copy(fontSize = 90.sp),
-                h3 = typography.h3.copy(fontSize = 72.sp),
-                h4 = typography.h4.copy(fontSize = 51.sp),
-                h5 = typography.h5.copy(fontSize = 36.sp),
-                h6 = typography.h6.copy(fontSize = 30.sp),
-                body1 = typography.body1.copy(fontSize = 24.sp),
-                body2 = typography.body2.copy(fontSize = 21.sp),
-                subtitle1 = typography.subtitle1.copy(fontSize = 24.sp),
-                subtitle2 = typography.subtitle2.copy(fontSize = 21.sp),
-                button = typography.button.copy(fontSize = 21.sp),
-                caption = typography.caption.copy(fontSize = 18.sp),
-                overline = typography.overline.copy(fontSize = 15.sp),
+                h1 = typography.h1.scaledToFontSize(144.sp),
+                h2 = typography.h2.scaledToFontSize(90.sp),
+                h3 = typography.h3.scaledToFontSize(72.sp),
+                h4 = typography.h4.scaledToFontSize(51.sp),
+                h5 = typography.h5.scaledToFontSize(36.sp),
+                h6 = typography.h6.scaledToFontSize(30.sp),
+                body1 = typography.body1.scaledToFontSize(24.sp),
+                body2 = typography.body2.scaledToFontSize(21.sp),
+                subtitle1 = typography.subtitle1.scaledToFontSize(24.sp),
+                subtitle2 = typography.subtitle2.scaledToFontSize(21.sp),
+                button = typography.button.scaledToFontSize(21.sp),
+                caption = typography.caption.scaledToFontSize(18.sp),
+                overline = typography.overline.scaledToFontSize(15.sp),
             ),
             content = content,
         )
     }
+}
+
+private fun TextStyle.scaledToFontSize(fontSize: TextUnit): TextStyle {
+    val scale = fontSize.value / this.fontSize.value
+    return copy(
+        fontSize = fontSize,
+        lineHeight = if (lineHeight.isSpecified) lineHeight * scale else lineHeight,
+    )
 }
 
 data class PocketCastsTheme(
