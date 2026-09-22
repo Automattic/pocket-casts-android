@@ -5,7 +5,7 @@ import com.squareup.moshi.JsonClass
 import java.util.Date
 
 @JsonClass(generateAdapter = true)
-internal data class WhatsNewCatalogResponse(
+data class WhatsNewCatalogResponse(
     val schemaVersion: Int = 0,
     val generatedAt: Date? = null,
     val platform: String? = null,
@@ -22,7 +22,7 @@ internal data class WhatsNewCatalogResponse(
 }
 
 @JsonClass(generateAdapter = true)
-internal data class WhatsNewMessageResponse(
+data class WhatsNewMessageResponse(
     val id: String? = null,
     val type: String? = null,
     val publishedAt: Date? = null,
@@ -67,7 +67,7 @@ internal data class WhatsNewMessageResponse(
 }
 
 @JsonClass(generateAdapter = true)
-internal data class WhatsNewTargetingResponse(
+data class WhatsNewTargetingResponse(
     val audiences: LossyList<String> = LossyList(),
     val minimumAppVersion: String? = null,
 ) {
@@ -78,7 +78,7 @@ internal data class WhatsNewTargetingResponse(
 }
 
 @JsonClass(generateAdapter = true)
-internal data class WhatsNewPageResponse(
+data class WhatsNewPageResponse(
     val image: WhatsNewImageResponse? = null,
     val heading: String? = null,
     val description: String? = null,
@@ -95,7 +95,7 @@ internal data class WhatsNewPageResponse(
 }
 
 @JsonClass(generateAdapter = true)
-internal data class WhatsNewImageResponse(
+data class WhatsNewImageResponse(
     val url: String? = null,
     val width: Int? = null,
     val height: Int? = null,
@@ -108,7 +108,7 @@ internal data class WhatsNewImageResponse(
 }
 
 @JsonClass(generateAdapter = true)
-internal data class WhatsNewActionResponse(
+data class WhatsNewActionResponse(
     val event: String? = null,
     val label: String? = null,
 ) {
@@ -120,7 +120,7 @@ internal data class WhatsNewActionResponse(
 }
 
 @JsonClass(generateAdapter = true)
-internal data class WhatsNewPollResponse(
+data class WhatsNewPollResponse(
     val pollId: String? = null,
     val pollKey: String? = null,
     val question: String? = null,
@@ -137,7 +137,7 @@ internal data class WhatsNewPollResponse(
 }
 
 @JsonClass(generateAdapter = true)
-internal data class WhatsNewPollOptionResponse(
+data class WhatsNewPollOptionResponse(
     val id: String? = null,
     val pollOptionKey: String? = null,
     val label: String? = null,
