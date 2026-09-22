@@ -29,6 +29,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.shownotes.ShowNotesManager
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
+import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
@@ -38,6 +39,7 @@ import com.automattic.eventhorizon.EventHorizon
 import java.time.Instant
 import java.util.Date
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -52,6 +54,7 @@ import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -460,6 +463,25 @@ class ShelfSharedViewModelTest {
         shelfSharedViewModel.setOverflowMenuOpen(true)
 
         verify(showNotesManager).loadShowNotes(podcastUuid = "podcastUuid", episodeUuid = "episodeUuid")
+    }
+
+    @Test
+    fun `given show notes loading from overflow menu, when overflow menu closed, then load is not cancelled`() = runTest {
+        initViewModel(currentEpisode = transcriptEpisode, shelfItems = transcriptInOverflowItems)
+        val response = CompletableDeferred<Unit>()
+        var isLoadCompleted = false
+        whenever(showNotesManager.loadShowNotes(any(), any())).doSuspendableAnswer {
+            response.await()
+            isLoadCompleted = true
+            ShowNotesState.NotFound
+        }
+
+        shelfSharedViewModel.setPlayerOpen(true)
+        shelfSharedViewModel.setOverflowMenuOpen(true)
+        shelfSharedViewModel.setOverflowMenuOpen(false)
+        response.complete(Unit)
+
+        assertTrue(isLoadCompleted)
     }
 
     @Test

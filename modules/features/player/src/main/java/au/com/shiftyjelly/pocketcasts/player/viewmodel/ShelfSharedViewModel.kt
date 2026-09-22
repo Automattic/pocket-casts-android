@@ -42,7 +42,6 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.distinctUntilChangedBy
@@ -154,9 +153,9 @@ class ShelfSharedViewModel @Inject constructor(
                     }
                 }
                 .distinctUntilChangedBy { it?.uuid }
-                .collectLatest { episode ->
-                    if (episode == null) return@collectLatest
-                    if (transcriptManager.observeIsTranscriptAvailable(episode.uuid).first()) return@collectLatest
+                .collect { episode ->
+                    if (episode == null) return@collect
+                    if (transcriptManager.observeIsTranscriptAvailable(episode.uuid).first()) return@collect
                     showNotesManager.loadShowNotes(podcastUuid = episode.podcastUuid, episodeUuid = episode.uuid)
                 }
         }
