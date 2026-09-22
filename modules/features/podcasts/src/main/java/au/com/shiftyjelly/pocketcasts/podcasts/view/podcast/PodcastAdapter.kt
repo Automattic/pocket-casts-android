@@ -140,6 +140,8 @@ class PodcastAdapter(
     private val onBookmarkPlayClicked: (Bookmark) -> Unit,
     private val onBookmarkClick: (Bookmark, BaseEpisode) -> Unit,
     private val onBookmarkArtworkClick: (Bookmark) -> Unit,
+    private val onBookmarkSwipeShare: (Bookmark, settleRow: () -> Unit) -> Unit,
+    private val onBookmarkSwipeDelete: (Bookmark, settleRow: () -> Unit) -> Unit,
     private val onHeadsetSettingsClicked: () -> Unit,
     private val onGetBookmarksClicked: () -> Unit,
     private val onChangeHeaderExpanded: (String, Boolean) -> Unit,
@@ -182,6 +184,8 @@ class PodcastAdapter(
         val onBookmarkRowLongPress: (Bookmark) -> Unit,
         val onBookmarkRowClick: (Bookmark, Int) -> Unit,
         val onBookmarkArtworkClick: () -> Unit,
+        val onBookmarkSwipeShare: (Bookmark, settleRow: () -> Unit) -> Unit,
+        val onBookmarkSwipeDelete: (Bookmark, settleRow: () -> Unit) -> Unit,
         val isMultiSelecting: () -> Boolean,
         val isSelected: (Bookmark) -> Boolean,
     )
@@ -625,6 +629,8 @@ class PodcastAdapter(
                                     }
                                 },
                                 onBookmarkArtworkClick = { onBookmarkArtworkClick(bookmark) },
+                                onBookmarkSwipeShare = onBookmarkSwipeShare,
+                                onBookmarkSwipeDelete = onBookmarkSwipeDelete,
                                 isMultiSelecting = { multiSelectBookmarksHelper.isMultiSelecting },
                                 isSelected = { selectedBookmark ->
                                     multiSelectBookmarksHelper.isSelected(
