@@ -115,6 +115,15 @@ class AppIconTest {
         assertEquals(1, states.values.count { it == PackageManager.COMPONENT_ENABLED_STATE_ENABLED })
     }
 
+    @Test
+    @Config(sdk = [33])
+    fun `selecting the alias that is already enabled does not touch the package manager again`() {
+        appIcon.enableSelectedAlias(AppIconType.DARK)
+        appIcon.enableSelectedAlias(AppIconType.DARK)
+
+        verify(packageManager, times(1)).setComponentEnabledSettings(any())
+    }
+
     private companion object {
         const val PACKAGE_NAME = "au.com.shiftyjelly.pocketcasts.debug"
         const val DEFAULT_ALIAS = "au.com.shiftyjelly.pocketcasts.ui.MainActivityDefault"
