@@ -114,8 +114,9 @@ class ShelfSharedViewModel @Inject constructor(
         settings.showSmartBookmarksTooltip.flow,
         playerOpenState,
         settings.smartBookmarksTooltipDismissed.flow,
-    ) { showTooltip, isPlayerOpen, isDismissed ->
-        showTooltip && isPlayerOpen && !isDismissed && FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS)
+        FeatureFlag.isEnabledFlow(Feature.SMART_BOOKMARKS),
+    ) { showTooltip, isPlayerOpen, isDismissed, isSmartBookmarksEnabled ->
+        showTooltip && isPlayerOpen && !isDismissed && isSmartBookmarksEnabled
     }
 
     val uiState = combine(
