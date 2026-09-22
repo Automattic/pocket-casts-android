@@ -14,10 +14,14 @@
         ([#6005](https://github.com/Automattic/pocket-casts-android/pull/6005))
     *   Confirm playlist removals and mixed changes after adding episodes to playlists, not only additions
         ([#5632](https://github.com/Automattic/pocket-casts-android/pull/5632))
+    *   Fix Profile tab refresh button from being hidden behind the bottom nav after a cold start
+        ([#6033](https://github.com/Automattic/pocket-casts-android/pull/6033))
     *   Show a single launcher icon after choosing a custom app icon
         ([#5609](https://github.com/Automattic/pocket-casts-android/pull/5609))
     *   Enable the transcript button on the full-screen player without playing the episode or opening the details page
         ([#6034](https://github.com/Automattic/pocket-casts-android/pull/6034))
+    *   Stay in Pocket Casts after changing the app icon instead of closing to the home screen
+        ([#6017](https://github.com/Automattic/pocket-casts-android/pull/6017))
 
 8.21
 -----

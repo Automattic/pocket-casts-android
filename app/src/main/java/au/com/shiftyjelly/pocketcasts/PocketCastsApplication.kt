@@ -4,6 +4,8 @@ import android.app.Application
 import android.os.Environment
 import android.os.StrictMode
 import androidx.hilt.work.HiltWorkerFactory
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.work.Configuration
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsController
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentProvider
@@ -16,6 +18,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.appreview.AppReviewExceptionHandler
 import au.com.shiftyjelly.pocketcasts.repositories.appreview.AppReviewManager
+import au.com.shiftyjelly.pocketcasts.repositories.di.ProcessLifecycle
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadStatusObserver
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearSync
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
@@ -103,6 +106,9 @@ class PocketCastsApplication :
     @Inject lateinit var userEpisodeManager: UserEpisodeManager
 
     @Inject lateinit var appIcon: AppIcon
+
+    @Inject @ProcessLifecycle
+    lateinit var processLifecycleOwner: LifecycleOwner
 
     @Inject lateinit var coilImageLoader: ImageLoader
 
@@ -204,6 +210,16 @@ class PocketCastsApplication :
             .setJobSchedulerJobIdRange(1000, 20000)
             .build()
 
+    private fun applySelectedAppIconWhenBackgrounded() {
+        processLifecycleOwner.lifecycle.addObserver(
+            object : DefaultLifecycleObserver {
+                override fun onStop(owner: LifecycleOwner) {
+                    appIcon.enableSelectedAlias(appIcon.activeAppIcon)
+                }
+            },
+        )
+    }
+
     private fun setupApp() {
         LogBuffer.i("Application", "App started. ${settings.getVersion()} (${settings.getVersionCode()})")
 
@@ -218,7 +234,7 @@ class PocketCastsApplication :
         }
 
         runBlocking {
-            appIcon.enableSelectedAlias(appIcon.activeAppIcon)
+            applySelectedAppIconWhenBackgrounded()
 
             notificationHelper.setupNotificationChannels()
             notificationManager.setupOnboardingNotifications()
