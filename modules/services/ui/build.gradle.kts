@@ -46,8 +46,11 @@ dependencies {
     implementation(projects.modules.services.localization)
     implementation(projects.modules.services.utils)
 
+    testImplementation(libs.androidx.test.core)
+    testImplementation(libs.coroutines.test)
     testImplementation(libs.junit)
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.kotlin)
     testImplementation(libs.robolectric)
+    testImplementation(libs.work.test)
 }

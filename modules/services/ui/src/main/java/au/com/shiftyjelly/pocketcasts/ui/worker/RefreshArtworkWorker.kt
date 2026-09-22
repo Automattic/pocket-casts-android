@@ -4,20 +4,24 @@ import android.content.Context
 import androidx.hilt.work.HiltWorker
 import androidx.work.Constraints
 import androidx.work.CoroutineWorker
+import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.colors.ColorManager
-import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
+import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.images.CoilManager
-import coil3.imageLoader
+import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import coil3.request.CachePolicy
+import coil3.request.ErrorResult
+import coil3.request.ImageRequest
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -33,35 +37,62 @@ class RefreshArtworkWorker @AssistedInject constructor(
 ) : CoroutineWorker(context, params) {
 
     companion object {
+        private const val WORK_NAME = "RefreshArtworkWorker"
+
         fun start(context: Context) {
             val workRequest = OneTimeWorkRequestBuilder<RefreshArtworkWorker>()
                 .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
                 .build()
-            WorkManager.getInstance(context).enqueue(workRequest)
+            WorkManager.getInstance(context).enqueueUniqueWork(
+                WORK_NAME,
+                ExistingWorkPolicy.KEEP,
+                workRequest,
+            )
         }
     }
 
     override suspend fun doWork(): Result {
+        var successful = 0
+        var failed = 0
         withContext(Dispatchers.IO) {
-            coilManager.clearAll()
             val podcasts = podcastManager.findSubscribedNoOrder()
-            colorManager.updateColors(podcasts)
-            val imageRequestFactory = PocketCastsImageRequestFactory(applicationContext).themed()
+            val isWearOs = Util.isWearOs(applicationContext)
             for (podcast in podcasts) {
-                try {
-                    val request = imageRequestFactory.create(podcast)
-                        .newBuilder()
-                        .memoryCachePolicy(CachePolicy.DISABLED)
-                        .build()
-                    applicationContext.imageLoader.execute(request)
-                } catch (e: Exception) {
-                    Timber.e(e)
+                for (url in PodcastImage.getArtworkUrls(uuid = podcast.uuid, isWearOS = isWearOs)) {
+                    try {
+                        val request = ImageRequest.Builder(applicationContext)
+                            .data(url)
+                            // The original bytes are still cached; only the discarded decode is sampled.
+                            .size(1, 1)
+                            .memoryCachePolicy(CachePolicy.DISABLED)
+                            // Replaces the cached copy only once the new one arrives.
+                            .diskCachePolicy(CachePolicy.WRITE_ONLY)
+                            .build()
+                        val result = coilManager.imageLoader.execute(request)
+                        if (result is ErrorResult) {
+                            failed++
+                            Timber.i("Could not refresh podcast artwork from $url. ${result.throwable.message}")
+                        } else {
+                            successful++
+                        }
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: Exception) {
+                        failed++
+                        Timber.e(e, "Could not refresh podcast artwork from $url")
+                    }
                 }
             }
+            // Cleared last so live screens cannot repopulate it from the entries being replaced.
+            coilManager.clearMemoryCache()
+            colorManager.updateColors(podcasts)
         }
 
-        Timber.i("Successfully refreshed the podcasts artwork.")
-
+        // Nothing is lost when a request fails, so there is nothing to retry; the user can refresh again.
+        LogBuffer.i(
+            LogBuffer.TAG_BACKGROUND_TASKS,
+            "Artwork refresh: $successful image requests succeeded ($failed failed).",
+        )
         return Result.success()
     }
 }

@@ -2,7 +2,11 @@ package au.com.shiftyjelly.pocketcasts.ui.di
 
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.servers.di.Artwork
+import au.com.shiftyjelly.pocketcasts.ui.images.ArtworkCacheStrategy
+import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
+import au.com.shiftyjelly.pocketcasts.utils.Util
 import coil3.ImageLoader
+import coil3.annotation.ExperimentalCoilApi
 import coil3.disk.DiskCache
 import coil3.disk.directory
 import coil3.network.okhttp.OkHttpNetworkFetcherFactory
@@ -20,6 +24,7 @@ import okhttp3.OkHttpClient
 @InstallIn(SingletonComponent::class)
 class UiModule {
 
+    @OptIn(ExperimentalCoilApi::class)
     @Provides
     @Singleton
     internal fun provideCoilImageLoader(
@@ -32,14 +37,27 @@ class UiModule {
                 add(
                     OkHttpNetworkFetcherFactory(
                         callFactory = { httpClient.get() },
+                        cacheStrategy = { ArtworkCacheStrategy() },
                     ),
                 )
             }
             .diskCache {
                 DiskCache.Builder()
                     .directory(context.cacheDir.resolve("ImageCache"))
+                    .apply {
+                        // Coil's default floor of 10MB holds only a handful of covers.
+                        if (Util.getAppPlatform(context) == AppPlatform.Phone) {
+                            maxSizePercent(ARTWORK_DISK_CACHE_FREE_SPACE_PERCENT)
+                            minimumMaxSizeBytes(ARTWORK_DISK_CACHE_MINIMUM_BYTES)
+                        }
+                    }
                     .build()
             }
             .build()
+    }
+
+    private companion object {
+        const val ARTWORK_DISK_CACHE_FREE_SPACE_PERCENT = 0.05
+        const val ARTWORK_DISK_CACHE_MINIMUM_BYTES = 64L * 1024 * 1024
     }
 }
