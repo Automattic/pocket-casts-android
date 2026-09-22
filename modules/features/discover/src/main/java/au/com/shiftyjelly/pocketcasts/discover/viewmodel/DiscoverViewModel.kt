@@ -51,7 +51,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlowable
-import kotlinx.coroutines.rx2.await
 import kotlinx.coroutines.rx2.rxMaybe
 import kotlinx.coroutines.rx2.rxSingle
 import kotlinx.coroutines.withContext
@@ -323,7 +322,7 @@ class DiscoverViewModel @Inject constructor(
         viewModelScope.launch {
             val episode = try {
                 withContext(Dispatchers.IO) {
-                    podcastManager.findOrDownloadPodcastRxSingle(discoverEpisode.podcast_uuid).await()
+                    podcastManager.findOrDownloadPodcast(discoverEpisode.podcast_uuid)
                     episodeManager.findByUuid(discoverEpisode.uuid)
                 }
             } catch (e: CancellationException) {
