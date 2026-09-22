@@ -14,8 +14,12 @@
         ([#6005](https://github.com/Automattic/pocket-casts-android/pull/6005))
     *   Confirm playlist removals and mixed changes after adding episodes to playlists, not only additions
         ([#5632](https://github.com/Automattic/pocket-casts-android/pull/5632))
+    *   Fix Profile tab refresh button from being hidden behind the bottom nav after a cold start
+        ([#6033](https://github.com/Automattic/pocket-casts-android/pull/6033))
     *   Show a single launcher icon after choosing a custom app icon
         ([#5609](https://github.com/Automattic/pocket-casts-android/pull/5609))
+    *   Stay in Pocket Casts after changing the app icon instead of closing to the home screen
+        ([#6017](https://github.com/Automattic/pocket-casts-android/pull/6017))
     *   Resume immediately when a headphone or car play button is pressed, instead of waiting for the multi-tap
         window, and stop wireless Android Auto from pausing playback
         ([#5645](https://github.com/Automattic/pocket-casts-android/pull/5645))

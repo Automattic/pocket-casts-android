@@ -511,11 +511,16 @@ class MainActivity :
             binding.bottomContainer.updatePadding(bottom = insets.bottom)
             windowInsets
         }
-        binding.bottomContainer.addOnLayoutChangeListener { view, _, _, _, _, _, _, _, _ ->
-            binding.mainFragment.updatePadding(bottom = view.height)
+        binding.bottomContainer.addOnLayoutChangeListener { view, _, top, _, bottom, _, oldTop, _, oldBottom ->
+            if (bottom - top == oldBottom - oldTop) return@addOnLayoutChangeListener
+            view.post {
+                // Add padding to the page so the bottom navigation doesn't cover it
+                binding.mainFragment.updatePadding(bottom = view.height)
 
-            BottomSheetBehavior.from(binding.playerBottomSheet).apply {
-                peekHeight = miniPlayerHeight + view.height
+                // Peek the full-screen player so the mini player sits above the bottom navigation
+                BottomSheetBehavior.from(binding.playerBottomSheet).apply {
+                    peekHeight = miniPlayerHeight + view.height
+                }
             }
         }
 

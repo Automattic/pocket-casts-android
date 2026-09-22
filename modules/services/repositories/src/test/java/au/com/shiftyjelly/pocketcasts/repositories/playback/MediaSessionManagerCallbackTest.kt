@@ -143,6 +143,7 @@ class MediaSessionManagerCallbackTest {
         settings = settings,
         context = RuntimeEnvironment.getApplication(),
         eventHorizon = mock<EventHorizon>(),
+        errorReporter = mock<PlaybackServiceErrorReporter>(),
         bookmarkManager = mock<BookmarkManager>(),
         browseTreeProvider = mock<BrowseTreeProvider>(),
         applicationScope = scope,

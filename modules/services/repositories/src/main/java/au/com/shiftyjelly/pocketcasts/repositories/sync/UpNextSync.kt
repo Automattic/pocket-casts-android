@@ -34,7 +34,6 @@ import com.pocketcasts.service.api.upNextEpisodeRequest
 import com.pocketcasts.service.api.upNextSyncRequest
 import java.util.Date
 import javax.inject.Inject
-import kotlinx.coroutines.rx2.await
 import kotlinx.coroutines.rx2.awaitSingleOrNull
 import retrofit2.HttpException
 import com.pocketcasts.service.api.UpNextSyncRequest as UpNextProtobufSyncRequest
@@ -296,7 +295,7 @@ class UpNextSync @Inject constructor(
         // remove user episodes
         val filteredUuids = podcastUuids.filter { it != Podcast.userPodcast.uuid }
         filteredUuids.forEach { podcastUuid ->
-            podcastManager.findOrDownloadPodcastRxSingle(podcastUuid).await()
+            podcastManager.findOrDownloadPodcast(podcastUuid)
         }
     }
 

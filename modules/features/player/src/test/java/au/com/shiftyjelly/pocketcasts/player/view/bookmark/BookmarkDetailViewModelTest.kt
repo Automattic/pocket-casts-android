@@ -1,5 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.player.view.bookmark
 
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -18,6 +20,15 @@ import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import com.automattic.eventhorizon.BookmarkDeleteFormDismissedEvent
+import com.automattic.eventhorizon.BookmarkDeleteFormShownEvent
+import com.automattic.eventhorizon.BookmarkDeleteFormSubmittedEvent
+import com.automattic.eventhorizon.BookmarkDeletedEvent
+import com.automattic.eventhorizon.BookmarkDetailsShownEvent
+import com.automattic.eventhorizon.BookmarkPlayTappedEvent
+import com.automattic.eventhorizon.BookmarkShareTappedEvent
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.SourceViewType
 import io.reactivex.Single
 import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -52,7 +63,8 @@ class BookmarkDetailViewModelTest {
     private val transcriptManager = mock<TranscriptManager>()
     private val showNotesManager = mock<ShowNotesManager>()
     private val settings = mock<Settings>()
-    private val viewModel = BookmarkDetailViewModel(bookmarkManager, episodeManager, podcastCacheServiceManager, transcriptManager, showNotesManager, settings)
+    private val eventSink = TestEventSink()
+    private val viewModel = BookmarkDetailViewModel(bookmarkManager, episodeManager, podcastCacheServiceManager, transcriptManager, showNotesManager, settings, EventHorizon(eventSink))
 
     private val bookmarkUuid = "bookmark-id"
     private val episodeUuid = "episode-id"
@@ -237,6 +249,7 @@ class BookmarkDetailViewModelTest {
             passageLocation = null,
             timeSecs = 0,
             referenceTime = null,
+            source = SourceView.PLAYER,
         )
 
         val state = viewModel.uiState.value
@@ -314,12 +327,60 @@ class BookmarkDetailViewModelTest {
         assertEquals(state.passage!!.start, state.referenceOffset)
     }
 
+    @Test
+    fun `tracks details shown on load`() = runTest {
+        load(passage = firstSentence, passageLocation = 0, source = SourceView.PROFILE)
+
+        val event = eventSink.pollEvent() as BookmarkDetailsShownEvent
+        assertEquals(SourceViewType.Profile, event.source)
+        assertEquals(true, event.hasPassage)
+        assertEquals(episodeUuid, event.episodeUuid)
+        assertEquals(podcastUuid, event.podcastUuid)
+    }
+
+    @Test
+    fun `tracks play and share tapped`() = runTest {
+        load(passage = null, passageLocation = null)
+        eventSink.skipEvent()
+
+        viewModel.onPlayTapped()
+        viewModel.onShareTapped()
+
+        assertTrue(eventSink.pollEvent() is BookmarkPlayTappedEvent)
+        assertTrue(eventSink.pollEvent() is BookmarkShareTappedEvent)
+    }
+
+    @Test
+    fun `tracks the delete flow and removes the bookmark`() = runTest {
+        load(passage = null, passageLocation = null)
+        eventSink.skipEvent()
+
+        viewModel.onDeleteFormShown()
+        viewModel.deleteBookmark()
+
+        assertTrue(eventSink.pollEvent() is BookmarkDeleteFormShownEvent)
+        assertTrue(eventSink.pollEvent() is BookmarkDeleteFormSubmittedEvent)
+        verifyBlocking(bookmarkManager) { deleteToSync(bookmarkUuid) }
+        assertTrue(eventSink.pollEvent() is BookmarkDeletedEvent)
+    }
+
+    @Test
+    fun `tracks delete form dismissed on cancel`() = runTest {
+        load(passage = null, passageLocation = null)
+        eventSink.skipEvent()
+
+        viewModel.onDeleteFormDismissed()
+
+        assertTrue(eventSink.pollEvent() is BookmarkDeleteFormDismissedEvent)
+    }
+
     private fun load(
         passage: String?,
         passageLocation: Int?,
         podcastTitle: String = "Podcast",
         timeSecs: Int = 0,
         referenceTime: Int? = null,
+        source: SourceView = SourceView.PLAYER,
     ) {
         viewModel.load(
             bookmarkUuid = bookmarkUuid,
@@ -331,6 +392,7 @@ class BookmarkDetailViewModelTest {
             passageLocation = passageLocation,
             timeSecs = timeSecs,
             referenceTime = referenceTime,
+            source = source,
         )
     }
 }
