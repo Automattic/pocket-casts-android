@@ -19,6 +19,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.shownotes.ShowNotesManager
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -43,9 +44,13 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.distinctUntilChangedBy
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
@@ -63,6 +68,7 @@ class ShelfSharedViewModel @Inject constructor(
     private val settings: Settings,
     private val userEpisodeManager: UserEpisodeManager,
     private val transcriptManager: TranscriptManager,
+    private val showNotesManager: ShowNotesManager,
     private val downloadQueue: DownloadQueue,
     @IoDispatcher ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
@@ -102,6 +108,7 @@ class ShelfSharedViewModel @Inject constructor(
     }
 
     private val playerOpenState = MutableStateFlow(false)
+    private val overflowMenuOpenState = MutableStateFlow(false)
 
     private val smartBookmarksPromoActiveFlow = combine(
         settings.showSmartBookmarksTooltip.flow,
@@ -125,6 +132,34 @@ class ShelfSharedViewModel @Inject constructor(
         SharingStarted.Lazily,
         UiState(),
     )
+
+    init {
+        loadMissingTranscriptsWhenPlayerOpen()
+    }
+
+    // Transcripts are only saved when show notes are processed, so load them once the Transcript button is visible
+    private fun loadMissingTranscriptsWhenPlayerOpen() {
+        viewModelScope.launch {
+            combine(playerOpenState, overflowMenuOpenState, ::Pair)
+                .flatMapLatest { (isPlayerOpen, isOverflowMenuOpen) ->
+                    if (!isPlayerOpen) {
+                        flowOf(null)
+                    } else {
+                        uiState.map { state ->
+                            val isTranscriptButtonVisible = (ShelfItem.Transcript in state.playerShelfItems) ||
+                                (isOverflowMenuOpen && ShelfItem.Transcript in state.playerBottomSheetShelfItems)
+                            (state.episode as? PodcastEpisode)?.takeIf { isTranscriptButtonVisible }
+                        }
+                    }
+                }
+                .distinctUntilChangedBy { it?.uuid }
+                .collect { episode ->
+                    if (episode == null) return@collect
+                    if (transcriptManager.observeIsTranscriptAvailable(episode.uuid).first()) return@collect
+                    showNotesManager.loadShowNotes(podcastUuid = episode.podcastUuid, episodeUuid = episode.uuid)
+                }
+        }
+    }
 
     private fun createUiState(
         shelfItems: List<ShelfItem>,
@@ -282,6 +317,10 @@ class ShelfSharedViewModel @Inject constructor(
 
     fun setPlayerOpen(isOpen: Boolean) {
         playerOpenState.value = isOpen
+    }
+
+    fun setOverflowMenuOpen(isOpen: Boolean) {
+        overflowMenuOpenState.value = isOpen
     }
 
     fun onAddBookmarkClick(
