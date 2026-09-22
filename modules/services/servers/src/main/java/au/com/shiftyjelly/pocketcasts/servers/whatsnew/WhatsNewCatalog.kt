@@ -70,7 +70,7 @@ data class WhatsNewImage(
     val height: Int?,
     val alt: String?,
 ) {
-    val aspectRatio = if (width != null && height != null && width > 0 && height > 0) {
+    val aspectRatio get() = if (width != null && height != null && width > 0 && height > 0) {
         width.toFloat() / height.toFloat()
     } else {
         null

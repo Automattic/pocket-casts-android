@@ -20,12 +20,14 @@ class LossyListAdapterFactory : JsonAdapter.Factory {
         if (annotations.isNotEmpty() || Types.getRawType(type) != LossyList::class.java) return null
 
         val elementType = (type as? ParameterizedType)?.actualTypeArguments?.singleOrNull() ?: return null
-        return LossyListAdapter(moshi.adapter<Any>(elementType))
+        val listType = Types.newParameterizedType(List::class.java, elementType)
+        return LossyListAdapter(moshi.adapter<Any>(elementType), moshi.adapter<List<Any>>(listType))
     }
 }
 
 private class LossyListAdapter<T>(
     private val elementAdapter: JsonAdapter<T>,
+    private val listAdapter: JsonAdapter<List<T>>,
 ) : JsonAdapter<LossyList<T>>() {
     override fun fromJson(reader: JsonReader): LossyList<T> {
         if (reader.peek() != JsonReader.Token.BEGIN_ARRAY) {
@@ -37,13 +39,15 @@ private class LossyListAdapter<T>(
         var droppedCount = 0
         reader.beginArray()
         while (reader.hasNext()) {
-            val value = reader.readJsonValue()
-            val element = try {
-                elementAdapter.fromJsonValue(value)
-            } catch (e: JsonDataException) {
-                Timber.w(e, "Dropping an entry that could not be decoded")
-                null
+            val element = reader.peekJson().use { peeked ->
+                try {
+                    elementAdapter.fromJson(peeked)
+                } catch (e: JsonDataException) {
+                    Timber.w(e, "Dropping an entry that could not be decoded")
+                    null
+                }
             }
+            reader.skipValue()
             if (element == null) droppedCount++ else values.add(element)
         }
         reader.endArray()
@@ -51,8 +55,6 @@ private class LossyListAdapter<T>(
     }
 
     override fun toJson(writer: JsonWriter, value: LossyList<T>?) {
-        writer.beginArray()
-        value?.values?.forEach { element -> elementAdapter.toJson(writer, element) }
-        writer.endArray()
+        listAdapter.toJson(writer, value?.values)
     }
 }

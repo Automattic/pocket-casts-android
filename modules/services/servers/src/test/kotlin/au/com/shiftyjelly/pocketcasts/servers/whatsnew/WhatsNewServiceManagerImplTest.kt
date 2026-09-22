@@ -4,11 +4,12 @@ import au.com.shiftyjelly.pocketcasts.servers.di.NetworkModule
 import java.net.HttpURLConnection.HTTP_FORBIDDEN
 import java.net.HttpURLConnection.HTTP_NOT_FOUND
 import java.util.Locale
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
+import org.junit.Assert.assertThrows
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -29,7 +30,7 @@ class WhatsNewServiceManagerImplTest {
         .build()
         .create<WhatsNewCatalogService>()
 
-    private var locale = Locale.US
+    private var locale = Locale.GERMAN
     private val serviceManager = WhatsNewServiceManagerImpl(service) { locale }
 
     @Test
@@ -38,7 +39,9 @@ class WhatsNewServiceManagerImplTest {
 
         val catalog = serviceManager.getCatalog()
 
-        assertEquals("/whats-new/v1/android/en.json", server.takeRequest().path)
+        val request = server.takeRequest()
+        assertEquals("/whats-new/v1/android/de.json", request.path)
+        assertEquals("no-cache", request.getHeader("Cache-Control"))
         assertEquals("Browse by network", catalog.messages.single().title)
     }
 
@@ -73,19 +76,20 @@ class WhatsNewServiceManagerImplTest {
         locale = Locale.FRENCH
         server.enqueue(MockResponse().setResponseCode(500))
 
-        assertTrue(catalogError() is HttpException)
+        assertThrows(HttpException::class.java) { fetchCatalog() }
         assertEquals(1, server.requestCount)
     }
 
     @Test
     fun `a missing english catalog is not asked for twice`() = runTest {
+        locale = Locale.ENGLISH
         server.enqueue(MockResponse().setResponseCode(HTTP_FORBIDDEN))
 
-        assertTrue(catalogError() is HttpException)
+        assertThrows(HttpException::class.java) { fetchCatalog() }
         assertEquals(1, server.requestCount)
     }
 
-    private suspend fun catalogError() = runCatching { serviceManager.getCatalog() }.exceptionOrNull()
+    private fun fetchCatalog() = runBlocking { serviceManager.getCatalog() }
 
     private fun catalogResponse() = MockResponse().setBody(
         """

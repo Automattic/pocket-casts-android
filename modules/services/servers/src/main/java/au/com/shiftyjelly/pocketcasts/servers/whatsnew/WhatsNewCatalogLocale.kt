@@ -7,10 +7,8 @@ object WhatsNewCatalogLocale {
 
     private val traditionalChineseCountries = setOf("tw", "hk", "mo")
 
-    private val legacyLanguageCodes = mapOf("iw" to "he", "in" to "id", "ji" to "yi")
-
     fun catalogName(locale: Locale): String {
-        val language = locale.language.lowercase().let { language -> legacyLanguageCodes[language] ?: language }
+        val language = locale.toLanguageTag().substringBefore('-').lowercase().takeUnless { it == "und" }.orEmpty()
         val country = locale.country.lowercase()
         val script = locale.script.lowercase()
 

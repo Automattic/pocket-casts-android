@@ -1,17 +1,21 @@
 package au.com.shiftyjelly.pocketcasts.servers.whatsnew
 
-import au.com.shiftyjelly.pocketcasts.servers.di.NetworkModule
+import au.com.shiftyjelly.pocketcasts.servers.adapters.LossyListAdapterFactory
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
 import java.time.Instant
+import java.util.Date
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 
-@RunWith(RobolectricTestRunner::class)
 class WhatsNewCatalogResponseTest {
-    private val adapter = NetworkModule().provideMoshi().adapter(WhatsNewCatalogResponse::class.java)
+    private val adapter = Moshi.Builder()
+        .add(Date::class.java, Rfc3339DateJsonAdapter().nullSafe())
+        .add(LossyListAdapterFactory())
+        .build()
+        .adapter(WhatsNewCatalogResponse::class.java)
 
     @Test
     fun `decodes the catalog the server publishes`() {
@@ -152,9 +156,18 @@ class WhatsNewCatalogResponseTest {
 
     @Test
     fun `a required field that says nothing drops the message`() {
-        val catalog = decode(catalogOf(message(title = "   ")))
+        val blankFields = listOf(
+            message(title = "   "),
+            """{ "id": " ", "type": "tip", "publishedAt": "2026-08-12T09:00:00Z", "targeting": {}, "title": "t", "pages": [{ "heading": "h", "description": "d" }] }""",
+            message(body = """"pages": [{ "heading": " ", "description": "d" }]"""),
+            message(body = """"pages": [{ "heading": "h", "description": " " }]"""),
+            message(type = "research", body = """"poll": { "pollId": " ", "pollKey": "k", "question": "q", "options": [{ "id": "o1", "pollOptionKey": "k", "label": "l" }] }"""),
+            message(type = "research", body = """"poll": { "pollId": "p1", "pollKey": "k", "question": "q", "options": [{ "id": " ", "pollOptionKey": "k", "label": "l" }] }"""),
+        )
 
-        assertTrue(catalog.messages.isEmpty())
+        blankFields.forEach { json ->
+            assertTrue(json, decode(catalogOf(json)).messages.isEmpty())
+        }
     }
 
     @Test
@@ -268,7 +281,7 @@ class WhatsNewCatalogResponseTest {
         val catalog = decode(
             catalogOf(
                 message(title = "Sort your Up Next"),
-                """{ "id": "m2", "type": "tip", "publishedAt": "not a date", "targeting": {}, "title": "Broken", "pages": [] }""",
+                """{ "id": "m2", "type": "tip", "publishedAt": "not a date", "targeting": {}, "title": "Broken", "pages": [{ "heading": "h", "description": "d" }] }""",
                 message(title = "Browse by network"),
             ),
         )
@@ -303,6 +316,29 @@ class WhatsNewCatalogResponseTest {
 
         val targeting = catalog.messages.single().targeting
         assertTrue(WhatsNewAudience.entries.none(targeting::targets))
+    }
+
+    @Test
+    fun `a timestamp the catalog itself cannot be read by does not cost it its messages`() {
+        val catalog = decode(
+            """{ "schemaVersion": null, "generatedAt": "2026-09-22 11:39:17", "messages": [${message(title = "Browse by network")}] }""",
+        )
+
+        assertNull(catalog.generatedAt)
+        assertEquals(listOf("Browse by network"), catalog.messages.map { it.title })
+    }
+
+    @Test
+    fun `a message that repeats a field keeps the last one it was sent`() {
+        val catalog = decode(
+            catalogOf(
+                """{ "id": "m1", "id": "m2", "type": "tip", "publishedAt": "2026-08-12T09:00:00Z", "targeting": {}, "title": "Repeated", "pages": [{ "heading": "h", "description": "d" }] }""",
+                message(title = "Browse by network"),
+            ),
+        )
+
+        assertEquals(listOf("Repeated", "Browse by network"), catalog.messages.map { it.title })
+        assertEquals("m2", catalog.messages.first().id)
     }
 
     @Test

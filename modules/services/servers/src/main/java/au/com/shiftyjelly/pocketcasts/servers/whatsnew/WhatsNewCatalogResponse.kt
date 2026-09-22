@@ -2,19 +2,22 @@ package au.com.shiftyjelly.pocketcasts.servers.whatsnew
 
 import au.com.shiftyjelly.pocketcasts.servers.adapters.LossyList
 import com.squareup.moshi.JsonClass
+import java.time.Instant
+import java.time.format.DateTimeParseException
 import java.util.Date
+import timber.log.Timber
 
 @JsonClass(generateAdapter = true)
 data class WhatsNewCatalogResponse(
-    val schemaVersion: Int = 0,
-    val generatedAt: Date? = null,
+    val schemaVersion: Int? = null,
+    val generatedAt: String? = null,
     val platform: String? = null,
     val locale: String? = null,
     val messages: LossyList<WhatsNewMessageResponse> = LossyList(),
 ) {
     fun toCatalog() = WhatsNewCatalog(
-        schemaVersion = schemaVersion,
-        generatedAt = generatedAt?.toInstant(),
+        schemaVersion = schemaVersion ?: 0,
+        generatedAt = generatedAt?.let(::parseInstantOrNull),
         platform = platform,
         locale = locale,
         messages = messages.values.mapNotNull(WhatsNewMessageResponse::toMessage),
@@ -57,7 +60,11 @@ data class WhatsNewMessageResponse(
             WhatsNewContent.Research(WhatsNewResearch(description = description.nonBlank(), poll = poll))
         }
 
-        else -> pages?.toPages()?.let(WhatsNewContent::Pages)
+        WhatsNewMessageType.NewFeature,
+        WhatsNewMessageType.Tip,
+        WhatsNewMessageType.Announcement,
+        WhatsNewMessageType.KnownIssue,
+        -> pages?.toPages()?.let(WhatsNewContent::Pages)
     }
 
     private fun List<WhatsNewPageResponse>.toPages(): List<WhatsNewPage>? {
@@ -125,13 +132,13 @@ data class WhatsNewPollResponse(
     val pollId: String? = null,
     val pollKey: String? = null,
     val question: String? = null,
-    val options: List<WhatsNewPollOptionResponse> = emptyList(),
+    val options: List<WhatsNewPollOptionResponse>? = null,
 ) {
     fun toPoll(): WhatsNewPoll? {
         val pollId = pollId.nonBlank() ?: return null
         val pollKey = pollKey.nonBlank() ?: return null
         val question = question.nonBlank() ?: return null
-        val options = options.map { option -> option.toOption() ?: return null }.ifEmpty { return null }
+        val options = options?.map { option -> option.toOption() ?: return null }?.ifEmpty { null } ?: return null
 
         return WhatsNewPoll(pollId = pollId, pollKey = pollKey, question = question, options = options)
     }
@@ -152,3 +159,10 @@ data class WhatsNewPollOptionResponse(
 }
 
 private fun String?.nonBlank() = this?.trim()?.takeIf(String::isNotEmpty)
+
+private fun parseInstantOrNull(value: String) = try {
+    Instant.parse(value)
+} catch (e: DateTimeParseException) {
+    Timber.w(e, "Ignoring a What's New catalog timestamp that could not be read")
+    null
+}
