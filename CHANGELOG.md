@@ -22,6 +22,8 @@
         ([#6034](https://github.com/Automattic/pocket-casts-android/pull/6034))
     *   Stay in Pocket Casts after changing the app icon instead of closing to the home screen
         ([#6017](https://github.com/Automattic/pocket-casts-android/pull/6017))
+    *   Resume playback immediately when a headphone or car play button is pressed
+        ([#5645](https://github.com/Automattic/pocket-casts-android/pull/5645))
 
 8.21
 -----
