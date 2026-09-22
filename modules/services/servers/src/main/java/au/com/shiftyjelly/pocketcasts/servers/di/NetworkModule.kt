@@ -38,6 +38,9 @@ import au.com.shiftyjelly.pocketcasts.servers.server.ListWebService
 import au.com.shiftyjelly.pocketcasts.servers.sync.LoginIdentity
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncService
 import au.com.shiftyjelly.pocketcasts.servers.webfeeds.WebFeedsService
+import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewCatalogService
+import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewServiceManager
+import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewServiceManagerImpl
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
 import dagger.Lazy
@@ -405,6 +408,20 @@ class NetworkModule {
     @Provides
     @Singleton
     fun provideStaticService(@StaticServiceRetrofit retrofit: Retrofit): StaticService = retrofit.create()
+
+    @Provides
+    @Singleton
+    fun provideWhatsNewCatalogService(@StaticServiceRetrofit retrofit: Retrofit): WhatsNewCatalogService = retrofit.create()
+
+    @Provides
+    @Singleton
+    fun provideWhatsNewServiceManager(
+        service: WhatsNewCatalogService,
+        @ApplicationContext context: Context,
+    ): WhatsNewServiceManager = WhatsNewServiceManagerImpl(
+        service = service,
+        provideLocale = { context.resources.configuration.locales[0] },
+    )
 
     @Provides
     @Singleton
