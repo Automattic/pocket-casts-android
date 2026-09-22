@@ -15,6 +15,10 @@ import kotlinx.coroutines.yield
  * Event registration starts synchronously, which preserves framework callback order unless overlapping events
  * contend on the queue's mutex. [onImmediatePlay] may therefore run on the caller's stack and must stay fast.
  * [onMediaEvent] runs only after a suspension boundary, outside that synchronous registration section.
+ *
+ * A failing [onImmediatePlay] is reported and declined, which lets the tap resolve to the normal single tap
+ * action instead. It must therefore not have started playback before it throws, or that fallback toggles the
+ * playback it just started back off.
  */
 internal class MediaButtonEventHandler(
     private val scopeProvider: () -> CoroutineScope,
