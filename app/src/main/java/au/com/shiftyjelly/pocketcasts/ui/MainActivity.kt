@@ -514,10 +514,10 @@ class MainActivity :
         binding.bottomContainer.addOnLayoutChangeListener { view, _, top, _, bottom, _, oldTop, _, oldBottom ->
             if (bottom - top == oldBottom - oldTop) return@addOnLayoutChangeListener
             view.post {
-                // Add padding to the page so the mini player doesn't cover it
+                // Add padding to the page so the bottom navigation doesn't cover it
                 binding.mainFragment.updatePadding(bottom = view.height)
 
-                // Peek the hidden full-screen player page to show the mini player above the bottom container (bottom navigation tabs and system navigation)
+                // Peek the full-screen player so the mini player sits above the bottom navigation
                 BottomSheetBehavior.from(binding.playerBottomSheet).apply {
                     peekHeight = miniPlayerHeight + view.height
                 }
