@@ -27,6 +27,7 @@ import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.LocalPodcastColors
 import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
+import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
@@ -42,6 +43,7 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.views.R
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
+import au.com.shiftyjelly.pocketcasts.views.multiselect.BookmarkDeleter
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -79,6 +81,9 @@ class BookmarksFragment : BaseFragment() {
 
     @Inject
     lateinit var settings: Settings
+
+    @Inject
+    lateinit var bookmarkDeleter: BookmarkDeleter
 
     private val sourceView: SourceView
         get() = SourceView.fromString(arguments?.getString(ARG_SOURCE_VIEW))
@@ -139,6 +144,8 @@ class BookmarksFragment : BaseFragment() {
                                 forceDarkTheme = sourceView == SourceView.PLAYER,
                             )
                         },
+                        onSwipeShareClick = ::onSwipeShareBookmarkClick,
+                        onSwipeDeleteClick = ::onSwipeDeleteBookmarkClick,
                         onShareBookmarkClick = ::onShareBookmarkClick,
                         onEditBookmarkClick = ::onEditBookmarkClick,
                         onUpgradeClick = ::onUpgradeClicked,
@@ -238,6 +245,30 @@ class BookmarksFragment : BaseFragment() {
                 .forBookmark(episode, timestamp, podcast.backgroundColor, sourceView)
                 .show(parentFragmentManager, "share_screen")
         }
+    }
+
+    private fun onSwipeShareBookmarkClick(bookmark: Bookmark, settleRow: () -> Unit) {
+        lifecycleScope.launch {
+            val shared = bookmarksViewModel.getSharedBookmark(bookmark)
+            settleRow()
+            val (podcast, episode, sharedBookmark) = shared ?: return@launch
+            bookmarksViewModel.onShare(podcast.uuid, episode.uuid, sourceView)
+            ShareEpisodeTimestampFragment
+                .forBookmark(episode, sharedBookmark.timeSecs.seconds, podcast.backgroundColor, sourceView)
+                .show(parentFragmentManager, "share_screen")
+        }
+    }
+
+    private fun onSwipeDeleteBookmarkClick(bookmark: Bookmark, settleRow: () -> Unit) {
+        bookmarkDeleter.confirmDelete(
+            bookmarks = listOf(bookmark),
+            source = sourceView,
+            resources = resources,
+            fragmentManager = childFragmentManager,
+            scope = lifecycleScope,
+            onDeleted = { count -> bookmarksViewModel.onBookmarksDeleted(count) },
+            onDismissed = settleRow,
+        )
     }
 
     private fun onEditBookmarkClick() {
