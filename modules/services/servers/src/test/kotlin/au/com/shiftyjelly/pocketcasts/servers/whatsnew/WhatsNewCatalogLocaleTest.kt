@@ -34,6 +34,12 @@ class WhatsNewCatalogLocaleTest {
     }
 
     @Test
+    fun `simplified chinese keeps its catalog in a traditional chinese region`() {
+        assertEquals("zh-cn", catalogName(Locale.forLanguageTag("zh-Hans-HK")))
+        assertEquals("zh-cn", catalogName(Locale.forLanguageTag("zh-Hans-MO")))
+    }
+
+    @Test
     fun `a language the feed does not publish yet is still asked for`() {
         assertEquals("cy", catalogName(Locale.forLanguageTag("cy")))
     }

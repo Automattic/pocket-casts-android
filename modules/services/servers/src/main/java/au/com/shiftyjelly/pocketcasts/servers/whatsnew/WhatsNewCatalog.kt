@@ -42,8 +42,13 @@ sealed interface WhatsNewContent {
 data class WhatsNewTargeting(
     val audiences: List<String>,
     val minimumAppVersion: String?,
+    val hasUnreadableAudiences: Boolean = false,
 ) {
-    fun targets(audience: WhatsNewAudience) = audiences.isEmpty() || audience.key in audiences
+    fun targets(audience: WhatsNewAudience) = if (audiences.isEmpty() && !hasUnreadableAudiences) {
+        true
+    } else {
+        audience.key in audiences
+    }
 }
 
 enum class WhatsNewAudience(val key: String) {

@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.servers.di
 
 import android.content.Context
+import androidx.core.os.ConfigurationCompat
 import au.com.shiftyjelly.pocketcasts.models.entity.AnonymousBumpStat
 import au.com.shiftyjelly.pocketcasts.models.type.BlazeAdLocation
 import au.com.shiftyjelly.pocketcasts.models.type.BlazeAdLocationMoshiAdapter
@@ -52,6 +53,7 @@ import dagger.hilt.components.SingletonComponent
 import io.reactivex.schedulers.Schedulers
 import java.io.File
 import java.util.Date
+import java.util.Locale
 import java.util.concurrent.TimeUnit
 import javax.inject.Qualifier
 import javax.inject.Singleton
@@ -420,7 +422,7 @@ class NetworkModule {
         @ApplicationContext context: Context,
     ): WhatsNewServiceManager = WhatsNewServiceManagerImpl(
         service = service,
-        provideLocale = { context.resources.configuration.locales[0] },
+        provideLocale = { ConfigurationCompat.getLocales(context.resources.configuration)[0] ?: Locale.ROOT },
     )
 
     @Provides

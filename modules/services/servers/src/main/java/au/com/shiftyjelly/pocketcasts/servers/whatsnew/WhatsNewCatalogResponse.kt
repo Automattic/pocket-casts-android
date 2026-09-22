@@ -34,7 +34,7 @@ data class WhatsNewMessageResponse(
     val poll: WhatsNewPollResponse? = null,
 ) {
     fun toMessage(): WhatsNewMessage? {
-        val id = id ?: return null
+        val id = id.nonBlank() ?: return null
         val type = WhatsNewMessageType.fromKey(type) ?: return null
         val publishedAt = publishedAt ?: return null
         val targeting = targeting ?: return null
@@ -74,6 +74,7 @@ data class WhatsNewTargetingResponse(
     fun toTargeting() = WhatsNewTargeting(
         audiences = audiences.values,
         minimumAppVersion = minimumAppVersion.nonBlank(),
+        hasUnreadableAudiences = audiences.droppedCount > 0,
     )
 }
 
@@ -127,7 +128,7 @@ data class WhatsNewPollResponse(
     val options: List<WhatsNewPollOptionResponse> = emptyList(),
 ) {
     fun toPoll(): WhatsNewPoll? {
-        val pollId = pollId ?: return null
+        val pollId = pollId.nonBlank() ?: return null
         val pollKey = pollKey.nonBlank() ?: return null
         val question = question.nonBlank() ?: return null
         val options = options.map { option -> option.toOption() ?: return null }.ifEmpty { return null }
@@ -143,7 +144,7 @@ data class WhatsNewPollOptionResponse(
     val label: String? = null,
 ) {
     fun toOption(): WhatsNewPoll.Option? {
-        val id = id ?: return null
+        val id = id.nonBlank() ?: return null
         val pollOptionKey = pollOptionKey.nonBlank() ?: return null
         val label = label.nonBlank() ?: return null
         return WhatsNewPoll.Option(id = id, pollOptionKey = pollOptionKey, label = label)

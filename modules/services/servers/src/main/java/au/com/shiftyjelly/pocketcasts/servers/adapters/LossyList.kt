@@ -10,7 +10,10 @@ import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 import timber.log.Timber
 
-data class LossyList<T>(val values: List<T> = emptyList())
+data class LossyList<T>(
+    val values: List<T> = emptyList(),
+    val droppedCount: Int = 0,
+)
 
 class LossyListAdapterFactory : JsonAdapter.Factory {
     override fun create(type: Type, annotations: Set<Annotation>, moshi: Moshi): JsonAdapter<*>? {
@@ -31,17 +34,20 @@ private class LossyListAdapter<T>(
         }
 
         val values = mutableListOf<T>()
+        var droppedCount = 0
         reader.beginArray()
         while (reader.hasNext()) {
             val value = reader.readJsonValue()
-            try {
-                elementAdapter.fromJsonValue(value)?.let(values::add)
+            val element = try {
+                elementAdapter.fromJsonValue(value)
             } catch (e: JsonDataException) {
                 Timber.w(e, "Dropping an entry that could not be decoded")
+                null
             }
+            if (element == null) droppedCount++ else values.add(element)
         }
         reader.endArray()
-        return LossyList(values)
+        return LossyList(values, droppedCount)
     }
 
     override fun toJson(writer: JsonWriter, value: LossyList<T>?) {

@@ -298,6 +298,23 @@ class WhatsNewCatalogResponseTest {
     }
 
     @Test
+    fun `a message whose audiences are all unreadable targets nobody rather than everyone`() {
+        val catalog = decode(catalogOf(message(targeting = """{ "audiences": [{ "tier": "plus" }] }""")))
+
+        val targeting = catalog.messages.single().targeting
+        assertTrue(WhatsNewAudience.entries.none(targeting::targets))
+    }
+
+    @Test
+    fun `a message with a blank id is dropped`() {
+        val catalog = decode(
+            catalogOf("""{ "id": "  ", "type": "tip", "publishedAt": "2026-08-12T09:00:00Z", "targeting": {}, "title": "t", "pages": [{ "heading": "h", "description": "d" }] }"""),
+        )
+
+        assertTrue(catalog.messages.isEmpty())
+    }
+
+    @Test
     fun `a message aimed only at an audience this version does not know targets nobody`() {
         val catalog = decode(
             catalogOf(message(targeting = """{ "audiences": ["future_audience"] }""")),
