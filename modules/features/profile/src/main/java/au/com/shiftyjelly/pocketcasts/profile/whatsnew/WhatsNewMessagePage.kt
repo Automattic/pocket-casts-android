@@ -55,7 +55,6 @@ import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.PagerDotIndicator
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
@@ -97,7 +96,7 @@ internal fun WhatsNewMessagePage(
         ThemedTopAppBar(
             title = when (message.content) {
                 is WhatsNewContent.Pages -> message.title
-                is WhatsNewContent.Research -> stringResource(message.type.labelId)
+                is WhatsNewContent.Research -> stringResource(LR.string.whats_new_research_title)
             },
             onNavigationClick = onBackPress,
         )
@@ -311,6 +310,7 @@ private fun WhatsNewPoll(
         ) {
             TextH20(
                 text = poll.research.poll.question,
+                lineHeight = 28.sp,
                 modifier = Modifier.semantics { heading() },
             )
             val description = poll.research.description
@@ -357,6 +357,9 @@ private fun WhatsNewPoll(
                     onClick = onSubmitClick,
                     enabled = poll.canSubmit,
                     includePadding = false,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.W600,
+                    modifier = Modifier.heightIn(min = 56.dp),
                 )
             }
         }
@@ -391,21 +394,27 @@ private fun WhatsNewPollOption(
             .padding(horizontal = 16.dp, vertical = 12.dp),
     ) {
         if (isSelected) {
-            Icon(
-                painter = painterResource(IR.drawable.ic_tick_circle),
-                contentDescription = null,
-                tint = colors.primaryField03Active,
-                modifier = Modifier.size(24.dp),
-            )
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .size(22.dp)
+                    .background(colors.primaryField03Active, CircleShape),
+            ) {
+                Icon(
+                    painter = painterResource(IR.drawable.ic_check),
+                    contentDescription = null,
+                    tint = colors.primaryInteractive02,
+                    modifier = Modifier.size(14.dp),
+                )
+            }
         } else {
             Box(
                 modifier = Modifier
-                    .size(24.dp)
-                    .padding(2.dp)
-                    .border(2.dp, colors.primaryUi05, CircleShape),
+                    .size(22.dp)
+                    .border(1.5.dp, colors.primaryIcon02, CircleShape),
             )
         }
-        TextH40(
+        TextH30(
             text = label,
         )
     }
