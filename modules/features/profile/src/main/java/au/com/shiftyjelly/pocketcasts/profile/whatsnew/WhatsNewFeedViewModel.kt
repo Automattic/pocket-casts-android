@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -23,8 +24,8 @@ class WhatsNewFeedViewModel @Inject constructor(
     private val loadState = MutableStateFlow(LoadState.Loading)
     private val isRefreshing = MutableStateFlow(false)
 
-    val uiState: StateFlow<UiState> = combine(
-        manager.feedMessages,
+    internal val uiState: StateFlow<UiState> = combine(
+        manager.feedMessages.onEach { messages -> manager.markAsListed(messages.map { it.id }) },
         manager.readState,
         manager.catalog,
         loadState,
@@ -49,19 +50,13 @@ class WhatsNewFeedViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), 0)
 
     init {
-        viewModelScope.launch {
-            manager.feedMessages.collect { messages ->
-                val ids = messages.map { it.id }
-                manager.markAsListed(ids)
-                manager.markAsSeen(ids)
-            }
-        }
         load()
     }
 
     fun refresh() {
+        if (isRefreshing.value) return
+        isRefreshing.value = true
         viewModelScope.launch {
-            isRefreshing.value = true
             try {
                 manager.refresh()
             } finally {
@@ -93,20 +88,20 @@ class WhatsNewFeedViewModel @Inject constructor(
         }
     }
 
-    data class UiState(
+    internal data class UiState(
         val items: List<WhatsNewFeedItem> = emptyList(),
         val loadState: LoadState = LoadState.Loading,
         val isRefreshing: Boolean = false,
     )
 
-    enum class LoadState {
+    internal enum class LoadState {
         Loading,
         Loaded,
         Failed,
     }
 }
 
-data class WhatsNewFeedItem(
+internal data class WhatsNewFeedItem(
     val id: String,
     val type: WhatsNewMessageType,
     val title: String,

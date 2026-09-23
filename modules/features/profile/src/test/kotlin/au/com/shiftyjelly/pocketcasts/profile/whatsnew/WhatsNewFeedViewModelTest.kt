@@ -69,8 +69,9 @@ class WhatsNewFeedViewModelTest {
     }
 
     @Test
-    fun `a cached catalog shows as loaded even when the refresh fails`() = runTest {
+    fun `a cached catalog shows as loaded when the fetch brings nothing new`() = runTest {
         manager.publish(listOf(message("cached")))
+        manager.onRefresh = {}
 
         createViewModel().uiState.test {
             val state = expectMostRecentItem()
@@ -103,14 +104,23 @@ class WhatsNewFeedViewModelTest {
     }
 
     @Test
-    fun `listing messages marks them listed and seen but not read`() = runTest {
+    fun `showing the feed marks its messages listed but not read`() = runTest {
         manager.publish(listOf(message("a"), message("b")))
 
+        createViewModel().uiState.test {
+            expectMostRecentItem()
+            assertEquals(setOf("a", "b"), manager.readState.value.listedMessageIds)
+            assertTrue(manager.readState.value.readMessageIds.isEmpty())
+        }
+    }
+
+    @Test
+    fun `messages arriving while the feed is not shown are not marked listed`() = runTest {
         createViewModel()
 
-        assertEquals(setOf("a", "b"), manager.readState.value.listedMessageIds)
-        assertEquals(setOf("a", "b"), manager.readState.value.seenMessageIds)
-        assertTrue(manager.readState.value.readMessageIds.isEmpty())
+        manager.publish(listOf(message("a")))
+
+        assertTrue(manager.readState.value.listedMessageIds.isEmpty())
     }
 
     @Test
@@ -124,14 +134,45 @@ class WhatsNewFeedViewModelTest {
     }
 
     @Test
-    fun `pull to refresh forces a fetch`() = runTest {
+    fun `pull to refresh forces a fetch and shows progress until it finishes`() = runTest {
         manager.publish(listOf(message("a")))
         val viewModel = createViewModel()
+        val refresh = CompletableDeferred<Unit>()
+        manager.onRefresh = { refresh.await() }
+
+        viewModel.uiState.test {
+            assertFalse(expectMostRecentItem().isRefreshing)
+            viewModel.refresh()
+            assertTrue(expectMostRecentItem().isRefreshing)
+            refresh.complete(Unit)
+            assertFalse(expectMostRecentItem().isRefreshing)
+        }
+        assertEquals(1, manager.forcedRefreshCount)
+    }
+
+    @Test
+    fun `pulling again while a refresh is in flight does not fetch twice`() = runTest {
+        manager.publish(listOf(message("a")))
+        val viewModel = createViewModel()
+        val refresh = CompletableDeferred<Unit>()
+        manager.onRefresh = { refresh.await() }
 
         viewModel.refresh()
+        viewModel.refresh()
+        refresh.complete(Unit)
 
         assertEquals(1, manager.forcedRefreshCount)
-        assertFalse(viewModel.uiState.value.isRefreshing)
+    }
+
+    @Test
+    fun `refreshing without any catalog fails`() = runTest {
+        val viewModel = createViewModel()
+
+        viewModel.uiState.test {
+            assertEquals(LoadState.Failed, expectMostRecentItem().loadState)
+            viewModel.refresh()
+            assertEquals(LoadState.Failed, expectMostRecentItem().loadState)
+        }
     }
 
     private fun message(id: String) = WhatsNewMessage(
