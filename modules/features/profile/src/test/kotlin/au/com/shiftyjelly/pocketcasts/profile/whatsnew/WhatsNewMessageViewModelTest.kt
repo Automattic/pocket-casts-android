@@ -11,13 +11,16 @@ import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewPage
 import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewTargeting
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import java.time.Instant
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 class WhatsNewMessageViewModelTest {
     @get:Rule
@@ -55,14 +58,40 @@ class WhatsNewMessageViewModelTest {
     }
 
     @Test
-    fun `a message that leaves the feed while open becomes missing`() = runTest {
+    fun `a message that leaves the feed while open stays on screen`() = runTest {
         val message = message("expiring")
         feedMessages.value = listOf(message)
 
         createViewModel("expiring").uiState.test {
             assertEquals(UiState.Loaded(message), expectMostRecentItem())
             feedMessages.value = emptyList()
-            assertEquals(UiState.Missing, awaitItem())
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun `waits for the catalog to load before deciding the message is missing`() = runTest {
+        val refresh = CompletableDeferred<Unit>()
+        whenever(manager.refreshIfNeeded()).doSuspendableAnswer { refresh.await() }
+        val message = message("restored")
+
+        createViewModel("restored").uiState.test {
+            assertEquals(UiState.Loading, expectMostRecentItem())
+            feedMessages.value = listOf(message)
+            refresh.complete(Unit)
+            assertEquals(UiState.Loaded(message), expectMostRecentItem())
+        }
+    }
+
+    @Test
+    fun `a message still absent once the catalog has loaded is missing`() = runTest {
+        val refresh = CompletableDeferred<Unit>()
+        whenever(manager.refreshIfNeeded()).doSuspendableAnswer { refresh.await() }
+
+        createViewModel("gone").uiState.test {
+            assertEquals(UiState.Loading, expectMostRecentItem())
+            refresh.complete(Unit)
+            assertEquals(UiState.Missing, expectMostRecentItem())
         }
     }
 
