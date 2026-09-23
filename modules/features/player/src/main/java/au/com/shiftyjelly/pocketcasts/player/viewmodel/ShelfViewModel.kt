@@ -24,6 +24,7 @@ import java.util.Collections
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -50,10 +51,13 @@ class ShelfViewModel @AssistedInject constructor(
                 }
         }
         viewModelScope.launch {
-            settings.showSmartBookmarksTooltip.flow.collectLatest { showTooltip ->
-                _uiState.update {
-                    it.copy(showBookmarkNewBadge = showTooltip && FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS))
-                }
+            combine(
+                settings.showSmartBookmarksTooltip.flow,
+                FeatureFlag.isEnabledFlow(Feature.SMART_BOOKMARKS),
+            ) { showTooltip, isSmartBookmarksEnabled ->
+                showTooltip && isSmartBookmarksEnabled
+            }.collectLatest { showBadge ->
+                _uiState.update { it.copy(showBookmarkNewBadge = showBadge) }
             }
         }
     }
