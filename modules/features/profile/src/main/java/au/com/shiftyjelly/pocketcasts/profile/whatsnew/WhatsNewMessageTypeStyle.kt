@@ -20,7 +20,7 @@ internal val WhatsNewMessageType.iconId
         WhatsNewMessageType.Tip -> IR.drawable.ic_sort
         WhatsNewMessageType.Announcement -> IR.drawable.ic_heart
         WhatsNewMessageType.KnownIssue -> IR.drawable.ic_warning
-        WhatsNewMessageType.Research -> IR.drawable.ic_transcript_24
+        WhatsNewMessageType.Research -> IR.drawable.ic_whats_new_research
     }
 
 internal val WhatsNewMessageType.gradient
