@@ -342,6 +342,7 @@ private fun WhatsNewPoll(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(MaterialTheme.theme.colors.primaryUi01)
+                .semantics { liveRegion = LiveRegionMode.Polite }
                 .padding(16.dp),
         ) {
             if (poll.hasResponded) {
@@ -349,7 +350,6 @@ private fun WhatsNewPoll(
                     text = stringResource(LR.string.whats_new_poll_answered),
                     color = MaterialTheme.theme.colors.primaryText02,
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite },
                 )
             } else {
                 RowButton(
@@ -359,7 +359,7 @@ private fun WhatsNewPoll(
                     includePadding = false,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.W600,
-                    modifier = Modifier.heightIn(min = 56.dp),
+                    textVerticalPadding = 9.dp,
                 )
             }
         }
