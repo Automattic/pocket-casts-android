@@ -5,6 +5,7 @@ import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
@@ -12,6 +13,10 @@ import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import com.automattic.eventhorizon.EventHorizon
 import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertEquals
@@ -26,9 +31,11 @@ import org.mockito.Mockito.verify
 import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturnConsecutively
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.stub
+import org.mockito.kotlin.times
 import org.mockito.kotlin.whenever
 import retrofit2.HttpException
 import retrofit2.Response
@@ -148,7 +155,7 @@ class EpisodeManagerImplTest {
     }
 
     @Test
-    fun `download missing episode completes empty when a user episode cannot be found`() = runTest {
+    fun `download missing episode returns null when a user episode cannot be found`() = runTest {
         whenever(episodeDao.exists("episode1")).thenReturn(false)
         whenever(episodeDao.findByUuid("episode1")).thenReturn(null)
         whenever(userEpisodeManager.findEpisodeByUuid("episode1")).thenReturn(null)
@@ -157,6 +164,28 @@ class EpisodeManagerImplTest {
 
         assertNull(result)
         verify(podcastCacheServiceManager, never()).getPodcastAndEpisode(any(), any())
+    }
+
+    @Test
+    fun `download missing episode finishes the insert when the caller is cancelled`() = runTest {
+        val serverEpisode = createEpisode()
+        val podcast = Podcast(uuid = "podcast1").apply { episodes.add(serverEpisode) }
+        whenever(episodeDao.exists("episode1")).thenReturn(false)
+        whenever(podcastCacheServiceManager.getPodcastAndEpisode("podcast1", "episode1")).thenReturn(podcast)
+        whenever(episodeDao.insertAllOrIgnore(any())).doSuspendableAnswer { delay(1_000) }
+        episodeDao.stub {
+            on { findByUuid("episode1") } doReturnConsecutively listOf(null, serverEpisode)
+        }
+
+        var result: BaseEpisode? = null
+        val job = launch { result = downloadMissingEpisode(podcastUuid = "podcast1") }
+        advanceTimeBy(500)
+        job.cancel()
+        advanceUntilIdle()
+
+        verify(episodeDao, times(2)).findByUuid("episode1")
+        assertTrue(job.isCancelled)
+        assertNull(result)
     }
 
     private fun createEpisode() = PodcastEpisode(uuid = "episode1", podcastUuid = "podcast1", publishedDate = Date())
