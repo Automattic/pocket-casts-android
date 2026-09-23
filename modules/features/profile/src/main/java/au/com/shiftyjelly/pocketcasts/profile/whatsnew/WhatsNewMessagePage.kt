@@ -30,6 +30,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -348,6 +349,7 @@ private fun WhatsNewPoll(
                     text = stringResource(LR.string.whats_new_poll_answered),
                     color = MaterialTheme.theme.colors.primaryText02,
                     textAlign = TextAlign.Center,
+                    modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite },
                 )
             } else {
                 RowButton(
@@ -376,6 +378,7 @@ private fun WhatsNewPollOption(
         modifier = Modifier
             .fillMaxWidth()
             .heightIn(min = 64.dp)
+            .alpha(if (isEnabled || isSelected) 1f else 0.6f)
             .clip(shape)
             .background(colors.primaryUi01Active)
             .then(if (isSelected) Modifier.border(2.dp, colors.primaryField03Active, shape) else Modifier)

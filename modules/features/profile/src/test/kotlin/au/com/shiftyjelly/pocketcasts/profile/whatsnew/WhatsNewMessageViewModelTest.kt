@@ -229,6 +229,44 @@ class WhatsNewMessageViewModelTest {
     }
 
     @Test
+    fun `picking another option replaces the selection`() = runTest {
+        feedMessages.value = listOf(research())
+        val viewModel = createViewModel("research")
+
+        viewModel.uiState.test {
+            expectMostRecentItem()
+            viewModel.onOptionClick("a")
+            viewModel.onOptionClick("b")
+            assertEquals("b", (expectMostRecentItem() as UiState.Loaded).poll!!.selectedOptionId)
+        }
+    }
+
+    @Test
+    fun `a selection the poll no longer offers cannot be submitted`() = runTest {
+        feedMessages.value = listOf(research())
+        val viewModel = createViewModel("research")
+
+        viewModel.uiState.test {
+            expectMostRecentItem()
+            viewModel.onOptionClick("b")
+            val withoutB = research().copy(
+                content = WhatsNewContent.Research(
+                    research().researchContent.copy(
+                        poll = research().researchContent.poll.copy(
+                            options = research().researchContent.poll.options.filter { it.id != "b" },
+                        ),
+                    ),
+                ),
+            )
+            feedMessages.value = listOf(withoutB)
+            assertFalse((expectMostRecentItem() as UiState.Loaded).poll!!.canSubmit)
+            viewModel.onSubmitClick()
+        }
+        verify(manager, never()).markAsResponded(any())
+        verifyNoInteractions(eventHorizon)
+    }
+
+    @Test
     fun `nothing is submitted before an option is picked`() = runTest {
         feedMessages.value = listOf(research())
         val viewModel = createViewModel("research")
