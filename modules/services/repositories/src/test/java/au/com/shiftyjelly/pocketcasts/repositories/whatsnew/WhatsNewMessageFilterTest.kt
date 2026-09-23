@@ -64,6 +64,14 @@ class WhatsNewMessageFilterTest {
     }
 
     @Test
+    fun `a release candidate counts as the release it is a candidate for`() {
+        val filter = WhatsNewMessageFilter(WhatsNewAudience.Plus, ReleaseVersion(8, 21, releaseCandidate = 6))
+
+        assertTrue(filter.includes(message(minimumAppVersion = "8.21"), now))
+        assertFalse(filter.includes(message(minimumAppVersion = "8.22"), now))
+    }
+
+    @Test
     fun `a message gated on a version is hidden when the app version is unknown`() {
         val filter = WhatsNewMessageFilter(WhatsNewAudience.Plus, appVersion = null)
 
