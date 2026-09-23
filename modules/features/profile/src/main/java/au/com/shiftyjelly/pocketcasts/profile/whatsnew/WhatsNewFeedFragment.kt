@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.profile.whatsnew
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalDensity
 import androidx.fragment.app.viewModels
@@ -23,6 +24,10 @@ class WhatsNewFeedFragment : BaseFragment() {
     ) = contentWithoutConsumedInsets {
         AppTheme(themeType = theme.activeTheme) {
             val state by viewModel.uiState.collectAsStateWithLifecycle()
+            val shownIds = state.items.map(WhatsNewFeedItem::id)
+            LaunchedEffect(shownIds) {
+                viewModel.onMessagesShown(shownIds)
+            }
             val bottomInsetPx by viewModel.bottomInset.collectAsStateWithLifecycle()
             val bottomInset = with(LocalDensity.current) { bottomInsetPx.toDp() }
             WhatsNewFeedPage(
