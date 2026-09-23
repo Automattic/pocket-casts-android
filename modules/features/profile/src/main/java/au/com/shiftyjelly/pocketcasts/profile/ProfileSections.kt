@@ -163,6 +163,7 @@ private fun ProfileSectionsPreview(
             sections = ProfileSection.entries,
             onClick = {},
             modifier = Modifier.fillMaxWidth(),
+            sectionsWithDot = setOf(ProfileSection.WhatsNew),
         )
     }
 }

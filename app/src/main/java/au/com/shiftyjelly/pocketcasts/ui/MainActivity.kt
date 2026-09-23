@@ -587,7 +587,7 @@ class MainActivity :
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.hasUnseenWhatsNew.collect { hasUnseen ->
-                    val isProfileShown = navigator.currentTab() == VR.id.navigation_profile
+                    val isProfileShown = isProfileRootShown()
                     if (hasUnseen && isProfileShown) {
                         viewModel.onProfileShown()
                     }
@@ -682,6 +682,8 @@ class MainActivity :
                         }
                     }
                     settings.setSelectedTab(currentTab)
+                } else if (it is NavigatorAction.FragmentRemoved && isProfileRootShown()) {
+                    viewModel.onProfileShown()
                 } else if (it is NavigatorAction.NewFragmentAdded) {
                     if (navigator.currentTab() == VR.id.navigation_profile) {
                         resetEoYBadgeIfNeeded()
@@ -709,6 +711,10 @@ class MainActivity :
             settings.setEndOfYearShowBadge2025(false)
             renderProfileBadge()
         }
+    }
+
+    private fun isProfileRootShown(): Boolean {
+        return navigator.currentTab() == VR.id.navigation_profile && navigator.isAtRootOfStack() && !viewModel.isPlayerOpen
     }
 
     private fun renderProfileBadge() {
