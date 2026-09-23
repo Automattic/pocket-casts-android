@@ -1,0 +1,64 @@
+package au.com.shiftyjelly.pocketcasts.profile.whatsnew
+
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalDensity
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
+import au.com.shiftyjelly.pocketcasts.profile.whatsnew.WhatsNewMessageViewModel.UiState
+import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.withCreationCallback
+
+@AndroidEntryPoint
+class WhatsNewMessageFragment : BaseFragment() {
+    private val viewModel by viewModels<WhatsNewMessageViewModel>(
+        extrasProducer = {
+            defaultViewModelCreationExtras.withCreationCallback<WhatsNewMessageViewModel.Factory> { factory ->
+                factory.create(requireNotNull(requireArguments().getString(ARG_MESSAGE_ID)))
+            }
+        },
+    )
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
+    ) = contentWithoutConsumedInsets {
+        AppTheme(themeType = theme.activeTheme) {
+            val state by viewModel.uiState.collectAsStateWithLifecycle()
+            val bottomInsetPx by viewModel.bottomInset.collectAsStateWithLifecycle()
+            val bottomInset = with(LocalDensity.current) { bottomInsetPx.toDp() }
+            when (val uiState = state) {
+                UiState.Loading -> Unit
+
+                UiState.Missing -> LaunchedEffect(Unit) { close() }
+
+                is UiState.Loaded -> WhatsNewMessagePage(
+                    message = uiState.message,
+                    bottomInset = bottomInset,
+                    onBackPress = ::close,
+                )
+            }
+        }
+    }
+
+    private fun close() {
+        activity?.onBackPressedDispatcher?.onBackPressed()
+    }
+
+    companion object {
+        private const val ARG_MESSAGE_ID = "whats_new_message_id"
+
+        fun newInstance(messageId: String) = WhatsNewMessageFragment().apply {
+            arguments = Bundle().apply {
+                putString(ARG_MESSAGE_ID, messageId)
+            }
+        }
+    }
+}
