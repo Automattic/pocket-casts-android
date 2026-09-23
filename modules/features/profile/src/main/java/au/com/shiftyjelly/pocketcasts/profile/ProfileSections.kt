@@ -85,6 +85,10 @@ internal enum class ProfileSection(
     @DrawableRes val iconId: Int,
     @StringRes val labelId: Int,
 ) {
+    WhatsNew(
+        iconId = IR.drawable.ic_mail,
+        labelId = LR.string.settings_whats_new,
+    ),
     Stats(
         iconId = IR.drawable.ic_stats,
         labelId = LR.string.profile_navigation_stats,
@@ -120,7 +124,13 @@ internal enum class ProfileSection(
     ;
 
     companion object {
-        fun visibleEntries(): List<ProfileSection> = entries.filter { it != Blogs || FeatureFlag.isEnabled(Feature.BLOGS) }
+        fun visibleEntries(): List<ProfileSection> = entries.filter { section ->
+            when (section) {
+                WhatsNew -> FeatureFlag.isEnabled(Feature.WHATS_NEW_FEED)
+                Blogs -> FeatureFlag.isEnabled(Feature.BLOGS)
+                else -> true
+            }
+        }
     }
 }
 
