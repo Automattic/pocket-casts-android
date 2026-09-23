@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -33,9 +34,9 @@ class WhatsNewMessageViewModel @AssistedInject constructor(
     private var shownMessage: WhatsNewMessage? = null
 
     internal val uiState: StateFlow<UiState> = combine(
-        manager.feedMessages.map { messages ->
-            messages.firstOrNull { it.id == messageId }?.also { shownMessage = it } ?: shownMessage
-        },
+        manager.feedMessages
+            .map { messages -> messages.firstOrNull { it.id == messageId }?.also { shownMessage = it } ?: shownMessage }
+            .distinctUntilChanged(),
         isMissing,
     ) { message, isMissing ->
         when {

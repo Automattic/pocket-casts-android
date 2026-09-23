@@ -62,7 +62,7 @@ class WhatsNewMessageFragment : BaseFragment() {
             WhatsNewActionEvent.OpenDiscover -> host.openTab(VR.id.navigation_discover)
             WhatsNewActionEvent.OpenUpNext -> host.openTab(VR.id.navigation_upnext)
             WhatsNewActionEvent.OpenPlaylists -> host.openTab(VR.id.navigation_filters)
-            WhatsNewActionEvent.OpenProfile -> host.openTab(VR.id.navigation_profile)
+            WhatsNewActionEvent.OpenProfile -> host.closeProfileToRoot()
             WhatsNewActionEvent.OpenSettings -> host.addFragment(SettingsFragment())
         }
     }

@@ -18,6 +18,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -212,7 +216,8 @@ private fun WhatsNewPageImage(
     pageHeight: Dp,
     modifier: Modifier = Modifier,
 ) {
-    val aspectRatio = image.aspectRatio
+    var loadedAspectRatio by remember(image.url) { mutableStateOf<Float?>(null) }
+    val aspectRatio = image.aspectRatio ?: loadedAspectRatio
     val sizeModifier = if (aspectRatio != null) {
         Modifier.size(WhatsNewImageLayout.size(aspectRatio, contentWidth, pageHeight))
     } else {
@@ -220,15 +225,19 @@ private fun WhatsNewPageImage(
             .fillMaxWidth()
             .heightIn(max = WhatsNewImageLayout.maximumHeight(pageHeight))
     }
-    val semanticsModifier = if (image.alt == null) Modifier.clearAndSetSemantics {} else Modifier
     AsyncImage(
         model = image.url,
         contentDescription = image.alt,
         contentScale = ContentScale.Fit,
+        onSuccess = { state ->
+            val size = state.painter.intrinsicSize
+            if (size.width > 0f && size.height > 0f) {
+                loadedAspectRatio = size.width / size.height
+            }
+        },
         modifier = modifier
             .then(sizeModifier)
-            .clip(RoundedCornerShape(8.dp))
-            .then(semanticsModifier),
+            .clip(RoundedCornerShape(8.dp)),
     )
 }
 
