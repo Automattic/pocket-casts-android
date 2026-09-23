@@ -28,7 +28,10 @@ import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,7 +40,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight
@@ -76,6 +82,8 @@ internal fun WhatsNewFeedPage(
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val allReadDescription = stringResource(LR.string.whats_new_feed_all_read)
+    var readAllAnnouncement by remember { mutableStateOf("") }
     val pullRefreshState = rememberPullRefreshState(
         refreshing = state.isRefreshing,
         onRefresh = onRefresh,
@@ -91,11 +99,15 @@ internal fun WhatsNewFeedPage(
             actions = { color ->
                 if (state.hasUnread) {
                     TextButton(
-                        onClick = onReadAllClick,
+                        onClick = {
+                            readAllAnnouncement = allReadDescription
+                            onReadAllClick()
+                        },
                     ) {
                         TextH50(
                             text = stringResource(LR.string.whats_new_feed_read_all),
                             color = color,
+                            maxLines = 1,
                         )
                     }
                 }
@@ -119,6 +131,14 @@ internal fun WhatsNewFeedPage(
                     onRetry = onRetry,
                 )
             }
+            Box(
+                modifier = Modifier
+                    .size(1.dp)
+                    .semantics {
+                        liveRegion = LiveRegionMode.Polite
+                        contentDescription = readAllAnnouncement
+                    },
+            )
             PullRefreshIndicator(
                 refreshing = state.isRefreshing,
                 state = pullRefreshState,
