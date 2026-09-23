@@ -335,6 +335,8 @@ class MainActivity :
     private val disposables = CompositeDisposable()
     private var videoPlayerShown: Boolean = false
     private var overrideNextRefreshTimer: Boolean = false
+    private var isEndOfYearBadgeVisible = false
+    private var isWhatsNewBadgeVisible = false
 
     private var mediaRouter: MediaRouter? = null
     private val mediaRouterCallback = object : MediaRouter.Callback() {}
@@ -575,8 +577,21 @@ class MainActivity :
                         setupEndOfYearLaunchBottomSheet()
                     }
                     if (settings.getEndOfYearShowBadge2025()) {
-                        binding.bottomNavigation.getOrCreateBadge(VR.id.navigation_profile)
+                        isEndOfYearBadgeVisible = true
+                        renderProfileBadge()
                     }
+                }
+            }
+        }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.hasUnseenWhatsNew.collect { hasUnseen ->
+                    if (hasUnseen && navigator.currentTab() == VR.id.navigation_profile) {
+                        viewModel.onProfileShown()
+                    }
+                    isWhatsNewBadgeVisible = hasUnseen
+                    renderProfileBadge()
                 }
             }
         }
@@ -659,7 +674,10 @@ class MainActivity :
                     if (settings.selectedTab() != currentTab) {
                         trackTabOpened(currentTab)
                         when (currentTab) {
-                            VR.id.navigation_profile -> resetEoYBadgeIfNeeded()
+                            VR.id.navigation_profile -> {
+                                resetEoYBadgeIfNeeded()
+                                viewModel.onProfileShown()
+                            }
                         }
                     }
                     settings.setSelectedTab(currentTab)
@@ -685,11 +703,18 @@ class MainActivity :
     }
 
     private fun resetEoYBadgeIfNeeded() {
-        if (binding.bottomNavigation.getBadge(VR.id.navigation_profile) != null &&
-            settings.getEndOfYearShowBadge2025()
-        ) {
-            binding.bottomNavigation.removeBadge(VR.id.navigation_profile)
+        if (isEndOfYearBadgeVisible && settings.getEndOfYearShowBadge2025()) {
+            isEndOfYearBadgeVisible = false
             settings.setEndOfYearShowBadge2025(false)
+            renderProfileBadge()
+        }
+    }
+
+    private fun renderProfileBadge() {
+        if (isEndOfYearBadgeVisible || isWhatsNewBadgeVisible) {
+            binding.bottomNavigation.getOrCreateBadge(VR.id.navigation_profile)
+        } else {
+            binding.bottomNavigation.removeBadge(VR.id.navigation_profile)
         }
     }
 
