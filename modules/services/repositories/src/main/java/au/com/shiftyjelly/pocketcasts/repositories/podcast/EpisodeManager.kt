@@ -101,7 +101,7 @@ interface EpisodeManager {
 
     /** Utility methods  */
     suspend fun countEpisodes(): Int
-    suspend fun downloadMissingEpisode(episodeUuid: String, podcastUuid: String, skeletonEpisode: PodcastEpisode, podcastManager: PodcastManager, downloadMetaData: Boolean, source: SourceView): BaseEpisode?
+    suspend fun downloadMissingEpisode(episodeUuid: String, podcastUuid: String, skeletonEpisode: PodcastEpisode, downloadMetaData: Boolean): BaseEpisode?
     suspend fun downloadMissingPodcastEpisode(episodeUuid: String, podcastUuid: String): PodcastEpisode?
 
     fun unarchiveAllInListBlocking(episodes: List<PodcastEpisode>)

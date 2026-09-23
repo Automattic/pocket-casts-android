@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
 import android.content.Context
 import app.cash.turbine.test
-import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
@@ -169,8 +168,6 @@ class EpisodeManagerImplTest {
         episodeUuid = "episode1",
         podcastUuid = podcastUuid,
         skeletonEpisode = skeletonEpisode,
-        podcastManager = mock(),
         downloadMetaData = false,
-        source = SourceView.UNKNOWN,
     )
 }

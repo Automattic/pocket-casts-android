@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.repositories.sync
 
-import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextChangeDao
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
@@ -306,7 +305,7 @@ class UpNextSync @Inject constructor(
             userEpisodeManager.downloadMissingUserEpisode(uuid = episodeUuid, placeholderTitle = title, placeholderPublished = published)
         } else {
             val skeletonEpisode = buildSkeletonPodcastEpisode(podcastUuid)
-            episodeManager.downloadMissingEpisode(episodeUuid = episodeUuid, podcastUuid = podcastUuid, skeletonEpisode = skeletonEpisode, podcastManager = podcastManager, downloadMetaData = false, source = SourceView.UP_NEXT)
+            episodeManager.downloadMissingEpisode(episodeUuid = episodeUuid, podcastUuid = podcastUuid, skeletonEpisode = skeletonEpisode, downloadMetaData = false)
         }
     }
 }

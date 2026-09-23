@@ -305,9 +305,7 @@ class EpisodeFragmentViewModel @Inject constructor(
                 episodeUuid,
                 podcastUuid,
                 PodcastEpisode(uuid = episodeUuid, publishedDate = Date()),
-                podcastManager,
                 downloadMetaData = true,
-                source = source,
             ) as? PodcastEpisode
     }
 

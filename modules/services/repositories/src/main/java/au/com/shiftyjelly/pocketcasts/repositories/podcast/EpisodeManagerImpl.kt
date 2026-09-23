@@ -856,7 +856,7 @@ class EpisodeManagerImpl @Inject constructor(
     /**
      * Try downloading the episode if it is missing. If the server doesn't know about it insert the skeleton episode.
      */
-    override suspend fun downloadMissingEpisode(episodeUuid: String, podcastUuid: String, skeletonEpisode: PodcastEpisode, podcastManager: PodcastManager, downloadMetaData: Boolean, source: SourceView): BaseEpisode? {
+    override suspend fun downloadMissingEpisode(episodeUuid: String, podcastUuid: String, skeletonEpisode: PodcastEpisode, downloadMetaData: Boolean): BaseEpisode? {
         return withContext(ioDispatcher) {
             if (episodeDao.exists(episodeUuid) || podcastUuid == Podcast.userPodcast.uuid) {
                 return@withContext findEpisodeByUuid(episodeUuid)

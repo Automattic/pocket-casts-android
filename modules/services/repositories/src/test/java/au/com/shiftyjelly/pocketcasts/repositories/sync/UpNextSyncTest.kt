@@ -447,7 +447,7 @@ class UpNextSyncTest {
 
         assertEquals(null, result)
         verify(userEpisodeManager, never()).downloadMissingUserEpisode(any(), anyOrNull(), anyOrNull())
-        verify(episodeManager, never()).downloadMissingEpisode(any(), any(), any(), any(), any(), any())
+        verify(episodeManager, never()).downloadMissingEpisode(any(), any(), any(), any())
     }
 
     @Test
@@ -487,9 +487,7 @@ class UpNextSyncTest {
                 episodeUuid = eq("episode1"),
                 podcastUuid = eq("podcast1"),
                 skeletonEpisode = any(),
-                podcastManager = eq(podcastManager),
                 downloadMetaData = eq(false),
-                source = any(),
             ),
         ).thenReturn(episode)
 
@@ -505,9 +503,7 @@ class UpNextSyncTest {
             episodeUuid = eq("episode1"),
             podcastUuid = eq("podcast1"),
             skeletonEpisode = any(),
-            podcastManager = eq(podcastManager),
             downloadMetaData = eq(false),
-            source = any(),
         )
     }
 
