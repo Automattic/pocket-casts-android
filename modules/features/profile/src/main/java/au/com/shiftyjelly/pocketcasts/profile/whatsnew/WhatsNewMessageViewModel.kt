@@ -121,7 +121,7 @@ class WhatsNewMessageViewModel @AssistedInject constructor(
         val selectedOptionId: String?,
         val hasResponded: Boolean,
     ) {
-        val canSubmit get() = !hasResponded && selectedOptionId != null
+        val canSubmit get() = !hasResponded && research.poll.options.any { it.id == selectedOptionId }
     }
 
     internal data class Page(
