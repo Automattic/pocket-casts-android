@@ -47,9 +47,12 @@ class WhatsNewMessageFragment : BaseFragment() {
                 is UiState.Loaded -> WhatsNewMessagePage(
                     message = uiState.message,
                     pages = uiState.pages,
+                    poll = uiState.poll,
                     bottomInset = bottomInset,
                     onBackPress = ::close,
                     onActionClick = ::perform,
+                    onOptionClick = viewModel::onOptionClick,
+                    onSubmitClick = viewModel::onSubmitClick,
                 )
             }
         }
