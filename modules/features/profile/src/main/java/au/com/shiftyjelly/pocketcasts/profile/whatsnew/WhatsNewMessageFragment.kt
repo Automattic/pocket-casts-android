@@ -11,10 +11,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.profile.whatsnew.WhatsNewMessageViewModel.UiState
+import au.com.shiftyjelly.pocketcasts.settings.SettingsFragment
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
+import au.com.shiftyjelly.pocketcasts.views.R as VR
 
 @AndroidEntryPoint
 class WhatsNewMessageFragment : BaseFragment() {
@@ -44,10 +46,24 @@ class WhatsNewMessageFragment : BaseFragment() {
 
                 is UiState.Loaded -> WhatsNewMessagePage(
                     message = uiState.message,
+                    pages = uiState.pages,
                     bottomInset = bottomInset,
                     onBackPress = ::close,
+                    onActionClick = ::perform,
                 )
             }
+        }
+    }
+
+    private fun perform(event: WhatsNewActionEvent) {
+        val host = activity as? FragmentHostListener ?: return
+        when (event) {
+            WhatsNewActionEvent.OpenPodcasts -> host.openTab(VR.id.navigation_podcasts)
+            WhatsNewActionEvent.OpenDiscover -> host.openTab(VR.id.navigation_discover)
+            WhatsNewActionEvent.OpenUpNext -> host.openTab(VR.id.navigation_upnext)
+            WhatsNewActionEvent.OpenPlaylists -> host.openTab(VR.id.navigation_filters)
+            WhatsNewActionEvent.OpenProfile -> host.openTab(VR.id.navigation_profile)
+            WhatsNewActionEvent.OpenSettings -> host.addFragment(SettingsFragment())
         }
     }
 
