@@ -3,7 +3,13 @@ package au.com.shiftyjelly.pocketcasts.account.deviceapprove
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.ReadSetting
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
+import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
+import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import com.automattic.eventhorizon.DeviceApproveConnectTappedEvent
 import com.automattic.eventhorizon.DeviceApproveDismissedEvent
@@ -20,11 +26,13 @@ import okhttp3.Request
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import retrofit2.HttpException
 import retrofit2.Response
@@ -35,6 +43,12 @@ class DeviceApproveViewModelTest {
     val coroutineRule = MainCoroutineRule()
 
     private val syncManager = mock<SyncManager>()
+    private val userManager = mock<UserManager>()
+    private val playbackManager = mock<PlaybackManager>()
+    private val upNextQueue = mock<UpNextQueue>()
+    private val folderManager = mock<FolderManager>()
+    private val searchHistoryManager = mock<SearchHistoryManager>()
+    private val episodeManager = mock<EpisodeManager>()
     private val cachedSubscription = mock<ReadSetting<Subscription?>> {
         on { value } doReturn null
     }
@@ -137,6 +151,29 @@ class DeviceApproveViewModelTest {
     }
 
     @Test
+    fun `switching account signs out and clears the email`() = runTest {
+        whenever(syncManager.isLoggedIn()).thenReturn(true)
+        whenever(syncManager.getEmail()).thenReturn("user@example.com")
+
+        val viewModel = createViewModel(userCode = "ABCD12")
+        whenever(syncManager.isLoggedIn()).thenReturn(false)
+        whenever(syncManager.getEmail()).thenReturn(null)
+        viewModel.switchAccount()
+        advanceUntilIdle()
+
+        verify(userManager).signOutAndClearData(
+            playbackManager = playbackManager,
+            upNextQueue = upNextQueue,
+            folderManager = folderManager,
+            searchHistoryManager = searchHistoryManager,
+            episodeManager = episodeManager,
+            wasInitiatedByUser = true,
+        )
+        assertFalse(viewModel.uiState.value.isLoggedIn)
+        assertNull(viewModel.uiState.value.email)
+    }
+
+    @Test
     fun `upsell is not prompted when signing into an existing subscription`() = runTest {
         whenever(syncManager.isLoggedIn()).thenReturn(false)
         val subscription = mock<Subscription>()
@@ -147,7 +184,17 @@ class DeviceApproveViewModelTest {
         assertFalse(viewModel.shouldPromptUpsellAfterApproval)
     }
 
-    private fun createViewModel(userCode: String) = DeviceApproveViewModel(syncManager, settings, eventHorizon).apply {
+    private fun createViewModel(userCode: String) = DeviceApproveViewModel(
+        syncManager,
+        userManager,
+        playbackManager,
+        upNextQueue,
+        folderManager,
+        searchHistoryManager,
+        episodeManager,
+        settings,
+        eventHorizon,
+    ).apply {
         setUserCode(userCode)
     }
 
