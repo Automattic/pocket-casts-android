@@ -62,7 +62,7 @@ webkit = "1.17.0"
 wordpress-lint = "2.2.0"
 work = "2.11.2"
 credentials = "1.6.0"
-google-id = "1.2.0"
+google-id = "1.2.1"
 
 [libraries]
 # JNA (required by UniFFI-generated fingerprint bindings)
