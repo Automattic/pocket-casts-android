@@ -4,10 +4,14 @@ import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.profile.whatsnew.WhatsNewMessageViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.repositories.whatsnew.WhatsNewManager
+import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewAction
 import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewContent
+import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewImage
 import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewMessage
 import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewMessageType
 import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewPage
+import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewPoll
+import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewResearch
 import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewTargeting
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import java.time.Instant
@@ -44,7 +48,7 @@ class WhatsNewMessageViewModelTest {
         feedMessages.value = listOf(message("other"), wanted)
 
         createViewModel("wanted").uiState.test {
-            assertEquals(UiState.Loaded(wanted), expectMostRecentItem())
+            assertEquals(wanted, (expectMostRecentItem() as UiState.Loaded).message)
         }
     }
 
@@ -63,7 +67,7 @@ class WhatsNewMessageViewModelTest {
         feedMessages.value = listOf(message)
 
         createViewModel("expiring").uiState.test {
-            assertEquals(UiState.Loaded(message), expectMostRecentItem())
+            assertEquals(message, (expectMostRecentItem() as UiState.Loaded).message)
             feedMessages.value = emptyList()
             expectNoEvents()
         }
@@ -79,7 +83,7 @@ class WhatsNewMessageViewModelTest {
             assertEquals(UiState.Loading, expectMostRecentItem())
             feedMessages.value = listOf(message)
             refresh.complete(Unit)
-            assertEquals(UiState.Loaded(message), expectMostRecentItem())
+            assertEquals(message, (expectMostRecentItem() as UiState.Loaded).message)
         }
     }
 
@@ -94,6 +98,79 @@ class WhatsNewMessageViewModelTest {
             assertEquals(UiState.Missing, expectMostRecentItem())
         }
     }
+
+    @Test
+    fun `pages keep their order and content`() = runTest {
+        val image = WhatsNewImage(url = "https://example.com/a.webp", width = 2, height = 1, alt = "Alt")
+        feedMessages.value = listOf(
+            message(
+                "paged",
+                WhatsNewPage(image = image, heading = "One", description = "First", action = null),
+                WhatsNewPage(image = null, heading = "Two", description = "Second", action = null),
+            ),
+        )
+
+        createViewModel("paged").uiState.test {
+            val pages = (expectMostRecentItem() as UiState.Loaded).pages
+            assertEquals(listOf("One", "Two"), pages.map { it.heading })
+            assertEquals(listOf("First", "Second"), pages.map { it.description })
+            assertEquals(listOf(image, null), pages.map { it.image })
+        }
+    }
+
+    @Test
+    fun `a supported action becomes the page's button`() = runTest {
+        feedMessages.value = listOf(message("action", page(WhatsNewAction(event = "open_discover", label = "Open Discover"))))
+
+        createViewModel("action").uiState.test {
+            val action = (expectMostRecentItem() as UiState.Loaded).pages.single().action
+            assertEquals(WhatsNewMessageViewModel.Action("Open Discover", WhatsNewActionEvent.OpenDiscover), action)
+        }
+    }
+
+    @Test
+    fun `an unsupported action drops only the button`() = runTest {
+        feedMessages.value = listOf(
+            message(
+                "unsupported",
+                page(WhatsNewAction(event = "open_upsell", label = "Upgrade")),
+                page(WhatsNewAction(event = "open_time_machine", label = "Travel")),
+            ),
+        )
+
+        createViewModel("unsupported").uiState.test {
+            val pages = (expectMostRecentItem() as UiState.Loaded).pages
+            assertEquals(2, pages.size)
+            assertEquals(listOf(null, null), pages.map { it.action })
+        }
+    }
+
+    @Test
+    fun `a research message has no pages`() = runTest {
+        val research = message("research").copy(
+            type = WhatsNewMessageType.Research,
+            content = WhatsNewContent.Research(
+                WhatsNewResearch(
+                    description = null,
+                    poll = WhatsNewPoll(
+                        pollId = "poll",
+                        pollKey = "poll",
+                        question = "Question",
+                        options = listOf(WhatsNewPoll.Option(id = "a", pollOptionKey = "a", label = "A")),
+                    ),
+                ),
+            ),
+        )
+        feedMessages.value = listOf(research)
+
+        createViewModel("research").uiState.test {
+            assertEquals(emptyList<WhatsNewMessageViewModel.Page>(), (expectMostRecentItem() as UiState.Loaded).pages)
+        }
+    }
+
+    private fun page(action: WhatsNewAction?) = WhatsNewPage(image = null, heading = "Heading", description = "Description", action = action)
+
+    private fun message(id: String, vararg pages: WhatsNewPage) = message(id).copy(content = WhatsNewContent.Pages(pages.toList()))
 
     private fun message(id: String) = WhatsNewMessage(
         id = id,

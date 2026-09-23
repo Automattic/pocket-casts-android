@@ -3,17 +3,28 @@ package au.com.shiftyjelly.pocketcasts.profile.whatsnew
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
@@ -22,25 +33,35 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
+import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
+import au.com.shiftyjelly.pocketcasts.compose.components.PagerDotIndicator
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.profile.whatsnew.WhatsNewMessageViewModel.Action
+import au.com.shiftyjelly.pocketcasts.profile.whatsnew.WhatsNewMessageViewModel.Page
 import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewContent
+import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewImage
 import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewMessage
 import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewMessageType
-import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewPage
 import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewPoll
 import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewResearch
 import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewTargeting
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import coil3.compose.AsyncImage
 import java.time.Instant
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
+
+private val HorizontalPadding = 20.dp
 
 @Composable
 internal fun WhatsNewMessagePage(
     message: WhatsNewMessage,
+    pages: List<Page>,
     bottomInset: Dp,
     onBackPress: () -> Unit,
+    onActionClick: (WhatsNewActionEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -55,22 +76,105 @@ internal fun WhatsNewMessagePage(
             },
             onNavigationClick = onBackPress,
         )
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 20.dp)
-                .padding(top = 32.dp, bottom = bottomInset + 24.dp),
-        ) {
-            when (val content = message.content) {
-                is WhatsNewContent.Pages -> {
-                    val page = content.pages.first()
-                    WhatsNewMessageText(heading = page.heading, description = page.description)
-                }
+        when (val content = message.content) {
+            is WhatsNewContent.Pages -> WhatsNewPages(
+                pages = pages,
+                bottomInset = bottomInset,
+                onActionClick = onActionClick,
+                modifier = Modifier.weight(1f),
+            )
 
-                is WhatsNewContent.Research -> WhatsNewMessageText(
-                    heading = content.research.poll.question,
-                    description = content.research.description,
+            is WhatsNewContent.Research -> WhatsNewMessageText(
+                heading = content.research.poll.question,
+                description = content.research.description,
+                modifier = Modifier
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = HorizontalPadding)
+                    .padding(top = 32.dp, bottom = bottomInset + 24.dp),
+            )
+        }
+    }
+}
+
+@Composable
+private fun WhatsNewPages(
+    pages: List<Page>,
+    bottomInset: Dp,
+    onActionClick: (WhatsNewActionEvent) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val pagerState = rememberPagerState(pageCount = { pages.size })
+    Column(
+        modifier = modifier.padding(bottom = bottomInset),
+    ) {
+        HorizontalPager(
+            state = pagerState,
+            modifier = Modifier.weight(1f),
+        ) { index ->
+            WhatsNewPageContent(
+                page = pages[index],
+                onActionClick = onActionClick,
+            )
+        }
+        if (pages.size > 1) {
+            val progress = stringResource(
+                LR.string.whats_new_message_page_progress,
+                pagerState.currentPage + 1,
+                pages.size,
+            )
+            PagerDotIndicator(
+                state = pagerState,
+                activeDotColor = MaterialTheme.theme.colors.primaryUi05Selected,
+                inactiveDotColor = MaterialTheme.theme.colors.primaryUi05,
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(vertical = 20.dp)
+                    .clearAndSetSemantics { contentDescription = progress },
+            )
+        }
+    }
+}
+
+@Composable
+private fun WhatsNewPageContent(
+    page: Page,
+    onActionClick: (WhatsNewActionEvent) -> Unit,
+) {
+    BoxWithConstraints(
+        modifier = Modifier.fillMaxSize(),
+    ) {
+        val pageHeight = maxHeight
+        val contentWidth = maxWidth - HorizontalPadding * 2
+        Column(
+            modifier = Modifier.fillMaxSize(),
+        ) {
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = HorizontalPadding)
+                    .padding(bottom = 24.dp),
+            ) {
+                if (page.image != null) {
+                    WhatsNewPageImage(
+                        image = page.image,
+                        contentWidth = contentWidth,
+                        pageHeight = pageHeight,
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .padding(top = 32.dp),
+                    )
+                }
+                WhatsNewMessageText(
+                    heading = page.heading,
+                    description = page.description,
+                    modifier = Modifier.padding(top = if (page.image != null) 40.dp else 32.dp),
+                )
+            }
+            if (page.action != null) {
+                WhatsNewPageAction(
+                    action = page.action,
+                    onClick = { onActionClick(page.action.event) },
                 )
             }
         }
@@ -98,6 +202,53 @@ internal fun WhatsNewMessageLoadingPage(
                 color = MaterialTheme.theme.colors.primaryInteractive01,
             )
         }
+    }
+}
+
+@Composable
+private fun WhatsNewPageImage(
+    image: WhatsNewImage,
+    contentWidth: Dp,
+    pageHeight: Dp,
+    modifier: Modifier = Modifier,
+) {
+    val aspectRatio = image.aspectRatio
+    val sizeModifier = if (aspectRatio != null) {
+        Modifier.size(WhatsNewImageLayout.size(aspectRatio, contentWidth, pageHeight))
+    } else {
+        Modifier
+            .fillMaxWidth()
+            .heightIn(max = WhatsNewImageLayout.maximumHeight(pageHeight))
+    }
+    val semanticsModifier = if (image.alt == null) Modifier.clearAndSetSemantics {} else Modifier
+    AsyncImage(
+        model = image.url,
+        contentDescription = image.alt,
+        contentScale = ContentScale.Fit,
+        modifier = modifier
+            .then(sizeModifier)
+            .clip(RoundedCornerShape(8.dp))
+            .then(semanticsModifier),
+    )
+}
+
+@Composable
+private fun WhatsNewPageAction(
+    action: Action,
+    onClick: () -> Unit,
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.theme.colors.primaryUi01)
+            .padding(horizontal = HorizontalPadding)
+            .padding(top = 16.dp, bottom = 8.dp),
+    ) {
+        RowButton(
+            text = action.label,
+            onClick = onClick,
+            includePadding = false,
+        )
     }
 }
 
@@ -132,19 +283,25 @@ private fun WhatsNewMessagePagePreview(
         WhatsNewMessagePage(
             message = previewMessage(
                 type = WhatsNewMessageType.NewFeature,
-                content = WhatsNewContent.Pages(
-                    listOf(
-                        WhatsNewPage(
-                            image = null,
-                            heading = "You already trust the name",
-                            description = "Browse networks in Discover to see every podcast they make.",
-                            action = null,
-                        ),
-                    ),
+                content = WhatsNewContent.Pages(emptyList()),
+            ),
+            pages = listOf(
+                Page(
+                    image = null,
+                    heading = "You already trust the name",
+                    description = "Browse networks in Discover to see every podcast they make.",
+                    action = Action(label = "Open Discover", event = WhatsNewActionEvent.OpenDiscover),
+                ),
+                Page(
+                    image = null,
+                    heading = "Follow a whole network",
+                    description = "Tap a network to see everything it publishes.",
+                    action = null,
                 ),
             ),
             bottomInset = 0.dp,
             onBackPress = {},
+            onActionClick = {},
         )
     }
 }
@@ -168,8 +325,10 @@ private fun WhatsNewMessagePageResearchPreview() {
                     ),
                 ),
             ),
+            pages = emptyList(),
             bottomInset = 0.dp,
             onBackPress = {},
+            onActionClick = {},
         )
     }
 }
