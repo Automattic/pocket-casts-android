@@ -4,17 +4,21 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
@@ -34,8 +38,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
@@ -84,7 +88,7 @@ internal fun WhatsNewFeedPage(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .pullRefresh(pullRefreshState, enabled = state.items.isNotEmpty()),
+                .pullRefresh(pullRefreshState, enabled = state.loadState == LoadState.Loaded),
         ) {
             if (state.items.isNotEmpty()) {
                 WhatsNewFeedList(
@@ -95,10 +99,8 @@ internal fun WhatsNewFeedPage(
             } else {
                 WhatsNewFeedUnavailable(
                     loadState = state.loadState,
+                    bottomInset = bottomInset,
                     onRetry = onRetry,
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .padding(bottom = bottomInset),
                 )
             }
             PullRefreshIndicator(
@@ -143,14 +145,17 @@ private fun WhatsNewFeedRow(
     date: String,
     onClick: () -> Unit,
 ) {
+    val unreadDescription = stringResource(LR.string.whats_new_feed_unread)
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick)
+            .clickable(role = Role.Button, onClick = onClick)
             .semantics(mergeDescendants = true) {
-                role = Role.Button
+                if (item.isUnread) {
+                    stateDescription = unreadDescription
+                }
             }
             .padding(horizontal = 16.dp, vertical = 12.dp),
     ) {
@@ -213,6 +218,31 @@ private fun WhatsNewFeedIcon(
 
 @Composable
 private fun WhatsNewFeedUnavailable(
+    loadState: LoadState,
+    bottomInset: Dp,
+    onRetry: () -> Unit,
+) {
+    BoxWithConstraints(
+        modifier = Modifier.fillMaxSize(),
+    ) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .verticalScroll(rememberScrollState())
+                .fillMaxWidth()
+                .heightIn(min = maxHeight)
+                .padding(bottom = bottomInset),
+        ) {
+            WhatsNewFeedUnavailableContent(
+                loadState = loadState,
+                onRetry = onRetry,
+            )
+        }
+    }
+}
+
+@Composable
+private fun WhatsNewFeedUnavailableContent(
     loadState: LoadState,
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
