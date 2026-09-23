@@ -21,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import au.com.shiftyjelly.pocketcasts.repositories.whatsnew.WhatsNewManager
 import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewFragment
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
 import com.automattic.eventhorizon.BookmarkDeletedEvent
@@ -28,6 +29,7 @@ import com.automattic.eventhorizon.EventHorizon
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.Instant
 import javax.inject.Inject
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -53,6 +55,7 @@ class MainActivityViewModel
     private val podcastManager: PodcastManager,
     private val bookmarkManager: BookmarkManager,
     private val eventHorizon: EventHorizon,
+    private val whatsNewManager: WhatsNewManager,
 ) : ViewModel() {
     private val _state = MutableStateFlow(State())
     val state = _state.asStateFlow()
@@ -120,6 +123,14 @@ class MainActivityViewModel
     }
 
     suspend fun isEndOfYearStoriesEligible() = endOfYearManager.isEligibleForEndOfYear()
+
+    val hasUnseenWhatsNew: Flow<Boolean> = whatsNewManager.hasUnseenMessages
+
+    fun onProfileShown() {
+        viewModelScope.launch {
+            whatsNewManager.markFeedAsSeen()
+        }
+    }
 
     fun updateStoriesModalShowState(show: Boolean) {
         viewModelScope.launch {
