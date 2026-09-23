@@ -215,6 +215,31 @@ class WhatsNewManagerImplTest {
     }
 
     @Test
+    fun `showing profile marks the feed seen, taking the dot off the tab but not the row`() = runTest {
+        val manager = manager()
+        manager.refreshIfNeeded()
+
+        manager.markFeedAsSeen()
+
+        assertEquals(setOf("m1"), manager.readState.value.seenMessageIds)
+        manager.hasUnseenMessages.test {
+            assertFalse(awaitItem())
+        }
+        manager.hasUnlistedMessages.test {
+            assertTrue(awaitItem())
+        }
+    }
+
+    @Test
+    fun `showing profile before anything has loaded marks nothing seen`() = runTest {
+        val manager = manager()
+
+        manager.markFeedAsSeen()
+
+        assertTrue(manager.readState.value.seenMessageIds.isEmpty())
+    }
+
+    @Test
     fun `a message this user is not targeted by never reaches the feed or its dots`() = runTest {
         serviceManager.catalog = catalogJson("For patrons only", audiences = """["patron"]""")
         val manager = manager()
