@@ -31,10 +31,12 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
@@ -128,8 +130,8 @@ private fun WhatsNewPages(
             )
             PagerDotIndicator(
                 state = pagerState,
-                activeDotColor = MaterialTheme.theme.colors.primaryUi05Selected,
-                inactiveDotColor = MaterialTheme.theme.colors.primaryUi05,
+                activeDotColor = MaterialTheme.theme.colors.primaryText01,
+                inactiveDotColor = MaterialTheme.theme.colors.primaryIcon02,
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
                     .padding(vertical = 20.dp)
@@ -250,13 +252,15 @@ private fun WhatsNewPageAction(
         modifier = Modifier
             .fillMaxWidth()
             .background(MaterialTheme.theme.colors.primaryUi01)
-            .padding(horizontal = HorizontalPadding)
-            .padding(top = 16.dp, bottom = 8.dp),
+            .padding(16.dp),
     ) {
         RowButton(
             text = action.label,
             onClick = onClick,
             includePadding = false,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.W600,
+            modifier = Modifier.heightIn(min = 56.dp),
         )
     }
 }
@@ -273,11 +277,15 @@ private fun WhatsNewMessageText(
     ) {
         TextH30(
             text = heading,
+            fontSize = 17.sp,
+            lineHeight = 22.sp,
             modifier = Modifier.semantics { heading() },
         )
         if (description != null) {
             TextP40(
                 text = description,
+                fontSize = 15.sp,
+                lineHeight = 20.sp,
             )
         }
     }
