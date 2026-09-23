@@ -4,15 +4,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.whatsnew.WhatsNewManager
+import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewMessage
 import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewMessageType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.Instant
 import javax.inject.Inject
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -24,15 +25,17 @@ class WhatsNewFeedViewModel @Inject constructor(
     private val loadState = MutableStateFlow(LoadState.Loading)
     private val isRefreshing = MutableStateFlow(false)
 
+    private var loadJob: Job? = null
+
     internal val uiState: StateFlow<UiState> = combine(
-        manager.feedMessages.onEach { messages -> manager.markAsListed(messages.map { it.id }) },
+        manager.feedMessages,
         manager.readState,
         manager.catalog,
         loadState,
         isRefreshing,
     ) { messages, readState, catalog, loadState, isRefreshing ->
         UiState(
-            items = messages.map { message ->
+            items = messages.distinctBy(WhatsNewMessage::id).map { message ->
                 WhatsNewFeedItem(
                     id = message.id,
                     type = message.type,
@@ -67,8 +70,13 @@ class WhatsNewFeedViewModel @Inject constructor(
     }
 
     fun retry() {
+        if (loadJob?.isActive == true) return
         loadState.value = LoadState.Loading
         load()
+    }
+
+    fun onMessagesShown(ids: List<String>) {
+        manager.markAsListed(ids)
     }
 
     fun onMessageClick(id: String) {
@@ -76,7 +84,7 @@ class WhatsNewFeedViewModel @Inject constructor(
     }
 
     private fun load() {
-        viewModelScope.launch {
+        loadJob = viewModelScope.launch {
             manager.refreshIfNeeded()
             failIfNothingLoaded()
         }

@@ -104,23 +104,52 @@ class WhatsNewFeedViewModelTest {
     }
 
     @Test
-    fun `showing the feed marks its messages listed but not read`() = runTest {
+    fun `showing messages marks them listed but not read`() = runTest {
         manager.publish(listOf(message("a"), message("b")))
+
+        createViewModel().onMessagesShown(listOf("a", "b"))
+
+        assertEquals(setOf("a", "b"), manager.readState.value.listedMessageIds)
+        assertTrue(manager.readState.value.readMessageIds.isEmpty())
+    }
+
+    @Test
+    fun `collecting the feed does not mark anything listed on its own`() = runTest {
+        manager.publish(listOf(message("a")))
 
         createViewModel().uiState.test {
             expectMostRecentItem()
-            assertEquals(setOf("a", "b"), manager.readState.value.listedMessageIds)
-            assertTrue(manager.readState.value.readMessageIds.isEmpty())
+            manager.publish(listOf(message("a"), message("b")))
+            expectMostRecentItem()
+        }
+
+        assertTrue(manager.readState.value.listedMessageIds.isEmpty())
+    }
+
+    @Test
+    fun `a message the catalog repeats is listed once`() = runTest {
+        manager.publish(listOf(message("a"), message("a"), message("b")))
+
+        createViewModel().uiState.test {
+            assertEquals(listOf("a", "b"), expectMostRecentItem().items.map { it.id })
         }
     }
 
     @Test
-    fun `messages arriving while the feed is not shown are not marked listed`() = runTest {
-        createViewModel()
+    fun `retrying again while a retry is in flight does not fetch twice`() = runTest {
+        var fetchCount = 0
+        val viewModel = createViewModel()
+        val refresh = CompletableDeferred<Unit>()
+        manager.onRefresh = {
+            fetchCount++
+            refresh.await()
+        }
 
-        manager.publish(listOf(message("a")))
+        viewModel.retry()
+        viewModel.retry()
+        refresh.complete(Unit)
 
-        assertTrue(manager.readState.value.listedMessageIds.isEmpty())
+        assertEquals(1, fetchCount)
     }
 
     @Test
