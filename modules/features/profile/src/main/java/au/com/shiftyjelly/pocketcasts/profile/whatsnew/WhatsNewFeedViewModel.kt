@@ -83,6 +83,10 @@ class WhatsNewFeedViewModel @Inject constructor(
         manager.markAsRead(listOf(id))
     }
 
+    fun onReadAllClick() {
+        manager.markAsRead(uiState.value.items.map { it.id })
+    }
+
     private fun load() {
         loadJob = viewModelScope.launch {
             manager.refreshIfNeeded()
@@ -100,7 +104,9 @@ class WhatsNewFeedViewModel @Inject constructor(
         val items: List<WhatsNewFeedItem> = emptyList(),
         val loadState: LoadState = LoadState.Loading,
         val isRefreshing: Boolean = false,
-    )
+    ) {
+        val hasUnread get() = items.any { it.isUnread }
+    }
 
     internal enum class LoadState {
         Loading,

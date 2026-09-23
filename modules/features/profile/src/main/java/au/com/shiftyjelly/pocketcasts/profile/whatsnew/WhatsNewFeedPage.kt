@@ -23,6 +23,7 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.TextButton
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
@@ -51,6 +52,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
 import au.com.shiftyjelly.pocketcasts.compose.components.NoContentBanner
 import au.com.shiftyjelly.pocketcasts.compose.components.TextC70
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.profile.whatsnew.WhatsNewFeedViewModel.LoadState
@@ -69,6 +71,7 @@ internal fun WhatsNewFeedPage(
     bottomInset: Dp,
     onBackPress: () -> Unit,
     onMessageClick: (String) -> Unit,
+    onReadAllClick: () -> Unit,
     onRefresh: () -> Unit,
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
@@ -85,6 +88,18 @@ internal fun WhatsNewFeedPage(
         ThemedTopAppBar(
             title = stringResource(LR.string.settings_whats_new),
             onNavigationClick = onBackPress,
+            actions = { color ->
+                if (state.hasUnread) {
+                    TextButton(
+                        onClick = onReadAllClick,
+                    ) {
+                        TextH50(
+                            text = stringResource(LR.string.whats_new_feed_read_all),
+                            color = color,
+                        )
+                    }
+                }
+            },
         )
         Box(
             modifier = Modifier
@@ -300,6 +315,7 @@ private fun WhatsNewFeedPagePreview(
             bottomInset = 0.dp,
             onBackPress = {},
             onMessageClick = {},
+            onReadAllClick = {},
             onRefresh = {},
             onRetry = {},
         )
@@ -315,6 +331,7 @@ private fun WhatsNewFeedPageEmptyPreview() {
             bottomInset = 0.dp,
             onBackPress = {},
             onMessageClick = {},
+            onReadAllClick = {},
             onRefresh = {},
             onRetry = {},
         )
@@ -330,6 +347,7 @@ private fun WhatsNewFeedPageFailedPreview() {
             bottomInset = 0.dp,
             onBackPress = {},
             onMessageClick = {},
+            onReadAllClick = {},
             onRefresh = {},
             onRetry = {},
         )
