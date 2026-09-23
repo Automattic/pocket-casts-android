@@ -6,6 +6,9 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.whatsnew.WhatsNewManager
 import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewMessage
 import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewMessageType
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.WhatsNewFeedShownEvent
+import com.automattic.eventhorizon.WhatsNewReadAllTappedEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.Instant
 import javax.inject.Inject
@@ -20,6 +23,7 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class WhatsNewFeedViewModel @Inject constructor(
     private val manager: WhatsNewManager,
+    private val eventHorizon: EventHorizon,
     settings: Settings,
 ) : ViewModel() {
     private val loadState = MutableStateFlow(LoadState.Loading)
@@ -83,7 +87,12 @@ class WhatsNewFeedViewModel @Inject constructor(
         manager.markAsRead(listOf(id))
     }
 
+    fun onScreenShown() {
+        eventHorizon.track(WhatsNewFeedShownEvent)
+    }
+
     fun onReadAllClick() {
+        eventHorizon.track(WhatsNewReadAllTappedEvent)
         manager.markAsRead(uiState.value.items.map { it.id })
     }
 

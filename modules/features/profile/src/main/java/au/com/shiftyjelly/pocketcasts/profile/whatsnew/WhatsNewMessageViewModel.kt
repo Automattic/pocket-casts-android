@@ -8,9 +8,10 @@ import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewAction
 import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewContent
 import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewImage
 import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewMessage
-import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewMessageType
 import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewResearch
 import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.WhatsNewActionTappedEvent
+import com.automattic.eventhorizon.WhatsNewMessageShownEvent
 import com.automattic.eventhorizon.WhatsNewPollResponseSubmittedEvent
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -26,7 +27,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import com.automattic.eventhorizon.WhatsNewMessageType as AnalyticsMessageType
 
 @HiltViewModel(assistedFactory = WhatsNewMessageViewModel.Factory::class)
 class WhatsNewMessageViewModel @AssistedInject constructor(
@@ -43,7 +43,7 @@ class WhatsNewMessageViewModel @AssistedInject constructor(
 
     internal val uiState: StateFlow<UiState> = combine(
         manager.feedMessages
-            .map { messages -> messages.firstOrNull { it.id == messageId }?.also { shownMessage = it } ?: shownMessage }
+            .map { messages -> messages.firstOrNull { it.id == messageId }?.also(::onMessageFound) ?: shownMessage }
             .distinctUntilChanged(),
         isMissing,
         selectedOptionId,
@@ -71,6 +71,13 @@ class WhatsNewMessageViewModel @AssistedInject constructor(
     val bottomInset: StateFlow<Int> = settings.bottomInset
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), 0)
 
+    private fun onMessageFound(message: WhatsNewMessage) {
+        if (shownMessage == null) {
+            eventHorizon.track(WhatsNewMessageShownEvent(messageUuid = message.id, messageType = message.type.analyticsValue))
+        }
+        shownMessage = message
+    }
+
     init {
         viewModelScope.launch {
             manager.refreshIfNeeded()
@@ -78,6 +85,17 @@ class WhatsNewMessageViewModel @AssistedInject constructor(
                 isMissing.value = true
             }
         }
+    }
+
+    internal fun onActionClick(event: WhatsNewActionEvent) {
+        val message = shownMessage ?: return
+        eventHorizon.track(
+            WhatsNewActionTappedEvent(
+                messageUuid = message.id,
+                messageType = message.type.analyticsValue,
+                action = event.analyticsValue,
+            ),
+        )
     }
 
     fun onOptionClick(optionId: String) {
@@ -158,15 +176,6 @@ class WhatsNewMessageViewModel @AssistedInject constructor(
     }
 
     private val WhatsNewMessage.research get() = (content as? WhatsNewContent.Research)?.research
-
-    private val WhatsNewMessageType.analyticsValue
-        get() = when (this) {
-            WhatsNewMessageType.NewFeature -> AnalyticsMessageType.NewFeature
-            WhatsNewMessageType.Tip -> AnalyticsMessageType.Tip
-            WhatsNewMessageType.Announcement -> AnalyticsMessageType.Announcement
-            WhatsNewMessageType.KnownIssue -> AnalyticsMessageType.KnownIssue
-            WhatsNewMessageType.Research -> AnalyticsMessageType.Research
-        }
 
     @AssistedFactory
     interface Factory {
