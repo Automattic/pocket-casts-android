@@ -40,16 +40,18 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
 import au.com.shiftyjelly.pocketcasts.compose.components.NoContentBanner
 import au.com.shiftyjelly.pocketcasts.compose.components.TextC70
-import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.profile.whatsnew.WhatsNewFeedViewModel.LoadState
@@ -173,12 +175,16 @@ private fun WhatsNewFeedRow(
                 TextC70(
                     text = stringResource(item.type.labelId),
                     maxLines = 1,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.W600,
                     modifier = Modifier.weight(1f),
                 )
                 TextC70(
                     text = date,
                     isUpperCase = false,
                     maxLines = 1,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.W600,
                 )
                 Box(
                     modifier = Modifier
@@ -188,7 +194,7 @@ private fun WhatsNewFeedRow(
                         .background(MaterialTheme.theme.colors.support05),
                 )
             }
-            TextP40(
+            TextH40(
                 text = item.title,
                 maxLines = 2,
             )
