@@ -30,7 +30,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.rx2.await
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -125,7 +124,7 @@ class PodcastListViewModel @Inject constructor(
         viewModelScope.launch {
             val episode = try {
                 withContext(ioDispatcher) {
-                    podcastManager.findOrDownloadPodcastRxSingle(discoverEpisode.podcast_uuid).await()
+                    podcastManager.findOrDownloadPodcast(discoverEpisode.podcast_uuid)
                     episodeManager.findByUuid(discoverEpisode.uuid)
                 }
             } catch (e: CancellationException) {
