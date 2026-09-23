@@ -3,16 +3,19 @@ package au.com.shiftyjelly.pocketcasts.account.deviceapprove
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -28,6 +31,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -55,6 +59,7 @@ fun DeviceApprovePage(
     state: DeviceApproveUiState,
     onConnect: () -> Unit,
     onSetUpAccount: () -> Unit,
+    onSwitchAccount: () -> Unit,
     onDone: () -> Unit,
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
@@ -62,14 +67,10 @@ fun DeviceApprovePage(
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
-            .fillMaxWidth()
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = 24.dp, vertical = 16.dp),
+            .fillMaxSize()
+            .padding(top = 16.dp),
     ) {
         Pill()
-        Spacer(Modifier.height(24.dp))
-        PairingBadges()
-        Spacer(Modifier.height(24.dp))
         when (state.status) {
             DeviceApproveStatus.Approved -> ResultContent(
                 title = stringResource(LR.string.device_approve_success_title),
@@ -96,6 +97,7 @@ fun DeviceApprovePage(
                 state = state,
                 onConnect = onConnect,
                 onSetUpAccount = onSetUpAccount,
+                onSwitchAccount = onSwitchAccount,
             )
         }
     }
@@ -106,25 +108,27 @@ private fun ColumnScope.ApproveContent(
     state: DeviceApproveUiState,
     onConnect: () -> Unit,
     onSetUpAccount: () -> Unit,
+    onSwitchAccount: () -> Unit,
 ) {
-    TextH20(
-        text = stringResource(LR.string.device_approve_title),
-        textAlign = TextAlign.Center,
-    )
-    Spacer(Modifier.height(8.dp))
-    TextP40(
-        text = stringResource(
+    PairingBody(
+        title = stringResource(LR.string.device_approve_title),
+        message = stringResource(
             if (state.isLoggedIn) LR.string.device_approve_description else LR.string.device_approve_login_required,
         ),
-        color = MaterialTheme.theme.colors.primaryText02,
-        textAlign = TextAlign.Center,
-    )
-    Spacer(Modifier.height(24.dp))
+    ) {
+        if (state.isLoggedIn) {
+            Spacer(Modifier.height(24.dp))
+            AccountCard(email = state.email.orEmpty())
+            Spacer(Modifier.height(16.dp))
+            CodeChip(code = state.userCode)
+            Spacer(Modifier.height(16.dp))
+            SwitchAccountLink(
+                onClick = onSwitchAccount,
+                enabled = state.status == DeviceApproveStatus.Idle,
+            )
+        }
+    }
     if (state.isLoggedIn) {
-        AccountCard(email = state.email.orEmpty())
-        Spacer(Modifier.height(16.dp))
-        CodeChip(code = state.userCode)
-        Spacer(Modifier.height(24.dp))
         RowLoadingButton(
             text = stringResource(LR.string.device_approve_connect),
             isLoading = state.status == DeviceApproveStatus.Submitting,
@@ -139,6 +143,55 @@ private fun ColumnScope.ApproveContent(
 }
 
 @Composable
+private fun ColumnScope.PairingBody(
+    title: String,
+    message: String,
+    content: @Composable ColumnScope.() -> Unit = {},
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+        modifier = Modifier
+            .weight(1f)
+            .fillMaxWidth()
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 16.dp),
+    ) {
+        PairingBadges()
+        Spacer(Modifier.height(24.dp))
+        TextH20(text = title, textAlign = TextAlign.Center)
+        Spacer(Modifier.height(8.dp))
+        TextP40(
+            text = message,
+            color = MaterialTheme.theme.colors.primaryText02,
+            textAlign = TextAlign.Center,
+        )
+        content()
+    }
+}
+
+@Composable
+private fun SwitchAccountLink(
+    onClick: () -> Unit,
+    enabled: Boolean,
+) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .clip(RoundedCornerShape(8.dp))
+            .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
+            .sizeIn(minWidth = 48.dp, minHeight = 48.dp)
+            .padding(horizontal = 12.dp),
+    ) {
+        TextP40(
+            text = stringResource(LR.string.device_approve_switch_account),
+            color = MaterialTheme.theme.colors.primaryInteractive01.copy(alpha = if (enabled) 1f else 0.5f),
+            textAlign = TextAlign.Center,
+        )
+    }
+}
+
+@Composable
 private fun PairingBadges(modifier: Modifier = Modifier) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -148,15 +201,15 @@ private fun PairingBadges(modifier: Modifier = Modifier) {
             Image(
                 painter = painterResource(IR.drawable.ic_pocket_casts_logo),
                 contentDescription = null,
-                modifier = Modifier.size(28.dp),
+                modifier = Modifier.size(24.dp),
             )
         }
-        BadgeDots(Modifier.padding(horizontal = 12.dp))
+        BadgeDots(Modifier.padding(horizontal = 16.dp))
         LogoBadge {
             Image(
                 painter = painterResource(IR.drawable.ic_android_robot),
                 contentDescription = null,
-                modifier = Modifier.size(34.dp),
+                modifier = Modifier.size(32.dp),
             )
         }
     }
@@ -167,9 +220,9 @@ private fun LogoBadge(content: @Composable () -> Unit) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
-            .size(64.dp)
+            .size(80.dp)
             .clip(CircleShape)
-            .background(Brush.linearGradient(listOf(Color(0xFF03161F), Color(0xFF08354F)))),
+            .background(Brush.linearGradient(listOf(Color(0xFF010609), Color(0xFF0C4A6F)))),
         content = { content() },
     )
 }
@@ -177,7 +230,7 @@ private fun LogoBadge(content: @Composable () -> Unit) {
 @Composable
 private fun BadgeDots(modifier: Modifier = Modifier) {
     Row(
-        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        horizontalArrangement = Arrangement.spacedBy(2.dp),
         modifier = modifier,
     ) {
         repeat(3) {
@@ -185,7 +238,7 @@ private fun BadgeDots(modifier: Modifier = Modifier) {
                 Modifier
                     .size(4.dp)
                     .clip(CircleShape)
-                    .background(MaterialTheme.theme.colors.primaryText02),
+                    .background(MaterialTheme.theme.colors.primaryUi05),
             )
         }
     }
@@ -198,7 +251,7 @@ private fun AccountCard(email: String) {
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .background(MaterialTheme.theme.colors.primaryUi06)
+            .background(MaterialTheme.theme.colors.primaryUi02)
             .border(1.dp, MaterialTheme.theme.colors.primaryUi05, RoundedCornerShape(12.dp))
             .padding(16.dp),
     ) {
@@ -225,7 +278,7 @@ private fun CodeChip(code: String) {
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .background(MaterialTheme.theme.colors.primaryUi06)
+            .background(MaterialTheme.theme.colors.primaryUi02)
             .border(1.dp, MaterialTheme.theme.colors.primaryUi05, RoundedCornerShape(12.dp))
             .padding(vertical = 16.dp),
     ) {
@@ -240,14 +293,7 @@ private fun ColumnScope.ResultContent(
     buttonText: String,
     onButtonClick: () -> Unit,
 ) {
-    TextH20(text = title, textAlign = TextAlign.Center)
-    Spacer(Modifier.height(8.dp))
-    TextP40(
-        text = message,
-        color = MaterialTheme.theme.colors.primaryText02,
-        textAlign = TextAlign.Center,
-    )
-    Spacer(Modifier.height(24.dp))
+    PairingBody(title = title, message = message)
     RowButton(text = buttonText, onClick = onButtonClick)
 }
 
@@ -261,6 +307,7 @@ private fun DeviceApprovePageLoggedInPreview(
             state = DeviceApproveUiState(userCode = "ABCD12", isLoggedIn = true, email = "user@example.com"),
             onConnect = {},
             onSetUpAccount = {},
+            onSwitchAccount = {},
             onDone = {},
             onClose = {},
         )
@@ -277,6 +324,7 @@ private fun DeviceApprovePageLoggedOutPreview(
             state = DeviceApproveUiState(userCode = "ABCD12", isLoggedIn = false),
             onConnect = {},
             onSetUpAccount = {},
+            onSwitchAccount = {},
             onDone = {},
             onClose = {},
         )

@@ -28,7 +28,6 @@ import com.automattic.eventhorizon.PodcastSubscribedEvent
 import com.automattic.eventhorizon.PodcastUnsubscribedEvent
 import com.automattic.eventhorizon.PodcastsScreenSortOrderChangedEvent
 import com.jakewharton.rxrelay2.BehaviorRelay
-import io.reactivex.Single
 import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -41,6 +40,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -61,7 +61,7 @@ class TvPodcastDetailsViewModelTest {
 
     private val episodes = MutableSharedFlow<List<PodcastEpisode>>(replay = 1)
     private val podcastManager = mock<PodcastManager> {
-        on { findOrDownloadPodcastRxSingle(any(), any()) } doReturn Single.just(podcast)
+        on { findOrDownloadPodcast(any(), any()) } doReturn podcast
         on { podcastByUuidFlow(any()) } doReturn MutableStateFlow(podcast)
     }
     private val episodeManager = mock<EpisodeManager> {
@@ -170,7 +170,7 @@ class TvPodcastDetailsViewModelTest {
     fun `a sort order change re-runs the episodes query`() = runTest {
         val podcastFlow = MutableStateFlow(podcast.copy(episodesSortType = EpisodesSortType.EPISODES_SORT_BY_DATE_DESC))
         val podcastManager = mock<PodcastManager> {
-            on { findOrDownloadPodcastRxSingle(any(), any()) } doReturn Single.just(podcast)
+            on { findOrDownloadPodcast(any(), any()) } doReturn podcast
             on { podcastByUuidFlow(any()) } doReturn podcastFlow
         }
         val viewModel = createViewModel(podcastManager = podcastManager)
@@ -192,7 +192,7 @@ class TvPodcastDetailsViewModelTest {
     fun `a non-sort podcast change does not re-run the episodes query`() = runTest {
         val podcastFlow = MutableStateFlow(podcast.copy(episodesSortType = EpisodesSortType.EPISODES_SORT_BY_DATE_DESC))
         val podcastManager = mock<PodcastManager> {
-            on { findOrDownloadPodcastRxSingle(any(), any()) } doReturn Single.just(podcast)
+            on { findOrDownloadPodcast(any(), any()) } doReturn podcast
             on { podcastByUuidFlow(any()) } doReturn podcastFlow
         }
         val viewModel = createViewModel(podcastManager = podcastManager)
@@ -228,7 +228,7 @@ class TvPodcastDetailsViewModelTest {
     @Test
     fun `a podcast that cannot be resolved maps to the not found state`() = runTest {
         val podcastManager = mock<PodcastManager> {
-            on { findOrDownloadPodcastRxSingle(any(), any()) } doReturn Single.error(RuntimeException("boom"))
+            on { findOrDownloadPodcast(any(), any()) } doThrow RuntimeException("boom")
         }
         val viewModel = createViewModel(podcastManager = podcastManager)
 
@@ -270,7 +270,7 @@ class TvPodcastDetailsViewModelTest {
     fun `toggling a subscribed podcast unfollows it`() = runTest {
         val subscribedPodcast = podcast.copy(isSubscribed = true)
         val podcastManager = mock<PodcastManager> {
-            on { findOrDownloadPodcastRxSingle(any(), any()) } doReturn Single.just(subscribedPodcast)
+            on { findOrDownloadPodcast(any(), any()) } doReturn subscribedPodcast
             on { podcastByUuidFlow(any()) } doReturn MutableStateFlow(subscribedPodcast)
         }
         val viewModel = createViewModel(podcastManager = podcastManager)
@@ -311,7 +311,7 @@ class TvPodcastDetailsViewModelTest {
     fun `unfollowing a podcast tracks the unsubscribe tapped and unsubscribed events`() = runTest {
         val subscribedPodcast = podcast.copy(isSubscribed = true)
         val podcastManager = mock<PodcastManager> {
-            on { findOrDownloadPodcastRxSingle(any(), any()) } doReturn Single.just(subscribedPodcast)
+            on { findOrDownloadPodcast(any(), any()) } doReturn subscribedPodcast
             on { podcastByUuidFlow(any()) } doReturn MutableStateFlow(subscribedPodcast)
         }
         val viewModel = createViewModel(podcastManager = podcastManager)

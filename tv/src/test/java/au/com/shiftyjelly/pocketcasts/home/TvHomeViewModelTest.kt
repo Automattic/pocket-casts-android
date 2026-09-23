@@ -53,7 +53,6 @@ import com.automattic.eventhorizon.HomeShownEvent
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.Observable
-import io.reactivex.Single
 import java.util.Date
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -1054,14 +1053,14 @@ class TvHomeViewModelTest {
         createViewModel().playEpisode(homeEpisode())
 
         verifyBlocking(playbackManager) { playNowSuspend(episode = episode, sourceView = SourceView.DISCOVER) }
-        verify(podcastManager, never()).findOrDownloadPodcastRxSingle(any(), any())
+        verifyBlocking(podcastManager, never()) { findOrDownloadPodcast(any(), any()) }
     }
 
     @Test
     fun `playEpisode fetches the podcast before playing an unknown episode`() = runTest {
         val episode = episode("episode-1", podcastUuid = "podcast-1")
         whenever(episodeManager.findByUuid("episode-1")).thenReturn(null, episode)
-        whenever(podcastManager.findOrDownloadPodcastRxSingle("podcast-1")).thenReturn(Single.just(Podcast(uuid = "podcast-1")))
+        whenever(podcastManager.findOrDownloadPodcast("podcast-1")).thenReturn(Podcast(uuid = "podcast-1"))
 
         createViewModel().playEpisode(homeEpisode())
 
@@ -1084,7 +1083,7 @@ class TvHomeViewModelTest {
     @Test
     fun `playEpisode reports a failure when the podcast fetch fails`() = runTest {
         whenever(episodeManager.findByUuid("episode-1")).thenReturn(null)
-        whenever(podcastManager.findOrDownloadPodcastRxSingle("podcast-1")).thenReturn(Single.error(RuntimeException("boom")))
+        whenever(podcastManager.findOrDownloadPodcast("podcast-1")).thenThrow(RuntimeException("boom"))
         val viewModel = createViewModel()
 
         viewModel.playFailures.test {
@@ -1099,7 +1098,7 @@ class TvHomeViewModelTest {
     fun `playEpisode streams a curated clip from the feed url when the episode cannot be resolved`() = runTest {
         val playable = episode("episode-1", podcastUuid = "podcast-1")
         whenever(episodeManager.findByUuid("episode-1")).thenReturn(null, null, playable)
-        whenever(podcastManager.findOrDownloadPodcastRxSingle("podcast-1")).thenReturn(Single.just(Podcast(uuid = "podcast-1")))
+        whenever(podcastManager.findOrDownloadPodcast("podcast-1")).thenReturn(Podcast(uuid = "podcast-1"))
 
         createViewModel().playEpisode(madeForTvEpisode())
 
@@ -1113,7 +1112,7 @@ class TvHomeViewModelTest {
     fun `playEpisode streams a curated clip from the feed url when the lookup throws`() = runTest {
         val playable = episode("episode-1", podcastUuid = "podcast-1")
         whenever(episodeManager.findByUuid("episode-1")).thenReturn(null, playable)
-        whenever(podcastManager.findOrDownloadPodcastRxSingle("podcast-1")).thenReturn(Single.error(RuntimeException("boom")))
+        whenever(podcastManager.findOrDownloadPodcast("podcast-1")).thenThrow(RuntimeException("boom"))
 
         createViewModel().playEpisode(madeForTvEpisode())
 
@@ -1126,7 +1125,7 @@ class TvHomeViewModelTest {
     @Test
     fun `playEpisode reports a failure when the episode carries no playable url`() = runTest {
         whenever(episodeManager.findByUuid("episode-1")).thenReturn(null)
-        whenever(podcastManager.findOrDownloadPodcastRxSingle("podcast-1")).thenReturn(Single.just(Podcast(uuid = "podcast-1")))
+        whenever(podcastManager.findOrDownloadPodcast("podcast-1")).thenReturn(Podcast(uuid = "podcast-1"))
         val viewModel = createViewModel()
 
         viewModel.playFailures.test {
@@ -1141,7 +1140,7 @@ class TvHomeViewModelTest {
     fun `playLatestEpisode plays the newest episode of a featured podcast`() = runTest {
         val podcast = Podcast(uuid = "podcast-1")
         val newest = episode(uuid = "episode-new", podcastUuid = "podcast-1")
-        whenever(podcastManager.findOrDownloadPodcastRxSingle("podcast-1")).thenReturn(Single.just(podcast))
+        whenever(podcastManager.findOrDownloadPodcast("podcast-1")).thenReturn(podcast)
         whenever(episodeManager.findEpisodesByPodcastOrderedByPublishDate(podcast))
             .thenReturn(listOf(newest, episode(uuid = "episode-old", podcastUuid = "podcast-1")))
 
@@ -1157,7 +1156,7 @@ class TvHomeViewModelTest {
     @Test
     fun `playLatestEpisode reports a failure when the podcast has no episodes`() = runTest {
         val podcast = Podcast(uuid = "podcast-1")
-        whenever(podcastManager.findOrDownloadPodcastRxSingle("podcast-1")).thenReturn(Single.just(podcast))
+        whenever(podcastManager.findOrDownloadPodcast("podcast-1")).thenReturn(podcast)
         whenever(episodeManager.findEpisodesByPodcastOrderedByPublishDate(podcast)).thenReturn(emptyList())
         val viewModel = createViewModel()
 
@@ -1173,7 +1172,7 @@ class TvHomeViewModelTest {
     fun `playLatestEpisode records the tap even when playback fails`() = runTest {
         val podcast = Podcast(uuid = "podcast-1")
         val newest = episode(uuid = "episode-new", podcastUuid = "podcast-1")
-        whenever(podcastManager.findOrDownloadPodcastRxSingle("podcast-1")).thenReturn(Single.just(podcast))
+        whenever(podcastManager.findOrDownloadPodcast("podcast-1")).thenReturn(podcast)
         whenever(episodeManager.findEpisodesByPodcastOrderedByPublishDate(podcast)).thenReturn(listOf(newest))
         whenever { playbackManager.playNowSuspend(episode = newest, sourceView = SourceView.DISCOVER) }
             .thenThrow(RuntimeException("boom"))

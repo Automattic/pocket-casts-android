@@ -5,6 +5,8 @@
         ([#5964](https://github.com/Automattic/pocket-casts-android/pull/5964))
     *   Smart Bookmarks
         ([#6038](https://github.com/Automattic/pocket-casts-android/pull/6038))
+    *   Switch accounts from the screen that appears when you pair a device by scanning its QR code
+        ([#6019](https://github.com/Automattic/pocket-casts-android/pull/6019))
 *   Bug Fixes
     *   Show every matching folder in search results instead of only the last one
         ([#5953](https://github.com/Automattic/pocket-casts-android/pull/5953))
