@@ -587,10 +587,11 @@ class MainActivity :
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.hasUnseenWhatsNew.collect { hasUnseen ->
-                    if (hasUnseen && navigator.currentTab() == VR.id.navigation_profile) {
+                    val isProfileShown = navigator.currentTab() == VR.id.navigation_profile
+                    if (hasUnseen && isProfileShown) {
                         viewModel.onProfileShown()
                     }
-                    isWhatsNewBadgeVisible = hasUnseen
+                    isWhatsNewBadgeVisible = hasUnseen && !isProfileShown
                     renderProfileBadge()
                 }
             }
