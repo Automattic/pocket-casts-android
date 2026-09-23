@@ -27,9 +27,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -135,7 +137,10 @@ private fun WhatsNewPages(
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
                     .padding(vertical = 20.dp)
-                    .clearAndSetSemantics { contentDescription = progress },
+                    .clearAndSetSemantics {
+                        contentDescription = progress
+                        liveRegion = LiveRegionMode.Polite
+                    },
             )
         }
     }
@@ -219,6 +224,8 @@ private fun WhatsNewPageImage(
     modifier: Modifier = Modifier,
 ) {
     var loadedAspectRatio by remember(image.url) { mutableStateOf<Float?>(null) }
+    var hasFailed by remember(image.url) { mutableStateOf(false) }
+    if (hasFailed) return
     val aspectRatio = image.aspectRatio ?: loadedAspectRatio
     val sizeModifier = if (aspectRatio != null) {
         Modifier.size(WhatsNewImageLayout.size(aspectRatio, contentWidth, pageHeight))
@@ -237,6 +244,7 @@ private fun WhatsNewPageImage(
                 loadedAspectRatio = size.width / size.height
             }
         },
+        onError = { hasFailed = true },
         modifier = modifier
             .then(sizeModifier)
             .clip(RoundedCornerShape(8.dp)),
@@ -260,7 +268,7 @@ private fun WhatsNewPageAction(
             includePadding = false,
             fontSize = 18.sp,
             fontWeight = FontWeight.W600,
-            modifier = Modifier.heightIn(min = 56.dp),
+            textVerticalPadding = 9.dp,
         )
     }
 }
