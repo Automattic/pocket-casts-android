@@ -21,7 +21,8 @@ data class WhatsNewMessageFilter(
     private fun isSupported(message: WhatsNewMessage): Boolean {
         val minimum = message.targeting.minimumAppVersion ?: return true
         val required = ReleaseVersion.fromString(minimum) ?: return false
-        return appVersion != null && appVersion >= required
+        val version = appVersion?.copy(releaseCandidate = null) ?: return false
+        return version >= required
     }
 
     private fun isLive(message: WhatsNewMessage, now: Instant): Boolean {
