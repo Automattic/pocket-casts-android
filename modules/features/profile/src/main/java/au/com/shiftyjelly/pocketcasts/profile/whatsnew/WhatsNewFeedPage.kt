@@ -16,8 +16,12 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -53,15 +57,21 @@ import java.time.temporal.ChronoUnit
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 internal fun WhatsNewFeedPage(
     state: UiState,
     bottomInset: Dp,
     onBackPress: () -> Unit,
     onMessageClick: (String) -> Unit,
+    onRefresh: () -> Unit,
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val pullRefreshState = rememberPullRefreshState(
+        refreshing = state.isRefreshing,
+        onRefresh = onRefresh,
+    )
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -72,7 +82,9 @@ internal fun WhatsNewFeedPage(
             onNavigationClick = onBackPress,
         )
         Box(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .pullRefresh(pullRefreshState, enabled = state.items.isNotEmpty()),
         ) {
             if (state.items.isNotEmpty()) {
                 WhatsNewFeedList(
@@ -89,6 +101,13 @@ internal fun WhatsNewFeedPage(
                         .padding(bottom = bottomInset),
                 )
             }
+            PullRefreshIndicator(
+                refreshing = state.isRefreshing,
+                state = pullRefreshState,
+                backgroundColor = MaterialTheme.theme.colors.primaryUi01,
+                contentColor = MaterialTheme.theme.colors.primaryInteractive01,
+                modifier = Modifier.align(Alignment.TopCenter),
+            )
         }
     }
 }
@@ -245,6 +264,7 @@ private fun WhatsNewFeedPagePreview(
             bottomInset = 0.dp,
             onBackPress = {},
             onMessageClick = {},
+            onRefresh = {},
             onRetry = {},
         )
     }
@@ -259,6 +279,7 @@ private fun WhatsNewFeedPageEmptyPreview() {
             bottomInset = 0.dp,
             onBackPress = {},
             onMessageClick = {},
+            onRefresh = {},
             onRetry = {},
         )
     }
@@ -273,6 +294,7 @@ private fun WhatsNewFeedPageFailedPreview() {
             bottomInset = 0.dp,
             onBackPress = {},
             onMessageClick = {},
+            onRefresh = {},
             onRetry = {},
         )
     }
