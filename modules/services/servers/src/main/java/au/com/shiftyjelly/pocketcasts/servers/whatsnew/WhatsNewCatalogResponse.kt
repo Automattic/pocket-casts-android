@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.servers.whatsnew
 import au.com.shiftyjelly.pocketcasts.servers.adapters.LossyList
 import com.squareup.moshi.JsonClass
 import java.time.Instant
+import java.time.OffsetDateTime
 import java.time.format.DateTimeParseException
 import java.util.Date
 import timber.log.Timber
@@ -161,7 +162,7 @@ data class WhatsNewPollOptionResponse(
 private fun String?.nonBlank() = this?.trim()?.takeIf(String::isNotEmpty)
 
 private fun parseInstantOrNull(value: String) = try {
-    Instant.parse(value)
+    OffsetDateTime.parse(value).toInstant()
 } catch (e: DateTimeParseException) {
     Timber.w(e, "Ignoring a What's New catalog timestamp that could not be read")
     null

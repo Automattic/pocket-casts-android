@@ -30,9 +30,14 @@ private class LossyListAdapter<T>(
     private val listAdapter: JsonAdapter<List<T>>,
 ) : JsonAdapter<LossyList<T>>() {
     override fun fromJson(reader: JsonReader): LossyList<T> {
-        if (reader.peek() != JsonReader.Token.BEGIN_ARRAY) {
+        if (reader.peek() == JsonReader.Token.NULL) {
             reader.skipValue()
             return LossyList()
+        }
+        if (reader.peek() != JsonReader.Token.BEGIN_ARRAY) {
+            Timber.w("Dropping a list that was not published as an array")
+            reader.skipValue()
+            return LossyList(droppedCount = 1)
         }
 
         val values = mutableListOf<T>()

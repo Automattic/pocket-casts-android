@@ -375,6 +375,23 @@ class WhatsNewCatalogResponseTest {
         assertTrue(WhatsNewAudience.entries.all(targeting::targets))
     }
 
+    @Test
+    fun `audiences published as something other than a list target nobody rather than everyone`() {
+        val catalog = decode(catalogOf(message(targeting = """{ "audiences": { "include": ["plus"] } }""")))
+
+        val targeting = catalog.messages.single().targeting
+        assertTrue(WhatsNewAudience.entries.none(targeting::targets))
+    }
+
+    @Test
+    fun `a catalog timestamp with a numeric offset is read`() {
+        val catalog = decode(
+            """{ "schemaVersion": 1, "generatedAt": "2026-09-22T13:39:17+02:00", "messages": [${message(title = "Browse by network")}] }""",
+        )
+
+        assertEquals(Instant.parse("2026-09-22T11:39:17Z"), catalog.generatedAt)
+    }
+
     private fun decode(json: String) = requireNotNull(adapter.fromJson(json)).toCatalog()
 
     private fun catalogOf(vararg messages: String) = """{ "schemaVersion": 1, "messages": [${messages.joinToString(",")}] }"""
