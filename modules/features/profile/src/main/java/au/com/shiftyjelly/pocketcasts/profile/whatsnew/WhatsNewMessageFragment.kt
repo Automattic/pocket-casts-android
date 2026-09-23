@@ -53,10 +53,7 @@ class WhatsNewMessageFragment : BaseFragment() {
                     poll = uiState.poll,
                     bottomInset = bottomInset,
                     onBackPress = ::close,
-                    onActionClick = { event ->
-                        viewModel.onActionClick(event)
-                        perform(event)
-                    },
+                    onActionClick = ::perform,
                     onOptionClick = viewModel::onOptionClick,
                     onSubmitClick = viewModel::onSubmitClick,
                 )
@@ -66,6 +63,7 @@ class WhatsNewMessageFragment : BaseFragment() {
 
     private fun perform(event: WhatsNewActionEvent) {
         val host = activity as? FragmentHostListener ?: return
+        viewModel.onActionClick(event)
         when (event) {
             WhatsNewActionEvent.OpenPodcasts -> host.openTab(VR.id.navigation_podcasts)
 
