@@ -13,7 +13,6 @@ import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import com.automattic.eventhorizon.EventHorizon
 import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.rx2.awaitSingleOrNull
 import kotlinx.coroutines.test.runTest
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertEquals
@@ -166,12 +165,12 @@ class EpisodeManagerImplTest {
     private suspend fun downloadMissingEpisode(
         podcastUuid: String,
         skeletonEpisode: PodcastEpisode = createEpisode(),
-    ) = episodeManagerImpl.downloadMissingEpisodeRxMaybe(
+    ) = episodeManagerImpl.downloadMissingEpisode(
         episodeUuid = "episode1",
         podcastUuid = podcastUuid,
         skeletonEpisode = skeletonEpisode,
         podcastManager = mock(),
         downloadMetaData = false,
         source = SourceView.UNKNOWN,
-    ).awaitSingleOrNull()
+    )
 }
