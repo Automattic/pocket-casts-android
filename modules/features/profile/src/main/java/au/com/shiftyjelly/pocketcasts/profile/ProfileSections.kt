@@ -25,9 +25,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -52,7 +52,9 @@ internal fun ProfileSections(
     Column(
         modifier = modifier,
     ) {
+        val unreadDescription = stringResource(LR.string.whats_new_feed_unread)
         sections.forEach { section ->
+            val hasDot = section in sectionsWithDot
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
@@ -67,6 +69,9 @@ internal fun ProfileSections(
                     )
                     .semantics(mergeDescendants = true) {
                         role = Role.Button
+                        if (hasDot) {
+                            stateDescription = unreadDescription
+                        }
                     }
                     .padding(16.dp),
             ) {
@@ -82,13 +87,11 @@ internal fun ProfileSections(
                     text = stringResource(section.labelId),
                     modifier = Modifier.weight(1f),
                 )
-                if (section in sectionsWithDot) {
-                    val unreadDescription = stringResource(LR.string.whats_new_feed_unread)
+                if (hasDot) {
                     Box(
                         modifier = Modifier
                             .size(8.dp)
-                            .background(MaterialTheme.theme.colors.support05, CircleShape)
-                            .semantics { contentDescription = unreadDescription },
+                            .background(MaterialTheme.theme.colors.support05, CircleShape),
                     )
                 }
             }

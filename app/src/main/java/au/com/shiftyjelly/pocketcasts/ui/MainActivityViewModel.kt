@@ -124,7 +124,7 @@ class MainActivityViewModel
 
     suspend fun isEndOfYearStoriesEligible() = endOfYearManager.isEligibleForEndOfYear()
 
-    val hasUnseenWhatsNew: Flow<Boolean> = whatsNewManager.hasUnseenMessages
+    val hasUnseenWhatsNew: Flow<Boolean> get() = whatsNewManager.hasUnseenMessages
 
     fun onProfileShown() {
         viewModelScope.launch {

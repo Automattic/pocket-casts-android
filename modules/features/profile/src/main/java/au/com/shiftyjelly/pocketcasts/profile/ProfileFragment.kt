@@ -57,9 +57,10 @@ class ProfileFragment :
         CallOnce {
             profileViewModel.onScreenShown()
         }
+        val hasWhatsNewDot = profileViewModel.hasWhatsNewDot.collectAsState().value
         val state = ProfilePageState(
             sections = ProfileSection.visibleEntries(),
-            sectionsWithDot = if (profileViewModel.hasWhatsNewDot.collectAsState().value) setOf(ProfileSection.WhatsNew) else emptySet(),
+            sectionsWithDot = setOfNotNull(ProfileSection.WhatsNew.takeIf { hasWhatsNewDot }),
             isPlaybackEnabled = profileViewModel.isPlaybackAvailable.collectAsState().value,
             isFreeAccountBannerVisible = profileViewModel.isFreeAccountBannerVisible.collectAsState().value,
             isUpgradeBannerVisible = profileViewModel.showUpgradeBanner.collectAsState(false).value,
