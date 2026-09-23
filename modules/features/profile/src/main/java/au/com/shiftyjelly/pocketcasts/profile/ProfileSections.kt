@@ -2,15 +2,19 @@ package au.com.shiftyjelly.pocketcasts.profile
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ripple
@@ -21,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
@@ -42,6 +47,7 @@ internal fun ProfileSections(
     sections: List<ProfileSection>,
     onClick: (ProfileSection) -> Unit,
     modifier: Modifier = Modifier,
+    sectionsWithDot: Set<ProfileSection> = emptySet(),
 ) {
     Column(
         modifier = modifier,
@@ -74,7 +80,17 @@ internal fun ProfileSections(
                 )
                 TextP40(
                     text = stringResource(section.labelId),
+                    modifier = Modifier.weight(1f),
                 )
+                if (section in sectionsWithDot) {
+                    val unreadDescription = stringResource(LR.string.whats_new_feed_unread)
+                    Box(
+                        modifier = Modifier
+                            .size(8.dp)
+                            .background(MaterialTheme.theme.colors.support05, CircleShape)
+                            .semantics { contentDescription = unreadDescription },
+                    )
+                }
             }
             HorizontalDivider()
         }
