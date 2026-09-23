@@ -11,6 +11,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.profile.whatsnew.WhatsNewMessageViewModel.UiState
+import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
@@ -35,9 +36,11 @@ class WhatsNewMessageFragment : BaseFragment() {
             val bottomInsetPx by viewModel.bottomInset.collectAsStateWithLifecycle()
             val bottomInset = with(LocalDensity.current) { bottomInsetPx.toDp() }
             when (val uiState = state) {
-                UiState.Loading -> Unit
+                UiState.Loading -> WhatsNewMessageLoadingPage(
+                    onBackPress = ::close,
+                )
 
-                UiState.Missing -> LaunchedEffect(Unit) { close() }
+                UiState.Missing -> LaunchedEffect(Unit) { dismiss() }
 
                 is UiState.Loaded -> WhatsNewMessagePage(
                     message = uiState.message,
@@ -50,6 +53,10 @@ class WhatsNewMessageFragment : BaseFragment() {
 
     private fun close() {
         activity?.onBackPressedDispatcher?.onBackPressed()
+    }
+
+    private fun dismiss() {
+        (activity as? FragmentHostListener)?.closeModal(this)
     }
 
     companion object {
