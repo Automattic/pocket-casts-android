@@ -28,6 +28,7 @@ import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -67,8 +68,12 @@ import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewMessageType
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import java.time.Instant
 import java.time.temporal.ChronoUnit
+import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.delay
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+
+private val ReadAllAnnouncementDuration = 1.seconds
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -84,6 +89,12 @@ internal fun WhatsNewFeedPage(
 ) {
     val allReadDescription = stringResource(LR.string.whats_new_feed_all_read)
     var readAllAnnouncement by remember { mutableStateOf("") }
+    LaunchedEffect(readAllAnnouncement) {
+        if (readAllAnnouncement.isNotEmpty()) {
+            delay(ReadAllAnnouncementDuration)
+            readAllAnnouncement = ""
+        }
+    }
     val pullRefreshState = rememberPullRefreshState(
         refreshing = state.isRefreshing,
         onRefresh = onRefresh,
