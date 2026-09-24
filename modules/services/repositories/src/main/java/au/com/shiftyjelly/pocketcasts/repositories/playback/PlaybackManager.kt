@@ -3076,10 +3076,12 @@ internal fun castSessionFailureAction(
     failureType: CastManager.SessionFailureType,
     isCastPlayerActive: Boolean,
 ): CastSessionFailureAction {
-    return when {
-        isCastPlayerActive -> CastSessionFailureAction.ShowToastAndError
-        failureType == CastManager.SessionFailureType.START -> CastSessionFailureAction.ShowToast
-        else -> CastSessionFailureAction.Ignore
+    if (isCastPlayerActive) {
+        return CastSessionFailureAction.ShowToastAndError
+    }
+    return when (failureType) {
+        CastManager.SessionFailureType.START -> CastSessionFailureAction.ShowToast
+        CastManager.SessionFailureType.RESUME -> CastSessionFailureAction.Ignore
     }
 }
 
