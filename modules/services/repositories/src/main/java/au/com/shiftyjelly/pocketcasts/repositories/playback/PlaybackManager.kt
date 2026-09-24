@@ -328,19 +328,29 @@ open class PlaybackManager @Inject constructor(
                     castReconnected()
                 }
 
-                override fun sessionFailed(errorCode: Int) {
+                override fun sessionFailed(errorCode: Int, failureType: CastManager.SessionFailureType) {
+                    val action = castSessionFailureAction(failureType, isCastPlayerActive = player?.isRemote == true)
+                    if (action == CastSessionFailureAction.Ignore) {
+                        LogBuffer.i(
+                            LogBuffer.TAG_PLAYBACK,
+                            "Ignoring Cast session resume failure with error code $errorCode while not casting",
+                        )
+                        return
+                    }
                     LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Cast session failed with error code $errorCode")
                     launch(Dispatchers.Main) {
                         val message = application.getString(LR.string.error_cast_connection_failed)
                         Toast.makeText(application, message, Toast.LENGTH_LONG).show()
-                        playbackStateRelay.blockingFirst().let { playbackState ->
-                            playbackStateRelay.accept(
-                                playbackState.copy(
-                                    state = PlaybackState.State.ERROR,
-                                    lastErrorMessage = message,
-                                    lastChangeFrom = LastChangeFrom.OnPlayerError.value,
-                                ),
-                            )
+                        if (action == CastSessionFailureAction.ShowToastAndError) {
+                            playbackStateRelay.blockingFirst().let { playbackState ->
+                                playbackStateRelay.accept(
+                                    playbackState.copy(
+                                        state = PlaybackState.State.ERROR,
+                                        lastErrorMessage = message,
+                                        lastChangeFrom = LastChangeFrom.OnPlayerError.value,
+                                    ),
+                                )
+                            }
                         }
                     }
                 }
@@ -3053,6 +3063,25 @@ open class PlaybackManager @Inject constructor(
         OnUpdatePausedPlaybackState("updatePausedPlaybackState"),
         OnUpdateSleepTimerStatus("updateSleepTimerStatus"),
         OnUserSeeking("onUserSeeking"),
+    }
+}
+
+internal enum class CastSessionFailureAction {
+    Ignore,
+    ShowToast,
+    ShowToastAndError,
+}
+
+internal fun castSessionFailureAction(
+    failureType: CastManager.SessionFailureType,
+    isCastPlayerActive: Boolean,
+): CastSessionFailureAction {
+    if (isCastPlayerActive) {
+        return CastSessionFailureAction.ShowToastAndError
+    }
+    return when (failureType) {
+        CastManager.SessionFailureType.START -> CastSessionFailureAction.ShowToast
+        CastManager.SessionFailureType.RESUME -> CastSessionFailureAction.Ignore
     }
 }
 

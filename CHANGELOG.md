@@ -30,6 +30,8 @@
         ([#6017](https://github.com/Automattic/pocket-casts-android/pull/6017))
     *   Resume playback immediately when a headphone or car play button is pressed
         ([#5645](https://github.com/Automattic/pocket-casts-android/pull/5645))
+    *   Prevent Cast connection failures from interrupting local playback or removing playback controls
+        ([#5656](https://github.com/Automattic/pocket-casts-android/pull/5656))
 
 8.21
 -----
