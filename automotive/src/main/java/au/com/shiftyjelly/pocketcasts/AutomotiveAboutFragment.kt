@@ -161,5 +161,7 @@ private fun TextLinkButton(text: String, onClick: () -> Unit, modifier: Modifier
 @Composable
 @Preview
 private fun AboutPageRow() {
-    AboutPage(onOpenLicenses = {}, onOpenLogs = {}, onOpenUrl = {})
+    AutomotiveTheme {
+        AboutPage(onOpenLicenses = {}, onOpenLogs = {}, onOpenUrl = {})
+    }
 }
