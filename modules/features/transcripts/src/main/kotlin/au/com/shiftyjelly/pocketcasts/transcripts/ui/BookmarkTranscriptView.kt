@@ -233,14 +233,23 @@ fun BookmarkTranscriptView(
                     layout = handleLayout,
                     passage = passage,
                     color = color,
-                    onMove = { index -> currentPassageChange(transcript.movePassageStart(passage, index)) },
+                    onMove = { index ->
+                        if (!transcript.isSpeakerOffset(index)) {
+                            currentPassageChange(transcript.movePassageStart(passage, index))
+                        }
+                    },
                 )
                 PassageHandle(
                     edge = HandleEdge.End,
                     layout = handleLayout,
                     passage = passage,
                     color = color,
-                    onMove = { index -> currentPassageChange(transcript.movePassageEnd(passage, index)) },
+                    onMove = { offset ->
+                        val index = (offset - 1).coerceAtLeast(0)
+                        if (!transcript.isSpeakerOffset(index)) {
+                            currentPassageChange(transcript.movePassageEnd(passage, index))
+                        }
+                    },
                 )
             }
         }
@@ -276,39 +285,46 @@ private fun PassageHandle(
     }
     val density = LocalDensity.current
     val knobPx = with(density) { HandleKnob.toPx() }
-    val touchPx = with(density) { HandleTouchWidth.toPx() }
-    val origin = Offset(
-        x = (if (edge == HandleEdge.Start) box.left else box.right) - touchPx / 2,
-        y = if (edge == HandleEdge.Start) box.top - knobPx else box.top,
-    )
-    val currentOrigin by rememberUpdatedState(origin)
+    val stem = Offset(x = if (edge == HandleEdge.Start) box.left else box.right, y = box.center.y)
+    val knobY = if (edge == HandleEdge.Start) box.top - knobPx / 2 else box.bottom + knobPx / 2
+    val stemTop = min(box.top, knobY)
+    val stemHeight = with(density) { (max(box.bottom, knobY) - stemTop).toDp() }
+    val currentStem by rememberUpdatedState(stem)
     val currentLayout by rememberUpdatedState(layout)
     val currentOnMove by rememberUpdatedState(onMove)
-    Box(
-        modifier = Modifier
-            .offset {
-                IntOffset(
-                    x = (Gutter.toPx() + origin.x).roundToInt(),
-                    y = (TopFade.toPx() + origin.y).roundToInt(),
-                )
-            }
-            .size(width = HandleTouchWidth, height = with(density) { (box.height + knobPx).toDp() })
-            .systemGestureExclusion()
-            .pointerInput(edge) {
-                detectDragGestures { change, _ ->
-                    change.consume()
-                    currentOnMove(currentLayout.getOffsetForPosition(currentOrigin + change.position))
+    Box {
+        Box(
+            modifier = Modifier
+                .offset {
+                    IntOffset(
+                        x = (Gutter.toPx() + stem.x - HandleStem.toPx() / 2).roundToInt(),
+                        y = (TopFade.toPx() + stemTop).roundToInt(),
+                    )
                 }
-            }
-            .drawBehind {
-                val stemX = size.width / 2
-                val stemTop = if (edge == HandleEdge.Start) knobPx / 2 else 0f
-                val stemBottom = if (edge == HandleEdge.Start) size.height else box.height
-                drawLine(color, Offset(stemX, stemTop), Offset(stemX, stemBottom), strokeWidth = HandleStem.toPx())
-                val knobY = if (edge == HandleEdge.Start) knobPx / 2 else size.height - knobPx / 2
-                drawCircle(color, radius = knobPx / 2, center = Offset(stemX, knobY))
-            },
-    )
+                .size(width = HandleStem, height = stemHeight)
+                .background(color),
+        )
+        Box(
+            modifier = Modifier
+                .offset {
+                    IntOffset(
+                        x = (Gutter.toPx() + stem.x - HandleTouch.toPx() / 2).roundToInt(),
+                        y = (TopFade.toPx() + knobY - HandleTouch.toPx() / 2).roundToInt(),
+                    )
+                }
+                .size(HandleTouch)
+                .systemGestureExclusion()
+                .pointerInput(edge) {
+                    var position = Offset.Zero
+                    detectDragGestures(onDragStart = { position = currentStem }) { change, dragAmount ->
+                        change.consume()
+                        position += dragAmount
+                        currentOnMove(currentLayout.getOffsetForPosition(position))
+                    }
+                }
+                .drawBehind { drawCircle(color, radius = knobPx / 2) },
+        )
+    }
 }
 
 private fun BookmarkTranscript.isSpeakerOffset(index: Int) = speakerSpans.any { index in it.start until it.end }
@@ -328,7 +344,7 @@ private val SpeakerSpanStyle = SpanStyle(
 private val Gutter = 28.dp
 private val HandleKnob = 12.dp
 private val HandleStem = 2.dp
-private val HandleTouchWidth = 48.dp
+private val HandleTouch = 40.dp
 private val GlyphBox = 24.dp
 
 private val TopFade = 48.dp
