@@ -158,15 +158,10 @@ private fun Content(
             .verticalScroll(rememberScrollState())
             .padding(16.dp),
     ) {
-        val titleRes = if (isNewBookmark) R.string.add_bookmark_title_hint else R.string.change_bookmark_title_hint
         TextP40(
-            text = stringResource(titleRes),
+            text = stringResource(LR.string.bookmark_title_label),
             color = colors.contrast02,
-            textAlign = TextAlign.Center,
-        )
-
-        Spacer(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.fillMaxWidth(),
         )
 
         val tintTextSelectionColors = TextSelectionColors(
