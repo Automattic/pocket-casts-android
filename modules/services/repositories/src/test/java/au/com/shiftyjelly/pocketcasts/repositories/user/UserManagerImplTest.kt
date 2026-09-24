@@ -16,20 +16,25 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.reactive.awaitFirst
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doSuspendableAnswer
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -106,8 +111,87 @@ class UserManagerImplTest {
             expectNoEvents()
             verify(subscriptionManager, never()).fetchFreshSubscriptionResult()
         }
+    }
+
+    @Test
+    fun `signInStateFlow does not schedule notifications`() = runTest {
+        cachedSubscriptionFlow.value = Subscription.PlusPreview
+        val userManager = createUserManager()
+
+        userManager.signInStateFlow().test {
+            assertEquals(SignInState.SignedOut, awaitItem())
+            isLoggedIn.accept(true)
+            awaitItem()
+        }
         advanceUntilIdle()
+        verifyNoInteractions(notificationScheduler)
+    }
+
+    @Test
+    fun `monitorRecommendationNotifications schedules once when logged in`() = runTest {
+        isLoggedIn.accept(true)
+        val userManager = createUserManager(applicationScope = backgroundScope)
+
+        userManager.monitorRecommendationNotifications()
+        runCurrent()
+
         verify(notificationScheduler).setupTrendingAndRecommendationsNotifications()
+        verify(notificationScheduler, never()).cancelScheduledWorksByTag(any())
+    }
+
+    @Test
+    fun `monitorRecommendationNotifications cancels recommendations when logged out`() = runTest {
+        val userManager = createUserManager(applicationScope = backgroundScope)
+
+        userManager.monitorRecommendationNotifications()
+        runCurrent()
+
+        verify(notificationScheduler).cancelScheduledWorksByTag(listOf(UserManagerImpl.RECOMMENDATIONS_WORK_TAG))
+        verify(notificationScheduler, never()).setupTrendingAndRecommendationsNotifications()
+    }
+
+    @Test
+    fun `monitorRecommendationNotifications follows login transitions`() = runTest {
+        val userManager = createUserManager(applicationScope = backgroundScope)
+
+        userManager.monitorRecommendationNotifications()
+        runCurrent()
+        isLoggedIn.accept(true)
+        runCurrent()
+        isLoggedIn.accept(false)
+        runCurrent()
+
+        inOrder(notificationScheduler) {
+            verify(notificationScheduler).cancelScheduledWorksByTag(listOf(UserManagerImpl.RECOMMENDATIONS_WORK_TAG))
+            verify(notificationScheduler).setupTrendingAndRecommendationsNotifications()
+            verify(notificationScheduler).cancelScheduledWorksByTag(listOf(UserManagerImpl.RECOMMENDATIONS_WORK_TAG))
+        }
+    }
+
+    @Test
+    fun `monitorRecommendationNotifications ignores repeated login states`() = runTest {
+        isLoggedIn.accept(true)
+        val userManager = createUserManager(applicationScope = backgroundScope)
+
+        userManager.monitorRecommendationNotifications()
+        runCurrent()
+        isLoggedIn.accept(true)
+        runCurrent()
+
+        verify(notificationScheduler, times(1)).setupTrendingAndRecommendationsNotifications()
+    }
+
+    @Test
+    fun `monitorRecommendationNotifications does not multiply with sign-in state subscribers`() = runTest {
+        isLoggedIn.accept(true)
+        cachedSubscriptionFlow.value = Subscription.PlusPreview
+        val userManager = createUserManager(applicationScope = backgroundScope)
+
+        userManager.monitorRecommendationNotifications()
+        repeat(3) { userManager.signInStateFlow().launchIn(backgroundScope) }
+        runCurrent()
+
+        verify(notificationScheduler, times(1)).setupTrendingAndRecommendationsNotifications()
     }
 
     @Test
@@ -174,7 +258,9 @@ class UserManagerImplTest {
         }
     }
 
-    private fun TestScope.createUserManager() = UserManagerImpl(
+    private fun TestScope.createUserManager(
+        applicationScope: CoroutineScope = CoroutineScope(StandardTestDispatcher(testScheduler)),
+    ) = UserManagerImpl(
         application = mock(),
         settings = settings,
         syncManager = syncManager,
@@ -186,7 +272,7 @@ class UserManagerImplTest {
         analyticsController = mock(),
         eventHorizon = mock(),
         accountStatusInfo = mock(),
-        applicationScope = CoroutineScope(StandardTestDispatcher(testScheduler)),
+        applicationScope = applicationScope,
         crashLogging = mock(),
         experimentProvider = mock(),
         endOfYearSync = mock(),

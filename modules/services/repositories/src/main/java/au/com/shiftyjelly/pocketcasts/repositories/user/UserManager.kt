@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.user
 import android.accounts.AccountManager
 import android.accounts.OnAccountsUpdateListener
 import android.content.Context
+import androidx.annotation.VisibleForTesting
 import au.com.shiftyjelly.pocketcasts.analytics.AccountStatusInfo
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsController
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
@@ -34,7 +35,6 @@ import com.automattic.eventhorizon.UserSignedOutEvent
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.Flowable
 import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -47,6 +47,7 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.mapLatest
@@ -94,18 +95,18 @@ class UserManagerImpl @Inject constructor(
     private val endOfYearSync: EndOfYearSync,
     private val notificationScheduler: NotificationScheduler,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
-) : UserManager,
-    CoroutineScope {
+) : UserManager {
 
     companion object {
         private const val KEY_USER_INITIATED = "user_initiated"
         private const val SUBSCRIPTION_FETCH_MAX_ATTEMPTS = 3
         private const val SUBSCRIPTION_FETCH_TIMEOUT_MS = 10_000L
         private const val SUBSCRIPTION_FETCH_RETRY_DELAY_MS = 2_000L
-    }
 
-    override val coroutineContext: CoroutineContext
-        get() = defaultDispatcher
+        @VisibleForTesting
+        internal val RECOMMENDATIONS_WORK_TAG =
+            "$TAG_TRENDING_RECOMMENDATIONS-${TrendingAndRecommendationsNotificationType.Recommendations.subcategory}"
+    }
 
     private val _onServerSignOut = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     override val onServerSignOut: SharedFlow<Unit> = _onServerSignOut.asSharedFlow()
@@ -125,23 +126,31 @@ class UserManagerImpl @Inject constructor(
 
         val accountManager = AccountManager.get(application)
         accountManager.addOnAccountsUpdatedListener(accountListener, null, true)
+
+        monitorRecommendationNotifications()
+    }
+
+    // Kept out of signInStateFlow so scheduling runs once per login change, not once per subscriber.
+    @VisibleForTesting
+    internal fun monitorRecommendationNotifications() {
+        applicationScope.launch(defaultDispatcher) {
+            syncManager.isLoggedInObservable.asFlow()
+                .distinctUntilChanged()
+                .collect { isLoggedIn ->
+                    if (isLoggedIn) {
+                        notificationScheduler.setupTrendingAndRecommendationsNotifications()
+                    } else {
+                        notificationScheduler.cancelScheduledWorksByTag(listOf(RECOMMENDATIONS_WORK_TAG))
+                    }
+                }
+        }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun signInStateFlow(): Flow<SignInState> {
         return syncManager.isLoggedInObservable.asFlow()
             .flatMapLatest { isLoggedIn ->
-                if (isLoggedIn) {
-                    launch {
-                        notificationScheduler.setupTrendingAndRecommendationsNotifications()
-                    }
-                    signedInStateFlow()
-                } else {
-                    launch {
-                        notificationScheduler.cancelScheduledWorksByTag(listOf("$TAG_TRENDING_RECOMMENDATIONS-${TrendingAndRecommendationsNotificationType.Recommendations.subcategory}"))
-                    }
-                    flowOf(SignInState.SignedOut)
-                }
+                if (isLoggedIn) signedInStateFlow() else flowOf(SignInState.SignedOut)
             }
     }
 
