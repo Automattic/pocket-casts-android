@@ -34,7 +34,6 @@ import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.jakewharton.rxrelay2.PublishRelay
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.Flowable
-import io.reactivex.Single
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration.Companion.days
@@ -122,7 +121,7 @@ class PodcastManagerImpl @Inject constructor(
     }
 
     override suspend fun subscribeToPodcastOrThrow(podcastUuid: String, sync: Boolean, shouldAutoDownload: Boolean): Podcast {
-        return addPodcastRxSingle(podcastUuid = podcastUuid, sync = sync, subscribed = true, shouldAutoDownload = shouldAutoDownload).await()
+        return addPodcast(podcastUuid = podcastUuid, sync = sync, subscribed = true, shouldAutoDownload = shouldAutoDownload)
     }
 
     // addPodcastRxSingle runs its first query on the subscribing thread, so keep it off the caller's thread.
@@ -160,8 +159,8 @@ class PodcastManagerImpl @Inject constructor(
         return null
     }
 
-    override fun addPodcastRxSingle(podcastUuid: String, sync: Boolean, subscribed: Boolean, shouldAutoDownload: Boolean): Single<Podcast> {
-        return subscribeManager.addPodcastRxSingle(podcastUuid = podcastUuid, sync = sync, subscribed = subscribed, shouldAutoDownload = shouldAutoDownload)
+    override suspend fun addPodcast(podcastUuid: String, sync: Boolean, subscribed: Boolean, shouldAutoDownload: Boolean): Podcast {
+        return subscribeManager.addPodcastRxSingle(podcastUuid = podcastUuid, sync = sync, subscribed = subscribed, shouldAutoDownload = shouldAutoDownload).await()
     }
 
     override fun isSubscribingToPodcast(podcastUuid: String): Boolean {

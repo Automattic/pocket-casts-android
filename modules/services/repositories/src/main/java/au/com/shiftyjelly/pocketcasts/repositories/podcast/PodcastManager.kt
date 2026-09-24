@@ -16,7 +16,6 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import io.reactivex.Flowable
-import io.reactivex.Single
 import kotlinx.coroutines.flow.Flow
 
 interface PodcastManager {
@@ -61,7 +60,7 @@ interface PodcastManager {
     suspend fun findOrDownloadPodcast(podcastUuid: String, waitForSubscribe: Boolean = false): Podcast
     fun isSubscribingToPodcasts(): Boolean
     fun isSubscribingToPodcast(podcastUuid: String): Boolean
-    fun addPodcastRxSingle(podcastUuid: String, sync: Boolean, subscribed: Boolean, shouldAutoDownload: Boolean): Single<Podcast>
+    suspend fun addPodcast(podcastUuid: String, sync: Boolean, subscribed: Boolean, shouldAutoDownload: Boolean): Podcast
 
     suspend fun replaceCuratedPodcasts(podcasts: List<CuratedPodcast>)
 

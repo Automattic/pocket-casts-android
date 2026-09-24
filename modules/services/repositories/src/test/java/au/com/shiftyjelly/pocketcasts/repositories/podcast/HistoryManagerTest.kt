@@ -8,15 +8,15 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import java.util.Date
 import java.util.concurrent.atomic.AtomicInteger
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.rx2.rxSingle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
-import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.doSuspendableAnswer
+import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -84,13 +84,11 @@ class HistoryManagerTest {
         val maxActiveAdds = AtomicInteger()
         val podcastManager = mock<PodcastManager> {
             on { findSubscribedUuids() } doReturn emptyList()
-            on { addPodcastRxSingle(any(), any(), any(), any()) } doAnswer { invocation ->
-                rxSingle {
-                    maxActiveAdds.accumulateAndGet(activeAdds.incrementAndGet(), ::maxOf)
-                    delay(20)
-                    activeAdds.decrementAndGet()
-                    Podcast(uuid = invocation.getArgument(0))
-                }
+            on { addPodcast(any(), any(), any(), any()) } doSuspendableAnswer { invocation ->
+                maxActiveAdds.accumulateAndGet(activeAdds.incrementAndGet(), ::maxOf)
+                delay(20)
+                activeAdds.decrementAndGet()
+                Podcast(uuid = invocation.getArgument(0))
             }
         }
 
@@ -100,7 +98,7 @@ class HistoryManagerTest {
         )
 
         missingPodcastUuids.forEach { podcastUuid ->
-            verify(podcastManager).addPodcastRxSingle(podcastUuid, sync = false, subscribed = false, shouldAutoDownload = false)
+            verifyBlocking(podcastManager) { addPodcast(podcastUuid, sync = false, subscribed = false, shouldAutoDownload = false) }
         }
         assertTrue(maxActiveAdds.get() in 1..HistoryManager.ADD_PODCAST_CONCURRENCY)
     }
@@ -110,7 +108,7 @@ class HistoryManagerTest {
         val episodeManager = episodeManager(storedInteractionDate = 50L)
         val podcastManager = mock<PodcastManager> {
             on { findSubscribedUuids() } doReturn emptyList()
-            on { addPodcastRxSingle(any(), any(), any(), any()) } doReturn rxSingle<Podcast> { throw IllegalStateException("boom") }
+            on { addPodcast(any(), any(), any(), any()) } doThrow IllegalStateException("boom")
         }
 
         HistoryManager(podcastManager, episodeManager, settings).processServerResponse(
