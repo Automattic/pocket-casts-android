@@ -18,8 +18,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -56,8 +58,13 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.LocalPodcastColors
+import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
+import au.com.shiftyjelly.pocketcasts.compose.PodcastColorsParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
+import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.BookmarkTranscript
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TextSpan
@@ -69,10 +76,11 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 /**
- * Renders a [BookmarkTranscript] with the bookmarked [passage] highlighted in the primary text
- * colour and the surrounding transcript dimmed, scrolling the passage into view. Read-only in the
- * bookmark details; when [editable] a tap selects the sentence it lands in and a drag extends the
- * passage across sentences, reporting the new span through [onPassageChange].
+ * Renders a [BookmarkTranscript] scrolled to the bookmarked [passage]. Read-only in the bookmark
+ * details, where the passage is drawn in the primary text colour and the rest of the transcript is
+ * dimmed. When [editable] the whole transcript is drawn in [editableTextColor] and the passage is
+ * marked by an [editableHighlightColor] background; a tap selects the sentence it lands in and a
+ * drag extends the passage across sentences, reporting the new span through [onPassageChange].
  */
 @Composable
 fun BookmarkTranscriptView(
@@ -301,5 +309,29 @@ private fun BookmarkTranscriptViewPreview(
             referenceOffset = passage.start,
             modifier = Modifier.background(rememberTranscriptTheme().background),
         )
+    }
+}
+
+@Preview
+@Composable
+private fun BookmarkTranscriptViewEditablePreview(
+    @PreviewParameter(PodcastColorsParameterProvider::class) podcastColors: PodcastColors,
+) {
+    val transcript = remember { BookmarkTranscript.from(Transcript.TextPreview) }
+    val passage = remember { transcript.sentenceDisplaySpan(index = 40) }
+    AppTheme(ThemeType.DARK) {
+        CompositionLocalProvider(LocalPodcastColors provides podcastColors) {
+            val playerColors = requireNotNull(MaterialTheme.theme.rememberPlayerColors())
+            BookmarkTranscriptView(
+                transcript = transcript,
+                passage = passage,
+                editable = true,
+                scrollToPassage = false,
+                referenceOffset = passage.start,
+                editableTextColor = playerColors.contrast01,
+                editableHighlightColor = playerColors.highlight01,
+                modifier = Modifier.background(playerColors.background01),
+            )
+        }
     }
 }
