@@ -94,10 +94,13 @@ fun AutomotiveTheme(content: @Composable () -> Unit) {
 }
 
 private fun TextStyle.scaledToFontSize(fontSize: TextUnit): TextStyle {
+    if (!this.fontSize.isSpecified || !lineHeight.isSpecified) {
+        return copy(fontSize = fontSize)
+    }
     val scale = fontSize.value / this.fontSize.value
     return copy(
         fontSize = fontSize,
-        lineHeight = if (lineHeight.isSpecified) lineHeight * scale else lineHeight,
+        lineHeight = lineHeight * scale,
     )
 }
 
