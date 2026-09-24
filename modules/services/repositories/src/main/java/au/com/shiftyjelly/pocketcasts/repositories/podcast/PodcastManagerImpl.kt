@@ -124,14 +124,13 @@ class PodcastManagerImpl @Inject constructor(
         return addPodcast(podcastUuid = podcastUuid, sync = sync, subscribed = true, shouldAutoDownload = shouldAutoDownload)
     }
 
-    // addPodcast runs its first query on the calling thread, so keep it off the caller's thread.
-    override suspend fun findOrDownloadPodcast(podcastUuid: String, waitForSubscribe: Boolean): Podcast = withContext(ioDispatcher) {
+    override suspend fun findOrDownloadPodcast(podcastUuid: String, waitForSubscribe: Boolean): Podcast {
         val existingPodcast = if (waitForSubscribe) {
             findPodcastOrWaitForSubscribe(podcastUuid)
         } else {
             findPodcastByUuid(podcastUuid)
         }
-        existingPodcast ?: addPodcast(podcastUuid, sync = false, subscribed = false, shouldAutoDownload = false)
+        return existingPodcast ?: addPodcast(podcastUuid, sync = false, subscribed = false, shouldAutoDownload = false)
     }
 
     private suspend fun findPodcastOrWaitForSubscribe(
@@ -159,8 +158,9 @@ class PodcastManagerImpl @Inject constructor(
         return null
     }
 
-    override suspend fun addPodcast(podcastUuid: String, sync: Boolean, subscribed: Boolean, shouldAutoDownload: Boolean): Podcast {
-        return subscribeManager.addPodcastRxSingle(podcastUuid = podcastUuid, sync = sync, subscribed = subscribed, shouldAutoDownload = shouldAutoDownload).await()
+    // The Rx chain runs its first query on the subscribing thread, so keep it off the caller's thread.
+    override suspend fun addPodcast(podcastUuid: String, sync: Boolean, subscribed: Boolean, shouldAutoDownload: Boolean): Podcast = withContext(ioDispatcher) {
+        subscribeManager.addPodcastRxSingle(podcastUuid = podcastUuid, sync = sync, subscribed = subscribed, shouldAutoDownload = shouldAutoDownload).await()
     }
 
     override fun isSubscribingToPodcast(podcastUuid: String): Boolean {
