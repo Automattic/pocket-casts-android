@@ -103,10 +103,11 @@ fun BookmarkTranscriptView(
     val currentLayout by rememberUpdatedState(layout)
     val currentPassageChange by rememberUpdatedState(onPassageChange)
 
-    val text = remember(transcript, passage, theme, editable, editableTextColor) {
+    val editableColor = editableTextColor.takeOrElse { theme.primaryText }
+    val text = remember(transcript, passage, theme, editable, editableColor) {
         buildAnnotatedString {
             append(transcript.displayText)
-            val baseColor = if (editable) editableTextColor.takeOrElse { theme.primaryText } else theme.secondaryText
+            val baseColor = if (editable) editableColor else theme.secondaryText
             addStyle(SpanStyle(color = baseColor), 0, transcript.displayText.length)
             transcript.speakerSpans.forEach { span ->
                 addStyle(SpeakerSpanStyle, span.start, span.end)
@@ -196,7 +197,7 @@ fun BookmarkTranscriptView(
                     Icon(
                         painter = painterResource(IR.drawable.ic_bookmark_fill),
                         contentDescription = null,
-                        tint = theme.primaryText,
+                        tint = if (editable) editableColor else theme.primaryText,
                         modifier = Modifier
                             .size(GlyphBox)
                             .offset {
