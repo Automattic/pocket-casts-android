@@ -29,7 +29,15 @@ class BookmarkTitleFallbackTest {
         assertEquals("one two three four five six", BookmarkTitleFallback.fromPassage("one two three four five six, seven"))
         assertEquals("one two three four five six", BookmarkTitleFallback.fromPassage("one two three four five six; seven"))
         assertEquals("one two three four five six", BookmarkTitleFallback.fromPassage("one two three four five six: seven"))
-        assertEquals("one two three four five", BookmarkTitleFallback.fromPassage("one two three four five — six seven"))
+        assertEquals("one two three four five six", BookmarkTitleFallback.fromPassage("one two three four five six– seven"))
+        assertEquals("one two three four five six", BookmarkTitleFallback.fromPassage("one two three four five six- seven"))
+    }
+
+    @Test
+    fun `skips standalone dashes so they neither count as words nor end the title`() {
+        assertEquals("one two three four five six", BookmarkTitleFallback.fromPassage("one two three four five — six seven"))
+        assertEquals("one two three four five six", BookmarkTitleFallback.fromPassage("one two three four five - six seven"))
+        assertEquals("one two three four five", BookmarkTitleFallback.fromPassage("one two three four five, – "))
     }
 
     @Test
@@ -38,10 +46,24 @@ class BookmarkTitleFallbackTest {
     }
 
     @Test
-    fun `caps the title at 100 characters`() {
+    fun `caps a single long word at 100 characters`() {
         val longWord = "a".repeat(150)
 
         assertEquals(100, BookmarkTitleFallback.fromPassage(longWord)?.length)
+    }
+
+    @Test
+    fun `caps long words at the last whole word`() {
+        val word = "a".repeat(40)
+
+        assertEquals("$word $word", BookmarkTitleFallback.fromPassage("$word $word, $word"))
+    }
+
+    @Test
+    fun `does not split a character when capping`() {
+        val title = BookmarkTitleFallback.fromPassage("a".repeat(99) + "😀" + "a".repeat(10))
+
+        assertEquals("a".repeat(99), title)
     }
 
     @Test
