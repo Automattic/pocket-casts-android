@@ -26,9 +26,9 @@ class SwipeRowState internal constructor(
 }
 
 @Composable
-fun rememberSwipeRowState(): SwipeRowState {
+fun rememberSwipeRowState(key: Any? = null): SwipeRowState {
     val scope = rememberCoroutineScope()
-    return remember(scope) {
+    return remember(scope, key) {
         SwipeRowState(
             draggableState = AnchoredDraggableState(initialValue = SwipeRowAnchor.Resting),
             scope = scope,

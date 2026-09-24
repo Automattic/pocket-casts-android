@@ -86,6 +86,22 @@ class SwipeRowAnchorsTest {
         isTrailingFullSwipeEnabled = isTrailingFullSwipeEnabled,
     )
 
+    @Test
+    fun `revealing an action settles past half its width`() {
+        assertEquals(36f, swipeRowPositionalThreshold(distance = 72f, actionWidthPx = 72f, fullSwipeThresholdPx = 600f))
+    }
+
+    @Test
+    fun `a full swipe settles once the drag passes the full swipe threshold`() {
+        val threshold = swipeRowPositionalThreshold(
+            distance = ROW_WIDTH * FULL_SWIPE_ANCHOR_MULTIPLIER - 72f,
+            actionWidthPx = 72f,
+            fullSwipeThresholdPx = 600f,
+        )
+
+        assertEquals(528f, threshold)
+    }
+
     private companion object {
         const val ROW_WIDTH = 1080f
     }

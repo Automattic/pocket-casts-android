@@ -111,7 +111,7 @@ fun BookmarkRow(
     }
     val displayEpisode = episode ?: fetchedEpisode
     val canShare = displayEpisode is PodcastEpisode && displayEpisode.uuid.isNotEmpty()
-    val swipeState = rememberSwipeRowState()
+    val swipeState = rememberSwipeRowState(key = bookmark.uuid)
     Column(
         modifier = modifier,
     ) {
@@ -124,9 +124,9 @@ fun BookmarkRow(
             isSwipeEnabled = !isSelecting,
             leadingAction = onShareClick
                 ?.takeIf { canShare }
-                ?.let { onShare -> SwipeRowActionDefaults.share(onClick = onShare) },
+                ?.let { onShare -> SwipeRowActionDefaults.share(isFullSwipeEnabled = true, onClick = onShare) },
             trailingAction = onDeleteClick
-                ?.let { onDelete -> SwipeRowActionDefaults.delete(onClick = onDelete) },
+                ?.let { onDelete -> SwipeRowActionDefaults.delete(isFullSwipeEnabled = true, onClick = onDelete) },
         ) {
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,

@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.compose.swipe
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.AnchoredDraggableDefaults
 import androidx.compose.foundation.gestures.DraggableAnchors
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.anchoredDraggable
@@ -58,6 +59,8 @@ import androidx.compose.material.MaterialTheme as Material
 
 private val ActionIconSize = 24.dp
 private val ActionHorizontalPadding = 48.dp
+private val FullSwipeMinThreshold = 200.dp
+private val FullSwipeThresholdMargin = 24.dp
 
 internal const val FULL_SWIPE_ANCHOR_MULTIPLIER = 2
 
@@ -90,6 +93,12 @@ internal fun swipeRowAnchors(
     }
 }
 
+internal fun swipeRowPositionalThreshold(
+    distance: Float,
+    actionWidthPx: Float,
+    fullSwipeThresholdPx: Float,
+) = if (distance > actionWidthPx) fullSwipeThresholdPx - actionWidthPx else distance / 2f
+
 @Composable
 fun SwipeRow(
     state: SwipeRowState,
@@ -101,6 +110,15 @@ fun SwipeRow(
 ) {
     val density = LocalDensity.current
     val actionWidthPx = with(density) { (ActionIconSize + ActionHorizontalPadding).toPx() }
+    val fullSwipeThresholdPx = with(density) {
+        maxOf(actionWidthPx + FullSwipeThresholdMargin.toPx(), FullSwipeMinThreshold.toPx())
+    }
+    val flingBehavior = AnchoredDraggableDefaults.flingBehavior(
+        state = state.draggableState,
+        positionalThreshold = remember(actionWidthPx, fullSwipeThresholdPx) {
+            { distance -> swipeRowPositionalThreshold(distance, actionWidthPx, fullSwipeThresholdPx) }
+        },
+    )
     var rowWidthPx by remember { mutableIntStateOf(0) }
 
     val anchors = remember(rowWidthPx, actionWidthPx, leadingAction, trailingAction) {
@@ -184,6 +202,7 @@ fun SwipeRow(
                     orientation = Orientation.Horizontal,
                     enabled = isSwipeEnabled,
                     interactionSource = interactionSource,
+                    flingBehavior = flingBehavior,
                 )
                 .semantics {
                     customActions = actions.map { action ->
@@ -222,7 +241,7 @@ private fun BoxScope.SwipeRowActionSlab(
             .matchParentSize()
             .graphicsLayer {
                 val offset = state.settledOffset
-                translationX = if (isLeading) offset - rowWidthPx else offset + rowWidthPx
+                translationX = if (isLeading) (offset - rowWidthPx).coerceAtMost(0f) else (offset + rowWidthPx).coerceAtLeast(0f)
             }
             .background(action.backgroundColor)
             .clickable(

@@ -24,11 +24,13 @@ object SwipeRowActionDefaults {
     @Composable
     fun share(
         contentDescription: String = stringResource(LR.string.share),
+        isFullSwipeEnabled: Boolean = false,
         onClick: (SwipeRowState) -> Unit,
     ) = SwipeRowAction(
         iconId = IR.drawable.ic_share,
         contentDescription = contentDescription,
         backgroundColor = Material.theme.colors.support01,
+        isFullSwipeEnabled = isFullSwipeEnabled,
         onClick = onClick,
     )
 
