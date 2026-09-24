@@ -32,6 +32,65 @@ class BookmarkTranscriptTest {
     }
 
     @Test
+    fun `moving the passage start snaps to the start of the word`() {
+        val passage = transcript.sentenceDisplaySpan(transcript.displayText.indexOf("gets in"))
+        val index = transcript.displayText.indexOf("selective") + 3
+
+        val moved = transcript.movePassageStart(passage, index)
+
+        assertEquals("selective admissions.\n$secondSentence", transcript.displaySubstring(moved))
+    }
+
+    @Test
+    fun `moving the passage start inside the passage trims it`() {
+        val passage = transcript.sentenceDisplaySpan(transcript.displayText.indexOf("gets in"))
+
+        val moved = transcript.movePassageStart(passage, transcript.displayText.indexOf("gets in") + 2)
+
+        assertEquals("gets in and the kid who doesn't is often basically noise.", transcript.displaySubstring(moved))
+    }
+
+    @Test
+    fun `moving the passage start onto a space starts at the next word`() {
+        val passage = transcript.sentenceDisplaySpan(transcript.displayText.indexOf("gets in"))
+
+        val moved = transcript.movePassageStart(passage, transcript.displayText.indexOf(" gets in"))
+
+        assertEquals("gets in and the kid who doesn't is often basically noise.", transcript.displaySubstring(moved))
+    }
+
+    @Test
+    fun `moving the passage end snaps to the end of the word`() {
+        val passage = transcript.sentenceDisplaySpan(transcript.displayText.indexOf("gets in"))
+        val index = transcript.displayText.indexOf("researchers") + 2
+
+        val moved = transcript.movePassageEnd(passage, index)
+
+        assertEquals("$secondSentence\nSpeaker 2\nRight, and that's why some researchers", transcript.displaySubstring(moved))
+        assertEquals("$secondSentence Right, and that's why some researchers", transcript.passage(moved).text)
+    }
+
+    @Test
+    fun `moving the passage end inside the passage trims it`() {
+        val passage = transcript.sentenceDisplaySpan(transcript.displayText.indexOf("gets in"))
+
+        val moved = transcript.movePassageEnd(passage, transcript.displayText.indexOf("gets in"))
+
+        assertEquals("The difference between the kid who gets", transcript.displaySubstring(moved))
+    }
+
+    @Test
+    fun `moving a passage edge past the other keeps at least one character`() {
+        val passage = transcript.sentenceDisplaySpan(transcript.displayText.indexOf("gets in"))
+
+        val start = transcript.movePassageStart(passage, transcript.displayText.length - 1)
+        val end = transcript.movePassageEnd(passage, 0)
+
+        assertEquals(TextSpan(passage.end - 1, passage.end), start)
+        assertEquals(TextSpan(passage.start, passage.start + 1), end)
+    }
+
+    @Test
     fun `sentence span is empty for an empty transcript`() {
         val empty = bookmarkTranscript()
 
