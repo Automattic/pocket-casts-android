@@ -974,9 +974,9 @@ private fun <T> Flowable<List<T>>.withSearchResult(
 
 private fun Maybe<Podcast>.downloadMissingPodcast(uuid: String, podcastManager: PodcastManager): Single<Podcast> {
     return this.switchIfEmpty(
-        Single.defer {
+        rxSingle {
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Podcast $uuid not found in database")
-            rxSingle { podcastManager.findOrDownloadPodcast(podcastUuid = uuid, waitForSubscribe = true) }
+            podcastManager.findOrDownloadPodcast(podcastUuid = uuid, waitForSubscribe = true)
         },
     )
 }
