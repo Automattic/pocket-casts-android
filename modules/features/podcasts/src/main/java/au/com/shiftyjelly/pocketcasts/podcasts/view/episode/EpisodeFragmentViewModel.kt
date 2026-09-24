@@ -302,9 +302,9 @@ class EpisodeFragmentViewModel @Inject constructor(
         val podcast = podcastManager.findOrDownloadPodcast(podcastUuid)
         return podcast.episodes.find { it.uuid == episodeUuid }
             ?: episodeManager.downloadMissingEpisode(
-                episodeUuid,
-                podcastUuid,
-                PodcastEpisode(uuid = episodeUuid, publishedDate = Date()),
+                episodeUuid = episodeUuid,
+                podcastUuid = podcastUuid,
+                skeletonEpisode = PodcastEpisode(uuid = episodeUuid, publishedDate = Date()),
                 downloadMetaData = true,
             ) as? PodcastEpisode
     }
