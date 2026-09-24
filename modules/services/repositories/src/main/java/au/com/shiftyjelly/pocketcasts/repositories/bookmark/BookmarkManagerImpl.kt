@@ -267,10 +267,12 @@ class BookmarkManagerImpl @Inject constructor(
                     source = source,
                 )
                 val now = System.currentTimeMillis()
+                val title = suggestion.generation.title?.takeIf { it.isNotBlank() }
+                    ?: BookmarkTitleFallback.fromPassage(suggestion.passage)
                 bookmarkDao.updateGeneratedData(
                     bookmarkUuid = bookmark.uuid,
-                    title = suggestion.generation.title,
-                    titleModified = now.takeIf { suggestion.generation.title != null },
+                    title = title,
+                    titleModified = now.takeIf { title != null },
                     passage = suggestion.passage,
                     passageLocation = suggestion.passageLocation,
                     passageModified = now,
