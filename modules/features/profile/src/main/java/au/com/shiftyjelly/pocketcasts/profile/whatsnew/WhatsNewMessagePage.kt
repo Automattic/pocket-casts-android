@@ -156,6 +156,8 @@ private fun WhatsNewPageContent(
     ) {
         val pageHeight = maxHeight
         val contentWidth = maxWidth - HorizontalPadding * 2
+        var hasImageFailed by remember(page.image?.url) { mutableStateOf(false) }
+        val showsImage = page.image != null && !hasImageFailed
         Column(
             modifier = Modifier.fillMaxSize(),
         ) {
@@ -166,11 +168,12 @@ private fun WhatsNewPageContent(
                     .padding(horizontal = HorizontalPadding)
                     .padding(bottom = 24.dp),
             ) {
-                if (page.image != null) {
+                if (page.image != null && showsImage) {
                     WhatsNewPageImage(
                         image = page.image,
                         contentWidth = contentWidth,
                         pageHeight = pageHeight,
+                        onError = { hasImageFailed = true },
                         modifier = Modifier
                             .align(Alignment.CenterHorizontally)
                             .padding(top = 32.dp),
@@ -179,7 +182,7 @@ private fun WhatsNewPageContent(
                 WhatsNewMessageText(
                     heading = page.heading,
                     description = page.description,
-                    modifier = Modifier.padding(top = if (page.image != null) 40.dp else 32.dp),
+                    modifier = Modifier.padding(top = if (showsImage) 40.dp else 32.dp),
                 )
             }
             if (page.action != null) {
@@ -221,11 +224,10 @@ private fun WhatsNewPageImage(
     image: WhatsNewImage,
     contentWidth: Dp,
     pageHeight: Dp,
+    onError: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var loadedAspectRatio by remember(image.url) { mutableStateOf<Float?>(null) }
-    var hasFailed by remember(image.url) { mutableStateOf(false) }
-    if (hasFailed) return
     val aspectRatio = image.aspectRatio ?: loadedAspectRatio
     val sizeModifier = if (aspectRatio != null) {
         Modifier.size(WhatsNewImageLayout.size(aspectRatio, contentWidth, pageHeight))
@@ -244,7 +246,7 @@ private fun WhatsNewPageImage(
                 loadedAspectRatio = size.width / size.height
             }
         },
-        onError = { hasFailed = true },
+        onError = { onError() },
         modifier = modifier
             .then(sizeModifier)
             .clip(RoundedCornerShape(8.dp)),
