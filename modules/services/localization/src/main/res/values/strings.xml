@@ -1878,6 +1878,17 @@
     <string name="settings_whats_new">What\'s new</string>
     <string name="settings_whats_new_next" translatable="false">@string/next</string>
     <string name="settings_whats_new_done">Done</string>
+    <string name="whats_new_category_new_feature">New Feature</string>
+    <string name="whats_new_category_tip">Tips and Tricks</string>
+    <string name="whats_new_category_announcement">Announcement</string>
+    <string name="whats_new_category_known_issue">Known Issue</string>
+    <string name="whats_new_category_research">User Research</string>
+    <string name="whats_new_feed_empty_title">No messages yet</string>
+    <string name="whats_new_feed_empty_description">New features, tips and announcements will show up\u00A0here.</string>
+    <string name="whats_new_feed_unread">Unread</string>
+    <string name="whats_new_feed_read_all">Read all</string>
+    <string name="whats_new_feed_all_read">All messages marked as read</string>
+    <string name="whats_new_feed_unable_to_load">Unable to load What\'s new</string>
     <string name="settings_manage_downloads_deleting">Deleting episodes…</string>
     <string name="settings_storage_phone">Phone</string>
     <string name="settings_storage_sd_card">SD Card</string>
