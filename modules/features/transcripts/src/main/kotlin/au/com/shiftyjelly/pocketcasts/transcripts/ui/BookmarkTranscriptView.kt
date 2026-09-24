@@ -117,6 +117,11 @@ fun BookmarkTranscriptView(
     )
     val currentLayout by rememberUpdatedState(layout)
     val currentPassageChange by rememberUpdatedState(onPassageChange)
+    val selectSentence: (Int) -> Unit = { offset ->
+        if (!transcript.isSpeakerOffset(offset)) {
+            currentPassageChange(transcript.sentenceDisplaySpan(offset))
+        }
+    }
 
     val editableColor = editableTextColor.takeOrElse { theme.primaryText }
     val highlightColor = editableHighlightColor.takeOrElse { theme.highlightText }
@@ -170,10 +175,7 @@ fun BookmarkTranscriptView(
                                 .pointerInput(transcript) {
                                     detectTapGestures { position ->
                                         val result = currentLayout ?: return@detectTapGestures
-                                        val offset = result.getOffsetForPosition(position)
-                                        if (!transcript.isSpeakerOffset(offset)) {
-                                            currentPassageChange(transcript.sentenceDisplaySpan(offset))
-                                        }
+                                        selectSentence(result.getOffsetForPosition(position))
                                     }
                                 }
                                 .pointerInput(transcript) {
@@ -233,6 +235,7 @@ fun BookmarkTranscriptView(
                     layout = handleLayout,
                     passage = passage,
                     color = color,
+                    onTap = selectSentence,
                     onMove = { index ->
                         if (!transcript.isSpeakerOffset(index)) {
                             currentPassageChange(transcript.movePassageStart(passage, index))
@@ -244,6 +247,7 @@ fun BookmarkTranscriptView(
                     layout = handleLayout,
                     passage = passage,
                     color = color,
+                    onTap = selectSentence,
                     onMove = { offset ->
                         val index = (offset - 1).coerceAtLeast(0)
                         if (!transcript.isSpeakerOffset(index)) {
@@ -277,6 +281,7 @@ private fun PassageHandle(
     layout: TextLayoutResult,
     passage: TextSpan,
     color: Color,
+    onTap: (Int) -> Unit,
     onMove: (Int) -> Unit,
 ) {
     val box = when (edge) {
@@ -285,13 +290,16 @@ private fun PassageHandle(
     }
     val density = LocalDensity.current
     val knobPx = with(density) { HandleKnob.toPx() }
+    val touchPx = with(density) { HandleTouch.toPx() }
     val stem = Offset(x = if (edge == HandleEdge.Start) box.left else box.right, y = box.center.y)
     val knobY = if (edge == HandleEdge.Start) box.top - knobPx / 2 else box.bottom + knobPx / 2
     val stemTop = min(box.top, knobY)
     val stemHeight = with(density) { (max(box.bottom, knobY) - stemTop).toDp() }
     val currentStem by rememberUpdatedState(stem)
+    val currentTouchOrigin by rememberUpdatedState(Offset(stem.x - touchPx / 2, knobY - touchPx / 2))
     val currentLayout by rememberUpdatedState(layout)
     val currentOnMove by rememberUpdatedState(onMove)
+    val currentOnTap by rememberUpdatedState(onTap)
     Box {
         Box(
             modifier = Modifier
@@ -314,6 +322,11 @@ private fun PassageHandle(
                 }
                 .size(HandleTouch)
                 .systemGestureExclusion()
+                .pointerInput(edge) {
+                    detectTapGestures { position ->
+                        currentOnTap(currentLayout.getOffsetForPosition(currentTouchOrigin + position))
+                    }
+                }
                 .pointerInput(edge) {
                     var position = Offset.Zero
                     detectDragGestures(onDragStart = { position = currentStem }) { change, dragAmount ->
@@ -351,7 +364,7 @@ private val TopFade = 48.dp
 private val BottomFade = 64.dp
 
 private val ContentPadding = PaddingValues(start = Gutter, end = Gutter, top = TopFade, bottom = BottomFade)
-private val EditContentPadding = PaddingValues(start = Gutter, end = Gutter, top = TopFade, bottom = 0.dp)
+private val EditContentPadding = PaddingValues(start = Gutter, end = Gutter, top = TopFade, bottom = HandleTouch / 2)
 
 private val FadeInThresholdMs = 200L
 
