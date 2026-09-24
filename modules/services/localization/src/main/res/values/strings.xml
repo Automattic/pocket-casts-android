@@ -1876,7 +1876,7 @@
     <string name="settings_auto_archive_no_starred_summary">Starred episodes won\'t be auto archived</string>
     <string name="settings_select_podcasts">Select Podcasts</string>
     <string name="settings_notification_silent">Silent</string>
-    <string name="settings_whats_new">What\'s New</string>
+    <string name="settings_whats_new">What\'s new</string>
     <string name="settings_whats_new_next" translatable="false">@string/next</string>
     <string name="settings_whats_new_done">Done</string>
     <string name="settings_manage_downloads_deleting">Deleting episodes…</string>
