@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.servers.di
 
 import android.content.Context
+import androidx.core.os.ConfigurationCompat
 import au.com.shiftyjelly.pocketcasts.models.entity.AnonymousBumpStat
 import au.com.shiftyjelly.pocketcasts.models.type.BlazeAdLocation
 import au.com.shiftyjelly.pocketcasts.models.type.BlazeAdLocationMoshiAdapter
@@ -16,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.servers.OkHttpInterceptor
 import au.com.shiftyjelly.pocketcasts.servers.adapters.ExecutorEnqueueAdapterFactory
 import au.com.shiftyjelly.pocketcasts.servers.adapters.InstantAdapter
+import au.com.shiftyjelly.pocketcasts.servers.adapters.LossyListAdapterFactory
 import au.com.shiftyjelly.pocketcasts.servers.addInterceptors
 import au.com.shiftyjelly.pocketcasts.servers.analytics.AnalyticsLiveService
 import au.com.shiftyjelly.pocketcasts.servers.analytics.EventProperties
@@ -37,6 +39,9 @@ import au.com.shiftyjelly.pocketcasts.servers.server.ListWebService
 import au.com.shiftyjelly.pocketcasts.servers.sync.LoginIdentity
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncService
 import au.com.shiftyjelly.pocketcasts.servers.webfeeds.WebFeedsService
+import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewCatalogService
+import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewServiceManager
+import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewServiceManagerImpl
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
 import dagger.Lazy
@@ -48,6 +53,7 @@ import dagger.hilt.components.SingletonComponent
 import io.reactivex.schedulers.Schedulers
 import java.io.File
 import java.util.Date
+import java.util.Locale
 import java.util.concurrent.TimeUnit
 import javax.inject.Qualifier
 import javax.inject.Singleton
@@ -109,6 +115,7 @@ class NetworkModule {
             .add(DisplayStyleMoshiAdapter())
             .add(ExpandedStyleMoshiAdapter())
             .add(EventProperties::class.java, EventPropertiesJsonAdapter())
+            .add(LossyListAdapterFactory())
             .build()
     }
 
@@ -403,6 +410,20 @@ class NetworkModule {
     @Provides
     @Singleton
     fun provideStaticService(@StaticServiceRetrofit retrofit: Retrofit): StaticService = retrofit.create()
+
+    @Provides
+    @Singleton
+    fun provideWhatsNewCatalogService(@StaticServiceRetrofit retrofit: Retrofit): WhatsNewCatalogService = retrofit.create()
+
+    @Provides
+    @Singleton
+    fun provideWhatsNewServiceManager(
+        service: WhatsNewCatalogService,
+        @ApplicationContext context: Context,
+    ): WhatsNewServiceManager = WhatsNewServiceManagerImpl(
+        service = service,
+        provideLocale = { ConfigurationCompat.getLocales(context.resources.configuration)[0] ?: Locale.ROOT },
+    )
 
     @Provides
     @Singleton
