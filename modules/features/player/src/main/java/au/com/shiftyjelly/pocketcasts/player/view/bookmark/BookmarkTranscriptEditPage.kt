@@ -89,6 +89,7 @@ fun BookmarkTranscriptEditPage(
                     passage = uiState.passage,
                     editable = true,
                     referenceOffset = uiState.referenceOffset,
+                    editableTextColor = playerColors.contrast01,
                     onPassageChange = onPassageChange,
                     modifier = Modifier.fillMaxSize(),
                 )

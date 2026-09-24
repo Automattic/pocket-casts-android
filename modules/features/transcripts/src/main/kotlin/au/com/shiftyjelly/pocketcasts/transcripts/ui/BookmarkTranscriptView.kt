@@ -35,6 +35,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
@@ -82,6 +83,7 @@ fun BookmarkTranscriptView(
     scrollToPassage: Boolean = true,
     anchorFraction: Float = 0.5f,
     referenceOffset: Int? = null,
+    editableTextColor: Color = Color.Unspecified,
     onPassageChange: (TextSpan) -> Unit = {},
 ) {
     val theme = rememberTranscriptTheme()
@@ -101,16 +103,17 @@ fun BookmarkTranscriptView(
     val currentLayout by rememberUpdatedState(layout)
     val currentPassageChange by rememberUpdatedState(onPassageChange)
 
-    val text = remember(transcript, passage, theme, editable) {
+    val text = remember(transcript, passage, theme, editable, editableTextColor) {
         buildAnnotatedString {
             append(transcript.displayText)
-            addStyle(SpanStyle(color = theme.secondaryText), 0, transcript.displayText.length)
+            val baseColor = if (editable) editableTextColor.takeOrElse { theme.primaryText } else theme.secondaryText
+            addStyle(SpanStyle(color = baseColor), 0, transcript.displayText.length)
             transcript.speakerSpans.forEach { span ->
                 addStyle(SpeakerSpanStyle, span.start, span.end)
             }
             passage?.let {
                 val style = if (editable) {
-                    SpanStyle(color = theme.primaryText, background = theme.highlightText.copy(alpha = 0.24f))
+                    SpanStyle(background = theme.highlightText.copy(alpha = 0.24f))
                 } else {
                     SpanStyle(color = theme.primaryText)
                 }
