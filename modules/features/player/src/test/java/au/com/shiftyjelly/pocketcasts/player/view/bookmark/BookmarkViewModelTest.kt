@@ -95,7 +95,8 @@ class BookmarkViewModelTest {
 
     @Test
     fun `shown event carries the episode and podcast of the bookmark`() = runTest {
-        whenever(episodeManager.findEpisodeByUuid(episodeUuid)).thenReturn(PodcastEpisode(uuid = episodeUuid, podcastUuid = "podcast-id", publishedDate = Date()))
+        whenever(episodeManager.findEpisodeByUuid(episodeUuid))
+            .thenReturn(PodcastEpisode(uuid = episodeUuid, podcastUuid = "podcast-id", publishedDate = Date()))
 
         viewModel.load(arguments)
 
@@ -106,7 +107,7 @@ class BookmarkViewModelTest {
     }
 
     @Test
-    fun `shown event is tracked once when the sheet loads again`() = runTest {
+    fun `shown event is tracked once when load is called again`() = runTest {
         viewModel.load(arguments)
         viewModel.load(arguments)
 
@@ -119,13 +120,37 @@ class BookmarkViewModelTest {
         viewModel.load(arguments)
 
         val event = eventSink.pollEvent() as BookmarkEditFormShownEvent
+        assertEquals(true, event.isNewBookmark)
         assertEquals(episodeUuid, event.episodeUuid)
         assertEquals(null, event.podcastUuid)
+        verify(bookmarkManager, never()).suggestBookmark(any(), any())
+    }
+
+    @Test
+    fun `shown event reports an existing bookmark found at the episode time as not new`() = runTest {
+        val episode = PodcastEpisode(uuid = episodeUuid, podcastUuid = "podcast-id", publishedDate = Date())
+        whenever(episodeManager.findEpisodeByUuid(episodeUuid)).thenReturn(episode)
+        whenever(bookmarkManager.findByEpisodeTime(episode, timeSecs))
+            .thenReturn(Bookmark(uuid = "existing-id", episodeUuid = episodeUuid, podcastUuid = "podcast-id", title = "Mine"))
+
+        viewModel.load(arguments)
+
+        val event = eventSink.pollEvent() as BookmarkEditFormShownEvent
+        assertEquals(false, event.isNewBookmark)
+        assertEquals("podcast-id", event.podcastUuid)
+    }
+
+    @Test
+    fun `dismissing before the sheet loads tracks nothing`() = runTest {
+        viewModel.onClose()
+
+        assertTrue(eventSink.isEmpty())
     }
 
     @Test
     fun `dismissed event carries the episode and podcast of the bookmark`() = runTest {
-        whenever(bookmarkManager.findBookmark("existing-id")).thenReturn(Bookmark(uuid = "existing-id", episodeUuid = episodeUuid, podcastUuid = "podcast-id", title = "Mine"))
+        whenever(bookmarkManager.findBookmark("existing-id"))
+            .thenReturn(Bookmark(uuid = "existing-id", episodeUuid = episodeUuid, podcastUuid = "podcast-id", title = "Mine"))
         viewModel.load(arguments.copy(bookmarkUuid = "existing-id"))
         eventSink.skipEvent()
 
@@ -157,6 +182,8 @@ class BookmarkViewModelTest {
 
     @Test
     fun `submitting reports whether a passage was saved and changed`() = runTest {
+        whenever(episodeManager.findEpisodeByUuid(episodeUuid))
+            .thenReturn(PodcastEpisode(uuid = episodeUuid, podcastUuid = "podcast-id", publishedDate = Date()))
         viewModel.load(arguments)
         eventSink.skipEvent()
         viewModel.onPassageEdited("a chosen passage", 3)
@@ -167,6 +194,7 @@ class BookmarkViewModelTest {
         assertEquals(true, event.hasPassage)
         assertEquals(true, event.passageChanged)
         assertEquals(episodeUuid, event.episodeUuid)
+        assertEquals("podcast-id", event.podcastUuid)
     }
 
     @Test
