@@ -84,6 +84,7 @@ fun BookmarkTranscriptView(
     anchorFraction: Float = 0.5f,
     referenceOffset: Int? = null,
     editableTextColor: Color = Color.Unspecified,
+    editableHighlightColor: Color = Color.Unspecified,
     onPassageChange: (TextSpan) -> Unit = {},
 ) {
     val theme = rememberTranscriptTheme()
@@ -104,7 +105,8 @@ fun BookmarkTranscriptView(
     val currentPassageChange by rememberUpdatedState(onPassageChange)
 
     val editableColor = editableTextColor.takeOrElse { theme.primaryText }
-    val text = remember(transcript, passage, theme, editable, editableColor) {
+    val highlightColor = editableHighlightColor.takeOrElse { theme.highlightText }
+    val text = remember(transcript, passage, theme, editable, editableColor, highlightColor) {
         buildAnnotatedString {
             append(transcript.displayText)
             val baseColor = if (editable) editableColor else theme.secondaryText
@@ -114,7 +116,7 @@ fun BookmarkTranscriptView(
             }
             passage?.let {
                 val style = if (editable) {
-                    SpanStyle(background = theme.highlightText.copy(alpha = 0.24f))
+                    SpanStyle(background = highlightColor.copy(alpha = 0.24f))
                 } else {
                     SpanStyle(color = theme.primaryText)
                 }
