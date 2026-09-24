@@ -30,7 +30,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -186,13 +185,14 @@ private fun WhatsNewFeedRow(
                     fontSize = 11.sp,
                     fontWeight = FontWeight.W600,
                 )
-                Box(
-                    modifier = Modifier
-                        .size(8.dp)
-                        .alpha(if (item.isUnread) 1f else 0f)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.theme.colors.support05),
-                )
+                if (item.isUnread) {
+                    Box(
+                        modifier = Modifier
+                            .size(8.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.theme.colors.support05),
+                    )
+                }
             }
             TextH40(
                 text = item.title,
