@@ -35,6 +35,7 @@ class WhatsNewFeedFragment : BaseFragment() {
                 bottomInset = bottomInset,
                 onBackPress = { activity?.onBackPressedDispatcher?.onBackPressed() },
                 onMessageClick = viewModel::onMessageClick,
+                onReadAllClick = viewModel::onReadAllClick,
                 onRefresh = viewModel::refresh,
                 onRetry = viewModel::retry,
             )

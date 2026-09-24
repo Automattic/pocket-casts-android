@@ -163,6 +163,30 @@ class WhatsNewFeedViewModelTest {
     }
 
     @Test
+    fun `read all marks exactly the listed messages read`() = runTest {
+        manager.publish(listOf(message("a"), message("b")))
+        manager.catalog.value = manager.catalog.value?.copy(messages = listOf(message("a"), message("b"), message("hidden")))
+        val viewModel = createViewModel()
+
+        viewModel.uiState.test {
+            assertTrue(expectMostRecentItem().hasUnread)
+            viewModel.onReadAllClick()
+            assertFalse(expectMostRecentItem().hasUnread)
+        }
+        assertEquals(setOf("a", "b"), manager.readState.value.readMessageIds)
+    }
+
+    @Test
+    fun `nothing is unread once every listed message is read`() = runTest {
+        manager.publish(listOf(message("a")))
+        manager.readState.value = WhatsNewReadState(readMessageIds = setOf("a"))
+
+        createViewModel().uiState.test {
+            assertFalse(expectMostRecentItem().hasUnread)
+        }
+    }
+
+    @Test
     fun `pull to refresh forces a fetch and shows progress until it finishes`() = runTest {
         manager.publish(listOf(message("a")))
         val viewModel = createViewModel()
