@@ -288,7 +288,7 @@ class BookmarkManagerImpl @Inject constructor(
         }
     }
 
-    override fun enrichBookmarkPassage(bookmark: Bookmark) {
+    override fun enrichBookmarkPassage(bookmark: Bookmark, useFallbackTitle: Boolean) {
         launch(Dispatchers.IO) {
             try {
                 val window = transcriptWindowExtractor.extractWindow(
@@ -296,10 +296,11 @@ class BookmarkManagerImpl @Inject constructor(
                     timeSecs = bookmark.timeSecs,
                 ) ?: return@launch
                 val now = System.currentTimeMillis()
+                val title = if (useFallbackTitle) BookmarkTitleFallback.fromPassage(window.passage) else null
                 bookmarkDao.updateGeneratedData(
                     bookmarkUuid = bookmark.uuid,
-                    title = null,
-                    titleModified = null,
+                    title = title,
+                    titleModified = now.takeIf { title != null },
                     passage = window.passage,
                     passageLocation = window.location,
                     passageModified = now,

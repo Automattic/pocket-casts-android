@@ -314,7 +314,7 @@ class BookmarkViewModelTest {
             passageLocation = eq(5),
             referenceTime = eq(118),
         )
-        verify(bookmarkManager, never()).enrichBookmarkPassage(any())
+        verify(bookmarkManager, never()).enrichBookmarkPassage(any(), any())
     }
 
     @Test
@@ -340,7 +340,24 @@ class BookmarkViewModelTest {
             passageLocation = isNull(),
             referenceTime = isNull(),
         )
-        verify(bookmarkManager).enrichBookmarkPassage(any())
+        verify(bookmarkManager).enrichBookmarkPassage(any(), eq(true))
+    }
+
+    @Test
+    fun `keeps a typed title when saving without a suggestion`() = runTest {
+        stubNewBookmark()
+        val gate = CompletableDeferred<BookmarkSuggestion?>()
+        doSuspendableAnswer { gate.await() }.whenever(bookmarkManager).suggestBookmark(episodeUuid, timeSecs)
+        whenever(episodeManager.findByUuid(episodeUuid)).thenReturn(PodcastEpisode(uuid = episodeUuid, publishedDate = Date()))
+        whenever(bookmarkManager.add(any(), any(), any(), any(), any(), anyOrNull(), anyOrNull(), anyOrNull())).thenReturn(Bookmark(uuid = "new-id"))
+
+        viewModel.load(arguments)
+        viewModel.changeTitle(TextFieldValue("My title"))
+        val saved = CompletableDeferred<Unit>()
+        viewModel.saveBookmark { _, _ -> saved.complete(Unit) }
+        saved.await()
+
+        verify(bookmarkManager).enrichBookmarkPassage(any(), eq(false))
     }
 
     @Test

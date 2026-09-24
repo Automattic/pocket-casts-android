@@ -279,7 +279,7 @@ class BookmarkViewModel
                         referenceTime = editedReferenceTimeSecs ?: suggestion?.referenceTimeSecs,
                     )
                     if (suggestion == null && FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS)) {
-                        bookmarkManager.enrichBookmarkPassage(created)
+                        bookmarkManager.enrichBookmarkPassage(created, useFallbackTitle = title == defaultTitle)
                     }
                     created
                 } else {
