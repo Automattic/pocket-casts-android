@@ -247,6 +247,7 @@ private fun BoxScope.SwipeRowActionSlab(
             .graphicsLayer {
                 val offset = state.settledOffset
                 translationX = if (isLeading) (offset - rowWidthPx).coerceAtMost(0f) else (offset + rowWidthPx).coerceAtLeast(0f)
+                clip = true
             }
             .background(action.backgroundColor)
             .clickable(
