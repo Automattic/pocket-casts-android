@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.systemGestureExclusion
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
@@ -292,6 +293,7 @@ private fun PassageHandle(
                 )
             }
             .size(width = HandleTouchWidth, height = with(density) { (box.height + knobPx).toDp() })
+            .systemGestureExclusion()
             .pointerInput(edge) {
                 detectDragGestures { change, _ ->
                     change.consume()
