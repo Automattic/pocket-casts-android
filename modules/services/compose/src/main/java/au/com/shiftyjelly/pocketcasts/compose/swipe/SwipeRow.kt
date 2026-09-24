@@ -122,13 +122,17 @@ fun SwipeRow(
     )
     var rowWidthPx by remember { mutableIntStateOf(0) }
 
-    val anchors = remember(rowWidthPx, actionWidthPx, leadingAction, trailingAction) {
+    val hasLeadingAction = leadingAction != null
+    val hasTrailingAction = trailingAction != null
+    val isLeadingFullSwipeEnabled = leadingAction?.isFullSwipeEnabled == true
+    val isTrailingFullSwipeEnabled = trailingAction?.isFullSwipeEnabled == true
+    val anchors = remember(rowWidthPx, actionWidthPx, hasLeadingAction, hasTrailingAction, isLeadingFullSwipeEnabled, isTrailingFullSwipeEnabled) {
         swipeRowAnchors(
             rowWidthPx = rowWidthPx.toFloat(),
-            leadingWidthPx = actionWidthPx.takeIf { leadingAction != null },
-            trailingWidthPx = actionWidthPx.takeIf { trailingAction != null },
-            isLeadingFullSwipeEnabled = leadingAction?.isFullSwipeEnabled == true,
-            isTrailingFullSwipeEnabled = trailingAction?.isFullSwipeEnabled == true,
+            leadingWidthPx = actionWidthPx.takeIf { hasLeadingAction },
+            trailingWidthPx = actionWidthPx.takeIf { hasTrailingAction },
+            isLeadingFullSwipeEnabled = isLeadingFullSwipeEnabled,
+            isTrailingFullSwipeEnabled = isTrailingFullSwipeEnabled,
         )
     }
     SideEffect {
