@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.profile
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -19,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksContainerFra
 import au.com.shiftyjelly.pocketcasts.podcasts.view.ProfileEpisodeListFragment
 import au.com.shiftyjelly.pocketcasts.profile.blogs.BlogsFragment
 import au.com.shiftyjelly.pocketcasts.profile.cloud.CloudFilesFragment
+import au.com.shiftyjelly.pocketcasts.profile.sharing.ShareProfileActivity
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralsGuestPassFragment
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralsGuestPassFragment.ReferralsPageType
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralsViewModel
@@ -106,6 +108,7 @@ class ProfileFragment :
             },
             onShareClick = {
                 profileViewModel.onShareClick()
+                startActivity(Intent(requireContext(), ShareProfileActivity::class.java))
             },
             onCreateFreeAccountBannerClick = {
                 profileViewModel.onCreateFreeAccountClick()

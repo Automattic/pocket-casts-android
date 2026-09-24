@@ -31,6 +31,7 @@
         <activity
             android:name="au.com.shiftyjelly.pocketcasts.account.AccountActivity"
             android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".sharing.ShareProfileActivity" />
         <service
             android:name=".accountmanager.PocketCastsAuthenticatorService"
             android:enabled="true"
