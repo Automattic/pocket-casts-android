@@ -124,14 +124,14 @@ class PodcastManagerImpl @Inject constructor(
         return addPodcast(podcastUuid = podcastUuid, sync = sync, subscribed = true, shouldAutoDownload = shouldAutoDownload)
     }
 
-    // addPodcastRxSingle runs its first query on the subscribing thread, so keep it off the caller's thread.
+    // addPodcast runs its first query on the calling thread, so keep it off the caller's thread.
     override suspend fun findOrDownloadPodcast(podcastUuid: String, waitForSubscribe: Boolean): Podcast = withContext(ioDispatcher) {
         val existingPodcast = if (waitForSubscribe) {
             findPodcastOrWaitForSubscribe(podcastUuid)
         } else {
             findPodcastByUuid(podcastUuid)
         }
-        existingPodcast ?: subscribeManager.addPodcastRxSingle(podcastUuid, sync = false, subscribed = false, shouldAutoDownload = false).await()
+        existingPodcast ?: addPodcast(podcastUuid, sync = false, subscribed = false, shouldAutoDownload = false)
     }
 
     private suspend fun findPodcastOrWaitForSubscribe(
