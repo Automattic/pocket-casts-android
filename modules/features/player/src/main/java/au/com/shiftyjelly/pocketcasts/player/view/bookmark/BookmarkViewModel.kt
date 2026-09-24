@@ -115,10 +115,12 @@ class BookmarkViewModel
             val episode = episodeManager.findEpisodeByUuid(arguments.episodeUuid)
             val bookmark = when {
                 bookmarkUuid != null -> bookmarkManager.findBookmark(bookmarkUuid)
+
                 episode != null -> bookmarkManager.findByEpisodeTime(
                     episode = episode,
                     timeSecs = arguments.timeSecs,
                 )
+
                 else -> null
             }
             val podcastUuid = bookmark?.podcastUuid ?: (episode as? PodcastEpisode)?.podcastUuid
@@ -309,6 +311,7 @@ class BookmarkViewModel
     }
 
     fun onClose() {
+        if (!::arguments.isInitialized) return
         eventHorizon.track(
             BookmarkEditFormDismissedEvent(
                 source = analyticsSource,
