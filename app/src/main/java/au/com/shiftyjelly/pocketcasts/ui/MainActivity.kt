@@ -1453,6 +1453,9 @@ class MainActivity :
         updateNavAndStatusColors(playerOpen = false, playingPodcast = null)
 
         viewModel.isPlayerOpen = false
+        if (isProfileRootShown()) {
+            viewModel.onProfileShown()
+        }
         viewModel.closeMultiSelect()
         playerBottomSheetBackCallback?.isEnabled = false
         playerContainerCallbackUpdater?.invoke()
