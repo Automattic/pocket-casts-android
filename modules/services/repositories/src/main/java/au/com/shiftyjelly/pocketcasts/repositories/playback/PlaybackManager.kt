@@ -329,12 +329,11 @@ open class PlaybackManager @Inject constructor(
                 }
 
                 override fun sessionFailed(errorCode: Int, failureType: CastManager.SessionFailureType) {
-                    // The Cast SDK can resume a saved session without user interaction. A failed cold resume must not
-                    // turn healthy local playback into an error or tear down its media notification.
-                    if (!shouldSurfaceCastSessionFailure(failureType, isCastPlayerActive = player?.isRemote == true)) {
+                    val action = castSessionFailureAction(failureType, isCastPlayerActive = player?.isRemote == true)
+                    if (action == CastSessionFailureAction.Ignore) {
                         LogBuffer.i(
                             LogBuffer.TAG_PLAYBACK,
-                            "Ignoring Cast session resume failure with error code $errorCode during local playback",
+                            "Ignoring Cast session resume failure with error code $errorCode while not casting",
                         )
                         return
                     }
@@ -342,14 +341,16 @@ open class PlaybackManager @Inject constructor(
                     launch(Dispatchers.Main) {
                         val message = application.getString(LR.string.error_cast_connection_failed)
                         Toast.makeText(application, message, Toast.LENGTH_LONG).show()
-                        playbackStateRelay.blockingFirst().let { playbackState ->
-                            playbackStateRelay.accept(
-                                playbackState.copy(
-                                    state = PlaybackState.State.ERROR,
-                                    lastErrorMessage = message,
-                                    lastChangeFrom = LastChangeFrom.OnPlayerError.value,
-                                ),
-                            )
+                        if (action == CastSessionFailureAction.ShowToastAndError) {
+                            playbackStateRelay.blockingFirst().let { playbackState ->
+                                playbackStateRelay.accept(
+                                    playbackState.copy(
+                                        state = PlaybackState.State.ERROR,
+                                        lastErrorMessage = message,
+                                        lastChangeFrom = LastChangeFrom.OnPlayerError.value,
+                                    ),
+                                )
+                            }
                         }
                     }
                 }
@@ -3065,13 +3066,20 @@ open class PlaybackManager @Inject constructor(
     }
 }
 
-internal fun shouldSurfaceCastSessionFailure(
+internal enum class CastSessionFailureAction {
+    Ignore,
+    ShowToast,
+    ShowToastAndError,
+}
+
+internal fun castSessionFailureAction(
     failureType: CastManager.SessionFailureType,
     isCastPlayerActive: Boolean,
-): Boolean {
-    return when (failureType) {
-        CastManager.SessionFailureType.START -> true
-        CastManager.SessionFailureType.RESUME -> isCastPlayerActive
+): CastSessionFailureAction {
+    return when {
+        isCastPlayerActive -> CastSessionFailureAction.ShowToastAndError
+        failureType == CastManager.SessionFailureType.START -> CastSessionFailureAction.ShowToast
+        else -> CastSessionFailureAction.Ignore
     }
 }
 
