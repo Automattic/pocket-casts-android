@@ -55,7 +55,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.rx2.asFlow
 import kotlinx.coroutines.rx2.await
-import kotlinx.coroutines.rx2.rxSingle
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -124,13 +123,6 @@ class PodcastManagerImpl @Inject constructor(
 
     override suspend fun subscribeToPodcastOrThrow(podcastUuid: String, sync: Boolean, shouldAutoDownload: Boolean): Podcast {
         return addPodcastRxSingle(podcastUuid = podcastUuid, sync = sync, subscribed = true, shouldAutoDownload = shouldAutoDownload).await()
-    }
-
-    /**
-     * If the podcast isn't already in the database add it as unsubscribed.
-     */
-    override fun findOrDownloadPodcastRxSingle(podcastUuid: String, waitForSubscribe: Boolean): Single<Podcast> {
-        return rxSingle { findOrDownloadPodcast(podcastUuid, waitForSubscribe) }
     }
 
     // addPodcastRxSingle runs its first query on the subscribing thread, so keep it off the caller's thread.
