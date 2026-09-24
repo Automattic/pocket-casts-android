@@ -445,10 +445,15 @@ class MediaSessionManager(
     @MainThread
     private fun applyCurrentEpisodeMetadata(player: PocketCastsForwardingPlayer) {
         val episode = playbackManager.getCurrentEpisode() ?: return
+        val podcast = playbackManager.playbackStateRelay.blockingFirst()
+            .takeIf { it.episodeUuid == episode.uuid }
+            ?.podcast
         val showArtwork = settings.showArtworkOnLockScreen.value
         val useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork
-        val artworkUri = if (showArtwork) resolveAndWrapArtworkUri(episode, podcast = null, useEpisodeArtwork) else null
-        player.updateMetadata(episode, podcast = null, showArtwork = showArtwork, useEpisodeArtwork = useEpisodeArtwork, artworkData = null, artworkUri = artworkUri, showRating = !isAutomotive)
+        val artworkUri = if (showArtwork) resolveAndWrapArtworkUri(episode, podcast, useEpisodeArtwork) else null
+        val previousMediaId = player.previousMediaId
+        player.updateMetadata(episode, podcast, showArtwork = showArtwork, useEpisodeArtwork = useEpisodeArtwork, artworkData = null, artworkUri = artworkUri, showRating = !isAutomotive)
+        player.previousMediaId = previousMediaId
     }
 
     @OptIn(UnstableApi::class)
