@@ -158,7 +158,6 @@ private fun Content(
 ) {
     val focusRequester = remember { FocusRequester() }
     Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
             .fillMaxHeight()
             .verticalScroll(rememberScrollState())
@@ -167,7 +166,6 @@ private fun Content(
         TextP40(
             text = stringResource(LR.string.bookmark_title_label),
             color = colors.contrast02,
-            modifier = Modifier.fillMaxWidth(),
         )
 
         val tintTextSelectionColors = TextSelectionColors(
