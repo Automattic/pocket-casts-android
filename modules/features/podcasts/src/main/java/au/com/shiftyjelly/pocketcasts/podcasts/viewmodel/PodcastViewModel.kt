@@ -95,6 +95,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlowable
 import kotlinx.coroutines.rx2.rxMaybe
+import kotlinx.coroutines.rx2.rxSingle
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -975,7 +976,7 @@ private fun Maybe<Podcast>.downloadMissingPodcast(uuid: String, podcastManager: 
     return this.switchIfEmpty(
         Single.defer {
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Podcast $uuid not found in database")
-            podcastManager.findOrDownloadPodcastRxSingle(podcastUuid = uuid, waitForSubscribe = true)
+            rxSingle { podcastManager.findOrDownloadPodcast(podcastUuid = uuid, waitForSubscribe = true) }
         },
     )
 }

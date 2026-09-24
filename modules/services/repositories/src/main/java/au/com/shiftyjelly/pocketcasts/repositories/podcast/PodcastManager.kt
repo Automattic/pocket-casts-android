@@ -58,7 +58,8 @@ interface PodcastManager {
     fun subscribeToPodcast(podcastUuid: String, sync: Boolean, shouldAutoDownload: Boolean = true)
 
     suspend fun subscribeToPodcastOrThrow(podcastUuid: String, sync: Boolean = false, shouldAutoDownload: Boolean = true): Podcast
-    fun findOrDownloadPodcastRxSingle(podcastUuid: String, waitForSubscribe: Boolean = false): Single<Podcast>
+
+    /** If the podcast isn't already in the database add it as unsubscribed. */
     suspend fun findOrDownloadPodcast(podcastUuid: String, waitForSubscribe: Boolean = false): Podcast
     fun isSubscribingToPodcasts(): Boolean
     fun isSubscribingToPodcast(podcastUuid: String): Boolean
