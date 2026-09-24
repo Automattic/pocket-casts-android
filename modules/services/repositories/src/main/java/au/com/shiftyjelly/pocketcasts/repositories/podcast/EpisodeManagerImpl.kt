@@ -35,7 +35,6 @@ import com.automattic.eventhorizon.EpisodeUnstarredEvent
 import com.automattic.eventhorizon.EventHorizon
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.Flowable
-import io.reactivex.Maybe
 import java.io.File
 import java.util.Date
 import java.util.concurrent.TimeUnit
@@ -857,13 +856,13 @@ class EpisodeManagerImpl @Inject constructor(
     /**
      * Try downloading the episode if it is missing. If the server doesn't know about it insert the skeleton episode.
      */
-    override fun downloadMissingEpisodeRxMaybe(episodeUuid: String, podcastUuid: String, skeletonEpisode: PodcastEpisode, podcastManager: PodcastManager, downloadMetaData: Boolean, source: SourceView): Maybe<BaseEpisode> {
-        return rxMaybe(ioDispatcher) {
+    override suspend fun downloadMissingEpisode(episodeUuid: String, podcastUuid: String, skeletonEpisode: PodcastEpisode, downloadMetaData: Boolean): BaseEpisode? {
+        return withContext(ioDispatcher) {
             if (episodeDao.exists(episodeUuid) || podcastUuid == Podcast.userPodcast.uuid) {
-                return@rxMaybe findEpisodeByUuid(episodeUuid)
+                return@withContext findEpisodeByUuid(episodeUuid)
             }
             val response = podcastCacheServiceManager.getPodcastAndEpisode(podcastUuid, episodeUuid)
-            // A dispose mid-insert must not leave an episode row without its details task enqueued
+            // A cancellation mid-insert must not leave an episode row without its details task enqueued
             withContext(NonCancellable) {
                 val episode = response.episodes.firstOrNull() ?: skeletonEpisode
                 add(listOf(episode), podcastUuid, downloadMetaData)

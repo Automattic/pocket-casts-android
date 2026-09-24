@@ -22,7 +22,6 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.google.protobuf.Timestamp
 import com.pocketcasts.service.api.UpNextResponse
 import com.pocketcasts.service.api.upNextResponse
-import io.reactivex.Maybe
 import java.util.Date
 import kotlinx.coroutines.test.runTest
 import okhttp3.Protocol
@@ -448,7 +447,7 @@ class UpNextSyncTest {
 
         assertEquals(null, result)
         verify(userEpisodeManager, never()).downloadMissingUserEpisode(any(), anyOrNull(), anyOrNull())
-        verify(episodeManager, never()).downloadMissingEpisodeRxMaybe(any(), any(), any(), any(), any(), any())
+        verify(episodeManager, never()).downloadMissingEpisode(any(), any(), any(), any())
     }
 
     @Test
@@ -484,15 +483,13 @@ class UpNextSyncTest {
         val episode = createPodcastEpisode(uuid = "episode1", podcastUuid = "podcast1")
 
         whenever(
-            episodeManager.downloadMissingEpisodeRxMaybe(
+            episodeManager.downloadMissingEpisode(
                 episodeUuid = eq("episode1"),
                 podcastUuid = eq("podcast1"),
                 skeletonEpisode = any(),
-                podcastManager = eq(podcastManager),
                 downloadMetaData = eq(false),
-                source = any(),
             ),
-        ).thenReturn(Maybe.just(episode))
+        ).thenReturn(episode)
 
         val result = upNextSync.importMissingEpisode(
             podcastUuid = "podcast1",
@@ -502,13 +499,11 @@ class UpNextSyncTest {
         ) { createPodcastEpisode(uuid = "episode1", podcastUuid = "podcast1") }
 
         assertEquals(episode, result)
-        verify(episodeManager).downloadMissingEpisodeRxMaybe(
+        verify(episodeManager).downloadMissingEpisode(
             episodeUuid = eq("episode1"),
             podcastUuid = eq("podcast1"),
             skeletonEpisode = any(),
-            podcastManager = eq(podcastManager),
             downloadMetaData = eq(false),
-            source = any(),
         )
     }
 

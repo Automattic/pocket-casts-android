@@ -67,7 +67,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
-import kotlinx.coroutines.rx2.awaitSingleOrNull
 
 @HiltViewModel
 class EpisodeFragmentViewModel @Inject constructor(
@@ -302,14 +301,12 @@ class EpisodeFragmentViewModel @Inject constructor(
         // Not in the database, so try to load the episode from the server
         val podcast = podcastManager.findOrDownloadPodcast(podcastUuid)
         return podcast.episodes.find { it.uuid == episodeUuid }
-            ?: episodeManager.downloadMissingEpisodeRxMaybe(
-                episodeUuid,
-                podcastUuid,
-                PodcastEpisode(uuid = episodeUuid, publishedDate = Date()),
-                podcastManager,
+            ?: episodeManager.downloadMissingEpisode(
+                episodeUuid = episodeUuid,
+                podcastUuid = podcastUuid,
+                skeletonEpisode = PodcastEpisode(uuid = episodeUuid, publishedDate = Date()),
                 downloadMetaData = true,
-                source = source,
-            ).awaitSingleOrNull() as? PodcastEpisode
+            ) as? PodcastEpisode
     }
 
     private fun onStateLoaded(episodeState: EpisodeFragmentState) {
