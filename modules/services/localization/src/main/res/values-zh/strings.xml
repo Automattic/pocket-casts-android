@@ -985,7 +985,6 @@ Language: zh_CN
     <string name="notification_channel_description_playback_error">播放时出现错误</string>
     <string name="notification_channel_description_episode">在播放新一集时显示</string>
     <string name="notification_channel_description_download">在 Pocket Casts 下载剧集时显示</string>
-    <string name="change_bookmark_title_hint">更改识别此书签的标题</string>
     <string name="bookmark">书签</string>
     <string name="details">详细信息</string>
     <string name="episode">剧集</string>
@@ -1002,7 +1001,6 @@ Language: zh_CN
     <string name="bookmark_added">已添加书签“%s”</string>
     <string name="add_bookmark_title">添加书签</string>
     <string name="add_bookmark">添加书签</string>
-    <string name="add_bookmark_title_hint">添加可选标题以识别此书签</string>
     <string name="bookmarks_sort_timestamp">时间戳</string>
     <string name="bookmarks_select_option">选择书签</string>
     <string name="bookmarks_delete_summary_singular">此书签将被删除。 此操作无法撤消。</string>

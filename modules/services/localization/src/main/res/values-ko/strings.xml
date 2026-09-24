@@ -985,7 +985,6 @@ Language: ko_KR
     <string name="notification_channel_description_playback_error">재생 중 오류</string>
     <string name="notification_channel_description_episode">새 에피소드가 나올 때 표시</string>
     <string name="notification_channel_description_download">Pocket Casts를 통해 에피소드를 다운로드하는 동안 표시</string>
-    <string name="change_bookmark_title_hint">이 북마크를 식별하는 제목 변경</string>
     <string name="bookmark">북마크</string>
     <string name="details">세부사항</string>
     <string name="episode">에피소드</string>
@@ -998,7 +997,6 @@ Language: ko_KR
     <string name="skipping_to">%s(으)로 건너뛰는 중</string>
     <string name="playing_bookmark">\"%s\" 재생 중</string>
     <string name="save_bookmark">북마크 저장</string>
-    <string name="add_bookmark_title_hint">이 북마크를 식별할 선택적 제목 추가</string>
     <string name="change_title">제목 변경</string>
     <string name="bookmark_added">북마크 \"%s\" 추가됨</string>
     <string name="add_bookmark_title">북마크 추가</string>

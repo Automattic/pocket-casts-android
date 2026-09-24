@@ -985,7 +985,6 @@ Language: pt_BR
     <string name="notification_channel_description_playback_error">Erros durante a reprodução</string>
     <string name="notification_channel_description_episode">Aparece quando um novo episódio é lançado</string>
     <string name="notification_channel_description_download">Aparece quando o Pocket Casts está fazendo download de episódios</string>
-    <string name="change_bookmark_title_hint">Altere o título que identifica este favorito</string>
     <string name="bookmark">Favorito</string>
     <string name="details">Detalhes</string>
     <string name="episode">Episódio</string>
@@ -998,7 +997,6 @@ Language: pt_BR
     <string name="skipping_to">Pulando para %s</string>
     <string name="playing_bookmark">Reproduzindo \"%s\"</string>
     <string name="save_bookmark">Salvar favorito</string>
-    <string name="add_bookmark_title_hint">Adicione um título opcional para identificar este favorito</string>
     <string name="change_title">Alterar título</string>
     <string name="bookmark_added">Favorito \"%s\" adicionado</string>
     <string name="add_bookmark_title">Adicionar favorito</string>
