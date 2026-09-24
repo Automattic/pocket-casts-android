@@ -341,7 +341,7 @@ class BookmarkManagerImpl @Inject constructor(
         }
         val durationMs = System.currentTimeMillis() - startMs
         response.error?.let { Timber.w("Smart bookmark enrichment returned error: $it") }
-        val title = response.title?.takeIf { it.isNotEmpty() }
+        val title = response.title?.takeIf { it.isNotBlank() }
         val failureReason = when {
             title != null -> null
             response.error != null -> "server_error"
