@@ -61,6 +61,7 @@ class BookmarkViewModel
     private var capturedSuggestion: BookmarkSuggestion? = null
     private var passageEdited = false
     private var loadJob: Job? = null
+    private var hasTrackedShown = false
     private var analyticsSource: SourceViewType = SourceViewType.Player
 
     private val defaultTitle: String get() = context.getString(LR.string.bookmark)
@@ -300,6 +301,8 @@ class BookmarkViewModel
     }
 
     private fun trackShown() {
+        if (hasTrackedShown) return
+        hasTrackedShown = true
         eventHorizon.track(
             BookmarkEditFormShownEvent(
                 source = analyticsSource,
@@ -312,6 +315,7 @@ class BookmarkViewModel
 
     fun onClose() {
         if (!::arguments.isInitialized) return
+        trackShown()
         eventHorizon.track(
             BookmarkEditFormDismissedEvent(
                 source = analyticsSource,
@@ -323,6 +327,8 @@ class BookmarkViewModel
     }
 
     fun onSubmitBookmark() {
+        if (!::arguments.isInitialized) return
+        trackShown()
         val state = uiState.value
         eventHorizon.track(
             BookmarkEditFormSubmittedEvent(

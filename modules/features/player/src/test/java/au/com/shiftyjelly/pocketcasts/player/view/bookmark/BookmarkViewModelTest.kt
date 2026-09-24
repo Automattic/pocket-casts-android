@@ -28,6 +28,7 @@ import com.automattic.eventhorizon.SourceViewType
 import java.util.Date
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -160,6 +161,18 @@ class BookmarkViewModelTest {
         assertEquals(false, event.isNewBookmark)
         assertEquals(episodeUuid, event.episodeUuid)
         assertEquals("podcast-id", event.podcastUuid)
+    }
+
+    @Test
+    fun `dismissing while the sheet is loading tracks shown before dismissed`() = runTest {
+        whenever(episodeManager.findEpisodeByUuid(episodeUuid)).doSuspendableAnswer { awaitCancellation() }
+        viewModel.load(arguments)
+
+        viewModel.onClose()
+
+        assertTrue(eventSink.pollEvent() is BookmarkEditFormShownEvent)
+        assertTrue(eventSink.pollEvent() is BookmarkEditFormDismissedEvent)
+        assertTrue(eventSink.isEmpty())
     }
 
     @Test
