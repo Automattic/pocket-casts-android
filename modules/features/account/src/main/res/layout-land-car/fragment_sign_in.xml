@@ -42,6 +42,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toTopOf="@id/emailLayout"
+            app:layout_constraintVertical_bias="0"
             app:layout_constraintVertical_chainStyle="packed"/>
 
         <com.google.android.material.textfield.TextInputLayout
