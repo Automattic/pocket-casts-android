@@ -22,12 +22,20 @@ import androidx.media3.ui.WearUnsuitableOutputPlaybackSuppressionResolverListene
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintPcmTap
 import au.com.shiftyjelly.pocketcasts.repositories.stats.PlaybackStatsCollector
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
+import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.utils.fingerprint.FingerprintDecodePolicy
+import au.com.shiftyjelly.pocketcasts.utils.fingerprint.FingerprintPolicy
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -37,10 +45,13 @@ class SimplePlayer(
     private val playbackStatsCollector: PlaybackStatsCollector,
     private val context: Context,
     private val dataSourceFactory: ExoPlayerDataSourceFactory,
+    private val fingerprintPcmTap: FingerprintPcmTap? = null,
+    private val fingerprintDecodePolicy: FingerprintDecodePolicy,
     override val onPlayerEvent: (au.com.shiftyjelly.pocketcasts.repositories.playback.Player, PlayerEvent) -> Unit,
 ) : LocalPlayer(onPlayerEvent) {
     private val reducedBufferManufacturers = listOf("mercedes-benz")
     private val useReducedBuffer = reducedBufferManufacturers.contains(Build.MANUFACTURER.lowercase()) || Util.isWearOs(context)
+    private val isTv = Util.isTv(context)
     private val bufferTimeMinMillis = TimeUnit.MINUTES.toMillis(2).toInt()
     private val bufferTimeMaxMillis = if (useReducedBuffer) TimeUnit.MINUTES.toMillis(2).toInt() else TimeUnit.MINUTES.toMillis(4).toInt()
 
@@ -52,15 +63,28 @@ class SimplePlayer(
     @UnstableApi
     private var trackSelector: DefaultTrackSelector? = null
 
+    @Volatile
     private var renderersFactory: ShiftyRenderersFactory? = null
     private var playbackEffects: PlaybackEffects? = null
 
     var videoWidth: Int = 0
     var videoHeight: Int = 0
 
-    override var isPip: Boolean = false
+    override val currentAudioLevel: Float get() = renderersFactory?.currentAudioLevel ?: 0f
 
     private var videoChangedListener: VideoChangedListener? = null
+    private val mainHandler = Handler(Looper.getMainLooper())
+
+    private val _hasVideoSurfaceFlow = MutableStateFlow(false)
+    val hasVideoSurfaceFlow = _hasVideoSurfaceFlow.asStateFlow()
+    private var hasVideoSurface: Boolean
+        get() = _hasVideoSurfaceFlow.value
+        set(value) {
+            _hasVideoSurfaceFlow.value = value
+        }
+    private var videoTrackDisableRunnable: Runnable? = null
+
+    private var pendingSurface: SurfaceView? = null
 
     @Volatile
     private var prepared = false
@@ -122,6 +146,8 @@ class SimplePlayer(
 
         player = null
         prepared = false
+        pendingSurface = null
+        cancelPendingVideoTrackDisable()
 
         videoChangedListener?.videoNeedsReset()
     }
@@ -196,7 +222,8 @@ class SimplePlayer(
     private fun prepare() {
         val trackSelector = DefaultTrackSelector(context)
         this.trackSelector = trackSelector
-        applyAudioOnly()
+        hasVideoSurface = false
+        applyVideoTrackSelection()
 
         val minBufferMillis = if (isStreaming) bufferTimeMinMillis else DefaultLoadControl.DEFAULT_MIN_BUFFER_MS
         val maxBufferMillis = if (isStreaming) bufferTimeMaxMillis else DefaultLoadControl.DEFAULT_MAX_BUFFER_MS
@@ -224,8 +251,18 @@ class SimplePlayer(
         player.addListener(PlayPauseListener(playbackStatsCollector))
         player.addAnalyticsListener(renderer)
 
+        val surfaceToAttach = pendingSurface
         handleStop()
         this.player = player
+        surfaceToAttach?.let { surface ->
+            try {
+                player.setVideoSurfaceHolder(surface.holder)
+                hasVideoSurface = true
+                applyVideoTrackSelection()
+            } catch (e: Exception) {
+                Timber.e(e)
+            }
+        }
 
         setPlayerEffects()
         player.addListener(object : Player.Listener {
@@ -300,35 +337,72 @@ class SimplePlayer(
     private fun updateVideoState() {
         val player = player ?: return
         if (player.playbackState == Player.STATE_READY) {
-            onVideoTrackChanged(player.currentTracks.isTypeSelected(C.TRACK_TYPE_VIDEO))
+            onVideoTrackChanged(player.currentTracks.containsType(C.TRACK_TYPE_VIDEO) && !settings.audioOnly.value)
         }
     }
 
     override fun updateAudioOnly() {
-        applyAudioOnly()
+        Handler(Looper.getMainLooper()).post {
+            applyVideoTrackSelection()
+            updateVideoState()
+        }
     }
 
     @OptIn(UnstableApi::class)
-    private fun applyAudioOnly() {
+    private fun applyVideoTrackSelection() {
         val trackSelector = trackSelector ?: return
         trackSelector.parameters = trackSelector.buildUponParameters()
-            .setTrackTypeDisabled(C.TRACK_TYPE_VIDEO, settings.audioOnly.value)
+            .setTrackTypeDisabled(C.TRACK_TYPE_VIDEO, shouldDisableVideoTrack(settings.audioOnly.value, hasVideoSurface, episodeLocation.isHlsStream))
             .build()
+    }
+
+    private fun scheduleVideoTrackDisable() {
+        cancelPendingVideoTrackDisable()
+        val runnable = Runnable {
+            videoTrackDisableRunnable = null
+            if (!hasVideoSurface) {
+                applyVideoTrackSelection()
+            }
+        }
+        videoTrackDisableRunnable = runnable
+        mainHandler.postDelayed(runnable, VIDEO_TRACK_DISABLE_GRACE_MS)
+    }
+
+    private fun cancelPendingVideoTrackDisable() {
+        videoTrackDisableRunnable?.let(mainHandler::removeCallbacks)
+        videoTrackDisableRunnable = null
     }
 
     private fun addVideoListener(player: ExoPlayer) {
         player.addListener(object : Player.Listener {
-            override fun onVideoSizeChanged(videoSize: VideoSize) {
-                videoWidth = videoSize.width
-                videoHeight = videoSize.height
+            override fun onSurfaceSizeChanged(width: Int, height: Int) {
+                val attached = width != 0 || height != 0
+                if (attached != hasVideoSurface) {
+                    hasVideoSurface = attached
+                    if (attached) {
+                        cancelPendingVideoTrackDisable()
+                        applyVideoTrackSelection()
+                    } else {
+                        scheduleVideoTrackDisable()
+                    }
+                }
+            }
 
+            override fun onVideoSizeChanged(videoSize: VideoSize) {
                 // Real video dimensions are definitive proof the stream carries video.
                 if (videoSize.width > 0 && videoSize.height > 0) {
+                    videoWidth = videoSize.width
+                    videoHeight = videoSize.height
                     onVideoTrackChanged(true)
+                    videoChangedListener?.let {
+                        mainHandler.post { it.videoSizeChanged(videoSize.width, videoSize.height, videoSize.pixelWidthHeightRatio) }
+                    }
                 }
+            }
 
+            override fun onRenderedFirstFrame() {
                 videoChangedListener?.let {
-                    Handler(Looper.getMainLooper()).post { it.videoSizeChanged(videoSize.width, videoSize.height, videoSize.pixelWidthHeightRatio) }
+                    mainHandler.post { it.videoFirstFrameRendered() }
                 }
             }
         })
@@ -336,18 +410,30 @@ class SimplePlayer(
 
     private fun createRenderersFactory(): ShiftyRenderersFactory {
         val playbackEffects: PlaybackEffects? = this.playbackEffects
-        return if (playbackEffects == null) {
-            ShiftyRenderersFactory(context = context, statsManager = statsManager, boostVolume = false)
-        } else {
-            ShiftyRenderersFactory(context = context, statsManager = statsManager, boostVolume = playbackEffects.isVolumeBoosted)
-        }
+        return ShiftyRenderersFactory(
+            context = context,
+            statsManager = statsManager,
+            boostVolume = playbackEffects?.isVolumeBoosted ?: false,
+            fingerprintPcmTap = fingerprintPcmTap,
+            fingerprintTapEnabled = {
+                FeatureFlag.isEnabled(Feature.SYNCED_TRANSCRIPTS) &&
+                    Util.getAppPlatform(context) == AppPlatform.Phone &&
+                    fingerprintDecodePolicy.current() != FingerprintPolicy.DISABLED
+            },
+            audioLevelMeterEnabled = { isTv },
+        )
     }
 
-    fun setDisplay(surfaceView: SurfaceView?): Boolean {
-        val player = player ?: return false
+    fun setDisplay(surfaceView: SurfaceView): Boolean {
+        val player = player
+        if (player == null) {
+            pendingSurface = surfaceView
+            return false
+        }
+        pendingSurface = null
 
         return try {
-            player.setVideoSurfaceHolder(surfaceView?.holder)
+            player.setVideoSurfaceHolder(surfaceView.holder)
             true
         } catch (e: Exception) {
             Timber.e(e)
@@ -355,9 +441,26 @@ class SimplePlayer(
         }
     }
 
+    fun clearDisplay(surfaceView: SurfaceView) {
+        val player = player
+        if (player == null) {
+            if (pendingSurface == surfaceView) {
+                pendingSurface = null
+            }
+            return
+        }
+
+        try {
+            player.clearVideoSurfaceHolder(surfaceView.holder)
+        } catch (e: Exception) {
+            Timber.e(e)
+        }
+    }
+
     interface VideoChangedListener {
         fun videoSizeChanged(width: Int, height: Int, pixelWidthHeightRatio: Float)
         fun videoNeedsReset()
+        fun videoFirstFrameRendered()
     }
 
     fun setVideoSizeChangedListener(videoChangedListener: VideoChangedListener) {
@@ -379,6 +482,12 @@ class SimplePlayer(
         }
         player.playbackParameters = PlaybackParameters(playbackEffects.playbackSpeed.toFloat(), 1f)
     }
+}
+
+private const val VIDEO_TRACK_DISABLE_GRACE_MS = 10_000L
+
+internal fun shouldDisableVideoTrack(audioOnly: Boolean, hasVideoSurface: Boolean, isHlsStream: Boolean): Boolean {
+    return audioOnly || (!hasVideoSurface && !isHlsStream)
 }
 
 private class PlayPauseListener(

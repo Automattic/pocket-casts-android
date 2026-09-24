@@ -53,7 +53,6 @@ class AccountManagerStatusInfo @Inject constructor(
     }
 
     internal companion object {
-        // Legacy key value
-        const val ANON_ID_KEY = "nosara_tracks_anon_id"
+        const val ANON_ID_KEY = AccountConstants.ANON_ID_KEY
     }
 }

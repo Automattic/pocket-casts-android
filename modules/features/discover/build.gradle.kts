@@ -64,6 +64,7 @@ dependencies {
     implementation(projects.modules.services.localization)
     implementation(projects.modules.services.utils)
 
+    testImplementation(libs.androidx.arch.core)
     testImplementation(libs.coroutines.test)
     testImplementation(libs.junit)
     testImplementation(libs.moshi)

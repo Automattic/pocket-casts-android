@@ -29,7 +29,6 @@ dependencies {
     api(libs.rx2.java)
     api(libs.rx2.relay)
     api(libs.work.runtime)
-    api(libs.work.rx2)
 
     api(projects.modules.services.analytics)
     api(projects.modules.services.coroutines)
@@ -82,6 +81,7 @@ dependencies {
     testImplementation(libs.okHttp.mockwebserver)
     testImplementation(libs.robolectric)
     testImplementation(libs.turbine)
+    testImplementation(libs.work.test)
 
     testImplementation(projects.modules.services.sharedtest)
     testImplementation(projects.modules.services.analytics.testing)

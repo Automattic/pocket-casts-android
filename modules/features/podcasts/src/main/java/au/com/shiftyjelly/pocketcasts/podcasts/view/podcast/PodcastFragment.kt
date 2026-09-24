@@ -38,6 +38,7 @@ import androidx.recyclerview.widget.SimpleItemAnimator
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPlural
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -46,6 +47,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivity
+import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkDetailFragment
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksSortByDialog
 import au.com.shiftyjelly.pocketcasts.podcasts.BuildConfig
 import au.com.shiftyjelly.pocketcasts.podcasts.R
@@ -84,6 +86,7 @@ import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.extensions.smoothScrollToTop
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
+import au.com.shiftyjelly.pocketcasts.views.multiselect.BookmarkDeleter
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper.NavigationState
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper.Companion.MULTI_SELECT_TOGGLE_PAYLOAD
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
@@ -102,6 +105,7 @@ import com.automattic.eventhorizon.FolderPodcastModalOptionTappedEvent
 import com.automattic.eventhorizon.FolderPodcastModalOptionType
 import com.automattic.eventhorizon.PodcastScreenCategoryTappedEvent
 import com.automattic.eventhorizon.PodcastScreenFolderTappedEvent
+import com.automattic.eventhorizon.PodcastScreenNetworkTappedEvent
 import com.automattic.eventhorizon.PodcastScreenOptionsTappedEvent
 import com.automattic.eventhorizon.PodcastScreenPodcastDetailsLinkTappedEvent
 import com.automattic.eventhorizon.PodcastScreenSettingsTappedEvent
@@ -157,6 +161,9 @@ class PodcastFragment : BaseFragment() {
 
     @Inject
     lateinit var settings: Settings
+
+    @Inject
+    lateinit var bookmarkDeleter: BookmarkDeleter
 
     @Inject
     lateinit var podcastManager: PodcastManager
@@ -650,6 +657,27 @@ class PodcastFragment : BaseFragment() {
         viewModel.play(bookmark)
     }
 
+    private val onBookmarkClick: (bookmark: Bookmark, episode: BaseEpisode) -> Unit = { bookmark, episode ->
+        BookmarkDetailFragment.show(
+            fragmentManager = parentFragmentManager,
+            bookmark = bookmark,
+            episodeTitle = episode.title,
+            podcastUuid = viewModel.podcastUuid,
+            podcastTitle = viewModel.podcast.value?.title.orEmpty(),
+            sourceView = SourceView.PODCAST_SCREEN,
+        )
+    }
+
+    private val onBookmarkArtworkClick: (bookmark: Bookmark) -> Unit = { bookmark ->
+        (activity as? FragmentHostListener)?.openEpisodeDialog(
+            episodeUuid = bookmark.episodeUuid,
+            source = EpisodeViewSource.UNKNOWN,
+            podcastUuid = bookmark.podcastUuid,
+            forceDark = false,
+            autoPlay = false,
+        )
+    }
+
     private fun onHeadsetSettingsClicked() {
         val fragmentHostListener = (activity as? FragmentHostListener)
         viewModel.onHeadsetSettingsClicked()
@@ -752,6 +780,10 @@ class PodcastFragment : BaseFragment() {
             onArtworkLongClicked = onArtworkLongClicked,
             onTabClicked = onTabClicked,
             onBookmarkPlayClicked = onBookmarkPlayClicked,
+            onBookmarkClick = onBookmarkClick,
+            onBookmarkArtworkClick = onBookmarkArtworkClick,
+            onBookmarkSwipeShare = ::onSwipeShareBookmarkClick,
+            onBookmarkSwipeDelete = ::onSwipeDeleteBookmarkClick,
             ratingsViewModel = ratingsViewModel,
             onHeadsetSettingsClicked = ::onHeadsetSettingsClicked,
             onGetBookmarksClicked = ::onGetBookmarksClicked,
@@ -783,6 +815,22 @@ class PodcastFragment : BaseFragment() {
                     val hostListener = (requireActivity() as FragmentHostListener)
                     hostListener.closeToRoot()
                     hostListener.openTab(VR.id.navigation_discover)
+                }
+            },
+            onClickNetwork = { podcast ->
+                val listId = podcast.networkListId
+                if (listId != null) {
+                    eventHorizon.track(
+                        PodcastScreenNetworkTappedEvent(
+                            podcastUuid = podcast.uuid,
+                            listId = listId,
+                        ),
+                    )
+                    (requireActivity() as FragmentHostListener).openNetworkPage(
+                        listId = listId,
+                        title = podcast.author,
+                        sourceView = SourceView.PODCAST_SCREEN,
+                    )
                 }
             },
             onClickWebsite = { podcast ->
@@ -941,8 +989,10 @@ class PodcastFragment : BaseFragment() {
 
     override fun onPause() {
         super.onPause()
-        viewModel.multiSelectEpisodesHelper.isMultiSelecting = false
-        viewModel.multiSelectBookmarksHelper.isMultiSelecting = false
+        if (!requireActivity().isChangingConfigurations) {
+            viewModel.multiSelectEpisodesHelper.isMultiSelecting = false
+            viewModel.multiSelectBookmarksHelper.isMultiSelecting = false
+        }
     }
 
     private fun onShareBookmarkClick() {
@@ -954,6 +1004,38 @@ class PodcastFragment : BaseFragment() {
                 .forBookmark(episode, timestamp, podcast.backgroundColor, SourceView.PODCAST_SCREEN)
                 .show(parentFragmentManager, "share_screen")
         }
+    }
+
+    private fun onSwipeShareBookmarkClick(bookmark: Bookmark, settleRow: () -> Unit) {
+        lifecycleScope.launch {
+            val shared = viewModel.getSharedBookmark(bookmark)
+            settleRow()
+            val (podcast, episode, sharedBookmark) = shared ?: return@launch
+            viewModel.onBookmarkShare(podcast.uuid, episode.uuid, sourceView)
+            ShareEpisodeTimestampFragment
+                .forBookmark(episode, sharedBookmark.timeSecs.seconds, podcast.backgroundColor, SourceView.PODCAST_SCREEN)
+                .show(parentFragmentManager, "share_screen")
+        }
+    }
+
+    private fun onSwipeDeleteBookmarkClick(bookmark: Bookmark, settleRow: () -> Unit) {
+        bookmarkDeleter.confirmDelete(
+            bookmarks = listOf(bookmark),
+            source = SourceView.PODCAST_SCREEN,
+            resources = resources,
+            fragmentManager = childFragmentManager,
+            scope = lifecycleScope,
+            onDeleted = { count ->
+                showSnackBar(
+                    resources.getStringPlural(
+                        count,
+                        LR.string.bookmarks_deleted_singular,
+                        LR.string.bookmarks_deleted_plural,
+                    ),
+                )
+            },
+            onDismissed = settleRow,
+        )
     }
 
     private suspend fun onEditBookmarkClick() {

@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -338,25 +339,14 @@ private fun WearApp(
 
                 loggingInScreens(
                     onClose = {
-                        when (startDestination) {
-                            WatchListScreen.ROUTE -> {
-                                val popped = navController.popBackStack(
-                                    route = WatchListScreen.ROUTE,
-                                    inclusive = false,
-                                )
-                                if (popped) {
-                                    ScrollToTop.initiate(navController)
-                                }
-                            }
-
-                            RequirePlusScreen.ROUTE -> {
-                                navController.popBackStack(
-                                    route = RequirePlusScreen.ROUTE,
-                                    inclusive = false,
-                                )
-                            }
-
-                            else -> throw IllegalStateException("Unexpected start destination $startDestination")
+                        // Read the live graph because the captured startDestination is stale once sign in swaps the graph.
+                        val liveStartDestination = navController.graph.findStartDestination()
+                        val popped = navController.popBackStack(
+                            destinationId = liveStartDestination.id,
+                            inclusive = false,
+                        )
+                        if (popped && liveStartDestination.route == WatchListScreen.ROUTE) {
+                            ScrollToTop.initiate(navController)
                         }
                     },
                 )

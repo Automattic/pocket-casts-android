@@ -14,6 +14,8 @@ import kotlinx.coroutines.test.runTest
 import okhttp3.CacheControl
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -53,41 +55,30 @@ class TranscriptWindowExtractorTest {
         whenever(fingerprintTimingManager.activeEpisodeUuid).thenReturn("episode-id")
         whenever(fingerprintTimingManager.referenceTime(5000)).thenReturn(25.0)
 
-        val result = extractor(sampleVtt).extractWindow("episode-id", timeSecs = 5, windowSecs = 15)
+        val result = extractor(sampleVtt).extractWindow("episode-id", timeSecs = 5)
 
-        assertEquals(
-            "Let me start by defining what AI actually means in practice. " +
-                "AI is a broad field that includes machine learning, deep learning, and more. " +
-                "The recent advances have been truly remarkable for the industry.",
-            result,
-        )
+        assertEquals(windowAroundTwentyFive, result?.passage)
+        assertEquals(25, result?.referenceTimeSecs)
+        assertEquals(0, result?.location)
     }
 
     @Test
-    fun `use playback time when mapping is for another episode`() = runTest {
+    fun `return null when mapping is for another episode`() = runTest {
         whenever(fingerprintTimingManager.activeEpisodeUuid).thenReturn("other-episode")
 
-        val result = extractor(sampleVtt).extractWindow("episode-id", timeSecs = 5, windowSecs = 15)
+        val result = extractor(sampleVtt).extractWindow("episode-id", timeSecs = 5)
 
-        assertEquals(
-            "Welcome to the show everyone. Today we are going to discuss artificial intelligence. " +
-                "Let me start by defining what AI actually means in practice.",
-            result,
-        )
+        assertNull(result)
     }
 
     @Test
-    fun `use playback time when reference time is unavailable`() = runTest {
+    fun `return null when reference time is unavailable and there is no current episode`() = runTest {
         whenever(fingerprintTimingManager.activeEpisodeUuid).thenReturn("episode-id")
         whenever(fingerprintTimingManager.referenceTime(5000)).thenReturn(null)
 
-        val result = extractor(sampleVtt).extractWindow("episode-id", timeSecs = 5, windowSecs = 15)
+        val result = extractor(sampleVtt).extractWindow("episode-id", timeSecs = 5)
 
-        assertEquals(
-            "Welcome to the show everyone. Today we are going to discuss artificial intelligence. " +
-                "Let me start by defining what AI actually means in practice.",
-            result,
-        )
+        assertNull(result)
     }
 
     @Test
@@ -104,14 +95,10 @@ class TranscriptWindowExtractorTest {
             null
         }.whenever(fingerprintTimingManager).prepareForCurrentEpisode(FingerprintTimingManager.PrepareTrigger.BOOKMARK)
 
-        val result = extractor(sampleVtt).extractWindow("episode-id", timeSecs = 5, windowSecs = 15)
+        val result = extractor(sampleVtt).extractWindow("episode-id", timeSecs = 5)
 
-        assertEquals(
-            "Let me start by defining what AI actually means in practice. " +
-                "AI is a broad field that includes machine learning, deep learning, and more. " +
-                "The recent advances have been truly remarkable for the industry.",
-            result,
-        )
+        assertEquals(windowAroundTwentyFive, result?.passage)
+        assertEquals(25, result?.referenceTimeSecs)
     }
 
     @Test
@@ -129,49 +116,37 @@ class TranscriptWindowExtractorTest {
             null
         }.whenever(fingerprintTimingManager).prepareForCurrentEpisode(FingerprintTimingManager.PrepareTrigger.BOOKMARK)
 
-        val result = extractor(sampleVtt).extractWindow("episode-id", timeSecs = 5, windowSecs = 15)
+        val result = extractor(sampleVtt).extractWindow("episode-id", timeSecs = 5)
 
-        assertEquals(
-            "Let me start by defining what AI actually means in practice. " +
-                "AI is a broad field that includes machine learning, deep learning, and more. " +
-                "The recent advances have been truly remarkable for the industry.",
-            result,
-        )
+        assertEquals(windowAroundTwentyFive, result?.passage)
+        assertEquals(25, result?.referenceTimeSecs)
     }
 
     @Test
-    fun `use playback time when the mapping never covers the bookmark`() = runTest {
+    fun `return null when the mapping never covers the bookmark`() = runTest {
         whenever(fingerprintTimingManager.activeEpisodeUuid).thenReturn("episode-id")
         whenever(fingerprintTimingManager.referenceTime(5000)).thenReturn(null)
         whenever(fingerprintTimingManager.mappingVersion).thenReturn(MutableStateFlow(0L))
         whenever(playbackManager.getCurrentEpisode()).thenReturn(currentEpisode)
 
-        val result = extractor(sampleVtt).extractWindow("episode-id", timeSecs = 5, windowSecs = 15)
+        val result = extractor(sampleVtt).extractWindow("episode-id", timeSecs = 5)
 
-        assertEquals(
-            "Welcome to the show everyone. Today we are going to discuss artificial intelligence. " +
-                "Let me start by defining what AI actually means in practice.",
-            result,
-        )
+        assertNull(result)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun `use playback time without waiting when fingerprinting is unavailable`() = runTest {
+    fun `return null without waiting when fingerprinting is unavailable`() = runTest {
         whenever(fingerprintTimingManager.activeEpisodeUuid).thenReturn("episode-id")
         whenever(fingerprintTimingManager.referenceTime(5000)).thenReturn(null)
         whenever(fingerprintTimingManager.mappingVersion).thenReturn(MutableStateFlow(0L))
         whenever(fingerprintTimingManager.stateFlow).thenReturn(MutableStateFlow(FingerprintTimingManager.State.Unavailable("episode-id")))
         whenever(playbackManager.getCurrentEpisode()).thenReturn(currentEpisode)
 
-        val result = extractor(sampleVtt).extractWindow("episode-id", timeSecs = 5, windowSecs = 15)
+        val result = extractor(sampleVtt).extractWindow("episode-id", timeSecs = 5)
 
         assertEquals(0, currentTime)
-        assertEquals(
-            "Welcome to the show everyone. Today we are going to discuss artificial intelligence. " +
-                "Let me start by defining what AI actually means in practice.",
-            result,
-        )
+        assertNull(result)
     }
 
     private val sampleVtt = """
@@ -199,26 +174,35 @@ class TranscriptWindowExtractorTest {
         |This is a much later segment about totally different things.
     """.trimMargin()
 
+    private val windowAroundTwentyFive =
+        "Welcome to the show everyone. Today we are going to discuss artificial intelligence. " +
+            "Let me start by defining what AI actually means in practice. " +
+            "AI is a broad field that includes machine learning, deep learning, and more."
+
     @Test
-    fun `extract window around middle of transcript`() {
-        val result = TranscriptWindowExtractor.parseVttWindow(sampleVtt, timeSecs = 25, windowSecs = 15)
+    fun `extract window from the cues before and up to the center`() {
+        val result = TranscriptWindowExtractor.parseVttWindow(sampleVtt, centerSecs = 30)
 
         assertEquals(
-            "Let me start by defining what AI actually means in practice. " +
+            "Today we are going to discuss artificial intelligence. " +
+                "Let me start by defining what AI actually means in practice. " +
                 "AI is a broad field that includes machine learning, deep learning, and more. " +
                 "The recent advances have been truly remarkable for the industry.",
-            result,
+            result?.passage,
         )
+        assertEquals(30, result?.referenceTimeSecs)
+        assertEquals("Welcome to the show everyone.".length + 1, result?.location)
     }
 
     @Test
-    fun `extract window at start of transcript`() {
-        val result = TranscriptWindowExtractor.parseVttWindow(sampleVtt, timeSecs = 0, windowSecs = 10)
+    fun `clamp the window start at the beginning of the transcript`() {
+        val result = TranscriptWindowExtractor.parseVttWindow(sampleVtt, centerSecs = 5)
 
         assertEquals(
             "Welcome to the show everyone. Today we are going to discuss artificial intelligence.",
-            result,
+            result?.passage,
         )
+        assertEquals(0, result?.location)
     }
 
     @Test
@@ -230,14 +214,14 @@ class TranscriptWindowExtractorTest {
             |Just a few words.
         """.trimMargin()
 
-        val result = TranscriptWindowExtractor.parseVttWindow(shortVtt, timeSecs = 2, windowSecs = 30)
+        val result = TranscriptWindowExtractor.parseVttWindow(shortVtt, centerSecs = 2)
 
         assertNull(result)
     }
 
     @Test
     fun `return null when no cues in window`() {
-        val result = TranscriptWindowExtractor.parseVttWindow(sampleVtt, timeSecs = 300, windowSecs = 10)
+        val result = TranscriptWindowExtractor.parseVttWindow(sampleVtt, centerSecs = 300)
 
         assertNull(result)
     }
@@ -258,18 +242,14 @@ class TranscriptWindowExtractorTest {
             |
             |00:20.000 --> 00:30.000
             |AI is a broad field that includes machine learning, deep learning, and more.
-            |
-            |00:30.000 --> 00:40.000
-            |The recent advances have been truly remarkable for the industry.
         """.trimMargin()
 
-        val result = TranscriptWindowExtractor.parseVttWindow(vtt, timeSecs = 15, windowSecs = 10)
+        val result = TranscriptWindowExtractor.parseVttWindow(vtt, centerSecs = 15)
 
         assertEquals(
-            "Today we are going to discuss artificial intelligence. " +
-                "Let me start by defining what AI actually means in practice. " +
-                "AI is a broad field that includes machine learning, deep learning, and more.",
-            result,
+            "Welcome to the show everyone. Today we are going to discuss artificial intelligence. " +
+                "Let me start by defining what AI actually means in practice.",
+            result?.passage,
         )
     }
 
@@ -282,11 +262,96 @@ class TranscriptWindowExtractorTest {
             |<v Alice>This is a sentence with enough words to pass the minimum threshold for extraction.
         """.trimMargin()
 
-        val result = TranscriptWindowExtractor.parseVttWindow(vttWithTags, timeSecs = 5, windowSecs = 10)
+        val result = TranscriptWindowExtractor.parseVttWindow(vttWithTags, centerSecs = 5)
 
         assertEquals(
             "This is a sentence with enough words to pass the minimum threshold for extraction.",
-            result,
+            result?.passage,
         )
+    }
+
+    @Test
+    fun `snap the window to whole sentences`() {
+        val vtt = """
+            |WEBVTT
+            |
+            |00:00:00.000 --> 00:00:05.000
+            |The first sentence starts here and
+            |
+            |00:00:05.000 --> 00:00:15.000
+            |runs into the second cue before it stops.
+            |
+            |00:00:15.000 --> 00:00:25.000
+            |A whole middle sentence lives entirely inside the window without any trouble at all here.
+            |
+            |00:00:25.000 --> 00:00:35.000
+            |The final sentence begins in this cue and
+            |
+            |00:00:35.000 --> 00:00:45.000
+            |then extends beyond the window edge to finish.
+        """.trimMargin()
+
+        val result = TranscriptWindowExtractor.parseVttWindow(vtt, centerSecs = 30)
+
+        assertEquals(
+            "The first sentence starts here and runs into the second cue before it stops. " +
+                "A whole middle sentence lives entirely inside the window without any trouble at all here. " +
+                "The final sentence begins in this cue and then extends beyond the window edge to finish.",
+            result?.passage,
+        )
+    }
+
+    @Test
+    fun `bound the passage when the transcript has no sentence boundaries`() {
+        val filler = "word ".repeat(30).trim()
+        val vtt = buildString {
+            appendLine("WEBVTT")
+            appendLine()
+            for (i in 0 until 13) {
+                val start = i * 10
+                val end = start + 10
+                appendLine("00:%02d:%02d.000 --> 00:%02d:%02d.000".format(start / 60, start % 60, end / 60, end % 60))
+                appendLine(
+                    when (i) {
+                        0 -> "zzzstart $filler"
+                        12 -> "$filler zzzend"
+                        else -> filler
+                    },
+                )
+                appendLine()
+            }
+        }
+
+        val result = TranscriptWindowExtractor.parseVttWindow(vtt, centerSecs = 60)
+
+        assertNotNull(result)
+        assertFalse(result!!.passage.contains("zzzstart"))
+        assertFalse(result.passage.contains("zzzend"))
+    }
+
+    @Test
+    fun `return null when the snapped window is below the minimum words`() {
+        val vtt = """
+            |WEBVTT
+            |
+            |00:00:00.000 --> 00:00:05.000
+            |Intro sentence here.
+            |
+            |00:00:05.000 --> 00:00:15.000
+            |Short one.
+            |
+            |00:00:15.000 --> 00:00:25.000
+            |Tiny bit.
+            |
+            |00:00:25.000 --> 00:00:35.000
+            |Last short.
+            |
+            |00:00:35.000 --> 00:00:45.000
+            |Beyond the edge.
+        """.trimMargin()
+
+        val result = TranscriptWindowExtractor.parseVttWindow(vtt, centerSecs = 30)
+
+        assertNull(result)
     }
 }

@@ -186,6 +186,15 @@ class DeveloperViewModel
         settings.showUpNextSortDurationTooltip.set(true, updateModifiedAt = false)
     }
 
+    fun showGiftTooltip() {
+        settings.showReferralsTooltip.set(true, updateModifiedAt = false)
+    }
+
+    fun showPlaylistTooltips() {
+        settings.showPremadePlaylistsTooltip.set(true, updateModifiedAt = false)
+        settings.showRearrangePlaylistsTooltip.set(true, updateModifiedAt = false)
+    }
+
     fun resetNotificationsPrompt() {
         settings.notificationsPromptAcknowledged.set(false, updateModifiedAt = false)
     }

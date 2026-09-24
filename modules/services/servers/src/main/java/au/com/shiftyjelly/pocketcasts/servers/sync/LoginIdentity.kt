@@ -18,11 +18,17 @@ sealed class LoginIdentity(
         analyticsValue = LoginIdentityType.Google,
     )
 
+    object QrCode : LoginIdentity(
+        key = "QrCode",
+        analyticsValue = LoginIdentityType.QrCode,
+    )
+
     companion object {
         fun valueOf(value: String?): LoginIdentity? {
             return when (value) {
                 PocketCasts.key -> PocketCasts
                 Google.key -> Google
+                QrCode.key -> QrCode
                 else -> null
             }
         }

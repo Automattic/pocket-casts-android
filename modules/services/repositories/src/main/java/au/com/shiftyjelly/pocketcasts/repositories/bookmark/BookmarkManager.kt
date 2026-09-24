@@ -7,6 +7,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeDefault
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForPodcast
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForProfile
 import com.automattic.eventhorizon.BookmarkSourceType
+import com.automattic.eventhorizon.SourceViewType
 import java.time.Instant
 import kotlinx.coroutines.flow.Flow
 
@@ -17,8 +18,12 @@ interface BookmarkManager {
         title: String,
         creationSource: BookmarkSourceType,
         addedAt: Instant = Instant.now(),
+        passage: String? = null,
+        passageLocation: Int? = null,
+        referenceTime: Int? = null,
     ): Bookmark
     suspend fun updateTitle(bookmarkUuid: String, title: String)
+    suspend fun updatePassage(bookmarkUuid: String, passage: String, passageLocation: Int, referenceTime: Int?)
     suspend fun findBookmark(bookmarkUuid: String, deleted: Boolean = false): Bookmark?
     suspend fun findByEpisodeTime(episode: BaseEpisode, timeSecs: Int): Bookmark?
     suspend fun findEpisodeBookmarksFlow(
@@ -34,12 +39,27 @@ interface BookmarkManager {
     suspend fun upsertSynced(bookmark: Bookmark): Bookmark
     suspend fun searchInPodcastByTitle(podcastUuid: String, title: String): List<String>
     suspend fun searchByBookmarkOrEpisodeTitle(title: String): List<String>
-    fun findUserEpisodesBookmarksFlow(): Flow<List<Bookmark>>
     fun findBookmarksFlow(
         sortType: BookmarksSortTypeForProfile,
     ): Flow<List<Bookmark>>
     fun hasBookmarksFlow(episodeUuid: String): Flow<Boolean>
-    fun enrichBookmark(bookmark: Bookmark)
+    fun enrichBookmark(bookmark: Bookmark, source: SourceViewType)
+    fun enrichBookmarkPassage(bookmark: Bookmark)
+    suspend fun suggestBookmark(episodeUuid: String, timeSecs: Int): BookmarkSuggestion?
+    suspend fun suggestTitle(passage: String): TitleGeneration
 
     var sourceView: SourceView
 }
+
+data class BookmarkSuggestion(
+    val passage: String,
+    val passageLocation: Int,
+    val referenceTimeSecs: Int,
+    val generation: TitleGeneration,
+)
+
+data class TitleGeneration(
+    val title: String?,
+    val durationMs: Long,
+    val failureReason: String?,
+)

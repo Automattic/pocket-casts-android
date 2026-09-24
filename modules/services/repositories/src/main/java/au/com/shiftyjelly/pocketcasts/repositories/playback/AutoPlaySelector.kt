@@ -19,7 +19,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.reactive.awaitFirst
 import kotlinx.coroutines.withContext
 
 class AutoPlaySelector @Inject constructor(
@@ -115,7 +114,7 @@ class AutoPlaySelector @Inject constructor(
     }
 
     private suspend fun findDownloadedEpisodes(): List<PodcastEpisode> {
-        return episodeManager.findDownloadedEpisodesRxFlowable().awaitFirst()
+        return episodeManager.findDownloadedEpisodesFlow().first()
     }
 
     private suspend fun findUserEpisodes(): List<UserEpisode> {

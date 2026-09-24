@@ -61,6 +61,8 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.buttons.PlayButton
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
@@ -136,12 +138,17 @@ class PodcastAdapter(
     private val ratingsViewModel: PodcastRatingsViewModel,
     private val onTabClicked: (PodcastTab) -> Unit,
     private val onBookmarkPlayClicked: (Bookmark) -> Unit,
+    private val onBookmarkClick: (Bookmark, BaseEpisode) -> Unit,
+    private val onBookmarkArtworkClick: (Bookmark) -> Unit,
+    private val onBookmarkSwipeShare: (Bookmark, settleRow: () -> Unit) -> Unit,
+    private val onBookmarkSwipeDelete: (Bookmark, settleRow: () -> Unit) -> Unit,
     private val onHeadsetSettingsClicked: () -> Unit,
     private val onGetBookmarksClicked: () -> Unit,
     private val onChangeHeaderExpanded: (String, Boolean) -> Unit,
     private val onDescriptionExpanded: (Boolean) -> Unit,
     private val onClickRating: (Podcast) -> Unit,
     private val onClickCategory: (Podcast) -> Unit,
+    private val onClickNetwork: (Podcast) -> Unit,
     private val onClickWebsite: (Podcast) -> Unit,
     private val onArtworkAvailable: (Podcast) -> Unit,
     private val onRecommendedRetryClicked: () -> Unit,
@@ -176,6 +183,9 @@ class PodcastAdapter(
         val onBookmarkPlayClicked: (Bookmark) -> Unit,
         val onBookmarkRowLongPress: (Bookmark) -> Unit,
         val onBookmarkRowClick: (Bookmark, Int) -> Unit,
+        val onBookmarkArtworkClick: () -> Unit,
+        val onBookmarkSwipeShare: (Bookmark, settleRow: () -> Unit) -> Unit,
+        val onBookmarkSwipeDelete: (Bookmark, settleRow: () -> Unit) -> Unit,
         val isMultiSelecting: () -> Boolean,
         val isSelected: (Bookmark) -> Boolean,
     )
@@ -261,6 +271,7 @@ class PodcastAdapter(
                 theme = theme,
                 useBlurredArtwork = headerType == HeaderType.Blur,
                 onClickCategory = onClickCategory,
+                onClickNetwork = onClickNetwork,
                 onClickRating = onClickRating,
                 onClickFollow = onSubscribeClicked,
                 onClickUnfollow = { onUnsubscribeClicked { } },
@@ -602,20 +613,28 @@ class PodcastAdapter(
                     )
                 } else {
                     addAll(
-                        bookmarks.map {
+                        bookmarks.map { bookmark ->
+                            val episode = episodes.find { it.uuid == bookmark.episodeUuid } ?: noOpEpisode
                             BookmarkItemData(
-                                bookmark = it,
-                                episode = episodes.find { episode -> episode.uuid == it.episodeUuid } ?: noOpEpisode,
+                                bookmark = bookmark,
+                                episode = episode,
                                 onBookmarkPlayClicked = onBookmarkPlayClicked,
                                 onBookmarkRowLongPress = onBookmarkRowLongPress,
-                                onBookmarkRowClick = { bookmark, adapterPosition ->
-                                    multiSelectBookmarksHelper.toggle(bookmark)
-                                    notifyItemChanged(adapterPosition)
+                                onBookmarkRowClick = { clickedBookmark, adapterPosition ->
+                                    if (!multiSelectBookmarksHelper.isMultiSelecting && FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS)) {
+                                        onBookmarkClick(clickedBookmark, episode)
+                                    } else {
+                                        multiSelectBookmarksHelper.toggle(clickedBookmark)
+                                        notifyItemChanged(adapterPosition)
+                                    }
                                 },
+                                onBookmarkArtworkClick = { onBookmarkArtworkClick(bookmark) },
+                                onBookmarkSwipeShare = onBookmarkSwipeShare,
+                                onBookmarkSwipeDelete = onBookmarkSwipeDelete,
                                 isMultiSelecting = { multiSelectBookmarksHelper.isMultiSelecting },
-                                isSelected = { bookmark ->
+                                isSelected = { selectedBookmark ->
                                     multiSelectBookmarksHelper.isSelected(
-                                        bookmark,
+                                        selectedBookmark,
                                     )
                                 },
                                 useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork(Element.Bookmarks),
@@ -783,6 +802,7 @@ class PodcastAdapter(
         private val theme: Theme,
         private val useBlurredArtwork: Boolean,
         private val onClickCategory: (Podcast) -> Unit,
+        private val onClickNetwork: (Podcast) -> Unit,
         private val onClickRating: (Podcast) -> Unit,
         private val onClickFollow: () -> Unit,
         private val onClickUnfollow: () -> Unit,
@@ -823,10 +843,12 @@ class PodcastAdapter(
                         title = podcast.title,
                         category = podcast.getFirstCategory(itemView.context.resources),
                         author = podcast.author,
+                        networkListId = podcast.networkListId,
                         explicit = podcast.explicit ?: false,
                         description = podcastDescription,
                         podcastInfoState = PodcastInfoState(
                             author = podcast.author,
+                            networkListId = podcast.networkListId,
                             link = podcast.getShortUrl(),
                             schedule = podcast.displayableFrequency(context.resources),
                             next = podcast.displayableNextEpisodeDate(context),
@@ -851,6 +873,7 @@ class PodcastAdapter(
                         ),
                         useBlurredArtwork = useBlurredArtwork,
                         onClickCategory = { onClickCategory(podcast) },
+                        onClickNetwork = { onClickNetwork(podcast) },
                         onClickRating = { onClickRating(podcast) },
                         onClickFollow = onClickFollow,
                         onClickUnfollow = onClickUnfollow,

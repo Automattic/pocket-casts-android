@@ -63,6 +63,12 @@ class TranscriptManagerImpl @Inject constructor(
         return transcript
     }
 
+    override suspend fun loadGeneratedTranscript(episodeUuid: String): Transcript.Text? {
+        val generated = loadLocalTranscripts(episodeUuid).firstOrNull { it.isGenerated } ?: return null
+        val parserWithTranscript = associateWithParser(generated) ?: return null
+        return readTranscript(parserWithTranscript) as? Transcript.Text
+    }
+
     private suspend fun findAndCacheTranscript(episodeUuid: String): Transcript? {
         val transcript = loadLocalTranscripts(episodeUuid)
             .asFlow()

@@ -9,6 +9,8 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfRowItem
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfTitle
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.PlayerShelfOverflowMenuRearrangeActionMovedEvent
 import com.automattic.eventhorizon.PlayerShelfOverflowMenuRearrangeFinishedEvent
@@ -22,6 +24,7 @@ import java.util.Collections
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -46,6 +49,16 @@ class ShelfViewModel @AssistedInject constructor(
                 .collectLatest { isAvailable ->
                     _uiState.update { it.copy(isTranscriptAvailable = isAvailable) }
                 }
+        }
+        viewModelScope.launch {
+            combine(
+                settings.showSmartBookmarksTooltip.flow,
+                FeatureFlag.isEnabledFlow(Feature.SMART_BOOKMARKS),
+            ) { showTooltip, isSmartBookmarksEnabled ->
+                showTooltip && isSmartBookmarksEnabled
+            }.collectLatest { showBadge ->
+                _uiState.update { it.copy(showBookmarkNewBadge = showBadge) }
+            }
         }
     }
 
@@ -158,6 +171,7 @@ class ShelfViewModel @AssistedInject constructor(
         val shelfRowItems: List<ShelfRowItem> = emptyList(),
         val episode: BaseEpisode? = null,
         val isTranscriptAvailable: Boolean = false,
+        val showBookmarkNewBadge: Boolean = false,
     )
 
     enum class ShelfActionSource(

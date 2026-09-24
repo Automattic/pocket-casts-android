@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.transcripts.ui
 
 import android.os.SystemClock
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.DragInteraction
 import androidx.compose.foundation.layout.Box
@@ -19,6 +20,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameNanos
@@ -29,7 +31,9 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
+import au.com.shiftyjelly.pocketcasts.deeplink.ChangeBookmarkTitleDeepLink
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptEntry
 import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintTimingManager
@@ -70,6 +74,7 @@ fun TranscriptPage(
     transcriptPadding: PaddingValues = PaddingValues(0.dp),
     paywallPadding: PaddingValues = PaddingValues(0.dp),
     showCloseButton: Boolean = true,
+    isBackHandlerEnabled: Boolean = true,
     toolbarTrailingContent: (@Composable (ToolbarColors) -> Unit)? = null,
     onHighlightText: (() -> Unit)? = null,
 ) {
@@ -124,11 +129,11 @@ fun TranscriptPage(
                     .weight(1f)
                     .fillMaxWidth(),
             ) {
+                val tapScope = rememberCoroutineScope()
                 val tapToSeekHandler: ((TranscriptEntry, Int) -> Unit)? =
                     if (FeatureFlag.isEnabled(Feature.SYNCED_TRANSCRIPTS) && uiState.isTapToSeekAvailable && viewModel != null) {
                         { entry, index ->
-                            val seekTarget = viewModel.seekToTranscriptEntry(entry)
-                            if (seekTarget != null) {
+                            val applySeek = { seekTarget: Int ->
                                 // Hold the tapped row lit until fingerprinting catches up to the seek.
                                 highlightState = HighlightState(entryIndex = index)
                                 pendingSeek = PendingTapSeek(positionMs = seekTarget, entryIndex = index)
@@ -136,7 +141,44 @@ fun TranscriptPage(
                                     forceScrollIndex = index
                                 }
                             }
+                            when (val result = viewModel.seekToTranscriptEntry(entry)) {
+                                is TranscriptViewModel.TapSeekResult.Seeked -> applySeek(result.positionMs)
+
+                                TranscriptViewModel.TapSeekResult.Resolving -> {
+                                    // Light the row as immediate feedback while the bounded resolve runs.
+                                    // The null-target hold keeps the frame loop from overwriting it.
+                                    val previousHighlight = highlightState
+                                    highlightState = HighlightState(entryIndex = index)
+                                    pendingSeek = PendingTapSeek(positionMs = null, entryIndex = index)
+                                    tapScope.launch {
+                                        var seekTarget: Int? = null
+                                        try {
+                                            seekTarget = viewModel.resolveAndSeekToEntry(entry)
+                                        } finally {
+                                            // Also restores the highlight when a user seek cancels the resolve.
+                                            val target = seekTarget
+                                            if (target != null) {
+                                                applySeek(target)
+                                            } else {
+                                                pendingSeek = pendingSeek?.takeUnless { it.positionMs == null && it.entryIndex == index }
+                                                if (highlightState.entryIndex == index) {
+                                                    highlightState = previousHighlight
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                TranscriptViewModel.TapSeekResult.Unavailable -> Unit
+                            }
                         }
+                    } else {
+                        null
+                    }
+
+                val onBookmarkText: ((String) -> Unit)? =
+                    if (viewModel != null && uiState.isBookmarkFromSelectionAvailable && FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS)) {
+                        viewModel::createBookmarkFromSelection
                     } else {
                         null
                     }
@@ -149,6 +191,7 @@ fun TranscriptPage(
                     highlightState = highlightState,
                     onEntryClick = tapToSeekHandler,
                     onHighlightText = onHighlightText,
+                    onBookmarkText = onBookmarkText,
                     modifier = Modifier
                         .padding(top = 16.dp)
                         .padding(transcriptPadding),
@@ -180,6 +223,10 @@ fun TranscriptPage(
                     .padding(start = 16.dp, end = 16.dp, bottom = debugBottomPadding),
             )
         }
+    }
+
+    BackHandler(enabled = isSearching && isBackHandlerEnabled) {
+        onHideSearchBar()
     }
 
     ScrollToItemEffect(
@@ -229,11 +276,27 @@ private fun TranscriptMessageEffect(viewModel: TranscriptViewModel?) {
     if (viewModel == null) return
     val context = LocalContext.current
     val tapToSeekUnavailableMessage = stringResource(LR.string.transcript_tap_to_seek_streaming_unavailable)
+    val bookmarkFailedMessage = stringResource(LR.string.bookmark_create_failed)
     LaunchedEffect(viewModel) {
         viewModel.messages.collect { message ->
             when (message) {
                 TranscriptMessage.TapToSeekStreamingUnavailable -> {
                     Toast.makeText(context, tapToSeekUnavailableMessage, Toast.LENGTH_SHORT).show()
+                }
+
+                TranscriptMessage.BookmarkFailed -> {
+                    Toast.makeText(context, bookmarkFailedMessage, Toast.LENGTH_SHORT).show()
+                }
+
+                is TranscriptMessage.OpenBookmarkEditor -> {
+                    context.startActivity(
+                        ChangeBookmarkTitleDeepLink(
+                            message.bookmarkUuid,
+                            isNewBookmark = message.isNewBookmark,
+                            fromEpisode = message.fromEpisode,
+                            sourceView = SourceView.TRANSCRIPT.key,
+                        ).toIntent(context),
+                    )
                 }
             }
         }
@@ -250,6 +313,7 @@ private fun TranscriptContent(
     modifier: Modifier = Modifier,
     highlightState: HighlightState = HighlightState(),
     onEntryClick: ((TranscriptEntry, Int) -> Unit)? = null,
+    onBookmarkText: ((String) -> Unit)? = null,
 ) {
     when (val transcriptState = uiState.transcriptState) {
         is TranscriptState.Loading -> {
@@ -270,6 +334,7 @@ private fun TranscriptContent(
                     state = listState,
                     theme = theme,
                     onHighlightText = onHighlightText,
+                    onBookmarkText = onBookmarkText,
                     modifier = modifier,
                 )
             }
@@ -340,13 +405,19 @@ private fun HighlightEffect(
 
     val cueIndexHolder = remember(transcript.entries) { intArrayOf(0) }
 
+    // A new transcript makes any held tap stale; branch flaps below must not drop it.
+    LaunchedEffect(transcript.entries) {
+        latestOnConsumePendingSeek()
+    }
+
     if (isPlaying && isSyncedActive) {
         LaunchedEffect(transcript.entries) {
             cueIndexHolder[0] = 0
-            latestOnConsumePendingSeek()
             var wasHighlighting = false
             var settledForSeek: Int? = null
-            latestOnHighlightChanged(HighlightState())
+            if (latestPendingSeek == null) {
+                latestOnHighlightChanged(HighlightState())
+            }
             val episode = playbackManager.getCurrentEpisode()
             while (true) {
                 withFrameNanos { }
@@ -359,13 +430,15 @@ private fun HighlightEffect(
 
                 val pending = latestPendingSeek
                 if (pending != null) {
-                    // Hold the tapped row until the seek settles and resolution reaches it.
-                    if (settledForSeek != pending.positionMs &&
-                        TranscriptCueHelper.isSeekSettled(posMs, pending.positionMs)
+                    // Hold the tapped row until the target is known, the seek settles, and
+                    // resolution reaches it.
+                    val targetMs = pending.positionMs
+                    if (targetMs != null && settledForSeek != targetMs &&
+                        TranscriptCueHelper.isSeekSettled(posMs, targetMs)
                     ) {
-                        settledForSeek = pending.positionMs
+                        settledForSeek = targetMs
                     }
-                    val settled = settledForSeek == pending.positionMs
+                    val settled = targetMs != null && settledForSeek == targetMs
                     val reachedRow = TranscriptCueHelper.hasReachedTappedRow(outcome, pending.entryIndex)
                     if (settled && reachedRow) {
                         latestOnConsumePendingSeek()
@@ -395,13 +468,17 @@ private fun HighlightEffect(
             }
         }
     } else if (isSyncedActive) {
-        // Paused but synced: no frame loop, so recompute once per position change.
+        // Paused but synced: no frame loop, so recompute once per position change. A held tap
+        // stays lit while the position sits at its target; seeking elsewhere releases it.
         LaunchedEffect(transcript.entries, playbackState?.positionMs) {
             val posMs = playbackState?.positionMs ?: return@LaunchedEffect
-            if (posMs == latestPendingSeek?.positionMs) {
-                return@LaunchedEffect
+            val pending = latestPendingSeek
+            if (pending != null) {
+                if (!TranscriptCueHelper.isHeldTapStale(posMs, pending.positionMs)) {
+                    return@LaunchedEffect
+                }
+                latestOnConsumePendingSeek()
             }
-            latestOnConsumePendingSeek()
             when (val outcome = resolveHighlight(transcript.entries, posMs, fingerprintTimingManager, cueIndexHolder[0])) {
                 is HighlightOutcome.Show -> {
                     cueIndexHolder[0] = outcome.entryIndex
@@ -527,7 +604,8 @@ internal data class HighlightState(
 )
 
 internal data class PendingTapSeek(
-    val positionMs: Int,
+    // Null while the bounded resolve is still computing the target position.
+    val positionMs: Int?,
     val entryIndex: Int,
 )
 

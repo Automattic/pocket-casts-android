@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.toChapterOriginType
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
+import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.GeneratedChapterSeeker
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
@@ -53,11 +54,16 @@ class ChaptersViewModel @AssistedInject constructor(
     private val episodeManager: EpisodeManager,
     private val settings: Settings,
     private val eventHorizon: EventHorizon,
+    private val generatedChapterSeeker: GeneratedChapterSeeker,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     private val isTogglingChapters = MutableStateFlow(false)
 
     val uiState = mode.uiStateFlow().stateIn(viewModelScope, SharingStarted.Lazily, UiState())
+
+    val resolvingChapterIndex = generatedChapterSeeker
+        .resolvingChapterIndex(playbackManager.playbackStateFlow.map { it.episodeUuid })
+        .stateIn(viewModelScope, SharingStarted.Lazily, null)
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun Mode.uiStateFlow() = when (this) {

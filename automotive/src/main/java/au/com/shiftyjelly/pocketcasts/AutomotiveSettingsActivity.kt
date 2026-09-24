@@ -7,6 +7,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -117,6 +118,9 @@ class AutomotiveSettingsActivity :
     }
 
     override fun openPodcastPage(uuid: String, sourceView: String?) {
+    }
+
+    override fun openNetworkPage(listId: String, title: String?, sourceView: SourceView?) {
     }
 
     override fun openCloudFiles() {

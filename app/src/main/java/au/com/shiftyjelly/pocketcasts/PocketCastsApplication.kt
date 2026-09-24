@@ -4,6 +4,8 @@ import android.app.Application
 import android.os.Environment
 import android.os.StrictMode
 import androidx.hilt.work.HiltWorkerFactory
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.work.Configuration
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsController
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentProvider
@@ -16,6 +18,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.appreview.AppReviewExceptionHandler
 import au.com.shiftyjelly.pocketcasts.repositories.appreview.AppReviewManager
+import au.com.shiftyjelly.pocketcasts.repositories.di.ProcessLifecycle
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadStatusObserver
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearSync
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
@@ -26,6 +29,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationMana
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackServiceToggle
 import au.com.shiftyjelly.pocketcasts.repositories.playback.SleepTimerRestartWhenShakingDevice
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.DefaultPlaylistsInitializer
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistInteractionNotifier
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -55,6 +59,7 @@ import java.io.File
 import java.util.concurrent.Executors
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -102,9 +107,14 @@ class PocketCastsApplication :
 
     @Inject lateinit var appIcon: AppIcon
 
+    @Inject @ProcessLifecycle
+    lateinit var processLifecycleOwner: LifecycleOwner
+
     @Inject lateinit var coilImageLoader: ImageLoader
 
     @Inject lateinit var userManager: UserManager
+
+    @Inject lateinit var defaultPlaylistsInitializer: DefaultPlaylistsInitializer
 
     @Inject lateinit var analyticsController: AnalyticsController
 
@@ -200,11 +210,31 @@ class PocketCastsApplication :
             .setJobSchedulerJobIdRange(1000, 20000)
             .build()
 
+    private fun applySelectedAppIconWhenBackgrounded() {
+        processLifecycleOwner.lifecycle.addObserver(
+            object : DefaultLifecycleObserver {
+                override fun onStop(owner: LifecycleOwner) {
+                    appIcon.enableSelectedAlias(appIcon.activeAppIcon)
+                }
+            },
+        )
+    }
+
     private fun setupApp() {
         LogBuffer.i("Application", "App started. ${settings.getVersion()} (${settings.getVersionCode()})")
 
+        applicationScope.launch {
+            try {
+                defaultPlaylistsInitializer.initialize()
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, e, "Failed to seed the default playlists")
+            }
+        }
+
         runBlocking {
-            appIcon.enableSelectedAlias(appIcon.activeAppIcon)
+            applySelectedAppIconWhenBackgrounded()
 
             notificationHelper.setupNotificationChannels()
             notificationManager.setupOnboardingNotifications()
