@@ -1,8 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter
 
-import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.ComposeView
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
@@ -34,13 +31,10 @@ class BookmarkViewHolder(
                     } else {
                         null
                     },
-                    modifier = Modifier
-                        .pointerInput(data.bookmark.adapterId) {
-                            detectTapGestures(
-                                onLongPress = { data.onBookmarkRowLongPress(data.bookmark) },
-                                onTap = { data.onBookmarkRowClick(data.bookmark, bindingAdapterPosition) },
-                            )
-                        },
+                    onClick = { data.onBookmarkRowClick(data.bookmark, bindingAdapterPosition) },
+                    onLongClick = { data.onBookmarkRowLongPress(data.bookmark) },
+                    onShareClick = { swipeState -> data.onBookmarkSwipeShare(data.bookmark, swipeState::settle) },
+                    onDeleteClick = { swipeState -> data.onBookmarkSwipeDelete(data.bookmark, swipeState::settle) },
                 )
             }
         }

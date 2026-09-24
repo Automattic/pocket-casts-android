@@ -303,4 +303,43 @@ class BookmarksViewModelTest {
         verifyBlocking(bookmarkEpisodeResolver) { resolve(bookmark) }
         verify(playbackManager).seekToTimeMs(eq(10_000), anyOrNull())
     }
+
+    @Test
+    fun `getSharedBookmark returns the podcast and episode for a given bookmark`() = runTest {
+        val bookmark = Bookmark("uuid1", episodeUuid = "episode-1", podcastUuid = "podcast-1")
+        val podcast = Podcast(uuid = "podcast-1")
+        val podcastEpisode = PodcastEpisode(uuid = "episode-1", podcastUuid = "podcast-1", publishedDate = Date())
+        whenever(podcastManager.findPodcastByUuid("podcast-1")).thenReturn(podcast)
+        whenever(episodeManager.findEpisodeByUuid("episode-1")).thenReturn(podcastEpisode)
+
+        val shared = bookmarksViewModel.getSharedBookmark(bookmark)
+
+        assertEquals(Triple(podcast, podcastEpisode, bookmark), shared)
+    }
+
+    @Test
+    fun `getSharedBookmark returns null when the episode is not a podcast episode`() = runTest {
+        val bookmark = Bookmark("uuid1", episodeUuid = "episode-1", podcastUuid = "podcast-1")
+        whenever(podcastManager.findPodcastByUuid("podcast-1")).thenReturn(Podcast(uuid = "podcast-1"))
+        whenever(episodeManager.findEpisodeByUuid("episode-1")).thenReturn(UserEpisode("episode-1", publishedDate = Date()))
+
+        assertEquals(null, bookmarksViewModel.getSharedBookmark(bookmark))
+    }
+
+    @Test
+    fun `getSharedBookmark returns null when the podcast is missing`() = runTest {
+        val bookmark = Bookmark("uuid1", episodeUuid = "episode-1", podcastUuid = "podcast-1")
+        whenever(podcastManager.findPodcastByUuid("podcast-1")).thenReturn(null)
+
+        assertEquals(null, bookmarksViewModel.getSharedBookmark(bookmark))
+    }
+
+    @Test
+    fun `onBookmarksDeleted emits a deleted message`() = runTest {
+        bookmarksViewModel.message.test {
+            bookmarksViewModel.onBookmarksDeleted(count = 2)
+
+            assertEquals(BookmarksViewModel.BookmarkMessage.BookmarksDeleted(count = 2), awaitItem())
+        }
+    }
 }

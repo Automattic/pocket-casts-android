@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.player.view.bookmark
 
 import android.widget.Toast
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -24,7 +23,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -42,6 +40,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.NoContentBanner
 import au.com.shiftyjelly.pocketcasts.compose.components.SearchBar
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPlural
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -70,6 +69,8 @@ fun BookmarksPage(
     bookmarksViewModel: BookmarksViewModel,
     multiSelectHelper: MultiSelectBookmarksHelper,
     onRowLongClick: (Bookmark) -> Unit,
+    onSwipeShareClick: (Bookmark, settleRow: () -> Unit) -> Unit,
+    onSwipeDeleteClick: (Bookmark, settleRow: () -> Unit) -> Unit,
     onShareBookmarkClick: () -> Unit,
     onEditBookmarkClick: () -> Unit,
     onUpgradeClick: () -> Unit,
@@ -92,6 +93,8 @@ fun BookmarksPage(
         colors = bookmarkColors,
         bottomInset = bottomInset,
         onRowLongClick = onRowLongClick,
+        onSwipeShareClick = onSwipeShareClick,
+        onSwipeDeleteClick = onSwipeDeleteClick,
         onBookmarksOptionsMenuClick = { bookmarksViewModel.onOptionsMenuClicked() },
         onPlayClick = { bookmark ->
             bookmarksViewModel.play(bookmark)
@@ -132,6 +135,13 @@ fun BookmarksPage(
                 @Suppress("LocalContextGetResourceValueCall")
                 val string = when (message) {
                     is BookmarkMessage.BookmarkEpisodeNotFound -> context.getString(LR.string.episode_not_found)
+
+                    is BookmarkMessage.BookmarksDeleted -> context.resources.getStringPlural(
+                        count = message.count,
+                        singular = LR.string.bookmarks_deleted_singular,
+                        plural = LR.string.bookmarks_deleted_plural,
+                    )
+
                     is BookmarkMessage.PlayingBookmark -> context.getString(LR.string.playing_bookmark, message.bookmarkTitle)
                 }
                 Toast.makeText(context, string, Toast.LENGTH_SHORT).show()
@@ -153,6 +163,8 @@ private fun Content(
     colors: BookmarkColors,
     bottomInset: Dp,
     onRowLongClick: (Bookmark) -> Unit,
+    onSwipeShareClick: (Bookmark, settleRow: () -> Unit) -> Unit,
+    onSwipeDeleteClick: (Bookmark, settleRow: () -> Unit) -> Unit,
     onPlayClick: (Bookmark) -> Unit,
     onFetchEpisode: suspend (Bookmark) -> BaseEpisode?,
     onBookmarksOptionsMenuClick: () -> Unit,
@@ -180,6 +192,8 @@ private fun Content(
                 colors = colors,
                 bottomInset = bottomInset,
                 onRowLongClick = onRowLongClick,
+                onSwipeShareClick = onSwipeShareClick,
+                onSwipeDeleteClick = onSwipeDeleteClick,
                 onOptionsMenuClick = onBookmarksOptionsMenuClick,
                 onPlayClick = onPlayClick,
                 onArtworkClick = onBookmarkArtworkClick,
@@ -232,6 +246,8 @@ private fun BookmarksView(
     bottomInset: Dp,
     colors: BookmarkColors,
     onRowLongClick: (Bookmark) -> Unit,
+    onSwipeShareClick: (Bookmark, settleRow: () -> Unit) -> Unit,
+    onSwipeDeleteClick: (Bookmark, settleRow: () -> Unit) -> Unit,
     onOptionsMenuClick: () -> Unit,
     onPlayClick: (Bookmark) -> Unit,
     onFetchEpisode: suspend (Bookmark) -> BaseEpisode?,
@@ -288,7 +304,7 @@ private fun BookmarksView(
                 )
             }
         }
-        items(state.bookmarks, key = { it }) { bookmark ->
+        items(state.bookmarks, key = { it.uuid }) { bookmark ->
             val episode = state.bookmarkIdAndEpisodeMap[bookmark.uuid]
             BookmarkRow(
                 bookmark = bookmark.copy(episodeTitle = episode?.title.orEmpty()),
@@ -303,12 +319,10 @@ private fun BookmarksView(
                 onPlayClick = { onPlayClick(bookmark) },
                 onArtworkClick = onArtworkClick?.let { handler -> { handler(bookmark) } },
                 onFetchEpisode = { onFetchEpisode(bookmark) },
-                modifier = Modifier.pointerInput(bookmark.adapterId) {
-                    detectTapGestures(
-                        onLongPress = { onRowLongClick(bookmark) },
-                        onTap = { state.onRowClick(bookmark) },
-                    )
-                },
+                onClick = { state.onRowClick(bookmark) },
+                onLongClick = { onRowLongClick(bookmark) },
+                onShareClick = { swipeState -> onSwipeShareClick(bookmark, swipeState::settle) },
+                onDeleteClick = { swipeState -> onSwipeDeleteClick(bookmark, swipeState::settle) },
             )
         }
     }
@@ -352,6 +366,8 @@ private fun BookmarksPreview(
             onPlayClick = {},
             onFetchEpisode = { null },
             onRowLongClick = {},
+            onSwipeShareClick = { _, _ -> },
+            onSwipeDeleteClick = { _, _ -> },
             onBookmarksOptionsMenuClick = {},
             onSearchTextChange = {},
             onUpgradeClick = {},
