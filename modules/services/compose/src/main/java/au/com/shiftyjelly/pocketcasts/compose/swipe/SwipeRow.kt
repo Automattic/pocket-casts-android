@@ -28,6 +28,7 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.AbsoluteAlignment
@@ -159,14 +160,18 @@ fun SwipeRow(
         }
     }
 
-    LaunchedEffect(state, leadingAction, trailingAction) {
-        snapshotFlow { state.draggableState.settledValue }.collect { anchor ->
-            when (anchor) {
-                SwipeRowAnchor.FullLeading -> leadingAction?.onClick?.invoke(state)
-                SwipeRowAnchor.FullTrailing -> trailingAction?.onClick?.invoke(state)
-                else -> Unit
+    val latestLeadingAction by rememberUpdatedState(leadingAction)
+    val latestTrailingAction by rememberUpdatedState(trailingAction)
+    LaunchedEffect(state) {
+        snapshotFlow { state.draggableState.settledValue }
+            .drop(1)
+            .collect { anchor ->
+                when (anchor) {
+                    SwipeRowAnchor.FullLeading -> latestLeadingAction?.onClick?.invoke(state)
+                    SwipeRowAnchor.FullTrailing -> latestTrailingAction?.onClick?.invoke(state)
+                    else -> Unit
+                }
             }
-        }
     }
 
     Box(
