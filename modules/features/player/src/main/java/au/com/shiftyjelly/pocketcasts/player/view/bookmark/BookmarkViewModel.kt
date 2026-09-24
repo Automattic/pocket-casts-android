@@ -5,7 +5,6 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkGenerationAnalytics
@@ -114,16 +113,20 @@ class BookmarkViewModel
         loadJob = viewModelScope.launch {
             // load the existing bookmark
             val episode = episodeManager.findEpisodeByUuid(arguments.episodeUuid)
-            val bookmark = if (bookmarkUuid == null) {
-                if (episode == null) return@launch
-                bookmarkManager.findByEpisodeTime(
+            val bookmark = when {
+                bookmarkUuid != null -> bookmarkManager.findBookmark(bookmarkUuid)
+                episode != null -> bookmarkManager.findByEpisodeTime(
                     episode = episode,
                     timeSecs = arguments.timeSecs,
                 )
-            } else {
-                bookmarkManager.findBookmark(bookmarkUuid)
+                else -> null
             }
             val podcastUuid = bookmark?.podcastUuid ?: (episode as? PodcastEpisode)?.podcastUuid
+            mutableUiState.value = mutableUiState.value.copy(
+                podcastUuid = podcastUuid,
+                isNewBookmark = mutableUiState.value.isNewBookmark && (bookmark == null || bookmarkUuid != null),
+            )
+            trackShown()
             if (bookmark != null) {
                 originalTitle = bookmark.title
                 mutableUiState.value = mutableUiState.value.copy(
@@ -132,8 +135,6 @@ class BookmarkViewModel
                     passage = displayPassage(bookmark),
                     passageLocation = bookmark.passageLocation,
                     referenceTime = bookmark.referenceTime,
-                    podcastUuid = podcastUuid,
-                    isNewBookmark = mutableUiState.value.isNewBookmark && bookmarkUuid != null,
                 )
                 val passage = bookmark.passage
                 if (mutableUiState.value.isNewBookmark && passage != null && FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS)) {
@@ -142,8 +143,7 @@ class BookmarkViewModel
                 if (displayPassage(bookmark) != null) {
                     updateCanEditTranscript()
                 }
-            } else if (bookmarkUuid == null && FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS)) {
-                mutableUiState.value = mutableUiState.value.copy(podcastUuid = podcastUuid)
+            } else if (bookmarkUuid == null && episode != null && FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS)) {
                 generateTitleSuggestion(arguments.episodeUuid, arguments.timeSecs)
             }
         }
@@ -297,11 +297,13 @@ class BookmarkViewModel
         }
     }
 
-    fun onShown(isNewBookmark: Boolean, source: SourceView) {
+    private fun trackShown() {
         eventHorizon.track(
             BookmarkEditFormShownEvent(
-                source = source.analyticsValue,
-                isNewBookmark = isNewBookmark,
+                source = analyticsSource,
+                isNewBookmark = uiState.value.isNewBookmark,
+                episodeUuid = arguments.episodeUuid,
+                podcastUuid = uiState.value.podcastUuid,
             ),
         )
     }
@@ -311,6 +313,8 @@ class BookmarkViewModel
             BookmarkEditFormDismissedEvent(
                 source = analyticsSource,
                 isNewBookmark = uiState.value.isNewBookmark,
+                episodeUuid = arguments.episodeUuid,
+                podcastUuid = uiState.value.podcastUuid,
             ),
         )
     }
@@ -323,6 +327,8 @@ class BookmarkViewModel
                 isNewBookmark = state.isNewBookmark,
                 hasPassage = state.passage?.isNotEmpty() == true,
                 passageChanged = passageEdited,
+                episodeUuid = arguments.episodeUuid,
+                podcastUuid = state.podcastUuid,
             ),
         )
     }
