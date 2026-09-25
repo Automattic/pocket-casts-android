@@ -21,7 +21,6 @@ import androidx.compose.ui.Modifier
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
-import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.LocalPodcastColors
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.compose.theme
@@ -74,10 +73,6 @@ class BookmarkFragment : BaseFragment() {
 
         AppThemeWithBackground(theme.activeTheme) {
             val uiState: BookmarkViewModel.UiState by viewModel.uiState.collectAsState()
-
-            CallOnce {
-                viewModel.onShown(isNewBookmark = args.isNewBookmark || args.bookmarkUuid == null, source = args.source)
-            }
 
             CompositionLocalProvider(
                 LocalPodcastColors provides args.podcastColors,

@@ -19,6 +19,7 @@ import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import com.automattic.eventhorizon.BookmarkEditFormDismissedEvent
 import com.automattic.eventhorizon.BookmarkEditFormShownEvent
 import com.automattic.eventhorizon.BookmarkEditFormSubmittedEvent
 import com.automattic.eventhorizon.BookmarkTitleSuggestionTappedEvent
@@ -27,6 +28,7 @@ import com.automattic.eventhorizon.SourceViewType
 import java.util.Date
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -85,11 +87,92 @@ class BookmarkViewModelTest {
 
     @Test
     fun `edit form events use the source the sheet was opened from`() = runTest {
-        viewModel.onShown(isNewBookmark = true, source = SourceView.TRANSCRIPT)
+        viewModel.load(arguments.copy(source = SourceView.TRANSCRIPT))
 
         val event = eventSink.pollEvent()
         assertTrue(event is BookmarkEditFormShownEvent)
         assertEquals(SourceViewType.Transcript, (event as BookmarkEditFormShownEvent).source)
+    }
+
+    @Test
+    fun `shown event carries the episode and podcast of the bookmark`() = runTest {
+        whenever(episodeManager.findEpisodeByUuid(episodeUuid))
+            .thenReturn(PodcastEpisode(uuid = episodeUuid, podcastUuid = "podcast-id", publishedDate = Date()))
+
+        viewModel.load(arguments)
+
+        val event = eventSink.pollEvent() as BookmarkEditFormShownEvent
+        assertEquals(true, event.isNewBookmark)
+        assertEquals(episodeUuid, event.episodeUuid)
+        assertEquals("podcast-id", event.podcastUuid)
+    }
+
+    @Test
+    fun `shown event is tracked once when load is called again`() = runTest {
+        viewModel.load(arguments)
+        viewModel.load(arguments)
+
+        assertTrue(eventSink.pollEvent() is BookmarkEditFormShownEvent)
+        assertTrue(eventSink.isEmpty())
+    }
+
+    @Test
+    fun `shown event is tracked when the episode is missing`() = runTest {
+        viewModel.load(arguments)
+
+        val event = eventSink.pollEvent() as BookmarkEditFormShownEvent
+        assertEquals(true, event.isNewBookmark)
+        assertEquals(episodeUuid, event.episodeUuid)
+        assertEquals(null, event.podcastUuid)
+        verify(bookmarkManager, never()).suggestBookmark(any(), any())
+    }
+
+    @Test
+    fun `shown event reports an existing bookmark found at the episode time as not new`() = runTest {
+        val episode = PodcastEpisode(uuid = episodeUuid, podcastUuid = "podcast-id", publishedDate = Date())
+        whenever(episodeManager.findEpisodeByUuid(episodeUuid)).thenReturn(episode)
+        whenever(bookmarkManager.findByEpisodeTime(episode, timeSecs))
+            .thenReturn(Bookmark(uuid = "existing-id", episodeUuid = episodeUuid, podcastUuid = "podcast-id", title = "Mine"))
+
+        viewModel.load(arguments)
+
+        val event = eventSink.pollEvent() as BookmarkEditFormShownEvent
+        assertEquals(false, event.isNewBookmark)
+        assertEquals("podcast-id", event.podcastUuid)
+    }
+
+    @Test
+    fun `dismissing before the sheet loads tracks nothing`() = runTest {
+        viewModel.onClose()
+
+        assertTrue(eventSink.isEmpty())
+    }
+
+    @Test
+    fun `dismissed event carries the episode and podcast of the bookmark`() = runTest {
+        whenever(bookmarkManager.findBookmark("existing-id"))
+            .thenReturn(Bookmark(uuid = "existing-id", episodeUuid = episodeUuid, podcastUuid = "podcast-id", title = "Mine"))
+        viewModel.load(arguments.copy(bookmarkUuid = "existing-id"))
+        eventSink.skipEvent()
+
+        viewModel.onClose()
+
+        val event = eventSink.pollEvent() as BookmarkEditFormDismissedEvent
+        assertEquals(false, event.isNewBookmark)
+        assertEquals(episodeUuid, event.episodeUuid)
+        assertEquals("podcast-id", event.podcastUuid)
+    }
+
+    @Test
+    fun `dismissing while the sheet is loading tracks shown before dismissed`() = runTest {
+        whenever(episodeManager.findEpisodeByUuid(episodeUuid)).doSuspendableAnswer { awaitCancellation() }
+        viewModel.load(arguments)
+
+        viewModel.onClose()
+
+        assertTrue(eventSink.pollEvent() is BookmarkEditFormShownEvent)
+        assertTrue(eventSink.pollEvent() is BookmarkEditFormDismissedEvent)
+        assertTrue(eventSink.isEmpty())
     }
 
     @Test
@@ -102,6 +185,7 @@ class BookmarkViewModelTest {
     @Test
     fun `tapping the suggested title tracks it and applies the title`() = runTest {
         viewModel.load(arguments)
+        eventSink.skipEvent()
 
         viewModel.onSuggestionTapped("A great moment")
 
@@ -111,7 +195,10 @@ class BookmarkViewModelTest {
 
     @Test
     fun `submitting reports whether a passage was saved and changed`() = runTest {
+        whenever(episodeManager.findEpisodeByUuid(episodeUuid))
+            .thenReturn(PodcastEpisode(uuid = episodeUuid, podcastUuid = "podcast-id", publishedDate = Date()))
         viewModel.load(arguments)
+        eventSink.skipEvent()
         viewModel.onPassageEdited("a chosen passage", 3)
 
         viewModel.onSubmitBookmark()
@@ -119,6 +206,8 @@ class BookmarkViewModelTest {
         val event = eventSink.pollEvent() as BookmarkEditFormSubmittedEvent
         assertEquals(true, event.hasPassage)
         assertEquals(true, event.passageChanged)
+        assertEquals(episodeUuid, event.episodeUuid)
+        assertEquals("podcast-id", event.podcastUuid)
     }
 
     @Test
