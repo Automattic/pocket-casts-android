@@ -93,6 +93,28 @@ class BookmarkTranscript private constructor(
         return TextSpan(start, end)
     }
 
+    fun movePassageStart(passage: TextSpan, index: Int): TextSpan {
+        if (displayText.isEmpty()) return passage
+        var start = wordBoundaries(index).first.coerceAtMost(passage.end - 1)
+        while (start < passage.end - 1 && displayText[start].isWhitespace()) start++
+        return TextSpan(start, passage.end)
+    }
+
+    fun movePassageEnd(passage: TextSpan, index: Int): TextSpan {
+        if (displayText.isEmpty()) return passage
+        var end = wordBoundaries(index).second.coerceAtLeast(passage.start + 1)
+        while (end > passage.start + 1 && displayText[end - 1].isWhitespace()) end--
+        return TextSpan(passage.start, end)
+    }
+
+    private fun wordBoundaries(index: Int): Pair<Int, Int> {
+        val clamped = index.coerceIn(0, displayText.length - 1)
+        val iterator = BreakIterator.getWordInstance().apply { setText(displayText) }
+        val start = iterator.preceding(clamped + 1).let { if (it == BreakIterator.DONE) 0 else it }
+        val end = iterator.following(clamped).let { if (it == BreakIterator.DONE) displayText.length else it }
+        return start to end
+    }
+
     fun passage(displaySpan: TextSpan): Passage {
         if (flatText.isEmpty()) return Passage("", 0)
         var start = 0
