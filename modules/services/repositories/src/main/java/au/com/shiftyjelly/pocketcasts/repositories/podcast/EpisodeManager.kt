@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.PendingEpisodeTask
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.DailyListenedTime
@@ -49,8 +50,8 @@ interface EpisodeManager {
 
     /** Add methods  */
     fun addBlocking(episode: PodcastEpisode, downloadMetaData: Boolean): Boolean
-    fun addBlocking(episodes: List<PodcastEpisode>, podcastUuid: String, downloadMetaData: Boolean): List<PodcastEpisode>
-    suspend fun add(episodes: List<PodcastEpisode>, podcastUuid: String, downloadMetaData: Boolean): List<PodcastEpisode>
+    fun addBlocking(episodes: List<PodcastEpisode>, podcastUuid: String, downloadMetaData: Boolean, pendingTasks: List<PendingEpisodeTask.Type> = emptyList()): List<PodcastEpisode>
+    suspend fun add(episodes: List<PodcastEpisode>, podcastUuid: String, downloadMetaData: Boolean, pendingTasks: List<PendingEpisodeTask.Type> = emptyList()): List<PodcastEpisode>
     fun insertBlocking(episodes: List<PodcastEpisode>)
 
     /** Update methods  */
