@@ -11,15 +11,19 @@ import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfRowItem
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
+import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.PlayerShelfOverflowMenuRearrangeActionMovedEvent
 import com.automattic.eventhorizon.ShelfActionSourceType
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -34,8 +38,11 @@ class ShelfViewModelTest {
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    @get:Rule
+    @get:Rule(order = 0)
     val coroutineRule = MainCoroutineRule()
+
+    @get:Rule(order = 1)
+    val featureFlagRule = InMemoryFeatureFlagRule()
 
     @Mock
     private lateinit var transcriptManager: TranscriptManager
@@ -198,6 +205,46 @@ class ShelfViewModelTest {
         }
     }
 
+    @Test
+    fun `given smart bookmarks promo release, then the bookmark new badge is shown`() = runTest {
+        FeatureFlag.setEnabled(Feature.SMART_BOOKMARKS, true)
+        initViewModel(version = "8.22-rc-1")
+
+        assertTrue(shelfViewModel.uiState.value.showBookmarkNewBadge)
+    }
+
+    @Test
+    fun `given smart bookmarks promo patch release, then the bookmark new badge is shown`() = runTest {
+        FeatureFlag.setEnabled(Feature.SMART_BOOKMARKS, true)
+        initViewModel(version = "8.22.1")
+
+        assertTrue(shelfViewModel.uiState.value.showBookmarkNewBadge)
+    }
+
+    @Test
+    fun `given release before the smart bookmarks promo, then the bookmark new badge is hidden`() = runTest {
+        FeatureFlag.setEnabled(Feature.SMART_BOOKMARKS, true)
+        initViewModel(version = "8.21")
+
+        assertFalse(shelfViewModel.uiState.value.showBookmarkNewBadge)
+    }
+
+    @Test
+    fun `given release after the smart bookmarks promo, then the bookmark new badge is hidden`() = runTest {
+        FeatureFlag.setEnabled(Feature.SMART_BOOKMARKS, true)
+        initViewModel(version = "8.23")
+
+        assertFalse(shelfViewModel.uiState.value.showBookmarkNewBadge)
+    }
+
+    @Test
+    fun `given smart bookmarks disabled, then the bookmark new badge is hidden`() = runTest {
+        FeatureFlag.setEnabled(Feature.SMART_BOOKMARKS, false)
+        initViewModel(version = "8.22")
+
+        assertFalse(shelfViewModel.uiState.value.showBookmarkNewBadge)
+    }
+
     private fun moveShelfItem(
         from: Int,
         to: Int,
@@ -211,14 +258,13 @@ class ShelfViewModelTest {
 
     private fun initViewModel(
         isEditable: Boolean = true,
+        version: String = "8.21",
     ) {
         val episodeId = "testEpisodeId"
         whenever(transcriptManager.observeIsTranscriptAvailable(episodeId)).thenReturn(flowOf(true))
         val userSetting = mock<UserSetting<List<ShelfItem>>>()
         whenever(settings.shelfItems).thenReturn(userSetting)
-        val smartBookmarksTooltipSetting = mock<UserSetting<Boolean>>()
-        whenever(smartBookmarksTooltipSetting.flow).thenReturn(MutableStateFlow(false))
-        whenever(settings.showSmartBookmarksTooltip).thenReturn(smartBookmarksTooltipSetting)
+        whenever(settings.getVersion()).thenReturn(version)
 
         shelfViewModel = ShelfViewModel(
             episodeId = episodeId,
