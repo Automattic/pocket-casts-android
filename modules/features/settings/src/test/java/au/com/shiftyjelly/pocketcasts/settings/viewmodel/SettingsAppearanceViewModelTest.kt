@@ -27,6 +27,8 @@ import org.mockito.Mock
 import org.mockito.Mockito.mock
 import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
+import org.mockito.kotlin.any
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -96,5 +98,13 @@ class SettingsAppearanceViewModelTest {
         viewModel.onThemeChanged(ThemeType.DARK)
 
         verify(notificationManager).updateUserFeatureInteraction(OnboardingNotificationType.Themes)
+    }
+
+    @Test
+    fun `when an app icon is selected, should store it without switching the alias`() {
+        viewModel.updateGlobalIcon(AppIcon.AppIconType.DARK)
+
+        verify(appIcon).activeAppIcon = AppIcon.AppIconType.DARK
+        verify(appIcon, never()).enableSelectedAlias(any())
     }
 }

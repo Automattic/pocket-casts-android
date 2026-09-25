@@ -232,6 +232,9 @@ class PlayerHeaderFragment :
         val playbackNotice by viewModel.playbackNotice.collectAsStateWithLifecycle()
 
         val isPlayerOpen by remember { isPlayerOpenFlow() }.collectAsStateWithLifecycle(false)
+        LaunchedEffect(isPlayerOpen) {
+            shelfSharedViewModel.setPlayerOpen(isPlayerOpen)
+        }
         val isTranscriptOpen by shelfSharedViewModel.isTranscriptOpen.collectAsStateWithLifecycle()
         val transcriptUiState by transcriptViewModel.uiState.collectAsStateWithLifecycle()
 

@@ -13,7 +13,6 @@ import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.FolderCreateColorShownEvent
 import com.automattic.eventhorizon.FolderSavedEvent
-import io.reactivex.Flowable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
@@ -54,8 +53,8 @@ class FolderEditViewModelTest {
         whenever(settings.podcastGridLayout).thenReturn(gridType)
 
         val podcastManager = mock<PodcastManager>()
-        whenever(podcastManager.podcastsOrderByLatestEpisodeRxFlowable()).thenReturn(Flowable.just(emptyList()))
-        whenever(podcastManager.subscribedRxFlowable()).thenReturn(Flowable.just(emptyList()))
+        whenever(podcastManager.observePodcastsSortedByLatestEpisode()).thenReturn(flowOf(emptyList()))
+        whenever(podcastManager.findSubscribedNoOrderFlow()).thenReturn(flowOf(emptyList()))
 
         val folderManager = mock<FolderManager>()
         whenever(folderManager.observeFolders()).thenReturn(flowOf(emptyList()))

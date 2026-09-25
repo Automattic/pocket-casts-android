@@ -984,7 +984,6 @@ Language: ja_JP
     <string name="notification_channel_description_playback_error">再生中のエラー</string>
     <string name="notification_channel_description_episode">新しいエピソードが公開されると表示されます</string>
     <string name="notification_channel_description_download">Pocket Casts のエピソードのダウンロード中に表示されます</string>
-    <string name="change_bookmark_title_hint">このブックマークを特定するタイトルを変更します</string>
     <string name="bookmark">ブックマーク</string>
     <string name="details">詳細</string>
     <string name="episode">エピソード</string>
@@ -997,7 +996,6 @@ Language: ja_JP
     <string name="skipping_to"> %s にスキップしています</string>
     <string name="playing_bookmark">「%s」を再生中 </string>
     <string name="save_bookmark">ブックマークを保存</string>
-    <string name="add_bookmark_title_hint">任意のタイトルを追加してこのブックマークを特定</string>
     <string name="change_title">タイトルを変更</string>
     <string name="bookmark_added">ブックマーク「%s」を追加しました</string>
     <string name="add_bookmark_title">ブックマークを追加</string>

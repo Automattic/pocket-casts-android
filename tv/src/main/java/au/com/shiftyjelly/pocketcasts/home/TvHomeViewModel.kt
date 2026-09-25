@@ -51,7 +51,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlow
-import kotlinx.coroutines.rx2.await
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -272,7 +271,7 @@ class TvHomeViewModel @Inject constructor(
             try {
                 val found = episodeManager.findByUuid(episode.episodeUuid)
                     ?: runCatching {
-                        podcastManager.findOrDownloadPodcastRxSingle(episode.podcastUuid).await()
+                        podcastManager.findOrDownloadPodcast(episode.podcastUuid)
                         episodeManager.findByUuid(episode.episodeUuid)
                             ?: episodeManager.downloadMissingPodcastEpisode(episode.episodeUuid, episode.podcastUuid)
                     }.getOrElse { if (it is CancellationException) throw it else null }
@@ -299,7 +298,7 @@ class TvHomeViewModel @Inject constructor(
     fun playLatestEpisode(row: TvDiscoverRow, podcast: TvDiscoverPodcast) {
         viewModelScope.launch {
             try {
-                val loadedPodcast = podcastManager.findOrDownloadPodcastRxSingle(podcast.uuid).await()
+                val loadedPodcast = podcastManager.findOrDownloadPodcast(podcast.uuid)
                 podcastManager.refreshPodcast(loadedPodcast, playbackManager)
                 val latest = episodeManager.findEpisodesByPodcastOrderedByPublishDate(loadedPodcast).firstOrNull()
                 if (latest != null) {

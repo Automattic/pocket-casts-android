@@ -98,6 +98,7 @@ import au.com.shiftyjelly.pocketcasts.compose.text.HtmlText
 import au.com.shiftyjelly.pocketcasts.compose.text.markdownToHtml
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
+import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
@@ -161,6 +162,7 @@ import au.com.shiftyjelly.pocketcasts.views.helper.IntentUtil
 import au.com.shiftyjelly.pocketcasts.views.helper.ShowNotesFormatter
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.setLongStyleDate
+import au.com.shiftyjelly.pocketcasts.views.multiselect.BookmarkDeleter
 import au.com.shiftyjelly.pocketcasts.views.swipe.AddToPlaylistFragmentFactory
 import com.automattic.eventhorizon.ChaptersShownSource
 import com.automattic.eventhorizon.EpisodeDetailDismissedEvent
@@ -240,6 +242,9 @@ class EpisodeFragment : BaseFragment() {
 
     @Inject
     lateinit var settings: Settings
+
+    @Inject
+    lateinit var bookmarkDeleter: BookmarkDeleter
 
     @Inject
     lateinit var warningsHelper: WarningsHelper
@@ -873,6 +878,8 @@ class EpisodeFragment : BaseFragment() {
                                         forceDarkTheme = false,
                                     )
                                 },
+                                onSwipeShareClick = ::onSwipeShareBookmarkClick,
+                                onSwipeDeleteClick = ::onSwipeDeleteBookmarkClick,
                                 onShareBookmarkClick = ::onShareBookmarkClick,
                                 onEditBookmarkClick = ::onEditBookmarkClick,
                                 onBookmarkDetailClick = { data ->
@@ -1225,6 +1232,30 @@ class EpisodeFragment : BaseFragment() {
                 startActivity(BookmarkActivity.launchIntent(requireContext(), bookmarkArguments))
             }
         }
+    }
+
+    private fun onSwipeShareBookmarkClick(bookmark: Bookmark, settleRow: () -> Unit) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            val shared = bookmarksViewModel.getSharedBookmark(bookmark)
+            settleRow()
+            val (podcast, episode, sharedBookmark) = shared ?: return@launch
+            bookmarksViewModel.onShare(podcast.uuid, episode.uuid, SourceView.EPISODE_DETAILS)
+            ShareEpisodeTimestampFragment
+                .forBookmark(episode, sharedBookmark.timeSecs.seconds, podcast.backgroundColor, SourceView.EPISODE_DETAILS)
+                .show(parentFragmentManager, "share_screen")
+        }
+    }
+
+    private fun onSwipeDeleteBookmarkClick(bookmark: Bookmark, settleRow: () -> Unit) {
+        bookmarkDeleter.confirmDelete(
+            bookmarks = listOf(bookmark),
+            source = SourceView.EPISODE_DETAILS,
+            resources = resources,
+            fragmentManager = childFragmentManager,
+            scope = viewLifecycleOwner.lifecycleScope,
+            onDeleted = { count -> bookmarksViewModel.onBookmarksDeleted(count) },
+            onDismissed = settleRow,
+        )
     }
 
     private fun onBookmarksUpgradeClick() {

@@ -260,6 +260,26 @@ abstract class BookmarkDao {
         )
     }
 
+    @Query(
+        """UPDATE bookmarks SET
+            passage = :passage,
+            passage_location = :passageLocation,
+            passage_modified = :passageModified,
+            reference_time = CASE WHEN :referenceTime IS NOT NULL THEN :referenceTime ELSE reference_time END,
+            reference_time_modified = CASE WHEN :referenceTime IS NOT NULL THEN :referenceTimeModified ELSE reference_time_modified END,
+            sync_status = :syncStatus
+            WHERE uuid = :bookmarkUuid""",
+    )
+    abstract suspend fun updatePassage(
+        bookmarkUuid: String,
+        passage: String,
+        passageLocation: Int,
+        passageModified: Long,
+        referenceTime: Int?,
+        referenceTimeModified: Long?,
+        syncStatus: SyncStatus,
+    )
+
     @Query("SELECT * FROM bookmarks WHERE sync_status = :syncStatus")
     abstract fun findNotSyncedBlocking(syncStatus: SyncStatus = SyncStatus.NOT_SYNCED): List<Bookmark>
 
@@ -276,14 +296,6 @@ abstract class BookmarkDao {
         }
     }
 
-    @Query(
-        """SELECT bookmarks.*
-            FROM bookmarks
-            JOIN user_episodes ON bookmarks.episode_uuid = user_episodes.uuid 
-            AND deleted = :deleted""",
-    )
-    abstract fun findUserEpisodesBookmarksFlow(deleted: Boolean = false): Flow<List<Bookmark>>
-
-    @Query("SELECT EXISTS(SELECT 1 FROM bookmarks WHERE episode_uuid IS :episodeUuid)")
-    abstract fun hasBookmarksFlow(episodeUuid: String): Flow<Boolean>
+    @Query("SELECT EXISTS(SELECT 1 FROM bookmarks WHERE episode_uuid = :episodeUuid AND deleted = :deleted)")
+    abstract fun hasBookmarksFlow(episodeUuid: String, deleted: Boolean = false): Flow<Boolean>
 }

@@ -4,9 +4,9 @@ import android.content.Context
 import androidx.annotation.ColorInt
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.map
-import androidx.lifecycle.toLiveData
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
@@ -43,12 +43,6 @@ import com.automattic.eventhorizon.EpisodeSummaryTappedEvent
 import com.automattic.eventhorizon.EpisodeUnarchivedEvent
 import com.automattic.eventhorizon.EventHorizon
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.Flowable
-import io.reactivex.Maybe
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.functions.Function4
-import io.reactivex.schedulers.Schedulers
 import java.util.Date
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -58,15 +52,21 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
-import kotlinx.coroutines.rx2.asFlowable
 
 @HiltViewModel
 class EpisodeFragmentViewModel @Inject constructor(
@@ -93,8 +93,6 @@ class EpisodeFragmentViewModel @Inject constructor(
     val isPlaying: LiveData<Boolean> = playbackManager.playbackStateLive.map {
         it.episodeUuid == episode?.uuid && it.isPlaying
     }
-
-    val disposables = CompositeDisposable()
 
     var episode: PodcastEpisode? = null
     var podcast: Podcast? = null
@@ -213,84 +211,43 @@ class EpisodeFragmentViewModel @Inject constructor(
         startPlaybackTimestamp = timestamp
         autoDispatchPlay = autoPlay
         val isDarkTheme = forceDark || theme.isDarkTheme
-        val progressUpdatesObservable = downloadProgressCache
+        val downloadProgressFlow = downloadProgressCache
             .progressFlow(episodeUuid)
             .map { progress -> (progress?.percentage?.toFloat() ?: 0f) / 100 }
             .distinctUntilChanged()
-            .asFlowable()
 
-        // If we can't find it in the database and we know the podcast uuid we can try load it
-        // from the server
-        val onEmptyHandler = if (podcastUuid != null) {
-            podcastManager.findOrDownloadPodcastRxSingle(podcastUuid).flatMapMaybe {
-                val episode = it.episodes.find { episode -> episode.uuid == episodeUuid }
-                if (episode != null) {
-                    Maybe.just(episode)
-                } else {
-                    episodeManager.downloadMissingEpisodeRxMaybe(episodeUuid, podcastUuid, PodcastEpisode(uuid = episodeUuid, publishedDate = Date()), podcastManager, downloadMetaData = true, source = source).flatMap { missingEpisode ->
-                        if (missingEpisode is PodcastEpisode) {
-                            Maybe.just(missingEpisode)
-                        } else {
-                            Maybe.empty()
-                        }
-                    }
-                }
-            }
-        } else {
-            Maybe.empty()
+        // Without both an episode and a podcast there is no state to emit, so the screen stays blank
+        val stateFlow = flow<EpisodeFragmentState> {
+            val episode = findEpisode(episodeUuid, podcastUuid) ?: return@flow
+            val podcast = podcastManager.findPodcastByUuid(episode.podcastUuid) ?: return@flow
+            val tintColor = podcast.getTintColor(isDarkTheme)
+            emitAll(
+                combine(
+                    episodeManager.findByUuidFlow(episodeUuid),
+                    showNotesManager.loadShowNotesFlow(podcastUuid = episode.podcastUuid, episodeUuid = episode.uuid),
+                    downloadProgressFlow,
+                ) { episodeLoaded, showNotesState, downloadProgress ->
+                    EpisodeFragmentState.Loaded(
+                        episode = episodeLoaded,
+                        podcast = podcast,
+                        showNotesState = showNotesState,
+                        tintColor = tintColor,
+                        podcastColor = tintColor,
+                        downloadProgress = downloadProgress,
+                    )
+                },
+            )
         }
+            .onEach(::onStateLoaded)
+            .catch { error -> emit(EpisodeFragmentState.Error(error)) }
+            .flowOn(Dispatchers.IO)
 
-        @Suppress("DEPRECATION")
-        val maybeEpisode = episodeManager.findByUuidRxMaybe(episodeUuid)
-
-        val stateObservable: Flowable<EpisodeFragmentState> = maybeEpisode
-            .switchIfEmpty(onEmptyHandler)
-            .flatMapPublisher { episode ->
-                val zipper: Function4<PodcastEpisode, Podcast, ShowNotesState, Float, EpisodeFragmentState> = Function4 { episodeLoaded: PodcastEpisode, podcast: Podcast, showNotesState: ShowNotesState, downloadProgress: Float ->
-                    val tintColor = podcast.getTintColor(isDarkTheme)
-                    val podcastColor = podcast.getTintColor(isDarkTheme)
-                    EpisodeFragmentState.Loaded(episodeLoaded, podcast, showNotesState, tintColor, podcastColor, downloadProgress)
-                }
-                return@flatMapPublisher Flowable.combineLatest(
-                    episodeManager.findByUuidFlow(episodeUuid).asFlowable(),
-                    podcastManager.findPodcastByUuidRxMaybe(episode.podcastUuid).toFlowable(),
-                    showNotesManager.loadShowNotesFlow(podcastUuid = episode.podcastUuid, episodeUuid = episode.uuid).asFlowable(),
-                    progressUpdatesObservable,
-                    zipper,
-                )
-            }
-            .doOnNext {
-                if (it is EpisodeFragmentState.Loaded) {
-                    if (autoDispatchPlay) {
-                        val playTimestamp = startPlaybackTimestamp
-                        autoDispatchPlay = false
-                        startPlaybackTimestamp = null
-                        play(it.episode, playTimestamp)
-                    }
-                    episode = it.episode
-                    podcast = it.podcast
-                    _pageState.update { state ->
-                        val episodePublishedDate = it.episode.publishedDate
-                        val episodeDurationMs = it.episode.durationMs.toLong()
-                        if (
-                            state.episodePublishedDate == episodePublishedDate &&
-                            state.episodeDurationMs == episodeDurationMs
-                        ) {
-                            state
-                        } else {
-                            state.copy(
-                                episodePublishedDate = episodePublishedDate,
-                                episodeDurationMs = episodeDurationMs,
-                            )
-                        }
-                    }
-                }
-            }
-            .onErrorReturn { EpisodeFragmentState.Error(it) }
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeOn(Schedulers.io())
-
-        state = stateObservable.toLiveData()
+        // asLiveData won't re-run a completed flow, so keep it open to retry the load on the next onActive
+        // No inactive grace period, so a dismissed screen cannot still emit and trigger auto play
+        state = flow {
+            emitAll(stateFlow)
+            awaitCancellation()
+        }.asLiveData(timeoutInMs = 0)
 
         showNotesState = state
             .map { episodeState ->
@@ -336,9 +293,49 @@ class EpisodeFragmentViewModel @Inject constructor(
         }
     }
 
-    override fun onCleared() {
-        super.onCleared()
-        disposables.clear()
+    private suspend fun findEpisode(episodeUuid: String, podcastUuid: String?): PodcastEpisode? {
+        val episode = episodeManager.findByUuid(episodeUuid)
+        if (episode != null || podcastUuid == null) {
+            return episode
+        }
+        // Not in the database, so try to load the episode from the server
+        val podcast = podcastManager.findOrDownloadPodcast(podcastUuid)
+        return podcast.episodes.find { it.uuid == episodeUuid }
+            ?: episodeManager.downloadMissingEpisode(
+                episodeUuid = episodeUuid,
+                podcastUuid = podcastUuid,
+                skeletonEpisode = PodcastEpisode(uuid = episodeUuid, publishedDate = Date()),
+                downloadMetaData = true,
+            ) as? PodcastEpisode
+    }
+
+    private fun onStateLoaded(episodeState: EpisodeFragmentState) {
+        if (episodeState !is EpisodeFragmentState.Loaded) {
+            return
+        }
+        if (autoDispatchPlay) {
+            val playTimestamp = startPlaybackTimestamp
+            autoDispatchPlay = false
+            startPlaybackTimestamp = null
+            play(episodeState.episode, playTimestamp)
+        }
+        episode = episodeState.episode
+        podcast = episodeState.podcast
+        _pageState.update { pageState ->
+            val episodePublishedDate = episodeState.episode.publishedDate
+            val episodeDurationMs = episodeState.episode.durationMs.toLong()
+            if (
+                pageState.episodePublishedDate == episodePublishedDate &&
+                pageState.episodeDurationMs == episodeDurationMs
+            ) {
+                pageState
+            } else {
+                pageState.copy(
+                    episodePublishedDate = episodePublishedDate,
+                    episodeDurationMs = episodeDurationMs,
+                )
+            }
+        }
     }
 
     fun deleteDownloadedEpisode() {

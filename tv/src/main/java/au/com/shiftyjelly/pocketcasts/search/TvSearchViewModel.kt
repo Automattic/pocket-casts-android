@@ -55,7 +55,6 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.rx2.await
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -359,7 +358,7 @@ class TvSearchViewModel @Inject constructor(
             try {
                 val found = episodeManager.findByUuid(episode.episodeUuid)
                     ?: runCatching {
-                        podcastManager.findOrDownloadPodcastRxSingle(episode.podcastUuid).await()
+                        podcastManager.findOrDownloadPodcast(episode.podcastUuid)
                         episodeManager.findByUuid(episode.episodeUuid)
                             ?: episodeManager.downloadMissingPodcastEpisode(episode.episodeUuid, episode.podcastUuid)
                     }.getOrElse { if (it is CancellationException) throw it else null }
@@ -386,7 +385,7 @@ class TvSearchViewModel @Inject constructor(
     fun playLatestEpisode(row: TvDiscoverRow, podcast: TvDiscoverPodcast) {
         viewModelScope.launch {
             try {
-                val loadedPodcast = podcastManager.findOrDownloadPodcastRxSingle(podcast.uuid).await()
+                val loadedPodcast = podcastManager.findOrDownloadPodcast(podcast.uuid)
                 podcastManager.refreshPodcast(loadedPodcast, playbackManager)
                 val latest = episodeManager.findEpisodesByPodcastOrderedByPublishDate(loadedPodcast).firstOrNull()
                 if (latest != null) {
@@ -432,7 +431,7 @@ class TvSearchViewModel @Inject constructor(
     private suspend fun hydrate(episode: ImprovedSearchResultItem.EpisodeItem): PodcastEpisode? {
         return episodeManager.findByUuid(episode.uuid)
             ?: run {
-                podcastManager.findOrDownloadPodcastRxSingle(episode.podcastUuid).await()
+                podcastManager.findOrDownloadPodcast(episode.podcastUuid)
                 episodeManager.findByUuid(episode.uuid)
             }
     }

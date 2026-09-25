@@ -229,14 +229,10 @@ import com.automattic.eventhorizon.UpNextTabOpenedEvent
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
-import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.schedulers.Schedulers
 import java.time.Instant
 import java.util.Locale
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration
@@ -515,11 +511,16 @@ class MainActivity :
             binding.bottomContainer.updatePadding(bottom = insets.bottom)
             windowInsets
         }
-        binding.bottomContainer.addOnLayoutChangeListener { view, _, _, _, _, _, _, _, _ ->
-            binding.mainFragment.updatePadding(bottom = view.height)
+        binding.bottomContainer.addOnLayoutChangeListener { view, _, top, _, bottom, _, oldTop, _, oldBottom ->
+            if (bottom - top == oldBottom - oldTop) return@addOnLayoutChangeListener
+            view.post {
+                // Add padding to the page so the bottom navigation doesn't cover it
+                binding.mainFragment.updatePadding(bottom = view.height)
 
-            BottomSheetBehavior.from(binding.playerBottomSheet).apply {
-                peekHeight = miniPlayerHeight + view.height
+                // Peek the full-screen player so the mini player sits above the bottom navigation
+                BottomSheetBehavior.from(binding.playerBottomSheet).apply {
+                    peekHeight = miniPlayerHeight + view.height
+                }
             }
         }
 
@@ -811,12 +812,14 @@ class MainActivity :
                 overrideNextRefreshTimer = false
             } else {
                 // delay the refresh to allow the UI to load
-                Observable.timer(1, TimeUnit.SECONDS, Schedulers.io())
-                    .doOnNext {
+                lifecycleScope.launch(Dispatchers.IO) {
+                    delay(1.seconds)
+                    try {
                         podcastManager.refreshPodcastsIfRequired(fromLog = "open app")
+                    } catch (e: Exception) {
+                        Timber.e(e)
                     }
-                    .subscribeBy(onError = { Timber.e(it) })
-                    .addTo(disposables)
+                }
             }
         }
 
@@ -1677,7 +1680,12 @@ class MainActivity :
 
                 is ChangeBookmarkTitleDeepLink -> {
                     launch {
-                        val bookmarkArguments = viewModel.createBookmarkArguments(deepLink.bookmarkUuid)
+                        val bookmarkArguments = viewModel.createBookmarkArguments(
+                            deepLink.bookmarkUuid,
+                            isNewBookmark = deepLink.isNewBookmark,
+                            fromEpisode = deepLink.fromEpisode,
+                            source = SourceView.fromString(deepLink.sourceView),
+                        )
                         if (bookmarkArguments != null) {
                             bookmarkActivityLauncher.launch(BookmarkActivity.launchIntent(this@MainActivity, bookmarkArguments))
                         }
@@ -2138,13 +2146,11 @@ class MainActivity :
             getString(LR.string.bookmark_added, result.title)
         }
 
-        val action = View.OnClickListener {
-            showPlayerBookmarks()
+        val snackbar = Snackbar.make(view, snackbarMessage, Snackbar.LENGTH_LONG)
+        if (!result.fromEpisode) {
+            snackbar.setAction(LR.string.settings_view) { showPlayerBookmarks() }
         }
-
-        Snackbar.make(view, snackbarMessage, Snackbar.LENGTH_LONG)
-            .setAction(LR.string.settings_view, action)
-            .show()
+        snackbar.show()
     }
 
     private fun openImport() {

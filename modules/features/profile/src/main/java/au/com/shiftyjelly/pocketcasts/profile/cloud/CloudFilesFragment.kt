@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.view.isNotEmpty
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
@@ -207,10 +208,18 @@ class CloudFilesFragment :
             (it.itemAnimator as SimpleItemAnimator).changeDuration = 0
         }
 
-        viewModel.uiState.observe(viewLifecycleOwner) {
-            binding?.emptyLayout?.isVisible = it.userEpisodes.isEmpty()
-            adapter.submitList(it.userEpisodes)
-            adapter.notifyDataSetChanged()
+        viewModel.uiState.observe(viewLifecycleOwner) { uiState ->
+            val binding = binding ?: return@observe
+            val recyclerView = binding.recyclerView
+            // a row inserted at the top leaves the list anchored below it, so re-pin to 0 to keep the new file on screen
+            val isLaidOutAtTop = recyclerView.isNotEmpty() && !recyclerView.canScrollVertically(-1)
+            binding.emptyLayout.isVisible = uiState.userEpisodes.isEmpty()
+            val previousFirstUuid = adapter.currentList.firstOrNull()?.uuid
+            adapter.submitList(uiState.userEpisodes) {
+                if (isLaidOutAtTop && uiState.userEpisodes.firstOrNull()?.uuid != previousFirstUuid) {
+                    recyclerView.scrollToPosition(0)
+                }
+            }
         }
 
         binding?.layoutUsage?.isVisible = false

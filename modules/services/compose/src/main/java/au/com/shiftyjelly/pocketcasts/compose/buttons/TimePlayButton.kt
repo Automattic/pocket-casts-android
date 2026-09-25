@@ -35,6 +35,7 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 data class TimePlayButtonColors(
     val text: Color,
     val border: Color,
+    val background: Color = Color.Transparent,
 ) {
     companion object {
         fun default(colors: ThemeColors) = TimePlayButtonColors(
@@ -66,7 +67,7 @@ fun TimePlayButton(
         enabled = !isLoading,
         border = BorderStroke(2.dp, colors.border),
         colors = ButtonDefaults.outlinedButtonColors(
-            backgroundColor = Color.Transparent,
+            backgroundColor = colors.background,
         ),
         shape = CircleShape,
         modifier = modifier.semantics { contentDescription = description },

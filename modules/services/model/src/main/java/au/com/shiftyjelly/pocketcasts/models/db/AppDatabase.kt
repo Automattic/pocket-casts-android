@@ -121,7 +121,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         EpisodeChatMessage::class,
         EpisodeAlternateEnclosure::class,
     ],
-    version = 138,
+    version = 139,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 81, to = 82, spec = AppDatabase.Companion.DeleteSilenceRemovedMigration::class),
@@ -1530,6 +1530,14 @@ abstract class AppDatabase : RoomDatabase() {
             database.execSQL("CREATE INDEX IF NOT EXISTS `bookmarks_podcast_uuid` ON `bookmarks` (`podcast_uuid`)")
         }
 
+        val MIGRATION_138_139 = addMigration(138, 139) { database ->
+            // Existing rows are dropped because the old composite key left some undeletable, so they were resent on every run.
+            database.execSQL("DROP TABLE `bump_stats`")
+            database.execSQL(
+                "CREATE TABLE `bump_stats` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `event_time` INTEGER NOT NULL, `custom_event_props` TEXT NOT NULL)",
+            )
+        }
+
         fun addMigrations(databaseBuilder: Builder<AppDatabase>, context: Context) {
             databaseBuilder.addMigrations(
                 addMigration(1, 2) { },
@@ -1957,6 +1965,7 @@ abstract class AppDatabase : RoomDatabase() {
                 MIGRATION_135_136,
                 MIGRATION_136_137,
                 MIGRATION_137_138,
+                MIGRATION_138_139,
             )
         }
 

@@ -10,7 +10,6 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlayerEvent
 import io.reactivex.Flowable
-import io.reactivex.Maybe
 import java.util.Date
 import kotlinx.coroutines.flow.Flow
 
@@ -23,9 +22,6 @@ interface EpisodeManager {
 
     suspend fun findByUuid(uuid: String): PodcastEpisode?
     suspend fun findByUuids(uuids: Collection<String>): List<PodcastEpisode>
-
-    @Deprecated("Use findByUuid suspended function instead")
-    fun findByUuidRxMaybe(uuid: String): Maybe<PodcastEpisode>
 
     fun findByUuidFlow(uuid: String): Flow<PodcastEpisode>
     fun findEpisodeByUuidRxFlowable(uuid: String): Flowable<BaseEpisode>
@@ -105,7 +101,7 @@ interface EpisodeManager {
 
     /** Utility methods  */
     suspend fun countEpisodes(): Int
-    fun downloadMissingEpisodeRxMaybe(episodeUuid: String, podcastUuid: String, skeletonEpisode: PodcastEpisode, podcastManager: PodcastManager, downloadMetaData: Boolean, source: SourceView): Maybe<BaseEpisode>
+    suspend fun downloadMissingEpisode(episodeUuid: String, podcastUuid: String, skeletonEpisode: PodcastEpisode, downloadMetaData: Boolean): BaseEpisode?
     suspend fun downloadMissingPodcastEpisode(episodeUuid: String, podcastUuid: String): PodcastEpisode?
 
     fun unarchiveAllInListBlocking(episodes: List<PodcastEpisode>)

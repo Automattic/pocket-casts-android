@@ -984,7 +984,6 @@ Language: fr
     <string name="notification_channel_description_playback_error">Des erreurs ont survenues lors de la lecture</string>
     <string name="notification_channel_description_episode">S’affiche lorsqu’un nouvel épisode est sorti</string>
     <string name="notification_channel_description_download">S’affiche lorsque Pocket Casts télécharge des épisodes</string>
-    <string name="change_bookmark_title_hint">Modifier le titre qui identifie ce signet</string>
     <string name="bookmark">Signet</string>
     <string name="details">Détails</string>
     <string name="episode">Épisode</string>
@@ -997,7 +996,6 @@ Language: fr
     <string name="skipping_to">Passer à %s</string>
     <string name="playing_bookmark">Lecture de « %s »</string>
     <string name="save_bookmark">Enregistrer le signet</string>
-    <string name="add_bookmark_title_hint">Ajouter éventuellement un titre pour identifier ce signet</string>
     <string name="change_title">Modifier le titre</string>
     <string name="bookmark_added">Signet « %s » ajouté</string>
     <string name="add_bookmark_title">Ajouter un signet</string>

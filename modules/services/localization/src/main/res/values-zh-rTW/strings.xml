@@ -984,7 +984,6 @@ Language: zh_TW
     <string name="notification_channel_description_playback_error">播放時發生錯誤</string>
     <string name="notification_channel_description_episode">新單集推出時顯示</string>
     <string name="notification_channel_description_download">Pocket Casts 正在下載單集時顯示</string>
-    <string name="change_bookmark_title_hint">變更識別此書籤的名稱</string>
     <string name="bookmark">書籤</string>
     <string name="details">詳細資料</string>
     <string name="episode">單集</string>
@@ -1001,7 +1000,6 @@ Language: zh_TW
     <string name="add_bookmark_title">新增書籤</string>
     <string name="add_bookmark">新增書籤</string>
     <string name="skipping_to">跳到 %s</string>
-    <string name="add_bookmark_title_hint">新增選用式標題以識別此書籤</string>
     <string name="bookmarks_sort_timestamp">時間戳記</string>
     <string name="bookmarks_select_option">選取書籤</string>
     <string name="bookmarks_deleted_plural">%1$d 個書籤已刪除</string>

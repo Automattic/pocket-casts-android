@@ -53,9 +53,7 @@ import com.pocketcasts.service.api.bookmarkRequest
 import com.pocketcasts.service.api.userPlaylistListRequest
 import com.pocketcasts.service.api.userPodcastListRequest
 import dagger.Lazy
-import io.reactivex.BackpressureStrategy
 import io.reactivex.Completable
-import io.reactivex.Flowable
 import io.reactivex.Single
 import java.io.File
 import java.util.Locale
@@ -83,6 +81,7 @@ open class SyncServiceManager @Inject constructor(
     companion object {
         const val SCOPE_MOBILE = "mobile"
         const val SCOPE_TV = "tv"
+        const val SCOPE_WATCH = "watch"
 
         // Credentials come from UserFileAuthInterceptor, not from the URL.
         internal const val USER_FILE_PLAYBACK_PATH = "/files/url/token/"
@@ -100,7 +99,8 @@ open class SyncServiceManager @Inject constructor(
 
     private val scope = when (appPlatform) {
         AppPlatform.Tv -> SCOPE_TV
-        AppPlatform.Phone, AppPlatform.WearOs, AppPlatform.Automotive -> SCOPE_MOBILE
+        AppPlatform.WearOs -> SCOPE_WATCH
+        AppPlatform.Phone, AppPlatform.Automotive -> SCOPE_MOBILE
     }
 
     suspend fun register(email: String, password: String): LoginTokenResponse {
@@ -160,7 +160,7 @@ open class SyncServiceManager @Inject constructor(
         return service.emailChange(addBearer(token), request)
     }
 
-    fun deleteAccount(token: AccessToken): Single<UserChangeResponse> = service.deleteAccount(addBearer(token))
+    suspend fun deleteAccount(token: AccessToken): UserChangeResponse = service.deleteAccount(addBearer(token))
 
     suspend fun updatePassword(newPassword: String, oldPassword: String, token: AccessToken): LoginTokenResponse {
         val request = UpdatePasswordRequest(newPassword = newPassword, oldPassword = oldPassword, scope = scope)
@@ -188,7 +188,7 @@ open class SyncServiceManager @Inject constructor(
 
     suspend fun getHomeFolder(token: AccessToken): UserPodcastListResponse = service.getPodcastList(addBearer(token), userPodcastListRequest)
 
-    fun getPodcastEpisodes(podcastUuid: String, token: AccessToken): Single<PodcastEpisodesResponse> {
+    suspend fun getPodcastEpisodes(podcastUuid: String, token: AccessToken): PodcastEpisodesResponse {
         val request = PodcastEpisodesRequest(podcastUuid)
         return service.getPodcastEpisodes(addBearer(token), request)
     }
@@ -210,7 +210,7 @@ open class SyncServiceManager @Inject constructor(
         return service.getEpisodes(addBearer(token), request)
     }
 
-    fun historySync(request: HistorySyncRequest, token: AccessToken): Single<HistorySyncResponse> = service.historySync(addBearer(token), request)
+    suspend fun historySync(request: HistorySyncRequest, token: AccessToken): HistorySyncResponse = service.historySync(addBearer(token), request)
 
     /**
      * Retrieve listening history for a year.
@@ -231,56 +231,40 @@ open class SyncServiceManager @Inject constructor(
         token: AccessToken,
     ): SubscriptionStatusResponse = service.subscriptionPurchase(addBearer(token), request)
 
-    fun getFiles(token: AccessToken): Single<Response<FilesResponse>> = service.getFiles(addBearer(token))
+    suspend fun getFiles(token: AccessToken): Response<FilesResponse> = service.getFiles(addBearer(token))
 
-    fun postFiles(files: List<FilePost>, token: AccessToken): Single<Response<Void>> {
+    suspend fun postFiles(files: List<FilePost>, token: AccessToken): Response<Void> {
         val body = FilePostBody(files)
         return service.postFiles(addBearer(token), body)
     }
 
-    fun getFileUploadUrl(file: FileUploadData, token: AccessToken): Single<String> = service.getFileUploadUrl(addBearer(token), file).map { it.url }
+    suspend fun getFileUploadUrl(file: FileUploadData, token: AccessToken): String = service.getFileUploadUrl(addBearer(token), file).url
 
-    fun getFileUploadStatus(episodeUuid: String, token: AccessToken): Single<Boolean> = service.getFileUploadStatus(addBearer(token), episodeUuid).map { it.success }
+    suspend fun getFileUploadStatus(episodeUuid: String, token: AccessToken): Boolean = service.getFileUploadStatus(addBearer(token), episodeUuid).success
 
-    fun getFileImageUploadUrl(imageData: FileImageUploadData, token: AccessToken): Single<String> = service.getFileImageUploadUrl(addBearer(token), imageData).map { it.url }
+    suspend fun getFileImageUploadUrl(imageData: FileImageUploadData, token: AccessToken): String = service.getFileImageUploadUrl(addBearer(token), imageData).url
 
-    fun uploadToServer(episode: UserEpisode, url: String): Flowable<Float> {
+    suspend fun uploadToServer(episode: UserEpisode, url: String, onProgress: (Float) -> Unit) {
         val path = episode.downloadedFilePath ?: throw IllegalStateException("File is not downloaded")
         val file = File(path)
-
-        return Flowable.create(
-            { emitter ->
-                try {
-                    val requestBody = ProgressRequestBody.create((episode.fileType ?: "audio/mp3").toMediaType(), file, emitter)
-                    val call = service.uploadFile(url, requestBody)
-                    emitter.setCancellable { call.cancel() }
-
-                    call.execute()
-                    if (!emitter.isCancelled) {
-                        emitter.onComplete()
-                    }
-                } catch (e: java.lang.Exception) {
-                    emitter.tryOnError(e)
-                }
-            },
-            BackpressureStrategy.LATEST,
-        )
+        val requestBody = ProgressRequestBody.create((episode.fileType ?: "audio/mp3").toMediaType(), file, onProgress)
+        service.uploadFile(url, requestBody)
     }
 
-    fun uploadImageToServer(imageFile: File, url: String): Single<Response<Void>> {
+    suspend fun uploadImageToServer(imageFile: File, url: String) {
         val requestBody = imageFile.asRequestBody("image/png".toMediaType())
-        return service.uploadFileNoProgress(url, requestBody)
+        service.uploadFile(url, requestBody)
     }
 
-    fun deleteImageFromServer(episode: UserEpisode, token: AccessToken): Single<Response<Void>> = service.deleteImageFile(addBearer(token), episode.uuid)
+    suspend fun deleteImageFromServer(episode: UserEpisode, token: AccessToken): Response<Void> = service.deleteImageFile(addBearer(token), episode.uuid)
 
-    fun deleteFromServer(episode: UserEpisode, token: AccessToken): Single<Response<Void>> = service.deleteFile(addBearer(token), episode.uuid)
+    suspend fun deleteFromServer(episode: UserEpisode, token: AccessToken): Response<Void> = service.deleteFile(addBearer(token), episode.uuid)
 
     fun getPlaybackUrl(episode: UserEpisode): String = "${Settings.SERVER_API_URL}$USER_FILE_PLAYBACK_PATH${episode.uuid}"
 
     suspend fun getSignedPlaybackUrl(episode: UserEpisode, token: AccessToken): String = service.getFilePlaybackUrl(addBearer(token), episode.uuid).url
 
-    fun getUserEpisode(uuid: String, token: AccessToken): Single<Response<ServerFile>> = service.getFile(addBearer(token), uuid)
+    suspend fun getUserEpisode(uuid: String, token: AccessToken): Response<ServerFile> = service.getFile(addBearer(token), uuid)
 
     suspend fun loadStats(token: AccessToken): StatsBundle {
         val response = service.loadStats(addBearer(token), StatsSummaryRequest(deviceId = settings.getUniqueDeviceId()))
@@ -290,7 +274,7 @@ open class SyncServiceManager @Inject constructor(
         return StatsBundle(values, startedAt)
     }
 
-    fun getFileUsage(token: AccessToken): Single<FileAccount> = service.getFilesUsage(addBearer(token))
+    suspend fun getFileUsage(token: AccessToken): FileAccount = service.getFilesUsage(addBearer(token))
 
     suspend fun addPodcastRating(podcastUuid: String, rate: Int, token: AccessToken): PodcastRatingResponse {
         val request = PodcastRatingAddRequest.newBuilder()

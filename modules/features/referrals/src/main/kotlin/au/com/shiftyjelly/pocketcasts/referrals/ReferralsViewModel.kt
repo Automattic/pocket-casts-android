@@ -59,14 +59,15 @@ class ReferralsViewModel @Inject constructor(
         return combine(
             userManager.getSignInState().asFlow(),
             settings.playerOrUpNextBottomSheetState,
-        ) { signInState, playerBottomSheetState ->
+            settings.showReferralsTooltip.flow,
+        ) { signInState, playerBottomSheetState, showReferralsTooltip ->
             val canClaimReferral = signInState.isNoAccountOrFree && settings.referralClaimCode.value.isNotEmpty()
             val canSendReferral = signInState.isSignedInAsPlusOrPatron
             UiState.Loaded(
                 referralPlan = referralPlan,
                 showIcon = canSendReferral,
                 showTooltip = if (playerBottomSheetState == BottomSheetBehavior.STATE_COLLAPSED) {
-                    canSendReferral && settings.showReferralsTooltip.value
+                    canSendReferral && showReferralsTooltip
                 } else {
                     false
                 },

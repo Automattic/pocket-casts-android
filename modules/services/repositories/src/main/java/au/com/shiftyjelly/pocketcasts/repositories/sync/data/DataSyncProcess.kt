@@ -22,6 +22,8 @@ import au.com.shiftyjelly.pocketcasts.servers.extensions.toDate
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncSettingsTask
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.pocketcasts.service.api.Record
 import com.pocketcasts.service.api.SyncUpdateRequest
@@ -123,11 +125,33 @@ class DataSyncProcess(
             logProcess("playlists-data-full") {
                 playlistSync.fullSync()
             }
-            logProcess("bookmarks-data-full") {
+            val hasBookmarks = logProcess("bookmarks-data-full") {
                 bookmarkSync.fullSync()
+            }
+            if (hasBookmarks) {
+                logProcess("bookmarks-passages-full") {
+                    runCatching { rehydrateBookmarkPassages() }
+                        .onFailure { error ->
+                            if (error is CancellationException) throw error
+                            logError("bookmark passage rehydration failed", error)
+                        }
+                }
             }
             runCatching { Instant.parse(lastSyncAt) }.getOrDefault(Instant.now())
         }
+    }
+
+    // The full-sync bookmark list omits the passage fields; they only travel on the incremental
+    // sync records, so pull them once with a since-zero update after the initial full sync.
+    private suspend fun rehydrateBookmarkPassages() {
+        if (!FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS)) return
+        val request = syncUpdateRequest {
+            deviceUtcTimeMs = System.currentTimeMillis()
+            lastModified = Instant.EPOCH.toEpochMilli()
+            deviceId = settings.getUniqueDeviceId()
+        }
+        val response = syncManager.syncUpdateOrThrow(request)
+        bookmarkSync.processIncrementalResponse(response.recordsList.mapNotNull(Record::bookmarkOrNull))
     }
 
     private suspend fun syncIncrementalData(lastSyncTime: Instant): Instant {

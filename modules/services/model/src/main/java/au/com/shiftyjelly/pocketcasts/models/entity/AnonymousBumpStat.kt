@@ -2,16 +2,19 @@ package au.com.shiftyjelly.pocketcasts.models.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.PrimaryKey
 import androidx.room.ProvidedTypeConverter
 import androidx.room.TypeConverter
 import com.squareup.moshi.FromJson
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.ToJson
 import com.squareup.moshi.Types
+import java.util.Locale
 import timber.log.Timber
 
-@Entity(tableName = "bump_stats", primaryKeys = ["name", "event_time", "custom_event_props"])
+@Entity(tableName = "bump_stats")
 data class AnonymousBumpStat(
+    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "id") var id: Long = 0,
     @ColumnInfo(name = "name") var name: String,
     @ColumnInfo(name = "event_time") var eventTime: Long = System.currentTimeMillis(),
     @ColumnInfo(name = "custom_event_props") var customEventProps: Map<String, Any> = emptyMap(),
@@ -28,7 +31,7 @@ data class AnonymousBumpStat(
     }
 
     fun withBumpName(): AnonymousBumpStat {
-        val bumpName = "pcandroid_${name}_bump"
+        val bumpName = "pcandroid_${name.lowercase(Locale.ROOT)}_bump"
         return copy(name = bumpName)
     }
 

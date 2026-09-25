@@ -984,7 +984,6 @@ Language: ca
     <string name="notification_channel_description_bookmark">Mostra quan s\'afegeix un marcador utilitzant uns auriculars</string>
     <string name="notification_channel_description_sign_in_error">Es mostra quan es tanca la sessió en segon pla i no es pot tornar a iniciar sessió automàticament</string>
     <string name="notification_channel_description_podcast_import">Importa col·leccions de pòdcasts</string>
-    <string name="change_bookmark_title_hint">Canvia el títol que identifica aquest marcador</string>
     <string name="bookmark">Marcador</string>
     <string name="details">Notes</string>
     <string name="episode">Episodi</string>
@@ -1000,7 +999,6 @@ Language: ca
     <string name="save_bookmark">Desa el marcador</string>
     <string name="change_title">Canvia el títol</string>
     <string name="playing_bookmark">Reproduint «%s»</string>
-    <string name="add_bookmark_title_hint">Afegeix un títol opcional per a identificar aquest marcador</string>
     <string name="bookmark_added">S\'ha afegit el marcador «%s»</string>
     <string name="bookmarks_sort_timestamp">Marca temporal</string>
     <string name="bookmarks_select_option">Selecciona marcadors</string>

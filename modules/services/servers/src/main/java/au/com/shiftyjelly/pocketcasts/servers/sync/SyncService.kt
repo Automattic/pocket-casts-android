@@ -44,7 +44,6 @@ import com.pocketcasts.service.api.WinbackResponse
 import io.reactivex.Completable
 import io.reactivex.Single
 import okhttp3.RequestBody
-import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -90,7 +89,7 @@ interface SyncService {
     suspend fun emailChange(@Header("Authorization") authorization: String, @Body request: EmailChangeRequest): UserChangeResponse
 
     @POST("/user/delete_account")
-    fun deleteAccount(@Header("Authorization") authorization: String): Single<UserChangeResponse>
+    suspend fun deleteAccount(@Header("Authorization") authorization: String): UserChangeResponse
 
     @POST("/user/update_password")
     suspend fun updatePassword(@Header("Authorization") authorization: String, @Body request: UpdatePasswordRequest): LoginTokenResponse
@@ -113,7 +112,7 @@ interface SyncService {
     suspend fun getLastSyncAt(@Header("Authorization") authorization: String, @Body request: BasicRequest): LastSyncAtResponse
 
     @POST("/user/podcast/episodes")
-    fun getPodcastEpisodes(@Header("Authorization") authorization: String, @Body request: PodcastEpisodesRequest): Single<PodcastEpisodesResponse>
+    suspend fun getPodcastEpisodes(@Header("Authorization") authorization: String, @Body request: PodcastEpisodesRequest): PodcastEpisodesResponse
 
     @Headers("Content-Type: application/octet-stream")
     @POST("/user/podcast/list")
@@ -131,7 +130,7 @@ interface SyncService {
     suspend fun getEpisodes(@Header("Authorization") authorization: String, @Body request: PodcastsEpisodesRequest): EpisodesResponse
 
     @POST("/history/sync")
-    fun historySync(@Header("Authorization") authorization: String, @Body request: HistorySyncRequest): Single<HistorySyncResponse>
+    suspend fun historySync(@Header("Authorization") authorization: String, @Body request: HistorySyncRequest): HistorySyncResponse
 
     @POST("/history/year")
     suspend fun historyYear(@Header("Authorization") authorization: String, @Body request: HistoryYearSyncRequest): HistoryYearResponse
@@ -146,34 +145,31 @@ interface SyncService {
     suspend fun subscriptionPurchase(@Header("Authorization") authorization: String, @Body request: SubscriptionPurchaseRequest): SubscriptionStatusResponse
 
     @GET("/files")
-    fun getFiles(@Header("Authorization") authorization: String): Single<Response<FilesResponse>>
+    suspend fun getFiles(@Header("Authorization") authorization: String): Response<FilesResponse>
 
     @POST("/files")
-    fun postFiles(@Header("Authorization") authorization: String, @Body body: FilePostBody): Single<Response<Void>>
+    suspend fun postFiles(@Header("Authorization") authorization: String, @Body body: FilePostBody): Response<Void>
 
     @POST("/files/upload/request")
-    fun getFileUploadUrl(@Header("Authorization") authorization: String, @Body body: FileUploadData): Single<FileUploadResponse>
+    suspend fun getFileUploadUrl(@Header("Authorization") authorization: String, @Body body: FileUploadData): FileUploadResponse
 
     @POST("/files/upload/image")
-    fun getFileImageUploadUrl(@Header("Authorization") authorization: String, @Body body: FileImageUploadData): Single<FileUrlResponse>
+    suspend fun getFileImageUploadUrl(@Header("Authorization") authorization: String, @Body body: FileImageUploadData): FileUrlResponse
 
     @PUT
-    fun uploadFile(@Url url: String, @Body requestBody: RequestBody): Call<Void>
-
-    @PUT
-    fun uploadFileNoProgress(@Url url: String, @Body requestBody: RequestBody): Single<Response<Void>>
+    suspend fun uploadFile(@Url url: String, @Body requestBody: RequestBody): Response<Void>
 
     @GET("/files/upload/status/{uuid}")
-    fun getFileUploadStatus(@Header("Authorization") authorization: String, @Path("uuid") uuid: String): Single<FileUploadStatusResponse>
+    suspend fun getFileUploadStatus(@Header("Authorization") authorization: String, @Path("uuid") uuid: String): FileUploadStatusResponse
 
     @DELETE("/files/{uuid}")
-    fun deleteFile(@Header("Authorization") authorization: String, @Path("uuid") uuid: String): Single<Response<Void>>
+    suspend fun deleteFile(@Header("Authorization") authorization: String, @Path("uuid") uuid: String): Response<Void>
 
     @DELETE("/files/image/{uuid}")
-    fun deleteImageFile(@Header("Authorization") authorization: String, @Path("uuid") uuid: String): Single<Response<Void>>
+    suspend fun deleteImageFile(@Header("Authorization") authorization: String, @Path("uuid") uuid: String): Response<Void>
 
     @GET("/files/{uuid}")
-    fun getFile(@Header("Authorization") authorization: String, @Path("uuid") uuid: String): Single<Response<ServerFile>>
+    suspend fun getFile(@Header("Authorization") authorization: String, @Path("uuid") uuid: String): Response<ServerFile>
 
     @Headers("Cache-Control: no-store")
     @GET("/files/play/{uuid}")
@@ -183,7 +179,7 @@ interface SyncService {
     suspend fun loadStats(@Header("Authorization") authorization: String, @Body request: StatsSummaryRequest): Map<String, Any>
 
     @GET("/files/usage")
-    fun getFilesUsage(@Header("Authorization") authorization: String): Single<FileAccount>
+    suspend fun getFilesUsage(@Header("Authorization") authorization: String): FileAccount
 
     @POST("/subscription/promo/redeem")
     fun redeemPromoCode(@Header("Authorization") authorization: String, @Body request: PromoCodeRequest): Single<PromoCodeResponse>

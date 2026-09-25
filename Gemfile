@@ -3,7 +3,7 @@
 source 'https://rubygems.org'
 
 gem 'danger-dangermattic', '~> 1.4'
-gem 'fastlane', '~> 2.239'
+gem 'fastlane', '~> 2.240'
 gem 'fastlane-plugin-firebase_app_distribution', '~> 1.0'
 
 gem 'fastlane-plugin-wpmreleasetoolkit', '~> 15.0'

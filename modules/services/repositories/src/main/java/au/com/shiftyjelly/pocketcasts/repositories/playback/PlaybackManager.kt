@@ -101,7 +101,6 @@ import dagger.Lazy
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Completable
-import io.reactivex.Maybe
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -138,7 +137,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlow
 import kotlinx.coroutines.rx2.asFlowable
-import kotlinx.coroutines.rx2.awaitSingleOrNull
 import kotlinx.coroutines.rx2.rxCompletable
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -176,6 +174,7 @@ open class PlaybackManager @Inject constructor(
     private val browseTreeProvider: BrowseTreeProvider,
     private val alternateEnclosureManager: AlternateEnclosureManager,
     private val generatedChapterSeeker: Lazy<GeneratedChapterSeeker>,
+    private val playbackServiceErrorReporter: PlaybackServiceErrorReporter,
 ) : FocusManager.FocusChangeListener,
     AudioNoisyManager.AudioBecomingNoisyListener,
     CoroutineScope {
@@ -257,6 +256,7 @@ open class PlaybackManager @Inject constructor(
         settings = settings,
         context = application,
         eventHorizon = eventHorizon,
+        errorReporter = playbackServiceErrorReporter,
         bookmarkManager = bookmarkManager,
         browseTreeProvider = browseTreeProvider,
         applicationScope = applicationScope,
@@ -290,7 +290,9 @@ open class PlaybackManager @Inject constructor(
     private var videoStreamPreferredEpisodeUuid: String? = null
     private val isVideoToggleReloading = AtomicBoolean(false)
 
-    private var lastPlaybackSource: SourceView? = null
+    @Volatile
+    var lastPlaybackSource: SourceView? = null
+        private set
 
     private class PendingContentTypeEvent(
         val episodeUuid: String,
@@ -326,19 +328,29 @@ open class PlaybackManager @Inject constructor(
                     castReconnected()
                 }
 
-                override fun sessionFailed(errorCode: Int) {
+                override fun sessionFailed(errorCode: Int, failureType: CastManager.SessionFailureType) {
+                    val action = castSessionFailureAction(failureType, isCastPlayerActive = player?.isRemote == true)
+                    if (action == CastSessionFailureAction.Ignore) {
+                        LogBuffer.i(
+                            LogBuffer.TAG_PLAYBACK,
+                            "Ignoring Cast session resume failure with error code $errorCode while not casting",
+                        )
+                        return
+                    }
                     LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Cast session failed with error code $errorCode")
                     launch(Dispatchers.Main) {
                         val message = application.getString(LR.string.error_cast_connection_failed)
                         Toast.makeText(application, message, Toast.LENGTH_LONG).show()
-                        playbackStateRelay.blockingFirst().let { playbackState ->
-                            playbackStateRelay.accept(
-                                playbackState.copy(
-                                    state = PlaybackState.State.ERROR,
-                                    lastErrorMessage = message,
-                                    lastChangeFrom = LastChangeFrom.OnPlayerError.value,
-                                ),
-                            )
+                        if (action == CastSessionFailureAction.ShowToastAndError) {
+                            playbackStateRelay.blockingFirst().let { playbackState ->
+                                playbackStateRelay.accept(
+                                    playbackState.copy(
+                                        state = PlaybackState.State.ERROR,
+                                        lastErrorMessage = message,
+                                        lastChangeFrom = LastChangeFrom.OnPlayerError.value,
+                                    ),
+                                )
+                            }
                         }
                     }
                 }
@@ -649,6 +661,25 @@ open class PlaybackManager @Inject constructor(
         }
     }
 
+    /**
+     * Plays the queue only if playback isn't already running, unlike the [playPause] toggle.
+     * Used for KEYCODE_MEDIA_PLAY, which has explicit play semantics: some head units
+     * (wireless Android Auto in particular) send it redundantly while playback is already
+     * running, and toggling would pause playback. Media-button callbacks invoke it immediately
+     * instead of waiting for multi-tap disambiguation.
+     */
+    fun playIfNotPlaying(sourceView: SourceView = SourceView.UNKNOWN) {
+        if (isPlaying()) {
+            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Ignoring play request because playback is already playing")
+        } else {
+            LogBuffer.i(
+                LogBuffer.TAG_PLAYBACK,
+                "Explicit play request from source=$sourceView",
+            )
+            playQueue(sourceView)
+        }
+    }
+
     fun playQueue(
         sourceView: SourceView = SourceView.UNKNOWN,
         showedStreamWarning: Boolean = false,
@@ -791,7 +822,9 @@ open class PlaybackManager @Inject constructor(
         SourceView.ABOUT,
         SourceView.APPEARANCE,
         SourceView.STORAGE_AND_DATA_USAGE,
+        SourceView.HEADPHONES,
         SourceView.NOTIFICATION_BOOKMARK,
+        SourceView.TRANSCRIPT,
         SourceView.METERED_NETWORK_CHANGE,
         SourceView.WIDGET_PLAYER_SMALL,
         SourceView.WIDGET_PLAYER_MEDIUM,
@@ -1772,14 +1805,19 @@ open class PlaybackManager @Inject constructor(
                         .subscribe()
                 } else if (episode is UserEpisode) {
                     userEpisodeManager.findEpisodeByUuid(episode.uuid)?.let { userEpisode ->
-                        syncManager.postFilesRxSingle(listOf(userEpisode.toServerPostFile()))
-                            .ignoreElement()
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .doOnComplete { Timber.d("Synced user episode completion") }
-                            .doOnError { Timber.e("Could not sync user episode completion ${it.message}") }
-                            .onErrorComplete()
-                            .subscribe()
+                        // Fire and forget so completion handling does not wait on the network before auto play
+                        applicationScope.launch(Dispatchers.IO) {
+                            try {
+                                val response = syncManager.postFiles(listOf(userEpisode.toServerPostFile()))
+                                if (response.isSuccessful) {
+                                    Timber.d("Synced user episode completion")
+                                } else {
+                                    Timber.e("Could not sync user episode completion ${response.code()}")
+                                }
+                            } catch (e: Exception) {
+                                Timber.e("Could not sync user episode completion ${e.message}")
+                            }
+                        }
                     }
                 }
             }
@@ -2098,15 +2136,12 @@ open class PlaybackManager @Inject constructor(
             }
 
             is UserEpisode -> {
-                userEpisodeManager.findEpisodeByUuidRxMaybe(currentUpNextEpisode.uuid)
-                    .flatMap {
-                        if (it.serverStatus == UserEpisodeServerStatus.MISSING) {
-                            userEpisodeManager.downloadMissingUserEpisodeRxMaybe(currentUpNextEpisode.uuid, placeholderTitle = currentUpNextEpisode.title, placeholderPublished = null)
-                        } else {
-                            Maybe.just(it)
-                        }
-                    }
-                    .awaitSingleOrNull()
+                val userEpisode = userEpisodeManager.findEpisodeByUuid(currentUpNextEpisode.uuid)
+                if (userEpisode?.serverStatus == UserEpisodeServerStatus.MISSING) {
+                    userEpisodeManager.downloadMissingUserEpisode(currentUpNextEpisode.uuid, placeholderTitle = currentUpNextEpisode.title, placeholderPublished = null)
+                } else {
+                    userEpisode
+                }
             }
 
             else -> {
@@ -2470,6 +2505,10 @@ open class PlaybackManager @Inject constructor(
             return
         }
 
+        // Set before the relay emits playing
+        lastPlaybackSource = sourceView
+        playbackServiceErrorReporter.resetFailureCount()
+
         cancelPauseTimer()
         setupBufferUpdateTimer(episode)
 
@@ -2522,7 +2561,6 @@ open class PlaybackManager @Inject constructor(
 
         sleepTimer.restartSleepTimerIfApplies(currentEpisodeUuid = episode.uuid)
 
-        lastPlaybackSource = sourceView
         trackPlaybackPlay(sourceView, episode)
     }
 
@@ -3025,6 +3063,25 @@ open class PlaybackManager @Inject constructor(
         OnUpdatePausedPlaybackState("updatePausedPlaybackState"),
         OnUpdateSleepTimerStatus("updateSleepTimerStatus"),
         OnUserSeeking("onUserSeeking"),
+    }
+}
+
+internal enum class CastSessionFailureAction {
+    Ignore,
+    ShowToast,
+    ShowToastAndError,
+}
+
+internal fun castSessionFailureAction(
+    failureType: CastManager.SessionFailureType,
+    isCastPlayerActive: Boolean,
+): CastSessionFailureAction {
+    if (isCastPlayerActive) {
+        return CastSessionFailureAction.ShowToastAndError
+    }
+    return when (failureType) {
+        CastManager.SessionFailureType.START -> CastSessionFailureAction.ShowToast
+        CastManager.SessionFailureType.RESUME -> CastSessionFailureAction.Ignore
     }
 }
 

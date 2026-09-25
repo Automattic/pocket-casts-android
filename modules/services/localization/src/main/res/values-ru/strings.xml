@@ -984,7 +984,6 @@ Language: ru
     <string name="notification_channel_description_playback_error">Ошибки при воспроизведении</string>
     <string name="notification_channel_description_episode">Показывает, что появился новый выпуск</string>
     <string name="notification_channel_description_download">Показывает, что Pocket Casts скачивает выпуски</string>
-    <string name="change_bookmark_title_hint">Измените название этой закладки</string>
     <string name="bookmark">Закладка</string>
     <string name="details">Подробнее</string>
     <string name="episode">Выпуск</string>
@@ -997,7 +996,6 @@ Language: ru
     <string name="skipping_to">Переход к %s</string>
     <string name="playing_bookmark">Воспроизведение «%s»</string>
     <string name="save_bookmark">Сохранить закладку</string>
-    <string name="add_bookmark_title_hint">Добавьте название, чтобы отличать эту закладку от других</string>
     <string name="add_bookmark">Добавить закладку</string>
     <string name="change_title">Изменить название</string>
     <string name="bookmark_added">Закладка «%s» добавлена</string>

@@ -44,7 +44,6 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.login.ExchangeSonosResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.parseErrorResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.parseTokenErrorResponse
-import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.LoginIdentityType
@@ -79,8 +78,6 @@ import com.pocketcasts.service.api.WinbackResponse
 import com.squareup.moshi.Moshi
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.Completable
-import io.reactivex.Flowable
-import io.reactivex.Maybe
 import io.reactivex.Single
 import java.io.File
 import java.net.HttpURLConnection
@@ -130,12 +127,14 @@ class SyncManagerImpl @Inject constructor(
         return result
     }
 
-    override fun deleteAccountRxSingle(): Single<UserChangeResponse> = getCacheTokenOrLoginRxSingle { token ->
-        syncServiceManager.deleteAccount(token)
-    }.doOnSuccess {
-        if (it.success == true) {
+    override suspend fun deleteAccount(): UserChangeResponse {
+        val result = getCacheTokenOrLogin { token ->
+            syncServiceManager.deleteAccount(token)
+        }
+        if (result.success == true) {
             eventHorizon.track(UserAccountDeletedEvent)
         }
+        return result
     }
 
     override suspend fun updatePassword(newPassword: String, oldPassword: String) {
@@ -157,8 +156,6 @@ class SyncManagerImpl @Inject constructor(
     override fun getEmail(): String? = syncAccountManager.getEmail()
 
     override fun emailFlow() = syncAccountManager.emailFlow().distinctUntilChanged()
-
-    override fun emailFlowable(): Flowable<Optional<String>> = syncAccountManager.emailFlowable().distinctUntilChanged()
 
     override suspend fun getAccessToken(account: Account): AccessToken = syncAccountManager.peekAccessToken(account)
         ?: fetchAccessToken(account)
@@ -328,46 +325,44 @@ class SyncManagerImpl @Inject constructor(
 
 // User Episodes / Files
 
-    override fun getFilesRxSingle(): Single<Response<FilesResponse>> = getCacheTokenOrLoginRxSingle { token ->
+    override suspend fun getFiles(): Response<FilesResponse> = getCacheTokenOrLogin { token ->
         syncServiceManager.getFiles(token)
     }
 
-    override fun getFileUsageRxSingle(): Single<FileAccount> = getCacheTokenOrLoginRxSingle { token ->
+    override suspend fun getFileUsage(): FileAccount = getCacheTokenOrLogin { token ->
         syncServiceManager.getFileUsage(token)
     }
 
-    override fun postFilesRxSingle(files: List<FilePost>): Single<Response<Void>> = getCacheTokenOrLoginRxSingle { token ->
+    override suspend fun postFiles(files: List<FilePost>): Response<Void> = getCacheTokenOrLogin { token ->
         syncServiceManager.postFiles(files, token)
     }
 
-    override fun getFileUploadStatusRxSingle(episodeUuid: String): Single<Boolean> = getCacheTokenOrLoginRxSingle { token ->
+    override suspend fun getFileUploadStatus(episodeUuid: String): Boolean = getCacheTokenOrLogin { token ->
         syncServiceManager.getFileUploadStatus(episodeUuid, token)
     }
 
-    override fun uploadFileToServerRxCompletable(episode: UserEpisode): Completable = getCacheTokenOrLoginRxSingle { token ->
-        syncServiceManager.getFileUploadUrl(episode.toUploadData(), token)
-    }.flatMapCompletable { url ->
-        syncServiceManager.uploadToServer(episode, url)
-            .doOnNext { progress -> UploadProgressManager.pushProgress(episode.uuid, progress) }
-            .ignoreElements()
+    override suspend fun uploadFileToServer(episode: UserEpisode) {
+        val url = getCacheTokenOrLogin { token ->
+            syncServiceManager.getFileUploadUrl(episode.toUploadData(), token)
+        }
+        syncServiceManager.uploadToServer(episode, url) { progress ->
+            UploadProgressManager.pushProgress(episode.uuid, progress)
+        }
     }
 
-    override fun uploadImageToServerRxCompletable(
-        episode: UserEpisode,
-        imageFile: File,
-    ): Completable = getCacheTokenOrLoginRxSingle { token ->
-        val imageData = FileImageUploadData(episode.uuid, imageFile.length(), "image/png")
-        syncServiceManager.getFileImageUploadUrl(imageData, token)
-    }.flatMapCompletable { uploadUrl ->
+    override suspend fun uploadImageToServer(episode: UserEpisode, imageFile: File) {
+        val uploadUrl = getCacheTokenOrLogin { token ->
+            val imageData = FileImageUploadData(episode.uuid, imageFile.length(), "image/png")
+            syncServiceManager.getFileImageUploadUrl(imageData, token)
+        }
         syncServiceManager.uploadImageToServer(imageFile, uploadUrl)
-            .ignoreElement()
     }
 
-    override fun deleteImageFromServerRxSingle(episode: UserEpisode): Single<Response<Void>> = getCacheTokenOrLoginRxSingle { token ->
+    override suspend fun deleteImageFromServer(episode: UserEpisode): Response<Void> = getCacheTokenOrLogin { token ->
         syncServiceManager.deleteImageFromServer(episode, token)
     }
 
-    override fun deleteFromServerRxSingle(episode: UserEpisode): Single<Response<Void>> = getCacheTokenOrLoginRxSingle { token ->
+    override suspend fun deleteFromServer(episode: UserEpisode): Response<Void> = getCacheTokenOrLogin { token ->
         syncServiceManager.deleteFromServer(episode, token)
     }
 
@@ -377,26 +372,24 @@ class SyncManagerImpl @Inject constructor(
         syncServiceManager.getSignedPlaybackUrl(episode, token)
     }
 
-    override fun getUserEpisodeRxMaybe(uuid: String): Maybe<ServerFile> = if (settings.cachedMembership.value.subscription != null) {
-        getCacheTokenOrLoginRxSingle { token ->
-            syncServiceManager.getUserEpisode(uuid, token)
-        }.flatMapMaybe {
-            if (it.isSuccessful) {
-                Maybe.just(it.body())
-            } else if (it.code() == HttpURLConnection.HTTP_NOT_FOUND) {
-                Maybe.empty()
-            } else {
-                Maybe.error(HttpException(it))
-            }
-        }
-    } else {
+    override suspend fun getUserEpisode(uuid: String): ServerFile? {
         // If the user doesn't have an active subscription, do not bother grabbing the file
-        Maybe.empty()
+        if (settings.cachedMembership.value.subscription == null) {
+            return null
+        }
+        val response = getCacheTokenOrLogin { token ->
+            syncServiceManager.getUserEpisode(uuid, token)
+        }
+        return when {
+            response.isSuccessful -> checkNotNull(response.body())
+            response.code() == HttpURLConnection.HTTP_NOT_FOUND -> null
+            else -> throw HttpException(response)
+        }
     }
 
 // History
 
-    override fun historySyncRxSingle(request: HistorySyncRequest): Single<HistorySyncResponse> = getCacheTokenOrLoginRxSingle { token ->
+    override suspend fun historySync(request: HistorySyncRequest): HistorySyncResponse = getCacheTokenOrLogin { token ->
         syncServiceManager.historySync(request, token)
     }
 
@@ -446,7 +439,7 @@ class SyncManagerImpl @Inject constructor(
         syncServiceManager.getEpisodes(request, token)
     }
 
-    override fun getPodcastEpisodesRxSingle(podcastUuid: String): Single<PodcastEpisodesResponse> = getCacheTokenOrLoginRxSingle { token ->
+    override suspend fun getPodcastEpisodes(podcastUuid: String): PodcastEpisodesResponse = getCacheTokenOrLogin { token ->
         syncServiceManager.getPodcastEpisodes(podcastUuid, token)
     }
 

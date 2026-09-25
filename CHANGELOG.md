@@ -1,6 +1,37 @@
 8.22
 -----
-
+*   New Features
+    *   Log in to the Wear OS app by scanning a QR code with your phone or entering a code on the web
+        ([#5964](https://github.com/Automattic/pocket-casts-android/pull/5964))
+    *   Smart Bookmarks
+        ([#6038](https://github.com/Automattic/pocket-casts-android/pull/6038))
+    *   Switch accounts from the screen that appears when you pair a device by scanning its QR code
+        ([#6019](https://github.com/Automattic/pocket-casts-android/pull/6019))
+    *   Swipe a bookmark to share or delete it
+        ([#6041](https://github.com/Automattic/pocket-casts-android/pull/6041))
+*   Bug Fixes
+    *   Show every matching folder in search results instead of only the last one
+        ([#5953](https://github.com/Automattic/pocket-casts-android/pull/5953))
+    *   Show the correct play or pause button for User Files
+        ([#5963](https://github.com/Automattic/pocket-casts-android/pull/5963))
+    *   Remove the bookmark icon from an episode as soon as its last bookmark is deleted, instead of waiting for the next sync
+        ([#6005](https://github.com/Automattic/pocket-casts-android/pull/6005))
+    *   Keep a newly uploaded file in view instead of letting the Files list jump past it
+        ([#6005](https://github.com/Automattic/pocket-casts-android/pull/6005))
+    *   Confirm playlist removals and mixed changes after adding episodes to playlists, not only additions
+        ([#5632](https://github.com/Automattic/pocket-casts-android/pull/5632))
+    *   Fix Profile tab refresh button from being hidden behind the bottom nav after a cold start
+        ([#6033](https://github.com/Automattic/pocket-casts-android/pull/6033))
+    *   Show a single launcher icon after choosing a custom app icon
+        ([#5609](https://github.com/Automattic/pocket-casts-android/pull/5609))
+    *   Enable the transcript button on the full-screen player without playing the episode or opening the details page
+        ([#6034](https://github.com/Automattic/pocket-casts-android/pull/6034))
+    *   Stay in Pocket Casts after changing the app icon instead of closing to the home screen
+        ([#6017](https://github.com/Automattic/pocket-casts-android/pull/6017))
+    *   Resume playback immediately when a headphone or car play button is pressed
+        ([#5645](https://github.com/Automattic/pocket-casts-android/pull/5645))
+    *   Prevent Cast connection failures from interrupting local playback or removing playback controls
+        ([#5656](https://github.com/Automattic/pocket-casts-android/pull/5656))
 
 8.21
 -----
@@ -22,6 +53,8 @@
         ([#5868](https://github.com/Automattic/pocket-casts-android/pull/5868))
     *   Keep the Playback Effects icon visible on the Now Playing screen when a podcast's colours haven't loaded yet
         ([#5877](https://github.com/Automattic/pocket-casts-android/pull/5877))
+    *   Show the bookmark details play control as a time button in the header and open the episode when its artwork or title is tapped
+        ([#5946](https://github.com/Automattic/pocket-casts-android/pull/5946))
 
 8.20
 -----

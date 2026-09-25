@@ -130,6 +130,10 @@ interface Settings {
         const val SHOW_REFERRALS_TOOLTIP = "show_referrals_tooltip"
 
         const val SHOW_UP_NEXT_SORT_DURATION_TOOLTIP = "show_up_next_sort_duration_tooltip"
+
+        const val SHOW_SMART_BOOKMARKS_TOOLTIP = "show_smart_bookmarks_tooltip"
+
+        const val SMART_BOOKMARKS_TOOLTIP_DISMISSED = "smart_bookmarks_tooltip_dismissed"
     }
 
     enum class NotificationChannel(val id: String) {
@@ -596,6 +600,10 @@ interface Settings {
     fun setAutomotiveConnectedToMediaSession(isLoaded: Boolean)
 
     val showReferralsTooltip: UserSetting<Boolean>
+
+    val showSmartBookmarksTooltip: UserSetting<Boolean>
+
+    val smartBookmarksTooltipDismissed: UserSetting<Boolean>
 
     val showUpNextSortDurationTooltip: UserSetting<Boolean>
 

@@ -14,6 +14,8 @@ import kotlinx.coroutines.test.runTest
 import okhttp3.CacheControl
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -266,5 +268,90 @@ class TranscriptWindowExtractorTest {
             "This is a sentence with enough words to pass the minimum threshold for extraction.",
             result?.passage,
         )
+    }
+
+    @Test
+    fun `snap the window to whole sentences`() {
+        val vtt = """
+            |WEBVTT
+            |
+            |00:00:00.000 --> 00:00:05.000
+            |The first sentence starts here and
+            |
+            |00:00:05.000 --> 00:00:15.000
+            |runs into the second cue before it stops.
+            |
+            |00:00:15.000 --> 00:00:25.000
+            |A whole middle sentence lives entirely inside the window without any trouble at all here.
+            |
+            |00:00:25.000 --> 00:00:35.000
+            |The final sentence begins in this cue and
+            |
+            |00:00:35.000 --> 00:00:45.000
+            |then extends beyond the window edge to finish.
+        """.trimMargin()
+
+        val result = TranscriptWindowExtractor.parseVttWindow(vtt, centerSecs = 30)
+
+        assertEquals(
+            "The first sentence starts here and runs into the second cue before it stops. " +
+                "A whole middle sentence lives entirely inside the window without any trouble at all here. " +
+                "The final sentence begins in this cue and then extends beyond the window edge to finish.",
+            result?.passage,
+        )
+    }
+
+    @Test
+    fun `bound the passage when the transcript has no sentence boundaries`() {
+        val filler = "word ".repeat(30).trim()
+        val vtt = buildString {
+            appendLine("WEBVTT")
+            appendLine()
+            for (i in 0 until 13) {
+                val start = i * 10
+                val end = start + 10
+                appendLine("00:%02d:%02d.000 --> 00:%02d:%02d.000".format(start / 60, start % 60, end / 60, end % 60))
+                appendLine(
+                    when (i) {
+                        0 -> "zzzstart $filler"
+                        12 -> "$filler zzzend"
+                        else -> filler
+                    },
+                )
+                appendLine()
+            }
+        }
+
+        val result = TranscriptWindowExtractor.parseVttWindow(vtt, centerSecs = 60)
+
+        assertNotNull(result)
+        assertFalse(result!!.passage.contains("zzzstart"))
+        assertFalse(result.passage.contains("zzzend"))
+    }
+
+    @Test
+    fun `return null when the snapped window is below the minimum words`() {
+        val vtt = """
+            |WEBVTT
+            |
+            |00:00:00.000 --> 00:00:05.000
+            |Intro sentence here.
+            |
+            |00:00:05.000 --> 00:00:15.000
+            |Short one.
+            |
+            |00:00:15.000 --> 00:00:25.000
+            |Tiny bit.
+            |
+            |00:00:25.000 --> 00:00:35.000
+            |Last short.
+            |
+            |00:00:35.000 --> 00:00:45.000
+            |Beyond the edge.
+        """.trimMargin()
+
+        val result = TranscriptWindowExtractor.parseVttWindow(vtt, centerSecs = 30)
+
+        assertNull(result)
     }
 }

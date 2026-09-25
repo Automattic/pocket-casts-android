@@ -12,6 +12,7 @@ import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -27,7 +28,9 @@ import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.podcast.Recommendations
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortType
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForPodcast
+import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkEpisodeResolver
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
+import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkPlaybackTimeResolver
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadQueue
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadType
@@ -68,7 +71,6 @@ import com.automattic.eventhorizon.PodcastsScreenEpisodeGroupingChangedEvent
 import com.automattic.eventhorizon.PodcastsScreenSortOrderChangedEvent
 import com.automattic.eventhorizon.PodcastsScreenTabTappedEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.Maybe
 import io.reactivex.Single
@@ -79,17 +81,26 @@ import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
+import kotlin.math.abs
 import kotlin.math.min
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlowable
+import kotlinx.coroutines.rx2.rxMaybe
+import kotlinx.coroutines.rx2.rxSingle
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+
+private const val LISTENER_TAKEOVER_TOLERANCE_MS = 1000
 
 @HiltViewModel
 class PodcastViewModel @Inject constructor(
@@ -103,6 +114,8 @@ class PodcastViewModel @Inject constructor(
     private val userManager: UserManager,
     private val eventHorizon: EventHorizon,
     private val bookmarkManager: BookmarkManager,
+    private val bookmarkPlaybackTimeResolver: BookmarkPlaybackTimeResolver,
+    private val bookmarkEpisodeResolver: BookmarkEpisodeResolver,
     private val episodeSearchHandler: EpisodeSearchHandler,
     private val bookmarkSearchHandler: BookmarkSearchHandler,
     private val recommendationsHandler: RecommendationsHandler,
@@ -146,13 +159,12 @@ class PodcastViewModel @Inject constructor(
 
     fun loadPodcast(uuid: String, resources: Resources) {
         this@PodcastViewModel.podcastUuid = uuid
-        val episodeSearchResults = episodeSearchHandler.getSearchResultsObservable(uuid)
-        val bookmarkSearchResults = bookmarkSearchHandler.getSearchResultsObservable(uuid)
+        val episodeSearchResults = episodeSearchHandler.getSearchResultsFlow(uuid).asFlowable()
+        val bookmarkSearchResults = bookmarkSearchHandler.getSearchResultsFlow(uuid).asFlowable()
 
         disposables.clear()
 
-        val podcastFlowable = podcastManager.findPodcastByUuidRxMaybe(uuid)
-            .subscribeOn(Schedulers.io())
+        val podcastFlowable = rxMaybe(Dispatchers.IO) { podcastManager.findPodcastByUuid(uuid) }
             .flatMap {
                 LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Loaded podcast $uuid from database")
                 if (it.isSubscribed) {
@@ -185,12 +197,12 @@ class PodcastViewModel @Inject constructor(
                 podcast.postValue(newPodcast)
             }
 
-        val recommendationsFlowable = recommendationsHandler.getRecommendationsFlowable(uuid)
+        val recommendationsFlowable = recommendationsHandler.getRecommendationsFlow(uuid).asFlowable()
 
         Flowable.combineLatest(
             podcastFlowable,
-            episodeSearchResults.toFlowable(BackpressureStrategy.LATEST),
-            bookmarkSearchResults.toFlowable(BackpressureStrategy.LATEST),
+            episodeSearchResults,
+            bookmarkSearchResults,
             recommendationsFlowable,
         ) { podcast, episodeSearch, bookmarkSearch, recommendations ->
             CombinedData(
@@ -468,26 +480,69 @@ class PodcastViewModel @Inject constructor(
         )
     }
 
+    private var playJob: Job? = null
+
     fun play(bookmark: Bookmark) {
-        launch {
-            val bookmarkEpisode = episodeManager.findEpisodeByUuid(bookmark.episodeUuid)
-            bookmarkEpisode?.let {
-                val shouldLoadOrSwitchEpisode = !playbackManager.isPlaying() ||
-                    playbackManager.getCurrentEpisode()?.uuid != bookmarkEpisode.uuid
-                if (shouldLoadOrSwitchEpisode) {
-                    playbackManager.playNowSync(it, sourceView = SourceView.PODCAST_SCREEN)
-                }
+        playJob?.cancel()
+        playJob = launch {
+            val bookmarkEpisode = resolveEpisode(bookmark) ?: return@launch
+            val hasReferenceTime = bookmark.referenceTime != null
+            val isPlayingBookmarkEpisode = playbackManager.isPlaying() &&
+                playbackManager.getCurrentEpisode()?.uuid == bookmarkEpisode.uuid
+            val pausedForResolve = hasReferenceTime && isPlayingBookmarkEpisode
+            val positionBeforeResolveMs = if (pausedForResolve) {
+                playbackManager.getCurrentTimeMs(bookmarkEpisode)
+            } else {
+                0
             }
-            playbackManager.seekToTimeMs(bookmark.timeSecs * 1000)
+            if (pausedForResolve) {
+                playbackManager.pauseSuspend()
+            }
+            val seekToMs = try {
+                bookmarkPlaybackTimeResolver.playbackTimeMs(
+                    episode = bookmarkEpisode,
+                    referenceTimeSecs = bookmark.referenceTime,
+                    fallbackTimeSecs = bookmark.timeSecs,
+                )
+            } catch (e: CancellationException) {
+                if (pausedForResolve) {
+                    withContext(NonCancellable) {
+                        val stillOurEpisode = playbackManager.getCurrentEpisode()?.uuid == bookmarkEpisode.uuid
+                        if (stillOurEpisode && !playbackManager.isPlaying()) {
+                            playbackManager.playNowSync(bookmarkEpisode, sourceView = SourceView.PODCAST_SCREEN)
+                        }
+                    }
+                }
+                throw e
+            }
+            if (pausedForResolve) {
+                if (listenerTookOver(bookmarkEpisode, positionBeforeResolveMs)) {
+                    return@launch
+                }
+                playbackManager.playNowSync(bookmarkEpisode, sourceView = SourceView.PODCAST_SCREEN)
+            } else if (!isPlayingBookmarkEpisode) {
+                playbackManager.playNowSync(bookmarkEpisode, sourceView = SourceView.PODCAST_SCREEN)
+            }
+            playbackManager.seekToTimeMs(positionMs = seekToMs)
         }
     }
 
+    private suspend fun listenerTookOver(episode: BaseEpisode, positionBeforeResolveMs: Int): Boolean {
+        if (playbackManager.getCurrentEpisode()?.uuid != episode.uuid) return true
+        return abs(playbackManager.getCurrentTimeMs(episode) - positionBeforeResolveMs) >= LISTENER_TAKEOVER_TOLERANCE_MS
+    }
+
+    suspend fun resolveEpisode(bookmark: Bookmark): BaseEpisode? = bookmarkEpisodeResolver.resolve(bookmark)
+
     suspend fun getSharedBookmark(): Triple<Podcast, PodcastEpisode, Bookmark>? {
-        return multiSelectBookmarksHelper.selectedListLive.value?.firstOrNull()?.let { bookmark ->
-            val podcast = podcastManager.findPodcastByUuid(bookmark.podcastUuid) ?: return null
-            val episode = episodeManager.findEpisodeByUuid(bookmark.episodeUuid) as? PodcastEpisode ?: return null
-            Triple(podcast, episode, bookmark)
-        }
+        val bookmark = multiSelectBookmarksHelper.selectedListLive.value?.firstOrNull() ?: return null
+        return getSharedBookmark(bookmark)
+    }
+
+    suspend fun getSharedBookmark(bookmark: Bookmark): Triple<Podcast, PodcastEpisode, Bookmark>? {
+        val podcast = podcastManager.findPodcastByUuid(bookmark.podcastUuid) ?: return null
+        val episode = episodeManager.findEpisodeByUuid(bookmark.episodeUuid) as? PodcastEpisode ?: return null
+        return Triple(podcast, episode, bookmark)
     }
 
     suspend fun createBookmarkArguments(): BookmarkArguments? {
@@ -498,6 +553,7 @@ class PodcastViewModel @Inject constructor(
             episodeUuid = bookmark.episodeUuid,
             timeSecs = bookmark.timeSecs,
             podcastColors = podcast?.let(::PodcastColors) ?: PodcastColors.ForUserEpisode,
+            source = SourceView.PODCAST_SCREEN,
         )
     }
 
@@ -921,9 +977,9 @@ private fun <T> Flowable<List<T>>.withSearchResult(
 
 private fun Maybe<Podcast>.downloadMissingPodcast(uuid: String, podcastManager: PodcastManager): Single<Podcast> {
     return this.switchIfEmpty(
-        Single.defer {
+        rxSingle {
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Podcast $uuid not found in database")
-            podcastManager.findOrDownloadPodcastRxSingle(podcastUuid = uuid, waitForSubscribe = true)
+            podcastManager.findOrDownloadPodcast(podcastUuid = uuid, waitForSubscribe = true)
         },
     )
 }

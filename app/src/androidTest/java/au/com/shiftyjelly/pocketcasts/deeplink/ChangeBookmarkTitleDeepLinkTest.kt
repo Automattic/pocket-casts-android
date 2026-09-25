@@ -18,4 +18,11 @@ class ChangeBookmarkTitleDeepLinkTest {
         assertEquals("bookmark-id", intent.getStringExtra("bookmark_uuid"))
         assertEquals("bookmark_uuid_bookmark-id", intent.getStringExtra("NOTIFICATION_TAG"))
     }
+
+    @Test
+    fun createChangeBookmarkTitleFromEpisodeIntent() {
+        val intent = ChangeBookmarkTitleDeepLink("bookmark-id", fromEpisode = true).toIntent(context)
+
+        assertEquals(true, intent.getBooleanExtra("bookmark_from_episode", false))
+    }
 }

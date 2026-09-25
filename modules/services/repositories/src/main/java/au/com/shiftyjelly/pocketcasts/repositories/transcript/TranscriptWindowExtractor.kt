@@ -6,6 +6,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintTiming
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.TranscriptService
 import dagger.Lazy
+import java.text.BreakIterator
+import java.util.Locale
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.cancellation.CancellationException
@@ -88,6 +90,8 @@ class TranscriptWindowExtractor @Inject constructor(
         private const val MIN_WORDS = 10
         private const val BACKWARD_WINDOW_SECS = 25
         private const val FORWARD_WINDOW_SECS = 5
+        private const val MAX_SNAP_EXPANSION = 300
+        private val WORD_SEPARATOR = "\\s+".toRegex()
 
         // The tap-built map lags the playhead by a full fingerprint window, so cover that plus slack.
         private val COVERAGE_TIMEOUT = 12.seconds
@@ -105,12 +109,50 @@ class TranscriptWindowExtractor @Inject constructor(
             val inWindow = texts.filter { it.startTimeMs >= 0 && it.startTimeMs < windowEndMs && it.endTimeMs > windowStartMs }
             if (inWindow.isEmpty()) return null
 
-            val passage = inWindow.joinToString(" ") { it.value.trim() }.trim()
-            if (passage.split("\\s+".toRegex()).size < MIN_WORDS) return null
-
+            val fullText = texts.joinToString(" ") { it.value.trim() }
             val firstIndex = texts.indexOfFirst { it === inWindow.first() }
-            val location = texts.take(firstIndex).sumOf { it.value.trim().length + 1 }
-            return TranscriptWindow(passage = passage, location = location, referenceTimeSecs = centerSecs)
+            val windowStart = texts.take(firstIndex).sumOf { it.value.trim().length + 1 }
+            val windowPassage = inWindow.joinToString(" ") { it.value.trim() }.trim()
+
+            val (start, end) = snapToSentences(fullText, windowStart, windowStart + windowPassage.length)
+                ?.takeIf { (snapStart, snapEnd) -> wordCount(fullText.substring(snapStart, snapEnd)) >= MIN_WORDS }
+                ?: return null
+            val raw = fullText.substring(start, end)
+            val location = start + (raw.length - raw.trimStart().length)
+            return TranscriptWindow(passage = raw.trim(), location = location, referenceTimeSecs = centerSecs)
         }
+
+        private fun snapToSentences(text: String, start: Int, end: Int): Pair<Int, Int>? {
+            val iterator = BreakIterator.getSentenceInstance(Locale.getDefault())
+            iterator.setText(text)
+            val snappedStart = if (isSentenceStart(iterator, text, start)) {
+                start
+            } else {
+                iterator.preceding(start).takeIf { it != BreakIterator.DONE && start - it <= MAX_SNAP_EXPANSION } ?: start
+            }
+            val snappedEnd = if (isSentenceEnd(iterator, text, end)) {
+                end
+            } else {
+                iterator.following(end).takeIf { it != BreakIterator.DONE && it - end <= MAX_SNAP_EXPANSION } ?: end
+            }
+            if (snappedStart >= snappedEnd) {
+                return null
+            }
+            return snappedStart to snappedEnd
+        }
+
+        private fun isSentenceStart(iterator: BreakIterator, text: String, position: Int): Boolean {
+            if (iterator.isBoundary(position)) return true
+            val previous = iterator.preceding(position)
+            return previous != BreakIterator.DONE && text.substring(previous, position).isBlank()
+        }
+
+        private fun isSentenceEnd(iterator: BreakIterator, text: String, position: Int): Boolean {
+            if (iterator.isBoundary(position)) return true
+            val next = iterator.following(position)
+            return next != BreakIterator.DONE && text.substring(position, next).isBlank()
+        }
+
+        private fun wordCount(text: String) = text.trim().split(WORD_SEPARATOR).count { it.isNotEmpty() }
     }
 }

@@ -983,7 +983,6 @@ Language: nl
     <string name="notification_channel_description_playback_error">Fouten tijdens playback</string>
     <string name="notification_channel_description_episode">Wordt weergegeven wanneer een nieuwe aflevering uitkomt</string>
     <string name="notification_channel_description_download">Wordt weergegeven wanneer Pocket Casts afleveringen downloadt</string>
-    <string name="change_bookmark_title_hint">Wijzig de titel die deze bladwijzer identificeert</string>
     <string name="bookmark">Bladwijzer</string>
     <string name="details">Details</string>
     <string name="episode">Aflevering</string>
@@ -996,7 +995,6 @@ Language: nl
     <string name="skipping_to">Doorspoelen naar %s</string>
     <string name="playing_bookmark">%s aan het afspelen</string>
     <string name="save_bookmark">Bladwijzer opslaan</string>
-    <string name="add_bookmark_title_hint">Voeg een optionele titel toe om deze bladwijzer eenvoudig te identificeren</string>
     <string name="change_title">Titel wijzigen</string>
     <string name="bookmark_added">Bladwijzer %s toegevoegd</string>
     <string name="add_bookmark_title">Bladwijzer toevoegen</string>

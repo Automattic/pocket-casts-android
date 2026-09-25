@@ -1404,7 +1404,7 @@ class SettingsImpl @Inject constructor(
         setInt(SHOWN_BATTERY_WARNING_KEY, max(0, value))
     }
 
-    override fun getTimesToShowBatteryWarning(): Int = getInt(SHOWN_BATTERY_WARNING_KEY, 4)
+    override fun getTimesToShowBatteryWarning(): Int = getInt(SHOWN_BATTERY_WARNING_KEY, 3)
 
     override val collectAnalytics = UserSetting.BoolPref(
         sharedPrefKey = "SendUsageStatsKey",
@@ -1605,6 +1605,19 @@ class SettingsImpl @Inject constructor(
     override val showReferralsTooltip: UserSetting<Boolean> = UserSetting.BoolPref(
         sharedPrefKey = Settings.SHOW_REFERRALS_TOOLTIP,
         defaultValue = true,
+        sharedPrefs = sharedPreferences,
+    )
+
+    override val showSmartBookmarksTooltip: UserSetting<Boolean> = UserSetting.BoolPref(
+        sharedPrefKey = Settings.SHOW_SMART_BOOKMARKS_TOOLTIP,
+        // Defaults to false so fresh installs never see the tooltip, VersionMigrationsWorker enables it for upgrading users.
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
+
+    override val smartBookmarksTooltipDismissed: UserSetting<Boolean> = UserSetting.BoolPref(
+        sharedPrefKey = Settings.SMART_BOOKMARKS_TOOLTIP_DISMISSED,
+        defaultValue = false,
         sharedPrefs = sharedPreferences,
     )
 

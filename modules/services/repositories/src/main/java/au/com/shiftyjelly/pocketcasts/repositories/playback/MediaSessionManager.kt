@@ -51,11 +51,10 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.eventhorizon.EventHorizon
-import io.reactivex.Completable
+import com.automattic.eventhorizon.PlaybackServiceType
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.Observables
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
@@ -88,6 +87,7 @@ class MediaSessionManager(
     val settings: Settings,
     val context: Context,
     val eventHorizon: EventHorizon,
+    val errorReporter: PlaybackServiceErrorReporter,
     val bookmarkManager: BookmarkManager,
     val browseTreeProvider: BrowseTreeProvider,
     private val applicationScope: CoroutineScope,
@@ -255,6 +255,7 @@ class MediaSessionManager(
                                 LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Failed to add command to queue: $tag")
                             }
                         },
+                        scopeProvider = { scope },
                     ),
                 )
             }
@@ -595,7 +596,16 @@ class MediaSessionManager(
         try {
             context.startService(Intent().setComponent(component))
         } catch (e: Exception) {
-            Timber.e(e, "Failed to start ${component.className}")
+            LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Failed to start ${component.className}: $e")
+            errorReporter.trackServiceStartFailed(
+                service = if (component.className == LegacyPlaybackService::class.java.name) {
+                    PlaybackServiceType.Legacy
+                } else {
+                    PlaybackServiceType.Media3
+                },
+                error = e,
+                source = playbackManager.lastPlaybackSource,
+            )
         }
     }
 
@@ -1221,48 +1231,50 @@ class MediaSessionManager(
         stateBuilder.addCustomAction(skipBackBuilder.build())
     }
 
-    inner class MediaSessionCallback(
+    internal inner class MediaSessionCallback(
         val playbackManager: PlaybackManager,
         val episodeManager: EpisodeManager,
         val enqueueCommand: (String, suspend () -> Unit) -> Unit,
+        scopeProvider: () -> CoroutineScope,
     ) : MediaSessionCompat.Callback() {
 
-        private var playFromSearchDisposable: Disposable? = null
-        private val mediaEventQueue = MediaEventQueue(scopeProvider = { this@MediaSessionManager.scope })
+        private val mediaButtonEventHandler = MediaButtonEventHandler(
+            scopeProvider = scopeProvider,
+            onImmediatePlay = {
+                playbackManager.playIfNotPlaying(sourceView = source)
+            },
+            onMediaEvent = { event ->
+                LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Media button output event: $event")
+                when (event) {
+                    MediaEvent.SingleTap -> handleMediaButtonSingleTap()
+                    MediaEvent.DoubleTap -> handleMediaButtonDoubleTap()
+                    MediaEvent.TripleTap -> handleMediaButtonTripleTap()
+                }
+            },
+            isPlaying = { playbackManager.isPlaying() },
+        )
 
         override fun onMediaButtonEvent(mediaButtonEvent: Intent): Boolean {
-            if (Intent.ACTION_MEDIA_BUTTON == mediaButtonEvent.action) {
-                val keyEvent = IntentCompat.getParcelableExtra(mediaButtonEvent, Intent.EXTRA_KEY_EVENT, KeyEvent::class.java) ?: return false
-                logEvent(keyEvent.toString())
-                if (keyEvent.action == KeyEvent.ACTION_DOWN) {
-                    LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Media button Android event: ${keyEvent.action}")
-                    val inputEvent = when (keyEvent.keyCode) {
-                        KeyEvent.KEYCODE_MEDIA_PLAY, KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE, KeyEvent.KEYCODE_HEADSETHOOK -> MediaEvent.SingleTap
-                        KeyEvent.KEYCODE_MEDIA_NEXT -> MediaEvent.DoubleTap
-                        KeyEvent.KEYCODE_MEDIA_PREVIOUS -> MediaEvent.TripleTap
-                        else -> null
-                    }
-                    LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Media button input event: ${keyEvent.action}")
-
-                    if (inputEvent != null) {
-                        scope.launch {
-                            val outputEvent = mediaEventQueue.consumeEvent(inputEvent)
-                            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Media button output event: ${keyEvent.action}")
-                            when (outputEvent) {
-                                MediaEvent.SingleTap -> handleMediaButtonSingleTap()
-                                MediaEvent.DoubleTap -> handleMediaButtonDoubleTap()
-                                MediaEvent.TripleTap -> handleMediaButtonTripleTap()
-                                null -> Unit
-                            }
-                        }
-                        return true
-                    }
-                }
-            } else {
+            if (Intent.ACTION_MEDIA_BUTTON != mediaButtonEvent.action) {
                 logEvent("onMediaButtonEvent(${mediaButtonEvent.action ?: "unknown action"})")
+                return super.onMediaButtonEvent(mediaButtonEvent)
             }
 
-            return super.onMediaButtonEvent(mediaButtonEvent)
+            val keyEvent = IntentCompat.getParcelableExtra(
+                mediaButtonEvent,
+                Intent.EXTRA_KEY_EVENT,
+                KeyEvent::class.java,
+            ) ?: return false
+            logEvent(keyEvent.toString())
+            if (keyEvent.action == KeyEvent.ACTION_DOWN) {
+                LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Media button Android event: keyCode=${keyEvent.keyCode}")
+            }
+
+            return if (mediaButtonEventHandler.handle(keyEvent)) {
+                true
+            } else {
+                super.onMediaButtonEvent(mediaButtonEvent)
+            }
         }
 
         private fun onAddBookmark() {
@@ -1344,10 +1356,7 @@ class MediaSessionManager(
 
         override fun onPlayFromSearch(query: String?, extras: Bundle?) {
             logEvent("play from search")
-            playFromSearchDisposable?.dispose()
-            playFromSearchDisposable = performPlayFromSearchRx(query)
-                .subscribeOn(Schedulers.io())
-                .subscribeBy(onError = { Timber.e(it) })
+            actions.performPlayFromSearch(query)
         }
 
         override fun onStop() {
@@ -1451,10 +1460,6 @@ class MediaSessionManager(
 
     fun playFromSearchExternal(query: String) {
         actions.performPlayFromSearch(query)
-    }
-
-    private fun performPlayFromSearchRx(searchTerm: String?): Completable {
-        return actions.performPlayFromSearchRx(searchTerm)
     }
 
     @DrawableRes

@@ -20,6 +20,8 @@ import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_DO
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_EPISODE
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_PODCAST
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_AUTO_PLAY
+import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_BOOKMARK_FROM_EPISODE
+import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_BOOKMARK_IS_NEW
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_BOOKMARK_UUID
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_EPISODE_UUID
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_PAGE
@@ -136,7 +138,14 @@ private class AddBookmarkAdapter : DeepLinkAdapter {
 
 private class ChangeBookmarkTitleAdapter : DeepLinkAdapter {
     override fun create(intent: Intent) = if (intent.action == ACTION_OPEN_CHANGE_BOOKMARK_TITLE) {
-        intent.getStringExtra(EXTRA_BOOKMARK_UUID)?.let(::ChangeBookmarkTitleDeepLink)
+        intent.getStringExtra(EXTRA_BOOKMARK_UUID)?.let { uuid ->
+            ChangeBookmarkTitleDeepLink(
+                uuid,
+                intent.getBooleanExtra(EXTRA_BOOKMARK_IS_NEW, false),
+                intent.getBooleanExtra(EXTRA_BOOKMARK_FROM_EPISODE, false),
+                intent.getStringExtra(EXTRA_SOURCE_VIEW),
+            )
+        }
     } else {
         null
     }
