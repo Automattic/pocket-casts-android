@@ -1,25 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-09-10 14:58:41+0000
+Translation-Revision-Date: 2026-09-16 18:10:43+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: it
 -->
 <resources>
+    <string name="bookmark_edit_transcript_title">Modifica trascrizione</string>
+    <string name="bookmarks_upgrade_example_title">Sala delle audizioni</string>
+    <string name="bookmark_edit_transcript_subtitle">Seleziona un passaggio della trascrizione per questo segnalibro</string>
     <string name="search_filters_networks">Reti</string>
     <string name="discover_networks">Reti</string>
     <string name="discover_network">Rete</string>
     <string name="device_approve_login_required">Per connettere il dispositivo, devi avere un account. Accedi o crea un account e riprova.</string>
     <string name="device_approve_error_message">Riprova più tardi.</string>
     <string name="device_approve_error_title">Approvazione del dispositivo non riuscita</string>
-    <string name="device_approve_expired_message">Torna alla TV per generarne una nuova.</string>
     <string name="device_approve_expired_title">Il codice QR è scaduto</string>
-    <string name="device_approve_success_message">La TV è ora connessa al tuo account.</string>
-    <string name="device_approve_success_title">TV connessa</string>
     <string name="device_approve_connect">Connetti</string>
     <string name="device_approve_signing_in_as">Accesso come…</string>
     <string name="device_approve_description">L\'ascolto verrà sincronizzato automaticamente.\nPuoi disconnetterti in qualsiasi momento da Impostazioni.</string>
-    <string name="device_approve_title">Connettiti alla TV</string>
     <string name="tv_settings_subscription_plan">Piano</string>
     <string name="tv_settings_subscription_next_renewal">Prossimo rinnovo</string>
     <string name="tv_settings_subscription_lifetime">A vita</string>
@@ -1734,7 +1733,6 @@ Language: it
     <string name="settings_apply_group_by">Vuoi modificare tutti i tuoi podcast esistenti in modo che vengano raggruppati per %s?</string>
     <string name="settings_apply_archived_show">Vuoi modificare tutti i tuoi podcast esistenti in modo che vengano visualizzati gli archiviati?</string>
     <string name="settings_apply_archived_hide">Vuoi modificare tutti i tuoi podcast esistenti in modo che vengano nascosti gli archiviati?</string>
-    <string name="settings_app_icon_updated_message">Questa nuova icona potrebbe richiedere alcuni minuti per essere visualizzata e vedrai due icone nella schermata di tutte le app. Questo è normale. Trascina la nuova sulla schermata iniziale e dovrebbe essere tutto in ordine.</string>
     <string name="settings_app_icon_updated">Icona aggiornata</string>
     <string name="settings_app_icon_title">Titolo</string>
     <string name="settings_app_icon_image">immagine dell\'icona</string>
@@ -1938,6 +1936,7 @@ Language: it
     <string name="profile_next_payment">Prossimo pagamento: %s</string>
     <string name="profile_new_password">Nuova password</string>
     <string name="profile_new_email_address">Nuovo indirizzo e-mail</string>
+    <string name="profile_license_agreement">Pocket Casts tiene alla tua privacy. Questa Politica sulla privacy spiega quali informazioni raccogliamo su di te e quali sono le motivazioni per cui lo facciamo, cosa possiamo fare con tali informazioni e come le gestiamo. Quanto detto si applica alle app Pocket Casts per iOS e Android e al servizio web di Pocket Casts con le app per macOS e Windows associate (obbligato in solido, il Servizio) Usando il Servizio, accetti la presente Politica sulla privacy. Se attivi le notifiche push nell\'app, archiviamo il token push che Apple ci fornisce per inviare tali notifiche push al tuo dispositivo. Se acquisti l\'app web, archiviamo un ID transazione per il tuo acquisto. Se scegli di non creare un account e non usi le notifiche push, non viene archiviato alcun dato su di te sui nostri server. Anche il servizio web di Pocket Casts usa cookie e tecnologie simili per mantenere l\'accesso. Se scegli di generare una richiesta di supporto dall\'interno del Servizio, possiamo generare un allegato contenente dati aggiuntivi per assisterti durante l\'indirizzamento della tua richiesta di supporto, che sei libero di visualizzare prima dell\'invio.</string>
     <string name="profile_last_refresh">Ultimo aggiornamento: %s fa</string>
     <string name="profile_joined">Stai partecipando:</string>
     <string name="profile_get_plus">Ottieni Pocket Casts Plus per sbloccare questa funzionalità e molto altro.</string>
@@ -1951,7 +1950,6 @@ Language: it
     <string name="profile_ended">Terminato il %s</string>
     <string name="profile_end_tour">FINE TOUR</string>
     <string name="profile_email">E-mail</string>
-    <string name="profile_license_agreement">Pocket Casts tiene alla tua privacy. Questa Politica sulla privacy spiega quali informazioni raccogliamo su di te e quali sono le motivazioni per cui lo facciamo, cosa possiamo fare con tali informazioni e come le gestiamo. Quanto detto si applica alle app Pocket Casts per iOS e Android e al servizio web di Pocket Casts con le app per macOS e Windows associate (obbligato in solido, il Servizio) Usando il Servizio, accetti la presente Politica sulla privacy. Se attivi le notifiche push nell\'app, archiviamo il token push che Apple ci fornisce per inviare tali notifiche push al tuo dispositivo. Se acquisti l\'app web, archiviamo un ID transazione per il tuo acquisto. Se scegli di non creare un account e non usi le notifiche push, non viene archiviato alcun dato su di te sui nostri server. Anche il servizio web di Pocket Casts usa cookie e tecnologie simili per mantenere l\'accesso. Se scegli di generare una richiesta di supporto dall\'interno del Servizio, possiamo generare un allegato contenente dati aggiuntivi per assisterti durante l\'indirizzamento della tua richiesta di supporto, che sei libero di visualizzare prima dell\'invio.</string>
     <string name="profile_deleting_account">Eliminazione dell\'account in corso…</string>
     <string name="profile_delete_from_device_title">Elimina dal dispositivo</string>
     <string name="profile_delete_from_device_only">Elimina solo dal dispositivo</string>

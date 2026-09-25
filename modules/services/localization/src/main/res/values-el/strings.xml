@@ -1271,7 +1271,6 @@ Language: el_GR
     <string name="settings_auto_archive_episode_limit">Όριο επεισοδίων</string>
     <string name="settings_apply_to_existing_podcasts">Εφαρμογή σε υπάρχοντα podcasts;</string>
     <string name="settings_apply_to_existing">Εφαρμογή σε υπάρχοντα</string>
-    <string name="settings_app_icon_updated_message">Αυτό το νέο εικονίδιο μπορεί να χρειαστεί μερικά λεπτά για να εμφανιστεί και θα βλέπεις δύο εικονίδια στην οθόνη όλων των εφαρμογών. Αυτό είναι φυσιολογικό. Σύρε το νέο εικονίδιο στην αρχική σου οθόνη και είσαι εντάξει!</string>
     <string name="settings_app_icon_updated">Εικονίδιο ενημερώθηκε</string>
     <string name="settings_app_icon_title">Τίτλος</string>
     <string name="settings_app_icon_image">εικόνα εικονιδίου</string>

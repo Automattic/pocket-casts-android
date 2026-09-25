@@ -786,7 +786,6 @@ Language: nb_NO
     <string name="settings_apply_group_by">Vil du endre alle eksisterende podcaster til å bli gruppert av %s?</string>
     <string name="settings_apply_archived_show">Vil du endre alle eksisterende podcaster til å vise de arkiverte?</string>
     <string name="settings_apply_archived_hide">Vil du endre alle eksisterende podcaster til å skjule de arkiverte?</string>
-    <string name="settings_app_icon_updated_message">Det kan ta noen minutter før dette nye ikonet vises, og du ser to ikoner på skjermen med alle apper. Dette er normalt. Dra det nye ikonet til startskjermen, så er du klar!</string>
     <string name="settings_app_icon_updated">Ikon oppdatert</string>
     <string name="settings_app_icon_title">Tittel</string>
     <string name="settings_app_icon_image">ikonbilde</string>

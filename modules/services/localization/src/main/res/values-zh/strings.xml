@@ -1,25 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-09-10 11:55:24+0000
+Translation-Revision-Date: 2026-09-16 18:10:43+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="bookmark_edit_transcript_title">编辑文字转录稿</string>
+    <string name="bookmarks_upgrade_example_title">试镜室</string>
+    <string name="bookmark_edit_transcript_subtitle">为此书签选择文字转录稿段落</string>
     <string name="search_filters_networks">网络</string>
     <string name="discover_networks">网络</string>
     <string name="discover_network">网络</string>
     <string name="device_approve_login_required">要连接您的设备，您需要有一个账户。 请登录或创建一个账户，然后重试。</string>
     <string name="device_approve_error_message">请稍后重试。</string>
     <string name="device_approve_error_title">设备审批失败</string>
-    <string name="device_approve_expired_message">请返回您的 TV 生成一个新的二维码。</string>
     <string name="device_approve_expired_title">您的二维码已过期</string>
-    <string name="device_approve_success_message">您的 TV 现已连接到您的账户。</string>
-    <string name="device_approve_success_title">TV 已连接</string>
     <string name="device_approve_connect">连接</string>
     <string name="device_approve_signing_in_as">正在以…身份登录</string>
     <string name="device_approve_description">您的收听进度将自动同步。\n您可以随时在“设置”中断开连接。</string>
-    <string name="device_approve_title">连接到您的 TV</string>
     <string name="tv_settings_subscription_plan">套餐</string>
     <string name="tv_settings_subscription_next_renewal">下次续订时间</string>
     <string name="tv_settings_subscription_lifetime">使用期限</string>
@@ -1797,7 +1796,6 @@ Language: zh_CN
     <string name="settings_apply_group_by">是否要将所有现有播客更改为按%s分组？</string>
     <string name="settings_apply_archived_show">是否要将所有现有播客更改为显示已存档的剧集？</string>
     <string name="settings_apply_archived_hide">是否要将所有现有播客更改为隐藏已存档的剧集？</string>
-    <string name="settings_app_icon_updated_message">此新图标可能需要几分钟时间才能显示，您将在“所有应用程序”屏幕中看到两个图标。 这是正常的。 将一个新图标拖放到您的主屏幕上，您应该可以开始！</string>
     <string name="settings_app_icon_updated">图标已更新</string>
     <string name="settings_app_icon_title">标题</string>
     <string name="settings_app_icon_image">图标图像</string>

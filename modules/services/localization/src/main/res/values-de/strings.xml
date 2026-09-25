@@ -1,25 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-09-09 10:57:26+0000
+Translation-Revision-Date: 2026-09-16 18:10:43+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: de
 -->
 <resources>
+    <string name="bookmark_edit_transcript_title">Transkript bearbeiten</string>
+    <string name="bookmarks_upgrade_example_title">Der Casting-Raum</string>
+    <string name="bookmark_edit_transcript_subtitle">Wähle eine Transkriptpassage für dieses Lesezeichen aus</string>
     <string name="search_filters_networks">Netzwerke</string>
     <string name="discover_networks">Netzwerke</string>
     <string name="discover_network">Netzwerk</string>
     <string name="device_approve_login_required">Um dein Gerät zu verbinden, benötigst du ein Konto. Bitte melde dich an oder erstelle ein Konto und versuche es erneut.</string>
     <string name="device_approve_error_message">Bitte versuche es später erneut.</string>
     <string name="device_approve_error_title">Gerätegenehmigung fehlgeschlagen</string>
-    <string name="device_approve_expired_message">Bitte gehe zurück zu deinem Fernseher, um einen neuen zu generieren.</string>
     <string name="device_approve_expired_title">Dein QR-Code ist abgelaufen</string>
-    <string name="device_approve_success_message">Dein Fernseher ist jetzt mit deinem Konto verbunden.</string>
-    <string name="device_approve_success_title">Fernseher verbunden</string>
     <string name="device_approve_connect">Verbinden</string>
     <string name="device_approve_signing_in_as">Anmelden als …</string>
     <string name="device_approve_description">Dein Hörverlauf wird automatisch synchronisiert.\nDu kannst die Verbindung jederzeit in den Einstellungen trennen.</string>
-    <string name="device_approve_title">Mit dem Fernseher verbinden</string>
     <string name="tv_settings_subscription_plan">Tarif</string>
     <string name="tv_settings_subscription_next_renewal">Nächste Verlängerung</string>
     <string name="tv_settings_subscription_lifetime">Lebenslang</string>
@@ -1757,7 +1756,6 @@ Language: de
     <string name="settings_theme_electricity">Elektrizität</string>
     <string name="settings_theme_radioactivity">Radioaktivität</string>
     <string name="settings_use_android_light_dark_mode">Android Light Mode/Dark Mode verwenden</string>
-    <string name="settings_app_icon_updated_message">Es kann ein paar Minuten dauern, bis dieses neue Icon angezeigt wird. Du siehst dann in deiner App-Ansicht zwei Icons – das ist normal. Ziehe einfach das neue auf deinen Startbildschirm und schon ist alles erledigt!</string>
     <string name="settings_theme_classic">Klassisch</string>
     <string name="settings_app_icon_red_velvet">Roter Samt</string>
     <string name="settings_app_icon_round_dark">Rund dunkel</string>

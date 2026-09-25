@@ -1,25 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-09-10 09:58:32+0000
+Translation-Revision-Date: 2026-09-18 08:40:55+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="bookmark_edit_transcript_title">Redigera transkription</string>
+    <string name="bookmarks_upgrade_example_title">Provspelningsrummet</string>
+    <string name="bookmark_edit_transcript_subtitle">Välj en transkriptionspassage för detta bokmärke</string>
     <string name="search_filters_networks">Nätverk</string>
     <string name="discover_networks">Nätverk</string>
     <string name="discover_network">Nätverk</string>
     <string name="device_approve_login_required">För att ansluta din enhet måste du ha ett konto. Logga in eller skapa ett konto och försök igen.</string>
     <string name="device_approve_error_message">Försök igen senare.</string>
     <string name="device_approve_error_title">Godkännande av enhet misslyckades</string>
-    <string name="device_approve_expired_message">Gå tillbaka till din TV för att generera en ny.</string>
     <string name="device_approve_expired_title">Din QR-kod har löpt ut</string>
-    <string name="device_approve_success_message">Din TV är nu ansluten till ditt konto.</string>
-    <string name="device_approve_success_title">TV ansluten</string>
     <string name="device_approve_connect">Anslut</string>
     <string name="device_approve_signing_in_as">Loggar in som…</string>
+    <string name="device_approve_success_title">Enhet ansluten</string>
+    <string name="device_approve_success_message">Din enhet är nu ansluten till ditt konto.</string>
+    <string name="device_approve_expired_message">Gå tillbaka till din enhet för att generera en ny.</string>
     <string name="device_approve_description">Din lyssning synkroniseras automatiskt.\nDu kan när som helst koppla från Inställningar.</string>
-    <string name="device_approve_title">Anslut till din TV</string>
     <string name="tv_settings_subscription_plan">Paket</string>
     <string name="tv_settings_subscription_next_renewal">Nästa förnyelse</string>
     <string name="tv_settings_subscription_lifetime">Livstid</string>
@@ -1786,7 +1788,6 @@ Language: sv_SE
     <string name="settings_auto_archive_inactive">Arkivera inaktiva avsnitt</string>
     <string name="settings_auto_archive_episode_limit">Avsnittsgräns</string>
     <string name="settings_apply_group_by">Vill du ändra så att alla dina befintliga podcasts grupperas som %s?</string>
-    <string name="settings_app_icon_updated_message">Det kan ta ett par minuter innan den nya ikonen visas. Du kommer att se två ikoner på skärmen i alla dina appar. Detta är normalt. Dra den nya ikonen till din startskärm. Sedan är du klar!</string>
     <string name="settings_app_icon_updated">Ikon uppdaterad</string>
     <string name="settings_app_icon_title">Rubrik</string>
     <string name="settings_app_icon_image">ikonbild</string>
@@ -1965,10 +1966,10 @@ Language: sv_SE
     <string name="profile_free_account">Gratis konto</string>
     <string name="profile_files_remove_image">Byt bild</string>
     <string name="profile_files_empty_summary">Vill du lyssna på dina egna filer?\nTryck på knappen + för att öppna dem i Pocket Casts så visas de här.</string>
-    <string name="profile_license_agreement">Pocket Casts värdesätter din integritet. Denna sekretesspolicy beskriver vilken information vi samlar in om dig, varför vi samlar in informationen, vad vi kan göra med informationen och hur vi hanterar den. Den gäller för Pocket Casts-apparna på iOS och Android, samt för Pocket Casts-webbtjänsten med tillhörande macOS- och Windows-appar (gemensamt och separat – tjänsten). Genom att använda tjänsten samtycker du till denna sekretesspolicy. Om du aktiverar push-notiser i appen lagrar vi den push-token som Apple tillhandahåller för att leverera dessa push-notiser till din enhet. Om du köper webbappen lagrar vi ett transaktions-ID för ditt köp. Om du väljer att inte skapa ett konto, och inte använder push-notiser, lagras ingen data om dig på våra servrar. Pocket Casts-webbtjänsten använder även cookies och liknande teknik för att hålla dig inloggad. Om du skulle välja att skapa en supportbegäran inuti tjänsten kan vi generera en bilaga som innehåller ytterligare data för att underlätta hanteringen av din supportbegäran. Du är välkommen att granska denna bilaga innan dess inskickande.</string>
     <string name="profile_files_add_filename">Namn</string>
     <string name="profile_file_locked">låst</string>
     <string name="profile_file">Fil</string>
+    <string name="profile_license_agreement">Pocket Casts värdesätter din integritet. Denna sekretesspolicy beskriver vilken information vi samlar in om dig, varför vi samlar in informationen, vad vi kan göra med informationen och hur vi hanterar den. Den gäller för Pocket Casts-apparna på iOS och Android, samt för Pocket Casts-webbtjänsten med tillhörande macOS- och Windows-appar (gemensamt och separat – tjänsten). Genom att använda tjänsten samtycker du till denna sekretesspolicy. Om du aktiverar push-notiser i appen lagrar vi den push-token som Apple tillhandahåller för att leverera dessa push-notiser till din enhet. Om du köper webbappen lagrar vi ett transaktions-ID för ditt köp. Om du väljer att inte skapa ett konto, och inte använder push-notiser, lagras ingen data om dig på våra servrar. Pocket Casts-webbtjänsten använder även cookies och liknande teknik för att hålla dig inloggad. Om du skulle välja att skapa en supportbegäran inuti tjänsten kan vi generera en bilaga som innehåller ytterligare data för att underlätta hanteringen av din supportbegäran. Du är välkommen att granska denna bilaga innan dess inskickande.</string>
     <string name="profile_feature_requires">Den här funktionen kräver\nPocket Casts Plus</string>
     <string name="profile_ends">Slutar %s</string>
     <string name="profile_ended">Slutade %s</string>
