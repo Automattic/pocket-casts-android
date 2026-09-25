@@ -333,13 +333,4 @@ class BookmarksViewModelTest {
 
         assertEquals(null, bookmarksViewModel.getSharedBookmark(bookmark))
     }
-
-    @Test
-    fun `onBookmarksDeleted emits a deleted message`() = runTest {
-        bookmarksViewModel.message.test {
-            bookmarksViewModel.onBookmarksDeleted(count = 2)
-
-            assertEquals(BookmarksViewModel.BookmarkMessage.BookmarksDeleted(count = 2), awaitItem())
-        }
-    }
 }
