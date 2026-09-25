@@ -238,6 +238,9 @@ open class PlaybackManager @Inject constructor(
     private var syncTimerDisposable: Disposable? = null
     private var lastWarnedPlayedEpisodeUuid: String? = null
     private var lastPlayedEpisodeUuid: String? = null
+
+    @Volatile
+    private var replayableEpisodeUuid: String? = null
     private var lastTrackedAutoPlaySource: AutoPlaySource? = null
 
     private val lastPrefetchedEpisodeUuid = AtomicReference<String?>(null)
@@ -693,7 +696,23 @@ open class PlaybackManager @Inject constructor(
     ) {
         if (upNextQueue.currentEpisode != null) {
             loadEpisodeWhenRequired(sourceView, showedStreamWarning)
+        } else {
+            replayFinishedEpisode(sourceView, showedStreamWarning)
         }
+    }
+
+    private suspend fun replayFinishedEpisode(sourceView: SourceView, showedStreamWarning: Boolean) {
+        val uuid = replayableEpisodeUuid ?: return
+        replayableEpisodeUuid = null
+        if (!Util.isCarUiMode(application)) {
+            return
+        }
+        val episode = episodeManager.findEpisodeByUuid(uuid)
+        if (episode == null) {
+            shutdown()
+            return
+        }
+        playNowSuspend(episode = episode, showedStreamWarning = showedStreamWarning, sourceView = sourceView)
     }
 
     fun playNow(
@@ -1118,6 +1137,26 @@ open class PlaybackManager @Inject constructor(
 
         withContext(Dispatchers.Main) {
             playbackStateRelay.accept(PlaybackState(state = PlaybackState.State.EMPTY, lastChangeFrom = LastChangeFrom.OnShutdown.value))
+        }
+        castManager.endSession()
+    }
+
+    private suspend fun shutdownKeepingEpisodeVisible() {
+        stop()
+
+        audioNoisyManager.unregister()
+        focusManager.giveUpAudioFocus()
+
+        withContext(Dispatchers.Main) {
+            playbackStateRelay.blockingFirst().let {
+                playbackStateRelay.accept(
+                    it.copy(
+                        state = PlaybackState.State.PAUSED,
+                        isPrepared = false,
+                        lastChangeFrom = LastChangeFrom.OnShutdown.value,
+                    ),
+                )
+            }
         }
         castManager.endSession()
     }
@@ -1833,8 +1872,13 @@ open class PlaybackManager @Inject constructor(
             nextEpisode = autoLoadEpisode(autoPlay)
             if (nextEpisode == null) {
                 lastTrackedAutoPlaySource = null
-                stop()
-                shutdown()
+                if (episode != null && Util.isCarUiMode(application)) {
+                    replayableEpisodeUuid = episode.uuid
+                    shutdownKeepingEpisodeVisible()
+                } else {
+                    stop()
+                    shutdown()
+                }
             }
         } else {
             loadCurrentEpisode(play = autoPlay, sourceView = SourceView.AUTO_PLAY)
@@ -2129,6 +2173,7 @@ open class PlaybackManager @Inject constructor(
         forceStream: Boolean = false,
         sourceView: SourceView = SourceView.UNKNOWN,
     ) {
+        replayableEpisodeUuid = null
         // make sure we have the most recent copy from the database
         val episode = when (val currentUpNextEpisode = upNextQueue.currentEpisode) {
             is PodcastEpisode -> {
