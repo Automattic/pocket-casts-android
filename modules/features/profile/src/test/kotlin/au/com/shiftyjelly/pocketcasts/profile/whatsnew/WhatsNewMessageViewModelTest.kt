@@ -17,6 +17,9 @@ import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewResearch
 import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewTargeting
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.WhatsNewActionTappedEvent
+import com.automattic.eventhorizon.WhatsNewActionType
+import com.automattic.eventhorizon.WhatsNewMessageShownEvent
 import com.automattic.eventhorizon.WhatsNewPollResponseSubmittedEvent
 import java.time.Instant
 import kotlinx.coroutines.CompletableDeferred
@@ -151,8 +154,8 @@ class WhatsNewMessageViewModelTest {
         feedMessages.value = listOf(
             message(
                 "unsupported",
-                page(WhatsNewAction(event = "open_upsell", label = "Upgrade")),
                 page(WhatsNewAction(event = "open_time_machine", label = "Travel")),
+                page(WhatsNewAction(event = "open_hyperspace", label = "Jump")),
             ),
         )
 
@@ -196,7 +199,7 @@ class WhatsNewMessageViewModelTest {
             assertTrue(poll.canSubmit)
         }
         verify(manager, never()).markAsResponded(any())
-        verifyNoInteractions(eventHorizon)
+        verify(eventHorizon, never()).track(any<WhatsNewPollResponseSubmittedEvent>())
     }
 
     @Test
@@ -263,7 +266,7 @@ class WhatsNewMessageViewModelTest {
             viewModel.onSubmitClick()
         }
         verify(manager, never()).markAsResponded(any())
-        verifyNoInteractions(eventHorizon)
+        verify(eventHorizon, never()).track(any<WhatsNewPollResponseSubmittedEvent>())
     }
 
     @Test
@@ -276,7 +279,7 @@ class WhatsNewMessageViewModelTest {
             viewModel.onSubmitClick()
         }
         verify(manager, never()).markAsResponded(any())
-        verifyNoInteractions(eventHorizon)
+        verify(eventHorizon, never()).track(any<WhatsNewPollResponseSubmittedEvent>())
     }
 
     @Test
@@ -294,7 +297,7 @@ class WhatsNewMessageViewModelTest {
             expectNoEvents()
         }
         verify(manager, never()).markAsResponded(any())
-        verifyNoInteractions(eventHorizon)
+        verify(eventHorizon, never()).track(any<WhatsNewPollResponseSubmittedEvent>())
     }
 
     private fun research() = message("research").copy(
@@ -316,6 +319,50 @@ class WhatsNewMessageViewModelTest {
     )
 
     private val WhatsNewMessage.researchContent get() = (content as WhatsNewContent.Research).research
+
+    @Test
+    fun `showing a message reports it once however often the feed emits`() = runTest {
+        val message = message("shown")
+        feedMessages.value = listOf(message)
+
+        createViewModel("shown").uiState.test {
+            expectMostRecentItem()
+            feedMessages.value = listOf(message, message("other"))
+            feedMessages.value = listOf(message)
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify(eventHorizon, times(1)).track(
+            WhatsNewMessageShownEvent(messageUuid = "shown", messageType = AnalyticsMessageType.Tip),
+        )
+    }
+
+    @Test
+    fun `a message the feed does not list is not reported as shown`() = runTest {
+        feedMessages.value = listOf(message("other"))
+
+        createViewModel("hidden").uiState.test {
+            expectMostRecentItem()
+        }
+        verifyNoInteractions(eventHorizon)
+    }
+
+    @Test
+    fun `tapping an action reports it with its message`() = runTest {
+        feedMessages.value = listOf(message("action", page(WhatsNewAction(event = "open_upsell", label = "Upgrade"))))
+        val viewModel = createViewModel("action")
+
+        viewModel.uiState.test {
+            val action = (expectMostRecentItem() as UiState.Loaded).pages.single().action!!
+            viewModel.onActionClick(action.event)
+        }
+        verify(eventHorizon).track(
+            WhatsNewActionTappedEvent(
+                messageUuid = "action",
+                messageType = AnalyticsMessageType.Tip,
+                action = WhatsNewActionType.OpenUpsell,
+            ),
+        )
+    }
 
     private fun page(action: WhatsNewAction?) = WhatsNewPage(image = null, heading = "Heading", description = "Description", action = action)
 

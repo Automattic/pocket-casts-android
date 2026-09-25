@@ -12,6 +12,9 @@ import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.profile.whatsnew.WhatsNewMessageViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.settings.SettingsFragment
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
@@ -60,13 +63,24 @@ class WhatsNewMessageFragment : BaseFragment() {
 
     private fun perform(event: WhatsNewActionEvent) {
         val host = activity as? FragmentHostListener ?: return
+        viewModel.onActionClick(event)
         when (event) {
             WhatsNewActionEvent.OpenPodcasts -> host.openTab(VR.id.navigation_podcasts)
+
             WhatsNewActionEvent.OpenDiscover -> host.openTab(VR.id.navigation_discover)
+
             WhatsNewActionEvent.OpenUpNext -> host.openTab(VR.id.navigation_upnext)
+
             WhatsNewActionEvent.OpenPlaylists -> host.openTab(VR.id.navigation_filters)
+
             WhatsNewActionEvent.OpenProfile -> host.closeProfileToRoot()
+
             WhatsNewActionEvent.OpenSettings -> host.addFragment(SettingsFragment())
+
+            WhatsNewActionEvent.OpenUpsell -> OnboardingLauncher.openOnboardingFlow(
+                requireActivity(),
+                OnboardingFlow.Upsell(OnboardingUpgradeSource.WHATS_NEW),
+            )
         }
     }
 

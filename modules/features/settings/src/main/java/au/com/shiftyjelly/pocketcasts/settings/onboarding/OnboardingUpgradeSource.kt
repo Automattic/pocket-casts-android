@@ -92,6 +92,9 @@ enum class OnboardingUpgradeSource(
     AI_SUMMARIES(
         analyticsValue = OnboardingSourceType.Unknown,
     ),
+    WHATS_NEW(
+        analyticsValue = OnboardingSourceType.WhatsNew,
+    ),
     FINISHED_ONBOARDING(
         analyticsValue = OnboardingSourceType.AccountCreated,
     ),
