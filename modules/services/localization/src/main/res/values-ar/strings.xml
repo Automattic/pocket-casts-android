@@ -11,15 +11,11 @@ Language: ar
     <string name="discover_network">الشبكة</string>
     <string name="device_approve_error_message">يُرجى المحاولة مرة أخرى لاحقًا.</string>
     <string name="device_approve_error_title">فشلت الموافقة على ربط الجهاز</string>
-    <string name="device_approve_expired_message">يُرجى الرجوع إلى التلفاز الخاص بك لإنشاء رمز جديد.</string>
     <string name="device_approve_expired_title">انتهت صلاحية رمز الاستجابة السريعة الخاص بك</string>
-    <string name="device_approve_success_message">تم الآن ربط التلفاز الخاص بك بحسابك.</string>
-    <string name="device_approve_success_title">التلفزيون متصل</string>
     <string name="device_approve_connect">ربط</string>
     <string name="device_approve_signing_in_as">جارٍ تسجيل الدخول باسم…</string>
     <string name="device_approve_login_required">لربط جهازك، يجب أن يكون لديك حساب. يُرجى تسجيل الدخول أو إنشاء حساب والمحاولة مرة أخرى.</string>
     <string name="device_approve_description">ستتم مزامنة سجل الاستماع الخاص بك تلقائيًا.\nيمكنك قطع الاتصال في أي وقت من الإعدادات.</string>
-    <string name="device_approve_title">الربط بالتلفاز الخاص بك</string>
     <string name="tv_history_empty_subtitle">ستظهر الحلقات التي تقوم بتشغيلها هنا</string>
     <string name="tv_history_empty_title">لا يوجد سجل استماع</string>
     <string name="tv_settings_terms_of_use_qr_message">امسح رمز الاستجابة السريعة أدناه، أو افتح عنوان الموقع الموجود على هاتفك للاطلاع على شروط الاستخدام.</string>
@@ -1788,7 +1784,6 @@ Language: ar
     <string name="settings_apply_group_by">هل ترغب في تغيير جميع حلقات البث الصوتي الموجودة الخاصة بك ليتم تجميعها حسب %s؟</string>
     <string name="settings_apply_archived_show">هل ترغب في تغيير جميع حلقات البث الصوتي الموجودة الخاصة بك لعرض حلقات البث الصوتي التي تمت أرشفتها؟</string>
     <string name="settings_apply_archived_hide">هل ترغب في تغيير جميع حلقات البث الصوتي الموجودة الخاصة بك لإخفاء حلقات البث الصوتي التي تمت أرشفتها؟</string>
-    <string name="settings_app_icon_updated_message">قد يستغرق ظهور هذه الأيقونة الجديدة بضع دقائق، وسترى أيقونتين في شاشة تطبيقاتك. هذا أمر طبيعي. اسحب الأيقونة الجديدة إلى شاشتك الرئيسية، وعندئذٍ ينبغي أن تكون جاهزًا للبدء!</string>
     <string name="settings_app_icon_updated">تم تحديث الأيقونة</string>
     <string name="settings_app_icon_title">الاسم</string>
     <string name="settings_app_icon_image">صورة الأيقونة</string>

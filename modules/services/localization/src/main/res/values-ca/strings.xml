@@ -1,25 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-09-08 23:29:41+0000
+Translation-Revision-Date: 2026-09-16 18:10:43+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: ca
 -->
 <resources>
+    <string name="bookmark_edit_transcript_title">Edita la transcripció</string>
+    <string name="bookmarks_upgrade_example_title">La sala d\'audicions</string>
+    <string name="bookmark_edit_transcript_subtitle">Selecciona un fragment de la transcripció per a aquest marcador</string>
     <string name="search_filters_networks">Xarxes</string>
     <string name="discover_networks">Xarxes</string>
     <string name="discover_network">Xarxa</string>
     <string name="device_approve_login_required">Per connectar el teu dispositiu necessites tenir un compte. Inicia sessió o crea un compte i torna-ho a provar.</string>
     <string name="device_approve_error_message">Torna-ho a intentar més tard.</string>
     <string name="device_approve_error_title">No s\'ha pogut aprovar el dispositiu</string>
-    <string name="device_approve_expired_message">Torna a la teva TV per generar-ne un de nou.</string>
     <string name="device_approve_expired_title">El teu codi QR ha caducat</string>
-    <string name="device_approve_success_message">La teva TV ja està connectada al teu compte.</string>
-    <string name="device_approve_success_title">TV connectada</string>
     <string name="device_approve_connect">Connecta</string>
     <string name="device_approve_signing_in_as">Iniciant la sessió com a…</string>
     <string name="device_approve_description">L\'escolta se sincronitzarà automàticament.\nPots desconnectar-te en qualsevol moment des d\'Ajustos.</string>
-    <string name="device_approve_title">Connecta la teva TV</string>
     <string name="tv_settings_subscription_plan">Pla</string>
     <string name="tv_settings_subscription_next_renewal">Pròxima renovació</string>
     <string name="tv_settings_subscription_lifetime">De per vida</string>
@@ -1782,7 +1781,6 @@ Language: ca
     <string name="settings_auto_download_podcasts">Descarrega pòdcasts automàticament</string>
     <string name="settings_auto_download_clear_errors">Esborra tots els errors de descàrrega</string>
     <string name="settings_auto_archive_inactive">Arxiva els episodis inactius</string>
-    <string name="settings_app_icon_updated_message">És possible que la icona nova trigui un parell de minuts a aparèixer i veuràs dues icones a la pantalla on es mostren les teves aplicacions. És normal. Arrossega la nova a la pantalla d\'inici i estarà tot llest!</string>
     <string name="plus_upgrade_to_pocket_casts_plus">Actualitza a Pocket Casts Plus</string>
     <string name="discover">Descobreix</string>
     <string name="settings_status_service_discover">Descobreix i cerca</string>
@@ -2038,11 +2036,11 @@ Language: ca
     <string name="profile_reset_password_sent">S\'ha enviat l\'enllaç per a recuperar la contrasenya</string>
     <string name="profile_promo_sign_in_or_create_summary">Es requereix un compte de Pocket Casts per a Pocket Casts Plus. Així, podràs escoltar els pòdcasts a tots els teus dispositius sense interrupcions i de forma fàcil.\n\nCrea un compte o inicia sessió per a canviar el teu accés a Pocket Casts Plus.</string>
     <string name="profile_next_payment">Pròxim pagament: %s</string>
+    <string name="profile_license_agreement">Pocket Casts valora la teva privadesa. Aquesta política de privadesa explica quina informació recopilem sobre tu i per què, què podem fer amb aquesta informació i com la gestionem. S\'aplica a les aplicacions Pocket Casts per iOS i Android, i al servei web Pocket Casts amb les aplicacions associades per macOS i Windows (conjuntament i de manera solidària, el Servei). En utilitzar el servei, acceptes aquesta política de privadesa. Si actives les notificacions push a l\'aplicació, emmagatzemem el token push que Apple ens proporciona per a poder enviar-te aquestes notificacions push al teu dispositiu. Si compres l\'aplicació web, emmagatzemem una id de transacció per la teva compra. Si decideixes no crear un compte, i no utilitzes notificacions push, no s\'emmagatzema cap dada teva als nostres servidors. El servei web Pocket Casts també utilitza galetes i tecnologies similars per a mantenir-te connectat. Si decideixes generar una sol·licitud d\'assistència des del servei, podem generar un adjunt que contingui dades addicionals per a ajudar a abordar la teva sol·licitud d\'assistència que pots consultar abans de la seva presentació.</string>
     <string name="profile_get_plus">Aconsegueix Pocket Casts Plus per a desbloquejar aquesta funció i moltes més!</string>
     <string name="profile_files_empty_summary">Vols escoltar els teus propis fitxers? \nToca el botó + per a obrir-los a Pocket Casts, i apareixeran aquí.</string>
     <string name="filters_no_episodes">No s\'han trobat episodis</string>
     <string name="filters_create_select_criteria">Selecciona els teus criteris de filtre amb aquests botons per a crear una llista de reproducció intel·ligent d\'episodis actualitzada.</string>
-    <string name="profile_license_agreement">Pocket Casts valora la teva privadesa. Aquesta política de privadesa explica quina informació recopilem sobre tu i per què, què podem fer amb aquesta informació i com la gestionem. S\'aplica a les aplicacions Pocket Casts per iOS i Android, i al servei web Pocket Casts amb les aplicacions associades per macOS i Windows (conjuntament i de manera solidària, el Servei). En utilitzar el servei, acceptes aquesta política de privadesa. Si actives les notificacions push a l\'aplicació, emmagatzemem el token push que Apple ens proporciona per a poder enviar-te aquestes notificacions push al teu dispositiu. Si compres l\'aplicació web, emmagatzemem una id de transacció per la teva compra. Si decideixes no crear un compte, i no utilitzes notificacions push, no s\'emmagatzema cap dada teva als nostres servidors. El servei web Pocket Casts també utilitza galetes i tecnologies similars per a mantenir-te connectat. Si decideixes generar una sol·licitud d\'assistència des del servei, podem generar un adjunt que contingui dades addicionals per a ajudar a abordar la teva sol·licitud d\'assistència que pots consultar abans de la seva presentació.</string>
     <string name="podcasts">Pòdcasts</string>
     <string name="download_warning_title">Descarrega-ho tot</string>
     <string name="episode_row_download_failed">Error a la descàrrega</string>

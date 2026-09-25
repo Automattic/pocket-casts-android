@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-09-10 09:55:59+0000
+Translation-Revision-Date: 2026-09-16 18:10:43+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: es
 -->
 <resources>
+    <string name="bookmark_edit_transcript_title">Editar transcripción</string>
+    <string name="bookmarks_upgrade_example_title">La sala de audiciones</string>
+    <string name="bookmark_edit_transcript_subtitle">Elige un pasaje de transcripción para este marcador</string>
     <string name="search_filters_networks">Redes</string>
     <string name="discover_networks">Redes</string>
+    <string name="discover_network">Red</string>
     <string name="device_approve_login_required">Para poder conectar tu dispositivo, necesitas tener una cuenta. Inicia sesión o crea una cuenta e inténtalo de nuevo.</string>
     <string name="device_approve_error_message">Inténtalo de nuevo más tarde.</string>
     <string name="device_approve_error_title">No se ha podido aprobar el dispositivo</string>
-    <string name="device_approve_expired_message">Vuelve a tu televisor para generar uno nuevo.</string>
     <string name="device_approve_expired_title">Tu código QR ha caducado</string>
-    <string name="device_approve_success_message">Tu televisor está conectado a tu cuenta.</string>
-    <string name="device_approve_success_title">TV conectada</string>
     <string name="device_approve_connect">Conectar</string>
     <string name="device_approve_signing_in_as">Iniciando sesión como…</string>
     <string name="device_approve_description">Tu escucha se sincronizará automáticamente.\nPuedes desconectarte en cualquier momento desde Ajustes.</string>
-    <string name="device_approve_title">Conéctate a tu televisor</string>
     <string name="tv_settings_subscription_plan">Plan</string>
     <string name="tv_settings_subscription_next_renewal">Próxima renovación</string>
     <string name="tv_settings_subscription_lifetime">De por vida</string>
@@ -1786,7 +1786,6 @@ Language: es
     <string name="settings_apply_group_by">¿Quieres cambiar todos tus podcasts actuales y que se agrupen por %s?</string>
     <string name="settings_apply_archived_show">¿Quieres cambiar todos tus podcasts actuales y que se muestren los archivados?</string>
     <string name="settings_apply_archived_hide">¿Quieres cambiar todos tus podcasts actuales y que se oculten los archivados?</string>
-    <string name="settings_app_icon_updated_message">Es posible que el icono nuevo tarde un par de minutos en aparecer y verás dos iconos en la pantalla en la que se muestren tus aplicaciones. Es normal. Arrastra el nuevo a la pantalla de inicio y estará todo listo.</string>
     <string name="settings_app_icon_updated">Icono actualizado</string>
     <string name="settings_app_icon_title">Título</string>
     <string name="settings_app_icon_image">imagen del icono</string>

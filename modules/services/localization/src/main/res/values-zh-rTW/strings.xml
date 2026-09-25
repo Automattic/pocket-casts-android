@@ -1,25 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-09-10 14:58:23+0000
+Translation-Revision-Date: 2026-09-16 18:10:24+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="bookmark_edit_transcript_title">編輯逐字稿</string>
+    <string name="bookmarks_upgrade_example_title">試鏡室</string>
+    <string name="bookmark_edit_transcript_subtitle">選取此書籤的逐字稿段落</string>
     <string name="search_filters_networks">網路</string>
     <string name="discover_networks">網路</string>
     <string name="discover_network">網路</string>
     <string name="device_approve_login_required">你必須擁有帳號才能連結裝置。 請登入或建立帳號，然後再試一次。</string>
     <string name="device_approve_error_message">請稍後再試。</string>
     <string name="device_approve_error_title">裝置核准失敗</string>
-    <string name="device_approve_expired_message">請回到電視畫面，產生新 QR 碼。</string>
     <string name="device_approve_expired_title">QR 碼已過期</string>
-    <string name="device_approve_success_message">電視已連結到你的帳號。</string>
-    <string name="device_approve_success_title">電視已連結</string>
     <string name="device_approve_connect">連結</string>
     <string name="device_approve_signing_in_as">正在確認登入身分…</string>
     <string name="device_approve_description">你的收聽內容會自動同步。\n可隨時前往「設定」取消連結。</string>
-    <string name="device_approve_title">連結到你的電視</string>
     <string name="tv_settings_subscription_plan">方案</string>
     <string name="tv_settings_subscription_next_renewal">下次續訂</string>
     <string name="tv_settings_subscription_lifetime">終生</string>
@@ -1798,7 +1797,6 @@ Language: zh_TW
     <string name="plus_learn_more_button">進一步了解</string>
     <string name="settings_theme_dark_contrast">深色對比</string>
     <string name="settings_theme_light_contrast">淺色對比</string>
-    <string name="settings_app_icon_updated_message">這個新圖示可能需要幾分鐘才會出現，所有應用程式畫面將顯示兩個圖示；這是正常的。將新圖示拖曳到主畫面，這樣就大功告成了！</string>
     <string name="settings_status_service_ad_blocker_help_plural">最常見的原因是在手機或網路上設定了廣告封鎖程式。 你需要解除本網域 %s 的封鎖</string>
     <string name="settings_status_service_ad_blocker_help_singular">最常見的原因是在手機或網路上設定了廣告封鎖程式。 你需要解除本網域 %s 的封鎖</string>
     <string name="error_chartable_streaming">串流失敗。製作人使用的 Chartable 分析遭封鎖，如果你有執行 AdGuard 等 篩選應用程式，需要將 chtbl.com 列入允許清單才能播放本集。</string>
