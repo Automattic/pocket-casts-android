@@ -7,7 +7,7 @@ class SyncStatusConverter {
 
     @TypeConverter
     fun toSyncStatus(value: Int?): SyncStatus? {
-        return if (value == null) null else SyncStatus.values()[value]
+        return if (value == null) null else SyncStatus.entries.getOrNull(value) ?: SyncStatus.NOT_SYNCED
     }
 
     @TypeConverter

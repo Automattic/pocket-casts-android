@@ -163,9 +163,9 @@ limitations under the License.
         <item name="android:windowAnimationStyle">@style/Car.Dialog.Animation</item>
         <item name="android:windowTitleStyle">@style/Widget.Car.Dialog.Title</item>
         <item name="alertDialogStyle">@style/AlertDialog</item>
-        <item name="buttonBarNeutralButtonStyle">@style/Widget.Car.Button.Borderless.Colored</item>
-        <item name="buttonBarNegativeButtonStyle">@style/Widget.Car.Button.Borderless.Colored</item>
-        <item name="buttonBarPositiveButtonStyle">@style/Widget.Car.Button.Borderless.Colored</item>
+        <item name="buttonBarNeutralButtonStyle">@style/Widget.Car.Dialog.Button</item>
+        <item name="buttonBarNegativeButtonStyle">@style/Widget.Car.Dialog.Button</item>
+        <item name="buttonBarPositiveButtonStyle">@style/Widget.Car.Dialog.Button</item>
         <item name="listDividerAlertDialog">@drawable/car_preference_divider</item>
         <item name="textInputStyle">@style/Widget.Design.TextInputLayout</item>
     </style>

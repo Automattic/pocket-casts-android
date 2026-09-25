@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.profile.cloud
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.toLiveData
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
@@ -29,12 +30,17 @@ import com.automattic.eventhorizon.UserFileDeletedEvent
 import com.automattic.eventhorizon.UserFileDetailOptionTappedEvent
 import com.automattic.eventhorizon.UserFilePlayPauseButtonTappedEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.BackpressureStrategy
-import io.reactivex.rxkotlin.Flowables
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.rx2.asFlow
 
 @HiltViewModel
 class CloudBottomSheetViewModel @Inject constructor(
@@ -52,13 +58,16 @@ class CloudBottomSheetViewModel @Inject constructor(
     private val source = SourceView.FILES
 
     fun setup(uuid: String) {
-        val isPlayingFlowable = playbackManager.playbackStateRelay.filter { it.episodeUuid == uuid }.map { it.isPlaying }.startWith(false).toFlowable(BackpressureStrategy.LATEST)
-        val inUpNextFlowable = playbackManager.upNextQueue.changesObservable.containsUuid(uuid).toFlowable(BackpressureStrategy.LATEST)
-        val episodeFlowable = userEpisodeManager.episodeRxFlowable(uuid)
-        val combined = Flowables.combineLatest(episodeFlowable, inUpNextFlowable, isPlayingFlowable) { episode, inUpNext, isPlaying ->
-            BottomSheetState(episode, inUpNext, isPlaying)
-        }
-        state = combined.toLiveData()
+        val isPlayingFlow = playbackManager.playbackStateFlow
+            .filter { it.episodeUuid == uuid }
+            .map { it.isPlaying }
+            .onStart { emit(false) }
+        val inUpNextFlow = playbackManager.upNextQueue.changesObservable.asFlow().containsUuid(uuid)
+        // Room emits null once the file is deleted, keep showing the last known episode instead
+        val episodeFlow = userEpisodeManager.episodeFlow(uuid).filterNotNull()
+        state = combine(episodeFlow, inUpNextFlow, isPlayingFlow, ::BottomSheetState)
+            .distinctUntilChanged()
+            .asLiveData()
     }
 
     fun getDeleteStateOnDeleteClick(episode: UserEpisode): DeleteState {

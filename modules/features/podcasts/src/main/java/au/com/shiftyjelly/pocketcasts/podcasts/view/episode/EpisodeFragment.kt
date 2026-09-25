@@ -93,16 +93,19 @@ import au.com.shiftyjelly.pocketcasts.compose.buttons.ButtonTab
 import au.com.shiftyjelly.pocketcasts.compose.buttons.ButtonTabs
 import au.com.shiftyjelly.pocketcasts.compose.components.AnimatedPlayPauseButton
 import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
+import au.com.shiftyjelly.pocketcasts.compose.summary.SummaryPaywall
 import au.com.shiftyjelly.pocketcasts.compose.text.HtmlText
 import au.com.shiftyjelly.pocketcasts.compose.text.markdownToHtml
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
+import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivity
+import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkDetailFragment
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksPage
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksSortByDialog
 import au.com.shiftyjelly.pocketcasts.player.view.chapters.ChaptersPage
@@ -150,6 +153,7 @@ import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.utils.parceler.DurationParceler
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.extensions.cleanup
+import au.com.shiftyjelly.pocketcasts.views.extensions.copyLinkOnLongPress
 import au.com.shiftyjelly.pocketcasts.views.extensions.hide
 import au.com.shiftyjelly.pocketcasts.views.extensions.show
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
@@ -158,7 +162,9 @@ import au.com.shiftyjelly.pocketcasts.views.helper.IntentUtil
 import au.com.shiftyjelly.pocketcasts.views.helper.ShowNotesFormatter
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.setLongStyleDate
+import au.com.shiftyjelly.pocketcasts.views.multiselect.BookmarkDeleter
 import au.com.shiftyjelly.pocketcasts.views.swipe.AddToPlaylistFragmentFactory
+import com.automattic.eventhorizon.ChaptersShownSource
 import com.automattic.eventhorizon.EpisodeDetailDismissedEvent
 import com.automattic.eventhorizon.EpisodeDetailPodcastNameTappedEvent
 import com.automattic.eventhorizon.EpisodeDetailShowNotesLinkTappedEvent
@@ -236,6 +242,9 @@ class EpisodeFragment : BaseFragment() {
 
     @Inject
     lateinit var settings: Settings
+
+    @Inject
+    lateinit var bookmarkDeleter: BookmarkDeleter
 
     @Inject
     lateinit var warningsHelper: WarningsHelper
@@ -465,6 +474,7 @@ class EpisodeFragment : BaseFragment() {
                                 LR.string.podcasts_download_download,
                             ),
                         )
+                        binding.btnDownload.isVisible = !state.episode.isHlsOnly
                         val episodeStatus = state.episode.downloadStatus
                         binding.btnDownload.state = when (episodeStatus) {
                             EpisodeDownloadStatus.DownloadNotRequested -> DownloadButtonState.NotDownloaded(downloadSize)
@@ -730,6 +740,7 @@ class EpisodeFragment : BaseFragment() {
             val transcript = pageState.transcript as? Transcript.Text
             val isSummaryEnabled = FeatureFlag.isEnabledFlow(Feature.AI_SUMMARIES).collectAsState().value
             val isPlusUser = pageState.isPlusUser
+            val isFreeTrialAvailable = pageState.isFreeTrialAvailable
             val selectedTab = pageState.selectedContentTab
 
             val showDescription = !isSummaryEnabled ||
@@ -821,22 +832,33 @@ class EpisodeFragment : BaseFragment() {
                         }
 
                         if (selectedTab == EpisodeContentTab.SUMMARY && summaryText != null) {
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 16.dp, vertical = 16.dp),
-                            ) {
-                                Text(
-                                    text = stringResource(LR.string.episode_summary),
-                                    color = MaterialTheme.theme.colors.primaryText01,
-                                    fontSize = 20.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    modifier = Modifier.padding(bottom = 16.dp),
-                                )
-                                HtmlText(
-                                    html = markdownToHtml(summaryText.orEmpty()),
-                                    color = MaterialTheme.theme.colors.primaryText01,
-                                    textStyleResId = UR.style.P40,
+                            if (isPlusUser) {
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 16.dp, vertical = 16.dp),
+                                ) {
+                                    Text(
+                                        text = stringResource(LR.string.episode_summary),
+                                        color = MaterialTheme.theme.colors.primaryText01,
+                                        fontSize = 20.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        modifier = Modifier.padding(bottom = 16.dp),
+                                    )
+                                    HtmlText(
+                                        html = markdownToHtml(summaryText.orEmpty()),
+                                        color = MaterialTheme.theme.colors.primaryText01,
+                                        textStyleResId = UR.style.P40,
+                                    )
+                                }
+                            } else {
+                                val screenHeight = with(LocalDensity.current) { LocalWindowInfo.current.containerSize.height.toDp() }
+                                SummaryPaywall(
+                                    summaryText = summaryText.orEmpty(),
+                                    isFreeTrialAvailable = isFreeTrialAvailable,
+                                    onClickSubscribe = ::onSummaryUpgradeClick,
+                                    contentPadding = PaddingValues(16.dp),
+                                    modifier = Modifier.height(screenHeight),
                                 )
                             }
                         }
@@ -856,8 +878,20 @@ class EpisodeFragment : BaseFragment() {
                                         forceDarkTheme = false,
                                     )
                                 },
+                                onSwipeShareClick = ::onSwipeShareBookmarkClick,
+                                onSwipeDeleteClick = ::onSwipeDeleteBookmarkClick,
                                 onShareBookmarkClick = ::onShareBookmarkClick,
                                 onEditBookmarkClick = ::onEditBookmarkClick,
+                                onBookmarkDetailClick = { data ->
+                                    BookmarkDetailFragment.show(
+                                        fragmentManager = parentFragmentManager,
+                                        bookmark = data.bookmark,
+                                        episodeTitle = data.episodeTitle,
+                                        podcastUuid = data.podcastUuid,
+                                        podcastTitle = data.podcastTitle,
+                                        sourceView = SourceView.EPISODE_DETAILS,
+                                    )
+                                },
                                 onUpgradeClick = ::onBookmarksUpgradeClick,
                                 showOptionsDialog = ::showBookmarksOptionsDialog,
                                 openFragment = ::openBookmarkSettingsFragment,
@@ -885,6 +919,7 @@ class EpisodeFragment : BaseFragment() {
                                     onSkipChaptersClick = chaptersViewModel::enableTogglingOrUpsell,
                                     isTogglingChapters = chaptersState.isTogglingChapters,
                                     showSubscriptionIcon = chaptersState.showSubscriptionIcon,
+                                    resolvingChapterIndex = chaptersViewModel.resolvingChapterIndex.collectAsState().value,
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .heightIn(max = screenHeight),
@@ -947,7 +982,7 @@ class EpisodeFragment : BaseFragment() {
                                     Row(
                                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                                     ) {
-                                        if (transcriptUiState.isTextTranscriptLoaded && FeatureFlag.isEnabled(Feature.SHARE_TRANSCRIPTS)) {
+                                        if (transcriptUiState.isTextTranscriptLoaded) {
                                             TranscriptShareButton(
                                                 toolbarColors = toolbarColors,
                                                 onClick = transcriptViewModel::shareTranscript,
@@ -1085,7 +1120,7 @@ class EpisodeFragment : BaseFragment() {
                                         Row(
                                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                                         ) {
-                                            if (transcriptUiState.isTextTranscriptLoaded && FeatureFlag.isEnabled(Feature.SHARE_TRANSCRIPTS)) {
+                                            if (transcriptUiState.isTextTranscriptLoaded) {
                                                 TranscriptShareButton(
                                                     toolbarColors = toolbarColors,
                                                     onClick = transcriptViewModel::shareTranscript,
@@ -1152,7 +1187,10 @@ class EpisodeFragment : BaseFragment() {
     ): List<ButtonTab> {
         val tabClickHandlers = mapOf<Int, () -> Unit>(
             LR.string.details to { viewModel.selectContentTab(EpisodeContentTab.DESCRIPTION) },
-            LR.string.chapters to { viewModel.selectContentTab(EpisodeContentTab.CHAPTERS) },
+            LR.string.chapters to {
+                viewModel.selectContentTab(EpisodeContentTab.CHAPTERS)
+                chaptersViewModel.trackChaptersShown(ChaptersShownSource.EpisodeDetails)
+            },
             LR.string.bookmarks to { viewModel.selectContentTab(EpisodeContentTab.BOOKMARKS) },
             LR.string.transcript to {
                 if (transcript != null) {
@@ -1196,12 +1234,41 @@ class EpisodeFragment : BaseFragment() {
         }
     }
 
+    private fun onSwipeShareBookmarkClick(bookmark: Bookmark, settleRow: () -> Unit) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            val shared = bookmarksViewModel.getSharedBookmark(bookmark)
+            settleRow()
+            val (podcast, episode, sharedBookmark) = shared ?: return@launch
+            bookmarksViewModel.onShare(podcast.uuid, episode.uuid, SourceView.EPISODE_DETAILS)
+            ShareEpisodeTimestampFragment
+                .forBookmark(episode, sharedBookmark.timeSecs.seconds, podcast.backgroundColor, SourceView.EPISODE_DETAILS)
+                .show(parentFragmentManager, "share_screen")
+        }
+    }
+
+    private fun onSwipeDeleteBookmarkClick(bookmark: Bookmark, settleRow: () -> Unit) {
+        bookmarkDeleter.deleteWithUndo(
+            bookmark = bookmark,
+            source = SourceView.EPISODE_DETAILS,
+            snackbarView = requireView(),
+            scope = viewLifecycleOwner.lifecycleScope,
+            onUndo = settleRow,
+        )
+    }
+
     private fun onBookmarksUpgradeClick() {
         bookmarksViewModel.onGetBookmarksButtonTapped()
         val onboardingFlow = OnboardingFlow.Upsell(
             source = OnboardingUpgradeSource.BOOKMARKS,
         )
         OnboardingLauncher.openOnboardingFlow(requireActivity(), onboardingFlow)
+    }
+
+    private fun onSummaryUpgradeClick() {
+        OnboardingLauncher.openOnboardingFlow(
+            requireActivity(),
+            OnboardingFlow.Upsell(OnboardingUpgradeSource.AI_SUMMARIES),
+        )
     }
 
     private fun showBookmarksOptionsDialog(selectedValue: Int) {
@@ -1303,6 +1370,7 @@ class EpisodeFragment : BaseFragment() {
                     isVerticalScrollBarEnabled = false
                     // stop the web view jumping after loading
                     isFocusable = false
+                    copyLinkOnLongPress()
                     webViewClient = object : WebViewClient() {
                         override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
                             val url = request.url.toString()

@@ -5,6 +5,7 @@ import android.content.Context
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.Color
+import androidx.core.text.parseAsHtml
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
@@ -19,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.profile.cloud.AddFileActivity
+import au.com.shiftyjelly.pocketcasts.repositories.di.DefaultDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadProgressCache
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadQueue
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadType
@@ -50,6 +52,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -63,6 +66,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
@@ -90,6 +94,7 @@ class EpisodeViewModel @Inject constructor(
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val audioOutputSelectorHelper: AudioOutputSelectorHelper,
     private val userEpisodeManager: UserEpisodeManager,
+    @DefaultDispatcher private val backgroundDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(appContext as Application) {
     private var playAttempt: Job? = null
     private val sourceView = SourceView.EPISODE_DETAILS
@@ -102,7 +107,7 @@ class EpisodeViewModel @Inject constructor(
             val inUpNext: Boolean,
             val tintColor: Color?,
             val downloadProgress: Float? = null,
-            val showNotesState: ShowNotesState,
+            val showNotesText: String?,
             val errorData: ErrorData?,
         ) : State() {
             data class ErrorData(
@@ -161,7 +166,7 @@ class EpisodeViewModel @Inject constructor(
             .map { progress -> (progress?.percentage?.toFloat() ?: 0f) / 100 }
             .distinctUntilChanged()
 
-        val showNotesFlow = episodeFlow
+        val showNotesTextFlow = episodeFlow
             .flatMapLatest {
                 when (it) {
                     is PodcastEpisode -> showNotesManager.loadShowNotesFlow(
@@ -173,6 +178,9 @@ class EpisodeViewModel @Inject constructor(
                     is UserEpisode -> flowOf(ShowNotesState.NotFound)
                 }
             }
+            // Parse the show notes HTML off the main thread, and only when the notes change, to avoid blocking the UI.
+            .map { showNotesState -> parseShowNotes(showNotesState) }
+            .flowOn(backgroundDispatcher)
 
         stateFlow = combine(
             episodeFlow,
@@ -181,8 +189,8 @@ class EpisodeViewModel @Inject constructor(
             isPlayingEpisodeFlow.onStart { emit(false) },
             inUpNextFlow,
             downloadProgressFlow,
-            showNotesFlow,
-        ) { episode, podcast, isPlayingEpisode, upNext, downloadProgress, showNotesState ->
+            showNotesTextFlow,
+        ) { episode, podcast, isPlayingEpisode, upNext, downloadProgress, showNotesText ->
 
             State.Loaded(
                 episode = episode,
@@ -191,10 +199,14 @@ class EpisodeViewModel @Inject constructor(
                 downloadProgress = downloadProgress,
                 inUpNext = isInUpNext(upNext, episode),
                 tintColor = getTintColor(episode, podcast, theme),
-                showNotesState = showNotesState,
+                showNotesText = showNotesText,
                 errorData = getErrorData(episode),
             )
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), State.Empty)
+    }
+
+    private fun parseShowNotes(showNotesState: ShowNotesState): String? {
+        return (showNotesState as? ShowNotesState.Loaded)?.showNotes?.parseAsHtml()?.toString()
     }
 
     private fun getErrorData(episode: BaseEpisode): State.Loaded.ErrorData? {

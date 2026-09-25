@@ -74,7 +74,7 @@ project.apply {
         set("targetSdkVersionWear", 36)
         set("targetSdkVersionAutomotive", 35)
         set("targetSdkVersionTv", 36)
-        set("compileSdkVersion", 36)
+        set("compileSdkVersion", 37)
         set("testInstrumentationRunner", "androidx.test.runner.AndroidJUnitRunner")
 
         // App Signing
@@ -120,11 +120,5 @@ project.apply {
         set("encryptionKey", secretProperties.getProperty("encryption_key", ""))
         set("appSecret", secretProperties.getProperty("app_secret", ""))
         set("metaAppId", secretProperties.getProperty("metaAppId", ""))
-        set("sentryAuthToken", secretProperties.getProperty("sentryAuthToken", ""))
-        set("sentryOrg", secretProperties.getProperty("sentryOrg", ""))
-        set("sentryAndroidProject", secretProperties.getProperty("sentryAndroidProject", ""))
-        set("sentryAutomotiveProject", secretProperties.getProperty("sentryAutomotiveProject", ""))
-        set("sentryWearProject", secretProperties.getProperty("sentryWearProject", ""))
-        set("sentryTvProject", secretProperties.getProperty("sentryTvProject", ""))
     }
 }

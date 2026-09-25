@@ -114,9 +114,9 @@ fun HelpPage(
                     }
                 }
             },
-            onContactSupport = {
+            onContactSupport = { recipient ->
                 scope.launch {
-                    val intent = viewModel.getSupportIntent(activity)
+                    val intent = viewModel.getSupportIntent(activity, recipient)
                     try {
                         activity.startActivity(intent)
                     } catch (_: ActivityNotFoundException) {
@@ -167,7 +167,7 @@ fun HelpPage(
 private fun HelpPage(
     appBarInsets: WindowInsets,
     onSendFeedbackEmail: () -> Unit,
-    onContactSupport: () -> Unit,
+    onContactSupport: (String) -> Unit,
     onTapUri: (Uri) -> Unit,
     onShowLogs: () -> Unit,
     onShowStatusPage: () -> Unit,
@@ -343,7 +343,7 @@ private fun ActionRow(
 @Composable
 private fun HelpWebViewContainer(
     onSendFeedbackEmail: () -> Unit,
-    onContactSupport: () -> Unit,
+    onContactSupport: (String) -> Unit,
     onTapUri: (Uri) -> Unit,
     onWebViewCreate: (WebView) -> Unit,
     onWebViewDispose: (WebView) -> Unit,
@@ -405,7 +405,7 @@ private fun HelpWebViewContainer(
                 )
 
                 ContainerState.Error -> WebViewError(
-                    onContactSupport = onContactSupport,
+                    onContactSupport = { onContactSupport("support@pocketcasts.com") },
                     modifier = Modifier.fillMaxSize(),
                 )
 
@@ -469,7 +469,7 @@ private fun WebViewError(
 private fun HelpWebView(
     state: WebViewState,
     onSendFeedbackEmail: () -> Unit,
-    onContactSupport: () -> Unit,
+    onContactSupport: (String) -> Unit,
     onTapUri: (Uri) -> Unit,
     onLoadUrl: (String) -> Unit,
     onWebViewCreate: (WebView) -> Unit,
@@ -504,7 +504,7 @@ private fun HelpWebView(
 
 private class HelpWebViewClient(
     private val onSendFeedbackEmail: () -> Unit,
-    private val onContactSupport: () -> Unit,
+    private val onContactSupport: (String) -> Unit,
     private val onTapUri: (Uri) -> Unit,
     private val onLoadUrl: (String) -> Unit,
 ) : AccompanistWebViewClient() {
@@ -514,7 +514,14 @@ private class HelpWebViewClient(
         when {
             url.contains("feedback", ignoreCase = true) -> onSendFeedbackEmail()
 
-            contactSupportAction.any { url.startsWith(it) } -> onContactSupport()
+            url.startsWith("mailto:") -> {
+                val recipient = url.removePrefix("mailto:").substringBefore('?')
+                if (recipient in supportRecipients) {
+                    onContactSupport(recipient)
+                } else {
+                    onTapUri(request.url)
+                }
+            }
 
             url.startsWith("https://support.pocketcasts.com") -> {
                 val androidUrl = if ("device=android" !in url) {
@@ -537,7 +544,11 @@ private class HelpWebViewClient(
     }
 }
 
-private val contactSupportAction = listOf("mailto:support@shiftyjelly.com", "mailto:support@pocketcasts.com")
+private val supportRecipients = setOf(
+    "support@shiftyjelly.com",
+    "support@pocketcasts.com",
+    "chatbot-support@pocketcasts.com",
+)
 private val fadeAnimationSpec = spring<Float>(stiffness = Spring.StiffnessMedium, visibilityThreshold = 0.001f)
 private val expandAnimationSpec = spring<IntSize>(stiffness = Spring.StiffnessMedium, visibilityThreshold = IntSize.VisibilityThreshold)
 private val popupEnterTransition = fadeIn(fadeAnimationSpec) + expandIn(expandAnimationSpec, expandFrom = Alignment.TopEnd)

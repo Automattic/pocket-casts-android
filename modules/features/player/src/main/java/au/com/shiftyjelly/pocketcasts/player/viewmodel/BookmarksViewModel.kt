@@ -22,11 +22,15 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration.Ele
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortType
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeDefault
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForProfile
+import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkEpisodeResolver
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
+import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkPlaybackTimeResolver
 import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
@@ -39,9 +43,14 @@ import com.automattic.eventhorizon.BookmarksSortByChangedEvent
 import com.automattic.eventhorizon.EventHorizon
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlin.math.abs
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.cancelChildren
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -52,6 +61,11 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.rx2.await
+import kotlinx.coroutines.withContext
+
+private const val PLAY_SPINNER_DELAY_MS = 250L
+private const val LISTENER_TAKEOVER_TOLERANCE_MS = 1000
 
 @HiltViewModel
 class BookmarksViewModel
@@ -65,18 +79,28 @@ class BookmarksViewModel
     private val playbackManager: PlaybackManager,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val bookmarkSearchHandler: BookmarkSearchHandler,
+    private val bookmarkPlaybackTimeResolver: BookmarkPlaybackTimeResolver,
+    private val bookmarkEpisodeResolver: BookmarkEpisodeResolver,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
     val uiState: StateFlow<UiState> = _uiState
 
-    private val _showOptionsDialog = MutableSharedFlow<Int>()
+    private val _showOptionsDialog = MutableSharedFlow<Int>(extraBufferCapacity = 1)
     val showOptionsDialog = _showOptionsDialog.asSharedFlow()
 
-    private val _message = MutableSharedFlow<BookmarkMessage>()
+    private val _message = MutableSharedFlow<BookmarkMessage>(extraBufferCapacity = 1)
     val message = _message.asSharedFlow()
 
+    private val _showBookmarkDetail = MutableSharedFlow<BookmarkDetailData>(extraBufferCapacity = 1)
+    val showBookmarkDetail = _showBookmarkDetail.asSharedFlow()
+
+    private val _resolvingBookmarkUuid = MutableStateFlow<String?>(null)
+    val resolvingBookmarkUuid: StateFlow<String?> = _resolvingBookmarkUuid
+
     private var isFragmentActive: Boolean = true
+
+    private var playJob: Job? = null
 
     private var sourceView: SourceView = SourceView.UNKNOWN
         set(value) {
@@ -250,12 +274,31 @@ class BookmarksViewModel
     }
 
     private fun onRowClick(bookmark: Bookmark) {
-        if ((_uiState.value as? UiState.Loaded)?.isMultiSelecting == false) return
-
-        if (multiSelectHelper.isSelected(bookmark)) {
-            multiSelectHelper.deselect(bookmark)
+        if ((_uiState.value as? UiState.Loaded)?.isMultiSelecting == true) {
+            if (multiSelectHelper.isSelected(bookmark)) {
+                multiSelectHelper.deselect(bookmark)
+            } else {
+                multiSelectHelper.select(bookmark)
+            }
+        } else if (FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS)) {
+            viewModelScope.launch(ioDispatcher) {
+                val loadedState = _uiState.value as? UiState.Loaded ?: return@launch
+                val episodeTitle = loadedState.bookmarkIdAndEpisodeMap[bookmark.uuid]?.title
+                    ?: bookmark.episodeTitle
+                val podcastTitle = bookmark.podcastTitle.ifEmpty {
+                    podcastManager.findPodcastByUuid(bookmark.podcastUuid)?.title.orEmpty()
+                }
+                _showBookmarkDetail.emit(
+                    BookmarkDetailData(
+                        bookmark = bookmark,
+                        episodeTitle = episodeTitle,
+                        podcastUuid = bookmark.podcastUuid,
+                        podcastTitle = podcastTitle,
+                    ),
+                )
+            }
         } else {
-            multiSelectHelper.select(bookmark)
+            play(bookmark)
         }
     }
 
@@ -266,12 +309,15 @@ class BookmarksViewModel
     }
 
     suspend fun getSharedBookmark(): Triple<Podcast, PodcastEpisode, Bookmark>? {
-        return (_uiState.value as? UiState.Loaded)?.let {
-            val bookmark = it.bookmarks.firstOrNull { bookmark -> multiSelectHelper.isSelected(bookmark) } ?: return null
-            val podcast = podcastManager.findPodcastByUuid(bookmark.podcastUuid) ?: return null
-            val episode = episodeManager.findEpisodeByUuid(bookmark.episodeUuid) as? PodcastEpisode ?: return null
-            Triple(podcast, episode, bookmark)
-        }
+        val loaded = _uiState.value as? UiState.Loaded ?: return null
+        val bookmark = loaded.bookmarks.firstOrNull(multiSelectHelper::isSelected) ?: return null
+        return getSharedBookmark(bookmark)
+    }
+
+    suspend fun getSharedBookmark(bookmark: Bookmark): Triple<Podcast, PodcastEpisode, Bookmark>? {
+        val podcast = podcastManager.findPodcastByUuid(bookmark.podcastUuid) ?: return null
+        val episode = episodeManager.findEpisodeByUuid(bookmark.episodeUuid) as? PodcastEpisode ?: return null
+        return Triple(podcast, episode, bookmark)
     }
 
     fun onSearchTextChanged(searchText: String) {
@@ -292,20 +338,64 @@ class BookmarksViewModel
     }
 
     fun play(bookmark: Bookmark) {
-        viewModelScope.launch {
-            val bookmarkEpisode = episodeManager.findEpisodeByUuid(bookmark.episodeUuid)
-            bookmarkEpisode?.let {
-                val shouldLoadOrSwitchEpisode = !playbackManager.isPlaying() ||
-                    playbackManager.getCurrentEpisode()?.uuid != bookmarkEpisode.uuid
-                if (shouldLoadOrSwitchEpisode) {
-                    playbackManager.playNowSync(it, sourceView = sourceView)
-                }
-            } ?: run {
+        playJob?.cancel()
+        playJob = viewModelScope.launch {
+            val bookmarkEpisode = resolveEpisode(bookmark) ?: run {
                 _message.emit(BookmarkMessage.BookmarkEpisodeNotFound)
                 return@launch
             }
+            val hasReferenceTime = bookmark.referenceTime != null
+            val isPlayingBookmarkEpisode = playbackManager.isPlaying() &&
+                playbackManager.getCurrentEpisode()?.uuid == bookmarkEpisode.uuid
+            val pausedForResolve = hasReferenceTime && isPlayingBookmarkEpisode
+            val positionBeforeResolveMs = if (pausedForResolve) {
+                playbackManager.getCurrentTimeMs(bookmarkEpisode)
+            } else {
+                0
+            }
+            if (pausedForResolve) {
+                playbackManager.pauseSuspend()
+            }
+            val spinnerJob = if (hasReferenceTime) {
+                launch {
+                    delay(PLAY_SPINNER_DELAY_MS)
+                    _resolvingBookmarkUuid.value = bookmark.uuid
+                }
+            } else {
+                null
+            }
+            val seekToMs = try {
+                bookmarkPlaybackTimeResolver.playbackTimeMs(
+                    episode = bookmarkEpisode,
+                    referenceTimeSecs = bookmark.referenceTime,
+                    fallbackTimeSecs = bookmark.timeSecs,
+                )
+            } catch (e: CancellationException) {
+                if (pausedForResolve) {
+                    withContext(NonCancellable) {
+                        val stillOurEpisode = playbackManager.getCurrentEpisode()?.uuid == bookmarkEpisode.uuid
+                        if (stillOurEpisode && !playbackManager.isPlaying()) {
+                            playbackManager.playNowSync(bookmarkEpisode, sourceView = sourceView)
+                        }
+                    }
+                }
+                throw e
+            } finally {
+                spinnerJob?.cancel()
+                if (_resolvingBookmarkUuid.value == bookmark.uuid) {
+                    _resolvingBookmarkUuid.value = null
+                }
+            }
+            if (pausedForResolve) {
+                if (listenerTookOver(bookmarkEpisode, positionBeforeResolveMs)) {
+                    return@launch
+                }
+                playbackManager.playNowSync(bookmarkEpisode, sourceView = sourceView)
+            } else if (!isPlayingBookmarkEpisode) {
+                playbackManager.playNowSync(bookmarkEpisode, sourceView = sourceView)
+            }
             _message.emit(BookmarkMessage.PlayingBookmark(bookmark.title))
-            playbackManager.seekToTimeMs(positionMs = bookmark.timeSecs * 1000)
+            playbackManager.seekToTimeMs(positionMs = seekToMs)
             eventHorizon.track(
                 BookmarkPlayTappedEvent(
                     source = sourceView.analyticsValue,
@@ -316,6 +406,13 @@ class BookmarksViewModel
         }
     }
 
+    private suspend fun listenerTookOver(episode: BaseEpisode, positionBeforeResolveMs: Int): Boolean {
+        if (playbackManager.getCurrentEpisode()?.uuid != episode.uuid) return true
+        return abs(playbackManager.getCurrentTimeMs(episode) - positionBeforeResolveMs) >= LISTENER_TAKEOVER_TOLERANCE_MS
+    }
+
+    suspend fun resolveEpisode(bookmark: Bookmark): BaseEpisode? = bookmarkEpisodeResolver.resolve(bookmark)
+
     suspend fun createBookmarkArguments(): BookmarkArguments? {
         val loadedState = _uiState.value as? UiState.Loaded ?: return null
         val bookmark = loadedState.bookmarks.firstOrNull(multiSelectHelper::isSelected) ?: return null
@@ -325,6 +422,7 @@ class BookmarksViewModel
             episodeUuid = bookmark.episodeUuid,
             timeSecs = bookmark.timeSecs,
             podcastColors = podcast?.let(::PodcastColors) ?: PodcastColors.ForUserEpisode,
+            source = sourceView,
         )
     }
 
@@ -398,6 +496,13 @@ class BookmarksViewModel
         data object BookmarkEpisodeNotFound : BookmarkMessage()
         data class PlayingBookmark(val bookmarkTitle: String) : BookmarkMessage()
     }
+
+    data class BookmarkDetailData(
+        val bookmark: Bookmark,
+        val episodeTitle: String,
+        val podcastUuid: String,
+        val podcastTitle: String,
+    )
 }
 
 internal sealed class MessageViewColors {

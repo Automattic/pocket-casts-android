@@ -169,6 +169,10 @@ abstract class LocalPlayer(override val onPlayerEvent: (Player, PlayerEvent) -> 
         onPlayerEvent(this, PlayerEvent.EpisodeChanged(episodeUuid))
     }
 
+    protected fun onVideoTrackChanged(hasVideo: Boolean) {
+        onPlayerEvent(this, PlayerEvent.VideoTrackChanged(hasVideo))
+    }
+
     override suspend fun seekToTimeMs(positionMs: Int) {
         withContext(Dispatchers.Main) {
             if (positionMs < 0) {
@@ -185,8 +189,8 @@ abstract class LocalPlayer(override val onPlayerEvent: (Player, PlayerEvent) -> 
         }
     }
 
-    override fun setEpisode(episode: BaseEpisode) {
-        episodeLocation = EpisodeLocation.create(episode)
+    override fun setEpisode(episode: BaseEpisode, preferStream: Boolean) {
+        episodeLocation = EpisodeLocation.create(episode, preferStream)
     }
 
     override suspend fun setPlaybackEffects(playbackEffects: PlaybackEffects) {}

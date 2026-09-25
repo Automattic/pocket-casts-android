@@ -6,6 +6,8 @@ import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
 import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import com.automattic.eventhorizon.EventHorizon
@@ -13,6 +15,7 @@ import io.reactivex.Flowable
 import java.time.Instant
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
@@ -63,6 +66,11 @@ class UpNextViewModelTest {
                     ),
                 ),
             )
-        return UpNextViewModel(userManager, mock(), EventHorizon(TestEventSink()))
+        val settings = mock<Settings>()
+        val showSortTooltipSetting = mock<UserSetting<Boolean>>()
+        whenever(showSortTooltipSetting.flow).thenReturn(MutableStateFlow(false))
+        whenever(settings.showUpNextSortDurationTooltip).thenReturn(showSortTooltipSetting)
+
+        return UpNextViewModel(userManager, mock(), EventHorizon(TestEventSink()), settings)
     }
 }

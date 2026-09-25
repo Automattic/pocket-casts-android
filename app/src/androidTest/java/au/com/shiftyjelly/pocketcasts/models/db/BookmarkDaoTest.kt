@@ -17,7 +17,9 @@ import java.util.UUID
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.After
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -246,6 +248,28 @@ class BookmarkDaoTest {
             assert(get(1).bookmark.uuid == bookmark1.uuid)
             assert(get(2).bookmark.uuid == bookmark3.uuid)
         }
+    }
+
+    @Test
+    fun testHasBookmarksIgnoresDeletedBookmarks() = runTest {
+        val bookmark = FakeBookmarksGenerator.create()
+        bookmarkDao.insert(bookmark)
+        assertTrue(
+            "An inserted bookmark should count as a bookmark",
+            bookmarkDao.hasBookmarksFlow(defaultEpisodeUuid).first(),
+        )
+
+        bookmarkDao.updateDeleted(
+            uuid = bookmark.uuid,
+            deleted = true,
+            deletedModified = Date().time,
+            syncStatus = SyncStatus.NOT_SYNCED,
+        )
+
+        assertFalse(
+            "A bookmark deleted but not yet synced should not count as a bookmark",
+            bookmarkDao.hasBookmarksFlow(defaultEpisodeUuid).first(),
+        )
     }
 
     companion object {

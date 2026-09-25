@@ -1,0 +1,402 @@
+package au.com.shiftyjelly.pocketcasts.player.view.bookmark
+
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.dp
+import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.bookmark.BookmarkRowColors
+import au.com.shiftyjelly.pocketcasts.compose.buttons.TimePlayButton
+import au.com.shiftyjelly.pocketcasts.compose.buttons.TimePlayButtonColors
+import au.com.shiftyjelly.pocketcasts.compose.components.EpisodeImage
+import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
+import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
+import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.Transcript
+import au.com.shiftyjelly.pocketcasts.repositories.transcript.BookmarkTranscript
+import au.com.shiftyjelly.pocketcasts.repositories.transcript.TextSpan
+import au.com.shiftyjelly.pocketcasts.transcripts.ui.BookmarkTranscriptView
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.images.R as IR
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
+
+@Composable
+internal fun BookmarkDetailPage(
+    title: String,
+    episodeTitle: String,
+    podcastUuid: String,
+    podcastTitle: String,
+    timeSecs: Int,
+    createdAtText: String,
+    isResolving: Boolean,
+    onPlayClick: () -> Unit,
+    onClose: () -> Unit,
+    onEpisodeClick: () -> Unit,
+    onMoreClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    episode: BaseEpisode? = null,
+    useEpisodeArtwork: Boolean = false,
+    isPodcastTitleLoading: Boolean = false,
+    passage: String? = null,
+    transcriptState: BookmarkDetailViewModel.TranscriptState = BookmarkDetailViewModel.TranscriptState.None,
+) {
+    val theme = MaterialTheme.theme
+    val playerColors = theme.rememberPlayerColors()
+    val colors = remember(theme.type, playerColors) {
+        if (playerColors != null) {
+            BookmarkRowColors.player(playerColors)
+        } else {
+            BookmarkRowColors.default(theme.colors)
+        }
+    }
+    val playButtonBackground = if (playerColors != null) {
+        playerColors.contrast01
+    } else {
+        theme.colors.primaryInteractive01
+    }
+    val playButtonText = if (playerColors != null) {
+        playerColors.background01
+    } else {
+        theme.colors.primaryInteractive02
+    }
+    val playButtonColors = TimePlayButtonColors(
+        text = playButtonText,
+        border = playButtonBackground,
+        background = playButtonBackground,
+    )
+
+    val showTranscript = transcriptState !is BookmarkDetailViewModel.TranscriptState.None
+
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .then(
+                if (showTranscript) {
+                    Modifier.fillMaxHeight()
+                } else {
+                    Modifier
+                        .verticalScroll(rememberScrollState())
+                        .padding(bottom = 24.dp)
+                },
+            ),
+    ) {
+        DragHandle(
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(top = 12.dp),
+        )
+
+        Header(
+            buttonColor = colors.primaryText,
+            onClose = onClose,
+            onMoreClick = onMoreClick,
+        )
+
+        Column(
+            modifier = Modifier.padding(horizontal = 20.dp),
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .weight(1f)
+                        .then(
+                            if (episode != null) {
+                                Modifier.clickable(onClickLabel = stringResource(LR.string.go_to_episode), onClick = onEpisodeClick)
+                            } else {
+                                Modifier
+                            },
+                        ),
+                ) {
+                    if (episode != null) {
+                        EpisodeImage(
+                            episode = episode,
+                            corners = 8.dp,
+                            useEpisodeArtwork = useEpisodeArtwork,
+                            modifier = Modifier.size(56.dp),
+                        )
+                    } else {
+                        PodcastImage(
+                            uuid = podcastUuid,
+                            imageSize = 56.dp,
+                            cornerSize = 8.dp,
+                            elevation = null,
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(12.dp))
+
+                    Column(
+                        modifier = Modifier.weight(1f),
+                    ) {
+                        if (isPodcastTitleLoading) {
+                            Box(
+                                modifier = Modifier
+                                    .padding(vertical = 3.dp)
+                                    .width(120.dp)
+                                    .height(12.dp)
+                                    .clip(RoundedCornerShape(4.dp))
+                                    .background(colors.secondaryText.copy(alpha = 0.12f)),
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                        } else if (podcastTitle.isNotEmpty()) {
+                            TextH70(
+                                text = podcastTitle,
+                                color = colors.secondaryText,
+                                maxLines = 1,
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                        }
+
+                        if (episodeTitle.isNotEmpty()) {
+                            TextH50(
+                                text = episodeTitle,
+                                color = colors.primaryText,
+                                maxLines = 2,
+                            )
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.width(12.dp))
+
+                TimePlayButton(
+                    timeSecs = timeSecs,
+                    contentDescriptionId = LR.string.bookmark_play,
+                    onClick = onPlayClick,
+                    isLoading = isResolving,
+                    colors = playButtonColors,
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            TextH70(
+                text = createdAtText,
+                color = colors.secondaryText,
+            )
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            TextH30(
+                text = title,
+                color = colors.primaryText,
+            )
+        }
+
+        if (showTranscript) {
+            TranscriptSection(
+                transcriptState = transcriptState,
+                passage = passage,
+                colors = colors,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .padding(top = 16.dp),
+            )
+        }
+    }
+}
+
+@Composable
+private fun TranscriptSection(
+    transcriptState: BookmarkDetailViewModel.TranscriptState,
+    passage: String?,
+    colors: BookmarkRowColors,
+    modifier: Modifier = Modifier,
+) {
+    when (transcriptState) {
+        BookmarkDetailViewModel.TranscriptState.None -> Unit
+
+        BookmarkDetailViewModel.TranscriptState.Loading -> TranscriptLoadingPlaceholder(
+            colors = colors,
+            modifier = modifier,
+        )
+
+        BookmarkDetailViewModel.TranscriptState.Unavailable -> {
+            if (passage != null) {
+                val transcript = remember(passage) { BookmarkTranscript.fromPassage(passage) }
+                BookmarkTranscriptView(
+                    transcript = transcript,
+                    passage = remember(transcript) { TextSpan(0, transcript.displayText.length) },
+                    editable = false,
+                    scrollToPassage = false,
+                    referenceOffset = if (passage.isNotEmpty()) 0 else null,
+                    modifier = modifier,
+                )
+            }
+        }
+
+        is BookmarkDetailViewModel.TranscriptState.Loaded -> BookmarkTranscriptView(
+            transcript = transcriptState.transcript,
+            passage = transcriptState.passage,
+            editable = false,
+            anchorFraction = 0.4f,
+            referenceOffset = transcriptState.referenceOffset,
+            modifier = modifier,
+        )
+    }
+}
+
+@Composable
+private fun TranscriptLoadingPlaceholder(
+    colors: BookmarkRowColors,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(20.dp),
+        modifier = modifier.padding(horizontal = 20.dp, vertical = 24.dp),
+    ) {
+        listOf(
+            listOf(0.95f, 0.88f, 0.5f),
+            listOf(0.9f, 0.72f),
+            listOf(0.6f),
+            listOf(0.93f, 0.85f, 0.6f),
+            listOf(0.82f, 0.55f),
+            listOf(0.9f, 0.78f, 0.45f),
+        ).forEach { turn ->
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                turn.forEach { fraction ->
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth(fraction)
+                            .height(14.dp)
+                            .clip(RoundedCornerShape(4.dp))
+                            .background(colors.primaryText.copy(alpha = 0.12f)),
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun DragHandle(modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier
+            .width(36.dp)
+            .height(4.dp)
+            .clip(RoundedCornerShape(2.dp))
+            .background(MaterialTheme.theme.colors.primaryText01.copy(alpha = 0.3f)),
+    )
+}
+
+@Composable
+private fun Header(
+    buttonColor: Color,
+    onClose: () -> Unit,
+    onMoreClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(start = 4.dp, end = 4.dp, top = 4.dp, bottom = 8.dp),
+    ) {
+        IconButton(
+            onClick = onClose,
+        ) {
+            Icon(
+                imageVector = Icons.Default.Close,
+                contentDescription = stringResource(LR.string.close),
+                tint = buttonColor,
+            )
+        }
+        Spacer(modifier = Modifier.weight(1f))
+        IconButton(
+            onClick = onMoreClick,
+        ) {
+            Icon(
+                painter = painterResource(IR.drawable.ic_ellipsis_horizontal),
+                contentDescription = stringResource(LR.string.more_options),
+                tint = buttonColor,
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun BookmarkDetailPagePreview(
+    @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
+) {
+    AppThemeWithBackground(themeType) {
+        BookmarkDetailPage(
+            title = "Latency vs throughput tradeoff",
+            episodeTitle = "Can the U.S. Rein in Prediction Markets?",
+            podcastUuid = "",
+            podcastTitle = "Hard Fork",
+            timeSecs = 340,
+            createdAtText = "May 7, 2024 - 6:40 PM",
+            isResolving = false,
+            onPlayClick = {},
+            onClose = {},
+            onEpisodeClick = {},
+            onMoreClick = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun BookmarkDetailPageTranscriptPreview(
+    @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
+) {
+    val transcript = remember { BookmarkTranscript.from(Transcript.TextPreview) }
+    AppThemeWithBackground(themeType) {
+        BookmarkDetailPage(
+            title = "Why admissions feel like a lottery",
+            episodeTitle = "Higher Education's Identity Crisis",
+            podcastUuid = "",
+            podcastTitle = "Radio Atlantic",
+            timeSecs = 1390,
+            createdAtText = "May 7, 2024 - 6:40 PM",
+            isResolving = false,
+            onPlayClick = {},
+            onClose = {},
+            onEpisodeClick = {},
+            onMoreClick = {},
+            passage = "Lorem ipsum",
+            transcriptState = BookmarkDetailViewModel.TranscriptState.Loaded(
+                transcript = transcript,
+                passage = transcript.sentenceDisplaySpan(index = 40),
+            ),
+        )
+    }
+}

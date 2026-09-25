@@ -257,8 +257,8 @@ class TranscriptSanitizationTest {
 
             assertEquals(
                 buildTranscript {
-                    text("Period.", startTimeMs = 0, endTimeMs = 1000)
-                    text("Unfinished sentence.", startTimeMs = 0, endTimeMs = 2000)
+                    text("Period.", startTimeMs = 0, endTimeMs = 388)
+                    text("Unfinished sentence.", startTimeMs = 388, endTimeMs = 2000)
                 },
                 output.withoutWords(),
             )
@@ -276,7 +276,7 @@ class TranscriptSanitizationTest {
             val secondEntry = output[1] as TranscriptEntry.Text
             assertEquals(
                 listOf(
-                    TranscriptEntry.WordTiming("Unfinished", 0, 1000, 0, 10),
+                    TranscriptEntry.WordTiming("Unfinished", 388, 1000, 0, 10),
                     TranscriptEntry.WordTiming("sentence.", 1000, 2000, 11, 20),
                 ),
                 secondEntry.words,

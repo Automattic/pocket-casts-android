@@ -12,6 +12,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -57,6 +58,10 @@ fun ShelfBottomSheetPage(
     onDismiss: () -> Unit,
 ) {
     val shelfUiState by shelfSharedViewModel.uiState.collectAsStateWithLifecycle()
+    DisposableEffect(shelfSharedViewModel) {
+        shelfSharedViewModel.setOverflowMenuOpen(true)
+        onDispose { shelfSharedViewModel.setOverflowMenuOpen(false) }
+    }
     val performMediaRouteClick = remember { MutableSharedFlow<Unit>() }
     val coroutineScope = rememberCoroutineScope()
     Content(
@@ -73,6 +78,7 @@ fun ShelfBottomSheetPage(
         val uiState by shelfViewModel.uiState.collectAsState()
         MenuShelfItems(
             state = uiState,
+            isVideoEnabled = shelfUiState.isVideoRenderingEnabled,
             onClick = { item, enabled ->
                 when (item) {
                     ShelfItem.Effects -> shelfSharedViewModel.onEffectsClick(ShelfItemSource.OverflowMenu)
@@ -143,6 +149,8 @@ fun ShelfBottomSheetPage(
                             source = ShelfItemSource.OverflowMenu,
                         )
                     }
+
+                    ShelfItem.StreamSelector -> shelfSharedViewModel.onVideoToggleClick(ShelfItemSource.OverflowMenu)
                 }
                 if (item != ShelfItem.Cast) onDismiss()
             },

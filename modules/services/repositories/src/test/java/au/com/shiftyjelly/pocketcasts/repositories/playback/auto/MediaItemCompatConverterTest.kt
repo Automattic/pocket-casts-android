@@ -20,7 +20,7 @@ class MediaItemCompatConverterTest {
             .setMediaMetadata(
                 MediaMetadata.Builder()
                     .setTitle("Test Podcast")
-                    .setArtist("Test Author")
+                    .setSubtitle("Test Subtitle")
                     .setDescription("A description")
                     .setArtworkUri("https://example.com/art.jpg".toUri())
                     .setIsBrowsable(true)
@@ -33,7 +33,7 @@ class MediaItemCompatConverterTest {
 
         assertEquals("podcast-123", compat.mediaId)
         assertEquals("Test Podcast", compat.description.title)
-        assertEquals("Test Author", compat.description.subtitle)
+        assertEquals("Test Subtitle", compat.description.subtitle)
         assertEquals("A description", compat.description.description)
         assertEquals("https://example.com/art.jpg".toUri(), compat.description.iconUri)
         assertTrue(compat.isBrowsable)
@@ -47,7 +47,9 @@ class MediaItemCompatConverterTest {
             .setMediaMetadata(
                 MediaMetadata.Builder()
                     .setTitle("Test Episode")
+                    // artist is set but unused; subtitle is the field that must win (PCDROID-563)
                     .setArtist("Test Podcast")
+                    .setSubtitle("5 days ago • 32 min")
                     .setIsBrowsable(false)
                     .setIsPlayable(true)
                     .build(),
@@ -58,6 +60,8 @@ class MediaItemCompatConverterTest {
 
         assertEquals("episode-456", compat.mediaId)
         assertEquals("Test Episode", compat.description.title)
+        // PCDROID-563: episode date + duration must come from MediaMetadata.subtitle, not artist
+        assertEquals("5 days ago • 32 min", compat.description.subtitle)
         assertTrue(compat.isPlayable)
         assertEquals(0, compat.flags and MediaBrowserCompat.MediaItem.FLAG_BROWSABLE)
     }

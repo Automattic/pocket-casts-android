@@ -5,6 +5,8 @@
 
 # Expected variables passed to the pipeline by ReleasesV2: `TRACK`, `ROLLOUT_PERCENT`
 
+priority: 1
+
 steps:
   - label: "🚂 Update Rollouts"
     command: |

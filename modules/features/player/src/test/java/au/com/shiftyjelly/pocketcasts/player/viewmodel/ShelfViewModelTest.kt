@@ -16,6 +16,7 @@ import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.PlayerShelfOverflowMenuRearrangeActionMovedEvent
 import com.automattic.eventhorizon.ShelfActionSourceType
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -215,6 +216,9 @@ class ShelfViewModelTest {
         whenever(transcriptManager.observeIsTranscriptAvailable(episodeId)).thenReturn(flowOf(true))
         val userSetting = mock<UserSetting<List<ShelfItem>>>()
         whenever(settings.shelfItems).thenReturn(userSetting)
+        val smartBookmarksTooltipSetting = mock<UserSetting<Boolean>>()
+        whenever(smartBookmarksTooltipSetting.flow).thenReturn(MutableStateFlow(false))
+        whenever(settings.showSmartBookmarksTooltip).thenReturn(smartBookmarksTooltipSetting)
 
         shelfViewModel = ShelfViewModel(
             episodeId = episodeId,

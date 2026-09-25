@@ -67,9 +67,13 @@ internal fun TranscriptLines(
     state: LazyListState = rememberLazyListState(),
     theme: TranscriptTheme = TranscriptTheme.default(MaterialTheme.theme.colors),
     onHighlightText: (() -> Unit)? = null,
+    onBookmarkText: ((String) -> Unit)? = null,
 ) {
-    val customMenuItems = remember {
+    val customMenuItems = remember(onBookmarkText != null) {
         buildList {
+            if (onBookmarkText != null) {
+                add(CustomMenuItemOption.Bookmark)
+            }
             // Only show the share option on older versions of Android, as the new versions
             // have a share feature built into the copy
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
@@ -86,6 +90,7 @@ internal fun TranscriptLines(
         ProvideTextSelectionToolbar(
             customMenuItems = customMenuItems,
             onHighlightText = onHighlightText,
+            onBookmarkText = onBookmarkText,
         ) {
             SelectionContainer {
                 FadedLazyColumn(
@@ -185,21 +190,26 @@ private fun TranscriptLine(
             .orEmpty()
     }
 
-    val textColor = if (isEntryHighlighted && wordTimings.isEmpty()) theme.highlightText else theme.primaryText
+    // Highlight the current word within the sentence, falling back to the whole entry when no
+    // fragment resolves so a current sentence never goes dark.
+    val wordIndex = highlightState.wordIndex
+    val highlightWord = if (isEntryHighlighted && wordIndex != null && wordTimings.isNotEmpty()) {
+        wordTimings[wordIndex.coerceAtMost(wordTimings.lastIndex)]
+            .takeIf { it.charOffsetStart in 0..<it.charOffsetEnd && it.charOffsetEnd <= entryText.length }
+    } else {
+        null
+    }
+    val textColor = if (isEntryHighlighted && highlightWord == null) theme.highlightText else theme.primaryText
 
     Text(
         text = buildAnnotatedString {
             append(entryText)
-            if (isEntryHighlighted && wordTimings.isNotEmpty() && highlightState.wordIndex != null) {
-                val wordIdx = highlightState.wordIndex.coerceAtMost(wordTimings.lastIndex)
-                val word = wordTimings[wordIdx]
-                if (word.charOffsetStart >= 0 && word.charOffsetEnd <= entryText.length) {
-                    addStyle(
-                        SpanStyle(color = theme.highlightText),
-                        word.charOffsetStart,
-                        word.charOffsetEnd,
-                    )
-                }
+            if (highlightWord != null) {
+                addStyle(
+                    SpanStyle(color = theme.highlightText),
+                    highlightWord.charOffsetStart,
+                    highlightWord.charOffsetEnd,
+                )
             }
             searchHighlights.forEach { (startIndex, endIndex) ->
                 val highlightCoordinates = SearchCoordinates(line = entryIndex, match = startIndex)

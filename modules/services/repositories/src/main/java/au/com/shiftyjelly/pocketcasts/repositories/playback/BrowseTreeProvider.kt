@@ -38,8 +38,8 @@ import au.com.shiftyjelly.pocketcasts.servers.model.transformWithRegion
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.rx2.awaitSingleOrNull
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -275,7 +275,7 @@ class BrowseTreeProvider @Inject constructor(
 
         val episodesWithSource = if (DOWNLOADS_ROOT == parentId) {
             autoPlaySource = AutoPlaySource.Predefined.Downloads
-            episodeManager.findDownloadedEpisodesRxFlowable().blockingFirst() to ""
+            episodeManager.findDownloadedEpisodesFlow().first() to ""
         } else {
             autoPlaySource = AutoPlaySource.fromId(parentId)
             val episodes = getPlaylistEpisodes(
@@ -313,10 +313,16 @@ class BrowseTreeProvider @Inject constructor(
             }
         } else {
             val podcastFound = podcastManager.findPodcastByUuid(parentId)
-                ?: podcastManager.findOrDownloadPodcastRxSingle(parentId).toMaybe().onErrorComplete().awaitSingleOrNull()
+                ?: try {
+                    podcastManager.findOrDownloadPodcast(parentId)
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    null
+                }
             podcastFound?.let { podcast ->
                 val episodes = episodeManager
-                    .findEpisodesByPodcastOrderedBlocking(podcast)
+                    .findEpisodesByPodcastOrdered(podcast)
                     .filterNot { !showPlayed && (it.isFinished || it.isArchived) }
                     .take(EPISODE_LIMIT)
                     .toMutableList()

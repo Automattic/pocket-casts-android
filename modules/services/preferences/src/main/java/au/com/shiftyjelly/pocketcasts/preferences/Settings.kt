@@ -31,7 +31,6 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.preferences.model.ThemeSetting
 import com.automattic.eventhorizon.UpNextSwipeActionType
 import com.automattic.eventhorizon.UploadedFilesSortType
-import io.reactivex.Observable
 import java.time.Instant
 import java.util.Date
 import kotlinx.coroutines.flow.Flow
@@ -129,6 +128,12 @@ interface Settings {
         const val AUTOMOTIVE_CONNECTED_TO_MEDIA_SESSION = "automotive_connected_to_media_session"
 
         const val SHOW_REFERRALS_TOOLTIP = "show_referrals_tooltip"
+
+        const val SHOW_UP_NEXT_SORT_DURATION_TOOLTIP = "show_up_next_sort_duration_tooltip"
+
+        const val SHOW_SMART_BOOKMARKS_TOOLTIP = "show_smart_bookmarks_tooltip"
+
+        const val SMART_BOOKMARKS_TOOLTIP_DISMISSED = "smart_bookmarks_tooltip_dismissed"
     }
 
     enum class NotificationChannel(val id: String) {
@@ -294,8 +299,8 @@ interface Settings {
     val currentSessionId: String
     val sessionIds: List<String>
 
-    val selectPodcastSortTypeObservable: Observable<PodcastsSortType>
-    val multiSelectItemsObservable: Observable<List<String>>
+    val selectPodcastSortTypeFlow: StateFlow<PodcastsSortType>
+    val multiSelectItemsFlow: StateFlow<List<String>>
     val refreshStateFlow: StateFlow<RefreshState>
 
     val shelfItems: UserSetting<List<ShelfItem>>
@@ -369,6 +374,8 @@ interface Settings {
 
     fun clearPlusPreferences()
 
+    fun clearUserPreferences()
+
     fun setDismissLowStorageModalTime(lastUpdateTime: Long)
     fun shouldShowLowStorageModalAfterSnooze(): Boolean
 
@@ -385,6 +392,7 @@ interface Settings {
     val streamingMode: UserSetting<Boolean>
     val keepScreenAwake: UserSetting<Boolean>
     val openPlayerAutomatically: UserSetting<Boolean>
+    val showGeneratedChapters: UserSetting<Boolean>
 
     val autoDownloadUnmeteredOnly: UserSetting<Boolean>
     val autoDownloadOnlyWhenCharging: UserSetting<Boolean>
@@ -467,6 +475,8 @@ interface Settings {
     val marketingOptIn: UserSetting<Boolean>
 
     val freeGiftAcknowledged: UserSetting<Boolean>
+
+    val audioOnly: UserSetting<Boolean>
 
     val cloudSortOrder: UserSetting<CloudSortOrder>
     val cloudAddToUpNext: UserSetting<Boolean>
@@ -591,6 +601,12 @@ interface Settings {
 
     val showReferralsTooltip: UserSetting<Boolean>
 
+    val showSmartBookmarksTooltip: UserSetting<Boolean>
+
+    val smartBookmarksTooltipDismissed: UserSetting<Boolean>
+
+    val showUpNextSortDurationTooltip: UserSetting<Boolean>
+
     val playerOrUpNextBottomSheetState: Flow<Int>
     fun updatePlayerOrUpNextBottomSheetState(state: Int)
 
@@ -613,7 +629,9 @@ interface Settings {
     val isFreeAccountProfileBannerDismissed: UserSetting<Boolean>
     val isFreeAccountFiltersBannerDismissed: UserSetting<Boolean>
     val isFreeAccountHistoryBannerDismissed: UserSetting<Boolean>
-    val showFreeAccountEncouragement: UserSetting<Boolean>
+
+    /** Cadence anchor for the recurring account-encouragement modal; `null` means the clock has never started. */
+    val freeAccountEncouragementLastShown: UserSetting<Instant?>
 
     val showPlaylistsOnboarding: UserSetting<Boolean>
     val saveUpNextAsPlaylist: UserSetting<Boolean>

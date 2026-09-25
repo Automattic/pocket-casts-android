@@ -69,3 +69,6 @@ sentry.properties
 developer.properties
 
 .claude/settings.local.json
+
+# Local scratch / working notes (not tracked)
+scratch/

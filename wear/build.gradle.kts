@@ -11,7 +11,7 @@ plugins {
 }
 
 sentry {
-    projectName = project.findProperty("sentryWearProject")?.toString()
+    projectName = "pocket-casts-wear"
 }
 
 android {
@@ -34,10 +34,6 @@ android {
 
         named("release") {
             manifestPlaceholders["appIcon"] = "@mipmap/ic_launcher"
-
-            if (project.findProperty("sentryWearProject")?.toString().isNullOrBlank()) {
-                println("WARNING: Sentry configuration not found. The ProGuard mapping files won't be uploaded.")
-            }
         }
     }
 
@@ -88,6 +84,7 @@ dependencies {
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.coroutines.android)
     implementation(libs.coroutines.core)
+    implementation(libs.coroutines.play.services)
     implementation(libs.coroutines.reactive)
     implementation(libs.coroutines.rx2)
     implementation(libs.dagger.hilt.android)
@@ -121,6 +118,7 @@ dependencies {
     implementation(libs.navigation.runtime)
     implementation(libs.okhttp)
     implementation(libs.play.auth)
+    implementation(libs.play.wearable)
     implementation(libs.retrofit)
     implementation(libs.rx2.java)
     implementation(libs.rx2.relay)
@@ -152,6 +150,7 @@ dependencies {
     implementation(projects.modules.services.mediaNoop)
     implementation(projects.modules.services.model)
     implementation(projects.modules.services.preferences)
+    implementation(projects.modules.services.qr)
     implementation(projects.modules.services.repositories)
     implementation(projects.modules.services.servers)
     implementation(projects.modules.services.sharing)

@@ -40,7 +40,7 @@ class ShiftyAudioRendererV2(
 
     @Throws(ExoPlaybackException::class)
     override fun processOutputBuffer(positionUs: Long, elapsedRealtimeUs: Long, codec: MediaCodecAdapter?, buffer: ByteBuffer?, bufferIndex: Int, bufferFlags: Int, sampleCount: Int, bufferPresentationTimeUs: Long, isDecodeOnlyBuffer: Boolean, isLastBuffer: Boolean, format: Format): Boolean {
-        if ((isDecodeOnlyBuffer || shouldUseBypass(format)) && bufferFlags and MediaCodec.BUFFER_FLAG_CODEC_CONFIG != 0) {
+        if (bufferFlags and MediaCodec.BUFFER_FLAG_CODEC_CONFIG != 0 && (isDecodeOnlyBuffer || shouldUseBypass(format))) {
             return super.processOutputBuffer(positionUs, elapsedRealtimeUs, codec, buffer, bufferIndex, bufferFlags, sampleCount, bufferPresentationTimeUs, isDecodeOnlyBuffer, isLastBuffer, format)
         }
 

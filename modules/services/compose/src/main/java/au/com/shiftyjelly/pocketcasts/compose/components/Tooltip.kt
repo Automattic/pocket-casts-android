@@ -48,25 +48,46 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 fun TooltipPopup(
     title: String,
     tipPosition: TipPosition,
+    modifier: Modifier = Modifier,
     body: String? = null,
     @FloatRange(from = 0.0, to = 1.0) maxWidthFraction: Float? = null,
     maxWidth: Dp? = null,
     elevation: Dp = 16.dp,
     anchorOffset: DpOffset = DpOffset.Zero,
     properties: PopupProperties = PopupProperties(dismissOnClickOutside = false),
+    clickableElevationPadding: Boolean = false,
     onClick: (() -> Unit)? = null,
     onClickOutside: (() -> Unit)? = null,
 ) {
     // We're adding additional padding to the popup box in order to prevent shadow clipping.
     // There's no API to determine how much padding is needed. We just eyeball it to 150%.
     val elevationPadding = elevation * 1.5f
+    val isBelowAnchor = tipPosition.isTopAligned()
     Popup(
         popupPositionProvider = rememberTooltipPositionProvider(tipPosition, anchorOffset, elevationPadding),
         properties = properties,
         onDismissRequest = onClickOutside,
     ) {
         Box(
-            modifier = Modifier.padding(elevationPadding),
+            modifier = Modifier
+                .then(
+                    if (onClick != null && clickableElevationPadding) {
+                        Modifier.clickable(
+                            interactionSource = null,
+                            indication = null,
+                            onClick = onClick,
+                        )
+                    } else {
+                        Modifier
+                    },
+                )
+                .padding(
+                    start = elevationPadding,
+                    top = if (isBelowAnchor) 0.dp else elevationPadding,
+                    end = elevationPadding,
+                    bottom = if (isBelowAnchor) elevationPadding else 0.dp,
+                )
+                .then(modifier),
         ) {
             Tooltip(
                 title = title,
@@ -219,7 +240,7 @@ private fun rememberTooltipPositionProvider(
     }
 }
 
-private class TooltipPositionProvider(
+internal class TooltipPositionProvider(
     private val tipPosition: TipPosition,
     anchorOffset: DpOffset,
     private val elevation: Dp,
@@ -239,39 +260,37 @@ private class TooltipPositionProvider(
 
         return anchorOffset + when (tipPosition.normalize(layoutDirection)) {
             TipPosition.TopStart -> {
-                val elevationOffset = IntOffset(elevationPx, elevationPx)
+                val elevationOffset = IntOffset(elevationPx, 0)
                 val tipOffset = IntOffset(density.run { CornerTipPeakPosition.roundToPx() }, 0)
                 anchorBounds.bottomCenter - elevationOffset - tipOffset
             }
 
             TipPosition.TopCenter -> {
-                val elevationOffset = IntOffset(0, elevationPx)
                 val contentOffset = IntOffset(popupContentSize.width / 2, 0)
-                anchorBounds.bottomCenter - elevationOffset - contentOffset
+                anchorBounds.bottomCenter - contentOffset
             }
 
             TipPosition.TopEnd -> {
-                val elevationOffset = IntOffset(-elevationPx, elevationPx)
+                val elevationOffset = IntOffset(-elevationPx, 0)
                 val contentOffset = IntOffset(popupContentSize.width, 0)
                 val tipOffset = IntOffset(density.run { CornerTipPeakPosition.roundToPx() }, 0)
                 anchorBounds.bottomCenter - elevationOffset - contentOffset + tipOffset
             }
 
             TipPosition.BottomStart -> {
-                val elevationOffset = IntOffset(elevationPx, -elevationPx)
+                val elevationOffset = IntOffset(elevationPx, 0)
                 val contentOffset = IntOffset(0, popupContentSize.height)
                 val tipOffset = IntOffset(density.run { CornerTipPeakPosition.roundToPx() }, 0)
                 anchorBounds.topCenter - elevationOffset - contentOffset - tipOffset
             }
 
             TipPosition.BottomCenter -> {
-                val elevationOffset = IntOffset(0, -elevationPx)
                 val contentOffset = IntOffset(popupContentSize.width / 2, popupContentSize.height)
-                anchorBounds.topCenter - elevationOffset - contentOffset
+                anchorBounds.topCenter - contentOffset
             }
 
             TipPosition.BottomEnd -> {
-                val elevationOffset = IntOffset(elevationPx, elevationPx)
+                val elevationOffset = IntOffset(elevationPx, 0)
                 val contentOffset = IntOffset(popupContentSize.width, popupContentSize.height)
                 val tipOffset = IntOffset(density.run { CornerTipPeakPosition.roundToPx() }, 0)
                 anchorBounds.topCenter + elevationOffset - contentOffset + tipOffset

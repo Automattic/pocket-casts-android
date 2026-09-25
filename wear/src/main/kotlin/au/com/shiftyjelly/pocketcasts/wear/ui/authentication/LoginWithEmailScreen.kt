@@ -86,7 +86,7 @@ fun LoginWithEmailScreen(
                 val currentState = signInState as? SignInState.Failure
                 val message = currentState?.message
                     ?: stringResource(
-                        currentState?.errors?.last()?.message
+                        currentState?.errors?.lastOrNull()?.message
                             ?: LR.string.error_login_failed,
                     )
                 ErrorScreen(message)

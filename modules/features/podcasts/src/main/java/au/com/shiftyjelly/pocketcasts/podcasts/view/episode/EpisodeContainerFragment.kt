@@ -36,6 +36,7 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
+import com.automattic.eventhorizon.ChaptersShownSource
 import com.automattic.eventhorizon.EpisodeTabType
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -54,6 +55,7 @@ class EpisodeContainerFragment :
     EpisodeFragment.EpisodeLoadedListener {
     companion object {
         private const val NEW_INSTANCE_ARG = "EpisodeContainerFragmentArg"
+        private const val INVALID_TAB_POSITION = -1
 
         fun newInstance(
             episode: PodcastEpisode,
@@ -233,6 +235,8 @@ class EpisodeContainerFragment :
             }.attach()
 
             viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+                private var previousPosition: Int = INVALID_TAB_POSITION
+
                 override fun onPageScrollStateChanged(state: Int) {
                     super.onPageScrollStateChanged(state)
                     viewPager.isUserInputEnabled = !bookmarksViewModel.multiSelectHelper.isMultiSelecting
@@ -242,7 +246,11 @@ class EpisodeContainerFragment :
                     super.onPageSelected(position)
                     btnFav.isVisible = adapter.isDetailsTab(position)
                     btnShare.isVisible = adapter.isDetailsTab(position)
+                    if (adapter.isChaptersTab(position) && previousPosition != INVALID_TAB_POSITION) {
+                        chaptersViewModel.trackChaptersShown(ChaptersShownSource.EpisodeDetails)
+                    }
                     viewModel.onPageSelected(adapter.tabType(position))
+                    previousPosition = position
                 }
             })
 
@@ -399,6 +407,8 @@ class EpisodeContainerFragment :
         fun tabType(position: Int) = sections[position].analyticsValue
 
         fun isDetailsTab(position: Int) = sections[position] is Section.Details
+
+        fun isChaptersTab(position: Int) = sections[position] is Section.Chapters
     }
 
     override fun onEpisodeLoaded(state: EpisodeFragment.EpisodeToolbarState) {

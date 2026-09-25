@@ -44,7 +44,9 @@ dependencies {
     implementation(libs.coil)
     implementation(libs.coil.network.okhttp)
     implementation(libs.compose.ui)
-    implementation(libs.compose.ui.tooling)
+    implementation(libs.compose.ui.tooling.preview)
+    debugImplementation(libs.compose.ui.tooling)
+    debugProdImplementation(libs.compose.ui.tooling)
     implementation(libs.coroutines.core)
     implementation(libs.coroutines.rx2)
     implementation(libs.fragment.ktx)
@@ -62,6 +64,7 @@ dependencies {
     implementation(projects.modules.services.localization)
     implementation(projects.modules.services.utils)
 
+    testImplementation(libs.androidx.arch.core)
     testImplementation(libs.coroutines.test)
     testImplementation(libs.junit)
     testImplementation(libs.moshi)

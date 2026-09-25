@@ -8,6 +8,9 @@ data class Chapters(
     val hasGeneratedChapters: Boolean
         get() = any { it.isGenerated }
 
+    val origin: ChapterOrigin
+        get() = firstOrNull()?.origin ?: ChapterOrigin.Unknown
+
     private val selectedItems: List<Chapter>
         get() = filter { it.selected }
 

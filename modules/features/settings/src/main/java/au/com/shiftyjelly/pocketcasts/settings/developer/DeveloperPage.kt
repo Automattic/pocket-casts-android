@@ -20,6 +20,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.PlaylistPlay
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.outlined.BugReport
+import androidx.compose.material.icons.outlined.CardGiftcard
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Downloading
 import androidx.compose.material.icons.outlined.EditCalendar
@@ -44,7 +45,9 @@ import androidx.compose.ui.window.Dialog
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.components.FormField
+import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRow
+import au.com.shiftyjelly.pocketcasts.compose.components.SettingSectionHeader
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -63,6 +66,9 @@ fun DeveloperPage(
     onShowNotificationsTestingClick: () -> Unit,
     onResetSuggestedFoldersSuggestion: () -> Unit,
     onResetPlaylistsOnboarding: () -> Unit,
+    onResetUpNextSortTooltip: () -> Unit,
+    onShowGiftTooltip: () -> Unit,
+    onShowPlaylistTooltips: () -> Unit,
     onResetNotificationsPrompt: () -> Unit,
     onShowAppReviewPrompt: () -> Unit,
     onClearAppReviewSettings: () -> Unit,
@@ -83,17 +89,12 @@ fun DeveloperPage(
                 onNavigationClick = onBackPress,
             )
         }
+
+        item {
+            SectionHeader(text = "Sync and data", showDivider = false)
+        }
         item {
             ForceRefreshSetting(onClick = onForceRefreshClick)
-        }
-        item {
-            SendCrashSetting(
-                onClick = { onSendCrash(crashMessage) },
-                onLongClick = { openCrashMessageDialog = true },
-            )
-        }
-        item {
-            TriggerNotificationSetting(onClick = onTriggerNotificationClick)
         }
         item {
             DeleteFirstEpisodeSetting(onClick = onDeleteFirstEpisodeClick)
@@ -101,20 +102,12 @@ fun DeveloperPage(
         item {
             TriggerUpdateEpisodeDetails(onClick = onTriggerUpdateEpisodeDetails)
         }
+
         item {
-            EndOfYear(onClick = onTriggerResetEoYModalProfileBadge)
+            SectionHeader(text = "Notifications")
         }
         item {
-            ResetSuggestedFoldersSuggestion(onClick = onResetSuggestedFoldersSuggestion)
-        }
-        item {
-            ShowWhatsNew(onClick = onShowWhatsNewClick)
-        }
-        item {
-            ShowAppReviewPrompt(onClick = onShowAppReviewPrompt)
-        }
-        item {
-            ClearAppReviewSettings(onClick = onClearAppReviewSettings)
+            TriggerNotificationSetting(onClick = onTriggerNotificationClick)
         }
         item {
             NotificationsTesting(onClick = onShowNotificationsTestingClick)
@@ -122,14 +115,56 @@ fun DeveloperPage(
         item {
             ResetNotificationsPrompt(onClick = onResetNotificationsPrompt)
         }
+
+        item {
+            SectionHeader(text = "Tooltips and onboarding")
+        }
+        item {
+            ResetSuggestedFoldersSuggestion(onClick = onResetSuggestedFoldersSuggestion)
+        }
         item {
             ResetPlaylistsOnboarding(onClick = onResetPlaylistsOnboarding)
+        }
+        item {
+            ShowPlaylistTooltips(onClick = onShowPlaylistTooltips)
+        }
+        item {
+            ResetUpNextSortTooltip(onClick = onResetUpNextSortTooltip)
+        }
+        item {
+            ShowGiftTooltip(onClick = onShowGiftTooltip)
+        }
+
+        item {
+            SectionHeader(text = "Modals and prompts")
+        }
+        item {
+            ShowWhatsNew(onClick = onShowWhatsNewClick)
+        }
+        item {
+            EndOfYear(onClick = onTriggerResetEoYModalProfileBadge)
+        }
+        item {
+            ShowAppReviewPrompt(onClick = onShowAppReviewPrompt)
+        }
+        item {
+            ClearAppReviewSettings(onClick = onClearAppReviewSettings)
+        }
+
+        item {
+            SectionHeader(text = "Errors and crashes")
         }
         item {
             TriggerPlaybackError(onClick = onTriggerPlaybackError)
         }
         item {
             TriggerConnectionError(onClick = onTriggerConnectionError)
+        }
+        item {
+            SendCrashSetting(
+                onClick = { onSendCrash(crashMessage) },
+                onLongClick = { openCrashMessageDialog = true },
+            )
         }
         item {
             CrashApp()
@@ -149,6 +184,23 @@ fun DeveloperPage(
 }
 
 @Composable
+private fun SectionHeader(
+    text: String,
+    modifier: Modifier = Modifier,
+    showDivider: Boolean = true,
+) {
+    Column(modifier = modifier) {
+        if (showDivider) {
+            HorizontalDivider()
+        }
+        SettingSectionHeader(
+            text = text,
+            indent = false,
+        )
+    }
+}
+
+@Composable
 private fun ForceRefreshSetting(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -157,6 +209,214 @@ private fun ForceRefreshSetting(
         primaryText = "Force refresh",
         secondaryText = "Refresh podcasts and sync data",
         icon = rememberVectorPainter(Icons.Default.Refresh),
+        modifier = modifier.clickable { onClick() },
+    )
+}
+
+@Composable
+private fun DeleteFirstEpisodeSetting(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    SettingRow(
+        primaryText = "Delete first episodes",
+        secondaryText = "Testing the podcast page can find missing episodes",
+        icon = rememberVectorPainter(Icons.Outlined.Delete),
+        modifier = modifier.clickable { onClick() },
+    )
+}
+
+@Composable
+private fun TriggerUpdateEpisodeDetails(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    SettingRow(
+        primaryText = "Trigger update episode details",
+        secondaryText = "Test the update episode details task with 5 random episodes",
+        icon = rememberVectorPainter(Icons.Outlined.Downloading),
+        modifier = modifier.clickable { onClick() },
+    )
+}
+
+@Composable
+private fun TriggerNotificationSetting(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    SettingRow(
+        primaryText = "Trigger new episode notification",
+        secondaryText = "Test the notifications work",
+        icon = rememberVectorPainter(Icons.Outlined.Notifications),
+        modifier = modifier.clickable { onClick() },
+    )
+}
+
+@Composable
+private fun NotificationsTesting(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    SettingRow(
+        primaryText = "Notifications testing",
+        secondaryText = "Adjust delays and trigger notifications on-demand",
+        icon = rememberVectorPainter(Icons.Outlined.Notifications),
+        modifier = modifier.clickable { onClick() },
+    )
+}
+
+@Composable
+private fun ResetNotificationsPrompt(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    SettingRow(
+        primaryText = "Reset notifications prompt",
+        secondaryText = "Show enable notifications prompt on Podcasts when the permission is missing",
+        icon = rememberVectorPainter(Icons.Outlined.Notifications),
+        modifier = modifier.clickable { onClick() },
+    )
+}
+
+@Composable
+private fun ResetPlaylistsOnboarding(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    SettingRow(
+        primaryText = "Reset Playlists onboarding",
+        secondaryText = "Show Playlists onboarding",
+        icon = rememberVectorPainter(Icons.AutoMirrored.Outlined.PlaylistPlay),
+        modifier = modifier.clickable { onClick() },
+    )
+}
+
+@Composable
+private fun ShowPlaylistTooltips(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    SettingRow(
+        primaryText = "Show Playlists tooltips",
+        secondaryText = "Show the premade and rearrange tooltips on the Playlists tab again",
+        icon = rememberVectorPainter(Icons.AutoMirrored.Outlined.PlaylistPlay),
+        modifier = modifier.clickable { onClick() },
+    )
+}
+
+@Composable
+private fun ResetUpNextSortTooltip(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    SettingRow(
+        primaryText = "Show Up Next sort tooltip",
+        secondaryText = "Show the \"Sort by Duration\" tooltip on the Up Next tab again",
+        icon = rememberVectorPainter(Icons.AutoMirrored.Outlined.PlaylistPlay),
+        modifier = modifier.clickable { onClick() },
+    )
+}
+
+@Composable
+private fun ShowGiftTooltip(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    SettingRow(
+        primaryText = "Show gift tooltip",
+        secondaryText = "Show the referrals tooltip on the gift icon again",
+        icon = rememberVectorPainter(Icons.Outlined.CardGiftcard),
+        modifier = modifier.clickable { onClick() },
+    )
+}
+
+@Composable
+private fun ResetSuggestedFoldersSuggestion(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    SettingRow(
+        primaryText = "Reset Smart Folders",
+        secondaryText = "Allows to retrigger suggested folders",
+        icon = rememberVectorPainter(Icons.Outlined.Folder),
+        modifier = modifier.clickable { onClick() },
+    )
+}
+
+@Composable
+private fun ShowWhatsNew(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    SettingRow(
+        primaryText = "Show What's New",
+        secondaryText = "Open the What's New page",
+        icon = rememberVectorPainter(Icons.Outlined.NewReleases),
+        modifier = modifier.clickable { onClick() },
+    )
+}
+
+@Composable
+private fun EndOfYear(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    SettingRow(
+        primaryText = "Reset End of Year modal",
+        secondaryText = "Reset modal and profile badge for end of year",
+        icon = rememberVectorPainter(Icons.Outlined.EditCalendar),
+        modifier = modifier.clickable { onClick() },
+    )
+}
+
+@Composable
+private fun ShowAppReviewPrompt(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    SettingRow(
+        primaryText = "Show app review prompt",
+        secondaryText = "Open the prompt to give ratings",
+        icon = rememberVectorPainter(Icons.Outlined.StarBorder),
+        modifier = modifier.clickable { onClick() },
+    )
+}
+
+@Composable
+private fun ClearAppReviewSettings(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    SettingRow(
+        primaryText = "Clear app review settings",
+        secondaryText = "Reset all app review settings to help test",
+        icon = rememberVectorPainter(Icons.Outlined.Delete),
+        modifier = modifier.clickable { onClick() },
+    )
+}
+
+@Composable
+private fun TriggerPlaybackError(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    SettingRow(
+        primaryText = "Trigger playback error",
+        secondaryText = "Set playback state to a playback error with chevron",
+        icon = rememberVectorPainter(Icons.Outlined.ErrorOutline),
+        modifier = modifier.clickable { onClick() },
+    )
+}
+
+@Composable
+private fun TriggerConnectionError(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    SettingRow(
+        primaryText = "Trigger connection error",
+        secondaryText = "Set playback state to a connection error without chevron",
+        icon = rememberVectorPainter(Icons.Outlined.ErrorOutline),
         modifier = modifier.clickable { onClick() },
     )
 }
@@ -176,6 +436,20 @@ private fun SendCrashSetting(
             onClick = onClick,
             onLongClick = onLongClick,
         ),
+    )
+}
+
+@Composable
+private fun CrashApp(
+    modifier: Modifier = Modifier,
+) {
+    SettingRow(
+        primaryText = "Go Bye Bye",
+        secondaryText = "Crashes the app",
+        icon = rememberVectorPainter(Icons.Outlined.ErrorOutline),
+        modifier = modifier.clickable {
+            throw RuntimeException("Crashing in 3, 2, 1… Boom!")
+        },
     )
 }
 
@@ -234,189 +508,6 @@ private fun CrashMessageDialog(
     }
 }
 
-@Composable
-private fun TriggerNotificationSetting(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    SettingRow(
-        primaryText = "Trigger new episode notification",
-        secondaryText = "Test the notifications work",
-        icon = rememberVectorPainter(Icons.Outlined.Notifications),
-        modifier = modifier.clickable { onClick() },
-    )
-}
-
-@Composable
-private fun ResetNotificationsPrompt(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    SettingRow(
-        primaryText = "Reset notifications prompt",
-        secondaryText = "Show enable notifications prompt on Podcasts when the permission is missing",
-        icon = rememberVectorPainter(Icons.Outlined.Notifications),
-        modifier = modifier.clickable { onClick() },
-    )
-}
-
-@Composable
-private fun DeleteFirstEpisodeSetting(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    SettingRow(
-        primaryText = "Delete first episodes",
-        secondaryText = "Testing the podcast page can find missing episodes",
-        icon = rememberVectorPainter(Icons.Outlined.Delete),
-        modifier = modifier.clickable { onClick() },
-    )
-}
-
-@Composable
-private fun TriggerUpdateEpisodeDetails(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    SettingRow(
-        primaryText = "Trigger update episode details",
-        secondaryText = "Test the update episode details task with 5 random episodes",
-        icon = rememberVectorPainter(Icons.Outlined.Downloading),
-        modifier = modifier.clickable { onClick() },
-    )
-}
-
-@Composable
-private fun EndOfYear(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    SettingRow(
-        primaryText = "Reset End of Year modal",
-        secondaryText = "Reset modal and profile badge for end of year",
-        icon = rememberVectorPainter(Icons.Outlined.EditCalendar),
-        modifier = modifier.clickable { onClick() },
-    )
-}
-
-@Composable
-private fun ShowWhatsNew(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    SettingRow(
-        primaryText = "Show What's New",
-        secondaryText = "Open the What's New page",
-        icon = rememberVectorPainter(Icons.Outlined.NewReleases),
-        modifier = modifier.clickable { onClick() },
-    )
-}
-
-@Composable
-private fun ShowAppReviewPrompt(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    SettingRow(
-        primaryText = "Show app review prompt",
-        secondaryText = "Open the prompt to give ratings",
-        icon = rememberVectorPainter(Icons.Outlined.StarBorder),
-        modifier = modifier.clickable { onClick() },
-    )
-}
-
-@Composable
-private fun ClearAppReviewSettings(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    SettingRow(
-        primaryText = "Clear app review settings",
-        secondaryText = "Reset all app review settings to help test",
-        icon = rememberVectorPainter(Icons.Outlined.Delete),
-        modifier = modifier.clickable { onClick() },
-    )
-}
-
-@Composable
-private fun NotificationsTesting(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    SettingRow(
-        primaryText = "Notifications testing",
-        secondaryText = "Adjust delays and trigger notifications on-demand",
-        icon = rememberVectorPainter(Icons.Outlined.Notifications),
-        modifier = modifier.clickable { onClick() },
-    )
-}
-
-@Composable
-private fun ResetPlaylistsOnboarding(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    SettingRow(
-        primaryText = "Reset Playlists onboarding",
-        secondaryText = "Show Playlists onboarding and tooltips",
-        icon = rememberVectorPainter(Icons.AutoMirrored.Outlined.PlaylistPlay),
-        modifier = modifier.clickable { onClick() },
-    )
-}
-
-@Composable
-private fun TriggerPlaybackError(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    SettingRow(
-        primaryText = "Trigger playback error",
-        secondaryText = "Set playback state to a playback error with chevron",
-        icon = rememberVectorPainter(Icons.Outlined.ErrorOutline),
-        modifier = modifier.clickable { onClick() },
-    )
-}
-
-@Composable
-private fun TriggerConnectionError(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    SettingRow(
-        primaryText = "Trigger connection error",
-        secondaryText = "Set playback state to a connection error without chevron",
-        icon = rememberVectorPainter(Icons.Outlined.ErrorOutline),
-        modifier = modifier.clickable { onClick() },
-    )
-}
-
-@Composable
-private fun CrashApp(
-    modifier: Modifier = Modifier,
-) {
-    SettingRow(
-        primaryText = "Go Bye Bye",
-        secondaryText = "Crashes the app",
-        icon = rememberVectorPainter(Icons.Outlined.ErrorOutline),
-        modifier = modifier.clickable {
-            throw RuntimeException("Crashing in 3, 2, 1… Boom!")
-        },
-    )
-}
-
-@Composable
-private fun ResetSuggestedFoldersSuggestion(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    SettingRow(
-        primaryText = "Reset Smart Folders",
-        secondaryText = "Allows to retrigger suggested folders",
-        icon = rememberVectorPainter(Icons.Outlined.Folder),
-        modifier = modifier.clickable { onClick() },
-    )
-}
-
 @Preview(name = "Light")
 @Composable
 private fun DeveloperPageLightPreview() {
@@ -448,6 +539,9 @@ private fun DeveloperPagePreview() {
         onResetSuggestedFoldersSuggestion = {},
         onShowNotificationsTestingClick = {},
         onResetPlaylistsOnboarding = {},
+        onResetUpNextSortTooltip = {},
+        onShowGiftTooltip = {},
+        onShowPlaylistTooltips = {},
         onResetNotificationsPrompt = {},
         onShowAppReviewPrompt = {},
         onClearAppReviewSettings = {},

@@ -5,5 +5,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 interface SubscriptionManager {
     suspend fun fetchFreshSubscription(): Subscription?
 
+    suspend fun fetchFreshSubscriptionResult(): Result<Subscription?>
+
     fun clearCachedMembership()
 }

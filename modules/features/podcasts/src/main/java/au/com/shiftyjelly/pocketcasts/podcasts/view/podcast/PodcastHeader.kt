@@ -117,6 +117,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageReques
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.views.extensions.copyLinkToClipboard
 import coil3.compose.rememberAsyncImagePainter
 import kotlin.math.roundToInt
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -129,6 +130,7 @@ internal fun PodcastHeader(
     title: String,
     category: String,
     author: String,
+    networkListId: String?,
     explicit: Boolean,
     description: AnnotatedString,
     podcastInfoState: PodcastInfoState,
@@ -143,6 +145,7 @@ internal fun PodcastHeader(
     contentPadding: PaddingValues,
     useBlurredArtwork: Boolean,
     onClickCategory: () -> Unit,
+    onClickNetwork: () -> Unit,
     onClickRating: () -> Unit,
     onClickFollow: () -> Unit,
     onClickUnfollow: () -> Unit,
@@ -201,7 +204,9 @@ internal fun PodcastHeader(
                 title = title,
                 category = category,
                 author = author,
+                networkListId = networkListId,
                 explicit = explicit,
+                linkColor = linkColor,
                 rating = rating,
                 onClickRating = onClickRating,
                 isFollowed = isFollowed,
@@ -211,6 +216,7 @@ internal fun PodcastHeader(
                 isHeaderExpanded = isHeaderExpanded,
                 onClickTitle = onToggleHeader,
                 onClickCategory = onClickCategory,
+                onClickNetwork = onClickNetwork,
                 onClickFollow = onClickFollow,
                 onClickUnfollow = onClickUnfollow,
                 onClickFolder = onClickFolder,
@@ -230,6 +236,7 @@ internal fun PodcastHeader(
                     isDescriptionExpanded = isDescriptionExpanded,
                     onClickShowNotes = onToggleDescription,
                     onClickWebsiteLink = onClickWebsiteLink,
+                    onClickNetwork = onClickNetwork,
                 )
             }
         }
@@ -241,7 +248,9 @@ private fun PodcastControls(
     title: String,
     category: String,
     author: String,
+    networkListId: String?,
     explicit: Boolean,
+    linkColor: Color,
     rating: RatingState,
     isFollowed: Boolean,
     areNotificationsEnabled: Boolean,
@@ -250,6 +259,7 @@ private fun PodcastControls(
     isHeaderExpanded: Boolean,
     onClickTitle: () -> Unit,
     onClickCategory: () -> Unit,
+    onClickNetwork: () -> Unit,
     onClickRating: () -> Unit,
     onClickFollow: () -> Unit,
     onClickUnfollow: () -> Unit,
@@ -276,8 +286,11 @@ private fun PodcastControls(
             PodcastCategoriesLabel(
                 category = category,
                 author = author,
+                networkListId = networkListId,
                 explicit = explicit,
+                linkColor = linkColor,
                 onClickCategory = onClickCategory,
+                onClickNetwork = onClickNetwork,
             )
         }
         TextH20(
@@ -328,11 +341,16 @@ private fun PodcastControls(
 private fun PodcastCategoriesLabel(
     category: String,
     author: String,
+    networkListId: String?,
     explicit: Boolean,
+    linkColor: Color,
     onClickCategory: () -> Unit,
+    onClickNetwork: () -> Unit,
 ) {
     val showExplicitIndicator by FeatureFlag.isEnabledFlow(Feature.EXPLICIT_PODCAST_INDICATOR).collectAsStateWithLifecycle()
-    val text = remember(category, author, explicit, onClickCategory, showExplicitIndicator) {
+    val isNetworkDiscoveryEnabled by FeatureFlag.isEnabledFlow(Feature.NETWORK_DISCOVERY).collectAsStateWithLifecycle()
+    val isAuthorLinked = isNetworkDiscoveryEnabled && networkListId != null && author.isNotBlank()
+    val text = remember(category, author, explicit, onClickCategory, onClickNetwork, showExplicitIndicator, isAuthorLinked, linkColor) {
         val text = listOf(category, author).filter(String::isNotBlank).joinToString(separator = " · ")
         buildAnnotatedString {
             append(text)
@@ -348,6 +366,20 @@ private fun PodcastCategoriesLabel(
                     ),
                     start = 0,
                     end = category.length,
+                )
+            }
+            if (isAuthorLinked) {
+                addLink(
+                    LinkAnnotation.Clickable(
+                        tag = "network",
+                        linkInteractionListener = LinkInteractionListener { onClickNetwork() },
+                        styles = TextLinkStyles(
+                            style = SpanStyle(color = linkColor, textDecoration = TextDecoration.None),
+                            focusedStyle = SpanStyle(textDecoration = TextDecoration.Underline),
+                        ),
+                    ),
+                    start = text.length - author.length,
+                    end = text.length,
                 )
             }
             if (showExplicitIndicator && explicit) {
@@ -735,7 +767,9 @@ private fun PodcastDetails(
     isDescriptionExpanded: Boolean,
     onClickShowNotes: () -> Unit,
     onClickWebsiteLink: () -> Unit,
+    onClickNetwork: () -> Unit,
 ) {
+    val context = LocalContext.current
     Column {
         if (description.isNotEmpty()) {
             Spacer(
@@ -749,6 +783,8 @@ private fun PodcastDetails(
                     color = MaterialTheme.theme.colors.primaryText01,
                 ),
                 maxLines = 4,
+                onLinkLongPress = { url -> context.copyLinkToClipboard(url) },
+                copyLinkAccessibilityLabel = stringResource(LR.string.share_label_copy_link),
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable(
@@ -764,6 +800,7 @@ private fun PodcastDetails(
         PodcastInfoView(
             state = podcastInfoState,
             onWebsiteLinkClick = onClickWebsiteLink,
+            onNetworkClick = onClickNetwork,
             linkColor = linkColor,
         )
     }
@@ -974,6 +1011,7 @@ private fun PodcastHeaderPreview(
                 title = "The Pitchfork Review",
                 category = "Music",
                 author = "Pitchfork",
+                networkListId = "list-id",
                 explicit = true,
                 description = AnnotatedString(
                     """
@@ -984,6 +1022,7 @@ private fun PodcastHeaderPreview(
                 ),
                 podcastInfoState = PodcastInfoState(
                     author = "Pocket Casts",
+                    networkListId = "list-id",
                     link = "pocketcasts.com",
                     schedule = "Every two weeks",
                     next = "Meaning of life",
@@ -1010,6 +1049,7 @@ private fun PodcastHeaderPreview(
                 ),
                 useBlurredArtwork = false,
                 onClickCategory = {},
+                onClickNetwork = {},
                 onClickRating = {},
                 onClickFollow = { isFollowed = true },
                 onClickUnfollow = { isFollowed = false },

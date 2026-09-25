@@ -30,6 +30,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.ImprovedSearchResultItem
 import au.com.shiftyjelly.pocketcasts.search.component.ImprovedSearchEpisodeResultRow
 import au.com.shiftyjelly.pocketcasts.search.component.ImprovedSearchFolderResultRow
+import au.com.shiftyjelly.pocketcasts.search.component.ImprovedSearchNetworkResultRow
 import au.com.shiftyjelly.pocketcasts.search.component.ImprovedSearchPodcastResultRow
 import au.com.shiftyjelly.pocketcasts.search.component.NoResultsView
 import au.com.shiftyjelly.pocketcasts.search.component.SearchFailedView
@@ -38,12 +39,13 @@ import au.com.shiftyjelly.pocketcasts.views.helper.PlayButtonListener
 
 @Composable
 fun ImprovedSearchResultsPage(
-    state: SearchUiState.ImprovedResults,
+    state: SearchUiState.Results,
     loading: Boolean,
     bottomInset: Dp,
     onEpisodeClick: (ImprovedSearchResultItem.EpisodeItem) -> Unit,
     onPodcastClick: (ImprovedSearchResultItem.PodcastItem) -> Unit,
     onFolderClick: (Folder, List<Podcast>) -> Unit,
+    onNetworkClick: (ImprovedSearchResultItem.NetworkItem) -> Unit,
     onFollowPodcast: (ImprovedSearchResultItem.PodcastItem) -> Unit,
     onFilterSelect: (ResultsFilters) -> Unit,
     playButtonListener: PlayButtonListener,
@@ -71,11 +73,12 @@ fun ImprovedSearchResultsPage(
                     onEpisodeClick = onEpisodeClick,
                     onPodcastClick = onPodcastClick,
                     onFolderClick = onFolderClick,
+                    onNetworkClick = onNetworkClick,
                     onFollowPodcast = onFollowPodcast,
                     playButtonListener = playButtonListener,
                     onScroll = onScroll,
                     selectedFilterIndex = state.selectedFilterIndex,
-                    filterOptions = state.filterOptions.toList(),
+                    filterOptions = state.filterOptions,
                     onFilterSelect = onFilterSelect,
                     onEmptyResultsShow = onEmptyResultsShow,
                     onResultsShow = onResultsShow,
@@ -102,11 +105,12 @@ fun ImprovedSearchResultsPage(
 
 @Composable
 private fun ImprovedSearchResultsView(
-    state: SearchUiState.SearchOperation.Success<SearchResults.ImprovedResults>,
+    state: SearchUiState.SearchOperation.Success<SearchResults.Results>,
     bottomInset: Dp,
     onEpisodeClick: (ImprovedSearchResultItem.EpisodeItem) -> Unit,
     onPodcastClick: (ImprovedSearchResultItem.PodcastItem) -> Unit,
     onFolderClick: (Folder, List<Podcast>) -> Unit,
+    onNetworkClick: (ImprovedSearchResultItem.NetworkItem) -> Unit,
     onFollowPodcast: (ImprovedSearchResultItem.PodcastItem) -> Unit,
     playButtonListener: PlayButtonListener,
     onScroll: () -> Unit,
@@ -127,7 +131,7 @@ private fun ImprovedSearchResultsView(
     }
     val listState = rememberLazyListState()
 
-    LaunchedEffect(state.searchTerm, state.results.filteredResults.size, onResultsShow, onEmptyResultsShow) {
+    LaunchedEffect(state.searchTerm, state.results.filter, state.results.filteredResults.size, onResultsShow, onEmptyResultsShow) {
         if (state.results.filteredResults.isNotEmpty()) {
             onResultsShow()
         } else if (state.searchTerm.isNotEmpty()) {
@@ -150,7 +154,8 @@ private fun ImprovedSearchResultsView(
                     .background(
                         color = MaterialTheme.colors.background,
                     )
-                    .padding(16.dp),
+                    .padding(vertical = 16.dp),
+                contentPadding = PaddingValues(horizontal = 16.dp),
                 items = filterOptions.map { stringResource(it.resId) },
                 selectedIndex = selectedFilterIndex,
                 onFilterSelect = { onFilterSelect(filterOptions[it]) },
@@ -182,6 +187,15 @@ private fun ImprovedSearchResultsView(
                                 podcastItem = item,
                                 onClick = { onPodcastClick(item) },
                                 onFollow = { onFollowPodcast(item) },
+                            )
+                        }
+                    }
+
+                    is ImprovedSearchResultItem.NetworkItem -> {
+                        item(key = "network-${item.uuid}", contentType = "network") {
+                            ImprovedSearchNetworkResultRow(
+                                networkItem = item,
+                                onClick = { onNetworkClick(item) },
                             )
                         }
                     }

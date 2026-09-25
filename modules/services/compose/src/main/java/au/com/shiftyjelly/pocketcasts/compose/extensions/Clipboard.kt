@@ -2,10 +2,11 @@ package au.com.shiftyjelly.pocketcasts.compose.extensions
 
 import android.content.ClipData
 import androidx.compose.ui.platform.Clipboard
+import androidx.compose.ui.platform.nativeClipboardManager
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 
 fun Clipboard.getPrimaryClipText(): String? = try {
-    nativeClipboard.primaryClip?.getItemAtOrNull(0)?.text?.toString()
+    nativeClipboardManager.primaryClip?.getItemAtOrNull(0)?.text?.toString()
 } catch (e: Exception) {
     LogBuffer.e(LogBuffer.TAG_CRASH, e, "Failed to get primary clip text from clipboard")
     null

@@ -24,7 +24,6 @@ import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelpe
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper.Companion.MULTI_SELECT_TOGGLE_PAYLOAD
 import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeAction
 import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeRowActions
-import io.reactivex.disposables.CompositeDisposable
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 val PLAYBACK_DIFF: DiffUtil.ItemCallback<BaseEpisode> = object : DiffUtil.ItemCallback<BaseEpisode>() {
@@ -53,7 +52,6 @@ class EpisodeListAdapter(
     private val multiSelectHelper: MultiSelectEpisodesHelper,
     private val fragmentManager: FragmentManager,
 ) : ListAdapter<BaseEpisode, RecyclerView.ViewHolder>(PLAYBACK_DIFF) {
-    val disposables = CompositeDisposable()
 
     init {
         setHasStableIds(true)
@@ -177,11 +175,6 @@ class EpisodeListAdapter(
             streamByDefault = settings.streamingMode.value,
             animateMultiSelection = animateMultiSelection,
         )
-    }
-
-    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
-        super.onDetachedFromRecyclerView(recyclerView)
-        disposables.clear()
     }
 
     override fun onViewRecycled(holder: RecyclerView.ViewHolder) {

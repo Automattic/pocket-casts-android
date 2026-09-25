@@ -8,6 +8,7 @@ import android.content.pm.PackageManager
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.deeplink.AddBookmarkDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ChangeBookmarkTitleDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.DeleteBookmarkDeepLink
@@ -19,6 +20,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.isAppForeground
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.eventhorizon.BookmarkSourceType
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -52,6 +55,7 @@ class BookmarkHelper(
                 timeSecs = timeInSecs,
             )
 
+            val isNew = bookmark == null
             if (bookmark == null) {
                 bookmark = bookmarkManager.add(
                     episode = episode,
@@ -61,6 +65,9 @@ class BookmarkHelper(
                 )
             }
 
+            if (isNew && FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS)) {
+                bookmarkManager.enrichBookmark(bookmark, SourceView.HEADPHONES.analyticsValue)
+            }
             if (settings.headphoneControlsPlayBookmarkConfirmationSound.value) {
                 playbackManager.playBookmarkTone()
             }
@@ -79,7 +86,7 @@ private fun buildAndShowNotification(
     val changeTitleAction = NotificationCompat.Action(
         IR.drawable.ic_notification_edit,
         context.getString(LR.string.bookmark_notification_action_change_title),
-        buildPendingIntent(context, ChangeBookmarkTitleDeepLink(bookmarkUuid).toIntent(context)),
+        buildPendingIntent(context, ChangeBookmarkTitleDeepLink(bookmarkUuid, sourceView = SourceView.NOTIFICATION_BOOKMARK.key).toIntent(context)),
     )
 
     val deleteAction = NotificationCompat.Action(

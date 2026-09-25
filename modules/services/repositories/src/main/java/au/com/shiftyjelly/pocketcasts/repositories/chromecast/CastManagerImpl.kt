@@ -12,10 +12,12 @@ import com.google.android.gms.cast.framework.SessionManager
 import com.google.android.gms.cast.framework.SessionManagerListener
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
-import com.jakewharton.rxrelay2.BehaviorRelay
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -27,7 +29,8 @@ class CastManagerImpl @Inject constructor(
     private val sessionManagerListener = CastSessionManagerListener()
     private var sessionListener: CastManager.SessionListener? = null
 
-    override val isConnectedObservable = BehaviorRelay.create<Boolean>().apply { accept(false) }
+    private val _isConnectedFlow = MutableStateFlow(false)
+    override val isConnectedFlow: StateFlow<Boolean> = _isConnectedFlow.asStateFlow()
 
     init {
         try {
@@ -116,12 +119,12 @@ class CastManagerImpl @Inject constructor(
             Timber.i("Cast Session onSessionStarted")
             eventHorizon.track(ChromecastStartedCastingEvent)
             sessionListener?.sessionStarted()
-            isConnectedObservable.accept(true)
+            _isConnectedFlow.value = true
         }
 
         override fun onSessionStartFailed(session: Session, i: Int) {
             LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Cast session start failed with error code $i")
-            sessionListener?.sessionFailed(i)
+            sessionListener?.sessionFailed(i, CastManager.SessionFailureType.START)
         }
 
         override fun onSessionEnding(session: Session) {
@@ -132,7 +135,7 @@ class CastManagerImpl @Inject constructor(
             Timber.i("Cast Session onSessionEnded")
             eventHorizon.track(ChromecastStoppedCastingEvent)
             sessionListener?.sessionEnded()
-            isConnectedObservable.accept(false)
+            _isConnectedFlow.value = false
         }
 
         override fun onSessionResuming(session: Session, s: String) {
@@ -142,17 +145,17 @@ class CastManagerImpl @Inject constructor(
         override fun onSessionResumed(session: Session, b: Boolean) {
             Timber.i("Cast Session onSessionResumed $sessionListener")
             sessionListener?.sessionReconnected()
-            isConnectedObservable.accept(true)
+            _isConnectedFlow.value = true
         }
 
         override fun onSessionResumeFailed(session: Session, i: Int) {
             LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Cast session resume failed with error code $i")
-            sessionListener?.sessionFailed(i)
+            sessionListener?.sessionFailed(i, CastManager.SessionFailureType.RESUME)
         }
 
         override fun onSessionSuspended(session: Session, i: Int) {
             Timber.i("Cast Session onSessionSuspended")
-            isConnectedObservable.accept(false)
+            _isConnectedFlow.value = false
         }
     }
 }

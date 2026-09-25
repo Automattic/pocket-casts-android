@@ -34,7 +34,12 @@ data class ReferenceFingerprint(
 
     val checkpointDurationSeconds: Float get() = checkpointDuration.toFloat()
 
-    fun libraryCheckpoints(): List<LibraryCheckpoint> {
+    @Json(ignore = true)
+    internal val decodedCheckpoints by lazy { decodeCheckpoints() }
+
+    fun libraryCheckpoints(): List<LibraryCheckpoint> = decodedCheckpoints
+
+    private fun decodeCheckpoints(): List<LibraryCheckpoint> {
         var accumulated = 0
         return checkpoints.mapNotNull { checkpoint ->
             if (checkpoint.size < 2) return@mapNotNull null

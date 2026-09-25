@@ -23,7 +23,6 @@ import androidx.media.utils.MediaConstants.PLAYBACK_STATE_EXTRAS_KEY_MEDIA_ID
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.CommandButton
 import androidx.media3.session.MediaLibraryService
-import androidx.media3.session.MediaSession
 import androidx.media3.session.SessionCommand
 import androidx.media3.session.SessionError
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
@@ -52,11 +51,10 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.eventhorizon.EventHorizon
-import io.reactivex.Completable
+import com.automattic.eventhorizon.PlaybackServiceType
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.Observables
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
@@ -89,6 +87,7 @@ class MediaSessionManager(
     val settings: Settings,
     val context: Context,
     val eventHorizon: EventHorizon,
+    val errorReporter: PlaybackServiceErrorReporter,
     val bookmarkManager: BookmarkManager,
     val browseTreeProvider: BrowseTreeProvider,
     private val applicationScope: CoroutineScope,
@@ -122,6 +121,7 @@ class MediaSessionManager(
         FeatureFlag.isEnabled(Feature.MEDIA3_SESSION)
     }
     private val isAutomotive = Util.isAutomotive(context)
+    private val isTv = Util.isTv(context)
 
     // Automotive always needs a MediaLibrarySession for the service contract (it's the
     // app entry point on AAOS), even when the Media3 flag is OFF. The internal behavior
@@ -135,7 +135,9 @@ class MediaSessionManager(
     val mediaSession: MediaSessionCompat? by lazy {
         if (!useMedia3Session && !isAutomotive) {
             MediaSessionCompat(context, "PocketCastsMediaSession").also { session ->
-                session.setSessionActivity(context.getLaunchActivityPendingIntent())
+                if (!isTv) {
+                    session.setSessionActivity(context.getLaunchActivityPendingIntent())
+                }
                 session.setRatingType(RatingCompat.RATING_HEART)
                 session.setExtras(
                     Bundle().apply {
@@ -253,6 +255,7 @@ class MediaSessionManager(
                                 LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Failed to add command to queue: $tag")
                             }
                         },
+                        scopeProvider = { scope },
                     ),
                 )
             }
@@ -313,8 +316,14 @@ class MediaSessionManager(
             onSkipBack = { scope.launch { commandMutex.withLock { playbackManager.skipBackwardSuspend() } } },
             onStop = {
                 if (playbackManager.player !is CastPlayer) {
-                    LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Media3: stop → pause")
-                    scope.launch { commandMutex.withLock { playbackManager.pauseSuspend(sourceView = SourceView.MEDIA_BUTTON_BROADCAST_ACTION) } }
+                    if (isAutomotive) {
+                        // On Automotive a stop command must fully tear down playback, not just pause
+                        LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Media3: stop → stop (automotive)")
+                        scope.launch { commandMutex.withLock { playbackManager.stopSuspend(sourceView = SourceView.MEDIA_BUTTON_BROADCAST_ACTION) } }
+                    } else {
+                        LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Media3: stop → pause")
+                        scope.launch { commandMutex.withLock { playbackManager.pauseSuspend(sourceView = SourceView.MEDIA_BUTTON_BROADCAST_ACTION) } }
+                    }
                 }
             },
             onPlay = {
@@ -339,6 +348,7 @@ class MediaSessionManager(
                     true
                 }
             },
+            isAutomotive = isAutomotive,
         )
 
         media3Callback = Media3SessionCallback(
@@ -376,7 +386,7 @@ class MediaSessionManager(
                 },
             )
             .apply {
-                if (!Util.isAutomotive(context)) {
+                if (!isAutomotive && !isTv) {
                     setSessionActivity(context.getLaunchActivityPendingIntent())
                 }
             }
@@ -430,6 +440,20 @@ class MediaSessionManager(
         Timber.i("Media3 session player swapped")
     }
 
+    @OptIn(UnstableApi::class)
+    @MainThread
+    private fun resetToEmptyState() {
+        val currentPlayer = forwardingPlayer ?: return
+        if (currentPlayer.wrappedPlayer is SeedStatePlayer) return
+        val seed = SeedStatePlayer(Looper.getMainLooper())
+        val swapped = currentPlayer.swapPlayer(seed)
+        swapped.clearMetadata()
+        forwardingPlayer = swapped
+        media3Session?.player = swapped
+        placeholderPlayer?.release()
+        placeholderPlayer = seed
+    }
+
     /**
      * Creates a [CastStatePlayer] and installs it into the Media3 session so that
      * notifications and lock screen controls reflect cast playback state.
@@ -478,6 +502,7 @@ class MediaSessionManager(
             onSkipForward = { scope.launch { commandMutex.withLock { playbackManager.skipForwardSuspend() } } },
             onSkipBack = { scope.launch { commandMutex.withLock { playbackManager.skipBackwardSuspend() } } },
             playGuard = currentPlayer.playGuard,
+            isAutomotive = isAutomotive,
         ).also {
             it.currentMediaItem = currentPlayer.currentMediaItem
             it.previousMediaId = currentPlayer.previousMediaId
@@ -571,12 +596,36 @@ class MediaSessionManager(
         try {
             context.startService(Intent().setComponent(component))
         } catch (e: Exception) {
-            Timber.e(e, "Failed to start ${component.className}")
+            LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Failed to start ${component.className}: $e")
+            errorReporter.trackServiceStartFailed(
+                service = if (component.className == LegacyPlaybackService::class.java.name) {
+                    PlaybackServiceType.Legacy
+                } else {
+                    PlaybackServiceType.Media3
+                },
+                error = e,
+                source = playbackManager.lastPlaybackSource,
+            )
         }
     }
 
     @OptIn(UnstableApi::class)
     private fun observeForMedia3Updates() {
+        if (isAutomotive) {
+            playbackManager.playbackStateRelay
+                .map { it.isError }
+                .distinctUntilChanged()
+                // Skip the BehaviorRelay's initial replay so we don't detach the session that
+                // PlaybackService.onCreate just attached; only react to genuine transitions after startup.
+                .skip(1)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                    onNext = { hasError -> setMedia3SessionAttached(!hasError) },
+                    onError = { Timber.e(it, "Error observing automotive active state") },
+                )
+                .addTo(disposables)
+        }
+
         val episodeAndState = playbackManager.playbackStateRelay
             .distinctUntilChanged { old, new ->
                 old.episodeUuid == new.episodeUuid &&
@@ -643,7 +692,12 @@ class MediaSessionManager(
                     val player = forwardingPlayer ?: return@subscribeBy
                     val data = dataOpt.get()
                     if (data == null) {
-                        player.clearMetadata()
+                        if (isAutomotive) {
+                            resetToEmptyState()
+                            updateMedia3CustomLayout()
+                        } else {
+                            player.clearMetadata()
+                        }
                         return@subscribeBy
                     }
                     val wrappedUri = if (data.showArtwork) {
@@ -686,6 +740,25 @@ class MediaSessionManager(
                 onError = { Timber.e(it, "Error observing Up Next changes") },
             )
             .addTo(disposables)
+    }
+
+    @OptIn(UnstableApi::class)
+    private fun setMedia3SessionAttached(attached: Boolean) {
+        val session = media3Session ?: return
+        val service = media3Service ?: return
+        try {
+            if (attached) {
+                if (!service.sessions.contains(session)) {
+                    service.addSession(session)
+                }
+            } else {
+                if (service.sessions.contains(session)) {
+                    service.removeSession(session)
+                }
+            }
+        } catch (e: Exception) {
+            Timber.e(e, "Failed to ${if (attached) "add" else "remove"} Media3 session")
+        }
     }
 
     @OptIn(UnstableApi::class)
@@ -1158,48 +1231,50 @@ class MediaSessionManager(
         stateBuilder.addCustomAction(skipBackBuilder.build())
     }
 
-    inner class MediaSessionCallback(
+    internal inner class MediaSessionCallback(
         val playbackManager: PlaybackManager,
         val episodeManager: EpisodeManager,
         val enqueueCommand: (String, suspend () -> Unit) -> Unit,
+        scopeProvider: () -> CoroutineScope,
     ) : MediaSessionCompat.Callback() {
 
-        private var playFromSearchDisposable: Disposable? = null
-        private val mediaEventQueue = MediaEventQueue(scopeProvider = { this@MediaSessionManager.scope })
+        private val mediaButtonEventHandler = MediaButtonEventHandler(
+            scopeProvider = scopeProvider,
+            onImmediatePlay = {
+                playbackManager.playIfNotPlaying(sourceView = source)
+            },
+            onMediaEvent = { event ->
+                LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Media button output event: $event")
+                when (event) {
+                    MediaEvent.SingleTap -> handleMediaButtonSingleTap()
+                    MediaEvent.DoubleTap -> handleMediaButtonDoubleTap()
+                    MediaEvent.TripleTap -> handleMediaButtonTripleTap()
+                }
+            },
+            isPlaying = { playbackManager.isPlaying() },
+        )
 
         override fun onMediaButtonEvent(mediaButtonEvent: Intent): Boolean {
-            if (Intent.ACTION_MEDIA_BUTTON == mediaButtonEvent.action) {
-                val keyEvent = IntentCompat.getParcelableExtra(mediaButtonEvent, Intent.EXTRA_KEY_EVENT, KeyEvent::class.java) ?: return false
-                logEvent(keyEvent.toString())
-                if (keyEvent.action == KeyEvent.ACTION_DOWN) {
-                    LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Media button Android event: ${keyEvent.action}")
-                    val inputEvent = when (keyEvent.keyCode) {
-                        KeyEvent.KEYCODE_MEDIA_PLAY, KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE, KeyEvent.KEYCODE_HEADSETHOOK -> MediaEvent.SingleTap
-                        KeyEvent.KEYCODE_MEDIA_NEXT -> MediaEvent.DoubleTap
-                        KeyEvent.KEYCODE_MEDIA_PREVIOUS -> MediaEvent.TripleTap
-                        else -> null
-                    }
-                    LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Media button input event: ${keyEvent.action}")
-
-                    if (inputEvent != null) {
-                        scope.launch {
-                            val outputEvent = mediaEventQueue.consumeEvent(inputEvent)
-                            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Media button output event: ${keyEvent.action}")
-                            when (outputEvent) {
-                                MediaEvent.SingleTap -> handleMediaButtonSingleTap()
-                                MediaEvent.DoubleTap -> handleMediaButtonDoubleTap()
-                                MediaEvent.TripleTap -> handleMediaButtonTripleTap()
-                                null -> Unit
-                            }
-                        }
-                        return true
-                    }
-                }
-            } else {
+            if (Intent.ACTION_MEDIA_BUTTON != mediaButtonEvent.action) {
                 logEvent("onMediaButtonEvent(${mediaButtonEvent.action ?: "unknown action"})")
+                return super.onMediaButtonEvent(mediaButtonEvent)
             }
 
-            return super.onMediaButtonEvent(mediaButtonEvent)
+            val keyEvent = IntentCompat.getParcelableExtra(
+                mediaButtonEvent,
+                Intent.EXTRA_KEY_EVENT,
+                KeyEvent::class.java,
+            ) ?: return false
+            logEvent(keyEvent.toString())
+            if (keyEvent.action == KeyEvent.ACTION_DOWN) {
+                LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Media button Android event: keyCode=${keyEvent.keyCode}")
+            }
+
+            return if (mediaButtonEventHandler.handle(keyEvent)) {
+                true
+            } else {
+                super.onMediaButtonEvent(mediaButtonEvent)
+            }
         }
 
         private fun onAddBookmark() {
@@ -1281,10 +1356,7 @@ class MediaSessionManager(
 
         override fun onPlayFromSearch(query: String?, extras: Bundle?) {
             logEvent("play from search")
-            playFromSearchDisposable?.dispose()
-            playFromSearchDisposable = performPlayFromSearchRx(query)
-                .subscribeOn(Schedulers.io())
-                .subscribeBy(onError = { Timber.e(it) })
+            actions.performPlayFromSearch(query)
         }
 
         override fun onStop() {
@@ -1388,10 +1460,6 @@ class MediaSessionManager(
 
     fun playFromSearchExternal(query: String) {
         actions.performPlayFromSearch(query)
-    }
-
-    private fun performPlayFromSearchRx(searchTerm: String?): Completable {
-        return actions.performPlayFromSearchRx(searchTerm)
     }
 
     @DrawableRes
