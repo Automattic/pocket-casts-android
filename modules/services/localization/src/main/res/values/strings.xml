@@ -1888,6 +1888,7 @@
     <string name="whats_new_feed_unread">Unread</string>
     <string name="whats_new_feed_read_all">Read all</string>
     <string name="whats_new_feed_all_read">All messages marked as read</string>
+    <string name="whats_new_message_page_progress">Page %1$d of %2$d</string>
     <string name="whats_new_feed_unable_to_load">Unable to load What\'s new</string>
     <string name="settings_manage_downloads_deleting">Deleting episodes…</string>
     <string name="settings_storage_phone">Phone</string>
