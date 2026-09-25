@@ -2487,6 +2487,7 @@
     <string name="bookmarks_delete_singular">Delete bookmark</string>
     <string name="bookmarks_deleted_plural">%1$d bookmarks deleted</string>
     <string name="bookmarks_deleted_singular">Bookmark deleted</string>
+    <string name="bookmarks_deleted_undo">Undo</string>
     <string name="bookmarks_delete_summary_plural">%d bookmarks will be deleted. This cannot be undone.</string>
     <string name="bookmarks_delete_summary_singular">This bookmark will be deleted. This cannot be undone.</string>
     <string name="bookmark_not_found">Bookmark not found</string>
