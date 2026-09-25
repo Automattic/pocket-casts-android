@@ -1,25 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-09-10 14:58:23+0000
+Translation-Revision-Date: 2026-09-16 18:10:24+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="bookmark_edit_transcript_title">編輯逐字稿</string>
+    <string name="bookmarks_upgrade_example_title">試鏡室</string>
+    <string name="bookmark_edit_transcript_subtitle">選取此書籤的逐字稿段落</string>
     <string name="search_filters_networks">網路</string>
     <string name="discover_networks">網路</string>
     <string name="discover_network">網路</string>
     <string name="device_approve_login_required">你必須擁有帳號才能連結裝置。 請登入或建立帳號，然後再試一次。</string>
     <string name="device_approve_error_message">請稍後再試。</string>
     <string name="device_approve_error_title">裝置核准失敗</string>
-    <string name="device_approve_expired_message">請回到電視畫面，產生新 QR 碼。</string>
     <string name="device_approve_expired_title">QR 碼已過期</string>
-    <string name="device_approve_success_message">電視已連結到你的帳號。</string>
-    <string name="device_approve_success_title">電視已連結</string>
     <string name="device_approve_connect">連結</string>
     <string name="device_approve_signing_in_as">正在確認登入身分…</string>
     <string name="device_approve_description">你的收聽內容會自動同步。\n可隨時前往「設定」取消連結。</string>
-    <string name="device_approve_title">連結到你的電視</string>
     <string name="tv_settings_subscription_plan">方案</string>
     <string name="tv_settings_subscription_next_renewal">下次續訂</string>
     <string name="tv_settings_subscription_lifetime">終生</string>

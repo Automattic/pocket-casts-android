@@ -1,25 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-09-10 16:55:25+0000
+Translation-Revision-Date: 2026-09-16 18:10:43+0000
 Plural-Forms: nplurals=2; plural=n > 1;
 Generator: GlotPress/2.4.0-alpha
 Language: fr
 -->
 <resources>
+    <string name="bookmark_edit_transcript_title">Modifier la transcription</string>
+    <string name="bookmarks_upgrade_example_title">La salle d’audition</string>
+    <string name="bookmark_edit_transcript_subtitle">Sélectionner un passage de transcription pour ce signet</string>
     <string name="search_filters_networks">Réseaux</string>
     <string name="discover_networks">Réseaux</string>
     <string name="discover_network">Réseau</string>
     <string name="device_approve_login_required">Pour connecter votre appareil, vous devez avoir un compte. Veuillez vous connecter ou créer un compte et réessayer.</string>
     <string name="device_approve_error_message">Veuillez réessayer plus tard.</string>
     <string name="device_approve_error_title">Échec de l’approbation de l’appareil</string>
-    <string name="device_approve_expired_message">Veuillez retourner sur votre téléviseur pour en générer un nouveau.</string>
     <string name="device_approve_expired_title">Votre code QR a expiré</string>
-    <string name="device_approve_success_message">Votre téléviseur est maintenant connecté à votre compte.</string>
-    <string name="device_approve_success_title">TV connectée</string>
     <string name="device_approve_connect">Connecter</string>
     <string name="device_approve_signing_in_as">Connexion en tant que…</string>
     <string name="device_approve_description">Votre écoute sera synchronisée automatiquement.\nVous pouvez vous déconnecter à tout moment des réglages.</string>
-    <string name="device_approve_title">Se connecter à votre téléviseur</string>
     <string name="tv_settings_subscription_plan">Plan</string>
     <string name="tv_settings_subscription_next_renewal">Prochain renouvellement</string>
     <string name="tv_settings_subscription_lifetime">Durée de vie</string>

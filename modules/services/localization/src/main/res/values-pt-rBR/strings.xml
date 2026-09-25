@@ -1,25 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-09-09 19:56:21+0000
+Translation-Revision-Date: 2026-09-16 18:10:43+0000
 Plural-Forms: nplurals=2; plural=(n > 1);
 Generator: GlotPress/2.4.0-alpha
 Language: pt_BR
 -->
 <resources>
+    <string name="bookmark_edit_transcript_title">Editar transcrição</string>
+    <string name="bookmarks_upgrade_example_title">Sala de audições</string>
+    <string name="bookmark_edit_transcript_subtitle">Selecione uma parte da transcrição para este favorito</string>
     <string name="search_filters_networks">Redes</string>
     <string name="discover_networks">Redes</string>
     <string name="discover_network">Rede</string>
     <string name="device_approve_login_required">Para conectar seu dispositivo, você precisa ter uma conta. Faça login ou crie uma conta e tente novamente.</string>
     <string name="device_approve_error_message">Tente novamente mais tarde.</string>
     <string name="device_approve_error_title">Falha na aprovação do dispositivo</string>
-    <string name="device_approve_expired_message">Volte para sua TV para gerar um novo.</string>
     <string name="device_approve_expired_title">Seu código QR expirou</string>
-    <string name="device_approve_success_message">Sua TV agora está conectada à sua conta.</string>
-    <string name="device_approve_success_title">TV conectada</string>
     <string name="device_approve_connect">Conectar</string>
     <string name="device_approve_signing_in_as">Fazendo login como…</string>
     <string name="device_approve_description">Seu streaming será sincronizado automaticamente.\nVocê pode se desconectar a qualquer momento nas Configurações.</string>
-    <string name="device_approve_title">Conectar à sua TV</string>
     <string name="tv_settings_subscription_plan">Plano</string>
     <string name="tv_settings_subscription_next_renewal">Próxima renovação</string>
     <string name="tv_settings_subscription_lifetime">Vitalícia</string>

@@ -1,25 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-09-10 11:56:41+0000
+Translation-Revision-Date: 2026-09-16 18:10:43+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="bookmark_edit_transcript_title">Transcriptie bewerken</string>
+    <string name="bookmarks_upgrade_example_title">De auditieruimte</string>
+    <string name="bookmark_edit_transcript_subtitle">Selecteer een transcriptiepassage voor deze bladwijzer</string>
     <string name="search_filters_networks">Netwerken</string>
     <string name="discover_networks">Netwerken</string>
     <string name="discover_network">Netwerk</string>
     <string name="device_approve_login_required">Om je apparaat te verbinden, moet je een account hebben. Log in of maak een account aan en probeer het opnieuw.</string>
     <string name="device_approve_error_message">Probeer het later opnieuw.</string>
     <string name="device_approve_error_title">Apparaatgoedkeuring mislukt</string>
-    <string name="device_approve_expired_message">Ga terug naar je tv om een nieuwe te genereren.</string>
     <string name="device_approve_expired_title">Je QR-code is verlopen</string>
-    <string name="device_approve_success_message">Je tv is nu verbonden met je account.</string>
-    <string name="device_approve_success_title">Tv verbonden</string>
     <string name="device_approve_connect">Verbinden</string>
     <string name="device_approve_signing_in_as">Inloggen als …</string>
     <string name="device_approve_description">Je luistergedrag wordt automatisch gesynchroniseerd.\nJe kunt op elk moment de verbinding met Instellingen verbreken.</string>
-    <string name="device_approve_title">Maak verbinding met je tv</string>
     <string name="tv_settings_subscription_plan">Abonnement</string>
     <string name="tv_settings_subscription_next_renewal">Volgende verlenging</string>
     <string name="tv_settings_subscription_lifetime">Levenslang</string>
@@ -1954,10 +1953,10 @@ Language: nl
     <string name="profile_next_payment">Volgende betaling: %s</string>
     <string name="profile_new_password">Nieuw wachtwoord</string>
     <string name="profile_new_email_address">Nieuw e-mailadres</string>
-    <string name="profile_license_agreement">Pocket Casts waardeert je privacy. In dit Privacybeleid wordt uitgelegd welke informatie we over je verzamelen en waarom, wat we met die informatie doen en hoe we de informatie behandelen. Het Privacybeleid is van toepassing op de Pocket Casts-apps voor iOS en Android en de Pocket Casts online service met bijbehorende macOS- en Windows-apps (samen en afzonderlijk de Service). Door de service te gebruiken, ga je akkoord met dit Privacybeleid. Als je pushberichten inschakelt in de app, slaan we de push-token op die Apple ons geeft om deze pushberichten naar je apparaat te sturen. Als je de online app aanschaft, slaan we een transactienummer op voor je aankoop. Als je ervoor kies geen account aan te maken en geen pushberichten gebruikt, worden er geen gegevens over jou opgeslagen op onze servers. De Pocket Casts-online service gebruikt ook cookies en andere technologieën om je ingelogd te houden. Als je ervoor kiest een ondersteuningsverzoek te genereren in de service, kunnen we een bijlage genereren met aanvullende gegevens om te helpen bij je verzoek. Je kunt deze bijlage inzien voor je hem indient.</string>
     <string name="profile_last_refresh">Laatst vernieuwd: %s geleden</string>
     <string name="profile_joined">Deelnemen:</string>
     <string name="profile_get_plus">Neem Pocket Casts Plus om deze functie en nog veel meer te ontgrendelen!</string>
+    <string name="profile_license_agreement">Pocket Casts waardeert je privacy. In dit Privacybeleid wordt uitgelegd welke informatie we over je verzamelen en waarom, wat we met die informatie doen en hoe we de informatie behandelen. Het Privacybeleid is van toepassing op de Pocket Casts-apps voor iOS en Android en de Pocket Casts online service met bijbehorende macOS- en Windows-apps (samen en afzonderlijk de Service). Door de service te gebruiken, ga je akkoord met dit Privacybeleid. Als je pushberichten inschakelt in de app, slaan we de push-token op die Apple ons geeft om deze pushberichten naar je apparaat te sturen. Als je de online app aanschaft, slaan we een transactienummer op voor je aankoop. Als je ervoor kies geen account aan te maken en geen pushberichten gebruikt, worden er geen gegevens over jou opgeslagen op onze servers. De Pocket Casts-online service gebruikt ook cookies en andere technologieën om je ingelogd te houden. Als je ervoor kiest een ondersteuningsverzoek te genereren in de service, kunnen we een bijlage genereren met aanvullende gegevens om te helpen bij je verzoek. Je kunt deze bijlage inzien voor je hem indient.</string>
     <string name="profile_free_account">Gratis account</string>
     <string name="profile_files_remove_image">Afbeelding vervangen</string>
     <string name="profile_files_empty_summary">Wil je naar je eigen bestanden luisteren?\nTik op de knop + om ze te openen in Pocket Casts en ze verschijnen hier.</string>

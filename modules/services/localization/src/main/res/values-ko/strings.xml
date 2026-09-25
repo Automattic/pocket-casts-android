@@ -1,25 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-09-09 10:56:42+0000
+Translation-Revision-Date: 2026-09-16 18:10:43+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="bookmark_edit_transcript_title">대본 편집</string>
+    <string name="bookmarks_upgrade_example_title">오디션 룸</string>
+    <string name="bookmark_edit_transcript_subtitle">이 북마크에 사용할 대본 구간 선택</string>
     <string name="search_filters_networks">네트워크</string>
     <string name="discover_networks">네트워크</string>
     <string name="discover_network">네트워크</string>
     <string name="device_approve_login_required">기기를 연결하려면 계정이 있어야 합니다. 로그인하거나 계정을 생성하고 다시 시도하세요.</string>
     <string name="device_approve_error_message">나중에 다시 시도해 보세요.</string>
     <string name="device_approve_error_title">기기 승인 실패</string>
-    <string name="device_approve_expired_message">TV로 돌아가서 새로 하나를 생성하세요.</string>
     <string name="device_approve_expired_title">QR 코드 만료됨</string>
-    <string name="device_approve_success_message">이제 TV가 계정에 연결되었습니다.</string>
-    <string name="device_approve_success_title">TV 연결됨</string>
     <string name="device_approve_connect">연결</string>
     <string name="device_approve_signing_in_as">다음으로 로그인 중…</string>
     <string name="device_approve_description">청취가 자동으로 동기화됩니다.\n언제든지 설정에서 연결을 해제할 수 있습니다.</string>
-    <string name="device_approve_title">TV에 연결</string>
     <string name="tv_settings_subscription_plan">요금제</string>
     <string name="tv_settings_subscription_next_renewal">다음 갱신</string>
     <string name="tv_settings_subscription_lifetime">평생</string>
@@ -1924,6 +1923,7 @@ Language: ko_KR
     <string name="profile_navigation_listening_history">청취 기록</string>
     <string name="profile_navigation_files">파일</string>
     <string name="profile_monthly">매월</string>
+    <string name="profile_license_agreement">Pocket Casts에서는 개인정보를 소중하게 취급합니다. 이 개인정보 취급방침에서는 회원님에 대해 수집하는 정보와 수집 이유, 해당 정보로 무엇을 할 수 있으며 어떻게 취급하는지를 설명합니다. macOS 및 Windows 앱과 연결된 Pocket Casts 웹 서비스(서비스로 통칭)와 iOS 및 Android Pocket Casts 앱에 적용됩니다. 서비스를 이용하면 이 개인정보 취급방침에 동의하는 것입니다. 앱에서 푸시 알림을 켜면 Apple에서 제공하는 푸시 토큰이 해당 푸시 알림을 기기에 전달하기 위해 저장됩니다. 웹 앱을 구매하면 구매의 거래 ID가 저장됩니다. 계정을 생성하지 않기로 선택하고 푸시 알림을 사용하지 않으면 회원님에 대한 데이터가 서버에 저장되지 않습니다. Pocket Casts 웹 서비스에서는 쿠키 및 유사한 기술을 사용하여 로그인 상태를 유지합니다. 서비스 내에서 후원 요청을 생성하기로 선택하는 경우 제출하기 전에 볼 수 있는 후원 요청을 해결하는 데 도움이 되는 추가 데이터가 포함된 첨부 파일이 생성될 수 있습니다.</string>
     <string name="profile_last_refresh">마지막 새로 고침: %s 전</string>
     <string name="profile_joined">가입됨:</string>
     <string name="profile_get_plus">이 기능과 훨씬 더 많은 기능을 잠금 해제하려면 Pocket Casts Plus를 받으세요!</string>
@@ -1935,7 +1935,6 @@ Language: ko_KR
     <string name="profile_files_add_filename">이름</string>
     <string name="profile_files_add_custom_image">사용자 정의 이미지 추가</string>
     <string name="profile_file_locked">잠김</string>
-    <string name="profile_license_agreement">Pocket Casts에서는 개인정보를 소중하게 취급합니다. 이 개인정보 취급방침에서는 회원님에 대해 수집하는 정보와 수집 이유, 해당 정보로 무엇을 할 수 있으며 어떻게 취급하는지를 설명합니다. macOS 및 Windows 앱과 연결된 Pocket Casts 웹 서비스(서비스로 통칭)와 iOS 및 Android Pocket Casts 앱에 적용됩니다. 서비스를 이용하면 이 개인정보 취급방침에 동의하는 것입니다. 앱에서 푸시 알림을 켜면 Apple에서 제공하는 푸시 토큰이 해당 푸시 알림을 기기에 전달하기 위해 저장됩니다. 웹 앱을 구매하면 구매의 거래 ID가 저장됩니다. 계정을 생성하지 않기로 선택하고 푸시 알림을 사용하지 않으면 회원님에 대한 데이터가 서버에 저장되지 않습니다. Pocket Casts 웹 서비스에서는 쿠키 및 유사한 기술을 사용하여 로그인 상태를 유지합니다. 서비스 내에서 후원 요청을 생성하기로 선택하는 경우 제출하기 전에 볼 수 있는 후원 요청을 해결하는 데 도움이 되는 추가 데이터가 포함된 첨부 파일이 생성될 수 있습니다.</string>
     <string name="profile_file">파일</string>
     <string name="profile_feature_requires">이 기능에 Pocket Casts Plus 필요</string>
     <string name="profile_ends">%s 종료</string>
