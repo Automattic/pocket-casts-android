@@ -274,6 +274,8 @@ class WhatsNewFeedViewModelTest {
             readState.value = readState.value.copy(listedMessageIds = readState.value.listedMessageIds + messageIds)
         }
 
+        override suspend fun markFeedAsSeen() = markAsSeen(feedMessages.value.map { it.id })
+
         override fun markAsResponded(pollId: String) {
             readState.value = readState.value.copy(respondedPollIds = readState.value.respondedPollIds + pollId)
         }
