@@ -45,6 +45,7 @@ class LoginWithGoogleViewModel @Inject constructor(
 
         sealed interface Failed : State {
             data object GoogleLoginUnavailable : Failed
+            data object NoGoogleCredential : Failed
             data class CredentialError(val exception: Throwable) : Failed
             data object Cancelled : Failed
             data object Other : Failed
@@ -105,7 +106,7 @@ class LoginWithGoogleViewModel @Inject constructor(
                 }.onFailure {
                     LogBuffer.e(LogBuffer.TAG_CRASH, it, "${WearLogging.PREFIX} Unable to sign in with Google One Tap")
                     _state.value = when (it) {
-                        is NoCredentialException -> State.Failed.GoogleLoginUnavailable
+                        is NoCredentialException -> State.Failed.NoGoogleCredential
 
                         is GetCredentialCancellationException,
                         is GetCredentialInterruptedException,
