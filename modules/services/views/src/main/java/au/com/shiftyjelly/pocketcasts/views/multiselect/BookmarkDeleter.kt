@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.views.multiselect
 
 import android.content.res.Resources
+import android.view.View
 import androidx.fragment.app.FragmentManager
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPlural
@@ -13,6 +14,7 @@ import com.automattic.eventhorizon.BookmarkDeleteFormShownEvent
 import com.automattic.eventhorizon.BookmarkDeleteFormSubmittedEvent
 import com.automattic.eventhorizon.BookmarkDeletedEvent
 import com.automattic.eventhorizon.EventHorizon
+import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -77,6 +79,25 @@ class BookmarkDeleter @Inject constructor(
                 }
             }
             .show(fragmentManager, "delete_bookmarks_warning")
+    }
+
+    fun deleteWithUndo(
+        bookmark: Bookmark,
+        source: SourceView,
+        snackbarView: View,
+        scope: CoroutineScope,
+        onUndo: () -> Unit = {},
+    ) {
+        scope.launch {
+            bookmarkManager.deleteToSync(bookmark.uuid)
+            eventHorizon.track(BookmarkDeletedEvent(source = source.analyticsValue))
+            Snackbar.make(snackbarView, LR.string.bookmarks_deleted_singular, Snackbar.LENGTH_LONG)
+                .setAction(LR.string.bookmarks_deleted_undo) {
+                    onUndo()
+                    scope.launch { bookmarkManager.restoreToSync(bookmark) }
+                }
+                .show()
+        }
     }
 
     internal suspend fun deleteConfirmed(bookmarks: List<Bookmark>, source: SourceView) {
