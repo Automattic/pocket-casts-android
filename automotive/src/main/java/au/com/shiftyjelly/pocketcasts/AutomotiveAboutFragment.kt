@@ -4,11 +4,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -78,7 +80,10 @@ private fun AboutPage(
     val scrollState = rememberScrollState()
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.verticalScroll(scrollState),
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.theme.colors.primaryUi04)
+            .verticalScroll(scrollState),
     ) {
         Image(
             painter = painterResource(context.getThemeDrawable(UR.attr.logo_title_vertical)),
@@ -156,5 +161,7 @@ private fun TextLinkButton(text: String, onClick: () -> Unit, modifier: Modifier
 @Composable
 @Preview
 private fun AboutPageRow() {
-    AboutPage(onOpenLicenses = {}, onOpenLogs = {}, onOpenUrl = {})
+    AutomotiveTheme {
+        AboutPage(onOpenLicenses = {}, onOpenLogs = {}, onOpenUrl = {})
+    }
 }
