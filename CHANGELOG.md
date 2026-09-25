@@ -32,6 +32,8 @@
         ([#5645](https://github.com/Automattic/pocket-casts-android/pull/5645))
     *   Prevent Cast connection failures from interrupting local playback or removing playback controls
         ([#5656](https://github.com/Automattic/pocket-casts-android/pull/5656))
+    *   Keep the Automotive account screens usable at large font sizes by not opening the keyboard over them
+        ([#6030](https://github.com/Automattic/pocket-casts-android/pull/6030))
 
 8.21
 -----
