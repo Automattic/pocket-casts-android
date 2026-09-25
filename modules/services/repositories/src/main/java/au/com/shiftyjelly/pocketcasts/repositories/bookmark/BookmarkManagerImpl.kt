@@ -236,6 +236,16 @@ class BookmarkManagerImpl @Inject constructor(
         )
     }
 
+    override suspend fun restoreToSync(bookmark: Bookmark) {
+        bookmarkDao.insert(
+            bookmark.copy(
+                deleted = false,
+                deletedModified = System.currentTimeMillis(),
+                syncStatus = SyncStatus.NOT_SYNCED,
+            ),
+        )
+    }
+
     /**
      * Remove the bookmark from the database.
      */

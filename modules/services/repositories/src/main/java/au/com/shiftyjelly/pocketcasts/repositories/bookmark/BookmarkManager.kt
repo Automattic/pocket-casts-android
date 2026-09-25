@@ -35,6 +35,7 @@ interface BookmarkManager {
         sortType: BookmarksSortTypeForPodcast,
     ): Flow<List<Bookmark>>
     suspend fun deleteToSync(bookmarkUuid: String)
+    suspend fun restoreToSync(bookmark: Bookmark)
     suspend fun deleteSynced(bookmarkUuid: String)
     suspend fun upsertSynced(bookmark: Bookmark): Bookmark
     suspend fun searchInPodcastByTitle(podcastUuid: String, title: String): List<String>
