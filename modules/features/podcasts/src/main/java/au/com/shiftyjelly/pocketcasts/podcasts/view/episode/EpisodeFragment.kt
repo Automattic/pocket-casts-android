@@ -1247,14 +1247,12 @@ class EpisodeFragment : BaseFragment() {
     }
 
     private fun onSwipeDeleteBookmarkClick(bookmark: Bookmark, settleRow: () -> Unit) {
-        bookmarkDeleter.confirmDelete(
-            bookmarks = listOf(bookmark),
+        bookmarkDeleter.deleteWithUndo(
+            bookmark = bookmark,
             source = SourceView.EPISODE_DETAILS,
-            resources = resources,
-            fragmentManager = childFragmentManager,
+            snackbarView = requireView(),
             scope = viewLifecycleOwner.lifecycleScope,
-            onDeleted = { count -> bookmarksViewModel.onBookmarksDeleted(count) },
-            onDismissed = settleRow,
+            onUndo = settleRow,
         )
     }
 
