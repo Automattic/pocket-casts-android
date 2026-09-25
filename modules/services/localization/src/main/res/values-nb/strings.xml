@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-04-11 08:10:10+0000
+Translation-Revision-Date: 2026-06-05 18:10:06+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nb_NO
 -->
 <resources>
+    <string name="sponsored">Sponset</string>
     <string name="dismiss">Avbryt</string>
     <string name="playback">Avspilling</string>
     <string name="bookmark">Bokmerke</string>
@@ -21,7 +22,6 @@ Language: nb_NO
     <string name="add_bookmark_title">Legg til bokmerke</string>
     <string name="bookmark_added">Bokmerker %s er lagt til</string>
     <string name="change_title">Endre tittel</string>
-    <string name="add_bookmark_title_hint">Legg til en valgfri tittel for å identifisere dette bokmerket</string>
     <string name="save_bookmark">Lagre bokmerke</string>
     <string name="playing_bookmark">Spiller av %s</string>
     <string name="skipping_to">Hopper til %s</string>
@@ -785,7 +785,6 @@ Language: nb_NO
     <string name="settings_apply_group_by">Vil du endre alle eksisterende podcaster til å bli gruppert av %s?</string>
     <string name="settings_apply_archived_show">Vil du endre alle eksisterende podcaster til å vise de arkiverte?</string>
     <string name="settings_apply_archived_hide">Vil du endre alle eksisterende podcaster til å skjule de arkiverte?</string>
-    <string name="settings_app_icon_updated_message">Det kan ta noen minutter før dette nye ikonet vises, og du ser to ikoner på skjermen med alle apper. Dette er normalt. Dra det nye ikonet til startskjermen, så er du klar!</string>
     <string name="settings_app_icon_updated">Ikon oppdatert</string>
     <string name="settings_app_icon_title">Tittel</string>
     <string name="settings_app_icon_image">ikonbilde</string>

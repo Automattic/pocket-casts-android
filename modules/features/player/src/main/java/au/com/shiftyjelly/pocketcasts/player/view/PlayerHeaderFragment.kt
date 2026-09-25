@@ -47,7 +47,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -76,6 +76,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.asFlow
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import au.com.shiftyjelly.pocketcasts.ads.AdReportFragment
@@ -94,9 +95,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.rememberNestedScrollLoc
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.BlazeAd
-import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.player.R
-import au.com.shiftyjelly.pocketcasts.player.view.PlaybackIssuesBottomSheetFragment
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivity
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivityContract
 import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.ArtworkImage
@@ -128,8 +127,6 @@ import au.com.shiftyjelly.pocketcasts.transcripts.ui.TranscriptShareButton
 import au.com.shiftyjelly.pocketcasts.ui.extensions.inPortrait
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog.ButtonType.Danger
@@ -144,9 +141,8 @@ import com.automattic.eventhorizon.PlaybackErrorTappedEvent
 import com.automattic.eventhorizon.PlayerErrorBannerSource
 import com.automattic.eventhorizon.TranscriptDismissedEvent
 import com.automattic.eventhorizon.TranscriptGeneratedPaywallDismissedEvent
-import com.automattic.eventhorizon.TranscriptGeneratedPaywallShownEvent
 import com.automattic.eventhorizon.TranscriptGeneratedPaywallSubscribeTappedEvent
-import com.automattic.eventhorizon.TranscriptShownEvent
+import com.automattic.eventhorizon.TranscriptTextHighlightedEvent
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -223,20 +219,24 @@ class PlayerHeaderFragment :
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ) = contentWithoutConsumedInsets {
-        val windowSize = currentWindowAdaptiveInfo().windowSizeClass
+        val windowSize = currentWindowAdaptiveInfoV2().windowSizeClass
         val isPortraitConfiguration = LocalConfiguration.current.inPortrait()
         val isPortraitPlayer = isPortraitConfiguration || windowSize.isAtLeastMediumHeight()
         val maxWidthFraction = if (isPortraitConfiguration && windowSize.isAtLeastMediumWidth()) 0.8f else 1f
 
-        val podcastColors by remember { podcastColorsFlow() }.collectAsState(PodcastColors.ForUserEpisode)
-        val headerData by remember { playerHeaderFlow() }.collectAsState(PlayerViewModel.PlayerHeader())
+        val podcastColors by remember { podcastColorsFlow() }.collectAsStateWithLifecycle(PodcastColors.ForUserEpisode)
+        val headerData by remember { playerHeaderFlow() }.collectAsStateWithLifecycle(PlayerViewModel.PlayerHeader())
+        // Not lifecycle-gated: carries the video Player/surface and re-emitting it on resume can freeze the frame.
         val artworkOrVideoState by remember { playerVisualsStateFlow() }.collectAsState(ArtworkOrVideoState.NoContent)
-        val activeAd by viewModel.activeAd.collectAsState()
-        val playbackNotice by viewModel.playbackNotice.collectAsState()
+        val activeAd by viewModel.activeAd.collectAsStateWithLifecycle()
+        val playbackNotice by viewModel.playbackNotice.collectAsStateWithLifecycle()
 
-        val isPlayerOpen by isPlayerOpenFlow().collectAsState(false)
-        val isTranscriptOpen by shelfSharedViewModel.isTranscriptOpen.collectAsState()
-        val transcriptUiState by transcriptViewModel.uiState.collectAsState()
+        val isPlayerOpen by remember { isPlayerOpenFlow() }.collectAsStateWithLifecycle(false)
+        LaunchedEffect(isPlayerOpen) {
+            shelfSharedViewModel.setPlayerOpen(isPlayerOpen)
+        }
+        val isTranscriptOpen by shelfSharedViewModel.isTranscriptOpen.collectAsStateWithLifecycle()
+        val transcriptUiState by transcriptViewModel.uiState.collectAsStateWithLifecycle()
 
         val transitionData = updateTranscriptTransitionData(
             isTranscriptOpen = isTranscriptOpen,
@@ -256,6 +256,7 @@ class PlayerHeaderFragment :
                     TranscriptContent(
                         state = transcriptUiState,
                         isVisible = transitionData.isTranscriptOpen,
+                        isPlayerOpen = isPlayerOpen,
                         isPortraitPlayer = isPortraitPlayer,
                         modifier = Modifier
                             .fillMaxWidth(fraction = maxWidthFraction)
@@ -407,6 +408,11 @@ class PlayerHeaderFragment :
                                     episodeId = it.uuid,
                                 ).show(childFragmentManager, "shelf_bottom_sheet")
                             }
+                        }
+
+                        NavigationState.ShowStreamingWarningDialog -> {
+                            warningsHelper.streamingWarningDialog(onConfirm = { shelfSharedViewModel.onVideoToggleConfirmed() })
+                                .show(parentFragmentManager, "stream warning")
                         }
 
                         NavigationState.ShowAddBookmark -> {
@@ -592,6 +598,7 @@ class PlayerHeaderFragment :
 
     private fun isListDataEquivalentForVisuals(old: PlayerViewModel.ListData, new: PlayerViewModel.ListData): Boolean {
         return old.podcastHeader.episode?.uuid == new.podcastHeader.episode?.uuid &&
+            old.podcastHeader.isVideo == new.podcastHeader.isVideo &&
             old.podcastHeader.useEpisodeArtwork == new.podcastHeader.useEpisodeArtwork &&
             old.podcastHeader.chapter?.index == new.podcastHeader.chapter?.index &&
             old.podcastHeader.isPrepared == new.podcastHeader.isPrepared
@@ -633,6 +640,7 @@ class PlayerHeaderFragment :
             override fun onSlide(bottomSheet: View, slideOffset: Float) = Unit
         }
         val hostListener = (requireActivity() as FragmentHostListener)
+        send(hostListener.getPlayerBottomSheetState() == BottomSheetBehavior.STATE_EXPANDED)
         hostListener.addPlayerBottomSheetCallback(callback)
         awaitClose {
             hostListener.removePlayerBottomSheetCallback(callback)
@@ -956,6 +964,7 @@ class PlayerHeaderFragment :
                 ArtworkOrVideo(
                     state = artworkOrVideoState,
                     onChapterUrlClick = {},
+                    videoSurfaceState = playbackManager.videoSurfaceState,
                     configureVideoView = { videoView ->
                         videoView.setOnClickListener { onFullScreenVideoClick() }
                     },
@@ -1004,6 +1013,7 @@ class PlayerHeaderFragment :
     private fun TranscriptContent(
         state: TranscriptsUiState,
         isVisible: Boolean,
+        isPlayerOpen: Boolean,
         isPortraitPlayer: Boolean,
         modifier: Modifier = Modifier,
     ) {
@@ -1016,6 +1026,9 @@ class PlayerHeaderFragment :
             val navigationBarPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
             TranscriptPage(
                 uiState = state,
+                viewModel = transcriptViewModel,
+                fingerprintTimingManager = transcriptViewModel.fingerprintTimingManager,
+                playbackManager = transcriptViewModel.playbackManager,
                 toolbarPadding = PaddingValues(horizontal = 16.dp),
                 paywallPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp),
                 transcriptPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = navigationBarPadding + if (isPortraitPlayer) 96.dp else 16.dp),
@@ -1030,6 +1043,7 @@ class PlayerHeaderFragment :
                 onSelectNextSearch = transcriptViewModel::selectNextSearchMatch,
                 onShowSearchBar = transcriptViewModel::openSearch,
                 onHideSearchBar = transcriptViewModel::hideSearch,
+                isBackHandlerEnabled = isPlayerOpen,
                 onClickSubscribe = {
                     transcriptViewModel.track { source, podcastUuid, episodeUuid ->
                         TranscriptGeneratedPaywallSubscribeTappedEvent(
@@ -1040,20 +1054,9 @@ class PlayerHeaderFragment :
                     }
                     OnboardingLauncher.openOnboardingFlow(requireActivity(), OnboardingFlow.Upsell(OnboardingUpgradeSource.GENERATED_TRANSCRIPTS))
                 },
-                onShowTranscript = { transcript ->
+                onHighlightText = {
                     transcriptViewModel.track { source, podcastUuid, episodeUuid ->
-                        TranscriptShownEvent(
-                            type = transcript.type.analyticsValue,
-                            showAsWebpage = transcript is Transcript.Web,
-                            podcastUuid = podcastUuid,
-                            episodeUuid = episodeUuid,
-                            source = source,
-                        )
-                    }
-                },
-                onShowTranscriptPaywall = {
-                    transcriptViewModel.track { source, podcastUuid, episodeUuid ->
-                        TranscriptGeneratedPaywallShownEvent(
+                        TranscriptTextHighlightedEvent(
                             podcastUuid = podcastUuid,
                             episodeUuid = episodeUuid,
                             source = source,
@@ -1061,7 +1064,7 @@ class PlayerHeaderFragment :
                     }
                 },
                 toolbarTrailingContent = { toolbarColors ->
-                    if (state.isTextTranscriptLoaded && FeatureFlag.isEnabled(Feature.SHARE_TRANSCRIPTS)) {
+                    if (state.isTextTranscriptLoaded) {
                         TranscriptShareButton(
                             toolbarColors = toolbarColors,
                             onClick = transcriptViewModel::shareTranscript,
@@ -1111,6 +1114,7 @@ class PlayerHeaderFragment :
                         state = artworkOrVideoState,
                         artworkCornerRadius = if (availableHeightDp > 120.dp) 16.dp else 8.dp,
                         onChapterUrlClick = viewModel::onChapterUrlClick,
+                        videoSurfaceState = playbackManager.videoSurfaceState,
                         configureVideoView = { videoView ->
                             videoView.setOnClickListener { onFullScreenVideoClick() }
                         },
@@ -1168,6 +1172,7 @@ class PlayerHeaderFragment :
                 ) {
                     VideoBox(
                         player = artworkOrVideoState.player,
+                        videoSurfaceState = playbackManager.videoSurfaceState,
                         configureVideoView = { videoView ->
                             videoView.setOnClickListener { onFullScreenVideoClick() }
                         },

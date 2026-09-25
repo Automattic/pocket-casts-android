@@ -14,6 +14,9 @@ enum class OnboardingUpgradeSource(
     BANNER_AD(
         analyticsValue = OnboardingSourceType.BannerAd,
     ),
+    BLOGS(
+        analyticsValue = OnboardingSourceType.Blogs,
+    ),
     ICONS(
         analyticsValue = OnboardingSourceType.Icons,
     ),
@@ -77,8 +80,17 @@ enum class OnboardingUpgradeSource(
     GENERATED_TRANSCRIPTS(
         analyticsValue = OnboardingSourceType.GeneratedTranscripts,
     ),
+    SYNCED_TRANSCRIPTS(
+        analyticsValue = OnboardingSourceType.SyncedTranscripts,
+    ),
     DEEP_LINK(
         analyticsValue = OnboardingSourceType.DeepLink,
+    ),
+    EPISODE_CHAT(
+        analyticsValue = OnboardingSourceType.EpisodeChat,
+    ),
+    AI_SUMMARIES(
+        analyticsValue = OnboardingSourceType.Unknown,
     ),
     FINISHED_ONBOARDING(
         analyticsValue = OnboardingSourceType.AccountCreated,

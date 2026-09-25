@@ -30,7 +30,6 @@ dependencies {
     api(libs.dagger.hilt.android)
     api(libs.material)
     api(libs.rx2.java)
-    api(libs.rx2.relay)
 
     api(projects.modules.features.player)
     api(projects.modules.features.transcripts)
@@ -72,6 +71,7 @@ dependencies {
 
     implementation(projects.modules.features.ads)
     implementation(projects.modules.features.account)
+    implementation(projects.modules.features.chat)
     implementation(projects.modules.features.reimagine)
     implementation(projects.modules.features.search)
     implementation(projects.modules.features.settings)

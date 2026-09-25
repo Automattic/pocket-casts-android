@@ -273,7 +273,7 @@ class PodcastSettingsViewModel @AssistedInject constructor(
 
             podcastFlow.update { it?.copy(trimMode = mode) }
             updatePlayerEffects()
-            podcastManager.updateTrimModeBlocking(podcast, mode)
+            podcastManager.updateTrimMode(podcast, mode)
         }
     }
 
@@ -291,7 +291,7 @@ class PodcastSettingsViewModel @AssistedInject constructor(
 
             podcastFlow.update { it?.copy(trimMode = mode) }
             updatePlayerEffects()
-            podcastManager.updateTrimModeBlocking(podcast, mode)
+            podcastManager.updateTrimMode(podcast, mode)
         }
     }
 
@@ -368,14 +368,16 @@ class PodcastSettingsViewModel @AssistedInject constructor(
     }
 
     fun unfollow() {
-        viewModelScope.launch(NonCancellable) {
-            podcastManager.unsubscribe(podcastUuid, SourceView.PODCAST_SETTINGS)
-            eventHorizon.track(
-                PodcastUnsubscribedEvent(
-                    uuid = podcastUuid,
-                    source = SourceView.PODCAST_SETTINGS.analyticsValue,
-                ),
-            )
+        viewModelScope.launch {
+            withContext(NonCancellable) {
+                podcastManager.unsubscribe(podcastUuid, SourceView.PODCAST_SETTINGS)
+                eventHorizon.track(
+                    PodcastUnsubscribedEvent(
+                        uuid = podcastUuid,
+                        source = SourceView.PODCAST_SETTINGS.analyticsValue,
+                    ),
+                )
+            }
         }
     }
 

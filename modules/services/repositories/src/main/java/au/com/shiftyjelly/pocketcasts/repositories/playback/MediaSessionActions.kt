@@ -12,7 +12,6 @@ import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.eventhorizon.EpisodeArchivedEvent
 import com.automattic.eventhorizon.EpisodeMarkedAsPlayedEvent
 import com.automattic.eventhorizon.EventHorizon
-import io.reactivex.Completable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -131,10 +130,6 @@ internal class MediaSessionActions(
                 )
             }
         }
-    }
-
-    fun performPlayFromSearchRx(searchTerm: String?): Completable {
-        return Completable.fromAction { performPlayFromSearch(searchTerm) }
     }
 
     fun performPlayFromSearch(searchTerm: String?) {

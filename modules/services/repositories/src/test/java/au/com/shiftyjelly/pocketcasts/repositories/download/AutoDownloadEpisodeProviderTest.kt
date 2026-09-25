@@ -38,7 +38,7 @@ class AutoDownloadEpisodeProviderTest {
     }
 
     private val episodeManager = mock<EpisodeManager> {
-        on { findEpisodesByPodcastOrderedSuspend(any()) } doAnswer { invocation ->
+        on { findEpisodesByPodcastOrdered(any()) } doAnswer { invocation ->
             podcastEpisodes[invocation.arguments[0]].orEmpty()
         }
     }

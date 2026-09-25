@@ -15,6 +15,7 @@ android {
 dependencies {
     ksp(libs.dagger.hilt.compiler)
     ksp(libs.hilt.compiler)
+    ksp(libs.moshi.kotlin.codegen)
 
     api(libs.billing.ktx)
     api(libs.dagger.hilt.android)
@@ -28,11 +29,11 @@ dependencies {
     api(libs.rx2.java)
     api(libs.rx2.relay)
     api(libs.work.runtime)
-    api(libs.work.rx2)
 
     api(projects.modules.services.analytics)
     api(projects.modules.services.coroutines)
     api(projects.modules.services.crashlogging)
+    api(projects.modules.services.fingerprint)
     api(projects.modules.services.localization)
     api(projects.modules.services.model)
     api(projects.modules.services.payment)
@@ -80,6 +81,7 @@ dependencies {
     testImplementation(libs.okHttp.mockwebserver)
     testImplementation(libs.robolectric)
     testImplementation(libs.turbine)
+    testImplementation(libs.work.test)
 
     testImplementation(projects.modules.services.sharedtest)
     testImplementation(projects.modules.services.analytics.testing)

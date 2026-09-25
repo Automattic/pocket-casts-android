@@ -1,8 +1,19 @@
 package au.com.shiftyjelly.pocketcasts.models.to
 
 sealed interface TranscriptEntry {
+    data class WordTiming(
+        val text: String,
+        val startTimeMs: Long,
+        val endTimeMs: Long,
+        val charOffsetStart: Int,
+        val charOffsetEnd: Int,
+    )
+
     data class Text(
         val value: String,
+        val startTimeMs: Long = -1L,
+        val endTimeMs: Long = -1L,
+        val words: List<WordTiming> = emptyList(),
     ) : TranscriptEntry
 
     data class Speaker(

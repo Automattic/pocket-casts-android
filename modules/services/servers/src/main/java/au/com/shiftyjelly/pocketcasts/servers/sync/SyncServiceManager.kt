@@ -14,13 +14,20 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.forgotpassword.ForgotPassword
 import au.com.shiftyjelly.pocketcasts.servers.sync.forgotpassword.ForgotPasswordResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearSyncRequest
+import au.com.shiftyjelly.pocketcasts.servers.sync.login.DeviceApproveRequest
+import au.com.shiftyjelly.pocketcasts.servers.sync.login.DeviceAuthorizeRequest
+import au.com.shiftyjelly.pocketcasts.servers.sync.login.DeviceAuthorizeResponse
+import au.com.shiftyjelly.pocketcasts.servers.sync.login.DeviceTokenRequest
+import au.com.shiftyjelly.pocketcasts.servers.sync.login.DeviceTokenResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.ExchangeSonosResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginGoogleRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginPocketCastsRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.register.RegisterRequest
+import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
+import com.google.protobuf.StringValue
 import com.pocketcasts.service.api.BookmarksResponse
 import com.pocketcasts.service.api.EpisodesResponse
 import com.pocketcasts.service.api.PodcastRatingAddRequest
@@ -39,14 +46,14 @@ import com.pocketcasts.service.api.SyncUpdateResponse
 import com.pocketcasts.service.api.UpNextResponse
 import com.pocketcasts.service.api.UserPlaylistListResponse
 import com.pocketcasts.service.api.UserPodcastListResponse
+import com.pocketcasts.service.api.WebFeedCreateRequest
+import com.pocketcasts.service.api.WebFeedCreateResponse
 import com.pocketcasts.service.api.WinbackResponse
 import com.pocketcasts.service.api.bookmarkRequest
 import com.pocketcasts.service.api.userPlaylistListRequest
 import com.pocketcasts.service.api.userPodcastListRequest
 import dagger.Lazy
-import io.reactivex.BackpressureStrategy
 import io.reactivex.Completable
-import io.reactivex.Flowable
 import io.reactivex.Single
 import java.io.File
 import java.util.Locale
@@ -68,10 +75,16 @@ open class SyncServiceManager @Inject constructor(
     private val service: SyncService,
     val settings: Settings,
     @Cached val cache: Lazy<Cache>,
+    appPlatform: AppPlatform,
 ) {
 
     companion object {
         const val SCOPE_MOBILE = "mobile"
+        const val SCOPE_TV = "tv"
+        const val SCOPE_WATCH = "watch"
+
+        // Credentials come from UserFileAuthInterceptor, not from the URL.
+        internal const val USER_FILE_PLAYBACK_PATH = "/files/url/token/"
 
         private val userPodcastListRequest = userPodcastListRequest {
             v = Settings.SYNC_API_VERSION.toString()
@@ -84,18 +97,24 @@ open class SyncServiceManager @Inject constructor(
         }
     }
 
+    private val scope = when (appPlatform) {
+        AppPlatform.Tv -> SCOPE_TV
+        AppPlatform.WearOs -> SCOPE_WATCH
+        AppPlatform.Phone, AppPlatform.Automotive -> SCOPE_MOBILE
+    }
+
     suspend fun register(email: String, password: String): LoginTokenResponse {
-        val request = RegisterRequest(email = email, password = password, scope = SCOPE_MOBILE)
+        val request = RegisterRequest(email = email, password = password, scope = scope)
         return service.register(request)
     }
 
     suspend fun login(email: String, password: String): LoginTokenResponse {
-        val request = LoginPocketCastsRequest(email = email, password = password, scope = SCOPE_MOBILE)
+        val request = LoginPocketCastsRequest(email = email, password = password, scope = scope)
         return service.loginPocketCasts(request)
     }
 
     suspend fun loginGoogle(idToken: String): LoginTokenResponse {
-        val request = LoginGoogleRequest(idToken = idToken, scope = SCOPE_MOBILE)
+        val request = LoginGoogleRequest(idToken = idToken, scope = scope)
         return service.loginGoogle(request)
     }
 
@@ -104,8 +123,23 @@ open class SyncServiceManager @Inject constructor(
      * If any 4xx is returned the user should be logged out and asked to login.
      */
     suspend fun loginToken(refreshToken: RefreshToken): LoginTokenResponse {
-        val request = LoginTokenRequest(refreshToken = refreshToken, scope = SCOPE_MOBILE)
+        val request = LoginTokenRequest(refreshToken = refreshToken)
         return service.loginToken(request)
+    }
+
+    suspend fun deviceAuthorize(): DeviceAuthorizeResponse {
+        val request = DeviceAuthorizeRequest(scope = scope)
+        return service.deviceAuthorize(request)
+    }
+
+    suspend fun deviceToken(deviceCode: String): DeviceTokenResponse {
+        val request = DeviceTokenRequest(deviceCode = deviceCode)
+        return service.deviceToken(request)
+    }
+
+    suspend fun deviceApprove(token: AccessToken, userCode: String, approve: Boolean) {
+        val request = DeviceApproveRequest(userCode = userCode, deny = !approve)
+        service.deviceApprove(addBearer(token), request)
     }
 
     suspend fun forgotPassword(email: String): ForgotPasswordResponse {
@@ -121,15 +155,15 @@ open class SyncServiceManager @Inject constructor(
         val request = EmailChangeRequest(
             newEmail,
             password,
-            SCOPE_MOBILE,
+            scope,
         )
         return service.emailChange(addBearer(token), request)
     }
 
-    fun deleteAccount(token: AccessToken): Single<UserChangeResponse> = service.deleteAccount(addBearer(token))
+    suspend fun deleteAccount(token: AccessToken): UserChangeResponse = service.deleteAccount(addBearer(token))
 
     suspend fun updatePassword(newPassword: String, oldPassword: String, token: AccessToken): LoginTokenResponse {
-        val request = UpdatePasswordRequest(newPassword = newPassword, oldPassword = oldPassword, scope = SCOPE_MOBILE)
+        val request = UpdatePasswordRequest(newPassword = newPassword, oldPassword = oldPassword, scope = scope)
         return service.updatePassword(authorization = addBearer(token), request = request)
     }
 
@@ -150,14 +184,11 @@ open class SyncServiceManager @Inject constructor(
 
     suspend fun upNextSyncProtobuf(request: com.pocketcasts.service.api.UpNextSyncRequest, token: AccessToken): UpNextResponse = service.upNextSyncProtobuf(addBearer(token), request)
 
-    fun getLastSyncAtRx(token: AccessToken): Single<String> = service.getLastSyncAtRx(addBearer(token), buildBasicRequest())
-        .map { response -> response.lastSyncAt ?: "" }
-
     suspend fun getLastSyncAtOrThrow(token: AccessToken): String = service.getLastSyncAt(addBearer(token), buildBasicRequest()).lastSyncAt ?: ""
 
     suspend fun getHomeFolder(token: AccessToken): UserPodcastListResponse = service.getPodcastList(addBearer(token), userPodcastListRequest)
 
-    fun getPodcastEpisodes(podcastUuid: String, token: AccessToken): Single<PodcastEpisodesResponse> {
+    suspend fun getPodcastEpisodes(podcastUuid: String, token: AccessToken): PodcastEpisodesResponse {
         val request = PodcastEpisodesRequest(podcastUuid)
         return service.getPodcastEpisodes(addBearer(token), request)
     }
@@ -179,7 +210,7 @@ open class SyncServiceManager @Inject constructor(
         return service.getEpisodes(addBearer(token), request)
     }
 
-    fun historySync(request: HistorySyncRequest, token: AccessToken): Single<HistorySyncResponse> = service.historySync(addBearer(token), request)
+    suspend fun historySync(request: HistorySyncRequest, token: AccessToken): HistorySyncResponse = service.historySync(addBearer(token), request)
 
     /**
      * Retrieve listening history for a year.
@@ -200,54 +231,40 @@ open class SyncServiceManager @Inject constructor(
         token: AccessToken,
     ): SubscriptionStatusResponse = service.subscriptionPurchase(addBearer(token), request)
 
-    fun getFiles(token: AccessToken): Single<Response<FilesResponse>> = service.getFiles(addBearer(token))
+    suspend fun getFiles(token: AccessToken): Response<FilesResponse> = service.getFiles(addBearer(token))
 
-    fun postFiles(files: List<FilePost>, token: AccessToken): Single<Response<Void>> {
+    suspend fun postFiles(files: List<FilePost>, token: AccessToken): Response<Void> {
         val body = FilePostBody(files)
         return service.postFiles(addBearer(token), body)
     }
 
-    fun getFileUploadUrl(file: FileUploadData, token: AccessToken): Single<String> = service.getFileUploadUrl(addBearer(token), file).map { it.url }
+    suspend fun getFileUploadUrl(file: FileUploadData, token: AccessToken): String = service.getFileUploadUrl(addBearer(token), file).url
 
-    fun getFileUploadStatus(episodeUuid: String, token: AccessToken): Single<Boolean> = service.getFileUploadStatus(addBearer(token), episodeUuid).map { it.success }
+    suspend fun getFileUploadStatus(episodeUuid: String, token: AccessToken): Boolean = service.getFileUploadStatus(addBearer(token), episodeUuid).success
 
-    fun getFileImageUploadUrl(imageData: FileImageUploadData, token: AccessToken): Single<String> = service.getFileImageUploadUrl(addBearer(token), imageData).map { it.url }
+    suspend fun getFileImageUploadUrl(imageData: FileImageUploadData, token: AccessToken): String = service.getFileImageUploadUrl(addBearer(token), imageData).url
 
-    fun uploadToServer(episode: UserEpisode, url: String): Flowable<Float> {
+    suspend fun uploadToServer(episode: UserEpisode, url: String, onProgress: (Float) -> Unit) {
         val path = episode.downloadedFilePath ?: throw IllegalStateException("File is not downloaded")
         val file = File(path)
-
-        return Flowable.create(
-            { emitter ->
-                try {
-                    val requestBody = ProgressRequestBody.create((episode.fileType ?: "audio/mp3").toMediaType(), file, emitter)
-                    val call = service.uploadFile(url, requestBody)
-                    emitter.setCancellable { call.cancel() }
-
-                    call.execute()
-                    if (!emitter.isCancelled) {
-                        emitter.onComplete()
-                    }
-                } catch (e: java.lang.Exception) {
-                    emitter.tryOnError(e)
-                }
-            },
-            BackpressureStrategy.LATEST,
-        )
+        val requestBody = ProgressRequestBody.create((episode.fileType ?: "audio/mp3").toMediaType(), file, onProgress)
+        service.uploadFile(url, requestBody)
     }
 
-    fun uploadImageToServer(imageFile: File, url: String): Single<Response<Void>> {
+    suspend fun uploadImageToServer(imageFile: File, url: String) {
         val requestBody = imageFile.asRequestBody("image/png".toMediaType())
-        return service.uploadFileNoProgress(url, requestBody)
+        service.uploadFile(url, requestBody)
     }
 
-    fun deleteImageFromServer(episode: UserEpisode, token: AccessToken): Single<Response<Void>> = service.deleteImageFile(addBearer(token), episode.uuid)
+    suspend fun deleteImageFromServer(episode: UserEpisode, token: AccessToken): Response<Void> = service.deleteImageFile(addBearer(token), episode.uuid)
 
-    fun deleteFromServer(episode: UserEpisode, token: AccessToken): Single<Response<Void>> = service.deleteFile(addBearer(token), episode.uuid)
+    suspend fun deleteFromServer(episode: UserEpisode, token: AccessToken): Response<Void> = service.deleteFile(addBearer(token), episode.uuid)
 
-    fun getPlaybackUrl(episode: UserEpisode, token: AccessToken): Single<String> = Single.just("${Settings.SERVER_API_URL}/files/url/${episode.uuid}?token=${token.value}")
+    fun getPlaybackUrl(episode: UserEpisode): String = "${Settings.SERVER_API_URL}$USER_FILE_PLAYBACK_PATH${episode.uuid}"
 
-    fun getUserEpisode(uuid: String, token: AccessToken): Single<Response<ServerFile>> = service.getFile(addBearer(token), uuid)
+    suspend fun getSignedPlaybackUrl(episode: UserEpisode, token: AccessToken): String = service.getFilePlaybackUrl(addBearer(token), episode.uuid).url
+
+    suspend fun getUserEpisode(uuid: String, token: AccessToken): Response<ServerFile> = service.getFile(addBearer(token), uuid)
 
     suspend fun loadStats(token: AccessToken): StatsBundle {
         val response = service.loadStats(addBearer(token), StatsSummaryRequest(deviceId = settings.getUniqueDeviceId()))
@@ -257,7 +274,7 @@ open class SyncServiceManager @Inject constructor(
         return StatsBundle(values, startedAt)
     }
 
-    fun getFileUsage(token: AccessToken): Single<FileAccount> = service.getFilesUsage(addBearer(token))
+    suspend fun getFileUsage(token: AccessToken): FileAccount = service.getFilesUsage(addBearer(token))
 
     suspend fun addPodcastRating(podcastUuid: String, rate: Int, token: AccessToken): PodcastRatingResponse {
         val request = PodcastRatingAddRequest.newBuilder()
@@ -300,6 +317,21 @@ open class SyncServiceManager @Inject constructor(
         return service.getStarredEpisodes(addBearer(token))
     }
 
+    suspend fun createWebFeedPodcast(token: AccessToken, url: String): WebFeedCreateResponse {
+        val request = WebFeedCreateRequest.newBuilder()
+            .setUrl(url)
+            .build()
+        return service.createWebFeedPodcast(addBearer(token), request)
+    }
+
+    suspend fun pollWebFeedPodcast(token: AccessToken, pollUuid: String, url: String): WebFeedCreateResponse {
+        val request = WebFeedCreateRequest.newBuilder()
+            .setPollUuid(StringValue.of(pollUuid))
+            .setUrl(url)
+            .build()
+        return service.createWebFeedPodcast(addBearer(token), request)
+    }
+
     // Referral
     suspend fun getReferralCode(token: AccessToken): Response<ReferralCodeResponse> {
         return service.getReferralCode(addBearer(token))
@@ -321,8 +353,7 @@ open class SyncServiceManager @Inject constructor(
     }
 
     suspend fun signOut() {
-        val cache = withContext(Dispatchers.Default) { cache.get() }
-        cache.evictAll()
+        withContext(Dispatchers.IO) { cache.get().evictAll() }
     }
 
     private fun buildBasicRequest(): BasicRequest {

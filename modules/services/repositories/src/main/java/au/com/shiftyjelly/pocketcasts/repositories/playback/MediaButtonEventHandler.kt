@@ -1,0 +1,102 @@
+package au.com.shiftyjelly.pocketcasts.repositories.playback
+
+import android.view.KeyEvent
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.yield
+
+/**
+ * Serializes media-button key events before dispatching their resolved actions.
+ *
+ * Event registration starts synchronously, which preserves framework callback order unless overlapping events
+ * contend on the queue's mutex. [onImmediatePlay] may therefore run on the caller's stack and must stay fast.
+ * [onMediaEvent] runs only after a suspension boundary, outside that synchronous registration section.
+ *
+ * A failing [onImmediatePlay] is reported and declined, which lets the tap resolve to the normal single tap
+ * action instead. It must therefore not have started playback before it throws, or that fallback toggles the
+ * playback it just started back off.
+ */
+internal class MediaButtonEventHandler(
+    private val scopeProvider: () -> CoroutineScope,
+    private val onImmediatePlay: () -> Unit,
+    private val onMediaEvent: (MediaEvent) -> Unit,
+    private val isPlaying: () -> Boolean,
+    private val onError: (Exception) -> Unit = {
+        LogBuffer.e(LogBuffer.TAG_PLAYBACK, it, "Media button event handling failed")
+    },
+) {
+    private val mediaEventQueue = MediaEventQueue(scopeProvider)
+
+    private val scope: CoroutineScope get() = scopeProvider()
+
+    fun handle(keyEvent: KeyEvent): Boolean {
+        if (keyEvent.action != KeyEvent.ACTION_DOWN) {
+            return false
+        }
+
+        val inputEvent = when (keyEvent.keyCode) {
+            KeyEvent.KEYCODE_MEDIA_PLAY,
+            KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE,
+            KeyEvent.KEYCODE_HEADSETHOOK,
+            -> MediaEvent.SingleTap
+
+            KeyEvent.KEYCODE_MEDIA_NEXT -> MediaEvent.DoubleTap
+
+            KeyEvent.KEYCODE_MEDIA_PREVIOUS -> MediaEvent.TripleTap
+
+            else -> null
+        } ?: return false
+
+        // While playback runs the device stays awake and the tap window keeps its timing, so toggle keys can still
+        // wait for it. While paused the device can suspend mid-window, and a toggle tap can only mean play.
+        val resolvesToImmediatePlay = when (keyEvent.keyCode) {
+            KeyEvent.KEYCODE_MEDIA_PLAY -> true
+
+            KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE,
+            KeyEvent.KEYCODE_HEADSETHOOK,
+            -> !isPlaying()
+
+            else -> false
+        }
+        val immediateSingleTapHandler = if (resolvesToImmediatePlay) ::handleImmediatePlay else null
+
+        // Register the event on the caller's stack where possible, so delivery order is usually preserved.
+        // Overlapping events contend on the queue's mutex and finish registering on the provided scope.
+        scope.launch(start = CoroutineStart.UNDISPATCHED) {
+            try {
+                coroutineContext.ensureActive()
+                val outputEvent = mediaEventQueue.consumeEvent(
+                    event = inputEvent,
+                    onImmediateSingleTap = immediateSingleTapHandler,
+                )
+                if (outputEvent != null) {
+                    // Output actions historically ran asynchronously on the callback scope.
+                    yield()
+                    onMediaEvent(outputEvent)
+                }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                onError(e)
+            }
+        }
+        return true
+    }
+
+    private fun handleImmediatePlay(): Boolean {
+        return try {
+            onImmediatePlay()
+            true
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            // Report and decline the tap so it still resolves to the normal single tap action.
+            onError(e)
+            false
+        }
+    }
+}

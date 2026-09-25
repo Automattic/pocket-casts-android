@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.playback
 import android.net.Uri
 import android.text.TextUtils
 import androidx.annotation.OptIn
+import androidx.media3.common.MimeTypes
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.util.UnstableApi
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
@@ -11,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.type.UserEpisodeServerStatus
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.getArtworkUrl
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.stats.PlaybackStatsCollector
 import com.google.android.gms.cast.MediaInfo
 import com.google.android.gms.cast.MediaLoadOptions
@@ -22,6 +24,7 @@ import com.google.android.gms.cast.framework.CastSession
 import com.google.android.gms.cast.framework.SessionManager
 import com.google.android.gms.cast.framework.media.RemoteMediaClient
 import com.google.android.gms.common.images.WebImage
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONException
@@ -30,6 +33,7 @@ import timber.log.Timber
 
 class CastPlayer(
     private val playbackStatsCollector: PlaybackStatsCollector,
+    private val userEpisodeManager: UserEpisodeManager,
     override val onPlayerEvent: (Player, PlayerEvent) -> Unit,
 ) : Player {
 
@@ -44,8 +48,6 @@ class CastPlayer(
     private var playbackEffects: PlaybackEffects? = null
     private val remoteMediaClientListener = RemoteMediaClientListener()
     private val playPauseCallback = PlayPauseCallback(playbackStatsCollector, currentClient = { remoteMediaClient })
-
-    override var isPip: Boolean = false
 
     private val sessionManager: SessionManager?
         get() = CastContext.getSharedInstance()?.sessionManager
@@ -236,8 +238,8 @@ class CastPlayer(
         this.podcast = podcast
     }
 
-    override fun setEpisode(episode: BaseEpisode) {
-        this.episodeLocation = EpisodeLocation.Stream(episode, episode.downloadUrl)
+    override fun setEpisode(episode: BaseEpisode, preferStream: Boolean) {
+        this.episodeLocation = EpisodeLocation.Stream(episode, episode.streamUrl, episode.isStreamUrlHls)
         localEpisodeUuid = episode.uuid
         buildCustomData()
     }
@@ -251,7 +253,7 @@ class CastPlayer(
         remoteMediaClient?.registerCallback(playPauseCallback)
     }
 
-    private fun loadEpisode(episodeUuid: String, currentPositionMs: Int, autoPlay: Boolean) {
+    private suspend fun loadEpisode(episodeUuid: String, currentPositionMs: Int, autoPlay: Boolean) {
         if (episodeUuid == remoteEpisodeUuid && autoPlay) {
             remoteMediaClient?.play()
             return
@@ -262,12 +264,25 @@ class CastPlayer(
         if (episode == null || podcast == null || episodeUuid != episode.uuid) {
             return
         }
-        val url = episode.downloadUrl ?: return
+        val url = episodeLocation?.uri ?: return
         if (episode is UserEpisode && (episode.serverStatus != UserEpisodeServerStatus.UPLOADED || episode.downloadUrl == null)) {
             onPlayerEvent(this, PlayerEvent.PlayerError("Unable to cast local file"))
             return
         }
-        val mediaInfo = buildMediaInfo(url, episode, podcast)
+        // A cast device fetches the file itself and cannot send our auth header, so it needs a signed URL.
+        val castUrl = if (episode is UserEpisode) {
+            try {
+                withContext(Dispatchers.IO) { userEpisodeManager.getSignedPlaybackUrl(episode) }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                onPlayerEvent(this, PlayerEvent.PlayerError("Could not load cloud file ${e.message}"))
+                return
+            }
+        } else {
+            url
+        }
+        val mediaInfo = buildMediaInfo(castUrl, episode, podcast)
         val loadOptions = MediaLoadOptions.Builder()
             .setAutoplay(autoPlay)
             .setPlaybackRate(calcPlaybackSpeed())
@@ -286,8 +301,15 @@ class CastPlayer(
             putString(MediaMetadata.KEY_ALBUM_TITLE, podcast.title)
             addImage(WebImage(Uri.parse(podcast.getArtworkUrl(960))))
         }
+        // STREAM_TYPE_BUFFERED is correct for VOD podcasts (including VOD HLS). Live HLS would
+        // need STREAM_TYPE_LIVE, but we don't currently serve live streams.
         var mediaInfo = MediaInfo.Builder(url).setStreamType(MediaInfo.STREAM_TYPE_BUFFERED).setMetadata(mediaMetadata)
-        episode.fileType?.let {
+        val contentType = if (episodeLocation.isHlsStream) {
+            MimeTypes.APPLICATION_M3U8
+        } else {
+            episode.fileType
+        }
+        contentType?.let {
             mediaInfo = mediaInfo.setContentType(it)
         }
         customData?.let {

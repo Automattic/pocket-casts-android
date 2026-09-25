@@ -8,10 +8,13 @@ import android.view.LayoutInflater
 import android.view.SurfaceHolder
 import android.widget.FrameLayout
 import androidx.annotation.OptIn
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.media3.common.util.UnstableApi
 import au.com.shiftyjelly.pocketcasts.player.databinding.VideoViewBinding
 import au.com.shiftyjelly.pocketcasts.repositories.playback.Player
 import au.com.shiftyjelly.pocketcasts.repositories.playback.SimplePlayer
+import au.com.shiftyjelly.pocketcasts.repositories.playback.VideoSurfaceState
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 
 @OptIn(UnstableApi::class)
@@ -23,6 +26,7 @@ class VideoView @JvmOverloads constructor(
     SurfaceHolder.Callback,
     SimplePlayer.VideoChangedListener {
     var player: Player? = null
+    var videoSurfaceStateProvider: (() -> VideoSurfaceState)? = null
     private var isSurfaceCreated = false
     private var isSurfaceConnectionPending = false
     private var isSurfaceConnected = false
@@ -42,8 +46,31 @@ class VideoView @JvmOverloads constructor(
         super.setVisibility(visibility)
         if (visibility == GONE) {
             isSurfaceConnected = false
-            (player as? SimplePlayer)?.setDisplay(null)
+            (player as? SimplePlayer)?.clearDisplay(binding.surfaceView)
         }
+    }
+
+    override fun onDetachedFromWindow() {
+        // Compose removes (rather than hides) this view when the player switches off video, so detach
+        // the surface here too — otherwise the SurfaceView keeps showing the last decoded frame.
+        releaseSurface()
+        super.onDetachedFromWindow()
+    }
+
+    override fun onWindowVisibilityChanged(visibility: Int) {
+        super.onWindowVisibilityChanged(visibility)
+        // The fullscreen player may have taken the video output while this window was hidden.
+        if (visibility == VISIBLE && isSurfaceCreated) {
+            isSurfaceConnected = false
+            connectWithDelay()
+        }
+    }
+
+    /** Detach the surface from the player so no frozen frame lingers once video is no longer shown. */
+    fun releaseSurface() {
+        (player as? SimplePlayer)?.clearDisplay(binding.surfaceView)
+        isSurfaceConnected = false
+        isSurfaceConnectionPending = false
     }
 
     fun connectWithDelay() {
@@ -67,13 +94,29 @@ class VideoView @JvmOverloads constructor(
         }, SURFACE_CONNECT_DELAY_MS)
     }
 
+    fun reconnect() {
+        isSurfaceConnected = false
+        connectWithDelay()
+    }
+
     private fun connect() {
         if (!isSurfaceCreated || isSurfaceConnected || !isSurfaceConnectionPending) {
             return
         }
 
+        // A backgrounded host must not steal the video output from the fullscreen player.
+        val lifecycleState = findViewTreeLifecycleOwner()?.lifecycle?.currentState
+        if (lifecycleState != null && !lifecycleState.isAtLeast(Lifecycle.State.STARTED)) {
+            return
+        }
+
+        // The fullscreen or PiP player owns the surface while it lives, so don't claim it here.
+        if ((videoSurfaceStateProvider?.invoke() ?: VideoSurfaceState.NONE) != VideoSurfaceState.NONE) {
+            return
+        }
+
         val player = this.player as? SimplePlayer
-        if (player == null || !player.supportsVideo() || player.isRemote || player.isPip) {
+        if (player == null || !player.supportsVideo() || player.isRemote) {
             return
         }
 
@@ -91,6 +134,8 @@ class VideoView @JvmOverloads constructor(
     override fun videoNeedsReset() {
         isSurfaceConnected = false
     }
+
+    override fun videoFirstFrameRendered() = Unit
 
     override fun surfaceCreated(holder: SurfaceHolder) {
         isSurfaceCreated = true

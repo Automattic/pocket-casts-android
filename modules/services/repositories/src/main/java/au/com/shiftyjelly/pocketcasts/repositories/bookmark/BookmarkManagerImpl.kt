@@ -9,25 +9,40 @@ import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeDefault
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForPodcast
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForProfile
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
+import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptWindowExtractor
+import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
+import au.com.shiftyjelly.pocketcasts.servers.sync.bookmark.BookmarkEnrichRequest
+import au.com.shiftyjelly.pocketcasts.servers.sync.bookmark.BookmarkEnrichResponse
 import com.automattic.eventhorizon.BookmarkCreatedEvent
+import com.automattic.eventhorizon.BookmarkEnrichmentTriggerType
 import com.automattic.eventhorizon.BookmarkSourceType
 import com.automattic.eventhorizon.BookmarkUpdateTitleEvent
 import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.SourceViewType
 import java.time.Instant
 import java.util.Date
 import java.util.UUID
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 class BookmarkManagerImpl @Inject constructor(
     appDatabase: AppDatabase,
     private val eventHorizon: EventHorizon,
+    private val syncManager: SyncManager,
+    private val podcastCacheServiceManager: PodcastCacheServiceManager,
+    private val transcriptWindowExtractor: TranscriptWindowExtractor,
+    private val bookmarkGenerationAnalytics: BookmarkGenerationAnalytics,
 ) : BookmarkManager,
     CoroutineScope {
 
@@ -47,8 +62,12 @@ class BookmarkManagerImpl @Inject constructor(
         title: String,
         creationSource: BookmarkSourceType,
         addedAt: Instant,
+        passage: String?,
+        passageLocation: Int?,
+        referenceTime: Int?,
     ): Bookmark {
-        // Prevent adding more than one bookmark at the same place
+        // Prevent adding more than one bookmark at the same place. A passage from a new selection is
+        // persisted only when the user confirms it in the editor, not here.
         val existingBookmark = findByEpisodeTime(episode = episode, timeSecs = timeSecs)
         if (existingBookmark != null) {
             return existingBookmark
@@ -64,6 +83,11 @@ class BookmarkManagerImpl @Inject constructor(
             titleModified = addedAtMs,
             deleted = false,
             deletedModified = addedAtMs,
+            passage = passage,
+            passageLocation = passageLocation,
+            passageModified = addedAtMs.takeIf { passage != null },
+            referenceTime = referenceTime,
+            referenceTimeModified = addedAtMs.takeIf { referenceTime != null },
             syncStatus = SyncStatus.NOT_SYNCED,
         )
         bookmarkDao.insert(bookmark)
@@ -90,6 +114,19 @@ class BookmarkManagerImpl @Inject constructor(
             BookmarkUpdateTitleEvent(
                 source = sourceView.analyticsValue,
             ),
+        )
+    }
+
+    override suspend fun updatePassage(bookmarkUuid: String, passage: String, passageLocation: Int, referenceTime: Int?) {
+        val modifiedAt = System.currentTimeMillis()
+        bookmarkDao.updatePassage(
+            bookmarkUuid = bookmarkUuid,
+            passage = passage,
+            passageLocation = passageLocation,
+            passageModified = modifiedAt,
+            referenceTime = referenceTime,
+            referenceTimeModified = referenceTime?.let { modifiedAt },
+            syncStatus = SyncStatus.NOT_SYNCED,
         )
     }
 
@@ -199,18 +236,21 @@ class BookmarkManagerImpl @Inject constructor(
         )
     }
 
+    override suspend fun restoreToSync(bookmark: Bookmark) {
+        bookmarkDao.insert(
+            bookmark.copy(
+                deleted = false,
+                deletedModified = System.currentTimeMillis(),
+                syncStatus = SyncStatus.NOT_SYNCED,
+            ),
+        )
+    }
+
     /**
      * Remove the bookmark from the database.
      */
     override suspend fun deleteSynced(bookmarkUuid: String) {
         bookmarkDao.deleteByUuid(bookmarkUuid)
-    }
-
-    /**
-     * Find all bookmarks that need to be synced.
-     */
-    override fun findBookmarksToSyncBlocking(): List<Bookmark> {
-        return bookmarkDao.findNotSyncedBlocking()
     }
 
     /**
@@ -221,9 +261,112 @@ class BookmarkManagerImpl @Inject constructor(
         return bookmark
     }
 
-    override fun findUserEpisodesBookmarksFlow() = bookmarkDao.findUserEpisodesBookmarksFlow()
-
     override fun hasBookmarksFlow(episodeUuid: String): Flow<Boolean> {
         return bookmarkDao.hasBookmarksFlow(episodeUuid)
+    }
+
+    override fun enrichBookmark(bookmark: Bookmark, source: SourceViewType) {
+        launch(Dispatchers.IO) {
+            try {
+                val suggestion = suggestBookmark(bookmark.episodeUuid, bookmark.timeSecs) ?: return@launch
+                bookmarkGenerationAnalytics.report(
+                    generation = suggestion.generation,
+                    episodeUuid = bookmark.episodeUuid,
+                    podcastUuid = bookmark.podcastUuid.takeIf { it.isNotBlank() },
+                    trigger = BookmarkEnrichmentTriggerType.Background,
+                    source = source,
+                )
+                val now = System.currentTimeMillis()
+                val title = suggestion.generation.title?.takeIf { it.isNotBlank() }
+                    ?: BookmarkTitleFallback.fromPassage(suggestion.passage)
+                bookmarkDao.updateGeneratedData(
+                    bookmarkUuid = bookmark.uuid,
+                    title = title,
+                    titleModified = now.takeIf { title != null },
+                    passage = suggestion.passage,
+                    passageLocation = suggestion.passageLocation,
+                    passageModified = now,
+                    referenceTime = suggestion.referenceTimeSecs,
+                    referenceTimeModified = now,
+                    syncStatus = SyncStatus.NOT_SYNCED,
+                )
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Timber.e(e, "Smart bookmark enrichment failed for ${bookmark.uuid}")
+            }
+        }
+    }
+
+    override fun enrichBookmarkPassage(bookmark: Bookmark, useFallbackTitle: Boolean) {
+        launch(Dispatchers.IO) {
+            try {
+                val window = transcriptWindowExtractor.extractWindow(
+                    episodeUuid = bookmark.episodeUuid,
+                    timeSecs = bookmark.timeSecs,
+                ) ?: return@launch
+                val now = System.currentTimeMillis()
+                val title = if (useFallbackTitle) BookmarkTitleFallback.fromPassage(window.passage) else null
+                bookmarkDao.updateGeneratedData(
+                    bookmarkUuid = bookmark.uuid,
+                    title = title,
+                    titleModified = now.takeIf { title != null },
+                    passage = window.passage,
+                    passageLocation = window.location,
+                    passageModified = now,
+                    referenceTime = window.referenceTimeSecs,
+                    referenceTimeModified = now,
+                    syncStatus = SyncStatus.NOT_SYNCED,
+                )
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Timber.e(e, "Smart bookmark passage enrichment failed for ${bookmark.uuid}")
+            }
+        }
+    }
+
+    override suspend fun suggestBookmark(episodeUuid: String, timeSecs: Int): BookmarkSuggestion? = withContext(Dispatchers.IO) {
+        val window = transcriptWindowExtractor.extractWindow(episodeUuid = episodeUuid, timeSecs = timeSecs) ?: return@withContext null
+        BookmarkSuggestion(
+            passage = window.passage,
+            passageLocation = window.location,
+            referenceTimeSecs = window.referenceTimeSecs,
+            generation = generateTitle(window.passage),
+        )
+    }
+
+    override suspend fun suggestTitle(passage: String): TitleGeneration = withContext(Dispatchers.IO) {
+        generateTitle(passage)
+    }
+
+    private suspend fun generateTitle(snippet: String): TitleGeneration {
+        val startMs = System.currentTimeMillis()
+        val response = try {
+            callEnrichApi(snippet)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Timber.e(e, "Smart bookmark title generation failed")
+            return TitleGeneration(title = null, durationMs = System.currentTimeMillis() - startMs, failureReason = "unknown")
+        }
+        val durationMs = System.currentTimeMillis() - startMs
+        response.error?.let { Timber.w("Smart bookmark enrichment returned error: $it") }
+        val title = response.title?.takeIf { it.isNotBlank() }
+        val failureReason = when {
+            title != null -> null
+            response.error != null -> "server_error"
+            else -> "server_empty_title"
+        }
+        return TitleGeneration(title = title, durationMs = durationMs, failureReason = failureReason)
+    }
+
+    private suspend fun callEnrichApi(snippet: String): BookmarkEnrichResponse {
+        return syncManager.getCacheTokenOrLogin { token ->
+            podcastCacheServiceManager.enrichBookmark(
+                authorization = "Bearer ${token.value}",
+                request = BookmarkEnrichRequest(transcriptSnippet = snippet),
+            )
+        }
     }
 }

@@ -184,8 +184,7 @@ private fun Content(
         }
 
         item {
-            val signInState = state.signInState
-            when (signInState) {
+            when (val signInState = state.signInState) {
                 is SignInState.SignedIn -> {
                     WatchListChip(
                         title = stringResource(LR.string.log_out),
@@ -202,6 +201,9 @@ private fun Content(
                         onClick = signInClick,
                     )
                 }
+
+                // Not yet known; the sign-in chip appears once the state flow emits.
+                null -> Unit
             }
         }
 

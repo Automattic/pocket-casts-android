@@ -9,7 +9,7 @@ plugins {
 }
 
 sentry {
-    projectName = project.findProperty("sentryAutomotiveProject")?.toString()
+    projectName = "pocket-casts-automotive"
 }
 
 android {
@@ -38,10 +38,6 @@ android {
 
         named("release") {
             manifestPlaceholders["appIcon"] = "@mipmap/ic_launcher"
-
-            if (project.findProperty("sentryAutomotiveProject")?.toString().isNullOrBlank()) {
-                println("WARNING: Sentry configuration not found. The ProGuard mapping files won't be uploaded.")
-            }
         }
     }
 
@@ -96,7 +92,6 @@ dependencies {
     implementation(libs.rx2.java)
     implementation(libs.timber)
     implementation(libs.work.runtime)
-    implementation(libs.zxing)
 
     implementation(projects.modules.features.account)
     implementation(projects.modules.features.cartheme)
@@ -116,6 +111,7 @@ dependencies {
     implementation(projects.modules.services.mediaNoop)
     implementation(projects.modules.services.model)
     implementation(projects.modules.services.preferences)
+    implementation(projects.modules.services.qr)
     implementation(projects.modules.services.repositories)
     implementation(projects.modules.services.servers)
     implementation(projects.modules.services.sharing)

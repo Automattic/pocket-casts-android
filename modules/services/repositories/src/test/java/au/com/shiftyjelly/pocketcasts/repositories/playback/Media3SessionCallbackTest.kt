@@ -20,8 +20,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -32,8 +32,10 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doCallRealMethod
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
@@ -65,7 +67,7 @@ class Media3SessionCallbackTest {
         bookmarkHelper = mock()
         mockSession = mock()
         mockController = mock()
-        testScope = TestScope(UnconfinedTestDispatcher())
+        testScope = TestScope(StandardTestDispatcher())
 
         callback = Media3SessionCallback(
             playbackManager = playbackManager,
@@ -340,12 +342,74 @@ class Media3SessionCallbackTest {
     // --- Headphone action handler tests ---
 
     @Test
-    fun `KEYCODE_MEDIA_PLAY routes through multi-tap as single tap`() = runTest {
+    fun `KEYCODE_MEDIA_PLAY while paused starts playback before the multi-tap window expires`() = runTest {
+        doCallRealMethod().whenever(playbackManager).playIfNotPlaying(any())
+        whenever(playbackManager.isPlaying()).thenReturn(false)
+
+        sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_PLAY)
+
+        // A dedicated play key must not wait 600 ms for tap disambiguation.
+        verify(playbackManager).playQueue(
+            sourceView = eq(SourceView.MEDIA_BUTTON_BROADCAST_ACTION),
+            showedStreamWarning = any(),
+        )
+        verify(playbackManager, never()).playPause(sourceView = any())
+
+        testScope.advanceUntilIdle()
+
+        // A lone dedicated play key has already been handled, so the delayed
+        // single-tap result must not toggle playback.
+        verify(playbackManager, never()).playPause(sourceView = any())
+    }
+
+    @Test
+    fun `KEYCODE_MEDIA_PLAY while paused resumes before the double-tap action`() = runTest {
+        mockHeadphoneNextAction(HeadphoneAction.ADD_BOOKMARK)
+        doCallRealMethod().whenever(playbackManager).playIfNotPlaying(any())
+        whenever(playbackManager.isPlaying()).thenReturn(false)
+
+        sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_PLAY)
+        verify(playbackManager).playQueue(
+            sourceView = eq(SourceView.MEDIA_BUTTON_BROADCAST_ACTION),
+            showedStreamWarning = any(),
+        )
+
+        sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE)
+        testScope.advanceUntilIdle()
+        shadowOf(android.os.Looper.getMainLooper()).idle()
+
+        verify(bookmarkHelper).handleAddBookmarkAction(any(), any())
+        verify(playbackManager, never()).playPause(sourceView = any())
+    }
+
+    @Test
+    fun `KEYCODE_MEDIA_PLAY stays suppressed after KEYCODE_MEDIA_NEXT`() = runTest {
+        mockHeadphoneNextAction(HeadphoneAction.SKIP_FORWARD)
+        mockSkipSettings()
+        whenever(playbackManager.isPlaying()).thenReturn(true)
+
+        sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_NEXT)
         sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_PLAY)
         testScope.advanceUntilIdle()
 
-        // Routed through MediaEventQueue — single tap resolves as play/pause
-        verify(playbackManager).playPause(sourceView = any())
+        verify(playbackManager, never()).playIfNotPlaying(sourceView = any())
+        verify(playbackManager).skipForwardSuspend(
+            sourceView = any(),
+            jumpAmountSeconds = eq(30),
+        )
+    }
+
+    @Test
+    fun `KEYCODE_MEDIA_PLAY while already playing does not toggle`() = runTest {
+        doCallRealMethod().whenever(playbackManager).playIfNotPlaying(any())
+        whenever(playbackManager.isPlaying()).thenReturn(true)
+
+        sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_PLAY)
+        testScope.advanceUntilIdle()
+
+        verify(playbackManager, never()).playQueue(any(), any())
+        verify(playbackManager, never()).pause(any(), any())
+        verify(playbackManager, never()).playPause(any())
     }
 
     @Test
@@ -360,11 +424,24 @@ class Media3SessionCallbackTest {
     }
 
     @Test
-    fun `KEYCODE_MEDIA_PLAY_PAUSE single tap calls playPause`() {
+    fun `KEYCODE_MEDIA_PLAY_PAUSE single tap calls playPause while playing`() {
+        whenever(playbackManager.isPlaying()).thenReturn(true)
+
         sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE)
         testScope.advanceUntilIdle()
 
         verify(playbackManager).playPause(sourceView = any())
+    }
+
+    @Test
+    fun `KEYCODE_MEDIA_PLAY_PAUSE resumes immediately while paused`() {
+        whenever(playbackManager.isPlaying()).thenReturn(false)
+
+        sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE)
+        testScope.advanceUntilIdle()
+
+        verify(playbackManager).playIfNotPlaying(sourceView = any())
+        verify(playbackManager, never()).playPause(sourceView = any())
     }
 
     @Test
@@ -380,18 +457,6 @@ class Media3SessionCallbackTest {
             sourceView = any(),
             jumpAmountSeconds = eq(30),
         )
-    }
-
-    @Test
-    fun `double tap with ADD_BOOKMARK setting calls bookmarkHelper`() = runTest {
-        mockHeadphoneNextAction(HeadphoneAction.ADD_BOOKMARK)
-
-        sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_NEXT)
-        testScope.advanceUntilIdle()
-        // The bookmark action dispatches on Dispatchers.Main, so idle the main looper
-        shadowOf(android.os.Looper.getMainLooper()).idle()
-
-        verify(bookmarkHelper).handleAddBookmarkAction(any(), any())
     }
 
     @Test
@@ -439,7 +504,7 @@ class Media3SessionCallbackTest {
     // --- onAddMediaItems resolved item tests ---
 
     @Test
-    fun `onAddMediaItems with valid mediaId returns resolved MediaItem and fires playNowSuspend`() = runTest {
+    fun `onAddMediaItems with valid mediaId returns resolved MediaItem and fires playNowSync`() = runTest {
         val episode = PodcastEpisode(
             uuid = "ep-uuid-1",
             title = "My Episode",
@@ -471,7 +536,7 @@ class Media3SessionCallbackTest {
         assertNotNull(resolved.mediaMetadata.artworkUri)
         assertTrue(resolved.mediaMetadata.isPlayable!!)
 
-        verify(playbackManager).playNowSuspend(
+        verify(playbackManager).playNowSync(
             episode = any(),
             forceStream = any(),
             showedStreamWarning = any(),
@@ -492,6 +557,40 @@ class Media3SessionCallbackTest {
 
         val result = future.get()
         assertTrue(result.isEmpty())
+    }
+
+    @Test
+    fun `onAddMediaItems with current episode resumes queue instead of forcing player switch`() = runTest {
+        val episode = PodcastEpisode(
+            uuid = "ep-uuid-1",
+            title = "My Episode",
+            duration = 3600.0,
+            publishedDate = Date(),
+            podcastUuid = "pod-uuid-1",
+        )
+        whenever(episodeManager.findEpisodeByUuid("ep-uuid-1")).thenReturn(episode)
+        whenever(playbackManager.getCurrentEpisode()).thenReturn(episode)
+
+        val mediaItem = MediaItem.Builder()
+            .setMediaId("pod-uuid-1#ep-uuid-1")
+            .build()
+
+        val future = callback.onAddMediaItems(mockSession, mockController, listOf(mediaItem))
+        testScope.advanceUntilIdle()
+
+        val result = future.get()
+        assertEquals(1, result.size)
+
+        verify(playbackManager).playQueueSuspend(
+            sourceView = any(),
+            showedStreamWarning = eq(false),
+        )
+        verify(playbackManager, never()).playNowSync(
+            episode = any(),
+            forceStream = any(),
+            showedStreamWarning = any(),
+            sourceView = any(),
+        )
     }
 
     @Test
@@ -517,7 +616,7 @@ class Media3SessionCallbackTest {
         assertEquals("My Upload", resolved.mediaMetadata.title)
         assertTrue(resolved.mediaMetadata.isPlayable!!)
 
-        verify(playbackManager).playNowSuspend(
+        verify(playbackManager).playNowSync(
             episode = any(),
             forceStream = any(),
             showedStreamWarning = any(),

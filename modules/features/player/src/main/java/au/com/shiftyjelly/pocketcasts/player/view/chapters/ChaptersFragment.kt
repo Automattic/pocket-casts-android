@@ -56,6 +56,7 @@ class ChaptersFragment : BaseFragment() {
         savedInstanceState: Bundle?,
     ) = contentWithoutConsumedInsets {
         val state by viewModel.uiState.collectAsState()
+        val resolvingChapterIndex by viewModel.resolvingChapterIndex.collectAsState()
 
         AppThemeWithBackground(mode.themeType) {
             ChaptersTheme(state.podcast) {
@@ -65,6 +66,7 @@ class ChaptersFragment : BaseFragment() {
                     lazyListState = lazyListState,
                     chapters = state.chapters,
                     showHeader = state.showHeader,
+                    hasGeneratedChapters = state.hasGeneratedChapters,
                     totalChaptersCount = state.chaptersCount,
                     isTogglingChapters = state.isTogglingChapters,
                     showSubscriptionIcon = state.showSubscriptionIcon,
@@ -72,6 +74,7 @@ class ChaptersFragment : BaseFragment() {
                     onSkipChaptersClick = viewModel::enableTogglingOrUpsell,
                     onSelectionChange = viewModel::selectChapter,
                     onUrlClick = ::openChapterUrl,
+                    resolvingChapterIndex = resolvingChapterIndex,
                     modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection()),
                 )
 

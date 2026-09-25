@@ -88,22 +88,24 @@ class SuggestedFoldersViewModel @AssistedInject constructor(
         if (suggestedFoldersJob?.isActive == true) {
             return
         }
-        viewModelScope.launch(NonCancellable) {
-            _state.update { value ->
-                value.copy(useFoldersState = UseFoldersState.Applying)
-            }
-            val suggestedFolders = withContext(Dispatchers.Default) {
-                state.value.suggestedFolders.flatMap { folder ->
-                    folder.podcastIds.map { podcastId ->
-                        DbSuggestedFolder(folder.name, podcastId)
+        viewModelScope.launch {
+            withContext(NonCancellable) {
+                _state.update { value ->
+                    value.copy(useFoldersState = UseFoldersState.Applying)
+                }
+                val suggestedFolders = withContext(Dispatchers.Default) {
+                    state.value.suggestedFolders.flatMap { folder ->
+                        folder.podcastIds.map { podcastId ->
+                            DbSuggestedFolder(folder.name, podcastId)
+                        }
                     }
                 }
+                suggestedFoldersManager.useSuggestedFolders(suggestedFolders)
+                _state.update { value ->
+                    value.copy(useFoldersState = UseFoldersState.Applied)
+                }
+                podcastManager.refreshPodcasts("suggested-folders")
             }
-            suggestedFoldersManager.useSuggestedFolders(suggestedFolders)
-            _state.update { value ->
-                value.copy(useFoldersState = UseFoldersState.Applied)
-            }
-            podcastManager.refreshPodcasts("suggested-folders")
         }
     }
 

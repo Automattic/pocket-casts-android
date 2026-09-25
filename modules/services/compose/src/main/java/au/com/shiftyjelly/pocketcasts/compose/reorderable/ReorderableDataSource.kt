@@ -97,7 +97,7 @@ fun <T : Any, K : Any, I : Any, S : ReorderableLazyCollectionState<I>> rememberR
     // because after commit on drag stop, we don't want to emit the original items
     // before the commit had a chance to recompose us with the updated items. We do this
     // in order to avoid flicker caused by transient resetting to the original unordered items
-    // before the commited changes come through.
+    // before the committed changes come through.
     //
     // Note that in case the commit did not update the items, we will stay in PendingRefresh
     // state until down the line either items changes, or another drag is started

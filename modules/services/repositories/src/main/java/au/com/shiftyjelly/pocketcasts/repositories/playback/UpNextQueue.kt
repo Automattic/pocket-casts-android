@@ -178,3 +178,9 @@ fun Observable<UpNextQueue.State>.containsUuid(uuid: String): Observable<Boolean
         }
     }
 }
+
+fun Flow<UpNextQueue.State>.containsUuid(uuid: String): Flow<Boolean> {
+    return map { state ->
+        state is UpNextQueue.State.Loaded && (state.queue.any { it.uuid == uuid } || state.episode.uuid == uuid)
+    }
+}

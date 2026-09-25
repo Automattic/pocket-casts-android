@@ -1,18 +1,23 @@
 package au.com.shiftyjelly.pocketcasts.player.view.shelf
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.LocalRippleConfiguration
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.RippleConfiguration
 import androidx.compose.material.RippleDefaults
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
@@ -21,9 +26,11 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
@@ -46,10 +53,23 @@ fun ShelfItemRow(
     modifier: Modifier = Modifier,
     isEditable: Boolean = true,
     isTranscriptAvailable: Boolean = false,
+    isVideoEnabled: Boolean = true,
+    showNewBadge: Boolean = false,
     onClick: ((ShelfItem, Boolean) -> Unit)? = null,
 ) {
     val subtitleResId = item.subtitleId(episode)
     val isEnabled = item != ShelfItem.Transcript || isTranscriptAvailable
+    val showVideoToggleLabel = item == ShelfItem.StreamSelector && !isEditable
+    val titleResId = if (showVideoToggleLabel) {
+        if (isVideoEnabled) LR.string.player_action_hide_video else LR.string.player_action_show_video
+    } else {
+        item.titleId(episode)
+    }
+    val iconResId = if (showVideoToggleLabel) {
+        if (isVideoEnabled) IR.drawable.ic_video_off else IR.drawable.ic_video_on
+    } else {
+        item.iconId(episode)
+    }
     CompositionLocalProvider(
         LocalRippleConfiguration provides if (isEditable) {
             null
@@ -69,7 +89,7 @@ fun ShelfItemRow(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
-                painter = painterResource(item.iconId(episode)),
+                painter = painterResource(iconResId),
                 contentDescription = null,
                 modifier = Modifier
                     .padding(start = 16.dp)
@@ -81,10 +101,17 @@ fun ShelfItemRow(
                     .weight(1f)
                     .padding(horizontal = 24.dp, vertical = 8.dp),
             ) {
-                TextH40(
-                    text = stringResource(item.titleId(episode)),
-                    color = MaterialTheme.theme.colors.playerContrast01,
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    TextH40(
+                        text = stringResource(titleResId),
+                        color = MaterialTheme.theme.colors.playerContrast01,
+                        modifier = Modifier.weight(1f, fill = false),
+                    )
+                    if (showNewBadge) {
+                        Spacer(modifier = Modifier.width(8.dp))
+                        NewBadge()
+                    }
+                }
                 if (isEditable && subtitleResId != null) {
                     TextH50(
                         text = stringResource(subtitleResId),
@@ -104,6 +131,22 @@ fun ShelfItemRow(
             }
         }
     }
+}
+
+@Composable
+private fun NewBadge() {
+    Text(
+        text = stringResource(LR.string.bookmark_new_badge),
+        color = MaterialTheme.theme.colors.playerContrast01,
+        fontSize = 12.sp,
+        fontWeight = FontWeight.Medium,
+        modifier = Modifier
+            .background(
+                color = MaterialTheme.theme.colors.playerContrast05,
+                shape = RoundedCornerShape(8.dp),
+            )
+            .padding(horizontal = 8.dp, vertical = 2.dp),
+    )
 }
 
 @Preview

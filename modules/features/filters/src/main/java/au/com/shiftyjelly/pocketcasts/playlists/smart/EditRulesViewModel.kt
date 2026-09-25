@@ -29,6 +29,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @HiltViewModel(assistedFactory = EditRulesViewModel.Factory::class)
 class EditRulesViewModel @AssistedInject constructor(
@@ -97,11 +98,13 @@ class EditRulesViewModel @AssistedInject constructor(
     fun applyRule(type: RuleType) {
         rulesEditor?.applyRule(type)
         areSmartRulesEditedFlow.value = true
-        viewModelScope.launch(NonCancellable) {
-            val smartRules = uiState.value?.appliedRules?.toSmartRules()
-            if (smartRules != null) {
-                playlistManager.updateSmartRules(playlistUuid, smartRules)
-                trackRulesUpdated(type)
+        viewModelScope.launch {
+            withContext(NonCancellable) {
+                val smartRules = uiState.value?.appliedRules?.toSmartRules()
+                if (smartRules != null) {
+                    playlistManager.updateSmartRules(playlistUuid, smartRules)
+                    trackRulesUpdated(type)
+                }
             }
         }
     }

@@ -18,6 +18,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.appreview.AppReviewManager
 import au.com.shiftyjelly.pocketcasts.repositories.appreview.AppReviewManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManagerImpl
+import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatManager
+import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
@@ -47,6 +49,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueueImpl
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManagerImpl
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.AlternateEnclosureManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.AlternateEnclosureManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -90,6 +94,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserSettingsCrashReportPermission
+import au.com.shiftyjelly.pocketcasts.repositories.whatsnew.WhatsNewManager
+import au.com.shiftyjelly.pocketcasts.repositories.whatsnew.WhatsNewManagerImpl
 import com.google.android.play.core.review.ReviewManager
 import com.google.android.play.core.review.ReviewManagerFactory
 import com.squareup.moshi.Moshi
@@ -125,6 +131,10 @@ abstract class RepositoryModule {
 
     @Binds
     @Singleton
+    abstract fun bindWhatsNewManager(impl: WhatsNewManagerImpl): WhatsNewManager
+
+    @Binds
+    @Singleton
     abstract fun providesSubscriptionManager(subscriptionManagerImpl: SubscriptionManagerImpl): SubscriptionManager
 
     @Binds
@@ -146,6 +156,10 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun providesBookmarkManager(bookmarkManager: BookmarkManagerImpl): BookmarkManager
+
+    @Binds
+    @Singleton
+    abstract fun providesChatManager(chatManagerImpl: ChatManagerImpl): ChatManager
 
     @Binds
     @Singleton
@@ -197,6 +211,9 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun provideChapterManager(chapterManagerImpl: ChapterManagerImpl): ChapterManager
+
+    @Binds
+    abstract fun provideAlternateEnclosureManager(impl: AlternateEnclosureManagerImpl): AlternateEnclosureManager
 
     @Binds
     abstract fun provideObserveUser(observeTrackableUser: ObserveTrackableUser): ObserveUser

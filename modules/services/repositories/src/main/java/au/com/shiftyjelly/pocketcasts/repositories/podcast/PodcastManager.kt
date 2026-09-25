@@ -16,7 +16,6 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import io.reactivex.Flowable
-import io.reactivex.Maybe
 import io.reactivex.Single
 import kotlinx.coroutines.flow.Flow
 
@@ -26,29 +25,26 @@ interface PodcastManager {
     fun searchPodcastByTitleBlocking(title: String): Podcast?
     fun findPodcastByUuidBlocking(uuid: String): Podcast?
     suspend fun findPodcastByUuid(uuid: String): Podcast?
-    fun findPodcastByUuidRxMaybe(uuid: String): Maybe<Podcast>
     fun podcastByUuidRxFlowable(uuid: String): Flowable<Podcast>
     fun podcastByUuidFlow(uuid: String): Flow<Podcast>
     fun podcastByEpisodeUuidFlow(uuid: String): Flow<Podcast>
-    fun podcastSubscriptionsRxFlowable(): Flowable<List<String>>
+
+    // The subscribed uuids, including in-flight subscribes, re-emitted when one subscribes or unsubscribes.
+    fun podcastSubscriptionsFlow(): Flow<List<String>>
 
     fun findSubscribedBlocking(): List<Podcast>
-    fun findSubscribedRxSingle(): Single<List<Podcast>>
     fun findSubscribedFlow(searchTerm: String? = null): Flow<List<Podcast>>
     suspend fun findSubscribedSorted(): List<Podcast>
     suspend fun findSubscribedNoOrder(): List<Podcast>
     suspend fun findPodcastsInFolder(folderUuid: String): List<Podcast>
-    fun findPodcastsInFolderRxSingle(folderUuid: String): Single<List<Podcast>>
     suspend fun findPodcastsNotInFolder(): List<Podcast>
     suspend fun findSubscribedUuids(): List<String>
 
     fun observePodcastsSortedByLatestEpisode(): Flow<List<Podcast>>
     fun observePodcastsBySortedRecentlyPlayed(): Flow<List<Podcast>>
     fun observePodcastsSortedByUserChoice(folder: Folder): Flow<List<Podcast>>
-    fun podcastsOrderByLatestEpisodeRxFlowable(): Flowable<List<Podcast>>
-    fun podcastsOrderByRecentlyPlayedEpisodeRxFlowable(): Flowable<List<Podcast>>
-
-    fun subscribedRxFlowable(): Flowable<List<Podcast>>
+    fun observeSubscribedWebFeedPodcasts(): Flow<List<Podcast>>
+    fun findSubscribedNoOrderFlow(): Flow<List<Podcast>>
     suspend fun findPodcastsOrderByTitle(): List<Podcast>
     suspend fun findPodcastsToSync(): List<Podcast>
     suspend fun findPodcastsOrderByLatestEpisode(orderAsc: Boolean): List<Podcast>
@@ -62,9 +58,8 @@ interface PodcastManager {
     fun subscribeToPodcast(podcastUuid: String, sync: Boolean, shouldAutoDownload: Boolean = true)
 
     suspend fun subscribeToPodcastOrThrow(podcastUuid: String, sync: Boolean = false, shouldAutoDownload: Boolean = true): Podcast
-    fun findOrDownloadPodcastRxSingle(podcastUuid: String, waitForSubscribe: Boolean = false): Single<Podcast>
+    suspend fun findOrDownloadPodcast(podcastUuid: String, waitForSubscribe: Boolean = false): Podcast
     fun isSubscribingToPodcasts(): Boolean
-    fun getSubscribedPodcastUuidsRxSingle(): Single<List<String>>
     fun isSubscribingToPodcast(podcastUuid: String): Boolean
     fun addPodcastRxSingle(podcastUuid: String, sync: Boolean, subscribed: Boolean, shouldAutoDownload: Boolean): Single<Podcast>
 
@@ -81,12 +76,13 @@ interface PodcastManager {
     suspend fun updateAutoAddToUpNexts(podcastUuids: List<String>, autoAddToUpNext: Podcast.AutoAddUpNext)
     suspend fun updateAutoAddToUpNextsIf(podcastUuids: List<String>, newValue: Podcast.AutoAddUpNext, onlyIfValue: Podcast.AutoAddUpNext)
     fun updateOverrideGlobalEffectsBlocking(podcast: Podcast, override: Boolean)
-    suspend fun updateTrimModeBlocking(podcast: Podcast, trimMode: TrimMode)
+    suspend fun updateTrimMode(podcast: Podcast, trimMode: TrimMode)
     fun updateVolumeBoostedBlocking(podcast: Podcast, override: Boolean)
     fun updatePlaybackSpeedBlocking(podcast: Podcast, speed: Double)
     fun updateEffectsBlocking(podcast: Podcast, effects: PlaybackEffects)
     fun updateEpisodesSortTypeBlocking(podcast: Podcast, episodesSortType: EpisodesSortType)
     suspend fun updateShowNotifications(podcastUuid: String, show: Boolean)
+    suspend fun updateShowNotificationsForSubscribed(enabledPodcastUuids: Collection<String>)
     suspend fun updatePodcastPositions(podcasts: List<Podcast>)
     suspend fun updateStartFromInSec(podcast: Podcast, autoStartFrom: Int)
     fun updateColorsBlocking(podcastUuid: String, background: Int, tintForLightBg: Int, tintForDarkBg: Int, fabForLightBg: Int, fabForDarkBg: Int, linkForLightBg: Int, linkForDarkBg: Int, colorLastDownloaded: Long)
@@ -127,7 +123,7 @@ interface PodcastManager {
     fun updateGroupingForAllBlocking(grouping: PodcastGrouping)
 
     fun buildUserEpisodePodcast(episode: UserEpisode): Podcast
-    fun autoAddToUpNextPodcastsRxFlowable(): Flowable<List<Podcast>>
+    fun autoAddToUpNextPodcastsFlow(): Flow<List<Podcast>>
     suspend fun findAutoAddToUpNextPodcasts(): List<Podcast>
 
     suspend fun refreshPodcastFeed(podcast: Podcast): Boolean

@@ -13,6 +13,7 @@ import com.google.devtools.ksp.gradle.KspExtension
 import com.google.devtools.ksp.gradle.KspGradleSubplugin
 import io.sentry.android.gradle.extensions.InstrumentationFeature
 import io.sentry.android.gradle.extensions.SentryPluginExtension
+import io.sentry.android.gradle.tasks.SentryCliExecTask
 import java.util.EnumSet
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
@@ -98,11 +99,43 @@ dependencyAnalysis {
                 exclude("org.jetbrains.kotlin:kotlin-stdlib")
             }
         }
+
+        project(":tv") {
+            onIncorrectConfiguration {
+                severity("warn")
+                exclude("org.jetbrains.kotlin:kotlin-stdlib")
+            }
+        }
     }
 }
 
 val ktlintVersion = libs.versions.ktlint.asProvider().get()
 val ktlintComposeRules = libs.ktlint.compose.rules.get().toString()
+val spotlessPreCommitFiles = providers.gradleProperty("spotlessPreCommitFiles").orNull
+    ?.let { fileList ->
+        file(fileList)
+            .readLines()
+            .map(String::trim)
+            .filter(String::isNotEmpty)
+            .map { rootProject.file(it) }
+            .filter { it.isFile }
+    }
+val spotlessPreCommitKotlinFiles = spotlessPreCommitFiles?.filter { file ->
+    val path = file.relativeTo(rootDir).invariantSeparatorsPath
+    path.endsWith(".kt") &&
+        "/uniffi/" !in path &&
+        (
+            path.startsWith("app/src/") ||
+                path.startsWith("automotive/src/") ||
+                path.startsWith("tv/src/") ||
+                path.startsWith("wear/src/") ||
+                (path.startsWith("modules/") && "/src/" in path)
+            )
+}
+val spotlessPreCommitKotlinGradleFiles = spotlessPreCommitFiles?.filter { file ->
+    val path = file.relativeTo(rootDir).invariantSeparatorsPath
+    path.endsWith(".kts") && "/" !in path
+}
 
 spotless {
     val ktLintConfigOverride = mapOf(
@@ -116,19 +149,40 @@ spotless {
     )
 
     kotlin {
-        target(
-            "app/src/**/*.kt",
-            "automotive/src/**/*.kt",
-            "modules/**/src/**/*.kt",
-            "wear/src/**/*.kt",
-        )
+        if (spotlessPreCommitKotlinFiles != null) {
+            target(spotlessPreCommitKotlinFiles)
+        } else {
+            target(
+                fileTree(rootDir) {
+                    include(
+                        "app/src/**/*.kt",
+                        "automotive/src/**/*.kt",
+                        "modules/**/src/**/*.kt",
+                        "tv/src/**/*.kt",
+                        "wear/src/**/*.kt",
+                    )
+                    exclude(
+                        "**/build/**",
+                        "**/uniffi/**",
+                        "vendor/**",
+                        ".git/**",
+                        ".gradle/**",
+                        ".idea/**",
+                    )
+                },
+            )
+        }
         ktlint(ktlintVersion)
             .editorConfigOverride(ktLintConfigOverride + ktLintConfigComposeOverride)
             .customRuleSets(listOf(ktlintComposeRules))
     }
 
     kotlinGradle {
-        target("*.kts")
+        if (spotlessPreCommitKotlinGradleFiles != null) {
+            target(spotlessPreCommitKotlinGradleFiles)
+        } else {
+            target("*.kts")
+        }
         ktlint(ktlintVersion).editorConfigOverride(ktLintConfigOverride)
     }
 }
@@ -139,16 +193,6 @@ tasks.withType(SpotlessTask::class.java).configureEach {
 
 val javaTarget = JvmTarget.fromTarget(libs.versions.java.get())
 
-allprojects {
-    configurations.configureEach {
-        resolutionStrategy.eachDependency {
-            if (requested.name.startsWith("kotlin-stdlib")) {
-                useVersion(libs.versions.kotlin.asProvider().get())
-            }
-        }
-    }
-}
-
 subprojects {
     apply(plugin = rootProject.libs.plugins.dependency.analysis.get().pluginId)
 
@@ -157,9 +201,6 @@ subprojects {
             compilerOptions {
                 jvmTarget.set(javaTarget)
                 allWarningsAsErrors.set(true)
-                freeCompilerArgs.addAll(
-                    "-Xannotation-default-target=param-property",
-                )
                 optIn.addAll("kotlin.RequiresOptIn")
             }
         }
@@ -253,6 +294,7 @@ subprojects {
                 buildConfigField("String", "SERVER_LIST_URL", "\"https://lists.pocketcasts.com\"")
                 buildConfigField("String", "SERVER_LIST_HOST", "\"lists.pocketcasts.com\"")
                 buildConfigField("String", "SERVER_SHOW_NOTES_URLS", "\"https://shownotes.pocketcasts.com\"")
+                buildConfigField("String", "WEB_FEEDS_API_URL", "\"https://web-feeds-api.pocketcasts.com\"")
 
                 testInstrumentationRunner = project.property("testInstrumentationRunner") as String
                 testApplicationId = "au.com.shiftyjelly.pocketcasts.test${project.name.replace("-", "_")}"
@@ -309,6 +351,7 @@ subprojects {
                     buildConfigField("String", "SERVER_LIST_URL", "\"https://lists.pocketcasts.net\"")
                     buildConfigField("String", "SERVER_LIST_HOST", "\"lists.pocketcasts.net\"")
                     buildConfigField("String", "SERVER_SHOW_NOTES_URLS", "\"https://shownotes.pocketcasts.net\"")
+                    buildConfigField("String", "WEB_FEEDS_API_URL", "\"https://web-feeds-api.pocketcasts.net\"")
                 }
 
                 maybeCreate("debugProd").apply {
@@ -419,9 +462,11 @@ subprojects {
 }
 
 fun Project.applyCommonSentryConfiguration() {
+    val sentryAuthToken = providers.environmentVariable("SENTRY_AUTH_TOKEN").orNull?.trim()?.ifEmpty { null }
+
     extensions.getByType(SentryPluginExtension::class.java).apply {
-        authToken = project.findProperty("sentryAuthToken")?.toString()
-        org = project.findProperty("sentryOrg")?.toString()
+        authToken = sentryAuthToken
+        org = "a8c"
 
         val shouldUploadDebugFiles = System.getenv()["CI"].toBoolean() &&
             !project.properties["skipSentryProguardMappingUpload"]?.toString().toBoolean()
@@ -435,11 +480,22 @@ fun Project.applyCommonSentryConfiguration() {
         includeDependenciesReport = false
         ignoredBuildTypes = setOf("debug", "debugProd", "prototype")
     }
+
+    tasks.withType<SentryCliExecTask>().configureEach {
+        doFirst {
+            if (sentryAuthToken == null) {
+                throw GradleException(
+                    "SENTRY_AUTH_TOKEN is not set (or is blank). Export it to upload debug files to Sentry, " +
+                        "or pass -PskipSentryProguardMappingUpload=true to skip the upload.",
+                )
+            }
+        }
+    }
 }
 
 tasks.register("aggregatedLintRelease") {
     group = "verification"
     description = "Run Lint tasks for application modules"
 
-    dependsOn(":app:lintRelease", ":automotive:lintRelease", ":wear:lintRelease")
+    dependsOn(":app:lintRelease", ":automotive:lintRelease", ":tv:lintRelease", ":wear:lintRelease")
 }

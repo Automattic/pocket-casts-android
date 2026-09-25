@@ -1,0 +1,40 @@
+package au.com.shiftyjelly.pocketcasts.home
+
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
+import au.com.shiftyjelly.pocketcasts.images.R as IR
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
+
+sealed class TvTab(@StringRes val contentDescriptionRes: Int) {
+
+    sealed class TextTab(
+        @StringRes val labelRes: Int,
+    ) : TvTab(contentDescriptionRes = labelRes)
+
+    sealed class IconTab(
+        @StringRes contentDescriptionRes: Int,
+        @DrawableRes val iconRes: Int,
+    ) : TvTab(contentDescriptionRes)
+
+    sealed class TextWithIconTab(
+        @StringRes val labelRes: Int,
+        @DrawableRes val iconRes: Int,
+    ) : TvTab(contentDescriptionRes = labelRes)
+
+    data object Home : TextTab(labelRes = LR.string.home)
+    data object YourPodcasts : TextTab(labelRes = LR.string.tv_tab_your_podcasts)
+    data object Playlists : TextTab(labelRes = LR.string.playlists)
+    data object UpNext : TextTab(labelRes = LR.string.up_next)
+    data object NowPlaying : TextTab(labelRes = LR.string.player_tab_playing_wide)
+    data object Search : IconTab(contentDescriptionRes = LR.string.search, iconRes = IR.drawable.ic_search)
+
+    companion object {
+        // Built lazily: referencing the nested objects while the TvTab class hierarchy is still
+        // initializing (e.g. TvTab.Home being the first member touched) would capture them as null.
+        val entries: List<TvTab> by lazy { listOf(Home, YourPodcasts, Playlists, UpNext, Search) }
+
+        private val entriesWithNowPlaying: List<TvTab> by lazy { listOf(Home, YourPodcasts, Playlists, UpNext, NowPlaying, Search) }
+
+        fun tabs(showNowPlaying: Boolean): List<TvTab> = if (showNowPlaying) entriesWithNowPlaying else entries
+    }
+}

@@ -14,7 +14,6 @@ import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.NewsletterOptInChangedEvent
 import com.automattic.eventhorizon.NewsletterSourceType
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.disposables.CompositeDisposable
 import javax.inject.Inject
 import kotlinx.coroutines.launch
 
@@ -33,7 +32,6 @@ class CreateAccountViewModel
     val newsletter = MutableLiveData<Boolean>().apply { postValue(false) }
 
     val createAccountState = MutableLiveData<CreateAccountState>().apply { value = CreateAccountState.CurrentlyValid }
-    private val disposables = CompositeDisposable()
     var defaultSubscriptionType = SubscriptionType.FREE
 
     companion object {
@@ -153,11 +151,6 @@ class CreateAccountViewModel
 
     fun onCloseDoneForm() {
         eventHorizon.track(AccountUpdatedDismissedEvent)
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        disposables.clear()
     }
 }
 

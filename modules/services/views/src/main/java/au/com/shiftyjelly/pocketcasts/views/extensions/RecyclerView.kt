@@ -39,14 +39,11 @@ fun RecyclerView.quickScrollToTop() {
 
         override fun calculateSpeedPerPixel(displayMetrics: DisplayMetrics): Float {
             val scrollOffset = computeVerticalScrollOffset()
-            val scrollRange = computeVerticalScrollRange()
-
-            return if (scrollRange > 0 && scrollOffset > 0) {
-                val pixelsInRange = scrollRange * scrollOffset / scrollRange.toFloat()
-                (MILLIS_PER_RANGE / pixelsInRange).coerceAtMost(MAX_MILLIS_PER_INCH / displayMetrics.densityDpi)
-            } else {
-                super.calculateSpeedPerPixel(displayMetrics)
-            }
+            if (scrollOffset <= 0) return super.calculateSpeedPerPixel(displayMetrics)
+            // The speed used to be derived from `scrollRange * scrollOffset / scrollRange.toFloat()`,
+            // which is just `scrollOffset`; the leading Int * Int product overflowed on long queues and
+            // produced a negative (crashing) scroll duration, so divide by scrollOffset directly.
+            return (MILLIS_PER_RANGE / scrollOffset).coerceAtMost(MAX_MILLIS_PER_INCH / displayMetrics.densityDpi)
         }
     }
 

@@ -147,21 +147,19 @@ data class OnboardingSubscriptionPlan private constructor(
             }
         }
 
+    private val trialDurationText
+        @Composable get(): String {
+            val discountedPhase = requireNotNull(discountedPricingPhase)
+            val recurringPeriods = (discountedPhase.schedule.recurrenceMode as RecurrenceMode.Recurring).value
+            return discountedPhase.schedule.period.toText(recurringPeriods)
+        }
+
     val offerBadgeText
         @Composable get() = when (key.offer) {
             SubscriptionOffer.IntroOffer -> stringResource(LR.string.half_price_first_year)
-
-            SubscriptionOffer.Trial -> {
-                val discountedPhase = requireNotNull(discountedPricingPhase)
-                val recurringPeriods = (discountedPhase.schedule.recurrenceMode as RecurrenceMode.Recurring).value
-
-                stringResource(LR.string.plus_trial_duration_free_trial, discountedPhase.schedule.period.toText(recurringPeriods))
-            }
-
+            SubscriptionOffer.Trial -> stringResource(LR.string.plus_trial_duration_free_trial, trialDurationText)
             SubscriptionOffer.Referral -> null
-
             SubscriptionOffer.Winback -> null
-
             null -> null
         }
 
@@ -178,11 +176,13 @@ data class OnboardingSubscriptionPlan private constructor(
         }
 
     @Composable
-    fun ctaButtonText(isRenewingSubscription: Boolean) = if (isRenewingSubscription) {
+    fun ctaButtonText(
+        isRenewingSubscription: Boolean,
+    ) = if (isRenewingSubscription) {
         stringResource(LR.string.renew_your_subscription)
     } else {
         when (key.offer) {
-            SubscriptionOffer.Trial -> stringResource(LR.string.profile_start_free_trial)
+            SubscriptionOffer.Trial -> stringResource(LR.string.profile_try_duration_for_free, trialDurationText)
 
             SubscriptionOffer.IntroOffer,
             SubscriptionOffer.Referral,
@@ -249,6 +249,8 @@ data class OnboardingSubscriptionPlan private constructor(
             OnboardingUpgradeSource.BOOKMARKS,
             OnboardingUpgradeSource.BOOKMARKS_SHELF_ACTION,
             -> LR.string.onboarding_bookmarks_title
+
+            OnboardingUpgradeSource.BLOGS -> LR.string.onboarding_blogs_title
 
             else -> LR.string.onboarding_upgrade_generic_title
         }

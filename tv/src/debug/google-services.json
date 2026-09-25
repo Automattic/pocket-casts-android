@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "219484810371",
+    "project_id": "pocket-casts-debug",
+    "storage_bucket": "pocket-casts-debug.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:219484810371:android:7502b372956eb312fc3fb6",
+        "android_client_info": {
+          "package_name": "au.com.shiftyjelly.pocketcasts.debug"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "219484810371-dq2i74pgo8p71n072hjj1fk63mt1vap4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBguqVfwriVWjnSqRg50XPfZZH5r1VumNM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "219484810371-dq2i74pgo8p71n072hjj1fk63mt1vap4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

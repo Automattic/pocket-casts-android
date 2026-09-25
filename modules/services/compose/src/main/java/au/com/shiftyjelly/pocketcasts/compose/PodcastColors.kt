@@ -17,7 +17,7 @@ data class PodcastColors(
 ) : Parcelable {
     constructor(podcast: Podcast) : this(
         background = Color(podcast.backgroundColor),
-        playerTint = Color(podcast.getPlayerTintColor(isDarkTheme = true)),
+        playerTint = Color(podcast.getTintColor(isDarkTheme = true)),
     )
 
     companion object {

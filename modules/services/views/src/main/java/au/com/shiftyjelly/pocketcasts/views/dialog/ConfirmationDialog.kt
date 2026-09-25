@@ -145,8 +145,11 @@ open class ConfirmationDialog : BottomSheetDialogFragment() {
         binding.lblSummary.text = summary
         summaryTextColorAttr?.let { binding.lblSummary.setTextColor(context.getThemeColor(it)) }
         summaryTextSize?.let { binding.lblSummary.setTextSize(TypedValue.COMPLEX_UNIT_SP, it) }
-        binding.imgIcon.setImageResource(iconId)
-        iconTintAttr?.let { binding.imgIcon.imageTintList = ColorStateList.valueOf(context.getThemeColor(it)) }
+        binding.imgIcon.isVisible = iconId != 0
+        if (iconId != 0) {
+            binding.imgIcon.setImageResource(iconId)
+            iconTintAttr?.let { binding.imgIcon.imageTintList = ColorStateList.valueOf(context.getThemeColor(it)) }
+        }
 
         val layout = binding.root as ViewGroup
         layout.setSystemWindowInsetToPadding(bottom = true)

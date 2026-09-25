@@ -7,6 +7,8 @@ import au.com.shiftyjelly.pocketcasts.servers.search.AutoCompleteResult
 import au.com.shiftyjelly.pocketcasts.servers.search.AutoCompleteSearchService
 import au.com.shiftyjelly.pocketcasts.servers.search.CombinedResult
 import au.com.shiftyjelly.pocketcasts.servers.search.CombinedSearchRequest
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
 
@@ -16,32 +18,60 @@ class ImprovedSearchManagerImpl @Inject constructor(
 ) : ImprovedSearchManager {
     override suspend fun autoCompleteSearch(term: String): List<SearchAutoCompleteItem> {
         val response = autoCompleteSearchService.autoCompleteSearch(query = term, termsLimit = null, podcastsLimit = null)
-        return response.results.map {
+        return response.results.mapNotNull {
             when (it) {
                 is AutoCompleteResult.TermResult -> SearchAutoCompleteItem.Term(term = it.value)
-                is AutoCompleteResult.PodcastResult -> SearchAutoCompleteItem.Podcast(uuid = it.value.uuid, title = it.value.title, author = it.value.author.orEmpty())
+
+                is AutoCompleteResult.PodcastResult -> SearchAutoCompleteItem.Podcast(
+                    uuid = it.value.uuid,
+                    title = it.value.title,
+                    author = it.value.author.orEmpty(),
+                    isExplicit = it.value.explicit == true,
+                )
+
+                AutoCompleteResult.Unknown -> null
             }
         }
     }
 
     override suspend fun combinedSearch(term: String): List<ImprovedSearchResultItem> {
         val response = combinedSearchService.combinedSearch(CombinedSearchRequest(term))
-        return response.results.map {
+        return response.results.mapNotNull {
             when (it) {
-                is CombinedResult.PodcastResult -> ImprovedSearchResultItem.PodcastItem(
-                    uuid = it.uuid,
-                    title = it.title,
-                    author = it.author.orEmpty(),
-                    isFollowed = false,
-                )
+                is CombinedResult.PodcastResult -> {
+                    val title = it.title?.takeIf { title -> title.isNotBlank() } ?: return@mapNotNull null
+                    ImprovedSearchResultItem.PodcastItem(
+                        uuid = it.uuid,
+                        title = title,
+                        author = it.author.orEmpty(),
+                        isFollowed = false,
+                        isExplicit = it.explicit == true,
+                    )
+                }
 
                 is CombinedResult.EpisodeResult -> ImprovedSearchResultItem.EpisodeItem(
                     uuid = it.uuid,
                     title = it.title,
                     podcastUuid = it.podcastUuid,
+                    podcastTitle = it.podcastTitle,
                     publishedDate = it.publishedDate,
                     duration = it.duration.seconds,
+                    hasVideo = it.hasVideo == true,
                 )
+
+                is CombinedResult.NetworkResult -> {
+                    if (!FeatureFlag.isEnabled(Feature.NETWORK_DISCOVERY)) return@mapNotNull null
+                    val uuid = it.uuid ?: return@mapNotNull null
+                    val title = it.title?.takeIf { title -> title.isNotBlank() } ?: return@mapNotNull null
+                    ImprovedSearchResultItem.NetworkItem(
+                        uuid = uuid,
+                        title = title,
+                        description = it.shortDescription,
+                        imageUrl = it.collectionImage,
+                    )
+                }
+
+                CombinedResult.Unknown -> null
             }
         }
     }

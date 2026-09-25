@@ -24,8 +24,8 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.UpNextSyncRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.UpNextSyncResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.UserChangeResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearResponse
+import au.com.shiftyjelly.pocketcasts.servers.sync.login.DeviceAuthorizeResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.ExchangeSonosResponse
-import au.com.shiftyjelly.pocketcasts.utils.Optional
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.pocketcasts.service.api.BookmarksResponse
 import com.pocketcasts.service.api.EpisodesResponse
@@ -41,10 +41,9 @@ import com.pocketcasts.service.api.SyncUpdateResponse
 import com.pocketcasts.service.api.UpNextResponse
 import com.pocketcasts.service.api.UserPlaylistListResponse
 import com.pocketcasts.service.api.UserPodcastListResponse
+import com.pocketcasts.service.api.WebFeedCreateResponse
 import com.pocketcasts.service.api.WinbackResponse
 import io.reactivex.Completable
-import io.reactivex.Flowable
-import io.reactivex.Maybe
 import io.reactivex.Single
 import java.io.File
 import kotlinx.coroutines.flow.Flow
@@ -60,34 +59,44 @@ interface SyncManager : NamedSettingsCaller {
     fun getLoginIdentity(): LoginIdentity?
     fun getEmail(): String?
     fun emailFlow(): Flow<String?>
-    fun emailFlowable(): Flowable<Optional<String>>
     suspend fun signOut(action: suspend () -> Unit = {})
     suspend fun loginWithGoogle(idToken: String, signInSource: SignInSource): LoginResult
     suspend fun loginWithEmailAndPassword(email: String, password: String, signInSource: SignInSource): LoginResult
     suspend fun loginWithToken(token: RefreshToken, loginIdentity: LoginIdentity, signInSource: SignInSource): LoginResult
+    suspend fun deviceAuthorize(): DeviceAuthorizeResponse
+
+    suspend fun deviceApprove(userCode: String, approve: Boolean)
+
+    /**
+     * [isNewAccount] is a caller assertion that this pairing is a signup, not server truth the way
+     * AuthResultModel.isNewAccount carries it elsewhere. It drives new-account analytics attribution
+     * (and the value stored in that field), so each caller must set it deliberately.
+     */
+    suspend fun loginWithDeviceAuth(deviceCode: String, signInSource: SignInSource, isNewAccount: Boolean): LoginResult
     suspend fun createUserWithEmailAndPassword(email: String, password: String, signInSource: SignInSource.UserInitiated): LoginResult
     suspend fun forgotPassword(email: String, onSuccess: () -> Unit, onError: (String) -> Unit)
     suspend fun getAccessToken(account: Account): AccessToken
     fun getRefreshToken(): RefreshToken?
     suspend fun emailChange(newEmail: String, password: String): UserChangeResponse
-    fun deleteAccountRxSingle(): Single<UserChangeResponse>
+    suspend fun deleteAccount(): UserChangeResponse
     suspend fun updatePassword(newPassword: String, oldPassword: String)
     suspend fun <T> getCacheTokenOrLogin(serverCall: suspend (token: AccessToken) -> T): T
 
     // User Episodes / Files
-    fun getFilesRxSingle(): Single<Response<FilesResponse>>
-    fun getFileUploadStatusRxSingle(episodeUuid: String): Single<Boolean>
-    fun uploadFileToServerRxCompletable(episode: UserEpisode): Completable
-    fun uploadImageToServerRxCompletable(episode: UserEpisode, imageFile: File): Completable
-    fun postFilesRxSingle(files: List<FilePost>): Single<Response<Void>>
-    fun getUserEpisodeRxMaybe(uuid: String): Maybe<ServerFile>
-    fun getFileUsageRxSingle(): Single<FileAccount>
-    fun deleteImageFromServerRxSingle(episode: UserEpisode): Single<Response<Void>>
-    fun deleteFromServerRxSingle(episode: UserEpisode): Single<Response<Void>>
-    fun getPlaybackUrlRxSingle(episode: UserEpisode): Single<String>
+    suspend fun getFiles(): Response<FilesResponse>
+    suspend fun getFileUploadStatus(episodeUuid: String): Boolean
+    suspend fun uploadFileToServer(episode: UserEpisode)
+    suspend fun uploadImageToServer(episode: UserEpisode, imageFile: File)
+    suspend fun postFiles(files: List<FilePost>): Response<Void>
+    suspend fun getUserEpisode(uuid: String): ServerFile?
+    suspend fun getFileUsage(): FileAccount
+    suspend fun deleteImageFromServer(episode: UserEpisode): Response<Void>
+    suspend fun deleteFromServer(episode: UserEpisode): Response<Void>
+    fun getPlaybackUrl(episode: UserEpisode): String
+    suspend fun getSignedPlaybackUrl(episode: UserEpisode): String
 
     // History
-    fun historySyncRxSingle(request: HistorySyncRequest): Single<HistorySyncResponse>
+    suspend fun historySync(request: HistorySyncRequest): HistorySyncResponse
     suspend fun historyYear(year: Int, count: Boolean): HistoryYearResponse
 
     // Subscription
@@ -97,14 +106,14 @@ interface SyncManager : NamedSettingsCaller {
     fun validatePromoCodeRxSingle(code: String): Single<PromoCodeResponse>
 
     // Sync
-    fun getLastSyncAtRxSingle(): Single<String>
     suspend fun getLastSyncAtOrThrow(): String
     suspend fun getHomeFolderOrThrow(): UserPodcastListResponse
     suspend fun getPlaylistsOrThrow(): UserPlaylistListResponse
     suspend fun getBookmarksOrThrow(): BookmarksResponse
     suspend fun getEpisodesOrThrow(request: PodcastsEpisodesRequest): EpisodesResponse
-    fun getPodcastEpisodesRxSingle(podcastUuid: String): Single<PodcastEpisodesResponse>
+    suspend fun getPodcastEpisodes(podcastUuid: String): PodcastEpisodesResponse
     suspend fun getStarredEpisodesOrThrow(): StarredEpisodesResponse
+    suspend fun createWebFeedPodcast(url: String): WebFeedCreateResponse
 
     suspend fun syncUpdateOrThrow(request: SyncUpdateRequest): SyncUpdateResponse
 

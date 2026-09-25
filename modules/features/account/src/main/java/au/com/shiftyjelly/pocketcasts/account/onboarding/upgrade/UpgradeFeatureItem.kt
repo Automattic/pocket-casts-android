@@ -34,6 +34,13 @@ enum class PlusUpgradeFeatureItem(
     ) {
         override fun title() = LR.string.onboarding_upgrade_features_transcripts
     },
+    EpisodeChat(
+        image = IR.drawable.ic_ai,
+    ) {
+        override val isYearlyFeature get() = FeatureFlag.isEnabled(Feature.EPISODE_CHAT)
+        override val isMonthlyFeature get() = FeatureFlag.isEnabled(Feature.EPISODE_CHAT)
+        override fun title() = LR.string.episode_chat
+    },
     Folders(
         image = IR.drawable.ic_plus_feature_folder,
     ) {

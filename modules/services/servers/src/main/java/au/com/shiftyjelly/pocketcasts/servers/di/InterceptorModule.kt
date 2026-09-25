@@ -8,7 +8,9 @@ import au.com.shiftyjelly.pocketcasts.servers.CleanAndRetryInterceptor
 import au.com.shiftyjelly.pocketcasts.servers.OkHttpInterceptor
 import au.com.shiftyjelly.pocketcasts.servers.interceptors.BasicAuthInterceptor
 import au.com.shiftyjelly.pocketcasts.servers.interceptors.InternationalizationInterceptor
+import au.com.shiftyjelly.pocketcasts.servers.interceptors.UserFileAuthInterceptor
 import au.com.shiftyjelly.pocketcasts.servers.sync.TokenHandler
+import au.com.shiftyjelly.pocketcasts.servers.sync.getAccessTokenBlocking
 import au.com.shiftyjelly.pocketcasts.servers.toClientInterceptor
 import au.com.shiftyjelly.pocketcasts.servers.toNetworkInterceptor
 import com.automattic.android.tracks.crashlogging.CrashLoggingOkHttpInterceptorProvider
@@ -21,7 +23,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import java.net.HttpURLConnection
 import kotlin.time.Duration.Companion.minutes
-import kotlinx.coroutines.runBlocking
+import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.logging.HttpLoggingInterceptor
@@ -114,12 +116,13 @@ object InterceptorModule {
             if (unauthenticatedEndpoints.contains(original.url.encodedPathSegments.firstOrNull())) {
                 chain.proceed(original)
             } else {
-                val token = runBlocking { tokenHandler.getAccessToken() }
+                val token = tokenHandler.getAccessTokenBlocking()
                 return@Interceptor if (token != null) {
                     val response = chain.proceed(buildRequestWithToken(original, token))
                     if (response.code == HttpURLConnection.HTTP_UNAUTHORIZED) {
                         tokenHandler.invalidateAccessToken()
-                        val newToken = runBlocking { tokenHandler.getAccessToken() }
+                        response.close()
+                        val newToken = tokenHandler.getAccessTokenBlocking()
                         chain.proceed(buildRequestWithToken(original, newToken))
                     } else {
                         response
@@ -129,6 +132,17 @@ object InterceptorModule {
                 }
             }
         }
+    }
+
+    @Provides
+    @UserFileInterceptor
+    fun provideUserFileAuthInterceptor(
+        tokenHandler: TokenHandler,
+    ): Interceptor {
+        return UserFileAuthInterceptor(
+            apiUrl = Settings.SERVER_API_URL.toHttpUrl(),
+            tokenHandler = tokenHandler,
+        )
     }
 
     @Provides
@@ -208,6 +222,7 @@ object InterceptorModule {
     @Downloads
     fun provideDownloadsInterceptors(
         @I18nInterceptor i18nInterceptor: Interceptor,
+        @UserFileInterceptor userFileAuthInterceptor: Interceptor,
     ): List<OkHttpInterceptor> {
         return buildList {
             add(publicUserAgentInterceptor.toClientInterceptor())
@@ -215,6 +230,7 @@ object InterceptorModule {
             add(crashLoggingInterceptor.toClientInterceptor())
             add(basicAuthInterceptor)
             add(cleanAndRetryInterceptor)
+            add(userFileAuthInterceptor.toClientInterceptor())
 
             if (BuildConfig.DEBUG) {
                 val loggingInterceptor = HttpLoggingInterceptor().apply {
@@ -251,6 +267,7 @@ object InterceptorModule {
     @Player
     fun providePlayerInterceptors(
         @I18nInterceptor i18nInterceptor: Interceptor,
+        @UserFileInterceptor userFileAuthInterceptor: Interceptor,
     ): List<OkHttpInterceptor> {
         return buildList {
             add(publicUserAgentInterceptor.toClientInterceptor())
@@ -258,6 +275,7 @@ object InterceptorModule {
             add(crashLoggingInterceptor.toClientInterceptor())
             add(basicAuthInterceptor)
             add(cleanAndRetryInterceptor)
+            add(userFileAuthInterceptor.toClientInterceptor())
 
             if (BuildConfig.DEBUG) {
                 val loggingInterceptor = HttpLoggingInterceptor().apply {

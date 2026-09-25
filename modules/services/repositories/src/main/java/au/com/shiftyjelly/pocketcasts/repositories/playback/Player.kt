@@ -11,6 +11,7 @@ sealed interface EpisodeLocation {
     data class Stream(
         override val episode: BaseEpisode,
         override val uri: String?,
+        val isHls: Boolean,
     ) : EpisodeLocation
 
     data class Downloaded(
@@ -19,16 +20,38 @@ sealed interface EpisodeLocation {
     ) : EpisodeLocation
 
     companion object {
-        fun create(episode: BaseEpisode) = if (episode.isDownloaded) {
+        fun create(episode: BaseEpisode, preferStream: Boolean = false) = if (episode.isDownloaded && !(preferStream && episode.isStreamUrlHls)) {
             EpisodeLocation.Downloaded(episode, episode.downloadedFilePath)
         } else {
-            EpisodeLocation.Stream(episode, episode.downloadUrl)
+            EpisodeLocation.Stream(episode, episode.streamUrl, episode.isStreamUrlHls)
+        }
+    }
+}
+
+val EpisodeLocation?.isHlsStream: Boolean
+    get() = (this as? EpisodeLocation.Stream)?.isHls == true
+
+/**
+ * Whether the stream the player prepared carries video. HLS starts [Unknown] until the player's tracks
+ * resolve it to [HasVideo] or [AudioOnly]; the video surface is shown only once it reaches [HasVideo].
+ */
+enum class StreamVideoState {
+    NotVideo,
+    Unknown,
+    HasVideo,
+    AudioOnly,
+    ;
+
+    companion object {
+        fun initialFor(episode: BaseEpisode, audioOnly: Boolean, playingHlsStream: Boolean, isRemote: Boolean) = when {
+            audioOnly && (episode.isVideo || playingHlsStream) -> AudioOnly
+            playingHlsStream && !isRemote -> Unknown
+            else -> NotVideo
         }
     }
 }
 
 interface Player {
-    var isPip: Boolean
     val isRemote: Boolean
     val isStreaming: Boolean
     val filePath: String?
@@ -38,12 +61,20 @@ interface Player {
     val isDownloading: Boolean
     val onPlayerEvent: (Player, PlayerEvent) -> Unit
 
+    /**
+     * Smoothed RMS level of the playing audio in the range 0f..1f, updated from the audio
+     * pipeline so it is safe to poll every frame. Players that don't measure audio return 0f,
+     * which the UI treats as "no level available" rather than silence.
+     */
+    val currentAudioLevel: Float get() = 0f
+
     suspend fun load(currentPositionMs: Int)
     suspend fun getCurrentPositionMs(): Int
     suspend fun play(currentPositionMs: Int)
     suspend fun pause()
     suspend fun stop()
     suspend fun setPlaybackEffects(playbackEffects: PlaybackEffects)
+    fun updateAudioOnly() {}
     suspend fun seekToTimeMs(positionMs: Int)
     suspend fun isPlaying(): Boolean
     suspend fun isBuffering(): Boolean
@@ -55,5 +86,5 @@ interface Player {
     fun supportsVideo(): Boolean
     fun setVolume(volume: Float)
     fun setPodcast(podcast: Podcast?)
-    fun setEpisode(episode: BaseEpisode)
+    fun setEpisode(episode: BaseEpisode, preferStream: Boolean = false)
 }

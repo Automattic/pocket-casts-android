@@ -2,14 +2,19 @@ package au.com.shiftyjelly.pocketcasts.settings.stats
 
 import android.app.Application
 import android.content.res.Resources
+import au.com.shiftyjelly.pocketcasts.models.to.DailyListenedTime
 import au.com.shiftyjelly.pocketcasts.models.to.StatsBundle
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
+import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.review.InAppReviewHelper
 import java.time.Instant
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.Date
@@ -17,6 +22,7 @@ import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -26,6 +32,7 @@ import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyInt
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
@@ -34,6 +41,9 @@ import org.mockito.kotlin.whenever
 class StatsViewModelTest {
     @get:Rule
     val coroutineRule = MainCoroutineRule()
+
+    @get:Rule
+    val featureFlagRule = InMemoryFeatureFlagRule()
 
     @Mock
     private lateinit var settings: Settings
@@ -61,10 +71,11 @@ class StatsViewModelTest {
         whenever(mockResources.getString(anyInt())).thenReturn("")
         whenever(application.resources).thenReturn(mockResources)
         whenever(syncManager.isLoggedIn()).thenReturn(true)
+        FeatureFlag.setEnabled(Feature.STATS_HEATMAP, false)
     }
 
     @Test
-    fun `given last 7 days played upto sum more than 2_5 hrs, when stats are loaded, then app review dialog is shown`() = runTest {
+    fun `given last 7 days played up to sum more than 2_5 hrs, when stats are loaded, then app review dialog is shown`() = runTest {
         initViewModel(playedUpToSumInHours = 3.0)
 
         viewModel.loadStats()
@@ -73,7 +84,7 @@ class StatsViewModelTest {
     }
 
     @Test
-    fun `given last 7 days played upto sum less than 2_5 hrs, when stats are loaded, then app review dialog  is not shown`() = runTest {
+    fun `given last 7 days played up to sum less than 2_5 hrs, when stats are loaded, then app review dialog is not shown`() = runTest {
         initViewModel(playedUpToSumInHours = 2.0)
 
         viewModel.loadStats()
@@ -115,6 +126,34 @@ class StatsViewModelTest {
         viewModel.loadStats()
 
         assertFalse((viewModel.state.value as StatsViewModel.State.Loaded).showAppReviewDialog)
+    }
+
+    @Test
+    fun `given heatmap flag enabled, when stats are loaded, then heat levels are populated`() = runTest {
+        FeatureFlag.setEnabled(Feature.STATS_HEATMAP, true)
+        whenever(episodeManager.dailyListenedTime(any())).thenReturn(
+            listOf(
+                DailyListenedTime(LocalDate.now().toString(), 100.0),
+                DailyListenedTime(LocalDate.now().minusDays(1).toString(), 50.0),
+            ),
+        )
+        initViewModel()
+
+        viewModel.loadStats()
+
+        val state = viewModel.state.value as StatsViewModel.State.Loaded
+        assertEquals(2, state.heatLevels.size)
+    }
+
+    @Test
+    fun `given heatmap flag disabled, when stats are loaded, then heat levels are empty`() = runTest {
+        FeatureFlag.setEnabled(Feature.STATS_HEATMAP, false)
+        initViewModel()
+
+        viewModel.loadStats()
+
+        val state = viewModel.state.value as StatsViewModel.State.Loaded
+        assertTrue(state.heatLevels.isEmpty())
     }
 
     private suspend fun initViewModel(

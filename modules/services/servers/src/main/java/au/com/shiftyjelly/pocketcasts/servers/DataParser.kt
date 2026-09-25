@@ -1,10 +1,14 @@
 package au.com.shiftyjelly.pocketcasts.servers
 
+import au.com.shiftyjelly.pocketcasts.models.entity.AlternateEnclosureSource
+import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeAlternateEnclosure
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.firstHlsMimeType
 import au.com.shiftyjelly.pocketcasts.models.to.Share
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
+import au.com.shiftyjelly.pocketcasts.models.type.MediaKind
 import au.com.shiftyjelly.pocketcasts.servers.discover.PodcastSearch
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -140,20 +144,68 @@ object DataParser {
         if (uuid == null || publishedAt == null || podcastUuidOrJson == null) {
             return null
         }
+        val enclosures = parseAlternateEnclosures(jsonEpisode, uuid)
+        val url = getString(jsonEpisode, "url")
+        val fileType = getString(jsonEpisode, "file_type")
+        // HLS-only episode (no progressive download): surface the HLS MIME for isHlsOnly, but keep a real video type.
+        val resolvedFileType = if (url.isNullOrBlank() && fileType?.startsWith("video/") != true) {
+            enclosures.firstHlsMimeType() ?: fileType
+        } else {
+            fileType
+        }
         return PodcastEpisode(
             downloadStatus = EpisodeDownloadStatus.DownloadNotRequested,
             playingStatus = EpisodePlayingStatus.NOT_PLAYED,
             title = getString(jsonEpisode, "title") ?: "",
             uuid = uuid,
-            downloadUrl = getString(jsonEpisode, "url"),
+            downloadUrl = url,
             sizeInBytes = getLong(jsonEpisode, "size_in_bytes"),
             duration = getDouble(jsonEpisode, "duration_in_secs"),
             episodeDescription = getString(jsonEpisode, "description") ?: "",
-            fileType = getString(jsonEpisode, "file_type"),
+            fileType = resolvedFileType,
             publishedDate = publishedAt,
             podcastUuid = podcastUuidOrJson,
             addedDate = Date(),
-        )
+        ).apply {
+            alternateEnclosures = enclosures
+        }
+    }
+
+    private fun parseAlternateEnclosures(jsonEpisode: JSONObject, episodeUuid: String): List<EpisodeAlternateEnclosure> {
+        val enclosures = jsonEpisode.optJSONArray("alternate_enclosures") ?: return emptyList()
+        return (0 until enclosures.length()).mapNotNull { i ->
+            val enclosure = enclosures.optJSONObject(i) ?: return@mapNotNull null
+            val sourcesJson = enclosure.optJSONArray("sources")
+            val sources = if (sourcesJson == null) {
+                emptyList()
+            } else {
+                (0 until sourcesJson.length()).mapNotNull { j ->
+                    val source = sourcesJson.optJSONObject(j) ?: return@mapNotNull null
+                    getString(source, "uri")?.let { uri ->
+                        AlternateEnclosureSource(uri = uri, contentType = getString(source, "content_type"))
+                    }
+                }
+            }
+            val integrity = enclosure.optJSONObject("integrity")
+            EpisodeAlternateEnclosure(
+                episodeUuid = episodeUuid,
+                position = i,
+                type = getString(enclosure, "type"),
+                // Read as a raw string, not via getString, which would coerce a non-string kind into a junk Unknown.
+                mediaKind = MediaKind.fromServer(enclosure.opt("media_kind") as? String),
+                bitrate = getLongOrNull(enclosure, "bitrate"),
+                length = getLongOrNull(enclosure, "length"),
+                height = getIntOrNull(enclosure, "height"),
+                width = getIntOrNull(enclosure, "width"),
+                lang = getString(enclosure, "lang"),
+                title = getString(enclosure, "title"),
+                codecs = getString(enclosure, "codecs"),
+                integrityType = integrity?.let { getString(it, "type") },
+                integrityValue = integrity?.let { getString(it, "value") },
+                isDefault = enclosure.optBoolean("default", false),
+                sources = sources,
+            )
+        }
     }
 
     fun getString(jsonObject: JSONObject, key: String): String? {
@@ -170,6 +222,14 @@ object DataParser {
         } catch (e: Exception) {
             0
         }
+    }
+
+    private fun getLongOrNull(jsonObject: JSONObject, key: String): Long? {
+        return if (jsonObject.has(key) && !jsonObject.isNull(key)) jsonObject.optLong(key) else null
+    }
+
+    private fun getIntOrNull(jsonObject: JSONObject, key: String): Int? {
+        return if (jsonObject.has(key) && !jsonObject.isNull(key)) jsonObject.optInt(key) else null
     }
 
     private fun getDouble(jsonObject: JSONObject, key: String): Double {

@@ -1,15 +1,18 @@
 package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
-import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.HistorySyncResponse
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
-import io.reactivex.Observable
-import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.rx2.await
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -48,20 +51,10 @@ class HistoryManager @Inject constructor(
         val missingPodcastUuids = podcastUuids.minus(databaseSubscribedPodcastUuids)
 
         // add the podcasts five at a time
-        Observable.fromIterable(missingPodcastUuids)
-            .observeOn(Schedulers.io())
-            .flatMap(
-                { podcastUuid ->
-                    podcastManager.addPodcastRxSingle(podcastUuid = podcastUuid, sync = false, subscribed = false, shouldAutoDownload = false)
-                        .doOnError { throwable -> LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, throwable, "History manager could not add podcast") }
-                        .onErrorReturn { Podcast(uuid = podcastUuid) }
-                        .toObservable()
-                },
-                true,
-                ADD_PODCAST_CONCURRENCY,
-            )
-            .toList()
-            .await()
+        val addPodcastPermits = Semaphore(permits = ADD_PODCAST_CONCURRENCY)
+        missingPodcastUuids
+            .map { podcastUuid -> async { addPodcastPermits.withPermit { addMissingPodcast(podcastUuid) } } }
+            .awaitAll()
 
         for (change in changes) {
             val interactionDate = change.modifiedAt.toLong()
@@ -72,24 +65,38 @@ class HistoryManager @Inject constructor(
                 val podcastUuid = change.podcast
                 if (episode != null) {
                     if ((episode.lastPlaybackInteraction ?: 0) < interactionDate) {
-                        episode.lastPlaybackInteraction = interactionDate
-                        episode.lastPlaybackInteractionSyncStatus = PodcastEpisode.LAST_PLAYBACK_INTERACTION_SYNCED
-                        episodeManager.updateBlocking(episode)
+                        episodeManager.updatePlaybackInteraction(
+                            episodeUuid = episodeUuid,
+                            interactionDate = interactionDate,
+                            syncStatus = PodcastEpisode.LAST_PLAYBACK_INTERACTION_SYNCED,
+                        )
                     }
                 } else if (podcastUuid != null) {
                     Timber.i("Listening history episode no longer exists. Episode: $episodeUuid podcast: $podcastUuid")
                 }
             } else if (change.action == ACTION_DELETE) {
                 if (episode != null) {
-                    episode.lastPlaybackInteraction = 0
-                    episode.lastPlaybackInteractionSyncStatus = 1
-                    episodeManager.updateBlocking(episode)
+                    episodeManager.updatePlaybackInteraction(
+                        episodeUuid = episodeUuid,
+                        interactionDate = 0,
+                        syncStatus = PodcastEpisode.LAST_PLAYBACK_INTERACTION_SYNCED,
+                    )
                 }
             }
         }
 
         if (updateServerModified) {
             settings.setHistoryServerModified(response.serverModified)
+        }
+    }
+
+    private suspend fun addMissingPodcast(podcastUuid: String) {
+        val addPodcast = podcastManager.addPodcastRxSingle(podcastUuid = podcastUuid, sync = false, subscribed = false, shouldAutoDownload = false)
+        try {
+            addPodcast.await()
+        } catch (throwable: Throwable) {
+            currentCoroutineContext().ensureActive()
+            LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, throwable, "History manager could not add podcast")
         }
     }
 }

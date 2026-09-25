@@ -26,6 +26,6 @@ class ConnectivityStateManager @Inject constructor(
         .stateIn(
             scope = coroutineScope,
             started = SharingStarted.Eagerly,
-            initialValue = false,
+            initialValue = true,
         )
 }

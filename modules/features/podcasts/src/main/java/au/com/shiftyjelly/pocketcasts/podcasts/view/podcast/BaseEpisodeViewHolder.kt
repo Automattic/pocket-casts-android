@@ -25,9 +25,11 @@ import au.com.shiftyjelly.pocketcasts.views.buttons.PlayButton
 import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeAction
 import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeRowActions
 import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeRowLayout
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.plusAssign
-import io.reactivex.rxkotlin.subscribeBy
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -60,13 +62,14 @@ abstract class BaseEpisodeViewHolder<T : Any>(
 
     private val dateFormatter = RelativeDateFormatter(context)
 
-    private val disposable = CompositeDisposable()
+    private val holderScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
+    private var rowDataJob: Job? = null
 
     private var isMultiSelectEnabled = false
 
     private var streamByDefault = false
 
-    private var isObservingRowData = false
+    private var hasHlsAlternateEnclosure = false
 
     @Suppress("UNCHECKED_CAST")
     private val swipeLayout = binding.root as SwipeRowLayout<SwipeAction>
@@ -117,8 +120,8 @@ abstract class BaseEpisodeViewHolder<T : Any>(
         val previousUuid = boundItem?.let(::toPodcastEpisode)?.uuid
         setupInitialState(item, tint, isMultiSelectEnabled, streamByDefault)
 
-        val isNewEpisode = previousUuid != episode.uuid || !isObservingRowData
-        if (isNewEpisode) {
+        val shouldObserveRowData = previousUuid != episode.uuid || rowDataJob?.isActive != true
+        if (shouldObserveRowData) {
             observeRowData()
         }
         bindArtwork(useEpisodeArtwork)
@@ -156,16 +159,17 @@ abstract class BaseEpisodeViewHolder<T : Any>(
     }
 
     fun unbind() {
-        disposable.clear()
+        rowDataJob?.cancel()
+        rowDataJob = null
         binding.episodeRow.handler?.removeCallbacksAndMessages(null)
     }
 
     private fun observeRowData() {
-        disposable.clear()
-        disposable += rowDataProvider.episodeRowDataObservable(episode.uuid)
-            .doOnSubscribe { isObservingRowData = true }
-            .doOnDispose { isObservingRowData = false }
-            .subscribeBy(onNext = { data ->
+        rowDataJob?.cancel()
+        hasHlsAlternateEnclosure = false
+        rowDataJob = holderScope.launch {
+            rowDataProvider.episodeRowDataFlow(episode.uuid).collect { data ->
+                hasHlsAlternateEnclosure = data.hasHlsAlternateEnclosure
                 isPlaying = data.playbackState.isPlaying && data.playbackState.episodeUuid == episode.uuid
                 bindPlaybackButton()
 
@@ -180,7 +184,8 @@ abstract class BaseEpisodeViewHolder<T : Any>(
                 }
                 bindSwipeActions()
                 bindContentDescription(isInUpNext = data.isInUpNext)
-            })
+            }
+        }
     }
 
     private fun bindArtwork(useEpisodeArtwork: Boolean) {
@@ -202,7 +207,7 @@ abstract class BaseEpisodeViewHolder<T : Any>(
 
     private fun bindStatus(downloadProgress: Int) {
         binding.star.isVisible = episode.isStarred
-        binding.video.isVisible = episode.isVideo
+        binding.video.isVisible = episode.showsVideoIcon(hasHlsAlternateEnclosure)
         binding.progressBar.isVisible = false
         binding.progressCircle.isVisible = false
 

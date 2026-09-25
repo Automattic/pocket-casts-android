@@ -14,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.settings.util.TextResource
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.SettingsNotificationsShownEvent
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -152,12 +153,23 @@ internal class NotificationsSettingsViewModelTest {
         assertEquals(viewModel.state.value.areSystemNotificationsEnabled, true)
     }
 
+    @Test
+    fun `GIVEN podcast selection WHEN selection changes THEN persisted in a single call`() = runTest {
+        val viewModel = createViewModel()
+        val selection = listOf("uuid-1", "uuid-2")
+
+        viewModel.onSelectedPodcastsChanged(selection)
+
+        verify(podcastManager).updateShowNotificationsForSubscribed(selection)
+    }
+
     private fun createViewModel() = NotificationsSettingsViewModel(
         preferenceRepository = repository,
         eventHorizon = EventHorizon(eventSink),
         podcastManager = podcastManager,
         notificationScheduler = notificationScheduler,
         notificationHelper = notificationHelper,
+        applicationScope = CoroutineScope(coroutineRule.testDispatcher),
     )
 
     private companion object {

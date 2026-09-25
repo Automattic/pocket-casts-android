@@ -17,13 +17,11 @@ import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeDownloadFailureStatistics
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.DailyListenedTime
 import au.com.shiftyjelly.pocketcasts.models.to.EpisodeWithTitle
 import au.com.shiftyjelly.pocketcasts.models.type.DownloadStatusUpdate
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
-import io.reactivex.Flowable
-import io.reactivex.Maybe
-import io.reactivex.Single
 import java.time.Instant
 import java.util.Date
 import java.util.UUID
@@ -35,12 +33,6 @@ abstract class EpisodeDao {
 
     @RawQuery(observedEntities = [PodcastEpisode::class, Podcast::class])
     abstract fun findEpisodesBlocking(query: SupportSQLiteQuery): List<PodcastEpisode>
-
-    @RawQuery(observedEntities = [PodcastEpisode::class, Podcast::class])
-    abstract fun findEpisodesRxFlowable(query: SupportSQLiteQuery): Flowable<List<PodcastEpisode>>
-
-    @RawQuery(observedEntities = [PodcastEpisode::class, Podcast::class])
-    abstract fun countRxFlowable(query: SupportSQLiteQuery): Flowable<Int>
 
     @Query("SELECT * FROM podcast_episodes WHERE uuid = :uuid")
     abstract suspend fun findByUuid(uuid: String): PodcastEpisode?
@@ -62,14 +54,7 @@ abstract class EpisodeDao {
     abstract suspend fun countEpisodesByPodcast(podcastUuid: String): Int
 
     @Query("SELECT * FROM podcast_episodes WHERE uuid = :uuid")
-    abstract fun findByUuidRxMaybe(uuid: String): Maybe<PodcastEpisode>
-
-    @Query("SELECT * FROM podcast_episodes WHERE uuid = :uuid")
     abstract fun findByUuidFlow(uuid: String): Flow<PodcastEpisode?>
-
-    @Transaction
-    @Query("SELECT * FROM podcast_episodes WHERE download_task_id IS NOT NULL")
-    abstract fun findDownloadingEpisodesRxFlowable(): Flowable<List<PodcastEpisode>>
 
     @Query("SELECT * FROM podcast_episodes WHERE UPPER(title) = UPPER(:query) LIMIT 1")
     abstract suspend fun findFirstBySearchQuery(query: String): PodcastEpisode?
@@ -252,9 +237,6 @@ abstract class EpisodeDao {
     @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY published_date DESC, added_date DESC LIMIT 1")
     abstract fun findLatestBlocking(podcastUuid: String): PodcastEpisode?
 
-    @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY published_date DESC, added_date DESC LIMIT 1")
-    abstract fun findLatestRxMaybe(podcastUuid: String): Maybe<PodcastEpisode>
-
     @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE (download_task_id IS NOT NULL OR episode_status == :downloadEpisodeDownloadStatus OR (episode_status == :failedEpisodeDownloadStatus AND last_download_attempt_date > :failedDownloadCutoff AND archived == 0)) ORDER BY last_download_attempt_date DESC")
     abstract fun findDownloadingEpisodesIncludingFailedFlow(failedDownloadCutoff: Long, failedEpisodeDownloadStatus: EpisodeDownloadStatus = EpisodeDownloadStatus.DownloadFailed, downloadEpisodeDownloadStatus: EpisodeDownloadStatus = EpisodeDownloadStatus.Downloaded): Flow<List<PodcastEpisode>>
@@ -265,7 +247,7 @@ abstract class EpisodeDao {
 
     @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE episode_status == :downloadEpisodeDownloadStatus ORDER BY last_download_attempt_date DESC")
-    abstract fun findDownloadedEpisodesRxFlowable(downloadEpisodeDownloadStatus: EpisodeDownloadStatus = EpisodeDownloadStatus.Downloaded): Flowable<List<PodcastEpisode>>
+    abstract fun findDownloadedEpisodesFlow(downloadEpisodeDownloadStatus: EpisodeDownloadStatus = EpisodeDownloadStatus.Downloaded): Flow<List<PodcastEpisode>>
 
     @Query("SELECT COUNT(*) FROM podcast_episodes WHERE episode_status == :downloadEpisodeDownloadStatus AND playing_status == :playingStatus")
     abstract suspend fun downloadedEpisodesThatHaveNotBeenPlayedCount(
@@ -274,8 +256,8 @@ abstract class EpisodeDao {
     ): Int
 
     @Transaction
-    @Query("SELECT * FROM podcast_episodes WHERE starred = 1 ORDER BY last_starred_date DESC")
-    abstract fun findStarredEpisodesFlow(): Flow<List<PodcastEpisode>>
+    @Query("SELECT * FROM podcast_episodes WHERE starred = 1 ORDER BY last_starred_date DESC LIMIT :limit")
+    abstract fun findStarredEpisodesFlow(limit: Int = Int.MAX_VALUE): Flow<List<PodcastEpisode>>
 
     @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE starred = 1")
@@ -445,14 +427,10 @@ abstract class EpisodeDao {
     abstract suspend fun count(): Int
 
     @Query("SELECT COUNT(*) FROM podcast_episodes WHERE uuid = :uuid")
-    abstract fun countByUuidBlocking(uuid: String): Int
+    abstract suspend fun countByUuid(uuid: String): Int
 
-    fun existsBlocking(uuid: String): Boolean {
-        return countByUuidBlocking(uuid) != 0
-    }
-
-    fun existsRxSingle(uuid: String): Single<Boolean> {
-        return Single.fromCallable { existsBlocking(uuid) }
+    suspend fun exists(uuid: String): Boolean {
+        return countByUuid(uuid) != 0
     }
 
     @Query("SELECT podcasts.uuid AS uuid, count(podcast_episodes.uuid) AS count FROM podcast_episodes, podcasts WHERE podcast_episodes.podcast_id = podcasts.uuid AND (podcast_episodes.playing_status = :playingStatusNotPlayed OR podcast_episodes.playing_status = :playingStatusInProgress) AND podcast_episodes.archived = 0 GROUP BY podcasts.uuid")
@@ -493,8 +471,8 @@ abstract class EpisodeDao {
     @Query("UPDATE podcast_episodes SET playing_status = :playingStatus, playing_status_modified = :modified WHERE uuid = :uuid")
     abstract fun updatePlayingStatusBlocking(playingStatus: EpisodePlayingStatus, modified: Long, uuid: String)
 
-    @Query("UPDATE podcast_episodes SET last_playback_interaction_date = :modified, last_playback_interaction_sync_status = 0 WHERE uuid = :uuid")
-    abstract suspend fun updatePlaybackInteractionDate(uuid: String, modified: Long)
+    @Query("UPDATE podcast_episodes SET last_playback_interaction_date = :interactionDate, last_playback_interaction_sync_status = :syncStatus WHERE uuid = :uuid")
+    abstract suspend fun updatePlaybackInteraction(uuid: String, interactionDate: Long, syncStatus: Long)
 
     @Query("UPDATE podcast_episodes SET duration = :duration, duration_modified = :modified WHERE uuid = :uuid")
     abstract fun updateDurationBlocking(duration: Double, modified: Long, uuid: String)
@@ -741,4 +719,19 @@ abstract class EpisodeDao {
         """,
     )
     abstract suspend fun clearDownloadsWithoutTaskId(statuses: Collection<EpisodeDownloadStatus>)
+
+    @Query(
+        """
+        SELECT
+          date(last_playback_interaction_date / 1000, 'unixepoch', 'localtime') AS listen_date,
+          SUM(played_up_to) AS total_played_seconds
+        FROM podcast_episodes
+        WHERE
+          last_playback_interaction_date IS NOT NULL
+          AND last_playback_interaction_date >= :fromEpochMs
+        GROUP BY listen_date
+        ORDER BY listen_date ASC
+        """,
+    )
+    abstract suspend fun dailyListenedTime(fromEpochMs: Long): List<DailyListenedTime>
 }

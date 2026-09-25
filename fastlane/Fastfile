@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require 'cgi'
+require 'json'
+
 default_platform(:android)
 fastlane_require 'dotenv'
 
@@ -19,6 +22,8 @@ RELEASE_NOTES_SOURCE_PATH = File.join(PROJECT_ROOT_FOLDER, 'CHANGELOG.md')
 EXTRACTED_RELEASE_NOTES_PATH = File.join(ORIGINALS_METADATA_DIR_PATH, 'release_notes.txt')
 PLAY_STORE_TRACK_AUTOMOTIVE_BETA = 'automotive:beta'
 PLAY_STORE_TRACK_AUTOMOTIVE_PRODUCTION = 'automotive:production'
+PLAY_STORE_TRACK_TV_BETA = 'tv:beta'
+PLAY_STORE_TRACK_TV_PRODUCTION = 'tv:production'
 PLAY_STORE_TRACK_WEAR_BETA = 'wear:beta'
 PLAY_STORE_TRACK_WEAR_PRODUCTION = 'wear:production'
 PLAY_STORE_TRACK_BETA = 'beta'
@@ -66,8 +71,9 @@ ENV['SUPPLY_UPLOAD_MAX_RETRIES'] = '5'
 GITHUB_REPO = 'automattic/pocket-casts-android'
 APPS_APP = 'app'
 APPS_AUTOMOTIVE = 'automotive'
+APPS_TV = 'tv'
 APPS_WEAR = 'wear'
-APPS = [APPS_APP, APPS_AUTOMOTIVE, APPS_WEAR].freeze
+APPS = [APPS_APP, APPS_AUTOMOTIVE, APPS_WEAR, APPS_TV].freeze
 
 UPLOAD_TO_PLAY_STORE_JSON_KEY = File.join(PROJECT_ROOT_FOLDER, 'google-upload-credentials.json')
 UPLOAD_TO_PLAY_STORE_COMMON_OPTIONS = {
@@ -181,11 +187,7 @@ platform :android do
         milestone: new_version
       )
     rescue StandardError => e
-      UI.error <<~MESSAGE
-        Error moving PRs to next milestone or freezing the current `#{new_version}` milestone: #{e.message}.
-        Please manually check that the PRs which were targeting milestone `#{new_version}` have been moved to the next one
-        and that the milestone `#{new_version}` that just entered code-freeze had the "❄️" marker added to its title.
-      MESSAGE
+      report_milestone_error(error_title: "Error moving PRs to the next milestone or freezing the `#{new_version}` milestone: #{e.message}")
     end
   end
 
@@ -330,11 +332,12 @@ platform :android do
     begin
       close_milestone(repository: GITHUB_REPO, milestone: release_version_current)
     rescue StandardError => e
-      UI.important("Could not find a GitHub milestone for hotfix #{release_version_current} to close: #{e}")
+      report_milestone_error(error_title: "Error closing the milestone `#{release_version_current}` for the hotfix: #{e.message}")
     end
   end
 
-  # Update the rollout of all 3 variants/form-factors (app, automotive, wear) of the latest builds of the given Google Play track to the given % value
+  # Update the rollout of all app variants/form factors for the latest builds of the
+  # given Google Play track to the given % value
   #
   # @param percent [Float] The rollout percentage, between 0 and 1
   # @param track [String] The Google Play track for which to update the rollout of. Must be either `beta` or `production`.
@@ -373,7 +376,12 @@ platform :android do
     not_found_variants.each do |message|
       UI.important(message)
     end
-    UI.user_error!('None of the 3 app variants were found in Google Play Console. We expected at least one') if not_found_variants.count == APPS.count
+    if not_found_variants.count == APPS.count
+      UI.user_error!(
+        "None of the #{APPS.count} app variants were found in Google Play Console. " \
+        'We expected at least one'
+      )
+    end
   end
 
   # Downloads the latest translations from GlotPress and creates a PR to integrate them into the current `release/*` branch
@@ -404,10 +412,10 @@ platform :android do
         api_token: ENV.fetch('GITHUB_TOKEN')
       )
 
-      buildkite_annotate(context: 'translations-pr-url', message: "Translations PR: #{pr_url || 'Error creating PR'}") if is_ci?
+      buildkite_annotate(context: 'translations-pr-url', message: "Translations PR: #{pr_url || 'Error creating PR'}") if is_ci
     else
       UI.important('No translations were downloaded, so no PR was created')
-      buildkite_annotate(context: 'translations-pr-url', message: 'No translations were downloaded, so no PR was created') if is_ci?
+      buildkite_annotate(context: 'translations-pr-url', message: 'No translations were downloaded, so no PR was created') if is_ci
       Fastlane::Helper::GitHelper.checkout_and_pull(base_branch)
       Fastlane::Helper::GitHelper.delete_local_branch_if_exists!(pr_branch)
     end
@@ -449,8 +457,12 @@ platform :android do
     version = release_version_current
 
     # Wrap up
-    set_milestone_frozen_marker(repository: GITHUB_REPO, milestone: version, freeze: false)
-    close_milestone(repository: GITHUB_REPO, milestone: version)
+    begin
+      set_milestone_frozen_marker(repository: GITHUB_REPO, milestone: version, freeze: false)
+      close_milestone(repository: GITHUB_REPO, milestone: version)
+    rescue StandardError => e
+      report_milestone_error(error_title: "Error unfreezing or closing the milestone `#{version}`: #{e.message}")
+    end
 
     push_to_git_remote(tags: false)
     trigger_release_build(branch_to_build: "release/#{version}")
@@ -508,7 +520,7 @@ platform :android do
         RELEASE_VERSION: release_version_current
       }
     }
-    if is_ci?
+    if is_ci
       buildkite_pipeline_upload(**pipeline_args)
     else
       buildkite_trigger_build(
@@ -528,27 +540,22 @@ platform :android do
   # - Creates draft Github release
   #
   # @param skip_confirm [Boolean] If true, avoids any interactive prompt
-  # @param skip_prechecks [Boolean] If true, skips android_build_preflight
   # @param create_gh_release [Boolean] If true, creates a draft GitHub release
   #
-  lane :build_and_upload_to_play_store do |skip_prechecks: false, skip_confirm: false, create_gh_release: false|
+  lane :build_and_upload_to_play_store do |skip_confirm: false, create_gh_release: false|
     version = version_name_current
     build_code = build_code_current
     is_beta = beta_version?(version)
 
-    unless skip_prechecks
-      # Match branch names that begin with `release/`
-      # Skip this check on CI because that action relies on CI env vars, but when this lane is called as part of `code_freeze` the branch changed since the CI build started, so that wouldn't work
-      ensure_git_branch(branch: '^release/') unless is_ci
+    # Match branch names that begin with `release/`
+    # Skip this check on CI because that action relies on CI env vars, but when this lane is called as part of `code_freeze` the branch changed since the CI build started, so that wouldn't work
+    ensure_git_branch(branch: '^release/') unless is_ci
 
-      UI.important("Building version #{version_name_current} (#{build_code_current}) for upload to Google Play Console")
-      UI.user_error!("Terminating as requested. Don't forget to run the remainder of this automation manually.") unless skip_confirm || UI.confirm('Do you want to continue?')
+    UI.important("Building version #{version_name_current} (#{build_code_current}) for upload to Google Play Console")
+    UI.user_error!("Terminating as requested. Don't forget to run the remainder of this automation manually.") unless skip_confirm || UI.confirm('Do you want to continue?')
 
-      # Check local repo status
-      ensure_git_status_clean unless is_ci
-
-      android_build_preflight
-    end
+    # Check local repo status
+    ensure_git_status_clean unless is_ci
 
     release_assets = []
 
@@ -584,22 +591,20 @@ platform :android do
   #
   # @param version [String] The version to create
   # @param build_code [String] The build code to create
-  # @param app [String] The Android app to build (i.e 'app', 'automotive', or 'wear')
+  # @param app [String] The Android app to build (i.e. 'app', 'automotive', 'tv', or 'wear')
   lane :build_bundle do |app:, version: version_name_current, build_code: build_code_current|
     aab_artifact_path = aab_artifact_path(app, version)
     build_dir = 'artifacts/'
+    gradle_properties = gradle_properties_for_app(app: app)
 
     gradle(task: 'clean')
     UI.message('Running lint...')
-    gradle(task: ":#{app}:lintRelease")
+    gradle(task: ":#{app}:lintRelease", properties: gradle_properties)
     UI.message("Building #{version} / #{build_code} - #{aab_artifact_path}...")
     gradle(
       task: ":#{app}:bundle",
       build_type: 'Release',
-      properties: {
-        'IS_AUTOMOTIVE_BUILD' => app == APPS_AUTOMOTIVE,
-        'IS_WEAR_BUILD' => app == APPS_WEAR
-      }
+      properties: gradle_properties
     )
 
     aab_file = File.join(PROJECT_ROOT_FOLDER, bundle_output_path(app))
@@ -614,8 +619,12 @@ platform :android do
 
   # Build the application and instrumented tests, then run the tests in Firebase Test Lab
   #
+  # The task names are deliberately scoped to `app`. Unscoped `assembleDebug` / `assembleDebugAndroidTest`
+  # run in *every* project, which builds debug APKs for `automotive` / `tv` / `wear` and
+  # an `androidTest` variant for all modules — even though Firebase Test Lab below only ever
+  # consumes `app-debug.apk` and `app-debug-androidTest.apk`.
   lane :build_and_instrumented_test do
-    gradle(tasks: %w[assembleDebug assembleDebugAndroidTest])
+    gradle(tasks: %w[:app:assembleDebug :app:assembleDebugAndroidTest])
 
     # Run the instrumented tests in Firebase Test Lab
     firebase_login(
@@ -635,7 +644,7 @@ platform :android do
     )
   end
 
-  # Compiles prototype builds and uploads to FAD (app) and S3 (wear/automotive)
+  # Compiles prototype builds and uploads to FAD (app) and S3 (wear/automotive/TV)
   #
   lane :build_and_upload_prototype_build do
     firebase_account_key = ENV.fetch('FIREBASE_APP_DISTRIBUTION_ACCOUNT_KEY', nil)
@@ -650,7 +659,7 @@ platform :android do
     gradle(
       task: 'app:assemble',
       build_type: app_build_type,
-      properties: gradle_properties
+      properties: gradle_properties.merge(gradle_properties_for_app(app: APPS_APP))
     )
 
     app_apk = lane_context[SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS].first
@@ -684,19 +693,22 @@ platform :android do
       )
     end
 
-    # Build wear/automotive and upload to S3 (PRs only)
+    # Build wear/automotive/TV and upload to S3 (PRs only)
     next unless pr_number
+
+    # The comment action otherwise reuses the mobile build's Firebase URL and metadata for S3 builds.
+    lane_context.delete(SharedValues::FIREBASE_APP_DISTRO_RELEASE)
 
     UI.user_error!("'BUILDKITE_ARTIFACTS_S3_BUCKET' must be defined as an environment variable.") unless ENV['BUILDKITE_ARTIFACTS_S3_BUCKET']
 
-    other_platforms = %w[wear automotive]
+    other_platforms = [APPS_WEAR, APPS_AUTOMOTIVE, APPS_TV]
 
     other_apks = []
     other_platforms.each do |platform|
       gradle(
         task: "#{platform}:assemble",
         build_type: other_builds_type,
-        properties: gradle_properties
+        properties: gradle_properties.merge(gradle_properties_for_app(app: platform))
       )
 
       generated_apk_paths = lane_context[SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS]
@@ -723,7 +735,7 @@ platform :android do
         app_display_name: get_app_display_name(apk_path: apk_path),
         app_icon: ':amazon-s3:',
         download_url: install_url,
-        metadata: { 'Build Type': other_builds_type },
+        metadata: { 'Build Type': other_builds_type }.merge(apk_metadata_for_comment(apk_path: apk_path)),
         fold: true
       )
     end
@@ -748,20 +760,40 @@ platform :android do
 
   def get_app_display_name(apk_path:)
     key = get_app_key(apk_path: apk_path).to_sym
-    { app: '📱 Mobile', wear: '⌚ Wear', automotive: '🚗 Automotive' }.fetch(key, '❔ Unknown')
+    { app: '📱 Mobile', wear: '⌚ Wear', automotive: '🚗 Automotive', tv: '📺 TV' }.fetch(key, '❔ Unknown')
+  end
+
+  def apk_metadata_for_comment(apk_path:)
+    metadata_path = File.join(File.dirname(apk_path), 'output-metadata.json')
+    metadata = JSON.parse(File.read(metadata_path))
+    apk_metadata = metadata.fetch('elements').find { |element| element['outputFile'] == File.basename(apk_path) }
+    UI.user_error!("No metadata for '#{File.basename(apk_path)}' in '#{metadata_path}'.") unless apk_metadata
+
+    {
+      'Build Number' => apk_metadata.fetch('versionCode'),
+      'Version' => apk_metadata.fetch('versionName'),
+      'Application ID' => metadata.fetch('applicationId')
+    }.transform_values { |value| "<code>#{CGI.escapeHTML(value.to_s)}</code>" }
+  end
+
+  # Mimics the subset of ActiveSupport's `String#parameterize` we rely on.
+  # release-toolkit dropped its `activesupport` runtime dependency in v14.3.1,
+  # so `String#parameterize` is no longer available here.
+  def parameterize(string)
+    string.downcase.gsub(/[^a-z0-9\-_]+/, '-').squeeze('-').gsub(/\A-|-\z/, '')
   end
 
   # This function is Buildkite-specific
   def generate_prototype_build_number
     if ENV['BUILDKITE']
       commit = ENV.fetch('BUILDKITE_COMMIT', nil)[0, 7]
-      branch = ENV['BUILDKITE_BRANCH'].parameterize
+      branch = parameterize(ENV.fetch('BUILDKITE_BRANCH', nil))
       pr_num = ENV.fetch('BUILDKITE_PULL_REQUEST', nil)
 
       pr_num == 'false' ? "#{branch}-#{commit}" : "pr#{pr_num}-#{commit}"
     else
       repo = Git.open(PROJECT_ROOT_FOLDER)
-      commit = repo.current_branch.parameterize
+      commit = parameterize(repo.current_branch)
       branch = repo.revparse('HEAD')[0, 7]
 
       "#{branch}-#{commit}"
@@ -929,7 +961,16 @@ platform :android do
     BUILD_CODE_FORMATTER.build_code(build_code: build_code_next)
   end
 
-  # Returns the versionCode for a given app, adjusting for offset depending if it's the mobile, automotive or wear app
+  # Shared modules use these properties for versioning, platform metadata, and the runtime Sentry DSN.
+  def gradle_properties_for_app(app:)
+    {
+      'IS_AUTOMOTIVE_BUILD' => app == APPS_AUTOMOTIVE,
+      'IS_WEAR_BUILD' => app == APPS_WEAR,
+      'IS_TV_BUILD' => app == APPS_TV
+    }
+  end
+
+  # Returns the versionCode for a given app, adjusting for offset depending on its form factor
   #
   # See also `dependencies.gradle.kts` and its `versionCodeDifferenceBetweenAppAnd*` constants where those offsets are defined
   #
@@ -939,6 +980,8 @@ platform :android do
       (version_code.to_i + 50_000).to_s
     when APPS_WEAR
       (version_code.to_i + 100_000).to_s
+    when APPS_TV
+      (version_code.to_i + 150_000).to_s
     else
       version_code
     end
@@ -946,7 +989,7 @@ platform :android do
 
   # Returns the Play Store track for a given app, for Open Testing or Production
   #
-  # @param app [String] The type of app. One of `APPS_APP`, `APPS_AUTOMOTIVE`, `APPS_WEAR`
+  # @param app [String] The type of app. One of `APPS_APP`, `APPS_AUTOMOTIVE`, `APPS_TV`, `APPS_WEAR`
   # @param is_beta [Boolean] If we want the track for Open Testing. Otherwise, returns the track for Production
   # @return [String] The Play Store track to use in the `upload_to_play_store(track: …)` action call
   #
@@ -956,6 +999,8 @@ platform :android do
       is_beta ? PLAY_STORE_TRACK_AUTOMOTIVE_BETA : PLAY_STORE_TRACK_AUTOMOTIVE_PRODUCTION
     when APPS_WEAR
       is_beta ? PLAY_STORE_TRACK_WEAR_BETA : PLAY_STORE_TRACK_WEAR_PRODUCTION
+    when APPS_TV
+      is_beta ? PLAY_STORE_TRACK_TV_BETA : PLAY_STORE_TRACK_TV_PRODUCTION
     else
       is_beta ? PLAY_STORE_TRACK_BETA : PLAY_STORE_TRACK_PRODUCTION
     end
@@ -970,5 +1015,19 @@ platform :android do
     buildkite_annotate(style: 'error', context: 'error-checking-branch', message: error_message) if is_ci
 
     UI.user_error!(error_message)
+  end
+
+  # Reports a milestone-related error, both in the logs and — on CI — as a Buildkite annotation,
+  # clarifying that the error is expected when the release task is not being run for the first time.
+  def report_milestone_error(error_title:)
+    error_message = <<~MESSAGE
+      #{error_title}
+
+      - If this is not the first time you are running the release task (e.g. retrying because it failed on first attempt), the milestone might have already been closed and this error is expected.
+      - Otherwise if this is the first you are running the release task for this version, please investigate the error.
+    MESSAGE
+
+    UI.error(error_message)
+    buildkite_annotate(style: 'warning', context: 'error-with-milestone', message: error_message) if is_ci
   end
 end

@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.text.AnnotatedString
@@ -56,16 +57,18 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration.Ele
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeRowDataProvider
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
+import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.buttons.PlayButton
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper.Companion.MULTI_SELECT_TOGGLE_PAYLOAD
 import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeAction
 import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeRowActions
-import io.reactivex.disposables.CompositeDisposable
 import java.util.Date
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -135,12 +138,17 @@ class PodcastAdapter(
     private val ratingsViewModel: PodcastRatingsViewModel,
     private val onTabClicked: (PodcastTab) -> Unit,
     private val onBookmarkPlayClicked: (Bookmark) -> Unit,
+    private val onBookmarkClick: (Bookmark, BaseEpisode) -> Unit,
+    private val onBookmarkArtworkClick: (Bookmark) -> Unit,
+    private val onBookmarkSwipeShare: (Bookmark, settleRow: () -> Unit) -> Unit,
+    private val onBookmarkSwipeDelete: (Bookmark, settleRow: () -> Unit) -> Unit,
     private val onHeadsetSettingsClicked: () -> Unit,
     private val onGetBookmarksClicked: () -> Unit,
     private val onChangeHeaderExpanded: (String, Boolean) -> Unit,
     private val onDescriptionExpanded: (Boolean) -> Unit,
     private val onClickRating: (Podcast) -> Unit,
     private val onClickCategory: (Podcast) -> Unit,
+    private val onClickNetwork: (Podcast) -> Unit,
     private val onClickWebsite: (Podcast) -> Unit,
     private val onArtworkAvailable: (Podcast) -> Unit,
     private val onRecommendedRetryClicked: () -> Unit,
@@ -175,6 +183,9 @@ class PodcastAdapter(
         val onBookmarkPlayClicked: (Bookmark) -> Unit,
         val onBookmarkRowLongPress: (Bookmark) -> Unit,
         val onBookmarkRowClick: (Bookmark, Int) -> Unit,
+        val onBookmarkArtworkClick: () -> Unit,
+        val onBookmarkSwipeShare: (Bookmark, settleRow: () -> Unit) -> Unit,
+        val onBookmarkSwipeDelete: (Bookmark, settleRow: () -> Unit) -> Unit,
         val isMultiSelecting: () -> Boolean,
         val isSelected: (Bookmark) -> Boolean,
     )
@@ -229,13 +240,12 @@ class PodcastAdapter(
         val VIEW_TYPE_DIVIDER_TITLE = R.layout.adapter_divider_row
     }
 
-    private val disposables = CompositeDisposable()
     private var podcast: Podcast = Podcast()
     private var podcastDescription = AnnotatedString("")
 
     private var headerExpanded: Boolean = false
     private var isDescriptionExpanded = false
-    private var tintColor: Int = 0x000000
+    private var tintColor: Int = context.getThemeColor(UR.attr.primary_icon_01)
     private var signInState: SignInState = SignInState.SignedOut
     private var ratingState: RatingState = RatingState.Loading
 
@@ -261,6 +271,7 @@ class PodcastAdapter(
                 theme = theme,
                 useBlurredArtwork = headerType == HeaderType.Blur,
                 onClickCategory = onClickCategory,
+                onClickNetwork = onClickNetwork,
                 onClickRating = onClickRating,
                 onClickFollow = onSubscribeClicked,
                 onClickUnfollow = { onUnsubscribeClicked { } },
@@ -376,11 +387,6 @@ class PodcastAdapter(
         }
     }
 
-    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
-        super.onDetachedFromRecyclerView(recyclerView)
-        disposables.clear()
-    }
-
     private fun bindingEpisodeHeaderViewHolder(holder: EpisodeHeaderViewHolder, position: Int) {
         val episodeHeader = getItem(position) as? EpisodeHeader ?: return
         holder.binding.episodesSummary.let {
@@ -407,6 +413,7 @@ class PodcastAdapter(
             text = episodeHeader.searchTerm
         }
         holder.binding.btnArchived.setText(if (episodeHeader.showingArchived) LR.string.podcast_hide_archived else LR.string.podcast_show_archived)
+        holder.binding.btnArchived.setTextColor(ThemeColor.podcastText02(theme.activeTheme, tintColor))
         holder.binding.btnArchived.setOnClickListener { onShowArchivedClicked() }
     }
 
@@ -421,7 +428,8 @@ class PodcastAdapter(
             isMultiSelectEnabled = multiSelectEpisodesHelper.isMultiSelecting,
             isSelected = multiSelectEpisodesHelper.isSelected(episode),
             useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork(Element.Podcasts),
-            streamByDefault = settings.streamingMode.value,
+            streamByDefault = settings.streamingMode.value || castConnected,
+            tint = tintColor,
             animateMultiSelection = animateMultiSelection,
         )
     }
@@ -467,7 +475,9 @@ class PodcastAdapter(
     }
 
     fun setTint(tintColor: Int) {
+        if (this.tintColor == tintColor) return
         this.tintColor = tintColor
+        notifyDataSetChanged()
     }
 
     fun setSignInState(signInState: SignInState) {
@@ -603,20 +613,28 @@ class PodcastAdapter(
                     )
                 } else {
                     addAll(
-                        bookmarks.map {
+                        bookmarks.map { bookmark ->
+                            val episode = episodes.find { it.uuid == bookmark.episodeUuid } ?: noOpEpisode
                             BookmarkItemData(
-                                bookmark = it,
-                                episode = episodes.find { episode -> episode.uuid == it.episodeUuid } ?: noOpEpisode,
+                                bookmark = bookmark,
+                                episode = episode,
                                 onBookmarkPlayClicked = onBookmarkPlayClicked,
                                 onBookmarkRowLongPress = onBookmarkRowLongPress,
-                                onBookmarkRowClick = { bookmark, adapterPosition ->
-                                    multiSelectBookmarksHelper.toggle(bookmark)
-                                    notifyItemChanged(adapterPosition)
+                                onBookmarkRowClick = { clickedBookmark, adapterPosition ->
+                                    if (!multiSelectBookmarksHelper.isMultiSelecting && FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS)) {
+                                        onBookmarkClick(clickedBookmark, episode)
+                                    } else {
+                                        multiSelectBookmarksHelper.toggle(clickedBookmark)
+                                        notifyItemChanged(adapterPosition)
+                                    }
                                 },
+                                onBookmarkArtworkClick = { onBookmarkArtworkClick(bookmark) },
+                                onBookmarkSwipeShare = onBookmarkSwipeShare,
+                                onBookmarkSwipeDelete = onBookmarkSwipeDelete,
                                 isMultiSelecting = { multiSelectBookmarksHelper.isMultiSelecting },
-                                isSelected = { bookmark ->
+                                isSelected = { selectedBookmark ->
                                     multiSelectBookmarksHelper.isSelected(
-                                        bookmark,
+                                        selectedBookmark,
                                     )
                                 },
                                 useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork(Element.Bookmarks),
@@ -784,6 +802,7 @@ class PodcastAdapter(
         private val theme: Theme,
         private val useBlurredArtwork: Boolean,
         private val onClickCategory: (Podcast) -> Unit,
+        private val onClickNetwork: (Podcast) -> Unit,
         private val onClickRating: (Podcast) -> Unit,
         private val onClickFollow: () -> Unit,
         private val onClickUnfollow: () -> Unit,
@@ -824,14 +843,17 @@ class PodcastAdapter(
                         title = podcast.title,
                         category = podcast.getFirstCategory(itemView.context.resources),
                         author = podcast.author,
+                        networkListId = podcast.networkListId,
                         explicit = podcast.explicit ?: false,
                         description = podcastDescription,
                         podcastInfoState = PodcastInfoState(
                             author = podcast.author,
+                            networkListId = podcast.networkListId,
                             link = podcast.getShortUrl(),
                             schedule = podcast.displayableFrequency(context.resources),
                             next = podcast.displayableNextEpisodeDate(context),
                         ),
+                        linkColor = Color(ThemeColor.podcastText02(theme.activeTheme, tintColor)),
                         rating = ratingState,
                         isFollowed = podcast.isSubscribed,
                         areNotificationsEnabled = podcast.isShowNotifications,
@@ -851,6 +873,7 @@ class PodcastAdapter(
                         ),
                         useBlurredArtwork = useBlurredArtwork,
                         onClickCategory = { onClickCategory(podcast) },
+                        onClickNetwork = { onClickNetwork(podcast) },
                         onClickRating = { onClickRating(podcast) },
                         onClickFollow = onClickFollow,
                         onClickUnfollow = onClickUnfollow,

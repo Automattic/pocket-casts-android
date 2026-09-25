@@ -5,6 +5,8 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastRatings
 import au.com.shiftyjelly.pocketcasts.models.entity.SuggestedFolder
 import au.com.shiftyjelly.pocketcasts.servers.discover.EpisodeSearch
+import au.com.shiftyjelly.pocketcasts.servers.sync.bookmark.BookmarkEnrichRequest
+import au.com.shiftyjelly.pocketcasts.servers.sync.bookmark.BookmarkEnrichResponse
 import io.reactivex.Single
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
@@ -25,22 +27,17 @@ class PodcastCacheServiceManagerImpl @Inject constructor(
             .map(PodcastResponse::toPodcast)
     }
 
-    override fun getPodcastAndEpisodeSingle(podcastUuid: String, episodeUuid: String): Single<Podcast> {
-        return service.getPodcastAndEpisodeSingle(podcastUuid, episodeUuid).map(PodcastResponse::toPodcast)
-    }
-
     override suspend fun getPodcastAndEpisode(podcastUuid: String, episodeUuid: String): Podcast {
         return service.getPodcastAndEpisode(podcastUuid, episodeUuid).toPodcast()
     }
 
-    override fun searchEpisodes(podcastUuid: String, searchTerm: String): Single<List<String>> {
-        return service.searchPodcastForEpisodes(SearchBody(podcastUuid, searchTerm)).map { it.episodes.map { it.uuid } }
+    override suspend fun searchEpisodes(podcastUuid: String, searchTerm: String): List<String> {
+        return service.searchPodcastForEpisodes(SearchBody(podcastUuid, searchTerm)).episodes.map { it.uuid }
     }
 
-    override fun searchEpisodes(searchTerm: String): Single<EpisodeSearch> {
-        return service.searchEpisodes(SearchEpisodesBody(searchTerm)).map {
-            EpisodeSearch(it.episodes.map { result -> result.toEpisodeItem() })
-        }
+    override suspend fun searchEpisodes(searchTerm: String): EpisodeSearch {
+        val response = service.searchEpisodes(SearchEpisodesBody(searchTerm))
+        return EpisodeSearch(response.episodes.map { result -> result.toEpisodeItem() })
     }
 
     override suspend fun getPodcastRatings(podcastUuid: String, useCache: Boolean): PodcastRatings {
@@ -86,6 +83,17 @@ class PodcastCacheServiceManagerImpl @Inject constructor(
 
     override suspend fun suggestedFolders(request: SuggestedFoldersRequest): List<SuggestedFolder> {
         return service.suggestedFolders(request).toSuggestedFolders()
+    }
+
+    override suspend fun episodeChat(authorization: String, request: EpisodeChatRequest): EpisodeChatResponse {
+        return service.episodeChat(
+            authorization = authorization,
+            request = request,
+        )
+    }
+
+    override suspend fun enrichBookmark(authorization: String, request: BookmarkEnrichRequest): BookmarkEnrichResponse {
+        return service.enrichBookmark(authorization, request)
     }
 
     private fun Map<String, List<String>>.toSuggestedFolders(): List<SuggestedFolder> {

@@ -4,8 +4,10 @@ import android.content.Context
 import androidx.annotation.OptIn
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaItem.ClippingConfiguration
+import androidx.media3.common.MimeTypes
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.database.StandaloneDatabaseProvider
+import androidx.media3.datasource.DataSource
 import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.datasource.cache.CacheDataSource
 import androidx.media3.datasource.cache.LeastRecentlyUsedCacheEvictor
@@ -40,10 +42,11 @@ class ExoPlayerDataSourceFactory @Inject constructor(
     private val settings: Settings,
     private val crashLogging: CrashLogging,
 ) {
+    private val maxCacheSizeBytes = settings.getExoPlayerCacheEntirePlayingEpisodeSizeInMB() * 1024 * 1024L
+
     private val cache = runCatching {
         val cacheDir = File(context.cacheDir, CACHE_DIR_NAME)
-        val size = settings.getExoPlayerCacheEntirePlayingEpisodeSizeInMB() * 1024 * 1024L
-        val evictor = LeastRecentlyUsedCacheEvictor(size)
+        val evictor = LeastRecentlyUsedCacheEvictor(maxCacheSizeBytes)
         SimpleCache(cacheDir, evictor, StandaloneDatabaseProvider(context))
     }.onFailure { e ->
         val errorMessage = "Failed to instantiate ExoPlayer cache ${e.message}"
@@ -61,6 +64,17 @@ class ExoPlayerDataSourceFactory @Inject constructor(
         .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
         .let { if (cache != null) it.setCache(cache) else it }
 
+    val blockingCacheFactory get() = CacheDataSource.Factory()
+        .setUpstreamDataSourceFactory(defaultFactory)
+        .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR or CacheDataSource.FLAG_BLOCK_ON_CACHE)
+        .let { if (cache != null) it.setCache(cache) else it }
+
+    val isCacheAvailable get() = cache != null
+
+    val upstreamFactory: DataSource.Factory get() = defaultFactory
+
+    fun cachedLengthAt(cacheKey: String, position: Long, length: Long): Long = cache?.getCachedLength(cacheKey, position, length) ?: -1L
+
     fun createMediaSource(
         episodeLocation: EpisodeLocation,
         clipRange: ClosedRange<Long>? = null,
@@ -69,11 +83,12 @@ class ExoPlayerDataSourceFactory @Inject constructor(
         val episodeUri = episodeLocation.uri ?: return null
         val mediaItem = MediaItem.Builder()
             .setUri(episodeUri)
-            .let { builder ->
+            .apply {
+                if (episodeLocation.isHlsStream) {
+                    setMimeType(MimeTypes.APPLICATION_M3U8)
+                }
                 if (clipRange != null) {
-                    builder.setClippingConfiguration(clipRange.toClippingConfiguration())
-                } else {
-                    builder
+                    setClippingConfiguration(clipRange.toClippingConfiguration())
                 }
             }
             .setCustomCacheKey(episodeLocation.episode.uuid)
@@ -86,7 +101,7 @@ class ExoPlayerDataSourceFactory @Inject constructor(
 
         val cacheFactory = cacheFactory
             .setCacheWriteDataSinkFactory(null)
-            .takeIf { episodeLocation.episode.shouldUseCache() }
+            .takeIf { episodeLocation.shouldUseCache() }
 
         startCachingEntireEpisodeIfNeeded(
             cacheDataSourceFactory = cacheFactory,
@@ -95,9 +110,10 @@ class ExoPlayerDataSourceFactory @Inject constructor(
         )
 
         val dataFactory = cacheFactory ?: defaultFactory
+        // Only DefaultMediaSourceFactory applies the ClippingConfiguration, so clipping must win over HLS.
         val factory = when {
-            episodeLocation.episode.isHLS -> HlsMediaSource.Factory(dataFactory)
             (clipRange != null) -> DefaultMediaSourceFactory(dataFactory, extractorsFactory)
+            episodeLocation.isHlsStream -> HlsMediaSource.Factory(dataFactory)
             else -> ProgressiveMediaSource.Factory(dataFactory, extractorsFactory)
         }
         if (FeatureFlag.isEnabled(Feature.LOAD_ERROR_HANDLING_POLICY)) {
@@ -111,16 +127,19 @@ class ExoPlayerDataSourceFactory @Inject constructor(
         episodeLocation: EpisodeLocation,
         onCachingComplete: (String) -> Unit,
     ) {
+        if (episodeLocation.isHlsStream) return
         val episodeUri = episodeLocation.uri ?: return
         val cacheFactory = cacheDataSourceFactory ?: cacheFactory
             .setCacheWriteDataSinkFactory(null)
-            .takeIf { episodeLocation.episode.shouldUseCache() }
+            .takeIf { episodeLocation.shouldUseCache() }
 
         if (cacheFactory != null) {
             CacheWorker.startCachingEntireEpisode(
                 context = context,
                 url = episodeUri,
                 episodeUuid = episodeLocation.episode.uuid,
+                networkConstraint = cacheNetworkConstraint(settings.warnOnMeteredNetwork.value),
+                maxCacheBytes = maxCacheSizeBytes,
                 onCachingComplete = onCachingComplete,
             )
         }
@@ -133,7 +152,7 @@ class ExoPlayerDataSourceFactory @Inject constructor(
     ) {
         val episodeUuid = episodeLocation.episode.uuid
         try {
-            if (episodeLocation.episode.shouldUseCache().not()) return
+            if (episodeLocation.shouldUseCache().not()) return
 
             cache?.removeResource(episodeUuid)
             onCachingReset(episodeUuid)
@@ -152,7 +171,12 @@ class ExoPlayerDataSourceFactory @Inject constructor(
         }
     }
 
-    private fun BaseEpisode.shouldUseCache() = !isDownloaded && !isDownloading && settings.cacheEntirePlayingEpisode.value
+    private fun EpisodeLocation.shouldUseCache() = shouldCacheEntireEpisode(
+        episode = episode,
+        isHlsStream = isHlsStream,
+        cacheEntirePlayingEpisodeEnabled = settings.cacheEntirePlayingEpisode.value,
+        maxCacheSizeBytes = maxCacheSizeBytes,
+    )
 
     private fun ClosedRange<Long>.toClippingConfiguration() = ClippingConfiguration.Builder()
         .setStartPositionMs(start)
@@ -163,3 +187,15 @@ class ExoPlayerDataSourceFactory @Inject constructor(
         const val CACHE_DIR_NAME = "pocketcasts-exoplayer-cache"
     }
 }
+
+internal fun shouldCacheEntireEpisode(
+    episode: BaseEpisode,
+    isHlsStream: Boolean,
+    cacheEntirePlayingEpisodeEnabled: Boolean,
+    maxCacheSizeBytes: Long,
+) = !episode.isDownloaded &&
+    !episode.isDownloading &&
+    !isHlsStream &&
+    !episode.isVideo &&
+    cacheEntirePlayingEpisodeEnabled &&
+    !(maxCacheSizeBytes > 0 && episode.sizeInBytes > maxCacheSizeBytes)

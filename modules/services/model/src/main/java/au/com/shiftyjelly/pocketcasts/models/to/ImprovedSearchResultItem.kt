@@ -22,13 +22,23 @@ sealed interface ImprovedSearchResultItem {
         override val title: String,
         val author: String,
         val isFollowed: Boolean,
+        val isExplicit: Boolean = false,
+    ) : ImprovedSearchResultItem
+
+    data class NetworkItem(
+        override val uuid: String,
+        override val title: String,
+        val description: String? = null,
+        val imageUrl: String? = null,
     ) : ImprovedSearchResultItem
 
     data class EpisodeItem(
         override val uuid: String,
         override val title: String,
         val podcastUuid: String,
+        val podcastTitle: String,
         val publishedDate: Date,
         val duration: Duration,
+        val hasVideo: Boolean = false,
     ) : ImprovedSearchResultItem
 }

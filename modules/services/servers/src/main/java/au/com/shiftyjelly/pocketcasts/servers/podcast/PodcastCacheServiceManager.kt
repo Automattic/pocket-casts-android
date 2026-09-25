@@ -5,19 +5,22 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastRatings
 import au.com.shiftyjelly.pocketcasts.models.entity.SuggestedFolder
 import au.com.shiftyjelly.pocketcasts.servers.discover.EpisodeSearch
+import au.com.shiftyjelly.pocketcasts.servers.sync.bookmark.BookmarkEnrichRequest
+import au.com.shiftyjelly.pocketcasts.servers.sync.bookmark.BookmarkEnrichResponse
 import io.reactivex.Single
 import retrofit2.Response
 
 interface PodcastCacheServiceManager {
     fun getPodcast(podcastUuid: String): Single<Podcast>
-    fun getPodcastAndEpisodeSingle(podcastUuid: String, episodeUuid: String): Single<Podcast>
     suspend fun getPodcastAndEpisode(podcastUuid: String, episodeUuid: String): Podcast
-    fun searchEpisodes(podcastUuid: String, searchTerm: String): Single<List<String>>
-    fun searchEpisodes(searchTerm: String): Single<EpisodeSearch>
+    suspend fun searchEpisodes(podcastUuid: String, searchTerm: String): List<String>
+    suspend fun searchEpisodes(searchTerm: String): EpisodeSearch
     suspend fun getPodcastResponse(podcastUuid: String): Response<PodcastResponse>
     suspend fun getPodcastRatings(podcastUuid: String, useCache: Boolean): PodcastRatings
     suspend fun getShowNotes(podcastUuid: String): ShowNotesResponse
     suspend fun getShowNotesCache(podcastUuid: String): ShowNotesResponse?
     suspend fun getEpisodeUrl(episode: PodcastEpisode): String?
     suspend fun suggestedFolders(request: SuggestedFoldersRequest): List<SuggestedFolder>
+    suspend fun episodeChat(authorization: String, request: EpisodeChatRequest): EpisodeChatResponse
+    suspend fun enrichBookmark(authorization: String, request: BookmarkEnrichRequest): BookmarkEnrichResponse
 }

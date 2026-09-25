@@ -36,6 +36,7 @@ object LocaliseHelper {
         "true crime" to R.string.discover_category_crime,
         "tv & film" to R.string.discover_category_tv,
         "featured" to R.string.discover_featured,
+        "networks" to R.string.discover_networks,
         "trending" to R.string.discover_trending,
         "australia" to R.string.discover_region_australia,
         "austria" to R.string.discover_region_austria,

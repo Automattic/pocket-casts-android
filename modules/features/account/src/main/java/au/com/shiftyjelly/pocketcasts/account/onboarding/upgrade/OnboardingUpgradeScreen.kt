@@ -65,6 +65,7 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.components.UpgradeTrial
 import au.com.shiftyjelly.pocketcasts.account.onboarding.components.UpgradeTrialTimeline
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.PrivacyPolicy
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.UpgradeRowButton
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.contextual.BlogsUpsellHeader
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.contextual.BookmarksAnimation
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.contextual.FoldersAnimation
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.contextual.PreselectChaptersAnimation
@@ -468,6 +469,16 @@ private fun createContentPages(
             )
         }
 
+        OnboardingUpgradeSource.BLOGS -> {
+            add(UpgradePagerContent.Blogs)
+            add(
+                UpgradePagerContent.Features(
+                    features = currentPlan.featureItems,
+                    showCta = false,
+                ),
+            )
+        }
+
         OnboardingUpgradeSource.UP_NEXT_SHUFFLE -> {
             add(UpgradePagerContent.Shuffle)
             add(
@@ -517,6 +528,10 @@ private sealed interface UpgradePagerContent {
     }
 
     data object Bookmarks : UpgradePagerContent {
+        override val showCta get() = true
+    }
+
+    data object Blogs : UpgradePagerContent {
         override val showCta get() = true
     }
 
@@ -672,6 +687,14 @@ private fun UpgradePagerContent.toComponent(
                 },
             )
 
+            is UpgradePagerContent.Blogs -> BlogsUpgradeContent(
+                modifier = modifier,
+                onCtaClick = {
+                    onClickSeeAllFeatures()
+                    scrollToNext()
+                },
+            )
+
             is UpgradePagerContent.Shuffle -> ShuffleUpgradeContent(
                 modifier = modifier,
                 onCtaClick = {
@@ -819,6 +842,49 @@ private fun BookmarksUpgradeContent(
             contentAlignment = Alignment.Center,
         ) {
             BookmarksAnimation(
+                modifier = Modifier
+                    .fillMaxWidth(widthFraction)
+                    .scale(scaleFactor),
+            )
+        }
+    }
+}
+
+@Composable
+private fun BlogsUpgradeContent(
+    onCtaClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(modifier = modifier) {
+        TextP40(
+            text = stringResource(LR.string.onboarding_upgrade_schedule_see_features),
+            modifier = Modifier
+                .padding(horizontal = 24.dp)
+                .padding(bottom = 24.dp)
+                .clickable { onCtaClick() },
+            color = MaterialTheme.theme.colors.primaryInteractive01,
+        )
+
+        val isTablet = Util.isTablet(LocalContext.current)
+        val widthFraction = if (isTablet) {
+            0.6f
+        } else {
+            1f
+        }
+        val scaleFactor = if (isTablet) {
+            1.4f
+        } else {
+            1f
+        }
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp * scaleFactor)
+                .padding(bottom = 24.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            BlogsUpsellHeader(
                 modifier = Modifier
                     .fillMaxWidth(widthFraction)
                     .scale(scaleFactor),

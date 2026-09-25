@@ -133,6 +133,15 @@ message SyncUserBookmark {
   google.protobuf.Int64Value title_modified = 7;
   google.protobuf.BoolValue is_deleted = 8;
   google.protobuf.Int64Value is_deleted_modified = 9;
+  google.protobuf.StringValue ai_title = 10;
+  google.protobuf.Int64Value ai_title_modified = 11;
+  google.protobuf.StringValue ai_summary = 12;
+  google.protobuf.Int64Value ai_summary_modified = 13;
+  google.protobuf.StringValue passage = 14;
+  google.protobuf.Int32Value passage_location = 15;
+  google.protobuf.Int64Value passage_modified = 16;
+  google.protobuf.Int32Value reference_time = 17;
+  google.protobuf.Int64Value reference_time_modified = 18;
 }
 
 message BookmarkRequest {
@@ -149,6 +158,11 @@ message BookmarkResponse {
   int32 time = 5;
   string title = 6;
   google.protobuf.Timestamp createdAt = 7;
+  google.protobuf.StringValue passage = 8;
+  google.protobuf.Int32Value passage_location = 9;
+  google.protobuf.Int64Value passage_modified = 10;
+  google.protobuf.Int32Value reference_time = 11;
+  google.protobuf.Int64Value reference_time_modified = 12;
 }
 
 message BookmarksResponse {
@@ -395,4 +409,25 @@ message UpNextResponse {
   int64 server_modified = 1;
   repeated EpisodeResponse episodes = 4;
   repeated EpisodeSyncResponse episodeSync = 5;
+}
+
+message WebFeedCreateRequest {
+  string url = 1;
+  google.protobuf.StringValue poll_uuid = 2;
+}
+
+message ApiPodcastResponse {
+  string uuid = 1;
+  string title = 2;
+  string author = 3;
+  string description = 4;
+  string url = 5;
+  string slug = 6;
+}
+
+message WebFeedCreateResponse {
+  oneof result {
+    ApiPodcastResponse podcast = 1;
+    string poll_uuid = 2;
+  }
 }

@@ -13,27 +13,36 @@ import androidx.compose.material.Card
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.podcasts.R as IR
 
 @Composable
 fun PodcastInfoView(
     state: PodcastInfoState,
     onWebsiteLinkClick: () -> Unit,
+    onNetworkClick: () -> Unit,
     modifier: Modifier = Modifier,
+    linkColor: Color = MaterialTheme.theme.colors.primaryIcon01,
 ) {
+    val isNetworkDiscoveryEnabled by FeatureFlag.isEnabledFlow(Feature.NETWORK_DISCOVERY).collectAsStateWithLifecycle()
+    val isAuthorLinked = isNetworkDiscoveryEnabled && state.networkListId != null
     Card(
         shape = RoundedCornerShape(8.dp),
         elevation = 0.dp,
@@ -50,17 +59,23 @@ fun PodcastInfoView(
             verticalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier.padding(16.dp),
         ) {
-            PodcastInfoItem(
-                state.author,
-                IR.drawable.ic_author,
-            )
+            if (state.author.isNotEmpty()) {
+                PodcastInfoItem(
+                    text = state.author,
+                    icon = IR.drawable.ic_author,
+                    isLink = isAuthorLinked,
+                    linkColor = linkColor,
+                    onClick = onNetworkClick,
+                )
+            }
 
             if (!state.link.isNullOrEmpty()) {
                 PodcastInfoItem(
                     text = state.link,
                     icon = IR.drawable.ic_link,
                     isLink = true,
-                    onWebsiteLinkClick = onWebsiteLinkClick,
+                    linkColor = linkColor,
+                    onClick = onWebsiteLinkClick,
                 )
             }
 
@@ -87,7 +102,8 @@ private fun PodcastInfoItem(
     icon: Int,
     modifier: Modifier = Modifier,
     isLink: Boolean = false,
-    onWebsiteLinkClick: () -> Unit = {},
+    linkColor: Color = MaterialTheme.theme.colors.primaryIcon01,
+    onClick: () -> Unit = {},
 ) {
     Row(
         modifier = modifier
@@ -107,11 +123,9 @@ private fun PodcastInfoItem(
             TextP40(
                 text = text,
                 maxLines = 3,
-                color = MaterialTheme.theme.colors.support05,
+                color = linkColor,
                 fontWeight = FontWeight.W400,
-                modifier = Modifier.clickable {
-                    onWebsiteLinkClick.invoke()
-                },
+                modifier = Modifier.clickable(onClick = onClick),
             )
         } else {
             TextP40(
@@ -132,12 +146,14 @@ private fun PreviewPodcastInfoView(
     AppTheme(themeType) {
         PodcastInfoView(
             state = PodcastInfoState(
-                "John",
-                "www.google.com",
-                "Every two weeks",
-                "Episode 2",
+                author = "John",
+                networkListId = "list-id",
+                link = "www.google.com",
+                schedule = "Every two weeks",
+                next = "Episode 2",
             ),
             onWebsiteLinkClick = {},
+            onNetworkClick = {},
             modifier = Modifier.fillMaxWidth(),
         )
     }
@@ -145,6 +161,7 @@ private fun PreviewPodcastInfoView(
 
 data class PodcastInfoState(
     val author: String,
+    val networkListId: String?,
     val link: String?,
     val schedule: String?,
     val next: String?,

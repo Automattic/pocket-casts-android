@@ -32,19 +32,18 @@ import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompo
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.EpisodeItem
+import au.com.shiftyjelly.pocketcasts.models.to.ImprovedSearchResultItem
 import au.com.shiftyjelly.pocketcasts.models.to.SearchHistoryEntry
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.search.SearchResultsFragment.Companion.ResultsType
 import au.com.shiftyjelly.pocketcasts.search.SearchViewModel.SearchResultType
 import au.com.shiftyjelly.pocketcasts.search.databinding.FragmentSearchBinding
 import au.com.shiftyjelly.pocketcasts.search.searchhistory.SearchHistoryClearAllConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.search.searchhistory.SearchHistoryPage
 import au.com.shiftyjelly.pocketcasts.search.searchhistory.SearchHistoryViewModel
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
+import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.extensions.hide
 import au.com.shiftyjelly.pocketcasts.views.extensions.show
 import au.com.shiftyjelly.pocketcasts.views.extensions.showKeyboard
@@ -67,7 +66,6 @@ private const val ARG_FLOATING = "arg_floating"
 private const val ARG_ONLY_SEARCH_REMOTE = "arg_only_search_remote"
 private const val ARG_SOURCE = "arg_source"
 private const val SEARCH_HISTORY_CLEAR_ALL_CONFIRMATION_DIALOG_TAG = "search_history_clear_all_confirmation_dialog"
-private const val SEARCH_RESULTS_TAG = "search_results"
 
 @AndroidEntryPoint
 class SearchFragment : BaseFragment() {
@@ -249,7 +247,7 @@ class SearchFragment : BaseFragment() {
             viewModel.state
                 .scan<SearchUiState, Pair<SearchUiState?, SearchUiState?>>(null to null) { acc, value -> acc.second to value }
                 .drop(1)
-                .filter { (previous, next) -> previous is SearchUiState.Suggestions && (next is SearchUiState.OldResults || next is SearchUiState.ImprovedResults) }
+                .filter { (previous, next) -> previous is SearchUiState.Suggestions && next is SearchUiState.Results }
                 .mapNotNull { (_, next) -> next?.searchTerm }
                 .collect {
                     if (it != searchView.query) {
@@ -260,7 +258,7 @@ class SearchFragment : BaseFragment() {
 
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
-                viewModel.updateSearchQuery(query, immediate = true)
+                viewModel.updateSearchQuery(query)
                 binding.searchHistoryPanel.hide()
                 UiUtil.hideKeyboard(searchView)
                 return true
@@ -271,9 +269,6 @@ class SearchFragment : BaseFragment() {
                 val characterCount = query.length
                 val lowerCaseSearch = query.lowercase()
                 if ((characterCount == 1 && lowerCaseSearch.startsWith("h")) || (characterCount == 2 && lowerCaseSearch.startsWith("ht")) || (characterCount == 3 && lowerCaseSearch.startsWith("htt")) || lowerCaseSearch.startsWith("http")) {
-                    if (((viewModel.state.value as? SearchUiState.OldResults)?.operation as? SearchUiState.SearchOperation.Success)?.results?.podcasts?.isNotEmpty() == true) {
-                        binding.searchHistoryPanel.hide()
-                    }
                     return true
                 }
                 viewModel.updateSearchQuery(query)
@@ -288,7 +283,7 @@ class SearchFragment : BaseFragment() {
         binding.searchHistoryPanel.apply {
             setContentWithViewCompositionStrategy {
                 val state = viewModel.state.collectAsState()
-                if ((state.value is SearchUiState.Suggestions || !FeatureFlag.isEnabled(Feature.IMPROVED_SEARCH_SUGGESTIONS)) && state.value.searchTerm.isNullOrBlank()) {
+                if (state.value is SearchUiState.Suggestions && state.value.searchTerm.isNullOrBlank()) {
                     searchHistoryViewModel.start()
                 }
 
@@ -347,13 +342,14 @@ class SearchFragment : BaseFragment() {
                 val state by viewModel.state.collectAsState()
                 AppThemeWithBackground(theme.activeTheme) {
                     when (val state = state) {
-                        is SearchUiState.ImprovedResults ->
+                        is SearchUiState.Results ->
                             ImprovedSearchResultsPage(
                                 state = state,
                                 loading = state.isLoading,
                                 onEpisodeClick = { onEpisodeClick(episode = SearchHistoryEntry.fromImprovedEpisodeResult(it)) },
                                 onPodcastClick = { onPodcastClick(SearchHistoryEntry.fromImprovedPodcastResult(it), it.isFollowed) },
                                 onFolderClick = ::onFolderClick,
+                                onNetworkClick = ::onNetworkClick,
                                 onFollowPodcast = { viewModel.onSubscribeToPodcast(it.uuid) },
                                 playButtonListener = playButtonListener,
                                 onScroll = { UiUtil.hideKeyboard(searchView) },
@@ -364,23 +360,10 @@ class SearchFragment : BaseFragment() {
                                 onErrorShow = viewModel::reportErrorResultsShown,
                             )
 
-                        is SearchUiState.OldResults ->
-                            SearchInlineResultsPage(
-                                state = state,
-                                loading = state.isLoading,
-                                onEpisodeClick = ::onEpisodeClick,
-                                onPodcastClick = { onPodcastClick(SearchHistoryEntry.fromPodcast(it), it.isSubscribed) },
-                                onFolderClick = ::onFolderClick,
-                                onShowAllCLick = ::onShowAllClick,
-                                onFollowPodcast = ::onSubscribeToPodcast,
-                                onScroll = { UiUtil.hideKeyboard(searchView) },
-                                bottomInset = bottomInset.pxToDp(LocalContext.current).dp,
-                            )
-
                         else -> Spacer(modifier = Modifier.size(0.dp))
                     }
                 }
-                binding.searchInlineResults.isVisible = (state is SearchUiState.OldResults || state is SearchUiState.ImprovedResults) && !state.searchTerm.isNullOrBlank()
+                binding.searchInlineResults.isVisible = state is SearchUiState.Results && !state.searchTerm.isNullOrBlank()
             }
         }
     }
@@ -438,13 +421,18 @@ class SearchFragment : BaseFragment() {
         binding?.searchView?.let { UiUtil.hideKeyboard(it) }
     }
 
-    private fun onShowAllClick(resultsType: ResultsType) {
-        viewModel.trackSearchListShown(source, resultsType)
-        val fragment = SearchResultsFragment.newInstance(resultsType, onlySearchRemote, source)
-        childFragmentManager.beginTransaction()
-            .replace(R.id.searchResults, fragment)
-            .addToBackStack(SEARCH_RESULTS_TAG)
-            .commit()
+    private fun onNetworkClick(network: ImprovedSearchResultItem.NetworkItem) {
+        viewModel.trackSearchResultTapped(
+            source = source,
+            uuid = network.uuid,
+            type = SearchResultType.NETWORK,
+        )
+        (requireActivity() as FragmentHostListener).openNetworkPage(
+            listId = network.uuid,
+            title = network.title,
+            sourceView = SourceView.SEARCH_RESULTS,
+        )
+        binding?.searchView?.let { UiUtil.hideKeyboard(it) }
     }
 
     override fun onBackPressed(): Boolean {

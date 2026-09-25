@@ -15,8 +15,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.servers.ServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.discover.GlobalServerSearch
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.SearchFailedEvent
 import com.automattic.eventhorizon.SearchPerformedEvent
@@ -28,6 +26,7 @@ import io.reactivex.rxkotlin.Observables
 import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -40,7 +39,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.rx2.asFlow
-import kotlinx.coroutines.rx2.await
+import kotlinx.coroutines.rx2.rxSingle
 import timber.log.Timber
 
 class SearchHandler @Inject constructor(
@@ -55,7 +54,7 @@ class SearchHandler @Inject constructor(
 ) {
     private var source: SourceView = SourceView.UNKNOWN
     private val searchQuery = BehaviorRelay.create<Query>().apply {
-        accept(if (FeatureFlag.isEnabled(Feature.IMPROVED_SEARCH_SUGGESTIONS)) Query.Suggestions("") else Query.SearchResults(""))
+        accept(Query.Suggestions(""))
     }
 
     private val loadingObservable = BehaviorRelay.create<Boolean>().apply {
@@ -79,13 +78,11 @@ class SearchHandler @Inject constructor(
                 val folderSearch =
                     if (signInState.isSignedInAsPlusOrPatron) {
                         // only show folders if the user has Plus
-                        folderManager.findFoldersSingle()
-                            .subscribeOn(Schedulers.io())
+                        rxSingle { folderManager.getAll() }
                             .flatMapObservable { Observable.fromIterable(it) }
                             .filter { it.name.contains(query, ignoreCase = true) }
-                            .switchMapSingle { folder ->
-                                podcastManager
-                                    .findPodcastsInFolderRxSingle(folderUuid = folder.uuid)
+                            .concatMapSingle { folder ->
+                                rxSingle { podcastManager.findPodcastsInFolder(folderUuid = folder.uuid) }
                                     .map { podcasts -> FolderItem.Folder(folder = folder, podcasts = podcasts) }
                             }
                             .toList()
@@ -94,8 +91,7 @@ class SearchHandler @Inject constructor(
                     }
 
                 // search podcasts
-                val podcastSearch = podcastManager.findSubscribedRxSingle()
-                    .subscribeOn(Schedulers.io())
+                val podcastSearch = rxSingle(Dispatchers.IO) { podcastManager.findSubscribedBlocking() }
                     .flatMapObservable { Observable.fromIterable(it) }
                     .filter { it.title.contains(query, ignoreCase = true) || it.author.contains(query, ignoreCase = true) }
                     .map { podcast ->
@@ -112,9 +108,7 @@ class SearchHandler @Inject constructor(
             }
         }
 
-    private val subscribedPodcastUuids = podcastManager
-        .findSubscribedRxSingle()
-        .subscribeOn(Schedulers.io())
+    private val subscribedPodcastUuids = rxSingle(Dispatchers.IO) { podcastManager.findSubscribedBlocking() }
         .map { podcasts -> podcasts.map(Podcast::uuid).toHashSet() }
         .toObservable()
 
@@ -215,13 +209,20 @@ class SearchHandler @Inject constructor(
                 author = folderItem.podcast.author,
                 title = folderItem.title,
                 isSubscribed = true,
+                isExplicit = folderItem.podcast.explicit == true,
             )
 
             is FolderItem.Folder -> SearchAutoCompleteItem.Folder(
                 uuid = folderItem.uuid,
                 title = folderItem.title,
                 podcasts = folderItem.podcasts.map {
-                    SearchAutoCompleteItem.Podcast(uuid = it.uuid, title = it.title, author = it.author, isSubscribed = true)
+                    SearchAutoCompleteItem.Podcast(
+                        uuid = it.uuid,
+                        title = it.title,
+                        author = it.author,
+                        isSubscribed = true,
+                        isExplicit = it.explicit == true,
+                    )
                 },
                 color = folderItem.folder.color,
             )
@@ -242,8 +243,8 @@ class SearchHandler @Inject constructor(
             }
         }
         .map { it.term }
-        .switchMap {
-            if (it.length <= 1) {
+        .switchMap { searchTerm ->
+            if (searchTerm.length <= 1) {
                 Observable.just(GlobalServerSearch())
             } else {
                 eventHorizon.track(
@@ -253,18 +254,16 @@ class SearchHandler @Inject constructor(
                 )
                 loadingObservable.accept(true)
 
-                var globalSearch = GlobalServerSearch(searchTerm = it)
-                val podcastServerSearch = serviceManager
-                    .searchForPodcastsRx(it)
+                var globalSearch = GlobalServerSearch(searchTerm = searchTerm)
+                val podcastServerSearch = rxSingle { serviceManager.searchForPodcasts(searchTerm).getOrThrow() }
                     .map { podcastSearch ->
                         globalSearch = globalSearch.copy(podcastSearch = podcastSearch)
                         globalSearch
                     }
                     .toObservable()
 
-                if (!it.startsWith("http")) {
-                    val episodesServerSearch = cacheServiceManager
-                        .searchEpisodes(it)
+                if (!searchTerm.startsWith("http")) {
+                    val episodesServerSearch = rxSingle { cacheServiceManager.searchEpisodes(searchTerm) }
                         .map { episodeSearch ->
                             globalSearch = globalSearch.copy(episodeSearch = episodeSearch)
                             globalSearch
@@ -341,7 +340,7 @@ class SearchHandler @Inject constructor(
     val searchResults = searchFlowable.asFlow()
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val improvedSearchResults: Flow<SearchUiState.SearchOperation<SearchResults.ImprovedResults>> = combine(
+    val improvedSearchResults: Flow<SearchUiState.SearchOperation<SearchResults.Results>> = combine(
         searchQuery.filter { it is Query.SearchResults }.map { it.term.trim() }.asFlow(),
         combine(
             searchQuery.asFlow().map { it is Query.SearchResults },
@@ -354,31 +353,37 @@ class SearchHandler @Inject constructor(
             if (!isResultsQuery) {
                 emptyFlow()
             } else if (query.isBlank()) {
-                flowOf(SearchUiState.SearchOperation.Success(searchTerm = query, results = SearchResults.ImprovedResults(results = emptyList(), filter = ResultsFilters.TOP_RESULTS)))
+                flowOf(SearchUiState.SearchOperation.Success(searchTerm = query, results = SearchResults.Results(results = emptyList(), filter = ResultsFilters.TOP_RESULTS)))
             } else {
                 flow {
                     emit(SearchUiState.SearchOperation.Loading(searchTerm = query))
                     val subscribedUuids = podcastManager.findSubscribedUuids()
                     if (query.startsWith("http")) {
-                        val podcastSearch = serviceManager
-                            .searchForPodcastsRx(query)
-                            .map { list -> list.searchResults.map { ImprovedSearchResultItem.PodcastItem(uuid = it.uuid, title = it.title, author = it.author, isFollowed = subscribedUuids.contains(it.uuid)) } }
-                            .await()
+                        val podcastSearch = serviceManager.searchForPodcasts(query).getOrThrow()
+                            .searchResults
+                            .map { ImprovedSearchResultItem.PodcastItem(uuid = it.uuid, title = it.title, author = it.author, isFollowed = subscribedUuids.contains(it.uuid)) }
                         eventHorizon.track(
                             SearchPerformedEvent(
                                 source = source.analyticsValue,
                             ),
                         )
-                        emit(SearchUiState.SearchOperation.Success(searchTerm = query, results = SearchResults.ImprovedResults(results = podcastSearch, filter = ResultsFilters.TOP_RESULTS)))
+                        emit(SearchUiState.SearchOperation.Success(searchTerm = query, results = SearchResults.Results(results = podcastSearch, filter = ResultsFilters.TOP_RESULTS)))
                     } else {
                         val localResults = localPodcasts.map {
                             when (it) {
                                 is FolderItem.Folder -> ImprovedSearchResultItem.FolderItem(folder = it.folder, podcasts = it.podcasts)
-                                is FolderItem.Podcast -> ImprovedSearchResultItem.PodcastItem(uuid = it.uuid, isFollowed = true, title = it.podcast.title, author = it.podcast.author)
+
+                                is FolderItem.Podcast -> ImprovedSearchResultItem.PodcastItem(
+                                    uuid = it.uuid,
+                                    isFollowed = true,
+                                    title = it.podcast.title,
+                                    author = it.podcast.author,
+                                    isExplicit = it.podcast.explicit == true,
+                                )
                             }
                         }
                         if (localResults.isNotEmpty()) {
-                            emit(SearchUiState.SearchOperation.Success(searchTerm = query, results = SearchResults.ImprovedResults(results = localResults, filter = ResultsFilters.TOP_RESULTS)))
+                            emit(SearchUiState.SearchOperation.Success(searchTerm = query, results = SearchResults.Results(results = localResults, filter = ResultsFilters.TOP_RESULTS)))
                         }
                         val apiResults = try {
                             eventHorizon.track(
@@ -401,10 +406,10 @@ class SearchHandler @Inject constructor(
                             }
                         }
                         val combinedResults = (localResults + apiResults).distinctBy { it::class to it.uuid }
-                        emit(SearchUiState.SearchOperation.Success(searchTerm = query, results = SearchResults.ImprovedResults(results = combinedResults, filter = ResultsFilters.TOP_RESULTS)))
+                        emit(SearchUiState.SearchOperation.Success(searchTerm = query, results = SearchResults.Results(results = combinedResults, filter = ResultsFilters.TOP_RESULTS)))
                     }
                 }.catch {
-                    emit(SearchUiState.SearchOperation.Error(searchTerm = query, error = it) as SearchUiState.SearchOperation<SearchResults.ImprovedResults>)
+                    emit(SearchUiState.SearchOperation.Error(searchTerm = query, error = it) as SearchUiState.SearchOperation<SearchResults.Results>)
                 }
             }
         }

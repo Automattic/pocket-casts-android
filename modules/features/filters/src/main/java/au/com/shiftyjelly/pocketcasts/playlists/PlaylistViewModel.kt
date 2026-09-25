@@ -69,6 +69,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
 @HiltViewModel(assistedFactory = PlaylistViewModel.Factory::class)
@@ -153,14 +154,18 @@ class PlaylistViewModel @AssistedInject constructor(
         )
         settings.saveUpNextAsPlaylist.set(saveUpNext, updateModifiedAt = false)
         if (saveUpNext && saveUpNextJob?.isActive != true) {
-            saveUpNextJob = viewModelScope.launch(NonCancellable) {
-                playAllHandler.saveUpNextAsPlaylist(upNextTranslation)
-                _upNextSavedAsPlaylistSignal.emit(Unit)
+            saveUpNextJob = viewModelScope.launch {
+                withContext(NonCancellable) {
+                    playAllHandler.saveUpNextAsPlaylist(upNextTranslation)
+                    _upNextSavedAsPlaylistSignal.emit(Unit)
+                }
             }
         }
         if (playAllJob?.isActive != true) {
-            playAllJob = viewModelScope.launch(NonCancellable) {
-                playAllHandler.playAllPendingEpisodes()
+            playAllJob = viewModelScope.launch {
+                withContext(NonCancellable) {
+                    playAllHandler.playAllPendingEpisodes()
+                }
             }
         }
     }
@@ -254,14 +259,16 @@ class PlaylistViewModel @AssistedInject constructor(
     }
 
     fun deletePlaylist() {
-        viewModelScope.launch(NonCancellable) {
-            delay(300) // Some small delay to navigate back to the main UI first.
-            playlistManager.deletePlaylist(playlistUuid)
-            eventHorizon.track(
-                FilterDeletedEvent(
-                    filterType = playlistType.analyticsValue,
-                ),
-            )
+        viewModelScope.launch {
+            withContext(NonCancellable) {
+                delay(300) // Some small delay to navigate back to the main UI first.
+                playlistManager.deletePlaylist(playlistUuid)
+                eventHorizon.track(
+                    FilterDeletedEvent(
+                        filterType = playlistType.analyticsValue,
+                    ),
+                )
+            }
         }
     }
 

@@ -3,6 +3,8 @@ package au.com.shiftyjelly.pocketcasts.profile.accountmanager
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
+import au.com.shiftyjelly.pocketcasts.account.AccountActivity
+import au.com.shiftyjelly.pocketcasts.repositories.sync.PocketCastsAccountAuthenticator
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -15,7 +17,7 @@ class PocketCastsAuthenticatorService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        authenticator = PocketCastsAccountAuthenticator(this, syncManager)
+        authenticator = PocketCastsAccountAuthenticator(this, syncManager, AccountActivity::class.java)
     }
 
     override fun onDestroy() {

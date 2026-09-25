@@ -19,7 +19,7 @@ class SubscriptionManagerImpl @Inject constructor(
     private val syncManager: SyncManager,
     private val settings: Settings,
 ) : SubscriptionManager {
-    private val fetchMembershipAction = SyncedAction<Unit, Membership?> {
+    private val fetchMembershipAction = SyncedAction<Unit, Result<Membership>> {
         runCatching { syncManager.subscriptionStatus().toMembership() }
             .onSuccess { membership ->
                 val subscription = membership.subscription
@@ -28,11 +28,14 @@ class SubscriptionManagerImpl @Inject constructor(
                     settings.setTrialFinishedSeen(false)
                 }
             }
-            .getOrNull()
     }
 
     override suspend fun fetchFreshSubscription(): Subscription? {
-        return fetchMembershipAction.run(scope)?.subscription
+        return fetchMembershipAction.run(scope).getOrNull()?.subscription
+    }
+
+    override suspend fun fetchFreshSubscriptionResult(): Result<Subscription?> {
+        return fetchMembershipAction.run(scope).map { it.subscription }
     }
 
     override fun clearCachedMembership() {
