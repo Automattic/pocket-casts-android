@@ -44,7 +44,7 @@ class ShelfViewModel @AssistedInject constructor(
     val uiState: StateFlow<UiState> = _uiState
 
     private val isSmartBookmarksPromoRelease = ReleaseVersion.fromString(settings.getVersion())
-        ?.let { version -> ReleaseVersion(version.major, version.minor) in SMART_BOOKMARKS_PROMO_RELEASES } == true
+        ?.let { version -> ReleaseVersion(version.major, version.minor) == SMART_BOOKMARKS_PROMO_RELEASE } == true
 
     init {
         viewModelScope.launch {
@@ -189,11 +189,7 @@ class ShelfViewModel @AssistedInject constructor(
     companion object {
         const val ERROR_MINIMUM_SHELF_ITEMS = "Minimum 4 shelf items should be present"
         const val ERROR_SHELF_ITEM_INVALID_MOVE_POSITION = "Shelf item invalid move position"
-        private val SMART_BOOKMARKS_PROMO_RELEASES = setOf(
-            ReleaseVersion(major = 8, minor = 22),
-            ReleaseVersion(major = 8, minor = 23),
-            ReleaseVersion(major = 8, minor = 24),
-        )
+        private val SMART_BOOKMARKS_PROMO_RELEASE = ReleaseVersion(major = 8, minor = 22)
         val shortcutTitle = ShelfTitle(LR.string.player_rearrange_actions_shown)
         val moreActionsTitle = ShelfTitle(LR.string.player_rearrange_actions_hidden)
     }

@@ -216,7 +216,7 @@ class ShelfViewModelTest {
     @Test
     fun `given smart bookmarks promo patch release, then the bookmark new badge is shown`() = runTest {
         FeatureFlag.setEnabled(Feature.SMART_BOOKMARKS, true)
-        initViewModel(version = "8.24.1")
+        initViewModel(version = "8.22.1")
 
         assertTrue(shelfViewModel.uiState.value.showBookmarkNewBadge)
     }
@@ -232,7 +232,7 @@ class ShelfViewModelTest {
     @Test
     fun `given release after the smart bookmarks promo, then the bookmark new badge is hidden`() = runTest {
         FeatureFlag.setEnabled(Feature.SMART_BOOKMARKS, true)
-        initViewModel(version = "8.25")
+        initViewModel(version = "8.23")
 
         assertFalse(shelfViewModel.uiState.value.showBookmarkNewBadge)
     }
