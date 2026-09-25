@@ -262,7 +262,7 @@ class VersionMigrationsWorker @AssistedInject constructor(
             settings.showUpNextSortDurationTooltip.set(true, updateModifiedAt = false)
         }
 
-        // Show the smart bookmarks "New" badge and player tip to users upgrading into this release, but not to fresh installs.
+        // Show the smart bookmarks player tip to users upgrading into this release, but not to fresh installs.
         if (previousVersionCode < 9460) {
             settings.showSmartBookmarksTooltip.set(true, updateModifiedAt = false)
         }
