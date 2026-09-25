@@ -4,6 +4,7 @@ import android.content.res.Resources
 import android.view.View
 import androidx.fragment.app.FragmentManager
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPlural
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
@@ -26,6 +27,7 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 class BookmarkDeleter @Inject constructor(
     private val bookmarkManager: BookmarkManager,
     private val eventHorizon: EventHorizon,
+    @ApplicationScope private val applicationScope: CoroutineScope,
 ) {
     fun confirmDelete(
         bookmarks: List<Bookmark>,
@@ -94,7 +96,7 @@ class BookmarkDeleter @Inject constructor(
             Snackbar.make(snackbarView, LR.string.bookmarks_deleted_singular, Snackbar.LENGTH_LONG)
                 .setAction(LR.string.bookmarks_deleted_undo) {
                     onUndo()
-                    scope.launch { bookmarkManager.restoreToSync(bookmark) }
+                    applicationScope.launch { bookmarkManager.restoreToSync(bookmark) }
                 }
                 .show()
         }
