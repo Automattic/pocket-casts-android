@@ -7,7 +7,6 @@ import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewServiceManager
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.ReleaseVersion
-import java.time.Duration
 import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -21,12 +20,12 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import okhttp3.CacheControl
 import timber.log.Timber
 
 @Singleton
 class WhatsNewManagerImpl @Inject constructor(
     private val serviceManager: WhatsNewServiceManager,
-    private val catalogStore: WhatsNewCatalogStore,
     private val readStateStore: WhatsNewReadStateStore,
     private val settings: Settings,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -58,9 +57,9 @@ class WhatsNewManagerImpl @Inject constructor(
 
     private val refreshLock = Mutex()
 
-    override suspend fun refreshIfNeeded() = refreshCatalog(force = false)
+    override suspend fun refreshIfNeeded() = refreshCatalog(cacheControl = null)
 
-    override suspend fun refresh() = refreshCatalog(force = true)
+    override suspend fun refresh() = refreshCatalog(CacheControl.FORCE_NETWORK)
 
     override fun markAsRead(messageIds: Collection<String>) = readStateStore.markAsRead(messageIds)
 
@@ -72,44 +71,28 @@ class WhatsNewManagerImpl @Inject constructor(
 
     override fun resetReadState() = readStateStore.reset()
 
-    private suspend fun refreshCatalog(force: Boolean) {
+    private suspend fun refreshCatalog(cacheControl: CacheControl?) {
         FeatureFlag.awaitProvidersInitialised()
         if (!FeatureFlag.isEnabled(Feature.WHATS_NEW_FEED)) return
 
         refreshLock.withLock {
             withContext(ioDispatcher) {
-                val locale = serviceManager.catalogLocale()
                 if (_catalog.value == null) {
-                    _catalog.value = catalogStore.read(locale)
+                    fetchCatalog(CacheControl.FORCE_CACHE)
                 }
-                if (force || _catalog.value == null || isStale(locale)) {
-                    fetchCatalog(locale)
-                }
+                fetchCatalog(cacheControl)
             }
         }
         evaluatedAt.value = Instant.now()
     }
 
-    private suspend fun fetchCatalog(locale: String) {
+    private suspend fun fetchCatalog(cacheControl: CacheControl?) {
         try {
-            val body = serviceManager.getCatalog()
-            val catalog = catalogStore.decode(body) ?: return
-            catalogStore.write(locale, body)
-            _catalog.value = catalog
+            _catalog.value = serviceManager.getCatalog(cacheControl)
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
             Timber.w(e, "Could not refresh the What's New catalog")
         }
-    }
-
-    private fun isStale(locale: String): Boolean {
-        val writtenAt = catalogStore.writtenAt(locale) ?: return true
-        val age = Duration.between(writtenAt, Instant.now())
-        return age.isNegative || age >= REFRESH_INTERVAL
-    }
-
-    companion object {
-        val REFRESH_INTERVAL: Duration = Duration.ofHours(6)
     }
 }

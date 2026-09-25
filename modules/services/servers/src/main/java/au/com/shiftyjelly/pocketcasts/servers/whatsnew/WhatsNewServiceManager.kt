@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.servers.whatsnew
 
-interface WhatsNewServiceManager {
-    fun catalogLocale(): String
+import okhttp3.CacheControl
 
-    suspend fun getCatalog(): String
+interface WhatsNewServiceManager {
+    suspend fun getCatalog(cacheControl: CacheControl? = null): WhatsNewCatalog
 }

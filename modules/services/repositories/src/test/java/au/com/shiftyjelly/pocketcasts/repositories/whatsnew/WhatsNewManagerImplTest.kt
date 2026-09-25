@@ -6,18 +6,19 @@ import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.ReadSetting
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.servers.di.NetworkModule
+import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewCatalog
+import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewCatalogResponse
 import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewServiceManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
-import com.squareup.moshi.Moshi
-import java.io.File
 import java.io.IOException
 import java.time.Instant
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import okhttp3.CacheControl
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -38,22 +39,16 @@ class WhatsNewManagerImplTest {
     @get:Rule
     val featureFlagRule = InMemoryFeatureFlagRule()
 
-    private val moshi: Moshi = NetworkModule().provideMoshi()
-    private lateinit var context: Context
-    private lateinit var catalogStore: WhatsNewCatalogStore
     private lateinit var readStateStore: WhatsNewReadStateStore
     private lateinit var serviceManager: FakeServiceManager
     private lateinit var settings: Settings
 
     @Before
     fun setUp() {
-        context = RuntimeEnvironment.getApplication()
-        File(context.cacheDir, "whats-new").deleteRecursively()
-
+        val context = RuntimeEnvironment.getApplication()
         val preferences = context.getSharedPreferences("whats-new-manager-test", Context.MODE_PRIVATE)
         preferences.edit().clear().commit()
 
-        catalogStore = WhatsNewCatalogStore(context, moshi)
         readStateStore = WhatsNewReadStateStore(preferences)
         serviceManager = FakeServiceManager(catalogJson("Browse by network"))
         val subscription = mock<ReadSetting<Subscription?>>()
@@ -65,50 +60,47 @@ class WhatsNewManagerImplTest {
         FeatureFlag.setEnabled(Feature.WHATS_NEW_FEED, true)
     }
 
-    private fun manager() = WhatsNewManagerImpl(serviceManager, catalogStore, readStateStore, settings, UnconfinedTestDispatcher())
+    private fun manager() = WhatsNewManagerImpl(serviceManager, readStateStore, settings, UnconfinedTestDispatcher())
 
     @Test
-    fun `fetches the catalog when there is nothing on disk`() = runTest {
+    fun `fetches the catalog when nothing is cached`() = runTest {
         val manager = manager()
 
         manager.refreshIfNeeded()
 
-        assertEquals(1, serviceManager.requestCount)
+        assertEquals(1, serviceManager.networkRequestCount)
         assertEquals(listOf("Browse by network"), manager.catalog.value?.messages?.map { it.title })
     }
 
     @Test
-    fun `publishes the catalog on disk without going to the network`() = runTest {
+    fun `publishes the cached catalog before going to the network`() = runTest {
         manager().refreshIfNeeded()
-        serviceManager.requestCount = 0
+        serviceManager.error = IOException("no network")
 
         val manager = manager()
         manager.refreshIfNeeded()
 
-        assertEquals(0, serviceManager.requestCount)
         assertEquals(listOf("Browse by network"), manager.catalog.value?.messages?.map { it.title })
     }
 
     @Test
-    fun `fetches again once the copy on disk has aged out`() = runTest {
-        manager().refreshIfNeeded()
-        ageOutTheCachedCatalog()
-        serviceManager.requestCount = 0
+    fun `lets the http cache decide whether a refresh needs the network`() = runTest {
+        val manager = manager()
+        manager.refreshIfNeeded()
 
-        manager().refreshIfNeeded()
+        manager.refreshIfNeeded()
 
-        assertEquals(1, serviceManager.requestCount)
+        assertEquals(listOf(null, null), serviceManager.networkCacheControls)
     }
 
     @Test
-    fun `refreshing fetches while the copy on disk is current`() = runTest {
+    fun `refreshing revalidates the catalog with the server`() = runTest {
         val manager = manager()
         manager.refreshIfNeeded()
-        serviceManager.requestCount = 0
 
         manager.refresh()
 
-        assertEquals(1, serviceManager.requestCount)
+        assertEquals(CacheControl.FORCE_NETWORK, serviceManager.networkCacheControls.last())
     }
 
     @Test
@@ -148,7 +140,6 @@ class WhatsNewManagerImplTest {
     fun `keeps the catalog it has when the refresh fails`() = runTest {
         val manager = manager()
         manager.refreshIfNeeded()
-        ageOutTheCachedCatalog()
         serviceManager.error = IOException("no network")
 
         manager.refresh()
@@ -172,7 +163,7 @@ class WhatsNewManagerImplTest {
 
         manager().refresh()
 
-        assertEquals(0, serviceManager.requestCount)
+        assertEquals(0, serviceManager.networkRequestCount)
     }
 
     @Test
@@ -238,11 +229,6 @@ class WhatsNewManagerImplTest {
         }
     }
 
-    private fun ageOutTheCachedCatalog() {
-        val file = File(File(context.cacheDir, "whats-new"), "catalog-en.json")
-        file.setLastModified(System.currentTimeMillis() - WhatsNewManagerImpl.REFRESH_INTERVAL.toMillis() - 1000)
-    }
-
     private fun catalogJson(
         title: String,
         audiences: String = """["free"]""",
@@ -268,15 +254,21 @@ class WhatsNewManagerImplTest {
     private class FakeServiceManager(
         var catalog: String,
     ) : WhatsNewServiceManager {
-        var requestCount = 0
+        private val adapter = NetworkModule().provideMoshi().adapter(WhatsNewCatalogResponse::class.java)
+        private var cached: String? = null
+        val networkCacheControls = mutableListOf<CacheControl?>()
+        val networkRequestCount get() = networkCacheControls.size
         var error: Exception? = null
 
-        override fun catalogLocale() = "en"
-
-        override suspend fun getCatalog(): String {
-            requestCount++
-            error?.let { throw it }
-            return catalog
+        override suspend fun getCatalog(cacheControl: CacheControl?): WhatsNewCatalog {
+            val body = if (cacheControl?.onlyIfCached == true) {
+                cached ?: throw IOException("not cached")
+            } else {
+                networkCacheControls += cacheControl
+                error?.let { throw it }
+                catalog.also { cached = it }
+            }
+            return requireNotNull(adapter.fromJson(body)).toCatalog()
         }
     }
 }
