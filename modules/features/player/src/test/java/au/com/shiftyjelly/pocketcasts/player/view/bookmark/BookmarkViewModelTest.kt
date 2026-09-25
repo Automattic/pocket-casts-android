@@ -78,6 +78,7 @@ class BookmarkViewModelTest {
         timeSecs = timeSecs,
         podcastColors = PodcastColors.ForUserEpisode,
     )
+    private val failedGeneration = TitleGeneration(title = null, durationMs = 16, failureReason = "server_error")
     private val suggestion = BookmarkSuggestion(passage = "the passage", passageLocation = 5, referenceTimeSecs = 118, generation = TitleGeneration("A great moment", 0, null))
 
     @Before
@@ -286,6 +287,55 @@ class BookmarkViewModelTest {
     }
 
     @Test
+    fun `titles the bookmark with the passage's first words when generation fails`() = runTest {
+        stubNewBookmark()
+        whenever(bookmarkManager.suggestBookmark(episodeUuid, timeSecs))
+            .thenReturn(suggestion.copy(passage = "Hey! Hey! No, no, no! Up now! You!", generation = failedGeneration))
+
+        viewModel.load(arguments)
+
+        val state = viewModel.uiState.value
+        assertEquals("Hey! Hey! No, no, no! Up", state.title.text)
+        assertEquals(BookmarkViewModel.TitleSuggestion.None, state.titleSuggestion)
+    }
+
+    @Test
+    fun `keeps an edited title when generation fails`() = runTest {
+        stubNewBookmark()
+        val gate = CompletableDeferred<BookmarkSuggestion?>()
+        doSuspendableAnswer { gate.await() }.whenever(bookmarkManager).suggestBookmark(episodeUuid, timeSecs)
+        viewModel.load(arguments)
+        viewModel.changeTitle(TextFieldValue("My own title"))
+
+        gate.complete(suggestion.copy(generation = failedGeneration))
+
+        val state = viewModel.uiState.value
+        assertEquals("My own title", state.title.text)
+        assertEquals(BookmarkViewModel.TitleSuggestion.None, state.titleSuggestion)
+    }
+
+    @Test
+    fun `titles a transcript bookmark with its passage's first words when generation fails`() = runTest {
+        whenever(bookmarkManager.findBookmark("new-id"))
+            .thenReturn(Bookmark(uuid = "new-id", title = "Bookmark", passage = "one two three four five six seven"))
+        whenever(bookmarkManager.suggestTitle("one two three four five six seven")).thenReturn(failedGeneration)
+
+        viewModel.load(newBookmarkArguments("new-id"))
+
+        assertEquals("one two three four five six", viewModel.uiState.value.title.text)
+    }
+
+    @Test
+    fun `keeps the default title when neither a title nor a passage is available`() = runTest {
+        stubNewBookmark()
+        whenever(bookmarkManager.suggestBookmark(episodeUuid, timeSecs)).thenReturn(null)
+
+        viewModel.load(arguments)
+
+        assertEquals("Bookmark", viewModel.uiState.value.title.text)
+    }
+
+    @Test
     fun `offers to edit the transcript once a passage is suggested`() = runTest {
         stubNewBookmark()
         whenever(bookmarkManager.suggestBookmark(episodeUuid, timeSecs)).thenReturn(suggestion)
@@ -353,7 +403,7 @@ class BookmarkViewModelTest {
             passageLocation = eq(5),
             referenceTime = eq(118),
         )
-        verify(bookmarkManager, never()).enrichBookmarkPassage(any())
+        verify(bookmarkManager, never()).enrichBookmarkPassage(any(), any())
     }
 
     @Test
@@ -379,7 +429,24 @@ class BookmarkViewModelTest {
             passageLocation = isNull(),
             referenceTime = isNull(),
         )
-        verify(bookmarkManager).enrichBookmarkPassage(any())
+        verify(bookmarkManager).enrichBookmarkPassage(any(), eq(true))
+    }
+
+    @Test
+    fun `keeps a typed title when saving without a suggestion`() = runTest {
+        stubNewBookmark()
+        val gate = CompletableDeferred<BookmarkSuggestion?>()
+        doSuspendableAnswer { gate.await() }.whenever(bookmarkManager).suggestBookmark(episodeUuid, timeSecs)
+        whenever(episodeManager.findByUuid(episodeUuid)).thenReturn(PodcastEpisode(uuid = episodeUuid, publishedDate = Date()))
+        whenever(bookmarkManager.add(any(), any(), any(), any(), any(), anyOrNull(), anyOrNull(), anyOrNull())).thenReturn(Bookmark(uuid = "new-id"))
+
+        viewModel.load(arguments)
+        viewModel.changeTitle(TextFieldValue("My title"))
+        val saved = CompletableDeferred<Unit>()
+        viewModel.saveBookmark { _, _ -> saved.complete(Unit) }
+        saved.await()
+
+        verify(bookmarkManager).enrichBookmarkPassage(any(), eq(false))
     }
 
     @Test

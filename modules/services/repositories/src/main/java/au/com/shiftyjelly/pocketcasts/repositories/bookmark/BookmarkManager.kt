@@ -44,7 +44,7 @@ interface BookmarkManager {
     ): Flow<List<Bookmark>>
     fun hasBookmarksFlow(episodeUuid: String): Flow<Boolean>
     fun enrichBookmark(bookmark: Bookmark, source: SourceViewType)
-    fun enrichBookmarkPassage(bookmark: Bookmark)
+    fun enrichBookmarkPassage(bookmark: Bookmark, useFallbackTitle: Boolean)
     suspend fun suggestBookmark(episodeUuid: String, timeSecs: Int): BookmarkSuggestion?
     suspend fun suggestTitle(passage: String): TitleGeneration
 

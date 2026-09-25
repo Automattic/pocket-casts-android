@@ -10,6 +10,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkGenerationAnalytics
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkSuggestion
+import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkTitleFallback
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.shownotes.ShowNotesManager
@@ -183,12 +184,7 @@ class BookmarkViewModel
         } else {
             mutableUiState.value.copy(isCapturingPassage = false)
         }
-        val suggestedTitle = suggestion?.generation?.title?.takeIf { it.isNotBlank() }
-        when {
-            suggestedTitle == null -> mutableUiState.value = mutableUiState.value.copy(titleSuggestion = TitleSuggestion.None)
-            uiState.value.title.text == originalTitle -> applySuggestion(suggestedTitle)
-            else -> mutableUiState.value = mutableUiState.value.copy(titleSuggestion = TitleSuggestion.Available(suggestedTitle))
-        }
+        showTitleSuggestion(suggestion?.generation?.title, suggestion?.passage)
     }
 
     private suspend fun generateTitleSuggestionFromPassage(passage: String) {
@@ -199,11 +195,18 @@ class BookmarkViewModel
         generation?.let {
             bookmarkGenerationAnalytics.report(it, arguments.episodeUuid, uiState.value.podcastUuid, BookmarkEnrichmentTriggerType.EditSheet, analyticsSource)
         }
-        val suggestedTitle = generation?.title?.takeIf { it.isNotBlank() }
+        showTitleSuggestion(generation?.title, passage)
+    }
+
+    private fun showTitleSuggestion(generatedTitle: String?, passage: String?) {
+        val suggestedTitle = generatedTitle?.takeIf { it.isNotBlank() }
+        val isTitleUnchanged = uiState.value.title.text == originalTitle
+        val fallbackTitle = BookmarkTitleFallback.fromPassage(passage)
         when {
-            suggestedTitle == null -> mutableUiState.value = mutableUiState.value.copy(titleSuggestion = TitleSuggestion.None)
-            uiState.value.title.text == originalTitle -> applySuggestion(suggestedTitle)
-            else -> mutableUiState.value = mutableUiState.value.copy(titleSuggestion = TitleSuggestion.Available(suggestedTitle))
+            suggestedTitle != null && isTitleUnchanged -> applySuggestion(suggestedTitle)
+            suggestedTitle != null -> mutableUiState.value = mutableUiState.value.copy(titleSuggestion = TitleSuggestion.Available(suggestedTitle))
+            fallbackTitle != null && isTitleUnchanged -> applySuggestion(fallbackTitle)
+            else -> mutableUiState.value = mutableUiState.value.copy(titleSuggestion = TitleSuggestion.None)
         }
     }
 
@@ -279,7 +282,7 @@ class BookmarkViewModel
                         referenceTime = editedReferenceTimeSecs ?: suggestion?.referenceTimeSecs,
                     )
                     if (suggestion == null && FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS)) {
-                        bookmarkManager.enrichBookmarkPassage(created)
+                        bookmarkManager.enrichBookmarkPassage(created, useFallbackTitle = title == defaultTitle)
                     }
                     created
                 } else {
