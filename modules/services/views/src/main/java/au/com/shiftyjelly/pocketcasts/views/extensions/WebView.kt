@@ -1,5 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.views.extensions
 
+import android.app.ActivityManager
+import android.content.Context
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.view.ViewGroup
@@ -46,6 +49,16 @@ internal fun webViewLinkUrl(
         else -> null
     }
     return url?.takeIf(String::isNotBlank)
+}
+
+fun WebView.blockRemoteContentOnInProcessRenderer() {
+    val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as? ActivityManager
+    val rendererLikelyInProcess = activityManager?.isLowRamDevice == true ||
+        Build.VERSION.SDK_INT <= Build.VERSION_CODES.O_MR1
+    if (rendererLikelyInProcess) {
+        settings.blockNetworkLoads = true
+        settings.loadsImagesAutomatically = false
+    }
 }
 
 @Suppress("DEPRECATION")
