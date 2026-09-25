@@ -7,6 +7,7 @@ import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewServiceManager
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.ReleaseVersion
+import java.net.HttpURLConnection.HTTP_GATEWAY_TIMEOUT
 import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -21,6 +22,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import okhttp3.CacheControl
+import retrofit2.HttpException
 import timber.log.Timber
 
 @Singleton
@@ -92,7 +94,10 @@ class WhatsNewManagerImpl @Inject constructor(
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            Timber.w(e, "Could not refresh the What's New catalog")
+            val isCacheMiss = cacheControl?.onlyIfCached == true && (e as? HttpException)?.code() == HTTP_GATEWAY_TIMEOUT
+            if (!isCacheMiss) {
+                Timber.w(e, "Could not refresh the What's New catalog")
+            }
         }
     }
 }
