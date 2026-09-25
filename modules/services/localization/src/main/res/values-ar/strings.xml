@@ -985,7 +985,6 @@ Language: ar
     <string name="notification_channel_description_playback_error">الأخطاء في أثناء التشغيل</string>
     <string name="notification_channel_description_episode">يتم عرضه عندما تظهر حلقة جديدة</string>
     <string name="notification_channel_description_download">يتم عرضه بينما يقوم Pocket Casts بتنزيل الحلقات</string>
-    <string name="change_bookmark_title_hint">تغيير العنوان الذي يحدد هذه الإشارة المرجعية</string>
     <string name="bookmark">إشارة مرجعية</string>
     <string name="details">تفاصيل</string>
     <string name="episode">الحلقة</string>
@@ -999,7 +998,6 @@ Language: ar
     <string name="add_bookmark_title">إضافة إشارة مرجعية</string>
     <string name="bookmark_added">تمت إضافة الإشارة المرجعية \"%s\"</string>
     <string name="change_title">تغيير العنوان</string>
-    <string name="add_bookmark_title_hint">إضافة عنوان اختياري لتحديد هذه الإشارة المرجعية</string>
     <string name="save_bookmark">حفظ الإشارة المرجعية</string>
     <string name="playing_bookmark">تشغيل \"%s\"</string>
     <string name="skipping_to">تخطٍ إلى %s</string>

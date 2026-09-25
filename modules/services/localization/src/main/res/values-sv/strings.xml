@@ -985,7 +985,6 @@ Language: sv_SE
     <string name="notification_channel_description_playback_error">Fel vid uppspelning</string>
     <string name="notification_channel_description_episode">Visas när ett nytt avsnitt släpps</string>
     <string name="notification_channel_description_download">Visas när Pocket Casts laddar ner avsnitt</string>
-    <string name="change_bookmark_title_hint">Ändra rubriken som identifierar detta bokmärke</string>
     <string name="bookmark">Bokmärk</string>
     <string name="details">Detaljer</string>
     <string name="episode">Avsnitt</string>
@@ -997,7 +996,6 @@ Language: sv_SE
     <string name="settings_notification_play_over_duck">Duckningsvolym</string>
     <string name="playing_bookmark">Spelar ”%s”</string>
     <string name="save_bookmark">Spara bokmärke</string>
-    <string name="add_bookmark_title_hint">Lägg till en valfri rubrik för att identifiera detta bokmärke</string>
     <string name="change_title">Ändra rubrik</string>
     <string name="bookmark_added">Bokmärke ”%s” tillagt</string>
     <string name="add_bookmark_title">Lägg till bokmärke</string>
