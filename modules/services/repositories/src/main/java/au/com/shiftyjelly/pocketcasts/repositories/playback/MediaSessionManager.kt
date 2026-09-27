@@ -330,7 +330,15 @@ class MediaSessionManager(
                 scope.launch { commandMutex.withLock { playbackManager.playQueueSuspend(sourceView = SourceView.MEDIA_BUTTON_BROADCAST_ACTION) } }
             },
             onPause = {
-                scope.launch { commandMutex.withLock { playbackManager.pauseSuspend(sourceView = SourceView.MEDIA_BUTTON_BROADCAST_ACTION) } }
+                scope.launch {
+                    commandMutex.withLock {
+                        if (playbackManager.isPlaying()) {
+                            playbackManager.pauseSuspend(sourceView = SourceView.MEDIA_BUTTON_BROADCAST_ACTION)
+                        } else {
+                            playbackManager.playQueueSuspend(sourceView = SourceView.MEDIA_BUTTON_BROADCAST_ACTION)
+                        }
+                    }
+                }
             },
             onSeekTo = { positionMs ->
                 scope.launch {
@@ -1267,6 +1275,14 @@ class MediaSessionManager(
             ) ?: return false
             logEvent(keyEvent.toString())
             if (keyEvent.action == KeyEvent.ACTION_DOWN) {
+                if (keyEvent.keyCode == KeyEvent.KEYCODE_MEDIA_PAUSE) {
+                    if (playbackManager.isPlaying()) {
+                        enqueueCommand("pause") { playbackManager.pauseSuspend(sourceView = source) }
+                    } else {
+                        enqueueCommand("play") { playbackManager.playQueueSuspend(sourceView = source) }
+                    }
+                    return true
+                }
                 LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Media button Android event: keyCode=${keyEvent.keyCode}")
             }
 
@@ -1351,7 +1367,11 @@ class MediaSessionManager(
 
         override fun onPause() {
             logEvent("pause")
-            enqueueCommand("pause") { playbackManager.pauseSuspend(sourceView = source) }
+            if (playbackManager.isPlaying()) {
+                enqueueCommand("pause") { playbackManager.pauseSuspend(sourceView = source) }
+            } else {
+                enqueueCommand("play") { playbackManager.playQueueSuspend(sourceView = source) }
+            }
         }
 
         override fun onPlayFromSearch(query: String?, extras: Bundle?) {
