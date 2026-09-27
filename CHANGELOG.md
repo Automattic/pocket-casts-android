@@ -32,6 +32,8 @@
         ([#5645](https://github.com/Automattic/pocket-casts-android/pull/5645))
     *   Prevent Cast connection failures from interrupting local playback or removing playback controls
         ([#5656](https://github.com/Automattic/pocket-casts-android/pull/5656))
+    *   Fix Skip Last calculation at increased playback speeds
+        ([#5230](https://github.com/Automattic/pocket-casts-android/pull/5230))
 
 8.21
 -----
