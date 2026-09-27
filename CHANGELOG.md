@@ -32,6 +32,8 @@
         ([#5645](https://github.com/Automattic/pocket-casts-android/pull/5645))
     *   Prevent Cast connection failures from interrupting local playback or removing playback controls
         ([#5656](https://github.com/Automattic/pocket-casts-android/pull/5656))
+    *   New-episode notifications no longer replace earlier unread ones; notifications for episodes that arrive over time now stack
+        ([#5850](https://github.com/Automattic/pocket-casts-android/pull/5850))
 
 8.21
 -----
