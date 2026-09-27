@@ -152,6 +152,7 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.utils.parceler.DurationParceler
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
+import au.com.shiftyjelly.pocketcasts.views.extensions.blockRemoteContentOnInProcessRenderer
 import au.com.shiftyjelly.pocketcasts.views.extensions.cleanup
 import au.com.shiftyjelly.pocketcasts.views.extensions.copyLinkOnLongPress
 import au.com.shiftyjelly.pocketcasts.views.extensions.hide
@@ -1365,6 +1366,7 @@ class EpisodeFragment : BaseFragment() {
                         javaScriptEnabled = false
                         loadsImagesAutomatically = true
                     }
+                    blockRemoteContentOnInProcessRenderer()
                     // stopping the white flash on web player load
                     setBackgroundColor(Color.argb(1, 0, 0, 0))
                     isVerticalScrollBarEnabled = false

@@ -23,6 +23,7 @@ import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toSecondsFromColonFormattedString
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import au.com.shiftyjelly.pocketcasts.views.extensions.blockRemoteContentOnInProcessRenderer
 import au.com.shiftyjelly.pocketcasts.views.extensions.cleanup
 import au.com.shiftyjelly.pocketcasts.views.extensions.copyLinkOnLongPress
 import au.com.shiftyjelly.pocketcasts.views.extensions.show
@@ -120,6 +121,7 @@ class NotesFragment : BaseFragment() {
                 settings.javaScriptCanOpenWindowsAutomatically = false
                 settings.javaScriptEnabled = false
                 settings.loadsImagesAutomatically = true
+                blockRemoteContentOnInProcessRenderer()
                 isScrollbarFadingEnabled = false
                 isVerticalScrollBarEnabled = false
                 // stop the web view jumping after loading

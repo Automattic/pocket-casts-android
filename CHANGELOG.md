@@ -32,6 +32,8 @@
         ([#5645](https://github.com/Automattic/pocket-casts-android/pull/5645))
     *   Prevent Cast connection failures from interrupting local playback or removing playback controls
         ([#5656](https://github.com/Automattic/pocket-casts-android/pull/5656))
+    *   Fix a crash on Android 8 devices when the full-screen player loaded show notes containing remote images
+        ([#5847](https://github.com/Automattic/pocket-casts-android/pull/5847))
 
 8.21
 -----
