@@ -14,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.account.viewmodel.SignInState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.SignInViewModel
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getTintedDrawable
+import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.views.extensions.addOnTextChanged
 import au.com.shiftyjelly.pocketcasts.views.extensions.showKeyboard
@@ -71,7 +72,9 @@ class SignInFragment : BaseFragment() {
             false
         }
 
-        txtEmail.showKeyboard()
+        if (!Util.isCarUiMode(view.context)) {
+            txtEmail.showKeyboard()
+        }
         txtEmail.addOnTextChanged {
             viewModel.updateEmail(it)
         }

@@ -63,7 +63,10 @@ class AccountActivity : AppCompatActivity() {
         val view = binding.root
         setContentView(view)
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, windowInsets ->
-            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
+            val insetTypes = WindowInsetsCompat.Type.systemBars() or
+                WindowInsetsCompat.Type.displayCutout() or
+                WindowInsetsCompat.Type.ime()
+            val insets = windowInsets.getInsets(insetTypes)
             binding.root.updatePadding(
                 left = insets.left,
                 right = insets.right,
