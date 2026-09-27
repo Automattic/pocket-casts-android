@@ -32,6 +32,8 @@
         ([#5645](https://github.com/Automattic/pocket-casts-android/pull/5645))
     *   Prevent Cast connection failures from interrupting local playback or removing playback controls
         ([#5656](https://github.com/Automattic/pocket-casts-android/pull/5656))
+    *   Show the correct episode artwork on the media notification and lock screen when the next queued episode starts
+        ([#5911](https://github.com/Automattic/pocket-casts-android/pull/5911))
 
 8.21
 -----
