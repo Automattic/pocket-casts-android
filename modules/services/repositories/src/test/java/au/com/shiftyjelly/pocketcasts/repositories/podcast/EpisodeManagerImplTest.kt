@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import com.automattic.eventhorizon.EventHorizon
+import java.time.Clock
 import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
@@ -67,6 +68,7 @@ class EpisodeManagerImplTest {
     fun setUp() = runTest {
         whenever(appDatabase.episodeDao()).thenReturn(episodeDao)
         whenever(appDatabase.userEpisodeDao()).thenReturn(mock())
+        whenever(appDatabase.pendingEpisodeTaskDao()).thenReturn(mock())
         episodeManagerImpl = EpisodeManagerImpl(
             appDatabase = appDatabase,
             settings = mock(),
@@ -76,6 +78,7 @@ class EpisodeManagerImplTest {
             userEpisodeManager = userEpisodeManager,
             ioDispatcher = coroutineRule.testDispatcher,
             eventHorizon = EventHorizon(TestEventSink()),
+            clock = Clock.systemUTC(),
         )
     }
 

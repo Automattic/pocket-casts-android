@@ -1103,7 +1103,7 @@ class TvHomeViewModelTest {
         createViewModel().playEpisode(madeForTvEpisode())
 
         verifyBlocking(episodeManager) {
-            add(argThat { size == 1 && first().downloadUrl == "https://example.com/clip.mp4" }, eq("podcast-1"), eq(false))
+            add(argThat { size == 1 && first().downloadUrl == "https://example.com/clip.mp4" }, eq("podcast-1"), eq(false), eq(emptyList()))
         }
         verifyBlocking(playbackManager) { playNowSuspend(episode = playable, sourceView = SourceView.DISCOVER) }
     }
@@ -1117,7 +1117,7 @@ class TvHomeViewModelTest {
         createViewModel().playEpisode(madeForTvEpisode())
 
         verifyBlocking(episodeManager) {
-            add(argThat { size == 1 && first().downloadUrl == "https://example.com/clip.mp4" }, eq("podcast-1"), eq(false))
+            add(argThat { size == 1 && first().downloadUrl == "https://example.com/clip.mp4" }, eq("podcast-1"), eq(false), eq(emptyList()))
         }
         verifyBlocking(playbackManager) { playNowSuspend(episode = playable, sourceView = SourceView.DISCOVER) }
     }

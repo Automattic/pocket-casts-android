@@ -26,6 +26,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
 import com.automattic.eventhorizon.EventHorizon
 import com.squareup.moshi.Moshi
+import java.time.Clock
 import java.util.Calendar
 import java.util.Date
 import java.util.UUID
@@ -89,6 +90,7 @@ class AutoArchiveTest {
             userEpisodeManager = userEpisodeManager,
             ioDispatcher = testDispatcher,
             eventHorizon = EventHorizon(TestEventSink()),
+            clock = Clock.systemUTC(),
         )
     }
 

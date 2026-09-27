@@ -714,7 +714,7 @@ class TvSearchViewModelTest {
         )
 
         verifyBlocking(episodeManager) {
-            add(argThat { size == 1 && first().downloadUrl == "https://example.com/clip.mp4" }, eq("podcast-episode-1"), eq(false))
+            add(argThat { size == 1 && first().downloadUrl == "https://example.com/clip.mp4" }, eq("podcast-episode-1"), eq(false), eq(emptyList()))
         }
         verifyBlocking(playbackManager) { playNowSuspend(episode = playable, sourceView = SourceView.SEARCH) }
     }
@@ -731,7 +731,7 @@ class TvSearchViewModelTest {
         )
 
         verifyBlocking(episodeManager) {
-            add(argThat { size == 1 && first().downloadUrl == "https://example.com/clip.mp4" }, eq("podcast-episode-1"), eq(false))
+            add(argThat { size == 1 && first().downloadUrl == "https://example.com/clip.mp4" }, eq("podcast-episode-1"), eq(false), eq(emptyList()))
         }
         verifyBlocking(playbackManager) { playNowSuspend(episode = playable, sourceView = SourceView.SEARCH) }
     }

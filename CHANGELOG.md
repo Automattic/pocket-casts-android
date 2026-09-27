@@ -32,6 +32,8 @@
         ([#5645](https://github.com/Automattic/pocket-casts-android/pull/5645))
     *   Prevent Cast connection failures from interrupting local playback or removing playback controls
         ([#5656](https://github.com/Automattic/pocket-casts-android/pull/5656))
+    *   Download new episodes and add them to Up Next when a podcast refresh was interrupted before it got to them
+        ([#6010](https://github.com/Automattic/pocket-casts-android/pull/6010))
 
 8.21
 -----
