@@ -32,6 +32,8 @@
         ([#5645](https://github.com/Automattic/pocket-casts-android/pull/5645))
     *   Prevent Cast connection failures from interrupting local playback or removing playback controls
         ([#5656](https://github.com/Automattic/pocket-casts-android/pull/5656))
+    *   Sync the played, archived and starred status set on other devices even for episodes not yet in your local library
+        ([#5879](https://github.com/Automattic/pocket-casts-android/pull/5879))
 
 8.21
 -----

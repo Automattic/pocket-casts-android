@@ -4,13 +4,8 @@ import androidx.room.withTransaction
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
-import au.com.shiftyjelly.pocketcasts.servers.extensions.toDate
-import com.pocketcasts.service.api.EpisodeResponse
 import com.pocketcasts.service.api.podcastsEpisodesRequest
-import com.pocketcasts.service.api.publishedOrNull
-import java.util.Date
 
 internal class MissingEpisodesSync(
     private val syncManager: SyncManager,
@@ -39,8 +34,8 @@ internal class MissingEpisodesSync(
         val localEpisodes = mutableListOf<PodcastEpisode>()
         val localPodcasts = mutableListOf<Podcast>()
         response.episodesList.forEach { serverEpisode ->
-            localEpisodes.add(toPodcastEpisode(serverEpisode))
-            localPodcasts.add(toPodcast(serverEpisode))
+            localEpisodes.add(serverEpisode.toPodcastEpisode())
+            localPodcasts.add(serverEpisode.toPodcast())
         }
         appDatabase.withTransaction {
             episodeDao.insertAllOrIgnore(localEpisodes)
@@ -48,29 +43,3 @@ internal class MissingEpisodesSync(
         }
     }
 }
-
-private fun toPodcastEpisode(serverEpisode: EpisodeResponse) = PodcastEpisode(
-    uuid = serverEpisode.uuid,
-    downloadUrl = serverEpisode.url,
-    publishedDate = serverEpisode.publishedOrNull?.toDate() ?: Date(0),
-    duration = serverEpisode.duration.toDouble(),
-    fileType = serverEpisode.fileType,
-    title = serverEpisode.title,
-    sizeInBytes = serverEpisode.size,
-    playingStatus = EpisodePlayingStatus.fromInt(serverEpisode.playingStatus),
-    playedUpTo = serverEpisode.playedUpTo.toDouble(),
-    isStarred = serverEpisode.starred,
-    podcastUuid = serverEpisode.podcastUuid,
-    type = serverEpisode.episodeType,
-    season = serverEpisode.episodeSeason.toLong(),
-    number = serverEpisode.episodeNumber.toLong(),
-    isArchived = serverEpisode.isDeleted,
-    slug = serverEpisode.slug,
-)
-
-private fun toPodcast(serverEpisode: EpisodeResponse) = Podcast(
-    uuid = serverEpisode.podcastUuid,
-    title = serverEpisode.podcastTitle,
-    author = serverEpisode.author,
-    slug = serverEpisode.podcastSlug,
-)
