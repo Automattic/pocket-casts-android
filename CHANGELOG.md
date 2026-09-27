@@ -32,6 +32,8 @@
         ([#5645](https://github.com/Automattic/pocket-casts-android/pull/5645))
     *   Prevent Cast connection failures from interrupting local playback or removing playback controls
         ([#5656](https://github.com/Automattic/pocket-casts-android/pull/5656))
+    *   Refresh a podcast's private flag so sharing becomes available again once a podcast is made public
+        ([#5875](https://github.com/Automattic/pocket-casts-android/pull/5875))
 
 8.21
 -----

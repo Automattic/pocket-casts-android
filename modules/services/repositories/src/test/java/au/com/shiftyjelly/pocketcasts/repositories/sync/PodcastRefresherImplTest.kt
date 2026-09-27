@@ -75,6 +75,7 @@ class PodcastRefresherImplTest {
             explicit = podcast.explicit,
             webFeed = podcast.webFeed,
             networkListId = podcast.networkListId,
+            isPrivate = podcast.isPrivate,
         )
     }
 
@@ -98,6 +99,7 @@ class PodcastRefresherImplTest {
             explicit = existingPodcast.explicit,
             webFeed = existingPodcast.webFeed,
             networkListId = existingPodcast.networkListId,
+            isPrivate = existingPodcast.isPrivate,
         )
     }
 
@@ -121,6 +123,7 @@ class PodcastRefresherImplTest {
             explicit = existingPodcast.explicit,
             webFeed = existingPodcast.webFeed,
             networkListId = existingPodcast.networkListId,
+            isPrivate = existingPodcast.isPrivate,
         )
     }
 
@@ -144,6 +147,7 @@ class PodcastRefresherImplTest {
             explicit = existingPodcast.explicit,
             webFeed = existingPodcast.webFeed,
             networkListId = existingPodcast.networkListId,
+            isPrivate = existingPodcast.isPrivate,
         )
     }
 
@@ -167,6 +171,7 @@ class PodcastRefresherImplTest {
             explicit = existingPodcast.explicit,
             webFeed = existingPodcast.webFeed,
             networkListId = existingPodcast.networkListId,
+            isPrivate = existingPodcast.isPrivate,
         )
     }
 
@@ -192,6 +197,7 @@ class PodcastRefresherImplTest {
             explicit = existingPodcast.explicit,
             webFeed = existingPodcast.webFeed,
             networkListId = existingPodcast.networkListId,
+            isPrivate = existingPodcast.isPrivate,
         )
     }
 
@@ -215,6 +221,7 @@ class PodcastRefresherImplTest {
             explicit = existingPodcast.explicit,
             webFeed = existingPodcast.webFeed,
             networkListId = existingPodcast.networkListId,
+            isPrivate = existingPodcast.isPrivate,
         )
     }
 
@@ -238,6 +245,7 @@ class PodcastRefresherImplTest {
             explicit = existingPodcast.explicit,
             webFeed = existingPodcast.webFeed,
             networkListId = existingPodcast.networkListId,
+            isPrivate = existingPodcast.isPrivate,
         )
     }
 
@@ -261,6 +269,7 @@ class PodcastRefresherImplTest {
             explicit = existingPodcast.explicit,
             webFeed = existingPodcast.webFeed,
             networkListId = existingPodcast.networkListId,
+            isPrivate = existingPodcast.isPrivate,
         )
     }
 
@@ -284,6 +293,7 @@ class PodcastRefresherImplTest {
             explicit = true,
             webFeed = existingPodcast.webFeed,
             networkListId = existingPodcast.networkListId,
+            isPrivate = existingPodcast.isPrivate,
         )
     }
 
@@ -307,6 +317,7 @@ class PodcastRefresherImplTest {
             explicit = true,
             webFeed = existingPodcast.webFeed,
             networkListId = existingPodcast.networkListId,
+            isPrivate = existingPodcast.isPrivate,
         )
     }
 
@@ -330,6 +341,7 @@ class PodcastRefresherImplTest {
             explicit = existingPodcast.explicit,
             webFeed = true,
             networkListId = existingPodcast.networkListId,
+            isPrivate = existingPodcast.isPrivate,
         )
     }
 
@@ -363,6 +375,7 @@ class PodcastRefresherImplTest {
             explicit = existingPodcast.explicit,
             webFeed = existingPodcast.webFeed,
             networkListId = existingPodcast.networkListId,
+            isPrivate = existingPodcast.isPrivate,
         )
     }
 
@@ -390,6 +403,7 @@ class PodcastRefresherImplTest {
             explicit = existingPodcast.explicit,
             webFeed = existingPodcast.webFeed,
             networkListId = existingPodcast.networkListId,
+            isPrivate = existingPodcast.isPrivate,
         )
     }
 
@@ -413,6 +427,7 @@ class PodcastRefresherImplTest {
             explicit = existingPodcast.explicit,
             webFeed = existingPodcast.webFeed,
             networkListId = "cdb75bc0-9f5a-4217-b1ca-f573821a7913",
+            isPrivate = existingPodcast.isPrivate,
         )
     }
 
@@ -436,6 +451,55 @@ class PodcastRefresherImplTest {
             explicit = existingPodcast.explicit,
             webFeed = existingPodcast.webFeed,
             networkListId = "cdb75bc0-9f5a-4217-b1ca-f573821a7913",
+            isPrivate = existingPodcast.isPrivate,
+        )
+    }
+
+    @Test
+    fun `updatePodcastIfRequired updates when the podcast becomes public`() = runTest {
+        val existingPodcast = createPodcast(isPrivate = true)
+        val updatedPodcast = existingPodcast.copy(isPrivate = false)
+
+        podcastRefresher.updatePodcastIfRequired(existingPodcast, updatedPodcast)
+
+        verify(podcastDao).updateRefresh(
+            uuid = existingPodcast.uuid,
+            title = existingPodcast.title,
+            author = existingPodcast.author,
+            podcastCategory = existingPodcast.podcastCategory,
+            podcastDescription = existingPodcast.podcastDescription,
+            estimatedNextEpisode = existingPodcast.estimatedNextEpisode,
+            episodeFrequency = existingPodcast.episodeFrequency,
+            refreshAvailable = existingPodcast.refreshAvailable,
+            fundingUrl = existingPodcast.fundingUrl,
+            explicit = existingPodcast.explicit,
+            webFeed = existingPodcast.webFeed,
+            networkListId = existingPodcast.networkListId,
+            isPrivate = false,
+        )
+    }
+
+    @Test
+    fun `updatePodcastIfRequired updates when the podcast becomes private`() = runTest {
+        val existingPodcast = createPodcast(isPrivate = false)
+        val updatedPodcast = existingPodcast.copy(isPrivate = true)
+
+        podcastRefresher.updatePodcastIfRequired(existingPodcast, updatedPodcast)
+
+        verify(podcastDao).updateRefresh(
+            uuid = existingPodcast.uuid,
+            title = existingPodcast.title,
+            author = existingPodcast.author,
+            podcastCategory = existingPodcast.podcastCategory,
+            podcastDescription = existingPodcast.podcastDescription,
+            estimatedNextEpisode = existingPodcast.estimatedNextEpisode,
+            episodeFrequency = existingPodcast.episodeFrequency,
+            refreshAvailable = existingPodcast.refreshAvailable,
+            fundingUrl = existingPodcast.fundingUrl,
+            explicit = existingPodcast.explicit,
+            webFeed = existingPodcast.webFeed,
+            networkListId = existingPodcast.networkListId,
+            isPrivate = true,
         )
     }
 
@@ -452,6 +516,7 @@ class PodcastRefresherImplTest {
         explicit: Boolean? = null,
         webFeed: Boolean = false,
         networkListId: String? = null,
+        isPrivate: Boolean = false,
     ) = Podcast(
         uuid = uuid,
         title = title,
@@ -465,5 +530,6 @@ class PodcastRefresherImplTest {
         explicit = explicit,
         webFeed = webFeed,
         networkListId = networkListId,
+        isPrivate = isPrivate,
     )
 }

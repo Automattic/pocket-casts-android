@@ -147,7 +147,8 @@ class PodcastRefresherImpl @Inject constructor(
             existingPodcast.fundingUrl != updatedPodcast.fundingUrl ||
             existingPodcast.explicit != updatedPodcast.explicit ||
             existingPodcast.webFeed != updatedPodcast.webFeed ||
-            existingPodcast.networkListId != updatedPodcast.networkListId
+            existingPodcast.networkListId != updatedPodcast.networkListId ||
+            existingPodcast.isPrivate != updatedPodcast.isPrivate
         ) {
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh required update for podcast ${existingPodcast.uuid}")
             appDatabase.podcastDao().updateRefresh(
@@ -163,6 +164,7 @@ class PodcastRefresherImpl @Inject constructor(
                 explicit = updatedPodcast.explicit,
                 webFeed = updatedPodcast.webFeed,
                 networkListId = updatedPodcast.networkListId,
+                isPrivate = updatedPodcast.isPrivate,
             )
         }
     }

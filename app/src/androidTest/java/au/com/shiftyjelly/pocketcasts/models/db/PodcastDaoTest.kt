@@ -230,5 +230,6 @@ class PodcastDaoTest {
         explicit = null,
         webFeed = false,
         networkListId = networkListId,
+        isPrivate = false,
     )
 }
