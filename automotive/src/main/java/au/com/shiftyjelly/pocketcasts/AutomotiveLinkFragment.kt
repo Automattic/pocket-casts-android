@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.Fragment
 import au.com.shiftyjelly.pocketcasts.compose.AutomotiveTheme
@@ -66,7 +67,7 @@ class AutomotiveLinkFragment : Fragment() {
             Text(
                 text = url,
                 fontSize = 32.sp,
-                lineHeight = 40.sp,
+                lineHeight = 1.5.em,
                 textAlign = TextAlign.Center,
                 color = Color.White,
             )
