@@ -372,7 +372,7 @@ enum class Feature(
     WEAR_QR_SIGN_IN(
         key = "wear_qr_sign_in",
         title = "Log in to the Wear OS app with a QR code",
-        defaultValue = isDebugOrPrototypeBuild,
+        defaultValue = true,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
