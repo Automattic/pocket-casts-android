@@ -64,7 +64,9 @@ class AutomotiveSettingsActivity :
 
     private fun handleBackPressed() {
         if (supportFragmentManager.backStackEntryCount > 0) {
-            supportFragmentManager.popBackStack()
+            if (!supportFragmentManager.isStateSaved) {
+                supportFragmentManager.popBackStack()
+            }
             return
         }
         onBackPressedDispatcher.onBackPressed()
