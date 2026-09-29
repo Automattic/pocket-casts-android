@@ -10,6 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
+import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -34,7 +35,10 @@ class WhatsNewFeedFragment : BaseFragment() {
                 state = state,
                 bottomInset = bottomInset,
                 onBackPress = { activity?.onBackPressedDispatcher?.onBackPressed() },
-                onMessageClick = viewModel::onMessageClick,
+                onMessageClick = { id ->
+                    viewModel.onMessageClick(id)
+                    (activity as? FragmentHostListener)?.addFragment(WhatsNewMessageFragment.newInstance(id))
+                },
                 onReadAllClick = viewModel::onReadAllClick,
                 onRefresh = viewModel::refresh,
                 onRetry = viewModel::retry,
