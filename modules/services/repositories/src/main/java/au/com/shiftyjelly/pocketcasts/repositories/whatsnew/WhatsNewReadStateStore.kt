@@ -31,6 +31,10 @@ class WhatsNewReadStateStore @Inject constructor(
         state.copy(readMessageIds = state.readMessageIds + messageIds)
     }
 
+    fun markAsUnread(messageIds: Collection<String>) = update { state ->
+        state.copy(readMessageIds = state.readMessageIds - messageIds.toSet())
+    }
+
     fun markAsSeen(messageIds: Collection<String>) = update { state ->
         state.copy(seenMessageIds = state.seenMessageIds + messageIds)
     }
@@ -61,9 +65,9 @@ class WhatsNewReadStateStore @Inject constructor(
         }
     }
 
-    private fun update(transform: (WhatsNewReadState) -> WhatsNewReadState) = synchronized(this) {
+    private fun update(transform: (WhatsNewReadState) -> WhatsNewReadState): Boolean = synchronized(this) {
         val state = transform(_state.value)
-        if (state == _state.value) return@synchronized
+        if (state == _state.value) return@synchronized false
 
         _state.value = state
         preferences.edit {
@@ -78,6 +82,7 @@ class WhatsNewReadStateStore @Inject constructor(
                 putLong(FEED_START_DATE_KEY, feedStartDate.toEpochMilli())
             }
         }
+        true
     }
 
     private fun read() = WhatsNewReadState(

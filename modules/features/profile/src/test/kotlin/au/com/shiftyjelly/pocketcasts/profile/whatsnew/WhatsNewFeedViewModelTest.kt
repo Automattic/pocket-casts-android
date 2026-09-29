@@ -306,6 +306,12 @@ class WhatsNewFeedViewModelTest {
 
         override fun forgetReadMessages() = Unit
 
+        override fun markAsUnread(messageIds: Collection<String>) {
+            readState.value = readState.value.copy(readMessageIds = readState.value.readMessageIds - messageIds.toSet())
+        }
+
+        override fun syncReadState() = Unit
+
         override fun resetReadState() {
             readState.value = WhatsNewReadState()
         }
