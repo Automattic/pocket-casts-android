@@ -203,80 +203,82 @@ private fun WhatsNewFeedRow(
 ) {
     val unreadDescription = stringResource(LR.string.whats_new_feed_unread)
     var isMenuShown by remember { mutableStateOf(false) }
-    if (onToggleReadClick != null) {
-        DropdownMenu(
-            expanded = isMenuShown,
-            onDismissRequest = { isMenuShown = false },
+    Box {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .combinedClickable(
+                    role = Role.Button,
+                    onClick = onClick,
+                    onLongClick = onToggleReadClick?.let { { isMenuShown = true } },
+                )
+                .semantics(mergeDescendants = true) {
+                    if (item.isUnread) {
+                        stateDescription = unreadDescription
+                    }
+                }
+                .padding(horizontal = 16.dp, vertical = 12.dp),
         ) {
-            DropdownMenuItem(
-                onClick = {
-                    isMenuShown = false
-                    onToggleReadClick()
-                },
+            WhatsNewFeedIcon(
+                type = item.type,
+            )
+            Column(
+                verticalArrangement = Arrangement.spacedBy(2.dp),
+                modifier = Modifier.weight(1f),
             ) {
-                TextP40(
-                    text = stringResource(
-                        if (item.isUnread) LR.string.whats_new_feed_mark_as_read else LR.string.whats_new_feed_mark_as_unread,
-                    ),
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    TextC70(
+                        text = stringResource(item.type.labelId),
+                        maxLines = 1,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.W600,
+                        modifier = Modifier.weight(1f),
+                    )
+                    TextC70(
+                        text = date,
+                        isUpperCase = false,
+                        maxLines = 1,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.W600,
+                    )
+                    if (item.isUnread) {
+                        Box(
+                            modifier = Modifier
+                                .size(8.dp)
+                                .clip(CircleShape)
+                                .background(MaterialTheme.theme.colors.support05),
+                        )
+                    }
+                }
+                TextH40(
+                    text = item.title,
+                    maxLines = 2,
                 )
             }
         }
-    }
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        modifier = Modifier
-            .fillMaxWidth()
-            .combinedClickable(
-                role = Role.Button,
-                onClick = onClick,
-                onLongClick = onToggleReadClick?.let { { isMenuShown = true } },
-            )
-            .semantics(mergeDescendants = true) {
-                if (item.isUnread) {
-                    stateDescription = unreadDescription
-                }
-            }
-            .padding(horizontal = 16.dp, vertical = 12.dp),
-    ) {
-        WhatsNewFeedIcon(
-            type = item.type,
-        )
-        Column(
-            verticalArrangement = Arrangement.spacedBy(2.dp),
-            modifier = Modifier.weight(1f),
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
+        if (onToggleReadClick != null) {
+            DropdownMenu(
+                expanded = isMenuShown,
+                onDismissRequest = { isMenuShown = false },
             ) {
-                TextC70(
-                    text = stringResource(item.type.labelId),
-                    maxLines = 1,
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.W600,
-                    modifier = Modifier.weight(1f),
-                )
-                TextC70(
-                    text = date,
-                    isUpperCase = false,
-                    maxLines = 1,
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.W600,
-                )
-                if (item.isUnread) {
-                    Box(
-                        modifier = Modifier
-                            .size(8.dp)
-                            .clip(CircleShape)
-                            .background(MaterialTheme.theme.colors.support05),
+                DropdownMenuItem(
+                    onClick = {
+                        isMenuShown = false
+                        onToggleReadClick()
+                    },
+                ) {
+                    TextP40(
+                        text = stringResource(
+                            if (item.isUnread) LR.string.whats_new_feed_mark_as_read else LR.string.whats_new_feed_mark_as_unread,
+                        ),
                     )
                 }
             }
-            TextH40(
-                text = item.title,
-                maxLines = 2,
-            )
         }
     }
 }
