@@ -75,6 +75,10 @@ class WhatsNewManagerImpl @Inject constructor(
 
     override fun markAsResponded(pollId: String) = readStateStore.markAsResponded(pollId)
 
+    override fun startFeed() = readStateStore.startFeed(Instant.now())
+
+    override fun forgetReadMessages() = readStateStore.forgetReadMessages()
+
     override fun resetReadState() = readStateStore.reset()
 
     private suspend fun refreshCatalog(cacheControl: CacheControl?) {

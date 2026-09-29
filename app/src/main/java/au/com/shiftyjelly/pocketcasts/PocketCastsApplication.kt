@@ -323,6 +323,10 @@ class PocketCastsApplication :
                     Timber.e(e, "Unable to create opml folder.")
                 }
 
+                if (settings.getMigratedVersionCode() == 0) {
+                    whatsNewManager.get().startFeed()
+                }
+
                 VersionMigrationsWorker.performMigrations(
                     context = this@PocketCastsApplication,
                     settings = settings,
