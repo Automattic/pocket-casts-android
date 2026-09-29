@@ -324,7 +324,7 @@ class PocketCastsApplication :
                 }
 
                 if (settings.getMigratedVersionCode() == 0) {
-                    whatsNewManager.get().startFeed()
+                    applicationScope.launch { whatsNewManager.get().startFeed() }
                 }
 
                 VersionMigrationsWorker.performMigrations(

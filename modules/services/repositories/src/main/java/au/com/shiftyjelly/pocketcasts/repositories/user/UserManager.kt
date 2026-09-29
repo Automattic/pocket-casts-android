@@ -32,6 +32,7 @@ import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.android.tracks.crashlogging.CrashLogging
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.UserSignedOutEvent
+import dagger.Lazy
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
@@ -85,7 +86,7 @@ class UserManagerImpl @Inject constructor(
     private val experimentProvider: ExperimentProvider,
     private val endOfYearSync: EndOfYearSync,
     private val notificationScheduler: NotificationScheduler,
-    private val whatsNewManager: WhatsNewManager,
+    private val whatsNewManager: Lazy<WhatsNewManager>,
 ) : UserManager,
     CoroutineScope {
 
@@ -178,7 +179,7 @@ class UserManagerImpl @Inject constructor(
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Signing out")
             signOutJob = applicationScope.launch {
                 syncManager.signOut {
-                    whatsNewManager.forgetReadMessages()
+                    whatsNewManager.get().forgetReadMessages()
                     settings.clearPlusPreferences()
 
                     userEpisodeManager.removeCloudStatusFromFiles(playbackManager)

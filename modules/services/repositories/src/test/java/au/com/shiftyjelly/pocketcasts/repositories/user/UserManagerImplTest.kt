@@ -94,6 +94,6 @@ class UserManagerImplTest {
         experimentProvider = mock(),
         endOfYearSync = mock(),
         notificationScheduler = mock(),
-        whatsNewManager = whatsNewManager,
+        whatsNewManager = { whatsNewManager },
     )
 }
