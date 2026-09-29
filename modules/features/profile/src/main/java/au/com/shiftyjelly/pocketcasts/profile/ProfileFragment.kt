@@ -62,7 +62,6 @@ class ProfileFragment :
         val hasWhatsNewDot = profileViewModel.hasWhatsNewDot.collectAsState().value
         val state = ProfilePageState(
             sections = ProfileSection.visibleEntries(),
-            sectionsWithDot = setOfNotNull(ProfileSection.WhatsNew.takeIf { hasWhatsNewDot }),
             isWhatsNewVisible = FeatureFlag.isEnabled(Feature.WHATS_NEW_FEED),
             hasWhatsNewDot = hasWhatsNewDot,
             isPlaybackEnabled = profileViewModel.isPlaybackAvailable.collectAsState().value,
@@ -182,7 +181,6 @@ class ProfileFragment :
     private fun goToSection(section: ProfileSection) {
         profileViewModel.onSectionClick(section)
         val fragment = when (section) {
-            ProfileSection.WhatsNew -> WhatsNewFeedFragment()
             ProfileSection.Stats -> StatsFragment()
             ProfileSection.Downloads -> ProfileEpisodeListFragment.newInstance(ProfileEpisodeListFragment.Mode.Downloaded)
             ProfileSection.CloudFiles -> CloudFilesFragment()

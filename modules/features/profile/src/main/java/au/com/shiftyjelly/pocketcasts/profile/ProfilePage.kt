@@ -177,7 +177,6 @@ internal fun ProfilePage(
                 item {
                     ProfileSections(
                         sections = state.sections,
-                        sectionsWithDot = state.sectionsWithDot,
                         onClick = onSectionClick,
                         modifier = Modifier.fillMaxWidth(),
                     )
@@ -228,7 +227,6 @@ internal fun ProfilePage(
 
 internal data class ProfilePageState(
     val sections: List<ProfileSection>,
-    val sectionsWithDot: Set<ProfileSection>,
     val isWhatsNewVisible: Boolean,
     val hasWhatsNewDot: Boolean,
     val isPlaybackEnabled: Boolean,
@@ -425,7 +423,6 @@ private fun ProfilePageStub(
     ProfilePage(
         state = ProfilePageState(
             sections = ProfileSection.entries,
-            sectionsWithDot = setOf(ProfileSection.WhatsNew),
             isWhatsNewVisible = true,
             hasWhatsNewDot = true,
             isPlaybackEnabled = true,
