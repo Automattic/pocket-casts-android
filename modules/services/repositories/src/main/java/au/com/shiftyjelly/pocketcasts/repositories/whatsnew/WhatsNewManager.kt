@@ -28,7 +28,7 @@ interface WhatsNewManager {
 
     suspend fun markFeedAsSeen()
 
-    fun markAsResponded(pollId: String)
+    fun markAsResponded(pollId: String, optionId: String)
 
     fun resetReadState()
 }

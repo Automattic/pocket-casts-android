@@ -198,13 +198,13 @@ class WhatsNewMessageViewModelTest {
             assertEquals("b", poll.selectedOptionId)
             assertTrue(poll.canSubmit)
         }
-        verify(manager, never()).markAsResponded(any())
+        verify(manager, never()).markAsResponded(any(), any())
         verify(eventHorizon, never()).track(any<WhatsNewPollResponseSubmittedEvent>())
     }
 
     @Test
     fun `submitting records the answer and reports it once`() = runTest {
-        whenever(manager.markAsResponded(any())).then { readState.value = readState.value.copy(respondedPollIds = setOf("poll")) }
+        whenever(manager.markAsResponded(any(), any())).then { readState.value = readState.value.copy(respondedPollIds = setOf("poll")) }
         feedMessages.value = listOf(research())
         val viewModel = createViewModel("research")
 
@@ -218,7 +218,7 @@ class WhatsNewMessageViewModelTest {
             assertEquals("b", poll.selectedOptionId)
             assertFalse(poll.canSubmit)
         }
-        verify(manager, times(1)).markAsResponded("poll")
+        verify(manager, times(1)).markAsResponded("poll", "b")
         verify(eventHorizon, times(1)).track(
             WhatsNewPollResponseSubmittedEvent(
                 messageUuid = "research",
@@ -265,7 +265,7 @@ class WhatsNewMessageViewModelTest {
             assertFalse((expectMostRecentItem() as UiState.Loaded).poll!!.canSubmit)
             viewModel.onSubmitClick()
         }
-        verify(manager, never()).markAsResponded(any())
+        verify(manager, never()).markAsResponded(any(), any())
         verify(eventHorizon, never()).track(any<WhatsNewPollResponseSubmittedEvent>())
     }
 
@@ -278,7 +278,7 @@ class WhatsNewMessageViewModelTest {
             expectMostRecentItem()
             viewModel.onSubmitClick()
         }
-        verify(manager, never()).markAsResponded(any())
+        verify(manager, never()).markAsResponded(any(), any())
         verify(eventHorizon, never()).track(any<WhatsNewPollResponseSubmittedEvent>())
     }
 
@@ -296,7 +296,7 @@ class WhatsNewMessageViewModelTest {
             viewModel.onSubmitClick()
             expectNoEvents()
         }
-        verify(manager, never()).markAsResponded(any())
+        verify(manager, never()).markAsResponded(any(), any())
         verify(eventHorizon, never()).track(any<WhatsNewPollResponseSubmittedEvent>())
     }
 

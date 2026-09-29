@@ -7,6 +7,7 @@ import app.cash.turbine.test
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -83,9 +84,35 @@ class WhatsNewReadStateStoreTest {
 
     @Test
     fun `an answered poll stays answered in the next session`() {
-        store().markAsResponded("p1")
+        store().markAsResponded("p1", "o1")
 
         assertTrue(store().state.value.hasRespondedTo("p1"))
+    }
+
+    @Test
+    fun `the option a poll was answered with is remembered in the next session`() {
+        store().markAsResponded("p1", "o1")
+        store().markAsResponded("p2", "o2")
+
+        assertEquals("o1", store().state.value.answerTo("p1"))
+        assertEquals("o2", store().state.value.answerTo("p2"))
+    }
+
+    @Test
+    fun `a poll answered before its option was remembered has no answer`() {
+        preferences.edit(commit = true) { putStringSet("whatsNewRespondedPollIds", setOf("p1")) }
+
+        val state = store().state.value
+
+        assertTrue(state.hasRespondedTo("p1"))
+        assertNull(state.answerTo("p1"))
+    }
+
+    @Test
+    fun `unreadable poll answers are dropped`() {
+        preferences.edit(commit = true) { putString("whatsNewPollAnswers", "not json") }
+
+        assertEquals(emptyMap<String, String>(), store().state.value.pollAnswers)
     }
 
     @Test
@@ -93,7 +120,7 @@ class WhatsNewReadStateStoreTest {
         val store = store()
         store.markAsRead(listOf("m1"))
         store.markAsListed(listOf("m2"))
-        store.markAsResponded("p1")
+        store.markAsResponded("p1", "o1")
 
         store.reset()
 

@@ -73,7 +73,7 @@ class WhatsNewManagerImpl @Inject constructor(
 
     override suspend fun markFeedAsSeen() = markAsSeen(feedMessages.first().map(WhatsNewMessage::id))
 
-    override fun markAsResponded(pollId: String) = readStateStore.markAsResponded(pollId)
+    override fun markAsResponded(pollId: String, optionId: String) = readStateStore.markAsResponded(pollId, optionId)
 
     override fun resetReadState() = readStateStore.reset()
 

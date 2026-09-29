@@ -5,6 +5,7 @@ data class WhatsNewReadState(
     val seenMessageIds: Set<String> = emptySet(),
     val listedMessageIds: Set<String> = emptySet(),
     val respondedPollIds: Set<String> = emptySet(),
+    val pollAnswers: Map<String, String> = emptyMap(),
 ) {
     fun isRead(messageId: String) = messageId in readMessageIds
 
@@ -13,4 +14,6 @@ data class WhatsNewReadState(
     fun isListed(messageId: String) = messageId in listedMessageIds
 
     fun hasRespondedTo(pollId: String) = pollId in respondedPollIds
+
+    fun answerTo(pollId: String) = pollAnswers[pollId]
 }

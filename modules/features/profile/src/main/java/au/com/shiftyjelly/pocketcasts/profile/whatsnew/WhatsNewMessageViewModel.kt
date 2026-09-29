@@ -109,7 +109,7 @@ class WhatsNewMessageViewModel @AssistedInject constructor(
         val poll = message.research?.poll ?: return
         val option = poll.options.firstOrNull { it.id == selectedOptionId.value } ?: return
         if (manager.readState.value.hasRespondedTo(poll.pollId)) return
-        manager.markAsResponded(poll.pollId)
+        manager.markAsResponded(poll.pollId, option.id)
         eventHorizon.track(
             WhatsNewPollResponseSubmittedEvent(
                 messageUuid = message.id,

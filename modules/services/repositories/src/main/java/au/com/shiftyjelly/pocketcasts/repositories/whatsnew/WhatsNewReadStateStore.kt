@@ -8,6 +8,9 @@ import javax.inject.Singleton
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import org.json.JSONException
+import org.json.JSONObject
+import timber.log.Timber
 
 @Singleton
 class WhatsNewReadStateStore @Inject constructor(
@@ -41,8 +44,11 @@ class WhatsNewReadStateStore @Inject constructor(
         )
     }
 
-    fun markAsResponded(pollId: String) = update { state ->
-        state.copy(respondedPollIds = state.respondedPollIds + pollId)
+    fun markAsResponded(pollId: String, optionId: String) = update { state ->
+        state.copy(
+            respondedPollIds = state.respondedPollIds + pollId,
+            pollAnswers = state.pollAnswers + (pollId to optionId),
+        )
     }
 
     fun reset() = synchronized(this) {
@@ -62,6 +68,7 @@ class WhatsNewReadStateStore @Inject constructor(
             putStringSet(SEEN_KEY, state.seenMessageIds)
             putStringSet(LISTED_KEY, state.listedMessageIds)
             putStringSet(RESPONDED_KEY, state.respondedPollIds)
+            putString(POLL_ANSWERS_KEY, JSONObject(state.pollAnswers).toString())
         }
     }
 
@@ -70,16 +77,29 @@ class WhatsNewReadStateStore @Inject constructor(
         seenMessageIds = preferences.readIds(SEEN_KEY),
         listedMessageIds = preferences.readIds(LISTED_KEY),
         respondedPollIds = preferences.readIds(RESPONDED_KEY),
+        pollAnswers = preferences.readPollAnswers(),
     )
 
     private fun SharedPreferences.readIds(key: String) = getStringSet(key, null).orEmpty().toSet()
+
+    private fun SharedPreferences.readPollAnswers(): Map<String, String> {
+        val json = getString(POLL_ANSWERS_KEY, null) ?: return emptyMap()
+        return try {
+            val answers = JSONObject(json)
+            answers.keys().asSequence().associateWith(answers::getString)
+        } catch (e: JSONException) {
+            Timber.w(e, "What's New: dropping unreadable poll answers")
+            emptyMap()
+        }
+    }
 
     private companion object {
         const val READ_KEY = "whatsNewReadMessageIds"
         const val SEEN_KEY = "whatsNewSeenMessageIds"
         const val LISTED_KEY = "whatsNewListedMessageIds"
         const val RESPONDED_KEY = "whatsNewRespondedPollIds"
+        const val POLL_ANSWERS_KEY = "whatsNewPollAnswers"
 
-        val whatsNewKeys = setOf(READ_KEY, SEEN_KEY, LISTED_KEY, RESPONDED_KEY)
+        val whatsNewKeys = setOf(READ_KEY, SEEN_KEY, LISTED_KEY, RESPONDED_KEY, POLL_ANSWERS_KEY)
     }
 }
