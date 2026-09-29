@@ -143,6 +143,7 @@ import au.com.shiftyjelly.pocketcasts.player.view.dialog.MiniPlayerDialog
 import au.com.shiftyjelly.pocketcasts.player.view.video.VideoActivity
 import au.com.shiftyjelly.pocketcasts.playlists.PlaylistFragment
 import au.com.shiftyjelly.pocketcasts.playlists.PlaylistsFragment
+import au.com.shiftyjelly.pocketcasts.playlists.showCreatePlaylist
 import au.com.shiftyjelly.pocketcasts.podcasts.view.ProfileEpisodeListFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeContainerFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.SuggestedFoldersFragment
@@ -1621,6 +1622,13 @@ class MainActivity :
 
     override fun closeProfileToRoot() {
         navigator.reset(tab = VR.id.navigation_profile, resetRootFragment = false)
+    }
+
+    override fun openCreatePlaylist() {
+        closePlayer()
+        openTab(VR.id.navigation_filters)
+        navigator.reset(tab = VR.id.navigation_filters, resetRootFragment = false)
+        supportFragmentManager.showCreatePlaylist()
     }
 
     override fun setSupportActionBar(toolbar: Toolbar?) {

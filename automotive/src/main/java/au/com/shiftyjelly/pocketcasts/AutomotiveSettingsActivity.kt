@@ -112,6 +112,9 @@ class AutomotiveSettingsActivity :
     override fun closeProfileToRoot() {
     }
 
+    override fun openCreatePlaylist() {
+    }
+
     override fun openPodcastPage(uuid: String, sourceView: String?) {
     }
 

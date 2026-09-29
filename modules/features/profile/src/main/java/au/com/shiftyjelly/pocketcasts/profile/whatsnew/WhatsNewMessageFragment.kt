@@ -81,6 +81,8 @@ class WhatsNewMessageFragment : BaseFragment() {
                 requireActivity(),
                 OnboardingFlow.Upsell(OnboardingUpgradeSource.WHATS_NEW),
             )
+
+            WhatsNewActionEvent.CreatePlaylist -> host.openCreatePlaylist()
         }
     }
 
