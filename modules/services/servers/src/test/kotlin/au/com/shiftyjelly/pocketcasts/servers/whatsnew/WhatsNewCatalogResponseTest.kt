@@ -201,12 +201,30 @@ class WhatsNewCatalogResponseTest {
     }
 
     @Test
-    fun `an incomplete action drops the message`() {
-        val catalog = decode(
-            catalogOf(message(body = """"pages": [{ "heading": "h", "description": "d", "action": { "event": "", "label": "Try it" } }]""")),
+    fun `an action this version cannot perform leaves the page without it`() {
+        val actions = listOf(
+            """{ "event": "", "label": "Try it" }""",
+            """{ "label": "Open it" }""",
+            """{ "type": "create_playlist", "label": "  " }""",
+            """{ "type": "create_playlist" }""",
+            """{ "type": "open_link", "label": "Learn more" }""",
+            """{ "type": "open_link", "arguments": {}, "label": "Learn more" }""",
+            """{ "type": "open_link", "arguments": { "url": "http://blog.pocketcasts.com" }, "label": "Learn more" }""",
+            """{ "type": "open_link", "arguments": { "url": "pocketcasts://podcasts" }, "label": "Learn more" }""",
+            """{ "type": "open_link", "arguments": { "url": "/transcripts" }, "label": "Learn more" }""",
+            """{ "type": "open_link", "arguments": { "url": "https://" }, "label": "Learn more" }""",
+            """{ "type": "open_link", "arguments": { "url": "https://exa mple.com" }, "label": "Learn more" }""",
         )
 
-        assertTrue(catalog.messages.isEmpty())
+        actions.forEach { action ->
+            val catalog = decode(
+                catalogOf(message(body = """"pages": [{ "heading": "Try it", "description": "d", "action": $action }]""")),
+            )
+
+            val page = (catalog.messages.single().content as WhatsNewContent.Pages).pages.single()
+            assertEquals(action, "Try it", page.heading)
+            assertNull(action, page.action)
+        }
     }
 
     @Test

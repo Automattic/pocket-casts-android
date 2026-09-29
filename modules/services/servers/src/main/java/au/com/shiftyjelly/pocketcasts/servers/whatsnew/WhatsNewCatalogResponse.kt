@@ -99,7 +99,13 @@ data class WhatsNewPageResponse(
         val heading = heading.nonBlank() ?: return null
         val description = description.nonBlank() ?: return null
         val image = image?.let { it.toImage() ?: return null }
-        val action = action?.let { it.toAction() ?: return null }
+        val action = action?.let { response ->
+            response.toAction().also { action ->
+                if (action == null) {
+                    Timber.i("What's New: dropping an action this version can't perform: $response")
+                }
+            }
+        }
 
         return WhatsNewPage(image = image, heading = heading, description = description, action = action)
     }
