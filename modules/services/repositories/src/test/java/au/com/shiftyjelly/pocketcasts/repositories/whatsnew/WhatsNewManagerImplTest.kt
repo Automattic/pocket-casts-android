@@ -255,10 +255,8 @@ class WhatsNewManagerImplTest {
 
     @Test
     fun `a message published after a fresh install started is unread`() = runTest {
-        serviceManager.catalog = catalogJson("Fresh", publishedAt = Instant.now().plusSeconds(1).toString())
+        readStateStore.startFeed(Instant.parse("2026-09-01T00:00:00Z"))
         val manager = manager()
-        manager.startFeed()
-        Thread.sleep(1_100)
         manager.refreshIfNeeded()
 
         manager.hasUnlistedMessages.test {
