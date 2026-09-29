@@ -469,6 +469,18 @@ class SyncManagerImpl @Inject constructor(
 
     // Rating
 
+    override suspend fun getWhatsNewReadMessageIds(messageIds: Collection<String>) = getCacheTokenOrLogin { token ->
+        syncServiceManager.getWhatsNewReadMessageIds(messageIds, token)
+    }
+
+    override suspend fun markWhatsNewAsRead(messageIds: Collection<String>) = getCacheTokenOrLogin { token ->
+        syncServiceManager.markWhatsNewAsRead(messageIds, token)
+    }
+
+    override suspend fun markWhatsNewAsUnread(messageIds: Collection<String>) = getCacheTokenOrLogin { token ->
+        syncServiceManager.markWhatsNewAsUnread(messageIds, token)
+    }
+
     override suspend fun addPodcastRating(podcastUuid: String, rate: Int): PodcastRatingResponse = getCacheTokenOrLogin { token ->
         syncServiceManager.addPodcastRating(podcastUuid, rate, token)
     }

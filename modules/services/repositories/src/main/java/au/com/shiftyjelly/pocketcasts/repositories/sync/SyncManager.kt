@@ -119,6 +119,11 @@ interface SyncManager : NamedSettingsCaller {
 
     fun episodeSyncRxCompletable(request: EpisodeSyncRequest): Completable
 
+    // What's New
+    suspend fun getWhatsNewReadMessageIds(messageIds: Collection<String>): Set<String>
+    suspend fun markWhatsNewAsRead(messageIds: Collection<String>)
+    suspend fun markWhatsNewAsUnread(messageIds: Collection<String>)
+
     // Rating
     suspend fun addPodcastRating(podcastUuid: String, rate: Int): PodcastRatingResponse
     suspend fun getPodcastRating(podcastUuid: String): PodcastRatingResponse
