@@ -1634,7 +1634,8 @@ class MainActivity :
 
     override fun openDeepLink(url: String): Boolean {
         val intent = Intent(Intent.ACTION_VIEW, url.toUri())
-        if (deepLinkFactory.create(intent) == null) {
+        val deepLink = deepLinkFactory.create(intent)
+        if (deepLink == null || deepLink is ShowPodcastFromUrlDeepLink) {
             return false
         }
         handleIntent(intent, savedInstanceState = null)
