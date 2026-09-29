@@ -484,6 +484,20 @@ private fun WhatsNewMessagePagePreview(
 @Preview
 @Composable
 private fun WhatsNewMessagePageResearchPreview() {
+    WhatsNewResearchPreview(selectedOptionId = "a", hasResponded = false)
+}
+
+@Preview
+@Composable
+private fun WhatsNewMessagePageAnsweredResearchPreview() {
+    WhatsNewResearchPreview(selectedOptionId = "b", hasResponded = true)
+}
+
+@Composable
+private fun WhatsNewResearchPreview(
+    selectedOptionId: String,
+    hasResponded: Boolean,
+) {
     val research = WhatsNewResearch(
         description = "One question, ten seconds.",
         poll = WhatsNewPoll(
@@ -503,7 +517,7 @@ private fun WhatsNewMessagePageResearchPreview() {
                 content = WhatsNewContent.Research(research),
             ),
             pages = emptyList(),
-            poll = PollState(research = research, selectedOptionId = "a", hasResponded = false),
+            poll = PollState(research = research, selectedOptionId = selectedOptionId, hasResponded = hasResponded),
             bottomInset = 0.dp,
             onBackPress = {},
             onActionClick = {},
