@@ -4,6 +4,7 @@ import android.view.KeyEvent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
@@ -227,8 +228,171 @@ class MediaButtonEventHandlerTest {
         assertEquals(listOf(MediaEvent.DoubleTap), events)
     }
 
+    @Test
+    fun `held KEYCODE_MEDIA_PLAY while paused plays once without a multi tap`() = runTest {
+        var immediatePlayCount = 0
+        val events = mutableListOf<MediaEvent>()
+        val handler = MediaButtonEventHandler(
+            scopeProvider = { this },
+            onImmediatePlay = { immediatePlayCount++ },
+            onMediaEvent = events::add,
+            isPlaying = { false },
+        )
+
+        assertTrue(handler.handle(keyEvent(KeyEvent.KEYCODE_MEDIA_PLAY)))
+        advanceTimeBy(490)
+        for (repeatCount in 1..3) {
+            assertTrue(handler.handle(keyEvent(KeyEvent.KEYCODE_MEDIA_PLAY, repeatCount = repeatCount)))
+            advanceTimeBy(50)
+        }
+
+        advanceUntilIdle()
+        assertEquals(1, immediatePlayCount)
+        assertEquals(emptyList<MediaEvent>(), events)
+    }
+
+    @Test
+    fun `held KEYCODE_MEDIA_PLAY while playing does not resolve a multi tap`() = runTest {
+        var immediatePlayCount = 0
+        val events = mutableListOf<MediaEvent>()
+        val handler = MediaButtonEventHandler(
+            scopeProvider = { this },
+            onImmediatePlay = { immediatePlayCount++ },
+            onMediaEvent = events::add,
+            isPlaying = { true },
+        )
+
+        handler.handle(keyEvent(KeyEvent.KEYCODE_MEDIA_PLAY))
+        advanceTimeBy(490)
+        handler.handle(keyEvent(KeyEvent.KEYCODE_MEDIA_PLAY, repeatCount = 1))
+
+        advanceUntilIdle()
+        assertEquals(1, immediatePlayCount)
+        assertEquals(emptyList<MediaEvent>(), events)
+    }
+
+    @Test
+    fun `held toggle keys while playing resolve a single tap`() = runTest {
+        for (keyCode in listOf(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE, KeyEvent.KEYCODE_HEADSETHOOK)) {
+            var immediatePlayCount = 0
+            val events = mutableListOf<MediaEvent>()
+            val handler = MediaButtonEventHandler(
+                scopeProvider = { this },
+                onImmediatePlay = { immediatePlayCount++ },
+                onMediaEvent = events::add,
+                isPlaying = { true },
+            )
+
+            assertTrue(handler.handle(keyEvent(keyCode)))
+            advanceTimeBy(400)
+            for (repeatCount in 1..3) {
+                assertTrue(handler.handle(keyEvent(keyCode, repeatCount = repeatCount)))
+                advanceTimeBy(50)
+            }
+
+            advanceUntilIdle()
+            assertEquals(0, immediatePlayCount)
+            assertEquals(listOf(MediaEvent.SingleTap), events)
+        }
+    }
+
+    @Test
+    fun `held toggle keys while paused play once without a multi tap`() = runTest {
+        for (keyCode in listOf(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE, KeyEvent.KEYCODE_HEADSETHOOK)) {
+            var immediatePlayCount = 0
+            val events = mutableListOf<MediaEvent>()
+            val handler = MediaButtonEventHandler(
+                scopeProvider = { this },
+                onImmediatePlay = { immediatePlayCount++ },
+                onMediaEvent = events::add,
+                isPlaying = { false },
+            )
+
+            handler.handle(keyEvent(keyCode))
+            advanceTimeBy(400)
+            handler.handle(keyEvent(keyCode, repeatCount = 1))
+
+            advanceUntilIdle()
+            assertEquals(1, immediatePlayCount)
+            assertEquals(emptyList<MediaEvent>(), events)
+        }
+    }
+
+    @Test
+    fun `held toggle key repeats after the tap window do not start a new tap`() = runTest {
+        val events = mutableListOf<MediaEvent>()
+        val handler = MediaButtonEventHandler(
+            scopeProvider = { this },
+            onImmediatePlay = {},
+            onMediaEvent = events::add,
+            isPlaying = { true },
+        )
+
+        handler.handle(keyEvent(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE))
+        advanceTimeBy(700)
+        for (repeatCount in 1..3) {
+            handler.handle(keyEvent(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE, repeatCount = repeatCount))
+            advanceTimeBy(50)
+        }
+
+        advanceUntilIdle()
+        assertEquals(listOf(MediaEvent.SingleTap), events)
+    }
+
+    @Test
+    fun `tap followed by a hold within the tap window resolves a double tap`() = runTest {
+        val events = mutableListOf<MediaEvent>()
+        val handler = MediaButtonEventHandler(
+            scopeProvider = { this },
+            onImmediatePlay = {},
+            onMediaEvent = events::add,
+            isPlaying = { true },
+        )
+
+        handler.handle(keyEvent(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE))
+        advanceTimeBy(200)
+        handler.handle(keyEvent(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE))
+        advanceTimeBy(300)
+        handler.handle(keyEvent(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE, repeatCount = 1))
+
+        advanceUntilIdle()
+        assertEquals(listOf(MediaEvent.DoubleTap), events)
+    }
+
+    @Test
+    fun `held KEYCODE_MEDIA_NEXT still emits each repeat`() = runTest {
+        val events = mutableListOf<MediaEvent>()
+        val handler = MediaButtonEventHandler(
+            scopeProvider = { this },
+            onImmediatePlay = {},
+            onMediaEvent = events::add,
+            isPlaying = { true },
+        )
+
+        for (repeatCount in 0..2) {
+            assertTrue(handler.handle(keyEvent(KeyEvent.KEYCODE_MEDIA_NEXT, repeatCount = repeatCount)))
+            runCurrent()
+        }
+
+        advanceUntilIdle()
+        assertEquals(List(3) { MediaEvent.DoubleTap }, events)
+    }
+
+    @Test
+    fun `held unhandled keys return false`() = runTest {
+        val handler = MediaButtonEventHandler(
+            scopeProvider = { this },
+            onImmediatePlay = {},
+            onMediaEvent = {},
+            isPlaying = { false },
+        )
+
+        assertFalse(handler.handle(keyEvent(KeyEvent.KEYCODE_MEDIA_PAUSE, repeatCount = 1)))
+    }
+
     private fun keyEvent(
         keyCode: Int,
         action: Int = KeyEvent.ACTION_DOWN,
-    ) = KeyEvent(action, keyCode)
+        repeatCount: Int = 0,
+    ) = KeyEvent(0L, 0L, action, keyCode, repeatCount)
 }
