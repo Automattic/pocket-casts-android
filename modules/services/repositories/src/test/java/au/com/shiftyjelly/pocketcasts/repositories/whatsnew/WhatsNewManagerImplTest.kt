@@ -256,6 +256,7 @@ class WhatsNewManagerImplTest {
 
     @Test
     fun `a research message stays out of the feed and its dots while polls are off`() = runTest {
+        FeatureFlag.setEnabled(Feature.WHATS_NEW_POLLS, false)
         serviceManager.catalog = researchCatalogJson()
         val manager = manager()
         manager.refreshIfNeeded()

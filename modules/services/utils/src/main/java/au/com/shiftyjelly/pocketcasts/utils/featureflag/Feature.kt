@@ -390,7 +390,7 @@ enum class Feature(
     WHATS_NEW_POLLS(
         key = "whats_new_polls",
         title = "What's New polls",
-        defaultValue = false,
+        defaultValue = isDebugOrPrototypeBuild,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
