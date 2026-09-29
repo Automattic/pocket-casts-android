@@ -417,6 +417,44 @@ class WhatsNewManagerImplTest {
     }
 
     @Test
+    fun `reads fetched for an account that signs out mid-sync are not taken on`() = runTest {
+        isLoggedIn.accept(true)
+        remote.read += "m1"
+        readStateStore.markAsRead(listOf("m1"))
+        val manager = manager()
+        remote.onList = { manager.forgetReadMessages() }
+
+        manager.refreshIfNeeded()
+
+        assertTrue(manager.readState.value.readMessageIds.isEmpty())
+        assertTrue(remote.markedRead.isEmpty())
+    }
+
+    @Test
+    fun `nothing is synced while the feature is off`() = runTest {
+        isLoggedIn.accept(true)
+        val manager = manager()
+        manager.refreshIfNeeded()
+        FeatureFlag.setEnabled(Feature.WHATS_NEW_FEED, false)
+
+        manager.markAsRead(listOf("m1"))
+
+        assertTrue(remote.markedRead.isEmpty())
+    }
+
+    @Test
+    fun `reading a message that was already read does not reach the account again`() = runTest {
+        isLoggedIn.accept(true)
+        val manager = manager()
+        manager.refreshIfNeeded()
+        manager.markAsRead(listOf("m1"))
+
+        manager.markAsRead(listOf("m1"))
+
+        assertEquals(listOf(setOf("m1")), remote.markedRead)
+    }
+
+    @Test
     fun `marking a message unread takes it back here and for the account`() = runTest {
         isLoggedIn.accept(true)
         val manager = manager()
@@ -466,9 +504,11 @@ class WhatsNewManagerImplTest {
         val markedRead = mutableListOf<Set<String>>()
         val markedUnread = mutableListOf<Set<String>>()
         var error: Exception? = null
+        var onList: () -> Unit = {}
 
         fun readAmong(ids: Collection<String>): Set<String> {
             error?.let { throw it }
+            onList()
             return read intersect ids.toSet()
         }
 

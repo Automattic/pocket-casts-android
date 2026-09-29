@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.ReleaseVersion
 import java.net.HttpURLConnection.HTTP_GATEWAY_TIMEOUT
 import java.time.Instant
+import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.cancellation.CancellationException
@@ -73,6 +74,8 @@ class WhatsNewManagerImpl @Inject constructor(
 
     private val syncRequests = Channel<Unit>(Channel.CONFLATED)
 
+    private val accountGeneration = AtomicInteger()
+
     init {
         applicationScope.launch(ioDispatcher) {
             for (request in syncRequests) {
@@ -131,6 +134,7 @@ class WhatsNewManagerImpl @Inject constructor(
     }
 
     override fun forgetReadMessages() {
+        accountGeneration.incrementAndGet()
         readStateStore.forgetReadMessages()
     }
 
@@ -157,17 +161,19 @@ class WhatsNewManagerImpl @Inject constructor(
     }
 
     private suspend fun performReadStateSync() {
-        if (!syncManager.isLoggedIn()) return
+        if (!FeatureFlag.isEnabled(Feature.WHATS_NEW_FEED) || !syncManager.isLoggedIn()) return
+        val generation = accountGeneration.get()
         val messageIds = _catalog.value?.messages?.map(WhatsNewMessage::id)?.toSet().orEmpty()
         if (messageIds.isEmpty()) return
         val read = readState.value.readMessageIds intersect messageIds
         try {
             val remotelyRead = syncManager.getWhatsNewReadMessageIds(messageIds)
+            if (generation != accountGeneration.get()) return
             val unsynced = read - remotelyRead
             if (unsynced.isNotEmpty()) {
                 syncManager.markWhatsNewAsRead(unsynced)
             }
-            if (remotelyRead.isNotEmpty()) {
+            if (remotelyRead.isNotEmpty() && generation == accountGeneration.get()) {
                 readStateStore.markAsRead(remotelyRead)
             }
         } catch (e: CancellationException) {
