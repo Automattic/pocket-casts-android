@@ -195,6 +195,7 @@ class ProfileViewModel @Inject constructor(
 
     internal fun onSectionClick(section: ProfileSection) {
         val event = when (section) {
+            ProfileSection.WhatsNew -> null
             ProfileSection.Stats -> StatsShownEvent
             ProfileSection.Downloads -> DownloadsShownEvent
             ProfileSection.CloudFiles -> UploadedFilesShownEvent
@@ -204,7 +205,7 @@ class ProfileViewModel @Inject constructor(
             ProfileSection.ListeningHistory -> ListeningHistoryShownEvent
             ProfileSection.Help -> SettingsHelpShownEvent
         }
-        eventHorizon.track(event)
+        event?.let(eventHorizon::track)
     }
 
     internal fun refreshProfile() {

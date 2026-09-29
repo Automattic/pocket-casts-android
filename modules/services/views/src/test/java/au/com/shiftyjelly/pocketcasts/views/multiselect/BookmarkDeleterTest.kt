@@ -8,6 +8,7 @@ import com.automattic.eventhorizon.BookmarkDeleteFormSubmittedEvent
 import com.automattic.eventhorizon.BookmarkDeletedEvent
 import com.automattic.eventhorizon.EventHorizon
 import java.util.Date
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -18,7 +19,7 @@ import org.mockito.kotlin.verifyNoInteractions
 class BookmarkDeleterTest {
     private val bookmarkManager = mock<BookmarkManager>()
     private val eventSink = TestEventSink()
-    private val deleter = BookmarkDeleter(bookmarkManager, EventHorizon(eventSink))
+    private val deleter = BookmarkDeleter(bookmarkManager, EventHorizon(eventSink), TestScope())
 
     @Test
     fun `deletes every bookmark and tracks the submitted and deleted events`() = runTest {

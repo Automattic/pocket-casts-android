@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfTitle
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.ReleaseVersion
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.PlayerShelfOverflowMenuRearrangeActionMovedEvent
 import com.automattic.eventhorizon.PlayerShelfOverflowMenuRearrangeFinishedEvent
@@ -24,7 +25,7 @@ import java.util.Collections
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -42,6 +43,9 @@ class ShelfViewModel @AssistedInject constructor(
     private var _uiState: MutableStateFlow<UiState> = MutableStateFlow(UiState())
     val uiState: StateFlow<UiState> = _uiState
 
+    private val isSmartBookmarksPromoRelease = ReleaseVersion.fromString(settings.getVersion())
+        ?.let { version -> ReleaseVersion(version.major, version.minor) == SMART_BOOKMARKS_PROMO_RELEASE } == true
+
     init {
         viewModelScope.launch {
             transcriptManager.observeIsTranscriptAvailable(episodeId)
@@ -51,11 +55,8 @@ class ShelfViewModel @AssistedInject constructor(
                 }
         }
         viewModelScope.launch {
-            combine(
-                settings.showSmartBookmarksTooltip.flow,
-                FeatureFlag.isEnabledFlow(Feature.SMART_BOOKMARKS),
-            ) { showTooltip, isSmartBookmarksEnabled ->
-                showTooltip && isSmartBookmarksEnabled
+            FeatureFlag.isEnabledFlow(Feature.SMART_BOOKMARKS).map { isSmartBookmarksEnabled ->
+                isSmartBookmarksEnabled && isSmartBookmarksPromoRelease
             }.collectLatest { showBadge ->
                 _uiState.update { it.copy(showBookmarkNewBadge = showBadge) }
             }
@@ -188,6 +189,7 @@ class ShelfViewModel @AssistedInject constructor(
     companion object {
         const val ERROR_MINIMUM_SHELF_ITEMS = "Minimum 4 shelf items should be present"
         const val ERROR_SHELF_ITEM_INVALID_MOVE_POSITION = "Shelf item invalid move position"
+        private val SMART_BOOKMARKS_PROMO_RELEASE = ReleaseVersion(major = 8, minor = 22)
         val shortcutTitle = ShelfTitle(LR.string.player_rearrange_actions_shown)
         val moreActionsTitle = ShelfTitle(LR.string.player_rearrange_actions_hidden)
     }

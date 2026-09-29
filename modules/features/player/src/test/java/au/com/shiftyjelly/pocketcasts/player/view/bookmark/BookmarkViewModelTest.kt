@@ -19,6 +19,7 @@ import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import com.automattic.eventhorizon.BookmarkEditFormDismissedEvent
 import com.automattic.eventhorizon.BookmarkEditFormShownEvent
 import com.automattic.eventhorizon.BookmarkEditFormSubmittedEvent
 import com.automattic.eventhorizon.BookmarkTitleSuggestionTappedEvent
@@ -27,6 +28,7 @@ import com.automattic.eventhorizon.SourceViewType
 import java.util.Date
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -76,6 +78,7 @@ class BookmarkViewModelTest {
         timeSecs = timeSecs,
         podcastColors = PodcastColors.ForUserEpisode,
     )
+    private val failedGeneration = TitleGeneration(title = null, durationMs = 16, failureReason = "server_error")
     private val suggestion = BookmarkSuggestion(passage = "the passage", passageLocation = 5, referenceTimeSecs = 118, generation = TitleGeneration("A great moment", 0, null))
 
     @Before
@@ -85,11 +88,92 @@ class BookmarkViewModelTest {
 
     @Test
     fun `edit form events use the source the sheet was opened from`() = runTest {
-        viewModel.onShown(isNewBookmark = true, source = SourceView.TRANSCRIPT)
+        viewModel.load(arguments.copy(source = SourceView.TRANSCRIPT))
 
         val event = eventSink.pollEvent()
         assertTrue(event is BookmarkEditFormShownEvent)
         assertEquals(SourceViewType.Transcript, (event as BookmarkEditFormShownEvent).source)
+    }
+
+    @Test
+    fun `shown event carries the episode and podcast of the bookmark`() = runTest {
+        whenever(episodeManager.findEpisodeByUuid(episodeUuid))
+            .thenReturn(PodcastEpisode(uuid = episodeUuid, podcastUuid = "podcast-id", publishedDate = Date()))
+
+        viewModel.load(arguments)
+
+        val event = eventSink.pollEvent() as BookmarkEditFormShownEvent
+        assertEquals(true, event.isNewBookmark)
+        assertEquals(episodeUuid, event.episodeUuid)
+        assertEquals("podcast-id", event.podcastUuid)
+    }
+
+    @Test
+    fun `shown event is tracked once when load is called again`() = runTest {
+        viewModel.load(arguments)
+        viewModel.load(arguments)
+
+        assertTrue(eventSink.pollEvent() is BookmarkEditFormShownEvent)
+        assertTrue(eventSink.isEmpty())
+    }
+
+    @Test
+    fun `shown event is tracked when the episode is missing`() = runTest {
+        viewModel.load(arguments)
+
+        val event = eventSink.pollEvent() as BookmarkEditFormShownEvent
+        assertEquals(true, event.isNewBookmark)
+        assertEquals(episodeUuid, event.episodeUuid)
+        assertEquals(null, event.podcastUuid)
+        verify(bookmarkManager, never()).suggestBookmark(any(), any())
+    }
+
+    @Test
+    fun `shown event reports an existing bookmark found at the episode time as not new`() = runTest {
+        val episode = PodcastEpisode(uuid = episodeUuid, podcastUuid = "podcast-id", publishedDate = Date())
+        whenever(episodeManager.findEpisodeByUuid(episodeUuid)).thenReturn(episode)
+        whenever(bookmarkManager.findByEpisodeTime(episode, timeSecs))
+            .thenReturn(Bookmark(uuid = "existing-id", episodeUuid = episodeUuid, podcastUuid = "podcast-id", title = "Mine"))
+
+        viewModel.load(arguments)
+
+        val event = eventSink.pollEvent() as BookmarkEditFormShownEvent
+        assertEquals(false, event.isNewBookmark)
+        assertEquals("podcast-id", event.podcastUuid)
+    }
+
+    @Test
+    fun `dismissing before the sheet loads tracks nothing`() = runTest {
+        viewModel.onClose()
+
+        assertTrue(eventSink.isEmpty())
+    }
+
+    @Test
+    fun `dismissed event carries the episode and podcast of the bookmark`() = runTest {
+        whenever(bookmarkManager.findBookmark("existing-id"))
+            .thenReturn(Bookmark(uuid = "existing-id", episodeUuid = episodeUuid, podcastUuid = "podcast-id", title = "Mine"))
+        viewModel.load(arguments.copy(bookmarkUuid = "existing-id"))
+        eventSink.skipEvent()
+
+        viewModel.onClose()
+
+        val event = eventSink.pollEvent() as BookmarkEditFormDismissedEvent
+        assertEquals(false, event.isNewBookmark)
+        assertEquals(episodeUuid, event.episodeUuid)
+        assertEquals("podcast-id", event.podcastUuid)
+    }
+
+    @Test
+    fun `dismissing while the sheet is loading tracks shown before dismissed`() = runTest {
+        whenever(episodeManager.findEpisodeByUuid(episodeUuid)).doSuspendableAnswer { awaitCancellation() }
+        viewModel.load(arguments)
+
+        viewModel.onClose()
+
+        assertTrue(eventSink.pollEvent() is BookmarkEditFormShownEvent)
+        assertTrue(eventSink.pollEvent() is BookmarkEditFormDismissedEvent)
+        assertTrue(eventSink.isEmpty())
     }
 
     @Test
@@ -102,6 +186,7 @@ class BookmarkViewModelTest {
     @Test
     fun `tapping the suggested title tracks it and applies the title`() = runTest {
         viewModel.load(arguments)
+        eventSink.skipEvent()
 
         viewModel.onSuggestionTapped("A great moment")
 
@@ -111,7 +196,10 @@ class BookmarkViewModelTest {
 
     @Test
     fun `submitting reports whether a passage was saved and changed`() = runTest {
+        whenever(episodeManager.findEpisodeByUuid(episodeUuid))
+            .thenReturn(PodcastEpisode(uuid = episodeUuid, podcastUuid = "podcast-id", publishedDate = Date()))
         viewModel.load(arguments)
+        eventSink.skipEvent()
         viewModel.onPassageEdited("a chosen passage", 3)
 
         viewModel.onSubmitBookmark()
@@ -119,6 +207,8 @@ class BookmarkViewModelTest {
         val event = eventSink.pollEvent() as BookmarkEditFormSubmittedEvent
         assertEquals(true, event.hasPassage)
         assertEquals(true, event.passageChanged)
+        assertEquals(episodeUuid, event.episodeUuid)
+        assertEquals("podcast-id", event.podcastUuid)
     }
 
     @Test
@@ -197,6 +287,55 @@ class BookmarkViewModelTest {
     }
 
     @Test
+    fun `titles the bookmark with the passage's first words when generation fails`() = runTest {
+        stubNewBookmark()
+        whenever(bookmarkManager.suggestBookmark(episodeUuid, timeSecs))
+            .thenReturn(suggestion.copy(passage = "Hey! Hey! No, no, no! Up now! You!", generation = failedGeneration))
+
+        viewModel.load(arguments)
+
+        val state = viewModel.uiState.value
+        assertEquals("Hey! Hey! No, no, no! Up", state.title.text)
+        assertEquals(BookmarkViewModel.TitleSuggestion.None, state.titleSuggestion)
+    }
+
+    @Test
+    fun `keeps an edited title when generation fails`() = runTest {
+        stubNewBookmark()
+        val gate = CompletableDeferred<BookmarkSuggestion?>()
+        doSuspendableAnswer { gate.await() }.whenever(bookmarkManager).suggestBookmark(episodeUuid, timeSecs)
+        viewModel.load(arguments)
+        viewModel.changeTitle(TextFieldValue("My own title"))
+
+        gate.complete(suggestion.copy(generation = failedGeneration))
+
+        val state = viewModel.uiState.value
+        assertEquals("My own title", state.title.text)
+        assertEquals(BookmarkViewModel.TitleSuggestion.None, state.titleSuggestion)
+    }
+
+    @Test
+    fun `titles a transcript bookmark with its passage's first words when generation fails`() = runTest {
+        whenever(bookmarkManager.findBookmark("new-id"))
+            .thenReturn(Bookmark(uuid = "new-id", title = "Bookmark", passage = "one two three four five six seven"))
+        whenever(bookmarkManager.suggestTitle("one two three four five six seven")).thenReturn(failedGeneration)
+
+        viewModel.load(newBookmarkArguments("new-id"))
+
+        assertEquals("one two three four five six", viewModel.uiState.value.title.text)
+    }
+
+    @Test
+    fun `keeps the default title when neither a title nor a passage is available`() = runTest {
+        stubNewBookmark()
+        whenever(bookmarkManager.suggestBookmark(episodeUuid, timeSecs)).thenReturn(null)
+
+        viewModel.load(arguments)
+
+        assertEquals("Bookmark", viewModel.uiState.value.title.text)
+    }
+
+    @Test
     fun `offers to edit the transcript once a passage is suggested`() = runTest {
         stubNewBookmark()
         whenever(bookmarkManager.suggestBookmark(episodeUuid, timeSecs)).thenReturn(suggestion)
@@ -264,7 +403,7 @@ class BookmarkViewModelTest {
             passageLocation = eq(5),
             referenceTime = eq(118),
         )
-        verify(bookmarkManager, never()).enrichBookmarkPassage(any())
+        verify(bookmarkManager, never()).enrichBookmarkPassage(any(), any())
     }
 
     @Test
@@ -290,7 +429,24 @@ class BookmarkViewModelTest {
             passageLocation = isNull(),
             referenceTime = isNull(),
         )
-        verify(bookmarkManager).enrichBookmarkPassage(any())
+        verify(bookmarkManager).enrichBookmarkPassage(any(), eq(true))
+    }
+
+    @Test
+    fun `keeps a typed title when saving without a suggestion`() = runTest {
+        stubNewBookmark()
+        val gate = CompletableDeferred<BookmarkSuggestion?>()
+        doSuspendableAnswer { gate.await() }.whenever(bookmarkManager).suggestBookmark(episodeUuid, timeSecs)
+        whenever(episodeManager.findByUuid(episodeUuid)).thenReturn(PodcastEpisode(uuid = episodeUuid, publishedDate = Date()))
+        whenever(bookmarkManager.add(any(), any(), any(), any(), any(), anyOrNull(), anyOrNull(), anyOrNull())).thenReturn(Bookmark(uuid = "new-id"))
+
+        viewModel.load(arguments)
+        viewModel.changeTitle(TextFieldValue("My title"))
+        val saved = CompletableDeferred<Unit>()
+        viewModel.saveBookmark { _, _ -> saved.complete(Unit) }
+        saved.await()
+
+        verify(bookmarkManager).enrichBookmarkPassage(any(), eq(false))
     }
 
     @Test

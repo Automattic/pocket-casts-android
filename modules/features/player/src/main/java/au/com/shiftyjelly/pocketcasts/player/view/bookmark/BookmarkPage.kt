@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.player.view.bookmark
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,19 +16,21 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
-import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.TextFieldDefaults.indicatorLine
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -38,6 +41,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -46,6 +50,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -135,6 +140,7 @@ fun BookmarkPage(
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun Content(
     isNewBookmark: Boolean,
@@ -152,21 +158,14 @@ private fun Content(
 ) {
     val focusRequester = remember { FocusRequester() }
     Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
             .fillMaxHeight()
             .verticalScroll(rememberScrollState())
             .padding(16.dp),
     ) {
-        val titleRes = if (isNewBookmark) R.string.add_bookmark_title_hint else R.string.change_bookmark_title_hint
         TextP40(
-            text = stringResource(titleRes),
+            text = stringResource(LR.string.bookmark_title_label),
             color = colors.contrast02,
-            textAlign = TextAlign.Center,
-        )
-
-        Spacer(
-            modifier = Modifier.weight(1f),
         )
 
         val tintTextSelectionColors = TextSelectionColors(
@@ -175,37 +174,59 @@ private fun Content(
         )
         val suggestingTitleDescription = stringResource(LR.string.bookmark_suggesting_title)
         CompositionLocalProvider(LocalTextSelectionColors provides tintTextSelectionColors) {
-            TextField(
+            val interactionSource = remember { MutableInteractionSource() }
+            val textFieldColors = TextFieldDefaults.textFieldColors(
+                textColor = colors.contrast01,
+                backgroundColor = Color.Transparent,
+                cursorColor = colors.highlight01,
+                focusedIndicatorColor = colors.highlight01,
+                unfocusedIndicatorColor = colors.highlight01,
+            )
+            val trailingIcon: (@Composable () -> Unit)? = if (titleSuggestion is BookmarkViewModel.TitleSuggestion.Generating) {
+                {
+                    CircularProgressIndicator(
+                        color = colors.contrast02,
+                        strokeWidth = 2.dp,
+                        modifier = Modifier
+                            .size(16.dp)
+                            .semantics { contentDescription = suggestingTitleDescription },
+                    )
+                }
+            } else {
+                null
+            }
+            BasicTextField(
                 value = title,
                 onValueChange = { onTitleChange(it) },
                 textStyle = LocalTextStyle.current.copy(
+                    color = colors.contrast01,
                     // if the title is too long, reduce the font size
                     fontSize = if (title.text.length > 20) 18.sp else 26.sp,
                     fontWeight = FontWeight.Bold,
                 ),
-                trailingIcon = if (titleSuggestion is BookmarkViewModel.TitleSuggestion.Generating) {
-                    {
-                        CircularProgressIndicator(
-                            color = colors.contrast02,
-                            strokeWidth = 2.dp,
-                            modifier = Modifier
-                                .size(16.dp)
-                                .semantics { contentDescription = suggestingTitleDescription },
-                        )
-                    }
-                } else {
-                    null
+                cursorBrush = SolidColor(colors.highlight01),
+                interactionSource = interactionSource,
+                decorationBox = { innerTextField ->
+                    TextFieldDefaults.TextFieldDecorationBox(
+                        value = title.text,
+                        innerTextField = innerTextField,
+                        enabled = true,
+                        singleLine = false,
+                        visualTransformation = VisualTransformation.None,
+                        interactionSource = interactionSource,
+                        trailingIcon = trailingIcon,
+                        colors = textFieldColors,
+                        contentPadding = TextFieldDefaults.textFieldWithoutLabelPadding(start = 0.dp, end = 0.dp),
+                    )
                 },
-                colors = TextFieldDefaults.textFieldColors(
-                    textColor = colors.contrast01,
-                    backgroundColor = Color.Transparent,
-                    cursorColor = colors.highlight01,
-                    focusedIndicatorColor = colors.highlight01,
-                    unfocusedIndicatorColor = colors.highlight01,
-
-                ),
                 modifier = Modifier
                     .fillMaxWidth()
+                    .indicatorLine(
+                        enabled = true,
+                        isError = false,
+                        interactionSource = interactionSource,
+                        colors = textFieldColors,
+                    )
                     .focusRequester(focusRequester)
                     .onEnter(onSave)
                     .onTabMoveFocus(),

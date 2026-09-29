@@ -1019,22 +1019,12 @@ class PodcastFragment : BaseFragment() {
     }
 
     private fun onSwipeDeleteBookmarkClick(bookmark: Bookmark, settleRow: () -> Unit) {
-        bookmarkDeleter.confirmDelete(
-            bookmarks = listOf(bookmark),
+        bookmarkDeleter.deleteWithUndo(
+            bookmark = bookmark,
             source = SourceView.PODCAST_SCREEN,
-            resources = resources,
-            fragmentManager = childFragmentManager,
+            snackbarView = (activity as FragmentHostListener).snackBarView(),
             scope = lifecycleScope,
-            onDeleted = { count ->
-                showSnackBar(
-                    resources.getStringPlural(
-                        count,
-                        LR.string.bookmarks_deleted_singular,
-                        LR.string.bookmarks_deleted_plural,
-                    ),
-                )
-            },
-            onDismissed = settleRow,
+            onUndo = settleRow,
         )
     }
 

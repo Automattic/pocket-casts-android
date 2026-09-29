@@ -236,6 +236,16 @@ class BookmarkManagerImpl @Inject constructor(
         )
     }
 
+    override suspend fun restoreToSync(bookmark: Bookmark) {
+        bookmarkDao.insert(
+            bookmark.copy(
+                deleted = false,
+                deletedModified = System.currentTimeMillis(),
+                syncStatus = SyncStatus.NOT_SYNCED,
+            ),
+        )
+    }
+
     /**
      * Remove the bookmark from the database.
      */
@@ -267,10 +277,12 @@ class BookmarkManagerImpl @Inject constructor(
                     source = source,
                 )
                 val now = System.currentTimeMillis()
+                val title = suggestion.generation.title?.takeIf { it.isNotBlank() }
+                    ?: BookmarkTitleFallback.fromPassage(suggestion.passage)
                 bookmarkDao.updateGeneratedData(
                     bookmarkUuid = bookmark.uuid,
-                    title = suggestion.generation.title,
-                    titleModified = now.takeIf { suggestion.generation.title != null },
+                    title = title,
+                    titleModified = now.takeIf { title != null },
                     passage = suggestion.passage,
                     passageLocation = suggestion.passageLocation,
                     passageModified = now,
@@ -286,7 +298,7 @@ class BookmarkManagerImpl @Inject constructor(
         }
     }
 
-    override fun enrichBookmarkPassage(bookmark: Bookmark) {
+    override fun enrichBookmarkPassage(bookmark: Bookmark, useFallbackTitle: Boolean) {
         launch(Dispatchers.IO) {
             try {
                 val window = transcriptWindowExtractor.extractWindow(
@@ -294,10 +306,11 @@ class BookmarkManagerImpl @Inject constructor(
                     timeSecs = bookmark.timeSecs,
                 ) ?: return@launch
                 val now = System.currentTimeMillis()
+                val title = if (useFallbackTitle) BookmarkTitleFallback.fromPassage(window.passage) else null
                 bookmarkDao.updateGeneratedData(
                     bookmarkUuid = bookmark.uuid,
-                    title = null,
-                    titleModified = null,
+                    title = title,
+                    titleModified = now.takeIf { title != null },
                     passage = window.passage,
                     passageLocation = window.location,
                     passageModified = now,
@@ -339,7 +352,7 @@ class BookmarkManagerImpl @Inject constructor(
         }
         val durationMs = System.currentTimeMillis() - startMs
         response.error?.let { Timber.w("Smart bookmark enrichment returned error: $it") }
-        val title = response.title?.takeIf { it.isNotEmpty() }
+        val title = response.title?.takeIf { it.isNotBlank() }
         val failureReason = when {
             title != null -> null
             response.error != null -> "server_error"

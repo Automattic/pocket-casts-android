@@ -2,16 +2,21 @@ package au.com.shiftyjelly.pocketcasts.servers.whatsnew
 
 import au.com.shiftyjelly.pocketcasts.servers.di.NetworkModule
 import java.net.HttpURLConnection.HTTP_FORBIDDEN
+import java.net.HttpURLConnection.HTTP_GATEWAY_TIMEOUT
 import java.net.HttpURLConnection.HTTP_NOT_FOUND
 import java.util.Locale
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
+import okhttp3.Cache
+import okhttp3.CacheControl
+import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertThrows
 import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.TemporaryFolder
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import retrofit2.HttpException
@@ -24,14 +29,26 @@ class WhatsNewServiceManagerImplTest {
     @get:Rule
     val server = MockWebServer()
 
-    private val service = Retrofit.Builder()
-        .baseUrl(server.url("/"))
-        .addConverterFactory(MoshiConverterFactory.create(NetworkModule().provideMoshi()))
-        .build()
-        .create<WhatsNewCatalogService>()
+    @get:Rule
+    val tempFolder = TemporaryFolder()
+
+    private val client by lazy {
+        OkHttpClient.Builder()
+            .cache(Cache(tempFolder.newFolder("http-cache"), 1024 * 1024))
+            .build()
+    }
+
+    private val service by lazy {
+        Retrofit.Builder()
+            .baseUrl(server.url("/"))
+            .client(client)
+            .addConverterFactory(MoshiConverterFactory.create(NetworkModule().provideMoshi()))
+            .build()
+            .create<WhatsNewCatalogService>()
+    }
 
     private var locale = Locale.GERMAN
-    private val serviceManager = WhatsNewServiceManagerImpl(service) { locale }
+    private val serviceManager by lazy { WhatsNewServiceManagerImpl(service) { locale } }
 
     @Test
     fun `asks for the catalog published for the app's locale`() = runTest {
@@ -39,10 +56,53 @@ class WhatsNewServiceManagerImplTest {
 
         val catalog = serviceManager.getCatalog()
 
-        val request = server.takeRequest()
-        assertEquals("/whats-new/v1/android/de.json", request.path)
-        assertEquals("no-cache", request.getHeader("Cache-Control"))
+        assertEquals("/whats-new/v1/android/de.json", server.takeRequest().path)
         assertEquals("Browse by network", catalog.messages.single().title)
+    }
+
+    @Test
+    fun `revalidates the catalog when asked to skip the cache`() = runTest {
+        server.enqueue(catalogResponse())
+
+        serviceManager.getCatalog(CacheControl.FORCE_NETWORK)
+
+        assertEquals("no-cache", server.takeRequest().getHeader("Cache-Control"))
+    }
+
+    @Test
+    fun `reads the cached catalog without the network`() = runTest {
+        server.enqueue(catalogResponse())
+        serviceManager.getCatalog()
+
+        val catalog = serviceManager.getCatalog(CacheControl.FORCE_CACHE)
+
+        assertEquals(1, server.requestCount)
+        assertEquals("Browse by network", catalog.messages.single().title)
+    }
+
+    @Test
+    fun `reads the cached english catalog when the locale was never cached`() = runTest {
+        locale = Locale.FRENCH
+        server.enqueue(MockResponse().setResponseCode(HTTP_FORBIDDEN))
+        server.enqueue(catalogResponse())
+        serviceManager.getCatalog()
+
+        val catalog = serviceManager.getCatalog(CacheControl.FORCE_CACHE)
+
+        assertEquals(2, server.requestCount)
+        assertEquals("Browse by network", catalog.messages.single().title)
+    }
+
+    @Test
+    fun `an empty cache is reported as a failure`() = runTest {
+        locale = Locale.FRENCH
+
+        val error = assertThrows(HttpException::class.java) {
+            runBlocking { serviceManager.getCatalog(CacheControl.FORCE_CACHE) }
+        }
+
+        assertEquals(HTTP_GATEWAY_TIMEOUT, error.code())
+        assertEquals(0, server.requestCount)
     }
 
     @Test
@@ -91,7 +151,7 @@ class WhatsNewServiceManagerImplTest {
 
     private fun fetchCatalog() = runBlocking { serviceManager.getCatalog() }
 
-    private fun catalogResponse() = MockResponse().setBody(
+    private fun catalogResponse() = MockResponse().setHeader("Cache-Control", "max-age=1800").setBody(
         """
         {
           "schemaVersion": 1,

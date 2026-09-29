@@ -28,6 +28,7 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.AbsoluteAlignment
@@ -121,13 +122,17 @@ fun SwipeRow(
     )
     var rowWidthPx by remember { mutableIntStateOf(0) }
 
-    val anchors = remember(rowWidthPx, actionWidthPx, leadingAction, trailingAction) {
+    val hasLeadingAction = leadingAction != null
+    val hasTrailingAction = trailingAction != null
+    val isLeadingFullSwipeEnabled = leadingAction?.isFullSwipeEnabled == true
+    val isTrailingFullSwipeEnabled = trailingAction?.isFullSwipeEnabled == true
+    val anchors = remember(rowWidthPx, actionWidthPx, hasLeadingAction, hasTrailingAction, isLeadingFullSwipeEnabled, isTrailingFullSwipeEnabled) {
         swipeRowAnchors(
             rowWidthPx = rowWidthPx.toFloat(),
-            leadingWidthPx = actionWidthPx.takeIf { leadingAction != null },
-            trailingWidthPx = actionWidthPx.takeIf { trailingAction != null },
-            isLeadingFullSwipeEnabled = leadingAction?.isFullSwipeEnabled == true,
-            isTrailingFullSwipeEnabled = trailingAction?.isFullSwipeEnabled == true,
+            leadingWidthPx = actionWidthPx.takeIf { hasLeadingAction },
+            trailingWidthPx = actionWidthPx.takeIf { hasTrailingAction },
+            isLeadingFullSwipeEnabled = isLeadingFullSwipeEnabled,
+            isTrailingFullSwipeEnabled = isTrailingFullSwipeEnabled,
         )
     }
     SideEffect {
@@ -159,14 +164,18 @@ fun SwipeRow(
         }
     }
 
-    LaunchedEffect(state, leadingAction, trailingAction) {
-        snapshotFlow { state.draggableState.settledValue }.collect { anchor ->
-            when (anchor) {
-                SwipeRowAnchor.FullLeading -> leadingAction?.onClick?.invoke(state)
-                SwipeRowAnchor.FullTrailing -> trailingAction?.onClick?.invoke(state)
-                else -> Unit
+    val latestLeadingAction by rememberUpdatedState(leadingAction)
+    val latestTrailingAction by rememberUpdatedState(trailingAction)
+    LaunchedEffect(state) {
+        snapshotFlow { state.draggableState.settledValue }
+            .drop(1)
+            .collect { anchor ->
+                when (anchor) {
+                    SwipeRowAnchor.FullLeading -> latestLeadingAction?.onClick?.invoke(state)
+                    SwipeRowAnchor.FullTrailing -> latestTrailingAction?.onClick?.invoke(state)
+                    else -> Unit
+                }
             }
-        }
     }
 
     Box(
@@ -242,6 +251,7 @@ private fun BoxScope.SwipeRowActionSlab(
             .graphicsLayer {
                 val offset = state.settledOffset
                 translationX = if (isLeading) (offset - rowWidthPx).coerceAtMost(0f) else (offset + rowWidthPx).coerceAtLeast(0f)
+                clip = true
             }
             .background(action.backgroundColor)
             .clickable(

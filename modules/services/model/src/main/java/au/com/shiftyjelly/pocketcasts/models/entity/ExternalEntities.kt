@@ -112,7 +112,7 @@ sealed interface ExternalEpisode {
         val artworkUrl: String?,
         val tintColorIndex: Int,
     ) : ExternalEpisode {
-        override val coverUrl get() = artworkUrl?.takeIf { tintColorIndex == 0 } ?: "${BuildConfig.SERVER_STATIC_URL}/discover/images/artwork/dark/960/$tintColorIndex.png"
+        override val coverUrl get() = artworkUrl?.takeIf { tintColorIndex == 0 } ?: userEpisodePlaceholderArtworkUrl(tintColorIndex, isDarkTheme = true, size = 960)
     }
 }
 
@@ -167,3 +167,8 @@ data class ExternalPodcastView(
 private fun podcastCover(podcastId: String) = "${BuildConfig.SERVER_STATIC_URL}/discover/images/webp/960/$podcastId.webp"
 
 private fun landscapePodcastCover(podcastId: String) = "${BuildConfig.SERVER_STATIC_URL}/engage/$podcastId.jpg"
+
+fun userEpisodePlaceholderArtworkUrl(tintColorIndex: Int, isDarkTheme: Boolean, size: Int): String {
+    val themeType = if (isDarkTheme) "dark" else "light"
+    return "${BuildConfig.SERVER_STATIC_URL}/discover/images/artwork/$themeType/$size/$tintColorIndex.webp"
+}

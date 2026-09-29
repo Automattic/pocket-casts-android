@@ -260,14 +260,12 @@ class BookmarksFragment : BaseFragment() {
     }
 
     private fun onSwipeDeleteBookmarkClick(bookmark: Bookmark, settleRow: () -> Unit) {
-        bookmarkDeleter.confirmDelete(
-            bookmarks = listOf(bookmark),
+        bookmarkDeleter.deleteWithUndo(
+            bookmark = bookmark,
             source = sourceView,
-            resources = resources,
-            fragmentManager = childFragmentManager,
+            snackbarView = requireView(),
             scope = lifecycleScope,
-            onDeleted = { count -> bookmarksViewModel.onBookmarksDeleted(count) },
-            onDismissed = settleRow,
+            onUndo = settleRow,
         )
     }
 

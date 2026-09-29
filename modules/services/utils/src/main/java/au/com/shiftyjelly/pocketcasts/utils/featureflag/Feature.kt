@@ -372,11 +372,20 @@ enum class Feature(
     WEAR_QR_SIGN_IN(
         key = "wear_qr_sign_in",
         title = "Log in to the Wear OS app with a QR code",
-        defaultValue = isDebugOrPrototypeBuild,
+        defaultValue = true,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
         addedOn = LocalDate.parse("2026-09-14"),
+    ),
+    WHATS_NEW_FEED(
+        key = "whats_new_feed",
+        title = "What's New feed",
+        defaultValue = isDebugOrPrototypeBuild,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+        addedOn = LocalDate.parse("2026-09-22"),
     ),
 }
 

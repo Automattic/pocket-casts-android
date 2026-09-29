@@ -5,12 +5,12 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkGenerationAnalytics
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkSuggestion
+import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkTitleFallback
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.shownotes.ShowNotesManager
@@ -62,6 +62,7 @@ class BookmarkViewModel
     private var capturedSuggestion: BookmarkSuggestion? = null
     private var passageEdited = false
     private var loadJob: Job? = null
+    private var hasTrackedShown = false
     private var analyticsSource: SourceViewType = SourceViewType.Player
 
     private val defaultTitle: String get() = context.getString(LR.string.bookmark)
@@ -114,16 +115,22 @@ class BookmarkViewModel
         loadJob = viewModelScope.launch {
             // load the existing bookmark
             val episode = episodeManager.findEpisodeByUuid(arguments.episodeUuid)
-            val bookmark = if (bookmarkUuid == null) {
-                if (episode == null) return@launch
-                bookmarkManager.findByEpisodeTime(
+            val bookmark = when {
+                bookmarkUuid != null -> bookmarkManager.findBookmark(bookmarkUuid)
+
+                episode != null -> bookmarkManager.findByEpisodeTime(
                     episode = episode,
                     timeSecs = arguments.timeSecs,
                 )
-            } else {
-                bookmarkManager.findBookmark(bookmarkUuid)
+
+                else -> null
             }
             val podcastUuid = bookmark?.podcastUuid ?: (episode as? PodcastEpisode)?.podcastUuid
+            mutableUiState.value = mutableUiState.value.copy(
+                podcastUuid = podcastUuid,
+                isNewBookmark = mutableUiState.value.isNewBookmark && (bookmark == null || bookmarkUuid != null),
+            )
+            trackShown()
             if (bookmark != null) {
                 originalTitle = bookmark.title
                 mutableUiState.value = mutableUiState.value.copy(
@@ -132,8 +139,6 @@ class BookmarkViewModel
                     passage = displayPassage(bookmark),
                     passageLocation = bookmark.passageLocation,
                     referenceTime = bookmark.referenceTime,
-                    podcastUuid = podcastUuid,
-                    isNewBookmark = mutableUiState.value.isNewBookmark && bookmarkUuid != null,
                 )
                 val passage = bookmark.passage
                 if (mutableUiState.value.isNewBookmark && passage != null && FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS)) {
@@ -142,8 +147,7 @@ class BookmarkViewModel
                 if (displayPassage(bookmark) != null) {
                     updateCanEditTranscript()
                 }
-            } else if (bookmarkUuid == null && FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS)) {
-                mutableUiState.value = mutableUiState.value.copy(podcastUuid = podcastUuid)
+            } else if (bookmarkUuid == null && episode != null && FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS)) {
                 generateTitleSuggestion(arguments.episodeUuid, arguments.timeSecs)
             }
         }
@@ -180,12 +184,7 @@ class BookmarkViewModel
         } else {
             mutableUiState.value.copy(isCapturingPassage = false)
         }
-        val suggestedTitle = suggestion?.generation?.title?.takeIf { it.isNotBlank() }
-        when {
-            suggestedTitle == null -> mutableUiState.value = mutableUiState.value.copy(titleSuggestion = TitleSuggestion.None)
-            uiState.value.title.text == originalTitle -> applySuggestion(suggestedTitle)
-            else -> mutableUiState.value = mutableUiState.value.copy(titleSuggestion = TitleSuggestion.Available(suggestedTitle))
-        }
+        showTitleSuggestion(suggestion?.generation?.title, suggestion?.passage)
     }
 
     private suspend fun generateTitleSuggestionFromPassage(passage: String) {
@@ -196,11 +195,18 @@ class BookmarkViewModel
         generation?.let {
             bookmarkGenerationAnalytics.report(it, arguments.episodeUuid, uiState.value.podcastUuid, BookmarkEnrichmentTriggerType.EditSheet, analyticsSource)
         }
-        val suggestedTitle = generation?.title?.takeIf { it.isNotBlank() }
+        showTitleSuggestion(generation?.title, passage)
+    }
+
+    private fun showTitleSuggestion(generatedTitle: String?, passage: String?) {
+        val suggestedTitle = generatedTitle?.takeIf { it.isNotBlank() }
+        val isTitleUnchanged = uiState.value.title.text == originalTitle
+        val fallbackTitle = BookmarkTitleFallback.fromPassage(passage)
         when {
-            suggestedTitle == null -> mutableUiState.value = mutableUiState.value.copy(titleSuggestion = TitleSuggestion.None)
-            uiState.value.title.text == originalTitle -> applySuggestion(suggestedTitle)
-            else -> mutableUiState.value = mutableUiState.value.copy(titleSuggestion = TitleSuggestion.Available(suggestedTitle))
+            suggestedTitle != null && isTitleUnchanged -> applySuggestion(suggestedTitle)
+            suggestedTitle != null -> mutableUiState.value = mutableUiState.value.copy(titleSuggestion = TitleSuggestion.Available(suggestedTitle))
+            fallbackTitle != null && isTitleUnchanged -> applySuggestion(fallbackTitle)
+            else -> mutableUiState.value = mutableUiState.value.copy(titleSuggestion = TitleSuggestion.None)
         }
     }
 
@@ -276,7 +282,7 @@ class BookmarkViewModel
                         referenceTime = editedReferenceTimeSecs ?: suggestion?.referenceTimeSecs,
                     )
                     if (suggestion == null && FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS)) {
-                        bookmarkManager.enrichBookmarkPassage(created)
+                        bookmarkManager.enrichBookmarkPassage(created, useFallbackTitle = title == defaultTitle)
                     }
                     created
                 } else {
@@ -297,25 +303,35 @@ class BookmarkViewModel
         }
     }
 
-    fun onShown(isNewBookmark: Boolean, source: SourceView) {
+    private fun trackShown() {
+        if (hasTrackedShown) return
+        hasTrackedShown = true
         eventHorizon.track(
             BookmarkEditFormShownEvent(
-                source = source.analyticsValue,
-                isNewBookmark = isNewBookmark,
+                source = analyticsSource,
+                isNewBookmark = uiState.value.isNewBookmark,
+                episodeUuid = arguments.episodeUuid,
+                podcastUuid = uiState.value.podcastUuid,
             ),
         )
     }
 
     fun onClose() {
+        if (!::arguments.isInitialized) return
+        trackShown()
         eventHorizon.track(
             BookmarkEditFormDismissedEvent(
                 source = analyticsSource,
                 isNewBookmark = uiState.value.isNewBookmark,
+                episodeUuid = arguments.episodeUuid,
+                podcastUuid = uiState.value.podcastUuid,
             ),
         )
     }
 
     fun onSubmitBookmark() {
+        if (!::arguments.isInitialized) return
+        trackShown()
         val state = uiState.value
         eventHorizon.track(
             BookmarkEditFormSubmittedEvent(
@@ -323,6 +339,8 @@ class BookmarkViewModel
                 isNewBookmark = state.isNewBookmark,
                 hasPassage = state.passage?.isNotEmpty() == true,
                 passageChanged = passageEdited,
+                episodeUuid = arguments.episodeUuid,
+                podcastUuid = state.podcastUuid,
             ),
         )
     }

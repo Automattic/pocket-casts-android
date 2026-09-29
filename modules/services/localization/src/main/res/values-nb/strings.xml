@@ -22,7 +22,6 @@ Language: nb_NO
     <string name="add_bookmark_title">Legg til bokmerke</string>
     <string name="bookmark_added">Bokmerker %s er lagt til</string>
     <string name="change_title">Endre tittel</string>
-    <string name="add_bookmark_title_hint">Legg til en valgfri tittel for å identifisere dette bokmerket</string>
     <string name="save_bookmark">Lagre bokmerke</string>
     <string name="playing_bookmark">Spiller av %s</string>
     <string name="skipping_to">Hopper til %s</string>

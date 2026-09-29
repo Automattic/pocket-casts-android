@@ -1,3 +1,7 @@
+8.23
+-----
+
+
 8.22
 -----
 *   New Features
@@ -34,6 +38,8 @@
         ([#5656](https://github.com/Automattic/pocket-casts-android/pull/5656))
     *   Keep the episode on screen in the car when the Up Next queue runs out
         ([#6031](https://github.com/Automattic/pocket-casts-android/pull/6031))
+    *   Keep the Automotive account screens usable at large font sizes by not opening the keyboard over them
+        ([#6030](https://github.com/Automattic/pocket-casts-android/pull/6030))
 
 8.21
 -----

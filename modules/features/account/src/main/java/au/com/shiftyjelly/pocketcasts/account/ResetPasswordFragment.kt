@@ -14,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.account.viewmodel.ResetPasswordState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.ResetPasswordViewModel
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getTintedDrawable
+import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.views.extensions.addOnTextChanged
 import au.com.shiftyjelly.pocketcasts.views.extensions.showKeyboard
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
@@ -43,7 +44,9 @@ class ResetPasswordFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding?.progress?.isVisible = false
-        binding?.txtEmail?.showKeyboard()
+        if (!Util.isCarUiMode(view.context)) {
+            binding?.txtEmail?.showKeyboard()
+        }
 
         viewModel.clearValues()
 

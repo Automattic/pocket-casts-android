@@ -5,6 +5,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.snap
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
@@ -15,11 +16,14 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.systemGestureExclusion
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -29,12 +33,15 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
@@ -55,8 +62,13 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.LocalPodcastColors
+import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
+import au.com.shiftyjelly.pocketcasts.compose.PodcastColorsParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
+import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.BookmarkTranscript
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TextSpan
@@ -68,10 +80,12 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 /**
- * Renders a [BookmarkTranscript] with the bookmarked [passage] highlighted in the primary text
- * colour and the surrounding transcript dimmed, scrolling the passage into view. Read-only in the
- * bookmark details; when [editable] a tap selects the sentence it lands in and a drag extends the
- * passage across sentences, reporting the new span through [onPassageChange].
+ * Renders a [BookmarkTranscript] scrolled to the bookmarked [passage]. Read-only in the bookmark
+ * details, where the passage is drawn in the primary text colour and the rest of the transcript is
+ * dimmed. When [editable] the whole transcript is drawn in [editableTextColor] and the passage is
+ * marked by an [editableHighlightColor] background; a tap selects the sentence it lands in, a drag
+ * extends the passage across sentences, and handles at either end move its start or end a word at a
+ * time, reporting the new span through [onPassageChange].
  */
 @Composable
 fun BookmarkTranscriptView(
@@ -82,6 +96,9 @@ fun BookmarkTranscriptView(
     scrollToPassage: Boolean = true,
     anchorFraction: Float = 0.5f,
     referenceOffset: Int? = null,
+    editableTextColor: Color = Color.Unspecified,
+    editableHighlightColor: Color = Color.Unspecified,
+    handleColor: Color = Color.Unspecified,
     onPassageChange: (TextSpan) -> Unit = {},
 ) {
     val theme = rememberTranscriptTheme()
@@ -100,17 +117,25 @@ fun BookmarkTranscriptView(
     )
     val currentLayout by rememberUpdatedState(layout)
     val currentPassageChange by rememberUpdatedState(onPassageChange)
+    val selectSentence: (Int) -> Unit = { offset ->
+        if (!transcript.isSpeakerOffset(offset)) {
+            currentPassageChange(transcript.sentenceDisplaySpan(offset))
+        }
+    }
 
-    val text = remember(transcript, passage, theme, editable) {
+    val editableColor = editableTextColor.takeOrElse { theme.primaryText }
+    val highlightColor = editableHighlightColor.takeOrElse { theme.highlightText }
+    val text = remember(transcript, passage, theme, editable, editableColor, highlightColor) {
         buildAnnotatedString {
             append(transcript.displayText)
-            addStyle(SpanStyle(color = theme.secondaryText), 0, transcript.displayText.length)
+            val baseColor = if (editable) editableColor else theme.secondaryText
+            addStyle(SpanStyle(color = baseColor), 0, transcript.displayText.length)
             transcript.speakerSpans.forEach { span ->
                 addStyle(SpeakerSpanStyle, span.start, span.end)
             }
             passage?.let {
                 val style = if (editable) {
-                    SpanStyle(color = theme.primaryText, background = theme.highlightText.copy(alpha = 0.24f))
+                    SpanStyle(background = highlightColor.copy(alpha = 0.24f))
                 } else {
                     SpanStyle(color = theme.primaryText)
                 }
@@ -150,10 +175,7 @@ fun BookmarkTranscriptView(
                                 .pointerInput(transcript) {
                                     detectTapGestures { position ->
                                         val result = currentLayout ?: return@detectTapGestures
-                                        val offset = result.getOffsetForPosition(position)
-                                        if (!transcript.isSpeakerOffset(offset)) {
-                                            currentPassageChange(transcript.sentenceDisplaySpan(offset))
-                                        }
+                                        selectSentence(result.getOffsetForPosition(position))
                                     }
                                 }
                                 .pointerInput(transcript) {
@@ -193,7 +215,7 @@ fun BookmarkTranscriptView(
                     Icon(
                         painter = painterResource(IR.drawable.ic_bookmark_fill),
                         contentDescription = null,
-                        tint = theme.primaryText,
+                        tint = if (editable) editableColor else theme.primaryText,
                         modifier = Modifier
                             .size(GlyphBox)
                             .offset {
@@ -204,6 +226,35 @@ fun BookmarkTranscriptView(
                             },
                     )
                 }
+            }
+            val handleLayout = layout
+            if (editable && passage != null && !passage.isEmpty && handleLayout != null) {
+                val color = handleColor.takeOrElse { theme.highlightText }
+                PassageHandle(
+                    edge = HandleEdge.Start,
+                    layout = handleLayout,
+                    passage = passage,
+                    color = color,
+                    onTap = selectSentence,
+                    onMove = { index ->
+                        if (!transcript.isSpeakerOffset(index)) {
+                            currentPassageChange(transcript.movePassageStart(passage, index))
+                        }
+                    },
+                )
+                PassageHandle(
+                    edge = HandleEdge.End,
+                    layout = handleLayout,
+                    passage = passage,
+                    color = color,
+                    onTap = selectSentence,
+                    onMove = { offset ->
+                        val index = (offset - 1).coerceAtLeast(0)
+                        if (!transcript.isSpeakerOffset(index)) {
+                            currentPassageChange(transcript.movePassageEnd(passage, index))
+                        }
+                    },
+                )
             }
         }
     }
@@ -222,6 +273,73 @@ fun BookmarkTranscriptView(
     }
 }
 
+private enum class HandleEdge { Start, End }
+
+@Composable
+private fun PassageHandle(
+    edge: HandleEdge,
+    layout: TextLayoutResult,
+    passage: TextSpan,
+    color: Color,
+    onTap: (Int) -> Unit,
+    onMove: (Int) -> Unit,
+) {
+    val box = when (edge) {
+        HandleEdge.Start -> layout.getBoundingBox(passage.start)
+        HandleEdge.End -> layout.getBoundingBox(passage.end - 1)
+    }
+    val density = LocalDensity.current
+    val knobPx = with(density) { HandleKnob.toPx() }
+    val touchPx = with(density) { HandleTouch.toPx() }
+    val stem = Offset(x = if (edge == HandleEdge.Start) box.left else box.right, y = box.center.y)
+    val knobY = if (edge == HandleEdge.Start) box.top - knobPx / 2 else box.bottom + knobPx / 2
+    val stemTop = min(box.top, knobY)
+    val stemHeight = with(density) { (max(box.bottom, knobY) - stemTop).toDp() }
+    val currentStem by rememberUpdatedState(stem)
+    val currentTouchOrigin by rememberUpdatedState(Offset(stem.x - touchPx / 2, knobY - touchPx / 2))
+    val currentLayout by rememberUpdatedState(layout)
+    val currentOnMove by rememberUpdatedState(onMove)
+    val currentOnTap by rememberUpdatedState(onTap)
+    Box {
+        Box(
+            modifier = Modifier
+                .offset {
+                    IntOffset(
+                        x = (Gutter.toPx() + stem.x - HandleStem.toPx() / 2).roundToInt(),
+                        y = (TopFade.toPx() + stemTop).roundToInt(),
+                    )
+                }
+                .size(width = HandleStem, height = stemHeight)
+                .background(color),
+        )
+        Box(
+            modifier = Modifier
+                .offset {
+                    IntOffset(
+                        x = (Gutter.toPx() + stem.x - HandleTouch.toPx() / 2).roundToInt(),
+                        y = (TopFade.toPx() + knobY - HandleTouch.toPx() / 2).roundToInt(),
+                    )
+                }
+                .size(HandleTouch)
+                .systemGestureExclusion()
+                .pointerInput(edge) {
+                    detectTapGestures { position ->
+                        currentOnTap(currentLayout.getOffsetForPosition(currentTouchOrigin + position))
+                    }
+                }
+                .pointerInput(edge) {
+                    var position = Offset.Zero
+                    detectDragGestures(onDragStart = { position = currentStem }) { change, dragAmount ->
+                        change.consume()
+                        position += dragAmount
+                        currentOnMove(currentLayout.getOffsetForPosition(position))
+                    }
+                }
+                .drawBehind { drawCircle(color, radius = knobPx / 2) },
+        )
+    }
+}
+
 private fun BookmarkTranscript.isSpeakerOffset(index: Int) = speakerSpans.any { index in it.start until it.end }
 
 private val SimpleTextStyle = TextStyle(
@@ -237,13 +355,16 @@ private val SpeakerSpanStyle = SpanStyle(
 )
 
 private val Gutter = 28.dp
+private val HandleKnob = 12.dp
+private val HandleStem = 2.dp
+private val HandleTouch = 40.dp
 private val GlyphBox = 24.dp
 
 private val TopFade = 48.dp
 private val BottomFade = 64.dp
 
 private val ContentPadding = PaddingValues(start = Gutter, end = Gutter, top = TopFade, bottom = BottomFade)
-private val EditContentPadding = PaddingValues(start = Gutter, end = Gutter, top = TopFade, bottom = 0.dp)
+private val EditContentPadding = PaddingValues(start = Gutter, end = Gutter, top = TopFade, bottom = HandleTouch / 2)
 
 private val FadeInThresholdMs = 200L
 
@@ -295,5 +416,29 @@ private fun BookmarkTranscriptViewPreview(
             referenceOffset = passage.start,
             modifier = Modifier.background(rememberTranscriptTheme().background),
         )
+    }
+}
+
+@Preview
+@Composable
+private fun BookmarkTranscriptViewEditablePreview(
+    @PreviewParameter(PodcastColorsParameterProvider::class) podcastColors: PodcastColors,
+) {
+    val transcript = remember { BookmarkTranscript.from(Transcript.TextPreview) }
+    val passage = remember { transcript.sentenceDisplaySpan(index = 40) }
+    AppTheme(ThemeType.DARK) {
+        CompositionLocalProvider(LocalPodcastColors provides podcastColors) {
+            val playerColors = requireNotNull(MaterialTheme.theme.rememberPlayerColors())
+            BookmarkTranscriptView(
+                transcript = transcript,
+                passage = passage,
+                editable = true,
+                scrollToPassage = false,
+                referenceOffset = passage.start,
+                editableTextColor = playerColors.contrast01,
+                editableHighlightColor = playerColors.highlight01,
+                modifier = Modifier.background(playerColors.background01),
+            )
+        }
     }
 }

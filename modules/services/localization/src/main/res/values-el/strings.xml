@@ -483,7 +483,6 @@ Language: el_GR
     <string name="bookmark_notification_title_added">Προστέθηκε σελιδοδείκτης</string>
     <string name="notification_channel_description_podcast_import">Εισαγωγή συλλογών podcast</string>
     <string name="notification_channel_description_playback_error">Σφάλματα κατά την αναπαραγωγή</string>
-    <string name="change_bookmark_title_hint">Άλλαξε τον τίτλο που προσδιορίζει αυτόν το σελιδοδείκτη</string>
     <string name="bookmark">Σελιδοδείκτης</string>
     <string name="details">Λεπτομέρειες</string>
     <string name="episode">Επεισόδιο</string>
@@ -495,7 +494,6 @@ Language: el_GR
     <string name="settings_notification_play_over_duck">Μείωση έντασης</string>
     <string name="skipping_to">Παράλειψη σε %s</string>
     <string name="save_bookmark">Αποθήκευση σελιδοδείκτη</string>
-    <string name="add_bookmark_title_hint">Πρόσθεσε έναν προαιρετικό τίτλο για να αναγνωρίζεις αυτό το σελιδοδείκτη</string>
     <string name="change_title">Αλλαγή τίτλου</string>
     <string name="add_bookmark">Προσθήκη σελιδοδείκτη</string>
     <string name="playing_bookmark">Παίζει «%s»</string>

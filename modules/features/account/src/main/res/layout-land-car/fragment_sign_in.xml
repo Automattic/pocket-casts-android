@@ -3,12 +3,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="?attr/primary_ui_01"
+    android:fillViewport="true">
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/primary_ui_01"
-        android:padding="16dp">
+        android:paddingTop="16dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="128dp">
 
         <ProgressBar
             android:id="@+id/progress"
@@ -38,6 +42,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toTopOf="@id/emailLayout"
+            app:layout_constraintVertical_bias="0"
             app:layout_constraintVertical_chainStyle="packed"/>
 
         <com.google.android.material.textfield.TextInputLayout

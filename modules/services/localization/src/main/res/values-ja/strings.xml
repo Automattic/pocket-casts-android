@@ -1,25 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-09-10 09:56:40+0000
+Translation-Revision-Date: 2026-09-16 18:10:43+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="bookmark_edit_transcript_title">トランスクリプトを編集</string>
+    <string name="bookmarks_upgrade_example_title">オーディション室</string>
+    <string name="bookmark_edit_transcript_subtitle">このブックマークにトランスクリプトの一節を選択</string>
     <string name="search_filters_networks">ネットワーク</string>
     <string name="discover_networks">ネットワーク</string>
     <string name="discover_network">ネットワーク</string>
     <string name="device_approve_login_required">端末を接続するにはアカウントが必要です。 ログインするか、アカウントを作成してもう一度お試しください。</string>
     <string name="device_approve_error_message">しばらくしてからもう一度お試しください。</string>
     <string name="device_approve_error_title">端末の承認に失敗しました</string>
-    <string name="device_approve_expired_message">テレビに戻って新たに生成してください。</string>
     <string name="device_approve_expired_title">QR コードの有効期限が切れました</string>
-    <string name="device_approve_success_message">テレビがアカウントに接続されました。</string>
-    <string name="device_approve_success_title">テレビが接続されました</string>
     <string name="device_approve_connect">接続</string>
     <string name="device_approve_signing_in_as">次でログイン中…</string>
     <string name="device_approve_description">聴取内容は自動的に同期されます。\n接続はいつでも「設定」から解除できます。</string>
-    <string name="device_approve_title">テレビに接続</string>
     <string name="tv_settings_subscription_plan">プラン</string>
     <string name="tv_settings_subscription_next_renewal">次回の更新</string>
     <string name="tv_settings_subscription_lifetime">無期限</string>
@@ -985,7 +984,6 @@ Language: ja_JP
     <string name="notification_channel_description_playback_error">再生中のエラー</string>
     <string name="notification_channel_description_episode">新しいエピソードが公開されると表示されます</string>
     <string name="notification_channel_description_download">Pocket Casts のエピソードのダウンロード中に表示されます</string>
-    <string name="change_bookmark_title_hint">このブックマークを特定するタイトルを変更します</string>
     <string name="bookmark">ブックマーク</string>
     <string name="details">詳細</string>
     <string name="episode">エピソード</string>
@@ -998,7 +996,6 @@ Language: ja_JP
     <string name="skipping_to"> %s にスキップしています</string>
     <string name="playing_bookmark">「%s」を再生中 </string>
     <string name="save_bookmark">ブックマークを保存</string>
-    <string name="add_bookmark_title_hint">任意のタイトルを追加してこのブックマークを特定</string>
     <string name="change_title">タイトルを変更</string>
     <string name="bookmark_added">ブックマーク「%s」を追加しました</string>
     <string name="add_bookmark_title">ブックマークを追加</string>

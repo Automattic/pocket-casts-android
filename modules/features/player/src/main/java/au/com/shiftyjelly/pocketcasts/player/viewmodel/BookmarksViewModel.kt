@@ -320,12 +320,6 @@ class BookmarksViewModel
         return Triple(podcast, episode, bookmark)
     }
 
-    fun onBookmarksDeleted(count: Int) {
-        viewModelScope.launch {
-            _message.emit(BookmarkMessage.BookmarksDeleted(count))
-        }
-    }
-
     fun onSearchTextChanged(searchText: String) {
         (uiState.value as? UiState.Loaded)?.let {
             _uiState.value = it.copy(searchText = searchText)
@@ -500,7 +494,6 @@ class BookmarksViewModel
 
     sealed class BookmarkMessage {
         data object BookmarkEpisodeNotFound : BookmarkMessage()
-        data class BookmarksDeleted(val count: Int) : BookmarkMessage()
         data class PlayingBookmark(val bookmarkTitle: String) : BookmarkMessage()
     }
 
