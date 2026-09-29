@@ -166,6 +166,7 @@ class MediaButtonEventHandlerTest {
 
         assertFalse(handler.handle(keyEvent(KeyEvent.KEYCODE_VOLUME_UP)))
         assertFalse(handler.handle(keyEvent(KeyEvent.KEYCODE_MEDIA_PLAY, KeyEvent.ACTION_UP)))
+        assertFalse(handler.handle(keyEvent(KeyEvent.KEYCODE_MEDIA_PAUSE, repeatCount = 1)))
     }
 
     @Test
@@ -252,26 +253,6 @@ class MediaButtonEventHandlerTest {
     }
 
     @Test
-    fun `held KEYCODE_MEDIA_PLAY while playing does not resolve a multi tap`() = runTest {
-        var immediatePlayCount = 0
-        val events = mutableListOf<MediaEvent>()
-        val handler = MediaButtonEventHandler(
-            scopeProvider = { this },
-            onImmediatePlay = { immediatePlayCount++ },
-            onMediaEvent = events::add,
-            isPlaying = { true },
-        )
-
-        handler.handle(keyEvent(KeyEvent.KEYCODE_MEDIA_PLAY))
-        advanceTimeBy(490)
-        handler.handle(keyEvent(KeyEvent.KEYCODE_MEDIA_PLAY, repeatCount = 1))
-
-        advanceUntilIdle()
-        assertEquals(1, immediatePlayCount)
-        assertEquals(emptyList<MediaEvent>(), events)
-    }
-
-    @Test
     fun `held toggle keys while playing resolve a single tap`() = runTest {
         for (keyCode in listOf(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE, KeyEvent.KEYCODE_HEADSETHOOK)) {
             var immediatePlayCount = 0
@@ -308,9 +289,9 @@ class MediaButtonEventHandlerTest {
                 isPlaying = { false },
             )
 
-            handler.handle(keyEvent(keyCode))
+            assertTrue(handler.handle(keyEvent(keyCode)))
             advanceTimeBy(400)
-            handler.handle(keyEvent(keyCode, repeatCount = 1))
+            assertTrue(handler.handle(keyEvent(keyCode, repeatCount = 1)))
 
             advanceUntilIdle()
             assertEquals(1, immediatePlayCount)
@@ -331,7 +312,7 @@ class MediaButtonEventHandlerTest {
         handler.handle(keyEvent(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE))
         advanceTimeBy(700)
         for (repeatCount in 1..3) {
-            handler.handle(keyEvent(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE, repeatCount = repeatCount))
+            assertTrue(handler.handle(keyEvent(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE, repeatCount = repeatCount)))
             advanceTimeBy(50)
         }
 
@@ -353,7 +334,7 @@ class MediaButtonEventHandlerTest {
         advanceTimeBy(200)
         handler.handle(keyEvent(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE))
         advanceTimeBy(300)
-        handler.handle(keyEvent(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE, repeatCount = 1))
+        assertTrue(handler.handle(keyEvent(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE, repeatCount = 1)))
 
         advanceUntilIdle()
         assertEquals(listOf(MediaEvent.DoubleTap), events)
@@ -376,18 +357,6 @@ class MediaButtonEventHandlerTest {
 
         advanceUntilIdle()
         assertEquals(List(3) { MediaEvent.DoubleTap }, events)
-    }
-
-    @Test
-    fun `held unhandled keys return false`() = runTest {
-        val handler = MediaButtonEventHandler(
-            scopeProvider = { this },
-            onImmediatePlay = {},
-            onMediaEvent = {},
-            isPlaying = { false },
-        )
-
-        assertFalse(handler.handle(keyEvent(KeyEvent.KEYCODE_MEDIA_PAUSE, repeatCount = 1)))
     }
 
     private fun keyEvent(

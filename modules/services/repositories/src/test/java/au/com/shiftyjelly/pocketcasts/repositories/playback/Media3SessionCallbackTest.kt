@@ -425,6 +425,7 @@ class Media3SessionCallbackTest {
         assertTrue(sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_PLAY, repeatCount = 1))
         testScope.advanceUntilIdle()
 
+        verify(playbackManager).playIfNotPlaying(sourceView = any())
         verify(playbackManager, never()).skipForwardSuspend(sourceView = any(), jumpAmountSeconds = any())
         verify(playbackManager, never()).playQueue(any(), any())
         verify(playbackManager, never()).playPause(any())
