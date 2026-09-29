@@ -387,6 +387,15 @@ enum class Feature(
         hasDevToggle = true,
         addedOn = LocalDate.parse("2026-09-22"),
     ),
+    WHATS_NEW_POLLS(
+        key = "whats_new_polls",
+        title = "What's New polls",
+        defaultValue = false,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+        addedOn = LocalDate.parse("2026-09-29"),
+    ),
 }
 
 sealed class FeatureTier {
