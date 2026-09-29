@@ -88,7 +88,7 @@ class WhatsNewReadStateStore @Inject constructor(
             val answers = JSONObject(json)
             answers.keys().asSequence().associateWith(answers::getString)
         } catch (e: JSONException) {
-            Timber.w(e, "What's New: dropping unreadable poll answers")
+            Timber.w(e, "Could not read the What's New poll answers")
             emptyMap()
         }
     }

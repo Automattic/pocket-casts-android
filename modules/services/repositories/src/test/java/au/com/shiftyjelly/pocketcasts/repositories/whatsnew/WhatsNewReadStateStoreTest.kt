@@ -109,6 +109,15 @@ class WhatsNewReadStateStoreTest {
     }
 
     @Test
+    fun `a poll answer written elsewhere reaches the published state`() {
+        val store = store()
+
+        preferences.edit(commit = true) { putString("whatsNewPollAnswers", """{"p1":"o1"}""") }
+
+        assertEquals("o1", store.state.value.answerTo("p1"))
+    }
+
+    @Test
     fun `unreadable poll answers are dropped`() {
         preferences.edit(commit = true) { putString("whatsNewPollAnswers", "not json") }
 
