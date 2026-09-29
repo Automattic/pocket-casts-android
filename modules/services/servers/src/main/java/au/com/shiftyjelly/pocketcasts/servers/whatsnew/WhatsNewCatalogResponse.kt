@@ -2,6 +2,8 @@ package au.com.shiftyjelly.pocketcasts.servers.whatsnew
 
 import au.com.shiftyjelly.pocketcasts.servers.adapters.LossyList
 import com.squareup.moshi.JsonClass
+import java.net.URI
+import java.net.URISyntaxException
 import java.time.Instant
 import java.time.OffsetDateTime
 import java.time.format.DateTimeParseException
@@ -118,15 +120,27 @@ data class WhatsNewImageResponse(
 
 @JsonClass(generateAdapter = true)
 data class WhatsNewActionResponse(
+    val type: String? = null,
     val event: String? = null,
+    val arguments: WhatsNewActionArgumentsResponse? = null,
     val label: String? = null,
 ) {
     fun toAction(): WhatsNewAction? {
-        val event = event.nonBlank() ?: return null
+        val type = (type ?: event).nonBlank() ?: return null
+        val url = if (type == WhatsNewAction.OPEN_LINK) {
+            arguments?.url.nonBlank()?.takeIf(::isSecureWebUrl) ?: return null
+        } else {
+            null
+        }
         val label = label.nonBlank() ?: return null
-        return WhatsNewAction(event = event, label = label)
+        return WhatsNewAction(type = type, label = label, url = url)
     }
 }
+
+@JsonClass(generateAdapter = true)
+data class WhatsNewActionArgumentsResponse(
+    val url: String? = null,
+)
 
 @JsonClass(generateAdapter = true)
 data class WhatsNewPollResponse(
@@ -160,6 +174,13 @@ data class WhatsNewPollOptionResponse(
 }
 
 private fun String?.nonBlank() = this?.trim()?.takeIf(String::isNotEmpty)
+
+private fun isSecureWebUrl(value: String) = try {
+    val uri = URI(value)
+    uri.scheme.equals("https", ignoreCase = true) && !uri.host.isNullOrEmpty()
+} catch (e: URISyntaxException) {
+    false
+}
 
 private fun parseInstantOrNull(value: String) = try {
     OffsetDateTime.parse(value).toInstant()

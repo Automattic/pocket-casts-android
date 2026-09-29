@@ -168,9 +168,9 @@ class WhatsNewMessageViewModel @AssistedInject constructor(
     }
 
     private fun actionOf(action: WhatsNewAction): Action? {
-        val event = WhatsNewActionEvent.fromKey(action.event)
+        val event = WhatsNewActionEvent.fromKey(action.type)
         if (event == null) {
-            Timber.i("What's New: dropping an action this build doesn't support: ${action.event}")
+            Timber.i("What's New: dropping an action this build doesn't support: ${action.type}")
         }
         return event?.let { Action(label = action.label, event = it) }
     }

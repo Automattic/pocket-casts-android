@@ -210,13 +210,40 @@ class WhatsNewCatalogResponseTest {
     }
 
     @Test
-    fun `an action naming an unknown event still decodes`() {
-        val catalog = decode(
-            catalogOf(message(body = """"pages": [{ "heading": "h", "description": "d", "action": { "event": "open_something_later", "label": "Try it" } }]""")),
+    fun `an action naming an unknown type still decodes`() {
+        val action = decodeAction("""{ "type": "open_something_later", "label": "Try it" }""")
+
+        assertEquals(WhatsNewAction(type = "open_something_later", label = "Try it", url = null), action)
+    }
+
+    @Test
+    fun `decodes an action published with a type`() {
+        val action = decodeAction("""{ "type": "create_playlist", "label": "Create a playlist" }""")
+
+        assertEquals(WhatsNewAction(type = "create_playlist", label = "Create a playlist", url = null), action)
+    }
+
+    @Test
+    fun `decodes an action published as an event`() {
+        val action = decodeAction("""{ "event": "open_discover", "label": "Explore Discover" }""")
+
+        assertEquals(WhatsNewAction(type = "open_discover", label = "Explore Discover", url = null), action)
+    }
+
+    @Test
+    fun `an action type wins over its event`() {
+        val action = decodeAction("""{ "type": "open_up_next", "event": "open_discover", "label": "Open it" }""")
+
+        assertEquals("open_up_next", action?.type)
+    }
+
+    @Test
+    fun `decodes a link action with its url`() {
+        val action = decodeAction(
+            """{ "type": "open_link", "arguments": { "url": "https://blog.pocketcasts.com/transcripts" }, "label": "Learn more" }""",
         )
 
-        val page = (catalog.messages.single().content as WhatsNewContent.Pages).pages.single()
-        assertEquals(WhatsNewAction(event = "open_something_later", label = "Try it"), page.action)
+        assertEquals(WhatsNewAction(type = "open_link", label = "Learn more", url = "https://blog.pocketcasts.com/transcripts"), action)
     }
 
     @Test
@@ -393,6 +420,11 @@ class WhatsNewCatalogResponseTest {
     }
 
     private fun decode(json: String) = requireNotNull(adapter.fromJson(json)).toCatalog()
+
+    private fun decodeAction(action: String): WhatsNewAction? {
+        val catalog = decode(catalogOf(message(body = """"pages": [{ "heading": "h", "description": "d", "action": $action }]""")))
+        return (catalog.messages.single().content as WhatsNewContent.Pages).pages.single().action
+    }
 
     private fun catalogOf(vararg messages: String) = """{ "schemaVersion": 1, "messages": [${messages.joinToString(",")}] }"""
 
