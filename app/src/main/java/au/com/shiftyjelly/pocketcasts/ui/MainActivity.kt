@@ -1584,6 +1584,10 @@ class MainActivity :
         navigator.reset(tab = VR.id.navigation_filters, resetRootFragment = true)
     }
 
+    override fun closeProfileToRoot() {
+        navigator.reset(tab = VR.id.navigation_profile, resetRootFragment = false)
+    }
+
     override fun setSupportActionBar(toolbar: Toolbar?) {
         super.setSupportActionBar(toolbar)
 
