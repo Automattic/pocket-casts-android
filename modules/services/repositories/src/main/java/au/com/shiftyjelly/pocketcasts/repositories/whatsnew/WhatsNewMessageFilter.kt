@@ -3,15 +3,22 @@ package au.com.shiftyjelly.pocketcasts.repositories.whatsnew
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewAudience
 import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewMessage
+import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewMessageType
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.ReleaseVersion
 import java.time.Instant
 
 data class WhatsNewMessageFilter(
     val audience: WhatsNewAudience,
     val appVersion: ReleaseVersion?,
+    val includesPolls: Boolean,
 ) {
     fun includes(message: WhatsNewMessage, now: Instant = Instant.now()): Boolean {
-        return message.targeting.targets(audience) && isSupported(message) && isLive(message, now)
+        return (includesPolls || message.type != WhatsNewMessageType.Research) &&
+            message.targeting.targets(audience) &&
+            isSupported(message) &&
+            isLive(message, now)
     }
 
     fun feedMessages(messages: List<WhatsNewMessage>, now: Instant = Instant.now()): List<WhatsNewMessage> {
@@ -32,13 +39,18 @@ data class WhatsNewMessageFilter(
     }
 
     companion object {
-        fun of(tier: SubscriptionTier?, appVersion: ReleaseVersion?) = WhatsNewMessageFilter(
+        fun of(
+            tier: SubscriptionTier?,
+            appVersion: ReleaseVersion?,
+            includesPolls: Boolean = FeatureFlag.isEnabled(Feature.WHATS_NEW_POLLS),
+        ) = WhatsNewMessageFilter(
             audience = when (tier) {
                 SubscriptionTier.Plus -> WhatsNewAudience.Plus
                 SubscriptionTier.Patron -> WhatsNewAudience.Patron
                 null -> WhatsNewAudience.Free
             },
             appVersion = appVersion,
+            includesPolls = includesPolls,
         )
     }
 }

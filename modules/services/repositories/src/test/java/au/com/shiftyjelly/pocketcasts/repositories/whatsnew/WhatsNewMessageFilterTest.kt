@@ -6,6 +6,8 @@ import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewContent
 import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewMessage
 import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewMessageType
 import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewPage
+import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewPoll
+import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewResearch
 import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewTargeting
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.ReleaseVersion
 import java.time.Instant
@@ -16,7 +18,7 @@ import org.junit.Test
 
 class WhatsNewMessageFilterTest {
     private val now = Instant.parse("2026-09-22T00:00:00Z")
-    private val filter = WhatsNewMessageFilter(WhatsNewAudience.Plus, ReleaseVersion(8, 22))
+    private val filter = WhatsNewMessageFilter(WhatsNewAudience.Plus, ReleaseVersion(8, 22), includesPolls = true)
 
     @Test
     fun `a message aimed at the user's tier is shown`() {
@@ -65,7 +67,7 @@ class WhatsNewMessageFilterTest {
 
     @Test
     fun `a release candidate counts as the release it is a candidate for`() {
-        val filter = WhatsNewMessageFilter(WhatsNewAudience.Plus, ReleaseVersion(8, 21, releaseCandidate = 6))
+        val filter = WhatsNewMessageFilter(WhatsNewAudience.Plus, ReleaseVersion(8, 21, releaseCandidate = 6), includesPolls = true)
 
         assertTrue(filter.includes(message(minimumAppVersion = "8.21"), now))
         assertFalse(filter.includes(message(minimumAppVersion = "8.22"), now))
@@ -73,7 +75,7 @@ class WhatsNewMessageFilterTest {
 
     @Test
     fun `a message gated on a version is hidden when the app version is unknown`() {
-        val filter = WhatsNewMessageFilter(WhatsNewAudience.Plus, appVersion = null)
+        val filter = WhatsNewMessageFilter(WhatsNewAudience.Plus, appVersion = null, includesPolls = true)
 
         assertFalse(filter.includes(message(minimumAppVersion = "8.22"), now))
     }
@@ -117,17 +119,45 @@ class WhatsNewMessageFilterTest {
     }
 
     @Test
+    fun `a research message is shown when polls are included`() {
+        assertTrue(filter.includes(research(), now))
+    }
+
+    @Test
+    fun `a research message is hidden when polls are not included`() {
+        val filter = WhatsNewMessageFilter(WhatsNewAudience.Plus, ReleaseVersion(8, 22), includesPolls = false)
+
+        assertFalse(filter.includes(research(), now))
+        assertTrue(filter.includes(message(), now))
+    }
+
+    @Test
     fun `a free user is matched against the free audience`() {
-        val filter = WhatsNewMessageFilter.of(tier = null, appVersion = ReleaseVersion(8, 22))
+        val filter = WhatsNewMessageFilter.of(tier = null, appVersion = ReleaseVersion(8, 22), includesPolls = true)
 
         assertEquals(WhatsNewAudience.Free, filter.audience)
     }
 
     @Test
     fun `a subscriber is matched against the audience for their tier`() {
-        assertEquals(WhatsNewAudience.Plus, WhatsNewMessageFilter.of(SubscriptionTier.Plus, null).audience)
-        assertEquals(WhatsNewAudience.Patron, WhatsNewMessageFilter.of(SubscriptionTier.Patron, null).audience)
+        assertEquals(WhatsNewAudience.Plus, WhatsNewMessageFilter.of(SubscriptionTier.Plus, null, includesPolls = true).audience)
+        assertEquals(WhatsNewAudience.Patron, WhatsNewMessageFilter.of(SubscriptionTier.Patron, null, includesPolls = true).audience)
     }
+
+    private fun research() = message(id = "poll").copy(
+        type = WhatsNewMessageType.Research,
+        content = WhatsNewContent.Research(
+            WhatsNewResearch(
+                description = null,
+                poll = WhatsNewPoll(
+                    pollId = "p1",
+                    pollKey = "k",
+                    question = "q",
+                    options = listOf(WhatsNewPoll.Option(id = "o1", pollOptionKey = "ok", label = "l")),
+                ),
+            ),
+        ),
+    )
 
     private fun message(
         id: String = "m1",

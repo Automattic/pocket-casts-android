@@ -254,6 +254,53 @@ class WhatsNewManagerImplTest {
         }
     }
 
+    @Test
+    fun `a research message stays out of the feed and its dots while polls are off`() = runTest {
+        serviceManager.catalog = researchCatalogJson()
+        val manager = manager()
+        manager.refreshIfNeeded()
+
+        manager.feedMessages.test {
+            assertTrue(awaitItem().isEmpty())
+        }
+        manager.hasUnlistedMessages.test {
+            assertFalse(awaitItem())
+        }
+    }
+
+    @Test
+    fun `a research message reaches the feed while polls are on`() = runTest {
+        FeatureFlag.setEnabled(Feature.WHATS_NEW_POLLS, true)
+        serviceManager.catalog = researchCatalogJson()
+        val manager = manager()
+        manager.refreshIfNeeded()
+
+        manager.feedMessages.test {
+            assertEquals(listOf("Help shape the player"), awaitItem().map { it.title })
+        }
+    }
+
+    private fun researchCatalogJson() = """
+            {
+              "schemaVersion": 1,
+              "messages": [
+                {
+                  "id": "r1",
+                  "type": "research",
+                  "publishedAt": "2026-09-18T05:11:26Z",
+                  "targeting": {},
+                  "title": "Help shape the player",
+                  "poll": {
+                    "pollId": "p1",
+                    "pollKey": "player",
+                    "question": "What should we improve next?",
+                    "options": [{ "id": "o1", "pollOptionKey": "speed", "label": "Speed" }]
+                  }
+                }
+              ]
+            }
+    """.trimIndent()
+
     private fun catalogJson(
         title: String,
         audiences: String = """["free"]""",
