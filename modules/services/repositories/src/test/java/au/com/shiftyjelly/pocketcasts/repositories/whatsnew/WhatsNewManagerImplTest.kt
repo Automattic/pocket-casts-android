@@ -5,6 +5,7 @@ import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.ReadSetting
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.di.NetworkModule
 import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewCatalog
@@ -50,6 +51,11 @@ class WhatsNewManagerImplTest {
     private lateinit var serviceManager: FakeServiceManager
     private lateinit var settings: Settings
     private val isLoggedIn = BehaviorRelay.createDefault(false)
+    private val isDotEnabled = MutableStateFlow(true)
+    private val showWhatsNewDot = mock<UserSetting<Boolean>> {
+        on { flow } doReturn isDotEnabled
+        on { value } doAnswer { isDotEnabled.value }
+    }
     private val remote = FakeRemoteReadState()
     private val syncManager = mock<SyncManager> {
         on { isLoggedInObservable } doReturn isLoggedIn
@@ -78,6 +84,7 @@ class WhatsNewManagerImplTest {
         settings = mock()
         whenever(settings.cachedSubscription) doReturn subscription
         whenever(settings.getVersion()) doReturn "8.22"
+        whenever(settings.showWhatsNewDot) doReturn showWhatsNewDot
 
         FeatureFlag.setEnabled(Feature.WHATS_NEW_FEED, true)
     }
@@ -502,6 +509,35 @@ class WhatsNewManagerImplTest {
         manager.markAsUnread(listOf("m1"))
 
         assertTrue(remote.markedUnread.isEmpty())
+    }
+
+    @Test
+    fun `turning the dot off takes it off the row and the tab`() = runTest {
+        val manager = manager()
+        manager.refreshIfNeeded()
+
+        isDotEnabled.value = false
+
+        manager.hasUnlistedMessages.test {
+            assertFalse(awaitItem())
+        }
+        manager.hasUnseenMessages.test {
+            assertFalse(awaitItem())
+        }
+    }
+
+    @Test
+    fun `turning the dot back on shows it again for messages still unseen`() = runTest {
+        isDotEnabled.value = false
+        val manager = manager()
+        manager.refreshIfNeeded()
+        manager.markFeedAsSeen()
+
+        isDotEnabled.value = true
+
+        manager.hasUnseenMessages.test {
+            assertTrue(awaitItem())
+        }
     }
 
     private fun catalogJson(
