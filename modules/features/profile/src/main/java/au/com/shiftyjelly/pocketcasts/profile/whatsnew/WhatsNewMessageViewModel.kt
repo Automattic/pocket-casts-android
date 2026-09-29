@@ -54,10 +54,12 @@ class WhatsNewMessageViewModel @AssistedInject constructor(
                 message = message,
                 pages = pagesOf(message),
                 poll = message.research?.let { research ->
+                    val pollId = research.poll.pollId
+                    val hasResponded = readState.hasRespondedTo(pollId)
                     PollState(
                         research = research,
-                        selectedOptionId = selectedOptionId,
-                        hasResponded = readState.hasRespondedTo(research.poll.pollId),
+                        selectedOptionId = if (hasResponded) readState.answerTo(pollId) else selectedOptionId,
+                        hasResponded = hasResponded,
                     )
                 },
             )

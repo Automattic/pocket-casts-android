@@ -204,7 +204,9 @@ class WhatsNewMessageViewModelTest {
 
     @Test
     fun `submitting records the answer and reports it once`() = runTest {
-        whenever(manager.markAsResponded(any(), any())).then { readState.value = readState.value.copy(respondedPollIds = setOf("poll")) }
+        whenever(manager.markAsResponded(any(), any())).then {
+            readState.value = readState.value.copy(respondedPollIds = setOf("poll"), pollAnswers = mapOf("poll" to "b"))
+        }
         feedMessages.value = listOf(research())
         val viewModel = createViewModel("research")
 
@@ -277,6 +279,25 @@ class WhatsNewMessageViewModelTest {
         viewModel.uiState.test {
             expectMostRecentItem()
             viewModel.onSubmitClick()
+        }
+        verify(manager, never()).markAsResponded(any(), any())
+        verify(eventHorizon, never()).track(any<WhatsNewPollResponseSubmittedEvent>())
+    }
+
+    @Test
+    fun `a poll answered on this device reopens closed with its option selected`() = runTest {
+        readState.value = WhatsNewReadState(respondedPollIds = setOf("poll"), pollAnswers = mapOf("poll" to "b"))
+        feedMessages.value = listOf(research())
+        val viewModel = createViewModel("research")
+
+        viewModel.uiState.test {
+            val poll = (expectMostRecentItem() as UiState.Loaded).poll!!
+            assertTrue(poll.hasResponded)
+            assertEquals("b", poll.selectedOptionId)
+            assertFalse(poll.canSubmit)
+            viewModel.onOptionClick("a")
+            viewModel.onSubmitClick()
+            expectNoEvents()
         }
         verify(manager, never()).markAsResponded(any(), any())
         verify(eventHorizon, never()).track(any<WhatsNewPollResponseSubmittedEvent>())
