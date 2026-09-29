@@ -516,12 +516,15 @@ class WhatsNewManagerImplTest {
         val manager = manager()
         manager.refreshIfNeeded()
 
-        isDotEnabled.value = false
-
         manager.hasUnlistedMessages.test {
+            assertTrue(awaitItem())
+            isDotEnabled.value = false
             assertFalse(awaitItem())
         }
+        isDotEnabled.value = true
         manager.hasUnseenMessages.test {
+            assertTrue(awaitItem())
+            isDotEnabled.value = false
             assertFalse(awaitItem())
         }
     }
@@ -532,6 +535,7 @@ class WhatsNewManagerImplTest {
         val manager = manager()
         manager.refreshIfNeeded()
         manager.markFeedAsSeen()
+        assertTrue(manager.readState.value.seenMessageIds.isEmpty())
 
         isDotEnabled.value = true
 

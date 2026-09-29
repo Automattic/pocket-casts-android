@@ -63,11 +63,19 @@ class WhatsNewManagerImpl @Inject constructor(
         WhatsNewMessageFilter.of(subscription?.tier, appVersion).feedMessages(catalog?.messages.orEmpty(), now)
     }.distinctUntilChanged()
 
-    override val hasUnlistedMessages = combine(feedMessages, readState, settings.showWhatsNewDot.flow) { messages, readState, isDotEnabled ->
+    override val hasUnlistedMessages = combine(
+        feedMessages,
+        readState,
+        settings.showWhatsNewDot.flow,
+    ) { messages, readState, isDotEnabled ->
         isDotEnabled && messages.any(readState::isUnlisted)
     }.distinctUntilChanged()
 
-    override val hasUnseenMessages = combine(feedMessages, readState, settings.showWhatsNewDot.flow) { messages, readState, isDotEnabled ->
+    override val hasUnseenMessages = combine(
+        feedMessages,
+        readState,
+        settings.showWhatsNewDot.flow,
+    ) { messages, readState, isDotEnabled ->
         isDotEnabled && messages.any(readState::isUnseen)
     }.distinctUntilChanged()
 
