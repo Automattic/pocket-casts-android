@@ -110,6 +110,23 @@ class WhatsNewFeedViewModelTest {
     }
 
     @Test
+    fun `toggling a row flips it between read and unread`() = runTest {
+        manager.publish(listOf(message("a")))
+        val viewModel = createViewModel()
+
+        viewModel.uiState.test {
+            expectMostRecentItem()
+            viewModel.onToggleReadClick("a")
+            assertEquals(setOf("a"), manager.readState.value.readMessageIds)
+
+            expectMostRecentItem()
+            viewModel.onToggleReadClick("a")
+            assertTrue(manager.readState.value.readMessageIds.isEmpty())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun `showing messages marks them listed but not read`() = runTest {
         manager.publish(listOf(message("a"), message("b")))
 

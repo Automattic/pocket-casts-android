@@ -87,6 +87,15 @@ class WhatsNewFeedViewModel @Inject constructor(
         manager.markAsRead(listOf(id))
     }
 
+    fun onToggleReadClick(id: String) {
+        val item = uiState.value.items.firstOrNull { it.id == id } ?: return
+        if (item.isUnread) {
+            manager.markAsRead(listOf(id))
+        } else {
+            manager.markAsUnread(listOf(id))
+        }
+    }
+
     fun onScreenShown() {
         eventHorizon.track(WhatsNewFeedShownEvent)
     }
