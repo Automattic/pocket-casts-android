@@ -12,11 +12,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -32,6 +34,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
@@ -70,6 +74,7 @@ internal fun ProfilePage(
     onReferralsTooltipClick: () -> Unit,
     onReferralsTooltipShow: () -> Unit,
     onSettingsClick: () -> Unit,
+    onWhatsNewClick: () -> Unit,
     onHeaderClick: () -> Unit,
     onShareClick: () -> Unit,
     onCreateFreeAccountBannerClick: () -> Unit,
@@ -100,6 +105,9 @@ internal fun ProfilePage(
                 onReferralsTooltipClick = onReferralsTooltipClick,
                 onReferralsTooltipShow = onReferralsTooltipShow,
                 onSettingsClick = onSettingsClick,
+                isWhatsNewVisible = state.isWhatsNewVisible,
+                hasWhatsNewDot = state.hasWhatsNewDot,
+                onWhatsNewClick = onWhatsNewClick,
             )
             LazyColumn(
                 state = listState,
@@ -221,6 +229,8 @@ internal fun ProfilePage(
 internal data class ProfilePageState(
     val sections: List<ProfileSection>,
     val sectionsWithDot: Set<ProfileSection>,
+    val isWhatsNewVisible: Boolean,
+    val hasWhatsNewDot: Boolean,
     val isPlaybackEnabled: Boolean,
     val isFreeAccountBannerVisible: Boolean,
     val isUpgradeBannerVisible: Boolean,
@@ -248,6 +258,9 @@ private fun Toolbar(
     onReferralsTooltipClick: () -> Unit,
     onReferralsTooltipShow: () -> Unit,
     onSettingsClick: () -> Unit,
+    isWhatsNewVisible: Boolean,
+    hasWhatsNewDot: Boolean,
+    onWhatsNewClick: () -> Unit,
 ) {
     Row(
         horizontalArrangement = Arrangement.End,
@@ -270,6 +283,12 @@ private fun Toolbar(
                 modifier = Modifier.weight(1f),
             )
         }
+        if (isWhatsNewVisible) {
+            WhatsNewButton(
+                hasDot = hasWhatsNewDot,
+                onClick = onWhatsNewClick,
+            )
+        }
         IconButton(
             onClick = onSettingsClick,
         ) {
@@ -278,6 +297,38 @@ private fun Toolbar(
                 contentDescription = stringResource(au.com.shiftyjelly.pocketcasts.localization.R.string.settings),
                 tint = MaterialTheme.theme.colors.secondaryIcon01,
             )
+        }
+    }
+}
+
+@Composable
+private fun WhatsNewButton(
+    hasDot: Boolean,
+    onClick: () -> Unit,
+) {
+    val unreadDescription = stringResource(LR.string.whats_new_feed_unread)
+    IconButton(
+        onClick = onClick,
+        modifier = Modifier.semantics {
+            if (hasDot) {
+                stateDescription = unreadDescription
+            }
+        },
+    ) {
+        Box {
+            Icon(
+                painter = painterResource(IR.drawable.ic_whats_new_bell),
+                contentDescription = stringResource(LR.string.settings_whats_new),
+                tint = MaterialTheme.theme.colors.primaryIcon01,
+            )
+            if (hasDot) {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .size(8.dp)
+                        .background(MaterialTheme.theme.colors.support05, CircleShape),
+                )
+            }
         }
     }
 }
@@ -375,6 +426,8 @@ private fun ProfilePageStub(
         state = ProfilePageState(
             sections = ProfileSection.entries,
             sectionsWithDot = setOf(ProfileSection.WhatsNew),
+            isWhatsNewVisible = true,
+            hasWhatsNewDot = true,
             isPlaybackEnabled = true,
             isUpgradeBannerVisible = true,
             isFreeAccountBannerVisible = true,
@@ -408,6 +461,7 @@ private fun ProfilePageStub(
         onReferralsTooltipClick = {},
         onReferralsTooltipShow = {},
         onSettingsClick = {},
+        onWhatsNewClick = {},
         onHeaderClick = {},
         onShareClick = {},
         onCreateFreeAccountBannerClick = {},
