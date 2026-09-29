@@ -256,6 +256,20 @@ class WhatsNewCatalogResponseTest {
     }
 
     @Test
+    fun `an action type sent as null falls back to its event`() {
+        val action = decodeAction("""{ "type": null, "event": "open_discover", "label": "Open it" }""")
+
+        assertEquals("open_discover", action?.type)
+    }
+
+    @Test
+    fun `an empty action type does not fall back to its event`() {
+        val action = decodeAction("""{ "type": "", "event": "open_discover", "label": "Open it" }""")
+
+        assertNull(action)
+    }
+
+    @Test
     fun `decodes a link action with its url`() {
         val action = decodeAction(
             """{ "type": "open_link", "arguments": { "url": "https://blog.pocketcasts.com/transcripts" }, "label": "Learn more" }""",

@@ -86,12 +86,11 @@ class WhatsNewMessageFragment : BaseFragment() {
 
             WhatsNewActionEvent.CreatePlaylist -> host.openCreatePlaylist()
 
-            WhatsNewActionEvent.OpenLink -> action.url?.let(::openLink)
+            WhatsNewActionEvent.OpenLink -> action.url?.let { url -> openLink(host, url) }
         }
     }
 
-    private fun openLink(url: String) {
-        val host = activity as? FragmentHostListener ?: return
+    private fun openLink(host: FragmentHostListener, url: String) {
         if (!host.openDeepLink(url)) {
             WebViewActivity.show(context, url.toUri().host.orEmpty(), url)
         }

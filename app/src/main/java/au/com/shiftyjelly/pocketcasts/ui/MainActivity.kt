@@ -1627,7 +1627,6 @@ class MainActivity :
 
     override fun openCreatePlaylist() {
         closePlayer()
-        openTab(VR.id.navigation_filters)
         navigator.reset(tab = VR.id.navigation_filters, resetRootFragment = false)
         supportFragmentManager.showCreatePlaylist()
     }
@@ -1635,7 +1634,7 @@ class MainActivity :
     override fun openDeepLink(url: String): Boolean {
         val intent = Intent(Intent.ACTION_VIEW, url.toUri())
         val deepLink = deepLinkFactory.create(intent)
-        if (deepLink == null || deepLink is ShowPodcastFromUrlDeepLink) {
+        if (deepLink == null || deepLink is ShowPodcastFromUrlDeepLink || deepLink is PocketCastsWebsiteGetDeepLink) {
             return false
         }
         handleIntent(intent, savedInstanceState = null)

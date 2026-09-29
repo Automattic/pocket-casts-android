@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.profile.whatsnew
 
+import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewAction
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
@@ -17,6 +18,11 @@ class WhatsNewActionEventTest {
         WhatsNewActionEvent.entries.mapNotNull { event -> event.analyticsValue?.let { event to it } }.forEach { (event, action) ->
             assertEquals(event.key, action.toString())
         }
+    }
+
+    @Test
+    fun `the link action matches the catalog's link type`() {
+        assertEquals(WhatsNewAction.OPEN_LINK, WhatsNewActionEvent.OpenLink.key)
     }
 
     @Test
