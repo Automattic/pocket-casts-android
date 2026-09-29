@@ -26,6 +26,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
+import au.com.shiftyjelly.pocketcasts.repositories.whatsnew.WhatsNewManager
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.android.tracks.crashlogging.CrashLogging
@@ -84,6 +85,7 @@ class UserManagerImpl @Inject constructor(
     private val experimentProvider: ExperimentProvider,
     private val endOfYearSync: EndOfYearSync,
     private val notificationScheduler: NotificationScheduler,
+    private val whatsNewManager: WhatsNewManager,
 ) : UserManager,
     CoroutineScope {
 
@@ -176,6 +178,7 @@ class UserManagerImpl @Inject constructor(
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Signing out")
             signOutJob = applicationScope.launch {
                 syncManager.signOut {
+                    whatsNewManager.forgetReadMessages()
                     settings.clearPlusPreferences()
 
                     userEpisodeManager.removeCloudStatusFromFiles(playbackManager)
