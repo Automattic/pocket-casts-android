@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalDensity
+import androidx.core.net.toUri
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
@@ -16,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
+import au.com.shiftyjelly.pocketcasts.views.activity.WebViewActivity
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
@@ -61,10 +63,10 @@ class WhatsNewMessageFragment : BaseFragment() {
         }
     }
 
-    private fun perform(event: WhatsNewActionEvent) {
+    private fun perform(action: WhatsNewMessageViewModel.Action) {
         val host = activity as? FragmentHostListener ?: return
-        viewModel.onActionClick(event)
-        when (event) {
+        viewModel.onActionClick(action.event)
+        when (action.event) {
             WhatsNewActionEvent.OpenPodcasts -> host.openTab(VR.id.navigation_podcasts)
 
             WhatsNewActionEvent.OpenDiscover -> host.openTab(VR.id.navigation_discover)
@@ -83,6 +85,15 @@ class WhatsNewMessageFragment : BaseFragment() {
             )
 
             WhatsNewActionEvent.CreatePlaylist -> host.openCreatePlaylist()
+
+            WhatsNewActionEvent.OpenLink -> action.url?.let(::openLink)
+        }
+    }
+
+    private fun openLink(url: String) {
+        val host = activity as? FragmentHostListener ?: return
+        if (!host.openDeepLink(url)) {
+            WebViewActivity.show(context, url.toUri().host.orEmpty(), url)
         }
     }
 

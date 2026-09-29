@@ -150,6 +150,20 @@ class WhatsNewMessageViewModelTest {
     }
 
     @Test
+    fun `a link action carries its url to the button`() = runTest {
+        val link = WhatsNewAction(type = "open_link", label = "Learn more", url = "https://blog.pocketcasts.com")
+        feedMessages.value = listOf(message("link", page(link)))
+
+        createViewModel("link").uiState.test {
+            val action = (expectMostRecentItem() as UiState.Loaded).pages.single().action
+            assertEquals(
+                WhatsNewMessageViewModel.Action("Learn more", WhatsNewActionEvent.OpenLink, "https://blog.pocketcasts.com"),
+                action,
+            )
+        }
+    }
+
+    @Test
     fun `an unsupported action drops only the button`() = runTest {
         feedMessages.value = listOf(
             message(

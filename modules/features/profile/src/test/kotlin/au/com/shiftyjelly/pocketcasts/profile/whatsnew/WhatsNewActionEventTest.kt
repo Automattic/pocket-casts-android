@@ -7,7 +7,7 @@ import org.junit.Test
 class WhatsNewActionEventTest {
     @Test
     fun `every supported catalog event maps to its action`() {
-        val keys = listOf("open_podcasts", "open_discover", "open_up_next", "open_playlists", "open_profile", "open_settings", "open_upsell", "create_playlist")
+        val keys = listOf("open_podcasts", "open_discover", "open_up_next", "open_playlists", "open_profile", "open_settings", "open_upsell", "create_playlist", "open_link")
 
         assertEquals(WhatsNewActionEvent.entries, keys.map(WhatsNewActionEvent::fromKey))
     }

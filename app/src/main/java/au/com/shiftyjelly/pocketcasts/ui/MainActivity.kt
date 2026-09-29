@@ -34,6 +34,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -1629,6 +1630,15 @@ class MainActivity :
         openTab(VR.id.navigation_filters)
         navigator.reset(tab = VR.id.navigation_filters, resetRootFragment = false)
         supportFragmentManager.showCreatePlaylist()
+    }
+
+    override fun openDeepLink(url: String): Boolean {
+        val intent = Intent(Intent.ACTION_VIEW, url.toUri())
+        if (deepLinkFactory.create(intent) == null) {
+            return false
+        }
+        handleIntent(intent, savedInstanceState = null)
+        return true
     }
 
     override fun setSupportActionBar(toolbar: Toolbar?) {
