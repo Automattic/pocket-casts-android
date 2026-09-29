@@ -52,11 +52,11 @@ class WhatsNewManagerImpl @Inject constructor(
     }.distinctUntilChanged()
 
     override val hasUnlistedMessages = combine(feedMessages, readState) { messages, readState ->
-        messages.any { message -> !readState.isListed(message.id) }
+        messages.any(readState::isUnlisted)
     }.distinctUntilChanged()
 
     override val hasUnseenMessages = combine(feedMessages, readState) { messages, readState ->
-        messages.any { message -> readState.isUnseen(message.id) }
+        messages.any(readState::isUnseen)
     }.distinctUntilChanged()
 
     private val refreshLock = Mutex()
