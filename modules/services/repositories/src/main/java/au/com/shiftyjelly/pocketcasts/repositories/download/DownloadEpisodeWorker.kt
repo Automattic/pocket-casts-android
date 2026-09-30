@@ -102,6 +102,7 @@ class DownloadEpisodeWorker @AssistedInject constructor(
     private val downloader = EpisodeDownloader(
         httpClient = httpClient,
         progressCache = progressCache,
+        waitForWifi = args.waitForWifi,
         onCall = { call ->
             downloadCall = call
         },
