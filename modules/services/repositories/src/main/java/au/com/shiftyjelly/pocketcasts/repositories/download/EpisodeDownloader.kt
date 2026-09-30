@@ -109,23 +109,26 @@ internal class EpisodeDownloader(
         progressCache.updateProgress(episode.uuid, downloadedByteCount = 0L, contentLength = null)
         return call.blockingEnqueue().use { response ->
             onResponse(response)
-
-            if (!response.isSuccessful) {
-                return Result.UnsuccessfulHttpCall(response.code)
-            }
-
-            val contentType = response.header("Content-Type")
-            if (contentType.isInvalidContentType()) {
-                return Result.InvalidContentType(contentType)
-            }
-
-            if (isResumeEnabled) {
-                PartialDownload.from(response)?.writeTo(tempFile)
-            }
-            val contentLength = response.body.contentLength().takeIf { it > 0 } ?: episode.sizeInBytes.takeIf { it > 0 }
-            response.body.source().withProgress(episode, initialByteCount = 0, contentLength).writeTo(tempFile, append = false)
-            completeDownload(episode, downloadFile, tempFile)
+            saveFromStart(episode, response, downloadFile, tempFile, isResumeEnabled)
         }
+    }
+
+    private fun saveFromStart(episode: BaseEpisode, response: Response, downloadFile: File, tempFile: File, isResumeEnabled: Boolean): Result {
+        if (!response.isSuccessful) {
+            return Result.UnsuccessfulHttpCall(response.code)
+        }
+
+        val contentType = response.header("Content-Type")
+        if (contentType.isInvalidContentType()) {
+            return Result.InvalidContentType(contentType)
+        }
+
+        if (isResumeEnabled) {
+            PartialDownload.from(response)?.writeTo(tempFile)
+        }
+        val contentLength = response.body.contentLength().takeIf { it > 0 } ?: episode.sizeInBytes.takeIf { it > 0 }
+        response.body.source().withProgress(episode, initialByteCount = 0, contentLength).writeTo(tempFile, append = false)
+        return completeDownload(episode, downloadFile, tempFile)
     }
 
     private fun resumeOrNull(episode: BaseEpisode, downloadUrl: HttpUrl, downloadFile: File, tempFile: File, partialDownload: PartialDownload): Result? {
@@ -143,16 +146,28 @@ internal class EpisodeDownloader(
         return call.blockingEnqueue().use { response ->
             onResponse(response)
 
+            val host = response.request.url.host
+            if (response.code == 200) {
+                LogBuffer.i(LogBuffer.TAG_DOWNLOAD, "Download resume ignored. Episode: ${episode.uuid}, Host: $host")
+                PartialDownload.delete(tempFile)
+                progressCache.updateProgress(episode.uuid, downloadedByteCount = 0L, contentLength = null)
+                return saveFromStart(episode, response, downloadFile, tempFile, isResumeEnabled = true)
+            }
+            if (response.code.isTransientHttpCode()) {
+                return Result.UnsuccessfulHttpCall(response.code)
+            }
+
+            val source = response.body.source()
             val rejectionReason = partialDownload.rejectionReason(response, offset)
                 ?: response.header("Content-Type").takeIf { it.isInvalidContentType() }?.let { "content type $it" }
-                ?: "overlap".takeUnless { response.body.source().startsWithTailOf(tempFile, offset) }
+                ?: "overlap".takeUnless { source.startsWithTailOf(tempFile, offset) }
             if (rejectionReason != null) {
-                LogBuffer.i(LogBuffer.TAG_DOWNLOAD, "Download resume rejected. Episode: ${episode.uuid}, Reason: $rejectionReason")
+                LogBuffer.i(LogBuffer.TAG_DOWNLOAD, "Download resume rejected. Episode: ${episode.uuid}, Host: $host, Reason: $rejectionReason")
                 return null
             }
 
-            LogBuffer.i(LogBuffer.TAG_DOWNLOAD, "Download resumed. Episode: ${episode.uuid}, Offset: $initialByteCount")
-            response.body.source().withProgress(episode, initialByteCount, partialDownload.contentLength).writeTo(tempFile, append = true)
+            LogBuffer.i(LogBuffer.TAG_DOWNLOAD, "Download resumed. Episode: ${episode.uuid}, Host: $host, Offset: $initialByteCount")
+            source.withProgress(episode, initialByteCount, partialDownload.contentLength).writeTo(tempFile, append = true)
             val resumedByteCount = tempFile.length()
             if (resumedByteCount != partialDownload.contentLength) {
                 LogBuffer.i(LogBuffer.TAG_DOWNLOAD, "Download resume incomplete. Episode: ${episode.uuid}, Size: $resumedByteCount, Expected: ${partialDownload.contentLength}")
@@ -199,7 +214,13 @@ internal class EpisodeDownloader(
         buffer().use { source -> fileSink.use { sink -> source.readAll(sink) } }
     }
 
-    private val Result.isResumable get() = this is Result.ExceptionFailure && throwable is IOException
+    private val Result.isResumable get() = when (this) {
+        is Result.ExceptionFailure -> throwable is IOException
+        is Result.UnsuccessfulHttpCall -> code.isTransientHttpCode()
+        else -> false
+    }
+
+    private fun Int.isTransientHttpCode() = this == 408 || this == 429 || this in 500..599
 
     sealed interface Result {
         data class Success(val file: File) : Result

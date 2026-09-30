@@ -176,14 +176,58 @@ class EpisodeDownloaderResumeTest {
     }
 
     @Test
-    fun `download from the start when the server ignores the range`() {
+    fun `use a full response to the range request as a download from the start`() {
         givenPartialDownload(length = 200 * 1024)
         server.enqueue(fullResponse().build())
+
+        val result = download()
+
+        assertEquals(Result.Success(downloadFile), result)
+        assertArrayEquals(payload, downloadFile.readBytes())
+        assertEquals(1, server.requestCount)
+        assertEquals(DownloadProgress(payload.size.toLong(), payload.size.toLong()), progressCache.progressFlow(episode.uuid).value)
+    }
+
+    @Test
+    fun `download from the start when the last modified date changed`() {
+        givenPartialDownload(length = 200 * 1024, entityTag = null, lastModified = LAST_MODIFIED)
+        server.enqueue(partialResponse(from = 200 * 1024 - PartialDownload.OVERLAP_BYTE_COUNT, entityTag = null, lastModified = "Wed, 30 Sep 2026 10:00:00 GMT").build())
         server.enqueue(fullResponse().build())
 
         val result = download()
 
         assertDownloadedFromStartAfterRejection(result)
+    }
+
+    @Test
+    fun `keep the partial download when the range request fails temporarily`() {
+        givenPartialDownload(length = 200 * 1024)
+        server.enqueue(MockResponse.Builder().code(503).build())
+
+        val result = download()
+
+        assertEquals(Result.UnsuccessfulHttpCall(503), result)
+        assertEquals(1, server.requestCount)
+        assertEquals(PartialDownload(ENTITY_TAG, null, payload.size.toLong()), PartialDownload.readFrom(tempFile))
+    }
+
+    @Test
+    fun `resume again when the connection drops during a resumed download`() {
+        givenPartialDownload(length = 100 * 1024)
+        server.enqueue(
+            partialResponse(from = 100 * 1024 - PartialDownload.OVERLAP_BYTE_COUNT)
+                .onResponseBody(SocketEffect.ShutdownConnection)
+                .build(),
+        )
+        download()
+        val partialLength = tempFile.length()
+        server.enqueue(partialResponse(from = partialLength - PartialDownload.OVERLAP_BYTE_COUNT).build())
+
+        val result = download()
+
+        assertTrue(partialLength > 100 * 1024)
+        assertEquals(Result.Success(downloadFile), result)
+        assertArrayEquals(payload, downloadFile.readBytes())
     }
 
     @Test
@@ -260,12 +304,12 @@ class EpisodeDownloaderResumeTest {
     @Test
     fun `discard the partial download on an http failure`() {
         givenPartialDownload(length = 200 * 1024)
-        server.enqueue(MockResponse.Builder().code(500).build())
-        server.enqueue(MockResponse.Builder().code(500).build())
+        server.enqueue(MockResponse.Builder().code(404).build())
+        server.enqueue(MockResponse.Builder().code(404).build())
 
         val result = download()
 
-        assertTrue(result is Result.UnsuccessfulHttpCall)
+        assertEquals(Result.UnsuccessfulHttpCall(404), result)
         assertFalse(tempFile.exists())
         assertFalse(metadataFile().exists())
     }
