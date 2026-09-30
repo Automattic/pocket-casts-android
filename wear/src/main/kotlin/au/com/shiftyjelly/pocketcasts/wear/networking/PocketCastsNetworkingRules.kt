@@ -10,6 +10,7 @@ import com.google.android.horologist.networks.data.NetworkType
 import com.google.android.horologist.networks.data.Networks
 import com.google.android.horologist.networks.data.RequestType
 import com.google.android.horologist.networks.rules.Allow
+import com.google.android.horologist.networks.rules.Fail
 import com.google.android.horologist.networks.rules.NetworkingRules
 import com.google.android.horologist.networks.rules.RequestCheck
 
@@ -22,18 +23,28 @@ object PocketCastsNetworkingRules : NetworkingRules {
             }
         }
 
-        return requestType is RequestType.MediaRequest
+        return requestType is RequestType.MediaRequest || requestType == WifiOnlyDownloadRequest
     }
 
     override fun checkValidRequest(
         requestType: RequestType,
         currentNetworkInfo: NetworkInfo,
-    ): RequestCheck = Allow
+    ): RequestCheck = if (requestType == WifiOnlyDownloadRequest && currentNetworkInfo is NetworkInfo.Cellular) {
+        Fail("$requestType can't use cellular")
+    } else {
+        Allow
+    }
 
     override fun getPreferredNetwork(
         networks: Networks,
         requestType: RequestType,
     ): NetworkStatus? = when (requestType) {
+        WifiOnlyDownloadRequest -> {
+            networks.networks
+                .filter { it.networkInfo.type != NetworkType.Cell }
+                .prefer(NetworkType.Wifi, NetworkType.BT)
+        }
+
         is RequestType.MediaRequest, RequestType.ImageRequest -> {
             getPreferredNetworkForMedia(networks, requestType)
         }
