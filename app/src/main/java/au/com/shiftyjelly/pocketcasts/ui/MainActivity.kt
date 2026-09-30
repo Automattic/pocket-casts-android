@@ -1635,12 +1635,12 @@ class MainActivity :
 
     override fun openNetworks() {
         closePlayer()
-        openTab(VR.id.navigation_discover)
+        navigator.reset(tab = VR.id.navigation_discover, resetRootFragment = false)
         if (!FeatureFlag.isEnabled(Feature.NETWORK_DISCOVERY)) return
         lifecycleScope.launch {
             val networks = discoverDeepLinkManager.getNetworksList(resources) ?: return@launch
             withResumed {
-                if (navigator.currentTab() != VR.id.navigation_discover || navigator.currentFragment() is NetworksGridFragment) return@withResumed
+                if (navigator.currentFragment() !is DiscoverFragment) return@withResumed
                 addFragment(NetworksGridFragment.newInstance(sourceUrl = networks.source, title = networks.title.tryToLocalise(resources)))
             }
         }
