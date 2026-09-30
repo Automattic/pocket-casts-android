@@ -1,8 +1,5 @@
 8.23
 -----
-*   Updates
-    *   Remove the "Gift … of Pocket Casts Plus!" tooltip from the Profile tab
-        ([#6103](https://github.com/Automattic/pocket-casts-android/pull/6103))
 
 8.22
 -----
