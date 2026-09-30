@@ -89,12 +89,11 @@ class WhatsNewMessageViewModel @AssistedInject constructor(
 
     internal fun onActionClick(event: WhatsNewActionEvent) {
         val message = shownMessage ?: return
-        val action = event.analyticsValue ?: return
         eventHorizon.track(
             WhatsNewActionTappedEvent(
                 messageUuid = message.id,
                 messageType = message.type.analyticsValue,
-                action = action,
+                action = event.analyticsValue,
             ),
         )
     }

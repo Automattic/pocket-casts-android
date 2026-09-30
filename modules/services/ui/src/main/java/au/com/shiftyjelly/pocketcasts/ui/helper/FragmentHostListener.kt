@@ -23,6 +23,7 @@ interface FragmentHostListener {
     fun closeFiltersToRoot()
     fun closeProfileToRoot()
     fun openCreatePlaylist()
+    fun openNetworks()
     fun openInAppDeepLink(url: String): Boolean
     fun openPodcastPage(uuid: String, sourceView: String? = null)
 

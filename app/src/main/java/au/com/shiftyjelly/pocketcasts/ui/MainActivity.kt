@@ -118,12 +118,14 @@ import au.com.shiftyjelly.pocketcasts.discover.util.DiscoverDeepLinkManager
 import au.com.shiftyjelly.pocketcasts.discover.util.DiscoverDeepLinkManager.Companion.RECOMMENDATIONS_USER
 import au.com.shiftyjelly.pocketcasts.discover.util.DiscoverDeepLinkManager.Companion.STAFF_PICKS_LIST_ID
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment
+import au.com.shiftyjelly.pocketcasts.discover.view.NetworksGridFragment
 import au.com.shiftyjelly.pocketcasts.discover.view.PodcastGridFragment
 import au.com.shiftyjelly.pocketcasts.discover.view.PodcastGridListFragment
 import au.com.shiftyjelly.pocketcasts.discover.view.PodcastListFragment
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesActivity
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesActivity.StoriesSource
 import au.com.shiftyjelly.pocketcasts.endofyear.ui.EndOfYearLaunchBottomSheet
+import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -1629,6 +1631,19 @@ class MainActivity :
         closePlayer()
         navigator.reset(tab = VR.id.navigation_filters, resetRootFragment = false)
         supportFragmentManager.showCreatePlaylist()
+    }
+
+    override fun openNetworks() {
+        closePlayer()
+        navigator.reset(tab = VR.id.navigation_discover, resetRootFragment = false)
+        if (!FeatureFlag.isEnabled(Feature.NETWORK_DISCOVERY)) return
+        lifecycleScope.launch {
+            val networks = discoverDeepLinkManager.getNetworksList(resources) ?: return@launch
+            withResumed {
+                if (navigator.currentFragment() !is DiscoverFragment) return@withResumed
+                addFragment(NetworksGridFragment.newInstance(sourceUrl = networks.source, title = networks.title.tryToLocalise(resources)))
+            }
+        }
     }
 
     override fun openInAppDeepLink(url: String): Boolean {

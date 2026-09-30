@@ -87,6 +87,8 @@ class WhatsNewMessageFragment : BaseFragment() {
             WhatsNewActionEvent.CreatePlaylist -> host.openCreatePlaylist()
 
             WhatsNewActionEvent.OpenLink -> action.url?.let { url -> openLink(host, url) }
+
+            WhatsNewActionEvent.OpenNetworks -> host.openNetworks()
         }
     }
 

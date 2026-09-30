@@ -378,6 +378,24 @@ class WhatsNewMessageViewModelTest {
         )
     }
 
+    @Test
+    fun `tapping a networks action reports it`() = runTest {
+        feedMessages.value = listOf(message("networks", page(WhatsNewAction(type = "open_networks", label = "Browse networks", url = null))))
+        val viewModel = createViewModel("networks")
+
+        viewModel.uiState.test {
+            val action = (expectMostRecentItem() as UiState.Loaded).pages.single().action!!
+            viewModel.onActionClick(action.event)
+        }
+        verify(eventHorizon).track(
+            WhatsNewActionTappedEvent(
+                messageUuid = "networks",
+                messageType = AnalyticsMessageType.Tip,
+                action = WhatsNewActionType.OpenNetworks,
+            ),
+        )
+    }
+
     private fun page(action: WhatsNewAction?) = WhatsNewPage(image = null, heading = "Heading", description = "Description", action = action)
 
     private fun message(id: String, vararg pages: WhatsNewPage) = message(id).copy(content = WhatsNewContent.Pages(pages.toList()))
