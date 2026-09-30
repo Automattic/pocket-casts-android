@@ -74,31 +74,67 @@ class BrowseTreeProviderTest {
 
     @Test
     fun `getRootId returns RECENT_ROOT when isRecent and has current episode`() {
-        val result = provider.getRootId(isRecent = true, isSuggested = false, hasCurrentEpisode = true)
+        val result = provider.getRootId(
+            isRecent = true,
+            isSuggested = false,
+            hasCurrentEpisode = true,
+            isAutomotive = false,
+        )
         assertEquals(RECENT_ROOT, result)
     }
 
     @Test
     fun `getRootId returns null when isRecent but no current episode`() {
-        val result = provider.getRootId(isRecent = true, isSuggested = false, hasCurrentEpisode = false)
+        val result = provider.getRootId(
+            isRecent = true,
+            isSuggested = false,
+            hasCurrentEpisode = false,
+            isAutomotive = false,
+        )
         assertNull(result)
     }
 
     @Test
-    fun `getRootId returns SUGGESTED_ROOT when isSuggested`() {
-        val result = provider.getRootId(isRecent = false, isSuggested = true, hasCurrentEpisode = false)
+    fun `getRootId returns SUGGESTED_ROOT when isSuggested on automotive`() {
+        val result = provider.getRootId(
+            isRecent = false,
+            isSuggested = true,
+            hasCurrentEpisode = false,
+            isAutomotive = true,
+        )
         assertEquals(SUGGESTED_ROOT, result)
     }
 
     @Test
+    fun `getRootId returns MEDIA_ID_ROOT when isSuggested on phone`() {
+        val result = provider.getRootId(
+            isRecent = false,
+            isSuggested = true,
+            hasCurrentEpisode = true,
+            isAutomotive = false,
+        )
+        assertEquals(MEDIA_ID_ROOT, result)
+    }
+
+    @Test
     fun `getRootId returns MEDIA_ID_ROOT by default`() {
-        val result = provider.getRootId(isRecent = false, isSuggested = false, hasCurrentEpisode = false)
+        val result = provider.getRootId(
+            isRecent = false,
+            isSuggested = false,
+            hasCurrentEpisode = false,
+            isAutomotive = false,
+        )
         assertEquals(MEDIA_ID_ROOT, result)
     }
 
     @Test
     fun `getRootId prefers recent over suggested`() {
-        val result = provider.getRootId(isRecent = true, isSuggested = true, hasCurrentEpisode = true)
+        val result = provider.getRootId(
+            isRecent = true,
+            isSuggested = true,
+            hasCurrentEpisode = true,
+            isAutomotive = true,
+        )
         assertEquals(RECENT_ROOT, result)
     }
 
