@@ -1,6 +1,8 @@
 8.23
 -----
-
+*   Bug Fixes
+    *   Stop a held headphone or car play button from skipping forward
+        ([#6075](https://github.com/Automattic/pocket-casts-android/pull/6075))
 
 8.22
 -----

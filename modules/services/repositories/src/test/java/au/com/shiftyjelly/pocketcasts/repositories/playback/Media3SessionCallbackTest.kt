@@ -22,6 +22,7 @@ import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -413,6 +414,24 @@ class Media3SessionCallbackTest {
     }
 
     @Test
+    fun `held KEYCODE_MEDIA_PLAY while playing consumes repeats without skipping`() = runTest {
+        mockHeadphoneNextAction(HeadphoneAction.SKIP_FORWARD)
+        mockSkipSettings()
+        doCallRealMethod().whenever(playbackManager).playIfNotPlaying(any())
+        whenever(playbackManager.isPlaying()).thenReturn(true)
+
+        assertTrue(sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_PLAY))
+        testScope.advanceTimeBy(490)
+        assertTrue(sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_PLAY, repeatCount = 1))
+        testScope.advanceUntilIdle()
+
+        verify(playbackManager).playIfNotPlaying(sourceView = any())
+        verify(playbackManager, never()).skipForwardSuspend(sourceView = any(), jumpAmountSeconds = any())
+        verify(playbackManager, never()).playQueue(any(), any())
+        verify(playbackManager, never()).playPause(any())
+    }
+
+    @Test
     fun `KEYCODE_MEDIA_PAUSE calls pauseSuspend`() = runTest {
         sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_PAUSE)
         testScope.advanceUntilIdle()
@@ -626,12 +645,15 @@ class Media3SessionCallbackTest {
 
     // --- Helpers ---
 
-    private fun sendMediaButtonEvent(keyCode: Int) {
-        val keyEvent = KeyEvent(KeyEvent.ACTION_DOWN, keyCode)
+    private fun sendMediaButtonEvent(
+        keyCode: Int,
+        repeatCount: Int = 0,
+    ): Boolean {
+        val keyEvent = KeyEvent(0L, 0L, KeyEvent.ACTION_DOWN, keyCode, repeatCount)
         val intent = Intent(Intent.ACTION_MEDIA_BUTTON).apply {
             putExtra(Intent.EXTRA_KEY_EVENT, keyEvent)
         }
-        callback.onMediaButtonEvent(mockSession, mockController, intent)
+        return callback.onMediaButtonEvent(mockSession, mockController, intent)
     }
 
     private fun mockHeadphoneNextAction(action: HeadphoneAction) {
