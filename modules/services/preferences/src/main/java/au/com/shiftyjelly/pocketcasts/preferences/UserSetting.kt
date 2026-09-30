@@ -88,6 +88,15 @@ abstract class UserSetting<T>(
         updateModifiedAtServerString(modifiedAt)
     }
 
+    fun reset() {
+        sharedPrefs.edit().run {
+            remove(sharedPrefKey)
+            remove(modifiedAtKey)
+            apply()
+        }
+        _flow.value = get()
+    }
+
     private fun updateModifiedAtServerString(modifiedAt: Instant?) {
         if (modifiedAt != null) {
             sharedPrefs.edit().run {

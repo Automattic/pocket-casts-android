@@ -93,7 +93,7 @@ class UserManagerImplTest {
         userManager.signOut(playbackManager, wasInitiatedByUser = true)
         advanceUntilIdle()
 
-        verify(showWhatsNewDot).set(true, updateModifiedAt = false)
+        verify(showWhatsNewDot).reset()
     }
 
     private fun TestScope.createUserManager() = UserManagerImpl(
