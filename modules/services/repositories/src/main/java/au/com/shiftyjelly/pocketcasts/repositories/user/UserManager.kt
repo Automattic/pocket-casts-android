@@ -180,6 +180,7 @@ class UserManagerImpl @Inject constructor(
             signOutJob = applicationScope.launch {
                 syncManager.signOut {
                     whatsNewManager.get().forgetReadMessages()
+                    settings.showWhatsNewDot.set(true, updateModifiedAt = false)
                     settings.clearPlusPreferences()
 
                     userEpisodeManager.removeCloudStatusFromFiles(playbackManager)
