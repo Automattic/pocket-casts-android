@@ -42,6 +42,8 @@ class DeveloperFragment : BaseFragment() {
                 bottomInset = bottomInset.value.pxToDp(LocalContext.current).dp,
                 onSendCrash = viewModel::onSendCrash,
                 onShowWhatsNewClick = ::onShowWhatsNewClick,
+                onResetWhatsNewReadState = viewModel::resetWhatsNewReadState,
+                onResetWhatsNewToFreshInstall = viewModel::resetWhatsNewToFreshInstall,
                 onResetSuggestedFoldersSuggestion = viewModel::resetSuggestedFoldersSuggestion,
                 onShowNotificationsTestingClick = ::onShowNotificationsTestingClick,
                 onResetPlaylistsOnboarding = viewModel::resetPlaylistsOnboarding,

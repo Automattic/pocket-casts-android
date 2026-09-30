@@ -15,6 +15,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SuggestedFoldersManager
+import au.com.shiftyjelly.pocketcasts.repositories.whatsnew.WhatsNewManager
 import com.automattic.android.tracks.crashlogging.CrashLogging
 import com.google.android.play.core.ktx.requestReview
 import com.google.android.play.core.review.testing.FakeReviewManager
@@ -42,6 +43,7 @@ class DeveloperViewModel
     @ApplicationContext private val context: Context,
     private val crashLogging: CrashLogging,
     private val appReviewManagerImpl: AppReviewManagerImpl,
+    private val whatsNewManager: WhatsNewManager,
 ) : ViewModel() {
     private val reviewManager = FakeReviewManager(context)
 
@@ -193,6 +195,15 @@ class DeveloperViewModel
     fun showPlaylistTooltips() {
         settings.showPremadePlaylistsTooltip.set(true, updateModifiedAt = false)
         settings.showRearrangePlaylistsTooltip.set(true, updateModifiedAt = false)
+    }
+
+    fun resetWhatsNewReadState() {
+        whatsNewManager.resetReadState()
+    }
+
+    fun resetWhatsNewToFreshInstall() {
+        whatsNewManager.resetReadState()
+        whatsNewManager.startFeed()
     }
 
     fun resetNotificationsPrompt() {
