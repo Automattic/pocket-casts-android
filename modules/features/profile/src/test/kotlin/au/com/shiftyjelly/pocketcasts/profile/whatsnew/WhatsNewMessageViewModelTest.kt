@@ -141,7 +141,7 @@ class WhatsNewMessageViewModelTest {
 
     @Test
     fun `a supported action becomes the page's button`() = runTest {
-        feedMessages.value = listOf(message("action", page(WhatsNewAction(event = "open_discover", label = "Open Discover"))))
+        feedMessages.value = listOf(message("action", page(WhatsNewAction(type = "open_discover", label = "Open Discover", url = null))))
 
         createViewModel("action").uiState.test {
             val action = (expectMostRecentItem() as UiState.Loaded).pages.single().action
@@ -150,12 +150,26 @@ class WhatsNewMessageViewModelTest {
     }
 
     @Test
+    fun `a link action carries its url to the button`() = runTest {
+        val link = WhatsNewAction(type = "open_link", label = "Learn more", url = "https://blog.pocketcasts.com")
+        feedMessages.value = listOf(message("link", page(link)))
+
+        createViewModel("link").uiState.test {
+            val action = (expectMostRecentItem() as UiState.Loaded).pages.single().action
+            assertEquals(
+                WhatsNewMessageViewModel.Action("Learn more", WhatsNewActionEvent.OpenLink, "https://blog.pocketcasts.com"),
+                action,
+            )
+        }
+    }
+
+    @Test
     fun `an unsupported action drops only the button`() = runTest {
         feedMessages.value = listOf(
             message(
                 "unsupported",
-                page(WhatsNewAction(event = "open_time_machine", label = "Travel")),
-                page(WhatsNewAction(event = "open_hyperspace", label = "Jump")),
+                page(WhatsNewAction(type = "open_time_machine", label = "Travel", url = null)),
+                page(WhatsNewAction(type = "open_hyperspace", label = "Jump", url = null)),
             ),
         )
 
@@ -348,7 +362,7 @@ class WhatsNewMessageViewModelTest {
 
     @Test
     fun `tapping an action reports it with its message`() = runTest {
-        feedMessages.value = listOf(message("action", page(WhatsNewAction(event = "open_upsell", label = "Upgrade"))))
+        feedMessages.value = listOf(message("action", page(WhatsNewAction(type = "open_upsell", label = "Upgrade", url = null))))
         val viewModel = createViewModel("action")
 
         viewModel.uiState.test {

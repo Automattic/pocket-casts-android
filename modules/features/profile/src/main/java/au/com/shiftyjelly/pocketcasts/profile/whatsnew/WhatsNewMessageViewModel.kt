@@ -89,11 +89,12 @@ class WhatsNewMessageViewModel @AssistedInject constructor(
 
     internal fun onActionClick(event: WhatsNewActionEvent) {
         val message = shownMessage ?: return
+        val action = event.analyticsValue ?: return
         eventHorizon.track(
             WhatsNewActionTappedEvent(
                 messageUuid = message.id,
                 messageType = message.type.analyticsValue,
-                action = event.analyticsValue,
+                action = action,
             ),
         )
     }
@@ -152,6 +153,7 @@ class WhatsNewMessageViewModel @AssistedInject constructor(
     internal data class Action(
         val label: String,
         val event: WhatsNewActionEvent,
+        val url: String? = null,
     )
 
     private fun pagesOf(message: WhatsNewMessage) = when (val content = message.content) {
@@ -168,11 +170,11 @@ class WhatsNewMessageViewModel @AssistedInject constructor(
     }
 
     private fun actionOf(action: WhatsNewAction): Action? {
-        val event = WhatsNewActionEvent.fromKey(action.event)
+        val event = WhatsNewActionEvent.fromKey(action.type)
         if (event == null) {
-            Timber.i("What's New: dropping an action this build doesn't support: ${action.event}")
+            Timber.i("What's New: dropping an action this build doesn't support: ${action.type}")
         }
-        return event?.let { Action(label = action.label, event = it) }
+        return event?.let { Action(label = action.label, event = it, url = action.url) }
     }
 
     private val WhatsNewMessage.research get() = (content as? WhatsNewContent.Research)?.research

@@ -34,6 +34,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -143,6 +144,7 @@ import au.com.shiftyjelly.pocketcasts.player.view.dialog.MiniPlayerDialog
 import au.com.shiftyjelly.pocketcasts.player.view.video.VideoActivity
 import au.com.shiftyjelly.pocketcasts.playlists.PlaylistFragment
 import au.com.shiftyjelly.pocketcasts.playlists.PlaylistsFragment
+import au.com.shiftyjelly.pocketcasts.playlists.showCreatePlaylist
 import au.com.shiftyjelly.pocketcasts.podcasts.view.ProfileEpisodeListFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeContainerFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.SuggestedFoldersFragment
@@ -1621,6 +1623,22 @@ class MainActivity :
 
     override fun closeProfileToRoot() {
         navigator.reset(tab = VR.id.navigation_profile, resetRootFragment = false)
+    }
+
+    override fun openCreatePlaylist() {
+        closePlayer()
+        navigator.reset(tab = VR.id.navigation_filters, resetRootFragment = false)
+        supportFragmentManager.showCreatePlaylist()
+    }
+
+    override fun openInAppDeepLink(url: String): Boolean {
+        val intent = Intent(Intent.ACTION_VIEW, url.toUri())
+        val deepLink = deepLinkFactory.create(intent)
+        if (deepLink == null || deepLink is ShowPodcastFromUrlDeepLink || deepLink is PocketCastsWebsiteGetDeepLink) {
+            return false
+        }
+        handleIntent(intent, savedInstanceState = null)
+        return true
     }
 
     override fun setSupportActionBar(toolbar: Toolbar?) {
