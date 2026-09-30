@@ -791,7 +791,6 @@ Language: zh_TW
     <string name="referrals_claim_guest_pass_title">領取你的 %1$s 訪客體驗券</string>
     <string name="referrals_claim_guess_pass_banner_card_subtitle">解鎖完整聆聽體驗</string>
     <string name="referrals_claim_guess_pass_banner_card_title">領取你的 %1$s Plus 訪客體驗券</string>
-    <string name="referrals_tooltip_message">贈送 %1$s Pocket Casts Plus 體驗！</string>
     <string name="referrals_share_guest_pass">分享訪客體驗券</string>
     <string name="referrals_send_guest_pass_title">贈送 %1$s Pocket Casts Plus 體驗</string>
     <string name="move_down">下移</string>

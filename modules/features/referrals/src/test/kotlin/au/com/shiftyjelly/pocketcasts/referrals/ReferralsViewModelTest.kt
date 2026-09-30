@@ -15,14 +15,11 @@ import au.com.shiftyjelly.pocketcasts.referrals.ReferralsViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import com.automattic.eventhorizon.EventHorizon
-import com.google.android.material.bottomsheet.BottomSheetBehavior
 import io.reactivex.Flowable
 import java.time.Instant
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.mock
@@ -50,13 +47,8 @@ class ReferralsViewModelTest {
         giftDays = 0,
     )
 
-    @Before
-    fun setUp() {
-        whenever(settings.playerOrUpNextBottomSheetState).thenReturn(flowOf(BottomSheetBehavior.STATE_COLLAPSED))
-    }
-
     @Test
-    fun `gift icon ,tooltip, profile banner are not shown if referral subscription offer not found`() = runTest {
+    fun `gift icon and profile banner are not shown if referral subscription offer not found`() = runTest {
         paymentDataSource.loadedProducts = emptyList()
         initViewModel()
 
@@ -104,46 +96,6 @@ class ReferralsViewModelTest {
 
         viewModel.state.test {
             assertEquals(true, (awaitItem() as UiState.Loaded).showIcon)
-        }
-    }
-
-    @Test
-    fun `tooltip is shown for paid account on launch`() = runTest {
-        initViewModel()
-
-        viewModel.state.test {
-            assertEquals(true, (awaitItem() as UiState.Loaded).showTooltip)
-        }
-    }
-
-    @Test
-    fun `tooltip is not shown for free account on launch`() = runTest {
-        initViewModel(SignInState.SignedOut)
-
-        viewModel.state.test {
-            assertEquals(false, (awaitItem() as UiState.Loaded).showTooltip)
-        }
-    }
-
-    @Test
-    fun `tooltip is hidden on icon click`() = runTest {
-        initViewModel()
-
-        viewModel.onIconClick()
-
-        viewModel.state.test {
-            assertEquals(false, (awaitItem() as UiState.Loaded).showTooltip)
-        }
-    }
-
-    @Test
-    fun `tooltip is hidden on tooltip click`() = runTest {
-        initViewModel()
-
-        viewModel.onTooltipClick()
-
-        viewModel.state.test {
-            assertEquals(false, (awaitItem() as UiState.Loaded).showTooltip)
         }
     }
 
@@ -210,9 +162,7 @@ class ReferralsViewModelTest {
     private fun initViewModel(
         signInState: SignInState = SignInState.SignedIn(email, subscription),
         referralCode: String = referralClaimCode,
-        showReferralsTooltipUserSetting: UserSetting<Boolean> = UserSetting.Mock(true, mock()),
     ) {
-        whenever(settings.showReferralsTooltip).thenReturn(showReferralsTooltipUserSetting)
         whenever(userManager.getSignInState()).thenReturn(Flowable.just(signInState))
         whenever(settings.referralClaimCode).thenReturn(UserSetting.Mock(referralCode, mock()))
         viewModel = ReferralsViewModel(

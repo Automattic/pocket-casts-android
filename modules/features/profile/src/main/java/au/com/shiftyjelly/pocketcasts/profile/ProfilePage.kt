@@ -57,7 +57,7 @@ import au.com.shiftyjelly.pocketcasts.payment.flatMap
 import au.com.shiftyjelly.pocketcasts.payment.getOrNull
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralSubscriptionPlan
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralsClaimGuestPassBannerCard
-import au.com.shiftyjelly.pocketcasts.referrals.ReferralsIconWithTooltip
+import au.com.shiftyjelly.pocketcasts.referrals.ReferralsIcon
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralsViewModel
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import java.util.Date
@@ -71,8 +71,6 @@ internal fun ProfilePage(
     state: ProfilePageState,
     themeType: Theme.ThemeType,
     onSendReferralsClick: () -> Unit,
-    onReferralsTooltipClick: () -> Unit,
-    onReferralsTooltipShow: () -> Unit,
     onSettingsClick: () -> Unit,
     onWhatsNewClick: () -> Unit,
     onHeaderClick: () -> Unit,
@@ -102,8 +100,6 @@ internal fun ProfilePage(
             Toolbar(
                 state = state.referralsState,
                 onSendReferralsClick = onSendReferralsClick,
-                onReferralsTooltipClick = onReferralsTooltipClick,
-                onReferralsTooltipShow = onReferralsTooltipShow,
                 onSettingsClick = onSettingsClick,
                 isWhatsNewVisible = state.isWhatsNewVisible,
                 hasWhatsNewDot = state.hasWhatsNewDot,
@@ -253,8 +249,6 @@ private fun VerticalSpacer() {
 private fun Toolbar(
     state: ReferralsViewModel.UiState,
     onSendReferralsClick: () -> Unit,
-    onReferralsTooltipClick: () -> Unit,
-    onReferralsTooltipShow: () -> Unit,
     onSettingsClick: () -> Unit,
     isWhatsNewVisible: Boolean,
     hasWhatsNewDot: Boolean,
@@ -270,11 +264,9 @@ private fun Toolbar(
             .height(56.dp)
             .padding(horizontal = horizontalPadding),
     ) {
-        ReferralsIconWithTooltip(
+        ReferralsIcon(
             state = state,
             onIconClick = onSendReferralsClick,
-            onTooltipClick = onReferralsTooltipClick,
-            onTooltipShow = onReferralsTooltipShow,
         )
         if (LocalConfiguration.current.orientation != Configuration.ORIENTATION_LANDSCAPE) {
             Spacer(
@@ -447,7 +439,6 @@ private fun ProfilePageStub(
                     .flatMap(ReferralSubscriptionPlan::create)
                     .getOrNull()!!,
                 showIcon = true,
-                showTooltip = false,
                 showProfileBanner = true,
                 showHideBannerPopup = false,
             ),
@@ -455,8 +446,6 @@ private fun ProfilePageStub(
         ),
         themeType = theme,
         onClaimReferralsClick = {},
-        onReferralsTooltipClick = {},
-        onReferralsTooltipShow = {},
         onSettingsClick = {},
         onWhatsNewClick = {},
         onHeaderClick = {},

@@ -791,7 +791,6 @@ Language: ru
     <string name="referrals_claim_guest_pass_title">Получите бесплатный гостевой пропуск на %1$s</string>
     <string name="referrals_claim_guess_pass_banner_card_subtitle">Откройте невероятные возможности прослушивания</string>
     <string name="referrals_claim_guess_pass_banner_card_title">Получите бесплатный гостевой пропуск в Plus на %1$s</string>
-    <string name="referrals_tooltip_message">%1$s пользования Pocket Casts Plus в подарок!</string>
     <string name="referrals_share_guest_pass">Поделиться гостевым пропуском</string>
     <string name="referrals_send_guest_pass_title">%1$s пользования Pocket Casts Plus в подарок</string>
     <string name="move_down">Перенести вниз</string>

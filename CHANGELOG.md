@@ -1,6 +1,8 @@
 8.23
 -----
-
+*   Updates
+    *   Remove the "Gift … of Pocket Casts Plus!" tooltip from the Profile tab
+        ([#TBD](https://github.com/Automattic/pocket-casts-android/pull/TBD))
 
 8.22
 -----

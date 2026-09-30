@@ -20,7 +20,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.PlaylistPlay
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.outlined.BugReport
-import androidx.compose.material.icons.outlined.CardGiftcard
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Downloading
 import androidx.compose.material.icons.outlined.EditCalendar
@@ -67,7 +66,6 @@ fun DeveloperPage(
     onResetSuggestedFoldersSuggestion: () -> Unit,
     onResetPlaylistsOnboarding: () -> Unit,
     onResetUpNextSortTooltip: () -> Unit,
-    onShowGiftTooltip: () -> Unit,
     onShowPlaylistTooltips: () -> Unit,
     onResetNotificationsPrompt: () -> Unit,
     onShowAppReviewPrompt: () -> Unit,
@@ -130,9 +128,6 @@ fun DeveloperPage(
         }
         item {
             ResetUpNextSortTooltip(onClick = onResetUpNextSortTooltip)
-        }
-        item {
-            ShowGiftTooltip(onClick = onShowGiftTooltip)
         }
 
         item {
@@ -313,19 +308,6 @@ private fun ResetUpNextSortTooltip(
         primaryText = "Show Up Next sort tooltip",
         secondaryText = "Show the \"Sort by Duration\" tooltip on the Up Next tab again",
         icon = rememberVectorPainter(Icons.AutoMirrored.Outlined.PlaylistPlay),
-        modifier = modifier.clickable { onClick() },
-    )
-}
-
-@Composable
-private fun ShowGiftTooltip(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    SettingRow(
-        primaryText = "Show gift tooltip",
-        secondaryText = "Show the referrals tooltip on the gift icon again",
-        icon = rememberVectorPainter(Icons.Outlined.CardGiftcard),
         modifier = modifier.clickable { onClick() },
     )
 }
@@ -540,7 +522,6 @@ private fun DeveloperPagePreview() {
         onShowNotificationsTestingClick = {},
         onResetPlaylistsOnboarding = {},
         onResetUpNextSortTooltip = {},
-        onShowGiftTooltip = {},
         onShowPlaylistTooltips = {},
         onResetNotificationsPrompt = {},
         onShowAppReviewPrompt = {},
