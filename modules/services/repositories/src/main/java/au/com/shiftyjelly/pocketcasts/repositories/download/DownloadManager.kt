@@ -187,19 +187,27 @@ private class DownloadQueueController(
             }
             clearCancellableDownloads()
         }
-        deleteOrphanedPartialDownloads(pendingWorks.keys)
+        deleteOrphanedPartialDownloads()
     }
 
-    private fun deleteOrphanedPartialDownloads(pendingEpisodeUuids: Set<String>) {
+    private suspend fun deleteOrphanedPartialDownloads() {
         val staleBefore = clock.instant().minus(PARTIAL_DOWNLOAD_MAX_IDLE).toEpochMilli()
-        runCatching {
+        val staleFiles = runCatching {
             fileStorage.getOrCreateEpisodesTempDir()
                 .listFiles()
                 .orEmpty()
                 .filter { file -> file.isFile && !file.isHidden && file.lastModified() < staleBefore }
-                .filter { file -> file.name.substringBefore('.') !in pendingEpisodeUuids }
-                .forEach(File::delete)
+        }.getOrDefault(emptyList())
+        if (staleFiles.isEmpty()) {
+            return
         }
+        val pendingEpisodeUuids = workManager
+            .getDownloadWorkInfos<DownloadWorkInfo>()
+            .filterValues(DownloadWorkInfo::isCancellable)
+            .keys
+        staleFiles
+            .filter { file -> file.name.substringBefore('.') !in pendingEpisodeUuids }
+            .forEach { file -> runCatching { file.delete() } }
     }
 
     suspend fun addToQueue(episodeUuids: Collection<String>, downloadType: DownloadType, sourceView: SourceView) {
