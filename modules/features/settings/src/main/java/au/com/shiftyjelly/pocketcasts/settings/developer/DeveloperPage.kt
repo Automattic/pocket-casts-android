@@ -28,8 +28,8 @@ import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.MarkEmailUnread
 import androidx.compose.material.icons.outlined.NewReleases
-import androidx.compose.material.icons.outlined.RestartAlt
 import androidx.compose.material.icons.outlined.Notifications
+import androidx.compose.material.icons.outlined.RestartAlt
 import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -377,7 +377,7 @@ private fun ResetWhatsNewReadState(
 ) {
     SettingRow(
         primaryText = "Reset read state",
-        secondaryText = "Mark every message unread and bring the dots back",
+        secondaryText = "Forget which messages were read, seen, listed or answered on this device",
         icon = rememberVectorPainter(Icons.Outlined.MarkEmailUnread),
         modifier = modifier.clickable { onClick() },
     )
