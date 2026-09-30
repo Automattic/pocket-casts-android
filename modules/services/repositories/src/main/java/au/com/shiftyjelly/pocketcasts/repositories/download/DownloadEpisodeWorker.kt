@@ -172,7 +172,7 @@ class DownloadEpisodeWorker @AssistedInject constructor(
             is DownloadResult.Failure -> {
                 val (errorMessage, shouldRetry) = processFailure(result)
                 val isRetrying = shouldRetry && runAttemptCount < MAX_DOWNLOAD_ATTEMPT_COUNT
-                if (!isRetrying || stopReason == WorkInfo.STOP_REASON_CANCELLED_BY_APP) {
+                if (!isRetrying || isCancelledByApp()) {
                     partialDownloadFile?.let(downloader::discardPartialDownload)
                 }
                 if (isRetrying) {
@@ -186,6 +186,10 @@ class DownloadEpisodeWorker @AssistedInject constructor(
                 }
             }
         }
+    }
+
+    private fun isCancelledByApp(): Boolean {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && stopReason == WorkInfo.STOP_REASON_CANCELLED_BY_APP
     }
 
     override fun onStopped() {
