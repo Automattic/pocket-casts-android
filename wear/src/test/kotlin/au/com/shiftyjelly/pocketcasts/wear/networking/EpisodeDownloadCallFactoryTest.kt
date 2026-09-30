@@ -5,6 +5,7 @@ import com.google.android.horologist.networks.data.RequestType
 import com.google.android.horologist.networks.okhttp.impl.RequestTypeHolder.Companion.requestType
 import com.google.android.horologist.networks.okhttp.requestTypeOrNull
 import java.io.IOException
+import kotlin.reflect.KClass
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.EventListener
@@ -16,7 +17,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import kotlin.reflect.KClass
 
 class EpisodeDownloadCallFactoryTest {
     private val delegate = FakeCallFactory()
