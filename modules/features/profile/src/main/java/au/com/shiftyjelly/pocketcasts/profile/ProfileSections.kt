@@ -2,19 +2,15 @@ package au.com.shiftyjelly.pocketcasts.profile
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ripple
@@ -27,7 +23,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -47,14 +42,11 @@ internal fun ProfileSections(
     sections: List<ProfileSection>,
     onClick: (ProfileSection) -> Unit,
     modifier: Modifier = Modifier,
-    sectionsWithDot: Set<ProfileSection> = emptySet(),
 ) {
     Column(
         modifier = modifier,
     ) {
-        val unreadDescription = stringResource(LR.string.whats_new_feed_unread)
         sections.forEach { section ->
-            val hasDot = section in sectionsWithDot
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
@@ -69,9 +61,6 @@ internal fun ProfileSections(
                     )
                     .semantics(mergeDescendants = true) {
                         role = Role.Button
-                        if (hasDot) {
-                            stateDescription = unreadDescription
-                        }
                     }
                     .padding(16.dp),
             ) {
@@ -85,15 +74,7 @@ internal fun ProfileSections(
                 )
                 TextP40(
                     text = stringResource(section.labelId),
-                    modifier = Modifier.weight(1f),
                 )
-                if (hasDot) {
-                    Box(
-                        modifier = Modifier
-                            .size(8.dp)
-                            .background(MaterialTheme.theme.colors.support05, CircleShape),
-                    )
-                }
             }
             HorizontalDivider()
         }
@@ -104,10 +85,6 @@ internal enum class ProfileSection(
     @DrawableRes val iconId: Int,
     @StringRes val labelId: Int,
 ) {
-    WhatsNew(
-        iconId = IR.drawable.ic_mail,
-        labelId = LR.string.settings_whats_new,
-    ),
     Stats(
         iconId = IR.drawable.ic_stats,
         labelId = LR.string.profile_navigation_stats,
@@ -145,7 +122,6 @@ internal enum class ProfileSection(
     companion object {
         fun visibleEntries(): List<ProfileSection> = entries.filter { section ->
             when (section) {
-                WhatsNew -> FeatureFlag.isEnabled(Feature.WHATS_NEW_FEED)
                 Blogs -> FeatureFlag.isEnabled(Feature.BLOGS)
                 else -> true
             }
@@ -163,7 +139,6 @@ private fun ProfileSectionsPreview(
             sections = ProfileSection.entries,
             onClick = {},
             modifier = Modifier.fillMaxWidth(),
-            sectionsWithDot = setOf(ProfileSection.WhatsNew),
         )
     }
 }
