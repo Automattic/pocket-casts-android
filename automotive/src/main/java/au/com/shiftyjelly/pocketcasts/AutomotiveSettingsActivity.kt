@@ -115,7 +115,7 @@ class AutomotiveSettingsActivity :
     override fun openCreatePlaylist() {
     }
 
-    override fun openDeepLink(url: String) = false
+    override fun openInAppDeepLink(url: String) = false
 
     override fun openPodcastPage(uuid: String, sourceView: String?) {
     }

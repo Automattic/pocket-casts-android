@@ -1631,7 +1631,7 @@ class MainActivity :
         supportFragmentManager.showCreatePlaylist()
     }
 
-    override fun openDeepLink(url: String): Boolean {
+    override fun openInAppDeepLink(url: String): Boolean {
         val intent = Intent(Intent.ACTION_VIEW, url.toUri())
         val deepLink = deepLinkFactory.create(intent)
         if (deepLink == null || deepLink is ShowPodcastFromUrlDeepLink || deepLink is PocketCastsWebsiteGetDeepLink) {

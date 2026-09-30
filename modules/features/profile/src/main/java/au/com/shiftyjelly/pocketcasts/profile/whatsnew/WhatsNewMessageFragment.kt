@@ -91,7 +91,7 @@ class WhatsNewMessageFragment : BaseFragment() {
     }
 
     private fun openLink(host: FragmentHostListener, url: String) {
-        if (!host.openDeepLink(url)) {
+        if (!host.openInAppDeepLink(url)) {
             WebViewActivity.show(context, url.toUri().host.orEmpty(), url)
         }
     }

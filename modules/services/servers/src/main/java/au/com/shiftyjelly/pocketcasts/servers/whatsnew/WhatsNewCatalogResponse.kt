@@ -2,12 +2,11 @@ package au.com.shiftyjelly.pocketcasts.servers.whatsnew
 
 import au.com.shiftyjelly.pocketcasts.servers.adapters.LossyList
 import com.squareup.moshi.JsonClass
-import java.net.URI
-import java.net.URISyntaxException
 import java.time.Instant
 import java.time.OffsetDateTime
 import java.time.format.DateTimeParseException
 import java.util.Date
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import timber.log.Timber
 
 @JsonClass(generateAdapter = true)
@@ -181,12 +180,7 @@ data class WhatsNewPollOptionResponse(
 
 private fun String?.nonBlank() = this?.trim()?.takeIf(String::isNotEmpty)
 
-private fun isSecureWebUrl(value: String) = try {
-    val uri = URI(value)
-    uri.scheme.equals("https", ignoreCase = true) && !uri.host.isNullOrEmpty()
-} catch (e: URISyntaxException) {
-    false
-}
+private fun isSecureWebUrl(value: String) = value.toHttpUrlOrNull()?.scheme == "https"
 
 private fun parseInstantOrNull(value: String) = try {
     OffsetDateTime.parse(value).toInstant()
