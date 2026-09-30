@@ -11,17 +11,12 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import okhttp3.Call
 import okhttp3.OkHttpClient
-import okhttp3.Request
 
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class AutomotiveAppModule {
 
     companion object {
-        @Provides
-        @Downloads
-        fun downloadRequestBuilder(): Request.Builder = Request.Builder()
-
         @Provides
         fun provideShareDialogFactory(): AddToPlaylistFragmentFactory = AddToPlaylistFragmentFactory.Stub
     }
