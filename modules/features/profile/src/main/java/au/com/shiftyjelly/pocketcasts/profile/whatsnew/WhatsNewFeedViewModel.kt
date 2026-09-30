@@ -45,7 +45,7 @@ class WhatsNewFeedViewModel @Inject constructor(
                     type = message.type,
                     title = message.title,
                     publishedAt = message.publishedAt,
-                    isUnread = !readState.isRead(message.id),
+                    isUnread = !readState.isRead(message),
                 )
             },
             loadState = if (catalog != null) LoadState.Loaded else loadState,

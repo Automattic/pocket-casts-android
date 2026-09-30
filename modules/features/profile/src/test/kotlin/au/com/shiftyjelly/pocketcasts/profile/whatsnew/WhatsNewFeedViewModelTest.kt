@@ -302,6 +302,10 @@ class WhatsNewFeedViewModelTest {
             readState.value = readState.value.copy(respondedPollIds = readState.value.respondedPollIds + pollId)
         }
 
+        override fun startFeed() = Unit
+
+        override fun forgetReadMessages() = Unit
+
         override fun resetReadState() {
             readState.value = WhatsNewReadState()
         }
