@@ -790,7 +790,6 @@ Language: de
     <string name="referrals_activate_my_pass">Meinen Pass aktivieren</string>
     <string name="referrals_claim_guest_pass_title">Sichere dir deinen %1$s-Gastpass</string>
     <string name="referrals_claim_guess_pass_banner_card_subtitle">Profitiere vom vollständigen Audioerlebnis</string>
-    <string name="referrals_tooltip_message">Verschenke %1$s-Pocket Casts Plus!</string>
     <string name="referrals_claim_guess_pass_banner_card_title">Sichere dir deinen %1$s-Gastpass für Plus</string>
     <string name="referrals_share_guest_pass">Gastpass teilen</string>
     <string name="referrals_send_guest_pass_title">Verschenke %1$s-Pocket Casts Plus</string>

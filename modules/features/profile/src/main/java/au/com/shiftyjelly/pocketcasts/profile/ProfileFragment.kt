@@ -89,14 +89,7 @@ class ProfileFragment :
             themeType = theme.activeTheme,
             listState = listState,
             onSendReferralsClick = {
-                referralsViewModel.onIconClick()
                 fragmentHostListener.showBottomSheet(ReferralsGuestPassFragment.newInstance(ReferralsPageType.Send))
-            },
-            onReferralsTooltipClick = {
-                referralsViewModel.onTooltipClick()
-            },
-            onReferralsTooltipShow = {
-                referralsViewModel.onTooltipShown()
             },
             onSettingsClick = {
                 profileViewModel.onSettingsClick()

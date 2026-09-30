@@ -790,7 +790,6 @@ Language: zh_CN
     <string name="referrals_activate_my_pass">激活我的通行证</string>
     <string name="referrals_claim_guest_pass_title">领取您的 %1$s 访客通行证</string>
     <string name="referrals_claim_guess_pass_banner_card_subtitle">解锁完整的收听体验</string>
-    <string name="referrals_tooltip_message">赠送 %1$s Pocket Casts Plus 使用权！</string>
     <string name="referrals_claim_guess_pass_banner_card_title">领取您的 %1$s Plus 访客通行证</string>
     <string name="referrals_share_guest_pass">共享访客通行证</string>
     <string name="referrals_send_guest_pass_title">赠送 %1$s Pocket Casts Plus 使用权</string>
