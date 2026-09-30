@@ -2,7 +2,7 @@
 -----
 *   Bug Fixes
     *   Fix Wear OS episode downloads not switching to WiFi
-        ([#PR](https://github.com/Automattic/pocket-casts-android/pull/PR))
+        ([#6100](https://github.com/Automattic/pocket-casts-android/pull/6100))
 
 
 8.22
