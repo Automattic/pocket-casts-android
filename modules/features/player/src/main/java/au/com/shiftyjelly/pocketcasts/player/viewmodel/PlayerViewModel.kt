@@ -590,7 +590,7 @@ class PlayerViewModel @Inject constructor(
         val episode = playbackManager.upNextQueue.currentEpisode ?: return
 
         if (episode.isDownloadNotRequested) {
-            downloadQueue.enqueue(episode.uuid, DownloadType.UserTriggered(waitForWifi = false), source)
+            downloadQueue.enqueue(episode.uuid, DownloadType.UserTriggered(waitForWifi = settings.warnOnMeteredNetwork.value), source)
             onDownloadStart.invoke()
         } else {
             downloadQueue.cancel(episode.uuid, source)
