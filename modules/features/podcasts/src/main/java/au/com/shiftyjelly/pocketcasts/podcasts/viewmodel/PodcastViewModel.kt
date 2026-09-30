@@ -451,10 +451,10 @@ class PodcastViewModel @Inject constructor(
         }
     }
 
-    fun downloadAll() {
+    fun downloadAll(waitForWifi: Boolean) {
         val episodes = (uiState.value as? UiState.Loaded)?.episodes ?: return
         val trimmedList = episodes.subList(0, min(Settings.MAX_DOWNLOAD, episodes.count())).map(PodcastEpisode::uuid)
-        downloadQueue.enqueueAll(trimmedList, DownloadType.UserTriggered(waitForWifi = false), SourceView.PODCAST_SCREEN)
+        downloadQueue.enqueueAll(trimmedList, DownloadType.UserTriggered(waitForWifi), SourceView.PODCAST_SCREEN)
     }
 
     suspend fun getFolder(): Folder? {
