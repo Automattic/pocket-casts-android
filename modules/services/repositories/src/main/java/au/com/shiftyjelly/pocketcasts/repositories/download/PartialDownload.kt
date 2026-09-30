@@ -74,7 +74,7 @@ internal data class PartialDownload(
 
         private fun Response.hasIdentityEncoding() = header("Content-Encoding").let { it == null || it.equals("identity", ignoreCase = true) }
 
-        private val CONTENT_RANGE_REGEX = Regex("""bytes (\d+)-(\d+)/(\d+)""")
+        private val CONTENT_RANGE_REGEX = Regex("""bytes (\d+)-(\d+)/(\d+)""", RegexOption.IGNORE_CASE)
 
         private const val ENTITY_TAG_KEY = "entityTag"
         private const val LAST_MODIFIED_KEY = "lastModified"
