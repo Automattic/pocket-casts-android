@@ -1,7 +1,7 @@
 8.23
 -----
 *   Bug Fixes
-    *   Ask before Download All and multi-select downloads use mobile data
+    *   Ask before Download All, multi-select and Wear OS downloads use mobile data
         ([#6096](https://github.com/Automattic/pocket-casts-android/pull/6096))
 
 
