@@ -30,10 +30,17 @@ class EpisodeDownloadCallFactory(
         private val isCompleted = AtomicBoolean()
 
         @Volatile
+        private var isCancelled = false
+
+        @Volatile
         private var callback: Callback? = null
 
         override fun enqueue(responseCallback: Callback) {
             callback = responseCallback
+            if (isCancelled) {
+                failCancelled()
+                return
+            }
             delegate.enqueue(
                 object : Callback {
                     override fun onFailure(call: Call, e: IOException) {
@@ -54,7 +61,12 @@ class EpisodeDownloadCallFactory(
         }
 
         override fun cancel() {
+            isCancelled = true
             delegate.cancel()
+            failCancelled()
+        }
+
+        private fun failCancelled() {
             val callback = callback
             if (callback != null && isCompleted.compareAndSet(false, true)) {
                 callback.onFailure(this, IOException("Canceled"))

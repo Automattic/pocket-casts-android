@@ -87,6 +87,18 @@ class EpisodeDownloadCallFactoryTest {
     }
 
     @Test
+    fun `fail a download that is cancelled before it is enqueued`() {
+        val call = factory.newCall(downloadRequest(waitForWifi = true))
+        val callback = RecordingCallback()
+
+        call.cancel()
+        call.enqueue(callback)
+
+        assertEquals(1, callback.failures.size)
+        assertEquals(false, delegate.calls.single().isExecuted())
+    }
+
+    @Test
     fun `pass the response of a download through once`() {
         val call = factory.newCall(downloadRequest(waitForWifi = false))
         val callback = RecordingCallback()
