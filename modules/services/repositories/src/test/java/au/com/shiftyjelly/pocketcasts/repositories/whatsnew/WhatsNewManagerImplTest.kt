@@ -544,6 +544,42 @@ class WhatsNewManagerImplTest {
         }
     }
 
+    @Test
+    fun `an answered poll leaves the feed and its dots`() = runTest {
+        serviceManager.catalog = pollCatalogJson()
+        val manager = manager()
+        manager.refreshIfNeeded()
+
+        manager.markAsResponded("p1")
+
+        manager.feedMessages.test {
+            assertEquals(listOf("m1"), awaitItem().map { it.id })
+        }
+        manager.hasUnlistedMessages.test {
+            assertTrue(awaitItem())
+        }
+        manager.markAsListed(listOf("m1"))
+        manager.hasUnlistedMessages.test {
+            assertFalse(awaitItem())
+        }
+        manager.hasUnseenMessages.test {
+            assertFalse(awaitItem())
+        }
+    }
+
+    @Test
+    fun `answering another poll leaves this one in the feed`() = runTest {
+        serviceManager.catalog = pollCatalogJson()
+        val manager = manager()
+        manager.refreshIfNeeded()
+
+        manager.markAsResponded("another-poll")
+
+        manager.feedMessages.test {
+            assertEquals(listOf("poll", "m1"), awaitItem().map { it.id })
+        }
+    }
+
     private fun catalogJson(
         title: String,
         audiences: String = """["free"]""",
@@ -590,6 +626,35 @@ class WhatsNewManagerImplTest {
             read -= ids.toSet()
         }
     }
+
+    private fun pollCatalogJson() = """
+            {
+              "schemaVersion": 1,
+              "messages": [
+                {
+                  "id": "m1",
+                  "type": "new_feature",
+                  "publishedAt": "2026-09-18T05:11:26Z",
+                  "targeting": { "audiences": ["free"] },
+                  "title": "Browse by network",
+                  "pages": [{ "heading": "h", "description": "d" }]
+                },
+                {
+                  "id": "poll",
+                  "type": "research",
+                  "publishedAt": "2026-09-19T05:11:26Z",
+                  "targeting": { "audiences": ["free"] },
+                  "title": "Help shape the player",
+                  "poll": {
+                    "pollId": "p1",
+                    "pollKey": "player",
+                    "question": "What should we improve next?",
+                    "options": [{ "id": "o1", "pollOptionKey": "up_next", "label": "Up Next" }]
+                  }
+                }
+              ]
+            }
+    """.trimIndent()
 
     private class FakeServiceManager(
         var catalog: String,
