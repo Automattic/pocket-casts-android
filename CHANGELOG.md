@@ -10,7 +10,7 @@
         ([#6105](https://github.com/Automattic/pocket-casts-android/pull/6105))
     *   Fix a crash when opening onboarding or upgrade screens on Android 8.0
         ([#6104](https://github.com/Automattic/pocket-casts-android/pull/6104))
-    *   Ask before Download All and multi-select downloads use mobile data
+    *   Ask before Download All, multi-select and Wear OS downloads use mobile data
         ([#6096](https://github.com/Automattic/pocket-casts-android/pull/6096))
 
 8.22
