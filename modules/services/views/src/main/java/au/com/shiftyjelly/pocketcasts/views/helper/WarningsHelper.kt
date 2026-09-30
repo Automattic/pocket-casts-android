@@ -5,9 +5,11 @@ import android.content.Context
 import android.view.View
 import androidx.fragment.app.Fragment
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPlural
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadQueue
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadType
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -36,6 +38,7 @@ class WarningsHelper @Inject constructor(
     private val playbackManager: PlaybackManager,
     private val userEpisodeManager: UserEpisodeManager,
     private val eventHorizon: EventHorizon,
+    private val settings: Settings,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) {
 
@@ -79,6 +82,34 @@ class WarningsHelper @Inject constructor(
             .setOnConfirm { download(episodeUuid, waitForWifi = false, source = source) }
             .setSecondaryButtonType(ConfirmationDialog.ButtonType.Normal(activity.getString(LR.string.download_warning_on_wifi_later)))
             .setOnSecondary { download(episodeUuid, waitForWifi = true, source = source) }
+    }
+
+    fun bulkDownloadDialog(episodeCount: Int, onDownload: (waitForWifi: Boolean) -> Unit): ConfirmationDialog? {
+        return if (Network.isUnmeteredConnection(activity)) {
+            val waitForWifi = settings.warnOnMeteredNetwork.value
+            ConfirmationDialog.downloadWarningDialog(episodeCount, activity.resources) { onDownload(waitForWifi) }
+        } else {
+            bulkDownloadWarning(episodeCount, onDownload)
+        }
+    }
+
+    private fun bulkDownloadWarning(episodeCount: Int, onDownload: (waitForWifi: Boolean) -> Unit): ConfirmationDialog {
+        val titleRes =
+            if (Network.isWifiConnection(activity)) LR.string.download_warning_title_metered_wifi else LR.string.download_warning_title_on_wifi
+        val summary = buildList {
+            add(activity.resources.getStringPlural(episodeCount, LR.string.download_warning_on_wifi_summary, LR.string.download_warning_bulk_on_wifi_summary))
+            if (episodeCount > Settings.MAX_DOWNLOAD) {
+                add(activity.getString(LR.string.download_warning_limit_summary, Settings.MAX_DOWNLOAD))
+            }
+        }.joinToString(separator = " ")
+        return ConfirmationDialog()
+            .setIconId(IR.drawable.ic_wifi)
+            .setTitle(activity.getString(titleRes))
+            .setSummary(summary)
+            .setButtonType(ConfirmationDialog.ButtonType.Normal(activity.getString(LR.string.download_warning_on_wifi_button)))
+            .setOnConfirm { onDownload(false) }
+            .setSecondaryButtonType(ConfirmationDialog.ButtonType.Normal(activity.getString(LR.string.download_warning_on_wifi_later)))
+            .setOnSecondary { onDownload(true) }
     }
 
     fun uploadWarning(episodeUuid: String, source: SourceView): ConfirmationDialog {
