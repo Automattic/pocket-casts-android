@@ -1,6 +1,8 @@
 8.23
 -----
 *   Bug Fixes
+    *   Show the podcast grid and playlists in Android Auto again, instead of only a short list of recent episodes
+        ([#6098](https://github.com/Automattic/pocket-casts-android/pull/6098))
     *   Show the same flat toolbar on every screen opened from Profile
         ([#6093](https://github.com/Automattic/pocket-casts-android/pull/6093))
 
