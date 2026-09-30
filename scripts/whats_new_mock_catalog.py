@@ -35,6 +35,7 @@ def main():
 
     device.adb("shell", "am", "force-stop", args.package)
     device.run_as("mkdir", "-p", CACHE_DIR)
+    device.run_as("rm", "-f", f"{CACHE_DIR}/journal.bkp")
 
     if args.reset:
         device.run_as("rm", "-f", f"{CACHE_DIR}/{key}.0", f"{CACHE_DIR}/{key}.1")
