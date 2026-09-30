@@ -88,6 +88,40 @@ class WhatsNewReadStateStoreTest {
     }
 
     @Test
+    fun `a read waits for the account until it is uploaded`() {
+        store().markAsRead(listOf("m1"))
+        assertEquals(setOf("m1"), store().state.value.pendingReadMessageIds)
+
+        store().markAsUploaded(readMessageIds = setOf("m1"))
+
+        assertTrue(store().state.value.pendingReadMessageIds.isEmpty())
+    }
+
+    @Test
+    fun `the account's read state replaces reads that were already uploaded`() {
+        val store = store()
+        store.markAsRead(listOf("m1", "m2"))
+        store.markAsUploaded(readMessageIds = setOf("m1"))
+
+        store.applyAccountReadState(messageIds = setOf("m1", "m2", "m3"), accountReadMessageIds = setOf("m3"))
+
+        assertEquals(setOf("m2", "m3"), store.state.value.readMessageIds)
+    }
+
+    @Test
+    fun `a pending unread is not read again by the account`() {
+        val store = store()
+        store.markAsRead(listOf("m1"))
+        store.markAsUploaded(readMessageIds = setOf("m1"))
+        store.markAsUnread(listOf("m1"))
+
+        store.applyAccountReadState(messageIds = setOf("m1"), accountReadMessageIds = setOf("m1"))
+
+        assertFalse(store.state.value.isRead(message("m1")))
+        assertEquals(setOf("m1"), store.state.value.pendingUnreadMessageIds)
+    }
+
+    @Test
     fun `an answered poll stays answered in the next session`() {
         store().markAsResponded("p1")
 

@@ -420,14 +420,12 @@ class WhatsNewManagerImplTest {
     fun `reads fetched for an account that signs out mid-sync are not taken on`() = runTest {
         isLoggedIn.accept(true)
         remote.read += "m1"
-        readStateStore.markAsRead(listOf("m1"))
         val manager = manager()
         remote.onList = { manager.forgetReadMessages() }
 
         manager.refreshIfNeeded()
 
         assertTrue(manager.readState.value.readMessageIds.isEmpty())
-        assertTrue(remote.markedRead.isEmpty())
     }
 
     @Test
@@ -465,6 +463,35 @@ class WhatsNewManagerImplTest {
 
         assertTrue(manager.readState.value.readMessageIds.isEmpty())
         assertEquals(listOf(setOf("m1")), remote.markedUnread)
+    }
+
+    @Test
+    fun `a message marked unread elsewhere is taken back here and not read again for the account`() = runTest {
+        isLoggedIn.accept(true)
+        val manager = manager()
+        manager.refreshIfNeeded()
+        manager.markAsRead(listOf("m1"))
+
+        remote.read -= "m1"
+        manager.refresh()
+
+        assertTrue(manager.readState.value.readMessageIds.isEmpty())
+        assertEquals(listOf(setOf("m1")), remote.markedRead)
+    }
+
+    @Test
+    fun `a read that failed to reach the account is sent on the next sync`() = runTest {
+        isLoggedIn.accept(true)
+        val manager = manager()
+        manager.refreshIfNeeded()
+        remote.error = IOException("no network")
+        manager.markAsRead(listOf("m1"))
+
+        remote.error = null
+        manager.refresh()
+
+        assertEquals(setOf("m1"), remote.read)
+        assertEquals(setOf("m1"), manager.readState.value.readMessageIds)
     }
 
     @Test
@@ -513,6 +540,7 @@ class WhatsNewManagerImplTest {
         }
 
         fun markAsRead(ids: Collection<String>) {
+            error?.let { throw it }
             markedRead += ids.toSet()
             read += ids
         }

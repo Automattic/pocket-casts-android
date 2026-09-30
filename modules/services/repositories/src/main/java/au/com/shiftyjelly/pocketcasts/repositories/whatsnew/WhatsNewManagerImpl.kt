@@ -19,6 +19,7 @@ import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -79,7 +80,12 @@ class WhatsNewManagerImpl @Inject constructor(
     init {
         applicationScope.launch(ioDispatcher) {
             for (request in syncRequests) {
-                performReadStateSync()
+                try {
+                    performReadStateSync()
+                } catch (e: Exception) {
+                    ensureActive()
+                    Timber.w(e, "Could not sync the What's New read state")
+                }
             }
         }
         applicationScope.launch {
@@ -102,16 +108,8 @@ class WhatsNewManagerImpl @Inject constructor(
     }
 
     override fun markAsUnread(messageIds: Collection<String>) {
-        if (!readStateStore.markAsUnread(messageIds)) return
-        applicationScope.launch(ioDispatcher) {
-            if (!syncManager.isLoggedIn()) return@launch
-            try {
-                syncManager.markWhatsNewAsUnread(messageIds)
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
-                Timber.w(e, "Could not mark What's New messages unread for the account")
-            }
+        if (readStateStore.markAsUnread(messageIds)) {
+            syncReadState()
         }
     }
 
@@ -161,25 +159,27 @@ class WhatsNewManagerImpl @Inject constructor(
     }
 
     private suspend fun performReadStateSync() {
+        FeatureFlag.awaitProvidersInitialised()
         if (!FeatureFlag.isEnabled(Feature.WHATS_NEW_FEED) || !syncManager.isLoggedIn()) return
         val generation = accountGeneration.get()
         val messageIds = _catalog.value?.messages?.map(WhatsNewMessage::id)?.toSet().orEmpty()
         if (messageIds.isEmpty()) return
-        val read = readState.value.readMessageIds intersect messageIds
-        try {
-            val remotelyRead = syncManager.getWhatsNewReadMessageIds(messageIds)
+        val state = readState.value
+        val unread = state.pendingUnreadMessageIds intersect messageIds
+        if (unread.isNotEmpty()) {
+            syncManager.markWhatsNewAsUnread(unread)
             if (generation != accountGeneration.get()) return
-            val unsynced = read - remotelyRead
-            if (unsynced.isNotEmpty()) {
-                syncManager.markWhatsNewAsRead(unsynced)
-            }
-            if (remotelyRead.isNotEmpty() && generation == accountGeneration.get()) {
-                readStateStore.markAsRead(remotelyRead)
-            }
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            Timber.w(e, "Could not sync the What's New read state")
+            readStateStore.markAsUploaded(unreadMessageIds = unread)
+        }
+        val read = state.pendingReadMessageIds intersect messageIds
+        if (read.isNotEmpty()) {
+            syncManager.markWhatsNewAsRead(read)
+            if (generation != accountGeneration.get()) return
+            readStateStore.markAsUploaded(readMessageIds = read)
+        }
+        val accountRead = syncManager.getWhatsNewReadMessageIds(messageIds)
+        if (generation == accountGeneration.get()) {
+            readStateStore.applyAccountReadState(messageIds, accountRead)
         }
     }
 

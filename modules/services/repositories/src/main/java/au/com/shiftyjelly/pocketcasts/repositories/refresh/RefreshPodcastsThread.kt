@@ -46,6 +46,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.data.DataSyncProcess
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import au.com.shiftyjelly.pocketcasts.repositories.whatsnew.WhatsNewManager
 import au.com.shiftyjelly.pocketcasts.servers.RefreshResponse
 import au.com.shiftyjelly.pocketcasts.servers.ServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.exception.RefreshTokenExpiredException
@@ -93,6 +94,7 @@ class RefreshPodcastsThread(
         fun userManager(): UserManager
         fun syncManager(): SyncManager
         fun ratingsManager(): RatingsManager
+        fun whatsNewManager(): WhatsNewManager
         fun appDatabase(): AppDatabase
     }
 
@@ -258,6 +260,7 @@ class RefreshPodcastsThread(
             statsManager = entryPoint.statsManager(),
             subscriptionManager = entryPoint.subscriptionManager(),
             ratingsManager = entryPoint.ratingsManager(),
+            whatsNewManager = entryPoint.whatsNewManager(),
             appDatabase = entryPoint.appDatabase(),
             settings = entryPoint.settings(),
             fileStorage = entryPoint.fileStorage(),

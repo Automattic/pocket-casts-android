@@ -9,6 +9,8 @@ data class WhatsNewReadState(
     val listedMessageIds: Set<String> = emptySet(),
     val respondedPollIds: Set<String> = emptySet(),
     val feedStartDate: Instant? = null,
+    val pendingReadMessageIds: Set<String> = emptySet(),
+    val pendingUnreadMessageIds: Set<String> = emptySet(),
 ) {
     fun isRead(message: WhatsNewMessage): Boolean {
         if (message.id in readMessageIds) return true

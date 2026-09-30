@@ -18,6 +18,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncHistoryTask
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.UpNextSyncWorker
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
+import au.com.shiftyjelly.pocketcasts.repositories.whatsnew.WhatsNewManager
 import au.com.shiftyjelly.pocketcasts.servers.extensions.toDate
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncSettingsTask
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
@@ -57,6 +58,7 @@ class DataSyncProcess(
     private val statsManager: StatsManager,
     private val subscriptionManager: SubscriptionManager,
     private val ratingsManager: RatingsManager,
+    private val whatsNewManager: WhatsNewManager,
     private val appDatabase: AppDatabase,
     private val settings: Settings,
     private val fileStorage: FileStorage,
@@ -85,6 +87,7 @@ class DataSyncProcess(
                     syncBrokenFiles()
                     syncPlaybackHistory()
                     syncPodcastRatings()
+                    syncWhatsNewReadState()
                 }
             }.onFailure { settings.recordErrorSession() }
         }
@@ -227,6 +230,14 @@ class DataSyncProcess(
             logProcess("playback-history") {
                 val operation = SyncHistoryTask.scheduleToRun(context)
                 operation.awaitOperation("Playback History", timeoutDuration = 5.minutes)
+            }
+        }
+    }
+
+    private suspend fun syncWhatsNewReadState() {
+        if (Util.getAppPlatform(context) == AppPlatform.Phone) {
+            logProcess("whats-new") {
+                whatsNewManager.refreshIfNeeded()
             }
         }
     }

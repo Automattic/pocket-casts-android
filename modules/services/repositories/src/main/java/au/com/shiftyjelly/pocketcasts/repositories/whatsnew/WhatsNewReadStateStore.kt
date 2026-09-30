@@ -28,11 +28,32 @@ class WhatsNewReadStateStore @Inject constructor(
     }
 
     fun markAsRead(messageIds: Collection<String>) = update { state ->
-        state.copy(readMessageIds = state.readMessageIds + messageIds)
+        state.copy(
+            readMessageIds = state.readMessageIds + messageIds,
+            pendingReadMessageIds = state.pendingReadMessageIds + (messageIds - state.readMessageIds),
+            pendingUnreadMessageIds = state.pendingUnreadMessageIds - messageIds.toSet(),
+        )
     }
 
     fun markAsUnread(messageIds: Collection<String>) = update { state ->
-        state.copy(readMessageIds = state.readMessageIds - messageIds.toSet())
+        state.copy(
+            readMessageIds = state.readMessageIds - messageIds.toSet(),
+            pendingReadMessageIds = state.pendingReadMessageIds - messageIds.toSet(),
+            pendingUnreadMessageIds = state.pendingUnreadMessageIds + (messageIds intersect state.readMessageIds),
+        )
+    }
+
+    fun markAsUploaded(readMessageIds: Set<String> = emptySet(), unreadMessageIds: Set<String> = emptySet()) = update { state ->
+        state.copy(
+            pendingReadMessageIds = state.pendingReadMessageIds - readMessageIds,
+            pendingUnreadMessageIds = state.pendingUnreadMessageIds - unreadMessageIds,
+        )
+    }
+
+    fun applyAccountReadState(messageIds: Set<String>, accountReadMessageIds: Set<String>) = update { state ->
+        val unreadOnAccount = messageIds - accountReadMessageIds - state.pendingReadMessageIds
+        val readOnAccount = accountReadMessageIds - state.pendingUnreadMessageIds
+        state.copy(readMessageIds = state.readMessageIds - unreadOnAccount + readOnAccount)
     }
 
     fun markAsSeen(messageIds: Collection<String>) = update { state ->
@@ -55,7 +76,11 @@ class WhatsNewReadStateStore @Inject constructor(
     }
 
     fun forgetReadMessages() = update { state ->
-        state.copy(readMessageIds = emptySet())
+        state.copy(
+            readMessageIds = emptySet(),
+            pendingReadMessageIds = emptySet(),
+            pendingUnreadMessageIds = emptySet(),
+        )
     }
 
     fun reset() = synchronized(this) {
@@ -75,6 +100,8 @@ class WhatsNewReadStateStore @Inject constructor(
             putStringSet(SEEN_KEY, state.seenMessageIds)
             putStringSet(LISTED_KEY, state.listedMessageIds)
             putStringSet(RESPONDED_KEY, state.respondedPollIds)
+            putStringSet(PENDING_READ_KEY, state.pendingReadMessageIds)
+            putStringSet(PENDING_UNREAD_KEY, state.pendingUnreadMessageIds)
             val feedStartDate = state.feedStartDate
             if (feedStartDate == null) {
                 remove(FEED_START_DATE_KEY)
@@ -93,6 +120,8 @@ class WhatsNewReadStateStore @Inject constructor(
         feedStartDate = preferences.takeIf { it.contains(FEED_START_DATE_KEY) }
             ?.getLong(FEED_START_DATE_KEY, 0)
             ?.let(Instant::ofEpochMilli),
+        pendingReadMessageIds = preferences.readIds(PENDING_READ_KEY),
+        pendingUnreadMessageIds = preferences.readIds(PENDING_UNREAD_KEY),
     )
 
     private fun SharedPreferences.readIds(key: String) = getStringSet(key, null).orEmpty().toSet()
@@ -103,7 +132,17 @@ class WhatsNewReadStateStore @Inject constructor(
         const val LISTED_KEY = "whatsNewListedMessageIds"
         const val RESPONDED_KEY = "whatsNewRespondedPollIds"
         const val FEED_START_DATE_KEY = "whatsNewFeedStartDate"
+        const val PENDING_READ_KEY = "whatsNewPendingReadMessageIds"
+        const val PENDING_UNREAD_KEY = "whatsNewPendingUnreadMessageIds"
 
-        val whatsNewKeys = setOf(READ_KEY, SEEN_KEY, LISTED_KEY, RESPONDED_KEY, FEED_START_DATE_KEY)
+        val whatsNewKeys = setOf(
+            READ_KEY,
+            SEEN_KEY,
+            LISTED_KEY,
+            RESPONDED_KEY,
+            FEED_START_DATE_KEY,
+            PENDING_READ_KEY,
+            PENDING_UNREAD_KEY,
+        )
     }
 }
