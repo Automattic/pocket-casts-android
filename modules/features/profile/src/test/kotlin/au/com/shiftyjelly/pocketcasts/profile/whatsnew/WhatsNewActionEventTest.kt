@@ -15,8 +15,8 @@ class WhatsNewActionEventTest {
 
     @Test
     fun `every action reports its catalog key`() {
-        WhatsNewActionEvent.entries.mapNotNull { event -> event.analyticsValue?.let { event to it } }.forEach { (event, action) ->
-            assertEquals(event.key, action.toString())
+        WhatsNewActionEvent.entries.forEach { event ->
+            assertEquals(event.key, event.analyticsValue.toString())
         }
     }
 

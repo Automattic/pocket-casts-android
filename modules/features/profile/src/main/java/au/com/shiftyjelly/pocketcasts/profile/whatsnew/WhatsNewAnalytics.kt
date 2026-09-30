@@ -13,24 +13,16 @@ internal val WhatsNewMessageType.analyticsValue
         WhatsNewMessageType.Research -> AnalyticsMessageType.Research
     }
 
-internal val WhatsNewActionEvent.analyticsValue: WhatsNewActionType?
+internal val WhatsNewActionEvent.analyticsValue
     get() = when (this) {
         WhatsNewActionEvent.OpenPodcasts -> WhatsNewActionType.OpenPodcasts
-
         WhatsNewActionEvent.OpenDiscover -> WhatsNewActionType.OpenDiscover
-
         WhatsNewActionEvent.OpenUpNext -> WhatsNewActionType.OpenUpNext
-
         WhatsNewActionEvent.OpenPlaylists -> WhatsNewActionType.OpenPlaylists
-
         WhatsNewActionEvent.OpenProfile -> WhatsNewActionType.OpenProfile
-
         WhatsNewActionEvent.OpenSettings -> WhatsNewActionType.OpenSettings
-
         WhatsNewActionEvent.OpenUpsell -> WhatsNewActionType.OpenUpsell
-
-        WhatsNewActionEvent.CreatePlaylist,
-        WhatsNewActionEvent.OpenLink,
-        WhatsNewActionEvent.OpenNetworks,
-        -> null
+        WhatsNewActionEvent.CreatePlaylist -> WhatsNewActionType.CreatePlaylist
+        WhatsNewActionEvent.OpenLink -> WhatsNewActionType.OpenLink
+        WhatsNewActionEvent.OpenNetworks -> WhatsNewActionType.OpenNetworks
     }
