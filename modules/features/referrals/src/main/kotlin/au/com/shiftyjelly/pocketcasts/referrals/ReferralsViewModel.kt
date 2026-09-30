@@ -20,7 +20,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
@@ -53,11 +53,14 @@ class ReferralsViewModel @Inject constructor(
     }
 
     private fun observeLoadedUiStates(referralPlan: ReferralSubscriptionPlan): Flow<UiState> {
-        return userManager.getSignInState().asFlow().map { signInState ->
+        return combine(
+            userManager.getSignInState().asFlow(),
+            settings.referralClaimCode.flow,
+        ) { signInState, claimCode ->
             UiState.Loaded(
                 referralPlan = referralPlan,
                 showIcon = signInState.isSignedInAsPlusOrPatron,
-                showProfileBanner = signInState.isNoAccountOrFree && settings.referralClaimCode.value.isNotEmpty(),
+                showProfileBanner = signInState.isNoAccountOrFree && claimCode.isNotEmpty(),
             )
         }
     }

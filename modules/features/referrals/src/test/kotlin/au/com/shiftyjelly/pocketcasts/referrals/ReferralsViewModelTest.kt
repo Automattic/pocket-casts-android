@@ -18,6 +18,7 @@ import com.automattic.eventhorizon.EventHorizon
 import io.reactivex.Flowable
 import java.time.Instant
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -159,12 +160,34 @@ class ReferralsViewModelTest {
         }
     }
 
+    @Test
+    fun `profile banner follows referral code changes`() = runTest {
+        val referralCodeFlow = MutableStateFlow(referralClaimCode)
+        val referralCodeSetting = mock<UserSetting<String>>()
+        whenever(referralCodeSetting.flow).thenReturn(referralCodeFlow)
+        initViewModel(
+            signInState = SignInState.SignedOut,
+            referralCodeSetting = referralCodeSetting,
+        )
+
+        viewModel.state.test {
+            assertEquals(true, (awaitItem() as UiState.Loaded).showProfileBanner)
+
+            referralCodeFlow.value = ""
+            assertEquals(false, (awaitItem() as UiState.Loaded).showProfileBanner)
+
+            referralCodeFlow.value = "new_referral_code"
+            assertEquals(true, (awaitItem() as UiState.Loaded).showProfileBanner)
+        }
+    }
+
     private fun initViewModel(
         signInState: SignInState = SignInState.SignedIn(email, subscription),
         referralCode: String = referralClaimCode,
+        referralCodeSetting: UserSetting<String> = UserSetting.Mock(referralCode, mock()),
     ) {
         whenever(userManager.getSignInState()).thenReturn(Flowable.just(signInState))
-        whenever(settings.referralClaimCode).thenReturn(UserSetting.Mock(referralCode, mock()))
+        whenever(settings.referralClaimCode).thenReturn(referralCodeSetting)
         viewModel = ReferralsViewModel(
             userManager = userManager,
             paymentClient = paymentClient,
