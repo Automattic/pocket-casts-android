@@ -36,7 +36,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -257,12 +256,12 @@ private fun WhatsNewFeedIcon(
         modifier = Modifier
             .size(56.dp)
             .clip(RoundedCornerShape(4.dp))
-            .background(Brush.linearGradient(type.gradient)),
+            .background(type.gradient),
     ) {
         Icon(
             painter = painterResource(type.iconId),
             contentDescription = null,
-            tint = Color.White,
+            tint = Color.White.copy(alpha = 0.8f),
             modifier = Modifier.size(24.dp),
         )
     }
