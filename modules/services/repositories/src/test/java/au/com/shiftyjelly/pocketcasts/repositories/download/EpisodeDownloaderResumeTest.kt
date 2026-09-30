@@ -320,6 +320,24 @@ class EpisodeDownloaderResumeTest {
         assertFalse(metadataFile().exists())
     }
 
+    @Test
+    fun `fail and discard the partial download when the resumed file is shorter than expected`() {
+        givenPartialDownload(length = 200 * 1024)
+        val offset = 200 * 1024 - PartialDownload.OVERLAP_BYTE_COUNT
+        server.enqueue(
+            partialResponse(from = offset)
+                .body(Buffer().write(payload, offset.toInt(), payload.size - offset.toInt() - 1024))
+                .build(),
+        )
+
+        val result = download()
+
+        assertEquals(Result.SuspiciousFileSize(payload.size - 1024L), result)
+        assertFalse(downloadFile.exists())
+        assertFalse(tempFile.exists())
+        assertFalse(metadataFile().exists())
+    }
+
     private fun download() = downloader.download(episode, downloadFile, tempFile)
 
     private fun assertDownloadedFromStartAfterRejection(result: Result) {

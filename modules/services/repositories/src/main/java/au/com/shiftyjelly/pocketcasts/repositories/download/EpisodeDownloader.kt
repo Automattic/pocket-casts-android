@@ -153,6 +153,11 @@ internal class EpisodeDownloader(
 
             LogBuffer.i(LogBuffer.TAG_DOWNLOAD, "Download resumed. Episode: ${episode.uuid}, Offset: $initialByteCount")
             response.body.source().withProgress(episode, initialByteCount, partialDownload.contentLength).writeTo(tempFile, append = true)
+            val resumedByteCount = tempFile.length()
+            if (resumedByteCount != partialDownload.contentLength) {
+                LogBuffer.i(LogBuffer.TAG_DOWNLOAD, "Download resume incomplete. Episode: ${episode.uuid}, Size: $resumedByteCount, Expected: ${partialDownload.contentLength}")
+                return Result.SuspiciousFileSize(resumedByteCount)
+            }
             completeDownload(episode, downloadFile, tempFile)
         }
     }
