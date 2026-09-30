@@ -121,6 +121,13 @@ class DiscoverDeepLinkManagerTest {
         assertNull(manager.getNetworksList(mockResources))
     }
 
+    @Test
+    fun `getNetworksList returns null when the discover feed fails to load`() = runTest {
+        whenever(mockRepository.getDiscoverFeed()).thenThrow(RuntimeException("offline"))
+
+        assertNull(manager.getNetworksList(mockResources))
+    }
+
     private fun stubRegion(code: String) {
         val discoverCountryCodeMock: UserSetting<String> = mock()
         whenever(discoverCountryCodeMock.value).thenReturn(code)
