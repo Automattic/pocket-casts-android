@@ -3,6 +3,8 @@
 *   Bug Fixes
     *   Show the same flat toolbar on every screen opened from Profile
         ([#6093](https://github.com/Automattic/pocket-casts-android/pull/6093))
+    *   Fix a crash when refreshing podcasts while the system account service is unavailable
+        ([#6105](https://github.com/Automattic/pocket-casts-android/pull/6105))
 
 8.22
 -----
