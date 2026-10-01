@@ -163,6 +163,7 @@ internal class Media3LibrarySessionCallback(
             isRecent = isRecent,
             isSuggested = isSuggested,
             hasCurrentEpisode = playbackManager.getCurrentEpisode() != null,
+            isAutomotive = Util.isAutomotive(contextProvider()),
         ) ?: return Futures.immediateFuture(
             LibraryResult.ofError(SessionError.ERROR_BAD_VALUE),
         )
