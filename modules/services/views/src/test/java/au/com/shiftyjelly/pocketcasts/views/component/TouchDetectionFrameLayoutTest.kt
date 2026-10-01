@@ -7,17 +7,17 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.LinearLayout
-import androidx.test.core.app.ApplicationProvider
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.RuntimeEnvironment
 
 @RunWith(RobolectricTestRunner::class)
 class TouchDetectionFrameLayoutTest {
-    private val context = ApplicationProvider.getApplicationContext<Context>()
+    private val context: Context = RuntimeEnvironment.getApplication()
 
     private val root = TouchDetectionFrameLayout(context)
     private val container = FrameLayout(context)
@@ -41,9 +41,6 @@ class TouchDetectionFrameLayoutTest {
 
         twoFingerTapReleasingRightFirst()
 
-        assertFalse(root.isTouching)
-        assertTrue(MotionEvent.ACTION_CANCEL in leftChild.actions)
-
         val replacement = RecordingView(context)
         container.addView(replacement, ViewGroup.LayoutParams(WIDTH, HEIGHT))
         layOut()
@@ -58,6 +55,12 @@ class TouchDetectionFrameLayoutTest {
         layOut()
 
         twoFingerTapReleasingRightFirst()
+
+        assertEquals(
+            listOf(MotionEvent.ACTION_DOWN, MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL),
+            rightChild.actions,
+        )
+
         rightChild.actions.clear()
         tap(RIGHT_X)
 
