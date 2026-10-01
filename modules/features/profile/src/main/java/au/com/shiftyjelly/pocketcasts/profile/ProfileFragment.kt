@@ -31,6 +31,8 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSourc
 import au.com.shiftyjelly.pocketcasts.settings.stats.StatsFragment
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.fragments.TopScrollable
 import dagger.hilt.android.AndroidEntryPoint
@@ -57,8 +59,11 @@ class ProfileFragment :
         CallOnce {
             profileViewModel.onScreenShown()
         }
+        val hasWhatsNewDot = profileViewModel.hasWhatsNewDot.collectAsState().value
         val state = ProfilePageState(
             sections = ProfileSection.visibleEntries(),
+            isWhatsNewVisible = FeatureFlag.isEnabled(Feature.WHATS_NEW_FEED),
+            hasWhatsNewDot = hasWhatsNewDot,
             isPlaybackEnabled = profileViewModel.isPlaybackAvailable.collectAsState().value,
             isFreeAccountBannerVisible = profileViewModel.isFreeAccountBannerVisible.collectAsState().value,
             isUpgradeBannerVisible = profileViewModel.showUpgradeBanner.collectAsState(false).value,
@@ -84,18 +89,14 @@ class ProfileFragment :
             themeType = theme.activeTheme,
             listState = listState,
             onSendReferralsClick = {
-                referralsViewModel.onIconClick()
                 fragmentHostListener.showBottomSheet(ReferralsGuestPassFragment.newInstance(ReferralsPageType.Send))
-            },
-            onReferralsTooltipClick = {
-                referralsViewModel.onTooltipClick()
-            },
-            onReferralsTooltipShow = {
-                referralsViewModel.onTooltipShown()
             },
             onSettingsClick = {
                 profileViewModel.onSettingsClick()
                 fragmentHostListener.addFragment(SettingsFragment())
+            },
+            onWhatsNewClick = {
+                fragmentHostListener.addFragment(WhatsNewFeedFragment())
             },
             onHeaderClick = {
                 profileViewModel.onHeaderClick()
@@ -173,7 +174,6 @@ class ProfileFragment :
     private fun goToSection(section: ProfileSection) {
         profileViewModel.onSectionClick(section)
         val fragment = when (section) {
-            ProfileSection.WhatsNew -> WhatsNewFeedFragment()
             ProfileSection.Stats -> StatsFragment()
             ProfileSection.Downloads -> ProfileEpisodeListFragment.newInstance(ProfileEpisodeListFragment.Mode.Downloaded)
             ProfileSection.CloudFiles -> CloudFilesFragment()

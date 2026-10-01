@@ -790,7 +790,6 @@ Language: ko_KR
     <string name="referrals_activate_my_pass">내 패스 활성화</string>
     <string name="referrals_claim_guest_pass_title">비회원 패스 %1$s개월권 받기</string>
     <string name="referrals_claim_guess_pass_banner_card_subtitle">모든 기능을 갖춘 청취 환경 이용하기</string>
-    <string name="referrals_tooltip_message">Pocket Casts Plus %1$s개월권을 선물하세요!</string>
     <string name="referrals_claim_guess_pass_banner_card_title">Plus 혜택이 제공되는 비회원 패스 %1$s개월권 받기</string>
     <string name="referrals_share_guest_pass">비회원 패스 공유</string>
     <string name="referrals_send_guest_pass_title">Pocket Casts Plus %1$s개월권 선물하기</string>

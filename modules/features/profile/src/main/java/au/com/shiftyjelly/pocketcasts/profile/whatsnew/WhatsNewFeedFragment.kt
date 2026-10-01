@@ -9,7 +9,9 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
+import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -22,6 +24,9 @@ class WhatsNewFeedFragment : BaseFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ) = contentWithoutConsumedInsets {
+        CallOnce {
+            viewModel.onScreenShown()
+        }
         AppTheme(themeType = theme.activeTheme) {
             val state by viewModel.uiState.collectAsStateWithLifecycle()
             val shownIds = state.items.map(WhatsNewFeedItem::id)
@@ -34,7 +39,10 @@ class WhatsNewFeedFragment : BaseFragment() {
                 state = state,
                 bottomInset = bottomInset,
                 onBackPress = { activity?.onBackPressedDispatcher?.onBackPressed() },
-                onMessageClick = viewModel::onMessageClick,
+                onMessageClick = { id ->
+                    viewModel.onMessageClick(id)
+                    (activity as? FragmentHostListener)?.addFragment(WhatsNewMessageFragment.newInstance(id))
+                },
                 onReadAllClick = viewModel::onReadAllClick,
                 onRefresh = viewModel::refresh,
                 onRetry = viewModel::retry,

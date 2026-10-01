@@ -789,7 +789,6 @@ Language: nl
     <string name="referrals_activate_my_pass">Activeer mijn pas</string>
     <string name="referrals_claim_guest_pass_title">Claim je gastenpas van %1$s voor Plus</string>
     <string name="referrals_claim_guess_pass_banner_card_subtitle">Ontgrendel de volledige luisterervaring</string>
-    <string name="referrals_tooltip_message">Geef %1$s Pocket Casts Plus weg!</string>
     <string name="referrals_claim_guess_pass_banner_card_title">Claim je gastenpas van %1$svoor Plus</string>
     <string name="referrals_share_guest_pass">Gastenpassen delen</string>
     <string name="referrals_send_guest_pass_title">Geef %1$s Pocket Casts Plus weg</string>

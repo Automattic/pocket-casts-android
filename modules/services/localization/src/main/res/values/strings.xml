@@ -1888,6 +1888,9 @@
     <string name="whats_new_feed_unread">Unread</string>
     <string name="whats_new_feed_read_all">Read all</string>
     <string name="whats_new_feed_all_read">All messages marked as read</string>
+    <string name="whats_new_research_title">User research</string>
+    <string name="whats_new_poll_answered">Thanks for answering.</string>
+    <string name="whats_new_message_page_progress">Page %1$d of %2$d</string>
     <string name="whats_new_feed_unable_to_load">Unable to load What\'s new</string>
     <string name="settings_manage_downloads_deleting">Deleting episodes…</string>
     <string name="settings_storage_phone">Phone</string>
@@ -2745,7 +2748,6 @@
     <!-- Referrals share text, `%1$s' is a placeholder for the offer duration on the Plus subscription -->
     <string name="referrals_share_text">Hi there!\n\nHere\'s a %1$s guest pass for Pocket&#160;Casts&#160;Plus - my favorite podcast player. It\'s packed with unique features like bookmarks, folders and more that you won\'t find anywhere else. I think you\'ll love it too!</string>
     <!-- Referrals tooltip message, `%1$s' is a placeholder for the offer duration on the Plus subscription -->
-    <string name="referrals_tooltip_message">Gift %1$s of Pocket&#160;Casts&#160;Plus!</string>
     <string name="referrals_create_subscription_failed">Could not create subscription. Please try again later.</string>
     <string name="referrals_redeem_code_failed">Could not redeem code. Please try again later.</string>
 

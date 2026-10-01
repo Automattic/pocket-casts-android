@@ -1602,12 +1602,6 @@ class SettingsImpl @Inject constructor(
         editor.apply()
     }
 
-    override val showReferralsTooltip: UserSetting<Boolean> = UserSetting.BoolPref(
-        sharedPrefKey = Settings.SHOW_REFERRALS_TOOLTIP,
-        defaultValue = true,
-        sharedPrefs = sharedPreferences,
-    )
-
     override val showSmartBookmarksTooltip: UserSetting<Boolean> = UserSetting.BoolPref(
         sharedPrefKey = Settings.SHOW_SMART_BOOKMARKS_TOOLTIP,
         // Defaults to false so fresh installs never see the tooltip, VersionMigrationsWorker enables it for upgrading users.

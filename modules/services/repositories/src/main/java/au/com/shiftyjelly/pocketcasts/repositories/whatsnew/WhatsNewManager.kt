@@ -26,7 +26,13 @@ interface WhatsNewManager {
 
     fun markAsListed(messageIds: Collection<String>)
 
+    suspend fun markFeedAsSeen()
+
     fun markAsResponded(pollId: String)
+
+    fun startFeed()
+
+    fun forgetReadMessages()
 
     fun resetReadState()
 }

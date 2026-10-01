@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.referrals
 
-import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material.Icon
@@ -8,18 +7,14 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
-import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.LocalColors
 import au.com.shiftyjelly.pocketcasts.compose.ThemeColors
-import au.com.shiftyjelly.pocketcasts.compose.components.TipPosition
-import au.com.shiftyjelly.pocketcasts.compose.components.TooltipPopup
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralsViewModel.UiState
@@ -27,51 +22,17 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
-fun ReferralsIconWithTooltip(
+fun ReferralsIcon(
     state: UiState,
     onIconClick: () -> Unit,
-    onTooltipClick: () -> Unit,
-    onTooltipShow: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    CallOnce {
-        onTooltipShow()
-    }
-
-    when (state) {
-        is UiState.Loading, UiState.NoOffer -> Unit
-
-        is UiState.Loaded -> {
-            ReferralsIconWithTooltip(
-                state = state,
-                onIconClick = onIconClick,
-                onTooltipClick = onTooltipClick,
-            )
-        }
-    }
-}
-
-@Composable
-private fun ReferralsIconWithTooltip(
-    state: UiState.Loaded,
-    onIconClick: () -> Unit,
-    onTooltipClick: () -> Unit,
-) {
-    if (state.showIcon) {
-        Box {
-            Icon(
-                onIconClick = onIconClick,
-                colors = LocalColors.current.colors,
-            )
-            val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
-            if (state.showTooltip) {
-                TooltipPopup(
-                    title = stringResource(LR.string.referrals_tooltip_message, state.referralPlan.offerDurationText),
-                    tipPosition = if (isLandscape) TipPosition.TopEnd else TipPosition.TopStart,
-                    clickableElevationPadding = true,
-                    onClick = onTooltipClick,
-                )
-            }
-        }
+    if (state is UiState.Loaded && state.showIcon) {
+        Icon(
+            onIconClick = onIconClick,
+            colors = LocalColors.current.colors,
+            modifier = modifier,
+        )
     }
 }
 
@@ -79,8 +40,12 @@ private fun ReferralsIconWithTooltip(
 private fun Icon(
     onIconClick: () -> Unit,
     colors: ThemeColors,
+    modifier: Modifier = Modifier,
 ) {
-    IconButton(onClick = onIconClick) {
+    IconButton(
+        onClick = onIconClick,
+        modifier = modifier,
+    ) {
         Icon(
             painter = painterResource(id = R.drawable.ic_gift),
             contentDescription = stringResource(LR.string.gift),
@@ -91,7 +56,7 @@ private fun Icon(
 
 @Preview(device = Devices.PORTRAIT_REGULAR)
 @Composable
-private fun IconWithBadgePreview(
+private fun IconPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
     AppTheme(themeType) {
