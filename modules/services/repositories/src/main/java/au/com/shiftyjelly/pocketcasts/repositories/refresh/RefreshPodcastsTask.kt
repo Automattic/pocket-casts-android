@@ -72,7 +72,9 @@ class RefreshPodcastsTask @AssistedInject constructor(
                 .setInitialDelay(REFRESH_EVERY_HOURS, TimeUnit.HOURS)
                 .build()
 
-            workManager.enqueueUniquePeriodicWork(TAG_REFRESH_TASK, ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE, request)
+            // This is called every time the app is opened. Update the existing work in place instead of replacing it,
+            // otherwise a refresh that is already running gets cancelled and the schedule starts over.
+            workManager.enqueueUniquePeriodicWork(TAG_REFRESH_TASK, ExistingPeriodicWorkPolicy.UPDATE, request)
 
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Set up periodic refresh")
         }
