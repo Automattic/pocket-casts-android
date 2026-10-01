@@ -8,6 +8,9 @@ internal enum class WhatsNewActionEvent(val key: String) {
     OpenProfile("open_profile"),
     OpenSettings("open_settings"),
     OpenUpsell("open_upsell"),
+    CreatePlaylist("create_playlist"),
+    OpenLink("open_link"),
+    OpenNetworks("open_networks"),
     ;
 
     companion object {

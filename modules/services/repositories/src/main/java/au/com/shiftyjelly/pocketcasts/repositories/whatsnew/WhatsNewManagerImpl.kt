@@ -52,11 +52,11 @@ class WhatsNewManagerImpl @Inject constructor(
     }.distinctUntilChanged()
 
     override val hasUnlistedMessages = combine(feedMessages, readState) { messages, readState ->
-        messages.any { message -> !readState.isListed(message.id) }
+        messages.any(readState::isUnlisted)
     }.distinctUntilChanged()
 
     override val hasUnseenMessages = combine(feedMessages, readState) { messages, readState ->
-        messages.any { message -> readState.isUnseen(message.id) }
+        messages.any(readState::isUnseen)
     }.distinctUntilChanged()
 
     private val refreshLock = Mutex()
@@ -74,6 +74,10 @@ class WhatsNewManagerImpl @Inject constructor(
     override suspend fun markFeedAsSeen() = markAsSeen(feedMessages.first().map(WhatsNewMessage::id))
 
     override fun markAsResponded(pollId: String) = readStateStore.markAsResponded(pollId)
+
+    override fun startFeed() = readStateStore.startFeed(Instant.now())
+
+    override fun forgetReadMessages() = readStateStore.forgetReadMessages()
 
     override fun resetReadState() = readStateStore.reset()
 

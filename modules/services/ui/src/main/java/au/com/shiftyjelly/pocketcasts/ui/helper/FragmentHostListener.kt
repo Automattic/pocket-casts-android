@@ -22,6 +22,9 @@ interface FragmentHostListener {
     fun closePodcastsToRoot()
     fun closeFiltersToRoot()
     fun closeProfileToRoot()
+    fun openCreatePlaylist()
+    fun openNetworks()
+    fun openInAppDeepLink(url: String): Boolean
     fun openPodcastPage(uuid: String, sourceView: String? = null)
 
     /** Feature modules cannot depend on each other, so this is how they reach the Discover network page. */

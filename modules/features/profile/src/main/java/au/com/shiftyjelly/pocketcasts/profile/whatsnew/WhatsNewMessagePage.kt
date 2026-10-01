@@ -83,7 +83,7 @@ internal fun WhatsNewMessagePage(
     poll: PollState?,
     bottomInset: Dp,
     onBackPress: () -> Unit,
-    onActionClick: (WhatsNewActionEvent) -> Unit,
+    onActionClick: (Action) -> Unit,
     onOptionClick: (String) -> Unit,
     onSubmitClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -123,7 +123,7 @@ internal fun WhatsNewMessagePage(
 private fun WhatsNewPages(
     pages: List<Page>,
     bottomInset: Dp,
-    onActionClick: (WhatsNewActionEvent) -> Unit,
+    onActionClick: (Action) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val pagerState = rememberPagerState(pageCount = { pages.size })
@@ -164,7 +164,7 @@ private fun WhatsNewPages(
 @Composable
 private fun WhatsNewPageContent(
     page: Page,
-    onActionClick: (WhatsNewActionEvent) -> Unit,
+    onActionClick: (Action) -> Unit,
 ) {
     BoxWithConstraints(
         modifier = Modifier.fillMaxSize(),
@@ -203,7 +203,7 @@ private fun WhatsNewPageContent(
             if (page.action != null) {
                 WhatsNewPageAction(
                     action = page.action,
-                    onClick = { onActionClick(page.action.event) },
+                    onClick = { onActionClick(page.action) },
                 )
             }
         }

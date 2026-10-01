@@ -22,4 +22,7 @@ internal val WhatsNewActionEvent.analyticsValue
         WhatsNewActionEvent.OpenProfile -> WhatsNewActionType.OpenProfile
         WhatsNewActionEvent.OpenSettings -> WhatsNewActionType.OpenSettings
         WhatsNewActionEvent.OpenUpsell -> WhatsNewActionType.OpenUpsell
+        WhatsNewActionEvent.CreatePlaylist -> WhatsNewActionType.CreatePlaylist
+        WhatsNewActionEvent.OpenLink -> WhatsNewActionType.OpenLink
+        WhatsNewActionEvent.OpenNetworks -> WhatsNewActionType.OpenNetworks
     }

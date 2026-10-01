@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.whatsnew
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import au.com.shiftyjelly.pocketcasts.preferences.di.PublicSharedPreferences
+import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -45,6 +46,14 @@ class WhatsNewReadStateStore @Inject constructor(
         state.copy(respondedPollIds = state.respondedPollIds + pollId)
     }
 
+    fun startFeed(date: Instant) = update { state ->
+        state.copy(feedStartDate = state.feedStartDate ?: date)
+    }
+
+    fun forgetReadMessages() = update { state ->
+        state.copy(readMessageIds = emptySet())
+    }
+
     fun reset() = synchronized(this) {
         _state.value = WhatsNewReadState()
         preferences.edit {
@@ -62,6 +71,12 @@ class WhatsNewReadStateStore @Inject constructor(
             putStringSet(SEEN_KEY, state.seenMessageIds)
             putStringSet(LISTED_KEY, state.listedMessageIds)
             putStringSet(RESPONDED_KEY, state.respondedPollIds)
+            val feedStartDate = state.feedStartDate
+            if (feedStartDate == null) {
+                remove(FEED_START_DATE_KEY)
+            } else {
+                putLong(FEED_START_DATE_KEY, feedStartDate.toEpochMilli())
+            }
         }
     }
 
@@ -70,6 +85,9 @@ class WhatsNewReadStateStore @Inject constructor(
         seenMessageIds = preferences.readIds(SEEN_KEY),
         listedMessageIds = preferences.readIds(LISTED_KEY),
         respondedPollIds = preferences.readIds(RESPONDED_KEY),
+        feedStartDate = preferences.takeIf { it.contains(FEED_START_DATE_KEY) }
+            ?.getLong(FEED_START_DATE_KEY, 0)
+            ?.let(Instant::ofEpochMilli),
     )
 
     private fun SharedPreferences.readIds(key: String) = getStringSet(key, null).orEmpty().toSet()
@@ -79,7 +97,8 @@ class WhatsNewReadStateStore @Inject constructor(
         const val SEEN_KEY = "whatsNewSeenMessageIds"
         const val LISTED_KEY = "whatsNewListedMessageIds"
         const val RESPONDED_KEY = "whatsNewRespondedPollIds"
+        const val FEED_START_DATE_KEY = "whatsNewFeedStartDate"
 
-        val whatsNewKeys = setOf(READ_KEY, SEEN_KEY, LISTED_KEY, RESPONDED_KEY)
+        val whatsNewKeys = setOf(READ_KEY, SEEN_KEY, LISTED_KEY, RESPONDED_KEY, FEED_START_DATE_KEY)
     }
 }

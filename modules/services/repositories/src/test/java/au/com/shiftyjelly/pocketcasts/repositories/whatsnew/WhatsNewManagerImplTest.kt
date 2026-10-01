@@ -240,6 +240,60 @@ class WhatsNewManagerImplTest {
     }
 
     @Test
+    fun `a fresh install starts with the messages published before it read and without dots`() = runTest {
+        val manager = manager()
+        manager.startFeed()
+        manager.refreshIfNeeded()
+
+        manager.hasUnlistedMessages.test {
+            assertFalse(awaitItem())
+        }
+        manager.hasUnseenMessages.test {
+            assertFalse(awaitItem())
+        }
+    }
+
+    @Test
+    fun `a message published after a fresh install started is unread`() = runTest {
+        readStateStore.startFeed(Instant.parse("2026-09-01T00:00:00Z"))
+        val manager = manager()
+        manager.refreshIfNeeded()
+
+        manager.hasUnlistedMessages.test {
+            assertTrue(awaitItem())
+        }
+    }
+
+    @Test
+    fun `a read message does not light the row's dot even though the feed never listed it`() = runTest {
+        val manager = manager()
+        manager.refreshIfNeeded()
+        manager.markAsRead(listOf("m1"))
+
+        manager.hasUnlistedMessages.test {
+            assertFalse(awaitItem())
+        }
+    }
+
+    @Test
+    fun `forgetting read messages brings them back unread without lighting the dots again`() = runTest {
+        val manager = manager()
+        manager.refreshIfNeeded()
+        manager.markAsListed(listOf("m1"))
+        manager.markAsRead(listOf("m1"))
+
+        manager.forgetReadMessages()
+
+        assertTrue(manager.readState.value.readMessageIds.isEmpty())
+        manager.hasUnlistedMessages.test {
+            assertFalse(awaitItem())
+        }
+        manager.hasUnseenMessages.test {
+            assertFalse(awaitItem())
+        }
+    }
+
+    @Test
     fun `a message this user is not targeted by never reaches the feed or its dots`() = runTest {
         serviceManager.catalog = catalogJson("For patrons only", audiences = """["patron"]""")
         val manager = manager()

@@ -30,5 +30,9 @@ interface WhatsNewManager {
 
     fun markAsResponded(pollId: String)
 
+    fun startFeed()
+
+    fun forgetReadMessages()
+
     fun resetReadState()
 }
