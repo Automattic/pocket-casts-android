@@ -22,7 +22,6 @@ class PodcastCacheServiceManagerImpl @Inject constructor(
     }
 
     override suspend fun getPodcast(podcastUuid: String): Podcast = withContext(Dispatchers.IO) {
-        // Mapping every episode is too slow for the main thread
         service.getPodcastAndEpisodes(podcastUuid).toPodcast()
     }
 
