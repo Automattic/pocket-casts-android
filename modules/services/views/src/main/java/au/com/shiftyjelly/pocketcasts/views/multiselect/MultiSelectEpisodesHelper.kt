@@ -29,6 +29,7 @@ import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.dialog.ShareDialogFactory
 import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.DeleteState
+import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
 import au.com.shiftyjelly.pocketcasts.views.swipe.AddToPlaylistFragmentFactory
 import com.automattic.android.tracks.crashlogging.CrashLogging
 import com.automattic.eventhorizon.EpisodeBulkArchivedEvent
@@ -40,6 +41,10 @@ import com.automattic.eventhorizon.EpisodeBulkUnstarredEvent
 import com.automattic.eventhorizon.EpisodeRemovedListeningHistoryEvent
 import com.automattic.eventhorizon.EventHorizon
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.EntryPoint
+import dagger.hilt.InstallIn
+import dagger.hilt.android.EntryPointAccessors
+import dagger.hilt.android.components.ActivityComponent
 import javax.inject.Inject
 import kotlin.math.min
 import kotlinx.coroutines.CoroutineScope
@@ -105,7 +110,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
             }
 
             R.id.menu_download -> {
-                download(resources, fragmentManager)
+                download(resources, activity)
                 true
             }
 
@@ -391,7 +396,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
             .show(fragmentManager, "confirm_archive_all_")
     }
 
-    fun download(resources: Resources, fragmentManager: FragmentManager) {
+    fun download(resources: Resources, activity: FragmentActivity) {
         if (selectedSet.isEmpty()) {
             closeMultiSelect()
             return
@@ -399,12 +404,13 @@ class MultiSelectEpisodesHelper @Inject constructor(
 
         val list = selectedSet.toList()
         val trimmedList = list.subList(0, min(Settings.MAX_DOWNLOAD, selectedSet.count())).map(BaseEpisode::uuid)
-        ConfirmationDialog.downloadWarningDialog(list.count(), resources) {
-            downloadQueue.enqueueAll(trimmedList, DownloadType.UserTriggered(waitForWifi = false), source)
+        val warningsHelper = EntryPointAccessors.fromActivity(activity, MultiSelectEpisodesEntryPoint::class.java).warningsHelper()
+        warningsHelper.bulkDownloadDialog(list.count()) { waitForWifi ->
+            downloadQueue.enqueueAll(trimmedList, DownloadType.UserTriggered(waitForWifi), source)
             val snackText = resources.getStringPlural(trimmedList.size, LR.string.download_queued_singular, LR.string.download_queued_plural)
             showSnackBar(snackText)
             closeMultiSelect()
-        }?.show(fragmentManager, "multiselect_download")
+        }?.show(activity.supportFragmentManager, "multiselect_download")
     }
 
     private fun deleteDownload(resources: Resources, fragmentManager: FragmentManager) {
@@ -592,6 +598,12 @@ class MultiSelectEpisodesHelper @Inject constructor(
             }
             closeMultiSelect()
         }
+    }
+
+    @EntryPoint
+    @InstallIn(ActivityComponent::class)
+    interface MultiSelectEpisodesEntryPoint {
+        fun warningsHelper(): WarningsHelper
     }
 
     companion object {

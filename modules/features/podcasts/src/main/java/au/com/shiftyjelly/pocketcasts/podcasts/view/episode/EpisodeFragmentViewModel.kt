@@ -352,7 +352,7 @@ class EpisodeFragmentViewModel @Inject constructor(
         if (episode.isDownloadCancellable) {
             downloadQueue.cancel(episode.uuid, source)
         } else if (!episode.isDownloaded) {
-            downloadQueue.enqueue(episode.uuid, DownloadType.UserTriggered(waitForWifi = false), source)
+            downloadQueue.enqueue(episode.uuid, DownloadType.UserTriggered(waitForWifi = settings.warnOnMeteredNetwork.value), source)
         }
         launch {
             episodeManager.clearPlaybackErrorBlocking(episode)
