@@ -1,5 +1,8 @@
 8.23
 -----
+*   Bug Fixes
+    *   Show the same flat toolbar on every screen opened from Profile
+        ([#6093](https://github.com/Automattic/pocket-casts-android/pull/6093))
 
 8.22
 -----
