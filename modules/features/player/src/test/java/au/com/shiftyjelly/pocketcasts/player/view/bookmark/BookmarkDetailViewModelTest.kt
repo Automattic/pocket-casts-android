@@ -29,7 +29,6 @@ import com.automattic.eventhorizon.BookmarkPlayTappedEvent
 import com.automattic.eventhorizon.BookmarkShareTappedEvent
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.SourceViewType
-import io.reactivex.Single
 import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -228,7 +227,7 @@ class BookmarkDetailViewModelTest {
     @Test
     fun `fetches the podcast title when it is missing`() = runTest {
         whenever(podcastCacheServiceManager.getPodcast(podcastUuid))
-            .thenReturn(Single.just(Podcast(uuid = podcastUuid, title = "Fetched")))
+            .thenReturn(Podcast(uuid = podcastUuid, title = "Fetched"))
 
         load(passage = null, passageLocation = null, podcastTitle = "")
 
