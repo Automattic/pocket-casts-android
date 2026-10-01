@@ -5,6 +5,7 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.exception.RefreshTokenExpired
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import java.io.IOException
+import java.io.InterruptedIOException
 import kotlinx.coroutines.runBlocking
 
 interface TokenHandler {
@@ -17,6 +18,9 @@ internal fun TokenHandler.getAccessTokenBlocking(): AccessToken? = try {
     runBlocking { getAccessToken() }
 } catch (e: IOException) {
     throw e
+} catch (e: InterruptedException) {
+    Thread.currentThread().interrupt()
+    throw InterruptedIOException("Interrupted while reading an access token").apply { initCause(e) }
 } catch (e: RefreshTokenExpiredException) {
     if (FeatureFlag.isEnabled(Feature.INTERCEPTOR_REFRESH_TOKEN_FALLBACK)) {
         null

@@ -4,10 +4,12 @@ import android.accounts.AuthenticatorException
 import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
 import au.com.shiftyjelly.pocketcasts.servers.sync.TokenHandler
 import au.com.shiftyjelly.pocketcasts.servers.sync.exception.RefreshTokenExpiredException
+import au.com.shiftyjelly.pocketcasts.servers.sync.getAccessTokenBlocking
 import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import java.io.IOException
+import java.io.InterruptedIOException
 import java.net.HttpURLConnection
 import java.util.ArrayDeque
 import java.util.concurrent.CompletableFuture
@@ -168,6 +170,20 @@ class TokenInterceptorTest {
         assertSame(bindFailure, failure.cause)
         assertEquals(1, server.requestCount)
         assertTrue(tokenHandler.invalidatedAccessToken)
+    }
+
+    @Test
+    fun `keeps the interrupt flag when reading the token is interrupted`() {
+        val tokenHandler = FakeTokenHandler(TokenResult.Failure(InterruptedException()))
+
+        try {
+            assertThrows(InterruptedIOException::class.java) {
+                tokenHandler.getAccessTokenBlocking()
+            }
+            assertTrue(Thread.currentThread().isInterrupted)
+        } finally {
+            Thread.interrupted()
+        }
     }
 
     private fun enqueueAndAwaitFailure(tokenHandler: TokenHandler): IOException {
