@@ -25,8 +25,10 @@ import androidx.compose.material.icons.outlined.Downloading
 import androidx.compose.material.icons.outlined.EditCalendar
 import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.material.icons.outlined.Folder
+import androidx.compose.material.icons.outlined.MarkEmailUnread
 import androidx.compose.material.icons.outlined.NewReleases
 import androidx.compose.material.icons.outlined.Notifications
+import androidx.compose.material.icons.outlined.RestartAlt
 import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -62,6 +64,8 @@ fun DeveloperPage(
     onTriggerResetEoYModalProfileBadge: () -> Unit,
     onSendCrash: (String) -> Unit,
     onShowWhatsNewClick: () -> Unit,
+    onResetWhatsNewReadState: () -> Unit,
+    onResetWhatsNewToFreshInstall: () -> Unit,
     onShowNotificationsTestingClick: () -> Unit,
     onResetSuggestedFoldersSuggestion: () -> Unit,
     onResetPlaylistsOnboarding: () -> Unit,
@@ -144,6 +148,16 @@ fun DeveloperPage(
         }
         item {
             ClearAppReviewSettings(onClick = onClearAppReviewSettings)
+        }
+
+        item {
+            SectionHeader(text = "What's New feed")
+        }
+        item {
+            ResetWhatsNewReadState(onClick = onResetWhatsNewReadState)
+        }
+        item {
+            ResetWhatsNewToFreshInstall(onClick = onResetWhatsNewToFreshInstall)
         }
 
         item {
@@ -339,6 +353,32 @@ private fun ShowWhatsNew(
 }
 
 @Composable
+private fun ResetWhatsNewReadState(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    SettingRow(
+        primaryText = "Reset read state",
+        secondaryText = "Forget which messages were read, seen, listed or answered on this device",
+        icon = rememberVectorPainter(Icons.Outlined.MarkEmailUnread),
+        modifier = modifier.clickable { onClick() },
+    )
+}
+
+@Composable
+private fun ResetWhatsNewToFreshInstall(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    SettingRow(
+        primaryText = "Reset to fresh install",
+        secondaryText = "Mark the messages published so far as read, like a new install",
+        icon = rememberVectorPainter(Icons.Outlined.RestartAlt),
+        modifier = modifier.clickable { onClick() },
+    )
+}
+
+@Composable
 private fun EndOfYear(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -518,6 +558,8 @@ private fun DeveloperPagePreview() {
         bottomInset = 0.dp,
         onSendCrash = {},
         onShowWhatsNewClick = {},
+        onResetWhatsNewReadState = {},
+        onResetWhatsNewToFreshInstall = {},
         onResetSuggestedFoldersSuggestion = {},
         onShowNotificationsTestingClick = {},
         onResetPlaylistsOnboarding = {},
