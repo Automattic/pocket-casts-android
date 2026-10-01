@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.preferences
 
 import android.annotation.SuppressLint
 import android.content.SharedPreferences
+import androidx.core.content.edit
 import au.com.shiftyjelly.pocketcasts.coroutines.flow.mapState
 import java.lang.ref.WeakReference
 import java.time.Clock
@@ -89,19 +90,17 @@ abstract class UserSetting<T>(
     }
 
     fun reset() {
-        sharedPrefs.edit().run {
+        sharedPrefs.edit {
             remove(sharedPrefKey)
             remove(modifiedAtKey)
-            apply()
         }
         _flow.value = get()
     }
 
     private fun updateModifiedAtServerString(modifiedAt: Instant?) {
         if (modifiedAt != null) {
-            sharedPrefs.edit().run {
+            sharedPrefs.edit {
                 putString(modifiedAtKey, modifiedAt.toString())
-                apply()
             }
         }
     }
