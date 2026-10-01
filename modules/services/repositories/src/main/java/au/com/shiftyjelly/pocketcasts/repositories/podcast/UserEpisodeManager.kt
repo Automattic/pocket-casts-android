@@ -30,7 +30,6 @@ import com.automattic.eventhorizon.EpisodeUploadFailedEvent
 import com.automattic.eventhorizon.EpisodeUploadFinishedEvent
 import com.automattic.eventhorizon.EventHorizon
 import dagger.hilt.android.qualifiers.ApplicationContext
-import io.reactivex.Flowable
 import java.io.File
 import java.net.HttpURLConnection
 import java.util.Date
@@ -50,7 +49,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.rx2.asFlowable
 import kotlinx.coroutines.rx2.await
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
@@ -62,7 +60,6 @@ interface UserEpisodeManager {
     suspend fun delete(episode: UserEpisode, playbackManager: PlaybackManager) = deleteAll(listOf(episode), playbackManager)
     suspend fun deleteAll(episodes: List<UserEpisode>, playbackManager: PlaybackManager)
     suspend fun findUserEpisodes(): List<UserEpisode>
-    fun episodeRxFlowable(uuid: String): Flowable<UserEpisode>
     fun episodeFlow(uuid: String): Flow<UserEpisode?>
     suspend fun findEpisodeByUuid(uuid: String): UserEpisode?
     suspend fun findEpisodesByUuids(episodeUuids: List<String>): List<UserEpisode>
@@ -210,10 +207,6 @@ class UserEpisodeManagerImpl @Inject constructor(
             Settings.CloudSortOrder.SHORT_LONG -> userEpisodeDao.findUserEpisodesDurationAscFlow()
             Settings.CloudSortOrder.LONG_SHORT -> userEpisodeDao.findUserEpisodesDurationDescFlow()
         }.map { it.filterNot { episode -> episode.serverStatus == UserEpisodeServerStatus.MISSING } }
-    }
-
-    override fun episodeRxFlowable(uuid: String): Flowable<UserEpisode> {
-        return userEpisodeDao.findEpisodeFlow(uuid).filterNotNull().asFlowable()
     }
 
     override fun episodeFlow(uuid: String): Flow<UserEpisode?> {

@@ -8,13 +8,16 @@ import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import com.automattic.eventhorizon.EventHorizon
 import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -97,6 +100,18 @@ class EpisodeManagerImplTest {
         verify(episodeDao).getAllPodcastEpisodes(10, 0)
         verify(episodeDao).getAllPodcastEpisodes(10, 10)
         verify(episodeDao).getAllPodcastEpisodes(10, 20)
+    }
+
+    @Test
+    fun `find episode by uuid flowable falls back to the user episode and skips missing emissions`() = runTest {
+        val userEpisode = UserEpisode(uuid = "episode1", publishedDate = Date())
+        whenever(episodeDao.findByUuid("episode1")).thenReturn(null)
+        whenever(userEpisodeManager.episodeFlow("episode1")).thenReturn(flowOf(null, userEpisode, null))
+
+        episodeManagerImpl.findEpisodeByUuidRxFlowable("episode1").asFlow().test {
+            assertEquals(userEpisode, awaitItem())
+            awaitComplete()
+        }
     }
 
     @Test

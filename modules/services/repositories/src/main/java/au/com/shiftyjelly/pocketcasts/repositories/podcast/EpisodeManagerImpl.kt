@@ -100,7 +100,7 @@ class EpisodeManagerImpl @Inject constructor(
     override fun findEpisodeByUuidRxFlowable(uuid: String): Flowable<BaseEpisode> {
         return rxMaybe(ioDispatcher) { episodeDao.findByUuid(uuid) }
             .flatMapPublisher<BaseEpisode> { findByUuidFlow(uuid).asFlowable() }
-            .switchIfEmpty(userEpisodeManager.episodeRxFlowable(uuid))
+            .switchIfEmpty(userEpisodeManager.episodeFlow(uuid).filterNotNull().asFlowable())
     }
 
     override fun findEpisodeByUuidFlow(uuid: String): Flow<BaseEpisode> = merge(
