@@ -25,9 +25,10 @@ import com.automattic.eventhorizon.PlayerDismissedEvent
 import com.automattic.eventhorizon.PlayerShownEvent
 import com.automattic.eventhorizon.SettingType
 import com.automattic.eventhorizon.Trackable
-import io.reactivex.subjects.BehaviorSubject
 import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
@@ -52,13 +53,16 @@ class TvNowPlayingViewModelTest {
     val coroutineRule = MainCoroutineRule()
 
     private val playbackStates = MutableStateFlow(PlaybackState())
-    private val queueChanges = BehaviorSubject.create<UpNextQueue.State>()
+    private val queueChanges = MutableSharedFlow<UpNextQueue.State>(
+        replay = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST,
+    )
     private val players = MutableStateFlow<Player?>(null)
     private val streamVideoStates = MutableStateFlow(StreamVideoState.NotVideo)
     private val videoRenderingEnabledStates = MutableStateFlow(true)
 
     private val queue = mock<UpNextQueue> {
-        on { changesObservable } doReturn queueChanges
+        on { changesFlow } doReturn queueChanges
     }
     private val playbackManager = mock<PlaybackManager> {
         on { playbackStateFlow } doReturn playbackStates
@@ -104,7 +108,7 @@ class TvNowPlayingViewModelTest {
         viewModel.uiState.test {
             assertEquals(TvNowPlayingUiState.Empty, awaitItem())
 
-            queueChanges.onNext(UpNextQueue.State.Empty)
+            queueChanges.tryEmit(UpNextQueue.State.Empty)
             expectNoEvents()
         }
     }
@@ -112,7 +116,7 @@ class TvNowPlayingViewModelTest {
     @Test
     fun `a loaded queue maps the playback state`() = runTest {
         val podcast = Podcast(uuid = "podcast", title = "Podcast")
-        queueChanges.onNext(UpNextQueue.State.Loaded(audioEpisode, podcast, emptyList()))
+        queueChanges.tryEmit(UpNextQueue.State.Loaded(audioEpisode, podcast, emptyList()))
         playbackStates.value = PlaybackState(
             state = PlaybackState.State.PLAYING,
             episodeUuid = audioEpisode.uuid,
@@ -144,7 +148,7 @@ class TvNowPlayingViewModelTest {
 
     @Test
     fun `a default playback state maps default effects`() = runTest {
-        queueChanges.onNext(UpNextQueue.State.Loaded(audioEpisode, null, emptyList()))
+        queueChanges.tryEmit(UpNextQueue.State.Loaded(audioEpisode, null, emptyList()))
 
         viewModel.uiState.test {
             val state = awaitItem() as TvNowPlayingUiState.Loaded
@@ -157,7 +161,7 @@ class TvNowPlayingViewModelTest {
     @Test
     fun `playback progress of a different episode falls back to the entity`() = runTest {
         val episode = PodcastEpisode(uuid = "next", publishedDate = Date(0), playedUpTo = 12.0, duration = 60.0)
-        queueChanges.onNext(UpNextQueue.State.Loaded(episode, null, emptyList()))
+        queueChanges.tryEmit(UpNextQueue.State.Loaded(episode, null, emptyList()))
         playbackStates.value = PlaybackState(
             state = PlaybackState.State.PLAYING,
             episodeUuid = "previous",
@@ -176,7 +180,7 @@ class TvNowPlayingViewModelTest {
 
     @Test
     fun `an error playback state is exposed`() = runTest {
-        queueChanges.onNext(UpNextQueue.State.Loaded(audioEpisode, null, emptyList()))
+        queueChanges.tryEmit(UpNextQueue.State.Loaded(audioEpisode, null, emptyList()))
         playbackStates.value = PlaybackState(
             state = PlaybackState.State.ERROR,
             lastErrorMessage = "Something went wrong",
@@ -190,7 +194,7 @@ class TvNowPlayingViewModelTest {
 
     @Test
     fun `a stream with video is video`() = runTest {
-        queueChanges.onNext(UpNextQueue.State.Loaded(audioEpisode, null, emptyList()))
+        queueChanges.tryEmit(UpNextQueue.State.Loaded(audioEpisode, null, emptyList()))
         streamVideoStates.value = StreamVideoState.HasVideo
 
         viewModel.uiState.test {
@@ -200,7 +204,7 @@ class TvNowPlayingViewModelTest {
 
     @Test
     fun `an unknown stream is not video`() = runTest {
-        queueChanges.onNext(UpNextQueue.State.Loaded(videoEpisode, null, emptyList()))
+        queueChanges.tryEmit(UpNextQueue.State.Loaded(videoEpisode, null, emptyList()))
         streamVideoStates.value = StreamVideoState.Unknown
 
         viewModel.uiState.test {
@@ -210,7 +214,7 @@ class TvNowPlayingViewModelTest {
 
     @Test
     fun `an audio only stream is not video`() = runTest {
-        queueChanges.onNext(UpNextQueue.State.Loaded(videoEpisode, null, emptyList()))
+        queueChanges.tryEmit(UpNextQueue.State.Loaded(videoEpisode, null, emptyList()))
         streamVideoStates.value = StreamVideoState.AudioOnly
 
         viewModel.uiState.test {
@@ -220,7 +224,7 @@ class TvNowPlayingViewModelTest {
 
     @Test
     fun `a video episode without stream video info is video`() = runTest {
-        queueChanges.onNext(UpNextQueue.State.Loaded(videoEpisode, null, emptyList()))
+        queueChanges.tryEmit(UpNextQueue.State.Loaded(videoEpisode, null, emptyList()))
 
         viewModel.uiState.test {
             assertEquals(true, (awaitItem() as TvNowPlayingUiState.Loaded).isVideo)
@@ -229,7 +233,7 @@ class TvNowPlayingViewModelTest {
 
     @Test
     fun `video is disabled when rendering is off`() = runTest {
-        queueChanges.onNext(UpNextQueue.State.Loaded(videoEpisode, null, emptyList()))
+        queueChanges.tryEmit(UpNextQueue.State.Loaded(videoEpisode, null, emptyList()))
         videoRenderingEnabledStates.value = false
 
         viewModel.uiState.test {

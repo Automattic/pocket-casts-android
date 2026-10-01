@@ -159,7 +159,7 @@ class EpisodeViewModel @Inject constructor(
             .filter { it.episodeUuid == episodeUuid }
             .map { it.isPlaying }
 
-        val inUpNextFlow = playbackManager.upNextQueue.changesObservable.asFlow()
+        val inUpNextFlow = playbackManager.upNextQueue.changesFlow
 
         val downloadProgressFlow = downloadProgressCache
             .progressFlow(episodeUuid)
