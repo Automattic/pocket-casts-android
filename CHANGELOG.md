@@ -14,6 +14,8 @@
     *   Swipe a bookmark to share or delete it
         ([#6041](https://github.com/Automattic/pocket-casts-android/pull/6041))
 *   Bug Fixes
+    *   Show the podcast grid and playlists in Android Auto again, instead of only a short list of recent episodes
+        ([#6098](https://github.com/Automattic/pocket-casts-android/pull/6098))
     *   Show every matching folder in search results instead of only the last one
         ([#5953](https://github.com/Automattic/pocket-casts-android/pull/5953))
     *   Show the correct play or pause button for User Files
