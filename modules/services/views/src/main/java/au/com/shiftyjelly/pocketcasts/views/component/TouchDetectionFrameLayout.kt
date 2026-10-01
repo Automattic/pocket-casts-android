@@ -6,6 +6,7 @@ import android.view.MotionEvent
 import android.widget.FrameLayout
 import java.time.Instant
 import kotlin.time.Duration
+import timber.log.Timber
 
 class TouchDetectionFrameLayout @JvmOverloads constructor(
     context: Context,
@@ -32,6 +33,31 @@ class TouchDetectionFrameLayout @JvmOverloads constructor(
                 recentReleaseTimestamp = Instant.now()
             }
         }
-        return super.dispatchTouchEvent(event)
+        return try {
+            super.dispatchTouchEvent(event)
+        } catch (e: NullPointerException) {
+            if (!e.isRecycledTouchTargetCrash()) {
+                throw e
+            }
+            Timber.w(e, "Touch target removed during touch dispatch")
+            cancelTouchTargets(event)
+            true
+        }
     }
+
+    private fun cancelTouchTargets(event: MotionEvent) {
+        val cancelEvent = MotionEvent.obtain(event)
+        cancelEvent.action = MotionEvent.ACTION_CANCEL
+        super.dispatchTouchEvent(cancelEvent)
+        cancelEvent.recycle()
+    }
+}
+
+internal fun NullPointerException.isRecycledTouchTargetCrash(): Boolean {
+    val frame = stackTrace.firstOrNull() ?: return false
+    if (frame.className != "android.view.ViewGroup") {
+        return false
+    }
+    return frame.methodName == "resetCancelNextUpFlag" ||
+        (frame.methodName == "dispatchTouchEvent" && message.orEmpty().contains("mPrivateFlags"))
 }
