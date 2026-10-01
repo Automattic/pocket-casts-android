@@ -6,6 +6,7 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.exception.RefreshTokenExpired
 import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import java.io.IOException
 import java.net.HttpURLConnection
 import java.util.ArrayDeque
 import java.util.concurrent.TimeUnit
@@ -57,15 +58,16 @@ class TokenInterceptorTest {
     }
 
     @Test
-    fun `throws when refresh token has expired and fallback is disabled`() {
+    fun `fails the call when refresh token has expired and fallback is disabled`() {
         FeatureFlag.setEnabled(Feature.INTERCEPTOR_REFRESH_TOKEN_FALLBACK, false)
         val tokenHandler = FakeTokenHandler(TokenResult.Expired)
         val client = newClient(tokenHandler)
         server.enqueue(MockResponse())
 
-        assertThrows(RefreshTokenExpiredException::class.java) {
+        val exception = assertThrows(IOException::class.java) {
             client.newCall(Request.Builder().url(server.url("/podcasts/search")).build()).execute()
         }
+        assertTrue(exception.cause is RefreshTokenExpiredException)
         assertEquals(1, tokenHandler.getAccessTokenCalls)
     }
 
@@ -86,7 +88,7 @@ class TokenInterceptorTest {
     }
 
     @Test
-    fun `throws when refreshed token has expired and fallback is disabled`() {
+    fun `fails the call when refreshed token has expired and fallback is disabled`() {
         FeatureFlag.setEnabled(Feature.INTERCEPTOR_REFRESH_TOKEN_FALLBACK, false)
         val tokenHandler = FakeTokenHandler(
             TokenResult.Token(AccessToken("expired-access-token")),
@@ -95,9 +97,10 @@ class TokenInterceptorTest {
         val client = newClient(tokenHandler)
         server.enqueue(MockResponse().setResponseCode(HttpURLConnection.HTTP_UNAUTHORIZED))
 
-        assertThrows(RefreshTokenExpiredException::class.java) {
+        val exception = assertThrows(IOException::class.java) {
             client.newCall(Request.Builder().url(server.url("/podcasts/search")).build()).execute()
         }
+        assertTrue(exception.cause is RefreshTokenExpiredException)
 
         val firstRequest = server.takeRequest(5, TimeUnit.SECONDS)
         assertEquals("Bearer expired-access-token", firstRequest?.getHeader("Authorization"))
