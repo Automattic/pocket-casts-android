@@ -237,6 +237,18 @@ class BookmarkDetailViewModelTest {
     }
 
     @Test
+    fun `stops loading the podcast title when the fetch fails`() = runTest {
+        whenever(podcastCacheServiceManager.getPodcast(podcastUuid))
+            .thenThrow(RuntimeException("Network error"))
+
+        load(passage = null, passageLocation = null, podcastTitle = "")
+
+        val state = viewModel.uiState.value
+        assertEquals("", state.podcastTitle)
+        assertFalse(state.isPodcastTitleLoading)
+    }
+
+    @Test
     fun `does not fetch the podcast title for uploaded files`() = runTest {
         viewModel.load(
             bookmarkUuid = bookmarkUuid,
