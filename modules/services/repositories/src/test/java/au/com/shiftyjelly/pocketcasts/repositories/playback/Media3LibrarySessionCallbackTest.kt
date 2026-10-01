@@ -91,8 +91,14 @@ class Media3LibrarySessionCallbackTest {
     fun `onGetLibraryRoot returns root media item for default params`() {
         val episode = PodcastEpisode(uuid = "ep-1", publishedDate = Date())
         whenever(playbackManager.getCurrentEpisode()).thenReturn(episode)
-        whenever(browseTreeProvider.getRootId(isRecent = false, isSuggested = false, hasCurrentEpisode = true))
-            .thenReturn(MEDIA_ID_ROOT)
+        whenever(
+            browseTreeProvider.getRootId(
+                isRecent = false,
+                isSuggested = false,
+                hasCurrentEpisode = true,
+                isAutomotive = false,
+            ),
+        ).thenReturn(MEDIA_ID_ROOT)
 
         val result = callback.onGetLibraryRoot(mockSession, mockController, null)
 
@@ -101,17 +107,47 @@ class Media3LibrarySessionCallbackTest {
     }
 
     @Test
-    fun `onGetLibraryRoot returns suggested root when params isSuggested`() {
+    fun `onGetLibraryRoot passes suggested hint with phone platform`() {
         val episode = PodcastEpisode(uuid = "ep-1", publishedDate = Date())
         whenever(playbackManager.getCurrentEpisode()).thenReturn(episode)
-        whenever(browseTreeProvider.getRootId(isRecent = false, isSuggested = true, hasCurrentEpisode = true))
-            .thenReturn(SUGGESTED_ROOT)
+        whenever(
+            browseTreeProvider.getRootId(
+                isRecent = false,
+                isSuggested = true,
+                hasCurrentEpisode = true,
+                isAutomotive = false,
+            ),
+        ).thenReturn(MEDIA_ID_ROOT)
 
         val params = MediaLibraryService.LibraryParams.Builder()
             .setSuggested(true)
             .build()
 
         val result = callback.onGetLibraryRoot(mockSession, mockController, params)
+
+        val libraryResult = result.get()
+        assertEquals(MEDIA_ID_ROOT, libraryResult.value?.mediaId)
+    }
+
+    @Test
+    fun `onGetLibraryRoot passes suggested hint with automotive platform`() {
+        val automotiveCallback = createAutomotiveCallback()
+        val episode = PodcastEpisode(uuid = "ep-1", publishedDate = Date())
+        whenever(playbackManager.getCurrentEpisode()).thenReturn(episode)
+        whenever(
+            browseTreeProvider.getRootId(
+                isRecent = false,
+                isSuggested = true,
+                hasCurrentEpisode = true,
+                isAutomotive = true,
+            ),
+        ).thenReturn(SUGGESTED_ROOT)
+
+        val params = MediaLibraryService.LibraryParams.Builder()
+            .setSuggested(true)
+            .build()
+
+        val result = automotiveCallback.onGetLibraryRoot(mockSession, mockController, params)
 
         val libraryResult = result.get()
         assertEquals(SUGGESTED_ROOT, libraryResult.value?.mediaId)
@@ -121,8 +157,14 @@ class Media3LibrarySessionCallbackTest {
     fun `onGetLibraryRoot returns recent root when params isRecent`() {
         val episode = PodcastEpisode(uuid = "ep-1", publishedDate = Date())
         whenever(playbackManager.getCurrentEpisode()).thenReturn(episode)
-        whenever(browseTreeProvider.getRootId(isRecent = true, isSuggested = false, hasCurrentEpisode = true))
-            .thenReturn(RECENT_ROOT)
+        whenever(
+            browseTreeProvider.getRootId(
+                isRecent = true,
+                isSuggested = false,
+                hasCurrentEpisode = true,
+                isAutomotive = false,
+            ),
+        ).thenReturn(RECENT_ROOT)
 
         val params = MediaLibraryService.LibraryParams.Builder()
             .setRecent(true)
@@ -137,14 +179,25 @@ class Media3LibrarySessionCallbackTest {
     @Test
     fun `onGetLibraryRoot passes hasCurrentEpisode false when no current episode`() {
         whenever(playbackManager.getCurrentEpisode()).thenReturn(null)
-        whenever(browseTreeProvider.getRootId(isRecent = false, isSuggested = false, hasCurrentEpisode = false))
-            .thenReturn(MEDIA_ID_ROOT)
+        whenever(
+            browseTreeProvider.getRootId(
+                isRecent = false,
+                isSuggested = false,
+                hasCurrentEpisode = false,
+                isAutomotive = false,
+            ),
+        ).thenReturn(MEDIA_ID_ROOT)
 
         val result = callback.onGetLibraryRoot(mockSession, mockController, null)
 
         val libraryResult = result.get()
         assertEquals(MEDIA_ID_ROOT, libraryResult.value?.mediaId)
-        verify(browseTreeProvider).getRootId(isRecent = false, isSuggested = false, hasCurrentEpisode = false)
+        verify(browseTreeProvider).getRootId(
+            isRecent = false,
+            isSuggested = false,
+            hasCurrentEpisode = false,
+            isAutomotive = false,
+        )
     }
 
     @Test
@@ -358,25 +411,7 @@ class Media3LibrarySessionCallbackTest {
 
     @Test
     fun `onPlaybackResumption sets automotive connected flag on automotive`() = runTest {
-        val automotiveContext: Context = mock()
-        val automotivePackageManager: PackageManager = mock()
-        val metaData = Bundle().apply { putBoolean("pocketcasts_automotive", true) }
-        val appInfo = ApplicationInfo().apply { this.metaData = metaData }
-        whenever(automotivePackageManager.getApplicationInfo(any<String>(), any<Int>())).thenReturn(appInfo)
-        whenever(automotiveContext.packageManager).thenReturn(automotivePackageManager)
-        whenever(automotiveContext.packageName).thenReturn("au.com.shiftyjelly.pocketcasts.debug")
-
-        val automotiveCallback = Media3LibrarySessionCallback(
-            sessionCallback = sessionCallback,
-            browseTreeProvider = browseTreeProvider,
-            playbackManager = playbackManager,
-            episodeManager = episodeManager,
-            podcastManager = podcastManager,
-            settings = mockSettings,
-            packageValidator = null,
-            scopeProvider = { testScope },
-            contextProvider = { automotiveContext },
-        )
+        val automotiveCallback = createAutomotiveCallback()
 
         val episode = PodcastEpisode(
             uuid = "ep-1",
@@ -430,5 +465,27 @@ class Media3LibrarySessionCallbackTest {
             .setMediaId(mediaId)
             .setMediaMetadata(metadata)
             .build()
+    }
+
+    private fun createAutomotiveCallback(): Media3LibrarySessionCallback {
+        val automotiveContext: Context = mock()
+        val automotivePackageManager: PackageManager = mock()
+        val metaData = Bundle().apply { putBoolean("pocketcasts_automotive", true) }
+        val appInfo = ApplicationInfo().apply { this.metaData = metaData }
+        whenever(automotivePackageManager.getApplicationInfo(any<String>(), any<Int>())).thenReturn(appInfo)
+        whenever(automotiveContext.packageManager).thenReturn(automotivePackageManager)
+        whenever(automotiveContext.packageName).thenReturn("au.com.shiftyjelly.pocketcasts.debug")
+
+        return Media3LibrarySessionCallback(
+            sessionCallback = sessionCallback,
+            browseTreeProvider = browseTreeProvider,
+            playbackManager = playbackManager,
+            episodeManager = episodeManager,
+            podcastManager = podcastManager,
+            settings = mockSettings,
+            packageValidator = null,
+            scopeProvider = { testScope },
+            contextProvider = { automotiveContext },
+        )
     }
 }
