@@ -142,9 +142,10 @@ open class LegacyPlaybackService :
             return null
         }
 
+        val isAutomotive = Util.isAutomotive(this)
         if (!clientPackageName.contains("au.com.shiftyjelly.pocketcasts")) {
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Client: $clientPackageName connected to legacy media session")
-            if (Util.isAutomotive(this) && !settings.automotiveConnectedToMediaSession()) {
+            if (isAutomotive && !settings.automotiveConnectedToMediaSession()) {
                 launch {
                     kotlinx.coroutines.delay(1000)
                     settings.setAutomotiveConnectedToMediaSession(true)
@@ -156,7 +157,7 @@ open class LegacyPlaybackService :
         val isSuggested = rootHints?.getBoolean(BrowserRoot.EXTRA_SUGGESTED) ?: false
         val hasCurrentEpisode = playbackManager.getCurrentEpisode() != null
 
-        val rootId = browseTreeProvider.getRootId(isRecent, isSuggested, hasCurrentEpisode)
+        val rootId = browseTreeProvider.getRootId(isRecent, isSuggested, hasCurrentEpisode, isAutomotive)
             ?: return null
 
         val extras = Bundle().apply {
