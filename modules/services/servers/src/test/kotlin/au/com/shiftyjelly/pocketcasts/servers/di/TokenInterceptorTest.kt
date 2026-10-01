@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.servers.di
 
+import android.accounts.AuthenticatorException
 import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
 import au.com.shiftyjelly.pocketcasts.servers.sync.TokenHandler
 import au.com.shiftyjelly.pocketcasts.servers.sync.exception.RefreshTokenExpiredException
@@ -9,18 +10,29 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.util.ArrayDeque
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.CopyOnWriteArrayList
+import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.Dispatcher
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.Response
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertSame
 import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
 
+@RunWith(RobolectricTestRunner::class)
 class TokenInterceptorTest {
     @get:Rule
     val server = MockWebServer()
@@ -131,6 +143,67 @@ class TokenInterceptorTest {
         assertTrue(tokenHandler.invalidatedAccessToken)
     }
 
+    @Test
+    fun `fails the async call without crashing when the authenticator cannot be bound`() {
+        val bindFailure = AuthenticatorException("bind failure")
+        val tokenHandler = FakeTokenHandler(TokenResult.Failure(bindFailure))
+
+        val failure = enqueueAndAwaitFailure(tokenHandler)
+
+        assertSame(bindFailure, failure.cause)
+        assertEquals(0, server.requestCount)
+    }
+
+    @Test
+    fun `fails the async call without crashing when the authenticator cannot be bound after unauthorized`() {
+        val bindFailure = AuthenticatorException("bind failure")
+        val tokenHandler = FakeTokenHandler(
+            TokenResult.Token(AccessToken("expired-access-token")),
+            TokenResult.Failure(bindFailure),
+        )
+        server.enqueue(MockResponse().setResponseCode(HttpURLConnection.HTTP_UNAUTHORIZED))
+
+        val failure = enqueueAndAwaitFailure(tokenHandler)
+
+        assertSame(bindFailure, failure.cause)
+        assertEquals(1, server.requestCount)
+        assertTrue(tokenHandler.invalidatedAccessToken)
+    }
+
+    private fun enqueueAndAwaitFailure(tokenHandler: TokenHandler): IOException {
+        val uncaughtExceptions = CopyOnWriteArrayList<Throwable>()
+        val dispatcherThreads = CopyOnWriteArrayList<Thread>()
+        val executor = Executors.newCachedThreadPool { runnable ->
+            Thread(runnable).apply {
+                setUncaughtExceptionHandler { _, throwable -> uncaughtExceptions += throwable }
+                dispatcherThreads += this
+            }
+        }
+        val client = newClient(tokenHandler).newBuilder()
+            .dispatcher(Dispatcher(executor))
+            .build()
+        val failure = CompletableFuture<IOException>()
+
+        client.newCall(Request.Builder().url(server.url("/podcasts/search")).build()).enqueue(
+            object : Callback {
+                override fun onFailure(call: Call, e: IOException) {
+                    failure.complete(e)
+                }
+
+                override fun onResponse(call: Call, response: Response) {
+                    response.close()
+                    failure.completeExceptionally(AssertionError("Expected the call to fail"))
+                }
+            },
+        )
+
+        val exception = failure.get(5, TimeUnit.SECONDS)
+        executor.shutdown()
+        dispatcherThreads.forEach { it.join(TimeUnit.SECONDS.toMillis(5)) }
+        assertEquals(emptyList<Throwable>(), uncaughtExceptions)
+        return exception
+    }
+
     private fun newClient(tokenHandler: TokenHandler): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor(InterceptorModule.provideTokenInterceptor(tokenHandler))
@@ -153,6 +226,7 @@ class TokenInterceptorTest {
             check(results.isNotEmpty()) { "No token result configured" }
             return when (val result = results.removeFirst()) {
                 TokenResult.Expired -> throw RefreshTokenExpiredException()
+                is TokenResult.Failure -> throw result.exception
                 is TokenResult.Token -> result.accessToken
             }
         }
@@ -165,5 +239,6 @@ class TokenInterceptorTest {
     private sealed class TokenResult {
         data class Token(val accessToken: AccessToken?) : TokenResult()
         object Expired : TokenResult()
+        data class Failure(val exception: Exception) : TokenResult()
     }
 }
