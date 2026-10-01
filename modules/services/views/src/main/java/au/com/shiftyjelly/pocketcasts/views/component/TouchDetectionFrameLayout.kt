@@ -48,8 +48,11 @@ class TouchDetectionFrameLayout @JvmOverloads constructor(
     private fun cancelTouchTargets(event: MotionEvent) {
         val cancelEvent = MotionEvent.obtain(event)
         cancelEvent.action = MotionEvent.ACTION_CANCEL
-        super.dispatchTouchEvent(cancelEvent)
-        cancelEvent.recycle()
+        try {
+            super.dispatchTouchEvent(cancelEvent)
+        } finally {
+            cancelEvent.recycle()
+        }
     }
 }
 
