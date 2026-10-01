@@ -789,7 +789,6 @@ Language: it
     <string name="referrals_activate_my_pass">Attiva il mio pass</string>
     <string name="referrals_claim_guest_pass_title">Riscatta il tuo pass per ospiti %1$s</string>
     <string name="referrals_claim_guess_pass_banner_card_subtitle">Sblocca l\'esperienza di ascolto completa</string>
-    <string name="referrals_tooltip_message">Regala %1$s di Pocket Casts Plus!</string>
     <string name="referrals_claim_guess_pass_banner_card_title">Riscatta il tuo pass per ospiti %1$s per Plus</string>
     <string name="referrals_share_guest_pass">Condividi pass per ospiti</string>
     <string name="referrals_send_guest_pass_title">Regala %1$s di Pocket Casts Plus</string>

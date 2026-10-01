@@ -786,7 +786,6 @@ Language: ar
     <string name="referrals_invalid_offer_description">لا يمكن استرداد هذا المرور الخاص بالضيف إلا مرة واحدة، وهو متاح لأولئك الذين ليس لديهم اشتراك Plus أو Patron نشط. شكرًا على الاستماع!</string>
     <string name="referrals_claim_guest_pass_title">المطالبة بـ ⁦%1$s⁩ Guest Pass الخاص بك</string>
     <string name="referrals_activate_my_pass">تفعيل المرور الخاص بي</string>
-    <string name="referrals_tooltip_message">قم بإهداء ⁦%1$s⁩ من Pocket Casts Plus!</string>
     <string name="referrals_claim_guess_pass_banner_card_subtitle">إطلاق العنان لتجربة الاستماع الكاملة</string>
     <string name="referrals_claim_guess_pass_banner_card_title">المطالبة بـ ⁦%1$s⁩ Guest Pass إلى Plus الخاص بك</string>
     <string name="referrals_share_guest_pass">مشاركة ممر الضيف</string>

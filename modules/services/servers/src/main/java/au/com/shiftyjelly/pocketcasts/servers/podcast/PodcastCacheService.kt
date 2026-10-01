@@ -8,7 +8,6 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.bookmark.BookmarkEnrichReques
 import au.com.shiftyjelly.pocketcasts.servers.sync.bookmark.BookmarkEnrichResponse
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
-import io.reactivex.Single
 import java.util.Date
 import okhttp3.ResponseBody
 import retrofit2.Response
@@ -81,7 +80,7 @@ interface PodcastCacheService {
     suspend fun getPodcastAndEpisodesRaw(@Path("podcastUuid") podcastUuid: String): Response<PodcastResponse>
 
     @GET("/mobile/podcast/full/{podcastUuid}")
-    fun getPodcastAndEpisodes(@Path("podcastUuid") podcastUuid: String): Single<PodcastResponse>
+    suspend fun getPodcastAndEpisodes(@Path("podcastUuid") podcastUuid: String): PodcastResponse
 
     @GET("/mobile/show_notes/full/{podcastUuid}")
     suspend fun getShowNotesLocation(@Path("podcastUuid") podcastUuid: String, @Query("disableredirect") disableRedirect: Boolean = true): ShowNotesLocationResponse

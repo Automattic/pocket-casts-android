@@ -12,6 +12,9 @@ import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewMessageType
 import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewPage
 import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewTargeting
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.WhatsNewFeedShownEvent
+import com.automattic.eventhorizon.WhatsNewReadAllTappedEvent
 import java.time.Instant
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,6 +26,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 
 class WhatsNewFeedViewModelTest {
     @get:Rule
@@ -34,7 +38,9 @@ class WhatsNewFeedViewModelTest {
         on { bottomInset } doReturn MutableStateFlow(0)
     }
 
-    private fun createViewModel() = WhatsNewFeedViewModel(manager, settings)
+    private val eventHorizon = mock<EventHorizon>()
+
+    private fun createViewModel() = WhatsNewFeedViewModel(manager, eventHorizon, settings)
 
     @Test
     fun `shows the messages the manager lists once the catalog loads`() = runTest {
@@ -163,6 +169,22 @@ class WhatsNewFeedViewModelTest {
     }
 
     @Test
+    fun `showing the feed reports it`() = runTest {
+        createViewModel().onScreenShown()
+
+        verify(eventHorizon).track(WhatsNewFeedShownEvent)
+    }
+
+    @Test
+    fun `read all reports the tap`() = runTest {
+        manager.publish(listOf(message("a")))
+
+        createViewModel().onReadAllClick()
+
+        verify(eventHorizon).track(WhatsNewReadAllTappedEvent)
+    }
+
+    @Test
     fun `read all marks exactly the listed messages read`() = runTest {
         manager.publish(listOf(message("a"), message("b")))
         manager.catalog.value = manager.catalog.value?.copy(messages = listOf(message("a"), message("b"), message("hidden")))
@@ -274,9 +296,15 @@ class WhatsNewFeedViewModelTest {
             readState.value = readState.value.copy(listedMessageIds = readState.value.listedMessageIds + messageIds)
         }
 
+        override suspend fun markFeedAsSeen() = markAsSeen(feedMessages.value.map { it.id })
+
         override fun markAsResponded(pollId: String) {
             readState.value = readState.value.copy(respondedPollIds = readState.value.respondedPollIds + pollId)
         }
+
+        override fun startFeed() = Unit
+
+        override fun forgetReadMessages() = Unit
 
         override fun resetReadState() {
             readState.value = WhatsNewReadState()

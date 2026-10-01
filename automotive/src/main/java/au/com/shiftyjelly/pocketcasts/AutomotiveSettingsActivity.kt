@@ -109,6 +109,17 @@ class AutomotiveSettingsActivity :
     override fun closeFiltersToRoot() {
     }
 
+    override fun closeProfileToRoot() {
+    }
+
+    override fun openCreatePlaylist() {
+    }
+
+    override fun openNetworks() {
+    }
+
+    override fun openInAppDeepLink(url: String) = false
+
     override fun openPodcastPage(uuid: String, sourceView: String?) {
     }
 
