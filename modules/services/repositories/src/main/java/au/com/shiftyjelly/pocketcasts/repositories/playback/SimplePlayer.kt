@@ -164,12 +164,50 @@ class SimplePlayer(
         if (player?.isCurrentMediaItemSeekable == false && player?.isPlaying == true) {
             Toast.makeText(context, "Unable to seek. File headers appear to be invalid.", Toast.LENGTH_SHORT).show()
         } else {
-            try {
-                player?.seekTo(positionMs.toLong())
-                super.onSeekComplete(positionMs)
-            } catch (e: Exception) {
-                LogBuffer.e(LogBuffer.TAG_PLAYBACK, e, "Failed to seek to $positionMs ms.")
+            val currentPlayer = player ?: return
+            // https://linear.app/a8c/issue/PCDROID-591/attempt-to-fix-classcastexception-crash-of-exoplayer
+            if (currentPlayer.isReadyForSeek()) {
+                seekPlayer(currentPlayer, positionMs)
+            } else {
+                when (currentPlayer.playbackState) {
+                    Player.STATE_IDLE -> {
+                        val listener = object : Player.Listener {
+                            override fun onPlaybackStateChanged(playbackState: Int) {
+                                if (playbackState == Player.STATE_READY || playbackState == Player.STATE_BUFFERING) {
+                                    currentPlayer.removeListener(this)
+                                    seekPlayer(currentPlayer, positionMs)
+                                } else if (playbackState == Player.STATE_IDLE || playbackState == Player.STATE_ENDED) {
+                                    currentPlayer.removeListener(this)
+                                }
+                            }
+                        }
+                        currentPlayer.addListener(listener)
+                        if (currentPlayer.isReadyForSeek()) {
+                            currentPlayer.removeListener(listener)
+                            seekPlayer(currentPlayer, positionMs)
+                        }
+                    }
+
+                    else -> {
+                        seekPlayer(currentPlayer, positionMs)
+                    }
+                }
             }
+        }
+    }
+
+    private fun ExoPlayer.isReadyForSeek(): Boolean {
+        val state = playbackState
+        return state == Player.STATE_READY || state == Player.STATE_BUFFERING
+    }
+
+    private fun seekPlayer(player: ExoPlayer, positionMs: Int) {
+        try {
+            player.seekTo(positionMs.toLong())
+            super.onSeekComplete(positionMs)
+        } catch (e: Exception) {
+            LogBuffer.e(LogBuffer.TAG_PLAYBACK, e, "Failed to seek to $positionMs ms.")
+            super.onSeekComplete(player.currentPosition.toInt())
         }
     }
 
