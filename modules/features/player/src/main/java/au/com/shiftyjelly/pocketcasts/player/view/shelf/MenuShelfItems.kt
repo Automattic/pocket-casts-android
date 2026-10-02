@@ -25,9 +25,9 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfTitle
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import java.util.Date
-import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun MenuShelfItems(

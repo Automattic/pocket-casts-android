@@ -157,7 +157,9 @@ fun PlayerShelf(
             )
         },
         onEpisodeChatClick = {
-            shelfSharedViewModel.onEpisodeChatClick(ShelfItemSource.Shelf)
+            val podcast = playerViewModel.podcast ?: return@PlayerShelfContent
+            val episode = playerViewModel.episode as? PodcastEpisode ?: return@PlayerShelfContent
+            shelfSharedViewModel.onEpisodeChatClick(podcast, episode, ShelfItemSource.Shelf)
         },
         showBookmarkTooltip = shelfItemsState.showBookmarkTooltip,
         showBookmarkOverflowTooltip = shelfItemsState.showBookmarkOverflowTooltip,

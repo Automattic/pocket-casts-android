@@ -1331,12 +1331,13 @@ class EpisodeFragment : BaseFragment() {
                     episode.title,
                     episodeSubtitle,
                     episode.durationMs,
+                    SourceView.EPISODE_DETAILS,
                 )
                 fragment.show(parentFragmentManager, "episode_chat")
             }
         } else {
             if (parentFragmentManager.findFragmentByTag("episode_chat_paywall") == null) {
-                val fragment = ChatPaywallFragment.newInstance(episodeUuid, podcastUuid)
+                val fragment = ChatPaywallFragment.newInstance(episodeUuid, podcastUuid, SourceView.EPISODE_DETAILS)
                 fragment.show(parentFragmentManager, "episode_chat_paywall")
             }
         }

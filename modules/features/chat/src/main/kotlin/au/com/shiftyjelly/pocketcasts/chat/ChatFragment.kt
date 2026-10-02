@@ -14,6 +14,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.fragment.app.viewModels
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.chat.ui.ChatScreen
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
@@ -40,11 +41,12 @@ class ChatFragment : BaseDialogFragment() {
             episodeTitle: String,
             episodeSubtitle: String,
             episodeDurationMs: Int,
+            sourceView: SourceView,
         ) = ChatFragment().apply {
             arguments = Bundle().apply {
                 putParcelable(
                     ARGS_KEY,
-                    Args(episodeUuid, podcastUuid, podcastTitle, episodeTitle, episodeSubtitle, episodeDurationMs),
+                    Args(episodeUuid, podcastUuid, podcastTitle, episodeTitle, episodeSubtitle, episodeDurationMs, sourceView),
                 )
             }
         }
@@ -63,6 +65,7 @@ class ChatFragment : BaseDialogFragment() {
             podcastUuid = args.podcastUuid,
             podcastTitle = args.podcastTitle,
             episodeDurationMs = args.episodeDurationMs,
+            sourceView = args.sourceView,
         )
     }
 
@@ -136,5 +139,6 @@ class ChatFragment : BaseDialogFragment() {
         val episodeTitle: String,
         val episodeSubtitle: String,
         val episodeDurationMs: Int,
+        val sourceView: SourceView,
     ) : Parcelable
 }
