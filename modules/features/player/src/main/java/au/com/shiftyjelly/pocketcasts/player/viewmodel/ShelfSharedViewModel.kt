@@ -119,6 +119,19 @@ class ShelfSharedViewModel @Inject constructor(
         showTooltip && isPlayerOpen && !isDismissed && isSmartBookmarksEnabled
     }
 
+    private val episodeChatPromoActiveFlow = combine(
+        playerOpenState,
+        settings.episodeChatTooltipDismissed.flow,
+    ) { isPlayerOpen, isDismissed ->
+        isPlayerOpen && !isDismissed
+    }
+
+    private val promoStateFlow = combine(
+        smartBookmarksPromoActiveFlow,
+        episodeChatPromoActiveFlow,
+        ::PromoState,
+    )
+
     val uiState = combine(
         settings.shelfItems.flow,
         shelfUpNextFlow,
@@ -126,7 +139,7 @@ class ShelfSharedViewModel @Inject constructor(
             .mapNotNull { state -> (state as? UpNextQueue.State.Loaded)?.episode?.uuid }
             .flatMapLatest { episodeUuid -> transcriptManager.observeIsTranscriptAvailable(episodeUuid) },
         videoStateFlow,
-        smartBookmarksPromoActiveFlow,
+        promoStateFlow,
         ::createUiState,
     ).stateIn(
         viewModelScope,
@@ -168,7 +181,7 @@ class ShelfSharedViewModel @Inject constructor(
         shelfUpNext: UpNextQueue.State,
         isTranscriptAvailable: Boolean,
         videoState: VideoState,
-        isSmartBookmarksPromoActive: Boolean,
+        promoState: PromoState,
     ): UiState {
         val episode = (shelfUpNext as? UpNextQueue.State.Loaded)?.episode
         val streamHasVideo = videoState.streamVideoState == StreamVideoState.HasVideo || videoState.streamVideoState == StreamVideoState.Unknown
@@ -185,9 +198,15 @@ class ShelfSharedViewModel @Inject constructor(
             episode = episode,
             isTranscriptAvailable = isTranscriptAvailable,
             isVideoRenderingEnabled = videoState.renderingEnabled && streamHasVideo,
-            isSmartBookmarksPromoActive = isSmartBookmarksPromoActive,
+            isSmartBookmarksPromoActive = promoState.isSmartBookmarksPromoActive,
+            isEpisodeChatPromoActive = promoState.isEpisodeChatPromoActive,
         )
     }
+
+    private data class PromoState(
+        val isSmartBookmarksPromoActive: Boolean,
+        val isEpisodeChatPromoActive: Boolean,
+    )
 
     private data class VideoState(
         val streamVideoState: StreamVideoState,
@@ -321,6 +340,10 @@ class ShelfSharedViewModel @Inject constructor(
         settings.smartBookmarksTooltipDismissed.set(true, updateModifiedAt = false)
     }
 
+    fun dismissEpisodeChatTooltip() {
+        settings.episodeChatTooltipDismissed.set(true, updateModifiedAt = false)
+    }
+
     fun setPlayerOpen(isOpen: Boolean) {
         playerOpenState.value = isOpen
     }
@@ -410,6 +433,7 @@ class ShelfSharedViewModel @Inject constructor(
         source: ShelfItemSource,
     ) {
         trackShelfAction(ShelfItem.EpisodeChat, source)
+        dismissEpisodeChatTooltip()
         viewModelScope.launch {
             val isPaidUser = settings.cachedSubscription.value != null
             _navigationState.emit(NavigationState.ShowEpisodeChat(podcast, episode, isPaidUser))
@@ -444,6 +468,7 @@ class ShelfSharedViewModel @Inject constructor(
         val isTranscriptAvailable: Boolean = false,
         val isVideoRenderingEnabled: Boolean = true,
         val isSmartBookmarksPromoActive: Boolean = false,
+        val isEpisodeChatPromoActive: Boolean = false,
     ) {
         private val visibleShelfItems: List<ShelfItem>
             get() = shelfItems.filter { it != ShelfItem.EpisodeChat || isTranscriptAvailable }
@@ -455,6 +480,11 @@ class ShelfSharedViewModel @Inject constructor(
             get() = isSmartBookmarksPromoActive && ShelfItem.Bookmark in playerShelfItems
         val showBookmarkOverflowTooltip: Boolean
             get() = isSmartBookmarksPromoActive && ShelfItem.Bookmark in playerBottomSheetShelfItems
+        val showEpisodeChatTooltip: Boolean
+            get() = isEpisodeChatPromoActive &&
+                ShelfItem.EpisodeChat in playerBottomSheetShelfItems &&
+                !showBookmarkTooltip &&
+                !showBookmarkOverflowTooltip
     }
 
     data class PlayerShelfData(

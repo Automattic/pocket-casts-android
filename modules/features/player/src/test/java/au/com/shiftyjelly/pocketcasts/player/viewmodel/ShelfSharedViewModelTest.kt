@@ -104,6 +104,8 @@ class ShelfSharedViewModelTest {
 
     private lateinit var shelfSharedViewModel: ShelfSharedViewModel
 
+    private val episodeChatTooltipDismissedSetting = mock<UserSetting<Boolean>>()
+
     private val plusSubscription = Subscription(
         tier = SubscriptionTier.Plus,
         billingCycle = BillingCycle.Monthly,
@@ -560,11 +562,79 @@ class ShelfSharedViewModelTest {
         }
     }
 
-    private suspend fun awaitLoadedState(): ShelfSharedViewModel.UiState {
+    @Test
+    fun `given episode chat in overflow menu and player open, then episode chat tooltip is shown`() = runTest {
+        initViewModel(currentEpisode = transcriptEpisode, isTranscriptAvailable = true, isEpisodeChatEnabled = true)
+        shelfSharedViewModel.setPlayerOpen(true)
+
+        assertTrue(awaitLoadedState { it.isEpisodeChatPromoActive }.showEpisodeChatTooltip)
+    }
+
+    @Test
+    fun `given episode chat tooltip dismissed, then episode chat tooltip is not shown`() = runTest {
+        initViewModel(
+            currentEpisode = transcriptEpisode,
+            isTranscriptAvailable = true,
+            isEpisodeChatEnabled = true,
+            isEpisodeChatTooltipDismissed = true,
+        )
+        shelfSharedViewModel.setPlayerOpen(true)
+
+        assertFalse(awaitLoadedState().showEpisodeChatTooltip)
+    }
+
+    @Test
+    fun `given episode chat on the shelf, then episode chat tooltip is not shown`() = runTest {
+        val shelfItems = listOf(ShelfItem.EpisodeChat) + (ShelfItem.entries - ShelfItem.EpisodeChat)
+        initViewModel(
+            currentEpisode = transcriptEpisode,
+            isTranscriptAvailable = true,
+            isEpisodeChatEnabled = true,
+            shelfItems = shelfItems,
+        )
+        shelfSharedViewModel.setPlayerOpen(true)
+
+        assertFalse(awaitLoadedState { it.isEpisodeChatPromoActive }.showEpisodeChatTooltip)
+    }
+
+    @Test
+    fun `given smart bookmarks tooltip shown, then episode chat tooltip waits`() {
+        val state = ShelfSharedViewModel.UiState(
+            shelfItems = ShelfItem.entries,
+            isTranscriptAvailable = true,
+            isSmartBookmarksPromoActive = true,
+            isEpisodeChatPromoActive = true,
+        )
+
+        assertTrue(state.showBookmarkOverflowTooltip)
+        assertFalse(state.showEpisodeChatTooltip)
+    }
+
+    @Test
+    fun `when episode chat tooltip dismissed, then dismissal is saved`() = runTest {
+        initViewModel()
+
+        shelfSharedViewModel.dismissEpisodeChatTooltip()
+
+        verify(episodeChatTooltipDismissedSetting).set(true, updateModifiedAt = false)
+    }
+
+    @Test
+    fun `when episode chat clicked, then episode chat tooltip is dismissed`() = runTest {
+        initViewModel()
+
+        shelfSharedViewModel.onEpisodeChatClick(Podcast(uuid = "podcastUuid"), transcriptEpisode, ShelfItemSource.OverflowMenu)
+
+        verify(episodeChatTooltipDismissedSetting).set(true, updateModifiedAt = false)
+    }
+
+    private suspend fun awaitLoadedState(
+        isReady: (ShelfSharedViewModel.UiState) -> Boolean = { true },
+    ): ShelfSharedViewModel.UiState {
         var state = shelfSharedViewModel.uiState.value
         shelfSharedViewModel.uiState.test {
             state = awaitItem()
-            while (state.episode == null) {
+            while (state.episode == null || !isReady(state)) {
                 state = awaitItem()
             }
             cancelAndIgnoreRemainingEvents()
@@ -581,6 +651,7 @@ class ShelfSharedViewModelTest {
         isTranscriptAvailable: Boolean = false,
         shelfItems: List<ShelfItem> = ShelfItem.entries,
         isEpisodeChatEnabled: Boolean = false,
+        isEpisodeChatTooltipDismissed: Boolean = false,
     ) {
         FeatureFlag.setEnabled(Feature.HLS_STREAMING, true)
         FeatureFlag.setEnabled(Feature.EPISODE_CHAT, isEpisodeChatEnabled)
@@ -613,6 +684,9 @@ class ShelfSharedViewModelTest {
         val smartBookmarksTooltipDismissedSetting = mock<UserSetting<Boolean>>()
         whenever(smartBookmarksTooltipDismissedSetting.flow).thenReturn(MutableStateFlow(false))
         whenever(settings.smartBookmarksTooltipDismissed).thenReturn(smartBookmarksTooltipDismissedSetting)
+
+        whenever(episodeChatTooltipDismissedSetting.flow).thenReturn(MutableStateFlow(isEpisodeChatTooltipDismissed))
+        whenever(settings.episodeChatTooltipDismissed).thenReturn(episodeChatTooltipDismissedSetting)
 
         val userSubscriptionSetting = mock<UserSetting<Subscription?>>()
         whenever(userSubscriptionSetting.value).thenReturn(subscription)

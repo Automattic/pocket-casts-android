@@ -164,6 +164,8 @@ fun PlayerShelf(
         showBookmarkTooltip = shelfItemsState.showBookmarkTooltip,
         showBookmarkOverflowTooltip = shelfItemsState.showBookmarkOverflowTooltip,
         onBookmarkTooltipDismiss = { shelfSharedViewModel.dismissBookmarkTooltip() },
+        showEpisodeChatTooltip = shelfItemsState.showEpisodeChatTooltip,
+        onEpisodeChatTooltipDismiss = { shelfSharedViewModel.dismissEpisodeChatTooltip() },
         modifier = modifier,
     )
 }
@@ -193,6 +195,8 @@ private fun PlayerShelfContent(
     showBookmarkTooltip: Boolean = false,
     showBookmarkOverflowTooltip: Boolean = false,
     onBookmarkTooltipDismiss: () -> Unit = {},
+    showEpisodeChatTooltip: Boolean = false,
+    onEpisodeChatTooltipDismiss: () -> Unit = {},
     playerColors: PlayerColors = MaterialTheme.theme.rememberPlayerColorsOrDefault(),
 ) {
     Row(
@@ -314,6 +318,17 @@ private fun PlayerShelfContent(
                     anchorOffset = DpOffset(0.dp, (-4).dp),
                     clickableElevationPadding = true,
                     onClick = onBookmarkTooltipDismiss,
+                )
+            }
+            if (showEpisodeChatTooltip) {
+                TooltipPopup(
+                    title = stringResource(LR.string.episode_chat_tooltip_title),
+                    body = stringResource(LR.string.episode_chat_tooltip_body),
+                    tipPosition = TipPosition.BottomEnd,
+                    maxWidth = 300.dp,
+                    anchorOffset = DpOffset(0.dp, (-4).dp),
+                    clickableElevationPadding = true,
+                    onClick = onEpisodeChatTooltipDismiss,
                 )
             }
         }
