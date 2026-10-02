@@ -25,6 +25,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfTitle
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import java.util.Date
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 
@@ -64,7 +65,7 @@ fun MenuShelfItems(
                                     isEditable = state.isEditable,
                                     isTranscriptAvailable = state.isTranscriptAvailable,
                                     isVideoEnabled = isVideoEnabled,
-                                    showNewBadge = !state.isEditable && state.showBookmarkNewBadge && listItem == ShelfItem.Bookmark,
+                                    badgeTextId = shelfItemBadgeTextId(listItem, state.isEditable, state.showBookmarkNewBadge),
                                     onClick = onClick,
                                     modifier = rowDraggableModifier,
                                 )
@@ -89,6 +90,17 @@ fun MenuShelfItems(
             )
         }
     }
+}
+
+private fun shelfItemBadgeTextId(
+    item: ShelfItem,
+    isEditable: Boolean,
+    showBookmarkNewBadge: Boolean,
+): Int? = when {
+    isEditable -> null
+    item == ShelfItem.EpisodeChat -> LR.string.episode_chat_beta_badge
+    item == ShelfItem.Bookmark && showBookmarkNewBadge -> LR.string.bookmark_new_badge
+    else -> null
 }
 
 @Preview
