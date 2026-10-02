@@ -151,6 +151,8 @@ fun ShelfBottomSheetPage(
                     }
 
                     ShelfItem.StreamSelector -> shelfSharedViewModel.onVideoToggleClick(ShelfItemSource.OverflowMenu)
+
+                    ShelfItem.EpisodeChat -> shelfSharedViewModel.onEpisodeChatClick(ShelfItemSource.OverflowMenu)
                 }
                 if (item != ShelfItem.Cast) onDismiss()
             },

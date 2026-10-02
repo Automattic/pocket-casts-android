@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.settings.advanced
 
 import android.content.Context
+import android.content.SharedPreferences
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.work.NetworkType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -18,13 +19,14 @@ import org.junit.Test
 
 class AdvancedSettingsTest {
     private lateinit var settings: Settings
+    private lateinit var sharedPreferences: SharedPreferences
 
     @Before
     fun setUp() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val fileName = "FILE_NAME"
 
-        val sharedPreferences = context.getSharedPreferences(fileName, Context.MODE_PRIVATE)
+        sharedPreferences = context.getSharedPreferences(fileName, Context.MODE_PRIVATE)
         sharedPreferences.edit().clear().commit()
         val moshi = NetworkModule().provideMoshi()
         val firebaseRemoteConfig = FirebaseRemoteConfig.getInstance()
@@ -99,6 +101,28 @@ class AdvancedSettingsTest {
         settings.shelfItems.set(items, updateModifiedAt = false)
 
         assertEquals(settings.shelfItems.value.take(5), items)
+    }
+
+    @Test
+    fun savedShelfItemsWithoutEpisodeChatGetItFirstInTheOverflowMenu() {
+        val savedItems = ShelfItem.entries - ShelfItem.EpisodeChat
+        sharedPreferences.edit().putString("shelfItems", savedItems.joinToString(",") { it.id }).commit()
+
+        val items = settings.shelfItems.value
+
+        assertEquals(savedItems.take(4) + ShelfItem.EpisodeChat + savedItems.drop(4), items)
+    }
+
+    @Test
+    fun savedShelfItemsWithoutTranscriptAndEpisodeChatGetBothInserted() {
+        val savedItems = ShelfItem.entries - ShelfItem.Transcript - ShelfItem.EpisodeChat
+        sharedPreferences.edit().putString("shelfItems", savedItems.joinToString(",") { it.id }).commit()
+
+        val items = settings.shelfItems.value
+
+        assertEquals(ShelfItem.Transcript, items[3])
+        assertEquals(ShelfItem.EpisodeChat, items[4])
+        assertEquals(ShelfItem.entries.size, items.size)
     }
 
     @Test

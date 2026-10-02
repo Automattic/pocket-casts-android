@@ -149,7 +149,8 @@ class ShelfSharedViewModel @Inject constructor(
                         uiState.map { state ->
                             val isTranscriptButtonVisible = (ShelfItem.Transcript in state.playerShelfItems) ||
                                 (isOverflowMenuOpen && ShelfItem.Transcript in state.playerBottomSheetShelfItems)
-                            (state.episode as? PodcastEpisode)?.takeIf { isTranscriptButtonVisible }
+                            val needsTranscript = isTranscriptButtonVisible || ShelfItem.EpisodeChat in state.shelfItems
+                            (state.episode as? PodcastEpisode)?.takeIf { needsTranscript }
                         }
                     }
                 }
@@ -176,7 +177,11 @@ class ShelfSharedViewModel @Inject constructor(
             episode is PodcastEpisode &&
             (streamHasVideo || videoState.hlsAvailable)
         return uiState.value.copy(
-            shelfItems = shelfItems.filter { it.showIf(episode) && (it != ShelfItem.StreamSelector || canToggleVideo) },
+            shelfItems = shelfItems.filter { item ->
+                item.showIf(episode) &&
+                    (item != ShelfItem.StreamSelector || canToggleVideo) &&
+                    (item != ShelfItem.EpisodeChat || FeatureFlag.isEnabled(Feature.EPISODE_CHAT))
+            },
             episode = episode,
             isTranscriptAvailable = isTranscriptAvailable,
             isVideoRenderingEnabled = videoState.renderingEnabled && streamHasVideo,
@@ -399,6 +404,10 @@ class ShelfSharedViewModel @Inject constructor(
         }
     }
 
+    fun onEpisodeChatClick(source: ShelfItemSource) {
+        trackShelfAction(ShelfItem.EpisodeChat, source)
+    }
+
     fun onMoreClick() {
         eventHorizon.track(PlayerShelfOverflowMenuShownEvent)
         viewModelScope.launch {
@@ -428,10 +437,12 @@ class ShelfSharedViewModel @Inject constructor(
         val isVideoRenderingEnabled: Boolean = true,
         val isSmartBookmarksPromoActive: Boolean = false,
     ) {
+        private val visibleShelfItems: List<ShelfItem>
+            get() = shelfItems.filter { it != ShelfItem.EpisodeChat || isTranscriptAvailable }
         val playerShelfItems: List<ShelfItem>
-            get() = shelfItems.take(MIN_SHELF_ITEMS_SIZE)
+            get() = visibleShelfItems.take(MIN_SHELF_ITEMS_SIZE)
         val playerBottomSheetShelfItems: List<ShelfItem>
-            get() = shelfItems.drop(MIN_SHELF_ITEMS_SIZE)
+            get() = visibleShelfItems.drop(MIN_SHELF_ITEMS_SIZE)
         val showBookmarkTooltip: Boolean
             get() = isSmartBookmarksPromoActive && ShelfItem.Bookmark in playerShelfItems
         val showBookmarkOverflowTooltip: Boolean
