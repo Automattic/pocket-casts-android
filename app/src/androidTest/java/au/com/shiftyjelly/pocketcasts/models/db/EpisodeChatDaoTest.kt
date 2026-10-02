@@ -50,25 +50,24 @@ class EpisodeChatDaoTest {
             createdAt = Date(100),
         )
 
-        episodeChatDao.insertChat(chat)
+        episodeChatDao.insertChatIfAbsent(chat)
 
         assertEquals(chat, episodeChatDao.getChatByEpisode(EPISODE_UUID))
         assertNull(episodeChatDao.getChatByEpisode("missing-episode-uuid"))
     }
 
     @Test
-    fun testReplaceChat() = runTest {
+    fun testInsertChatIfAbsentKeepsExistingChatAndMessages() = runTest {
         insertEpisode()
-        episodeChatDao.insertChat(EpisodeChat(episodeUuid = EPISODE_UUID, podcastUuid = "old-podcast-uuid", createdAt = Date(100)))
-        val replacement = EpisodeChat(
-            episodeUuid = EPISODE_UUID,
-            podcastUuid = PODCAST_UUID,
-            createdAt = Date(200),
-        )
+        val existing = EpisodeChat(episodeUuid = EPISODE_UUID, podcastUuid = PODCAST_UUID, createdAt = Date(100))
+        episodeChatDao.insertChatIfAbsent(existing)
+        val message = createMessage(uuid = "message-uuid", text = "Message")
+        episodeChatDao.insertMessage(message)
 
-        episodeChatDao.insertChat(replacement)
+        episodeChatDao.insertChatIfAbsent(EpisodeChat(episodeUuid = EPISODE_UUID, podcastUuid = "other-podcast-uuid", createdAt = Date(200)))
 
-        assertEquals(replacement, episodeChatDao.getChatByEpisode(EPISODE_UUID))
+        assertEquals(existing, episodeChatDao.getChatByEpisode(EPISODE_UUID))
+        assertEquals(listOf(message), episodeChatDao.getMessages(EPISODE_UUID))
     }
 
     @Test
@@ -112,7 +111,7 @@ class EpisodeChatDaoTest {
 
     private suspend fun insertChat(episodeUuid: String = EPISODE_UUID) {
         insertEpisode(episodeUuid)
-        episodeChatDao.insertChat(EpisodeChat(episodeUuid = episodeUuid, podcastUuid = PODCAST_UUID))
+        episodeChatDao.insertChatIfAbsent(EpisodeChat(episodeUuid = episodeUuid, podcastUuid = PODCAST_UUID))
     }
 
     private suspend fun insertEpisode(episodeUuid: String = EPISODE_UUID) {

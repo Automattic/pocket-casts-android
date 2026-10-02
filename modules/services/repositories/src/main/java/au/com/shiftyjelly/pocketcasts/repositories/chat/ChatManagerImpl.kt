@@ -35,9 +35,7 @@ class ChatManagerImpl @Inject constructor(
     }
 
     override suspend fun createChat(episodeUuid: String, podcastUuid: String) {
-        if (episodeChatDao.getChatByEpisode(episodeUuid) == null) {
-            episodeChatDao.insertChat(EpisodeChat(episodeUuid = episodeUuid, podcastUuid = podcastUuid))
-        }
+        episodeChatDao.insertChatIfAbsent(EpisodeChat(episodeUuid = episodeUuid, podcastUuid = podcastUuid))
     }
 
     override suspend fun sendMessage(

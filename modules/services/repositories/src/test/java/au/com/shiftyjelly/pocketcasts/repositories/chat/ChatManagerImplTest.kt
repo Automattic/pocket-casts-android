@@ -67,7 +67,6 @@ class ChatManagerImplTest {
         )
 
         assertEquals(listOf(existingChat), episodeChatDao.chats)
-        assertEquals(0, episodeChatDao.insertedChatCount)
     }
 
     @Test
@@ -222,12 +221,10 @@ class ChatManagerImplTest {
         val chats = mutableListOf<EpisodeChat>()
         val messages = mutableListOf<EpisodeChatMessage>()
         val deletedEpisodeUuids = mutableListOf<String>()
-        var insertedChatCount = 0
-
-        override suspend fun insertChat(chat: EpisodeChat) {
-            insertedChatCount++
-            chats.removeAll { it.episodeUuid == chat.episodeUuid }
-            chats += chat
+        override suspend fun insertChatIfAbsent(chat: EpisodeChat) {
+            if (chats.none { it.episodeUuid == chat.episodeUuid }) {
+                chats += chat
+            }
         }
 
         override suspend fun getChatByEpisode(episodeUuid: String): EpisodeChat? {
