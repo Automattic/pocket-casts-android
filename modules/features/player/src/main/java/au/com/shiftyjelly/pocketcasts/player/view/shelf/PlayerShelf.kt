@@ -325,15 +325,17 @@ private fun PlayerShelfContent(
             }
             if (showEpisodeChatTooltip) {
                 LaunchedEffect(Unit) { onEpisodeChatTooltipShow() }
-                TooltipPopup(
-                    title = stringResource(LR.string.episode_chat_shelf_title),
-                    body = stringResource(LR.string.episode_chat_tooltip_body),
-                    tipPosition = TipPosition.BottomEnd,
-                    maxWidth = 300.dp,
-                    anchorOffset = DpOffset(0.dp, (-4).dp),
-                    clickableElevationPadding = true,
-                    onClick = onEpisodeChatTooltipClick,
-                )
+                AppTheme(Theme.ThemeType.LIGHT) {
+                    TooltipPopup(
+                        title = stringResource(LR.string.episode_chat_shelf_title),
+                        body = stringResource(LR.string.episode_chat_tooltip_body),
+                        tipPosition = TipPosition.BottomEnd,
+                        maxWidth = 300.dp,
+                        anchorOffset = DpOffset(0.dp, (-4).dp),
+                        clickableElevationPadding = true,
+                        onClick = onEpisodeChatTooltipClick,
+                    )
+                }
             }
         }
     }
