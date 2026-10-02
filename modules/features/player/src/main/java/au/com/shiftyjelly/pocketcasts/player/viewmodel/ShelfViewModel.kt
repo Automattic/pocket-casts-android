@@ -133,7 +133,14 @@ class ShelfViewModel @AssistedInject constructor(
         shelfItem: ShelfItem,
     ) {
         trackShelfItemMovedEvent(fromIndex, toIndex, shelfItem)
-        settings.shelfItems.set(_uiState.value.shelfRowItems.filterIsInstance<ShelfItem>(), updateModifiedAt = true)
+        val reorderedItems = _uiState.value.shelfRowItems.filterIsInstance<ShelfItem>()
+        settings.shelfItems.set(settings.shelfItems.value.withReorderedItems(reorderedItems), updateModifiedAt = true)
+    }
+
+    private fun List<ShelfItem>.withReorderedItems(reorderedItems: List<ShelfItem>): List<ShelfItem> {
+        val reorderedQueue = ArrayDeque(reorderedItems)
+        val reorderedSet = reorderedItems.toSet()
+        return map { item -> if (item in reorderedSet) reorderedQueue.removeFirst() else item } + reorderedQueue
     }
 
     private fun sectionTitleAt(position: Int) = if (position < _uiState.value.shelfRowItems.indexOf(moreActionsTitle)) {
