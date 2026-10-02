@@ -158,7 +158,6 @@ class PodcastManagerImpl @Inject constructor(
         return null
     }
 
-    // The Rx chain runs its first query on the subscribing thread, so keep it off the caller's thread.
     override suspend fun addPodcast(podcastUuid: String, sync: Boolean, subscribed: Boolean, shouldAutoDownload: Boolean): Podcast = withContext(ioDispatcher) {
         subscribeManager.addPodcastRxSingle(podcastUuid = podcastUuid, sync = sync, subscribed = subscribed, shouldAutoDownload = shouldAutoDownload).await()
     }
