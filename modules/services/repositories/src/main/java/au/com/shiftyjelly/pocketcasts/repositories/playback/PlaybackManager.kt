@@ -131,6 +131,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -2268,7 +2269,10 @@ open class PlaybackManager @Inject constructor(
                     }
 
                     is UserEpisode -> {
-                        userEpisodeManager.episodeRxFlowable(episode.uuid).cast(BaseEpisode::class.java)
+                        userEpisodeManager.episodeFlow(episode.uuid)
+                            .filterNotNull()
+                            .asFlowable()
+                            .cast(BaseEpisode::class.java)
                     }
                 }
                 episodeSubscription = episodeObservable
