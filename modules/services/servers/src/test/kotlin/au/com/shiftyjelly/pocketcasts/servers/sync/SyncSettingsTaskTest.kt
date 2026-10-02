@@ -20,6 +20,7 @@ class SyncSettingsTaskTest {
     private val lastSyncTime: Instant = Instant.EPOCH
 
     private val showGeneratedChapters = mock<UserSetting<Boolean>>()
+    private val showWhatsNewDot = mock<UserSetting<Boolean>>()
     private val settings = mock<Settings>()
 
     private class FakeNamedSettingsCaller(
@@ -46,6 +47,7 @@ class SyncSettingsTaskTest {
         whenever(settings.collectListeningStats).thenReturn(unsyncedSetting())
         whenever(settings.audioOnly).thenReturn(unsyncedSetting())
         whenever(settings.showGeneratedChapters).thenReturn(showGeneratedChapters)
+        whenever(settings.showWhatsNewDot).thenReturn(showWhatsNewDot)
     }
 
     @Test
@@ -110,5 +112,26 @@ class SyncSettingsTaskTest {
         SyncSettingsTask.run(settings, lastSyncTime, caller)
 
         verify(showGeneratedChapters, never()).set(any(), any(), any(), any())
+    }
+
+    @Test
+    fun `turning the what's new dot off pushes showWhatsNewDot false`() = runTest {
+        whenever(showWhatsNewDot.getSyncValue(lastSyncTime)).thenReturn(false)
+        val caller = FakeNamedSettingsCaller()
+
+        SyncSettingsTask.run(settings, lastSyncTime, caller)
+
+        assertEquals(false, caller.request?.settings?.showWhatsNewDot)
+    }
+
+    @Test
+    fun `a showWhatsNewDot response is applied without being pushed back`() = runTest {
+        val caller = FakeNamedSettingsCaller(
+            mapOf("showWhatsNewDot" to SettingResponse(value = false, changed = true)),
+        )
+
+        SyncSettingsTask.run(settings, lastSyncTime, caller)
+
+        verify(showWhatsNewDot).set(eq(false), eq(false), any(), any())
     }
 }

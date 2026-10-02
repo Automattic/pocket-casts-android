@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.user
 
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.whatsnew.WhatsNewManager
@@ -75,6 +76,24 @@ class UserManagerImplTest {
         advanceUntilIdle()
 
         verify(whatsNewManager).forgetReadMessages()
+    }
+
+    @Test
+    fun `signing out turns the what's new unread dot back on`() = runTest {
+        val showWhatsNewDot = mock<UserSetting<Boolean>>()
+        whenever(settings.showWhatsNewDot).thenReturn(showWhatsNewDot)
+        whenever(settings.getFullySignedOut()).thenReturn(false)
+        syncManager.stub {
+            on { signOut(any()) } doSuspendableAnswer { invocation ->
+                runCatching { invocation.getArgument<suspend () -> Unit>(0).invoke() }.getOrNull()
+            }
+        }
+        val userManager = createUserManager()
+
+        userManager.signOut(playbackManager, wasInitiatedByUser = true)
+        advanceUntilIdle()
+
+        verify(showWhatsNewDot).reset()
     }
 
     private fun TestScope.createUserManager() = UserManagerImpl(

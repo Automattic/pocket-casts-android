@@ -76,6 +76,7 @@ import com.automattic.eventhorizon.SettingsGeneralShownEvent
 import com.automattic.eventhorizon.SettingsGeneralSkipBackChangedEvent
 import com.automattic.eventhorizon.SettingsGeneralSkipForwardChangedEvent
 import com.automattic.eventhorizon.SettingsGeneralUpNextSwipeChangedEvent
+import com.automattic.eventhorizon.SettingsGeneralWhatsNewUnreadDotToggledEvent
 import com.automattic.eventhorizon.SettingsUseRealTimeForPlaybackRemainingTimeEvent
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -432,6 +433,34 @@ class PlaybackSettingsFragment : BaseFragment() {
                                 },
                             )
                         }
+
+                        SettingsItems.SETTINGS_HEADER_WHATS_NEW -> {
+                            if (FeatureFlag.isEnabled(Feature.WHATS_NEW_FEED)) {
+                                Column {
+                                    Spacer(modifier = Modifier.height(SettingsSection.verticalPadding))
+                                    SettingSectionHeader(
+                                        text = stringResource(LR.string.settings_whats_new),
+                                        indent = false,
+                                    )
+                                }
+                            }
+                        }
+
+                        SettingsItems.SETTINGS_WHATS_NEW_UNREAD_DOT -> {
+                            if (FeatureFlag.isEnabled(Feature.WHATS_NEW_FEED)) {
+                                WhatsNewUnreadDot(
+                                    saved = settings.showWhatsNewDot.flow.collectAsState().value,
+                                    onSave = { isDotEnabled ->
+                                        eventHorizon.track(
+                                            SettingsGeneralWhatsNewUnreadDotToggledEvent(
+                                                enabled = isDotEnabled,
+                                            ),
+                                        )
+                                        settings.showWhatsNewDot.set(isDotEnabled, updateModifiedAt = true)
+                                    },
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -611,6 +640,15 @@ class PlaybackSettingsFragment : BaseFragment() {
     )
 
     @Composable
+    private fun WhatsNewUnreadDot(saved: Boolean, onSave: (Boolean) -> Unit) = SettingRow(
+        primaryText = stringResource(LR.string.settings_general_whats_new_unread_dot),
+        secondaryText = stringResource(LR.string.settings_general_whats_new_unread_dot_summary),
+        toggle = SettingRowToggle.Switch(checked = saved),
+        modifier = Modifier.toggleable(value = saved, role = Role.Switch) { onSave(!saved) },
+        indent = false,
+    )
+
+    @Composable
     private fun IntelligentPlaybackResumption(saved: Boolean, onSave: (Boolean) -> Unit) = SettingRow(
         primaryText = stringResource(LR.string.settings_playback_resumption),
         secondaryText = stringResource(LR.string.settings_playback_resumption_summary),
@@ -735,4 +773,6 @@ private enum class SettingsItems {
     SETTINGS_HEADER_SLEEP_TIMER,
     SETTINGS_SLEEP_TIMER_RESTART,
     SETTINGS_SLEEP_TIMER_SHAKE,
+    SETTINGS_HEADER_WHATS_NEW,
+    SETTINGS_WHATS_NEW_UNREAD_DOT,
 }

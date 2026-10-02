@@ -63,12 +63,20 @@ class WhatsNewManagerImpl @Inject constructor(
         WhatsNewMessageFilter.of(subscription?.tier, appVersion).feedMessages(catalog?.messages.orEmpty(), now)
     }.distinctUntilChanged()
 
-    override val hasUnlistedMessages = combine(feedMessages, readState) { messages, readState ->
-        messages.any(readState::isUnlisted)
+    override val hasUnlistedMessages = combine(
+        feedMessages,
+        readState,
+        settings.showWhatsNewDot.flow,
+    ) { messages, readState, isDotEnabled ->
+        isDotEnabled && messages.any(readState::isUnlisted)
     }.distinctUntilChanged()
 
-    override val hasUnseenMessages = combine(feedMessages, readState) { messages, readState ->
-        messages.any(readState::isUnseen)
+    override val hasUnseenMessages = combine(
+        feedMessages,
+        readState,
+        settings.showWhatsNewDot.flow,
+    ) { messages, readState, isDotEnabled ->
+        isDotEnabled && messages.any(readState::isUnseen)
     }.distinctUntilChanged()
 
     private val refreshLock = Mutex()
@@ -121,7 +129,10 @@ class WhatsNewManagerImpl @Inject constructor(
         readStateStore.markAsListed(messageIds)
     }
 
-    override suspend fun markFeedAsSeen() = markAsSeen(feedMessages.first().map(WhatsNewMessage::id))
+    override suspend fun markFeedAsSeen() {
+        if (!settings.showWhatsNewDot.value) return
+        markAsSeen(feedMessages.first().map(WhatsNewMessage::id))
+    }
 
     override fun markAsResponded(pollId: String) {
         readStateStore.markAsResponded(pollId)

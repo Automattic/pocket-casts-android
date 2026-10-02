@@ -1876,6 +1876,8 @@
     <string name="settings_select_podcasts">Select Podcasts</string>
     <string name="settings_notification_silent">Silent</string>
     <string name="settings_whats_new">What\'s new</string>
+    <string name="settings_general_whats_new_unread_dot">Show unread dot</string>
+    <string name="settings_general_whats_new_unread_dot_summary">Show an unread dot on Profile when there are new What\'s new messages.</string>
     <string name="settings_whats_new_next" translatable="false">@string/next</string>
     <string name="settings_whats_new_done">Done</string>
     <string name="whats_new_category_new_feature">New Feature</string>
