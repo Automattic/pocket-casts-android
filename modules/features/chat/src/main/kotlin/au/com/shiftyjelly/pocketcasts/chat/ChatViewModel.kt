@@ -56,6 +56,7 @@ class ChatViewModel @Inject constructor(
     private var transientUserMessage: ChatMessage.User? = null
     private lateinit var episodeUuid: String
     private lateinit var podcastUuid: String
+    private lateinit var sourceView: SourceView
 
     init {
         viewModelScope.launch {
@@ -74,9 +75,11 @@ class ChatViewModel @Inject constructor(
         podcastUuid: String,
         podcastTitle: String,
         episodeDurationMs: Int,
+        sourceView: SourceView,
     ) {
         this.episodeUuid = episodeUuid
         this.podcastUuid = podcastUuid
+        this.sourceView = sourceView
         _uiState.update {
             it.copy(
                 episodeTitle = episodeTitle,
@@ -128,7 +131,7 @@ class ChatViewModel @Inject constructor(
         }
         eventHorizon.track(
             EpisodeChatClearedEvent(
-                source = SourceView.EPISODE_DETAILS.analyticsValue,
+                source = sourceView.analyticsValue,
                 episodeUuid = episodeUuid,
                 podcastUuid = podcastUuid,
             ),
@@ -141,7 +144,7 @@ class ChatViewModel @Inject constructor(
     fun trackDismissed() {
         eventHorizon.track(
             EpisodeChatDismissedEvent(
-                source = SourceView.EPISODE_DETAILS.analyticsValue,
+                source = sourceView.analyticsValue,
                 episodeUuid = episodeUuid,
                 podcastUuid = podcastUuid,
             ),
@@ -170,7 +173,7 @@ class ChatViewModel @Inject constructor(
         if (quote.isPlaying) {
             eventHorizon.track(
                 EpisodeChatQuoteStopTappedEvent(
-                    source = SourceView.EPISODE_DETAILS.analyticsValue,
+                    source = sourceView.analyticsValue,
                     episodeUuid = episodeUuid,
                     podcastUuid = podcastUuid,
                 ),
@@ -179,7 +182,7 @@ class ChatViewModel @Inject constructor(
         } else {
             eventHorizon.track(
                 EpisodeChatQuotePlayTappedEvent(
-                    source = SourceView.EPISODE_DETAILS.analyticsValue,
+                    source = sourceView.analyticsValue,
                     episodeUuid = episodeUuid,
                     podcastUuid = podcastUuid,
                 ),
@@ -304,7 +307,7 @@ class ChatViewModel @Inject constructor(
 
     private suspend fun pauseCurrentPlayback() {
         if (playbackManager.playbackStateFlow.first().isPlaying) {
-            playbackManager.pauseSuspend(sourceView = SourceView.EPISODE_DETAILS)
+            playbackManager.pauseSuspend(sourceView = sourceView)
         }
     }
 
@@ -312,11 +315,11 @@ class ChatViewModel @Inject constructor(
         val state = playbackManager.playbackStateFlow.first()
         val isAlreadyCurrent = state.episodeUuid == episode.uuid && !state.isEmpty && !state.isStopped && !state.isError
         if (!isAlreadyCurrent) {
-            playbackManager.playNowSuspend(episode = episode, sourceView = SourceView.EPISODE_DETAILS)
+            playbackManager.playNowSuspend(episode = episode, sourceView = sourceView)
             if (!awaitPlaybackEpisode(episode.uuid)) return false
         }
         playbackManager.seekToTimeMsSuspend(positionMs = startMs)
-        playbackManager.playQueueSuspend(sourceView = SourceView.EPISODE_DETAILS)
+        playbackManager.playQueueSuspend(sourceView = sourceView)
         return true
     }
 
@@ -339,7 +342,7 @@ class ChatViewModel @Inject constructor(
 
     private suspend fun restorePreviousPlayback(snapshot: PlaybackSnapshot?) {
         if (snapshot == null) {
-            playbackManager.pauseSuspend(sourceView = SourceView.EPISODE_DETAILS)
+            playbackManager.pauseSuspend(sourceView = sourceView)
             return
         }
         val currentState = playbackManager.playbackStateFlow.first()
@@ -349,20 +352,20 @@ class ChatViewModel @Inject constructor(
             !currentState.isError
         if (!isSnapshotCurrent) {
             val previous = episodeManager.findEpisodeByUuid(snapshot.episodeUuid) ?: run {
-                playbackManager.pauseSuspend(sourceView = SourceView.EPISODE_DETAILS)
+                playbackManager.pauseSuspend(sourceView = sourceView)
                 return
             }
-            playbackManager.playNowSuspend(episode = previous, sourceView = SourceView.EPISODE_DETAILS)
+            playbackManager.playNowSuspend(episode = previous, sourceView = sourceView)
             if (!awaitPlaybackEpisode(snapshot.episodeUuid)) {
-                playbackManager.pauseSuspend(sourceView = SourceView.EPISODE_DETAILS)
+                playbackManager.pauseSuspend(sourceView = sourceView)
                 return
             }
         }
         playbackManager.seekToTimeMsSuspend(positionMs = snapshot.positionMs)
         if (snapshot.wasPlaying) {
-            playbackManager.playQueueSuspend(sourceView = SourceView.EPISODE_DETAILS)
+            playbackManager.playQueueSuspend(sourceView = sourceView)
         } else {
-            playbackManager.pauseSuspend(sourceView = SourceView.EPISODE_DETAILS)
+            playbackManager.pauseSuspend(sourceView = sourceView)
         }
     }
 
@@ -411,7 +414,7 @@ class ChatViewModel @Inject constructor(
                 transientUserMessage = null
                 eventHorizon.track(
                     EpisodeChatMessageSentEvent(
-                        source = SourceView.EPISODE_DETAILS.analyticsValue,
+                        source = sourceView.analyticsValue,
                         episodeUuid = episodeUuid,
                         podcastUuid = podcastUuid,
                         messageLength = message.text.length.toLong(),
@@ -439,7 +442,7 @@ class ChatViewModel @Inject constructor(
     private fun trackShown() {
         eventHorizon.track(
             EpisodeChatShownEvent(
-                source = SourceView.EPISODE_DETAILS.analyticsValue,
+                source = sourceView.analyticsValue,
                 episodeUuid = episodeUuid,
                 podcastUuid = podcastUuid,
             ),
@@ -449,7 +452,7 @@ class ChatViewModel @Inject constructor(
     private fun trackMessageFailed(error: EpisodeChatErrorType) {
         eventHorizon.track(
             EpisodeChatMessageFailedEvent(
-                source = SourceView.EPISODE_DETAILS.analyticsValue,
+                source = sourceView.analyticsValue,
                 episodeUuid = episodeUuid,
                 podcastUuid = podcastUuid,
                 error = error,

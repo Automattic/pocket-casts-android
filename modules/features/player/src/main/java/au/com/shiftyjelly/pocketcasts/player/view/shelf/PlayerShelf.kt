@@ -12,8 +12,10 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -156,9 +158,17 @@ fun PlayerShelf(
                 source = ShelfItemSource.Shelf,
             )
         },
+        onEpisodeChatClick = {
+            val podcast = playerViewModel.podcast ?: return@PlayerShelfContent
+            val episode = playerViewModel.episode as? PodcastEpisode ?: return@PlayerShelfContent
+            shelfSharedViewModel.onEpisodeChatClick(podcast, episode, ShelfItemSource.Shelf)
+        },
         showBookmarkTooltip = shelfItemsState.showBookmarkTooltip,
         showBookmarkOverflowTooltip = shelfItemsState.showBookmarkOverflowTooltip,
         onBookmarkTooltipDismiss = { shelfSharedViewModel.dismissBookmarkTooltip() },
+        showEpisodeChatTooltip = shelfItemsState.showEpisodeChatTooltip,
+        onEpisodeChatTooltipShow = { shelfSharedViewModel.onEpisodeChatTooltipShown() },
+        onEpisodeChatTooltipClick = { shelfSharedViewModel.onEpisodeChatTooltipTapped() },
         modifier = modifier,
     )
 }
@@ -182,11 +192,15 @@ private fun PlayerShelfContent(
     onTranscriptClick: (Boolean) -> Unit,
     onVideoToggleClick: () -> Unit,
     onAddToPlaylistClick: () -> Unit,
+    onEpisodeChatClick: () -> Unit,
     onMoreClick: () -> Unit,
     modifier: Modifier = Modifier,
     showBookmarkTooltip: Boolean = false,
     showBookmarkOverflowTooltip: Boolean = false,
     onBookmarkTooltipDismiss: () -> Unit = {},
+    showEpisodeChatTooltip: Boolean = false,
+    onEpisodeChatTooltipShow: () -> Unit = {},
+    onEpisodeChatTooltipClick: () -> Unit = {},
     playerColors: PlayerColors = MaterialTheme.theme.rememberPlayerColorsOrDefault(),
 ) {
     Row(
@@ -287,6 +301,11 @@ private fun PlayerShelfContent(
                     playerColors = playerColors,
                     onClick = onVideoToggleClick,
                 )
+
+                ShelfItem.EpisodeChat -> EpisodeChatButton(
+                    playerColors = playerColors,
+                    onClick = onEpisodeChatClick,
+                )
             }
         }
         Box {
@@ -304,6 +323,21 @@ private fun PlayerShelfContent(
                     clickableElevationPadding = true,
                     onClick = onBookmarkTooltipDismiss,
                 )
+            }
+            if (showEpisodeChatTooltip) {
+                val currentOnEpisodeChatTooltipShow by rememberUpdatedState(onEpisodeChatTooltipShow)
+                LaunchedEffect(Unit) { currentOnEpisodeChatTooltipShow() }
+                AppTheme(Theme.ThemeType.LIGHT) {
+                    TooltipPopup(
+                        title = stringResource(LR.string.episode_chat_shelf_title),
+                        body = stringResource(LR.string.episode_chat_tooltip_body),
+                        tipPosition = TipPosition.BottomEnd,
+                        maxWidth = 300.dp,
+                        anchorOffset = DpOffset(0.dp, (-4).dp),
+                        clickableElevationPadding = true,
+                        onClick = onEpisodeChatTooltipClick,
+                    )
+                }
             }
         }
     }
@@ -482,6 +516,20 @@ private fun AddToPlaylistButton(
 }
 
 @Composable
+private fun EpisodeChatButton(
+    playerColors: PlayerColors,
+    onClick: () -> Unit,
+) {
+    IconButton(onClick = onClick) {
+        Icon(
+            painterResource(id = IR.drawable.ic_episode_chat),
+            contentDescription = stringResource(LR.string.episode_chat_shelf_title),
+            tint = playerColors.contrast03,
+        )
+    }
+}
+
+@Composable
 private fun BookmarkButton(
     playerColors: PlayerColors,
     onClick: () -> Unit,
@@ -576,6 +624,7 @@ private fun PlayerShelfPreview(
             onTranscriptClick = {},
             onVideoToggleClick = {},
             onAddToPlaylistClick = {},
+            onEpisodeChatClick = {},
             onMoreClick = {},
         )
     }

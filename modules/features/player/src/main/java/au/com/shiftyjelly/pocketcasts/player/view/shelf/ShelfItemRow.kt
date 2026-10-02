@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.player.view.shelf
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -54,7 +55,7 @@ fun ShelfItemRow(
     isEditable: Boolean = true,
     isTranscriptAvailable: Boolean = false,
     isVideoEnabled: Boolean = true,
-    showNewBadge: Boolean = false,
+    @StringRes badgeTextId: Int? = null,
     onClick: ((ShelfItem, Boolean) -> Unit)? = null,
 ) {
     val subtitleResId = item.subtitleId(episode)
@@ -107,9 +108,9 @@ fun ShelfItemRow(
                         color = MaterialTheme.theme.colors.playerContrast01,
                         modifier = Modifier.weight(1f, fill = false),
                     )
-                    if (showNewBadge) {
+                    if (badgeTextId != null) {
                         Spacer(modifier = Modifier.width(8.dp))
-                        NewBadge()
+                        Badge(text = stringResource(badgeTextId))
                     }
                 }
                 if (isEditable && subtitleResId != null) {
@@ -134,9 +135,9 @@ fun ShelfItemRow(
 }
 
 @Composable
-private fun NewBadge() {
+private fun Badge(text: String) {
     Text(
-        text = stringResource(LR.string.bookmark_new_badge),
+        text = text,
         color = MaterialTheme.theme.colors.playerContrast01,
         fontSize = 12.sp,
         fontWeight = FontWeight.Medium,
@@ -162,6 +163,26 @@ private fun ShelfItemWithoutSubtitlePreview(
                 publishedDate = Date(),
             ),
             item = ShelfItem.Star,
+            onClick = { _, _ -> },
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun ShelfItemWithBadgePreview(
+    @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
+) {
+    AppTheme(themeType) {
+        ShelfItemRow(
+            episode = PodcastEpisode(
+                title = "Podcast Episode",
+                uuid = "",
+                publishedDate = Date(),
+            ),
+            item = ShelfItem.EpisodeChat,
+            isEditable = false,
+            badgeTextId = LR.string.episode_chat_beta_badge,
             onClick = { _, _ -> },
         )
     }
