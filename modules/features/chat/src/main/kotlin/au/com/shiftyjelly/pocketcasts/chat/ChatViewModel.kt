@@ -210,7 +210,7 @@ class ChatViewModel @Inject constructor(
                 val quoteEpisode = withContext(Dispatchers.IO) {
                     episodeManager.findEpisodeByUuid(episodeUuid)
                 }
-                if (quoteEpisode == null) {
+                if (quoteEpisode == null || !quote.isWithinEpisode(quoteEpisode.durationMs)) {
                     finishQuotePlayback(session)
                     return@launch
                 }

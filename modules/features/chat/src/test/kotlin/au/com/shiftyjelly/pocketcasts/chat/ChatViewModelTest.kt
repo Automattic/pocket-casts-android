@@ -3,6 +3,8 @@ package au.com.shiftyjelly.pocketcasts.chat
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatManager
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatMessage
 import au.com.shiftyjelly.pocketcasts.repositories.playback.NetworkConnectionWatcher
@@ -20,10 +22,12 @@ import com.automattic.eventhorizon.EpisodeChatMessageSentEvent
 import com.automattic.eventhorizon.EpisodeChatShownEvent
 import com.automattic.eventhorizon.EventHorizon
 import java.io.IOException
+import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -33,9 +37,13 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ChatViewModelTest {
@@ -49,6 +57,7 @@ class ChatViewModelTest {
     private val playbackManager = mock<PlaybackManager> {
         on { playbackStateFlow } doReturn MutableStateFlow(PlaybackState())
     }
+    private val episodeManager = mock<EpisodeManager>()
     private val networkConnectionWatcher = TestNetworkConnectionWatcher()
 
     private lateinit var eventSink: TestEventSink
@@ -64,7 +73,7 @@ class ChatViewModelTest {
         networkConnectionWatcher = networkConnectionWatcher,
         chatManager = chatManager,
         playbackManager = playbackManager,
-        episodeManager = mock<EpisodeManager>(),
+        episodeManager = episodeManager,
         eventHorizon = EventHorizon(eventSink),
         applicationScope = kotlinx.coroutines.CoroutineScope(coroutineRule.testDispatcher),
     )
@@ -355,8 +364,27 @@ class ChatViewModelTest {
         viewModel.playQuote(quote.uuid)
         advanceUntilIdle()
 
-        verifyNoInteractions(playbackManager)
+        verifyNoSeek()
         assertTrue(eventSink.isEmpty())
+    }
+
+    @Test
+    fun `play quote outside stored episode duration does not seek`() = runTest {
+        val quote = createQuote(startMs = 49_020_000, endMs = 49_500_000)
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(
+            PodcastEpisode(uuid = EPISODE_UUID, publishedDate = Date(), duration = 123.0),
+        )
+        playableState(quote, episodeDurationMs = 0)
+
+        viewModel.playQuote(quote.uuid)
+        viewModel.uiState.first { state -> state.messages.filterIsInstance<ChatMessage.Quote>().none { it.isPlaying } }
+
+        verifyNoSeek()
+    }
+
+    private suspend fun verifyNoSeek() {
+        verify(playbackManager, never()).playNowSuspend(any<BaseEpisode>(), any(), any(), any())
+        verify(playbackManager, never()).seekToTimeMsSuspend(any(), anyOrNull())
     }
 
     private fun TestScope.playableState(
