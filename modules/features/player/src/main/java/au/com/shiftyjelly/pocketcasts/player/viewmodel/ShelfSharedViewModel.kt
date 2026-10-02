@@ -27,6 +27,9 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.DeleteState
+import com.automattic.eventhorizon.EpisodeChatTooltipDismissedEvent
+import com.automattic.eventhorizon.EpisodeChatTooltipShownEvent
+import com.automattic.eventhorizon.EpisodeChatTooltipTappedEvent
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.PlayerShelfActionTappedEvent
 import com.automattic.eventhorizon.PlayerShelfOverflowMenuShownEvent
@@ -343,7 +346,16 @@ class ShelfSharedViewModel @Inject constructor(
         settings.smartBookmarksTooltipDismissed.set(true, updateModifiedAt = false)
     }
 
-    fun dismissEpisodeChatTooltip() {
+    fun onEpisodeChatTooltipShown() {
+        eventHorizon.track(EpisodeChatTooltipShownEvent)
+    }
+
+    fun onEpisodeChatTooltipTapped() {
+        eventHorizon.track(EpisodeChatTooltipTappedEvent)
+        dismissEpisodeChatTooltip()
+    }
+
+    private fun dismissEpisodeChatTooltip() {
         settings.episodeChatTooltipDismissed.set(true, updateModifiedAt = false)
     }
 
@@ -436,6 +448,9 @@ class ShelfSharedViewModel @Inject constructor(
         source: ShelfItemSource,
     ) {
         trackShelfAction(ShelfItem.EpisodeChat, source)
+        if (uiState.value.showEpisodeChatTooltip) {
+            eventHorizon.track(EpisodeChatTooltipDismissedEvent)
+        }
         dismissEpisodeChatTooltip()
         viewModelScope.launch {
             val isPaidUser = settings.cachedSubscription.value != null

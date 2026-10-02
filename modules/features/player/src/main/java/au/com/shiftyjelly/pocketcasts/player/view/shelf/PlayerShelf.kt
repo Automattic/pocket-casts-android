@@ -12,6 +12,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -165,7 +166,8 @@ fun PlayerShelf(
         showBookmarkOverflowTooltip = shelfItemsState.showBookmarkOverflowTooltip,
         onBookmarkTooltipDismiss = { shelfSharedViewModel.dismissBookmarkTooltip() },
         showEpisodeChatTooltip = shelfItemsState.showEpisodeChatTooltip,
-        onEpisodeChatTooltipDismiss = { shelfSharedViewModel.dismissEpisodeChatTooltip() },
+        onEpisodeChatTooltipShow = { shelfSharedViewModel.onEpisodeChatTooltipShown() },
+        onEpisodeChatTooltipClick = { shelfSharedViewModel.onEpisodeChatTooltipTapped() },
         modifier = modifier,
     )
 }
@@ -196,7 +198,8 @@ private fun PlayerShelfContent(
     showBookmarkOverflowTooltip: Boolean = false,
     onBookmarkTooltipDismiss: () -> Unit = {},
     showEpisodeChatTooltip: Boolean = false,
-    onEpisodeChatTooltipDismiss: () -> Unit = {},
+    onEpisodeChatTooltipShow: () -> Unit = {},
+    onEpisodeChatTooltipClick: () -> Unit = {},
     playerColors: PlayerColors = MaterialTheme.theme.rememberPlayerColorsOrDefault(),
 ) {
     Row(
@@ -321,6 +324,7 @@ private fun PlayerShelfContent(
                 )
             }
             if (showEpisodeChatTooltip) {
+                LaunchedEffect(Unit) { onEpisodeChatTooltipShow() }
                 TooltipPopup(
                     title = stringResource(LR.string.episode_chat_shelf_title),
                     body = stringResource(LR.string.episode_chat_tooltip_body),
@@ -328,7 +332,7 @@ private fun PlayerShelfContent(
                     maxWidth = 300.dp,
                     anchorOffset = DpOffset(0.dp, (-4).dp),
                     clickableElevationPadding = true,
-                    onClick = onEpisodeChatTooltipDismiss,
+                    onClick = onEpisodeChatTooltipClick,
                 )
             }
         }
