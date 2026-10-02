@@ -126,6 +126,32 @@ class AdvancedSettingsTest {
     }
 
     @Test
+    fun savedShelfItemsKeepEpisodeChatAtItsCustomPosition() {
+        val savedItems = (ShelfItem.entries - ShelfItem.EpisodeChat) + ShelfItem.EpisodeChat
+        settings.shelfItems.set(savedItems, updateModifiedAt = false)
+
+        val reloaded = SettingsImpl(
+            sharedPreferences = sharedPreferences,
+            privatePreferences = sharedPreferences,
+            context = InstrumentationRegistry.getInstrumentation().targetContext,
+            firebaseRemoteConfig = FirebaseRemoteConfig.getInstance(),
+            moshi = NetworkModule().provideMoshi(),
+        )
+
+        assertEquals(savedItems, reloaded.shelfItems.value)
+    }
+
+    @Test
+    fun shortSavedShelfItemsStillGetEpisodeChat() {
+        sharedPreferences.edit().putString("shelfItems", "effects,sleep").commit()
+
+        val items = settings.shelfItems.value
+
+        assertEquals(listOf(ShelfItem.Effects, ShelfItem.Sleep, ShelfItem.Transcript, ShelfItem.EpisodeChat), items.take(4))
+        assertEquals(ShelfItem.entries.size, items.size)
+    }
+
+    @Test
     fun artworkConfigurationIsSavedCorrectly() {
         val config = ArtworkConfiguration(
             useEpisodeArtwork = true,
