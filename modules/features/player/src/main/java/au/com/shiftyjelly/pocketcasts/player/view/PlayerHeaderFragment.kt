@@ -81,6 +81,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import au.com.shiftyjelly.pocketcasts.ads.AdReportFragment
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.chat.ChatFragment
+import au.com.shiftyjelly.pocketcasts.chat.ChatPaywallFragment
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.LocalPodcastColors
 import au.com.shiftyjelly.pocketcasts.compose.PlayerColors
@@ -95,6 +97,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.rememberNestedScrollLoc
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.BlazeAd
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivity
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivityContract
@@ -435,6 +438,8 @@ class PlayerHeaderFragment :
                                 fragment.show(parentFragmentManager, "add-to-playlist")
                             }
                         }
+
+                        is NavigationState.ShowEpisodeChat -> showEpisodeChat(navigationState)
                     }
                 }
             }
@@ -513,6 +518,26 @@ class PlayerHeaderFragment :
             source = source,
         )
         OnboardingLauncher.openOnboardingFlow(requireActivity(), onboardingFlow)
+    }
+
+    private fun showEpisodeChat(navigationState: NavigationState.ShowEpisodeChat) {
+        val episode = navigationState.episode
+        if (navigationState.isPaidUser) {
+            if (parentFragmentManager.findFragmentByTag("episode_chat") == null) {
+                ChatFragment.newInstance(
+                    episodeUuid = episode.uuid,
+                    podcastUuid = episode.podcastUuid,
+                    podcastTitle = navigationState.podcast.title,
+                    episodeTitle = episode.title,
+                    episodeSubtitle = PodcastEpisode.seasonPrefix(episode.episodeType, episode.season, episode.number, resources).orEmpty(),
+                    episodeDurationMs = episode.durationMs,
+                    sourceView = SourceView.PLAYER,
+                ).show(parentFragmentManager, "episode_chat")
+            }
+        } else if (parentFragmentManager.findFragmentByTag("episode_chat_paywall") == null) {
+            ChatPaywallFragment.newInstance(episode.uuid, episode.podcastUuid, SourceView.PLAYER)
+                .show(parentFragmentManager, "episode_chat_paywall")
+        }
     }
 
     override fun onClosePlayer() {

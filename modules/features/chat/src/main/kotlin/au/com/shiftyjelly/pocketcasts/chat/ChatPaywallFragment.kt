@@ -37,9 +37,10 @@ class ChatPaywallFragment : BaseDialogFragment() {
         fun newInstance(
             episodeUuid: String,
             podcastUuid: String?,
+            sourceView: SourceView,
         ) = ChatPaywallFragment().apply {
             arguments = Bundle().apply {
-                putParcelable(ARGS_KEY, Args(episodeUuid, podcastUuid))
+                putParcelable(ARGS_KEY, Args(episodeUuid, podcastUuid, sourceView))
             }
         }
     }
@@ -54,7 +55,7 @@ class ChatPaywallFragment : BaseDialogFragment() {
         super.onCreate(savedInstanceState)
         eventHorizon.track(
             EpisodeChatPaywallShownEvent(
-                source = SourceView.EPISODE_DETAILS.analyticsValue,
+                source = args.sourceView.analyticsValue,
                 episodeUuid = args.episodeUuid,
                 podcastUuid = args.podcastUuid ?: AnalyticsTracker.INVALID_OR_NULL_VALUE,
             ),
@@ -75,7 +76,7 @@ class ChatPaywallFragment : BaseDialogFragment() {
                 onClickSubscribe = {
                     eventHorizon.track(
                         EpisodeChatPaywallSubscribeTappedEvent(
-                            source = SourceView.EPISODE_DETAILS.analyticsValue,
+                            source = args.sourceView.analyticsValue,
                             episodeUuid = args.episodeUuid,
                             podcastUuid = args.podcastUuid ?: AnalyticsTracker.INVALID_OR_NULL_VALUE,
                         ),
@@ -94,7 +95,7 @@ class ChatPaywallFragment : BaseDialogFragment() {
     override fun onDismiss(dialog: DialogInterface) {
         eventHorizon.track(
             EpisodeChatPaywallDismissedEvent(
-                source = SourceView.EPISODE_DETAILS.analyticsValue,
+                source = args.sourceView.analyticsValue,
                 episodeUuid = args.episodeUuid,
                 podcastUuid = args.podcastUuid ?: AnalyticsTracker.INVALID_OR_NULL_VALUE,
             ),
@@ -106,5 +107,6 @@ class ChatPaywallFragment : BaseDialogFragment() {
     private class Args(
         val episodeUuid: String,
         val podcastUuid: String?,
+        val sourceView: SourceView,
     ) : Parcelable
 }

@@ -404,8 +404,16 @@ class ShelfSharedViewModel @Inject constructor(
         }
     }
 
-    fun onEpisodeChatClick(source: ShelfItemSource) {
+    fun onEpisodeChatClick(
+        podcast: Podcast,
+        episode: PodcastEpisode,
+        source: ShelfItemSource,
+    ) {
         trackShelfAction(ShelfItem.EpisodeChat, source)
+        viewModelScope.launch {
+            val isPaidUser = settings.cachedSubscription.value != null
+            _navigationState.emit(NavigationState.ShowEpisodeChat(podcast, episode, isPaidUser))
+        }
     }
 
     fun onMoreClick() {
@@ -493,6 +501,7 @@ class ShelfSharedViewModel @Inject constructor(
         data object ShowAddBookmark : NavigationState
         data class StartUpsellFlow(val source: OnboardingUpgradeSource) : NavigationState
         data class AddEpisodeToPlaylist(val episodeUuid: String, val podcastUuid: String) : NavigationState
+        data class ShowEpisodeChat(val podcast: Podcast, val episode: PodcastEpisode, val isPaidUser: Boolean) : NavigationState
     }
 
     sealed interface SnackbarMessage {

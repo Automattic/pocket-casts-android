@@ -538,6 +538,28 @@ class ShelfSharedViewModelTest {
         verify(showNotesManager).loadShowNotes(podcastUuid = "podcastUuid", episodeUuid = "episodeUuid")
     }
 
+    @Test
+    fun `given paid user, when episode chat clicked, then chat is shown`() = runTest {
+        initViewModel(subscription = plusSubscription)
+        val podcast = Podcast(uuid = "podcastUuid")
+
+        shelfSharedViewModel.navigationState.test {
+            shelfSharedViewModel.onEpisodeChatClick(podcast, transcriptEpisode, ShelfItemSource.OverflowMenu)
+            assertEquals(NavigationState.ShowEpisodeChat(podcast, transcriptEpisode, isPaidUser = true), awaitItem())
+        }
+    }
+
+    @Test
+    fun `given free user, when episode chat clicked, then chat is shown as not paid`() = runTest {
+        initViewModel(subscription = null)
+        val podcast = Podcast(uuid = "podcastUuid")
+
+        shelfSharedViewModel.navigationState.test {
+            shelfSharedViewModel.onEpisodeChatClick(podcast, transcriptEpisode, ShelfItemSource.Shelf)
+            assertEquals(NavigationState.ShowEpisodeChat(podcast, transcriptEpisode, isPaidUser = false), awaitItem())
+        }
+    }
+
     private suspend fun awaitLoadedState(): ShelfSharedViewModel.UiState {
         var state = shelfSharedViewModel.uiState.value
         shelfSharedViewModel.uiState.test {
