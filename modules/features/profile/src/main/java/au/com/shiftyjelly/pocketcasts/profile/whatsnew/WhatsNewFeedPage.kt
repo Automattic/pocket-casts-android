@@ -262,7 +262,7 @@ private fun WhatsNewFeedIcon(
             painter = painterResource(type.iconId),
             contentDescription = null,
             tint = Color.White.copy(alpha = 0.8f),
-            modifier = Modifier.size(24.dp),
+            modifier = Modifier.size(type.iconSize),
         )
     }
 }
