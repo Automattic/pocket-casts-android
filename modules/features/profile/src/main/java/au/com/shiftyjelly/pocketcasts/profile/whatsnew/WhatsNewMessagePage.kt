@@ -91,7 +91,7 @@ internal fun WhatsNewMessagePage(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(MaterialTheme.theme.colors.primaryUi01),
+            .background(MaterialTheme.theme.colors.primaryUi02),
     ) {
         ThemedTopAppBar(
             title = when (message.content) {
@@ -197,7 +197,7 @@ private fun WhatsNewPageContent(
                 WhatsNewMessageText(
                     heading = page.heading,
                     description = page.description,
-                    modifier = Modifier.padding(top = if (showsImage) 40.dp else 32.dp),
+                    modifier = Modifier.padding(top = 40.dp),
                 )
             }
             if (page.action != null) {
@@ -218,7 +218,7 @@ internal fun WhatsNewMessageLoadingPage(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(MaterialTheme.theme.colors.primaryUi01),
+            .background(MaterialTheme.theme.colors.primaryUi02),
     ) {
         ThemedTopAppBar(
             onNavigationClick = onBackPress,
@@ -276,7 +276,7 @@ private fun WhatsNewPageAction(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.theme.colors.primaryUi01)
+            .background(MaterialTheme.theme.colors.primaryUi02)
             .padding(16.dp),
     ) {
         RowButton(
@@ -341,7 +341,7 @@ private fun WhatsNewPoll(
             contentAlignment = Alignment.Center,
             modifier = Modifier
                 .fillMaxWidth()
-                .background(MaterialTheme.theme.colors.primaryUi01)
+                .background(MaterialTheme.theme.colors.primaryUi02)
                 .semantics { liveRegion = LiveRegionMode.Polite }
                 .padding(16.dp),
         ) {
