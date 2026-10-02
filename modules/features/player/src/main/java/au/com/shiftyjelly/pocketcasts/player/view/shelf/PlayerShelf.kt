@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -324,7 +325,8 @@ private fun PlayerShelfContent(
                 )
             }
             if (showEpisodeChatTooltip) {
-                LaunchedEffect(Unit) { onEpisodeChatTooltipShow() }
+                val currentOnEpisodeChatTooltipShow by rememberUpdatedState(onEpisodeChatTooltipShow)
+                LaunchedEffect(Unit) { currentOnEpisodeChatTooltipShow() }
                 AppTheme(Theme.ThemeType.LIGHT) {
                     TooltipPopup(
                         title = stringResource(LR.string.episode_chat_shelf_title),
