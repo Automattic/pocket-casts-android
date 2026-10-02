@@ -56,7 +56,6 @@ class ChatViewModel @Inject constructor(
     private var transientUserMessage: ChatMessage.User? = null
     private lateinit var episodeUuid: String
     private lateinit var podcastUuid: String
-    private lateinit var welcomeMessageText: String
 
     init {
         viewModelScope.launch {
@@ -75,11 +74,9 @@ class ChatViewModel @Inject constructor(
         podcastUuid: String,
         podcastTitle: String,
         episodeDurationMs: Int,
-        welcomeMessage: String,
     ) {
         this.episodeUuid = episodeUuid
         this.podcastUuid = podcastUuid
-        this.welcomeMessageText = welcomeMessage
         _uiState.update {
             it.copy(
                 episodeTitle = episodeTitle,
@@ -90,7 +87,7 @@ class ChatViewModel @Inject constructor(
             )
         }
         observeMessages()
-        ensureChatExists(podcastUuid)
+        createChat(podcastUuid)
         trackShown()
     }
 
@@ -104,13 +101,9 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    private fun ensureChatExists(podcastUuid: String) {
+    private fun createChat(podcastUuid: String) {
         viewModelScope.launch {
-            val existing = chatManager.getMessages(episodeUuid)
-            if (existing.isEmpty()) {
-                val welcomeMsg = ChatMessage.Assistant(text = welcomeMessageText)
-                chatManager.createChat(episodeUuid, podcastUuid, welcomeMsg)
-            }
+            chatManager.createChat(episodeUuid, podcastUuid)
         }
     }
 
@@ -121,10 +114,9 @@ class ChatViewModel @Inject constructor(
     fun clearChat() {
         sendJob?.cancel()
         transientUserMessage = null
-        val welcomeMsg = ChatMessage.Assistant(text = welcomeMessageText)
         _uiState.update {
             it.copy(
-                messages = listOf(welcomeMsg),
+                messages = emptyList(),
                 isAwaitingReply = false,
                 error = null,
             )
@@ -137,7 +129,7 @@ class ChatViewModel @Inject constructor(
             ),
         )
         viewModelScope.launch {
-            chatManager.clearMessages(episodeUuid, welcomeMsg)
+            chatManager.clearMessages(episodeUuid)
         }
     }
 

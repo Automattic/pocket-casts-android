@@ -34,9 +34,10 @@ class ChatManagerImpl @Inject constructor(
         return episodeChatDao.getMessages(episodeUuid).toChatMessages(quoteMetadataAdapter)
     }
 
-    override suspend fun createChat(episodeUuid: String, podcastUuid: String, welcomeMessage: ChatMessage) {
-        episodeChatDao.insertChat(EpisodeChat(episodeUuid = episodeUuid, podcastUuid = podcastUuid))
-        episodeChatDao.insertMessage(welcomeMessage.toEntity(episodeUuid, quoteMetadataAdapter))
+    override suspend fun createChat(episodeUuid: String, podcastUuid: String) {
+        if (episodeChatDao.getChatByEpisode(episodeUuid) == null) {
+            episodeChatDao.insertChat(EpisodeChat(episodeUuid = episodeUuid, podcastUuid = podcastUuid))
+        }
     }
 
     override suspend fun sendMessage(
@@ -88,9 +89,8 @@ class ChatManagerImpl @Inject constructor(
         episodeChatDao.insertMessage(quoteMessage.toEntity(episodeUuid, quoteMetadataAdapter))
     }
 
-    override suspend fun clearMessages(episodeUuid: String, welcomeMessage: ChatMessage) {
+    override suspend fun clearMessages(episodeUuid: String) {
         episodeChatDao.deleteMessagesByEpisode(episodeUuid)
-        episodeChatDao.insertMessage(welcomeMessage.toEntity(episodeUuid, quoteMetadataAdapter))
     }
 
     // Pick transcript for chat: prefer author-provided (non-generated) over Pocket Casts-generated.

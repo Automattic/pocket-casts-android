@@ -10,7 +10,6 @@ interface ChatManager {
     suspend fun createChat(
         episodeUuid: String,
         podcastUuid: String,
-        welcomeMessage: ChatMessage,
     )
 
     suspend fun sendMessage(
@@ -19,8 +18,5 @@ interface ChatManager {
         allMessages: List<ChatMessage>,
     )
 
-    suspend fun clearMessages(
-        episodeUuid: String,
-        welcomeMessage: ChatMessage,
-    )
+    suspend fun clearMessages(episodeUuid: String)
 }

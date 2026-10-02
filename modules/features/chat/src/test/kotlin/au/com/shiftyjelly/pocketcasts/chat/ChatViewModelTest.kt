@@ -61,7 +61,7 @@ class ChatViewModelTest {
     )
 
     @Test
-    fun `set episode info creates chat with welcome message when empty`() = runTest {
+    fun `set episode info creates chat without messages`() = runTest {
         viewModel.setEpisodeInfo(
             episodeUuid = EPISODE_UUID,
             episodeTitle = "Episode title",
@@ -69,7 +69,6 @@ class ChatViewModelTest {
             podcastUuid = PODCAST_UUID,
             podcastTitle = "Podcast title",
             episodeDurationMs = 123_000,
-            welcomeMessage = "Welcome",
         )
 
         viewModel.uiState.test {
@@ -80,9 +79,9 @@ class ChatViewModelTest {
             assertEquals(PODCAST_UUID, state.podcastUuid)
             assertEquals("Podcast title", state.podcastTitle)
             assertEquals(123_000, state.episodeDurationMs)
-            assertEquals(listOf(ChatMessage.Assistant(text = "Welcome", uuid = "welcome-uuid")), state.messages)
+            assertEquals(emptyList<ChatMessage>(), state.messages)
         }
-        assertEquals(CreateChat(EPISODE_UUID, PODCAST_UUID, "Welcome"), chatManager.createdChats.single())
+        assertEquals(CreateChat(EPISODE_UUID, PODCAST_UUID), chatManager.createdChats.single())
     }
 
     @Test
@@ -100,7 +99,7 @@ class ChatViewModelTest {
     }
 
     @Test
-    fun `set episode info does not create chat when messages exist`() = runTest {
+    fun `set episode info shows stored messages`() = runTest {
         val message = ChatMessage.User(text = "Existing", uuid = "user-uuid")
         chatManager.messages.value = listOf(message)
 
@@ -111,13 +110,11 @@ class ChatViewModelTest {
             podcastUuid = PODCAST_UUID,
             podcastTitle = "Podcast title",
             episodeDurationMs = 123_000,
-            welcomeMessage = "Welcome",
         )
 
         viewModel.uiState.test {
             assertEquals(listOf(message), awaitItem().messages)
         }
-        assertTrue(chatManager.createdChats.isEmpty())
     }
 
     @Test
@@ -151,6 +148,26 @@ class ChatViewModelTest {
         )
         assertFalse(viewModel.uiState.value.isAwaitingReply)
         assertEquals(null, viewModel.uiState.value.error)
+    }
+
+    @Test
+    fun `send passes only conversation messages as history`() = runTest {
+        setEpisodeInfo()
+        viewModel.onInputTextChange("First question")
+        viewModel.onSend()
+        advanceUntilIdle()
+        viewModel.onInputTextChange("Second question")
+
+        viewModel.onSend()
+        advanceUntilIdle()
+
+        assertEquals(
+            listOf(
+                emptyList(),
+                listOf("First question", "Response"),
+            ),
+            chatManager.sentHistories,
+        )
     }
 
     @Test
@@ -246,11 +263,11 @@ class ChatViewModelTest {
         setEpisodeInfo()
         advanceUntilIdle()
 
-        assertEquals(listOf(ChatMessage.Assistant(text = "Welcome", uuid = "welcome-uuid")), viewModel.uiState.value.messages)
+        assertEquals(emptyList<ChatMessage>(), viewModel.uiState.value.messages)
     }
 
     @Test
-    fun `clear chat cancels waiting state and restores welcome message`() = runTest {
+    fun `clear chat cancels waiting state and removes messages`() = runTest {
         setEpisodeInfo()
         chatManager.sendMessageException = IOException()
         viewModel.onInputTextChange("Question")
@@ -261,10 +278,8 @@ class ChatViewModelTest {
         viewModel.clearChat()
         advanceUntilIdle()
 
-        assertEquals(ClearMessages(EPISODE_UUID, "Welcome"), chatManager.clearedMessages.single())
-        val message = viewModel.uiState.value.messages.single()
-        assertTrue(message is ChatMessage.Assistant)
-        assertEquals("Welcome", (message as ChatMessage.Assistant).text)
+        assertEquals(EPISODE_UUID, chatManager.clearedEpisodeUuids.single())
+        assertEquals(emptyList<ChatMessage>(), viewModel.uiState.value.messages)
         assertEquals(null, viewModel.uiState.value.error)
         assertFalse(viewModel.uiState.value.isAwaitingReply)
     }
@@ -295,7 +310,6 @@ class ChatViewModelTest {
             podcastUuid = PODCAST_UUID,
             podcastTitle = "Podcast title",
             episodeDurationMs = 123_000,
-            welcomeMessage = "Welcome",
         )
     }
 
@@ -307,16 +321,16 @@ class ChatViewModelTest {
         val messages = MutableStateFlow<List<ChatMessage>>(emptyList())
         val createdChats = mutableListOf<CreateChat>()
         val sentMessages = mutableListOf<SendMessage>()
-        val clearedMessages = mutableListOf<ClearMessages>()
+        val sentHistories = mutableListOf<List<String>>()
+        val clearedEpisodeUuids = mutableListOf<String>()
         var sendMessageException: Exception? = null
 
         override fun observeMessages(episodeUuid: String): Flow<List<ChatMessage>> = messages
 
         override suspend fun getMessages(episodeUuid: String): List<ChatMessage> = messages.value
 
-        override suspend fun createChat(episodeUuid: String, podcastUuid: String, welcomeMessage: ChatMessage) {
-            createdChats += CreateChat(episodeUuid, podcastUuid, (welcomeMessage as ChatMessage.Assistant).text)
-            messages.value = listOf(welcomeMessage.copy(uuid = "welcome-uuid"))
+        override suspend fun createChat(episodeUuid: String, podcastUuid: String) {
+            createdChats += CreateChat(episodeUuid, podcastUuid)
         }
 
         override suspend fun sendMessage(
@@ -326,18 +340,24 @@ class ChatViewModelTest {
         ) {
             sendMessageException?.let { throw it }
             sentMessages += SendMessage(episodeUuid, message.text)
-            messages.value += listOf(message, ChatMessage.Assistant(text = "Response", uuid = "response-uuid"))
+            sentHistories += allMessages.map { it.text() }
+            messages.value += listOf(message, ChatMessage.Assistant(text = "Response", uuid = "response-uuid-${sentMessages.size}"))
         }
 
-        override suspend fun clearMessages(episodeUuid: String, welcomeMessage: ChatMessage) {
-            clearedMessages += ClearMessages(episodeUuid, (welcomeMessage as ChatMessage.Assistant).text)
-            messages.value = listOf(welcomeMessage.copy(uuid = "welcome-uuid"))
+        override suspend fun clearMessages(episodeUuid: String) {
+            clearedEpisodeUuids += episodeUuid
+            messages.value = emptyList()
+        }
+
+        private fun ChatMessage.text() = when (this) {
+            is ChatMessage.User -> text
+            is ChatMessage.Assistant -> text
+            is ChatMessage.Quote -> text
         }
     }
 
-    private data class CreateChat(val episodeUuid: String, val podcastUuid: String, val welcomeMessage: String)
+    private data class CreateChat(val episodeUuid: String, val podcastUuid: String)
     private data class SendMessage(val episodeUuid: String, val message: String)
-    private data class ClearMessages(val episodeUuid: String, val welcomeMessage: String)
 
     private companion object {
         const val EPISODE_UUID = "episode-uuid"
