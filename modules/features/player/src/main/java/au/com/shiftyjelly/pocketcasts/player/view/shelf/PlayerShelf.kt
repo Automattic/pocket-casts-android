@@ -156,6 +156,9 @@ fun PlayerShelf(
                 source = ShelfItemSource.Shelf,
             )
         },
+        onEpisodeChatClick = {
+            shelfSharedViewModel.onEpisodeChatClick(ShelfItemSource.Shelf)
+        },
         showBookmarkTooltip = shelfItemsState.showBookmarkTooltip,
         showBookmarkOverflowTooltip = shelfItemsState.showBookmarkOverflowTooltip,
         onBookmarkTooltipDismiss = { shelfSharedViewModel.dismissBookmarkTooltip() },
@@ -182,6 +185,7 @@ private fun PlayerShelfContent(
     onTranscriptClick: (Boolean) -> Unit,
     onVideoToggleClick: () -> Unit,
     onAddToPlaylistClick: () -> Unit,
+    onEpisodeChatClick: () -> Unit,
     onMoreClick: () -> Unit,
     modifier: Modifier = Modifier,
     showBookmarkTooltip: Boolean = false,
@@ -286,6 +290,11 @@ private fun PlayerShelfContent(
                     isVideoEnabled = isVideoEnabled,
                     playerColors = playerColors,
                     onClick = onVideoToggleClick,
+                )
+
+                ShelfItem.EpisodeChat -> EpisodeChatButton(
+                    playerColors = playerColors,
+                    onClick = onEpisodeChatClick,
                 )
             }
         }
@@ -482,6 +491,20 @@ private fun AddToPlaylistButton(
 }
 
 @Composable
+private fun EpisodeChatButton(
+    playerColors: PlayerColors,
+    onClick: () -> Unit,
+) {
+    IconButton(onClick = onClick) {
+        Icon(
+            painterResource(id = IR.drawable.ic_episode_chat),
+            contentDescription = stringResource(LR.string.episode_chat_shelf_title),
+            tint = playerColors.contrast03,
+        )
+    }
+}
+
+@Composable
 private fun BookmarkButton(
     playerColors: PlayerColors,
     onClick: () -> Unit,
@@ -576,6 +599,7 @@ private fun PlayerShelfPreview(
             onTranscriptClick = {},
             onVideoToggleClick = {},
             onAddToPlaylistClick = {},
+            onEpisodeChatClick = {},
             onMoreClick = {},
         )
     }

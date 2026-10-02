@@ -491,6 +491,65 @@ class ShelfSharedViewModelTest {
         verify(showNotesManager, never()).loadShowNotes(any(), any())
     }
 
+    @Test
+    fun `given episode chat enabled and transcript available, then episode chat is first in the overflow menu`() = runTest {
+        initViewModel(currentEpisode = transcriptEpisode, isTranscriptAvailable = true, isEpisodeChatEnabled = true)
+
+        val state = awaitLoadedState()
+
+        assertEquals(ShelfItem.EpisodeChat, state.playerBottomSheetShelfItems.first())
+    }
+
+    @Test
+    fun `given episode chat enabled and no transcript, then episode chat is hidden from the player`() = runTest {
+        initViewModel(currentEpisode = transcriptEpisode, isTranscriptAvailable = false, isEpisodeChatEnabled = true)
+
+        val state = awaitLoadedState()
+
+        assertFalse(ShelfItem.EpisodeChat in state.playerShelfItems + state.playerBottomSheetShelfItems)
+        assertTrue(ShelfItem.EpisodeChat in state.shelfItems)
+    }
+
+    @Test
+    fun `given episode chat disabled, then episode chat is hidden everywhere`() = runTest {
+        initViewModel(currentEpisode = transcriptEpisode, isTranscriptAvailable = true, isEpisodeChatEnabled = false)
+
+        val state = awaitLoadedState()
+
+        assertFalse(ShelfItem.EpisodeChat in state.shelfItems)
+    }
+
+    @Test
+    fun `given episode chat on shelf and no transcript, then the next item takes its shelf slot`() = runTest {
+        val shelfItems = listOf(ShelfItem.EpisodeChat) + (ShelfItem.entries - ShelfItem.EpisodeChat)
+        initViewModel(currentEpisode = transcriptEpisode, shelfItems = shelfItems, isEpisodeChatEnabled = true)
+
+        val state = awaitLoadedState()
+
+        assertEquals(shelfItems.drop(1).take(4), state.playerShelfItems)
+    }
+
+    @Test
+    fun `given episode chat enabled and transcript not loaded, when player opened, then show notes are loaded`() = runTest {
+        initViewModel(currentEpisode = transcriptEpisode, shelfItems = transcriptInOverflowItems, isEpisodeChatEnabled = true)
+
+        shelfSharedViewModel.setPlayerOpen(true)
+
+        verify(showNotesManager).loadShowNotes(podcastUuid = "podcastUuid", episodeUuid = "episodeUuid")
+    }
+
+    private suspend fun awaitLoadedState(): ShelfSharedViewModel.UiState {
+        var state = shelfSharedViewModel.uiState.value
+        shelfSharedViewModel.uiState.test {
+            state = awaitItem()
+            while (state.episode == null) {
+                state = awaitItem()
+            }
+            cancelAndIgnoreRemainingEvents()
+        }
+        return state
+    }
+
     private fun initViewModel(
         subscription: Subscription? = plusSubscription,
         currentEpisode: PodcastEpisode? = null,
@@ -499,8 +558,10 @@ class ShelfSharedViewModelTest {
         audioOnly: Boolean = false,
         isTranscriptAvailable: Boolean = false,
         shelfItems: List<ShelfItem> = ShelfItem.entries,
+        isEpisodeChatEnabled: Boolean = false,
     ) {
         FeatureFlag.setEnabled(Feature.HLS_STREAMING, true)
+        FeatureFlag.setEnabled(Feature.EPISODE_CHAT, isEpisodeChatEnabled)
 
         whenever(playbackManager.upNextQueue).thenReturn(upNextQueue)
         val upNextState = if (currentEpisode != null) {

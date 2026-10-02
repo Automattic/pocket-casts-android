@@ -90,6 +90,10 @@ class SettingsImpl @Inject constructor(
         private const val PROCESSED_SIGNOUT_KEY = "ProcessedSignout"
         private const val MIGRATED_VERSION_CODE_KEY = "MIGRATED_VERSION_CODE"
         private const val NEEDS_LOGIN_PROMPT_AFTER_RESTORE_KEY = "NeedsLoginPromptAfterRestore"
+        private val newShelfItemPositions = mapOf(
+            ShelfItem.Transcript to 3,
+            ShelfItem.EpisodeChat to 4,
+        )
     }
 
     private var languageCode: String? = null
@@ -124,12 +128,13 @@ class SettingsImpl @Inject constructor(
         fromString = { itemIdsString ->
             val decodedItems = itemIdsString.split(',').mapNotNull(ShelfItem::fromId)
             val missingItems = ShelfItem.entries - decodedItems
-            if (missingItems.contains(ShelfItem.Transcript)) {
-                // Add new item Transcript to the list of items at 4th position
-                return@PrefFromString decodedItems.toMutableList()
-                    .also { it.add(3, ShelfItem.Transcript) } + (missingItems - ShelfItem.Transcript)
+            val items = decodedItems.toMutableList()
+            newShelfItemPositions.forEach { (item, position) ->
+                if (item in missingItems) {
+                    items.add(position.coerceAtMost(items.size), item)
+                }
             }
-            decodedItems + missingItems
+            items + (missingItems - newShelfItemPositions.keys)
         },
         toString = { items ->
             val allItems = items.distinct() + (ShelfItem.entries - items)
