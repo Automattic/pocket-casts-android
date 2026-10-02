@@ -31,6 +31,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.servers.di.Downloads
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.extensions.anyMessageContains
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.google.common.util.concurrent.ListenableFuture
 import dagger.Lazy
@@ -102,6 +104,7 @@ class DownloadEpisodeWorker @AssistedInject constructor(
     private val downloader = EpisodeDownloader(
         httpClient = httpClient,
         progressCache = progressCache,
+        isResumeEnabled = { FeatureFlag.isEnabled(Feature.RESUME_EPISODE_DOWNLOADS) },
         onCall = { call ->
             downloadCall = call
         },
@@ -127,6 +130,7 @@ class DownloadEpisodeWorker @AssistedInject constructor(
             LogBuffer.i(LogBuffer.TAG_DOWNLOAD, "Download started. Episode: ${args.episodeUuid}")
         }
         var resolvedEpisode: BaseEpisode? = null
+        var partialDownloadFile: File? = null
         val timedValue = measureTimedValue {
             try {
                 // Block the work until the state is dispatched to keep it consistent
@@ -139,6 +143,7 @@ class DownloadEpisodeWorker @AssistedInject constructor(
                 resolvedEpisode = episode
                 val downloadFile = getDownloadFileOrThrow(episode)
                 val tempFile = fileStorage.getOrCreatePodcastEpisodeTempFile(episode)
+                partialDownloadFile = tempFile
 
                 val downloadResult = downloader.download(
                     episode = episode,
@@ -166,7 +171,11 @@ class DownloadEpisodeWorker @AssistedInject constructor(
 
             is DownloadResult.Failure -> {
                 val (errorMessage, shouldRetry) = processFailure(result)
-                if (shouldRetry && runAttemptCount < MAX_DOWNLOAD_ATTEMPT_COUNT) {
+                val isRetrying = shouldRetry && runAttemptCount < MAX_DOWNLOAD_ATTEMPT_COUNT
+                if (!isRetrying || isCancelledByApp()) {
+                    partialDownloadFile?.let(downloader::discardPartialDownload)
+                }
+                if (isRetrying) {
                     Result.retry()
                 } else {
                     val data = Data.Builder()
@@ -177,6 +186,10 @@ class DownloadEpisodeWorker @AssistedInject constructor(
                 }
             }
         }
+    }
+
+    private fun isCancelledByApp(): Boolean {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && stopReason == WorkInfo.STOP_REASON_CANCELLED_BY_APP
     }
 
     override fun onStopped() {

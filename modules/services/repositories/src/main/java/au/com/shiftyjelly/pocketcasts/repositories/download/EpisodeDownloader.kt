@@ -4,9 +4,11 @@ import androidx.annotation.WorkerThread
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.Lazy
 import java.io.File
 import java.io.IOException
+import java.io.RandomAccessFile
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.coroutines.resume
@@ -15,10 +17,13 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.suspendCancellableCoroutine
 import okhttp3.Call
 import okhttp3.Callback
+import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.Request
 import okhttp3.Response
+import okio.BufferedSource
 import okio.Source
+import okio.appendingSink
 import okio.buffer
 import okio.sink
 
@@ -47,14 +52,16 @@ internal class EpisodeDownloader(
     private val httpClient: Lazy<Call.Factory>,
     private val progressCache: DownloadProgressCache,
     private val minContentLength: Long = SUSPICIOUS_FILE_SIZE,
+    private val isResumeEnabled: () -> Boolean = { false },
     private val onCall: (Call) -> Unit = {},
     private val onResponse: (Response) -> Unit = {},
     private val onComplete: (DownloadProgress?, fileSize: Long) -> Unit = { _, _ -> },
 ) {
     @WorkerThread
     fun download(episode: BaseEpisode, downloadFile: File, tempFile: File): Result {
+        val isResumeEnabled = isResumeEnabled()
         val result = try {
-            downloadOrThrow(episode, downloadFile, tempFile)
+            downloadOrThrow(episode, downloadFile, tempFile, isResumeEnabled)
         } catch (error: Throwable) {
             Result.ExceptionFailure(error)
         }
@@ -62,7 +69,9 @@ internal class EpisodeDownloader(
         val progress = progressCache.progressFlow.value[episode.uuid]
         onComplete(progress, tempFile.length())
 
-        runCatching { tempFile.delete() }
+        if (!isResumeEnabled || !result.isResumable) {
+            discardPartialDownload(tempFile)
+        }
         if (result is Result.Failure) {
             progressCache.clearProgress(episode.uuid)
             runCatching { downloadFile.delete() }
@@ -71,12 +80,28 @@ internal class EpisodeDownloader(
         return result
     }
 
-    private fun downloadOrThrow(episode: BaseEpisode, downloadFile: File, tempFile: File): Result {
+    fun discardPartialDownload(tempFile: File) {
+        runCatching { PartialDownload.delete(tempFile) }
+    }
+
+    private fun downloadOrThrow(episode: BaseEpisode, downloadFile: File, tempFile: File, isResumeEnabled: Boolean): Result {
         val downloadUrl = episode.downloadUrl?.toHttpUrlOrNull()
         if (downloadUrl == null) {
             return Result.InvalidDownloadUrl(episode.downloadUrl)
         }
 
+        val partialDownload = if (isResumeEnabled) PartialDownload.readFrom(tempFile) else null
+        if (partialDownload != null) {
+            val result = resumeOrNull(episode, downloadUrl, downloadFile, tempFile, partialDownload)
+            if (result != null) {
+                return result
+            }
+        }
+        PartialDownload.delete(tempFile)
+        return downloadFromStart(episode, downloadUrl, downloadFile, tempFile, isResumeEnabled)
+    }
+
+    private fun downloadFromStart(episode: BaseEpisode, downloadUrl: HttpUrl, downloadFile: File, tempFile: File, isResumeEnabled: Boolean): Result {
         val request = Request.Builder().url(downloadUrl).build()
         val call = httpClient.get().newCall(request)
         onCall(call)
@@ -84,46 +109,118 @@ internal class EpisodeDownloader(
         progressCache.updateProgress(episode.uuid, downloadedByteCount = 0L, contentLength = null)
         return call.blockingEnqueue().use { response ->
             onResponse(response)
+            saveFromStart(episode, response, downloadFile, tempFile, isResumeEnabled)
+        }
+    }
 
-            if (!response.isSuccessful) {
+    private fun saveFromStart(episode: BaseEpisode, response: Response, downloadFile: File, tempFile: File, isResumeEnabled: Boolean): Result {
+        if (!response.isSuccessful) {
+            return Result.UnsuccessfulHttpCall(response.code)
+        }
+
+        val contentType = response.header("Content-Type")
+        if (contentType.isInvalidContentType()) {
+            return Result.InvalidContentType(contentType)
+        }
+
+        if (isResumeEnabled) {
+            PartialDownload.from(response)?.writeTo(tempFile)
+        }
+        val contentLength = response.body.contentLength().takeIf { it > 0 } ?: episode.sizeInBytes.takeIf { it > 0 }
+        response.body.source().withProgress(episode, initialByteCount = 0, contentLength).writeTo(tempFile, append = false)
+        return completeDownload(episode, downloadFile, tempFile)
+    }
+
+    private fun resumeOrNull(episode: BaseEpisode, downloadUrl: HttpUrl, downloadFile: File, tempFile: File, partialDownload: PartialDownload): Result? {
+        val initialByteCount = tempFile.length()
+        val offset = initialByteCount - PartialDownload.OVERLAP_BYTE_COUNT
+        val request = Request.Builder()
+            .url(downloadUrl)
+            .header("Range", "bytes=$offset-")
+            .header("If-Range", partialDownload.validator)
+            .build()
+        val call = httpClient.get().newCall(request)
+        onCall(call)
+
+        progressCache.updateProgress(episode.uuid, initialByteCount, partialDownload.contentLength)
+        return call.blockingEnqueue().use { response ->
+            onResponse(response)
+
+            val host = response.request.url.host
+            if (response.code == 200) {
+                LogBuffer.i(LogBuffer.TAG_DOWNLOAD, "Download resume ignored. Episode: ${episode.uuid}, Host: $host")
+                PartialDownload.delete(tempFile)
+                progressCache.updateProgress(episode.uuid, downloadedByteCount = 0L, contentLength = null)
+                return saveFromStart(episode, response, downloadFile, tempFile, isResumeEnabled = true)
+            }
+            if (response.code.isTransientHttpCode()) {
                 return Result.UnsuccessfulHttpCall(response.code)
             }
 
-            val contentType = response.header("Content-Type")
-            if (contentType.isInvalidContentType()) {
-                return Result.InvalidContentType(contentType)
+            val source = response.body.source()
+            val rejectionReason = partialDownload.rejectionReason(response, offset)
+                ?: response.header("Content-Type").takeIf { it.isInvalidContentType() }?.let { "content type $it" }
+                ?: "overlap".takeUnless { source.startsWithTailOf(tempFile, offset) }
+            if (rejectionReason != null) {
+                LogBuffer.i(LogBuffer.TAG_DOWNLOAD, "Download resume rejected. Episode: ${episode.uuid}, Host: $host, Reason: $rejectionReason")
+                return null
             }
 
-            response.downloadProgressSource(episode).readTo(tempFile)
-            val bytesDownloaded = progressCache.progressFlow(episode.uuid).value?.downloadedByteCount ?: 0
-            val isValidFileSize = when (episode) {
-                is PodcastEpisode -> bytesDownloaded >= minContentLength
-                is UserEpisode -> true
+            LogBuffer.i(LogBuffer.TAG_DOWNLOAD, "Download resumed. Episode: ${episode.uuid}, Host: $host, Offset: $initialByteCount")
+            source.withProgress(episode, initialByteCount, partialDownload.contentLength).writeTo(tempFile, append = true)
+            val resumedByteCount = tempFile.length()
+            if (resumedByteCount != partialDownload.contentLength) {
+                LogBuffer.i(LogBuffer.TAG_DOWNLOAD, "Download resume incomplete. Episode: ${episode.uuid}, Size: $resumedByteCount, Expected: ${partialDownload.contentLength}")
+                return Result.SuspiciousFileSize(resumedByteCount)
             }
-            if (!isValidFileSize) {
-                return Result.SuspiciousFileSize(bytesDownloaded)
-            }
-
-            tempFile.copyTo(downloadFile, overwrite = true)
-            Result.Success(downloadFile)
+            completeDownload(episode, downloadFile, tempFile)
         }
     }
 
-    private fun Response.downloadProgressSource(episode: BaseEpisode): Source {
-        val contentLength = body.contentLength().takeIf { it > 0 } ?: episode.sizeInBytes.takeIf { it > 0 }
-        val source = if (contentLength != null) {
-            body.source().withReadListener { byteCount ->
-                progressCache.updateProgress(episode.uuid, byteCount, contentLength)
+    private fun completeDownload(episode: BaseEpisode, downloadFile: File, tempFile: File): Result {
+        val bytesDownloaded = progressCache.progressFlow(episode.uuid).value?.downloadedByteCount ?: 0
+        val isValidFileSize = when (episode) {
+            is PodcastEpisode -> bytesDownloaded >= minContentLength
+            is UserEpisode -> true
+        }
+        if (!isValidFileSize) {
+            return Result.SuspiciousFileSize(bytesDownloaded)
+        }
+
+        tempFile.copyTo(downloadFile, overwrite = true)
+        return Result.Success(downloadFile)
+    }
+
+    private fun BufferedSource.startsWithTailOf(tempFile: File, offset: Long): Boolean {
+        val tail = RandomAccessFile(tempFile, "r").use { file ->
+            file.seek(offset)
+            ByteArray(PartialDownload.OVERLAP_BYTE_COUNT.toInt()).also(file::readFully)
+        }
+        return request(PartialDownload.OVERLAP_BYTE_COUNT) && readByteArray(PartialDownload.OVERLAP_BYTE_COUNT).contentEquals(tail)
+    }
+
+    private fun Source.withProgress(episode: BaseEpisode, initialByteCount: Long, contentLength: Long?): Source {
+        return if (contentLength != null) {
+            withReadListener { byteCount ->
+                progressCache.updateProgress(episode.uuid, initialByteCount + byteCount, contentLength)
             }
         } else {
-            body.source()
+            this
         }
-        return source
     }
 
-    private fun Source.readTo(tempFile: File) {
-        buffer().use { source -> tempFile.sink().use { sink -> source.readAll(sink) } }
+    private fun Source.writeTo(tempFile: File, append: Boolean) {
+        val fileSink = if (append) tempFile.appendingSink() else tempFile.sink()
+        buffer().use { source -> fileSink.use { sink -> source.readAll(sink) } }
     }
+
+    private val Result.isResumable get() = when (this) {
+        is Result.ExceptionFailure -> throwable is IOException
+        is Result.UnsuccessfulHttpCall -> code.isTransientHttpCode()
+        else -> false
+    }
+
+    private fun Int.isTransientHttpCode() = this == 408 || this == 429 || this in 500..599
 
     sealed interface Result {
         data class Success(val file: File) : Result

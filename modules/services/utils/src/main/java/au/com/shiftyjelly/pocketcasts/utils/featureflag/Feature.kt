@@ -387,6 +387,15 @@ enum class Feature(
         hasDevToggle = true,
         addedOn = LocalDate.parse("2026-09-22"),
     ),
+    RESUME_EPISODE_DOWNLOADS(
+        key = "resume_episode_downloads",
+        title = "Resume interrupted episode downloads",
+        defaultValue = isDebugOrPrototypeBuild,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+        addedOn = LocalDate.parse("2026-09-30"),
+    ),
 }
 
 sealed class FeatureTier {
