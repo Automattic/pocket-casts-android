@@ -5,6 +5,7 @@ import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.ReadSetting
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.di.NetworkModule
 import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewCatalog
 import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewCatalogResponse
@@ -12,11 +13,14 @@ import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewServiceManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import com.jakewharton.rxrelay2.BehaviorRelay
 import java.io.IOException
 import java.time.Instant
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import okhttp3.CacheControl
 import org.junit.Assert.assertEquals
@@ -27,7 +31,10 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
+import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
@@ -42,6 +49,21 @@ class WhatsNewManagerImplTest {
     private lateinit var readStateStore: WhatsNewReadStateStore
     private lateinit var serviceManager: FakeServiceManager
     private lateinit var settings: Settings
+    private val isLoggedIn = BehaviorRelay.createDefault(false)
+    private val remote = FakeRemoteReadState()
+    private val syncManager = mock<SyncManager> {
+        on { isLoggedInObservable } doReturn isLoggedIn
+        on { isLoggedIn() } doAnswer { isLoggedIn.value == true }
+        on { getWhatsNewReadMessageIds(any()) } doSuspendableAnswer { invocation ->
+            remote.readAmong(invocation.getArgument(0))
+        }
+        on { markWhatsNewAsRead(any()) } doSuspendableAnswer { invocation ->
+            remote.markAsRead(invocation.getArgument(0))
+        }
+        on { markWhatsNewAsUnread(any()) } doSuspendableAnswer { invocation ->
+            remote.markAsUnread(invocation.getArgument(0))
+        }
+    }
 
     @Before
     fun setUp() {
@@ -60,7 +82,14 @@ class WhatsNewManagerImplTest {
         FeatureFlag.setEnabled(Feature.WHATS_NEW_FEED, true)
     }
 
-    private fun manager() = WhatsNewManagerImpl(serviceManager, readStateStore, settings, UnconfinedTestDispatcher())
+    private fun TestScope.manager() = WhatsNewManagerImpl(
+        serviceManager = serviceManager,
+        readStateStore = readStateStore,
+        settings = settings,
+        syncManager = syncManager,
+        ioDispatcher = UnconfinedTestDispatcher(testScheduler),
+        applicationScope = backgroundScope,
+    )
 
     @Test
     fun `fetches the catalog when nothing is cached`() = runTest {
@@ -308,6 +337,173 @@ class WhatsNewManagerImplTest {
         }
     }
 
+    @Test
+    fun `refreshing while signed in takes on the messages the account has read`() = runTest {
+        isLoggedIn.accept(true)
+        remote.read += "m1"
+        val manager = manager()
+
+        manager.refreshIfNeeded()
+
+        assertEquals(setOf("m1"), manager.readState.value.readMessageIds)
+    }
+
+    @Test
+    fun `refreshing while signed in tells the account what this device has read`() = runTest {
+        isLoggedIn.accept(true)
+        readStateStore.markAsRead(listOf("m1"))
+        val manager = manager()
+
+        manager.refreshIfNeeded()
+
+        assertEquals(listOf(setOf("m1")), remote.markedRead)
+    }
+
+    @Test
+    fun `reading a message while signed in tells the account`() = runTest {
+        isLoggedIn.accept(true)
+        val manager = manager()
+        manager.refreshIfNeeded()
+
+        manager.markAsRead(listOf("m1"))
+
+        assertEquals(setOf("m1"), remote.read)
+    }
+
+    @Test
+    fun `only the messages in the catalog are reconciled`() = runTest {
+        isLoggedIn.accept(true)
+        readStateStore.markAsRead(listOf("m1", "retired"))
+        val manager = manager()
+
+        manager.refreshIfNeeded()
+
+        assertEquals(listOf(setOf("m1")), remote.markedRead)
+    }
+
+    @Test
+    fun `nothing is synced while signed out`() = runTest {
+        val manager = manager()
+        manager.refreshIfNeeded()
+
+        manager.markAsRead(listOf("m1"))
+
+        assertTrue(remote.markedRead.isEmpty())
+    }
+
+    @Test
+    fun `signing in takes on the messages the account has read`() = runTest {
+        remote.read += "m1"
+        val manager = manager()
+        manager.refreshIfNeeded()
+        runCurrent()
+
+        isLoggedIn.accept(true)
+        runCurrent()
+
+        assertEquals(setOf("m1"), manager.readState.value.readMessageIds)
+    }
+
+    @Test
+    fun `a failed sync keeps what this device has read`() = runTest {
+        isLoggedIn.accept(true)
+        remote.error = IOException("no network")
+        readStateStore.markAsRead(listOf("m1"))
+        val manager = manager()
+
+        manager.refreshIfNeeded()
+
+        assertEquals(setOf("m1"), manager.readState.value.readMessageIds)
+    }
+
+    @Test
+    fun `reads fetched for an account that signs out mid-sync are not taken on`() = runTest {
+        isLoggedIn.accept(true)
+        remote.read += "m1"
+        val manager = manager()
+        remote.onList = { manager.forgetReadMessages() }
+
+        manager.refreshIfNeeded()
+
+        assertTrue(manager.readState.value.readMessageIds.isEmpty())
+    }
+
+    @Test
+    fun `nothing is synced while the feature is off`() = runTest {
+        isLoggedIn.accept(true)
+        val manager = manager()
+        manager.refreshIfNeeded()
+        FeatureFlag.setEnabled(Feature.WHATS_NEW_FEED, false)
+
+        manager.markAsRead(listOf("m1"))
+
+        assertTrue(remote.markedRead.isEmpty())
+    }
+
+    @Test
+    fun `reading a message that was already read does not reach the account again`() = runTest {
+        isLoggedIn.accept(true)
+        val manager = manager()
+        manager.refreshIfNeeded()
+        manager.markAsRead(listOf("m1"))
+
+        manager.markAsRead(listOf("m1"))
+
+        assertEquals(listOf(setOf("m1")), remote.markedRead)
+    }
+
+    @Test
+    fun `marking a message unread takes it back here and for the account`() = runTest {
+        isLoggedIn.accept(true)
+        val manager = manager()
+        manager.refreshIfNeeded()
+        manager.markAsRead(listOf("m1"))
+
+        manager.markAsUnread(listOf("m1"))
+
+        assertTrue(manager.readState.value.readMessageIds.isEmpty())
+        assertEquals(listOf(setOf("m1")), remote.markedUnread)
+    }
+
+    @Test
+    fun `a message marked unread elsewhere is taken back here and not read again for the account`() = runTest {
+        isLoggedIn.accept(true)
+        val manager = manager()
+        manager.refreshIfNeeded()
+        manager.markAsRead(listOf("m1"))
+
+        remote.read -= "m1"
+        manager.refresh()
+
+        assertTrue(manager.readState.value.readMessageIds.isEmpty())
+        assertEquals(listOf(setOf("m1")), remote.markedRead)
+    }
+
+    @Test
+    fun `a read that failed to reach the account is sent on the next sync`() = runTest {
+        isLoggedIn.accept(true)
+        val manager = manager()
+        manager.refreshIfNeeded()
+        remote.error = IOException("no network")
+        manager.markAsRead(listOf("m1"))
+
+        remote.error = null
+        manager.refresh()
+
+        assertEquals(setOf("m1"), remote.read)
+        assertEquals(setOf("m1"), manager.readState.value.readMessageIds)
+    }
+
+    @Test
+    fun `marking a message unread that was not read does not reach the account`() = runTest {
+        isLoggedIn.accept(true)
+        val manager = manager()
+
+        manager.markAsUnread(listOf("m1"))
+
+        assertTrue(remote.markedUnread.isEmpty())
+    }
+
     private fun catalogJson(
         title: String,
         audiences: String = """["free"]""",
@@ -329,6 +525,31 @@ class WhatsNewManagerImplTest {
               ]
             }
     """.trimIndent()
+
+    private class FakeRemoteReadState {
+        val read = mutableSetOf<String>()
+        val markedRead = mutableListOf<Set<String>>()
+        val markedUnread = mutableListOf<Set<String>>()
+        var error: Exception? = null
+        var onList: () -> Unit = {}
+
+        fun readAmong(ids: Collection<String>): Set<String> {
+            error?.let { throw it }
+            onList()
+            return read intersect ids.toSet()
+        }
+
+        fun markAsRead(ids: Collection<String>) {
+            error?.let { throw it }
+            markedRead += ids.toSet()
+            read += ids
+        }
+
+        fun markAsUnread(ids: Collection<String>) {
+            markedUnread += ids.toSet()
+            read -= ids.toSet()
+        }
+    }
 
     private class FakeServiceManager(
         var catalog: String,

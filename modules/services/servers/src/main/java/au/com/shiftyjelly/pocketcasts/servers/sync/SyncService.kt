@@ -38,6 +38,8 @@ import com.pocketcasts.service.api.UserPlaylistListRequest
 import com.pocketcasts.service.api.UserPlaylistListResponse
 import com.pocketcasts.service.api.UserPodcastListRequest
 import com.pocketcasts.service.api.UserPodcastListResponse
+import com.pocketcasts.service.api.UuidListResponse
+import com.pocketcasts.service.api.UuidsRequest
 import com.pocketcasts.service.api.WebFeedCreateRequest
 import com.pocketcasts.service.api.WebFeedCreateResponse
 import com.pocketcasts.service.api.WinbackResponse
@@ -186,6 +188,18 @@ interface SyncService {
 
     @POST("/subscription/promo/validate")
     fun validatePromoCode(@Body request: PromoCodeRequest): Single<PromoCodeResponse>
+
+    @Headers("Content-Type: application/octet-stream")
+    @POST("/user/whats_new/read_state/list")
+    suspend fun getWhatsNewReadState(@Header("Authorization") authorization: String, @Body request: UuidsRequest): UuidListResponse
+
+    @Headers("Content-Type: application/octet-stream")
+    @PUT("/user/whats_new/read")
+    suspend fun markWhatsNewAsRead(@Header("Authorization") authorization: String, @Body request: UuidsRequest): Response<Void>
+
+    @Headers("Content-Type: application/octet-stream")
+    @PUT("/user/whats_new/unread")
+    suspend fun markWhatsNewAsUnread(@Header("Authorization") authorization: String, @Body request: UuidsRequest): Response<Void>
 
     @Headers("Content-Type: application/octet-stream")
     @POST("/user/bookmark/list")

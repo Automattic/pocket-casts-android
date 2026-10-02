@@ -11,6 +11,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
+import au.com.shiftyjelly.pocketcasts.profile.BuildConfig
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
@@ -46,6 +47,7 @@ class WhatsNewFeedFragment : BaseFragment() {
                 onReadAllClick = viewModel::onReadAllClick,
                 onRefresh = viewModel::refresh,
                 onRetry = viewModel::retry,
+                onToggleReadClick = if (BuildConfig.DEBUG) viewModel::onToggleReadClick else null,
             )
         }
     }

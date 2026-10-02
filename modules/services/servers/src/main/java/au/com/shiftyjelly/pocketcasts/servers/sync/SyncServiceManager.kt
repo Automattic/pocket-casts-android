@@ -46,6 +46,7 @@ import com.pocketcasts.service.api.SyncUpdateResponse
 import com.pocketcasts.service.api.UpNextResponse
 import com.pocketcasts.service.api.UserPlaylistListResponse
 import com.pocketcasts.service.api.UserPodcastListResponse
+import com.pocketcasts.service.api.UuidsRequest
 import com.pocketcasts.service.api.WebFeedCreateRequest
 import com.pocketcasts.service.api.WebFeedCreateResponse
 import com.pocketcasts.service.api.WinbackResponse
@@ -64,6 +65,7 @@ import kotlinx.coroutines.withContext
 import okhttp3.Cache
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.asRequestBody
+import retrofit2.HttpException
 import retrofit2.Response
 
 /**
@@ -204,6 +206,24 @@ open class SyncServiceManager @Inject constructor(
 
     suspend fun getBookmarks(token: AccessToken): BookmarksResponse {
         return service.getBookmarkList(addBearer(token), bookmarkRequest {})
+    }
+
+    suspend fun getWhatsNewReadMessageIds(messageIds: Collection<String>, token: AccessToken): Set<String> {
+        return service.getWhatsNewReadState(addBearer(token), uuidsRequest(messageIds)).uuidsList.toSet()
+    }
+
+    suspend fun markWhatsNewAsRead(messageIds: Collection<String>, token: AccessToken) {
+        service.markWhatsNewAsRead(addBearer(token), uuidsRequest(messageIds)).throwUnlessSuccessful()
+    }
+
+    suspend fun markWhatsNewAsUnread(messageIds: Collection<String>, token: AccessToken) {
+        service.markWhatsNewAsUnread(addBearer(token), uuidsRequest(messageIds)).throwUnlessSuccessful()
+    }
+
+    private fun uuidsRequest(messageIds: Collection<String>) = UuidsRequest.newBuilder().addAllUuids(messageIds).build()
+
+    private fun Response<*>.throwUnlessSuccessful() {
+        if (!isSuccessful) throw HttpException(this)
     }
 
     suspend fun getEpisodes(request: PodcastsEpisodesRequest, token: AccessToken): EpisodesResponse {
