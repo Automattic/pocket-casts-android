@@ -30,10 +30,6 @@ class ChatManagerImpl @Inject constructor(
         return episodeChatDao.observeMessages(episodeUuid).map { it.toChatMessages(quoteMetadataAdapter) }
     }
 
-    override suspend fun getMessages(episodeUuid: String): List<ChatMessage> {
-        return episodeChatDao.getMessages(episodeUuid).toChatMessages(quoteMetadataAdapter)
-    }
-
     override suspend fun createChat(episodeUuid: String, podcastUuid: String) {
         episodeChatDao.insertChatIfAbsent(EpisodeChat(episodeUuid = episodeUuid, podcastUuid = podcastUuid))
     }

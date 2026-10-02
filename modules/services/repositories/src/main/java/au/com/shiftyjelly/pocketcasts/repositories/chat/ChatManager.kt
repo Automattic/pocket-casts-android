@@ -5,8 +5,6 @@ import kotlinx.coroutines.flow.Flow
 interface ChatManager {
     fun observeMessages(episodeUuid: String): Flow<List<ChatMessage>>
 
-    suspend fun getMessages(episodeUuid: String): List<ChatMessage>
-
     suspend fun createChat(
         episodeUuid: String,
         podcastUuid: String,

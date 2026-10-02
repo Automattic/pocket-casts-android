@@ -404,8 +404,6 @@ class ChatViewModelTest {
 
         override fun observeMessages(episodeUuid: String): Flow<List<ChatMessage>> = messages
 
-        override suspend fun getMessages(episodeUuid: String): List<ChatMessage> = messages.value
-
         override suspend fun createChat(episodeUuid: String, podcastUuid: String) {
             createdChats += CreateChat(episodeUuid, podcastUuid)
         }
