@@ -74,7 +74,9 @@ class RefreshPodcastsTaskSchedulingTest {
         whenever(backgroundRefresh.value).thenReturn(false)
         RefreshPodcastsTask.scheduleOrCancel(context, settings)
 
-        assertTrue(scheduledWork().all { it.state == WorkInfo.State.CANCELLED })
+        val work = scheduledWork()
+        assertEquals(1, work.size)
+        assertTrue(work.all { it.state == WorkInfo.State.CANCELLED })
     }
 
     private fun scheduledWork() = WorkManager.getInstance(context).getWorkInfosByTag(TAG_REFRESH_TASK).get()

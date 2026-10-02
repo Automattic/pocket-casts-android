@@ -106,7 +106,6 @@ class RefreshPodcastsThread(
 
     fun run(): ListenableWorker.Result {
         val entryPoint = getEntryPoint()
-        var attempt: RefreshThrottle.Attempt? = null
         try {
             val settings = entryPoint.settings()
 
@@ -124,8 +123,9 @@ class RefreshPodcastsThread(
                 return ListenableWorker.Result.retry()
             }
 
-            attempt = throttle.tryStart(runNow)
-            if (attempt == null) {
+            // Nothing refreshed means the attempt doesn't throttle the next one.
+            val ranRefresh = throttle.tryRun(runNow) { refresh() }
+            if (!ranRefresh) {
                 LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Not refreshing as too soon")
                 try {
                     // sleep for half a second to give the user a feeling of "oh the app is refreshing"
@@ -134,17 +134,10 @@ class RefreshPodcastsThread(
                 }
 
                 dispatchCurrentRefreshedState()
-                return ListenableWorker.Result.success()
-            }
-
-            if (!refresh()) {
-                // Nothing was refreshed, don't let this attempt throttle the next one.
-                attempt.abort()
             }
 
             return ListenableWorker.Result.success()
         } catch (e: Exception) {
-            attempt?.abort()
             Timber.e(e)
             LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, e, "Refresh failed")
 

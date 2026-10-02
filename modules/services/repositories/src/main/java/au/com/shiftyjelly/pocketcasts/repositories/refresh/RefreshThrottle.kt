@@ -31,6 +31,24 @@ internal class RefreshThrottle(
         return attempt
     }
 
+    /**
+     * Runs [block] unless the last attempt was too recent. Returns whether [block] was run.
+     *
+     * [block] returns true if it refreshed something. If it returns false or throws, its attempt is aborted.
+     */
+    fun tryRun(runNow: Boolean, block: () -> Boolean): Boolean {
+        val attempt = tryStart(runNow) ?: return false
+        var refreshed = false
+        try {
+            refreshed = block()
+        } finally {
+            if (!refreshed) {
+                attempt.abort()
+            }
+        }
+        return true
+    }
+
     @Synchronized
     fun reset() {
         lastStartMs = NEVER_MS
