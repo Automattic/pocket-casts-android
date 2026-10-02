@@ -322,7 +322,7 @@ private fun PlayerShelfContent(
             }
             if (showEpisodeChatTooltip) {
                 TooltipPopup(
-                    title = stringResource(LR.string.episode_chat_tooltip_title),
+                    title = stringResource(LR.string.episode_chat_shelf_title),
                     body = stringResource(LR.string.episode_chat_tooltip_body),
                     tipPosition = TipPosition.BottomEnd,
                     maxWidth = 300.dp,
