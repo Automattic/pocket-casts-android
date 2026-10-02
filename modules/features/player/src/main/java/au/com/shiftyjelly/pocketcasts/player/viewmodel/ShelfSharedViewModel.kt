@@ -132,8 +132,15 @@ class ShelfSharedViewModel @Inject constructor(
         ::PromoState,
     )
 
-    val uiState = combine(
+    private val shelfItemsFlow = combine(
         settings.shelfItems.flow,
+        FeatureFlag.isEnabledFlow(Feature.EPISODE_CHAT),
+    ) { shelfItems, isEpisodeChatEnabled ->
+        if (isEpisodeChatEnabled) shelfItems else shelfItems - ShelfItem.EpisodeChat
+    }
+
+    val uiState = combine(
+        shelfItemsFlow,
         shelfUpNextFlow,
         shelfUpNextFlow
             .mapNotNull { state -> (state as? UpNextQueue.State.Loaded)?.episode?.uuid }
@@ -190,11 +197,7 @@ class ShelfSharedViewModel @Inject constructor(
             episode is PodcastEpisode &&
             (streamHasVideo || videoState.hlsAvailable)
         return uiState.value.copy(
-            shelfItems = shelfItems.filter { item ->
-                item.showIf(episode) &&
-                    (item != ShelfItem.StreamSelector || canToggleVideo) &&
-                    (item != ShelfItem.EpisodeChat || FeatureFlag.isEnabled(Feature.EPISODE_CHAT))
-            },
+            shelfItems = shelfItems.filter { it.showIf(episode) && (it != ShelfItem.StreamSelector || canToggleVideo) },
             episode = episode,
             isTranscriptAvailable = isTranscriptAvailable,
             isVideoRenderingEnabled = videoState.renderingEnabled && streamHasVideo,

@@ -66,10 +66,10 @@ class ShelfSharedViewModelTest {
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    @get:Rule
+    @get:Rule(order = 0)
     val coroutineRule = MainCoroutineRule()
 
-    @get:Rule
+    @get:Rule(order = 1)
     val featureFlagRule = InMemoryFeatureFlagRule()
 
     @Mock

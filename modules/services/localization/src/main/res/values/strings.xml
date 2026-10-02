@@ -139,7 +139,6 @@
     <string name="episode_chat">Chat with Episode</string>
     <string name="episode_chat_shelf_title">Ask about this episode</string>
     <string name="episode_chat_beta_badge">Beta</string>
-    <string name="episode_chat_tooltip_title">Ask about this episode</string>
     <string name="episode_chat_tooltip_body">Ask it anything. It was listening too.</string>
     <string name="episode_summary">Episode Summary</string>
     <string name="summary_upsell_title">AI-Powered Summaries</string>
