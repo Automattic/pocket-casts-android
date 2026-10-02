@@ -297,21 +297,24 @@ class WhatsNewMessageViewModelTest {
     }
 
     @Test
-    fun `a poll answered before opens closed with no option selected`() = runTest {
-        readState.value = WhatsNewReadState(respondedPollIds = setOf("poll"))
+    fun `an answered poll stays on screen with its answer after it leaves the feed`() = runTest {
+        whenever(manager.markAsResponded(any())).then {
+            readState.value = readState.value.copy(respondedPollIds = setOf("poll"))
+            feedMessages.value = emptyList()
+        }
         feedMessages.value = listOf(research())
         val viewModel = createViewModel("research")
 
         viewModel.uiState.test {
-            val poll = (expectMostRecentItem() as UiState.Loaded).poll!!
-            assertTrue(poll.hasResponded)
-            assertNull(poll.selectedOptionId)
-            viewModel.onOptionClick("a")
+            expectMostRecentItem()
+            viewModel.onOptionClick("b")
             viewModel.onSubmitClick()
-            expectNoEvents()
+            val state = expectMostRecentItem() as UiState.Loaded
+            assertEquals("research", state.message.id)
+            val poll = state.poll!!
+            assertTrue(poll.hasResponded)
+            assertEquals("b", poll.selectedOptionId)
         }
-        verify(manager, never()).markAsResponded(any())
-        verify(eventHorizon, never()).track(any<WhatsNewPollResponseSubmittedEvent>())
     }
 
     private fun research() = message("research").copy(

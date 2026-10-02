@@ -5,6 +5,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewCatalog
+import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewContent
 import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewMessage
 import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewServiceManager
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
@@ -59,8 +60,11 @@ class WhatsNewManagerImpl @Inject constructor(
         catalog,
         settings.cachedSubscription.flow,
         evaluatedAt,
-    ) { catalog, subscription, now ->
-        WhatsNewMessageFilter.of(subscription?.tier, appVersion).feedMessages(catalog?.messages.orEmpty(), now)
+        readState,
+    ) { catalog, subscription, now, readState ->
+        WhatsNewMessageFilter.of(subscription?.tier, appVersion)
+            .feedMessages(catalog?.messages.orEmpty(), now)
+            .filterNot { message -> message.pollId?.let(readState::hasRespondedTo) == true }
     }.distinctUntilChanged()
 
     override val hasUnlistedMessages = combine(
@@ -152,6 +156,8 @@ class WhatsNewManagerImpl @Inject constructor(
     override fun syncReadState() {
         syncRequests.trySend(Unit)
     }
+
+    private val WhatsNewMessage.pollId get() = (content as? WhatsNewContent.Research)?.research?.poll?.pollId
 
     private suspend fun refreshCatalog(cacheControl: CacheControl?) {
         FeatureFlag.awaitProvidersInitialised()
