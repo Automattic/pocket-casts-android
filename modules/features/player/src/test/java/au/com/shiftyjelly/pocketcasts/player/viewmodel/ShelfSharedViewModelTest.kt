@@ -35,7 +35,13 @@ import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import com.automattic.eventhorizon.EpisodeChatTooltipDismissedEvent
+import com.automattic.eventhorizon.EpisodeChatTooltipShownEvent
+import com.automattic.eventhorizon.EpisodeChatTooltipTappedEvent
 import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.PlayerShelfActionTappedEvent
+import com.automattic.eventhorizon.ShelfActionSourceType
+import com.automattic.eventhorizon.ShelfActionType
 import java.time.Instant
 import java.util.Date
 import kotlin.time.Duration.Companion.seconds
@@ -103,6 +109,8 @@ class ShelfSharedViewModelTest {
     private lateinit var showNotesManager: ShowNotesManager
 
     private lateinit var shelfSharedViewModel: ShelfSharedViewModel
+
+    private val eventSink = TestEventSink()
 
     private val episodeChatTooltipDismissedSetting = mock<UserSetting<Boolean>>()
 
@@ -611,12 +619,37 @@ class ShelfSharedViewModelTest {
     }
 
     @Test
-    fun `when episode chat tooltip dismissed, then dismissal is saved`() = runTest {
+    fun `when episode chat tooltip tapped, then dismissal is saved and tapped is tracked`() = runTest {
         initViewModel()
 
-        shelfSharedViewModel.dismissEpisodeChatTooltip()
+        shelfSharedViewModel.onEpisodeChatTooltipTapped()
 
         verify(episodeChatTooltipDismissedSetting).set(true, updateModifiedAt = false)
+        assertEquals(EpisodeChatTooltipTappedEvent, eventSink.pollEvent())
+    }
+
+    @Test
+    fun `when episode chat tooltip shown, then shown is tracked`() = runTest {
+        initViewModel()
+
+        shelfSharedViewModel.onEpisodeChatTooltipShown()
+
+        assertEquals(EpisodeChatTooltipShownEvent, eventSink.pollEvent())
+    }
+
+    @Test
+    fun `given episode chat tooltip showing, when episode chat clicked, then tooltip dismissed is tracked`() = runTest {
+        initViewModel(currentEpisode = transcriptEpisode, isTranscriptAvailable = true, isEpisodeChatEnabled = true)
+        shelfSharedViewModel.setPlayerOpen(true)
+        awaitLoadedState { it.showEpisodeChatTooltip }
+
+        shelfSharedViewModel.onEpisodeChatClick(Podcast(uuid = "podcastUuid"), transcriptEpisode, ShelfItemSource.OverflowMenu)
+
+        assertEquals(
+            PlayerShelfActionTappedEvent(from = ShelfActionSourceType.OverflowMenu, action = ShelfActionType.EpisodeChat),
+            eventSink.pollEvent(),
+        )
+        assertEquals(EpisodeChatTooltipDismissedEvent, eventSink.pollEvent())
     }
 
     @Test
@@ -701,7 +734,7 @@ class ShelfSharedViewModelTest {
         whenever(settings.audioOnly).thenReturn(audioOnlySetting)
 
         shelfSharedViewModel = ShelfSharedViewModel(
-            eventHorizon = EventHorizon(TestEventSink()),
+            eventHorizon = EventHorizon(eventSink),
             applicationScope = applicationScope,
             chromeCastAnalytics = chromeCastAnalytics,
             episodeManager = episodeManager,
