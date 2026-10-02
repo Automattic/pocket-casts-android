@@ -95,7 +95,12 @@ class ChatViewModel @Inject constructor(
         viewModelScope.launch {
             chatManager.observeMessages(episodeUuid).collect { messages ->
                 _uiState.update { state ->
-                    state.copy(messages = messages.withTransientUserMessage().withQuotePlaybackState(state.messages.playingQuoteUuid()))
+                    state.copy(
+                        messages = messages.withTransientUserMessage().withQuotePlaybackState(
+                            playingQuoteUuid = state.messages.playingQuoteUuid(),
+                            episodeDurationMs = state.episodeDurationMs,
+                        ),
+                    )
                 }
             }
         }
@@ -278,7 +283,12 @@ class ChatViewModel @Inject constructor(
 
     private fun updatePlayingQuote(playingQuoteUuid: String?) {
         _uiState.update { state ->
-            state.copy(messages = state.messages.withQuotePlaybackState(playingQuoteUuid))
+            state.copy(
+                messages = state.messages.withQuotePlaybackState(
+                    playingQuoteUuid = playingQuoteUuid,
+                    episodeDurationMs = state.episodeDurationMs,
+                ),
+            )
         }
     }
 
@@ -451,11 +461,14 @@ class ChatViewModel @Inject constructor(
         return filterIsInstance<ChatMessage.Quote>().firstOrNull { it.isPlaying }?.uuid
     }
 
-    private fun List<ChatMessage>.withQuotePlaybackState(playingQuoteUuid: String?): List<ChatMessage> {
+    private fun List<ChatMessage>.withQuotePlaybackState(
+        playingQuoteUuid: String?,
+        episodeDurationMs: Int,
+    ): List<ChatMessage> {
         val isQuotePlaybackEnabled = FeatureFlag.isEnabled(Feature.EPISODE_CHAT_PLAYABLE_QUOTES)
         return map { message ->
             if (message is ChatMessage.Quote) {
-                val canPlay = isQuotePlaybackEnabled && message.startMs >= 0 && message.endMs > message.startMs
+                val canPlay = isQuotePlaybackEnabled && message.isWithinEpisode(episodeDurationMs)
                 message.copy(
                     canPlay = canPlay,
                     isPlaying = canPlay && message.uuid == playingQuoteUuid,
@@ -464,6 +477,12 @@ class ChatViewModel @Inject constructor(
                 message
             }
         }
+    }
+
+    private fun ChatMessage.Quote.isWithinEpisode(episodeDurationMs: Int): Boolean {
+        val isValidRange = startMs >= 0 && endMs > startMs
+        val endsBeforeEpisode = episodeDurationMs <= 0 || endMs < episodeDurationMs
+        return isValidRange && endsBeforeEpisode
     }
 }
 

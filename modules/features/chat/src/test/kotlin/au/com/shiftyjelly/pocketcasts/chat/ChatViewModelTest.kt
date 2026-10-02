@@ -9,7 +9,10 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.NetworkConnectionWat
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.automattic.eventhorizon.EpisodeChatClearedEvent
 import com.automattic.eventhorizon.EpisodeChatErrorType
 import com.automattic.eventhorizon.EpisodeChatMessageFailedEvent
@@ -21,6 +24,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -31,13 +35,20 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verifyNoInteractions
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ChatViewModelTest {
     @get:Rule
     val coroutineRule = MainCoroutineRule()
 
+    @get:Rule
+    val featureFlagRule = InMemoryFeatureFlagRule()
+
     private val chatManager = TestChatManager()
+    private val playbackManager = mock<PlaybackManager> {
+        on { playbackStateFlow } doReturn MutableStateFlow(PlaybackState())
+    }
     private val networkConnectionWatcher = TestNetworkConnectionWatcher()
 
     private lateinit var eventSink: TestEventSink
@@ -52,9 +63,7 @@ class ChatViewModelTest {
     private fun createViewModel() = ChatViewModel(
         networkConnectionWatcher = networkConnectionWatcher,
         chatManager = chatManager,
-        playbackManager = mock<PlaybackManager> {
-            on { playbackStateFlow } doReturn MutableStateFlow(PlaybackState())
-        },
+        playbackManager = playbackManager,
         episodeManager = mock<EpisodeManager>(),
         eventHorizon = EventHorizon(eventSink),
         applicationScope = kotlinx.coroutines.CoroutineScope(coroutineRule.testDispatcher),
@@ -302,14 +311,82 @@ class ChatViewModelTest {
         )
     }
 
-    private fun setEpisodeInfo() {
+    @Test
+    fun `quote within episode can play`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+
+        assertTrue(playableState(quote))
+    }
+
+    @Test
+    fun `quote starting after episode end cannot play`() = runTest {
+        val quote = createQuote(startMs = 49_020_000, endMs = 49_500_000)
+
+        assertFalse(playableState(quote))
+    }
+
+    @Test
+    fun `quote ending after episode end cannot play`() = runTest {
+        val quote = createQuote(startMs = 120_000, endMs = 130_000)
+
+        assertFalse(playableState(quote))
+    }
+
+    @Test
+    fun `quote ending at episode end cannot play`() = runTest {
+        val quote = createQuote(startMs = 120_000, endMs = 123_000)
+
+        assertFalse(playableState(quote))
+    }
+
+    @Test
+    fun `quote with unknown episode duration can play`() = runTest {
+        val quote = createQuote(startMs = 49_020_000, endMs = 49_500_000)
+
+        assertTrue(playableState(quote, episodeDurationMs = 0))
+    }
+
+    @Test
+    fun `play quote outside episode does not touch playback`() = runTest {
+        val quote = createQuote(startMs = 49_020_000, endMs = 49_500_000)
+        playableState(quote)
+        eventSink.skipEvent()
+
+        viewModel.playQuote(quote.uuid)
+        advanceUntilIdle()
+
+        verifyNoInteractions(playbackManager)
+        assertTrue(eventSink.isEmpty())
+    }
+
+    private fun TestScope.playableState(
+        quote: ChatMessage.Quote,
+        episodeDurationMs: Int = 123_000,
+    ): Boolean {
+        FeatureFlag.setEnabled(Feature.EPISODE_CHAT_PLAYABLE_QUOTES, true)
+        chatManager.messages.value = listOf(quote)
+        setEpisodeInfo(episodeDurationMs)
+        advanceUntilIdle()
+        return viewModel.uiState.value.messages.filterIsInstance<ChatMessage.Quote>().single().canPlay
+    }
+
+    private fun createQuote(startMs: Int, endMs: Int) = ChatMessage.Quote(
+        text = "Quote",
+        start = "start",
+        end = "end",
+        startMs = startMs,
+        endMs = endMs,
+        uuid = "quote-uuid",
+    )
+
+    private fun setEpisodeInfo(episodeDurationMs: Int = 123_000) {
         viewModel.setEpisodeInfo(
             episodeUuid = EPISODE_UUID,
             episodeTitle = "Episode title",
             episodeSubtitle = "Episode subtitle",
             podcastUuid = PODCAST_UUID,
             podcastTitle = "Podcast title",
-            episodeDurationMs = 123_000,
+            episodeDurationMs = episodeDurationMs,
         )
     }
 
