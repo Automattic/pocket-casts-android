@@ -12,8 +12,8 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 abstract class EpisodeChatDao {
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract suspend fun insertChat(chat: EpisodeChat)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    abstract suspend fun insertChatIfAbsent(chat: EpisodeChat)
 
     @Query("SELECT * FROM episode_chats WHERE episode_uuid = :episodeUuid")
     abstract suspend fun getChatByEpisode(episodeUuid: String): EpisodeChat?

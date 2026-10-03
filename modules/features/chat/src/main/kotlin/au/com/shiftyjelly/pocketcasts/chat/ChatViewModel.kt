@@ -56,7 +56,6 @@ class ChatViewModel @Inject constructor(
     private var transientUserMessage: ChatMessage.User? = null
     private lateinit var episodeUuid: String
     private lateinit var podcastUuid: String
-    private lateinit var welcomeMessageText: String
 
     init {
         viewModelScope.launch {
@@ -75,11 +74,9 @@ class ChatViewModel @Inject constructor(
         podcastUuid: String,
         podcastTitle: String,
         episodeDurationMs: Int,
-        welcomeMessage: String,
     ) {
         this.episodeUuid = episodeUuid
         this.podcastUuid = podcastUuid
-        this.welcomeMessageText = welcomeMessage
         _uiState.update {
             it.copy(
                 episodeTitle = episodeTitle,
@@ -90,7 +87,7 @@ class ChatViewModel @Inject constructor(
             )
         }
         observeMessages()
-        ensureChatExists(podcastUuid)
+        createChat(podcastUuid)
         trackShown()
     }
 
@@ -98,19 +95,20 @@ class ChatViewModel @Inject constructor(
         viewModelScope.launch {
             chatManager.observeMessages(episodeUuid).collect { messages ->
                 _uiState.update { state ->
-                    state.copy(messages = messages.withTransientUserMessage().withQuotePlaybackState(state.messages.playingQuoteUuid()))
+                    state.copy(
+                        messages = messages.withTransientUserMessage().withQuotePlaybackState(
+                            playingQuoteUuid = state.messages.playingQuoteUuid(),
+                            episodeDurationMs = state.episodeDurationMs,
+                        ),
+                    )
                 }
             }
         }
     }
 
-    private fun ensureChatExists(podcastUuid: String) {
+    private fun createChat(podcastUuid: String) {
         viewModelScope.launch {
-            val existing = chatManager.getMessages(episodeUuid)
-            if (existing.isEmpty()) {
-                val welcomeMsg = ChatMessage.Assistant(text = welcomeMessageText)
-                chatManager.createChat(episodeUuid, podcastUuid, welcomeMsg)
-            }
+            chatManager.createChat(episodeUuid, podcastUuid)
         }
     }
 
@@ -121,10 +119,9 @@ class ChatViewModel @Inject constructor(
     fun clearChat() {
         sendJob?.cancel()
         transientUserMessage = null
-        val welcomeMsg = ChatMessage.Assistant(text = welcomeMessageText)
         _uiState.update {
             it.copy(
-                messages = listOf(welcomeMsg),
+                messages = emptyList(),
                 isAwaitingReply = false,
                 error = null,
             )
@@ -137,7 +134,7 @@ class ChatViewModel @Inject constructor(
             ),
         )
         viewModelScope.launch {
-            chatManager.clearMessages(episodeUuid, welcomeMsg)
+            chatManager.clearMessages(episodeUuid)
         }
     }
 
@@ -213,7 +210,7 @@ class ChatViewModel @Inject constructor(
                 val quoteEpisode = withContext(Dispatchers.IO) {
                     episodeManager.findEpisodeByUuid(episodeUuid)
                 }
-                if (quoteEpisode == null) {
+                if (quoteEpisode == null || !quote.isWithinEpisode(quoteEpisode.durationMs)) {
                     finishQuotePlayback(session)
                     return@launch
                 }
@@ -286,7 +283,12 @@ class ChatViewModel @Inject constructor(
 
     private fun updatePlayingQuote(playingQuoteUuid: String?) {
         _uiState.update { state ->
-            state.copy(messages = state.messages.withQuotePlaybackState(playingQuoteUuid))
+            state.copy(
+                messages = state.messages.withQuotePlaybackState(
+                    playingQuoteUuid = playingQuoteUuid,
+                    episodeDurationMs = state.episodeDurationMs,
+                ),
+            )
         }
     }
 
@@ -459,11 +461,14 @@ class ChatViewModel @Inject constructor(
         return filterIsInstance<ChatMessage.Quote>().firstOrNull { it.isPlaying }?.uuid
     }
 
-    private fun List<ChatMessage>.withQuotePlaybackState(playingQuoteUuid: String?): List<ChatMessage> {
+    private fun List<ChatMessage>.withQuotePlaybackState(
+        playingQuoteUuid: String?,
+        episodeDurationMs: Int,
+    ): List<ChatMessage> {
         val isQuotePlaybackEnabled = FeatureFlag.isEnabled(Feature.EPISODE_CHAT_PLAYABLE_QUOTES)
         return map { message ->
             if (message is ChatMessage.Quote) {
-                val canPlay = isQuotePlaybackEnabled && message.startMs >= 0 && message.endMs > message.startMs
+                val canPlay = isQuotePlaybackEnabled && message.isWithinEpisode(episodeDurationMs)
                 message.copy(
                     canPlay = canPlay,
                     isPlaying = canPlay && message.uuid == playingQuoteUuid,
@@ -472,6 +477,12 @@ class ChatViewModel @Inject constructor(
                 message
             }
         }
+    }
+
+    private fun ChatMessage.Quote.isWithinEpisode(episodeDurationMs: Int): Boolean {
+        val isValidRange = startMs >= 0 && endMs > startMs
+        val endsBeforeEpisode = episodeDurationMs <= 0 || endMs < episodeDurationMs
+        return isValidRange && endsBeforeEpisode
     }
 }
 

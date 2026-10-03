@@ -80,6 +80,11 @@ fun ChatScreen(
                 episodeDurationMs = uiState.episodeDurationMs,
                 theme = theme,
             )
+            AiMessageBubble(
+                text = stringResource(LR.string.chat_preview_ai_1),
+                podcastUuid = uiState.podcastUuid,
+                theme = theme,
+            )
             uiState.messages.forEachIndexed { index, message ->
                 when (message) {
                     is ChatMessage.Assistant -> AiMessageBubble(
@@ -161,9 +166,6 @@ private fun ChatScreenPreview(
                 podcastTitle = "Pocket Casts Weekly",
                 episodeDurationMs = 3_600_000,
                 messages = listOf(
-                    ChatMessage.Assistant(
-                        text = "Ask me anything about this episode. I can summarize topics or find key moments.",
-                    ),
                     ChatMessage.User(
                         text = "What was the main point?",
                     ),

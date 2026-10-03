@@ -63,7 +63,6 @@ class ChatFragment : BaseDialogFragment() {
             podcastUuid = args.podcastUuid,
             podcastTitle = args.podcastTitle,
             episodeDurationMs = args.episodeDurationMs,
-            welcomeMessage = getString(LR.string.chat_preview_ai_1),
         )
     }
 
