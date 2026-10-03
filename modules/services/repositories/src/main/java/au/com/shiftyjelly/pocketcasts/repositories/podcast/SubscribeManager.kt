@@ -41,6 +41,7 @@ import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.rx2.await
 import kotlinx.coroutines.rx2.rxCompletable
 import kotlinx.coroutines.rx2.rxSingle
 import timber.log.Timber
@@ -164,27 +165,23 @@ class SubscribeManager @Inject constructor(
     }
 
     private fun subscribeToExistingOrServerPodcastRxSingle(podcastUuid: String, sync: Boolean, subscribed: Boolean, shouldAutoDownload: Boolean): Single<Podcast> {
-        // check if the podcast exists already
-        val subscribedObservable = podcastDao.isSubscribedToPodcastRxSingle(podcastUuid)
-        return subscribedObservable.flatMap { isSubscribed ->
+        return rxSingle(Dispatchers.IO) {
             // download the podcast json and add to the database if it doesn't exist
-            if (isSubscribed) {
-                subscribeToExistingPodcastRxSingle(podcastUuid, sync)
+            if (podcastDao.isSubscribedToPodcast(podcastUuid)) {
+                subscribeToExistingPodcast(podcastUuid, sync)
             } else {
-                subscribeToServerPodcastRxSingle(podcastUuid, sync, subscribed, shouldAutoDownload)
+                subscribeToServerPodcastRxSingle(podcastUuid, sync, subscribed, shouldAutoDownload).await()
             }
         }
     }
 
-    private fun subscribeToExistingPodcastRxSingle(podcastUuid: String, sync: Boolean): Single<Podcast> {
-        // set subscribed to true and update the sync status
-        val updateObservable = podcastDao.updateSubscribedRxCompletable(subscribed = true, uuid = podcastUuid)
-            .andThen(podcastDao.updateSyncStatusRxCompletable(syncStatus = if (sync) Podcast.SYNC_STATUS_NOT_SYNCED else Podcast.SYNC_STATUS_SYNCED, uuid = podcastUuid))
-            .andThen(Completable.fromAction { podcastDao.updateGroupingBlocking(settings.podcastGroupingDefault.value, podcastUuid) })
-            .andThen(rxCompletable { podcastDao.updateShowArchived(podcastUuid, settings.showArchivedDefault.value) })
-        // return the final podcast
-        val findObservable = podcastDao.findByUuidRxMaybe(podcastUuid)
-        return updateObservable.andThen(findObservable.toSingle())
+    private suspend fun subscribeToExistingPodcast(podcastUuid: String, sync: Boolean): Podcast {
+        podcastDao.updateSubscribed(subscribed = true, uuid = podcastUuid)
+        podcastDao.updateSyncStatus(syncStatus = if (sync) Podcast.SYNC_STATUS_NOT_SYNCED else Podcast.SYNC_STATUS_SYNCED, uuid = podcastUuid)
+        podcastDao.updateGroupingBlocking(settings.podcastGroupingDefault.value, podcastUuid)
+        podcastDao.updateShowArchived(podcastUuid, settings.showArchivedDefault.value)
+        // NoSuchElementException matches the error the previous Maybe.toSingle() raised
+        return podcastDao.findPodcastByUuid(podcastUuid) ?: throw NoSuchElementException("Podcast $podcastUuid not found after subscribing")
     }
 
     private fun subscribeToServerPodcastRxSingle(podcastUuid: String, sync: Boolean, subscribed: Boolean, shouldAutoDownload: Boolean): Single<Podcast> {
