@@ -40,8 +40,7 @@ class NowPlayingChipViewModel @Inject constructor(
         viewModelScope.launch {
             playbackManager
                 .upNextQueue
-                .getChangesObservableWithLiveCurrentEpisode(episodeManager, podcastManager)
-                .asFlow()
+                .getChangesFlowWithLiveCurrentEpisode(episodeManager, podcastManager)
                 .stateIn(viewModelScope, SharingStarted.Eagerly, null)
                 .collect { upNextQueue ->
                     _state.update {
