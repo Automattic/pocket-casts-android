@@ -4,6 +4,7 @@
     *   Add a What's new feed with announcements from the Pocket Casts team, opened from the bell on the Profile tab. Unread messages show a dot, which you can turn off in Settings → General, and read messages sync across your devices when you're signed in
         ([#6082](https://github.com/Automattic/pocket-casts-android/pull/6082))
 *   Bug Fixes
+    *   Enable adjusting volume with the watch crown on the Wear OS Now Playing screen
     *   Show the same flat toolbar on every screen opened from Profile
         ([#6093](https://github.com/Automattic/pocket-casts-android/pull/6093))
     *   Fix a crash when refreshing podcasts while the system account service is unavailable
