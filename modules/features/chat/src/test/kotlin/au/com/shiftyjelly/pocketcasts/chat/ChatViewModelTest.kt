@@ -60,10 +60,16 @@ class ChatViewModelTest {
     val featureFlagRule = InMemoryFeatureFlagRule()
 
     private val chatManager = TestChatManager()
+    private val playbackState = MutableStateFlow(PlaybackState())
     private val playbackManager = mock<PlaybackManager> {
-        on { playbackStateFlow } doReturn MutableStateFlow(PlaybackState())
+        on { playbackStateFlow } doReturn playbackState
     }
-    private val episodeManager = mock<EpisodeManager>()
+    private val episode = MutableStateFlow<BaseEpisode>(
+        PodcastEpisode(uuid = EPISODE_UUID, publishedDate = Date(), duration = 200.0, playedUpTo = 50.0),
+    )
+    private val episodeManager = mock<EpisodeManager> {
+        on { findEpisodeByUuidFlow(EPISODE_UUID) } doReturn episode
+    }
     private val betaSheetSeen = MutableStateFlow(false)
     private val betaSheetSeenSetting = mock<UserSetting<Boolean>> {
         on { value } doAnswer { betaSheetSeen.value }
@@ -412,6 +418,37 @@ class ChatViewModelTest {
         viewModel.uiState.first { state -> state.messages.filterIsInstance<ChatMessage.Quote>().none { it.isPlaying } }
 
         verifyNoSeek()
+    }
+
+    @Test
+    fun `playback shows the saved position when another episode is playing`() = runTest {
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = "other-uuid", positionMs = 10_000)
+
+        setEpisodeInfo()
+        advanceUntilIdle()
+
+        assertEquals(ChatPlayback(isPlaying = false, positionMs = 50_000, durationMs = 200_000), viewModel.uiState.value.playback)
+    }
+
+    @Test
+    fun `playback follows the player when the chat episode is current`() = runTest {
+        setEpisodeInfo()
+        playbackState.value = PlaybackState(
+            state = PlaybackState.State.PLAYING,
+            episodeUuid = EPISODE_UUID,
+            positionMs = 80_000,
+            durationMs = 190_000,
+        )
+        advanceUntilIdle()
+
+        assertEquals(ChatPlayback(isPlaying = true, positionMs = 80_000, durationMs = 190_000), viewModel.uiState.value.playback)
+    }
+
+    @Test
+    fun `playback progress is clamped and safe without a duration`() {
+        assertEquals(0.25f, ChatPlayback(positionMs = 50, durationMs = 200).progress)
+        assertEquals(1f, ChatPlayback(positionMs = 300, durationMs = 200).progress)
+        assertEquals(0f, ChatPlayback(positionMs = 300, durationMs = 0).progress)
     }
 
     private suspend fun verifyNoSeek() {

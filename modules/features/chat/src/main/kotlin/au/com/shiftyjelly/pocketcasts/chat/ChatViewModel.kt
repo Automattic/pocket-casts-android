@@ -34,6 +34,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.update
@@ -96,6 +98,7 @@ class ChatViewModel @Inject constructor(
             )
         }
         observeMessages()
+        observePlayback()
         createChat(podcastUuid)
         trackShown()
         showBetaSheetIfNeeded(isBeta)
@@ -112,6 +115,31 @@ class ChatViewModel @Inject constructor(
                         ),
                     )
                 }
+            }
+        }
+    }
+
+    private fun observePlayback() {
+        viewModelScope.launch {
+            combine(
+                playbackManager.playbackStateFlow,
+                episodeManager.findEpisodeByUuidFlow(episodeUuid),
+            ) { playbackState, episode ->
+                if (playbackState.episodeUuid == episode.uuid) {
+                    ChatPlayback(
+                        isPlaying = playbackState.isPlaying,
+                        positionMs = playbackState.positionMs,
+                        durationMs = playbackState.durationMs.takeIf { it > 0 } ?: episode.durationMs,
+                    )
+                } else {
+                    ChatPlayback(
+                        isPlaying = false,
+                        positionMs = episode.playedUpToMs,
+                        durationMs = episode.durationMs,
+                    )
+                }
+            }.distinctUntilChanged().collect { playback ->
+                _uiState.update { it.copy(playback = playback) }
             }
         }
     }
@@ -555,6 +583,15 @@ data class ChatUiState(
     val error: ChatError? = null,
     val isBeta: Boolean = false,
     val isBetaSheetVisible: Boolean = false,
+    val playback: ChatPlayback = ChatPlayback(),
 ) {
     val canSend: Boolean get() = inputText.isNotBlank() && isConnected && !isAwaitingReply
+}
+
+data class ChatPlayback(
+    val isPlaying: Boolean = false,
+    val positionMs: Int = 0,
+    val durationMs: Int = 0,
+) {
+    val progress: Float get() = if (durationMs > 0) (positionMs.toFloat() / durationMs).coerceIn(0f, 1f) else 0f
 }
