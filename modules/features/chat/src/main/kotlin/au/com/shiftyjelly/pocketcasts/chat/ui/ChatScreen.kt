@@ -180,6 +180,9 @@ private fun ChatContent(
                     )
                 }
             }
+            if (uiState.messages.lastOrNull().isAnswer && !uiState.isAwaitingReply) {
+                ChatDisclaimer(theme = theme)
+            }
             if (uiState.isAwaitingReply) {
                 ThinkingBubble(theme = theme)
             }
@@ -198,6 +201,22 @@ private fun ChatContent(
             theme = theme,
         )
     }
+}
+
+private val ChatMessage?.isAnswer get() = this is ChatMessage.Assistant || this is ChatMessage.Quote
+
+@Composable
+private fun ChatDisclaimer(
+    theme: ChatTheme,
+    modifier: Modifier = Modifier,
+) {
+    Text(
+        text = stringResource(LR.string.chat_ai_disclaimer),
+        color = theme.secondaryText,
+        fontSize = 12.sp,
+        lineHeight = 16.sp,
+        modifier = modifier.fillMaxWidth(),
+    )
 }
 
 @Composable
