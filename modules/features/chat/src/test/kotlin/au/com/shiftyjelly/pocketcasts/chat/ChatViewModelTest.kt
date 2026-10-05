@@ -5,6 +5,8 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatManager
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatMessage
 import au.com.shiftyjelly.pocketcasts.repositories.playback.NetworkConnectionWatcher
@@ -15,6 +17,8 @@ import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import com.automattic.eventhorizon.EpisodeChatBetaSheetDismissedEvent
+import com.automattic.eventhorizon.EpisodeChatBetaSheetShownEvent
 import com.automattic.eventhorizon.EpisodeChatClearedEvent
 import com.automattic.eventhorizon.EpisodeChatErrorType
 import com.automattic.eventhorizon.EpisodeChatMessageFailedEvent
@@ -39,9 +43,11 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -58,6 +64,13 @@ class ChatViewModelTest {
         on { playbackStateFlow } doReturn MutableStateFlow(PlaybackState())
     }
     private val episodeManager = mock<EpisodeManager>()
+    private val betaSheetSeen = MutableStateFlow(false)
+    private val betaSheetSeenSetting = mock<UserSetting<Boolean>> {
+        on { value } doAnswer { betaSheetSeen.value }
+    }
+    private val settings = mock<Settings> {
+        on { episodeChatBetaSheetSeen } doReturn betaSheetSeenSetting
+    }
     private val networkConnectionWatcher = TestNetworkConnectionWatcher()
 
     private lateinit var eventSink: TestEventSink
@@ -75,6 +88,7 @@ class ChatViewModelTest {
         playbackManager = playbackManager,
         episodeManager = episodeManager,
         eventHorizon = EventHorizon(eventSink),
+        settings = settings,
         applicationScope = kotlinx.coroutines.CoroutineScope(coroutineRule.testDispatcher),
     )
 
@@ -428,6 +442,7 @@ class ChatViewModelTest {
     private fun setEpisodeInfo(
         episodeDurationMs: Int = 123_000,
         sourceView: SourceView = SourceView.EPISODE_DETAILS,
+        isBeta: Boolean = false,
     ) {
         viewModel.setEpisodeInfo(
             episodeUuid = EPISODE_UUID,
@@ -437,8 +452,62 @@ class ChatViewModelTest {
             podcastTitle = "Podcast title",
             episodeDurationMs = episodeDurationMs,
             sourceView = sourceView,
-            isBeta = false,
+            isBeta = isBeta,
         )
+    }
+
+    @Test
+    fun `beta user sees the beta sheet once`() = runTest {
+        setEpisodeInfo(isBeta = true)
+        eventSink.skipEvent()
+
+        assertTrue(viewModel.uiState.value.isBetaSheetVisible)
+        assertEquals(
+            EpisodeChatBetaSheetShownEvent(
+                source = SourceView.EPISODE_DETAILS.analyticsValue,
+                episodeUuid = EPISODE_UUID,
+                podcastUuid = PODCAST_UUID,
+            ),
+            eventSink.pollEvent(),
+        )
+    }
+
+    @Test
+    fun `beta user who saw the sheet does not see it again`() = runTest {
+        betaSheetSeen.value = true
+
+        setEpisodeInfo(isBeta = true)
+
+        assertFalse(viewModel.uiState.value.isBetaSheetVisible)
+    }
+
+    @Test
+    fun `plus user does not see the beta sheet`() = runTest {
+        setEpisodeInfo(isBeta = false)
+
+        assertFalse(viewModel.uiState.value.isBetaSheetVisible)
+        assertFalse(viewModel.uiState.value.isBeta)
+    }
+
+    @Test
+    fun `dismissing the beta sheet saves it as seen and tracks it`() = runTest {
+        setEpisodeInfo(isBeta = true)
+        eventSink.skipEvent(2)
+
+        viewModel.dismissBetaSheet()
+        viewModel.dismissBetaSheet()
+
+        assertFalse(viewModel.uiState.value.isBetaSheetVisible)
+        verify(betaSheetSeenSetting, times(1)).set(true, updateModifiedAt = false)
+        assertEquals(
+            EpisodeChatBetaSheetDismissedEvent(
+                source = SourceView.EPISODE_DETAILS.analyticsValue,
+                episodeUuid = EPISODE_UUID,
+                podcastUuid = PODCAST_UUID,
+            ),
+            eventSink.pollEvent(),
+        )
+        assertTrue(eventSink.isEmpty())
     }
 
     private class TestNetworkConnectionWatcher : NetworkConnectionWatcher {
