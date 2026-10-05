@@ -285,3 +285,31 @@ private fun ChatScreenPreview(
         }
     }
 }
+
+@Preview
+@Composable
+private fun ChatScreenEmptyPreview(
+    @PreviewParameter(PodcastColorsParameterProvider::class) podcastColors: PodcastColors,
+) {
+    AppThemeWithBackground(ThemeType.DARK) {
+        CompositionLocalProvider(LocalPodcastColors provides podcastColors) {
+            ChatScreen(
+                uiState = ChatUiState(
+                    episodeTitle = "The future of podcast discovery",
+                    podcastUuid = "preview-podcast-uuid",
+                    podcastTitle = "Pocket Casts Weekly",
+                    isBeta = true,
+                ),
+                onClickClose = {},
+                onClickMore = {},
+                onClickPlayPause = {},
+                onInputTextChange = {},
+                onSend = {},
+                onClickSuggestion = {},
+                onRetry = {},
+                onPlayQuote = {},
+                onDismissBetaSheet = {},
+            )
+        }
+    }
+}
