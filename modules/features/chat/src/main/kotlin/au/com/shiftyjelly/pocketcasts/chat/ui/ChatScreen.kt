@@ -153,6 +153,7 @@ private fun ChatContent(
         ) {
             ChatWelcome(
                 isConversationStarted = uiState.messages.isNotEmpty() || uiState.isAwaitingReply,
+                isConnected = uiState.isConnected,
                 onClickSuggestion = onClickSuggestion,
                 theme = theme,
             )
