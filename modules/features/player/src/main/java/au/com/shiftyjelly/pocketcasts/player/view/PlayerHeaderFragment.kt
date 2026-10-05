@@ -83,6 +83,7 @@ import au.com.shiftyjelly.pocketcasts.ads.AdReportFragment
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.chat.ChatFragment
 import au.com.shiftyjelly.pocketcasts.chat.ChatPaywallFragment
+import au.com.shiftyjelly.pocketcasts.chat.EpisodeChatAccess
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.LocalPodcastColors
 import au.com.shiftyjelly.pocketcasts.compose.PlayerColors
@@ -523,7 +524,8 @@ class PlayerHeaderFragment :
 
     private fun showEpisodeChat(navigationState: NavigationState.ShowEpisodeChat) {
         val episode = navigationState.episode
-        if (navigationState.isPaidUser) {
+        val access = navigationState.access
+        if (access is EpisodeChatAccess.Chat) {
             if (parentFragmentManager.findFragmentByTag("episode_chat") == null) {
                 ChatFragment.newInstance(
                     episodeUuid = episode.uuid,
@@ -533,6 +535,7 @@ class PlayerHeaderFragment :
                     episodeSubtitle = PodcastEpisode.seasonPrefix(episode.episodeType, episode.season, episode.number, resources).orEmpty(),
                     episodeDurationMs = episode.durationMs,
                     sourceView = SourceView.PLAYER,
+                    isBeta = access.isBeta,
                 ).show(parentFragmentManager, "episode_chat")
             }
         } else if (parentFragmentManager.findFragmentByTag("episode_chat_paywall") == null) {

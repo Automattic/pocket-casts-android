@@ -76,6 +76,7 @@ class ChatViewModel @Inject constructor(
         podcastTitle: String,
         episodeDurationMs: Int,
         sourceView: SourceView,
+        isBeta: Boolean,
     ) {
         this.episodeUuid = episodeUuid
         this.podcastUuid = podcastUuid
@@ -87,6 +88,7 @@ class ChatViewModel @Inject constructor(
                 podcastUuid = podcastUuid,
                 podcastTitle = podcastTitle,
                 episodeDurationMs = episodeDurationMs,
+                isBeta = isBeta,
             )
         }
         observeMessages()
@@ -521,6 +523,7 @@ data class ChatUiState(
     val isConnected: Boolean = true,
     val isAwaitingReply: Boolean = false,
     val error: ChatError? = null,
+    val isBeta: Boolean = false,
 ) {
     val canSend: Boolean get() = inputText.isNotBlank() && isConnected && !isAwaitingReply
 }
