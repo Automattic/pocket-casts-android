@@ -98,7 +98,6 @@ import au.com.shiftyjelly.pocketcasts.compose.components.rememberNestedScrollLoc
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.BlazeAd
-import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivity
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivityContract
@@ -532,7 +531,6 @@ class PlayerHeaderFragment :
                     podcastUuid = episode.podcastUuid,
                     podcastTitle = navigationState.podcast.title,
                     episodeTitle = episode.title,
-                    episodeSubtitle = PodcastEpisode.seasonPrefix(episode.episodeType, episode.season, episode.number, resources).orEmpty(),
                     episodeDurationMs = episode.durationMs,
                     sourceView = SourceView.PLAYER,
                     isBeta = access.isBeta,
