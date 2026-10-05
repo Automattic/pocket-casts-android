@@ -144,6 +144,16 @@ class ChatViewModel @Inject constructor(
         }
     }
 
+    fun onPlayPauseClick() {
+        if (_uiState.value.playback.isPlaying) {
+            playbackManager.pause(sourceView = sourceView)
+        } else {
+            viewModelScope.launch {
+                playbackManager.playNowSuspend(episodeUuid, sourceView = sourceView)
+            }
+        }
+    }
+
     private fun createChat(podcastUuid: String) {
         viewModelScope.launch {
             chatManager.createChat(episodeUuid, podcastUuid)
