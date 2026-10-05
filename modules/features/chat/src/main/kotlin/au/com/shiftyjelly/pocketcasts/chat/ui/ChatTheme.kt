@@ -23,6 +23,9 @@ internal data class ChatTheme(
     val sendButton: Color,
     val sendButtonIcon: Color,
     val divider: Color,
+    val closeButtonBackground: Color,
+    val progress: Color,
+    val progressTrack: Color,
 ) {
     companion object {
         fun default(colors: ThemeColors) = ChatTheme(
@@ -40,13 +43,16 @@ internal data class ChatTheme(
             sendButton = colors.primaryInteractive01,
             sendButtonIcon = colors.primaryInteractive02,
             divider = colors.primaryUi05,
+            closeButtonBackground = colors.primaryUi05,
+            progress = colors.primaryInteractive01,
+            progressTrack = colors.primaryUi05,
         )
 
         fun player(colors: PlayerColors) = ChatTheme(
             background = colors.background01,
-            primaryText = colors.contrast02,
+            primaryText = colors.contrast01,
             secondaryText = colors.contrast04,
-            iconButton = colors.contrast02,
+            iconButton = colors.contrast01,
             aiBubble = colors.contrast05,
             aiBubbleText = colors.contrast02,
             userBubble = colors.contrast01,
@@ -57,6 +63,9 @@ internal data class ChatTheme(
             sendButton = colors.contrast01,
             sendButtonIcon = colors.background01,
             divider = colors.contrast05,
+            closeButtonBackground = colors.contrast05,
+            progress = colors.highlight01,
+            progressTrack = colors.contrast05,
         )
     }
 }
