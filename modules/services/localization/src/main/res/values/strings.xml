@@ -2566,6 +2566,9 @@
     <string name="chat_suggestion_summarize">Summarize this episode</string>
     <string name="chat_ai_disclaimer">AI can make mistakes, so double-check it.</string>
     <string name="chat_survey_title">Enjoying Ask about this Episode?</string>
+    <string name="chat_survey_not_really">Not really</string>
+    <string name="chat_survey_yes">Yes!</string>
+    <string name="chat_feedback_thanks">Thanks for the feedback</string>
     <string name="chat_send">Send</string>
     <string name="chat_clear">Clear Chat</string>
     <string name="chat_error_server">Something went wrong. Please try again.</string>
