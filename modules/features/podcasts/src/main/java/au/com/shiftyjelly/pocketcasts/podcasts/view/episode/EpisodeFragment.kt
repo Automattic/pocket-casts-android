@@ -1318,8 +1318,7 @@ class EpisodeFragment : BaseFragment() {
     }
 
     private fun openChat(episodeUuid: String, podcastUuid: String?) {
-        val pageState = viewModel.pageState.value
-        val access = EpisodeChatAccess.from(isPlusUser = pageState.isPlusUser, isSignedIn = pageState.isSignedIn)
+        val access = viewModel.episodeChatAccess()
         if (access is EpisodeChatAccess.Chat) {
             val episode = viewModel.episode ?: return
             val chatPodcastUuid = podcastUuid ?: return
