@@ -88,6 +88,7 @@ class ChatViewModelTest {
             podcastTitle = "Podcast title",
             episodeDurationMs = 123_000,
             sourceView = SourceView.EPISODE_DETAILS,
+            isBeta = false,
         )
 
         viewModel.uiState.test {
@@ -144,6 +145,7 @@ class ChatViewModelTest {
             podcastTitle = "Podcast title",
             episodeDurationMs = 123_000,
             sourceView = SourceView.EPISODE_DETAILS,
+            isBeta = false,
         )
 
         viewModel.uiState.test {
@@ -435,6 +437,7 @@ class ChatViewModelTest {
             podcastTitle = "Podcast title",
             episodeDurationMs = episodeDurationMs,
             sourceView = sourceView,
+            isBeta = false,
         )
     }
 

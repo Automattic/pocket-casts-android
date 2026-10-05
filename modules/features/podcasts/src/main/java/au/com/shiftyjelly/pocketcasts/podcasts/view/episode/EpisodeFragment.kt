@@ -85,6 +85,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.chat.ChatFragment
 import au.com.shiftyjelly.pocketcasts.chat.ChatPaywallFragment
+import au.com.shiftyjelly.pocketcasts.chat.EpisodeChatAccess
 import au.com.shiftyjelly.pocketcasts.chat.ui.ChatBanner
 import au.com.shiftyjelly.pocketcasts.chat.ui.ChatBannerColors
 import au.com.shiftyjelly.pocketcasts.chat.ui.ChatBannerDimensions
@@ -780,7 +781,7 @@ class EpisodeFragment : BaseFragment() {
                                         onClickLabel = stringResource(LR.string.episode_chat),
                                     ) {
                                         val t = transcript ?: return@clickable
-                                        openChat(t.episodeUuid, t.podcastUuid, isPlusUser)
+                                        openChat(t.episodeUuid, t.podcastUuid)
                                     }
                                     .fillMaxWidth()
                                     .padding(horizontal = 14.dp, vertical = 12.dp),
@@ -1042,7 +1043,7 @@ class EpisodeFragment : BaseFragment() {
                                         role = Role.Button,
                                         onClickLabel = stringResource(LR.string.episode_chat),
                                     ) {
-                                        openChat(transcript.episodeUuid, transcript.podcastUuid, isPlusUser)
+                                        openChat(transcript.episodeUuid, transcript.podcastUuid)
                                     },
                             )
                         }
@@ -1316,8 +1317,10 @@ class EpisodeFragment : BaseFragment() {
         webView?.loadDataWithBaseURL("file://android_asset/", notes, "text/html", "UTF-8", null)
     }
 
-    private fun openChat(episodeUuid: String, podcastUuid: String?, isPlusUser: Boolean) {
-        if (isPlusUser) {
+    private fun openChat(episodeUuid: String, podcastUuid: String?) {
+        val pageState = viewModel.pageState.value
+        val access = EpisodeChatAccess.from(isPlusUser = pageState.isPlusUser, isSignedIn = pageState.isSignedIn)
+        if (access is EpisodeChatAccess.Chat) {
             val episode = viewModel.episode ?: return
             val chatPodcastUuid = podcastUuid ?: return
             val episodeSubtitle = PodcastEpisode
@@ -1332,6 +1335,7 @@ class EpisodeFragment : BaseFragment() {
                     episodeSubtitle,
                     episode.durationMs,
                     SourceView.EPISODE_DETAILS,
+                    access.isBeta,
                 )
                 fragment.show(parentFragmentManager, "episode_chat")
             }

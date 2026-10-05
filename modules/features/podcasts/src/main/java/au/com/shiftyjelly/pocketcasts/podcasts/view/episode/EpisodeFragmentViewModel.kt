@@ -110,6 +110,7 @@ class EpisodeFragmentViewModel @Inject constructor(
     data class EpisodePageState(
         val transcript: Transcript? = null,
         val isPlusUser: Boolean = false,
+        val isSignedIn: Boolean = false,
         val isFreeTrialAvailable: Boolean = false,
         val summary: String? = null,
         val selectedContentTab: EpisodeContentTab = EpisodeContentTab.DESCRIPTION,
@@ -167,7 +168,10 @@ class EpisodeFragmentViewModel @Inject constructor(
         viewModelScope.launch {
             userManager.getSignInState().asFlow().collect { signInState ->
                 _pageState.update { state ->
-                    state.copy(isPlusUser = signInState.isSignedInAsPlusOrPatron)
+                    state.copy(
+                        isPlusUser = signInState.isSignedInAsPlusOrPatron,
+                        isSignedIn = signInState.isSignedIn,
+                    )
                 }
             }
         }

@@ -42,11 +42,12 @@ class ChatFragment : BaseDialogFragment() {
             episodeSubtitle: String,
             episodeDurationMs: Int,
             sourceView: SourceView,
+            isBeta: Boolean,
         ) = ChatFragment().apply {
             arguments = Bundle().apply {
                 putParcelable(
                     ARGS_KEY,
-                    Args(episodeUuid, podcastUuid, podcastTitle, episodeTitle, episodeSubtitle, episodeDurationMs, sourceView),
+                    Args(episodeUuid, podcastUuid, podcastTitle, episodeTitle, episodeSubtitle, episodeDurationMs, sourceView, isBeta),
                 )
             }
         }
@@ -66,6 +67,7 @@ class ChatFragment : BaseDialogFragment() {
             podcastTitle = args.podcastTitle,
             episodeDurationMs = args.episodeDurationMs,
             sourceView = args.sourceView,
+            isBeta = args.isBeta,
         )
     }
 
@@ -140,5 +142,6 @@ class ChatFragment : BaseDialogFragment() {
         val episodeSubtitle: String,
         val episodeDurationMs: Int,
         val sourceView: SourceView,
+        val isBeta: Boolean,
     ) : Parcelable
 }
