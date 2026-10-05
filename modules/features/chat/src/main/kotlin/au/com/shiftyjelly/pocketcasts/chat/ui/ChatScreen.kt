@@ -43,6 +43,7 @@ fun ChatScreen(
     uiState: ChatUiState,
     onClickClose: () -> Unit,
     onClickMore: () -> Unit,
+    onClickPlayPause: () -> Unit,
     onInputTextChange: (String) -> Unit,
     onSend: () -> Unit,
     onRetry: () -> Unit,
@@ -86,6 +87,7 @@ fun ChatScreen(
             theme = theme,
             onClickClose = onClickClose,
             onClickMore = onClickMore,
+            onClickPlayPause = onClickPlayPause,
             onInputTextChange = onInputTextChange,
             onSend = onSend,
             onRetry = onRetry,
@@ -100,6 +102,7 @@ private fun ChatContent(
     theme: ChatTheme,
     onClickClose: () -> Unit,
     onClickMore: () -> Unit,
+    onClickPlayPause: () -> Unit,
     onInputTextChange: (String) -> Unit,
     onSend: () -> Unit,
     onRetry: () -> Unit,
@@ -120,12 +123,13 @@ private fun ChatContent(
             .background(theme.background)
             .imePadding(),
     ) {
-        ChatToolbar(
+        ChatHeader(
             episodeTitle = uiState.episodeTitle,
-            episodeSubtitle = uiState.episodeSubtitle,
             podcastUuid = uiState.podcastUuid,
             podcastTitle = uiState.podcastTitle,
-            onClickBack = onClickClose,
+            playback = uiState.playback,
+            onClickClose = onClickClose,
+            onClickPlayPause = onClickPlayPause,
             onClickMore = {
                 focusManager.clearFocus(force = true)
                 keyboardController?.hide()
@@ -249,6 +253,7 @@ private fun ChatScreenPreview(
             ),
             onClickClose = {},
             onClickMore = {},
+            onClickPlayPause = {},
             onInputTextChange = {},
             onSend = {},
             onRetry = {},

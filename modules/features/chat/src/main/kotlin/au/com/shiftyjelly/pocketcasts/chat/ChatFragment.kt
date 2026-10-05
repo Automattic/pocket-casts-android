@@ -103,6 +103,7 @@ class ChatFragment : BaseDialogFragment() {
                     uiState = uiState,
                     onClickClose = { dismiss() },
                     onClickMore = ::showOptionsDialog,
+                    onClickPlayPause = viewModel::onPlayPauseClick,
                     onInputTextChange = viewModel::onInputTextChange,
                     onSend = viewModel::onSend,
                     onRetry = viewModel::retry,
