@@ -9,13 +9,16 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.RadioButton
@@ -28,6 +31,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
@@ -67,6 +72,8 @@ internal fun ChatFeedbackForm(
             .fillMaxWidth()
             .background(theme.background)
             .navigationBarsPadding()
+            .imePadding()
+            .verticalScroll(rememberScrollState())
             .padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 16.dp),
     ) {
         Box(
@@ -169,6 +176,7 @@ private fun DetailsField(
     onDetailsChange: (String) -> Unit,
     theme: ChatTheme,
 ) {
+    val hint = stringResource(LR.string.chat_feedback_details_hint)
     BasicTextField(
         value = details,
         onValueChange = onDetailsChange,
@@ -184,7 +192,7 @@ private fun DetailsField(
             ) {
                 if (details.isEmpty()) {
                     Text(
-                        text = stringResource(LR.string.chat_feedback_details_hint),
+                        text = hint,
                         color = theme.inputHint,
                         fontSize = 15.sp,
                         lineHeight = 20.sp,
@@ -195,7 +203,8 @@ private fun DetailsField(
         },
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 12.dp),
+            .padding(top = 12.dp)
+            .semantics { contentDescription = hint },
     )
 }
 

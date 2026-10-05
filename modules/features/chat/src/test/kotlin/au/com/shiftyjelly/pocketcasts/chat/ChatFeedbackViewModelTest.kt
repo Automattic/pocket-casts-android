@@ -142,6 +142,16 @@ class ChatFeedbackViewModelTest {
     }
 
     @Test
+    fun `details are capped`() {
+        val viewModel = createViewModel()
+        viewModel.onReasonSelected(ChatFeedback.Reason.Other)
+
+        viewModel.onDetailsChange("a".repeat(1_500))
+
+        assertEquals(1_000, viewModel.uiState.value.details.length)
+    }
+
+    @Test
     fun `tracks dismissal without submitting`() {
         val viewModel = createViewModel()
         eventSink.skipEvent()
@@ -172,7 +182,11 @@ class ChatFeedbackViewModelTest {
 
         override suspend fun createChat(episodeUuid: String, podcastUuid: String) = Unit
 
-        override suspend fun sendMessage(episodeUuid: String, message: ChatMessage.User, allMessages: List<ChatMessage>) = Unit
+        override suspend fun sendMessage(
+            episodeUuid: String,
+            message: ChatMessage.User,
+            allMessages: List<ChatMessage>,
+        ) = Unit
 
         override suspend fun clearMessages(episodeUuid: String) = Unit
     }

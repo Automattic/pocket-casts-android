@@ -7,6 +7,7 @@ import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatFeedback
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatFeedbackManager
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatManager
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.eventhorizon.EpisodeChatFeedbackFormDismissedEvent
 import com.automattic.eventhorizon.EpisodeChatFeedbackFormShownEvent
 import com.automattic.eventhorizon.EpisodeChatFeedbackReasonType
@@ -77,8 +78,9 @@ class ChatFeedbackViewModel @Inject constructor(
     }
 
     fun onDetailsChange(details: String) {
-        savedStateHandle[DETAILS_KEY] = details
-        _uiState.update { it.copy(details = details) }
+        val limited = details.take(MAX_DETAILS_LENGTH)
+        savedStateHandle[DETAILS_KEY] = limited
+        _uiState.update { it.copy(details = limited) }
     }
 
     fun submit(): Boolean {
@@ -98,15 +100,17 @@ class ChatFeedbackViewModel @Inject constructor(
             ),
         )
         applicationScope.launch {
-            feedbackManager.submit(
-                ChatFeedback(
-                    episodeUuid = episodeUuid,
-                    podcastUuid = podcastUuid,
-                    reason = reason,
-                    details = details,
-                    conversation = chatManager.observeMessages(episodeUuid).first(),
-                ),
-            )
+            runCatching {
+                feedbackManager.submit(
+                    ChatFeedback(
+                        episodeUuid = episodeUuid,
+                        podcastUuid = podcastUuid,
+                        reason = reason,
+                        details = details,
+                        conversation = chatManager.observeMessages(episodeUuid).first(),
+                    ),
+                )
+            }.onFailure { LogBuffer.e(LOG_TAG, it, "Failed to submit episode chat feedback") }
         }
         return true
     }
@@ -137,6 +141,8 @@ class ChatFeedbackViewModel @Inject constructor(
         const val IS_SUBMITTED_KEY = "is_submitted"
         const val REASON_KEY = "reason"
         const val DETAILS_KEY = "details"
+        const val MAX_DETAILS_LENGTH = 1000
+        const val LOG_TAG = "EpisodeChat"
     }
 }
 
