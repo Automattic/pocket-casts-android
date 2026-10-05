@@ -49,6 +49,7 @@ fun ChatScreen(
     onClickPlayPause: () -> Unit,
     onInputTextChange: (String) -> Unit,
     onSend: () -> Unit,
+    onClickSuggestion: (String) -> Unit,
     onRetry: () -> Unit,
     onPlayQuote: (quoteUuid: String) -> Unit,
     onDismissBetaSheet: () -> Unit,
@@ -93,6 +94,7 @@ fun ChatScreen(
             onClickPlayPause = onClickPlayPause,
             onInputTextChange = onInputTextChange,
             onSend = onSend,
+            onClickSuggestion = onClickSuggestion,
             onRetry = onRetry,
             onPlayQuote = onPlayQuote,
         )
@@ -108,6 +110,7 @@ private fun ChatContent(
     onClickPlayPause: () -> Unit,
     onInputTextChange: (String) -> Unit,
     onSend: () -> Unit,
+    onClickSuggestion: (String) -> Unit,
     onRetry: () -> Unit,
     onPlayQuote: (quoteUuid: String) -> Unit,
     modifier: Modifier = Modifier,
@@ -148,13 +151,9 @@ private fun ChatContent(
                 .verticalScroll(scrollState)
                 .padding(horizontal = 16.dp, vertical = 12.dp),
         ) {
-            ChatContextBubble(
-                episodeDurationMs = uiState.episodeDurationMs,
-                theme = theme,
-            )
-            AiMessageBubble(
-                text = stringResource(LR.string.chat_preview_ai_1),
-                podcastUuid = uiState.podcastUuid,
+            ChatWelcome(
+                isConversationStarted = uiState.messages.isNotEmpty() || uiState.isAwaitingReply,
+                onClickSuggestion = onClickSuggestion,
                 theme = theme,
             )
             uiState.messages.forEachIndexed { index, message ->
@@ -259,6 +258,7 @@ private fun ChatScreenPreview(
                 onClickPlayPause = {},
                 onInputTextChange = {},
                 onSend = {},
+                onClickSuggestion = {},
                 onRetry = {},
                 onPlayQuote = {},
                 onDismissBetaSheet = {},

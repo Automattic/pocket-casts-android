@@ -27,6 +27,7 @@ import com.automattic.eventhorizon.EpisodeChatShownEvent
 import com.automattic.eventhorizon.EventHorizon
 import java.io.IOException
 import java.util.Date
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -202,6 +203,44 @@ class ChatViewModelTest {
         )
         assertFalse(viewModel.uiState.value.isAwaitingReply)
         assertEquals(null, viewModel.uiState.value.error)
+    }
+
+    @Test
+    fun `suggestion click sends the suggestion and keeps the typed input`() = runTest {
+        setEpisodeInfo()
+        viewModel.onInputTextChange("Draft")
+
+        viewModel.onSuggestionClick("Summarize this episode")
+        advanceUntilIdle()
+
+        assertEquals(SendMessage(EPISODE_UUID, "Summarize this episode"), chatManager.sentMessages.single())
+        assertEquals("Draft", viewModel.uiState.value.inputText)
+        eventSink.skipEvent()
+        assertEquals(
+            EpisodeChatMessageSentEvent(
+                source = SourceView.EPISODE_DETAILS.analyticsValue,
+                episodeUuid = EPISODE_UUID,
+                podcastUuid = PODCAST_UUID,
+                messageLength = "Summarize this episode".length.toLong(),
+            ),
+            eventSink.pollEvent(),
+        )
+    }
+
+    @Test
+    fun `suggestion click is ignored while awaiting a reply`() = runTest {
+        setEpisodeInfo()
+        val gate = CompletableDeferred<Unit>()
+        chatManager.sendMessageGate = gate
+        viewModel.onInputTextChange("First question")
+        viewModel.onSend()
+        advanceUntilIdle()
+
+        viewModel.onSuggestionClick("Summarize this episode")
+        gate.complete(Unit)
+        advanceUntilIdle()
+
+        assertEquals(listOf(SendMessage(EPISODE_UUID, "First question")), chatManager.sentMessages)
     }
 
     @Test
@@ -625,6 +664,7 @@ class ChatViewModelTest {
         val sentHistories = mutableListOf<List<String>>()
         val clearedEpisodeUuids = mutableListOf<String>()
         var sendMessageException: Exception? = null
+        var sendMessageGate: CompletableDeferred<Unit>? = null
 
         override fun observeMessages(episodeUuid: String): Flow<List<ChatMessage>> = messages
 
@@ -637,6 +677,7 @@ class ChatViewModelTest {
             message: ChatMessage.User,
             allMessages: List<ChatMessage>,
         ) {
+            sendMessageGate?.await()
             sendMessageException?.let { throw it }
             sentMessages += SendMessage(episodeUuid, message.text)
             sentHistories += allMessages.map { it.text() }

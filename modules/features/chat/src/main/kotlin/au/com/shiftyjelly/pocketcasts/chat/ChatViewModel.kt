@@ -216,6 +216,11 @@ class ChatViewModel @Inject constructor(
         performSend(message = ChatMessage.User(text = text))
     }
 
+    fun onSuggestionClick(text: String) {
+        if (_uiState.value.isAwaitingReply) return
+        performSend(message = ChatMessage.User(text = text))
+    }
+
     fun retry() {
         val failedUserMessage = transientUserMessage ?: return
         performSend(message = failedUserMessage)
