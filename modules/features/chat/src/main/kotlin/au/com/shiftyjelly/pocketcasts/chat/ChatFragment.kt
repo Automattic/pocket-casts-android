@@ -138,7 +138,19 @@ class ChatFragment : BaseDialogFragment() {
 
     override fun onDismiss(dialog: DialogInterface) {
         viewModel.trackDismissed()
+        showSurveyIfEligible()
         super.onDismiss(dialog)
+    }
+
+    private fun showSurveyIfEligible() {
+        if (parentFragmentManager.isStateSaved || !viewModel.consumeSurveyEligibility()) return
+        ChatSurveyFragment.show(
+            fragmentManager = parentFragmentManager,
+            episodeUuid = args.episodeUuid,
+            podcastUuid = args.podcastUuid,
+            sourceView = args.sourceView,
+            podcastColors = args.podcastColors,
+        )
     }
 
     @Suppress("DEPRECATION")
