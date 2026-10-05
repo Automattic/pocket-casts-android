@@ -8,11 +8,20 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ModalBottomSheetLayout
+import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Text
+import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
@@ -27,6 +36,8 @@ import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatMessage
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.filter
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -38,9 +49,63 @@ fun ChatScreen(
     onSend: () -> Unit,
     onRetry: () -> Unit,
     onPlayQuote: (quoteUuid: String) -> Unit,
+    onDismissBetaSheet: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val theme = rememberChatTheme()
+    val betaSheetState = rememberModalBottomSheetState(
+        initialValue = ModalBottomSheetValue.Hidden,
+        skipHalfExpanded = true,
+    )
+    val currentOnDismissBetaSheet by rememberUpdatedState(onDismissBetaSheet)
+
+    LaunchedEffect(uiState.isBetaSheetVisible) {
+        if (uiState.isBetaSheetVisible) betaSheetState.show() else betaSheetState.hide()
+    }
+    LaunchedEffect(betaSheetState) {
+        snapshotFlow { betaSheetState.currentValue }
+            .drop(1)
+            .filter { it == ModalBottomSheetValue.Hidden }
+            .collect { currentOnDismissBetaSheet() }
+    }
+
+    ModalBottomSheetLayout(
+        sheetState = betaSheetState,
+        sheetShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
+        scrimColor = Color.Black.copy(alpha = 0.5f),
+        sheetContent = {
+            ChatBetaSheet(
+                theme = theme,
+                onClickGotIt = onDismissBetaSheet,
+            )
+        },
+        modifier = modifier,
+    ) {
+        ChatContent(
+            uiState = uiState,
+            theme = theme,
+            onClickClose = onClickClose,
+            onClickMore = onClickMore,
+            onInputTextChange = onInputTextChange,
+            onSend = onSend,
+            onRetry = onRetry,
+            onPlayQuote = onPlayQuote,
+        )
+    }
+}
+
+@Composable
+private fun ChatContent(
+    uiState: ChatUiState,
+    theme: ChatTheme,
+    onClickClose: () -> Unit,
+    onClickMore: () -> Unit,
+    onInputTextChange: (String) -> Unit,
+    onSend: () -> Unit,
+    onRetry: () -> Unit,
+    onPlayQuote: (quoteUuid: String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
     val scrollState = rememberScrollState()
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -186,6 +251,7 @@ private fun ChatScreenPreview(
             onSend = {},
             onRetry = {},
             onPlayQuote = {},
+            onDismissBetaSheet = {},
         )
     }
 }

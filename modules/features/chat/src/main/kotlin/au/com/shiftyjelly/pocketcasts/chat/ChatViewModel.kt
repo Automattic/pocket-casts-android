@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatManager
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatMessage
 import au.com.shiftyjelly.pocketcasts.repositories.playback.NetworkConnectionWatcher
@@ -13,6 +14,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import com.automattic.eventhorizon.EpisodeChatBetaSheetDismissedEvent
+import com.automattic.eventhorizon.EpisodeChatBetaSheetShownEvent
 import com.automattic.eventhorizon.EpisodeChatClearedEvent
 import com.automattic.eventhorizon.EpisodeChatDismissedEvent
 import com.automattic.eventhorizon.EpisodeChatErrorType
@@ -45,6 +48,7 @@ class ChatViewModel @Inject constructor(
     private val playbackManager: PlaybackManager,
     private val episodeManager: EpisodeManager,
     private val eventHorizon: EventHorizon,
+    private val settings: Settings,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel() {
 
@@ -94,6 +98,7 @@ class ChatViewModel @Inject constructor(
         observeMessages()
         createChat(podcastUuid)
         trackShown()
+        showBetaSheetIfNeeded(isBeta)
     }
 
     private fun observeMessages() {
@@ -441,6 +446,31 @@ class ChatViewModel @Inject constructor(
         return if (any { it.uuid == message.uuid }) this else this + message
     }
 
+    private fun showBetaSheetIfNeeded(isBeta: Boolean) {
+        if (!isBeta || settings.episodeChatBetaSheetSeen.value) return
+        _uiState.update { it.copy(isBetaSheetVisible = true) }
+        eventHorizon.track(
+            EpisodeChatBetaSheetShownEvent(
+                source = sourceView.analyticsValue,
+                episodeUuid = episodeUuid,
+                podcastUuid = podcastUuid,
+            ),
+        )
+    }
+
+    fun dismissBetaSheet() {
+        if (!_uiState.value.isBetaSheetVisible) return
+        settings.episodeChatBetaSheetSeen.set(true, updateModifiedAt = false)
+        _uiState.update { it.copy(isBetaSheetVisible = false) }
+        eventHorizon.track(
+            EpisodeChatBetaSheetDismissedEvent(
+                source = sourceView.analyticsValue,
+                episodeUuid = episodeUuid,
+                podcastUuid = podcastUuid,
+            ),
+        )
+    }
+
     private fun trackShown() {
         eventHorizon.track(
             EpisodeChatShownEvent(
@@ -524,6 +554,7 @@ data class ChatUiState(
     val isAwaitingReply: Boolean = false,
     val error: ChatError? = null,
     val isBeta: Boolean = false,
+    val isBetaSheetVisible: Boolean = false,
 ) {
     val canSend: Boolean get() = inputText.isNotBlank() && isConnected && !isAwaitingReply
 }

@@ -92,6 +92,7 @@ class ChatFragment : BaseDialogFragment() {
                 onSend = viewModel::onSend,
                 onRetry = viewModel::retry,
                 onPlayQuote = viewModel::playQuote,
+                onDismissBetaSheet = viewModel::dismissBetaSheet,
                 modifier = Modifier.fillMaxSize(),
             )
         }
