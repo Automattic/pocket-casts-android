@@ -10,18 +10,21 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.onClick
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withLink
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
@@ -55,26 +58,32 @@ internal fun AiQuoteBubble(
 ) {
     val currentOnClickPlay by rememberUpdatedState(onClickPlay)
     val actionLabel = stringResource(if (isPlaying) LR.string.chat_stop_quote else LR.string.chat_play_quote)
-    val text = buildAnnotatedString {
-        withStyle(SpanStyle(fontStyle = FontStyle.Italic)) {
-            append(quote)
-        }
-        if (timestampLabel.isNotEmpty()) {
-            append(" ")
-            val timestamp = "($timestampLabel)"
-            if (isPlayable) {
-                withLink(
-                    LinkAnnotation.Clickable(
-                        tag = QUOTE_TIMESTAMP_TAG,
-                        styles = TextLinkStyles(SpanStyle(color = theme.quoteTimestamp)),
-                        linkInteractionListener = { currentOnClickPlay() },
-                    ),
-                ) {
-                    append(timestamp)
-                }
-            } else {
-                withStyle(SpanStyle(color = theme.secondaryText)) {
-                    append(timestamp)
+    val timestampColor = if (isPlayable) theme.quoteTimestamp else theme.secondaryText
+    val text = remember(quote, timestampLabel, isPlayable, isPlaying, timestampColor) {
+        buildAnnotatedString {
+            withStyle(SpanStyle(fontStyle = FontStyle.Italic)) {
+                append(quote)
+            }
+            if (timestampLabel.isNotEmpty()) {
+                append(" ")
+                val timestampStyle = SpanStyle(
+                    color = timestampColor,
+                    textDecoration = if (isPlaying) TextDecoration.Underline else null,
+                )
+                if (isPlayable) {
+                    withLink(
+                        LinkAnnotation.Clickable(
+                            tag = QUOTE_TIMESTAMP_TAG,
+                            styles = TextLinkStyles(timestampStyle),
+                            linkInteractionListener = { currentOnClickPlay() },
+                        ),
+                    ) {
+                        append("($timestampLabel)")
+                    }
+                } else {
+                    withStyle(timestampStyle) {
+                        append("($timestampLabel)")
+                    }
                 }
             }
         }
@@ -88,7 +97,8 @@ internal fun AiQuoteBubble(
             .fillMaxWidth()
             .then(
                 if (isPlayable) {
-                    Modifier.semantics {
+                    Modifier.clearAndSetSemantics {
+                        contentDescription = text.text
                         onClick(label = actionLabel) {
                             currentOnClickPlay()
                             true
