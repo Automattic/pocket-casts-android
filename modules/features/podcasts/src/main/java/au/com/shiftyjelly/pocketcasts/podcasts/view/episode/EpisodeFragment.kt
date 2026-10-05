@@ -90,6 +90,7 @@ import au.com.shiftyjelly.pocketcasts.chat.ui.ChatBanner
 import au.com.shiftyjelly.pocketcasts.chat.ui.ChatBannerColors
 import au.com.shiftyjelly.pocketcasts.chat.ui.ChatBannerDimensions
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
 import au.com.shiftyjelly.pocketcasts.compose.buttons.ButtonTab
 import au.com.shiftyjelly.pocketcasts.compose.buttons.ButtonTabs
 import au.com.shiftyjelly.pocketcasts.compose.components.AnimatedPlayPauseButton
@@ -1335,6 +1336,7 @@ class EpisodeFragment : BaseFragment() {
                     episode.durationMs,
                     SourceView.EPISODE_DETAILS,
                     access.isBeta,
+                    viewModel.podcast?.let(::PodcastColors) ?: PodcastColors.ForUserEpisode,
                 )
                 fragment.show(parentFragmentManager, "episode_chat")
             }
