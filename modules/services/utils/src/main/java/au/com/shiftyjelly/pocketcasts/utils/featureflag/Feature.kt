@@ -284,7 +284,7 @@ enum class Feature(
         title = "Episode Chat: Free Beta",
         defaultValue = isDebugOrPrototypeBuild,
         tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = true,
+        hasFirebaseRemoteFlag = false,
         hasDevToggle = true,
         addedOn = LocalDate.parse("2026-10-05"),
     ),
