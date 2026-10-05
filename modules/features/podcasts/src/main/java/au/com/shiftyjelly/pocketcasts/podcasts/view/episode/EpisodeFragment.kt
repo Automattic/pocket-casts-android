@@ -1323,16 +1323,12 @@ class EpisodeFragment : BaseFragment() {
         if (access is EpisodeChatAccess.Chat) {
             val episode = viewModel.episode ?: return
             val chatPodcastUuid = podcastUuid ?: return
-            val episodeSubtitle = PodcastEpisode
-                .seasonPrefix(episode.episodeType, episode.season, episode.number, resources)
-                .orEmpty()
             if (parentFragmentManager.findFragmentByTag("episode_chat") == null) {
                 val fragment = ChatFragment.newInstance(
                     episodeUuid,
                     chatPodcastUuid,
                     viewModel.podcast?.title.orEmpty(),
                     episode.title,
-                    episodeSubtitle,
                     episode.durationMs,
                     SourceView.EPISODE_DETAILS,
                     access.isBeta,

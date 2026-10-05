@@ -231,7 +231,6 @@ private fun ChatScreenPreview(
             uiState = ChatUiState(
                 inputText = "Ask a follow-up",
                 episodeTitle = "The future of podcast discovery",
-                episodeSubtitle = "May 25",
                 podcastUuid = "preview-podcast-uuid",
                 podcastTitle = "Pocket Casts Weekly",
                 episodeDurationMs = 3_600_000,

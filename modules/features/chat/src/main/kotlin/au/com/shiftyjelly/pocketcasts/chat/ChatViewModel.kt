@@ -77,7 +77,6 @@ class ChatViewModel @Inject constructor(
     fun setEpisodeInfo(
         episodeUuid: String,
         episodeTitle: String,
-        episodeSubtitle: String,
         podcastUuid: String,
         podcastTitle: String,
         episodeDurationMs: Int,
@@ -90,7 +89,6 @@ class ChatViewModel @Inject constructor(
         _uiState.update {
             it.copy(
                 episodeTitle = episodeTitle,
-                episodeSubtitle = episodeSubtitle,
                 podcastUuid = podcastUuid,
                 podcastTitle = podcastTitle,
                 episodeDurationMs = episodeDurationMs,
@@ -591,7 +589,6 @@ private data class PlaybackSnapshot(
 data class ChatUiState(
     val inputText: String = "",
     val episodeTitle: String = "",
-    val episodeSubtitle: String = "",
     val podcastUuid: String = "",
     val podcastTitle: String = "",
     val episodeDurationMs: Int = 0,

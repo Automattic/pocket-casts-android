@@ -103,7 +103,6 @@ class ChatViewModelTest {
         viewModel.setEpisodeInfo(
             episodeUuid = EPISODE_UUID,
             episodeTitle = "Episode title",
-            episodeSubtitle = "Episode subtitle",
             podcastUuid = PODCAST_UUID,
             podcastTitle = "Podcast title",
             episodeDurationMs = 123_000,
@@ -115,7 +114,6 @@ class ChatViewModelTest {
             val state = awaitItem()
 
             assertEquals("Episode title", state.episodeTitle)
-            assertEquals("Episode subtitle", state.episodeSubtitle)
             assertEquals(PODCAST_UUID, state.podcastUuid)
             assertEquals("Podcast title", state.podcastTitle)
             assertEquals(123_000, state.episodeDurationMs)
@@ -160,7 +158,6 @@ class ChatViewModelTest {
         viewModel.setEpisodeInfo(
             episodeUuid = EPISODE_UUID,
             episodeTitle = "Episode title",
-            episodeSubtitle = "Episode subtitle",
             podcastUuid = PODCAST_UUID,
             podcastTitle = "Podcast title",
             episodeDurationMs = 123_000,
@@ -529,7 +526,6 @@ class ChatViewModelTest {
         viewModel.setEpisodeInfo(
             episodeUuid = EPISODE_UUID,
             episodeTitle = "Episode title",
-            episodeSubtitle = "Episode subtitle",
             podcastUuid = PODCAST_UUID,
             podcastTitle = "Podcast title",
             episodeDurationMs = episodeDurationMs,
