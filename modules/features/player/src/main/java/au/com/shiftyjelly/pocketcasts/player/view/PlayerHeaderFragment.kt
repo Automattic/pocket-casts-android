@@ -536,6 +536,7 @@ class PlayerHeaderFragment :
                     episodeDurationMs = episode.durationMs,
                     sourceView = SourceView.PLAYER,
                     isBeta = access.isBeta,
+                    podcastColors = PodcastColors(navigationState.podcast),
                 ).show(parentFragmentManager, "episode_chat")
             }
         } else if (parentFragmentManager.findFragmentByTag("episode_chat_paywall") == null) {
