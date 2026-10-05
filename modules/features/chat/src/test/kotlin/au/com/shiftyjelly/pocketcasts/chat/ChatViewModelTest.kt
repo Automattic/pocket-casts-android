@@ -457,7 +457,7 @@ class ChatViewModelTest {
     }
 
     @Test
-    fun `beta user sees the beta sheet once`() = runTest {
+    fun `beta user sees the beta sheet and it is tracked`() = runTest {
         setEpisodeInfo(isBeta = true)
         eventSink.skipEvent()
 
@@ -470,6 +470,18 @@ class ChatViewModelTest {
             ),
             eventSink.pollEvent(),
         )
+    }
+
+    @Test
+    fun `setting episode info again while the beta sheet is open does not track it twice`() = runTest {
+        setEpisodeInfo(isBeta = true)
+        eventSink.skipEvent(2)
+
+        setEpisodeInfo(isBeta = true)
+        eventSink.skipEvent()
+
+        assertTrue(viewModel.uiState.value.isBetaSheetVisible)
+        assertTrue(eventSink.isEmpty())
     }
 
     @Test

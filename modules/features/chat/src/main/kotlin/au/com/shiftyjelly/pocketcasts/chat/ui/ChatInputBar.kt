@@ -127,7 +127,7 @@ internal fun ChatInputBar(
         }
         if (showBetaNote) {
             Text(
-                text = stringResource(LR.string.chat_beta_note),
+                text = stringResource(LR.string.chat_beta_sheet_title),
                 color = theme.secondaryText,
                 fontSize = 12.sp,
                 lineHeight = 16.sp,

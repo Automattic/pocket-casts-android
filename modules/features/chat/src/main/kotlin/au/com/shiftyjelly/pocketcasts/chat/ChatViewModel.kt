@@ -447,7 +447,7 @@ class ChatViewModel @Inject constructor(
     }
 
     private fun showBetaSheetIfNeeded(isBeta: Boolean) {
-        if (!isBeta || settings.episodeChatBetaSheetSeen.value) return
+        if (!isBeta || settings.episodeChatBetaSheetSeen.value || _uiState.value.isBetaSheetVisible) return
         _uiState.update { it.copy(isBetaSheetVisible = true) }
         eventHorizon.track(
             EpisodeChatBetaSheetShownEvent(

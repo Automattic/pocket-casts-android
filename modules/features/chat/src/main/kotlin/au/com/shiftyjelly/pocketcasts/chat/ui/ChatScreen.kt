@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.chat.ui
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -19,7 +20,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
@@ -36,8 +36,6 @@ import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatMessage
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
-import kotlinx.coroutines.flow.drop
-import kotlinx.coroutines.flow.filter
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -53,25 +51,27 @@ fun ChatScreen(
     modifier: Modifier = Modifier,
 ) {
     val theme = rememberChatTheme()
+    val currentOnDismissBetaSheet by rememberUpdatedState(onDismissBetaSheet)
     val betaSheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
         skipHalfExpanded = true,
+        confirmValueChange = { value ->
+            if (value == ModalBottomSheetValue.Hidden) currentOnDismissBetaSheet()
+            true
+        },
     )
-    val currentOnDismissBetaSheet by rememberUpdatedState(onDismissBetaSheet)
 
     LaunchedEffect(uiState.isBetaSheetVisible) {
         if (uiState.isBetaSheetVisible) betaSheetState.show() else betaSheetState.hide()
     }
-    LaunchedEffect(betaSheetState) {
-        snapshotFlow { betaSheetState.currentValue }
-            .drop(1)
-            .filter { it == ModalBottomSheetValue.Hidden }
-            .collect { currentOnDismissBetaSheet() }
+    BackHandler(enabled = uiState.isBetaSheetVisible) {
+        onDismissBetaSheet()
     }
 
     ModalBottomSheetLayout(
         sheetState = betaSheetState,
         sheetShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
+        sheetBackgroundColor = theme.background,
         scrimColor = Color.Black.copy(alpha = 0.5f),
         sheetContent = {
             ChatBetaSheet(
