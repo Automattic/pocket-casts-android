@@ -471,6 +471,25 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `play pause during a quote ends it without restoring the previous position`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID, positionMs = 10_000)
+        playableState(quote)
+        viewModel.playQuote(quote.uuid)
+        advanceUntilIdle()
+
+        viewModel.onPlayPauseClick()
+        advanceUntilIdle()
+        playbackState.value = playbackState.value.copy(positionMs = 3_000)
+        advanceUntilIdle()
+
+        assertTrue(viewModel.uiState.value.messages.filterIsInstance<ChatMessage.Quote>().none { it.isPlaying })
+        verify(playbackManager).pause(transientLoss = false, sourceView = SourceView.EPISODE_DETAILS)
+        verify(playbackManager, never()).seekToTimeMsSuspend(org.mockito.kotlin.eq(10_000), anyOrNull())
+    }
+
+    @Test
     fun `playback progress is clamped and safe without a duration`() {
         assertEquals(0.25f, ChatPlayback(positionMs = 50, durationMs = 200).progress)
         assertEquals(1f, ChatPlayback(positionMs = 300, durationMs = 200).progress)

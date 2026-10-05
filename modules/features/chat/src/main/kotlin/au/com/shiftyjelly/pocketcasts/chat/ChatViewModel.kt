@@ -145,13 +145,21 @@ class ChatViewModel @Inject constructor(
     }
 
     fun onPlayPauseClick() {
-        if (_uiState.value.playback.isPlaying) {
-            playbackManager.pause(sourceView = sourceView)
-        } else {
-            viewModelScope.launch {
+        endQuoteWithoutRestoring()
+        viewModelScope.launch {
+            val playbackState = playbackManager.playbackStateFlow.first()
+            if (playbackState.episodeUuid == episodeUuid && playbackState.isPlaying) {
+                playbackManager.pause(sourceView = sourceView)
+            } else {
                 playbackManager.playNowSuspend(episodeUuid, sourceView = sourceView)
             }
         }
+    }
+
+    private fun endQuoteWithoutRestoring() {
+        val session = quotePlaybackSession ?: return
+        session.job?.cancel()
+        clearQuotePlaybackState(session)
     }
 
     private fun createChat(podcastUuid: String) {
