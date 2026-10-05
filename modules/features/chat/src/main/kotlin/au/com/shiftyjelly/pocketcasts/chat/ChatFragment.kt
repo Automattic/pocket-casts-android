@@ -143,7 +143,8 @@ class ChatFragment : BaseDialogFragment() {
     }
 
     private fun showSurveyIfEligible() {
-        if (parentFragmentManager.isStateSaved || !viewModel.consumeSurveyEligibility()) return
+        val isHostGoingAway = parentFragment?.isRemoving == true || activity?.isChangingConfigurations == true
+        if (isHostGoingAway || parentFragmentManager.isStateSaved || !viewModel.consumeSurveyEligibility()) return
         ChatSurveyFragment.show(
             fragmentManager = parentFragmentManager,
             episodeUuid = args.episodeUuid,
