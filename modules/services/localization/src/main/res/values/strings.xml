@@ -2566,6 +2566,7 @@
     <string name="chat_beta_sheet_body">Free for everyone while we test it. It\'ll become a Plus feature later.</string>
     <string name="chat_beta_note">Ask about this episode is in beta</string>
     <string name="chat_input_hint">Ask about this episode…</string>
+    <string name="chat_input_question_hint">Ask a question…</string>
     <string name="chat_welcome">Ask about anything in this episode. Or start here.</string>
     <string name="chat_suggestion_summarize">Summarize this episode</string>
     <string name="chat_ai_disclaimer">AI can make mistakes, so double-check it.</string>
