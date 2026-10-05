@@ -228,11 +228,6 @@ Language: nl
     <string name="chat_preview_ai_2">Deze aflevering duikt in de wetenschap van gewoontevorming en onderzoekt hoe kleine dagelijkse routines in de loop van de tijd tot grote veranderingen kunnen leiden.</string>
     <string name="chat_preview_user_1">Wat was het hoofdonderwerp van deze aflevering?</string>
     <string name="chat_preview_ai_1">Hallo! Ik ben er om je te helpen deze aflevering te verkennen. Vraag me iets over de besproken onderwerpen, belangrijke afhaalpunten of specifieke momenten.</string>
-    <string name="chat_episode_assistant">AFLEVERINGSASSISTENT</string>
-    <string name="chat_context_label_with_duration">Chat met deze aflevering · %1$s</string>
-    <string name="chat_input_hint">Vraag over deze aflevering…</string>
-    <string name="chat_thinking">AAN HET DENKEN</string>
-    <string name="chat_context_label">Aan het chatten met deze aflevering</string>
     <string name="chat_paywall_title">Chat met deze aflevering</string>
     <string name="episode_chat">Chat met aflevering</string>
     <string name="blogs_experiment_banner_body">Blogs is iets wat we uitproberen. Het kan zo blijven, opnieuw worden uitgedacht of stilletjes verdwijnen.</string>
