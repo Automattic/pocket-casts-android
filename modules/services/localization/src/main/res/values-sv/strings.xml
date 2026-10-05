@@ -224,15 +224,10 @@ Language: sv_SE
     <string name="chat_error_server">Något gick fel. Försök igen.</string>
     <string name="chat_clear">Rensa chatt</string>
     <string name="chat_send">Skicka</string>
-    <string name="chat_input_hint">Fråga om detta avsnitt …</string>
     <string name="chat_preview_user_2">Nämndes några praktiska tips?</string>
     <string name="chat_preview_ai_2">Detta avsnitt dyker in i vetenskapen om vanebildning och utforskar hur små dagliga rutiner kan leda till stora förändringar över tid.</string>
     <string name="chat_preview_user_1">Vilket var huvudämnet för detta avsnitt?</string>
     <string name="chat_preview_ai_1">Hej! Jag är här för att hjälpa dig att utforska detta avsnitt. Fråga mig vad som helst om de ämnen som diskuteras, viktiga saker att ta med sig eller specifika ögonblick.</string>
-    <string name="chat_thinking">TÄNKER</string>
-    <string name="chat_episode_assistant">AVSNITTSASSISTENT</string>
-    <string name="chat_context_label_with_duration">Chattar med detta avsnitt · %1$s</string>
-    <string name="chat_context_label">Chattar med detta avsnitt</string>
     <string name="chat_paywall_title">Chatta med detta avsnitt</string>
     <string name="episode_chat">Chatta med avsnitt</string>
     <string name="blogs_experiment_banner_body">Bloggar är något vi testar. Den kanske stannar kvar, omarbetas eller försvinner i tysthet.</string>
