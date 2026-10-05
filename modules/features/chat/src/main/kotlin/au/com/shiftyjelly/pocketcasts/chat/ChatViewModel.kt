@@ -20,6 +20,7 @@ import com.automattic.eventhorizon.EpisodeChatBetaSheetShownEvent
 import com.automattic.eventhorizon.EpisodeChatClearedEvent
 import com.automattic.eventhorizon.EpisodeChatDismissedEvent
 import com.automattic.eventhorizon.EpisodeChatErrorType
+import com.automattic.eventhorizon.EpisodeChatInputType
 import com.automattic.eventhorizon.EpisodeChatMessageFailedEvent
 import com.automattic.eventhorizon.EpisodeChatMessageSentEvent
 import com.automattic.eventhorizon.EpisodeChatQuotePlayTappedEvent
@@ -62,6 +63,7 @@ class ChatViewModel @Inject constructor(
     private var sendJob: Job? = null
     private var quotePlaybackSession: QuotePlaybackSession? = null
     private var transientUserMessage: ChatMessage.User? = null
+    private var transientInputType: EpisodeChatInputType = EpisodeChatInputType.Typed
     private lateinit var episodeUuid: String
     private lateinit var podcastUuid: String
     private lateinit var sourceView: SourceView
@@ -213,18 +215,18 @@ class ChatViewModel @Inject constructor(
         if (text.isEmpty()) return
 
         _uiState.update { it.copy(inputText = "") }
-        performSend(message = ChatMessage.User(text = text))
+        performSend(message = ChatMessage.User(text = text), inputType = EpisodeChatInputType.Typed)
     }
 
-    fun onSuggestionClick(text: String) {
+    fun onSummarizeClick(text: String) {
         val state = _uiState.value
         if (state.isAwaitingReply || !state.isConnected) return
-        performSend(message = ChatMessage.User(text = text))
+        performSend(message = ChatMessage.User(text = text), inputType = EpisodeChatInputType.SummaryPrompt)
     }
 
     fun retry() {
         val failedUserMessage = transientUserMessage ?: return
-        performSend(message = failedUserMessage)
+        performSend(message = failedUserMessage, inputType = transientInputType)
     }
 
     fun playQuote(quoteUuid: String) {
@@ -459,8 +461,9 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    private fun performSend(message: ChatMessage.User) {
+    private fun performSend(message: ChatMessage.User, inputType: EpisodeChatInputType) {
         transientUserMessage = message
+        transientInputType = inputType
         val currentMessages = _uiState.value.messages.filterNot { it.uuid == message.uuid }
 
         _uiState.update {
@@ -481,6 +484,7 @@ class ChatViewModel @Inject constructor(
                         episodeUuid = episodeUuid,
                         podcastUuid = podcastUuid,
                         messageLength = message.text.length.toLong(),
+                        inputType = inputType,
                     ),
                 )
             } catch (e: IOException) {

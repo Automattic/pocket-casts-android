@@ -106,7 +106,7 @@ class ChatFragment : BaseDialogFragment() {
                     onClickPlayPause = viewModel::onPlayPauseClick,
                     onInputTextChange = viewModel::onInputTextChange,
                     onSend = viewModel::onSend,
-                    onClickSuggestion = viewModel::onSuggestionClick,
+                    onClickSuggestion = viewModel::onSummarizeClick,
                     onRetry = viewModel::retry,
                     onPlayQuote = viewModel::playQuote,
                     onDismissBetaSheet = viewModel::dismissBetaSheet,

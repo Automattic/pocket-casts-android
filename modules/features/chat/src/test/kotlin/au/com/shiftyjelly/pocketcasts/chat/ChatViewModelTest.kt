@@ -22,6 +22,7 @@ import com.automattic.eventhorizon.EpisodeChatBetaSheetDismissedEvent
 import com.automattic.eventhorizon.EpisodeChatBetaSheetShownEvent
 import com.automattic.eventhorizon.EpisodeChatClearedEvent
 import com.automattic.eventhorizon.EpisodeChatErrorType
+import com.automattic.eventhorizon.EpisodeChatInputType
 import com.automattic.eventhorizon.EpisodeChatMessageFailedEvent
 import com.automattic.eventhorizon.EpisodeChatMessageSentEvent
 import com.automattic.eventhorizon.EpisodeChatShownEvent
@@ -207,12 +208,12 @@ class ChatViewModelTest {
     }
 
     @Test
-    fun `suggestion click sends the suggestion and keeps the typed input`() = runTest {
+    fun `summarize click sends the summary prompt and keeps the typed input`() = runTest {
         setEpisodeInfo()
         connectToInternet()
         viewModel.onInputTextChange("Draft")
 
-        viewModel.onSuggestionClick("Summarize this episode")
+        viewModel.onSummarizeClick("Summarize this episode")
         advanceUntilIdle()
 
         assertEquals(SendMessage(EPISODE_UUID, "Summarize this episode"), chatManager.sentMessages.single())
@@ -224,13 +225,14 @@ class ChatViewModelTest {
                 episodeUuid = EPISODE_UUID,
                 podcastUuid = PODCAST_UUID,
                 messageLength = "Summarize this episode".length.toLong(),
+                inputType = EpisodeChatInputType.SummaryPrompt,
             ),
             eventSink.pollEvent(),
         )
     }
 
     @Test
-    fun `suggestion click is ignored while awaiting a reply`() = runTest {
+    fun `summarize click is ignored while awaiting a reply`() = runTest {
         setEpisodeInfo()
         connectToInternet()
         val gate = CompletableDeferred<Unit>()
@@ -239,7 +241,7 @@ class ChatViewModelTest {
         viewModel.onSend()
         advanceUntilIdle()
 
-        viewModel.onSuggestionClick("Summarize this episode")
+        viewModel.onSummarizeClick("Summarize this episode")
         gate.complete(Unit)
         advanceUntilIdle()
 
@@ -247,12 +249,12 @@ class ChatViewModelTest {
     }
 
     @Test
-    fun `suggestion click is ignored while offline`() = runTest {
+    fun `summarize click is ignored while offline`() = runTest {
         setEpisodeInfo()
         networkConnectionWatcher.networkCapabilities.value = null
         advanceUntilIdle()
 
-        viewModel.onSuggestionClick("Summarize this episode")
+        viewModel.onSummarizeClick("Summarize this episode")
         advanceUntilIdle()
 
         assertTrue(chatManager.sentMessages.isEmpty())
@@ -293,6 +295,7 @@ class ChatViewModelTest {
                 episodeUuid = EPISODE_UUID,
                 podcastUuid = PODCAST_UUID,
                 messageLength = "Question".length.toLong(),
+                inputType = EpisodeChatInputType.Typed,
             ),
             eventSink.pollEvent(),
         )
@@ -353,6 +356,25 @@ class ChatViewModelTest {
                 message = "Last question",
             ),
             chatManager.sentMessages.single(),
+        )
+    }
+
+    @Test
+    fun `retry keeps the summarize input type`() = runTest {
+        setEpisodeInfo()
+        connectToInternet()
+        chatManager.sendMessageException = IOException()
+        viewModel.onSummarizeClick("Summarize this episode")
+        advanceUntilIdle()
+        chatManager.sendMessageException = null
+        eventSink.skipEvent(eventSink.size)
+
+        viewModel.retry()
+        advanceUntilIdle()
+
+        assertEquals(
+            EpisodeChatInputType.SummaryPrompt,
+            (eventSink.pollEvent() as EpisodeChatMessageSentEvent).inputType,
         )
     }
 
