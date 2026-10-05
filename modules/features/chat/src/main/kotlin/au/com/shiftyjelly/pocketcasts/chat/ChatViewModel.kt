@@ -64,6 +64,7 @@ class ChatViewModel @Inject constructor(
     private var quotePlaybackSession: QuotePlaybackSession? = null
     private var transientUserMessage: ChatMessage.User? = null
     private var transientInputType: EpisodeChatInputType = EpisodeChatInputType.Typed
+    private var hasReceivedAnswer = false
     private lateinit var episodeUuid: String
     private lateinit var podcastUuid: String
     private lateinit var sourceView: SourceView
@@ -479,6 +480,7 @@ class ChatViewModel @Inject constructor(
             try {
                 chatManager.sendMessage(episodeUuid, message, currentMessages)
                 transientUserMessage = null
+                hasReceivedAnswer = true
                 eventHorizon.track(
                     EpisodeChatMessageSentEvent(
                         source = sourceView.analyticsValue,
@@ -517,6 +519,12 @@ class ChatViewModel @Inject constructor(
                 podcastUuid = podcastUuid,
             ),
         )
+    }
+
+    fun consumeSurveyEligibility(): Boolean {
+        if (!hasReceivedAnswer || settings.episodeChatSurveySeen.value) return false
+        settings.episodeChatSurveySeen.set(true, updateModifiedAt = false)
+        return true
     }
 
     fun dismissBetaSheet() {
