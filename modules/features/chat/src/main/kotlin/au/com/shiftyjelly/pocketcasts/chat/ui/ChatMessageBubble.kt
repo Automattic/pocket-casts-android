@@ -23,101 +23,28 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
-import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
-internal fun ChatContextBubble(
-    episodeDurationMs: Int,
-    theme: ChatTheme,
-    modifier: Modifier = Modifier,
-) {
-    val context = LocalContext.current
-    val durationLabel = if (episodeDurationMs > 0) {
-        TimeHelper.getTimeDurationShortString(
-            timeMs = episodeDurationMs.toLong(),
-            context = context,
-            emptyString = "",
-        )
-    } else {
-        ""
-    }
-    Text(
-        text = if (durationLabel.isEmpty()) {
-            stringResource(LR.string.chat_context_label)
-        } else {
-            stringResource(LR.string.chat_context_label_with_duration, durationLabel)
-        },
-        color = theme.userBubble,
-        fontSize = 13.sp,
-        lineHeight = 18.sp,
-        fontWeight = FontWeight.SemiBold,
-        modifier = modifier
-            .background(theme.userBubble.copy(alpha = 0.12f), ChatContextShape)
-            .padding(horizontal = 14.dp, vertical = 8.dp),
-    )
-}
-
-@Composable
 internal fun AiMessageBubble(
     text: String,
-    podcastUuid: String,
     theme: ChatTheme,
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+    Text(
+        text = text,
+        color = theme.aiBubbleText,
+        fontSize = 15.sp,
+        lineHeight = 20.sp,
         modifier = modifier.fillMaxWidth(),
-    ) {
-        AssistantMessageTitle(
-            podcastUuid = podcastUuid,
-            theme = theme,
-        )
-        Text(
-            text = text,
-            color = theme.aiBubbleText,
-            fontSize = 16.sp,
-            lineHeight = 24.sp,
-            modifier = Modifier.widthIn(max = 300.dp),
-        )
-    }
-}
-
-@Composable
-private fun AssistantMessageTitle(
-    podcastUuid: String,
-    theme: ChatTheme,
-    modifier: Modifier = Modifier,
-) {
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(6.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier.fillMaxWidth(),
-    ) {
-        PodcastImage(
-            uuid = podcastUuid,
-            imageSize = 16.dp,
-            cornerSize = 8.dp,
-            elevation = null,
-        )
-        Text(
-            text = stringResource(LR.string.chat_episode_assistant),
-            color = theme.userBubble,
-            fontSize = 12.sp,
-            lineHeight = 16.sp,
-            fontWeight = FontWeight.Bold,
-            letterSpacing = 0.8.sp,
-        )
-    }
+    )
 }
 
 @Composable
@@ -205,15 +132,16 @@ internal fun UserMessageBubble(
         modifier = modifier.fillMaxWidth(),
     ) {
         val bubbleModifier = Modifier
-            .widthIn(max = 300.dp)
+            .widthIn(max = 250.dp)
+            .clip(UserBubbleShape)
             .then(if (allowRetry) Modifier.clickable(onClick = onRetry) else Modifier)
-            .background(theme.userBubble, UserBubbleShape)
-            .padding(horizontal = 14.dp, vertical = 10.dp)
+            .background(theme.userBubble)
+            .padding(horizontal = 16.dp, vertical = 10.dp)
         Text(
             text = text,
             color = theme.userBubbleText,
             fontSize = 15.sp,
-            lineHeight = 22.sp,
+            lineHeight = 20.sp,
             modifier = bubbleModifier,
         )
         if (allowRetry) {
@@ -253,8 +181,6 @@ internal fun ThinkingBubble(
     }
 }
 
-private val ChatContextShape = RoundedCornerShape(20.dp)
-
 private val QuoteCardShape = RoundedCornerShape(
     topStart = 4.dp,
     topEnd = 16.dp,
@@ -262,9 +188,4 @@ private val QuoteCardShape = RoundedCornerShape(
     bottomEnd = 16.dp,
 )
 
-private val UserBubbleShape = RoundedCornerShape(
-    topStart = 16.dp,
-    topEnd = 4.dp,
-    bottomStart = 16.dp,
-    bottomEnd = 16.dp,
-)
+private val UserBubbleShape = RoundedCornerShape(16.dp)
