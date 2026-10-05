@@ -39,6 +39,7 @@ internal fun ChatInputBar(
     onSend: () -> Unit,
     isConnected: Boolean,
     canSend: Boolean,
+    showBetaNote: Boolean,
     theme: ChatTheme,
     modifier: Modifier = Modifier,
 ) {
@@ -123,6 +124,15 @@ internal fun ChatInputBar(
                     modifier = Modifier.size(18.dp),
                 )
             }
+        }
+        if (showBetaNote) {
+            Text(
+                text = stringResource(LR.string.chat_beta_note),
+                color = theme.secondaryText,
+                fontSize = 12.sp,
+                lineHeight = 16.sp,
+                modifier = Modifier.padding(bottom = 8.dp),
+            )
         }
     }
 }

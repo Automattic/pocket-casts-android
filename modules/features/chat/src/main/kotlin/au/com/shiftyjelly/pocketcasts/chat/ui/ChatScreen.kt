@@ -189,6 +189,7 @@ private fun ChatContent(
             onSend = onSend,
             isConnected = uiState.isConnected,
             canSend = uiState.canSend,
+            showBetaNote = uiState.isBeta,
             theme = theme,
         )
     }
@@ -230,6 +231,7 @@ private fun ChatScreenPreview(
                 podcastUuid = "preview-podcast-uuid",
                 podcastTitle = "Pocket Casts Weekly",
                 episodeDurationMs = 3_600_000,
+                isBeta = true,
                 messages = listOf(
                     ChatMessage.User(
                         text = "What was the main point?",
