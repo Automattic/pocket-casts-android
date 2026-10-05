@@ -224,15 +224,10 @@ Language: ko_KR
     <string name="chat_error_server">문제가 발생했습니다. 다시 시도해 주세요.</string>
     <string name="chat_clear">채팅 지우기</string>
     <string name="chat_send">보내기</string>
-    <string name="chat_input_hint">이 에피소드에 대해 물어보기…</string>
     <string name="chat_preview_user_2">유용한 팁이 언급되었나요?</string>
     <string name="chat_preview_ai_2">이 에피소드에서는 습관 형성의 과학을 파고들며 일상적인 작은 습관이 시간이 지남에 따라 어떻게 큰 변화로 이어지는지 탐구합니다.</string>
     <string name="chat_preview_user_1">이 에피소드의 기본 주제는 무엇이었나요?</string>
     <string name="chat_preview_ai_1">안녕하세요! 이 에피소드 탐색을 도와드리겠습니다. 논의된 주제, 핵심 내용 또는 특정 순간에 대해 무엇이든 물어보세요.</string>
-    <string name="chat_thinking">생각 중</string>
-    <string name="chat_episode_assistant">에피소드 도우미</string>
-    <string name="chat_context_label_with_duration">이 에피소드로 채팅 중 · %1$s</string>
-    <string name="chat_context_label">이 에피소드로 채팅 중</string>
     <string name="chat_paywall_title">이 에피소드로 채팅</string>
     <string name="episode_chat">에피소드로 채팅</string>
     <string name="blogs_experiment_banner_body">블로그는 저희가 시도 중인 것 중 하나입니다. 계속 유지될 수도 있고, 개편될 수도 있고, 조용히 사라질 수도 있습니다.</string>
