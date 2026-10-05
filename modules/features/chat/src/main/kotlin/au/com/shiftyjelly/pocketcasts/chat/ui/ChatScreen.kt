@@ -160,7 +160,6 @@ private fun ChatContent(
                 when (message) {
                     is ChatMessage.Assistant -> AiMessageBubble(
                         text = message.displayText,
-                        podcastUuid = uiState.podcastUuid,
                         theme = theme,
                     )
 
