@@ -17,7 +17,6 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -125,19 +124,12 @@ internal fun ChatHeader(
                 )
             }
             IconButton(onClick = onClickPlayPause) {
-                if (playback.isPlaying) {
-                    Icon(
-                        painter = painterResource(IR.drawable.ic_widget_pause),
-                        contentDescription = stringResource(LR.string.pause),
-                        tint = theme.iconButton,
-                    )
-                } else {
-                    Icon(
-                        imageVector = Icons.Filled.PlayArrow,
-                        contentDescription = stringResource(LR.string.play),
-                        tint = theme.iconButton,
-                    )
-                }
+                Icon(
+                    painter = painterResource(if (playback.isPlaying) IR.drawable.ic_widget_pause else IR.drawable.ic_widget_play),
+                    contentDescription = stringResource(if (playback.isPlaying) LR.string.pause else LR.string.play),
+                    tint = theme.iconButton,
+                    modifier = Modifier.size(24.dp),
+                )
             }
         }
         Box(
