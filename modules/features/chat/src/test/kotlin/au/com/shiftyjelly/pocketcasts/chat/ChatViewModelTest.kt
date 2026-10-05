@@ -445,6 +445,32 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `play pause pauses when the chat episode is playing`() = runTest {
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID)
+        setEpisodeInfo(sourceView = SourceView.PLAYER)
+        advanceUntilIdle()
+
+        viewModel.onPlayPauseClick()
+        advanceUntilIdle()
+
+        verify(playbackManager).pause(transientLoss = false, sourceView = SourceView.PLAYER)
+        verify(playbackManager, never()).playNowSuspend(any<String>(), any(), any(), any())
+    }
+
+    @Test
+    fun `play pause plays the chat episode when it is not playing`() = runTest {
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = "other-uuid")
+        setEpisodeInfo(sourceView = SourceView.PLAYER)
+        advanceUntilIdle()
+
+        viewModel.onPlayPauseClick()
+        advanceUntilIdle()
+
+        verify(playbackManager).playNowSuspend(EPISODE_UUID, false, false, SourceView.PLAYER)
+        verify(playbackManager, never()).pause(any(), any())
+    }
+
+    @Test
     fun `playback progress is clamped and safe without a duration`() {
         assertEquals(0.25f, ChatPlayback(positionMs = 50, durationMs = 200).progress)
         assertEquals(1f, ChatPlayback(positionMs = 300, durationMs = 200).progress)
