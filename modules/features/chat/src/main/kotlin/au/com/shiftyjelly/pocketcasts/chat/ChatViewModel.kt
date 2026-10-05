@@ -217,7 +217,8 @@ class ChatViewModel @Inject constructor(
     }
 
     fun onSuggestionClick(text: String) {
-        if (_uiState.value.isAwaitingReply) return
+        val state = _uiState.value
+        if (state.isAwaitingReply || !state.isConnected) return
         performSend(message = ChatMessage.User(text = text))
     }
 

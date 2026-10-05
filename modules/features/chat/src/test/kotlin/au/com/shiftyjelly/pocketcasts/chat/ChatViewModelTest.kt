@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.chat
 
+import android.net.NetworkCapabilities
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
@@ -208,6 +209,7 @@ class ChatViewModelTest {
     @Test
     fun `suggestion click sends the suggestion and keeps the typed input`() = runTest {
         setEpisodeInfo()
+        connectToInternet()
         viewModel.onInputTextChange("Draft")
 
         viewModel.onSuggestionClick("Summarize this episode")
@@ -230,6 +232,7 @@ class ChatViewModelTest {
     @Test
     fun `suggestion click is ignored while awaiting a reply`() = runTest {
         setEpisodeInfo()
+        connectToInternet()
         val gate = CompletableDeferred<Unit>()
         chatManager.sendMessageGate = gate
         viewModel.onInputTextChange("First question")
@@ -241,6 +244,18 @@ class ChatViewModelTest {
         advanceUntilIdle()
 
         assertEquals(listOf(SendMessage(EPISODE_UUID, "First question")), chatManager.sentMessages)
+    }
+
+    @Test
+    fun `suggestion click is ignored while offline`() = runTest {
+        setEpisodeInfo()
+        networkConnectionWatcher.networkCapabilities.value = null
+        advanceUntilIdle()
+
+        viewModel.onSuggestionClick("Summarize this episode")
+        advanceUntilIdle()
+
+        assertTrue(chatManager.sentMessages.isEmpty())
     }
 
     @Test
@@ -546,6 +561,13 @@ class ChatViewModelTest {
         assertEquals(0f, ChatPlayback(positionMs = 300, durationMs = 0).progress)
     }
 
+    private fun TestScope.connectToInternet() {
+        networkConnectionWatcher.networkCapabilities.value = mock<NetworkCapabilities> {
+            on { hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) } doReturn true
+        }
+        advanceUntilIdle()
+    }
+
     private suspend fun verifyNoSeek() {
         verify(playbackManager, never()).playNowSuspend(any<BaseEpisode>(), any(), any(), any())
         verify(playbackManager, never()).seekToTimeMsSuspend(any(), anyOrNull())
@@ -654,7 +676,7 @@ class ChatViewModelTest {
     }
 
     private class TestNetworkConnectionWatcher : NetworkConnectionWatcher {
-        override val networkCapabilities: StateFlow<android.net.NetworkCapabilities?> = MutableStateFlow(null)
+        override val networkCapabilities = MutableStateFlow<NetworkCapabilities?>(null)
     }
 
     private class TestChatManager : ChatManager {
