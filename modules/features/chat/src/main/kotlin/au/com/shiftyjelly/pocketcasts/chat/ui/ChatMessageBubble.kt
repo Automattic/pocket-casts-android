@@ -2,9 +2,7 @@ package au.com.shiftyjelly.pocketcasts.chat.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
@@ -24,7 +22,6 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withLink
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
@@ -145,25 +142,12 @@ internal fun ThinkingBubble(
     theme: ChatTheme,
     modifier: Modifier = Modifier,
 ) {
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier.fillMaxWidth(),
-    ) {
-        Text(
-            text = stringResource(LR.string.chat_thinking),
-            color = theme.userBubble,
-            fontSize = 12.sp,
-            lineHeight = 16.sp,
-            fontWeight = FontWeight.Bold,
-            letterSpacing = 0.8.sp,
-        )
-        ChatTypingIndicator(
-            theme = theme,
-            showBubble = false,
-            dotColor = theme.secondaryText,
-        )
-    }
+    ChatTypingIndicator(
+        theme = theme,
+        showBubble = false,
+        dotColor = theme.secondaryText,
+        modifier = modifier,
+    )
 }
 
 private val UserBubbleShape = RoundedCornerShape(16.dp)
