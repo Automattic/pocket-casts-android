@@ -26,6 +26,7 @@ internal data class ChatTheme(
     val closeButtonBackground: Color,
     val progress: Color,
     val progressTrack: Color,
+    val chipBorder: Color,
 ) {
     companion object {
         fun default(colors: ThemeColors) = ChatTheme(
@@ -46,6 +47,7 @@ internal data class ChatTheme(
             closeButtonBackground = colors.primaryUi05,
             progress = colors.primaryInteractive01,
             progressTrack = colors.primaryUi05,
+            chipBorder = colors.primaryUi05,
         )
 
         fun player(colors: PlayerColors) = ChatTheme(
@@ -66,6 +68,7 @@ internal data class ChatTheme(
             closeButtonBackground = colors.contrast05,
             progress = colors.highlight01,
             progressTrack = colors.contrast05,
+            chipBorder = colors.contrast05,
         )
     }
 }
