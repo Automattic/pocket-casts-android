@@ -23,6 +23,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 internal fun ChatWelcome(
     isConversationStarted: Boolean,
+    isConnected: Boolean,
     onClickSuggestion: (String) -> Unit,
     theme: ChatTheme,
     modifier: Modifier = Modifier,
@@ -42,7 +43,7 @@ internal fun ChatWelcome(
         )
         ChatSuggestionChip(
             text = summarize,
-            enabled = !isConversationStarted,
+            enabled = !isConversationStarted && isConnected,
             onClick = { onClickSuggestion(summarize) },
             theme = theme,
         )
