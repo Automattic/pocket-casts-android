@@ -73,7 +73,7 @@ fun TvVideoTile(
                 modifier = Modifier.fillMaxSize(),
             )
 
-            if (videoPreviewUrl != null) {
+            if (videoPreviewUrl != null && rememberSupportsVideoPreviews()) {
                 var posterFrame by remember(videoPreviewUrl) { mutableStateOf<Bitmap?>(null) }
                 LaunchedEffect(videoPreviewUrl) {
                     posterFrame = TvVideoPreviewFrameLoader.frameFor(videoPreviewUrl)
@@ -86,14 +86,12 @@ fun TvVideoTile(
                         modifier = Modifier.fillMaxSize(),
                     )
                 }
-                if (rememberSupportsVideoPreviews()) {
-                    TvVideoPreviewPlayer(
-                        videoUrl = videoPreviewUrl,
-                        isFocused = isFocused,
-                        isPodcastPlaying = isPodcastPlaying,
-                        modifier = Modifier.fillMaxSize(),
-                    )
-                }
+                TvVideoPreviewPlayer(
+                    videoUrl = videoPreviewUrl,
+                    isFocused = isFocused,
+                    isPodcastPlaying = isPodcastPlaying,
+                    modifier = Modifier.fillMaxSize(),
+                )
             }
 
             Box(

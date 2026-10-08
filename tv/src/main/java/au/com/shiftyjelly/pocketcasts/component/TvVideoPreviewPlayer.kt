@@ -104,11 +104,18 @@ fun TvVideoPreviewPlayer(
 @Composable
 fun rememberSupportsVideoPreviews(): Boolean {
     val context = LocalContext.current
-    return remember(context) {
-        val activityManager = context.getSystemService<ActivityManager>() ?: return@remember false
-        val memoryInfo = ActivityManager.MemoryInfo().also(activityManager::getMemoryInfo)
-        !activityManager.isLowRamDevice && memoryInfo.totalMem >= MIN_PREVIEW_TOTAL_MEMORY_BYTES
-    }
+    return remember(context) { supportsVideoPreviews(context) }
+}
+
+private var cachedSupportsVideoPreviews: Boolean? = null
+
+private fun supportsVideoPreviews(context: Context): Boolean = cachedSupportsVideoPreviews ?: run {
+    val activityManager = context.getSystemService<ActivityManager>()
+    val memoryInfo = ActivityManager.MemoryInfo().also { activityManager?.getMemoryInfo(it) }
+    val supported = activityManager != null &&
+        !activityManager.isLowRamDevice &&
+        memoryInfo.totalMem >= MIN_PREVIEW_TOTAL_MEMORY_BYTES
+    supported.also { cachedSupportsVideoPreviews = it }
 }
 
 private fun createPreviewPlayer(
