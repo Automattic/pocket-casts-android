@@ -110,7 +110,7 @@ class TracksAnalyticsTracker @Inject constructor(
         ).plus(tvEventProperties()).mapKeys { it.key.analyticsKey }
     }
 
-    private fun tvEventProperties() = if (Util.isTv(appContext)) {
+    private fun tvEventProperties() = if (Util.getAppPlatform(appContext) == AppPlatform.Tv) {
         mapOf(PredefinedEventProperty.INSTALL_SOURCE to Util.getInstallSource(appContext).analyticsValue)
     } else {
         emptyMap()
