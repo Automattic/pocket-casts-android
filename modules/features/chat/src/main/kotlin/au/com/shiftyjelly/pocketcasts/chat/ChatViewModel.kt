@@ -24,6 +24,7 @@ import com.automattic.eventhorizon.EpisodeChatInputType
 import com.automattic.eventhorizon.EpisodeChatMessageFailedEvent
 import com.automattic.eventhorizon.EpisodeChatMessageSentEvent
 import com.automattic.eventhorizon.EpisodeChatQuotePlayTappedEvent
+import com.automattic.eventhorizon.EpisodeChatQuoteSourceType
 import com.automattic.eventhorizon.EpisodeChatQuoteStopTappedEvent
 import com.automattic.eventhorizon.EpisodeChatShownEvent
 import com.automattic.eventhorizon.EventHorizon
@@ -250,6 +251,7 @@ class ChatViewModel @Inject constructor(
                     source = sourceView.analyticsValue,
                     episodeUuid = episodeUuid,
                     podcastUuid = podcastUuid,
+                    quoteSource = EpisodeChatQuoteSourceType.InlineTimestamp,
                 ),
             )
             stopQuote()
@@ -259,6 +261,7 @@ class ChatViewModel @Inject constructor(
                     source = sourceView.analyticsValue,
                     episodeUuid = episodeUuid,
                     podcastUuid = podcastUuid,
+                    quoteSource = EpisodeChatQuoteSourceType.InlineTimestamp,
                 ),
             )
             startQuote(quote)

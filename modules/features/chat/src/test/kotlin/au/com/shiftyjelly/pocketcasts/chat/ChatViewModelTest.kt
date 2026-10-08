@@ -25,6 +25,9 @@ import com.automattic.eventhorizon.EpisodeChatErrorType
 import com.automattic.eventhorizon.EpisodeChatInputType
 import com.automattic.eventhorizon.EpisodeChatMessageFailedEvent
 import com.automattic.eventhorizon.EpisodeChatMessageSentEvent
+import com.automattic.eventhorizon.EpisodeChatQuotePlayTappedEvent
+import com.automattic.eventhorizon.EpisodeChatQuoteSourceType
+import com.automattic.eventhorizon.EpisodeChatQuoteStopTappedEvent
 import com.automattic.eventhorizon.EpisodeChatShownEvent
 import com.automattic.eventhorizon.EventHorizon
 import java.io.IOException
@@ -713,6 +716,39 @@ class ChatViewModelTest {
 
         verifyNoSeek()
         assertTrue(eventSink.isEmpty())
+    }
+
+    @Test
+    fun `playing and stopping a quote tracks the inline timestamp as the source`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID)
+        playableState(quote)
+        eventSink.skipEvent()
+
+        viewModel.playQuote(quote.uuid)
+        advanceUntilIdle()
+        viewModel.playQuote(quote.uuid)
+        advanceUntilIdle()
+
+        assertEquals(
+            EpisodeChatQuotePlayTappedEvent(
+                source = SourceView.EPISODE_DETAILS.analyticsValue,
+                episodeUuid = EPISODE_UUID,
+                podcastUuid = PODCAST_UUID,
+                quoteSource = EpisodeChatQuoteSourceType.InlineTimestamp,
+            ),
+            eventSink.pollEvent(),
+        )
+        assertEquals(
+            EpisodeChatQuoteStopTappedEvent(
+                source = SourceView.EPISODE_DETAILS.analyticsValue,
+                episodeUuid = EPISODE_UUID,
+                podcastUuid = PODCAST_UUID,
+                quoteSource = EpisodeChatQuoteSourceType.InlineTimestamp,
+            ),
+            eventSink.pollEvent(),
+        )
     }
 
     @Test
