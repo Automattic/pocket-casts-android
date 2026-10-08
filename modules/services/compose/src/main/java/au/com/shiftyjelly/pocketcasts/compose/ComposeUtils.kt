@@ -1,8 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.compose
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.platform.LocalView
 
 /**
  * Calls a function a single time. This can be useful for calling a
@@ -19,4 +21,16 @@ fun CallOnce(onCall: () -> Unit) {
         onCall()
     }
     shown.value = true
+}
+
+@Composable
+fun KeepScreenOnEffect(keepOn: Boolean) {
+    val view = LocalView.current
+    DisposableEffect(keepOn) {
+        val previousKeepScreenOn = view.keepScreenOn
+        view.keepScreenOn = keepOn
+        onDispose {
+            view.keepScreenOn = previousKeepScreenOn
+        }
+    }
 }
