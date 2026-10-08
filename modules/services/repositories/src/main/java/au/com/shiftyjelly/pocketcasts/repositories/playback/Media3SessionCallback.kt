@@ -61,6 +61,7 @@ internal class Media3SessionCallback(
     private val bookmarkHelper: BookmarkHelper,
     private val scopeProvider: () -> CoroutineScope,
     private val contextProvider: () -> Context,
+    private val isTv: Boolean = false,
     private val source: SourceView = SourceView.MEDIA_BUTTON_BROADCAST_ACTION,
     internal val commandMutex: Mutex = Mutex(),
 ) : MediaSession.Callback {
@@ -78,6 +79,7 @@ internal class Media3SessionCallback(
             }
         },
         isPlaying = { playbackManager.isPlaying() },
+        togglesImmediately = isTv,
     )
 
     override fun onConnect(

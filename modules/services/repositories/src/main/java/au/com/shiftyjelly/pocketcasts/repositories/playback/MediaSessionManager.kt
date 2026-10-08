@@ -360,6 +360,7 @@ class MediaSessionManager(
             bookmarkHelper = bookmarkHelper,
             scopeProvider = { scope },
             contextProvider = { context },
+            isTv = isTv,
             commandMutex = commandMutex,
         )
         media3LibraryCallback = Media3LibrarySessionCallback(
@@ -1252,6 +1253,7 @@ class MediaSessionManager(
                 }
             },
             isPlaying = { playbackManager.isPlaying() },
+            togglesImmediately = isTv,
         )
 
         override fun onMediaButtonEvent(mediaButtonEvent: Intent): Boolean {

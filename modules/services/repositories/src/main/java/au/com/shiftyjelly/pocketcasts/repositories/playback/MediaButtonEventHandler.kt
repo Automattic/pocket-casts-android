@@ -25,6 +25,7 @@ internal class MediaButtonEventHandler(
     private val onImmediatePlay: () -> Unit,
     private val onMediaEvent: (MediaEvent) -> Unit,
     private val isPlaying: () -> Boolean,
+    private val togglesImmediately: Boolean = false,
     private val onError: (Exception) -> Unit = {
         LogBuffer.e(LogBuffer.TAG_PLAYBACK, it, "Media button event handling failed")
     },
@@ -51,6 +52,11 @@ internal class MediaButtonEventHandler(
             else -> null
         } ?: return false
 
+        if (togglesImmediately && keyEvent.keyCode in TOGGLE_KEY_CODES) {
+            dispatch { MediaEvent.SingleTap }
+            return true
+        }
+
         // While playback runs the device stays awake and the tap window keeps its timing, so toggle keys can still
         // wait for it. While paused the device can suspend mid-window, and a toggle tap can only mean play.
         val resolvesToImmediatePlay = when (keyEvent.keyCode) {
@@ -66,13 +72,20 @@ internal class MediaButtonEventHandler(
 
         // Register the event on the caller's stack where possible, so delivery order is usually preserved.
         // Overlapping events contend on the queue's mutex and finish registering on the provided scope.
+        dispatch {
+            mediaEventQueue.consumeEvent(
+                event = inputEvent,
+                onImmediateSingleTap = immediateSingleTapHandler,
+            )
+        }
+        return true
+    }
+
+    private fun dispatch(resolveEvent: suspend () -> MediaEvent?) {
         scope.launch(start = CoroutineStart.UNDISPATCHED) {
             try {
                 coroutineContext.ensureActive()
-                val outputEvent = mediaEventQueue.consumeEvent(
-                    event = inputEvent,
-                    onImmediateSingleTap = immediateSingleTapHandler,
-                )
+                val outputEvent = resolveEvent()
                 if (outputEvent != null) {
                     // Output actions historically ran asynchronously on the callback scope.
                     yield()
@@ -84,7 +97,6 @@ internal class MediaButtonEventHandler(
                 onError(e)
             }
         }
-        return true
     }
 
     private fun handleImmediatePlay(): Boolean {
@@ -98,5 +110,9 @@ internal class MediaButtonEventHandler(
             onError(e)
             false
         }
+    }
+
+    private companion object {
+        val TOGGLE_KEY_CODES = setOf(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE, KeyEvent.KEYCODE_HEADSETHOOK)
     }
 }
