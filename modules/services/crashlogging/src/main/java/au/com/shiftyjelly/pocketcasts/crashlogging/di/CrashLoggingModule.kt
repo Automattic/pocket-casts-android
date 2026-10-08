@@ -9,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.crashlogging.ContextBasedLocaleProvider
 import au.com.shiftyjelly.pocketcasts.crashlogging.FilteringCrashLogging
 import au.com.shiftyjelly.pocketcasts.crashlogging.LocaleProvider
 import au.com.shiftyjelly.pocketcasts.crashlogging.PocketCastsCrashLoggingDataProvider
+import au.com.shiftyjelly.pocketcasts.utils.Util
 import com.automattic.android.tracks.crashlogging.CrashLogging
 import com.automattic.android.tracks.crashlogging.CrashLoggingProvider
 import com.automattic.encryptedlogging.EncryptedLogging
@@ -40,9 +41,10 @@ abstract class CrashLoggingModule {
         }
 
         @Provides
-        fun provideBuildDataProvider(): BuildDataProvider {
+        fun provideBuildDataProvider(@ApplicationContext context: Context): BuildDataProvider {
             return object : BuildDataProvider {
                 override val buildPlatform: String = BuildConfig.BUILD_PLATFORM
+                override val installSource: String? = if (Util.isTv(context)) Util.getInstallSource(context).analyticsValue else null
             }
         }
 

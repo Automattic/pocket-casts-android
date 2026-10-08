@@ -27,9 +27,10 @@ internal class PocketCastsCrashLoggingDataProvider @Inject constructor(
 ) : CrashLoggingDataProvider {
 
     override val applicationContextProvider: Flow<Map<String, String>> = flowOf(
-        mapOf(
+        listOfNotNull(
             GLOBAL_TAG_APP_PLATFORM to BuildConfig.BUILD_PLATFORM,
-        ),
+            buildDataProvider.installSource?.let { GLOBAL_TAG_INSTALL_SOURCE to it },
+        ).toMap(),
     )
 
     override val buildType: String = BuildConfig.BUILD_TYPE
@@ -96,6 +97,7 @@ internal class PocketCastsCrashLoggingDataProvider @Inject constructor(
 
     companion object {
         const val GLOBAL_TAG_APP_PLATFORM = "app.platform"
+        const val GLOBAL_TAG_INSTALL_SOURCE = "app.install_source"
         const val MOBILE_ERROR_SAMPLING = 0.3
         const val EXTRA_UUID = "uuid"
     }
