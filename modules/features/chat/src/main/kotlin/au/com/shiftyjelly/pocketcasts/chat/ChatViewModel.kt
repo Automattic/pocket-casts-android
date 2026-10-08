@@ -34,12 +34,14 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -59,6 +61,9 @@ class ChatViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(ChatUiState())
     val uiState = _uiState.asStateFlow()
+
+    private val _feedbackThanks = Channel<Unit>(Channel.CONFLATED)
+    val feedbackThanks = _feedbackThanks.receiveAsFlow()
 
     private var sendJob: Job? = null
     private var quotePlaybackSession: QuotePlaybackSession? = null
@@ -532,7 +537,14 @@ class ChatViewModel @Inject constructor(
             }
             state.copy(answerRatings = ratings)
         }
+        if (newRating == ChatAnswerRating.Positive) {
+            showFeedbackThanks()
+        }
         return newRating
+    }
+
+    fun showFeedbackThanks() {
+        _feedbackThanks.trySend(Unit)
     }
 
     fun consumeSurveyEligibility(): Boolean {

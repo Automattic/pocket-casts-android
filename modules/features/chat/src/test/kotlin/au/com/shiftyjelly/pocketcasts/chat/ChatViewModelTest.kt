@@ -445,6 +445,31 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `a thumbs up thanks the user`() = runTest {
+        setEpisodeInfo()
+
+        viewModel.feedbackThanks.test {
+            viewModel.rateAnswer("answer-uuid", ChatAnswerRating.Positive)
+
+            awaitItem()
+        }
+    }
+
+    @Test
+    fun `a thumbs down or a cleared rating does not thank the user`() = runTest {
+        setEpisodeInfo()
+        viewModel.rateAnswer("first-answer", ChatAnswerRating.Positive)
+
+        viewModel.feedbackThanks.test {
+            awaitItem()
+            viewModel.rateAnswer("first-answer", ChatAnswerRating.Positive)
+            viewModel.rateAnswer("second-answer", ChatAnswerRating.Negative)
+
+            expectNoEvents()
+        }
+    }
+
+    @Test
     fun `clear chat removes the ratings`() = runTest {
         setEpisodeInfo()
         viewModel.rateAnswer("answer-uuid", ChatAnswerRating.Positive)
