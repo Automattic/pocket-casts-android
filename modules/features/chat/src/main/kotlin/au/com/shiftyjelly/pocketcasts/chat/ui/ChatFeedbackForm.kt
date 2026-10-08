@@ -1,6 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.chat.ui
 
 import androidx.annotation.StringRes
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -100,7 +105,11 @@ internal fun ChatFeedbackForm(
                 )
             }
         }
-        if (showDetails) {
+        AnimatedVisibility(
+            visible = showDetails,
+            enter = expandVertically() + fadeIn(),
+            exit = shrinkVertically() + fadeOut(),
+        ) {
             DetailsField(
                 details = details,
                 onDetailsChange = onDetailsChange,
