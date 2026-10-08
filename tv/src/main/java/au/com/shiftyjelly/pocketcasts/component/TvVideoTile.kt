@@ -86,12 +86,14 @@ fun TvVideoTile(
                         modifier = Modifier.fillMaxSize(),
                     )
                 }
-                TvVideoPreviewPlayer(
-                    videoUrl = videoPreviewUrl,
-                    isFocused = isFocused,
-                    isPodcastPlaying = isPodcastPlaying,
-                    modifier = Modifier.fillMaxSize(),
-                )
+                if (rememberSupportsVideoPreviews()) {
+                    TvVideoPreviewPlayer(
+                        videoUrl = videoPreviewUrl,
+                        isFocused = isFocused,
+                        isPodcastPlaying = isPodcastPlaying,
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                }
             }
 
             Box(
