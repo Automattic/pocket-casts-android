@@ -15,6 +15,11 @@ class InstallSourceTest {
     }
 
     @Test
+    fun `maps other Amazon installers to Amazon Appstore`() {
+        assertEquals(InstallSource.AmazonAppstore, InstallSource.fromInstallerPackageName("com.amazon.mShop.android"))
+    }
+
+    @Test
     fun `maps other installers to other`() {
         assertEquals(InstallSource.Other, InstallSource.fromInstallerPackageName("com.android.shell"))
     }

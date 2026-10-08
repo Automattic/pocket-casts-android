@@ -18,10 +18,10 @@ enum class InstallSource(
     ;
 
     companion object {
-        fun fromInstallerPackageName(packageName: String?) = when (packageName) {
-            "com.android.vending" -> GooglePlay
-            "com.amazon.venezia" -> AmazonAppstore
-            null -> Unknown
+        fun fromInstallerPackageName(packageName: String?) = when {
+            packageName == null -> Unknown
+            packageName == "com.android.vending" -> GooglePlay
+            packageName.startsWith("com.amazon.") -> AmazonAppstore
             else -> Other
         }
     }
