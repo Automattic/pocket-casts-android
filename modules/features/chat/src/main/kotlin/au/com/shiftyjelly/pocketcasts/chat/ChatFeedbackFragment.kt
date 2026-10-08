@@ -12,6 +12,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.toArgb
 import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
@@ -38,6 +39,7 @@ class ChatFeedbackFragment : BaseDialogFragment() {
     companion object {
         private const val ARGS_KEY = "chat_feedback_args"
         private const val TAG = "episode_chat_feedback"
+        const val SUBMITTED_RESULT_KEY = "episode_chat_feedback_submitted"
 
         fun show(
             fragmentManager: FragmentManager,
@@ -58,6 +60,7 @@ class ChatFeedbackFragment : BaseDialogFragment() {
 
     enum class Trigger(val analyticsValue: EpisodeChatFeedbackTriggerType) {
         SessionSurvey(EpisodeChatFeedbackTriggerType.SessionSurvey),
+        ResponseRating(EpisodeChatFeedbackTriggerType.ResponseRating),
     }
 
     private val args get() = requireArguments().requireParcelable<Args>(ARGS_KEY)
@@ -106,7 +109,11 @@ class ChatFeedbackFragment : BaseDialogFragment() {
 
     private fun submit() {
         if (viewModel.submit()) {
-            showChatFeedbackThanks()
+            if (args.trigger == Trigger.ResponseRating) {
+                setFragmentResult(SUBMITTED_RESULT_KEY, Bundle.EMPTY)
+            } else {
+                showChatFeedbackThanks()
+            }
             dismiss()
         }
     }
