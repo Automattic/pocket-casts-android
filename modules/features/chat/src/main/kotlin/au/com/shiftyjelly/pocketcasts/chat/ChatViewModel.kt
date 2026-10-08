@@ -26,7 +26,9 @@ import com.automattic.eventhorizon.EpisodeChatMessageSentEvent
 import com.automattic.eventhorizon.EpisodeChatQuotePlayTappedEvent
 import com.automattic.eventhorizon.EpisodeChatQuoteSourceType
 import com.automattic.eventhorizon.EpisodeChatQuoteStopTappedEvent
+import com.automattic.eventhorizon.EpisodeChatResponseRatedEvent
 import com.automattic.eventhorizon.EpisodeChatResponseReceivedEvent
+import com.automattic.eventhorizon.EpisodeChatSentimentType
 import com.automattic.eventhorizon.EpisodeChatShownEvent
 import com.automattic.eventhorizon.EventHorizon
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -557,10 +559,32 @@ class ChatViewModel @Inject constructor(
             }
             state.copy(answerRatings = ratings)
         }
+        if (newRating != null) {
+            trackAnswerRated(answerUuid, newRating)
+        }
         if (newRating == ChatAnswerRating.Positive) {
             _feedbackThanks.trySend(Unit)
         }
         return newRating
+    }
+
+    private fun trackAnswerRated(answerUuid: String, rating: ChatAnswerRating) {
+        val messages = _uiState.value.messages
+        val answerIndex = messages.indexOfFirst { it.uuid == answerUuid }
+        val messageIndex = if (answerIndex >= 0) {
+            messages.subList(0, answerIndex).count { it is ChatMessage.User }.toLong()
+        } else {
+            null
+        }
+        eventHorizon.track(
+            EpisodeChatResponseRatedEvent(
+                source = sourceView.analyticsValue,
+                episodeUuid = episodeUuid,
+                podcastUuid = podcastUuid,
+                rating = rating.analyticsValue,
+                messageIndex = messageIndex,
+            ),
+        )
     }
 
     fun onFeedbackSubmitted() {
@@ -694,9 +718,9 @@ data class ChatUiState(
         }
 }
 
-enum class ChatAnswerRating {
-    Positive,
-    Negative,
+enum class ChatAnswerRating(val analyticsValue: EpisodeChatSentimentType) {
+    Positive(EpisodeChatSentimentType.Positive),
+    Negative(EpisodeChatSentimentType.Negative),
 }
 
 data class ChatPlayback(
