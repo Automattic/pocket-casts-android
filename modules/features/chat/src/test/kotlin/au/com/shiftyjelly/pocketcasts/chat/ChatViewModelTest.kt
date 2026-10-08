@@ -234,6 +234,7 @@ class ChatViewModelTest {
                 podcastUuid = PODCAST_UUID,
                 messageLength = "Summarize this episode".length.toLong(),
                 inputType = EpisodeChatInputType.SummaryPrompt,
+                messageIndex = 1,
             ),
             eventSink.pollEvent(),
         )
@@ -317,6 +318,7 @@ class ChatViewModelTest {
                 podcastUuid = PODCAST_UUID,
                 messageLength = "Question".length.toLong(),
                 inputType = EpisodeChatInputType.Typed,
+                messageIndex = 1,
             ),
             eventSink.pollEvent(),
         )
@@ -508,6 +510,53 @@ class ChatViewModelTest {
         )
 
         assertEquals(mapOf(1 to "a1"), state.answerUuidsByLastIndex)
+    }
+
+    @Test
+    fun `message index counts the questions in the conversation`() = runTest {
+        setEpisodeInfo()
+
+        sendQuestion("First")
+        sendQuestion("Second")
+
+        assertEquals(listOf(1L, 2L), eventSink.messageIndexes())
+    }
+
+    @Test
+    fun `message index continues from the stored conversation`() = runTest {
+        chatManager.messages.value = listOf(ChatMessage.User("Earlier"), ChatMessage.Assistant("Answer"))
+        setEpisodeInfo()
+        advanceUntilIdle()
+
+        sendQuestion("Next")
+
+        assertEquals(listOf(2L), eventSink.messageIndexes())
+    }
+
+    @Test
+    fun `message index restarts after clearing the chat`() = runTest {
+        setEpisodeInfo()
+        sendQuestion("First")
+
+        viewModel.clearChat()
+        advanceUntilIdle()
+        sendQuestion("Again")
+
+        assertEquals(listOf(1L, 1L), eventSink.messageIndexes())
+    }
+
+    @Test
+    fun `retry keeps the message index`() = runTest {
+        setEpisodeInfo()
+        sendQuestion("First")
+        chatManager.sendMessageException = IOException()
+        sendQuestion("Second")
+        chatManager.sendMessageException = null
+
+        viewModel.retry()
+        advanceUntilIdle()
+
+        assertEquals(listOf(1L, 2L), eventSink.messageIndexes())
     }
 
     @Test
@@ -774,6 +823,16 @@ class ChatViewModelTest {
             on { hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) } doReturn true
         }
         advanceUntilIdle()
+    }
+
+    private fun TestScope.sendQuestion(text: String) {
+        viewModel.onInputTextChange(text)
+        viewModel.onSend()
+        advanceUntilIdle()
+    }
+
+    private fun TestEventSink.messageIndexes(): List<Long?> {
+        return List(size) { pollEvent() }.filterIsInstance<EpisodeChatMessageSentEvent>().map { it.messageIndex }
     }
 
     private suspend fun verifyNoSeek() {
