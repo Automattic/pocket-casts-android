@@ -63,6 +63,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -1318,6 +1319,20 @@ class TvHomeViewModelTest {
         createViewModel().trackBannerTapped(TvDiscoverBanner.DiscoverMore)
 
         verify(eventHorizon).track(BannerRowTappedEvent(type = "discover_more"))
+    }
+
+    @Test
+    fun `podcast audio is active while playing or paused by a transient focus loss`() {
+        val viewModel = createViewModel()
+
+        whenever(playbackManager.playbackStateRelay).thenReturn(BehaviorRelay.createDefault(PlaybackState(state = PlaybackState.State.PLAYING)))
+        assertTrue(viewModel.isPodcastAudioActive())
+
+        whenever(playbackManager.playbackStateRelay).thenReturn(BehaviorRelay.createDefault(PlaybackState(state = PlaybackState.State.PAUSED, transientLoss = true)))
+        assertTrue(viewModel.isPodcastAudioActive())
+
+        whenever(playbackManager.playbackStateRelay).thenReturn(BehaviorRelay.createDefault(PlaybackState(state = PlaybackState.State.PAUSED)))
+        assertFalse(viewModel.isPodcastAudioActive())
     }
 
     @Test
