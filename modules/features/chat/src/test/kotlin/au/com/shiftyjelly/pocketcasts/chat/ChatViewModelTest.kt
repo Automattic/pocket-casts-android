@@ -456,7 +456,7 @@ class ChatViewModelTest {
     }
 
     @Test
-    fun `a thumbs down or a cleared rating does not thank the user`() = runTest {
+    fun `a thumbs down, a switch to thumbs down or a cleared rating does not thank the user`() = runTest {
         setEpisodeInfo()
         viewModel.rateAnswer("first-answer", ChatAnswerRating.Positive)
 
@@ -464,6 +464,9 @@ class ChatViewModelTest {
             awaitItem()
             viewModel.rateAnswer("first-answer", ChatAnswerRating.Positive)
             viewModel.rateAnswer("second-answer", ChatAnswerRating.Negative)
+            viewModel.rateAnswer("third-answer", ChatAnswerRating.Positive)
+            awaitItem()
+            viewModel.rateAnswer("third-answer", ChatAnswerRating.Negative)
 
             expectNoEvents()
         }

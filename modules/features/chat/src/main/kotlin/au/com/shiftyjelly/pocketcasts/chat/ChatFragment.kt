@@ -32,6 +32,7 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.parcelize.Parcelize
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -100,7 +101,10 @@ class ChatFragment : BaseDialogFragment() {
         val snackbarHostState = remember { SnackbarHostState() }
         val thanksMessage = stringResource(LR.string.chat_feedback_thanks)
         LaunchedEffect(snackbarHostState) {
-            viewModel.feedbackThanks.collect { snackbarHostState.showSnackbar(thanksMessage) }
+            viewModel.feedbackThanks.collectLatest {
+                snackbarHostState.currentSnackbarData?.dismiss()
+                snackbarHostState.showSnackbar(thanksMessage)
+            }
         }
 
         AppTheme(theme.activeTheme) {
