@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.playback
 import android.media.AudioDeviceInfo
 import android.media.AudioManager
 import androidx.core.content.getSystemService
+import java.util.concurrent.TimeUnit
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -23,7 +24,9 @@ class AudioNoisyManagerTest {
 
     private var noisyCount = 0
     private val listener = object : AudioNoisyManager.AudioBecomingNoisyListener {
-        override fun onAudioBecomingNoisy() {
+        override fun onAudioBecomingNoisy() = Unit
+
+        override fun onHdmiAudioDisconnected() {
             noisyCount++
         }
     }
@@ -35,6 +38,39 @@ class AudioNoisyManagerTest {
         removeOutputDevice(hdmiDevice)
 
         assertEquals(1, noisyCount)
+    }
+
+    @Test
+    fun `HDMI disconnect waits before it is reported`() {
+        AudioNoisyManager(context, pausesOnHdmiDisconnect = true).register(listener)
+
+        shadowAudioManager.addOutputDevice(hdmiDevice, false)
+        shadowAudioManager.removeOutputDevice(hdmiDevice, true)
+        ShadowLooper.idleMainLooper(999, TimeUnit.MILLISECONDS)
+
+        assertEquals(0, noisyCount)
+    }
+
+    @Test
+    fun `HDMI reconnecting within the delay is not reported`() {
+        AudioNoisyManager(context, pausesOnHdmiDisconnect = true).register(listener)
+
+        shadowAudioManager.addOutputDevice(hdmiDevice, false)
+        shadowAudioManager.removeOutputDevice(hdmiDevice, true)
+        shadowAudioManager.addOutputDevice(hdmiDevice, true)
+        ShadowLooper.idleMainLooper(2, TimeUnit.SECONDS)
+
+        assertEquals(0, noisyCount)
+    }
+
+    @Test
+    fun `HDMI ARC and eARC disconnects are reported`() {
+        AudioNoisyManager(context, pausesOnHdmiDisconnect = true).register(listener)
+
+        removeOutputDevice(outputDevice(AudioDeviceInfo.TYPE_HDMI_ARC))
+        removeOutputDevice(outputDevice(AudioDeviceInfo.TYPE_HDMI_EARC))
+
+        assertEquals(2, noisyCount)
     }
 
     @Test
@@ -83,6 +119,6 @@ class AudioNoisyManagerTest {
     private fun removeOutputDevice(device: AudioDeviceInfo) {
         shadowAudioManager.addOutputDevice(device, false)
         shadowAudioManager.removeOutputDevice(device, true)
-        ShadowLooper.idleMainLooper()
+        ShadowLooper.idleMainLooper(2, TimeUnit.SECONDS)
     }
 }

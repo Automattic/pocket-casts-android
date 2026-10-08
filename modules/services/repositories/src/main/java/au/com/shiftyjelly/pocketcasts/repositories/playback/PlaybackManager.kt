@@ -2084,6 +2084,12 @@ open class PlaybackManager @Inject constructor(
         focusWasPlaying = null
     }
 
+    override fun onHdmiAudioDisconnected() {
+        if (isPlaying()) {
+            onAudioBecomingNoisy()
+        }
+    }
+
     /**
      * Check the player is initialised and if we are using the correct player either the system or cast player.
      */

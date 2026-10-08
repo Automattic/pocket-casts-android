@@ -29,10 +29,21 @@ open class AudioNoisyManager(
         }
     }
 
+    private val mainHandler = Handler(Looper.getMainLooper())
+
+    private val hdmiDisconnected = Runnable { listener?.onHdmiAudioDisconnected() }
+
     private val hdmiDeviceCallback = object : AudioDeviceCallback() {
+        override fun onAudioDevicesAdded(addedDevices: Array<out AudioDeviceInfo>) {
+            if (addedDevices.any(::isHdmiSink)) {
+                mainHandler.removeCallbacks(hdmiDisconnected)
+            }
+        }
+
         override fun onAudioDevicesRemoved(removedDevices: Array<out AudioDeviceInfo>) {
-            if (removedDevices.any { it.isSink && it.type in HDMI_DEVICE_TYPES }) {
-                listener?.onAudioBecomingNoisy()
+            if (removedDevices.any(::isHdmiSink)) {
+                mainHandler.removeCallbacks(hdmiDisconnected)
+                mainHandler.postDelayed(hdmiDisconnected, HDMI_DISCONNECT_DELAY_MS)
             }
         }
     }
@@ -45,7 +56,7 @@ open class AudioNoisyManager(
         receiverRegistered = true
         context.registerReceiver(broadcastReceiver, intentFilter)
         if (pausesOnHdmiDisconnect) {
-            context.getSystemService<AudioManager>()?.registerAudioDeviceCallback(hdmiDeviceCallback, Handler(Looper.getMainLooper()))
+            context.getSystemService<AudioManager>()?.registerAudioDeviceCallback(hdmiDeviceCallback, mainHandler)
         }
     }
 
@@ -59,15 +70,22 @@ open class AudioNoisyManager(
             }
             if (pausesOnHdmiDisconnect) {
                 context.getSystemService<AudioManager>()?.unregisterAudioDeviceCallback(hdmiDeviceCallback)
+                mainHandler.removeCallbacks(hdmiDisconnected)
             }
         }
     }
 
+    private fun isHdmiSink(device: AudioDeviceInfo) = device.isSink && device.type in HDMI_DEVICE_TYPES
+
     interface AudioBecomingNoisyListener {
         fun onAudioBecomingNoisy()
+
+        fun onHdmiAudioDisconnected()
     }
 
     private companion object {
+        const val HDMI_DISCONNECT_DELAY_MS = 1_000L
+
         val HDMI_DEVICE_TYPES = setOf(
             AudioDeviceInfo.TYPE_HDMI,
             AudioDeviceInfo.TYPE_HDMI_ARC,
