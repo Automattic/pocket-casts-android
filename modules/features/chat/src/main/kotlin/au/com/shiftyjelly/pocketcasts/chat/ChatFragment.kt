@@ -109,6 +109,7 @@ class ChatFragment : BaseDialogFragment() {
                     onClickSuggestion = viewModel::onSummarizeClick,
                     onRetry = viewModel::retry,
                     onPlayQuote = viewModel::playQuote,
+                    onRateAnswer = { answerUuid, rating -> viewModel.rateAnswer(answerUuid, rating) },
                     onDismissBetaSheet = viewModel::dismissBetaSheet,
                     modifier = Modifier.fillMaxSize(),
                 )

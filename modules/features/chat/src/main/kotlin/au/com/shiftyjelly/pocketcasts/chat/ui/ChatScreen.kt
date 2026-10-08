@@ -31,6 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import au.com.shiftyjelly.pocketcasts.chat.ChatAnswerRating
 import au.com.shiftyjelly.pocketcasts.chat.ChatError
 import au.com.shiftyjelly.pocketcasts.chat.ChatUiState
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
@@ -52,6 +53,7 @@ fun ChatScreen(
     onClickSuggestion: (String) -> Unit,
     onRetry: () -> Unit,
     onPlayQuote: (quoteUuid: String) -> Unit,
+    onRateAnswer: (answerUuid: String, rating: ChatAnswerRating) -> Unit,
     onDismissBetaSheet: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -97,6 +99,7 @@ fun ChatScreen(
             onClickSuggestion = onClickSuggestion,
             onRetry = onRetry,
             onPlayQuote = onPlayQuote,
+            onRateAnswer = onRateAnswer,
         )
     }
 }
@@ -113,6 +116,7 @@ private fun ChatContent(
     onClickSuggestion: (String) -> Unit,
     onRetry: () -> Unit,
     onPlayQuote: (quoteUuid: String) -> Unit,
+    onRateAnswer: (answerUuid: String, rating: ChatAnswerRating) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
@@ -159,6 +163,7 @@ private fun ChatContent(
                     theme = theme,
                 )
             }
+            val answerUuidsByLastIndex = uiState.answerUuidsByLastIndex
             uiState.messages.forEachIndexed { index, message ->
                 when (message) {
                     is ChatMessage.Assistant -> AiMessageBubble(
@@ -180,6 +185,13 @@ private fun ChatContent(
                         theme = theme,
                         allowRetry = index == uiState.messages.lastIndex && uiState.error != null,
                         onRetry = onRetry,
+                    )
+                }
+                answerUuidsByLastIndex[index]?.let { answerUuid ->
+                    ChatAnswerRatingRow(
+                        rating = uiState.answerRatings[answerUuid],
+                        onRate = { rating -> onRateAnswer(answerUuid, rating) },
+                        theme = theme,
                     )
                 }
             }
@@ -283,6 +295,7 @@ private fun ChatScreenPreview(
                 onClickSuggestion = {},
                 onRetry = {},
                 onPlayQuote = {},
+                onRateAnswer = { _, _ -> },
                 onDismissBetaSheet = {},
             )
         }
@@ -312,6 +325,7 @@ private fun ChatScreenEmptyPreview(
                 onClickSuggestion = {},
                 onRetry = {},
                 onPlayQuote = {},
+                onRateAnswer = { _, _ -> },
                 onDismissBetaSheet = {},
             )
         }
