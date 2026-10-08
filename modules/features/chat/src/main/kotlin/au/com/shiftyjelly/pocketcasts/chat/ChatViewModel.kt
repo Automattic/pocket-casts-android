@@ -188,6 +188,7 @@ class ChatViewModel @Inject constructor(
                 messages = emptyList(),
                 isAwaitingReply = false,
                 error = null,
+                answerRatings = emptyMap(),
             )
         }
         eventHorizon.track(
@@ -521,6 +522,19 @@ class ChatViewModel @Inject constructor(
         )
     }
 
+    fun rateAnswer(answerUuid: String, rating: ChatAnswerRating): ChatAnswerRating? {
+        val newRating = rating.takeIf { it != _uiState.value.answerRatings[answerUuid] }
+        _uiState.update { state ->
+            val ratings = if (newRating == null) {
+                state.answerRatings - answerUuid
+            } else {
+                state.answerRatings + (answerUuid to newRating)
+            }
+            state.copy(answerRatings = ratings)
+        }
+        return newRating
+    }
+
     fun consumeSurveyEligibility(): Boolean {
         if (!hasReceivedAnswer || settings.episodeChatSurveySeen.value) return false
         settings.episodeChatSurveySeen.set(true, updateModifiedAt = false)
@@ -625,8 +639,31 @@ data class ChatUiState(
     val isBeta: Boolean = false,
     val isBetaSheetVisible: Boolean = false,
     val playback: ChatPlayback = ChatPlayback(),
+    val answerRatings: Map<String, ChatAnswerRating> = emptyMap(),
 ) {
     val canSend: Boolean get() = inputText.isNotBlank() && isConnected && !isAwaitingReply
+
+    val answerUuidsByLastIndex: Map<Int, String>
+        get() = buildMap {
+            var answerUuid: String? = null
+            messages.forEachIndexed { index, message ->
+                if (message is ChatMessage.User) {
+                    answerUuid = null
+                } else {
+                    val uuid = answerUuid ?: message.uuid
+                    answerUuid = uuid
+                    val next = messages.getOrNull(index + 1)
+                    if (next == null || next is ChatMessage.User) {
+                        put(index, uuid)
+                    }
+                }
+            }
+        }
+}
+
+enum class ChatAnswerRating {
+    Positive,
+    Negative,
 }
 
 data class ChatPlayback(

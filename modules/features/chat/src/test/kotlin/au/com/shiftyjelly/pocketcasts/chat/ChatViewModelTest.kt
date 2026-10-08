@@ -41,6 +41,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -396,6 +397,89 @@ class ChatViewModelTest {
             EpisodeChatInputType.SummaryPrompt,
             (eventSink.pollEvent() as EpisodeChatMessageSentEvent).inputType,
         )
+    }
+
+    @Test
+    fun `rating an answer stores the rating`() = runTest {
+        setEpisodeInfo()
+
+        val result = viewModel.rateAnswer("answer-uuid", ChatAnswerRating.Positive)
+
+        assertEquals(ChatAnswerRating.Positive, result)
+        assertEquals(mapOf("answer-uuid" to ChatAnswerRating.Positive), viewModel.uiState.value.answerRatings)
+    }
+
+    @Test
+    fun `rating an answer again with the same rating clears it`() = runTest {
+        setEpisodeInfo()
+        viewModel.rateAnswer("answer-uuid", ChatAnswerRating.Negative)
+
+        val result = viewModel.rateAnswer("answer-uuid", ChatAnswerRating.Negative)
+
+        assertNull(result)
+        assertEquals(emptyMap<String, ChatAnswerRating>(), viewModel.uiState.value.answerRatings)
+    }
+
+    @Test
+    fun `rating an answer with the other rating switches it`() = runTest {
+        setEpisodeInfo()
+        viewModel.rateAnswer("answer-uuid", ChatAnswerRating.Positive)
+
+        val result = viewModel.rateAnswer("answer-uuid", ChatAnswerRating.Negative)
+
+        assertEquals(ChatAnswerRating.Negative, result)
+        assertEquals(mapOf("answer-uuid" to ChatAnswerRating.Negative), viewModel.uiState.value.answerRatings)
+    }
+
+    @Test
+    fun `ratings are kept per answer`() = runTest {
+        setEpisodeInfo()
+
+        viewModel.rateAnswer("first-answer", ChatAnswerRating.Positive)
+        viewModel.rateAnswer("second-answer", ChatAnswerRating.Negative)
+
+        assertEquals(
+            mapOf("first-answer" to ChatAnswerRating.Positive, "second-answer" to ChatAnswerRating.Negative),
+            viewModel.uiState.value.answerRatings,
+        )
+    }
+
+    @Test
+    fun `clear chat removes the ratings`() = runTest {
+        setEpisodeInfo()
+        viewModel.rateAnswer("answer-uuid", ChatAnswerRating.Positive)
+
+        viewModel.clearChat()
+
+        assertEquals(emptyMap<String, ChatAnswerRating>(), viewModel.uiState.value.answerRatings)
+    }
+
+    @Test
+    fun `an answer ends before the next question and spans its quotes`() {
+        val state = ChatUiState(
+            messages = listOf(
+                ChatMessage.User("Q1", uuid = "q1"),
+                ChatMessage.Assistant("A1", uuid = "a1"),
+                ChatMessage.Quote("Quote", start = "", end = "", uuid = "a1-quote"),
+                ChatMessage.User("Q2", uuid = "q2"),
+                ChatMessage.Assistant("A2", uuid = "a2"),
+            ),
+        )
+
+        assertEquals(mapOf(2 to "a1", 4 to "a2"), state.answerUuidsByLastIndex)
+    }
+
+    @Test
+    fun `a question without an answer has nothing to rate`() {
+        val state = ChatUiState(
+            messages = listOf(
+                ChatMessage.User("Q1", uuid = "q1"),
+                ChatMessage.Assistant("A1", uuid = "a1"),
+                ChatMessage.User("Q2", uuid = "q2"),
+            ),
+        )
+
+        assertEquals(mapOf(1 to "a1"), state.answerUuidsByLastIndex)
     }
 
     @Test
