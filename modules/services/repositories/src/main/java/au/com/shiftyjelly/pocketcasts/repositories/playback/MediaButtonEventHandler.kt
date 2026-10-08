@@ -52,7 +52,7 @@ internal class MediaButtonEventHandler(
             else -> null
         } ?: return false
 
-        if (togglesImmediately && keyEvent.keyCode in TOGGLE_KEY_CODES) {
+        if (togglesImmediately && keyEvent.keyCode == KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE) {
             dispatch { MediaEvent.SingleTap }
             return true
         }
@@ -110,9 +110,5 @@ internal class MediaButtonEventHandler(
             onError(e)
             false
         }
-    }
-
-    private companion object {
-        val TOGGLE_KEY_CODES = setOf(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE, KeyEvent.KEYCODE_HEADSETHOOK)
     }
 }
