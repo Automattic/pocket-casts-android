@@ -225,9 +225,11 @@ internal class Media3SessionCallback(
                 return true
             }
 
-            // PiP skip buttons use dedicated key codes that always skip forward/back,
+            // PiP skip buttons and remote fast-forward/rewind keys always skip forward/back,
             // bypassing headphone control settings.
-            KeyEvent.KEYCODE_MEDIA_SKIP_FORWARD -> {
+            KeyEvent.KEYCODE_MEDIA_SKIP_FORWARD,
+            KeyEvent.KEYCODE_MEDIA_FAST_FORWARD,
+            -> {
                 scope.launch {
                     try {
                         playbackManager.skipForwardSuspend(
@@ -235,13 +237,15 @@ internal class Media3SessionCallback(
                             jumpAmountSeconds = settings.skipForwardInSecs.value,
                         )
                     } catch (e: Exception) {
-                        Timber.e(e, "PiP skip forward failed")
+                        Timber.e(e, "Skip forward failed")
                     }
                 }
                 return true
             }
 
-            KeyEvent.KEYCODE_MEDIA_SKIP_BACKWARD -> {
+            KeyEvent.KEYCODE_MEDIA_SKIP_BACKWARD,
+            KeyEvent.KEYCODE_MEDIA_REWIND,
+            -> {
                 scope.launch {
                     try {
                         playbackManager.skipBackwardSuspend(
@@ -249,7 +253,7 @@ internal class Media3SessionCallback(
                             jumpAmountSeconds = settings.skipBackInSecs.value,
                         )
                     } catch (e: Exception) {
-                        Timber.e(e, "PiP skip backward failed")
+                        Timber.e(e, "Skip backward failed")
                     }
                 }
                 return true
