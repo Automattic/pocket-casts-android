@@ -28,10 +28,13 @@ import com.automattic.eventhorizon.EpisodeChatMessageSentEvent
 import com.automattic.eventhorizon.EpisodeChatQuotePlayTappedEvent
 import com.automattic.eventhorizon.EpisodeChatQuoteSourceType
 import com.automattic.eventhorizon.EpisodeChatQuoteStopTappedEvent
+import com.automattic.eventhorizon.EpisodeChatResponseReceivedEvent
 import com.automattic.eventhorizon.EpisodeChatShownEvent
 import com.automattic.eventhorizon.EventHorizon
 import java.io.IOException
 import java.util.Date
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.TestTimeSource
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -92,6 +95,7 @@ class ChatViewModelTest {
         on { episodeChatSurveySeen } doReturn surveySeenSetting
     }
     private val networkConnectionWatcher = TestNetworkConnectionWatcher()
+    private val timeSource = TestTimeSource()
 
     private lateinit var eventSink: TestEventSink
     private lateinit var viewModel: ChatViewModel
@@ -111,6 +115,7 @@ class ChatViewModelTest {
         settings = settings,
         applicationScope = kotlinx.coroutines.CoroutineScope(coroutineRule.testDispatcher),
         ioDispatcher = coroutineRule.testDispatcher,
+        timeSource = timeSource,
     )
 
     @Test
@@ -325,6 +330,42 @@ class ChatViewModelTest {
             ),
             eventSink.pollEvent(),
         )
+    }
+
+    @Test
+    fun `send tracks how long the response took`() = runTest {
+        setEpisodeInfo()
+        chatManager.sendMessageGate = CompletableDeferred()
+        viewModel.onInputTextChange("Question")
+        viewModel.onSend()
+        advanceUntilIdle()
+
+        timeSource += 2_500.milliseconds
+        chatManager.sendMessageGate?.complete(Unit)
+        advanceUntilIdle()
+
+        eventSink.skipEvent(2)
+        assertEquals(
+            EpisodeChatResponseReceivedEvent(
+                source = SourceView.EPISODE_DETAILS.analyticsValue,
+                episodeUuid = EPISODE_UUID,
+                podcastUuid = PODCAST_UUID,
+                durationMs = 2_500,
+            ),
+            eventSink.pollEvent(),
+        )
+    }
+
+    @Test
+    fun `failed send does not track a response`() = runTest {
+        setEpisodeInfo()
+        eventSink.skipEvent()
+        chatManager.sendMessageException = IOException()
+
+        sendQuestion("Question")
+
+        eventSink.skipEvent()
+        assertTrue(eventSink.isEmpty())
     }
 
     @Test
