@@ -96,6 +96,7 @@ class ChatViewModelTest {
         eventHorizon = EventHorizon(eventSink),
         settings = settings,
         applicationScope = kotlinx.coroutines.CoroutineScope(coroutineRule.testDispatcher),
+        ioDispatcher = coroutineRule.testDispatcher,
     )
 
     @Test
