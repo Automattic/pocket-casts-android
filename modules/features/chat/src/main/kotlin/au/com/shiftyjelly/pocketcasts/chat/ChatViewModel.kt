@@ -26,11 +26,13 @@ import com.automattic.eventhorizon.EpisodeChatMessageSentEvent
 import com.automattic.eventhorizon.EpisodeChatQuotePlayTappedEvent
 import com.automattic.eventhorizon.EpisodeChatQuoteSourceType
 import com.automattic.eventhorizon.EpisodeChatQuoteStopTappedEvent
+import com.automattic.eventhorizon.EpisodeChatResponseReceivedEvent
 import com.automattic.eventhorizon.EpisodeChatShownEvent
 import com.automattic.eventhorizon.EventHorizon
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.io.IOException
 import javax.inject.Inject
+import kotlin.time.TimeSource
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -58,6 +60,7 @@ class ChatViewModel @Inject constructor(
     private val settings: Settings,
     @ApplicationScope private val applicationScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val timeSource: TimeSource,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ChatUiState())
@@ -489,7 +492,9 @@ class ChatViewModel @Inject constructor(
 
         sendJob = viewModelScope.launch {
             try {
+                val sentAt = timeSource.markNow()
                 chatManager.sendMessage(episodeUuid, message, currentMessages)
+                val responseDuration = sentAt.elapsedNow()
                 transientUserMessage = null
                 hasReceivedAnswer = true
                 eventHorizon.track(
@@ -500,6 +505,14 @@ class ChatViewModel @Inject constructor(
                         messageLength = message.text.length.toLong(),
                         inputType = inputType,
                         messageIndex = messageIndex,
+                    ),
+                )
+                eventHorizon.track(
+                    EpisodeChatResponseReceivedEvent(
+                        source = sourceView.analyticsValue,
+                        episodeUuid = episodeUuid,
+                        podcastUuid = podcastUuid,
+                        durationMs = responseDuration.inWholeMilliseconds,
                     ),
                 )
             } catch (e: IOException) {
