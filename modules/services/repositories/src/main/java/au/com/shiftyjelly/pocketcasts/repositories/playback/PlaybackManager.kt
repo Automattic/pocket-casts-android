@@ -202,7 +202,7 @@ open class PlaybackManager @Inject constructor(
         mainThreadContext = Dispatchers.Main,
     )
 
-    private var audioNoisyManager = AudioNoisyManager(application)
+    private var audioNoisyManager = AudioNoisyManager(application, pausesOnHdmiDisconnect = Util.isTv(application))
 
     private val bookmarkTonePlayer: MediaPlayer by lazy {
         MediaPlayer().apply {
