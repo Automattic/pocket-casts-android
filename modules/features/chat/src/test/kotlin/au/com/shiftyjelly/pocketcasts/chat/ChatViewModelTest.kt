@@ -364,7 +364,7 @@ class ChatViewModelTest {
 
         sendQuestion("Question")
 
-        eventSink.skipEvent()
+        assertTrue(eventSink.pollEvent() is EpisodeChatMessageFailedEvent)
         assertTrue(eventSink.isEmpty())
     }
 
@@ -587,6 +587,20 @@ class ChatViewModelTest {
         sendQuestion("Again")
 
         assertEquals(listOf(1L, 1L), eventSink.messageIndexes())
+    }
+
+    @Test
+    fun `a new question after a failed one does not count the failed one`() = runTest {
+        setEpisodeInfo()
+        sendQuestion("First")
+        chatManager.sendMessageException = IOException()
+        sendQuestion("Failed")
+        chatManager.sendMessageException = null
+
+        sendQuestion("Second")
+
+        assertEquals(listOf(1L, 2L), eventSink.messageIndexes())
+        assertEquals(listOf("First", "Response"), chatManager.sentHistories.last())
     }
 
     @Test

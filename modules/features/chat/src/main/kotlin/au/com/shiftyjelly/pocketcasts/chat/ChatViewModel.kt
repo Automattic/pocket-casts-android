@@ -477,9 +477,10 @@ class ChatViewModel @Inject constructor(
     }
 
     private fun performSend(message: ChatMessage.User, inputType: EpisodeChatInputType) {
+        val unsentMessageUuids = setOfNotNull(transientUserMessage?.uuid, message.uuid)
         transientUserMessage = message
         transientInputType = inputType
-        val currentMessages = _uiState.value.messages.filterNot { it.uuid == message.uuid }
+        val currentMessages = _uiState.value.messages.filterNot { it.uuid in unsentMessageUuids }
         val messageIndex = currentMessages.count { it is ChatMessage.User } + 1L
 
         _uiState.update {
