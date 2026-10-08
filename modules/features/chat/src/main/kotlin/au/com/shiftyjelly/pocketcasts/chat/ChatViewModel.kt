@@ -474,6 +474,7 @@ class ChatViewModel @Inject constructor(
         transientUserMessage = message
         transientInputType = inputType
         val currentMessages = _uiState.value.messages.filterNot { it.uuid == message.uuid }
+        val messageIndex = currentMessages.count { it is ChatMessage.User } + 1L
 
         _uiState.update {
             it.copy(
@@ -495,6 +496,7 @@ class ChatViewModel @Inject constructor(
                         podcastUuid = podcastUuid,
                         messageLength = message.text.length.toLong(),
                         inputType = inputType,
+                        messageIndex = messageIndex,
                     ),
                 )
             } catch (e: IOException) {
