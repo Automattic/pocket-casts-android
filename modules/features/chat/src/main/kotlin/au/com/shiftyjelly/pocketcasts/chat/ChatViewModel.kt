@@ -70,6 +70,7 @@ class ChatViewModel @Inject constructor(
     private var transientUserMessage: ChatMessage.User? = null
     private var transientInputType: EpisodeChatInputType = EpisodeChatInputType.Typed
     private var hasReceivedAnswer = false
+    private var hasSubmittedFeedback = false
     private lateinit var episodeUuid: String
     private lateinit var podcastUuid: String
     private lateinit var sourceView: SourceView
@@ -538,17 +539,18 @@ class ChatViewModel @Inject constructor(
             state.copy(answerRatings = ratings)
         }
         if (newRating == ChatAnswerRating.Positive) {
-            showFeedbackThanks()
+            _feedbackThanks.trySend(Unit)
         }
         return newRating
     }
 
-    fun showFeedbackThanks() {
+    fun onFeedbackSubmitted() {
+        hasSubmittedFeedback = true
         _feedbackThanks.trySend(Unit)
     }
 
     fun consumeSurveyEligibility(): Boolean {
-        if (!hasReceivedAnswer || settings.episodeChatSurveySeen.value) return false
+        if (!hasReceivedAnswer || hasSubmittedFeedback || settings.episodeChatSurveySeen.value) return false
         settings.episodeChatSurveySeen.set(true, updateModifiedAt = false)
         return true
     }
