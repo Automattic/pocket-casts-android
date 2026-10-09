@@ -58,6 +58,9 @@ class EpisodeDownloadCallFactory(
                     }
                 },
             )
+            if (isCancelled) {
+                delegate.cancel()
+            }
         }
 
         override fun cancel() {
