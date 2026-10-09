@@ -90,6 +90,7 @@ import au.com.shiftyjelly.pocketcasts.chat.ui.ChatBanner
 import au.com.shiftyjelly.pocketcasts.chat.ui.ChatBannerColors
 import au.com.shiftyjelly.pocketcasts.chat.ui.ChatBannerDimensions
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
 import au.com.shiftyjelly.pocketcasts.compose.buttons.ButtonTab
 import au.com.shiftyjelly.pocketcasts.compose.buttons.ButtonTabs
 import au.com.shiftyjelly.pocketcasts.compose.components.AnimatedPlayPauseButton
@@ -1322,19 +1323,16 @@ class EpisodeFragment : BaseFragment() {
         if (access is EpisodeChatAccess.Chat) {
             val episode = viewModel.episode ?: return
             val chatPodcastUuid = podcastUuid ?: return
-            val episodeSubtitle = PodcastEpisode
-                .seasonPrefix(episode.episodeType, episode.season, episode.number, resources)
-                .orEmpty()
             if (parentFragmentManager.findFragmentByTag("episode_chat") == null) {
                 val fragment = ChatFragment.newInstance(
                     episodeUuid,
                     chatPodcastUuid,
                     viewModel.podcast?.title.orEmpty(),
                     episode.title,
-                    episodeSubtitle,
                     episode.durationMs,
                     SourceView.EPISODE_DETAILS,
                     access.isBeta,
+                    viewModel.podcast?.let(::PodcastColors) ?: PodcastColors.ForUserEpisode,
                 )
                 fragment.show(parentFragmentManager, "episode_chat")
             }

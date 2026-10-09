@@ -9,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatManager
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatMessage
+import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.playback.NetworkConnectionWatcher
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -29,11 +30,13 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import java.io.IOException
 import javax.inject.Inject
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.update
@@ -50,6 +53,7 @@ class ChatViewModel @Inject constructor(
     private val eventHorizon: EventHorizon,
     private val settings: Settings,
     @ApplicationScope private val applicationScope: CoroutineScope,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ChatUiState())
@@ -75,7 +79,6 @@ class ChatViewModel @Inject constructor(
     fun setEpisodeInfo(
         episodeUuid: String,
         episodeTitle: String,
-        episodeSubtitle: String,
         podcastUuid: String,
         podcastTitle: String,
         episodeDurationMs: Int,
@@ -88,7 +91,6 @@ class ChatViewModel @Inject constructor(
         _uiState.update {
             it.copy(
                 episodeTitle = episodeTitle,
-                episodeSubtitle = episodeSubtitle,
                 podcastUuid = podcastUuid,
                 podcastTitle = podcastTitle,
                 episodeDurationMs = episodeDurationMs,
@@ -96,6 +98,7 @@ class ChatViewModel @Inject constructor(
             )
         }
         observeMessages()
+        observePlayback()
         createChat(podcastUuid)
         trackShown()
         showBetaSheetIfNeeded(isBeta)
@@ -114,6 +117,53 @@ class ChatViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    private fun observePlayback() {
+        viewModelScope.launch {
+            combine(
+                playbackManager.playbackStateFlow,
+                episodeManager.findEpisodeByUuidFlow(episodeUuid),
+            ) { playbackState, episode ->
+                if (playbackState.episodeUuid == episode.uuid) {
+                    ChatPlayback(
+                        isPlaying = playbackState.isPlaying,
+                        positionMs = playbackState.positionMs,
+                        durationMs = playbackState.durationMs.takeIf { it > 0 } ?: episode.durationMs,
+                    )
+                } else {
+                    ChatPlayback(
+                        isPlaying = false,
+                        positionMs = episode.playedUpToMs,
+                        durationMs = episode.durationMs,
+                    )
+                }
+            }.distinctUntilChanged().collect { playback ->
+                _uiState.update { it.copy(playback = playback) }
+            }
+        }
+    }
+
+    fun onPlayPauseClick() {
+        val quoteJob = endQuoteWithoutRestoring()
+        viewModelScope.launch {
+            quoteJob?.join()
+            val state = playbackManager.playbackStateFlow.first()
+            val isCurrent = state.episodeUuid == episodeUuid && !state.isEmpty && !state.isStopped && !state.isError
+            when {
+                isCurrent && state.isPlaying -> playbackManager.pause(sourceView = sourceView)
+                isCurrent -> playbackManager.playQueueSuspend(sourceView = sourceView)
+                else -> playbackManager.playNowSuspend(episodeUuid, sourceView = sourceView)
+            }
+        }
+    }
+
+    private fun endQuoteWithoutRestoring(): Job? {
+        val session = quotePlaybackSession ?: return null
+        val job = session.job
+        job?.cancel()
+        clearQuotePlaybackState(session)
+        return job
     }
 
     private fun createChat(podcastUuid: String) {
@@ -217,7 +267,7 @@ class ChatViewModel @Inject constructor(
                 if (quotePlaybackSession !== session) return@launch
 
                 session.captureSnapshotIfNeeded()
-                val quoteEpisode = withContext(Dispatchers.IO) {
+                val quoteEpisode = withContext(ioDispatcher) {
                     episodeManager.findEpisodeByUuid(episodeUuid)
                 }
                 if (quoteEpisode == null || !quote.isWithinEpisode(quoteEpisode.durationMs)) {
@@ -226,7 +276,7 @@ class ChatViewModel @Inject constructor(
                 }
 
                 session.shouldRestorePlayback = true
-                val didStartPlayback = withContext(Dispatchers.IO) {
+                val didStartPlayback = withContext(ioDispatcher) {
                     pauseCurrentPlayback()
                     startQuotePlayback(quoteEpisode, quote.startMs)
                 }
@@ -256,7 +306,7 @@ class ChatViewModel @Inject constructor(
 
         clearQuotePlaybackState(session)
         if (shouldRestorePlayback) {
-            viewModelScope.launch(Dispatchers.IO) {
+            viewModelScope.launch(ioDispatcher) {
                 job?.join()
                 restorePreviousPlayback(snapshot)
             }
@@ -265,7 +315,7 @@ class ChatViewModel @Inject constructor(
 
     private suspend fun QuotePlaybackSession.captureSnapshotIfNeeded() {
         if (isSnapshotCaptured) return
-        snapshot = withContext(Dispatchers.IO) {
+        snapshot = withContext(ioDispatcher) {
             capturePlaybackSnapshot()
         }
         isSnapshotCaptured = true
@@ -277,7 +327,7 @@ class ChatViewModel @Inject constructor(
 
         val wasCurrentSession = clearQuotePlaybackState(session)
         if (wasCurrentSession && shouldRestorePlayback) {
-            withContext(Dispatchers.IO) {
+            withContext(ioDispatcher) {
                 restorePreviousPlayback(snapshot)
             }
         }
@@ -396,7 +446,7 @@ class ChatViewModel @Inject constructor(
         job?.cancel()
         quotePlaybackSession = null
         if (session.shouldRestorePlayback) {
-            applicationScope.launch(Dispatchers.IO) {
+            applicationScope.launch(ioDispatcher) {
                 job?.join()
                 restorePreviousPlayback(session.snapshot)
             }
@@ -545,7 +595,6 @@ private data class PlaybackSnapshot(
 data class ChatUiState(
     val inputText: String = "",
     val episodeTitle: String = "",
-    val episodeSubtitle: String = "",
     val podcastUuid: String = "",
     val podcastTitle: String = "",
     val episodeDurationMs: Int = 0,
@@ -555,6 +604,15 @@ data class ChatUiState(
     val error: ChatError? = null,
     val isBeta: Boolean = false,
     val isBetaSheetVisible: Boolean = false,
+    val playback: ChatPlayback = ChatPlayback(),
 ) {
     val canSend: Boolean get() = inputText.isNotBlank() && isConnected && !isAwaitingReply
+}
+
+data class ChatPlayback(
+    val isPlaying: Boolean = false,
+    val positionMs: Int = 0,
+    val durationMs: Int = 0,
+) {
+    val progress: Float get() = if (durationMs > 0) (positionMs.toFloat() / durationMs).coerceIn(0f, 1f) else 0f
 }

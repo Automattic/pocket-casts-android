@@ -92,11 +92,13 @@ internal fun ChatInputBar(
                             .background(theme.inputBackground, InputShape)
                             .padding(horizontal = 16.dp, vertical = 10.dp),
                     ) {
-                        Text(
-                            text = stringResource(LR.string.chat_input_hint),
-                            color = if (text.isEmpty()) theme.inputHint else theme.inputBackground,
-                            fontSize = 16.sp,
-                        )
+                        if (text.isEmpty()) {
+                            Text(
+                                text = stringResource(LR.string.chat_input_hint),
+                                color = theme.inputHint,
+                                fontSize = 16.sp,
+                            )
+                        }
                         innerTextField()
                     }
                 },

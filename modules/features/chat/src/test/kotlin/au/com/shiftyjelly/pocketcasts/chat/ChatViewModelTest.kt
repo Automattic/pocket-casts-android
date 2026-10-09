@@ -60,10 +60,16 @@ class ChatViewModelTest {
     val featureFlagRule = InMemoryFeatureFlagRule()
 
     private val chatManager = TestChatManager()
+    private val playbackState = MutableStateFlow(PlaybackState())
     private val playbackManager = mock<PlaybackManager> {
-        on { playbackStateFlow } doReturn MutableStateFlow(PlaybackState())
+        on { playbackStateFlow } doReturn playbackState
     }
-    private val episodeManager = mock<EpisodeManager>()
+    private val episode = MutableStateFlow<BaseEpisode>(
+        PodcastEpisode(uuid = EPISODE_UUID, publishedDate = Date(), duration = 200.0, playedUpTo = 50.0),
+    )
+    private val episodeManager = mock<EpisodeManager> {
+        on { findEpisodeByUuidFlow(EPISODE_UUID) } doReturn episode
+    }
     private val betaSheetSeen = MutableStateFlow(false)
     private val betaSheetSeenSetting = mock<UserSetting<Boolean>> {
         on { value } doAnswer { betaSheetSeen.value }
@@ -90,6 +96,7 @@ class ChatViewModelTest {
         eventHorizon = EventHorizon(eventSink),
         settings = settings,
         applicationScope = kotlinx.coroutines.CoroutineScope(coroutineRule.testDispatcher),
+        ioDispatcher = coroutineRule.testDispatcher,
     )
 
     @Test
@@ -97,7 +104,6 @@ class ChatViewModelTest {
         viewModel.setEpisodeInfo(
             episodeUuid = EPISODE_UUID,
             episodeTitle = "Episode title",
-            episodeSubtitle = "Episode subtitle",
             podcastUuid = PODCAST_UUID,
             podcastTitle = "Podcast title",
             episodeDurationMs = 123_000,
@@ -109,7 +115,6 @@ class ChatViewModelTest {
             val state = awaitItem()
 
             assertEquals("Episode title", state.episodeTitle)
-            assertEquals("Episode subtitle", state.episodeSubtitle)
             assertEquals(PODCAST_UUID, state.podcastUuid)
             assertEquals("Podcast title", state.podcastTitle)
             assertEquals(123_000, state.episodeDurationMs)
@@ -154,7 +159,6 @@ class ChatViewModelTest {
         viewModel.setEpisodeInfo(
             episodeUuid = EPISODE_UUID,
             episodeTitle = "Episode title",
-            episodeSubtitle = "Episode subtitle",
             podcastUuid = PODCAST_UUID,
             podcastTitle = "Podcast title",
             episodeDurationMs = 123_000,
@@ -414,6 +418,95 @@ class ChatViewModelTest {
         verifyNoSeek()
     }
 
+    @Test
+    fun `playback shows the saved position when another episode is playing`() = runTest {
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = "other-uuid", positionMs = 10_000)
+
+        setEpisodeInfo()
+        advanceUntilIdle()
+
+        assertEquals(ChatPlayback(isPlaying = false, positionMs = 50_000, durationMs = 200_000), viewModel.uiState.value.playback)
+    }
+
+    @Test
+    fun `playback follows the player when the chat episode is current`() = runTest {
+        setEpisodeInfo()
+        playbackState.value = PlaybackState(
+            state = PlaybackState.State.PLAYING,
+            episodeUuid = EPISODE_UUID,
+            positionMs = 80_000,
+            durationMs = 190_000,
+        )
+        advanceUntilIdle()
+
+        assertEquals(ChatPlayback(isPlaying = true, positionMs = 80_000, durationMs = 190_000), viewModel.uiState.value.playback)
+    }
+
+    @Test
+    fun `play pause pauses when the chat episode is playing`() = runTest {
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID)
+        setEpisodeInfo(sourceView = SourceView.PLAYER)
+        advanceUntilIdle()
+
+        viewModel.onPlayPauseClick()
+        advanceUntilIdle()
+
+        verify(playbackManager).pause(transientLoss = false, sourceView = SourceView.PLAYER)
+        verify(playbackManager, never()).playNowSuspend(any<String>(), any(), any(), any())
+    }
+
+    @Test
+    fun `play pause plays the chat episode when it is not playing`() = runTest {
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = "other-uuid")
+        setEpisodeInfo(sourceView = SourceView.PLAYER)
+        advanceUntilIdle()
+
+        viewModel.onPlayPauseClick()
+        advanceUntilIdle()
+
+        verify(playbackManager).playNowSuspend(EPISODE_UUID, false, false, SourceView.PLAYER)
+        verify(playbackManager, never()).pause(any(), any())
+    }
+
+    @Test
+    fun `play pause resumes the paused chat episode without reloading it`() = runTest {
+        playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID)
+        setEpisodeInfo(sourceView = SourceView.PLAYER)
+        advanceUntilIdle()
+
+        viewModel.onPlayPauseClick()
+        advanceUntilIdle()
+
+        verify(playbackManager).playQueueSuspend(SourceView.PLAYER, false)
+        verify(playbackManager, never()).playNowSuspend(any<String>(), any(), any(), any())
+    }
+
+    @Test
+    fun `play pause during a quote ends it without restoring the previous position`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID, positionMs = 10_000)
+        playableState(quote)
+        viewModel.playQuote(quote.uuid)
+        advanceUntilIdle()
+
+        viewModel.onPlayPauseClick()
+        advanceUntilIdle()
+        playbackState.value = playbackState.value.copy(positionMs = 3_000)
+        advanceUntilIdle()
+
+        assertTrue(viewModel.uiState.value.messages.filterIsInstance<ChatMessage.Quote>().none { it.isPlaying })
+        verify(playbackManager).pause(transientLoss = false, sourceView = SourceView.EPISODE_DETAILS)
+        verify(playbackManager, never()).seekToTimeMsSuspend(org.mockito.kotlin.eq(10_000), anyOrNull())
+    }
+
+    @Test
+    fun `playback progress is clamped and safe without a duration`() {
+        assertEquals(0.25f, ChatPlayback(positionMs = 50, durationMs = 200).progress)
+        assertEquals(1f, ChatPlayback(positionMs = 300, durationMs = 200).progress)
+        assertEquals(0f, ChatPlayback(positionMs = 300, durationMs = 0).progress)
+    }
+
     private suspend fun verifyNoSeek() {
         verify(playbackManager, never()).playNowSuspend(any<BaseEpisode>(), any(), any(), any())
         verify(playbackManager, never()).seekToTimeMsSuspend(any(), anyOrNull())
@@ -447,7 +540,6 @@ class ChatViewModelTest {
         viewModel.setEpisodeInfo(
             episodeUuid = EPISODE_UUID,
             episodeTitle = "Episode title",
-            episodeSubtitle = "Episode subtitle",
             podcastUuid = PODCAST_UUID,
             podcastTitle = "Podcast title",
             episodeDurationMs = episodeDurationMs,
