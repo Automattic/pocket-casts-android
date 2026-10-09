@@ -224,11 +224,6 @@ Language: zh_TW
     <string name="chat_error_server">發生錯誤。 請再試一次。</string>
     <string name="chat_clear">清除對話</string>
     <string name="chat_send">傳送</string>
-    <string name="chat_preview_user_2">是否有提及任何實用的秘訣？</string>
-    <string name="chat_preview_ai_2">本集深入探討習慣形成的科學，探索微小的日常慣例如何隨時間產生巨大變化。</string>
-    <string name="chat_preview_user_1">本集的主題是什麼？</string>
-    <string name="chat_preview_ai_1">你好！ 我可以協助你探索本集。 你可以詢問討論主題、要點或特定時刻的任何相關資訊。</string>
-    <string name="chat_paywall_title">與此單集對話</string>
     <string name="episode_chat">與單集對話</string>
     <string name="blogs_experiment_banner_body">我們正在針對部落格方面進行嘗試。 我們可能會進行保留、重新設計或逐漸淘汰。</string>
     <string name="blogs_experiment_banner_lead">目前仍為實驗階段。</string>
