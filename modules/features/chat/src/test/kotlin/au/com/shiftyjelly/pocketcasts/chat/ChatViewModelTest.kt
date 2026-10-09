@@ -469,6 +469,19 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `play pause resumes the paused chat episode without reloading it`() = runTest {
+        playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID)
+        setEpisodeInfo(sourceView = SourceView.PLAYER)
+        advanceUntilIdle()
+
+        viewModel.onPlayPauseClick()
+        advanceUntilIdle()
+
+        verify(playbackManager).playQueueSuspend(SourceView.PLAYER, false)
+        verify(playbackManager, never()).playNowSuspend(any<String>(), any(), any(), any())
+    }
+
+    @Test
     fun `play pause during a quote ends it without restoring the previous position`() = runTest {
         val quote = createQuote(startMs = 1_000, endMs = 3_000)
         whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)

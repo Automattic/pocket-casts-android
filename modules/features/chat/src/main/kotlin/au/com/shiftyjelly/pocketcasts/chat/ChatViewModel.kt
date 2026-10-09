@@ -145,21 +145,25 @@ class ChatViewModel @Inject constructor(
     }
 
     fun onPlayPauseClick() {
-        endQuoteWithoutRestoring()
+        val quoteJob = endQuoteWithoutRestoring()
         viewModelScope.launch {
-            val playbackState = playbackManager.playbackStateFlow.first()
-            if (playbackState.episodeUuid == episodeUuid && playbackState.isPlaying) {
-                playbackManager.pause(sourceView = sourceView)
-            } else {
-                playbackManager.playNowSuspend(episodeUuid, sourceView = sourceView)
+            quoteJob?.join()
+            val state = playbackManager.playbackStateFlow.first()
+            val isCurrent = state.episodeUuid == episodeUuid && !state.isEmpty && !state.isStopped && !state.isError
+            when {
+                isCurrent && state.isPlaying -> playbackManager.pause(sourceView = sourceView)
+                isCurrent -> playbackManager.playQueueSuspend(sourceView = sourceView)
+                else -> playbackManager.playNowSuspend(episodeUuid, sourceView = sourceView)
             }
         }
     }
 
-    private fun endQuoteWithoutRestoring() {
-        val session = quotePlaybackSession ?: return
-        session.job?.cancel()
+    private fun endQuoteWithoutRestoring(): Job? {
+        val session = quotePlaybackSession ?: return null
+        val job = session.job
+        job?.cancel()
         clearQuotePlaybackState(session)
+        return job
     }
 
     private fun createChat(podcastUuid: String) {
