@@ -2564,6 +2564,7 @@
     <string name="chat_preview_user_2">Were there any practical tips mentioned?</string>
     <string name="chat_beta_sheet_title">Ask about this episode is in beta</string>
     <string name="chat_beta_sheet_body">Free for everyone while we test it. It\'ll become a Plus feature later.</string>
+    <string name="chat_beta_note">Ask about this episode is in beta</string>
     <string name="chat_input_hint">Ask about this episode…</string>
     <string name="chat_send">Send</string>
     <string name="chat_clear">Clear Chat</string>
