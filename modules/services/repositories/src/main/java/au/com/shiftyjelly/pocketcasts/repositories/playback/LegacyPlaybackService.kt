@@ -137,7 +137,9 @@ open class LegacyPlaybackService :
                 source = playbackManager.lastPlaybackSource,
                 playbackContinued = playbackManager.isPlaying(),
             )
-            stopSelf()
+            if (!playbackManager.isPlaying()) {
+                stopSelf()
+            }
         }
     }
 

@@ -613,10 +613,6 @@ class MediaSessionManager(
             Timber.e("No enabled media browser service found in manifest")
             return
         }
-        if (FeatureFlag.isEnabled(Feature.FOREGROUND_BEFORE_PLAYBACK)) {
-            startServiceForeground(context, component)
-            return
-        }
         if (needsMedia3Session && media3Session != null) return
         try {
             context.startService(Intent().setComponent(component))
