@@ -18,6 +18,10 @@ interface TranscriptManager {
         episodeUuid: String,
     ): String?
 
+    suspend fun loadGeneratedChapters(
+        episodeUuid: String,
+    )
+
     fun resetInvalidTranscripts(
         episodeUuid: String,
     )

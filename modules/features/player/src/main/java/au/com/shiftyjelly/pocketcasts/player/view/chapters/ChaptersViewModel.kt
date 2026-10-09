@@ -16,6 +16,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
 import com.automattic.eventhorizon.ChapterLinkClickedEvent
 import com.automattic.eventhorizon.ChaptersShownEvent
 import com.automattic.eventhorizon.ChaptersShownSource
@@ -38,10 +39,12 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -55,9 +58,16 @@ class ChaptersViewModel @AssistedInject constructor(
     private val settings: Settings,
     private val eventHorizon: EventHorizon,
     private val generatedChapterSeeker: GeneratedChapterSeeker,
+    private val transcriptManager: TranscriptManager,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     private val isTogglingChapters = MutableStateFlow(false)
+
+    init {
+        viewModelScope.launch(ioDispatcher) {
+            mode.episodeIdFlow().collectLatest(transcriptManager::loadGeneratedChapters)
+        }
+    }
 
     val uiState = mode.uiStateFlow().stateIn(viewModelScope, SharingStarted.Lazily, UiState())
 
@@ -68,12 +78,16 @@ class ChaptersViewModel @AssistedInject constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun Mode.uiStateFlow() = when (this) {
         is Mode.Episode -> createUiStateFlow(episodeId)
+        is Mode.Player -> episodeIdFlow().flatMapLatest(::createUiStateFlow)
+    }
+
+    private fun Mode.episodeIdFlow() = when (this) {
+        is Mode.Episode -> flowOf(episodeId)
 
         is Mode.Player ->
             playbackManager.playbackStateFlow
                 .map { it.episodeUuid }
                 .distinctUntilChanged()
-                .flatMapLatest(::createUiStateFlow)
     }
 
     private fun createUiStateFlow(episodeId: String) = combine(

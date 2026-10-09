@@ -257,9 +257,7 @@ class PlayerContainerFragment :
 
         viewModel.listDataLive.observe(viewLifecycleOwner) {
             adapter.updateNotes(addNotes = !it.podcastHeader.isUserEpisode)
-            val isSummaryOrChaptersEnabled =
-                FeatureFlag.isEnabled(Feature.AI_SUMMARIES) || FeatureFlag.isEnabled(Feature.GENERATED_CHAPTERS)
-            if (isSummaryOrChaptersEnabled && !it.podcastHeader.isUserEpisode) {
+            if (FeatureFlag.isEnabled(Feature.AI_SUMMARIES) && !it.podcastHeader.isUserEpisode) {
                 summaryViewModel.loadSummary(it.podcastHeader.episodeUuid)
             } else {
                 summaryViewModel.clearSummary()
