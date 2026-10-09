@@ -19,7 +19,6 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.utils.extensions.escapeLike
-import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Maybe
 import io.reactivex.Single
@@ -240,7 +239,7 @@ abstract class PodcastDao {
     abstract fun searchByTitleBlocking(title: String): Podcast?
 
     @Query("UPDATE podcasts SET sync_status = :syncStatus WHERE uuid = :uuid")
-    abstract fun updateSyncStatusBlocking(syncStatus: Int, uuid: String)
+    abstract suspend fun updateSyncStatus(syncStatus: Int, uuid: String)
 
     @Query("UPDATE podcasts SET show_archived = :showArchived, show_archived_modified = :modified, sync_status = 0 WHERE uuid = :uuid")
     abstract suspend fun updateShowArchived(uuid: String, showArchived: Boolean, modified: Date = Date())
@@ -250,10 +249,6 @@ abstract class PodcastDao {
 
     @Query("UPDATE podcasts SET folder_uuid = :folderUuid, sync_status = 0 WHERE uuid IN (:podcastUuids)")
     abstract suspend fun updateFolderUuid(folderUuid: String?, podcastUuids: List<String>)
-
-    fun updateSyncStatusRxCompletable(syncStatus: Int, uuid: String): Completable {
-        return Completable.fromAction { updateSyncStatusBlocking(syncStatus, uuid) }
-    }
 
     @Query("UPDATE podcasts SET sync_status = :syncStatus WHERE subscribed = 1")
     abstract suspend fun updateAllSubscribedSyncStatus(syncStatus: Int)
@@ -328,7 +323,7 @@ abstract class PodcastDao {
     abstract suspend fun countSubscribed(): Int
 
     @Query("SELECT COUNT(*) FROM podcasts WHERE subscribed = 1 AND uuid = :uuid")
-    abstract fun countSubscribedByUuidBlocking(uuid: String): Int
+    abstract suspend fun countSubscribedByUuid(uuid: String): Int
 
     @Query("SELECT COUNT(*) FROM podcasts WHERE subscribed = 1")
     abstract fun countSubscribedFlow(): Flow<Int>
@@ -342,12 +337,8 @@ abstract class PodcastDao {
     @Query("SELECT COUNT(*) FROM podcast_episodes WHERE podcast_id IS :podcastUuid")
     abstract fun episodeCountFlow(podcastUuid: String): Flow<Int>
 
-    fun isSubscribedToPodcastBlocking(uuid: String): Boolean {
-        return countSubscribedByUuidBlocking(uuid) != 0
-    }
-
-    fun isSubscribedToPodcastRxSingle(uuid: String): Single<Boolean> {
-        return Single.fromCallable { isSubscribedToPodcastBlocking(uuid) }
+    suspend fun isSubscribedToPodcast(uuid: String): Boolean {
+        return countSubscribedByUuid(uuid) != 0
     }
 
     @Query("UPDATE podcasts SET auto_add_to_up_next = :autoAddToUpNext, auto_add_to_up_next_modified = :modified, sync_status = 0 WHERE uuid = :uuid")
@@ -408,11 +399,7 @@ abstract class PodcastDao {
     }
 
     @Query("UPDATE podcasts SET subscribed = :subscribed WHERE uuid = :uuid")
-    abstract fun updateSubscribedBlocking(subscribed: Boolean, uuid: String)
-
-    fun updateSubscribedRxCompletable(subscribed: Boolean, uuid: String): Completable {
-        return Completable.fromAction { updateSubscribedBlocking(subscribed, uuid) }
-    }
+    abstract suspend fun updateSubscribed(subscribed: Boolean, uuid: String)
 
     @Query("UPDATE podcasts SET start_from = :autoStartFrom, start_from_modified = :modified, sync_status = 0 WHERE uuid = :uuid")
     abstract suspend fun updateStartFrom(autoStartFrom: Int, uuid: String, modified: Date = Date())
