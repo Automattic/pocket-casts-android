@@ -704,7 +704,7 @@ open class PlaybackManager @Inject constructor(
     private suspend fun replayFinishedEpisode(sourceView: SourceView, showedStreamWarning: Boolean) {
         val uuid = replayableEpisodeUuid ?: return
         replayableEpisodeUuid = null
-        if (!Util.isCarUiMode(application)) {
+        if (!Util.isAutomotive(application)) {
             return
         }
         val episode = episodeManager.findEpisodeByUuid(uuid)
@@ -1872,7 +1872,7 @@ open class PlaybackManager @Inject constructor(
             nextEpisode = autoLoadEpisode(autoPlay)
             if (nextEpisode == null) {
                 lastTrackedAutoPlaySource = null
-                if (episode != null && Util.isCarUiMode(application)) {
+                if (episode != null && Util.isAutomotive(application)) {
                     replayableEpisodeUuid = episode.uuid
                     shutdownKeepingEpisodeVisible()
                 } else {
