@@ -180,8 +180,6 @@ Language: ar
     <string name="up_next_sort_duration_tooltip_title">فرز حسب المدة</string>
     <string name="transcript_tap_to_seek_streaming_unavailable">قم بتنزيل الحلقة لتمكين ميزة Tap to Seek</string>
     <string name="bookmark_play_from">تشغيل من %s</string>
-    <string name="summary_upsell_description">اشترك في خطة Plus للحصول على حق الوصول إليها وإلى الميزات الأخرى للخطة المميزة، مثل: الإشارات المرجعية والمجلدات.</string>
-    <string name="summary_upsell_title">ملخصات مدعومة بالذكاء الاصطناعي</string>
     <string name="tv_create_account_title">إنشاء حساب مجّاني لك</string>
     <string name="tv_onboarding_sign_in_instructions">افتح الكاميرا ووجّهها إلى كود الاستجابة السريعة (QR) هذا</string>
     <string name="tv_onboarding_sign_in_title">تسجيل الدخول باستخدام هاتفك</string>
@@ -213,10 +211,6 @@ Language: ar
     <string name="blogs_found_followed_badge">تمت متابعة البث الصوتي</string>
     <string name="blogs_found_feed_detected">تم العثور على تلقيم</string>
     <string name="chapters_generated_disclaimer">يجري إنشاء هذه الفصول تلقائيًا، وقد لا تكون دقيقة بالكامل.</string>
-    <string name="description">وصف</string>
-    <string name="player_tab_summary">الملخص</string>
-    <string name="summary">الملخص</string>
-    <string name="episode_summary">ملخص الحلقة</string>
     <string name="chat_stop_quote">إيقاف الاقتباس</string>
     <string name="chat_play_quote">تشغيل اقتباس</string>
     <string name="chat_tap_to_retry">انقر لإعادة المحاولة</string>
