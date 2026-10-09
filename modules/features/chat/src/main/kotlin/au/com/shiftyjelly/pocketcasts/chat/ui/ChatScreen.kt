@@ -186,7 +186,6 @@ private fun ChatContent(
                             quote = message.displayText,
                             timestampLabel = message.timestampLabel,
                             isPlayable = message.canPlay,
-                            isPlaying = message.isPlaying,
                             theme = theme,
                             onClickPlay = { onPlayQuote(message.uuid) },
                         )
