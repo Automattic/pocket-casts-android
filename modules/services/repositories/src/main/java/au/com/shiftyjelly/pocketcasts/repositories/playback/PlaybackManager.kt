@@ -202,9 +202,8 @@ open class PlaybackManager @Inject constructor(
             if (skipLastSecs == null || skipLastSecs <= 0) return false
             if (durationMs == null || durationMs <= 0) return false
             if (positionMs < 0) return false
-            val thresholdMs = effectiveSkipLastMs(skipLastSecs, playbackSpeed)
-            if (durationMs <= thresholdMs) return false
-            return durationMs - positionMs < thresholdMs
+            if (durationMs <= skipLastSecs * 1000L) return false
+            return durationMs - positionMs < effectiveSkipLastMs(skipLastSecs, playbackSpeed)
         }
     }
 
@@ -2723,7 +2722,7 @@ open class PlaybackManager @Inject constructor(
                 statsManager.addTimeSavedAutoSkipping(remainingMs.toLong())
                 episodeManager.markAsPlayedBlocking(episode, this, podcastManager)
                 LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Skipping remainder of ${episode.title} with skip last $skipLast (speed=$playbackSpeed)")
-                showToast(application.getString(LR.string.player_skipped_last, skipLast))
+                showToast(application.getString(LR.string.player_skipped_last, remainingMs / 1000))
             }
             return
         }

@@ -149,14 +149,20 @@ class PlaybackManagerSkipLastTest {
     @Test
     fun `shouldSkipLast returns false when episode is shorter than the skip-last window`() {
         // A 60s episode with skipLast=120s at 1x: the whole episode is inside the window, but we
-        // intentionally do NOT fire because the guard `durationMs > thresholdMs` filters it out
+        // intentionally do NOT fire because the guard `durationMs > skipLastSecs * 1000` filters it out
         // to avoid skipping an entire short episode.
         assertFalse(
             shouldSkipLast(skipLastSecs = 120, playbackSpeed = 1.0, positionMs = 0, durationMs = 60_000),
         )
-        // Same at 2x: 120s episode, 240s window → still filtered out.
         assertFalse(
             shouldSkipLast(skipLastSecs = 120, playbackSpeed = 2.0, positionMs = 0, durationMs = 120_000),
+        )
+    }
+
+    @Test
+    fun `shouldSkipLast still fires at high speed for an episode longer than the unscaled window`() {
+        assertTrue(
+            shouldSkipLast(skipLastSecs = 300, playbackSpeed = 3.0, positionMs = 0, durationMs = 600_000),
         )
     }
 }
