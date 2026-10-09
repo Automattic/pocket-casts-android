@@ -17,7 +17,6 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.automattic.eventhorizon.EpisodeChatBetaSheetDismissedEvent
 import com.automattic.eventhorizon.EpisodeChatBetaSheetShownEvent
-import com.automattic.eventhorizon.EpisodeChatClearedEvent
 import com.automattic.eventhorizon.EpisodeChatDismissedEvent
 import com.automattic.eventhorizon.EpisodeChatErrorType
 import com.automattic.eventhorizon.EpisodeChatInputType
@@ -190,29 +189,6 @@ class ChatViewModel @Inject constructor(
 
     fun onInputTextChange(text: String) {
         _uiState.update { it.copy(inputText = text) }
-    }
-
-    fun clearChat() {
-        sendJob?.cancel()
-        transientUserMessage = null
-        _uiState.update {
-            it.copy(
-                messages = emptyList(),
-                isAwaitingReply = false,
-                error = null,
-                answerRatings = emptyMap(),
-            )
-        }
-        eventHorizon.track(
-            EpisodeChatClearedEvent(
-                source = sourceView.analyticsValue,
-                episodeUuid = episodeUuid,
-                podcastUuid = podcastUuid,
-            ),
-        )
-        viewModelScope.launch {
-            chatManager.clearMessages(episodeUuid)
-        }
     }
 
     fun trackDismissed() {

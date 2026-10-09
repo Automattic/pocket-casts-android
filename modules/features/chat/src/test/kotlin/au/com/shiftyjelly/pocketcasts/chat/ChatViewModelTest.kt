@@ -20,7 +20,6 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.automattic.eventhorizon.EpisodeChatBetaSheetDismissedEvent
 import com.automattic.eventhorizon.EpisodeChatBetaSheetShownEvent
-import com.automattic.eventhorizon.EpisodeChatClearedEvent
 import com.automattic.eventhorizon.EpisodeChatErrorType
 import com.automattic.eventhorizon.EpisodeChatInputType
 import com.automattic.eventhorizon.EpisodeChatMessageFailedEvent
@@ -559,16 +558,6 @@ class ChatViewModelTest {
     }
 
     @Test
-    fun `clear chat removes the ratings`() = runTest {
-        setEpisodeInfo()
-        viewModel.rateAnswer("answer-uuid", ChatAnswerRating.Positive)
-
-        viewModel.clearChat()
-
-        assertEquals(emptyMap<String, ChatAnswerRating>(), viewModel.uiState.value.answerRatings)
-    }
-
-    @Test
     fun `an answer ends before the next question and spans its quotes`() {
         val state = ChatUiState(
             messages = listOf(
@@ -615,18 +604,6 @@ class ChatViewModelTest {
         sendQuestion("Next")
 
         assertEquals(listOf(2L), eventSink.messageIndexes())
-    }
-
-    @Test
-    fun `message index restarts after clearing the chat`() = runTest {
-        setEpisodeInfo()
-        sendQuestion("First")
-
-        viewModel.clearChat()
-        advanceUntilIdle()
-        sendQuestion("Again")
-
-        assertEquals(listOf(1L, 1L), eventSink.messageIndexes())
     }
 
     @Test
@@ -727,42 +704,6 @@ class ChatViewModelTest {
         advanceUntilIdle()
 
         assertEquals(emptyList<ChatMessage>(), viewModel.uiState.value.messages)
-    }
-
-    @Test
-    fun `clear chat cancels waiting state and removes messages`() = runTest {
-        setEpisodeInfo()
-        chatManager.sendMessageException = IOException()
-        viewModel.onInputTextChange("Question")
-        viewModel.onSend()
-        advanceUntilIdle()
-        assertEquals(ChatError.NetworkError, viewModel.uiState.value.error)
-
-        viewModel.clearChat()
-        advanceUntilIdle()
-
-        assertEquals(EPISODE_UUID, chatManager.clearedEpisodeUuids.single())
-        assertEquals(emptyList<ChatMessage>(), viewModel.uiState.value.messages)
-        assertEquals(null, viewModel.uiState.value.error)
-        assertFalse(viewModel.uiState.value.isAwaitingReply)
-    }
-
-    @Test
-    fun `clear chat tracks chat cleared`() = runTest {
-        setEpisodeInfo()
-        eventSink.skipEvent()
-
-        viewModel.clearChat()
-        advanceUntilIdle()
-
-        assertEquals(
-            EpisodeChatClearedEvent(
-                source = SourceView.EPISODE_DETAILS.analyticsValue,
-                episodeUuid = EPISODE_UUID,
-                podcastUuid = PODCAST_UUID,
-            ),
-            eventSink.pollEvent(),
-        )
     }
 
     @Test
@@ -1083,7 +1024,6 @@ class ChatViewModelTest {
         val createdChats = mutableListOf<CreateChat>()
         val sentMessages = mutableListOf<SendMessage>()
         val sentHistories = mutableListOf<List<String>>()
-        val clearedEpisodeUuids = mutableListOf<String>()
         var sendMessageException: Exception? = null
         var sendMessageGate: CompletableDeferred<Unit>? = null
 
@@ -1106,7 +1046,6 @@ class ChatViewModelTest {
         }
 
         override suspend fun clearMessages(episodeUuid: String) {
-            clearedEpisodeUuids += episodeUuid
             messages.value = emptyList()
         }
 
