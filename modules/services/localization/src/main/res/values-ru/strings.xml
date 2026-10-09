@@ -222,7 +222,6 @@ Language: ru
     <string name="chat_tap_to_retry">Нажмите, чтобы повторить попытку.</string>
     <string name="chat_error_network">Не удалось подключиться к серверу. Проверьте подключение.</string>
     <string name="chat_error_server">Что-то пошло не так. Повторите попытку.</string>
-    <string name="chat_clear">Очистить чат</string>
     <string name="chat_send">Отправить</string>
     <string name="episode_chat">Чат по выпуску</string>
     <string name="blogs_experiment_banner_body">Блоги — наша свежая идея. Они могут остаться навсегда, подвергнуться переработке или тихо сойти со сцены.</string>

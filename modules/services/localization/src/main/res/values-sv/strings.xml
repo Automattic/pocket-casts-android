@@ -222,7 +222,6 @@ Language: sv_SE
     <string name="chat_tap_to_retry">Tryck för att försöka igen</string>
     <string name="chat_error_network">Kan inte nå servern. Kontrollera din anslutning.</string>
     <string name="chat_error_server">Något gick fel. Försök igen.</string>
-    <string name="chat_clear">Rensa chatt</string>
     <string name="chat_send">Skicka</string>
     <string name="episode_chat">Chatta med avsnitt</string>
     <string name="blogs_experiment_banner_body">Bloggar är något vi testar. Den kanske stannar kvar, omarbetas eller försvinner i tysthet.</string>

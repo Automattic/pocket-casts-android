@@ -222,7 +222,6 @@ Language: ko_KR
     <string name="chat_tap_to_retry">눌러서 다시 시도</string>
     <string name="chat_error_network">서버에 연결할 수 없습니다. 연결을 확인하세요.</string>
     <string name="chat_error_server">문제가 발생했습니다. 다시 시도해 주세요.</string>
-    <string name="chat_clear">채팅 지우기</string>
     <string name="chat_send">보내기</string>
     <string name="episode_chat">에피소드로 채팅</string>
     <string name="blogs_experiment_banner_body">블로그는 저희가 시도 중인 것 중 하나입니다. 계속 유지될 수도 있고, 개편될 수도 있고, 조용히 사라질 수도 있습니다.</string>

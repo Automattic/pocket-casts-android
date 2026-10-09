@@ -222,7 +222,6 @@ Language: fr
     <string name="chat_tap_to_retry">Appuyer pour réessayer</string>
     <string name="chat_error_network">Impossible d’atteindre le serveur. Vérifiez votre connexion.</string>
     <string name="chat_error_server">Un problème est survenu. Veuillez réessayer.</string>
-    <string name="chat_clear">Effacer la discussion</string>
     <string name="chat_send">Envoyer</string>
     <string name="episode_chat">Discuter de l’épisode ·</string>
     <string name="blogs_experiment_banner_body">Nous sommes en train de tester les blogs. Ça pourrait rester, être retravaillé ou disparaître discrètement.</string>

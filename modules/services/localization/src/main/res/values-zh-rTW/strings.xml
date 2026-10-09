@@ -222,7 +222,6 @@ Language: zh_TW
     <string name="chat_tap_to_retry">點選以重試</string>
     <string name="chat_error_network">無法連結至伺服器。 請檢查你的連線。</string>
     <string name="chat_error_server">發生錯誤。 請再試一次。</string>
-    <string name="chat_clear">清除對話</string>
     <string name="chat_send">傳送</string>
     <string name="episode_chat">與單集對話</string>
     <string name="blogs_experiment_banner_body">我們正在針對部落格方面進行嘗試。 我們可能會進行保留、重新設計或逐漸淘汰。</string>
