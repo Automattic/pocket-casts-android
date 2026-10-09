@@ -137,6 +137,10 @@
     <string name="token_refresh_sign_in_error_description">There was a problem and you\'ve been signed out. Tap here to sign back in.</string>
     <string name="view_transcript">View transcript</string>
     <string name="episode_chat">Chat with Episode</string>
+    <string name="episode_chat_shelf_title">Ask about this episode</string>
+    <string name="episode_chat_beta_badge">Beta</string>
+    <string name="episode_chat_needs_transcript">Ask about this episode needs a transcript.</string>
+    <string name="episode_chat_tooltip_body">Ask it anything. It was listening too.</string>
     <string name="episode_summary">Episode Summary</string>
     <string name="summary_upsell_title">AI-Powered Summaries</string>
     <string name="summary_upsell_description">Subscribe to Plus to get access to it and other Premium&#160;features like bookmarks and folders.</string>
