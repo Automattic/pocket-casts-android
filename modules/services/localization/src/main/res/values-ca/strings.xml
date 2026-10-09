@@ -1,14 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-09-16 18:10:43+0000
+Translation-Revision-Date: 2026-10-02 10:10:10+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: ca
 -->
 <resources>
+    <string name="settings_general_whats_new_unread_dot">Marca els missatges nous amb un punt</string>
+    <string name="whats_new_poll_answered">Gràcies per respondre.</string>
+    <string name="whats_new_message_page_progress">Pàgina %1$d de %2$d</string>
+    <string name="whats_new_research_title">Recerca d\'usuaris</string>
+    <string name="whats_new_feed_read_all">Marca-ho tot com a llegit</string>
+    <string name="whats_new_feed_unable_to_load">No s\'ha pogut carregar «Novetats»</string>
+    <string name="whats_new_feed_all_read">S\'han marcat tots els missatges com a llegits</string>
+    <string name="whats_new_feed_unread">No llegits</string>
+    <string name="whats_new_feed_empty_description">Aquí apareixeran les funcions noves, els consells i els\u00A0anuncis.</string>
+    <string name="whats_new_feed_empty_title">Encara no hi ha missatges</string>
+    <string name="whats_new_category_tip">Consells i trucs</string>
+    <string name="whats_new_category_research">Recerca d\'usuaris</string>
+    <string name="whats_new_category_new_feature">Funció nova</string>
+    <string name="whats_new_category_known_issue">Problema conegut</string>
+    <string name="whats_new_category_announcement">Anunci</string>
+    <string name="bookmark_title_label">Títol</string>
+    <string name="bookmarks_deleted_undo">Desfés</string>
+    <string name="device_approve_switch_account_confirm">Canvia de compte</string>
+    <string name="device_approve_switch_account_message">Això tancarà la sessió i eliminarà els pòdcasts, els filtres i l\'historial d\'escolta d\'aquest dispositiu.</string>
+    <string name="device_approve_switch_account_title">Vols canviar de compte?</string>
+    <string name="device_approve_switch_account">No ets tu? Canvia de compte</string>
+    <string name="bookmark_edit_transcript_selection">Fragment seleccionat: %1$s</string>
+    <string name="removed_from_playlist_feedback">S\'ha tret de la llista de reproducció</string>
+    <string name="bookmark_adding_transcript">S\'està afegint la transcripció…</string>
+    <string name="settings_app_icon_updated_message_v2">La icona nova pot trigar uns minuts a aparèixer. Si la drecera de la pantalla d\'inici desapareix, torna a afegir Pocket Casts des de la pantalla de totes les aplicacions.</string>
+    <string name="go_to_episode">Ves a l\'episodi</string>
+    <string name="smart_bookmarks_upsell_message">Un sol toc. Ja té nom i inclou el text.</string>
+    <string name="smart_bookmarks_upsell_title">Desa les parts que val la pena conservar</string>
+    <string name="bookmarks_upgrade_example_passage">Estàs triant la persona, no el currículum.</string>
     <string name="bookmark_edit_transcript_title">Edita la transcripció</string>
     <string name="bookmarks_upgrade_example_title">La sala d\'audicions</string>
+    <string name="bookmark_suggestion_prefix">Suggeriment:</string>
+    <string name="bookmark_suggesting_title">S\'està suggerint un títol…</string>
+    <string name="bookmark_player_tip_message">Conserva la part que volies</string>
+    <string name="bookmark_new_badge">Nou</string>
     <string name="bookmark_edit_transcript_subtitle">Selecciona un fragment de la transcripció per a aquest marcador</string>
+    <string name="bookmark_create_failed">No s\'ha pogut afegir el marcador</string>
+    <string name="device_approve_title">Connecta el dispositiu</string>
+    <string name="log_in_with_code_error">No s\'ha pogut obtenir el codi d\'inici de sessió</string>
+    <string name="log_in_with_code_instructions">Escaneja el codi QR amb el mòbil o ves a %1$s i introdueix aquest codi</string>
+    <string name="log_in_with_code">Inicia la sessió amb un codi</string>
     <string name="search_filters_networks">Xarxes</string>
     <string name="discover_networks">Xarxes</string>
     <string name="discover_network">Xarxa</string>
@@ -18,6 +56,9 @@ Language: ca
     <string name="device_approve_expired_title">El teu codi QR ha caducat</string>
     <string name="device_approve_connect">Connecta</string>
     <string name="device_approve_signing_in_as">Iniciant la sessió com a…</string>
+    <string name="device_approve_expired_message">Torna al dispositiu per generar-ne un de nou.</string>
+    <string name="device_approve_success_message">El dispositiu ja està connectat al teu compte.</string>
+    <string name="device_approve_success_title">Dispositiu connectat</string>
     <string name="device_approve_description">L\'escolta se sincronitzarà automàticament.\nPots desconnectar-te en qualsevol moment des d\'Ajustos.</string>
     <string name="tv_settings_subscription_plan">Pla</string>
     <string name="tv_settings_subscription_next_renewal">Pròxima renovació</string>
@@ -286,7 +327,6 @@ Language: ca
     <string name="end_of_year_next_story">Història següent</string>
     <string name="end_of_year_previous_story">Història anterior</string>
     <string name="end_of_year_story_listened_to_numbers">Has escoltat %1$d pòdcasts i %2$d episodis</string>
-    <string name="up_next_as_playlist_replace_body">Reproduir això substituirà la cua actual de Tot seguit.</string>
     <string name="up_next_as_playlist_replace_switch_description">Desa la cua de Tot Seguit com a llista de reproducció.</string>
     <string name="added_to_playlist_single">Afegit a %1$s</string>
     <string name="end_of_year_failed_to_load_message">No s\'ha pogut carregar la reproducció</string>
@@ -378,7 +418,6 @@ Language: ca
     <string name="manual_playlist_no_available_episode_body">Sembla que has afegit tots els episodis d\'aquest pòdcast.</string>
     <string name="manual_playlist_no_content_title_alternative">Comença a crear la teva llista de reproducció</string>
     <string name="manual_playlist_no_content_title">Afegeix episodis a la teva llista de reproducció</string>
-    <string name="manual_playlist_no_content_body">Llisca cap a l\'esquerra en un episodi per a afegir-lo a la teva llista de reproducció.</string>
     <string name="unavailable">No disponible</string>
     <string name="add_to_playlist_failure_message">Aquesta llista de reproducció és plena. Elimina alguns episodis o comença’n una de nova.</string>
     <string name="added_to_playlist">%1$s afegit a “%2$s”</string>
@@ -790,7 +829,6 @@ Language: ca
     <string name="referrals_activate_my_pass">Activa la meva invitació</string>
     <string name="referrals_claim_guest_pass_title">Reclama el teu %1$s accés de convidat</string>
     <string name="referrals_claim_guess_pass_banner_card_subtitle">Desbloqueja l\'experiència d\'escolta completa</string>
-    <string name="referrals_tooltip_message">Regal %1$s de Pocket Casts Plus!</string>
     <string name="referrals_claim_guess_pass_banner_card_title">Reclama el teu %1$s accés de convidat a Plus</string>
     <string name="referrals_share_guest_pass">Comparteix les invitacions per a convidats</string>
     <string name="referrals_send_guest_pass_title">Regal %1$s de Pocket Casts Plus</string>
@@ -2408,6 +2446,10 @@ Language: ca
         <item quantity="one">Afegit a %d llista de reproducció</item>
         <item quantity="other">Afegit a %d llistes de reproducció</item>
     </plurals>
+    <plurals name="changed_playlists">
+        <item quantity="one">S\'ha canviat %d llista de reproducció</item>
+        <item quantity="other">S\'han canviat %d llistes de reproducció</item>
+    </plurals>
     <plurals name="chapter">
         <item quantity="one">capítol</item>
         <item quantity="other">capítols</item>
@@ -2523,6 +2565,10 @@ Language: ca
     <plurals name="profile_stats_second_saved">
         <item quantity="one">Segon estalviat</item>
         <item quantity="other">Segons estalviats</item>
+    </plurals>
+    <plurals name="removed_from_playlists">
+        <item quantity="one">S\'ha tret de %d llista de reproducció</item>
+        <item quantity="other">S\'ha tret de %d llistes de reproducció</item>
     </plurals>
     <plurals name="second">
         <item quantity="one">segon</item>
