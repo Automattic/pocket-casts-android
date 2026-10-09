@@ -192,6 +192,7 @@ class PlayerHeaderFragment :
         },
     )
     private val sourceView = SourceView.PLAYER
+    private var isEpisodeChatUpsellOpening = false
 
     private val activityLauncher: ActivityResultLauncher<Intent> = registerForActivityResult(BookmarkActivityContract()) { result ->
         showViewBookmarksSnackbar(result)
@@ -508,6 +509,11 @@ class PlayerHeaderFragment :
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        isEpisodeChatUpsellOpening = false
+    }
+
     override fun onShowNotesClick(episodeUuid: String) {
         val fragment = NotesFragment.newInstance(episodeUuid)
         openBottomSheet(fragment)
@@ -536,7 +542,8 @@ class PlayerHeaderFragment :
                     podcastColors = PodcastColors(navigationState.podcast),
                 ).show(parentFragmentManager, "episode_chat")
             }
-        } else {
+        } else if (!isEpisodeChatUpsellOpening) {
+            isEpisodeChatUpsellOpening = true
             startUpsellFlow(OnboardingUpgradeSource.EPISODE_CHAT)
         }
     }
