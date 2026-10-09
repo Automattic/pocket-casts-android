@@ -815,5 +815,5 @@ private class TestTranscriptManager : TranscriptManager {
         shouldLoadTranscripts = true
     }
 
-    override suspend fun loadGeneratedChapters(episodeUuid: String) = Unit
+    override suspend fun loadGeneratedChapters(episodeUuid: String) = true
 }

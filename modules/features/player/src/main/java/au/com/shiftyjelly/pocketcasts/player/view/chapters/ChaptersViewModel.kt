@@ -32,9 +32,12 @@ import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -68,7 +71,13 @@ class ChaptersViewModel @AssistedInject constructor(
         viewModelScope.launch(ioDispatcher) {
             mode.episodeIdFlow()
                 .filter { it.isNotEmpty() }
-                .collectLatest(transcriptManager::loadGeneratedChapters)
+                .collectLatest { episodeId ->
+                    var retryDelay = 5.seconds
+                    while (!transcriptManager.loadGeneratedChapters(episodeId) && retryDelay <= 2.minutes) {
+                        delay(retryDelay)
+                        retryDelay *= 2
+                    }
+                }
         }
     }
 

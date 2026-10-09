@@ -31,11 +31,14 @@ import com.automattic.eventhorizon.PlayerChapterSelectedEvent
 import java.time.Instant
 import java.util.Date
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -64,7 +67,9 @@ class ChaptersViewModelTest {
     private val playbackManager = mock<PlaybackManager>()
     private val episodeManager = mock<EpisodeManager>()
     private val settings = mock<Settings>()
-    private val transcriptManager = mock<TranscriptManager>()
+    private val transcriptManager = mock<TranscriptManager> {
+        on { loadGeneratedChapters(any()) } doReturn true
+    }
     private val generatedChapterSeeker = mock<GeneratedChapterSeeker> {
         on { resolvingChapterIndex(any()) } doReturn MutableStateFlow<Int?>(null)
     }
@@ -145,6 +150,35 @@ class ChaptersViewModelTest {
         verifyBlocking(transcriptManager) { loadGeneratedChapters("id") }
         verifyBlocking(transcriptManager) { loadGeneratedChapters("id2") }
         verifyBlocking(transcriptManager, never()) { loadGeneratedChapters("") }
+    }
+
+    @Test
+    fun `retries generated chapters with backoff while loading fails`() = runTest {
+        clearInvocations(transcriptManager)
+        whenever(transcriptManager.loadGeneratedChapters("id")).thenReturn(false, false, true)
+        ChaptersViewModel(
+            mode = Mode.Episode("id"),
+            chapterManager = chapterManager,
+            playbackManager = playbackManager,
+            episodeManager = episodeManager,
+            settings = settings,
+            eventHorizon = EventHorizon(TestEventSink()),
+            generatedChapterSeeker = generatedChapterSeeker,
+            transcriptManager = transcriptManager,
+            ioDispatcher = testDispatcher,
+        )
+        verifyBlocking(transcriptManager, times(1)) { loadGeneratedChapters("id") }
+
+        advanceTimeBy(5.seconds)
+        runCurrent()
+        verifyBlocking(transcriptManager, times(2)) { loadGeneratedChapters("id") }
+
+        advanceTimeBy(10.seconds)
+        runCurrent()
+        verifyBlocking(transcriptManager, times(3)) { loadGeneratedChapters("id") }
+
+        advanceTimeBy(10.minutes)
+        verifyBlocking(transcriptManager, times(3)) { loadGeneratedChapters("id") }
     }
 
     @Test

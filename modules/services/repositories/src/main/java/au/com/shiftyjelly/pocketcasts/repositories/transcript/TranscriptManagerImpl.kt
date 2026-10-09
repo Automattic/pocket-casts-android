@@ -148,22 +148,24 @@ class TranscriptManagerImpl @Inject constructor(
             .getOrNull()
     }
 
-    override suspend fun loadGeneratedChapters(episodeUuid: String) {
-        if (!FeatureFlag.isEnabled(Feature.GENERATED_CHAPTERS)) return
+    override suspend fun loadGeneratedChapters(episodeUuid: String): Boolean {
+        if (!FeatureFlag.isEnabled(Feature.GENERATED_CHAPTERS)) return true
 
-        try {
+        return try {
             val generatedTranscript = loadLocalTranscripts(episodeUuid)
-                .firstOrNull { it.isGenerated } ?: return
+                .firstOrNull { it.isGenerated } ?: return true
 
             val metaUrl = generatedTranscript.url.removeSuffix(".vtt") + "-meta.json"
             val meta = transcriptService.getTranscriptOrThrow(metaUrl).use { body ->
                 metaAdapter.fromJson(body.source())
-            } ?: return
+            } ?: return true
             saveAiChaptersIfNeeded(episodeUuid, meta.chapters)
+            true
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
             Timber.tag("GeneratedChapters").e(e, "Failed to load generated chapters for episode $episodeUuid")
+            false
         }
     }
 
