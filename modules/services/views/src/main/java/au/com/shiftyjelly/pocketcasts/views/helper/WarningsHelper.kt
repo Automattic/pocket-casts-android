@@ -85,7 +85,7 @@ class WarningsHelper @Inject constructor(
     }
 
     fun bulkDownloadDialog(episodeCount: Int, onDownload: (waitForWifi: Boolean) -> Unit): ConfirmationDialog? {
-        return if (Network.isUnmeteredConnection(activity)) {
+        return if (episodeCount == 0 || Network.isUnmeteredConnection(activity)) {
             val waitForWifi = settings.warnOnMeteredNetwork.value
             ConfirmationDialog.downloadWarningDialog(episodeCount, activity.resources) { onDownload(waitForWifi) }
         } else {
