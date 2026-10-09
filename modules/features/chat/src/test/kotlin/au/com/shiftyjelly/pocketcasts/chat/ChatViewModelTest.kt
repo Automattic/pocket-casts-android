@@ -44,6 +44,7 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -113,6 +114,7 @@ class ChatViewModelTest {
         episodeManager = episodeManager,
         eventHorizon = EventHorizon(eventSink),
         settings = settings,
+        applicationScope = kotlinx.coroutines.CoroutineScope(coroutineRule.testDispatcher),
         ioDispatcher = coroutineRule.testDispatcher,
         timeSource = timeSource,
     )
@@ -783,8 +785,6 @@ class ChatViewModelTest {
 
         viewModel.playQuote(quote.uuid)
         advanceUntilIdle()
-        playbackState.value = playbackState.value.copy(state = PlaybackState.State.PLAYING, positionMs = 3_500)
-        advanceUntilIdle()
 
         verify(playbackManager).seekToTimeMsSuspend(org.mockito.kotlin.eq(1_000), anyOrNull())
         verify(playbackManager).playQueueSuspend(any(), any())
@@ -792,6 +792,45 @@ class ChatViewModelTest {
         verify(playbackManager, never()).pause(any(), any())
         verify(playbackManager, never()).pauseSuspend(any(), any())
         verify(playbackManager, never()).seekToTimeMsSuspend(org.mockito.kotlin.eq(10_000), anyOrNull())
+    }
+
+    @Test
+    fun `playing a quote while another episode plays switches to the chat episode first`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = "other-uuid")
+        whenever(playbackManager.playNowSuspend(any<BaseEpisode>(), any(), any(), any())).then {
+            playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID)
+            Unit
+        }
+        playableState(quote)
+
+        viewModel.playQuote(quote.uuid)
+        advanceUntilIdle()
+
+        val order = org.mockito.kotlin.inOrder(playbackManager)
+        order.verify(playbackManager).playNowSuspend(org.mockito.kotlin.eq(episode.value), any(), any(), any())
+        order.verify(playbackManager).seekToTimeMsSuspend(org.mockito.kotlin.eq(1_000), anyOrNull())
+    }
+
+    @Test
+    fun `play pause while a quote is starting cancels the quote`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = "other-uuid")
+        whenever(playbackManager.playNowSuspend(any<String>(), any(), any(), any())).then {
+            playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID)
+            Unit
+        }
+        playableState(quote)
+
+        viewModel.playQuote(quote.uuid)
+        runCurrent()
+        viewModel.onPlayPauseClick()
+        advanceUntilIdle()
+
+        verify(playbackManager, never()).seekToTimeMsSuspend(any(), anyOrNull())
+        verify(playbackManager, never()).playQueueSuspend(any(), any())
     }
 
     @Test

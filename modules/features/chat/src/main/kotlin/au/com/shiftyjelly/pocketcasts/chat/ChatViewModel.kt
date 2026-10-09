@@ -4,6 +4,7 @@ import android.net.NetworkCapabilities
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatManager
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatMessage
@@ -33,6 +34,7 @@ import javax.inject.Inject
 import kotlin.time.TimeSource
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -53,6 +55,7 @@ class ChatViewModel @Inject constructor(
     private val episodeManager: EpisodeManager,
     private val eventHorizon: EventHorizon,
     private val settings: Settings,
+    @ApplicationScope private val applicationScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val timeSource: TimeSource,
 ) : ViewModel() {
@@ -152,6 +155,7 @@ class ChatViewModel @Inject constructor(
     }
 
     fun onPlayPauseClick() {
+        quotePlaybackJob?.cancel()
         viewModelScope.launch {
             val state = playbackManager.playbackStateFlow.first()
             val isCurrent = state.episodeUuid == episodeUuid && !state.isEmpty && !state.isStopped && !state.isError
@@ -217,7 +221,7 @@ class ChatViewModel @Inject constructor(
             ),
         )
         quotePlaybackJob?.cancel()
-        quotePlaybackJob = viewModelScope.launch(ioDispatcher) {
+        quotePlaybackJob = applicationScope.launch(ioDispatcher) {
             val episode = episodeManager.findEpisodeByUuid(episodeUuid)
             if (episode == null || !quote.isWithinEpisode(episode.durationMs)) return@launch
             val state = playbackManager.playbackStateFlow.first()
