@@ -541,6 +541,19 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `survey is not offered after feedback was submitted in the chat`() = runTest {
+        setEpisodeInfo()
+        viewModel.onInputTextChange("Question")
+        viewModel.onSend()
+        advanceUntilIdle()
+
+        viewModel.onFeedbackSubmitted()
+
+        assertFalse(viewModel.consumeSurveyEligibility())
+        assertFalse(surveySeen.value)
+    }
+
+    @Test
     fun `survey is not offered when it was already seen`() = runTest {
         surveySeen.value = true
         setEpisodeInfo()

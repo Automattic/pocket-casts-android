@@ -88,7 +88,7 @@ class ChatFragment : BaseDialogFragment() {
             isBeta = args.isBeta,
         )
         childFragmentManager.setFragmentResultListener(ChatFeedbackFragment.SUBMITTED_RESULT_KEY, this) { _, _ ->
-            viewModel.showFeedbackThanks()
+            viewModel.onFeedbackSubmitted()
         }
     }
 
