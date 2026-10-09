@@ -10,6 +10,7 @@ import au.com.shiftyjelly.pocketcasts.servers.podcast.EpisodeChatRequest
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.TokenHandler
 import com.squareup.moshi.Moshi
+import java.util.Date
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.flow.Flow
@@ -61,26 +62,27 @@ class ChatManagerImpl @Inject constructor(
             request = request,
         )
 
-        episodeChatDao.insertMessage(message.toEntity(episodeUuid, quoteMetadataAdapter))
-
         val aiReply = ChatMessage.Assistant(text = response.reply)
-        episodeChatDao.insertMessage(aiReply.toEntity(episodeUuid, quoteMetadataAdapter))
-
-        persistQuoteIfPresent(episodeUuid, response.quote)
+        val messages = listOfNotNull(message, aiReply, response.quote?.toQuoteMessage())
+        val createdAtMs = System.currentTimeMillis()
+        episodeChatDao.insertMessages(
+            messages.mapIndexed { index, chatMessage ->
+                chatMessage.toEntity(episodeUuid, quoteMetadataAdapter).copy(createdAt = Date(createdAtMs + index))
+            },
+        )
     }
 
-    private suspend fun persistQuoteIfPresent(episodeUuid: String, quote: EpisodeChatQuote?) {
-        val quoteText = quote?.text?.takeIf { it.isNotBlank() } ?: return
-        val quoteStart = quote.start.orEmpty()
-        val quoteEnd = quote.end.orEmpty()
-        val quoteMessage = ChatMessage.Quote(
+    private fun EpisodeChatQuote.toQuoteMessage(): ChatMessage.Quote? {
+        val quoteText = text.takeIf { it.isNotBlank() } ?: return null
+        val quoteStart = start.orEmpty()
+        val quoteEnd = end.orEmpty()
+        return ChatMessage.Quote(
             text = quoteText,
             start = quoteStart,
             end = quoteEnd,
             startMs = parseTimestampMs(quoteStart) ?: -1,
             endMs = parseTimestampMs(quoteEnd) ?: -1,
         )
-        episodeChatDao.insertMessage(quoteMessage.toEntity(episodeUuid, quoteMetadataAdapter))
     }
 
     override suspend fun clearMessages(episodeUuid: String) {
