@@ -3,13 +3,18 @@ package au.com.shiftyjelly.pocketcasts.chat
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatManager
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatMessage
 import au.com.shiftyjelly.pocketcasts.repositories.playback.NetworkConnectionWatcher
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.automattic.eventhorizon.EpisodeChatClearedEvent
 import com.automattic.eventhorizon.EpisodeChatErrorType
 import com.automattic.eventhorizon.EpisodeChatMessageFailedEvent
@@ -17,10 +22,13 @@ import com.automattic.eventhorizon.EpisodeChatMessageSentEvent
 import com.automattic.eventhorizon.EpisodeChatShownEvent
 import com.automattic.eventhorizon.EventHorizon
 import java.io.IOException
+import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -29,15 +37,27 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ChatViewModelTest {
     @get:Rule
     val coroutineRule = MainCoroutineRule()
 
+    @get:Rule
+    val featureFlagRule = InMemoryFeatureFlagRule()
+
     private val chatManager = TestChatManager()
+    private val playbackManager = mock<PlaybackManager> {
+        on { playbackStateFlow } doReturn MutableStateFlow(PlaybackState())
+    }
+    private val episodeManager = mock<EpisodeManager>()
     private val networkConnectionWatcher = TestNetworkConnectionWatcher()
 
     private lateinit var eventSink: TestEventSink
@@ -52,16 +72,14 @@ class ChatViewModelTest {
     private fun createViewModel() = ChatViewModel(
         networkConnectionWatcher = networkConnectionWatcher,
         chatManager = chatManager,
-        playbackManager = mock<PlaybackManager> {
-            on { playbackStateFlow } doReturn MutableStateFlow(PlaybackState())
-        },
-        episodeManager = mock<EpisodeManager>(),
+        playbackManager = playbackManager,
+        episodeManager = episodeManager,
         eventHorizon = EventHorizon(eventSink),
         applicationScope = kotlinx.coroutines.CoroutineScope(coroutineRule.testDispatcher),
     )
 
     @Test
-    fun `set episode info creates chat with welcome message when empty`() = runTest {
+    fun `set episode info creates chat without messages`() = runTest {
         viewModel.setEpisodeInfo(
             episodeUuid = EPISODE_UUID,
             episodeTitle = "Episode title",
@@ -69,7 +87,6 @@ class ChatViewModelTest {
             podcastUuid = PODCAST_UUID,
             podcastTitle = "Podcast title",
             episodeDurationMs = 123_000,
-            welcomeMessage = "Welcome",
         )
 
         viewModel.uiState.test {
@@ -80,9 +97,9 @@ class ChatViewModelTest {
             assertEquals(PODCAST_UUID, state.podcastUuid)
             assertEquals("Podcast title", state.podcastTitle)
             assertEquals(123_000, state.episodeDurationMs)
-            assertEquals(listOf(ChatMessage.Assistant(text = "Welcome", uuid = "welcome-uuid")), state.messages)
+            assertEquals(emptyList<ChatMessage>(), state.messages)
         }
-        assertEquals(CreateChat(EPISODE_UUID, PODCAST_UUID, "Welcome"), chatManager.createdChats.single())
+        assertEquals(CreateChat(EPISODE_UUID, PODCAST_UUID), chatManager.createdChats.single())
     }
 
     @Test
@@ -100,7 +117,7 @@ class ChatViewModelTest {
     }
 
     @Test
-    fun `set episode info does not create chat when messages exist`() = runTest {
+    fun `set episode info shows stored messages`() = runTest {
         val message = ChatMessage.User(text = "Existing", uuid = "user-uuid")
         chatManager.messages.value = listOf(message)
 
@@ -111,13 +128,11 @@ class ChatViewModelTest {
             podcastUuid = PODCAST_UUID,
             podcastTitle = "Podcast title",
             episodeDurationMs = 123_000,
-            welcomeMessage = "Welcome",
         )
 
         viewModel.uiState.test {
             assertEquals(listOf(message), awaitItem().messages)
         }
-        assertTrue(chatManager.createdChats.isEmpty())
     }
 
     @Test
@@ -151,6 +166,26 @@ class ChatViewModelTest {
         )
         assertFalse(viewModel.uiState.value.isAwaitingReply)
         assertEquals(null, viewModel.uiState.value.error)
+    }
+
+    @Test
+    fun `send passes only conversation messages as history`() = runTest {
+        setEpisodeInfo()
+        viewModel.onInputTextChange("First question")
+        viewModel.onSend()
+        advanceUntilIdle()
+        viewModel.onInputTextChange("Second question")
+
+        viewModel.onSend()
+        advanceUntilIdle()
+
+        assertEquals(
+            listOf(
+                emptyList(),
+                listOf("First question", "Response"),
+            ),
+            chatManager.sentHistories,
+        )
     }
 
     @Test
@@ -246,11 +281,11 @@ class ChatViewModelTest {
         setEpisodeInfo()
         advanceUntilIdle()
 
-        assertEquals(listOf(ChatMessage.Assistant(text = "Welcome", uuid = "welcome-uuid")), viewModel.uiState.value.messages)
+        assertEquals(emptyList<ChatMessage>(), viewModel.uiState.value.messages)
     }
 
     @Test
-    fun `clear chat cancels waiting state and restores welcome message`() = runTest {
+    fun `clear chat cancels waiting state and removes messages`() = runTest {
         setEpisodeInfo()
         chatManager.sendMessageException = IOException()
         viewModel.onInputTextChange("Question")
@@ -261,10 +296,8 @@ class ChatViewModelTest {
         viewModel.clearChat()
         advanceUntilIdle()
 
-        assertEquals(ClearMessages(EPISODE_UUID, "Welcome"), chatManager.clearedMessages.single())
-        val message = viewModel.uiState.value.messages.single()
-        assertTrue(message is ChatMessage.Assistant)
-        assertEquals("Welcome", (message as ChatMessage.Assistant).text)
+        assertEquals(EPISODE_UUID, chatManager.clearedEpisodeUuids.single())
+        assertEquals(emptyList<ChatMessage>(), viewModel.uiState.value.messages)
         assertEquals(null, viewModel.uiState.value.error)
         assertFalse(viewModel.uiState.value.isAwaitingReply)
     }
@@ -287,15 +320,101 @@ class ChatViewModelTest {
         )
     }
 
-    private fun setEpisodeInfo() {
+    @Test
+    fun `quote within episode can play`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+
+        assertTrue(playableState(quote))
+    }
+
+    @Test
+    fun `quote starting after episode end cannot play`() = runTest {
+        val quote = createQuote(startMs = 49_020_000, endMs = 49_500_000)
+
+        assertFalse(playableState(quote))
+    }
+
+    @Test
+    fun `quote ending after episode end cannot play`() = runTest {
+        val quote = createQuote(startMs = 120_000, endMs = 130_000)
+
+        assertFalse(playableState(quote))
+    }
+
+    @Test
+    fun `quote ending at episode end cannot play`() = runTest {
+        val quote = createQuote(startMs = 120_000, endMs = 123_000)
+
+        assertFalse(playableState(quote))
+    }
+
+    @Test
+    fun `quote with unknown episode duration can play`() = runTest {
+        val quote = createQuote(startMs = 49_020_000, endMs = 49_500_000)
+
+        assertTrue(playableState(quote, episodeDurationMs = 0))
+    }
+
+    @Test
+    fun `play quote outside episode does not touch playback`() = runTest {
+        val quote = createQuote(startMs = 49_020_000, endMs = 49_500_000)
+        playableState(quote)
+        eventSink.skipEvent()
+
+        viewModel.playQuote(quote.uuid)
+        advanceUntilIdle()
+
+        verifyNoSeek()
+        assertTrue(eventSink.isEmpty())
+    }
+
+    @Test
+    fun `play quote outside stored episode duration does not seek`() = runTest {
+        val quote = createQuote(startMs = 49_020_000, endMs = 49_500_000)
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(
+            PodcastEpisode(uuid = EPISODE_UUID, publishedDate = Date(), duration = 123.0),
+        )
+        playableState(quote, episodeDurationMs = 0)
+
+        viewModel.playQuote(quote.uuid)
+        viewModel.uiState.first { state -> state.messages.filterIsInstance<ChatMessage.Quote>().none { it.isPlaying } }
+
+        verifyNoSeek()
+    }
+
+    private suspend fun verifyNoSeek() {
+        verify(playbackManager, never()).playNowSuspend(any<BaseEpisode>(), any(), any(), any())
+        verify(playbackManager, never()).seekToTimeMsSuspend(any(), anyOrNull())
+    }
+
+    private fun TestScope.playableState(
+        quote: ChatMessage.Quote,
+        episodeDurationMs: Int = 123_000,
+    ): Boolean {
+        FeatureFlag.setEnabled(Feature.EPISODE_CHAT_PLAYABLE_QUOTES, true)
+        chatManager.messages.value = listOf(quote)
+        setEpisodeInfo(episodeDurationMs)
+        advanceUntilIdle()
+        return viewModel.uiState.value.messages.filterIsInstance<ChatMessage.Quote>().single().canPlay
+    }
+
+    private fun createQuote(startMs: Int, endMs: Int) = ChatMessage.Quote(
+        text = "Quote",
+        start = "start",
+        end = "end",
+        startMs = startMs,
+        endMs = endMs,
+        uuid = "quote-uuid",
+    )
+
+    private fun setEpisodeInfo(episodeDurationMs: Int = 123_000) {
         viewModel.setEpisodeInfo(
             episodeUuid = EPISODE_UUID,
             episodeTitle = "Episode title",
             episodeSubtitle = "Episode subtitle",
             podcastUuid = PODCAST_UUID,
             podcastTitle = "Podcast title",
-            episodeDurationMs = 123_000,
-            welcomeMessage = "Welcome",
+            episodeDurationMs = episodeDurationMs,
         )
     }
 
@@ -307,16 +426,14 @@ class ChatViewModelTest {
         val messages = MutableStateFlow<List<ChatMessage>>(emptyList())
         val createdChats = mutableListOf<CreateChat>()
         val sentMessages = mutableListOf<SendMessage>()
-        val clearedMessages = mutableListOf<ClearMessages>()
+        val sentHistories = mutableListOf<List<String>>()
+        val clearedEpisodeUuids = mutableListOf<String>()
         var sendMessageException: Exception? = null
 
         override fun observeMessages(episodeUuid: String): Flow<List<ChatMessage>> = messages
 
-        override suspend fun getMessages(episodeUuid: String): List<ChatMessage> = messages.value
-
-        override suspend fun createChat(episodeUuid: String, podcastUuid: String, welcomeMessage: ChatMessage) {
-            createdChats += CreateChat(episodeUuid, podcastUuid, (welcomeMessage as ChatMessage.Assistant).text)
-            messages.value = listOf(welcomeMessage.copy(uuid = "welcome-uuid"))
+        override suspend fun createChat(episodeUuid: String, podcastUuid: String) {
+            createdChats += CreateChat(episodeUuid, podcastUuid)
         }
 
         override suspend fun sendMessage(
@@ -326,18 +443,24 @@ class ChatViewModelTest {
         ) {
             sendMessageException?.let { throw it }
             sentMessages += SendMessage(episodeUuid, message.text)
-            messages.value += listOf(message, ChatMessage.Assistant(text = "Response", uuid = "response-uuid"))
+            sentHistories += allMessages.map { it.text() }
+            messages.value += listOf(message, ChatMessage.Assistant(text = "Response", uuid = "response-uuid-${sentMessages.size}"))
         }
 
-        override suspend fun clearMessages(episodeUuid: String, welcomeMessage: ChatMessage) {
-            clearedMessages += ClearMessages(episodeUuid, (welcomeMessage as ChatMessage.Assistant).text)
-            messages.value = listOf(welcomeMessage.copy(uuid = "welcome-uuid"))
+        override suspend fun clearMessages(episodeUuid: String) {
+            clearedEpisodeUuids += episodeUuid
+            messages.value = emptyList()
+        }
+
+        private fun ChatMessage.text() = when (this) {
+            is ChatMessage.User -> text
+            is ChatMessage.Assistant -> text
+            is ChatMessage.Quote -> text
         }
     }
 
-    private data class CreateChat(val episodeUuid: String, val podcastUuid: String, val welcomeMessage: String)
+    private data class CreateChat(val episodeUuid: String, val podcastUuid: String)
     private data class SendMessage(val episodeUuid: String, val message: String)
-    private data class ClearMessages(val episodeUuid: String, val welcomeMessage: String)
 
     private companion object {
         const val EPISODE_UUID = "episode-uuid"

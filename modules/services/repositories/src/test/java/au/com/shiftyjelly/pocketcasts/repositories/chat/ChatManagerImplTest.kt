@@ -14,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.TokenHandler
 import com.squareup.moshi.Moshi
 import java.io.IOException
+import java.util.Date
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
@@ -44,25 +45,28 @@ class ChatManagerImplTest {
     )
 
     @Test
-    fun `create chat stores chat and welcome message`() = runTest {
+    fun `create chat stores chat without messages`() = runTest {
         manager.createChat(
             episodeUuid = EPISODE_UUID,
             podcastUuid = PODCAST_UUID,
-            welcomeMessage = ChatMessage.Assistant(text = "Welcome", uuid = "welcome-uuid"),
         )
 
         assertEquals(EPISODE_UUID, episodeChatDao.chats.single().episodeUuid)
         assertEquals(PODCAST_UUID, episodeChatDao.chats.single().podcastUuid)
-        assertEquals(
-            EpisodeChatMessage(
-                uuid = "welcome-uuid",
-                episodeUuid = EPISODE_UUID,
-                text = "Welcome",
-                role = ChatRole.Assistant.value,
-                createdAt = episodeChatDao.messages.single().createdAt,
-            ),
-            episodeChatDao.messages.single(),
+        assertEquals(emptyList<EpisodeChatMessage>(), episodeChatDao.messages)
+    }
+
+    @Test
+    fun `create chat keeps existing chat`() = runTest {
+        val existingChat = EpisodeChat(episodeUuid = EPISODE_UUID, podcastUuid = PODCAST_UUID, createdAt = Date(100))
+        episodeChatDao.chats += existingChat
+
+        manager.createChat(
+            episodeUuid = EPISODE_UUID,
+            podcastUuid = PODCAST_UUID,
         )
+
+        assertEquals(listOf(existingChat), episodeChatDao.chats)
     }
 
     @Test
@@ -86,7 +90,6 @@ class ChatManagerImplTest {
             episodeUuid = EPISODE_UUID,
             message = ChatMessage.User(text = "What happened?", uuid = "user-uuid"),
             allMessages = listOf(
-                ChatMessage.Assistant(text = "Welcome", uuid = "welcome-uuid"),
                 ChatMessage.User(text = "Earlier question", uuid = "earlier-user-uuid"),
                 ChatMessage.Quote(text = "Earlier quote", start = "00:00", end = "00:01", uuid = "quote-uuid"),
             ),
@@ -101,7 +104,6 @@ class ChatManagerImplTest {
                 transcriptUrl = "author-url",
                 message = "What happened?",
                 conversationHistory = listOf(
-                    ConversationMessage(role = "assistant", content = "Welcome"),
                     ConversationMessage(role = "user", content = "Earlier question"),
                     ConversationMessage(role = "assistant", content = "Earlier quote"),
                 ),
@@ -175,20 +177,16 @@ class ChatManagerImplTest {
     }
 
     @Test
-    fun `clear messages deletes episode messages and stores welcome message`() = runTest {
+    fun `clear messages deletes episode messages`() = runTest {
         episodeChatDao.messages += listOf(
             createMessage(uuid = "old-message", episodeUuid = EPISODE_UUID, text = "Old message"),
             createMessage(uuid = "other-message", episodeUuid = "other-episode-uuid", text = "Other message"),
         )
 
-        manager.clearMessages(
-            episodeUuid = EPISODE_UUID,
-            welcomeMessage = ChatMessage.Assistant(text = "Welcome", uuid = "welcome-uuid"),
-        )
+        manager.clearMessages(episodeUuid = EPISODE_UUID)
 
         assertEquals(listOf(EPISODE_UUID), episodeChatDao.deletedEpisodeUuids)
-        assertEquals(listOf("other-message", "welcome-uuid"), episodeChatDao.messages.map { it.uuid })
-        assertEquals(listOf("Other message", "Welcome"), episodeChatDao.messages.map { it.text })
+        assertEquals(listOf("other-message"), episodeChatDao.messages.map { it.uuid })
     }
 
     @Test
@@ -223,10 +221,10 @@ class ChatManagerImplTest {
         val chats = mutableListOf<EpisodeChat>()
         val messages = mutableListOf<EpisodeChatMessage>()
         val deletedEpisodeUuids = mutableListOf<String>()
-
-        override suspend fun insertChat(chat: EpisodeChat) {
-            chats.removeAll { it.episodeUuid == chat.episodeUuid }
-            chats += chat
+        override suspend fun insertChatIfAbsent(chat: EpisodeChat) {
+            if (chats.none { it.episodeUuid == chat.episodeUuid }) {
+                chats += chat
+            }
         }
 
         override suspend fun getChatByEpisode(episodeUuid: String): EpisodeChat? {
