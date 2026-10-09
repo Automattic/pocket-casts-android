@@ -78,8 +78,14 @@ class ChatViewModelTest {
     private val betaSheetSeenSetting = mock<UserSetting<Boolean>> {
         on { value } doAnswer { betaSheetSeen.value }
     }
+    private val surveySeen = MutableStateFlow(false)
+    private val surveySeenSetting = mock<UserSetting<Boolean>> {
+        on { value } doAnswer { surveySeen.value }
+        on { set(any(), any(), any(), any()) } doAnswer { surveySeen.value = it.getArgument(0) }
+    }
     private val settings = mock<Settings> {
         on { episodeChatBetaSheetSeen } doReturn betaSheetSeenSetting
+        on { episodeChatSurveySeen } doReturn surveySeenSetting
     }
     private val networkConnectionWatcher = TestNetworkConnectionWatcher()
 
@@ -390,6 +396,47 @@ class ChatViewModelTest {
             EpisodeChatInputType.SummaryPrompt,
             (eventSink.pollEvent() as EpisodeChatMessageSentEvent).inputType,
         )
+    }
+
+    @Test
+    fun `survey is not offered when no answer was received`() = runTest {
+        setEpisodeInfo()
+
+        assertFalse(viewModel.consumeSurveyEligibility())
+    }
+
+    @Test
+    fun `survey is not offered when sending failed`() = runTest {
+        setEpisodeInfo()
+        chatManager.sendMessageException = IOException()
+        viewModel.onInputTextChange("Question")
+        viewModel.onSend()
+        advanceUntilIdle()
+
+        assertFalse(viewModel.consumeSurveyEligibility())
+    }
+
+    @Test
+    fun `survey is offered once after an answer`() = runTest {
+        setEpisodeInfo()
+        viewModel.onInputTextChange("Question")
+        viewModel.onSend()
+        advanceUntilIdle()
+
+        assertTrue(viewModel.consumeSurveyEligibility())
+        assertTrue(surveySeen.value)
+        assertFalse(viewModel.consumeSurveyEligibility())
+    }
+
+    @Test
+    fun `survey is not offered when it was already seen`() = runTest {
+        surveySeen.value = true
+        setEpisodeInfo()
+        viewModel.onInputTextChange("Question")
+        viewModel.onSend()
+        advanceUntilIdle()
+
+        assertFalse(viewModel.consumeSurveyEligibility())
     }
 
     @Test

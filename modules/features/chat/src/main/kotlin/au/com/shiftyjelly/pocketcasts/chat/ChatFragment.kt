@@ -138,7 +138,22 @@ class ChatFragment : BaseDialogFragment() {
 
     override fun onDismiss(dialog: DialogInterface) {
         viewModel.trackDismissed()
+        showSurveyIfEligible()
         super.onDismiss(dialog)
+    }
+
+    private fun showSurveyIfEligible() {
+        val isHostGoingAway = parentFragment?.isRemoving == true ||
+            activity?.isChangingConfigurations == true ||
+            activity?.isFinishing == true
+        if (isHostGoingAway || parentFragmentManager.isStateSaved || !viewModel.consumeSurveyEligibility()) return
+        ChatSurveyFragment.show(
+            fragmentManager = parentFragmentManager,
+            episodeUuid = args.episodeUuid,
+            podcastUuid = args.podcastUuid,
+            sourceView = args.sourceView,
+            podcastColors = args.podcastColors,
+        )
     }
 
     @Suppress("DEPRECATION")

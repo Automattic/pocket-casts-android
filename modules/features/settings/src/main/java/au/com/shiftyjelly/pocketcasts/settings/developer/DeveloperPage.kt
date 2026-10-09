@@ -74,6 +74,7 @@ fun DeveloperPage(
     onResetNotificationsPrompt: () -> Unit,
     onShowAppReviewPrompt: () -> Unit,
     onClearAppReviewSettings: () -> Unit,
+    onResetEpisodeChatSurvey: () -> Unit,
     onTriggerPlaybackError: () -> Unit,
     onTriggerConnectionError: () -> Unit,
     modifier: Modifier = Modifier,
@@ -148,6 +149,9 @@ fun DeveloperPage(
         }
         item {
             ClearAppReviewSettings(onClick = onClearAppReviewSettings)
+        }
+        item {
+            ResetEpisodeChatSurvey(onClick = onResetEpisodeChatSurvey)
         }
 
         item {
@@ -418,6 +422,19 @@ private fun ClearAppReviewSettings(
 }
 
 @Composable
+private fun ResetEpisodeChatSurvey(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    SettingRow(
+        primaryText = "Reset episode chat survey",
+        secondaryText = "Show the survey again after the next answered episode chat",
+        icon = rememberVectorPainter(Icons.Outlined.RestartAlt),
+        modifier = modifier.clickable { onClick() },
+    )
+}
+
+@Composable
 private fun TriggerPlaybackError(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -568,6 +585,7 @@ private fun DeveloperPagePreview() {
         onResetNotificationsPrompt = {},
         onShowAppReviewPrompt = {},
         onClearAppReviewSettings = {},
+        onResetEpisodeChatSurvey = {},
         onTriggerPlaybackError = {},
         onTriggerConnectionError = {},
     )
