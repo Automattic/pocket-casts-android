@@ -16,11 +16,11 @@ class PocketCastsMediaIntentReceiver : MediaIntentReceiver() {
     }
 
     override fun onReceiveActionRewind(session: Session, skipStepMs: Long) {
-        seek(session, rewindDeltaMs(application.settings.skipBackInSecs.value))
+        seek(session, -application.settings.skipBackInSecs.value * 1000L)
     }
 
     override fun onReceiveActionForward(session: Session, skipStepMs: Long) {
-        seek(session, forwardDeltaMs(application.settings.skipForwardInSecs.value))
+        seek(session, application.settings.skipForwardInSecs.value * 1000L)
     }
 
     private fun seek(session: Session, deltaMs: Long) {
@@ -29,6 +29,7 @@ class PocketCastsMediaIntentReceiver : MediaIntentReceiver() {
         val client = castSession.remoteMediaClient ?: return
         val targetPositionMs = seekTargetPositionMs(
             approximatePositionMs = client.approximateStreamPosition,
+            durationMs = client.streamDuration,
             deltaMs = deltaMs,
             isLiveStream = client.isLiveStream,
             isPlayingAd = client.isPlayingAd,
@@ -42,16 +43,14 @@ class PocketCastsMediaIntentReceiver : MediaIntentReceiver() {
     }
 }
 
-internal fun rewindDeltaMs(skipBackInSecs: Int): Long = -skipBackInSecs.toLong() * 1000L
-
-internal fun forwardDeltaMs(skipForwardInSecs: Int): Long = skipForwardInSecs.toLong() * 1000L
-
 internal fun seekTargetPositionMs(
     approximatePositionMs: Long,
+    durationMs: Long,
     deltaMs: Long,
     isLiveStream: Boolean,
     isPlayingAd: Boolean,
 ): Long? {
     if (deltaMs == 0L || isLiveStream || isPlayingAd) return null
-    return approximatePositionMs + deltaMs
+    val targetPositionMs = (approximatePositionMs + deltaMs).coerceAtLeast(0L)
+    return if (durationMs > 0L) targetPositionMs.coerceAtMost(durationMs) else targetPositionMs
 }
