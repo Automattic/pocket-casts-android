@@ -89,9 +89,6 @@ enum class OnboardingUpgradeSource(
     EPISODE_CHAT(
         analyticsValue = OnboardingSourceType.EpisodeChat,
     ),
-    AI_SUMMARIES(
-        analyticsValue = OnboardingSourceType.Unknown,
-    ),
     WHATS_NEW(
         analyticsValue = OnboardingSourceType.WhatsNew,
     ),

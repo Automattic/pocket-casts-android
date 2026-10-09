@@ -288,15 +288,6 @@ enum class Feature(
         hasDevToggle = true,
         addedOn = LocalDate.parse("2026-04-27"),
     ),
-    AI_SUMMARIES(
-        key = "ai_summaries",
-        title = "AI Summaries",
-        defaultValue = isDebugOrPrototypeBuild,
-        tier = FeatureTier.Plus(),
-        hasFirebaseRemoteFlag = true,
-        hasDevToggle = true,
-        addedOn = LocalDate.parse("2026-05-12"),
-    ),
     GENERATED_CHAPTERS(
         key = "generated_chapters",
         title = "AI-Generated Chapters",
