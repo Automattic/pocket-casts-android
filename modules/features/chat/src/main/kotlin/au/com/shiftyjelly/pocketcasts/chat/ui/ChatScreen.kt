@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.chat.ui
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,13 +15,17 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
+import androidx.compose.material.Snackbar
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.Text
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
@@ -31,12 +36,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import au.com.shiftyjelly.pocketcasts.chat.ChatAnswerRating
 import au.com.shiftyjelly.pocketcasts.chat.ChatError
 import au.com.shiftyjelly.pocketcasts.chat.ChatUiState
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.LocalPodcastColors
 import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
 import au.com.shiftyjelly.pocketcasts.compose.PodcastColorsParameterProvider
+import au.com.shiftyjelly.pocketcasts.compose.components.ThemedSnackbarHost
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatMessage
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -52,6 +59,8 @@ fun ChatScreen(
     onClickSuggestion: (String) -> Unit,
     onRetry: () -> Unit,
     onPlayQuote: (quoteUuid: String) -> Unit,
+    onRateAnswer: (answerUuid: String, rating: ChatAnswerRating) -> Unit,
+    snackbarHostState: SnackbarHostState,
     onDismissBetaSheet: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -97,6 +106,8 @@ fun ChatScreen(
             onClickSuggestion = onClickSuggestion,
             onRetry = onRetry,
             onPlayQuote = onPlayQuote,
+            onRateAnswer = onRateAnswer,
+            snackbarHostState = snackbarHostState,
         )
     }
 }
@@ -113,6 +124,8 @@ private fun ChatContent(
     onClickSuggestion: (String) -> Unit,
     onRetry: () -> Unit,
     onPlayQuote: (quoteUuid: String) -> Unit,
+    onRateAnswer: (answerUuid: String, rating: ChatAnswerRating) -> Unit,
+    snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
@@ -144,54 +157,75 @@ private fun ChatContent(
             theme = theme,
         )
 
-        Column(
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier
-                .weight(1f)
-                .verticalScroll(scrollState)
-                .padding(horizontal = 16.dp, vertical = 12.dp),
-        ) {
-            if (uiState.areMessagesLoaded) {
-                ChatWelcome(
-                    isConversationStarted = uiState.messages.isNotEmpty() || uiState.isAwaitingReply,
-                    isConnected = uiState.isConnected,
-                    onClickSuggestion = onClickSuggestion,
-                    theme = theme,
-                )
-            }
-            uiState.messages.forEachIndexed { index, message ->
-                when (message) {
-                    is ChatMessage.Assistant -> AiMessageBubble(
-                        text = message.displayText,
+        Box(modifier = Modifier.weight(1f)) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(scrollState)
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
+            ) {
+                if (uiState.areMessagesLoaded) {
+                    ChatWelcome(
+                        isConversationStarted = uiState.messages.isNotEmpty() || uiState.isAwaitingReply,
+                        isConnected = uiState.isConnected,
+                        onClickSuggestion = onClickSuggestion,
                         theme = theme,
-                    )
-
-                    is ChatMessage.Quote -> AiQuoteBubble(
-                        quote = message.displayText,
-                        timestampLabel = message.timestampLabel,
-                        isPlayable = message.canPlay,
-                        isPlaying = message.isPlaying,
-                        theme = theme,
-                        onClickPlay = { onPlayQuote(message.uuid) },
-                    )
-
-                    is ChatMessage.User -> UserMessageBubble(
-                        text = message.text,
-                        theme = theme,
-                        allowRetry = index == uiState.messages.lastIndex && uiState.error != null,
-                        onRetry = onRetry,
                     )
                 }
+                val answerUuidsByLastIndex = uiState.answerUuidsByLastIndex
+                uiState.messages.forEachIndexed { index, message ->
+                    when (message) {
+                        is ChatMessage.Assistant -> AiMessageBubble(
+                            text = message.displayText,
+                            theme = theme,
+                        )
+
+                        is ChatMessage.Quote -> AiQuoteBubble(
+                            quote = message.displayText,
+                            timestampLabel = message.timestampLabel,
+                            isPlayable = message.canPlay,
+                            isPlaying = message.isPlaying,
+                            theme = theme,
+                            onClickPlay = { onPlayQuote(message.uuid) },
+                        )
+
+                        is ChatMessage.User -> UserMessageBubble(
+                            text = message.text,
+                            theme = theme,
+                            allowRetry = index == uiState.messages.lastIndex && uiState.error != null,
+                            onRetry = onRetry,
+                        )
+                    }
+                    answerUuidsByLastIndex[index]?.let { answerUuid ->
+                        ChatAnswerRatingRow(
+                            rating = uiState.answerRatings[answerUuid],
+                            onRate = { rating -> onRateAnswer(answerUuid, rating) },
+                            theme = theme,
+                        )
+                    }
+                }
+                if (uiState.messages.lastOrNull().isAnswer && !uiState.isAwaitingReply) {
+                    ChatDisclaimer(theme = theme)
+                }
+                if (uiState.isAwaitingReply) {
+                    ThinkingBubble(theme = theme)
+                }
+                if (uiState.error != null) {
+                    ChatErrorMessage(error = uiState.error, theme = theme)
+                }
             }
-            if (uiState.messages.lastOrNull().isAnswer && !uiState.isAwaitingReply) {
-                ChatDisclaimer(theme = theme)
-            }
-            if (uiState.isAwaitingReply) {
-                ThinkingBubble(theme = theme)
-            }
-            if (uiState.error != null) {
-                ChatErrorMessage(error = uiState.error, theme = theme)
-            }
+            ThemedSnackbarHost(
+                hostState = snackbarHostState,
+                snackbar = { data, _ ->
+                    Snackbar(
+                        snackbarData = data,
+                        backgroundColor = Color.White,
+                        contentColor = Color.Black,
+                    )
+                },
+                modifier = Modifier.align(Alignment.BottomCenter),
+            )
         }
 
         ChatInputBar(
@@ -283,6 +317,8 @@ private fun ChatScreenPreview(
                 onClickSuggestion = {},
                 onRetry = {},
                 onPlayQuote = {},
+                onRateAnswer = { _, _ -> },
+                snackbarHostState = remember { SnackbarHostState() },
                 onDismissBetaSheet = {},
             )
         }
@@ -312,6 +348,8 @@ private fun ChatScreenEmptyPreview(
                 onClickSuggestion = {},
                 onRetry = {},
                 onPlayQuote = {},
+                onRateAnswer = { _, _ -> },
+                snackbarHostState = remember { SnackbarHostState() },
                 onDismissBetaSheet = {},
             )
         }

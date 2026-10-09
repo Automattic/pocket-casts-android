@@ -2569,6 +2569,8 @@
     <string name="chat_survey_not_really">Not really</string>
     <string name="chat_survey_yes">Yes!</string>
     <string name="chat_feedback_thanks">Thanks for the feedback</string>
+    <string name="chat_rate_answer_good">Good response</string>
+    <string name="chat_rate_answer_bad">Bad response</string>
     <string name="chat_feedback_title">What went wrong</string>
     <string name="chat_feedback_reason_not_interesting">It wasn’t interesting</string>
     <string name="chat_feedback_reason_wrong_facts">It got the facts wrong</string>

@@ -34,12 +34,14 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -60,11 +62,15 @@ class ChatViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(ChatUiState())
     val uiState = _uiState.asStateFlow()
 
+    private val _feedbackThanks = Channel<Unit>(Channel.CONFLATED)
+    val feedbackThanks = _feedbackThanks.receiveAsFlow()
+
     private var sendJob: Job? = null
     private var quotePlaybackSession: QuotePlaybackSession? = null
     private var transientUserMessage: ChatMessage.User? = null
     private var transientInputType: EpisodeChatInputType = EpisodeChatInputType.Typed
     private var hasReceivedAnswer = false
+    private var hasSubmittedFeedback = false
     private lateinit var episodeUuid: String
     private lateinit var podcastUuid: String
     private lateinit var sourceView: SourceView
@@ -188,6 +194,7 @@ class ChatViewModel @Inject constructor(
                 messages = emptyList(),
                 isAwaitingReply = false,
                 error = null,
+                answerRatings = emptyMap(),
             )
         }
         eventHorizon.track(
@@ -521,8 +528,29 @@ class ChatViewModel @Inject constructor(
         )
     }
 
+    fun rateAnswer(answerUuid: String, rating: ChatAnswerRating): ChatAnswerRating? {
+        val newRating = rating.takeIf { it != _uiState.value.answerRatings[answerUuid] }
+        _uiState.update { state ->
+            val ratings = if (newRating == null) {
+                state.answerRatings - answerUuid
+            } else {
+                state.answerRatings + (answerUuid to newRating)
+            }
+            state.copy(answerRatings = ratings)
+        }
+        if (newRating == ChatAnswerRating.Positive) {
+            _feedbackThanks.trySend(Unit)
+        }
+        return newRating
+    }
+
+    fun onFeedbackSubmitted() {
+        hasSubmittedFeedback = true
+        _feedbackThanks.trySend(Unit)
+    }
+
     fun consumeSurveyEligibility(): Boolean {
-        if (!hasReceivedAnswer || settings.episodeChatSurveySeen.value) return false
+        if (!hasReceivedAnswer || hasSubmittedFeedback || settings.episodeChatSurveySeen.value) return false
         settings.episodeChatSurveySeen.set(true, updateModifiedAt = false)
         return true
     }
@@ -625,8 +653,31 @@ data class ChatUiState(
     val isBeta: Boolean = false,
     val isBetaSheetVisible: Boolean = false,
     val playback: ChatPlayback = ChatPlayback(),
+    val answerRatings: Map<String, ChatAnswerRating> = emptyMap(),
 ) {
     val canSend: Boolean get() = inputText.isNotBlank() && isConnected && !isAwaitingReply
+
+    val answerUuidsByLastIndex: Map<Int, String>
+        get() = buildMap {
+            var answerUuid: String? = null
+            messages.forEachIndexed { index, message ->
+                if (message is ChatMessage.User) {
+                    answerUuid = null
+                } else {
+                    val uuid = answerUuid ?: message.uuid
+                    answerUuid = uuid
+                    val next = messages.getOrNull(index + 1)
+                    if (next == null || next is ChatMessage.User) {
+                        put(index, uuid)
+                    }
+                }
+            }
+        }
+}
+
+enum class ChatAnswerRating {
+    Positive,
+    Negative,
 }
 
 data class ChatPlayback(

@@ -8,12 +8,15 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.res.stringResource
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.chat.ui.ChatScreen
@@ -29,6 +32,7 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.parcelize.Parcelize
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -83,6 +87,9 @@ class ChatFragment : BaseDialogFragment() {
             sourceView = args.sourceView,
             isBeta = args.isBeta,
         )
+        childFragmentManager.setFragmentResultListener(ChatFeedbackFragment.SUBMITTED_RESULT_KEY, this) { _, _ ->
+            viewModel.onFeedbackSubmitted()
+        }
     }
 
     override fun onCreateView(
@@ -91,6 +98,14 @@ class ChatFragment : BaseDialogFragment() {
         savedInstanceState: Bundle?,
     ) = contentWithoutConsumedInsets {
         val uiState by viewModel.uiState.collectAsState()
+        val snackbarHostState = remember { SnackbarHostState() }
+        val thanksMessage = stringResource(LR.string.chat_feedback_thanks)
+        LaunchedEffect(snackbarHostState) {
+            viewModel.feedbackThanks.collectLatest {
+                snackbarHostState.currentSnackbarData?.dismiss()
+                snackbarHostState.showSnackbar(thanksMessage)
+            }
+        }
 
         AppTheme(theme.activeTheme) {
             CompositionLocalProvider(LocalPodcastColors provides args.podcastColors) {
@@ -109,11 +124,25 @@ class ChatFragment : BaseDialogFragment() {
                     onClickSuggestion = viewModel::onSummarizeClick,
                     onRetry = viewModel::retry,
                     onPlayQuote = viewModel::playQuote,
+                    onRateAnswer = ::rateAnswer,
+                    snackbarHostState = snackbarHostState,
                     onDismissBetaSheet = viewModel::dismissBetaSheet,
                     modifier = Modifier.fillMaxSize(),
                 )
             }
         }
+    }
+
+    private fun rateAnswer(answerUuid: String, rating: ChatAnswerRating) {
+        if (viewModel.rateAnswer(answerUuid, rating) != ChatAnswerRating.Negative) return
+        ChatFeedbackFragment.show(
+            fragmentManager = childFragmentManager,
+            episodeUuid = args.episodeUuid,
+            podcastUuid = args.podcastUuid,
+            sourceView = args.sourceView,
+            podcastColors = args.podcastColors,
+            trigger = ChatFeedbackFragment.Trigger.ResponseRating,
+        )
     }
 
     private fun showOptionsDialog() {
