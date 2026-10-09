@@ -34,6 +34,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -246,6 +247,19 @@ class ChatViewModelTest {
         advanceUntilIdle()
 
         assertEquals(listOf(SendMessage(EPISODE_UUID, "First question")), chatManager.sentMessages)
+    }
+
+    @Test
+    fun `summarize click is ignored before the messages load`() = runTest {
+        chatManager.observedMessages = emptyFlow()
+        setEpisodeInfo()
+        connectToInternet()
+
+        viewModel.onSummarizeClick("Summarize this episode")
+        advanceUntilIdle()
+
+        assertFalse(viewModel.uiState.value.areMessagesLoaded)
+        assertTrue(chatManager.sentMessages.isEmpty())
     }
 
     @Test
@@ -703,6 +717,7 @@ class ChatViewModelTest {
 
     private class TestChatManager : ChatManager {
         val messages = MutableStateFlow<List<ChatMessage>>(emptyList())
+        var observedMessages: Flow<List<ChatMessage>>? = null
         val createdChats = mutableListOf<CreateChat>()
         val sentMessages = mutableListOf<SendMessage>()
         val sentHistories = mutableListOf<List<String>>()
@@ -710,7 +725,7 @@ class ChatViewModelTest {
         var sendMessageException: Exception? = null
         var sendMessageGate: CompletableDeferred<Unit>? = null
 
-        override fun observeMessages(episodeUuid: String): Flow<List<ChatMessage>> = messages
+        override fun observeMessages(episodeUuid: String): Flow<List<ChatMessage>> = observedMessages ?: messages
 
         override suspend fun createChat(episodeUuid: String, podcastUuid: String) {
             createdChats += CreateChat(episodeUuid, podcastUuid)
