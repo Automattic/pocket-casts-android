@@ -44,6 +44,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.clearInvocations
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -123,6 +124,8 @@ class ChaptersViewModelTest {
 
     @Test
     fun `player mode loads generated chapters for each new playing episode`() = runTest {
+        clearInvocations(transcriptManager)
+        playbackStateFlow.value = PlaybackState(episodeUuid = "")
         ChaptersViewModel(
             mode = Mode.Player,
             chapterManager = chapterManager,
@@ -135,11 +138,13 @@ class ChaptersViewModelTest {
             ioDispatcher = testDispatcher,
         )
 
+        playbackStateFlow.value = PlaybackState(episodeUuid = "id")
         playbackStateFlow.value = PlaybackState(episodeUuid = "id", positionMs = 1_000)
         playbackStateFlow.value = PlaybackState(episodeUuid = "id2")
 
-        verifyBlocking(transcriptManager, times(2)) { loadGeneratedChapters("id") }
+        verifyBlocking(transcriptManager) { loadGeneratedChapters("id") }
         verifyBlocking(transcriptManager) { loadGeneratedChapters("id2") }
+        verifyBlocking(transcriptManager, never()) { loadGeneratedChapters("") }
     }
 
     @Test

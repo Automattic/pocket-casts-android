@@ -36,7 +36,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -60,7 +59,6 @@ class TranscriptManagerTest {
     private val subripDbTranscript = createDbTranscript("application/x-subrip")
     private val jsonDbTranscript = createDbTranscript("application/json")
     private val htmlDbTranscript = createDbTranscript("text/html")
-    private val generatedVttDbTranscript = createDbTranscript("text/vtt", episodeUuid = "summary-episode-id", url = "transcript.vtt", isGenerated = true)
     private val generatedVttTranscript = createDbTranscript("text/vtt", isGenerated = true, url = "transcript-url.vtt")
 
     private val transcriptManager = TranscriptManagerImpl(
@@ -537,7 +535,6 @@ private fun createDbTranscript(
 
 private val META_JSON_WITH_CHAPTERS = """
     {
-        "summary": "A great episode.",
         "chapters": [
             {"title": "Introduction", "timestamp": "00:15", "startTime": 15},
             {"title": "Main Topic", "timestamp": "01:13", "startTime": 73},
@@ -548,14 +545,12 @@ private val META_JSON_WITH_CHAPTERS = """
 
 private val META_JSON_NO_CHAPTERS = """
     {
-        "summary": "This is a summary.",
         "chapters": []
     }
 """.trimIndent()
 
 private val META_JSON_INVALID_CHAPTERS = """
     {
-        "summary": "Summary with bad chapters.",
         "chapters": [
             {"title": "", "startTime": 30},
             {"title": "Valid Chapter", "startTime": 60},

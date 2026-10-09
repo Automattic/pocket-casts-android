@@ -187,7 +187,7 @@ class TranscriptManagerImpl @Inject constructor(
             .mapIndexed { index, chapter -> chapter.copy(index = index) }
         if (dbChapters.isNotEmpty()) {
             chapterManager.updateChapters(episodeUuid, dbChapters)
-            Timber.tag("Summaries").d("Saved ${dbChapters.size} AI chapters for episode $episodeUuid")
+            Timber.tag("GeneratedChapters").d("Saved ${dbChapters.size} AI chapters for episode $episodeUuid")
         }
     }
 
