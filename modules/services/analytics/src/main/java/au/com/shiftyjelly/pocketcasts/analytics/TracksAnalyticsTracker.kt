@@ -107,7 +107,13 @@ class TracksAnalyticsTracker @Inject constructor(
                 AppPlatform.WearOs -> "watch"
                 AppPlatform.Tv -> "tv"
             },
-        ).mapKeys { it.key.analyticsKey }
+        ).plus(tvEventProperties()).mapKeys { it.key.analyticsKey }
+    }
+
+    private fun tvEventProperties() = if (Util.getAppPlatform(appContext) == AppPlatform.Tv) {
+        mapOf(PredefinedEventProperty.INSTALL_SOURCE to Util.getInstallSource(appContext).analyticsValue)
+    } else {
+        emptyMap()
     }
 
     private var lastAliasedAnonId: String? = null
@@ -145,6 +151,7 @@ class TracksAnalyticsTracker @Inject constructor(
         THEME_DARK_PREFERENCE("theme_dark_preference"),
         THEME_LIGHT_PREFERENCE("theme_light_preference"),
         THEME_USE_SYSTEM_SETTINGS("theme_use_system_settings"),
+        INSTALL_SOURCE("install_source"),
     }
 
     companion object {

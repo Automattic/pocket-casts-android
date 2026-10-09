@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Context.ACCESSIBILITY_SERVICE
 import android.content.pm.PackageManager
 import android.content.res.Configuration
+import android.os.Build
 import android.os.Looper
 import android.text.format.Formatter
 import android.view.accessibility.AccessibilityManager
@@ -16,6 +17,7 @@ import java.util.Locale
 object Util {
     private const val MINIMUM_SMALLEST_WIDTH_DP_FOR_TABLET = 570
     private var appPlatform: AppPlatform? = null
+    private var installSource: InstallSource? = null
 
     fun isAndroidAutoConnectedFlow(context: Context) = CarConnection(context).type
         .map { it == CarConnection.CONNECTION_TYPE_PROJECTION }
@@ -42,6 +44,20 @@ object Util {
         }
         appPlatform = value
         value
+    }
+
+    fun getInstallSource(context: Context): InstallSource = installSource ?: run {
+        val installerPackageName = try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                context.packageManager.getInstallSourceInfo(context.packageName).installingPackageName
+            } else {
+                @Suppress("DEPRECATION")
+                context.packageManager.getInstallerPackageName(context.packageName)
+            }
+        } catch (e: Exception) {
+            null
+        }
+        InstallSource.fromInstallerPackageName(installerPackageName).also { installSource = it }
     }
 
     private fun appInfoHasBoolean(key: String, context: Context, default: Boolean = false): Boolean {

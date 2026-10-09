@@ -4,4 +4,5 @@ import au.com.shiftyjelly.pocketcasts.crashlogging.BuildDataProvider
 
 class FakeBuildDataProvider : BuildDataProvider {
     override var buildPlatform = ""
+    override var installSource: String? = null
 }
