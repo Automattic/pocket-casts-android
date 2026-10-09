@@ -161,7 +161,7 @@ fun PlayerShelf(
         onEpisodeChatClick = {
             val podcast = playerViewModel.podcast ?: return@PlayerShelfContent
             val episode = playerViewModel.episode as? PodcastEpisode ?: return@PlayerShelfContent
-            shelfSharedViewModel.onEpisodeChatClick(podcast, episode, ShelfItemSource.Shelf)
+            shelfSharedViewModel.onEpisodeChatClick(podcast, episode, shelfItemsState.isTranscriptAvailable, ShelfItemSource.Shelf)
         },
         showBookmarkTooltip = shelfItemsState.showBookmarkTooltip,
         showBookmarkOverflowTooltip = shelfItemsState.showBookmarkOverflowTooltip,
@@ -303,6 +303,7 @@ private fun PlayerShelfContent(
                 )
 
                 ShelfItem.EpisodeChat -> EpisodeChatButton(
+                    isTranscriptAvailable = isTranscriptAvailable,
                     playerColors = playerColors,
                     onClick = onEpisodeChatClick,
                 )
@@ -517,14 +518,17 @@ private fun AddToPlaylistButton(
 
 @Composable
 private fun EpisodeChatButton(
+    isTranscriptAvailable: Boolean,
     playerColors: PlayerColors,
     onClick: () -> Unit,
 ) {
+    val alpha = if (isTranscriptAvailable) 1f else 0.4f
     IconButton(onClick = onClick) {
         Icon(
             painterResource(id = IR.drawable.ic_episode_chat),
             contentDescription = stringResource(LR.string.episode_chat_shelf_title),
             tint = playerColors.contrast03,
+            modifier = Modifier.alpha(alpha),
         )
     }
 }

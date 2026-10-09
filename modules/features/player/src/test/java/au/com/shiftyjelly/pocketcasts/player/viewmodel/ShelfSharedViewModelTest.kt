@@ -511,13 +511,12 @@ class ShelfSharedViewModelTest {
     }
 
     @Test
-    fun `given episode chat enabled and no transcript, then episode chat is hidden from the player`() = runTest {
+    fun `given episode chat enabled and no transcript, then episode chat stays in the overflow menu`() = runTest {
         initViewModel(currentEpisode = transcriptEpisode, isTranscriptAvailable = false, isEpisodeChatEnabled = true)
 
         val state = awaitLoadedState()
 
-        assertFalse(ShelfItem.EpisodeChat in state.playerShelfItems + state.playerBottomSheetShelfItems)
-        assertTrue(ShelfItem.EpisodeChat in state.shelfItems)
+        assertEquals(ShelfItem.EpisodeChat, state.playerBottomSheetShelfItems.first())
     }
 
     @Test
@@ -530,13 +529,13 @@ class ShelfSharedViewModelTest {
     }
 
     @Test
-    fun `given episode chat on shelf and no transcript, then the next item takes its shelf slot`() = runTest {
+    fun `given episode chat on shelf and no transcript, then it keeps its shelf slot`() = runTest {
         val shelfItems = listOf(ShelfItem.EpisodeChat) + (ShelfItem.entries - ShelfItem.EpisodeChat)
         initViewModel(currentEpisode = transcriptEpisode, shelfItems = shelfItems, isEpisodeChatEnabled = true)
 
         val state = awaitLoadedState()
 
-        assertEquals(shelfItems.drop(1).take(4), state.playerShelfItems)
+        assertEquals(shelfItems.take(4), state.playerShelfItems)
     }
 
     @Test
@@ -554,7 +553,7 @@ class ShelfSharedViewModelTest {
         val podcast = Podcast(uuid = "podcastUuid")
 
         shelfSharedViewModel.navigationState.test {
-            shelfSharedViewModel.onEpisodeChatClick(podcast, transcriptEpisode, ShelfItemSource.OverflowMenu)
+            shelfSharedViewModel.onEpisodeChatClick(podcast, transcriptEpisode, isTranscriptAvailable = true, ShelfItemSource.OverflowMenu)
             assertEquals(NavigationState.ShowEpisodeChat(podcast, transcriptEpisode, isPaidUser = true), awaitItem())
         }
     }
@@ -565,9 +564,28 @@ class ShelfSharedViewModelTest {
         val podcast = Podcast(uuid = "podcastUuid")
 
         shelfSharedViewModel.navigationState.test {
-            shelfSharedViewModel.onEpisodeChatClick(podcast, transcriptEpisode, ShelfItemSource.Shelf)
+            shelfSharedViewModel.onEpisodeChatClick(podcast, transcriptEpisode, isTranscriptAvailable = true, ShelfItemSource.Shelf)
             assertEquals(NavigationState.ShowEpisodeChat(podcast, transcriptEpisode, isPaidUser = false), awaitItem())
         }
+    }
+
+    @Test
+    fun `given no transcript, when episode chat clicked, then the needs transcript message is shown`() = runTest {
+        initViewModel(subscription = plusSubscription)
+
+        shelfSharedViewModel.snackbarMessages.test {
+            shelfSharedViewModel.onEpisodeChatClick(Podcast(uuid = "podcastUuid"), transcriptEpisode, isTranscriptAvailable = false, ShelfItemSource.OverflowMenu)
+            assertEquals(SnackbarMessage.EpisodeChatNeedsTranscript, awaitItem())
+        }
+        assertTrue(eventSink.isEmpty())
+    }
+
+    @Test
+    fun `given no transcript, then episode chat tooltip is not shown`() = runTest {
+        initViewModel(currentEpisode = transcriptEpisode, isTranscriptAvailable = false, isEpisodeChatEnabled = true)
+        shelfSharedViewModel.setPlayerOpen(true)
+
+        assertFalse(awaitLoadedState { it.isEpisodeChatPromoActive }.showEpisodeChatTooltip)
     }
 
     @Test
@@ -643,7 +661,7 @@ class ShelfSharedViewModelTest {
         shelfSharedViewModel.setPlayerOpen(true)
         awaitLoadedState { it.showEpisodeChatTooltip }
 
-        shelfSharedViewModel.onEpisodeChatClick(Podcast(uuid = "podcastUuid"), transcriptEpisode, ShelfItemSource.OverflowMenu)
+        shelfSharedViewModel.onEpisodeChatClick(Podcast(uuid = "podcastUuid"), transcriptEpisode, isTranscriptAvailable = true, ShelfItemSource.OverflowMenu)
 
         assertEquals(
             PlayerShelfActionTappedEvent(from = ShelfActionSourceType.OverflowMenu, action = ShelfActionType.EpisodeChat),
@@ -656,7 +674,7 @@ class ShelfSharedViewModelTest {
     fun `when episode chat clicked, then episode chat tooltip is dismissed`() = runTest {
         initViewModel()
 
-        shelfSharedViewModel.onEpisodeChatClick(Podcast(uuid = "podcastUuid"), transcriptEpisode, ShelfItemSource.OverflowMenu)
+        shelfSharedViewModel.onEpisodeChatClick(Podcast(uuid = "podcastUuid"), transcriptEpisode, isTranscriptAvailable = true, ShelfItemSource.OverflowMenu)
 
         verify(episodeChatTooltipDismissedSetting).set(true, updateModifiedAt = false)
     }

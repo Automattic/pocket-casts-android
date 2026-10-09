@@ -445,8 +445,13 @@ class ShelfSharedViewModel @Inject constructor(
     fun onEpisodeChatClick(
         podcast: Podcast,
         episode: PodcastEpisode,
+        isTranscriptAvailable: Boolean,
         source: ShelfItemSource,
     ) {
+        if (!isTranscriptAvailable) {
+            viewModelScope.launch { _snackbarMessages.emit(SnackbarMessage.EpisodeChatNeedsTranscript) }
+            return
+        }
         trackShelfAction(ShelfItem.EpisodeChat, source)
         if (uiState.value.showEpisodeChatTooltip) {
             eventHorizon.track(EpisodeChatTooltipDismissedEvent)
@@ -488,18 +493,17 @@ class ShelfSharedViewModel @Inject constructor(
         val isSmartBookmarksPromoActive: Boolean = false,
         val isEpisodeChatPromoActive: Boolean = false,
     ) {
-        val visibleShelfItems: List<ShelfItem>
-            get() = shelfItems.filter { it != ShelfItem.EpisodeChat || isTranscriptAvailable }
         val playerShelfItems: List<ShelfItem>
-            get() = visibleShelfItems.take(MIN_SHELF_ITEMS_SIZE)
+            get() = shelfItems.take(MIN_SHELF_ITEMS_SIZE)
         val playerBottomSheetShelfItems: List<ShelfItem>
-            get() = visibleShelfItems.drop(MIN_SHELF_ITEMS_SIZE)
+            get() = shelfItems.drop(MIN_SHELF_ITEMS_SIZE)
         val showBookmarkTooltip: Boolean
             get() = isSmartBookmarksPromoActive && ShelfItem.Bookmark in playerShelfItems
         val showBookmarkOverflowTooltip: Boolean
             get() = isSmartBookmarksPromoActive && ShelfItem.Bookmark in playerBottomSheetShelfItems
         val showEpisodeChatTooltip: Boolean
             get() = isEpisodeChatPromoActive &&
+                isTranscriptAvailable &&
                 ShelfItem.EpisodeChat in playerBottomSheetShelfItems &&
                 !showBookmarkTooltip &&
                 !showBookmarkOverflowTooltip
@@ -556,6 +560,7 @@ class ShelfSharedViewModel @Inject constructor(
         data object EpisodeDownloadStarted : SnackbarMessage
         data object EpisodeRemoved : SnackbarMessage
         data object TranscriptNotAvailable : SnackbarMessage
+        data object EpisodeChatNeedsTranscript : SnackbarMessage
         data object ShareNotAvailable : SnackbarMessage
     }
 

@@ -59,7 +59,7 @@ fun ShelfItemRow(
     onClick: ((ShelfItem, Boolean) -> Unit)? = null,
 ) {
     val subtitleResId = item.subtitleId(episode)
-    val isEnabled = item != ShelfItem.Transcript || isTranscriptAvailable
+    val isEnabled = isTranscriptAvailable || (item != ShelfItem.Transcript && item != ShelfItem.EpisodeChat)
     val showVideoToggleLabel = item == ShelfItem.StreamSelector && !isEditable
     val titleResId = if (showVideoToggleLabel) {
         if (isVideoEnabled) LR.string.player_action_hide_video else LR.string.player_action_show_video

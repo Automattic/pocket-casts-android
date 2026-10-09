@@ -155,7 +155,7 @@ fun ShelfBottomSheetPage(
                     ShelfItem.EpisodeChat -> {
                         val podcast = playerViewModel.podcast ?: return@MenuShelfItems
                         val episode = playerViewModel.episode as? PodcastEpisode ?: return@MenuShelfItems
-                        shelfSharedViewModel.onEpisodeChatClick(podcast, episode, ShelfItemSource.OverflowMenu)
+                        shelfSharedViewModel.onEpisodeChatClick(podcast, episode, enabled, ShelfItemSource.OverflowMenu)
                     }
                 }
                 if (item != ShelfItem.Cast) onDismiss()
