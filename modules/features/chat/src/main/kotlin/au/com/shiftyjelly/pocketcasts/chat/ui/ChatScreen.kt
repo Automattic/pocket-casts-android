@@ -53,7 +53,6 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 fun ChatScreen(
     uiState: ChatUiState,
     onClickClose: () -> Unit,
-    onClickMore: () -> Unit,
     onClickPlayPause: () -> Unit,
     onInputTextChange: (String) -> Unit,
     onSend: () -> Unit,
@@ -100,7 +99,6 @@ fun ChatScreen(
             uiState = uiState,
             theme = theme,
             onClickClose = onClickClose,
-            onClickMore = onClickMore,
             onClickPlayPause = onClickPlayPause,
             onInputTextChange = onInputTextChange,
             onSend = onSend,
@@ -118,7 +116,6 @@ private fun ChatContent(
     uiState: ChatUiState,
     theme: ChatTheme,
     onClickClose: () -> Unit,
-    onClickMore: () -> Unit,
     onClickPlayPause: () -> Unit,
     onInputTextChange: (String) -> Unit,
     onSend: () -> Unit,
@@ -150,11 +147,6 @@ private fun ChatContent(
             playback = uiState.playback,
             onClickClose = onClickClose,
             onClickPlayPause = onClickPlayPause,
-            onClickMore = {
-                focusManager.clearFocus(force = true)
-                keyboardController?.hide()
-                onClickMore()
-            },
             theme = theme,
         )
 
@@ -320,7 +312,6 @@ private fun ChatScreenPreview(
                     ),
                 ),
                 onClickClose = {},
-                onClickMore = {},
                 onClickPlayPause = {},
                 onInputTextChange = {},
                 onSend = {},
@@ -351,7 +342,6 @@ private fun ChatScreenEmptyPreview(
                     areMessagesLoaded = true,
                 ),
                 onClickClose = {},
-                onClickMore = {},
                 onClickPlayPause = {},
                 onInputTextChange = {},
                 onSend = {},
