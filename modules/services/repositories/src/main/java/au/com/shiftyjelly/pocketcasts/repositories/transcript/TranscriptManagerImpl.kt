@@ -149,34 +149,40 @@ class TranscriptManagerImpl @Inject constructor(
     }
 
     override suspend fun loadSummaryText(episodeUuid: String): String? {
-        val isChaptersEnabled = FeatureFlag.isEnabled(Feature.GENERATED_CHAPTERS)
-        val isSummaryEnabled = FeatureFlag.isEnabled(Feature.AI_SUMMARIES)
-        if (!isChaptersEnabled && !isSummaryEnabled) return null
+        if (!FeatureFlag.isEnabled(Feature.AI_SUMMARIES)) return null
 
         return try {
             val generatedTranscript = loadLocalTranscripts(episodeUuid)
                 .firstOrNull { it.isGenerated } ?: return null
 
             val metaUrl = generatedTranscript.url.removeSuffix(".vtt") + "-meta.json"
-            val response = transcriptService.getTranscriptOrThrow(metaUrl)
-            response.use { body ->
-                val meta = metaAdapter.fromJson(body.source()) ?: return@use null
-
-                if (isChaptersEnabled) {
-                    saveAiChaptersIfNeeded(episodeUuid, meta.chapters)
-                }
-
-                if (isSummaryEnabled) {
-                    meta.summary?.takeIf { it.isNotBlank() }
-                } else {
-                    null
-                }
+            transcriptService.getTranscriptOrThrow(metaUrl).use { body ->
+                metaAdapter.fromJson(body.source())?.summary?.takeIf { it.isNotBlank() }
             }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
             Timber.tag("Summaries").e(e, "Failed to load summary for episode $episodeUuid")
             null
+        }
+    }
+
+    override suspend fun loadGeneratedChapters(episodeUuid: String) {
+        if (!FeatureFlag.isEnabled(Feature.GENERATED_CHAPTERS)) return
+
+        try {
+            val generatedTranscript = loadLocalTranscripts(episodeUuid)
+                .firstOrNull { it.isGenerated } ?: return
+
+            val metaUrl = generatedTranscript.url.removeSuffix(".vtt") + "-meta.json"
+            val meta = transcriptService.getTranscriptOrThrow(metaUrl).use { body ->
+                metaAdapter.fromJson(body.source())
+            } ?: return
+            saveAiChaptersIfNeeded(episodeUuid, meta.chapters)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Timber.tag("GeneratedChapters").e(e, "Failed to load generated chapters for episode $episodeUuid")
         }
     }
 

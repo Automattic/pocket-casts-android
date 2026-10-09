@@ -21,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import com.automattic.eventhorizon.ChapterOriginType
 import com.automattic.eventhorizon.ChaptersShownEvent
@@ -62,6 +63,7 @@ class ChaptersViewModelTest {
     private val playbackManager = mock<PlaybackManager>()
     private val episodeManager = mock<EpisodeManager>()
     private val settings = mock<Settings>()
+    private val transcriptManager = mock<TranscriptManager>()
     private val generatedChapterSeeker = mock<GeneratedChapterSeeker> {
         on { resolvingChapterIndex(any()) } doReturn MutableStateFlow<Int?>(null)
     }
@@ -109,8 +111,35 @@ class ChaptersViewModelTest {
             settings = settings,
             eventHorizon = EventHorizon(eventSink),
             generatedChapterSeeker = generatedChapterSeeker,
+            transcriptManager = transcriptManager,
             ioDispatcher = testDispatcher,
         )
+    }
+
+    @Test
+    fun `episode mode loads generated chapters for its episode`() = runTest {
+        verifyBlocking(transcriptManager) { loadGeneratedChapters("id") }
+    }
+
+    @Test
+    fun `player mode loads generated chapters for each new playing episode`() = runTest {
+        ChaptersViewModel(
+            mode = Mode.Player,
+            chapterManager = chapterManager,
+            playbackManager = playbackManager,
+            episodeManager = episodeManager,
+            settings = settings,
+            eventHorizon = EventHorizon(TestEventSink()),
+            generatedChapterSeeker = generatedChapterSeeker,
+            transcriptManager = transcriptManager,
+            ioDispatcher = testDispatcher,
+        )
+
+        playbackStateFlow.value = PlaybackState(episodeUuid = "id", positionMs = 1_000)
+        playbackStateFlow.value = PlaybackState(episodeUuid = "id2")
+
+        verifyBlocking(transcriptManager, times(2)) { loadGeneratedChapters("id") }
+        verifyBlocking(transcriptManager) { loadGeneratedChapters("id2") }
     }
 
     @Test
@@ -262,6 +291,7 @@ class ChaptersViewModelTest {
             settings = settings,
             eventHorizon = EventHorizon(TestEventSink()),
             generatedChapterSeeker = generatedChapterSeeker,
+            transcriptManager = transcriptManager,
             ioDispatcher = testDispatcher,
         )
 

@@ -270,8 +270,7 @@ class EpisodeFragmentViewModel @Inject constructor(
         }
 
         val isSummaryEnabled = FeatureFlag.isEnabled(Feature.AI_SUMMARIES)
-        val isChaptersEnabled = FeatureFlag.isEnabled(Feature.GENERATED_CHAPTERS)
-        if ((isSummaryEnabled || isChaptersEnabled) && lastSummaryEpisodeUuid != episodeUuid) {
+        if (isSummaryEnabled && lastSummaryEpisodeUuid != episodeUuid) {
             _pageState.update { state ->
                 state.withSummary(null)
             }
@@ -282,7 +281,7 @@ class EpisodeFragmentViewModel @Inject constructor(
                 _pageState.update { state ->
                     state.withSummary(result)
                 }
-                if (result != null || !isSummaryEnabled) {
+                if (result != null) {
                     lastSummaryEpisodeUuid = episodeUuid
                 }
             }
