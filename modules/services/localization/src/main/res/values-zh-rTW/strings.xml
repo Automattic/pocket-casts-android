@@ -211,7 +211,6 @@ Language: zh_TW
     <string name="blogs_found_feed_detected">找到的摘要</string>
     <string name="blogs_found_headline">大聲朗讀你的部落格</string>
     <string name="chapters_generated_disclaimer">系統會自動產生這些章節，但可能不會完全正確。</string>
-    <string name="chat_stop_quote">停止引文</string>
     <string name="chat_play_quote">播放引文</string>
     <string name="chat_tap_to_retry">點選以重試</string>
     <string name="chat_error_network">無法連結至伺服器。 請檢查你的連線。</string>

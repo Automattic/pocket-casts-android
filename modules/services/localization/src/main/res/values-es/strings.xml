@@ -211,7 +211,6 @@ Language: es
     <string name="blogs_found_followed_badge">PÓDCAST SEGUIDO</string>
     <string name="blogs_found_feed_detected">Feed encontrado</string>
     <string name="chapters_generated_disclaimer">Estos capítulos se generan automáticamente y puede que no sean del todo precisos.</string>
-    <string name="chat_stop_quote">Detener cita</string>
     <string name="chat_play_quote">Reproducir cita</string>
     <string name="chat_tap_to_retry">Tocar para intentar de nuevo</string>
     <string name="chat_error_network">No se puede establecer conexión con el servidor. Comprueba tu conexión.</string>

@@ -211,7 +211,6 @@ Language: sv_SE
     <string name="blogs_found_followed_badge">FÖLJD PODCAST</string>
     <string name="blogs_found_feed_detected">Flöde hittades</string>
     <string name="chapters_generated_disclaimer">Dessa kapitel genereras automatiskt och är kanske inte helt korrekta.</string>
-    <string name="chat_stop_quote">Stoppa citat</string>
     <string name="chat_play_quote">Spela upp citat</string>
     <string name="chat_tap_to_retry">Tryck för att försöka igen</string>
     <string name="chat_error_network">Kan inte nå servern. Kontrollera din anslutning.</string>

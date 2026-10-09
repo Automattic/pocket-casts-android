@@ -211,7 +211,6 @@ Language: de
     <string name="blogs_found_followed_badge">PODCAST ABONNIERT</string>
     <string name="blogs_found_feed_detected">Feed gefunden</string>
     <string name="chapters_generated_disclaimer">Diese Kapitel werden automatisch generiert und sind möglicherweise nicht ganz korrekt.</string>
-    <string name="chat_stop_quote">Zitat anhalten</string>
     <string name="chat_play_quote">Zitat abspielen</string>
     <string name="chat_tap_to_retry">Tippen, um es erneut zu versuchen.</string>
     <string name="chat_error_network">Der Server kann nicht erreicht werden. Überprüfe deine Netzwerkverbindung.</string>

@@ -211,7 +211,6 @@ Language: nl
     <string name="blogs_found_followed_badge">PODCAST GEVOLGD</string>
     <string name="blogs_found_feed_detected">Feed gevonden</string>
     <string name="chapters_generated_disclaimer">Deze hoofdstukken worden automatisch gegenereerd en zijn mogelijk niet perfect nauwkeurig.</string>
-    <string name="chat_stop_quote">Citaat stoppen</string>
     <string name="chat_play_quote">Citaat afspelen</string>
     <string name="chat_tap_to_retry">Tik om opnieuw te proberen</string>
     <string name="chat_error_network">Kan de server niet bereiken. Controleer je netwerkverbinding.</string>
