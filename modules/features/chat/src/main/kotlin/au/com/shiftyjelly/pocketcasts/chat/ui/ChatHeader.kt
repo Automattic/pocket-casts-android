@@ -50,7 +50,6 @@ internal fun ChatHeader(
     podcastTitle: String,
     playback: ChatPlayback,
     onClickClose: () -> Unit,
-    onClickMore: () -> Unit,
     onClickPlayPause: () -> Unit,
     theme: ChatTheme,
     modifier: Modifier = Modifier,
@@ -76,14 +75,6 @@ internal fun ChatHeader(
                     contentDescription = stringResource(LR.string.close),
                     tint = theme.iconButton,
                     modifier = Modifier.size(20.dp),
-                )
-            }
-            Spacer(modifier = Modifier.weight(1f))
-            IconButton(onClick = onClickMore) {
-                Icon(
-                    painter = painterResource(IR.drawable.ic_more_vert_black_24dp),
-                    contentDescription = stringResource(LR.string.more_options),
-                    tint = theme.iconButton,
                 )
             }
         }
@@ -162,7 +153,6 @@ private fun ChatHeaderPreview(
                 podcastTitle = "Smart Money",
                 playback = ChatPlayback(isPlaying = true, positionMs = 30, durationMs = 100),
                 onClickClose = {},
-                onClickMore = {},
                 onClickPlayPause = {},
                 theme = theme,
                 modifier = Modifier.background(theme.background),

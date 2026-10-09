@@ -222,7 +222,6 @@ Language: ja_JP
     <string name="chat_tap_to_retry">タップして再試行</string>
     <string name="chat_error_network">サーバーにアクセスできません。 接続を確認してください。</string>
     <string name="chat_error_server">エラーが発生しました。 もう一度お試しください。</string>
-    <string name="chat_clear">チャットを消去</string>
     <string name="chat_send">送信</string>
     <string name="episode_chat">エピソードについてチャットする</string>
     <string name="blogs_experiment_banner_body">ブログ機能は実験中です。 継続する可能性や、手直しされる可能性、静かに消える可能性があります。</string>

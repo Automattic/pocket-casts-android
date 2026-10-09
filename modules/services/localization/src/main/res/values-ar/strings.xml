@@ -222,7 +222,6 @@ Language: ar
     <string name="chat_tap_to_retry">انقر لإعادة المحاولة</string>
     <string name="chat_error_network">تعذّر الاتصال بالخادم. تحقق من اتصالك.</string>
     <string name="chat_error_server">حدث خطأ ما. يُرجى إعادة المحاولة.</string>
-    <string name="chat_clear">مسح المحادثة</string>
     <string name="chat_send">إرسال</string>
     <string name="episode_chat">المحادثة حول الحلقة</string>
     <string name="blogs_experiment_banner_body">المدوّنات ميزة نقوم بتجربتها حاليًا. قد تستمر كما هي، أو تخضع لتعديلات، أو تختفي بهدوء.</string>

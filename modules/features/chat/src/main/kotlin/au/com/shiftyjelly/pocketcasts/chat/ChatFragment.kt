@@ -27,14 +27,11 @@ import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedI
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
-import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
-import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.parcelize.Parcelize
-import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
@@ -117,7 +114,6 @@ class ChatFragment : BaseDialogFragment() {
                 ChatScreen(
                     uiState = uiState,
                     onClickClose = { dismiss() },
-                    onClickMore = ::showOptionsDialog,
                     onClickPlayPause = viewModel::onPlayPauseClick,
                     onInputTextChange = viewModel::onInputTextChange,
                     onSend = viewModel::onSend,
@@ -143,26 +139,6 @@ class ChatFragment : BaseDialogFragment() {
             podcastColors = args.podcastColors,
             trigger = ChatFeedbackFragment.Trigger.ResponseRating,
         )
-    }
-
-    private fun showOptionsDialog() {
-        val view = view ?: return
-        UiUtil.hideKeyboard(view)
-        view.post {
-            if (isAdded) {
-                showClearChatOptionsDialog()
-            }
-        }
-    }
-
-    private fun showClearChatOptionsDialog() {
-        OptionsDialog()
-            .addTextOption(
-                titleId = LR.string.chat_clear,
-                imageId = IR.drawable.ic_delete,
-                click = { viewModel.clearChat() },
-            )
-            .show(parentFragmentManager, "chat_options")
     }
 
     override fun onDismiss(dialog: DialogInterface) {

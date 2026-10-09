@@ -28,8 +28,6 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -52,7 +50,6 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 fun ChatScreen(
     uiState: ChatUiState,
     onClickClose: () -> Unit,
-    onClickMore: () -> Unit,
     onClickPlayPause: () -> Unit,
     onInputTextChange: (String) -> Unit,
     onSend: () -> Unit,
@@ -99,7 +96,6 @@ fun ChatScreen(
             uiState = uiState,
             theme = theme,
             onClickClose = onClickClose,
-            onClickMore = onClickMore,
             onClickPlayPause = onClickPlayPause,
             onInputTextChange = onInputTextChange,
             onSend = onSend,
@@ -117,7 +113,6 @@ private fun ChatContent(
     uiState: ChatUiState,
     theme: ChatTheme,
     onClickClose: () -> Unit,
-    onClickMore: () -> Unit,
     onClickPlayPause: () -> Unit,
     onInputTextChange: (String) -> Unit,
     onSend: () -> Unit,
@@ -129,8 +124,6 @@ private fun ChatContent(
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
-    val focusManager = LocalFocusManager.current
-    val keyboardController = LocalSoftwareKeyboardController.current
 
     LaunchedEffect(uiState.messages.size, uiState.isAwaitingReply, scrollState.maxValue) {
         scrollState.scrollTo(scrollState.maxValue)
@@ -149,11 +142,6 @@ private fun ChatContent(
             playback = uiState.playback,
             onClickClose = onClickClose,
             onClickPlayPause = onClickPlayPause,
-            onClickMore = {
-                focusManager.clearFocus(force = true)
-                keyboardController?.hide()
-                onClickMore()
-            },
             theme = theme,
         )
 
@@ -310,7 +298,6 @@ private fun ChatScreenPreview(
                     ),
                 ),
                 onClickClose = {},
-                onClickMore = {},
                 onClickPlayPause = {},
                 onInputTextChange = {},
                 onSend = {},
@@ -341,7 +328,6 @@ private fun ChatScreenEmptyPreview(
                     areMessagesLoaded = true,
                 ),
                 onClickClose = {},
-                onClickMore = {},
                 onClickPlayPause = {},
                 onInputTextChange = {},
                 onSend = {},
