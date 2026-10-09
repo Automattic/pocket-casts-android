@@ -217,7 +217,6 @@ Language: pt_BR
     <string name="player_tab_summary">Resumo</string>
     <string name="summary">Resumo</string>
     <string name="episode_summary">Resumo do episódio</string>
-    <string name="chat_stop_quote">Parar citação</string>
     <string name="chat_play_quote">Reproduzir citação</string>
     <string name="chat_tap_to_retry">Toque para tentar novamente</string>
     <string name="chat_error_network">Não foi possível acessar o servidor. Verifique sua conexão.</string>

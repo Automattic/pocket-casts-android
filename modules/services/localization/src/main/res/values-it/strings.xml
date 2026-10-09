@@ -217,7 +217,6 @@ Language: it
     <string name="player_tab_summary">Riepilogo</string>
     <string name="summary">Riepilogo</string>
     <string name="episode_summary">Riassunto dell\'episodio</string>
-    <string name="chat_stop_quote">Interrompi citazione</string>
     <string name="chat_play_quote">Riproduci citazione</string>
     <string name="chat_tap_to_retry">Tocca per riprovare</string>
     <string name="chat_error_network">Impossibile raggiungere il server. Controlla la tua connessione.</string>

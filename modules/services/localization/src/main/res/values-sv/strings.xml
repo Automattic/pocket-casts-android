@@ -217,7 +217,6 @@ Language: sv_SE
     <string name="player_tab_summary">Sammanfattning</string>
     <string name="summary">Sammanfattning</string>
     <string name="episode_summary">Avsnittssammanfattning</string>
-    <string name="chat_stop_quote">Stoppa citat</string>
     <string name="chat_play_quote">Spela upp citat</string>
     <string name="chat_tap_to_retry">Tryck för att försöka igen</string>
     <string name="chat_error_network">Kan inte nå servern. Kontrollera din anslutning.</string>
