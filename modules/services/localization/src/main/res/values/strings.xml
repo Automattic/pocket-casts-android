@@ -2946,6 +2946,10 @@
     <string name="onboarding_preselect_chapters_title">Preselect Chapters: cut to the good stuff</string>
     <string name="onboarding_preselect_chapters_chapter_title">Chapter %1$d</string>
     <string name="onboarding_blogs_title">Blogs: listen to\nwhat you read.</string>
+    <string name="onboarding_episode_chat_title">Ask about this episode:</string>
+    <string name="onboarding_episode_chat_question_1">What are the key topics?</string>
+    <string name="onboarding_episode_chat_answer">This episode covers AI, health, and productivity.</string>
+    <string name="onboarding_episode_chat_question_2">Summarize the main takeaways?</string>
     <string name="onboarding_blogs_upsell_sample_title">Why we redesigned the player</string>
     <string name="onboarding_blogs_upsell_sample_label">Blog · Apr 24</string>
     <string name="onboarding_upgrade_tnc">Terms\u00A0and\u00A0Conditions</string>
