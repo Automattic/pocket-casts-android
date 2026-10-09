@@ -224,11 +224,6 @@ Language: it
     <string name="chat_error_server">Si è verificato un problema. Riprova.</string>
     <string name="chat_clear">Cancella chat</string>
     <string name="chat_send">Invia</string>
-    <string name="chat_preview_user_2">Sono stati menzionati alcuni suggerimenti pratici?</string>
-    <string name="chat_preview_ai_2">Questo episodio approfondisce gli aspetti scientifici della formazione delle abitudini, spiegando come le piccole routine quotidiane possano portare a grandi cambiamenti nel corso del tempo.</string>
-    <string name="chat_preview_user_1">Qual è stato l\'argomento principale di questo episodio?</string>
-    <string name="chat_preview_ai_1">Ciao! Sono qui per aiutarti a scoprire questo episodio. Chiedimi qualcosa sugli argomenti discussi, sui passaggi chiave o su momenti specifici.</string>
-    <string name="chat_paywall_title">Chatta con questo episodio</string>
     <string name="episode_chat">Chatta con l\'episodio</string>
     <string name="blogs_experiment_banner_body">I blog sono una novità che stiamo sperimentando. Potrebbe restare, essere rielaborato o scomparire senza fare troppo rumore.</string>
     <string name="blogs_experiment_banner_lead">È un esperimento.</string>

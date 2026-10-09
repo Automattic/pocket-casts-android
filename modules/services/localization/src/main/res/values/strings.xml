@@ -2553,11 +2553,6 @@
     <string name="transcript_tap_to_seek_streaming_unavailable">Download the episode to tap to seek</string>
 
     <!-- Chat -->
-    <string name="chat_paywall_title">Chat with this episode</string>
-    <string name="chat_preview_ai_1">Hi! I\'m here to help you explore this episode. Ask me anything about the topics discussed, key takeaways, or specific moments.</string>
-    <string name="chat_preview_user_1">What was the main topic of this episode?</string>
-    <string name="chat_preview_ai_2">This episode dives into the science of habit formation, exploring how small daily routines can lead to big changes over time.</string>
-    <string name="chat_preview_user_2">Were there any practical tips mentioned?</string>
     <string name="chat_beta_sheet_title">Ask about this episode is in beta</string>
     <string name="chat_beta_sheet_body">Free for everyone while we test it. It\'ll become a Plus feature later.</string>
     <string name="chat_beta_note">Ask about this episode is in beta</string>
@@ -2946,6 +2941,10 @@
     <string name="onboarding_preselect_chapters_title">Preselect Chapters: cut to the good stuff</string>
     <string name="onboarding_preselect_chapters_chapter_title">Chapter %1$d</string>
     <string name="onboarding_blogs_title">Blogs: listen to\nwhat you read.</string>
+    <string name="onboarding_episode_chat_title">Ask about this episode:</string>
+    <string name="onboarding_episode_chat_question_1">What are the key topics?</string>
+    <string name="onboarding_episode_chat_answer">This episode covers AI, health, and productivity.</string>
+    <string name="onboarding_episode_chat_question_2">Summarize the main takeaways?</string>
     <string name="onboarding_blogs_upsell_sample_title">Why we redesigned the player</string>
     <string name="onboarding_blogs_upsell_sample_label">Blog · Apr 24</string>
     <string name="onboarding_upgrade_tnc">Terms\u00A0and\u00A0Conditions</string>

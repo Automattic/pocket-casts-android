@@ -67,6 +67,7 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgra
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.UpgradeRowButton
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.contextual.BlogsUpsellHeader
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.contextual.BookmarksAnimation
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.contextual.EpisodeChatAnimation
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.contextual.FoldersAnimation
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.contextual.PreselectChaptersAnimation
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.contextual.ShuffleAnimation
@@ -489,6 +490,16 @@ private fun createContentPages(
             )
         }
 
+        OnboardingUpgradeSource.EPISODE_CHAT -> {
+            add(UpgradePagerContent.EpisodeChat)
+            add(
+                UpgradePagerContent.Features(
+                    features = currentPlan.featureItems,
+                    showCta = false,
+                ),
+            )
+        }
+
         OnboardingUpgradeSource.SKIP_CHAPTERS -> {
             add(UpgradePagerContent.PreselectChapters)
             add(
@@ -540,6 +551,10 @@ private sealed interface UpgradePagerContent {
     }
 
     data object PreselectChapters : UpgradePagerContent {
+        override val showCta get() = true
+    }
+
+    data object EpisodeChat : UpgradePagerContent {
         override val showCta get() = true
     }
 }
@@ -704,6 +719,14 @@ private fun UpgradePagerContent.toComponent(
             )
 
             is UpgradePagerContent.PreselectChapters -> PreselectChaptersUpgradeContent(
+                modifier = modifier,
+                onCtaClick = {
+                    onClickSeeAllFeatures()
+                    scrollToNext()
+                },
+            )
+
+            is UpgradePagerContent.EpisodeChat -> EpisodeChatUpgradeContent(
                 modifier = modifier,
                 onCtaClick = {
                     onClickSeeAllFeatures()
@@ -931,6 +954,42 @@ private fun ShuffleUpgradeContent(
                 modifier = Modifier
                     .fillMaxWidth(widthFraction)
                     .scale(scaleFactor),
+            )
+        }
+    }
+}
+
+@Composable
+private fun EpisodeChatUpgradeContent(
+    onCtaClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(modifier = modifier) {
+        TextP40(
+            text = stringResource(LR.string.onboarding_upgrade_schedule_see_features),
+            modifier = Modifier
+                .padding(horizontal = 24.dp)
+                .padding(bottom = 24.dp)
+                .clickable { onCtaClick() },
+            color = MaterialTheme.theme.colors.primaryInteractive01,
+        )
+
+        val isTablet = Util.isTablet(LocalContext.current)
+        val widthFraction = if (isTablet) {
+            0.6f
+        } else {
+            1f
+        }
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp)
+                .padding(bottom = 24.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            EpisodeChatAnimation(
+                modifier = Modifier.fillMaxWidth(widthFraction),
             )
         }
     }

@@ -82,7 +82,6 @@ import androidx.lifecycle.repeatOnLifecycle
 import au.com.shiftyjelly.pocketcasts.ads.AdReportFragment
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.chat.ChatFragment
-import au.com.shiftyjelly.pocketcasts.chat.ChatPaywallFragment
 import au.com.shiftyjelly.pocketcasts.chat.EpisodeChatAccess
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.LocalPodcastColors
@@ -193,6 +192,7 @@ class PlayerHeaderFragment :
         },
     )
     private val sourceView = SourceView.PLAYER
+    private var isEpisodeChatUpsellOpening = false
 
     private val activityLauncher: ActivityResultLauncher<Intent> = registerForActivityResult(BookmarkActivityContract()) { result ->
         showViewBookmarksSnackbar(result)
@@ -509,6 +509,11 @@ class PlayerHeaderFragment :
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        isEpisodeChatUpsellOpening = false
+    }
+
     override fun onShowNotesClick(episodeUuid: String) {
         val fragment = NotesFragment.newInstance(episodeUuid)
         openBottomSheet(fragment)
@@ -537,9 +542,9 @@ class PlayerHeaderFragment :
                     podcastColors = PodcastColors(navigationState.podcast),
                 ).show(parentFragmentManager, "episode_chat")
             }
-        } else if (parentFragmentManager.findFragmentByTag("episode_chat_paywall") == null) {
-            ChatPaywallFragment.newInstance(episode.uuid, episode.podcastUuid, SourceView.PLAYER)
-                .show(parentFragmentManager, "episode_chat_paywall")
+        } else if (!isEpisodeChatUpsellOpening) {
+            isEpisodeChatUpsellOpening = true
+            startUpsellFlow(OnboardingUpgradeSource.EPISODE_CHAT)
         }
     }
 
