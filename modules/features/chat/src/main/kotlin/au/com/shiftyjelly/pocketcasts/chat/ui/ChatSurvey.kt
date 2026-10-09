@@ -1,9 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.chat.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -11,12 +13,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
-import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -33,17 +38,17 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 internal fun ChatSurvey(
     theme: ChatTheme,
-    onClickClose: () -> Unit,
+    onClickNotReally: () -> Unit,
+    onClickYes: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(24.dp),
         modifier = modifier
             .fillMaxWidth()
             .background(theme.background)
             .navigationBarsPadding()
-            .padding(horizontal = 24.dp, vertical = 12.dp),
+            .padding(start = 24.dp, end = 24.dp, top = 8.dp, bottom = 32.dp),
     ) {
         Box(
             modifier = Modifier
@@ -55,18 +60,64 @@ internal fun ChatSurvey(
             text = stringResource(LR.string.chat_survey_title),
             color = theme.primaryText,
             fontSize = 20.sp,
-            lineHeight = 24.sp,
+            lineHeight = 25.sp,
             fontWeight = FontWeight.SemiBold,
             textAlign = TextAlign.Center,
+            modifier = Modifier.padding(top = 48.dp, bottom = 40.dp),
         )
-        TextButton(onClick = onClickClose) {
-            Text(
-                text = stringResource(LR.string.close),
-                color = theme.primaryText,
+        Row(
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            SurveyAnswer(
+                emoji = NOT_REALLY_EMOJI,
+                label = stringResource(LR.string.chat_survey_not_really),
+                onClick = onClickNotReally,
+                theme = theme,
+            )
+            SurveyAnswer(
+                emoji = YES_EMOJI,
+                label = stringResource(LR.string.chat_survey_yes),
+                onClick = onClickYes,
+                theme = theme,
             )
         }
     }
 }
+
+@Composable
+private fun SurveyAnswer(
+    emoji: String,
+    label: String,
+    onClick: () -> Unit,
+    theme: ChatTheme,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = modifier
+            .clip(RoundedCornerShape(16.dp))
+            .clickable(role = Role.Button, onClick = onClick)
+            .semantics(mergeDescendants = true) {}
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+    ) {
+        Text(
+            text = emoji,
+            fontSize = 56.sp,
+            modifier = Modifier.clearAndSetSemantics {},
+        )
+        Text(
+            text = label,
+            color = theme.primaryText,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.SemiBold,
+        )
+    }
+}
+
+private const val NOT_REALLY_EMOJI = "\uD83D\uDE14"
+private const val YES_EMOJI = "\uD83E\uDD70"
 
 @Preview
 @Composable
@@ -77,7 +128,8 @@ private fun ChatSurveyPreview(
         CompositionLocalProvider(LocalPodcastColors provides podcastColors) {
             ChatSurvey(
                 theme = rememberChatTheme(),
-                onClickClose = {},
+                onClickNotReally = {},
+                onClickYes = {},
             )
         }
     }
