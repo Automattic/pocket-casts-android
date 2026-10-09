@@ -106,7 +106,7 @@ class ChatFeedbackFragment : BaseDialogFragment() {
 
     private fun submit() {
         if (viewModel.submit()) {
-            activity?.showChatFeedbackThanks()
+            showChatFeedbackThanks()
             dismiss()
         }
     }
