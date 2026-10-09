@@ -222,7 +222,6 @@ Language: it
     <string name="chat_tap_to_retry">Tocca per riprovare</string>
     <string name="chat_error_network">Impossibile raggiungere il server. Controlla la tua connessione.</string>
     <string name="chat_error_server">Si è verificato un problema. Riprova.</string>
-    <string name="chat_clear">Cancella chat</string>
     <string name="chat_send">Invia</string>
     <string name="episode_chat">Chatta con l\'episodio</string>
     <string name="blogs_experiment_banner_body">I blog sono una novità che stiamo sperimentando. Potrebbe restare, essere rielaborato o scomparire senza fare troppo rumore.</string>

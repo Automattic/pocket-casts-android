@@ -222,7 +222,6 @@ Language: de
     <string name="chat_tap_to_retry">Tippen, um es erneut zu versuchen.</string>
     <string name="chat_error_network">Der Server kann nicht erreicht werden. Überprüfe deine Netzwerkverbindung.</string>
     <string name="chat_error_server">Es ist ein Fehler aufgetreten. Bitte versuche es erneut.</string>
-    <string name="chat_clear">Chat löschen</string>
     <string name="chat_send">Senden</string>
     <string name="episode_chat">Mit Folge chatten</string>
     <string name="blogs_experiment_banner_body">Blogs sind etwas, das wir ausprobieren. Sie könnten bestehen bleiben, überarbeitet werden oder still und leise verschwinden.</string>

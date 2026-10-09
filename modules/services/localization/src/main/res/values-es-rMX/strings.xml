@@ -222,7 +222,6 @@ Language: es
     <string name="chat_tap_to_retry">Tocar para intentar de nuevo</string>
     <string name="chat_error_network">No se puede establecer conexión con el servidor. Comprueba tu conexión.</string>
     <string name="chat_error_server">Se ha producido un error. Inténtalo de nuevo.</string>
-    <string name="chat_clear">Borrar chat</string>
     <string name="chat_send">Enviar</string>
     <string name="episode_chat">Chatear sobre el episodio</string>
     <string name="blogs_experiment_banner_body">Estamos probando los blogs. Puede que se queden, que se modifiquen o que desaparezcan sin hacer ruido.</string>

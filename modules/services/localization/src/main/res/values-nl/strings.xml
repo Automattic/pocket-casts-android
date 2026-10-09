@@ -222,7 +222,6 @@ Language: nl
     <string name="chat_tap_to_retry">Tik om opnieuw te proberen</string>
     <string name="chat_error_network">Kan de server niet bereiken. Controleer je netwerkverbinding.</string>
     <string name="chat_error_server">Er is iets misgegaan. Probeer het nog eens.</string>
-    <string name="chat_clear">Chat wissen</string>
     <string name="chat_send">Verzenden</string>
     <string name="episode_chat">Chat met aflevering</string>
     <string name="blogs_experiment_banner_body">Blogs is iets wat we uitproberen. Het kan zo blijven, opnieuw worden uitgedacht of stilletjes verdwijnen.</string>

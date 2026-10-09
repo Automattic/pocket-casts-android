@@ -217,7 +217,6 @@ Language: ca
     <string name="chat_play_quote">Reprodueix la citació</string>
     <string name="chat_error_network">No s\'ha pogut connectar al servidor. Comprova la connexió.</string>
     <string name="chat_error_server">S\'ha produït un error. Torna-ho a intentar.</string>
-    <string name="chat_clear">Esborra el xat</string>
     <string name="chat_send">Envia</string>
     <string name="chat_tap_to_retry">Toca per a tornar-ho a intentar</string>
     <string name="episode_chat">Xateja sobre l\'episodi</string>
