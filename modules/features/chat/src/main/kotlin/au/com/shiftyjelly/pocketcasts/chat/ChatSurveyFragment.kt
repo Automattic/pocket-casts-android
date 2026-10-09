@@ -11,6 +11,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.graphics.toArgb
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
@@ -90,7 +91,9 @@ class ChatSurveyFragment : BaseDialogFragment() {
     }
 
     private fun showThanks() {
-        val root = activity?.findViewById<View>(android.R.id.content) ?: return
+        val root = (parentFragment as? DialogFragment)?.dialog?.window?.decorView?.findViewById<View>(android.R.id.content)
+            ?: activity?.findViewById(android.R.id.content)
+            ?: return
         Snackbar.make(root, getString(LR.string.chat_feedback_thanks), Snackbar.LENGTH_SHORT)
             .setBackgroundTint(Color.WHITE)
             .setTextColor(Color.BLACK)
