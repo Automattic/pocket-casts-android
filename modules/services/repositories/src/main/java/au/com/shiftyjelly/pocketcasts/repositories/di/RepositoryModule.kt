@@ -18,8 +18,10 @@ import au.com.shiftyjelly.pocketcasts.repositories.appreview.AppReviewManager
 import au.com.shiftyjelly.pocketcasts.repositories.appreview.AppReviewManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManagerImpl
+import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatFeedbackManager
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatManager
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatManagerImpl
+import au.com.shiftyjelly.pocketcasts.repositories.chat.LoggingChatFeedbackManager
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
@@ -160,6 +162,10 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun providesChatManager(chatManagerImpl: ChatManagerImpl): ChatManager
+
+    @Binds
+    @Singleton
+    abstract fun providesChatFeedbackManager(chatFeedbackManager: LoggingChatFeedbackManager): ChatFeedbackManager
 
     @Binds
     @Singleton
