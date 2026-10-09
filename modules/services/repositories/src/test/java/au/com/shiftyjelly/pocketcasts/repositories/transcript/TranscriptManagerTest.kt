@@ -32,6 +32,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -381,7 +382,7 @@ class TranscriptManagerTest {
         localTranscriptsFlow.value = listOf(generatedVttTranscript)
         service.metaJsonResponse = META_JSON_WITH_CHAPTERS
 
-        transcriptManager.loadGeneratedChapters("episode-id")
+        assertTrue(transcriptManager.loadGeneratedChapters("episode-id"))
 
         verify(chapterManager).updateChapters(
             "episode-id",
@@ -464,7 +465,7 @@ class TranscriptManagerTest {
         service.shouldThrow = true
         localTranscriptsFlow.value = listOf(generatedVttTranscript)
 
-        transcriptManager.loadGeneratedChapters("episode-id")
+        assertFalse(transcriptManager.loadGeneratedChapters("episode-id"))
 
         verify(chapterManager, never()).updateChapters(any(), any())
     }

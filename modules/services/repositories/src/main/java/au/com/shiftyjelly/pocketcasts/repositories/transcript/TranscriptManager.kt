@@ -16,7 +16,7 @@ interface TranscriptManager {
 
     suspend fun loadGeneratedChapters(
         episodeUuid: String,
-    )
+    ): Boolean
 
     fun resetInvalidTranscripts(
         episodeUuid: String,
