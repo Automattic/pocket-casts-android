@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.player.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.chat.EpisodeChatAccess
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -20,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.shownotes.ShowNotesManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -73,6 +75,7 @@ class ShelfSharedViewModel @Inject constructor(
     private val transcriptManager: TranscriptManager,
     private val showNotesManager: ShowNotesManager,
     private val downloadQueue: DownloadQueue,
+    private val syncManager: SyncManager,
     @IoDispatcher ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     private val shelfUpNextFlow: SharedFlow<UpNextQueue.State> = playbackManager.upNextQueue
@@ -458,8 +461,11 @@ class ShelfSharedViewModel @Inject constructor(
         }
         dismissEpisodeChatTooltip()
         viewModelScope.launch {
-            val isPaidUser = settings.cachedSubscription.value != null
-            _navigationState.emit(NavigationState.ShowEpisodeChat(podcast, episode, isPaidUser))
+            val access = EpisodeChatAccess.from(
+                isPlusUser = settings.cachedSubscription.value != null,
+                isSignedIn = syncManager.isLoggedIn(),
+            )
+            _navigationState.emit(NavigationState.ShowEpisodeChat(podcast, episode, access))
         }
     }
 
@@ -553,7 +559,7 @@ class ShelfSharedViewModel @Inject constructor(
         data object ShowAddBookmark : NavigationState
         data class StartUpsellFlow(val source: OnboardingUpgradeSource) : NavigationState
         data class AddEpisodeToPlaylist(val episodeUuid: String, val podcastUuid: String) : NavigationState
-        data class ShowEpisodeChat(val podcast: Podcast, val episode: PodcastEpisode, val isPaidUser: Boolean) : NavigationState
+        data class ShowEpisodeChat(val podcast: Podcast, val episode: PodcastEpisode, val access: EpisodeChatAccess) : NavigationState
     }
 
     sealed interface SnackbarMessage {

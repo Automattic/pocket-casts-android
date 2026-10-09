@@ -9,6 +9,7 @@ import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.chat.EpisodeChatAccess
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -26,6 +27,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.shownotes.ShowNotesManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
@@ -82,12 +84,18 @@ class EpisodeFragmentViewModel @Inject constructor(
     private val transcriptManager: TranscriptManager,
     private val userManager: UserManager,
     private val paymentClient: PaymentClient,
+    private val syncManager: SyncManager,
 ) : ViewModel(),
     CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
 
     private val source = SourceView.EPISODE_DETAILS
+
+    fun episodeChatAccess() = EpisodeChatAccess.from(
+        isPlusUser = settings.cachedSubscription.value != null,
+        isSignedIn = syncManager.isLoggedIn(),
+    )
     lateinit var state: LiveData<EpisodeFragmentState>
     lateinit var showNotesState: LiveData<ShowNotesState>
     val isPlaying: LiveData<Boolean> = playbackManager.playbackStateLive.map {

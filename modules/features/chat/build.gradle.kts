@@ -28,6 +28,7 @@ dependencies {
 
     implementation(platform(libs.compose.bom))
 
+    implementation(libs.compose.activity)
     implementation(libs.compose.material)
     implementation(libs.compose.material.icons.core)
     implementation(libs.compose.foundation)
@@ -43,6 +44,7 @@ dependencies {
     implementation(projects.modules.services.coroutines)
     implementation(projects.modules.services.images)
     implementation(projects.modules.services.localization)
+    implementation(projects.modules.services.preferences)
     implementation(projects.modules.services.ui)
     implementation(projects.modules.services.utils)
 

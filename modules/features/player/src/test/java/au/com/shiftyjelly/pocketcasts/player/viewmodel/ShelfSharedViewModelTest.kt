@@ -4,6 +4,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
+import au.com.shiftyjelly.pocketcasts.chat.EpisodeChatAccess
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -28,6 +29,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.shownotes.ShowNotesManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
 import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
@@ -107,6 +109,9 @@ class ShelfSharedViewModelTest {
 
     @Mock
     private lateinit var showNotesManager: ShowNotesManager
+
+    @Mock
+    private lateinit var syncManager: SyncManager
 
     private lateinit var shelfSharedViewModel: ShelfSharedViewModel
 
@@ -554,18 +559,33 @@ class ShelfSharedViewModelTest {
 
         shelfSharedViewModel.navigationState.test {
             shelfSharedViewModel.onEpisodeChatClick(podcast, transcriptEpisode, isTranscriptAvailable = true, ShelfItemSource.OverflowMenu)
-            assertEquals(NavigationState.ShowEpisodeChat(podcast, transcriptEpisode, isPaidUser = true), awaitItem())
+            assertEquals(NavigationState.ShowEpisodeChat(podcast, transcriptEpisode, EpisodeChatAccess.Chat(isBeta = false)), awaitItem())
         }
     }
 
     @Test
-    fun `given free user, when episode chat clicked, then chat is shown as not paid`() = runTest {
+    fun `given signed in free user and free beta, when episode chat clicked, then beta chat is shown`() = runTest {
         initViewModel(subscription = null)
+        FeatureFlag.setEnabled(Feature.EPISODE_CHAT_FREE_BETA, true)
+        whenever(syncManager.isLoggedIn()).thenReturn(true)
         val podcast = Podcast(uuid = "podcastUuid")
 
         shelfSharedViewModel.navigationState.test {
             shelfSharedViewModel.onEpisodeChatClick(podcast, transcriptEpisode, isTranscriptAvailable = true, ShelfItemSource.Shelf)
-            assertEquals(NavigationState.ShowEpisodeChat(podcast, transcriptEpisode, isPaidUser = false), awaitItem())
+            assertEquals(NavigationState.ShowEpisodeChat(podcast, transcriptEpisode, EpisodeChatAccess.Chat(isBeta = true)), awaitItem())
+        }
+    }
+
+    @Test
+    fun `given signed out user, when episode chat clicked, then paywall is shown`() = runTest {
+        initViewModel(subscription = null)
+        FeatureFlag.setEnabled(Feature.EPISODE_CHAT_FREE_BETA, true)
+        whenever(syncManager.isLoggedIn()).thenReturn(false)
+        val podcast = Podcast(uuid = "podcastUuid")
+
+        shelfSharedViewModel.navigationState.test {
+            shelfSharedViewModel.onEpisodeChatClick(podcast, transcriptEpisode, isTranscriptAvailable = true, ShelfItemSource.Shelf)
+            assertEquals(NavigationState.ShowEpisodeChat(podcast, transcriptEpisode, EpisodeChatAccess.Paywall), awaitItem())
         }
     }
 
@@ -763,6 +783,7 @@ class ShelfSharedViewModelTest {
             transcriptManager = transcriptManager,
             showNotesManager = showNotesManager,
             downloadQueue = mock(),
+            syncManager = syncManager,
             ioDispatcher = coroutineRule.testDispatcher,
         )
     }

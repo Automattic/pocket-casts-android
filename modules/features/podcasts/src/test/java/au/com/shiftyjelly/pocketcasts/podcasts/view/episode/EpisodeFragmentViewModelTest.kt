@@ -1,15 +1,18 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.episode
 
 import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
+import au.com.shiftyjelly.pocketcasts.chat.EpisodeChatAccess
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.SignInState
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
 import au.com.shiftyjelly.pocketcasts.payment.PaymentResult
 import au.com.shiftyjelly.pocketcasts.payment.PaymentResultCode
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeFragmentViewModel.EpisodeContentTab.DESCRIPTION
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeFragmentViewModel.EpisodeContentTab.SUMMARY
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeFragmentViewModel.EpisodePageState
+import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadProgressCache
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadQueue
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -17,10 +20,14 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.shownotes.ShowNotesManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.automattic.eventhorizon.EpisodeSummarySourceType
 import com.automattic.eventhorizon.EpisodeSummaryTappedEvent
 import com.automattic.eventhorizon.EventHorizon
@@ -34,13 +41,17 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
+import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 @RunWith(MockitoJUnitRunner::class)
 class EpisodeFragmentViewModelTest {
 
-    @get:Rule
+    @get:Rule(order = 0)
     val coroutineRule = MainCoroutineRule()
+
+    @get:Rule(order = 1)
+    val featureFlagRule = InMemoryFeatureFlagRule()
 
     @Mock
     lateinit var episodeManager: EpisodeManager
@@ -75,6 +86,9 @@ class EpisodeFragmentViewModelTest {
     @Mock
     lateinit var paymentClient: PaymentClient
 
+    @Mock
+    lateinit var syncManager: SyncManager
+
     private val eventSink = TestEventSink()
 
     private lateinit var viewModel: EpisodeFragmentViewModel
@@ -101,7 +115,30 @@ class EpisodeFragmentViewModelTest {
             transcriptManager = transcriptManager,
             userManager = userManager,
             paymentClient = paymentClient,
+            syncManager = syncManager,
         )
+    }
+
+    @Test
+    fun `signed in free user gets beta chat access during the free beta`() {
+        FeatureFlag.setEnabled(Feature.EPISODE_CHAT_FREE_BETA, true)
+        val subscriptionSetting = mock<UserSetting<Subscription?>>()
+        whenever(subscriptionSetting.value).thenReturn(null)
+        whenever(settings.cachedSubscription).thenReturn(subscriptionSetting)
+        whenever(syncManager.isLoggedIn()).thenReturn(true)
+
+        assertEquals(EpisodeChatAccess.Chat(isBeta = true), viewModel.episodeChatAccess())
+    }
+
+    @Test
+    fun `signed out user gets the chat paywall`() {
+        FeatureFlag.setEnabled(Feature.EPISODE_CHAT_FREE_BETA, true)
+        val subscriptionSetting = mock<UserSetting<Subscription?>>()
+        whenever(subscriptionSetting.value).thenReturn(null)
+        whenever(settings.cachedSubscription).thenReturn(subscriptionSetting)
+        whenever(syncManager.isLoggedIn()).thenReturn(false)
+
+        assertEquals(EpisodeChatAccess.Paywall, viewModel.episodeChatAccess())
     }
 
     @Test

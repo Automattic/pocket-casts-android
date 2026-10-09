@@ -279,6 +279,15 @@ enum class Feature(
         hasDevToggle = true,
         addedOn = LocalDate.parse("2026-04-22"),
     ),
+    EPISODE_CHAT_FREE_BETA(
+        key = "episode_chat_free_beta",
+        title = "Episode Chat: Free Beta",
+        defaultValue = isDebugOrPrototypeBuild,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = false,
+        hasDevToggle = true,
+        addedOn = LocalDate.parse("2026-10-05"),
+    ),
     EPISODE_CHAT_PLAYABLE_QUOTES(
         key = "episode_chat_playable_quotes",
         title = "Episode Chat: Playable Quotes",
