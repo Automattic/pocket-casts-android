@@ -151,12 +151,14 @@ private fun ChatContent(
                 .verticalScroll(scrollState)
                 .padding(horizontal = 16.dp, vertical = 12.dp),
         ) {
-            ChatWelcome(
-                isConversationStarted = uiState.messages.isNotEmpty() || uiState.isAwaitingReply,
-                isConnected = uiState.isConnected,
-                onClickSuggestion = onClickSuggestion,
-                theme = theme,
-            )
+            if (uiState.areMessagesLoaded) {
+                ChatWelcome(
+                    isConversationStarted = uiState.messages.isNotEmpty() || uiState.isAwaitingReply,
+                    isConnected = uiState.isConnected,
+                    onClickSuggestion = onClickSuggestion,
+                    theme = theme,
+                )
+            }
             uiState.messages.forEachIndexed { index, message ->
                 when (message) {
                     is ChatMessage.Assistant -> AiMessageBubble(
@@ -257,6 +259,7 @@ private fun ChatScreenPreview(
                     podcastTitle = "Pocket Casts Weekly",
                     episodeDurationMs = 3_600_000,
                     isBeta = true,
+                    areMessagesLoaded = true,
                     messages = listOf(
                         ChatMessage.User(
                             text = "What was the main point?",
@@ -299,6 +302,7 @@ private fun ChatScreenEmptyPreview(
                     podcastUuid = "preview-podcast-uuid",
                     podcastTitle = "Pocket Casts Weekly",
                     isBeta = true,
+                    areMessagesLoaded = true,
                 ),
                 onClickClose = {},
                 onClickMore = {},
