@@ -1,14 +1,56 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-09-16 18:10:43+0000
+Translation-Revision-Date: 2026-10-08 09:59:15+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="manual_playlist_no_content_body_alternative">팔로우하는 팟캐스트에서 에피소드를 선택하세요. 또는 에피소드에서 왼쪽으로 살짝 밀어서 원하는 대로 추가할 수 있습니다.</string>
+    <string name="manual_playlist_no_content_body">좋아하는 팟캐스트를 찾은 다음에 에피소드에서 왼쪽으로 살짝 밀어서 추가하세요.</string>
+    <string name="settings_general_whats_new_unread_dot_summary">새 소식의 새 메시지가 있을 때 프로필에 읽지 않은 dot이 표시됩니다.</string>
+    <string name="settings_general_whats_new_unread_dot">읽지 않은 dot 표시</string>
+    <string name="up_next_as_playlist_replace_body">이 항목을 재생하면 현재의 다음 차례가 대체됩니다. 유지하려면 재생목록으로 저장하세요.</string>
+    <string name="whats_new_message_page_progress">%1$d/%2$d페이지</string>
+    <string name="whats_new_poll_answered">답변해 주셔서 감사합니다.</string>
+    <string name="whats_new_research_title">사용자 연구</string>
+    <string name="whats_new_feed_unable_to_load">새 소식을 로드할 수 없음</string>
+    <string name="whats_new_feed_all_read">모든 메시지가 읽음으로 표시됨</string>
+    <string name="whats_new_feed_read_all">모두 읽음</string>
+    <string name="whats_new_feed_unread">읽지 않음</string>
+    <string name="whats_new_feed_empty_description">새 기능, 팁 및 공지가 여기에 표시됩니다.</string>
+    <string name="whats_new_feed_empty_title">아직 메시지 없음</string>
+    <string name="whats_new_category_research">사용자 연구</string>
+    <string name="whats_new_category_known_issue">알려진 문제</string>
+    <string name="whats_new_category_announcement">공지</string>
+    <string name="whats_new_category_tip">팁 및 요령</string>
+    <string name="whats_new_category_new_feature">새 기능</string>
+    <string name="bookmark_title_label">제목</string>
+    <string name="bookmarks_deleted_undo">실행 취소</string>
+    <string name="device_approve_switch_account_confirm">계정 전환</string>
+    <string name="device_approve_switch_account_message">그러면 이 기기에서 로그아웃되고 팟캐스트, 필터 및 청취 기록이 제거됩니다.</string>
+    <string name="device_approve_switch_account_title">계정을 전환하나요?</string>
+    <string name="device_approve_switch_account">본인이 아닌가요? 계정 전환</string>
+    <string name="bookmark_edit_transcript_selection">선택한 구절: %1$s</string>
+    <string name="removed_from_playlist_feedback">재생목록에서 제거됨</string>
+    <string name="bookmark_adding_transcript">대본 추가 중…</string>
+    <string name="settings_app_icon_updated_message_v2">이 새 아이콘이 표시되려면 몇 분 정도 걸릴 수 있습니다. 홈 화면 단축키가 사라지면 모든 앱 화면에서 Pocket Casts를 다시 추가하세요.</string>
+    <string name="go_to_episode">에피소드로 이동</string>
+    <string name="smart_bookmarks_upsell_message">한 번 누르세요. 이름이 지정되고, 단어가 함께 나옵니다.</string>
+    <string name="smart_bookmarks_upsell_title">유지할 가치가 있는 부분 저장</string>
+    <string name="bookmarks_upgrade_example_passage">이력서가 아니라 사람을 캐스팅하는 중입니다.</string>
     <string name="bookmark_edit_transcript_title">대본 편집</string>
     <string name="bookmarks_upgrade_example_title">오디션 룸</string>
+    <string name="bookmark_suggestion_prefix">제안:</string>
+    <string name="bookmark_suggesting_title">제목 제안 중…</string>
+    <string name="bookmark_player_tip_message">원하는 부분 유지</string>
+    <string name="bookmark_new_badge">신규</string>
     <string name="bookmark_edit_transcript_subtitle">이 북마크에 사용할 대본 구간 선택</string>
+    <string name="bookmark_create_failed">북마크를 추가할 수 없음</string>
+    <string name="device_approve_title">본인 기기 연결</string>
+    <string name="log_in_with_code_error">로그인 코드를 가져올 수 없음</string>
+    <string name="log_in_with_code_instructions">스마트폰으로 QR 코드를 스캔하거나 %1$s(으)로 이동하여 이 코드를 입력하세요.</string>
+    <string name="log_in_with_code">코드로 로그인</string>
     <string name="search_filters_networks">네트워크</string>
     <string name="discover_networks">네트워크</string>
     <string name="discover_network">네트워크</string>
@@ -18,6 +60,9 @@ Language: ko_KR
     <string name="device_approve_expired_title">QR 코드 만료됨</string>
     <string name="device_approve_connect">연결</string>
     <string name="device_approve_signing_in_as">다음으로 로그인 중…</string>
+    <string name="device_approve_expired_message">새 기기를 생성하려면 본인 기기로 돌아가세요.</string>
+    <string name="device_approve_success_message">이제 기기가 계정에 연결되었습니다.</string>
+    <string name="device_approve_success_title">기기 연결됨</string>
     <string name="device_approve_description">청취가 자동으로 동기화됩니다.\n언제든지 설정에서 연결을 해제할 수 있습니다.</string>
     <string name="tv_settings_subscription_plan">요금제</string>
     <string name="tv_settings_subscription_next_renewal">다음 갱신</string>
@@ -287,7 +332,6 @@ Language: ko_KR
     <string name="end_of_year_next_story">다음 스토리</string>
     <string name="end_of_year_story_listened_to_numbers">%1$d개 팟캐스트와 %2$d개 에피소드를 시청하셨습니다.</string>
     <string name="up_next_as_playlist_replace_switch_description">현재 다음 차례 대기열을 재생목록으로 저장합니다.</string>
-    <string name="up_next_as_playlist_replace_body">이 항목을 재생하면 현재의 다음 차례 대기열이 대체됩니다.</string>
     <string name="added_to_playlist_single">%1$s에 추가됨</string>
     <string name="end_of_year_failed_to_load_message">죄송합니다. 재생을 로드할 수 없습니다.</string>
     <string name="end_of_year_stories_already_subscribed_to_plus">Plus 혜택으로 추가 통계와 강력한 기능 활용</string>
@@ -378,7 +422,6 @@ Language: ko_KR
     <string name="manual_playlist_no_available_episode_body">이 프로그램의 모든 에피소드를 추가하신 것 같습니다.</string>
     <string name="manual_playlist_no_content_title_alternative">회원님의 재생목록 만들기 시작</string>
     <string name="manual_playlist_no_content_title">회원님의 재생목록에 에피소드 추가</string>
-    <string name="manual_playlist_no_content_body">에피소드를 왼쪽으로 살짝 밀어서 회원님의 재생목록에 추가하세요.</string>
     <string name="unavailable">사용할 수 없음</string>
     <string name="add_to_playlist_failure_message">이 재생 목록은 가득 찼습니다. 몇몇 에피소드를 삭제하거나 새로운 에피소드를 시작하세요.</string>
     <string name="added_to_playlist">“%2$s”에 %1$s 추가됨</string>
@@ -790,7 +833,6 @@ Language: ko_KR
     <string name="referrals_activate_my_pass">내 패스 활성화</string>
     <string name="referrals_claim_guest_pass_title">비회원 패스 %1$s개월권 받기</string>
     <string name="referrals_claim_guess_pass_banner_card_subtitle">모든 기능을 갖춘 청취 환경 이용하기</string>
-    <string name="referrals_tooltip_message">Pocket Casts Plus %1$s개월권을 선물하세요!</string>
     <string name="referrals_claim_guess_pass_banner_card_title">Plus 혜택이 제공되는 비회원 패스 %1$s개월권 받기</string>
     <string name="referrals_share_guest_pass">비회원 패스 공유</string>
     <string name="referrals_send_guest_pass_title">Pocket Casts Plus %1$s개월권 선물하기</string>
@@ -2407,6 +2449,9 @@ Language: ko_KR
     <plurals name="added_to_playlist_single_multiple">
         <item quantity="other">%d 재생목록에 추가됨</item>
     </plurals>
+    <plurals name="changed_playlists">
+        <item quantity="other">변경한 %d개 재생목록</item>
+    </plurals>
     <plurals name="chapter">
         <item quantity="other">챕터</item>
     </plurals>
@@ -2493,6 +2538,9 @@ Language: ko_KR
     </plurals>
     <plurals name="profile_stats_second_saved">
         <item quantity="other">절약한 시간(초)</item>
+    </plurals>
+    <plurals name="removed_from_playlists">
+        <item quantity="other">%d개 재생목록에서 제거됨</item>
     </plurals>
     <plurals name="second">
         <item quantity="other">초</item>

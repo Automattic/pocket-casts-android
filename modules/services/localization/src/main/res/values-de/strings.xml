@@ -1,14 +1,56 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-09-16 18:10:43+0000
+Translation-Revision-Date: 2026-10-08 09:57:17+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: de
 -->
 <resources>
+    <string name="manual_playlist_no_content_body_alternative">Wähle Folgen aus den Podcasts, denen du folgst. Oder wische bei jeder Folge nach links, um sie hinzuzufügen.</string>
+    <string name="manual_playlist_no_content_body">Finde einen Podcast, der dir gefällt, und wische dann bei jeder Folge nach links, um sie hinzuzufügen.</string>
+    <string name="settings_general_whats_new_unread_dot_summary">Einen „Ungelesen“-Punkt im Profil anzeigen, wenn es neue Nachrichten zu Neuigkeiten gibt.</string>
+    <string name="settings_general_whats_new_unread_dot">„Ungelesen“-Punkt anzeigen</string>
+    <string name="up_next_as_playlist_replace_body">Wenn du dies abspielst, wird deine aktuelle Warteschlange „Als Nächstes“ damit ersetzt. Speichere sie als Playlist, um sie zu behalten.</string>
+    <string name="whats_new_message_page_progress">Seite %1$d von %2$d</string>
+    <string name="whats_new_poll_answered">Vielen Dank für deine Antwort.</string>
+    <string name="whats_new_research_title">Benutzerforschung</string>
+    <string name="whats_new_feed_unable_to_load">Neuigkeiten können nicht geladen werden</string>
+    <string name="whats_new_feed_all_read">Alle Nachrichten sind als gelesen markiert</string>
+    <string name="whats_new_feed_read_all">Alle lesen</string>
+    <string name="whats_new_feed_unread">Ungelesen</string>
+    <string name="whats_new_feed_empty_description">Neue Funktionen, Tipps und Ankündigungen werden\u00A0hier angezeigt.</string>
+    <string name="whats_new_feed_empty_title">Noch keine Nachrichten</string>
+    <string name="whats_new_category_research">Benutzerforschung</string>
+    <string name="whats_new_category_known_issue">Bekanntes Problem</string>
+    <string name="whats_new_category_announcement">Ankündigung</string>
+    <string name="whats_new_category_tip">Tipps und Tricks</string>
+    <string name="whats_new_category_new_feature">Neue Funktion</string>
+    <string name="bookmark_title_label">Titel</string>
+    <string name="bookmarks_deleted_undo">Rückgängig machen</string>
+    <string name="device_approve_switch_account_confirm">Konto wechseln</string>
+    <string name="device_approve_switch_account_message">Dadurch wirst du abgemeldet und die Podcasts, Filter und der Audioverlauf werden auf diesem Gerät entfernt.</string>
+    <string name="device_approve_switch_account_title">Konto wechseln?</string>
+    <string name="device_approve_switch_account">Das bist nicht du? Konto wechseln</string>
+    <string name="bookmark_edit_transcript_selection">Ausgewählte Passage: %1$s</string>
+    <string name="removed_from_playlist_feedback">Aus Playlist entfernt</string>
+    <string name="bookmark_adding_transcript">Transkript wird hinzugefügt …</string>
+    <string name="settings_app_icon_updated_message_v2">Es kann ein paar Minuten dauern, bis dieses neue Icon angezeigt wird. Wenn die Verknüpfung auf dem Startbildschirm ausgeblendet wird, füge Pocket Casts erneut über den Bildschirm „Alle Apps“ hinzu.</string>
+    <string name="go_to_episode">Zur Folge</string>
+    <string name="smart_bookmarks_upsell_message">Einmal tippen. Und es wird nach dem gesprochenen Text benannt.</string>
+    <string name="smart_bookmarks_upsell_title">Wichtige Teile aufbewahren</string>
+    <string name="bookmarks_upgrade_example_passage">Du wählst die Person aus, nicht den Lebenslauf.</string>
     <string name="bookmark_edit_transcript_title">Transkript bearbeiten</string>
     <string name="bookmarks_upgrade_example_title">Der Casting-Raum</string>
+    <string name="bookmark_suggestion_prefix">Vorschlag:</string>
+    <string name="bookmark_suggesting_title">Ein Titel wird vorgeschlagen …</string>
+    <string name="bookmark_player_tip_message">Behalte den gewünschten Teil</string>
+    <string name="bookmark_new_badge">Neu</string>
     <string name="bookmark_edit_transcript_subtitle">Wähle eine Transkriptpassage für dieses Lesezeichen aus</string>
+    <string name="bookmark_create_failed">Lesezeichen konnte nicht hinzugefügt werden</string>
+    <string name="device_approve_title">Gerät verbinden</string>
+    <string name="log_in_with_code_error">Dein Anmeldecode konnte nicht abgerufen werden</string>
+    <string name="log_in_with_code_instructions">Scanne den QR-Code mit deinem Mobiltelefon oder gib diesen Code unter %1$s ein</string>
+    <string name="log_in_with_code">Mit Code anmelden</string>
     <string name="search_filters_networks">Netzwerke</string>
     <string name="discover_networks">Netzwerke</string>
     <string name="discover_network">Netzwerk</string>
@@ -18,6 +60,9 @@ Language: de
     <string name="device_approve_expired_title">Dein QR-Code ist abgelaufen</string>
     <string name="device_approve_connect">Verbinden</string>
     <string name="device_approve_signing_in_as">Anmelden als …</string>
+    <string name="device_approve_expired_message">Bitte gehe zurück zu deinem Gerät, um einen neuen Code zu generieren.</string>
+    <string name="device_approve_success_message">Dein Gerät ist jetzt mit deinem Konto verbunden.</string>
+    <string name="device_approve_success_title">Gerät verbunden</string>
     <string name="device_approve_description">Dein Hörverlauf wird automatisch synchronisiert.\nDu kannst die Verbindung jederzeit in den Einstellungen trennen.</string>
     <string name="tv_settings_subscription_plan">Tarif</string>
     <string name="tv_settings_subscription_next_renewal">Nächste Verlängerung</string>
@@ -287,7 +332,6 @@ Language: de
     <string name="end_of_year_next_story">Nächste Story</string>
     <string name="end_of_year_story_listened_to_numbers">Du hast dir %1$d Podcasts und %2$d Folgen angehört</string>
     <string name="up_next_as_playlist_replace_switch_description">Speichere deine aktuelle Warteschlange „Als Nächstes“ als Playlist.</string>
-    <string name="up_next_as_playlist_replace_body">Wenn du sie abspielst, wird deine aktuelle Warteschlange „Als Nächstes“ damit ersetzt.</string>
     <string name="added_to_playlist_single">Zu %1$s hinzugefügt</string>
     <string name="end_of_year_failed_to_load_message">Die Wiedergabe konnte leider nicht geladen werden</string>
     <string name="end_of_year_stories_already_subscribed_to_plus">Mit deinen Plus-Vorteilen erhältst du zusätzliche Statistiken und leistungsstarke Funktionen</string>
@@ -378,7 +422,6 @@ Language: de
     <string name="manual_playlist_no_available_episode_body">Anscheinend hast du alle Folgen aus dieser Show hinzugefügt.</string>
     <string name="manual_playlist_no_content_title_alternative">Erstelle deine Playlist</string>
     <string name="manual_playlist_no_content_title">Füge Folgen zu deiner Playlist hinzu</string>
-    <string name="manual_playlist_no_content_body">Wische bei einer Folge nach links, um sie zu deiner Playlist hinzuzufügen.</string>
     <string name="unavailable">Nicht verfügbar</string>
     <string name="added_to_playlist">%1$s zu „%2$s“ hinzugefügt</string>
     <string name="add_to_playlist_failure_message">Diese Playlist ist voll. Entferne einige Folgen oder erstelle eine neue.</string>
@@ -790,7 +833,6 @@ Language: de
     <string name="referrals_activate_my_pass">Meinen Pass aktivieren</string>
     <string name="referrals_claim_guest_pass_title">Sichere dir deinen %1$s-Gastpass</string>
     <string name="referrals_claim_guess_pass_banner_card_subtitle">Profitiere vom vollständigen Audioerlebnis</string>
-    <string name="referrals_tooltip_message">Verschenke %1$s-Pocket Casts Plus!</string>
     <string name="referrals_claim_guess_pass_banner_card_title">Sichere dir deinen %1$s-Gastpass für Plus</string>
     <string name="referrals_share_guest_pass">Gastpass teilen</string>
     <string name="referrals_send_guest_pass_title">Verschenke %1$s-Pocket Casts Plus</string>
@@ -2408,6 +2450,10 @@ Language: de
         <item quantity="one">Zu %d Playlist hinzugefügt</item>
         <item quantity="other">Zu %d Playlists hinzugefügt</item>
     </plurals>
+    <plurals name="changed_playlists">
+        <item quantity="one">%d Playlist geändert</item>
+        <item quantity="other">%d Playlists geändert</item>
+    </plurals>
     <plurals name="chapter">
         <item quantity="one">Kapitel</item>
         <item quantity="other">Kapitel</item>
@@ -2523,6 +2569,10 @@ Language: de
     <plurals name="profile_stats_second_saved">
         <item quantity="one">Sekunde gespart</item>
         <item quantity="other">Sekunden gespart</item>
+    </plurals>
+    <plurals name="removed_from_playlists">
+        <item quantity="one">Aus %d Playlist entfernt</item>
+        <item quantity="other">Aus %d Playlists entfernt</item>
     </plurals>
     <plurals name="second">
         <item quantity="one">Sekunde</item>
