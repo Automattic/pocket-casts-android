@@ -161,11 +161,11 @@ class DataSyncProcess(
                 syncManager.syncUpdateOrThrow(request)
             }
             val records = response.recordsList
-            logProcess("episode-data-incremental") {
-                episodeSync.processIncrementalResponse(records.mapNotNull(Record::episodeOrNull))
-            }
             logProcess("podcasts-data-incremental") {
                 podcastSync.processIncrementalResponse(records.mapNotNull(Record::podcastOrNull))
+            }
+            logProcess("episode-data-incremental") {
+                episodeSync.processIncrementalResponse(records.mapNotNull(Record::episodeOrNull))
             }
             logProcess("folders-data-incremental") {
                 folderSync.processIncrementalResponse(records.mapNotNull(Record::folderOrNull))

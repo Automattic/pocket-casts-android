@@ -8,7 +8,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
-import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.google.protobuf.boolValue
 import com.google.protobuf.int32Value
 import com.google.protobuf.int64Value
@@ -75,7 +74,8 @@ internal class EpisodeSync(
         val serverEpisodesMap = serverEpisodes.associateBy(SyncUserEpisode::getUuid)
         val presentEpisodes = episodeManager.findByUuids(serverEpisodesMap.keys)
         val presentUuids = presentEpisodes.mapTo(mutableSetOf(), PodcastEpisode::uuid)
-        val localEpisodes = presentEpisodes + fetchMissingEpisodes(serverEpisodesMap, presentUuids)
+        val fetchedEpisodes = fetchMissingEpisodes(serverEpisodesMap, presentUuids)
+        val localEpisodes = presentEpisodes + fetchedEpisodes
 
         val episodesToArchive = mutableListOf<PodcastEpisode>()
         val episodeToFinish = mutableListOf<PodcastEpisode>()
@@ -91,7 +91,7 @@ internal class EpisodeSync(
         episodesToArchive.forEach { episode ->
             episode.isArchived = true
         }
-        episodeToFinish.forEach { episode ->
+        (episodeToFinish + fetchedEpisodes.filter(PodcastEpisode::isFinished)).distinctBy(PodcastEpisode::uuid).forEach { episode ->
             episodeManager.markedAsPlayedExternally(episode, playbackManager, podcastManager)
         }
         episodeManager.updateAllSyncFields(localEpisodes)
@@ -110,23 +110,16 @@ internal class EpisodeSync(
         if (episodesToFetch.isEmpty()) {
             return emptyList()
         }
-        return runCatching {
-            episodesToFetch.chunked(MISSING_EPISODES_BATCH_SIZE).flatMap { batch ->
-                val request = podcastsEpisodesRequest {
-                    batch.forEach { episode ->
-                        podcastUuids.add(episode.podcastUuid)
-                        episodeUuids.add(episode.uuid)
-                    }
-                }
-                syncManager.getEpisodesOrThrow(request).episodesList.map { it.toPodcastEpisode() }
-            }.also { shells ->
-                shells.groupBy(PodcastEpisode::podcastUuid).forEach { (podcastUuid, episodes) ->
-                    episodeManager.add(episodes, podcastUuid, downloadMetaData = false)
-                }
+        return episodesToFetch.chunked(MISSING_EPISODES_BATCH_SIZE).flatMap { batch ->
+            val request = podcastsEpisodesRequest {
+                podcastUuids.addAll(batch.map(SyncUserEpisode::getPodcastUuid).distinct())
+                episodeUuids.addAll(batch.map(SyncUserEpisode::getUuid))
             }
-        }.getOrElse { error ->
-            LogBuffer.e("DataSync", error, "Failed to fetch missing episodes during incremental sync")
-            emptyList()
+            syncManager.getEpisodesOrThrow(request).episodesList.map { it.toPodcastEpisode() }
+        }.also { shells ->
+            shells.groupBy(PodcastEpisode::podcastUuid).forEach { (podcastUuid, episodes) ->
+                episodeManager.add(episodes, podcastUuid, downloadMetaData = false)
+            }
         }
     }
 

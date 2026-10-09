@@ -13,8 +13,10 @@ import com.pocketcasts.service.api.EpisodeResponse
 import com.pocketcasts.service.api.EpisodesResponse
 import com.pocketcasts.service.api.SyncUserEpisode
 import com.pocketcasts.service.api.syncUserEpisode
+import java.io.IOException
 import java.util.Date
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
@@ -69,6 +71,21 @@ class EpisodeSyncTest {
         verify(episodeManager).updateAllSyncFields(
             argThat { any { it.uuid == "episode1" && it.playingStatus == EpisodePlayingStatus.COMPLETED && it.isStarred } },
         )
+        verify(episodeManager).markedAsPlayedExternally(argThat { uuid == "episode1" }, eq(playbackManager), eq(podcastManager))
+    }
+
+    @Test
+    fun `propagate a failure to fetch missing episodes`() = runTest {
+        val serverEpisode = completedServerEpisode(uuid = "episode1", podcastUuid = "podcast1")
+
+        whenever(episodeManager.findByUuids(any())).thenReturn(emptyList())
+        whenever(podcastManager.findSubscribedUuids()).thenReturn(listOf("podcast1"))
+        whenever(syncManager.getEpisodesOrThrow(any())).thenAnswer { throw IOException("Network error") }
+
+        val result = runCatching { episodeSync.processIncrementalResponse(listOf(serverEpisode)) }
+
+        assertTrue(result.exceptionOrNull() is IOException)
+        verify(episodeManager, never()).updateAllSyncFields(any())
     }
 
     @Test
