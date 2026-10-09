@@ -217,7 +217,6 @@ Language: ja_JP
     <string name="player_tab_summary">概要</string>
     <string name="summary">概要</string>
     <string name="episode_summary">エピソードの概要</string>
-    <string name="chat_stop_quote">引用を停止</string>
     <string name="chat_play_quote">引用を再生</string>
     <string name="chat_tap_to_retry">タップして再試行</string>
     <string name="chat_error_network">サーバーにアクセスできません。 接続を確認してください。</string>

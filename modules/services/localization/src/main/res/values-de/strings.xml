@@ -217,7 +217,6 @@ Language: de
     <string name="player_tab_summary">Zusammenfassung</string>
     <string name="summary">Zusammenfassung</string>
     <string name="episode_summary">Folgenzusammenfassung</string>
-    <string name="chat_stop_quote">Zitat anhalten</string>
     <string name="chat_play_quote">Zitat abspielen</string>
     <string name="chat_tap_to_retry">Tippen, um es erneut zu versuchen.</string>
     <string name="chat_error_network">Der Server kann nicht erreicht werden. Überprüfe deine Netzwerkverbindung.</string>

@@ -217,7 +217,6 @@ Language: nl
     <string name="episode_summary">Overzicht aflevering</string>
     <string name="player_tab_summary">Samenvatting</string>
     <string name="summary">Samenvatting</string>
-    <string name="chat_stop_quote">Citaat stoppen</string>
     <string name="chat_play_quote">Citaat afspelen</string>
     <string name="chat_tap_to_retry">Tik om opnieuw te proberen</string>
     <string name="chat_error_network">Kan de server niet bereiken. Controleer je netwerkverbinding.</string>

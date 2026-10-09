@@ -217,7 +217,6 @@ Language: zh_CN
     <string name="player_tab_summary">摘要</string>
     <string name="summary">摘要</string>
     <string name="episode_summary">剧集摘要</string>
-    <string name="chat_stop_quote">结束引用</string>
     <string name="chat_play_quote">播放引用</string>
     <string name="chat_tap_to_retry">轻点以重试</string>
     <string name="chat_error_network">无法连接到该服务器。 请检查您的连接。</string>
