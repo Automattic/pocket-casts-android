@@ -252,6 +252,8 @@ data class OnboardingSubscriptionPlan private constructor(
 
             OnboardingUpgradeSource.BLOGS -> LR.string.onboarding_blogs_title
 
+            OnboardingUpgradeSource.EPISODE_CHAT -> LR.string.onboarding_episode_chat_title
+
             else -> LR.string.onboarding_upgrade_generic_title
         }
 
