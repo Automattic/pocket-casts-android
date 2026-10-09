@@ -55,10 +55,8 @@ fun WebView.blockRemoteContentOnInProcessRenderer() {
     val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as? ActivityManager
     val rendererLikelyInProcess = activityManager?.isLowRamDevice == true ||
         Build.VERSION.SDK_INT <= Build.VERSION_CODES.O_MR1
-    if (rendererLikelyInProcess) {
-        settings.blockNetworkLoads = true
-        settings.loadsImagesAutomatically = false
-    }
+    settings.blockNetworkLoads = rendererLikelyInProcess
+    settings.loadsImagesAutomatically = !rendererLikelyInProcess
 }
 
 @Suppress("DEPRECATION")
