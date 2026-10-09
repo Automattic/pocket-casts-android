@@ -61,6 +61,7 @@ import dagger.hilt.EntryPoint
 import dagger.hilt.EntryPoints
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import java.time.Clock
 import java.util.Date
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -101,11 +102,6 @@ class RefreshPodcastsThread(
     @Volatile
     private var taskHasBeenCancelled = false
 
-    private fun isAllowedToRun(runNow: Boolean = false): Boolean {
-        val now = System.currentTimeMillis()
-        return now > lastRefreshAllowedTime + if (runNow) THROTTLE_RUN_NOW_MS else THROTTLE_PERIODIC_MS
-    }
-
     fun getEntryPoint(): RefreshPodcastsThreadEntryPoint {
         return EntryPoints.get(context.applicationContext, RefreshPodcastsThreadEntryPoint::class.java)
     }
@@ -129,7 +125,9 @@ class RefreshPodcastsThread(
                 return ListenableWorker.Result.retry()
             }
 
-            if (!isAllowedToRun(runNow)) {
+            // Nothing refreshed means the attempt doesn't throttle the next one.
+            val ranRefresh = throttle.tryRun(runNow) { refresh() }
+            if (!ranRefresh) {
                 LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Not refreshing as too soon")
                 try {
                     // sleep for half a second to give the user a feeling of "oh the app is refreshing"
@@ -138,11 +136,7 @@ class RefreshPodcastsThread(
                 }
 
                 dispatchCurrentRefreshedState()
-                return ListenableWorker.Result.success()
             }
-            lastRefreshAllowedTime = System.currentTimeMillis()
-
-            refresh()
 
             return ListenableWorker.Result.success()
         } catch (e: Exception) {
@@ -167,30 +161,32 @@ class RefreshPodcastsThread(
         taskHasBeenCancelled = true
     }
 
-    /** REFRESH  */
-    private fun refresh() {
+    /** REFRESH. Returns true if the podcasts were refreshed, false if the refresh failed or was cancelled. */
+    private fun refresh(): Boolean {
         val entryPoint = getEntryPoint()
         val podcastManager = entryPoint.podcastManager()
         val serviceManager = entryPoint.serviceManager()
         val podcasts = podcastManager.findSubscribedBlocking()
         val startTime = SystemClock.elapsedRealtime()
-        runBlocking { serviceManager.refreshPodcastsSync(podcasts) }
-            .onSuccess { response ->
+        return runBlocking { serviceManager.refreshPodcastsSync(podcasts) }.fold(
+            onSuccess = { response ->
                 val elapsedTime = String.format("%d ms", SystemClock.elapsedRealtime() - startTime)
                 LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh - podcasts response - $elapsedTime")
                 processRefreshResponse(response)
-            }
-            .onFailure { error ->
+            },
+            onFailure = { error ->
                 LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, error, "Server call failed")
                 refreshFailedOrCancelled("Server call failed")
-            }
+                false
+            },
+        )
     }
 
-    private fun processRefreshResponse(result: RefreshResponse?) {
+    private fun processRefreshResponse(result: RefreshResponse?): Boolean {
         if (taskHasBeenCancelled) {
             refreshFailedOrCancelled("Not refreshing as task cancelled (2)")
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Not refreshing as task cancelled (2)")
-            return
+            return false
         }
 
         val entryPoint = getEntryPoint()
@@ -243,6 +239,7 @@ class RefreshPodcastsThread(
         } else {
             settings.setRefreshState(RefreshState.Success(Date(System.currentTimeMillis())))
         }
+        return true
     }
 
     private fun sync(): RefreshState {
@@ -423,10 +420,14 @@ class RefreshPodcastsThread(
 
         private val THROTTLE_RUN_NOW_MS: Long = if (BuildConfig.DEBUG) 0 else 15.seconds.inWholeMilliseconds
         private val THROTTLE_PERIODIC_MS: Long = if (BuildConfig.DEBUG) 0 else 5.minutes.inWholeMilliseconds
-        private var lastRefreshAllowedTime: Long = -10000
+        private val throttle = RefreshThrottle(
+            clock = Clock.systemUTC(),
+            runNowIntervalMs = THROTTLE_RUN_NOW_MS,
+            periodicIntervalMs = THROTTLE_PERIODIC_MS,
+        )
 
         fun clearLastRefreshTime() {
-            lastRefreshAllowedTime = -10000
+            throttle.reset()
         }
 
         fun updateNotifications(lastSeen: Date?, settings: Settings, podcastManager: PodcastManager, episodeManager: EpisodeManager, notificationHelper: NotificationHelper, context: Context) {
