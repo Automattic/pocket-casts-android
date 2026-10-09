@@ -224,11 +224,6 @@ Language: es
     <string name="chat_error_server">Se ha producido un error. Inténtalo de nuevo.</string>
     <string name="chat_clear">Borrar chat</string>
     <string name="chat_send">Enviar</string>
-    <string name="chat_preview_user_2">¿Se han mencionado algunos consejos prácticos?</string>
-    <string name="chat_preview_ai_2">Este episodio profundiza en la ciencia de la adquisición de hábitos, ya que analiza cómo las pequeñas rutinas diarias pueden conducir a grandes cambios a lo largo del tiempo.</string>
-    <string name="chat_preview_user_1">¿Cuál ha sido el tema principal de este episodio?</string>
-    <string name="chat_preview_ai_1">¡Hola! Estoy aquí para ayudarte a explorar este episodio. Pregúntame cualquier cosa sobre los temas que se han tratado, las conclusiones clave o momentos específicos.</string>
-    <string name="chat_paywall_title">Chatear sobre este episodio</string>
     <string name="episode_chat">Chatear sobre el episodio</string>
     <string name="blogs_experiment_banner_body">Estamos probando los blogs. Puede que se queden, que se modifiquen o que desaparezcan sin hacer ruido.</string>
     <string name="blogs_experiment_banner_lead">Esto es un experimento.</string>

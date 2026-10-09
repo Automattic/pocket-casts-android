@@ -224,11 +224,6 @@ Language: de
     <string name="chat_error_server">Es ist ein Fehler aufgetreten. Bitte versuche es erneut.</string>
     <string name="chat_clear">Chat löschen</string>
     <string name="chat_send">Senden</string>
-    <string name="chat_preview_user_2">Wurden praktische Tipps erwähnt?</string>
-    <string name="chat_preview_ai_2">Diese Folge befasst sich mit der Wissenschaft der Gewohnheitsbildung und erforscht, wie kleine tägliche Routinen im Laufe der Zeit zu großen Veränderungen führen können.</string>
-    <string name="chat_preview_user_1">Was war das Hauptthema dieser Folge?</string>
-    <string name="chat_preview_ai_1">Hallo! Ich bin hier, um dir zu helfen, diese Folge zu entdecken. Stell mir Fragen zu den angesprochenen Themen, wichtigen Punkten oder bestimmten Momenten.</string>
-    <string name="chat_paywall_title">Mit dieser Folge chatten</string>
     <string name="episode_chat">Mit Folge chatten</string>
     <string name="blogs_experiment_banner_body">Blogs sind etwas, das wir ausprobieren. Sie könnten bestehen bleiben, überarbeitet werden oder still und leise verschwinden.</string>
     <string name="blogs_experiment_banner_lead">Es handelt sich um ein Experiment.</string>
