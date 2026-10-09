@@ -110,7 +110,7 @@ fun NavGraphBuilder.authenticationNavGraph(
                     googleSignInSuccessScreen(GoogleAccountData(name = it.name, avatarUrl = it.avatarUrl))
                 },
                 onError = {
-                    showErrorToastMessage = it?.toString() ?: defaultErrorMessage
+                    showErrorToastMessage = defaultErrorMessage
                 },
                 onGoogleNotAvailable = {
                     showErrorToastMessage = defaultErrorMessage
