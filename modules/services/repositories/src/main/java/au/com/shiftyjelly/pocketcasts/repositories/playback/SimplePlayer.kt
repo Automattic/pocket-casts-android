@@ -164,7 +164,11 @@ class SimplePlayer(
         if (player?.isCurrentMediaItemSeekable == false && player?.isPlaying == true) {
             Toast.makeText(context, "Unable to seek. File headers appear to be invalid.", Toast.LENGTH_SHORT).show()
         } else {
-            val currentPlayer = player ?: return
+            val currentPlayer = player
+            if (currentPlayer == null) {
+                super.onSeekComplete(positionMs)
+                return
+            }
             // https://linear.app/a8c/issue/PCDROID-591/attempt-to-fix-classcastexception-crash-of-exoplayer
             if (currentPlayer.isReadyForSeek()) {
                 seekPlayer(currentPlayer, positionMs)
@@ -207,7 +211,7 @@ class SimplePlayer(
             super.onSeekComplete(positionMs)
         } catch (e: Exception) {
             LogBuffer.e(LogBuffer.TAG_PLAYBACK, e, "Failed to seek to $positionMs ms.")
-            super.onSeekComplete(player.currentPosition.toInt())
+            super.onSeekComplete(runCatching { player.currentPosition.toInt() }.getOrDefault(positionMs))
         }
     }
 
