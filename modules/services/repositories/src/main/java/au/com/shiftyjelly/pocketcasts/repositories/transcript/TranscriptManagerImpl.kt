@@ -148,25 +148,6 @@ class TranscriptManagerImpl @Inject constructor(
             .getOrNull()
     }
 
-    override suspend fun loadSummaryText(episodeUuid: String): String? {
-        if (!FeatureFlag.isEnabled(Feature.AI_SUMMARIES)) return null
-
-        return try {
-            val generatedTranscript = loadLocalTranscripts(episodeUuid)
-                .firstOrNull { it.isGenerated } ?: return null
-
-            val metaUrl = generatedTranscript.url.removeSuffix(".vtt") + "-meta.json"
-            transcriptService.getTranscriptOrThrow(metaUrl).use { body ->
-                metaAdapter.fromJson(body.source())?.summary?.takeIf { it.isNotBlank() }
-            }
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            Timber.tag("Summaries").e(e, "Failed to load summary for episode $episodeUuid")
-            null
-        }
-    }
-
     override suspend fun loadGeneratedChapters(episodeUuid: String) {
         if (!FeatureFlag.isEnabled(Feature.GENERATED_CHAPTERS)) return
 

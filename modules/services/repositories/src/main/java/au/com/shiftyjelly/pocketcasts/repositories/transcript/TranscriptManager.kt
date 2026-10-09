@@ -14,10 +14,6 @@ interface TranscriptManager {
         episodeUuid: String,
     ): Transcript.Text?
 
-    suspend fun loadSummaryText(
-        episodeUuid: String,
-    ): String?
-
     suspend fun loadGeneratedChapters(
         episodeUuid: String,
     )
