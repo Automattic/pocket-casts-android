@@ -217,7 +217,6 @@ Language: ar
     <string name="player_tab_summary">الملخص</string>
     <string name="summary">الملخص</string>
     <string name="episode_summary">ملخص الحلقة</string>
-    <string name="chat_stop_quote">إيقاف الاقتباس</string>
     <string name="chat_play_quote">تشغيل اقتباس</string>
     <string name="chat_tap_to_retry">انقر لإعادة المحاولة</string>
     <string name="chat_error_network">تعذّر الاتصال بالخادم. تحقق من اتصالك.</string>

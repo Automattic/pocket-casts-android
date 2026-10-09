@@ -217,7 +217,6 @@ Language: ru
     <string name="player_tab_summary">Обзор</string>
     <string name="summary">Обзор</string>
     <string name="episode_summary">Обзор выпуска</string>
-    <string name="chat_stop_quote">Остановить цитату</string>
     <string name="chat_play_quote">Воспроизвести цитату</string>
     <string name="chat_tap_to_retry">Нажмите, чтобы повторить попытку.</string>
     <string name="chat_error_network">Не удалось подключиться к серверу. Проверьте подключение.</string>

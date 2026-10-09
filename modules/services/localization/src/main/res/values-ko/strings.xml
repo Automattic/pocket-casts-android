@@ -217,7 +217,6 @@ Language: ko_KR
     <string name="player_tab_summary">요약</string>
     <string name="summary">요약</string>
     <string name="episode_summary">에피소드 요약</string>
-    <string name="chat_stop_quote">인용 중지</string>
     <string name="chat_play_quote">인용 재생</string>
     <string name="chat_tap_to_retry">눌러서 다시 시도</string>
     <string name="chat_error_network">서버에 연결할 수 없습니다. 연결을 확인하세요.</string>
