@@ -25,10 +25,18 @@ import com.automattic.eventhorizon.EpisodeChatErrorType
 import com.automattic.eventhorizon.EpisodeChatInputType
 import com.automattic.eventhorizon.EpisodeChatMessageFailedEvent
 import com.automattic.eventhorizon.EpisodeChatMessageSentEvent
+import com.automattic.eventhorizon.EpisodeChatQuotePlayTappedEvent
+import com.automattic.eventhorizon.EpisodeChatQuoteSourceType
+import com.automattic.eventhorizon.EpisodeChatQuoteStopTappedEvent
+import com.automattic.eventhorizon.EpisodeChatResponseRatedEvent
+import com.automattic.eventhorizon.EpisodeChatResponseReceivedEvent
+import com.automattic.eventhorizon.EpisodeChatSentimentType
 import com.automattic.eventhorizon.EpisodeChatShownEvent
 import com.automattic.eventhorizon.EventHorizon
 import java.io.IOException
 import java.util.Date
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.TestTimeSource
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -89,6 +97,7 @@ class ChatViewModelTest {
         on { episodeChatSurveySeen } doReturn surveySeenSetting
     }
     private val networkConnectionWatcher = TestNetworkConnectionWatcher()
+    private val timeSource = TestTimeSource()
 
     private lateinit var eventSink: TestEventSink
     private lateinit var viewModel: ChatViewModel
@@ -108,6 +117,7 @@ class ChatViewModelTest {
         settings = settings,
         applicationScope = kotlinx.coroutines.CoroutineScope(coroutineRule.testDispatcher),
         ioDispatcher = coroutineRule.testDispatcher,
+        timeSource = timeSource,
     )
 
     @Test
@@ -234,6 +244,7 @@ class ChatViewModelTest {
                 podcastUuid = PODCAST_UUID,
                 messageLength = "Summarize this episode".length.toLong(),
                 inputType = EpisodeChatInputType.SummaryPrompt,
+                messageIndex = 1,
             ),
             eventSink.pollEvent(),
         )
@@ -317,9 +328,46 @@ class ChatViewModelTest {
                 podcastUuid = PODCAST_UUID,
                 messageLength = "Question".length.toLong(),
                 inputType = EpisodeChatInputType.Typed,
+                messageIndex = 1,
             ),
             eventSink.pollEvent(),
         )
+    }
+
+    @Test
+    fun `send tracks how long the response took`() = runTest {
+        setEpisodeInfo()
+        chatManager.sendMessageGate = CompletableDeferred()
+        viewModel.onInputTextChange("Question")
+        viewModel.onSend()
+        advanceUntilIdle()
+
+        timeSource += 2_500.milliseconds
+        chatManager.sendMessageGate?.complete(Unit)
+        advanceUntilIdle()
+
+        eventSink.skipEvent(2)
+        assertEquals(
+            EpisodeChatResponseReceivedEvent(
+                source = SourceView.EPISODE_DETAILS.analyticsValue,
+                episodeUuid = EPISODE_UUID,
+                podcastUuid = PODCAST_UUID,
+                durationMs = 2_500,
+            ),
+            eventSink.pollEvent(),
+        )
+    }
+
+    @Test
+    fun `failed send does not track a response`() = runTest {
+        setEpisodeInfo()
+        eventSink.skipEvent()
+        chatManager.sendMessageException = IOException()
+
+        sendQuestion("Question")
+
+        assertTrue(eventSink.pollEvent() is EpisodeChatMessageFailedEvent)
+        assertTrue(eventSink.isEmpty())
     }
 
     @Test
@@ -473,6 +521,44 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `rating an answer tracks the rating with the number of the question it answers`() = runTest {
+        chatManager.messages.value = listOf(
+            ChatMessage.User("Q1", uuid = "q1"),
+            ChatMessage.Assistant("A1", uuid = "a1"),
+            ChatMessage.User("Q2", uuid = "q2"),
+            ChatMessage.Assistant("A2", uuid = "a2"),
+        )
+        setEpisodeInfo()
+        advanceUntilIdle()
+        eventSink.skipEvent()
+
+        viewModel.rateAnswer("a2", ChatAnswerRating.Negative)
+
+        assertEquals(
+            EpisodeChatResponseRatedEvent(
+                source = SourceView.EPISODE_DETAILS.analyticsValue,
+                episodeUuid = EPISODE_UUID,
+                podcastUuid = PODCAST_UUID,
+                rating = EpisodeChatSentimentType.Negative,
+                messageIndex = 2,
+            ),
+            eventSink.pollEvent(),
+        )
+    }
+
+    @Test
+    fun `clearing a rating is not tracked`() = runTest {
+        setEpisodeInfo()
+        eventSink.skipEvent()
+        viewModel.rateAnswer("answer-uuid", ChatAnswerRating.Positive)
+        eventSink.skipEvent()
+
+        viewModel.rateAnswer("answer-uuid", ChatAnswerRating.Positive)
+
+        assertTrue(eventSink.isEmpty())
+    }
+
+    @Test
     fun `clear chat removes the ratings`() = runTest {
         setEpisodeInfo()
         viewModel.rateAnswer("answer-uuid", ChatAnswerRating.Positive)
@@ -508,6 +594,67 @@ class ChatViewModelTest {
         )
 
         assertEquals(mapOf(1 to "a1"), state.answerUuidsByLastIndex)
+    }
+
+    @Test
+    fun `message index counts the questions in the conversation`() = runTest {
+        setEpisodeInfo()
+
+        sendQuestion("First")
+        sendQuestion("Second")
+
+        assertEquals(listOf(1L, 2L), eventSink.messageIndexes())
+    }
+
+    @Test
+    fun `message index continues from the stored conversation`() = runTest {
+        chatManager.messages.value = listOf(ChatMessage.User("Earlier"), ChatMessage.Assistant("Answer"))
+        setEpisodeInfo()
+        advanceUntilIdle()
+
+        sendQuestion("Next")
+
+        assertEquals(listOf(2L), eventSink.messageIndexes())
+    }
+
+    @Test
+    fun `message index restarts after clearing the chat`() = runTest {
+        setEpisodeInfo()
+        sendQuestion("First")
+
+        viewModel.clearChat()
+        advanceUntilIdle()
+        sendQuestion("Again")
+
+        assertEquals(listOf(1L, 1L), eventSink.messageIndexes())
+    }
+
+    @Test
+    fun `a new question after a failed one does not count the failed one`() = runTest {
+        setEpisodeInfo()
+        sendQuestion("First")
+        chatManager.sendMessageException = IOException()
+        sendQuestion("Failed")
+        chatManager.sendMessageException = null
+
+        sendQuestion("Second")
+
+        assertEquals(listOf(1L, 2L), eventSink.messageIndexes())
+        assertEquals(listOf("First", "Response"), chatManager.sentHistories.last())
+    }
+
+    @Test
+    fun `retry keeps the message index`() = runTest {
+        setEpisodeInfo()
+        sendQuestion("First")
+        chatManager.sendMessageException = IOException()
+        sendQuestion("Second")
+        chatManager.sendMessageException = null
+
+        viewModel.retry()
+        advanceUntilIdle()
+
+        assertEquals(listOf(1L, 2L), eventSink.messageIndexes())
     }
 
     @Test
@@ -667,6 +814,39 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `playing and stopping a quote tracks the inline timestamp as the source`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID)
+        playableState(quote)
+        eventSink.skipEvent()
+
+        viewModel.playQuote(quote.uuid)
+        advanceUntilIdle()
+        viewModel.playQuote(quote.uuid)
+        advanceUntilIdle()
+
+        assertEquals(
+            EpisodeChatQuotePlayTappedEvent(
+                source = SourceView.EPISODE_DETAILS.analyticsValue,
+                episodeUuid = EPISODE_UUID,
+                podcastUuid = PODCAST_UUID,
+                quoteSource = EpisodeChatQuoteSourceType.InlineTimestamp,
+            ),
+            eventSink.pollEvent(),
+        )
+        assertEquals(
+            EpisodeChatQuoteStopTappedEvent(
+                source = SourceView.EPISODE_DETAILS.analyticsValue,
+                episodeUuid = EPISODE_UUID,
+                podcastUuid = PODCAST_UUID,
+                quoteSource = EpisodeChatQuoteSourceType.InlineTimestamp,
+            ),
+            eventSink.pollEvent(),
+        )
+    }
+
+    @Test
     fun `play quote outside stored episode duration does not seek`() = runTest {
         val quote = createQuote(startMs = 49_020_000, endMs = 49_500_000)
         whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(
@@ -774,6 +954,16 @@ class ChatViewModelTest {
             on { hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) } doReturn true
         }
         advanceUntilIdle()
+    }
+
+    private fun TestScope.sendQuestion(text: String) {
+        viewModel.onInputTextChange(text)
+        viewModel.onSend()
+        advanceUntilIdle()
+    }
+
+    private fun TestEventSink.messageIndexes(): List<Long?> {
+        return List(size) { pollEvent() }.filterIsInstance<EpisodeChatMessageSentEvent>().map { it.messageIndex }
     }
 
     private suspend fun verifyNoSeek() {

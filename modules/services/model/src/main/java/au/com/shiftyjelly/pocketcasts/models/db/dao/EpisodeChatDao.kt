@@ -24,6 +24,9 @@ abstract class EpisodeChatDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun insertMessage(message: EpisodeChatMessage)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    abstract suspend fun insertMessages(messages: List<EpisodeChatMessage>)
+
     @Query("SELECT * FROM episode_chat_messages WHERE episode_uuid = :episodeUuid ORDER BY created_at ASC")
     abstract fun observeMessages(episodeUuid: String): Flow<List<EpisodeChatMessage>>
 
