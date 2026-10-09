@@ -4,6 +4,7 @@ import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import java.net.ProtocolException
+import kotlin.random.Random
 import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -14,12 +15,14 @@ import okhttp3.ResponseBody.Companion.asResponseBody
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okio.Buffer
+import okio.GzipSink
 import okio.Source
 import okio.Timeout
 import okio.blackholeSink
 import okio.buffer
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertThrows
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 
@@ -40,6 +43,31 @@ class ContentLengthValidatorInterceptorTest {
         client.newCall(Request.Builder().url(server.url("/episode.mp3")).build()).execute().use { response ->
             assertEquals("hello world", response.body.string())
         }
+    }
+
+    @Test
+    fun `truncated gzipped response over the network throws`() {
+        val gzipped = Buffer()
+        GzipSink(gzipped).buffer().use { it.write(Random(0).nextBytes(2 * MB.toInt())) }
+        val declaredLength = gzipped.size
+        server.protocols = listOf(Protocol.H2_PRIOR_KNOWLEDGE)
+        server.enqueue(
+            MockResponse()
+                .setBody(Buffer().apply { write(gzipped, MB) })
+                .setHeader("Content-Encoding", "gzip")
+                .setHeader("Content-Length", declaredLength),
+        )
+        val client = OkHttpClient.Builder()
+            .protocols(listOf(Protocol.H2_PRIOR_KNOWLEDGE))
+            .addNetworkInterceptor(ContentLengthValidatorInterceptor())
+            .build()
+
+        val exception = assertThrows(ProtocolException::class.java) {
+            client.newCall(Request.Builder().url(server.url("/episode.mp3")).build()).execute().use { response ->
+                response.body.source().readAll(blackholeSink())
+            }
+        }
+        assertTrue(exception.message.orEmpty().contains("received $MB of $declaredLength bytes from"))
     }
 
     @Test
