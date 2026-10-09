@@ -656,10 +656,8 @@ class EpisodeFragment : BaseFragment() {
             try {
                 webView = WebView(context).apply {
                     settings.apply {
-                        blockNetworkLoads = false
                         javaScriptCanOpenWindowsAutomatically = false
                         javaScriptEnabled = false
-                        loadsImagesAutomatically = true
                     }
                     blockRemoteContentOnInProcessRenderer()
                     // stopping the white flash on web player load

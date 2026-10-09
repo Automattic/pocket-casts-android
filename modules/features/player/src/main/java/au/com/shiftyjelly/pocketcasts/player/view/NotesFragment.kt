@@ -117,10 +117,8 @@ class NotesFragment : BaseFragment() {
             binding?.showNotes?.removeAllViews()
 
             webView = WebView(requireContext()).apply {
-                settings.blockNetworkLoads = false
                 settings.javaScriptCanOpenWindowsAutomatically = false
                 settings.javaScriptEnabled = false
-                settings.loadsImagesAutomatically = true
                 blockRemoteContentOnInProcessRenderer()
                 isScrollbarFadingEnabled = false
                 isVerticalScrollBarEnabled = false
