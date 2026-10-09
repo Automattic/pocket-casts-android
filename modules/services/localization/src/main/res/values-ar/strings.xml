@@ -1,11 +1,56 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-09-10 09:55:43+0000
+Translation-Revision-Date: 2026-10-08 20:57:16+0000
 Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;
 Generator: GlotPress/2.4.0-alpha
 Language: ar
 -->
 <resources>
+    <string name="manual_playlist_no_content_body_alternative">اختر حلقات من حلقات البث الصوتي التي تتابعها. أو اسحب إلى اليسار على أي حلقة لإضافتها أثناء التنقل.</string>
+    <string name="manual_playlist_no_content_body">اعثر على بث صوتي ينال إعجابك، ثم مرر لليسار على أي حلقة لإضافته.</string>
+    <string name="settings_general_whats_new_unread_dot_summary">اعرض نقطة تشير إلى وجود عناصر غير مقروءة على \"الملف الشخصي\" عند وجود رسائل جديدة في \"ما الجديد\".</string>
+    <string name="settings_general_whats_new_unread_dot">إظهار نقطة غير مقروءة</string>
+    <string name="up_next_as_playlist_replace_body">سيؤدي تشغيل هذا إلى استبدال قائمة \"التالي\" الحالية احفظها كقائمة تشغيل للاحتفاظ بها.</string>
+    <string name="whats_new_message_page_progress">صفحة ⁦%1$d⁩ من ⁦%2$d⁩</string>
+    <string name="whats_new_poll_answered">شكرًا على الإجابة.</string>
+    <string name="whats_new_research_title">بحث المستخدم</string>
+    <string name="whats_new_feed_unable_to_load">تعذّر تحميل \"ما الجديد\".</string>
+    <string name="whats_new_feed_all_read">تم وسم جميع الرسائل كمقروءة</string>
+    <string name="whats_new_feed_read_all">قراءة الكل</string>
+    <string name="whats_new_feed_unread">غير مقروء</string>
+    <string name="whats_new_feed_empty_description">ستظهر الميزات، والنصائح، والإعلانات الجديدة هنا\u00A0.</string>
+    <string name="whats_new_feed_empty_title">لا توجد رسائل حتى الآن</string>
+    <string name="whats_new_category_research">بحث المستخدم</string>
+    <string name="whats_new_category_known_issue">مشكلة معروفة</string>
+    <string name="whats_new_category_announcement">إعلان</string>
+    <string name="whats_new_category_tip">نصائح وحيل</string>
+    <string name="whats_new_category_new_feature">ميزة جديدة</string>
+    <string name="bookmarks_deleted_undo">تراجع</string>
+    <string name="bookmark_title_label">العنوان</string>
+    <string name="device_approve_switch_account_confirm">تبديل الحساب</string>
+    <string name="device_approve_switch_account_message">يقوم هذا بتسجيل الخروج وإزالة البث الصوتي، وعوامل التصفية، وسجل الاستماع على هذا الجهاز.</string>
+    <string name="device_approve_switch_account_title">هل ترغب في تبديل الحساب؟</string>
+    <string name="device_approve_switch_account">أليس هذا أنت؟ تبديل الحساب</string>
+    <string name="bookmark_edit_transcript_selection">الفقرة المحددة: ⁦%1$s⁩</string>
+    <string name="removed_from_playlist_feedback">تمت الإزالة من قائمة التشغيل</string>
+    <string name="bookmark_adding_transcript">جارٍ إضافة النصّ المكتوب…</string>
+    <string name="settings_app_icon_updated_message_v2">قد يستغرق ظهور هذه الأيقونة الجديدة بضع دقائق. إذا اختفى اختصار شاشتك الرئيسية، أضف Pocket Casts مرة أخرى من شاشة جميع تطبيقاتك.</string>
+    <string name="go_to_episode">الانتقال إلى الحلقة</string>
+    <string name="smart_bookmarks_upsell_message">نقرة واحدة. إنه يحمل اسمًا، وتأتي الكلمات معه.</string>
+    <string name="smart_bookmarks_upsell_title">حفظ الأجزاء التي تستحق الحفظ</string>
+    <string name="bookmarks_upgrade_example_passage">أنت تختار الشخص، وليس السيرة الذاتية.</string>
+    <string name="bookmarks_upgrade_example_title">غرفة الاختبار</string>
+    <string name="bookmark_suggestion_prefix">اقتراح:</string>
+    <string name="bookmark_suggesting_title">جارٍ اقتراح عنوان…</string>
+    <string name="bookmark_player_tip_message">احتفظ بالجزء الذي أردته</string>
+    <string name="bookmark_new_badge">جديد</string>
+    <string name="bookmark_edit_transcript_title">تحرير النص المكتوب</string>
+    <string name="bookmark_edit_transcript_subtitle">تحديد فقرة من النصّ المكتوب لهذه الإشارة المرجعية</string>
+    <string name="bookmark_create_failed">تتعذر إضافة إشارة مرجعية</string>
+    <string name="device_approve_title">توصيل جهازك</string>
+    <string name="log_in_with_code_error">يتعذّر الحصول على كود تسجيل الدخول الخاص بك</string>
+    <string name="log_in_with_code_instructions">امسح رمز الاستجابة السريعة ضوئيًا باستخدام هاتفك، أو انتقل إلى ⁦%1$s⁩ وأدخل هذا الكود</string>
+    <string name="log_in_with_code">تسجيل الدخول باستخدام الكود</string>
     <string name="search_filters_networks">الشبكات</string>
     <string name="discover_networks">الشبكات</string>
     <string name="discover_network">الشبكة</string>
@@ -15,6 +60,9 @@ Language: ar
     <string name="device_approve_connect">ربط</string>
     <string name="device_approve_signing_in_as">جارٍ تسجيل الدخول باسم…</string>
     <string name="device_approve_login_required">لربط جهازك، يجب أن يكون لديك حساب. يُرجى تسجيل الدخول أو إنشاء حساب والمحاولة مرة أخرى.</string>
+    <string name="device_approve_expired_message">يُرجى الرجوع إلى جهازك لإنشاء واحد جديد.</string>
+    <string name="device_approve_success_message">جهازك متصل الآن بحسابك.</string>
+    <string name="device_approve_success_title">الجهاز متصل</string>
     <string name="device_approve_description">ستتم مزامنة سجل الاستماع الخاص بك تلقائيًا.\nيمكنك قطع الاتصال في أي وقت من الإعدادات.</string>
     <string name="tv_history_empty_subtitle">ستظهر الحلقات التي تقوم بتشغيلها هنا</string>
     <string name="tv_history_empty_title">لا يوجد سجل استماع</string>
@@ -284,7 +332,6 @@ Language: ar
     <string name="end_of_year_next_story">القصَّة التالية</string>
     <string name="end_of_year_story_listened_to_numbers">لقد سجلت الدخول إلى ⁦%1$d⁩ البث الصوتي ⁦%2$d⁩ والحلقات</string>
     <string name="up_next_as_playlist_replace_switch_description">احفظ قائمة انتظار التالي الحالية لديك كقائمة تشغيل.</string>
-    <string name="up_next_as_playlist_replace_body">سيؤدي تشغيل هذا إلى استبدال قائمة التالي الحالية لديك.</string>
     <string name="added_to_playlist_single">تمت الإضافة إلى ⁦%1$s⁩</string>
     <string name="end_of_year_failed_to_load_message">نأسف، تعذّر علينا تحميل التشغيل</string>
     <string name="end_of_year_stories_already_subscribed_to_plus">يسمح Plus لديك بإلغاء قفل الإحصاءات الإضافية وميزات الطاقة</string>
@@ -375,7 +422,6 @@ Language: ar
     <string name="manual_playlist_no_available_episode_body">يبدو أنك أضفت كل الحلقات من هذا العرض.</string>
     <string name="manual_playlist_no_content_title_alternative">ابدأ بإنشاء قائمة التشغيل الخاصة بك</string>
     <string name="manual_playlist_no_content_title">أضف حلقات إلى قائمة التشغيل الخاصة بك</string>
-    <string name="manual_playlist_no_content_body">اسحب لليسار على الحلقة لإضافتها إلى قائمة التشغيل الخاصة بك.</string>
     <string name="unavailable">غير متاح</string>
     <string name="add_to_playlist_failure_message">قائمة التشغيل هذه ممتلئة. إزالة بعض الحلقات أو بدء حلقة جديدة.</string>
     <string name="added_to_playlist"> تمت إضافة ⁦%1$s⁩ إلى “⁦%2$s⁩”</string>
@@ -2408,6 +2454,14 @@ Language: ar
         <item quantity="many">تمت الإضافة إلى %d قوائم التشغيل</item>
         <item quantity="other">تمت الإضافة إلى قوائم %d التشغيل</item>
     </plurals>
+    <plurals name="changed_playlists">
+        <item quantity="zero">تم تغيير %d قائمة التشغيل</item>
+        <item quantity="one">تم تغيير %d قائمة التشغيل</item>
+        <item quantity="two">تم تغيير %d من قوائم التشغيل</item>
+        <item quantity="few">تم تغيير %d من قوائم التشغيل</item>
+        <item quantity="many">تم تغيير %d من قوائم التشغيل</item>
+        <item quantity="other">تم تغيير %d من قوائم التشغيل</item>
+    </plurals>
     <plurals name="chapter">
         <item quantity="zero">فصل</item>
         <item quantity="one">فصل</item>
@@ -2631,6 +2685,14 @@ Language: ar
         <item quantity="few">الثواني التي تم الحفظ فيها</item>
         <item quantity="many">الثواني التي تم الحفظ فيها</item>
         <item quantity="other">الثواني التي تم الحفظ فيها</item>
+    </plurals>
+    <plurals name="removed_from_playlists">
+        <item quantity="zero">تمت الإزالة من %d قائمة التشغيل</item>
+        <item quantity="one">تمت الإزالة من %d قائمة التشغيل</item>
+        <item quantity="two">تمت الإزالة من %d قوائم التشغيل</item>
+        <item quantity="few">تمت الإزالة من %d قوائم التشغيل</item>
+        <item quantity="many">تمت الإزالة من %d قوائم التشغيل</item>
+        <item quantity="other">تمت الإزالة من %d قوائم التشغيل</item>
     </plurals>
     <plurals name="second">
         <item quantity="zero">ثانية</item>

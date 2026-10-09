@@ -1,14 +1,56 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-09-18 08:40:55+0000
+Translation-Revision-Date: 2026-10-08 11:55:19+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="manual_playlist_no_content_body_alternative">Välj avsnitt från de podcasts du följer. Eller svep åt vänster på ett avsnitt för att lägga till det allteftersom.</string>
+    <string name="manual_playlist_no_content_body">Hitta en podcast du gillar och svep sedan åt vänster på ett avsnitt för att lägga till det.</string>
+    <string name="settings_general_whats_new_unread_dot_summary">Visa en oläst punkt på profil när det finns nya meddelanden.</string>
+    <string name="settings_general_whats_new_unread_dot">Show unread dot</string>
+    <string name="up_next_as_playlist_replace_body">Om du spelar upp detta ersätts din nuvarande Nästa-prenumeration. Spara den som en spellista för att behålla den.</string>
+    <string name="whats_new_message_page_progress">Sida %1$d av %2$d</string>
+    <string name="whats_new_poll_answered">Thanks for answering.</string>
+    <string name="whats_new_research_title">Användarundersökning</string>
+    <string name="whats_new_feed_unable_to_load">Det gick inte att ladda vad som är nytt</string>
+    <string name="whats_new_feed_all_read">Alla meddelanden markerade som lästa</string>
+    <string name="whats_new_feed_read_all">Read all</string>
+    <string name="whats_new_feed_unread">Oläst</string>
+    <string name="whats_new_feed_empty_description">Nya funktioner, tips och tillkännagivanden kommer att visas\u00A0här.</string>
+    <string name="whats_new_feed_empty_title">Inga meddelanden ännu</string>
+    <string name="whats_new_category_research">User Research</string>
+    <string name="whats_new_category_known_issue">Ett känt fel.</string>
+    <string name="whats_new_category_announcement">Meddelande</string>
+    <string name="whats_new_category_tip">Personalens tips och råd</string>
+    <string name="whats_new_category_new_feature">Ny funktion</string>
+    <string name="bookmark_title_label">Rubrik</string>
+    <string name="bookmarks_deleted_undo">Ångra</string>
+    <string name="device_approve_switch_account_confirm">Växla konto</string>
+    <string name="device_approve_switch_account_message">Detta loggar ut dig och tar bort podcasts, filter och lyssningshistorik på den här enheten.</string>
+    <string name="device_approve_switch_account_title">Växla konto</string>
+    <string name="device_approve_switch_account">Inte du? Växla konto</string>
+    <string name="bookmark_edit_transcript_selection">Vald passage: %1$s</string>
+    <string name="removed_from_playlist_feedback">Ta bort från spellista</string>
+    <string name="bookmark_adding_transcript">Lägger till transkription …</string>
+    <string name="settings_app_icon_updated_message_v2">Det kan ta några minuter innan den här nya ikonen visas. Om din startskärmsgenväg försvinner lägger du till Pocket Casts igen från skärmen Alla dina appar.</string>
+    <string name="go_to_episode">Gå till avsnitt</string>
+    <string name="smart_bookmarks_upsell_message">Ett tryck. Den heter och orden kommer med den.</string>
+    <string name="smart_bookmarks_upsell_title">Spara de delar som är värda att behålla</string>
+    <string name="bookmarks_upgrade_example_passage">Det är du som skickar personen, inte CV:t.</string>
     <string name="bookmark_edit_transcript_title">Redigera transkription</string>
     <string name="bookmarks_upgrade_example_title">Provspelningsrummet</string>
+    <string name="bookmark_suggestion_prefix">Förslag:</string>
+    <string name="bookmark_suggesting_title">Föreslår en rubrik …</string>
+    <string name="bookmark_player_tip_message">Behåll den del du ville ha</string>
+    <string name="bookmark_new_badge">Ny</string>
     <string name="bookmark_edit_transcript_subtitle">Välj en transkriptionspassage för detta bokmärke</string>
+    <string name="bookmark_create_failed">Kunde inte lägga till bokmärke</string>
+    <string name="device_approve_title">Anslut din enhet</string>
+    <string name="log_in_with_code_error">Kunde inte hämta din inloggningskod</string>
+    <string name="log_in_with_code_instructions">Skanna QR-koden med din telefon eller gå till %1$s och ange denna kod</string>
+    <string name="log_in_with_code">Logga in med QR-kod</string>
     <string name="search_filters_networks">Nätverk</string>
     <string name="discover_networks">Nätverk</string>
     <string name="discover_network">Nätverk</string>
@@ -290,7 +332,6 @@ Language: sv_SE
     <string name="end_of_year_next_story">Nästa berättelse</string>
     <string name="end_of_year_story_listened_to_numbers">Du har lyssnat på %1$d podcasts och %2$d avsnitt</string>
     <string name="up_next_as_playlist_replace_switch_description">Spara din nuvarande Nästa-kö som en spellista.</string>
-    <string name="up_next_as_playlist_replace_body">Om du spelar upp det här kommer din nuvarande Nästa att ersättas.</string>
     <string name="added_to_playlist_single">Tillagd till %1$s</string>
     <string name="end_of_year_failed_to_load_message">Det gick inte att ladda uppspelning</string>
     <string name="end_of_year_stories_already_subscribed_to_plus">Dina Plus-förmåner låser upp extra statistik- och power-funktioner</string>
@@ -381,7 +422,6 @@ Language: sv_SE
     <string name="manual_playlist_no_available_episode_body">Det verkar som att du har lagt till alla avsnitt från den här showen.</string>
     <string name="manual_playlist_no_content_title_alternative">Börja bygga din spellista</string>
     <string name="manual_playlist_no_content_title">Lägg till avsnitt i din spellista</string>
-    <string name="manual_playlist_no_content_body">Svep åt vänster på ett avsnitt för att lägga till det i din spellista.</string>
     <string name="unavailable">Inte tillgängligt</string>
     <string name="add_to_playlist_failure_message">Den här spellistan är full. Ta bort några avsnitt eller starta en ny.</string>
     <string name="added_to_playlist">%1$s har lagts till i “%2$s”</string>
@@ -2410,6 +2450,10 @@ Language: sv_SE
         <item quantity="one">Tillagd i %d spellista</item>
         <item quantity="other">Tillagd i %d spellistor</item>
     </plurals>
+    <plurals name="changed_playlists">
+        <item quantity="one">Ändrade %d spellista</item>
+        <item quantity="other">Ändrade %d spellistor</item>
+    </plurals>
     <plurals name="chapter">
         <item quantity="one">kapitel</item>
         <item quantity="other">kapitel</item>
@@ -2525,6 +2569,10 @@ Language: sv_SE
     <plurals name="profile_stats_second_saved">
         <item quantity="one">Sekund sparad</item>
         <item quantity="other">Sekunder sparade</item>
+    </plurals>
+    <plurals name="removed_from_playlists">
+        <item quantity="one">Ta bort från spellista%d</item>
+        <item quantity="other">Ta bort från spellista%d</item>
     </plurals>
     <plurals name="second">
         <item quantity="one">sekund</item>

@@ -1,14 +1,56 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-09-16 18:10:43+0000
+Translation-Revision-Date: 2026-10-08 15:56:45+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+    <string name="manual_playlist_no_content_body_alternative">Выберите выпуски из подкастов, на которые вы подписаны. Также можно смахнуть влево любой выпуск, чтобы сразу добавить его.</string>
+    <string name="manual_playlist_no_content_body">Найдите понравившийся подкаст, а затем смахните влево любой выпуск, чтобы добавить его.</string>
+    <string name="settings_general_whats_new_unread_dot_summary">Показывать индикатор непрочитанного в профиле при появлении новых сообщений в разделе «Что нового».</string>
+    <string name="settings_general_whats_new_unread_dot">Показывать индикатор непрочитанного</string>
+    <string name="up_next_as_playlist_replace_body">Воспроизведение этого трека заменит текущий список «Далее». Сохраните его в виде плейлиста, чтобы не потерять.</string>
+    <string name="whats_new_message_page_progress">Стр. %1$d из %2$d</string>
+    <string name="whats_new_poll_answered">Спасибо за ответ!</string>
+    <string name="whats_new_research_title">Исследования пользователей</string>
+    <string name="whats_new_feed_unable_to_load">Не удалось загрузить раздел «Что нового»</string>
+    <string name="whats_new_feed_all_read">Все сообщения отмечены как прочитанные</string>
+    <string name="whats_new_feed_read_all">Отметить все как прочитанные</string>
+    <string name="whats_new_feed_unread">Непрочитанные</string>
+    <string name="whats_new_feed_empty_description">Новые функции, советы и объявления появятсяu00A0здесь.</string>
+    <string name="whats_new_feed_empty_title">Сообщений пока нет</string>
+    <string name="whats_new_category_research">Исследования пользователей</string>
+    <string name="whats_new_category_known_issue">Известная проблема</string>
+    <string name="whats_new_category_announcement">Объявление</string>
+    <string name="whats_new_category_tip">Советы и хитрости</string>
+    <string name="whats_new_category_new_feature">Новая функция</string>
+    <string name="bookmark_title_label">Заголовок</string>
+    <string name="bookmarks_deleted_undo">Отмена</string>
+    <string name="device_approve_switch_account_confirm">Сменить учётную запись</string>
+    <string name="device_approve_switch_account_message">При этом вы выйдете из системы, а подкасты, фильтры и история прослушивания будут удалены с этого устройства.</string>
+    <string name="device_approve_switch_account_title">Сменить учётную запись?</string>
+    <string name="device_approve_switch_account">Это не вы? Сменить учётную запись</string>
+    <string name="bookmark_edit_transcript_selection">Выбранный отрывок: %1$s</string>
+    <string name="removed_from_playlist_feedback">Удалено из плейлиста</string>
+    <string name="bookmark_adding_transcript">Добавление расшифровки…</string>
+    <string name="settings_app_icon_updated_message_v2">Новая иконка появится в течение нескольких минут. Если ярлык на главном экране исчезнет, добавьте Pocket Casts заново со страницы всех приложений.</string>
+    <string name="go_to_episode">Перейти к выпуску</string>
+    <string name="smart_bookmarks_upsell_message">В одно касание. Дайте ему название, и слова польются сами.</string>
+    <string name="smart_bookmarks_upsell_title">Сохраняйте самое важное</string>
+    <string name="bookmarks_upgrade_example_passage">Вы выбираете человека, а не резюме.</string>
     <string name="bookmark_edit_transcript_title">Изменить расшифровку</string>
     <string name="bookmarks_upgrade_example_title">Комната для прослушивания</string>
+    <string name="bookmark_suggestion_prefix">Предложение:</string>
+    <string name="bookmark_suggesting_title">Предлагаем заголовок…</string>
+    <string name="bookmark_player_tip_message">Оставьте только то, что вам нужно</string>
+    <string name="bookmark_new_badge">Новое</string>
     <string name="bookmark_edit_transcript_subtitle">Выберите отрывок расшифровки для этой закладки</string>
+    <string name="bookmark_create_failed">Не удалось добавить закладку</string>
+    <string name="device_approve_title">Подключите устройство</string>
+    <string name="log_in_with_code_error">Не удалось получить код для входа</string>
+    <string name="log_in_with_code_instructions">Отсканируйте QR-код на телефоне или перейдите на страницу %1$s и введите этот код</string>
+    <string name="log_in_with_code">Вход по коду</string>
     <string name="search_filters_networks">Сети</string>
     <string name="discover_networks">Сети</string>
     <string name="discover_network">Сеть</string>
@@ -18,6 +60,9 @@ Language: ru
     <string name="device_approve_expired_title">Срок действия QR-кода истёк</string>
     <string name="device_approve_connect">Подключить</string>
     <string name="device_approve_signing_in_as">Вход в систему…</string>
+    <string name="device_approve_expired_message">Вернитесь к своему устройству, чтобы сгенерировать новый код.</string>
+    <string name="device_approve_success_message">Ваше устройство успешно подключено к учётной записи.</string>
+    <string name="device_approve_success_title">Устройство подключено</string>
     <string name="device_approve_description">Ваше прослушивание будет синхронизироваться автоматически.\nВы можете отключиться в любой момент на странице «Настройки».</string>
     <string name="tv_settings_subscription_plan">Тарифный план</string>
     <string name="tv_settings_subscription_next_renewal">Следующее продление</string>
@@ -287,7 +332,6 @@ Language: ru
     <string name="end_of_year_next_story">Следующая история</string>
     <string name="end_of_year_story_listened_to_numbers">Вы подключались к %1$d подкастам и %2$d выпускам</string>
     <string name="up_next_as_playlist_replace_switch_description">Сохранить текущий список «Следующие» как плейлист.</string>
-    <string name="up_next_as_playlist_replace_body">При запуске он заменит текущий список «Следующие».</string>
     <string name="added_to_playlist_single">Добавлено в %1$s</string>
     <string name="end_of_year_failed_to_load_message">Не удалось загрузить Ваш год в подкастах</string>
     <string name="end_of_year_stories_already_subscribed_to_plus">Привилегии Plus позволяют вам пользоваться расширенной статистикой и мощными функциями</string>
@@ -378,7 +422,6 @@ Language: ru
     <string name="manual_playlist_no_available_episode_body">По-видимому, вы добавили все выпуски этого шоу.</string>
     <string name="manual_playlist_no_content_title_alternative">Создать плейлист</string>
     <string name="manual_playlist_no_content_title">Добавить выпуски в плейлист</string>
-    <string name="manual_playlist_no_content_body">Смахните выпуск влево, чтобы добавить его в плейлист.</string>
     <string name="unavailable">Недоступно</string>
     <string name="add_to_playlist_failure_message">Этот плейлист заполнен. Удалите несколько выпусков или создайте новый плейлист.</string>
     <string name="added_to_playlist">%1$s добавлен в «%2$s»</string>
@@ -2408,6 +2451,11 @@ Language: ru
         <item quantity="few">Добавлен в плейлисты (%d)</item>
         <item quantity="many">Добавлен в плейлисты (%d)</item>
     </plurals>
+    <plurals name="changed_playlists">
+        <item quantity="one">Изменено плейлистов: %d</item>
+        <item quantity="few">Изменено плейлистов: %d</item>
+        <item quantity="many">Изменено плейлистов: %d</item>
+    </plurals>
     <plurals name="chapter">
         <item quantity="one">глава</item>
         <item quantity="few">главы</item>
@@ -2552,6 +2600,11 @@ Language: ru
         <item quantity="one">сек сохранено</item>
         <item quantity="few">сек сохранено</item>
         <item quantity="many">сек сохранено</item>
+    </plurals>
+    <plurals name="removed_from_playlists">
+        <item quantity="one">Удалено из плейлистов (%d)</item>
+        <item quantity="few">Удалено из плейлистов (%d)</item>
+        <item quantity="many">Удалено из плейлистов (%d)</item>
     </plurals>
     <plurals name="second">
         <item quantity="one">сек</item>

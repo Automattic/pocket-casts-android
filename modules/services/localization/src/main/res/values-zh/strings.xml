@@ -1,14 +1,56 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-09-16 18:10:43+0000
+Translation-Revision-Date: 2026-10-08 11:58:54+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="manual_playlist_no_content_body_alternative">从您关注的播客中选择剧集。 或者在任意剧集上向左滑动，即可边浏览边添加。</string>
+    <string name="manual_playlist_no_content_body">找到您喜欢的播客，然后在任意剧集上向左滑动即可添加。</string>
+    <string name="settings_general_whats_new_unread_dot_summary">当有新的“最新动态”消息时，在个人资料上显示未读标记。</string>
+    <string name="settings_general_whats_new_unread_dot">显示未读标记</string>
+    <string name="up_next_as_playlist_replace_body">播放此剧集将替换您当前的“接下来播放”。 将其保存为播放列表以保留。</string>
+    <string name="whats_new_message_page_progress">第 %1$d 页，共 %2$d 页</string>
+    <string name="whats_new_poll_answered">感谢您的回答。</string>
+    <string name="whats_new_research_title">用户研究</string>
+    <string name="whats_new_feed_unable_to_load">无法加载“最新动态”消息</string>
+    <string name="whats_new_feed_all_read">所有消息均已标记为已读</string>
+    <string name="whats_new_feed_read_all">全部已读</string>
+    <string name="whats_new_feed_unread">未读</string>
+    <string name="whats_new_feed_empty_description">新功能、提示和公告将在此处发布。</string>
+    <string name="whats_new_feed_empty_title">尚无消息</string>
+    <string name="whats_new_category_research">用户研究</string>
+    <string name="whats_new_category_known_issue">已知问题</string>
+    <string name="whats_new_category_announcement">公告</string>
+    <string name="whats_new_category_tip">提示和技巧</string>
+    <string name="whats_new_category_new_feature">新功能</string>
+    <string name="bookmark_title_label">标题</string>
+    <string name="bookmarks_deleted_undo">撤销</string>
+    <string name="device_approve_switch_account_confirm">切换账户</string>
+    <string name="device_approve_switch_account_message">这将使您退出登录，并移除此设备上的播客、筛选器和收听历史记录。</string>
+    <string name="device_approve_switch_account_title">切换账户？</string>
+    <string name="device_approve_switch_account">不是本人？ 切换账户</string>
+    <string name="bookmark_edit_transcript_selection">所选段落：%1$s</string>
+    <string name="removed_from_playlist_feedback">已从播放列表中移除</string>
+    <string name="bookmark_adding_transcript">正在添加文字转录稿…</string>
+    <string name="settings_app_icon_updated_message_v2">此新图标可能需要几分钟时间才能显示。 如果您的主屏幕快捷键消失，请从“所有应用程序”屏幕中重新添加 Pocket Casts。</string>
+    <string name="go_to_episode">转到剧集</string>
+    <string name="smart_bookmarks_upsell_message">轻点一下。 名字一经确定，相关词语便随之而来。</string>
+    <string name="smart_bookmarks_upsell_title">保留值得保留的部分</string>
+    <string name="bookmarks_upgrade_example_passage">您是在选人，而不是在选简历。</string>
     <string name="bookmark_edit_transcript_title">编辑文字转录稿</string>
     <string name="bookmarks_upgrade_example_title">试镜室</string>
+    <string name="bookmark_suggestion_prefix">建议：</string>
+    <string name="bookmark_suggesting_title">正在建议标题…</string>
+    <string name="bookmark_player_tip_message">保留您想要的部分</string>
+    <string name="bookmark_new_badge">新建</string>
     <string name="bookmark_edit_transcript_subtitle">为此书签选择文字转录稿段落</string>
+    <string name="bookmark_create_failed">无法添加书签</string>
+    <string name="device_approve_title">连接您的设备</string>
+    <string name="log_in_with_code_error">无法获取您的登录代码</string>
+    <string name="log_in_with_code_instructions">使用手机扫描二维码，或前往 %1$s 并输入此代码</string>
+    <string name="log_in_with_code">使用代码登录</string>
     <string name="search_filters_networks">网络</string>
     <string name="discover_networks">网络</string>
     <string name="discover_network">网络</string>
@@ -18,6 +60,9 @@ Language: zh_CN
     <string name="device_approve_expired_title">您的二维码已过期</string>
     <string name="device_approve_connect">连接</string>
     <string name="device_approve_signing_in_as">正在以…身份登录</string>
+    <string name="device_approve_expired_message">请返回您的设备以生成一个新的代码。</string>
+    <string name="device_approve_success_message">您的设备现已连接到您的账户。</string>
+    <string name="device_approve_success_title">设备已连接</string>
     <string name="device_approve_description">您的收听进度将自动同步。\n您可以随时在“设置”中断开连接。</string>
     <string name="tv_settings_subscription_plan">套餐</string>
     <string name="tv_settings_subscription_next_renewal">下次续订时间</string>
@@ -287,7 +332,6 @@ Language: zh_CN
     <string name="end_of_year_next_story">下一篇故事</string>
     <string name="end_of_year_story_listened_to_numbers">您收听了 %1$d 个播客和 %2$d 集内容</string>
     <string name="up_next_as_playlist_replace_switch_description">将您当前的“接下来播放”队列保存为播放列表。</string>
-    <string name="up_next_as_playlist_replace_body">播放此内容将替换您当前的“接下来播放”。</string>
     <string name="added_to_playlist_single">已添加到 %1$s 中</string>
     <string name="end_of_year_failed_to_load_message">很抱歉，我们无法加载播放记录</string>
     <string name="end_of_year_stories_already_subscribed_to_plus">您的 Plus 福利可解锁额外统计信息和强大功能</string>
@@ -378,7 +422,6 @@ Language: zh_CN
     <string name="manual_playlist_no_available_episode_body">您似乎已添加此节目中的所有剧集。</string>
     <string name="manual_playlist_no_content_title_alternative">开始构建您的播放列表</string>
     <string name="manual_playlist_no_content_title">将剧集添加到您的播放列表</string>
-    <string name="manual_playlist_no_content_body">向左滑动剧集即可将其添加到您的播放列表。</string>
     <string name="unavailable">不可用</string>
     <string name="add_to_playlist_failure_message">此播放列表已满。 删减几集或开始新的一集。</string>
     <string name="added_to_playlist">%1$s 已添加至“%2$s”</string>
@@ -2406,6 +2449,9 @@ Language: zh_CN
     <plurals name="added_to_playlist_single_multiple">
         <item quantity="other">已添加到 %d 个播放列表中</item>
     </plurals>
+    <plurals name="changed_playlists">
+        <item quantity="other">已更改 %d 个播放列表</item>
+    </plurals>
     <plurals name="chapter">
         <item quantity="other">章节</item>
     </plurals>
@@ -2492,6 +2538,9 @@ Language: zh_CN
     </plurals>
     <plurals name="profile_stats_second_saved">
         <item quantity="other">已保存的秒数</item>
+    </plurals>
+    <plurals name="removed_from_playlists">
+        <item quantity="other">已从 %d 个播放列表中移除</item>
     </plurals>
     <plurals name="second">
         <item quantity="other">秒</item>
