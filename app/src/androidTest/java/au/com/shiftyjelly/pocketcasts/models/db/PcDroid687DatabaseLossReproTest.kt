@@ -82,12 +82,14 @@ class PcDroid687DatabaseLossReproTest {
 
         val db = migrationTestHelper.runMigrationsAndValidate(
             dbName,
-            137,
+            139,
             true,
             AppDatabase.MIGRATION_133_134,
             AppDatabase.MIGRATION_134_135,
             AppDatabase.MIGRATION_135_136,
             AppDatabase.MIGRATION_136_137,
+            AppDatabase.MIGRATION_137_138,
+            AppDatabase.MIGRATION_138_139,
         )
 
         assertEquals("podcasts should survive the migration", 1, countRows(db, "podcasts"))
@@ -114,21 +116,23 @@ class PcDroid687DatabaseLossReproTest {
 
         val reporter = RecordingReporter()
         var podcasts = -1
+        var lastError: Throwable? = null
         repeat(2) {
             if (podcasts >= 0) return@repeat
             val room = productionRoom(dbName, reporter)
             try {
                 podcasts = countRows(room.openHelper.writableDatabase, "podcasts")
-            } catch (_: Throwable) {
+            } catch (e: Throwable) {
+                lastError = e
             } finally {
                 room.close()
             }
         }
 
-        assertEquals("corruption should be reported exactly once", 1, reporter.calls)
+        assertEquals("corruption should be reported exactly once (last error: $lastError)", 1, reporter.calls)
         assertNotNull("the corrupt database should be preserved", reporter.backupPath)
         assertTrue("the backup file should exist on disk", File(reporter.backupPath!!).exists())
         assertTrue("the corrupt database size should be captured", reporter.databaseSizeBytes > 0)
-        assertEquals("Room still recovers by recreating an empty database", 0, podcasts)
+        assertEquals("Room still recovers by recreating an empty database (last error: $lastError)", 0, podcasts)
     }
 }

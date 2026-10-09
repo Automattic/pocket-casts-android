@@ -4,6 +4,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.sqlite.db.SupportSQLiteOpenHelper
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import java.io.File
+import java.io.IOException
 
 class CorruptionHandlingOpenHelperFactory(
     private val delegate: SupportSQLiteOpenHelper.Factory,
@@ -47,9 +48,15 @@ class CorruptionHandlingOpenHelperFactory(
         }
 
         private fun preserveAndReport(name: String) {
-            val databaseFile = configuration.context.getDatabasePath(name)
+            val databaseFile = if (configuration.useNoBackupDirectory) {
+                File(configuration.context.noBackupFilesDir, name)
+            } else {
+                configuration.context.getDatabasePath(name)
+            }
             val sizeBytes = if (databaseFile.exists()) databaseFile.length() else 0L
-            val backup = backUp(databaseFile)
+            val backup = runCatching { backUp(databaseFile) }
+                .onFailure { LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, it, "Failed to back up corrupt database $name") }
+                .getOrNull()
             reporter().onDatabaseCorrupted(name, backup?.absolutePath, sizeBytes)
         }
 
@@ -59,18 +66,28 @@ class CorruptionHandlingOpenHelperFactory(
             }
             val directory = databaseFile.parentFile ?: return null
 
+            val existingBackup = directory.listFiles { file -> file.name.startsWith("${databaseFile.name}.$BACKUP_MARKER-") }
+                ?.maxByOrNull(File::length)
+            if (existingBackup != null && existingBackup.length() >= databaseFile.length()) {
+                return existingBackup
+            }
+            if (directory.usableSpace < databaseFile.length()) {
+                return null
+            }
+
             val suffix = "$BACKUP_MARKER-${System.currentTimeMillis()}"
-            val backup = File(directory, "${databaseFile.name}.$suffix")
-            databaseFile.copyTo(backup, overwrite = true)
-            for (extension in AUXILIARY_EXTENSIONS) {
-                val auxiliary = File(directory, "${databaseFile.name}$extension")
-                if (auxiliary.exists()) {
-                    auxiliary.copyTo(File(directory, "${databaseFile.name}$extension.$suffix"), overwrite = true)
-                }
+            val auxiliaries = AUXILIARY_EXTENSIONS.map { File(directory, "${databaseFile.name}$it") }.filter(File::exists)
+            val copies = listOf(databaseFile) + auxiliaries
+            val targets = copies.map { File(directory, "${it.name}.$suffix") }
+            try {
+                copies.zip(targets).forEach { (source, target) -> source.copyTo(target, overwrite = true) }
+            } catch (e: IOException) {
+                targets.forEach(File::delete)
+                throw e
             }
 
             pruneOlderBackups(directory, databaseFile, keepSuffix = suffix)
-            return backup
+            return targets.first()
         }
 
         private fun pruneOlderBackups(directory: File, databaseFile: File, keepSuffix: String) {
