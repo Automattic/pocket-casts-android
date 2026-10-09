@@ -83,12 +83,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
-import au.com.shiftyjelly.pocketcasts.chat.ChatFragment
-import au.com.shiftyjelly.pocketcasts.chat.ChatPaywallFragment
-import au.com.shiftyjelly.pocketcasts.chat.EpisodeChatAccess
-import au.com.shiftyjelly.pocketcasts.chat.ui.ChatBanner
-import au.com.shiftyjelly.pocketcasts.chat.ui.ChatBannerColors
-import au.com.shiftyjelly.pocketcasts.chat.ui.ChatBannerDimensions
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
 import au.com.shiftyjelly.pocketcasts.compose.buttons.ButtonTab
@@ -757,52 +751,6 @@ class EpisodeFragment : BaseFragment() {
                     val hasChapters = chaptersState.chaptersCount > 0
 
                     Column(modifier = Modifier.fillMaxWidth()) {
-                        val askTheEpisodeVisible = FeatureFlag.isEnabled(Feature.EPISODE_CHAT) && transcript != null
-                        AnimatedVisibility(
-                            visible = askTheEpisodeVisible,
-                            enter = BannerEnterTransition,
-                            exit = BannerExitTransition,
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(10.dp),
-                                modifier = Modifier
-                                    .padding(start = 16.dp, end = 16.dp, top = 16.dp)
-                                    .border(
-                                        width = 0.5.dp,
-                                        color = MaterialTheme.theme.colors.primaryUi05,
-                                        shape = RoundedCornerShape(12.dp),
-                                    )
-                                    .background(
-                                        MaterialTheme.theme.colors.primaryUi04,
-                                        RoundedCornerShape(12.dp),
-                                    )
-                                    .clickable(
-                                        role = Role.Button,
-                                        onClickLabel = stringResource(LR.string.episode_chat),
-                                    ) {
-                                        val t = transcript ?: return@clickable
-                                        openChat(t.episodeUuid, t.podcastUuid)
-                                    }
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 14.dp, vertical = 12.dp),
-                            ) {
-                                Image(
-                                    painter = painterResource(IR.drawable.ic_ai),
-                                    contentDescription = null,
-                                    colorFilter = ColorFilter.tint(MaterialTheme.theme.colors.primaryIcon02),
-                                    modifier = Modifier.size(18.dp),
-                                )
-                                Text(
-                                    text = stringResource(LR.string.episode_chat),
-                                    color = MaterialTheme.theme.colors.primaryText02,
-                                    fontSize = 15.sp,
-                                    fontWeight = FontWeight(500),
-                                    letterSpacing = 0.5.sp,
-                                )
-                            }
-                        }
-
                         val tabs = buildMergedTabs(transcript, summaryText, hasChapters)
 
                         val isSelectedTabAvailable = tabs.any { it.labelResId == selectedTab.labelResId }
@@ -829,7 +777,7 @@ class EpisodeFragment : BaseFragment() {
                                     .fillMaxWidth()
                                     .background(MaterialTheme.theme.colors.primaryUi01)
                                     .alpha(if (isStickyTabBarVisible.value) 0f else 1f)
-                                    .padding(top = if (askTheEpisodeVisible) 4.dp else 16.dp),
+                                    .padding(top = 16.dp),
                             )
                         }
 
@@ -1034,20 +982,6 @@ class EpisodeFragment : BaseFragment() {
                                     },
                             )
                         }
-                        if (FeatureFlag.isEnabled(Feature.EPISODE_CHAT) && transcript != null) {
-                            ChatBanner(
-                                colors = ChatBannerColors.default().copy(leadingIcon = episodeIconColor),
-                                dimensions = ChatBannerDimensions.compact(),
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable(
-                                        role = Role.Button,
-                                        onClickLabel = stringResource(LR.string.episode_chat),
-                                    ) {
-                                        openChat(transcript.episodeUuid, transcript.podcastUuid)
-                                    },
-                            )
-                        }
                     }
                 }
             }
@@ -1090,7 +1024,6 @@ class EpisodeFragment : BaseFragment() {
                     val chaptersState = chaptersViewModel.uiState.collectAsState().value
                     val hasChapters = chaptersState.chaptersCount > 0
                     val tabs = buildMergedTabs(transcript, summaryText, hasChapters)
-                    val askTheEpisodeVisible = FeatureFlag.isEnabled(Feature.EPISODE_CHAT) && transcript != null
 
                     Column(modifier = Modifier.fillMaxWidth()) {
                         Column(
@@ -1101,7 +1034,6 @@ class EpisodeFragment : BaseFragment() {
                             EpisodeTabBar(
                                 tabs = tabs,
                                 selectedTab = selectedTab,
-                                askTheEpisodeVisible = askTheEpisodeVisible,
                             )
 
                             if (selectedTab == EpisodeContentTab.TRANSCRIPT) {
@@ -1166,7 +1098,6 @@ class EpisodeFragment : BaseFragment() {
     private fun EpisodeTabBar(
         tabs: List<ButtonTab>,
         selectedTab: EpisodeContentTab,
-        askTheEpisodeVisible: Boolean,
     ) {
         if (tabs.size > 1) {
             val selectedButtonTab = tabs.findSelected(selectedTab)
@@ -1177,7 +1108,7 @@ class EpisodeFragment : BaseFragment() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(MaterialTheme.theme.colors.primaryUi01)
-                    .padding(top = if (askTheEpisodeVisible) 4.dp else 16.dp),
+                    .padding(top = 16.dp),
             )
         }
     }
@@ -1316,32 +1247,6 @@ class EpisodeFragment : BaseFragment() {
 
     private fun loadShowNotes(notes: String) {
         webView?.loadDataWithBaseURL("file://android_asset/", notes, "text/html", "UTF-8", null)
-    }
-
-    private fun openChat(episodeUuid: String, podcastUuid: String?) {
-        val access = viewModel.episodeChatAccess()
-        if (access is EpisodeChatAccess.Chat) {
-            val episode = viewModel.episode ?: return
-            val chatPodcastUuid = podcastUuid ?: return
-            if (parentFragmentManager.findFragmentByTag("episode_chat") == null) {
-                val fragment = ChatFragment.newInstance(
-                    episodeUuid,
-                    chatPodcastUuid,
-                    viewModel.podcast?.title.orEmpty(),
-                    episode.title,
-                    episode.durationMs,
-                    SourceView.EPISODE_DETAILS,
-                    access.isBeta,
-                    viewModel.podcast?.let(::PodcastColors) ?: PodcastColors.ForUserEpisode,
-                )
-                fragment.show(parentFragmentManager, "episode_chat")
-            }
-        } else {
-            if (parentFragmentManager.findFragmentByTag("episode_chat_paywall") == null) {
-                val fragment = ChatPaywallFragment.newInstance(episodeUuid, podcastUuid, SourceView.EPISODE_DETAILS)
-                fragment.show(parentFragmentManager, "episode_chat_paywall")
-            }
-        }
     }
 
     override fun onPause() {
