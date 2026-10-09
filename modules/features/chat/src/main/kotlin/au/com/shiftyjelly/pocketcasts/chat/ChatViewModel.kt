@@ -115,6 +115,7 @@ class ChatViewModel @Inject constructor(
                             playingQuoteUuid = state.messages.playingQuoteUuid(),
                             episodeDurationMs = state.episodeDurationMs,
                         ),
+                        areMessagesLoaded = true,
                     )
                 }
             }
@@ -220,7 +221,7 @@ class ChatViewModel @Inject constructor(
 
     fun onSummarizeClick(text: String) {
         val state = _uiState.value
-        if (state.isAwaitingReply || !state.isConnected) return
+        if (!state.areMessagesLoaded || state.isAwaitingReply || !state.isConnected) return
         performSend(message = ChatMessage.User(text = text), inputType = EpisodeChatInputType.SummaryPrompt)
     }
 
@@ -609,6 +610,7 @@ data class ChatUiState(
     val podcastTitle: String = "",
     val episodeDurationMs: Int = 0,
     val messages: List<ChatMessage> = emptyList(),
+    val areMessagesLoaded: Boolean = false,
     val isConnected: Boolean = true,
     val isAwaitingReply: Boolean = false,
     val error: ChatError? = null,
