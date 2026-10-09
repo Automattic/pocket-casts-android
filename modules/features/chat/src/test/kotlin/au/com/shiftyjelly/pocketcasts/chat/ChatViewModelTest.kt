@@ -26,7 +26,6 @@ import com.automattic.eventhorizon.EpisodeChatMessageFailedEvent
 import com.automattic.eventhorizon.EpisodeChatMessageSentEvent
 import com.automattic.eventhorizon.EpisodeChatQuotePlayTappedEvent
 import com.automattic.eventhorizon.EpisodeChatQuoteSourceType
-import com.automattic.eventhorizon.EpisodeChatQuoteStopTappedEvent
 import com.automattic.eventhorizon.EpisodeChatResponseRatedEvent
 import com.automattic.eventhorizon.EpisodeChatResponseReceivedEvent
 import com.automattic.eventhorizon.EpisodeChatSentimentType
@@ -114,7 +113,6 @@ class ChatViewModelTest {
         episodeManager = episodeManager,
         eventHorizon = EventHorizon(eventSink),
         settings = settings,
-        applicationScope = kotlinx.coroutines.CoroutineScope(coroutineRule.testDispatcher),
         ioDispatcher = coroutineRule.testDispatcher,
         timeSource = timeSource,
     )
@@ -721,15 +719,15 @@ class ChatViewModelTest {
     }
 
     @Test
-    fun `quote ending after episode end cannot play`() = runTest {
+    fun `quote starting before episode end can play even when it ends after it`() = runTest {
         val quote = createQuote(startMs = 120_000, endMs = 130_000)
 
-        assertFalse(playableState(quote))
+        assertTrue(playableState(quote))
     }
 
     @Test
-    fun `quote ending at episode end cannot play`() = runTest {
-        val quote = createQuote(startMs = 120_000, endMs = 123_000)
+    fun `quote starting at episode end cannot play`() = runTest {
+        val quote = createQuote(startMs = 123_000, endMs = 125_000)
 
         assertFalse(playableState(quote))
     }
@@ -755,15 +753,13 @@ class ChatViewModelTest {
     }
 
     @Test
-    fun `playing and stopping a quote tracks the inline timestamp as the source`() = runTest {
+    fun `playing a quote tracks the inline timestamp as the source`() = runTest {
         val quote = createQuote(startMs = 1_000, endMs = 3_000)
         whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
         playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID)
         playableState(quote)
         eventSink.skipEvent()
 
-        viewModel.playQuote(quote.uuid)
-        advanceUntilIdle()
         viewModel.playQuote(quote.uuid)
         advanceUntilIdle()
 
@@ -776,15 +772,26 @@ class ChatViewModelTest {
             ),
             eventSink.pollEvent(),
         )
-        assertEquals(
-            EpisodeChatQuoteStopTappedEvent(
-                source = SourceView.EPISODE_DETAILS.analyticsValue,
-                episodeUuid = EPISODE_UUID,
-                podcastUuid = PODCAST_UUID,
-                quoteSource = EpisodeChatQuoteSourceType.InlineTimestamp,
-            ),
-            eventSink.pollEvent(),
-        )
+    }
+
+    @Test
+    fun `playing a quote seeks to its start and keeps playing`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID, positionMs = 10_000)
+        playableState(quote)
+
+        viewModel.playQuote(quote.uuid)
+        advanceUntilIdle()
+        playbackState.value = playbackState.value.copy(state = PlaybackState.State.PLAYING, positionMs = 3_500)
+        advanceUntilIdle()
+
+        verify(playbackManager).seekToTimeMsSuspend(org.mockito.kotlin.eq(1_000), anyOrNull())
+        verify(playbackManager).playQueueSuspend(any(), any())
+        verify(playbackManager, never()).playNowSuspend(any<BaseEpisode>(), any(), any(), any())
+        verify(playbackManager, never()).pause(any(), any())
+        verify(playbackManager, never()).pauseSuspend(any(), any())
+        verify(playbackManager, never()).seekToTimeMsSuspend(org.mockito.kotlin.eq(10_000), anyOrNull())
     }
 
     @Test
@@ -796,7 +803,7 @@ class ChatViewModelTest {
         playableState(quote, episodeDurationMs = 0)
 
         viewModel.playQuote(quote.uuid)
-        viewModel.uiState.first { state -> state.messages.filterIsInstance<ChatMessage.Quote>().none { it.isPlaying } }
+        advanceUntilIdle()
 
         verifyNoSeek()
     }
@@ -862,25 +869,6 @@ class ChatViewModelTest {
 
         verify(playbackManager).playQueueSuspend(SourceView.PLAYER, false)
         verify(playbackManager, never()).playNowSuspend(any<String>(), any(), any(), any())
-    }
-
-    @Test
-    fun `play pause during a quote ends it without restoring the previous position`() = runTest {
-        val quote = createQuote(startMs = 1_000, endMs = 3_000)
-        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
-        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID, positionMs = 10_000)
-        playableState(quote)
-        viewModel.playQuote(quote.uuid)
-        advanceUntilIdle()
-
-        viewModel.onPlayPauseClick()
-        advanceUntilIdle()
-        playbackState.value = playbackState.value.copy(positionMs = 3_000)
-        advanceUntilIdle()
-
-        assertTrue(viewModel.uiState.value.messages.filterIsInstance<ChatMessage.Quote>().none { it.isPlaying })
-        verify(playbackManager).pause(transientLoss = false, sourceView = SourceView.EPISODE_DETAILS)
-        verify(playbackManager, never()).seekToTimeMsSuspend(org.mockito.kotlin.eq(10_000), anyOrNull())
     }
 
     @Test

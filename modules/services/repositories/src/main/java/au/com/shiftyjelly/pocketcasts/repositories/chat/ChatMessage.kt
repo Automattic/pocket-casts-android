@@ -34,7 +34,6 @@ sealed interface ChatMessage {
         val startMs: Int = -1,
         val endMs: Int = -1,
         val canPlay: Boolean = false,
-        val isPlaying: Boolean = false,
         override val uuid: String = UUID.randomUUID().toString(),
     ) : ChatMessage {
         override val role: ChatRole get() = ChatRole.Quote
