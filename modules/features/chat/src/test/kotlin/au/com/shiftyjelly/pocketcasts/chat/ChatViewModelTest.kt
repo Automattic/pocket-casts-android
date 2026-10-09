@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.chat
 
+import android.net.NetworkCapabilities
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
@@ -21,16 +22,19 @@ import com.automattic.eventhorizon.EpisodeChatBetaSheetDismissedEvent
 import com.automattic.eventhorizon.EpisodeChatBetaSheetShownEvent
 import com.automattic.eventhorizon.EpisodeChatClearedEvent
 import com.automattic.eventhorizon.EpisodeChatErrorType
+import com.automattic.eventhorizon.EpisodeChatInputType
 import com.automattic.eventhorizon.EpisodeChatMessageFailedEvent
 import com.automattic.eventhorizon.EpisodeChatMessageSentEvent
 import com.automattic.eventhorizon.EpisodeChatShownEvent
 import com.automattic.eventhorizon.EventHorizon
 import java.io.IOException
 import java.util.Date
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -205,6 +209,72 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `summarize click sends the summary prompt and keeps the typed input`() = runTest {
+        setEpisodeInfo()
+        connectToInternet()
+        viewModel.onInputTextChange("Draft")
+
+        viewModel.onSummarizeClick("Summarize this episode")
+        advanceUntilIdle()
+
+        assertEquals(SendMessage(EPISODE_UUID, "Summarize this episode"), chatManager.sentMessages.single())
+        assertEquals("Draft", viewModel.uiState.value.inputText)
+        eventSink.skipEvent()
+        assertEquals(
+            EpisodeChatMessageSentEvent(
+                source = SourceView.EPISODE_DETAILS.analyticsValue,
+                episodeUuid = EPISODE_UUID,
+                podcastUuid = PODCAST_UUID,
+                messageLength = "Summarize this episode".length.toLong(),
+                inputType = EpisodeChatInputType.SummaryPrompt,
+            ),
+            eventSink.pollEvent(),
+        )
+    }
+
+    @Test
+    fun `summarize click is ignored while awaiting a reply`() = runTest {
+        setEpisodeInfo()
+        connectToInternet()
+        val gate = CompletableDeferred<Unit>()
+        chatManager.sendMessageGate = gate
+        viewModel.onInputTextChange("First question")
+        viewModel.onSend()
+        advanceUntilIdle()
+
+        viewModel.onSummarizeClick("Summarize this episode")
+        gate.complete(Unit)
+        advanceUntilIdle()
+
+        assertEquals(listOf(SendMessage(EPISODE_UUID, "First question")), chatManager.sentMessages)
+    }
+
+    @Test
+    fun `summarize click is ignored before the messages load`() = runTest {
+        chatManager.observedMessages = emptyFlow()
+        setEpisodeInfo()
+        connectToInternet()
+
+        viewModel.onSummarizeClick("Summarize this episode")
+        advanceUntilIdle()
+
+        assertFalse(viewModel.uiState.value.areMessagesLoaded)
+        assertTrue(chatManager.sentMessages.isEmpty())
+    }
+
+    @Test
+    fun `summarize click is ignored while offline`() = runTest {
+        setEpisodeInfo()
+        networkConnectionWatcher.networkCapabilities.value = null
+        advanceUntilIdle()
+
+        viewModel.onSummarizeClick("Summarize this episode")
+        advanceUntilIdle()
+
+        assertTrue(chatManager.sentMessages.isEmpty())
+    }
+
+    @Test
     fun `send passes only conversation messages as history`() = runTest {
         setEpisodeInfo()
         viewModel.onInputTextChange("First question")
@@ -239,6 +309,7 @@ class ChatViewModelTest {
                 episodeUuid = EPISODE_UUID,
                 podcastUuid = PODCAST_UUID,
                 messageLength = "Question".length.toLong(),
+                inputType = EpisodeChatInputType.Typed,
             ),
             eventSink.pollEvent(),
         )
@@ -299,6 +370,25 @@ class ChatViewModelTest {
                 message = "Last question",
             ),
             chatManager.sentMessages.single(),
+        )
+    }
+
+    @Test
+    fun `retry keeps the summarize input type`() = runTest {
+        setEpisodeInfo()
+        connectToInternet()
+        chatManager.sendMessageException = IOException()
+        viewModel.onSummarizeClick("Summarize this episode")
+        advanceUntilIdle()
+        chatManager.sendMessageException = null
+        eventSink.skipEvent(eventSink.size)
+
+        viewModel.retry()
+        advanceUntilIdle()
+
+        assertEquals(
+            EpisodeChatInputType.SummaryPrompt,
+            (eventSink.pollEvent() as EpisodeChatMessageSentEvent).inputType,
         )
     }
 
@@ -507,6 +597,13 @@ class ChatViewModelTest {
         assertEquals(0f, ChatPlayback(positionMs = 300, durationMs = 0).progress)
     }
 
+    private fun TestScope.connectToInternet() {
+        networkConnectionWatcher.networkCapabilities.value = mock<NetworkCapabilities> {
+            on { hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) } doReturn true
+        }
+        advanceUntilIdle()
+    }
+
     private suspend fun verifyNoSeek() {
         verify(playbackManager, never()).playNowSuspend(any<BaseEpisode>(), any(), any(), any())
         verify(playbackManager, never()).seekToTimeMsSuspend(any(), anyOrNull())
@@ -615,18 +712,20 @@ class ChatViewModelTest {
     }
 
     private class TestNetworkConnectionWatcher : NetworkConnectionWatcher {
-        override val networkCapabilities: StateFlow<android.net.NetworkCapabilities?> = MutableStateFlow(null)
+        override val networkCapabilities = MutableStateFlow<NetworkCapabilities?>(null)
     }
 
     private class TestChatManager : ChatManager {
         val messages = MutableStateFlow<List<ChatMessage>>(emptyList())
+        var observedMessages: Flow<List<ChatMessage>>? = null
         val createdChats = mutableListOf<CreateChat>()
         val sentMessages = mutableListOf<SendMessage>()
         val sentHistories = mutableListOf<List<String>>()
         val clearedEpisodeUuids = mutableListOf<String>()
         var sendMessageException: Exception? = null
+        var sendMessageGate: CompletableDeferred<Unit>? = null
 
-        override fun observeMessages(episodeUuid: String): Flow<List<ChatMessage>> = messages
+        override fun observeMessages(episodeUuid: String): Flow<List<ChatMessage>> = observedMessages ?: messages
 
         override suspend fun createChat(episodeUuid: String, podcastUuid: String) {
             createdChats += CreateChat(episodeUuid, podcastUuid)
@@ -637,6 +736,7 @@ class ChatViewModelTest {
             message: ChatMessage.User,
             allMessages: List<ChatMessage>,
         ) {
+            sendMessageGate?.await()
             sendMessageException?.let { throw it }
             sentMessages += SendMessage(episodeUuid, message.text)
             sentHistories += allMessages.map { it.text() }

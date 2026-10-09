@@ -49,6 +49,7 @@ fun ChatScreen(
     onClickPlayPause: () -> Unit,
     onInputTextChange: (String) -> Unit,
     onSend: () -> Unit,
+    onClickSuggestion: (String) -> Unit,
     onRetry: () -> Unit,
     onPlayQuote: (quoteUuid: String) -> Unit,
     onDismissBetaSheet: () -> Unit,
@@ -93,6 +94,7 @@ fun ChatScreen(
             onClickPlayPause = onClickPlayPause,
             onInputTextChange = onInputTextChange,
             onSend = onSend,
+            onClickSuggestion = onClickSuggestion,
             onRetry = onRetry,
             onPlayQuote = onPlayQuote,
         )
@@ -108,6 +110,7 @@ private fun ChatContent(
     onClickPlayPause: () -> Unit,
     onInputTextChange: (String) -> Unit,
     onSend: () -> Unit,
+    onClickSuggestion: (String) -> Unit,
     onRetry: () -> Unit,
     onPlayQuote: (quoteUuid: String) -> Unit,
     modifier: Modifier = Modifier,
@@ -148,20 +151,18 @@ private fun ChatContent(
                 .verticalScroll(scrollState)
                 .padding(horizontal = 16.dp, vertical = 12.dp),
         ) {
-            ChatContextBubble(
-                episodeDurationMs = uiState.episodeDurationMs,
-                theme = theme,
-            )
-            AiMessageBubble(
-                text = stringResource(LR.string.chat_preview_ai_1),
-                podcastUuid = uiState.podcastUuid,
-                theme = theme,
-            )
+            if (uiState.areMessagesLoaded) {
+                ChatWelcome(
+                    isConversationStarted = uiState.messages.isNotEmpty() || uiState.isAwaitingReply,
+                    isConnected = uiState.isConnected,
+                    onClickSuggestion = onClickSuggestion,
+                    theme = theme,
+                )
+            }
             uiState.messages.forEachIndexed { index, message ->
                 when (message) {
                     is ChatMessage.Assistant -> AiMessageBubble(
                         text = message.displayText,
-                        podcastUuid = uiState.podcastUuid,
                         theme = theme,
                     )
 
@@ -182,6 +183,9 @@ private fun ChatContent(
                     )
                 }
             }
+            if (uiState.messages.lastOrNull().isAnswer && !uiState.isAwaitingReply) {
+                ChatDisclaimer(theme = theme)
+            }
             if (uiState.isAwaitingReply) {
                 ThinkingBubble(theme = theme)
             }
@@ -200,6 +204,22 @@ private fun ChatContent(
             theme = theme,
         )
     }
+}
+
+private val ChatMessage?.isAnswer get() = this is ChatMessage.Assistant || this is ChatMessage.Quote
+
+@Composable
+private fun ChatDisclaimer(
+    theme: ChatTheme,
+    modifier: Modifier = Modifier,
+) {
+    Text(
+        text = stringResource(LR.string.chat_ai_disclaimer),
+        color = theme.secondaryText,
+        fontSize = 12.sp,
+        lineHeight = 16.sp,
+        modifier = modifier.fillMaxWidth(),
+    )
 }
 
 @Composable
@@ -239,6 +259,7 @@ private fun ChatScreenPreview(
                     podcastTitle = "Pocket Casts Weekly",
                     episodeDurationMs = 3_600_000,
                     isBeta = true,
+                    areMessagesLoaded = true,
                     messages = listOf(
                         ChatMessage.User(
                             text = "What was the main point?",
@@ -259,6 +280,36 @@ private fun ChatScreenPreview(
                 onClickPlayPause = {},
                 onInputTextChange = {},
                 onSend = {},
+                onClickSuggestion = {},
+                onRetry = {},
+                onPlayQuote = {},
+                onDismissBetaSheet = {},
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun ChatScreenEmptyPreview(
+    @PreviewParameter(PodcastColorsParameterProvider::class) podcastColors: PodcastColors,
+) {
+    AppThemeWithBackground(ThemeType.DARK) {
+        CompositionLocalProvider(LocalPodcastColors provides podcastColors) {
+            ChatScreen(
+                uiState = ChatUiState(
+                    episodeTitle = "The future of podcast discovery",
+                    podcastUuid = "preview-podcast-uuid",
+                    podcastTitle = "Pocket Casts Weekly",
+                    isBeta = true,
+                    areMessagesLoaded = true,
+                ),
+                onClickClose = {},
+                onClickMore = {},
+                onClickPlayPause = {},
+                onInputTextChange = {},
+                onSend = {},
+                onClickSuggestion = {},
                 onRetry = {},
                 onPlayQuote = {},
                 onDismissBetaSheet = {},

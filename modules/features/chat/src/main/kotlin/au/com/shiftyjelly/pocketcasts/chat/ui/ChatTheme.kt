@@ -26,6 +26,8 @@ internal data class ChatTheme(
     val closeButtonBackground: Color,
     val progress: Color,
     val progressTrack: Color,
+    val chipBorder: Color,
+    val quoteTimestamp: Color,
 ) {
     companion object {
         fun default(colors: ThemeColors) = ChatTheme(
@@ -46,6 +48,8 @@ internal data class ChatTheme(
             closeButtonBackground = colors.primaryUi05,
             progress = colors.primaryInteractive01,
             progressTrack = colors.primaryUi05,
+            chipBorder = colors.primaryUi05,
+            quoteTimestamp = colors.primaryInteractive01,
         )
 
         fun player(colors: PlayerColors) = ChatTheme(
@@ -54,18 +58,20 @@ internal data class ChatTheme(
             secondaryText = colors.contrast04,
             iconButton = colors.contrast01,
             aiBubble = colors.contrast05,
-            aiBubbleText = colors.contrast02,
-            userBubble = colors.contrast01,
-            userBubbleText = colors.background01,
-            inputBackground = colors.contrast05,
+            aiBubbleText = colors.contrast01,
+            userBubble = colors.contrast06,
+            userBubbleText = colors.contrast01,
+            inputBackground = colors.contrast06,
             inputText = colors.contrast02,
-            inputHint = colors.contrast04,
+            inputHint = colors.contrast03,
             sendButton = colors.contrast01,
             sendButtonIcon = colors.background01,
             divider = colors.contrast05,
             closeButtonBackground = colors.contrast05,
             progress = colors.highlight01,
             progressTrack = colors.contrast05,
+            chipBorder = colors.contrast05,
+            quoteTimestamp = QuoteTimestampBlue,
         )
     }
 }
@@ -83,3 +89,5 @@ internal fun rememberChatTheme(): ChatTheme {
         }
     }
 }
+
+private val QuoteTimestampBlue = Color(0xFF2A67F9)
