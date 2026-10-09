@@ -82,7 +82,7 @@ class ChatSurveyFragment : BaseDialogFragment() {
     private fun answer(isPositive: Boolean) {
         viewModel.onAnswer(isPositive)
         if (isPositive) {
-            activity?.showChatFeedbackThanks()
+            showChatFeedbackThanks()
         } else {
             ChatFeedbackFragment.show(
                 fragmentManager = parentFragmentManager,
