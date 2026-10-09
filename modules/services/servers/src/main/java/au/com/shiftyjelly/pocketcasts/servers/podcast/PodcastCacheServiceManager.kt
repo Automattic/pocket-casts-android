@@ -7,11 +7,10 @@ import au.com.shiftyjelly.pocketcasts.models.entity.SuggestedFolder
 import au.com.shiftyjelly.pocketcasts.servers.discover.EpisodeSearch
 import au.com.shiftyjelly.pocketcasts.servers.sync.bookmark.BookmarkEnrichRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.bookmark.BookmarkEnrichResponse
-import io.reactivex.Single
 import retrofit2.Response
 
 interface PodcastCacheServiceManager {
-    fun getPodcast(podcastUuid: String): Single<Podcast>
+    suspend fun getPodcast(podcastUuid: String): Podcast
     suspend fun getPodcastAndEpisode(podcastUuid: String, episodeUuid: String): Podcast
     suspend fun searchEpisodes(podcastUuid: String, searchTerm: String): List<String>
     suspend fun searchEpisodes(searchTerm: String): EpisodeSearch

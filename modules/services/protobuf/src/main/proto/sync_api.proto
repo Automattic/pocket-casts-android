@@ -431,3 +431,11 @@ message WebFeedCreateResponse {
     string poll_uuid = 2;
   }
 }
+
+message UuidsRequest {
+  repeated string uuids = 1;
+}
+
+message UuidListResponse {
+  repeated string uuids = 1;
+}

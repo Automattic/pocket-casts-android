@@ -201,22 +201,81 @@ class WhatsNewCatalogResponseTest {
     }
 
     @Test
-    fun `an incomplete action drops the message`() {
-        val catalog = decode(
-            catalogOf(message(body = """"pages": [{ "heading": "h", "description": "d", "action": { "event": "", "label": "Try it" } }]""")),
+    fun `an action this version cannot perform leaves the page without it`() {
+        val actions = listOf(
+            """{ "event": "", "label": "Try it" }""",
+            """{ "label": "Open it" }""",
+            """{ "type": "create_playlist", "label": "  " }""",
+            """{ "type": "create_playlist" }""",
+            """{ "type": "open_link", "label": "Learn more" }""",
+            """{ "type": "open_link", "arguments": {}, "label": "Learn more" }""",
+            """{ "type": "open_link", "arguments": { "url": "http://blog.pocketcasts.com" }, "label": "Learn more" }""",
+            """{ "type": "open_link", "arguments": { "url": "pocketcasts://podcasts" }, "label": "Learn more" }""",
+            """{ "type": "open_link", "arguments": { "url": "/transcripts" }, "label": "Learn more" }""",
+            """{ "type": "open_link", "arguments": { "url": "https://" }, "label": "Learn more" }""",
+            """{ "type": "open_link", "arguments": { "url": "https://exa mple.com" }, "label": "Learn more" }""",
         )
 
-        assertTrue(catalog.messages.isEmpty())
+        actions.forEach { action ->
+            val catalog = decode(
+                catalogOf(message(body = """"pages": [{ "heading": "Try it", "description": "d", "action": $action }]""")),
+            )
+
+            val page = (catalog.messages.single().content as WhatsNewContent.Pages).pages.single()
+            assertEquals(action, "Try it", page.heading)
+            assertNull(action, page.action)
+        }
     }
 
     @Test
-    fun `an action naming an unknown event still decodes`() {
-        val catalog = decode(
-            catalogOf(message(body = """"pages": [{ "heading": "h", "description": "d", "action": { "event": "open_something_later", "label": "Try it" } }]""")),
+    fun `an action naming an unknown type still decodes`() {
+        val action = decodeAction("""{ "type": "open_something_later", "label": "Try it" }""")
+
+        assertEquals(WhatsNewAction(type = "open_something_later", label = "Try it", url = null), action)
+    }
+
+    @Test
+    fun `decodes an action published with a type`() {
+        val action = decodeAction("""{ "type": "create_playlist", "label": "Create a playlist" }""")
+
+        assertEquals(WhatsNewAction(type = "create_playlist", label = "Create a playlist", url = null), action)
+    }
+
+    @Test
+    fun `decodes an action published as an event`() {
+        val action = decodeAction("""{ "event": "open_discover", "label": "Explore Discover" }""")
+
+        assertEquals(WhatsNewAction(type = "open_discover", label = "Explore Discover", url = null), action)
+    }
+
+    @Test
+    fun `an action type wins over its event`() {
+        val action = decodeAction("""{ "type": "open_up_next", "event": "open_discover", "label": "Open it" }""")
+
+        assertEquals("open_up_next", action?.type)
+    }
+
+    @Test
+    fun `an action type sent as null falls back to its event`() {
+        val action = decodeAction("""{ "type": null, "event": "open_discover", "label": "Open it" }""")
+
+        assertEquals("open_discover", action?.type)
+    }
+
+    @Test
+    fun `an empty action type does not fall back to its event`() {
+        val action = decodeAction("""{ "type": "", "event": "open_discover", "label": "Open it" }""")
+
+        assertNull(action)
+    }
+
+    @Test
+    fun `decodes a link action with its url`() {
+        val action = decodeAction(
+            """{ "type": "open_link", "arguments": { "url": "https://blog.pocketcasts.com/transcripts" }, "label": "Learn more" }""",
         )
 
-        val page = (catalog.messages.single().content as WhatsNewContent.Pages).pages.single()
-        assertEquals(WhatsNewAction(event = "open_something_later", label = "Try it"), page.action)
+        assertEquals(WhatsNewAction(type = "open_link", label = "Learn more", url = "https://blog.pocketcasts.com/transcripts"), action)
     }
 
     @Test
@@ -393,6 +452,11 @@ class WhatsNewCatalogResponseTest {
     }
 
     private fun decode(json: String) = requireNotNull(adapter.fromJson(json)).toCatalog()
+
+    private fun decodeAction(action: String): WhatsNewAction? {
+        val catalog = decode(catalogOf(message(body = """"pages": [{ "heading": "h", "description": "d", "action": $action }]""")))
+        return (catalog.messages.single().content as WhatsNewContent.Pages).pages.single().action
+    }
 
     private fun catalogOf(vararg messages: String) = """{ "schemaVersion": 1, "messages": [${messages.joinToString(",")}] }"""
 

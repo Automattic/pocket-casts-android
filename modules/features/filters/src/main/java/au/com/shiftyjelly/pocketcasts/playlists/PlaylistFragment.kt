@@ -391,7 +391,7 @@ class PlaylistFragment :
                 if (isAnyPodcastFollowed) {
                     NoContentData(
                         title = getString(LR.string.manual_playlist_no_content_title_alternative),
-                        body = "",
+                        body = getString(LR.string.manual_playlist_no_content_body_alternative),
                         iconId = IR.drawable.ic_playlists,
                         primaryButton = NoContentData.Button(
                             text = getString(LR.string.add_episodes),

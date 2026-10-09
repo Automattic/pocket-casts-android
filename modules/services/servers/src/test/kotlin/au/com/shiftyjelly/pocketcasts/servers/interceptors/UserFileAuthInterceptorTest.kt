@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.servers.interceptors
 import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
 import au.com.shiftyjelly.pocketcasts.servers.sync.TokenHandler
 import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
+import java.io.IOException
 import java.net.HttpURLConnection
 import java.util.ArrayDeque
 import java.util.concurrent.TimeUnit
@@ -13,6 +14,8 @@ import okhttp3.mockwebserver.MockWebServer
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertSame
+import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -127,6 +130,24 @@ class UserFileAuthInterceptorTest {
 
         assertEquals(1, tokenHandler.getAccessTokenCalls)
         assertFalse(tokenHandler.invalidatedAccessToken)
+    }
+
+    @Test
+    fun `fails the call with an IOException when the token cannot be read`() {
+        val failure = IllegalStateException("bind failure")
+        val tokenHandler = object : TokenHandler {
+            override suspend fun getAccessToken(): AccessToken = throw failure
+
+            override fun invalidateAccessToken() = Unit
+        }
+        val client = newClient(tokenHandler)
+
+        val exception = assertThrows(IOException::class.java) {
+            client.newCall(userFileRequest()).execute()
+        }
+
+        assertSame(failure, exception.cause)
+        assertEquals(0, apiServer.requestCount)
     }
 
     private companion object {

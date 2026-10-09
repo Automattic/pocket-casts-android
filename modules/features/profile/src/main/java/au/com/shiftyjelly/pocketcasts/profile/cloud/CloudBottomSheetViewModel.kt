@@ -40,7 +40,6 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.rx2.asFlow
 
 @HiltViewModel
 class CloudBottomSheetViewModel @Inject constructor(
@@ -62,7 +61,7 @@ class CloudBottomSheetViewModel @Inject constructor(
             .filter { it.episodeUuid == uuid }
             .map { it.isPlaying }
             .onStart { emit(false) }
-        val inUpNextFlow = playbackManager.upNextQueue.changesObservable.asFlow().containsUuid(uuid)
+        val inUpNextFlow = playbackManager.upNextQueue.changesFlow.containsUuid(uuid)
         // Room emits null once the file is deleted, keep showing the last known episode instead
         val episodeFlow = userEpisodeManager.episodeFlow(uuid).filterNotNull()
         state = combine(episodeFlow, inUpNextFlow, isPlayingFlow, ::BottomSheetState)

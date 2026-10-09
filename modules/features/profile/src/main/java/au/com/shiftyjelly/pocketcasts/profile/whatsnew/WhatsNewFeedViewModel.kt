@@ -6,6 +6,9 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.whatsnew.WhatsNewManager
 import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewMessage
 import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewMessageType
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.WhatsNewFeedShownEvent
+import com.automattic.eventhorizon.WhatsNewReadAllTappedEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.Instant
 import javax.inject.Inject
@@ -20,6 +23,7 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class WhatsNewFeedViewModel @Inject constructor(
     private val manager: WhatsNewManager,
+    private val eventHorizon: EventHorizon,
     settings: Settings,
 ) : ViewModel() {
     private val loadState = MutableStateFlow(LoadState.Loading)
@@ -41,7 +45,7 @@ class WhatsNewFeedViewModel @Inject constructor(
                     type = message.type,
                     title = message.title,
                     publishedAt = message.publishedAt,
-                    isUnread = !readState.isRead(message.id),
+                    isUnread = !readState.isRead(message),
                 )
             },
             loadState = if (catalog != null) LoadState.Loaded else loadState,
@@ -83,7 +87,21 @@ class WhatsNewFeedViewModel @Inject constructor(
         manager.markAsRead(listOf(id))
     }
 
+    fun onToggleReadClick(id: String) {
+        val item = uiState.value.items.firstOrNull { it.id == id } ?: return
+        if (item.isUnread) {
+            manager.markAsRead(listOf(id))
+        } else {
+            manager.markAsUnread(listOf(id))
+        }
+    }
+
+    fun onScreenShown() {
+        eventHorizon.track(WhatsNewFeedShownEvent)
+    }
+
     fun onReadAllClick() {
+        eventHorizon.track(WhatsNewReadAllTappedEvent)
         manager.markAsRead(uiState.value.items.map { it.id })
     }
 

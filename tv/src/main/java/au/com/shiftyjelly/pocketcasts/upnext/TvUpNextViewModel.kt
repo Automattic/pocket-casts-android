@@ -25,7 +25,6 @@ import kotlinx.coroutines.flow.WhileSubscribed
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.rx2.asFlow
 import timber.log.Timber
 
 @HiltViewModel
@@ -37,7 +36,7 @@ class TvUpNextViewModel @Inject constructor(
     private val eventHorizon: EventHorizon,
 ) : ViewModel() {
 
-    val uiState: StateFlow<TvUpNextUiState> = upNextQueue.changesObservable.asFlow()
+    val uiState: StateFlow<TvUpNextUiState> = upNextQueue.changesFlow
         .map { state ->
             val episodes = when (state) {
                 is UpNextQueue.State.Empty -> emptyList()

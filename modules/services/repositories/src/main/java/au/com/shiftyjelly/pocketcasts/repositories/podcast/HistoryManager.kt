@@ -10,7 +10,6 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
-import kotlinx.coroutines.rx2.await
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
@@ -91,9 +90,8 @@ class HistoryManager @Inject constructor(
     }
 
     private suspend fun addMissingPodcast(podcastUuid: String) {
-        val addPodcast = podcastManager.addPodcastRxSingle(podcastUuid = podcastUuid, sync = false, subscribed = false, shouldAutoDownload = false)
         try {
-            addPodcast.await()
+            podcastManager.addPodcast(podcastUuid = podcastUuid, sync = false, subscribed = false, shouldAutoDownload = false)
         } catch (throwable: Throwable) {
             currentCoroutineContext().ensureActive()
             LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, throwable, "History manager could not add podcast")

@@ -1094,7 +1094,8 @@
     <string name="episode_status_rule_description">%1$s + %2$d</string>
     <string name="increment_longer_than_duration">Increment \"longer than\" duration</string>
     <string name="increment_shorter_than_duration">Increment \"shorter than\" duration</string>
-    <string name="manual_playlist_no_content_body">Swipe left on an episode to add it to your playlist.</string>
+    <string name="manual_playlist_no_content_body">Find a podcast you like, then swipe left on any episode to add it.</string>
+    <string name="manual_playlist_no_content_body_alternative">Pick episodes from the podcasts you follow. Or swipe left on any episode to add it as you go.</string>
     <string name="manual_playlist_no_content_title">Add episodes to your playlist</string>
     <string name="manual_playlist_no_content_title_alternative">Start building your playlist</string>
     <string name="manual_playlist_no_available_episode_body">Looks like you’ve added all episodes from this show.</string>
@@ -1172,7 +1173,7 @@
     <string name="smart_rules">Smart rules</string>
     <string name="smart_rules_description">Set up smart rules to automatically add episodes to your smart playlist.</string>
     <string name="up_next_as_playlist_button_secondary">Replace and play</string>
-    <string name="up_next_as_playlist_replace_body">Playing this will replace your current Up Next.</string>
+    <string name="up_next_as_playlist_replace_body">Playing this will replace your current Up Next. Save it as a playlist to keep it.</string>
     <string name="up_next_as_playlist_replace_switch_description">Save your current Up&#160;Next queue as a playlist.</string>
     <string name="up_next_as_playlist_replace_button_primary" translatable="false">@string/up_next_as_playlist_button_secondary</string>
     <string name="up_next_as_playlist_replace_title">Replace your Up Next?</string>
@@ -1876,6 +1877,8 @@
     <string name="settings_select_podcasts">Select Podcasts</string>
     <string name="settings_notification_silent">Silent</string>
     <string name="settings_whats_new">What\'s new</string>
+    <string name="settings_general_whats_new_unread_dot">Show unread dot</string>
+    <string name="settings_general_whats_new_unread_dot_summary">Show an unread dot on Profile when there are new What\'s new messages.</string>
     <string name="settings_whats_new_next" translatable="false">@string/next</string>
     <string name="settings_whats_new_done">Done</string>
     <string name="whats_new_category_new_feature">New Feature</string>
@@ -1888,6 +1891,11 @@
     <string name="whats_new_feed_unread">Unread</string>
     <string name="whats_new_feed_read_all">Read all</string>
     <string name="whats_new_feed_all_read">All messages marked as read</string>
+    <string name="whats_new_feed_mark_as_read" translatable="false">Mark as read</string>
+    <string name="whats_new_feed_mark_as_unread" translatable="false">Mark as unread</string>
+    <string name="whats_new_research_title">User research</string>
+    <string name="whats_new_poll_answered">Thanks for answering.</string>
+    <string name="whats_new_message_page_progress">Page %1$d of %2$d</string>
     <string name="whats_new_feed_unable_to_load">Unable to load What\'s new</string>
     <string name="settings_manage_downloads_deleting">Deleting episodes…</string>
     <string name="settings_storage_phone">Phone</string>
@@ -2745,7 +2753,6 @@
     <!-- Referrals share text, `%1$s' is a placeholder for the offer duration on the Plus subscription -->
     <string name="referrals_share_text">Hi there!\n\nHere\'s a %1$s guest pass for Pocket&#160;Casts&#160;Plus - my favorite podcast player. It\'s packed with unique features like bookmarks, folders and more that you won\'t find anywhere else. I think you\'ll love it too!</string>
     <!-- Referrals tooltip message, `%1$s' is a placeholder for the offer duration on the Plus subscription -->
-    <string name="referrals_tooltip_message">Gift %1$s of Pocket&#160;Casts&#160;Plus!</string>
     <string name="referrals_create_subscription_failed">Could not create subscription. Please try again later.</string>
     <string name="referrals_redeem_code_failed">Could not redeem code. Please try again later.</string>
 

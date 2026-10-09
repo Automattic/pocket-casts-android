@@ -20,14 +20,15 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.PlaylistPlay
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.outlined.BugReport
-import androidx.compose.material.icons.outlined.CardGiftcard
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Downloading
 import androidx.compose.material.icons.outlined.EditCalendar
 import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.material.icons.outlined.Folder
+import androidx.compose.material.icons.outlined.MarkEmailUnread
 import androidx.compose.material.icons.outlined.NewReleases
 import androidx.compose.material.icons.outlined.Notifications
+import androidx.compose.material.icons.outlined.RestartAlt
 import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -63,11 +64,12 @@ fun DeveloperPage(
     onTriggerResetEoYModalProfileBadge: () -> Unit,
     onSendCrash: (String) -> Unit,
     onShowWhatsNewClick: () -> Unit,
+    onResetWhatsNewReadState: () -> Unit,
+    onResetWhatsNewToFreshInstall: () -> Unit,
     onShowNotificationsTestingClick: () -> Unit,
     onResetSuggestedFoldersSuggestion: () -> Unit,
     onResetPlaylistsOnboarding: () -> Unit,
     onResetUpNextSortTooltip: () -> Unit,
-    onShowGiftTooltip: () -> Unit,
     onShowPlaylistTooltips: () -> Unit,
     onResetNotificationsPrompt: () -> Unit,
     onShowAppReviewPrompt: () -> Unit,
@@ -131,9 +133,6 @@ fun DeveloperPage(
         item {
             ResetUpNextSortTooltip(onClick = onResetUpNextSortTooltip)
         }
-        item {
-            ShowGiftTooltip(onClick = onShowGiftTooltip)
-        }
 
         item {
             SectionHeader(text = "Modals and prompts")
@@ -149,6 +148,16 @@ fun DeveloperPage(
         }
         item {
             ClearAppReviewSettings(onClick = onClearAppReviewSettings)
+        }
+
+        item {
+            SectionHeader(text = "What's New feed")
+        }
+        item {
+            ResetWhatsNewReadState(onClick = onResetWhatsNewReadState)
+        }
+        item {
+            ResetWhatsNewToFreshInstall(onClick = onResetWhatsNewToFreshInstall)
         }
 
         item {
@@ -318,19 +327,6 @@ private fun ResetUpNextSortTooltip(
 }
 
 @Composable
-private fun ShowGiftTooltip(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    SettingRow(
-        primaryText = "Show gift tooltip",
-        secondaryText = "Show the referrals tooltip on the gift icon again",
-        icon = rememberVectorPainter(Icons.Outlined.CardGiftcard),
-        modifier = modifier.clickable { onClick() },
-    )
-}
-
-@Composable
 private fun ResetSuggestedFoldersSuggestion(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -352,6 +348,32 @@ private fun ShowWhatsNew(
         primaryText = "Show What's New",
         secondaryText = "Open the What's New page",
         icon = rememberVectorPainter(Icons.Outlined.NewReleases),
+        modifier = modifier.clickable { onClick() },
+    )
+}
+
+@Composable
+private fun ResetWhatsNewReadState(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    SettingRow(
+        primaryText = "Reset read state",
+        secondaryText = "Forget which messages were read, seen, listed or answered on this device",
+        icon = rememberVectorPainter(Icons.Outlined.MarkEmailUnread),
+        modifier = modifier.clickable { onClick() },
+    )
+}
+
+@Composable
+private fun ResetWhatsNewToFreshInstall(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    SettingRow(
+        primaryText = "Reset to fresh install",
+        secondaryText = "Mark the messages published so far as read, like a new install",
+        icon = rememberVectorPainter(Icons.Outlined.RestartAlt),
         modifier = modifier.clickable { onClick() },
     )
 }
@@ -536,11 +558,12 @@ private fun DeveloperPagePreview() {
         bottomInset = 0.dp,
         onSendCrash = {},
         onShowWhatsNewClick = {},
+        onResetWhatsNewReadState = {},
+        onResetWhatsNewToFreshInstall = {},
         onResetSuggestedFoldersSuggestion = {},
         onShowNotificationsTestingClick = {},
         onResetPlaylistsOnboarding = {},
         onResetUpNextSortTooltip = {},
-        onShowGiftTooltip = {},
         onShowPlaylistTooltips = {},
         onResetNotificationsPrompt = {},
         onShowAppReviewPrompt = {},

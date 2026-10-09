@@ -27,7 +27,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.launchIn
@@ -54,12 +56,14 @@ class UpNextQueueImpl @Inject constructor(
         get() = Dispatchers.Default
 
     // Not a StateFlow: it would drop equal writes, and the debounced server sync below is driven off this flow.
-    private val changesFlow = MutableSharedFlow<UpNextQueue.State>(
+    private val _changesFlow = MutableSharedFlow<UpNextQueue.State>(
         replay = 1,
         onBufferOverflow = BufferOverflow.DROP_OLDEST,
     ).apply { tryEmit(UpNextQueue.State.Empty) }
 
-    private val currentState get() = changesFlow.replayCache.firstOrNull() ?: UpNextQueue.State.Empty
+    private val currentState get() = _changesFlow.replayCache.firstOrNull() ?: UpNextQueue.State.Empty
+
+    override val changesFlow: Flow<UpNextQueue.State> = _changesFlow.asSharedFlow()
 
     override val changesObservable: Observable<UpNextQueue.State> = changesFlow.asObservable()
 
@@ -123,7 +127,7 @@ class UpNextQueueImpl @Inject constructor(
     }
 
     override fun updateCurrentEpisodeState(state: UpNextQueue.State) {
-        changesFlow.tryEmit(state)
+        _changesFlow.tryEmit(state)
     }
 
     private fun saveChangesBlocking(action: UpNextAction) {

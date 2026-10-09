@@ -13,9 +13,6 @@ import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import com.automattic.eventhorizon.EventHorizon
 import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -98,16 +95,6 @@ class UserEpisodeManagerImplTest {
         userEpisodeManagerImpl.deselectChapterIndexForEpisode(3, userEpisode)
 
         assertEquals(ChapterIndices(listOf(1, 2, 3)), userEpisode.deselectedChapters)
-    }
-
-    @Test
-    fun `episode flowable skips emissions while the episode does not exist`() = runTest {
-        val userEpisode = UserEpisode(uuid = "uuid", publishedDate = Date())
-        whenever(userEpisodeDao.findEpisodeFlow("uuid")).thenReturn(flowOf(null, userEpisode, null))
-
-        val emissions = userEpisodeManagerImpl.episodeRxFlowable("uuid").asFlow().toList()
-
-        assertEquals(listOf(userEpisode), emissions)
     }
 
     @Test
