@@ -41,6 +41,8 @@ class TouchDetectionFrameLayoutTest {
 
         twoFingerTapReleasingRightFirst()
 
+        assertFalse(root.isTouching)
+
         val replacement = RecordingView(context)
         container.addView(replacement, ViewGroup.LayoutParams(WIDTH, HEIGHT))
         layOut()
