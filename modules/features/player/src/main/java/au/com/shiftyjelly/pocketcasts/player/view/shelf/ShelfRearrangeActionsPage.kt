@@ -65,8 +65,8 @@ fun ShelfRearrangeActionsPage(
         )
     }
 
-    LaunchedEffect(shelfItemsState.shelfItems, episode?.uuid) {
-        shelfViewModel.setData(shelfItemsState.shelfItems, episode)
+    LaunchedEffect(shelfItemsState.visibleShelfItems, episode?.uuid) {
+        shelfViewModel.setData(shelfItemsState.visibleShelfItems, episode)
     }
 
     DisposableEffect(Unit) {

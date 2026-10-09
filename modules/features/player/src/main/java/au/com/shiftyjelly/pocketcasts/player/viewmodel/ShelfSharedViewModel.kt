@@ -488,7 +488,7 @@ class ShelfSharedViewModel @Inject constructor(
         val isSmartBookmarksPromoActive: Boolean = false,
         val isEpisodeChatPromoActive: Boolean = false,
     ) {
-        private val visibleShelfItems: List<ShelfItem>
+        val visibleShelfItems: List<ShelfItem>
             get() = shelfItems.filter { it != ShelfItem.EpisodeChat || isTranscriptAvailable }
         val playerShelfItems: List<ShelfItem>
             get() = visibleShelfItems.take(MIN_SHELF_ITEMS_SIZE)
