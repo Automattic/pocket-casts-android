@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.episode
 
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -10,8 +11,10 @@ import au.com.shiftyjelly.pocketcasts.payment.PaymentResultCode
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeFragmentViewModel.EpisodeContentTab.DESCRIPTION
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeFragmentViewModel.EpisodeContentTab.SUMMARY
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeFragmentViewModel.EpisodePageState
+import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadProgressCache
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadQueue
+import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadType
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -34,6 +37,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @RunWith(MockitoJUnitRunner::class)
@@ -193,5 +198,25 @@ class EpisodeFragmentViewModelTest {
         val newState = state.selectContentTab(SUMMARY)
 
         assertEquals(SUMMARY, newState.selectedContentTab)
+    }
+
+    @Test
+    fun `download waits for wifi when the data warning is on`() {
+        whenever(settings.warnOnMeteredNetwork).thenReturn(UserSetting.Mock(initialValue = true, mock()))
+        viewModel.episode = PodcastEpisode(uuid = "ep-uuid", publishedDate = java.util.Date())
+
+        viewModel.downloadEpisode()
+
+        verify(downloadQueue).enqueue("ep-uuid", DownloadType.UserTriggered(waitForWifi = true), SourceView.EPISODE_DETAILS)
+    }
+
+    @Test
+    fun `download uses any network when the data warning is off`() {
+        whenever(settings.warnOnMeteredNetwork).thenReturn(UserSetting.Mock(initialValue = false, mock()))
+        viewModel.episode = PodcastEpisode(uuid = "ep-uuid", publishedDate = java.util.Date())
+
+        viewModel.downloadEpisode()
+
+        verify(downloadQueue).enqueue("ep-uuid", DownloadType.UserTriggered(waitForWifi = false), SourceView.EPISODE_DETAILS)
     }
 }
