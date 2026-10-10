@@ -10,6 +10,8 @@
         ([#6105](https://github.com/Automattic/pocket-casts-android/pull/6105))
     *   Fix a crash when opening onboarding or upgrade screens on Android 8.0
         ([#6104](https://github.com/Automattic/pocket-casts-android/pull/6104))
+    *   Fix Wear OS episode downloads not switching to WiFi
+        ([#6100](https://github.com/Automattic/pocket-casts-android/pull/6100))
 
 8.22
 -----
