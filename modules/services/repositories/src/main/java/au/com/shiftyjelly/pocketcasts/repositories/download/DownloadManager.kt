@@ -24,6 +24,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.DownloadStatusUpdate
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.task.UpdateShowNotesTask
+import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintMappingCache
 import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintReferenceRetriever
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
@@ -43,6 +44,7 @@ import com.automattic.eventhorizon.EventHorizon
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
 import java.time.Clock
+import java.time.Duration
 import java.util.UUID
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
@@ -74,6 +76,7 @@ class DownloadManager @Inject constructor(
     clock: Clock,
     progressCache: DownloadProgressCache,
     eventHorizon: EventHorizon,
+    fileStorage: FileStorage,
     @ApplicationContext private val context: Context,
     @ApplicationScope private val scope: CoroutineScope,
 ) : DownloadQueue,
@@ -99,6 +102,8 @@ class DownloadManager @Inject constructor(
         progressCache = progressCache,
         settings = settings,
         analytics = analytics,
+        fileStorage = fileStorage,
+        clock = clock,
         context = context,
         coroutineScope = scope,
     )
@@ -159,6 +164,8 @@ private class DownloadQueueController(
     private val progressCache: DownloadProgressCache,
     private val settings: Settings,
     private val analytics: DownloadAnalytics,
+    private val fileStorage: FileStorage,
+    private val clock: Clock,
     private val context: Context,
     private val coroutineScope: CoroutineScope,
 ) {
@@ -180,6 +187,27 @@ private class DownloadQueueController(
             }
             clearCancellableDownloads()
         }
+        deleteOrphanedPartialDownloads()
+    }
+
+    private suspend fun deleteOrphanedPartialDownloads() {
+        val staleBefore = clock.instant().minus(PARTIAL_DOWNLOAD_MAX_IDLE).toEpochMilli()
+        val staleFiles = runCatching {
+            fileStorage.getOrCreateEpisodesTempDir()
+                .listFiles()
+                .orEmpty()
+                .filter { file -> file.isFile && !file.isHidden && file.lastModified() < staleBefore }
+        }.getOrDefault(emptyList())
+        if (staleFiles.isEmpty()) {
+            return
+        }
+        val pendingEpisodeUuids = workManager
+            .getDownloadWorkInfos<DownloadWorkInfo>()
+            .filterValues(DownloadWorkInfo::isCancellable)
+            .keys
+        staleFiles
+            .filter { file -> file.name.substringBefore('.') !in pendingEpisodeUuids }
+            .forEach { file -> runCatching { file.delete() } }
     }
 
     suspend fun addToQueue(episodeUuids: Collection<String>, downloadType: DownloadType, sourceView: SourceView) {
@@ -260,6 +288,7 @@ private class DownloadQueueController(
             progressCache.clearProgress(episodes.keys)
             transcriptDao.deleteForEpisodes(episodes.keys)
             val deletedEpisodes = episodes.mapNotNull { (_, episode) ->
+                runCatching { PartialDownload.delete(fileStorage.getOrCreatePodcastEpisodeTempFile(episode)) }
                 val deletedEpisode = runCatching {
                     val isFileDeleted = episode.downloadedFilePath?.let { filePath ->
                         val deleted = File(filePath).delete()
@@ -846,3 +875,5 @@ private suspend inline fun <reified T : DownloadWorkInfo> WorkManager.getDownloa
     ?.filterIsInstance<T>()
     ?.associateBy(DownloadWorkInfo::episodeUuid)
     .orEmpty()
+
+private val PARTIAL_DOWNLOAD_MAX_IDLE = Duration.ofHours(1)
