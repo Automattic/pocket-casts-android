@@ -180,8 +180,6 @@ Language: ja_JP
     <string name="up_next_sort_duration_tooltip_title">所要時間で並び替え</string>
     <string name="transcript_tap_to_seek_streaming_unavailable">エピソードをダウンロードし、タップして検索</string>
     <string name="bookmark_play_from">%s から再生</string>
-    <string name="summary_upsell_description">Plus サブスクリプションに登録すると、Plus にアクセスし、ブックマークやフォルダーなどのその他のプレミアム機能もご利用いただけます。</string>
-    <string name="summary_upsell_title">AI を活用した概要</string>
     <string name="tv_create_account_title">無料アカウントを作成</string>
     <string name="tv_onboarding_sign_in_instructions">カメラを開き、この QR コードに向けます</string>
     <string name="tv_onboarding_sign_in_title">スマートフォンでログイン</string>
@@ -213,10 +211,6 @@ Language: ja_JP
     <string name="blogs_found_followed_badge">フォローしているポッドキャスト</string>
     <string name="blogs_found_feed_detected">見つかったフィード</string>
     <string name="chapters_generated_disclaimer">これらのチャプターは自動的に生成されており、正確さに欠ける可能性があります。</string>
-    <string name="description">説明</string>
-    <string name="player_tab_summary">概要</string>
-    <string name="summary">概要</string>
-    <string name="episode_summary">エピソードの概要</string>
     <string name="chat_stop_quote">引用を停止</string>
     <string name="chat_play_quote">引用を再生</string>
     <string name="chat_tap_to_retry">タップして再試行</string>

@@ -148,35 +148,24 @@ class TranscriptManagerImpl @Inject constructor(
             .getOrNull()
     }
 
-    override suspend fun loadSummaryText(episodeUuid: String): String? {
-        val isChaptersEnabled = FeatureFlag.isEnabled(Feature.GENERATED_CHAPTERS)
-        val isSummaryEnabled = FeatureFlag.isEnabled(Feature.AI_SUMMARIES)
-        if (!isChaptersEnabled && !isSummaryEnabled) return null
+    override suspend fun loadGeneratedChapters(episodeUuid: String): Boolean {
+        if (!FeatureFlag.isEnabled(Feature.GENERATED_CHAPTERS)) return true
 
         return try {
             val generatedTranscript = loadLocalTranscripts(episodeUuid)
-                .firstOrNull { it.isGenerated } ?: return null
+                .firstOrNull { it.isGenerated } ?: return true
 
             val metaUrl = generatedTranscript.url.removeSuffix(".vtt") + "-meta.json"
-            val response = transcriptService.getTranscriptOrThrow(metaUrl)
-            response.use { body ->
-                val meta = metaAdapter.fromJson(body.source()) ?: return@use null
-
-                if (isChaptersEnabled) {
-                    saveAiChaptersIfNeeded(episodeUuid, meta.chapters)
-                }
-
-                if (isSummaryEnabled) {
-                    meta.summary?.takeIf { it.isNotBlank() }
-                } else {
-                    null
-                }
-            }
+            val meta = transcriptService.getTranscriptOrThrow(metaUrl).use { body ->
+                metaAdapter.fromJson(body.source())
+            } ?: return true
+            saveAiChaptersIfNeeded(episodeUuid, meta.chapters)
+            true
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            Timber.tag("Summaries").e(e, "Failed to load summary for episode $episodeUuid")
-            null
+            Timber.tag("GeneratedChapters").e(e, "Failed to load generated chapters for episode $episodeUuid")
+            false
         }
     }
 
@@ -200,7 +189,7 @@ class TranscriptManagerImpl @Inject constructor(
             .mapIndexed { index, chapter -> chapter.copy(index = index) }
         if (dbChapters.isNotEmpty()) {
             chapterManager.updateChapters(episodeUuid, dbChapters)
-            Timber.tag("Summaries").d("Saved ${dbChapters.size} AI chapters for episode $episodeUuid")
+            Timber.tag("GeneratedChapters").d("Saved ${dbChapters.size} AI chapters for episode $episodeUuid")
         }
     }
 

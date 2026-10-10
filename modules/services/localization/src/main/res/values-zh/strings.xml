@@ -180,8 +180,6 @@ Language: zh_CN
     <string name="up_next_sort_duration_tooltip_title">按时长排序</string>
     <string name="transcript_tap_to_seek_streaming_unavailable">下载该剧集后，即可通过点击跳转播放位置</string>
     <string name="bookmark_play_from">从 %s 播放</string>
-    <string name="summary_upsell_description">订阅 Plus 以使用此功能和其他高级功能（如书签和文件夹）。</string>
-    <string name="summary_upsell_title">AI 驱动的摘要</string>
     <string name="tv_create_account_title">创建您的免费账户</string>
     <string name="tv_onboarding_sign_in_instructions">打开摄像头，对准此二维码</string>
     <string name="tv_onboarding_sign_in_title">使用手机登录</string>
@@ -213,10 +211,6 @@ Language: zh_CN
     <string name="blogs_found_followed_badge">已关注播客</string>
     <string name="blogs_found_feed_detected">已找到源</string>
     <string name="chapters_generated_disclaimer">这些章节为自动生成，可能不完全准确。</string>
-    <string name="description">描述</string>
-    <string name="player_tab_summary">摘要</string>
-    <string name="summary">摘要</string>
-    <string name="episode_summary">剧集摘要</string>
     <string name="chat_stop_quote">结束引用</string>
     <string name="chat_play_quote">播放引用</string>
     <string name="chat_tap_to_retry">轻点以重试</string>

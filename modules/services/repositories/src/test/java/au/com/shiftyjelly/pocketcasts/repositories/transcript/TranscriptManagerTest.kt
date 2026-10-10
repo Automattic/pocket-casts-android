@@ -32,11 +32,11 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -60,7 +60,6 @@ class TranscriptManagerTest {
     private val subripDbTranscript = createDbTranscript("application/x-subrip")
     private val jsonDbTranscript = createDbTranscript("application/json")
     private val htmlDbTranscript = createDbTranscript("text/html")
-    private val generatedVttDbTranscript = createDbTranscript("text/vtt", episodeUuid = "summary-episode-id", url = "transcript.vtt", isGenerated = true)
     private val generatedVttTranscript = createDbTranscript("text/vtt", isGenerated = true, url = "transcript-url.vtt")
 
     private val transcriptManager = TranscriptManagerImpl(
@@ -378,60 +377,12 @@ class TranscriptManagerTest {
     }
 
     @Test
-    fun `load summary text from generated transcript meta`() = runTest {
-        service.metaJsonResponse = """{"summary": "Episode summary text"}"""
-        localTranscriptsFlow.value = listOf(generatedVttDbTranscript)
-
-        val summary = transcriptManager.loadSummaryText("summary-episode-id")
-
-        assertEquals("Episode summary text", summary)
-    }
-
-    @Test
-    fun `return null summary when no generated transcript exists`() = runTest {
-        localTranscriptsFlow.value = listOf(generatedVttDbTranscript.copy(isGenerated = false))
-
-        val summary = transcriptManager.loadSummaryText("summary-episode-id")
-
-        assertNull(summary)
-    }
-
-    @Test
-    fun `return null summary when summary field is blank`() = runTest {
-        service.metaJsonResponse = """{"summary": ""}"""
-        localTranscriptsFlow.value = listOf(generatedVttDbTranscript)
-
-        val summary = transcriptManager.loadSummaryText("summary-episode-id")
-
-        assertNull(summary)
-    }
-
-    @Test
-    fun `return null summary on service failure`() = runTest {
-        service.shouldThrow = true
-        localTranscriptsFlow.value = listOf(generatedVttDbTranscript)
-
-        val summary = transcriptManager.loadSummaryText("summary-episode-id")
-
-        assertNull(summary)
-    }
-
-    @Test
-    fun `return null summary when transcripts not loaded in time`() = runTest {
-        val summary = async { transcriptManager.loadSummaryText("summary-episode-id") }
-
-        advanceTimeBy(1.minutes)
-
-        assertNull(summary.await())
-    }
-
-    @Test
     fun `save ai chapters when no existing chapters`() = runTest {
         FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
         localTranscriptsFlow.value = listOf(generatedVttTranscript)
         service.metaJsonResponse = META_JSON_WITH_CHAPTERS
 
-        transcriptManager.loadSummaryText("episode-id")
+        assertTrue(transcriptManager.loadGeneratedChapters("episode-id"))
 
         verify(chapterManager).updateChapters(
             "episode-id",
@@ -470,19 +421,52 @@ class TranscriptManagerTest {
             parsers = parsers,
         )
 
-        managerWithChapters.loadSummaryText("episode-id")
+        managerWithChapters.loadGeneratedChapters("episode-id")
 
         verify(chapterManagerWithExisting, never()).updateChapters(any(), any())
     }
 
     @Test
-    fun `return summary even when chapters are empty`() = runTest {
+    fun `do not save generated chapters when the meta has none`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
         localTranscriptsFlow.value = listOf(generatedVttTranscript)
         service.metaJsonResponse = META_JSON_NO_CHAPTERS
 
-        val summary = transcriptManager.loadSummaryText("episode-id")
+        transcriptManager.loadGeneratedChapters("episode-id")
 
-        assertEquals("This is a summary.", summary)
+        verify(chapterManager, never()).updateChapters(any(), any())
+    }
+
+    @Test
+    fun `do not fetch meta when generated chapters are disabled`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, false)
+        localTranscriptsFlow.value = listOf(generatedVttTranscript)
+        service.metaJsonResponse = META_JSON_WITH_CHAPTERS
+
+        transcriptManager.loadGeneratedChapters("episode-id")
+
+        assertEquals(0, service.metaRequestCount)
+        verify(chapterManager, never()).updateChapters(any(), any())
+    }
+
+    @Test
+    fun `do not fetch meta without a generated transcript`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        localTranscriptsFlow.value = listOf(generatedVttTranscript.copy(isGenerated = false))
+
+        transcriptManager.loadGeneratedChapters("episode-id")
+
+        assertEquals(0, service.metaRequestCount)
+    }
+
+    @Test
+    fun `ignore a failing meta request`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        service.shouldThrow = true
+        localTranscriptsFlow.value = listOf(generatedVttTranscript)
+
+        assertFalse(transcriptManager.loadGeneratedChapters("episode-id"))
+
         verify(chapterManager, never()).updateChapters(any(), any())
     }
 
@@ -492,7 +476,7 @@ class TranscriptManagerTest {
         localTranscriptsFlow.value = listOf(generatedVttTranscript)
         service.metaJsonResponse = META_JSON_INVALID_CHAPTERS
 
-        transcriptManager.loadSummaryText("episode-id")
+        transcriptManager.loadGeneratedChapters("episode-id")
 
         verify(chapterManager).updateChapters(
             "episode-id",
@@ -500,90 +484,6 @@ class TranscriptManagerTest {
                 DbChapter(index = 0, episodeUuid = "episode-id", startTimeMs = 60000, title = "Valid Chapter", origin = ChapterOrigin.Generated),
             ),
         )
-    }
-
-    @Test
-    fun `return summary when meta json has no chapters field`() = runTest {
-        localTranscriptsFlow.value = listOf(generatedVttTranscript)
-        service.metaJsonResponse = """{"summary": "Just a summary"}"""
-
-        val summary = transcriptManager.loadSummaryText("episode-id")
-
-        assertEquals("Just a summary", summary)
-        verify(chapterManager, never()).updateChapters(any(), any())
-    }
-
-    @Test
-    fun `save ai chapters but withhold summary when only generated chapters enabled`() = runTest {
-        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
-        FeatureFlag.setEnabled(Feature.AI_SUMMARIES, false)
-        localTranscriptsFlow.value = listOf(generatedVttTranscript)
-        service.metaJsonResponse = META_JSON_WITH_CHAPTERS
-
-        val summary = transcriptManager.loadSummaryText("episode-id")
-
-        assertNull(summary)
-        verify(chapterManager).updateChapters(
-            "episode-id",
-            listOf(
-                DbChapter(index = 0, episodeUuid = "episode-id", startTimeMs = 15000, title = "Introduction", origin = ChapterOrigin.Generated),
-                DbChapter(index = 1, episodeUuid = "episode-id", startTimeMs = 73000, title = "Main Topic", origin = ChapterOrigin.Generated),
-                DbChapter(index = 2, episodeUuid = "episode-id", startTimeMs = 180000, title = "Wrap Up", origin = ChapterOrigin.Generated),
-            ),
-        )
-    }
-
-    @Test
-    fun `do not return summary when summaries disabled`() = runTest {
-        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
-        FeatureFlag.setEnabled(Feature.AI_SUMMARIES, false)
-        localTranscriptsFlow.value = listOf(generatedVttTranscript)
-        service.metaJsonResponse = META_JSON_WITH_CHAPTERS
-
-        val summary = transcriptManager.loadSummaryText("episode-id")
-
-        assertNull(summary)
-    }
-
-    @Test
-    fun `do not save ai chapters when generated chapters disabled`() = runTest {
-        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, false)
-        FeatureFlag.setEnabled(Feature.AI_SUMMARIES, true)
-        localTranscriptsFlow.value = listOf(generatedVttTranscript)
-        service.metaJsonResponse = META_JSON_WITH_CHAPTERS
-
-        val summary = transcriptManager.loadSummaryText("episode-id")
-
-        assertEquals("A great episode.", summary)
-        verify(chapterManager, never()).updateChapters(any(), any())
-    }
-
-    @Test
-    fun `do not fetch meta when both ai features disabled`() = runTest {
-        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, false)
-        FeatureFlag.setEnabled(Feature.AI_SUMMARIES, false)
-        localTranscriptsFlow.value = listOf(generatedVttTranscript)
-        service.metaJsonResponse = META_JSON_WITH_CHAPTERS
-
-        val summary = transcriptManager.loadSummaryText("episode-id")
-
-        assertNull(summary)
-        assertEquals(0, service.metaRequestCount)
-        verify(chapterManager, never()).updateChapters(any(), any())
-    }
-
-    @Test
-    fun `fetch meta only once for chapters and summary`() = runTest {
-        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
-        FeatureFlag.setEnabled(Feature.AI_SUMMARIES, true)
-        localTranscriptsFlow.value = listOf(generatedVttTranscript)
-        service.metaJsonResponse = META_JSON_WITH_CHAPTERS
-
-        val summary = transcriptManager.loadSummaryText("episode-id")
-
-        assertEquals("A great episode.", summary)
-        assertEquals(1, service.metaRequestCount)
-        verify(chapterManager).updateChapters(eq("episode-id"), any())
     }
 }
 
@@ -636,7 +536,6 @@ private fun createDbTranscript(
 
 private val META_JSON_WITH_CHAPTERS = """
     {
-        "summary": "A great episode.",
         "chapters": [
             {"title": "Introduction", "timestamp": "00:15", "startTime": 15},
             {"title": "Main Topic", "timestamp": "01:13", "startTime": 73},
@@ -647,14 +546,12 @@ private val META_JSON_WITH_CHAPTERS = """
 
 private val META_JSON_NO_CHAPTERS = """
     {
-        "summary": "This is a summary.",
         "chapters": []
     }
 """.trimIndent()
 
 private val META_JSON_INVALID_CHAPTERS = """
     {
-        "summary": "Summary with bad chapters.",
         "chapters": [
             {"title": "", "startTime": 30},
             {"title": "Valid Chapter", "startTime": 60},

@@ -180,8 +180,6 @@ Language: zh_TW
     <string name="up_next_sort_duration_tooltip_title">依長度排序</string>
     <string name="transcript_tap_to_seek_streaming_unavailable">下載單集即可點選並搜尋</string>
     <string name="bookmark_play_from">透過「%s」播放</string>
-    <string name="summary_upsell_description">訂閱 Plus 即可存取逐字稿和其他進階版功能，例如書籤和資料夾。</string>
-    <string name="summary_upsell_title">AI 摘要</string>
     <string name="tv_create_account_title">建立免費帳號</string>
     <string name="tv_onboarding_sign_in_instructions">開啟相機並對準此 QR 碼</string>
     <string name="tv_onboarding_sign_in_title">使用手機登入</string>
@@ -213,10 +211,6 @@ Language: zh_TW
     <string name="blogs_found_feed_detected">找到的摘要</string>
     <string name="blogs_found_headline">大聲朗讀你的部落格</string>
     <string name="chapters_generated_disclaimer">系統會自動產生這些章節，但可能不會完全正確。</string>
-    <string name="description">描述</string>
-    <string name="player_tab_summary">摘要</string>
-    <string name="summary">摘要</string>
-    <string name="episode_summary">單集摘要</string>
     <string name="chat_stop_quote">停止引文</string>
     <string name="chat_play_quote">播放引文</string>
     <string name="chat_tap_to_retry">點選以重試</string>
