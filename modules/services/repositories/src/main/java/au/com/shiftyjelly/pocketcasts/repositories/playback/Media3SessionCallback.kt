@@ -61,6 +61,7 @@ internal class Media3SessionCallback(
     private val bookmarkHelper: BookmarkHelper,
     private val scopeProvider: () -> CoroutineScope,
     private val contextProvider: () -> Context,
+    private val isTv: Boolean = false,
     private val source: SourceView = SourceView.MEDIA_BUTTON_BROADCAST_ACTION,
     internal val commandMutex: Mutex = Mutex(),
 ) : MediaSession.Callback {
@@ -78,6 +79,7 @@ internal class Media3SessionCallback(
             }
         },
         isPlaying = { playbackManager.isPlaying() },
+        togglesImmediately = isTv,
     )
 
     override fun onConnect(
@@ -225,9 +227,11 @@ internal class Media3SessionCallback(
                 return true
             }
 
-            // PiP skip buttons use dedicated key codes that always skip forward/back,
+            // PiP skip buttons and remote fast-forward/rewind keys always skip forward/back,
             // bypassing headphone control settings.
-            KeyEvent.KEYCODE_MEDIA_SKIP_FORWARD -> {
+            KeyEvent.KEYCODE_MEDIA_SKIP_FORWARD,
+            KeyEvent.KEYCODE_MEDIA_FAST_FORWARD,
+            -> {
                 scope.launch {
                     try {
                         playbackManager.skipForwardSuspend(
@@ -235,13 +239,15 @@ internal class Media3SessionCallback(
                             jumpAmountSeconds = settings.skipForwardInSecs.value,
                         )
                     } catch (e: Exception) {
-                        Timber.e(e, "PiP skip forward failed")
+                        Timber.e(e, "Skip forward failed")
                     }
                 }
                 return true
             }
 
-            KeyEvent.KEYCODE_MEDIA_SKIP_BACKWARD -> {
+            KeyEvent.KEYCODE_MEDIA_SKIP_BACKWARD,
+            KeyEvent.KEYCODE_MEDIA_REWIND,
+            -> {
                 scope.launch {
                     try {
                         playbackManager.skipBackwardSuspend(
@@ -249,7 +255,7 @@ internal class Media3SessionCallback(
                             jumpAmountSeconds = settings.skipBackInSecs.value,
                         )
                     } catch (e: Exception) {
-                        Timber.e(e, "PiP skip backward failed")
+                        Timber.e(e, "Skip backward failed")
                     }
                 }
                 return true

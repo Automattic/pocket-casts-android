@@ -202,7 +202,7 @@ open class PlaybackManager @Inject constructor(
         mainThreadContext = Dispatchers.Main,
     )
 
-    private var audioNoisyManager = AudioNoisyManager(application)
+    private var audioNoisyManager = AudioNoisyManager(application, pausesOnHdmiDisconnect = Util.isTv(application))
 
     private val bookmarkTonePlayer: MediaPlayer by lazy {
         MediaPlayer().apply {
@@ -2082,6 +2082,12 @@ open class PlaybackManager @Inject constructor(
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "System fired 'Audio Becoming Noisy' event, pausing playback.")
         pause(sourceView = SourceView.AUTO_PAUSE)
         focusWasPlaying = null
+    }
+
+    override fun onHdmiAudioDisconnected() {
+        if (isPlaying()) {
+            onAudioBecomingNoisy()
+        }
     }
 
     /**

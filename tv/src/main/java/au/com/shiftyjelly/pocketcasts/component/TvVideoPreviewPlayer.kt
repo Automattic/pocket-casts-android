@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.component
 
+import android.app.ActivityManager
 import android.content.Context
 import androidx.annotation.OptIn
 import androidx.compose.animation.core.animateFloatAsState
@@ -15,6 +16,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.getSystemService
+import androidx.media3.common.AudioAttributes
+import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
@@ -30,6 +34,7 @@ private const val MAX_PREVIEW_MS = 30_000L
 private const val FADE_DURATION_MS = 300
 private const val FADE_STEPS = 20
 private const val PREVIEW_VOLUME = 0.5f
+private const val MIN_PREVIEW_TOTAL_MEMORY_BYTES = 1_280L * 1024 * 1024
 
 @OptIn(UnstableApi::class)
 @Composable
@@ -50,7 +55,12 @@ fun TvVideoPreviewPlayer(
         if (isFocused) {
             val exoPlayer = player ?: run {
                 delay(PLAY_DELAY_MS)
-                createPreviewPlayer(context, videoUrl) { hasFirstFrame = true }.also { player = it }
+                createPreviewPlayer(
+                    context = context,
+                    videoUrl = videoUrl,
+                    handlesAudioFocus = !currentIsPodcastPlaying(),
+                    onFirstFrame = { hasFirstFrame = true },
+                ).also { player = it }
             }
             exoPlayer.volume = if (currentIsPodcastPlaying()) 0f else PREVIEW_VOLUME
             exoPlayer.prepare()
@@ -91,8 +101,34 @@ fun TvVideoPreviewPlayer(
     }
 }
 
-private fun createPreviewPlayer(context: Context, videoUrl: String, onFirstFrame: () -> Unit): ExoPlayer {
-    return ExoPlayer.Builder(context).build().apply {
+@Composable
+fun rememberSupportsVideoPreviews(): Boolean {
+    val context = LocalContext.current
+    return remember(context) { supportsVideoPreviews(context) }
+}
+
+private var cachedSupportsVideoPreviews: Boolean? = null
+
+private fun supportsVideoPreviews(context: Context): Boolean = cachedSupportsVideoPreviews ?: run {
+    val activityManager = context.getSystemService<ActivityManager>()
+    val memoryInfo = ActivityManager.MemoryInfo().also { activityManager?.getMemoryInfo(it) }
+    val supported = activityManager != null &&
+        !activityManager.isLowRamDevice &&
+        memoryInfo.totalMem >= MIN_PREVIEW_TOTAL_MEMORY_BYTES
+    supported.also { cachedSupportsVideoPreviews = it }
+}
+
+private fun createPreviewPlayer(
+    context: Context,
+    videoUrl: String,
+    handlesAudioFocus: Boolean,
+    onFirstFrame: () -> Unit,
+): ExoPlayer {
+    val audioAttributes = AudioAttributes.Builder()
+        .setUsage(C.USAGE_MEDIA)
+        .setContentType(C.AUDIO_CONTENT_TYPE_MOVIE)
+        .build()
+    return ExoPlayer.Builder(context).setAudioAttributes(audioAttributes, handlesAudioFocus).build().apply {
         repeatMode = Player.REPEAT_MODE_OFF
         volume = 0f
         setMediaItem(MediaItem.fromUri(videoUrl))

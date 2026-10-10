@@ -624,6 +624,32 @@ class Media3SessionCallbackTest {
         )
     }
 
+    @Test
+    fun `KEYCODE_MEDIA_FAST_FORWARD skips forward`() = runTest {
+        mockSkipSettings()
+
+        sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_FAST_FORWARD)
+        testScope.advanceUntilIdle()
+
+        verify(playbackManager).skipForwardSuspend(
+            sourceView = any(),
+            jumpAmountSeconds = eq(30),
+        )
+    }
+
+    @Test
+    fun `KEYCODE_MEDIA_REWIND skips backward`() = runTest {
+        mockSkipSettings()
+
+        sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_REWIND)
+        testScope.advanceUntilIdle()
+
+        verify(playbackManager).skipBackwardSuspend(
+            sourceView = any(),
+            jumpAmountSeconds = eq(10),
+        )
+    }
+
     // --- Helpers ---
 
     private fun sendMediaButtonEvent(keyCode: Int) {

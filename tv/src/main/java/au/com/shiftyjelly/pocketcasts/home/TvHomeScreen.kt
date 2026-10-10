@@ -118,7 +118,7 @@ fun TvHomeScreen(
             onListImpression = viewModel::trackDiscoverListShown,
             onRetryRow = viewModel::retryDiscoverRow,
             loadCategoryCovers = viewModel::categoryCoverUrls,
-            isPodcastPlaying = viewModel::isPlaying,
+            isPodcastPlaying = viewModel::isPodcastAudioActive,
             modifier = Modifier
                 .fillMaxSize()
                 .tvFocusInactiveWhen(category != null || podcastUuid != null),

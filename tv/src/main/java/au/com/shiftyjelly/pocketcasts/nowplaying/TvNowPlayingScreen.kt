@@ -71,6 +71,7 @@ import au.com.shiftyjelly.pocketcasts.component.TvEpisodeActionContext
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeActionsModal
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeInfoModal
 import au.com.shiftyjelly.pocketcasts.component.TvMoreButton
+import au.com.shiftyjelly.pocketcasts.compose.KeepScreenOnEffect
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -188,6 +189,8 @@ private fun TvNowPlayingContent(
     val focusTopBar = LocalFocusTvTopBar.current
     val seekBarFocusRequester = remember { FocusRequester() }
     val episode = state.episode
+
+    KeepScreenOnEffect(keepOn = state.isVideo && state.isPlaying)
 
     val currentOnConsumePlayerFocusRequest by rememberUpdatedState(onConsumePlayerFocusRequest)
     LaunchedEffect(isPlayerFocusRequested) {
