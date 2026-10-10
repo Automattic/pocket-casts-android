@@ -10,6 +10,8 @@
         ([#6105](https://github.com/Automattic/pocket-casts-android/pull/6105))
     *   Fix a crash when opening onboarding or upgrade screens on Android 8.0
         ([#6104](https://github.com/Automattic/pocket-casts-android/pull/6104))
+    *   Fix a rare crash when tapping with two fingers while a screen is changing
+        ([#6107](https://github.com/Automattic/pocket-casts-android/pull/6107))
 
 8.22
 -----
