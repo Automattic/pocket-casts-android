@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.nowplaying
 
+import android.os.Build
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
@@ -407,13 +408,15 @@ private fun EpisodeArtwork(
                 artworkSize = ArtworkSize,
             )
         }
-        TvArtworkImage(
-            model = episode.artworkModel(),
-            modifier = Modifier
-                .requiredSize(ArtworkSize * BlurredArtworkScale)
-                .blur(BlurredArtworkRadius, BlurredEdgeTreatment.Unbounded)
-                .alpha(0.7f),
-        )
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            TvArtworkImage(
+                model = episode.artworkModel(),
+                modifier = Modifier
+                    .requiredSize(ArtworkSize * BlurredArtworkScale)
+                    .blur(BlurredArtworkRadius, BlurredEdgeTreatment.Unbounded)
+                    .alpha(0.7f),
+            )
+        }
         TvArtworkImage(
             model = episode.artworkModel(),
             modifier = Modifier

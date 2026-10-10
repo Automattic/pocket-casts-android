@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.component
 
+import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -76,7 +78,16 @@ fun TvFeaturedTile(
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxSize()
-                    .blur(30.dp),
+                    .then(
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                            Modifier.blur(30.dp)
+                        } else {
+                            Modifier.drawWithContent {
+                                drawContent()
+                                drawRect(Color.Black, alpha = UNBLURRED_ARTWORK_DIM_ALPHA)
+                            }
+                        },
+                    ),
             )
 
             Box(
@@ -192,3 +203,5 @@ private fun TvFeaturedTilePreview() {
         }
     }
 }
+
+private const val UNBLURRED_ARTWORK_DIM_ALPHA = 0.6f
