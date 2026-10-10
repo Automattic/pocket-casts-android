@@ -10,6 +10,8 @@
         ([#6105](https://github.com/Automattic/pocket-casts-android/pull/6105))
     *   Fix a crash when opening onboarding or upgrade screens on Android 8.0
         ([#6104](https://github.com/Automattic/pocket-casts-android/pull/6104))
+    *   Fix the player showing a different episode from the one playing after tapping Play next on the current episode
+        ([#6145](https://github.com/Automattic/pocket-casts-android/pull/6145))
 
 8.22
 -----
