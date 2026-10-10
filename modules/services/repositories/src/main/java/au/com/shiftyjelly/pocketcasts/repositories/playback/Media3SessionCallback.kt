@@ -221,7 +221,13 @@ internal class Media3SessionCallback(
         // for the multi-tap window to expire.
         when (keyEvent.keyCode) {
             KeyEvent.KEYCODE_MEDIA_PAUSE -> {
-                scope.launch { playbackManager.pauseSuspend(sourceView = source) }
+                scope.launch {
+                    if (playbackManager.isPlaying()) {
+                        playbackManager.pauseSuspend(sourceView = source)
+                    } else {
+                        playbackManager.playQueueSuspend(sourceView = source)
+                    }
+                }
                 return true
             }
 
