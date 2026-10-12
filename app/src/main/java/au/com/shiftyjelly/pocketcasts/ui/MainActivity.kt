@@ -168,6 +168,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.di.NotificationPermissionChec
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.opml.OpmlImportTask
+import au.com.shiftyjelly.pocketcasts.repositories.payment.PlayInAppMessages
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackNoticeType
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
@@ -331,6 +332,9 @@ class MainActivity :
 
     @Inject
     lateinit var paymentClient: PaymentClient
+
+    @Inject
+    lateinit var playInAppMessages: PlayInAppMessages
 
     @Inject
     lateinit var appReviewManager: AppReviewManager
@@ -868,6 +872,10 @@ class MainActivity :
 
         lifecycleScope.launch {
             paymentClient.acknowledgePendingPurchases()
+        }
+
+        lifecycleScope.launch {
+            playInAppMessages.show(this@MainActivity)
         }
 
         // Schedule next refresh in the background
