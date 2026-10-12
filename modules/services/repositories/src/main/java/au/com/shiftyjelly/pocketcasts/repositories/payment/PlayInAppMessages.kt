@@ -16,10 +16,14 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 
 @Singleton
 class PlayInAppMessages @Inject constructor(
@@ -31,6 +35,7 @@ class PlayInAppMessages @Inject constructor(
     @ProcessLifecycle processLifecycleOwner: LifecycleOwner,
 ) : DefaultLifecycleObserver {
     private var isShownInForeground = false
+    private var pendingMessages: Job? = null
 
     init {
         processLifecycleOwner.lifecycle.addObserver(this)
@@ -40,14 +45,16 @@ class PlayInAppMessages @Inject constructor(
         isShownInForeground = false
     }
 
-    suspend fun show(activity: Activity) {
-        if (isShownInForeground || !isEligible()) {
+    fun show(activity: Activity) {
+        if (isShownInForeground || pendingMessages?.isActive == true || !isEligible()) {
             return
         }
         isShownInForeground = true
-        val result = paymentClient.showInAppMessages(activity)
-        if (result is PaymentResult.Success && result.value is InAppMessageResult.SubscriptionStatusUpdated) {
-            refreshSubscription()
+        pendingMessages = scope.launch(Dispatchers.Main) {
+            val result = withTimeoutOrNull(PendingMessagesTimeout) { paymentClient.showInAppMessages(activity) }
+            if (result is PaymentResult.Success && result.value is InAppMessageResult.SubscriptionStatusUpdated) {
+                refreshSubscription()
+            }
         }
     }
 
@@ -58,16 +65,15 @@ class PlayInAppMessages @Inject constructor(
             platform !in NonPlayPlatforms
     }
 
-    private fun refreshSubscription() {
-        scope.launch {
-            subscriptionManager.fetchFreshSubscription()
-            delay(RefreshRetryDelay)
-            subscriptionManager.fetchFreshSubscription()
-        }
+    private suspend fun refreshSubscription() {
+        subscriptionManager.fetchFreshSubscription()
+        delay(RefreshRetryDelay)
+        subscriptionManager.fetchFreshSubscription()
     }
 
     private companion object {
         val NonPlayPlatforms = setOf(SubscriptionPlatform.iOS, SubscriptionPlatform.Web, SubscriptionPlatform.Gift)
         val RefreshRetryDelay = 5.seconds
+        val PendingMessagesTimeout = 30.minutes
     }
 }

@@ -874,9 +874,7 @@ class MainActivity :
             paymentClient.acknowledgePendingPurchases()
         }
 
-        lifecycleScope.launch {
-            playInAppMessages.show(this@MainActivity)
-        }
+        playInAppMessages.show(this@MainActivity)
 
         // Schedule next refresh in the background
         RefreshPodcastsTask.scheduleOrCancel(this@MainActivity, settings)

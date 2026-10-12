@@ -139,10 +139,7 @@ private val TransactionalInAppMessageParams = InAppMessageParams.newBuilder()
     .build()
 
 private fun GoogleInAppMessageResult.toInAppMessageResult() = when (responseCode) {
-    GoogleInAppMessageResult.InAppMessageResponseCode.SUBSCRIPTION_STATUS_UPDATED -> {
-        InAppMessageResult.SubscriptionStatusUpdated(purchaseToken)
-    }
-
+    GoogleInAppMessageResult.InAppMessageResponseCode.SUBSCRIPTION_STATUS_UPDATED -> InAppMessageResult.SubscriptionStatusUpdated
     else -> InAppMessageResult.NoActionNeeded
 }
 

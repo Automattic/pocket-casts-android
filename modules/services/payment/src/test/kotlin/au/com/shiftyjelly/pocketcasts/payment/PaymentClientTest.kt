@@ -453,11 +453,11 @@ class PaymentClientTest {
 
     @Test
     fun `show in-app messages`() = runTest {
-        dataSource.inAppMessageResult = InAppMessageResult.SubscriptionStatusUpdated("token")
+        dataSource.inAppMessageResult = InAppMessageResult.SubscriptionStatusUpdated
 
         val result = client.showInAppMessages(mock<Activity>())
 
-        assertEquals(InAppMessageResult.SubscriptionStatusUpdated("token"), result.getOrNull())
+        assertEquals(InAppMessageResult.SubscriptionStatusUpdated, result.getOrNull())
         listener.assertEvents(Event.ShowInAppMessagesSuccess)
     }
 
