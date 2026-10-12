@@ -82,8 +82,6 @@ fun NowPlayingScreen(
     val volumeUiState by volumeViewModel.volumeUiState.collectAsStateWithLifecycle()
     Scaffold(
         modifier = modifier.fillMaxSize(),
-        // Displays the volume level along the screen edge when adjusting volume,
-        // which automatically fades out after inactivity.
         positionIndicator = {
             VolumePositionIndicator(
                 volumeUiState = { volumeUiState },

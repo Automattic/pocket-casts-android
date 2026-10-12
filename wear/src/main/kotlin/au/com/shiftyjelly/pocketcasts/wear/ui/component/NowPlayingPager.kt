@@ -49,10 +49,7 @@ fun NowPlayingPager(
 
     val activeScrollState = when (pagerState.currentPage) {
         0 -> page0ColumnState
-
         2 -> page2ColumnState
-
-        // Page 1 does not scroll.
         else -> null
     }
 
