@@ -146,7 +146,7 @@ private fun Badge(text: String) {
                 color = MaterialTheme.theme.colors.playerContrast05,
                 shape = RoundedCornerShape(8.dp),
             )
-            .padding(horizontal = 8.dp, vertical = 2.dp),
+            .padding(horizontal = 8.dp),
     )
 }
 
