@@ -154,7 +154,7 @@ private fun ChatContent(
             if (uiState.areMessagesLoaded) {
                 ChatWelcome(
                     isConversationStarted = uiState.messages.isNotEmpty() || uiState.isAwaitingReply,
-                    isConnected = uiState.isConnected,
+                    isSuggestionEnabled = uiState.isConnected && !uiState.isAwaitingReply,
                     onClickSuggestion = onClickSuggestion,
                     theme = theme,
                 )

@@ -233,6 +233,26 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `summarize click sends the summary prompt after an answer`() = runTest {
+        setEpisodeInfo()
+        connectToInternet()
+        viewModel.onInputTextChange("First question")
+        viewModel.onSend()
+        advanceUntilIdle()
+
+        viewModel.onSummarizeClick("Summarize this episode")
+        advanceUntilIdle()
+
+        assertEquals(
+            listOf(
+                SendMessage(EPISODE_UUID, "First question"),
+                SendMessage(EPISODE_UUID, "Summarize this episode"),
+            ),
+            chatManager.sentMessages,
+        )
+    }
+
+    @Test
     fun `summarize click is ignored while awaiting a reply`() = runTest {
         setEpisodeInfo()
         connectToInternet()
