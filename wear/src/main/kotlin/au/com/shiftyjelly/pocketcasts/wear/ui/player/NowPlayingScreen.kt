@@ -202,7 +202,7 @@ fun NowPlayingScreen(
                 .requestFocusOnHierarchyActive()
                 .rotaryScrollable(
                     behavior = volumeRotaryBehavior(
-                        volumeUiStateProvider = { volumeUiState },
+                        volumeUiStateProvider = { volumeViewModel.volumeUiState.value },
                         onRotaryVolumeInput = { newVolume -> volumeViewModel.setVolume(newVolume) },
                     ),
                     focusRequester = focusRequester,
