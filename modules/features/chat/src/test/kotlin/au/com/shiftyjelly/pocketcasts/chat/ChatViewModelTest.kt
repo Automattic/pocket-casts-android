@@ -87,6 +87,7 @@ class ChatViewModelTest {
             podcastUuid = PODCAST_UUID,
             podcastTitle = "Podcast title",
             episodeDurationMs = 123_000,
+            sourceView = SourceView.EPISODE_DETAILS,
         )
 
         viewModel.uiState.test {
@@ -117,6 +118,20 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `set episode info tracks chat shown with the given source`() = runTest {
+        setEpisodeInfo(sourceView = SourceView.PLAYER)
+
+        assertEquals(
+            EpisodeChatShownEvent(
+                source = SourceView.PLAYER.analyticsValue,
+                episodeUuid = EPISODE_UUID,
+                podcastUuid = PODCAST_UUID,
+            ),
+            eventSink.pollEvent(),
+        )
+    }
+
+    @Test
     fun `set episode info shows stored messages`() = runTest {
         val message = ChatMessage.User(text = "Existing", uuid = "user-uuid")
         chatManager.messages.value = listOf(message)
@@ -128,6 +143,7 @@ class ChatViewModelTest {
             podcastUuid = PODCAST_UUID,
             podcastTitle = "Podcast title",
             episodeDurationMs = 123_000,
+            sourceView = SourceView.EPISODE_DETAILS,
         )
 
         viewModel.uiState.test {
@@ -407,7 +423,10 @@ class ChatViewModelTest {
         uuid = "quote-uuid",
     )
 
-    private fun setEpisodeInfo(episodeDurationMs: Int = 123_000) {
+    private fun setEpisodeInfo(
+        episodeDurationMs: Int = 123_000,
+        sourceView: SourceView = SourceView.EPISODE_DETAILS,
+    ) {
         viewModel.setEpisodeInfo(
             episodeUuid = EPISODE_UUID,
             episodeTitle = "Episode title",
@@ -415,6 +434,7 @@ class ChatViewModelTest {
             podcastUuid = PODCAST_UUID,
             podcastTitle = "Podcast title",
             episodeDurationMs = episodeDurationMs,
+            sourceView = sourceView,
         )
     }
 

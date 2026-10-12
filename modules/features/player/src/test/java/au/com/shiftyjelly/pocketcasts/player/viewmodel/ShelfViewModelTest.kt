@@ -30,6 +30,10 @@ import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito.mock
 import org.mockito.junit.MockitoJUnitRunner
+import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
@@ -245,6 +249,23 @@ class ShelfViewModelTest {
         assertFalse(shelfViewModel.uiState.value.showBookmarkNewBadge)
     }
 
+    @Test
+    fun `given hidden shelf items, when an item is moved, then hidden items keep their saved positions`() = runTest {
+        val savedItems = ShelfItem.entries
+        val hiddenItems = setOf(ShelfItem.EpisodeChat, ShelfItem.StreamSelector)
+        val visibleItems = savedItems - hiddenItems
+        initViewModel(isEditable = true, savedItems = savedItems)
+        shelfViewModel.setData(visibleItems, PodcastEpisode(uuid = "uuid", publishedDate = SafeDate()))
+
+        shelfViewModel.onShelfItemMove(1, 2)
+
+        val savedCaptor = argumentCaptor<List<ShelfItem>>()
+        verify(settings.shelfItems).set(savedCaptor.capture(), eq(true), any(), any())
+        val saved = savedCaptor.firstValue
+        hiddenItems.forEach { assertEquals(savedItems.indexOf(it), saved.indexOf(it)) }
+        assertEquals(listOf(visibleItems[1], visibleItems[0]) + visibleItems.drop(2), saved - hiddenItems)
+    }
+
     private fun moveShelfItem(
         from: Int,
         to: Int,
@@ -259,10 +280,12 @@ class ShelfViewModelTest {
     private fun initViewModel(
         isEditable: Boolean = true,
         version: String = "8.21",
+        savedItems: List<ShelfItem> = ShelfItem.entries,
     ) {
         val episodeId = "testEpisodeId"
         whenever(transcriptManager.observeIsTranscriptAvailable(episodeId)).thenReturn(flowOf(true))
         val userSetting = mock<UserSetting<List<ShelfItem>>>()
+        whenever(userSetting.value).thenReturn(savedItems)
         whenever(settings.shelfItems).thenReturn(userSetting)
         whenever(settings.getVersion()).thenReturn(version)
 
