@@ -378,6 +378,15 @@ enum class Feature(
         hasDevToggle = true,
         addedOn = LocalDate.parse("2026-09-22"),
     ),
+    PLAY_IN_APP_MESSAGES(
+        key = "play_in_app_messages",
+        title = "Google Play in-app messages for declined payments",
+        defaultValue = false,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+        addedOn = LocalDate.parse("2026-10-12"),
+    ),
 }
 
 sealed class FeatureTier {
