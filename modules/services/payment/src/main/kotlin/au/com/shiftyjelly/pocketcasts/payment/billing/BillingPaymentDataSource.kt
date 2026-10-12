@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.payment.billing
 
 import android.app.Activity
 import android.content.Context
+import au.com.shiftyjelly.pocketcasts.payment.InAppMessageResult
 import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
 import au.com.shiftyjelly.pocketcasts.payment.PaymentDataSource
 import au.com.shiftyjelly.pocketcasts.payment.PaymentResult
@@ -14,6 +15,7 @@ import au.com.shiftyjelly.pocketcasts.payment.map
 import com.android.billingclient.api.AcknowledgePurchaseParams
 import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingResult
+import com.android.billingclient.api.InAppMessageParams
 import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.ProductDetailsResult
 import com.android.billingclient.api.PurchasesResult
@@ -23,8 +25,11 @@ import com.android.billingclient.api.QueryPurchasesParams
 import com.android.billingclient.api.acknowledgePurchase
 import com.android.billingclient.api.queryProductDetails
 import com.android.billingclient.api.queryPurchasesAsync
+import kotlin.coroutines.resume
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.suspendCancellableCoroutine
+import com.android.billingclient.api.InAppMessageResult as GoogleInAppMessageResult
 import com.android.billingclient.api.Purchase as GooglePurchase
 
 internal class BillingPaymentDataSource(
@@ -112,6 +117,33 @@ internal class BillingPaymentDataSource(
             }
         }
     }
+
+    override suspend fun showInAppMessages(activity: Activity): PaymentResult<InAppMessageResult> {
+        return connection.withConnectedClient { client ->
+            suspendCancellableCoroutine { continuation ->
+                val billingResult = client.showInAppMessages(activity, TransactionalInAppMessageParams) { result ->
+                    if (continuation.isActive) {
+                        continuation.resume(PaymentResult.Success(result.toInAppMessageResult()))
+                    }
+                }
+                if (!billingResult.isOk() && continuation.isActive) {
+                    continuation.resume(billingResult.toPaymentFailure())
+                }
+            }
+        }
+    }
+}
+
+private val TransactionalInAppMessageParams = InAppMessageParams.newBuilder()
+    .addInAppMessageCategoryToShow(InAppMessageParams.InAppMessageCategoryId.TRANSACTIONAL)
+    .build()
+
+private fun GoogleInAppMessageResult.toInAppMessageResult() = when (responseCode) {
+    GoogleInAppMessageResult.InAppMessageResponseCode.SUBSCRIPTION_STATUS_UPDATED -> {
+        InAppMessageResult.SubscriptionStatusUpdated(purchaseToken)
+    }
+
+    else -> InAppMessageResult.NoActionNeeded
 }
 
 private val AllSubscriptionsQueryProductDetailsParams = QueryProductDetailsParams.newBuilder()

@@ -72,6 +72,12 @@ class PaymentClient @Inject constructor(
         }
     }
 
+    suspend fun showInAppMessages(activity: Activity): PaymentResult<InAppMessageResult> {
+        return dataSource
+            .showInAppMessages(activity)
+            .also { forEachListener { onInAppMessagesShown(it) } }
+    }
+
     private suspend fun listenToPurchaseUpdates(): Nothing {
         dataSource.purchaseResults.collect { result ->
             val recoveredResult = result.recover { code, message ->
@@ -187,6 +193,8 @@ class PaymentClient @Inject constructor(
         fun onConfirmPurchase(purchase: Purchase) = Unit
 
         fun onPurchaseConfirmed(result: PaymentResult<Purchase>) = Unit
+
+        fun onInAppMessagesShown(result: PaymentResult<InAppMessageResult>) = Unit
 
         fun onMessage(message: String) = Unit
     }
