@@ -128,7 +128,7 @@ class ChatViewModelTest {
             podcastUuid = PODCAST_UUID,
             podcastTitle = "Podcast title",
             episodeDurationMs = 123_000,
-            sourceView = SourceView.EPISODE_DETAILS,
+            sourceView = SourceView.PLAYER,
             isBeta = false,
         )
 
@@ -147,20 +147,6 @@ class ChatViewModelTest {
     @Test
     fun `set episode info tracks chat shown`() = runTest {
         setEpisodeInfo()
-
-        assertEquals(
-            EpisodeChatShownEvent(
-                source = SourceView.EPISODE_DETAILS.analyticsValue,
-                episodeUuid = EPISODE_UUID,
-                podcastUuid = PODCAST_UUID,
-            ),
-            eventSink.pollEvent(),
-        )
-    }
-
-    @Test
-    fun `set episode info tracks chat shown with the given source`() = runTest {
-        setEpisodeInfo(sourceView = SourceView.PLAYER)
 
         assertEquals(
             EpisodeChatShownEvent(
@@ -183,7 +169,7 @@ class ChatViewModelTest {
             podcastUuid = PODCAST_UUID,
             podcastTitle = "Podcast title",
             episodeDurationMs = 123_000,
-            sourceView = SourceView.EPISODE_DETAILS,
+            sourceView = SourceView.PLAYER,
             isBeta = false,
         )
 
@@ -239,7 +225,7 @@ class ChatViewModelTest {
         eventSink.skipEvent()
         assertEquals(
             EpisodeChatMessageSentEvent(
-                source = SourceView.EPISODE_DETAILS.analyticsValue,
+                source = SourceView.PLAYER.analyticsValue,
                 episodeUuid = EPISODE_UUID,
                 podcastUuid = PODCAST_UUID,
                 messageLength = "Summarize this episode".length.toLong(),
@@ -343,7 +329,7 @@ class ChatViewModelTest {
 
         assertEquals(
             EpisodeChatMessageSentEvent(
-                source = SourceView.EPISODE_DETAILS.analyticsValue,
+                source = SourceView.PLAYER.analyticsValue,
                 episodeUuid = EPISODE_UUID,
                 podcastUuid = PODCAST_UUID,
                 messageLength = "Question".length.toLong(),
@@ -369,7 +355,7 @@ class ChatViewModelTest {
         eventSink.skipEvent(2)
         assertEquals(
             EpisodeChatResponseReceivedEvent(
-                source = SourceView.EPISODE_DETAILS.analyticsValue,
+                source = SourceView.PLAYER.analyticsValue,
                 episodeUuid = EPISODE_UUID,
                 podcastUuid = PODCAST_UUID,
                 durationMs = 2_500,
@@ -418,7 +404,7 @@ class ChatViewModelTest {
 
         assertEquals(
             EpisodeChatMessageFailedEvent(
-                source = SourceView.EPISODE_DETAILS.analyticsValue,
+                source = SourceView.PLAYER.analyticsValue,
                 episodeUuid = EPISODE_UUID,
                 podcastUuid = PODCAST_UUID,
                 error = EpisodeChatErrorType.Network,
@@ -556,7 +542,7 @@ class ChatViewModelTest {
 
         assertEquals(
             EpisodeChatResponseRatedEvent(
-                source = SourceView.EPISODE_DETAILS.analyticsValue,
+                source = SourceView.PLAYER.analyticsValue,
                 episodeUuid = EPISODE_UUID,
                 podcastUuid = PODCAST_UUID,
                 rating = EpisodeChatSentimentType.Negative,
@@ -777,7 +763,7 @@ class ChatViewModelTest {
 
         assertEquals(
             EpisodeChatClearedEvent(
-                source = SourceView.EPISODE_DETAILS.analyticsValue,
+                source = SourceView.PLAYER.analyticsValue,
                 episodeUuid = EPISODE_UUID,
                 podcastUuid = PODCAST_UUID,
             ),
@@ -848,7 +834,7 @@ class ChatViewModelTest {
 
         assertEquals(
             EpisodeChatQuotePlayTappedEvent(
-                source = SourceView.EPISODE_DETAILS.analyticsValue,
+                source = SourceView.PLAYER.analyticsValue,
                 episodeUuid = EPISODE_UUID,
                 podcastUuid = PODCAST_UUID,
                 quoteSource = EpisodeChatQuoteSourceType.InlineTimestamp,
@@ -857,7 +843,7 @@ class ChatViewModelTest {
         )
         assertEquals(
             EpisodeChatQuoteStopTappedEvent(
-                source = SourceView.EPISODE_DETAILS.analyticsValue,
+                source = SourceView.PLAYER.analyticsValue,
                 episodeUuid = EPISODE_UUID,
                 podcastUuid = PODCAST_UUID,
                 quoteSource = EpisodeChatQuoteSourceType.InlineTimestamp,
@@ -907,7 +893,7 @@ class ChatViewModelTest {
     @Test
     fun `play pause pauses when the chat episode is playing`() = runTest {
         playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID)
-        setEpisodeInfo(sourceView = SourceView.PLAYER)
+        setEpisodeInfo()
         advanceUntilIdle()
 
         viewModel.onPlayPauseClick()
@@ -920,7 +906,7 @@ class ChatViewModelTest {
     @Test
     fun `play pause plays the chat episode when it is not playing`() = runTest {
         playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = "other-uuid")
-        setEpisodeInfo(sourceView = SourceView.PLAYER)
+        setEpisodeInfo()
         advanceUntilIdle()
 
         viewModel.onPlayPauseClick()
@@ -933,7 +919,7 @@ class ChatViewModelTest {
     @Test
     fun `play pause resumes the paused chat episode without reloading it`() = runTest {
         playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID)
-        setEpisodeInfo(sourceView = SourceView.PLAYER)
+        setEpisodeInfo()
         advanceUntilIdle()
 
         viewModel.onPlayPauseClick()
@@ -958,7 +944,7 @@ class ChatViewModelTest {
         advanceUntilIdle()
 
         assertTrue(viewModel.uiState.value.messages.filterIsInstance<ChatMessage.Quote>().none { it.isPlaying })
-        verify(playbackManager).pause(transientLoss = false, sourceView = SourceView.EPISODE_DETAILS)
+        verify(playbackManager).pause(transientLoss = false, sourceView = SourceView.PLAYER)
         verify(playbackManager, never()).seekToTimeMsSuspend(org.mockito.kotlin.eq(10_000), anyOrNull())
     }
 
@@ -1013,7 +999,7 @@ class ChatViewModelTest {
 
     private fun setEpisodeInfo(
         episodeDurationMs: Int = 123_000,
-        sourceView: SourceView = SourceView.EPISODE_DETAILS,
+        sourceView: SourceView = SourceView.PLAYER,
         isBeta: Boolean = false,
     ) {
         viewModel.setEpisodeInfo(
@@ -1035,7 +1021,7 @@ class ChatViewModelTest {
         assertTrue(viewModel.uiState.value.isBetaSheetVisible)
         assertEquals(
             EpisodeChatBetaSheetShownEvent(
-                source = SourceView.EPISODE_DETAILS.analyticsValue,
+                source = SourceView.PLAYER.analyticsValue,
                 episodeUuid = EPISODE_UUID,
                 podcastUuid = PODCAST_UUID,
             ),
@@ -1084,7 +1070,7 @@ class ChatViewModelTest {
         verify(betaSheetSeenSetting, times(1)).set(true, updateModifiedAt = false)
         assertEquals(
             EpisodeChatBetaSheetDismissedEvent(
-                source = SourceView.EPISODE_DETAILS.analyticsValue,
+                source = SourceView.PLAYER.analyticsValue,
                 episodeUuid = EPISODE_UUID,
                 podcastUuid = PODCAST_UUID,
             ),
