@@ -234,15 +234,6 @@ enum class Feature(
         hasDevToggle = true,
         addedOn = LocalDate.parse("2026-03-31"),
     ),
-    EXPLICIT_PODCAST_INDICATOR(
-        key = "explicit_podcast_indicator",
-        title = "Explicit podcast indicator",
-        defaultValue = isDebugOrPrototypeBuild,
-        tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = true,
-        hasDevToggle = true,
-        addedOn = LocalDate.parse("2026-04-23"),
-    ),
     IMPROVED_LISTENING_STATS(
         key = "improved_listening_stats",
         title = "Show improved listening stats",
