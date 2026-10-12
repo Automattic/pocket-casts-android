@@ -53,6 +53,7 @@ fun EpisodeScreen(
     navigateToConfirmDeleteDownload: () -> Unit,
     navigateToRemoveFromUpNextNotification: () -> Unit,
     navigateToStreamingConfirmation: () -> Unit,
+    navigateToDownloadDataUseConfirmation: () -> Unit,
     navigateToNowPlaying: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: EpisodeViewModel = hiltViewModel(),
@@ -122,7 +123,7 @@ fun EpisodeScreen(
                         if (episode.isDownloaded) {
                             navigateToConfirmDeleteDownload()
                         } else {
-                            viewModel.downloadEpisode()
+                            viewModel.onDownloadClicked(navigateToDownloadDataUseConfirmation)
                         }
                     },
                     downloadButtonState = when (episode.downloadStatus) {

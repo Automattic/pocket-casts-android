@@ -19,6 +19,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.profile.cloud.AddFileActivity
 import au.com.shiftyjelly.pocketcasts.repositories.di.DefaultDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadProgressCache
@@ -34,6 +35,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.shownotes.ShowNotesManager
 import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
+import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.wear.ui.player.AudioOutputSelectorHelper
 import au.com.shiftyjelly.pocketcasts.wear.ui.player.StreamingConfirmationScreen
@@ -95,6 +97,7 @@ class EpisodeViewModel @Inject constructor(
     private val audioOutputSelectorHelper: AudioOutputSelectorHelper,
     private val userEpisodeManager: UserEpisodeManager,
     @DefaultDispatcher private val backgroundDispatcher: CoroutineDispatcher,
+    private val settings: Settings,
 ) : AndroidViewModel(appContext as Application) {
     private var playAttempt: Job? = null
     private val sourceView = SourceView.EPISODE_DETAILS
@@ -275,15 +278,32 @@ class EpisodeViewModel @Inject constructor(
             } ?: extractColorFromEpisodeArtwork(episode)
     }
 
-    fun downloadEpisode() {
+    fun onDownloadClicked(showDataUseConfirmation: () -> Unit) {
+        val episode = (stateFlow.value as? State.Loaded)?.episode ?: return
+        val action = DownloadAction.from(
+            episode = episode,
+            warnOnMeteredNetwork = settings.warnOnMeteredNetwork.value,
+            isUnmeteredConnection = Network.isUnmeteredConnection(getApplication()),
+        )
+        when (action) {
+            DownloadAction.Cancel -> viewModelScope.launch(Dispatchers.IO) {
+                episodeManager.clearPlaybackErrorBlocking(episode)
+                downloadQueue.cancel(episode.uuid, sourceView)
+            }
+
+            DownloadAction.ConfirmDataUse -> showDataUseConfirmation()
+
+            is DownloadAction.Download -> downloadEpisode(action.waitForWifi)
+
+            DownloadAction.None -> Unit
+        }
+    }
+
+    fun downloadEpisode(waitForWifi: Boolean) {
         val episode = (stateFlow.value as? State.Loaded)?.episode ?: return
         viewModelScope.launch(Dispatchers.IO) {
             episodeManager.clearPlaybackErrorBlocking(episode)
-            if (episode.isDownloadCancellable) {
-                downloadQueue.cancel(episode.uuid, sourceView)
-            } else if (!episode.isDownloaded) {
-                downloadQueue.enqueue(episode.uuid, DownloadType.UserTriggered(waitForWifi = false), sourceView)
-            }
+            downloadQueue.enqueue(episode.uuid, DownloadType.UserTriggered(waitForWifi), sourceView)
         }
     }
 

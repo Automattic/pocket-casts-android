@@ -86,6 +86,7 @@ import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.extensions.smoothScrollToTop
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
+import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.BookmarkDeleter
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper.NavigationState
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper.Companion.MULTI_SELECT_TOGGLE_PAYLOAD
@@ -188,6 +189,9 @@ class PodcastFragment : BaseFragment() {
 
     @Inject
     lateinit var rowDataProvider: EpisodeRowDataProvider
+
+    @Inject
+    lateinit var warningsHelper: WarningsHelper
 
     private val viewModel: PodcastViewModel by viewModels()
     private val ratingsViewModel: PodcastRatingsViewModel by viewModels()
@@ -1299,10 +1303,9 @@ class PodcastFragment : BaseFragment() {
 
     private fun downloadAll() {
         val episodeCount = viewModel.episodeCount()
-        val dialog = ConfirmationDialog.downloadWarningDialog(episodeCount, resources) {
-            viewModel.downloadAll()
-        }
-        dialog?.show(parentFragmentManager, "download_confirm")
+        warningsHelper
+            .bulkDownloadDialog(episodeCount) { waitForWifi -> viewModel.downloadAll(waitForWifi) }
+            ?.show(parentFragmentManager, "download_confirm")
     }
 
     private fun showSnackBar(

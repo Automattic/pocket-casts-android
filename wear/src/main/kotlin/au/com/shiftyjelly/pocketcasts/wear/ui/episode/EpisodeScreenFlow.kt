@@ -35,6 +35,7 @@ object EpisodeScreenFlow {
     const val EPISODE_SCREEN = "episodeScreen"
     private const val UP_NEXT_OPTIONS_SCREEN = "upNextOptionsScreen"
     private const val DELETE_DOWNLOAD_CONFIRMATION_SCREEN = "deleteDownloadConfirmationScreen"
+    private const val DOWNLOAD_DATA_USE_CONFIRMATION_SCREEN = "downloadDataUseConfirmationScreen"
     private const val DELETE_DOWNLOAD_NOTIFICATION_SCREEN = "deleteDownloadNotificationScreen"
     private const val REMOVE_FROM_UP_NEXT_NOTIFICAGTIONS_SCREEN = "removeFromUpNextNotificationScreen"
 
@@ -89,6 +90,9 @@ object EpisodeScreenFlow {
                         navigateToStreamingConfirmation = {
                             navController.navigate(StreamingConfirmationScreen.ROUTE)
                         },
+                        navigateToDownloadDataUseConfirmation = {
+                            navController.navigate(DOWNLOAD_DATA_USE_CONFIRMATION_SCREEN)
+                        },
                         navigateToNowPlaying = {
                             coroutineScope.launch {
                                 pagerState.animateScrollToPage(NowPlayingScreen.PAGER_INDEX)
@@ -107,6 +111,24 @@ object EpisodeScreenFlow {
                 UpNextOptionsScreen(
                     episodeScreenViewModelStoreOwner = episodeScreenBackStackEntry, // Reuse view model from EpisodeScreen
                     onComplete = { navController.popBackStack() },
+                )
+            }
+
+            composable(
+                route = DOWNLOAD_DATA_USE_CONFIRMATION_SCREEN,
+            ) {
+                val episodeScreenViewModelStoreOwner = remember(it) {
+                    navController.getBackStackEntry(EPISODE_SCREEN)
+                }
+                val viewModel = hiltViewModel<EpisodeViewModel>(episodeScreenViewModelStoreOwner)
+
+                ObtainConfirmationScreen(
+                    text = stringResource(LR.string.download_warning_on_wifi_summary),
+                    onConfirm = {
+                        viewModel.downloadEpisode(waitForWifi = false)
+                        navController.popBackStack()
+                    },
+                    onCancel = { navController.popBackStack() },
                 )
             }
 

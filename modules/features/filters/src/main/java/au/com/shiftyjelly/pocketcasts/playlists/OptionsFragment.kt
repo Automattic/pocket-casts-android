@@ -30,7 +30,6 @@ import androidx.fragment.app.viewModels
 import androidx.fragment.compose.content
 import au.com.shiftyjelly.pocketcasts.compose.components.displayLabel
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.playlists.PlaylistViewModel.Companion.DOWNLOAD_ALL_LIMIT
 import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistOption
 import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistOptionsColumn
 import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistSortOptionsColumn
@@ -38,16 +37,19 @@ import au.com.shiftyjelly.pocketcasts.playlists.manual.EditPlaylistFragment
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.availableSortTypes
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
-import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
-import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog.ButtonType
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
+import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
 class OptionsFragment : BaseDialogFragment() {
     private val viewModel by viewModels<PlaylistViewModel>({ requireParentFragment() })
+
+    @Inject
+    lateinit var warningsHelper: WarningsHelper
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -219,31 +221,11 @@ class OptionsFragment : BaseDialogFragment() {
     }
 
     private fun downloadAll(episodeCount: Int) {
-        when {
-            parentFragmentManager.findFragmentByTag("download_confirm") != null -> Unit
-
-            episodeCount < 5 -> {
-                viewModel.downloadAll()
-            }
-
-            episodeCount in 5..DOWNLOAD_ALL_LIMIT -> {
-                val dialog = ConfirmationDialog()
-                    .setButtonType(ButtonType.Normal(getString(LR.string.download_warning_button, episodeCount)))
-                    .setIconId(IR.drawable.ic_download)
-                    .setTitle(getString(LR.string.download_warning_title))
-                    .setOnConfirm { viewModel.downloadAll() }
-                dialog.show(parentFragmentManager, "download_confirm")
-            }
-
-            else -> {
-                val dialog = ConfirmationDialog()
-                    .setButtonType(ButtonType.Normal(getString(LR.string.download_warning_button, DOWNLOAD_ALL_LIMIT)))
-                    .setIconId(IR.drawable.ic_download)
-                    .setTitle(getString(LR.string.download_warning_title))
-                    .setSummary(getString(LR.string.download_warning_limit_summary, DOWNLOAD_ALL_LIMIT))
-                    .setOnConfirm { viewModel.downloadAll() }
-                dialog.show(parentFragmentManager, "download_confirm")
-            }
+        if (parentFragmentManager.findFragmentByTag("download_confirm") != null) {
+            return
         }
+        warningsHelper
+            .bulkDownloadDialog(episodeCount) { waitForWifi -> viewModel.downloadAll(waitForWifi) }
+            ?.show(parentFragmentManager, "download_confirm")
     }
 }

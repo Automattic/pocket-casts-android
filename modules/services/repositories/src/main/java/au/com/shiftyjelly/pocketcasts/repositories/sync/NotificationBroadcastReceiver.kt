@@ -117,7 +117,7 @@ class NotificationBroadcastReceiver :
     }
 
     private fun downloadEpisode(episodeUuid: String) {
-        downloadQueue.enqueue(episodeUuid, DownloadType.UserTriggered(waitForWifi = false), source)
+        downloadQueue.enqueue(episodeUuid, DownloadType.UserTriggered(waitForWifi = settings.warnOnMeteredNetwork.value), source)
     }
 
     private fun markAsPlayed(episodeUuid: String) {

@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadQueue
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadType
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -49,6 +50,7 @@ class CloudBottomSheetViewModel @Inject constructor(
     private val downloadQueue: DownloadQueue,
     private val podcastManager: PodcastManager,
     private val eventHorizon: EventHorizon,
+    private val settings: Settings,
     @ApplicationScope private val applicationScope: CoroutineScope,
     userManager: UserManager,
 ) : ViewModel() {
@@ -136,7 +138,7 @@ class CloudBottomSheetViewModel @Inject constructor(
     }
 
     fun download(episode: UserEpisode) {
-        downloadQueue.enqueue(episode.uuid, DownloadType.UserTriggered(waitForWifi = false), source)
+        downloadQueue.enqueue(episode.uuid, DownloadType.UserTriggered(waitForWifi = settings.warnOnMeteredNetwork.value), source)
     }
 
     fun removeFromUpNext(episode: UserEpisode) {

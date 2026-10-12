@@ -170,14 +170,14 @@ class PlaylistViewModel @AssistedInject constructor(
         }
     }
 
-    fun downloadAll() {
+    fun downloadAll(waitForWifi: Boolean) {
         val episodes = uiState.value.playlist
             ?.episodes
             ?.toPodcastEpisodes()
             ?.take(DOWNLOAD_ALL_LIMIT)
             ?.map(PodcastEpisode::uuid)
             .orEmpty()
-        downloadQueue.enqueueAll(episodes, DownloadType.UserTriggered(waitForWifi = false), SourceView.FILTERS)
+        downloadQueue.enqueueAll(episodes, DownloadType.UserTriggered(waitForWifi), SourceView.FILTERS)
     }
 
     fun deleteEpisode(episodeUuid: String) {
