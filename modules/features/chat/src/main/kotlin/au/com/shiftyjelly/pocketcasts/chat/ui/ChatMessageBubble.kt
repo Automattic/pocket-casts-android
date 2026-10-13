@@ -56,19 +56,16 @@ private fun String.withHangingBullets(indent: TextUnit): AnnotatedString {
         lines.forEachIndexed { index, line ->
             val isBullet = line.startsWith(BULLET_PREFIX)
             if (isBullet && lines.getOrNull(index - 1)?.startsWith(BULLET_PREFIX) == true) {
-                append("\n")
+                withStyle(ParagraphStyle()) { append(ZERO_WIDTH_SPACE) }
             }
-            val lineText = if (index < lines.lastIndex) "$line\n" else line
-            if (isBullet) {
-                withStyle(ParagraphStyle(textIndent = TextIndent(restLine = indent))) { append(lineText) }
-            } else {
-                append(lineText)
-            }
+            val paragraphStyle = if (isBullet) ParagraphStyle(textIndent = TextIndent(restLine = indent)) else ParagraphStyle()
+            withStyle(paragraphStyle) { append(line.ifEmpty { ZERO_WIDTH_SPACE }) }
         }
     }
 }
 
 private const val BULLET_PREFIX = "•  "
+private const val ZERO_WIDTH_SPACE = "\u200B"
 
 private val AiMessageTextStyle = TextStyle(fontSize = 15.sp, lineHeight = 20.sp)
 
