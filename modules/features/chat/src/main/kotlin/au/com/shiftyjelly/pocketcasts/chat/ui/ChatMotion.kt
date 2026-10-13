@@ -80,5 +80,24 @@ internal fun ChatAppear(
     }
 }
 
+@Composable
+internal fun ChatFadeOut(
+    durationMillis: Int,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit,
+) {
+    if (rememberIsReduceMotionEnabled()) return
+    val visibility = remember { MutableTransitionState(true) }
+    visibility.targetState = false
+    AnimatedVisibility(
+        visibleState = visibility,
+        enter = EnterTransition.None,
+        exit = fadeOut(tween(durationMillis)),
+        modifier = modifier,
+    ) {
+        content()
+    }
+}
+
 private const val APPEAR_DURATION_MS = 200
 internal const val ANSWER_CROSS_FADE_MS = 150

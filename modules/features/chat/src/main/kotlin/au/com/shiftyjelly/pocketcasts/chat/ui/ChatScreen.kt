@@ -224,15 +224,24 @@ private fun ChatContent(
                 uiState.messages.forEachIndexed { index, message ->
                     key(message.uuid) {
                         val isNew = message.uuid !in initialMessageUuids
+                        val replacesTypingIndicator = isNew && uiState.messages.getOrNull(index - 1) is ChatMessage.User
                         when (message) {
-                            is ChatMessage.Assistant -> ChatAppear(animate = isNew, durationMillis = ANSWER_CROSS_FADE_MS) {
+                            is ChatMessage.Assistant -> ChatAnswerAppear(
+                                animate = isNew,
+                                replacesTypingIndicator = replacesTypingIndicator,
+                                theme = theme,
+                            ) {
                                 AiMessageBubble(
                                     text = message.displayText,
                                     theme = theme,
                                 )
                             }
 
-                            is ChatMessage.Quote -> ChatAppear(animate = isNew, durationMillis = ANSWER_CROSS_FADE_MS) {
+                            is ChatMessage.Quote -> ChatAnswerAppear(
+                                animate = isNew,
+                                replacesTypingIndicator = replacesTypingIndicator,
+                                theme = theme,
+                            ) {
                                 AiQuoteBubble(
                                     quote = message.displayText,
                                     timestampLabel = message.timestampLabel,
@@ -272,13 +281,11 @@ private fun ChatContent(
                         }
                     }
                 }
-                val isReduceMotionEnabled = rememberIsReduceMotionEnabled()
-                AnimatedVisibility(
-                    visible = uiState.isAwaitingReply,
-                    enter = EnterTransition.None,
-                    exit = if (isReduceMotionEnabled) ExitTransition.None else fadeOut(tween(ANSWER_CROSS_FADE_MS)),
-                ) {
-                    ThinkingBubble(theme = theme)
+                if (uiState.isAwaitingReply) {
+                    ThinkingBubble(
+                        theme = theme,
+                        modifier = Modifier.padding(top = TypingIndicatorExtraGap),
+                    )
                 }
                 ChatAnsweringAnnouncement(
                     isAnswering = uiState.isAwaitingReply,
@@ -322,6 +329,27 @@ private fun ChatContent(
 }
 
 private val FollowNewestThreshold = 48.dp
+private val TypingIndicatorExtraGap = 8.dp
+
+@Composable
+private fun ChatAnswerAppear(
+    animate: Boolean,
+    replacesTypingIndicator: Boolean,
+    theme: ChatTheme,
+    content: @Composable () -> Unit,
+) {
+    Box {
+        ChatAppear(animate = animate, durationMillis = ANSWER_CROSS_FADE_MS, content = content)
+        if (replacesTypingIndicator) {
+            ChatFadeOut(durationMillis = ANSWER_CROSS_FADE_MS) {
+                ThinkingBubble(
+                    theme = theme,
+                    modifier = Modifier.padding(top = TypingIndicatorExtraGap),
+                )
+            }
+        }
+    }
+}
 
 private val ChatMessage?.isAnswer get() = this is ChatMessage.Assistant || this is ChatMessage.Quote
 
