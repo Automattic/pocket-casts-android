@@ -409,7 +409,7 @@ class PlayerHeaderFragment :
                             viewModel.episode?.let {
                                 ShelfBottomSheet.newInstance(
                                     episodeId = it.uuid,
-                                ).show(childFragmentManager, "shelf_bottom_sheet")
+                                ).show(childFragmentManager, MORE_ACTIONS_TAG)
                             }
                         }
 
@@ -496,11 +496,12 @@ class PlayerHeaderFragment :
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 shelfSharedViewModel.snackbarMessages.collect { message ->
+                    if (message == SnackbarMessage.EpisodeChatNeedsTranscript && isMoreActionsOpen()) return@collect
                     val text = when (message) {
                         SnackbarMessage.EpisodeDownloadStarted -> LR.string.episode_queued_for_download
                         SnackbarMessage.EpisodeRemoved -> LR.string.episode_was_removed
                         SnackbarMessage.TranscriptNotAvailable -> LR.string.transcript_error_not_available
-                        SnackbarMessage.EpisodeChatNeedsTranscript -> LR.string.episode_chat_needs_transcript
+                        SnackbarMessage.EpisodeChatNeedsTranscript -> LR.string.episode_chat_needs_transcript_message
                         SnackbarMessage.ShareNotAvailable -> LR.string.sharing_is_not_available_for_private_podcasts
                     }
                     showSnackBar(text = getString(text))
@@ -513,6 +514,8 @@ class PlayerHeaderFragment :
         super.onResume()
         isEpisodeChatUpsellOpening = false
     }
+
+    private fun isMoreActionsOpen() = childFragmentManager.findFragmentByTag(MORE_ACTIONS_TAG) != null
 
     override fun onShowNotesClick(episodeUuid: String) {
         val fragment = NotesFragment.newInstance(episodeUuid)
@@ -1337,3 +1340,5 @@ private val transcriptExitTransition = fadeOut(spring(stiffness = Spring.Stiffne
 
 private val shelfEnterTransition = fadeIn() + expandVertically(expandFrom = Alignment.Top)
 private val shelfExitTransition = fadeOut() + shrinkVertically(shrinkTowards = Alignment.Top)
+
+private const val MORE_ACTIONS_TAG = "shelf_bottom_sheet"
