@@ -231,6 +231,15 @@ class PlaybackSettingsFragment : BaseFragment() {
                             )
                         }
 
+                        SettingsItems.SETTINGS_HIDE_CAUGHT_UP_PODCASTS -> {
+                            HideCaughtUpPodcasts(
+                                saved = settings.hidePodcastsWithNoUnfinishedEpisodes.flow.collectAsState().value,
+                                onSave = { hide ->
+                                    settings.hidePodcastsWithNoUnfinishedEpisodes.set(hide, updateModifiedAt = false)
+                                },
+                            )
+                        }
+
                         SettingsItems.SETTINGS_MEDIA_NOTIFICATION_CONTROLS -> {
                             SettingRow(
                                 primaryText = stringResource(LR.string.settings_media_notification_controls),
@@ -604,6 +613,15 @@ class PlaybackSettingsFragment : BaseFragment() {
     }
 
     @Composable
+    private fun HideCaughtUpPodcasts(saved: Boolean, onSave: (Boolean) -> Unit) = SettingRow(
+        primaryText = stringResource(LR.string.hide_caught_up_podcasts),
+        secondaryText = stringResource(LR.string.hide_caught_up_podcasts_summary),
+        toggle = SettingRowToggle.Switch(checked = saved),
+        modifier = Modifier.toggleable(value = saved, role = Role.Switch) { onSave(!saved) },
+        indent = false,
+    )
+
+    @Composable
     private fun KeepScreenAwake(saved: Boolean, onSave: (Boolean) -> Unit) = SettingRow(
         primaryText = stringResource(LR.string.settings_keep_screen_awake),
         secondaryText = stringResource(LR.string.settings_keep_screen_awake_summary),
@@ -758,6 +776,7 @@ private enum class SettingsItems {
     SETTINGS_UP_NEXT_SWIPE,
     SETTINGS_EPISODE_GROUPING,
     SETTINGS_ARCHIVED_EPISODES,
+    SETTINGS_HIDE_CAUGHT_UP_PODCASTS,
     SETTINGS_MEDIA_NOTIFICATION_CONTROLS,
     SETTINGS_HEADER_PLAYER,
     SETTINGS_SKIP_FORWARD_TIME,

@@ -248,6 +248,12 @@ class SettingsImpl @Inject constructor(
         toString = { it.clientId.toString() },
     )
 
+    override val hidePodcastsWithNoUnfinishedEpisodes = UserSetting.BoolPref(
+        sharedPrefKey = "hidePodcastsWithNoUnfinishedEpisodes",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
+
     override val prioritizeSeekAccuracy = UserSetting.BoolPref(
         sharedPrefKey = "prioritizeSeekAccuracy",
         defaultValue = false,

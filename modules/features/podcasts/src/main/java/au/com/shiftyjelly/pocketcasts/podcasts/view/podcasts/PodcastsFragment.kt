@@ -207,6 +207,7 @@ class PodcastsFragment :
             scope = viewLifecycleOwner.lifecycleScope,
             adapter = folderAdapter,
             commitItems = viewModel::reorderItems,
+            canDrag = { !settings.hidePodcastsWithNoUnfinishedEpisodes.value },
         )
         binding.recyclerView.let {
             it.adapter = adapter
@@ -547,6 +548,7 @@ class PodcastsFragment :
         binding.emptyView.setContentWithViewCompositionStrategy {
             val activeAd by viewModel.activeAd.collectAsState()
             val isViewVisible by emptyViewVisibilityFlow.collectAsState(false)
+            val uiState by viewModel.uiState.collectAsState()
 
             AppTheme(themeType = theme.activeTheme) {
                 Column(
@@ -576,7 +578,13 @@ class PodcastsFragment :
                         modifier = Modifier.weight(1f),
                     )
 
-                    if (folderUuid != null) {
+                    if (uiState.hasHiddenPodcasts) {
+                        NoUnfinishedPodcastsBanner(
+                            onClickButton = {
+                                settings.hidePodcastsWithNoUnfinishedEpisodes.set(false, updateModifiedAt = false)
+                            },
+                        )
+                    } else if (folderUuid != null) {
                         NoFolderPodcastsBanner(
                             onClickButton = {
                                 FolderEditPodcastsFragment.newInstance(folderUuid).show(parentFragmentManager, "add_podcasts_card")
@@ -769,6 +777,19 @@ class PodcastsFragment :
             }
         }
     }
+}
+
+@Composable
+private fun NoUnfinishedPodcastsBanner(
+    onClickButton: () -> Unit,
+) {
+    NoContentBanner(
+        title = stringResource(LR.string.no_unfinished_podcasts),
+        body = stringResource(LR.string.no_unfinished_podcasts_summary),
+        iconResourceId = IR.drawable.ic_podcasts,
+        primaryButtonText = stringResource(LR.string.show_all_podcasts),
+        onPrimaryButtonClick = onClickButton,
+    )
 }
 
 @Composable

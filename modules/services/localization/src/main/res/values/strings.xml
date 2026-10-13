@@ -34,6 +34,11 @@
     <string name="add_to_up_next_bottom">Play last in Up Next</string>
     <string name="add_to_up_next_question">Add to up next?</string>
     <string name="archive">Archive</string>
+    <string name="hide_caught_up_podcasts">Hide caught-up podcasts</string>
+    <string name="hide_caught_up_podcasts_summary">Hide podcasts with no unarchived episodes left to finish.</string>
+    <string name="no_unfinished_podcasts">All caught up</string>
+    <string name="no_unfinished_podcasts_summary">There are no unfinished episodes in these podcasts.</string>
+    <string name="show_all_podcasts">Show all podcasts</string>
     <string name="unarchive">Unarchive</string>
     <string name="archive_episode">Archive episode</string>
     <string name="archived">Archived</string>

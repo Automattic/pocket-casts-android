@@ -320,6 +320,7 @@ interface Settings {
     fun refreshPodcastsOnResume(isUnmetered: Boolean): Boolean
     val backgroundRefreshPodcasts: UserSetting<Boolean>
     val podcastsSortType: UserSetting<PodcastsSortType>
+    val hidePodcastsWithNoUnfinishedEpisodes: UserSetting<Boolean>
     val prioritizeSeekAccuracy: UserSetting<Boolean>
     val cacheEntirePlayingEpisode: UserSetting<Boolean>
     val liveAnalyticsUrl: UserSetting<String>
