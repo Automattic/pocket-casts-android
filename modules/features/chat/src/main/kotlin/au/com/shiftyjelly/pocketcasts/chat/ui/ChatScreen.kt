@@ -88,7 +88,8 @@ fun ChatScreen(
         sheetContent = {
             ChatBetaSheet(
                 theme = theme,
-                onClickGotIt = onDismissBetaSheet,
+                buttonText = stringResource(LR.string.got_it),
+                onClickButton = onDismissBetaSheet,
             )
         },
         modifier = modifier,
