@@ -109,6 +109,21 @@ class EpisodeChatDaoTest {
         assertEquals(listOf(otherMessage), episodeChatDao.getMessages("other-episode-uuid"))
     }
 
+    @Test
+    fun testUpdateRating() = runTest {
+        insertChat()
+        val message = createMessage(uuid = "message-uuid", text = "Answer")
+        episodeChatDao.insertMessage(message)
+
+        episodeChatDao.updateRating("message-uuid", "positive")
+
+        assertEquals(listOf(message.copy(rating = "positive")), episodeChatDao.getMessages(EPISODE_UUID))
+
+        episodeChatDao.updateRating("message-uuid", null)
+
+        assertEquals(listOf(message), episodeChatDao.getMessages(EPISODE_UUID))
+    }
+
     private suspend fun insertChat(episodeUuid: String = EPISODE_UUID) {
         insertEpisode(episodeUuid)
         episodeChatDao.insertChatIfAbsent(EpisodeChat(episodeUuid = episodeUuid, podcastUuid = PODCAST_UUID))
