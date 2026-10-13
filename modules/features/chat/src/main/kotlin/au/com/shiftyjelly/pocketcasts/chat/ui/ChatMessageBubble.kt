@@ -199,8 +199,6 @@ internal fun ThinkingBubble(
 ) {
     ChatTypingIndicator(
         theme = theme,
-        showBubble = false,
-        dotColor = theme.secondaryText,
         modifier = modifier,
     )
 }

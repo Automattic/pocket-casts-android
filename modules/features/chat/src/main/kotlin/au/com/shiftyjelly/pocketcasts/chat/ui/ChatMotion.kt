@@ -28,12 +28,13 @@ internal fun ChatAppear(
     animate: Boolean,
     modifier: Modifier = Modifier,
     rise: Dp = 0.dp,
+    durationMillis: Int = APPEAR_DURATION_MS,
     content: @Composable () -> Unit,
 ) {
     val isReduceMotionEnabled = rememberIsReduceMotionEnabled()
     val progress = remember { Animatable(if (animate && !isReduceMotionEnabled) 0f else 1f) }
     LaunchedEffect(progress) {
-        progress.animateTo(1f, tween(durationMillis = APPEAR_DURATION_MS, easing = EaseOut))
+        progress.animateTo(1f, tween(durationMillis = durationMillis, easing = EaseOut))
     }
     Box(
         modifier = modifier.graphicsLayer {
@@ -47,3 +48,4 @@ internal fun ChatAppear(
 }
 
 private const val APPEAR_DURATION_MS = 200
+internal const val ANSWER_CROSS_FADE_MS = 150
