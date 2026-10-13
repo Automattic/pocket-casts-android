@@ -1,6 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.chat.ui
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -186,18 +191,22 @@ private fun ChatContent(
                     key(message.uuid) {
                         val isNew = message.uuid !in initialMessageUuids
                         when (message) {
-                            is ChatMessage.Assistant -> AiMessageBubble(
-                                text = message.displayText,
-                                theme = theme,
-                            )
+                            is ChatMessage.Assistant -> ChatAppear(animate = isNew, durationMillis = ANSWER_CROSS_FADE_MS) {
+                                AiMessageBubble(
+                                    text = message.displayText,
+                                    theme = theme,
+                                )
+                            }
 
-                            is ChatMessage.Quote -> AiQuoteBubble(
-                                quote = message.displayText,
-                                timestampLabel = message.timestampLabel,
-                                isPlayable = message.canPlay,
-                                theme = theme,
-                                onClickPlay = { onPlayQuote(message.uuid) },
-                            )
+                            is ChatMessage.Quote -> ChatAppear(animate = isNew, durationMillis = ANSWER_CROSS_FADE_MS) {
+                                AiQuoteBubble(
+                                    quote = message.displayText,
+                                    timestampLabel = message.timestampLabel,
+                                    isPlayable = message.canPlay,
+                                    theme = theme,
+                                    onClickPlay = { onPlayQuote(message.uuid) },
+                                )
+                            }
 
                             is ChatMessage.User -> ChatAppear(animate = isNew, rise = 8.dp) {
                                 UserMessageBubble(
@@ -229,7 +238,12 @@ private fun ChatContent(
                         }
                     }
                 }
-                if (uiState.isAwaitingReply) {
+                val isReduceMotionEnabled = rememberIsReduceMotionEnabled()
+                AnimatedVisibility(
+                    visible = uiState.isAwaitingReply,
+                    enter = EnterTransition.None,
+                    exit = if (isReduceMotionEnabled) ExitTransition.None else fadeOut(tween(ANSWER_CROSS_FADE_MS)),
+                ) {
                     ThinkingBubble(theme = theme)
                 }
                 ChatAnsweringAnnouncement(isAnswering = uiState.isAwaitingReply)
