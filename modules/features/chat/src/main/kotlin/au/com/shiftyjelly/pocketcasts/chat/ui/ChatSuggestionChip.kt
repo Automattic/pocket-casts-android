@@ -64,7 +64,7 @@ private fun ChatSuggestionChip(
         fontSize = 15.sp,
         lineHeight = 20.sp,
         modifier = modifier
-            .alpha(if (enabled) 1f else 0.5f)
+            .alpha(if (enabled) 1f else DISABLED_ALPHA)
             .clip(CircleShape)
             .border(1.dp, theme.chipBorder, CircleShape)
             .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
