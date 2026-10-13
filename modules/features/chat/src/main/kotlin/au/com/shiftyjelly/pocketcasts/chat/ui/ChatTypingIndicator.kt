@@ -16,15 +16,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.LiveRegionMode
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.liveRegion
-import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
-import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 internal fun ChatTypingIndicator(
@@ -65,44 +59,38 @@ internal fun ChatTypingIndicator(
         animationSpec = dotKeyframes(400),
         label = "dot3",
     )
-    val answeringDescription = stringResource(LR.string.chat_answering)
 
     val shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp, bottomStart = 4.dp, bottomEnd = 16.dp)
 
     Row(
         horizontalArrangement = Arrangement.spacedBy(4.dp),
         verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier
-            .semantics {
-                contentDescription = answeringDescription
-                liveRegion = LiveRegionMode.Polite
-            }
-            .then(
-                if (showBubble) {
-                    Modifier
-                        .background(theme.aiBubble, shape)
-                        .padding(horizontal = 14.dp, vertical = 10.dp)
-                } else {
-                    Modifier
-                },
-            ),
+        modifier = modifier.then(
+            if (showBubble) {
+                Modifier
+                    .background(theme.aiBubble, shape)
+                    .padding(horizontal = 14.dp, vertical = 10.dp)
+            } else {
+                Modifier
+            },
+        ),
     ) {
         Box(
             modifier = Modifier
                 .size(8.dp)
-                .alpha(if (isReduceMotionEnabled) REDUCED_MOTION_DOT_ALPHA else dot1Alpha)
+                .graphicsLayer { alpha = if (isReduceMotionEnabled) REDUCED_MOTION_DOT_ALPHA else dot1Alpha }
                 .background(dotColor, CircleShape),
         )
         Box(
             modifier = Modifier
                 .size(8.dp)
-                .alpha(if (isReduceMotionEnabled) REDUCED_MOTION_DOT_ALPHA else dot2Alpha)
+                .graphicsLayer { alpha = if (isReduceMotionEnabled) REDUCED_MOTION_DOT_ALPHA else dot2Alpha }
                 .background(dotColor, CircleShape),
         )
         Box(
             modifier = Modifier
                 .size(8.dp)
-                .alpha(if (isReduceMotionEnabled) REDUCED_MOTION_DOT_ALPHA else dot3Alpha)
+                .graphicsLayer { alpha = if (isReduceMotionEnabled) REDUCED_MOTION_DOT_ALPHA else dot3Alpha }
                 .background(dotColor, CircleShape),
         )
     }

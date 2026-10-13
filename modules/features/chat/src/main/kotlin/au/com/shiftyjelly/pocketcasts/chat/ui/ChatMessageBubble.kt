@@ -126,6 +126,7 @@ internal fun UserMessageBubble(
     theme: ChatTheme,
     modifier: Modifier = Modifier,
     isNotSent: Boolean = false,
+    isRetryEnabled: Boolean = true,
     onRetry: () -> Unit = {},
 ) {
     Column(
@@ -136,11 +137,14 @@ internal fun UserMessageBubble(
             horizontalAlignment = Alignment.End,
             verticalArrangement = Arrangement.spacedBy(4.dp),
             modifier = if (isNotSent) {
-                Modifier.clickable(
-                    onClickLabel = stringResource(LR.string.chat_not_sent_tap_to_retry),
-                    role = Role.Button,
-                    onClick = onRetry,
-                )
+                Modifier
+                    .clip(UserBubbleShape)
+                    .clickable(
+                        enabled = isRetryEnabled,
+                        onClickLabel = stringResource(LR.string.try_again),
+                        role = Role.Button,
+                        onClick = onRetry,
+                    )
             } else {
                 Modifier
             },

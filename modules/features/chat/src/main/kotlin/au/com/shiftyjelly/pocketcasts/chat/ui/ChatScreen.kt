@@ -43,7 +43,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
@@ -212,6 +216,7 @@ private fun ChatContent(
                                     text = message.text,
                                     theme = theme,
                                     isNotSent = index == uiState.messages.lastIndex && uiState.error == ChatError.NetworkError,
+                                    isRetryEnabled = uiState.isConnected,
                                     onRetry = onRetry,
                                 )
                             }
@@ -239,8 +244,9 @@ private fun ChatContent(
                 if (uiState.isAwaitingReply) {
                     ThinkingBubble(theme = theme)
                 }
+                ChatAnsweringAnnouncement(isAnswering = uiState.isAwaitingReply)
                 if (uiState.error == ChatError.ServerError) {
-                    ChatServerError(theme = theme, onRetry = onRetry)
+                    ChatServerError(theme = theme, isRetryEnabled = uiState.isConnected, onRetry = onRetry)
                 }
             }
             ThemedSnackbarHost(
@@ -293,8 +299,23 @@ private fun ChatDisclaimer(
 }
 
 @Composable
+private fun ChatAnsweringAnnouncement(
+    isAnswering: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    val answering = stringResource(LR.string.chat_answering)
+    Box(
+        modifier = modifier.semantics {
+            liveRegion = LiveRegionMode.Polite
+            contentDescription = if (isAnswering) answering else ""
+        },
+    )
+}
+
+@Composable
 private fun ChatServerError(
     theme: ChatTheme,
+    isRetryEnabled: Boolean,
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -325,7 +346,7 @@ private fun ChatServerError(
             modifier = Modifier
                 .clip(CircleShape)
                 .border(1.dp, theme.chipBorder, CircleShape)
-                .clickable(role = Role.Button, onClick = onRetry)
+                .clickable(enabled = isRetryEnabled, role = Role.Button, onClick = onRetry)
                 .defaultMinSize(minHeight = 44.dp)
                 .padding(horizontal = 16.dp, vertical = 12.dp),
         ) {
@@ -437,7 +458,6 @@ private fun ChatScreenErrorPreview(
                     podcastTitle = "Pocket Casts Weekly",
                     isBeta = true,
                     areMessagesLoaded = true,
-                    isConnected = error != ChatError.NetworkError,
                     error = error,
                     messages = listOf(
                         ChatMessage.User(

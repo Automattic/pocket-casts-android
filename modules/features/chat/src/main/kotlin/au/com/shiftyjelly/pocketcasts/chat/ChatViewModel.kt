@@ -228,6 +228,7 @@ class ChatViewModel @Inject constructor(
     }
 
     fun retry() {
+        if (!_uiState.value.isConnected || _uiState.value.isAwaitingReply) return
         val failedUserMessage = transientUserMessage ?: return
         performSend(message = failedUserMessage, inputType = transientInputType)
     }
@@ -287,7 +288,7 @@ class ChatViewModel @Inject constructor(
             it.copy(
                 isAwaitingReply = true,
                 error = null,
-                messages = it.messages.withTransientUserMessage(),
+                messages = it.messages.filterNot { message -> message.uuid in unsentMessageUuids }.withTransientUserMessage(),
             )
         }
 
