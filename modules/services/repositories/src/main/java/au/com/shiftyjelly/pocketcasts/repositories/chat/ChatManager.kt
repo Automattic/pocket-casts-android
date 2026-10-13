@@ -17,4 +17,6 @@ interface ChatManager {
     )
 
     suspend fun clearMessages(episodeUuid: String)
+
+    suspend fun rateAnswer(answerUuid: String, rating: ChatAnswerRating?)
 }
