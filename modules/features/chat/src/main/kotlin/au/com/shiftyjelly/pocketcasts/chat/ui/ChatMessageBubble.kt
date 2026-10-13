@@ -135,7 +135,7 @@ internal fun UserMessageBubble(
     ) {
         Column(
             horizontalAlignment = Alignment.End,
-            verticalArrangement = Arrangement.spacedBy(4.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
             modifier = if (isNotSent) {
                 Modifier
                     .clip(UserBubbleShape)
