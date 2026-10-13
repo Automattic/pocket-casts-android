@@ -415,6 +415,7 @@ class ChatViewModelTest {
     @Test
     fun `retry resends failed transient user message`() = runTest {
         setEpisodeInfo()
+        connectToInternet()
         chatManager.sendMessageException = IOException()
         viewModel.onInputTextChange("Last question")
         viewModel.onSend()
@@ -431,6 +432,41 @@ class ChatViewModelTest {
             ),
             chatManager.sentMessages.single(),
         )
+    }
+
+    @Test
+    fun `retry does nothing while offline`() = runTest {
+        setEpisodeInfo()
+        connectToInternet()
+        chatManager.sendMessageException = IOException()
+        viewModel.onInputTextChange("Question")
+        viewModel.onSend()
+        advanceUntilIdle()
+        chatManager.sendMessageException = null
+        networkConnectionWatcher.networkCapabilities.value = null
+        advanceUntilIdle()
+
+        viewModel.retry()
+        advanceUntilIdle()
+
+        assertTrue(chatManager.sentMessages.isEmpty())
+        assertEquals(ChatError.NetworkError, viewModel.uiState.value.error)
+    }
+
+    @Test
+    fun `sending a new question drops the earlier unsent one`() = runTest {
+        setEpisodeInfo()
+        connectToInternet()
+        chatManager.sendMessageException = IOException()
+        viewModel.onInputTextChange("First")
+        viewModel.onSend()
+        advanceUntilIdle()
+
+        viewModel.onInputTextChange("Second")
+        viewModel.onSend()
+
+        val texts = viewModel.uiState.value.messages.filterIsInstance<ChatMessage.User>().map { it.text }
+        assertEquals(listOf("Second"), texts)
     }
 
     @Test
@@ -629,6 +665,7 @@ class ChatViewModelTest {
     @Test
     fun `retry keeps the message index`() = runTest {
         setEpisodeInfo()
+        connectToInternet()
         sendQuestion("First")
         chatManager.sendMessageException = IOException()
         sendQuestion("Second")
