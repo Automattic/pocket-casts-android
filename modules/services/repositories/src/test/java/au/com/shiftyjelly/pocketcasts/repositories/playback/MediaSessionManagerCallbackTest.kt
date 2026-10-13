@@ -13,9 +13,11 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import com.automattic.eventhorizon.EventHorizon
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
@@ -69,6 +71,33 @@ class MediaSessionManagerCallbackTest {
 
         verify(playbackManager, never()).playIfNotPlaying(any())
         assertEquals(listOf("skip forwards"), queuedCommands)
+    }
+
+    @Test
+    fun `legacy held KEYCODE_MEDIA_PLAY consumes repeats without skipping`() = runTest {
+        val playbackManager = mock<PlaybackManager>()
+        val episodeManager = mock<EpisodeManager>()
+        val settings = mock<Settings>()
+        val nextAction = mock<UserSetting<HeadphoneAction>>()
+        whenever(settings.headphoneControlsNextAction).thenReturn(nextAction)
+        whenever(nextAction.value).thenReturn(HeadphoneAction.SKIP_FORWARD)
+        val manager = createManager(this, playbackManager, episodeManager, settings)
+        val queuedCommands = mutableListOf<String>()
+        val callback = manager.createCallback(
+            scope = this,
+            playbackManager = playbackManager,
+            episodeManager = episodeManager,
+            enqueueCommand = { tag, _ -> queuedCommands += tag },
+        )
+
+        assertTrue(callback.onMediaButtonEvent(mediaButtonIntent(KeyEvent.KEYCODE_MEDIA_PLAY)))
+        advanceTimeBy(490)
+        assertTrue(callback.onMediaButtonEvent(mediaButtonIntent(KeyEvent.KEYCODE_MEDIA_PLAY, repeatCount = 1)))
+        advanceUntilIdle()
+
+        verify(playbackManager).playIfNotPlaying(SourceView.MEDIA_BUTTON_BROADCAST_ACTION)
+        verify(playbackManager, never()).playPause(any())
+        assertEquals(emptyList<String>(), queuedCommands)
     }
 
     @Test
@@ -161,7 +190,10 @@ class MediaSessionManagerCallbackTest {
         scopeProvider = { scope },
     )
 
-    private fun mediaButtonIntent(keyCode: Int) = Intent(Intent.ACTION_MEDIA_BUTTON).apply {
-        putExtra(Intent.EXTRA_KEY_EVENT, KeyEvent(KeyEvent.ACTION_DOWN, keyCode))
+    private fun mediaButtonIntent(
+        keyCode: Int,
+        repeatCount: Int = 0,
+    ) = Intent(Intent.ACTION_MEDIA_BUTTON).apply {
+        putExtra(Intent.EXTRA_KEY_EVENT, KeyEvent(0L, 0L, KeyEvent.ACTION_DOWN, keyCode, repeatCount))
     }
 }
