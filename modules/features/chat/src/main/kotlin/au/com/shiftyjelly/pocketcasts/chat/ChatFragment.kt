@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -17,8 +18,11 @@ import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.chat.ui.ChatScreen
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.LocalPodcastColors
+import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
@@ -31,6 +35,8 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
 class ChatFragment : BaseDialogFragment() {
+    override val statusBarIconColor = StatusBarIconColor.Light
+
     companion object {
         private const val ARGS_KEY = "chat_args"
 
@@ -39,15 +45,24 @@ class ChatFragment : BaseDialogFragment() {
             podcastUuid: String,
             podcastTitle: String,
             episodeTitle: String,
-            episodeSubtitle: String,
             episodeDurationMs: Int,
             sourceView: SourceView,
             isBeta: Boolean,
+            podcastColors: PodcastColors,
         ) = ChatFragment().apply {
             arguments = Bundle().apply {
                 putParcelable(
                     ARGS_KEY,
-                    Args(episodeUuid, podcastUuid, podcastTitle, episodeTitle, episodeSubtitle, episodeDurationMs, sourceView, isBeta),
+                    Args(
+                        episodeUuid,
+                        podcastUuid,
+                        podcastTitle,
+                        episodeTitle,
+                        episodeDurationMs,
+                        sourceView,
+                        isBeta,
+                        podcastColors,
+                    ),
                 )
             }
         }
@@ -62,7 +77,6 @@ class ChatFragment : BaseDialogFragment() {
         viewModel.setEpisodeInfo(
             episodeUuid = args.episodeUuid,
             episodeTitle = args.episodeTitle,
-            episodeSubtitle = args.episodeSubtitle,
             podcastUuid = args.podcastUuid,
             podcastTitle = args.podcastTitle,
             episodeDurationMs = args.episodeDurationMs,
@@ -79,22 +93,25 @@ class ChatFragment : BaseDialogFragment() {
         val uiState by viewModel.uiState.collectAsState()
 
         AppTheme(theme.activeTheme) {
-            val backgroundColor = MaterialTheme.theme.colors.primaryUi01
-            LaunchedEffect(backgroundColor) {
-                setDialogTint(backgroundColor.toArgb())
-            }
+            CompositionLocalProvider(LocalPodcastColors provides args.podcastColors) {
+                val backgroundColor = MaterialTheme.theme.rememberPlayerColorsOrDefault().background01
+                LaunchedEffect(backgroundColor) {
+                    setDialogTint(backgroundColor.toArgb())
+                }
 
-            ChatScreen(
-                uiState = uiState,
-                onClickClose = { dismiss() },
-                onClickMore = ::showOptionsDialog,
-                onInputTextChange = viewModel::onInputTextChange,
-                onSend = viewModel::onSend,
-                onRetry = viewModel::retry,
-                onPlayQuote = viewModel::playQuote,
-                onDismissBetaSheet = viewModel::dismissBetaSheet,
-                modifier = Modifier.fillMaxSize(),
-            )
+                ChatScreen(
+                    uiState = uiState,
+                    onClickClose = { dismiss() },
+                    onClickMore = ::showOptionsDialog,
+                    onClickPlayPause = viewModel::onPlayPauseClick,
+                    onInputTextChange = viewModel::onInputTextChange,
+                    onSend = viewModel::onSend,
+                    onRetry = viewModel::retry,
+                    onPlayQuote = viewModel::playQuote,
+                    onDismissBetaSheet = viewModel::dismissBetaSheet,
+                    modifier = Modifier.fillMaxSize(),
+                )
+            }
         }
     }
 
@@ -140,9 +157,9 @@ class ChatFragment : BaseDialogFragment() {
         val podcastUuid: String,
         val podcastTitle: String,
         val episodeTitle: String,
-        val episodeSubtitle: String,
         val episodeDurationMs: Int,
         val sourceView: SourceView,
         val isBeta: Boolean,
+        val podcastColors: PodcastColors,
     ) : Parcelable
 }

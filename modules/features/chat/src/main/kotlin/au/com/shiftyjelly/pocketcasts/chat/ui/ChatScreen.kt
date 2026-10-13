@@ -17,6 +17,7 @@ import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Text
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
@@ -33,7 +34,9 @@ import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.chat.ChatError
 import au.com.shiftyjelly.pocketcasts.chat.ChatUiState
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
-import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
+import au.com.shiftyjelly.pocketcasts.compose.LocalPodcastColors
+import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
+import au.com.shiftyjelly.pocketcasts.compose.PodcastColorsParameterProvider
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatMessage
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -43,6 +46,7 @@ fun ChatScreen(
     uiState: ChatUiState,
     onClickClose: () -> Unit,
     onClickMore: () -> Unit,
+    onClickPlayPause: () -> Unit,
     onInputTextChange: (String) -> Unit,
     onSend: () -> Unit,
     onRetry: () -> Unit,
@@ -86,6 +90,7 @@ fun ChatScreen(
             theme = theme,
             onClickClose = onClickClose,
             onClickMore = onClickMore,
+            onClickPlayPause = onClickPlayPause,
             onInputTextChange = onInputTextChange,
             onSend = onSend,
             onRetry = onRetry,
@@ -100,6 +105,7 @@ private fun ChatContent(
     theme: ChatTheme,
     onClickClose: () -> Unit,
     onClickMore: () -> Unit,
+    onClickPlayPause: () -> Unit,
     onInputTextChange: (String) -> Unit,
     onSend: () -> Unit,
     onRetry: () -> Unit,
@@ -120,12 +126,13 @@ private fun ChatContent(
             .background(theme.background)
             .imePadding(),
     ) {
-        ChatToolbar(
+        ChatHeader(
             episodeTitle = uiState.episodeTitle,
-            episodeSubtitle = uiState.episodeSubtitle,
             podcastUuid = uiState.podcastUuid,
             podcastTitle = uiState.podcastTitle,
-            onClickBack = onClickClose,
+            playback = uiState.playback,
+            onClickClose = onClickClose,
+            onClickPlayPause = onClickPlayPause,
             onClickMore = {
                 focusManager.clearFocus(force = true)
                 keyboardController?.hide()
@@ -220,40 +227,42 @@ private fun ChatErrorMessage(
 @Preview
 @Composable
 private fun ChatScreenPreview(
-    @PreviewParameter(ThemePreviewParameterProvider::class) themeType: ThemeType,
+    @PreviewParameter(PodcastColorsParameterProvider::class) podcastColors: PodcastColors,
 ) {
-    AppThemeWithBackground(themeType) {
-        ChatScreen(
-            uiState = ChatUiState(
-                inputText = "Ask a follow-up",
-                episodeTitle = "The future of podcast discovery",
-                episodeSubtitle = "May 25",
-                podcastUuid = "preview-podcast-uuid",
-                podcastTitle = "Pocket Casts Weekly",
-                episodeDurationMs = 3_600_000,
-                isBeta = true,
-                messages = listOf(
-                    ChatMessage.User(
-                        text = "What was the main point?",
-                    ),
-                    ChatMessage.Assistant(
-                        text = "The hosts focused on making discovery feel personal without adding friction.",
-                    ),
-                    ChatMessage.Quote(
-                        text = "The important idea is to keep the interface simple while still surfacing useful context.",
-                        start = "12:04",
-                        end = "12:18",
-                        canPlay = true,
+    AppThemeWithBackground(ThemeType.DARK) {
+        CompositionLocalProvider(LocalPodcastColors provides podcastColors) {
+            ChatScreen(
+                uiState = ChatUiState(
+                    inputText = "Ask a follow-up",
+                    episodeTitle = "The future of podcast discovery",
+                    podcastUuid = "preview-podcast-uuid",
+                    podcastTitle = "Pocket Casts Weekly",
+                    episodeDurationMs = 3_600_000,
+                    isBeta = true,
+                    messages = listOf(
+                        ChatMessage.User(
+                            text = "What was the main point?",
+                        ),
+                        ChatMessage.Assistant(
+                            text = "The hosts focused on making discovery feel personal without adding friction.",
+                        ),
+                        ChatMessage.Quote(
+                            text = "The important idea is to keep the interface simple while still surfacing useful context.",
+                            start = "12:04",
+                            end = "12:18",
+                            canPlay = true,
+                        ),
                     ),
                 ),
-            ),
-            onClickClose = {},
-            onClickMore = {},
-            onInputTextChange = {},
-            onSend = {},
-            onRetry = {},
-            onPlayQuote = {},
-            onDismissBetaSheet = {},
-        )
+                onClickClose = {},
+                onClickMore = {},
+                onClickPlayPause = {},
+                onInputTextChange = {},
+                onSend = {},
+                onRetry = {},
+                onPlayQuote = {},
+                onDismissBetaSheet = {},
+            )
+        }
     }
 }
