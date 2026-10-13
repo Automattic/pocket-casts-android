@@ -212,9 +212,6 @@ Language: pt_BR
     <string name="blogs_found_feed_detected">Feed encontrado</string>
     <string name="chapters_generated_disclaimer">Esses capítulos são gerados automaticamente e podem não ser perfeitamente precisos.</string>
     <string name="chat_play_quote">Reproduzir citação</string>
-    <string name="chat_tap_to_retry">Toque para tentar novamente</string>
-    <string name="chat_error_network">Não foi possível acessar o servidor. Verifique sua conexão.</string>
-    <string name="chat_error_server">Ocorreu um erro. Tente novamente.</string>
     <string name="chat_clear">Apagar conversa</string>
     <string name="chat_send">Enviar</string>
     <string name="episode_chat">Conversar com episódio</string>

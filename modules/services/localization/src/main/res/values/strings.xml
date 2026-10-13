@@ -2572,11 +2572,10 @@
     <string name="chat_feedback_legal">Submitting shares this conversation with us to help improve chat.</string>
     <string name="chat_feedback_learn_more">Learn more</string>
     <string name="chat_send">Send</string>
+    <string name="chat_not_sent_tap_to_retry">Not sent. Tap to try again.</string>
+    <string name="chat_error_server_on_our_end">Something went wrong on our end.</string>
     <string name="chat_clear">Clear Chat</string>
     <string name="chat_offline_note">You’re offline. Connect to ask a question.</string>
-    <string name="chat_error_server">Something went wrong. Please try again.</string>
-    <string name="chat_error_network">Unable to reach the server. Check your connection.</string>
-    <string name="chat_tap_to_retry">Tap to retry</string>
     <string name="chat_play_quote">Play quote</string>
 
     <!--    Tasker Plugin-->
