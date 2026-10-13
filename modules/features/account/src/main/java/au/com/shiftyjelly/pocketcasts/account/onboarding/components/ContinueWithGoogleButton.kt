@@ -57,6 +57,7 @@ fun ContinueWithGoogleButton(
     ) { result ->
         viewModel.onGoogleLegacySignInResult(
             result = result,
+            flow = flow,
             onSuccess = onComplete,
             onError = showError,
         )
