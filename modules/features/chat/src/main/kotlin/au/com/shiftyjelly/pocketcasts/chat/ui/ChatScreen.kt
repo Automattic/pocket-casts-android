@@ -229,6 +229,7 @@ private fun ChatContent(
                             text = data.message,
                             fontSize = 13.sp,
                             lineHeight = 18.sp,
+                            letterSpacing = 0.sp,
                             fontWeight = FontWeight.SemiBold,
                         )
                     }
