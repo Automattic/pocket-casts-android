@@ -31,6 +31,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -202,6 +203,7 @@ private fun ChatContent(
                             rating = uiState.answerRatings[answerUuid],
                             onRate = { rating -> onRateAnswer(answerUuid, rating) },
                             theme = theme,
+                            modifier = Modifier.padding(top = 8.dp),
                         )
                     }
                 }
@@ -219,10 +221,17 @@ private fun ChatContent(
                 hostState = snackbarHostState,
                 snackbar = { data, _ ->
                     Snackbar(
-                        snackbarData = data,
                         backgroundColor = Color.White,
-                        contentColor = Color.Black,
-                    )
+                        contentColor = theme.onWhiteText,
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                    ) {
+                        Text(
+                            text = data.message,
+                            fontSize = 13.sp,
+                            lineHeight = 18.sp,
+                            fontWeight = FontWeight.SemiBold,
+                        )
+                    }
                 },
                 modifier = Modifier.align(Alignment.BottomCenter),
             )
@@ -249,7 +258,7 @@ private fun ChatDisclaimer(
 ) {
     Text(
         text = stringResource(LR.string.chat_ai_disclaimer),
-        color = theme.secondaryText,
+        color = theme.inputHint,
         fontSize = 12.sp,
         lineHeight = 16.sp,
         modifier = modifier.fillMaxWidth(),
