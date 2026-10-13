@@ -54,7 +54,7 @@ internal fun ChatSurvey(
             modifier = Modifier
                 .width(56.dp)
                 .height(4.dp)
-                .background(theme.secondaryText, RoundedCornerShape(2.dp)),
+                .background(theme.sheetHandle, RoundedCornerShape(2.dp)),
         )
         Text(
             text = stringResource(LR.string.chat_survey_title),
@@ -63,10 +63,10 @@ internal fun ChatSurvey(
             lineHeight = 25.sp,
             fontWeight = FontWeight.SemiBold,
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(top = 48.dp, bottom = 40.dp),
+            modifier = Modifier.padding(top = 48.dp, bottom = 46.dp),
         )
         Row(
-            horizontalArrangement = Arrangement.SpaceEvenly,
+            horizontalArrangement = Arrangement.spacedBy(87.dp, Alignment.CenterHorizontally),
             modifier = Modifier.fillMaxWidth(),
         ) {
             SurveyAnswer(
@@ -95,16 +95,17 @@ private fun SurveyAnswer(
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
         modifier = modifier
+            .width(88.dp)
             .clip(RoundedCornerShape(16.dp))
             .clickable(role = Role.Button, onClick = onClick)
             .semantics(mergeDescendants = true) {}
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(vertical = 8.dp),
     ) {
         Text(
             text = emoji,
-            fontSize = 56.sp,
+            fontSize = 68.sp,
             modifier = Modifier.clearAndSetSemantics {},
         )
         Text(
