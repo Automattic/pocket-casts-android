@@ -177,8 +177,8 @@ private fun ChatContent(
             .collect { isFollowingNewest = scrollState.maxValue - scrollState.value <= followThresholdPx }
     }
     val newestMessage = uiState.messages.lastOrNull()
-    LaunchedEffect(newestMessage?.uuid) {
-        if (newestMessage is ChatMessage.User) {
+    LaunchedEffect(newestMessage?.uuid, uiState.isAwaitingReply) {
+        if (uiState.isAwaitingReply && newestMessage is ChatMessage.User) {
             isFollowingNewest = true
         }
     }
