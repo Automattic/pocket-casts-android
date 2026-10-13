@@ -79,8 +79,10 @@ internal fun ChatInputBar(
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
                 keyboardActions = KeyboardActions(onSend = {
-                    onSend()
-                    keyboardController?.hide()
+                    if (canSend) {
+                        onSend()
+                        keyboardController?.hide()
+                    }
                 }),
                 textStyle = TextStyle(
                     color = theme.inputText,
