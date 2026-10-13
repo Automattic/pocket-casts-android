@@ -274,7 +274,16 @@ private fun ChatContent(
                         }
                     }
                 }
-                if (uiState.isAwaitingReply) {
+                val isReduceMotionEnabled = rememberIsReduceMotionEnabled()
+                AnimatedVisibility(
+                    visible = uiState.isAwaitingReply || uiState.isAnswerLanding(initialMessageUuids),
+                    enter = EnterTransition.None,
+                    exit = if (uiState.error != null && !isReduceMotionEnabled) {
+                        fadeOut(tween(ANSWER_CROSS_FADE_MS))
+                    } else {
+                        ExitTransition.None
+                    },
+                ) {
                     ThinkingBubble(
                         theme = theme,
                         modifier = Modifier.padding(top = TypingIndicatorExtraGap),
@@ -322,6 +331,11 @@ private fun ChatContent(
 }
 
 private val FollowNewestThreshold = 48.dp
+
+private fun ChatUiState.isAnswerLanding(initialMessageUuids: Set<String>): Boolean {
+    val newestMessage = messages.lastOrNull()
+    return error == null && newestMessage is ChatMessage.User && newestMessage.uuid !in initialMessageUuids
+}
 private val TypingIndicatorExtraGap = 8.dp
 
 @Composable
