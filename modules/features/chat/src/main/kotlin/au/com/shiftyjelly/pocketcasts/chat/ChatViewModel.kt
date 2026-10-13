@@ -156,8 +156,10 @@ class ChatViewModel @Inject constructor(
     }
 
     fun onPlayPauseClick() {
-        quotePlaybackJob?.cancel()
+        val previousJob = quotePlaybackJob
+        previousJob?.cancel()
         viewModelScope.launch(ioDispatcher) {
+            previousJob?.join()
             val state = playbackManager.playbackStateFlow.first()
             val isCurrent = state.episodeUuid == episodeUuid && !state.isEmpty && !state.isStopped && !state.isError
             when {
@@ -244,8 +246,10 @@ class ChatViewModel @Inject constructor(
                 quoteSource = EpisodeChatQuoteSourceType.InlineTimestamp,
             ),
         )
-        quotePlaybackJob?.cancel()
+        val previousJob = quotePlaybackJob
+        previousJob?.cancel()
         quotePlaybackJob = applicationScope.launch(ioDispatcher) {
+            previousJob?.join()
             val episode = episodeManager.findEpisodeByUuid(episodeUuid)
             if (episode == null || !quote.isWithinEpisode(episode.durationMs)) return@launch
             val state = playbackManager.playbackStateFlow.first()
