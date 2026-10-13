@@ -146,7 +146,7 @@ class ChatViewModel @Inject constructor(
 
     fun onPlayPauseClick() {
         val quoteJob = endQuoteWithoutRestoring()
-        viewModelScope.launch {
+        viewModelScope.launch(ioDispatcher) {
             quoteJob?.join()
             val state = playbackManager.playbackStateFlow.first()
             val isCurrent = state.episodeUuid == episodeUuid && !state.isEmpty && !state.isStopped && !state.isError
