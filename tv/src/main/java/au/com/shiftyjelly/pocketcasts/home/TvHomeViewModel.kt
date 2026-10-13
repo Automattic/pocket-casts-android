@@ -264,7 +264,7 @@ class TvHomeViewModel @Inject constructor(
 
     fun trackBannerTapped(banner: TvDiscoverBanner) = discoverFeedAnalytics.trackBannerTapped(banner)
 
-    fun isPlaying(): Boolean = playbackManager.isPlaying()
+    fun isPodcastAudioActive(): Boolean = playbackManager.playbackStateRelay.blockingFirst().let { it.isPlaying || it.transientLoss }
 
     fun playEpisode(episode: TvDiscoverEpisode) {
         viewModelScope.launch {
