@@ -279,15 +279,6 @@ enum class Feature(
         hasDevToggle = true,
         addedOn = LocalDate.parse("2026-10-05"),
     ),
-    EPISODE_CHAT_PLAYABLE_QUOTES(
-        key = "episode_chat_playable_quotes",
-        title = "Episode Chat: Playable Quotes",
-        defaultValue = isDebugOrPrototypeBuild,
-        tier = FeatureTier.Plus(),
-        hasFirebaseRemoteFlag = true,
-        hasDevToggle = true,
-        addedOn = LocalDate.parse("2026-04-27"),
-    ),
     AI_SUMMARIES(
         key = "ai_summaries",
         title = "AI Summaries",

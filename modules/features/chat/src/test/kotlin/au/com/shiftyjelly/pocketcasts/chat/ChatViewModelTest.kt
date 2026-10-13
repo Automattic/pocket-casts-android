@@ -14,10 +14,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.NetworkConnectionWat
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
-import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.automattic.eventhorizon.EpisodeChatBetaSheetDismissedEvent
 import com.automattic.eventhorizon.EpisodeChatBetaSheetShownEvent
 import com.automattic.eventhorizon.EpisodeChatErrorType
@@ -67,9 +64,6 @@ import org.mockito.kotlin.whenever
 class ChatViewModelTest {
     @get:Rule
     val coroutineRule = MainCoroutineRule()
-
-    @get:Rule
-    val featureFlagRule = InMemoryFeatureFlagRule()
 
     private val chatManager = TestChatManager()
     private val playbackState = MutableStateFlow(PlaybackState())
@@ -1017,7 +1011,6 @@ class ChatViewModelTest {
         quote: ChatMessage.Quote,
         episodeDurationMs: Int = 123_000,
     ): Boolean {
-        FeatureFlag.setEnabled(Feature.EPISODE_CHAT_PLAYABLE_QUOTES, true)
         chatManager.messages.value = listOf(quote)
         setEpisodeInfo(episodeDurationMs)
         advanceUntilIdle()
