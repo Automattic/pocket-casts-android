@@ -214,8 +214,8 @@ class ChatViewModel @Inject constructor(
     }
 
     fun onSend() {
+        if (!_uiState.value.canSend) return
         val text = _uiState.value.inputText.trim()
-        if (text.isEmpty()) return
 
         _uiState.update { it.copy(inputText = "") }
         performSend(message = ChatMessage.User(text = text), inputType = EpisodeChatInputType.Typed)
