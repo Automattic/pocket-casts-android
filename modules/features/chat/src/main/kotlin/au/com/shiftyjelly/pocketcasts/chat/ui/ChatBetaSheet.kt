@@ -34,7 +34,8 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 internal fun ChatBetaSheet(
     theme: ChatTheme,
-    onClickGotIt: () -> Unit,
+    buttonText: String,
+    onClickButton: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -72,12 +73,12 @@ internal fun ChatBetaSheet(
         )
         Spacer(modifier = Modifier.height(24.dp))
         RowButton(
-            text = stringResource(LR.string.got_it),
+            text = buttonText,
             textColor = theme.background,
             fontWeight = FontWeight.SemiBold,
             colors = ButtonDefaults.buttonColors(backgroundColor = theme.primaryText),
             includePadding = false,
-            onClick = onClickGotIt,
+            onClick = onClickButton,
             modifier = Modifier.fillMaxWidth(),
         )
     }
@@ -91,7 +92,8 @@ private fun ChatBetaSheetPreview(
     AppThemeWithBackground(themeType) {
         ChatBetaSheet(
             theme = rememberChatTheme(),
-            onClickGotIt = {},
+            buttonText = stringResource(LR.string.got_it),
+            onClickButton = {},
         )
     }
 }

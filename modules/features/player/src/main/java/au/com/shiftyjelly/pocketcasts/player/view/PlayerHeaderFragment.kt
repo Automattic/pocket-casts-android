@@ -82,6 +82,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import au.com.shiftyjelly.pocketcasts.ads.AdReportFragment
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.chat.ChatFragment
+import au.com.shiftyjelly.pocketcasts.chat.ChatSignInSheetFragment
 import au.com.shiftyjelly.pocketcasts.chat.EpisodeChatAccess
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.LocalPodcastColors
@@ -299,6 +300,9 @@ class PlayerHeaderFragment :
         observeShelfItemNavigationState()
         observeTranscriptPageTransition()
         observeSnackbarMessages()
+        parentFragmentManager.setFragmentResultListener(ChatSignInSheetFragment.SIGN_IN_RESULT_KEY, viewLifecycleOwner) { _, _ ->
+            shelfSharedViewModel.onEpisodeChatSignInClick()
+        }
     }
 
     private fun observeNavigationState() {
@@ -440,6 +444,10 @@ class PlayerHeaderFragment :
                         }
 
                         is NavigationState.ShowEpisodeChat -> showEpisodeChat(navigationState)
+
+                        NavigationState.StartEpisodeChatSignIn -> {
+                            OnboardingLauncher.openOnboardingFlow(requireActivity(), OnboardingFlow.LoggedOut)
+                        }
                     }
                 }
             }
@@ -513,6 +521,7 @@ class PlayerHeaderFragment :
     override fun onResume() {
         super.onResume()
         isEpisodeChatUpsellOpening = false
+        shelfSharedViewModel.onReturnFromEpisodeChatSignIn()
     }
 
     private fun isMoreActionsOpen() = childFragmentManager.findFragmentByTag(MORE_ACTIONS_TAG) != null
@@ -545,6 +554,14 @@ class PlayerHeaderFragment :
                     podcastColors = PodcastColors(navigationState.podcast),
                 ).show(parentFragmentManager, "episode_chat")
             }
+        } else if (access is EpisodeChatAccess.SignIn) {
+            ChatSignInSheetFragment.show(
+                fragmentManager = parentFragmentManager,
+                episodeUuid = episode.uuid,
+                podcastUuid = episode.podcastUuid,
+                sourceView = SourceView.PLAYER,
+                podcastColors = PodcastColors(navigationState.podcast),
+            )
         } else if (!isEpisodeChatUpsellOpening) {
             isEpisodeChatUpsellOpening = true
             startUpsellFlow(OnboardingUpgradeSource.EPISODE_CHAT)

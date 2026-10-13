@@ -104,6 +104,9 @@ class ShelfSharedViewModel @Inject constructor(
     private val _snackbarMessages = MutableSharedFlow<SnackbarMessage>()
     val snackbarMessages = _snackbarMessages.asSharedFlow()
 
+    private var episodeChatSignInRequest: NavigationState.ShowEpisodeChat? = null
+    private var isAwaitingEpisodeChatSignIn = false
+
     private val videoStateFlow = combine(
         playbackManager.streamVideoState,
         playbackManager.streamHlsAvailable,
@@ -460,12 +463,35 @@ class ShelfSharedViewModel @Inject constructor(
             eventHorizon.track(EpisodeChatTooltipDismissedEvent)
         }
         dismissEpisodeChatTooltip()
+        showEpisodeChat(podcast, episode)
+    }
+
+    private fun showEpisodeChat(podcast: Podcast, episode: PodcastEpisode) {
         viewModelScope.launch {
             val access = EpisodeChatAccess.from(
                 isPlusUser = settings.cachedSubscription.value != null,
                 isSignedIn = syncManager.isLoggedIn(),
             )
-            _navigationState.emit(NavigationState.ShowEpisodeChat(podcast, episode, access))
+            val request = NavigationState.ShowEpisodeChat(podcast, episode, access)
+            episodeChatSignInRequest = request.takeIf { access == EpisodeChatAccess.SignIn }
+            _navigationState.emit(request)
+        }
+    }
+
+    fun onEpisodeChatSignInClick() {
+        if (episodeChatSignInRequest == null) return
+        settings.episodeChatBetaSheetSeen.set(true, updateModifiedAt = false)
+        isAwaitingEpisodeChatSignIn = true
+        viewModelScope.launch { _navigationState.emit(NavigationState.StartEpisodeChatSignIn) }
+    }
+
+    fun onReturnFromEpisodeChatSignIn() {
+        if (!isAwaitingEpisodeChatSignIn) return
+        isAwaitingEpisodeChatSignIn = false
+        val request = episodeChatSignInRequest ?: return
+        episodeChatSignInRequest = null
+        if (syncManager.isLoggedIn()) {
+            showEpisodeChat(request.podcast, request.episode)
         }
     }
 
@@ -560,6 +586,7 @@ class ShelfSharedViewModel @Inject constructor(
         data class StartUpsellFlow(val source: OnboardingUpgradeSource) : NavigationState
         data class AddEpisodeToPlaylist(val episodeUuid: String, val podcastUuid: String) : NavigationState
         data class ShowEpisodeChat(val podcast: Podcast, val episode: PodcastEpisode, val access: EpisodeChatAccess) : NavigationState
+        data object StartEpisodeChatSignIn : NavigationState
     }
 
     sealed interface SnackbarMessage {
