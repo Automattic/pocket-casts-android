@@ -30,6 +30,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
@@ -138,6 +139,7 @@ private fun ChatContent(
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
+    val initialMessageUuids = remember(uiState.areMessagesLoaded) { uiState.messages.mapTo(HashSet()) { it.uuid } }
 
     LaunchedEffect(uiState.messages.size, uiState.isAwaitingReply, scrollState.maxValue) {
         scrollState.scrollTo(scrollState.maxValue)
@@ -177,38 +179,50 @@ private fun ChatContent(
                 }
                 val answerUuidsByLastIndex = uiState.answerUuidsByLastIndex
                 uiState.messages.forEachIndexed { index, message ->
-                    when (message) {
-                        is ChatMessage.Assistant -> AiMessageBubble(
-                            text = message.displayText,
-                            theme = theme,
-                        )
+                    key(message.uuid) {
+                        val isNew = message.uuid !in initialMessageUuids
+                        when (message) {
+                            is ChatMessage.Assistant -> AiMessageBubble(
+                                text = message.displayText,
+                                theme = theme,
+                            )
 
-                        is ChatMessage.Quote -> AiQuoteBubble(
-                            quote = message.displayText,
-                            timestampLabel = message.timestampLabel,
-                            isPlayable = message.canPlay,
-                            theme = theme,
-                            onClickPlay = { onPlayQuote(message.uuid) },
-                        )
+                            is ChatMessage.Quote -> AiQuoteBubble(
+                                quote = message.displayText,
+                                timestampLabel = message.timestampLabel,
+                                isPlayable = message.canPlay,
+                                theme = theme,
+                                onClickPlay = { onPlayQuote(message.uuid) },
+                            )
 
-                        is ChatMessage.User -> UserMessageBubble(
-                            text = message.text,
-                            theme = theme,
-                            isNotSent = index == uiState.messages.lastIndex && uiState.error == ChatError.NetworkError,
-                            onRetry = onRetry,
-                        )
-                    }
-                    answerUuidsByLastIndex[index]?.let { answerUuid ->
-                        ChatAnswerRatingRow(
-                            rating = uiState.answerRatings[answerUuid],
-                            onRate = { rating -> onRateAnswer(answerUuid, rating) },
-                            theme = theme,
-                            modifier = Modifier.padding(top = 8.dp),
-                        )
+                            is ChatMessage.User -> ChatAppear(animate = isNew, rise = 8.dp) {
+                                UserMessageBubble(
+                                    text = message.text,
+                                    theme = theme,
+                                    isNotSent = index == uiState.messages.lastIndex && uiState.error == ChatError.NetworkError,
+                                    onRetry = onRetry,
+                                )
+                            }
+                        }
+                        answerUuidsByLastIndex[index]?.let { answerUuid ->
+                            ChatAppear(animate = isNew) {
+                                ChatAnswerRatingRow(
+                                    rating = uiState.answerRatings[answerUuid],
+                                    onRate = { rating -> onRateAnswer(answerUuid, rating) },
+                                    theme = theme,
+                                    modifier = Modifier.padding(top = 8.dp),
+                                )
+                            }
+                        }
                     }
                 }
-                if (uiState.messages.lastOrNull().isAnswer && !uiState.isAwaitingReply) {
-                    ChatDisclaimer(theme = theme)
+                val lastMessage = uiState.messages.lastOrNull()
+                if (lastMessage.isAnswer && !uiState.isAwaitingReply) {
+                    key(lastMessage?.uuid) {
+                        ChatAppear(animate = lastMessage?.uuid !in initialMessageUuids) {
+                            ChatDisclaimer(theme = theme)
+                        }
+                    }
                 }
                 if (uiState.isAwaitingReply) {
                     ThinkingBubble(theme = theme)
