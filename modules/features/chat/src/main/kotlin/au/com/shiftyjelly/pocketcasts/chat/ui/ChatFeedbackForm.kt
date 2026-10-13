@@ -133,7 +133,7 @@ internal fun ChatFeedbackForm(
                     fontSize = 13.sp,
                     textAlign = TextAlign.Center,
                     modifier = Modifier
-                        .padding(top = 24.dp)
+                        .padding(top = if (showDetails) 28.dp else 12.dp)
                         .semantics { liveRegion = LiveRegionMode.Polite },
                 )
             }
@@ -149,14 +149,21 @@ internal fun ChatFeedbackForm(
                     disabledContentColor = if (isSubmitting) theme.onWhiteText else theme.onWhiteText.copy(alpha = 0.5f),
                 ),
                 modifier = Modifier
-                    .padding(top = if (hasSubmitError) 12.dp else 24.dp)
+                    .padding(
+                        top = when {
+                            !hasSubmitError -> 24.dp
+                            showDetails -> 20.dp
+                            else -> 28.dp
+                        },
+                    )
                     .fillMaxWidth()
                     .heightIn(min = 56.dp),
             ) {
                 if (isSubmitting) {
                     val sending = stringResource(LR.string.chat_feedback_sending)
                     CircularProgressIndicator(
-                        color = theme.background,
+                        color = theme.onWhiteText,
+                        backgroundColor = theme.onWhiteText.copy(alpha = 0.3f),
                         strokeWidth = 2.dp,
                         modifier = Modifier
                             .size(24.dp)
