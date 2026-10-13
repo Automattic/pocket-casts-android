@@ -11,7 +11,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.LocalTextStyle
+import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -42,45 +45,47 @@ internal fun ChatSurvey(
     onClickYes: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier
-            .fillMaxWidth()
-            .background(theme.background)
-            .navigationBarsPadding()
-            .padding(start = 24.dp, end = 24.dp, top = 8.dp, bottom = 32.dp),
-    ) {
-        Box(
-            modifier = Modifier
-                .width(56.dp)
-                .height(4.dp)
-                .background(theme.sheetHandle, RoundedCornerShape(2.dp)),
-        )
-        Text(
-            text = stringResource(LR.string.chat_survey_title),
-            color = theme.primaryText,
-            fontSize = 20.sp,
-            lineHeight = 25.sp,
-            fontWeight = FontWeight.SemiBold,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(top = 48.dp, bottom = 46.dp),
-        )
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(87.dp, Alignment.CenterHorizontally),
-            modifier = Modifier.fillMaxWidth(),
+    ProvideTextStyle(LocalTextStyle.current.copy(letterSpacing = 0.sp)) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = modifier
+                .fillMaxWidth()
+                .background(theme.background)
+                .navigationBarsPadding()
+                .padding(start = 24.dp, end = 24.dp, top = 8.dp, bottom = 32.dp),
         ) {
-            SurveyAnswer(
-                emoji = NOT_REALLY_EMOJI,
-                label = stringResource(LR.string.chat_survey_not_really),
-                onClick = onClickNotReally,
-                theme = theme,
+            Box(
+                modifier = Modifier
+                    .width(56.dp)
+                    .height(4.dp)
+                    .background(theme.sheetHandle, RoundedCornerShape(2.dp)),
             )
-            SurveyAnswer(
-                emoji = YES_EMOJI,
-                label = stringResource(LR.string.chat_survey_yes),
-                onClick = onClickYes,
-                theme = theme,
+            Text(
+                text = stringResource(LR.string.chat_survey_title),
+                color = theme.primaryText,
+                fontSize = 20.sp,
+                lineHeight = 25.sp,
+                fontWeight = FontWeight.SemiBold,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(top = 48.dp, bottom = 46.dp),
             )
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(87.dp, Alignment.CenterHorizontally),
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                SurveyAnswer(
+                    emoji = NOT_REALLY_EMOJI,
+                    label = stringResource(LR.string.chat_survey_not_really),
+                    onClick = onClickNotReally,
+                    theme = theme,
+                )
+                SurveyAnswer(
+                    emoji = YES_EMOJI,
+                    label = stringResource(LR.string.chat_survey_yes),
+                    onClick = onClickYes,
+                    theme = theme,
+                )
+            }
         }
     }
 }
@@ -97,7 +102,7 @@ private fun SurveyAnswer(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(12.dp),
         modifier = modifier
-            .width(88.dp)
+            .widthIn(min = 88.dp)
             .clip(RoundedCornerShape(16.dp))
             .clickable(role = Role.Button, onClick = onClick)
             .semantics(mergeDescendants = true) {}
