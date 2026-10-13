@@ -36,12 +36,16 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
@@ -66,6 +70,7 @@ import au.com.shiftyjelly.pocketcasts.compose.PodcastColorsParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.components.ThemedSnackbarHost
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatMessage
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
+import kotlinx.coroutines.flow.filter
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -150,8 +155,23 @@ private fun ChatContent(
     val scrollState = rememberScrollState()
     val initialMessageUuids = remember(uiState.areMessagesLoaded) { uiState.messages.mapTo(HashSet()) { it.uuid } }
 
+    val followThresholdPx = with(LocalDensity.current) { FollowNewestThreshold.roundToPx() }
+    var isFollowingNewest by remember { mutableStateOf(true) }
+    LaunchedEffect(scrollState) {
+        snapshotFlow { scrollState.isScrollInProgress }
+            .filter { inProgress -> !inProgress }
+            .collect { isFollowingNewest = scrollState.maxValue - scrollState.value <= followThresholdPx }
+    }
+    val newestMessage = uiState.messages.lastOrNull()
+    LaunchedEffect(newestMessage?.uuid) {
+        if (newestMessage is ChatMessage.User) {
+            isFollowingNewest = true
+        }
+    }
     LaunchedEffect(uiState.messages.size, uiState.isAwaitingReply, scrollState.maxValue) {
-        scrollState.scrollTo(scrollState.maxValue)
+        if (isFollowingNewest) {
+            scrollState.scrollTo(scrollState.maxValue)
+        }
     }
 
     Column(
@@ -286,6 +306,8 @@ private fun ChatContent(
         )
     }
 }
+
+private val FollowNewestThreshold = 48.dp
 
 private val ChatMessage?.isAnswer get() = this is ChatMessage.Assistant || this is ChatMessage.Quote
 
