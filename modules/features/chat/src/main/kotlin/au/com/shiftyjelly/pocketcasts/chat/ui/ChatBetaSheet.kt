@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -40,46 +41,49 @@ internal fun ChatBetaSheet(
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(12.dp),
         modifier = modifier
             .fillMaxWidth()
             .background(theme.background)
             .navigationBarsPadding()
             .padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 20.dp),
     ) {
-        Pill(backgroundColor = theme.secondaryText)
-        Spacer(modifier = Modifier.height(12.dp))
+        Pill(backgroundColor = theme.sheetHandle)
+        Spacer(modifier = Modifier.height(36.dp))
         Icon(
             painter = painterResource(IR.drawable.ic_episode_chat),
             contentDescription = null,
-            tint = theme.secondaryText,
-            modifier = Modifier.size(28.dp),
+            tint = theme.tertiaryText,
+            modifier = Modifier.size(30.dp),
         )
+        Spacer(modifier = Modifier.height(18.dp))
         Text(
             text = stringResource(LR.string.chat_beta_sheet_title),
             color = theme.primaryText,
-            fontSize = 20.sp,
-            lineHeight = 26.sp,
+            fontSize = 22.sp,
+            lineHeight = 25.sp,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
         )
         Text(
             text = stringResource(LR.string.chat_beta_sheet_body),
-            color = theme.secondaryText,
+            color = theme.tertiaryText,
             fontSize = 15.sp,
-            lineHeight = 20.sp,
+            lineHeight = 21.sp,
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(horizontal = 16.dp),
+            modifier = Modifier.padding(top = 10.dp, start = 25.dp, end = 25.dp),
         )
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(48.dp))
         RowButton(
             text = buttonText,
-            textColor = theme.background,
+            textColor = theme.onWhiteText,
+            fontSize = 18.sp,
             fontWeight = FontWeight.SemiBold,
             colors = ButtonDefaults.buttonColors(backgroundColor = theme.primaryText),
             includePadding = false,
             onClick = onClickButton,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = 56.dp),
         )
     }
 }
