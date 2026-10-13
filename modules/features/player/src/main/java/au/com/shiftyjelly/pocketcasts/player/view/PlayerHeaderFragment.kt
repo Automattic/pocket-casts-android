@@ -133,6 +133,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog.ButtonType.Danger
+import au.com.shiftyjelly.pocketcasts.views.extensions.applyLightToastStyle
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
@@ -512,7 +513,7 @@ class PlayerHeaderFragment :
                         SnackbarMessage.EpisodeChatNeedsTranscript -> LR.string.episode_chat_needs_transcript_message
                         SnackbarMessage.ShareNotAvailable -> LR.string.sharing_is_not_available_for_private_podcasts
                     }
-                    showSnackBar(text = getString(text))
+                    showSnackBar(text = getString(text), isLight = message == SnackbarMessage.EpisodeChatNeedsTranscript)
                 }
             }
         }
@@ -610,9 +611,11 @@ class PlayerHeaderFragment :
             .show()
     }
 
-    private fun showSnackBar(text: CharSequence) {
+    private fun showSnackBar(text: CharSequence, isLight: Boolean = false) {
         parentFragment?.view?.let {
-            Snackbar.make(it, text, Snackbar.LENGTH_SHORT).show()
+            Snackbar.make(it, text, Snackbar.LENGTH_SHORT)
+                .apply { if (isLight) applyLightToastStyle() }
+                .show()
         }
     }
 

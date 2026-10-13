@@ -21,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.requireString
+import au.com.shiftyjelly.pocketcasts.views.extensions.applyLightToastStyle
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -87,7 +88,7 @@ class ShelfBottomSheet : BaseDialogFragment() {
 
     private fun showSnackbar(text: String) {
         val root = dialog?.window?.decorView?.findViewById<View>(android.R.id.content) ?: return
-        Snackbar.make(root, text, Snackbar.LENGTH_LONG).show()
+        Snackbar.make(root, text, Snackbar.LENGTH_LONG).applyLightToastStyle().show()
     }
 
     companion object {
