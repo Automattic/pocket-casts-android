@@ -2,15 +2,15 @@ package au.com.shiftyjelly.pocketcasts.chat.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconToggleButton
+import androidx.compose.material.LocalMinimumInteractiveComponentEnforcement
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.layout.layout
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -25,6 +25,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 internal fun ChatAnswerRatingRow(
     rating: ChatAnswerRating?,
@@ -33,24 +34,18 @@ internal fun ChatAnswerRatingRow(
     modifier: Modifier = Modifier,
 ) {
     Row(
-        horizontalArrangement = Arrangement.spacedBy((-4).dp),
-        modifier = modifier
-            .offset(x = (-14).dp)
-            .layout { measurable, constraints ->
-                val placeable = measurable.measure(constraints)
-                val inset = (placeable.height - IconSize.roundToPx()) / 2
-                layout(placeable.width, placeable.height - inset * 2) {
-                    placeable.place(0, -inset)
-                }
-            },
+        horizontalArrangement = Arrangement.spacedBy(24.dp),
+        modifier = modifier,
     ) {
-        ChatAnswerRating.entries.forEach { option ->
-            RatingButton(
-                rating = option,
-                isSelected = option == rating,
-                onClick = { onRate(option) },
-                theme = theme,
-            )
+        CompositionLocalProvider(LocalMinimumInteractiveComponentEnforcement provides false) {
+            ChatAnswerRating.entries.forEach { option ->
+                RatingButton(
+                    rating = option,
+                    isSelected = option == rating,
+                    onClick = { onRate(option) },
+                    theme = theme,
+                )
+            }
         }
     }
 }
