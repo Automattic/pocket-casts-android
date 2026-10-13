@@ -5,12 +5,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -24,6 +26,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathOperation
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
@@ -56,6 +59,9 @@ fun TooltipPopup(
     anchorOffset: DpOffset = DpOffset.Zero,
     properties: PopupProperties = PopupProperties(dismissOnClickOutside = false),
     clickableElevationPadding: Boolean = false,
+    contentPadding: PaddingValues = TooltipDefaults.ContentPadding,
+    titleStyle: TextStyle? = null,
+    bodyStyle: TextStyle? = null,
     onClick: (() -> Unit)? = null,
     onClickOutside: (() -> Unit)? = null,
 ) {
@@ -94,6 +100,9 @@ fun TooltipPopup(
                 body = body,
                 tipPosition = tipPosition,
                 elevation = elevation,
+                contentPadding = contentPadding,
+                titleStyle = titleStyle,
+                bodyStyle = bodyStyle,
                 modifier = Modifier
                     .then(
                         if (maxWidthFraction != null) {
@@ -128,6 +137,9 @@ fun Tooltip(
     modifier: Modifier = Modifier,
     body: String? = null,
     elevation: Dp = 16.dp,
+    contentPadding: PaddingValues = TooltipDefaults.ContentPadding,
+    titleStyle: TextStyle? = null,
+    bodyStyle: TextStyle? = null,
 ) {
     val tooltipShape = TooltipShape(tipPosition)
     val (backgroundColor, titleColor, descriptionColor) = rememberTooltipColors()
@@ -139,25 +151,33 @@ fun Tooltip(
             .then(modifier),
     ) {
         Column(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
+            modifier = Modifier.padding(contentPadding),
         ) {
             if (tipPosition.isTopAligned()) {
                 Spacer(
                     modifier = Modifier.height(TipHeight),
                 )
             }
-            TextH40(
-                text = title,
-                color = titleColor,
-            )
+            if (titleStyle != null) {
+                Text(text = title, color = titleColor, style = titleStyle)
+            } else {
+                TextH40(
+                    text = title,
+                    color = titleColor,
+                )
+            }
             if (body != null) {
                 Spacer(
                     modifier = Modifier.height(4.dp),
                 )
-                TextP50(
-                    text = body,
-                    color = descriptionColor,
-                )
+                if (bodyStyle != null) {
+                    Text(text = body, color = descriptionColor, style = bodyStyle)
+                } else {
+                    TextP50(
+                        text = body,
+                        color = descriptionColor,
+                    )
+                }
             }
             if (tipPosition.isBottomAligned()) {
                 Spacer(
@@ -166,6 +186,10 @@ fun Tooltip(
             }
         }
     }
+}
+
+object TooltipDefaults {
+    val ContentPadding = PaddingValues(horizontal = 16.dp, vertical = 14.dp)
 }
 
 enum class TipPosition {
