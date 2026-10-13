@@ -13,12 +13,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.text.style.TextIndent
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -29,14 +36,41 @@ internal fun AiMessageBubble(
     theme: ChatTheme,
     modifier: Modifier = Modifier,
 ) {
+    val textMeasurer = rememberTextMeasurer()
+    val density = LocalDensity.current
+    val bulletIndent = remember(textMeasurer, density) {
+        with(density) { textMeasurer.measure(BULLET_PREFIX, AiMessageTextStyle).size.width.toSp() }
+    }
+    val styledText = remember(text, bulletIndent) { text.withHangingBullets(bulletIndent) }
     Text(
-        text = text,
+        text = styledText,
         color = theme.aiBubbleText,
-        fontSize = 15.sp,
-        lineHeight = 20.sp,
+        style = AiMessageTextStyle,
         modifier = modifier.fillMaxWidth(),
     )
 }
+
+private fun String.withHangingBullets(indent: TextUnit): AnnotatedString {
+    val lines = lines()
+    return buildAnnotatedString {
+        lines.forEachIndexed { index, line ->
+            val isBullet = line.startsWith(BULLET_PREFIX)
+            if (isBullet && lines.getOrNull(index - 1)?.startsWith(BULLET_PREFIX) == true) {
+                append("\n")
+            }
+            val lineText = if (index < lines.lastIndex) "$line\n" else line
+            if (isBullet) {
+                withStyle(ParagraphStyle(textIndent = TextIndent(restLine = indent))) { append(lineText) }
+            } else {
+                append(lineText)
+            }
+        }
+    }
+}
+
+private const val BULLET_PREFIX = "•  "
+
+private val AiMessageTextStyle = TextStyle(fontSize = 15.sp, lineHeight = 20.sp)
 
 @Composable
 internal fun AiQuoteBubble(
