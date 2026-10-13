@@ -9,6 +9,7 @@ import com.automattic.eventhorizon.EpisodeChatSurveyResponseSubmittedEvent
 import com.automattic.eventhorizon.EpisodeChatSurveyShownEvent
 import com.automattic.eventhorizon.EventHorizon
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -64,8 +65,8 @@ class ChatSurveyViewModelTest {
         val viewModel = createViewModel()
         eventSink.skipEvent()
 
-        viewModel.onAnswer(isPositive = false)
-        viewModel.onAnswer(isPositive = true)
+        assertTrue(viewModel.onAnswer(isPositive = false))
+        assertFalse(viewModel.onAnswer(isPositive = true))
 
         assertEquals(
             EpisodeChatSentimentType.Negative,

@@ -45,8 +45,8 @@ class ChatSurveyViewModel @Inject constructor(
         )
     }
 
-    fun onAnswer(isPositive: Boolean) {
-        if (isAnswered) return
+    fun onAnswer(isPositive: Boolean): Boolean {
+        if (isAnswered) return false
         isAnswered = true
         eventHorizon.track(
             EpisodeChatSurveyResponseSubmittedEvent(
@@ -56,6 +56,7 @@ class ChatSurveyViewModel @Inject constructor(
                 response = if (isPositive) EpisodeChatSentimentType.Positive else EpisodeChatSentimentType.Negative,
             ),
         )
+        return true
     }
 
     fun onDismissed() {

@@ -37,6 +37,7 @@ dependencies {
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.coroutines.core)
     implementation(libs.fragment.ktx)
+    implementation(libs.lottie.compose)
 
     implementation(projects.modules.features.settings)
     implementation(projects.modules.services.analytics)

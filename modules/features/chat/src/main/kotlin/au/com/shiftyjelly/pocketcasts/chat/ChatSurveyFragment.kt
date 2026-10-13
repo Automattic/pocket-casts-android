@@ -80,7 +80,7 @@ class ChatSurveyFragment : BaseDialogFragment() {
     }
 
     private fun answer(isPositive: Boolean) {
-        viewModel.onAnswer(isPositive)
+        if (!viewModel.onAnswer(isPositive)) return
         if (isPositive) {
             showChatFeedbackThanks()
         } else {
