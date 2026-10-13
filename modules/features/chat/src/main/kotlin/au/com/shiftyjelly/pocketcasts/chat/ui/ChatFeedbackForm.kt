@@ -85,15 +85,14 @@ internal fun ChatFeedbackForm(
             modifier = Modifier
                 .width(56.dp)
                 .height(4.dp)
-                .background(theme.secondaryText, RoundedCornerShape(2.dp)),
+                .background(theme.tertiaryText, RoundedCornerShape(2.dp)),
         )
         Text(
             text = stringResource(LR.string.chat_feedback_title).uppercase(),
-            color = theme.secondaryText,
+            color = theme.tertiaryText,
             fontSize = 13.sp,
             fontWeight = FontWeight.Bold,
-            letterSpacing = 0.6.sp,
-            modifier = Modifier.padding(top = 24.dp, bottom = 16.dp),
+            modifier = Modifier.padding(top = 20.dp, bottom = 25.dp),
         )
         Column(modifier = Modifier.selectableGroup()) {
             ChatFeedback.Reason.entries.forEach { option ->
@@ -123,9 +122,9 @@ internal fun ChatFeedbackForm(
             elevation = null,
             colors = ButtonDefaults.buttonColors(
                 backgroundColor = theme.primaryText,
-                contentColor = theme.background,
-                disabledBackgroundColor = theme.primaryText.copy(alpha = 0.4f),
-                disabledContentColor = theme.background,
+                contentColor = theme.onWhiteText,
+                disabledBackgroundColor = theme.primaryText.copy(alpha = 0.5f),
+                disabledContentColor = theme.onWhiteText.copy(alpha = 0.5f),
             ),
             modifier = Modifier
                 .padding(top = 24.dp)
@@ -189,22 +188,22 @@ private fun DetailsField(
     BasicTextField(
         value = details,
         onValueChange = onDetailsChange,
-        textStyle = TextStyle(color = theme.inputText, fontSize = 15.sp, lineHeight = 20.sp),
+        textStyle = TextStyle(color = theme.inputText, fontSize = 15.sp, lineHeight = 21.sp),
         cursorBrush = SolidColor(theme.primaryText),
         decorationBox = { innerTextField ->
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(min = 96.dp)
-                    .background(theme.inputBackground, RoundedCornerShape(12.dp))
-                    .padding(horizontal = 12.dp, vertical = 10.dp),
+                    .height(155.dp)
+                    .background(theme.inputBackground, RoundedCornerShape(26.dp))
+                    .padding(horizontal = 16.dp, vertical = 15.dp),
             ) {
                 if (details.isEmpty()) {
                     Text(
                         text = hint,
-                        color = theme.inputHint,
+                        color = theme.detailsHint,
                         fontSize = 15.sp,
-                        lineHeight = 20.sp,
+                        lineHeight = 21.sp,
                     )
                 }
                 innerTextField()
@@ -212,7 +211,7 @@ private fun DetailsField(
         },
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 12.dp)
+            .padding(top = 3.dp)
             .semantics { contentDescription = hint },
     )
 }
@@ -240,9 +239,9 @@ private fun LegalNote(
     }
     Text(
         text = text,
-        color = theme.secondaryText,
+        color = theme.tertiaryText,
         fontSize = 13.sp,
-        lineHeight = 16.sp,
+        lineHeight = 15.sp,
         textAlign = TextAlign.Center,
         modifier = modifier,
     )
