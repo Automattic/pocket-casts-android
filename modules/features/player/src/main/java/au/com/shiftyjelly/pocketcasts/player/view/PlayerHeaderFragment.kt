@@ -446,7 +446,7 @@ class PlayerHeaderFragment :
                         is NavigationState.ShowEpisodeChat -> showEpisodeChat(navigationState)
 
                         NavigationState.StartEpisodeChatSignIn -> {
-                            OnboardingLauncher.openOnboardingFlow(requireActivity(), OnboardingFlow.LoggedOut)
+                            OnboardingLauncher.openOnboardingFlow(requireActivity(), OnboardingFlow.EpisodeChatSignIn)
                         }
                     }
                 }
