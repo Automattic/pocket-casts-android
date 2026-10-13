@@ -404,7 +404,7 @@ private fun ChatServerError(
             Icon(
                 painter = painterResource(IR.drawable.ic_alert_small),
                 contentDescription = null,
-                tint = theme.secondaryText,
+                tint = theme.tertiaryText,
                 modifier = Modifier.size(20.dp),
             )
             Text(

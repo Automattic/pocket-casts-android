@@ -58,7 +58,7 @@ internal fun ChatInputBar(
         if (!isConnected) {
             ChatOfflineNote(
                 theme = theme,
-                modifier = Modifier.padding(bottom = 8.dp),
+                modifier = Modifier.padding(bottom = 18.dp),
             )
         }
         Row(
@@ -138,10 +138,10 @@ internal fun ChatInputBar(
         if (showBetaNote) {
             Text(
                 text = stringResource(LR.string.chat_beta_note),
-                color = theme.secondaryText,
+                color = theme.inputHint,
                 fontSize = 12.sp,
                 lineHeight = 16.sp,
-                modifier = Modifier.padding(bottom = 8.dp),
+                modifier = Modifier.padding(top = 10.dp, bottom = 8.dp),
             )
         }
     }
@@ -160,12 +160,12 @@ private fun ChatOfflineNote(
         Icon(
             painter = painterResource(IR.drawable.ic_wifi_off),
             contentDescription = null,
-            tint = theme.secondaryText,
+            tint = theme.tertiaryText,
             modifier = Modifier.size(16.dp),
         )
         Text(
             text = stringResource(LR.string.chat_offline_note),
-            color = theme.secondaryText,
+            color = theme.tertiaryText,
             fontSize = 13.sp,
         )
     }
