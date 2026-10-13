@@ -3,12 +3,14 @@ package au.com.shiftyjelly.pocketcasts.chat.ui
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.Icon
 import androidx.compose.material.IconToggleButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -31,8 +33,16 @@ internal fun ChatAnswerRatingRow(
     modifier: Modifier = Modifier,
 ) {
     Row(
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-        modifier = modifier.offset(x = (-14).dp),
+        horizontalArrangement = Arrangement.spacedBy((-4).dp),
+        modifier = modifier
+            .offset(x = (-14).dp)
+            .layout { measurable, constraints ->
+                val placeable = measurable.measure(constraints)
+                val inset = (placeable.height - IconSize.roundToPx()) / 2
+                layout(placeable.width, placeable.height - inset * 2) {
+                    placeable.place(0, -inset)
+                }
+            },
     ) {
         ChatAnswerRating.entries.forEach { option ->
             RatingButton(
@@ -61,11 +71,20 @@ private fun RatingButton(
         Icon(
             painter = painterResource(if (isSelected) IR.drawable.ic_chat_thumb_down_filled else IR.drawable.ic_chat_thumb_down),
             contentDescription = stringResource(rating.labelRes),
-            tint = theme.rating,
-            modifier = Modifier.rotate(if (rating == ChatAnswerRating.Positive) 180f else 0f),
+            tint = if (isSelected) theme.primaryText else theme.rating,
+            modifier = Modifier
+                .size(IconSize)
+                .graphicsLayer {
+                    when (rating) {
+                        ChatAnswerRating.Positive -> scaleY = -1f
+                        ChatAnswerRating.Negative -> scaleX = -1f
+                    }
+                },
         )
     }
 }
+
+private val IconSize = 20.dp
 
 private val ChatAnswerRating.labelRes
     get() = when (this) {
