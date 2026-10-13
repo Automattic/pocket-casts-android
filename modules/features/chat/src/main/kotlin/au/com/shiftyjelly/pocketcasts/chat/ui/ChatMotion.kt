@@ -7,6 +7,7 @@ import android.os.Looper
 import android.provider.Settings
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.EaseOut
 import androidx.compose.animation.core.MutableTransitionState
@@ -86,13 +87,11 @@ internal fun ChatFadeOut(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
-    if (rememberIsReduceMotionEnabled()) return
-    val visibility = remember { MutableTransitionState(true) }
-    visibility.targetState = false
+    val visibility = remember { MutableTransitionState(true).apply { targetState = false } }
     AnimatedVisibility(
         visibleState = visibility,
         enter = EnterTransition.None,
-        exit = fadeOut(tween(durationMillis)),
+        exit = if (rememberIsReduceMotionEnabled()) ExitTransition.None else fadeOut(tween(durationMillis)),
         modifier = modifier,
     ) {
         content()
