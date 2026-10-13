@@ -218,9 +218,6 @@ Language: pt_BR
     <string name="summary">Resumo</string>
     <string name="episode_summary">Resumo do episódio</string>
     <string name="chat_play_quote">Reproduzir citação</string>
-    <string name="chat_tap_to_retry">Toque para tentar novamente</string>
-    <string name="chat_error_network">Não foi possível acessar o servidor. Verifique sua conexão.</string>
-    <string name="chat_error_server">Ocorreu um erro. Tente novamente.</string>
     <string name="chat_send">Enviar</string>
     <string name="episode_chat">Conversar com episódio</string>
     <string name="blogs_experiment_banner_body">Ainda estamos experimentando os blogs. Pode funcionar, precisar de ajustes ou ser deixado de lado.</string>

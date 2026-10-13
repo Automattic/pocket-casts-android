@@ -33,6 +33,7 @@ internal data class ChatTheme(
     val sheetHandle: Color,
     val detailsHint: Color,
     val rating: Color,
+    val errorText: Color,
 ) {
     companion object {
         fun default(colors: ThemeColors) = ChatTheme(
@@ -59,6 +60,7 @@ internal data class ChatTheme(
             sheetHandle = ThemeLightColors.primaryUi05,
             detailsHint = ThemeLightColors.primaryText02,
             rating = colors.primaryIcon02,
+            errorText = colors.support05,
         )
 
         fun player(colors: PlayerColors) = ChatTheme(
@@ -85,6 +87,7 @@ internal data class ChatTheme(
             sheetHandle = ThemeLightColors.primaryUi05,
             detailsHint = ThemeLightColors.primaryText02,
             rating = colors.contrast05,
+            errorText = ErrorRed,
         )
     }
 }
@@ -104,3 +107,4 @@ internal fun rememberChatTheme(): ChatTheme {
 }
 
 private val QuoteTimestampBlue = Color(0xFF2A67F9)
+private val ErrorRed = Color(0xFFF43E37)
