@@ -224,15 +224,10 @@ Language: fr
     <string name="chat_error_server">Un problème est survenu. Veuillez réessayer.</string>
     <string name="chat_clear">Effacer la discussion</string>
     <string name="chat_send">Envoyer</string>
-    <string name="chat_input_hint">Poser une question sur cet épisode…</string>
     <string name="chat_preview_user_2">Des conseils pratiques ont-ils été mentionnés ?</string>
     <string name="chat_preview_ai_2">Cet épisode se penche sur les mécanismes scientifiques qui sous-tendent la formation des habitudes, en expliquant comment de petits gestes quotidiens peuvent, au fil du temps, déboucher sur de grands changements.</string>
     <string name="chat_preview_user_1">Quel était le thème principal de cet épisode ?</string>
     <string name="chat_preview_ai_1">Bonjour ! Je suis là pour vous aider à découvrir cet épisode. N’hésitez pas à me poser toutes vos questions sur les sujets abordés, les points clés à retenir ou des moments précis.</string>
-    <string name="chat_thinking">EN COURS DE RÉFLEXION</string>
-    <string name="chat_episode_assistant">ASSISTANT ÉPISODE</string>
-    <string name="chat_context_label_with_duration">Discussion sur cet épisode · %1$s</string>
-    <string name="chat_context_label">Discussion sur cet épisode</string>
     <string name="chat_paywall_title">Discuter de cet épisode ·</string>
     <string name="episode_chat">Discuter de l’épisode ·</string>
     <string name="blogs_experiment_banner_body">Nous sommes en train de tester les blogs. Ça pourrait rester, être retravaillé ou disparaître discrètement.</string>

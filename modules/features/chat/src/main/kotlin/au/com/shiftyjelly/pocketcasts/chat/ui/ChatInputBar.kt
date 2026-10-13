@@ -5,11 +5,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -18,7 +18,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -64,8 +64,8 @@ internal fun ChatInputBar(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(
-                    start = 12.dp,
-                    end = 12.dp,
+                    start = 16.dp,
+                    end = 16.dp,
                     bottom = 8.dp,
                 ),
         ) {
@@ -81,7 +81,8 @@ internal fun ChatInputBar(
                 }),
                 textStyle = TextStyle(
                     color = theme.inputText,
-                    fontSize = 16.sp,
+                    fontSize = 15.sp,
+                    lineHeight = 20.sp,
                 ),
                 cursorBrush = SolidColor(theme.sendButton),
                 decorationBox = { innerTextField ->
@@ -89,14 +90,16 @@ internal fun ChatInputBar(
                         contentAlignment = Alignment.CenterStart,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .background(theme.inputBackground, InputShape)
-                            .padding(horizontal = 16.dp, vertical = 10.dp),
+                            .heightIn(min = 44.dp)
+                            .background(theme.inputBackground, CircleShape)
+                            .padding(horizontal = 16.dp, vertical = 12.dp),
                     ) {
                         if (text.isEmpty()) {
                             Text(
-                                text = stringResource(LR.string.chat_input_hint),
+                                text = stringResource(LR.string.chat_input_question_hint),
                                 color = theme.inputHint,
-                                fontSize = 16.sp,
+                                fontSize = 15.sp,
+                                lineHeight = 20.sp,
                             )
                         }
                         innerTextField()
@@ -112,18 +115,18 @@ internal fun ChatInputBar(
                 enabled = canSend,
                 modifier = Modifier
                     .padding(start = 8.dp)
-                    .size(36.dp)
+                    .size(44.dp)
                     .clip(CircleShape)
                     .background(
-                        if (canSend) theme.sendButton else theme.divider,
+                        if (canSend) theme.sendButton else theme.inputBackground,
                         CircleShape,
                     ),
             ) {
                 Icon(
-                    imageVector = Icons.AutoMirrored.Filled.Send,
+                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                     contentDescription = stringResource(LR.string.chat_send),
                     tint = if (canSend) theme.sendButtonIcon else theme.inputHint,
-                    modifier = Modifier.size(18.dp),
+                    modifier = Modifier.size(24.dp),
                 )
             }
         }
@@ -138,5 +141,3 @@ internal fun ChatInputBar(
         }
     }
 }
-
-private val InputShape = RoundedCornerShape(24.dp)

@@ -224,15 +224,10 @@ Language: pt_BR
     <string name="chat_error_server">Ocorreu um erro. Tente novamente.</string>
     <string name="chat_clear">Apagar conversa</string>
     <string name="chat_send">Enviar</string>
-    <string name="chat_input_hint">Pergunte sobre este episódio…</string>
     <string name="chat_preview_user_2">Foram mencionadas algumas dicas práticas?</string>
     <string name="chat_preview_ai_2">Este episódio mergulha na ciência da formação de hábitos, explorando como pequenas rotinas diárias podem levar a grandes mudanças ao longo do tempo.</string>
     <string name="chat_preview_user_1">Qual foi o tema principal deste episódio?</string>
     <string name="chat_preview_ai_1">Oi! Estou aqui para ajudar você a conhecer este episódio. Pergunte-me qualquer coisa sobre os assuntos abordados, os principais aprendizados ou momentos específicos.</string>
-    <string name="chat_thinking">PENSANDO</string>
-    <string name="chat_episode_assistant">ASSISTENTE DE EPISÓDIOS</string>
-    <string name="chat_context_label_with_duration">Conversando com este episódio · %1$s</string>
-    <string name="chat_context_label">Conversando com este episódio</string>
     <string name="chat_paywall_title">Conversar com este episódio</string>
     <string name="episode_chat">Conversar com episódio</string>
     <string name="blogs_experiment_banner_body">Ainda estamos experimentando os blogs. Pode funcionar, precisar de ajustes ou ser deixado de lado.</string>
