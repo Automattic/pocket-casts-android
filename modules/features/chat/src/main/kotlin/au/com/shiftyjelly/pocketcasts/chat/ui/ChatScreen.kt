@@ -246,7 +246,10 @@ private fun ChatContent(
                 ) {
                     ThinkingBubble(theme = theme)
                 }
-                ChatAnsweringAnnouncement(isAnswering = uiState.isAwaitingReply)
+                ChatAnsweringAnnouncement(
+                    isAnswering = uiState.isAwaitingReply,
+                    answer = uiState.messages.newestAnswerText(excluding = initialMessageUuids),
+                )
                 if (uiState.error == ChatError.ServerError) {
                     ChatServerError(theme = theme, isRetryEnabled = uiState.isConnected, onRetry = onRetry)
                 }
@@ -303,15 +306,32 @@ private fun ChatDisclaimer(
 @Composable
 private fun ChatAnsweringAnnouncement(
     isAnswering: Boolean,
+    answer: String?,
     modifier: Modifier = Modifier,
 ) {
     val answering = stringResource(LR.string.chat_answering)
     Box(
         modifier = modifier.semantics {
             liveRegion = LiveRegionMode.Polite
-            contentDescription = if (isAnswering) answering else ""
+            contentDescription = when {
+                isAnswering -> answering
+                answer != null -> answer
+                else -> ""
+            }
         },
     )
+}
+
+private fun List<ChatMessage>.newestAnswerText(excluding: Set<String>): String? {
+    val answer = takeLastWhile { it.isAnswer }
+    if (answer.isEmpty() || answer.any { it.uuid in excluding }) return null
+    return answer.joinToString(separator = "\n") { message ->
+        when (message) {
+            is ChatMessage.Assistant -> message.displayText
+            is ChatMessage.Quote -> message.displayText
+            is ChatMessage.User -> message.text
+        }
+    }
 }
 
 @Composable
