@@ -59,7 +59,7 @@ fun TooltipPopup(
     anchorOffset: DpOffset = DpOffset.Zero,
     properties: PopupProperties = PopupProperties(dismissOnClickOutside = false),
     clickableElevationPadding: Boolean = false,
-    contentPadding: PaddingValues = TooltipDefaults.ContentPadding,
+    contentPadding: PaddingValues = TooltipContentPadding,
     titleStyle: TextStyle? = null,
     bodyStyle: TextStyle? = null,
     onClick: (() -> Unit)? = null,
@@ -137,7 +137,7 @@ fun Tooltip(
     modifier: Modifier = Modifier,
     body: String? = null,
     elevation: Dp = 16.dp,
-    contentPadding: PaddingValues = TooltipDefaults.ContentPadding,
+    contentPadding: PaddingValues = TooltipContentPadding,
     titleStyle: TextStyle? = null,
     bodyStyle: TextStyle? = null,
 ) {
@@ -188,9 +188,7 @@ fun Tooltip(
     }
 }
 
-object TooltipDefaults {
-    val ContentPadding = PaddingValues(horizontal = 16.dp, vertical = 14.dp)
-}
+private val TooltipContentPadding = PaddingValues(horizontal = 16.dp, vertical = 14.dp)
 
 enum class TipPosition {
     TopStart,
