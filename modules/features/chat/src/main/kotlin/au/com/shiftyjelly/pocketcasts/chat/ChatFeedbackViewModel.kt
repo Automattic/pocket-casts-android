@@ -17,7 +17,6 @@ import com.automattic.eventhorizon.EpisodeChatFeedbackTriggerType
 import com.automattic.eventhorizon.EventHorizon
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
@@ -57,6 +56,10 @@ class ChatFeedbackViewModel @Inject constructor(
         set(value) {
             savedStateHandle[IS_SUBMITTED_KEY] = value
         }
+
+    init {
+        if (isSubmitted) _submitted.trySend(Unit)
+    }
 
     fun onShown(
         episodeUuid: String,
@@ -108,25 +111,23 @@ class ChatFeedbackViewModel @Inject constructor(
         )
         _uiState.update { it.copy(isSubmitting = true, hasSubmitError = false) }
         val request = applicationScope.async {
-            feedbackManager.submit(
-                ChatFeedback(
-                    episodeUuid = episodeUuid,
-                    podcastUuid = podcastUuid,
-                    reason = reason,
-                    details = details,
-                    conversation = chatManager.observeMessages(episodeUuid).first(),
-                ),
-            )
+            runCatching {
+                feedbackManager.submit(
+                    ChatFeedback(
+                        episodeUuid = episodeUuid,
+                        podcastUuid = podcastUuid,
+                        reason = reason,
+                        details = details,
+                        conversation = chatManager.observeMessages(episodeUuid).first(),
+                    ),
+                )
+            }.onFailure { LogBuffer.e(LOG_TAG, it, "Failed to submit episode chat feedback") }
         }
         viewModelScope.launch {
-            try {
-                request.await()
+            if (request.await().isSuccess) {
                 isSubmitted = true
                 _submitted.send(Unit)
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
-                LogBuffer.e(LOG_TAG, "Failed to submit episode chat feedback: ${e.message}")
+            } else {
                 _uiState.update { it.copy(isSubmitting = false, hasSubmitError = true) }
             }
         }

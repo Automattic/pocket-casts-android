@@ -193,6 +193,19 @@ class ChatFeedbackViewModelTest {
     }
 
     @Test
+    fun `restored after a successful submit emits submitted again`() = runTest {
+        createViewModel().apply {
+            onReasonSelected(ChatFeedback.Reason.WrongFacts)
+            submit()
+        }
+        advanceUntilIdle()
+
+        createViewModel().submitted.test {
+            awaitItem()
+        }
+    }
+
+    @Test
     fun `details are capped`() {
         val viewModel = createViewModel()
         viewModel.onReasonSelected(ChatFeedback.Reason.Other)

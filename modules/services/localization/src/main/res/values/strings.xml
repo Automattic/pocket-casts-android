@@ -2574,6 +2574,7 @@
     <string name="chat_feedback_reason_offensive">It’s offensive</string>
     <string name="chat_feedback_reason_other">Other</string>
     <string name="chat_feedback_details_hint">Share details (optional)</string>
+    <string name="chat_feedback_sending">Sending feedback</string>
     <string name="chat_feedback_send_failed">Couldn’t send your feedback. Check your connection.</string>
     <string name="chat_feedback_submit">Submit feedback</string>
     <string name="chat_feedback_legal">Submitting shares this conversation with us to help improve chat.</string>
