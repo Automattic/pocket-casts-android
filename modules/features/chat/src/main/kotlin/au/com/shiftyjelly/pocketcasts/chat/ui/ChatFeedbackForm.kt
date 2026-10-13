@@ -26,6 +26,8 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.LocalTextStyle
+import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.RadioButton
 import androidx.compose.material.RadioButtonDefaults
 import androidx.compose.material.Text
@@ -71,77 +73,79 @@ internal fun ChatFeedbackForm(
     theme: ChatTheme,
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier
-            .fillMaxWidth()
-            .background(theme.background)
-            .navigationBarsPadding()
-            .imePadding()
-            .verticalScroll(rememberScrollState())
-            .padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 16.dp),
-    ) {
-        Box(
-            modifier = Modifier
-                .width(56.dp)
-                .height(4.dp)
-                .background(theme.tertiaryText, RoundedCornerShape(2.dp)),
-        )
-        Text(
-            text = stringResource(LR.string.chat_feedback_title).uppercase(),
-            color = theme.tertiaryText,
-            fontSize = 13.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(top = 20.dp, bottom = 25.dp),
-        )
-        Column(modifier = Modifier.selectableGroup()) {
-            ChatFeedback.Reason.entries.forEach { option ->
-                ReasonRow(
-                    label = option.labelRes,
-                    isSelected = option == reason,
-                    onClick = { onSelectReason(option) },
+    ProvideTextStyle(LocalTextStyle.current.copy(letterSpacing = 0.sp)) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = modifier
+                .fillMaxWidth()
+                .background(theme.background)
+                .navigationBarsPadding()
+                .imePadding()
+                .verticalScroll(rememberScrollState())
+                .padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 16.dp),
+        ) {
+            Box(
+                modifier = Modifier
+                    .width(56.dp)
+                    .height(4.dp)
+                    .background(theme.tertiaryText, RoundedCornerShape(2.dp)),
+            )
+            Text(
+                text = stringResource(LR.string.chat_feedback_title).uppercase(),
+                color = theme.tertiaryText,
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(top = 20.dp, bottom = 25.dp),
+            )
+            Column(modifier = Modifier.selectableGroup()) {
+                ChatFeedback.Reason.entries.forEach { option ->
+                    ReasonRow(
+                        label = option.labelRes,
+                        isSelected = option == reason,
+                        onClick = { onSelectReason(option) },
+                        theme = theme,
+                    )
+                }
+            }
+            AnimatedVisibility(
+                visible = showDetails,
+                enter = expandVertically() + fadeIn(),
+                exit = shrinkVertically() + fadeOut(),
+            ) {
+                DetailsField(
+                    details = details,
+                    onDetailsChange = onDetailsChange,
                     theme = theme,
                 )
             }
-        }
-        AnimatedVisibility(
-            visible = showDetails,
-            enter = expandVertically() + fadeIn(),
-            exit = shrinkVertically() + fadeOut(),
-        ) {
-            DetailsField(
-                details = details,
-                onDetailsChange = onDetailsChange,
+            Button(
+                onClick = onSubmit,
+                enabled = canSubmit,
+                shape = RoundedCornerShape(12.dp),
+                elevation = null,
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = theme.primaryText,
+                    contentColor = theme.onWhiteText,
+                    disabledBackgroundColor = theme.primaryText.copy(alpha = 0.5f),
+                    disabledContentColor = theme.onWhiteText.copy(alpha = 0.5f),
+                ),
+                modifier = Modifier
+                    .padding(top = 24.dp)
+                    .fillMaxWidth()
+                    .heightIn(min = 56.dp),
+            ) {
+                Text(
+                    text = stringResource(LR.string.chat_feedback_submit),
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.SemiBold,
+                )
+            }
+            LegalNote(
+                onClickLearnMore = onClickLearnMore,
                 theme = theme,
+                modifier = Modifier.padding(horizontal = 12.dp, vertical = 12.dp),
             )
         }
-        Button(
-            onClick = onSubmit,
-            enabled = canSubmit,
-            shape = RoundedCornerShape(12.dp),
-            elevation = null,
-            colors = ButtonDefaults.buttonColors(
-                backgroundColor = theme.primaryText,
-                contentColor = theme.onWhiteText,
-                disabledBackgroundColor = theme.primaryText.copy(alpha = 0.5f),
-                disabledContentColor = theme.onWhiteText.copy(alpha = 0.5f),
-            ),
-            modifier = Modifier
-                .padding(top = 24.dp)
-                .fillMaxWidth()
-                .heightIn(min = 56.dp),
-        ) {
-            Text(
-                text = stringResource(LR.string.chat_feedback_submit),
-                fontSize = 18.sp,
-                fontWeight = FontWeight.SemiBold,
-            )
-        }
-        LegalNote(
-            onClickLearnMore = onClickLearnMore,
-            theme = theme,
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 12.dp),
-        )
     }
 }
 
