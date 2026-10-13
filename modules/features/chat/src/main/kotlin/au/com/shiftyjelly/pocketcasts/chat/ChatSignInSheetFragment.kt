@@ -25,6 +25,7 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import com.automattic.eventhorizon.EpisodeChatBetaSheetDismissedEvent
 import com.automattic.eventhorizon.EpisodeChatBetaSheetShownEvent
+import com.automattic.eventhorizon.EpisodeChatBetaSheetSignInTappedEvent
 import com.automattic.eventhorizon.EventHorizon
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -100,6 +101,13 @@ class ChatSignInSheetFragment : BaseDialogFragment() {
     private fun signIn() {
         if (isSigningIn) return
         isSigningIn = true
+        eventHorizon.track(
+            EpisodeChatBetaSheetSignInTappedEvent(
+                source = args.sourceView.analyticsValue,
+                episodeUuid = args.episodeUuid,
+                podcastUuid = args.podcastUuid,
+            ),
+        )
         setFragmentResult(SIGN_IN_RESULT_KEY, Bundle.EMPTY)
         dismiss()
     }
