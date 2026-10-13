@@ -152,7 +152,7 @@ private fun ChatContent(
                 modifier = Modifier
                     .fillMaxSize()
                     .verticalScroll(scrollState)
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                    .padding(start = 16.dp, end = 16.dp, top = 24.dp, bottom = 12.dp),
             ) {
                 if (uiState.areMessagesLoaded) {
                     ChatWelcome(
