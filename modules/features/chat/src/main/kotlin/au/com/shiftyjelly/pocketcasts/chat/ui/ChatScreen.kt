@@ -124,20 +124,22 @@ fun ChatScreen(
         },
         modifier = modifier,
     ) {
-        ChatContent(
-            uiState = uiState,
-            theme = theme,
-            onClickClose = onClickClose,
-            onClickMore = onClickMore,
-            onClickPlayPause = onClickPlayPause,
-            onInputTextChange = onInputTextChange,
-            onSend = onSend,
-            onClickSuggestion = onClickSuggestion,
-            onRetry = onRetry,
-            onPlayQuote = onPlayQuote,
-            onRateAnswer = onRateAnswer,
-            snackbarHostState = snackbarHostState,
-        )
+        ProvideReduceMotion {
+            ChatContent(
+                uiState = uiState,
+                theme = theme,
+                onClickClose = onClickClose,
+                onClickMore = onClickMore,
+                onClickPlayPause = onClickPlayPause,
+                onInputTextChange = onInputTextChange,
+                onSend = onSend,
+                onClickSuggestion = onClickSuggestion,
+                onRetry = onRetry,
+                onPlayQuote = onPlayQuote,
+                onRateAnswer = onRateAnswer,
+                snackbarHostState = snackbarHostState,
+            )
+        }
     }
 }
 
