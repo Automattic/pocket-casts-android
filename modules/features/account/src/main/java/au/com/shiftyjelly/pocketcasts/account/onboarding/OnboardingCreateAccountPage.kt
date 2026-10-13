@@ -249,7 +249,7 @@ internal fun OnboardingCreateAccountPage(
                 showPasswordError = state.showPasswordError,
                 showPasswordErrorMessage = false,
                 enabled = state.enableSubmissionFields,
-                onConfirm = { viewModel.createAccount(onAccountCreated) },
+                onConfirm = { viewModel.createAccount(flow, onAccountCreated) },
                 onUpdateEmail = viewModel::updateEmail,
                 onUpdatePassword = viewModel::updatePassword,
                 isCreatingAccount = true,
@@ -283,7 +283,7 @@ internal fun OnboardingCreateAccountPage(
             RowButton(
                 text = stringResource(LR.string.create_account),
                 enabled = state.enableSubmissionFields,
-                onClick = { viewModel.createAccount(onAccountCreated) },
+                onClick = { viewModel.createAccount(flow, onAccountCreated) },
             )
         }
     }
