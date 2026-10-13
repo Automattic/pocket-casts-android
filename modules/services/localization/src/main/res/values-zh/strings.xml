@@ -224,11 +224,6 @@ Language: zh_CN
     <string name="chat_error_server">出错了。 请重试。</string>
     <string name="chat_clear">清除聊天记录</string>
     <string name="chat_send">发送</string>
-    <string name="chat_preview_user_2">是否提到了任何实用建议？</string>
-    <string name="chat_preview_ai_2">此剧集深入探讨了习惯养成的科学原理，由此分析了日常的微小习惯如何随着时间的推移带来巨大改变。</string>
-    <string name="chat_preview_user_1">此剧集的主要话题是什么？</string>
-    <string name="chat_preview_ai_1">您好！ 我将带您深入了解此剧集。 就所讨论的话题、关键要点或具体片段向我进行提问。</string>
-    <string name="chat_paywall_title">参与关于此剧集的讨论</string>
     <string name="episode_chat">参与剧集讨论</string>
     <string name="blogs_experiment_banner_body">博客是我们正在尝试推出的功能。 它可能会保留下来，也可能被优化调整，甚至悄然下架。</string>
     <string name="blogs_experiment_banner_lead">这只是一项试用版功能。</string>

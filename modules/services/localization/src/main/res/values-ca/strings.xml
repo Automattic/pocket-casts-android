@@ -219,12 +219,7 @@ Language: ca
     <string name="chat_error_server">S\'ha produït un error. Torna-ho a intentar.</string>
     <string name="chat_clear">Esborra el xat</string>
     <string name="chat_send">Envia</string>
-    <string name="chat_preview_user_2">S\'han esmentat consells pràctics?</string>
-    <string name="chat_preview_ai_2">Aquest episodi aprofundeix en la ciència de la formació d\'hàbits i explora com les petites rutines diàries poden generar grans canvis amb el temps.</string>
-    <string name="chat_preview_user_1">Quin era el tema principal d\'aquest episodi?</string>
     <string name="chat_tap_to_retry">Toca per a tornar-ho a intentar</string>
-    <string name="chat_preview_ai_1">Hola! Soc aquí per a ajudar-te a explorar aquest episodi. Pregunta\'m qualsevol cosa sobre els temes tractats, les conclusions principals o moments concrets.</string>
-    <string name="chat_paywall_title">Xateja sobre aquest episodi</string>
     <string name="episode_chat">Xateja sobre l\'episodi</string>
     <string name="blogs_experiment_banner_body">Els blogs són una cosa que estem experimentant. Pot quedar-se, remodelar-se, o desaparèixer sense fer soroll.</string>
     <string name="blogs_experiment_banner_lead">Això és un experiment.</string>

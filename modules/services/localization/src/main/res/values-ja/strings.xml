@@ -224,11 +224,6 @@ Language: ja_JP
     <string name="chat_error_server">エラーが発生しました。 もう一度お試しください。</string>
     <string name="chat_clear">チャットを消去</string>
     <string name="chat_send">送信</string>
-    <string name="chat_preview_user_2">何か実用的なアドバイスについて言及していましたか ?</string>
-    <string name="chat_preview_ai_2">このエピソードは習慣形成の科学に深く切り込み、日々の小さな習慣がどのようにして時間をかけて大きな変化につながるのかを探ります。</string>
-    <string name="chat_preview_user_1">このエピソードのメインテーマは何でしたか ?</string>
-    <string name="chat_preview_ai_1">こんにちは ! このエピソードの内容確認をお手伝いします。 議論されたトピック、重要なポイント、特定の場面について、何でも質問してください。</string>
-    <string name="chat_paywall_title">このエピソードについてチャットする</string>
     <string name="episode_chat">エピソードについてチャットする</string>
     <string name="blogs_experiment_banner_body">ブログ機能は実験中です。 継続する可能性や、手直しされる可能性、静かに消える可能性があります。</string>
     <string name="blogs_experiment_banner_lead">これは実験です。</string>
