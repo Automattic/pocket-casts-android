@@ -68,7 +68,7 @@ internal fun ChatHeader(
                     .minimumInteractiveComponentSize()
                     .size(32.dp)
                     .clip(CircleShape)
-                    .background(theme.closeButtonBackground)
+                    .background(theme.inputBackground)
                     .clickable(role = Role.Button, onClick = onClickClose),
             ) {
                 Icon(
@@ -108,7 +108,7 @@ internal fun ChatHeader(
                 Text(
                     text = episodeTitle,
                     color = theme.primaryText,
-                    fontSize = 15.sp,
+                    fontSize = 13.sp,
                     lineHeight = 18.sp,
                     fontWeight = FontWeight.SemiBold,
                     maxLines = 1,
@@ -116,8 +116,8 @@ internal fun ChatHeader(
                 )
                 Text(
                     text = podcastTitle,
-                    color = theme.secondaryText,
-                    fontSize = 15.sp,
+                    color = theme.tertiaryText,
+                    fontSize = 13.sp,
                     lineHeight = 18.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -136,13 +136,13 @@ internal fun ChatHeader(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(2.dp)
-                .background(theme.progressTrack),
+                .background(theme.inputHint),
         ) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth(playback.progress)
                     .height(2.dp)
-                    .background(theme.progress),
+                    .background(theme.progress, CircleShape),
             )
         }
     }
