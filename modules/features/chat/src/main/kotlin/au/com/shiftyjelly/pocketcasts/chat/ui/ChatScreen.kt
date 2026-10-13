@@ -25,8 +25,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
+import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
+import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Snackbar
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.Text
@@ -110,35 +112,37 @@ fun ChatScreen(
         onDismissBetaSheet()
     }
 
-    ModalBottomSheetLayout(
-        sheetState = betaSheetState,
-        sheetShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
-        sheetBackgroundColor = theme.background,
-        scrimColor = Color.Black.copy(alpha = 0.5f),
-        sheetContent = {
-            ChatBetaSheet(
-                theme = theme,
-                buttonText = stringResource(LR.string.got_it),
-                onClickButton = onDismissBetaSheet,
-            )
-        },
-        modifier = modifier,
-    ) {
-        ProvideReduceMotion {
-            ChatContent(
-                uiState = uiState,
-                theme = theme,
-                onClickClose = onClickClose,
-                onClickMore = onClickMore,
-                onClickPlayPause = onClickPlayPause,
-                onInputTextChange = onInputTextChange,
-                onSend = onSend,
-                onClickSuggestion = onClickSuggestion,
-                onRetry = onRetry,
-                onPlayQuote = onPlayQuote,
-                onRateAnswer = onRateAnswer,
-                snackbarHostState = snackbarHostState,
-            )
+    ProvideTextStyle(LocalTextStyle.current.copy(letterSpacing = 0.sp)) {
+        ModalBottomSheetLayout(
+            sheetState = betaSheetState,
+            sheetShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
+            sheetBackgroundColor = theme.background,
+            scrimColor = Color.Black.copy(alpha = 0.5f),
+            sheetContent = {
+                ChatBetaSheet(
+                    theme = theme,
+                    buttonText = stringResource(LR.string.got_it),
+                    onClickButton = onDismissBetaSheet,
+                )
+            },
+            modifier = modifier,
+        ) {
+            ProvideReduceMotion {
+                ChatContent(
+                    uiState = uiState,
+                    theme = theme,
+                    onClickClose = onClickClose,
+                    onClickMore = onClickMore,
+                    onClickPlayPause = onClickPlayPause,
+                    onInputTextChange = onInputTextChange,
+                    onSend = onSend,
+                    onClickSuggestion = onClickSuggestion,
+                    onRetry = onRetry,
+                    onPlayQuote = onPlayQuote,
+                    onRateAnswer = onRateAnswer,
+                    snackbarHostState = snackbarHostState,
+                )
+            }
         }
     }
 }
