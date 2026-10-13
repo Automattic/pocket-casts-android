@@ -78,6 +78,9 @@ class ChatFeedbackFragment : BaseDialogFragment() {
         savedInstanceState: Bundle?,
     ) = contentWithoutConsumedInsets {
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+        LaunchedEffect(Unit) {
+            viewModel.submitted.collect { onSubmitted() }
+        }
 
         AppTheme(theme.activeTheme) {
             CompositionLocalProvider(LocalPodcastColors provides args.podcastColors) {
@@ -91,9 +94,11 @@ class ChatFeedbackFragment : BaseDialogFragment() {
                     details = uiState.details,
                     showDetails = uiState.showDetails,
                     canSubmit = uiState.canSubmit,
+                    isSubmitting = uiState.isSubmitting,
+                    hasSubmitError = uiState.hasSubmitError,
                     onSelectReason = viewModel::onReasonSelected,
                     onDetailsChange = viewModel::onDetailsChange,
-                    onSubmit = ::submit,
+                    onSubmit = viewModel::submit,
                     onClickLearnMore = { context?.startActivityViewUrl(Settings.INFO_PRIVACY_URL) },
                     theme = rememberChatTheme(),
                 )
@@ -107,15 +112,13 @@ class ChatFeedbackFragment : BaseDialogFragment() {
         dialog?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
     }
 
-    private fun submit() {
-        if (viewModel.submit()) {
-            if (args.trigger == Trigger.ResponseRating) {
-                setFragmentResult(SUBMITTED_RESULT_KEY, Bundle.EMPTY)
-            } else {
-                showChatFeedbackThanks()
-            }
-            dismiss()
+    private fun onSubmitted() {
+        if (args.trigger == Trigger.ResponseRating) {
+            setFragmentResult(SUBMITTED_RESULT_KEY, Bundle.EMPTY)
+        } else {
+            showChatFeedbackThanks()
         }
+        dismiss()
     }
 
     override fun onDismiss(dialog: DialogInterface) {

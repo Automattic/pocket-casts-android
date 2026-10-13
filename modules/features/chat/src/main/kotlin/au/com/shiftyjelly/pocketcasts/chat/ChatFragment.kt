@@ -99,7 +99,7 @@ class ChatFragment : BaseDialogFragment() {
     ) = contentWithoutConsumedInsets {
         val uiState by viewModel.uiState.collectAsState()
         val snackbarHostState = remember { SnackbarHostState() }
-        val thanksMessage = stringResource(LR.string.chat_feedback_thanks)
+        val thanksMessage = stringResource(LR.string.chat_feedback_thank_you)
         LaunchedEffect(snackbarHostState) {
             viewModel.feedbackThanks.collectLatest {
                 snackbarHostState.currentSnackbarData?.dismiss()
