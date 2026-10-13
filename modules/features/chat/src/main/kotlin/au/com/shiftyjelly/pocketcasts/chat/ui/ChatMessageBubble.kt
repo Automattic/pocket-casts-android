@@ -165,4 +165,4 @@ internal fun ThinkingBubble(
     )
 }
 
-private val UserBubbleShape = RoundedCornerShape(16.dp)
+private val UserBubbleShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp, bottomEnd = 4.dp, bottomStart = 16.dp)
