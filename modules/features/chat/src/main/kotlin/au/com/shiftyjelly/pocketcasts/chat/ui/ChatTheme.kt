@@ -62,7 +62,7 @@ internal data class ChatTheme(
             userBubble = colors.contrast06,
             userBubbleText = colors.contrast01,
             inputBackground = colors.contrast06,
-            inputText = colors.contrast02,
+            inputText = colors.contrast01,
             inputHint = colors.contrast03,
             sendButton = colors.contrast01,
             sendButtonIcon = colors.background01,

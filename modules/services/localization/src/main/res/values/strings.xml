@@ -2569,6 +2569,16 @@
     <string name="chat_survey_not_really">Not really</string>
     <string name="chat_survey_yes">Yes!</string>
     <string name="chat_feedback_thanks">Thanks for the feedback</string>
+    <string name="chat_feedback_title">What went wrong</string>
+    <string name="chat_feedback_reason_not_interesting">It wasn’t interesting</string>
+    <string name="chat_feedback_reason_wrong_facts">It got the facts wrong</string>
+    <string name="chat_feedback_reason_out_of_date">It’s out of date</string>
+    <string name="chat_feedback_reason_offensive">It’s offensive</string>
+    <string name="chat_feedback_reason_other">Other</string>
+    <string name="chat_feedback_details_hint">Share details (optional)</string>
+    <string name="chat_feedback_submit">Submit feedback</string>
+    <string name="chat_feedback_legal">Submitting shares this conversation with us to help improve chat.</string>
+    <string name="chat_feedback_learn_more">Learn more</string>
     <string name="chat_send">Send</string>
     <string name="chat_clear">Clear Chat</string>
     <string name="chat_error_server">Something went wrong. Please try again.</string>
