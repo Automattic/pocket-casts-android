@@ -74,6 +74,7 @@ import au.com.shiftyjelly.pocketcasts.compose.PodcastColorsParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.components.ThemedSnackbarHost
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatMessage
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.filter
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -291,14 +292,14 @@ private fun ChatContent(
                         modifier = Modifier.padding(top = TypingIndicatorExtraGap),
                     )
                 }
-                ChatAnsweringAnnouncement(
-                    isAnswering = uiState.isAwaitingReply,
-                    answer = uiState.messages.newestAnswerText(excluding = initialMessageUuids),
-                )
                 if (uiState.error == ChatError.ServerError) {
                     ChatServerError(theme = theme, isRetryEnabled = uiState.isConnected, onRetry = onRetry)
                 }
             }
+            ChatAnsweringAnnouncement(
+                isAnswering = uiState.isAwaitingReply,
+                answer = uiState.messages.newestAnswerText(excluding = initialMessageUuids),
+            )
             ThemedSnackbarHost(
                 hostState = snackbarHostState,
                 snackbar = { data, _ ->
@@ -378,17 +379,28 @@ private fun ChatAnsweringAnnouncement(
     modifier: Modifier = Modifier,
 ) {
     val answering = stringResource(LR.string.chat_answering)
+    val target = when {
+        isAnswering -> answering
+        else -> answer
+    }
+    var announcement by remember { mutableStateOf("") }
+    LaunchedEffect(target) {
+        if (target == null) return@LaunchedEffect
+        announcement = target
+        delay(ANNOUNCEMENT_CLEAR_DELAY_MS)
+        announcement = ""
+    }
     Box(
-        modifier = modifier.semantics {
-            liveRegion = LiveRegionMode.Polite
-            contentDescription = when {
-                isAnswering -> answering
-                answer != null -> answer
-                else -> ""
-            }
-        },
+        modifier = modifier
+            .size(1.dp)
+            .semantics {
+                liveRegion = LiveRegionMode.Polite
+                contentDescription = announcement
+            },
     )
 }
+
+private const val ANNOUNCEMENT_CLEAR_DELAY_MS = 3_000L
 
 private fun List<ChatMessage>.newestAnswerText(excluding: Set<String>): String? {
     val answer = takeLastWhile { it.isAnswer }
