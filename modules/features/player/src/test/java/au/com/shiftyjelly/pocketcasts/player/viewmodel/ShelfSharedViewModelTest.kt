@@ -604,7 +604,7 @@ class ShelfSharedViewModelTest {
     }
 
     @Test
-    fun `when sign in tapped on the episode chat sheet, then beta sheet is marked seen and sign in starts`() = runTest {
+    fun `when sign in tapped on the episode chat sheet, then sign in starts`() = runTest {
         initViewModel(subscription = null)
         FeatureFlag.setEnabled(Feature.EPISODE_CHAT_FREE_BETA, true)
         whenever(syncManager.isLoggedIn()).thenReturn(false)
@@ -616,7 +616,7 @@ class ShelfSharedViewModelTest {
             shelfSharedViewModel.onEpisodeChatSignInClick()
             assertEquals(NavigationState.StartEpisodeChatSignIn, awaitItem())
         }
-        verify(episodeChatBetaSheetSeenSetting).set(true, updateModifiedAt = false)
+        verify(episodeChatBetaSheetSeenSetting, never()).set(true, updateModifiedAt = false)
     }
 
     @Test
@@ -636,6 +636,7 @@ class ShelfSharedViewModelTest {
             shelfSharedViewModel.onReturnFromEpisodeChatSignIn()
             expectNoEvents()
         }
+        verify(episodeChatBetaSheetSeenSetting).set(true, updateModifiedAt = false)
     }
 
     @Test

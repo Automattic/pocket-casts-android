@@ -479,8 +479,6 @@ class ShelfSharedViewModel @Inject constructor(
     }
 
     fun onEpisodeChatSignInClick() {
-        if (episodeChatSignInRequest == null) return
-        settings.episodeChatBetaSheetSeen.set(true, updateModifiedAt = false)
         isAwaitingEpisodeChatSignIn = true
         viewModelScope.launch { _navigationState.emit(NavigationState.StartEpisodeChatSignIn) }
     }
@@ -491,6 +489,7 @@ class ShelfSharedViewModel @Inject constructor(
         val request = episodeChatSignInRequest ?: return
         episodeChatSignInRequest = null
         if (syncManager.isLoggedIn()) {
+            settings.episodeChatBetaSheetSeen.set(true, updateModifiedAt = false)
             showEpisodeChat(request.podcast, request.episode)
         }
     }

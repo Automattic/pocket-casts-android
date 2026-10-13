@@ -98,6 +98,7 @@ class ChatSignInSheetFragment : BaseDialogFragment() {
     }
 
     private fun signIn() {
+        if (isSigningIn) return
         isSigningIn = true
         setFragmentResult(SIGN_IN_RESULT_KEY, Bundle.EMPTY)
         dismiss()
