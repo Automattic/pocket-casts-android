@@ -88,6 +88,15 @@ internal fun ChatHistory(
                 .semantics { heading() },
         )
         Box(modifier = Modifier.weight(1f)) {
+            if (sections.isEmpty()) {
+                Text(
+                    text = stringResource(LR.string.chat_history_empty),
+                    color = theme.tertiaryText,
+                    fontSize = 15.sp,
+                    lineHeight = 20.sp,
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                )
+            }
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 sections.forEach { section ->
                     item(key = section.group.name) {
@@ -195,6 +204,21 @@ private fun ChatHistoryRow(
                 modifier = Modifier.size(24.dp),
             )
         }
+    }
+}
+
+@Preview
+@Composable
+private fun ChatHistoryEmptyPreview() {
+    AppTheme(Theme.ThemeType.DARK) {
+        ChatHistory(
+            sections = emptyList(),
+            onClickBack = {},
+            onClickChat = {},
+            onDeleteChat = {},
+            snackbarHostState = remember { SnackbarHostState() },
+            theme = rememberChatTheme(),
+        )
     }
 }
 
