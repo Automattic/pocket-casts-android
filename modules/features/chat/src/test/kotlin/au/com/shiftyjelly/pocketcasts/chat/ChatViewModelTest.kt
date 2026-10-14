@@ -1745,6 +1745,60 @@ class ChatViewModelTest {
         assertEquals(listOf(EPISODE_UUID), chatManager.clearedEpisodeUuids)
     }
 
+    @Test
+    fun `history cannot open while an answer is pending`() = runTest {
+        setEpisodeInfo()
+        chatManager.sendMessageGate = CompletableDeferred()
+        viewModel.onInputTextChange("Question")
+        viewModel.onSend()
+        runCurrent()
+
+        viewModel.showHistory()
+
+        assertFalse(viewModel.uiState.value.isHistoryVisible)
+    }
+
+    @Test
+    fun `opening another chat restores its stored ratings`() = runTest {
+        val answer = ChatMessage.Assistant(text = "Answer", uuid = "answer-uuid", rating = ChatAnswerRating.Positive)
+        chatManager.otherMessages.value = listOf(ChatMessage.User(text = "Question", uuid = "question-uuid"), answer)
+        chatManager.messages.value = listOf(ChatMessage.User(text = "Question", uuid = "message-uuid"))
+        setEpisodeInfo()
+        advanceUntilIdle()
+
+        viewModel.openHistoryChat(historyItem(OTHER_EPISODE_UUID))
+        chatManager.messages.value = emptyList()
+        advanceUntilIdle()
+
+        assertEquals(mapOf("answer-uuid" to ChatAnswerRating.Positive), viewModel.uiState.value.answerRatings)
+    }
+
+    @Test
+    fun `undoing a quote after switching chats tracks the quote episode`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID, positionMs = 10_000)
+        playableState(quote)
+        viewModel.playQuote(quote.uuid)
+        advanceUntilIdle()
+        viewModel.openHistoryChat(historyItem(OTHER_EPISODE_UUID))
+        advanceUntilIdle()
+        eventSink.skipEvent(eventSink.size)
+
+        viewModel.undoQuotePlay()
+        advanceUntilIdle()
+
+        assertEquals(
+            EpisodeChatQuotePlayUndoneEvent(
+                source = SourceView.PLAYER.analyticsValue,
+                episodeUuid = EPISODE_UUID,
+                podcastUuid = PODCAST_UUID,
+            ),
+            eventSink.pollEvent(),
+        )
+        verify(playbackManager, never()).playNowSuspend(any<BaseEpisode>(), any(), any(), any())
+    }
+
     private fun historyItem(
         episodeUuid: String,
         podcastUuid: String = OTHER_PODCAST_UUID,

@@ -140,7 +140,6 @@ class ChatViewModel @Inject constructor(
     private fun openChat(episode: ChatEpisode) {
         sendJob?.cancel()
         transientUserMessage = null
-        quotePlaybackUndo = null
         _uiState.update {
             it.copy(
                 episodeUuid = episode.uuid,
@@ -162,8 +161,11 @@ class ChatViewModel @Inject constructor(
 
     private fun observeMessages() {
         viewModelScope.launch {
-            chatEpisode.filterNotNull().flatMapLatest { chatManager.observeMessages(it.uuid) }.collect { messages ->
+            chatEpisode.filterNotNull().flatMapLatest { episode ->
+                chatManager.observeMessages(episode.uuid).map { messages -> episode.uuid to messages }
+            }.collect { (messagesEpisodeUuid, messages) ->
                 _uiState.update { state ->
+                    if (state.episodeUuid != messagesEpisodeUuid) return@update state
                     state.copy(
                         messages = messages.withTransientUserMessage().withQuotePlaybackState(
                             episodeDurationMs = state.episodeDurationMs,
@@ -224,6 +226,7 @@ class ChatViewModel @Inject constructor(
     }
 
     fun onPlayPauseClick() {
+        val episodeUuid = episodeUuid
         val previousJob = quotePlaybackJob
         previousJob?.cancel()
         viewModelScope.launch(ioDispatcher) {
@@ -252,6 +255,7 @@ class ChatViewModel @Inject constructor(
     }
 
     fun showHistory() {
+        if (_uiState.value.isAwaitingReply) return
         _uiState.update { it.copy(isHistoryVisible = true) }
         eventHorizon.track(
             EpisodeChatHistoryShownEvent(
@@ -432,6 +436,7 @@ class ChatViewModel @Inject constructor(
             ),
         )
         val episodeUuid = episodeUuid
+        val podcastUuid = podcastUuid
         val previousJob = quotePlaybackJob
         previousJob?.cancel()
         quotePlaybackJob = applicationScope.launch(ioDispatcher) {
@@ -446,6 +451,8 @@ class ChatViewModel @Inject constructor(
             playbackManager.seekToTimeMsSuspend(positionMs = quote.startMs)
             playbackManager.playQueueSuspend(sourceView = sourceView)
             quotePlaybackUndo = quotePlaybackUndo ?: PlaybackPosition(
+                quoteEpisodeUuid = episodeUuid,
+                quotePodcastUuid = podcastUuid,
                 episodeUuid = state.episodeUuid.takeUnless { state.isEmpty || it.isEmpty() },
                 positionMs = state.positionMs,
                 isPlaying = state.isPlaying,
@@ -471,11 +478,10 @@ class ChatViewModel @Inject constructor(
         eventHorizon.track(
             EpisodeChatQuotePlayUndoneEvent(
                 source = sourceView.analyticsValue,
-                episodeUuid = episodeUuid,
-                podcastUuid = podcastUuid,
+                episodeUuid = undo.quoteEpisodeUuid,
+                podcastUuid = undo.quotePodcastUuid,
             ),
         )
-        val quoteEpisodeUuid = episodeUuid
         val previousJob = quotePlaybackJob
         previousJob?.cancel()
         quotePlaybackJob = applicationScope.launch(ioDispatcher) {
@@ -485,7 +491,7 @@ class ChatViewModel @Inject constructor(
                 playbackManager.pause(sourceView = sourceView)
                 return@launch
             }
-            if (previousEpisode.uuid != quoteEpisodeUuid) {
+            if (previousEpisode.uuid != undo.quoteEpisodeUuid) {
                 playbackManager.playNowSuspend(episode = previousEpisode, sourceView = sourceView)
                 val isLoaded = awaitPlaybackEpisode(previousEpisode.uuid)
                 if (!undo.isPlaying) {
@@ -720,6 +726,8 @@ private data class ChatEpisode(
 )
 
 private class PlaybackPosition(
+    val quoteEpisodeUuid: String,
+    val quotePodcastUuid: String,
     val episodeUuid: String?,
     val positionMs: Int,
     val isPlaying: Boolean,
