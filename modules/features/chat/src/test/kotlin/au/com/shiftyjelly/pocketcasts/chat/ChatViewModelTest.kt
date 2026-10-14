@@ -8,6 +8,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.EpisodeChatHistoryItem
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatAnswerRating
@@ -1608,7 +1609,11 @@ class ChatViewModelTest {
         var clearMessagesGate: CompletableDeferred<Unit>? = null
         val savedRatings = mutableListOf<Pair<String, ChatAnswerRating?>>()
 
+        val history = MutableStateFlow<List<EpisodeChatHistoryItem>>(emptyList())
+
         override fun observeMessages(episodeUuid: String): Flow<List<ChatMessage>> = observedMessages ?: messages
+
+        override fun observeHistory(): Flow<List<EpisodeChatHistoryItem>> = history
 
         override suspend fun createChat(episodeUuid: String, podcastUuid: String) {
             createdChats += CreateChat(episodeUuid, podcastUuid)

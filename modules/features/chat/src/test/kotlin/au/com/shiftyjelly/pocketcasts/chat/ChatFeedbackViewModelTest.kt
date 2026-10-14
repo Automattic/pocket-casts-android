@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
+import au.com.shiftyjelly.pocketcasts.models.to.EpisodeChatHistoryItem
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatAnswerRating
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatFeedback
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatFeedbackManager
@@ -257,6 +258,8 @@ class ChatFeedbackViewModelTest {
 
     private class TestChatManager(private val messages: List<ChatMessage>) : ChatManager {
         override fun observeMessages(episodeUuid: String): Flow<List<ChatMessage>> = flowOf(messages)
+
+        override fun observeHistory(): Flow<List<EpisodeChatHistoryItem>> = flowOf(emptyList())
 
         override suspend fun createChat(episodeUuid: String, podcastUuid: String) = Unit
 

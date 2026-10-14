@@ -7,6 +7,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeChat
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeChatMessage
+import au.com.shiftyjelly.pocketcasts.models.to.EpisodeChatHistoryItem
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -42,6 +43,25 @@ abstract class EpisodeChatDao {
         deleteMessagesByEpisode(episodeUuid)
         return messages
     }
+
+    @Query(
+        """
+        SELECT
+          episode_chats.episode_uuid AS episode_uuid,
+          podcast_episodes.title AS episode_title,
+          podcast_episodes.podcast_id AS podcast_uuid,
+          IFNULL(podcasts.title, '') AS podcast_title,
+          podcast_episodes.duration AS episode_duration,
+          MAX(episode_chat_messages.created_at) AS last_message_at
+        FROM episode_chats
+        JOIN episode_chat_messages ON episode_chat_messages.episode_uuid = episode_chats.episode_uuid
+        JOIN podcast_episodes ON podcast_episodes.uuid = episode_chats.episode_uuid
+        LEFT JOIN podcasts ON podcasts.uuid = podcast_episodes.podcast_id
+        GROUP BY episode_chats.episode_uuid
+        ORDER BY last_message_at DESC
+        """,
+    )
+    abstract fun observeChatHistory(): Flow<List<EpisodeChatHistoryItem>>
 
     @Query("UPDATE episode_chat_messages SET rating = :rating WHERE uuid = :uuid")
     abstract suspend fun updateRating(uuid: String, rating: String?)

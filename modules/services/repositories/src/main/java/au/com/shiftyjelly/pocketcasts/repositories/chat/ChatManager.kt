@@ -1,9 +1,12 @@
 package au.com.shiftyjelly.pocketcasts.repositories.chat
 
+import au.com.shiftyjelly.pocketcasts.models.to.EpisodeChatHistoryItem
 import kotlinx.coroutines.flow.Flow
 
 interface ChatManager {
     fun observeMessages(episodeUuid: String): Flow<List<ChatMessage>>
+
+    fun observeHistory(): Flow<List<EpisodeChatHistoryItem>>
 
     suspend fun createChat(
         episodeUuid: String,
