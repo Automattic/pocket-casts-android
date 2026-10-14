@@ -140,13 +140,14 @@ private fun Badge(text: String) {
         text = text,
         color = MaterialTheme.theme.colors.playerContrast01,
         fontSize = 12.sp,
+        lineHeight = 16.sp,
         fontWeight = FontWeight.Medium,
         modifier = Modifier
             .background(
                 color = MaterialTheme.theme.colors.playerContrast05,
-                shape = RoundedCornerShape(8.dp),
+                shape = RoundedCornerShape(4.dp),
             )
-            .padding(horizontal = 8.dp),
+            .padding(horizontal = 8.dp, vertical = 2.dp),
     )
 }
 

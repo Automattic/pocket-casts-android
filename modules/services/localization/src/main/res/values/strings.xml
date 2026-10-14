@@ -139,7 +139,7 @@
     <string name="episode_chat">Chat with Episode</string>
     <string name="episode_chat_shelf_title">Ask about this episode</string>
     <string name="episode_chat_beta_badge">Beta</string>
-    <string name="episode_chat_needs_transcript">Ask about this episode needs a transcript.</string>
+    <string name="episode_chat_needs_transcript_message">Ask about this episode needs a transcript. This episode doesn’t have one.</string>
     <string name="episode_chat_tooltip_body">Ask it anything. It was listening too.</string>
     <string name="transcript">Transcript</string>
     <string name="episode_description">Episode Description</string>
@@ -2549,6 +2549,7 @@
     <!-- Chat -->
     <string name="chat_beta_sheet_title">Ask about this episode is in beta</string>
     <string name="chat_beta_sheet_body">Free for everyone while we test it. It\'ll become a Plus feature later.</string>
+    <string name="chat_beta_sheet_sign_in">Sign in to try it</string>
     <string name="chat_beta_note">Ask about this episode is in beta</string>
     <string name="chat_input_question_hint">Ask a question…</string>
     <string name="chat_welcome">Ask about anything in this episode. Or start here.</string>
