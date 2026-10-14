@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.chat
 
 import au.com.shiftyjelly.pocketcasts.models.to.EpisodeChatHistoryItem
 import java.time.Instant
-import java.time.LocalDate
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 
@@ -19,9 +18,9 @@ data class ChatHistorySection(
 )
 
 internal fun List<EpisodeChatHistoryItem>.toHistorySections(now: Instant, zone: ZoneId): List<ChatHistorySection> {
-    val today = LocalDate.ofInstant(now, zone)
+    val today = now.atZone(zone).toLocalDate()
     return groupBy { item ->
-        val day = LocalDate.ofInstant(item.lastMessageAt.toInstant(), zone)
+        val day = item.lastMessageAt.toInstant().atZone(zone).toLocalDate()
         when (ChronoUnit.DAYS.between(day, today)) {
             in Long.MIN_VALUE..0L -> ChatHistoryGroup.Today
             1L -> ChatHistoryGroup.Yesterday
