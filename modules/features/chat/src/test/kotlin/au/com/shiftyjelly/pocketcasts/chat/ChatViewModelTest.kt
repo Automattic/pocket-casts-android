@@ -20,11 +20,16 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import au.com.shiftyjelly.pocketcasts.sharedtest.MutableClock
 import com.automattic.eventhorizon.EpisodeChatBetaSheetDismissedEvent
 import com.automattic.eventhorizon.EpisodeChatBetaSheetShownEvent
 import com.automattic.eventhorizon.EpisodeChatClearUndoneEvent
 import com.automattic.eventhorizon.EpisodeChatClearedEvent
+import com.automattic.eventhorizon.EpisodeChatDeleteUndoneEvent
+import com.automattic.eventhorizon.EpisodeChatDeletedEvent
 import com.automattic.eventhorizon.EpisodeChatErrorType
+import com.automattic.eventhorizon.EpisodeChatHistoryRowTappedEvent
+import com.automattic.eventhorizon.EpisodeChatHistoryShownEvent
 import com.automattic.eventhorizon.EpisodeChatInputType
 import com.automattic.eventhorizon.EpisodeChatMessageFailedEvent
 import com.automattic.eventhorizon.EpisodeChatMessageSentEvent
@@ -37,6 +42,8 @@ import com.automattic.eventhorizon.EpisodeChatSentimentType
 import com.automattic.eventhorizon.EpisodeChatShownEvent
 import com.automattic.eventhorizon.EventHorizon
 import java.io.IOException
+import java.time.Instant
+import java.time.temporal.ChronoUnit
 import java.util.Date
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.TestTimeSource
@@ -84,6 +91,9 @@ class ChatViewModelTest {
     )
     private val episodeManager = mock<EpisodeManager> {
         on { findEpisodeByUuidFlow(EPISODE_UUID) } doReturn episode
+        on { findEpisodeByUuidFlow(OTHER_EPISODE_UUID) } doReturn MutableStateFlow(
+            PodcastEpisode(uuid = OTHER_EPISODE_UUID, publishedDate = Date(), duration = 300.0),
+        )
     }
     private val betaSheetSeen = MutableStateFlow(false)
     private val betaSheetSeenSetting = mock<UserSetting<Boolean>> {
@@ -100,6 +110,7 @@ class ChatViewModelTest {
     }
     private val networkConnectionWatcher = TestNetworkConnectionWatcher()
     private val timeSource = TestTimeSource()
+    private val clock = MutableClock(Instant.parse("2026-10-14T12:00:00Z"))
 
     private lateinit var eventSink: TestEventSink
     private lateinit var viewModel: ChatViewModel
@@ -120,6 +131,7 @@ class ChatViewModelTest {
         applicationScope = kotlinx.coroutines.CoroutineScope(coroutineRule.testDispatcher),
         ioDispatcher = coroutineRule.testDispatcher,
         timeSource = timeSource,
+        clock = clock,
     )
 
     @Test
@@ -1543,14 +1555,14 @@ class ChatViewModelTest {
     }
 
     @Test
-    fun `setting episode info again while the beta sheet is open does not track it twice`() = runTest {
+    fun `setting episode info again after recreation keeps the chat and does not track again`() = runTest {
         setEpisodeInfo(isBeta = true)
         eventSink.skipEvent(2)
 
         setEpisodeInfo(isBeta = true)
-        eventSink.skipEvent()
 
         assertTrue(viewModel.uiState.value.isBetaSheetVisible)
+        assertEquals(1, chatManager.createdChats.size)
         assertTrue(eventSink.isEmpty())
     }
 
@@ -1592,12 +1604,167 @@ class ChatViewModelTest {
         assertTrue(eventSink.isEmpty())
     }
 
+    @Test
+    fun `showing the history groups the chats and tracks how many there are`() = runTest {
+        chatManager.history.value = listOf(historyItem(EPISODE_UUID), historyItem(OTHER_EPISODE_UUID, daysAgo = 3))
+        setEpisodeInfo()
+        advanceUntilIdle()
+        eventSink.skipEvent()
+
+        viewModel.showHistory()
+
+        val state = viewModel.uiState.value
+        assertTrue(state.isHistoryVisible)
+        assertEquals(listOf(ChatHistoryGroup.Today, ChatHistoryGroup.PreviousSevenDays), state.history.map { it.group })
+        assertEquals(EpisodeChatHistoryShownEvent(source = SourceView.PLAYER.analyticsValue, chatCount = 2), eventSink.pollEvent())
+    }
+
+    @Test
+    fun `closing the history goes back to the chat`() = runTest {
+        setEpisodeInfo()
+        viewModel.showHistory()
+
+        viewModel.closeHistory()
+
+        assertFalse(viewModel.uiState.value.isHistoryVisible)
+    }
+
+    @Test
+    fun `opening another chat from the history shows its messages and keeps the header on what is playing`() = runTest {
+        val otherMessage = ChatMessage.User(text = "Other question", uuid = "other-message-uuid")
+        chatManager.otherMessages.value = listOf(otherMessage)
+        chatManager.messages.value = listOf(ChatMessage.User(text = "Question", uuid = "message-uuid"))
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID, title = "Episode title")
+        setEpisodeInfo()
+        advanceUntilIdle()
+        viewModel.showHistory()
+        eventSink.skipEvent(2)
+
+        viewModel.openHistoryChat(historyItem(OTHER_EPISODE_UUID))
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertFalse(state.isHistoryVisible)
+        assertEquals(OTHER_EPISODE_UUID, state.episodeUuid)
+        assertEquals("Title $OTHER_EPISODE_UUID", state.episodeTitle)
+        assertEquals(listOf(otherMessage), state.messages)
+        assertEquals("Episode title", state.otherPlayingEpisode?.episodeTitle)
+        assertEquals(CreateChat(OTHER_EPISODE_UUID, OTHER_PODCAST_UUID), chatManager.createdChats.last())
+        assertEquals(
+            EpisodeChatHistoryRowTappedEvent(
+                source = SourceView.PLAYER.analyticsValue,
+                episodeUuid = OTHER_EPISODE_UUID,
+                podcastUuid = OTHER_PODCAST_UUID,
+                isNowPlaying = false,
+            ),
+            eventSink.pollEvent(),
+        )
+        assertEquals(
+            EpisodeChatShownEvent(
+                source = SourceView.PLAYER.analyticsValue,
+                episodeUuid = OTHER_EPISODE_UUID,
+                podcastUuid = OTHER_PODCAST_UUID,
+            ),
+            eventSink.pollEvent(),
+        )
+    }
+
+    @Test
+    fun `opening the playing episode chat from the history tracks it as now playing`() = runTest {
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID)
+        setEpisodeInfo()
+        advanceUntilIdle()
+        eventSink.skipEvent()
+
+        viewModel.openHistoryChat(historyItem(EPISODE_UUID, podcastUuid = PODCAST_UUID))
+
+        assertEquals(
+            EpisodeChatHistoryRowTappedEvent(
+                source = SourceView.PLAYER.analyticsValue,
+                episodeUuid = EPISODE_UUID,
+                podcastUuid = PODCAST_UUID,
+                isNowPlaying = true,
+            ),
+            eventSink.pollEvent(),
+        )
+        assertTrue(eventSink.isEmpty())
+        assertEquals(1, chatManager.createdChats.size)
+    }
+
+    @Test
+    fun `deleting another chat from the history offers undo and restores it`() = runTest {
+        val otherMessage = ChatMessage.User(text = "Other question", uuid = "other-message-uuid")
+        chatManager.otherMessages.value = listOf(otherMessage)
+        val message = ChatMessage.User(text = "Question", uuid = "message-uuid")
+        chatManager.messages.value = listOf(message)
+        setEpisodeInfo()
+        advanceUntilIdle()
+        eventSink.skipEvent()
+
+        viewModel.toasts.test {
+            viewModel.deleteHistoryChat(historyItem(OTHER_EPISODE_UUID))
+            advanceUntilIdle()
+
+            assertEquals(ChatToast.ChatDeleted, awaitItem())
+        }
+        assertEquals(emptyList<ChatMessage>(), chatManager.otherMessages.value)
+        assertEquals(listOf(message), viewModel.uiState.value.messages)
+
+        viewModel.undoDeleteChat()
+        advanceUntilIdle()
+
+        assertEquals(listOf(otherMessage), chatManager.otherMessages.value)
+        assertEquals(
+            EpisodeChatDeletedEvent(
+                source = SourceView.PLAYER.analyticsValue,
+                episodeUuid = OTHER_EPISODE_UUID,
+                podcastUuid = OTHER_PODCAST_UUID,
+            ),
+            eventSink.pollEvent(),
+        )
+        assertEquals(
+            EpisodeChatDeleteUndoneEvent(
+                source = SourceView.PLAYER.analyticsValue,
+                episodeUuid = OTHER_EPISODE_UUID,
+                podcastUuid = OTHER_PODCAST_UUID,
+            ),
+            eventSink.pollEvent(),
+        )
+    }
+
+    @Test
+    fun `deleting the open chat from the history empties the conversation`() = runTest {
+        chatManager.messages.value = listOf(ChatMessage.User(text = "Question", uuid = "message-uuid"))
+        setEpisodeInfo()
+        advanceUntilIdle()
+
+        viewModel.deleteHistoryChat(historyItem(EPISODE_UUID, podcastUuid = PODCAST_UUID))
+        advanceUntilIdle()
+
+        assertEquals(emptyList<ChatMessage>(), viewModel.uiState.value.messages)
+        assertEquals(listOf(EPISODE_UUID), chatManager.clearedEpisodeUuids)
+    }
+
+    private fun historyItem(
+        episodeUuid: String,
+        podcastUuid: String = OTHER_PODCAST_UUID,
+        daysAgo: Long = 0,
+    ) = EpisodeChatHistoryItem(
+        episodeUuid = episodeUuid,
+        episodeTitle = "Title $episodeUuid",
+        podcastUuid = podcastUuid,
+        podcastTitle = "Podcast",
+        episodeDuration = 300.0,
+        lastMessageAt = Date.from(clock.instant().minus(daysAgo, ChronoUnit.DAYS)),
+    )
+
     private class TestNetworkConnectionWatcher : NetworkConnectionWatcher {
         override val networkCapabilities = MutableStateFlow<NetworkCapabilities?>(internetCapabilities())
     }
 
     private class TestChatManager : ChatManager {
         val messages = MutableStateFlow<List<ChatMessage>>(emptyList())
+        val otherMessages = MutableStateFlow<List<ChatMessage>>(emptyList())
         var observedMessages: Flow<List<ChatMessage>>? = null
         val createdChats = mutableListOf<CreateChat>()
         val sentMessages = mutableListOf<SendMessage>()
@@ -1611,7 +1778,9 @@ class ChatViewModelTest {
 
         val history = MutableStateFlow<List<EpisodeChatHistoryItem>>(emptyList())
 
-        override fun observeMessages(episodeUuid: String): Flow<List<ChatMessage>> = observedMessages ?: messages
+        override fun observeMessages(episodeUuid: String): Flow<List<ChatMessage>> = observedMessages ?: messagesFor(episodeUuid)
+
+        private fun messagesFor(episodeUuid: String) = if (episodeUuid == OTHER_EPISODE_UUID) otherMessages else messages
 
         override fun observeHistory(): Flow<List<EpisodeChatHistoryItem>> = history
 
@@ -1634,17 +1803,20 @@ class ChatViewModelTest {
         override suspend fun clearMessages(episodeUuid: String): ClearedChat {
             clearMessagesGate?.await()
             clearedEpisodeUuids += episodeUuid
-            val cleared = TestClearedChat(messages.value)
-            clearedMessageUuids += messages.value.map { it.uuid }
-            messages.value = emptyList()
+            val episodeMessages = messagesFor(episodeUuid)
+            val cleared = TestClearedChat(episodeUuid, episodeMessages.value)
+            clearedMessageUuids += episodeMessages.value.map { it.uuid }
+            episodeMessages.value = emptyList()
             return cleared
         }
 
         override suspend fun restoreMessages(clearedChat: ClearedChat) {
-            messages.value = (clearedChat as TestClearedChat).messages + messages.value
+            val cleared = clearedChat as TestClearedChat
+            val episodeMessages = messagesFor(cleared.episodeUuid)
+            episodeMessages.value = cleared.messages + episodeMessages.value
         }
 
-        private class TestClearedChat(override val messages: List<ChatMessage>) : ClearedChat
+        private class TestClearedChat(val episodeUuid: String, override val messages: List<ChatMessage>) : ClearedChat
 
         override suspend fun rateAnswer(answerUuid: String, rating: ChatAnswerRating?) {
             savedRatings += answerUuid to rating
@@ -1663,6 +1835,8 @@ class ChatViewModelTest {
     private companion object {
         const val EPISODE_UUID = "episode-uuid"
         const val PODCAST_UUID = "podcast-uuid"
+        const val OTHER_EPISODE_UUID = "other-episode-uuid"
+        const val OTHER_PODCAST_UUID = "other-podcast-uuid"
     }
 }
 
