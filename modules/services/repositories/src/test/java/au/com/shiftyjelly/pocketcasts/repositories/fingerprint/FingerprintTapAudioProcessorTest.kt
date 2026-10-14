@@ -67,6 +67,22 @@ class FingerprintTapAudioProcessorTest {
     }
 
     @Test
+    fun `feeds the tap from its own output rather than the decoder's input`() {
+        val processor = processor(isEnabled = true)
+        val bytes = ByteArray(16) { it.toByte() }
+        val inputBytes = bytes.copyOf()
+        processor.queueInput(ByteBuffer.wrap(inputBytes))
+        inputBytes.fill(0)
+        val captor = argumentCaptor<ByteBuffer>()
+        verify(tap).onPcm(captor.capture(), eq(format))
+        val seen = captor.firstValue
+        val copied = ByteArray(seen.remaining())
+        seen.get(copied)
+        assertArrayEquals(bytes, copied)
+        assertEquals(bytes.size, processor.output.remaining())
+    }
+
+    @Test
     fun `ignores empty input`() {
         val processor = processor(isEnabled = true)
         processor.queueInput(ByteBuffer.allocate(0))
