@@ -52,8 +52,10 @@ import kotlin.time.TimeSource
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -454,12 +456,24 @@ class ChatViewModel @Inject constructor(
             previousJob?.join()
             val episode = episodeManager.findEpisodeByUuid(episodeUuid)
             if (episode == null || !quote.isWithinEpisode(episode.durationMs)) return@launch
+            val quoteTime = async { quoteSeeker.quoteTime(episodeUuid, quote) }
             val state = playbackManager.playbackStateFlow.first()
             if (state.loadedEpisodeUuid != episodeUuid) {
                 playbackManager.playNowSuspend(episode = episode, sourceView = sourceView)
-                if (!awaitPlaybackEpisode(episodeUuid)) return@launch
+                if (!awaitPlaybackEpisode(episodeUuid)) {
+                    quoteTime.cancel()
+                    return@launch
+                }
             }
-            playbackManager.seekToTimeMsSuspend(positionMs = quoteSeeker.seekTimeMs(episode, quote))
+            val userSeek = async(start = CoroutineStart.UNDISPATCHED) { playbackManager.userSeeks.first() }
+            val seekTimeMs = try {
+                quoteSeeker.playbackTimeMs(episode, quoteTime.await())
+            } finally {
+                userSeek.cancel()
+            }
+            if (userSeek.isCompleted && !userSeek.isCancelled) return@launch
+            if (playbackManager.playbackStateFlow.first().loadedEpisodeUuid != episodeUuid) return@launch
+            playbackManager.seekToTimeMsSuspend(positionMs = seekTimeMs)
             playbackManager.playQueueSuspend(sourceView = sourceView)
             quotePlaybackUndo = quotePlaybackUndo ?: PlaybackPosition(
                 quoteEpisodeUuid = episodeUuid,

@@ -3,80 +3,74 @@ package au.com.shiftyjelly.pocketcasts.repositories.chat
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptEntry
 import kotlin.math.abs
 
-internal data class QuoteTiming(
-    val startMs: Long,
-    val endMs: Long,
-)
-
-internal fun List<TranscriptEntry>.findQuoteTiming(quote: String, hintMs: Long): QuoteTiming? {
+internal fun List<TranscriptEntry>.findQuoteStartMs(
+    quote: String,
+    hintMs: Long,
+    maxHintDistanceMs: Long = QUOTE_MAX_HINT_DISTANCE_MS,
+): Long? {
     val words = quote.normalizedWords()
     if (words.size < QUOTE_MIN_WORDS) return null
     val transcript = NormalizedTranscript(filterIsInstance<TranscriptEntry.Text>().filter { it.startTimeMs >= 0 })
-    if (transcript.text.isEmpty()) return null
+    if (transcript.text.isBlank()) return null
 
-    val needles = listOfNotNull(
-        words.joinToString(" "),
-        words.take(QUOTE_PREFIX_WORDS).joinToString(" ").takeIf { words.size > QUOTE_PREFIX_WORDS },
-    )
     val lastEndMs = transcript.entries.maxOf { it.endTimeMs }
     val hint = hintMs.takeIf { it in 0..lastEndMs }
-    return needles.firstNotNullOfOrNull { needle ->
-        val matches = transcript.indexesOf(needle)
-            .map { index -> QuoteTiming(transcript.startMsAt(index), transcript.endMsAt(index + needle.length - 1)) }
-        if (hint == null) matches.firstOrNull() else matches.minByOrNull { abs(it.startMs - hint) }
+    fun matchStarts(needle: String) = transcript.indexesOf(needle)
+        .map(transcript::startMsAt)
+        .filter { hint == null || abs(it - hint) <= maxHintDistanceMs }
+
+    val fullMatches = matchStarts(words.joinToString(" "))
+    if (fullMatches.isNotEmpty()) {
+        return if (hint == null) fullMatches.first() else fullMatches.minBy { abs(it - hint) }
     }
+    if (words.size <= QUOTE_PREFIX_WORDS) return null
+    return matchStarts(words.take(QUOTE_PREFIX_WORDS).joinToString(" ")).singleOrNull()
 }
 
 private class NormalizedTranscript(val entries: List<TranscriptEntry.Text>) {
-    private val builder = StringBuilder()
-    private val entryIndexes = mutableListOf<Int>()
-    private val charOffsets = mutableListOf<Int>()
+    val text: String
+    private val entryIndexes: IntArray
+    private val charOffsets: IntArray
 
     init {
+        val builder = StringBuilder()
+        val entryIndexList = ArrayList<Int>()
+        val charOffsetList = ArrayList<Int>()
         entries.forEachIndexed { entryIndex, entry ->
             var pendingSpace = builder.isNotEmpty()
             entry.value.forEachIndexed { charOffset, char ->
                 if (char.isLetterOrDigit()) {
                     if (pendingSpace) {
-                        append(' ', entryIndex, charOffset)
+                        builder.append(' ')
+                        entryIndexList += entryIndex
+                        charOffsetList += charOffset
                         pendingSpace = false
                     }
-                    append(char.lowercaseChar(), entryIndex, charOffset)
+                    builder.append(char.lowercaseChar())
+                    entryIndexList += entryIndex
+                    charOffsetList += charOffset
                 } else if (builder.isNotEmpty()) {
                     pendingSpace = true
                 }
             }
         }
+        text = " $builder "
+        entryIndexes = entryIndexList.toIntArray()
+        charOffsets = charOffsetList.toIntArray()
     }
-
-    val text = builder.toString()
 
     fun indexesOf(needle: String): List<Int> {
-        val paddedText = " $text "
         val paddedNeedle = " $needle "
-        return generateSequence(paddedText.indexOf(paddedNeedle)) { previous ->
-            paddedText.indexOf(paddedNeedle, previous + 1)
-        }.takeWhile { it >= 0 }.toList()
+        return generateSequence(text.indexOf(paddedNeedle)) { previous -> text.indexOf(paddedNeedle, previous + 1) }
+            .takeWhile { it >= 0 }
+            .toList()
     }
 
-    private fun append(char: Char, entryIndex: Int, charOffset: Int) {
-        builder.append(char)
-        entryIndexes += entryIndex
-        charOffsets += charOffset
-    }
-
-    fun startMsAt(index: Int): Long {
-        val entry = entries[entryIndexes[index]]
-        return entry.wordAt(charOffsets[index])?.startTimeMs ?: entry.startTimeMs
-    }
-
-    fun endMsAt(index: Int): Long {
-        val entry = entries[entryIndexes[index]]
-        return entry.wordAt(charOffsets[index])?.endTimeMs ?: entry.endTimeMs
-    }
-
-    private fun TranscriptEntry.Text.wordAt(charOffset: Int) = words.firstOrNull { word ->
-        word.startTimeMs >= 0 && charOffset in word.charOffsetStart..<word.charOffsetEnd
+    fun startMsAt(matchIndex: Int): Long {
+        val entry = entries[entryIndexes[matchIndex]]
+        val charOffset = charOffsets[matchIndex]
+        val word = entry.words.firstOrNull { it.startTimeMs >= 0 && charOffset in it.charOffsetStart..<it.charOffsetEnd }
+        return word?.startTimeMs ?: entry.startTimeMs
     }
 }
 
@@ -88,3 +82,5 @@ private fun String.normalizedWords() = map { if (it.isLetterOrDigit()) it.lowerc
 private const val QUOTE_MIN_WORDS = 4
 
 private const val QUOTE_PREFIX_WORDS = 8
+
+internal const val QUOTE_MAX_HINT_DISTANCE_MS = 180_000L

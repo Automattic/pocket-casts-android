@@ -15,6 +15,8 @@ import au.com.shiftyjelly.pocketcasts.utils.fingerprint.FingerprintPolicy
 import dagger.Lazy
 import java.util.Date
 import kotlin.time.Duration.Companion.milliseconds
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -22,6 +24,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -78,7 +81,7 @@ class ChatQuoteSeekerTest {
         whenever(transcriptManager.loadGeneratedTranscript(EPISODE_UUID)).thenReturn(generatedTranscript)
         whenever(timingManager.densePlaybackTime(EPISODE_UUID, 1_383_380.milliseconds)).thenReturn(1_413_480.milliseconds)
 
-        assertEquals(1_413_480, seeker().seekTimeMs(episode, generatedQuote))
+        assertEquals(1_413_480, seeker().seek(generatedQuote))
         verifyBlocking(timingManager, never()) { resolvePlaybackTime(any(), any()) }
     }
 
@@ -88,7 +91,7 @@ class ChatQuoteSeekerTest {
         whenever(timingManager.resolvePlaybackTime(eq(episode), eq(1_383_380.milliseconds)))
             .thenReturn(ChapterSeekResult.Resolved(1_353_280.milliseconds, usedPrior = false))
 
-        assertEquals(1_353_280, seeker().seekTimeMs(episode, generatedQuote))
+        assertEquals(1_353_280, seeker().seek(generatedQuote))
     }
 
     @Test
@@ -97,7 +100,7 @@ class ChatQuoteSeekerTest {
         whenever(timingManager.resolvePlaybackTime(any(), any()))
             .thenReturn(ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_NO_REFERENCE))
 
-        assertEquals(1_383_380, seeker().seekTimeMs(episode, generatedQuote))
+        assertEquals(1_383_380, seeker().seek(generatedQuote))
     }
 
     @Test
@@ -106,7 +109,7 @@ class ChatQuoteSeekerTest {
         whenever(timingManager.densePlaybackTime(EPISODE_UUID, 1_000.milliseconds)).thenReturn(31_000.milliseconds)
         val quote = generatedQuote.copy(text = "Something that was never said here", startMs = 1_000)
 
-        assertEquals(31_000, seeker().seekTimeMs(episode, quote))
+        assertEquals(31_000, seeker().seek(quote))
     }
 
     @Test
@@ -115,14 +118,14 @@ class ChatQuoteSeekerTest {
         whenever(transcriptManager.loadGeneratedTranscript(EPISODE_UUID)).thenReturn(generatedTranscript)
         whenever(timingManager.densePlaybackTime(EPISODE_UUID, 1_383_380.milliseconds)).thenReturn(1_413_480.milliseconds)
 
-        assertEquals(1_413_480, seeker().seekTimeMs(episode, authorQuote))
+        assertEquals(1_413_480, seeker().seek(authorQuote))
     }
 
     @Test
     fun `author quote uses its own transcript time without a generated match`() = runTest {
         whenever(transcriptManager.loadTranscript(EPISODE_UUID)).thenReturn(authorTranscript)
 
-        assertEquals(1_390_200, seeker().seekTimeMs(episode, authorQuote))
+        assertEquals(1_390_200, seeker().seek(authorQuote))
         verifyBlocking(timingManager, never()) { resolvePlaybackTime(any(), any()) }
     }
 
@@ -130,19 +133,19 @@ class ChatQuoteSeekerTest {
     fun `author quote ignores a generated transcript returned as the main one`() = runTest {
         whenever(transcriptManager.loadTranscript(EPISODE_UUID)).thenReturn(generatedTranscript)
 
-        assertEquals(1_390_000, seeker().seekTimeMs(episode, authorQuote.copy(text = "Not in any transcript at all")))
+        assertEquals(1_390_000, seeker().seek(authorQuote.copy(text = "Not in any transcript at all")))
     }
 
     @Test
     fun `quote keeps the server time without a transcript`() = runTest {
-        assertEquals(1_383_000, seeker().seekTimeMs(episode, generatedQuote))
+        assertEquals(1_383_000, seeker().seek(generatedQuote))
     }
 
     @Test
     fun `fingerprints are skipped off phone`() = runTest {
         whenever(transcriptManager.loadGeneratedTranscript(EPISODE_UUID)).thenReturn(generatedTranscript)
 
-        assertEquals(1_383_380, seeker(appPlatform = AppPlatform.Automotive).seekTimeMs(episode, generatedQuote))
+        assertEquals(1_383_380, seeker(appPlatform = AppPlatform.Automotive).seek(generatedQuote))
         verifyBlocking(timingManager, never()) { resolvePlaybackTime(any(), any()) }
     }
 
@@ -151,16 +154,43 @@ class ChatQuoteSeekerTest {
         FeatureFlag.setEnabled(Feature.SYNCED_TRANSCRIPTS, false)
         whenever(transcriptManager.loadGeneratedTranscript(EPISODE_UUID)).thenReturn(generatedTranscript)
 
-        assertEquals(1_383_380, seeker().seekTimeMs(episode, generatedQuote))
+        assertEquals(1_383_380, seeker().seek(generatedQuote))
     }
 
     @Test
     fun `tap only policy uses the dense map without a bounded resolve`() = runTest {
         whenever(transcriptManager.loadGeneratedTranscript(EPISODE_UUID)).thenReturn(generatedTranscript)
 
-        assertEquals(1_383_380, seeker(policy = FingerprintPolicy.TAP_ONLY).seekTimeMs(episode, generatedQuote))
+        assertEquals(1_383_380, seeker(policy = FingerprintPolicy.TAP_ONLY).seek(generatedQuote))
         verifyBlocking(timingManager, never()) { resolvePlaybackTime(any(), any()) }
     }
+
+    @Test
+    fun `fingerprint lookups that take too long use the transcript time`() = runTest {
+        whenever(transcriptManager.loadGeneratedTranscript(EPISODE_UUID)).thenReturn(generatedTranscript)
+        whenever(timingManager.resolvePlaybackTime(any(), any())).doSuspendableAnswer { awaitCancellation() }
+
+        assertEquals(1_383_380, seeker().seek(generatedQuote))
+    }
+
+    @Test
+    fun `author quote loads both transcripts at the same time`() = runTest {
+        val generatedLoaded = CompletableDeferred<Unit>()
+        whenever(transcriptManager.loadTranscript(EPISODE_UUID)).doSuspendableAnswer {
+            generatedLoaded.await()
+            authorTranscript
+        }
+        whenever(transcriptManager.loadGeneratedTranscript(EPISODE_UUID)).doSuspendableAnswer {
+            generatedLoaded.complete(Unit)
+            generatedTranscript
+        }
+
+        val quoteTime = seeker().quoteTime(EPISODE_UUID, authorQuote)
+
+        assertEquals(ChatQuoteSeeker.QuoteTime(timeMs = 1_390_200, referenceTimeMs = 1_383_380), quoteTime)
+    }
+
+    private suspend fun ChatQuoteSeeker.seek(quote: ChatMessage.Quote) = playbackTimeMs(episode, quoteTime(EPISODE_UUID, quote))
 
     private fun transcript(isGenerated: Boolean, vararg entries: TranscriptEntry) = Transcript.Text(
         entries = entries.toList(),
