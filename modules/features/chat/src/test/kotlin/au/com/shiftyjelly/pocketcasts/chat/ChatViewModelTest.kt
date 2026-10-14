@@ -26,6 +26,7 @@ import com.automattic.eventhorizon.EpisodeChatInputType
 import com.automattic.eventhorizon.EpisodeChatMessageFailedEvent
 import com.automattic.eventhorizon.EpisodeChatMessageSentEvent
 import com.automattic.eventhorizon.EpisodeChatQuotePlayTappedEvent
+import com.automattic.eventhorizon.EpisodeChatQuotePlayUndoneEvent
 import com.automattic.eventhorizon.EpisodeChatQuoteSourceType
 import com.automattic.eventhorizon.EpisodeChatResponseRatedEvent
 import com.automattic.eventhorizon.EpisodeChatResponseReceivedEvent
@@ -1098,6 +1099,62 @@ class ChatViewModelTest {
         verify(playbackManager, never()).pause(any(), any())
         verify(playbackManager, never()).pauseSuspend(any(), any())
         verify(playbackManager, never()).seekToTimeMsSuspend(org.mockito.kotlin.eq(10_000), anyOrNull())
+    }
+
+    @Test
+    fun `playing a quote offers undo with the episode title`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID, positionMs = 10_000)
+        playableState(quote)
+
+        viewModel.toasts.test {
+            viewModel.playQuote(quote.uuid)
+            advanceUntilIdle()
+
+            assertEquals(ChatToast.QuotePlaying(episode.value.title), awaitItem())
+        }
+    }
+
+    @Test
+    fun `undoing a quote goes back to where playback was and pauses if it was paused`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID, positionMs = 10_000)
+        playableState(quote)
+        viewModel.playQuote(quote.uuid)
+        advanceUntilIdle()
+        eventSink.skipEvent(eventSink.size)
+
+        viewModel.undoQuotePlay()
+        advanceUntilIdle()
+
+        verify(playbackManager).seekToTimeMsSuspend(org.mockito.kotlin.eq(10_000), anyOrNull())
+        verify(playbackManager).pause(any(), any())
+        assertEquals(
+            EpisodeChatQuotePlayUndoneEvent(
+                source = SourceView.PLAYER.analyticsValue,
+                episodeUuid = EPISODE_UUID,
+                podcastUuid = PODCAST_UUID,
+            ),
+            eventSink.pollEvent(),
+        )
+    }
+
+    @Test
+    fun `undoing a quote keeps playing if it was playing`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID, positionMs = 10_000)
+        playableState(quote)
+        viewModel.playQuote(quote.uuid)
+        advanceUntilIdle()
+
+        viewModel.undoQuotePlay()
+        advanceUntilIdle()
+
+        verify(playbackManager).seekToTimeMsSuspend(org.mockito.kotlin.eq(10_000), anyOrNull())
+        verify(playbackManager, never()).pause(any(), any())
     }
 
     @Test

@@ -26,6 +26,7 @@ import com.automattic.eventhorizon.EpisodeChatInputType
 import com.automattic.eventhorizon.EpisodeChatMessageFailedEvent
 import com.automattic.eventhorizon.EpisodeChatMessageSentEvent
 import com.automattic.eventhorizon.EpisodeChatQuotePlayTappedEvent
+import com.automattic.eventhorizon.EpisodeChatQuotePlayUndoneEvent
 import com.automattic.eventhorizon.EpisodeChatQuoteSourceType
 import com.automattic.eventhorizon.EpisodeChatResponseRatedEvent
 import com.automattic.eventhorizon.EpisodeChatResponseReceivedEvent
@@ -77,6 +78,7 @@ class ChatViewModel @Inject constructor(
 
     @Volatile private var clearedChat: ClearedChat? = null
 
+    @Volatile private var quotePlaybackUndo: PlaybackPosition? = null
     private var transientUserMessage: ChatMessage.User? = null
     private var transientInputType: EpisodeChatInputType = EpisodeChatInputType.Typed
     private var hasReceivedAnswer = false
@@ -303,6 +305,42 @@ class ChatViewModel @Inject constructor(
             }
             playbackManager.seekToTimeMsSuspend(positionMs = quote.startMs)
             playbackManager.playQueueSuspend(sourceView = sourceView)
+            quotePlaybackUndo = PlaybackPosition(
+                episodeUuid = state.episodeUuid.takeUnless { state.isEmpty || it.isEmpty() },
+                positionMs = state.positionMs,
+                isPlaying = state.isPlaying,
+            )
+            _toasts.trySend(ChatToast.QuotePlaying(episode.title))
+        }
+    }
+
+    fun undoQuotePlay() {
+        val undo = quotePlaybackUndo ?: return
+        quotePlaybackUndo = null
+        eventHorizon.track(
+            EpisodeChatQuotePlayUndoneEvent(
+                source = sourceView.analyticsValue,
+                episodeUuid = episodeUuid,
+                podcastUuid = podcastUuid,
+            ),
+        )
+        val previousJob = quotePlaybackJob
+        previousJob?.cancel()
+        quotePlaybackJob = applicationScope.launch(ioDispatcher) {
+            previousJob?.join()
+            val previousEpisode = undo.episodeUuid?.let { episodeManager.findEpisodeByUuid(it) }
+            if (previousEpisode == null) {
+                playbackManager.pause(sourceView = sourceView)
+                return@launch
+            }
+            if (previousEpisode.uuid != episodeUuid) {
+                playbackManager.playNowSuspend(episode = previousEpisode, sourceView = sourceView)
+                if (!awaitPlaybackEpisode(previousEpisode.uuid)) return@launch
+            }
+            playbackManager.seekToTimeMsSuspend(positionMs = undo.positionMs)
+            if (!undo.isPlaying) {
+                playbackManager.pause(sourceView = sourceView)
+            }
         }
     }
 
@@ -515,9 +553,16 @@ class ChatViewModel @Inject constructor(
 private const val QUOTE_PLAYBACK_EPISODE_TIMEOUT_MS = 5_000L
 private const val LOG_TAG = "EpisodeChat"
 
+private class PlaybackPosition(
+    val episodeUuid: String?,
+    val positionMs: Int,
+    val isPlaying: Boolean,
+)
+
 sealed interface ChatToast {
     data object FeedbackThanks : ChatToast
     data object ChatCleared : ChatToast
+    data class QuotePlaying(val episodeTitle: String) : ChatToast
 }
 
 data class ChatUiState(

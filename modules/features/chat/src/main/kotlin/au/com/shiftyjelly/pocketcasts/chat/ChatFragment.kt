@@ -122,6 +122,7 @@ class ChatFragment : BaseDialogFragment() {
                 if (result == SnackbarResult.ActionPerformed) {
                     when (toast) {
                         ChatToast.ChatCleared -> viewModel.undoClearChat()
+                        is ChatToast.QuotePlaying -> viewModel.undoQuotePlay()
                         ChatToast.FeedbackThanks -> Unit
                     }
                 }
@@ -232,6 +233,7 @@ class ChatFragment : BaseDialogFragment() {
     private fun ChatToast.message(resources: Resources) = when (this) {
         ChatToast.FeedbackThanks -> resources.getString(LR.string.chat_feedback_thank_you)
         ChatToast.ChatCleared -> resources.getString(LR.string.chat_cleared)
+        is ChatToast.QuotePlaying -> resources.getString(LR.string.chat_now_playing_episode, episodeTitle)
     }
 
     @Parcelize
