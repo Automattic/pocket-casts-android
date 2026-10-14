@@ -36,6 +36,13 @@ abstract class EpisodeChatDao {
     @Query("DELETE FROM episode_chat_messages WHERE episode_uuid = :episodeUuid")
     abstract suspend fun deleteMessagesByEpisode(episodeUuid: String)
 
+    @Transaction
+    open suspend fun takeMessages(episodeUuid: String): List<EpisodeChatMessage> {
+        val messages = getMessages(episodeUuid)
+        deleteMessagesByEpisode(episodeUuid)
+        return messages
+    }
+
     @Query("UPDATE episode_chat_messages SET rating = :rating WHERE uuid = :uuid")
     abstract suspend fun updateRating(uuid: String, rating: String?)
 }

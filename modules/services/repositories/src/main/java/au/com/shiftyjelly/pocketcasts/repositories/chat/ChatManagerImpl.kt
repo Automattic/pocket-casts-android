@@ -85,8 +85,14 @@ class ChatManagerImpl @Inject constructor(
         )
     }
 
-    override suspend fun clearMessages(episodeUuid: String) {
-        episodeChatDao.deleteMessagesByEpisode(episodeUuid)
+    override suspend fun clearMessages(episodeUuid: String): ClearedChat {
+        return StoredClearedChat(episodeChatDao.takeMessages(episodeUuid))
+    }
+
+    override suspend fun restoreMessages(clearedChat: ClearedChat) {
+        if (clearedChat is StoredClearedChat) {
+            episodeChatDao.insertMessages(clearedChat.messages)
+        }
     }
 
     override suspend fun rateAnswer(answerUuid: String, rating: ChatAnswerRating?) {
