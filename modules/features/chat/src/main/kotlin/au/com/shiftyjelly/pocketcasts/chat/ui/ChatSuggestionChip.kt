@@ -22,7 +22,6 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 internal fun ChatWelcome(
-    isConversationStarted: Boolean,
     isSuggestionEnabled: Boolean,
     onClickSuggestion: (String) -> Unit,
     theme: ChatTheme,
@@ -31,7 +30,7 @@ internal fun ChatWelcome(
     val summarize = stringResource(LR.string.chat_suggestion_summarize)
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalAlignment = if (isConversationStarted) Alignment.Start else Alignment.End,
+        horizontalAlignment = Alignment.End,
         modifier = modifier.fillMaxWidth(),
     ) {
         Text(

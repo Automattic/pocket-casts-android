@@ -217,10 +217,9 @@ private fun ChatContent(
                     .verticalScroll(scrollState)
                     .padding(start = 16.dp, end = 16.dp, top = 24.dp, bottom = 12.dp),
             ) {
-                if (uiState.areMessagesLoaded) {
+                if (uiState.areMessagesLoaded && uiState.messages.isEmpty() && !uiState.isAwaitingReply) {
                     ChatWelcome(
-                        isConversationStarted = uiState.messages.isNotEmpty() || uiState.isAwaitingReply,
-                        isSuggestionEnabled = uiState.isConnected && !uiState.isAwaitingReply,
+                        isSuggestionEnabled = uiState.isConnected,
                         onClickSuggestion = onClickSuggestion,
                         theme = theme,
                     )
