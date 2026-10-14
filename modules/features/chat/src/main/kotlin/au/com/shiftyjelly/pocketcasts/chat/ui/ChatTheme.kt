@@ -34,6 +34,8 @@ internal data class ChatTheme(
     val detailsHint: Color,
     val rating: Color,
     val errorText: Color,
+    val toastAction: Color,
+    val menuBackground: Color,
 ) {
     companion object {
         fun default(colors: ThemeColors) = ChatTheme(
@@ -61,6 +63,8 @@ internal data class ChatTheme(
             detailsHint = ThemeLightColors.primaryText02,
             rating = colors.primaryIcon02,
             errorText = colors.support05,
+            toastAction = ThemeLightColors.primaryInteractive01,
+            menuBackground = colors.primaryUi01,
         )
 
         fun player(colors: PlayerColors) = ChatTheme(
@@ -88,6 +92,8 @@ internal data class ChatTheme(
             detailsHint = ThemeLightColors.primaryText02,
             rating = colors.contrast05,
             errorText = ErrorRed,
+            toastAction = ThemeLightColors.primaryInteractive01,
+            menuBackground = colors.background02,
         )
     }
 }

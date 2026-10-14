@@ -212,7 +212,6 @@ Language: zh_TW
     <string name="blogs_found_headline">大聲朗讀你的部落格</string>
     <string name="chapters_generated_disclaimer">系統會自動產生這些章節，但可能不會完全正確。</string>
     <string name="chat_play_quote">播放引文</string>
-    <string name="chat_clear">清除對話</string>
     <string name="chat_send">傳送</string>
     <string name="blogs_experiment_banner_body">我們正在針對部落格方面進行嘗試。 我們可能會進行保留、重新設計或逐漸淘汰。</string>
     <string name="blogs_experiment_banner_lead">目前仍為實驗階段。</string>

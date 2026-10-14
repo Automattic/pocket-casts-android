@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatAnswerRating
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatManager
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatMessage
+import au.com.shiftyjelly.pocketcasts.repositories.chat.ClearedChat
 import au.com.shiftyjelly.pocketcasts.repositories.playback.NetworkConnectionWatcher
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
@@ -18,6 +19,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import com.automattic.eventhorizon.EpisodeChatBetaSheetDismissedEvent
 import com.automattic.eventhorizon.EpisodeChatBetaSheetShownEvent
+import com.automattic.eventhorizon.EpisodeChatClearUndoneEvent
 import com.automattic.eventhorizon.EpisodeChatClearedEvent
 import com.automattic.eventhorizon.EpisodeChatErrorType
 import com.automattic.eventhorizon.EpisodeChatInputType
@@ -40,6 +42,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -616,7 +619,7 @@ class ChatViewModelTest {
     fun `a thumbs up thanks the user`() = runTest {
         setEpisodeInfo()
 
-        viewModel.feedbackThanks.test {
+        viewModel.toasts.filter { it == ChatToast.FeedbackThanks }.test {
             viewModel.rateAnswer("answer-uuid", ChatAnswerRating.Positive)
 
             awaitItem()
@@ -628,7 +631,7 @@ class ChatViewModelTest {
         setEpisodeInfo()
         viewModel.rateAnswer("first-answer", ChatAnswerRating.Positive)
 
-        viewModel.feedbackThanks.test {
+        viewModel.toasts.filter { it == ChatToast.FeedbackThanks }.test {
             awaitItem()
             viewModel.rateAnswer("first-answer", ChatAnswerRating.Positive)
             viewModel.rateAnswer("second-answer", ChatAnswerRating.Negative)
@@ -680,7 +683,9 @@ class ChatViewModelTest {
 
     @Test
     fun `clear chat removes the ratings`() = runTest {
+        chatManager.messages.value = listOf(ChatMessage.User(text = "Q1", uuid = "q1"))
         setEpisodeInfo()
+        advanceUntilIdle()
         viewModel.rateAnswer("answer-uuid", ChatAnswerRating.Positive)
 
         viewModel.clearChat()
@@ -870,7 +875,9 @@ class ChatViewModelTest {
 
     @Test
     fun `clear chat tracks chat cleared`() = runTest {
+        chatManager.messages.value = listOf(ChatMessage.User(text = "Q1", uuid = "q1"))
         setEpisodeInfo()
+        advanceUntilIdle()
         eventSink.skipEvent()
 
         viewModel.clearChat()
@@ -884,6 +891,82 @@ class ChatViewModelTest {
             ),
             eventSink.pollEvent(),
         )
+    }
+
+    @Test
+    fun `clear chat offers undo`() = runTest {
+        chatManager.messages.value = listOf(ChatMessage.User(text = "Q1", uuid = "q1"))
+        setEpisodeInfo()
+        advanceUntilIdle()
+
+        viewModel.toasts.test {
+            viewModel.clearChat()
+
+            assertEquals(ChatToast.ChatCleared, awaitItem())
+        }
+    }
+
+    @Test
+    fun `undoing clear chat restores the messages and ratings and tracks it`() = runTest {
+        chatManager.messages.value = listOf(
+            ChatMessage.User(text = "Q1", uuid = "q1"),
+            ChatMessage.Assistant(text = "A1", rating = ChatAnswerRating.Positive, uuid = "a1"),
+        )
+        setEpisodeInfo()
+        advanceUntilIdle()
+        viewModel.clearChat()
+        advanceUntilIdle()
+        assertEquals(emptyMap<String, ChatAnswerRating>(), viewModel.uiState.value.answerRatings)
+        eventSink.skipEvent(eventSink.size)
+
+        viewModel.undoClearChat()
+        advanceUntilIdle()
+
+        assertEquals(listOf("q1", "a1"), viewModel.uiState.value.messages.map { it.uuid })
+        assertEquals(mapOf("a1" to ChatAnswerRating.Positive), viewModel.uiState.value.answerRatings)
+        assertEquals(
+            EpisodeChatClearUndoneEvent(
+                source = SourceView.PLAYER.analyticsValue,
+                episodeUuid = EPISODE_UUID,
+                podcastUuid = PODCAST_UUID,
+            ),
+            eventSink.pollEvent(),
+        )
+    }
+
+    @Test
+    fun `clearing an empty chat does nothing`() = runTest {
+        setEpisodeInfo()
+        advanceUntilIdle()
+        eventSink.skipEvent(eventSink.size)
+
+        viewModel.toasts.test {
+            viewModel.clearChat()
+            advanceUntilIdle()
+
+            expectNoEvents()
+        }
+        assertTrue(chatManager.clearedEpisodeUuids.isEmpty())
+        assertTrue(eventSink.isEmpty())
+    }
+
+    @Test
+    fun `asking after clearing the chat drops the undo`() = runTest {
+        chatManager.messages.value = listOf(
+            ChatMessage.User(text = "Q1", uuid = "q1"),
+            ChatMessage.Assistant(text = "A1", uuid = "a1"),
+        )
+        setEpisodeInfo()
+        advanceUntilIdle()
+        viewModel.clearChat()
+        advanceUntilIdle()
+        sendQuestion("Q2")
+
+        viewModel.undoClearChat()
+        advanceUntilIdle()
+
+        assertEquals(listOf("q1", "a1"), chatManager.clearedMessageUuids)
+        assertEquals(1, viewModel.uiState.value.messages.count { it is ChatMessage.User })
     }
 
     @Test
@@ -1229,6 +1312,7 @@ class ChatViewModelTest {
         val sentMessages = mutableListOf<SendMessage>()
         val sentHistories = mutableListOf<List<String>>()
         val clearedEpisodeUuids = mutableListOf<String>()
+        val clearedMessageUuids = mutableListOf<String>()
         var sendMessageException: Exception? = null
         var sendMessageGate: CompletableDeferred<Unit>? = null
         val savedRatings = mutableListOf<Pair<String, ChatAnswerRating?>>()
@@ -1251,10 +1335,19 @@ class ChatViewModelTest {
             messages.value += listOf(message, ChatMessage.Assistant(text = "Response", uuid = "response-uuid-${sentMessages.size}"))
         }
 
-        override suspend fun clearMessages(episodeUuid: String) {
+        override suspend fun clearMessages(episodeUuid: String): ClearedChat {
             clearedEpisodeUuids += episodeUuid
+            val cleared = TestClearedChat(messages.value)
+            clearedMessageUuids += messages.value.map { it.uuid }
             messages.value = emptyList()
+            return cleared
         }
+
+        override suspend fun restoreMessages(clearedChat: ClearedChat) {
+            messages.value = (clearedChat as TestClearedChat).messages + messages.value
+        }
+
+        private class TestClearedChat(val messages: List<ChatMessage>) : ClearedChat
 
         override suspend fun rateAnswer(answerUuid: String, rating: ChatAnswerRating?) {
             savedRatings += answerUuid to rating

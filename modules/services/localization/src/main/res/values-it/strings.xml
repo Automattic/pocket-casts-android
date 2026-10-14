@@ -212,7 +212,6 @@ Language: it
     <string name="blogs_found_feed_detected">Feed trovato</string>
     <string name="chapters_generated_disclaimer">Questi capitoli sono generati automaticamente e potrebbero non essere perfettamente accurati.</string>
     <string name="chat_play_quote">Riproduci citazione</string>
-    <string name="chat_clear">Cancella chat</string>
     <string name="chat_send">Invia</string>
     <string name="blogs_experiment_banner_body">I blog sono una novità che stiamo sperimentando. Potrebbe restare, essere rielaborato o scomparire senza fare troppo rumore.</string>
     <string name="blogs_experiment_banner_lead">È un esperimento.</string>

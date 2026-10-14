@@ -9,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatAnswerRating
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatManager
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatMessage
+import au.com.shiftyjelly.pocketcasts.repositories.chat.ClearedChat
 import au.com.shiftyjelly.pocketcasts.repositories.chat.answerRating
 import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.playback.NetworkConnectionWatcher
@@ -17,6 +18,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.eventhorizon.EpisodeChatBetaSheetDismissedEvent
 import com.automattic.eventhorizon.EpisodeChatBetaSheetShownEvent
+import com.automattic.eventhorizon.EpisodeChatClearUndoneEvent
 import com.automattic.eventhorizon.EpisodeChatClearedEvent
 import com.automattic.eventhorizon.EpisodeChatDismissedEvent
 import com.automattic.eventhorizon.EpisodeChatErrorType
@@ -65,12 +67,16 @@ class ChatViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(ChatUiState())
     val uiState = _uiState.asStateFlow()
 
-    private val _feedbackThanks = Channel<Unit>(Channel.CONFLATED)
-    val feedbackThanks = _feedbackThanks.receiveAsFlow()
+    private val _toasts = Channel<ChatToast>(Channel.CONFLATED)
+    val toasts = _toasts.receiveAsFlow()
 
     private var sendJob: Job? = null
     private var quotePlaybackJob: Job? = null
     private var ratingWriteJob: Job? = null
+    private var clearJob: Job? = null
+
+    @Volatile private var clearedChat: ClearedChatState? = null
+
     private var transientUserMessage: ChatMessage.User? = null
     private var transientInputType: EpisodeChatInputType = EpisodeChatInputType.Typed
     private var hasReceivedAnswer = false
@@ -184,8 +190,12 @@ class ChatViewModel @Inject constructor(
     }
 
     fun clearChat() {
-        sendJob?.cancel()
+        val state = _uiState.value
+        if (state.messages.isEmpty() && !state.isAwaitingReply) return
+        val pendingSend = sendJob
+        pendingSend?.cancel()
         transientUserMessage = null
+        val answerRatings = state.answerRatings
         _uiState.update {
             it.copy(
                 messages = emptyList(),
@@ -201,8 +211,33 @@ class ChatViewModel @Inject constructor(
                 podcastUuid = podcastUuid,
             ),
         )
-        viewModelScope.launch {
-            chatManager.clearMessages(episodeUuid)
+        clearedChat = null
+        val previousClear = clearJob
+        val pendingRatingWrite = ratingWriteJob
+        clearJob = applicationScope.launch(ioDispatcher) {
+            previousClear?.join()
+            pendingSend?.join()
+            pendingRatingWrite?.join()
+            clearedChat = ClearedChatState(chatManager.clearMessages(episodeUuid), answerRatings)
+        }
+        _toasts.trySend(ChatToast.ChatCleared)
+    }
+
+    fun undoClearChat() {
+        val pendingClear = clearJob
+        applicationScope.launch(ioDispatcher) {
+            pendingClear?.join()
+            val cleared = clearedChat ?: return@launch
+            clearedChat = null
+            _uiState.update { it.copy(answerRatings = cleared.answerRatings + it.answerRatings) }
+            chatManager.restoreMessages(cleared.chat)
+            eventHorizon.track(
+                EpisodeChatClearUndoneEvent(
+                    source = sourceView.analyticsValue,
+                    episodeUuid = episodeUuid,
+                    podcastUuid = podcastUuid,
+                ),
+            )
         }
     }
 
@@ -281,6 +316,7 @@ class ChatViewModel @Inject constructor(
     }
 
     private fun performSend(message: ChatMessage.User, inputType: EpisodeChatInputType) {
+        clearedChat = null
         val unsentMessageUuids = setOfNotNull(transientUserMessage?.uuid, message.uuid)
         transientUserMessage = message
         transientInputType = inputType
@@ -366,7 +402,7 @@ class ChatViewModel @Inject constructor(
             trackAnswerRated(answerUuid, newRating)
         }
         if (newRating == ChatAnswerRating.Positive) {
-            _feedbackThanks.trySend(Unit)
+            _toasts.trySend(ChatToast.FeedbackThanks)
         }
         return newRating
     }
@@ -410,7 +446,7 @@ class ChatViewModel @Inject constructor(
 
     fun onFeedbackSubmitted() {
         hasSubmittedFeedback = true
-        _feedbackThanks.trySend(Unit)
+        _toasts.trySend(ChatToast.FeedbackThanks)
     }
 
     fun consumeSurveyEligibility(): Boolean {
@@ -472,6 +508,16 @@ class ChatViewModel @Inject constructor(
 
 private const val QUOTE_PLAYBACK_EPISODE_TIMEOUT_MS = 5_000L
 private const val LOG_TAG = "EpisodeChat"
+
+private class ClearedChatState(
+    val chat: ClearedChat,
+    val answerRatings: Map<String, ChatAnswerRating>,
+)
+
+sealed interface ChatToast {
+    data object FeedbackThanks : ChatToast
+    data object ChatCleared : ChatToast
+}
 
 data class ChatUiState(
     val inputText: String = "",

@@ -212,7 +212,6 @@ Language: ja_JP
     <string name="blogs_found_feed_detected">見つかったフィード</string>
     <string name="chapters_generated_disclaimer">これらのチャプターは自動的に生成されており、正確さに欠ける可能性があります。</string>
     <string name="chat_play_quote">引用を再生</string>
-    <string name="chat_clear">チャットを消去</string>
     <string name="chat_send">送信</string>
     <string name="blogs_experiment_banner_body">ブログ機能は実験中です。 継続する可能性や、手直しされる可能性、静かに消える可能性があります。</string>
     <string name="blogs_experiment_banner_lead">これは実験です。</string>

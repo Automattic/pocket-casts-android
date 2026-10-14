@@ -34,6 +34,7 @@ import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Snackbar
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -85,7 +86,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 fun ChatScreen(
     uiState: ChatUiState,
     onClickClose: () -> Unit,
-    onClickMore: () -> Unit,
+    onClickClearChat: () -> Unit,
     onClickPlayPause: () -> Unit,
     onInputTextChange: (String) -> Unit,
     onSend: () -> Unit,
@@ -135,7 +136,7 @@ fun ChatScreen(
                     uiState = uiState,
                     theme = theme,
                     onClickClose = onClickClose,
-                    onClickMore = onClickMore,
+                    onClickClearChat = onClickClearChat,
                     onClickPlayPause = onClickPlayPause,
                     onInputTextChange = onInputTextChange,
                     onSend = onSend,
@@ -155,7 +156,7 @@ private fun ChatContent(
     uiState: ChatUiState,
     theme: ChatTheme,
     onClickClose: () -> Unit,
-    onClickMore: () -> Unit,
+    onClickClearChat: () -> Unit,
     onClickPlayPause: () -> Unit,
     onInputTextChange: (String) -> Unit,
     onSend: () -> Unit,
@@ -203,11 +204,11 @@ private fun ChatContent(
             playback = uiState.playback,
             onClickClose = onClickClose,
             onClickPlayPause = onClickPlayPause,
-            onClickMore = {
+            onOpenMenu = {
                 focusManager.clearFocus(force = true)
                 keyboardController?.hide()
-                onClickMore()
             },
+            onClickClearChat = onClickClearChat,
             theme = theme,
         )
 
@@ -320,6 +321,20 @@ private fun ChatContent(
                     Snackbar(
                         backgroundColor = Color.White,
                         contentColor = theme.onWhiteText,
+                        action = data.actionLabel?.let { label ->
+                            {
+                                TextButton(onClick = data::performAction) {
+                                    Text(
+                                        text = label,
+                                        color = theme.toastAction,
+                                        fontSize = 13.sp,
+                                        lineHeight = 18.sp,
+                                        letterSpacing = 0.sp,
+                                        fontWeight = FontWeight.SemiBold,
+                                    )
+                                }
+                            }
+                        },
                         modifier = Modifier.padding(horizontal = 16.dp),
                     ) {
                         Text(
@@ -521,7 +536,7 @@ private fun ChatScreenPreview(
                     ),
                 ),
                 onClickClose = {},
-                onClickMore = {},
+                onClickClearChat = {},
                 onClickPlayPause = {},
                 onInputTextChange = {},
                 onSend = {},
@@ -552,7 +567,7 @@ private fun ChatScreenEmptyPreview(
                     areMessagesLoaded = true,
                 ),
                 onClickClose = {},
-                onClickMore = {},
+                onClickClearChat = {},
                 onClickPlayPause = {},
                 onInputTextChange = {},
                 onSend = {},
@@ -589,7 +604,7 @@ private fun ChatScreenErrorPreview(
                     ),
                 ),
                 onClickClose = {},
-                onClickMore = {},
+                onClickClearChat = {},
                 onClickPlayPause = {},
                 onInputTextChange = {},
                 onSend = {},

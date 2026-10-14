@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.chat
 
 import android.content.DialogInterface
+import android.content.res.Resources
 import android.os.Bundle
 import android.os.Parcelable
 import android.view.LayoutInflater
@@ -9,6 +10,7 @@ import android.view.ViewGroup
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.SnackbarHostState
+import androidx.compose.material.SnackbarResult
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -16,7 +18,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.platform.LocalResources
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.chat.ui.ChatScreen
@@ -28,14 +30,11 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatAnswerRating
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
-import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
-import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.parcelize.Parcelize
-import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
@@ -100,11 +99,20 @@ class ChatFragment : BaseDialogFragment() {
     ) = contentWithoutConsumedInsets {
         val uiState by viewModel.uiState.collectAsState()
         val snackbarHostState = remember { SnackbarHostState() }
-        val thanksMessage = stringResource(LR.string.chat_feedback_thank_you)
+        val resources = LocalResources.current
         LaunchedEffect(snackbarHostState) {
-            viewModel.feedbackThanks.collectLatest {
+            viewModel.toasts.collectLatest { toast ->
                 snackbarHostState.currentSnackbarData?.dismiss()
-                snackbarHostState.showSnackbar(thanksMessage)
+                val result = snackbarHostState.showSnackbar(
+                    message = toast.message(resources),
+                    actionLabel = resources.getString(LR.string.chat_undo).takeIf { toast.isUndoable },
+                )
+                if (result == SnackbarResult.ActionPerformed) {
+                    when (toast) {
+                        ChatToast.ChatCleared -> viewModel.undoClearChat()
+                        ChatToast.FeedbackThanks -> Unit
+                    }
+                }
             }
         }
 
@@ -118,11 +126,17 @@ class ChatFragment : BaseDialogFragment() {
                 ChatScreen(
                     uiState = uiState,
                     onClickClose = { dismiss() },
-                    onClickMore = ::showOptionsDialog,
+                    onClickClearChat = viewModel::clearChat,
                     onClickPlayPause = viewModel::onPlayPauseClick,
                     onInputTextChange = viewModel::onInputTextChange,
-                    onSend = viewModel::onSend,
-                    onClickSuggestion = viewModel::onSummarizeClick,
+                    onSend = {
+                        if (uiState.canSend) snackbarHostState.currentSnackbarData?.dismiss()
+                        viewModel.onSend()
+                    },
+                    onClickSuggestion = { text ->
+                        if (uiState.isConnected && !uiState.isAwaitingReply) snackbarHostState.currentSnackbarData?.dismiss()
+                        viewModel.onSummarizeClick(text)
+                    },
                     onRetry = viewModel::retry,
                     onPlayQuote = viewModel::playQuote,
                     onRateAnswer = ::rateAnswer,
@@ -144,26 +158,6 @@ class ChatFragment : BaseDialogFragment() {
             podcastColors = args.podcastColors,
             trigger = ChatFeedbackFragment.Trigger.ResponseRating,
         )
-    }
-
-    private fun showOptionsDialog() {
-        val view = view ?: return
-        UiUtil.hideKeyboard(view)
-        view.post {
-            if (isAdded) {
-                showClearChatOptionsDialog()
-            }
-        }
-    }
-
-    private fun showClearChatOptionsDialog() {
-        OptionsDialog()
-            .addTextOption(
-                titleId = LR.string.chat_clear,
-                imageId = IR.drawable.ic_delete,
-                click = { viewModel.clearChat() },
-            )
-            .show(parentFragmentManager, "chat_options")
     }
 
     override fun onDismiss(dialog: DialogInterface) {
@@ -195,6 +189,13 @@ class ChatFragment : BaseDialogFragment() {
             behavior.isDraggable = false
             behavior.maxHeight = resources.displayMetrics.heightPixels
         }
+    }
+
+    private val ChatToast.isUndoable get() = this != ChatToast.FeedbackThanks
+
+    private fun ChatToast.message(resources: Resources) = when (this) {
+        ChatToast.FeedbackThanks -> resources.getString(LR.string.chat_feedback_thank_you)
+        ChatToast.ChatCleared -> resources.getString(LR.string.chat_cleared)
     }
 
     @Parcelize

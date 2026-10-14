@@ -212,7 +212,6 @@ Language: sv_SE
     <string name="blogs_found_feed_detected">Flöde hittades</string>
     <string name="chapters_generated_disclaimer">Dessa kapitel genereras automatiskt och är kanske inte helt korrekta.</string>
     <string name="chat_play_quote">Spela upp citat</string>
-    <string name="chat_clear">Rensa chatt</string>
     <string name="chat_send">Skicka</string>
     <string name="blogs_experiment_banner_body">Bloggar är något vi testar. Den kanske stannar kvar, omarbetas eller försvinner i tysthet.</string>
     <string name="blogs_experiment_banner_lead">Detta är ett experiment.</string>
