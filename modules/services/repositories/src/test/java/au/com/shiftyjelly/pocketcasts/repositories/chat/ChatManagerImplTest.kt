@@ -130,6 +130,28 @@ class ChatManagerImplTest {
     }
 
     @Test
+    fun `send message prefers a timed author transcript over html`() = runTest {
+        transcripts.value = listOf(
+            createTranscript(type = "text/html", isGenerated = false, url = "html-url"),
+            createTranscript(type = "text/vtt", isGenerated = false, url = "vtt-url"),
+            createTranscript(type = "text/vtt", isGenerated = true, url = "generated-url"),
+        )
+        whenever(podcastCacheServiceManager.episodeChat(any(), any())).thenReturn(
+            EpisodeChatResponse(reply = "Assistant reply", quote = null),
+        )
+
+        manager.sendMessage(
+            episodeUuid = EPISODE_UUID,
+            message = ChatMessage.User(text = "Question", uuid = "user-uuid"),
+            allMessages = emptyList(),
+        )
+
+        val requestCaptor = argumentCaptor<EpisodeChatRequest>()
+        verify(podcastCacheServiceManager).episodeChat(any(), requestCaptor.capture())
+        assertEquals("vtt-url", requestCaptor.firstValue.transcriptUrl)
+    }
+
+    @Test
     fun `send message stores user message after successful response`() = runTest {
         transcripts.value = listOf(createTranscript())
         whenever(podcastCacheServiceManager.episodeChat(any(), any())).thenReturn(

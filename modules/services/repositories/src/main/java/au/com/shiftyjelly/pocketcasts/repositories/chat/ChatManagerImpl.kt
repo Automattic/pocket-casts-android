@@ -4,6 +4,7 @@ import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeChatDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.TranscriptDao
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeChat
 import au.com.shiftyjelly.pocketcasts.models.entity.Transcript
+import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptsComparator
 import au.com.shiftyjelly.pocketcasts.servers.podcast.ConversationMessage
 import au.com.shiftyjelly.pocketcasts.servers.podcast.EpisodeChatQuote
 import au.com.shiftyjelly.pocketcasts.servers.podcast.EpisodeChatRequest
@@ -103,6 +104,6 @@ class ChatManagerImpl @Inject constructor(
     // Pick transcript for chat: prefer author-provided (non-generated) over Pocket Casts-generated.
     private suspend fun selectTranscript(episodeUuid: String): Transcript? {
         val transcripts = transcriptDao.observeTranscripts(episodeUuid).first()
-        return transcripts.minWithOrNull(compareBy({ it.isGenerated }, { it.type }))
+        return transcripts.minWithOrNull(TranscriptsComparator)
     }
 }
