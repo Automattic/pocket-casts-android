@@ -24,12 +24,17 @@ import com.automattic.eventhorizon.EpisodeChatInputType
 import com.automattic.eventhorizon.EpisodeChatMessageFailedEvent
 import com.automattic.eventhorizon.EpisodeChatMessageSentEvent
 import com.automattic.eventhorizon.EpisodeChatQuotePlayTappedEvent
+import com.automattic.eventhorizon.EpisodeChatQuoteSourceType
 import com.automattic.eventhorizon.EpisodeChatQuoteStopTappedEvent
+import com.automattic.eventhorizon.EpisodeChatResponseRatedEvent
+import com.automattic.eventhorizon.EpisodeChatResponseReceivedEvent
+import com.automattic.eventhorizon.EpisodeChatSentimentType
 import com.automattic.eventhorizon.EpisodeChatShownEvent
 import com.automattic.eventhorizon.EventHorizon
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.io.IOException
 import javax.inject.Inject
+import kotlin.time.TimeSource
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -57,6 +62,7 @@ class ChatViewModel @Inject constructor(
     private val settings: Settings,
     @ApplicationScope private val applicationScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val timeSource: TimeSource,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ChatUiState())
@@ -250,6 +256,7 @@ class ChatViewModel @Inject constructor(
                     source = sourceView.analyticsValue,
                     episodeUuid = episodeUuid,
                     podcastUuid = podcastUuid,
+                    quoteSource = EpisodeChatQuoteSourceType.InlineTimestamp,
                 ),
             )
             stopQuote()
@@ -259,6 +266,7 @@ class ChatViewModel @Inject constructor(
                     source = sourceView.analyticsValue,
                     episodeUuid = episodeUuid,
                     podcastUuid = podcastUuid,
+                    quoteSource = EpisodeChatQuoteSourceType.InlineTimestamp,
                 ),
             )
             startQuote(quote)
@@ -471,9 +479,11 @@ class ChatViewModel @Inject constructor(
     }
 
     private fun performSend(message: ChatMessage.User, inputType: EpisodeChatInputType) {
+        val unsentMessageUuids = setOfNotNull(transientUserMessage?.uuid, message.uuid)
         transientUserMessage = message
         transientInputType = inputType
-        val currentMessages = _uiState.value.messages.filterNot { it.uuid == message.uuid }
+        val currentMessages = _uiState.value.messages.filterNot { it.uuid in unsentMessageUuids }
+        val messageIndex = currentMessages.count { it is ChatMessage.User } + 1L
 
         _uiState.update {
             it.copy(
@@ -485,7 +495,9 @@ class ChatViewModel @Inject constructor(
 
         sendJob = viewModelScope.launch {
             try {
+                val sentAt = timeSource.markNow()
                 chatManager.sendMessage(episodeUuid, message, currentMessages)
+                val responseDuration = sentAt.elapsedNow()
                 transientUserMessage = null
                 hasReceivedAnswer = true
                 eventHorizon.track(
@@ -495,6 +507,15 @@ class ChatViewModel @Inject constructor(
                         podcastUuid = podcastUuid,
                         messageLength = message.text.length.toLong(),
                         inputType = inputType,
+                        messageIndex = messageIndex,
+                    ),
+                )
+                eventHorizon.track(
+                    EpisodeChatResponseReceivedEvent(
+                        source = sourceView.analyticsValue,
+                        episodeUuid = episodeUuid,
+                        podcastUuid = podcastUuid,
+                        durationMs = responseDuration.inWholeMilliseconds,
                     ),
                 )
             } catch (e: IOException) {
@@ -538,10 +559,32 @@ class ChatViewModel @Inject constructor(
             }
             state.copy(answerRatings = ratings)
         }
+        if (newRating != null) {
+            trackAnswerRated(answerUuid, newRating)
+        }
         if (newRating == ChatAnswerRating.Positive) {
             _feedbackThanks.trySend(Unit)
         }
         return newRating
+    }
+
+    private fun trackAnswerRated(answerUuid: String, rating: ChatAnswerRating) {
+        val messages = _uiState.value.messages
+        val answerIndex = messages.indexOfFirst { it.uuid == answerUuid }
+        val messageIndex = if (answerIndex >= 0) {
+            messages.subList(0, answerIndex).count { it is ChatMessage.User }.toLong()
+        } else {
+            null
+        }
+        eventHorizon.track(
+            EpisodeChatResponseRatedEvent(
+                source = sourceView.analyticsValue,
+                episodeUuid = episodeUuid,
+                podcastUuid = podcastUuid,
+                rating = rating.analyticsValue,
+                messageIndex = messageIndex,
+            ),
+        )
     }
 
     fun onFeedbackSubmitted() {
@@ -675,9 +718,9 @@ data class ChatUiState(
         }
 }
 
-enum class ChatAnswerRating {
-    Positive,
-    Negative,
+enum class ChatAnswerRating(val analyticsValue: EpisodeChatSentimentType) {
+    Positive(EpisodeChatSentimentType.Positive),
+    Negative(EpisodeChatSentimentType.Negative),
 }
 
 data class ChatPlayback(
