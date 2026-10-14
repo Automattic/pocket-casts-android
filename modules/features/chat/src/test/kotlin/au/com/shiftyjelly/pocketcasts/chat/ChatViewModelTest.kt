@@ -1330,6 +1330,21 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `the playing podcast is exposed for the chat colours only while an episode is loaded`() = runTest {
+        val podcast = Podcast(uuid = "other-podcast-uuid", title = "Other podcast")
+        setEpisodeInfo()
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = "other-uuid", podcast = podcast)
+        advanceUntilIdle()
+
+        assertEquals(podcast, viewModel.uiState.value.playingPodcast)
+
+        playbackState.value = PlaybackState(state = PlaybackState.State.STOPPED, episodeUuid = "other-uuid", podcast = podcast)
+        advanceUntilIdle()
+
+        assertNull(viewModel.uiState.value.playingPodcast)
+    }
+
+    @Test
     fun `header returns to the chat episode when it starts playing`() = runTest {
         playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = "other-uuid", title = "Other episode")
         setEpisodeInfo()

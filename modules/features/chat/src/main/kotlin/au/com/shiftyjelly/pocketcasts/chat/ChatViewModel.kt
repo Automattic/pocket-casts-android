@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
+import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatAnswerRating
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatManager
@@ -47,7 +48,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -174,6 +177,12 @@ class ChatViewModel @Inject constructor(
             }.distinctUntilChanged().collect { (otherPlayingEpisode, playback) ->
                 _uiState.update { it.copy(otherPlayingEpisode = otherPlayingEpisode, playback = playback) }
             }
+        }
+        viewModelScope.launch {
+            playbackManager.playbackStateFlow
+                .map { playbackState -> playbackState.podcast?.takeIf { playbackState.loadedEpisodeUuid != null } }
+                .distinctUntilChangedBy { it?.uuid }
+                .collect { podcast -> _uiState.update { it.copy(playingPodcast = podcast) } }
         }
     }
 
@@ -601,6 +610,7 @@ data class ChatUiState(
     val isBetaSheetVisible: Boolean = false,
     val playback: ChatPlayback = ChatPlayback(),
     val otherPlayingEpisode: ChatPlayingEpisode? = null,
+    val playingPodcast: Podcast? = null,
     val answerRatings: Map<String, ChatAnswerRating> = emptyMap(),
     val restoredMessageUuids: Set<String> = emptySet(),
 ) {
