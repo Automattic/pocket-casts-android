@@ -74,6 +74,7 @@ import au.com.shiftyjelly.pocketcasts.compose.LocalPodcastColors
 import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
 import au.com.shiftyjelly.pocketcasts.compose.PodcastColorsParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.components.ThemedSnackbarHost
+import au.com.shiftyjelly.pocketcasts.models.to.EpisodeChatHistoryItem
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatAnswerRating
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatMessage
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
@@ -87,6 +88,9 @@ fun ChatScreen(
     uiState: ChatUiState,
     onClickClose: () -> Unit,
     onClickMore: () -> Unit,
+    onCloseHistory: () -> Unit,
+    onOpenHistoryChat: (EpisodeChatHistoryItem) -> Unit,
+    onDeleteHistoryChat: (EpisodeChatHistoryItem) -> Unit,
     onClickPlayPause: () -> Unit,
     onInputTextChange: (String) -> Unit,
     onSend: () -> Unit,
@@ -131,21 +135,32 @@ fun ChatScreen(
             },
             modifier = modifier,
         ) {
-            ProvideReduceMotion {
-                ChatContent(
-                    uiState = uiState,
-                    theme = theme,
-                    onClickClose = onClickClose,
-                    onClickMore = onClickMore,
-                    onClickPlayPause = onClickPlayPause,
-                    onInputTextChange = onInputTextChange,
-                    onSend = onSend,
-                    onClickSuggestion = onClickSuggestion,
-                    onRetry = onRetry,
-                    onPlayQuote = onPlayQuote,
-                    onRateAnswer = onRateAnswer,
+            if (uiState.isHistoryVisible) {
+                ChatHistory(
+                    sections = uiState.history,
+                    onClickBack = onCloseHistory,
+                    onClickChat = onOpenHistoryChat,
+                    onDeleteChat = onDeleteHistoryChat,
                     snackbarHostState = snackbarHostState,
+                    theme = theme,
                 )
+            } else {
+                ProvideReduceMotion {
+                    ChatContent(
+                        uiState = uiState,
+                        theme = theme,
+                        onClickClose = onClickClose,
+                        onClickMore = onClickMore,
+                        onClickPlayPause = onClickPlayPause,
+                        onInputTextChange = onInputTextChange,
+                        onSend = onSend,
+                        onClickSuggestion = onClickSuggestion,
+                        onRetry = onRetry,
+                        onPlayQuote = onPlayQuote,
+                        onRateAnswer = onRateAnswer,
+                        snackbarHostState = snackbarHostState,
+                    )
+                }
             }
         }
     }
@@ -326,37 +341,9 @@ private fun ChatContent(
                 isAnswering = uiState.isAwaitingReply,
                 answer = uiState.messages.newestAnswerText(excluding = initialMessageUuids),
             )
-            ThemedSnackbarHost(
+            ChatSnackbarHost(
                 hostState = snackbarHostState,
-                snackbar = { data, _ ->
-                    Snackbar(
-                        backgroundColor = Color.White,
-                        contentColor = theme.onWhiteText,
-                        action = data.actionLabel?.let { label ->
-                            {
-                                TextButton(onClick = data::performAction) {
-                                    Text(
-                                        text = label,
-                                        color = theme.toastAction,
-                                        fontSize = 13.sp,
-                                        lineHeight = 18.sp,
-                                        letterSpacing = 0.sp,
-                                        fontWeight = FontWeight.SemiBold,
-                                    )
-                                }
-                            }
-                        },
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                    ) {
-                        Text(
-                            text = data.message,
-                            fontSize = 13.sp,
-                            lineHeight = 18.sp,
-                            letterSpacing = 0.sp,
-                            fontWeight = FontWeight.SemiBold,
-                        )
-                    }
-                },
+                theme = theme,
                 modifier = Modifier.align(Alignment.BottomCenter),
             )
         }
@@ -404,6 +391,47 @@ private fun ChatAnswerAppear(
 }
 
 private val ChatMessage?.isAnswer get() = this is ChatMessage.Assistant || this is ChatMessage.Quote
+
+@Composable
+internal fun ChatSnackbarHost(
+    hostState: SnackbarHostState,
+    theme: ChatTheme,
+    modifier: Modifier = Modifier,
+) {
+    ThemedSnackbarHost(
+        hostState = hostState,
+        snackbar = { data, _ ->
+            Snackbar(
+                backgroundColor = Color.White,
+                contentColor = theme.onWhiteText,
+                action = data.actionLabel?.let { label ->
+                    {
+                        TextButton(onClick = data::performAction) {
+                            Text(
+                                text = label,
+                                color = theme.toastAction,
+                                fontSize = 13.sp,
+                                lineHeight = 18.sp,
+                                letterSpacing = 0.sp,
+                                fontWeight = FontWeight.SemiBold,
+                            )
+                        }
+                    }
+                },
+                modifier = Modifier.padding(horizontal = 16.dp),
+            ) {
+                Text(
+                    text = data.message,
+                    fontSize = 13.sp,
+                    lineHeight = 18.sp,
+                    letterSpacing = 0.sp,
+                    fontWeight = FontWeight.SemiBold,
+                )
+            }
+        },
+        modifier = modifier,
+    )
+}
 
 @Composable
 private fun ChatAboutEpisode(
@@ -565,6 +593,9 @@ private fun ChatScreenPreview(
                 ),
                 onClickClose = {},
                 onClickMore = {},
+                onCloseHistory = {},
+                onOpenHistoryChat = {},
+                onDeleteHistoryChat = {},
                 onClickPlayPause = {},
                 onInputTextChange = {},
                 onSend = {},
@@ -596,6 +627,9 @@ private fun ChatScreenEmptyPreview(
                 ),
                 onClickClose = {},
                 onClickMore = {},
+                onCloseHistory = {},
+                onOpenHistoryChat = {},
+                onDeleteHistoryChat = {},
                 onClickPlayPause = {},
                 onInputTextChange = {},
                 onSend = {},
@@ -633,6 +667,9 @@ private fun ChatScreenErrorPreview(
                 ),
                 onClickClose = {},
                 onClickMore = {},
+                onCloseHistory = {},
+                onOpenHistoryChat = {},
+                onDeleteHistoryChat = {},
                 onClickPlayPause = {},
                 onInputTextChange = {},
                 onSend = {},

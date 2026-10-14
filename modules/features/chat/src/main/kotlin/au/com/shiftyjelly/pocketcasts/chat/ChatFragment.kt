@@ -122,6 +122,7 @@ class ChatFragment : BaseDialogFragment() {
                 if (result == SnackbarResult.ActionPerformed) {
                     when (toast) {
                         ChatToast.ChatCleared -> viewModel.undoClearChat()
+                        ChatToast.ChatDeleted -> viewModel.undoDeleteChat()
                         is ChatToast.QuotePlaying -> viewModel.undoQuotePlay()
                         ChatToast.FeedbackThanks -> Unit
                     }
@@ -148,6 +149,9 @@ class ChatFragment : BaseDialogFragment() {
                     uiState = uiState,
                     onClickClose = { dismiss() },
                     onClickMore = ::showOptionsDialog,
+                    onCloseHistory = viewModel::closeHistory,
+                    onOpenHistoryChat = viewModel::openHistoryChat,
+                    onDeleteHistoryChat = viewModel::deleteHistoryChat,
                     onClickPlayPause = viewModel::onPlayPauseClick,
                     onInputTextChange = viewModel::onInputTextChange,
                     onSend = viewModel::onSend,
@@ -165,10 +169,11 @@ class ChatFragment : BaseDialogFragment() {
 
     private fun rateAnswer(answerUuid: String, rating: ChatAnswerRating) {
         if (viewModel.rateAnswer(answerUuid, rating) != ChatAnswerRating.Negative) return
+        val uiState = viewModel.uiState.value
         ChatFeedbackFragment.show(
             fragmentManager = childFragmentManager,
-            episodeUuid = args.episodeUuid,
-            podcastUuid = args.podcastUuid,
+            episodeUuid = uiState.episodeUuid,
+            podcastUuid = uiState.podcastUuid,
             sourceView = args.sourceView,
             podcastColors = viewModel.uiState.value.podcastColors,
             trigger = ChatFeedbackFragment.Trigger.ResponseRating,
@@ -190,6 +195,11 @@ class ChatFragment : BaseDialogFragment() {
         OptionsDialog()
             .setForceDarkTheme(args.sourceView == SourceView.PLAYER)
             .addTextOption(
+                titleId = LR.string.chat_history,
+                imageId = IR.drawable.ic_history,
+                click = viewModel::showHistory,
+            )
+            .addTextOption(
                 titleId = LR.string.chat_clear,
                 titleColor = dangerColor,
                 imageId = IR.drawable.ic_delete,
@@ -210,10 +220,11 @@ class ChatFragment : BaseDialogFragment() {
             activity?.isChangingConfigurations == true ||
             activity?.isFinishing == true
         if (isHostGoingAway || parentFragmentManager.isStateSaved || !viewModel.consumeSurveyEligibility()) return
+        val uiState = viewModel.uiState.value
         ChatSurveyFragment.show(
             fragmentManager = parentFragmentManager,
-            episodeUuid = args.episodeUuid,
-            podcastUuid = args.podcastUuid,
+            episodeUuid = uiState.episodeUuid,
+            podcastUuid = uiState.podcastUuid,
             sourceView = args.sourceView,
             podcastColors = viewModel.uiState.value.podcastColors,
         )
@@ -241,6 +252,7 @@ class ChatFragment : BaseDialogFragment() {
     private fun ChatToast.message(resources: Resources) = when (this) {
         ChatToast.FeedbackThanks -> resources.getString(LR.string.chat_feedback_thank_you)
         ChatToast.ChatCleared -> resources.getString(LR.string.chat_cleared)
+        ChatToast.ChatDeleted -> resources.getString(LR.string.chat_deleted)
         is ChatToast.QuotePlaying -> resources.getString(LR.string.chat_now_playing_episode, episodeTitle)
     }
 
