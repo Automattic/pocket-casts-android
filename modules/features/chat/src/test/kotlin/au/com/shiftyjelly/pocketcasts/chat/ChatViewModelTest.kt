@@ -52,6 +52,7 @@ import kotlin.time.TestTimeSource
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.emptyFlow
@@ -86,8 +87,10 @@ class ChatViewModelTest {
 
     private val chatManager = TestChatManager()
     private val playbackState = MutableStateFlow(PlaybackState())
+    private val userSeeks = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     private val playbackManager = mock<PlaybackManager> {
         on { playbackStateFlow } doReturn playbackState
+        on { userSeeks } doReturn userSeeks
     }
     private val episode = MutableStateFlow<BaseEpisode>(
         PodcastEpisode(uuid = EPISODE_UUID, publishedDate = Date(), duration = 200.0, playedUpTo = 50.0),
@@ -125,7 +128,11 @@ class ChatViewModelTest {
     }
 
     private val quoteSeeker = mock<ChatQuoteSeeker> {
-        on { seekTimeMs(any(), any()) } doSuspendableAnswer { (it.arguments[1] as ChatMessage.Quote).startMs }
+        on { quoteTime(any(), any()) } doSuspendableAnswer {
+            val quote = it.arguments[1] as ChatMessage.Quote
+            ChatQuoteSeeker.QuoteTime(timeMs = quote.startMs, referenceTimeMs = null)
+        }
+        on { playbackTimeMs(any(), any()) } doSuspendableAnswer { (it.arguments[1] as ChatQuoteSeeker.QuoteTime).timeMs }
     }
 
     private fun createViewModel() = ChatViewModel(
@@ -1128,7 +1135,7 @@ class ChatViewModelTest {
     @Test
     fun `playing a quote seeks to the time the seeker resolves`() = runTest {
         val quote = createQuote(startMs = 1_000, endMs = 3_000)
-        whenever(quoteSeeker.seekTimeMs(any(), any())).thenReturn(31_500)
+        whenever(quoteSeeker.playbackTimeMs(any(), any())).thenReturn(31_500)
         whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
         playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID, positionMs = 10_000)
         playableState(quote)
@@ -1137,6 +1144,43 @@ class ChatViewModelTest {
         advanceUntilIdle()
 
         verify(playbackManager).seekToTimeMsSuspend(org.mockito.kotlin.eq(31_500), anyOrNull())
+    }
+
+    @Test
+    fun `playing a quote drops the seek when the user seeks while it resolves`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        val resolved = CompletableDeferred<Int>()
+        whenever(quoteSeeker.playbackTimeMs(any(), any())).doSuspendableAnswer { resolved.await() }
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID, positionMs = 10_000)
+        playableState(quote)
+
+        viewModel.playQuote(quote.uuid)
+        advanceUntilIdle()
+        userSeeks.emit(Unit)
+        resolved.complete(31_500)
+        advanceUntilIdle()
+
+        verify(playbackManager, never()).seekToTimeMsSuspend(any(), anyOrNull())
+        verify(playbackManager, never()).playQueueSuspend(any(), any())
+    }
+
+    @Test
+    fun `playing a quote drops the seek when the episode changes while it resolves`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        val resolved = CompletableDeferred<Int>()
+        whenever(quoteSeeker.playbackTimeMs(any(), any())).doSuspendableAnswer { resolved.await() }
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID, positionMs = 10_000)
+        playableState(quote)
+
+        viewModel.playQuote(quote.uuid)
+        advanceUntilIdle()
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = OTHER_EPISODE_UUID, positionMs = 0)
+        resolved.complete(31_500)
+        advanceUntilIdle()
+
+        verify(playbackManager, never()).seekToTimeMsSuspend(any(), anyOrNull())
     }
 
     @Test

@@ -16,6 +16,8 @@ import javax.inject.Singleton
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withTimeoutOrNull
 
 @Singleton
@@ -25,18 +27,35 @@ class ChatQuoteSeeker @Inject constructor(
     private val appPlatform: AppPlatform,
     private val decodePolicy: FingerprintDecodePolicy,
 ) {
-    suspend fun seekTimeMs(episode: BaseEpisode, quote: ChatMessage.Quote): Int {
-        val quoteMs = loadTextTranscript(episode.uuid, isGenerated = quote.isFromGeneratedTranscript)
-            ?.findQuoteStartMs(quote)
-            ?: quote.startMs
-        if (!isFingerprintSeekEnabled()) return quoteMs
+    data class QuoteTime(
+        val timeMs: Int,
+        val referenceTimeMs: Int?,
+    )
 
-        val referenceMs = if (quote.isFromGeneratedTranscript) {
-            quoteMs
+    suspend fun quoteTime(episodeUuid: String, quote: ChatMessage.Quote): QuoteTime = coroutineScope {
+        val sourceTranscript = async { loadTextTranscript(episodeUuid, isGenerated = quote.isFromGeneratedTranscript) }
+        val generatedTranscript = if (!quote.isFromGeneratedTranscript && isFingerprintSeekEnabled()) {
+            async { loadTextTranscript(episodeUuid, isGenerated = true) }
         } else {
-            loadTextTranscript(episode.uuid, isGenerated = true)?.findQuoteStartMs(quote) ?: return quoteMs
+            null
         }
-        return playbackTime(episode, referenceMs.milliseconds)?.inWholeMilliseconds?.toInt() ?: quoteMs
+
+        val timeMs = sourceTranscript.await()?.findQuoteStartMs(quote, hintMs = quote.startMs) ?: quote.startMs
+        val referenceTimeMs = if (quote.isFromGeneratedTranscript) {
+            timeMs
+        } else {
+            generatedTranscript?.await()?.findQuoteStartMs(quote, hintMs = timeMs, maxHintDistanceMs = Long.MAX_VALUE)
+        }
+        QuoteTime(timeMs, referenceTimeMs)
+    }
+
+    suspend fun playbackTimeMs(episode: BaseEpisode, quoteTime: QuoteTime): Int {
+        val referenceTimeMs = quoteTime.referenceTimeMs?.takeIf { it >= 0 && isFingerprintSeekEnabled() }
+            ?: return quoteTime.timeMs
+        val playbackTime = withTimeoutOrNull(FINGERPRINT_RESOLVE_TIMEOUT) {
+            playbackTime(episode, referenceTimeMs.milliseconds)
+        }
+        return playbackTime?.inWholeMilliseconds?.toInt() ?: quoteTime.timeMs
     }
 
     private suspend fun loadTextTranscript(episodeUuid: String, isGenerated: Boolean): Transcript.Text? {
@@ -49,8 +68,12 @@ class ChatQuoteSeeker @Inject constructor(
         }?.takeIf { it.isGenerated == isGenerated }
     }
 
-    private fun Transcript.Text.findQuoteStartMs(quote: ChatMessage.Quote): Int? {
-        return entries.findQuoteTiming(quote.text, hintMs = quote.startMs.toLong())?.startMs?.toInt()
+    private fun Transcript.Text.findQuoteStartMs(
+        quote: ChatMessage.Quote,
+        hintMs: Int,
+        maxHintDistanceMs: Long = QUOTE_MAX_HINT_DISTANCE_MS,
+    ): Int? {
+        return entries.findQuoteStartMs(quote.text, hintMs.toLong(), maxHintDistanceMs)?.toInt()
     }
 
     private suspend fun playbackTime(episode: BaseEpisode, referenceTime: Duration): Duration? {
@@ -66,3 +89,5 @@ class ChatQuoteSeeker @Inject constructor(
 }
 
 private val TRANSCRIPT_LOAD_TIMEOUT = 5.seconds
+
+private val FINGERPRINT_RESOLVE_TIMEOUT = 5.seconds

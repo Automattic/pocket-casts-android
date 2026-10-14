@@ -24,71 +24,89 @@ class QuoteTimingTest {
 
     @Test
     fun `finds quote spanning several cues`() {
-        val timing = entries.findQuoteTiming(
+        val startMs = entries.findQuoteStartMs(
             quote = "A gust travels through the grating, sending the pleated white skirt soaring above her head, revealing her underwear.",
             hintMs = 82_980_000,
         )
 
-        assertEquals(QuoteTiming(startMs = 1_383_380, endMs = 1_389_840), timing)
+        assertEquals(1_383_380L, startMs)
     }
 
     @Test
     fun `finds quote starting mid sentence`() {
-        val timing = entries.findQuoteTiming(quote = "“Sending the pleated white skirt soaring”", hintMs = -1)
-
-        assertEquals(QuoteTiming(startMs = 1_385_600, endMs = 1_388_480), timing)
+        assertEquals(1_385_600L, entries.findQuoteStartMs(quote = "“Sending the pleated white skirt soaring”", hintMs = -1))
     }
 
     @Test
     fun `finds quote spanning several entries`() {
-        val timing = entries.findQuoteTiming(quote = "revealing her underwear. Marilyn acts out", hintMs = -1)
-
-        assertEquals(QuoteTiming(startMs = 1_389_100, endMs = 1_394_620), timing)
+        assertEquals(1_389_100L, entries.findQuoteStartMs(quote = "revealing her underwear. Marilyn acts out", hintMs = -1))
     }
 
     @Test
-    fun `falls back to opening words when the end of the quote is reworded`() {
-        val timing = entries.findQuoteTiming(
+    fun `falls back to a unique match of the opening words when the end is reworded`() {
+        val startMs = entries.findQuoteStartMs(
             quote = "A gust travels through the grating, sending the pleated skirt up over her head.",
             hintMs = -1,
         )
 
-        assertEquals(QuoteTiming(startMs = 1_383_380, endMs = 1_388_480), timing)
+        assertEquals(1_383_380L, startMs)
+    }
+
+    @Test
+    fun `ignores opening words that match more than once`() {
+        val repeated = listOf(
+            TranscriptEntry.Text("This episode is brought to you by our sponsor Acme.", startTimeMs = 60_000, endTimeMs = 62_000),
+            TranscriptEntry.Text("This episode is brought to you by our listeners.", startTimeMs = 600_000, endTimeMs = 602_000),
+        )
+
+        assertNull(repeated.findQuoteStartMs("This episode is brought to you by our friends at Initech", hintMs = -1))
     }
 
     @Test
     fun `picks the occurrence closest to the hint`() {
         val repeated = listOf(
             TranscriptEntry.Text("We will be right back after this.", startTimeMs = 60_000, endTimeMs = 62_000),
-            TranscriptEntry.Text("We will be right back after this.", startTimeMs = 600_000, endTimeMs = 602_000),
+            TranscriptEntry.Text("We will be right back after this.", startTimeMs = 200_000, endTimeMs = 202_000),
         )
 
-        assertEquals(600_000L, repeated.findQuoteTiming("We will be right back", hintMs = 590_000)?.startMs)
-        assertEquals(60_000L, repeated.findQuoteTiming("We will be right back", hintMs = 82_980_000)?.startMs)
+        assertEquals(200_000L, repeated.findQuoteStartMs("We will be right back", hintMs = 190_000))
+        assertEquals(60_000L, repeated.findQuoteStartMs("We will be right back", hintMs = 82_980_000))
+    }
+
+    @Test
+    fun `ignores matches far from the hint`() {
+        assertNull(entries.findQuoteStartMs("A gust travels through the grating", hintMs = 1_000))
+    }
+
+    @Test
+    fun `allows a custom hint distance`() {
+        val startMs = entries.findQuoteStartMs("A gust travels through the grating", hintMs = 1_000, maxHintDistanceMs = Long.MAX_VALUE)
+
+        assertEquals(1_383_380L, startMs)
     }
 
     @Test
     fun `matches whole words only`() {
         val august = listOf(TranscriptEntry.Text("In August travels through the grating", startTimeMs = 0, endTimeMs = 1_000))
 
-        assertNull(august.findQuoteTiming("gust travels through the grating", hintMs = -1))
+        assertNull(august.findQuoteStartMs("gust travels through the grating", hintMs = -1))
     }
 
     @Test
     fun `ignores short quotes`() {
-        assertNull(entries.findQuoteTiming("revealing her underwear", hintMs = -1))
+        assertNull(entries.findQuoteStartMs("revealing her underwear", hintMs = -1))
     }
 
     @Test
     fun `returns null when the quote is not in the transcript`() {
-        assertNull(entries.findQuoteTiming("She sings happy birthday to the president", hintMs = -1))
+        assertNull(entries.findQuoteStartMs("She sings happy birthday to the president", hintMs = -1))
     }
 
     @Test
     fun `returns null when the transcript has no times`() {
         val untimed = listOf(TranscriptEntry.Text("A gust travels through the grating."))
 
-        assertNull(untimed.findQuoteTiming("A gust travels through the grating", hintMs = -1))
+        assertNull(untimed.findQuoteStartMs("A gust travels through the grating", hintMs = -1))
     }
 
     private fun word(text: String, startMs: Long, endMs: Long, charStart: Int, charEnd: Int) = TranscriptEntry.WordTiming(
