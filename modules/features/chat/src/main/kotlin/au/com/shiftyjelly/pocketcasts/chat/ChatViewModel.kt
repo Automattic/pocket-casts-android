@@ -14,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.chat.answerRating
 import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.playback.NetworkConnectionWatcher
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.eventhorizon.EpisodeChatBetaSheetDismissedEvent
@@ -147,21 +148,31 @@ class ChatViewModel @Inject constructor(
                 playbackManager.playbackStateFlow,
                 episodeManager.findEpisodeByUuidFlow(episodeUuid),
             ) { playbackState, episode ->
-                if (playbackState.episodeUuid == episode.uuid) {
-                    ChatPlayback(
-                        isPlaying = playbackState.isPlaying,
-                        positionMs = playbackState.positionMs,
-                        durationMs = playbackState.durationMs.takeIf { it > 0 } ?: episode.durationMs,
-                    )
-                } else {
-                    ChatPlayback(
+                when (playbackState.loadedEpisodeUuid) {
+                    null -> null to ChatPlayback(
                         isPlaying = false,
                         positionMs = episode.playedUpToMs,
                         durationMs = episode.durationMs,
                     )
+
+                    episode.uuid -> null to ChatPlayback(
+                        isPlaying = playbackState.isPlaying,
+                        positionMs = playbackState.positionMs,
+                        durationMs = playbackState.durationMs.takeIf { it > 0 } ?: episode.durationMs,
+                    )
+
+                    else -> ChatPlayingEpisode(
+                        episodeTitle = playbackState.title,
+                        podcastUuid = playbackState.podcast?.uuid.orEmpty(),
+                        podcastTitle = playbackState.podcast?.title.orEmpty(),
+                    ) to ChatPlayback(
+                        isPlaying = playbackState.isPlaying,
+                        positionMs = playbackState.positionMs,
+                        durationMs = playbackState.durationMs.coerceAtLeast(0),
+                    )
                 }
-            }.distinctUntilChanged().collect { playback ->
-                _uiState.update { it.copy(playback = playback) }
+            }.distinctUntilChanged().collect { (otherPlayingEpisode, playback) ->
+                _uiState.update { it.copy(otherPlayingEpisode = otherPlayingEpisode, playback = playback) }
             }
         }
     }
@@ -172,10 +183,9 @@ class ChatViewModel @Inject constructor(
         viewModelScope.launch(ioDispatcher) {
             previousJob?.join()
             val state = playbackManager.playbackStateFlow.first()
-            val isCurrent = state.episodeUuid == episodeUuid && !state.isEmpty && !state.isStopped && !state.isError
             when {
-                isCurrent && state.isPlaying -> playbackManager.pause(sourceView = sourceView)
-                isCurrent -> playbackManager.playQueueSuspend(sourceView = sourceView)
+                state.loadedEpisodeUuid != null && state.isPlaying -> playbackManager.pause(sourceView = sourceView)
+                state.loadedEpisodeUuid != null -> playbackManager.playQueueSuspend(sourceView = sourceView)
                 else -> playbackManager.playNowSuspend(episodeUuid, sourceView = sourceView)
             }
         }
@@ -298,8 +308,7 @@ class ChatViewModel @Inject constructor(
             val episode = episodeManager.findEpisodeByUuid(episodeUuid)
             if (episode == null || !quote.isWithinEpisode(episode.durationMs)) return@launch
             val state = playbackManager.playbackStateFlow.first()
-            val isCurrent = state.episodeUuid == episodeUuid && !state.isEmpty && !state.isStopped && !state.isError
-            if (!isCurrent) {
+            if (state.loadedEpisodeUuid != episodeUuid) {
                 playbackManager.playNowSuspend(episode = episode, sourceView = sourceView)
                 if (!awaitPlaybackEpisode(episodeUuid)) return@launch
             }
@@ -360,15 +369,8 @@ class ChatViewModel @Inject constructor(
     }
 
     private suspend fun awaitPlaybackEpisode(episodeUuid: String): Boolean {
-        val state = playbackManager.playbackStateFlow.first()
-        if (state.episodeUuid == episodeUuid && !state.isEmpty && !state.isStopped && !state.isError) return true
         return withTimeoutOrNull(QUOTE_PLAYBACK_EPISODE_TIMEOUT_MS) {
-            playbackManager.playbackStateFlow.first { playbackState ->
-                playbackState.episodeUuid == episodeUuid &&
-                    !playbackState.isEmpty &&
-                    !playbackState.isStopped &&
-                    !playbackState.isError
-            }
+            playbackManager.playbackStateFlow.first { it.loadedEpisodeUuid == episodeUuid }
         } != null
     }
 
@@ -568,6 +570,9 @@ class ChatViewModel @Inject constructor(
 private const val QUOTE_PLAYBACK_EPISODE_TIMEOUT_MS = 5_000L
 private const val LOG_TAG = "EpisodeChat"
 
+private val PlaybackState.loadedEpisodeUuid
+    get() = episodeUuid.takeIf { it.isNotEmpty() && !isEmpty && !isStopped && !isError }
+
 private class PlaybackPosition(
     val episodeUuid: String?,
     val positionMs: Int,
@@ -594,6 +599,7 @@ data class ChatUiState(
     val isBeta: Boolean = false,
     val isBetaSheetVisible: Boolean = false,
     val playback: ChatPlayback = ChatPlayback(),
+    val otherPlayingEpisode: ChatPlayingEpisode? = null,
     val answerRatings: Map<String, ChatAnswerRating> = emptyMap(),
     val restoredMessageUuids: Set<String> = emptySet(),
 ) {
@@ -622,6 +628,12 @@ private val ChatAnswerRating.analyticsValue
         ChatAnswerRating.Positive -> EpisodeChatSentimentType.Positive
         ChatAnswerRating.Negative -> EpisodeChatSentimentType.Negative
     }
+
+data class ChatPlayingEpisode(
+    val episodeTitle: String,
+    val podcastUuid: String,
+    val podcastTitle: String,
+)
 
 data class ChatPlayback(
     val isPlaying: Boolean = false,

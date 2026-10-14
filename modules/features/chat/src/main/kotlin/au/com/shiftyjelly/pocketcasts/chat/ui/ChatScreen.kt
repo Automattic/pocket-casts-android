@@ -200,10 +200,11 @@ private fun ChatContent(
             .background(theme.background)
             .imePadding(),
     ) {
+        val playingEpisode = uiState.otherPlayingEpisode
         ChatHeader(
-            episodeTitle = uiState.episodeTitle,
-            podcastUuid = uiState.podcastUuid,
-            podcastTitle = uiState.podcastTitle,
+            episodeTitle = playingEpisode?.episodeTitle ?: uiState.episodeTitle,
+            podcastUuid = playingEpisode?.podcastUuid ?: uiState.podcastUuid,
+            podcastTitle = playingEpisode?.podcastTitle ?: uiState.podcastTitle,
             playback = uiState.playback,
             onClickClose = onClickClose,
             onClickPlayPause = onClickPlayPause,
