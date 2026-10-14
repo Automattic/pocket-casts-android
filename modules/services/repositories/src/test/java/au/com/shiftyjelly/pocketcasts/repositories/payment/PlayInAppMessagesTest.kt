@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.payment
 
 import android.app.Activity
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.testing.TestLifecycleOwner
 import au.com.shiftyjelly.pocketcasts.models.type.Membership
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
@@ -136,6 +137,30 @@ class PlayInAppMessagesTest {
         lifecycleOwner.currentState = Lifecycle.State.RESUMED
         playInAppMessages.show(activity)
 
+        verifyBlocking(pendingDataSource, times(1)) { showInAppMessages(activity) }
+    }
+
+    @Test
+    fun `show messages again after the activity finishes while a request is pending`() = runTest {
+        val pendingDataSource = mock<PaymentDataSource> {
+            on { showInAppMessages(any()) } doSuspendableAnswer { awaitCancellation() }
+        }
+        paymentClient = PaymentClient.test(pendingDataSource, listener)
+        val activityLifecycleOwner = TestLifecycleOwner(Lifecycle.State.RESUMED, coroutineRule.testDispatcher)
+        val finishingActivity = mock<Activity>(extraInterfaces = arrayOf(LifecycleOwner::class)) {
+            on { isFinishing } doReturn true
+        }
+        whenever((finishingActivity as LifecycleOwner).lifecycle).doReturn(activityLifecycleOwner.lifecycle)
+        val playInAppMessages = playInAppMessages()
+
+        playInAppMessages.show(finishingActivity)
+        runCurrent()
+        activityLifecycleOwner.currentState = Lifecycle.State.DESTROYED
+        lifecycleOwner.currentState = Lifecycle.State.CREATED
+        lifecycleOwner.currentState = Lifecycle.State.RESUMED
+        playInAppMessages.show(activity)
+
+        verifyBlocking(pendingDataSource, times(1)) { showInAppMessages(finishingActivity) }
         verifyBlocking(pendingDataSource, times(1)) { showInAppMessages(activity) }
     }
 

@@ -51,7 +51,7 @@ class PlayInAppMessages @Inject constructor(
             return
         }
         isShownInForeground = true
-        pendingMessages = scope.launch(Dispatchers.Main) {
+        val job = scope.launch(Dispatchers.Main) {
             val result = withTimeoutOrNull(PendingMessagesTimeout) { paymentClient.showInAppMessages(activity) }
             if (result == null) {
                 LogBuffer.i(LogBuffer.TAG_SUBSCRIPTIONS, "In-app messages timed out")
@@ -60,6 +60,16 @@ class PlayInAppMessages @Inject constructor(
                 refreshSubscription()
             }
         }
+        pendingMessages = job
+        (activity as? LifecycleOwner)?.lifecycle?.addObserver(
+            object : DefaultLifecycleObserver {
+                override fun onDestroy(owner: LifecycleOwner) {
+                    if (activity.isFinishing) {
+                        job.cancel()
+                    }
+                }
+            },
+        )
     }
 
     private fun isEligible(): Boolean {
