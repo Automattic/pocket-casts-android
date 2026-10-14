@@ -45,6 +45,7 @@ import java.io.IOException
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import java.util.Date
+import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.TestTimeSource
 import kotlinx.coroutines.CompletableDeferred
@@ -1617,6 +1618,18 @@ class ChatViewModelTest {
         assertTrue(state.isHistoryVisible)
         assertEquals(listOf(ChatHistoryGroup.Today, ChatHistoryGroup.PreviousSevenDays), state.history.map { it.group })
         assertEquals(EpisodeChatHistoryShownEvent(source = SourceView.PLAYER.analyticsValue, chatCount = 2), eventSink.pollEvent())
+    }
+
+    @Test
+    fun `showing the history again regroups the chats for the current day`() = runTest {
+        chatManager.history.value = listOf(historyItem(EPISODE_UUID))
+        setEpisodeInfo()
+        advanceUntilIdle()
+        clock += 1.days
+
+        viewModel.showHistory()
+
+        assertEquals(listOf(ChatHistoryGroup.Yesterday), viewModel.uiState.value.history.map { it.group })
     }
 
     @Test

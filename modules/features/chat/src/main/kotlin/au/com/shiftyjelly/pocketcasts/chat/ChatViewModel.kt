@@ -100,6 +100,7 @@ class ChatViewModel @Inject constructor(
     private val episodeUuid get() = checkNotNull(chatEpisode.value).uuid
     private val podcastUuid get() = checkNotNull(chatEpisode.value).podcastUuid
     private var playingEpisodeUuid: String? = null
+    private var historyItems: List<EpisodeChatHistoryItem> = emptyList()
 
     @Volatile private var quotePlaybackUndo: PlaybackPosition? = null
     private var transientUserMessage: ChatMessage.User? = null
@@ -249,6 +250,7 @@ class ChatViewModel @Inject constructor(
     private fun observeHistory() {
         viewModelScope.launch {
             chatManager.observeHistory().collect { items ->
+                historyItems = items
                 _uiState.update { it.copy(history = items.toHistorySections(clock.instant(), ZoneId.systemDefault())) }
             }
         }
@@ -256,7 +258,12 @@ class ChatViewModel @Inject constructor(
 
     fun showHistory() {
         if (_uiState.value.isAwaitingReply) return
-        _uiState.update { it.copy(isHistoryVisible = true) }
+        _uiState.update {
+            it.copy(
+                isHistoryVisible = true,
+                history = historyItems.toHistorySections(clock.instant(), ZoneId.systemDefault()),
+            )
+        }
         eventHorizon.track(
             EpisodeChatHistoryShownEvent(
                 source = sourceView.analyticsValue,
