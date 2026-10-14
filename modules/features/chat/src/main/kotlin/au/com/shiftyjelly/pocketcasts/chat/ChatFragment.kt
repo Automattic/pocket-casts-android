@@ -192,13 +192,15 @@ class ChatFragment : BaseDialogFragment() {
 
     private fun showClearChatOptionsDialog() {
         val dangerColor = requireContext().getThemeColor(UR.attr.support_05)
-        OptionsDialog()
-            .setForceDarkTheme(args.sourceView == SourceView.PLAYER)
-            .addTextOption(
+        val dialog = OptionsDialog().setForceDarkTheme(args.sourceView == SourceView.PLAYER)
+        if (!viewModel.uiState.value.isAwaitingReply) {
+            dialog.addTextOption(
                 titleId = LR.string.chat_history,
                 imageId = IR.drawable.ic_history,
                 click = viewModel::showHistory,
             )
+        }
+        dialog
             .addTextOption(
                 titleId = LR.string.chat_clear,
                 titleColor = dangerColor,
