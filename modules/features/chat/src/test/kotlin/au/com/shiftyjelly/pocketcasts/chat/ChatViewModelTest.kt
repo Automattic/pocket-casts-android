@@ -5,6 +5,7 @@ import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
@@ -1078,6 +1079,7 @@ class ChatViewModelTest {
                 episodeUuid = EPISODE_UUID,
                 podcastUuid = PODCAST_UUID,
                 quoteSource = EpisodeChatQuoteSourceType.InlineTimestamp,
+                isOtherEpisode = false,
             ),
             eventSink.pollEvent(),
         )
@@ -1244,6 +1246,28 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `playing a quote while another episode plays tracks the switch`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = "other-uuid")
+        playableState(quote)
+        eventSink.skipEvent()
+
+        viewModel.playQuote(quote.uuid)
+
+        assertEquals(
+            EpisodeChatQuotePlayTappedEvent(
+                source = SourceView.PLAYER.analyticsValue,
+                episodeUuid = EPISODE_UUID,
+                podcastUuid = PODCAST_UUID,
+                quoteSource = EpisodeChatQuoteSourceType.InlineTimestamp,
+                isOtherEpisode = true,
+            ),
+            eventSink.pollEvent(),
+        )
+    }
+
+    @Test
     fun `play pause while a quote is starting cancels the quote`() = runTest {
         val quote = createQuote(startMs = 1_000, endMs = 3_000)
         whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
@@ -1278,12 +1302,52 @@ class ChatViewModelTest {
     }
 
     @Test
-    fun `playback shows the saved position when another episode is playing`() = runTest {
-        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = "other-uuid", positionMs = 10_000)
-
+    fun `playback shows the saved position when nothing is playing`() = runTest {
         setEpisodeInfo()
         advanceUntilIdle()
 
+        assertEquals(ChatPlayback(isPlaying = false, positionMs = 50_000, durationMs = 200_000), viewModel.uiState.value.playback)
+        assertNull(viewModel.uiState.value.otherPlayingEpisode)
+    }
+
+    @Test
+    fun `header follows another playing episode while the chat stays on its episode`() = runTest {
+        setEpisodeInfo()
+        playbackState.value = PlaybackState(
+            state = PlaybackState.State.PLAYING,
+            episodeUuid = "other-uuid",
+            title = "Other episode",
+            podcast = Podcast(uuid = "other-podcast-uuid", title = "Other podcast"),
+            positionMs = 10_000,
+            durationMs = 40_000,
+        )
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertEquals(ChatPlayingEpisode("Other episode", "other-podcast-uuid", "Other podcast"), state.otherPlayingEpisode)
+        assertEquals(ChatPlayback(isPlaying = true, positionMs = 10_000, durationMs = 40_000), state.playback)
+        assertEquals("Episode title", state.episodeTitle)
+    }
+
+    @Test
+    fun `header returns to the chat episode when it starts playing`() = runTest {
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = "other-uuid", title = "Other episode")
+        setEpisodeInfo()
+        advanceUntilIdle()
+
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID, positionMs = 1_000)
+        advanceUntilIdle()
+
+        assertNull(viewModel.uiState.value.otherPlayingEpisode)
+    }
+
+    @Test
+    fun `stopped playback shows the chat episode`() = runTest {
+        playbackState.value = PlaybackState(state = PlaybackState.State.STOPPED, episodeUuid = "other-uuid", title = "Other episode")
+        setEpisodeInfo()
+        advanceUntilIdle()
+
+        assertNull(viewModel.uiState.value.otherPlayingEpisode)
         assertEquals(ChatPlayback(isPlaying = false, positionMs = 50_000, durationMs = 200_000), viewModel.uiState.value.playback)
     }
 
@@ -1315,8 +1379,33 @@ class ChatViewModelTest {
     }
 
     @Test
-    fun `play pause plays the chat episode when it is not playing`() = runTest {
+    fun `play pause pauses another playing episode`() = runTest {
         playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = "other-uuid")
+        setEpisodeInfo()
+        advanceUntilIdle()
+
+        viewModel.onPlayPauseClick()
+        advanceUntilIdle()
+
+        verify(playbackManager).pause(transientLoss = false, sourceView = SourceView.PLAYER)
+        verify(playbackManager, never()).playNowSuspend(any<String>(), any(), any(), any())
+    }
+
+    @Test
+    fun `play pause resumes another paused episode`() = runTest {
+        playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = "other-uuid")
+        setEpisodeInfo()
+        advanceUntilIdle()
+
+        viewModel.onPlayPauseClick()
+        advanceUntilIdle()
+
+        verify(playbackManager).playQueueSuspend(SourceView.PLAYER, false)
+        verify(playbackManager, never()).playNowSuspend(any<String>(), any(), any(), any())
+    }
+
+    @Test
+    fun `play pause plays the chat episode when nothing is playing`() = runTest {
         setEpisodeInfo()
         advanceUntilIdle()
 
