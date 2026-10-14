@@ -21,6 +21,9 @@ class FakePaymentDataSource : PaymentDataSource {
     var receivedPurchases = emptyList<Purchase>()
         private set
 
+    var inAppMessageResult: InAppMessageResult = InAppMessageResult.NoActionNeeded
+    var inAppMessageResultCode: PaymentResultCode = PaymentResultCode.Ok
+
     private val _purchaseResults = MutableSharedFlow<PaymentResult<List<Purchase>>>()
 
     override val purchaseResults = _purchaseResults.asSharedFlow()
@@ -62,6 +65,14 @@ class FakePaymentDataSource : PaymentDataSource {
             PaymentResult.Success(purchase.copy(isAcknowledged = true))
         } else {
             PaymentResult.Failure(acknowledgePurchaseResultCode, "Acknowledge purchase error")
+        }
+    }
+
+    override suspend fun showInAppMessages(activity: Activity): PaymentResult<InAppMessageResult> {
+        return if (inAppMessageResultCode == PaymentResultCode.Ok) {
+            PaymentResult.Success(inAppMessageResult)
+        } else {
+            PaymentResult.Failure(inAppMessageResultCode, "Show in-app messages error")
         }
     }
 

@@ -76,6 +76,7 @@ dependencies {
 
     testImplementation(libs.coroutines.test)
     testImplementation(libs.junit)
+    testImplementation(libs.lifecycle.runtime.testing)
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.kotlin)
     testImplementation(libs.okHttp.mockwebserver)

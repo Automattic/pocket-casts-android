@@ -38,6 +38,7 @@ import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.doOnAttach
 import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
@@ -168,6 +169,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.di.NotificationPermissionChec
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.opml.OpmlImportTask
+import au.com.shiftyjelly.pocketcasts.repositories.payment.PlayInAppMessages
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackNoticeType
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
@@ -331,6 +333,9 @@ class MainActivity :
 
     @Inject
     lateinit var paymentClient: PaymentClient
+
+    @Inject
+    lateinit var playInAppMessages: PlayInAppMessages
 
     @Inject
     lateinit var appReviewManager: AppReviewManager
@@ -869,6 +874,8 @@ class MainActivity :
         lifecycleScope.launch {
             paymentClient.acknowledgePendingPurchases()
         }
+
+        window.decorView.doOnAttach { playInAppMessages.show(this@MainActivity) }
 
         // Schedule next refresh in the background
         RefreshPodcastsTask.scheduleOrCancel(this@MainActivity, settings)
