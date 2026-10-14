@@ -176,8 +176,6 @@ Language: ca
     <string name="up_next_sort_duration_tooltip_title">Ordena per durada</string>
     <string name="transcript_tap_to_seek_streaming_unavailable">Descarrega l\'episodi per a moure\'t per la transcripció</string>
     <string name="bookmark_play_from">Reprodueix des de %s</string>
-    <string name="summary_upsell_description">Subscriu-te a Plus per a accedir-hi i a altres funcions Prèmium com ara els marcadors i les carpetes.</string>
-    <string name="summary_upsell_title">Resums amb IA</string>
     <string name="tv_create_account_title">Crea el teu compte gratuït</string>
     <string name="tv_onboarding_sign_in_instructions">Obre la càmera i apunta al codi QR</string>
     <string name="tv_onboarding_sign_in_title">Inicia sessió amb el telèfon</string>
@@ -209,10 +207,6 @@ Language: ca
     <string name="blogs_found_followed_badge">PÒDCAST SEGUIT</string>
     <string name="blogs_found_feed_detected">S\'ha trobat el feed</string>
     <string name="chapters_generated_disclaimer">Aquests capítols es generen automàticament i poden no ser del tot precisos.</string>
-    <string name="player_tab_summary">Resum</string>
-    <string name="summary">Resum</string>
-    <string name="description">Descripció</string>
-    <string name="episode_summary">Resum de l\'episodi</string>
     <string name="chat_stop_quote">Atura la citació</string>
     <string name="chat_play_quote">Reprodueix la citació</string>
     <string name="chat_error_network">No s\'ha pogut connectar al servidor. Comprova la connexió.</string>

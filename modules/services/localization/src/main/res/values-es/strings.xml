@@ -180,8 +180,6 @@ Language: es
     <string name="up_next_sort_duration_tooltip_title">Ordenar por duración</string>
     <string name="transcript_tap_to_seek_streaming_unavailable">Descarga el episodio para pulsar para buscar</string>
     <string name="bookmark_play_from">Reproducir desde %s</string>
-    <string name="summary_upsell_description">Suscríbete a Plus para acceder a ella y a otras funciones Premium, como los marcadores y las carpetas.</string>
-    <string name="summary_upsell_title">Resúmenes con tecnología de IA</string>
     <string name="tv_create_account_title">Crea tu cuenta gratuita</string>
     <string name="tv_onboarding_sign_in_instructions">Abre la cámara y señala este código QR</string>
     <string name="tv_onboarding_sign_in_title">Inicia sesión con tu teléfono</string>
@@ -213,10 +211,6 @@ Language: es
     <string name="blogs_found_followed_badge">PÓDCAST SEGUIDO</string>
     <string name="blogs_found_feed_detected">Feed encontrado</string>
     <string name="chapters_generated_disclaimer">Estos capítulos se generan automáticamente y puede que no sean del todo precisos.</string>
-    <string name="description">Descripción</string>
-    <string name="player_tab_summary">Resumen</string>
-    <string name="summary">Resumen</string>
-    <string name="episode_summary">Resumen del episodio</string>
     <string name="chat_stop_quote">Detener cita</string>
     <string name="chat_play_quote">Reproducir cita</string>
     <string name="chat_tap_to_retry">Tocar para intentar de nuevo</string>

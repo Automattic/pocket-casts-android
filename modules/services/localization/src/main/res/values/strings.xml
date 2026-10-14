@@ -141,11 +141,6 @@
     <string name="episode_chat_beta_badge">Beta</string>
     <string name="episode_chat_needs_transcript">Ask about this episode needs a transcript.</string>
     <string name="episode_chat_tooltip_body">Ask it anything. It was listening too.</string>
-    <string name="episode_summary">Episode Summary</string>
-    <string name="summary_upsell_title">AI-Powered Summaries</string>
-    <string name="summary_upsell_description">Subscribe to Plus to get access to it and other Premium&#160;features like bookmarks and folders.</string>
-    <string name="description">Description</string>
-    <string name="summary">Summary</string>
     <string name="transcript">Transcript</string>
     <string name="episode_description">Episode Description</string>
     <string name="unstar">Unstar</string>
@@ -567,7 +562,6 @@
     <string name="player_tab_chapters" translatable="false">@string/chapters</string>
     <string name="player_tab_notes">Details</string>
     <string name="player_tab_playing">Playing</string>
-    <string name="player_tab_summary">Summary</string>
     <string name="player_tab_playing_wide">Now Playing</string>
     <string name="player_time_saved_detail">In total you have saved %s using this feature.</string>
     <string name="player_time_saved_no_hour">Congrats! You\'re saving time and getting through more podcasts.</string>

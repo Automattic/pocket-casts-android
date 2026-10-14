@@ -14,9 +14,9 @@ interface TranscriptManager {
         episodeUuid: String,
     ): Transcript.Text?
 
-    suspend fun loadSummaryText(
+    suspend fun loadGeneratedChapters(
         episodeUuid: String,
-    ): String?
+    ): Boolean
 
     fun resetInvalidTranscripts(
         episodeUuid: String,

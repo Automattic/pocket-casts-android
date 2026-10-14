@@ -180,8 +180,6 @@ Language: ru
     <string name="up_next_sort_duration_tooltip_title">Сортировать по длительности</string>
     <string name="transcript_tap_to_seek_streaming_unavailable">Скачать выпуск, чтобы искать нажатием</string>
     <string name="bookmark_play_from">Воспроизвести с %s</string>
-    <string name="summary_upsell_description">Подпишитесь на Plus, чтобы пользоваться ею и другими премиум-функциями, такими как закладки и папки.</string>
-    <string name="summary_upsell_title">Сводки на базе ИИ</string>
     <string name="tv_create_account_title">Создать бесплатную учётную запись</string>
     <string name="tv_onboarding_sign_in_instructions">Откройте камеру и наведите на этот QR-код</string>
     <string name="tv_onboarding_sign_in_title">Вход с телефона</string>
@@ -213,10 +211,6 @@ Language: ru
     <string name="blogs_found_followed_badge">ПОДПИСКИ НА ПОДКАСТ</string>
     <string name="blogs_found_feed_detected">Лента найдена</string>
     <string name="chapters_generated_disclaimer">Эти главы сгенерированы автоматически и могут быть не совсем точными.</string>
-    <string name="description">Описание</string>
-    <string name="player_tab_summary">Обзор</string>
-    <string name="summary">Обзор</string>
-    <string name="episode_summary">Обзор выпуска</string>
     <string name="chat_stop_quote">Остановить цитату</string>
     <string name="chat_play_quote">Воспроизвести цитату</string>
     <string name="chat_tap_to_retry">Нажмите, чтобы повторить попытку.</string>
