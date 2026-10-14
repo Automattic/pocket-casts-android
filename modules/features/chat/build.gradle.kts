@@ -22,7 +22,6 @@ dependencies {
     api(libs.compose.runtime)
     api(libs.dagger.hilt.android)
 
-    api(projects.modules.services.payment)
     api(projects.modules.services.repositories)
     api(projects.modules.services.views)
 
@@ -39,7 +38,6 @@ dependencies {
     implementation(libs.fragment.ktx)
     implementation(libs.lottie.compose)
 
-    implementation(projects.modules.features.settings)
     implementation(projects.modules.services.analytics)
     implementation(projects.modules.services.compose)
     implementation(projects.modules.services.coroutines)

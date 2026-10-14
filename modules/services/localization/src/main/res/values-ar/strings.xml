@@ -224,11 +224,6 @@ Language: ar
     <string name="chat_error_server">حدث خطأ ما. يُرجى إعادة المحاولة.</string>
     <string name="chat_clear">مسح المحادثة</string>
     <string name="chat_send">إرسال</string>
-    <string name="chat_preview_user_2">هل ذُكرت أي نصائح عملية؟</string>
-    <string name="chat_preview_ai_2">تتناول هذه الحلقة علم تكوين العادات، وتستعرض كيف يمكن للعادات اليومية البسيطة أن تُحدث تغييرات كبيرة مع مرور الوقت.</string>
-    <string name="chat_preview_user_1">ما الموضوع الرئيسي لهذه الحلقة؟</string>
-    <string name="chat_preview_ai_1">مرحبًا! أنا هنا لمساعدتك على استكشاف هذه الحلقة. اسألني أي شيء عن الموضوعات المطروحة، أو أبرز النقاط، أو لحظات محددة من الحلقة.</string>
-    <string name="chat_paywall_title">المحادثة حول هذه الحلقة</string>
     <string name="episode_chat">المحادثة حول الحلقة</string>
     <string name="blogs_experiment_banner_body">المدوّنات ميزة نقوم بتجربتها حاليًا. قد تستمر كما هي، أو تخضع لتعديلات، أو تختفي بهدوء.</string>
     <string name="blogs_experiment_banner_lead">هذه مجرد تجربة.</string>
