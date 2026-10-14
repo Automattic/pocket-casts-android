@@ -307,7 +307,7 @@ private fun WhatsNewButton(
     ) {
         Box {
             Icon(
-                painter = painterResource(IR.drawable.ic_whats_new_bell),
+                painter = painterResource(IR.drawable.ic_inbox),
                 contentDescription = stringResource(LR.string.settings_whats_new),
                 tint = MaterialTheme.theme.colors.primaryIcon01,
             )
