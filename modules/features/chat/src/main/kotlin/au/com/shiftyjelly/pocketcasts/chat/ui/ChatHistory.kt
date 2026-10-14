@@ -160,8 +160,7 @@ private fun ChatHistoryRow(
                 .background(theme.background)
                 .clickable(role = Role.Button, onClick = onClick)
                 .padding(start = 16.dp, end = 16.dp)
-                .height(64.dp)
-                .semantics(mergeDescendants = true) {},
+                .height(64.dp),
         ) {
             PodcastImage(
                 uuid = item.podcastUuid,

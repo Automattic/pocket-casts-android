@@ -16,6 +16,7 @@ import java.util.Date
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
@@ -34,7 +35,7 @@ class ChatManagerImpl @Inject constructor(
     }
 
     override fun observeHistory(): Flow<List<EpisodeChatHistoryItem>> {
-        return episodeChatDao.observeChatHistory()
+        return episodeChatDao.observeChatHistory().distinctUntilChanged()
     }
 
     override suspend fun createChat(episodeUuid: String, podcastUuid: String) {
