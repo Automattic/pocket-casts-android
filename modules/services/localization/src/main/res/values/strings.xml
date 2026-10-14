@@ -2561,7 +2561,7 @@
     <string name="chat_feedback_thank_you">Thanks for your feedback</string>
     <string name="chat_rate_answer_good">Good response</string>
     <string name="chat_rate_answer_bad">Bad response</string>
-    <string name="chat_feedback_what_went_wrong">What went wrong?</string>
+    <string name="chat_feedback_what_went_wrong">What went wrong</string>
     <string name="chat_feedback_reason_not_interesting">It wasn’t interesting</string>
     <string name="chat_feedback_reason_wrong_facts">It got the facts wrong</string>
     <string name="chat_feedback_reason_out_of_date">It’s out of date</string>
