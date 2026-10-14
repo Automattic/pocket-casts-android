@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
@@ -111,6 +112,7 @@ class ChatManagerImplTest {
             requestCaptor.firstValue,
         )
         assertEquals(listOf(ChatRole.User.value, ChatRole.Assistant.value, ChatRole.Quote.value), episodeChatDao.messages.map { it.role })
+        assertTrue(episodeChatDao.messages.zipWithNext().all { (first, second) -> first.createdAt < second.createdAt })
         assertEquals("user-uuid", episodeChatDao.messages[0].uuid)
         assertEquals("What happened?", episodeChatDao.messages[0].text)
         assertEquals("Assistant reply", episodeChatDao.messages[1].text)
@@ -236,8 +238,13 @@ class ChatManagerImplTest {
         }
 
         override suspend fun insertMessage(message: EpisodeChatMessage) {
-            messages.removeAll { it.uuid == message.uuid }
-            messages += message
+            insertMessages(listOf(message))
+        }
+
+        override suspend fun insertMessages(messages: List<EpisodeChatMessage>) {
+            val uuids = messages.map { it.uuid }.toSet()
+            this.messages.removeAll { it.uuid in uuids }
+            this.messages += messages
         }
 
         override fun observeMessages(episodeUuid: String): Flow<List<EpisodeChatMessage>> {

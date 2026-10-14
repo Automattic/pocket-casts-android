@@ -33,6 +33,7 @@ internal data class ChatTheme(
     val onWhiteText: Color,
     val sheetHandle: Color,
     val detailsHint: Color,
+    val rating: Color,
 ) {
     companion object {
         fun default(colors: ThemeColors) = ChatTheme(
@@ -59,6 +60,7 @@ internal data class ChatTheme(
             onWhiteText = ThemeLightColors.primaryText01,
             sheetHandle = ThemeLightColors.primaryUi05,
             detailsHint = ThemeLightColors.primaryText02,
+            rating = colors.primaryIcon02,
         )
 
         fun player(colors: PlayerColors) = ChatTheme(
@@ -85,6 +87,7 @@ internal data class ChatTheme(
             onWhiteText = ThemeLightColors.primaryText01,
             sheetHandle = ThemeLightColors.primaryUi05,
             detailsHint = ThemeLightColors.primaryText02,
+            rating = colors.contrast05,
         )
     }
 }
