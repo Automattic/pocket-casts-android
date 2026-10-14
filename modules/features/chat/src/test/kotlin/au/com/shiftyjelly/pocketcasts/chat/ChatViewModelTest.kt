@@ -14,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatAnswerRating
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatManager
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatMessage
+import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatQuoteSeeker
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ClearedChat
 import au.com.shiftyjelly.pocketcasts.repositories.playback.NetworkConnectionWatcher
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -71,6 +72,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
@@ -122,11 +124,16 @@ class ChatViewModelTest {
         viewModel = createViewModel()
     }
 
+    private val quoteSeeker = mock<ChatQuoteSeeker> {
+        on { seekTimeMs(any(), any()) } doSuspendableAnswer { (it.arguments[1] as ChatMessage.Quote).startMs }
+    }
+
     private fun createViewModel() = ChatViewModel(
         networkConnectionWatcher = networkConnectionWatcher,
         chatManager = chatManager,
         playbackManager = playbackManager,
         episodeManager = episodeManager,
+        quoteSeeker = quoteSeeker,
         eventHorizon = EventHorizon(eventSink),
         settings = settings,
         applicationScope = kotlinx.coroutines.CoroutineScope(coroutineRule.testDispatcher),
@@ -1116,6 +1123,20 @@ class ChatViewModelTest {
         verify(playbackManager, never()).pause(any(), any())
         verify(playbackManager, never()).pauseSuspend(any(), any())
         verify(playbackManager, never()).seekToTimeMsSuspend(org.mockito.kotlin.eq(10_000), anyOrNull())
+    }
+
+    @Test
+    fun `playing a quote seeks to the time the seeker resolves`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        whenever(quoteSeeker.seekTimeMs(any(), any())).thenReturn(31_500)
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID, positionMs = 10_000)
+        playableState(quote)
+
+        viewModel.playQuote(quote.uuid)
+        advanceUntilIdle()
+
+        verify(playbackManager).seekToTimeMsSuspend(org.mockito.kotlin.eq(31_500), anyOrNull())
     }
 
     @Test
