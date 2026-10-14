@@ -299,6 +299,7 @@ class ChatViewModel @Inject constructor(
                 episodeUuid = episodeUuid,
                 podcastUuid = podcastUuid,
                 quoteSource = EpisodeChatQuoteSourceType.InlineTimestamp,
+                isOtherEpisode = _uiState.value.otherPlayingEpisode != null,
             ),
         )
         val previousJob = quotePlaybackJob
