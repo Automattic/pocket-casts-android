@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.eventhorizon.EpisodeChatFeedbackFormDismissedEvent
 import com.automattic.eventhorizon.EpisodeChatFeedbackFormShownEvent
 import com.automattic.eventhorizon.EpisodeChatFeedbackReasonType
+import com.automattic.eventhorizon.EpisodeChatFeedbackSubmitFailedEvent
 import com.automattic.eventhorizon.EpisodeChatFeedbackSubmitTappedEvent
 import com.automattic.eventhorizon.EpisodeChatFeedbackTriggerType
 import com.automattic.eventhorizon.EventHorizon
@@ -128,6 +129,14 @@ class ChatFeedbackViewModel @Inject constructor(
                 isSubmitted = true
                 _submitted.send(Unit)
             } else {
+                eventHorizon.track(
+                    EpisodeChatFeedbackSubmitFailedEvent(
+                        source = sourceView.analyticsValue,
+                        episodeUuid = episodeUuid,
+                        podcastUuid = podcastUuid,
+                        trigger = trigger,
+                    ),
+                )
                 _uiState.update { it.copy(isSubmitting = false, hasSubmitError = true) }
             }
         }

@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import com.automattic.eventhorizon.EpisodeChatFeedbackFormDismissedEvent
 import com.automattic.eventhorizon.EpisodeChatFeedbackFormShownEvent
 import com.automattic.eventhorizon.EpisodeChatFeedbackReasonType
+import com.automattic.eventhorizon.EpisodeChatFeedbackSubmitFailedEvent
 import com.automattic.eventhorizon.EpisodeChatFeedbackSubmitTappedEvent
 import com.automattic.eventhorizon.EpisodeChatFeedbackTriggerType
 import com.automattic.eventhorizon.EventHorizon
@@ -188,6 +189,15 @@ class ChatFeedbackViewModelTest {
             awaitItem()
         }
         assertTrue(eventSink.pollEvent() is EpisodeChatFeedbackSubmitTappedEvent)
+        assertEquals(
+            EpisodeChatFeedbackSubmitFailedEvent(
+                source = SourceView.PLAYER.analyticsValue,
+                episodeUuid = EPISODE_UUID,
+                podcastUuid = PODCAST_UUID,
+                trigger = EpisodeChatFeedbackTriggerType.SessionSurvey,
+            ),
+            eventSink.pollEvent(),
+        )
         assertTrue(eventSink.pollEvent() is EpisodeChatFeedbackSubmitTappedEvent)
         assertTrue(eventSink.isEmpty())
     }
