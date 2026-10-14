@@ -14,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionMana
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.time.Duration.Companion.minutes
@@ -52,6 +53,9 @@ class PlayInAppMessages @Inject constructor(
         isShownInForeground = true
         pendingMessages = scope.launch(Dispatchers.Main) {
             val result = withTimeoutOrNull(PendingMessagesTimeout) { paymentClient.showInAppMessages(activity) }
+            if (result == null) {
+                LogBuffer.i(LogBuffer.TAG_SUBSCRIPTIONS, "In-app messages timed out")
+            }
             if (result is PaymentResult.Success && result.value is InAppMessageResult.SubscriptionStatusUpdated) {
                 refreshSubscription()
             }
@@ -66,6 +70,7 @@ class PlayInAppMessages @Inject constructor(
     }
 
     private suspend fun refreshSubscription() {
+        // The server learns about the Play change asynchronously, so the first fetch can still be stale
         subscriptionManager.fetchFreshSubscription()
         delay(RefreshRetryDelay)
         subscriptionManager.fetchFreshSubscription()
