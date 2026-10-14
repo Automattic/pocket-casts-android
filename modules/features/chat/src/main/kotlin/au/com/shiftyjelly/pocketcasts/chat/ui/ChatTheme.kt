@@ -6,12 +6,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import au.com.shiftyjelly.pocketcasts.compose.PlayerColors
 import au.com.shiftyjelly.pocketcasts.compose.ThemeColors
+import au.com.shiftyjelly.pocketcasts.compose.ThemeLightColors
 import au.com.shiftyjelly.pocketcasts.compose.theme
 
 internal data class ChatTheme(
     val background: Color,
     val primaryText: Color,
     val secondaryText: Color,
+    val tertiaryText: Color,
     val iconButton: Color,
     val aiBubble: Color,
     val aiBubbleText: Color,
@@ -28,12 +30,16 @@ internal data class ChatTheme(
     val progressTrack: Color,
     val chipBorder: Color,
     val quoteTimestamp: Color,
+    val onWhiteText: Color,
+    val sheetHandle: Color,
+    val detailsHint: Color,
 ) {
     companion object {
         fun default(colors: ThemeColors) = ChatTheme(
             background = colors.primaryUi01,
             primaryText = colors.primaryText01,
             secondaryText = colors.primaryText02,
+            tertiaryText = colors.primaryText02,
             iconButton = colors.primaryIcon01,
             aiBubble = colors.primaryUi05,
             aiBubbleText = colors.primaryText01,
@@ -50,19 +56,23 @@ internal data class ChatTheme(
             progressTrack = colors.primaryUi05,
             chipBorder = colors.primaryUi05,
             quoteTimestamp = colors.primaryInteractive01,
+            onWhiteText = ThemeLightColors.primaryText01,
+            sheetHandle = ThemeLightColors.primaryUi05,
+            detailsHint = ThemeLightColors.primaryText02,
         )
 
         fun player(colors: PlayerColors) = ChatTheme(
             background = colors.background01,
             primaryText = colors.contrast01,
             secondaryText = colors.contrast04,
+            tertiaryText = colors.contrast02,
             iconButton = colors.contrast01,
             aiBubble = colors.contrast05,
             aiBubbleText = colors.contrast01,
             userBubble = colors.contrast06,
             userBubbleText = colors.contrast01,
             inputBackground = colors.contrast06,
-            inputText = colors.contrast02,
+            inputText = colors.contrast01,
             inputHint = colors.contrast03,
             sendButton = colors.contrast01,
             sendButtonIcon = colors.background01,
@@ -72,6 +82,9 @@ internal data class ChatTheme(
             progressTrack = colors.contrast05,
             chipBorder = colors.contrast05,
             quoteTimestamp = QuoteTimestampBlue,
+            onWhiteText = ThemeLightColors.primaryText01,
+            sheetHandle = ThemeLightColors.primaryUi05,
+            detailsHint = ThemeLightColors.primaryText02,
         )
     }
 }

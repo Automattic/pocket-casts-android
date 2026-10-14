@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.chat
 
+import android.content.DialogInterface
 import android.os.Bundle
 import android.os.Parcelable
 import android.view.LayoutInflater
@@ -9,6 +10,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.graphics.toArgb
 import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.chat.ui.ChatSurvey
 import au.com.shiftyjelly.pocketcasts.chat.ui.rememberChatTheme
@@ -49,6 +51,13 @@ class ChatSurveyFragment : BaseDialogFragment() {
 
     private val args get() = requireArguments().requireParcelable<Args>(ARGS_KEY)
 
+    private val viewModel by viewModels<ChatSurveyViewModel>()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        viewModel.onShown(args.episodeUuid, args.podcastUuid, args.sourceView)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -63,10 +72,35 @@ class ChatSurveyFragment : BaseDialogFragment() {
 
                 ChatSurvey(
                     theme = rememberChatTheme(),
-                    onClickClose = { dismiss() },
+                    onClickNotReally = { answer(isPositive = false) },
+                    onClickYes = { answer(isPositive = true) },
                 )
             }
         }
+    }
+
+    private fun answer(isPositive: Boolean) {
+        if (!viewModel.onAnswer(isPositive)) return
+        if (isPositive) {
+            showChatFeedbackThanks()
+        } else {
+            ChatFeedbackFragment.show(
+                fragmentManager = parentFragmentManager,
+                episodeUuid = args.episodeUuid,
+                podcastUuid = args.podcastUuid,
+                sourceView = args.sourceView,
+                podcastColors = args.podcastColors,
+                trigger = ChatFeedbackFragment.Trigger.SessionSurvey,
+            )
+        }
+        dismiss()
+    }
+
+    override fun onDismiss(dialog: DialogInterface) {
+        if (activity?.isChangingConfigurations != true) {
+            viewModel.onDismissed()
+        }
+        super.onDismiss(dialog)
     }
 
     @Parcelize
