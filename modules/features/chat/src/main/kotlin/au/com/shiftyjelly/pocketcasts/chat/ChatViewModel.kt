@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatAnswerRating
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatManager
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatMessage
+import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatQuoteSeeker
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ClearedChat
 import au.com.shiftyjelly.pocketcasts.repositories.chat.answerRating
 import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
@@ -75,6 +76,7 @@ class ChatViewModel @Inject constructor(
     private val chatManager: ChatManager,
     private val playbackManager: PlaybackManager,
     private val episodeManager: EpisodeManager,
+    private val quoteSeeker: ChatQuoteSeeker,
     private val eventHorizon: EventHorizon,
     private val settings: Settings,
     @ApplicationScope private val applicationScope: CoroutineScope,
@@ -457,7 +459,7 @@ class ChatViewModel @Inject constructor(
                 playbackManager.playNowSuspend(episode = episode, sourceView = sourceView)
                 if (!awaitPlaybackEpisode(episodeUuid)) return@launch
             }
-            playbackManager.seekToTimeMsSuspend(positionMs = quote.startMs)
+            playbackManager.seekToTimeMsSuspend(positionMs = quoteSeeker.seekTimeMs(episode, quote))
             playbackManager.playQueueSuspend(sourceView = sourceView)
             quotePlaybackUndo = quotePlaybackUndo ?: PlaybackPosition(
                 quoteEpisodeUuid = episodeUuid,
