@@ -214,7 +214,6 @@ Language: nl
     <string name="chat_play_quote">Citaat afspelen</string>
     <string name="chat_clear">Chat wissen</string>
     <string name="chat_send">Verzenden</string>
-    <string name="episode_chat">Chat met aflevering</string>
     <string name="blogs_experiment_banner_body">Blogs is iets wat we uitproberen. Het kan zo blijven, opnieuw worden uitgedacht of stilletjes verdwijnen.</string>
     <string name="blogs_experiment_banner_lead">Dit is een experiment.</string>
     <string name="onboarding_blogs_upsell_sample_label">Blog · 24 apr</string>

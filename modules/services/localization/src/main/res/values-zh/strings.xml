@@ -214,7 +214,6 @@ Language: zh_CN
     <string name="chat_play_quote">播放引用</string>
     <string name="chat_clear">清除聊天记录</string>
     <string name="chat_send">发送</string>
-    <string name="episode_chat">参与剧集讨论</string>
     <string name="blogs_experiment_banner_body">博客是我们正在尝试推出的功能。 它可能会保留下来，也可能被优化调整，甚至悄然下架。</string>
     <string name="blogs_experiment_banner_lead">这只是一项试用版功能。</string>
     <string name="onboarding_blogs_upsell_sample_label">博客 · 4 月 24 日</string>

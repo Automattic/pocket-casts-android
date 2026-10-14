@@ -214,7 +214,6 @@ Language: ar
     <string name="chat_play_quote">تشغيل اقتباس</string>
     <string name="chat_clear">مسح المحادثة</string>
     <string name="chat_send">إرسال</string>
-    <string name="episode_chat">المحادثة حول الحلقة</string>
     <string name="blogs_experiment_banner_body">المدوّنات ميزة نقوم بتجربتها حاليًا. قد تستمر كما هي، أو تخضع لتعديلات، أو تختفي بهدوء.</string>
     <string name="blogs_experiment_banner_lead">هذه مجرد تجربة.</string>
     <string name="onboarding_blogs_upsell_sample_label">مدوّنة · 24 أبريل</string>

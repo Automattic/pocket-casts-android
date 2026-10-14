@@ -214,7 +214,6 @@ Language: sv_SE
     <string name="chat_play_quote">Spela upp citat</string>
     <string name="chat_clear">Rensa chatt</string>
     <string name="chat_send">Skicka</string>
-    <string name="episode_chat">Chatta med avsnitt</string>
     <string name="blogs_experiment_banner_body">Bloggar är något vi testar. Den kanske stannar kvar, omarbetas eller försvinner i tysthet.</string>
     <string name="blogs_experiment_banner_lead">Detta är ett experiment.</string>
     <string name="onboarding_blogs_upsell_sample_label">Blogg · 24 apr</string>

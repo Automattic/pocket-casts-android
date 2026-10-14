@@ -214,7 +214,6 @@ Language: ru
     <string name="chat_play_quote">Воспроизвести цитату</string>
     <string name="chat_clear">Очистить чат</string>
     <string name="chat_send">Отправить</string>
-    <string name="episode_chat">Чат по выпуску</string>
     <string name="blogs_experiment_banner_body">Блоги — наша свежая идея. Они могут остаться навсегда, подвергнуться переработке или тихо сойти со сцены.</string>
     <string name="blogs_experiment_banner_lead">Это эксперимент.</string>
     <string name="onboarding_blogs_upsell_sample_label">Блог · 24 апреля</string>
