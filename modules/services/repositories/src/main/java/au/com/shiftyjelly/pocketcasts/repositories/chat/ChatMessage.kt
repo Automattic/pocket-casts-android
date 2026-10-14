@@ -35,6 +35,7 @@ sealed interface ChatMessage {
         val startMs: Int = -1,
         val endMs: Int = -1,
         val canPlay: Boolean = false,
+        val isFromGeneratedTranscript: Boolean = false,
         val rating: ChatAnswerRating? = null,
         override val uuid: String = UUID.randomUUID().toString(),
     ) : ChatMessage {
@@ -78,7 +79,7 @@ internal fun ChatMessage.toEntity(
     val (text, metadata) = when (this) {
         is ChatMessage.User -> text to null
         is ChatMessage.Assistant -> text to null
-        is ChatMessage.Quote -> text to quoteMetadataAdapter.toJson(QuoteMetadata(start, end))
+        is ChatMessage.Quote -> text to quoteMetadataAdapter.toJson(QuoteMetadata(start, end, isFromGeneratedTranscript))
     }
     return EpisodeChatMessage(
         uuid = uuid,
@@ -117,6 +118,7 @@ private fun EpisodeChatMessage.toQuoteMessageOrNull(
         end = parsed.end,
         startMs = parseTimestampMs(parsed.start) ?: -1,
         endMs = parseTimestampMs(parsed.end) ?: -1,
+        isFromGeneratedTranscript = parsed.isFromGeneratedTranscript,
         rating = ChatAnswerRating.fromValue(rating),
         uuid = uuid,
     )
