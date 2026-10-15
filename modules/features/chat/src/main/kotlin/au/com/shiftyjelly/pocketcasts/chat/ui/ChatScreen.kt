@@ -205,6 +205,7 @@ private fun ChatContent(
             episodeTitle = playingEpisode?.episodeTitle ?: uiState.episodeTitle,
             podcastUuid = playingEpisode?.podcastUuid ?: uiState.podcastUuid,
             podcastTitle = playingEpisode?.podcastTitle ?: uiState.podcastTitle,
+            userEpisode = playingEpisode?.userEpisode,
             playback = uiState.playback,
             onClickClose = onClickClose,
             onClickPlayPause = onClickPlayPause,

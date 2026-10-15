@@ -7,6 +7,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatAnswerRating
@@ -1327,6 +1328,24 @@ class ChatViewModelTest {
         assertEquals(ChatPlayingEpisode("Other episode", "other-podcast-uuid", "Other podcast"), state.otherPlayingEpisode)
         assertEquals(ChatPlayback(isPlaying = true, positionMs = 10_000, durationMs = 40_000), state.playback)
         assertEquals("Episode title", state.episodeTitle)
+    }
+
+    @Test
+    fun `header shows a playing user file`() = runTest {
+        val userEpisode = UserEpisode(uuid = "user-file-uuid", publishedDate = Date(), title = "My recording")
+        whenever(episodeManager.findEpisodeByUuid("user-file-uuid")).thenReturn(userEpisode)
+        setEpisodeInfo()
+        playbackState.value = PlaybackState(
+            state = PlaybackState.State.PLAYING,
+            episodeUuid = "user-file-uuid",
+            title = "My recording",
+        )
+        advanceUntilIdle()
+
+        assertEquals(
+            ChatPlayingEpisode("My recording", podcastUuid = "", podcastTitle = "", userEpisode = userEpisode),
+            viewModel.uiState.value.otherPlayingEpisode,
+        )
     }
 
     @Test

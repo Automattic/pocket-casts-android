@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatAnswerRating
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatManager
@@ -150,7 +151,11 @@ class ChatViewModel @Inject constructor(
             combine(
                 playbackManager.playbackStateFlow,
                 episodeManager.findEpisodeByUuidFlow(episodeUuid),
-            ) { playbackState, episode ->
+                playbackManager.playbackStateFlow
+                    .map { it.loadedEpisodeUuid }
+                    .distinctUntilChanged()
+                    .map { uuid -> uuid?.takeIf { it != episodeUuid }?.let { episodeManager.findEpisodeByUuid(it) as? UserEpisode } },
+            ) { playbackState, episode, playingUserEpisode ->
                 when (playbackState.loadedEpisodeUuid) {
                     null -> null to ChatPlayback(
                         isPlaying = false,
@@ -168,6 +173,7 @@ class ChatViewModel @Inject constructor(
                         episodeTitle = playbackState.title,
                         podcastUuid = playbackState.podcast?.uuid.orEmpty(),
                         podcastTitle = playbackState.podcast?.title.orEmpty(),
+                        userEpisode = playingUserEpisode?.takeIf { it.uuid == playbackState.loadedEpisodeUuid },
                     ) to ChatPlayback(
                         isPlaying = playbackState.isPlaying,
                         positionMs = playbackState.positionMs,
@@ -644,6 +650,7 @@ data class ChatPlayingEpisode(
     val episodeTitle: String,
     val podcastUuid: String,
     val podcastTitle: String,
+    val userEpisode: UserEpisode? = null,
 )
 
 data class ChatPlayback(

@@ -230,7 +230,11 @@ class ChatFragment : BaseDialogFragment() {
         }
     }
 
-    private val ChatUiState.podcastColors get() = playingPodcast?.let(::PodcastColors) ?: args.podcastColors
+    private val ChatUiState.podcastColors
+        get() = when {
+            otherPlayingEpisode?.userEpisode != null -> PodcastColors.ForUserEpisode
+            else -> playingPodcast?.let(::PodcastColors) ?: args.podcastColors
+        }
 
     private val ChatToast.isUndoable get() = this != ChatToast.FeedbackThanks
 
