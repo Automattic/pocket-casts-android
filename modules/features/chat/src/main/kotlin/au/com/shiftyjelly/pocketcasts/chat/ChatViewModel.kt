@@ -148,6 +148,8 @@ class ChatViewModel @Inject constructor(
                 podcastUuid = episode.podcastUuid,
                 podcastTitle = episode.podcastTitle,
                 episodeDurationMs = episode.durationMs,
+                inputText = "",
+                restoredMessageUuids = emptySet(),
                 messages = emptyList(),
                 areMessagesLoaded = false,
                 isAwaitingReply = false,

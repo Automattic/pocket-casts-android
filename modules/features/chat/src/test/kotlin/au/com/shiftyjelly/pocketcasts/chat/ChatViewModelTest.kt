@@ -1772,6 +1772,18 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `opening another chat clears the typed question`() = runTest {
+        setEpisodeInfo()
+        advanceUntilIdle()
+        viewModel.onInputTextChange("Half typed")
+
+        viewModel.openHistoryChat(historyItem(OTHER_EPISODE_UUID))
+        advanceUntilIdle()
+
+        assertEquals("", viewModel.uiState.value.inputText)
+    }
+
+    @Test
     fun `opening another chat restores its stored ratings`() = runTest {
         val answer = ChatMessage.Assistant(text = "Answer", uuid = "answer-uuid", rating = ChatAnswerRating.Positive)
         chatManager.otherMessages.value = listOf(ChatMessage.User(text = "Question", uuid = "question-uuid"), answer)
