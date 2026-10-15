@@ -1166,6 +1166,25 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `playing a quote drops the seek when the user seeks while the episode loads`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        whenever(quoteSeeker.playbackTimeMs(any(), any())).thenReturn(31_500)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = "other-uuid")
+        whenever(playbackManager.playNowSuspend(any<BaseEpisode>(), any(), any(), any())).doSuspendableAnswer {
+            userSeeks.emit(Unit)
+            playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID)
+            Unit
+        }
+        playableState(quote)
+
+        viewModel.playQuote(quote.uuid)
+        advanceUntilIdle()
+
+        verify(playbackManager, never()).seekToTimeMsSuspend(any(), anyOrNull())
+    }
+
+    @Test
     fun `playing a quote drops the seek when the episode changes while it resolves`() = runTest {
         val quote = createQuote(startMs = 1_000, endMs = 3_000)
         val resolved = CompletableDeferred<Int>()

@@ -457,15 +457,16 @@ class ChatViewModel @Inject constructor(
             val episode = episodeManager.findEpisodeByUuid(episodeUuid)
             if (episode == null || !quote.isWithinEpisode(episode.durationMs)) return@launch
             val quoteTime = async { quoteSeeker.quoteTime(episodeUuid, quote) }
+            val userSeek = async(start = CoroutineStart.UNDISPATCHED) { playbackManager.userSeeks.first() }
             val state = playbackManager.playbackStateFlow.first()
             if (state.loadedEpisodeUuid != episodeUuid) {
                 playbackManager.playNowSuspend(episode = episode, sourceView = sourceView)
                 if (!awaitPlaybackEpisode(episodeUuid)) {
                     quoteTime.cancel()
+                    userSeek.cancel()
                     return@launch
                 }
             }
-            val userSeek = async(start = CoroutineStart.UNDISPATCHED) { playbackManager.userSeeks.first() }
             val seekTimeMs = try {
                 quoteSeeker.playbackTimeMs(episode, quoteTime.await())
             } finally {
