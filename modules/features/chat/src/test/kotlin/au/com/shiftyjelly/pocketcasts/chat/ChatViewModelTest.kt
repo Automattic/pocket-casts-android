@@ -1158,6 +1158,73 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `undoing after two quotes goes back to where playback was before the first`() = runTest {
+        val first = createQuote(startMs = 1_000, endMs = 3_000)
+        val second = createQuote(startMs = 5_000, endMs = 7_000, uuid = "second-quote-uuid")
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID, positionMs = 10_000)
+        chatManager.messages.value = listOf(first, second)
+        setEpisodeInfo(123_000)
+        advanceUntilIdle()
+        viewModel.playQuote(first.uuid)
+        advanceUntilIdle()
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID, positionMs = 1_500)
+        viewModel.playQuote(second.uuid)
+        advanceUntilIdle()
+
+        viewModel.undoQuotePlay()
+        advanceUntilIdle()
+
+        verify(playbackManager).seekToTimeMsSuspend(org.mockito.kotlin.eq(10_000), anyOrNull())
+        verify(playbackManager, never()).seekToTimeMsSuspend(org.mockito.kotlin.eq(1_500), anyOrNull())
+    }
+
+    @Test
+    fun `an expired quote undo starts again from the next quote`() = runTest {
+        val first = createQuote(startMs = 1_000, endMs = 3_000)
+        val second = createQuote(startMs = 5_000, endMs = 7_000, uuid = "second-quote-uuid")
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID, positionMs = 10_000)
+        chatManager.messages.value = listOf(first, second)
+        setEpisodeInfo(123_000)
+        advanceUntilIdle()
+        viewModel.playQuote(first.uuid)
+        advanceUntilIdle()
+        viewModel.onQuoteUndoExpired()
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID, positionMs = 1_500)
+        viewModel.playQuote(second.uuid)
+        advanceUntilIdle()
+
+        viewModel.undoQuotePlay()
+        advanceUntilIdle()
+
+        verify(playbackManager).seekToTimeMsSuspend(org.mockito.kotlin.eq(1_500), anyOrNull())
+    }
+
+    @Test
+    fun `undoing a quote pauses a paused other episode even when it loads too slowly`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        val other = PodcastEpisode(uuid = "other-uuid", publishedDate = Date())
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        whenever(episodeManager.findEpisodeByUuid("other-uuid")).thenReturn(other)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = "other-uuid", positionMs = 10_000)
+        whenever(playbackManager.playNowSuspend(org.mockito.kotlin.eq(episode.value), any(), any(), any())).then {
+            playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID)
+            Unit
+        }
+        playableState(quote)
+        viewModel.playQuote(quote.uuid)
+        advanceUntilIdle()
+
+        viewModel.undoQuotePlay()
+        advanceUntilIdle()
+
+        verify(playbackManager).playNowSuspend(org.mockito.kotlin.eq(other), any(), any(), any())
+        verify(playbackManager).pause(any(), any())
+        verify(playbackManager, never()).seekToTimeMsSuspend(org.mockito.kotlin.eq(10_000), anyOrNull())
+    }
+
+    @Test
     fun `playing a quote while another episode plays switches to the chat episode first`() = runTest {
         val quote = createQuote(startMs = 1_000, endMs = 3_000)
         whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
@@ -1310,13 +1377,13 @@ class ChatViewModelTest {
         return viewModel.uiState.value.messages.filterIsInstance<ChatMessage.Quote>().single().canPlay
     }
 
-    private fun createQuote(startMs: Int, endMs: Int) = ChatMessage.Quote(
+    private fun createQuote(startMs: Int, endMs: Int, uuid: String = "quote-uuid") = ChatMessage.Quote(
         text = "Quote",
         start = "start",
         end = "end",
         startMs = startMs,
         endMs = endMs,
-        uuid = "quote-uuid",
+        uuid = uuid,
     )
 
     private fun setEpisodeInfo(
