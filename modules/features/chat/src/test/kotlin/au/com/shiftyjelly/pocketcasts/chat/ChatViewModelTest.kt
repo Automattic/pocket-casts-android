@@ -38,6 +38,7 @@ import com.automattic.eventhorizon.EpisodeChatDeleteUndoneEvent
 import com.automattic.eventhorizon.EpisodeChatDeletedEvent
 import com.automattic.eventhorizon.EpisodeChatErrorType
 import com.automattic.eventhorizon.EpisodeChatHistoryRowTappedEvent
+import com.automattic.eventhorizon.EpisodeChatHistorySectionType
 import com.automattic.eventhorizon.EpisodeChatHistoryShownEvent
 import com.automattic.eventhorizon.EpisodeChatInputType
 import com.automattic.eventhorizon.EpisodeChatMessageFailedEvent
@@ -2137,6 +2138,32 @@ class ChatViewModelTest {
                 podcastUuid = OTHER_PODCAST_UUID,
                 hasHistory = true,
                 entryPoint = ChatEntryPoint.History.analyticsValue,
+            ),
+            eventSink.pollEvent(),
+        )
+    }
+
+    @Test
+    fun `opening a chat from the history tracks its section and position`() = runTest {
+        chatManager.history.value = listOf(
+            historyItem(EPISODE_UUID, podcastUuid = PODCAST_UUID),
+            historyItem("yesterday-episode", daysAgo = 1),
+            historyItem(OTHER_EPISODE_UUID, daysAgo = 3),
+        )
+        setEpisodeInfo()
+        viewModel.showHistory()
+        eventSink.skipEvent(eventSink.size)
+
+        viewModel.openHistoryChat(historyItem(OTHER_EPISODE_UUID, daysAgo = 3))
+
+        assertEquals(
+            EpisodeChatHistoryRowTappedEvent(
+                source = SourceView.PLAYER.analyticsValue,
+                episodeUuid = OTHER_EPISODE_UUID,
+                podcastUuid = OTHER_PODCAST_UUID,
+                isNowPlaying = false,
+                section = EpisodeChatHistorySectionType.Previous7Days,
+                position = 2,
             ),
             eventSink.pollEvent(),
         )

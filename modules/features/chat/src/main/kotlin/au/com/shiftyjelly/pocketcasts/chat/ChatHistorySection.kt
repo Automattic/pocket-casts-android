@@ -1,15 +1,16 @@
 package au.com.shiftyjelly.pocketcasts.chat
 
 import au.com.shiftyjelly.pocketcasts.models.to.EpisodeChatHistoryItem
+import com.automattic.eventhorizon.EpisodeChatHistorySectionType
 import java.time.Instant
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 
-enum class ChatHistoryGroup {
-    Today,
-    Yesterday,
-    PreviousSevenDays,
-    Older,
+enum class ChatHistoryGroup(val analyticsValue: EpisodeChatHistorySectionType) {
+    Today(EpisodeChatHistorySectionType.Today),
+    Yesterday(EpisodeChatHistorySectionType.Yesterday),
+    PreviousSevenDays(EpisodeChatHistorySectionType.Previous7Days),
+    Older(EpisodeChatHistorySectionType.Older),
 }
 
 data class ChatHistorySection(

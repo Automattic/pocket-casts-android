@@ -352,12 +352,17 @@ class ChatViewModel @Inject constructor(
     }
 
     fun openHistoryChat(item: EpisodeChatHistoryItem) {
+        val sections = _uiState.value.history
+        val section = sections.firstOrNull { section -> section.items.any { it.episodeUuid == item.episodeUuid } }
+        val position = sections.flatMap { it.items }.indexOfFirst { it.episodeUuid == item.episodeUuid }.takeIf { it >= 0 }
         eventHorizon.track(
             EpisodeChatHistoryRowTappedEvent(
                 source = sourceView.analyticsValue,
                 episodeUuid = item.episodeUuid,
                 podcastUuid = item.podcastUuid,
                 isNowPlaying = item.episodeUuid == playingEpisodeUuid,
+                section = section?.group?.analyticsValue,
+                position = position?.toLong(),
             ),
         )
         if (item.episodeUuid != episodeUuid) {
