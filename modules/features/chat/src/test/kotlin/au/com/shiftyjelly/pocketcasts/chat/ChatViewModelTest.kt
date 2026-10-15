@@ -15,6 +15,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatAnswerRating
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatManager
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatMessage
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatQuoteSeeker
+import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatSendFailure
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ClearedChat
 import au.com.shiftyjelly.pocketcasts.repositories.playback.NetworkConnectionWatcher
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -869,21 +870,85 @@ class ChatViewModelTest {
     }
 
     @Test
-    fun `failed user message is not restored in a new chat session`() = runTest {
+    fun `a question that did not reach us is shown as not sent when the chat reopens`() = runTest {
         setEpisodeInfo()
         chatManager.sendMessageException = IOException()
         viewModel.onInputTextChange("Failed question")
         viewModel.onSend()
         advanceUntilIdle()
-        val failedMessage = viewModel.uiState.value.messages.last()
-        assertTrue(failedMessage is ChatMessage.User)
-        assertEquals("Failed question", (failedMessage as ChatMessage.User).text)
 
         viewModel = createViewModel()
         setEpisodeInfo()
         advanceUntilIdle()
 
-        assertEquals(emptyList<ChatMessage>(), viewModel.uiState.value.messages)
+        val state = viewModel.uiState.value
+        assertEquals(listOf("Failed question"), state.messages.filterIsInstance<ChatMessage.User>().map { it.text })
+        assertEquals(ChatError.NetworkError, state.error)
+    }
+
+    @Test
+    fun `a question we could not answer shows the server error when the chat reopens`() = runTest {
+        chatManager.messages.value = listOf(ChatMessage.User(text = "Question", failure = ChatSendFailure.Server, uuid = "question-uuid"))
+
+        setEpisodeInfo()
+        advanceUntilIdle()
+
+        assertEquals(ChatError.ServerError, viewModel.uiState.value.error)
+    }
+
+    @Test
+    fun `a question left waiting when the chat closed is shown as not sent`() = runTest {
+        chatManager.messages.value = listOf(ChatMessage.User(text = "Question", uuid = "question-uuid"))
+
+        setEpisodeInfo()
+        advanceUntilIdle()
+
+        assertEquals(ChatError.NetworkError, viewModel.uiState.value.error)
+    }
+
+    @Test
+    fun `an answered conversation reopens without an error`() = runTest {
+        chatManager.messages.value = listOf(
+            ChatMessage.User(text = "Question", uuid = "question-uuid"),
+            ChatMessage.Assistant(text = "Answer", uuid = "answer-uuid"),
+        )
+
+        setEpisodeInfo()
+        advanceUntilIdle()
+
+        assertNull(viewModel.uiState.value.error)
+    }
+
+    @Test
+    fun `retrying a reopened question resends it without it in the history`() = runTest {
+        chatManager.messages.value = listOf(
+            ChatMessage.User(text = "First", uuid = "first-uuid"),
+            ChatMessage.Assistant(text = "Answer", uuid = "answer-uuid"),
+            ChatMessage.User(text = "Question", failure = ChatSendFailure.Network, uuid = "question-uuid"),
+        )
+        setEpisodeInfo()
+        advanceUntilIdle()
+
+        viewModel.retry()
+        advanceUntilIdle()
+
+        assertEquals(SendMessage(EPISODE_UUID, "Question"), chatManager.sentMessages.single())
+        assertEquals(listOf("First", "Answer"), chatManager.sentHistories.single())
+        assertNull(viewModel.uiState.value.error)
+    }
+
+    @Test
+    fun `asking something new instead of retrying discards the stored failed question`() = runTest {
+        chatManager.messages.value = listOf(ChatMessage.User(text = "Question", failure = ChatSendFailure.Network, uuid = "question-uuid"))
+        setEpisodeInfo()
+        advanceUntilIdle()
+
+        sendQuestion("Another question")
+
+        assertEquals(listOf("question-uuid"), chatManager.discardedMessageUuids)
+        val messages = viewModel.uiState.value.messages
+        assertEquals(listOf("Another question"), messages.filterIsInstance<ChatMessage.User>().map { it.text })
+        assertEquals(listOf("Response"), messages.filterIsInstance<ChatMessage.Assistant>().map { it.text })
     }
 
     @Test
@@ -1947,6 +2012,13 @@ class ChatViewModelTest {
 
         override fun observeHistory(): Flow<List<EpisodeChatHistoryItem>> = history
 
+        val discardedMessageUuids = mutableListOf<String>()
+
+        override suspend fun discardMessage(uuid: String) {
+            discardedMessageUuids += uuid
+            messages.value = messages.value.filterNot { it.uuid == uuid }
+        }
+
         override suspend fun createChat(episodeUuid: String, podcastUuid: String) {
             createdChats += CreateChat(episodeUuid, podcastUuid)
         }
@@ -1956,11 +2028,17 @@ class ChatViewModelTest {
             message: ChatMessage.User,
             allMessages: List<ChatMessage>,
         ) {
+            val episodeMessages = messagesFor(episodeUuid)
+            episodeMessages.value = episodeMessages.value.filterNot { it.uuid == message.uuid } + message
             sendMessageGate?.await()
-            sendMessageException?.let { throw it }
+            sendMessageException?.let { exception ->
+                val failure = if (exception is IOException) ChatSendFailure.Network else ChatSendFailure.Server
+                episodeMessages.value = episodeMessages.value.map { if (it.uuid == message.uuid) message.copy(failure = failure) else it }
+                throw exception
+            }
             sentMessages += SendMessage(episodeUuid, message.text)
             sentHistories += allMessages.map { it.text() }
-            messages.value += listOf(message, ChatMessage.Assistant(text = "Response", uuid = "response-uuid-${sentMessages.size}"))
+            episodeMessages.value += ChatMessage.Assistant(text = "Response", uuid = "response-uuid-${sentMessages.size}")
         }
 
         override suspend fun clearMessages(episodeUuid: String): ClearedChat {

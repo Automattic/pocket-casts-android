@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatAnswerRating
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatManager
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatMessage
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatQuoteSeeker
+import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatSendFailure
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ClearedChat
 import au.com.shiftyjelly.pocketcasts.repositories.chat.answerRating
 import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
@@ -171,6 +172,8 @@ class ChatViewModel @Inject constructor(
             chatEpisode.filterNotNull().flatMapLatest { episode ->
                 chatManager.observeMessages(episode.uuid).map { messages -> episode.uuid to messages }
             }.collect { (messagesEpisodeUuid, messages) ->
+                val unansweredQuestion = messages.unansweredQuestionOnOpen(messagesEpisodeUuid)
+                if (unansweredQuestion != null) transientUserMessage = unansweredQuestion
                 _uiState.update { state ->
                     if (state.episodeUuid != messagesEpisodeUuid) return@update state
                     state.copy(
@@ -179,10 +182,23 @@ class ChatViewModel @Inject constructor(
                         ),
                         areMessagesLoaded = true,
                         answerRatings = if (state.areMessagesLoaded) state.answerRatings else messages.storedAnswerRatings(),
+                        error = unansweredQuestion?.let { it.failure.toChatError() } ?: state.error,
                     )
                 }
             }
         }
+    }
+
+    private fun List<ChatMessage>.unansweredQuestionOnOpen(messagesEpisodeUuid: String): ChatMessage.User? {
+        val state = _uiState.value
+        val isOpening = state.episodeUuid == messagesEpisodeUuid && !state.areMessagesLoaded && !state.isAwaitingReply
+        if (!isOpening || transientUserMessage != null) return null
+        return lastOrNull() as? ChatMessage.User
+    }
+
+    private fun ChatSendFailure?.toChatError() = when (this) {
+        ChatSendFailure.Server -> ChatError.ServerError
+        ChatSendFailure.Network, null -> ChatError.NetworkError
     }
 
     private fun observePlayback() {
@@ -539,6 +555,7 @@ class ChatViewModel @Inject constructor(
     }
 
     private fun performSend(message: ChatMessage.User, inputType: EpisodeChatInputType) {
+        val supersededQuestionUuid = transientUserMessage?.uuid?.takeIf { it != message.uuid }
         val unsentMessageUuids = setOfNotNull(transientUserMessage?.uuid, message.uuid)
         transientUserMessage = message
         transientInputType = inputType
@@ -558,6 +575,7 @@ class ChatViewModel @Inject constructor(
             try {
                 pendingClear?.join()
                 clearedChat = null
+                supersededQuestionUuid?.let { chatManager.discardMessage(it) }
                 val sentAt = timeSource.markNow()
                 chatManager.sendMessage(episodeUuid, message, currentMessages)
                 val responseDuration = sentAt.elapsedNow()

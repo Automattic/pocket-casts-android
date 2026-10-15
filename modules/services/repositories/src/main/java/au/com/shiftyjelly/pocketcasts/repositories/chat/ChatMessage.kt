@@ -10,6 +10,7 @@ sealed interface ChatMessage {
 
     data class User(
         val text: String,
+        val failure: ChatSendFailure? = null,
         override val uuid: String = UUID.randomUUID().toString(),
     ) : ChatMessage {
         override val role: ChatRole get() = ChatRole.User
@@ -75,9 +76,10 @@ internal fun ChatMessage.textOrNull(): String? = when (this) {
 internal fun ChatMessage.toEntity(
     episodeUuid: String,
     quoteMetadataAdapter: JsonAdapter<QuoteMetadata>,
+    userMetadataAdapter: JsonAdapter<UserMessageMetadata>,
 ): EpisodeChatMessage {
     val (text, metadata) = when (this) {
-        is ChatMessage.User -> text to null
+        is ChatMessage.User -> text to failure?.let { userMetadataAdapter.toJson(UserMessageMetadata(it.value)) }
         is ChatMessage.Assistant -> text to null
         is ChatMessage.Quote -> text to quoteMetadataAdapter.toJson(QuoteMetadata(start, end, isFromGeneratedTranscript))
     }
@@ -93,9 +95,16 @@ internal fun ChatMessage.toEntity(
 
 internal fun List<EpisodeChatMessage>.toChatMessages(
     quoteMetadataAdapter: JsonAdapter<QuoteMetadata>,
+    userMetadataAdapter: JsonAdapter<UserMessageMetadata>,
 ) = mapNotNull { entity ->
     when (entity.role) {
-        ChatRole.User.value -> ChatMessage.User(text = entity.text, uuid = entity.uuid)
+        ChatRole.User.value -> ChatMessage.User(
+            text = entity.text,
+            failure = entity.metadata
+                ?.let { raw -> runCatching { userMetadataAdapter.fromJson(raw) }.getOrNull() }
+                ?.let { ChatSendFailure.fromValue(it.failure) },
+            uuid = entity.uuid,
+        )
 
         ChatRole.Quote.value -> entity.toQuoteMessageOrNull(quoteMetadataAdapter)
 
