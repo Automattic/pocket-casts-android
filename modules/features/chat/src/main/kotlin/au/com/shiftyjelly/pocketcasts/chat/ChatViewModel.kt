@@ -6,12 +6,15 @@ import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatAnswerRating
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatManager
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatMessage
+import au.com.shiftyjelly.pocketcasts.repositories.chat.answerRating
 import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.playback.NetworkConnectionWatcher
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.eventhorizon.EpisodeChatBetaSheetDismissedEvent
 import com.automattic.eventhorizon.EpisodeChatBetaSheetShownEvent
 import com.automattic.eventhorizon.EpisodeChatClearedEvent
@@ -67,6 +70,7 @@ class ChatViewModel @Inject constructor(
 
     private var sendJob: Job? = null
     private var quotePlaybackJob: Job? = null
+    private var ratingWriteJob: Job? = null
     private var transientUserMessage: ChatMessage.User? = null
     private var transientInputType: EpisodeChatInputType = EpisodeChatInputType.Typed
     private var hasReceivedAnswer = false
@@ -122,6 +126,7 @@ class ChatViewModel @Inject constructor(
                             episodeDurationMs = state.episodeDurationMs,
                         ),
                         areMessagesLoaded = true,
+                        answerRatings = if (state.areMessagesLoaded) state.answerRatings else messages.storedAnswerRatings(),
                     )
                 }
             }
@@ -356,6 +361,7 @@ class ChatViewModel @Inject constructor(
             }
             state.copy(answerRatings = ratings)
         }
+        saveAnswerRating(answerUuid, newRating)
         if (newRating != null) {
             trackAnswerRated(answerUuid, newRating)
         }
@@ -363,6 +369,24 @@ class ChatViewModel @Inject constructor(
             _feedbackThanks.trySend(Unit)
         }
         return newRating
+    }
+
+    private fun saveAnswerRating(answerUuid: String, rating: ChatAnswerRating?) {
+        val previousJob = ratingWriteJob
+        ratingWriteJob = applicationScope.launch(ioDispatcher) {
+            previousJob?.join()
+            try {
+                chatManager.rateAnswer(answerUuid, rating)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                LogBuffer.e(LOG_TAG, e, "Failed to save episode chat answer rating")
+            }
+        }
+    }
+
+    private fun List<ChatMessage>.storedAnswerRatings(): Map<String, ChatAnswerRating> {
+        return mapNotNull { message -> message.answerRating?.let { message.uuid to it } }.toMap()
     }
 
     private fun trackAnswerRated(answerUuid: String, rating: ChatAnswerRating) {
@@ -447,6 +471,7 @@ class ChatViewModel @Inject constructor(
 }
 
 private const val QUOTE_PLAYBACK_EPISODE_TIMEOUT_MS = 5_000L
+private const val LOG_TAG = "EpisodeChat"
 
 data class ChatUiState(
     val inputText: String = "",
@@ -484,10 +509,11 @@ data class ChatUiState(
         }
 }
 
-enum class ChatAnswerRating(val analyticsValue: EpisodeChatSentimentType) {
-    Positive(EpisodeChatSentimentType.Positive),
-    Negative(EpisodeChatSentimentType.Negative),
-}
+private val ChatAnswerRating.analyticsValue
+    get() = when (this) {
+        ChatAnswerRating.Positive -> EpisodeChatSentimentType.Positive
+        ChatAnswerRating.Negative -> EpisodeChatSentimentType.Negative
+    }
 
 data class ChatPlayback(
     val isPlaying: Boolean = false,

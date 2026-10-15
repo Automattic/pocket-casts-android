@@ -214,7 +214,6 @@ Language: pt_BR
     <string name="chat_play_quote">Reproduzir citação</string>
     <string name="chat_clear">Apagar conversa</string>
     <string name="chat_send">Enviar</string>
-    <string name="episode_chat">Conversar com episódio</string>
     <string name="blogs_experiment_banner_body">Ainda estamos experimentando os blogs. Pode funcionar, precisar de ajustes ou ser deixado de lado.</string>
     <string name="blogs_experiment_banner_lead">Isso é um experimento.</string>
     <string name="onboarding_blogs_upsell_sample_label">Blog · 24 de abril</string>

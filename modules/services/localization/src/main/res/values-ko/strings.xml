@@ -214,7 +214,6 @@ Language: ko_KR
     <string name="chat_play_quote">인용 재생</string>
     <string name="chat_clear">채팅 지우기</string>
     <string name="chat_send">보내기</string>
-    <string name="episode_chat">에피소드로 채팅</string>
     <string name="blogs_experiment_banner_body">블로그는 저희가 시도 중인 것 중 하나입니다. 계속 유지될 수도 있고, 개편될 수도 있고, 조용히 사라질 수도 있습니다.</string>
     <string name="blogs_experiment_banner_lead">하나의 실험입니다.</string>
     <string name="onboarding_blogs_upsell_sample_label">블로그 · 4월 24일</string>

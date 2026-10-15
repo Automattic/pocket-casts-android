@@ -8,6 +8,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
+import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatAnswerRating
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatManager
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatMessage
 import au.com.shiftyjelly.pocketcasts.repositories.playback.NetworkConnectionWatcher
@@ -559,6 +560,56 @@ class ChatViewModelTest {
             mapOf("first-answer" to ChatAnswerRating.Positive, "second-answer" to ChatAnswerRating.Negative),
             viewModel.uiState.value.answerRatings,
         )
+    }
+
+    @Test
+    fun `stored ratings are restored without tracking`() = runTest {
+        chatManager.messages.value = listOf(
+            ChatMessage.User(text = "Q1", uuid = "q1"),
+            ChatMessage.Assistant(text = "A1", rating = ChatAnswerRating.Positive, uuid = "a1"),
+            ChatMessage.User(text = "Q2", uuid = "q2"),
+            ChatMessage.Assistant(text = "A2", uuid = "a2"),
+        )
+        setEpisodeInfo()
+        advanceUntilIdle()
+
+        assertEquals(mapOf("a1" to ChatAnswerRating.Positive), viewModel.uiState.value.answerRatings)
+        assertTrue(List(eventSink.size) { eventSink.pollEvent() }.none { it is EpisodeChatResponseRatedEvent })
+    }
+
+    @Test
+    fun `rating changes are saved in order`() = runTest {
+        setEpisodeInfo()
+
+        viewModel.rateAnswer("answer-uuid", ChatAnswerRating.Positive)
+        viewModel.rateAnswer("answer-uuid", ChatAnswerRating.Negative)
+        viewModel.rateAnswer("answer-uuid", ChatAnswerRating.Negative)
+        advanceUntilIdle()
+
+        assertEquals(
+            listOf(
+                "answer-uuid" to ChatAnswerRating.Positive,
+                "answer-uuid" to ChatAnswerRating.Negative,
+                "answer-uuid" to null,
+            ),
+            chatManager.savedRatings,
+        )
+    }
+
+    @Test
+    fun `later message updates keep the ratings changed in the chat`() = runTest {
+        chatManager.messages.value = listOf(
+            ChatMessage.User(text = "Q1", uuid = "q1"),
+            ChatMessage.Assistant(text = "A1", rating = ChatAnswerRating.Positive, uuid = "a1"),
+        )
+        setEpisodeInfo()
+        advanceUntilIdle()
+
+        viewModel.rateAnswer("a1", ChatAnswerRating.Negative)
+        chatManager.messages.value += ChatMessage.User(text = "Q2", uuid = "q2")
+        advanceUntilIdle()
+
+        assertEquals(mapOf("a1" to ChatAnswerRating.Negative), viewModel.uiState.value.answerRatings)
     }
 
     @Test
@@ -1180,6 +1231,7 @@ class ChatViewModelTest {
         val clearedEpisodeUuids = mutableListOf<String>()
         var sendMessageException: Exception? = null
         var sendMessageGate: CompletableDeferred<Unit>? = null
+        val savedRatings = mutableListOf<Pair<String, ChatAnswerRating?>>()
 
         override fun observeMessages(episodeUuid: String): Flow<List<ChatMessage>> = observedMessages ?: messages
 
@@ -1202,6 +1254,10 @@ class ChatViewModelTest {
         override suspend fun clearMessages(episodeUuid: String) {
             clearedEpisodeUuids += episodeUuid
             messages.value = emptyList()
+        }
+
+        override suspend fun rateAnswer(answerUuid: String, rating: ChatAnswerRating?) {
+            savedRatings += answerUuid to rating
         }
 
         private fun ChatMessage.text() = when (this) {

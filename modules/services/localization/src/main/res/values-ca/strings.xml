@@ -210,7 +210,6 @@ Language: ca
     <string name="chat_play_quote">Reprodueix la citació</string>
     <string name="chat_clear">Esborra el xat</string>
     <string name="chat_send">Envia</string>
-    <string name="episode_chat">Xateja sobre l\'episodi</string>
     <string name="blogs_experiment_banner_body">Els blogs són una cosa que estem experimentant. Pot quedar-se, remodelar-se, o desaparèixer sense fer soroll.</string>
     <string name="blogs_experiment_banner_lead">Això és un experiment.</string>
     <string name="onboarding_blogs_upsell_sample_label">Blog · 24 d\'abril</string>

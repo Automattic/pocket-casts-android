@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
+import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatAnswerRating
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatFeedback
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatFeedbackManager
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatManager
@@ -265,6 +266,8 @@ class ChatFeedbackViewModelTest {
         ) = Unit
 
         override suspend fun clearMessages(episodeUuid: String) = Unit
+
+        override suspend fun rateAnswer(answerUuid: String, rating: ChatAnswerRating?) = Unit
     }
 
     private companion object {

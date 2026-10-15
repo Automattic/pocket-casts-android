@@ -17,6 +17,7 @@ sealed interface ChatMessage {
 
     data class Assistant(
         val text: String,
+        val rating: ChatAnswerRating? = null,
         override val uuid: String = UUID.randomUUID().toString(),
     ) : ChatMessage {
         override val role: ChatRole get() = ChatRole.Assistant
@@ -34,6 +35,7 @@ sealed interface ChatMessage {
         val startMs: Int = -1,
         val endMs: Int = -1,
         val canPlay: Boolean = false,
+        val rating: ChatAnswerRating? = null,
         override val uuid: String = UUID.randomUUID().toString(),
     ) : ChatMessage {
         override val role: ChatRole get() = ChatRole.Quote
@@ -54,6 +56,13 @@ enum class ChatRole(val value: String, val apiRole: String) {
     User(value = "user", apiRole = "user"),
     Quote(value = "quote", apiRole = "assistant"),
 }
+
+val ChatMessage.answerRating: ChatAnswerRating?
+    get() = when (this) {
+        is ChatMessage.User -> null
+        is ChatMessage.Assistant -> rating
+        is ChatMessage.Quote -> rating
+    }
 
 // Text content for history payloads. Returns null for message types that carry no text.
 internal fun ChatMessage.textOrNull(): String? = when (this) {
@@ -77,6 +86,7 @@ internal fun ChatMessage.toEntity(
         text = text,
         role = role.value,
         metadata = metadata,
+        rating = answerRating?.value,
     )
 }
 
@@ -85,8 +95,14 @@ internal fun List<EpisodeChatMessage>.toChatMessages(
 ) = mapNotNull { entity ->
     when (entity.role) {
         ChatRole.User.value -> ChatMessage.User(text = entity.text, uuid = entity.uuid)
+
         ChatRole.Quote.value -> entity.toQuoteMessageOrNull(quoteMetadataAdapter)
-        else -> ChatMessage.Assistant(text = entity.text, uuid = entity.uuid)
+
+        else -> ChatMessage.Assistant(
+            text = entity.text,
+            rating = ChatAnswerRating.fromValue(entity.rating),
+            uuid = entity.uuid,
+        )
     }
 }
 
@@ -101,6 +117,7 @@ private fun EpisodeChatMessage.toQuoteMessageOrNull(
         end = parsed.end,
         startMs = parseTimestampMs(parsed.start) ?: -1,
         endMs = parseTimestampMs(parsed.end) ?: -1,
+        rating = ChatAnswerRating.fromValue(rating),
         uuid = uuid,
     )
 }

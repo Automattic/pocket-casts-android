@@ -214,7 +214,6 @@ Language: fr
     <string name="chat_play_quote">Lire la citation</string>
     <string name="chat_clear">Effacer la discussion</string>
     <string name="chat_send">Envoyer</string>
-    <string name="episode_chat">Discuter de l’épisode ·</string>
     <string name="blogs_experiment_banner_body">Nous sommes en train de tester les blogs. Ça pourrait rester, être retravaillé ou disparaître discrètement.</string>
     <string name="blogs_experiment_banner_lead">Il s’agit d’une expérience.</string>
     <string name="onboarding_blogs_upsell_sample_label">Blog · Avr 24</string>

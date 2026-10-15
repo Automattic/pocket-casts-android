@@ -17,6 +17,7 @@ import java.io.IOException
 import java.util.Date
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -192,6 +193,29 @@ class ChatManagerImplTest {
     }
 
     @Test
+    fun `rate answer stores and clears the rating`() = runTest {
+        episodeChatDao.messages += createMessage(uuid = "answer-uuid", episodeUuid = EPISODE_UUID, text = "Answer")
+
+        manager.rateAnswer(answerUuid = "answer-uuid", rating = ChatAnswerRating.Negative)
+
+        assertEquals("negative", episodeChatDao.messages.single().rating)
+
+        manager.rateAnswer(answerUuid = "answer-uuid", rating = null)
+
+        assertNull(episodeChatDao.messages.single().rating)
+    }
+
+    @Test
+    fun `observed answers carry their stored rating`() = runTest {
+        episodeChatDao.messages += createMessage(uuid = "answer-uuid", episodeUuid = EPISODE_UUID, text = "Answer")
+            .copy(rating = "positive")
+
+        val messages = manager.observeMessages(EPISODE_UUID).first()
+
+        assertEquals(ChatAnswerRating.Positive, messages.single().answerRating)
+    }
+
+    @Test
     fun `blank quote text is ignored`() = runTest {
         transcripts.value = listOf(createTranscript())
         whenever(podcastCacheServiceManager.episodeChat(any(), any())).thenReturn(
@@ -258,6 +282,10 @@ class ChatManagerImplTest {
         override suspend fun deleteMessagesByEpisode(episodeUuid: String) {
             deletedEpisodeUuids += episodeUuid
             messages.removeAll { it.episodeUuid == episodeUuid }
+        }
+
+        override suspend fun updateRating(uuid: String, rating: String?) {
+            messages.replaceAll { if (it.uuid == uuid) it.copy(rating = rating) else it }
         }
     }
 

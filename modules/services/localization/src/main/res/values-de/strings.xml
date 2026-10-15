@@ -214,7 +214,6 @@ Language: de
     <string name="chat_play_quote">Zitat abspielen</string>
     <string name="chat_clear">Chat löschen</string>
     <string name="chat_send">Senden</string>
-    <string name="episode_chat">Mit Folge chatten</string>
     <string name="blogs_experiment_banner_body">Blogs sind etwas, das wir ausprobieren. Sie könnten bestehen bleiben, überarbeitet werden oder still und leise verschwinden.</string>
     <string name="blogs_experiment_banner_lead">Es handelt sich um ein Experiment.</string>
     <string name="onboarding_blogs_upsell_sample_label">Blog ・ 24. April</string>
