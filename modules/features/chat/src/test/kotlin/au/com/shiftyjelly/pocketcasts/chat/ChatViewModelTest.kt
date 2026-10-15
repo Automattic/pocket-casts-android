@@ -118,9 +118,10 @@ class ChatViewModelTest {
         on { value } doAnswer { surveySeen.value }
         on { set(any(), any(), any(), any()) } doAnswer { surveySeen.value = it.getArgument(0) }
     }
-    private var subscription: Subscription? = null
+    private val subscription = MutableStateFlow<Subscription?>(null)
     private val cachedSubscriptionSetting = mock<ReadSetting<Subscription?>> {
-        on { value } doAnswer { subscription }
+        on { value } doAnswer { subscription.value }
+        on { flow } doReturn subscription
     }
     private val settings = mock<Settings> {
         on { episodeChatBetaSheetSeen } doReturn betaSheetSeenSetting
@@ -1127,7 +1128,7 @@ class ChatViewModelTest {
     }
 
     @Test
-    fun `undoing a clear of only an unsent question does nothing`() = runTest {
+    fun `undoing a clear of only an unsent question brings it back as not sent`() = runTest {
         setEpisodeInfo()
         connectToInternet()
         chatManager.sendMessageException = IOException()
@@ -1139,8 +1140,8 @@ class ChatViewModelTest {
         viewModel.undoClearChat()
         advanceUntilIdle()
 
-        assertEquals(emptyList<ChatMessage>(), viewModel.uiState.value.messages)
-        assertTrue(eventSink.isEmpty())
+        assertEquals(listOf("Question"), viewModel.uiState.value.messages.filterIsInstance<ChatMessage.User>().map { it.text })
+        assertEquals(ChatError.NetworkError, viewModel.uiState.value.error)
     }
 
     @Test
@@ -1763,7 +1764,6 @@ class ChatViewModelTest {
         val state = viewModel.uiState.value
         assertTrue(state.isBetaSheetVisible)
         assertTrue(state.isSignInRequired)
-        eventSink.skipEvent()
         assertEquals(
             EpisodeChatBetaSheetShownEvent(
                 source = SourceView.PLAYER.analyticsValue,
@@ -1778,7 +1778,7 @@ class ChatViewModelTest {
     fun `tapping sign in on the beta sheet starts sign in and tracks it`() = runTest {
         isLoggedIn = false
         setEpisodeInfo(isBeta = true, requiresSignIn = true)
-        eventSink.skipEvent(2)
+        eventSink.skipEvent()
 
         viewModel.navigation.test {
             viewModel.onSignInClick()
@@ -1800,7 +1800,7 @@ class ChatViewModelTest {
     fun `coming back signed in hides the beta sheet and marks it seen`() = runTest {
         isLoggedIn = false
         setEpisodeInfo(isBeta = true, requiresSignIn = true)
-        eventSink.skipEvent(2)
+        eventSink.skipEvent()
 
         isLoggedIn = true
         viewModel.refreshSignIn()
@@ -1809,6 +1809,7 @@ class ChatViewModelTest {
         assertFalse(state.isBetaSheetVisible)
         assertFalse(state.isSignInRequired)
         verify(betaSheetSeenSetting).set(true, updateModifiedAt = false)
+        assertTrue(eventSink.pollEvent() is EpisodeChatShownEvent)
         assertTrue(eventSink.isEmpty())
     }
 
@@ -1818,7 +1819,11 @@ class ChatViewModelTest {
         setEpisodeInfo(isBeta = true, requiresSignIn = true)
 
         isLoggedIn = true
-        subscription = Subscription(
+        viewModel.refreshSignIn()
+        advanceUntilIdle()
+        assertTrue(viewModel.uiState.value.isBeta)
+
+        subscription.value = Subscription(
             tier = SubscriptionTier.Plus,
             billingCycle = BillingCycle.Monthly,
             platform = SubscriptionPlatform.Android,
@@ -1826,16 +1831,47 @@ class ChatViewModelTest {
             isAutoRenewing = true,
             giftDays = 0,
         )
-        viewModel.refreshSignIn()
+        advanceUntilIdle()
 
         assertFalse(viewModel.uiState.value.isBeta)
+    }
+
+    @Test
+    fun `a signed out user is not counted as opening the chat until signing in`() = runTest {
+        isLoggedIn = false
+        setEpisodeInfo(isBeta = true, requiresSignIn = true)
+        viewModel.trackDismissed()
+
+        assertTrue(eventSink.pollEvent() is EpisodeChatBetaSheetShownEvent)
+        assertTrue(eventSink.isEmpty())
+
+        isLoggedIn = true
+        viewModel.refreshSignIn()
+
+        assertTrue(eventSink.pollEvent() is EpisodeChatShownEvent)
+    }
+
+    @Test
+    fun `a signed out user does not see the saved conversation behind the sign in sheet`() = runTest {
+        chatManager.messages.value = listOf(ChatMessage.User(text = "Old question", uuid = "old-uuid"))
+        isLoggedIn = false
+        setEpisodeInfo(isBeta = true, requiresSignIn = true)
+        advanceUntilIdle()
+
+        assertEquals(emptyList<ChatMessage>(), viewModel.uiState.value.messages)
+
+        isLoggedIn = true
+        viewModel.refreshSignIn()
+        advanceUntilIdle()
+
+        assertEquals(listOf("old-uuid"), viewModel.uiState.value.messages.map { it.uuid })
     }
 
     @Test
     fun `tapping sign in twice starts sign in once`() = runTest {
         isLoggedIn = false
         setEpisodeInfo(isBeta = true, requiresSignIn = true)
-        eventSink.skipEvent(2)
+        eventSink.skipEvent()
 
         viewModel.navigation.test {
             viewModel.onSignInClick()
