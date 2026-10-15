@@ -923,6 +923,7 @@ class ChatViewModelTest {
         advanceUntilIdle()
 
         assertEquals(listOf("q1", "a1"), viewModel.uiState.value.messages.map { it.uuid })
+        assertEquals(setOf("q1", "a1"), viewModel.uiState.value.restoredMessageUuids)
         assertEquals(mapOf("a1" to ChatAnswerRating.Positive), viewModel.uiState.value.answerRatings)
         assertEquals(
             EpisodeChatClearUndoneEvent(

@@ -228,7 +228,12 @@ class ChatViewModel @Inject constructor(
             pendingClear?.join()
             val cleared = clearedChat ?: return@launch
             clearedChat = null
-            _uiState.update { it.copy(answerRatings = cleared.messages.storedAnswerRatings() + it.answerRatings) }
+            _uiState.update { state ->
+                state.copy(
+                    answerRatings = cleared.messages.storedAnswerRatings() + state.answerRatings,
+                    restoredMessageUuids = state.restoredMessageUuids + cleared.messages.map { it.uuid },
+                )
+            }
             chatManager.restoreMessages(cleared)
             eventHorizon.track(
                 EpisodeChatClearUndoneEvent(
@@ -530,6 +535,7 @@ data class ChatUiState(
     val isBetaSheetVisible: Boolean = false,
     val playback: ChatPlayback = ChatPlayback(),
     val answerRatings: Map<String, ChatAnswerRating> = emptyMap(),
+    val restoredMessageUuids: Set<String> = emptySet(),
 ) {
     val canSend: Boolean get() = inputText.isNotBlank() && isConnected && !isAwaitingReply
 

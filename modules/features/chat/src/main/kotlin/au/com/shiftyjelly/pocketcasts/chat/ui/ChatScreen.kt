@@ -170,7 +170,10 @@ private fun ChatContent(
     val scrollState = rememberScrollState()
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
-    val initialMessageUuids = remember(uiState.areMessagesLoaded) { uiState.messages.mapTo(HashSet()) { it.uuid } }
+    val loadedMessageUuids = remember(uiState.areMessagesLoaded) { uiState.messages.mapTo(HashSet()) { it.uuid } }
+    val initialMessageUuids = remember(loadedMessageUuids, uiState.restoredMessageUuids) {
+        loadedMessageUuids + uiState.restoredMessageUuids
+    }
 
     val followThresholdPx = with(LocalDensity.current) { FollowNewestThreshold.roundToPx() }
     var isFollowingNewest by remember { mutableStateOf(true) }
