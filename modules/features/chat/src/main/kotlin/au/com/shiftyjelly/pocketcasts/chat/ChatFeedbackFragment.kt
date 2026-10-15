@@ -14,7 +14,10 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.chat.ui.ChatFeedbackForm
 import au.com.shiftyjelly.pocketcasts.chat.ui.rememberChatTheme
@@ -30,6 +33,7 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import com.automattic.eventhorizon.EpisodeChatFeedbackTriggerType
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 
 @AndroidEntryPoint
@@ -70,6 +74,11 @@ class ChatFeedbackFragment : BaseDialogFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel.onShown(args.episodeUuid, args.podcastUuid, args.sourceView, args.trigger.analyticsValue)
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.submitted.collect { onSubmitted() }
+            }
+        }
     }
 
     override fun onCreateView(
@@ -78,6 +87,9 @@ class ChatFeedbackFragment : BaseDialogFragment() {
         savedInstanceState: Bundle?,
     ) = contentWithoutConsumedInsets {
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+        LaunchedEffect(uiState.isSubmitting) {
+            isCancelable = !uiState.isSubmitting
+        }
 
         AppTheme(theme.activeTheme) {
             CompositionLocalProvider(LocalPodcastColors provides args.podcastColors) {
@@ -91,9 +103,11 @@ class ChatFeedbackFragment : BaseDialogFragment() {
                     details = uiState.details,
                     showDetails = uiState.showDetails,
                     canSubmit = uiState.canSubmit,
+                    isSubmitting = uiState.isSubmitting,
+                    hasSubmitError = uiState.hasSubmitError,
                     onSelectReason = viewModel::onReasonSelected,
                     onDetailsChange = viewModel::onDetailsChange,
-                    onSubmit = ::submit,
+                    onSubmit = viewModel::submit,
                     onClickLearnMore = { context?.startActivityViewUrl(Settings.INFO_PRIVACY_URL) },
                     theme = rememberChatTheme(),
                 )
@@ -107,15 +121,13 @@ class ChatFeedbackFragment : BaseDialogFragment() {
         dialog?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
     }
 
-    private fun submit() {
-        if (viewModel.submit()) {
-            if (args.trigger == Trigger.ResponseRating) {
-                setFragmentResult(SUBMITTED_RESULT_KEY, Bundle.EMPTY)
-            } else {
-                showChatFeedbackThanks()
-            }
-            dismiss()
+    private fun onSubmitted() {
+        if (args.trigger == Trigger.ResponseRating) {
+            setFragmentResult(SUBMITTED_RESULT_KEY, Bundle.EMPTY)
+        } else {
+            showChatFeedbackThanks()
         }
+        dismiss()
     }
 
     override fun onDismiss(dialog: DialogInterface) {

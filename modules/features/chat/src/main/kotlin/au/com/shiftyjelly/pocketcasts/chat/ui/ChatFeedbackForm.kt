@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
@@ -26,6 +27,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.RadioButton
@@ -37,8 +39,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
@@ -66,6 +70,8 @@ internal fun ChatFeedbackForm(
     details: String,
     showDetails: Boolean,
     canSubmit: Boolean,
+    isSubmitting: Boolean,
+    hasSubmitError: Boolean,
     onSelectReason: (ChatFeedback.Reason) -> Unit,
     onDetailsChange: (String) -> Unit,
     onSubmit: () -> Unit,
@@ -91,7 +97,7 @@ internal fun ChatFeedbackForm(
                     .background(theme.tertiaryText, RoundedCornerShape(2.dp)),
             )
             Text(
-                text = stringResource(LR.string.chat_feedback_title).uppercase(),
+                text = stringResource(LR.string.chat_feedback_what_went_wrong).uppercase(),
                 color = theme.tertiaryText,
                 fontSize = 13.sp,
                 fontWeight = FontWeight.Bold,
@@ -102,6 +108,7 @@ internal fun ChatFeedbackForm(
                     ReasonRow(
                         label = option.labelRes,
                         isSelected = option == reason,
+                        isEnabled = !isSubmitting,
                         onClick = { onSelectReason(option) },
                         theme = theme,
                     )
@@ -114,8 +121,20 @@ internal fun ChatFeedbackForm(
             ) {
                 DetailsField(
                     details = details,
+                    isEnabled = !isSubmitting,
                     onDetailsChange = onDetailsChange,
                     theme = theme,
+                )
+            }
+            if (hasSubmitError) {
+                Text(
+                    text = stringResource(LR.string.chat_feedback_send_failed),
+                    color = theme.errorText,
+                    fontSize = 13.sp,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .padding(top = if (showDetails) 28.dp else 12.dp)
+                        .semantics { liveRegion = LiveRegionMode.Polite },
                 )
             }
             Button(
@@ -126,19 +145,37 @@ internal fun ChatFeedbackForm(
                 colors = ButtonDefaults.buttonColors(
                     backgroundColor = theme.primaryText,
                     contentColor = theme.onWhiteText,
-                    disabledBackgroundColor = theme.primaryText.copy(alpha = 0.5f),
-                    disabledContentColor = theme.onWhiteText.copy(alpha = 0.5f),
+                    disabledBackgroundColor = if (isSubmitting) theme.primaryText else theme.primaryText.copy(alpha = 0.5f),
+                    disabledContentColor = if (isSubmitting) theme.onWhiteText else theme.onWhiteText.copy(alpha = 0.5f),
                 ),
                 modifier = Modifier
-                    .padding(top = 24.dp)
+                    .padding(
+                        top = when {
+                            !hasSubmitError -> 24.dp
+                            showDetails -> 20.dp
+                            else -> 28.dp
+                        },
+                    )
                     .fillMaxWidth()
                     .heightIn(min = 56.dp),
             ) {
-                Text(
-                    text = stringResource(LR.string.chat_feedback_submit),
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.SemiBold,
-                )
+                if (isSubmitting) {
+                    val sending = stringResource(LR.string.chat_feedback_sending)
+                    CircularProgressIndicator(
+                        color = theme.onWhiteText,
+                        backgroundColor = theme.onWhiteText.copy(alpha = 0.3f),
+                        strokeWidth = 2.dp,
+                        modifier = Modifier
+                            .size(24.dp)
+                            .semantics { contentDescription = sending },
+                    )
+                } else {
+                    Text(
+                        text = stringResource(if (hasSubmitError) LR.string.try_again else LR.string.chat_feedback_submit),
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                }
             }
             LegalNote(
                 onClickLearnMore = onClickLearnMore,
@@ -153,6 +190,7 @@ internal fun ChatFeedbackForm(
 private fun ReasonRow(
     @StringRes label: Int,
     isSelected: Boolean,
+    isEnabled: Boolean,
     onClick: () -> Unit,
     theme: ChatTheme,
 ) {
@@ -161,7 +199,7 @@ private fun ReasonRow(
         modifier = Modifier
             .fillMaxWidth()
             .heightIn(min = 54.dp)
-            .selectable(selected = isSelected, role = Role.RadioButton, onClick = onClick)
+            .selectable(selected = isSelected, enabled = isEnabled, role = Role.RadioButton, onClick = onClick)
             .padding(horizontal = 4.dp),
     ) {
         Text(
@@ -174,6 +212,7 @@ private fun ReasonRow(
         RadioButton(
             selected = isSelected,
             onClick = null,
+            enabled = isEnabled,
             colors = RadioButtonDefaults.colors(
                 selectedColor = theme.quoteTimestamp,
                 unselectedColor = theme.primaryText,
@@ -185,6 +224,7 @@ private fun ReasonRow(
 @Composable
 private fun DetailsField(
     details: String,
+    isEnabled: Boolean,
     onDetailsChange: (String) -> Unit,
     theme: ChatTheme,
 ) {
@@ -192,6 +232,7 @@ private fun DetailsField(
     BasicTextField(
         value = details,
         onValueChange = onDetailsChange,
+        enabled = isEnabled,
         textStyle = TextStyle(color = theme.inputText, fontSize = 15.sp, lineHeight = 21.sp),
         cursorBrush = SolidColor(theme.primaryText),
         decorationBox = { innerTextField ->
@@ -274,6 +315,8 @@ private fun ChatFeedbackFormPreview(
                 details = "",
                 showDetails = true,
                 canSubmit = true,
+                isSubmitting = false,
+                hasSubmitError = true,
                 onSelectReason = {},
                 onDetailsChange = {},
                 onSubmit = {},

@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.chat
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatFeedback
@@ -11,15 +12,19 @@ import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.eventhorizon.EpisodeChatFeedbackFormDismissedEvent
 import com.automattic.eventhorizon.EpisodeChatFeedbackFormShownEvent
 import com.automattic.eventhorizon.EpisodeChatFeedbackReasonType
+import com.automattic.eventhorizon.EpisodeChatFeedbackSubmitFailedEvent
 import com.automattic.eventhorizon.EpisodeChatFeedbackSubmitTappedEvent
 import com.automattic.eventhorizon.EpisodeChatFeedbackTriggerType
 import com.automattic.eventhorizon.EventHorizon
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -39,6 +44,9 @@ class ChatFeedbackViewModel @Inject constructor(
     )
     val uiState = _uiState.asStateFlow()
 
+    private val _submitted = Channel<Unit>(Channel.CONFLATED)
+    val submitted = _submitted.receiveAsFlow()
+
     private lateinit var episodeUuid: String
     private lateinit var podcastUuid: String
     private lateinit var sourceView: SourceView
@@ -49,6 +57,10 @@ class ChatFeedbackViewModel @Inject constructor(
         set(value) {
             savedStateHandle[IS_SUBMITTED_KEY] = value
         }
+
+    init {
+        if (isSubmitted) _submitted.trySend(Unit)
+    }
 
     fun onShown(
         episodeUuid: String,
@@ -83,11 +95,10 @@ class ChatFeedbackViewModel @Inject constructor(
         _uiState.update { it.copy(details = limited) }
     }
 
-    fun submit(): Boolean {
+    fun submit() {
         val state = _uiState.value
-        val reason = state.reason ?: return false
-        if (isSubmitted) return false
-        isSubmitted = true
+        val reason = state.reason ?: return
+        if (isSubmitted || state.isSubmitting) return
         val details = state.detailsToSend
         eventHorizon.track(
             EpisodeChatFeedbackSubmitTappedEvent(
@@ -99,7 +110,8 @@ class ChatFeedbackViewModel @Inject constructor(
                 hasDetails = details.isNotEmpty(),
             ),
         )
-        applicationScope.launch {
+        _uiState.update { it.copy(isSubmitting = true, hasSubmitError = false) }
+        val request = applicationScope.async {
             runCatching {
                 feedbackManager.submit(
                     ChatFeedback(
@@ -112,7 +124,22 @@ class ChatFeedbackViewModel @Inject constructor(
                 )
             }.onFailure { LogBuffer.e(LOG_TAG, it, "Failed to submit episode chat feedback") }
         }
-        return true
+        viewModelScope.launch {
+            if (request.await().isSuccess) {
+                isSubmitted = true
+                _submitted.send(Unit)
+            } else {
+                eventHorizon.track(
+                    EpisodeChatFeedbackSubmitFailedEvent(
+                        source = sourceView.analyticsValue,
+                        episodeUuid = episodeUuid,
+                        podcastUuid = podcastUuid,
+                        trigger = trigger,
+                    ),
+                )
+                _uiState.update { it.copy(isSubmitting = false, hasSubmitError = true) }
+            }
+        }
     }
 
     fun onDismissed() {
@@ -130,8 +157,10 @@ class ChatFeedbackViewModel @Inject constructor(
     data class UiState(
         val reason: ChatFeedback.Reason? = null,
         val details: String = "",
+        val isSubmitting: Boolean = false,
+        val hasSubmitError: Boolean = false,
     ) {
-        val canSubmit get() = reason != null
+        val canSubmit get() = reason != null && !isSubmitting
         val showDetails get() = reason == ChatFeedback.Reason.Other
         val detailsToSend get() = if (showDetails) details.trim() else ""
     }
