@@ -37,6 +37,7 @@ import com.automattic.eventhorizon.EpisodeChatClearedEvent
 import com.automattic.eventhorizon.EpisodeChatDeleteUndoneEvent
 import com.automattic.eventhorizon.EpisodeChatDeletedEvent
 import com.automattic.eventhorizon.EpisodeChatDismissedEvent
+import com.automattic.eventhorizon.EpisodeChatEntryPointType
 import com.automattic.eventhorizon.EpisodeChatErrorType
 import com.automattic.eventhorizon.EpisodeChatHistoryRowTappedEvent
 import com.automattic.eventhorizon.EpisodeChatHistorySectionType
@@ -1968,6 +1969,7 @@ class ChatViewModelTest {
 
     @Test
     fun `a signed out user is not counted as opening the chat until signing in`() = runTest {
+        chatManager.messages.value = listOf(ChatMessage.User(text = "Old question", uuid = "old-uuid"))
         isLoggedIn = false
         setEpisodeInfo(isBeta = true, requiresSignIn = true)
         viewModel.trackDismissed()
@@ -1977,8 +1979,18 @@ class ChatViewModelTest {
 
         isLoggedIn = true
         viewModel.refreshSignIn()
+        advanceUntilIdle()
 
-        assertTrue(eventSink.pollEvent() is EpisodeChatShownEvent)
+        assertEquals(
+            EpisodeChatShownEvent(
+                source = SourceView.PLAYER.analyticsValue,
+                episodeUuid = EPISODE_UUID,
+                podcastUuid = PODCAST_UUID,
+                hasHistory = true,
+                entryPoint = EpisodeChatEntryPointType.SignIn,
+            ),
+            eventSink.pollEvent(),
+        )
     }
 
     @Test
