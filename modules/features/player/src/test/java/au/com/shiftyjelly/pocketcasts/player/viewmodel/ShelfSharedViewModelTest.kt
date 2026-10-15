@@ -562,7 +562,15 @@ class ShelfSharedViewModelTest {
 
         shelfSharedViewModel.navigationState.test {
             shelfSharedViewModel.onEpisodeChatClick(podcast, transcriptEpisode, isTranscriptAvailable = true, ShelfItemSource.OverflowMenu)
-            assertEquals(NavigationState.ShowEpisodeChat(podcast, transcriptEpisode, EpisodeChatAccess.Chat(isBeta = false), ChatEntryPoint.MoreActions), awaitItem())
+            assertEquals(
+                NavigationState.ShowEpisodeChat(
+                    podcast = podcast,
+                    episode = transcriptEpisode,
+                    access = EpisodeChatAccess.Chat(isBeta = false),
+                    entryPoint = ChatEntryPoint.MoreActions,
+                ),
+                awaitItem(),
+            )
         }
     }
 
@@ -575,7 +583,15 @@ class ShelfSharedViewModelTest {
 
         shelfSharedViewModel.navigationState.test {
             shelfSharedViewModel.onEpisodeChatClick(podcast, transcriptEpisode, isTranscriptAvailable = true, ShelfItemSource.Shelf)
-            assertEquals(NavigationState.ShowEpisodeChat(podcast, transcriptEpisode, EpisodeChatAccess.Chat(isBeta = true), ChatEntryPoint.PlayerShelf), awaitItem())
+            assertEquals(
+                NavigationState.ShowEpisodeChat(
+                    podcast = podcast,
+                    episode = transcriptEpisode,
+                    access = EpisodeChatAccess.Chat(isBeta = true),
+                    entryPoint = ChatEntryPoint.PlayerShelf,
+                ),
+                awaitItem(),
+            )
         }
     }
 
@@ -588,7 +604,15 @@ class ShelfSharedViewModelTest {
 
         shelfSharedViewModel.navigationState.test {
             shelfSharedViewModel.onEpisodeChatClick(podcast, transcriptEpisode, isTranscriptAvailable = true, ShelfItemSource.Shelf)
-            assertEquals(NavigationState.ShowEpisodeChat(podcast, transcriptEpisode, EpisodeChatAccess.SignIn, ChatEntryPoint.PlayerShelf), awaitItem())
+            assertEquals(
+                NavigationState.ShowEpisodeChat(
+                    podcast = podcast,
+                    episode = transcriptEpisode,
+                    access = EpisodeChatAccess.SignIn,
+                    entryPoint = ChatEntryPoint.PlayerShelf,
+                ),
+                awaitItem(),
+            )
         }
     }
 
@@ -601,7 +625,15 @@ class ShelfSharedViewModelTest {
 
         shelfSharedViewModel.navigationState.test {
             shelfSharedViewModel.onEpisodeChatClick(podcast, transcriptEpisode, isTranscriptAvailable = true, ShelfItemSource.Shelf)
-            assertEquals(NavigationState.ShowEpisodeChat(podcast, transcriptEpisode, EpisodeChatAccess.Paywall, ChatEntryPoint.PlayerShelf), awaitItem())
+            assertEquals(
+                NavigationState.ShowEpisodeChat(
+                    podcast = podcast,
+                    episode = transcriptEpisode,
+                    access = EpisodeChatAccess.Paywall,
+                    entryPoint = ChatEntryPoint.PlayerShelf,
+                ),
+                awaitItem(),
+            )
         }
     }
 
