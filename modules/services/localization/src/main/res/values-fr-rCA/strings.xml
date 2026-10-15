@@ -212,6 +212,7 @@ Language: fr
     <string name="blogs_found_feed_detected">Flux trouvé</string>
     <string name="chapters_generated_disclaimer">Ces chapitres sont générés automatiquement et peuvent ne pas être parfaitement exacts.</string>
     <string name="chat_play_quote">Lire la citation</string>
+    <string name="chat_clear">Effacer la discussion</string>
     <string name="chat_send">Envoyer</string>
     <string name="blogs_experiment_banner_body">Nous sommes en train de tester les blogs. Ça pourrait rester, être retravaillé ou disparaître discrètement.</string>
     <string name="blogs_experiment_banner_lead">Il s’agit d’une expérience.</string>

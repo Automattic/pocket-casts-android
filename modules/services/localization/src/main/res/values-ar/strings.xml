@@ -212,6 +212,7 @@ Language: ar
     <string name="blogs_found_feed_detected">تم العثور على تلقيم</string>
     <string name="chapters_generated_disclaimer">يجري إنشاء هذه الفصول تلقائيًا، وقد لا تكون دقيقة بالكامل.</string>
     <string name="chat_play_quote">تشغيل اقتباس</string>
+    <string name="chat_clear">مسح المحادثة</string>
     <string name="chat_send">إرسال</string>
     <string name="blogs_experiment_banner_body">المدوّنات ميزة نقوم بتجربتها حاليًا. قد تستمر كما هي، أو تخضع لتعديلات، أو تختفي بهدوء.</string>
     <string name="blogs_experiment_banner_lead">هذه مجرد تجربة.</string>

@@ -86,7 +86,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 fun ChatScreen(
     uiState: ChatUiState,
     onClickClose: () -> Unit,
-    onClickClearChat: () -> Unit,
+    onClickMore: () -> Unit,
     onClickPlayPause: () -> Unit,
     onInputTextChange: (String) -> Unit,
     onSend: () -> Unit,
@@ -136,7 +136,7 @@ fun ChatScreen(
                     uiState = uiState,
                     theme = theme,
                     onClickClose = onClickClose,
-                    onClickClearChat = onClickClearChat,
+                    onClickMore = onClickMore,
                     onClickPlayPause = onClickPlayPause,
                     onInputTextChange = onInputTextChange,
                     onSend = onSend,
@@ -156,7 +156,7 @@ private fun ChatContent(
     uiState: ChatUiState,
     theme: ChatTheme,
     onClickClose: () -> Unit,
-    onClickClearChat: () -> Unit,
+    onClickMore: () -> Unit,
     onClickPlayPause: () -> Unit,
     onInputTextChange: (String) -> Unit,
     onSend: () -> Unit,
@@ -204,11 +204,11 @@ private fun ChatContent(
             playback = uiState.playback,
             onClickClose = onClickClose,
             onClickPlayPause = onClickPlayPause,
-            onOpenMenu = {
+            onClickMore = {
                 focusManager.clearFocus(force = true)
                 keyboardController?.hide()
+                onClickMore()
             },
-            onClickClearChat = onClickClearChat,
             theme = theme,
         )
 
@@ -536,7 +536,7 @@ private fun ChatScreenPreview(
                     ),
                 ),
                 onClickClose = {},
-                onClickClearChat = {},
+                onClickMore = {},
                 onClickPlayPause = {},
                 onInputTextChange = {},
                 onSend = {},
@@ -567,7 +567,7 @@ private fun ChatScreenEmptyPreview(
                     areMessagesLoaded = true,
                 ),
                 onClickClose = {},
-                onClickClearChat = {},
+                onClickMore = {},
                 onClickPlayPause = {},
                 onInputTextChange = {},
                 onSend = {},
@@ -604,7 +604,7 @@ private fun ChatScreenErrorPreview(
                     ),
                 ),
                 onClickClose = {},
-                onClickClearChat = {},
+                onClickMore = {},
                 onClickPlayPause = {},
                 onInputTextChange = {},
                 onSend = {},

@@ -212,6 +212,7 @@ Language: nl
     <string name="blogs_found_feed_detected">Feed gevonden</string>
     <string name="chapters_generated_disclaimer">Deze hoofdstukken worden automatisch gegenereerd en zijn mogelijk niet perfect nauwkeurig.</string>
     <string name="chat_play_quote">Citaat afspelen</string>
+    <string name="chat_clear">Chat wissen</string>
     <string name="chat_send">Verzenden</string>
     <string name="blogs_experiment_banner_body">Blogs is iets wat we uitproberen. Het kan zo blijven, opnieuw worden uitgedacht of stilletjes verdwijnen.</string>
     <string name="blogs_experiment_banner_lead">Dit is een experiment.</string>

@@ -2573,12 +2573,12 @@
     <string name="chat_feedback_legal">Submitting shares this conversation with us to help improve chat.</string>
     <string name="chat_feedback_learn_more">Learn more</string>
     <string name="chat_send">Send</string>
-    <string name="chat_clear_chat">Clear chat</string>
     <string name="chat_cleared">Chat cleared</string>
     <string name="chat_undo">Undo</string>
     <string name="chat_not_sent_tap_to_retry">Not sent. Tap to try again.</string>
     <string name="chat_error_server_on_our_end">Something went wrong on our end.</string>
     <string name="chat_answering">Answering</string>
+    <string name="chat_clear">Clear chat</string>
     <string name="chat_offline_note">You’re offline. Connect to ask a question.</string>
     <string name="chat_play_quote">Play quote</string>
 

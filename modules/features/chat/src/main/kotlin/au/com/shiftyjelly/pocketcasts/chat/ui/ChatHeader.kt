@@ -11,17 +11,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.DropdownMenu
-import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -50,8 +44,7 @@ internal fun ChatHeader(
     podcastTitle: String,
     playback: ChatPlayback,
     onClickClose: () -> Unit,
-    onOpenMenu: () -> Unit,
-    onClickClearChat: () -> Unit,
+    onClickMore: () -> Unit,
     onClickPlayPause: () -> Unit,
     theme: ChatTheme,
     modifier: Modifier = Modifier,
@@ -71,11 +64,13 @@ internal fun ChatHeader(
                 )
             }
             Spacer(modifier = Modifier.weight(1f))
-            ChatMenu(
-                onOpen = onOpenMenu,
-                onClickClearChat = onClickClearChat,
-                theme = theme,
-            )
+            IconButton(onClick = onClickMore) {
+                Icon(
+                    painter = painterResource(IR.drawable.ic_ellipsis_horizontal),
+                    contentDescription = stringResource(LR.string.more_options),
+                    tint = theme.iconButton,
+                )
+            }
         }
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -138,54 +133,6 @@ internal fun ChatHeader(
     }
 }
 
-@Composable
-private fun ChatMenu(
-    onOpen: () -> Unit,
-    onClickClearChat: () -> Unit,
-    theme: ChatTheme,
-) {
-    var isExpanded by remember { mutableStateOf(false) }
-    Box {
-        IconButton(
-            onClick = {
-                onOpen()
-                isExpanded = true
-            },
-        ) {
-            Icon(
-                painter = painterResource(IR.drawable.ic_ellipsis_horizontal),
-                contentDescription = stringResource(LR.string.more_options),
-                tint = theme.iconButton,
-            )
-        }
-        DropdownMenu(
-            expanded = isExpanded,
-            onDismissRequest = { isExpanded = false },
-            modifier = Modifier.background(theme.menuBackground),
-        ) {
-            DropdownMenuItem(
-                onClick = {
-                    isExpanded = false
-                    onClickClearChat()
-                },
-            ) {
-                Icon(
-                    painter = painterResource(IR.drawable.ic_delete),
-                    contentDescription = null,
-                    tint = theme.errorText,
-                    modifier = Modifier.size(24.dp),
-                )
-                Spacer(modifier = Modifier.width(12.dp))
-                Text(
-                    text = stringResource(LR.string.chat_clear_chat),
-                    color = theme.errorText,
-                    fontSize = 17.sp,
-                )
-            }
-        }
-    }
-}
-
 @Preview
 @Composable
 private fun ChatHeaderPreview(
@@ -200,8 +147,7 @@ private fun ChatHeaderPreview(
                 podcastTitle = "Smart Money",
                 playback = ChatPlayback(isPlaying = true, positionMs = 30, durationMs = 100),
                 onClickClose = {},
-                onOpenMenu = {},
-                onClickClearChat = {},
+                onClickMore = {},
                 onClickPlayPause = {},
                 theme = theme,
                 modifier = Modifier.background(theme.background),

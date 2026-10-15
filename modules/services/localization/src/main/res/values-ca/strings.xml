@@ -208,6 +208,7 @@ Language: ca
     <string name="blogs_found_feed_detected">S\'ha trobat el feed</string>
     <string name="chapters_generated_disclaimer">Aquests capítols es generen automàticament i poden no ser del tot precisos.</string>
     <string name="chat_play_quote">Reprodueix la citació</string>
+    <string name="chat_clear">Esborra el xat</string>
     <string name="chat_send">Envia</string>
     <string name="blogs_experiment_banner_body">Els blogs són una cosa que estem experimentant. Pot quedar-se, remodelar-se, o desaparèixer sense fer soroll.</string>
     <string name="blogs_experiment_banner_lead">Això és un experiment.</string>

@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.SnackbarDuration
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.SnackbarResult
 import androidx.compose.runtime.CompositionLocalProvider
@@ -28,14 +29,19 @@ import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatAnswerRating
+import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
+import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
+import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.parcelize.Parcelize
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
 class ChatFragment : BaseDialogFragment() {
@@ -106,6 +112,7 @@ class ChatFragment : BaseDialogFragment() {
                 val result = snackbarHostState.showSnackbar(
                     message = toast.message(resources),
                     actionLabel = resources.getString(LR.string.chat_undo).takeIf { toast.isUndoable },
+                    duration = if (toast.isUndoable) SnackbarDuration.Long else SnackbarDuration.Short,
                 )
                 if (result == SnackbarResult.ActionPerformed) {
                     when (toast) {
@@ -126,7 +133,7 @@ class ChatFragment : BaseDialogFragment() {
                 ChatScreen(
                     uiState = uiState,
                     onClickClose = { dismiss() },
-                    onClickClearChat = viewModel::clearChat,
+                    onClickMore = ::showOptionsDialog,
                     onClickPlayPause = viewModel::onPlayPauseClick,
                     onInputTextChange = viewModel::onInputTextChange,
                     onSend = {
@@ -158,6 +165,30 @@ class ChatFragment : BaseDialogFragment() {
             podcastColors = args.podcastColors,
             trigger = ChatFeedbackFragment.Trigger.ResponseRating,
         )
+    }
+
+    private fun showOptionsDialog() {
+        val view = view ?: return
+        UiUtil.hideKeyboard(view)
+        view.post {
+            if (isAdded) {
+                showClearChatOptionsDialog()
+            }
+        }
+    }
+
+    private fun showClearChatOptionsDialog() {
+        val dangerColor = requireContext().getThemeColor(UR.attr.support_05)
+        OptionsDialog()
+            .setForceDarkTheme(args.sourceView == SourceView.PLAYER)
+            .addTextOption(
+                titleId = LR.string.chat_clear,
+                titleColor = dangerColor,
+                imageId = IR.drawable.ic_delete,
+                imageColor = dangerColor,
+                click = viewModel::clearChat,
+            )
+            .show(parentFragmentManager, "chat_options")
     }
 
     override fun onDismiss(dialog: DialogInterface) {
