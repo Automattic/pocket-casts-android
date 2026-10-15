@@ -129,11 +129,7 @@ class ChatFeedbackViewModel @Inject constructor(
                         conversation = chatManager.observeMessages(episodeUuid).first().dropLastWhile { it is ChatMessage.User },
                     ),
                 )
-            }.onFailure { LogBuffer.e(LOG_TAG, it, "Failed to submit episode chat feedback") }
-        }
-        viewModelScope.launch {
-            if (request.await().isSuccess) {
-                isSubmitted = true
+            }.onSuccess {
                 eventHorizon.track(
                     EpisodeChatFeedbackSubmittedEvent(
                         source = sourceView.analyticsValue,
@@ -145,8 +141,8 @@ class ChatFeedbackViewModel @Inject constructor(
                         messageIndex = messageIndex,
                     ),
                 )
-                _submitted.send(Unit)
-            } else {
+            }.onFailure {
+                LogBuffer.e(LOG_TAG, it, "Failed to submit episode chat feedback")
                 eventHorizon.track(
                     EpisodeChatFeedbackSubmitFailedEvent(
                         source = sourceView.analyticsValue,
@@ -156,6 +152,13 @@ class ChatFeedbackViewModel @Inject constructor(
                         messageIndex = messageIndex,
                     ),
                 )
+            }
+        }
+        viewModelScope.launch {
+            if (request.await().isSuccess) {
+                isSubmitted = true
+                _submitted.send(Unit)
+            } else {
                 _uiState.update { it.copy(isSubmitting = false, hasSubmitError = true) }
             }
         }

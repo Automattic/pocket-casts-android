@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.chat
 
 import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModelStore
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
@@ -21,6 +22,7 @@ import com.automattic.eventhorizon.EpisodeChatFeedbackSubmittedEvent
 import com.automattic.eventhorizon.EpisodeChatFeedbackTriggerType
 import com.automattic.eventhorizon.EventHorizon
 import java.io.IOException
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.SupervisorJob
@@ -265,6 +267,25 @@ class ChatFeedbackViewModelTest {
     }
 
     @Test
+    fun `feedback sent after the form closes is still tracked as submitted`() = runTest {
+        val gate = CompletableDeferred<Unit>()
+        feedbackManager.gate = gate
+        val viewModelStore = ViewModelStore()
+        val viewModel = createViewModel()
+        viewModelStore.put("feedback", viewModel)
+        viewModel.onReasonSelected(ChatFeedback.Reason.WrongFacts)
+        viewModel.submit()
+        advanceUntilIdle()
+        eventSink.skipEvent(eventSink.size)
+
+        viewModelStore.clear()
+        gate.complete(Unit)
+        advanceUntilIdle()
+
+        assertTrue(eventSink.pollEvent() is EpisodeChatFeedbackSubmittedEvent)
+    }
+
+    @Test
     fun `restored after a successful submit emits submitted again`() = runTest {
         createViewModel().apply {
             onReasonSelected(ChatFeedback.Reason.WrongFacts)
@@ -308,8 +329,10 @@ class ChatFeedbackViewModelTest {
     private class TestChatFeedbackManager : ChatFeedbackManager {
         val submitted = mutableListOf<ChatFeedback>()
         var failure: Exception? = null
+        var gate: CompletableDeferred<Unit>? = null
 
         override suspend fun submit(feedback: ChatFeedback) {
+            gate?.await()
             failure?.let { throw it }
             submitted += feedback
         }
