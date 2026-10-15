@@ -40,7 +40,9 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.automattic.eventhorizon.EpisodeChatTooltipDismissedEvent
 import com.automattic.eventhorizon.EpisodeChatTooltipShownEvent
+import com.automattic.eventhorizon.EpisodeChatEntryPointType
 import com.automattic.eventhorizon.EpisodeChatTooltipTappedEvent
+import com.automattic.eventhorizon.EpisodeChatUnavailableTappedEvent
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.PlayerShelfActionTappedEvent
 import com.automattic.eventhorizon.ShelfActionSourceType
@@ -626,6 +628,14 @@ class ShelfSharedViewModelTest {
             shelfSharedViewModel.onEpisodeChatClick(Podcast(uuid = "podcastUuid"), transcriptEpisode, isTranscriptAvailable = false, ShelfItemSource.OverflowMenu)
             assertEquals(SnackbarMessage.EpisodeChatNeedsTranscript, awaitItem())
         }
+        assertEquals(
+            EpisodeChatUnavailableTappedEvent(
+                episodeUuid = "episodeUuid",
+                podcastUuid = "podcastUuid",
+                entryPoint = EpisodeChatEntryPointType.MoreActions,
+            ),
+            eventSink.pollEvent(),
+        )
         assertTrue(eventSink.isEmpty())
     }
 

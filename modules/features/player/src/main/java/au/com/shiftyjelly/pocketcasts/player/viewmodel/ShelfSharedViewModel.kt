@@ -33,6 +33,7 @@ import au.com.shiftyjelly.pocketcasts.views.helper.DeleteState
 import com.automattic.eventhorizon.EpisodeChatTooltipDismissedEvent
 import com.automattic.eventhorizon.EpisodeChatTooltipShownEvent
 import com.automattic.eventhorizon.EpisodeChatTooltipTappedEvent
+import com.automattic.eventhorizon.EpisodeChatUnavailableTappedEvent
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.PlayerShelfActionTappedEvent
 import com.automattic.eventhorizon.PlayerShelfOverflowMenuShownEvent
@@ -453,6 +454,13 @@ class ShelfSharedViewModel @Inject constructor(
         source: ShelfItemSource,
     ) {
         if (!isTranscriptAvailable) {
+            eventHorizon.track(
+                EpisodeChatUnavailableTappedEvent(
+                    episodeUuid = episode.uuid,
+                    podcastUuid = episode.podcastUuid,
+                    entryPoint = source.chatEntryPoint.analyticsValue,
+                ),
+            )
             viewModelScope.launch { _snackbarMessages.emit(SnackbarMessage.EpisodeChatNeedsTranscript) }
             return
         }
