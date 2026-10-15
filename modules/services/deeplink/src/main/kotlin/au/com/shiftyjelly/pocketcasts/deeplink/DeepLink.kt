@@ -340,6 +340,13 @@ data object DeveloperOptionsDeeplink : IntentableDeepLink {
         .setData(Uri.parse("pktc://developer_options"))
 }
 
-private val Context.launcherIntent get() = requireNotNull(packageManager.getLaunchIntentForPackage(packageName)) {
-    "Missing launcher intent for $packageName"
-}
+private val Context.launcherIntent: Intent
+    get() {
+        val intent = requireNotNull(packageManager.getLaunchIntentForPackage(packageName)) {
+            "Missing launcher intent for $packageName"
+        }
+        val targetActivity = intent.component?.let { component ->
+            runCatching { packageManager.getActivityInfo(component, 0).targetActivity }.getOrNull()
+        }
+        return if (targetActivity != null) intent.setClassName(packageName, targetActivity) else intent
+    }
