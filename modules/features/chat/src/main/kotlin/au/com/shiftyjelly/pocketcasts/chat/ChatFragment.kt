@@ -16,7 +16,9 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalResources
@@ -106,20 +108,29 @@ class ChatFragment : BaseDialogFragment() {
         val uiState by viewModel.uiState.collectAsState()
         val snackbarHostState = remember { SnackbarHostState() }
         val resources = LocalResources.current
+        var shownToast by remember { mutableStateOf<ChatToast?>(null) }
         LaunchedEffect(snackbarHostState) {
             viewModel.toasts.collectLatest { toast ->
                 snackbarHostState.currentSnackbarData?.dismiss()
+                shownToast = toast
                 val result = snackbarHostState.showSnackbar(
                     message = toast.message(resources),
                     actionLabel = resources.getString(LR.string.chat_undo).takeIf { toast.isUndoable },
                     duration = if (toast.isUndoable) SnackbarDuration.Long else SnackbarDuration.Short,
                 )
+                shownToast = null
                 if (result == SnackbarResult.ActionPerformed) {
                     when (toast) {
                         ChatToast.ChatCleared -> viewModel.undoClearChat()
                         ChatToast.FeedbackThanks -> Unit
                     }
                 }
+            }
+        }
+        val hasMessages = uiState.messages.isNotEmpty()
+        LaunchedEffect(hasMessages) {
+            if (hasMessages && shownToast == ChatToast.ChatCleared) {
+                snackbarHostState.currentSnackbarData?.dismiss()
             }
         }
 
@@ -136,14 +147,8 @@ class ChatFragment : BaseDialogFragment() {
                     onClickMore = ::showOptionsDialog,
                     onClickPlayPause = viewModel::onPlayPauseClick,
                     onInputTextChange = viewModel::onInputTextChange,
-                    onSend = {
-                        if (uiState.canSend) snackbarHostState.currentSnackbarData?.dismiss()
-                        viewModel.onSend()
-                    },
-                    onClickSuggestion = { text ->
-                        if (uiState.isConnected && !uiState.isAwaitingReply) snackbarHostState.currentSnackbarData?.dismiss()
-                        viewModel.onSummarizeClick(text)
-                    },
+                    onSend = viewModel::onSend,
+                    onClickSuggestion = viewModel::onSummarizeClick,
                     onRetry = viewModel::retry,
                     onPlayQuote = viewModel::playQuote,
                     onRateAnswer = ::rateAnswer,
@@ -222,7 +227,7 @@ class ChatFragment : BaseDialogFragment() {
         }
     }
 
-    private val ChatToast.isUndoable get() = this != ChatToast.FeedbackThanks
+    private val ChatToast.isUndoable get() = this == ChatToast.ChatCleared
 
     private fun ChatToast.message(resources: Resources) = when (this) {
         ChatToast.FeedbackThanks -> resources.getString(LR.string.chat_feedback_thank_you)

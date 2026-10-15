@@ -199,6 +199,7 @@ class ChatManagerImplTest {
 
         val clearedChat = manager.clearMessages(episodeUuid = EPISODE_UUID)
 
+        assertEquals(listOf("answer-uuid"), clearedChat.messages.map { it.uuid })
         assertEquals(emptyList<EpisodeChatMessage>(), episodeChatDao.messages)
 
         manager.restoreMessages(clearedChat)

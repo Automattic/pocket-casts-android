@@ -75,7 +75,7 @@ class ChatViewModel @Inject constructor(
     private var ratingWriteJob: Job? = null
     private var clearJob: Job? = null
 
-    @Volatile private var clearedChat: ClearedChatState? = null
+    @Volatile private var clearedChat: ClearedChat? = null
 
     private var transientUserMessage: ChatMessage.User? = null
     private var transientInputType: EpisodeChatInputType = EpisodeChatInputType.Typed
@@ -195,7 +195,6 @@ class ChatViewModel @Inject constructor(
         val pendingSend = sendJob
         pendingSend?.cancel()
         transientUserMessage = null
-        val answerRatings = state.answerRatings
         _uiState.update {
             it.copy(
                 messages = emptyList(),
@@ -218,7 +217,7 @@ class ChatViewModel @Inject constructor(
             previousClear?.join()
             pendingSend?.join()
             pendingRatingWrite?.join()
-            clearedChat = ClearedChatState(chatManager.clearMessages(episodeUuid), answerRatings)
+            clearedChat = chatManager.clearMessages(episodeUuid).takeIf { it.messages.isNotEmpty() }
         }
         _toasts.trySend(ChatToast.ChatCleared)
     }
@@ -229,8 +228,8 @@ class ChatViewModel @Inject constructor(
             pendingClear?.join()
             val cleared = clearedChat ?: return@launch
             clearedChat = null
-            _uiState.update { it.copy(answerRatings = cleared.answerRatings + it.answerRatings) }
-            chatManager.restoreMessages(cleared.chat)
+            _uiState.update { it.copy(answerRatings = cleared.messages.storedAnswerRatings() + it.answerRatings) }
+            chatManager.restoreMessages(cleared)
             eventHorizon.track(
                 EpisodeChatClearUndoneEvent(
                     source = sourceView.analyticsValue,
@@ -316,7 +315,6 @@ class ChatViewModel @Inject constructor(
     }
 
     private fun performSend(message: ChatMessage.User, inputType: EpisodeChatInputType) {
-        clearedChat = null
         val unsentMessageUuids = setOfNotNull(transientUserMessage?.uuid, message.uuid)
         transientUserMessage = message
         transientInputType = inputType
@@ -331,8 +329,11 @@ class ChatViewModel @Inject constructor(
             )
         }
 
+        val pendingClear = clearJob
         sendJob = viewModelScope.launch {
             try {
+                pendingClear?.join()
+                clearedChat = null
                 val sentAt = timeSource.markNow()
                 chatManager.sendMessage(episodeUuid, message, currentMessages)
                 val responseDuration = sentAt.elapsedNow()
@@ -508,11 +509,6 @@ class ChatViewModel @Inject constructor(
 
 private const val QUOTE_PLAYBACK_EPISODE_TIMEOUT_MS = 5_000L
 private const val LOG_TAG = "EpisodeChat"
-
-private class ClearedChatState(
-    val chat: ClearedChat,
-    val answerRatings: Map<String, ChatAnswerRating>,
-)
 
 sealed interface ChatToast {
     data object FeedbackThanks : ChatToast

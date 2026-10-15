@@ -970,6 +970,48 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `a clear that finishes after a new question does not bring back the old chat`() = runTest {
+        chatManager.messages.value = listOf(
+            ChatMessage.User(text = "Q1", uuid = "q1"),
+            ChatMessage.Assistant(text = "A1", uuid = "a1"),
+        )
+        setEpisodeInfo()
+        connectToInternet()
+        advanceUntilIdle()
+        val gate = CompletableDeferred<Unit>()
+        chatManager.clearMessagesGate = gate
+        viewModel.clearChat()
+        sendQuestion("Q2")
+        assertTrue(chatManager.sentMessages.isEmpty())
+
+        gate.complete(Unit)
+        advanceUntilIdle()
+        viewModel.undoClearChat()
+        advanceUntilIdle()
+
+        assertEquals(listOf(SendMessage(EPISODE_UUID, "Q2")), chatManager.sentMessages)
+        assertEquals(listOf("response-uuid-1"), viewModel.uiState.value.messages.filterIsInstance<ChatMessage.Assistant>().map { it.uuid })
+        assertEquals(1, viewModel.uiState.value.messages.count { it is ChatMessage.User })
+    }
+
+    @Test
+    fun `undoing a clear of only an unsent question does nothing`() = runTest {
+        setEpisodeInfo()
+        connectToInternet()
+        chatManager.sendMessageException = IOException()
+        sendQuestion("Question")
+        viewModel.clearChat()
+        advanceUntilIdle()
+        eventSink.skipEvent(eventSink.size)
+
+        viewModel.undoClearChat()
+        advanceUntilIdle()
+
+        assertEquals(emptyList<ChatMessage>(), viewModel.uiState.value.messages)
+        assertTrue(eventSink.isEmpty())
+    }
+
+    @Test
     fun `quote within episode can play`() = runTest {
         val quote = createQuote(startMs = 1_000, endMs = 3_000)
 
@@ -1315,6 +1357,7 @@ class ChatViewModelTest {
         val clearedMessageUuids = mutableListOf<String>()
         var sendMessageException: Exception? = null
         var sendMessageGate: CompletableDeferred<Unit>? = null
+        var clearMessagesGate: CompletableDeferred<Unit>? = null
         val savedRatings = mutableListOf<Pair<String, ChatAnswerRating?>>()
 
         override fun observeMessages(episodeUuid: String): Flow<List<ChatMessage>> = observedMessages ?: messages
@@ -1336,6 +1379,7 @@ class ChatViewModelTest {
         }
 
         override suspend fun clearMessages(episodeUuid: String): ClearedChat {
+            clearMessagesGate?.await()
             clearedEpisodeUuids += episodeUuid
             val cleared = TestClearedChat(messages.value)
             clearedMessageUuids += messages.value.map { it.uuid }
@@ -1347,7 +1391,7 @@ class ChatViewModelTest {
             messages.value = (clearedChat as TestClearedChat).messages + messages.value
         }
 
-        private class TestClearedChat(val messages: List<ChatMessage>) : ClearedChat
+        private class TestClearedChat(override val messages: List<ChatMessage>) : ClearedChat
 
         override suspend fun rateAnswer(answerUuid: String, rating: ChatAnswerRating?) {
             savedRatings += answerUuid to rating
