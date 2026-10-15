@@ -9,6 +9,11 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.EpisodeChatHistoryItem
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
+import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.preferences.ReadSetting
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatAnswerRating
@@ -113,9 +118,14 @@ class ChatViewModelTest {
         on { value } doAnswer { surveySeen.value }
         on { set(any(), any(), any(), any()) } doAnswer { surveySeen.value = it.getArgument(0) }
     }
+    private var subscription: Subscription? = null
+    private val cachedSubscriptionSetting = mock<ReadSetting<Subscription?>> {
+        on { value } doAnswer { subscription }
+    }
     private val settings = mock<Settings> {
         on { episodeChatBetaSheetSeen } doReturn betaSheetSeenSetting
         on { episodeChatSurveySeen } doReturn surveySeenSetting
+        on { cachedSubscription } doReturn cachedSubscriptionSetting
     }
     private val networkConnectionWatcher = TestNetworkConnectionWatcher()
     private var isLoggedIn = true
@@ -942,6 +952,24 @@ class ChatViewModelTest {
         assertEquals(SendMessage(EPISODE_UUID, "Question"), chatManager.sentMessages.single())
         assertEquals(listOf("First", "Answer"), chatManager.sentHistories.single())
         assertNull(viewModel.uiState.value.error)
+    }
+
+    @Test
+    fun `undoing clear chat restores a failed question as not sent`() = runTest {
+        chatManager.messages.value = listOf(ChatMessage.User(text = "Question", failure = ChatSendFailure.Network, uuid = "question-uuid"))
+        setEpisodeInfo()
+        advanceUntilIdle()
+        viewModel.clearChat()
+        advanceUntilIdle()
+        assertNull(viewModel.uiState.value.error)
+
+        viewModel.undoClearChat()
+        advanceUntilIdle()
+
+        assertEquals(ChatError.NetworkError, viewModel.uiState.value.error)
+        viewModel.retry()
+        advanceUntilIdle()
+        assertEquals(SendMessage(EPISODE_UUID, "Question"), chatManager.sentMessages.single())
     }
 
     @Test
@@ -1782,6 +1810,51 @@ class ChatViewModelTest {
         assertFalse(state.isSignInRequired)
         verify(betaSheetSeenSetting).set(true, updateModifiedAt = false)
         assertTrue(eventSink.isEmpty())
+    }
+
+    @Test
+    fun `a plus account signing in leaves beta mode`() = runTest {
+        isLoggedIn = false
+        setEpisodeInfo(isBeta = true, requiresSignIn = true)
+
+        isLoggedIn = true
+        subscription = Subscription(
+            tier = SubscriptionTier.Plus,
+            billingCycle = BillingCycle.Monthly,
+            platform = SubscriptionPlatform.Android,
+            expiryDate = Instant.now(),
+            isAutoRenewing = true,
+            giftDays = 0,
+        )
+        viewModel.refreshSignIn()
+
+        assertFalse(viewModel.uiState.value.isBeta)
+    }
+
+    @Test
+    fun `tapping sign in twice starts sign in once`() = runTest {
+        isLoggedIn = false
+        setEpisodeInfo(isBeta = true, requiresSignIn = true)
+        eventSink.skipEvent(2)
+
+        viewModel.navigation.test {
+            viewModel.onSignInClick()
+            viewModel.onSignInClick()
+
+            assertEquals(ChatNavigation.SignIn, awaitItem())
+            expectNoEvents()
+        }
+        assertEquals(1, eventSink.size)
+    }
+
+    @Test
+    fun `an already signed in user is not asked to sign in`() = runTest {
+        betaSheetSeen.value = true
+
+        setEpisodeInfo(isBeta = true, requiresSignIn = true)
+
+        assertFalse(viewModel.uiState.value.isSignInRequired)
+        assertFalse(viewModel.uiState.value.isBetaSheetVisible)
     }
 
     @Test
