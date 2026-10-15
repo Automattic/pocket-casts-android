@@ -15,6 +15,7 @@ import com.automattic.eventhorizon.EpisodeChatFeedbackFormShownEvent
 import com.automattic.eventhorizon.EpisodeChatFeedbackReasonType
 import com.automattic.eventhorizon.EpisodeChatFeedbackSubmitFailedEvent
 import com.automattic.eventhorizon.EpisodeChatFeedbackSubmitTappedEvent
+import com.automattic.eventhorizon.EpisodeChatFeedbackSubmittedEvent
 import com.automattic.eventhorizon.EpisodeChatFeedbackTriggerType
 import com.automattic.eventhorizon.EventHorizon
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -52,6 +53,7 @@ class ChatFeedbackViewModel @Inject constructor(
     private lateinit var podcastUuid: String
     private lateinit var sourceView: SourceView
     private lateinit var trigger: EpisodeChatFeedbackTriggerType
+    private var messageIndex: Long? = null
 
     private var isSubmitted: Boolean
         get() = savedStateHandle[IS_SUBMITTED_KEY] ?: false
@@ -68,11 +70,13 @@ class ChatFeedbackViewModel @Inject constructor(
         podcastUuid: String,
         sourceView: SourceView,
         trigger: EpisodeChatFeedbackTriggerType,
+        messageIndex: Long?,
     ) {
         this.episodeUuid = episodeUuid
         this.podcastUuid = podcastUuid
         this.sourceView = sourceView
         this.trigger = trigger
+        this.messageIndex = messageIndex
         if (savedStateHandle.get<Boolean>(IS_SHOWN_TRACKED_KEY) == true) return
         savedStateHandle[IS_SHOWN_TRACKED_KEY] = true
         eventHorizon.track(
@@ -81,6 +85,7 @@ class ChatFeedbackViewModel @Inject constructor(
                 episodeUuid = episodeUuid,
                 podcastUuid = podcastUuid,
                 trigger = trigger,
+                messageIndex = messageIndex,
             ),
         )
     }
@@ -107,6 +112,7 @@ class ChatFeedbackViewModel @Inject constructor(
                 episodeUuid = episodeUuid,
                 podcastUuid = podcastUuid,
                 trigger = trigger,
+                messageIndex = messageIndex,
                 reason = reason.analyticsValue,
                 hasDetails = details.isNotEmpty(),
             ),
@@ -128,6 +134,17 @@ class ChatFeedbackViewModel @Inject constructor(
         viewModelScope.launch {
             if (request.await().isSuccess) {
                 isSubmitted = true
+                eventHorizon.track(
+                    EpisodeChatFeedbackSubmittedEvent(
+                        source = sourceView.analyticsValue,
+                        episodeUuid = episodeUuid,
+                        podcastUuid = podcastUuid,
+                        trigger = trigger,
+                        reason = reason.analyticsValue,
+                        hasDetails = details.isNotEmpty(),
+                        messageIndex = messageIndex,
+                    ),
+                )
                 _submitted.send(Unit)
             } else {
                 eventHorizon.track(
@@ -136,6 +153,7 @@ class ChatFeedbackViewModel @Inject constructor(
                         episodeUuid = episodeUuid,
                         podcastUuid = podcastUuid,
                         trigger = trigger,
+                        messageIndex = messageIndex,
                     ),
                 )
                 _uiState.update { it.copy(isSubmitting = false, hasSubmitError = true) }
@@ -151,6 +169,7 @@ class ChatFeedbackViewModel @Inject constructor(
                 episodeUuid = episodeUuid,
                 podcastUuid = podcastUuid,
                 trigger = trigger,
+                messageIndex = messageIndex,
             ),
         )
     }

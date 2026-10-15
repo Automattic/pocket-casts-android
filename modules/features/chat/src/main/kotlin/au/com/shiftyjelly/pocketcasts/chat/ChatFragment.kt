@@ -205,6 +205,7 @@ class ChatFragment : BaseDialogFragment() {
             sourceView = args.sourceView,
             podcastColors = viewModel.uiState.value.podcastColors,
             trigger = ChatFeedbackFragment.Trigger.ResponseRating,
+            messageIndex = viewModel.answerMessageIndex(answerUuid),
         )
     }
 

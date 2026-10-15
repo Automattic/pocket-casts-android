@@ -17,6 +17,7 @@ import com.automattic.eventhorizon.EpisodeChatFeedbackFormShownEvent
 import com.automattic.eventhorizon.EpisodeChatFeedbackReasonType
 import com.automattic.eventhorizon.EpisodeChatFeedbackSubmitFailedEvent
 import com.automattic.eventhorizon.EpisodeChatFeedbackSubmitTappedEvent
+import com.automattic.eventhorizon.EpisodeChatFeedbackSubmittedEvent
 import com.automattic.eventhorizon.EpisodeChatFeedbackTriggerType
 import com.automattic.eventhorizon.EventHorizon
 import java.io.IOException
@@ -47,14 +48,17 @@ class ChatFeedbackViewModelTest {
     private var storedMessages: List<ChatMessage> = conversation
     private val feedbackManager = TestChatFeedbackManager()
 
-    private fun createViewModel() = ChatFeedbackViewModel(
+    private fun createViewModel(
+        trigger: EpisodeChatFeedbackTriggerType = EpisodeChatFeedbackTriggerType.SessionSurvey,
+        messageIndex: Long? = null,
+    ) = ChatFeedbackViewModel(
         savedStateHandle = savedStateHandle,
         chatManager = TestChatManager(storedMessages),
         feedbackManager = feedbackManager,
         eventHorizon = EventHorizon(eventSink),
         applicationScope = CoroutineScope(SupervisorJob() + coroutineRule.testDispatcher),
     ).apply {
-        onShown(EPISODE_UUID, PODCAST_UUID, SourceView.PLAYER, EpisodeChatFeedbackTriggerType.SessionSurvey)
+        onShown(EPISODE_UUID, PODCAST_UUID, SourceView.PLAYER, trigger, messageIndex)
     }
 
     @Test
@@ -160,6 +164,7 @@ class ChatFeedbackViewModelTest {
 
         assertEquals(1, feedbackManager.submitted.size)
         assertTrue(eventSink.pollEvent() is EpisodeChatFeedbackSubmitTappedEvent)
+        assertTrue(eventSink.pollEvent() is EpisodeChatFeedbackSubmittedEvent)
         assertTrue(eventSink.isEmpty())
     }
 
@@ -215,7 +220,48 @@ class ChatFeedbackViewModelTest {
             eventSink.pollEvent(),
         )
         assertTrue(eventSink.pollEvent() is EpisodeChatFeedbackSubmitTappedEvent)
+        assertTrue(eventSink.pollEvent() is EpisodeChatFeedbackSubmittedEvent)
         assertTrue(eventSink.isEmpty())
+    }
+
+    @Test
+    fun `successful submit tracks the feedback for the rated answer`() = runTest {
+        val viewModel = createViewModel(trigger = EpisodeChatFeedbackTriggerType.ResponseRating, messageIndex = 2)
+        viewModel.onReasonSelected(ChatFeedback.Reason.WrongFacts)
+
+        viewModel.submit()
+        advanceUntilIdle()
+
+        assertEquals(
+            listOf(
+                EpisodeChatFeedbackFormShownEvent(
+                    source = SourceView.PLAYER.analyticsValue,
+                    episodeUuid = EPISODE_UUID,
+                    podcastUuid = PODCAST_UUID,
+                    trigger = EpisodeChatFeedbackTriggerType.ResponseRating,
+                    messageIndex = 2,
+                ),
+                EpisodeChatFeedbackSubmitTappedEvent(
+                    source = SourceView.PLAYER.analyticsValue,
+                    episodeUuid = EPISODE_UUID,
+                    podcastUuid = PODCAST_UUID,
+                    trigger = EpisodeChatFeedbackTriggerType.ResponseRating,
+                    reason = EpisodeChatFeedbackReasonType.WrongFacts,
+                    hasDetails = false,
+                    messageIndex = 2,
+                ),
+                EpisodeChatFeedbackSubmittedEvent(
+                    source = SourceView.PLAYER.analyticsValue,
+                    episodeUuid = EPISODE_UUID,
+                    podcastUuid = PODCAST_UUID,
+                    trigger = EpisodeChatFeedbackTriggerType.ResponseRating,
+                    reason = EpisodeChatFeedbackReasonType.WrongFacts,
+                    hasDetails = false,
+                    messageIndex = 2,
+                ),
+            ),
+            List(eventSink.size) { eventSink.pollEvent() },
+        )
     }
 
     @Test
