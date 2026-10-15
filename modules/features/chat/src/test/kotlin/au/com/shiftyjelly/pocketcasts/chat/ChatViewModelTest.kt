@@ -202,10 +202,37 @@ class ChatViewModelTest {
                 source = SourceView.PLAYER.analyticsValue,
                 episodeUuid = EPISODE_UUID,
                 podcastUuid = PODCAST_UUID,
+                hasHistory = false,
                 entryPoint = ChatEntryPoint.PlayerShelf.analyticsValue,
             ),
             eventSink.pollEvent(),
         )
+    }
+
+    @Test
+    fun `reopening a chat with messages tracks it as continued`() = runTest {
+        chatManager.messages.value = listOf(ChatMessage.User("Earlier"), ChatMessage.Assistant("Answer"))
+
+        setEpisodeInfo(entryPoint = ChatEntryPoint.MoreActions)
+
+        assertEquals(
+            EpisodeChatShownEvent(
+                source = SourceView.PLAYER.analyticsValue,
+                episodeUuid = EPISODE_UUID,
+                podcastUuid = PODCAST_UUID,
+                hasHistory = true,
+                entryPoint = ChatEntryPoint.MoreActions.analyticsValue,
+            ),
+            eventSink.pollEvent(),
+        )
+    }
+
+    @Test
+    fun `chat shown is tracked once per opened chat`() = runTest {
+        setEpisodeInfo()
+        chatManager.messages.value = listOf(ChatMessage.User("Question"))
+
+        assertEquals(1, List(eventSink.size) { eventSink.pollEvent() }.count { it is EpisodeChatShownEvent })
     }
 
     @Test
@@ -2068,6 +2095,7 @@ class ChatViewModelTest {
                 source = SourceView.PLAYER.analyticsValue,
                 episodeUuid = OTHER_EPISODE_UUID,
                 podcastUuid = OTHER_PODCAST_UUID,
+                hasHistory = true,
                 entryPoint = ChatEntryPoint.History.analyticsValue,
             ),
             eventSink.pollEvent(),

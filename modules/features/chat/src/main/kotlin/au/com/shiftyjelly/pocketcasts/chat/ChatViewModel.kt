@@ -119,6 +119,7 @@ class ChatViewModel @Inject constructor(
 
     @Volatile private var quotePlaybackUndo: PlaybackPosition? = null
     private var transientUserMessage: ChatMessage.User? = null
+    private var pendingShownEntryPoint: ChatEntryPoint? = null
     private var transientInputType: EpisodeChatInputType = EpisodeChatInputType.Typed
     private var hasReceivedAnswer = false
     private var hasSubmittedFeedback = false
@@ -178,9 +179,9 @@ class ChatViewModel @Inject constructor(
         if (!_uiState.value.isSignInRequired || !syncManager.isLoggedIn()) return
         settings.episodeChatBetaSheetSeen.set(true, updateModifiedAt = false)
         _uiState.update { it.copy(isSignInRequired = false, isBetaSheetVisible = false) }
+        pendingShownEntryPoint = ChatEntryPoint.SignIn
         observeMessages()
         observeHistory()
-        trackShown(ChatEntryPoint.SignIn)
         viewModelScope.launch {
             settings.cachedSubscription.flow.collect { subscription ->
                 _uiState.update { it.copy(isBeta = subscription == null) }
@@ -208,9 +209,9 @@ class ChatViewModel @Inject constructor(
                 answerRatings = emptyMap(),
             )
         }
+        pendingShownEntryPoint = entryPoint.takeUnless { _uiState.value.isSignInRequired }
         chatEpisode.value = episode
         createChat(episode)
-        if (!_uiState.value.isSignInRequired) trackShown(entryPoint)
     }
 
     private fun observeMessages() {
@@ -229,6 +230,9 @@ class ChatViewModel @Inject constructor(
                         answerRatings = if (state.areMessagesLoaded) state.answerRatings else messages.storedAnswerRatings(),
                         error = unansweredQuestion?.let { it.failure.toChatError() } ?: state.error,
                     )
+                }
+                if (messagesEpisodeUuid == chatEpisode.value?.uuid) {
+                    trackShownIfPending(hasHistory = messages.isNotEmpty())
                 }
             }
         }
@@ -777,12 +781,15 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    private fun trackShown(entryPoint: ChatEntryPoint) {
+    private fun trackShownIfPending(hasHistory: Boolean) {
+        val entryPoint = pendingShownEntryPoint ?: return
+        pendingShownEntryPoint = null
         eventHorizon.track(
             EpisodeChatShownEvent(
                 source = sourceView.analyticsValue,
                 episodeUuid = episodeUuid,
                 podcastUuid = podcastUuid,
+                hasHistory = hasHistory,
                 entryPoint = entryPoint.analyticsValue,
             ),
         )
