@@ -30,3 +30,13 @@ internal fun List<EpisodeChatHistoryItem>.toHistorySections(now: Instant, zone: 
         }
     }.toSortedMap().map { (group, items) -> ChatHistorySection(group, items) }
 }
+
+internal fun List<ChatHistorySection>.rowOf(episodeUuid: String): Pair<ChatHistoryGroup, Long>? {
+    var rowsBefore = 0L
+    for (section in this) {
+        val index = section.items.indexOfFirst { it.episodeUuid == episodeUuid }
+        if (index >= 0) return section.group to rowsBefore + index + 1
+        rowsBefore += section.items.size
+    }
+    return null
+}

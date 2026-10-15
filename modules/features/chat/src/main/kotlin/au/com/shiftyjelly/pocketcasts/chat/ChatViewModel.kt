@@ -210,6 +210,7 @@ class ChatViewModel @Inject constructor(
                 answerRatings = emptyMap(),
             )
         }
+        trackShownIfPending(hasHistory = null)
         pendingShownEntryPoint = entryPoint.takeUnless { _uiState.value.isSignInRequired }
         chatEpisode.value = episode
         createChat(episode)
@@ -352,22 +353,26 @@ class ChatViewModel @Inject constructor(
     }
 
     fun openHistoryChat(item: EpisodeChatHistoryItem) {
-        val sections = _uiState.value.history
-        val section = sections.firstOrNull { section -> section.items.any { it.episodeUuid == item.episodeUuid } }
-        val position = sections.flatMap { it.items }.indexOfFirst { it.episodeUuid == item.episodeUuid }.takeIf { it >= 0 }
+        val row = _uiState.value.history.rowOf(item.episodeUuid)
         eventHorizon.track(
             EpisodeChatHistoryRowTappedEvent(
                 source = sourceView.analyticsValue,
                 episodeUuid = item.episodeUuid,
                 podcastUuid = item.podcastUuid,
                 isNowPlaying = item.episodeUuid == playingEpisodeUuid,
-                section = section?.group?.analyticsValue,
-                position = position?.toLong(),
+                section = row?.first?.analyticsValue,
+                position = row?.second,
             ),
         )
         if (item.episodeUuid != episodeUuid) {
             openChat(
-                ChatEpisode(item.episodeUuid, item.episodeTitle, item.podcastUuid, item.podcastTitle, item.episodeDurationMs),
+                ChatEpisode(
+                    uuid = item.episodeUuid,
+                    title = item.episodeTitle,
+                    podcastUuid = item.podcastUuid,
+                    podcastTitle = item.podcastTitle,
+                    durationMs = item.episodeDurationMs,
+                ),
                 ChatEntryPoint.History,
             )
         }
@@ -483,6 +488,7 @@ class ChatViewModel @Inject constructor(
 
     fun trackDismissed() {
         if (_uiState.value.isSignInRequired) return
+        trackShownIfPending(hasHistory = null)
         eventHorizon.track(
             EpisodeChatDismissedEvent(
                 source = sourceView.analyticsValue,
@@ -798,7 +804,7 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    private fun trackShownIfPending(hasHistory: Boolean) {
+    private fun trackShownIfPending(hasHistory: Boolean?) {
         val entryPoint = pendingShownEntryPoint ?: return
         pendingShownEntryPoint = null
         eventHorizon.track(

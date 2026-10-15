@@ -36,6 +36,7 @@ import com.automattic.eventhorizon.EpisodeChatClearUndoneEvent
 import com.automattic.eventhorizon.EpisodeChatClearedEvent
 import com.automattic.eventhorizon.EpisodeChatDeleteUndoneEvent
 import com.automattic.eventhorizon.EpisodeChatDeletedEvent
+import com.automattic.eventhorizon.EpisodeChatDismissedEvent
 import com.automattic.eventhorizon.EpisodeChatErrorType
 import com.automattic.eventhorizon.EpisodeChatHistoryRowTappedEvent
 import com.automattic.eventhorizon.EpisodeChatHistorySectionType
@@ -227,6 +228,26 @@ class ChatViewModelTest {
             ),
             eventSink.pollEvent(),
         )
+    }
+
+    @Test
+    fun `closing the chat before its messages load still tracks it as shown`() = runTest {
+        chatManager.observedMessages = MutableSharedFlow()
+        setEpisodeInfo()
+
+        viewModel.trackDismissed()
+
+        assertEquals(
+            EpisodeChatShownEvent(
+                source = SourceView.PLAYER.analyticsValue,
+                episodeUuid = EPISODE_UUID,
+                podcastUuid = PODCAST_UUID,
+                hasHistory = null,
+                entryPoint = ChatEntryPoint.PlayerShelf.analyticsValue,
+            ),
+            eventSink.pollEvent(),
+        )
+        assertTrue(eventSink.pollEvent() is EpisodeChatDismissedEvent)
     }
 
     @Test
@@ -2163,7 +2184,7 @@ class ChatViewModelTest {
                 podcastUuid = OTHER_PODCAST_UUID,
                 isNowPlaying = false,
                 section = EpisodeChatHistorySectionType.Previous7Days,
-                position = 2,
+                position = 3,
             ),
             eventSink.pollEvent(),
         )
