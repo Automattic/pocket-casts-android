@@ -1,6 +1,8 @@
 8.24
 -----
-
+*   Bug Fixes
+    *   Keep episodes you've started listening to when a podcast's episode limit archives older episodes
+        ([#6154](https://github.com/Automattic/pocket-casts-android/pull/6154))
 
 8.23
 -----
