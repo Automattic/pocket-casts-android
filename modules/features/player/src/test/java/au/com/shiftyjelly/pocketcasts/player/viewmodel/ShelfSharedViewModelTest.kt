@@ -38,9 +38,9 @@ import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import com.automattic.eventhorizon.EpisodeChatEntryPointType
 import com.automattic.eventhorizon.EpisodeChatTooltipDismissedEvent
 import com.automattic.eventhorizon.EpisodeChatTooltipShownEvent
-import com.automattic.eventhorizon.EpisodeChatEntryPointType
 import com.automattic.eventhorizon.EpisodeChatTooltipTappedEvent
 import com.automattic.eventhorizon.EpisodeChatUnavailableTappedEvent
 import com.automattic.eventhorizon.EventHorizon
