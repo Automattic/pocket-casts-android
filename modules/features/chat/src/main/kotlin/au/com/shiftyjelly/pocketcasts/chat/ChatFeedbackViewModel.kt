@@ -8,6 +8,7 @@ import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatFeedback
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatFeedbackManager
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatManager
+import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatMessage
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.eventhorizon.EpisodeChatFeedbackFormDismissedEvent
 import com.automattic.eventhorizon.EpisodeChatFeedbackFormShownEvent
@@ -119,7 +120,7 @@ class ChatFeedbackViewModel @Inject constructor(
                         podcastUuid = podcastUuid,
                         reason = reason,
                         details = details,
-                        conversation = chatManager.observeMessages(episodeUuid).first(),
+                        conversation = chatManager.observeMessages(episodeUuid).first().dropLastWhile { it is ChatMessage.User },
                     ),
                 )
             }.onFailure { LogBuffer.e(LOG_TAG, it, "Failed to submit episode chat feedback") }
