@@ -149,10 +149,14 @@ class ChatViewModel @Inject constructor(
         val isSignInRequired = requiresSignIn && !syncManager.isLoggedIn()
         _uiState.update { it.copy(isBeta = isBeta, isSignInRequired = isSignInRequired) }
         openChat(ChatEpisode(episodeUuid, episodeTitle, podcastUuid, podcastTitle, episodeDurationMs))
-        observeMessages()
         observePlayback()
-        observeHistory()
-        if (isSignInRequired) showBetaSheet() else showBetaSheetIfNeeded(isBeta)
+        if (isSignInRequired) {
+            showBetaSheet()
+        } else {
+            observeMessages()
+            observeHistory()
+            showBetaSheetIfNeeded(isBeta)
+        }
     }
 
     fun onSignInClick() {
@@ -172,12 +176,14 @@ class ChatViewModel @Inject constructor(
         isSigningIn = false
         if (!_uiState.value.isSignInRequired || !syncManager.isLoggedIn()) return
         settings.episodeChatBetaSheetSeen.set(true, updateModifiedAt = false)
-        _uiState.update {
-            it.copy(
-                isSignInRequired = false,
-                isBetaSheetVisible = false,
-                isBeta = settings.cachedSubscription.value == null,
-            )
+        _uiState.update { it.copy(isSignInRequired = false, isBetaSheetVisible = false) }
+        observeMessages()
+        observeHistory()
+        trackShown()
+        viewModelScope.launch {
+            settings.cachedSubscription.flow.collect { subscription ->
+                _uiState.update { it.copy(isBeta = subscription == null) }
+            }
         }
     }
 
@@ -203,7 +209,7 @@ class ChatViewModel @Inject constructor(
         }
         chatEpisode.value = episode
         createChat(episode)
-        trackShown()
+        if (!_uiState.value.isSignInRequired) trackShown()
     }
 
     private fun observeMessages() {
@@ -462,6 +468,7 @@ class ChatViewModel @Inject constructor(
     }
 
     fun trackDismissed() {
+        if (_uiState.value.isSignInRequired) return
         eventHorizon.track(
             EpisodeChatDismissedEvent(
                 source = sourceView.analyticsValue,
