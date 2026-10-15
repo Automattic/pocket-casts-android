@@ -104,9 +104,6 @@ class ShelfSharedViewModel @Inject constructor(
     private val _snackbarMessages = MutableSharedFlow<SnackbarMessage>()
     val snackbarMessages = _snackbarMessages.asSharedFlow()
 
-    private var episodeChatSignInRequest: NavigationState.ShowEpisodeChat? = null
-    private var isAwaitingEpisodeChatSignIn = false
-
     private val videoStateFlow = combine(
         playbackManager.streamVideoState,
         playbackManager.streamHlsAvailable,
@@ -472,26 +469,12 @@ class ShelfSharedViewModel @Inject constructor(
                 isPlusUser = settings.cachedSubscription.value != null,
                 isSignedIn = syncManager.isLoggedIn(),
             )
-            val request = NavigationState.ShowEpisodeChat(podcast, episode, access)
-            episodeChatSignInRequest = request.takeIf { access == EpisodeChatAccess.SignIn }
-            _navigationState.emit(request)
+            _navigationState.emit(NavigationState.ShowEpisodeChat(podcast, episode, access))
         }
     }
 
     fun onEpisodeChatSignInClick() {
-        isAwaitingEpisodeChatSignIn = true
         viewModelScope.launch { _navigationState.emit(NavigationState.StartEpisodeChatSignIn) }
-    }
-
-    fun onReturnFromEpisodeChatSignIn() {
-        if (!isAwaitingEpisodeChatSignIn) return
-        isAwaitingEpisodeChatSignIn = false
-        val request = episodeChatSignInRequest ?: return
-        episodeChatSignInRequest = null
-        if (syncManager.isLoggedIn()) {
-            settings.episodeChatBetaSheetSeen.set(true, updateModifiedAt = false)
-            showEpisodeChat(request.podcast, request.episode)
-        }
     }
 
     fun onMoreClick() {

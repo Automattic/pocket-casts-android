@@ -100,6 +100,7 @@ fun ChatScreen(
     onRateAnswer: (answerUuid: String, rating: ChatAnswerRating) -> Unit,
     snackbarHostState: SnackbarHostState,
     onDismissBetaSheet: () -> Unit,
+    onSignInClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val theme = rememberChatTheme()
@@ -129,8 +130,8 @@ fun ChatScreen(
             sheetContent = {
                 ChatBetaSheet(
                     theme = theme,
-                    buttonText = stringResource(LR.string.got_it),
-                    onClickButton = onDismissBetaSheet,
+                    buttonText = stringResource(if (uiState.isSignInRequired) LR.string.chat_beta_sheet_sign_in else LR.string.got_it),
+                    onClickButton = if (uiState.isSignInRequired) onSignInClick else onDismissBetaSheet,
                 )
             },
             modifier = modifier,
@@ -605,6 +606,7 @@ private fun ChatScreenPreview(
                 onRateAnswer = { _, _ -> },
                 snackbarHostState = remember { SnackbarHostState() },
                 onDismissBetaSheet = {},
+                onSignInClick = {},
             )
         }
     }
@@ -639,6 +641,7 @@ private fun ChatScreenEmptyPreview(
                 onRateAnswer = { _, _ -> },
                 snackbarHostState = remember { SnackbarHostState() },
                 onDismissBetaSheet = {},
+                onSignInClick = {},
             )
         }
     }
@@ -679,6 +682,7 @@ private fun ChatScreenErrorPreview(
                 onRateAnswer = { _, _ -> },
                 snackbarHostState = remember { SnackbarHostState() },
                 onDismissBetaSheet = {},
+                onSignInClick = {},
             )
         }
     }
