@@ -141,6 +141,7 @@ class ChatViewModel @Inject constructor(
         podcastTitle: String,
         episodeDurationMs: Int,
         sourceView: SourceView,
+        entryPoint: ChatEntryPoint,
         isBeta: Boolean,
         requiresSignIn: Boolean = false,
     ) {
@@ -148,7 +149,7 @@ class ChatViewModel @Inject constructor(
         this.sourceView = sourceView
         val isSignInRequired = requiresSignIn && !syncManager.isLoggedIn()
         _uiState.update { it.copy(isBeta = isBeta, isSignInRequired = isSignInRequired) }
-        openChat(ChatEpisode(episodeUuid, episodeTitle, podcastUuid, podcastTitle, episodeDurationMs))
+        openChat(ChatEpisode(episodeUuid, episodeTitle, podcastUuid, podcastTitle, episodeDurationMs), entryPoint)
         observePlayback()
         if (isSignInRequired) {
             showBetaSheet()
@@ -179,7 +180,7 @@ class ChatViewModel @Inject constructor(
         _uiState.update { it.copy(isSignInRequired = false, isBetaSheetVisible = false) }
         observeMessages()
         observeHistory()
-        trackShown()
+        trackShown(ChatEntryPoint.SignIn)
         viewModelScope.launch {
             settings.cachedSubscription.flow.collect { subscription ->
                 _uiState.update { it.copy(isBeta = subscription == null) }
@@ -187,7 +188,7 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    private fun openChat(episode: ChatEpisode) {
+    private fun openChat(episode: ChatEpisode, entryPoint: ChatEntryPoint) {
         sendJob?.cancel()
         transientUserMessage = null
         isAdoptingUnansweredQuestion = true
@@ -209,7 +210,7 @@ class ChatViewModel @Inject constructor(
         }
         chatEpisode.value = episode
         createChat(episode)
-        if (!_uiState.value.isSignInRequired) trackShown()
+        if (!_uiState.value.isSignInRequired) trackShown(entryPoint)
     }
 
     private fun observeMessages() {
@@ -355,7 +356,10 @@ class ChatViewModel @Inject constructor(
             ),
         )
         if (item.episodeUuid != episodeUuid) {
-            openChat(ChatEpisode(item.episodeUuid, item.episodeTitle, item.podcastUuid, item.podcastTitle, item.episodeDurationMs))
+            openChat(
+                ChatEpisode(item.episodeUuid, item.episodeTitle, item.podcastUuid, item.podcastTitle, item.episodeDurationMs),
+                ChatEntryPoint.History,
+            )
         }
         closeHistory()
     }
@@ -773,12 +777,13 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    private fun trackShown() {
+    private fun trackShown(entryPoint: ChatEntryPoint) {
         eventHorizon.track(
             EpisodeChatShownEvent(
                 source = sourceView.analyticsValue,
                 episodeUuid = episodeUuid,
                 podcastUuid = podcastUuid,
+                entryPoint = entryPoint.analyticsValue,
             ),
         )
     }

@@ -177,6 +177,7 @@ class ChatViewModelTest {
             podcastTitle = "Podcast title",
             episodeDurationMs = 123_000,
             sourceView = SourceView.PLAYER,
+            entryPoint = ChatEntryPoint.PlayerShelf,
             isBeta = false,
         )
 
@@ -201,6 +202,7 @@ class ChatViewModelTest {
                 source = SourceView.PLAYER.analyticsValue,
                 episodeUuid = EPISODE_UUID,
                 podcastUuid = PODCAST_UUID,
+                entryPoint = ChatEntryPoint.PlayerShelf.analyticsValue,
             ),
             eventSink.pollEvent(),
         )
@@ -218,6 +220,7 @@ class ChatViewModelTest {
             podcastTitle = "Podcast title",
             episodeDurationMs = 123_000,
             sourceView = SourceView.PLAYER,
+            entryPoint = ChatEntryPoint.PlayerShelf,
             isBeta = false,
         )
 
@@ -1747,6 +1750,7 @@ class ChatViewModelTest {
     private fun setEpisodeInfo(
         episodeDurationMs: Int = 123_000,
         sourceView: SourceView = SourceView.PLAYER,
+        entryPoint: ChatEntryPoint = ChatEntryPoint.PlayerShelf,
         isBeta: Boolean = false,
         requiresSignIn: Boolean = false,
     ) {
@@ -1757,6 +1761,7 @@ class ChatViewModelTest {
             podcastTitle = "Podcast title",
             episodeDurationMs = episodeDurationMs,
             sourceView = sourceView,
+            entryPoint = entryPoint,
             isBeta = isBeta,
             requiresSignIn = requiresSignIn,
         )
@@ -2063,6 +2068,7 @@ class ChatViewModelTest {
                 source = SourceView.PLAYER.analyticsValue,
                 episodeUuid = OTHER_EPISODE_UUID,
                 podcastUuid = OTHER_PODCAST_UUID,
+                entryPoint = ChatEntryPoint.History.analyticsValue,
             ),
             eventSink.pollEvent(),
         )

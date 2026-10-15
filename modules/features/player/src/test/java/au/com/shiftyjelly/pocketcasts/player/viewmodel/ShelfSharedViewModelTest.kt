@@ -4,6 +4,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
+import au.com.shiftyjelly.pocketcasts.chat.ChatEntryPoint
 import au.com.shiftyjelly.pocketcasts.chat.EpisodeChatAccess
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -559,7 +560,7 @@ class ShelfSharedViewModelTest {
 
         shelfSharedViewModel.navigationState.test {
             shelfSharedViewModel.onEpisodeChatClick(podcast, transcriptEpisode, isTranscriptAvailable = true, ShelfItemSource.OverflowMenu)
-            assertEquals(NavigationState.ShowEpisodeChat(podcast, transcriptEpisode, EpisodeChatAccess.Chat(isBeta = false)), awaitItem())
+            assertEquals(NavigationState.ShowEpisodeChat(podcast, transcriptEpisode, EpisodeChatAccess.Chat(isBeta = false), ChatEntryPoint.MoreActions), awaitItem())
         }
     }
 
@@ -572,7 +573,7 @@ class ShelfSharedViewModelTest {
 
         shelfSharedViewModel.navigationState.test {
             shelfSharedViewModel.onEpisodeChatClick(podcast, transcriptEpisode, isTranscriptAvailable = true, ShelfItemSource.Shelf)
-            assertEquals(NavigationState.ShowEpisodeChat(podcast, transcriptEpisode, EpisodeChatAccess.Chat(isBeta = true)), awaitItem())
+            assertEquals(NavigationState.ShowEpisodeChat(podcast, transcriptEpisode, EpisodeChatAccess.Chat(isBeta = true), ChatEntryPoint.PlayerShelf), awaitItem())
         }
     }
 
@@ -585,7 +586,7 @@ class ShelfSharedViewModelTest {
 
         shelfSharedViewModel.navigationState.test {
             shelfSharedViewModel.onEpisodeChatClick(podcast, transcriptEpisode, isTranscriptAvailable = true, ShelfItemSource.Shelf)
-            assertEquals(NavigationState.ShowEpisodeChat(podcast, transcriptEpisode, EpisodeChatAccess.SignIn), awaitItem())
+            assertEquals(NavigationState.ShowEpisodeChat(podcast, transcriptEpisode, EpisodeChatAccess.SignIn, ChatEntryPoint.PlayerShelf), awaitItem())
         }
     }
 
@@ -598,7 +599,7 @@ class ShelfSharedViewModelTest {
 
         shelfSharedViewModel.navigationState.test {
             shelfSharedViewModel.onEpisodeChatClick(podcast, transcriptEpisode, isTranscriptAvailable = true, ShelfItemSource.Shelf)
-            assertEquals(NavigationState.ShowEpisodeChat(podcast, transcriptEpisode, EpisodeChatAccess.Paywall), awaitItem())
+            assertEquals(NavigationState.ShowEpisodeChat(podcast, transcriptEpisode, EpisodeChatAccess.Paywall, ChatEntryPoint.PlayerShelf), awaitItem())
         }
     }
 
