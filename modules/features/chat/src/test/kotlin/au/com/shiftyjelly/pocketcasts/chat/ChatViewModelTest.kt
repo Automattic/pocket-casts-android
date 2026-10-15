@@ -46,6 +46,7 @@ import com.automattic.eventhorizon.EpisodeChatQuotePlayTappedEvent
 import com.automattic.eventhorizon.EpisodeChatQuotePlayUndoneEvent
 import com.automattic.eventhorizon.EpisodeChatQuoteSourceType
 import com.automattic.eventhorizon.EpisodeChatResponseRatedEvent
+import com.automattic.eventhorizon.EpisodeChatResponseRatingClearedEvent
 import com.automattic.eventhorizon.EpisodeChatResponseReceivedEvent
 import com.automattic.eventhorizon.EpisodeChatSentimentType
 import com.automattic.eventhorizon.EpisodeChatShownEvent
@@ -786,15 +787,54 @@ class ChatViewModelTest {
     }
 
     @Test
-    fun `clearing a rating is not tracked`() = runTest {
+    fun `clearing a rating tracks the removed rating`() = runTest {
+        chatManager.messages.value = listOf(
+            ChatMessage.User("Q1", uuid = "q1"),
+            ChatMessage.Assistant("A1", uuid = "a1"),
+        )
         setEpisodeInfo()
         eventSink.skipEvent()
-        viewModel.rateAnswer("answer-uuid", ChatAnswerRating.Positive)
+        viewModel.rateAnswer("a1", ChatAnswerRating.Positive)
         eventSink.skipEvent()
 
-        viewModel.rateAnswer("answer-uuid", ChatAnswerRating.Positive)
+        viewModel.rateAnswer("a1", ChatAnswerRating.Positive)
 
-        assertTrue(eventSink.isEmpty())
+        assertEquals(
+            EpisodeChatResponseRatingClearedEvent(
+                source = SourceView.PLAYER.analyticsValue,
+                episodeUuid = EPISODE_UUID,
+                podcastUuid = PODCAST_UUID,
+                previousRating = EpisodeChatSentimentType.Positive,
+                messageIndex = 1,
+            ),
+            eventSink.pollEvent(),
+        )
+    }
+
+    @Test
+    fun `switching a rating tracks the replaced rating`() = runTest {
+        chatManager.messages.value = listOf(
+            ChatMessage.User("Q1", uuid = "q1"),
+            ChatMessage.Assistant("A1", uuid = "a1"),
+        )
+        setEpisodeInfo()
+        eventSink.skipEvent()
+        viewModel.rateAnswer("a1", ChatAnswerRating.Positive)
+        eventSink.skipEvent()
+
+        viewModel.rateAnswer("a1", ChatAnswerRating.Negative)
+
+        assertEquals(
+            EpisodeChatResponseRatedEvent(
+                source = SourceView.PLAYER.analyticsValue,
+                episodeUuid = EPISODE_UUID,
+                podcastUuid = PODCAST_UUID,
+                rating = EpisodeChatSentimentType.Negative,
+                messageIndex = 1,
+                previousRating = EpisodeChatSentimentType.Positive,
+            ),
+            eventSink.pollEvent(),
+        )
     }
 
     @Test

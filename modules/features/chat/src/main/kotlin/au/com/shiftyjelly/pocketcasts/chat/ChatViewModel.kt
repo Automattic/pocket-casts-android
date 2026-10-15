@@ -41,6 +41,7 @@ import com.automattic.eventhorizon.EpisodeChatQuotePlayTappedEvent
 import com.automattic.eventhorizon.EpisodeChatQuotePlayUndoneEvent
 import com.automattic.eventhorizon.EpisodeChatQuoteSourceType
 import com.automattic.eventhorizon.EpisodeChatResponseRatedEvent
+import com.automattic.eventhorizon.EpisodeChatResponseRatingClearedEvent
 import com.automattic.eventhorizon.EpisodeChatResponseReceivedEvent
 import com.automattic.eventhorizon.EpisodeChatSentimentType
 import com.automattic.eventhorizon.EpisodeChatShownEvent
@@ -695,7 +696,8 @@ class ChatViewModel @Inject constructor(
     }
 
     fun rateAnswer(answerUuid: String, rating: ChatAnswerRating): ChatAnswerRating? {
-        val newRating = rating.takeIf { it != _uiState.value.answerRatings[answerUuid] }
+        val previousRating = _uiState.value.answerRatings[answerUuid]
+        val newRating = rating.takeIf { it != previousRating }
         _uiState.update { state ->
             val ratings = if (newRating == null) {
                 state.answerRatings - answerUuid
@@ -705,9 +707,7 @@ class ChatViewModel @Inject constructor(
             state.copy(answerRatings = ratings)
         }
         saveAnswerRating(answerUuid, newRating)
-        if (newRating != null) {
-            trackAnswerRated(answerUuid, newRating)
-        }
+        trackAnswerRated(answerUuid, newRating, previousRating)
         if (newRating == ChatAnswerRating.Positive) {
             showToast(ChatToast.FeedbackThanks)
         }
@@ -732,23 +732,35 @@ class ChatViewModel @Inject constructor(
         return mapNotNull { message -> message.answerRating?.let { message.uuid to it } }.toMap()
     }
 
-    private fun trackAnswerRated(answerUuid: String, rating: ChatAnswerRating) {
+    fun answerMessageIndex(answerUuid: String): Long? {
         val messages = _uiState.value.messages
         val answerIndex = messages.indexOfFirst { it.uuid == answerUuid }
-        val messageIndex = if (answerIndex >= 0) {
-            messages.subList(0, answerIndex).count { it is ChatMessage.User }.toLong()
-        } else {
-            null
-        }
-        eventHorizon.track(
-            EpisodeChatResponseRatedEvent(
+        if (answerIndex < 0) return null
+        return messages.subList(0, answerIndex).count { it is ChatMessage.User }.toLong()
+    }
+
+    private fun trackAnswerRated(answerUuid: String, rating: ChatAnswerRating?, previousRating: ChatAnswerRating?) {
+        val event = when {
+            rating != null -> EpisodeChatResponseRatedEvent(
                 source = sourceView.analyticsValue,
                 episodeUuid = episodeUuid,
                 podcastUuid = podcastUuid,
                 rating = rating.analyticsValue,
-                messageIndex = messageIndex,
-            ),
-        )
+                messageIndex = answerMessageIndex(answerUuid),
+                previousRating = previousRating?.analyticsValue,
+            )
+
+            previousRating != null -> EpisodeChatResponseRatingClearedEvent(
+                source = sourceView.analyticsValue,
+                episodeUuid = episodeUuid,
+                podcastUuid = podcastUuid,
+                previousRating = previousRating.analyticsValue,
+                messageIndex = answerMessageIndex(answerUuid),
+            )
+
+            else -> return
+        }
+        eventHorizon.track(event)
     }
 
     fun onFeedbackSubmitted() {
