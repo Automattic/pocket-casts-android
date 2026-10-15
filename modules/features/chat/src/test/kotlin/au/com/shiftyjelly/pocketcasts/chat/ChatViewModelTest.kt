@@ -187,7 +187,7 @@ class ChatViewModelTest {
 
             val state = awaitItem()
             assertEquals("Question", state.inputText)
-            assertFalse(state.canSend)
+            assertTrue(state.canSend)
         }
     }
 
@@ -296,6 +296,39 @@ class ChatViewModelTest {
         advanceUntilIdle()
 
         assertTrue(chatManager.sentMessages.isEmpty())
+    }
+
+    @Test
+    fun `send is ignored while awaiting a reply and keeps the typed text`() = runTest {
+        setEpisodeInfo()
+        connectToInternet()
+        val gate = CompletableDeferred<Unit>()
+        chatManager.sendMessageGate = gate
+        viewModel.onInputTextChange("First question")
+        viewModel.onSend()
+        advanceUntilIdle()
+
+        viewModel.onInputTextChange("Second question")
+        viewModel.onSend()
+        gate.complete(Unit)
+        advanceUntilIdle()
+
+        assertEquals(listOf(SendMessage(EPISODE_UUID, "First question")), chatManager.sentMessages)
+        assertEquals("Second question", viewModel.uiState.value.inputText)
+    }
+
+    @Test
+    fun `send is ignored while offline`() = runTest {
+        setEpisodeInfo()
+        networkConnectionWatcher.networkCapabilities.value = null
+        advanceUntilIdle()
+
+        viewModel.onInputTextChange("Question")
+        viewModel.onSend()
+        advanceUntilIdle()
+
+        assertTrue(chatManager.sentMessages.isEmpty())
+        assertEquals("Question", viewModel.uiState.value.inputText)
     }
 
     @Test
@@ -416,6 +449,7 @@ class ChatViewModelTest {
     @Test
     fun `retry resends failed transient user message`() = runTest {
         setEpisodeInfo()
+        connectToInternet()
         chatManager.sendMessageException = IOException()
         viewModel.onInputTextChange("Last question")
         viewModel.onSend()
@@ -432,6 +466,41 @@ class ChatViewModelTest {
             ),
             chatManager.sentMessages.single(),
         )
+    }
+
+    @Test
+    fun `retry does nothing while offline`() = runTest {
+        setEpisodeInfo()
+        connectToInternet()
+        chatManager.sendMessageException = IOException()
+        viewModel.onInputTextChange("Question")
+        viewModel.onSend()
+        advanceUntilIdle()
+        chatManager.sendMessageException = null
+        networkConnectionWatcher.networkCapabilities.value = null
+        advanceUntilIdle()
+
+        viewModel.retry()
+        advanceUntilIdle()
+
+        assertTrue(chatManager.sentMessages.isEmpty())
+        assertEquals(ChatError.NetworkError, viewModel.uiState.value.error)
+    }
+
+    @Test
+    fun `sending a new question drops the earlier unsent one`() = runTest {
+        setEpisodeInfo()
+        connectToInternet()
+        chatManager.sendMessageException = IOException()
+        viewModel.onInputTextChange("First")
+        viewModel.onSend()
+        advanceUntilIdle()
+
+        viewModel.onInputTextChange("Second")
+        viewModel.onSend()
+
+        val texts = viewModel.uiState.value.messages.filterIsInstance<ChatMessage.User>().map { it.text }
+        assertEquals(listOf("Second"), texts)
     }
 
     @Test
@@ -652,6 +721,7 @@ class ChatViewModelTest {
     @Test
     fun `retry keeps the message index`() = runTest {
         setEpisodeInfo()
+        connectToInternet()
         sendQuestion("First")
         chatManager.sendMessageException = IOException()
         sendQuestion("Second")
@@ -983,9 +1053,7 @@ class ChatViewModelTest {
     }
 
     private fun TestScope.connectToInternet() {
-        networkConnectionWatcher.networkCapabilities.value = mock<NetworkCapabilities> {
-            on { hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) } doReturn true
-        }
+        networkConnectionWatcher.networkCapabilities.value = internetCapabilities()
         advanceUntilIdle()
     }
 
@@ -1107,7 +1175,7 @@ class ChatViewModelTest {
     }
 
     private class TestNetworkConnectionWatcher : NetworkConnectionWatcher {
-        override val networkCapabilities = MutableStateFlow<NetworkCapabilities?>(null)
+        override val networkCapabilities = MutableStateFlow<NetworkCapabilities?>(internetCapabilities())
     }
 
     private class TestChatManager : ChatManager {
@@ -1157,4 +1225,8 @@ class ChatViewModelTest {
         const val EPISODE_UUID = "episode-uuid"
         const val PODCAST_UUID = "podcast-uuid"
     }
+}
+
+private fun internetCapabilities() = mock<NetworkCapabilities> {
+    on { hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) } doReturn true
 }

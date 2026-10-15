@@ -212,9 +212,6 @@ Language: ru
     <string name="blogs_found_feed_detected">Лента найдена</string>
     <string name="chapters_generated_disclaimer">Эти главы сгенерированы автоматически и могут быть не совсем точными.</string>
     <string name="chat_play_quote">Воспроизвести цитату</string>
-    <string name="chat_tap_to_retry">Нажмите, чтобы повторить попытку.</string>
-    <string name="chat_error_network">Не удалось подключиться к серверу. Проверьте подключение.</string>
-    <string name="chat_error_server">Что-то пошло не так. Повторите попытку.</string>
     <string name="chat_clear">Очистить чат</string>
     <string name="chat_send">Отправить</string>
     <string name="episode_chat">Чат по выпуску</string>

@@ -212,9 +212,6 @@ Language: fr
     <string name="blogs_found_feed_detected">Flux trouvé</string>
     <string name="chapters_generated_disclaimer">Ces chapitres sont générés automatiquement et peuvent ne pas être parfaitement exacts.</string>
     <string name="chat_play_quote">Lire la citation</string>
-    <string name="chat_tap_to_retry">Appuyer pour réessayer</string>
-    <string name="chat_error_network">Impossible d’atteindre le serveur. Vérifiez votre connexion.</string>
-    <string name="chat_error_server">Un problème est survenu. Veuillez réessayer.</string>
     <string name="chat_clear">Effacer la discussion</string>
     <string name="chat_send">Envoyer</string>
     <string name="episode_chat">Discuter de l’épisode ·</string>

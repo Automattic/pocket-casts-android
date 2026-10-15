@@ -214,8 +214,8 @@ class ChatViewModel @Inject constructor(
     }
 
     fun onSend() {
+        if (!_uiState.value.canSend) return
         val text = _uiState.value.inputText.trim()
-        if (text.isEmpty()) return
 
         _uiState.update { it.copy(inputText = "") }
         performSend(message = ChatMessage.User(text = text), inputType = EpisodeChatInputType.Typed)
@@ -228,6 +228,7 @@ class ChatViewModel @Inject constructor(
     }
 
     fun retry() {
+        if (!_uiState.value.isConnected || _uiState.value.isAwaitingReply) return
         val failedUserMessage = transientUserMessage ?: return
         performSend(message = failedUserMessage, inputType = transientInputType)
     }
@@ -287,7 +288,7 @@ class ChatViewModel @Inject constructor(
             it.copy(
                 isAwaitingReply = true,
                 error = null,
-                messages = it.messages.withTransientUserMessage(),
+                messages = it.messages.filterNot { message -> message.uuid in unsentMessageUuids }.withTransientUserMessage(),
             )
         }
 

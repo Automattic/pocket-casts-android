@@ -212,9 +212,6 @@ Language: ar
     <string name="blogs_found_feed_detected">تم العثور على تلقيم</string>
     <string name="chapters_generated_disclaimer">يجري إنشاء هذه الفصول تلقائيًا، وقد لا تكون دقيقة بالكامل.</string>
     <string name="chat_play_quote">تشغيل اقتباس</string>
-    <string name="chat_tap_to_retry">انقر لإعادة المحاولة</string>
-    <string name="chat_error_network">تعذّر الاتصال بالخادم. تحقق من اتصالك.</string>
-    <string name="chat_error_server">حدث خطأ ما. يُرجى إعادة المحاولة.</string>
     <string name="chat_clear">مسح المحادثة</string>
     <string name="chat_send">إرسال</string>
     <string name="episode_chat">المحادثة حول الحلقة</string>

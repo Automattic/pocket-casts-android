@@ -212,9 +212,6 @@ Language: nl
     <string name="blogs_found_feed_detected">Feed gevonden</string>
     <string name="chapters_generated_disclaimer">Deze hoofdstukken worden automatisch gegenereerd en zijn mogelijk niet perfect nauwkeurig.</string>
     <string name="chat_play_quote">Citaat afspelen</string>
-    <string name="chat_tap_to_retry">Tik om opnieuw te proberen</string>
-    <string name="chat_error_network">Kan de server niet bereiken. Controleer je netwerkverbinding.</string>
-    <string name="chat_error_server">Er is iets misgegaan. Probeer het nog eens.</string>
     <string name="chat_clear">Chat wissen</string>
     <string name="chat_send">Verzenden</string>
     <string name="episode_chat">Chat met aflevering</string>

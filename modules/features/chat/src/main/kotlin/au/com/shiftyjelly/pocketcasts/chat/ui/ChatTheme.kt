@@ -24,7 +24,6 @@ internal data class ChatTheme(
     val inputHint: Color,
     val sendButton: Color,
     val sendButtonIcon: Color,
-    val divider: Color,
     val closeButtonBackground: Color,
     val progress: Color,
     val progressTrack: Color,
@@ -34,6 +33,7 @@ internal data class ChatTheme(
     val sheetHandle: Color,
     val detailsHint: Color,
     val rating: Color,
+    val errorText: Color,
 ) {
     companion object {
         fun default(colors: ThemeColors) = ChatTheme(
@@ -51,7 +51,6 @@ internal data class ChatTheme(
             inputHint = colors.primaryText02,
             sendButton = colors.primaryInteractive01,
             sendButtonIcon = colors.primaryInteractive02,
-            divider = colors.primaryUi05,
             closeButtonBackground = colors.primaryUi05,
             progress = colors.primaryInteractive01,
             progressTrack = colors.primaryUi05,
@@ -61,6 +60,7 @@ internal data class ChatTheme(
             sheetHandle = ThemeLightColors.primaryUi05,
             detailsHint = ThemeLightColors.primaryText02,
             rating = colors.primaryIcon02,
+            errorText = colors.support05,
         )
 
         fun player(colors: PlayerColors) = ChatTheme(
@@ -78,7 +78,6 @@ internal data class ChatTheme(
             inputHint = colors.contrast03,
             sendButton = colors.contrast01,
             sendButtonIcon = colors.background01,
-            divider = colors.contrast05,
             closeButtonBackground = colors.contrast05,
             progress = colors.highlight01,
             progressTrack = colors.contrast05,
@@ -88,6 +87,7 @@ internal data class ChatTheme(
             sheetHandle = ThemeLightColors.primaryUi05,
             detailsHint = ThemeLightColors.primaryText02,
             rating = colors.contrast05,
+            errorText = ErrorRed,
         )
     }
 }
@@ -107,3 +107,4 @@ internal fun rememberChatTheme(): ChatTheme {
 }
 
 private val QuoteTimestampBlue = Color(0xFF2A67F9)
+private val ErrorRed = Color(0xFFF43E37)

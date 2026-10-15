@@ -212,9 +212,6 @@ Language: sv_SE
     <string name="blogs_found_feed_detected">Flöde hittades</string>
     <string name="chapters_generated_disclaimer">Dessa kapitel genereras automatiskt och är kanske inte helt korrekta.</string>
     <string name="chat_play_quote">Spela upp citat</string>
-    <string name="chat_tap_to_retry">Tryck för att försöka igen</string>
-    <string name="chat_error_network">Kan inte nå servern. Kontrollera din anslutning.</string>
-    <string name="chat_error_server">Något gick fel. Försök igen.</string>
     <string name="chat_clear">Rensa chatt</string>
     <string name="chat_send">Skicka</string>
     <string name="episode_chat">Chatta med avsnitt</string>
