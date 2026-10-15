@@ -91,7 +91,8 @@ fun ChatScreen(
         sheetContent = {
             ChatBetaSheet(
                 theme = theme,
-                onClickGotIt = onDismissBetaSheet,
+                buttonText = stringResource(LR.string.got_it),
+                onClickButton = onDismissBetaSheet,
             )
         },
         modifier = modifier,
@@ -164,7 +165,7 @@ private fun ChatContent(
                 modifier = Modifier
                     .fillMaxSize()
                     .verticalScroll(scrollState)
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                    .padding(start = 16.dp, end = 16.dp, top = 24.dp, bottom = 12.dp),
             ) {
                 if (uiState.areMessagesLoaded) {
                     ChatWelcome(
@@ -186,7 +187,6 @@ private fun ChatContent(
                             quote = message.displayText,
                             timestampLabel = message.timestampLabel,
                             isPlayable = message.canPlay,
-                            isPlaying = message.isPlaying,
                             theme = theme,
                             onClickPlay = { onPlayQuote(message.uuid) },
                         )

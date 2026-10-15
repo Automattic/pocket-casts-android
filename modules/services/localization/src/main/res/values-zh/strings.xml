@@ -211,7 +211,6 @@ Language: zh_CN
     <string name="blogs_found_followed_badge">已关注播客</string>
     <string name="blogs_found_feed_detected">已找到源</string>
     <string name="chapters_generated_disclaimer">这些章节为自动生成，可能不完全准确。</string>
-    <string name="chat_stop_quote">结束引用</string>
     <string name="chat_play_quote">播放引用</string>
     <string name="chat_tap_to_retry">轻点以重试</string>
     <string name="chat_error_network">无法连接到该服务器。 请检查您的连接。</string>

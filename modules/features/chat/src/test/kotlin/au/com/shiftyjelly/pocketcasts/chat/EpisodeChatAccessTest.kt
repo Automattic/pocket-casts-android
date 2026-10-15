@@ -33,8 +33,15 @@ class EpisodeChatAccessTest {
     }
 
     @Test
-    fun `signed out user gets paywall even when free beta is on`() {
+    fun `signed out user is asked to sign in when free beta is on`() {
         FeatureFlag.setEnabled(Feature.EPISODE_CHAT_FREE_BETA, true)
+
+        assertEquals(EpisodeChatAccess.SignIn, EpisodeChatAccess.from(isPlusUser = false, isSignedIn = false))
+    }
+
+    @Test
+    fun `signed out user gets paywall when free beta is off`() {
+        FeatureFlag.setEnabled(Feature.EPISODE_CHAT_FREE_BETA, false)
 
         assertEquals(EpisodeChatAccess.Paywall, EpisodeChatAccess.from(isPlusUser = false, isSignedIn = false))
     }

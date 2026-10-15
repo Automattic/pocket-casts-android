@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.chat.ui
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,17 +14,12 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -62,20 +56,11 @@ internal fun ChatHeader(
                 .fillMaxWidth()
                 .padding(start = 8.dp, end = 4.dp),
         ) {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .minimumInteractiveComponentSize()
-                    .size(32.dp)
-                    .clip(CircleShape)
-                    .background(theme.closeButtonBackground)
-                    .clickable(role = Role.Button, onClick = onClickClose),
-            ) {
+            IconButton(onClick = onClickClose) {
                 Icon(
-                    imageVector = Icons.Filled.Close,
+                    painter = painterResource(IR.drawable.ic_close),
                     contentDescription = stringResource(LR.string.close),
                     tint = theme.iconButton,
-                    modifier = Modifier.size(20.dp),
                 )
             }
             Spacer(modifier = Modifier.weight(1f))
@@ -108,7 +93,7 @@ internal fun ChatHeader(
                 Text(
                     text = episodeTitle,
                     color = theme.primaryText,
-                    fontSize = 15.sp,
+                    fontSize = 13.sp,
                     lineHeight = 18.sp,
                     fontWeight = FontWeight.SemiBold,
                     maxLines = 1,
@@ -116,8 +101,8 @@ internal fun ChatHeader(
                 )
                 Text(
                     text = podcastTitle,
-                    color = theme.secondaryText,
-                    fontSize = 15.sp,
+                    color = theme.tertiaryText,
+                    fontSize = 13.sp,
                     lineHeight = 18.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -136,13 +121,13 @@ internal fun ChatHeader(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(2.dp)
-                .background(theme.progressTrack),
+                .background(theme.inputHint),
         ) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth(playback.progress)
                     .height(2.dp)
-                    .background(theme.progress),
+                    .background(theme.progress, CircleShape),
             )
         }
     }

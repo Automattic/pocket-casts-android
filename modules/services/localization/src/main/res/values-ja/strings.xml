@@ -211,7 +211,6 @@ Language: ja_JP
     <string name="blogs_found_followed_badge">フォローしているポッドキャスト</string>
     <string name="blogs_found_feed_detected">見つかったフィード</string>
     <string name="chapters_generated_disclaimer">これらのチャプターは自動的に生成されており、正確さに欠ける可能性があります。</string>
-    <string name="chat_stop_quote">引用を停止</string>
     <string name="chat_play_quote">引用を再生</string>
     <string name="chat_tap_to_retry">タップして再試行</string>
     <string name="chat_error_network">サーバーにアクセスできません。 接続を確認してください。</string>

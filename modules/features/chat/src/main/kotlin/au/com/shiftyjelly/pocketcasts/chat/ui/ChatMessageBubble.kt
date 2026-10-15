@@ -9,24 +9,23 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.clearAndSetSemantics
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.onClick
-import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.TextLinkStyles
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.withLink
+import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.text.style.TextIndent
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -37,53 +36,58 @@ internal fun AiMessageBubble(
     theme: ChatTheme,
     modifier: Modifier = Modifier,
 ) {
+    val textMeasurer = rememberTextMeasurer()
+    val density = LocalDensity.current
+    val bulletIndent = remember(textMeasurer, density) {
+        with(density) { textMeasurer.measure(BULLET_PREFIX, AiMessageTextStyle).size.width.toSp() }
+    }
+    val styledText = remember(text, bulletIndent) { text.withHangingBullets(bulletIndent) }
     Text(
-        text = text,
+        text = styledText,
         color = theme.aiBubbleText,
-        fontSize = 15.sp,
-        lineHeight = 20.sp,
+        style = AiMessageTextStyle,
         modifier = modifier.fillMaxWidth(),
     )
 }
+
+private fun String.withHangingBullets(indent: TextUnit): AnnotatedString {
+    val lines = lines()
+    return buildAnnotatedString {
+        lines.forEachIndexed { index, line ->
+            val isBullet = line.startsWith(BULLET_PREFIX)
+            if (isBullet && lines.getOrNull(index - 1)?.startsWith(BULLET_PREFIX) == true) {
+                withStyle(ParagraphStyle()) { append(ZERO_WIDTH_SPACE) }
+            }
+            val paragraphStyle = if (isBullet) ParagraphStyle(textIndent = TextIndent(restLine = indent)) else ParagraphStyle()
+            withStyle(paragraphStyle) { append(line.ifEmpty { ZERO_WIDTH_SPACE }) }
+        }
+    }
+}
+
+private const val BULLET_PREFIX = "•  "
+private const val ZERO_WIDTH_SPACE = "\u200B"
+
+private val AiMessageTextStyle = TextStyle(fontSize = 15.sp, lineHeight = 20.sp)
 
 @Composable
 internal fun AiQuoteBubble(
     quote: String,
     timestampLabel: String,
     isPlayable: Boolean,
-    isPlaying: Boolean,
     theme: ChatTheme,
     modifier: Modifier = Modifier,
     onClickPlay: () -> Unit = {},
 ) {
-    val currentOnClickPlay by rememberUpdatedState(onClickPlay)
-    val actionLabel = stringResource(if (isPlaying) LR.string.chat_stop_quote else LR.string.chat_play_quote)
     val timestampColor = if (isPlayable) theme.quoteTimestamp else theme.secondaryText
-    val text = remember(quote, timestampLabel, isPlayable, isPlaying, timestampColor) {
+    val text = remember(quote, timestampLabel, timestampColor) {
         buildAnnotatedString {
             withStyle(SpanStyle(fontStyle = FontStyle.Italic)) {
                 append(quote)
             }
             if (timestampLabel.isNotEmpty()) {
                 append(" ")
-                val timestampStyle = SpanStyle(
-                    color = timestampColor,
-                    textDecoration = if (isPlaying) TextDecoration.Underline else null,
-                )
-                if (isPlayable) {
-                    withLink(
-                        LinkAnnotation.Clickable(
-                            tag = QUOTE_TIMESTAMP_TAG,
-                            styles = TextLinkStyles(timestampStyle),
-                            linkInteractionListener = { currentOnClickPlay() },
-                        ),
-                    ) {
-                        append("($timestampLabel)")
-                    }
-                } else {
-                    withStyle(timestampStyle) {
-                        append("($timestampLabel)")
-                    }
+                withStyle(SpanStyle(color = timestampColor)) {
+                    append("($timestampLabel)")
                 }
             }
         }
@@ -97,13 +101,11 @@ internal fun AiQuoteBubble(
             .fillMaxWidth()
             .then(
                 if (isPlayable) {
-                    Modifier.clearAndSetSemantics {
-                        contentDescription = text.text
-                        onClick(label = actionLabel) {
-                            currentOnClickPlay()
-                            true
-                        }
-                    }
+                    Modifier.clickable(
+                        onClickLabel = stringResource(LR.string.chat_play_quote),
+                        role = Role.Button,
+                        onClick = onClickPlay,
+                    )
                 } else {
                     Modifier
                 },
@@ -160,6 +162,4 @@ internal fun ThinkingBubble(
     )
 }
 
-private val UserBubbleShape = RoundedCornerShape(16.dp)
-
-private const val QUOTE_TIMESTAMP_TAG = "quote_timestamp"
+private val UserBubbleShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp, bottomEnd = 4.dp, bottomStart = 16.dp)
