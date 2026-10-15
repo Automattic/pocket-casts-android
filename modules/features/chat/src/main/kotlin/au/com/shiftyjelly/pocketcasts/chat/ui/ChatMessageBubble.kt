@@ -1,5 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.chat.ui
 
+import androidx.compose.animation.core.InfiniteTransition
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -137,14 +139,12 @@ internal fun UserMessageBubble(
             horizontalAlignment = Alignment.End,
             verticalArrangement = Arrangement.spacedBy(8.dp),
             modifier = if (isNotSent) {
-                Modifier
-                    .clip(UserBubbleShape)
-                    .clickable(
-                        enabled = isRetryEnabled,
-                        onClickLabel = stringResource(LR.string.try_again),
-                        role = Role.Button,
-                        onClick = onRetry,
-                    )
+                Modifier.clickable(
+                    enabled = isRetryEnabled,
+                    onClickLabel = stringResource(LR.string.try_again),
+                    role = Role.Button,
+                    onClick = onRetry,
+                )
             } else {
                 Modifier
             },
@@ -196,10 +196,12 @@ private fun ChatNotSentLabel(
 internal fun ThinkingBubble(
     theme: ChatTheme,
     modifier: Modifier = Modifier,
+    transition: InfiniteTransition = rememberInfiniteTransition(label = "typing"),
 ) {
     ChatTypingIndicator(
         theme = theme,
         modifier = modifier,
+        transition = transition,
     )
 }
 

@@ -25,9 +25,9 @@ import kotlin.math.min
 internal fun ChatTypingIndicator(
     theme: ChatTheme,
     modifier: Modifier = Modifier,
+    transition: InfiniteTransition = rememberInfiniteTransition(label = "typing"),
 ) {
     val isReduceMotionEnabled = rememberIsReduceMotionEnabled()
-    val transition = rememberInfiniteTransition(label = "typing")
     Row(
         horizontalArrangement = Arrangement.spacedBy(6.dp),
         verticalAlignment = Alignment.CenterVertically,

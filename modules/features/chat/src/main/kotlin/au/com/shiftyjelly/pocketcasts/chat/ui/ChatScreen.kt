@@ -4,6 +4,8 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.InfiniteTransition
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
@@ -217,6 +219,7 @@ private fun ChatContent(
                     .verticalScroll(scrollState)
                     .padding(start = 16.dp, end = 16.dp, top = 24.dp, bottom = 12.dp),
             ) {
+                val typingTransition = rememberInfiniteTransition(label = "typing")
                 if (uiState.areMessagesLoaded && uiState.messages.isEmpty() && !uiState.isAwaitingReply) {
                     ChatWelcome(
                         isSuggestionEnabled = uiState.isConnected,
@@ -233,6 +236,7 @@ private fun ChatContent(
                             is ChatMessage.Assistant -> ChatAnswerAppear(
                                 animate = isNew,
                                 replacesTypingIndicator = replacesTypingIndicator,
+                                typingTransition = typingTransition,
                                 theme = theme,
                             ) {
                                 AiMessageBubble(
@@ -244,6 +248,7 @@ private fun ChatContent(
                             is ChatMessage.Quote -> ChatAnswerAppear(
                                 animate = isNew,
                                 replacesTypingIndicator = replacesTypingIndicator,
+                                typingTransition = typingTransition,
                                 theme = theme,
                             ) {
                                 AiQuoteBubble(
@@ -298,6 +303,7 @@ private fun ChatContent(
                     ThinkingBubble(
                         theme = theme,
                         modifier = Modifier.padding(top = TypingIndicatorExtraGap),
+                        transition = typingTransition,
                     )
                 }
                 if (uiState.error == ChatError.ServerError) {
@@ -353,6 +359,7 @@ private val TypingIndicatorExtraGap = 8.dp
 private fun ChatAnswerAppear(
     animate: Boolean,
     replacesTypingIndicator: Boolean,
+    typingTransition: InfiniteTransition,
     theme: ChatTheme,
     content: @Composable () -> Unit,
 ) {
@@ -363,6 +370,7 @@ private fun ChatAnswerAppear(
                 ThinkingBubble(
                     theme = theme,
                     modifier = Modifier.padding(top = TypingIndicatorExtraGap),
+                    transition = typingTransition,
                 )
             }
         }
