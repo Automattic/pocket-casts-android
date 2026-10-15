@@ -12,8 +12,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.playback.NetworkConnectionWatcher
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.automattic.eventhorizon.EpisodeChatBetaSheetDismissedEvent
 import com.automattic.eventhorizon.EpisodeChatBetaSheetShownEvent
 import com.automattic.eventhorizon.EpisodeChatClearedEvent
@@ -434,10 +432,9 @@ class ChatViewModel @Inject constructor(
     private fun List<ChatMessage>.withQuotePlaybackState(
         episodeDurationMs: Int,
     ): List<ChatMessage> {
-        val isQuotePlaybackEnabled = FeatureFlag.isEnabled(Feature.EPISODE_CHAT_PLAYABLE_QUOTES)
         return map { message ->
             if (message is ChatMessage.Quote) {
-                message.copy(canPlay = isQuotePlaybackEnabled && message.isWithinEpisode(episodeDurationMs))
+                message.copy(canPlay = message.isWithinEpisode(episodeDurationMs))
             } else {
                 message
             }
