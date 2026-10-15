@@ -59,9 +59,8 @@ class ChatManagerImpl @Inject constructor(
             throw e
         } catch (e: Exception) {
             val failure = if (e is IOException) ChatSendFailure.Network else ChatSendFailure.Server
-            episodeChatDao.insertMessage(
-                question.copy(metadata = userMetadataAdapter.toJson(UserMessageMetadata(failure.value))),
-            )
+            val failedQuestion = message.copy(failure = failure).toEntity(episodeUuid, quoteMetadataAdapter, userMetadataAdapter)
+            runCatching { episodeChatDao.insertMessage(failedQuestion.copy(createdAt = question.createdAt)) }
             throw e
         }
 
