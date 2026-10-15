@@ -113,6 +113,10 @@ class ChatViewModel @Inject constructor(
     private var playingEpisodeUuid: String? = null
     private var historyItems: List<EpisodeChatHistoryItem> = emptyList()
 
+    @Volatile private var isAdoptingUnansweredQuestion = false
+
+    private var isSigningIn = false
+
     @Volatile private var quotePlaybackUndo: PlaybackPosition? = null
     private var transientUserMessage: ChatMessage.User? = null
     private var transientInputType: EpisodeChatInputType = EpisodeChatInputType.Typed
@@ -142,16 +146,18 @@ class ChatViewModel @Inject constructor(
     ) {
         if (chatEpisode.value != null) return
         this.sourceView = sourceView
-        _uiState.update { it.copy(isBeta = isBeta, isSignInRequired = requiresSignIn) }
+        val isSignInRequired = requiresSignIn && !syncManager.isLoggedIn()
+        _uiState.update { it.copy(isBeta = isBeta, isSignInRequired = isSignInRequired) }
         openChat(ChatEpisode(episodeUuid, episodeTitle, podcastUuid, podcastTitle, episodeDurationMs))
         observeMessages()
         observePlayback()
         observeHistory()
-        if (requiresSignIn) showBetaSheet() else showBetaSheetIfNeeded(isBeta)
+        if (isSignInRequired) showBetaSheet() else showBetaSheetIfNeeded(isBeta)
     }
 
     fun onSignInClick() {
-        if (!_uiState.value.isSignInRequired) return
+        if (!_uiState.value.isSignInRequired || isSigningIn) return
+        isSigningIn = true
         eventHorizon.track(
             EpisodeChatBetaSheetSignInTappedEvent(
                 source = sourceView.analyticsValue,
@@ -163,14 +169,22 @@ class ChatViewModel @Inject constructor(
     }
 
     fun refreshSignIn() {
+        isSigningIn = false
         if (!_uiState.value.isSignInRequired || !syncManager.isLoggedIn()) return
         settings.episodeChatBetaSheetSeen.set(true, updateModifiedAt = false)
-        _uiState.update { it.copy(isSignInRequired = false, isBetaSheetVisible = false) }
+        _uiState.update {
+            it.copy(
+                isSignInRequired = false,
+                isBetaSheetVisible = false,
+                isBeta = settings.cachedSubscription.value == null,
+            )
+        }
     }
 
     private fun openChat(episode: ChatEpisode) {
         sendJob?.cancel()
         transientUserMessage = null
+        isAdoptingUnansweredQuestion = true
         _uiState.update {
             it.copy(
                 episodeUuid = episode.uuid,
@@ -197,8 +211,7 @@ class ChatViewModel @Inject constructor(
             chatEpisode.filterNotNull().flatMapLatest { episode ->
                 chatManager.observeMessages(episode.uuid).map { messages -> episode.uuid to messages }
             }.collect { (messagesEpisodeUuid, messages) ->
-                val unansweredQuestion = messages.unansweredQuestionOnOpen(messagesEpisodeUuid)
-                if (unansweredQuestion != null) transientUserMessage = unansweredQuestion
+                val unansweredQuestion = adoptUnansweredQuestion(messagesEpisodeUuid, messages)
                 _uiState.update { state ->
                     if (state.episodeUuid != messagesEpisodeUuid) return@update state
                     state.copy(
@@ -214,11 +227,14 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    private fun List<ChatMessage>.unansweredQuestionOnOpen(messagesEpisodeUuid: String): ChatMessage.User? {
+    private fun adoptUnansweredQuestion(messagesEpisodeUuid: String, messages: List<ChatMessage>): ChatMessage.User? {
         val state = _uiState.value
-        val isOpening = state.episodeUuid == messagesEpisodeUuid && !state.areMessagesLoaded && !state.isAwaitingReply
-        if (!isOpening || transientUserMessage != null) return null
-        return lastOrNull() as? ChatMessage.User
+        if (!isAdoptingUnansweredQuestion || state.episodeUuid != messagesEpisodeUuid) return null
+        isAdoptingUnansweredQuestion = false
+        if (state.isAwaitingReply || transientUserMessage != null) return null
+        val question = messages.lastOrNull() as? ChatMessage.User ?: return null
+        transientUserMessage = question
+        return question
     }
 
     private fun ChatSendFailure?.toChatError() = when (this) {
@@ -438,6 +454,7 @@ class ChatViewModel @Inject constructor(
                         restoredMessageUuids = state.restoredMessageUuids + cleared.chat.messages.map { it.uuid },
                     )
                 }
+                isAdoptingUnansweredQuestion = true
             }
             chatManager.restoreMessages(cleared.chat)
             eventHorizon.track(undoneEvent(cleared))
