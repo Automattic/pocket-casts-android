@@ -14,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.playback.NetworkConnectionWatcher
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.eventhorizon.EpisodeChatBetaSheetDismissedEvent
 import com.automattic.eventhorizon.EpisodeChatBetaSheetShownEvent
 import com.automattic.eventhorizon.EpisodeChatClearedEvent
@@ -374,7 +375,13 @@ class ChatViewModel @Inject constructor(
         val previousJob = ratingWriteJob
         ratingWriteJob = applicationScope.launch(ioDispatcher) {
             previousJob?.join()
-            chatManager.rateAnswer(answerUuid, rating)
+            try {
+                chatManager.rateAnswer(answerUuid, rating)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                LogBuffer.e(LOG_TAG, e, "Failed to save episode chat answer rating")
+            }
         }
     }
 
@@ -464,6 +471,7 @@ class ChatViewModel @Inject constructor(
 }
 
 private const val QUOTE_PLAYBACK_EPISODE_TIMEOUT_MS = 5_000L
+private const val LOG_TAG = "EpisodeChat"
 
 data class ChatUiState(
     val inputText: String = "",
