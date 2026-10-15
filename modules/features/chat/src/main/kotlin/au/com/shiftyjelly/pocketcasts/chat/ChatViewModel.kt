@@ -495,7 +495,7 @@ class ChatViewModel @Inject constructor(
     fun retry() {
         if (!_uiState.value.isConnected || _uiState.value.isAwaitingReply) return
         val failedUserMessage = transientUserMessage ?: return
-        performSend(message = failedUserMessage, inputType = transientInputType)
+        performSend(message = failedUserMessage, inputType = transientInputType, isRetry = true)
     }
 
     fun playQuote(quoteUuid: String) {
@@ -603,13 +603,24 @@ class ChatViewModel @Inject constructor(
         } != null
     }
 
-    private fun performSend(message: ChatMessage.User, inputType: EpisodeChatInputType) {
+    private fun performSend(message: ChatMessage.User, inputType: EpisodeChatInputType, isRetry: Boolean = false) {
         val supersededQuestionUuid = transientUserMessage?.uuid?.takeIf { it != message.uuid }
         val unsentMessageUuids = setOfNotNull(transientUserMessage?.uuid, message.uuid)
         transientUserMessage = message
         transientInputType = inputType
         val currentMessages = _uiState.value.messages.filterNot { it.uuid in unsentMessageUuids }
         val messageIndex = currentMessages.count { it is ChatMessage.User } + 1L
+        eventHorizon.track(
+            EpisodeChatMessageSentEvent(
+                source = sourceView.analyticsValue,
+                episodeUuid = episodeUuid,
+                podcastUuid = podcastUuid,
+                messageLength = message.text.length.toLong(),
+                inputType = inputType,
+                messageIndex = messageIndex,
+                isRetry = isRetry,
+            ),
+        )
 
         _uiState.update {
             it.copy(
@@ -631,30 +642,21 @@ class ChatViewModel @Inject constructor(
                 transientUserMessage = null
                 hasReceivedAnswer = true
                 eventHorizon.track(
-                    EpisodeChatMessageSentEvent(
-                        source = sourceView.analyticsValue,
-                        episodeUuid = episodeUuid,
-                        podcastUuid = podcastUuid,
-                        messageLength = message.text.length.toLong(),
-                        inputType = inputType,
-                        messageIndex = messageIndex,
-                    ),
-                )
-                eventHorizon.track(
                     EpisodeChatResponseReceivedEvent(
                         source = sourceView.analyticsValue,
                         episodeUuid = episodeUuid,
                         podcastUuid = podcastUuid,
                         durationMs = responseDuration.inWholeMilliseconds,
+                        messageIndex = messageIndex,
                     ),
                 )
             } catch (e: IOException) {
-                trackMessageFailed(EpisodeChatErrorType.Network)
+                trackMessageFailed(EpisodeChatErrorType.Network, inputType, messageIndex)
                 _uiState.update { it.copy(error = ChatError.NetworkError) }
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                trackMessageFailed(EpisodeChatErrorType.Server)
+                trackMessageFailed(EpisodeChatErrorType.Server, inputType, messageIndex)
                 _uiState.update { it.copy(error = ChatError.ServerError) }
             } finally {
                 _uiState.update { it.copy(isAwaitingReply = false) }
@@ -781,13 +783,15 @@ class ChatViewModel @Inject constructor(
         )
     }
 
-    private fun trackMessageFailed(error: EpisodeChatErrorType) {
+    private fun trackMessageFailed(error: EpisodeChatErrorType, inputType: EpisodeChatInputType, messageIndex: Long) {
         eventHorizon.track(
             EpisodeChatMessageFailedEvent(
                 source = sourceView.analyticsValue,
                 episodeUuid = episodeUuid,
                 podcastUuid = podcastUuid,
                 error = error,
+                inputType = inputType,
+                messageIndex = messageIndex,
             ),
         )
     }

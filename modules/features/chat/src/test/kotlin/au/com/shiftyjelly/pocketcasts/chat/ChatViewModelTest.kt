@@ -279,6 +279,7 @@ class ChatViewModelTest {
                 messageLength = "Summarize this episode".length.toLong(),
                 inputType = EpisodeChatInputType.SummaryPrompt,
                 messageIndex = 1,
+                isRetry = false,
             ),
             eventSink.pollEvent(),
         )
@@ -400,9 +401,10 @@ class ChatViewModelTest {
     }
 
     @Test
-    fun `send tracks message sent after success`() = runTest {
+    fun `send tracks message sent before the answer arrives`() = runTest {
         setEpisodeInfo()
         eventSink.skipEvent()
+        chatManager.sendMessageGate = CompletableDeferred()
         viewModel.onInputTextChange("Question")
 
         viewModel.onSend()
@@ -416,6 +418,7 @@ class ChatViewModelTest {
                 messageLength = "Question".length.toLong(),
                 inputType = EpisodeChatInputType.Typed,
                 messageIndex = 1,
+                isRetry = false,
             ),
             eventSink.pollEvent(),
         )
@@ -440,6 +443,7 @@ class ChatViewModelTest {
                 episodeUuid = EPISODE_UUID,
                 podcastUuid = PODCAST_UUID,
                 durationMs = 2_500,
+                messageIndex = 1,
             ),
             eventSink.pollEvent(),
         )
@@ -453,6 +457,7 @@ class ChatViewModelTest {
 
         sendQuestion("Question")
 
+        assertTrue(eventSink.pollEvent() is EpisodeChatMessageSentEvent)
         assertTrue(eventSink.pollEvent() is EpisodeChatMessageFailedEvent)
         assertTrue(eventSink.isEmpty())
     }
@@ -483,12 +488,15 @@ class ChatViewModelTest {
         viewModel.onSend()
         advanceUntilIdle()
 
+        eventSink.skipEvent()
         assertEquals(
             EpisodeChatMessageFailedEvent(
                 source = SourceView.PLAYER.analyticsValue,
                 episodeUuid = EPISODE_UUID,
                 podcastUuid = PODCAST_UUID,
                 error = EpisodeChatErrorType.Network,
+                inputType = EpisodeChatInputType.Typed,
+                messageIndex = 1,
             ),
             eventSink.pollEvent(),
         )
@@ -549,6 +557,34 @@ class ChatViewModelTest {
 
         val texts = viewModel.uiState.value.messages.filterIsInstance<ChatMessage.User>().map { it.text }
         assertEquals(listOf("Second"), texts)
+    }
+
+    @Test
+    fun `retry tracks message sent as a retry`() = runTest {
+        setEpisodeInfo()
+        connectToInternet()
+        chatManager.sendMessageException = IOException()
+        viewModel.onInputTextChange("Question")
+        viewModel.onSend()
+        advanceUntilIdle()
+        chatManager.sendMessageException = null
+        eventSink.skipEvent(eventSink.size)
+
+        viewModel.retry()
+        advanceUntilIdle()
+
+        assertEquals(
+            EpisodeChatMessageSentEvent(
+                source = SourceView.PLAYER.analyticsValue,
+                episodeUuid = EPISODE_UUID,
+                podcastUuid = PODCAST_UUID,
+                messageLength = "Question".length.toLong(),
+                inputType = EpisodeChatInputType.Typed,
+                messageIndex = 1,
+                isRetry = true,
+            ),
+            eventSink.pollEvent(),
+        )
     }
 
     @Test
@@ -814,7 +850,7 @@ class ChatViewModelTest {
 
         sendQuestion("Second")
 
-        assertEquals(listOf(1L, 2L), eventSink.messageIndexes())
+        assertEquals(listOf(1L, 2L, 2L), eventSink.messageIndexes())
         assertEquals(listOf("First", "Response"), chatManager.sentHistories.last())
     }
 
@@ -830,7 +866,7 @@ class ChatViewModelTest {
         viewModel.retry()
         advanceUntilIdle()
 
-        assertEquals(listOf(1L, 2L), eventSink.messageIndexes())
+        assertEquals(listOf(1L, 2L, 2L), eventSink.messageIndexes())
     }
 
     @Test
