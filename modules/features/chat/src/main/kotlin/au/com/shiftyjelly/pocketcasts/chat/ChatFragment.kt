@@ -22,7 +22,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalResources
+import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.chat.ui.ChatScreen
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
@@ -40,6 +44,7 @@ import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -51,6 +56,7 @@ class ChatFragment : BaseDialogFragment() {
 
     companion object {
         private const val ARGS_KEY = "chat_args"
+        const val SIGN_IN_RESULT_KEY = "episode_chat_sign_in"
 
         fun newInstance(
             episodeUuid: String,
@@ -61,6 +67,7 @@ class ChatFragment : BaseDialogFragment() {
             sourceView: SourceView,
             isBeta: Boolean,
             podcastColors: PodcastColors,
+            requiresSignIn: Boolean = false,
         ) = ChatFragment().apply {
             arguments = Bundle().apply {
                 putParcelable(
@@ -74,6 +81,7 @@ class ChatFragment : BaseDialogFragment() {
                         sourceView,
                         isBeta,
                         podcastColors,
+                        requiresSignIn,
                     ),
                 )
             }
@@ -94,10 +102,26 @@ class ChatFragment : BaseDialogFragment() {
             episodeDurationMs = args.episodeDurationMs,
             sourceView = args.sourceView,
             isBeta = args.isBeta,
+            requiresSignIn = args.requiresSignIn,
         )
         childFragmentManager.setFragmentResultListener(ChatFeedbackFragment.SUBMITTED_RESULT_KEY, this) { _, _ ->
             viewModel.onFeedbackSubmitted()
         }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.navigation.collect { navigation ->
+                    when (navigation) {
+                        ChatNavigation.SignIn -> setFragmentResult(SIGN_IN_RESULT_KEY, Bundle.EMPTY)
+                        ChatNavigation.Close -> dismiss()
+                    }
+                }
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.refreshSignIn()
     }
 
     override fun onCreateView(
@@ -161,6 +185,7 @@ class ChatFragment : BaseDialogFragment() {
                     onRateAnswer = ::rateAnswer,
                     snackbarHostState = snackbarHostState,
                     onDismissBetaSheet = viewModel::dismissBetaSheet,
+                    onSignInClick = viewModel::onSignInClick,
                     modifier = Modifier.fillMaxSize(),
                 )
             }
@@ -268,5 +293,6 @@ class ChatFragment : BaseDialogFragment() {
         val sourceView: SourceView,
         val isBeta: Boolean,
         val podcastColors: PodcastColors,
+        val requiresSignIn: Boolean,
     ) : Parcelable
 }

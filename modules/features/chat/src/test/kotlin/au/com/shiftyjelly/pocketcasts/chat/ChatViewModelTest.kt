@@ -21,10 +21,12 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.NetworkConnectionWat
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MutableClock
 import com.automattic.eventhorizon.EpisodeChatBetaSheetDismissedEvent
 import com.automattic.eventhorizon.EpisodeChatBetaSheetShownEvent
+import com.automattic.eventhorizon.EpisodeChatBetaSheetSignInTappedEvent
 import com.automattic.eventhorizon.EpisodeChatClearUndoneEvent
 import com.automattic.eventhorizon.EpisodeChatClearedEvent
 import com.automattic.eventhorizon.EpisodeChatDeleteUndoneEvent
@@ -116,6 +118,10 @@ class ChatViewModelTest {
         on { episodeChatSurveySeen } doReturn surveySeenSetting
     }
     private val networkConnectionWatcher = TestNetworkConnectionWatcher()
+    private var isLoggedIn = true
+    private val syncManager = mock<SyncManager> {
+        on { isLoggedIn() } doAnswer { isLoggedIn }
+    }
     private val timeSource = TestTimeSource()
     private val clock = MutableClock(Instant.parse("2026-10-14T12:00:00Z"))
 
@@ -148,6 +154,7 @@ class ChatViewModelTest {
         ioDispatcher = coroutineRule.testDispatcher,
         timeSource = timeSource,
         clock = clock,
+        syncManager = syncManager,
     )
 
     @Test
@@ -1676,6 +1683,7 @@ class ChatViewModelTest {
         episodeDurationMs: Int = 123_000,
         sourceView: SourceView = SourceView.PLAYER,
         isBeta: Boolean = false,
+        requiresSignIn: Boolean = false,
     ) {
         viewModel.setEpisodeInfo(
             episodeUuid = EPISODE_UUID,
@@ -1685,6 +1693,7 @@ class ChatViewModelTest {
             episodeDurationMs = episodeDurationMs,
             sourceView = sourceView,
             isBeta = isBeta,
+            requiresSignIn = requiresSignIn,
         )
     }
 
@@ -1714,6 +1723,89 @@ class ChatViewModelTest {
         assertTrue(viewModel.uiState.value.isBetaSheetVisible)
         assertEquals(1, chatManager.createdChats.size)
         assertTrue(eventSink.isEmpty())
+    }
+
+    @Test
+    fun `signed out user always sees the beta sheet asking to sign in`() = runTest {
+        betaSheetSeen.value = true
+        isLoggedIn = false
+
+        setEpisodeInfo(isBeta = true, requiresSignIn = true)
+
+        val state = viewModel.uiState.value
+        assertTrue(state.isBetaSheetVisible)
+        assertTrue(state.isSignInRequired)
+        eventSink.skipEvent()
+        assertEquals(
+            EpisodeChatBetaSheetShownEvent(
+                source = SourceView.PLAYER.analyticsValue,
+                episodeUuid = EPISODE_UUID,
+                podcastUuid = PODCAST_UUID,
+            ),
+            eventSink.pollEvent(),
+        )
+    }
+
+    @Test
+    fun `tapping sign in on the beta sheet starts sign in and tracks it`() = runTest {
+        isLoggedIn = false
+        setEpisodeInfo(isBeta = true, requiresSignIn = true)
+        eventSink.skipEvent(2)
+
+        viewModel.navigation.test {
+            viewModel.onSignInClick()
+
+            assertEquals(ChatNavigation.SignIn, awaitItem())
+        }
+        assertEquals(
+            EpisodeChatBetaSheetSignInTappedEvent(
+                source = SourceView.PLAYER.analyticsValue,
+                episodeUuid = EPISODE_UUID,
+                podcastUuid = PODCAST_UUID,
+            ),
+            eventSink.pollEvent(),
+        )
+        assertTrue(viewModel.uiState.value.isBetaSheetVisible)
+    }
+
+    @Test
+    fun `coming back signed in hides the beta sheet and marks it seen`() = runTest {
+        isLoggedIn = false
+        setEpisodeInfo(isBeta = true, requiresSignIn = true)
+        eventSink.skipEvent(2)
+
+        isLoggedIn = true
+        viewModel.refreshSignIn()
+
+        val state = viewModel.uiState.value
+        assertFalse(state.isBetaSheetVisible)
+        assertFalse(state.isSignInRequired)
+        verify(betaSheetSeenSetting).set(true, updateModifiedAt = false)
+        assertTrue(eventSink.isEmpty())
+    }
+
+    @Test
+    fun `coming back without signing in keeps the beta sheet`() = runTest {
+        isLoggedIn = false
+        setEpisodeInfo(isBeta = true, requiresSignIn = true)
+
+        viewModel.refreshSignIn()
+
+        assertTrue(viewModel.uiState.value.isBetaSheetVisible)
+        verify(betaSheetSeenSetting, never()).set(any(), any(), any(), any())
+    }
+
+    @Test
+    fun `dismissing the sign in sheet closes the chat without marking the sheet seen`() = runTest {
+        isLoggedIn = false
+        setEpisodeInfo(isBeta = true, requiresSignIn = true)
+
+        viewModel.navigation.test {
+            viewModel.dismissBetaSheet()
+
+            assertEquals(ChatNavigation.Close, awaitItem())
+        }
+        verify(betaSheetSeenSetting, never()).set(any(), any(), any(), any())
     }
 
     @Test

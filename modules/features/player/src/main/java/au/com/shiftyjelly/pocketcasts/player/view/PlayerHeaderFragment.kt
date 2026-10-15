@@ -82,7 +82,6 @@ import androidx.lifecycle.repeatOnLifecycle
 import au.com.shiftyjelly.pocketcasts.ads.AdReportFragment
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.chat.ChatFragment
-import au.com.shiftyjelly.pocketcasts.chat.ChatSignInSheetFragment
 import au.com.shiftyjelly.pocketcasts.chat.EpisodeChatAccess
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.LocalPodcastColors
@@ -301,7 +300,7 @@ class PlayerHeaderFragment :
         observeShelfItemNavigationState()
         observeTranscriptPageTransition()
         observeSnackbarMessages()
-        parentFragmentManager.setFragmentResultListener(ChatSignInSheetFragment.SIGN_IN_RESULT_KEY, viewLifecycleOwner) { _, _ ->
+        parentFragmentManager.setFragmentResultListener(ChatFragment.SIGN_IN_RESULT_KEY, viewLifecycleOwner) { _, _ ->
             shelfSharedViewModel.onEpisodeChatSignInClick()
         }
     }
@@ -522,7 +521,6 @@ class PlayerHeaderFragment :
     override fun onResume() {
         super.onResume()
         isEpisodeChatUpsellOpening = false
-        shelfSharedViewModel.onReturnFromEpisodeChatSignIn()
     }
 
     private fun isMoreActionsOpen() = childFragmentManager.findFragmentByTag(MORE_ACTIONS_TAG) != null
@@ -542,7 +540,7 @@ class PlayerHeaderFragment :
     private fun showEpisodeChat(navigationState: NavigationState.ShowEpisodeChat) {
         val episode = navigationState.episode
         val access = navigationState.access
-        if (access is EpisodeChatAccess.Chat) {
+        if (access is EpisodeChatAccess.Chat || access is EpisodeChatAccess.SignIn) {
             if (parentFragmentManager.findFragmentByTag("episode_chat") == null) {
                 ChatFragment.newInstance(
                     episodeUuid = episode.uuid,
@@ -551,18 +549,11 @@ class PlayerHeaderFragment :
                     episodeTitle = episode.title,
                     episodeDurationMs = episode.durationMs,
                     sourceView = SourceView.PLAYER,
-                    isBeta = access.isBeta,
+                    isBeta = (access as? EpisodeChatAccess.Chat)?.isBeta ?: true,
                     podcastColors = PodcastColors(navigationState.podcast),
+                    requiresSignIn = access is EpisodeChatAccess.SignIn,
                 ).show(parentFragmentManager, "episode_chat")
             }
-        } else if (access is EpisodeChatAccess.SignIn) {
-            ChatSignInSheetFragment.show(
-                fragmentManager = parentFragmentManager,
-                episodeUuid = episode.uuid,
-                podcastUuid = episode.podcastUuid,
-                sourceView = SourceView.PLAYER,
-                podcastColors = PodcastColors(navigationState.podcast),
-            )
         } else if (!isEpisodeChatUpsellOpening) {
             isEpisodeChatUpsellOpening = true
             startUpsellFlow(OnboardingUpgradeSource.EPISODE_CHAT)

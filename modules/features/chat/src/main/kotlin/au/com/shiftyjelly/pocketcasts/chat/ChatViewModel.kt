@@ -21,9 +21,11 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.NetworkConnectionWat
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.eventhorizon.EpisodeChatBetaSheetDismissedEvent
 import com.automattic.eventhorizon.EpisodeChatBetaSheetShownEvent
+import com.automattic.eventhorizon.EpisodeChatBetaSheetSignInTappedEvent
 import com.automattic.eventhorizon.EpisodeChatClearUndoneEvent
 import com.automattic.eventhorizon.EpisodeChatClearedEvent
 import com.automattic.eventhorizon.EpisodeChatDeleteUndoneEvent
@@ -86,6 +88,7 @@ class ChatViewModel @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val timeSource: TimeSource,
     private val clock: Clock,
+    private val syncManager: SyncManager,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ChatUiState())
@@ -93,6 +96,9 @@ class ChatViewModel @Inject constructor(
 
     private val _toasts = Channel<ChatToast>(Channel.CONFLATED)
     val toasts = _toasts.receiveAsFlow()
+
+    private val _navigation = Channel<ChatNavigation>(Channel.CONFLATED)
+    val navigation = _navigation.receiveAsFlow()
 
     private var sendJob: Job? = null
     private var quotePlaybackJob: Job? = null
@@ -132,15 +138,34 @@ class ChatViewModel @Inject constructor(
         episodeDurationMs: Int,
         sourceView: SourceView,
         isBeta: Boolean,
+        requiresSignIn: Boolean = false,
     ) {
         if (chatEpisode.value != null) return
         this.sourceView = sourceView
-        _uiState.update { it.copy(isBeta = isBeta) }
+        _uiState.update { it.copy(isBeta = isBeta, isSignInRequired = requiresSignIn) }
         openChat(ChatEpisode(episodeUuid, episodeTitle, podcastUuid, podcastTitle, episodeDurationMs))
         observeMessages()
         observePlayback()
         observeHistory()
-        showBetaSheetIfNeeded(isBeta)
+        if (requiresSignIn) showBetaSheet() else showBetaSheetIfNeeded(isBeta)
+    }
+
+    fun onSignInClick() {
+        if (!_uiState.value.isSignInRequired) return
+        eventHorizon.track(
+            EpisodeChatBetaSheetSignInTappedEvent(
+                source = sourceView.analyticsValue,
+                episodeUuid = episodeUuid,
+                podcastUuid = podcastUuid,
+            ),
+        )
+        _navigation.trySend(ChatNavigation.SignIn)
+    }
+
+    fun refreshSignIn() {
+        if (!_uiState.value.isSignInRequired || !syncManager.isLoggedIn()) return
+        settings.episodeChatBetaSheetSeen.set(true, updateModifiedAt = false)
+        _uiState.update { it.copy(isSignInRequired = false, isBetaSheetVisible = false) }
     }
 
     private fun openChat(episode: ChatEpisode) {
@@ -619,7 +644,12 @@ class ChatViewModel @Inject constructor(
     }
 
     private fun showBetaSheetIfNeeded(isBeta: Boolean) {
-        if (!isBeta || settings.episodeChatBetaSheetSeen.value || _uiState.value.isBetaSheetVisible) return
+        if (!isBeta || settings.episodeChatBetaSheetSeen.value) return
+        showBetaSheet()
+    }
+
+    private fun showBetaSheet() {
+        if (_uiState.value.isBetaSheetVisible) return
         _uiState.update { it.copy(isBetaSheetVisible = true) }
         eventHorizon.track(
             EpisodeChatBetaSheetShownEvent(
@@ -699,8 +729,11 @@ class ChatViewModel @Inject constructor(
     }
 
     fun dismissBetaSheet() {
-        if (!_uiState.value.isBetaSheetVisible) return
-        settings.episodeChatBetaSheetSeen.set(true, updateModifiedAt = false)
+        val state = _uiState.value
+        if (!state.isBetaSheetVisible) return
+        if (!state.isSignInRequired) {
+            settings.episodeChatBetaSheetSeen.set(true, updateModifiedAt = false)
+        }
         _uiState.update { it.copy(isBetaSheetVisible = false) }
         eventHorizon.track(
             EpisodeChatBetaSheetDismissedEvent(
@@ -709,6 +742,9 @@ class ChatViewModel @Inject constructor(
                 podcastUuid = podcastUuid,
             ),
         )
+        if (state.isSignInRequired) {
+            _navigation.trySend(ChatNavigation.Close)
+        }
     }
 
     private fun trackShown() {
@@ -777,6 +813,11 @@ private class PlaybackPosition(
     val isPlaying: Boolean,
 )
 
+sealed interface ChatNavigation {
+    data object SignIn : ChatNavigation
+    data object Close : ChatNavigation
+}
+
 sealed interface ChatToast {
     data object FeedbackThanks : ChatToast
     data object ChatCleared : ChatToast
@@ -798,6 +839,7 @@ data class ChatUiState(
     val error: ChatError? = null,
     val isBeta: Boolean = false,
     val isBetaSheetVisible: Boolean = false,
+    val isSignInRequired: Boolean = false,
     val playback: ChatPlayback = ChatPlayback(),
     val otherPlayingEpisode: ChatPlayingEpisode? = null,
     val playingPodcast: Podcast? = null,

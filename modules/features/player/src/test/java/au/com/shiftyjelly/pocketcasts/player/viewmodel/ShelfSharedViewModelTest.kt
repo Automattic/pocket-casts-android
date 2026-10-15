@@ -118,7 +118,6 @@ class ShelfSharedViewModelTest {
     private val eventSink = TestEventSink()
 
     private val episodeChatTooltipDismissedSetting = mock<UserSetting<Boolean>>()
-    private val episodeChatBetaSheetSeenSetting = mock<UserSetting<Boolean>>()
 
     private val plusSubscription = Subscription(
         tier = SubscriptionTier.Plus,
@@ -616,43 +615,6 @@ class ShelfSharedViewModelTest {
             shelfSharedViewModel.onEpisodeChatSignInClick()
             assertEquals(NavigationState.StartEpisodeChatSignIn, awaitItem())
         }
-        verify(episodeChatBetaSheetSeenSetting, never()).set(true, updateModifiedAt = false)
-    }
-
-    @Test
-    fun `given sign in completed, when returning to the player, then the chat opens`() = runTest {
-        initViewModel(subscription = null)
-        FeatureFlag.setEnabled(Feature.EPISODE_CHAT_FREE_BETA, true)
-        whenever(syncManager.isLoggedIn()).thenReturn(false)
-        val podcast = Podcast(uuid = "podcastUuid")
-
-        shelfSharedViewModel.navigationState.test {
-            shelfSharedViewModel.onEpisodeChatClick(podcast, transcriptEpisode, isTranscriptAvailable = true, ShelfItemSource.Shelf)
-            shelfSharedViewModel.onEpisodeChatSignInClick()
-            skipItems(2)
-            whenever(syncManager.isLoggedIn()).thenReturn(true)
-            shelfSharedViewModel.onReturnFromEpisodeChatSignIn()
-            assertEquals(NavigationState.ShowEpisodeChat(podcast, transcriptEpisode, EpisodeChatAccess.Chat(isBeta = true)), awaitItem())
-            shelfSharedViewModel.onReturnFromEpisodeChatSignIn()
-            expectNoEvents()
-        }
-        verify(episodeChatBetaSheetSeenSetting).set(true, updateModifiedAt = false)
-    }
-
-    @Test
-    fun `given sign in cancelled, when returning to the player, then nothing opens`() = runTest {
-        initViewModel(subscription = null)
-        FeatureFlag.setEnabled(Feature.EPISODE_CHAT_FREE_BETA, true)
-        whenever(syncManager.isLoggedIn()).thenReturn(false)
-        val podcast = Podcast(uuid = "podcastUuid")
-
-        shelfSharedViewModel.navigationState.test {
-            shelfSharedViewModel.onEpisodeChatClick(podcast, transcriptEpisode, isTranscriptAvailable = true, ShelfItemSource.Shelf)
-            shelfSharedViewModel.onEpisodeChatSignInClick()
-            skipItems(2)
-            shelfSharedViewModel.onReturnFromEpisodeChatSignIn()
-            expectNoEvents()
-        }
     }
 
     @Test
@@ -824,7 +786,6 @@ class ShelfSharedViewModelTest {
 
         whenever(episodeChatTooltipDismissedSetting.flow).thenReturn(MutableStateFlow(isEpisodeChatTooltipDismissed))
         whenever(settings.episodeChatTooltipDismissed).thenReturn(episodeChatTooltipDismissedSetting)
-        whenever(settings.episodeChatBetaSheetSeen).thenReturn(episodeChatBetaSheetSeenSetting)
 
         val userSubscriptionSetting = mock<UserSetting<Subscription?>>()
         whenever(userSubscriptionSetting.value).thenReturn(subscription)
