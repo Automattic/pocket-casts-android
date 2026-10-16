@@ -307,6 +307,11 @@ class SimplePlayer(
                     }
                     return
                 }
+                if (error.isDecoderLost()) {
+                    LogBuffer.i(LogBuffer.TAG_PLAYBACK, error, "Decoder lost.")
+                    onPlayerEvent(this@SimplePlayer, PlayerEvent.DecoderLost(error))
+                    return
+                }
                 LogBuffer.e(LogBuffer.TAG_PLAYBACK, error, "Play failed.")
                 val event = PlayerEvent.PlayerError(error.message ?: "", error)
                 this@SimplePlayer.onError(event)

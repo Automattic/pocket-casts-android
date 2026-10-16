@@ -23,6 +23,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.download.UpdateEpisodeDetails
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackErrorClassifier
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlayerEvent
+import au.com.shiftyjelly.pocketcasts.repositories.playback.isDecoderLost
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.days
@@ -619,6 +620,8 @@ class EpisodeManagerImpl @Inject constructor(
             } else {
                 messageId = LR.string.error_unable_to_cast
             }
+        } else if (event.error?.isDecoderLost() == true) {
+            messageId = errorClassifier.classifyErrorStringId(event)
         } else if (episode.isDownloaded) {
             val downloadedFilePath = episode.downloadedFilePath
             if (downloadedFilePath?.isNotBlank() == true) {
