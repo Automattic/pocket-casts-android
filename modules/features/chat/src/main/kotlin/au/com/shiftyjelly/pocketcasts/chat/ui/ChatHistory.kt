@@ -79,7 +79,7 @@ internal fun ChatHistory(
             modifier = Modifier.padding(start = 8.dp),
         ) {
             Icon(
-                painter = painterResource(IR.drawable.ic_chevron_small_left),
+                painter = painterResource(IR.drawable.ic_arrow_back),
                 contentDescription = stringResource(LR.string.back),
                 tint = theme.iconButton,
             )
