@@ -43,8 +43,11 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.parcelize.Parcelize
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -140,11 +143,21 @@ class ChatFragment : BaseDialogFragment() {
             viewModel.toasts.collectLatest { toast ->
                 snackbarHostState.currentSnackbarData?.dismiss()
                 shownToast = toast
-                val result = snackbarHostState.showSnackbar(
-                    message = toast.message(resources),
-                    actionLabel = resources.getString(LR.string.chat_undo).takeIf { toast.isUndoable },
-                    duration = if (toast.isUndoable) SnackbarDuration.Long else SnackbarDuration.Short,
-                )
+                val result = coroutineScope {
+                    val undoTimeout = if (toast.isUndoable) {
+                        launch {
+                            delay(UNDO_TOAST_DURATION)
+                            snackbarHostState.currentSnackbarData?.dismiss()
+                        }
+                    } else {
+                        null
+                    }
+                    snackbarHostState.showSnackbar(
+                        message = toast.message(resources),
+                        actionLabel = resources.getString(LR.string.chat_undo).takeIf { toast.isUndoable },
+                        duration = if (toast.isUndoable) SnackbarDuration.Indefinite else SnackbarDuration.Short,
+                    ).also { undoTimeout?.cancel() }
+                }
                 shownToast = null
                 if (result == SnackbarResult.ActionPerformed) {
                     when (toast) {
@@ -303,3 +316,5 @@ class ChatFragment : BaseDialogFragment() {
         val requiresSignIn: Boolean,
     ) : Parcelable
 }
+
+private val UNDO_TOAST_DURATION = 8.seconds
