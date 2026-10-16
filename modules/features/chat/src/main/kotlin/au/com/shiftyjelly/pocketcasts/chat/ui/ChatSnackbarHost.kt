@@ -5,6 +5,7 @@ import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Snackbar
@@ -72,7 +73,10 @@ private fun ChatSnackbar(
                 }
             }
         },
-        modifier = Modifier.padding(horizontal = 16.dp),
+        elevation = 0.dp,
+        modifier = Modifier
+            .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+            .then(if (data.actionLabel != null) Modifier.heightIn(min = 56.dp) else Modifier),
     ) {
         Text(
             text = data.message,
