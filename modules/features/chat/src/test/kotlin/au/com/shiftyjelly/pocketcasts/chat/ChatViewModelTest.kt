@@ -221,9 +221,21 @@ class ChatViewModelTest {
                 podcastUuid = PODCAST_UUID,
                 hasHistory = false,
                 entryPoint = ChatEntryPoint.PlayerShelf.analyticsValue,
+                isBeta = false,
             ),
             eventSink.pollEvent(),
         )
+    }
+
+    @Test
+    fun `opening the chat through the free beta tracks it as beta`() = runTest {
+        setEpisodeInfo(isBeta = true)
+        advanceUntilIdle()
+
+        val shown = generateSequence { if (eventSink.isEmpty()) null else eventSink.pollEvent() }
+            .filterIsInstance<EpisodeChatShownEvent>()
+            .single()
+        assertEquals(true, shown.isBeta)
     }
 
     @Test
@@ -239,6 +251,7 @@ class ChatViewModelTest {
                 podcastUuid = PODCAST_UUID,
                 hasHistory = true,
                 entryPoint = ChatEntryPoint.MoreActions.analyticsValue,
+                isBeta = false,
             ),
             eventSink.pollEvent(),
         )
@@ -258,6 +271,7 @@ class ChatViewModelTest {
                 podcastUuid = PODCAST_UUID,
                 hasHistory = null,
                 entryPoint = ChatEntryPoint.PlayerShelf.analyticsValue,
+                isBeta = false,
             ),
             eventSink.pollEvent(),
         )
@@ -1526,6 +1540,7 @@ class ChatViewModelTest {
                 source = SourceView.PLAYER.analyticsValue,
                 episodeUuid = EPISODE_UUID,
                 podcastUuid = PODCAST_UUID,
+                isOtherEpisode = false,
             ),
             eventSink.pollEvent(),
         )
@@ -1712,10 +1727,12 @@ class ChatViewModelTest {
         viewModel.playQuote(quote.uuid)
         advanceUntilIdle()
 
+        eventSink.skipEvent(eventSink.size)
         viewModel.undoQuotePlay()
         advanceUntilIdle()
 
         verify(upNextQueue).changeList(queued)
+        assertEquals(true, (eventSink.pollEvent() as EpisodeChatQuotePlayUndoneEvent).isOtherEpisode)
     }
 
     @Test
@@ -2195,6 +2212,7 @@ class ChatViewModelTest {
                 podcastUuid = PODCAST_UUID,
                 hasHistory = true,
                 entryPoint = EpisodeChatEntryPointType.SignIn,
+                isBeta = true,
             ),
             eventSink.pollEvent(),
         )
@@ -2411,6 +2429,7 @@ class ChatViewModelTest {
                 podcastUuid = OTHER_PODCAST_UUID,
                 hasHistory = true,
                 entryPoint = ChatEntryPoint.History.analyticsValue,
+                isBeta = false,
             ),
             eventSink.pollEvent(),
         )
@@ -2617,6 +2636,7 @@ class ChatViewModelTest {
                 source = SourceView.PLAYER.analyticsValue,
                 episodeUuid = EPISODE_UUID,
                 podcastUuid = PODCAST_UUID,
+                isOtherEpisode = false,
             ),
             eventSink.pollEvent(),
         )
