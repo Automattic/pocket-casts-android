@@ -107,7 +107,7 @@ private fun SwipeToDismissToast(
                     scope.launch { offsetX.snapTo(offsetX.value + delta) }
                 },
                 onDragStopped = { velocity ->
-                    val isFarEnough = width > 0 && abs(offsetX.value) > width * DismissDistanceFraction
+                    val isFarEnough = width > 0 && abs(offsetX.value) > width * DISMISS_DISTANCE_FRACTION
                     val isFlungAway = abs(velocity) > dismissVelocity && sign(velocity) != -sign(offsetX.value)
                     if (isFarEnough || isFlungAway) {
                         val direction = if (isFlungAway) sign(velocity) else sign(offsetX.value)
@@ -123,5 +123,5 @@ private fun SwipeToDismissToast(
     }
 }
 
-private const val DismissDistanceFraction = 0.4f
+private const val DISMISS_DISTANCE_FRACTION = 0.4f
 private val DismissVelocity = 1000.dp
