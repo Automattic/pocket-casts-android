@@ -10,6 +10,7 @@ data class EpisodeChatHistoryItem(
     @ColumnInfo(name = "podcast_title") val podcastTitle: String,
     @ColumnInfo(name = "episode_duration") val episodeDuration: Double,
     @ColumnInfo(name = "last_message_at") val lastMessageAt: Date,
+    @ColumnInfo(name = "episode_image_url") val episodeImageUrl: String? = null,
 ) {
     val episodeDurationMs get() = (episodeDuration * 1000).toInt()
 }
