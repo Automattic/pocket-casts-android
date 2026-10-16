@@ -629,6 +629,7 @@ class ChatViewModel @Inject constructor(
                 source = sourceView.analyticsValue,
                 episodeUuid = undo.quoteEpisodeUuid,
                 podcastUuid = undo.quotePodcastUuid,
+                isOtherEpisode = undo.episodeSwitch != null,
             ),
         )
         val previousJob = quotePlaybackJob
@@ -884,6 +885,7 @@ class ChatViewModel @Inject constructor(
                 podcastUuid = podcastUuid,
                 hasHistory = hasHistory,
                 entryPoint = entryPoint.analyticsValue,
+                isBeta = _uiState.value.isBeta,
             ),
         )
     }
