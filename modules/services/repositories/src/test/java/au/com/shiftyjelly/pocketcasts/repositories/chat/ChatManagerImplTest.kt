@@ -129,6 +129,7 @@ class ChatManagerImplTest {
         assertEquals("00:00:03", quote.end)
         assertEquals(1_000, quote.startMs)
         assertEquals(3_000, quote.endMs)
+        assertEquals(false, quote.isFromGeneratedTranscript)
     }
 
     @Test
@@ -151,6 +152,42 @@ class ChatManagerImplTest {
         val requestCaptor = argumentCaptor<EpisodeChatRequest>()
         verify(podcastCacheServiceManager).episodeChat(any(), requestCaptor.capture())
         assertEquals("vtt-url", requestCaptor.firstValue.transcriptUrl)
+    }
+
+    @Test
+    fun `send message marks quotes from the generated transcript`() = runTest {
+        transcripts.value = listOf(createTranscript(type = "text/vtt", isGenerated = true, url = "generated-url"))
+        whenever(podcastCacheServiceManager.episodeChat(any(), any())).thenReturn(
+            EpisodeChatResponse(
+                reply = "Assistant reply",
+                quote = EpisodeChatQuote(text = "Quoted text", start = "00:00:01", end = "00:00:03"),
+            ),
+        )
+
+        manager.sendMessage(
+            episodeUuid = EPISODE_UUID,
+            message = ChatMessage.User(text = "Question", uuid = "user-uuid"),
+            allMessages = emptyList(),
+        )
+
+        val quote = episodeChatDao.messages.toChatMessages(quoteAdapter()).filterIsInstance<ChatMessage.Quote>().single()
+        assertEquals(true, quote.isFromGeneratedTranscript)
+    }
+
+    @Test
+    fun `quotes stored before the generated transcript flag read as not generated`() {
+        val entity = EpisodeChatMessage(
+            uuid = "quote-uuid",
+            episodeUuid = EPISODE_UUID,
+            text = "Quoted text",
+            role = ChatRole.Quote.value,
+            metadata = """{"start":"00:00:01","end":"00:00:03"}""",
+        )
+
+        val quote = listOf(entity).toChatMessages(quoteAdapter()).single() as ChatMessage.Quote
+
+        assertEquals(1_000, quote.startMs)
+        assertEquals(false, quote.isFromGeneratedTranscript)
     }
 
     @Test
