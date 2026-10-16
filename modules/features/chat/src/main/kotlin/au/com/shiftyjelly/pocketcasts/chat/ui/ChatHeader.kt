@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
@@ -18,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
@@ -32,7 +34,10 @@ import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.LocalPodcastColors
 import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
 import au.com.shiftyjelly.pocketcasts.compose.PodcastColorsParameterProvider
+import au.com.shiftyjelly.pocketcasts.compose.components.EpisodeImage
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
+import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
+import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory.PlaceholderType
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -42,6 +47,7 @@ internal fun ChatHeader(
     episodeTitle: String,
     podcastUuid: String,
     podcastTitle: String,
+    userEpisode: UserEpisode?,
     playback: ChatPlayback,
     onClickClose: () -> Unit,
     onClickMore: () -> Unit,
@@ -78,12 +84,24 @@ internal fun ChatHeader(
                 .fillMaxWidth()
                 .padding(start = 16.dp, end = 4.dp, top = 12.dp, bottom = 12.dp),
         ) {
-            PodcastImage(
-                uuid = podcastUuid,
-                imageSize = 44.dp,
-                cornerSize = 4.dp,
-                elevation = null,
-            )
+            if (userEpisode != null) {
+                EpisodeImage(
+                    episode = userEpisode,
+                    useEpisodeArtwork = true,
+                    placeholderType = PlaceholderType.Small,
+                    corners = 4.dp,
+                    modifier = Modifier
+                        .size(44.dp)
+                        .clip(RoundedCornerShape(4.dp)),
+                )
+            } else {
+                PodcastImage(
+                    uuid = podcastUuid,
+                    imageSize = 44.dp,
+                    cornerSize = 4.dp,
+                    elevation = null,
+                )
+            }
             Spacer(modifier = Modifier.width(8.dp))
             Column(
                 modifier = Modifier
@@ -100,7 +118,7 @@ internal fun ChatHeader(
                     overflow = TextOverflow.Ellipsis,
                 )
                 Text(
-                    text = podcastTitle,
+                    text = podcastTitle.ifEmpty { if (userEpisode != null) stringResource(LR.string.profile_navigation_files) else "" },
                     color = theme.tertiaryText,
                     fontSize = 13.sp,
                     lineHeight = 18.sp,
@@ -145,6 +163,7 @@ private fun ChatHeaderPreview(
                 episodeTitle = "Navigating Life Insurance Choices",
                 podcastUuid = "preview-podcast-uuid",
                 podcastTitle = "Smart Money",
+                userEpisode = null,
                 playback = ChatPlayback(isPlaying = true, positionMs = 30, durationMs = 100),
                 onClickClose = {},
                 onClickMore = {},

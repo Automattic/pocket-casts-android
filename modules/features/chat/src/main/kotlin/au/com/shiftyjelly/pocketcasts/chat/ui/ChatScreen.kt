@@ -200,10 +200,12 @@ private fun ChatContent(
             .background(theme.background)
             .imePadding(),
     ) {
+        val playingEpisode = uiState.otherPlayingEpisode
         ChatHeader(
-            episodeTitle = uiState.episodeTitle,
-            podcastUuid = uiState.podcastUuid,
-            podcastTitle = uiState.podcastTitle,
+            episodeTitle = playingEpisode?.episodeTitle ?: uiState.episodeTitle,
+            podcastUuid = playingEpisode?.podcastUuid ?: uiState.podcastUuid,
+            podcastTitle = playingEpisode?.podcastTitle ?: uiState.podcastTitle,
+            userEpisode = playingEpisode?.userEpisode,
             playback = uiState.playback,
             onClickClose = onClickClose,
             onClickPlayPause = onClickPlayPause,
@@ -224,6 +226,12 @@ private fun ChatContent(
                     .padding(start = 16.dp, end = 16.dp, top = 24.dp, bottom = 12.dp),
             ) {
                 val typingTransition = rememberInfiniteTransition(label = "typing")
+                if (uiState.otherPlayingEpisode != null) {
+                    ChatAboutEpisode(
+                        episodeTitle = uiState.episodeTitle,
+                        theme = theme,
+                    )
+                }
                 if (uiState.areMessagesLoaded && uiState.messages.isEmpty() && !uiState.isAwaitingReply) {
                     ChatWelcome(
                         isSuggestionEnabled = uiState.isConnected,
@@ -396,6 +404,23 @@ private fun ChatAnswerAppear(
 }
 
 private val ChatMessage?.isAnswer get() = this is ChatMessage.Assistant || this is ChatMessage.Quote
+
+@Composable
+private fun ChatAboutEpisode(
+    episodeTitle: String,
+    theme: ChatTheme,
+    modifier: Modifier = Modifier,
+) {
+    Text(
+        text = stringResource(LR.string.chat_about_episode, episodeTitle),
+        color = theme.inputHint,
+        fontSize = 12.sp,
+        lineHeight = 16.sp,
+        fontWeight = FontWeight.SemiBold,
+        textAlign = TextAlign.Center,
+        modifier = modifier.fillMaxWidth(),
+    )
+}
 
 @Composable
 private fun ChatDisclaimer(

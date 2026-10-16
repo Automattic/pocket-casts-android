@@ -138,7 +138,7 @@ class ChatFragment : BaseDialogFragment() {
         }
 
         AppTheme(theme.activeTheme) {
-            CompositionLocalProvider(LocalPodcastColors provides args.podcastColors) {
+            CompositionLocalProvider(LocalPodcastColors provides uiState.podcastColors) {
                 val backgroundColor = MaterialTheme.theme.rememberPlayerColorsOrDefault().background01
                 LaunchedEffect(backgroundColor) {
                     setDialogTint(backgroundColor.toArgb())
@@ -170,7 +170,7 @@ class ChatFragment : BaseDialogFragment() {
             episodeUuid = args.episodeUuid,
             podcastUuid = args.podcastUuid,
             sourceView = args.sourceView,
-            podcastColors = args.podcastColors,
+            podcastColors = viewModel.uiState.value.podcastColors,
             trigger = ChatFeedbackFragment.Trigger.ResponseRating,
         )
     }
@@ -215,7 +215,7 @@ class ChatFragment : BaseDialogFragment() {
             episodeUuid = args.episodeUuid,
             podcastUuid = args.podcastUuid,
             sourceView = args.sourceView,
-            podcastColors = args.podcastColors,
+            podcastColors = viewModel.uiState.value.podcastColors,
         )
     }
 
@@ -229,6 +229,12 @@ class ChatFragment : BaseDialogFragment() {
             behavior.maxHeight = resources.displayMetrics.heightPixels
         }
     }
+
+    private val ChatUiState.podcastColors
+        get() = when {
+            otherPlayingEpisode?.userEpisode != null -> PodcastColors.ForUserEpisode
+            else -> playingPodcast?.let(::PodcastColors) ?: args.podcastColors
+        }
 
     private val ChatToast.isUndoable get() = this != ChatToast.FeedbackThanks
 
