@@ -308,8 +308,8 @@ class SimplePlayer(
                     return
                 }
                 if (error.isDecoderLost()) {
-                    LogBuffer.e(LogBuffer.TAG_PLAYBACK, error, "Decoder lost. playWhenReady: ${player.playWhenReady}")
-                    onPlayerEvent(this@SimplePlayer, PlayerEvent.DecoderLost(error, player.playWhenReady))
+                    LogBuffer.i(LogBuffer.TAG_PLAYBACK, error, "Decoder lost.")
+                    onPlayerEvent(this@SimplePlayer, PlayerEvent.DecoderLost(error))
                     return
                 }
                 LogBuffer.e(LogBuffer.TAG_PLAYBACK, error, "Play failed.")
