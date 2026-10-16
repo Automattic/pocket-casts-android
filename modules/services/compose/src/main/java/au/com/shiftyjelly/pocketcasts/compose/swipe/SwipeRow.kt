@@ -1,5 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.compose.swipe
 
+import androidx.compose.material.Text
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.AnchoredDraggableDefaults
@@ -270,12 +273,22 @@ private fun BoxScope.SwipeRowActionSlab(
                     translationX = if (isLeading) shift else -shift
                 },
         ) {
-            Icon(
-                painter = painterResource(action.iconId),
-                contentDescription = action.contentDescription,
-                tint = action.iconTint,
-                modifier = Modifier.size(ActionIconSize),
-            )
+            if (action.label != null) {
+                Text(
+                    text = action.label,
+                    color = action.iconTint,
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    maxLines = 1,
+                )
+            } else {
+                Icon(
+                    painter = painterResource(action.iconId),
+                    contentDescription = action.contentDescription,
+                    tint = action.iconTint,
+                    modifier = Modifier.size(ActionIconSize),
+                )
+            }
         }
     }
 }

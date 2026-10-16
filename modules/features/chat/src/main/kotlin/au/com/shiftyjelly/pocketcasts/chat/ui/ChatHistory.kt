@@ -161,6 +161,7 @@ private fun ChatHistoryRow(
     SwipeRow(
         state = rememberSwipeRowState(item.episodeUuid),
         trailingAction = SwipeRowActionDefaults.delete(
+            label = stringResource(LR.string.delete),
             isFullSwipeEnabled = true,
             onClick = { onDelete() },
         ),

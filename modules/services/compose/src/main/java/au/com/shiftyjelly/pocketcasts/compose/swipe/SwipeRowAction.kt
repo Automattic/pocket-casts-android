@@ -16,6 +16,7 @@ data class SwipeRowAction(
     val contentDescription: String,
     val backgroundColor: Color,
     val iconTint: Color = Color.White,
+    val label: String? = null,
     val isFullSwipeEnabled: Boolean = false,
     val onClick: (SwipeRowState) -> Unit,
 )
@@ -37,12 +38,14 @@ object SwipeRowActionDefaults {
     @Composable
     fun delete(
         contentDescription: String = stringResource(LR.string.delete),
+        label: String? = null,
         isFullSwipeEnabled: Boolean = false,
         onClick: (SwipeRowState) -> Unit,
     ) = SwipeRowAction(
         iconId = IR.drawable.ic_delete,
         contentDescription = contentDescription,
         backgroundColor = Material.theme.colors.support05,
+        label = label,
         isFullSwipeEnabled = isFullSwipeEnabled,
         onClick = onClick,
     )
