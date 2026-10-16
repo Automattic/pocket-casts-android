@@ -1,8 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.compose.swipe
 
-import androidx.compose.material.Text
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.AnchoredDraggableDefaults
@@ -23,6 +20,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.Icon
 import androidx.compose.material.LocalRippleConfiguration
 import androidx.compose.material.RippleConfiguration
+import androidx.compose.material.Text
 import androidx.compose.material.ripple.RippleAlpha
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -49,9 +47,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
