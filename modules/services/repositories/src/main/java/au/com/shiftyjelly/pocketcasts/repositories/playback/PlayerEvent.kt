@@ -7,6 +7,7 @@ import androidx.media3.common.PlaybackException
  */
 sealed class PlayerEvent {
     class PlayerError(val message: String, val error: PlaybackException? = null) : PlayerEvent()
+    class DecoderLost(val error: PlaybackException, val playWhenReady: Boolean) : PlayerEvent()
     object BufferingStateChanged : PlayerEvent()
     object PlayerPlaying : PlayerEvent()
     object PlayerPaused : PlayerEvent()

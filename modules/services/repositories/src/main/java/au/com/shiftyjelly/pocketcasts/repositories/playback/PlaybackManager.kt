@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.media.MediaPlayer
+import android.os.SystemClock
 import android.widget.Toast
 import androidx.annotation.MainThread
 import androidx.annotation.OptIn
@@ -188,6 +189,7 @@ open class PlaybackManager @Inject constructor(
         private const val MAX_TIME_WITHOUT_FOCUS_FOR_RESUME = (MAX_TIME_WITHOUT_FOCUS_FOR_RESUME_MINUTES * 60 * 1000).toLong()
         private const val PAUSE_TIMER_DELAY = ((MAX_TIME_WITHOUT_FOCUS_FOR_RESUME_MINUTES + 1) * 60 * 1000).toLong()
         private const val HLS_ENGINE_EXOPLAYER = "exoplayer"
+        private const val DECODER_RECOVERY_INTERVAL_MS = 60_000L
     }
 
     private var notificationPermissionChecker: NotificationPermissionChecker? = null
@@ -231,6 +233,9 @@ open class PlaybackManager @Inject constructor(
 
     private var updateCount = 0
     private var resettingPlayer = false
+    private var decoderLostPlayer: Player? = null
+    private var lastDecoderRecoveryMs: Long? = null
+    private var isDecoderRecoveryPending = false
     private var episodeLastBufferStatus: EpisodeBufferStatus? = null
     private var focusWasPlaying: Date? = null
     private var forcePlayerSwitch = false
@@ -1100,6 +1105,7 @@ open class PlaybackManager @Inject constructor(
                 player = null
             }
         }
+        decoderLostPlayer = null
 
         playbackStateRelay.blockingFirst().let {
             playbackStateRelay.accept(
@@ -1502,6 +1508,29 @@ open class PlaybackManager @Inject constructor(
 
     /** LISTENERS  */
 
+    private suspend fun onDecoderLost(event: PlayerEvent.DecoderLost) {
+        val lastRecoveryMs = lastDecoderRecoveryMs
+        if (lastRecoveryMs != null && SystemClock.elapsedRealtime() - lastRecoveryMs < DECODER_RECOVERY_INTERVAL_MS) {
+            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Decoder lost again shortly after recovering, giving up")
+            onPlayerError(PlayerEvent.PlayerError(event.error.message.orEmpty(), event.error))
+            return
+        }
+
+        decoderLostPlayer = player
+        when {
+            event.playWhenReady -> loadCurrentEpisode(play = true)
+            mediaSessionManager.isMedia3SessionActive -> loadCurrentEpisode(play = false)
+            else -> LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Decoder lost while paused, recovering on next play")
+        }
+    }
+
+    private fun startDecoderRecovery() {
+        decoderLostPlayer = null
+        lastDecoderRecoveryMs = SystemClock.elapsedRealtime()
+        isDecoderRecoveryPending = true
+        LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Decoder recovery started")
+    }
+
     @OptIn(UnstableApi::class)
     suspend fun onPlayerError(event: PlayerEvent.PlayerError) {
         settings.recordErrorSession()
@@ -1897,6 +1926,11 @@ open class PlaybackManager @Inject constructor(
     }
 
     suspend fun onDurationAvailable() {
+        if (isDecoderRecoveryPending) {
+            isDecoderRecoveryPending = false
+            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Decoder recovery succeeded")
+        }
+
         val episode = getCurrentEpisode()
         if (episode == null || player == null) {
             return
@@ -2122,7 +2156,8 @@ open class PlaybackManager @Inject constructor(
             playbackOnDevice &&
                 player != null &&
                 (
-                    player?.isStreaming != playingStream ||
+                    player === decoderLostPlayer ||
+                        player?.isStreaming != playingStream ||
                         (episode.isDownloaded && episode.downloadedFilePath != null && episode.downloadedFilePath != player?.filePath)
                     )
         }
@@ -2330,6 +2365,9 @@ open class PlaybackManager @Inject constructor(
             isPlayerSwitchRequired() ||
             isPlayerResetNeeded(episode, sameEpisode, castConnected, playingStream)
         ) {
+            if (player != null && player === decoderLostPlayer) {
+                startDecoderRecovery()
+            }
             // Don't create a player if we aren't playing because it will start to buffer
             if (play) {
                 Timber.d("Resetting player")
@@ -2634,6 +2672,7 @@ open class PlaybackManager @Inject constructor(
                 is PlayerEvent.SeekComplete -> onSeekComplete(event.positionMs)
                 is PlayerEvent.MetadataAvailable -> onMetadataAvailable(event.metaData)
                 is PlayerEvent.PlayerError -> onPlayerError(event)
+                is PlayerEvent.DecoderLost -> onDecoderLost(event)
                 is PlayerEvent.RemoteMetadataNotMatched -> onRemoteMetaDataNotMatched(event.remoteEpisodeUuid)
                 is PlayerEvent.EpisodeChanged -> onEpisodeChanged(event.episodeUuid)
                 is PlayerEvent.CachingComplete -> onCachingComplete(event.episodeUuid)
