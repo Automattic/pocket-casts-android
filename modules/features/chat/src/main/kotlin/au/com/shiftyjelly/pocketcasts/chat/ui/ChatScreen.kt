@@ -253,6 +253,7 @@ private fun ChatContent(
                     )
                 }
                 val answerUuidsByLastIndex = uiState.answerUuidsByLastIndex
+                val latestAnswerLastIndex = answerUuidsByLastIndex.keys.maxOrNull()
                 uiState.messages.forEachIndexed { index, message ->
                     key(message.uuid) {
                         val isNew = message.uuid !in initialMessageUuids
@@ -305,13 +306,10 @@ private fun ChatContent(
                                 )
                             }
                         }
-                    }
-                }
-                val lastMessage = uiState.messages.lastOrNull()
-                if (lastMessage.isAnswer && !uiState.isAwaitingReply) {
-                    key(lastMessage?.uuid) {
-                        ChatAppear(animate = lastMessage?.uuid !in initialMessageUuids) {
-                            ChatDisclaimer(theme = theme)
+                        if (index == latestAnswerLastIndex) {
+                            ChatAppear(animate = isNew) {
+                                ChatDisclaimer(theme = theme)
+                            }
                         }
                     }
                 }
