@@ -17,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.ReadSetting
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatAnswerRating
+import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatInputType
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatManager
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatMessage
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatQuoteSeeker
@@ -656,6 +657,52 @@ class ChatViewModelTest {
 
         assertEquals(
             EpisodeChatInputType.SummaryPrompt,
+            (eventSink.pollEvent() as EpisodeChatMessageSentEvent).inputType,
+        )
+    }
+
+    @Test
+    fun `retrying a reopened summarize question keeps the summarize input type`() = runTest {
+        chatManager.messages.value = listOf(
+            ChatMessage.User(
+                text = "Summarize this episode",
+                failure = ChatSendFailure.Network,
+                inputType = ChatInputType.SummaryPrompt,
+                uuid = "question-uuid",
+            ),
+        )
+        setEpisodeInfo()
+        connectToInternet()
+        advanceUntilIdle()
+        eventSink.skipEvent(eventSink.size)
+
+        viewModel.retry()
+        advanceUntilIdle()
+
+        assertEquals(
+            EpisodeChatInputType.SummaryPrompt,
+            (eventSink.pollEvent() as EpisodeChatMessageSentEvent).inputType,
+        )
+    }
+
+    @Test
+    fun `retrying a reopened typed question after a summarize send tracks it as typed`() = runTest {
+        setEpisodeInfo()
+        connectToInternet()
+        chatManager.sendMessageException = IOException()
+        viewModel.onSummarizeClick("Summarize this episode")
+        advanceUntilIdle()
+        chatManager.sendMessageException = null
+        chatManager.otherMessages.value = listOf(ChatMessage.User(text = "Typed", failure = ChatSendFailure.Network, uuid = "typed-uuid"))
+        viewModel.openHistoryChat(historyItem(OTHER_EPISODE_UUID))
+        advanceUntilIdle()
+        eventSink.skipEvent(eventSink.size)
+
+        viewModel.retry()
+        advanceUntilIdle()
+
+        assertEquals(
+            EpisodeChatInputType.Typed,
             (eventSink.pollEvent() as EpisodeChatMessageSentEvent).inputType,
         )
     }

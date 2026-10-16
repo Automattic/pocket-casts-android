@@ -10,6 +10,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.EpisodeChatHistoryItem
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatAnswerRating
+import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatInputType
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatManager
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatMessage
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatQuoteSeeker
@@ -121,7 +122,6 @@ class ChatViewModel @Inject constructor(
     @Volatile private var quotePlaybackUndo: PlaybackPosition? = null
     private var transientUserMessage: ChatMessage.User? = null
     private var pendingShownEntryPoint: ChatEntryPoint? = null
-    private var transientInputType: EpisodeChatInputType = EpisodeChatInputType.Typed
     private var hasReceivedAnswer = false
     private var hasSubmittedFeedback = false
     private lateinit var sourceView: SourceView
@@ -503,19 +503,19 @@ class ChatViewModel @Inject constructor(
         val text = _uiState.value.inputText.trim()
 
         _uiState.update { it.copy(inputText = "") }
-        performSend(message = ChatMessage.User(text = text), inputType = EpisodeChatInputType.Typed)
+        performSend(message = ChatMessage.User(text = text, inputType = ChatInputType.Typed))
     }
 
     fun onSummarizeClick(text: String) {
         val state = _uiState.value
         if (!state.areMessagesLoaded || state.isAwaitingReply || !state.isConnected) return
-        performSend(message = ChatMessage.User(text = text), inputType = EpisodeChatInputType.SummaryPrompt)
+        performSend(message = ChatMessage.User(text = text, inputType = ChatInputType.SummaryPrompt))
     }
 
     fun retry() {
         if (!_uiState.value.isConnected || _uiState.value.isAwaitingReply) return
         val failedUserMessage = transientUserMessage ?: return
-        performSend(message = failedUserMessage, inputType = transientInputType, isRetry = true)
+        performSend(message = failedUserMessage, isRetry = true)
     }
 
     fun playQuote(quoteUuid: String) {
@@ -623,11 +623,11 @@ class ChatViewModel @Inject constructor(
         } != null
     }
 
-    private fun performSend(message: ChatMessage.User, inputType: EpisodeChatInputType, isRetry: Boolean = false) {
+    private fun performSend(message: ChatMessage.User, isRetry: Boolean = false) {
+        val inputType = message.inputType.analyticsValue
         val supersededQuestionUuid = transientUserMessage?.uuid?.takeIf { it != message.uuid }
         val unsentMessageUuids = setOfNotNull(transientUserMessage?.uuid, message.uuid)
         transientUserMessage = message
-        transientInputType = inputType
         val currentMessages = _uiState.value.messages.filterNot { it.uuid in unsentMessageUuids }
         val messageIndex = currentMessages.count { it is ChatMessage.User } + 1L
         eventHorizon.track(
@@ -935,6 +935,12 @@ private val ChatAnswerRating.analyticsValue
     get() = when (this) {
         ChatAnswerRating.Positive -> EpisodeChatSentimentType.Positive
         ChatAnswerRating.Negative -> EpisodeChatSentimentType.Negative
+    }
+
+private val ChatInputType.analyticsValue
+    get() = when (this) {
+        ChatInputType.Typed -> EpisodeChatInputType.Typed
+        ChatInputType.SummaryPrompt -> EpisodeChatInputType.SummaryPrompt
     }
 
 data class ChatPlayingEpisode(

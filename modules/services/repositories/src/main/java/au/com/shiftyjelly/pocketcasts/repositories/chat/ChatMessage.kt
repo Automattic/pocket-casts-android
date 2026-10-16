@@ -11,6 +11,7 @@ sealed interface ChatMessage {
     data class User(
         val text: String,
         val failure: ChatSendFailure? = null,
+        val inputType: ChatInputType = ChatInputType.Typed,
         override val uuid: String = UUID.randomUUID().toString(),
     ) : ChatMessage {
         override val role: ChatRole get() = ChatRole.User
@@ -79,7 +80,7 @@ internal fun ChatMessage.toEntity(
     userMetadataAdapter: JsonAdapter<UserMessageMetadata>,
 ): EpisodeChatMessage {
     val (text, metadata) = when (this) {
-        is ChatMessage.User -> text to failure?.let { userMetadataAdapter.toJson(UserMessageMetadata(it.value)) }
+        is ChatMessage.User -> text to userMetadataAdapter.toJsonOrNull(this)
         is ChatMessage.Assistant -> text to null
         is ChatMessage.Quote -> text to quoteMetadataAdapter.toJson(QuoteMetadata(start, end, isFromGeneratedTranscript))
     }
@@ -93,18 +94,26 @@ internal fun ChatMessage.toEntity(
     )
 }
 
+private fun JsonAdapter<UserMessageMetadata>.toJsonOrNull(message: ChatMessage.User): String? {
+    val inputType = message.inputType.takeUnless { it == ChatInputType.Typed }
+    if (message.failure == null && inputType == null) return null
+    return toJson(UserMessageMetadata(failure = message.failure?.value, inputType = inputType?.value))
+}
+
 internal fun List<EpisodeChatMessage>.toChatMessages(
     quoteMetadataAdapter: JsonAdapter<QuoteMetadata>,
     userMetadataAdapter: JsonAdapter<UserMessageMetadata>,
 ) = mapNotNull { entity ->
     when (entity.role) {
-        ChatRole.User.value -> ChatMessage.User(
-            text = entity.text,
-            failure = entity.metadata
-                ?.let { raw -> runCatching { userMetadataAdapter.fromJson(raw) }.getOrNull() }
-                ?.let { ChatSendFailure.fromValue(it.failure) },
-            uuid = entity.uuid,
-        )
+        ChatRole.User.value -> {
+            val metadata = entity.metadata?.let { raw -> runCatching { userMetadataAdapter.fromJson(raw) }.getOrNull() }
+            ChatMessage.User(
+                text = entity.text,
+                failure = ChatSendFailure.fromValue(metadata?.failure),
+                inputType = ChatInputType.fromValue(metadata?.inputType) ?: ChatInputType.Typed,
+                uuid = entity.uuid,
+            )
+        }
 
         ChatRole.Quote.value -> entity.toQuoteMessageOrNull(quoteMetadataAdapter)
 
