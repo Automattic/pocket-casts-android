@@ -2160,6 +2160,23 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `showing the history before it loads tracks how many chats there are once it loads`() = runTest {
+        val history = MutableSharedFlow<List<EpisodeChatHistoryItem>>()
+        chatManager.observedHistory = history
+        setEpisodeInfo()
+        advanceUntilIdle()
+        eventSink.skipEvent()
+
+        viewModel.showHistory()
+        assertTrue(eventSink.isEmpty())
+        history.emit(listOf(historyItem(EPISODE_UUID), historyItem(OTHER_EPISODE_UUID, daysAgo = 3)))
+        advanceUntilIdle()
+
+        assertEquals(EpisodeChatHistoryShownEvent(source = SourceView.PLAYER.analyticsValue, chatCount = 2), eventSink.pollEvent())
+        assertTrue(eventSink.isEmpty())
+    }
+
+    @Test
     fun `showing the history again regroups the chats for the current day`() = runTest {
         chatManager.history.value = listOf(historyItem(EPISODE_UUID))
         setEpisodeInfo()
@@ -2428,7 +2445,9 @@ class ChatViewModelTest {
 
         private fun messagesFor(episodeUuid: String) = if (episodeUuid == OTHER_EPISODE_UUID) otherMessages else messages
 
-        override fun observeHistory(): Flow<List<EpisodeChatHistoryItem>> = history
+        var observedHistory: Flow<List<EpisodeChatHistoryItem>>? = null
+
+        override fun observeHistory(): Flow<List<EpisodeChatHistoryItem>> = observedHistory ?: history
 
         val discardedMessageUuids = mutableListOf<String>()
 
