@@ -122,8 +122,11 @@ class ChatFragment : BaseDialogFragment() {
                 if (result == SnackbarResult.ActionPerformed) {
                     when (toast) {
                         ChatToast.ChatCleared -> viewModel.undoClearChat()
+                        is ChatToast.QuotePlaying -> viewModel.undoQuotePlay()
                         ChatToast.FeedbackThanks -> Unit
                     }
+                } else if (toast is ChatToast.QuotePlaying) {
+                    viewModel.onQuoteUndoExpired()
                 }
             }
         }
@@ -227,11 +230,12 @@ class ChatFragment : BaseDialogFragment() {
         }
     }
 
-    private val ChatToast.isUndoable get() = this == ChatToast.ChatCleared
+    private val ChatToast.isUndoable get() = this != ChatToast.FeedbackThanks
 
     private fun ChatToast.message(resources: Resources) = when (this) {
         ChatToast.FeedbackThanks -> resources.getString(LR.string.chat_feedback_thank_you)
         ChatToast.ChatCleared -> resources.getString(LR.string.chat_cleared)
+        is ChatToast.QuotePlaying -> resources.getString(LR.string.chat_now_playing_episode, episodeTitle)
     }
 
     @Parcelize

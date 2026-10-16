@@ -200,7 +200,7 @@ class TranscriptManagerImpl @Inject constructor(
     }
 }
 
-private val TranscriptsComparator = compareBy<DbTranscript>(
+internal val TranscriptsComparator = compareBy<DbTranscript>(
     { it.isGenerated },
     { TranscriptType.fromMimeType(it.type).priority },
 )

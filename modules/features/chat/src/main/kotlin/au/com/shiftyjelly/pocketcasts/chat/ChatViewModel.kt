@@ -26,6 +26,7 @@ import com.automattic.eventhorizon.EpisodeChatInputType
 import com.automattic.eventhorizon.EpisodeChatMessageFailedEvent
 import com.automattic.eventhorizon.EpisodeChatMessageSentEvent
 import com.automattic.eventhorizon.EpisodeChatQuotePlayTappedEvent
+import com.automattic.eventhorizon.EpisodeChatQuotePlayUndoneEvent
 import com.automattic.eventhorizon.EpisodeChatQuoteSourceType
 import com.automattic.eventhorizon.EpisodeChatResponseRatedEvent
 import com.automattic.eventhorizon.EpisodeChatResponseReceivedEvent
@@ -77,6 +78,7 @@ class ChatViewModel @Inject constructor(
 
     @Volatile private var clearedChat: ClearedChat? = null
 
+    @Volatile private var quotePlaybackUndo: PlaybackPosition? = null
     private var transientUserMessage: ChatMessage.User? = null
     private var transientInputType: EpisodeChatInputType = EpisodeChatInputType.Typed
     private var hasReceivedAnswer = false
@@ -219,7 +221,7 @@ class ChatViewModel @Inject constructor(
             pendingRatingWrite?.join()
             clearedChat = chatManager.clearMessages(episodeUuid).takeIf { it.messages.isNotEmpty() }
         }
-        _toasts.trySend(ChatToast.ChatCleared)
+        showToast(ChatToast.ChatCleared)
     }
 
     fun undoClearChat() {
@@ -303,6 +305,57 @@ class ChatViewModel @Inject constructor(
             }
             playbackManager.seekToTimeMsSuspend(positionMs = quote.startMs)
             playbackManager.playQueueSuspend(sourceView = sourceView)
+            quotePlaybackUndo = quotePlaybackUndo ?: PlaybackPosition(
+                episodeUuid = state.episodeUuid.takeUnless { state.isEmpty || it.isEmpty() },
+                positionMs = state.positionMs,
+                isPlaying = state.isPlaying,
+            )
+            showToast(ChatToast.QuotePlaying(episode.title))
+        }
+    }
+
+    fun onQuoteUndoExpired() {
+        quotePlaybackUndo = null
+    }
+
+    private fun showToast(toast: ChatToast) {
+        if (toast !is ChatToast.QuotePlaying) {
+            quotePlaybackUndo = null
+        }
+        _toasts.trySend(toast)
+    }
+
+    fun undoQuotePlay() {
+        val undo = quotePlaybackUndo ?: return
+        quotePlaybackUndo = null
+        eventHorizon.track(
+            EpisodeChatQuotePlayUndoneEvent(
+                source = sourceView.analyticsValue,
+                episodeUuid = episodeUuid,
+                podcastUuid = podcastUuid,
+            ),
+        )
+        val previousJob = quotePlaybackJob
+        previousJob?.cancel()
+        quotePlaybackJob = applicationScope.launch(ioDispatcher) {
+            previousJob?.join()
+            val previousEpisode = undo.episodeUuid?.let { episodeManager.findEpisodeByUuid(it) }
+            if (previousEpisode == null) {
+                playbackManager.pause(sourceView = sourceView)
+                return@launch
+            }
+            if (previousEpisode.uuid != episodeUuid) {
+                playbackManager.playNowSuspend(episode = previousEpisode, sourceView = sourceView)
+                val isLoaded = awaitPlaybackEpisode(previousEpisode.uuid)
+                if (!undo.isPlaying) {
+                    playbackManager.pause(sourceView = sourceView)
+                }
+                if (!isLoaded) return@launch
+            }
+            playbackManager.seekToTimeMsSuspend(positionMs = undo.positionMs)
+            if (!undo.isPlaying) {
+                playbackManager.pause(sourceView = sourceView)
+            }
         }
     }
 
@@ -408,7 +461,7 @@ class ChatViewModel @Inject constructor(
             trackAnswerRated(answerUuid, newRating)
         }
         if (newRating == ChatAnswerRating.Positive) {
-            _toasts.trySend(ChatToast.FeedbackThanks)
+            showToast(ChatToast.FeedbackThanks)
         }
         return newRating
     }
@@ -452,7 +505,7 @@ class ChatViewModel @Inject constructor(
 
     fun onFeedbackSubmitted() {
         hasSubmittedFeedback = true
-        _toasts.trySend(ChatToast.FeedbackThanks)
+        showToast(ChatToast.FeedbackThanks)
     }
 
     fun consumeSurveyEligibility(): Boolean {
@@ -515,9 +568,16 @@ class ChatViewModel @Inject constructor(
 private const val QUOTE_PLAYBACK_EPISODE_TIMEOUT_MS = 5_000L
 private const val LOG_TAG = "EpisodeChat"
 
+private class PlaybackPosition(
+    val episodeUuid: String?,
+    val positionMs: Int,
+    val isPlaying: Boolean,
+)
+
 sealed interface ChatToast {
     data object FeedbackThanks : ChatToast
     data object ChatCleared : ChatToast
+    data class QuotePlaying(val episodeTitle: String) : ChatToast
 }
 
 data class ChatUiState(
