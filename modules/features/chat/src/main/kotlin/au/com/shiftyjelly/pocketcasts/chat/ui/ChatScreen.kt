@@ -136,6 +136,7 @@ fun ChatScreen(
             if (uiState.isHistoryVisible) {
                 ChatHistory(
                     sections = uiState.history,
+                    useEpisodeArtwork = uiState.useEpisodeArtwork,
                     onClickBack = onCloseHistory,
                     onClickChat = onOpenHistoryChat,
                     onDeleteChat = onDeleteHistoryChat,
@@ -253,6 +254,7 @@ private fun ChatContent(
                     )
                 }
                 val answerUuidsByLastIndex = uiState.answerUuidsByLastIndex
+                val latestAnswerLastIndex = answerUuidsByLastIndex.keys.maxOrNull()
                 uiState.messages.forEachIndexed { index, message ->
                     key(message.uuid) {
                         val isNew = message.uuid !in initialMessageUuids
@@ -305,13 +307,10 @@ private fun ChatContent(
                                 )
                             }
                         }
-                    }
-                }
-                val lastMessage = uiState.messages.lastOrNull()
-                if (lastMessage.isAnswer && !uiState.isAwaitingReply) {
-                    key(lastMessage?.uuid) {
-                        ChatAppear(animate = lastMessage?.uuid !in initialMessageUuids) {
-                            ChatDisclaimer(theme = theme)
+                        if (index == latestAnswerLastIndex) {
+                            ChatAppear(animate = isNew) {
+                                ChatDisclaimer(theme = theme)
+                            }
                         }
                     }
                 }
@@ -482,7 +481,7 @@ private fun ChatServerError(
                 painter = painterResource(IR.drawable.ic_alert_small),
                 contentDescription = null,
                 tint = theme.tertiaryText,
-                modifier = Modifier.size(20.dp),
+                modifier = Modifier.size(16.dp),
             )
             Text(
                 text = stringResource(LR.string.chat_error_server_on_our_end),

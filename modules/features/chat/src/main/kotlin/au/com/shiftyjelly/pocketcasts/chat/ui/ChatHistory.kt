@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.SnackbarHostState
@@ -25,9 +26,11 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
@@ -42,11 +45,13 @@ import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.LocalPodcastColors
 import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
 import au.com.shiftyjelly.pocketcasts.compose.PodcastColorsParameterProvider
-import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
+import au.com.shiftyjelly.pocketcasts.compose.components.EpisodeImage
 import au.com.shiftyjelly.pocketcasts.compose.swipe.SwipeRow
 import au.com.shiftyjelly.pocketcasts.compose.swipe.SwipeRowActionDefaults
 import au.com.shiftyjelly.pocketcasts.compose.swipe.rememberSwipeRowState
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.EpisodeChatHistoryItem
+import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory.PlaceholderType
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import java.util.Date
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -55,6 +60,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 internal fun ChatHistory(
     sections: List<ChatHistorySection>,
+    useEpisodeArtwork: Boolean,
     onClickBack: () -> Unit,
     onClickChat: (EpisodeChatHistoryItem) -> Unit,
     onDeleteChat: (EpisodeChatHistoryItem) -> Unit,
@@ -109,6 +115,7 @@ internal fun ChatHistory(
                     items(section.items, key = { it.episodeUuid }) { item ->
                         ChatHistoryRow(
                             item = item,
+                            useEpisodeArtwork = useEpisodeArtwork,
                             onClick = { onClickChat(item) },
                             onDelete = { onDeleteChat(item) },
                             theme = theme,
@@ -154,6 +161,7 @@ private fun ChatHistorySectionTitle(
 @Composable
 private fun ChatHistoryRow(
     item: EpisodeChatHistoryItem,
+    useEpisodeArtwork: Boolean,
     onClick: () -> Unit,
     onDelete: () -> Unit,
     theme: ChatTheme,
@@ -174,11 +182,23 @@ private fun ChatHistoryRow(
                 .padding(start = 16.dp, end = 16.dp)
                 .height(64.dp),
         ) {
-            PodcastImage(
-                uuid = item.podcastUuid,
-                imageSize = 44.dp,
-                cornerSize = 4.dp,
-                elevation = null,
+            val episode = remember(item.episodeUuid, item.podcastUuid, item.episodeImageUrl) {
+                PodcastEpisode(
+                    uuid = item.episodeUuid,
+                    podcastUuid = item.podcastUuid,
+                    imageUrl = item.episodeImageUrl,
+                    publishedDate = item.lastMessageAt,
+                )
+            }
+            EpisodeImage(
+                episode = episode,
+                useEpisodeArtwork = useEpisodeArtwork,
+                placeholderType = PlaceholderType.Small,
+                corners = 4.dp,
+                modifier = Modifier
+                    .size(44.dp)
+                    .clip(RoundedCornerShape(4.dp))
+                    .clearAndSetSemantics {},
             )
             Spacer(modifier = Modifier.width(12.dp))
             Column(modifier = Modifier.weight(1f)) {
@@ -216,6 +236,7 @@ private fun ChatHistoryEmptyPreview() {
     AppTheme(Theme.ThemeType.DARK) {
         ChatHistory(
             sections = emptyList(),
+            useEpisodeArtwork = false,
             onClickBack = {},
             onClickChat = {},
             onDeleteChat = {},
@@ -246,6 +267,7 @@ private fun ChatHistoryPreview(
                         ),
                     ),
                 ),
+                useEpisodeArtwork = true,
                 onClickBack = {},
                 onClickChat = {},
                 onDeleteChat = {},
