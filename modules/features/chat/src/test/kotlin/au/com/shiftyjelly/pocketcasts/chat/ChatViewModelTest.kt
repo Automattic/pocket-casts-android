@@ -17,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.preferences.ReadSetting
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatAnswerRating
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatInputType
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatManager
@@ -135,7 +136,11 @@ class ChatViewModelTest {
         on { value } doAnswer { subscription.value }
         on { flow } doReturn subscription
     }
+    private val artworkConfigurationSetting = mock<UserSetting<ArtworkConfiguration>> {
+        on { value } doReturn ArtworkConfiguration(useEpisodeArtwork = true)
+    }
     private val settings = mock<Settings> {
+        on { artworkConfiguration } doReturn artworkConfigurationSetting
         on { episodeChatBetaSheetSeen } doReturn betaSheetSeenSetting
         on { episodeChatSurveySeen } doReturn surveySeenSetting
         on { cachedSubscription } doReturn cachedSubscriptionSetting
