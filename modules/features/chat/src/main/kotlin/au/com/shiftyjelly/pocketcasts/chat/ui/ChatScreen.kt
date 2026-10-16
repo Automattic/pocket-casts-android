@@ -482,7 +482,7 @@ private fun ChatServerError(
                 painter = painterResource(IR.drawable.ic_alert_small),
                 contentDescription = null,
                 tint = theme.tertiaryText,
-                modifier = Modifier.size(20.dp),
+                modifier = Modifier.size(16.dp),
             )
             Text(
                 text = stringResource(LR.string.chat_error_server_on_our_end),
