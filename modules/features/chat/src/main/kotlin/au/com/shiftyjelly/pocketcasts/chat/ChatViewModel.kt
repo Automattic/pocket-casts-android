@@ -351,6 +351,7 @@ class ChatViewModel @Inject constructor(
             it.copy(
                 isHistoryVisible = true,
                 history = historyItems.orEmpty().toHistorySections(clock.instant(), ZoneId.systemDefault()),
+                useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork,
             )
         }
         if (historyItems == null) {
@@ -1003,6 +1004,7 @@ data class ChatUiState(
     val playingPodcast: Podcast? = null,
     val history: List<ChatHistorySection> = emptyList(),
     val isHistoryVisible: Boolean = false,
+    val useEpisodeArtwork: Boolean = false,
     val answerRatings: Map<String, ChatAnswerRating> = emptyMap(),
     val restoredMessageUuids: Set<String> = emptySet(),
 ) {

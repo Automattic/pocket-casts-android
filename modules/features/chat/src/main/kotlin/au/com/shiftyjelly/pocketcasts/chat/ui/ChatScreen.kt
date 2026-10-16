@@ -136,6 +136,7 @@ fun ChatScreen(
             if (uiState.isHistoryVisible) {
                 ChatHistory(
                     sections = uiState.history,
+                    useEpisodeArtwork = uiState.useEpisodeArtwork,
                     onClickBack = onCloseHistory,
                     onClickChat = onOpenHistoryChat,
                     onDeleteChat = onDeleteHistoryChat,
