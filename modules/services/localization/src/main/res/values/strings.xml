@@ -2599,6 +2599,7 @@
     <string name="chapter_to_skip_to">Chapter To Skip To</string>
     <string name="chapter_to_skip_to_not_valid">Chapter to skip to %1$s not valid</string>
     <string name="tasker_variables">Tasker Variables</string>
+    <string name="app_functions_description">Find and play podcasts, control playback, and manage your Up Next queue.</string>
     <string name="skip_to_next_chapter">Skip To Next Chapter</string>
     <string name="skip_to_previous_chapter">Skip To Previous Chapter</string>
     <string name="skip_to_chapter">Skip To Chapter</string>

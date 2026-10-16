@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AppFunctionAppMetadata xmlns:appfn="http://schemas.android.com/apk/androidx.appfunctions"
+    appfn:description="Pocket Casts is a podcast player. These functions find podcasts and episodes, control playback, and manage the Up Next queue, the ordered list of episodes that play next.
+    Operational patterns:
+    - IDs are resolved in two steps: 'searchPodcasts' returns podcast IDs, and 'findEpisodes' returns episode IDs for 'playEpisode', 'addToUpNext', 'downloadEpisode' and 'starEpisode'.
+    - For a spoken-style request such as 'play the latest episode of X', call 'playPodcast' once instead of searching, finding and playing separately.
+    - 'searchPodcasts' checks followed podcasts by default. Set 'searchCatalog' to true only when the podcast is not followed, since it needs the network.
+    - Playback changes apply asynchronously. Call 'getUpNext' to read the current player state.
+    Constraints:
+    - Search and list results are capped at 20 items.
+    - Playback speed ranges from 0.5 to 5.0. Sleep timers range from 1 to 1440 minutes.
+    - Unfollowing podcasts, clearing Up Next, and deleting downloads are not available."
+    appfn:displayDescription="@string/app_functions_description" />

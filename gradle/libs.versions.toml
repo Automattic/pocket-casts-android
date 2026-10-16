@@ -19,6 +19,7 @@
 # ignore AboutLibraries versions such as -b02 and stick to the stable versions
 aboutlibraries = "15.3.0"
 android-gradle-plugin = "9.4.1"
+appfunctions = "1.0.0-alpha12"
 billing = "9.1.0"
 coil = "3.6.3"
 compose = "2026.08.00" # https://developer.android.com/jetpack/compose/bom/bom-mapping
@@ -274,6 +275,8 @@ google-identity = { module = "com.google.android.libraries.identity.googleid:goo
 # Other dependencies
 androidx-annotation = "androidx.annotation:annotation:1.11.0"
 androidx-appcompat = "androidx.appcompat:appcompat:1.8.0"
+androidx-appfunctions = { module = "androidx.appfunctions:appfunctions", version.ref = "appfunctions" }
+androidx-appfunctions-compiler = { module = "androidx.appfunctions:appfunctions-compiler", version.ref = "appfunctions" }
 androidx-arch-core = "androidx.arch.core:core-testing:2.2.0"
 androidx-car = "androidx.car.app:app:1.7.0"
 androidx-cardview = "androidx.cardview:cardview:1.0.0"
