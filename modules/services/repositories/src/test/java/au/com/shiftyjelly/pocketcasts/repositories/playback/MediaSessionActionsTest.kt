@@ -164,6 +164,17 @@ class MediaSessionActionsTest {
         assertNull(searchFailedMessage)
     }
 
+    @Test
+    fun `performPlayFromSearch does not call onSearchFailed when podcast has nothing to play`() = runTest {
+        val podcast = Podcast(uuid = "pod-1", title = "Found")
+        whenever(podcastManager.searchPodcastByTitleBlocking("found")).thenReturn(podcast)
+        whenever(episodeManager.findLatestUnfinishedEpisodeByPodcastBlocking(podcast)).thenReturn(null)
+
+        actions.performPlayFromSearchSuspend("Found")
+
+        assertNull(searchFailedMessage)
+    }
+
     // --- changePlaybackSpeed ---
 
     @Test
