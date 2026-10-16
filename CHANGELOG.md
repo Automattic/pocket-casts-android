@@ -1,5 +1,8 @@
 8.24
 -----
+*   Bug Fixes
+    *   Fix tapping the media player or a notification not opening the app after changing the app icon
+        ([#6181](https://github.com/Automattic/pocket-casts-android/pull/6181))
 
 
 8.23

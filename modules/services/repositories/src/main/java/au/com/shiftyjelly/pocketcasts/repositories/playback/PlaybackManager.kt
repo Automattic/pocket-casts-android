@@ -69,6 +69,7 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.EpisodeSyncResponse
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.utils.extensions.getLaunchIntent
 import au.com.shiftyjelly.pocketcasts.utils.extensions.isPositive
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
@@ -2418,7 +2419,7 @@ open class PlaybackManager @Inject constructor(
     private fun sendDataWarningNotification(episode: BaseEpisode) {
         val manager = NotificationManagerCompat.from(application)
 
-        val intent = application.packageManager.getLaunchIntentForPackage(application.packageName)?.apply {
+        val intent = application.getLaunchIntent()?.apply {
             flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
         }
         val pendingIntent = if (Util.getAppPlatform(application) == AppPlatform.Phone && intent != null) {
