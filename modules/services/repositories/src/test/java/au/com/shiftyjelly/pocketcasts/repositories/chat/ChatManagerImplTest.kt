@@ -5,6 +5,7 @@ import au.com.shiftyjelly.pocketcasts.models.db.dao.TranscriptDao
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeChat
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeChatMessage
 import au.com.shiftyjelly.pocketcasts.models.entity.Transcript
+import au.com.shiftyjelly.pocketcasts.models.to.EpisodeChatHistoryItem
 import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
 import au.com.shiftyjelly.pocketcasts.servers.podcast.ConversationMessage
 import au.com.shiftyjelly.pocketcasts.servers.podcast.EpisodeChatQuote
@@ -18,6 +19,7 @@ import java.util.Date
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -320,6 +322,8 @@ class ChatManagerImplTest {
             deletedEpisodeUuids += episodeUuid
             messages.removeAll { it.episodeUuid == episodeUuid }
         }
+
+        override fun observeChatHistory(): Flow<List<EpisodeChatHistoryItem>> = flowOf(emptyList())
 
         override suspend fun updateRating(uuid: String, rating: String?) {
             messages.replaceAll { if (it.uuid == uuid) it.copy(rating = rating) else it }

@@ -8,7 +8,9 @@ import au.com.shiftyjelly.pocketcasts.models.di.ModelModule
 import au.com.shiftyjelly.pocketcasts.models.di.addTypeConverters
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeChat
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeChatMessage
+import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.EpisodeChatHistoryItem
 import com.squareup.moshi.Moshi
 import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -124,13 +126,34 @@ class EpisodeChatDaoTest {
         assertEquals(listOf(message), episodeChatDao.getMessages(EPISODE_UUID))
     }
 
+    @Test
+    fun testChatHistoryListsChatsWithMessagesNewestFirst() = runTest {
+        testDb.podcastDao().insertSuspend(Podcast(uuid = PODCAST_UUID, title = "Podcast"))
+        insertChat(EPISODE_UUID)
+        insertChat("other-episode-uuid")
+        insertChat("empty-episode-uuid")
+        episodeChatDao.insertMessage(createMessage(uuid = "first-uuid", text = "First", createdAt = Date(100)))
+        episodeChatDao.insertMessage(createMessage(uuid = "latest-uuid", text = "Latest", createdAt = Date(300)))
+        episodeChatDao.insertMessage(
+            createMessage(uuid = "other-uuid", episodeUuid = "other-episode-uuid", text = "Other", createdAt = Date(200)),
+        )
+
+        assertEquals(
+            listOf(
+                EpisodeChatHistoryItem(EPISODE_UUID, "Title $EPISODE_UUID", PODCAST_UUID, "Podcast", 0.0, Date(300)),
+                EpisodeChatHistoryItem("other-episode-uuid", "Title other-episode-uuid", PODCAST_UUID, "Podcast", 0.0, Date(200)),
+            ),
+            episodeChatDao.observeChatHistory().first(),
+        )
+    }
+
     private suspend fun insertChat(episodeUuid: String = EPISODE_UUID) {
         insertEpisode(episodeUuid)
         episodeChatDao.insertChatIfAbsent(EpisodeChat(episodeUuid = episodeUuid, podcastUuid = PODCAST_UUID))
     }
 
     private suspend fun insertEpisode(episodeUuid: String = EPISODE_UUID) {
-        testDb.episodeDao().insert(PodcastEpisode(uuid = episodeUuid, podcastUuid = PODCAST_UUID, publishedDate = Date()))
+        testDb.episodeDao().insert(PodcastEpisode(uuid = episodeUuid, podcastUuid = PODCAST_UUID, title = "Title $episodeUuid", publishedDate = Date()))
     }
 
     private fun createMessage(

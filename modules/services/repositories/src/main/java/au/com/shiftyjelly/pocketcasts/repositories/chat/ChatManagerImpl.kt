@@ -4,6 +4,7 @@ import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeChatDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.TranscriptDao
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeChat
 import au.com.shiftyjelly.pocketcasts.models.entity.Transcript
+import au.com.shiftyjelly.pocketcasts.models.to.EpisodeChatHistoryItem
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptsComparator
 import au.com.shiftyjelly.pocketcasts.servers.podcast.ConversationMessage
 import au.com.shiftyjelly.pocketcasts.servers.podcast.EpisodeChatQuote
@@ -15,6 +16,7 @@ import java.util.Date
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
@@ -30,6 +32,10 @@ class ChatManagerImpl @Inject constructor(
 
     override fun observeMessages(episodeUuid: String): Flow<List<ChatMessage>> {
         return episodeChatDao.observeMessages(episodeUuid).map { it.toChatMessages(quoteMetadataAdapter) }
+    }
+
+    override fun observeHistory(): Flow<List<EpisodeChatHistoryItem>> {
+        return episodeChatDao.observeChatHistory().distinctUntilChanged()
     }
 
     override suspend fun createChat(episodeUuid: String, podcastUuid: String) {
