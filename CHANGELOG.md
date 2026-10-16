@@ -1,5 +1,7 @@
 8.24
 -----
+*   New Features
+    *   Hide caught-up podcasts from the Podcasts screen when the optional setting is enabled
 *   Bug Fixes
     *   Fix tapping the media player or a notification not opening the app after changing the app icon
         ([#6181](https://github.com/Automattic/pocket-casts-android/pull/6181))
