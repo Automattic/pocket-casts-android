@@ -2177,6 +2177,22 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `closing the history before it loads does not track it as shown`() = runTest {
+        val history = MutableSharedFlow<List<EpisodeChatHistoryItem>>()
+        chatManager.observedHistory = history
+        setEpisodeInfo()
+        advanceUntilIdle()
+        eventSink.skipEvent()
+
+        viewModel.showHistory()
+        viewModel.closeHistory()
+        history.emit(listOf(historyItem(EPISODE_UUID)))
+        advanceUntilIdle()
+
+        assertTrue(eventSink.isEmpty())
+    }
+
+    @Test
     fun `showing the history again regroups the chats for the current day`() = runTest {
         chatManager.history.value = listOf(historyItem(EPISODE_UUID))
         setEpisodeInfo()

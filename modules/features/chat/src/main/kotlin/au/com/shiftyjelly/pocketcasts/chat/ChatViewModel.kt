@@ -331,7 +331,9 @@ class ChatViewModel @Inject constructor(
                 _uiState.update { it.copy(history = items.toHistorySections(clock.instant(), ZoneId.systemDefault())) }
                 if (isHistoryShownPending) {
                     isHistoryShownPending = false
-                    trackHistoryShown()
+                    if (_uiState.value.isHistoryVisible) {
+                        trackHistoryShown()
+                    }
                 }
             }
         }
