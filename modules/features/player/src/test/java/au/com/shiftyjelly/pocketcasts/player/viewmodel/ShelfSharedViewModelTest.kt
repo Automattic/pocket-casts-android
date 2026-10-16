@@ -4,6 +4,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
+import au.com.shiftyjelly.pocketcasts.chat.ChatEntryPoint
 import au.com.shiftyjelly.pocketcasts.chat.EpisodeChatAccess
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -37,9 +38,11 @@ import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import com.automattic.eventhorizon.EpisodeChatEntryPointType
 import com.automattic.eventhorizon.EpisodeChatTooltipDismissedEvent
 import com.automattic.eventhorizon.EpisodeChatTooltipShownEvent
 import com.automattic.eventhorizon.EpisodeChatTooltipTappedEvent
+import com.automattic.eventhorizon.EpisodeChatUnavailableTappedEvent
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.PlayerShelfActionTappedEvent
 import com.automattic.eventhorizon.ShelfActionSourceType
@@ -559,7 +562,15 @@ class ShelfSharedViewModelTest {
 
         shelfSharedViewModel.navigationState.test {
             shelfSharedViewModel.onEpisodeChatClick(podcast, transcriptEpisode, isTranscriptAvailable = true, ShelfItemSource.OverflowMenu)
-            assertEquals(NavigationState.ShowEpisodeChat(podcast, transcriptEpisode, EpisodeChatAccess.Chat(isBeta = false)), awaitItem())
+            assertEquals(
+                NavigationState.ShowEpisodeChat(
+                    podcast = podcast,
+                    episode = transcriptEpisode,
+                    access = EpisodeChatAccess.Chat(isBeta = false),
+                    entryPoint = ChatEntryPoint.MoreActions,
+                ),
+                awaitItem(),
+            )
         }
     }
 
@@ -572,7 +583,15 @@ class ShelfSharedViewModelTest {
 
         shelfSharedViewModel.navigationState.test {
             shelfSharedViewModel.onEpisodeChatClick(podcast, transcriptEpisode, isTranscriptAvailable = true, ShelfItemSource.Shelf)
-            assertEquals(NavigationState.ShowEpisodeChat(podcast, transcriptEpisode, EpisodeChatAccess.Chat(isBeta = true)), awaitItem())
+            assertEquals(
+                NavigationState.ShowEpisodeChat(
+                    podcast = podcast,
+                    episode = transcriptEpisode,
+                    access = EpisodeChatAccess.Chat(isBeta = true),
+                    entryPoint = ChatEntryPoint.PlayerShelf,
+                ),
+                awaitItem(),
+            )
         }
     }
 
@@ -585,7 +604,15 @@ class ShelfSharedViewModelTest {
 
         shelfSharedViewModel.navigationState.test {
             shelfSharedViewModel.onEpisodeChatClick(podcast, transcriptEpisode, isTranscriptAvailable = true, ShelfItemSource.Shelf)
-            assertEquals(NavigationState.ShowEpisodeChat(podcast, transcriptEpisode, EpisodeChatAccess.SignIn), awaitItem())
+            assertEquals(
+                NavigationState.ShowEpisodeChat(
+                    podcast = podcast,
+                    episode = transcriptEpisode,
+                    access = EpisodeChatAccess.SignIn,
+                    entryPoint = ChatEntryPoint.PlayerShelf,
+                ),
+                awaitItem(),
+            )
         }
     }
 
@@ -598,7 +625,15 @@ class ShelfSharedViewModelTest {
 
         shelfSharedViewModel.navigationState.test {
             shelfSharedViewModel.onEpisodeChatClick(podcast, transcriptEpisode, isTranscriptAvailable = true, ShelfItemSource.Shelf)
-            assertEquals(NavigationState.ShowEpisodeChat(podcast, transcriptEpisode, EpisodeChatAccess.Paywall), awaitItem())
+            assertEquals(
+                NavigationState.ShowEpisodeChat(
+                    podcast = podcast,
+                    episode = transcriptEpisode,
+                    access = EpisodeChatAccess.Paywall,
+                    entryPoint = ChatEntryPoint.PlayerShelf,
+                ),
+                awaitItem(),
+            )
         }
     }
 
@@ -625,6 +660,14 @@ class ShelfSharedViewModelTest {
             shelfSharedViewModel.onEpisodeChatClick(Podcast(uuid = "podcastUuid"), transcriptEpisode, isTranscriptAvailable = false, ShelfItemSource.OverflowMenu)
             assertEquals(SnackbarMessage.EpisodeChatNeedsTranscript, awaitItem())
         }
+        assertEquals(
+            EpisodeChatUnavailableTappedEvent(
+                episodeUuid = "episodeUuid",
+                podcastUuid = "podcastUuid",
+                entryPoint = EpisodeChatEntryPointType.MoreActions,
+            ),
+            eventSink.pollEvent(),
+        )
         assertTrue(eventSink.isEmpty())
     }
 
@@ -701,6 +744,19 @@ class ShelfSharedViewModelTest {
         shelfSharedViewModel.onEpisodeChatTooltipShown()
 
         assertEquals(EpisodeChatTooltipShownEvent, eventSink.pollEvent())
+    }
+
+    @Test
+    fun `when episode chat tooltip shown again after reopening the player, then shown is tracked once`() = runTest {
+        initViewModel()
+
+        shelfSharedViewModel.onEpisodeChatTooltipShown()
+        shelfSharedViewModel.setPlayerOpen(false)
+        shelfSharedViewModel.setPlayerOpen(true)
+        shelfSharedViewModel.onEpisodeChatTooltipShown()
+
+        assertEquals(EpisodeChatTooltipShownEvent, eventSink.pollEvent())
+        assertTrue(eventSink.isEmpty())
     }
 
     @Test

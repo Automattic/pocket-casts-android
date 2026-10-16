@@ -549,6 +549,7 @@ class PlayerHeaderFragment :
                     episodeTitle = episode.title,
                     episodeDurationMs = episode.durationMs,
                     sourceView = SourceView.PLAYER,
+                    entryPoint = navigationState.entryPoint,
                     isBeta = (access as? EpisodeChatAccess.Chat)?.isBeta ?: true,
                     podcastColors = PodcastColors(navigationState.podcast),
                     requiresSignIn = access is EpisodeChatAccess.SignIn,

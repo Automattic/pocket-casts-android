@@ -52,11 +52,15 @@ class ChatFeedbackFragment : BaseDialogFragment() {
             sourceView: SourceView,
             podcastColors: PodcastColors,
             trigger: Trigger,
+            messageIndex: Long?,
         ) {
             if (fragmentManager.isStateSaved || fragmentManager.findFragmentByTag(TAG) != null) return
             ChatFeedbackFragment().apply {
                 arguments = Bundle().apply {
-                    putParcelable(ARGS_KEY, Args(episodeUuid, podcastUuid, sourceView, podcastColors, trigger))
+                    putParcelable(
+                        ARGS_KEY,
+                        Args(episodeUuid, podcastUuid, sourceView, podcastColors, trigger, messageIndex),
+                    )
                 }
             }.show(fragmentManager, TAG)
         }
@@ -73,7 +77,13 @@ class ChatFeedbackFragment : BaseDialogFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel.onShown(args.episodeUuid, args.podcastUuid, args.sourceView, args.trigger.analyticsValue)
+        viewModel.onShown(
+            episodeUuid = args.episodeUuid,
+            podcastUuid = args.podcastUuid,
+            sourceView = args.sourceView,
+            trigger = args.trigger.analyticsValue,
+            messageIndex = args.messageIndex,
+        )
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.submitted.collect { onSubmitted() }
@@ -144,5 +154,6 @@ class ChatFeedbackFragment : BaseDialogFragment() {
         val sourceView: SourceView,
         val podcastColors: PodcastColors,
         val trigger: Trigger,
+        val messageIndex: Long?,
     ) : Parcelable
 }

@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.player.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.chat.ChatEntryPoint
 import au.com.shiftyjelly.pocketcasts.chat.EpisodeChatAccess
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
@@ -32,6 +33,7 @@ import au.com.shiftyjelly.pocketcasts.views.helper.DeleteState
 import com.automattic.eventhorizon.EpisodeChatTooltipDismissedEvent
 import com.automattic.eventhorizon.EpisodeChatTooltipShownEvent
 import com.automattic.eventhorizon.EpisodeChatTooltipTappedEvent
+import com.automattic.eventhorizon.EpisodeChatUnavailableTappedEvent
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.PlayerShelfActionTappedEvent
 import com.automattic.eventhorizon.PlayerShelfOverflowMenuShownEvent
@@ -114,6 +116,7 @@ class ShelfSharedViewModel @Inject constructor(
     }
 
     private val playerOpenState = MutableStateFlow(false)
+    private var hasTrackedEpisodeChatTooltipShown = false
     private val overflowMenuOpenState = MutableStateFlow(false)
 
     private val smartBookmarksPromoActiveFlow = combine(
@@ -350,6 +353,8 @@ class ShelfSharedViewModel @Inject constructor(
     }
 
     fun onEpisodeChatTooltipShown() {
+        if (hasTrackedEpisodeChatTooltipShown) return
+        hasTrackedEpisodeChatTooltipShown = true
         eventHorizon.track(EpisodeChatTooltipShownEvent)
     }
 
@@ -452,6 +457,13 @@ class ShelfSharedViewModel @Inject constructor(
         source: ShelfItemSource,
     ) {
         if (!isTranscriptAvailable) {
+            eventHorizon.track(
+                EpisodeChatUnavailableTappedEvent(
+                    episodeUuid = episode.uuid,
+                    podcastUuid = episode.podcastUuid,
+                    entryPoint = source.chatEntryPoint.analyticsValue,
+                ),
+            )
             viewModelScope.launch { _snackbarMessages.emit(SnackbarMessage.EpisodeChatNeedsTranscript) }
             return
         }
@@ -460,16 +472,16 @@ class ShelfSharedViewModel @Inject constructor(
             eventHorizon.track(EpisodeChatTooltipDismissedEvent)
         }
         dismissEpisodeChatTooltip()
-        showEpisodeChat(podcast, episode)
+        showEpisodeChat(podcast, episode, source.chatEntryPoint)
     }
 
-    private fun showEpisodeChat(podcast: Podcast, episode: PodcastEpisode) {
+    private fun showEpisodeChat(podcast: Podcast, episode: PodcastEpisode, entryPoint: ChatEntryPoint) {
         viewModelScope.launch {
             val access = EpisodeChatAccess.from(
                 isPlusUser = settings.cachedSubscription.value != null,
                 isSignedIn = syncManager.isLoggedIn(),
             )
-            _navigationState.emit(NavigationState.ShowEpisodeChat(podcast, episode, access))
+            _navigationState.emit(NavigationState.ShowEpisodeChat(podcast, episode, access, entryPoint))
         }
     }
 
@@ -567,7 +579,12 @@ class ShelfSharedViewModel @Inject constructor(
         data object ShowAddBookmark : NavigationState
         data class StartUpsellFlow(val source: OnboardingUpgradeSource) : NavigationState
         data class AddEpisodeToPlaylist(val episodeUuid: String, val podcastUuid: String) : NavigationState
-        data class ShowEpisodeChat(val podcast: Podcast, val episode: PodcastEpisode, val access: EpisodeChatAccess) : NavigationState
+        data class ShowEpisodeChat(
+            val podcast: Podcast,
+            val episode: PodcastEpisode,
+            val access: EpisodeChatAccess,
+            val entryPoint: ChatEntryPoint,
+        ) : NavigationState
         data object StartEpisodeChatSignIn : NavigationState
     }
 
@@ -581,12 +598,15 @@ class ShelfSharedViewModel @Inject constructor(
 
     enum class ShelfItemSource(
         val analyticsValue: ShelfActionSourceType,
+        val chatEntryPoint: ChatEntryPoint,
     ) {
         Shelf(
             analyticsValue = ShelfActionSourceType.Shelf,
+            chatEntryPoint = ChatEntryPoint.PlayerShelf,
         ),
         OverflowMenu(
             analyticsValue = ShelfActionSourceType.OverflowMenu,
+            chatEntryPoint = ChatEntryPoint.MoreActions,
         ),
     }
 

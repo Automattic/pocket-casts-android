@@ -13,4 +13,7 @@ enum class ChatSendFailure(val value: String) {
 }
 
 @JsonClass(generateAdapter = true)
-internal data class UserMessageMetadata(val failure: String)
+internal data class UserMessageMetadata(
+    val failure: String? = null,
+    val inputType: String? = null,
+)
