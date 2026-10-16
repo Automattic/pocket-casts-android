@@ -1,0 +1,123 @@
+package au.com.shiftyjelly.pocketcasts.chat.ui
+
+import androidx.compose.animation.core.Animatable
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Snackbar
+import androidx.compose.material.SnackbarData
+import androidx.compose.material.SnackbarHostState
+import androidx.compose.material.Text
+import androidx.compose.material.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import au.com.shiftyjelly.pocketcasts.compose.components.ThemedSnackbarHost
+import kotlin.math.abs
+import kotlin.math.roundToInt
+import kotlin.math.sign
+import kotlinx.coroutines.launch
+
+@Composable
+internal fun ChatSnackbarHost(
+    hostState: SnackbarHostState,
+    theme: ChatTheme,
+    modifier: Modifier = Modifier,
+) {
+    ThemedSnackbarHost(
+        hostState = hostState,
+        snackbar = { data, _ ->
+            SwipeToDismissToast(onDismiss = data::dismiss) {
+                ChatSnackbar(data = data, theme = theme)
+            }
+        },
+        modifier = modifier,
+    )
+}
+
+@Composable
+private fun ChatSnackbar(
+    data: SnackbarData,
+    theme: ChatTheme,
+) {
+    Snackbar(
+        backgroundColor = Color.White,
+        contentColor = theme.onWhiteText,
+        action = data.actionLabel?.let { label ->
+            {
+                TextButton(onClick = data::performAction) {
+                    Text(
+                        text = label,
+                        color = theme.toastAction,
+                        fontSize = 13.sp,
+                        lineHeight = 18.sp,
+                        letterSpacing = 0.sp,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                }
+            }
+        },
+        modifier = Modifier.padding(horizontal = 16.dp),
+    ) {
+        Text(
+            text = data.message,
+            fontSize = 13.sp,
+            lineHeight = 18.sp,
+            letterSpacing = 0.sp,
+            fontWeight = FontWeight.SemiBold,
+        )
+    }
+}
+
+@Composable
+private fun SwipeToDismissToast(
+    onDismiss: () -> Unit,
+    content: @Composable () -> Unit,
+) {
+    val offsetX = remember { Animatable(0f) }
+    var width by remember { mutableIntStateOf(0) }
+    val scope = rememberCoroutineScope()
+    val dismissVelocity = with(LocalDensity.current) { DismissVelocity.toPx() }
+    Box(
+        modifier = Modifier
+            .onSizeChanged { width = it.width }
+            .offset { IntOffset(offsetX.value.roundToInt(), 0) }
+            .graphicsLayer { alpha = 1f - (abs(offsetX.value) / width.coerceAtLeast(1)).coerceIn(0f, 1f) }
+            .draggable(
+                orientation = Orientation.Horizontal,
+                state = rememberDraggableState { delta ->
+                    scope.launch { offsetX.snapTo(offsetX.value + delta) }
+                },
+                onDragStopped = { velocity ->
+                    val isFarEnough = abs(offsetX.value) > width * DismissDistanceFraction
+                    if (isFarEnough || abs(velocity) > dismissVelocity) {
+                        val direction = if (offsetX.value != 0f) sign(offsetX.value) else sign(velocity)
+                        offsetX.animateTo(direction * width)
+                        onDismiss()
+                    } else {
+                        offsetX.animateTo(0f)
+                    }
+                },
+            ),
+    ) {
+        content()
+    }
+}
+
+private const val DismissDistanceFraction = 0.4f
+private val DismissVelocity = 1000.dp
