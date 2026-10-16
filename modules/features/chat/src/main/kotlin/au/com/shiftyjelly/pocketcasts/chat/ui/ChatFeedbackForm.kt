@@ -173,6 +173,7 @@ internal fun ChatFeedbackForm(
                     Text(
                         text = stringResource(if (hasSubmitError) LR.string.try_again else LR.string.chat_feedback_submit),
                         fontSize = 18.sp,
+                        letterSpacing = 0.sp,
                         fontWeight = FontWeight.SemiBold,
                     )
                 }
@@ -206,6 +207,7 @@ private fun ReasonRow(
             text = stringResource(label),
             color = theme.primaryText,
             fontSize = 16.sp,
+            lineHeight = 21.sp,
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier.weight(1f),
         )
@@ -246,7 +248,7 @@ private fun DetailsField(
                 if (details.isEmpty()) {
                     Text(
                         text = hint,
-                        color = theme.detailsHint,
+                        color = theme.inputHint,
                         fontSize = 15.sp,
                         lineHeight = 21.sp,
                     )
