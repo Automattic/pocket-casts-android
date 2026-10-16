@@ -193,6 +193,21 @@ class ChatManagerImplTest {
     }
 
     @Test
+    fun `restoring a cleared chat brings back its messages and ratings`() = runTest {
+        val answer = createMessage(uuid = "answer-uuid", episodeUuid = EPISODE_UUID, text = "Answer").copy(rating = "positive")
+        episodeChatDao.messages += answer
+
+        val clearedChat = manager.clearMessages(episodeUuid = EPISODE_UUID)
+
+        assertEquals(listOf("answer-uuid"), clearedChat.messages.map { it.uuid })
+        assertEquals(emptyList<EpisodeChatMessage>(), episodeChatDao.messages)
+
+        manager.restoreMessages(clearedChat)
+
+        assertEquals(listOf(answer), episodeChatDao.messages)
+    }
+
+    @Test
     fun `rate answer stores and clears the rating`() = runTest {
         episodeChatDao.messages += createMessage(uuid = "answer-uuid", episodeUuid = EPISODE_UUID, text = "Answer")
 

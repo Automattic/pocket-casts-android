@@ -9,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatFeedback
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatFeedbackManager
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatManager
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatMessage
+import au.com.shiftyjelly.pocketcasts.repositories.chat.ClearedChat
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import com.automattic.eventhorizon.EpisodeChatFeedbackFormDismissedEvent
 import com.automattic.eventhorizon.EpisodeChatFeedbackFormShownEvent
@@ -265,7 +266,11 @@ class ChatFeedbackViewModelTest {
             allMessages: List<ChatMessage>,
         ) = Unit
 
-        override suspend fun clearMessages(episodeUuid: String) = Unit
+        override suspend fun clearMessages(episodeUuid: String) = object : ClearedChat {
+            override val messages = emptyList<ChatMessage>()
+        }
+
+        override suspend fun restoreMessages(clearedChat: ClearedChat) = Unit
 
         override suspend fun rateAnswer(answerUuid: String, rating: ChatAnswerRating?) = Unit
     }

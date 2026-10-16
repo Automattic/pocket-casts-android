@@ -66,7 +66,7 @@ internal fun ChatHeader(
             Spacer(modifier = Modifier.weight(1f))
             IconButton(onClick = onClickMore) {
                 Icon(
-                    painter = painterResource(IR.drawable.ic_more_vert_black_24dp),
+                    painter = painterResource(IR.drawable.ic_ellipsis_horizontal),
                     contentDescription = stringResource(LR.string.more_options),
                     tint = theme.iconButton,
                 )

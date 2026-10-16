@@ -34,6 +34,7 @@ import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Snackbar
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -169,7 +170,10 @@ private fun ChatContent(
     val scrollState = rememberScrollState()
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
-    val initialMessageUuids = remember(uiState.areMessagesLoaded) { uiState.messages.mapTo(HashSet()) { it.uuid } }
+    val loadedMessageUuids = remember(uiState.areMessagesLoaded) { uiState.messages.mapTo(HashSet()) { it.uuid } }
+    val initialMessageUuids = remember(loadedMessageUuids, uiState.restoredMessageUuids) {
+        loadedMessageUuids + uiState.restoredMessageUuids
+    }
 
     val followThresholdPx = with(LocalDensity.current) { FollowNewestThreshold.roundToPx() }
     var isFollowingNewest by remember { mutableStateOf(true) }
@@ -320,6 +324,20 @@ private fun ChatContent(
                     Snackbar(
                         backgroundColor = Color.White,
                         contentColor = theme.onWhiteText,
+                        action = data.actionLabel?.let { label ->
+                            {
+                                TextButton(onClick = data::performAction) {
+                                    Text(
+                                        text = label,
+                                        color = theme.toastAction,
+                                        fontSize = 13.sp,
+                                        lineHeight = 18.sp,
+                                        letterSpacing = 0.sp,
+                                        fontWeight = FontWeight.SemiBold,
+                                    )
+                                }
+                            }
+                        },
                         modifier = Modifier.padding(horizontal = 16.dp),
                     ) {
                         Text(

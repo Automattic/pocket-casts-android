@@ -16,7 +16,9 @@ interface ChatManager {
         allMessages: List<ChatMessage>,
     )
 
-    suspend fun clearMessages(episodeUuid: String)
+    suspend fun clearMessages(episodeUuid: String): ClearedChat
+
+    suspend fun restoreMessages(clearedChat: ClearedChat)
 
     suspend fun rateAnswer(answerUuid: String, rating: ChatAnswerRating?)
 }
