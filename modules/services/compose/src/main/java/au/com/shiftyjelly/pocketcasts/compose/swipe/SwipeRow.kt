@@ -17,8 +17,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.text.BasicText
-import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material.Icon
 import androidx.compose.material.LocalRippleConfiguration
 import androidx.compose.material.RippleConfiguration
@@ -48,12 +46,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
@@ -275,22 +270,12 @@ private fun BoxScope.SwipeRowActionSlab(
                     translationX = if (isLeading) shift else -shift
                 },
         ) {
-            if (action.label != null) {
-                BasicText(
-                    text = action.label,
-                    style = TextStyle(color = action.iconTint, fontSize = 15.sp, fontWeight = FontWeight.SemiBold),
-                    maxLines = 1,
-                    autoSize = TextAutoSize.StepBased(minFontSize = 9.sp, maxFontSize = 15.sp),
-                    modifier = Modifier.padding(horizontal = 4.dp),
-                )
-            } else {
-                Icon(
-                    painter = painterResource(action.iconId),
-                    contentDescription = action.contentDescription,
-                    tint = action.iconTint,
-                    modifier = Modifier.size(ActionIconSize),
-                )
-            }
+            Icon(
+                painter = painterResource(action.iconId),
+                contentDescription = action.contentDescription,
+                tint = action.iconTint,
+                modifier = Modifier.size(ActionIconSize),
+            )
         }
     }
 }
