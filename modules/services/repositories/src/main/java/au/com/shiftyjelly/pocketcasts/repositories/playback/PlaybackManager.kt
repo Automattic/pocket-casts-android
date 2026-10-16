@@ -1598,6 +1598,7 @@ open class PlaybackManager @Inject constructor(
                     stuckException != null -> PlaybackIssue.StuckPlayer(errorClassifier.classifyErrorStringId(event))
                     cause is HttpDataSource.InvalidResponseCodeException -> PlaybackIssue.HttpError(cause.responseCode)
                     cause is HttpDataSource.HttpDataSourceException -> PlaybackIssue.TransientFailure
+                    event.error?.isDecoderLost() == true -> PlaybackIssue.TransientFailure
                     else -> null
                 }
                 val errorMessage = when (playbackIssue) {

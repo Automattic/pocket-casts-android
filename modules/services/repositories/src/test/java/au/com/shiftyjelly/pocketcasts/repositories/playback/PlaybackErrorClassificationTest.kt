@@ -108,6 +108,18 @@ class PlaybackErrorClassificationTest {
     }
 
     @Test
+    fun `decoder resources reclaimed maps to try again`() {
+        val error = PlaybackException(
+            "Decoder failed",
+            null,
+            PlaybackException.ERROR_CODE_DECODING_RESOURCES_RECLAIMED,
+        )
+        val event = PlayerEvent.PlayerError("Decoder failed", error)
+        val stringId = errorClassifier.classifyErrorStringId(event)
+        assertEquals(LR.string.error_playback_failed_try_again, stringId)
+    }
+
+    @Test
     fun `audio track init failed maps to audio output`() {
         val error = PlaybackException(
             "Audio track init failed",
