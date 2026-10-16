@@ -74,9 +74,7 @@ private fun ChatSnackbar(
             }
         },
         elevation = 0.dp,
-        modifier = Modifier
-            .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
-            .then(if (data.actionLabel != null) Modifier.heightIn(min = 56.dp) else Modifier),
+        modifier = if (data.actionLabel != null) Modifier.heightIn(min = 56.dp) else Modifier,
     ) {
         Text(
             text = data.message,
@@ -99,6 +97,7 @@ private fun SwipeToDismissToast(
     val dismissVelocity = with(LocalDensity.current) { DismissVelocity.toPx() }
     Box(
         modifier = Modifier
+            .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
             .onSizeChanged { width = it.width }
             .offset { IntOffset(offsetX.value.roundToInt(), 0) }
             .graphicsLayer { alpha = 1f - (abs(offsetX.value) / width.coerceAtLeast(1)).coerceIn(0f, 1f) }
@@ -108,9 +107,10 @@ private fun SwipeToDismissToast(
                     scope.launch { offsetX.snapTo(offsetX.value + delta) }
                 },
                 onDragStopped = { velocity ->
-                    val isFarEnough = abs(offsetX.value) > width * DismissDistanceFraction
-                    if (isFarEnough || abs(velocity) > dismissVelocity) {
-                        val direction = if (offsetX.value != 0f) sign(offsetX.value) else sign(velocity)
+                    val isFarEnough = width > 0 && abs(offsetX.value) > width * DismissDistanceFraction
+                    val isFlungAway = abs(velocity) > dismissVelocity && sign(velocity) != -sign(offsetX.value)
+                    if (isFarEnough || isFlungAway) {
+                        val direction = if (isFlungAway) sign(velocity) else sign(offsetX.value)
                         offsetX.animateTo(direction * width)
                         onDismiss()
                     } else {

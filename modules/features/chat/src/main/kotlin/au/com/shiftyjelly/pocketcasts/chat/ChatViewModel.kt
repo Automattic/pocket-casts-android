@@ -672,7 +672,8 @@ class ChatViewModel @Inject constructor(
         sendJob = viewModelScope.launch {
             try {
                 pendingClear?.join()
-                if (clearedChat?.episodeUuid == episodeUuid) {
+                val cleared = clearedChat
+                if (cleared == null || cleared.episodeUuid == episodeUuid) {
                     clearedChat = null
                     _undoExpired.trySend(Unit)
                 }
