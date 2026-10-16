@@ -241,7 +241,9 @@ class ChatFragment : BaseDialogFragment() {
     }
 
     override fun onDismiss(dialog: DialogInterface) {
-        viewModel.trackDismissed()
+        if (activity?.isChangingConfigurations != true) {
+            viewModel.trackDismissed()
+        }
         showSurveyIfEligible()
         super.onDismiss(dialog)
     }
