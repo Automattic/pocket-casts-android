@@ -9,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.EpisodeChatHistoryItem
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
 import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
@@ -26,6 +27,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.chat.ClearedChat
 import au.com.shiftyjelly.pocketcasts.repositories.playback.NetworkConnectionWatcher
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
@@ -101,9 +103,13 @@ class ChatViewModelTest {
     private val chatManager = TestChatManager()
     private val playbackState = MutableStateFlow(PlaybackState())
     private val userSeeks = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    private val upNextQueue = mock<UpNextQueue> {
+        on { queueEpisodes } doReturn emptyList()
+    }
     private val playbackManager = mock<PlaybackManager> {
         on { playbackStateFlow } doReturn playbackState
         on { userSeeks } doReturn userSeeks
+        on { upNextQueue } doReturn upNextQueue
     }
     private val episode = MutableStateFlow<BaseEpisode>(
         PodcastEpisode(uuid = EPISODE_UUID, publishedDate = Date(), duration = 200.0, playedUpTo = 50.0),
@@ -1626,10 +1632,15 @@ class ChatViewModelTest {
         val quote = createQuote(startMs = 1_000, endMs = 3_000)
         whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
         playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = "other-uuid")
+        whenever(playbackManager.playNowSuspend(org.mockito.kotlin.eq(episode.value), any(), any(), any())).then {
+            playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID)
+            Unit
+        }
         playableState(quote)
         eventSink.skipEvent()
 
         viewModel.playQuote(quote.uuid)
+        advanceUntilIdle()
 
         assertEquals(
             EpisodeChatQuotePlayTappedEvent(
@@ -1641,6 +1652,117 @@ class ChatViewModelTest {
             ),
             eventSink.pollEvent(),
         )
+    }
+
+    @Test
+    fun `a quote whose episode never loads shows that it could not play and is not tracked`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = "other-uuid")
+        playableState(quote)
+        eventSink.skipEvent(eventSink.size)
+
+        viewModel.toasts.test {
+            viewModel.playQuote(quote.uuid)
+            advanceUntilIdle()
+
+            assertEquals(ChatToast.QuotePlayFailed, awaitItem())
+        }
+        assertTrue(eventSink.isEmpty())
+    }
+
+    @Test
+    fun `undoing a quote from another episode puts Up Next back in its order`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        val other = PodcastEpisode(uuid = "other-uuid", publishedDate = Date())
+        val queued = listOf(PodcastEpisode(uuid = "queued-1", publishedDate = Date()), PodcastEpisode(uuid = "queued-2", publishedDate = Date()))
+        whenever(upNextQueue.queueEpisodes).thenReturn(queued)
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        whenever(episodeManager.findEpisodeByUuid("other-uuid")).thenReturn(other)
+        switchPlaybackOnPlayNow(other)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = "other-uuid", positionMs = 10_000)
+        playableState(quote)
+        viewModel.playQuote(quote.uuid)
+        advanceUntilIdle()
+
+        viewModel.undoQuotePlay()
+        advanceUntilIdle()
+
+        verify(upNextQueue).changeList(queued)
+    }
+
+    @Test
+    fun `undoing a quote from another episode restores its archived and played state`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        val other = PodcastEpisode(uuid = "other-uuid", publishedDate = Date())
+        val quoteEpisode = PodcastEpisode(
+            uuid = EPISODE_UUID,
+            publishedDate = Date(),
+            duration = 600.0,
+            isArchived = true,
+            playingStatus = EpisodePlayingStatus.COMPLETED,
+            playedUpTo = 600.0,
+        )
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(quoteEpisode)
+        whenever(episodeManager.findEpisodeByUuid("other-uuid")).thenReturn(other)
+        switchPlaybackOnPlayNow(other, quoteEpisode)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = "other-uuid", positionMs = 10_000)
+        playableState(quote)
+        viewModel.playQuote(quote.uuid)
+        advanceUntilIdle()
+
+        viewModel.undoQuotePlay()
+        advanceUntilIdle()
+
+        verify(episodeManager).updatePlayingStatusBlocking(quoteEpisode, EpisodePlayingStatus.COMPLETED)
+        verify(episodeManager).updatePlayedUpToBlocking(quoteEpisode, 600.0, true)
+        verify(episodeManager).archiveBlocking(org.mockito.kotlin.eq(quoteEpisode), org.mockito.kotlin.eq(playbackManager), any(), any())
+    }
+
+    @Test
+    fun `undoing a quote when nothing was loaded takes the episode out of Up Next`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        switchPlaybackOnPlayNow(other = null)
+        playbackState.value = PlaybackState()
+        playableState(quote)
+        viewModel.playQuote(quote.uuid)
+        advanceUntilIdle()
+
+        viewModel.undoQuotePlay()
+        advanceUntilIdle()
+
+        verify(playbackManager).removeEpisode(org.mockito.kotlin.eq(episode.value), any(), org.mockito.kotlin.eq(false), any())
+        verify(episodeManager, never()).archiveBlocking(any(), any(), any(), any())
+    }
+
+    @Test
+    fun `undoing a quote in the same episode leaves Up Next alone`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID, positionMs = 10_000)
+        playableState(quote)
+        viewModel.playQuote(quote.uuid)
+        advanceUntilIdle()
+
+        viewModel.undoQuotePlay()
+        advanceUntilIdle()
+
+        verify(upNextQueue, never()).changeList(any())
+        verify(episodeManager, never()).updatePlayingStatusBlocking(any(), any())
+    }
+
+    private suspend fun switchPlaybackOnPlayNow(other: BaseEpisode?, quoteEpisode: BaseEpisode = episode.value) {
+        whenever(playbackManager.playNowSuspend(org.mockito.kotlin.eq(quoteEpisode), any(), any(), any())).then {
+            playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID)
+            Unit
+        }
+        if (other != null) {
+            whenever(playbackManager.playNowSuspend(org.mockito.kotlin.eq(other), any(), any(), any())).then {
+                playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = other.uuid)
+                Unit
+            }
+        }
     }
 
     @Test

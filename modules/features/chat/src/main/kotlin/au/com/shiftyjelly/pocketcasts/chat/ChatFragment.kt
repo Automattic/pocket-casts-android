@@ -174,7 +174,7 @@ class ChatFragment : BaseDialogFragment() {
                         ChatToast.ChatCleared -> viewModel.undoClearChat()
                         ChatToast.ChatDeleted -> viewModel.undoDeleteChat()
                         is ChatToast.QuotePlaying -> viewModel.undoQuotePlay()
-                        ChatToast.FeedbackThanks -> Unit
+                        ChatToast.FeedbackThanks, ChatToast.QuotePlayFailed -> Unit
                     }
                 } else if (toast is ChatToast.QuotePlaying) {
                     viewModel.onQuoteUndoExpired()
@@ -304,13 +304,14 @@ class ChatFragment : BaseDialogFragment() {
             else -> playingPodcast?.let(::PodcastColors) ?: args.podcastColors
         }
 
-    private val ChatToast.isUndoable get() = this != ChatToast.FeedbackThanks
+    private val ChatToast.isUndoable get() = this != ChatToast.FeedbackThanks && this != ChatToast.QuotePlayFailed
 
     private fun ChatToast.message(resources: Resources) = when (this) {
         ChatToast.FeedbackThanks -> resources.getString(LR.string.chat_feedback_thank_you)
         ChatToast.ChatCleared -> resources.getString(LR.string.chat_cleared)
         ChatToast.ChatDeleted -> resources.getString(LR.string.chat_deleted)
         is ChatToast.QuotePlaying -> resources.getString(LR.string.chat_now_playing_episode, episodeTitle)
+        ChatToast.QuotePlayFailed -> resources.getString(LR.string.chat_quote_play_failed)
     }
 
     @Parcelize
