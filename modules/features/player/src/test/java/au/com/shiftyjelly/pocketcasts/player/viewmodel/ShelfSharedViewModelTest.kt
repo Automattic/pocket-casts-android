@@ -747,6 +747,19 @@ class ShelfSharedViewModelTest {
     }
 
     @Test
+    fun `when episode chat tooltip shown again after reopening the player, then shown is tracked once`() = runTest {
+        initViewModel()
+
+        shelfSharedViewModel.onEpisodeChatTooltipShown()
+        shelfSharedViewModel.setPlayerOpen(false)
+        shelfSharedViewModel.setPlayerOpen(true)
+        shelfSharedViewModel.onEpisodeChatTooltipShown()
+
+        assertEquals(EpisodeChatTooltipShownEvent, eventSink.pollEvent())
+        assertTrue(eventSink.isEmpty())
+    }
+
+    @Test
     fun `given episode chat tooltip showing, when episode chat clicked, then tooltip dismissed is tracked`() = runTest {
         initViewModel(currentEpisode = transcriptEpisode, isTranscriptAvailable = true, isEpisodeChatEnabled = true)
         shelfSharedViewModel.setPlayerOpen(true)

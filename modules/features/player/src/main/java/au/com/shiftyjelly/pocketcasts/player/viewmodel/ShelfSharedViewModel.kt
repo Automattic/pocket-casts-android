@@ -116,6 +116,7 @@ class ShelfSharedViewModel @Inject constructor(
     }
 
     private val playerOpenState = MutableStateFlow(false)
+    private var hasTrackedEpisodeChatTooltipShown = false
     private val overflowMenuOpenState = MutableStateFlow(false)
 
     private val smartBookmarksPromoActiveFlow = combine(
@@ -352,6 +353,8 @@ class ShelfSharedViewModel @Inject constructor(
     }
 
     fun onEpisodeChatTooltipShown() {
+        if (hasTrackedEpisodeChatTooltipShown) return
+        hasTrackedEpisodeChatTooltipShown = true
         eventHorizon.track(EpisodeChatTooltipShownEvent)
     }
 
