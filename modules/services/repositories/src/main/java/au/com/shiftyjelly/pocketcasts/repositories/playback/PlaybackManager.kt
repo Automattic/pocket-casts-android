@@ -2130,7 +2130,7 @@ open class PlaybackManager @Inject constructor(
      * Check the player is initialised and if we are using the correct player either the system or cast player.
      */
     private suspend fun isPlayerSwitchRequired(): Boolean {
-        if (player == null) {
+        if (player == null || player === decoderLostPlayer) {
             return true
         }
         if (forcePlayerSwitch) {
@@ -2157,8 +2157,7 @@ open class PlaybackManager @Inject constructor(
             playbackOnDevice &&
                 player != null &&
                 (
-                    player === decoderLostPlayer ||
-                        player?.isStreaming != playingStream ||
+                    player?.isStreaming != playingStream ||
                         (episode.isDownloaded && episode.downloadedFilePath != null && episode.downloadedFilePath != player?.filePath)
                     )
         }
