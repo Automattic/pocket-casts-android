@@ -18,9 +18,10 @@ class FingerprintTapAudioProcessor(
     }
 
     override fun queueInput(inputBuffer: ByteBuffer) {
-        val remaining = inputBuffer.remaining()
-        if (remaining == 0) return
-        tap.onPcm(inputBuffer.asReadOnlyBuffer(), inputAudioFormat)
-        replaceOutputBuffer(remaining).put(inputBuffer).flip()
+        if (!inputBuffer.hasRemaining()) return
+        val output = replaceOutputBuffer(inputBuffer.remaining())
+        output.put(inputBuffer).flip()
+        // Feed the tap from our own copy so the decoder-owned input buffer is read exactly once.
+        tap.onPcm(output.asReadOnlyBuffer(), inputAudioFormat)
     }
 }

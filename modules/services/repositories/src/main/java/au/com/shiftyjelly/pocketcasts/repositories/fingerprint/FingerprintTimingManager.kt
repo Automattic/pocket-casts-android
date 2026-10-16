@@ -953,7 +953,10 @@ class FingerprintTimingManager @Inject constructor(
                 pcmTap.chunks.collect { chunk ->
                     if (gen != generation) throw CancellationException("Fingerprint tap superseded")
                     val frames = chunkFrames(chunk)
-                    if (frames == 0) return@collect
+                    if (frames == 0) {
+                        chunk.recycle()
+                        return@collect
+                    }
                     val isContinuous = streamer != null &&
                         chunk.sampleRate == sampleRate &&
                         chunk.channelCount == channelCount &&
@@ -973,7 +976,8 @@ class FingerprintTimingManager @Inject constructor(
                         tapFrontierSec = Double.NaN
                         maybeStartCatchUpResolve(gen, chunk.positionSec)
                     }
-                    val windows = streamer.pushSamplesF32(chunkToFloatSamples(chunk), chunk.channelCount.toUShort())
+                    val samples = chunkToFloatSamples(chunk).also { chunk.recycle() }
+                    val windows = streamer.pushSamplesF32(samples, chunk.channelCount.toUShort())
                     if (windows.isNotEmpty()) {
                         tapFrontierSec = streamStartSec + windows.last().timestampMs.toDouble() / 1000.0
                         mutex.withLock {
@@ -1090,11 +1094,11 @@ class FingerprintTimingManager @Inject constructor(
     private fun chunkFrames(chunk: FingerprintPcmTap.PcmChunk): Int {
         val bytesPerSample = if (chunk.encoding == C.ENCODING_PCM_FLOAT) 4 else 2
         val bytesPerFrame = bytesPerSample * chunk.channelCount
-        return if (bytesPerFrame > 0) chunk.data.size / bytesPerFrame else 0
+        return if (bytesPerFrame > 0) chunk.size / bytesPerFrame else 0
     }
 
     private fun chunkToFloatSamples(chunk: FingerprintPcmTap.PcmChunk): List<Float> {
-        val buffer = ByteBuffer.wrap(chunk.data).order(ByteOrder.nativeOrder())
+        val buffer = ByteBuffer.wrap(chunk.data, 0, chunk.size).order(ByteOrder.nativeOrder())
         return if (chunk.encoding == C.ENCODING_PCM_FLOAT) {
             val floatBuffer = buffer.asFloatBuffer()
             val result = FloatArray(floatBuffer.remaining())
