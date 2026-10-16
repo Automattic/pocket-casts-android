@@ -1,11 +1,13 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playback
 
 import android.media.MediaCodec
+import androidx.media3.common.Format
 import androidx.media3.common.ParserException
 import androidx.media3.common.PlaybackException
 import androidx.media3.datasource.DataSpec
 import androidx.media3.datasource.HttpDataSource
 import androidx.media3.exoplayer.ExoPlaybackException
+import androidx.media3.exoplayer.mediacodec.MediaCodecRenderer.DecoderInitializationException
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -33,17 +35,22 @@ class DecoderLossTest {
     }
 
     @Test
-    fun `recoverable codec exception is a lost decoder`() {
-        val error = playbackException(cause = codecException(actionCode = ACTION_RECOVERABLE))
+    fun `codec exception that was not reclaimed is not a lost decoder`() {
+        val error = playbackException(cause = codecException(actionCode = ACTION_FATAL, errorCode = -22))
 
-        assertTrue(error.isDecoderLost())
+        assertFalse(error.isDecoderLost())
     }
 
     @Test
-    fun `transient codec exception is not a lost decoder`() {
-        val error = playbackException(cause = codecException(actionCode = ACTION_TRANSIENT))
+    fun `decoder initialization failure is not a lost decoder`() {
+        val initFailure = DecoderInitializationException(
+            Format.Builder().setSampleMimeType("audio/mpeg").build(),
+            codecException(actionCode = ACTION_FATAL),
+            false,
+            0,
+        )
 
-        assertFalse(error.isDecoderLost())
+        assertFalse(playbackException(cause = initFailure).isDecoderLost())
     }
 
     @Test
@@ -52,6 +59,14 @@ class DecoderLossTest {
         released.stackTrace = arrayOf(StackTraceElement(MediaCodec::class.java.name, "native_flush", null, -2))
 
         assertTrue(playbackException(cause = released).isDecoderLost())
+    }
+
+    @Test
+    fun `other illegal state thrown by MediaCodec is not a lost decoder`() {
+        val misuse = IllegalStateException("dequeueInputBuffer called in wrong state")
+        misuse.stackTrace = arrayOf(StackTraceElement(MediaCodec::class.java.name, "native_dequeueInputBuffer", null, -2))
+
+        assertFalse(playbackException(cause = misuse).isDecoderLost())
     }
 
     @Test
@@ -98,19 +113,20 @@ class DecoderLossTest {
         return ExoPlaybackException.createForUnexpected(RuntimeException(cause), errorCode)
     }
 
-    private fun codecException(actionCode: Int): MediaCodec.CodecException {
+    private fun codecException(
+        actionCode: Int,
+        errorCode: Int = MediaCodec.CodecException.ERROR_RECLAIMED,
+    ): MediaCodec.CodecException {
         val constructor = MediaCodec.CodecException::class.java.getDeclaredConstructor(
             Int::class.javaPrimitiveType,
             Int::class.javaPrimitiveType,
             String::class.java,
         )
         constructor.isAccessible = true
-        return constructor.newInstance(MediaCodec.CodecException.ERROR_RECLAIMED, actionCode, "Released by resource manager")
+        return constructor.newInstance(errorCode, actionCode, "Released by resource manager")
     }
 
     private companion object {
         const val ACTION_FATAL = 0
-        const val ACTION_TRANSIENT = 1
-        const val ACTION_RECOVERABLE = 2
     }
 }
