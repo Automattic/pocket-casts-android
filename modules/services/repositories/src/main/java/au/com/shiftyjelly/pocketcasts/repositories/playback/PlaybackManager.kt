@@ -2442,6 +2442,9 @@ open class PlaybackManager @Inject constructor(
             play(sourceView, posUpdatedOnPlayerReset)
         } else {
             player?.load(episode.playedUpToMs)
+            if (isDecoderRecoveryPending) {
+                installSimplePlayerInSession()
+            }
             onPlayerPaused()
         }
     }
@@ -2602,15 +2605,19 @@ open class PlaybackManager @Inject constructor(
         // SimplePlayer creates its ExoPlayer lazily in prepare(), which is called
         // inside play(). Now that the ExoPlayer exists, install it into the Media3
         // session so the notification system can monitor the player state.
+        installSimplePlayerInSession()
+
+        sleepTimer.restartSleepTimerIfApplies(currentEpisodeUuid = episode.uuid)
+
+        trackPlaybackPlay(sourceView, episode)
+    }
+
+    private suspend fun installSimplePlayerInSession() {
         withContext(Dispatchers.Main) {
             (player as? SimplePlayer)?.exoPlayer?.let {
                 mediaSessionManager.installPlayer(it)
             }
         }
-
-        sleepTimer.restartSleepTimerIfApplies(currentEpisodeUuid = episode.uuid)
-
-        trackPlaybackPlay(sourceView, episode)
     }
 
     private suspend fun addPodcastStartFromSettings(episode: PodcastEpisode, podcast: Podcast?, isPlaying: Boolean) {
