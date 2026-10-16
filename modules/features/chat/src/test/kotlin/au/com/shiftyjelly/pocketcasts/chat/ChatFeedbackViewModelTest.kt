@@ -44,11 +44,12 @@ class ChatFeedbackViewModelTest {
         ChatMessage.User(text = "Question", uuid = "user-uuid"),
         ChatMessage.Assistant(text = "Answer", uuid = "assistant-uuid"),
     )
+    private var storedMessages: List<ChatMessage> = conversation
     private val feedbackManager = TestChatFeedbackManager()
 
     private fun createViewModel() = ChatFeedbackViewModel(
         savedStateHandle = savedStateHandle,
-        chatManager = TestChatManager(conversation),
+        chatManager = TestChatManager(storedMessages),
         feedbackManager = feedbackManager,
         eventHorizon = EventHorizon(eventSink),
         applicationScope = CoroutineScope(SupervisorJob() + coroutineRule.testDispatcher),
@@ -105,6 +106,18 @@ class ChatFeedbackViewModelTest {
             ),
             feedbackManager.submitted.single(),
         )
+    }
+
+    @Test
+    fun `an unanswered question at the end is not sent with the feedback`() = runTest {
+        storedMessages = conversation + ChatMessage.User(text = "Not sent", uuid = "unsent-uuid")
+        val viewModel = createViewModel()
+        viewModel.onReasonSelected(ChatFeedback.Reason.WrongFacts)
+
+        viewModel.submit()
+        advanceUntilIdle()
+
+        assertEquals(conversation, feedbackManager.submitted.single().conversation)
     }
 
     @Test
@@ -260,6 +273,8 @@ class ChatFeedbackViewModelTest {
         override fun observeMessages(episodeUuid: String): Flow<List<ChatMessage>> = flowOf(messages)
 
         override fun observeHistory(): Flow<List<EpisodeChatHistoryItem>> = flowOf(emptyList())
+
+        override suspend fun discardMessage(uuid: String) = Unit
 
         override suspend fun createChat(episodeUuid: String, podcastUuid: String) = Unit
 

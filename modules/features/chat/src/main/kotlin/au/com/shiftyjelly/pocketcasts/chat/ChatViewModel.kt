@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatAnswerRating
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatManager
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatMessage
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatQuoteSeeker
+import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatSendFailure
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ClearedChat
 import au.com.shiftyjelly.pocketcasts.repositories.chat.answerRating
 import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
@@ -20,9 +21,11 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.NetworkConnectionWat
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.eventhorizon.EpisodeChatBetaSheetDismissedEvent
 import com.automattic.eventhorizon.EpisodeChatBetaSheetShownEvent
+import com.automattic.eventhorizon.EpisodeChatBetaSheetSignInTappedEvent
 import com.automattic.eventhorizon.EpisodeChatClearUndoneEvent
 import com.automattic.eventhorizon.EpisodeChatClearedEvent
 import com.automattic.eventhorizon.EpisodeChatDeleteUndoneEvent
@@ -85,6 +88,7 @@ class ChatViewModel @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val timeSource: TimeSource,
     private val clock: Clock,
+    private val syncManager: SyncManager,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ChatUiState())
@@ -92,6 +96,9 @@ class ChatViewModel @Inject constructor(
 
     private val _toasts = Channel<ChatToast>(Channel.CONFLATED)
     val toasts = _toasts.receiveAsFlow()
+
+    private val _navigation = Channel<ChatNavigation>(Channel.CONFLATED)
+    val navigation = _navigation.receiveAsFlow()
 
     private var sendJob: Job? = null
     private var quotePlaybackJob: Job? = null
@@ -105,6 +112,10 @@ class ChatViewModel @Inject constructor(
     private val podcastUuid get() = checkNotNull(chatEpisode.value).podcastUuid
     private var playingEpisodeUuid: String? = null
     private var historyItems: List<EpisodeChatHistoryItem> = emptyList()
+
+    @Volatile private var isAdoptingUnansweredQuestion = false
+
+    private var isSigningIn = false
 
     @Volatile private var quotePlaybackUndo: PlaybackPosition? = null
     private var transientUserMessage: ChatMessage.User? = null
@@ -131,20 +142,55 @@ class ChatViewModel @Inject constructor(
         episodeDurationMs: Int,
         sourceView: SourceView,
         isBeta: Boolean,
+        requiresSignIn: Boolean = false,
     ) {
         if (chatEpisode.value != null) return
         this.sourceView = sourceView
-        _uiState.update { it.copy(isBeta = isBeta) }
+        val isSignInRequired = requiresSignIn && !syncManager.isLoggedIn()
+        _uiState.update { it.copy(isBeta = isBeta, isSignInRequired = isSignInRequired) }
         openChat(ChatEpisode(episodeUuid, episodeTitle, podcastUuid, podcastTitle, episodeDurationMs))
-        observeMessages()
         observePlayback()
+        if (isSignInRequired) {
+            showBetaSheet()
+        } else {
+            observeMessages()
+            observeHistory()
+            showBetaSheetIfNeeded(isBeta)
+        }
+    }
+
+    fun onSignInClick() {
+        if (!_uiState.value.isSignInRequired || isSigningIn) return
+        isSigningIn = true
+        eventHorizon.track(
+            EpisodeChatBetaSheetSignInTappedEvent(
+                source = sourceView.analyticsValue,
+                episodeUuid = episodeUuid,
+                podcastUuid = podcastUuid,
+            ),
+        )
+        _navigation.trySend(ChatNavigation.SignIn)
+    }
+
+    fun refreshSignIn() {
+        isSigningIn = false
+        if (!_uiState.value.isSignInRequired || !syncManager.isLoggedIn()) return
+        settings.episodeChatBetaSheetSeen.set(true, updateModifiedAt = false)
+        _uiState.update { it.copy(isSignInRequired = false, isBetaSheetVisible = false) }
+        observeMessages()
         observeHistory()
-        showBetaSheetIfNeeded(isBeta)
+        trackShown()
+        viewModelScope.launch {
+            settings.cachedSubscription.flow.collect { subscription ->
+                _uiState.update { it.copy(isBeta = subscription == null) }
+            }
+        }
     }
 
     private fun openChat(episode: ChatEpisode) {
         sendJob?.cancel()
         transientUserMessage = null
+        isAdoptingUnansweredQuestion = true
         _uiState.update {
             it.copy(
                 episodeUuid = episode.uuid,
@@ -163,7 +209,7 @@ class ChatViewModel @Inject constructor(
         }
         chatEpisode.value = episode
         createChat(episode)
-        trackShown()
+        if (!_uiState.value.isSignInRequired) trackShown()
     }
 
     private fun observeMessages() {
@@ -171,6 +217,7 @@ class ChatViewModel @Inject constructor(
             chatEpisode.filterNotNull().flatMapLatest { episode ->
                 chatManager.observeMessages(episode.uuid).map { messages -> episode.uuid to messages }
             }.collect { (messagesEpisodeUuid, messages) ->
+                val unansweredQuestion = adoptUnansweredQuestion(messagesEpisodeUuid, messages)
                 _uiState.update { state ->
                     if (state.episodeUuid != messagesEpisodeUuid) return@update state
                     state.copy(
@@ -179,10 +226,26 @@ class ChatViewModel @Inject constructor(
                         ),
                         areMessagesLoaded = true,
                         answerRatings = if (state.areMessagesLoaded) state.answerRatings else messages.storedAnswerRatings(),
+                        error = unansweredQuestion?.let { it.failure.toChatError() } ?: state.error,
                     )
                 }
             }
         }
+    }
+
+    private fun adoptUnansweredQuestion(messagesEpisodeUuid: String, messages: List<ChatMessage>): ChatMessage.User? {
+        val state = _uiState.value
+        if (!isAdoptingUnansweredQuestion || state.episodeUuid != messagesEpisodeUuid) return null
+        isAdoptingUnansweredQuestion = false
+        if (state.isAwaitingReply || transientUserMessage != null) return null
+        val question = messages.lastOrNull() as? ChatMessage.User ?: return null
+        transientUserMessage = question
+        return question
+    }
+
+    private fun ChatSendFailure?.toChatError() = when (this) {
+        ChatSendFailure.Server -> ChatError.ServerError
+        ChatSendFailure.Network, null -> ChatError.NetworkError
     }
 
     private fun observePlayback() {
@@ -397,6 +460,7 @@ class ChatViewModel @Inject constructor(
                         restoredMessageUuids = state.restoredMessageUuids + cleared.chat.messages.map { it.uuid },
                     )
                 }
+                isAdoptingUnansweredQuestion = true
             }
             chatManager.restoreMessages(cleared.chat)
             eventHorizon.track(undoneEvent(cleared))
@@ -404,6 +468,7 @@ class ChatViewModel @Inject constructor(
     }
 
     fun trackDismissed() {
+        if (_uiState.value.isSignInRequired) return
         eventHorizon.track(
             EpisodeChatDismissedEvent(
                 source = sourceView.analyticsValue,
@@ -539,6 +604,7 @@ class ChatViewModel @Inject constructor(
     }
 
     private fun performSend(message: ChatMessage.User, inputType: EpisodeChatInputType) {
+        val supersededQuestionUuid = transientUserMessage?.uuid?.takeIf { it != message.uuid }
         val unsentMessageUuids = setOfNotNull(transientUserMessage?.uuid, message.uuid)
         transientUserMessage = message
         transientInputType = inputType
@@ -558,6 +624,7 @@ class ChatViewModel @Inject constructor(
             try {
                 pendingClear?.join()
                 clearedChat = null
+                supersededQuestionUuid?.let { chatManager.discardMessage(it) }
                 val sentAt = timeSource.markNow()
                 chatManager.sendMessage(episodeUuid, message, currentMessages)
                 val responseDuration = sentAt.elapsedNow()
@@ -601,7 +668,12 @@ class ChatViewModel @Inject constructor(
     }
 
     private fun showBetaSheetIfNeeded(isBeta: Boolean) {
-        if (!isBeta || settings.episodeChatBetaSheetSeen.value || _uiState.value.isBetaSheetVisible) return
+        if (!isBeta || settings.episodeChatBetaSheetSeen.value) return
+        showBetaSheet()
+    }
+
+    private fun showBetaSheet() {
+        if (_uiState.value.isBetaSheetVisible) return
         _uiState.update { it.copy(isBetaSheetVisible = true) }
         eventHorizon.track(
             EpisodeChatBetaSheetShownEvent(
@@ -681,8 +753,11 @@ class ChatViewModel @Inject constructor(
     }
 
     fun dismissBetaSheet() {
-        if (!_uiState.value.isBetaSheetVisible) return
-        settings.episodeChatBetaSheetSeen.set(true, updateModifiedAt = false)
+        val state = _uiState.value
+        if (!state.isBetaSheetVisible) return
+        if (!state.isSignInRequired) {
+            settings.episodeChatBetaSheetSeen.set(true, updateModifiedAt = false)
+        }
         _uiState.update { it.copy(isBetaSheetVisible = false) }
         eventHorizon.track(
             EpisodeChatBetaSheetDismissedEvent(
@@ -691,6 +766,9 @@ class ChatViewModel @Inject constructor(
                 podcastUuid = podcastUuid,
             ),
         )
+        if (state.isSignInRequired) {
+            _navigation.trySend(ChatNavigation.Close)
+        }
     }
 
     private fun trackShown() {
@@ -759,6 +837,11 @@ private class PlaybackPosition(
     val isPlaying: Boolean,
 )
 
+sealed interface ChatNavigation {
+    data object SignIn : ChatNavigation
+    data object Close : ChatNavigation
+}
+
 sealed interface ChatToast {
     data object FeedbackThanks : ChatToast
     data object ChatCleared : ChatToast
@@ -780,6 +863,7 @@ data class ChatUiState(
     val error: ChatError? = null,
     val isBeta: Boolean = false,
     val isBetaSheetVisible: Boolean = false,
+    val isSignInRequired: Boolean = false,
     val playback: ChatPlayback = ChatPlayback(),
     val otherPlayingEpisode: ChatPlayingEpisode? = null,
     val playingPodcast: Podcast? = null,
