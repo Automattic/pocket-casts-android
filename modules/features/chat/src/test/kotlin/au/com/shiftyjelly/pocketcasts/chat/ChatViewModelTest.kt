@@ -2359,6 +2359,45 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `sending in the open chat keeps the undo for another deleted chat`() = runTest {
+        val otherMessage = ChatMessage.User(text = "Other question", uuid = "other-message-uuid")
+        chatManager.otherMessages.value = listOf(otherMessage)
+        setEpisodeInfo()
+        connectToInternet()
+        advanceUntilIdle()
+        viewModel.deleteHistoryChat(historyItem(OTHER_EPISODE_UUID))
+        advanceUntilIdle()
+
+        viewModel.undoExpired.test {
+            viewModel.onInputTextChange("New question")
+            viewModel.onSend()
+            advanceUntilIdle()
+            expectNoEvents()
+        }
+        viewModel.undoDeleteChat()
+        advanceUntilIdle()
+
+        assertEquals(listOf(otherMessage), chatManager.otherMessages.value)
+    }
+
+    @Test
+    fun `sending after deleting the open chat expires its undo`() = runTest {
+        chatManager.messages.value = listOf(ChatMessage.User(text = "Question", uuid = "message-uuid"))
+        setEpisodeInfo()
+        connectToInternet()
+        advanceUntilIdle()
+        viewModel.deleteHistoryChat(historyItem(EPISODE_UUID, podcastUuid = PODCAST_UUID))
+        advanceUntilIdle()
+
+        viewModel.undoExpired.test {
+            viewModel.onInputTextChange("New question")
+            viewModel.onSend()
+            advanceUntilIdle()
+            awaitItem()
+        }
+    }
+
+    @Test
     fun `history cannot open while an answer is pending`() = runTest {
         setEpisodeInfo()
         chatManager.sendMessageGate = CompletableDeferred()

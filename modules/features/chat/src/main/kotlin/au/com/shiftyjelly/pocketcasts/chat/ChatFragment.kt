@@ -171,10 +171,11 @@ class ChatFragment : BaseDialogFragment() {
                 }
             }
         }
-        val hasMessages = uiState.messages.isNotEmpty()
-        LaunchedEffect(hasMessages) {
-            if (hasMessages && shownToast == ChatToast.ChatCleared) {
-                snackbarHostState.currentSnackbarData?.dismiss()
+        LaunchedEffect(snackbarHostState) {
+            viewModel.undoExpired.collect {
+                if (shownToast == ChatToast.ChatCleared || shownToast == ChatToast.ChatDeleted) {
+                    snackbarHostState.currentSnackbarData?.dismiss()
+                }
             }
         }
 
