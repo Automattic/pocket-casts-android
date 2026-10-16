@@ -21,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalAccessibilityManager
 import androidx.compose.ui.platform.LocalResources
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
@@ -43,8 +44,10 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import dagger.hilt.android.AndroidEntryPoint
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.parcelize.Parcelize
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -136,15 +139,30 @@ class ChatFragment : BaseDialogFragment() {
         val snackbarHostState = remember { SnackbarHostState() }
         val resources = LocalResources.current
         var shownToast by remember { mutableStateOf<ChatToast?>(null) }
+        val accessibilityManager = LocalAccessibilityManager.current
+        val undoToastTimeoutMs = remember(accessibilityManager) {
+            accessibilityManager?.calculateRecommendedTimeoutMillis(
+                originalTimeoutMillis = UNDO_TOAST_DURATION.inWholeMilliseconds,
+                containsIcons = false,
+                containsText = true,
+                containsControls = true,
+            ) ?: UNDO_TOAST_DURATION.inWholeMilliseconds
+        }
         LaunchedEffect(snackbarHostState) {
             viewModel.toasts.collectLatest { toast ->
                 snackbarHostState.currentSnackbarData?.dismiss()
                 shownToast = toast
-                val result = snackbarHostState.showSnackbar(
-                    message = toast.message(resources),
-                    actionLabel = resources.getString(LR.string.chat_undo).takeIf { toast.isUndoable },
-                    duration = if (toast.isUndoable) SnackbarDuration.Long else SnackbarDuration.Short,
-                )
+                val result = if (toast.isUndoable) {
+                    withTimeoutOrNull(undoToastTimeoutMs) {
+                        snackbarHostState.showSnackbar(
+                            message = toast.message(resources),
+                            actionLabel = resources.getString(LR.string.chat_undo),
+                            duration = SnackbarDuration.Indefinite,
+                        )
+                    } ?: SnackbarResult.Dismissed
+                } else {
+                    snackbarHostState.showSnackbar(message = toast.message(resources), duration = SnackbarDuration.Short)
+                }
                 shownToast = null
                 if (result == SnackbarResult.ActionPerformed) {
                     when (toast) {
@@ -158,10 +176,11 @@ class ChatFragment : BaseDialogFragment() {
                 }
             }
         }
-        val hasMessages = uiState.messages.isNotEmpty()
-        LaunchedEffect(hasMessages) {
-            if (hasMessages && shownToast == ChatToast.ChatCleared) {
-                snackbarHostState.currentSnackbarData?.dismiss()
+        LaunchedEffect(snackbarHostState) {
+            viewModel.undoExpired.collect {
+                if (shownToast == ChatToast.ChatCleared || shownToast == ChatToast.ChatDeleted) {
+                    snackbarHostState.currentSnackbarData?.dismiss()
+                }
             }
         }
 
@@ -303,3 +322,5 @@ class ChatFragment : BaseDialogFragment() {
         val requiresSignIn: Boolean,
     ) : Parcelable
 }
+
+private val UNDO_TOAST_DURATION = 8.seconds

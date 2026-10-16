@@ -99,6 +99,9 @@ class ChatViewModel @Inject constructor(
     private val _toasts = Channel<ChatToast>(Channel.CONFLATED)
     val toasts = _toasts.receiveAsFlow()
 
+    private val _undoExpired = Channel<Unit>(Channel.CONFLATED)
+    val undoExpired = _undoExpired.receiveAsFlow()
+
     private val _navigation = Channel<ChatNavigation>(Channel.CONFLATED)
     val navigation = _navigation.receiveAsFlow()
 
@@ -669,7 +672,11 @@ class ChatViewModel @Inject constructor(
         sendJob = viewModelScope.launch {
             try {
                 pendingClear?.join()
-                clearedChat = null
+                val cleared = clearedChat
+                if (cleared == null || cleared.episodeUuid == episodeUuid) {
+                    clearedChat = null
+                    _undoExpired.trySend(Unit)
+                }
                 supersededQuestionUuid?.let { chatManager.discardMessage(it) }
                 val sentAt = timeSource.markNow()
                 chatManager.sendMessage(episodeUuid, message, currentMessages)
