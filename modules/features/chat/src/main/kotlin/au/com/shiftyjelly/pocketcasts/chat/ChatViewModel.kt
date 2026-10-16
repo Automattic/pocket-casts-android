@@ -5,9 +5,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.EpisodeChatHistoryItem
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatAnswerRating
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatInputType
@@ -542,17 +545,9 @@ class ChatViewModel @Inject constructor(
             .firstOrNull { it.uuid == quoteUuid && it.canPlay }
             ?: return
 
-        eventHorizon.track(
-            EpisodeChatQuotePlayTappedEvent(
-                source = sourceView.analyticsValue,
-                episodeUuid = episodeUuid,
-                podcastUuid = podcastUuid,
-                quoteSource = EpisodeChatQuoteSourceType.InlineTimestamp,
-                isOtherEpisode = _uiState.value.otherPlayingEpisode != null,
-            ),
-        )
         val episodeUuid = episodeUuid
         val podcastUuid = podcastUuid
+        val isOtherEpisode = _uiState.value.otherPlayingEpisode != null
         val previousJob = quotePlaybackJob
         previousJob?.cancel()
         quotePlaybackJob = applicationScope.launch(ioDispatcher) {
@@ -562,13 +557,23 @@ class ChatViewModel @Inject constructor(
             val quoteTime = async { quoteSeeker.quoteTime(episodeUuid, quote) }
             val userSeek = async(start = CoroutineStart.UNDISPATCHED) { playbackManager.userSeeks.first() }
             val state = playbackManager.playbackStateFlow.first()
-            if (state.loadedEpisodeUuid != episodeUuid) {
+            val episodeSwitch = if (state.loadedEpisodeUuid != episodeUuid) {
+                val switch = EpisodeSwitch(
+                    queue = playbackManager.upNextQueue.queueEpisodes,
+                    wasArchived = episode.isArchived,
+                    playingStatus = episode.playingStatus,
+                    playedUpTo = episode.playedUpTo,
+                )
                 playbackManager.playNowSuspend(episode = episode, sourceView = sourceView)
                 if (!awaitPlaybackEpisode(episodeUuid)) {
                     quoteTime.cancel()
                     userSeek.cancel()
+                    showToast(ChatToast.QuotePlayFailed)
                     return@launch
                 }
+                switch
+            } else {
+                null
             }
             val seekTimeMs = try {
                 quoteSeeker.playbackTimeMs(episode, quoteTime.await())
@@ -579,12 +584,22 @@ class ChatViewModel @Inject constructor(
             if (playbackManager.playbackStateFlow.first().loadedEpisodeUuid != episodeUuid) return@launch
             playbackManager.seekToTimeMsSuspend(positionMs = seekTimeMs)
             playbackManager.playQueueSuspend(sourceView = sourceView)
+            eventHorizon.track(
+                EpisodeChatQuotePlayTappedEvent(
+                    source = sourceView.analyticsValue,
+                    episodeUuid = episodeUuid,
+                    podcastUuid = podcastUuid,
+                    quoteSource = EpisodeChatQuoteSourceType.InlineTimestamp,
+                    isOtherEpisode = isOtherEpisode,
+                ),
+            )
             quotePlaybackUndo = quotePlaybackUndo ?: PlaybackPosition(
                 quoteEpisodeUuid = episodeUuid,
                 quotePodcastUuid = podcastUuid,
                 episodeUuid = state.episodeUuid.takeUnless { state.isEmpty || it.isEmpty() },
                 positionMs = state.positionMs,
                 isPlaying = state.isPlaying,
+                episodeSwitch = episodeSwitch,
             )
             showToast(ChatToast.QuotePlaying(episode.title))
         }
@@ -618,6 +633,12 @@ class ChatViewModel @Inject constructor(
             val previousEpisode = undo.episodeUuid?.let { episodeManager.findEpisodeByUuid(it) }
             if (previousEpisode == null) {
                 playbackManager.pause(sourceView = sourceView)
+                undo.episodeSwitch?.let { switch ->
+                    episodeManager.findEpisodeByUuid(undo.quoteEpisodeUuid)?.let { quoteEpisode ->
+                        playbackManager.removeEpisode(quoteEpisode, source = sourceView, userInitiated = false)
+                    }
+                    restoreQuoteEpisode(undo.quoteEpisodeUuid, switch)
+                }
                 return@launch
             }
             if (previousEpisode.uuid != undo.quoteEpisodeUuid) {
@@ -627,11 +648,24 @@ class ChatViewModel @Inject constructor(
                     playbackManager.pause(sourceView = sourceView)
                 }
                 if (!isLoaded) return@launch
+                undo.episodeSwitch?.let { switch ->
+                    playbackManager.upNextQueue.changeList(switch.queue.filterNot { it.uuid == previousEpisode.uuid })
+                    restoreQuoteEpisode(undo.quoteEpisodeUuid, switch)
+                }
             }
             playbackManager.seekToTimeMsSuspend(positionMs = undo.positionMs)
             if (!undo.isPlaying) {
                 playbackManager.pause(sourceView = sourceView)
             }
+        }
+    }
+
+    private suspend fun restoreQuoteEpisode(episodeUuid: String, switch: EpisodeSwitch) {
+        val episode = episodeManager.findEpisodeByUuid(episodeUuid) ?: return
+        episodeManager.updatePlayingStatusBlocking(episode, switch.playingStatus)
+        episodeManager.updatePlayedUpToBlocking(episode, switch.playedUpTo, forceUpdate = true)
+        if (switch.wasArchived && episode is PodcastEpisode) {
+            episodeManager.archiveBlocking(episode, playbackManager)
         }
     }
 
@@ -870,7 +904,7 @@ class ChatViewModel @Inject constructor(
     }
 }
 
-private const val QUOTE_PLAYBACK_EPISODE_TIMEOUT_MS = 5_000L
+private const val QUOTE_PLAYBACK_EPISODE_TIMEOUT_MS = 10_000L
 private const val LOG_TAG = "EpisodeChat"
 
 private val PlaybackState.loadedEpisodeUuid
@@ -896,6 +930,14 @@ private class PlaybackPosition(
     val episodeUuid: String?,
     val positionMs: Int,
     val isPlaying: Boolean,
+    val episodeSwitch: EpisodeSwitch?,
+)
+
+private class EpisodeSwitch(
+    val queue: List<BaseEpisode>,
+    val wasArchived: Boolean,
+    val playingStatus: EpisodePlayingStatus,
+    val playedUpTo: Double,
 )
 
 sealed interface ChatNavigation {
@@ -908,6 +950,7 @@ sealed interface ChatToast {
     data object ChatCleared : ChatToast
     data object ChatDeleted : ChatToast
     data class QuotePlaying(val episodeTitle: String) : ChatToast
+    data object QuotePlayFailed : ChatToast
 }
 
 data class ChatUiState(
