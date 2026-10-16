@@ -31,10 +31,8 @@ import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.ProvideTextStyle
-import androidx.compose.material.Snackbar
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.Text
-import androidx.compose.material.TextButton
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -73,7 +71,6 @@ import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.LocalPodcastColors
 import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
 import au.com.shiftyjelly.pocketcasts.compose.PodcastColorsParameterProvider
-import au.com.shiftyjelly.pocketcasts.compose.components.ThemedSnackbarHost
 import au.com.shiftyjelly.pocketcasts.models.to.EpisodeChatHistoryItem
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatAnswerRating
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatMessage
@@ -392,47 +389,6 @@ private fun ChatAnswerAppear(
 }
 
 private val ChatMessage?.isAnswer get() = this is ChatMessage.Assistant || this is ChatMessage.Quote
-
-@Composable
-internal fun ChatSnackbarHost(
-    hostState: SnackbarHostState,
-    theme: ChatTheme,
-    modifier: Modifier = Modifier,
-) {
-    ThemedSnackbarHost(
-        hostState = hostState,
-        snackbar = { data, _ ->
-            Snackbar(
-                backgroundColor = Color.White,
-                contentColor = theme.onWhiteText,
-                action = data.actionLabel?.let { label ->
-                    {
-                        TextButton(onClick = data::performAction) {
-                            Text(
-                                text = label,
-                                color = theme.toastAction,
-                                fontSize = 13.sp,
-                                lineHeight = 18.sp,
-                                letterSpacing = 0.sp,
-                                fontWeight = FontWeight.SemiBold,
-                            )
-                        }
-                    }
-                },
-                modifier = Modifier.padding(horizontal = 16.dp),
-            ) {
-                Text(
-                    text = data.message,
-                    fontSize = 13.sp,
-                    lineHeight = 18.sp,
-                    letterSpacing = 0.sp,
-                    fontWeight = FontWeight.SemiBold,
-                )
-            }
-        },
-        modifier = modifier,
-    )
-}
 
 @Composable
 private fun ChatAboutEpisode(
