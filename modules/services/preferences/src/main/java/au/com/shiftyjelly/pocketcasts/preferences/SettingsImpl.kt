@@ -1247,6 +1247,7 @@ class SettingsImpl @Inject constructor(
         defaultValue = MediaNotificationControls.All,
         fromString = { MediaNotificationControls.itemForId(it) },
         toString = { it.key },
+        addMissingDefaultValues = true,
     )
 
     override val podcastGroupingDefault = run {
