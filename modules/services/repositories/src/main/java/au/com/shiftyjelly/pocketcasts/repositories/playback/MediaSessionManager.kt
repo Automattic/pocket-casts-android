@@ -448,7 +448,7 @@ class MediaSessionManager(
         if (currentPlayer.wrappedPlayer is SeedStatePlayer) return
         val seed = SeedStatePlayer(Looper.getMainLooper())
         val swapped = currentPlayer.swapPlayer(seed)
-        swapped.clearMetadata()
+        swapped.clearMetadata(title = context.getString(LR.string.automotive_nothing_playing_title))
         forwardingPlayer = swapped
         media3Session?.player = swapped
         placeholderPlayer?.release()

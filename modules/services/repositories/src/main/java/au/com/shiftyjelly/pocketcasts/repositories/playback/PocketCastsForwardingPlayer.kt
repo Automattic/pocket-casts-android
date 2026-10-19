@@ -147,13 +147,14 @@ class PocketCastsForwardingPlayer(
      * Clears metadata when nothing is playing, so the session doesn't show stale info.
      */
     @MainThread
-    fun clearMetadata() {
+    fun clearMetadata(title: String? = null) {
         checkMainThread()
-        currentMediaItem = MediaItem.EMPTY
+        val metadata = MediaMetadata.Builder().setTitle(title).build()
+        currentMediaItem = MediaItem.EMPTY.buildUpon().setMediaMetadata(metadata).build()
         previousMediaId = null
         isTransientLoss = false
         listeners.forEach { listener ->
-            listener.onMediaMetadataChanged(MediaMetadata.EMPTY)
+            listener.onMediaMetadataChanged(metadata)
         }
         dispatchEvents(Player.EVENT_MEDIA_METADATA_CHANGED)
     }
