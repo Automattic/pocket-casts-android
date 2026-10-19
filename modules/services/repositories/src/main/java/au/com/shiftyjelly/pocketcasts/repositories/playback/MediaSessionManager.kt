@@ -17,6 +17,7 @@ import android.view.KeyEvent
 import androidx.annotation.DrawableRes
 import androidx.annotation.MainThread
 import androidx.annotation.OptIn
+import androidx.annotation.VisibleForTesting
 import androidx.core.content.IntentCompat
 import androidx.core.net.toUri
 import androidx.media.utils.MediaConstants.PLAYBACK_STATE_EXTRAS_KEY_MEDIA_ID
@@ -30,6 +31,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.MediaNotificationControls
 import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneAction
@@ -68,6 +70,8 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -625,6 +629,13 @@ class MediaSessionManager(
                     onError = { Timber.e(it, "Error observing automotive active state") },
                 )
                 .addTo(disposables)
+
+            settings.refreshStateFlow
+                .filterIsInstance<RefreshState.Success>()
+                .distinctUntilChanged()
+                .onEach { media3Session?.let { session -> notifyPlaylistsChanged(session) } }
+                .catch { Timber.e(it, "Error observing refresh state") }
+                .launchIn(scope)
         }
 
         val episodeAndState = playbackManager.playbackStateRelay
@@ -741,6 +752,15 @@ class MediaSessionManager(
                 onError = { Timber.e(it, "Error observing Up Next changes") },
             )
             .addTo(disposables)
+    }
+
+    @OptIn(UnstableApi::class)
+    @VisibleForTesting
+    internal suspend fun notifyPlaylistsChanged(session: MediaLibraryService.MediaLibrarySession) {
+        session.notifyChildrenChanged(FILTERS_ROOT, Int.MAX_VALUE, null)
+        playlistManager.playlistPreviewsFlow().first().forEach { playlist ->
+            session.notifyChildrenChanged(playlist.uuid, Int.MAX_VALUE, null)
+        }
     }
 
     @OptIn(UnstableApi::class)
