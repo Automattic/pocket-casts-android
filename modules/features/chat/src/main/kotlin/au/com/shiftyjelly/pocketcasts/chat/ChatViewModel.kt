@@ -571,7 +571,7 @@ class ChatViewModel @Inject constructor(
                     userSeek.cancel()
                     showToast(ChatToast.QuotePlayFailed)
                     if (playbackManager.upNextQueue.currentEpisode?.uuid == episodeUuid) {
-                        restorePlayback(state.toPlaybackPosition(episodeUuid, podcastUuid, switch))
+                        restorePlayback(state.toPlaybackPosition(episodeUuid, podcastUuid, switch, isOtherEpisode))
                     } else {
                         restoreSwitchedEpisodes(switch)
                     }
@@ -603,8 +603,8 @@ class ChatViewModel @Inject constructor(
             quotePlaybackUndo.updateAndGet { undo ->
                 QuotePlaybackUndo(
                     id = undoId,
-                    position = undo?.position?.withLaterSwitch(episodeSwitch)
-                        ?: state.toPlaybackPosition(episodeUuid, podcastUuid, episodeSwitch),
+                    position = undo?.position?.withLaterSwitch(episodeSwitch, isOtherEpisode)
+                        ?: state.toPlaybackPosition(episodeUuid, podcastUuid, episodeSwitch, isOtherEpisode),
                 )
             }
             showToast(ChatToast.QuotePlaying(episode.title, undoId))
@@ -629,7 +629,7 @@ class ChatViewModel @Inject constructor(
                 source = sourceView.analyticsValue,
                 episodeUuid = undo.quoteEpisodeUuid,
                 podcastUuid = undo.quotePodcastUuid,
-                isOtherEpisode = undo.episodeSwitch != null,
+                isOtherEpisode = undo.isOtherEpisode,
             ),
         )
         val previousJob = quotePlaybackJob
@@ -952,15 +952,26 @@ private class PlaybackPosition(
     val positionMs: Int,
     val isPlaying: Boolean,
     val episodeSwitch: EpisodeSwitch?,
+    val isOtherEpisode: Boolean,
 ) {
     val hasSwitchedAwayFromPreviousEpisode get() = episodeSwitch?.episodes.orEmpty().any { it.uuid != episodeUuid }
 
-    fun withLaterSwitch(laterSwitch: EpisodeSwitch?): PlaybackPosition {
+    fun withLaterSwitch(laterSwitch: EpisodeSwitch?, isLaterOtherEpisode: Boolean): PlaybackPosition {
         val knownUuids = episodeSwitch?.episodes.orEmpty().map { it.uuid }.toSet()
         val newEpisodes = laterSwitch?.episodes.orEmpty().filterNot { it.uuid in knownUuids }
-        if (newEpisodes.isEmpty()) return this
-        val switch = episodeSwitch?.let { it.copy(episodes = it.episodes + newEpisodes) } ?: laterSwitch
-        return PlaybackPosition(quoteEpisodeUuid, quotePodcastUuid, episodeUuid, positionMs, isPlaying, switch)
+        val switch = when {
+            newEpisodes.isEmpty() -> episodeSwitch
+            else -> episodeSwitch?.let { it.copy(episodes = it.episodes + newEpisodes) } ?: laterSwitch
+        }
+        return PlaybackPosition(
+            quoteEpisodeUuid = quoteEpisodeUuid,
+            quotePodcastUuid = quotePodcastUuid,
+            episodeUuid = episodeUuid,
+            positionMs = positionMs,
+            isPlaying = isPlaying,
+            episodeSwitch = switch,
+            isOtherEpisode = isOtherEpisode || isLaterOtherEpisode,
+        )
     }
 }
 
@@ -968,6 +979,7 @@ private fun PlaybackState.toPlaybackPosition(
     quoteEpisodeUuid: String,
     quotePodcastUuid: String,
     episodeSwitch: EpisodeSwitch?,
+    isOtherEpisode: Boolean,
 ) = PlaybackPosition(
     quoteEpisodeUuid = quoteEpisodeUuid,
     quotePodcastUuid = quotePodcastUuid,
@@ -975,6 +987,7 @@ private fun PlaybackState.toPlaybackPosition(
     positionMs = positionMs,
     isPlaying = isPlaying,
     episodeSwitch = episodeSwitch,
+    isOtherEpisode = isOtherEpisode,
 )
 
 private data class EpisodeSwitch(
