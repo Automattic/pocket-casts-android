@@ -2820,6 +2820,54 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `an answer that fails while the history is open shows its error back in the chat`() = runTest {
+        setEpisodeInfo()
+        connectToInternet()
+        val gate = CompletableDeferred<Unit>()
+        chatManager.sendMessageGate = gate
+        chatManager.sendMessageException = IOException()
+        viewModel.onInputTextChange("Question")
+        viewModel.onSend()
+        runCurrent()
+        viewModel.showHistory()
+
+        gate.complete(Unit)
+        advanceUntilIdle()
+        viewModel.closeHistory()
+
+        val state = viewModel.uiState.value
+        assertFalse(state.isAwaitingReply)
+        assertEquals(ChatError.NetworkError, state.error)
+        assertEquals(listOf("Question"), state.messages.map { it.text() })
+    }
+
+    @Test
+    fun `deleting the open chat from the history while answering stops the answer and undo brings the question back`() = runTest {
+        setEpisodeInfo()
+        connectToInternet()
+        chatManager.sendMessageGate = CompletableDeferred()
+        viewModel.onInputTextChange("Question")
+        viewModel.onSend()
+        runCurrent()
+        viewModel.showHistory()
+
+        viewModel.deleteHistoryChat(historyItem(EPISODE_UUID, podcastUuid = PODCAST_UUID))
+        advanceUntilIdle()
+
+        assertFalse(viewModel.uiState.value.isAwaitingReply)
+        assertEquals(emptyList<ChatMessage>(), viewModel.uiState.value.messages)
+        assertTrue(chatManager.sentMessages.isEmpty())
+
+        viewModel.undoDeleteChat()
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertEquals(listOf("Question"), state.messages.map { it.text() })
+        assertEquals(ChatError.NetworkError, state.error)
+        assertTrue(chatManager.sentMessages.isEmpty())
+    }
+
+    @Test
     fun `tapping the open chat in the history while answering goes back to the pending answer`() = runTest {
         setEpisodeInfo()
         connectToInternet()
