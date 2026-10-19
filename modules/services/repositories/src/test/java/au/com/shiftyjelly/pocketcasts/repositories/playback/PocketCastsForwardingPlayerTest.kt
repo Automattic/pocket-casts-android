@@ -215,6 +215,30 @@ class PocketCastsForwardingPlayerTest {
     }
 
     @Test
+    fun `clearMetadata resets to empty metadata`() {
+        forwardingPlayer.updateMetadata(createPodcastEpisode(uuid = "ep-1", title = "Test"), null)
+
+        forwardingPlayer.clearMetadata()
+
+        assertEquals(MediaItem.EMPTY, forwardingPlayer.currentMediaItem)
+        assertEquals(MediaMetadata.EMPTY, forwardingPlayer.mediaMetadata)
+    }
+
+    @Test
+    fun `clearMetadata with title exposes only the title`() {
+        val listener = mock<Player.Listener>()
+        forwardingPlayer.addListener(listener)
+        forwardingPlayer.updateMetadata(createPodcastEpisode(uuid = "ep-1", title = "Test"), null)
+
+        forwardingPlayer.clearMetadata(title = "Choose an episode to play")
+
+        val expected = MediaMetadata.Builder().setTitle("Choose an episode to play").build()
+        assertEquals(expected, forwardingPlayer.mediaMetadata)
+        assertEquals(MediaItem.DEFAULT_MEDIA_ID, forwardingPlayer.currentMediaItem.mediaId)
+        verify(listener).onMediaMetadataChanged(expected)
+    }
+
+    @Test
     fun `non-automotive keeps full commands even with empty timeline`() {
         val player = mock<Player> {
             on { applicationLooper } doReturn Looper.getMainLooper()
