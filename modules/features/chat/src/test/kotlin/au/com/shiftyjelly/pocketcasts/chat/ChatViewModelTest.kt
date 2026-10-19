@@ -2699,16 +2699,81 @@ class ChatViewModelTest {
     }
 
     @Test
-    fun `history cannot open while an answer is pending`() = runTest {
+    fun `history opens while an answer is pending and the answer still lands`() = runTest {
         setEpisodeInfo()
-        chatManager.sendMessageGate = CompletableDeferred()
+        connectToInternet()
+        val gate = CompletableDeferred<Unit>()
+        chatManager.sendMessageGate = gate
         viewModel.onInputTextChange("Question")
         viewModel.onSend()
         runCurrent()
 
         viewModel.showHistory()
+        assertTrue(viewModel.uiState.value.isHistoryVisible)
+        assertTrue(viewModel.uiState.value.isAwaitingReply)
+
+        gate.complete(Unit)
+        advanceUntilIdle()
+        viewModel.closeHistory()
+
+        val state = viewModel.uiState.value
+        assertFalse(state.isAwaitingReply)
+        assertNull(state.error)
+        assertEquals(listOf("Question", "Response"), state.messages.map { it.text() })
+        assertEquals(SendMessage(EPISODE_UUID, "Question"), chatManager.sentMessages.single())
+    }
+
+    @Test
+    fun `tapping the open chat in the history while answering goes back to the pending answer`() = runTest {
+        setEpisodeInfo()
+        connectToInternet()
+        val gate = CompletableDeferred<Unit>()
+        chatManager.sendMessageGate = gate
+        viewModel.onInputTextChange("Question")
+        viewModel.onSend()
+        runCurrent()
+        viewModel.showHistory()
+
+        viewModel.openHistoryChat(historyItem(EPISODE_UUID, podcastUuid = PODCAST_UUID))
+        runCurrent()
 
         assertFalse(viewModel.uiState.value.isHistoryVisible)
+        assertTrue(viewModel.uiState.value.isAwaitingReply)
+        gate.complete(Unit)
+        advanceUntilIdle()
+        assertEquals(listOf("Question", "Response"), viewModel.uiState.value.messages.map { it.text() })
+        assertEquals(1, chatManager.createdChats.size)
+    }
+
+    @Test
+    fun `opening another chat from the history while answering leaves the question not sent`() = runTest {
+        setEpisodeInfo()
+        connectToInternet()
+        chatManager.sendMessageGate = CompletableDeferred()
+        viewModel.onInputTextChange("Question")
+        viewModel.onSend()
+        runCurrent()
+        viewModel.showHistory()
+
+        viewModel.openHistoryChat(historyItem(OTHER_EPISODE_UUID))
+        advanceUntilIdle()
+        assertFalse(viewModel.uiState.value.isAwaitingReply)
+        viewModel.openHistoryChat(historyItem(EPISODE_UUID, podcastUuid = PODCAST_UUID))
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertEquals(EPISODE_UUID, state.episodeUuid)
+        assertFalse(state.isAwaitingReply)
+        assertEquals(ChatError.NetworkError, state.error)
+        assertEquals(listOf("Question"), state.messages.map { it.text() })
+        assertTrue(chatManager.sentMessages.isEmpty())
+
+        chatManager.sendMessageGate = null
+        viewModel.retry()
+        advanceUntilIdle()
+
+        assertEquals(SendMessage(EPISODE_UUID, "Question"), chatManager.sentMessages.single())
+        assertEquals(listOf("Question", "Response"), viewModel.uiState.value.messages.map { it.text() })
     }
 
     @Test
@@ -2897,12 +2962,6 @@ class ChatViewModelTest {
         override suspend fun rateAnswer(answerUuid: String, rating: ChatAnswerRating?) {
             savedRatings += answerUuid to rating
         }
-
-        private fun ChatMessage.text() = when (this) {
-            is ChatMessage.User -> text
-            is ChatMessage.Assistant -> text
-            is ChatMessage.Quote -> text
-        }
     }
 
     private data class CreateChat(val episodeUuid: String, val podcastUuid: String)
@@ -2918,4 +2977,10 @@ class ChatViewModelTest {
 
 private fun internetCapabilities() = mock<NetworkCapabilities> {
     on { hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) } doReturn true
+}
+
+private fun ChatMessage.text() = when (this) {
+    is ChatMessage.User -> text
+    is ChatMessage.Assistant -> text
+    is ChatMessage.Quote -> text
 }

@@ -348,7 +348,6 @@ class ChatViewModel @Inject constructor(
     }
 
     fun showHistory() {
-        if (_uiState.value.isAwaitingReply) return
         _uiState.update {
             it.copy(
                 isHistoryVisible = true,
