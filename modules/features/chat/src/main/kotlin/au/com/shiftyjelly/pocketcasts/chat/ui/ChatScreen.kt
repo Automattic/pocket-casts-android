@@ -96,6 +96,7 @@ fun ChatScreen(
     onPlayQuote: (quoteUuid: String) -> Unit,
     onRateAnswer: (answerUuid: String, rating: ChatAnswerRating) -> Unit,
     snackbarHostState: SnackbarHostState,
+    onToastDragChange: (Boolean) -> Unit,
     onDismissBetaSheet: () -> Unit,
     onSignInClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -140,6 +141,7 @@ fun ChatScreen(
                     onClickChat = onOpenHistoryChat,
                     onDeleteChat = onDeleteHistoryChat,
                     snackbarHostState = snackbarHostState,
+                    onToastDragChange = onToastDragChange,
                     theme = theme,
                 )
             } else {
@@ -157,6 +159,7 @@ fun ChatScreen(
                         onPlayQuote = onPlayQuote,
                         onRateAnswer = onRateAnswer,
                         snackbarHostState = snackbarHostState,
+                        onToastDragChange = onToastDragChange,
                     )
                 }
             }
@@ -178,6 +181,7 @@ private fun ChatContent(
     onPlayQuote: (quoteUuid: String) -> Unit,
     onRateAnswer: (answerUuid: String, rating: ChatAnswerRating) -> Unit,
     snackbarHostState: SnackbarHostState,
+    onToastDragChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
@@ -342,6 +346,7 @@ private fun ChatContent(
             ChatSnackbarHost(
                 hostState = snackbarHostState,
                 theme = theme,
+                onDragChange = onToastDragChange,
                 modifier = Modifier.align(Alignment.BottomCenter),
             )
         }
@@ -561,6 +566,7 @@ private fun ChatScreenPreview(
                 onPlayQuote = {},
                 onRateAnswer = { _, _ -> },
                 snackbarHostState = remember { SnackbarHostState() },
+                onToastDragChange = {},
                 onDismissBetaSheet = {},
                 onSignInClick = {},
             )
@@ -596,6 +602,7 @@ private fun ChatScreenEmptyPreview(
                 onPlayQuote = {},
                 onRateAnswer = { _, _ -> },
                 snackbarHostState = remember { SnackbarHostState() },
+                onToastDragChange = {},
                 onDismissBetaSheet = {},
                 onSignInClick = {},
             )
@@ -637,6 +644,7 @@ private fun ChatScreenErrorPreview(
                 onPlayQuote = {},
                 onRateAnswer = { _, _ -> },
                 snackbarHostState = remember { SnackbarHostState() },
+                onToastDragChange = {},
                 onDismissBetaSheet = {},
                 onSignInClick = {},
             )
