@@ -25,15 +25,6 @@ abstract class EpisodeChatDao {
     @Query("DELETE FROM episode_chats")
     abstract suspend fun deleteAllChats()
 
-    @Query("DELETE FROM episode_chat_messages")
-    abstract suspend fun deleteAllMessages()
-
-    @Transaction
-    open suspend fun deleteAll() {
-        deleteAllMessages()
-        deleteAllChats()
-    }
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun insertMessage(message: EpisodeChatMessage)
 

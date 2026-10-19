@@ -112,6 +112,21 @@ class EpisodeChatDaoTest {
     }
 
     @Test
+    fun testDeleteAllChatsRemovesChatsAndTheirMessages() = runTest {
+        insertChat(EPISODE_UUID)
+        insertChat("other-episode-uuid")
+        episodeChatDao.insertMessage(createMessage(uuid = "message-uuid", episodeUuid = EPISODE_UUID, text = "Message"))
+        episodeChatDao.insertMessage(createMessage(uuid = "other-message-uuid", episodeUuid = "other-episode-uuid", text = "Other message"))
+
+        episodeChatDao.deleteAllChats()
+
+        assertNull(episodeChatDao.getChatByEpisode(EPISODE_UUID))
+        assertNull(episodeChatDao.getChatByEpisode("other-episode-uuid"))
+        assertEquals(emptyList<EpisodeChatMessage>(), episodeChatDao.getMessages(EPISODE_UUID))
+        assertEquals(emptyList<EpisodeChatMessage>(), episodeChatDao.getMessages("other-episode-uuid"))
+    }
+
+    @Test
     fun testUpdateRating() = runTest {
         insertChat()
         val message = createMessage(uuid = "message-uuid", text = "Answer")

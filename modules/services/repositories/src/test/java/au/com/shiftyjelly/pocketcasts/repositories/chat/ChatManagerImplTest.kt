@@ -315,9 +315,6 @@ class ChatManagerImplTest {
 
         override suspend fun deleteAllChats() {
             chats.clear()
-        }
-
-        override suspend fun deleteAllMessages() {
             messages.clear()
         }
 

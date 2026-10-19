@@ -108,7 +108,7 @@ class ChatManagerImpl @Inject constructor(
     }
 
     override suspend fun deleteAllChats() {
-        episodeChatDao.deleteAll()
+        episodeChatDao.deleteAllChats()
     }
 
     // Pick transcript for chat: prefer author-provided (non-generated) over Pocket Casts-generated.
