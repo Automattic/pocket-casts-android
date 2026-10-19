@@ -65,6 +65,7 @@ class ChatFragment : BaseDialogFragment() {
             episodeTitle: String,
             episodeDurationMs: Int,
             sourceView: SourceView,
+            entryPoint: ChatEntryPoint,
             isBeta: Boolean,
             podcastColors: PodcastColors,
             requiresSignIn: Boolean = false,
@@ -79,6 +80,7 @@ class ChatFragment : BaseDialogFragment() {
                         episodeTitle,
                         episodeDurationMs,
                         sourceView,
+                        entryPoint,
                         isBeta,
                         podcastColors,
                         requiresSignIn,
@@ -101,6 +103,7 @@ class ChatFragment : BaseDialogFragment() {
             podcastTitle = args.podcastTitle,
             episodeDurationMs = args.episodeDurationMs,
             sourceView = args.sourceView,
+            entryPoint = args.entryPoint,
             isBeta = args.isBeta,
             requiresSignIn = args.requiresSignIn,
         )
@@ -202,6 +205,7 @@ class ChatFragment : BaseDialogFragment() {
             sourceView = args.sourceView,
             podcastColors = viewModel.uiState.value.podcastColors,
             trigger = ChatFeedbackFragment.Trigger.ResponseRating,
+            messageIndex = viewModel.answerMessageIndex(answerUuid),
         )
     }
 
@@ -237,7 +241,9 @@ class ChatFragment : BaseDialogFragment() {
     }
 
     override fun onDismiss(dialog: DialogInterface) {
-        viewModel.trackDismissed()
+        if (activity?.isChangingConfigurations != true) {
+            viewModel.trackDismissed()
+        }
         showSurveyIfEligible()
         super.onDismiss(dialog)
     }
@@ -291,6 +297,7 @@ class ChatFragment : BaseDialogFragment() {
         val episodeTitle: String,
         val episodeDurationMs: Int,
         val sourceView: SourceView,
+        val entryPoint: ChatEntryPoint,
         val isBeta: Boolean,
         val podcastColors: PodcastColors,
         val requiresSignIn: Boolean,

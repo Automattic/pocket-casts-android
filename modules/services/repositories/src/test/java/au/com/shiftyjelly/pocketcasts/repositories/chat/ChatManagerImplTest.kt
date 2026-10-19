@@ -241,6 +241,28 @@ class ChatManagerImplTest {
     }
 
     @Test
+    fun `a failed summarize question keeps its input type`() = runTest {
+        transcripts.value = listOf(createTranscript())
+        whenever(podcastCacheServiceManager.episodeChat(any(), any())).thenAnswer { throw IOException() }
+        val question = ChatMessage.User(text = "Summarize", inputType = ChatInputType.SummaryPrompt, uuid = "user-uuid")
+
+        runCatching { manager.sendMessage(EPISODE_UUID, question, emptyList()) }
+
+        assertEquals(listOf(question.copy(failure = ChatSendFailure.Network)), storedQuestions())
+    }
+
+    @Test
+    fun `a question stored before input types were saved reads as typed with its failure`() = runTest {
+        episodeChatDao.messages += createMessage(uuid = "user-uuid", episodeUuid = EPISODE_UUID, text = "Question")
+            .copy(role = ChatRole.User.value, metadata = """{"failure":"network"}""")
+
+        assertEquals(
+            listOf(ChatMessage.User(text = "Question", failure = ChatSendFailure.Network, inputType = ChatInputType.Typed, uuid = "user-uuid")),
+            storedQuestions(),
+        )
+    }
+
+    @Test
     fun `send message stores the question before the reply arrives`() = runTest {
         transcripts.value = listOf(createTranscript())
         var storedBeforeReply = emptyList<String>()

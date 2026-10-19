@@ -10,6 +10,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.EpisodeChatHistoryItem
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatAnswerRating
+import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatInputType
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatManager
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatMessage
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatQuoteSeeker
@@ -41,6 +42,7 @@ import com.automattic.eventhorizon.EpisodeChatQuotePlayTappedEvent
 import com.automattic.eventhorizon.EpisodeChatQuotePlayUndoneEvent
 import com.automattic.eventhorizon.EpisodeChatQuoteSourceType
 import com.automattic.eventhorizon.EpisodeChatResponseRatedEvent
+import com.automattic.eventhorizon.EpisodeChatResponseRatingClearedEvent
 import com.automattic.eventhorizon.EpisodeChatResponseReceivedEvent
 import com.automattic.eventhorizon.EpisodeChatSentimentType
 import com.automattic.eventhorizon.EpisodeChatShownEvent
@@ -111,7 +113,8 @@ class ChatViewModel @Inject constructor(
     private val episodeUuid get() = checkNotNull(chatEpisode.value).uuid
     private val podcastUuid get() = checkNotNull(chatEpisode.value).podcastUuid
     private var playingEpisodeUuid: String? = null
-    private var historyItems: List<EpisodeChatHistoryItem> = emptyList()
+    private var historyItems: List<EpisodeChatHistoryItem>? = null
+    private var isHistoryShownPending = false
 
     @Volatile private var isAdoptingUnansweredQuestion = false
 
@@ -119,7 +122,7 @@ class ChatViewModel @Inject constructor(
 
     @Volatile private var quotePlaybackUndo: PlaybackPosition? = null
     private var transientUserMessage: ChatMessage.User? = null
-    private var transientInputType: EpisodeChatInputType = EpisodeChatInputType.Typed
+    private var pendingShownEntryPoint: ChatEntryPoint? = null
     private var hasReceivedAnswer = false
     private var hasSubmittedFeedback = false
     private lateinit var sourceView: SourceView
@@ -141,6 +144,7 @@ class ChatViewModel @Inject constructor(
         podcastTitle: String,
         episodeDurationMs: Int,
         sourceView: SourceView,
+        entryPoint: ChatEntryPoint,
         isBeta: Boolean,
         requiresSignIn: Boolean = false,
     ) {
@@ -148,7 +152,7 @@ class ChatViewModel @Inject constructor(
         this.sourceView = sourceView
         val isSignInRequired = requiresSignIn && !syncManager.isLoggedIn()
         _uiState.update { it.copy(isBeta = isBeta, isSignInRequired = isSignInRequired) }
-        openChat(ChatEpisode(episodeUuid, episodeTitle, podcastUuid, podcastTitle, episodeDurationMs))
+        openChat(ChatEpisode(episodeUuid, episodeTitle, podcastUuid, podcastTitle, episodeDurationMs), entryPoint)
         observePlayback()
         if (isSignInRequired) {
             showBetaSheet()
@@ -177,9 +181,9 @@ class ChatViewModel @Inject constructor(
         if (!_uiState.value.isSignInRequired || !syncManager.isLoggedIn()) return
         settings.episodeChatBetaSheetSeen.set(true, updateModifiedAt = false)
         _uiState.update { it.copy(isSignInRequired = false, isBetaSheetVisible = false) }
+        pendingShownEntryPoint = ChatEntryPoint.SignIn
         observeMessages()
         observeHistory()
-        trackShown()
         viewModelScope.launch {
             settings.cachedSubscription.flow.collect { subscription ->
                 _uiState.update { it.copy(isBeta = subscription == null) }
@@ -187,7 +191,7 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    private fun openChat(episode: ChatEpisode) {
+    private fun openChat(episode: ChatEpisode, entryPoint: ChatEntryPoint) {
         sendJob?.cancel()
         transientUserMessage = null
         isAdoptingUnansweredQuestion = true
@@ -207,9 +211,10 @@ class ChatViewModel @Inject constructor(
                 answerRatings = emptyMap(),
             )
         }
+        trackShownIfPending(hasHistory = null)
+        pendingShownEntryPoint = entryPoint.takeUnless { _uiState.value.isSignInRequired }
         chatEpisode.value = episode
         createChat(episode)
-        if (!_uiState.value.isSignInRequired) trackShown()
     }
 
     private fun observeMessages() {
@@ -228,6 +233,9 @@ class ChatViewModel @Inject constructor(
                         answerRatings = if (state.areMessagesLoaded) state.answerRatings else messages.storedAnswerRatings(),
                         error = unansweredQuestion?.let { it.failure.toChatError() } ?: state.error,
                     )
+                }
+                if (messagesEpisodeUuid == chatEpisode.value?.uuid) {
+                    trackShownIfPending(hasHistory = messages.isNotEmpty())
                 }
             }
         }
@@ -321,6 +329,12 @@ class ChatViewModel @Inject constructor(
             chatManager.observeHistory().collect { items ->
                 historyItems = items
                 _uiState.update { it.copy(history = items.toHistorySections(clock.instant(), ZoneId.systemDefault())) }
+                if (isHistoryShownPending) {
+                    isHistoryShownPending = false
+                    if (_uiState.value.isHistoryVisible) {
+                        trackHistoryShown()
+                    }
+                }
             }
         }
     }
@@ -330,9 +344,17 @@ class ChatViewModel @Inject constructor(
         _uiState.update {
             it.copy(
                 isHistoryVisible = true,
-                history = historyItems.toHistorySections(clock.instant(), ZoneId.systemDefault()),
+                history = historyItems.orEmpty().toHistorySections(clock.instant(), ZoneId.systemDefault()),
             )
         }
+        if (historyItems == null) {
+            isHistoryShownPending = true
+        } else {
+            trackHistoryShown()
+        }
+    }
+
+    private fun trackHistoryShown() {
         eventHorizon.track(
             EpisodeChatHistoryShownEvent(
                 source = sourceView.analyticsValue,
@@ -346,16 +368,28 @@ class ChatViewModel @Inject constructor(
     }
 
     fun openHistoryChat(item: EpisodeChatHistoryItem) {
+        val row = _uiState.value.history.rowOf(item.episodeUuid)
         eventHorizon.track(
             EpisodeChatHistoryRowTappedEvent(
                 source = sourceView.analyticsValue,
                 episodeUuid = item.episodeUuid,
                 podcastUuid = item.podcastUuid,
                 isNowPlaying = item.episodeUuid == playingEpisodeUuid,
+                section = row?.first?.analyticsValue,
+                position = row?.second,
             ),
         )
         if (item.episodeUuid != episodeUuid) {
-            openChat(ChatEpisode(item.episodeUuid, item.episodeTitle, item.podcastUuid, item.podcastTitle, item.episodeDurationMs))
+            openChat(
+                ChatEpisode(
+                    uuid = item.episodeUuid,
+                    title = item.episodeTitle,
+                    podcastUuid = item.podcastUuid,
+                    podcastTitle = item.podcastTitle,
+                    durationMs = item.episodeDurationMs,
+                ),
+                ChatEntryPoint.History,
+            )
         }
         closeHistory()
     }
@@ -469,6 +503,7 @@ class ChatViewModel @Inject constructor(
 
     fun trackDismissed() {
         if (_uiState.value.isSignInRequired) return
+        trackShownIfPending(hasHistory = null)
         eventHorizon.track(
             EpisodeChatDismissedEvent(
                 source = sourceView.analyticsValue,
@@ -483,19 +518,19 @@ class ChatViewModel @Inject constructor(
         val text = _uiState.value.inputText.trim()
 
         _uiState.update { it.copy(inputText = "") }
-        performSend(message = ChatMessage.User(text = text), inputType = EpisodeChatInputType.Typed)
+        performSend(message = ChatMessage.User(text = text, inputType = ChatInputType.Typed))
     }
 
     fun onSummarizeClick(text: String) {
         val state = _uiState.value
         if (!state.areMessagesLoaded || state.isAwaitingReply || !state.isConnected) return
-        performSend(message = ChatMessage.User(text = text), inputType = EpisodeChatInputType.SummaryPrompt)
+        performSend(message = ChatMessage.User(text = text, inputType = ChatInputType.SummaryPrompt))
     }
 
     fun retry() {
         if (!_uiState.value.isConnected || _uiState.value.isAwaitingReply) return
         val failedUserMessage = transientUserMessage ?: return
-        performSend(message = failedUserMessage, inputType = transientInputType)
+        performSend(message = failedUserMessage, isRetry = true)
     }
 
     fun playQuote(quoteUuid: String) {
@@ -603,13 +638,24 @@ class ChatViewModel @Inject constructor(
         } != null
     }
 
-    private fun performSend(message: ChatMessage.User, inputType: EpisodeChatInputType) {
+    private fun performSend(message: ChatMessage.User, isRetry: Boolean = false) {
+        val inputType = message.inputType.analyticsValue
         val supersededQuestionUuid = transientUserMessage?.uuid?.takeIf { it != message.uuid }
         val unsentMessageUuids = setOfNotNull(transientUserMessage?.uuid, message.uuid)
         transientUserMessage = message
-        transientInputType = inputType
         val currentMessages = _uiState.value.messages.filterNot { it.uuid in unsentMessageUuids }
         val messageIndex = currentMessages.count { it is ChatMessage.User } + 1L
+        eventHorizon.track(
+            EpisodeChatMessageSentEvent(
+                source = sourceView.analyticsValue,
+                episodeUuid = episodeUuid,
+                podcastUuid = podcastUuid,
+                messageLength = message.text.length.toLong(),
+                inputType = inputType,
+                messageIndex = messageIndex,
+                isRetry = isRetry,
+            ),
+        )
 
         _uiState.update {
             it.copy(
@@ -631,30 +677,21 @@ class ChatViewModel @Inject constructor(
                 transientUserMessage = null
                 hasReceivedAnswer = true
                 eventHorizon.track(
-                    EpisodeChatMessageSentEvent(
-                        source = sourceView.analyticsValue,
-                        episodeUuid = episodeUuid,
-                        podcastUuid = podcastUuid,
-                        messageLength = message.text.length.toLong(),
-                        inputType = inputType,
-                        messageIndex = messageIndex,
-                    ),
-                )
-                eventHorizon.track(
                     EpisodeChatResponseReceivedEvent(
                         source = sourceView.analyticsValue,
                         episodeUuid = episodeUuid,
                         podcastUuid = podcastUuid,
                         durationMs = responseDuration.inWholeMilliseconds,
+                        messageIndex = messageIndex,
                     ),
                 )
             } catch (e: IOException) {
-                trackMessageFailed(EpisodeChatErrorType.Network)
+                trackMessageFailed(EpisodeChatErrorType.Network, inputType, messageIndex)
                 _uiState.update { it.copy(error = ChatError.NetworkError) }
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                trackMessageFailed(EpisodeChatErrorType.Server)
+                trackMessageFailed(EpisodeChatErrorType.Server, inputType, messageIndex)
                 _uiState.update { it.copy(error = ChatError.ServerError) }
             } finally {
                 _uiState.update { it.copy(isAwaitingReply = false) }
@@ -685,7 +722,8 @@ class ChatViewModel @Inject constructor(
     }
 
     fun rateAnswer(answerUuid: String, rating: ChatAnswerRating): ChatAnswerRating? {
-        val newRating = rating.takeIf { it != _uiState.value.answerRatings[answerUuid] }
+        val previousRating = _uiState.value.answerRatings[answerUuid]
+        val newRating = rating.takeIf { it != previousRating }
         _uiState.update { state ->
             val ratings = if (newRating == null) {
                 state.answerRatings - answerUuid
@@ -695,9 +733,7 @@ class ChatViewModel @Inject constructor(
             state.copy(answerRatings = ratings)
         }
         saveAnswerRating(answerUuid, newRating)
-        if (newRating != null) {
-            trackAnswerRated(answerUuid, newRating)
-        }
+        trackAnswerRated(answerUuid, newRating, previousRating)
         if (newRating == ChatAnswerRating.Positive) {
             showToast(ChatToast.FeedbackThanks)
         }
@@ -722,23 +758,35 @@ class ChatViewModel @Inject constructor(
         return mapNotNull { message -> message.answerRating?.let { message.uuid to it } }.toMap()
     }
 
-    private fun trackAnswerRated(answerUuid: String, rating: ChatAnswerRating) {
+    fun answerMessageIndex(answerUuid: String): Long? {
         val messages = _uiState.value.messages
         val answerIndex = messages.indexOfFirst { it.uuid == answerUuid }
-        val messageIndex = if (answerIndex >= 0) {
-            messages.subList(0, answerIndex).count { it is ChatMessage.User }.toLong()
-        } else {
-            null
-        }
-        eventHorizon.track(
-            EpisodeChatResponseRatedEvent(
+        if (answerIndex < 0) return null
+        return messages.subList(0, answerIndex).count { it is ChatMessage.User }.toLong()
+    }
+
+    private fun trackAnswerRated(answerUuid: String, rating: ChatAnswerRating?, previousRating: ChatAnswerRating?) {
+        val event = when {
+            rating != null -> EpisodeChatResponseRatedEvent(
                 source = sourceView.analyticsValue,
                 episodeUuid = episodeUuid,
                 podcastUuid = podcastUuid,
                 rating = rating.analyticsValue,
-                messageIndex = messageIndex,
-            ),
-        )
+                messageIndex = answerMessageIndex(answerUuid),
+                previousRating = previousRating?.analyticsValue,
+            )
+
+            previousRating != null -> EpisodeChatResponseRatingClearedEvent(
+                source = sourceView.analyticsValue,
+                episodeUuid = episodeUuid,
+                podcastUuid = podcastUuid,
+                previousRating = previousRating.analyticsValue,
+                messageIndex = answerMessageIndex(answerUuid),
+            )
+
+            else -> return
+        }
+        eventHorizon.track(event)
     }
 
     fun onFeedbackSubmitted() {
@@ -771,23 +819,29 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    private fun trackShown() {
+    private fun trackShownIfPending(hasHistory: Boolean?) {
+        val entryPoint = pendingShownEntryPoint ?: return
+        pendingShownEntryPoint = null
         eventHorizon.track(
             EpisodeChatShownEvent(
                 source = sourceView.analyticsValue,
                 episodeUuid = episodeUuid,
                 podcastUuid = podcastUuid,
+                hasHistory = hasHistory,
+                entryPoint = entryPoint.analyticsValue,
             ),
         )
     }
 
-    private fun trackMessageFailed(error: EpisodeChatErrorType) {
+    private fun trackMessageFailed(error: EpisodeChatErrorType, inputType: EpisodeChatInputType, messageIndex: Long) {
         eventHorizon.track(
             EpisodeChatMessageFailedEvent(
                 source = sourceView.analyticsValue,
                 episodeUuid = episodeUuid,
                 podcastUuid = podcastUuid,
                 error = error,
+                inputType = inputType,
+                messageIndex = messageIndex,
             ),
         )
     }
@@ -896,6 +950,12 @@ private val ChatAnswerRating.analyticsValue
     get() = when (this) {
         ChatAnswerRating.Positive -> EpisodeChatSentimentType.Positive
         ChatAnswerRating.Negative -> EpisodeChatSentimentType.Negative
+    }
+
+private val ChatInputType.analyticsValue
+    get() = when (this) {
+        ChatInputType.Typed -> EpisodeChatInputType.Typed
+        ChatInputType.SummaryPrompt -> EpisodeChatInputType.SummaryPrompt
     }
 
 data class ChatPlayingEpisode(

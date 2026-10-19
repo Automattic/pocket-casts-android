@@ -17,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.ReadSetting
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatAnswerRating
+import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatInputType
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatManager
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatMessage
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatQuoteSeeker
@@ -36,8 +37,11 @@ import com.automattic.eventhorizon.EpisodeChatClearUndoneEvent
 import com.automattic.eventhorizon.EpisodeChatClearedEvent
 import com.automattic.eventhorizon.EpisodeChatDeleteUndoneEvent
 import com.automattic.eventhorizon.EpisodeChatDeletedEvent
+import com.automattic.eventhorizon.EpisodeChatDismissedEvent
+import com.automattic.eventhorizon.EpisodeChatEntryPointType
 import com.automattic.eventhorizon.EpisodeChatErrorType
 import com.automattic.eventhorizon.EpisodeChatHistoryRowTappedEvent
+import com.automattic.eventhorizon.EpisodeChatHistorySectionType
 import com.automattic.eventhorizon.EpisodeChatHistoryShownEvent
 import com.automattic.eventhorizon.EpisodeChatInputType
 import com.automattic.eventhorizon.EpisodeChatMessageFailedEvent
@@ -46,6 +50,7 @@ import com.automattic.eventhorizon.EpisodeChatQuotePlayTappedEvent
 import com.automattic.eventhorizon.EpisodeChatQuotePlayUndoneEvent
 import com.automattic.eventhorizon.EpisodeChatQuoteSourceType
 import com.automattic.eventhorizon.EpisodeChatResponseRatedEvent
+import com.automattic.eventhorizon.EpisodeChatResponseRatingClearedEvent
 import com.automattic.eventhorizon.EpisodeChatResponseReceivedEvent
 import com.automattic.eventhorizon.EpisodeChatSentimentType
 import com.automattic.eventhorizon.EpisodeChatShownEvent
@@ -177,6 +182,7 @@ class ChatViewModelTest {
             podcastTitle = "Podcast title",
             episodeDurationMs = 123_000,
             sourceView = SourceView.PLAYER,
+            entryPoint = ChatEntryPoint.PlayerShelf,
             isBeta = false,
         )
 
@@ -201,9 +207,57 @@ class ChatViewModelTest {
                 source = SourceView.PLAYER.analyticsValue,
                 episodeUuid = EPISODE_UUID,
                 podcastUuid = PODCAST_UUID,
+                hasHistory = false,
+                entryPoint = ChatEntryPoint.PlayerShelf.analyticsValue,
             ),
             eventSink.pollEvent(),
         )
+    }
+
+    @Test
+    fun `reopening a chat with messages tracks it as continued`() = runTest {
+        chatManager.messages.value = listOf(ChatMessage.User("Earlier"), ChatMessage.Assistant("Answer"))
+
+        setEpisodeInfo(entryPoint = ChatEntryPoint.MoreActions)
+
+        assertEquals(
+            EpisodeChatShownEvent(
+                source = SourceView.PLAYER.analyticsValue,
+                episodeUuid = EPISODE_UUID,
+                podcastUuid = PODCAST_UUID,
+                hasHistory = true,
+                entryPoint = ChatEntryPoint.MoreActions.analyticsValue,
+            ),
+            eventSink.pollEvent(),
+        )
+    }
+
+    @Test
+    fun `closing the chat before its messages load still tracks it as shown`() = runTest {
+        chatManager.observedMessages = MutableSharedFlow()
+        setEpisodeInfo()
+
+        viewModel.trackDismissed()
+
+        assertEquals(
+            EpisodeChatShownEvent(
+                source = SourceView.PLAYER.analyticsValue,
+                episodeUuid = EPISODE_UUID,
+                podcastUuid = PODCAST_UUID,
+                hasHistory = null,
+                entryPoint = ChatEntryPoint.PlayerShelf.analyticsValue,
+            ),
+            eventSink.pollEvent(),
+        )
+        assertTrue(eventSink.pollEvent() is EpisodeChatDismissedEvent)
+    }
+
+    @Test
+    fun `chat shown is tracked once per opened chat`() = runTest {
+        setEpisodeInfo()
+        chatManager.messages.value = listOf(ChatMessage.User("Question"))
+
+        assertEquals(1, List(eventSink.size) { eventSink.pollEvent() }.count { it is EpisodeChatShownEvent })
     }
 
     @Test
@@ -218,6 +272,7 @@ class ChatViewModelTest {
             podcastTitle = "Podcast title",
             episodeDurationMs = 123_000,
             sourceView = SourceView.PLAYER,
+            entryPoint = ChatEntryPoint.PlayerShelf,
             isBeta = false,
         )
 
@@ -279,6 +334,7 @@ class ChatViewModelTest {
                 messageLength = "Summarize this episode".length.toLong(),
                 inputType = EpisodeChatInputType.SummaryPrompt,
                 messageIndex = 1,
+                isRetry = false,
             ),
             eventSink.pollEvent(),
         )
@@ -400,9 +456,10 @@ class ChatViewModelTest {
     }
 
     @Test
-    fun `send tracks message sent after success`() = runTest {
+    fun `send tracks message sent before the answer arrives`() = runTest {
         setEpisodeInfo()
         eventSink.skipEvent()
+        chatManager.sendMessageGate = CompletableDeferred()
         viewModel.onInputTextChange("Question")
 
         viewModel.onSend()
@@ -416,6 +473,7 @@ class ChatViewModelTest {
                 messageLength = "Question".length.toLong(),
                 inputType = EpisodeChatInputType.Typed,
                 messageIndex = 1,
+                isRetry = false,
             ),
             eventSink.pollEvent(),
         )
@@ -440,6 +498,7 @@ class ChatViewModelTest {
                 episodeUuid = EPISODE_UUID,
                 podcastUuid = PODCAST_UUID,
                 durationMs = 2_500,
+                messageIndex = 1,
             ),
             eventSink.pollEvent(),
         )
@@ -453,6 +512,7 @@ class ChatViewModelTest {
 
         sendQuestion("Question")
 
+        assertTrue(eventSink.pollEvent() is EpisodeChatMessageSentEvent)
         assertTrue(eventSink.pollEvent() is EpisodeChatMessageFailedEvent)
         assertTrue(eventSink.isEmpty())
     }
@@ -483,12 +543,15 @@ class ChatViewModelTest {
         viewModel.onSend()
         advanceUntilIdle()
 
+        eventSink.skipEvent()
         assertEquals(
             EpisodeChatMessageFailedEvent(
                 source = SourceView.PLAYER.analyticsValue,
                 episodeUuid = EPISODE_UUID,
                 podcastUuid = PODCAST_UUID,
                 error = EpisodeChatErrorType.Network,
+                inputType = EpisodeChatInputType.Typed,
+                messageIndex = 1,
             ),
             eventSink.pollEvent(),
         )
@@ -552,6 +615,34 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `retry tracks message sent as a retry`() = runTest {
+        setEpisodeInfo()
+        connectToInternet()
+        chatManager.sendMessageException = IOException()
+        viewModel.onInputTextChange("Question")
+        viewModel.onSend()
+        advanceUntilIdle()
+        chatManager.sendMessageException = null
+        eventSink.skipEvent(eventSink.size)
+
+        viewModel.retry()
+        advanceUntilIdle()
+
+        assertEquals(
+            EpisodeChatMessageSentEvent(
+                source = SourceView.PLAYER.analyticsValue,
+                episodeUuid = EPISODE_UUID,
+                podcastUuid = PODCAST_UUID,
+                messageLength = "Question".length.toLong(),
+                inputType = EpisodeChatInputType.Typed,
+                messageIndex = 1,
+                isRetry = true,
+            ),
+            eventSink.pollEvent(),
+        )
+    }
+
+    @Test
     fun `retry keeps the summarize input type`() = runTest {
         setEpisodeInfo()
         connectToInternet()
@@ -566,6 +657,52 @@ class ChatViewModelTest {
 
         assertEquals(
             EpisodeChatInputType.SummaryPrompt,
+            (eventSink.pollEvent() as EpisodeChatMessageSentEvent).inputType,
+        )
+    }
+
+    @Test
+    fun `retrying a reopened summarize question keeps the summarize input type`() = runTest {
+        chatManager.messages.value = listOf(
+            ChatMessage.User(
+                text = "Summarize this episode",
+                failure = ChatSendFailure.Network,
+                inputType = ChatInputType.SummaryPrompt,
+                uuid = "question-uuid",
+            ),
+        )
+        setEpisodeInfo()
+        connectToInternet()
+        advanceUntilIdle()
+        eventSink.skipEvent(eventSink.size)
+
+        viewModel.retry()
+        advanceUntilIdle()
+
+        assertEquals(
+            EpisodeChatInputType.SummaryPrompt,
+            (eventSink.pollEvent() as EpisodeChatMessageSentEvent).inputType,
+        )
+    }
+
+    @Test
+    fun `retrying a reopened typed question after a summarize send tracks it as typed`() = runTest {
+        setEpisodeInfo()
+        connectToInternet()
+        chatManager.sendMessageException = IOException()
+        viewModel.onSummarizeClick("Summarize this episode")
+        advanceUntilIdle()
+        chatManager.sendMessageException = null
+        chatManager.otherMessages.value = listOf(ChatMessage.User(text = "Typed", failure = ChatSendFailure.Network, uuid = "typed-uuid"))
+        viewModel.openHistoryChat(historyItem(OTHER_EPISODE_UUID))
+        advanceUntilIdle()
+        eventSink.skipEvent(eventSink.size)
+
+        viewModel.retry()
+        advanceUntilIdle()
+
+        assertEquals(
+            EpisodeChatInputType.Typed,
             (eventSink.pollEvent() as EpisodeChatMessageSentEvent).inputType,
         )
     }
@@ -720,15 +857,54 @@ class ChatViewModelTest {
     }
 
     @Test
-    fun `clearing a rating is not tracked`() = runTest {
+    fun `clearing a rating tracks the removed rating`() = runTest {
+        chatManager.messages.value = listOf(
+            ChatMessage.User("Q1", uuid = "q1"),
+            ChatMessage.Assistant("A1", uuid = "a1"),
+        )
         setEpisodeInfo()
         eventSink.skipEvent()
-        viewModel.rateAnswer("answer-uuid", ChatAnswerRating.Positive)
+        viewModel.rateAnswer("a1", ChatAnswerRating.Positive)
         eventSink.skipEvent()
 
-        viewModel.rateAnswer("answer-uuid", ChatAnswerRating.Positive)
+        viewModel.rateAnswer("a1", ChatAnswerRating.Positive)
 
-        assertTrue(eventSink.isEmpty())
+        assertEquals(
+            EpisodeChatResponseRatingClearedEvent(
+                source = SourceView.PLAYER.analyticsValue,
+                episodeUuid = EPISODE_UUID,
+                podcastUuid = PODCAST_UUID,
+                previousRating = EpisodeChatSentimentType.Positive,
+                messageIndex = 1,
+            ),
+            eventSink.pollEvent(),
+        )
+    }
+
+    @Test
+    fun `switching a rating tracks the replaced rating`() = runTest {
+        chatManager.messages.value = listOf(
+            ChatMessage.User("Q1", uuid = "q1"),
+            ChatMessage.Assistant("A1", uuid = "a1"),
+        )
+        setEpisodeInfo()
+        eventSink.skipEvent()
+        viewModel.rateAnswer("a1", ChatAnswerRating.Positive)
+        eventSink.skipEvent()
+
+        viewModel.rateAnswer("a1", ChatAnswerRating.Negative)
+
+        assertEquals(
+            EpisodeChatResponseRatedEvent(
+                source = SourceView.PLAYER.analyticsValue,
+                episodeUuid = EPISODE_UUID,
+                podcastUuid = PODCAST_UUID,
+                rating = EpisodeChatSentimentType.Negative,
+                messageIndex = 1,
+                previousRating = EpisodeChatSentimentType.Positive,
+            ),
+            eventSink.pollEvent(),
+        )
     }
 
     @Test
@@ -814,7 +990,7 @@ class ChatViewModelTest {
 
         sendQuestion("Second")
 
-        assertEquals(listOf(1L, 2L), eventSink.messageIndexes())
+        assertEquals(listOf(1L, 2L, 2L), eventSink.messageIndexes())
         assertEquals(listOf("First", "Response"), chatManager.sentHistories.last())
     }
 
@@ -830,7 +1006,7 @@ class ChatViewModelTest {
         viewModel.retry()
         advanceUntilIdle()
 
-        assertEquals(listOf(1L, 2L), eventSink.messageIndexes())
+        assertEquals(listOf(1L, 2L, 2L), eventSink.messageIndexes())
     }
 
     @Test
@@ -1711,6 +1887,7 @@ class ChatViewModelTest {
     private fun setEpisodeInfo(
         episodeDurationMs: Int = 123_000,
         sourceView: SourceView = SourceView.PLAYER,
+        entryPoint: ChatEntryPoint = ChatEntryPoint.PlayerShelf,
         isBeta: Boolean = false,
         requiresSignIn: Boolean = false,
     ) {
@@ -1721,6 +1898,7 @@ class ChatViewModelTest {
             podcastTitle = "Podcast title",
             episodeDurationMs = episodeDurationMs,
             sourceView = sourceView,
+            entryPoint = entryPoint,
             isBeta = isBeta,
             requiresSignIn = requiresSignIn,
         )
@@ -1838,6 +2016,7 @@ class ChatViewModelTest {
 
     @Test
     fun `a signed out user is not counted as opening the chat until signing in`() = runTest {
+        chatManager.messages.value = listOf(ChatMessage.User(text = "Old question", uuid = "old-uuid"))
         isLoggedIn = false
         setEpisodeInfo(isBeta = true, requiresSignIn = true)
         viewModel.trackDismissed()
@@ -1847,8 +2026,18 @@ class ChatViewModelTest {
 
         isLoggedIn = true
         viewModel.refreshSignIn()
+        advanceUntilIdle()
 
-        assertTrue(eventSink.pollEvent() is EpisodeChatShownEvent)
+        assertEquals(
+            EpisodeChatShownEvent(
+                source = SourceView.PLAYER.analyticsValue,
+                episodeUuid = EPISODE_UUID,
+                podcastUuid = PODCAST_UUID,
+                hasHistory = true,
+                entryPoint = EpisodeChatEntryPointType.SignIn,
+            ),
+            eventSink.pollEvent(),
+        )
     }
 
     @Test
@@ -1971,6 +2160,39 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `showing the history before it loads tracks how many chats there are once it loads`() = runTest {
+        val history = MutableSharedFlow<List<EpisodeChatHistoryItem>>()
+        chatManager.observedHistory = history
+        setEpisodeInfo()
+        advanceUntilIdle()
+        eventSink.skipEvent()
+
+        viewModel.showHistory()
+        assertTrue(eventSink.isEmpty())
+        history.emit(listOf(historyItem(EPISODE_UUID), historyItem(OTHER_EPISODE_UUID, daysAgo = 3)))
+        advanceUntilIdle()
+
+        assertEquals(EpisodeChatHistoryShownEvent(source = SourceView.PLAYER.analyticsValue, chatCount = 2), eventSink.pollEvent())
+        assertTrue(eventSink.isEmpty())
+    }
+
+    @Test
+    fun `closing the history before it loads does not track it as shown`() = runTest {
+        val history = MutableSharedFlow<List<EpisodeChatHistoryItem>>()
+        chatManager.observedHistory = history
+        setEpisodeInfo()
+        advanceUntilIdle()
+        eventSink.skipEvent()
+
+        viewModel.showHistory()
+        viewModel.closeHistory()
+        history.emit(listOf(historyItem(EPISODE_UUID)))
+        advanceUntilIdle()
+
+        assertTrue(eventSink.isEmpty())
+    }
+
+    @Test
     fun `showing the history again regroups the chats for the current day`() = runTest {
         chatManager.history.value = listOf(historyItem(EPISODE_UUID))
         setEpisodeInfo()
@@ -2027,6 +2249,34 @@ class ChatViewModelTest {
                 source = SourceView.PLAYER.analyticsValue,
                 episodeUuid = OTHER_EPISODE_UUID,
                 podcastUuid = OTHER_PODCAST_UUID,
+                hasHistory = true,
+                entryPoint = ChatEntryPoint.History.analyticsValue,
+            ),
+            eventSink.pollEvent(),
+        )
+    }
+
+    @Test
+    fun `opening a chat from the history tracks its section and position`() = runTest {
+        chatManager.history.value = listOf(
+            historyItem(EPISODE_UUID, podcastUuid = PODCAST_UUID),
+            historyItem("yesterday-episode", daysAgo = 1),
+            historyItem(OTHER_EPISODE_UUID, daysAgo = 3),
+        )
+        setEpisodeInfo()
+        viewModel.showHistory()
+        eventSink.skipEvent(eventSink.size)
+
+        viewModel.openHistoryChat(historyItem(OTHER_EPISODE_UUID, daysAgo = 3))
+
+        assertEquals(
+            EpisodeChatHistoryRowTappedEvent(
+                source = SourceView.PLAYER.analyticsValue,
+                episodeUuid = OTHER_EPISODE_UUID,
+                podcastUuid = OTHER_PODCAST_UUID,
+                isNowPlaying = false,
+                section = EpisodeChatHistorySectionType.Previous7Days,
+                position = 3,
             ),
             eventSink.pollEvent(),
         )
@@ -2211,7 +2461,9 @@ class ChatViewModelTest {
 
         private fun messagesFor(episodeUuid: String) = if (episodeUuid == OTHER_EPISODE_UUID) otherMessages else messages
 
-        override fun observeHistory(): Flow<List<EpisodeChatHistoryItem>> = history
+        var observedHistory: Flow<List<EpisodeChatHistoryItem>>? = null
+
+        override fun observeHistory(): Flow<List<EpisodeChatHistoryItem>> = observedHistory ?: history
 
         val discardedMessageUuids = mutableListOf<String>()
 
