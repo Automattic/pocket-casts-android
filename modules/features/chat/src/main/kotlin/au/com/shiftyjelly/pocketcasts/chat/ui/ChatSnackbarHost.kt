@@ -109,7 +109,8 @@ private fun SwipeToDismissToast(
                 onDragStopped = { velocity ->
                     val isFarEnough = width > 0 && abs(offsetX.value) > width * DISMISS_DISTANCE_FRACTION
                     val isFlungAway = abs(velocity) > dismissVelocity && sign(velocity) != -sign(offsetX.value)
-                    if (isFarEnough || isFlungAway) {
+                    val isFlungBack = abs(velocity) > dismissVelocity && sign(velocity) == -sign(offsetX.value)
+                    if (isFlungAway || (isFarEnough && !isFlungBack)) {
                         val direction = if (isFlungAway) sign(velocity) else sign(offsetX.value)
                         offsetX.animateTo(direction * width)
                         onDismiss()
