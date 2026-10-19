@@ -160,22 +160,25 @@ class ChatViewModel @Inject constructor(
     ) {
         if (chatEpisode.value != null) return
         this.sourceView = sourceView
-        val isSignInRequired = requiresSignIn && !syncManager.isLoggedIn()
         _uiState.update {
             it.copy(
                 isBeta = isBeta,
                 isBetaNoteVisible = FeatureFlag.isEnabled(Feature.EPISODE_CHAT_FREE_BETA),
-                isSignInRequired = isSignInRequired,
+                isSignInRequired = requiresSignIn,
             )
         }
         openChat(ChatEpisode(episodeUuid, episodeTitle, podcastUuid, podcastTitle, episodeDurationMs), entryPoint)
         observePlayback()
-        if (isSignInRequired) {
-            showBetaSheet()
-        } else {
-            observeMessages()
-            observeHistory()
-            showBetaSheetIfNeeded(isBeta)
+        when {
+            !requiresSignIn -> {
+                observeMessages()
+                observeHistory()
+                showBetaSheetIfNeeded(isBeta)
+            }
+
+            syncManager.isLoggedIn() -> completeSignIn()
+
+            else -> showBetaSheet()
         }
     }
 
@@ -195,8 +198,18 @@ class ChatViewModel @Inject constructor(
     fun refreshSignIn() {
         isSigningIn = false
         if (!_uiState.value.isSignInRequired || !syncManager.isLoggedIn()) return
+        completeSignIn()
+    }
+
+    private fun completeSignIn() {
         settings.episodeChatBetaSheetSeen.set(true, updateModifiedAt = false)
-        _uiState.update { it.copy(isSignInRequired = false, isBetaSheetVisible = false) }
+        _uiState.update {
+            it.copy(
+                isBeta = settings.cachedSubscription.value == null,
+                isSignInRequired = false,
+                isBetaSheetVisible = false,
+            )
+        }
         pendingShownEntryPoint = ChatEntryPoint.SignIn
         observeMessages()
         observeHistory()
