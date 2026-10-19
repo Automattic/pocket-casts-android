@@ -90,7 +90,7 @@ internal data class ChatTheme(
             rating = colors.contrast05,
             errorText = ErrorRed,
             toastAction = ThemeLightColors.primaryInteractive01,
-            offlineNote = OfflineNoteWhite,
+            offlineNote = colors.contrast02.copy(alpha = maxOf(colors.contrast02.alpha, OFFLINE_NOTE_MIN_ALPHA)),
         )
     }
 }
@@ -111,4 +111,4 @@ internal fun rememberChatTheme(): ChatTheme {
 
 private val QuoteTimestampBlue = Color(0xFF2A67F9)
 private val ErrorRed = Color(0xFFF43E37)
-private val OfflineNoteWhite = Color.White.copy(alpha = 0.6f)
+private const val OFFLINE_NOTE_MIN_ALPHA = 0.6f
