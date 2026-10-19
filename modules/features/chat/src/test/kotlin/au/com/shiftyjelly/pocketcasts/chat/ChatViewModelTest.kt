@@ -1901,6 +1901,8 @@ class ChatViewModelTest {
             savedRatings += answerUuid to rating
         }
 
+        override suspend fun deleteAllChats() = Unit
+
         private fun ChatMessage.text() = when (this) {
             is ChatMessage.User -> text
             is ChatMessage.Assistant -> text

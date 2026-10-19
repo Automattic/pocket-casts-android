@@ -22,6 +22,9 @@ abstract class EpisodeChatDao {
     @Query("DELETE FROM episode_chats WHERE episode_uuid = :episodeUuid")
     abstract suspend fun deleteChat(episodeUuid: String)
 
+    @Query("DELETE FROM episode_chats")
+    abstract suspend fun deleteAllChats()
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun insertMessage(message: EpisodeChatMessage)
 

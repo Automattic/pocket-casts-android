@@ -24,4 +24,6 @@ interface ChatManager {
     suspend fun restoreMessages(clearedChat: ClearedChat)
 
     suspend fun rateAnswer(answerUuid: String, rating: ChatAnswerRating?)
+
+    suspend fun deleteAllChats()
 }
