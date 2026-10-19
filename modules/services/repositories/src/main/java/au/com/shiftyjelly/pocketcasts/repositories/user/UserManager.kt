@@ -185,7 +185,8 @@ class UserManagerImpl @Inject constructor(
                     settings.showWhatsNewDot.reset()
                     settings.clearPlusPreferences()
                     if (wasInitiatedByUser) {
-                        chatManager.get().deleteAllChats()
+                        runCatching { chatManager.get().deleteAllChats() }
+                            .onFailure { LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, it, "Failed to delete episode chats on sign out") }
                     }
 
                     userEpisodeManager.removeCloudStatusFromFiles(playbackManager)

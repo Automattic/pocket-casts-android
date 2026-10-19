@@ -18,6 +18,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doSuspendableAnswer
+import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.stub
@@ -124,6 +125,21 @@ class UserManagerImplTest {
 
         verify(userEpisodeManager).removeCloudStatusFromFiles(playbackManager)
         verify(chatManager, never()).deleteAllChats()
+    }
+
+    @Test
+    fun `failing to delete episode chats does not stop the sign out`() = runTest {
+        whenever(settings.getFullySignedOut()).thenReturn(false)
+        stubSyncManagerSignOut()
+        chatManager.stub {
+            on { deleteAllChats() } doThrow IllegalStateException("Database error")
+        }
+        val userManager = createUserManager()
+
+        userManager.signOut(playbackManager, wasInitiatedByUser = true)
+        advanceUntilIdle()
+
+        verify(userEpisodeManager).removeCloudStatusFromFiles(playbackManager)
     }
 
     private fun stubSyncManagerSignOut() {
