@@ -19,7 +19,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalAccessibilityManager
@@ -49,7 +48,6 @@ import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -142,7 +140,6 @@ class ChatFragment : BaseDialogFragment() {
         val snackbarHostState = remember { SnackbarHostState() }
         val resources = LocalResources.current
         var shownToast by remember { mutableStateOf<ChatToast?>(null) }
-        var isToastDragging by remember { mutableStateOf(false) }
         val accessibilityManager = LocalAccessibilityManager.current
         val undoToastTimeoutMs = remember(accessibilityManager) {
             accessibilityManager?.calculateRecommendedTimeoutMillis(
@@ -160,7 +157,6 @@ class ChatFragment : BaseDialogFragment() {
                     coroutineScope {
                         val expiry = launch {
                             delay(undoToastTimeoutMs)
-                            snapshotFlow { isToastDragging }.first { !it }
                             snackbarHostState.currentSnackbarData?.dismiss()
                         }
                         snackbarHostState.showSnackbar(
@@ -215,7 +211,6 @@ class ChatFragment : BaseDialogFragment() {
                     onPlayQuote = viewModel::playQuote,
                     onRateAnswer = ::rateAnswer,
                     snackbarHostState = snackbarHostState,
-                    onToastDragChange = { isToastDragging = it },
                     onDismissBetaSheet = viewModel::dismissBetaSheet,
                     onSignInClick = viewModel::onSignInClick,
                     modifier = Modifier.fillMaxSize(),
