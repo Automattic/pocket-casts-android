@@ -259,9 +259,9 @@ class BookmarkViewModel
     }
 
     fun saveBookmark(onSaved: (Bookmark, isExistingBookmark: Boolean) -> Unit) {
+        val state = uiState.value
         launch {
             try {
-                val state = uiState.value
                 val bookmarkUuid = state.bookmarkUuid
                 val episodeUuid = arguments.episodeUuid
                 val isExistingBookmark = !state.isNewBookmark
@@ -357,7 +357,7 @@ class BookmarkViewModel
         return when {
             offeredSuggestedTitle?.let(::normalizedTitle) == savedTitle -> BookmarkTitleSourceType.Suggested
             appliedFallbackTitle?.let(::normalizedTitle) == savedTitle -> BookmarkTitleSourceType.Fallback
-            offeredSuggestedTitle != null || appliedFallbackTitle != null -> BookmarkTitleSourceType.Edited
+            offeredSuggestedTitle != null -> BookmarkTitleSourceType.Edited
             else -> BookmarkTitleSourceType.Manual
         }
     }
