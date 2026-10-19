@@ -59,6 +59,7 @@ internal fun ChatHistory(
     onClickChat: (EpisodeChatHistoryItem) -> Unit,
     onDeleteChat: (EpisodeChatHistoryItem) -> Unit,
     snackbarHostState: SnackbarHostState,
+    onToastDragChange: (Boolean) -> Unit,
     theme: ChatTheme,
     modifier: Modifier = Modifier,
 ) {
@@ -119,6 +120,7 @@ internal fun ChatHistory(
             ChatSnackbarHost(
                 hostState = snackbarHostState,
                 theme = theme,
+                onDragChange = onToastDragChange,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .navigationBarsPadding(),
@@ -220,6 +222,7 @@ private fun ChatHistoryEmptyPreview() {
             onClickChat = {},
             onDeleteChat = {},
             snackbarHostState = remember { SnackbarHostState() },
+            onToastDragChange = {},
             theme = rememberChatTheme(),
         )
     }
@@ -250,6 +253,7 @@ private fun ChatHistoryPreview(
                 onClickChat = {},
                 onDeleteChat = {},
                 snackbarHostState = remember { SnackbarHostState() },
+                onToastDragChange = {},
                 theme = rememberChatTheme(),
             )
         }
