@@ -1785,6 +1785,53 @@ class ChatViewModelTest {
         verify(episodeManager, never()).updatePlayingStatusBlocking(any(), any())
     }
 
+    @Test
+    fun `undoing a quote from another chat after one in the playing episode goes back to that episode`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        val otherQuote = createQuote(startMs = 2_000, endMs = 4_000, uuid = "other-quote-uuid")
+        val playing = episode.value
+        val other = PodcastEpisode(
+            uuid = OTHER_EPISODE_UUID,
+            publishedDate = Date(),
+            duration = 300.0,
+            isArchived = true,
+            playingStatus = EpisodePlayingStatus.COMPLETED,
+            playedUpTo = 300.0,
+        )
+        val queued = listOf(PodcastEpisode(uuid = "queued-1", publishedDate = Date()))
+        whenever(upNextQueue.queueEpisodes).thenReturn(queued)
+        whenever(upNextQueue.currentEpisode).thenReturn(playing)
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(playing)
+        whenever(episodeManager.findEpisodeByUuid(OTHER_EPISODE_UUID)).thenReturn(other)
+        whenever(playbackManager.playNowSuspend(org.mockito.kotlin.same(other), any(), any(), any())).then {
+            playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = OTHER_EPISODE_UUID)
+            Unit
+        }
+        whenever(playbackManager.playNowSuspend(org.mockito.kotlin.same(playing), any(), any(), any())).then {
+            playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID)
+            Unit
+        }
+        playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID, positionMs = 10_000)
+        chatManager.otherMessages.value = listOf(otherQuote)
+        playableState(quote)
+        viewModel.playQuote(quote.uuid)
+        advanceUntilIdle()
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID, positionMs = 1_000)
+        viewModel.openHistoryChat(historyItem(OTHER_EPISODE_UUID))
+        advanceUntilIdle()
+        viewModel.playQuote(otherQuote.uuid)
+        advanceUntilIdle()
+
+        viewModel.undoQuotePlay()
+        advanceUntilIdle()
+
+        verify(playbackManager).playNowSuspend(org.mockito.kotlin.same(playing), any(), any(), any())
+        verify(upNextQueue).changeList(queued)
+        verify(episodeManager).updatePlayingStatusBlocking(org.mockito.kotlin.same(other), org.mockito.kotlin.eq(EpisodePlayingStatus.COMPLETED))
+        verify(episodeManager).archiveAllInList(listOf(other), null)
+        verify(playbackManager).seekToTimeMsSuspend(org.mockito.kotlin.eq(10_000), anyOrNull())
+    }
+
     private suspend fun switchPlaybackOnPlayNow(other: BaseEpisode?, quoteEpisode: BaseEpisode = episode.value) {
         whenever(playbackManager.playNowSuspend(org.mockito.kotlin.eq(quoteEpisode), any(), any(), any())).then {
             playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID)
