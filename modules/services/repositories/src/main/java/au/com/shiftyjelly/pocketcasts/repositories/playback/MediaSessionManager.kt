@@ -70,7 +70,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -631,8 +631,7 @@ class MediaSessionManager(
                 .addTo(disposables)
 
             settings.refreshStateFlow
-                .filterIsInstance<RefreshState.Success>()
-                .distinctUntilChanged()
+                .filter { it is RefreshState.Success || it is RefreshState.Failed }
                 .onEach { media3Session?.let { session -> notifyPlaylistsChanged(session) } }
                 .catch { Timber.e(it, "Error observing refresh state") }
                 .launchIn(applicationScope)
