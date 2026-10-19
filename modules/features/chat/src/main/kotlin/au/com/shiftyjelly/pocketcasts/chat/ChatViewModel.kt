@@ -640,7 +640,7 @@ class ChatViewModel @Inject constructor(
             }
             return
         }
-        if (previousEpisode.uuid != undo.quoteEpisodeUuid) {
+        if (undo.hasSwitchedAwayFromPreviousEpisode) {
             playbackManager.playNowSuspend(episode = previousEpisode, sourceView = sourceView)
             val isLoaded = awaitPlaybackEpisode(previousEpisode.uuid)
             if (!undo.isPlaying) {
@@ -934,6 +934,8 @@ private class PlaybackPosition(
     val isPlaying: Boolean,
     val episodeSwitch: EpisodeSwitch?,
 ) {
+    val hasSwitchedAwayFromPreviousEpisode get() = episodeSwitch?.episodes.orEmpty().any { it.uuid != episodeUuid }
+
     fun withLaterSwitch(laterSwitch: EpisodeSwitch?): PlaybackPosition {
         val knownUuids = episodeSwitch?.episodes.orEmpty().map { it.uuid }.toSet()
         val newEpisodes = laterSwitch?.episodes.orEmpty().filterNot { it.uuid in knownUuids }
