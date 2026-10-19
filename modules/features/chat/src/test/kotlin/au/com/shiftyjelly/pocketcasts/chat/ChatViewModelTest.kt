@@ -1914,10 +1914,12 @@ class ChatViewModelTest {
         advanceUntilIdle()
         viewModel.playQuote(otherQuote.uuid)
         advanceUntilIdle()
+        eventSink.skipEvent(eventSink.size)
 
         viewModel.undoQuotePlay()
         advanceUntilIdle()
 
+        assertEquals(true, (eventSink.pollEvent() as EpisodeChatQuotePlayUndoneEvent).isOtherEpisode)
         verify(playbackManager).playNowSuspend(org.mockito.kotlin.same(playing), any(), any(), any())
         verify(upNextQueue).changeList(queued)
         verify(episodeManager).updatePlayingStatusBlocking(org.mockito.kotlin.same(other), org.mockito.kotlin.eq(EpisodePlayingStatus.COMPLETED))

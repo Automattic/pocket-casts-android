@@ -959,9 +959,10 @@ private class PlaybackPosition(
     fun withLaterSwitch(laterSwitch: EpisodeSwitch?, isLaterOtherEpisode: Boolean): PlaybackPosition {
         val knownUuids = episodeSwitch?.episodes.orEmpty().map { it.uuid }.toSet()
         val newEpisodes = laterSwitch?.episodes.orEmpty().filterNot { it.uuid in knownUuids }
-        val switch = when {
-            newEpisodes.isEmpty() -> episodeSwitch
-            else -> episodeSwitch?.let { it.copy(episodes = it.episodes + newEpisodes) } ?: laterSwitch
+        val switch = if (newEpisodes.isEmpty()) {
+            episodeSwitch
+        } else {
+            episodeSwitch?.let { it.copy(episodes = it.episodes + newEpisodes) } ?: laterSwitch
         }
         return PlaybackPosition(
             quoteEpisodeUuid = quoteEpisodeUuid,
