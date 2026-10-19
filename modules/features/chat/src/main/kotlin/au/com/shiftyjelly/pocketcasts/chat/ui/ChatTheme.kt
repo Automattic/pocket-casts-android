@@ -54,7 +54,7 @@ internal data class ChatTheme(
             sendButtonIcon = colors.primaryInteractive02,
             closeButtonBackground = colors.primaryUi05,
             progress = colors.primaryInteractive01,
-            progressTrack = colors.primaryUi05,
+            progressTrack = colors.primaryText02,
             chipBorder = colors.primaryUi05,
             quoteTimestamp = colors.primaryInteractive01,
             onWhiteText = ThemeLightColors.primaryText01,
