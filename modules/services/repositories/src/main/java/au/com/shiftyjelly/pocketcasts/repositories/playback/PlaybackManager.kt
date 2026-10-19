@@ -884,6 +884,7 @@ open class PlaybackManager @Inject constructor(
         source: SourceView,
         userInitiated: Boolean = true,
     ) = withContext(Dispatchers.Default) {
+        if (upNextQueue.isCurrentEpisode(episode)) return@withContext
         val wasEmpty: Boolean = upNextQueue.isEmpty
         upNextQueue.playNextBlocking(episode, onAdd = null, isUserInitiated = userInitiated)
         if (userInitiated) {
@@ -906,6 +907,7 @@ open class PlaybackManager @Inject constructor(
         source: SourceView,
         userInitiated: Boolean = true,
     ) {
+        if (upNextQueue.isCurrentEpisode(episode)) return
         val wasEmpty: Boolean = upNextQueue.isEmpty
         upNextQueue.playLast(episode, onAdd = null, isUserInitiated = userInitiated)
         if (userInitiated) {
