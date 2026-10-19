@@ -118,8 +118,15 @@ fun ChatScreen(
         onDismissBetaSheet()
     }
     val loadedMessageUuids = remember(uiState.areMessagesLoaded) { uiState.messages.mapTo(HashSet()) { it.uuid } }
-    val initialMessageUuids = remember(loadedMessageUuids, uiState.restoredMessageUuids) {
-        loadedMessageUuids + uiState.restoredMessageUuids
+    var seenBeforeHistoryUuids by remember { mutableStateOf(emptySet<String>()) }
+    LaunchedEffect(uiState.isHistoryVisible) {
+        if (uiState.isHistoryVisible) {
+            val pendingQuestion = uiState.messages.lastOrNull()?.takeIf { uiState.isAwaitingReply && it is ChatMessage.User }
+            seenBeforeHistoryUuids = seenBeforeHistoryUuids + uiState.messages.filter { it != pendingQuestion }.map { it.uuid }
+        }
+    }
+    val initialMessageUuids = remember(loadedMessageUuids, uiState.restoredMessageUuids, seenBeforeHistoryUuids) {
+        loadedMessageUuids + uiState.restoredMessageUuids + seenBeforeHistoryUuids
     }
 
     ProvideTextStyle(LocalTextStyle.current.copy(letterSpacing = 0.sp)) {
