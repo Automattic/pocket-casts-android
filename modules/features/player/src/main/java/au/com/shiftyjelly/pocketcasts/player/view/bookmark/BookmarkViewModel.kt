@@ -25,6 +25,7 @@ import com.automattic.eventhorizon.BookmarkEnrichmentTriggerType
 import com.automattic.eventhorizon.BookmarkPassageEditorDismissedEvent
 import com.automattic.eventhorizon.BookmarkPassageEditorShownEvent
 import com.automattic.eventhorizon.BookmarkSourceType
+import com.automattic.eventhorizon.BookmarkTitleSourceType
 import com.automattic.eventhorizon.BookmarkTitleSuggestionTappedEvent
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.SourceViewType
@@ -60,6 +61,8 @@ class BookmarkViewModel
 
     private lateinit var arguments: BookmarkArguments
     private var capturedSuggestion: BookmarkSuggestion? = null
+    private var offeredSuggestedTitle: String? = null
+    private var appliedFallbackTitle: String? = null
     private var passageEdited = false
     private var loadJob: Job? = null
     private var hasTrackedShown = false
@@ -202,6 +205,8 @@ class BookmarkViewModel
         val suggestedTitle = generatedTitle?.takeIf { it.isNotBlank() }
         val isTitleUnchanged = uiState.value.title.text == originalTitle
         val fallbackTitle = BookmarkTitleFallback.fromPassage(passage)
+        offeredSuggestedTitle = suggestedTitle?.take(100)
+        appliedFallbackTitle = fallbackTitle?.takeIf { suggestedTitle == null && isTitleUnchanged }?.take(100)
         when {
             suggestedTitle != null && isTitleUnchanged -> applySuggestion(suggestedTitle)
             suggestedTitle != null -> mutableUiState.value = mutableUiState.value.copy(titleSuggestion = TitleSuggestion.Available(suggestedTitle))
@@ -260,7 +265,7 @@ class BookmarkViewModel
                 val bookmarkUuid = state.bookmarkUuid
                 val episodeUuid = arguments.episodeUuid
                 val isExistingBookmark = !state.isNewBookmark
-                val title = state.title.text.replace('\n', ' ').trim().ifBlank { defaultTitle }
+                val title = normalizedTitle(state.title.text).ifBlank { defaultTitle }
                 val editedReferenceTimeSecs = if (passageEdited) {
                     state.passage?.let { resolveEditedReferenceTimeSecs(it, state.passageLocation) }
                 } else {
@@ -339,11 +344,25 @@ class BookmarkViewModel
                 isNewBookmark = state.isNewBookmark,
                 hasPassage = state.passage?.isNotEmpty() == true,
                 passageChanged = passageEdited,
+                titleSource = titleSource(state),
                 episodeUuid = arguments.episodeUuid,
                 podcastUuid = state.podcastUuid,
             ),
         )
     }
+
+    private fun titleSource(state: UiState): BookmarkTitleSourceType? {
+        if (!state.isNewBookmark || !FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS)) return null
+        val savedTitle = normalizedTitle(state.title.text)
+        return when {
+            offeredSuggestedTitle?.let(::normalizedTitle) == savedTitle -> BookmarkTitleSourceType.Suggested
+            appliedFallbackTitle?.let(::normalizedTitle) == savedTitle -> BookmarkTitleSourceType.Fallback
+            offeredSuggestedTitle != null || appliedFallbackTitle != null -> BookmarkTitleSourceType.Edited
+            else -> BookmarkTitleSourceType.Manual
+        }
+    }
+
+    private fun normalizedTitle(title: String) = title.replace('\n', ' ').trim()
 
     fun onSuggestionTapped(title: String) {
         eventHorizon.track(
