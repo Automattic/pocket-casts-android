@@ -216,6 +216,21 @@ internal class Media3LibrarySessionCallback(
         return future
     }
 
+    override fun onSubscribe(
+        session: MediaLibraryService.MediaLibrarySession,
+        browser: MediaSession.ControllerInfo,
+        parentId: String,
+        params: MediaLibraryService.LibraryParams?,
+    ): ListenableFuture<LibraryResult<Void>> {
+        if (!Util.isAutomotive(contextProvider())) {
+            return super.onSubscribe(session, browser, parentId, params)
+        }
+        if (browser.controllerVersion != MediaSession.ControllerInfo.LEGACY_CONTROLLER_VERSION) {
+            session.notifyChildrenChanged(browser, parentId, Int.MAX_VALUE, params)
+        }
+        return Futures.immediateFuture(LibraryResult.ofVoid(params))
+    }
+
     override fun onGetSearchResult(
         session: MediaLibraryService.MediaLibrarySession,
         browser: MediaSession.ControllerInfo,

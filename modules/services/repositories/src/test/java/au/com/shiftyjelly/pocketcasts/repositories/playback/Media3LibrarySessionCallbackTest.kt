@@ -7,10 +7,12 @@ import android.os.Bundle
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
+import androidx.media3.session.LibraryResult
 import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaSession
 import androidx.media3.session.SessionCommand
 import androidx.media3.session.SessionCommands
+import androidx.media3.session.SessionError
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -391,6 +393,37 @@ class Media3LibrarySessionCallbackTest {
         callback.onConnect(mockSession, mockController)
 
         verify(podcastManager, never()).refreshPodcastsIfRequired(any())
+    }
+
+    @Test
+    fun `onSubscribe accepts legacy browser on automotive without notifying`() {
+        val automotiveCallback = createAutomotiveCallback()
+        whenever(mockController.controllerVersion).thenReturn(MediaSession.ControllerInfo.LEGACY_CONTROLLER_VERSION)
+
+        val result = automotiveCallback.onSubscribe(mockSession, mockController, "playlist-uuid", null).get()
+
+        assertEquals(LibraryResult.RESULT_SUCCESS, result.resultCode)
+        verify(mockSession, never()).notifyChildrenChanged(any(), any<String>(), any(), anyOrNull())
+    }
+
+    @Test
+    fun `onSubscribe accepts media3 browser on automotive and sends its children`() {
+        val automotiveCallback = createAutomotiveCallback()
+        whenever(mockController.controllerVersion).thenReturn(1_000_000)
+
+        val result = automotiveCallback.onSubscribe(mockSession, mockController, "playlist-uuid", null).get()
+
+        assertEquals(LibraryResult.RESULT_SUCCESS, result.resultCode)
+        verify(mockSession).notifyChildrenChanged(mockController, "playlist-uuid", Int.MAX_VALUE, null)
+    }
+
+    @Test
+    fun `onSubscribe keeps the default behaviour off automotive`() {
+        whenever(mockController.controllerVersion).thenReturn(MediaSession.ControllerInfo.LEGACY_CONTROLLER_VERSION)
+
+        val result = callback.onSubscribe(mockSession, mockController, "playlist-uuid", null).get()
+
+        assertEquals(SessionError.ERROR_NOT_SUPPORTED, result.resultCode)
     }
 
     @Test
