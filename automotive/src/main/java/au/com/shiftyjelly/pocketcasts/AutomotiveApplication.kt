@@ -124,6 +124,8 @@ class AutomotiveApplication :
             )
         }
 
+        RefreshPodcastsTask.scheduleOrCancel(this, settings)
+
         val playServices = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this) == ConnectionResult.SUCCESS
         Log.i(Settings.LOG_TAG_AUTO, "Play services $playServices")
 
