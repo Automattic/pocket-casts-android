@@ -3,6 +3,8 @@
 *   Bug Fixes
     *   Fix tapping the media player or a notification not opening the app after changing the app icon
         ([#6181](https://github.com/Automattic/pocket-casts-android/pull/6181))
+    *   Fix the add button covering the last file on the Files screen
+        ([#6192](https://github.com/Automattic/pocket-casts-android/pull/6192))
 
 
 8.23
