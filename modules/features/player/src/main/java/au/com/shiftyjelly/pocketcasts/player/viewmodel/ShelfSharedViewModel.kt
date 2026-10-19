@@ -494,6 +494,10 @@ class ShelfSharedViewModel @Inject constructor(
         if (uiState.value.isSmartBookmarksPromoActive) {
             dismissBookmarkTooltip()
         }
+        if (uiState.value.showEpisodeChatTooltip) {
+            eventHorizon.track(EpisodeChatTooltipDismissedEvent)
+            dismissEpisodeChatTooltip()
+        }
         viewModelScope.launch {
             _navigationState.emit(NavigationState.ShowMoreActions)
         }
