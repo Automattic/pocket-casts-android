@@ -20,6 +20,7 @@ import androidx.annotation.OptIn
 import androidx.core.content.IntentCompat
 import androidx.core.net.toUri
 import androidx.media.utils.MediaConstants.PLAYBACK_STATE_EXTRAS_KEY_MEDIA_ID
+import androidx.media3.common.MediaItem
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.CommandButton
 import androidx.media3.session.MediaLibraryService
@@ -433,6 +434,9 @@ class MediaSessionManager(
         pendingPlayer = null
         castStatePlayer = null
         val swapped = currentPlayer.swapPlayer(exoPlayer)
+        if (swapped.currentMediaItem.mediaId == MediaItem.DEFAULT_MEDIA_ID) {
+            swapped.clearMetadata()
+        }
         forwardingPlayer = swapped
         media3Session?.player = swapped
         placeholderPlayer?.release()
