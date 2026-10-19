@@ -117,6 +117,10 @@ fun ChatScreen(
     BackHandler(enabled = uiState.isBetaSheetVisible) {
         onDismissBetaSheet()
     }
+    val loadedMessageUuids = remember(uiState.areMessagesLoaded) { uiState.messages.mapTo(HashSet()) { it.uuid } }
+    val initialMessageUuids = remember(loadedMessageUuids, uiState.restoredMessageUuids) {
+        loadedMessageUuids + uiState.restoredMessageUuids
+    }
 
     ProvideTextStyle(LocalTextStyle.current.copy(letterSpacing = 0.sp)) {
         ModalBottomSheetLayout(
@@ -147,6 +151,7 @@ fun ChatScreen(
                 ProvideReduceMotion {
                     ChatContent(
                         uiState = uiState,
+                        initialMessageUuids = initialMessageUuids,
                         theme = theme,
                         onClickClose = onClickClose,
                         onClickMore = onClickMore,
@@ -168,6 +173,7 @@ fun ChatScreen(
 @Composable
 private fun ChatContent(
     uiState: ChatUiState,
+    initialMessageUuids: Set<String>,
     theme: ChatTheme,
     onClickClose: () -> Unit,
     onClickMore: () -> Unit,
@@ -184,10 +190,6 @@ private fun ChatContent(
     val scrollState = rememberScrollState()
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
-    val loadedMessageUuids = remember(uiState.areMessagesLoaded) { uiState.messages.mapTo(HashSet()) { it.uuid } }
-    val initialMessageUuids = remember(loadedMessageUuids, uiState.restoredMessageUuids) {
-        loadedMessageUuids + uiState.restoredMessageUuids
-    }
 
     val followThresholdPx = with(LocalDensity.current) { FollowNewestThreshold.roundToPx() }
     var isFollowingNewest by remember { mutableStateOf(true) }
