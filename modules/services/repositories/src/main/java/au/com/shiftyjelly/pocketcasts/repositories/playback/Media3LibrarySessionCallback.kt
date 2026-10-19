@@ -69,17 +69,16 @@ internal class Media3LibrarySessionCallback(
         }
         if (!controller.packageName.contains("au.com.shiftyjelly.pocketcasts")) {
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Client: ${controller.packageName} connected to media session")
-            val context = contextProvider()
-            if (Util.isAutomotive(context)) {
+            if (Util.isAutomotive(contextProvider())) {
                 podcastManager.refreshPodcastsIfRequired(fromLog = "Automotive connect")
-            }
-            if (Util.isAutomotive(context) && !settings.automotiveConnectedToMediaSession()) {
-                scope.launch {
-                    try {
-                        delay(1000)
-                        settings.setAutomotiveConnectedToMediaSession(true)
-                    } catch (e: Exception) {
-                        Timber.e(e, "Failed to set automotive connected flag")
+                if (!settings.automotiveConnectedToMediaSession()) {
+                    scope.launch {
+                        try {
+                            delay(1000)
+                            settings.setAutomotiveConnectedToMediaSession(true)
+                        } catch (e: Exception) {
+                            Timber.e(e, "Failed to set automotive connected flag")
+                        }
                     }
                 }
             }
