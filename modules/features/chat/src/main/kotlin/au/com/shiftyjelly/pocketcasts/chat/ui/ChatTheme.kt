@@ -82,7 +82,7 @@ internal data class ChatTheme(
             sendButtonIcon = colors.background01,
             closeButtonBackground = colors.contrast05,
             progress = colors.highlight01,
-            progressTrack = colors.contrast05,
+            progressTrack = colors.contrast02,
             chipBorder = colors.contrast05,
             quoteTimestamp = QuoteTimestampBlue,
             onWhiteText = ThemeLightColors.primaryText01,
