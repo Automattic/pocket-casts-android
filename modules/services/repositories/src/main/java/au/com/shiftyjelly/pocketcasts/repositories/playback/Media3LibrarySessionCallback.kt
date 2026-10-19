@@ -70,6 +70,9 @@ internal class Media3LibrarySessionCallback(
         if (!controller.packageName.contains("au.com.shiftyjelly.pocketcasts")) {
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Client: ${controller.packageName} connected to media session")
             val context = contextProvider()
+            if (Util.isAutomotive(context)) {
+                podcastManager.refreshPodcastsIfRequired(fromLog = "Automotive connect")
+            }
             if (Util.isAutomotive(context) && !settings.automotiveConnectedToMediaSession()) {
                 scope.launch {
                     try {
@@ -126,6 +129,7 @@ internal class Media3LibrarySessionCallback(
         val context = contextProvider()
         if (Util.isAutomotive(context)) {
             settings.setAutomotiveConnectedToMediaSession(true)
+            podcastManager.refreshPodcastsIfRequired(fromLog = "Automotive resumption")
         }
         scope.launch {
             try {

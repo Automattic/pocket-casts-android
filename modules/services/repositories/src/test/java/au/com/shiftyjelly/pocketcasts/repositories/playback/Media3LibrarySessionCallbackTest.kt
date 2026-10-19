@@ -365,6 +365,35 @@ class Media3LibrarySessionCallbackTest {
     }
 
     @Test
+    fun `onConnect refreshes podcasts for external client on automotive`() {
+        val automotiveCallback = createAutomotiveCallback()
+        whenever(mockController.packageName).thenReturn("com.android.car.media")
+        whenever(mockSettings.automotiveConnectedToMediaSession()).thenReturn(true)
+
+        automotiveCallback.onConnect(mockSession, mockController)
+
+        verify(podcastManager).refreshPodcastsIfRequired("Automotive connect")
+    }
+
+    @Test
+    fun `onConnect does not refresh podcasts for own package on automotive`() {
+        val automotiveCallback = createAutomotiveCallback()
+
+        automotiveCallback.onConnect(mockSession, mockController)
+
+        verify(podcastManager, never()).refreshPodcastsIfRequired(any())
+    }
+
+    @Test
+    fun `onConnect does not refresh podcasts for external client off automotive`() {
+        whenever(mockController.packageName).thenReturn("com.google.android.projection.gearhead")
+
+        callback.onConnect(mockSession, mockController)
+
+        verify(podcastManager, never()).refreshPodcastsIfRequired(any())
+    }
+
+    @Test
     fun `onCustomCommand delegates to sessionCallback`() {
         val command = SessionCommand(APP_ACTION_STAR, Bundle.EMPTY)
 
@@ -426,6 +455,16 @@ class Media3LibrarySessionCallbackTest {
         automotiveCallback.onPlaybackResumption(mockMediaSession, mockController, false)
 
         verify(mockSettings).setAutomotiveConnectedToMediaSession(true)
+        verify(podcastManager).refreshPodcastsIfRequired("Automotive resumption")
+    }
+
+    @Test
+    fun `onPlaybackResumption does not refresh podcasts off automotive`() = runTest {
+        whenever(playbackManager.getCurrentEpisode()).thenReturn(null)
+
+        callback.onPlaybackResumption(mock(), mockController, false)
+
+        verify(podcastManager, never()).refreshPodcastsIfRequired(any())
     }
 
     @Test
