@@ -151,7 +151,7 @@ private fun ChatHistorySectionTitle(
         color = theme.tertiaryText,
         fontSize = 13.sp,
         lineHeight = 18.sp,
-        fontWeight = FontWeight.SemiBold,
+        fontWeight = FontWeight.Bold,
         modifier = Modifier
             .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 8.dp)
             .semantics { heading() },
