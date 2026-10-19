@@ -31,8 +31,11 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
+import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MutableClock
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.automattic.eventhorizon.EpisodeChatBetaSheetDismissedEvent
 import com.automattic.eventhorizon.EpisodeChatBetaSheetShownEvent
 import com.automattic.eventhorizon.EpisodeChatBetaSheetSignInTappedEvent
@@ -99,8 +102,11 @@ import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ChatViewModelTest {
-    @get:Rule
+    @get:Rule(order = 0)
     val coroutineRule = MainCoroutineRule()
+
+    @get:Rule(order = 1)
+    val featureFlagRule = InMemoryFeatureFlagRule()
 
     private val chatManager = TestChatManager()
     private val playbackState = MutableStateFlow(PlaybackState())
@@ -2440,6 +2446,27 @@ class ChatViewModelTest {
 
         assertFalse(viewModel.uiState.value.isBetaSheetVisible)
         assertFalse(viewModel.uiState.value.isBeta)
+    }
+
+    @Test
+    fun `plus user sees the beta note while the feature is in beta`() = runTest {
+        FeatureFlag.setEnabled(Feature.EPISODE_CHAT_FREE_BETA, true)
+
+        setEpisodeInfo(isBeta = false)
+        advanceUntilIdle()
+
+        assertTrue(viewModel.uiState.value.isBetaNoteVisible)
+        assertFalse(viewModel.uiState.value.isBetaSheetVisible)
+    }
+
+    @Test
+    fun `nobody sees the beta note once the feature leaves beta`() = runTest {
+        FeatureFlag.setEnabled(Feature.EPISODE_CHAT_FREE_BETA, false)
+
+        setEpisodeInfo(isBeta = true)
+        advanceUntilIdle()
+
+        assertFalse(viewModel.uiState.value.isBetaNoteVisible)
     }
 
     @Test
