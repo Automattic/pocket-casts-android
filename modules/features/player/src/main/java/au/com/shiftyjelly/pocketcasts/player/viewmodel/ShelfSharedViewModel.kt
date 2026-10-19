@@ -491,6 +491,10 @@ class ShelfSharedViewModel @Inject constructor(
 
     fun onMoreClick() {
         eventHorizon.track(PlayerShelfOverflowMenuShownEvent)
+        if (uiState.value.showEpisodeChatTooltip) {
+            eventHorizon.track(EpisodeChatTooltipDismissedEvent)
+            dismissEpisodeChatTooltip()
+        }
         viewModelScope.launch {
             _navigationState.emit(NavigationState.ShowMoreActions)
         }
