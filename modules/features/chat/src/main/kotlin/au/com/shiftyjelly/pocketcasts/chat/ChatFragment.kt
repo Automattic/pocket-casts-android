@@ -19,6 +19,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalAccessibilityManager
@@ -45,9 +46,11 @@ import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import dagger.hilt.android.AndroidEntryPoint
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.parcelize.Parcelize
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -139,6 +142,7 @@ class ChatFragment : BaseDialogFragment() {
         val snackbarHostState = remember { SnackbarHostState() }
         val resources = LocalResources.current
         var shownToast by remember { mutableStateOf<ChatToast?>(null) }
+        var isToastDragging by remember { mutableStateOf(false) }
         val accessibilityManager = LocalAccessibilityManager.current
         val undoToastTimeoutMs = remember(accessibilityManager) {
             accessibilityManager?.calculateRecommendedTimeoutMillis(
@@ -153,13 +157,18 @@ class ChatFragment : BaseDialogFragment() {
                 snackbarHostState.currentSnackbarData?.dismiss()
                 shownToast = toast
                 val result = if (toast.isUndoable) {
-                    withTimeoutOrNull(undoToastTimeoutMs) {
+                    coroutineScope {
+                        val expiry = launch {
+                            delay(undoToastTimeoutMs)
+                            snapshotFlow { isToastDragging }.first { !it }
+                            snackbarHostState.currentSnackbarData?.dismiss()
+                        }
                         snackbarHostState.showSnackbar(
                             message = toast.message(resources),
                             actionLabel = resources.getString(LR.string.chat_undo),
                             duration = SnackbarDuration.Indefinite,
-                        )
-                    } ?: SnackbarResult.Dismissed
+                        ).also { expiry.cancel() }
+                    }
                 } else {
                     snackbarHostState.showSnackbar(message = toast.message(resources), duration = SnackbarDuration.Short)
                 }
@@ -206,6 +215,7 @@ class ChatFragment : BaseDialogFragment() {
                     onPlayQuote = viewModel::playQuote,
                     onRateAnswer = ::rateAnswer,
                     snackbarHostState = snackbarHostState,
+                    onToastDragChange = { isToastDragging = it },
                     onDismissBetaSheet = viewModel::dismissBetaSheet,
                     onSignInClick = viewModel::onSignInClick,
                     modifier = Modifier.fillMaxSize(),

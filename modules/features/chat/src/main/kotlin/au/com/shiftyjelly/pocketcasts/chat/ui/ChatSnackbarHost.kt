@@ -14,10 +14,12 @@ import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -38,12 +40,13 @@ import kotlinx.coroutines.launch
 internal fun ChatSnackbarHost(
     hostState: SnackbarHostState,
     theme: ChatTheme,
+    onDragChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     ThemedSnackbarHost(
         hostState = hostState,
         snackbar = { data, _ ->
-            SwipeToDismissToast(onDismiss = data::dismiss) {
+            SwipeToDismissToast(onDismiss = data::dismiss, onDragChange = onDragChange) {
                 ChatSnackbar(data = data, theme = theme)
             }
         },
@@ -89,9 +92,14 @@ private fun ChatSnackbar(
 @Composable
 private fun SwipeToDismissToast(
     onDismiss: () -> Unit,
+    onDragChange: (Boolean) -> Unit,
     content: @Composable () -> Unit,
 ) {
     val offsetX = remember { Animatable(0f) }
+    val currentOnDragChange by rememberUpdatedState(onDragChange)
+    DisposableEffect(Unit) {
+        onDispose { currentOnDragChange(false) }
+    }
     var width by remember { mutableIntStateOf(0) }
     val scope = rememberCoroutineScope()
     val dismissVelocity = with(LocalDensity.current) { DismissVelocity.toPx() }
@@ -106,7 +114,9 @@ private fun SwipeToDismissToast(
                 state = rememberDraggableState { delta ->
                     scope.launch { offsetX.snapTo(offsetX.value + delta) }
                 },
+                onDragStarted = { onDragChange(true) },
                 onDragStopped = { velocity ->
+                    onDragChange(false)
                     val isFarEnough = width > 0 && abs(offsetX.value) > width * DISMISS_DISTANCE_FRACTION
                     val isFlungAway = abs(velocity) > dismissVelocity && sign(velocity) != -sign(offsetX.value)
                     val isFlungBack = abs(velocity) > dismissVelocity && sign(velocity) == -sign(offsetX.value)
