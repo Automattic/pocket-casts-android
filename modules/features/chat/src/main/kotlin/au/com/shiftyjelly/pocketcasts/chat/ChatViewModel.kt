@@ -569,7 +569,11 @@ class ChatViewModel @Inject constructor(
                     quoteTime.cancel()
                     userSeek.cancel()
                     showToast(ChatToast.QuotePlayFailed)
-                    restorePlayback(state.toPlaybackPosition(episodeUuid, podcastUuid, switch))
+                    if (playbackManager.upNextQueue.currentEpisode?.uuid == episodeUuid) {
+                        restorePlayback(state.toPlaybackPosition(episodeUuid, podcastUuid, switch))
+                    } else {
+                        restoreSwitchedEpisodes(switch)
+                    }
                     return@launch
                 }
                 switch
