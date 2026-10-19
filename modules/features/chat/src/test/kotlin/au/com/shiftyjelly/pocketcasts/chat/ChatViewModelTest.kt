@@ -1727,6 +1727,7 @@ class ChatViewModelTest {
         val other = PodcastEpisode(uuid = "other-uuid", publishedDate = Date())
         whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
         whenever(episodeManager.findEpisodeByUuid("other-uuid")).thenReturn(other)
+        whenever(upNextQueue.currentEpisode).thenReturn(episode.value)
         whenever(playbackManager.playNowSuspend(org.mockito.kotlin.eq(other), any(), any(), any())).then {
             playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = "other-uuid")
             Unit
@@ -1739,6 +1740,27 @@ class ChatViewModelTest {
 
         verify(playbackManager).playNowSuspend(org.mockito.kotlin.eq(other), any(), any(), any())
         verify(playbackManager).seekToTimeMsSuspend(org.mockito.kotlin.eq(10_000), anyOrNull())
+    }
+
+    @Test
+    fun `a quote whose episode never loads keeps an episode started while it was loading`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        val other = PodcastEpisode(uuid = "other-uuid", publishedDate = Date())
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        whenever(episodeManager.findEpisodeByUuid("other-uuid")).thenReturn(other)
+        whenever(upNextQueue.currentEpisode).thenReturn(PodcastEpisode(uuid = "started-uuid", publishedDate = Date()))
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = "other-uuid", positionMs = 10_000)
+        playableState(quote)
+
+        viewModel.toasts.test {
+            viewModel.playQuote(quote.uuid)
+            advanceUntilIdle()
+
+            assertEquals(ChatToast.QuotePlayFailed, awaitItem())
+        }
+        verify(playbackManager, never()).playNowSuspend(org.mockito.kotlin.eq(other), any(), any(), any())
+        verify(playbackManager, never()).seekToTimeMsSuspend(any(), anyOrNull())
+        verify(upNextQueue, never()).changeList(any())
     }
 
     @Test
