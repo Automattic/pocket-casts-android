@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.media.MediaPlayer
+import android.os.SystemClock
 import android.widget.Toast
 import androidx.annotation.MainThread
 import androidx.annotation.OptIn
@@ -188,6 +189,7 @@ open class PlaybackManager @Inject constructor(
         private const val MAX_TIME_WITHOUT_FOCUS_FOR_RESUME = (MAX_TIME_WITHOUT_FOCUS_FOR_RESUME_MINUTES * 60 * 1000).toLong()
         private const val PAUSE_TIMER_DELAY = ((MAX_TIME_WITHOUT_FOCUS_FOR_RESUME_MINUTES + 1) * 60 * 1000).toLong()
         private const val HLS_ENGINE_EXOPLAYER = "exoplayer"
+        private const val DECODER_RECOVERY_INTERVAL_MS = 60_000L
     }
 
     private var notificationPermissionChecker: NotificationPermissionChecker? = null
@@ -231,6 +233,15 @@ open class PlaybackManager @Inject constructor(
 
     private var updateCount = 0
     private var resettingPlayer = false
+
+    @Volatile
+    private var decoderLostPlayer: Player? = null
+
+    @Volatile
+    private var lastDecoderRecoveryMs: Long? = null
+
+    @Volatile
+    private var isDecoderRecoveryPending = false
     private var episodeLastBufferStatus: EpisodeBufferStatus? = null
     private var focusWasPlaying: Date? = null
     private var forcePlayerSwitch = false
@@ -1102,6 +1113,8 @@ open class PlaybackManager @Inject constructor(
                 player = null
             }
         }
+        decoderLostPlayer = null
+        isDecoderRecoveryPending = false
 
         playbackStateRelay.blockingFirst().let {
             playbackStateRelay.accept(
@@ -1504,6 +1517,34 @@ open class PlaybackManager @Inject constructor(
 
     /** LISTENERS  */
 
+    private suspend fun onDecoderLost(source: Player, event: PlayerEvent.DecoderLost) {
+        if (player !== source) {
+            return
+        }
+        val lastRecoveryMs = lastDecoderRecoveryMs
+        val recoveredRecently = lastRecoveryMs != null && SystemClock.elapsedRealtime() - lastRecoveryMs < DECODER_RECOVERY_INTERVAL_MS
+        val isPlaying = isPlaying()
+        if (isPlaying && recoveredRecently) {
+            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Decoder lost again shortly after recovering, giving up")
+            onPlayerError(PlayerEvent.PlayerError(event.error.message.orEmpty(), event.error))
+            return
+        }
+
+        decoderLostPlayer = source
+        val sourceView = lastPlaybackSource ?: SourceView.UNKNOWN
+        when {
+            isPlaying -> loadCurrentEpisode(play = true, sourceView = sourceView, isAutomaticRecovery = true)
+            mediaSessionManager.usesMedia3Session && !recoveredRecently -> loadCurrentEpisode(play = false, sourceView = sourceView, isAutomaticRecovery = true)
+            else -> LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Decoder lost while paused, recovering on next play")
+        }
+    }
+
+    private fun startDecoderRecovery() {
+        lastDecoderRecoveryMs = SystemClock.elapsedRealtime()
+        isDecoderRecoveryPending = true
+        LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Decoder recovery started")
+    }
+
     @OptIn(UnstableApi::class)
     suspend fun onPlayerError(event: PlayerEvent.PlayerError) {
         settings.recordErrorSession()
@@ -1571,6 +1612,7 @@ open class PlaybackManager @Inject constructor(
                     stuckException != null -> PlaybackIssue.StuckPlayer(errorClassifier.classifyErrorStringId(event))
                     cause is HttpDataSource.InvalidResponseCodeException -> PlaybackIssue.HttpError(cause.responseCode)
                     cause is HttpDataSource.HttpDataSourceException -> PlaybackIssue.TransientFailure
+                    event.error?.isDecoderLost() == true -> PlaybackIssue.TransientFailure
                     else -> null
                 }
                 val errorMessage = when (playbackIssue) {
@@ -1899,6 +1941,11 @@ open class PlaybackManager @Inject constructor(
     }
 
     suspend fun onDurationAvailable() {
+        if (isDecoderRecoveryPending) {
+            isDecoderRecoveryPending = false
+            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Decoder recovery succeeded")
+        }
+
         val episode = getCurrentEpisode()
         if (episode == null || player == null) {
             return
@@ -2097,7 +2144,7 @@ open class PlaybackManager @Inject constructor(
      * Check the player is initialised and if we are using the correct player either the system or cast player.
      */
     private suspend fun isPlayerSwitchRequired(): Boolean {
-        if (player == null) {
+        if (player == null || player === decoderLostPlayer) {
             return true
         }
         if (forcePlayerSwitch) {
@@ -2138,6 +2185,7 @@ open class PlaybackManager @Inject constructor(
         showedStreamWarning: Boolean = false,
         forceStream: Boolean = false,
         sourceView: SourceView = SourceView.UNKNOWN,
+        isAutomaticRecovery: Boolean = false,
     ) {
         // make sure we have the most recent copy from the database
         val episode = when (val currentUpNextEpisode = upNextQueue.currentEpisode) {
@@ -2176,6 +2224,7 @@ open class PlaybackManager @Inject constructor(
 
         val currentPlayer = this.player
         val sameEpisode = currentPlayer != null && episode.uuid == currentPlayer.episodeUuid
+        val isDecoderRecovery = sameEpisode && currentPlayer === decoderLostPlayer
 
         // completed episodes should play from the start
         if (episode.isFinished) {
@@ -2223,19 +2272,21 @@ open class PlaybackManager @Inject constructor(
                 isRemote = castConnected,
             )
         }
-        _videoRenderingEnabled.value = true
+        if (!isDecoderRecovery) {
+            _videoRenderingEnabled.value = true
 
-        lastPlaybackSource = sourceView
+            lastPlaybackSource = sourceView
 
-        trackWithContentType(episode) { contentType ->
-            PlaybackSourceResolvedEvent(
-                playbackProtocol = if (playingStream && episode.isStreamUrlHls) PlaybackProtocolType.Hls else PlaybackProtocolType.Progressive,
-                isFallback = false,
-                contentType = contentType,
-                episodeUuid = episode.uuid,
-                podcastUuid = episode.podcastOrSubstituteUuid,
-                hlsEngine = if (playingStream && episode.isStreamUrlHls) HLS_ENGINE_EXOPLAYER else null,
-            )
+            trackWithContentType(episode) { contentType ->
+                PlaybackSourceResolvedEvent(
+                    playbackProtocol = if (playingStream && episode.isStreamUrlHls) PlaybackProtocolType.Hls else PlaybackProtocolType.Progressive,
+                    isFallback = false,
+                    contentType = contentType,
+                    episodeUuid = episode.uuid,
+                    podcastUuid = episode.podcastOrSubstituteUuid,
+                    hlsEngine = if (playingStream && episode.isStreamUrlHls) HLS_ENGINE_EXOPLAYER else null,
+                )
+            }
         }
 
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Opening episode. %s Downloaded: %b Downloading: %b Audio: %b File: %s Uuid: %s", episode.title, episode.isDownloaded, episode.isDownloading, episode.isAudio, episode.downloadUrl ?: "", episode.uuid)
@@ -2253,6 +2304,7 @@ open class PlaybackManager @Inject constructor(
                 episode.uuid != lastWarnedPlayedEpisodeUuid &&
                 !Network.isUnmeteredConnection(application) &&
                 !forceStream &&
+                !isDecoderRecovery &&
                 play
             ) {
                 sendDataWarningNotification(episode)
@@ -2330,8 +2382,13 @@ open class PlaybackManager @Inject constructor(
         // We want to make sure we get the current position at the last possible moment before changing/resetting the player
         val currentPositionMs = if (
             isPlayerSwitchRequired() ||
-            isPlayerResetNeeded(episode, sameEpisode, castConnected, playingStream)
+            isPlayerResetNeeded(episode, sameEpisode, castConnected, playingStream) ||
+            isDecoderRecovery
         ) {
+            decoderLostPlayer = null
+            if (isDecoderRecovery && !castConnected) {
+                startDecoderRecovery()
+            }
             // Don't create a player if we aren't playing because it will start to buffer
             if (play) {
                 Timber.d("Resetting player")
@@ -2403,7 +2460,11 @@ open class PlaybackManager @Inject constructor(
             if (sameEpisode && currentPositionMs != null) {
                 player?.seekToTimeMs(currentPositionMs)
             }
-            play(sourceView, posUpdatedOnPlayerReset)
+            play(sourceView, posUpdatedOnPlayerReset, trackPlay = !isAutomaticRecovery)
+        } else if (isAutomaticRecovery) {
+            player?.load(currentPositionMs ?: episode.playedUpToMs)
+            installSimplePlayerInSession()
+            setupPauseTimer()
         } else {
             player?.load(episode.playedUpToMs)
             onPlayerPaused()
@@ -2500,6 +2561,7 @@ open class PlaybackManager @Inject constructor(
     private suspend fun play(
         sourceView: SourceView = SourceView.UNKNOWN,
         posUpdatedOnPlayerReset: Boolean = false,
+        trackPlay: Boolean = true,
     ) {
         val episode = getCurrentEpisode()?.let {
             if (posUpdatedOnPlayerReset) {
@@ -2566,15 +2628,21 @@ open class PlaybackManager @Inject constructor(
         // SimplePlayer creates its ExoPlayer lazily in prepare(), which is called
         // inside play(). Now that the ExoPlayer exists, install it into the Media3
         // session so the notification system can monitor the player state.
+        installSimplePlayerInSession()
+
+        sleepTimer.restartSleepTimerIfApplies(currentEpisodeUuid = episode.uuid)
+
+        if (trackPlay) {
+            trackPlaybackPlay(sourceView, episode)
+        }
+    }
+
+    private suspend fun installSimplePlayerInSession() {
         withContext(Dispatchers.Main) {
             (player as? SimplePlayer)?.exoPlayer?.let {
                 mediaSessionManager.installPlayer(it)
             }
         }
-
-        sleepTimer.restartSleepTimerIfApplies(currentEpisodeUuid = episode.uuid)
-
-        trackPlaybackPlay(sourceView, episode)
     }
 
     private suspend fun addPodcastStartFromSettings(episode: PodcastEpisode, podcast: Podcast?, isPlaying: Boolean) {
@@ -2636,6 +2704,7 @@ open class PlaybackManager @Inject constructor(
                 is PlayerEvent.SeekComplete -> onSeekComplete(event.positionMs)
                 is PlayerEvent.MetadataAvailable -> onMetadataAvailable(event.metaData)
                 is PlayerEvent.PlayerError -> onPlayerError(event)
+                is PlayerEvent.DecoderLost -> onDecoderLost(player, event)
                 is PlayerEvent.RemoteMetadataNotMatched -> onRemoteMetaDataNotMatched(event.remoteEpisodeUuid)
                 is PlayerEvent.EpisodeChanged -> onEpisodeChanged(event.episodeUuid)
                 is PlayerEvent.CachingComplete -> onCachingComplete(event.episodeUuid)

@@ -38,6 +38,8 @@ class PlaybackErrorClassifier @Inject constructor() {
 
             cause is DecoderInitializationException -> LR.string.error_decoder_initialization
 
+            error.isDecoderLost() -> LR.string.error_playback_failed_try_again
+
             cause is UnrecognizedInputFormatException -> LR.string.error_playing_format
 
             error.errorCode == PlaybackException.ERROR_CODE_AUDIO_TRACK_INIT_FAILED ||

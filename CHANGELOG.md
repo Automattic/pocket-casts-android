@@ -3,6 +3,8 @@
 *   Bug Fixes
     *   Fix tapping the media player or a notification not opening the app after changing the app icon
         ([#6181](https://github.com/Automattic/pocket-casts-android/pull/6181))
+    *   Fix playback stopping and the media notification disappearing when resuming after a pause
+        ([#6187](https://github.com/Automattic/pocket-casts-android/pull/6187))
 
 
 8.23

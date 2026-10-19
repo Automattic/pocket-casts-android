@@ -130,6 +130,8 @@ class MediaSessionManager(
         useMedia3Session || isAutomotive
     }
 
+    val usesMedia3Session: Boolean get() = needsMedia3Session
+
     // On non-automotive platforms with flag OFF, create a MediaSessionCompat.
     // On automotive (regardless of flag), the MediaLibrarySession handles everything.
     val mediaSession: MediaSessionCompat? by lazy {
