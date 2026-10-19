@@ -163,6 +163,10 @@ class PocketCastsForwardingPlayer(
 
     override fun getMediaMetadata(): MediaMetadata = currentMediaItem.mediaMetadata
 
+    override fun isCommandAvailable(command: Int): Boolean {
+        return if (isEmptyState) availableCommands.contains(command) else super.isCommandAvailable(command)
+    }
+
     override fun getAvailableCommands(): Player.Commands {
         if (isEmptyState) {
             return Player.Commands.Builder()

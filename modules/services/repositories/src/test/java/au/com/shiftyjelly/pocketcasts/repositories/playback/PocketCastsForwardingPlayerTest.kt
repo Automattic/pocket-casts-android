@@ -204,6 +204,32 @@ class PocketCastsForwardingPlayerTest {
     }
 
     @Test
+    fun `automotive empty timeline reports command availability from its own commands`() {
+        val player = mock<Player> {
+            on { applicationLooper } doReturn Looper.getMainLooper()
+            on { currentTimeline } doReturn Timeline.EMPTY
+            on { isCommandAvailable(any()) } doReturn false
+        }
+        val forwarding = PocketCastsForwardingPlayer(player, isAutomotive = true)
+
+        assertTrue(forwarding.isCommandAvailable(Player.COMMAND_GET_METADATA))
+        assertTrue(forwarding.isCommandAvailable(Player.COMMAND_GET_CURRENT_MEDIA_ITEM))
+        assertFalse(forwarding.isCommandAvailable(Player.COMMAND_PLAY_PAUSE))
+    }
+
+    @Test
+    fun `non-empty timeline delegates command availability to the wrapped player`() {
+        val player = mock<Player> {
+            on { applicationLooper } doReturn Looper.getMainLooper()
+            on { currentTimeline } doReturn Timeline.EMPTY
+            on { isCommandAvailable(Player.COMMAND_GET_TIMELINE) } doReturn true
+        }
+        val forwarding = PocketCastsForwardingPlayer(player, isAutomotive = false)
+
+        assertTrue(forwarding.isCommandAvailable(Player.COMMAND_GET_TIMELINE))
+    }
+
+    @Test
     fun `automotive empty timeline reports null current media item`() {
         val player = mock<Player> {
             on { applicationLooper } doReturn Looper.getMainLooper()
