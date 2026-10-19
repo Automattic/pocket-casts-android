@@ -1,5 +1,8 @@
 8.24
 -----
+*   New Features
+    *   Show Google Play's in-app message when a subscription payment is declined, so you can fix the payment without leaving the app
+        ([#6153](https://github.com/Automattic/pocket-casts-android/pull/6153))
 *   Bug Fixes
     *   Fix tapping the media player or a notification not opening the app after changing the app icon
         ([#6181](https://github.com/Automattic/pocket-casts-android/pull/6181))
