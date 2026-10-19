@@ -107,6 +107,10 @@ class ChatManagerImpl @Inject constructor(
         episodeChatDao.updateRating(answerUuid, rating?.value)
     }
 
+    override suspend fun deleteAllChats() {
+        episodeChatDao.deleteAll()
+    }
+
     // Pick transcript for chat: prefer author-provided (non-generated) over Pocket Casts-generated.
     private suspend fun selectTranscript(episodeUuid: String): Transcript? {
         val transcripts = transcriptDao.observeTranscripts(episodeUuid).first()

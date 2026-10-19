@@ -274,6 +274,19 @@ class ChatManagerImplTest {
         assertNull(episodeChatDao.messages.single { it.role == ChatRole.Assistant.value }.metadata)
     }
 
+    @Test
+    fun `delete all chats removes every chat and message`() = runTest {
+        episodeChatDao.chats += EpisodeChat(episodeUuid = EPISODE_UUID, podcastUuid = PODCAST_UUID)
+        episodeChatDao.chats += EpisodeChat(episodeUuid = "other-episode-uuid", podcastUuid = PODCAST_UUID)
+        episodeChatDao.messages += createMessage(uuid = "message-1", episodeUuid = EPISODE_UUID, text = "Answer")
+        episodeChatDao.messages += createMessage(uuid = "message-2", episodeUuid = "other-episode-uuid", text = "Answer")
+
+        manager.deleteAllChats()
+
+        assertEquals(emptyList<EpisodeChat>(), episodeChatDao.chats)
+        assertEquals(emptyList<EpisodeChatMessage>(), episodeChatDao.messages)
+    }
+
     private fun quoteAdapter() = Moshi.Builder().build().adapter(QuoteMetadata::class.java)
 
     private class TestTokenHandler : TokenHandler {
@@ -298,6 +311,14 @@ class ChatManagerImplTest {
 
         override suspend fun deleteChat(episodeUuid: String) {
             chats.removeAll { it.episodeUuid == episodeUuid }
+        }
+
+        override suspend fun deleteAllChats() {
+            chats.clear()
+        }
+
+        override suspend fun deleteAllMessages() {
+            messages.clear()
         }
 
         override suspend fun insertMessage(message: EpisodeChatMessage) {

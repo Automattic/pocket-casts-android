@@ -276,6 +276,8 @@ class ChatFeedbackViewModelTest {
         override suspend fun restoreMessages(clearedChat: ClearedChat) = Unit
 
         override suspend fun rateAnswer(answerUuid: String, rating: ChatAnswerRating?) = Unit
+
+        override suspend fun deleteAllChats() = Unit
     }
 
     private companion object {
