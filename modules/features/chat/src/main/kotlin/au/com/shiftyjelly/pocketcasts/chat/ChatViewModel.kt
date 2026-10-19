@@ -55,6 +55,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import java.io.IOException
 import java.time.Clock
 import java.time.ZoneId
+import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
 import kotlin.time.TimeSource
 import kotlinx.coroutines.CancellationException
@@ -126,7 +127,8 @@ class ChatViewModel @Inject constructor(
 
     private var isSigningIn = false
 
-    @Volatile private var quotePlaybackUndo: PlaybackPosition? = null
+    private val quotePlaybackUndo = AtomicReference<QuotePlaybackUndo?>()
+    private var lastQuotePlaybackUndoId = 0
     private var transientUserMessage: ChatMessage.User? = null
     private var pendingShownEntryPoint: ChatEntryPoint? = null
     private var hasReceivedAnswer = false
@@ -592,26 +594,31 @@ class ChatViewModel @Inject constructor(
                     isOtherEpisode = isOtherEpisode,
                 ),
             )
-            quotePlaybackUndo = quotePlaybackUndo?.withLaterSwitch(episodeSwitch)
-                ?: state.toPlaybackPosition(episodeUuid, podcastUuid, episodeSwitch)
-            showToast(ChatToast.QuotePlaying(episode.title))
+            val undoId = ++lastQuotePlaybackUndoId
+            quotePlaybackUndo.updateAndGet { undo ->
+                QuotePlaybackUndo(
+                    id = undoId,
+                    position = undo?.position?.withLaterSwitch(episodeSwitch)
+                        ?: state.toPlaybackPosition(episodeUuid, podcastUuid, episodeSwitch),
+                )
+            }
+            showToast(ChatToast.QuotePlaying(episode.title, undoId))
         }
     }
 
-    fun onQuoteUndoExpired() {
-        quotePlaybackUndo = null
+    fun onQuoteUndoExpired(undoId: Int) {
+        quotePlaybackUndo.updateAndGet { undo -> undo?.takeUnless { it.id == undoId } }
     }
 
     private fun showToast(toast: ChatToast) {
-        if (toast !is ChatToast.QuotePlaying && toast !is ChatToast.QuotePlayFailed) {
-            quotePlaybackUndo = null
+        if (toast !is ChatToast.QuotePlaying) {
+            quotePlaybackUndo.set(null)
         }
         _toasts.trySend(toast)
     }
 
     fun undoQuotePlay() {
-        val undo = quotePlaybackUndo ?: return
-        quotePlaybackUndo = null
+        val undo = quotePlaybackUndo.getAndSet(null)?.position ?: return
         eventHorizon.track(
             EpisodeChatQuotePlayUndoneEvent(
                 source = sourceView.analyticsValue,
@@ -926,6 +933,11 @@ private data class ChatEpisode(
     val durationMs: Int,
 )
 
+private class QuotePlaybackUndo(
+    val id: Int,
+    val position: PlaybackPosition,
+)
+
 private class PlaybackPosition(
     val quoteEpisodeUuid: String,
     val quotePodcastUuid: String,
@@ -981,7 +993,7 @@ sealed interface ChatToast {
     data object FeedbackThanks : ChatToast
     data object ChatCleared : ChatToast
     data object ChatDeleted : ChatToast
-    data class QuotePlaying(val episodeTitle: String) : ChatToast
+    data class QuotePlaying(val episodeTitle: String, val undoId: Int) : ChatToast
     data object QuotePlayFailed : ChatToast
 }
 
