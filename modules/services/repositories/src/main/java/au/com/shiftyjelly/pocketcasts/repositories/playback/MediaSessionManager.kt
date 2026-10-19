@@ -635,7 +635,7 @@ class MediaSessionManager(
                 .distinctUntilChanged()
                 .onEach { media3Session?.let { session -> notifyPlaylistsChanged(session) } }
                 .catch { Timber.e(it, "Error observing refresh state") }
-                .launchIn(scope)
+                .launchIn(applicationScope)
         }
 
         val episodeAndState = playbackManager.playbackStateRelay
