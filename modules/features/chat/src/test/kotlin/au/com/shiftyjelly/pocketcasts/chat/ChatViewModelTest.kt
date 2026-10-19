@@ -1497,7 +1497,7 @@ class ChatViewModelTest {
             viewModel.playQuote(quote.uuid)
             advanceUntilIdle()
 
-            assertEquals(ChatToast.QuotePlaying(episode.value.title), awaitItem())
+            assertEquals(episode.value.title, (awaitItem() as ChatToast.QuotePlaying).episodeTitle)
         }
     }
 
@@ -1575,7 +1575,7 @@ class ChatViewModelTest {
         advanceUntilIdle()
         viewModel.playQuote(first.uuid)
         advanceUntilIdle()
-        viewModel.onQuoteUndoExpired()
+        viewModel.onQuoteUndoExpired(quotePlayingToast().undoId)
         playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID, positionMs = 1_500)
         viewModel.playQuote(second.uuid)
         advanceUntilIdle()
@@ -1584,6 +1584,54 @@ class ChatViewModelTest {
         advanceUntilIdle()
 
         verify(playbackManager).seekToTimeMsSuspend(org.mockito.kotlin.eq(1_500), anyOrNull())
+    }
+
+    @Test
+    fun `a quote toast replaced by the next quote keeps the first undo`() = runTest {
+        val first = createQuote(startMs = 1_000, endMs = 3_000)
+        val second = createQuote(startMs = 5_000, endMs = 7_000, uuid = "second-quote-uuid")
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID, positionMs = 10_000)
+        chatManager.messages.value = listOf(first, second)
+        setEpisodeInfo(123_000)
+        advanceUntilIdle()
+        viewModel.playQuote(first.uuid)
+        advanceUntilIdle()
+        val firstToast = quotePlayingToast()
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID, positionMs = 1_500)
+        viewModel.playQuote(second.uuid)
+        advanceUntilIdle()
+        viewModel.onQuoteUndoExpired(firstToast.undoId)
+
+        viewModel.undoQuotePlay()
+        advanceUntilIdle()
+
+        verify(playbackManager).seekToTimeMsSuspend(org.mockito.kotlin.eq(10_000), anyOrNull())
+        verify(playbackManager, never()).seekToTimeMsSuspend(org.mockito.kotlin.eq(1_500), anyOrNull())
+    }
+
+    @Test
+    fun `a quote that could not play drops the undo of the quote before it`() = runTest {
+        val first = createQuote(startMs = 1_000, endMs = 3_000)
+        val second = createQuote(startMs = 5_000, endMs = 7_000, uuid = "second-quote-uuid")
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        whenever(episodeManager.findEpisodeByUuid("other-uuid")).thenReturn(PodcastEpisode(uuid = "other-uuid", publishedDate = Date()))
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID, positionMs = 10_000)
+        chatManager.messages.value = listOf(first, second)
+        setEpisodeInfo(123_000)
+        advanceUntilIdle()
+        viewModel.playQuote(first.uuid)
+        advanceUntilIdle()
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = "other-uuid", positionMs = 1_500)
+        viewModel.playQuote(second.uuid)
+        advanceUntilIdle()
+        eventSink.skipEvent(eventSink.size)
+
+        viewModel.undoQuotePlay()
+        advanceUntilIdle()
+
+        verify(playbackManager, never()).seekToTimeMsSuspend(org.mockito.kotlin.eq(10_000), anyOrNull())
+        assertTrue(eventSink.isEmpty())
     }
 
     @Test
@@ -1831,6 +1879,8 @@ class ChatViewModelTest {
         verify(episodeManager).archiveAllInList(listOf(other), null)
         verify(playbackManager).seekToTimeMsSuspend(org.mockito.kotlin.eq(10_000), anyOrNull())
     }
+
+    private suspend fun quotePlayingToast() = viewModel.toasts.first() as ChatToast.QuotePlaying
 
     private suspend fun switchPlaybackOnPlayNow(other: BaseEpisode?, quoteEpisode: BaseEpisode = episode.value) {
         whenever(playbackManager.playNowSuspend(org.mockito.kotlin.eq(quoteEpisode), any(), any(), any())).then {

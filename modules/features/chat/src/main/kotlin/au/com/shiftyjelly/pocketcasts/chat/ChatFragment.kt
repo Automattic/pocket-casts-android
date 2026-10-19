@@ -151,33 +151,37 @@ class ChatFragment : BaseDialogFragment() {
         }
         LaunchedEffect(snackbarHostState) {
             viewModel.toasts.collectLatest { toast ->
-                snackbarHostState.currentSnackbarData?.dismiss()
-                shownToast = toast
-                val result = if (toast.isUndoable) {
-                    coroutineScope {
-                        val expiry = launch {
-                            delay(undoToastTimeoutMs)
-                            snackbarHostState.currentSnackbarData?.dismiss()
+                try {
+                    snackbarHostState.currentSnackbarData?.dismiss()
+                    shownToast = toast
+                    val result = if (toast.isUndoable) {
+                        coroutineScope {
+                            val expiry = launch {
+                                delay(undoToastTimeoutMs)
+                                snackbarHostState.currentSnackbarData?.dismiss()
+                            }
+                            snackbarHostState.showSnackbar(
+                                message = toast.message(resources),
+                                actionLabel = resources.getString(LR.string.chat_undo),
+                                duration = SnackbarDuration.Indefinite,
+                            ).also { expiry.cancel() }
                         }
-                        snackbarHostState.showSnackbar(
-                            message = toast.message(resources),
-                            actionLabel = resources.getString(LR.string.chat_undo),
-                            duration = SnackbarDuration.Indefinite,
-                        ).also { expiry.cancel() }
+                    } else {
+                        snackbarHostState.showSnackbar(message = toast.message(resources), duration = SnackbarDuration.Short)
                     }
-                } else {
-                    snackbarHostState.showSnackbar(message = toast.message(resources), duration = SnackbarDuration.Short)
-                }
-                shownToast = null
-                if (result == SnackbarResult.ActionPerformed) {
-                    when (toast) {
-                        ChatToast.ChatCleared -> viewModel.undoClearChat()
-                        ChatToast.ChatDeleted -> viewModel.undoDeleteChat()
-                        is ChatToast.QuotePlaying -> viewModel.undoQuotePlay()
-                        ChatToast.FeedbackThanks, ChatToast.QuotePlayFailed -> Unit
+                    shownToast = null
+                    if (result == SnackbarResult.ActionPerformed) {
+                        when (toast) {
+                            ChatToast.ChatCleared -> viewModel.undoClearChat()
+                            ChatToast.ChatDeleted -> viewModel.undoDeleteChat()
+                            is ChatToast.QuotePlaying -> viewModel.undoQuotePlay()
+                            ChatToast.FeedbackThanks, ChatToast.QuotePlayFailed -> Unit
+                        }
                     }
-                } else if (toast is ChatToast.QuotePlaying) {
-                    viewModel.onQuoteUndoExpired()
+                } finally {
+                    if (toast is ChatToast.QuotePlaying) {
+                        viewModel.onQuoteUndoExpired(toast.undoId)
+                    }
                 }
             }
         }
