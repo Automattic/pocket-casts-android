@@ -61,6 +61,11 @@ class ShelfViewModel @AssistedInject constructor(
                 _uiState.update { it.copy(showBookmarkNewBadge = showBadge) }
             }
         }
+        viewModelScope.launch {
+            FeatureFlag.isEnabledFlow(Feature.EPISODE_CHAT_FREE_BETA).collectLatest { isFreeBeta ->
+                _uiState.update { it.copy(showEpisodeChatBetaBadge = isFreeBeta) }
+            }
+        }
     }
 
     fun setData(
@@ -180,6 +185,7 @@ class ShelfViewModel @AssistedInject constructor(
         val episode: BaseEpisode? = null,
         val isTranscriptAvailable: Boolean = false,
         val showBookmarkNewBadge: Boolean = false,
+        val showEpisodeChatBetaBadge: Boolean = false,
     )
 
     enum class ShelfActionSource(
