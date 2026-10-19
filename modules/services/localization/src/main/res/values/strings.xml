@@ -2578,7 +2578,8 @@
     <string name="chat_history">Chat history</string>
     <string name="chat_history_previous_7_days">Previous 7 days</string>
     <string name="chat_history_older">Older</string>
-    <string name="chat_history_empty">Chats you have about episodes will show up here.</string>
+    <string name="chat_history_empty_title">No chats yet</string>
+    <string name="chat_history_empty_body">Ask about an episode and your chat will show up here.</string>
     <string name="chat_undo">Undo</string>
     <string name="chat_now_playing_episode">Now playing %1$s</string>
     <string name="chat_quote_play_failed">Couldn’t play this part of the episode</string>

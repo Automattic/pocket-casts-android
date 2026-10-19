@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.chat.ui
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -34,6 +35,7 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -96,12 +98,9 @@ internal fun ChatHistory(
         )
         Box(modifier = Modifier.weight(1f)) {
             if (sections.isEmpty()) {
-                Text(
-                    text = stringResource(LR.string.chat_history_empty),
-                    color = theme.tertiaryText,
-                    fontSize = 15.sp,
-                    lineHeight = 20.sp,
-                    modifier = Modifier.padding(horizontal = 16.dp),
+                ChatHistoryEmpty(
+                    theme = theme,
+                    modifier = Modifier.align(Alignment.Center),
                 )
             }
             LazyColumn(modifier = Modifier.fillMaxSize()) {
@@ -131,6 +130,36 @@ internal fun ChatHistory(
                     .navigationBarsPadding(),
             )
         }
+    }
+}
+
+@Composable
+private fun ChatHistoryEmpty(
+    theme: ChatTheme,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = modifier
+            .padding(horizontal = 32.dp)
+            .semantics(mergeDescendants = true) {},
+    ) {
+        Text(
+            text = stringResource(LR.string.chat_history_empty_title),
+            color = theme.primaryText,
+            fontSize = 17.sp,
+            lineHeight = 22.sp,
+            fontWeight = FontWeight.SemiBold,
+            textAlign = TextAlign.Center,
+        )
+        Text(
+            text = stringResource(LR.string.chat_history_empty_body),
+            color = theme.tertiaryText,
+            fontSize = 15.sp,
+            lineHeight = 20.sp,
+            textAlign = TextAlign.Center,
+        )
     }
 }
 
