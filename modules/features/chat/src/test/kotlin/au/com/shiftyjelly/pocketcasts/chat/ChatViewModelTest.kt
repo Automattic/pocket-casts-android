@@ -2408,6 +2408,56 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `a chat restored after signing in opens without a second beta sheet`() = runTest {
+        setEpisodeInfo(isBeta = true, requiresSignIn = true)
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertFalse(state.isSignInRequired)
+        assertFalse(state.isBetaSheetVisible)
+        assertTrue(state.isBeta)
+        verify(betaSheetSeenSetting).set(true, updateModifiedAt = false)
+        assertEquals(
+            EpisodeChatShownEvent(
+                source = SourceView.PLAYER.analyticsValue,
+                episodeUuid = EPISODE_UUID,
+                podcastUuid = PODCAST_UUID,
+                hasHistory = false,
+                entryPoint = EpisodeChatEntryPointType.SignIn,
+                isBeta = true,
+            ),
+            eventSink.pollEvent(),
+        )
+        assertTrue(eventSink.isEmpty())
+
+        viewModel.refreshSignIn()
+        advanceUntilIdle()
+
+        assertEquals(1, chatManager.createdChats.size)
+        assertTrue(eventSink.isEmpty())
+    }
+
+    @Test
+    fun `a plus account restored after signing in leaves beta mode without the beta sheet`() = runTest {
+        subscription.value = Subscription(
+            tier = SubscriptionTier.Plus,
+            billingCycle = BillingCycle.Monthly,
+            platform = SubscriptionPlatform.Android,
+            expiryDate = Instant.now(),
+            isAutoRenewing = true,
+            giftDays = 0,
+        )
+
+        setEpisodeInfo(isBeta = true, requiresSignIn = true)
+        advanceUntilIdle()
+
+        assertFalse(viewModel.uiState.value.isBeta)
+        assertFalse(viewModel.uiState.value.isBetaSheetVisible)
+        assertEquals(false, (eventSink.pollEvent() as EpisodeChatShownEvent).isBeta)
+        assertTrue(eventSink.isEmpty())
+    }
+
+    @Test
     fun `coming back without signing in keeps the beta sheet`() = runTest {
         isLoggedIn = false
         setEpisodeInfo(isBeta = true, requiresSignIn = true)
