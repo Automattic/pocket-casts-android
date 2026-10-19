@@ -61,6 +61,7 @@ import io.reactivex.rxkotlin.Observables
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -632,8 +633,16 @@ class MediaSessionManager(
 
             settings.refreshStateFlow
                 .filter { it is RefreshState.Success || it is RefreshState.Failed }
-                .onEach { media3Session?.let { session -> notifyPlaylistsChanged(session) } }
-                .catch { Timber.e(it, "Error observing refresh state") }
+                .onEach {
+                    val session = media3Session ?: return@onEach
+                    try {
+                        notifyPlaylistsChanged(session)
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: Exception) {
+                        Timber.e(e, "Failed to notify playlist changes")
+                    }
+                }
                 .launchIn(applicationScope)
         }
 
