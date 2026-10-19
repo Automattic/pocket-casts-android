@@ -1626,6 +1626,7 @@ class ChatViewModelTest {
         viewModel.playQuote(second.uuid)
         advanceUntilIdle()
         eventSink.skipEvent(eventSink.size)
+        assertEquals(ChatToast.QuotePlayFailed, viewModel.toasts.first())
 
         viewModel.undoQuotePlay()
         advanceUntilIdle()
