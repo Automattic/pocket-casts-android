@@ -227,7 +227,9 @@ class CloudFilesFragment :
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 settings.bottomInset.collect { bottomInset ->
-                    binding?.recyclerView?.updatePadding(bottom = bottomInset)
+                    binding?.recyclerView?.updatePadding(
+                        bottom = bottomInset + resources.getDimensionPixelSize(R.dimen.files_list_padding_bottom),
+                    )
                     binding?.fab?.updateLayoutParams<ViewGroup.MarginLayoutParams> {
                         bottomMargin = bottomInset + resources.getDimensionPixelSize(R.dimen.files_fab_margin_bottom)
                     }
