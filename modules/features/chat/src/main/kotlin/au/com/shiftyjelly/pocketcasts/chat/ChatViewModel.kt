@@ -26,6 +26,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.eventhorizon.EpisodeChatBetaSheetDismissedEvent
 import com.automattic.eventhorizon.EpisodeChatBetaSheetShownEvent
@@ -159,7 +161,13 @@ class ChatViewModel @Inject constructor(
         if (chatEpisode.value != null) return
         this.sourceView = sourceView
         val isSignInRequired = requiresSignIn && !syncManager.isLoggedIn()
-        _uiState.update { it.copy(isBeta = isBeta, isSignInRequired = isSignInRequired) }
+        _uiState.update {
+            it.copy(
+                isBeta = isBeta,
+                isBetaNoteVisible = FeatureFlag.isEnabled(Feature.EPISODE_CHAT_FREE_BETA),
+                isSignInRequired = isSignInRequired,
+            )
+        }
         openChat(ChatEpisode(episodeUuid, episodeTitle, podcastUuid, podcastTitle, episodeDurationMs), entryPoint)
         observePlayback()
         if (isSignInRequired) {
@@ -1030,6 +1038,7 @@ data class ChatUiState(
     val isAwaitingReply: Boolean = false,
     val error: ChatError? = null,
     val isBeta: Boolean = false,
+    val isBetaNoteVisible: Boolean = false,
     val isBetaSheetVisible: Boolean = false,
     val isSignInRequired: Boolean = false,
     val playback: ChatPlayback = ChatPlayback(),

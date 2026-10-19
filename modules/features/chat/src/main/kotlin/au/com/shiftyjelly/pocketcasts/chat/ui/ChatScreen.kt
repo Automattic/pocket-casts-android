@@ -351,7 +351,7 @@ private fun ChatContent(
             onSend = onSend,
             isConnected = uiState.isConnected,
             canSend = uiState.canSend,
-            showBetaNote = uiState.isBeta,
+            showBetaNote = uiState.isBetaNoteVisible,
             theme = theme,
         )
     }
@@ -530,7 +530,7 @@ private fun ChatScreenPreview(
                     podcastUuid = "preview-podcast-uuid",
                     podcastTitle = "Pocket Casts Weekly",
                     episodeDurationMs = 3_600_000,
-                    isBeta = true,
+                    isBetaNoteVisible = true,
                     areMessagesLoaded = true,
                     messages = listOf(
                         ChatMessage.User(
@@ -579,7 +579,7 @@ private fun ChatScreenEmptyPreview(
                     episodeTitle = "The future of podcast discovery",
                     podcastUuid = "preview-podcast-uuid",
                     podcastTitle = "Pocket Casts Weekly",
-                    isBeta = true,
+                    isBetaNoteVisible = true,
                     areMessagesLoaded = true,
                 ),
                 onClickClose = {},
@@ -614,7 +614,7 @@ private fun ChatScreenErrorPreview(
                     episodeTitle = "The future of podcast discovery",
                     podcastUuid = "preview-podcast-uuid",
                     podcastTitle = "Pocket Casts Weekly",
-                    isBeta = true,
+                    isBetaNoteVisible = true,
                     areMessagesLoaded = true,
                     error = error,
                     messages = listOf(
