@@ -346,6 +346,10 @@ class PodcastManagerImpl @Inject constructor(
         return podcastDao.observePodcastsOrderByRecentlyPlayedEpisode()
     }
 
+    override fun observePlayedPodcastUuids(): Flow<Set<String>> {
+        return podcastDao.observePlayedPodcastUuids().map { it.toSet() }
+    }
+
     override fun observeSubscribedWebFeedPodcasts(): Flow<List<Podcast>> {
         return podcastDao.observeSubscribedWebFeedPodcasts()
     }
