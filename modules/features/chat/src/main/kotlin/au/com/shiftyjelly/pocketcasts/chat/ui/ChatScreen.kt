@@ -42,6 +42,7 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -76,6 +77,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatAnswerRating
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatMessage
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filter
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -117,7 +119,9 @@ fun ChatScreen(
     BackHandler(enabled = uiState.isBetaSheetVisible) {
         onDismissBetaSheet()
     }
-    val loadedMessageUuids = remember(uiState.areMessagesLoaded) { uiState.messages.mapTo(HashSet()) { it.uuid } }
+    val loadedMessageUuids = remember(uiState.episodeUuid, uiState.areMessagesLoaded) {
+        uiState.messages.mapTo(HashSet()) { it.uuid }
+    }
     var seenBeforeHistoryUuids by remember { mutableStateOf(emptySet<String>()) }
     LaunchedEffect(uiState.isHistoryVisible) {
         if (uiState.isHistoryVisible) {
@@ -199,9 +203,10 @@ private fun ChatContent(
     val keyboardController = LocalSoftwareKeyboardController.current
 
     val followThresholdPx = with(LocalDensity.current) { FollowNewestThreshold.roundToPx() }
-    var isFollowingNewest by remember { mutableStateOf(true) }
+    var isFollowingNewest by rememberSaveable { mutableStateOf(true) }
     LaunchedEffect(scrollState) {
         snapshotFlow { scrollState.isScrollInProgress }
+            .drop(1)
             .filter { inProgress -> !inProgress }
             .collect { isFollowingNewest = scrollState.maxValue - scrollState.value <= followThresholdPx }
     }
