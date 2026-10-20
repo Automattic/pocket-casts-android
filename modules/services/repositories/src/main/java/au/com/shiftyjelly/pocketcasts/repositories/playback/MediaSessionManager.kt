@@ -17,6 +17,7 @@ import android.view.KeyEvent
 import androidx.annotation.DrawableRes
 import androidx.annotation.MainThread
 import androidx.annotation.OptIn
+import androidx.annotation.VisibleForTesting
 import androidx.core.content.IntentCompat
 import androidx.core.net.toUri
 import androidx.media.utils.MediaConstants.PLAYBACK_STATE_EXTRAS_KEY_MEDIA_ID
@@ -30,6 +31,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.MediaNotificationControls
 import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneAction
@@ -59,6 +61,7 @@ import io.reactivex.rxkotlin.Observables
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -68,6 +71,8 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -662,6 +667,20 @@ class MediaSessionManager(
                     onError = { Timber.e(it, "Error observing automotive active state") },
                 )
                 .addTo(disposables)
+
+            settings.refreshStateFlow
+                .filter { it is RefreshState.Success || it is RefreshState.Failed }
+                .onEach {
+                    val session = media3Session ?: return@onEach
+                    try {
+                        notifyPlaylistsChanged(session)
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: Exception) {
+                        Timber.e(e, "Failed to notify playlist changes")
+                    }
+                }
+                .launchIn(applicationScope)
         }
 
         val episodeAndState = playbackManager.playbackStateRelay
@@ -778,6 +797,15 @@ class MediaSessionManager(
                 onError = { Timber.e(it, "Error observing Up Next changes") },
             )
             .addTo(disposables)
+    }
+
+    @OptIn(UnstableApi::class)
+    @VisibleForTesting
+    internal suspend fun notifyPlaylistsChanged(session: MediaLibraryService.MediaLibrarySession) {
+        session.notifyChildrenChanged(FILTERS_ROOT, Int.MAX_VALUE, null)
+        playlistManager.playlistPreviewsFlow().first().forEach { playlist ->
+            session.notifyChildrenChanged(playlist.uuid, Int.MAX_VALUE, null)
+        }
     }
 
     @OptIn(UnstableApi::class)

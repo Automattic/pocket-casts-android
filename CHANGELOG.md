@@ -8,6 +8,8 @@
         ([#6181](https://github.com/Automattic/pocket-casts-android/pull/6181))
     *   Fix the add button covering the last file on the Files screen
         ([#6192](https://github.com/Automattic/pocket-casts-android/pull/6192))
+    *   Fix smart playlists in Android Automotive going empty when the car keeps the app running between drives
+        ([#6196](https://github.com/Automattic/pocket-casts-android/pull/6196))
     *   Keep the TV from going into standby while an episode is playing in the TV app
         ([#6199](https://github.com/Automattic/pocket-casts-android/pull/6199))
 
