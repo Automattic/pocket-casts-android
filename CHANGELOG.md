@@ -8,6 +8,8 @@
         ([#6181](https://github.com/Automattic/pocket-casts-android/pull/6181))
     *   Fix the add button covering the last file on the Files screen
         ([#6192](https://github.com/Automattic/pocket-casts-android/pull/6192))
+    *   Keep the TV from going into standby while an episode is playing in the TV app
+        ([#6199](https://github.com/Automattic/pocket-casts-android/pull/6199))
 
 
 8.23
