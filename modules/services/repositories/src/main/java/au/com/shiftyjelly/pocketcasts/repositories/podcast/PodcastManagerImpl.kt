@@ -44,6 +44,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
@@ -347,7 +348,7 @@ class PodcastManagerImpl @Inject constructor(
     }
 
     override fun observePlayedPodcastUuids(): Flow<Set<String>> {
-        return podcastDao.observePlayedPodcastUuids().map { it.toSet() }
+        return podcastDao.observePlayedPodcastUuids().map { it.toSet() }.distinctUntilChanged()
     }
 
     override fun observeSubscribedWebFeedPodcasts(): Flow<List<Podcast>> {
