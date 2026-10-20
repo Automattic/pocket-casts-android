@@ -828,6 +828,12 @@ class SettingsImpl @Inject constructor(
         toInt = { it.id },
     )
 
+    override val hidePlayedPodcasts = UserSetting.BoolPref(
+        sharedPrefKey = "hide_played_podcasts",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
+
     override fun getNotificationLastSeen(): Date? {
         return getDate("NOTIFICATION_LAST_SEEN")
     }
