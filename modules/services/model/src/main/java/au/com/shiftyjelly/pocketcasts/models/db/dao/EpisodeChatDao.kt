@@ -70,6 +70,18 @@ abstract class EpisodeChatDao {
     )
     abstract fun observeChatHistory(): Flow<List<EpisodeChatHistoryItem>>
 
+    @Query(
+        """
+        SELECT EXISTS(
+          SELECT 1
+          FROM episode_chats
+          JOIN episode_chat_messages ON episode_chat_messages.episode_uuid = episode_chats.episode_uuid
+          WHERE episode_chats.episode_uuid = :episodeUuid
+        )
+        """,
+    )
+    abstract suspend fun hasChatWithMessages(episodeUuid: String): Boolean
+
     @Query("UPDATE episode_chat_messages SET rating = :rating WHERE uuid = :uuid")
     abstract suspend fun updateRating(uuid: String, rating: String?)
 }
