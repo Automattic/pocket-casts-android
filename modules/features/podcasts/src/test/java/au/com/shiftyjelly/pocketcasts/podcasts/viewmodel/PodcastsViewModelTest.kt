@@ -27,13 +27,19 @@ import java.util.Date
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 class PodcastsViewModelTest {
     @get:Rule
@@ -52,6 +58,9 @@ class PodcastsViewModelTest {
     private val unplayedPodcast = Podcast(uuid = "unplayed")
     private val playedPodcast = Podcast(uuid = "played")
     private val playedPodcastInFolder = Podcast(uuid = "played-in-folder", rawFolderUuid = folder.uuid)
+
+    private val podcastsFlow = MutableStateFlow(listOf(unplayedPodcast, playedPodcast, playedPodcastInFolder))
+    private val folderManager = mock<FolderManager>()
 
     private val plusSubscription = Subscription(
         tier = SubscriptionTier.Plus,
@@ -96,6 +105,39 @@ class PodcastsViewModelTest {
         assertEquals(emptyList<FolderItem>(), viewModel.loadedItems())
     }
 
+    @Test
+    fun `flags hidden podcasts when every visible item is filtered out`() = runTest {
+        val viewModel = createViewModel(hidePlayedPodcasts = true, subscription = plusSubscription, folderUuid = folder.uuid)
+
+        assertTrue(viewModel.uiState.first { !it.isLoadingItems }.hasHiddenPodcasts)
+    }
+
+    @Test
+    fun `does not flag hidden podcasts when hiding is off`() = runTest {
+        val viewModel = createViewModel(hidePlayedPodcasts = false, subscription = plusSubscription, folderUuid = folder.uuid)
+
+        assertFalse(viewModel.uiState.first { !it.isLoadingItems }.hasHiddenPodcasts)
+    }
+
+    @Test
+    fun `keeps hidden podcasts in place when reordering`() = runTest {
+        val viewModel = createViewModel(hidePlayedPodcasts = true, subscription = null)
+        val secondUnplayedPodcast = Podcast(uuid = "unplayed-2")
+        podcastsFlow.value = listOf(unplayedPodcast, playedPodcast, secondUnplayedPodcast)
+        viewModel.loadedItems()
+
+        backgroundScope.launch(coroutineRule.testDispatcher) {
+            viewModel.reorderItems(listOf(FolderItem.Podcast(secondUnplayedPodcast), FolderItem.Podcast(unplayedPodcast)))
+        }
+
+        val captor = argumentCaptor<List<FolderItem>>()
+        verify(folderManager).updateSortPosition(captor.capture())
+        assertEquals(
+            listOf(secondUnplayedPodcast.uuid, playedPodcast.uuid, unplayedPodcast.uuid),
+            captor.firstValue.map(FolderItem::uuid),
+        )
+    }
+
     private suspend fun PodcastsViewModel.loadedItems(): List<FolderItem> {
         return uiState.first { !it.isLoadingItems }.items
     }
@@ -114,13 +156,11 @@ class PodcastsViewModelTest {
             on { refreshStateFlow } doReturn MutableStateFlow(RefreshState.Never)
         }
         val podcastManager = mock<PodcastManager> {
-            on { observePodcastsSortedByLatestEpisode() } doReturn flowOf(listOf(unplayedPodcast, playedPodcast, playedPodcastInFolder))
+            on { observePodcastsSortedByLatestEpisode() } doReturn podcastsFlow
             on { observePodcastsSortedByUserChoice(any()) } doReturn flowOf(listOf(playedPodcastInFolder))
             on { observePlayedPodcastUuids() } doReturn flowOf(setOf(playedPodcast.uuid, playedPodcastInFolder.uuid))
         }
-        val folderManager = mock<FolderManager> {
-            on { observeFolders() } doReturn flowOf(listOf(folder))
-        }
+        whenever(folderManager.observeFolders()).thenReturn(flowOf(listOf(folder)))
         val userManager = mock<UserManager> {
             on { getSignInState() } doReturn Flowable.just(SignInState.SignedIn(email = "", subscription = subscription))
         }
