@@ -62,15 +62,21 @@ internal class Media3SessionCallback(
     private val scopeProvider: () -> CoroutineScope,
     private val contextProvider: () -> Context,
     private val isTv: Boolean = false,
+    private val isAutomotive: Boolean = false,
     private val source: SourceView = SourceView.MEDIA_BUTTON_BROADCAST_ACTION,
     internal val commandMutex: Mutex = Mutex(),
 ) : MediaSession.Callback {
 
     private val scope: CoroutineScope get() = scopeProvider()
 
+    // Multi-tap media button actions run after the callback returns, so the
+    // source of the controller that sent the last button press is kept here.
+    @Volatile
+    private var mediaButtonSource: SourceView = source
+
     private val mediaButtonEventHandler = MediaButtonEventHandler(
         scopeProvider = scopeProvider,
-        onImmediatePlay = { playbackManager.playIfNotPlaying(sourceView = source) },
+        onImmediatePlay = { playbackManager.playIfNotPlaying(sourceView = mediaButtonSource) },
         onMediaEvent = { event ->
             when (event) {
                 MediaEvent.SingleTap -> handleMediaButtonSingleTap()
@@ -116,15 +122,29 @@ internal class Media3SessionCallback(
         customCommand: SessionCommand,
         args: Bundle,
     ): ListenableFuture<SessionResult> {
+        // Skip custom actions were never given a source, so other controllers keep reporting UNKNOWN.
+        val skipSource = controller.toSource(default = SourceView.UNKNOWN)
         return when (customCommand.customAction) {
-            APP_ACTION_SKIP_BACK -> launchCommandFuture("Skip back") { playbackManager.skipBackwardSuspend() }
-            APP_ACTION_SKIP_FWD -> launchCommandFuture("Skip forward") { playbackManager.skipForwardSuspend() }
+            APP_ACTION_SKIP_BACK -> launchCommandFuture("Skip back") {
+                playbackManager.skipBackwardSuspend(sourceView = skipSource)
+            }
+
+            APP_ACTION_SKIP_FWD -> launchCommandFuture("Skip forward") {
+                playbackManager.skipForwardSuspend(sourceView = skipSource)
+            }
+
             APP_ACTION_MARK_AS_PLAYED -> launchCommandFuture("Mark as played") { actions.markAsPlayedSuspend() }
+
             APP_ACTION_STAR -> launchCommandFuture("Star") { actions.starEpisodeSuspend() }
+
             APP_ACTION_UNSTAR -> launchCommandFuture("Unstar") { actions.unstarEpisodeSuspend() }
+
             APP_ACTION_CHANGE_SPEED -> launchCommandFuture("Change speed") { actions.changePlaybackSpeedSuspend() }
+
             APP_ACTION_ARCHIVE -> launchCommandFuture("Archive") { actions.archiveSuspend() }
+
             APP_ACTION_PLAY_NEXT -> launchCommandFuture("Play next") { playbackManager.playNextInQueue() }
+
             else -> Futures.immediateFuture(SessionResult(SessionError.ERROR_NOT_SUPPORTED))
         }
     }
@@ -148,6 +168,7 @@ internal class Media3SessionCallback(
             return Futures.immediateFuture(emptyList())
         }
 
+        val playSource = controller.toSource()
         val future = SettableFuture.create<List<MediaItem>>()
         scope.launch {
             commandMutex.withLock {
@@ -168,9 +189,9 @@ internal class Media3SessionCallback(
                     future.set(listOf(resolvedItem))
 
                     if (playbackManager.getCurrentEpisode()?.uuid == episode.uuid) {
-                        playbackManager.playQueueSuspend(sourceView = source)
+                        playbackManager.playQueueSuspend(sourceView = playSource)
                     } else {
-                        playbackManager.playNowSync(episode = episode, sourceView = source)
+                        playbackManager.playNowSync(episode = episode, sourceView = playSource)
                     }
                 } catch (e: Exception) {
                     Timber.e(e, "Play from media ID failed")
@@ -214,7 +235,12 @@ internal class Media3SessionCallback(
             return true
         }
 
-        LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Media3 media button event: keyCode=${keyEvent.keyCode}")
+        LogBuffer.i(
+            LogBuffer.TAG_PLAYBACK,
+            "Media3 media button event: keyCode=${keyEvent.keyCode} controller=${controllerInfo.packageName}",
+        )
+        val buttonSource = controllerInfo.toSource()
+        mediaButtonSource = buttonSource
 
         // Dedicated pause key has explicit semantics — handle it directly.
         // KEYCODE_MEDIA_PLAY stays in the multi-tap system because some Bluetooth
@@ -223,7 +249,7 @@ internal class Media3SessionCallback(
         // for the multi-tap window to expire.
         when (keyEvent.keyCode) {
             KeyEvent.KEYCODE_MEDIA_PAUSE -> {
-                scope.launch { playbackManager.pauseSuspend(sourceView = source) }
+                scope.launch { playbackManager.pauseSuspend(sourceView = buttonSource) }
                 return true
             }
 
@@ -235,7 +261,7 @@ internal class Media3SessionCallback(
                 scope.launch {
                     try {
                         playbackManager.skipForwardSuspend(
-                            sourceView = source,
+                            sourceView = buttonSource,
                             jumpAmountSeconds = settings.skipForwardInSecs.value,
                         )
                     } catch (e: Exception) {
@@ -251,7 +277,7 @@ internal class Media3SessionCallback(
                 scope.launch {
                     try {
                         playbackManager.skipBackwardSuspend(
-                            sourceView = source,
+                            sourceView = buttonSource,
                             jumpAmountSeconds = settings.skipBackInSecs.value,
                         )
                     } catch (e: Exception) {
@@ -266,7 +292,7 @@ internal class Media3SessionCallback(
     }
 
     private fun handleMediaButtonSingleTap() {
-        playbackManager.playPause(sourceView = source)
+        playbackManager.playPause(sourceView = mediaButtonSource)
     }
 
     private fun handleMediaButtonDoubleTap() {
@@ -275,6 +301,10 @@ internal class Media3SessionCallback(
 
     private fun handleMediaButtonTripleTap() {
         handleMediaButtonAction(settings.headphoneControlsPreviousAction.value)
+    }
+
+    private fun MediaSession.ControllerInfo.toSource(default: SourceView = source): SourceView {
+        return resolveMediaSessionSource(packageName, isAutomotive, default)
     }
 
     private fun launchCommand(tag: String, block: suspend () -> Unit) {
@@ -324,14 +354,15 @@ internal class Media3SessionCallback(
             }
 
             HeadphoneAction.SKIP_FORWARD -> {
+                val buttonSource = mediaButtonSource
                 scope.launch {
                     try {
                         playbackManager.skipForwardSuspend(
-                            sourceView = source,
+                            sourceView = buttonSource,
                             jumpAmountSeconds = settings.skipForwardInSecs.value,
                         )
                         if (!playbackManager.isPlaying()) {
-                            playbackManager.playQueueSuspend(source)
+                            playbackManager.playQueueSuspend(buttonSource)
                         }
                     } catch (e: Exception) {
                         Timber.e(e, "Skip forward failed")
@@ -340,10 +371,11 @@ internal class Media3SessionCallback(
             }
 
             HeadphoneAction.SKIP_BACK -> {
+                val buttonSource = mediaButtonSource
                 scope.launch {
                     try {
                         playbackManager.skipBackwardSuspend(
-                            sourceView = source,
+                            sourceView = buttonSource,
                             jumpAmountSeconds = settings.skipBackInSecs.value,
                         )
                     } catch (e: Exception) {

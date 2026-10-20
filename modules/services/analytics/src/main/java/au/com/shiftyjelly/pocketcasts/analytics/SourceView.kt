@@ -18,6 +18,14 @@ enum class SourceView(
         key = "auto_download",
         analyticsValue = SourceViewType.AutoDownload,
     ),
+    ANDROID_AUTO(
+        key = "android_auto",
+        analyticsValue = SourceViewType.AndroidAuto,
+    ),
+    AUTOMOTIVE(
+        key = "automotive",
+        analyticsValue = SourceViewType.Automotive,
+    ),
     BLOGS(
         key = "blogs",
         analyticsValue = SourceViewType.Blogs,
