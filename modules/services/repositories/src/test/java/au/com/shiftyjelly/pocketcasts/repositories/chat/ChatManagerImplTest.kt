@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -322,6 +323,26 @@ class ChatManagerImplTest {
     }
 
     @Test
+    fun `an episode with chat messages has a chat`() = runTest {
+        episodeChatDao.chats += EpisodeChat(episodeUuid = EPISODE_UUID, podcastUuid = PODCAST_UUID)
+        episodeChatDao.messages += createMessage(uuid = "message-uuid", episodeUuid = EPISODE_UUID, text = "Question")
+
+        assertTrue(manager.hasChatWithMessages(EPISODE_UUID))
+    }
+
+    @Test
+    fun `an episode with an empty chat has no chat`() = runTest {
+        episodeChatDao.chats += EpisodeChat(episodeUuid = EPISODE_UUID, podcastUuid = PODCAST_UUID)
+
+        assertFalse(manager.hasChatWithMessages(EPISODE_UUID))
+    }
+
+    @Test
+    fun `an episode without a chat has no chat`() = runTest {
+        assertFalse(manager.hasChatWithMessages(EPISODE_UUID))
+    }
+
+    @Test
     fun `restoring a cleared chat brings back its messages and ratings`() = runTest {
         val answer = createMessage(uuid = "answer-uuid", episodeUuid = EPISODE_UUID, text = "Answer").copy(rating = "positive")
         episodeChatDao.messages += answer
@@ -435,6 +456,10 @@ class ChatManagerImplTest {
         }
 
         override fun observeChatHistory(): Flow<List<EpisodeChatHistoryItem>> = flowOf(emptyList())
+
+        override suspend fun hasChatWithMessages(episodeUuid: String): Boolean {
+            return chats.any { it.episodeUuid == episodeUuid } && messages.any { it.episodeUuid == episodeUuid }
+        }
 
         override suspend fun updateRating(uuid: String, rating: String?) {
             messages.replaceAll { if (it.uuid == uuid) it.copy(rating = rating) else it }

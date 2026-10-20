@@ -3037,6 +3037,8 @@ class ChatViewModelTest {
 
         override fun observeHistory(): Flow<List<EpisodeChatHistoryItem>> = observedHistory ?: history
 
+        override suspend fun hasChatWithMessages(episodeUuid: String) = false
+
         val discardedMessageUuids = mutableListOf<String>()
 
         override suspend fun discardMessage(uuid: String) {

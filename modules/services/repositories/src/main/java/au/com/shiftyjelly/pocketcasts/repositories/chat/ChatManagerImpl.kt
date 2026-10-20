@@ -42,6 +42,10 @@ class ChatManagerImpl @Inject constructor(
         return episodeChatDao.observeChatHistory().distinctUntilChanged()
     }
 
+    override suspend fun hasChatWithMessages(episodeUuid: String): Boolean {
+        return episodeChatDao.hasChatWithMessages(episodeUuid)
+    }
+
     override suspend fun createChat(episodeUuid: String, podcastUuid: String) {
         episodeChatDao.insertChatIfAbsent(EpisodeChat(episodeUuid = episodeUuid, podcastUuid = podcastUuid))
     }
