@@ -340,6 +340,17 @@ class TranscriptViewModelTest {
     }
 
     @Test
+    fun `omit the episode chat from transcript shown when the lookup fails`() = runTest {
+        FeatureFlag.setEnabled(Feature.EPISODE_CHAT, true)
+        whenever(chatManager.hasChatWithMessages("episode-uuid")).thenThrow(IllegalStateException())
+
+        viewModel.loadTranscript("episode-uuid")
+        runCurrent()
+
+        assertNull((eventSink.pollEvent() as TranscriptShownEvent).hasEpisodeChat)
+    }
+
+    @Test
     fun `omit the episode chat from transcript shown when episode chat is disabled`() = runTest {
         FeatureFlag.setEnabled(Feature.EPISODE_CHAT, false)
         whenever(chatManager.hasChatWithMessages("episode-uuid")).thenReturn(true)

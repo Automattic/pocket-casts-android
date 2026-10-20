@@ -47,6 +47,7 @@ import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlin.time.Duration.Companion.milliseconds
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
@@ -516,7 +517,13 @@ class TranscriptViewModel @AssistedInject constructor(
             }
         } else {
             val hasEpisodeChat = if (FeatureFlag.isEnabled(Feature.EPISODE_CHAT)) {
-                chatManager.hasChatWithMessages(episodeUuid)
+                try {
+                    chatManager.hasChatWithMessages(episodeUuid)
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    null
+                }
             } else {
                 null
             }
