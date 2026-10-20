@@ -76,6 +76,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatAnswerRating
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatMessage
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filter
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -204,6 +205,7 @@ private fun ChatContent(
     var isFollowingNewest by remember { mutableStateOf(true) }
     LaunchedEffect(scrollState) {
         snapshotFlow { scrollState.isScrollInProgress }
+            .drop(1)
             .filter { inProgress -> !inProgress }
             .collect { isFollowingNewest = scrollState.maxValue - scrollState.value <= followThresholdPx }
     }
