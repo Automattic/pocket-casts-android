@@ -2177,6 +2177,7 @@ class ChatViewModelTest {
 
         verify(playbackManager, never()).seekToTimeMsSuspend(any(), anyOrNull())
         verify(playbackManager, never()).playQueueSuspend(any(), any())
+        assertNull(viewModel.uiState.value.loadingQuoteUuid)
     }
 
     @Test
