@@ -861,6 +861,9 @@ open class PlaybackManager @Inject constructor(
         SourceView.PODCAST_SCREEN,
         SourceView.STARRED,
         SourceView.MEDIA_BUTTON_BROADCAST_ACTION,
+        // Car commands used to be reported as MEDIA_BUTTON_BROADCAST_ACTION, so they keep its behavior.
+        SourceView.ANDROID_AUTO,
+        SourceView.AUTOMOTIVE,
         -> settings.trackingAutoPlaySource.value
     }
 
