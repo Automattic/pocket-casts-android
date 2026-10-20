@@ -221,9 +221,21 @@ class ChatViewModelTest {
                 podcastUuid = PODCAST_UUID,
                 hasHistory = false,
                 entryPoint = ChatEntryPoint.PlayerShelf.analyticsValue,
+                isBeta = false,
             ),
             eventSink.pollEvent(),
         )
+    }
+
+    @Test
+    fun `opening the chat through the free beta tracks it as beta`() = runTest {
+        setEpisodeInfo(isBeta = true)
+        advanceUntilIdle()
+
+        val shown = generateSequence { if (eventSink.isEmpty()) null else eventSink.pollEvent() }
+            .filterIsInstance<EpisodeChatShownEvent>()
+            .single()
+        assertEquals(true, shown.isBeta)
     }
 
     @Test
@@ -239,6 +251,7 @@ class ChatViewModelTest {
                 podcastUuid = PODCAST_UUID,
                 hasHistory = true,
                 entryPoint = ChatEntryPoint.MoreActions.analyticsValue,
+                isBeta = false,
             ),
             eventSink.pollEvent(),
         )
@@ -258,6 +271,7 @@ class ChatViewModelTest {
                 podcastUuid = PODCAST_UUID,
                 hasHistory = null,
                 entryPoint = ChatEntryPoint.PlayerShelf.analyticsValue,
+                isBeta = false,
             ),
             eventSink.pollEvent(),
         )
@@ -1526,6 +1540,7 @@ class ChatViewModelTest {
                 source = SourceView.PLAYER.analyticsValue,
                 episodeUuid = EPISODE_UUID,
                 podcastUuid = PODCAST_UUID,
+                isOtherEpisode = false,
             ),
             eventSink.pollEvent(),
         )
@@ -1802,10 +1817,12 @@ class ChatViewModelTest {
         viewModel.playQuote(quote.uuid)
         advanceUntilIdle()
 
+        eventSink.skipEvent(eventSink.size)
         viewModel.undoQuotePlay()
         advanceUntilIdle()
 
         verify(upNextQueue).changeList(queued)
+        assertEquals(true, (eventSink.pollEvent() as EpisodeChatQuotePlayUndoneEvent).isOtherEpisode)
     }
 
     @Test
@@ -1916,10 +1933,12 @@ class ChatViewModelTest {
         advanceUntilIdle()
         viewModel.playQuote(otherQuote.uuid)
         advanceUntilIdle()
+        eventSink.skipEvent(eventSink.size)
 
         viewModel.undoQuotePlay()
         advanceUntilIdle()
 
+        assertEquals(true, (eventSink.pollEvent() as EpisodeChatQuotePlayUndoneEvent).isOtherEpisode)
         verify(playbackManager).playNowSuspend(org.mockito.kotlin.same(playing), any(), any(), any())
         verify(upNextQueue).changeList(queued)
         verify(episodeManager).updatePlayingStatusBlocking(org.mockito.kotlin.same(other), org.mockito.kotlin.eq(EpisodePlayingStatus.COMPLETED))
@@ -2334,6 +2353,7 @@ class ChatViewModelTest {
                 podcastUuid = PODCAST_UUID,
                 hasHistory = true,
                 entryPoint = EpisodeChatEntryPointType.SignIn,
+                isBeta = true,
             ),
             eventSink.pollEvent(),
         )
@@ -2550,6 +2570,7 @@ class ChatViewModelTest {
                 podcastUuid = OTHER_PODCAST_UUID,
                 hasHistory = true,
                 entryPoint = ChatEntryPoint.History.analyticsValue,
+                isBeta = false,
             ),
             eventSink.pollEvent(),
         )
@@ -2756,10 +2777,52 @@ class ChatViewModelTest {
                 source = SourceView.PLAYER.analyticsValue,
                 episodeUuid = EPISODE_UUID,
                 podcastUuid = PODCAST_UUID,
+                isOtherEpisode = false,
             ),
             eventSink.pollEvent(),
         )
         verify(playbackManager, never()).playNowSuspend(any<BaseEpisode>(), any(), any(), any())
+    }
+
+    @Test
+    fun `undoing a quote when nothing was loaded tracks it as the same episode like the tap`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        switchPlaybackOnPlayNow(other = null)
+        playbackState.value = PlaybackState()
+        playableState(quote)
+        eventSink.skipEvent(eventSink.size)
+        viewModel.playQuote(quote.uuid)
+        advanceUntilIdle()
+        assertEquals(false, (eventSink.pollEvent() as EpisodeChatQuotePlayTappedEvent).isOtherEpisode)
+
+        viewModel.undoQuotePlay()
+        advanceUntilIdle()
+
+        assertEquals(false, (eventSink.pollEvent() as EpisodeChatQuotePlayUndoneEvent).isOtherEpisode)
+    }
+
+    @Test
+    fun `undoing chained quotes tracks another episode when any tap started from one`() = runTest {
+        val first = createQuote(startMs = 1_000, endMs = 3_000)
+        val second = createQuote(startMs = 5_000, endMs = 7_000, uuid = "second-quote-uuid")
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        whenever(episodeManager.findEpisodeByUuid("other-uuid")).thenReturn(PodcastEpisode(uuid = "other-uuid", publishedDate = Date()))
+        switchPlaybackOnPlayNow(other = null)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = "other-uuid", positionMs = 10_000)
+        chatManager.messages.value = listOf(first, second)
+        setEpisodeInfo(123_000)
+        advanceUntilIdle()
+        viewModel.playQuote(first.uuid)
+        advanceUntilIdle()
+        viewModel.playQuote(second.uuid)
+        advanceUntilIdle()
+        eventSink.skipEvent(eventSink.size)
+
+        viewModel.undoQuotePlay()
+        advanceUntilIdle()
+
+        assertEquals(true, (eventSink.pollEvent() as EpisodeChatQuotePlayUndoneEvent).isOtherEpisode)
     }
 
     private fun historyItem(
