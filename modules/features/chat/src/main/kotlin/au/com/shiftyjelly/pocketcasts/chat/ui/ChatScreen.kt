@@ -42,6 +42,7 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -202,7 +203,7 @@ private fun ChatContent(
     val keyboardController = LocalSoftwareKeyboardController.current
 
     val followThresholdPx = with(LocalDensity.current) { FollowNewestThreshold.roundToPx() }
-    var isFollowingNewest by remember { mutableStateOf(true) }
+    var isFollowingNewest by rememberSaveable { mutableStateOf(true) }
     LaunchedEffect(scrollState) {
         snapshotFlow { scrollState.isScrollInProgress }
             .drop(1)
