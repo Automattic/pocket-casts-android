@@ -659,10 +659,14 @@
     <string name="podcasts_menu_layout_list">List view</string>
     <string name="podcasts_menu_layout_small_grid">Small grid</string>
     <string name="podcasts_menu_more_options">More options</string>
+    <string name="podcasts_menu_played_podcasts">Played podcasts</string>
     <string name="podcasts_menu_search_podcasts">Search podcasts</string>
     <string name="podcasts_menu_share_podcasts">Share podcasts</string>
     <string name="podcasts_menu_sort_by">Sort by</string>
     <string name="podcasts_no_subscriptions">No podcasts found</string>
+    <string name="podcasts_played_podcasts_description">Hides podcasts you\'ve fully listened to. They reappear when a new episode arrives.</string>
+    <string name="podcasts_played_podcasts_hide">Hide</string>
+    <string name="podcasts_played_podcasts_show">Show</string>
     <string name="podcasts_plural">%d Podcasts</string>
     <string name="podcasts_share">Share podcasts</string>
     <string name="podcasts_share_0_selected">0 selected</string>
