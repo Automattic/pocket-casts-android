@@ -236,7 +236,7 @@ class FingerprintTimingManager @Inject constructor(
             val gen: Long
             mutex.withLock {
                 // Already prepared for this episode — reuse existing state. A failed preparation may
-                // retry when the user opens the transcript, since the failure could be transient.
+                // retry when the user opens the transcript or a chat quote, since the failure could be transient.
                 val retryableFailure = canRetryFailedPreparation(trigger) && state is State.Failed
                 if (currentEpisodeUuid == episodeUuid && state !is State.Idle && !retryableFailure) {
                     if (trigger == PrepareTrigger.TRANSCRIPT_VIEW) {
