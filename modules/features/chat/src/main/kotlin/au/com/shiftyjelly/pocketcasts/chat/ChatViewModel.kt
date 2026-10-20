@@ -133,6 +133,8 @@ class ChatViewModel @Inject constructor(
 
     private val quotePlaybackUndo = AtomicReference<QuotePlaybackUndo?>()
     private val quoteLoadId = AtomicInteger()
+    private val warmedUpEpisodeUuids = mutableSetOf<String>()
+    private val warmedUpQuoteUuids = mutableSetOf<String>()
     private var lastQuotePlaybackUndoId = 0
     private var transientUserMessage: ChatMessage.User? = null
     private var pendingShownEntryPoint: ChatEntryPoint? = null
@@ -172,6 +174,7 @@ class ChatViewModel @Inject constructor(
         }
         openChat(ChatEpisode(episodeUuid, episodeTitle, podcastUuid, podcastTitle, episodeDurationMs), entryPoint)
         observePlayback()
+        observeQuoteWarmUp()
         when {
             !requiresSignIn -> {
                 observeMessages()
@@ -335,6 +338,26 @@ class ChatViewModel @Inject constructor(
                 .distinctUntilChangedBy { it?.uuid }
                 .collect { podcast -> _uiState.update { it.copy(playingPodcast = podcast) } }
         }
+    }
+
+    private fun observeQuoteWarmUp() {
+        viewModelScope.launch {
+            combine(
+                _uiState.map { it.episodeUuid to it.messages }.distinctUntilChanged(),
+                playbackManager.playbackStateFlow.map { it.loadedEpisodeUuid }.distinctUntilChanged(),
+            ) { (chatEpisodeUuid, messages), loadedEpisodeUuid ->
+                val quotes = messages.filterIsInstance<ChatMessage.Quote>().filter { it.canPlay }
+                chatEpisodeUuid to quotes.takeIf { chatEpisodeUuid == loadedEpisodeUuid }.orEmpty()
+            }.collect { (chatEpisodeUuid, quotes) -> warmUpQuotes(chatEpisodeUuid, quotes) }
+        }
+    }
+
+    private fun warmUpQuotes(episodeUuid: String, quotes: List<ChatMessage.Quote>) {
+        if (quotes.isEmpty()) return
+        if (warmedUpEpisodeUuids.add(episodeUuid)) {
+            quoteSeeker.warmUpFingerprints(episodeUuid)
+        }
+        quotes.filter { warmedUpQuoteUuids.add(it.uuid) }.forEach { quoteSeeker.warmUpQuote(episodeUuid, it) }
     }
 
     fun onPlayPauseClick() {

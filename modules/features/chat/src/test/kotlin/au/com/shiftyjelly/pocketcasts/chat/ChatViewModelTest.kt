@@ -2100,6 +2100,66 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `a playable quote of the loaded episode warms up once`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID)
+        playableState(quote)
+
+        chatManager.messages.value = listOf(ChatMessage.User("Question"), quote)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID, positionMs = 2_000)
+        advanceUntilIdle()
+
+        verify(quoteSeeker, times(1)).warmUpQuote(org.mockito.kotlin.eq(EPISODE_UUID), org.mockito.kotlin.argThat { uuid == quote.uuid })
+        verify(quoteSeeker, times(1)).warmUpFingerprints(EPISODE_UUID)
+    }
+
+    @Test
+    fun `each new playable quote of the loaded episode warms up`() = runTest {
+        val first = createQuote(startMs = 1_000, endMs = 3_000)
+        val second = createQuote(startMs = 5_000, endMs = 7_000, uuid = "second-quote-uuid")
+        playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID)
+        playableState(first)
+
+        chatManager.messages.value = listOf(first, second)
+        advanceUntilIdle()
+
+        verify(quoteSeeker).warmUpQuote(org.mockito.kotlin.eq(EPISODE_UUID), org.mockito.kotlin.argThat { uuid == second.uuid })
+        verify(quoteSeeker, times(1)).warmUpFingerprints(EPISODE_UUID)
+    }
+
+    @Test
+    fun `a quote warms up once its episode is loaded`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        playableState(quote)
+        verify(quoteSeeker, never()).warmUpQuote(any(), any())
+
+        playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID)
+        advanceUntilIdle()
+
+        verify(quoteSeeker).warmUpQuote(org.mockito.kotlin.eq(EPISODE_UUID), any())
+    }
+
+    @Test
+    fun `quotes of an episode that is not loaded do not warm up`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = OTHER_EPISODE_UUID)
+        playableState(quote)
+
+        verify(quoteSeeker, never()).warmUpQuote(any(), any())
+        verify(quoteSeeker, never()).warmUpFingerprints(any())
+    }
+
+    @Test
+    fun `quotes that cannot play do not warm up`() = runTest {
+        val quote = createQuote(startMs = 49_020_000, endMs = 49_500_000)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID)
+        playableState(quote)
+
+        verify(quoteSeeker, never()).warmUpQuote(any(), any())
+        verify(quoteSeeker, never()).warmUpFingerprints(any())
+    }
+
+    @Test
     fun `play pause while a quote is starting cancels the quote`() = runTest {
         val quote = createQuote(startMs = 1_000, endMs = 3_000)
         whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
