@@ -225,7 +225,7 @@ class ChatQuoteSeekerTest {
     }
 
     @Test
-    fun `a tap after the quote warmed up matches the quote again`() = runTest {
+    fun `a tap after the warm-up finished asks the transcript manager again`() = runTest {
         whenever(transcriptManager.loadGeneratedTranscript(EPISODE_UUID)).thenReturn(generatedTranscript)
         val seeker = seeker()
         seeker.warmUpQuote(EPISODE_UUID, generatedQuote)
@@ -234,6 +234,38 @@ class ChatQuoteSeekerTest {
         seeker.quoteTime(EPISODE_UUID, generatedQuote)
 
         verifyBlocking(transcriptManager, times(2)) { loadGeneratedTranscript(EPISODE_UUID) }
+    }
+
+    @Test
+    fun `quotes of the same episode share one transcript load`() = runTest {
+        val loaded = CompletableDeferred<Transcript.Text>()
+        whenever(transcriptManager.loadGeneratedTranscript(EPISODE_UUID)).doSuspendableAnswer { loaded.await() }
+        val seeker = seeker()
+
+        seeker.warmUpQuote(EPISODE_UUID, generatedQuote)
+        seeker.warmUpQuote(EPISODE_UUID, generatedQuote.copy(text = "The special effects man waits", uuid = "other-quote-uuid"))
+        runCurrent()
+        loaded.complete(generatedTranscript)
+        runCurrent()
+
+        verifyBlocking(transcriptManager, times(1)) { loadGeneratedTranscript(EPISODE_UUID) }
+    }
+
+    @Test
+    fun `a cancelled tap leaves the transcript loading for the next tap`() = runTest {
+        val loaded = CompletableDeferred<Transcript.Text>()
+        whenever(transcriptManager.loadGeneratedTranscript(EPISODE_UUID)).doSuspendableAnswer { loaded.await() }
+        val seeker = seeker()
+        val firstTap = backgroundScope.async { seeker.quoteTime(EPISODE_UUID, generatedQuote) }
+        runCurrent()
+        firstTap.cancel()
+
+        val secondTap = backgroundScope.async { seeker.quoteTime(EPISODE_UUID, generatedQuote) }
+        runCurrent()
+        loaded.complete(generatedTranscript)
+
+        assertEquals(1_383_380, secondTap.await().timeMs)
+        verifyBlocking(transcriptManager, times(1)) { loadGeneratedTranscript(EPISODE_UUID) }
     }
 
     @Test
