@@ -291,6 +291,7 @@ private fun ChatContent(
                                     quote = message.displayText,
                                     timestampLabel = message.timestampLabel,
                                     isPlayable = message.canPlay,
+                                    isLoading = message.uuid == uiState.loadingQuoteUuid,
                                     theme = theme,
                                     onClickPlay = { onPlayQuote(message.uuid) },
                                 )
