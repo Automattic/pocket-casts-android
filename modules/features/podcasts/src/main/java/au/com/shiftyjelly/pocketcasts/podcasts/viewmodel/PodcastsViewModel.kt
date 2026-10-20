@@ -121,16 +121,31 @@ class PodcastsViewModel @AssistedInject constructor(
                 }
             }
 
+        val hiddenPodcastUuidsFlow = settings.hidePlayedPodcasts.flow
+            .flatMapLatest { hidePlayed ->
+                if (hidePlayed) podcastManager.observePlayedPodcastUuids() else flowOf(emptySet())
+            }
+
         return combine(
             podcastsFlow,
             foldersFlow,
             settings.podcastsSortType.flow,
             userManager.getSignInState().asFlow(),
-        ) { podcasts, folders, sortType, signInState ->
+            hiddenPodcastUuidsFlow,
+        ) { podcasts, folders, sortType, signInState, hiddenPodcastUuids ->
             withContext(Dispatchers.Default) {
-                buildUiState(podcasts, folders, sortType, signInState)
+                buildUiState(
+                    podcasts = podcasts.withoutHidden(hiddenPodcastUuids),
+                    folders = folders.map { it.copy(podcasts = it.podcasts.withoutHidden(hiddenPodcastUuids)) },
+                    sortType = sortType,
+                    signInState = signInState,
+                )
             }
         }
+    }
+
+    private fun List<Podcast>.withoutHidden(hiddenPodcastUuids: Set<String>): List<Podcast> {
+        return if (hiddenPodcastUuids.isEmpty()) this else filterNot { it.uuid in hiddenPodcastUuids }
     }
 
     private fun buildUiState(
