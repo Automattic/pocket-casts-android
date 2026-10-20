@@ -117,7 +117,9 @@ fun ChatScreen(
     BackHandler(enabled = uiState.isBetaSheetVisible) {
         onDismissBetaSheet()
     }
-    val loadedMessageUuids = remember(uiState.areMessagesLoaded) { uiState.messages.mapTo(HashSet()) { it.uuid } }
+    val loadedMessageUuids = remember(uiState.episodeUuid, uiState.areMessagesLoaded) {
+        uiState.messages.mapTo(HashSet()) { it.uuid }
+    }
     var seenBeforeHistoryUuids by remember { mutableStateOf(emptySet<String>()) }
     LaunchedEffect(uiState.isHistoryVisible) {
         if (uiState.isHistoryVisible) {
