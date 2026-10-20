@@ -34,7 +34,7 @@ class TvActivity : ComponentActivity() {
             TvTheme {
                 val isPlaybackActive by remember {
                     playbackManager.playbackStateFlow
-                        .map { it.isPlaying || it.isBuffering }
+                        .map { it.isPlaying }
                         .distinctUntilChanged()
                 }.collectAsStateWithLifecycle(initialValue = false)
                 KeepScreenOnEffect(keepOn = isPlaybackActive)
