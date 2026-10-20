@@ -16,7 +16,11 @@ import dagger.Lazy
 import java.util.Date
 import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -28,9 +32,12 @@ import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyBlocking
 import org.mockito.kotlin.whenever
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class ChatQuoteSeekerTest {
     @get:Rule
     val featureFlagRule = InMemoryFeatureFlagRule()
@@ -66,7 +73,7 @@ class ChatQuoteSeekerTest {
         FeatureFlag.setEnabled(Feature.SYNCED_TRANSCRIPTS, true)
     }
 
-    private fun seeker(
+    private fun TestScope.seeker(
         appPlatform: AppPlatform = AppPlatform.Phone,
         policy: FingerprintPolicy = FingerprintPolicy.PLATFORM,
     ) = ChatQuoteSeeker(
@@ -74,6 +81,7 @@ class ChatQuoteSeekerTest {
         fingerprintTimingManager = Lazy { timingManager },
         appPlatform = appPlatform,
         decodePolicy = mock { on { current() } doReturn policy },
+        scope = backgroundScope,
     )
 
     @Test
@@ -188,6 +196,74 @@ class ChatQuoteSeekerTest {
         val quoteTime = seeker().quoteTime(EPISODE_UUID, authorQuote)
 
         assertEquals(ChatQuoteSeeker.QuoteTime(timeMs = 1_390_200, referenceTimeMs = 1_383_380), quoteTime)
+    }
+
+    @Test
+    fun `warming up a quote loads its transcript before the tap`() = runTest {
+        whenever(transcriptManager.loadGeneratedTranscript(EPISODE_UUID)).thenReturn(generatedTranscript)
+
+        seeker().warmUpQuote(EPISODE_UUID, generatedQuote)
+        runCurrent()
+
+        verifyBlocking(transcriptManager) { loadGeneratedTranscript(EPISODE_UUID) }
+    }
+
+    @Test
+    fun `a tap while the quote warms up waits for the same transcript load`() = runTest {
+        val loaded = CompletableDeferred<Transcript.Text>()
+        whenever(transcriptManager.loadGeneratedTranscript(EPISODE_UUID)).doSuspendableAnswer { loaded.await() }
+        val seeker = seeker()
+        seeker.warmUpQuote(EPISODE_UUID, generatedQuote)
+        runCurrent()
+
+        val quoteTime = backgroundScope.async { seeker.quoteTime(EPISODE_UUID, generatedQuote) }
+        runCurrent()
+        loaded.complete(generatedTranscript)
+
+        assertEquals(ChatQuoteSeeker.QuoteTime(timeMs = 1_383_380, referenceTimeMs = 1_383_380), quoteTime.await())
+        verifyBlocking(transcriptManager, times(1)) { loadGeneratedTranscript(EPISODE_UUID) }
+    }
+
+    @Test
+    fun `a tap after the quote warmed up matches the quote again`() = runTest {
+        whenever(transcriptManager.loadGeneratedTranscript(EPISODE_UUID)).thenReturn(generatedTranscript)
+        val seeker = seeker()
+        seeker.warmUpQuote(EPISODE_UUID, generatedQuote)
+        runCurrent()
+
+        seeker.quoteTime(EPISODE_UUID, generatedQuote)
+
+        verifyBlocking(transcriptManager, times(2)) { loadGeneratedTranscript(EPISODE_UUID) }
+    }
+
+    @Test
+    fun `warming up fingerprints prepares them for the chat`() = runTest {
+        seeker().warmUpFingerprints(EPISODE_UUID)
+
+        verify(timingManager).onChatQuoteShown(EPISODE_UUID)
+    }
+
+    @Test
+    fun `warming up fingerprints is skipped off phone`() = runTest {
+        seeker(appPlatform = AppPlatform.Automotive).warmUpFingerprints(EPISODE_UUID)
+
+        verify(timingManager, never()).onChatQuoteShown(any())
+    }
+
+    @Test
+    fun `warming up fingerprints is skipped when the device cannot decode them`() = runTest {
+        seeker(policy = FingerprintPolicy.DISABLED).warmUpFingerprints(EPISODE_UUID)
+
+        verify(timingManager, never()).onChatQuoteShown(any())
+    }
+
+    @Test
+    fun `warming up fingerprints is skipped when synced transcripts are off`() = runTest {
+        FeatureFlag.setEnabled(Feature.SYNCED_TRANSCRIPTS, false)
+
+        seeker().warmUpFingerprints(EPISODE_UUID)
+
+        verify(timingManager, never()).onChatQuoteShown(any())
     }
 
     private suspend fun ChatQuoteSeeker.seek(quote: ChatMessage.Quote) = playbackTimeMs(episode, quoteTime(EPISODE_UUID, quote))

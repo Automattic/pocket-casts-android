@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.chat
 
+import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.ChapterSeekResult
@@ -11,11 +12,15 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.fingerprint.FingerprintDecodePolicy
 import au.com.shiftyjelly.pocketcasts.utils.fingerprint.FingerprintPolicy
 import dagger.Lazy
+import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withTimeoutOrNull
@@ -26,13 +31,42 @@ class ChatQuoteSeeker @Inject constructor(
     private val fingerprintTimingManager: Lazy<FingerprintTimingManager>,
     private val appPlatform: AppPlatform,
     private val decodePolicy: FingerprintDecodePolicy,
+    @ApplicationScope private val scope: CoroutineScope,
 ) {
+    private val pendingQuoteTimes = ConcurrentHashMap<Pair<String, String>, Deferred<QuoteTime>>()
+
     data class QuoteTime(
         val timeMs: Int,
         val referenceTimeMs: Int?,
     )
 
-    suspend fun quoteTime(episodeUuid: String, quote: ChatMessage.Quote): QuoteTime = coroutineScope {
+    fun warmUpQuote(episodeUuid: String, quote: ChatMessage.Quote) {
+        pendingQuoteTime(episodeUuid, quote)
+    }
+
+    fun warmUpFingerprints(episodeUuid: String) {
+        if (!isFingerprintSeekEnabled()) return
+        fingerprintTimingManager.get().onChatQuoteShown(episodeUuid)
+    }
+
+    suspend fun quoteTime(episodeUuid: String, quote: ChatMessage.Quote): QuoteTime {
+        return pendingQuoteTime(episodeUuid, quote).await()
+    }
+
+    private fun pendingQuoteTime(episodeUuid: String, quote: ChatMessage.Quote): Deferred<QuoteTime> {
+        val key = episodeUuid to quote.uuid
+        return pendingQuoteTimes.computeIfAbsent(key) {
+            scope.async(start = CoroutineStart.LAZY) {
+                try {
+                    findQuoteTime(episodeUuid, quote)
+                } finally {
+                    pendingQuoteTimes.remove(key)
+                }
+            }
+        }.also { it.start() }
+    }
+
+    private suspend fun findQuoteTime(episodeUuid: String, quote: ChatMessage.Quote): QuoteTime = coroutineScope {
         val sourceTranscript = async { loadTextTranscript(episodeUuid, isGenerated = quote.isFromGeneratedTranscript) }
         val generatedTranscript = if (!quote.isFromGeneratedTranscript && isFingerprintSeekEnabled()) {
             async { loadTextTranscript(episodeUuid, isGenerated = true) }
