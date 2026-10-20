@@ -6,5 +6,12 @@
         tools:replace="android:allowBackup,android:fullBackupContent,android:dataExtractionRules"
         android:allowBackup="true"
         android:fullBackupContent="@xml/backup_scheme"
-        android:dataExtractionRules="@xml/extraction_rules"/>
+        android:dataExtractionRules="@xml/extraction_rules"
+        android:backupInForeground="false">
+
+        <!-- Stops Android 16+ killing the app (and interrupting playback) after a full backup -->
+        <property
+            android:name="android.app.backup.PROPERTY_USE_RESTRICTED_BACKUP_MODE"
+            android:value="false" />
+    </application>
 </manifest>
