@@ -30,9 +30,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.AnnotatedString
@@ -118,14 +117,15 @@ internal fun AiQuoteBubble(
             }
             if (isLoading) {
                 append(" ")
-                appendInlineContent(QUOTE_SPINNER_ID)
+                appendInlineContent(QUOTE_SPINNER_ID, alternateText = " ")
             }
         }
     }
-    val inlineContent = remember(timestampColor) {
+    val spinnerSize = with(LocalDensity.current) { QuoteSpinnerSize.toSp() }
+    val inlineContent = remember(timestampColor, spinnerSize) {
         mapOf(
             QUOTE_SPINNER_ID to InlineTextContent(
-                placeholder = Placeholder(width = 12.sp, height = 12.sp, placeholderVerticalAlign = PlaceholderVerticalAlign.TextCenter),
+                placeholder = Placeholder(width = spinnerSize, height = spinnerSize, placeholderVerticalAlign = PlaceholderVerticalAlign.TextCenter),
             ) {
                 QuoteLoadingSpinner(color = timestampColor)
             },
@@ -180,13 +180,13 @@ private fun QuoteLoadingSpinner(
             progress = REDUCED_MOTION_SPINNER_PROGRESS,
             color = color,
             strokeWidth = 1.5.dp,
-            modifier = modifier.size(12.dp),
+            modifier = modifier.size(QuoteSpinnerSize),
         )
     } else {
         CircularProgressIndicator(
             color = color,
             strokeWidth = 1.5.dp,
-            modifier = modifier.size(12.dp),
+            modifier = modifier.size(QuoteSpinnerSize),
         )
     }
 }
@@ -205,18 +205,19 @@ private fun QuoteFindingMoment(
             isVisible = true
         }
     }
-    if (isVisible) {
+    if (isLoading && isVisible) {
         Text(
             text = stringResource(LR.string.chat_quote_finding_moment),
             color = theme.inputHint,
             fontSize = 12.sp,
             lineHeight = 16.sp,
-            modifier = modifier.semantics { liveRegion = LiveRegionMode.Polite },
+            modifier = modifier.clearAndSetSemantics {},
         )
     }
 }
 
 private const val QUOTE_SPINNER_ID = "quoteSpinner"
+private val QuoteSpinnerSize = 12.dp
 private const val LOADING_QUOTE_ALPHA = 0.6f
 private const val REDUCED_MOTION_SPINNER_PROGRESS = 0.75f
 private const val FINDING_MOMENT_DELAY_MS = 1_000L
