@@ -145,6 +145,25 @@ class CachedLengthValidatingDataSourceTest {
     }
 
     @Test
+    fun `ignores the content length of a range response without a content range`() {
+        storeCachedLength(1000)
+        upstream.headers = mapOf("Content-Length" to "600")
+
+        dataSource.open(dataSpec(position = 400))
+
+        assertEquals(1000L, cachedLength())
+    }
+
+    @Test
+    fun `ignores the content length of a bounded request`() {
+        upstream.headers = mapOf("Content-Length" to "600")
+
+        dataSource.open(dataSpec(length = 600))
+
+        assertEquals(C.LENGTH_UNSET.toLong(), cachedLength())
+    }
+
+    @Test
     fun `does not store a length when the response has none`() {
         upstream.headers = emptyMap()
 
@@ -182,10 +201,11 @@ class CachedLengthValidatingDataSourceTest {
         assertEquals(1000L, cachedLength())
     }
 
-    private fun dataSpec(position: Long = 0) = DataSpec.Builder()
+    private fun dataSpec(position: Long = 0, length: Long = C.LENGTH_UNSET.toLong()) = DataSpec.Builder()
         .setUri(URL)
         .setKey(KEY)
         .setPosition(position)
+        .setLength(length)
         .build()
 
     private fun storeCachedLength(length: Long) {
