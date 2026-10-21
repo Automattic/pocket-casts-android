@@ -378,6 +378,15 @@ enum class Feature(
         hasDevToggle = true,
         addedOn = LocalDate.parse("2026-10-12"),
     ),
+    RETRY_WITH_PLATFORM_USER_AGENT(
+        key = "retry_with_platform_user_agent",
+        title = "Retry failed media requests with the platform User-Agent",
+        defaultValue = true,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+        addedOn = LocalDate.parse("2026-10-21"),
+    ),
 }
 
 sealed class FeatureTier {
