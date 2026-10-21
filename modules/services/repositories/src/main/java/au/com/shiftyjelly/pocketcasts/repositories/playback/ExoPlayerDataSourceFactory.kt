@@ -45,9 +45,11 @@ class ExoPlayerDataSourceFactory @Inject constructor(
     private val maxCacheSizeBytes = settings.getExoPlayerCacheEntirePlayingEpisodeSizeInMB() * 1024 * 1024L
 
     private val cache = runCatching {
+        val databaseProvider = StandaloneDatabaseProvider(context)
+        SimpleCache.delete(File(context.cacheDir, LEGACY_CACHE_DIR_NAME), databaseProvider)
         val cacheDir = File(context.cacheDir, CACHE_DIR_NAME)
         val evictor = LeastRecentlyUsedCacheEvictor(maxCacheSizeBytes)
-        SimpleCache(cacheDir, evictor, StandaloneDatabaseProvider(context))
+        SimpleCache(cacheDir, evictor, databaseProvider)
     }.onFailure { e ->
         val errorMessage = "Failed to instantiate ExoPlayer cache ${e.message}"
         crashLogging.sendReport(Exception(errorMessage))
@@ -186,7 +188,8 @@ class ExoPlayerDataSourceFactory @Inject constructor(
         .build()
 
     private companion object {
-        const val CACHE_DIR_NAME = "pocketcasts-exoplayer-cache"
+        const val LEGACY_CACHE_DIR_NAME = "pocketcasts-exoplayer-cache"
+        const val CACHE_DIR_NAME = "pocketcasts-exoplayer-cache-v2"
     }
 }
 
