@@ -38,7 +38,7 @@ class MediaButtonEventHandlerTest {
     }
 
     @Test
-    fun `rapid KEYCODE_MEDIA_PLAY events run the immediate action once and emit a double tap`() = runTest {
+    fun `rapid KEYCODE_MEDIA_PLAY events play each time without a multi tap`() = runTest {
         var immediatePlayCount = 0
         val events = mutableListOf<MediaEvent>()
         val handler = MediaButtonEventHandler(
@@ -50,15 +50,56 @@ class MediaButtonEventHandlerTest {
 
         handler.handle(keyEvent(KeyEvent.KEYCODE_MEDIA_PLAY))
         handler.handle(keyEvent(KeyEvent.KEYCODE_MEDIA_PLAY))
+        handler.handle(keyEvent(KeyEvent.KEYCODE_MEDIA_PLAY))
 
-        assertEquals(1, immediatePlayCount)
+        assertEquals(3, immediatePlayCount)
 
         advanceUntilIdle()
-        assertEquals(listOf(MediaEvent.DoubleTap), events)
+        assertEquals(emptyList<MediaEvent>(), events)
     }
 
     @Test
-    fun `immediate play failure is reported without losing the resolved double tap`() = runTest {
+    fun `duplicate KEYCODE_MEDIA_PLAY presses inside the tap window do not resolve a multi tap`() = runTest {
+        for (gapMs in listOf(46L, 236L, 601L)) {
+            var immediatePlayCount = 0
+            val events = mutableListOf<MediaEvent>()
+            val handler = MediaButtonEventHandler(
+                scopeProvider = { this },
+                onImmediatePlay = { immediatePlayCount++ },
+                onMediaEvent = events::add,
+                isPlaying = { immediatePlayCount > 0 },
+            )
+
+            assertTrue(handler.handle(keyEvent(KeyEvent.KEYCODE_MEDIA_PLAY)))
+            advanceTimeBy(gapMs)
+            assertTrue(handler.handle(keyEvent(KeyEvent.KEYCODE_MEDIA_PLAY)))
+
+            advanceUntilIdle()
+            assertEquals(2, immediatePlayCount)
+            assertEquals(emptyList<MediaEvent>(), events)
+        }
+    }
+
+    @Test
+    fun `KEYCODE_MEDIA_PLAY does not join a toggle tap window`() = runTest {
+        val events = mutableListOf<MediaEvent>()
+        val handler = MediaButtonEventHandler(
+            scopeProvider = { this },
+            onImmediatePlay = {},
+            onMediaEvent = events::add,
+            isPlaying = { true },
+        )
+
+        handler.handle(keyEvent(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE))
+        advanceTimeBy(200)
+        handler.handle(keyEvent(KeyEvent.KEYCODE_MEDIA_PLAY))
+
+        advanceUntilIdle()
+        assertEquals(listOf(MediaEvent.SingleTap), events)
+    }
+
+    @Test
+    fun `immediate play failures are reported and resolve through the tap window`() = runTest {
         val failure = IllegalStateException("Immediate action failed")
         val errors = mutableListOf<Exception>()
         val events = mutableListOf<MediaEvent>()
@@ -74,7 +115,7 @@ class MediaButtonEventHandlerTest {
         assertTrue(handler.handle(keyEvent(KeyEvent.KEYCODE_MEDIA_PLAY)))
 
         advanceUntilIdle()
-        assertEquals(listOf(failure), errors)
+        assertEquals(listOf(failure, failure), errors)
         assertEquals(listOf(MediaEvent.DoubleTap), events)
     }
 

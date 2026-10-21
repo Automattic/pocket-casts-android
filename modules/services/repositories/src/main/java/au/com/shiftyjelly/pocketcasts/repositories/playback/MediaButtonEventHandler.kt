@@ -61,11 +61,14 @@ internal class MediaButtonEventHandler(
             return true
         }
 
+        if (keyEvent.keyCode == KeyEvent.KEYCODE_MEDIA_PLAY) {
+            dispatch { mediaEventQueue.consumeExplicitPlay(onPlay = ::handleImmediatePlay) }
+            return true
+        }
+
         // While playback runs the device stays awake and the tap window keeps its timing, so toggle keys can still
         // wait for it. While paused the device can suspend mid-window, and a toggle tap can only mean play.
         val resolvesToImmediatePlay = when (keyEvent.keyCode) {
-            KeyEvent.KEYCODE_MEDIA_PLAY -> true
-
             KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE,
             KeyEvent.KEYCODE_HEADSETHOOK,
             -> !isPlaying()

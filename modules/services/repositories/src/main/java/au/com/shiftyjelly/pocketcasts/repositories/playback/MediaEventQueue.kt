@@ -36,6 +36,13 @@ internal class MediaEventQueue(
         MediaEvent.DoubleTap, MediaEvent.TripleTap -> handleMultiTapEvent(event)
     }
 
+    suspend fun consumeExplicitPlay(onPlay: () -> Boolean): MediaEvent? {
+        if (stateMutex.withLock { isMultiTapWindowOpen }) {
+            return null
+        }
+        return if (onPlay()) null else handleSingleTapEvent(onImmediateSingleTap = null)
+    }
+
     private suspend fun handleSingleTapEvent(onImmediateSingleTap: (() -> Boolean)?): MediaEvent? {
         val newSingleTapJob = stateMutex.withLock {
             val currentSingleTapJob = singleTapJob
