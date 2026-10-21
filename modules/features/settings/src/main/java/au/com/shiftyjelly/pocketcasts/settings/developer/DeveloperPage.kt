@@ -19,6 +19,7 @@ import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.PlaylistPlay
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material.icons.outlined.BugReport
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Downloading
@@ -71,6 +72,7 @@ fun DeveloperPage(
     onResetPlaylistsOnboarding: () -> Unit,
     onResetUpNextSortTooltip: () -> Unit,
     onShowPlaylistTooltips: () -> Unit,
+    onShowSmartBookmarksTooltip: () -> Unit,
     onResetNotificationsPrompt: () -> Unit,
     onShowAppReviewPrompt: () -> Unit,
     onClearAppReviewSettings: () -> Unit,
@@ -133,6 +135,9 @@ fun DeveloperPage(
         }
         item {
             ResetUpNextSortTooltip(onClick = onResetUpNextSortTooltip)
+        }
+        item {
+            ShowSmartBookmarksTooltip(onClick = onShowSmartBookmarksTooltip)
         }
 
         item {
@@ -326,6 +331,19 @@ private fun ResetUpNextSortTooltip(
         primaryText = "Show Up Next sort tooltip",
         secondaryText = "Show the \"Sort by Duration\" tooltip on the Up Next tab again",
         icon = rememberVectorPainter(Icons.AutoMirrored.Outlined.PlaylistPlay),
+        modifier = modifier.clickable { onClick() },
+    )
+}
+
+@Composable
+private fun ShowSmartBookmarksTooltip(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    SettingRow(
+        primaryText = "Show Smart Bookmarks tooltip",
+        secondaryText = "Show the \"Add bookmark\" tooltip on the player shelf again",
+        icon = rememberVectorPainter(Icons.Outlined.BookmarkBorder),
         modifier = modifier.clickable { onClick() },
     )
 }
@@ -582,6 +600,7 @@ private fun DeveloperPagePreview() {
         onResetPlaylistsOnboarding = {},
         onResetUpNextSortTooltip = {},
         onShowPlaylistTooltips = {},
+        onShowSmartBookmarksTooltip = {},
         onResetNotificationsPrompt = {},
         onShowAppReviewPrompt = {},
         onClearAppReviewSettings = {},
