@@ -249,23 +249,25 @@ class ChatFragment : BaseDialogFragment() {
 
     private fun showClearChatOptionsDialog() {
         val dangerColor = requireContext().getThemeColor(UR.attr.support_05)
+        val uiState = viewModel.uiState.value
         val dialog = OptionsDialog().setForceDarkTheme(args.sourceView == SourceView.PLAYER)
-        if (!viewModel.uiState.value.isAwaitingReply) {
+        if (!uiState.isAwaitingReply) {
             dialog.addTextOption(
                 titleId = LR.string.chat_history,
                 imageId = IR.drawable.ic_history,
                 click = viewModel::showHistory,
             )
         }
-        dialog
-            .addTextOption(
+        if (uiState.messages.isNotEmpty() || uiState.isAwaitingReply) {
+            dialog.addTextOption(
                 titleId = LR.string.chat_clear,
                 titleColor = dangerColor,
                 imageId = IR.drawable.ic_delete,
                 imageColor = dangerColor,
                 click = viewModel::clearChat,
             )
-            .show(parentFragmentManager, "chat_options")
+        }
+        dialog.show(parentFragmentManager, "chat_options")
     }
 
     override fun onDismiss(dialog: DialogInterface) {
