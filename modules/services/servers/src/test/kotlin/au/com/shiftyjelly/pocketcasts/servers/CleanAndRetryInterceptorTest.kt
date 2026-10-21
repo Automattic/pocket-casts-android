@@ -138,6 +138,38 @@ class CleanAndRetryInterceptorTest {
         assertEquals("value", server.takeRequest().getHeader("User-Agent"))
     }
 
+    @Test
+    fun `report the failed response before retrying`() {
+        val retries = mutableListOf<Pair<String, Int>>()
+        val client = OkHttpClient.Builder()
+            .addInterceptor(
+                CleanAndRetryInterceptor(
+                    headersToRemove = emptyList(),
+                    onRetry = { request, response -> retries += request.url.host to response.code },
+                ),
+            )
+            .build()
+
+        server.enqueue(MockResponse().setResponseCode(503))
+        server.enqueue(MockResponse())
+        client.newCall(Request.Builder().url(url).build()).execute()
+
+        assertEquals(listOf(url.host to 503), retries)
+    }
+
+    @Test
+    fun `do not report successful responses`() {
+        val retries = mutableListOf<Int>()
+        val client = OkHttpClient.Builder()
+            .addInterceptor(CleanAndRetryInterceptor(headersToRemove = emptyList(), onRetry = { _, response -> retries += response.code }))
+            .build()
+
+        server.enqueue(MockResponse())
+        client.newCall(Request.Builder().url(url).build()).execute()
+
+        assertTrue(retries.isEmpty())
+    }
+
     private fun retryWithUserAgent(retryUserAgent: String?): RecordedRequest {
         val client = OkHttpClient.Builder()
             .addInterceptor(CleanAndRetryInterceptor(headersToRemove = listOf("User-Agent"), retryUserAgent = retryUserAgent))

@@ -14,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.TokenHandler
 import au.com.shiftyjelly.pocketcasts.servers.sync.getAccessTokenBlocking
 import au.com.shiftyjelly.pocketcasts.servers.toClientInterceptor
 import au.com.shiftyjelly.pocketcasts.servers.toNetworkInterceptor
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.android.tracks.crashlogging.CrashLoggingOkHttpInterceptorProvider
 import com.automattic.android.tracks.crashlogging.FormattedUrl
 import com.automattic.android.tracks.crashlogging.RequestFormatter
@@ -82,19 +83,29 @@ object InterceptorModule {
             .build()
     }
 
-    private val cleanAndRetryInterceptor = CleanAndRetryInterceptor(
-        headersToRemove = listOf(
-            // Remove our custom User-Agent. Internal ref: p1730724100345749-slack-C07J5LNP4SF
-            "User-Agent",
-            // Remove our custom i18n headers.
-            InternationalizationInterceptor.APP_LANGUAGE_HEADER,
-            InternationalizationInterceptor.USER_REGION_HEADER,
-            // Remove Sentry stuff from requests as well to make it more pure.
-            "sentry-trace",
-            "baggage",
-        ),
+    private val cleanAndRetryHeaders = listOf(
+        // Remove our custom User-Agent. Internal ref: p1730724100345749-slack-C07J5LNP4SF
+        "User-Agent",
+        // Remove our custom i18n headers.
+        InternationalizationInterceptor.APP_LANGUAGE_HEADER,
+        InternationalizationInterceptor.USER_REGION_HEADER,
+        // Remove Sentry stuff from requests as well to make it more pure.
+        "sentry-trace",
+        "baggage",
+    )
+
+    private val mediaCleanAndRetryInterceptor = CleanAndRetryInterceptor(
+        headersToRemove = cleanAndRetryHeaders,
         retryUserAgent = PlatformUserAgent.value,
+        onRetry = { request, response ->
+            LogBuffer.i(LogBuffer.TAG_DOWNLOAD, "Retrying ${request.url.host} with clean headers after HTTP ${response.code}")
+        },
     ).toClientInterceptor() // Must be client interceptor. Otherwise calls cannot be retried.
+
+    private val artworkCleanAndRetryInterceptor = CleanAndRetryInterceptor(
+        headersToRemove = cleanAndRetryHeaders,
+        retryUserAgent = PlatformUserAgent.value,
+    ).toClientInterceptor()
 
     private val basicAuthInterceptor = BasicAuthInterceptor().toClientInterceptor()
 
@@ -231,7 +242,7 @@ object InterceptorModule {
             add(i18nInterceptor.toClientInterceptor())
             add(crashLoggingInterceptor.toClientInterceptor())
             add(basicAuthInterceptor)
-            add(cleanAndRetryInterceptor)
+            add(mediaCleanAndRetryInterceptor)
             add(userFileAuthInterceptor.toClientInterceptor())
 
             if (BuildConfig.DEBUG) {
@@ -276,7 +287,7 @@ object InterceptorModule {
             add(i18nInterceptor.toClientInterceptor())
             add(crashLoggingInterceptor.toClientInterceptor())
             add(basicAuthInterceptor)
-            add(cleanAndRetryInterceptor)
+            add(mediaCleanAndRetryInterceptor)
             add(userFileAuthInterceptor.toClientInterceptor())
 
             if (BuildConfig.DEBUG) {
@@ -297,7 +308,7 @@ object InterceptorModule {
             add(publicUserAgentInterceptor.toClientInterceptor())
             add(i18nInterceptor.toClientInterceptor())
             add(crashLoggingInterceptor.toClientInterceptor())
-            add(cleanAndRetryInterceptor)
+            add(artworkCleanAndRetryInterceptor)
 
             if (BuildConfig.DEBUG) {
                 val loggingInterceptor = HttpLoggingInterceptor().apply {
