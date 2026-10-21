@@ -39,6 +39,8 @@
         ([#6220](https://github.com/Automattic/pocket-casts-android/pull/6220))
     *   Fix Cast playback pausing by itself a couple of seconds after you start casting
         ([#6227](https://github.com/Automattic/pocket-casts-android/pull/6227))
+    *   Fix streamed episodes with dynamically inserted ads ending a little early, before the outro
+        ([#6213](https://github.com/Automattic/pocket-casts-android/pull/6213))
 
 8.23
 -----
