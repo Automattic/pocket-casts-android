@@ -63,6 +63,7 @@ class BookmarkViewModel
     private var capturedSuggestion: BookmarkSuggestion? = null
     private var offeredSuggestedTitle: String? = null
     private var appliedFallbackTitle: String? = null
+    private var suggestedTitleApplied = false
     private var passageEdited = false
     private var loadJob: Job? = null
     private var hasTrackedShown = false
@@ -208,9 +209,15 @@ class BookmarkViewModel
         offeredSuggestedTitle = suggestedTitle?.take(100)
         appliedFallbackTitle = fallbackTitle?.takeIf { suggestedTitle == null && isTitleUnchanged }?.take(100)
         when {
-            suggestedTitle != null && isTitleUnchanged -> applySuggestion(suggestedTitle)
+            suggestedTitle != null && isTitleUnchanged -> {
+                suggestedTitleApplied = true
+                applySuggestion(suggestedTitle)
+            }
+
             suggestedTitle != null -> mutableUiState.value = mutableUiState.value.copy(titleSuggestion = TitleSuggestion.Available(suggestedTitle))
+
             fallbackTitle != null && isTitleUnchanged -> applySuggestion(fallbackTitle)
+
             else -> mutableUiState.value = mutableUiState.value.copy(titleSuggestion = TitleSuggestion.None)
         }
     }
@@ -357,7 +364,7 @@ class BookmarkViewModel
         return when {
             offeredSuggestedTitle?.let(::normalizedTitle) == savedTitle -> BookmarkTitleSourceType.Suggested
             appliedFallbackTitle?.let(::normalizedTitle) == savedTitle -> BookmarkTitleSourceType.Fallback
-            offeredSuggestedTitle != null -> BookmarkTitleSourceType.Edited
+            suggestedTitleApplied -> BookmarkTitleSourceType.Edited
             else -> BookmarkTitleSourceType.Manual
         }
     }
@@ -372,6 +379,7 @@ class BookmarkViewModel
                 podcastUuid = uiState.value.podcastUuid,
             ),
         )
+        suggestedTitleApplied = true
         applySuggestion(title)
     }
 

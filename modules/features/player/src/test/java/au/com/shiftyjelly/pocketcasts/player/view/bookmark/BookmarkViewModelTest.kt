@@ -574,13 +574,28 @@ class BookmarkViewModelTest {
     }
 
     @Test
-    fun `reports a typed title kept over an offered suggestion as edited`() = runTest {
+    fun `reports a typed title kept over an offered suggestion as manual`() = runTest {
         stubNewBookmark()
         val gate = CompletableDeferred<BookmarkSuggestion?>()
         doSuspendableAnswer { gate.await() }.whenever(bookmarkManager).suggestBookmark(episodeUuid, timeSecs)
         viewModel.load(arguments)
         viewModel.changeTitle(TextFieldValue("My own title"))
         gate.complete(suggestion)
+
+        assertEquals(BookmarkTitleSourceType.Manual, submittedTitleSource())
+    }
+
+    @Test
+    fun `reports a changed tapped suggestion as edited`() = runTest {
+        stubNewBookmark()
+        val gate = CompletableDeferred<BookmarkSuggestion?>()
+        doSuspendableAnswer { gate.await() }.whenever(bookmarkManager).suggestBookmark(episodeUuid, timeSecs)
+        viewModel.load(arguments)
+        viewModel.changeTitle(TextFieldValue("My own title"))
+        gate.complete(suggestion)
+        val offered = viewModel.uiState.value.titleSuggestion as BookmarkViewModel.TitleSuggestion.Available
+        viewModel.onSuggestionTapped(offered.title)
+        viewModel.changeTitle(TextFieldValue("${offered.title} and more"))
 
         assertEquals(BookmarkTitleSourceType.Edited, submittedTitleSource())
     }
