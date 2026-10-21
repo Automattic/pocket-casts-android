@@ -81,7 +81,28 @@ class CachedLengthValidatingDataSourceTest {
         upstream.headers = mapOf("Content-Range" to "bytes 400-899/900", "Content-Length" to "500")
 
         assertThrows(MediaBuildChangedException::class.java) { dataSource.open(dataSpec(position = 400)) }
-        assertEquals(1000L, cachedLength())
+    }
+
+    @Test
+    fun `replaces the cached build after a build change`() {
+        storeCachedLength(1000)
+        cacheBytes(position = 0, length = 400)
+        upstream.headers = mapOf("Content-Range" to "bytes 400-899/900", "Content-Length" to "500")
+
+        assertThrows(MediaBuildChangedException::class.java) { dataSource.open(dataSpec(position = 400)) }
+
+        assertEquals(0L, cache.getCachedBytes(KEY, 0, 400))
+        assertEquals(900L, cachedLength())
+    }
+
+    @Test
+    fun `closes the upstream before reporting a build change`() {
+        storeCachedLength(1000)
+        upstream.headers = mapOf("Content-Length" to "1200")
+
+        assertThrows(MediaBuildChangedException::class.java) { dataSource.open(dataSpec()) }
+
+        assertEquals(1, upstream.closeCount)
     }
 
     @Test
@@ -110,7 +131,7 @@ class CachedLengthValidatingDataSourceTest {
         upstream.headers = mapOf("Content-Range" to "bytes 400-1299/1300", "Content-Length" to "900")
 
         assertEquals(900L, dataSource.open(dataSpec(position = 400)))
-        assertEquals(1000L, cachedLength())
+        assertEquals(1200L, cachedLength())
     }
 
     @Test
@@ -173,10 +194,19 @@ class CachedLengthValidatingDataSourceTest {
         cache.applyContentMetadataMutations(KEY, mutations)
     }
 
+    private fun cacheBytes(position: Long, length: Int) {
+        val span = checkNotNull(cache.startReadWriteNonBlocking(KEY, position, length.toLong()))
+        val file = cache.startFile(KEY, position, length.toLong())
+        file.writeBytes(ByteArray(length))
+        cache.commitFile(file, length.toLong())
+        cache.releaseHoleSpan(span)
+    }
+
     private fun cachedLength() = ContentMetadata.getContentLength(cache.getContentMetadata(KEY))
 
     private class FakeUpstream : DataSource {
         var headers: Map<String, String> = emptyMap()
+        var closeCount = 0
 
         override fun addTransferListener(transferListener: TransferListener) = Unit
 
@@ -193,7 +223,9 @@ class CachedLengthValidatingDataSourceTest {
 
         override fun getResponseHeaders(): Map<String, List<String>> = headers.mapValues { listOf(it.value) }
 
-        override fun close() = Unit
+        override fun close() {
+            closeCount++
+        }
     }
 
     private companion object {
