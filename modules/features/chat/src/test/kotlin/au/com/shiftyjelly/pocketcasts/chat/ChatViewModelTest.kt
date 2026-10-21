@@ -14,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatAnswerRating
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatManager
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatMessage
+import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatQuoteSeeker
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ClearedChat
 import au.com.shiftyjelly.pocketcasts.repositories.playback.NetworkConnectionWatcher
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -51,6 +52,7 @@ import kotlin.time.TestTimeSource
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.emptyFlow
@@ -71,6 +73,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
@@ -84,8 +87,10 @@ class ChatViewModelTest {
 
     private val chatManager = TestChatManager()
     private val playbackState = MutableStateFlow(PlaybackState())
+    private val userSeeks = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     private val playbackManager = mock<PlaybackManager> {
         on { playbackStateFlow } doReturn playbackState
+        on { userSeeks } doReturn userSeeks
     }
     private val episode = MutableStateFlow<BaseEpisode>(
         PodcastEpisode(uuid = EPISODE_UUID, publishedDate = Date(), duration = 200.0, playedUpTo = 50.0),
@@ -122,11 +127,20 @@ class ChatViewModelTest {
         viewModel = createViewModel()
     }
 
+    private val quoteSeeker = mock<ChatQuoteSeeker> {
+        on { quoteTime(any(), any()) } doSuspendableAnswer {
+            val quote = it.arguments[1] as ChatMessage.Quote
+            ChatQuoteSeeker.QuoteTime(timeMs = quote.startMs, referenceTimeMs = null)
+        }
+        on { playbackTimeMs(any(), any()) } doSuspendableAnswer { (it.arguments[1] as ChatQuoteSeeker.QuoteTime).timeMs }
+    }
+
     private fun createViewModel() = ChatViewModel(
         networkConnectionWatcher = networkConnectionWatcher,
         chatManager = chatManager,
         playbackManager = playbackManager,
         episodeManager = episodeManager,
+        quoteSeeker = quoteSeeker,
         eventHorizon = EventHorizon(eventSink),
         settings = settings,
         applicationScope = kotlinx.coroutines.CoroutineScope(coroutineRule.testDispatcher),
@@ -1116,6 +1130,76 @@ class ChatViewModelTest {
         verify(playbackManager, never()).pause(any(), any())
         verify(playbackManager, never()).pauseSuspend(any(), any())
         verify(playbackManager, never()).seekToTimeMsSuspend(org.mockito.kotlin.eq(10_000), anyOrNull())
+    }
+
+    @Test
+    fun `playing a quote seeks to the time the seeker resolves`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        whenever(quoteSeeker.playbackTimeMs(any(), any())).thenReturn(31_500)
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID, positionMs = 10_000)
+        playableState(quote)
+
+        viewModel.playQuote(quote.uuid)
+        advanceUntilIdle()
+
+        verify(playbackManager).seekToTimeMsSuspend(org.mockito.kotlin.eq(31_500), anyOrNull())
+    }
+
+    @Test
+    fun `playing a quote drops the seek when the user seeks while it resolves`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        val resolved = CompletableDeferred<Int>()
+        whenever(quoteSeeker.playbackTimeMs(any(), any())).doSuspendableAnswer { resolved.await() }
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID, positionMs = 10_000)
+        playableState(quote)
+
+        viewModel.playQuote(quote.uuid)
+        advanceUntilIdle()
+        userSeeks.emit(Unit)
+        resolved.complete(31_500)
+        advanceUntilIdle()
+
+        verify(playbackManager, never()).seekToTimeMsSuspend(any(), anyOrNull())
+        verify(playbackManager, never()).playQueueSuspend(any(), any())
+    }
+
+    @Test
+    fun `playing a quote drops the seek when the user seeks while the episode loads`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        whenever(quoteSeeker.playbackTimeMs(any(), any())).thenReturn(31_500)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = "other-uuid")
+        whenever(playbackManager.playNowSuspend(any<BaseEpisode>(), any(), any(), any())).doSuspendableAnswer {
+            userSeeks.emit(Unit)
+            playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID)
+            Unit
+        }
+        playableState(quote)
+
+        viewModel.playQuote(quote.uuid)
+        advanceUntilIdle()
+
+        verify(playbackManager, never()).seekToTimeMsSuspend(any(), anyOrNull())
+    }
+
+    @Test
+    fun `playing a quote drops the seek when the episode changes while it resolves`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        val resolved = CompletableDeferred<Int>()
+        whenever(quoteSeeker.playbackTimeMs(any(), any())).doSuspendableAnswer { resolved.await() }
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID, positionMs = 10_000)
+        playableState(quote)
+
+        viewModel.playQuote(quote.uuid)
+        advanceUntilIdle()
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = OTHER_EPISODE_UUID, positionMs = 0)
+        resolved.complete(31_500)
+        advanceUntilIdle()
+
+        verify(playbackManager, never()).seekToTimeMsSuspend(any(), anyOrNull())
     }
 
     @Test

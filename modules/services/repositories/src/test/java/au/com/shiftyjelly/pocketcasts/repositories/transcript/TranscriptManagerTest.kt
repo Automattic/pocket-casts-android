@@ -324,6 +324,18 @@ class TranscriptManagerTest {
     }
 
     @Test
+    fun `cache recently parsed generated transcript`() = runTest {
+        localTranscriptsFlow.value = listOf(generatedVttTranscript)
+        val transcript1 = transcriptManager.loadGeneratedTranscript("episode-id")
+
+        parsers.getValue(TranscriptType.Vtt).parsingException = RuntimeException()
+        val transcript2 = transcriptManager.loadGeneratedTranscript("episode-id")
+
+        assertNotNull(transcript2)
+        assertEquals(transcript1, transcript2)
+    }
+
+    @Test
     fun `do not use cached transcript for a different episode`() = runTest {
         localTranscriptsFlow.value = listOf(vttDbTranscript)
         transcriptManager.loadTranscript("episode-id")

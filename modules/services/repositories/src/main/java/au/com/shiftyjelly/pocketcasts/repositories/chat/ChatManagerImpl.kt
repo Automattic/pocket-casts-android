@@ -70,7 +70,7 @@ class ChatManagerImpl @Inject constructor(
         )
 
         val aiReply = ChatMessage.Assistant(text = response.reply)
-        val messages = listOfNotNull(message, aiReply, response.quote?.toQuoteMessage())
+        val messages = listOfNotNull(message, aiReply, response.quote?.toQuoteMessage(isFromGeneratedTranscript = transcript.isGenerated))
         val createdAtMs = System.currentTimeMillis()
         episodeChatDao.insertMessages(
             messages.mapIndexed { index, chatMessage ->
@@ -79,7 +79,7 @@ class ChatManagerImpl @Inject constructor(
         )
     }
 
-    private fun EpisodeChatQuote.toQuoteMessage(): ChatMessage.Quote? {
+    private fun EpisodeChatQuote.toQuoteMessage(isFromGeneratedTranscript: Boolean): ChatMessage.Quote? {
         val quoteText = text.takeIf { it.isNotBlank() } ?: return null
         val quoteStart = start.orEmpty()
         val quoteEnd = end.orEmpty()
@@ -89,6 +89,7 @@ class ChatManagerImpl @Inject constructor(
             end = quoteEnd,
             startMs = parseTimestampMs(quoteStart) ?: -1,
             endMs = parseTimestampMs(quoteEnd) ?: -1,
+            isFromGeneratedTranscript = isFromGeneratedTranscript,
         )
     }
 
