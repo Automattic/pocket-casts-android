@@ -193,6 +193,11 @@ class DeveloperViewModel
         settings.showRearrangePlaylistsTooltip.set(true, updateModifiedAt = false)
     }
 
+    fun showSmartBookmarksTooltip() {
+        settings.showSmartBookmarksTooltip.set(true, updateModifiedAt = false)
+        settings.smartBookmarksTooltipDismissed.set(false, updateModifiedAt = false)
+    }
+
     fun resetWhatsNewReadState() {
         whatsNewManager.resetReadState()
     }

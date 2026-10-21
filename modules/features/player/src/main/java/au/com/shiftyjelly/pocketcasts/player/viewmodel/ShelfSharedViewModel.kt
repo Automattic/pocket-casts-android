@@ -496,6 +496,9 @@ class ShelfSharedViewModel @Inject constructor(
 
     fun onMoreClick() {
         eventHorizon.track(PlayerShelfOverflowMenuShownEvent)
+        if (uiState.value.isSmartBookmarksPromoActive) {
+            dismissBookmarkTooltip()
+        }
         viewModelScope.launch {
             _navigationState.emit(NavigationState.ShowMoreActions)
         }
