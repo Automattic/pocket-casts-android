@@ -44,6 +44,9 @@ internal class CachedLengthValidatingDataSource(
 
             else -> {
                 mediaBuildChanged = true
+                upstream.close()
+                cache.removeResource(key)
+                storeLength(key, servedLength)
                 val message = "Media for '$key' changed length from $cachedLength to $servedLength bytes"
                 LogBuffer.i(LogBuffer.TAG_PLAYBACK, message)
                 throw MediaBuildChangedException(message)
