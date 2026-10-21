@@ -396,6 +396,15 @@ enum class Feature(
         hasDevToggle = true,
         addedOn = LocalDate.parse("2026-10-21"),
     ),
+    VALIDATE_CACHED_MEDIA_LENGTH(
+        key = "validate_cached_media_length",
+        title = "Stop the playback cache from mixing media builds of different lengths",
+        defaultValue = true,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+        addedOn = LocalDate.parse("2026-10-21"),
+    ),
 }
 
 sealed class FeatureTier {
