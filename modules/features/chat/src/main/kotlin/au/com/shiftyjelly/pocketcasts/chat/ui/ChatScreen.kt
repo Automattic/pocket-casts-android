@@ -296,6 +296,7 @@ private fun ChatContent(
                                     quote = message.displayText,
                                     timestampLabel = message.timestampLabel,
                                     isPlayable = message.canPlay,
+                                    isLoading = message.uuid == uiState.loadingQuoteUuid,
                                     theme = theme,
                                     onClickPlay = { onPlayQuote(message.uuid) },
                                 )
@@ -559,7 +560,15 @@ private fun ChatScreenPreview(
                             end = "12:18",
                             canPlay = true,
                         ),
+                        ChatMessage.Quote(
+                            text = "Discovery works best when it feels like a friend's recommendation.",
+                            start = "24:30",
+                            end = "24:41",
+                            canPlay = true,
+                            uuid = "preview-loading-quote",
+                        ),
                     ),
+                    loadingQuoteUuid = "preview-loading-quote",
                 ),
                 onClickClose = {},
                 onClickMore = {},

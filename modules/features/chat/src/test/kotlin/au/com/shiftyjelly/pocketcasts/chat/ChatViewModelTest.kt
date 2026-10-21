@@ -1731,12 +1731,11 @@ class ChatViewModelTest {
     }
 
     @Test
-    fun `a quote whose episode never loads shows that it could not play and is not tracked`() = runTest {
+    fun `a quote whose episode never loads shows that it could not play`() = runTest {
         val quote = createQuote(startMs = 1_000, endMs = 3_000)
         whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
         playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = "other-uuid")
         playableState(quote)
-        eventSink.skipEvent(eventSink.size)
 
         viewModel.toasts.test {
             viewModel.playQuote(quote.uuid)
@@ -1744,6 +1743,29 @@ class ChatViewModelTest {
 
             assertEquals(ChatToast.QuotePlayFailed, awaitItem())
         }
+    }
+
+    @Test
+    fun `a quote tap is tracked before its episode loads even when it never does`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = "other-uuid")
+        playableState(quote)
+        eventSink.skipEvent(eventSink.size)
+
+        viewModel.playQuote(quote.uuid)
+
+        assertEquals(
+            EpisodeChatQuotePlayTappedEvent(
+                source = SourceView.PLAYER.analyticsValue,
+                episodeUuid = EPISODE_UUID,
+                podcastUuid = PODCAST_UUID,
+                quoteSource = EpisodeChatQuoteSourceType.InlineTimestamp,
+                isOtherEpisode = true,
+            ),
+            eventSink.pollEvent(),
+        )
+        advanceUntilIdle()
         assertTrue(eventSink.isEmpty())
     }
 
@@ -1968,6 +1990,195 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `a tapped quote loads until it plays`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        val resolved = CompletableDeferred<Int>()
+        whenever(quoteSeeker.playbackTimeMs(any(), any())).doSuspendableAnswer { resolved.await() }
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID)
+        playableState(quote)
+
+        viewModel.playQuote(quote.uuid)
+        assertEquals(quote.uuid, viewModel.uiState.value.loadingQuoteUuid)
+        advanceUntilIdle()
+        assertEquals(quote.uuid, viewModel.uiState.value.loadingQuoteUuid)
+
+        resolved.complete(1_000)
+        advanceUntilIdle()
+
+        assertNull(viewModel.uiState.value.loadingQuoteUuid)
+        verify(playbackManager).playQueueSuspend(any(), any())
+    }
+
+    @Test
+    fun `a tapped quote stops loading when its episode never loads`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = "other-uuid")
+        playableState(quote)
+
+        viewModel.playQuote(quote.uuid)
+        runCurrent()
+        assertEquals(quote.uuid, viewModel.uiState.value.loadingQuoteUuid)
+        advanceUntilIdle()
+
+        assertNull(viewModel.uiState.value.loadingQuoteUuid)
+    }
+
+    @Test
+    fun `a tapped quote stops loading when its episode cannot be found`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        playableState(quote)
+
+        viewModel.playQuote(quote.uuid)
+        advanceUntilIdle()
+
+        assertNull(viewModel.uiState.value.loadingQuoteUuid)
+        verifyNoSeek()
+    }
+
+    @Test
+    fun `a tapped quote stops loading when the user seeks first`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        val resolved = CompletableDeferred<Int>()
+        whenever(quoteSeeker.playbackTimeMs(any(), any())).doSuspendableAnswer { resolved.await() }
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID)
+        playableState(quote)
+
+        viewModel.playQuote(quote.uuid)
+        advanceUntilIdle()
+        userSeeks.emit(Unit)
+        resolved.complete(1_000)
+        advanceUntilIdle()
+
+        assertNull(viewModel.uiState.value.loadingQuoteUuid)
+    }
+
+    @Test
+    fun `tapping a loading quote again is ignored`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        val resolved = CompletableDeferred<Int>()
+        whenever(quoteSeeker.playbackTimeMs(any(), any())).doSuspendableAnswer { resolved.await() }
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID)
+        playableState(quote)
+        eventSink.skipEvent(eventSink.size)
+
+        viewModel.playQuote(quote.uuid)
+        advanceUntilIdle()
+        viewModel.playQuote(quote.uuid)
+        advanceUntilIdle()
+        resolved.complete(1_000)
+        advanceUntilIdle()
+
+        assertTrue(eventSink.pollEvent() is EpisodeChatQuotePlayTappedEvent)
+        assertTrue(eventSink.isEmpty())
+        verify(quoteSeeker, times(1)).playbackTimeMs(any(), any())
+        verify(playbackManager, times(1)).seekToTimeMsSuspend(any(), anyOrNull())
+    }
+
+    @Test
+    fun `tapping another quote moves the loading to it`() = runTest {
+        val first = createQuote(startMs = 1_000, endMs = 3_000)
+        val second = createQuote(startMs = 5_000, endMs = 7_000, uuid = "second-quote-uuid")
+        val resolved = CompletableDeferred<Int>()
+        whenever(quoteSeeker.playbackTimeMs(any(), any())).doSuspendableAnswer { resolved.await() }
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID)
+        chatManager.messages.value = listOf(first, second)
+        setEpisodeInfo()
+        advanceUntilIdle()
+
+        viewModel.playQuote(first.uuid)
+        advanceUntilIdle()
+        viewModel.playQuote(second.uuid)
+        advanceUntilIdle()
+
+        assertEquals(second.uuid, viewModel.uiState.value.loadingQuoteUuid)
+        resolved.complete(5_000)
+        advanceUntilIdle()
+        assertNull(viewModel.uiState.value.loadingQuoteUuid)
+        verify(playbackManager, times(1)).seekToTimeMsSuspend(org.mockito.kotlin.eq(5_000), anyOrNull())
+    }
+
+    @Test
+    fun `switching chats stops showing the quote loading`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        whenever(quoteSeeker.playbackTimeMs(any(), any())).doSuspendableAnswer { CompletableDeferred<Int>().await() }
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID)
+        playableState(quote)
+        viewModel.playQuote(quote.uuid)
+        advanceUntilIdle()
+
+        viewModel.openHistoryChat(historyItem(OTHER_EPISODE_UUID))
+        advanceUntilIdle()
+
+        assertNull(viewModel.uiState.value.loadingQuoteUuid)
+    }
+
+    @Test
+    fun `a playable quote of the loaded episode warms up once`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID)
+        playableState(quote)
+
+        chatManager.messages.value = listOf(ChatMessage.User("Question"), quote)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID, positionMs = 2_000)
+        advanceUntilIdle()
+
+        verify(quoteSeeker, times(1)).warmUpQuote(org.mockito.kotlin.eq(EPISODE_UUID), org.mockito.kotlin.argThat { uuid == quote.uuid })
+        verify(quoteSeeker, times(1)).warmUpFingerprints(EPISODE_UUID)
+    }
+
+    @Test
+    fun `each new playable quote of the loaded episode warms up`() = runTest {
+        val first = createQuote(startMs = 1_000, endMs = 3_000)
+        val second = createQuote(startMs = 5_000, endMs = 7_000, uuid = "second-quote-uuid")
+        playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID)
+        playableState(first)
+
+        chatManager.messages.value = listOf(first, second)
+        advanceUntilIdle()
+
+        verify(quoteSeeker).warmUpQuote(org.mockito.kotlin.eq(EPISODE_UUID), org.mockito.kotlin.argThat { uuid == second.uuid })
+        verify(quoteSeeker, times(1)).warmUpFingerprints(EPISODE_UUID)
+    }
+
+    @Test
+    fun `a quote warms up once its episode is loaded`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        playableState(quote)
+        verify(quoteSeeker, never()).warmUpQuote(any(), any())
+
+        playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID)
+        advanceUntilIdle()
+
+        verify(quoteSeeker).warmUpQuote(org.mockito.kotlin.eq(EPISODE_UUID), any())
+    }
+
+    @Test
+    fun `quotes of an episode that is not loaded do not warm up`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = OTHER_EPISODE_UUID)
+        playableState(quote)
+
+        verify(quoteSeeker, never()).warmUpQuote(any(), any())
+        verify(quoteSeeker, never()).warmUpFingerprints(any())
+    }
+
+    @Test
+    fun `quotes that cannot play do not warm up`() = runTest {
+        val quote = createQuote(startMs = 49_020_000, endMs = 49_500_000)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID)
+        playableState(quote)
+
+        verify(quoteSeeker, never()).warmUpQuote(any(), any())
+        verify(quoteSeeker, never()).warmUpFingerprints(any())
+    }
+
+    @Test
     fun `play pause while a quote is starting cancels the quote`() = runTest {
         val quote = createQuote(startMs = 1_000, endMs = 3_000)
         whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
@@ -1985,6 +2196,7 @@ class ChatViewModelTest {
 
         verify(playbackManager, never()).seekToTimeMsSuspend(any(), anyOrNull())
         verify(playbackManager, never()).playQueueSuspend(any(), any())
+        assertNull(viewModel.uiState.value.loadingQuoteUuid)
     }
 
     @Test
