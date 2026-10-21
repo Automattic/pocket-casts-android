@@ -572,6 +572,9 @@ class ChatViewModel @Inject constructor(
                     if (playbackManager.upNextQueue.currentEpisode?.uuid == episodeUuid) {
                         restorePlayback(state.toPlaybackPosition(episodeUuid, podcastUuid, switch))
                     } else {
+                        if (switch.queue.none { it.uuid == episodeUuid }) {
+                            playbackManager.upNextQueue.removeEpisode(episode)
+                        }
                         restoreSwitchedEpisodes(switch)
                     }
                     return@launch

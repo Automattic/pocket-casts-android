@@ -1761,6 +1761,25 @@ class ChatViewModelTest {
         verify(playbackManager, never()).playNowSuspend(org.mockito.kotlin.eq(other), any(), any(), any())
         verify(playbackManager, never()).seekToTimeMsSuspend(any(), anyOrNull())
         verify(upNextQueue, never()).changeList(any())
+        verify(upNextQueue).removeEpisode(org.mockito.kotlin.eq(episode.value), any())
+    }
+
+    @Test
+    fun `a quote whose episode never loads keeps it in Up Next when it was already queued`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        whenever(upNextQueue.queueEpisodes).thenReturn(listOf(episode.value))
+        whenever(upNextQueue.currentEpisode).thenReturn(PodcastEpisode(uuid = "started-uuid", publishedDate = Date()))
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = "other-uuid", positionMs = 10_000)
+        playableState(quote)
+
+        viewModel.toasts.test {
+            viewModel.playQuote(quote.uuid)
+            advanceUntilIdle()
+
+            assertEquals(ChatToast.QuotePlayFailed, awaitItem())
+        }
+        verify(upNextQueue, never()).removeEpisode(any(), any())
     }
 
     @Test
