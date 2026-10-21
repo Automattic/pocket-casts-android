@@ -23,6 +23,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
@@ -131,14 +132,10 @@ class MediaSessionManagerCallbackTest {
     }
 
     @Test
-    fun `legacy rapid KEYCODE_MEDIA_PLAY resolves previous action after immediate play`() = runTest {
+    fun `legacy rapid KEYCODE_MEDIA_PLAY plays without a multi tap action`() = runTest {
         val playbackManager = mock<PlaybackManager>()
         val episodeManager = mock<EpisodeManager>()
-        val settings = mock<Settings>()
-        val previousAction = mock<UserSetting<HeadphoneAction>>()
-        whenever(settings.headphoneControlsPreviousAction).thenReturn(previousAction)
-        whenever(previousAction.value).thenReturn(HeadphoneAction.SKIP_BACK)
-        val manager = createManager(this, playbackManager, episodeManager, settings)
+        val manager = createManager(this, playbackManager, episodeManager)
         val queuedCommands = mutableListOf<String>()
         val callback = manager.createCallback(
             scope = this,
@@ -149,13 +146,13 @@ class MediaSessionManagerCallbackTest {
 
         repeat(3) {
             callback.onMediaButtonEvent(mediaButtonIntent(KeyEvent.KEYCODE_MEDIA_PLAY))
+            advanceTimeBy(46)
         }
-
-        verify(playbackManager).playIfNotPlaying(SourceView.MEDIA_BUTTON_BROADCAST_ACTION)
 
         advanceUntilIdle()
 
-        assertEquals(listOf("skip backwards"), queuedCommands)
+        verify(playbackManager, times(3)).playIfNotPlaying(SourceView.MEDIA_BUTTON_BROADCAST_ACTION)
+        assertEquals(emptyList<String>(), queuedCommands)
         verify(playbackManager, never()).playPause(any())
     }
 

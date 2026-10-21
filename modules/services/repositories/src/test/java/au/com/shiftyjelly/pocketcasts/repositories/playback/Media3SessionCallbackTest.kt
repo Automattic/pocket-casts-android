@@ -42,7 +42,6 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
-import org.robolectric.Shadows.shadowOf
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(RobolectricTestRunner::class)
@@ -356,8 +355,9 @@ class Media3SessionCallbackTest {
     }
 
     @Test
-    fun `KEYCODE_MEDIA_PLAY while paused resumes before the double-tap action`() = runTest {
-        mockHeadphoneNextAction(HeadphoneAction.ADD_BOOKMARK)
+    fun `duplicate KEYCODE_MEDIA_PLAY while paused resumes without the double-tap action`() = runTest {
+        mockHeadphoneNextAction(HeadphoneAction.SKIP_FORWARD)
+        mockSkipSettings()
         doCallRealMethod().whenever(playbackManager).playIfNotPlaying(any())
         whenever(playbackManager.isPlaying()).thenReturn(false)
 
@@ -367,11 +367,13 @@ class Media3SessionCallbackTest {
             showedStreamWarning = any(),
         )
 
-        sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE)
+        whenever(playbackManager.isPlaying()).thenReturn(true)
+        testScope.advanceTimeBy(46)
+        sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_PLAY)
         testScope.advanceUntilIdle()
-        shadowOf(android.os.Looper.getMainLooper()).idle()
 
-        verify(bookmarkHelper).handleAddBookmarkAction(any(), any())
+        verify(playbackManager).playQueue(any(), any())
+        verify(playbackManager, never()).skipForwardSuspend(sourceView = any(), jumpAmountSeconds = any())
         verify(playbackManager, never()).playPause(sourceView = any())
     }
 
