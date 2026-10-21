@@ -1,5 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.servers
 
+import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNull
 import junit.framework.TestCase.assertTrue
@@ -7,12 +10,16 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
+import okhttp3.mockwebserver.RecordedRequest
 import org.junit.Rule
 import org.junit.Test
 
 class CleanAndRetryInterceptorTest {
     @get:Rule
     val server = MockWebServer()
+
+    @get:Rule
+    val featureFlagRule = InMemoryFeatureFlagRule()
     private val url = server.url("/")
 
     @Test
@@ -92,9 +99,48 @@ class CleanAndRetryInterceptorTest {
     }
 
     @Test
-    fun `replace User-Agent header with the default one`() {
+    fun `replace User-Agent header with the OkHttp default when there is no retry User-Agent`() {
+        val serverRequest = retryWithUserAgent(retryUserAgent = null)
+
+        assertTrue(serverRequest.getHeader("User-Agent")!!.startsWith("okhttp"))
+    }
+
+    @Test
+    fun `replace User-Agent header with the retry User-Agent`() {
+        val serverRequest = retryWithUserAgent(retryUserAgent = "Dalvik/2.1.0 (Linux; U; Android 16)")
+
+        assertEquals("Dalvik/2.1.0 (Linux; U; Android 16)", serverRequest.getHeader("User-Agent"))
+    }
+
+    @Test
+    fun `replace User-Agent header with the OkHttp default when the flag is disabled`() {
+        FeatureFlag.setEnabled(Feature.RETRY_WITH_PLATFORM_USER_AGENT, false)
+
+        val serverRequest = retryWithUserAgent(retryUserAgent = "Dalvik/2.1.0 (Linux; U; Android 16)")
+
+        assertTrue(serverRequest.getHeader("User-Agent")!!.startsWith("okhttp"))
+    }
+
+    @Test
+    fun `keep the original User-Agent on the first attempt`() {
         val client = OkHttpClient.Builder()
-            .addInterceptor(CleanAndRetryInterceptor(headersToRemove = listOf("User-Agent")))
+            .addInterceptor(CleanAndRetryInterceptor(headersToRemove = listOf("User-Agent"), retryUserAgent = "retry"))
+            .build()
+        val request = Request.Builder()
+            .url(url)
+            .header("User-Agent", "value")
+            .build()
+
+        server.enqueue(MockResponse().setResponseCode(404))
+        server.enqueue(MockResponse())
+        client.newCall(request).execute()
+
+        assertEquals("value", server.takeRequest().getHeader("User-Agent"))
+    }
+
+    private fun retryWithUserAgent(retryUserAgent: String?): RecordedRequest {
+        val client = OkHttpClient.Builder()
+            .addInterceptor(CleanAndRetryInterceptor(headersToRemove = listOf("User-Agent"), retryUserAgent = retryUserAgent))
             .build()
         val request = Request.Builder()
             .url(url)
@@ -106,8 +152,6 @@ class CleanAndRetryInterceptorTest {
         client.newCall(request).execute()
 
         server.takeRequest() // Initial request
-        val serverRequest = server.takeRequest()
-
-        assertTrue(serverRequest.getHeader("User-Agent")!!.startsWith("okhttp"))
+        return server.takeRequest()
     }
 }

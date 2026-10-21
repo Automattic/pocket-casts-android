@@ -1,10 +1,14 @@
 package au.com.shiftyjelly.pocketcasts.servers
 
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import okhttp3.Interceptor
+import okhttp3.Request
 import okhttp3.Response
 
 internal class CleanAndRetryInterceptor(
     private val headersToRemove: List<String>,
+    private val retryUserAgent: String? = null,
 ) : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val originalRequest = chain.request()
@@ -17,8 +21,14 @@ internal class CleanAndRetryInterceptor(
             response.close()
             val cleanRequest = originalRequest.newBuilder()
                 .let { builder -> headersToRemove.fold(builder) { acc, header -> acc.removeHeader(header) } }
+                .withRetryUserAgent()
                 .build()
             chain.proceed(cleanRequest)
         }
+    }
+
+    private fun Request.Builder.withRetryUserAgent(): Request.Builder {
+        val userAgent = retryUserAgent?.takeIf { FeatureFlag.isEnabled(Feature.RETRY_WITH_PLATFORM_USER_AGENT) }
+        return if (userAgent != null) header("User-Agent", userAgent) else this
     }
 }
