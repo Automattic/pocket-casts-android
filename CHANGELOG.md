@@ -12,6 +12,8 @@
         ([#6196](https://github.com/Automattic/pocket-casts-android/pull/6196))
     *   Keep the TV from going into standby while an episode is playing in the TV app
         ([#6199](https://github.com/Automattic/pocket-casts-android/pull/6199))
+    *   Dismiss the Smart Bookmarks tooltip when the More button is tapped
+        ([#6206](https://github.com/Automattic/pocket-casts-android/pull/6206))
 
 
 8.23
