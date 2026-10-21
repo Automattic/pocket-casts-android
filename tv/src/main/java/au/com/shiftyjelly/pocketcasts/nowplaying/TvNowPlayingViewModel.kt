@@ -33,7 +33,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.rx2.asFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
@@ -48,7 +47,7 @@ class TvNowPlayingViewModel @Inject constructor(
 
     val uiState: StateFlow<TvNowPlayingUiState> = combine(
         playbackManager.playbackStateFlow,
-        playbackManager.upNextQueue.changesObservable.asFlow(),
+        playbackManager.upNextQueue.changesFlow,
         playbackManager.playerFlow,
         playbackManager.streamVideoState,
         playbackManager.videoRenderingEnabled,

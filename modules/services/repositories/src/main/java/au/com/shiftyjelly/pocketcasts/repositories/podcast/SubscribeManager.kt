@@ -223,8 +223,7 @@ class SubscribeManager @Inject constructor(
 
     private fun downloadPodcastRxSingle(podcastUuid: String): Single<Podcast> {
         // download the podcast
-        val serverPodcastObservable = podcastCacheServiceManager.getPodcast(podcastUuid)
-            .subscribeOn(Schedulers.io())
+        val serverPodcastObservable = rxSingle(Dispatchers.IO) { podcastCacheServiceManager.getPodcast(podcastUuid) }
             .doOnSuccess { Timber.i("Downloaded episodes success podcast $podcastUuid") }
         // download the colors
         val colorObservable = rxSingle(Dispatchers.IO) { Optional.of(staticServiceManager.getColors(podcastUuid)) }

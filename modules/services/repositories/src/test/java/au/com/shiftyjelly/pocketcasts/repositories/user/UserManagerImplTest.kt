@@ -2,16 +2,27 @@ package au.com.shiftyjelly.pocketcasts.repositories.user
 
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
+import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
+import au.com.shiftyjelly.pocketcasts.repositories.whatsnew.WhatsNewManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.doSuspendableAnswer
+import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.stub
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -20,6 +31,9 @@ class UserManagerImplTest {
     private val settings = mock<Settings>()
     private val syncManager = mock<SyncManager>()
     private val playbackManager = mock<PlaybackManager>()
+    private val whatsNewManager = mock<WhatsNewManager>()
+    private val chatManager = mock<ChatManager>()
+    private val userEpisodeManager = mock<UserEpisodeManager>()
 
     @Test
     fun `server-forced sign out emits onServerSignOut`() = runTest {
@@ -54,13 +68,96 @@ class UserManagerImplTest {
         }
     }
 
+    @Test
+    fun `signing out forgets which what's new messages were read`() = runTest {
+        whenever(settings.getFullySignedOut()).thenReturn(false)
+        syncManager.stub {
+            on { signOut(any()) } doSuspendableAnswer { invocation ->
+                runCatching { invocation.getArgument<suspend () -> Unit>(0).invoke() }.getOrNull()
+            }
+        }
+        val userManager = createUserManager()
+
+        userManager.signOut(playbackManager, wasInitiatedByUser = true)
+        advanceUntilIdle()
+
+        verify(whatsNewManager).forgetReadMessages()
+    }
+
+    @Test
+    fun `signing out turns the what's new unread dot back on`() = runTest {
+        val showWhatsNewDot = mock<UserSetting<Boolean>>()
+        whenever(settings.showWhatsNewDot).thenReturn(showWhatsNewDot)
+        whenever(settings.getFullySignedOut()).thenReturn(false)
+        syncManager.stub {
+            on { signOut(any()) } doSuspendableAnswer { invocation ->
+                runCatching { invocation.getArgument<suspend () -> Unit>(0).invoke() }.getOrNull()
+            }
+        }
+        val userManager = createUserManager()
+
+        userManager.signOut(playbackManager, wasInitiatedByUser = true)
+        advanceUntilIdle()
+
+        verify(showWhatsNewDot).reset()
+    }
+
+    @Test
+    fun `user-initiated sign out deletes all episode chats`() = runTest {
+        whenever(settings.getFullySignedOut()).thenReturn(false)
+        stubSyncManagerSignOut()
+        val userManager = createUserManager()
+
+        userManager.signOut(playbackManager, wasInitiatedByUser = true)
+        advanceUntilIdle()
+
+        verify(chatManager).deleteAllChats()
+    }
+
+    @Test
+    fun `server-forced sign out keeps episode chats`() = runTest {
+        whenever(settings.getFullySignedOut()).thenReturn(false)
+        stubSyncManagerSignOut()
+        val userManager = createUserManager()
+
+        userManager.signOut(playbackManager, wasInitiatedByUser = false)
+        advanceUntilIdle()
+
+        verify(userEpisodeManager).removeCloudStatusFromFiles(playbackManager)
+        verify(chatManager, never()).deleteAllChats()
+    }
+
+    @Test
+    fun `failing to delete episode chats does not stop the sign out`() = runTest {
+        whenever(settings.getFullySignedOut()).thenReturn(false)
+        stubSyncManagerSignOut()
+        chatManager.stub {
+            on { deleteAllChats() } doThrow IllegalStateException("Database error")
+        }
+        val userManager = createUserManager()
+
+        userManager.signOut(playbackManager, wasInitiatedByUser = true)
+        advanceUntilIdle()
+
+        verify(userEpisodeManager).removeCloudStatusFromFiles(playbackManager)
+    }
+
+    private fun stubSyncManagerSignOut() {
+        whenever(settings.showWhatsNewDot).thenReturn(mock<UserSetting<Boolean>>())
+        syncManager.stub {
+            on { signOut(any()) } doSuspendableAnswer { invocation ->
+                runCatching { invocation.getArgument<suspend () -> Unit>(0).invoke() }.getOrNull()
+            }
+        }
+    }
+
     private fun TestScope.createUserManager() = UserManagerImpl(
         application = mock(),
         settings = settings,
         syncManager = syncManager,
         subscriptionManager = mock(),
         podcastManager = mock(),
-        userEpisodeManager = mock(),
+        userEpisodeManager = userEpisodeManager,
         playlistDao = mock(),
         playlistsInitializer = mock(),
         analyticsController = mock(),
@@ -71,5 +168,7 @@ class UserManagerImplTest {
         experimentProvider = mock(),
         endOfYearSync = mock(),
         notificationScheduler = mock(),
+        whatsNewManager = { whatsNewManager },
+        chatManager = { chatManager },
     )
 }

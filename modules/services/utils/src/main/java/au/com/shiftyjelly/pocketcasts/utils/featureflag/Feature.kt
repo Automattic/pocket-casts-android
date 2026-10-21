@@ -234,15 +234,6 @@ enum class Feature(
         hasDevToggle = true,
         addedOn = LocalDate.parse("2026-03-31"),
     ),
-    EXPLICIT_PODCAST_INDICATOR(
-        key = "explicit_podcast_indicator",
-        title = "Explicit podcast indicator",
-        defaultValue = isDebugOrPrototypeBuild,
-        tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = true,
-        hasDevToggle = true,
-        addedOn = LocalDate.parse("2026-04-23"),
-    ),
     IMPROVED_LISTENING_STATS(
         key = "improved_listening_stats",
         title = "Show improved listening stats",
@@ -279,23 +270,14 @@ enum class Feature(
         hasDevToggle = true,
         addedOn = LocalDate.parse("2026-04-22"),
     ),
-    EPISODE_CHAT_PLAYABLE_QUOTES(
-        key = "episode_chat_playable_quotes",
-        title = "Episode Chat: Playable Quotes",
+    EPISODE_CHAT_FREE_BETA(
+        key = "episode_chat_free_beta",
+        title = "Episode Chat: Free Beta",
         defaultValue = isDebugOrPrototypeBuild,
-        tier = FeatureTier.Plus(),
+        tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
-        addedOn = LocalDate.parse("2026-04-27"),
-    ),
-    AI_SUMMARIES(
-        key = "ai_summaries",
-        title = "AI Summaries",
-        defaultValue = isDebugOrPrototypeBuild,
-        tier = FeatureTier.Plus(),
-        hasFirebaseRemoteFlag = true,
-        hasDevToggle = true,
-        addedOn = LocalDate.parse("2026-05-12"),
+        addedOn = LocalDate.parse("2026-10-05"),
     ),
     GENERATED_CHAPTERS(
         key = "generated_chapters",
@@ -386,6 +368,15 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
         addedOn = LocalDate.parse("2026-09-22"),
+    ),
+    PLAY_IN_APP_MESSAGES(
+        key = "play_in_app_messages",
+        title = "Google Play in-app messages for declined payments",
+        defaultValue = false,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+        addedOn = LocalDate.parse("2026-10-12"),
     ),
 }
 

@@ -5,7 +5,6 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class EpisodeMetaResponse(
-    @Json(name = "summary") val summary: String? = null,
     @Json(name = "chapters") val chapters: List<MetaChapter>? = null,
 ) {
     @JsonClass(generateAdapter = true)

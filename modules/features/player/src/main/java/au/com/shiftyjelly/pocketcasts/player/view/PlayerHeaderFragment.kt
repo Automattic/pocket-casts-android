@@ -81,6 +81,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import au.com.shiftyjelly.pocketcasts.ads.AdReportFragment
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.chat.ChatFragment
+import au.com.shiftyjelly.pocketcasts.chat.EpisodeChatAccess
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.LocalPodcastColors
 import au.com.shiftyjelly.pocketcasts.compose.PlayerColors
@@ -130,6 +132,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog.ButtonType.Danger
+import au.com.shiftyjelly.pocketcasts.views.extensions.applyLightToastStyle
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
@@ -190,6 +193,7 @@ class PlayerHeaderFragment :
         },
     )
     private val sourceView = SourceView.PLAYER
+    private var isEpisodeChatUpsellOpening = false
 
     private val activityLauncher: ActivityResultLauncher<Intent> = registerForActivityResult(BookmarkActivityContract()) { result ->
         showViewBookmarksSnackbar(result)
@@ -296,6 +300,9 @@ class PlayerHeaderFragment :
         observeShelfItemNavigationState()
         observeTranscriptPageTransition()
         observeSnackbarMessages()
+        parentFragmentManager.setFragmentResultListener(ChatFragment.SIGN_IN_RESULT_KEY, viewLifecycleOwner) { _, _ ->
+            shelfSharedViewModel.onEpisodeChatSignInClick()
+        }
     }
 
     private fun observeNavigationState() {
@@ -406,7 +413,7 @@ class PlayerHeaderFragment :
                             viewModel.episode?.let {
                                 ShelfBottomSheet.newInstance(
                                     episodeId = it.uuid,
-                                ).show(childFragmentManager, "shelf_bottom_sheet")
+                                ).show(childFragmentManager, MORE_ACTIONS_TAG)
                             }
                         }
 
@@ -434,6 +441,12 @@ class PlayerHeaderFragment :
                                 )
                                 fragment.show(parentFragmentManager, "add-to-playlist")
                             }
+                        }
+
+                        is NavigationState.ShowEpisodeChat -> showEpisodeChat(navigationState)
+
+                        NavigationState.StartEpisodeChatSignIn -> {
+                            OnboardingLauncher.openOnboardingFlow(requireActivity(), OnboardingFlow.EpisodeChatSignIn)
                         }
                     }
                 }
@@ -491,17 +504,26 @@ class PlayerHeaderFragment :
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 shelfSharedViewModel.snackbarMessages.collect { message ->
+                    if (message == SnackbarMessage.EpisodeChatNeedsTranscript && isMoreActionsOpen()) return@collect
                     val text = when (message) {
                         SnackbarMessage.EpisodeDownloadStarted -> LR.string.episode_queued_for_download
                         SnackbarMessage.EpisodeRemoved -> LR.string.episode_was_removed
                         SnackbarMessage.TranscriptNotAvailable -> LR.string.transcript_error_not_available
+                        SnackbarMessage.EpisodeChatNeedsTranscript -> LR.string.episode_chat_needs_transcript_message
                         SnackbarMessage.ShareNotAvailable -> LR.string.sharing_is_not_available_for_private_podcasts
                     }
-                    showSnackBar(text = getString(text))
+                    showSnackBar(text = getString(text), isLight = message == SnackbarMessage.EpisodeChatNeedsTranscript)
                 }
             }
         }
     }
+
+    override fun onResume() {
+        super.onResume()
+        isEpisodeChatUpsellOpening = false
+    }
+
+    private fun isMoreActionsOpen() = childFragmentManager.findFragmentByTag(MORE_ACTIONS_TAG) != null
 
     override fun onShowNotesClick(episodeUuid: String) {
         val fragment = NotesFragment.newInstance(episodeUuid)
@@ -513,6 +535,30 @@ class PlayerHeaderFragment :
             source = source,
         )
         OnboardingLauncher.openOnboardingFlow(requireActivity(), onboardingFlow)
+    }
+
+    private fun showEpisodeChat(navigationState: NavigationState.ShowEpisodeChat) {
+        val episode = navigationState.episode
+        val access = navigationState.access
+        if (access is EpisodeChatAccess.Chat || access is EpisodeChatAccess.SignIn) {
+            if (parentFragmentManager.findFragmentByTag("episode_chat") == null) {
+                ChatFragment.newInstance(
+                    episodeUuid = episode.uuid,
+                    podcastUuid = episode.podcastUuid,
+                    podcastTitle = navigationState.podcast.title,
+                    episodeTitle = episode.title,
+                    episodeDurationMs = episode.durationMs,
+                    sourceView = SourceView.PLAYER,
+                    entryPoint = navigationState.entryPoint,
+                    isBeta = (access as? EpisodeChatAccess.Chat)?.isBeta ?: true,
+                    podcastColors = PodcastColors(navigationState.podcast),
+                    requiresSignIn = access is EpisodeChatAccess.SignIn,
+                ).show(parentFragmentManager, "episode_chat")
+            }
+        } else if (!isEpisodeChatUpsellOpening) {
+            isEpisodeChatUpsellOpening = true
+            startUpsellFlow(OnboardingUpgradeSource.EPISODE_CHAT)
+        }
     }
 
     override fun onClosePlayer() {
@@ -557,9 +603,11 @@ class PlayerHeaderFragment :
             .show()
     }
 
-    private fun showSnackBar(text: CharSequence) {
+    private fun showSnackBar(text: CharSequence, isLight: Boolean = false) {
         parentFragment?.view?.let {
-            Snackbar.make(it, text, Snackbar.LENGTH_SHORT).show()
+            Snackbar.make(it, text, Snackbar.LENGTH_SHORT)
+                .apply { if (isLight) applyLightToastStyle() }
+                .show()
         }
     }
 
@@ -1304,3 +1352,5 @@ private val transcriptExitTransition = fadeOut(spring(stiffness = Spring.Stiffne
 
 private val shelfEnterTransition = fadeIn() + expandVertically(expandFrom = Alignment.Top)
 private val shelfExitTransition = fadeOut() + shrinkVertically(shrinkTowards = Alignment.Top)
+
+private const val MORE_ACTIONS_TAG = "shelf_bottom_sheet"

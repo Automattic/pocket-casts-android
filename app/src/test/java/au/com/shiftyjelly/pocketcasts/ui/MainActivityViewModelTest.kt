@@ -16,6 +16,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import au.com.shiftyjelly.pocketcasts.repositories.whatsnew.WhatsNewManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.ui.MainActivityViewModel.NavigationState
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
@@ -81,6 +82,9 @@ class MainActivityViewModelTest {
     @Mock
     lateinit var bookmarkManager: BookmarkManager
 
+    @Mock
+    lateinit var whatsNewManager: WhatsNewManager
+
     private lateinit var viewModel: MainActivityViewModel
 
     private val episode = UserEpisode(uuid = TEST_EPISODE_UUID, publishedDate = Date())
@@ -92,6 +96,28 @@ class MainActivityViewModelTest {
     }
 
     /* What's new tests */
+
+    @Test
+    fun `the profile tab follows the unseen what's new messages`() = runTest {
+        val hasUnseen = MutableStateFlow(true)
+        whenever(whatsNewManager.hasUnseenMessages).thenReturn(hasUnseen)
+        initViewModel()
+
+        viewModel.hasUnseenWhatsNew.test {
+            assertTrue(awaitItem())
+            hasUnseen.value = false
+            assertFalse(awaitItem())
+        }
+    }
+
+    @Test
+    fun `showing profile marks the what's new feed seen`() = runTest {
+        initViewModel()
+
+        viewModel.onProfileShown()
+
+        verify(whatsNewManager).markFeedAsSeen()
+    }
 
     @Test
     fun `given a new user, then what's new should not be displayed`() = runTest {
@@ -269,6 +295,7 @@ class MainActivityViewModelTest {
             podcastManager = podcastManager,
             bookmarkManager = bookmarkManager,
             eventHorizon = EventHorizon(TestEventSink()),
+            whatsNewManager = whatsNewManager,
         )
     }
 }

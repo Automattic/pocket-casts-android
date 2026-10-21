@@ -347,10 +347,9 @@ private fun PodcastCategoriesLabel(
     onClickCategory: () -> Unit,
     onClickNetwork: () -> Unit,
 ) {
-    val showExplicitIndicator by FeatureFlag.isEnabledFlow(Feature.EXPLICIT_PODCAST_INDICATOR).collectAsStateWithLifecycle()
     val isNetworkDiscoveryEnabled by FeatureFlag.isEnabledFlow(Feature.NETWORK_DISCOVERY).collectAsStateWithLifecycle()
     val isAuthorLinked = isNetworkDiscoveryEnabled && networkListId != null && author.isNotBlank()
-    val text = remember(category, author, explicit, onClickCategory, onClickNetwork, showExplicitIndicator, isAuthorLinked, linkColor) {
+    val text = remember(category, author, explicit, onClickCategory, onClickNetwork, isAuthorLinked, linkColor) {
         val text = listOf(category, author).filter(String::isNotBlank).joinToString(separator = " · ")
         buildAnnotatedString {
             append(text)
@@ -382,7 +381,7 @@ private fun PodcastCategoriesLabel(
                     end = text.length,
                 )
             }
-            if (showExplicitIndicator && explicit) {
+            if (explicit) {
                 if (text.isNotBlank() || category.isNotBlank()) {
                     append(" · ")
                 }
@@ -396,7 +395,7 @@ private fun PodcastCategoriesLabel(
         text = text,
         color = iconColor,
         textAlign = TextAlign.Center,
-        inlineContent = if (showExplicitIndicator && explicit) {
+        inlineContent = if (explicit) {
             mapOf(
                 "explicit" to InlineTextContent(Placeholder(16.sp, 16.sp, PlaceholderVerticalAlign.TextCenter)) {
                     val explicitDescription = stringResource(LR.string.explicit)

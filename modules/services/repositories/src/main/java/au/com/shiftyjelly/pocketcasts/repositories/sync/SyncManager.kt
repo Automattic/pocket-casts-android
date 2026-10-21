@@ -26,6 +26,7 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.UserChangeResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.DeviceAuthorizeResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.ExchangeSonosResponse
+import com.automattic.eventhorizon.OnboardingFlowType
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.pocketcasts.service.api.BookmarksResponse
 import com.pocketcasts.service.api.EpisodesResponse
@@ -60,7 +61,13 @@ interface SyncManager : NamedSettingsCaller {
     fun getEmail(): String?
     fun emailFlow(): Flow<String?>
     suspend fun signOut(action: suspend () -> Unit = {})
-    suspend fun loginWithGoogle(idToken: String, signInSource: SignInSource): LoginResult
+
+    /** [flow] is the onboarding flow reported on `user_account_created` when this creates an account. */
+    suspend fun loginWithGoogle(
+        idToken: String,
+        signInSource: SignInSource,
+        flow: OnboardingFlowType = OnboardingFlowType.Unknown,
+    ): LoginResult
     suspend fun loginWithEmailAndPassword(email: String, password: String, signInSource: SignInSource): LoginResult
     suspend fun loginWithToken(token: RefreshToken, loginIdentity: LoginIdentity, signInSource: SignInSource): LoginResult
     suspend fun deviceAuthorize(): DeviceAuthorizeResponse
@@ -73,7 +80,12 @@ interface SyncManager : NamedSettingsCaller {
      * (and the value stored in that field), so each caller must set it deliberately.
      */
     suspend fun loginWithDeviceAuth(deviceCode: String, signInSource: SignInSource, isNewAccount: Boolean): LoginResult
-    suspend fun createUserWithEmailAndPassword(email: String, password: String, signInSource: SignInSource.UserInitiated): LoginResult
+    suspend fun createUserWithEmailAndPassword(
+        email: String,
+        password: String,
+        signInSource: SignInSource.UserInitiated,
+        flow: OnboardingFlowType = OnboardingFlowType.Unknown,
+    ): LoginResult
     suspend fun forgotPassword(email: String, onSuccess: () -> Unit, onError: (String) -> Unit)
     suspend fun getAccessToken(account: Account): AccessToken
     fun getRefreshToken(): RefreshToken?
@@ -118,6 +130,11 @@ interface SyncManager : NamedSettingsCaller {
     suspend fun syncUpdateOrThrow(request: SyncUpdateRequest): SyncUpdateResponse
 
     fun episodeSyncRxCompletable(request: EpisodeSyncRequest): Completable
+
+    // What's New
+    suspend fun getWhatsNewReadMessageIds(messageIds: Collection<String>): Set<String>
+    suspend fun markWhatsNewAsRead(messageIds: Collection<String>)
+    suspend fun markWhatsNewAsUnread(messageIds: Collection<String>)
 
     // Rating
     suspend fun addPodcastRating(podcastUuid: String, rate: Int): PodcastRatingResponse

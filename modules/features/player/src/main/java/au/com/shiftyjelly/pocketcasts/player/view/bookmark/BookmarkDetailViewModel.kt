@@ -31,7 +31,6 @@ import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.rx2.await
 
 @HiltViewModel
 class BookmarkDetailViewModel @Inject constructor(
@@ -128,7 +127,7 @@ class BookmarkDetailViewModel @Inject constructor(
         mutableState.value = mutableState.value.copy(isPodcastTitleLoading = true)
         viewModelScope.launch {
             val podcast = runCatching {
-                podcastCacheServiceManager.getPodcast(podcastUuid).await()
+                podcastCacheServiceManager.getPodcast(podcastUuid)
             }.onFailure {
                 if (it is CancellationException) throw it
             }.getOrNull()

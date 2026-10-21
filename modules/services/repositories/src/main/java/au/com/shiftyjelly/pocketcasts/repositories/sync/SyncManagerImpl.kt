@@ -198,7 +198,8 @@ class SyncManagerImpl @Inject constructor(
     override suspend fun loginWithGoogle(
         idToken: String,
         signInSource: SignInSource,
-    ): LoginResult = handleLogin(signInSource, LoginIdentity.Google) {
+        flow: OnboardingFlowType,
+    ): LoginResult = handleLogin(signInSource, LoginIdentity.Google, flow) {
         syncServiceManager.loginGoogle(idToken)
     }
 
@@ -275,6 +276,7 @@ class SyncManagerImpl @Inject constructor(
     private suspend fun handleLogin(
         signInSource: SignInSource,
         loginIdentity: LoginIdentity,
+        flow: OnboardingFlowType = OnboardingFlowType.Unknown,
         loginFunction: suspend () -> LoginTokenResponse,
     ): LoginResult {
         val loginResult = try {
@@ -286,7 +288,7 @@ class SyncManagerImpl @Inject constructor(
             exceptionToAuthResult(exception = ex, fallbackMessage = LR.string.error_login_failed)
         }
 
-        trackSignIn(loginResult, signInSource, loginIdentity)
+        trackSignIn(loginResult, signInSource, loginIdentity, flow = flow)
 
         return loginResult
     }
@@ -295,6 +297,7 @@ class SyncManagerImpl @Inject constructor(
         email: String,
         password: String,
         signInSource: SignInSource.UserInitiated,
+        flow: OnboardingFlowType,
     ): LoginResult {
         val loginResult = try {
             val response = syncServiceManager.register(email = email, password = password)
@@ -304,7 +307,7 @@ class SyncManagerImpl @Inject constructor(
             Timber.e(ex, "Failed to create a Pocket Casts account")
             exceptionToAuthResult(exception = ex, fallbackMessage = LR.string.server_login_unable_to_create_account)
         }
-        trackRegister(loginResult, signInSource)
+        trackRegister(loginResult, signInSource, flow)
         return loginResult
     }
 
@@ -467,6 +470,19 @@ class SyncManagerImpl @Inject constructor(
         return response
     }
 
+    // What's New
+    override suspend fun getWhatsNewReadMessageIds(messageIds: Collection<String>) = getCacheTokenOrLogin { token ->
+        syncServiceManager.getWhatsNewReadMessageIds(messageIds, token)
+    }
+
+    override suspend fun markWhatsNewAsRead(messageIds: Collection<String>) = getCacheTokenOrLogin { token ->
+        syncServiceManager.markWhatsNewAsRead(messageIds, token)
+    }
+
+    override suspend fun markWhatsNewAsUnread(messageIds: Collection<String>) = getCacheTokenOrLogin { token ->
+        syncServiceManager.markWhatsNewAsUnread(messageIds, token)
+    }
+
     // Rating
 
     override suspend fun addPodcastRating(podcastUuid: String, rate: Int): PodcastRatingResponse = getCacheTokenOrLogin { token ->
@@ -568,6 +584,7 @@ class SyncManagerImpl @Inject constructor(
         signInSource: SignInSource,
         loginIdentity: LoginIdentity,
         isNewAccount: Boolean = false,
+        flow: OnboardingFlowType = OnboardingFlowType.Unknown,
     ) {
         val event = when (loginResult) {
             is LoginResult.Success -> {
@@ -583,7 +600,7 @@ class SyncManagerImpl @Inject constructor(
                                 source = loginIdentity.analyticsValue,
                                 sourceInCode = signInSource.analyticsValue,
                                 redirectPath = NO_REDIRECT_PATH,
-                                flow = OnboardingFlowType.Unknown,
+                                flow = flow,
                             )
                         } else {
                             UserSignedInEvent(
@@ -627,6 +644,7 @@ class SyncManagerImpl @Inject constructor(
     private suspend fun trackRegister(
         loginResult: LoginResult,
         signInSource: SignInSource.UserInitiated,
+        flow: OnboardingFlowType,
     ) {
         val event = when (loginResult) {
             is LoginResult.Success -> {
@@ -635,7 +653,7 @@ class SyncManagerImpl @Inject constructor(
                     source = LoginIdentityType.Password,
                     sourceInCode = signInSource.analyticsValue,
                     redirectPath = NO_REDIRECT_PATH,
-                    flow = OnboardingFlowType.Unknown,
+                    flow = flow,
                 )
             }
 

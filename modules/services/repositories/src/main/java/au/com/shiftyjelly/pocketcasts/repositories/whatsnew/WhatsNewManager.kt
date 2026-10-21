@@ -22,11 +22,21 @@ interface WhatsNewManager {
 
     fun markAsRead(messageIds: Collection<String>)
 
+    fun markAsUnread(messageIds: Collection<String>)
+
     fun markAsSeen(messageIds: Collection<String>)
 
     fun markAsListed(messageIds: Collection<String>)
 
+    suspend fun markFeedAsSeen()
+
     fun markAsResponded(pollId: String)
+
+    fun startFeed()
+
+    fun forgetReadMessages()
+
+    fun syncReadState()
 
     fun resetReadState()
 }

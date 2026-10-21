@@ -34,9 +34,11 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.doOnAttach
 import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
@@ -117,12 +119,14 @@ import au.com.shiftyjelly.pocketcasts.discover.util.DiscoverDeepLinkManager
 import au.com.shiftyjelly.pocketcasts.discover.util.DiscoverDeepLinkManager.Companion.RECOMMENDATIONS_USER
 import au.com.shiftyjelly.pocketcasts.discover.util.DiscoverDeepLinkManager.Companion.STAFF_PICKS_LIST_ID
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment
+import au.com.shiftyjelly.pocketcasts.discover.view.NetworksGridFragment
 import au.com.shiftyjelly.pocketcasts.discover.view.PodcastGridFragment
 import au.com.shiftyjelly.pocketcasts.discover.view.PodcastGridListFragment
 import au.com.shiftyjelly.pocketcasts.discover.view.PodcastListFragment
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesActivity
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesActivity.StoriesSource
 import au.com.shiftyjelly.pocketcasts.endofyear.ui.EndOfYearLaunchBottomSheet
+import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -143,6 +147,7 @@ import au.com.shiftyjelly.pocketcasts.player.view.dialog.MiniPlayerDialog
 import au.com.shiftyjelly.pocketcasts.player.view.video.VideoActivity
 import au.com.shiftyjelly.pocketcasts.playlists.PlaylistFragment
 import au.com.shiftyjelly.pocketcasts.playlists.PlaylistsFragment
+import au.com.shiftyjelly.pocketcasts.playlists.showCreatePlaylist
 import au.com.shiftyjelly.pocketcasts.podcasts.view.ProfileEpisodeListFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeContainerFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.SuggestedFoldersFragment
@@ -164,6 +169,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.di.NotificationPermissionChec
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.opml.OpmlImportTask
+import au.com.shiftyjelly.pocketcasts.repositories.payment.PlayInAppMessages
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackNoticeType
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
@@ -329,12 +335,17 @@ class MainActivity :
     lateinit var paymentClient: PaymentClient
 
     @Inject
+    lateinit var playInAppMessages: PlayInAppMessages
+
+    @Inject
     lateinit var appReviewManager: AppReviewManager
 
     private val viewModel: MainActivityViewModel by viewModels()
     private val disposables = CompositeDisposable()
     private var videoPlayerShown: Boolean = false
     private var overrideNextRefreshTimer: Boolean = false
+    private var isEndOfYearBadgeVisible = false
+    private var isWhatsNewBadgeVisible = false
 
     private var mediaRouter: MediaRouter? = null
     private val mediaRouterCallback = object : MediaRouter.Callback() {}
@@ -575,8 +586,22 @@ class MainActivity :
                         setupEndOfYearLaunchBottomSheet()
                     }
                     if (settings.getEndOfYearShowBadge2025()) {
-                        binding.bottomNavigation.getOrCreateBadge(VR.id.navigation_profile)
+                        isEndOfYearBadgeVisible = true
+                        renderProfileBadge()
                     }
+                }
+            }
+        }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.hasUnseenWhatsNew.collect { hasUnseen ->
+                    val isProfileShown = isProfileRootShown()
+                    if (hasUnseen && isProfileShown) {
+                        viewModel.onProfileShown()
+                    }
+                    isWhatsNewBadgeVisible = hasUnseen && !isProfileShown
+                    renderProfileBadge()
                 }
             }
         }
@@ -659,10 +684,15 @@ class MainActivity :
                     if (settings.selectedTab() != currentTab) {
                         trackTabOpened(currentTab)
                         when (currentTab) {
-                            VR.id.navigation_profile -> resetEoYBadgeIfNeeded()
+                            VR.id.navigation_profile -> {
+                                resetEoYBadgeIfNeeded()
+                                viewModel.onProfileShown()
+                            }
                         }
                     }
                     settings.setSelectedTab(currentTab)
+                } else if (it is NavigatorAction.FragmentRemoved && isProfileRootShown()) {
+                    viewModel.onProfileShown()
                 } else if (it is NavigatorAction.NewFragmentAdded) {
                     if (navigator.currentTab() == VR.id.navigation_profile) {
                         resetEoYBadgeIfNeeded()
@@ -685,11 +715,22 @@ class MainActivity :
     }
 
     private fun resetEoYBadgeIfNeeded() {
-        if (binding.bottomNavigation.getBadge(VR.id.navigation_profile) != null &&
-            settings.getEndOfYearShowBadge2025()
-        ) {
-            binding.bottomNavigation.removeBadge(VR.id.navigation_profile)
+        if (isEndOfYearBadgeVisible && settings.getEndOfYearShowBadge2025()) {
+            isEndOfYearBadgeVisible = false
             settings.setEndOfYearShowBadge2025(false)
+            renderProfileBadge()
+        }
+    }
+
+    private fun isProfileRootShown(): Boolean {
+        return navigator.currentTab() == VR.id.navigation_profile && navigator.isAtRootOfStack() && !viewModel.isPlayerOpen
+    }
+
+    private fun renderProfileBadge() {
+        if (isEndOfYearBadgeVisible || isWhatsNewBadgeVisible) {
+            binding.bottomNavigation.getOrCreateBadge(VR.id.navigation_profile)
+        } else {
+            binding.bottomNavigation.removeBadge(VR.id.navigation_profile)
         }
     }
 
@@ -833,6 +874,8 @@ class MainActivity :
         lifecycleScope.launch {
             paymentClient.acknowledgePendingPurchases()
         }
+
+        window.decorView.doOnAttach { playInAppMessages.show(this@MainActivity) }
 
         // Schedule next refresh in the background
         RefreshPodcastsTask.scheduleOrCancel(this@MainActivity, settings)
@@ -1421,6 +1464,9 @@ class MainActivity :
         updateNavAndStatusColors(playerOpen = false, playingPodcast = null)
 
         viewModel.isPlayerOpen = false
+        if (isProfileRootShown()) {
+            viewModel.onProfileShown()
+        }
         viewModel.closeMultiSelect()
         playerBottomSheetBackCallback?.isEnabled = false
         playerContainerCallbackUpdater?.invoke()
@@ -1586,6 +1632,35 @@ class MainActivity :
 
     override fun closeProfileToRoot() {
         navigator.reset(tab = VR.id.navigation_profile, resetRootFragment = false)
+    }
+
+    override fun openCreatePlaylist() {
+        closePlayer()
+        navigator.reset(tab = VR.id.navigation_filters, resetRootFragment = false)
+        supportFragmentManager.showCreatePlaylist()
+    }
+
+    override fun openNetworks() {
+        closePlayer()
+        navigator.reset(tab = VR.id.navigation_discover, resetRootFragment = false)
+        if (!FeatureFlag.isEnabled(Feature.NETWORK_DISCOVERY)) return
+        lifecycleScope.launch {
+            val networks = discoverDeepLinkManager.getNetworksList(resources) ?: return@launch
+            withResumed {
+                if (navigator.currentFragment() !is DiscoverFragment) return@withResumed
+                addFragment(NetworksGridFragment.newInstance(sourceUrl = networks.source, title = networks.title.tryToLocalise(resources)))
+            }
+        }
+    }
+
+    override fun openInAppDeepLink(url: String): Boolean {
+        val intent = Intent(Intent.ACTION_VIEW, url.toUri())
+        val deepLink = deepLinkFactory.create(intent)
+        if (deepLink == null || deepLink is ShowPodcastFromUrlDeepLink || deepLink is PocketCastsWebsiteGetDeepLink) {
+            return false
+        }
+        handleIntent(intent, savedInstanceState = null)
+        return true
     }
 
     override fun setSupportActionBar(toolbar: Toolbar?) {

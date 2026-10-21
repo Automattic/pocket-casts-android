@@ -78,9 +78,14 @@ data class WhatsNewImage(
 }
 
 data class WhatsNewAction(
-    val event: String,
+    val type: String,
     val label: String,
-)
+    val url: String?,
+) {
+    companion object {
+        const val OPEN_LINK = "open_link"
+    }
+}
 
 data class WhatsNewResearch(
     val description: String?,

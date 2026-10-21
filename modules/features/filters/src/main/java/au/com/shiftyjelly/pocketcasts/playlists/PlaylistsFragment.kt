@@ -63,10 +63,7 @@ class PlaylistsFragment :
                 refreshEpisodeCount = viewModel::refreshEpisodeCount,
                 onCreatePlaylist = {
                     viewModel.trackCreatePlaylistClicked()
-                    val fragment = childFragmentManager.findFragmentByTag("create_playlist")
-                    if (fragment == null) {
-                        CreatePlaylistFragment().show(childFragmentManager, "create_playlist")
-                    }
+                    childFragmentManager.showCreatePlaylist()
                 },
                 onDeletePlaylist = { playlist, settleRow ->
                     viewModel.trackPlaylistDeleteTriggered(playlist)

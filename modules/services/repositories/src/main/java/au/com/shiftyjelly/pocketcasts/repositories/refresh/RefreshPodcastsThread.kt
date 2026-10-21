@@ -46,12 +46,14 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.data.DataSyncProcess
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import au.com.shiftyjelly.pocketcasts.repositories.whatsnew.WhatsNewManager
 import au.com.shiftyjelly.pocketcasts.servers.RefreshResponse
 import au.com.shiftyjelly.pocketcasts.servers.ServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.exception.RefreshTokenExpiredException
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.utils.extensions.getLaunchIntent
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import coil3.executeBlocking
 import coil3.imageLoader
@@ -93,6 +95,7 @@ class RefreshPodcastsThread(
         fun userManager(): UserManager
         fun syncManager(): SyncManager
         fun ratingsManager(): RatingsManager
+        fun whatsNewManager(): WhatsNewManager
         fun appDatabase(): AppDatabase
     }
 
@@ -258,6 +261,7 @@ class RefreshPodcastsThread(
             statsManager = entryPoint.statsManager(),
             subscriptionManager = entryPoint.subscriptionManager(),
             ratingsManager = entryPoint.ratingsManager(),
+            whatsNewManager = entryPoint.whatsNewManager(),
             appDatabase = entryPoint.appDatabase(),
             settings = entryPoint.settings(),
             fileStorage = entryPoint.fileStorage(),
@@ -641,7 +645,7 @@ class RefreshPodcastsThread(
                 wearBackground = getPodcastNotificationWearBitmap(firstPodcastUuid, podcastManager, context)
             }
 
-            val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)?.apply {
+            val intent = context.getLaunchIntent()?.apply {
                 flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
                 action = Settings.INTENT_OPEN_APP_NEW_EPISODES
             }

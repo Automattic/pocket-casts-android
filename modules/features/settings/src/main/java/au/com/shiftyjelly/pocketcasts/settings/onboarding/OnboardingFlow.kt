@@ -34,6 +34,11 @@ sealed interface OnboardingFlow : Parcelable {
     }
 
     @Parcelize
+    data object EpisodeChatSignIn : OnboardingFlow {
+        override val analyticsValue get() = OnboardingFlowType.LoggedOut
+    }
+
+    @Parcelize
     data class PlusAccountUpgrade(
         override val source: OnboardingUpgradeSource,
         override val preselectedTier: SubscriptionTier,

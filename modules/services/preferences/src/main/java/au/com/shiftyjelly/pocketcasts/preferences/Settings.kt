@@ -127,13 +127,14 @@ interface Settings {
 
         const val AUTOMOTIVE_CONNECTED_TO_MEDIA_SESSION = "automotive_connected_to_media_session"
 
-        const val SHOW_REFERRALS_TOOLTIP = "show_referrals_tooltip"
-
         const val SHOW_UP_NEXT_SORT_DURATION_TOOLTIP = "show_up_next_sort_duration_tooltip"
 
         const val SHOW_SMART_BOOKMARKS_TOOLTIP = "show_smart_bookmarks_tooltip"
 
         const val SMART_BOOKMARKS_TOOLTIP_DISMISSED = "smart_bookmarks_tooltip_dismissed"
+        const val EPISODE_CHAT_TOOLTIP_DISMISSED = "episode_chat_tooltip_dismissed"
+        const val EPISODE_CHAT_BETA_SHEET_SEEN = "episode_chat_beta_sheet_seen"
+        const val EPISODE_CHAT_SURVEY_SEEN = "episode_chat_survey_seen"
     }
 
     enum class NotificationChannel(val id: String) {
@@ -393,6 +394,7 @@ interface Settings {
     val keepScreenAwake: UserSetting<Boolean>
     val openPlayerAutomatically: UserSetting<Boolean>
     val showGeneratedChapters: UserSetting<Boolean>
+    val showWhatsNewDot: UserSetting<Boolean>
 
     val autoDownloadUnmeteredOnly: UserSetting<Boolean>
     val autoDownloadOnlyWhenCharging: UserSetting<Boolean>
@@ -599,11 +601,15 @@ interface Settings {
     fun automotiveConnectedToMediaSession(): Boolean
     fun setAutomotiveConnectedToMediaSession(isLoaded: Boolean)
 
-    val showReferralsTooltip: UserSetting<Boolean>
-
     val showSmartBookmarksTooltip: UserSetting<Boolean>
 
     val smartBookmarksTooltipDismissed: UserSetting<Boolean>
+
+    val episodeChatTooltipDismissed: UserSetting<Boolean>
+
+    val episodeChatBetaSheetSeen: UserSetting<Boolean>
+
+    val episodeChatSurveySeen: UserSetting<Boolean>
 
     val showUpNextSortDurationTooltip: UserSetting<Boolean>
 

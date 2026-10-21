@@ -19,15 +19,17 @@ import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.PlaylistPlay
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material.icons.outlined.BugReport
-import androidx.compose.material.icons.outlined.CardGiftcard
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Downloading
 import androidx.compose.material.icons.outlined.EditCalendar
 import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.material.icons.outlined.Folder
+import androidx.compose.material.icons.outlined.MarkEmailUnread
 import androidx.compose.material.icons.outlined.NewReleases
 import androidx.compose.material.icons.outlined.Notifications
+import androidx.compose.material.icons.outlined.RestartAlt
 import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -63,15 +65,18 @@ fun DeveloperPage(
     onTriggerResetEoYModalProfileBadge: () -> Unit,
     onSendCrash: (String) -> Unit,
     onShowWhatsNewClick: () -> Unit,
+    onResetWhatsNewReadState: () -> Unit,
+    onResetWhatsNewToFreshInstall: () -> Unit,
     onShowNotificationsTestingClick: () -> Unit,
     onResetSuggestedFoldersSuggestion: () -> Unit,
     onResetPlaylistsOnboarding: () -> Unit,
     onResetUpNextSortTooltip: () -> Unit,
-    onShowGiftTooltip: () -> Unit,
     onShowPlaylistTooltips: () -> Unit,
+    onShowSmartBookmarksTooltip: () -> Unit,
     onResetNotificationsPrompt: () -> Unit,
     onShowAppReviewPrompt: () -> Unit,
     onClearAppReviewSettings: () -> Unit,
+    onResetEpisodeChatSurvey: () -> Unit,
     onTriggerPlaybackError: () -> Unit,
     onTriggerConnectionError: () -> Unit,
     modifier: Modifier = Modifier,
@@ -132,7 +137,7 @@ fun DeveloperPage(
             ResetUpNextSortTooltip(onClick = onResetUpNextSortTooltip)
         }
         item {
-            ShowGiftTooltip(onClick = onShowGiftTooltip)
+            ShowSmartBookmarksTooltip(onClick = onShowSmartBookmarksTooltip)
         }
 
         item {
@@ -149,6 +154,19 @@ fun DeveloperPage(
         }
         item {
             ClearAppReviewSettings(onClick = onClearAppReviewSettings)
+        }
+        item {
+            ResetEpisodeChatSurvey(onClick = onResetEpisodeChatSurvey)
+        }
+
+        item {
+            SectionHeader(text = "What's New feed")
+        }
+        item {
+            ResetWhatsNewReadState(onClick = onResetWhatsNewReadState)
+        }
+        item {
+            ResetWhatsNewToFreshInstall(onClick = onResetWhatsNewToFreshInstall)
         }
 
         item {
@@ -318,14 +336,14 @@ private fun ResetUpNextSortTooltip(
 }
 
 @Composable
-private fun ShowGiftTooltip(
+private fun ShowSmartBookmarksTooltip(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     SettingRow(
-        primaryText = "Show gift tooltip",
-        secondaryText = "Show the referrals tooltip on the gift icon again",
-        icon = rememberVectorPainter(Icons.Outlined.CardGiftcard),
+        primaryText = "Show Smart Bookmarks tooltip",
+        secondaryText = "Show the \"Add bookmark\" tooltip on the player shelf again",
+        icon = rememberVectorPainter(Icons.Outlined.BookmarkBorder),
         modifier = modifier.clickable { onClick() },
     )
 }
@@ -352,6 +370,32 @@ private fun ShowWhatsNew(
         primaryText = "Show What's New",
         secondaryText = "Open the What's New page",
         icon = rememberVectorPainter(Icons.Outlined.NewReleases),
+        modifier = modifier.clickable { onClick() },
+    )
+}
+
+@Composable
+private fun ResetWhatsNewReadState(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    SettingRow(
+        primaryText = "Reset read state",
+        secondaryText = "Forget which messages were read, seen, listed or answered on this device",
+        icon = rememberVectorPainter(Icons.Outlined.MarkEmailUnread),
+        modifier = modifier.clickable { onClick() },
+    )
+}
+
+@Composable
+private fun ResetWhatsNewToFreshInstall(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    SettingRow(
+        primaryText = "Reset to fresh install",
+        secondaryText = "Mark the messages published so far as read, like a new install",
+        icon = rememberVectorPainter(Icons.Outlined.RestartAlt),
         modifier = modifier.clickable { onClick() },
     )
 }
@@ -391,6 +435,19 @@ private fun ClearAppReviewSettings(
         primaryText = "Clear app review settings",
         secondaryText = "Reset all app review settings to help test",
         icon = rememberVectorPainter(Icons.Outlined.Delete),
+        modifier = modifier.clickable { onClick() },
+    )
+}
+
+@Composable
+private fun ResetEpisodeChatSurvey(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    SettingRow(
+        primaryText = "Reset episode chat survey",
+        secondaryText = "Show the survey again after the next answered episode chat",
+        icon = rememberVectorPainter(Icons.Outlined.RestartAlt),
         modifier = modifier.clickable { onClick() },
     )
 }
@@ -536,15 +593,18 @@ private fun DeveloperPagePreview() {
         bottomInset = 0.dp,
         onSendCrash = {},
         onShowWhatsNewClick = {},
+        onResetWhatsNewReadState = {},
+        onResetWhatsNewToFreshInstall = {},
         onResetSuggestedFoldersSuggestion = {},
         onShowNotificationsTestingClick = {},
         onResetPlaylistsOnboarding = {},
         onResetUpNextSortTooltip = {},
-        onShowGiftTooltip = {},
         onShowPlaylistTooltips = {},
+        onShowSmartBookmarksTooltip = {},
         onResetNotificationsPrompt = {},
         onShowAppReviewPrompt = {},
         onClearAppReviewSettings = {},
+        onResetEpisodeChatSurvey = {},
         onTriggerPlaybackError = {},
         onTriggerConnectionError = {},
     )

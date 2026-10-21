@@ -5,6 +5,7 @@ import android.app.ActivityManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.ContextWrapper
+import android.content.Intent
 import android.content.res.Configuration
 import android.view.accessibility.AccessibilityManager
 import androidx.appcompat.app.AppCompatActivity
@@ -12,12 +13,20 @@ import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 
 fun Context.getLaunchActivityPendingIntent(): PendingIntent {
     // TV builds declare only a LEANBACK_LAUNCHER activity, which getLaunchIntentForPackage does not resolve.
-    val intent = packageManager.getLaunchIntentForPackage(packageName)
+    val intent = getLaunchIntent()
         ?: packageManager.getLeanbackLaunchIntentForPackage(packageName)
     if (intent == null) {
         LogBuffer.e(LogBuffer.TAG_CRASH, "Could not resolve a launch intent for $packageName; content intent will be inert")
     }
     return PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+}
+
+fun Context.getLaunchIntent(): Intent? {
+    val intent = packageManager.getLaunchIntentForPackage(packageName) ?: return null
+    val targetActivity = intent.component?.let { component ->
+        runCatching { packageManager.getActivityInfo(component, 0).targetActivity }.getOrNull()
+    }
+    return if (targetActivity != null) intent.setClassName(packageName, targetActivity) else intent
 }
 
 fun Context.isScreenReaderOn(): Boolean {

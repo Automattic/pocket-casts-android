@@ -20,11 +20,11 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.rx2.asFlow
 
 interface UpNextQueue {
     val isEmpty: Boolean
     val changesObservable: Observable<State>
+    val changesFlow: Flow<State>
     val currentEpisode: BaseEpisode?
     val queueEpisodes: List<BaseEpisode>
     val size: Int
@@ -108,7 +108,7 @@ interface UpNextQueue {
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     fun getChangesFlowWithLiveCurrentEpisode(episodeManager: EpisodeManager, podcastManager: PodcastManager): Flow<State> {
-        return changesObservable.asFlow().debounce(100).flatMapLatest { state ->
+        return changesFlow.debounce(100).flatMapLatest { state ->
             if (state is State.Loaded) {
                 if (state.podcast != null) {
                     episodeManager.findEpisodeByUuidFlow(state.episode.uuid)

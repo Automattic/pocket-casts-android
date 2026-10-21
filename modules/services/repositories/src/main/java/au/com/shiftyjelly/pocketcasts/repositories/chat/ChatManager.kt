@@ -1,16 +1,16 @@
 package au.com.shiftyjelly.pocketcasts.repositories.chat
 
+import au.com.shiftyjelly.pocketcasts.models.to.EpisodeChatHistoryItem
 import kotlinx.coroutines.flow.Flow
 
 interface ChatManager {
     fun observeMessages(episodeUuid: String): Flow<List<ChatMessage>>
 
-    suspend fun getMessages(episodeUuid: String): List<ChatMessage>
+    fun observeHistory(): Flow<List<EpisodeChatHistoryItem>>
 
     suspend fun createChat(
         episodeUuid: String,
         podcastUuid: String,
-        welcomeMessage: ChatMessage,
     )
 
     suspend fun sendMessage(
@@ -19,8 +19,13 @@ interface ChatManager {
         allMessages: List<ChatMessage>,
     )
 
-    suspend fun clearMessages(
-        episodeUuid: String,
-        welcomeMessage: ChatMessage,
-    )
+    suspend fun discardMessage(uuid: String)
+
+    suspend fun clearMessages(episodeUuid: String): ClearedChat
+
+    suspend fun restoreMessages(clearedChat: ClearedChat)
+
+    suspend fun rateAnswer(answerUuid: String, rating: ChatAnswerRating?)
+
+    suspend fun deleteAllChats()
 }

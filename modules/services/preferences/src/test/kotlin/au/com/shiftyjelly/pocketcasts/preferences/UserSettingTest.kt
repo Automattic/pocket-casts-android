@@ -1,6 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.preferences
 
+import java.time.Instant
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -43,5 +45,17 @@ class UserSettingTest {
 
         assertFalse(settingA.flow.value)
         assertTrue(settingB.flow.value)
+    }
+
+    @Test
+    fun `reset restores the default and forgets when it was modified`() {
+        val setting = UserSetting.BoolPref("key", defaultValue = true, sharedPrefs = FakeSharedPreferences())
+        setting.set(false, updateModifiedAt = true)
+
+        setting.reset()
+
+        assertTrue(setting.flow.value)
+        assertNull(setting.modifiedAt)
+        assertNull(setting.getSyncValue(Instant.EPOCH))
     }
 }

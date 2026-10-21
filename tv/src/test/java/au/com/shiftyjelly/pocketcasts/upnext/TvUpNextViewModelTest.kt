@@ -13,9 +13,10 @@ import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.UpNextDiscoverButtonTappedEvent
 import com.automattic.eventhorizon.UpNextShownEvent
 import com.automattic.eventhorizon.UpNextSourceType
-import io.reactivex.subjects.BehaviorSubject
 import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -32,9 +33,12 @@ class TvUpNextViewModelTest {
     @get:Rule
     val coroutineRule = MainCoroutineRule()
 
-    private val changes = BehaviorSubject.create<UpNextQueue.State>()
+    private val changes = MutableSharedFlow<UpNextQueue.State>(
+        replay = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST,
+    )
     private val upNextQueue = mock<UpNextQueue> {
-        on { changesObservable } doReturn changes
+        on { changesFlow } doReturn changes
     }
     private val syncManager = mock<SyncManager>()
     private val context = mock<Context>()
@@ -50,7 +54,7 @@ class TvUpNextViewModelTest {
         viewModel.uiState.test {
             assertEquals(TvUpNextUiState.Loading, awaitItem())
 
-            changes.onNext(UpNextQueue.State.Empty)
+            changes.tryEmit(UpNextQueue.State.Empty)
 
             assertEquals(TvUpNextUiState.Empty, awaitItem())
         }
@@ -65,7 +69,7 @@ class TvUpNextViewModelTest {
         viewModel.uiState.test {
             assertEquals(TvUpNextUiState.Loading, awaitItem())
 
-            changes.onNext(UpNextQueue.State.Loaded(currentEpisode, null, listOf(first, second)))
+            changes.tryEmit(UpNextQueue.State.Loaded(currentEpisode, null, listOf(first, second)))
 
             assertEquals(TvUpNextUiState.Loaded(listOf(first, second)), awaitItem())
         }
@@ -80,7 +84,7 @@ class TvUpNextViewModelTest {
         viewModel.uiState.test {
             assertEquals(TvUpNextUiState.Loading, awaitItem())
 
-            changes.onNext(UpNextQueue.State.Loaded(currentEpisode, null, listOf(podcastEpisode, userEpisode)))
+            changes.tryEmit(UpNextQueue.State.Loaded(currentEpisode, null, listOf(podcastEpisode, userEpisode)))
 
             assertEquals(TvUpNextUiState.Loaded(listOf(podcastEpisode)), awaitItem())
         }
@@ -94,7 +98,7 @@ class TvUpNextViewModelTest {
         viewModel.uiState.test {
             assertEquals(TvUpNextUiState.Loading, awaitItem())
 
-            changes.onNext(UpNextQueue.State.Loaded(currentEpisode, null, listOf(userEpisode)))
+            changes.tryEmit(UpNextQueue.State.Loaded(currentEpisode, null, listOf(userEpisode)))
 
             assertEquals(TvUpNextUiState.Empty, awaitItem())
         }
@@ -108,7 +112,7 @@ class TvUpNextViewModelTest {
         viewModel.uiState.test {
             assertEquals(TvUpNextUiState.Loading, awaitItem())
 
-            changes.onNext(UpNextQueue.State.Loaded(currentEpisode, null, listOf(queued)))
+            changes.tryEmit(UpNextQueue.State.Loaded(currentEpisode, null, listOf(queued)))
 
             val loaded = awaitItem() as TvUpNextUiState.Loaded
             assertFalse(loaded.episodes.contains(currentEpisode))
@@ -124,10 +128,10 @@ class TvUpNextViewModelTest {
         viewModel.uiState.test {
             assertEquals(TvUpNextUiState.Loading, awaitItem())
 
-            changes.onNext(UpNextQueue.State.Loaded(currentEpisode, null, listOf(queued)))
+            changes.tryEmit(UpNextQueue.State.Loaded(currentEpisode, null, listOf(queued)))
             assertEquals(TvUpNextUiState.Loaded(listOf(queued)), awaitItem())
 
-            changes.onNext(UpNextQueue.State.Empty)
+            changes.tryEmit(UpNextQueue.State.Empty)
             assertEquals(TvUpNextUiState.Empty, awaitItem())
         }
     }

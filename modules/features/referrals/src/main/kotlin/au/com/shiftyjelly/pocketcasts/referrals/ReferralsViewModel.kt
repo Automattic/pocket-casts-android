@@ -15,9 +15,6 @@ import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.ReferralPassBannerHideTappedEvent
 import com.automattic.eventhorizon.ReferralPassBannerShownEvent
-import com.automattic.eventhorizon.ReferralTooltipShownEvent
-import com.automattic.eventhorizon.ReferralTooltipTappedEvent
-import com.google.android.material.bottomsheet.BottomSheetBehavior
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
@@ -58,45 +55,13 @@ class ReferralsViewModel @Inject constructor(
     private fun observeLoadedUiStates(referralPlan: ReferralSubscriptionPlan): Flow<UiState> {
         return combine(
             userManager.getSignInState().asFlow(),
-            settings.playerOrUpNextBottomSheetState,
-            settings.showReferralsTooltip.flow,
-        ) { signInState, playerBottomSheetState, showReferralsTooltip ->
-            val canClaimReferral = signInState.isNoAccountOrFree && settings.referralClaimCode.value.isNotEmpty()
-            val canSendReferral = signInState.isSignedInAsPlusOrPatron
+            settings.referralClaimCode.flow,
+        ) { signInState, claimCode ->
             UiState.Loaded(
                 referralPlan = referralPlan,
-                showIcon = canSendReferral,
-                showTooltip = if (playerBottomSheetState == BottomSheetBehavior.STATE_COLLAPSED) {
-                    canSendReferral && showReferralsTooltip
-                } else {
-                    false
-                },
-                showProfileBanner = canClaimReferral,
+                showIcon = signInState.isSignedInAsPlusOrPatron,
+                showProfileBanner = signInState.isNoAccountOrFree && claimCode.isNotEmpty(),
             )
-        }
-    }
-
-    fun onIconClick() {
-        hideTooltip()
-    }
-
-    fun onTooltipClick() {
-        hideTooltip()
-        eventHorizon.track(ReferralTooltipTappedEvent)
-    }
-
-    private fun hideTooltip() {
-        if (settings.showReferralsTooltip.value) {
-            settings.showReferralsTooltip.set(false, updateModifiedAt = false)
-        }
-        (_state.value as? UiState.Loaded)?.let { loadedState ->
-            _state.update { loadedState.copy(showTooltip = false) }
-        }
-    }
-
-    fun onTooltipShown() {
-        if ((_state.value as? UiState.Loaded)?.showTooltip == true) {
-            eventHorizon.track(ReferralTooltipShownEvent)
         }
     }
 
@@ -127,7 +92,6 @@ class ReferralsViewModel @Inject constructor(
         data class Loaded(
             val referralPlan: ReferralSubscriptionPlan,
             val showIcon: Boolean = false,
-            val showTooltip: Boolean = false,
             val showProfileBanner: Boolean = false,
             val showHideBannerPopup: Boolean = false,
         ) : UiState()

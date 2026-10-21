@@ -7,7 +7,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.SuggestedFolder
 import au.com.shiftyjelly.pocketcasts.servers.discover.EpisodeSearch
 import au.com.shiftyjelly.pocketcasts.servers.sync.bookmark.BookmarkEnrichRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.bookmark.BookmarkEnrichResponse
-import io.reactivex.Single
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -22,9 +21,8 @@ class PodcastCacheServiceManagerImpl @Inject constructor(
         return service.getPodcastAndEpisodesRaw(podcastUuid)
     }
 
-    override fun getPodcast(podcastUuid: String): Single<Podcast> {
-        return service.getPodcastAndEpisodes(podcastUuid)
-            .map(PodcastResponse::toPodcast)
+    override suspend fun getPodcast(podcastUuid: String): Podcast = withContext(Dispatchers.IO) {
+        service.getPodcastAndEpisodes(podcastUuid).toPodcast()
     }
 
     override suspend fun getPodcastAndEpisode(podcastUuid: String, episodeUuid: String): Podcast {

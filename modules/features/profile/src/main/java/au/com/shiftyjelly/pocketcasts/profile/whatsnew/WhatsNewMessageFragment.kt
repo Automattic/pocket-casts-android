@@ -6,13 +6,18 @@ import android.view.ViewGroup
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalDensity
+import androidx.core.net.toUri
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.profile.whatsnew.WhatsNewMessageViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.settings.SettingsFragment
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
+import au.com.shiftyjelly.pocketcasts.views.activity.WebViewActivity
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
@@ -47,23 +52,49 @@ class WhatsNewMessageFragment : BaseFragment() {
                 is UiState.Loaded -> WhatsNewMessagePage(
                     message = uiState.message,
                     pages = uiState.pages,
+                    poll = uiState.poll,
                     bottomInset = bottomInset,
                     onBackPress = ::close,
                     onActionClick = ::perform,
+                    onOptionClick = viewModel::onOptionClick,
+                    onSubmitClick = viewModel::onSubmitClick,
                 )
             }
         }
     }
 
-    private fun perform(event: WhatsNewActionEvent) {
+    private fun perform(action: WhatsNewMessageViewModel.Action) {
         val host = activity as? FragmentHostListener ?: return
-        when (event) {
+        viewModel.onActionClick(action.event)
+        when (action.event) {
             WhatsNewActionEvent.OpenPodcasts -> host.openTab(VR.id.navigation_podcasts)
+
             WhatsNewActionEvent.OpenDiscover -> host.openTab(VR.id.navigation_discover)
+
             WhatsNewActionEvent.OpenUpNext -> host.openTab(VR.id.navigation_upnext)
+
             WhatsNewActionEvent.OpenPlaylists -> host.openTab(VR.id.navigation_filters)
+
             WhatsNewActionEvent.OpenProfile -> host.closeProfileToRoot()
+
             WhatsNewActionEvent.OpenSettings -> host.addFragment(SettingsFragment())
+
+            WhatsNewActionEvent.OpenUpsell -> OnboardingLauncher.openOnboardingFlow(
+                requireActivity(),
+                OnboardingFlow.Upsell(OnboardingUpgradeSource.WHATS_NEW),
+            )
+
+            WhatsNewActionEvent.CreatePlaylist -> host.openCreatePlaylist()
+
+            WhatsNewActionEvent.OpenLink -> action.url?.let { url -> openLink(host, url) }
+
+            WhatsNewActionEvent.OpenNetworks -> host.openNetworks()
+        }
+    }
+
+    private fun openLink(host: FragmentHostListener, url: String) {
+        if (!host.openInAppDeepLink(url)) {
+            WebViewActivity.show(context, url.toUri().host.orEmpty(), url)
         }
     }
 

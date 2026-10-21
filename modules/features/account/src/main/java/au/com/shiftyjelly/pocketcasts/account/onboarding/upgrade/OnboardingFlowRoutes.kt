@@ -78,6 +78,7 @@ object OnboardingFlowRoutes {
 
         is OnboardingFlow.LoggedOut,
         is OnboardingFlow.DeviceApproval,
+        is OnboardingFlow.EpisodeChatSignIn,
         -> ROUTE_SIGN_UP
 
         // Cannot use OnboardingNavRoute.PlusUpgrade.routeWithSource here, it is set as a defaultValue in the PlusUpgrade composable,
@@ -130,6 +131,7 @@ object OnboardingFlowRoutes {
                         is OnboardingFlow.InitialOnboarding,
                         is OnboardingFlow.LoggedOut,
                         is OnboardingFlow.DeviceApproval,
+                        is OnboardingFlow.EpisodeChatSignIn,
                         is OnboardingFlow.EngageSdk,
                         is OnboardingFlow.ReferralLoginOrSignUp,
                         -> exitOnboarding(OnboardingExitInfo.Simple)
@@ -308,6 +310,7 @@ object OnboardingFlowRoutes {
                         is OnboardingFlow.AccountEncouragement,
                         is OnboardingFlow.EngageSdk,
                         is OnboardingFlow.DeviceApproval,
+                        is OnboardingFlow.EpisodeChatSignIn,
                         is OnboardingFlow.InitialOnboarding,
                         is OnboardingFlow.LoggedOut,
                         is OnboardingFlow.PlusAccountUpgradeNeedsLogin,
@@ -352,10 +355,10 @@ object OnboardingFlowRoutes {
                 OnboardingUpgradeSource.UP_NEXT_SHUFFLE,
                 OnboardingUpgradeSource.GENERATED_TRANSCRIPTS,
                 OnboardingUpgradeSource.EPISODE_CHAT,
-                OnboardingUpgradeSource.AI_SUMMARIES,
                 OnboardingUpgradeSource.DEEP_LINK,
                 OnboardingUpgradeSource.FINISHED_ONBOARDING,
                 OnboardingUpgradeSource.SYNCED_TRANSCRIPTS,
+                OnboardingUpgradeSource.WHATS_NEW,
                 OnboardingUpgradeSource.UNKNOWN,
                 -> false
 

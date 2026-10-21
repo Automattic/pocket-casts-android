@@ -10,14 +10,12 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.ExplicitIcon
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
@@ -28,8 +26,6 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.to.ImprovedSearchResultItem
 import au.com.shiftyjelly.pocketcasts.models.to.SearchAutoCompleteItem
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 @Composable
@@ -81,10 +77,6 @@ private fun ImprovedSearchPodcastResultRow(
     onFollow: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val showExplicitIndicator by FeatureFlag
-        .isEnabledFlow(Feature.EXPLICIT_PODCAST_INDICATOR)
-        .collectAsStateWithLifecycle()
-
     Row(
         modifier = modifier
             .clickable(onClick = onClick)
@@ -100,7 +92,7 @@ private fun ImprovedSearchPodcastResultRow(
         Column(modifier = Modifier.weight(1f)) {
             PodcastResultTitle(
                 title = title,
-                isExplicit = isExplicit && showExplicitIndicator,
+                isExplicit = isExplicit,
             )
             TextP50(
                 text = author,

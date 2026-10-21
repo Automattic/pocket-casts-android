@@ -292,7 +292,6 @@ Language: el_GR
     <string name="referrals_invalid_offer_description">Αυτό το πάσο επισκέπτ μπορεί να εξαργυρωθεί μόνο μία φορά και είναι διαθέσιμη για όσους δεν έχουν ενεργή συνδρομή Plus ή Patron. Ευχαριστούμε που μας ακούς!</string>
     <string name="referrals_activate_my_pass">Ενεργοποίησε το πάσο μου</string>
     <string name="referrals_claim_guest_pass_title">Διεκδίκησε το %1$s Πάσο Επισκέπτη σου</string>
-    <string name="referrals_tooltip_message">Χάρισε %1$s Pocket Casts Plus!</string>
     <string name="referrals_claim_guess_pass_banner_card_subtitle">Ξεκλείδωσε την πλήρη εμπειρία ακρόασης</string>
     <string name="referrals_claim_guess_pass_banner_card_title">Διεκδίκησε το Πάσο Επισκέπτη %1$s για το Plus</string>
     <string name="referrals_share_guest_pass">Κοινοποίηση Guest Pass</string>

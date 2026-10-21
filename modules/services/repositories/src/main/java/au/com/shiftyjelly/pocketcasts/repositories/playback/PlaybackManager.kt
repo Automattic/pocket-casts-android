@@ -69,6 +69,7 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.EpisodeSyncResponse
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.utils.extensions.getLaunchIntent
 import au.com.shiftyjelly.pocketcasts.utils.extensions.isPositive
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
@@ -131,6 +132,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -201,7 +203,7 @@ open class PlaybackManager @Inject constructor(
         mainThreadContext = Dispatchers.Main,
     )
 
-    private var audioNoisyManager = AudioNoisyManager(application)
+    private var audioNoisyManager = AudioNoisyManager(application, pausesOnHdmiDisconnect = Util.isTv(application))
 
     private val bookmarkTonePlayer: MediaPlayer by lazy {
         MediaPlayer().apply {
@@ -859,6 +861,9 @@ open class PlaybackManager @Inject constructor(
         SourceView.PODCAST_SCREEN,
         SourceView.STARRED,
         SourceView.MEDIA_BUTTON_BROADCAST_ACTION,
+        // Car commands used to be reported as MEDIA_BUTTON_BROADCAST_ACTION, so they keep its behavior.
+        SourceView.ANDROID_AUTO,
+        SourceView.AUTOMOTIVE,
         -> settings.trackingAutoPlaySource.value
     }
 
@@ -882,6 +887,7 @@ open class PlaybackManager @Inject constructor(
         source: SourceView,
         userInitiated: Boolean = true,
     ) = withContext(Dispatchers.Default) {
+        if (upNextQueue.isCurrentEpisode(episode)) return@withContext
         val wasEmpty: Boolean = upNextQueue.isEmpty
         upNextQueue.playNextBlocking(episode, onAdd = null, isUserInitiated = userInitiated)
         if (userInitiated) {
@@ -904,6 +910,7 @@ open class PlaybackManager @Inject constructor(
         source: SourceView,
         userInitiated: Boolean = true,
     ) {
+        if (upNextQueue.isCurrentEpisode(episode)) return
         val wasEmpty: Boolean = upNextQueue.isEmpty
         upNextQueue.playLast(episode, onAdd = null, isUserInitiated = userInitiated)
         if (userInitiated) {
@@ -2083,6 +2090,12 @@ open class PlaybackManager @Inject constructor(
         focusWasPlaying = null
     }
 
+    override fun onHdmiAudioDisconnected() {
+        if (isPlaying()) {
+            onAudioBecomingNoisy()
+        }
+    }
+
     /**
      * Check the player is initialised and if we are using the correct player either the system or cast player.
      */
@@ -2268,7 +2281,10 @@ open class PlaybackManager @Inject constructor(
                     }
 
                     is UserEpisode -> {
-                        userEpisodeManager.episodeRxFlowable(episode.uuid).cast(BaseEpisode::class.java)
+                        userEpisodeManager.episodeFlow(episode.uuid)
+                            .filterNotNull()
+                            .asFlowable()
+                            .cast(BaseEpisode::class.java)
                     }
                 }
                 episodeSubscription = episodeObservable
@@ -2408,7 +2424,7 @@ open class PlaybackManager @Inject constructor(
     private fun sendDataWarningNotification(episode: BaseEpisode) {
         val manager = NotificationManagerCompat.from(application)
 
-        val intent = application.packageManager.getLaunchIntentForPackage(application.packageName)?.apply {
+        val intent = application.getLaunchIntent()?.apply {
             flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
         }
         val pendingIntent = if (Util.getAppPlatform(application) == AppPlatform.Phone && intent != null) {

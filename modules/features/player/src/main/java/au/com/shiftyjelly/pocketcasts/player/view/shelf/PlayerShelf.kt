@@ -4,6 +4,7 @@ import android.view.View
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -12,18 +13,23 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.map
@@ -156,9 +162,17 @@ fun PlayerShelf(
                 source = ShelfItemSource.Shelf,
             )
         },
+        onEpisodeChatClick = {
+            val podcast = playerViewModel.podcast ?: return@PlayerShelfContent
+            val episode = playerViewModel.episode as? PodcastEpisode ?: return@PlayerShelfContent
+            shelfSharedViewModel.onEpisodeChatClick(podcast, episode, shelfItemsState.isTranscriptAvailable, ShelfItemSource.Shelf)
+        },
         showBookmarkTooltip = shelfItemsState.showBookmarkTooltip,
         showBookmarkOverflowTooltip = shelfItemsState.showBookmarkOverflowTooltip,
         onBookmarkTooltipDismiss = { shelfSharedViewModel.dismissBookmarkTooltip() },
+        showEpisodeChatTooltip = shelfItemsState.showEpisodeChatTooltip,
+        onEpisodeChatTooltipShow = { shelfSharedViewModel.onEpisodeChatTooltipShown() },
+        onEpisodeChatTooltipClick = { shelfSharedViewModel.onEpisodeChatTooltipTapped() },
         modifier = modifier,
     )
 }
@@ -182,11 +196,15 @@ private fun PlayerShelfContent(
     onTranscriptClick: (Boolean) -> Unit,
     onVideoToggleClick: () -> Unit,
     onAddToPlaylistClick: () -> Unit,
+    onEpisodeChatClick: () -> Unit,
     onMoreClick: () -> Unit,
     modifier: Modifier = Modifier,
     showBookmarkTooltip: Boolean = false,
     showBookmarkOverflowTooltip: Boolean = false,
     onBookmarkTooltipDismiss: () -> Unit = {},
+    showEpisodeChatTooltip: Boolean = false,
+    onEpisodeChatTooltipShow: () -> Unit = {},
+    onEpisodeChatTooltipClick: () -> Unit = {},
     playerColors: PlayerColors = MaterialTheme.theme.rememberPlayerColorsOrDefault(),
 ) {
     Row(
@@ -287,6 +305,12 @@ private fun PlayerShelfContent(
                     playerColors = playerColors,
                     onClick = onVideoToggleClick,
                 )
+
+                ShelfItem.EpisodeChat -> EpisodeChatButton(
+                    isTranscriptAvailable = isTranscriptAvailable,
+                    playerColors = playerColors,
+                    onClick = onEpisodeChatClick,
+                )
             }
         }
         Box {
@@ -304,6 +328,24 @@ private fun PlayerShelfContent(
                     clickableElevationPadding = true,
                     onClick = onBookmarkTooltipDismiss,
                 )
+            }
+            if (showEpisodeChatTooltip) {
+                val currentOnEpisodeChatTooltipShow by rememberUpdatedState(onEpisodeChatTooltipShow)
+                LaunchedEffect(Unit) { currentOnEpisodeChatTooltipShow() }
+                AppTheme(Theme.ThemeType.LIGHT) {
+                    TooltipPopup(
+                        title = stringResource(LR.string.episode_chat_shelf_title),
+                        body = stringResource(LR.string.episode_chat_tooltip_body),
+                        tipPosition = TipPosition.BottomEnd,
+                        maxWidth = 300.dp,
+                        anchorOffset = DpOffset(0.dp, (-4).dp),
+                        clickableElevationPadding = true,
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
+                        titleStyle = TextStyle(fontSize = 15.sp, lineHeight = 20.sp, fontWeight = FontWeight.SemiBold),
+                        bodyStyle = TextStyle(fontSize = 15.sp, lineHeight = 20.sp),
+                        onClick = onEpisodeChatTooltipClick,
+                    )
+                }
             }
         }
     }
@@ -482,6 +524,23 @@ private fun AddToPlaylistButton(
 }
 
 @Composable
+private fun EpisodeChatButton(
+    isTranscriptAvailable: Boolean,
+    playerColors: PlayerColors,
+    onClick: () -> Unit,
+) {
+    val alpha = if (isTranscriptAvailable) 1f else 0.4f
+    IconButton(onClick = onClick) {
+        Icon(
+            painterResource(id = IR.drawable.ic_episode_chat),
+            contentDescription = stringResource(LR.string.episode_chat_shelf_title),
+            tint = playerColors.contrast03,
+            modifier = Modifier.alpha(alpha),
+        )
+    }
+}
+
+@Composable
 private fun BookmarkButton(
     playerColors: PlayerColors,
     onClick: () -> Unit,
@@ -576,6 +635,7 @@ private fun PlayerShelfPreview(
             onTranscriptClick = {},
             onVideoToggleClick = {},
             onAddToPlaylistClick = {},
+            onEpisodeChatClick = {},
             onMoreClick = {},
         )
     }

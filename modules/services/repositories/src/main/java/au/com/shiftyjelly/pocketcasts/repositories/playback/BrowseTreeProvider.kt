@@ -69,14 +69,15 @@ class BrowseTreeProvider @Inject constructor(
     private val listRepository: ListRepository,
 ) {
 
-    fun getRootId(isRecent: Boolean, isSuggested: Boolean, hasCurrentEpisode: Boolean): String? {
+    fun getRootId(isRecent: Boolean, isSuggested: Boolean, hasCurrentEpisode: Boolean, isAutomotive: Boolean): String? {
         return when {
             isRecent -> {
                 Timber.d("Browser root hint for recent items")
                 if (hasCurrentEpisode) RECENT_ROOT else null
             }
 
-            isSuggested -> {
+            // Only Automotive gets suggestions, as Android Auto sends this hint when browsing, hiding the library
+            isSuggested && isAutomotive -> {
                 Timber.d("Browser root hint for suggested items")
                 SUGGESTED_ROOT
             }

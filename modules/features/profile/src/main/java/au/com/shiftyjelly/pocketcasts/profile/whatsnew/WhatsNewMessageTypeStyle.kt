@@ -1,6 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.profile.whatsnew
 
+import androidx.compose.material.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewMessageType
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -16,18 +21,32 @@ internal val WhatsNewMessageType.labelId
 
 internal val WhatsNewMessageType.iconId
     get() = when (this) {
-        WhatsNewMessageType.NewFeature -> IR.drawable.ic_filters_list
-        WhatsNewMessageType.Tip -> IR.drawable.ic_sort
-        WhatsNewMessageType.Announcement -> IR.drawable.ic_heart
-        WhatsNewMessageType.KnownIssue -> IR.drawable.ic_warning
-        WhatsNewMessageType.Research -> IR.drawable.ic_whats_new_research
+        WhatsNewMessageType.NewFeature -> IR.drawable.ic_whats_new_new_feature
+        WhatsNewMessageType.Tip -> IR.drawable.ic_whats_new_tip
+        WhatsNewMessageType.Announcement -> IR.drawable.ic_whats_new_announcement
+        WhatsNewMessageType.KnownIssue -> IR.drawable.ic_whats_new_known_issue
+        WhatsNewMessageType.Research -> IR.drawable.ic_transcript_24
     }
 
-internal val WhatsNewMessageType.gradient
+internal val WhatsNewMessageType.iconSize
     get() = when (this) {
-        WhatsNewMessageType.NewFeature -> listOf(Color(0xFFF43769), Color(0xFFFB5246))
-        WhatsNewMessageType.Tip -> listOf(Color(0xFF03A9F4), Color(0xFF50D0F1))
-        WhatsNewMessageType.Announcement -> listOf(Color(0xFFC9522E), Color(0xFFB82E3C))
-        WhatsNewMessageType.KnownIssue -> listOf(Color(0xFFFF9D3B), Color(0xFFEB6F4F))
-        WhatsNewMessageType.Research -> listOf(Color(0xFF6B59C7), Color(0xFFBC4E7B))
+        WhatsNewMessageType.NewFeature,
+        WhatsNewMessageType.Tip,
+        WhatsNewMessageType.Announcement,
+        WhatsNewMessageType.Research,
+        -> 24.dp
+
+        WhatsNewMessageType.KnownIssue -> 28.dp
+    }
+
+internal val WhatsNewMessageType.gradient: Brush
+    @Composable get() {
+        val colors = MaterialTheme.theme.colors
+        return when (this) {
+            WhatsNewMessageType.NewFeature -> Brush.horizontalGradient(listOf(colors.gradient05A, colors.gradient05E))
+            WhatsNewMessageType.Tip -> Brush.linearGradient(listOf(colors.gradient03A, colors.gradient03E))
+            WhatsNewMessageType.Announcement -> Brush.linearGradient(listOf(colors.gradient02A, colors.gradient02E))
+            WhatsNewMessageType.KnownIssue -> Brush.linearGradient(listOf(Color(0xFFFD993D), Color(0xFFED754C)))
+            WhatsNewMessageType.Research -> Brush.linearGradient(listOf(colors.gradient04A, colors.gradient04E))
+        }
     }

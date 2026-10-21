@@ -5,7 +5,7 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.min
 
 internal object WhatsNewImageLayout {
-    private const val HEIGHT_FRACTION = 0.52f
+    private const val HEIGHT_FRACTION = 0.63f
 
     fun maximumHeight(pageHeight: Dp) = pageHeight * HEIGHT_FRACTION
 

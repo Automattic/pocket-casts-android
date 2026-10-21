@@ -6,6 +6,7 @@ import java.time.Instant
 import java.time.OffsetDateTime
 import java.time.format.DateTimeParseException
 import java.util.Date
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import timber.log.Timber
 
 @JsonClass(generateAdapter = true)
@@ -97,7 +98,13 @@ data class WhatsNewPageResponse(
         val heading = heading.nonBlank() ?: return null
         val description = description.nonBlank() ?: return null
         val image = image?.let { it.toImage() ?: return null }
-        val action = action?.let { it.toAction() ?: return null }
+        val action = action?.let { response ->
+            response.toAction().also { action ->
+                if (action == null) {
+                    Timber.i("What's New: dropping an action this version can't perform: $response")
+                }
+            }
+        }
 
         return WhatsNewPage(image = image, heading = heading, description = description, action = action)
     }
@@ -118,15 +125,27 @@ data class WhatsNewImageResponse(
 
 @JsonClass(generateAdapter = true)
 data class WhatsNewActionResponse(
+    val type: String? = null,
     val event: String? = null,
+    val arguments: WhatsNewActionArgumentsResponse? = null,
     val label: String? = null,
 ) {
     fun toAction(): WhatsNewAction? {
-        val event = event.nonBlank() ?: return null
+        val type = (type ?: event).nonBlank() ?: return null
+        val url = if (type == WhatsNewAction.OPEN_LINK) {
+            arguments?.url.nonBlank()?.takeIf(::isSecureWebUrl) ?: return null
+        } else {
+            null
+        }
         val label = label.nonBlank() ?: return null
-        return WhatsNewAction(event = event, label = label)
+        return WhatsNewAction(type = type, label = label, url = url)
     }
 }
+
+@JsonClass(generateAdapter = true)
+data class WhatsNewActionArgumentsResponse(
+    val url: String? = null,
+)
 
 @JsonClass(generateAdapter = true)
 data class WhatsNewPollResponse(
@@ -160,6 +179,8 @@ data class WhatsNewPollOptionResponse(
 }
 
 private fun String?.nonBlank() = this?.trim()?.takeIf(String::isNotEmpty)
+
+private fun isSecureWebUrl(value: String) = value.toHttpUrlOrNull()?.scheme == "https"
 
 private fun parseInstantOrNull(value: String) = try {
     OffsetDateTime.parse(value).toInstant()

@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.models.db.dao.PlaylistDao
 import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatManager
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearSync
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationScheduler
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationSchedulerImpl.Companion.TAG_TRENDING_RECOMMENDATIONS
@@ -26,11 +27,13 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
+import au.com.shiftyjelly.pocketcasts.repositories.whatsnew.WhatsNewManager
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.android.tracks.crashlogging.CrashLogging
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.UserSignedOutEvent
+import dagger.Lazy
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
@@ -84,6 +87,8 @@ class UserManagerImpl @Inject constructor(
     private val experimentProvider: ExperimentProvider,
     private val endOfYearSync: EndOfYearSync,
     private val notificationScheduler: NotificationScheduler,
+    private val whatsNewManager: Lazy<WhatsNewManager>,
+    private val chatManager: Lazy<ChatManager>,
 ) : UserManager,
     CoroutineScope {
 
@@ -176,7 +181,13 @@ class UserManagerImpl @Inject constructor(
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Signing out")
             signOutJob = applicationScope.launch {
                 syncManager.signOut {
+                    whatsNewManager.get().forgetReadMessages()
+                    settings.showWhatsNewDot.reset()
                     settings.clearPlusPreferences()
+                    if (wasInitiatedByUser) {
+                        runCatching { chatManager.get().deleteAllChats() }
+                            .onFailure { LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, it, "Failed to delete episode chats on sign out") }
+                    }
 
                     userEpisodeManager.removeCloudStatusFromFiles(playbackManager)
 

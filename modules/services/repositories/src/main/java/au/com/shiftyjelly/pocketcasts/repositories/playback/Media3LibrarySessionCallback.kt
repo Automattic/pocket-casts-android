@@ -69,14 +69,16 @@ internal class Media3LibrarySessionCallback(
         }
         if (!controller.packageName.contains("au.com.shiftyjelly.pocketcasts")) {
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Client: ${controller.packageName} connected to media session")
-            val context = contextProvider()
-            if (Util.isAutomotive(context) && !settings.automotiveConnectedToMediaSession()) {
-                scope.launch {
-                    try {
-                        delay(1000)
-                        settings.setAutomotiveConnectedToMediaSession(true)
-                    } catch (e: Exception) {
-                        Timber.e(e, "Failed to set automotive connected flag")
+            if (Util.isAutomotive(contextProvider())) {
+                podcastManager.refreshPodcastsIfRequired(fromLog = "Automotive connect")
+                if (!settings.automotiveConnectedToMediaSession()) {
+                    scope.launch {
+                        try {
+                            delay(1000)
+                            settings.setAutomotiveConnectedToMediaSession(true)
+                        } catch (e: Exception) {
+                            Timber.e(e, "Failed to set automotive connected flag")
+                        }
                     }
                 }
             }
@@ -126,6 +128,7 @@ internal class Media3LibrarySessionCallback(
         val context = contextProvider()
         if (Util.isAutomotive(context)) {
             settings.setAutomotiveConnectedToMediaSession(true)
+            podcastManager.refreshPodcastsIfRequired(fromLog = "Automotive resumption")
         }
         scope.launch {
             try {
@@ -163,6 +166,7 @@ internal class Media3LibrarySessionCallback(
             isRecent = isRecent,
             isSuggested = isSuggested,
             hasCurrentEpisode = playbackManager.getCurrentEpisode() != null,
+            isAutomotive = Util.isAutomotive(contextProvider()),
         ) ?: return Futures.immediateFuture(
             LibraryResult.ofError(SessionError.ERROR_BAD_VALUE),
         )
@@ -210,6 +214,21 @@ internal class Media3LibrarySessionCallback(
             }
         }
         return future
+    }
+
+    override fun onSubscribe(
+        session: MediaLibraryService.MediaLibrarySession,
+        browser: MediaSession.ControllerInfo,
+        parentId: String,
+        params: MediaLibraryService.LibraryParams?,
+    ): ListenableFuture<LibraryResult<Void>> {
+        if (!Util.isAutomotive(contextProvider())) {
+            return super.onSubscribe(session, browser, parentId, params)
+        }
+        if (browser.controllerVersion != MediaSession.ControllerInfo.LEGACY_CONTROLLER_VERSION) {
+            session.notifyChildrenChanged(browser, parentId, Int.MAX_VALUE, params)
+        }
+        return Futures.immediateFuture(LibraryResult.ofVoid(params))
     }
 
     override fun onGetSearchResult(
