@@ -123,10 +123,19 @@ fun ChatScreen(
         uiState.messages.mapTo(HashSet()) { it.uuid }
     }
     var seenBeforeHistoryUuids by remember { mutableStateOf(emptySet<String>()) }
+    var pendingQuestionUuid by remember { mutableStateOf<String?>(null) }
     LaunchedEffect(uiState.isHistoryVisible) {
         if (uiState.isHistoryVisible) {
             val pendingQuestion = uiState.messages.lastOrNull()?.takeIf { uiState.isAwaitingReply && it is ChatMessage.User }
+            pendingQuestionUuid = pendingQuestion?.uuid
             seenBeforeHistoryUuids = seenBeforeHistoryUuids + uiState.messages.filter { it != pendingQuestion }.map { it.uuid }
+        }
+    }
+    LaunchedEffect(pendingQuestionUuid, uiState.isAwaitingReply) {
+        val uuid = pendingQuestionUuid
+        if (uuid != null && !uiState.isAwaitingReply) {
+            seenBeforeHistoryUuids = seenBeforeHistoryUuids + uuid
+            pendingQuestionUuid = null
         }
     }
     val initialMessageUuids = remember(loadedMessageUuids, uiState.restoredMessageUuids, seenBeforeHistoryUuids) {
