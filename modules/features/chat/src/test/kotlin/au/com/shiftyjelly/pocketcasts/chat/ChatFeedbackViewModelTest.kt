@@ -343,6 +343,8 @@ class ChatFeedbackViewModelTest {
 
         override fun observeHistory(): Flow<List<EpisodeChatHistoryItem>> = flowOf(emptyList())
 
+        override suspend fun hasChatWithMessages(episodeUuid: String) = false
+
         override suspend fun discardMessage(uuid: String) = Unit
 
         override suspend fun createChat(episodeUuid: String, podcastUuid: String) = Unit

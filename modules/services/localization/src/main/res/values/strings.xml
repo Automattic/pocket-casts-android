@@ -2590,6 +2590,7 @@
     <string name="chat_clear">Clear chat</string>
     <string name="chat_offline_note">You’re offline. Connect to ask a question.</string>
     <string name="chat_play_quote">Play quote</string>
+    <string name="chat_quote_finding_moment">Finding the moment…</string>
 
     <!--    Tasker Plugin-->
     <string name="must_provide_filter_name">Must provide playlist name</string>

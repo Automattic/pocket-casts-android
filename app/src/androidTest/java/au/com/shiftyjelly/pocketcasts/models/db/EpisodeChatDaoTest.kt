@@ -18,7 +18,9 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -160,6 +162,37 @@ class EpisodeChatDaoTest {
             ),
             episodeChatDao.observeChatHistory().first(),
         )
+    }
+
+    @Test
+    fun testHasChatWithMessagesWhenTheChatHasMessages() = runTest {
+        insertChat()
+        episodeChatDao.insertMessage(createMessage(uuid = "message-uuid", text = "Message"))
+
+        assertTrue(episodeChatDao.hasChatWithMessages(EPISODE_UUID))
+    }
+
+    @Test
+    fun testHasNoChatWithMessagesWhenTheChatIsEmpty() = runTest {
+        insertChat()
+
+        assertFalse(episodeChatDao.hasChatWithMessages(EPISODE_UUID))
+    }
+
+    @Test
+    fun testHasNoChatWithMessagesWithoutAChat() = runTest {
+        insertEpisode()
+
+        assertFalse(episodeChatDao.hasChatWithMessages(EPISODE_UUID))
+    }
+
+    @Test
+    fun testHasNoChatWithMessagesWhenOnlyAnotherEpisodeHasMessages() = runTest {
+        insertChat(EPISODE_UUID)
+        insertChat("other-episode-uuid")
+        episodeChatDao.insertMessage(createMessage(uuid = "other-uuid", episodeUuid = "other-episode-uuid", text = "Other"))
+
+        assertFalse(episodeChatDao.hasChatWithMessages(EPISODE_UUID))
     }
 
     private suspend fun insertChat(episodeUuid: String = EPISODE_UUID) {

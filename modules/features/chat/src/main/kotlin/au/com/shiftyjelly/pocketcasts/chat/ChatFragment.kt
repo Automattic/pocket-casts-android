@@ -251,13 +251,11 @@ class ChatFragment : BaseDialogFragment() {
         val dangerColor = requireContext().getThemeColor(UR.attr.support_05)
         val uiState = viewModel.uiState.value
         val dialog = OptionsDialog().setForceDarkTheme(args.sourceView == SourceView.PLAYER)
-        if (!uiState.isAwaitingReply) {
-            dialog.addTextOption(
-                titleId = LR.string.chat_history,
-                imageId = IR.drawable.ic_history,
-                click = viewModel::showHistory,
-            )
-        }
+        dialog.addTextOption(
+            titleId = LR.string.chat_history,
+            imageId = IR.drawable.ic_history,
+            click = viewModel::showHistory,
+        )
         if (uiState.messages.isNotEmpty() || uiState.isAwaitingReply) {
             dialog.addTextOption(
                 titleId = LR.string.chat_clear,

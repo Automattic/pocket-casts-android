@@ -42,6 +42,7 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -76,6 +77,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatAnswerRating
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatMessage
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filter
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -117,6 +119,28 @@ fun ChatScreen(
     BackHandler(enabled = uiState.isBetaSheetVisible) {
         onDismissBetaSheet()
     }
+    val loadedMessageUuids = remember(uiState.episodeUuid, uiState.areMessagesLoaded) {
+        uiState.messages.mapTo(HashSet()) { it.uuid }
+    }
+    var seenBeforeHistoryUuids by remember { mutableStateOf(emptySet<String>()) }
+    var pendingQuestionUuid by remember { mutableStateOf<String?>(null) }
+    LaunchedEffect(uiState.isHistoryVisible) {
+        if (uiState.isHistoryVisible) {
+            val pendingQuestion = uiState.messages.lastOrNull()?.takeIf { uiState.isAwaitingReply && it is ChatMessage.User }
+            pendingQuestionUuid = pendingQuestion?.uuid
+            seenBeforeHistoryUuids = seenBeforeHistoryUuids + uiState.messages.filter { it != pendingQuestion }.map { it.uuid }
+        }
+    }
+    LaunchedEffect(pendingQuestionUuid, uiState.isAwaitingReply) {
+        val uuid = pendingQuestionUuid
+        if (uuid != null && !uiState.isAwaitingReply) {
+            seenBeforeHistoryUuids = seenBeforeHistoryUuids + uuid
+            pendingQuestionUuid = null
+        }
+    }
+    val initialMessageUuids = remember(loadedMessageUuids, uiState.restoredMessageUuids, seenBeforeHistoryUuids) {
+        loadedMessageUuids + uiState.restoredMessageUuids + seenBeforeHistoryUuids
+    }
 
     ProvideTextStyle(LocalTextStyle.current.copy(letterSpacing = 0.sp)) {
         ModalBottomSheetLayout(
@@ -147,6 +171,7 @@ fun ChatScreen(
                 ProvideReduceMotion {
                     ChatContent(
                         uiState = uiState,
+                        initialMessageUuids = initialMessageUuids,
                         theme = theme,
                         onClickClose = onClickClose,
                         onClickMore = onClickMore,
@@ -168,6 +193,7 @@ fun ChatScreen(
 @Composable
 private fun ChatContent(
     uiState: ChatUiState,
+    initialMessageUuids: Set<String>,
     theme: ChatTheme,
     onClickClose: () -> Unit,
     onClickMore: () -> Unit,
@@ -184,15 +210,12 @@ private fun ChatContent(
     val scrollState = rememberScrollState()
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
-    val loadedMessageUuids = remember(uiState.areMessagesLoaded) { uiState.messages.mapTo(HashSet()) { it.uuid } }
-    val initialMessageUuids = remember(loadedMessageUuids, uiState.restoredMessageUuids) {
-        loadedMessageUuids + uiState.restoredMessageUuids
-    }
 
     val followThresholdPx = with(LocalDensity.current) { FollowNewestThreshold.roundToPx() }
-    var isFollowingNewest by remember { mutableStateOf(true) }
+    var isFollowingNewest by rememberSaveable { mutableStateOf(true) }
     LaunchedEffect(scrollState) {
         snapshotFlow { scrollState.isScrollInProgress }
+            .drop(1)
             .filter { inProgress -> !inProgress }
             .collect { isFollowingNewest = scrollState.maxValue - scrollState.value <= followThresholdPx }
     }
@@ -282,6 +305,7 @@ private fun ChatContent(
                                     quote = message.displayText,
                                     timestampLabel = message.timestampLabel,
                                     isPlayable = message.canPlay,
+                                    isLoading = message.uuid == uiState.loadingQuoteUuid,
                                     theme = theme,
                                     onClickPlay = { onPlayQuote(message.uuid) },
                                 )
@@ -351,7 +375,7 @@ private fun ChatContent(
             onSend = onSend,
             isConnected = uiState.isConnected,
             canSend = uiState.canSend,
-            showBetaNote = uiState.isBeta,
+            showBetaNote = uiState.isBetaNoteVisible,
             theme = theme,
         )
     }
@@ -530,7 +554,7 @@ private fun ChatScreenPreview(
                     podcastUuid = "preview-podcast-uuid",
                     podcastTitle = "Pocket Casts Weekly",
                     episodeDurationMs = 3_600_000,
-                    isBeta = true,
+                    isBetaNoteVisible = true,
                     areMessagesLoaded = true,
                     messages = listOf(
                         ChatMessage.User(
@@ -545,7 +569,15 @@ private fun ChatScreenPreview(
                             end = "12:18",
                             canPlay = true,
                         ),
+                        ChatMessage.Quote(
+                            text = "Discovery works best when it feels like a friend's recommendation.",
+                            start = "24:30",
+                            end = "24:41",
+                            canPlay = true,
+                            uuid = "preview-loading-quote",
+                        ),
                     ),
+                    loadingQuoteUuid = "preview-loading-quote",
                 ),
                 onClickClose = {},
                 onClickMore = {},
@@ -579,7 +611,7 @@ private fun ChatScreenEmptyPreview(
                     episodeTitle = "The future of podcast discovery",
                     podcastUuid = "preview-podcast-uuid",
                     podcastTitle = "Pocket Casts Weekly",
-                    isBeta = true,
+                    isBetaNoteVisible = true,
                     areMessagesLoaded = true,
                 ),
                 onClickClose = {},
@@ -614,7 +646,7 @@ private fun ChatScreenErrorPreview(
                     episodeTitle = "The future of podcast discovery",
                     podcastUuid = "preview-podcast-uuid",
                     podcastTitle = "Pocket Casts Weekly",
-                    isBeta = true,
+                    isBetaNoteVisible = true,
                     areMessagesLoaded = true,
                     error = error,
                     messages = listOf(
