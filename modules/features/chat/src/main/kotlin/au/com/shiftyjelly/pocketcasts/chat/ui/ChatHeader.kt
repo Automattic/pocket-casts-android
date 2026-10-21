@@ -141,7 +141,7 @@ internal fun ChatHeader(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(2.dp)
-                .background(theme.inputHint),
+                .background(theme.progressTrack),
         ) {
             Box(
                 modifier = Modifier
