@@ -17,6 +17,7 @@ internal class MediaEventQueue(
 ) {
     private var singleTapJob: SingleTapJob? = null
     private var multiTapWindowEndsAt = Long.MIN_VALUE
+    private var explicitPlayWindowEndsAt = Long.MIN_VALUE
     private val stateMutex = Mutex()
 
     private val scope: CoroutineScope get() = scopeProvider()
@@ -37,10 +38,19 @@ internal class MediaEventQueue(
     }
 
     suspend fun consumeExplicitPlay(onPlay: () -> Boolean): MediaEvent? {
-        if (stateMutex.withLock { isMultiTapWindowOpen }) {
-            return null
+        val isIgnored = stateMutex.withLock {
+            val now = elapsedRealtime()
+            val isWindowOpen = isMultiTapWindowOpen || now <= explicitPlayWindowEndsAt
+            if (!isWindowOpen) {
+                explicitPlayWindowEndsAt = now + SINGLE_TAP_WINDOW_MS
+            }
+            isWindowOpen
         }
-        return if (onPlay()) null else handleSingleTapEvent(onImmediateSingleTap = null)
+        return when {
+            isIgnored -> null
+            onPlay() -> null
+            else -> MediaEvent.SingleTap
+        }
     }
 
     private suspend fun handleSingleTapEvent(onImmediateSingleTap: (() -> Boolean)?): MediaEvent? {

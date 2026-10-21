@@ -38,7 +38,7 @@ class MediaButtonEventHandlerTest {
     }
 
     @Test
-    fun `rapid KEYCODE_MEDIA_PLAY events play each time without a multi tap`() = runTest {
+    fun `rapid KEYCODE_MEDIA_PLAY events play once without a multi tap`() = runTest {
         var immediatePlayCount = 0
         val events = mutableListOf<MediaEvent>()
         val handler = MediaButtonEventHandler(
@@ -52,7 +52,7 @@ class MediaButtonEventHandlerTest {
         handler.handle(keyEvent(KeyEvent.KEYCODE_MEDIA_PLAY))
         handler.handle(keyEvent(KeyEvent.KEYCODE_MEDIA_PLAY))
 
-        assertEquals(3, immediatePlayCount)
+        assertEquals(1, immediatePlayCount)
 
         advanceUntilIdle()
         assertEquals(emptyList<MediaEvent>(), events)
@@ -60,7 +60,7 @@ class MediaButtonEventHandlerTest {
 
     @Test
     fun `duplicate KEYCODE_MEDIA_PLAY presses inside the tap window do not resolve a multi tap`() = runTest {
-        for (gapMs in listOf(46L, 236L, 601L)) {
+        for (gapMs in listOf(46L, 236L, 600L)) {
             var immediatePlayCount = 0
             val events = mutableListOf<MediaEvent>()
             val handler = MediaButtonEventHandler(
@@ -75,7 +75,7 @@ class MediaButtonEventHandlerTest {
             assertTrue(handler.handle(keyEvent(KeyEvent.KEYCODE_MEDIA_PLAY)))
 
             advanceUntilIdle()
-            assertEquals(2, immediatePlayCount)
+            assertEquals(1, immediatePlayCount)
             assertEquals(emptyList<MediaEvent>(), events)
         }
     }
@@ -99,7 +99,7 @@ class MediaButtonEventHandlerTest {
     }
 
     @Test
-    fun `immediate play failures are reported and resolve through the tap window`() = runTest {
+    fun `immediate play failure is reported and resolves a single tap once`() = runTest {
         val failure = IllegalStateException("Immediate action failed")
         val errors = mutableListOf<Exception>()
         val events = mutableListOf<MediaEvent>()
@@ -115,8 +115,8 @@ class MediaButtonEventHandlerTest {
         assertTrue(handler.handle(keyEvent(KeyEvent.KEYCODE_MEDIA_PLAY)))
 
         advanceUntilIdle()
-        assertEquals(listOf(failure, failure), errors)
-        assertEquals(listOf(MediaEvent.DoubleTap), events)
+        assertEquals(listOf(failure), errors)
+        assertEquals(listOf(MediaEvent.SingleTap), events)
     }
 
     @Test

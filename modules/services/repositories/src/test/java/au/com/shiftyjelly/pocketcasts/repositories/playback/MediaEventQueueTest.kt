@@ -292,7 +292,7 @@ class MediaEventQueueTest {
     }
 
     @Test
-    fun `do not count explicit plays as taps`() = runTest {
+    fun `ignore a duplicate explicit play inside the tap window`() = runTest {
         val handler = MediaEventQueue(scopeProvider = { this }, elapsedRealtime = { testScheduler.currentTime })
         var playCount = 0
 
@@ -311,6 +311,24 @@ class MediaEventQueueTest {
         )
         assertEquals(MediaEvent.SingleTap, handler.consumeEvent(MediaEvent.SingleTap))
 
+        assertEquals(1, playCount)
+    }
+
+    @Test
+    fun `handle an explicit play again after the tap window`() = runTest {
+        val handler = MediaEventQueue(scopeProvider = { this }, elapsedRealtime = { testScheduler.currentTime })
+        var playCount = 0
+
+        handler.consumeExplicitPlay {
+            playCount++
+            true
+        }
+        delay(601)
+        handler.consumeExplicitPlay {
+            playCount++
+            true
+        }
+
         assertEquals(2, playCount)
     }
 
@@ -321,7 +339,7 @@ class MediaEventQueueTest {
         val firstEvent = async { handler.consumeEvent(MediaEvent.SingleTap) }
 
         yield()
-        assertNull(handler.consumeExplicitPlay { true })
+        assertEquals(MediaEvent.SingleTap, handler.consumeExplicitPlay { false })
 
         assertEquals(MediaEvent.SingleTap, firstEvent.await())
     }
@@ -347,5 +365,6 @@ class MediaEventQueueTest {
         val handler = MediaEventQueue(scopeProvider = { this }, elapsedRealtime = { testScheduler.currentTime })
 
         assertEquals(MediaEvent.SingleTap, handler.consumeExplicitPlay { false })
+        assertNull(handler.consumeExplicitPlay { false })
     }
 }

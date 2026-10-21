@@ -23,7 +23,6 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
-import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
@@ -132,7 +131,7 @@ class MediaSessionManagerCallbackTest {
     }
 
     @Test
-    fun `legacy rapid KEYCODE_MEDIA_PLAY plays without a multi tap action`() = runTest {
+    fun `legacy rapid KEYCODE_MEDIA_PLAY plays once without a multi tap action`() = runTest {
         val playbackManager = mock<PlaybackManager>()
         val episodeManager = mock<EpisodeManager>()
         val manager = createManager(this, playbackManager, episodeManager)
@@ -151,7 +150,7 @@ class MediaSessionManagerCallbackTest {
 
         advanceUntilIdle()
 
-        verify(playbackManager, times(3)).playIfNotPlaying(SourceView.MEDIA_BUTTON_BROADCAST_ACTION)
+        verify(playbackManager).playIfNotPlaying(SourceView.MEDIA_BUTTON_BROADCAST_ACTION)
         assertEquals(emptyList<String>(), queuedCommands)
         verify(playbackManager, never()).playPause(any())
     }
