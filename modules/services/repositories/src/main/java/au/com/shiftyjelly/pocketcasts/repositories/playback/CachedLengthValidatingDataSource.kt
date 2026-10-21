@@ -32,7 +32,7 @@ internal class CachedLengthValidatingDataSource(
         if (key == null || mediaBuildChanged || !FeatureFlag.isEnabled(Feature.VALIDATE_CACHED_MEDIA_LENGTH)) {
             return length
         }
-        val servedLength = servedDocumentSize()
+        val servedLength = servedDocumentSize(dataSpec)
         if (servedLength == C.LENGTH_UNSET.toLong()) {
             return length
         }
@@ -67,10 +67,14 @@ internal class CachedLengthValidatingDataSource(
         upstream.close()
     }
 
-    private fun servedDocumentSize(): Long {
+    private fun servedDocumentSize(dataSpec: DataSpec): Long {
         val contentRange = responseHeader("Content-Range")
         if (contentRange != null) {
             return HttpUtil.getDocumentSize(contentRange)
+        }
+        val isWholeDocument = dataSpec.position == 0L && dataSpec.length == C.LENGTH_UNSET.toLong()
+        if (!isWholeDocument) {
+            return C.LENGTH_UNSET.toLong()
         }
         return responseHeader("Content-Length")?.toLongOrNull() ?: C.LENGTH_UNSET.toLong()
     }
