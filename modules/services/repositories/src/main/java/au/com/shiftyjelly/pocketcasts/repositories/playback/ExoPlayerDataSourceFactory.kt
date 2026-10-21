@@ -59,13 +59,15 @@ class ExoPlayerDataSourceFactory @Inject constructor(
         OkHttpDataSource.Factory { request -> httpClient.get().newCall(request) },
     )
 
+    private val cacheUpstreamFactory = cache?.let { CachedLengthValidatingDataSource.Factory(defaultFactory, it) } ?: defaultFactory
+
     val cacheFactory get() = CacheDataSource.Factory()
-        .setUpstreamDataSourceFactory(defaultFactory)
+        .setUpstreamDataSourceFactory(cacheUpstreamFactory)
         .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
         .let { if (cache != null) it.setCache(cache) else it }
 
     val blockingCacheFactory get() = CacheDataSource.Factory()
-        .setUpstreamDataSourceFactory(defaultFactory)
+        .setUpstreamDataSourceFactory(cacheUpstreamFactory)
         .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR or CacheDataSource.FLAG_BLOCK_ON_CACHE)
         .let { if (cache != null) it.setCache(cache) else it }
 
