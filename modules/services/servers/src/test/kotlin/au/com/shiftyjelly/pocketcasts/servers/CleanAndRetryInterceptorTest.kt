@@ -124,7 +124,9 @@ class CleanAndRetryInterceptorTest {
     @Test
     fun `keep the original User-Agent on the first attempt`() {
         val client = OkHttpClient.Builder()
-            .addInterceptor(CleanAndRetryInterceptor(headersToRemove = listOf("User-Agent"), retryUserAgent = "retry"))
+            .addInterceptor(
+                CleanAndRetryInterceptor(headersToRemove = listOf("User-Agent"), retryUserAgent = "retry"),
+            )
             .build()
         val request = Request.Builder()
             .url(url)
@@ -139,30 +141,31 @@ class CleanAndRetryInterceptorTest {
     }
 
     @Test
-    fun `report the failed response before retrying`() {
-        val retries = mutableListOf<Pair<String, Int>>()
-        val client = OkHttpClient.Builder()
-            .addInterceptor(
-                CleanAndRetryInterceptor(
-                    headersToRemove = emptyList(),
-                    onRetry = { request, response -> retries += request.url.host to response.code },
-                ),
-            )
-            .build()
+    fun `report the failed and retry status codes`() {
+        val retries = mutableListOf<Triple<String, Int, Int>>()
+        val interceptor = CleanAndRetryInterceptor(
+            headersToRemove = emptyList(),
+            onRetried = { request, failedCode, retryCode ->
+                retries += Triple(request.url.host, failedCode, retryCode)
+            },
+        )
+        val client = OkHttpClient.Builder().addInterceptor(interceptor).build()
 
         server.enqueue(MockResponse().setResponseCode(503))
-        server.enqueue(MockResponse())
+        server.enqueue(MockResponse().setResponseCode(206))
         client.newCall(Request.Builder().url(url).build()).execute()
 
-        assertEquals(listOf(url.host to 503), retries)
+        assertEquals(listOf(Triple(url.host, 503, 206)), retries)
     }
 
     @Test
     fun `do not report successful responses`() {
         val retries = mutableListOf<Int>()
-        val client = OkHttpClient.Builder()
-            .addInterceptor(CleanAndRetryInterceptor(headersToRemove = emptyList(), onRetry = { _, response -> retries += response.code }))
-            .build()
+        val interceptor = CleanAndRetryInterceptor(
+            headersToRemove = emptyList(),
+            onRetried = { _, failedCode, _ -> retries += failedCode },
+        )
+        val client = OkHttpClient.Builder().addInterceptor(interceptor).build()
 
         server.enqueue(MockResponse())
         client.newCall(Request.Builder().url(url).build()).execute()
@@ -172,7 +175,9 @@ class CleanAndRetryInterceptorTest {
 
     private fun retryWithUserAgent(retryUserAgent: String?): RecordedRequest {
         val client = OkHttpClient.Builder()
-            .addInterceptor(CleanAndRetryInterceptor(headersToRemove = listOf("User-Agent"), retryUserAgent = retryUserAgent))
+            .addInterceptor(
+                CleanAndRetryInterceptor(headersToRemove = listOf("User-Agent"), retryUserAgent = retryUserAgent),
+            )
             .build()
         val request = Request.Builder()
             .url(url)

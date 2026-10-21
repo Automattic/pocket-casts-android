@@ -94,18 +94,25 @@ object InterceptorModule {
         "baggage",
     )
 
-    private val mediaCleanAndRetryInterceptor = CleanAndRetryInterceptor(
-        headersToRemove = cleanAndRetryHeaders,
-        retryUserAgent = PlatformUserAgent.value,
-        onRetry = { request, response ->
-            LogBuffer.i(LogBuffer.TAG_DOWNLOAD, "Retrying ${request.url.host} with clean headers after HTTP ${response.code}")
-        },
-    ).toClientInterceptor() // Must be client interceptor. Otherwise calls cannot be retried.
+    private val downloadsCleanAndRetryInterceptor = mediaCleanAndRetryInterceptor(LogBuffer.TAG_DOWNLOAD)
+
+    private val playerCleanAndRetryInterceptor = mediaCleanAndRetryInterceptor(LogBuffer.TAG_PLAYBACK)
 
     private val artworkCleanAndRetryInterceptor = CleanAndRetryInterceptor(
         headersToRemove = cleanAndRetryHeaders,
         retryUserAgent = PlatformUserAgent.value,
     ).toClientInterceptor()
+
+    private fun mediaCleanAndRetryInterceptor(logTag: String) = CleanAndRetryInterceptor(
+        headersToRemove = cleanAndRetryHeaders,
+        retryUserAgent = PlatformUserAgent.value,
+        onRetried = { request, failedCode, retryCode ->
+            if (request.method != "HEAD") {
+                val host = request.url.host
+                LogBuffer.i(logTag, "Retried $host with clean headers: HTTP $failedCode -> $retryCode")
+            }
+        },
+    ).toClientInterceptor() // Must be client interceptor. Otherwise calls cannot be retried.
 
     private val basicAuthInterceptor = BasicAuthInterceptor().toClientInterceptor()
 
@@ -242,7 +249,7 @@ object InterceptorModule {
             add(i18nInterceptor.toClientInterceptor())
             add(crashLoggingInterceptor.toClientInterceptor())
             add(basicAuthInterceptor)
-            add(mediaCleanAndRetryInterceptor)
+            add(downloadsCleanAndRetryInterceptor)
             add(userFileAuthInterceptor.toClientInterceptor())
 
             if (BuildConfig.DEBUG) {
@@ -287,7 +294,7 @@ object InterceptorModule {
             add(i18nInterceptor.toClientInterceptor())
             add(crashLoggingInterceptor.toClientInterceptor())
             add(basicAuthInterceptor)
-            add(mediaCleanAndRetryInterceptor)
+            add(playerCleanAndRetryInterceptor)
             add(userFileAuthInterceptor.toClientInterceptor())
 
             if (BuildConfig.DEBUG) {

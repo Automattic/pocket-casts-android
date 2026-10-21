@@ -9,7 +9,7 @@ import okhttp3.Response
 internal class CleanAndRetryInterceptor(
     private val headersToRemove: List<String>,
     private val retryUserAgent: String? = null,
-    private val onRetry: (Request, Response) -> Unit = { _, _ -> },
+    private val onRetried: (request: Request, failedCode: Int, retryCode: Int) -> Unit = { _, _, _ -> },
 ) : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val originalRequest = chain.request()
@@ -20,12 +20,13 @@ internal class CleanAndRetryInterceptor(
             response
         } else {
             response.close()
-            onRetry(originalRequest, response)
             val cleanRequest = originalRequest.newBuilder()
                 .let { builder -> headersToRemove.fold(builder) { acc, header -> acc.removeHeader(header) } }
                 .withRetryUserAgent()
                 .build()
-            chain.proceed(cleanRequest)
+            chain.proceed(cleanRequest).also { retryResponse ->
+                onRetried(originalRequest, response.code, retryResponse.code)
+            }
         }
     }
 
