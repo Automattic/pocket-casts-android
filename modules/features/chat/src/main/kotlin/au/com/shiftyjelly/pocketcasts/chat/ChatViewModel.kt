@@ -353,6 +353,7 @@ class ChatViewModel @Inject constructor(
             it.copy(
                 isHistoryVisible = true,
                 history = historyItems.orEmpty().toHistorySections(clock.instant(), ZoneId.systemDefault()),
+                useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork,
             )
         }
         if (historyItems == null) {
@@ -570,7 +571,7 @@ class ChatViewModel @Inject constructor(
                     userSeek.cancel()
                     showToast(ChatToast.QuotePlayFailed)
                     if (playbackManager.upNextQueue.currentEpisode?.uuid == episodeUuid) {
-                        restorePlayback(state.toPlaybackPosition(episodeUuid, podcastUuid, switch))
+                        restorePlayback(state.toPlaybackPosition(episodeUuid, podcastUuid, switch, isOtherEpisode))
                     } else {
                         if (switch.queue.none { it.uuid == episodeUuid }) {
                             playbackManager.upNextQueue.removeEpisode(episode)
@@ -605,8 +606,8 @@ class ChatViewModel @Inject constructor(
             quotePlaybackUndo.updateAndGet { undo ->
                 QuotePlaybackUndo(
                     id = undoId,
-                    position = undo?.position?.withLaterSwitch(episodeSwitch)
-                        ?: state.toPlaybackPosition(episodeUuid, podcastUuid, episodeSwitch),
+                    position = undo?.position?.withLaterSwitch(episodeSwitch, isOtherEpisode)
+                        ?: state.toPlaybackPosition(episodeUuid, podcastUuid, episodeSwitch, isOtherEpisode),
                 )
             }
             showToast(ChatToast.QuotePlaying(episode.title, undoId))
@@ -631,6 +632,7 @@ class ChatViewModel @Inject constructor(
                 source = sourceView.analyticsValue,
                 episodeUuid = undo.quoteEpisodeUuid,
                 podcastUuid = undo.quotePodcastUuid,
+                isOtherEpisode = undo.isOtherEpisode,
             ),
         )
         val previousJob = quotePlaybackJob
@@ -886,6 +888,7 @@ class ChatViewModel @Inject constructor(
                 podcastUuid = podcastUuid,
                 hasHistory = hasHistory,
                 entryPoint = entryPoint.analyticsValue,
+                isBeta = _uiState.value.isBeta,
             ),
         )
     }
@@ -952,15 +955,27 @@ private class PlaybackPosition(
     val positionMs: Int,
     val isPlaying: Boolean,
     val episodeSwitch: EpisodeSwitch?,
+    val isOtherEpisode: Boolean,
 ) {
     val hasSwitchedAwayFromPreviousEpisode get() = episodeSwitch?.episodes.orEmpty().any { it.uuid != episodeUuid }
 
-    fun withLaterSwitch(laterSwitch: EpisodeSwitch?): PlaybackPosition {
+    fun withLaterSwitch(laterSwitch: EpisodeSwitch?, isLaterOtherEpisode: Boolean): PlaybackPosition {
         val knownUuids = episodeSwitch?.episodes.orEmpty().map { it.uuid }.toSet()
         val newEpisodes = laterSwitch?.episodes.orEmpty().filterNot { it.uuid in knownUuids }
-        if (newEpisodes.isEmpty()) return this
-        val switch = episodeSwitch?.let { it.copy(episodes = it.episodes + newEpisodes) } ?: laterSwitch
-        return PlaybackPosition(quoteEpisodeUuid, quotePodcastUuid, episodeUuid, positionMs, isPlaying, switch)
+        val switch = if (newEpisodes.isEmpty()) {
+            episodeSwitch
+        } else {
+            episodeSwitch?.let { it.copy(episodes = it.episodes + newEpisodes) } ?: laterSwitch
+        }
+        return PlaybackPosition(
+            quoteEpisodeUuid = quoteEpisodeUuid,
+            quotePodcastUuid = quotePodcastUuid,
+            episodeUuid = episodeUuid,
+            positionMs = positionMs,
+            isPlaying = isPlaying,
+            episodeSwitch = switch,
+            isOtherEpisode = isOtherEpisode || isLaterOtherEpisode,
+        )
     }
 }
 
@@ -968,6 +983,7 @@ private fun PlaybackState.toPlaybackPosition(
     quoteEpisodeUuid: String,
     quotePodcastUuid: String,
     episodeSwitch: EpisodeSwitch?,
+    isOtherEpisode: Boolean,
 ) = PlaybackPosition(
     quoteEpisodeUuid = quoteEpisodeUuid,
     quotePodcastUuid = quotePodcastUuid,
@@ -975,6 +991,7 @@ private fun PlaybackState.toPlaybackPosition(
     positionMs = positionMs,
     isPlaying = isPlaying,
     episodeSwitch = episodeSwitch,
+    isOtherEpisode = isOtherEpisode,
 )
 
 private data class EpisodeSwitch(
@@ -1024,6 +1041,7 @@ data class ChatUiState(
     val playingPodcast: Podcast? = null,
     val history: List<ChatHistorySection> = emptyList(),
     val isHistoryVisible: Boolean = false,
+    val useEpisodeArtwork: Boolean = false,
     val answerRatings: Map<String, ChatAnswerRating> = emptyMap(),
     val restoredMessageUuids: Set<String> = emptySet(),
 ) {
