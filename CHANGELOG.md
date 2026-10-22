@@ -14,6 +14,8 @@
         ([#6199](https://github.com/Automattic/pocket-casts-android/pull/6199))
     *   Dismiss the Smart Bookmarks tooltip when the More button is tapped
         ([#6206](https://github.com/Automattic/pocket-casts-android/pull/6206))
+    *   Fix streamed episodes with dynamically inserted ads ending a little early, before the outro
+        ([#6213](https://github.com/Automattic/pocket-casts-android/pull/6213))
 
 
 8.23

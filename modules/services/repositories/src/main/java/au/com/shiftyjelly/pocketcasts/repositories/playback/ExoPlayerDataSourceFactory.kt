@@ -19,6 +19,7 @@ import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.extractor.DefaultExtractorsFactory
 import androidx.media3.extractor.mp3.Mp3Extractor
+import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.servers.di.Player
@@ -31,6 +32,9 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import timber.log.Timber
 
@@ -41,13 +45,16 @@ class ExoPlayerDataSourceFactory @Inject constructor(
     @Player private val httpClient: Lazy<OkHttpClient>,
     private val settings: Settings,
     private val crashLogging: CrashLogging,
+    @ApplicationScope private val applicationScope: CoroutineScope,
 ) {
     private val maxCacheSizeBytes = settings.getExoPlayerCacheEntirePlayingEpisodeSizeInMB() * 1024 * 1024L
 
     private val cache = runCatching {
+        val databaseProvider = StandaloneDatabaseProvider(context)
+        deleteLegacyCache(databaseProvider)
         val cacheDir = File(context.cacheDir, CACHE_DIR_NAME)
         val evictor = LeastRecentlyUsedCacheEvictor(maxCacheSizeBytes)
-        SimpleCache(cacheDir, evictor, StandaloneDatabaseProvider(context))
+        SimpleCache(cacheDir, evictor, databaseProvider)
     }.onFailure { e ->
         val errorMessage = "Failed to instantiate ExoPlayer cache ${e.message}"
         crashLogging.sendReport(Exception(errorMessage))
@@ -59,13 +66,17 @@ class ExoPlayerDataSourceFactory @Inject constructor(
         OkHttpDataSource.Factory { request -> httpClient.get().newCall(request) },
     )
 
+    private val cacheUpstreamFactory = cache
+        ?.let { CachedLengthValidatingDataSource.Factory(defaultFactory, it) }
+        ?: defaultFactory
+
     val cacheFactory get() = CacheDataSource.Factory()
-        .setUpstreamDataSourceFactory(defaultFactory)
+        .setUpstreamDataSourceFactory(cacheUpstreamFactory)
         .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
         .let { if (cache != null) it.setCache(cache) else it }
 
     val blockingCacheFactory get() = CacheDataSource.Factory()
-        .setUpstreamDataSourceFactory(defaultFactory)
+        .setUpstreamDataSourceFactory(cacheUpstreamFactory)
         .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR or CacheDataSource.FLAG_BLOCK_ON_CACHE)
         .let { if (cache != null) it.setCache(cache) else it }
 
@@ -178,13 +189,23 @@ class ExoPlayerDataSourceFactory @Inject constructor(
         maxCacheSizeBytes = maxCacheSizeBytes,
     )
 
+    private fun deleteLegacyCache(databaseProvider: StandaloneDatabaseProvider) {
+        applicationScope.launch(Dispatchers.IO) {
+            runCatching { SimpleCache.delete(File(context.cacheDir, LEGACY_CACHE_DIR_NAME), databaseProvider) }
+                .onFailure { e ->
+                    LogBuffer.e(LogBuffer.TAG_PLAYBACK, e, "Failed to delete the legacy ExoPlayer cache")
+                }
+        }
+    }
+
     private fun ClosedRange<Long>.toClippingConfiguration() = ClippingConfiguration.Builder()
         .setStartPositionMs(start)
         .setEndPositionMs(endInclusive)
         .build()
 
     private companion object {
-        const val CACHE_DIR_NAME = "pocketcasts-exoplayer-cache"
+        const val LEGACY_CACHE_DIR_NAME = "pocketcasts-exoplayer-cache"
+        const val CACHE_DIR_NAME = "pocketcasts-exoplayer-cache-v2"
     }
 }
 
