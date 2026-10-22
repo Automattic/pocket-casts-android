@@ -276,9 +276,11 @@ private fun ChatContent(
                         theme = theme,
                     )
                 }
+                val answerStream = rememberChatAnswerStream(uiState.messages, initialMessageUuids)
                 val answerUuidsByLastIndex = uiState.answerUuidsByLastIndex
                 val latestAnswerLastIndex = answerUuidsByLastIndex.keys.maxOrNull()
                 uiState.messages.forEachIndexed { index, message ->
+                    if (answerStream?.hasStarted(message.uuid) == false) return@forEachIndexed
                     key(message.uuid) {
                         val isNew = message.uuid !in initialMessageUuids
                         val replacesTypingIndicator = isNew && uiState.messages.getOrNull(index - 1) is ChatMessage.User
@@ -292,6 +294,7 @@ private fun ChatContent(
                                 AiMessageBubble(
                                     text = message.displayText,
                                     theme = theme,
+                                    wordProgress = answerStream?.wordProgress(message.uuid),
                                 )
                             }
 
@@ -307,6 +310,7 @@ private fun ChatContent(
                                     isPlayable = message.canPlay,
                                     isLoading = message.uuid == uiState.loadingQuoteUuid,
                                     theme = theme,
+                                    wordProgress = answerStream?.wordProgress(message.uuid),
                                     onClickPlay = { onPlayQuote(message.uuid) },
                                 )
                             }
@@ -321,7 +325,8 @@ private fun ChatContent(
                                 )
                             }
                         }
-                        answerUuidsByLastIndex[index]?.let { answerUuid ->
+                        val isStreaming = answerStream?.isStreaming(message.uuid) == true
+                        answerUuidsByLastIndex[index]?.takeUnless { isStreaming }?.let { answerUuid ->
                             ChatAppear(animate = isNew) {
                                 ChatAnswerRatingRow(
                                     rating = uiState.answerRatings[answerUuid],
@@ -331,7 +336,7 @@ private fun ChatContent(
                                 )
                             }
                         }
-                        if (index == latestAnswerLastIndex) {
+                        if (index == latestAnswerLastIndex && !isStreaming) {
                             ChatAppear(animate = isNew) {
                                 ChatDisclaimer(theme = theme)
                             }
@@ -410,8 +415,6 @@ private fun ChatAnswerAppear(
         }
     }
 }
-
-private val ChatMessage?.isAnswer get() = this is ChatMessage.Assistant || this is ChatMessage.Quote
 
 @Composable
 private fun ChatAboutEpisode(
