@@ -58,33 +58,37 @@ internal fun AiMessageBubble(
     text: String,
     theme: ChatTheme,
     modifier: Modifier = Modifier,
+    wordProgress: (() -> Float)? = null,
 ) {
     val textMeasurer = rememberTextMeasurer()
     val density = LocalDensity.current
     val bulletIndent = remember(textMeasurer, density) {
         with(density) { textMeasurer.measure(BULLET_PREFIX, AiMessageTextStyle).size.width.toSp() }
     }
-    val styledText = remember(text, bulletIndent) { text.withHangingBullets(bulletIndent) }
+    val (styledText, words) = remember(text, bulletIndent) { text.withHangingBullets(bulletIndent) }
     Text(
-        text = styledText,
+        text = wordProgress?.let { progress -> styledText.revealed(words, progress(), theme.aiBubbleText) } ?: styledText,
         color = theme.aiBubbleText,
         style = AiMessageTextStyle,
         modifier = modifier.fillMaxWidth(),
     )
 }
 
-private fun String.withHangingBullets(indent: TextUnit): AnnotatedString {
+private fun String.withHangingBullets(indent: TextUnit): Pair<AnnotatedString, List<IntRange>> {
     val lines = lines()
-    return buildAnnotatedString {
+    val words = mutableListOf<IntRange>()
+    val text = buildAnnotatedString {
         lines.forEachIndexed { index, line ->
             val isBullet = line.startsWith(BULLET_PREFIX)
             if (isBullet && lines.getOrNull(index - 1)?.startsWith(BULLET_PREFIX) == true) {
                 withStyle(ParagraphStyle()) { append(ZERO_WIDTH_SPACE) }
             }
             val paragraphStyle = if (isBullet) ParagraphStyle(textIndent = TextIndent(restLine = indent)) else ParagraphStyle()
+            words += wordRanges(line, startOffset = length)
             withStyle(paragraphStyle) { append(line.ifEmpty { ZERO_WIDTH_SPACE }) }
         }
     }
+    return text to words
 }
 
 private const val BULLET_PREFIX = "•  "
@@ -100,6 +104,7 @@ internal fun AiQuoteBubble(
     theme: ChatTheme,
     modifier: Modifier = Modifier,
     isLoading: Boolean = false,
+    wordProgress: (() -> Float)? = null,
     onClickPlay: () -> Unit = {},
 ) {
     val timestampColor = if (isPlayable) theme.quoteTimestamp else theme.secondaryText
@@ -131,13 +136,16 @@ internal fun AiQuoteBubble(
             },
         )
     }
+    val words = remember(text) { wordRanges(text.text) }
+    val progress = wordProgress?.invoke()
+    val isRevealed = progress == null || progress >= revealedWordTarget(words.size)
     val loadingDescription = stringResource(LR.string.chat_quote_finding_moment)
     Column(
         verticalArrangement = Arrangement.spacedBy(4.dp),
         modifier = modifier.fillMaxWidth(),
     ) {
         Text(
-            text = text,
+            text = progress?.let { text.revealed(words, it, theme.aiBubbleText) } ?: text,
             inlineContent = inlineContent,
             color = theme.aiBubbleText,
             fontSize = 15.sp,
@@ -145,7 +153,7 @@ internal fun AiQuoteBubble(
             modifier = Modifier
                 .fillMaxWidth()
                 .then(
-                    if (isPlayable) {
+                    if (isPlayable && isRevealed) {
                         Modifier.clickable(
                             onClickLabel = stringResource(LR.string.chat_play_quote),
                             role = Role.Button,
