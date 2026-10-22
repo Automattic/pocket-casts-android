@@ -94,6 +94,12 @@ class AutomotiveApplication :
     override val workManagerConfiguration: Configuration
         get() = Configuration.Builder()
             .setWorkerFactory(workerFactory)
+            // The 3-thread executor bounds the blocking Workers (episode downloads, cache, prefetch, refresh).
+            // Since WorkManager 2.9 a CoroutineWorker also runs on that executor unless a worker context is set,
+            // so every sync worker queued behind long downloads and could stay unrun until the process was killed
+            // (PCDROID-833). Run CoroutineWorkers on Dispatchers.Default, as they did before 2.9, and leave the
+            // executor to the blocking workers.
+            .setWorkerCoroutineContext(Dispatchers.Default)
             .setExecutor(Executors.newFixedThreadPool(3))
             .setJobSchedulerJobIdRange(1000, 20000)
             .build()
