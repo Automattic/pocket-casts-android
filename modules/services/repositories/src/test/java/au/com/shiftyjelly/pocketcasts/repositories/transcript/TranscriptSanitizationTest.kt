@@ -321,6 +321,124 @@ class TranscriptSanitizationTest {
                 output.withoutWords(),
             )
         }
+
+        @Test
+        fun `keep CJK sentences as separate entries`() {
+            val input = buildTranscript {
+                text("これはペンです。", startTimeMs = 0, endTimeMs = 1000)
+                text("今日はいい天気ですね！", startTimeMs = 1000, endTimeMs = 2000)
+                text("元気ですか？", startTimeMs = 2000, endTimeMs = 3000)
+            }
+
+            val output = input.sanitize()
+
+            assertEquals(
+                buildTranscript {
+                    text("これはペンです。", startTimeMs = 0, endTimeMs = 1000)
+                    text("今日はいい天気ですね！", startTimeMs = 1000, endTimeMs = 2000)
+                    text("元気ですか？", startTimeMs = 2000, endTimeMs = 3000)
+                },
+                output.withoutWords(),
+            )
+        }
+
+        @Test
+        fun `split CJK mid-sentence break to next entry`() {
+            val input = buildTranscript {
+                text("最初の文。続きは")
+                text("次の文。")
+            }
+
+            val output = input.sanitize()
+
+            assertEquals(
+                buildTranscript {
+                    text("最初の文。")
+                    text("続きは 次の文。")
+                },
+                output.withoutWords(),
+            )
+        }
+
+        @Test
+        fun `split CJK mid-sentence preserves timing and word offsets`() {
+            val input = buildTranscript {
+                text("最初の文。続きは", startTimeMs = 0, endTimeMs = 1000)
+                text("次の文。", startTimeMs = 1000, endTimeMs = 2000)
+            }
+
+            val output = input.sanitize()
+
+            assertEquals(
+                buildTranscript {
+                    text("最初の文。", startTimeMs = 0, endTimeMs = 625)
+                    text("続きは 次の文。", startTimeMs = 625, endTimeMs = 2000)
+                },
+                output.withoutWords(),
+            )
+
+            val secondEntry = output[1] as TranscriptEntry.Text
+            assertEquals(
+                listOf(
+                    TranscriptEntry.WordTiming("続きは", 625, 1000, 0, 3),
+                    TranscriptEntry.WordTiming("次の文。", 1000, 2000, 4, 8),
+                ),
+                secondEntry.words,
+            )
+        }
+
+        @Test
+        fun `do not treat a bare CJK closing mark as a sentence end`() {
+            val input = buildTranscript {
+                text("これは「AI」")
+                text("について話します。")
+            }
+
+            val output = input.sanitize()
+
+            assertEquals(
+                buildTranscript {
+                    text("これは「AI」 について話します。")
+                },
+                output.withoutWords(),
+            )
+        }
+
+        @Test
+        fun `keep Devanagari sentences as separate entries`() {
+            val input = buildTranscript {
+                text("यह एक कलम है।", startTimeMs = 0, endTimeMs = 1000)
+                text("आज मौसम अच्छा है।", startTimeMs = 1000, endTimeMs = 2000)
+            }
+
+            val output = input.sanitize()
+
+            assertEquals(
+                buildTranscript {
+                    text("यह एक कलम है।", startTimeMs = 0, endTimeMs = 1000)
+                    text("आज मौसम अच्छा है।", startTimeMs = 1000, endTimeMs = 2000)
+                },
+                output.withoutWords(),
+            )
+        }
+
+        @Test
+        fun `keep a Latin closing quote attached to a CJK sentence`() {
+            val input = buildTranscript {
+                text("彼は\"はい。\"それから")
+                text("帰った。")
+            }
+
+            val output = input.sanitize()
+
+            assertEquals(
+                buildTranscript {
+                    text("彼は\"はい。\"")
+                    text("それから 帰った。")
+                },
+                output.withoutWords(),
+            )
+        }
     }
 
     @RunWith(Parameterized::class)
@@ -355,11 +473,29 @@ class TranscriptSanitizationTest {
                 arrayOf("!", "exclamation mark"),
                 arrayOf("?", "question mark"),
                 arrayOf("…", "ellipsis"),
+                arrayOf("。", "ideographic full stop"),
+                arrayOf("！", "fullwidth exclamation mark"),
+                arrayOf("？", "fullwidth question mark"),
+                arrayOf("｡", "halfwidth ideographic full stop"),
+                arrayOf("؟", "arabic question mark"),
+                arrayOf("۔", "urdu full stop"),
+                arrayOf("।", "devanagari danda"),
+                arrayOf("॥", "devanagari double danda"),
+                arrayOf("။", "burmese section mark"),
+                arrayOf("។", "khmer khan"),
+                arrayOf("៕", "khmer bariyoosan"),
+                arrayOf("።", "ethiopic full stop"),
+                arrayOf("։", "armenian full stop"),
                 arrayOf("-", "hyphen"),
                 arrayOf(")", "parenthesis"),
                 arrayOf("]", "square bracket"),
                 arrayOf(">", "diamond bracket"),
                 arrayOf("}", "curly bracket"),
+                arrayOf("。」", "ideographic full stop with corner bracket"),
+                arrayOf("！」", "fullwidth exclamation mark with corner bracket"),
+                arrayOf("？」", "fullwidth question mark with corner bracket"),
+                arrayOf("。』", "ideographic full stop with white corner bracket"),
+                arrayOf("。）", "ideographic full stop with fullwidth parenthesis"),
                 arrayOf("\"", "double quote"),
                 arrayOf("”", "double styled quote"),
                 arrayOf("'", "single quote"),
@@ -399,6 +535,19 @@ class TranscriptSanitizationTest {
                 arrayOf("!", "exclamation mark"),
                 arrayOf("?", "question mark"),
                 arrayOf("…", "ellipsis"),
+                arrayOf("。", "ideographic full stop"),
+                arrayOf("！", "fullwidth exclamation mark"),
+                arrayOf("？", "fullwidth question mark"),
+                arrayOf("｡", "halfwidth ideographic full stop"),
+                arrayOf("؟", "arabic question mark"),
+                arrayOf("۔", "urdu full stop"),
+                arrayOf("।", "devanagari danda"),
+                arrayOf("॥", "devanagari double danda"),
+                arrayOf("။", "burmese section mark"),
+                arrayOf("។", "khmer khan"),
+                arrayOf("៕", "khmer bariyoosan"),
+                arrayOf("።", "ethiopic full stop"),
+                arrayOf("։", "armenian full stop"),
                 arrayOf(".\"", "dot double quote"),
                 arrayOf("!\"", "exclamation mark double quote"),
                 arrayOf("?\"", "question mark double quote"),
@@ -415,6 +564,13 @@ class TranscriptSanitizationTest {
                 arrayOf("!’", "exclamation mark with single styled quote"),
                 arrayOf("?’", "question mark with single styled quote"),
                 arrayOf("…’", "ellipsis with single styled quote"),
+                arrayOf("。」", "ideographic full stop with corner bracket"),
+                arrayOf("！」", "fullwidth exclamation mark with corner bracket"),
+                arrayOf("？」", "fullwidth question mark with corner bracket"),
+                arrayOf("。』", "ideographic full stop with white corner bracket"),
+                arrayOf("。\"", "ideographic full stop with double quote"),
+                arrayOf("。”", "ideographic full stop with double styled quote"),
+                arrayOf(".」", "dot with corner bracket"),
             )
         }
     }
@@ -450,6 +606,9 @@ class TranscriptSanitizationTest {
                 arrayOf("]", "square bracket"),
                 arrayOf(">", "diamond bracket"),
                 arrayOf("}", "curly bracket"),
+                arrayOf("）", "fullwidth parenthesis"),
+                arrayOf("」", "corner bracket"),
+                arrayOf("』", "white corner bracket"),
                 arrayOf("\"", "double quote"),
                 arrayOf("”", "double styled quote"),
                 arrayOf("'", "single quote"),

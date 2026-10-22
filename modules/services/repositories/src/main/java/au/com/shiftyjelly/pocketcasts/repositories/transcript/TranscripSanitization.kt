@@ -182,20 +182,34 @@ private fun TranscriptEntry.isNotEmpty() = when (this) {
     is TranscriptEntry.Text -> value.isNotEmpty()
 }
 
+private val LatinSentenceTerminators = listOf(".", "!", "?", "…")
+private val LatinClosingQuotes = listOf("\"", "”", "'", "’")
+
+private val CjkSentenceTerminators = listOf("。", "！", "？", "｡")
+
+private val CjkClosingMarks = listOf("」", "』", "）")
+
+private val OtherScriptSentenceTerminators = listOf("؟", "۔", "।", "॥", "။", "។", "៕", "።", "։")
+
+private val SentenceTerminators = LatinSentenceTerminators + CjkSentenceTerminators + OtherScriptSentenceTerminators
+private val ClosingMarks = LatinClosingQuotes + CjkClosingMarks
+
+private val TerminalCombos = SentenceTerminators.flatMap { terminator ->
+    ClosingMarks.map { closer -> "$terminator$closer" }
+}
+
 fun String.endsAsSentence(): Boolean {
     return EndOfSentencePunctuation.any { punctuation -> endsWith(punctuation) }
 }
 
-private val EndOfSentencePunctuation = listOf(
-    // Sentences
-    ".", "!", "?", "…",
+private val EndOfSentencePunctuation = SentenceTerminators + listOf(
     // Interrupted sentences
     "-",
     // Brackets
     ")", "]", ">", "}",
     // Quotation marks
     "\"", "”", "'", "’",
-)
+) + TerminalCombos
 
 private fun String.findMidSentence(): Pair<Int, String>? {
     // We first search for punctuation followed by quotation marks (e.g., '."') before looking for standalone punctuation.
@@ -208,17 +222,9 @@ private fun String.findMidSentence(): Pair<Int, String>? {
     return findLastAnyOf(MidSentenceQuotationPunctuation) ?: findLastAnyOf(MidSentencePunctuation)
 }
 
-private val MidSentencePunctuation = listOf(
-    ".",
-    "!",
-    "?",
-    "…",
-)
+private val MidSentencePunctuation = SentenceTerminators
 
-private val MidSentenceQuotationPunctuation = MidSentencePunctuation.flatMap { punctuation ->
-    val quotationMarks = listOf("\"", "”", "'", "’")
-    quotationMarks.map { quotationMark -> "$punctuation$quotationMark" }
-}
+private val MidSentenceQuotationPunctuation = TerminalCombos
 
 // Splits a cue's time range proportionally at a character position, falling back to [endTimeMs]
 // for untimed/degenerate cues.
