@@ -21,10 +21,20 @@ class PlusUpgradeFeatureItemTest {
     }
 
     @Test
-    fun `given episode chat flag enabled, when checking feature visibility, then episode chat is shown`() {
+    fun `given episode chat flag enabled and no free beta, when checking feature visibility, then episode chat is shown`() {
         FeatureFlag.setEnabled(Feature.EPISODE_CHAT, true)
+        FeatureFlag.setEnabled(Feature.EPISODE_CHAT_FREE_BETA, false)
 
         assertTrue(PlusUpgradeFeatureItem.EpisodeChat.isMonthlyFeature)
         assertTrue(PlusUpgradeFeatureItem.EpisodeChat.isYearlyFeature)
+    }
+
+    @Test
+    fun `given episode chat free beta, when checking feature visibility, then episode chat is hidden`() {
+        FeatureFlag.setEnabled(Feature.EPISODE_CHAT, true)
+        FeatureFlag.setEnabled(Feature.EPISODE_CHAT_FREE_BETA, true)
+
+        assertFalse(PlusUpgradeFeatureItem.EpisodeChat.isMonthlyFeature)
+        assertFalse(PlusUpgradeFeatureItem.EpisodeChat.isYearlyFeature)
     }
 }

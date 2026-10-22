@@ -6,6 +6,8 @@ import au.com.shiftyjelly.pocketcasts.onboarding.signin.SyncCompletionWaiter
 import au.com.shiftyjelly.pocketcasts.onboarding.signin.TvSyncingViewModel
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.SignInSyncShownEvent
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
@@ -33,6 +35,16 @@ class TvSyncingViewModelTest {
     }
     private val syncCompletion = CompletableDeferred<Unit>()
     private val syncCompletionWaiter = SyncCompletionWaiter { syncCompletion.await() }
+    private val eventHorizon = mock<EventHorizon>()
+
+    @Test
+    fun `trackShown fires sign in sync shown event`() = runTest {
+        val viewModel = createViewModel()
+
+        viewModel.trackShown()
+
+        verify(eventHorizon).track(SignInSyncShownEvent)
+    }
 
     @Test
     fun `initial state has no podcasts and sync not complete`() = runTest {
@@ -154,7 +166,7 @@ class TvSyncingViewModelTest {
 
     private fun createViewModel(
         syncWaiter: SyncCompletionWaiter = syncCompletionWaiter,
-    ) = TvSyncingViewModel(podcastManager, syncWaiter)
+    ) = TvSyncingViewModel(podcastManager, syncWaiter, eventHorizon)
 
     private fun podcast(uuid: String) = Podcast(uuid = uuid)
 }

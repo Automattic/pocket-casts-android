@@ -9,6 +9,9 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfRowItem
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfTitle
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.ReleaseVersion
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.PlayerShelfOverflowMenuRearrangeActionMovedEvent
 import com.automattic.eventhorizon.PlayerShelfOverflowMenuRearrangeFinishedEvent
@@ -22,6 +25,7 @@ import java.util.Collections
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -39,6 +43,9 @@ class ShelfViewModel @AssistedInject constructor(
     private var _uiState: MutableStateFlow<UiState> = MutableStateFlow(UiState())
     val uiState: StateFlow<UiState> = _uiState
 
+    private val isSmartBookmarksPromoRelease = ReleaseVersion.fromString(settings.getVersion())
+        ?.let { version -> ReleaseVersion(version.major, version.minor) == SMART_BOOKMARKS_PROMO_RELEASE } == true
+
     init {
         viewModelScope.launch {
             transcriptManager.observeIsTranscriptAvailable(episodeId)
@@ -46,6 +53,18 @@ class ShelfViewModel @AssistedInject constructor(
                 .collectLatest { isAvailable ->
                     _uiState.update { it.copy(isTranscriptAvailable = isAvailable) }
                 }
+        }
+        viewModelScope.launch {
+            FeatureFlag.isEnabledFlow(Feature.SMART_BOOKMARKS).map { isSmartBookmarksEnabled ->
+                isSmartBookmarksEnabled && isSmartBookmarksPromoRelease
+            }.collectLatest { showBadge ->
+                _uiState.update { it.copy(showBookmarkNewBadge = showBadge) }
+            }
+        }
+        viewModelScope.launch {
+            FeatureFlag.isEnabledFlow(Feature.EPISODE_CHAT_FREE_BETA).collectLatest { isFreeBeta ->
+                _uiState.update { it.copy(showEpisodeChatBetaBadge = isFreeBeta) }
+            }
         }
     }
 
@@ -119,7 +138,14 @@ class ShelfViewModel @AssistedInject constructor(
         shelfItem: ShelfItem,
     ) {
         trackShelfItemMovedEvent(fromIndex, toIndex, shelfItem)
-        settings.shelfItems.set(_uiState.value.shelfRowItems.filterIsInstance<ShelfItem>(), updateModifiedAt = true)
+        val reorderedItems = _uiState.value.shelfRowItems.filterIsInstance<ShelfItem>()
+        settings.shelfItems.set(settings.shelfItems.value.withReorderedItems(reorderedItems), updateModifiedAt = true)
+    }
+
+    private fun List<ShelfItem>.withReorderedItems(reorderedItems: List<ShelfItem>): List<ShelfItem> {
+        val reorderedQueue = ArrayDeque(reorderedItems)
+        val reorderedSet = reorderedItems.toSet()
+        return map { item -> if (item in reorderedSet) reorderedQueue.removeFirst() else item } + reorderedQueue
     }
 
     private fun sectionTitleAt(position: Int) = if (position < _uiState.value.shelfRowItems.indexOf(moreActionsTitle)) {
@@ -158,6 +184,8 @@ class ShelfViewModel @AssistedInject constructor(
         val shelfRowItems: List<ShelfRowItem> = emptyList(),
         val episode: BaseEpisode? = null,
         val isTranscriptAvailable: Boolean = false,
+        val showBookmarkNewBadge: Boolean = false,
+        val showEpisodeChatBetaBadge: Boolean = false,
     )
 
     enum class ShelfActionSource(
@@ -174,6 +202,7 @@ class ShelfViewModel @AssistedInject constructor(
     companion object {
         const val ERROR_MINIMUM_SHELF_ITEMS = "Minimum 4 shelf items should be present"
         const val ERROR_SHELF_ITEM_INVALID_MOVE_POSITION = "Shelf item invalid move position"
+        private val SMART_BOOKMARKS_PROMO_RELEASE = ReleaseVersion(major = 8, minor = 22)
         val shortcutTitle = ShelfTitle(LR.string.player_rearrange_actions_shown)
         val moreActionsTitle = ShelfTitle(LR.string.player_rearrange_actions_hidden)
     }

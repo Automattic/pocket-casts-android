@@ -36,6 +36,7 @@ class SyncSettingsTask(context: Context, parameters: WorkerParameters) : Corouti
                     listeningTimeStats = settings.collectListeningStats.getSyncValue(lastSyncTime),
                     audioOnly = settings.audioOnly.getSyncValue(lastSyncTime),
                     disableAiChapters = settings.showGeneratedChapters.getSyncValue(lastSyncTime)?.not(),
+                    showWhatsNewDot = settings.showWhatsNewDot.getSyncValue(lastSyncTime),
                 ),
             )
 
@@ -62,6 +63,7 @@ class SyncSettingsTask(context: Context, parameters: WorkerParameters) : Corouti
                             "listeningTimeStats" -> settings.collectListeningStats.set(value.value, updateModifiedAt = false)
                             "audioOnly" -> settings.audioOnly.set(value.value, updateModifiedAt = false)
                             "disableAiChapters" -> settings.showGeneratedChapters.set(!value.value, updateModifiedAt = false)
+                            "showWhatsNewDot" -> settings.showWhatsNewDot.set(value.value, updateModifiedAt = false)
                         }
                     } else if (value.value is String) {
                         when (key) {

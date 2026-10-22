@@ -4,15 +4,22 @@ import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeChatDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.TranscriptDao
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeChat
 import au.com.shiftyjelly.pocketcasts.models.entity.Transcript
+import au.com.shiftyjelly.pocketcasts.models.to.EpisodeChatHistoryItem
+import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptsComparator
 import au.com.shiftyjelly.pocketcasts.servers.podcast.ConversationMessage
 import au.com.shiftyjelly.pocketcasts.servers.podcast.EpisodeChatQuote
 import au.com.shiftyjelly.pocketcasts.servers.podcast.EpisodeChatRequest
+import au.com.shiftyjelly.pocketcasts.servers.podcast.EpisodeChatResponse
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.TokenHandler
 import com.squareup.moshi.Moshi
+import java.io.IOException
+import java.util.Date
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
@@ -25,18 +32,22 @@ class ChatManagerImpl @Inject constructor(
     moshi: Moshi,
 ) : ChatManager {
     private val quoteMetadataAdapter = moshi.adapter(QuoteMetadata::class.java)
+    private val userMetadataAdapter = moshi.adapter(UserMessageMetadata::class.java)
 
     override fun observeMessages(episodeUuid: String): Flow<List<ChatMessage>> {
-        return episodeChatDao.observeMessages(episodeUuid).map { it.toChatMessages(quoteMetadataAdapter) }
+        return episodeChatDao.observeMessages(episodeUuid).map { it.toChatMessages(quoteMetadataAdapter, userMetadataAdapter) }
     }
 
-    override suspend fun getMessages(episodeUuid: String): List<ChatMessage> {
-        return episodeChatDao.getMessages(episodeUuid).toChatMessages(quoteMetadataAdapter)
+    override fun observeHistory(): Flow<List<EpisodeChatHistoryItem>> {
+        return episodeChatDao.observeChatHistory().distinctUntilChanged()
     }
 
-    override suspend fun createChat(episodeUuid: String, podcastUuid: String, welcomeMessage: ChatMessage) {
-        episodeChatDao.insertChat(EpisodeChat(episodeUuid = episodeUuid, podcastUuid = podcastUuid))
-        episodeChatDao.insertMessage(welcomeMessage.toEntity(episodeUuid, quoteMetadataAdapter))
+    override suspend fun hasChatWithMessages(episodeUuid: String): Boolean {
+        return episodeChatDao.hasChatWithMessages(episodeUuid)
+    }
+
+    override suspend fun createChat(episodeUuid: String, podcastUuid: String) {
+        episodeChatDao.insertChatIfAbsent(EpisodeChat(episodeUuid = episodeUuid, podcastUuid = podcastUuid))
     }
 
     override suspend fun sendMessage(
@@ -44,6 +55,38 @@ class ChatManagerImpl @Inject constructor(
         message: ChatMessage.User,
         allMessages: List<ChatMessage>,
     ) {
+        val question = message.copy(failure = null).toEntity(episodeUuid, quoteMetadataAdapter, userMetadataAdapter)
+        episodeChatDao.insertMessage(question)
+        val reply = try {
+            requestReply(episodeUuid, message, allMessages)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            val failure = if (e is IOException) ChatSendFailure.Network else ChatSendFailure.Server
+            val failedQuestion = message.copy(failure = failure).toEntity(episodeUuid, quoteMetadataAdapter, userMetadataAdapter)
+            runCatching { episodeChatDao.insertMessage(failedQuestion.copy(createdAt = question.createdAt)) }
+            throw e
+        }
+
+        val aiReply = ChatMessage.Assistant(text = reply.response.reply)
+        val replies = listOfNotNull(
+            aiReply,
+            reply.response.quote?.toQuoteMessage(isFromGeneratedTranscript = reply.isFromGeneratedTranscript),
+        )
+        val createdAtMs = maxOf(System.currentTimeMillis(), question.createdAt.time + 1)
+        episodeChatDao.insertMessages(
+            replies.mapIndexed { index, chatMessage ->
+                chatMessage.toEntity(episodeUuid, quoteMetadataAdapter, userMetadataAdapter)
+                    .copy(createdAt = Date(createdAtMs + index))
+            },
+        )
+    }
+
+    private suspend fun requestReply(
+        episodeUuid: String,
+        message: ChatMessage.User,
+        allMessages: List<ChatMessage>,
+    ): ChatReply {
         val history = allMessages.mapNotNull { msg ->
             val content = msg.textOrNull() ?: return@mapNotNull null
             ConversationMessage(role = msg.role.apiRole, content = content)
@@ -65,37 +108,54 @@ class ChatManagerImpl @Inject constructor(
             authorization = "Bearer ${accessToken.value}",
             request = request,
         )
-
-        episodeChatDao.insertMessage(message.toEntity(episodeUuid, quoteMetadataAdapter))
-
-        val aiReply = ChatMessage.Assistant(text = response.reply)
-        episodeChatDao.insertMessage(aiReply.toEntity(episodeUuid, quoteMetadataAdapter))
-
-        persistQuoteIfPresent(episodeUuid, response.quote)
+        return ChatReply(response, isFromGeneratedTranscript = transcript.isGenerated)
     }
 
-    private suspend fun persistQuoteIfPresent(episodeUuid: String, quote: EpisodeChatQuote?) {
-        val quoteText = quote?.text?.takeIf { it.isNotBlank() } ?: return
-        val quoteStart = quote.start.orEmpty()
-        val quoteEnd = quote.end.orEmpty()
-        val quoteMessage = ChatMessage.Quote(
+    override suspend fun discardMessage(uuid: String) {
+        episodeChatDao.deleteMessage(uuid)
+    }
+
+    private fun EpisodeChatQuote.toQuoteMessage(isFromGeneratedTranscript: Boolean): ChatMessage.Quote? {
+        val quoteText = text.takeIf { it.isNotBlank() } ?: return null
+        val quoteStart = start.orEmpty()
+        val quoteEnd = end.orEmpty()
+        return ChatMessage.Quote(
             text = quoteText,
             start = quoteStart,
             end = quoteEnd,
             startMs = parseTimestampMs(quoteStart) ?: -1,
             endMs = parseTimestampMs(quoteEnd) ?: -1,
+            isFromGeneratedTranscript = isFromGeneratedTranscript,
         )
-        episodeChatDao.insertMessage(quoteMessage.toEntity(episodeUuid, quoteMetadataAdapter))
     }
 
-    override suspend fun clearMessages(episodeUuid: String, welcomeMessage: ChatMessage) {
-        episodeChatDao.deleteMessagesByEpisode(episodeUuid)
-        episodeChatDao.insertMessage(welcomeMessage.toEntity(episodeUuid, quoteMetadataAdapter))
+    override suspend fun clearMessages(episodeUuid: String): ClearedChat {
+        val entities = episodeChatDao.takeMessages(episodeUuid)
+        return StoredClearedChat(entities, entities.toChatMessages(quoteMetadataAdapter, userMetadataAdapter))
+    }
+
+    override suspend fun restoreMessages(clearedChat: ClearedChat) {
+        if (clearedChat is StoredClearedChat) {
+            episodeChatDao.insertMessages(clearedChat.entities)
+        }
+    }
+
+    override suspend fun rateAnswer(answerUuid: String, rating: ChatAnswerRating?) {
+        episodeChatDao.updateRating(answerUuid, rating?.value)
+    }
+
+    override suspend fun deleteAllChats() {
+        episodeChatDao.deleteAllChats()
     }
 
     // Pick transcript for chat: prefer author-provided (non-generated) over Pocket Casts-generated.
     private suspend fun selectTranscript(episodeUuid: String): Transcript? {
         val transcripts = transcriptDao.observeTranscripts(episodeUuid).first()
-        return transcripts.minWithOrNull(compareBy({ it.isGenerated }, { it.type }))
+        return transcripts.minWithOrNull(TranscriptsComparator)
     }
 }
+
+private class ChatReply(
+    val response: EpisodeChatResponse,
+    val isFromGeneratedTranscript: Boolean,
+)

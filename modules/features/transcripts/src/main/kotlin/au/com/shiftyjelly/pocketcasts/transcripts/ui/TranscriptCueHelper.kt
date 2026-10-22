@@ -146,6 +146,8 @@ internal object TranscriptCueHelper {
 
     fun isSeekSettled(posMs: Int, seekTargetMs: Int): Boolean = abs(posMs - seekTargetMs) <= SEEK_SETTLE_TOLERANCE_MS
 
+    fun isHeldTapStale(posMs: Int, seekTargetMs: Int?): Boolean = seekTargetMs != null && !isSeekSettled(posMs, seekTargetMs)
+
     fun hasReachedTappedRow(outcome: HighlightOutcome, tappedIndex: Int): Boolean = outcome is HighlightOutcome.Show && outcome.entryIndex >= tappedIndex
 
     fun findWordIndex(

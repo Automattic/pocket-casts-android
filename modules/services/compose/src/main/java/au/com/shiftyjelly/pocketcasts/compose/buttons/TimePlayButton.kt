@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedButton
@@ -34,6 +35,7 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 data class TimePlayButtonColors(
     val text: Color,
     val border: Color,
+    val background: Color = Color.Transparent,
 ) {
     companion object {
         fun default(colors: ThemeColors) = TimePlayButtonColors(
@@ -54,6 +56,7 @@ fun TimePlayButton(
     @StringRes contentDescriptionId: Int,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    isLoading: Boolean = false,
     colors: TimePlayButtonColors = TimePlayButtonColors.default(MaterialTheme.theme.colors),
 ) {
     val timeText = TimeHelper.formattedSeconds(timeSecs.toDouble())
@@ -61,26 +64,35 @@ fun TimePlayButton(
 
     OutlinedButton(
         onClick = onClick,
+        enabled = !isLoading,
         border = BorderStroke(2.dp, colors.border),
         colors = ButtonDefaults.outlinedButtonColors(
-            backgroundColor = Color.Transparent,
+            backgroundColor = colors.background,
         ),
         shape = CircleShape,
         modifier = modifier.semantics { contentDescription = description },
     ) {
-        TextH40(
-            text = timeText,
-            color = colors.text,
-            maxLines = 1,
-            modifier = Modifier.clearAndSetSemantics { },
-        )
-        Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-        Icon(
-            painter = painterResource(IR.drawable.ic_play),
-            contentDescription = null,
-            tint = colors.text,
-            modifier = Modifier.size(10.dp, 13.dp),
-        )
+        if (isLoading) {
+            CircularProgressIndicator(
+                color = colors.text,
+                strokeWidth = 2.dp,
+                modifier = Modifier.size(16.dp),
+            )
+        } else {
+            TextH40(
+                text = timeText,
+                color = colors.text,
+                maxLines = 1,
+                modifier = Modifier.clearAndSetSemantics { },
+            )
+            Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+            Icon(
+                painter = painterResource(IR.drawable.ic_play),
+                contentDescription = null,
+                tint = colors.text,
+                modifier = Modifier.size(10.dp, 13.dp),
+            )
+        }
     }
 }
 

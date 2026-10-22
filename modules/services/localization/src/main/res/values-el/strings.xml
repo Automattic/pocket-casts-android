@@ -292,7 +292,6 @@ Language: el_GR
     <string name="referrals_invalid_offer_description">Αυτό το πάσο επισκέπτ μπορεί να εξαργυρωθεί μόνο μία φορά και είναι διαθέσιμη για όσους δεν έχουν ενεργή συνδρομή Plus ή Patron. Ευχαριστούμε που μας ακούς!</string>
     <string name="referrals_activate_my_pass">Ενεργοποίησε το πάσο μου</string>
     <string name="referrals_claim_guest_pass_title">Διεκδίκησε το %1$s Πάσο Επισκέπτη σου</string>
-    <string name="referrals_tooltip_message">Χάρισε %1$s Pocket Casts Plus!</string>
     <string name="referrals_claim_guess_pass_banner_card_subtitle">Ξεκλείδωσε την πλήρη εμπειρία ακρόασης</string>
     <string name="referrals_claim_guess_pass_banner_card_title">Διεκδίκησε το Πάσο Επισκέπτη %1$s για το Plus</string>
     <string name="referrals_share_guest_pass">Κοινοποίηση Guest Pass</string>
@@ -483,7 +482,6 @@ Language: el_GR
     <string name="bookmark_notification_title_added">Προστέθηκε σελιδοδείκτης</string>
     <string name="notification_channel_description_podcast_import">Εισαγωγή συλλογών podcast</string>
     <string name="notification_channel_description_playback_error">Σφάλματα κατά την αναπαραγωγή</string>
-    <string name="change_bookmark_title_hint">Άλλαξε τον τίτλο που προσδιορίζει αυτόν το σελιδοδείκτη</string>
     <string name="bookmark">Σελιδοδείκτης</string>
     <string name="details">Λεπτομέρειες</string>
     <string name="episode">Επεισόδιο</string>
@@ -495,7 +493,6 @@ Language: el_GR
     <string name="settings_notification_play_over_duck">Μείωση έντασης</string>
     <string name="skipping_to">Παράλειψη σε %s</string>
     <string name="save_bookmark">Αποθήκευση σελιδοδείκτη</string>
-    <string name="add_bookmark_title_hint">Πρόσθεσε έναν προαιρετικό τίτλο για να αναγνωρίζεις αυτό το σελιδοδείκτη</string>
     <string name="change_title">Αλλαγή τίτλου</string>
     <string name="add_bookmark">Προσθήκη σελιδοδείκτη</string>
     <string name="playing_bookmark">Παίζει «%s»</string>
@@ -1271,7 +1268,6 @@ Language: el_GR
     <string name="settings_auto_archive_episode_limit">Όριο επεισοδίων</string>
     <string name="settings_apply_to_existing_podcasts">Εφαρμογή σε υπάρχοντα podcasts;</string>
     <string name="settings_apply_to_existing">Εφαρμογή σε υπάρχοντα</string>
-    <string name="settings_app_icon_updated_message">Αυτό το νέο εικονίδιο μπορεί να χρειαστεί μερικά λεπτά για να εμφανιστεί και θα βλέπεις δύο εικονίδια στην οθόνη όλων των εφαρμογών. Αυτό είναι φυσιολογικό. Σύρε το νέο εικονίδιο στην αρχική σου οθόνη και είσαι εντάξει!</string>
     <string name="settings_app_icon_updated">Εικονίδιο ενημερώθηκε</string>
     <string name="settings_app_icon_title">Τίτλος</string>
     <string name="settings_app_icon_image">εικόνα εικονιδίου</string>

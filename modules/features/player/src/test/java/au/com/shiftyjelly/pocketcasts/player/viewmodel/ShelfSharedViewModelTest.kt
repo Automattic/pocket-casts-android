@@ -4,6 +4,8 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
+import au.com.shiftyjelly.pocketcasts.chat.ChatEntryPoint
+import au.com.shiftyjelly.pocketcasts.chat.EpisodeChatAccess
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -27,13 +29,29 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.shownotes.ShowNotesManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
+import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
+import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
+import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import com.automattic.eventhorizon.EpisodeChatEntryPointType
+import com.automattic.eventhorizon.EpisodeChatTooltipDismissedEvent
+import com.automattic.eventhorizon.EpisodeChatTooltipShownEvent
+import com.automattic.eventhorizon.EpisodeChatTooltipTappedEvent
+import com.automattic.eventhorizon.EpisodeChatUnavailableTappedEvent
 import com.automattic.eventhorizon.EventHorizon
-import io.reactivex.Observable
+import com.automattic.eventhorizon.PlayerShelfActionTappedEvent
+import com.automattic.eventhorizon.PlayerShelfOverflowMenuShownEvent
+import com.automattic.eventhorizon.ShelfActionSourceType
+import com.automattic.eventhorizon.ShelfActionType
 import java.time.Instant
 import java.util.Date
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -47,7 +65,10 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
+import org.mockito.kotlin.any
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -57,8 +78,11 @@ class ShelfSharedViewModelTest {
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    @get:Rule
+    @get:Rule(order = 0)
     val coroutineRule = MainCoroutineRule()
+
+    @get:Rule(order = 1)
+    val featureFlagRule = InMemoryFeatureFlagRule()
 
     @Mock
     private lateinit var applicationScope: CoroutineScope
@@ -84,7 +108,20 @@ class ShelfSharedViewModelTest {
     @Mock
     private lateinit var userEpisodeManager: UserEpisodeManager
 
+    @Mock
+    private lateinit var transcriptManager: TranscriptManager
+
+    @Mock
+    private lateinit var showNotesManager: ShowNotesManager
+
+    @Mock
+    private lateinit var syncManager: SyncManager
+
     private lateinit var shelfSharedViewModel: ShelfSharedViewModel
+
+    private val eventSink = TestEventSink()
+
+    private val episodeChatTooltipDismissedSetting = mock<UserSetting<Boolean>>()
 
     private val plusSubscription = Subscription(
         tier = SubscriptionTier.Plus,
@@ -94,6 +131,10 @@ class ShelfSharedViewModelTest {
         isAutoRenewing = true,
         giftDays = 0,
     )
+
+    private val transcriptEpisode = PodcastEpisode("episodeUuid", podcastUuid = "podcastUuid", publishedDate = Date())
+    private val transcriptOnShelfItems = listOf(ShelfItem.Transcript) + (ShelfItem.entries - ShelfItem.Transcript)
+    private val transcriptInOverflowItems = (ShelfItem.entries - ShelfItem.Transcript) + ShelfItem.Transcript
 
     @Test
     fun `when effects button clicked, then effects options are shown`() = runTest {
@@ -311,33 +352,538 @@ class ShelfSharedViewModelTest {
 
         shelfSharedViewModel.onVideoToggleClick(ShelfItemSource.Shelf)
 
-        verify(playbackManager).toggleVideoRendering()
+        verify(playbackManager).toggleVideoRendering(streamWarningConfirmed = false)
+    }
+
+    @Test
+    fun `given hls stream available and no video, then stream selector is shown`() = runTest {
+        val episode = PodcastEpisode("uuid", publishedDate = Date())
+        initViewModel(
+            currentEpisode = episode,
+            hlsAvailable = true,
+            streamVideoState = StreamVideoState.NotVideo,
+        )
+
+        shelfSharedViewModel.uiState.test {
+            var state = awaitItem()
+            while (state.episode == null) {
+                state = awaitItem()
+            }
+            assertTrue(state.shelfItems.contains(ShelfItem.StreamSelector))
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `given audio only enabled, then stream selector is hidden`() = runTest {
+        val episode = PodcastEpisode("uuid", publishedDate = Date())
+        initViewModel(
+            currentEpisode = episode,
+            hlsAvailable = true,
+            streamVideoState = StreamVideoState.AudioOnly,
+            audioOnly = true,
+        )
+
+        shelfSharedViewModel.uiState.test {
+            var state = awaitItem()
+            while (state.episode == null) {
+                state = awaitItem()
+            }
+            assertFalse(state.shelfItems.contains(ShelfItem.StreamSelector))
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `given no hls stream and no video, then stream selector is hidden`() = runTest {
+        val episode = PodcastEpisode("uuid", publishedDate = Date())
+        initViewModel(
+            currentEpisode = episode,
+            hlsAvailable = false,
+            streamVideoState = StreamVideoState.NotVideo,
+        )
+
+        shelfSharedViewModel.uiState.test {
+            var state = awaitItem()
+            while (state.episode == null) {
+                state = awaitItem()
+            }
+            assertFalse(state.shelfItems.contains(ShelfItem.StreamSelector))
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `given stream switch required and warning needed, when video toggle clicked, then streaming warning dialog is shown`() = runTest {
+        initViewModel()
+        whenever(playbackManager.videoToggleRequiresStreamSwitch()).thenReturn(true)
+        whenever(playbackManager.shouldWarnAboutPlayback()).thenReturn(true)
+
+        shelfSharedViewModel.navigationState.test {
+            shelfSharedViewModel.onVideoToggleClick(ShelfItemSource.Shelf)
+            assertEquals(NavigationState.ShowStreamingWarningDialog, awaitItem())
+        }
+
+        verify(playbackManager, never()).toggleVideoRendering(streamWarningConfirmed = false)
+    }
+
+    @Test
+    fun `given stream switch required without warning, when video toggle clicked, then video rendering is toggled`() = runTest {
+        initViewModel()
+        whenever(playbackManager.videoToggleRequiresStreamSwitch()).thenReturn(true)
+        whenever(playbackManager.shouldWarnAboutPlayback()).thenReturn(false)
+
+        shelfSharedViewModel.onVideoToggleClick(ShelfItemSource.Shelf)
+
+        verify(playbackManager).toggleVideoRendering(streamWarningConfirmed = false)
+    }
+
+    @Test
+    fun `when video toggle confirmed, then video rendering is toggled with stream warning confirmed`() = runTest {
+        initViewModel()
+
+        shelfSharedViewModel.onVideoToggleConfirmed()
+
+        verify(playbackManager).toggleVideoRendering(streamWarningConfirmed = true)
+    }
+
+    @Test
+    fun `given transcript button on shelf and not loaded, when player opened, then show notes are loaded`() = runTest {
+        initViewModel(currentEpisode = transcriptEpisode, shelfItems = transcriptOnShelfItems)
+
+        shelfSharedViewModel.setPlayerOpen(true)
+
+        verify(showNotesManager).loadShowNotes(podcastUuid = "podcastUuid", episodeUuid = "episodeUuid")
+    }
+
+    @Test
+    fun `given transcript button on shelf and already loaded, when player opened, then show notes are not loaded`() = runTest {
+        initViewModel(currentEpisode = transcriptEpisode, shelfItems = transcriptOnShelfItems, isTranscriptAvailable = true)
+
+        shelfSharedViewModel.setPlayerOpen(true)
+
+        verify(showNotesManager, never()).loadShowNotes(any(), any())
+    }
+
+    @Test
+    fun `given transcript button in overflow menu, when player opened, then show notes are not loaded`() = runTest {
+        initViewModel(currentEpisode = transcriptEpisode, shelfItems = transcriptInOverflowItems)
+
+        shelfSharedViewModel.setPlayerOpen(true)
+
+        verify(showNotesManager, never()).loadShowNotes(any(), any())
+    }
+
+    @Test
+    fun `given transcript button in overflow menu, when overflow menu opened, then show notes are loaded`() = runTest {
+        initViewModel(currentEpisode = transcriptEpisode, shelfItems = transcriptInOverflowItems)
+
+        shelfSharedViewModel.setPlayerOpen(true)
+        shelfSharedViewModel.setOverflowMenuOpen(true)
+
+        verify(showNotesManager).loadShowNotes(podcastUuid = "podcastUuid", episodeUuid = "episodeUuid")
+    }
+
+    @Test
+    fun `given show notes loading from overflow menu, when overflow menu closed, then load is not cancelled`() = runTest {
+        initViewModel(currentEpisode = transcriptEpisode, shelfItems = transcriptInOverflowItems)
+        val response = CompletableDeferred<Unit>()
+        var isLoadCompleted = false
+        whenever(showNotesManager.loadShowNotes(any(), any())).doSuspendableAnswer {
+            response.await()
+            isLoadCompleted = true
+            ShowNotesState.NotFound
+        }
+
+        shelfSharedViewModel.setPlayerOpen(true)
+        shelfSharedViewModel.setOverflowMenuOpen(true)
+        shelfSharedViewModel.setOverflowMenuOpen(false)
+        response.complete(Unit)
+
+        assertTrue(isLoadCompleted)
+    }
+
+    @Test
+    fun `given transcript button on shelf, when player closed, then show notes are not loaded`() = runTest {
+        initViewModel(currentEpisode = transcriptEpisode, shelfItems = transcriptOnShelfItems)
+
+        verify(showNotesManager, never()).loadShowNotes(any(), any())
+    }
+
+    @Test
+    fun `given episode chat enabled and transcript available, then episode chat is first in the overflow menu`() = runTest {
+        initViewModel(currentEpisode = transcriptEpisode, isTranscriptAvailable = true, isEpisodeChatEnabled = true)
+
+        val state = awaitLoadedState()
+
+        assertEquals(ShelfItem.EpisodeChat, state.playerBottomSheetShelfItems.first())
+    }
+
+    @Test
+    fun `given episode chat enabled and no transcript, then episode chat stays in the overflow menu`() = runTest {
+        initViewModel(currentEpisode = transcriptEpisode, isTranscriptAvailable = false, isEpisodeChatEnabled = true)
+
+        val state = awaitLoadedState()
+
+        assertEquals(ShelfItem.EpisodeChat, state.playerBottomSheetShelfItems.first())
+    }
+
+    @Test
+    fun `given episode chat disabled, then episode chat is hidden everywhere`() = runTest {
+        initViewModel(currentEpisode = transcriptEpisode, isTranscriptAvailable = true, isEpisodeChatEnabled = false)
+
+        val state = awaitLoadedState()
+
+        assertFalse(ShelfItem.EpisodeChat in state.shelfItems)
+    }
+
+    @Test
+    fun `given episode chat on shelf and no transcript, then it keeps its shelf slot`() = runTest {
+        val shelfItems = listOf(ShelfItem.EpisodeChat) + (ShelfItem.entries - ShelfItem.EpisodeChat)
+        initViewModel(currentEpisode = transcriptEpisode, shelfItems = shelfItems, isEpisodeChatEnabled = true)
+
+        val state = awaitLoadedState()
+
+        assertEquals(shelfItems.take(4), state.playerShelfItems)
+    }
+
+    @Test
+    fun `given episode chat enabled and transcript not loaded, when player opened, then show notes are loaded`() = runTest {
+        initViewModel(currentEpisode = transcriptEpisode, shelfItems = transcriptInOverflowItems, isEpisodeChatEnabled = true)
+
+        shelfSharedViewModel.setPlayerOpen(true)
+
+        verify(showNotesManager).loadShowNotes(podcastUuid = "podcastUuid", episodeUuid = "episodeUuid")
+    }
+
+    @Test
+    fun `given paid user, when episode chat clicked, then chat is shown`() = runTest {
+        initViewModel(subscription = plusSubscription)
+        val podcast = Podcast(uuid = "podcastUuid")
+
+        shelfSharedViewModel.navigationState.test {
+            shelfSharedViewModel.onEpisodeChatClick(podcast, transcriptEpisode, isTranscriptAvailable = true, ShelfItemSource.OverflowMenu)
+            assertEquals(
+                NavigationState.ShowEpisodeChat(
+                    podcast = podcast,
+                    episode = transcriptEpisode,
+                    access = EpisodeChatAccess.Chat(isBeta = false),
+                    entryPoint = ChatEntryPoint.MoreActions,
+                ),
+                awaitItem(),
+            )
+        }
+    }
+
+    @Test
+    fun `given signed in free user and free beta, when episode chat clicked, then beta chat is shown`() = runTest {
+        initViewModel(subscription = null)
+        FeatureFlag.setEnabled(Feature.EPISODE_CHAT_FREE_BETA, true)
+        whenever(syncManager.isLoggedIn()).thenReturn(true)
+        val podcast = Podcast(uuid = "podcastUuid")
+
+        shelfSharedViewModel.navigationState.test {
+            shelfSharedViewModel.onEpisodeChatClick(podcast, transcriptEpisode, isTranscriptAvailable = true, ShelfItemSource.Shelf)
+            assertEquals(
+                NavigationState.ShowEpisodeChat(
+                    podcast = podcast,
+                    episode = transcriptEpisode,
+                    access = EpisodeChatAccess.Chat(isBeta = true),
+                    entryPoint = ChatEntryPoint.PlayerShelf,
+                ),
+                awaitItem(),
+            )
+        }
+    }
+
+    @Test
+    fun `given signed out user and free beta, when episode chat clicked, then sign in is offered`() = runTest {
+        initViewModel(subscription = null)
+        FeatureFlag.setEnabled(Feature.EPISODE_CHAT_FREE_BETA, true)
+        whenever(syncManager.isLoggedIn()).thenReturn(false)
+        val podcast = Podcast(uuid = "podcastUuid")
+
+        shelfSharedViewModel.navigationState.test {
+            shelfSharedViewModel.onEpisodeChatClick(podcast, transcriptEpisode, isTranscriptAvailable = true, ShelfItemSource.Shelf)
+            assertEquals(
+                NavigationState.ShowEpisodeChat(
+                    podcast = podcast,
+                    episode = transcriptEpisode,
+                    access = EpisodeChatAccess.SignIn,
+                    entryPoint = ChatEntryPoint.PlayerShelf,
+                ),
+                awaitItem(),
+            )
+        }
+    }
+
+    @Test
+    fun `given signed out user without free beta, when episode chat clicked, then paywall is shown`() = runTest {
+        initViewModel(subscription = null)
+        FeatureFlag.setEnabled(Feature.EPISODE_CHAT_FREE_BETA, false)
+        whenever(syncManager.isLoggedIn()).thenReturn(false)
+        val podcast = Podcast(uuid = "podcastUuid")
+
+        shelfSharedViewModel.navigationState.test {
+            shelfSharedViewModel.onEpisodeChatClick(podcast, transcriptEpisode, isTranscriptAvailable = true, ShelfItemSource.Shelf)
+            assertEquals(
+                NavigationState.ShowEpisodeChat(
+                    podcast = podcast,
+                    episode = transcriptEpisode,
+                    access = EpisodeChatAccess.Paywall,
+                    entryPoint = ChatEntryPoint.PlayerShelf,
+                ),
+                awaitItem(),
+            )
+        }
+    }
+
+    @Test
+    fun `when sign in tapped on the episode chat sheet, then sign in starts`() = runTest {
+        initViewModel(subscription = null)
+        FeatureFlag.setEnabled(Feature.EPISODE_CHAT_FREE_BETA, true)
+        whenever(syncManager.isLoggedIn()).thenReturn(false)
+        val podcast = Podcast(uuid = "podcastUuid")
+
+        shelfSharedViewModel.navigationState.test {
+            shelfSharedViewModel.onEpisodeChatClick(podcast, transcriptEpisode, isTranscriptAvailable = true, ShelfItemSource.Shelf)
+            skipItems(1)
+            shelfSharedViewModel.onEpisodeChatSignInClick()
+            assertEquals(NavigationState.StartEpisodeChatSignIn, awaitItem())
+        }
+    }
+
+    @Test
+    fun `given no transcript, when episode chat clicked, then the needs transcript message is shown`() = runTest {
+        initViewModel(subscription = plusSubscription)
+
+        shelfSharedViewModel.snackbarMessages.test {
+            shelfSharedViewModel.onEpisodeChatClick(Podcast(uuid = "podcastUuid"), transcriptEpisode, isTranscriptAvailable = false, ShelfItemSource.OverflowMenu)
+            assertEquals(SnackbarMessage.EpisodeChatNeedsTranscript, awaitItem())
+        }
+        assertEquals(
+            EpisodeChatUnavailableTappedEvent(
+                episodeUuid = "episodeUuid",
+                podcastUuid = "podcastUuid",
+                entryPoint = EpisodeChatEntryPointType.MoreActions,
+            ),
+            eventSink.pollEvent(),
+        )
+        assertTrue(eventSink.isEmpty())
+    }
+
+    @Test
+    fun `given no transcript, then episode chat tooltip is not shown`() = runTest {
+        initViewModel(currentEpisode = transcriptEpisode, isTranscriptAvailable = false, isEpisodeChatEnabled = true)
+        shelfSharedViewModel.setPlayerOpen(true)
+
+        assertFalse(awaitLoadedState { it.isEpisodeChatPromoActive }.showEpisodeChatTooltip)
+    }
+
+    @Test
+    fun `given episode chat in overflow menu and player open, then episode chat tooltip is shown`() = runTest {
+        initViewModel(currentEpisode = transcriptEpisode, isTranscriptAvailable = true, isEpisodeChatEnabled = true)
+        shelfSharedViewModel.setPlayerOpen(true)
+
+        assertTrue(awaitLoadedState { it.isEpisodeChatPromoActive }.showEpisodeChatTooltip)
+    }
+
+    @Test
+    fun `given episode chat tooltip dismissed, then episode chat tooltip is not shown`() = runTest {
+        initViewModel(
+            currentEpisode = transcriptEpisode,
+            isTranscriptAvailable = true,
+            isEpisodeChatEnabled = true,
+            isEpisodeChatTooltipDismissed = true,
+        )
+        shelfSharedViewModel.setPlayerOpen(true)
+
+        assertFalse(awaitLoadedState().showEpisodeChatTooltip)
+    }
+
+    @Test
+    fun `given episode chat on the shelf, then episode chat tooltip is not shown`() = runTest {
+        val shelfItems = listOf(ShelfItem.EpisodeChat) + (ShelfItem.entries - ShelfItem.EpisodeChat)
+        initViewModel(
+            currentEpisode = transcriptEpisode,
+            isTranscriptAvailable = true,
+            isEpisodeChatEnabled = true,
+            shelfItems = shelfItems,
+        )
+        shelfSharedViewModel.setPlayerOpen(true)
+
+        assertFalse(awaitLoadedState { it.isEpisodeChatPromoActive }.showEpisodeChatTooltip)
+    }
+
+    @Test
+    fun `given smart bookmarks tooltip shown, then episode chat tooltip waits`() {
+        val state = ShelfSharedViewModel.UiState(
+            shelfItems = ShelfItem.entries,
+            isTranscriptAvailable = true,
+            isSmartBookmarksPromoActive = true,
+            isEpisodeChatPromoActive = true,
+        )
+
+        assertTrue(state.showBookmarkOverflowTooltip)
+        assertFalse(state.showEpisodeChatTooltip)
+    }
+
+    @Test
+    fun `when episode chat tooltip tapped, then dismissal is saved and tapped is tracked`() = runTest {
+        initViewModel()
+
+        shelfSharedViewModel.onEpisodeChatTooltipTapped()
+
+        verify(episodeChatTooltipDismissedSetting).set(true, updateModifiedAt = false)
+        assertEquals(EpisodeChatTooltipTappedEvent, eventSink.pollEvent())
+    }
+
+    @Test
+    fun `when episode chat tooltip shown, then shown is tracked`() = runTest {
+        initViewModel()
+
+        shelfSharedViewModel.onEpisodeChatTooltipShown()
+
+        assertEquals(EpisodeChatTooltipShownEvent, eventSink.pollEvent())
+    }
+
+    @Test
+    fun `when episode chat tooltip shown again after reopening the player, then shown is tracked once`() = runTest {
+        initViewModel()
+
+        shelfSharedViewModel.onEpisodeChatTooltipShown()
+        shelfSharedViewModel.setPlayerOpen(false)
+        shelfSharedViewModel.setPlayerOpen(true)
+        shelfSharedViewModel.onEpisodeChatTooltipShown()
+
+        assertEquals(EpisodeChatTooltipShownEvent, eventSink.pollEvent())
+        assertTrue(eventSink.isEmpty())
+    }
+
+    @Test
+    fun `given episode chat tooltip showing, when episode chat clicked, then tooltip dismissed is tracked`() = runTest {
+        initViewModel(currentEpisode = transcriptEpisode, isTranscriptAvailable = true, isEpisodeChatEnabled = true)
+        shelfSharedViewModel.setPlayerOpen(true)
+        awaitLoadedState { it.showEpisodeChatTooltip }
+
+        shelfSharedViewModel.onEpisodeChatClick(Podcast(uuid = "podcastUuid"), transcriptEpisode, isTranscriptAvailable = true, ShelfItemSource.OverflowMenu)
+
+        assertEquals(
+            PlayerShelfActionTappedEvent(from = ShelfActionSourceType.OverflowMenu, action = ShelfActionType.EpisodeChat),
+            eventSink.pollEvent(),
+        )
+        assertEquals(EpisodeChatTooltipDismissedEvent, eventSink.pollEvent())
+    }
+
+    @Test
+    fun `given episode chat tooltip showing, when more button clicked, then tooltip is dismissed and tracked`() = runTest {
+        initViewModel(currentEpisode = transcriptEpisode, isTranscriptAvailable = true, isEpisodeChatEnabled = true)
+        shelfSharedViewModel.setPlayerOpen(true)
+        awaitLoadedState { it.showEpisodeChatTooltip }
+
+        shelfSharedViewModel.onMoreClick()
+
+        verify(episodeChatTooltipDismissedSetting).set(true, updateModifiedAt = false)
+        assertEquals(PlayerShelfOverflowMenuShownEvent, eventSink.pollEvent())
+        assertEquals(EpisodeChatTooltipDismissedEvent, eventSink.pollEvent())
+    }
+
+    @Test
+    fun `given episode chat tooltip not showing, when more button clicked, then tooltip is kept for later`() = runTest {
+        initViewModel(currentEpisode = transcriptEpisode, isTranscriptAvailable = false, isEpisodeChatEnabled = true)
+        shelfSharedViewModel.setPlayerOpen(true)
+        awaitLoadedState { it.isEpisodeChatPromoActive }
+
+        shelfSharedViewModel.onMoreClick()
+
+        verify(episodeChatTooltipDismissedSetting, never()).set(any(), any(), any(), any())
+        assertEquals(PlayerShelfOverflowMenuShownEvent, eventSink.pollEvent())
+        assertTrue(eventSink.isEmpty())
+    }
+
+    @Test
+    fun `when episode chat clicked, then episode chat tooltip is dismissed`() = runTest {
+        initViewModel()
+
+        shelfSharedViewModel.onEpisodeChatClick(Podcast(uuid = "podcastUuid"), transcriptEpisode, isTranscriptAvailable = true, ShelfItemSource.OverflowMenu)
+
+        verify(episodeChatTooltipDismissedSetting).set(true, updateModifiedAt = false)
+    }
+
+    private suspend fun awaitLoadedState(
+        isReady: (ShelfSharedViewModel.UiState) -> Boolean = { true },
+    ): ShelfSharedViewModel.UiState {
+        var state = shelfSharedViewModel.uiState.value
+        shelfSharedViewModel.uiState.test {
+            state = awaitItem()
+            while (state.episode == null || !isReady(state)) {
+                state = awaitItem()
+            }
+            cancelAndIgnoreRemainingEvents()
+        }
+        return state
     }
 
     private fun initViewModel(
         subscription: Subscription? = plusSubscription,
+        currentEpisode: PodcastEpisode? = null,
+        hlsAvailable: Boolean = false,
+        streamVideoState: StreamVideoState = StreamVideoState.NotVideo,
+        audioOnly: Boolean = false,
+        isTranscriptAvailable: Boolean = false,
+        shelfItems: List<ShelfItem> = ShelfItem.entries,
+        isEpisodeChatEnabled: Boolean = false,
+        isEpisodeChatTooltipDismissed: Boolean = false,
     ) {
+        FeatureFlag.setEnabled(Feature.HLS_STREAMING, true)
+        FeatureFlag.setEnabled(Feature.EPISODE_CHAT, isEpisodeChatEnabled)
+
         whenever(playbackManager.upNextQueue).thenReturn(upNextQueue)
+        val upNextState = if (currentEpisode != null) {
+            UpNextQueue.State.Loaded(currentEpisode, null, listOf(currentEpisode))
+        } else {
+            UpNextQueue.State.Empty
+        }
         whenever(
-            upNextQueue.getChangesObservableWithLiveCurrentEpisode(
+            upNextQueue.getChangesFlowWithLiveCurrentEpisode(
                 episodeManager,
                 podcastManager,
             ),
-        ).thenReturn(Observable.just(UpNextQueue.State.Empty))
+        ).thenReturn(flowOf(upNextState))
+
+        if (currentEpisode != null) {
+            whenever(transcriptManager.observeIsTranscriptAvailable(currentEpisode.uuid)).thenReturn(flowOf(isTranscriptAvailable))
+        }
 
         val userSetting = mock<UserSetting<List<ShelfItem>>>()
-        whenever(userSetting.flow).thenReturn(MutableStateFlow(ShelfItem.entries))
+        whenever(userSetting.flow).thenReturn(MutableStateFlow(shelfItems))
         whenever(settings.shelfItems).thenReturn(userSetting)
+
+        val smartBookmarksTooltipSetting = mock<UserSetting<Boolean>>()
+        whenever(smartBookmarksTooltipSetting.flow).thenReturn(MutableStateFlow(false))
+        whenever(settings.showSmartBookmarksTooltip).thenReturn(smartBookmarksTooltipSetting)
+
+        val smartBookmarksTooltipDismissedSetting = mock<UserSetting<Boolean>>()
+        whenever(smartBookmarksTooltipDismissedSetting.flow).thenReturn(MutableStateFlow(false))
+        whenever(settings.smartBookmarksTooltipDismissed).thenReturn(smartBookmarksTooltipDismissedSetting)
+
+        whenever(episodeChatTooltipDismissedSetting.flow).thenReturn(MutableStateFlow(isEpisodeChatTooltipDismissed))
+        whenever(settings.episodeChatTooltipDismissed).thenReturn(episodeChatTooltipDismissedSetting)
 
         val userSubscriptionSetting = mock<UserSetting<Subscription?>>()
         whenever(userSubscriptionSetting.value).thenReturn(subscription)
         whenever(settings.cachedSubscription).thenReturn(userSubscriptionSetting)
 
-        whenever(playbackManager.streamVideoState).thenReturn(MutableStateFlow(StreamVideoState.NotVideo))
+        whenever(playbackManager.streamVideoState).thenReturn(MutableStateFlow(streamVideoState))
+        whenever(playbackManager.streamHlsAvailable).thenReturn(MutableStateFlow(hlsAvailable))
         whenever(playbackManager.videoRenderingEnabled).thenReturn(MutableStateFlow(true))
 
+        val audioOnlySetting = mock<UserSetting<Boolean>>()
+        whenever(audioOnlySetting.flow).thenReturn(MutableStateFlow(audioOnly))
+        whenever(settings.audioOnly).thenReturn(audioOnlySetting)
+
         shelfSharedViewModel = ShelfSharedViewModel(
-            eventHorizon = EventHorizon(TestEventSink()),
+            eventHorizon = EventHorizon(eventSink),
             applicationScope = applicationScope,
             chromeCastAnalytics = chromeCastAnalytics,
             episodeManager = episodeManager,
@@ -345,8 +891,11 @@ class ShelfSharedViewModelTest {
             podcastManager = podcastManager,
             settings = settings,
             userEpisodeManager = userEpisodeManager,
-            transcriptManager = mock(),
+            transcriptManager = transcriptManager,
+            showNotesManager = showNotesManager,
             downloadQueue = mock(),
+            syncManager = syncManager,
+            ioDispatcher = coroutineRule.testDispatcher,
         )
     }
 }

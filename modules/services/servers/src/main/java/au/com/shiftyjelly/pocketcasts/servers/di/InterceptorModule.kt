@@ -6,14 +6,15 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.servers.BuildConfig
 import au.com.shiftyjelly.pocketcasts.servers.CleanAndRetryInterceptor
 import au.com.shiftyjelly.pocketcasts.servers.OkHttpInterceptor
+import au.com.shiftyjelly.pocketcasts.servers.PlatformUserAgent
 import au.com.shiftyjelly.pocketcasts.servers.interceptors.BasicAuthInterceptor
 import au.com.shiftyjelly.pocketcasts.servers.interceptors.InternationalizationInterceptor
+import au.com.shiftyjelly.pocketcasts.servers.interceptors.UserFileAuthInterceptor
 import au.com.shiftyjelly.pocketcasts.servers.sync.TokenHandler
-import au.com.shiftyjelly.pocketcasts.servers.sync.exception.RefreshTokenExpiredException
+import au.com.shiftyjelly.pocketcasts.servers.sync.getAccessTokenBlocking
 import au.com.shiftyjelly.pocketcasts.servers.toClientInterceptor
 import au.com.shiftyjelly.pocketcasts.servers.toNetworkInterceptor
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.android.tracks.crashlogging.CrashLoggingOkHttpInterceptorProvider
 import com.automattic.android.tracks.crashlogging.FormattedUrl
 import com.automattic.android.tracks.crashlogging.RequestFormatter
@@ -24,7 +25,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import java.net.HttpURLConnection
 import kotlin.time.Duration.Companion.minutes
-import kotlinx.coroutines.runBlocking
+import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.logging.HttpLoggingInterceptor
@@ -82,17 +83,35 @@ object InterceptorModule {
             .build()
     }
 
-    private val cleanAndRetryInterceptor = CleanAndRetryInterceptor(
-        headersToRemove = listOf(
-            // Remove our custom User-Agent. Internal ref: p1730724100345749-slack-C07J5LNP4SF
-            "User-Agent",
-            // Remove our custom i18n headers.
-            InternationalizationInterceptor.APP_LANGUAGE_HEADER,
-            InternationalizationInterceptor.USER_REGION_HEADER,
-            // Remove Sentry stuff from requests as well to make it more pure.
-            "sentry-trace",
-            "baggage",
-        ),
+    private val cleanAndRetryHeaders = listOf(
+        // Remove our custom User-Agent. Internal ref: p1730724100345749-slack-C07J5LNP4SF
+        "User-Agent",
+        // Remove our custom i18n headers.
+        InternationalizationInterceptor.APP_LANGUAGE_HEADER,
+        InternationalizationInterceptor.USER_REGION_HEADER,
+        // Remove Sentry stuff from requests as well to make it more pure.
+        "sentry-trace",
+        "baggage",
+    )
+
+    private val downloadsCleanAndRetryInterceptor = mediaCleanAndRetryInterceptor(LogBuffer.TAG_DOWNLOAD)
+
+    private val playerCleanAndRetryInterceptor = mediaCleanAndRetryInterceptor(LogBuffer.TAG_PLAYBACK)
+
+    private val artworkCleanAndRetryInterceptor = CleanAndRetryInterceptor(
+        headersToRemove = cleanAndRetryHeaders,
+        retryUserAgent = PlatformUserAgent.value,
+    ).toClientInterceptor()
+
+    private fun mediaCleanAndRetryInterceptor(logTag: String) = CleanAndRetryInterceptor(
+        headersToRemove = cleanAndRetryHeaders,
+        retryUserAgent = PlatformUserAgent.value,
+        onRetried = { request, failedCode, retryCode ->
+            if (request.method != "HEAD") {
+                val host = request.url.host
+                LogBuffer.i(logTag, "Retried $host with clean headers: HTTP $failedCode -> $retryCode")
+            }
+        },
     ).toClientInterceptor() // Must be client interceptor. Otherwise calls cannot be retried.
 
     private val basicAuthInterceptor = BasicAuthInterceptor().toClientInterceptor()
@@ -112,30 +131,18 @@ object InterceptorModule {
             return builder.build()
         }
 
-        fun getAccessToken(): AccessToken? {
-            return if (FeatureFlag.isEnabled(Feature.INTERCEPTOR_REFRESH_TOKEN_FALLBACK)) {
-                try {
-                    runBlocking { tokenHandler.getAccessToken() }
-                } catch (_: RefreshTokenExpiredException) {
-                    null
-                }
-            } else {
-                runBlocking { tokenHandler.getAccessToken() }
-            }
-        }
-
         return Interceptor { chain ->
             val original = chain.request()
             if (unauthenticatedEndpoints.contains(original.url.encodedPathSegments.firstOrNull())) {
                 chain.proceed(original)
             } else {
-                val token = getAccessToken()
+                val token = tokenHandler.getAccessTokenBlocking()
                 return@Interceptor if (token != null) {
                     val response = chain.proceed(buildRequestWithToken(original, token))
                     if (response.code == HttpURLConnection.HTTP_UNAUTHORIZED) {
                         tokenHandler.invalidateAccessToken()
                         response.close()
-                        val newToken = getAccessToken()
+                        val newToken = tokenHandler.getAccessTokenBlocking()
                         chain.proceed(buildRequestWithToken(original, newToken))
                     } else {
                         response
@@ -145,6 +152,17 @@ object InterceptorModule {
                 }
             }
         }
+    }
+
+    @Provides
+    @UserFileInterceptor
+    fun provideUserFileAuthInterceptor(
+        tokenHandler: TokenHandler,
+    ): Interceptor {
+        return UserFileAuthInterceptor(
+            apiUrl = Settings.SERVER_API_URL.toHttpUrl(),
+            tokenHandler = tokenHandler,
+        )
     }
 
     @Provides
@@ -224,13 +242,15 @@ object InterceptorModule {
     @Downloads
     fun provideDownloadsInterceptors(
         @I18nInterceptor i18nInterceptor: Interceptor,
+        @UserFileInterceptor userFileAuthInterceptor: Interceptor,
     ): List<OkHttpInterceptor> {
         return buildList {
             add(publicUserAgentInterceptor.toClientInterceptor())
             add(i18nInterceptor.toClientInterceptor())
             add(crashLoggingInterceptor.toClientInterceptor())
             add(basicAuthInterceptor)
-            add(cleanAndRetryInterceptor)
+            add(downloadsCleanAndRetryInterceptor)
+            add(userFileAuthInterceptor.toClientInterceptor())
 
             if (BuildConfig.DEBUG) {
                 val loggingInterceptor = HttpLoggingInterceptor().apply {
@@ -267,13 +287,15 @@ object InterceptorModule {
     @Player
     fun providePlayerInterceptors(
         @I18nInterceptor i18nInterceptor: Interceptor,
+        @UserFileInterceptor userFileAuthInterceptor: Interceptor,
     ): List<OkHttpInterceptor> {
         return buildList {
             add(publicUserAgentInterceptor.toClientInterceptor())
             add(i18nInterceptor.toClientInterceptor())
             add(crashLoggingInterceptor.toClientInterceptor())
             add(basicAuthInterceptor)
-            add(cleanAndRetryInterceptor)
+            add(playerCleanAndRetryInterceptor)
+            add(userFileAuthInterceptor.toClientInterceptor())
 
             if (BuildConfig.DEBUG) {
                 val loggingInterceptor = HttpLoggingInterceptor().apply {
@@ -293,7 +315,7 @@ object InterceptorModule {
             add(publicUserAgentInterceptor.toClientInterceptor())
             add(i18nInterceptor.toClientInterceptor())
             add(crashLoggingInterceptor.toClientInterceptor())
-            add(cleanAndRetryInterceptor)
+            add(artworkCleanAndRetryInterceptor)
 
             if (BuildConfig.DEBUG) {
                 val loggingInterceptor = HttpLoggingInterceptor().apply {

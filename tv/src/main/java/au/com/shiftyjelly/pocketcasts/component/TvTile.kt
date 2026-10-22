@@ -21,22 +21,33 @@ import androidx.tv.material3.CardDefaults
 import androidx.tv.material3.CardGlow
 import androidx.tv.material3.CardScale
 import androidx.tv.material3.CardShape
+import androidx.tv.material3.Glow
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
-import au.com.shiftyjelly.pocketcasts.compose.AppTheme
-import au.com.shiftyjelly.pocketcasts.theme.TvColors
-import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.theme.TvTheme
+import au.com.shiftyjelly.pocketcasts.theme.tvColors
+
+val TvFocusedCardScale = 1.05f
+val TvFocusedPodcastScale = 1.12f
+val TvFocusedWideCardScale = 1.02f
+val TvTileSpacing = 20.dp
+
+fun tvFocusedCoverScale(): CardScale = CardDefaults.scale(focusedScale = TvFocusedPodcastScale)
+
+fun tvFocusedCoverGlow(): CardGlow = CardDefaults.glow(
+    focusedGlow = Glow(elevationColor = Color.Black, elevation = 16.dp),
+)
 
 @Composable
 fun TvTile(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     onLongClick: (() -> Unit)? = null,
-    scale: CardScale = CardDefaults.scale(focusedScale = 1.1f),
+    scale: CardScale = CardDefaults.scale(focusedScale = TvFocusedCardScale),
     shape: CardShape = CardDefaults.shape(),
     colors: CardColors = CardDefaults.colors(
-        containerColor = TvColors.DarkGray,
-        focusedContainerColor = TvColors.Gray,
+        containerColor = MaterialTheme.tvColors.backgroundBase,
+        focusedContainerColor = MaterialTheme.tvColors.backgroundOverlay,
     ),
     border: CardBorder = CardDefaults.border(
         border = Border.None,
@@ -64,21 +75,19 @@ fun TvTile(
 @Preview(device = Devices.TV_1080p, showBackground = true)
 @Composable
 private fun TvTilePreview() {
-    AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
-        MaterialTheme {
-            TvTile(onClick = {}) {
-                Box(
-                    modifier = Modifier
-                        .size(160.dp, 100.dp)
-                        .background(TvColors.DarkGray)
-                        .padding(12.dp),
-                    contentAlignment = Alignment.BottomStart,
-                ) {
-                    Text(
-                        text = "Sample Tile",
-                        color = Color.White,
-                    )
-                }
+    TvTheme {
+        TvTile(onClick = {}) {
+            Box(
+                modifier = Modifier
+                    .size(120.dp, 75.dp)
+                    .background(MaterialTheme.tvColors.backgroundBase)
+                    .padding(9.dp),
+                contentAlignment = Alignment.BottomStart,
+            ) {
+                Text(
+                    text = "Sample Tile",
+                    color = Color.White,
+                )
             }
         }
     }

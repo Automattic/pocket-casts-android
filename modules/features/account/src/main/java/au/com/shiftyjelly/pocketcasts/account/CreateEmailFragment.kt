@@ -17,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.SubscriptionType
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getTintedDrawable
+import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.views.extensions.addOnTextChanged
 import au.com.shiftyjelly.pocketcasts.views.extensions.showKeyboard
@@ -24,6 +25,7 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import com.automattic.eventhorizon.CreateAccountNextButtonTappedEvent
 import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.OnboardingFlowType
 import com.google.android.material.textfield.TextInputEditText
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -68,7 +70,9 @@ class CreateEmailFragment : BaseFragment() {
         txtEmail.setText(viewModel.email.value)
         txtPassword.setText(viewModel.password.value)
 
-        txtEmail.showKeyboard()
+        if (!Util.isCarUiMode(view.context)) {
+            txtEmail.showKeyboard()
+        }
         currentEditText = txtEmail
 
         scalePasswordToggleWithFontSize()
@@ -134,7 +138,7 @@ class CreateEmailFragment : BaseFragment() {
             ) {
                 txtError.text = ""
                 UiUtil.hideKeyboard(v)
-                eventHorizon.track(CreateAccountNextButtonTappedEvent)
+                eventHorizon.track(CreateAccountNextButtonTappedEvent(flow = OnboardingFlowType.Unknown))
                 viewModel.sendCreateAccount()
             }
         }

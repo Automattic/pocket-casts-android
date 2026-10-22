@@ -16,11 +16,9 @@ import com.automattic.eventhorizon.SettingsSelectPodcastsSelectNoneTappedEvent
 import com.automattic.eventhorizon.SettingsSelectPodcastsShownEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 @HiltViewModel
 class PodcastSelectViewModel @Inject constructor(
@@ -33,9 +31,7 @@ class PodcastSelectViewModel @Inject constructor(
 
     fun loadSelectablePodcasts(selectedUuids: List<String>) {
         viewModelScope.launch {
-            val podcasts = withContext(Dispatchers.IO) {
-                podcastManager.findSubscribedBlocking()
-            }
+            val podcasts = podcastManager.findSubscribedNoOrder()
 
             val sortedSelectable = podcasts
                 .sortedBy { PodcastsSortType.cleanStringForSort(it.title) }

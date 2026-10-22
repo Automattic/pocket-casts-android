@@ -13,7 +13,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -55,8 +58,12 @@ fun LoggingInScreen(
     ScreenScaffold {
         val state = viewModel.state.collectAsState().value
 
-        if (viewModel.shouldClose(withMinimumDelay)) {
-            onClose()
+        val shouldClose = viewModel.shouldClose(withMinimumDelay)
+        val currentOnClose by rememberUpdatedState(onClose)
+        LaunchedEffect(shouldClose) {
+            if (shouldClose) {
+                currentOnClose()
+            }
         }
 
         Content(

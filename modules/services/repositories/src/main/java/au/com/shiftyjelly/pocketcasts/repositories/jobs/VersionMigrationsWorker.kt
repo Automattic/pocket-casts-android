@@ -261,6 +261,11 @@ class VersionMigrationsWorker @AssistedInject constructor(
         if (previousVersionCode < 9437) {
             settings.showUpNextSortDurationTooltip.set(true, updateModifiedAt = false)
         }
+
+        // Show the smart bookmarks player tip to users upgrading into this release, but not to fresh installs.
+        if (previousVersionCode < 9460) {
+            settings.showSmartBookmarksTooltip.set(true, updateModifiedAt = false)
+        }
     }
 
     private fun removeOldTempPodcastDirectory() {
@@ -326,7 +331,7 @@ class VersionMigrationsWorker @AssistedInject constructor(
             val podcasts = podcastManager.findSubscribedBlocking()
             podcasts.forEach { podcast ->
                 if (podcast.isSilenceRemoved && podcast.trimMode == TrimMode.OFF) {
-                    podcastManager.updateTrimModeBlocking(podcast, TrimMode.LOW)
+                    podcastManager.updateTrimMode(podcast, TrimMode.LOW)
                 }
             }
         } catch (e: Exception) {

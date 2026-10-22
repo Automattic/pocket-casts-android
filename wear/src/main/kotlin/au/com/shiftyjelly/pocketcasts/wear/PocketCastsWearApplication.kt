@@ -15,6 +15,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.jobs.VersionMigrationsWorker
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackServiceToggle
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.DefaultPlaylistsInitializer
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.stats.PlaybackStatsSyncWorker
@@ -59,6 +60,8 @@ class PocketCastsWearApplication :
     @Inject lateinit var settings: Settings
 
     @Inject lateinit var userManager: UserManager
+
+    @Inject lateinit var defaultPlaylistsInitializer: DefaultPlaylistsInitializer
 
     @Inject lateinit var workerFactory: HiltWorkerFactory
 
@@ -113,6 +116,12 @@ class PocketCastsWearApplication :
             settings = settings,
             moshi = moshi,
         )
+
+        applicationScope.launch {
+            runStartupStep("default playlists seeding") {
+                defaultPlaylistsInitializer.initialize()
+            }
+        }
 
         // Defer the expensive playback/storage setup and monitors off the main thread to avoid blocking onCreate (ANRs).
         applicationScope.launch {

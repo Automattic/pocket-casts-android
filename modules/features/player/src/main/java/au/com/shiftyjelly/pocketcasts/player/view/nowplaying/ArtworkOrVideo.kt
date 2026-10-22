@@ -9,12 +9,15 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.player.view.video.VideoView
 import au.com.shiftyjelly.pocketcasts.repositories.playback.Player
+import au.com.shiftyjelly.pocketcasts.repositories.playback.VideoSurfaceState
+import kotlinx.coroutines.flow.StateFlow
 import okhttp3.HttpUrl
 
 @Composable
 internal fun ArtworkOrVideo(
     state: ArtworkOrVideoState,
     onChapterUrlClick: (HttpUrl) -> Unit,
+    videoSurfaceState: StateFlow<VideoSurfaceState>,
     configureVideoView: (VideoView) -> Unit,
     modifier: Modifier = Modifier,
     artworkCornerRadius: Dp = 16.dp,
@@ -33,6 +36,7 @@ internal fun ArtworkOrVideo(
             is ArtworkOrVideoState.Video -> {
                 VideoBox(
                     player = state.player,
+                    videoSurfaceState = videoSurfaceState,
                     configureVideoView = configureVideoView,
                 )
             }

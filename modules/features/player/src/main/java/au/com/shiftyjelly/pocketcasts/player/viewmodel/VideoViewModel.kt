@@ -4,28 +4,30 @@ import android.os.Build
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.toLiveData
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.BackpressureStrategy
-import io.reactivex.Completable
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.Disposable
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class VideoViewModel @Inject constructor(
     private val playbackManager: PlaybackManager,
 ) : ViewModel() {
 
-    val playbackState: LiveData<PlaybackState> = playbackManager.playbackStateRelay
-        .toFlowable(BackpressureStrategy.LATEST)
-        .toLiveData()
+    // Conflated so a busy main thread never blocks the thread pushing playback state
+    val playbackState: LiveData<PlaybackState> = playbackManager.playbackStateFlow
+        .conflate()
+        .asLiveData()
 
-    private var hideControlsTimer: Disposable? = null
+    private var hideControlsJob: Job? = null
     private var lastTimeHidingControls = 0L
 
     private var controlsVisibleMutable = MutableLiveData(true)
@@ -97,20 +99,15 @@ class VideoViewModel @Inject constructor(
 
     private fun startHideControlsTimer() {
         stopHideControlsTimer()
-        hideControlsTimer = Completable.timer(3, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
-            .subscribe {
-                if (playbackManager.isPlaying()) {
-                    this.hideControls()
-                }
+        hideControlsJob = viewModelScope.launch {
+            delay(3.seconds)
+            if (playbackManager.isPlaying()) {
+                hideControls()
             }
+        }
     }
 
     private fun stopHideControlsTimer() {
-        hideControlsTimer?.dispose()
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        stopHideControlsTimer()
+        hideControlsJob?.cancel()
     }
 }

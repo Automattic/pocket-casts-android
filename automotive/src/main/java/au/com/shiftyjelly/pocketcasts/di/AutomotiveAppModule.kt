@@ -1,5 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.di
 
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.DefaultPlaylistsInitializer
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.DefaultPlaylistsInitializerImpl
 import au.com.shiftyjelly.pocketcasts.servers.di.Downloads
 import au.com.shiftyjelly.pocketcasts.views.swipe.AddToPlaylistFragmentFactory
 import dagger.Binds
@@ -27,4 +29,7 @@ abstract class AutomotiveAppModule {
     @Binds
     @Downloads
     abstract fun downloadsCallFactory(@Downloads client: OkHttpClient): Call.Factory
+
+    @Binds
+    abstract fun defaultPlaylistsInitializer(initializer: DefaultPlaylistsInitializerImpl): DefaultPlaylistsInitializer
 }

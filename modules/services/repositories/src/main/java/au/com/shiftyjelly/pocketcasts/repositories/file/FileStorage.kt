@@ -18,7 +18,6 @@ import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.mapNotNull
-import kotlinx.coroutines.reactive.asFlow
 import timber.log.Timber
 
 open class FileStorage @Inject constructor(
@@ -179,7 +178,7 @@ open class FileStorage @Inject constructor(
                     .updateEpisodesWithNewFilePaths(episodesManager)
 
                 // Move episodes
-                episodesManager.findDownloadedEpisodesRxFlowable().asFlow().first()
+                episodesManager.findDownloadedEpisodesFlow().first()
                     .onEach { episode -> LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Found downloaded episode ${episode.title}") }
                     .matchWithDownloadedFilePaths()
                     .filterNotExistingFiles()

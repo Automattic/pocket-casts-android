@@ -6,7 +6,6 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import com.pocketcasts.service.api.StarredEpisode
-import io.reactivex.Single
 import java.util.Date
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.test.runTest
@@ -46,7 +45,7 @@ class StarredSyncTest {
         val localEpisode = createEpisode(serverEpisode)
 
         whenever(settings.getStarredServerModified()).thenReturn(0L)
-        whenever(podcastManager.findOrDownloadPodcastRxSingle(serverEpisode.podcastUuid)).thenReturn(Single.just(podcast))
+        whenever(podcastManager.findOrDownloadPodcast(serverEpisode.podcastUuid)).thenReturn(podcast)
         whenever(episodeManager.findByUuid(serverEpisode.uuid)).thenReturn(localEpisode)
 
         starredSync.syncStarredEpisodes(
@@ -71,7 +70,7 @@ class StarredSyncTest {
         )
 
         whenever(settings.getStarredServerModified()).thenReturn(0L)
-        whenever(podcastManager.findOrDownloadPodcastRxSingle(serverEpisode.podcastUuid)).thenReturn(Single.just(podcast))
+        whenever(podcastManager.findOrDownloadPodcast(serverEpisode.podcastUuid)).thenReturn(podcast)
         whenever(episodeManager.findByUuid(serverEpisode.uuid)).thenReturn(localEpisode)
 
         starredSync.syncStarredEpisodes(
@@ -98,9 +97,9 @@ class StarredSyncTest {
         val localEpisode3 = createEpisode(episode3)
 
         whenever(settings.getStarredServerModified()).thenReturn(0L)
-        whenever(podcastManager.findOrDownloadPodcastRxSingle(episode1.podcastUuid)).thenReturn(Single.just(podcast))
-        whenever(podcastManager.findOrDownloadPodcastRxSingle(episode2.podcastUuid)).thenReturn(Single.just(podcast))
-        whenever(podcastManager.findOrDownloadPodcastRxSingle(episode3.podcastUuid)).thenReturn(Single.just(podcast))
+        whenever(podcastManager.findOrDownloadPodcast(episode1.podcastUuid)).thenReturn(podcast)
+        whenever(podcastManager.findOrDownloadPodcast(episode2.podcastUuid)).thenReturn(podcast)
+        whenever(podcastManager.findOrDownloadPodcast(episode3.podcastUuid)).thenReturn(podcast)
         whenever(episodeManager.findByUuid(episode1.uuid)).thenReturn(localEpisode1)
         whenever(episodeManager.findByUuid(episode2.uuid)).thenReturn(localEpisode2)
         whenever(episodeManager.findByUuid(episode3.uuid)).thenReturn(localEpisode3)
@@ -125,7 +124,7 @@ class StarredSyncTest {
 
         // Set the last starred modified to now to check only the recent episode is updated
         whenever(settings.getStarredServerModified()).thenReturn(now)
-        whenever(podcastManager.findOrDownloadPodcastRxSingle(recentEpisode.podcastUuid)).thenReturn(Single.just(podcast))
+        whenever(podcastManager.findOrDownloadPodcast(recentEpisode.podcastUuid)).thenReturn(podcast)
         whenever(episodeManager.findByUuid(recentEpisode.uuid)).thenReturn(localRecentEpisode)
 
         starredSync.syncStarredEpisodes(

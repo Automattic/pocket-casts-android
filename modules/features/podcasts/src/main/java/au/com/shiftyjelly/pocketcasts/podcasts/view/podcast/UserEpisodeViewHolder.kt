@@ -23,9 +23,11 @@ import au.com.shiftyjelly.pocketcasts.views.buttons.PlayButton
 import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeAction
 import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeRowActions
 import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeRowLayout
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.plusAssign
-import io.reactivex.rxkotlin.subscribeBy
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 class UserEpisodeViewHolder(
@@ -53,13 +55,14 @@ class UserEpisodeViewHolder(
 
     private val dateFormatter = RelativeDateFormatter(context)
 
-    private val disposable: CompositeDisposable = CompositeDisposable()
+    private val holderScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
+    private var rowDataJob: Job? = null
+    private var rowData: UserEpisodeRowData? = null
 
     private var boundEpisode: UserEpisode? = null
     private val episode get() = requireNotNull(boundEpisode)
     private var isMultiSelectEnabled = false
     private var streamByDefault = false
-    private var isObservingRowData = false
 
     init {
         binding.episodeRow.setOnClickListener {
@@ -94,7 +97,7 @@ class UserEpisodeViewHolder(
         val previousUuid = boundEpisode?.uuid
         setupInitialState(episode, tint, isMultiSelectEnabled, streamByDefault)
 
-        if (previousUuid != episode.uuid || !isObservingRowData) {
+        if (previousUuid != episode.uuid || rowDataJob?.isActive != true) {
             observeRowData()
         }
         bindFileStatus()
@@ -114,6 +117,7 @@ class UserEpisodeViewHolder(
     private fun setupInitialState(episode: UserEpisode, tint: Int?, isMultiSelectEnabled: Boolean, streamByDefault: Boolean) {
         if (episode.uuid != this.boundEpisode?.uuid) {
             swipeLayout.clearTranslation()
+            rowData = null
         }
         this.boundEpisode = episode
         this.streamByDefault = streamByDefault
@@ -133,22 +137,23 @@ class UserEpisodeViewHolder(
     }
 
     fun unbind() {
-        disposable.clear()
+        rowDataJob?.cancel()
+        rowDataJob = null
         binding.episodeRow.handler?.removeCallbacksAndMessages(null)
     }
 
     private fun observeRowData() {
-        disposable.clear()
-        disposable += rowDataProvider.userEpisodeRowDataObservable(episode.uuid)
-            .doOnSubscribe { isObservingRowData = true }
-            .doOnDispose { isObservingRowData = false }
-            .subscribeBy(onNext = { data ->
+        rowDataJob?.cancel()
+        rowDataJob = holderScope.launch {
+            rowDataProvider.userEpisodeRowDataFlow(episode.uuid).collect { data ->
+                rowData = data
                 bindPlaybackButton()
                 bindDate()
                 bindSwipeActions()
                 bindContentDescription()
                 bindFileStatusUpdate(data)
-            })
+            }
+        }
     }
 
     private fun bindFileStatus() {
@@ -182,6 +187,8 @@ class UserEpisodeViewHolder(
     }
 
     private fun bindPlaybackButton() {
+        val playbackState = rowData?.playbackState
+        episode.playing = playbackState != null && playbackState.isPlaying && playbackState.episodeUuid == episode.uuid
         val buttonType = PlayButton.calculateButtonType(episode, streamByDefault)
         binding.playButton.setButtonType(episode, buttonType, tint, fromListUuid = null)
     }

@@ -8,7 +8,6 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.bookmark.BookmarkEnrichReques
 import au.com.shiftyjelly.pocketcasts.servers.sync.bookmark.BookmarkEnrichResponse
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
-import io.reactivex.Single
 import java.util.Date
 import okhttp3.ResponseBody
 import retrofit2.Response
@@ -81,7 +80,7 @@ interface PodcastCacheService {
     suspend fun getPodcastAndEpisodesRaw(@Path("podcastUuid") podcastUuid: String): Response<PodcastResponse>
 
     @GET("/mobile/podcast/full/{podcastUuid}")
-    fun getPodcastAndEpisodes(@Path("podcastUuid") podcastUuid: String): Single<PodcastResponse>
+    suspend fun getPodcastAndEpisodes(@Path("podcastUuid") podcastUuid: String): PodcastResponse
 
     @GET("/mobile/show_notes/full/{podcastUuid}")
     suspend fun getShowNotesLocation(@Path("podcastUuid") podcastUuid: String, @Query("disableredirect") disableRedirect: Boolean = true): ShowNotesLocationResponse
@@ -101,19 +100,16 @@ interface PodcastCacheService {
     suspend fun getShowNotesChapters(@Url url: String): RawChaptersResponse
 
     @GET("/mobile/podcast/findbyepisode/{podcastUuid}/{episodeUuid}")
-    fun getPodcastAndEpisodeSingle(@Path("podcastUuid") podcastUuid: String, @Path("episodeUuid") episodeUuid: String): Single<PodcastResponse>
-
-    @GET("/mobile/podcast/findbyepisode/{podcastUuid}/{episodeUuid}")
     suspend fun getPodcastAndEpisode(@Path("podcastUuid") podcastUuid: String, @Path("episodeUuid") episodeUuid: String): PodcastResponse
 
     @GET("/mobile/episode/url/{podcastUuid}/{episodeUuid}")
     suspend fun getEpisodeUrl(@Path("podcastUuid") podcastUuid: String, @Path("episodeUuid") episodeUuid: String): Response<ResponseBody>
 
     @POST("/mobile/podcast/episode/search")
-    fun searchPodcastForEpisodes(@Body searchBody: SearchBody): Single<SearchResultBody>
+    suspend fun searchPodcastForEpisodes(@Body searchBody: SearchBody): SearchResultBody
 
     @POST("/episode/search")
-    fun searchEpisodes(@Body body: SearchEpisodesBody): Single<SearchEpisodesResultBody>
+    suspend fun searchEpisodes(@Body body: SearchEpisodesBody): SearchEpisodesResultBody
 
     @GET("/podcast/rating/{podcastUuid}")
     suspend fun getPodcastRatings(@Path("podcastUuid") podcastUuid: String): PodcastRatingsResponse
@@ -125,7 +121,7 @@ interface PodcastCacheService {
     @POST("/podcast/suggest_folders")
     suspend fun suggestedFolders(@Body request: SuggestedFoldersRequest): SuggestedFoldersResponse
 
-    @POST("/search/combined")
+    @POST("/v2/search/combined")
     suspend fun combinedSearch(
         @Body request: CombinedSearchRequest,
     ): CombinedSearchResponse

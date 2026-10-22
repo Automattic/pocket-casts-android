@@ -7,12 +7,14 @@ sealed class ListType(val stringValue: String) {
     companion object {
         private const val PODCAST_LIST = "podcast_list"
         private const val EPISODE_LIST = "episode_list"
+        private const val LISTS_LIST = "lists_list"
         private const val CATEGORIES = "categories"
 
         fun fromString(value: String): ListType {
             return when (value) {
                 PODCAST_LIST -> PodcastList
                 EPISODE_LIST -> EpisodeList
+                LISTS_LIST -> ListsList
                 CATEGORIES -> Categories
                 else -> Unknown(value)
             }
@@ -21,6 +23,7 @@ sealed class ListType(val stringValue: String) {
 
     data object PodcastList : ListType(PODCAST_LIST)
     data object EpisodeList : ListType(EPISODE_LIST)
+    data object ListsList : ListType(LISTS_LIST)
     data object Categories : ListType(CATEGORIES)
     data class Unknown(val value: String) : ListType(value)
 

@@ -18,6 +18,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
+import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import androidx.fragment.compose.content
 import androidx.navigation.NavController
@@ -189,6 +190,14 @@ internal class CreatePlaylistFragment : BaseDialogFragment() {
         setPreFlingThreshold(thresholdDp = 150)
     }
 }
+
+fun FragmentManager.showCreatePlaylist() {
+    if (findFragmentByTag(CREATE_PLAYLIST_TAG) == null) {
+        CreatePlaylistFragment().show(this, CREATE_PLAYLIST_TAG)
+    }
+}
+
+private const val CREATE_PLAYLIST_TAG = "create_playlist"
 
 private object NavigationRoutes {
     const val NEW_PLAYLIST = "new_playlist"

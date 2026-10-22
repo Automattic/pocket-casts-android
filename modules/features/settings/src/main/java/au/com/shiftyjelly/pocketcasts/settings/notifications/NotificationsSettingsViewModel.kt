@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.settings.notifications
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationAction
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
@@ -30,12 +31,11 @@ import com.automattic.eventhorizon.SettingsNotificationsVibrationChangedEvent
 import com.automattic.eventhorizon.SettingsTrendingAdvancedSettingsTappedEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 @HiltViewModel
 internal class NotificationsSettingsViewModel @Inject constructor(
@@ -44,6 +44,7 @@ internal class NotificationsSettingsViewModel @Inject constructor(
     private val podcastManager: PodcastManager,
     private val notificationHelper: NotificationHelper,
     private val notificationScheduler: NotificationScheduler,
+    @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(
@@ -221,10 +222,12 @@ internal class NotificationsSettingsViewModel @Inject constructor(
     }
 
     internal fun onSelectedPodcastsChanged(newSelection: List<String>) {
-        viewModelScope.launch(Dispatchers.IO) {
-            podcastManager.findSubscribedBlocking().forEach {
-                podcastManager.updateShowNotifications(it.uuid, newSelection.contains(it.uuid))
-            }
+        // Persist outside of viewModelScope so leaving the screen can't cancel a half-applied selection
+        val updateJob = applicationScope.launch {
+            podcastManager.updateShowNotificationsForSubscribed(newSelection)
+        }
+        viewModelScope.launch {
+            updateJob.join()
             loadPreferences()
         }
     }
@@ -233,9 +236,8 @@ internal class NotificationsSettingsViewModel @Inject constructor(
         eventHorizon.track(NotificationsPermissionsOpenSystemSettingsEvent)
     }
 
-    internal suspend fun getSelectedPodcastIds(): List<String> = withContext(Dispatchers.IO) {
-        val uuids = podcastManager.findSubscribedBlocking().filter { it.isShowNotifications }.map { it.uuid }
-        uuids
+    internal suspend fun getSelectedPodcastIds(): List<String> {
+        return podcastManager.findSubscribedNoOrder().filter { it.isShowNotifications }.map { it.uuid }
     }
 
     internal data class State(

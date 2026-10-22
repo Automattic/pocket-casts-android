@@ -27,8 +27,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
-private const val TILE_SIZE_DP = 145
-private const val TILE_SPACING_DP = 9
+private const val TILE_SIZE_DP = 136
+private const val TILE_SPACING_DP = 12
 private const val TILE_CORNER_RADIUS_DP = 6
 private const val ANIMATION_OFFSET_DP = 107
 private const val GRID_VERTICAL_OFFSET_DP = -73

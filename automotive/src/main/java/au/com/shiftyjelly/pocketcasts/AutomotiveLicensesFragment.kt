@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.Fragment
 import au.com.shiftyjelly.pocketcasts.compose.AutomotiveTheme
@@ -53,9 +54,20 @@ class AutomotiveLicensesFragment : Fragment() {
                 licenseHueResolver = LicenseHueResolver { colors.primaryInteractive01 },
             ),
             textStyles = LibraryDefaults.m2VariantTextStyles(
-                nameTextStyle = MaterialTheme.typography.subtitle2.copy(fontWeight = FontWeight.Medium, fontSize = 32.sp),
-                authorTextStyle = MaterialTheme.typography.caption.copy(fontSize = 24.sp),
-                licenseTextStyle = MaterialTheme.typography.overline.copy(fontWeight = FontWeight.Medium, fontSize = 18.sp),
+                nameTextStyle = MaterialTheme.typography.subtitle2.copy(
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 32.sp,
+                    lineHeight = 1.5.em,
+                ),
+                authorTextStyle = MaterialTheme.typography.caption.copy(
+                    fontSize = 24.sp,
+                    lineHeight = 1.5.em,
+                ),
+                licenseTextStyle = MaterialTheme.typography.overline.copy(
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 18.sp,
+                    lineHeight = 1.5.em,
+                ),
             ),
         )
         Libraries(

@@ -16,7 +16,7 @@ data class SmartRules(
     val podcasts: PodcastsRule,
     val episodeDuration: EpisodeDurationRule,
 ) {
-    fun toSqlWhereClause(clock: Clock) = buildString {
+    fun toSqlWhereClause(clock: Clock, includeArchived: Boolean = false) = buildString {
         episodeStatus.run { appendSqlQuery(clock) }
         downloadStatus.run { appendSqlQuery(clock) }
         mediaType.run { appendSqlQuery(clock) }
@@ -24,7 +24,9 @@ data class SmartRules(
         starred.run { appendSqlQuery(clock) }
         podcasts.run { appendSqlQuery(clock) }
         episodeDuration.run { appendSqlQuery(clock) }
-        NonArchivedRule.run { appendSqlQuery(clock) }
+        if (!includeArchived) {
+            NonArchivedRule.run { appendSqlQuery(clock) }
+        }
         FollowedPodcastRule.run { appendSqlQuery(clock) }
     }
 

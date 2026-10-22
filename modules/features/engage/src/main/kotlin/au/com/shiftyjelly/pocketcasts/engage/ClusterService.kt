@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.engage
 
 import android.content.Context
-import android.net.Uri
+import androidx.core.net.toUri
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.deeplink.ShareListDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowEpisodeDeepLink
@@ -48,7 +48,7 @@ internal class ClusterService(
                     .setName(podcast.title)
                     .addPosterImage(
                         Image.Builder()
-                            .setImageUri(Uri.parse(podcast.coverUrl))
+                            .setImageUri(podcast.coverUrl.toUri())
                             .setImageWidthInPixel(podcast.coverSize)
                             .setImageHeightInPixel(podcast.coverSize)
                             .build(),
@@ -71,14 +71,14 @@ internal class ClusterService(
                     .setName(episode.title)
                     .addPosterImage(
                         Image.Builder()
-                            .setImageUri(Uri.parse(episode.coverUrl))
+                            .setImageUri(episode.coverUrl.toUri())
                             .setImageWidthInPixel(episode.coverSize)
                             .setImageHeightInPixel(episode.coverSize)
                             .build(),
                     )
                     .setPlayBackUri(episode.uri(autoPlay = true, SourceView.ENGAGE_SDK_RECOMMENDATIONS))
                     .setPodcastSeriesTitle(episode.podcastTitle)
-                    .setDurationMillis(episode.durationMs)
+                    .addDurationMillis(episode.durationMs)
                     .setPublishDateEpochMillis(episode.releaseTimestampMs)
                     .setInfoPageUri(episode.uri(autoPlay = false, SourceView.ENGAGE_SDK_RECOMMENDATIONS))
                     .addEpisodeIndex(episode.episodeNumber)
@@ -100,7 +100,7 @@ internal class ClusterService(
                     .setName(podcast.title)
                     .addPosterImage(
                         Image.Builder()
-                            .setImageUri(Uri.parse(podcast.coverUrl))
+                            .setImageUri(podcast.coverUrl.toUri())
                             .setImageWidthInPixel(podcast.coverSize)
                             .setImageHeightInPixel(podcast.coverSize)
                             .build(),
@@ -122,7 +122,7 @@ internal class ClusterService(
                         .setName(podcast.title)
                         .addPosterImage(
                             Image.Builder()
-                                .setImageUri(Uri.parse(podcast.coverUrl))
+                                .setImageUri(podcast.coverUrl.toUri())
                                 .setImageWidthInPixel(podcast.coverSize)
                                 .setImageHeightInPixel(podcast.coverSize)
                                 .build(),
@@ -174,14 +174,14 @@ internal class ClusterService(
                 .setName(episode.title)
                 .addPosterImage(
                     Image.Builder()
-                        .setImageUri(Uri.parse(episode.coverUrl))
+                        .setImageUri(episode.coverUrl.toUri())
                         .setImageWidthInPixel(episode.coverSize)
                         .setImageHeightInPixel(episode.coverSize)
                         .build(),
                 )
                 .setPlayBackUri(episode.uri(autoPlay = true, SourceView.ENGAGE_SDK_CONTINUATION))
                 .setPodcastSeriesTitle(episode.podcastTitle)
-                .setDurationMillis(episode.durationMs)
+                .addDurationMillis(episode.durationMs)
                 .setPublishDateEpochMillis(episode.releaseTimestampMs)
                 .setInfoPageUri(episode.uri(autoPlay = false, SourceView.ENGAGE_SDK_CONTINUATION))
                 .addEpisodeIndex(episode.episodeNumber)
@@ -222,7 +222,7 @@ internal class ClusterService(
                 .setName(podcast.title)
                 .addPosterImage(
                     Image.Builder()
-                        .setImageUri(Uri.parse(podcast.landscapeCoverUrl))
+                        .setImageUri(podcast.landscapeCoverUrl.toUri())
                         .setImageWidthInPixel(podcast.landscapeCoverWidth)
                         .setImageHeightInPixel(podcast.landscapeCoverHeight)
                         .build(),
@@ -263,7 +263,7 @@ internal class ClusterService(
                 val entity = SignInCardEntity.Builder()
                     .addPosterImage(
                         Image.Builder()
-                            .setImageUri(Uri.parse("https://static.pocketcasts.com/assets/engage-sdk-banner.png"))
+                            .setImageUri("https://static.pocketcasts.com/assets/engage-sdk-banner.png".toUri())
                             .setImageWidthInPixel(1264)
                             .setImageHeightInPixel(712)
                             .build(),
@@ -322,6 +322,15 @@ internal class ClusterService(
     private fun PodcastSeriesEntity.Builder.addLastEngagementTimeMillis(time: Long?): PodcastSeriesEntity.Builder {
         return if (time != null) {
             setLastEngagementTimeMillis(time)
+        } else {
+            this
+        }
+    }
+
+    // The feed doesn't always provide a duration, and the Engage SDK says to omit the duration if it's invalid.
+    private fun PodcastEpisodeEntity.Builder.addDurationMillis(durationMs: Long): PodcastEpisodeEntity.Builder {
+        return if (durationMs > 0) {
+            setDurationMillis(durationMs)
         } else {
             this
         }

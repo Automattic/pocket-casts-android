@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.servers.sync
 
 import androidx.annotation.NonNull
-import io.reactivex.FlowableEmitter
 import java.io.File
 import java.io.IOException
 import okhttp3.MediaType
@@ -14,14 +13,14 @@ import okio.buffer
 
 class ProgressRequestBody(private val delegate: RequestBody, private val listener: Listener) : RequestBody() {
     companion object {
-        fun create(contentType: MediaType?, file: File, emitter: FlowableEmitter<Float>): ProgressRequestBody {
+        fun create(contentType: MediaType?, file: File, onProgress: (Float) -> Unit): ProgressRequestBody {
             val requestBody = file.asRequestBody(contentType)
             return ProgressRequestBody(
                 requestBody,
                 object : Listener {
                     override fun onRequestProgress(bytesWritten: Long, contentLength: Long) {
                         val progress = bytesWritten.toFloat() / contentLength.toFloat()
-                        emitter.onNext(progress)
+                        onProgress(progress)
                     }
                 },
             )

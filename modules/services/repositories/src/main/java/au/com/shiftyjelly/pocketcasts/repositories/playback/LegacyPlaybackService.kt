@@ -1,9 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playback
 
-import android.app.ForegroundServiceStartNotAllowedException
 import android.app.Notification
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaMetadataCompat
@@ -22,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.PackageValidato
 import au.com.shiftyjelly.pocketcasts.utils.SchedulerProvider
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import com.automattic.eventhorizon.PlaybackServiceType
 import com.jakewharton.rxrelay2.BehaviorRelay
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.disposables.CompositeDisposable
@@ -53,7 +52,7 @@ open class LegacyPlaybackService :
 
     @Inject lateinit var notificationHelper: NotificationHelper
 
-    @Inject lateinit var eventHorizon: com.automattic.eventhorizon.EventHorizon
+    @Inject lateinit var errorReporter: PlaybackServiceErrorReporter
 
     @Inject lateinit var browseTreeProvider: BrowseTreeProvider
 
@@ -143,9 +142,10 @@ open class LegacyPlaybackService :
             return null
         }
 
+        val isAutomotive = Util.isAutomotive(this)
         if (!clientPackageName.contains("au.com.shiftyjelly.pocketcasts")) {
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Client: $clientPackageName connected to legacy media session")
-            if (Util.isAutomotive(this) && !settings.automotiveConnectedToMediaSession()) {
+            if (isAutomotive && !settings.automotiveConnectedToMediaSession()) {
                 launch {
                     kotlinx.coroutines.delay(1000)
                     settings.setAutomotiveConnectedToMediaSession(true)
@@ -157,7 +157,7 @@ open class LegacyPlaybackService :
         val isSuggested = rootHints?.getBoolean(BrowserRoot.EXTRA_SUGGESTED) ?: false
         val hasCurrentEpisode = playbackManager.getCurrentEpisode() != null
 
-        val rootId = browseTreeProvider.getRootId(isRecent, isSuggested, hasCurrentEpisode)
+        val rootId = browseTreeProvider.getRootId(isRecent, isSuggested, hasCurrentEpisode, isAutomotive)
             ?: return null
 
         val extras = Bundle().apply {
@@ -258,16 +258,23 @@ open class LegacyPlaybackService :
                 PlaybackStateCompat.STATE_PLAYING,
                 -> {
                     if (notification != null) {
+                        var reachedForeground = false
                         try {
                             startForeground(Settings.NotificationId.PLAYING.value, notification)
+                            reachedForeground = true
                             isForeground = true
+                            errorReporter.resetFailureCount()
                             notificationManager.enteredForeground(notification)
                             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "startForeground state: $state")
                         } catch (e: Exception) {
                             LogBuffer.e(LogBuffer.TAG_PLAYBACK, "attempted startForeground for state: $state, but that threw an exception we caught: $e")
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && e is ForegroundServiceStartNotAllowedException) {
-                                addBatteryWarnings()
-                                eventHorizon.track(com.automattic.eventhorizon.PlaybackForegroundServiceErrorEvent)
+                            if (!reachedForeground) {
+                                errorReporter.trackForegroundStartFailed(
+                                    service = PlaybackServiceType.Legacy,
+                                    error = e,
+                                    source = playbackManager.lastPlaybackSource,
+                                    playbackContinued = playbackManager.isPlaying(),
+                                )
                             }
                         }
                     } else {
@@ -309,11 +316,6 @@ open class LegacyPlaybackService :
                     }
                 }
             }
-        }
-
-        private fun addBatteryWarnings() {
-            val currentValue = settings.getTimesToShowBatteryWarning()
-            settings.setTimesToShowBatteryWarning(2 + currentValue)
         }
 
         private fun buildNotification(state: Int, metadata: MediaMetadataCompat?, useEpisodeArtwork: Boolean): Notification? {

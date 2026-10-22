@@ -1,0 +1,290 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-29T13:00:00Z",
+  "platform": "android",
+  "locale": "en",
+  "messages": [
+    {
+      "id": "00000000-0000-4000-8000-000000000001",
+      "type": "new_feature",
+      "publishedAt": "2026-09-29T12:59:00Z",
+      "expiresAt": "2027-12-31T00:00:00Z",
+      "targeting": {
+        "audiences": [
+          "free",
+          "plus",
+          "patron"
+        ],
+        "minimumAppVersion": null
+      },
+      "title": "Create playlist (create_playlist)",
+      "pages": [
+        {
+          "image": {
+            "url": "https://static.pocketcasts.net/servers/nodeweb/whats-new/media/images/368924f3-460e-4085-960b-219e2cd34218/adb775019834a41558b1b5cc20ff361fa6eb25ce41661248ddf7893c764c8bf6.webp",
+            "width": 760,
+            "height": 428,
+            "alt": "Pocket Casts"
+          },
+          "heading": "Create playlist",
+          "description": "Start a playlist from any of your episodes.",
+          "action": {
+            "type": "create_playlist",
+            "label": "Create playlist"
+          }
+        }
+      ]
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000002",
+      "type": "new_feature",
+      "publishedAt": "2026-09-29T12:58:00Z",
+      "expiresAt": "2027-12-31T00:00:00Z",
+      "targeting": {
+        "audiences": [
+          "free",
+          "plus",
+          "patron"
+        ],
+        "minimumAppVersion": null
+      },
+      "title": "Open link: website (open_link)",
+      "pages": [
+        {
+          "image": {
+            "url": "https://static.pocketcasts.net/servers/nodeweb/whats-new/media/images/368924f3-460e-4085-960b-219e2cd34218/adb775019834a41558b1b5cc20ff361fa6eb25ce41661248ddf7893c764c8bf6.webp",
+            "width": 760,
+            "height": 428,
+            "alt": "Pocket Casts"
+          },
+          "heading": "Open link: website",
+          "description": "Opens the Pocket Casts blog in the in-app browser.",
+          "action": {
+            "type": "open_link",
+            "label": "Read more",
+            "arguments": {
+              "url": "https://blog.pocketcasts.com/"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000004",
+      "type": "new_feature",
+      "publishedAt": "2026-09-29T12:56:00Z",
+      "expiresAt": "2027-12-31T00:00:00Z",
+      "targeting": {
+        "audiences": [
+          "free",
+          "plus",
+          "patron"
+        ],
+        "minimumAppVersion": null
+      },
+      "title": "Open Networks (open_networks)",
+      "pages": [
+        {
+          "image": {
+            "url": "https://static.pocketcasts.net/servers/nodeweb/whats-new/media/images/368924f3-460e-4085-960b-219e2cd34218/adb775019834a41558b1b5cc20ff361fa6eb25ce41661248ddf7893c764c8bf6.webp",
+            "width": 760,
+            "height": 428,
+            "alt": "Pocket Casts"
+          },
+          "heading": "Open Networks",
+          "description": "Find shows from your favourite podcast networks.",
+          "action": {
+            "type": "open_networks",
+            "label": "Browse networks"
+          }
+        }
+      ]
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000005",
+      "type": "new_feature",
+      "publishedAt": "2026-09-29T12:55:00Z",
+      "expiresAt": "2027-12-31T00:00:00Z",
+      "targeting": {
+        "audiences": [
+          "free",
+          "plus",
+          "patron"
+        ],
+        "minimumAppVersion": null
+      },
+      "title": "Open Discover (open_discover)",
+      "pages": [
+        {
+          "image": {
+            "url": "https://static.pocketcasts.net/servers/nodeweb/whats-new/media/images/368924f3-460e-4085-960b-219e2cd34218/adb775019834a41558b1b5cc20ff361fa6eb25ce41661248ddf7893c764c8bf6.webp",
+            "width": 760,
+            "height": 428,
+            "alt": "Pocket Casts"
+          },
+          "heading": "Open Discover",
+          "description": "Find something new to listen to.",
+          "action": {
+            "type": "open_discover",
+            "label": "Explore Discover"
+          }
+        }
+      ]
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000006",
+      "type": "new_feature",
+      "publishedAt": "2026-09-29T12:54:00Z",
+      "expiresAt": "2027-12-31T00:00:00Z",
+      "targeting": {
+        "audiences": [
+          "free",
+          "plus",
+          "patron"
+        ],
+        "minimumAppVersion": null
+      },
+      "title": "Open Podcasts (open_podcasts)",
+      "pages": [
+        {
+          "image": {
+            "url": "https://static.pocketcasts.net/servers/nodeweb/whats-new/media/images/368924f3-460e-4085-960b-219e2cd34218/adb775019834a41558b1b5cc20ff361fa6eb25ce41661248ddf7893c764c8bf6.webp",
+            "width": 760,
+            "height": 428,
+            "alt": "Pocket Casts"
+          },
+          "heading": "Open Podcasts",
+          "description": "All the shows you follow in one place.",
+          "action": {
+            "type": "open_podcasts",
+            "label": "Go to Podcasts"
+          }
+        }
+      ]
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000007",
+      "type": "new_feature",
+      "publishedAt": "2026-09-29T12:53:00Z",
+      "expiresAt": "2027-12-31T00:00:00Z",
+      "targeting": {
+        "audiences": [
+          "free",
+          "plus",
+          "patron"
+        ],
+        "minimumAppVersion": null
+      },
+      "title": "Open Up Next (open_up_next)",
+      "pages": [
+        {
+          "image": {
+            "url": "https://static.pocketcasts.net/servers/nodeweb/whats-new/media/images/368924f3-460e-4085-960b-219e2cd34218/adb775019834a41558b1b5cc20ff361fa6eb25ce41661248ddf7893c764c8bf6.webp",
+            "width": 760,
+            "height": 428,
+            "alt": "Pocket Casts"
+          },
+          "heading": "Open Up Next",
+          "description": "Check what's playing next.",
+          "action": {
+            "type": "open_up_next",
+            "label": "See Up Next"
+          }
+        }
+      ]
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000008",
+      "type": "new_feature",
+      "publishedAt": "2026-09-29T12:52:00Z",
+      "expiresAt": "2027-12-31T00:00:00Z",
+      "targeting": {
+        "audiences": [
+          "free",
+          "plus",
+          "patron"
+        ],
+        "minimumAppVersion": null
+      },
+      "title": "Open Playlists (open_playlists)",
+      "pages": [
+        {
+          "image": {
+            "url": "https://static.pocketcasts.net/servers/nodeweb/whats-new/media/images/368924f3-460e-4085-960b-219e2cd34218/adb775019834a41558b1b5cc20ff361fa6eb25ce41661248ddf7893c764c8bf6.webp",
+            "width": 760,
+            "height": 428,
+            "alt": "Pocket Casts"
+          },
+          "heading": "Open Playlists",
+          "description": "Your smart and manual playlists.",
+          "action": {
+            "type": "open_playlists",
+            "label": "See playlists"
+          }
+        }
+      ]
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000009",
+      "type": "new_feature",
+      "publishedAt": "2026-09-29T12:51:00Z",
+      "expiresAt": "2027-12-31T00:00:00Z",
+      "targeting": {
+        "audiences": [
+          "free",
+          "plus",
+          "patron"
+        ],
+        "minimumAppVersion": null
+      },
+      "title": "Open Profile (open_profile)",
+      "pages": [
+        {
+          "image": {
+            "url": "https://static.pocketcasts.net/servers/nodeweb/whats-new/media/images/368924f3-460e-4085-960b-219e2cd34218/adb775019834a41558b1b5cc20ff361fa6eb25ce41661248ddf7893c764c8bf6.webp",
+            "width": 760,
+            "height": 428,
+            "alt": "Pocket Casts"
+          },
+          "heading": "Open Profile",
+          "description": "Stats, files, bookmarks and more.",
+          "action": {
+            "type": "open_profile",
+            "label": "Go to Profile"
+          }
+        }
+      ]
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000010",
+      "type": "new_feature",
+      "publishedAt": "2026-09-29T12:50:00Z",
+      "expiresAt": "2027-12-31T00:00:00Z",
+      "targeting": {
+        "audiences": [
+          "free",
+          "plus",
+          "patron"
+        ],
+        "minimumAppVersion": null
+      },
+      "title": "Open Settings (open_settings)",
+      "pages": [
+        {
+          "image": {
+            "url": "https://static.pocketcasts.net/servers/nodeweb/whats-new/media/images/368924f3-460e-4085-960b-219e2cd34218/adb775019834a41558b1b5cc20ff361fa6eb25ce41661248ddf7893c764c8bf6.webp",
+            "width": 760,
+            "height": 428,
+            "alt": "Pocket Casts"
+          },
+          "heading": "Open Settings",
+          "description": "Tune Pocket Casts to your liking.",
+          "action": {
+            "type": "open_settings",
+            "label": "Open Settings"
+          }
+        }
+      ]
+    }
+  ]
+}

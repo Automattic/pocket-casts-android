@@ -13,24 +13,17 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.views.R
-import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
-import com.automattic.eventhorizon.BookmarkDeleteFormShownEvent
-import com.automattic.eventhorizon.BookmarkDeleteFormSubmittedEvent
-import com.automattic.eventhorizon.BookmarkDeletedEvent
-import com.automattic.eventhorizon.EventHorizon
 import javax.inject.Inject
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 class MultiSelectBookmarksHelper @Inject constructor(
     private val bookmarkManager: BookmarkManager,
-    private val eventHorizon: EventHorizon,
+    private val bookmarkDeleter: BookmarkDeleter,
     var episodeManager: EpisodeManager,
 ) : MultiSelectHelper<Bookmark>() {
     override val maxToolbarIcons = 3
@@ -115,63 +108,23 @@ class MultiSelectBookmarksHelper @Inject constructor(
             closeMultiSelect()
             return
         }
-        eventHorizon.track(
-            BookmarkDeleteFormShownEvent(
-                source = source.analyticsValue,
-            ),
-        )
-
-        val count = bookmarks.size
-        ConfirmationDialog()
-            .setForceDarkTheme(source == SourceView.PLAYER)
-            .setButtonType(
-                ConfirmationDialog.ButtonType.Danger(
+        bookmarkDeleter.confirmDelete(
+            bookmarks = bookmarks,
+            source = source,
+            resources = resources,
+            fragmentManager = fragmentManager,
+            scope = this,
+            onConfirmed = { closeMultiSelect() },
+            onDeleted = { count ->
+                showSnackBar(
                     resources.getStringPlural(
-                        count = count,
-                        singular = LR.string.bookmarks_delete_singular,
-                        plural = LR.string.bookmarks_delete_plural,
+                        count,
+                        LR.string.bookmarks_deleted_singular,
+                        LR.string.bookmarks_deleted_plural,
                     ),
-                ),
-            )
-            .setTitle(resources.getString(LR.string.are_you_sure))
-            .setSummary(
-                resources.getStringPlural(
-                    count = count,
-                    singular = LR.string.bookmarks_delete_summary_singular,
-                    plural = LR.string.bookmarks_delete_summary_plural,
-                ),
-            )
-            .setIconId(R.drawable.ic_delete)
-            .setIconTint(UR.attr.support_05)
-            .setOnConfirm {
-                launch {
-                    eventHorizon.track(
-                        BookmarkDeleteFormSubmittedEvent(
-                            source = source.analyticsValue,
-                        ),
-                    )
-
-                    bookmarks.forEach {
-                        bookmarkManager.deleteToSync(it.uuid)
-                        eventHorizon.track(
-                            BookmarkDeletedEvent(
-                                source = source.analyticsValue,
-                            ),
-                        )
-                    }
-
-                    withContext(Dispatchers.Main) {
-                        val snackText = resources.getStringPlural(
-                            count,
-                            LR.string.bookmarks_deleted_singular,
-                            LR.string.bookmarks_deleted_plural,
-                        )
-                        showSnackBar(snackText)
-                    }
-                }
-                closeMultiSelect()
-            }
-            .show(fragmentManager, "delete_bookmarks_warning")
+                )
+            },
+        )
     }
 
     private suspend fun isEligibleToShare(): Boolean {

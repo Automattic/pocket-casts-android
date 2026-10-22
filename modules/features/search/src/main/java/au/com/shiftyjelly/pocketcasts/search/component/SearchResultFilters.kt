@@ -4,7 +4,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.MaterialTheme
@@ -16,17 +18,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
-import au.com.shiftyjelly.pocketcasts.compose.components.FadeConfig
-import au.com.shiftyjelly.pocketcasts.compose.components.FadedLazyRow
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-
-private val defaultFadeConfig = FadeConfig.Default.copy(
-    showStartFade = false,
-    showEndFade = true,
-)
 
 @Composable
 fun SearchResultFilters(
@@ -34,11 +29,11 @@ fun SearchResultFilters(
     selectedIndex: Int,
     onFilterSelect: (Int) -> Unit,
     modifier: Modifier = Modifier,
-    fadeConfig: FadeConfig = defaultFadeConfig,
+    contentPadding: PaddingValues = PaddingValues(0.dp),
 ) {
-    FadedLazyRow(
-        fadeConfig = fadeConfig,
+    LazyRow(
         modifier = modifier,
+        contentPadding = contentPadding,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         itemsIndexed(items) { index, item ->
@@ -97,9 +92,10 @@ private fun PreviewSearchResultFilters(
 ) {
     AppThemeWithBackground(themeType) {
         SearchResultFilters(
-            items = listOf("Top Results", "Podcasts", "Episodes"),
+            items = listOf("Top Results", "Podcasts", "Episodes", "Networks"),
             selectedIndex = 1,
             onFilterSelect = {},
+            contentPadding = PaddingValues(horizontal = 16.dp),
         )
     }
 }

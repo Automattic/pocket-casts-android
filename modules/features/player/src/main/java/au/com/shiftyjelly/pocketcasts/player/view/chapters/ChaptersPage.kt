@@ -37,6 +37,7 @@ fun ChaptersPage(
     isTogglingChapters: Boolean,
     showSubscriptionIcon: Boolean,
     modifier: Modifier = Modifier,
+    resolvingChapterIndex: Int? = null,
 ) {
     LazyColumn(
         state = lazyListState,
@@ -81,6 +82,7 @@ fun ChaptersPage(
                 onSelectionChange = onSelectionChange,
                 onClick = { onChapterClick(state.chapter) },
                 onUrlClick = { onUrlClick(state.chapter) },
+                isResolving = state.chapter.index == resolvingChapterIndex,
                 modifier = Modifier.animateItem(),
             )
             if (index < chapters.lastIndex) {

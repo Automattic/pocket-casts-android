@@ -14,6 +14,7 @@ data class NamedSettingsSettings(
     @Json(name = "listeningTimeStats") val listeningTimeStats: Boolean? = null,
     @Json(name = "audioOnly") val audioOnly: Boolean? = null,
     @Json(name = "disableAiChapters") val disableAiChapters: Boolean? = null,
+    @Json(name = "showWhatsNewDot") val showWhatsNewDot: Boolean? = null,
 )
 
 @JsonClass(generateAdapter = true)

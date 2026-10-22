@@ -120,7 +120,12 @@ internal enum class ProfileSection(
     ;
 
     companion object {
-        fun visibleEntries(): List<ProfileSection> = entries.filter { it != Blogs || FeatureFlag.isEnabled(Feature.BLOGS) }
+        fun visibleEntries(): List<ProfileSection> = entries.filter { section ->
+            when (section) {
+                Blogs -> FeatureFlag.isEnabled(Feature.BLOGS)
+                else -> true
+            }
+        }
     }
 }
 

@@ -46,12 +46,14 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.data.DataSyncProcess
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import au.com.shiftyjelly.pocketcasts.repositories.whatsnew.WhatsNewManager
 import au.com.shiftyjelly.pocketcasts.servers.RefreshResponse
 import au.com.shiftyjelly.pocketcasts.servers.ServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.exception.RefreshTokenExpiredException
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.utils.extensions.getLaunchIntent
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import coil3.executeBlocking
 import coil3.imageLoader
@@ -93,6 +95,7 @@ class RefreshPodcastsThread(
         fun userManager(): UserManager
         fun syncManager(): SyncManager
         fun ratingsManager(): RatingsManager
+        fun whatsNewManager(): WhatsNewManager
         fun appDatabase(): AppDatabase
     }
 
@@ -258,6 +261,7 @@ class RefreshPodcastsThread(
             statsManager = entryPoint.statsManager(),
             subscriptionManager = entryPoint.subscriptionManager(),
             ratingsManager = entryPoint.ratingsManager(),
+            whatsNewManager = entryPoint.whatsNewManager(),
             appDatabase = entryPoint.appDatabase(),
             settings = entryPoint.settings(),
             fileStorage = entryPoint.fileStorage(),
@@ -339,8 +343,16 @@ class RefreshPodcastsThread(
                 // prepare to add to up next
                 when (podcast.autoAddToUpNext) {
                     AutoAddUpNext.OFF -> {}
-                    AutoAddUpNext.PLAY_LAST -> episodesToAddToUpNext.addAll(episodes.map { Pair(AutoAddUpNext.PLAY_LAST, it) })
-                    AutoAddUpNext.PLAY_NEXT -> episodesToAddToUpNext.addAll(episodes.map { Pair(AutoAddUpNext.PLAY_NEXT, it) })
+
+                    AutoAddUpNext.PLAY_LAST -> {
+                        logAutoAddToUpNext(podcast, episodes)
+                        episodesToAddToUpNext.addAll(episodes.map { Pair(AutoAddUpNext.PLAY_LAST, it) })
+                    }
+
+                    AutoAddUpNext.PLAY_NEXT -> {
+                        logAutoAddToUpNext(podcast, episodes)
+                        episodesToAddToUpNext.addAll(episodes.map { Pair(AutoAddUpNext.PLAY_NEXT, it) })
+                    }
                 }
             }
 
@@ -348,6 +360,13 @@ class RefreshPodcastsThread(
         }
 
         return AddedEpisodes(episodeUuidsAdded, episodesToAddToUpNext)
+    }
+
+    private fun logAutoAddToUpNext(podcast: Podcast, episodes: List<PodcastEpisode>) {
+        val episodeList = episodes.joinToString(separator = ", ") { "${it.uuid} (${it.title})" }
+        val message = "Auto add to Up Next: podcast=${podcast.uuid} (${podcast.title}) " +
+            "mode=${podcast.autoAddToUpNext} modified=${podcast.autoAddToUpNextModified} episodes=$episodeList"
+        LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, message)
     }
 
     private fun addNewEpisodesToUpNext(episodesToAddToUpNext: List<Pair<AutoAddUpNext, PodcastEpisode>>) {
@@ -358,11 +377,25 @@ class RefreshPodcastsThread(
         val entryPoint = getEntryPoint()
         val playbackManager = entryPoint.playbackManager()
         val episodeManager = entryPoint.episodeManager()
+        val podcastManager = entryPoint.podcastManager()
 
         // Because we may not have refreshed for a while, we collect all the auto add to up next episodes
         // and run through them one by one sorted by their publish date. They are added to up next as if the action
         // was run right as they were published magically
         runBlocking {
+            episodesToAddToUpNext
+                .groupBy { it.second.podcastUuid }
+                .forEach { (podcastUuid, pairs) ->
+                    val currentPodcast = podcastManager.findPodcastByUuid(podcastUuid) ?: return@forEach
+                    val queuedModes = pairs.map { it.first }.toSet()
+                    if (currentPodcast.autoAddToUpNext !in queuedModes) {
+                        val message = "Auto add to Up Next: podcast=$podcastUuid (${currentPodcast.title}) " +
+                            "was collected with mode=$queuedModes but now has mode=${currentPodcast.autoAddToUpNext} " +
+                            "modified=${currentPodcast.autoAddToUpNextModified}"
+                        LogBuffer.w(LogBuffer.TAG_BACKGROUND_TASKS, message)
+                    }
+                }
+
             val alreadyProcessedEpisodes = episodeManager.findEpisodesByUuids(episodesToAddToUpNext.map { it.second.uuid })
                 .filter { it.isFinished || it.isArchived }
                 .map { it.uuid }
@@ -612,7 +645,7 @@ class RefreshPodcastsThread(
                 wearBackground = getPodcastNotificationWearBitmap(firstPodcastUuid, podcastManager, context)
             }
 
-            val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)?.apply {
+            val intent = context.getLaunchIntent()?.apply {
                 flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
                 action = Settings.INTENT_OPEN_APP_NEW_EPISODES
             }

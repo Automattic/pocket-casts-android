@@ -5,12 +5,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -24,6 +26,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathOperation
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
@@ -55,12 +58,17 @@ fun TooltipPopup(
     elevation: Dp = 16.dp,
     anchorOffset: DpOffset = DpOffset.Zero,
     properties: PopupProperties = PopupProperties(dismissOnClickOutside = false),
+    clickableElevationPadding: Boolean = false,
+    contentPadding: PaddingValues = TooltipContentPadding,
+    titleStyle: TextStyle? = null,
+    bodyStyle: TextStyle? = null,
     onClick: (() -> Unit)? = null,
     onClickOutside: (() -> Unit)? = null,
 ) {
     // We're adding additional padding to the popup box in order to prevent shadow clipping.
     // There's no API to determine how much padding is needed. We just eyeball it to 150%.
     val elevationPadding = elevation * 1.5f
+    val isBelowAnchor = tipPosition.isTopAligned()
     Popup(
         popupPositionProvider = rememberTooltipPositionProvider(tipPosition, anchorOffset, elevationPadding),
         properties = properties,
@@ -68,7 +76,23 @@ fun TooltipPopup(
     ) {
         Box(
             modifier = Modifier
-                .padding(elevationPadding)
+                .then(
+                    if (onClick != null && clickableElevationPadding) {
+                        Modifier.clickable(
+                            interactionSource = null,
+                            indication = null,
+                            onClick = onClick,
+                        )
+                    } else {
+                        Modifier
+                    },
+                )
+                .padding(
+                    start = elevationPadding,
+                    top = if (isBelowAnchor) 0.dp else elevationPadding,
+                    end = elevationPadding,
+                    bottom = if (isBelowAnchor) elevationPadding else 0.dp,
+                )
                 .then(modifier),
         ) {
             Tooltip(
@@ -76,6 +100,9 @@ fun TooltipPopup(
                 body = body,
                 tipPosition = tipPosition,
                 elevation = elevation,
+                contentPadding = contentPadding,
+                titleStyle = titleStyle,
+                bodyStyle = bodyStyle,
                 modifier = Modifier
                     .then(
                         if (maxWidthFraction != null) {
@@ -110,6 +137,9 @@ fun Tooltip(
     modifier: Modifier = Modifier,
     body: String? = null,
     elevation: Dp = 16.dp,
+    contentPadding: PaddingValues = TooltipContentPadding,
+    titleStyle: TextStyle? = null,
+    bodyStyle: TextStyle? = null,
 ) {
     val tooltipShape = TooltipShape(tipPosition)
     val (backgroundColor, titleColor, descriptionColor) = rememberTooltipColors()
@@ -121,25 +151,33 @@ fun Tooltip(
             .then(modifier),
     ) {
         Column(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
+            modifier = Modifier.padding(contentPadding),
         ) {
             if (tipPosition.isTopAligned()) {
                 Spacer(
                     modifier = Modifier.height(TipHeight),
                 )
             }
-            TextH40(
-                text = title,
-                color = titleColor,
-            )
+            if (titleStyle != null) {
+                Text(text = title, color = titleColor, style = titleStyle)
+            } else {
+                TextH40(
+                    text = title,
+                    color = titleColor,
+                )
+            }
             if (body != null) {
                 Spacer(
                     modifier = Modifier.height(4.dp),
                 )
-                TextP50(
-                    text = body,
-                    color = descriptionColor,
-                )
+                if (bodyStyle != null) {
+                    Text(text = body, color = descriptionColor, style = bodyStyle)
+                } else {
+                    TextP50(
+                        text = body,
+                        color = descriptionColor,
+                    )
+                }
             }
             if (tipPosition.isBottomAligned()) {
                 Spacer(
@@ -149,6 +187,8 @@ fun Tooltip(
         }
     }
 }
+
+private val TooltipContentPadding = PaddingValues(horizontal = 16.dp, vertical = 14.dp)
 
 enum class TipPosition {
     TopStart,
@@ -222,7 +262,7 @@ private fun rememberTooltipPositionProvider(
     }
 }
 
-private class TooltipPositionProvider(
+internal class TooltipPositionProvider(
     private val tipPosition: TipPosition,
     anchorOffset: DpOffset,
     private val elevation: Dp,
@@ -242,39 +282,37 @@ private class TooltipPositionProvider(
 
         return anchorOffset + when (tipPosition.normalize(layoutDirection)) {
             TipPosition.TopStart -> {
-                val elevationOffset = IntOffset(elevationPx, elevationPx)
+                val elevationOffset = IntOffset(elevationPx, 0)
                 val tipOffset = IntOffset(density.run { CornerTipPeakPosition.roundToPx() }, 0)
                 anchorBounds.bottomCenter - elevationOffset - tipOffset
             }
 
             TipPosition.TopCenter -> {
-                val elevationOffset = IntOffset(0, elevationPx)
                 val contentOffset = IntOffset(popupContentSize.width / 2, 0)
-                anchorBounds.bottomCenter - elevationOffset - contentOffset
+                anchorBounds.bottomCenter - contentOffset
             }
 
             TipPosition.TopEnd -> {
-                val elevationOffset = IntOffset(-elevationPx, elevationPx)
+                val elevationOffset = IntOffset(-elevationPx, 0)
                 val contentOffset = IntOffset(popupContentSize.width, 0)
                 val tipOffset = IntOffset(density.run { CornerTipPeakPosition.roundToPx() }, 0)
                 anchorBounds.bottomCenter - elevationOffset - contentOffset + tipOffset
             }
 
             TipPosition.BottomStart -> {
-                val elevationOffset = IntOffset(elevationPx, -elevationPx)
+                val elevationOffset = IntOffset(elevationPx, 0)
                 val contentOffset = IntOffset(0, popupContentSize.height)
                 val tipOffset = IntOffset(density.run { CornerTipPeakPosition.roundToPx() }, 0)
                 anchorBounds.topCenter - elevationOffset - contentOffset - tipOffset
             }
 
             TipPosition.BottomCenter -> {
-                val elevationOffset = IntOffset(0, -elevationPx)
                 val contentOffset = IntOffset(popupContentSize.width / 2, popupContentSize.height)
-                anchorBounds.topCenter - elevationOffset - contentOffset
+                anchorBounds.topCenter - contentOffset
             }
 
             TipPosition.BottomEnd -> {
-                val elevationOffset = IntOffset(elevationPx, elevationPx)
+                val elevationOffset = IntOffset(elevationPx, 0)
                 val contentOffset = IntOffset(popupContentSize.width, popupContentSize.height)
                 val tipOffset = IntOffset(density.run { CornerTipPeakPosition.roundToPx() }, 0)
                 anchorBounds.topCenter + elevationOffset - contentOffset + tipOffset

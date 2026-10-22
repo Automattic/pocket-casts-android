@@ -69,7 +69,11 @@ class RepositoryProviderModule {
     @Provides
     @Singleton
     internal fun provideDiscoverRepository(listWebService: ListWebService, syncManager: SyncManager, @ApplicationContext context: Context): ListRepository {
-        val platform = if (Util.isAutomotive(context)) "automotive" else "android"
+        val platform = when {
+            Util.isAutomotive(context) -> ListRepository.PLATFORM_AUTOMOTIVE
+            Util.isTv(context) -> ListRepository.PLATFORM_TV
+            else -> ListRepository.PLATFORM_ANDROID
+        }
         return ListRepository(
             listWebService,
             syncManager,

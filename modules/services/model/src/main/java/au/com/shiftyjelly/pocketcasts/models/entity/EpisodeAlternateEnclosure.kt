@@ -5,6 +5,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import au.com.shiftyjelly.pocketcasts.models.type.MediaKind
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
@@ -28,6 +29,7 @@ data class EpisodeAlternateEnclosure(
     @ColumnInfo(name = "episode_uuid") val episodeUuid: String,
     @ColumnInfo(name = "position") val position: Int,
     @ColumnInfo(name = "type") val type: String? = null,
+    @ColumnInfo(name = "media_kind") val mediaKind: MediaKind? = null,
     @ColumnInfo(name = "bitrate") val bitrate: Long? = null,
     @ColumnInfo(name = "length") val length: Long? = null,
     @ColumnInfo(name = "height") val height: Int? = null,

@@ -3,10 +3,10 @@ package au.com.shiftyjelly.pocketcasts
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
-import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -23,15 +23,6 @@ class AutomotiveSettingsActivity :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_automotive_settings)
-
-        onBackPressedDispatcher.addCallback(
-            this,
-            object : OnBackPressedCallback(false) {
-                override fun handleOnBackPressed() {
-                    handleBackPressed()
-                }
-            },
-        )
 
         if (savedInstanceState == null) {
             val settingsFragment = AutomotiveSettingsFragment()
@@ -63,7 +54,9 @@ class AutomotiveSettingsActivity :
 
     private fun handleBackPressed() {
         if (supportFragmentManager.backStackEntryCount > 0) {
-            supportFragmentManager.popBackStack()
+            if (!supportFragmentManager.isStateSaved) {
+                supportFragmentManager.popBackStack()
+            }
             return
         }
         onBackPressedDispatcher.onBackPressed()
@@ -116,7 +109,21 @@ class AutomotiveSettingsActivity :
     override fun closeFiltersToRoot() {
     }
 
+    override fun closeProfileToRoot() {
+    }
+
+    override fun openCreatePlaylist() {
+    }
+
+    override fun openNetworks() {
+    }
+
+    override fun openInAppDeepLink(url: String) = false
+
     override fun openPodcastPage(uuid: String, sourceView: String?) {
+    }
+
+    override fun openNetworkPage(listId: String, title: String?, sourceView: SourceView?) {
     }
 
     override fun openCloudFiles() {

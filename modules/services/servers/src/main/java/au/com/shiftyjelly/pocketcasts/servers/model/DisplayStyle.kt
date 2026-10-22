@@ -15,6 +15,7 @@ sealed class DisplayStyle(val stringValue: String) {
         private const val SINGLE_PODCAST = "single_podcast"
         private const val SINGLE_EPISODE = "single_episode"
         private const val COLLECTION_LIST = "collection"
+        private const val VIDEO_PREVIEW_LIST = "video_preview_list"
 
         fun fromString(value: String): DisplayStyle? {
             return when (value) {
@@ -28,6 +29,7 @@ sealed class DisplayStyle(val stringValue: String) {
                 SINGLE_PODCAST -> SinglePodcast()
                 SINGLE_EPISODE -> SingleEpisode()
                 COLLECTION_LIST -> CollectionList()
+                VIDEO_PREVIEW_LIST -> VideoPreviewList()
                 else -> Unknown(value)
             }
         }
@@ -43,6 +45,7 @@ sealed class DisplayStyle(val stringValue: String) {
     class SinglePodcast : DisplayStyle(SINGLE_PODCAST)
     class SingleEpisode : DisplayStyle(SINGLE_EPISODE)
     class CollectionList : DisplayStyle(COLLECTION_LIST)
+    class VideoPreviewList : DisplayStyle(VIDEO_PREVIEW_LIST)
     data class Unknown(val value: String) : DisplayStyle(value)
 
     override fun toString(): String {

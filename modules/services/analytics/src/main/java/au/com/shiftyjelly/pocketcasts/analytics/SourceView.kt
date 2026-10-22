@@ -18,6 +18,14 @@ enum class SourceView(
         key = "auto_download",
         analyticsValue = SourceViewType.AutoDownload,
     ),
+    ANDROID_AUTO(
+        key = "android_auto",
+        analyticsValue = SourceViewType.AndroidAuto,
+    ),
+    AUTOMOTIVE(
+        key = "automotive",
+        analyticsValue = SourceViewType.Automotive,
+    ),
     BLOGS(
         key = "blogs",
         analyticsValue = SourceViewType.Blogs,
@@ -97,6 +105,10 @@ enum class SourceView(
     FULL_SCREEN_VIDEO(
         key = "full_screen_video",
         analyticsValue = SourceViewType.FullScreenVideo,
+    ),
+    HEADPHONES(
+        key = "headphones",
+        analyticsValue = SourceViewType.Headphones,
     ),
     LISTENING_HISTORY(
         key = "listening_history",
@@ -193,6 +205,10 @@ enum class SourceView(
     TASKER(
         key = "tasker",
         analyticsValue = SourceViewType.Tasker,
+    ),
+    TRANSCRIPT(
+        key = "transcript",
+        analyticsValue = SourceViewType.Transcript,
     ),
     UNKNOWN(
         key = "unknown",

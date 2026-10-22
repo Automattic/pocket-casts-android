@@ -31,6 +31,7 @@ dependencies {
     implementation(platform(libs.compose.bom))
 
     implementation(libs.androidx.webkit)
+    implementation(libs.compose.activity)
     implementation(libs.compose.material)
     implementation(libs.compose.material.icons.core)
     implementation(libs.compose.foundation)
@@ -47,6 +48,7 @@ dependencies {
 
     implementation(projects.modules.features.settings)
     implementation(projects.modules.services.compose)
+    implementation(projects.modules.services.deeplink)
     implementation(projects.modules.services.images)
     implementation(projects.modules.services.localization)
     implementation(projects.modules.services.ui)

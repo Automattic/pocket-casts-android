@@ -31,7 +31,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
-import kotlinx.coroutines.rx2.await
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -164,7 +163,7 @@ class AccountDetailsViewModel @Inject constructor(
     fun deleteAccount() {
         viewModelScope.launch {
             try {
-                val response = withContext(Dispatchers.IO) { syncManager.deleteAccountRxSingle().await() }
+                val response = withContext(Dispatchers.IO) { syncManager.deleteAccount() }
                 val success = response.success ?: false
                 deleteAccountState.value = if (success) {
                     DeleteAccountState.Success("OK")

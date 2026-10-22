@@ -12,9 +12,11 @@ import androidx.work.WorkerParameters
 import au.com.shiftyjelly.pocketcasts.engage.EngageSdkBridge.Companion.TAG
 import au.com.shiftyjelly.pocketcasts.repositories.external.ExternalDataManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
+import com.google.android.engage.common.datamodel.ClusterType
 import com.google.android.engage.service.AppEngageErrorCode
 import com.google.android.engage.service.AppEngageException
 import com.google.android.engage.service.AppEngagePublishClient
+import com.google.android.engage.service.ServiceAvailabilityRequest
 import com.google.android.gms.tasks.Task
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -136,12 +138,31 @@ internal abstract class ClusterSyncWorker(
                 Result.failure()
             }
 
-            !client.isServiceAvailable.await() -> {
+            !isServiceAvailable() -> {
                 Timber.tag(TAG).d("Engage SDK service is not avaialable. Failing '$type' cluster sync.")
                 Result.failure()
             }
 
             else -> submitCluster(service).awaitSafe()
+        }
+    }
+
+    private suspend fun isServiceAvailable(): Boolean {
+        return try {
+            val clusterType = when (type) {
+                "Recommendations" -> ClusterType.TYPE_RECOMMENDATION
+                "Continuation" -> ClusterType.TYPE_CONTINUATION
+                "Featured" -> ClusterType.TYPE_FEATURED
+                else -> ClusterType.TYPE_UNKNOWN
+            }
+            val request = ServiceAvailabilityRequest.Builder()
+                .addIntendedClusterType(clusterType)
+                .build()
+            val availabilityMap = client.isServiceAvailable(request).await()
+            availabilityMap[clusterType] == true
+        } catch (e: Throwable) {
+            Timber.tag(TAG).d(e, "Failed to check service availability for '$type' cluster.")
+            false
         }
     }
 

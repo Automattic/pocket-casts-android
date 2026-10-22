@@ -6,7 +6,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.UserEpisodeServerStatus
 class UserEpisodeServerStatusConverter {
     @TypeConverter
     fun toUserEpisodeServerStatus(value: Int?): UserEpisodeServerStatus? {
-        return if (value == null) null else UserEpisodeServerStatus.values()[value]
+        return if (value == null) null else UserEpisodeServerStatus.entries.getOrNull(value) ?: UserEpisodeServerStatus.LOCAL
     }
 
     @TypeConverter

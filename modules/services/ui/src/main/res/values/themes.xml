@@ -360,7 +360,7 @@
         <!-- Podcasts badge -->
         <item name="badgeDrawable">@drawable/unplayed</item>
         <!-- Default artwork -->
-        <item name="defaultArtworkSmall">@drawable/defaultartwork_small</item>
+        <item name="defaultArtworkSmall">@drawable/defaultartwork</item>
         <item name="defaultArtwork">@drawable/defaultartwork</item>
         <!-- Podcast header gradient color -->
         <item name="colorDarkHeader">@color/darktheme_background</item>
@@ -572,7 +572,7 @@
         <!-- Podcasts badge -->
         <item name="badgeDrawable">@drawable/unplayed</item>
         <!-- Default artwork -->
-        <item name="defaultArtworkSmall">@drawable/defaultartwork_small_dark</item>
+        <item name="defaultArtworkSmall">@drawable/defaultartwork_dark</item>
         <item name="defaultArtwork">@drawable/defaultartwork_dark</item>
         <!-- Podcast header gradient color -->
         <item name="colorDarkHeader">@color/darktheme_background</item>

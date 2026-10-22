@@ -10,7 +10,6 @@ import com.automattic.eventhorizon.DiscoverListPodcastSubscribedEvent
 import com.automattic.eventhorizon.DiscoverListPodcastTappedEvent
 import com.automattic.eventhorizon.DiscoverListShowAllTappedEvent
 import com.automattic.eventhorizon.Trackable
-import java.util.Locale
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
@@ -34,7 +33,7 @@ class AnonymousBumpStatsTracker @Inject constructor(
         }
 
         val bumpStat = AnonymousBumpStat(
-            name = event.analyticsName.lowercase(Locale.getDefault()),
+            name = event.analyticsName,
             customEventProps = event.analyticsProperties,
         ).withBumpName()
 

@@ -21,11 +21,9 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.reactive.asFlow
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
@@ -60,15 +58,8 @@ class OnboardingRecommendationsSearchViewModel @Inject constructor(
         searchHandler.setOnlySearchRemote(true)
         viewModelScope.launch {
 
-            val subscribedUuidFlow = podcastManager
-                .subscribedRxFlowable()
-                .asFlow()
-                .map { ls ->
-                    ls.map { it.uuid }
-                }
-
             combine(
-                subscribedUuidFlow,
+                podcastManager.podcastSubscriptionsFlow(),
                 searchHandler.searchResults,
             ) { subscribedUuids, searchState ->
                 val podcasts = when (searchState) {

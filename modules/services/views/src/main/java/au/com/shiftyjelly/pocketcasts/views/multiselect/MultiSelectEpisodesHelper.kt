@@ -5,8 +5,8 @@ import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.map
-import androidx.lifecycle.toLiveData
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPlural
@@ -40,12 +40,12 @@ import com.automattic.eventhorizon.EpisodeBulkUnstarredEvent
 import com.automattic.eventhorizon.EpisodeRemovedListeningHistoryEvent
 import com.automattic.eventhorizon.EventHorizon
 import com.google.android.material.snackbar.Snackbar
-import io.reactivex.BackpressureStrategy
 import javax.inject.Inject
 import kotlin.math.min
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -68,10 +68,9 @@ class MultiSelectEpisodesHelper @Inject constructor(
 ) : MultiSelectHelper<BaseEpisode>() {
     override val maxToolbarIcons = 4
 
-    override val toolbarActions: LiveData<List<MultiSelectAction>> = settings.multiSelectItemsObservable
-        .toFlowable(BackpressureStrategy.LATEST)
+    override val toolbarActions: LiveData<List<MultiSelectAction>> = settings.multiSelectItemsFlow
         .map { MultiSelectEpisodeAction.listFromIds(it) }
-        .toLiveData()
+        .asLiveData()
         .combineLatest(_selectedListLive)
         .map { (actions, selectedEpisodes) ->
             crashLogging.recordEvent("MultiSelectEpisodesHelper toolbarActions updated (${actions.size}): ${actions.map { it::class.java.simpleName }}, ${selectedEpisodes.size} selectedEpisodes from $source")

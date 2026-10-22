@@ -6,7 +6,7 @@ import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.consumeWindowInsets
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.graphics.toArgb
 import androidx.lifecycle.Lifecycle
@@ -39,7 +39,7 @@ class ReferralsGuestPassFragment : BaseFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ) = contentWithoutConsumedInsets {
-        val windowSize = currentWindowAdaptiveInfo().windowSizeClass
+        val windowSize = currentWindowAdaptiveInfoV2().windowSizeClass
 
         setBackgroundColor(view, ComposeColor.Transparent.toArgb())
 

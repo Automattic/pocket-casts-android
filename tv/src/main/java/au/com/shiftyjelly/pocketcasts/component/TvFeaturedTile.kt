@@ -1,10 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.component
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
+import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -32,14 +29,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.tv.material3.Button
 import androidx.tv.material3.CardDefaults
+import androidx.tv.material3.Glow
 import androidx.tv.material3.MaterialTheme
-import androidx.tv.material3.OutlinedButton
 import androidx.tv.material3.Text
-import au.com.shiftyjelly.pocketcasts.compose.AppTheme
-import au.com.shiftyjelly.pocketcasts.theme.TvColors
-import au.com.shiftyjelly.pocketcasts.theme.TvTextStyles
-import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.theme.TvTheme
+import au.com.shiftyjelly.pocketcasts.theme.tvColors
+import au.com.shiftyjelly.pocketcasts.theme.tvTypography
 import coil3.compose.AsyncImage
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -48,6 +45,7 @@ fun TvFeaturedTile(
     artworkUrl: String,
     isSponsored: Boolean,
     title: String,
+    author: String,
     description: String,
     onGoToPodcast: () -> Unit,
     onPlayLastEpisode: () -> Unit,
@@ -59,17 +57,20 @@ fun TvFeaturedTile(
 
     TvTile(
         onClick = onPlayLastEpisode,
-        scale = CardDefaults.scale(focusedScale = 1.05f),
+        scale = CardDefaults.scale(focusedScale = TvFocusedWideCardScale),
         colors = CardDefaults.colors(
             containerColor = Color.Transparent,
             focusedContainerColor = Color.Transparent,
+        ),
+        glow = CardDefaults.glow(
+            focusedGlow = Glow(elevationColor = Color.Black, elevation = 16.dp),
         ),
         modifier = modifier.tvTileButtonNavigation(buttonState, buttonActions),
     ) {
         Box(
             modifier = Modifier
-                .width(642.dp)
-                .height(200.dp),
+                .width(802.dp)
+                .height(250.dp),
         ) {
             AsyncImage(
                 model = artworkUrl,
@@ -77,7 +78,16 @@ fun TvFeaturedTile(
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxSize()
-                    .blur(40.dp),
+                    .then(
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                            Modifier.blur(30.dp)
+                        } else {
+                            Modifier.drawWithContent {
+                                drawContent()
+                                drawRect(Color.Black, alpha = UNBLURRED_ARTWORK_DIM_ALPHA)
+                            }
+                        },
+                    ),
             )
 
             Box(
@@ -87,9 +97,9 @@ fun TvFeaturedTile(
                         Brush.horizontalGradient(
                             colorStops = arrayOf(
                                 0f to Color.Transparent,
-                                0.2f to TvColors.Dark.copy(alpha = 0.7f),
-                                0.45f to TvColors.Dark,
-                                1f to TvColors.Dark,
+                                0.2f to MaterialTheme.tvColors.backgroundSunken.copy(alpha = 0.7f),
+                                0.45f to MaterialTheme.tvColors.backgroundSunken,
+                                1f to MaterialTheme.tvColors.backgroundSunken,
                             ),
                         ),
                     ),
@@ -104,65 +114,69 @@ fun TvFeaturedTile(
                     contentDescription = title,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
-                        .padding(16.dp)
-                        .size(168.dp)
-                        .clip(RoundedCornerShape(4.dp)),
+                        .padding(20.dp)
+                        .size(210.dp)
+                        .clip(RoundedCornerShape(3.dp)),
                 )
 
                 Column(
                     modifier = Modifier
                         .fillMaxHeight()
                         .weight(1f)
-                        .padding(horizontal = 14.dp, vertical = 17.dp),
+                        .padding(horizontal = 10.5.dp, vertical = 13.dp),
+                    verticalArrangement = Arrangement.Center,
                 ) {
                     if (isSponsored) {
                         Text(
                             text = sponsoredLabel ?: stringResource(LR.string.sponsored),
-                            style = TvTextStyles.FeaturedTileSponsoredLabel,
-                            color = Color.White.copy(alpha = 0.7f),
+                            style = MaterialTheme.tvTypography.caption2,
+                            color = MaterialTheme.tvColors.textPrimary70,
                         )
+                        Spacer(modifier = Modifier.height(4.dp))
                     }
 
-                    Spacer(modifier = Modifier.weight(1f))
+                    if (author.isNotBlank()) {
+                        Text(
+                            text = author,
+                            style = MaterialTheme.tvTypography.caption2,
+                            color = MaterialTheme.tvColors.textSecondary,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                        Spacer(modifier = Modifier.height(2.dp))
+                    }
 
                     Text(
                         text = title,
-                        style = TvTextStyles.FeaturedTileTitle,
-                        color = Color.White,
+                        style = MaterialTheme.tvTypography.title2,
+                        color = MaterialTheme.tvColors.textPrimary,
                     )
 
-                    Spacer(modifier = Modifier.height(7.dp))
+                    Spacer(modifier = Modifier.height(5.dp))
 
                     Text(
                         text = description,
-                        style = TvTextStyles.FeaturedTileDescription,
-                        color = Color.White.copy(alpha = 0.7f),
+                        style = MaterialTheme.tvTypography.caption2,
+                        color = MaterialTheme.tvColors.textPrimary70,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
                     )
 
-                    Spacer(modifier = Modifier.weight(1f))
-
-                    AnimatedVisibility(
-                        visible = buttonState.isFocused,
-                        enter = fadeIn() + expandVertically(expandFrom = Alignment.Top),
-                        exit = fadeOut() + shrinkVertically(shrinkTowards = Alignment.Top),
+                    Row(
+                        modifier = Modifier.padding(top = 12.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
                     ) {
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        Button(
+                            onClick = onPlayLastEpisode,
+                            colors = tileButtonColors(isSelected = buttonState.isButtonSelected(0)),
                         ) {
-                            OutlinedButton(
-                                onClick = onPlayLastEpisode,
-                                colors = tileButtonColors(isSelected = buttonState.isButtonSelected(0)),
-                            ) {
-                                Text(stringResource(LR.string.play_latest_episode))
-                            }
-                            OutlinedButton(
-                                onClick = onGoToPodcast,
-                                colors = tileButtonColors(isSelected = buttonState.isButtonSelected(1)),
-                            ) {
-                                Text(stringResource(LR.string.go_to_podcast))
-                            }
+                            Text(stringResource(LR.string.play_latest_episode))
+                        }
+                        Button(
+                            onClick = onGoToPodcast,
+                            colors = tileButtonColors(isSelected = buttonState.isButtonSelected(1)),
+                        ) {
+                            Text(stringResource(LR.string.go_to_podcast))
                         }
                     }
                 }
@@ -174,19 +188,20 @@ fun TvFeaturedTile(
 @Preview(device = Devices.TV_1080p)
 @Composable
 private fun TvFeaturedTilePreview() {
-    AppTheme(themeType = Theme.ThemeType.EXTRA_DARK) {
-        MaterialTheme {
-            Box(modifier = Modifier.background(TvColors.Dark)) {
-                TvFeaturedTile(
-                    artworkUrl = "",
-                    isSponsored = true,
-                    sponsoredLabel = "Sponsored \u00B7 iHeartPodcasts and Kaleidoscope",
-                    title = "Superhuman",
-                    description = "SuperHuman is a high-stakes, edge-of-your-seat docuseries that dives into the launch of what many have called the \"Doping Olympics\"",
-                    onGoToPodcast = {},
-                    onPlayLastEpisode = {},
-                )
-            }
+    TvTheme {
+        Box(modifier = Modifier.background(MaterialTheme.tvColors.backgroundSunken)) {
+            TvFeaturedTile(
+                artworkUrl = "",
+                isSponsored = true,
+                sponsoredLabel = "Sponsored \u00B7 iHeartPodcasts and Kaleidoscope",
+                title = "Superhuman",
+                author = "iHeartPodcasts",
+                description = "SuperHuman is a high-stakes, edge-of-your-seat docuseries that dives into the launch of what many have called the \"Doping Olympics\"",
+                onGoToPodcast = {},
+                onPlayLastEpisode = {},
+            )
         }
     }
 }
+
+private const val UNBLURRED_ARTWORK_DIM_ALPHA = 0.6f

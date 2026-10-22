@@ -47,6 +47,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.preference.ktx)
     implementation(libs.coil)
+    implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
     implementation(libs.compose.material)
     implementation(libs.compose.ui)
@@ -64,8 +65,6 @@ dependencies {
     implementation(libs.navigation.compose)
     implementation(libs.play.cast)
     implementation(libs.rx2.java)
-    implementation(libs.rx2.kotlin)
-    implementation(libs.rx2.relay)
     implementation(libs.timber)
 
     implementation(projects.modules.features.cartheme)

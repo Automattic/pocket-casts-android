@@ -8,6 +8,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -143,7 +144,7 @@ internal fun AccountSections(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(24.dp)
+                        .height(config.groupSpacing)
                         .background(MaterialTheme.theme.colors.primaryUi03),
                 )
             }
@@ -154,6 +155,10 @@ internal fun AccountSections(
 internal data class AccountSectionsConfig(
     val iconSize: Dp = 24.dp,
     val fontScale: Float = 1f,
+    val contentPadding: PaddingValues = PaddingValues(16.dp),
+    val iconSpacing: Dp = 16.dp,
+    val minRowHeight: Dp = 64.dp,
+    val groupSpacing: Dp = 24.dp,
 )
 
 internal data class AccountSectionsState(
@@ -296,7 +301,7 @@ private fun ButtonSection(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            .heightIn(min = 64.dp)
+            .heightIn(min = config.minRowHeight)
             .clickable(
                 interactionSource = remember(::MutableInteractionSource),
                 indication = ripple(
@@ -307,7 +312,7 @@ private fun ButtonSection(
             .semantics(mergeDescendants = true) {
                 role = Role.Button
             }
-            .padding(16.dp),
+            .padding(config.contentPadding),
     ) {
         Icon(
             painter = painterResource(section.iconId),
@@ -316,7 +321,7 @@ private fun ButtonSection(
             modifier = Modifier.size(config.iconSize),
         )
         Spacer(
-            modifier = Modifier.width(16.dp),
+            modifier = Modifier.width(config.iconSpacing),
         )
         TextH40(
             text = stringResource(section.titleId),
@@ -337,7 +342,7 @@ private fun SwitchSection(
         verticalAlignment = Alignment.Top,
         modifier = Modifier
             .fillMaxWidth()
-            .heightIn(min = 64.dp)
+            .heightIn(min = config.minRowHeight)
             .height(IntrinsicSize.Max)
             .clickable(
                 interactionSource = remember(::MutableInteractionSource),
@@ -349,7 +354,7 @@ private fun SwitchSection(
             .semantics(mergeDescendants = true) {
                 role = Role.Switch
             }
-            .padding(16.dp),
+            .padding(config.contentPadding),
     ) {
         Icon(
             painter = painterResource(section.iconId),
@@ -358,7 +363,7 @@ private fun SwitchSection(
             modifier = Modifier.size(config.iconSize),
         )
         Spacer(
-            modifier = Modifier.width(16.dp),
+            modifier = Modifier.width(config.iconSpacing),
         )
         Column(
             modifier = Modifier.fillMaxWidth(fraction = 0.75f),

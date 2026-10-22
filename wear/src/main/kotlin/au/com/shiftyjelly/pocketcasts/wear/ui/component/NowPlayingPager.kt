@@ -44,14 +44,13 @@ fun NowPlayingPager(
 ) {
     val pagerState = rememberPagerState { NowPlayingPager.PAGE_COUNT }
     val page0ColumnState = rememberResponsiveColumnState()
-    val page1ColumnState = rememberResponsiveColumnState()
     val page2ColumnState = rememberResponsiveColumnState()
     val pagerScope = remember(pagerState, page0ColumnState) { NowPlayingPagerScope(pagerState, page0ColumnState) }
 
     val activeScrollState = when (pagerState.currentPage) {
         0 -> page0ColumnState
         2 -> page2ColumnState
-        else -> page1ColumnState
+        else -> null
     }
 
     ScreenScaffold(

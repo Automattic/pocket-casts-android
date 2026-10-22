@@ -17,7 +17,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -57,7 +57,7 @@ fun ReferralsInvalidOfferPage(
 private fun ReferralsInvalidOfferPageContent(
     onDismiss: () -> Unit,
 ) {
-    val windowSize = currentWindowAdaptiveInfo().windowSizeClass
+    val windowSize = currentWindowAdaptiveInfoV2().windowSizeClass
 
     BoxWithConstraints(
         contentAlignment = Alignment.Center,

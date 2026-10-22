@@ -19,6 +19,7 @@ import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksContainerFra
 import au.com.shiftyjelly.pocketcasts.podcasts.view.ProfileEpisodeListFragment
 import au.com.shiftyjelly.pocketcasts.profile.blogs.BlogsFragment
 import au.com.shiftyjelly.pocketcasts.profile.cloud.CloudFilesFragment
+import au.com.shiftyjelly.pocketcasts.profile.whatsnew.WhatsNewFeedFragment
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralsGuestPassFragment
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralsGuestPassFragment.ReferralsPageType
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralsViewModel
@@ -30,6 +31,8 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSourc
 import au.com.shiftyjelly.pocketcasts.settings.stats.StatsFragment
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.fragments.TopScrollable
 import dagger.hilt.android.AndroidEntryPoint
@@ -56,8 +59,11 @@ class ProfileFragment :
         CallOnce {
             profileViewModel.onScreenShown()
         }
+        val hasWhatsNewDot = profileViewModel.hasWhatsNewDot.collectAsState().value
         val state = ProfilePageState(
             sections = ProfileSection.visibleEntries(),
+            isWhatsNewVisible = FeatureFlag.isEnabled(Feature.WHATS_NEW_FEED),
+            hasWhatsNewDot = hasWhatsNewDot,
             isPlaybackEnabled = profileViewModel.isPlaybackAvailable.collectAsState().value,
             isFreeAccountBannerVisible = profileViewModel.isFreeAccountBannerVisible.collectAsState().value,
             isUpgradeBannerVisible = profileViewModel.showUpgradeBanner.collectAsState(false).value,
@@ -83,18 +89,14 @@ class ProfileFragment :
             themeType = theme.activeTheme,
             listState = listState,
             onSendReferralsClick = {
-                referralsViewModel.onIconClick()
                 fragmentHostListener.showBottomSheet(ReferralsGuestPassFragment.newInstance(ReferralsPageType.Send))
-            },
-            onReferralsTooltipClick = {
-                referralsViewModel.onTooltipClick()
-            },
-            onReferralsTooltipShow = {
-                referralsViewModel.onTooltipShown()
             },
             onSettingsClick = {
                 profileViewModel.onSettingsClick()
                 fragmentHostListener.addFragment(SettingsFragment())
+            },
+            onWhatsNewClick = {
+                fragmentHostListener.addFragment(WhatsNewFeedFragment())
             },
             onHeaderClick = {
                 profileViewModel.onHeaderClick()

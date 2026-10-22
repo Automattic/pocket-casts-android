@@ -11,7 +11,10 @@ import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfRowItem
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
+import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.PlayerShelfOverflowMenuRearrangeActionMovedEvent
 import com.automattic.eventhorizon.ShelfActionSourceType
@@ -19,12 +22,18 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito.mock
 import org.mockito.junit.MockitoJUnitRunner
+import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
@@ -33,8 +42,11 @@ class ShelfViewModelTest {
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    @get:Rule
+    @get:Rule(order = 0)
     val coroutineRule = MainCoroutineRule()
+
+    @get:Rule(order = 1)
+    val featureFlagRule = InMemoryFeatureFlagRule()
 
     @Mock
     private lateinit var transcriptManager: TranscriptManager
@@ -197,6 +209,79 @@ class ShelfViewModelTest {
         }
     }
 
+    @Test
+    fun `given smart bookmarks promo release, then the bookmark new badge is shown`() = runTest {
+        FeatureFlag.setEnabled(Feature.SMART_BOOKMARKS, true)
+        initViewModel(version = "8.22-rc-1")
+
+        assertTrue(shelfViewModel.uiState.value.showBookmarkNewBadge)
+    }
+
+    @Test
+    fun `given smart bookmarks promo patch release, then the bookmark new badge is shown`() = runTest {
+        FeatureFlag.setEnabled(Feature.SMART_BOOKMARKS, true)
+        initViewModel(version = "8.22.1")
+
+        assertTrue(shelfViewModel.uiState.value.showBookmarkNewBadge)
+    }
+
+    @Test
+    fun `given release before the smart bookmarks promo, then the bookmark new badge is hidden`() = runTest {
+        FeatureFlag.setEnabled(Feature.SMART_BOOKMARKS, true)
+        initViewModel(version = "8.21")
+
+        assertFalse(shelfViewModel.uiState.value.showBookmarkNewBadge)
+    }
+
+    @Test
+    fun `given release after the smart bookmarks promo, then the bookmark new badge is hidden`() = runTest {
+        FeatureFlag.setEnabled(Feature.SMART_BOOKMARKS, true)
+        initViewModel(version = "8.23")
+
+        assertFalse(shelfViewModel.uiState.value.showBookmarkNewBadge)
+    }
+
+    @Test
+    fun `given smart bookmarks disabled, then the bookmark new badge is hidden`() = runTest {
+        FeatureFlag.setEnabled(Feature.SMART_BOOKMARKS, false)
+        initViewModel(version = "8.22")
+
+        assertFalse(shelfViewModel.uiState.value.showBookmarkNewBadge)
+    }
+
+    @Test
+    fun `given episode chat in free beta, then the episode chat beta badge is shown`() = runTest {
+        FeatureFlag.setEnabled(Feature.EPISODE_CHAT_FREE_BETA, true)
+        initViewModel()
+
+        assertTrue(shelfViewModel.uiState.value.showEpisodeChatBetaBadge)
+    }
+
+    @Test
+    fun `given episode chat out of free beta, then the episode chat beta badge is hidden`() = runTest {
+        FeatureFlag.setEnabled(Feature.EPISODE_CHAT_FREE_BETA, false)
+        initViewModel()
+
+        assertFalse(shelfViewModel.uiState.value.showEpisodeChatBetaBadge)
+    }
+
+    @Test
+    fun `given hidden shelf items, when an item is moved, then hidden items keep their saved positions`() = runTest {
+        val savedItems = ShelfItem.entries
+        val hiddenItems = setOf(ShelfItem.EpisodeChat, ShelfItem.StreamSelector)
+        val visibleItems = savedItems - hiddenItems
+        initViewModel(isEditable = true, savedItems = savedItems)
+        shelfViewModel.setData(visibleItems, PodcastEpisode(uuid = "uuid", publishedDate = SafeDate()))
+
+        shelfViewModel.onShelfItemMove(1, 2)
+
+        val savedCaptor = argumentCaptor<List<ShelfItem>>()
+        verify(settings.shelfItems).set(savedCaptor.capture(), eq(true), any(), any())
+        val saved = savedCaptor.firstValue
+        hiddenItems.forEach { assertEquals(savedItems.indexOf(it), saved.indexOf(it)) }
+        assertEquals(listOf(visibleItems[1], visibleItems[0]) + visibleItems.drop(2), saved - hiddenItems)
+    }
+
     private fun moveShelfItem(
         from: Int,
         to: Int,
@@ -210,11 +295,15 @@ class ShelfViewModelTest {
 
     private fun initViewModel(
         isEditable: Boolean = true,
+        version: String = "8.21",
+        savedItems: List<ShelfItem> = ShelfItem.entries,
     ) {
         val episodeId = "testEpisodeId"
         whenever(transcriptManager.observeIsTranscriptAvailable(episodeId)).thenReturn(flowOf(true))
         val userSetting = mock<UserSetting<List<ShelfItem>>>()
+        whenever(userSetting.value).thenReturn(savedItems)
         whenever(settings.shelfItems).thenReturn(userSetting)
+        whenever(settings.getVersion()).thenReturn(version)
 
         shelfViewModel = ShelfViewModel(
             episodeId = episodeId,

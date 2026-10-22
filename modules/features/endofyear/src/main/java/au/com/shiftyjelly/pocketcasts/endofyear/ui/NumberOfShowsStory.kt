@@ -12,7 +12,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.PageSize
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -68,7 +68,7 @@ internal fun NumberOfShowsStory(
                 .background(story.backgroundColor)
                 .padding(top = measurements.closeButtonBottomEdge + 16.dp),
         ) {
-            val windowSize = currentWindowAdaptiveInfo().windowSizeClass
+            val windowSize = currentWindowAdaptiveInfoV2().windowSizeClass
             TextH10(
                 text = stringResource(
                     LR.string.end_of_year_story_listened_to_numbers,

@@ -27,6 +27,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import java.util.Date
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun MenuShelfItems(
@@ -64,6 +65,7 @@ fun MenuShelfItems(
                                     isEditable = state.isEditable,
                                     isTranscriptAvailable = state.isTranscriptAvailable,
                                     isVideoEnabled = isVideoEnabled,
+                                    badgeTextId = shelfItemBadgeTextId(listItem, state),
                                     onClick = onClick,
                                     modifier = rowDraggableModifier,
                                 )
@@ -90,6 +92,16 @@ fun MenuShelfItems(
     }
 }
 
+private fun shelfItemBadgeTextId(
+    item: ShelfItem,
+    state: UiState,
+): Int? = when {
+    state.isEditable -> null
+    item == ShelfItem.EpisodeChat && state.showEpisodeChatBetaBadge -> LR.string.episode_chat_beta_badge
+    item == ShelfItem.Bookmark && state.showBookmarkNewBadge -> LR.string.bookmark_new_badge
+    else -> null
+}
+
 @Preview
 @Composable
 private fun MenuShelfItemsNonEditableContentPreview(
@@ -104,6 +116,7 @@ private fun MenuShelfItemsNonEditableContentPreview(
                 episode = PodcastEpisode("", publishedDate = Date()),
                 isEditable = false,
                 isTranscriptAvailable = false,
+                showEpisodeChatBetaBadge = true,
             ),
             selectedBackgroundColor = Color.Transparent,
             normalBackgroundColor = Color.Transparent,

@@ -15,6 +15,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SuggestedFoldersManager
+import au.com.shiftyjelly.pocketcasts.repositories.whatsnew.WhatsNewManager
 import com.automattic.android.tracks.crashlogging.CrashLogging
 import com.google.android.play.core.ktx.requestReview
 import com.google.android.play.core.review.testing.FakeReviewManager
@@ -42,6 +43,7 @@ class DeveloperViewModel
     @ApplicationContext private val context: Context,
     private val crashLogging: CrashLogging,
     private val appReviewManagerImpl: AppReviewManagerImpl,
+    private val whatsNewManager: WhatsNewManager,
 ) : ViewModel() {
     private val reviewManager = FakeReviewManager(context)
 
@@ -62,7 +64,7 @@ class DeveloperViewModel
                     for (podcast in podcasts) {
                         if (podcast.isShowNotifications) {
                             // find first podcast with more than one episode
-                            val episodes = episodeManager.findEpisodesByPodcastOrderedByPublishDateBlocking(podcast)
+                            val episodes = episodeManager.findEpisodesByPodcastOrderedByPublishDate(podcast)
                             if (episodes.size <= 1) {
                                 continue
                             } else {
@@ -99,7 +101,7 @@ class DeveloperViewModel
                 val podcasts = podcastManager.findSubscribedBlocking()
                 for (podcast in podcasts) {
                     // find first podcast with more than one episode
-                    val episodes = episodeManager.findEpisodesByPodcastOrderedByPublishDateBlocking(podcast)
+                    val episodes = episodeManager.findEpisodesByPodcastOrderedByPublishDate(podcast)
                     if (episodes.size <= 1) {
                         continue
                     } else {
@@ -111,7 +113,7 @@ class DeveloperViewModel
 
                         podcast.latestEpisodeUuid = newLatest?.uuid
                         podcast.latestEpisodeDate = newLatest?.publishedDate
-                        podcastManager.updatePodcastBlocking(podcast)
+                        podcastManager.updatePodcast(podcast)
 
                         continue
                     }
@@ -136,7 +138,7 @@ class DeveloperViewModel
                     .shuffled()
                     .asFlow()
                     .flatMapConcat {
-                        episodeManager.findEpisodesByPodcastOrderedSuspend(it).asFlow()
+                        episodeManager.findEpisodesByPodcastOrdered(it).asFlow()
                     }
                     .take(5)
                     .toList()
@@ -186,8 +188,31 @@ class DeveloperViewModel
         settings.showUpNextSortDurationTooltip.set(true, updateModifiedAt = false)
     }
 
+    fun showPlaylistTooltips() {
+        settings.showPremadePlaylistsTooltip.set(true, updateModifiedAt = false)
+        settings.showRearrangePlaylistsTooltip.set(true, updateModifiedAt = false)
+    }
+
+    fun showSmartBookmarksTooltip() {
+        settings.showSmartBookmarksTooltip.set(true, updateModifiedAt = false)
+        settings.smartBookmarksTooltipDismissed.set(false, updateModifiedAt = false)
+    }
+
+    fun resetWhatsNewReadState() {
+        whatsNewManager.resetReadState()
+    }
+
+    fun resetWhatsNewToFreshInstall() {
+        whatsNewManager.resetReadState()
+        whatsNewManager.startFeed()
+    }
+
     fun resetNotificationsPrompt() {
         settings.notificationsPromptAcknowledged.set(false, updateModifiedAt = false)
+    }
+
+    fun resetEpisodeChatSurvey() {
+        settings.episodeChatSurveySeen.set(false, updateModifiedAt = false)
     }
 
     fun showAppReviewPrompt() {

@@ -14,6 +14,9 @@ abstract class UpNextChangeDao {
     @Query("SELECT * FROM up_next_changes")
     abstract fun findAllBlocking(): List<UpNextChange>
 
+    @Query("SELECT COUNT(*) FROM up_next_changes")
+    abstract suspend fun count(): Int
+
     @Query("DELETE FROM up_next_changes WHERE modified <= :modified")
     abstract suspend fun deleteChangesOlderOrEqualTo(modified: Long)
 
