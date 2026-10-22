@@ -18,6 +18,8 @@
         ([#6206](https://github.com/Automattic/pocket-casts-android/pull/6206))
     *   Fix downloads and streams from some hosts, such as Buzzsprout, failing for good after a single failed attempt
         ([#6212](https://github.com/Automattic/pocket-casts-android/pull/6212))
+    *   Fix playback stopping right after it starts when another app removes the playback notification
+        ([#6217](https://github.com/Automattic/pocket-casts-android/pull/6217))
 
 
 8.23
