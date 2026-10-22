@@ -58,6 +58,7 @@ abstract class EpisodeChatDao {
           podcast_episodes.podcast_id AS podcast_uuid,
           IFNULL(podcasts.title, '') AS podcast_title,
           podcast_episodes.duration AS episode_duration,
+          podcast_episodes.image_url AS episode_image_url,
           MAX(episode_chat_messages.created_at) AS last_message_at
         FROM episode_chats
         JOIN episode_chat_messages ON episode_chat_messages.episode_uuid = episode_chats.episode_uuid
@@ -68,6 +69,18 @@ abstract class EpisodeChatDao {
         """,
     )
     abstract fun observeChatHistory(): Flow<List<EpisodeChatHistoryItem>>
+
+    @Query(
+        """
+        SELECT EXISTS(
+          SELECT 1
+          FROM episode_chats
+          JOIN episode_chat_messages ON episode_chat_messages.episode_uuid = episode_chats.episode_uuid
+          WHERE episode_chats.episode_uuid = :episodeUuid
+        )
+        """,
+    )
+    abstract suspend fun hasChatWithMessages(episodeUuid: String): Boolean
 
     @Query("UPDATE episode_chat_messages SET rating = :rating WHERE uuid = :uuid")
     abstract suspend fun updateRating(uuid: String, rating: String?)

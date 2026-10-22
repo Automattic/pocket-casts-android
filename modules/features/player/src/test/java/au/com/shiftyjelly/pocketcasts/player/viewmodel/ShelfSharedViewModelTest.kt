@@ -45,6 +45,7 @@ import com.automattic.eventhorizon.EpisodeChatTooltipTappedEvent
 import com.automattic.eventhorizon.EpisodeChatUnavailableTappedEvent
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.PlayerShelfActionTappedEvent
+import com.automattic.eventhorizon.PlayerShelfOverflowMenuShownEvent
 import com.automattic.eventhorizon.ShelfActionSourceType
 import com.automattic.eventhorizon.ShelfActionType
 import java.time.Instant
@@ -772,6 +773,32 @@ class ShelfSharedViewModelTest {
             eventSink.pollEvent(),
         )
         assertEquals(EpisodeChatTooltipDismissedEvent, eventSink.pollEvent())
+    }
+
+    @Test
+    fun `given episode chat tooltip showing, when more button clicked, then tooltip is dismissed and tracked`() = runTest {
+        initViewModel(currentEpisode = transcriptEpisode, isTranscriptAvailable = true, isEpisodeChatEnabled = true)
+        shelfSharedViewModel.setPlayerOpen(true)
+        awaitLoadedState { it.showEpisodeChatTooltip }
+
+        shelfSharedViewModel.onMoreClick()
+
+        verify(episodeChatTooltipDismissedSetting).set(true, updateModifiedAt = false)
+        assertEquals(PlayerShelfOverflowMenuShownEvent, eventSink.pollEvent())
+        assertEquals(EpisodeChatTooltipDismissedEvent, eventSink.pollEvent())
+    }
+
+    @Test
+    fun `given episode chat tooltip not showing, when more button clicked, then tooltip is kept for later`() = runTest {
+        initViewModel(currentEpisode = transcriptEpisode, isTranscriptAvailable = false, isEpisodeChatEnabled = true)
+        shelfSharedViewModel.setPlayerOpen(true)
+        awaitLoadedState { it.isEpisodeChatPromoActive }
+
+        shelfSharedViewModel.onMoreClick()
+
+        verify(episodeChatTooltipDismissedSetting, never()).set(any(), any(), any(), any())
+        assertEquals(PlayerShelfOverflowMenuShownEvent, eventSink.pollEvent())
+        assertTrue(eventSink.isEmpty())
     }
 
     @Test

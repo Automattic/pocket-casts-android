@@ -31,10 +31,10 @@ internal data class ChatTheme(
     val quoteTimestamp: Color,
     val onWhiteText: Color,
     val sheetHandle: Color,
-    val detailsHint: Color,
     val rating: Color,
     val errorText: Color,
     val toastAction: Color,
+    val offlineNote: Color,
 ) {
     companion object {
         fun default(colors: ThemeColors) = ChatTheme(
@@ -54,15 +54,15 @@ internal data class ChatTheme(
             sendButtonIcon = colors.primaryInteractive02,
             closeButtonBackground = colors.primaryUi05,
             progress = colors.primaryInteractive01,
-            progressTrack = colors.primaryUi05,
+            progressTrack = colors.primaryText02,
             chipBorder = colors.primaryUi05,
             quoteTimestamp = colors.primaryInteractive01,
             onWhiteText = ThemeLightColors.primaryText01,
             sheetHandle = ThemeLightColors.primaryUi05,
-            detailsHint = ThemeLightColors.primaryText02,
             rating = colors.primaryIcon02,
             errorText = colors.support05,
             toastAction = ThemeLightColors.primaryInteractive01,
+            offlineNote = colors.primaryText02,
         )
 
         fun player(colors: PlayerColors) = ChatTheme(
@@ -82,15 +82,15 @@ internal data class ChatTheme(
             sendButtonIcon = colors.background01,
             closeButtonBackground = colors.contrast05,
             progress = colors.highlight01,
-            progressTrack = colors.contrast05,
+            progressTrack = colors.contrast02,
             chipBorder = colors.contrast05,
             quoteTimestamp = QuoteTimestampBlue,
             onWhiteText = ThemeLightColors.primaryText01,
             sheetHandle = ThemeLightColors.primaryUi05,
-            detailsHint = ThemeLightColors.primaryText02,
             rating = colors.contrast05,
             errorText = ErrorRed,
             toastAction = ThemeLightColors.primaryInteractive01,
+            offlineNote = colors.contrast02.copy(alpha = maxOf(colors.contrast02.alpha, OFFLINE_NOTE_MIN_ALPHA)),
         )
     }
 }
@@ -111,3 +111,4 @@ internal fun rememberChatTheme(): ChatTheme {
 
 private val QuoteTimestampBlue = Color(0xFF2A67F9)
 private val ErrorRed = Color(0xFFF43E37)
+private const val OFFLINE_NOTE_MIN_ALPHA = 0.6f

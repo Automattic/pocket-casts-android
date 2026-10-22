@@ -151,33 +151,37 @@ class ChatFragment : BaseDialogFragment() {
         }
         LaunchedEffect(snackbarHostState) {
             viewModel.toasts.collectLatest { toast ->
-                snackbarHostState.currentSnackbarData?.dismiss()
-                shownToast = toast
-                val result = if (toast.isUndoable) {
-                    coroutineScope {
-                        val expiry = launch {
-                            delay(undoToastTimeoutMs)
-                            snackbarHostState.currentSnackbarData?.dismiss()
+                try {
+                    snackbarHostState.currentSnackbarData?.dismiss()
+                    shownToast = toast
+                    val result = if (toast.isUndoable) {
+                        coroutineScope {
+                            val expiry = launch {
+                                delay(undoToastTimeoutMs)
+                                snackbarHostState.currentSnackbarData?.dismiss()
+                            }
+                            snackbarHostState.showSnackbar(
+                                message = toast.message(resources),
+                                actionLabel = resources.getString(LR.string.chat_undo),
+                                duration = SnackbarDuration.Indefinite,
+                            ).also { expiry.cancel() }
                         }
-                        snackbarHostState.showSnackbar(
-                            message = toast.message(resources),
-                            actionLabel = resources.getString(LR.string.chat_undo),
-                            duration = SnackbarDuration.Indefinite,
-                        ).also { expiry.cancel() }
+                    } else {
+                        snackbarHostState.showSnackbar(message = toast.message(resources), duration = SnackbarDuration.Short)
                     }
-                } else {
-                    snackbarHostState.showSnackbar(message = toast.message(resources), duration = SnackbarDuration.Short)
-                }
-                shownToast = null
-                if (result == SnackbarResult.ActionPerformed) {
-                    when (toast) {
-                        ChatToast.ChatCleared -> viewModel.undoClearChat()
-                        ChatToast.ChatDeleted -> viewModel.undoDeleteChat()
-                        is ChatToast.QuotePlaying -> viewModel.undoQuotePlay()
-                        ChatToast.FeedbackThanks -> Unit
+                    shownToast = null
+                    if (result == SnackbarResult.ActionPerformed) {
+                        when (toast) {
+                            ChatToast.ChatCleared -> viewModel.undoClearChat()
+                            ChatToast.ChatDeleted -> viewModel.undoDeleteChat()
+                            is ChatToast.QuotePlaying -> viewModel.undoQuotePlay()
+                            ChatToast.FeedbackThanks, ChatToast.QuotePlayFailed -> Unit
+                        }
                     }
-                } else if (toast is ChatToast.QuotePlaying) {
-                    viewModel.onQuoteUndoExpired()
+                } finally {
+                    if (toast is ChatToast.QuotePlaying) {
+                        viewModel.onQuoteUndoExpired(toast.undoId)
+                    }
                 }
             }
         }
@@ -245,23 +249,23 @@ class ChatFragment : BaseDialogFragment() {
 
     private fun showClearChatOptionsDialog() {
         val dangerColor = requireContext().getThemeColor(UR.attr.support_05)
+        val uiState = viewModel.uiState.value
         val dialog = OptionsDialog().setForceDarkTheme(args.sourceView == SourceView.PLAYER)
-        if (!viewModel.uiState.value.isAwaitingReply) {
+        dialog.addTextOption(
+            titleId = LR.string.chat_history,
+            imageId = IR.drawable.ic_history,
+            click = viewModel::showHistory,
+        )
+        if (uiState.messages.isNotEmpty() || uiState.isAwaitingReply) {
             dialog.addTextOption(
-                titleId = LR.string.chat_history,
-                imageId = IR.drawable.ic_history,
-                click = viewModel::showHistory,
-            )
-        }
-        dialog
-            .addTextOption(
                 titleId = LR.string.chat_clear,
                 titleColor = dangerColor,
                 imageId = IR.drawable.ic_delete,
                 imageColor = dangerColor,
                 click = viewModel::clearChat,
             )
-            .show(parentFragmentManager, "chat_options")
+        }
+        dialog.show(parentFragmentManager, "chat_options")
     }
 
     override fun onDismiss(dialog: DialogInterface) {
@@ -304,13 +308,14 @@ class ChatFragment : BaseDialogFragment() {
             else -> playingPodcast?.let(::PodcastColors) ?: args.podcastColors
         }
 
-    private val ChatToast.isUndoable get() = this != ChatToast.FeedbackThanks
+    private val ChatToast.isUndoable get() = this != ChatToast.FeedbackThanks && this != ChatToast.QuotePlayFailed
 
     private fun ChatToast.message(resources: Resources) = when (this) {
         ChatToast.FeedbackThanks -> resources.getString(LR.string.chat_feedback_thank_you)
         ChatToast.ChatCleared -> resources.getString(LR.string.chat_cleared)
         ChatToast.ChatDeleted -> resources.getString(LR.string.chat_deleted)
         is ChatToast.QuotePlaying -> resources.getString(LR.string.chat_now_playing_episode, episodeTitle)
+        ChatToast.QuotePlayFailed -> resources.getString(LR.string.chat_quote_play_failed)
     }
 
     @Parcelize

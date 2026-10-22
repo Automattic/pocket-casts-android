@@ -5,9 +5,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.EpisodeChatHistoryItem
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatAnswerRating
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatInputType
@@ -23,6 +26,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.eventhorizon.EpisodeChatBetaSheetDismissedEvent
 import com.automattic.eventhorizon.EpisodeChatBetaSheetShownEvent
@@ -52,6 +57,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import java.io.IOException
 import java.time.Clock
 import java.time.ZoneId
+import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
 import kotlin.time.TimeSource
 import kotlinx.coroutines.CancellationException
@@ -62,6 +69,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
@@ -123,7 +131,11 @@ class ChatViewModel @Inject constructor(
 
     private var isSigningIn = false
 
-    @Volatile private var quotePlaybackUndo: PlaybackPosition? = null
+    private val quotePlaybackUndo = AtomicReference<QuotePlaybackUndo?>()
+    private val quoteLoadId = AtomicInteger()
+    private val warmedUpEpisodeUuids = mutableSetOf<String>()
+    private val warmedUpQuoteUuids = mutableSetOf<String>()
+    private var lastQuotePlaybackUndoId = 0
     private var transientUserMessage: ChatMessage.User? = null
     private var pendingShownEntryPoint: ChatEntryPoint? = null
     private var hasReceivedAnswer = false
@@ -153,16 +165,26 @@ class ChatViewModel @Inject constructor(
     ) {
         if (chatEpisode.value != null) return
         this.sourceView = sourceView
-        val isSignInRequired = requiresSignIn && !syncManager.isLoggedIn()
-        _uiState.update { it.copy(isBeta = isBeta, isSignInRequired = isSignInRequired) }
+        _uiState.update {
+            it.copy(
+                isBeta = isBeta,
+                isBetaNoteVisible = FeatureFlag.isEnabled(Feature.EPISODE_CHAT_FREE_BETA),
+                isSignInRequired = requiresSignIn,
+            )
+        }
         openChat(ChatEpisode(episodeUuid, episodeTitle, podcastUuid, podcastTitle, episodeDurationMs), entryPoint)
         observePlayback()
-        if (isSignInRequired) {
-            showBetaSheet()
-        } else {
-            observeMessages()
-            observeHistory()
-            showBetaSheetIfNeeded(isBeta)
+        observeQuoteWarmUp()
+        when {
+            !requiresSignIn -> {
+                observeMessages()
+                observeHistory()
+                showBetaSheetIfNeeded(isBeta)
+            }
+
+            syncManager.isLoggedIn() -> completeSignIn()
+
+            else -> showBetaSheet()
         }
     }
 
@@ -182,8 +204,18 @@ class ChatViewModel @Inject constructor(
     fun refreshSignIn() {
         isSigningIn = false
         if (!_uiState.value.isSignInRequired || !syncManager.isLoggedIn()) return
+        completeSignIn()
+    }
+
+    private fun completeSignIn() {
         settings.episodeChatBetaSheetSeen.set(true, updateModifiedAt = false)
-        _uiState.update { it.copy(isSignInRequired = false, isBetaSheetVisible = false) }
+        _uiState.update {
+            it.copy(
+                isBeta = settings.cachedSubscription.value == null,
+                isSignInRequired = false,
+                isBetaSheetVisible = false,
+            )
+        }
         pendingShownEntryPoint = ChatEntryPoint.SignIn
         observeMessages()
         observeHistory()
@@ -198,8 +230,10 @@ class ChatViewModel @Inject constructor(
         sendJob?.cancel()
         transientUserMessage = null
         isAdoptingUnansweredQuestion = true
+        quoteLoadId.incrementAndGet()
         _uiState.update {
             it.copy(
+                loadingQuoteUuid = null,
                 episodeUuid = episode.uuid,
                 episodeTitle = episode.title,
                 podcastUuid = episode.podcastUuid,
@@ -306,6 +340,26 @@ class ChatViewModel @Inject constructor(
         }
     }
 
+    private fun observeQuoteWarmUp() {
+        viewModelScope.launch {
+            combine(
+                _uiState.map { it.episodeUuid to it.messages }.distinctUntilChanged(),
+                playbackManager.playbackStateFlow.map { it.loadedEpisodeUuid }.distinctUntilChanged(),
+            ) { (chatEpisodeUuid, messages), loadedEpisodeUuid ->
+                val quotes = messages.filterIsInstance<ChatMessage.Quote>().filter { it.canPlay }
+                chatEpisodeUuid to quotes.takeIf { chatEpisodeUuid == loadedEpisodeUuid }.orEmpty()
+            }.collect { (chatEpisodeUuid, quotes) -> warmUpQuotes(chatEpisodeUuid, quotes) }
+        }
+    }
+
+    private fun warmUpQuotes(episodeUuid: String, quotes: List<ChatMessage.Quote>) {
+        if (quotes.isEmpty()) return
+        if (warmedUpEpisodeUuids.add(episodeUuid)) {
+            quoteSeeker.warmUpFingerprints(episodeUuid)
+        }
+        quotes.filter { warmedUpQuoteUuids.add(it.uuid) }.forEach { quoteSeeker.warmUpQuote(episodeUuid, it) }
+    }
+
     fun onPlayPauseClick() {
         val episodeUuid = episodeUuid
         val previousJob = quotePlaybackJob
@@ -343,11 +397,11 @@ class ChatViewModel @Inject constructor(
     }
 
     fun showHistory() {
-        if (_uiState.value.isAwaitingReply) return
         _uiState.update {
             it.copy(
                 isHistoryVisible = true,
                 history = historyItems.orEmpty().toHistorySections(clock.instant(), ZoneId.systemDefault()),
+                useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork,
             )
         }
         if (historyItems == null) {
@@ -541,96 +595,171 @@ class ChatViewModel @Inject constructor(
             .filterIsInstance<ChatMessage.Quote>()
             .firstOrNull { it.uuid == quoteUuid && it.canPlay }
             ?: return
+        if (quoteUuid == _uiState.value.loadingQuoteUuid) return
 
+        val episodeUuid = episodeUuid
+        val podcastUuid = podcastUuid
+        val isOtherEpisode = _uiState.value.otherPlayingEpisode != null
         eventHorizon.track(
             EpisodeChatQuotePlayTappedEvent(
                 source = sourceView.analyticsValue,
                 episodeUuid = episodeUuid,
                 podcastUuid = podcastUuid,
                 quoteSource = EpisodeChatQuoteSourceType.InlineTimestamp,
-                isOtherEpisode = _uiState.value.otherPlayingEpisode != null,
+                isOtherEpisode = isOtherEpisode,
             ),
         )
-        val episodeUuid = episodeUuid
-        val podcastUuid = podcastUuid
+        val loadId = startQuoteLoading(quoteUuid)
         val previousJob = quotePlaybackJob
         previousJob?.cancel()
         quotePlaybackJob = applicationScope.launch(ioDispatcher) {
-            previousJob?.join()
-            val episode = episodeManager.findEpisodeByUuid(episodeUuid)
-            if (episode == null || !quote.isWithinEpisode(episode.durationMs)) return@launch
-            val quoteTime = async { quoteSeeker.quoteTime(episodeUuid, quote) }
-            val userSeek = async(start = CoroutineStart.UNDISPATCHED) { playbackManager.userSeeks.first() }
-            val state = playbackManager.playbackStateFlow.first()
-            if (state.loadedEpisodeUuid != episodeUuid) {
-                playbackManager.playNowSuspend(episode = episode, sourceView = sourceView)
-                if (!awaitPlaybackEpisode(episodeUuid)) {
-                    quoteTime.cancel()
-                    userSeek.cancel()
-                    return@launch
-                }
-            }
-            val seekTimeMs = try {
-                quoteSeeker.playbackTimeMs(episode, quoteTime.await())
+            try {
+                previousJob?.join()
+                seekToQuote(quote, episodeUuid, podcastUuid, isOtherEpisode, loadId)
             } finally {
-                userSeek.cancel()
+                finishQuoteLoading(loadId)
             }
-            if (userSeek.isCompleted && !userSeek.isCancelled) return@launch
-            if (playbackManager.playbackStateFlow.first().loadedEpisodeUuid != episodeUuid) return@launch
-            playbackManager.seekToTimeMsSuspend(positionMs = seekTimeMs)
-            playbackManager.playQueueSuspend(sourceView = sourceView)
-            quotePlaybackUndo = quotePlaybackUndo ?: PlaybackPosition(
-                quoteEpisodeUuid = episodeUuid,
-                quotePodcastUuid = podcastUuid,
-                episodeUuid = state.episodeUuid.takeUnless { state.isEmpty || it.isEmpty() },
-                positionMs = state.positionMs,
-                isPlaying = state.isPlaying,
-            )
-            showToast(ChatToast.QuotePlaying(episode.title))
         }
     }
 
-    fun onQuoteUndoExpired() {
-        quotePlaybackUndo = null
+    private fun startQuoteLoading(quoteUuid: String): Int {
+        val loadId = quoteLoadId.incrementAndGet()
+        _uiState.update { it.copy(loadingQuoteUuid = quoteUuid) }
+        return loadId
+    }
+
+    private fun finishQuoteLoading(loadId: Int) {
+        _uiState.update { state ->
+            if (quoteLoadId.get() == loadId) state.copy(loadingQuoteUuid = null) else state
+        }
+    }
+
+    private suspend fun seekToQuote(
+        quote: ChatMessage.Quote,
+        episodeUuid: String,
+        podcastUuid: String,
+        isOtherEpisode: Boolean,
+        loadId: Int,
+    ) = coroutineScope {
+        val episode = episodeManager.findEpisodeByUuid(episodeUuid)
+        if (episode == null || !quote.isWithinEpisode(episode.durationMs)) return@coroutineScope
+        val quoteTime = async { quoteSeeker.quoteTime(episodeUuid, quote) }
+        val userSeek = async(start = CoroutineStart.UNDISPATCHED) { playbackManager.userSeeks.first() }
+        val state = playbackManager.playbackStateFlow.first()
+        val episodeSwitch = if (state.loadedEpisodeUuid != episodeUuid) {
+            val switch = EpisodeSwitch(
+                queue = playbackManager.upNextQueue.queueEpisodes,
+                episodes = listOf(SwitchedEpisode(episode)),
+            )
+            playbackManager.playNowSuspend(episode = episode, sourceView = sourceView)
+            if (!awaitPlaybackEpisode(episodeUuid)) {
+                quoteTime.cancel()
+                userSeek.cancel()
+                finishQuoteLoading(loadId)
+                showToast(ChatToast.QuotePlayFailed)
+                if (playbackManager.upNextQueue.currentEpisode?.uuid == episodeUuid) {
+                    restorePlayback(state.toPlaybackPosition(episodeUuid, podcastUuid, switch, isOtherEpisode))
+                } else {
+                    if (switch.queue.none { it.uuid == episodeUuid }) {
+                        playbackManager.upNextQueue.removeEpisode(episode)
+                    }
+                    restoreSwitchedEpisodes(switch)
+                }
+                return@coroutineScope
+            }
+            switch
+        } else {
+            null
+        }
+        val seekTimeMs = try {
+            quoteSeeker.playbackTimeMs(episode, quoteTime.await())
+        } finally {
+            userSeek.cancel()
+        }
+        if (userSeek.isCompleted && !userSeek.isCancelled) return@coroutineScope
+        if (playbackManager.playbackStateFlow.first().loadedEpisodeUuid != episodeUuid) return@coroutineScope
+        playbackManager.seekToTimeMsSuspend(positionMs = seekTimeMs)
+        playbackManager.playQueueSuspend(sourceView = sourceView)
+        val undoId = ++lastQuotePlaybackUndoId
+        quotePlaybackUndo.updateAndGet { undo ->
+            QuotePlaybackUndo(
+                id = undoId,
+                position = undo?.position?.withLaterSwitch(episodeSwitch, isOtherEpisode)
+                    ?: state.toPlaybackPosition(episodeUuid, podcastUuid, episodeSwitch, isOtherEpisode),
+            )
+        }
+        showToast(ChatToast.QuotePlaying(episode.title, undoId))
+    }
+
+    fun onQuoteUndoExpired(undoId: Int) {
+        quotePlaybackUndo.updateAndGet { undo -> undo?.takeUnless { it.id == undoId } }
     }
 
     private fun showToast(toast: ChatToast) {
         if (toast !is ChatToast.QuotePlaying) {
-            quotePlaybackUndo = null
+            quotePlaybackUndo.set(null)
         }
         _toasts.trySend(toast)
     }
 
     fun undoQuotePlay() {
-        val undo = quotePlaybackUndo ?: return
-        quotePlaybackUndo = null
+        val undo = quotePlaybackUndo.getAndSet(null)?.position ?: return
         eventHorizon.track(
             EpisodeChatQuotePlayUndoneEvent(
                 source = sourceView.analyticsValue,
                 episodeUuid = undo.quoteEpisodeUuid,
                 podcastUuid = undo.quotePodcastUuid,
+                isOtherEpisode = undo.isOtherEpisode,
             ),
         )
         val previousJob = quotePlaybackJob
         previousJob?.cancel()
         quotePlaybackJob = applicationScope.launch(ioDispatcher) {
             previousJob?.join()
-            val previousEpisode = undo.episodeUuid?.let { episodeManager.findEpisodeByUuid(it) }
-            if (previousEpisode == null) {
+            restorePlayback(undo)
+        }
+    }
+
+    private suspend fun restorePlayback(undo: PlaybackPosition) {
+        val switch = undo.episodeSwitch
+        val previousEpisode = undo.episodeUuid?.let { episodeManager.findEpisodeByUuid(it) }
+        if (previousEpisode == null) {
+            if (switch == null) {
                 playbackManager.pause(sourceView = sourceView)
-                return@launch
+            } else {
+                playbackManager.stop()
+                playbackManager.upNextQueue.removeAll()
+                restoreSwitchedEpisodes(switch)
             }
-            if (previousEpisode.uuid != undo.quoteEpisodeUuid) {
-                playbackManager.playNowSuspend(episode = previousEpisode, sourceView = sourceView)
-                val isLoaded = awaitPlaybackEpisode(previousEpisode.uuid)
-                if (!undo.isPlaying) {
-                    playbackManager.pause(sourceView = sourceView)
-                }
-                if (!isLoaded) return@launch
-            }
-            playbackManager.seekToTimeMsSuspend(positionMs = undo.positionMs)
+            return
+        }
+        if (undo.hasSwitchedAwayFromPreviousEpisode) {
+            playbackManager.playNowSuspend(episode = previousEpisode, sourceView = sourceView)
+            val isLoaded = awaitPlaybackEpisode(previousEpisode.uuid)
             if (!undo.isPlaying) {
                 playbackManager.pause(sourceView = sourceView)
+            }
+            if (switch != null) {
+                if (playbackManager.upNextQueue.currentEpisode?.uuid == previousEpisode.uuid) {
+                    playbackManager.upNextQueue.changeList(switch.queue)
+                }
+                restoreSwitchedEpisodes(switch)
+            }
+            if (!isLoaded) return
+        }
+        playbackManager.seekToTimeMsSuspend(positionMs = undo.positionMs)
+        if (!undo.isPlaying) {
+            playbackManager.pause(sourceView = sourceView)
+        }
+    }
+
+    private suspend fun restoreSwitchedEpisodes(switch: EpisodeSwitch) {
+        switch.episodes.forEach { switched ->
+            val episode = episodeManager.findEpisodeByUuid(switched.uuid) ?: return@forEach
+            episodeManager.updatePlayingStatusBlocking(episode, switched.playingStatus)
+            episodeManager.updatePlayedUpToBlocking(episode, switched.playedUpTo, forceUpdate = true)
+            if (switched.wasArchived && episode is PodcastEpisode) {
+                episodeManager.archiveAllInList(listOf(episode), playbackManager = null)
             }
         }
     }
@@ -836,6 +965,7 @@ class ChatViewModel @Inject constructor(
                 podcastUuid = podcastUuid,
                 hasHistory = hasHistory,
                 entryPoint = entryPoint.analyticsValue,
+                isBeta = _uiState.value.isBeta,
             ),
         )
     }
@@ -870,7 +1000,7 @@ class ChatViewModel @Inject constructor(
     }
 }
 
-private const val QUOTE_PLAYBACK_EPISODE_TIMEOUT_MS = 5_000L
+private const val QUOTE_PLAYBACK_EPISODE_TIMEOUT_MS = 10_000L
 private const val LOG_TAG = "EpisodeChat"
 
 private val PlaybackState.loadedEpisodeUuid
@@ -890,13 +1020,70 @@ private data class ChatEpisode(
     val durationMs: Int,
 )
 
+private class QuotePlaybackUndo(
+    val id: Int,
+    val position: PlaybackPosition,
+)
+
 private class PlaybackPosition(
     val quoteEpisodeUuid: String,
     val quotePodcastUuid: String,
     val episodeUuid: String?,
     val positionMs: Int,
     val isPlaying: Boolean,
+    val episodeSwitch: EpisodeSwitch?,
+    val isOtherEpisode: Boolean,
+) {
+    val hasSwitchedAwayFromPreviousEpisode get() = episodeSwitch?.episodes.orEmpty().any { it.uuid != episodeUuid }
+
+    fun withLaterSwitch(laterSwitch: EpisodeSwitch?, isLaterOtherEpisode: Boolean): PlaybackPosition {
+        val knownUuids = episodeSwitch?.episodes.orEmpty().map { it.uuid }.toSet()
+        val newEpisodes = laterSwitch?.episodes.orEmpty().filterNot { it.uuid in knownUuids }
+        val switch = if (newEpisodes.isEmpty()) {
+            episodeSwitch
+        } else {
+            episodeSwitch?.let { it.copy(episodes = it.episodes + newEpisodes) } ?: laterSwitch
+        }
+        return PlaybackPosition(
+            quoteEpisodeUuid = quoteEpisodeUuid,
+            quotePodcastUuid = quotePodcastUuid,
+            episodeUuid = episodeUuid,
+            positionMs = positionMs,
+            isPlaying = isPlaying,
+            episodeSwitch = switch,
+            isOtherEpisode = isOtherEpisode || isLaterOtherEpisode,
+        )
+    }
+}
+
+private fun PlaybackState.toPlaybackPosition(
+    quoteEpisodeUuid: String,
+    quotePodcastUuid: String,
+    episodeSwitch: EpisodeSwitch?,
+    isOtherEpisode: Boolean,
+) = PlaybackPosition(
+    quoteEpisodeUuid = quoteEpisodeUuid,
+    quotePodcastUuid = quotePodcastUuid,
+    episodeUuid = episodeUuid.takeUnless { isEmpty || it.isEmpty() },
+    positionMs = positionMs,
+    isPlaying = isPlaying,
+    episodeSwitch = episodeSwitch,
+    isOtherEpisode = isOtherEpisode,
 )
+
+private data class EpisodeSwitch(
+    val queue: List<BaseEpisode>,
+    val episodes: List<SwitchedEpisode>,
+)
+
+private class SwitchedEpisode(
+    val uuid: String,
+    val wasArchived: Boolean,
+    val playingStatus: EpisodePlayingStatus,
+    val playedUpTo: Double,
+) {
+    constructor(episode: BaseEpisode) : this(episode.uuid, episode.isArchived, episode.playingStatus, episode.playedUpTo)
+}
 
 sealed interface ChatNavigation {
     data object SignIn : ChatNavigation
@@ -907,7 +1094,8 @@ sealed interface ChatToast {
     data object FeedbackThanks : ChatToast
     data object ChatCleared : ChatToast
     data object ChatDeleted : ChatToast
-    data class QuotePlaying(val episodeTitle: String) : ChatToast
+    data class QuotePlaying(val episodeTitle: String, val undoId: Int) : ChatToast
+    data object QuotePlayFailed : ChatToast
 }
 
 data class ChatUiState(
@@ -923,6 +1111,7 @@ data class ChatUiState(
     val isAwaitingReply: Boolean = false,
     val error: ChatError? = null,
     val isBeta: Boolean = false,
+    val isBetaNoteVisible: Boolean = false,
     val isBetaSheetVisible: Boolean = false,
     val isSignInRequired: Boolean = false,
     val playback: ChatPlayback = ChatPlayback(),
@@ -930,8 +1119,10 @@ data class ChatUiState(
     val playingPodcast: Podcast? = null,
     val history: List<ChatHistorySection> = emptyList(),
     val isHistoryVisible: Boolean = false,
+    val useEpisodeArtwork: Boolean = false,
     val answerRatings: Map<String, ChatAnswerRating> = emptyMap(),
     val restoredMessageUuids: Set<String> = emptySet(),
+    val loadingQuoteUuid: String? = null,
 ) {
     val canSend: Boolean get() = inputText.isNotBlank() && isConnected && !isAwaitingReply
 

@@ -12,19 +12,32 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.InlineTextContent
+import androidx.compose.foundation.text.appendInlineContent
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.ParagraphStyle
+import androidx.compose.ui.text.Placeholder
+import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -36,6 +49,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.delay
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -85,12 +99,14 @@ internal fun AiQuoteBubble(
     isPlayable: Boolean,
     theme: ChatTheme,
     modifier: Modifier = Modifier,
+    isLoading: Boolean = false,
     onClickPlay: () -> Unit = {},
 ) {
     val timestampColor = if (isPlayable) theme.quoteTimestamp else theme.secondaryText
-    val text = remember(quote, timestampLabel, timestampColor) {
+    val quoteColor = if (isLoading) theme.aiBubbleText.copy(alpha = LOADING_QUOTE_ALPHA) else theme.aiBubbleText
+    val text = remember(quote, timestampLabel, timestampColor, quoteColor, isLoading) {
         buildAnnotatedString {
-            withStyle(SpanStyle(fontStyle = FontStyle.Italic)) {
+            withStyle(SpanStyle(fontStyle = FontStyle.Italic, color = quoteColor)) {
                 append(quote)
             }
             if (timestampLabel.isNotEmpty()) {
@@ -99,28 +115,112 @@ internal fun AiQuoteBubble(
                     append("($timestampLabel)")
                 }
             }
+            if (isLoading) {
+                append(" ")
+                appendInlineContent(QUOTE_SPINNER_ID, alternateText = " ")
+            }
         }
     }
-    Text(
-        text = text,
-        color = theme.aiBubbleText,
-        fontSize = 15.sp,
-        lineHeight = 20.sp,
-        modifier = modifier
-            .fillMaxWidth()
-            .then(
-                if (isPlayable) {
-                    Modifier.clickable(
-                        onClickLabel = stringResource(LR.string.chat_play_quote),
-                        role = Role.Button,
-                        onClick = onClickPlay,
-                    )
-                } else {
-                    Modifier
-                },
-            ),
-    )
+    val spinnerSize = with(LocalDensity.current) { QuoteSpinnerSize.toSp() }
+    val inlineContent = remember(timestampColor, spinnerSize) {
+        mapOf(
+            QUOTE_SPINNER_ID to InlineTextContent(
+                placeholder = Placeholder(width = spinnerSize, height = spinnerSize, placeholderVerticalAlign = PlaceholderVerticalAlign.TextCenter),
+            ) {
+                QuoteLoadingSpinner(color = timestampColor)
+            },
+        )
+    }
+    val loadingDescription = stringResource(LR.string.chat_quote_finding_moment)
+    Column(
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+        modifier = modifier.fillMaxWidth(),
+    ) {
+        Text(
+            text = text,
+            inlineContent = inlineContent,
+            color = theme.aiBubbleText,
+            fontSize = 15.sp,
+            lineHeight = 20.sp,
+            modifier = Modifier
+                .fillMaxWidth()
+                .then(
+                    if (isPlayable) {
+                        Modifier.clickable(
+                            onClickLabel = stringResource(LR.string.chat_play_quote),
+                            role = Role.Button,
+                            onClick = onClickPlay,
+                        )
+                    } else {
+                        Modifier
+                    },
+                )
+                .then(
+                    if (isLoading) {
+                        Modifier.semantics { stateDescription = loadingDescription }
+                    } else {
+                        Modifier
+                    },
+                ),
+        )
+        QuoteFindingMoment(
+            isLoading = isLoading,
+            theme = theme,
+        )
+    }
 }
+
+@Composable
+private fun QuoteLoadingSpinner(
+    color: Color,
+    modifier: Modifier = Modifier,
+) {
+    if (rememberIsReduceMotionEnabled()) {
+        CircularProgressIndicator(
+            progress = REDUCED_MOTION_SPINNER_PROGRESS,
+            color = color,
+            strokeWidth = 1.5.dp,
+            modifier = modifier.size(QuoteSpinnerSize),
+        )
+    } else {
+        CircularProgressIndicator(
+            color = color,
+            strokeWidth = 1.5.dp,
+            modifier = modifier.size(QuoteSpinnerSize),
+        )
+    }
+}
+
+@Composable
+private fun QuoteFindingMoment(
+    isLoading: Boolean,
+    theme: ChatTheme,
+    modifier: Modifier = Modifier,
+) {
+    var isVisible by remember { mutableStateOf(false) }
+    LaunchedEffect(isLoading) {
+        isVisible = false
+        if (isLoading) {
+            delay(FINDING_MOMENT_DELAY_MS)
+            isVisible = true
+        }
+    }
+    if (isLoading && isVisible) {
+        Text(
+            text = stringResource(LR.string.chat_quote_finding_moment),
+            color = theme.inputHint,
+            fontSize = 12.sp,
+            lineHeight = 16.sp,
+            modifier = modifier.clearAndSetSemantics {},
+        )
+    }
+}
+
+private const val QUOTE_SPINNER_ID = "quoteSpinner"
+private val QuoteSpinnerSize = 12.dp
+private const val LOADING_QUOTE_ALPHA = 0.6f
+private const val REDUCED_MOTION_SPINNER_PROGRESS = 0.75f
+private const val FINDING_MOMENT_DELAY_MS = 1_000L
 
 @Composable
 internal fun UserMessageBubble(

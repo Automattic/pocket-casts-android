@@ -8,6 +8,8 @@ interface ChatManager {
 
     fun observeHistory(): Flow<List<EpisodeChatHistoryItem>>
 
+    suspend fun hasChatWithMessages(episodeUuid: String): Boolean
+
     suspend fun createChat(
         episodeUuid: String,
         podcastUuid: String,

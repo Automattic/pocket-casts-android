@@ -26,7 +26,7 @@ sealed interface ChatMessage {
 
         // Replace `- ` / `* ` bullet markers from the model with a styled bullet glyph.
         val displayText: String by lazy {
-            Regex("""(?m)^\s*[-*]\s+""").replace(text, "•  ")
+            Regex("""(?m)^[ \t]*[-*][ \t]+""").replace(text, "•  ")
         }
     }
 
