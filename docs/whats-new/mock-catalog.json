@@ -285,6 +285,37 @@
           }
         }
       ]
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000011",
+      "type": "new_feature",
+      "publishedAt": "2026-09-29T12:49:00Z",
+      "expiresAt": "2027-12-31T00:00:00Z",
+      "targeting": {
+        "audiences": [
+          "free",
+          "plus",
+          "patron"
+        ],
+        "minimumAppVersion": null
+      },
+      "title": "Open Files (open_files)",
+      "pages": [
+        {
+          "image": {
+            "url": "https://static.pocketcasts.net/servers/nodeweb/whats-new/media/images/368924f3-460e-4085-960b-219e2cd34218/adb775019834a41558b1b5cc20ff361fa6eb25ce41661248ddf7893c764c8bf6.webp",
+            "width": 760,
+            "height": 428,
+            "alt": "Pocket Casts"
+          },
+          "heading": "Open Files",
+          "description": "Listen to your own audio and video files.",
+          "action": {
+            "type": "open_files",
+            "label": "Open Files"
+          }
+        }
+      ]
     }
   ]
 }
