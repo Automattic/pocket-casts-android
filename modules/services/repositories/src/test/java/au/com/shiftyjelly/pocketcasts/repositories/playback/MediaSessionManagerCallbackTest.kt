@@ -13,9 +13,11 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import com.automattic.eventhorizon.EventHorizon
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
@@ -72,6 +74,33 @@ class MediaSessionManagerCallbackTest {
     }
 
     @Test
+    fun `legacy held KEYCODE_MEDIA_PLAY consumes repeats without skipping`() = runTest {
+        val playbackManager = mock<PlaybackManager>()
+        val episodeManager = mock<EpisodeManager>()
+        val settings = mock<Settings>()
+        val nextAction = mock<UserSetting<HeadphoneAction>>()
+        whenever(settings.headphoneControlsNextAction).thenReturn(nextAction)
+        whenever(nextAction.value).thenReturn(HeadphoneAction.SKIP_FORWARD)
+        val manager = createManager(this, playbackManager, episodeManager, settings)
+        val queuedCommands = mutableListOf<String>()
+        val callback = manager.createCallback(
+            scope = this,
+            playbackManager = playbackManager,
+            episodeManager = episodeManager,
+            enqueueCommand = { tag, _ -> queuedCommands += tag },
+        )
+
+        assertTrue(callback.onMediaButtonEvent(mediaButtonIntent(KeyEvent.KEYCODE_MEDIA_PLAY)))
+        advanceTimeBy(490)
+        assertTrue(callback.onMediaButtonEvent(mediaButtonIntent(KeyEvent.KEYCODE_MEDIA_PLAY, repeatCount = 1)))
+        advanceUntilIdle()
+
+        verify(playbackManager).playIfNotPlaying(SourceView.MEDIA_BUTTON_BROADCAST_ACTION)
+        verify(playbackManager, never()).playPause(any())
+        assertEquals(emptyList<String>(), queuedCommands)
+    }
+
+    @Test
     fun `legacy KEYCODE_HEADSETHOOK resolves to play pause while playing`() = runTest {
         val playbackManager = mock<PlaybackManager>()
         whenever(playbackManager.isPlaying()).thenReturn(true)
@@ -102,14 +131,10 @@ class MediaSessionManagerCallbackTest {
     }
 
     @Test
-    fun `legacy rapid KEYCODE_MEDIA_PLAY resolves previous action after immediate play`() = runTest {
+    fun `legacy rapid KEYCODE_MEDIA_PLAY plays once without a multi tap action`() = runTest {
         val playbackManager = mock<PlaybackManager>()
         val episodeManager = mock<EpisodeManager>()
-        val settings = mock<Settings>()
-        val previousAction = mock<UserSetting<HeadphoneAction>>()
-        whenever(settings.headphoneControlsPreviousAction).thenReturn(previousAction)
-        whenever(previousAction.value).thenReturn(HeadphoneAction.SKIP_BACK)
-        val manager = createManager(this, playbackManager, episodeManager, settings)
+        val manager = createManager(this, playbackManager, episodeManager)
         val queuedCommands = mutableListOf<String>()
         val callback = manager.createCallback(
             scope = this,
@@ -120,13 +145,13 @@ class MediaSessionManagerCallbackTest {
 
         repeat(3) {
             callback.onMediaButtonEvent(mediaButtonIntent(KeyEvent.KEYCODE_MEDIA_PLAY))
+            advanceTimeBy(46)
         }
-
-        verify(playbackManager).playIfNotPlaying(SourceView.MEDIA_BUTTON_BROADCAST_ACTION)
 
         advanceUntilIdle()
 
-        assertEquals(listOf("skip backwards"), queuedCommands)
+        verify(playbackManager).playIfNotPlaying(SourceView.MEDIA_BUTTON_BROADCAST_ACTION)
+        assertEquals(emptyList<String>(), queuedCommands)
         verify(playbackManager, never()).playPause(any())
     }
 
@@ -161,7 +186,10 @@ class MediaSessionManagerCallbackTest {
         scopeProvider = { scope },
     )
 
-    private fun mediaButtonIntent(keyCode: Int) = Intent(Intent.ACTION_MEDIA_BUTTON).apply {
-        putExtra(Intent.EXTRA_KEY_EVENT, KeyEvent(KeyEvent.ACTION_DOWN, keyCode))
+    private fun mediaButtonIntent(
+        keyCode: Int,
+        repeatCount: Int = 0,
+    ) = Intent(Intent.ACTION_MEDIA_BUTTON).apply {
+        putExtra(Intent.EXTRA_KEY_EVENT, KeyEvent(0L, 0L, KeyEvent.ACTION_DOWN, keyCode, repeatCount))
     }
 }

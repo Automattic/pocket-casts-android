@@ -275,4 +275,96 @@ class MediaEventQueueTest {
 
         assertNull(handler.consumeEvent(MediaEvent.SingleTap))
     }
+
+    @Test
+    fun `handle an explicit play immediately`() = runTest {
+        val handler = MediaEventQueue(scopeProvider = { this }, elapsedRealtime = { testScheduler.currentTime })
+        var playCount = 0
+
+        assertNull(
+            handler.consumeExplicitPlay {
+                playCount++
+                true
+            },
+        )
+
+        assertEquals(1, playCount)
+    }
+
+    @Test
+    fun `ignore a duplicate explicit play inside the tap window`() = runTest {
+        val handler = MediaEventQueue(scopeProvider = { this }, elapsedRealtime = { testScheduler.currentTime })
+        var playCount = 0
+
+        assertNull(
+            handler.consumeExplicitPlay {
+                playCount++
+                true
+            },
+        )
+        delay(46)
+        assertNull(
+            handler.consumeExplicitPlay {
+                playCount++
+                true
+            },
+        )
+        assertEquals(MediaEvent.SingleTap, handler.consumeEvent(MediaEvent.SingleTap))
+
+        assertEquals(1, playCount)
+    }
+
+    @Test
+    fun `handle an explicit play again after the tap window`() = runTest {
+        val handler = MediaEventQueue(scopeProvider = { this }, elapsedRealtime = { testScheduler.currentTime })
+        var playCount = 0
+
+        handler.consumeExplicitPlay {
+            playCount++
+            true
+        }
+        delay(601)
+        handler.consumeExplicitPlay {
+            playCount++
+            true
+        }
+
+        assertEquals(2, playCount)
+    }
+
+    @Test
+    fun `do not add an explicit play to an active tap window`() = runTest {
+        val handler = MediaEventQueue(scopeProvider = { this }, elapsedRealtime = { testScheduler.currentTime })
+
+        val firstEvent = async { handler.consumeEvent(MediaEvent.SingleTap) }
+
+        yield()
+        assertEquals(MediaEvent.SingleTap, handler.consumeExplicitPlay { false })
+
+        assertEquals(MediaEvent.SingleTap, firstEvent.await())
+    }
+
+    @Test
+    fun `ignore an explicit play while the multi tap window is active`() = runTest {
+        val handler = MediaEventQueue(scopeProvider = { this }, elapsedRealtime = { testScheduler.currentTime })
+        var isHandled = false
+
+        handler.consumeEvent(MediaEvent.DoubleTap)
+
+        assertNull(
+            handler.consumeExplicitPlay {
+                isHandled = true
+                true
+            },
+        )
+        assertFalse(isHandled)
+    }
+
+    @Test
+    fun `resolve a declined explicit play to a single tap`() = runTest {
+        val handler = MediaEventQueue(scopeProvider = { this }, elapsedRealtime = { testScheduler.currentTime })
+
+        assertEquals(MediaEvent.SingleTap, handler.consumeExplicitPlay { false })
+        assertNull(handler.consumeExplicitPlay { false })
+    }
 }

@@ -14,6 +14,8 @@
         ([#6199](https://github.com/Automattic/pocket-casts-android/pull/6199))
     *   Dismiss the Smart Bookmarks tooltip when the More button is tapped
         ([#6206](https://github.com/Automattic/pocket-casts-android/pull/6206))
+    *   Stop headphone and car play buttons from skipping forward
+        ([#6075](https://github.com/Automattic/pocket-casts-android/pull/6075))
 
 
 8.23
