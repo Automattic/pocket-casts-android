@@ -421,6 +421,7 @@ class RefreshPodcastsThread(
     companion object {
 
         private const val GROUP_NEW_EPISODES = "group_new_episodes"
+        private const val INTENT_IDS_PER_EPISODE = 10
 
         private val THROTTLE_RUN_NOW_MS: Long = if (BuildConfig.DEBUG) 0 else 15.seconds.inWholeMilliseconds
         private val THROTTLE_PERIODIC_MS: Long = if (BuildConfig.DEBUG) 0 else 5.minutes.inWholeMilliseconds
@@ -487,7 +488,7 @@ class RefreshPodcastsThread(
 
                 for (i in notificationsEpisodeAndPodcast.indices) {
                     val episodePodcast = notificationsEpisodeAndPodcast[i]
-                    showEpisodeNotification(episodePodcast.second, episodePodcast.first, i, intentId, isGroup, notificationHelper, settings, context)
+                    showEpisodeNotification(episodePodcast.second, episodePodcast.first, i, intentId + i * INTENT_IDS_PER_EPISODE, isGroup, notificationHelper, settings, context)
                 }
             } catch (e: Exception) {
                 Timber.e(e)
