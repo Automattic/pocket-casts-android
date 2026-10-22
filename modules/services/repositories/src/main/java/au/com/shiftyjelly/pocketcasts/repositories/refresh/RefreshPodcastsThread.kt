@@ -421,6 +421,8 @@ class RefreshPodcastsThread(
     companion object {
 
         private const val GROUP_NEW_EPISODES = "group_new_episodes"
+        private const val INTENT_IDS_PER_EPISODE = 10
+        private const val MAX_EPISODE_NOTIFICATIONS = 20
 
         private val THROTTLE_RUN_NOW_MS: Long = if (BuildConfig.DEBUG) 0 else 15.seconds.inWholeMilliseconds
         private val THROTTLE_PERIODIC_MS: Long = if (BuildConfig.DEBUG) 0 else 5.minutes.inWholeMilliseconds
@@ -487,11 +489,22 @@ class RefreshPodcastsThread(
 
                 for (i in notificationsEpisodeAndPodcast.indices) {
                     val episodePodcast = notificationsEpisodeAndPodcast[i]
-                    showEpisodeNotification(episodePodcast.second, episodePodcast.first, i, intentId, isGroup, notificationHelper, settings, context)
+                    showEpisodeNotification(episodePodcast.second, episodePodcast.first, i, intentId + i * INTENT_IDS_PER_EPISODE, isGroup, notificationHelper, settings, context)
                 }
+
+                cancelOldestEpisodeNotifications(context)
             } catch (e: Exception) {
                 Timber.e(e)
             }
+        }
+
+        private fun cancelOldestEpisodeNotifications(context: Context) {
+            val manager = NotificationManagerCompat.from(context)
+            manager.activeNotifications
+                .filter { it.id == NotificationBroadcastReceiver.NOTIFICATION_ID && it.tag?.startsWith(NotificationBroadcastReceiver.NOTIFICATION_TAG_NEW_EPISODES_PREFIX) == true && it.tag != NotificationBroadcastReceiver.NOTIFICATION_TAG_NEW_EPISODES_PRIMARY }
+                .sortedByDescending { it.postTime }
+                .drop(MAX_EPISODE_NOTIFICATIONS)
+                .forEach { manager.cancel(it.tag, it.id) }
         }
 
         @Suppress("NAME_SHADOWING", "DEPRECATION")
@@ -526,11 +539,7 @@ class RefreshPodcastsThread(
             }
             intentId += 1
 
-            val notificationTag = if (isGroupNotification) {
-                NotificationBroadcastReceiver.NOTIFICATION_TAG_NEW_EPISODES_PREFIX + episode.uuid
-            } else {
-                NotificationBroadcastReceiver.NOTIFICATION_TAG_NEW_EPISODES_PRIMARY
-            }
+            val notificationTag = NotificationBroadcastReceiver.NOTIFICATION_TAG_NEW_EPISODES_PREFIX + episode.uuid
 
             val userActions = settings.newEpisodeNotificationActions.value
 
