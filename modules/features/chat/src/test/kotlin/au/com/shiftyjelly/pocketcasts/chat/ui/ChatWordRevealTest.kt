@@ -19,7 +19,7 @@ class ChatWordRevealTest {
             listOf(0..2, 4..6, 9..13, 15..18),
             words,
         )
-        assertEquals(listOf(12..13), wordRanges("​ ok", startOffset = 10))
+        assertEquals(listOf(12..13), wordRanges("\u200B ok", startOffset = 10))
     }
 
     @Test

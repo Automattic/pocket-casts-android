@@ -34,6 +34,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.semantics.text
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.Placeholder
@@ -66,15 +67,18 @@ internal fun AiMessageBubble(
         with(density) { textMeasurer.measure(BULLET_PREFIX, AiMessageTextStyle).size.width.toSp() }
     }
     val (styledText, words) = remember(text, bulletIndent) { text.withHangingBullets(bulletIndent) }
+    val shownText = wordProgress?.let { progress -> styledText.revealed(words, progress(), theme.aiBubbleText) } ?: styledText
     Text(
-        text = wordProgress?.let { progress -> styledText.revealed(words, progress(), theme.aiBubbleText) } ?: styledText,
+        text = shownText,
         color = theme.aiBubbleText,
         style = AiMessageTextStyle,
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .withFullTextSemantics(shownText, styledText),
     )
 }
 
-private fun String.withHangingBullets(indent: TextUnit): Pair<AnnotatedString, List<IntRange>> {
+internal fun String.withHangingBullets(indent: TextUnit): Pair<AnnotatedString, List<IntRange>> {
     val lines = lines()
     val words = mutableListOf<IntRange>()
     val text = buildAnnotatedString {
@@ -117,7 +121,7 @@ internal fun AiQuoteBubble(
             if (timestampLabel.isNotEmpty()) {
                 append(" ")
                 withStyle(SpanStyle(color = timestampColor)) {
-                    append("($timestampLabel)")
+                    append(quoteTimestampText(timestampLabel))
                 }
             }
             if (isLoading) {
@@ -139,13 +143,14 @@ internal fun AiQuoteBubble(
     val words = remember(text) { wordRanges(text.text) }
     val progress = wordProgress?.invoke()
     val isRevealed = progress == null || progress >= revealedWordTarget(words.size)
+    val shownText = progress?.let { text.revealed(words, it, theme.aiBubbleText) } ?: text
     val loadingDescription = stringResource(LR.string.chat_quote_finding_moment)
     Column(
         verticalArrangement = Arrangement.spacedBy(4.dp),
         modifier = modifier.fillMaxWidth(),
     ) {
         Text(
-            text = progress?.let { text.revealed(words, it, theme.aiBubbleText) } ?: text,
+            text = shownText,
             inlineContent = inlineContent,
             color = theme.aiBubbleText,
             fontSize = 15.sp,
@@ -163,6 +168,7 @@ internal fun AiQuoteBubble(
                         Modifier
                     },
                 )
+                .withFullTextSemantics(shownText, text)
                 .then(
                     if (isLoading) {
                         Modifier.semantics { stateDescription = loadingDescription }
@@ -176,6 +182,14 @@ internal fun AiQuoteBubble(
             theme = theme,
         )
     }
+}
+
+internal fun quoteTimestampText(timestampLabel: String) = if (timestampLabel.isEmpty()) "" else "($timestampLabel)"
+
+private fun Modifier.withFullTextSemantics(shownText: AnnotatedString, fullText: AnnotatedString) = if (shownText === fullText) {
+    this
+} else {
+    clearAndSetSemantics { text = fullText }
 }
 
 @Composable

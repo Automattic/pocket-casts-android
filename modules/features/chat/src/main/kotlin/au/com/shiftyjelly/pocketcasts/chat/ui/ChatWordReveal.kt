@@ -19,7 +19,7 @@ internal fun AnnotatedString.revealed(
     wordProgress: Float,
     defaultColor: Color,
 ): AnnotatedString {
-    if (wordProgress >= revealedWordTarget(words.size)) return this
+    if (words.isEmpty() || wordProgress >= revealedWordTarget(words.size)) return this
     val visibleWords = ceil(wordProgress).toInt().coerceIn(0, words.size)
     if (visibleWords == 0) return AnnotatedString("")
     val end = if (visibleWords == words.size) length else words[visibleWords - 1].last + 1
@@ -41,5 +41,5 @@ private fun AnnotatedString.colorAt(offset: Int): Color? = spanStyles
     ?.item
     ?.color
 
-private val WordRegex = Regex("""[^\s​]+""")
+private val WordRegex = Regex("""[^\s\u200B]+""")
 internal const val REVEAL_FADE_WORDS = 3

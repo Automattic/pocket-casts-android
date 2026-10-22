@@ -31,10 +31,11 @@ internal class ChatAnswerStream(
 
     fun hasStarted(uuid: String) = uuid !in wordOffsets || uuid in startedUuids
 
-    fun wordProgress(uuid: String): (() -> Float)? {
-        val offset = wordOffsets[uuid] ?: return null
-        return { progress.value - offset }
+    private val wordProgressByUuid: Map<String, () -> Float> = wordOffsets.mapValues { (_, offset) ->
+        { progress.value - offset }
     }
+
+    fun wordProgress(uuid: String): (() -> Float)? = wordProgressByUuid[uuid]
 
     suspend fun play(isReduceMotionEnabled: Boolean) {
         val remainingWords = target - progress.value
@@ -73,7 +74,7 @@ internal fun rememberChatAnswerStream(
             )
         }
     }
-    LaunchedEffect(stream) {
+    LaunchedEffect(stream, isReduceMotionEnabled) {
         stream?.play(isReduceMotionEnabled)
     }
     return stream
@@ -81,9 +82,9 @@ internal fun rememberChatAnswerStream(
 
 internal val ChatMessage?.isAnswer get() = this is ChatMessage.Assistant || this is ChatMessage.Quote
 
-private fun ChatMessage.revealWordCount(): Int = when (this) {
+internal fun ChatMessage.revealWordCount(): Int = when (this) {
     is ChatMessage.Assistant -> wordRanges(displayText).size
-    is ChatMessage.Quote -> wordRanges(displayText).size + if (timestampLabel.isEmpty()) 0 else wordRanges("($timestampLabel)").size
+    is ChatMessage.Quote -> wordRanges(displayText).size + wordRanges(quoteTimestampText(timestampLabel)).size
     is ChatMessage.User -> 0
 }
 
