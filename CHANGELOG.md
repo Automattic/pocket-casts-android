@@ -14,6 +14,8 @@
         ([#6199](https://github.com/Automattic/pocket-casts-android/pull/6199))
     *   Dismiss the Smart Bookmarks tooltip when the More button is tapped
         ([#6206](https://github.com/Automattic/pocket-casts-android/pull/6206))
+    *   Fix episodes ending early and being marked as played when the server cuts off the audio mid-episode
+        ([#5869](https://github.com/Automattic/pocket-casts-android/pull/5869))
 
 
 8.23
