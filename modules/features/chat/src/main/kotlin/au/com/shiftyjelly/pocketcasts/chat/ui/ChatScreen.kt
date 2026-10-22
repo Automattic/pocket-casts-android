@@ -231,7 +231,7 @@ private fun ChatContent(
         }
     }
     LaunchedEffect(uiState.messages.size, uiState.isAwaitingReply, scrollState.maxValue) {
-        if (isFollowingNewest) {
+        if (isFollowingNewest && !scrollState.isScrollInProgress) {
             scrollState.scrollTo(scrollState.maxValue)
         }
     }
