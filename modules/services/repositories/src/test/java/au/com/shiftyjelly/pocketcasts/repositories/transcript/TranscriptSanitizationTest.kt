@@ -459,6 +459,42 @@ class TranscriptSanitizationTest {
         }
 
         @Test
+        fun `split long unpunctuated phrases before the time limit`() {
+            val cue = "ก".repeat(80)
+            val input = buildTranscript {
+                repeat(6) { index -> text(cue, startTimeMs = index * 5000L, endTimeMs = (index + 1) * 5000L) }
+            }
+
+            val output = input.sanitize()
+
+            assertEquals(
+                buildTranscript {
+                    text("$cue $cue", startTimeMs = 0, endTimeMs = 10_000)
+                    text("$cue $cue", startTimeMs = 10_000, endTimeMs = 20_000)
+                    text("$cue $cue", startTimeMs = 20_000, endTimeMs = 30_000)
+                },
+                output.withoutWords(),
+            )
+        }
+
+        @Test
+        fun `keep short unpunctuated phrases together past the time limit`() {
+            val cue = "あ".repeat(10)
+            val input = buildTranscript {
+                repeat(6) { index -> text(cue, startTimeMs = index * 15_000L, endTimeMs = (index + 1) * 15_000L) }
+            }
+
+            val output = input.sanitize()
+
+            assertEquals(
+                buildTranscript {
+                    text(List(6) { cue }.joinToString(" "), startTimeMs = 0, endTimeMs = 90_000)
+                },
+                output.withoutWords(),
+            )
+        }
+
+        @Test
         fun `split unpunctuated Devanagari transcript at cue boundaries`() {
             val cue = "नमस्ते दोस्तों आज हम बात करेंगे ".repeat(3).trim()
             val input = buildTranscript {
@@ -498,7 +534,9 @@ class TranscriptSanitizationTest {
             val cue = "and then we kept talking about it for a really long time"
             val input = buildTranscript {
                 repeat(10) { index -> text("Short one.", startTimeMs = index * 2000L, endTimeMs = (index + 1) * 2000L) }
-                repeat(10) { index -> text(cue, startTimeMs = 20_000 + index * 3000L, endTimeMs = 20_000 + (index + 1) * 3000L) }
+                repeat(10) { index ->
+                    text(cue, startTimeMs = 20_000 + index * 3000L, endTimeMs = 20_000 + (index + 1) * 3000L)
+                }
                 text("the end.", startTimeMs = 50_000, endTimeMs = 51_000)
             }
 
@@ -506,7 +544,9 @@ class TranscriptSanitizationTest {
 
             assertEquals(
                 buildTranscript {
-                    repeat(10) { index -> text("Short one.", startTimeMs = index * 2000L, endTimeMs = (index + 1) * 2000L) }
+                    repeat(10) { index ->
+                        text("Short one.", startTimeMs = index * 2000L, endTimeMs = (index + 1) * 2000L)
+                    }
                     text(List(10) { cue }.joinToString(" ") + " the end.", startTimeMs = 20_000, endTimeMs = 51_000)
                 },
                 output.withoutWords(),
