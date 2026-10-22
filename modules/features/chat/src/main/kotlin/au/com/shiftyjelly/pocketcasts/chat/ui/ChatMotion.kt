@@ -10,6 +10,7 @@ import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.EaseOut
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeOut
@@ -24,11 +25,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.lerp
+import kotlinx.coroutines.delay
 
 private val LocalIsReduceMotionEnabled = staticCompositionLocalOf { false }
 
@@ -97,6 +104,50 @@ internal fun ChatFadeOut(
         content()
     }
 }
+
+@Composable
+internal fun ChatShimmer(
+    highlight: Color,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit,
+) {
+    val isReduceMotionEnabled = rememberIsReduceMotionEnabled()
+    val sweep = remember { Animatable(0f) }
+    LaunchedEffect(isReduceMotionEnabled) {
+        sweep.snapTo(0f)
+        if (isReduceMotionEnabled) return@LaunchedEffect
+        delay(SHIMMER_START_DELAY_MS)
+        while (true) {
+            sweep.animateTo(1f, tween(durationMillis = SHIMMER_SWEEP_MS, easing = LinearEasing))
+            delay(SHIMMER_PAUSE_MS)
+            sweep.snapTo(0f)
+        }
+    }
+    Box(
+        modifier = modifier
+            .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
+            .drawWithContent {
+                drawContent()
+                val halfBand = ShimmerHalfBandWidth.toPx()
+                val center = lerp(-halfBand, size.width + halfBand, sweep.value)
+                drawRect(
+                    brush = Brush.horizontalGradient(
+                        colors = listOf(Color.Transparent, highlight, Color.Transparent),
+                        startX = center - halfBand,
+                        endX = center + halfBand,
+                    ),
+                    blendMode = BlendMode.SrcAtop,
+                )
+            },
+    ) {
+        content()
+    }
+}
+
+private val ShimmerHalfBandWidth = 20.dp
+private const val SHIMMER_START_DELAY_MS = 400L
+private const val SHIMMER_SWEEP_MS = 870
+private const val SHIMMER_PAUSE_MS = 730L
 
 private const val APPEAR_DURATION_MS = 200
 internal const val ANSWER_CROSS_FADE_MS = 150
