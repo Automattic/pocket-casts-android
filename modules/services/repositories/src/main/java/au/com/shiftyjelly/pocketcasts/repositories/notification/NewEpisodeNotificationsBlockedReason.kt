@@ -4,8 +4,8 @@ import android.Manifest
 import android.app.NotificationManager
 import android.content.Context
 import android.content.pm.PackageManager
-import androidx.core.content.ContextCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 
 internal fun Context.newEpisodeNotificationsBlockedReason(): String? {
