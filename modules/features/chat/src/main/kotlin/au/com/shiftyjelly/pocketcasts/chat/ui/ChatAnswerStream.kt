@@ -16,33 +16,33 @@ import kotlin.math.roundToInt
 @Stable
 internal class ChatAnswerStream(
     private val progress: Animatable<Float, AnimationVector1D>,
-    private val wordOffsets: Map<String, Int>,
-    totalWords: Int,
+    private val chunkOffsets: Map<String, Int>,
+    totalChunks: Int,
 ) {
-    private val target = revealedWordTarget(totalWords).toFloat()
+    private val target = revealedChunkTarget(totalChunks).toFloat()
 
     private val startedUuids by derivedStateOf {
-        wordOffsets.filterValues { offset -> offset == 0 || progress.value > offset }.keys
+        chunkOffsets.filterValues { offset -> offset == 0 || progress.value > offset }.keys
     }
 
     val isComplete by derivedStateOf { progress.value >= target }
 
-    fun isStreaming(uuid: String) = uuid in wordOffsets && !isComplete
+    fun isStreaming(uuid: String) = uuid in chunkOffsets && !isComplete
 
-    fun hasStarted(uuid: String) = uuid !in wordOffsets || uuid in startedUuids
+    fun hasStarted(uuid: String) = uuid !in chunkOffsets || uuid in startedUuids
 
-    private val wordProgressByUuid: Map<String, () -> Float> = wordOffsets.mapValues { (_, offset) ->
+    private val revealProgressByUuid: Map<String, () -> Float> = chunkOffsets.mapValues { (_, offset) ->
         { progress.value - offset }
     }
 
-    fun wordProgress(uuid: String): (() -> Float)? = wordProgressByUuid[uuid]
+    fun revealProgress(uuid: String): (() -> Float)? = revealProgressByUuid[uuid]
 
     suspend fun play(isReduceMotionEnabled: Boolean) {
-        val remainingWords = target - progress.value
+        val remainingChunks = target - progress.value
         when {
-            remainingWords <= 0f -> Unit
+            remainingChunks <= 0f -> Unit
             isReduceMotionEnabled -> progress.snapTo(target)
-            else -> progress.animateTo(target, tween(durationMillis = revealDurationMillis(remainingWords), easing = LinearEasing))
+            else -> progress.animateTo(target, tween(durationMillis = revealDurationMillis(remainingChunks), easing = LinearEasing))
         }
     }
 
@@ -59,18 +59,18 @@ internal fun rememberChatAnswerStream(
     val answer = messages.takeLastWhile { it.isAnswer }
     val answerUuid = answer.firstOrNull()?.uuid?.takeIf { answer.none { message -> message.uuid in initialMessageUuids } }
     val isReduceMotionEnabled = rememberIsReduceMotionEnabled()
-    val wordCounts = remember(answer) { answer.map { message -> message.uuid to message.revealWordCount() } }
-    val totalWords = wordCounts.sumOf { (_, count) -> count }
+    val chunkCounts = remember(answer) { answer.map { message -> message.uuid to message.revealChunkCount() } }
+    val totalChunks = chunkCounts.sumOf { (_, count) -> count }
     val progress = remember(answerUuid) {
-        Animatable(if (isReduceMotionEnabled) revealedWordTarget(totalWords).toFloat() else 0f)
+        Animatable(if (isReduceMotionEnabled) revealedChunkTarget(totalChunks).toFloat() else 0f)
     }
-    val stream = remember(progress, wordCounts) {
+    val stream = remember(progress, chunkCounts) {
         answerUuid?.let {
-            val offsets = wordCounts.runningFold(0) { offset, (_, count) -> offset + count }
+            val offsets = chunkCounts.runningFold(0) { offset, (_, count) -> offset + count }
             ChatAnswerStream(
                 progress = progress,
-                wordOffsets = wordCounts.mapIndexed { index, (uuid, _) -> uuid to offsets[index] }.toMap(),
-                totalWords = totalWords,
+                chunkOffsets = chunkCounts.mapIndexed { index, (uuid, _) -> uuid to offsets[index] }.toMap(),
+                totalChunks = totalChunks,
             )
         }
     }
@@ -82,13 +82,15 @@ internal fun rememberChatAnswerStream(
 
 internal val ChatMessage?.isAnswer get() = this is ChatMessage.Assistant || this is ChatMessage.Quote
 
+internal fun ChatMessage.revealChunkCount(): Int = revealChunks(revealWordCount()).size
+
 internal fun ChatMessage.revealWordCount(): Int = when (this) {
     is ChatMessage.Assistant -> wordRanges(displayText).size
     is ChatMessage.Quote -> wordRanges(displayText).size + wordRanges(quoteTimestampText(timestampLabel)).size
     is ChatMessage.User -> 0
 }
 
-private fun revealDurationMillis(words: Float) = (words * REVEAL_MS_PER_WORD).roundToInt().coerceAtMost(REVEAL_MAX_DURATION_MS)
+private fun revealDurationMillis(chunks: Float) = (chunks * REVEAL_MS_PER_CHUNK).roundToInt().coerceAtMost(REVEAL_MAX_DURATION_MS)
 
-private const val REVEAL_MS_PER_WORD = 30
+private const val REVEAL_MS_PER_CHUNK = 120
 private const val REVEAL_MAX_DURATION_MS = 4_000

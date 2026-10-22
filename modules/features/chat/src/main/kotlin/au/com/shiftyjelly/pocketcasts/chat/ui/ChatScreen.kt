@@ -308,7 +308,7 @@ private fun ChatContent(
                                 AiMessageBubble(
                                     text = message.displayText,
                                     theme = theme,
-                                    wordProgress = answerStream?.wordProgress(message.uuid),
+                                    revealProgress = answerStream?.revealProgress(message.uuid),
                                 )
                             }
 
@@ -325,7 +325,7 @@ private fun ChatContent(
                                     isPlayable = message.canPlay,
                                     isLoading = message.uuid == uiState.loadingQuoteUuid,
                                     theme = theme,
-                                    wordProgress = answerStream?.wordProgress(message.uuid),
+                                    revealProgress = answerStream?.revealProgress(message.uuid),
                                     onClickPlay = { onPlayQuote(message.uuid) },
                                 )
                             }

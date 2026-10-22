@@ -59,7 +59,7 @@ internal fun AiMessageBubble(
     text: String,
     theme: ChatTheme,
     modifier: Modifier = Modifier,
-    wordProgress: (() -> Float)? = null,
+    revealProgress: (() -> Float)? = null,
 ) {
     val textMeasurer = rememberTextMeasurer()
     val density = LocalDensity.current
@@ -67,7 +67,8 @@ internal fun AiMessageBubble(
         with(density) { textMeasurer.measure(BULLET_PREFIX, AiMessageTextStyle).size.width.toSp() }
     }
     val (styledText, words) = remember(text, bulletIndent) { text.withHangingBullets(bulletIndent) }
-    val shownText = wordProgress?.let { progress -> styledText.revealed(words, progress(), theme.aiBubbleText) } ?: styledText
+    val chunks = remember(words) { revealChunks(words.size) }
+    val shownText = revealProgress?.let { progress -> styledText.revealed(words, chunks, progress(), theme.aiBubbleText) } ?: styledText
     Text(
         text = shownText,
         color = theme.aiBubbleText,
@@ -108,7 +109,7 @@ internal fun AiQuoteBubble(
     theme: ChatTheme,
     modifier: Modifier = Modifier,
     isLoading: Boolean = false,
-    wordProgress: (() -> Float)? = null,
+    revealProgress: (() -> Float)? = null,
     onClickPlay: () -> Unit = {},
 ) {
     val timestampColor = if (isPlayable) theme.quoteTimestamp else theme.secondaryText
@@ -141,9 +142,10 @@ internal fun AiQuoteBubble(
         )
     }
     val words = remember(text) { wordRanges(text.text) }
-    val progress = wordProgress?.invoke()
-    val isRevealed = progress == null || progress >= revealedWordTarget(words.size)
-    val shownText = progress?.let { text.revealed(words, it, theme.aiBubbleText) } ?: text
+    val chunks = remember(words) { revealChunks(words.size) }
+    val progress = revealProgress?.invoke()
+    val isRevealed = progress == null || progress >= revealedChunkTarget(chunks.size)
+    val shownText = progress?.let { text.revealed(words, chunks, it, theme.aiBubbleText) } ?: text
     val loadingDescription = stringResource(LR.string.chat_quote_finding_moment)
     Column(
         verticalArrangement = Arrangement.spacedBy(4.dp),

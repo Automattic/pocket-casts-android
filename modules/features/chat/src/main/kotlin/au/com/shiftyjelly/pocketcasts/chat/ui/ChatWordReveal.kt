@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.chat.ui
 
+import androidx.compose.animation.core.EaseOut
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.isSpecified
 import androidx.compose.ui.text.AnnotatedString
@@ -12,26 +13,38 @@ internal fun wordRanges(text: String, startOffset: Int = 0): List<IntRange> = Wo
     .map { match -> (match.range.first + startOffset)..(match.range.last + startOffset) }
     .toList()
 
-internal fun revealedWordTarget(wordCount: Int) = wordCount + REVEAL_FADE_WORDS
+internal fun revealChunks(wordCount: Int): List<IntRange> = buildList {
+    var start = 0
+    while (start < wordCount) {
+        val end = (start + RevealChunkSizes[size % RevealChunkSizes.size]).coerceAtMost(wordCount)
+        add(start until end)
+        start = end
+    }
+}
+
+internal fun revealedChunkTarget(chunkCount: Int) = chunkCount + REVEAL_FADE_CHUNKS
 
 internal fun AnnotatedString.revealed(
     words: List<IntRange>,
-    wordProgress: Float,
+    chunks: List<IntRange>,
+    chunkProgress: Float,
     defaultColor: Color,
 ): AnnotatedString {
-    if (words.isEmpty() || wordProgress >= revealedWordTarget(words.size)) return this
-    val visibleWords = ceil(wordProgress).toInt().coerceIn(0, words.size)
-    if (visibleWords == 0) return AnnotatedString("")
-    val end = if (visibleWords == words.size) length else words[visibleWords - 1].last + 1
-    val firstFadingWord = (floor(wordProgress - REVEAL_FADE_WORDS).toInt() + 1).coerceAtLeast(0)
+    if (chunks.isEmpty() || chunkProgress >= revealedChunkTarget(chunks.size)) return this
+    val visibleChunks = ceil(chunkProgress).toInt().coerceIn(0, chunks.size)
+    if (visibleChunks == 0) return AnnotatedString("")
+    val end = if (visibleChunks == chunks.size) length else words[chunks[visibleChunks - 1].last].last + 1
+    val firstFadingChunk = (floor(chunkProgress - REVEAL_FADE_CHUNKS).toInt() + 1).coerceAtLeast(0)
     val source = this
     return buildAnnotatedString {
         append(source.subSequence(0, end))
-        for (word in firstFadingWord until visibleWords) {
-            val range = words[word]
-            val alpha = ((wordProgress - word) / REVEAL_FADE_WORDS).coerceIn(0f, 1f)
-            val color = source.colorAt(range.first) ?: defaultColor
-            addStyle(SpanStyle(color = color.copy(alpha = color.alpha * alpha)), range.first, range.last + 1)
+        for (chunk in firstFadingChunk until visibleChunks) {
+            val alpha = EaseOut.transform(((chunkProgress - chunk) / REVEAL_FADE_CHUNKS).coerceIn(0f, 1f))
+            for (word in chunks[chunk]) {
+                val range = words[word]
+                val color = source.colorAt(range.first) ?: defaultColor
+                addStyle(SpanStyle(color = color.copy(alpha = color.alpha * alpha)), range.first, range.last + 1)
+            }
         }
     }
 }
@@ -41,5 +54,6 @@ private fun AnnotatedString.colorAt(offset: Int): Color? = spanStyles
     ?.item
     ?.color
 
-private val WordRegex = Regex("""[^\s\u200B]+""")
-internal const val REVEAL_FADE_WORDS = 3
+private val WordRegex = Regex("""[^\s​]+""")
+private val RevealChunkSizes = intArrayOf(3, 6, 4, 7, 5, 8, 4, 6)
+internal const val REVEAL_FADE_CHUNKS = 4
