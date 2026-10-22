@@ -16,6 +16,8 @@
         ([#6205](https://github.com/Automattic/pocket-casts-android/pull/6205))
     *   Dismiss the Smart Bookmarks tooltip when the More button is tapped
         ([#6206](https://github.com/Automattic/pocket-casts-android/pull/6206))
+    *   Fix downloads and streams from some hosts, such as Buzzsprout, failing for good after a single failed attempt
+        ([#6212](https://github.com/Automattic/pocket-casts-android/pull/6212))
 
 
 8.23
