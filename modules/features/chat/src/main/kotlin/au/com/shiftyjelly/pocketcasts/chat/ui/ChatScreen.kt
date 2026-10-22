@@ -138,6 +138,7 @@ fun ChatScreen(
             pendingQuestionUuid = null
         }
     }
+    val loadingPhase = rememberChatLoadingPhase(uiState.isAwaitingReply)
     val initialMessageUuids = remember(loadedMessageUuids, uiState.restoredMessageUuids, seenBeforeHistoryUuids) {
         loadedMessageUuids + uiState.restoredMessageUuids + seenBeforeHistoryUuids
     }
@@ -172,6 +173,7 @@ fun ChatScreen(
                     ChatContent(
                         uiState = uiState,
                         initialMessageUuids = initialMessageUuids,
+                        loadingPhase = loadingPhase,
                         theme = theme,
                         onClickClose = onClickClose,
                         onClickMore = onClickMore,
@@ -194,6 +196,7 @@ fun ChatScreen(
 private fun ChatContent(
     uiState: ChatUiState,
     initialMessageUuids: Set<String>,
+    loadingPhase: ChatLoadingPhase,
     theme: ChatTheme,
     onClickClose: () -> Unit,
     onClickMore: () -> Unit,
@@ -263,7 +266,6 @@ private fun ChatContent(
                     .padding(start = 16.dp, end = 16.dp, top = 24.dp, bottom = 12.dp),
             ) {
                 val typingTransition = rememberInfiniteTransition(label = "typing")
-                val loadingPhase = rememberChatLoadingPhase(uiState.isAwaitingReply)
                 if (uiState.otherPlayingEpisode != null) {
                     ChatAboutEpisode(
                         episodeTitle = uiState.episodeTitle,
