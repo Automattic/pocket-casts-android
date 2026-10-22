@@ -263,6 +263,7 @@ private fun ChatContent(
                     .padding(start = 16.dp, end = 16.dp, top = 24.dp, bottom = 12.dp),
             ) {
                 val typingTransition = rememberInfiniteTransition(label = "typing")
+                val loadingPhase = rememberChatLoadingPhase(uiState.isAwaitingReply)
                 if (uiState.otherPlayingEpisode != null) {
                     ChatAboutEpisode(
                         episodeTitle = uiState.episodeTitle,
@@ -286,6 +287,7 @@ private fun ChatContent(
                             is ChatMessage.Assistant -> ChatAnswerAppear(
                                 animate = isNew,
                                 replacesTypingIndicator = replacesTypingIndicator,
+                                loadingPhase = loadingPhase,
                                 typingTransition = typingTransition,
                                 theme = theme,
                             ) {
@@ -298,6 +300,7 @@ private fun ChatContent(
                             is ChatMessage.Quote -> ChatAnswerAppear(
                                 animate = isNew,
                                 replacesTypingIndicator = replacesTypingIndicator,
+                                loadingPhase = loadingPhase,
                                 typingTransition = typingTransition,
                                 theme = theme,
                             ) {
@@ -349,8 +352,8 @@ private fun ChatContent(
                     },
                 ) {
                     ThinkingBubble(
+                        phase = loadingPhase,
                         theme = theme,
-                        modifier = Modifier.padding(top = TypingIndicatorExtraGap),
                         transition = typingTransition,
                     )
                 }
@@ -387,12 +390,12 @@ private fun ChatUiState.isAnswerLanding(initialMessageUuids: Set<String>): Boole
     val newestMessage = messages.lastOrNull()
     return error == null && newestMessage is ChatMessage.User && newestMessage.uuid !in initialMessageUuids
 }
-private val TypingIndicatorExtraGap = 8.dp
 
 @Composable
 private fun ChatAnswerAppear(
     animate: Boolean,
     replacesTypingIndicator: Boolean,
+    loadingPhase: ChatLoadingPhase,
     typingTransition: InfiniteTransition,
     theme: ChatTheme,
     content: @Composable () -> Unit,
@@ -402,8 +405,8 @@ private fun ChatAnswerAppear(
         if (replacesTypingIndicator) {
             ChatFadeOut(durationMillis = ANSWER_CROSS_FADE_MS) {
                 ThinkingBubble(
+                    phase = loadingPhase,
                     theme = theme,
-                    modifier = Modifier.padding(top = TypingIndicatorExtraGap),
                     transition = typingTransition,
                 )
             }
