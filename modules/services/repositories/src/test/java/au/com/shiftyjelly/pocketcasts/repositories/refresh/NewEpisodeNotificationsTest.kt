@@ -193,6 +193,19 @@ class NewEpisodeNotificationsTest {
         loggedErrors.clear()
     }
 
+    @Test
+    fun `a failing summary does not stop the episodes from showing`() {
+        whenever(notificationHelper.episodeNotificationChannelBuilder())
+            .doThrow(IllegalStateException("Broken summary"))
+            .doAnswer { NotificationCompat.Builder(context, "episode") }
+
+        refresh(episode("episode-1", podcast1), episode("episode-2", podcast2))
+
+        assertEquals(setOf(tag("episode-1"), tag("episode-2")), activeTags())
+        assertTrue(loggedErrors.single().contains("summary"))
+        loggedErrors.clear()
+    }
+
     private fun refresh(vararg episodes: Pair<PodcastEpisode, Podcast>) {
         val podcastManager = mock<PodcastManager> {
             on { countNotificationsOnBlocking() } doReturn 2
@@ -206,7 +219,9 @@ class NewEpisodeNotificationsTest {
         RefreshPodcastsThread.updateNotifications(Date(0), settings, podcastManager, episodeManager, notificationHelper, context)
     }
 
-    private fun episode(uuid: String, podcast: Podcast) = PodcastEpisode(uuid = uuid, podcastUuid = podcast.uuid, title = uuid, publishedDate = Date()) to podcast
+    private fun episode(uuid: String, podcast: Podcast) = PodcastEpisode(uuid = uuid, podcastUuid = podcast.uuid, title = uuid, publishedDate = publishedDate) to podcast
+
+    private val publishedDate = Date(1_700_000_000_000)
 
     private fun tag(episodeUuid: String) = NotificationBroadcastReceiver.NOTIFICATION_TAG_NEW_EPISODES_PREFIX + episodeUuid
 

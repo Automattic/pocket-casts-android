@@ -492,7 +492,11 @@ class RefreshPodcastsThread(
                     }
 
                     // phone summary notifications display the first podcast icon but wear summary shows the last podcast notification
-                    showSummaryNotification(notificationLines, notificationsEpisodeAndPodcast.size, firstPodcastUuid, intentId, settings, podcastManager, notificationHelper, context)
+                    try {
+                        showSummaryNotification(notificationLines, notificationsEpisodeAndPodcast.size, firstPodcastUuid, intentId, settings, podcastManager, notificationHelper, context)
+                    } catch (e: Exception) {
+                        LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, e, "Failed to show the new episodes summary notification")
+                    }
                 }
 
                 for (i in notificationsEpisodeAndPodcast.indices) {
