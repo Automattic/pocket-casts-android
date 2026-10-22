@@ -80,11 +80,19 @@ class PlayerBroadcastReceiver : BroadcastReceiver() {
     }
 
     private fun onNotificationDismissed() {
-        pause()
+        playbackManager.onPlaybackNotificationDismissed(sourceView)
     }
 
     private fun stop() {
         playbackManager.stopAsync(sourceView = sourceView)
+    }
+}
+
+internal fun PlaybackManager.onPlaybackNotificationDismissed(sourceView: SourceView) {
+    if (isPlaying() || playbackStateRelay.blockingFirst().transientLoss) {
+        LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Playback notification removed while in the foreground, not pausing")
+    } else {
+        pause(sourceView = sourceView)
     }
 }
 
