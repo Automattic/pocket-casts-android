@@ -16,6 +16,7 @@ class PlayerBroadcastReceiver : BroadcastReceiver() {
         const val INTENT_ACTION_REFRESH_PODCASTS = "au.com.shiftyjelly.pocketcasts.action.REFRESH_PODCASTS"
         const val INTENT_ACTION_NOTIFICATION_PLAY = "au.com.shiftyjelly.pocketcasts.action.NOTIFICATION_PLAY"
         const val INTENT_ACTION_NOTIFICATION_PAUSE = "au.com.shiftyjelly.pocketcasts.action.NOTIFICATION_PAUSE"
+        const val INTENT_ACTION_NOTIFICATION_DISMISSED = "au.com.shiftyjelly.pocketcasts.action.NOTIFICATION_DISMISSED"
         const val INTENT_ACTION_WIDGET_PLAY = "au.com.shiftyjelly.pocketcasts.action.WIDGET_PLAY"
         const val INTENT_ACTION_WIDGET_PAUSE = "au.com.shiftyjelly.pocketcasts.action.WIDGET_PAUSE"
         const val INTENT_ACTION_SKIP_FORWARD = "au.com.shiftyjelly.pocketcasts.action.SKIP_FORWARD"
@@ -43,13 +44,14 @@ class PlayerBroadcastReceiver : BroadcastReceiver() {
                 INTENT_ACTION_NOTIFICATION_PLAY, INTENT_ACTION_WIDGET_PLAY, INTENT_ACTION_PLAY -> play()
                 INTENT_ACTION_NOTIFICATION_PAUSE, INTENT_ACTION_WIDGET_PAUSE, INTENT_ACTION_PAUSE -> pause()
                 INTENT_ACTION_STOP -> stop()
+                INTENT_ACTION_NOTIFICATION_DISMISSED -> onNotificationDismissed()
                 INTENT_ACTION_NEXT -> playNext()
                 INTENT_ACTION_SKIP_FORWARD -> skipForward(intent.skipAmountSecondsOrNull())
                 INTENT_ACTION_SKIP_BACKWARD -> skipBackward(intent.skipAmountSecondsOrNull())
             }
             // To help us with debugging user support emails log where the user took the action.
             val logFrom = when (intent.action) {
-                INTENT_ACTION_NOTIFICATION_PLAY, INTENT_ACTION_NOTIFICATION_PAUSE -> "notification"
+                INTENT_ACTION_NOTIFICATION_PLAY, INTENT_ACTION_NOTIFICATION_PAUSE, INTENT_ACTION_NOTIFICATION_DISMISSED -> "notification"
                 INTENT_ACTION_WIDGET_PLAY, INTENT_ACTION_WIDGET_PAUSE -> "widget"
                 else -> "external"
             }
@@ -77,8 +79,20 @@ class PlayerBroadcastReceiver : BroadcastReceiver() {
         playbackManager.playNextInQueue(sourceView = sourceView)
     }
 
+    private fun onNotificationDismissed() {
+        playbackManager.onPlaybackNotificationDismissed(sourceView)
+    }
+
     private fun stop() {
         playbackManager.stopAsync(sourceView = sourceView)
+    }
+}
+
+internal fun PlaybackManager.onPlaybackNotificationDismissed(sourceView: SourceView) {
+    if (isPlaying() || playbackStateRelay.blockingFirst().transientLoss) {
+        LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Playback notification removed while in the foreground, not pausing")
+    } else {
+        pause(sourceView = sourceView)
     }
 }
 
