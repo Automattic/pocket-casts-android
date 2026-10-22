@@ -15,23 +15,29 @@ import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
@@ -106,10 +112,12 @@ internal fun ChatFadeOut(
 }
 
 @Composable
-internal fun ChatShimmer(
+internal fun ChatShimmerText(
+    text: String,
+    color: Color,
     highlight: Color,
+    style: TextStyle,
     modifier: Modifier = Modifier,
-    content: @Composable () -> Unit,
 ) {
     val isReduceMotionEnabled = rememberIsReduceMotionEnabled()
     val sweep = remember { Animatable(0f) }
@@ -123,25 +131,24 @@ internal fun ChatShimmer(
             sweep.snapTo(0f)
         }
     }
-    Box(
+    var textWidth by remember { mutableFloatStateOf(0f) }
+    val halfBand = with(LocalDensity.current) { ShimmerHalfBandWidth.toPx() }
+    val center = lerp(-halfBand, textWidth + halfBand, sweep.value)
+    Text(
+        text = text,
+        style = style.copy(
+            brush = Brush.horizontalGradient(
+                colors = listOf(color, highlight, color),
+                startX = center - halfBand,
+                endX = center + halfBand,
+            ),
+        ),
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
         modifier = modifier
-            .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
-            .drawWithContent {
-                drawContent()
-                val halfBand = ShimmerHalfBandWidth.toPx()
-                val center = lerp(-halfBand, size.width + halfBand, sweep.value)
-                drawRect(
-                    brush = Brush.horizontalGradient(
-                        colors = listOf(Color.Transparent, highlight, Color.Transparent),
-                        startX = center - halfBand,
-                        endX = center + halfBand,
-                    ),
-                    blendMode = BlendMode.SrcAtop,
-                )
-            },
-    ) {
-        content()
-    }
+            .wrapContentWidth(Alignment.Start)
+            .onSizeChanged { size -> textWidth = size.width.toFloat() },
+    )
 }
 
 private val ShimmerHalfBandWidth = 20.dp

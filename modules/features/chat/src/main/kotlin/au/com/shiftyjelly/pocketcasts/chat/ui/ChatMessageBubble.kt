@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.chat.ui
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.core.EaseOut
 import androidx.compose.animation.core.InfiniteTransition
 import androidx.compose.animation.core.rememberInfiniteTransition
@@ -15,9 +16,11 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
@@ -63,7 +66,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.LocalPodcastColors
 import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
@@ -324,7 +327,7 @@ internal fun ThinkingBubble(
             if (isReduceMotionEnabled) {
                 EnterTransition.None togetherWith ExitTransition.None
             } else {
-                LoadingPhaseEnter togetherWith LoadingPhaseExit
+                LoadingPhaseEnter togetherWith LoadingPhaseExit using SizeTransform(clip = false)
             }
         },
         contentAlignment = Alignment.TopStart,
@@ -333,26 +336,28 @@ internal fun ThinkingBubble(
     ) { shownPhase ->
         val textRes = shownPhase.textRes
         if (textRes == null) {
-            ChatTypingIndicator(
-                theme = theme,
-                transition = transition,
-                modifier = Modifier.padding(top = TypingIndicatorExtraGap),
-            )
-        } else {
-            ChatShimmer(highlight = theme.primaryText) {
-                Text(
-                    text = stringResource(textRes),
-                    color = theme.inputHint,
-                    style = AiMessageTextStyle,
-                    maxLines = 1,
-                    modifier = Modifier.clearAndSetSemantics {},
+            Box(
+                contentAlignment = Alignment.CenterStart,
+                modifier = Modifier.heightIn(min = LoadingLineHeight),
+            ) {
+                ChatTypingIndicator(
+                    theme = theme,
+                    transition = transition,
                 )
             }
+        } else {
+            ChatShimmerText(
+                text = stringResource(textRes),
+                color = theme.inputHint,
+                highlight = theme.primaryText,
+                style = AiMessageTextStyle,
+                modifier = Modifier.clearAndSetSemantics {},
+            )
         }
     }
 }
 
-private val TypingIndicatorExtraGap = 8.dp
+private val LoadingLineHeight = 20.dp
 private val LoadingPhaseEnter = fadeIn(tween(durationMillis = 200, delayMillis = 100)) +
     slideInVertically(tween(durationMillis = 300, easing = EaseOut)) { height -> height / 3 }
 private val LoadingPhaseExit = fadeOut(tween(durationMillis = 130)) +
@@ -365,7 +370,7 @@ private val UserBubbleShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.d
 private fun ThinkingBubblePreview(
     @PreviewParameter(ChatLoadingPhaseParameterProvider::class) phase: ChatLoadingPhase,
 ) {
-    AppTheme(ThemeType.DARK) {
+    AppThemeWithBackground(ThemeType.DARK) {
         CompositionLocalProvider(LocalPodcastColors provides PodcastColors.ForUserEpisode) {
             val theme = rememberChatTheme()
             ThinkingBubble(
