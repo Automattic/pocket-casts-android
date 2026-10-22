@@ -423,6 +423,97 @@ class TranscriptSanitizationTest {
         }
 
         @Test
+        fun `split unpunctuated transcript into entries at cue boundaries`() {
+            val cue = "あ".repeat(20)
+            val input = buildTranscript {
+                repeat(8) { index -> text(cue, startTimeMs = index * 3000L, endTimeMs = (index + 1) * 3000L) }
+            }
+
+            val output = input.sanitize()
+
+            assertEquals(
+                buildTranscript {
+                    text(List(4) { cue }.joinToString(" "), startTimeMs = 0, endTimeMs = 12000)
+                    text(List(4) { cue }.joinToString(" "), startTimeMs = 12000, endTimeMs = 24000)
+                },
+                output.withoutWords(),
+            )
+        }
+
+        @Test
+        fun `split unpunctuated transcript with long cues at cue boundaries`() {
+            val cue = "ก".repeat(80)
+            val input = buildTranscript {
+                repeat(4) { index -> text(cue, startTimeMs = index * 10_000L, endTimeMs = (index + 1) * 10_000L) }
+            }
+
+            val output = input.sanitize()
+
+            assertEquals(
+                buildTranscript {
+                    text("$cue $cue", startTimeMs = 0, endTimeMs = 20_000)
+                    text("$cue $cue", startTimeMs = 20_000, endTimeMs = 40_000)
+                },
+                output.withoutWords(),
+            )
+        }
+
+        @Test
+        fun `split unpunctuated Devanagari transcript at cue boundaries`() {
+            val cue = "नमस्ते दोस्तों आज हम बात करेंगे ".repeat(3).trim()
+            val input = buildTranscript {
+                repeat(3) { index -> text(cue, startTimeMs = index * 10_000L, endTimeMs = (index + 1) * 10_000L) }
+            }
+
+            val output = input.sanitize()
+
+            assertEquals(
+                buildTranscript {
+                    text("$cue $cue", startTimeMs = 0, endTimeMs = 20_000)
+                    text(cue, startTimeMs = 20_000, endTimeMs = 30_000)
+                },
+                output.withoutWords(),
+            )
+        }
+
+        @Test
+        fun `do not split untimed unpunctuated transcript`() {
+            val cue = "あ".repeat(100)
+            val input = buildTranscript {
+                repeat(3) { text(cue) }
+            }
+
+            val output = input.sanitize()
+
+            assertEquals(
+                buildTranscript {
+                    text(List(3) { cue }.joinToString(" "))
+                },
+                output.withoutWords(),
+            )
+        }
+
+        @Test
+        fun `do not split long sentences in punctuated transcript`() {
+            val cue = "and then we kept talking about it for a really long time"
+            val input = buildTranscript {
+                repeat(10) { index -> text("Short one.", startTimeMs = index * 2000L, endTimeMs = (index + 1) * 2000L) }
+                repeat(10) { index -> text(cue, startTimeMs = 20_000 + index * 3000L, endTimeMs = 20_000 + (index + 1) * 3000L) }
+                text("the end.", startTimeMs = 50_000, endTimeMs = 51_000)
+            }
+
+            val output = input.sanitize()
+
+            assertEquals(
+                buildTranscript {
+                    repeat(10) { index -> text("Short one.", startTimeMs = index * 2000L, endTimeMs = (index + 1) * 2000L) }
+                    text(List(10) { cue }.joinToString(" ") + " the end.", startTimeMs = 20_000, endTimeMs = 51_000)
+                },
+                output.withoutWords(),
+            )
+        }
+
+        @Test
         fun `keep a Latin closing quote attached to a CJK sentence`() {
             val input = buildTranscript {
                 text("彼は\"はい。\"それから")
