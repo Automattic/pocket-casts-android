@@ -17,10 +17,19 @@ data class PodcastResult(
     val isSubscribed: Boolean,
 )
 
-/** A podcast episode, or an audio file the user uploaded to Pocket Casts. */
+/** A playlist of episodes the user created. */
+@AppFunctionSerializable(isDescribedByKDoc = true)
+data class PlaylistResult(
+    /** Unique playlist ID. Pass as "playlistUuid" to "getPlaylistEpisodes". */
+    val uuid: String,
+    /** Playlist name. */
+    val title: String,
+)
+
+/** A podcast episode, or an audio/video file the user uploaded to Pocket Casts. */
 @AppFunctionSerializable(isDescribedByKDoc = true)
 data class EpisodeResult(
-    /** Unique episode ID. Pass to "playEpisode", "addToUpNext", "downloadEpisode" or "starEpisode". */
+    /** Unique episode ID. Pass to any function that takes an "episodeUuid", such as "playEpisode" or "getTranscript". */
     val uuid: String,
     /** Episode title. */
     val title: String,
@@ -40,6 +49,8 @@ data class EpisodeResult(
     val isStarred: Boolean,
     /** True when the episode is downloaded and can play offline. */
     val isDownloaded: Boolean,
+    /** True when the user archived the episode, hiding it from their episode lists. */
+    val isArchived: Boolean,
 )
 
 /** The result of playing something found by a free-text search. */
@@ -57,7 +68,10 @@ data class PlaySearchResult(
 /** The playing episode and the Up Next queue. */
 @AppFunctionSerializable(isDescribedByKDoc = true)
 data class UpNextResult(
-    /** The episode loaded in the player, whether playing or paused. Null when nothing is loaded. */
+    /**
+     * The episode loaded in the player, whether playing or paused. Its "playedUpToSeconds" is the live playback
+     * position. Null when nothing is loaded.
+     */
     val currentEpisode: EpisodeResult?,
     /** True when audio is playing right now. */
     val isPlaying: Boolean,
@@ -67,6 +81,13 @@ data class UpNextResult(
     val queue: List<EpisodeResult>,
     /** Total number of queued episodes, which can exceed the size of "queue". */
     val queueSize: Int,
+    /** Title of the chapter playing now. Null when the episode has no chapters or nothing is loaded. */
+    val currentChapterTitle: String?,
+    /**
+     * Listening time left, in seconds at normal speed, across the rest of the current episode and every queued
+     * episode. Episodes with an unknown length count as 0.
+     */
+    val upNextRemainingSeconds: Int,
 )
 
 /** The state of the sleep timer. */
@@ -78,4 +99,53 @@ data class SleepTimerResult(
     val minutesLeft: Int,
     /** True when playback stops at the end of the current episode. */
     val stopsAtEndOfEpisode: Boolean,
+)
+
+/** A chapter of an episode. */
+@AppFunctionSerializable(isDescribedByKDoc = true)
+data class ChapterResult(
+    /** Chapter title. */
+    val title: String,
+    /** Where the chapter starts, in seconds. Pass to "seekTo" to jump to it. */
+    val startSeconds: Int,
+    /** Where the chapter ends, in seconds. */
+    val endSeconds: Int,
+)
+
+/** An episode with its show notes and chapters. */
+@AppFunctionSerializable(isDescribedByKDoc = true)
+data class EpisodeDetailsResult(
+    /** The episode. */
+    val episode: EpisodeResult,
+    /** The episode description and show notes as plain text, including any links. Null when there are none. */
+    val showNotes: String?,
+    /** The episode's chapters in order. Empty when it has none or they have not loaded yet. */
+    val chapters: List<ChapterResult>,
+)
+
+/** An episode transcript, or part of one. */
+@AppFunctionSerializable(isDescribedByKDoc = true)
+data class TranscriptResult(
+    /**
+     * The transcript, one line per passage. Each line starts with its time as "[h:mm:ss]" when known, and with the
+     * speaker's name when the speaker changes.
+     */
+    val text: String,
+    /** True when Pocket Casts generated the transcript from the audio, so names and words may be inaccurate. */
+    val isGenerated: Boolean,
+    /** True when the text was cut short. Call again with "fromSeconds" set to the last time shown to read on. */
+    val isTruncated: Boolean,
+)
+
+/** A saved moment in an episode. */
+@AppFunctionSerializable(isDescribedByKDoc = true)
+data class BookmarkResult(
+    /** Unique bookmark ID. */
+    val uuid: String,
+    /** Bookmark title. */
+    val title: String,
+    /** ID of the bookmarked episode. */
+    val episodeUuid: String,
+    /** Position of the bookmark in the episode, in seconds. */
+    val timeSeconds: Int,
 )
