@@ -11,6 +11,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -41,6 +42,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -49,6 +51,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -79,6 +82,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -208,6 +212,7 @@ private fun ChatContent(
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
+    val coroutineScope = rememberCoroutineScope()
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
 
@@ -284,12 +289,21 @@ private fun ChatContent(
                     key(message.uuid) {
                         val isNew = message.uuid !in initialMessageUuids
                         val replacesTypingIndicator = isNew && uiState.messages.getOrNull(index - 1) is ChatMessage.User
+                        val isStreaming = answerStream?.isStreaming(message.uuid) == true
+                        val skipStreamOnTap = if (isStreaming) {
+                            Modifier.pointerInput(answerStream) {
+                                detectTapGestures { coroutineScope.launch { answerStream.skip() } }
+                            }
+                        } else {
+                            Modifier
+                        }
                         when (message) {
                             is ChatMessage.Assistant -> ChatAnswerAppear(
                                 animate = isNew,
                                 replacesTypingIndicator = replacesTypingIndicator,
                                 typingTransition = typingTransition,
                                 theme = theme,
+                                modifier = skipStreamOnTap,
                             ) {
                                 AiMessageBubble(
                                     text = message.displayText,
@@ -303,6 +317,7 @@ private fun ChatContent(
                                 replacesTypingIndicator = replacesTypingIndicator,
                                 typingTransition = typingTransition,
                                 theme = theme,
+                                modifier = skipStreamOnTap,
                             ) {
                                 AiQuoteBubble(
                                     quote = message.displayText,
@@ -325,7 +340,6 @@ private fun ChatContent(
                                 )
                             }
                         }
-                        val isStreaming = answerStream?.isStreaming(message.uuid) == true
                         answerUuidsByLastIndex[index]?.takeUnless { isStreaming }?.let { answerUuid ->
                             ChatAppear(animate = isNew) {
                                 ChatAnswerRatingRow(
@@ -400,9 +414,10 @@ private fun ChatAnswerAppear(
     replacesTypingIndicator: Boolean,
     typingTransition: InfiniteTransition,
     theme: ChatTheme,
+    modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
-    Box {
+    Box(modifier = modifier) {
         ChatAppear(animate = animate, durationMillis = ANSWER_CROSS_FADE_MS, content = content)
         if (replacesTypingIndicator) {
             ChatFadeOut(durationMillis = ANSWER_CROSS_FADE_MS) {
