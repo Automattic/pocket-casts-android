@@ -29,6 +29,7 @@ import coil3.SingletonImageLoader
 import coil3.annotation.DelicateCoilApi
 import coil3.intercept.Interceptor
 import coil3.request.ErrorResult
+import java.time.Duration
 import java.util.Date
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -47,6 +48,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
+import org.robolectric.shadows.ShadowSystemClock
 import timber.log.Timber
 
 @OptIn(DelicateCoilApi::class)
@@ -160,6 +162,16 @@ class NewEpisodeNotificationsTest {
                 val actionIntent = shadowOf(posted.notification.actions.single().actionIntent).savedIntent
                 assertEquals(posted.tag, actionIntent.getStringExtra(NotificationBroadcastReceiver.INTENT_EXTRA_NOTIFICATION_TAG))
             }
+    }
+
+    @Test
+    fun `only the newest episode notifications are kept`() {
+        repeat(25) { index ->
+            refresh(episode("episode-$index", podcast1))
+            ShadowSystemClock.advanceBy(Duration.ofSeconds(1))
+        }
+
+        assertEquals((5 until 25).map { tag("episode-$it") }.toSet(), activeTags())
     }
 
     private fun refresh(vararg episodes: Pair<PodcastEpisode, Podcast>) {
