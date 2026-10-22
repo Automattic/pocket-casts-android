@@ -24,7 +24,7 @@ data class Subscription(
         get() = !isAutoRenewing && expiryDate.isBefore(Instant.now().plus(EXPIRING_WINDOW.toJavaDuration()))
 
     val expiresIn: Duration?
-        get() = if (isExpiring) expiryDate.toDurationFromNow() else null
+        get() = expiryDate.toDurationFromNow().takeIf { isExpiring && it.isPositive() }
 
     val isChampion
         get() = platform == SubscriptionPlatform.Gift && giftDays > CHAMPION_GIFT_LOWER_BOUND

@@ -45,6 +45,14 @@ class SubscriptionTest {
         assertNull(subscription.expiresIn)
     }
 
+    @Test
+    fun `cancelled subscription past its expiry date has no time left`() {
+        val subscription = subscription(isAutoRenewing = false, expiresInDays = -1)
+
+        assertTrue(subscription.isExpiring)
+        assertNull(subscription.expiresIn)
+    }
+
     private fun subscription(isAutoRenewing: Boolean, expiresInDays: Long) = Subscription(
         tier = SubscriptionTier.Plus,
         billingCycle = BillingCycle.Monthly,
