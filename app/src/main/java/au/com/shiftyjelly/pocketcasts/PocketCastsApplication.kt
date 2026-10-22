@@ -213,9 +213,10 @@ class PocketCastsApplication :
             // The 3-thread executor bounds the blocking Workers (episode downloads, cache, prefetch, refresh).
             // Since WorkManager 2.9 a CoroutineWorker also runs on that executor unless a worker context is set,
             // so every sync worker queued behind long downloads and could stay unrun until the process was killed
-            // (PCDROID-833). Run CoroutineWorkers on Dispatchers.Default, as they did before 2.9, and leave the
-            // executor to the blocking workers.
-            .setWorkerCoroutineContext(Dispatchers.Default)
+            // (PCDROID-833). Run CoroutineWorkers on Dispatchers.IO instead and leave the executor to the blocking
+            // workers. IO rather than Default because a few CoroutineWorkers still block in doWork (OpmlImportTask,
+            // VersionMigrationsWorker, SyncHistoryTask), and Default is the CPU-sized pool the UI coroutines share.
+            .setWorkerCoroutineContext(Dispatchers.IO)
             .setExecutor(Executors.newFixedThreadPool(3))
             .setJobSchedulerJobIdRange(1000, 20000)
             .build()
