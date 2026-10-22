@@ -34,6 +34,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationOpenReceiverActivity
+import au.com.shiftyjelly.pocketcasts.repositories.notification.newEpisodeNotificationsBlockedReason
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
@@ -450,6 +451,13 @@ class RefreshPodcastsThread(
                 val notificationsEpisodeAndPodcast = ArrayList<Pair<PodcastEpisode, Podcast>>()
 
                 val episodes = episodeManager.findNotificationEpisodesBlocking(lastSeen)
+                if (episodes.isNotEmpty()) {
+                    val episodeUuids = episodes.take(10).joinToString { it.uuid }
+                    LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh - new episode notifications since $lastSeen: ${episodes.size} ($episodeUuids)")
+                    context.newEpisodeNotificationsBlockedReason()?.let { reason ->
+                        LogBuffer.w(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh - new episode notifications can't be shown: $reason")
+                    }
+                }
                 for (episode in episodes) {
                     val podcast = podcastManager.findPodcastByUuidBlocking(episode.podcastUuid) ?: continue
                     notificationsEpisodeAndPodcast.add(Pair(episode, podcast))
@@ -489,12 +497,16 @@ class RefreshPodcastsThread(
 
                 for (i in notificationsEpisodeAndPodcast.indices) {
                     val episodePodcast = notificationsEpisodeAndPodcast[i]
-                    showEpisodeNotification(episodePodcast.second, episodePodcast.first, i, intentId + i * INTENT_IDS_PER_EPISODE, isGroup, notificationHelper, settings, context)
+                    try {
+                        showEpisodeNotification(episodePodcast.second, episodePodcast.first, i, intentId + i * INTENT_IDS_PER_EPISODE, isGroup, notificationHelper, settings, context)
+                    } catch (e: Exception) {
+                        LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, e, "Failed to show the new episode notification for ${episodePodcast.first.uuid}")
+                    }
                 }
 
                 cancelOldestEpisodeNotifications(context)
             } catch (e: Exception) {
-                Timber.e(e)
+                LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, e, "Failed to show new episode notifications")
             }
         }
 
