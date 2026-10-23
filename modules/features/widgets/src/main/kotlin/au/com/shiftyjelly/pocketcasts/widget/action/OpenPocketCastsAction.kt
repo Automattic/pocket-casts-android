@@ -1,26 +1,24 @@
 package au.com.shiftyjelly.pocketcasts.widget.action
 
-import android.content.Context
-import androidx.glance.GlanceId
-import androidx.glance.action.ActionParameters
-import androidx.glance.appwidget.action.ActionCallback
-import androidx.glance.appwidget.action.actionRunCallback
-import timber.log.Timber
+import android.content.Intent
+import androidx.compose.runtime.Composable
+import androidx.glance.LocalContext
+import androidx.glance.action.Action
+import androidx.glance.appwidget.action.actionStartActivity
+import au.com.shiftyjelly.pocketcasts.utils.extensions.getLaunchIntent
 
-internal class OpenPocketCastsAction : ActionCallback {
-    override suspend fun onAction(context: Context, glanceId: GlanceId, parameters: ActionParameters) {
-        val packageName = context.packageName
-        try {
-            val intent = requireNotNull(context.packageManager.getLaunchIntentForPackage(packageName)) {
-                "Missing default activity for $packageName"
-            }
-            context.startActivity(intent)
-        } catch (e: Throwable) {
-            Timber.e(e, "Failed to launch default intent for: $packageName")
-        }
-    }
-
-    companion object {
-        fun action() = actionRunCallback<OpenPocketCastsAction>()
+internal object OpenPocketCastsAction {
+    // Open the app through an activity PendingIntent that the launcher fires on our behalf.
+    // Starting the activity from an actionRunCallback counts as a background activity launch,
+    // which Android blocks silently for apps targeting API 35 and above.
+    @Composable
+    fun action(): Action {
+        val context = LocalContext.current
+        val intent = context.getLaunchIntent()
+            ?: Intent(Intent.ACTION_MAIN)
+                .addCategory(Intent.CATEGORY_LAUNCHER)
+                .setPackage(context.packageName)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        return actionStartActivity(intent)
     }
 }
