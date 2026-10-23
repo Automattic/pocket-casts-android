@@ -22,6 +22,7 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.automattic.eventhorizon.BookmarkEditFormDismissedEvent
 import com.automattic.eventhorizon.BookmarkEditFormShownEvent
 import com.automattic.eventhorizon.BookmarkEditFormSubmittedEvent
+import com.automattic.eventhorizon.BookmarkTitleSourceType
 import com.automattic.eventhorizon.BookmarkTitleSuggestionTappedEvent
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.SourceViewType
@@ -32,6 +33,7 @@ import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -540,6 +542,147 @@ class BookmarkViewModelTest {
         saved.await()
 
         verify(bookmarkManager).updatePassage("existing-id", "a hand-picked passage", 9, null)
+    }
+
+    @Test
+    fun `reports a generated title saved unchanged as suggested`() = runTest {
+        stubNewBookmark()
+        whenever(bookmarkManager.suggestBookmark(episodeUuid, timeSecs)).thenReturn(suggestion)
+        viewModel.load(arguments)
+
+        assertEquals(BookmarkTitleSourceType.Suggested, submittedTitleSource())
+    }
+
+    @Test
+    fun `reports a changed generated title as edited`() = runTest {
+        stubNewBookmark()
+        whenever(bookmarkManager.suggestBookmark(episodeUuid, timeSecs)).thenReturn(suggestion)
+        viewModel.load(arguments)
+        viewModel.changeTitle(TextFieldValue("A great moment, really"))
+
+        assertEquals(BookmarkTitleSourceType.Edited, submittedTitleSource())
+    }
+
+    @Test
+    fun `reports a cleared generated title as edited`() = runTest {
+        stubNewBookmark()
+        whenever(bookmarkManager.suggestBookmark(episodeUuid, timeSecs)).thenReturn(suggestion)
+        viewModel.load(arguments)
+        viewModel.changeTitle(TextFieldValue(""))
+
+        assertEquals(BookmarkTitleSourceType.Edited, submittedTitleSource())
+    }
+
+    @Test
+    fun `reports a typed title kept over an offered suggestion as manual`() = runTest {
+        stubNewBookmark()
+        val gate = CompletableDeferred<BookmarkSuggestion?>()
+        doSuspendableAnswer { gate.await() }.whenever(bookmarkManager).suggestBookmark(episodeUuid, timeSecs)
+        viewModel.load(arguments)
+        viewModel.changeTitle(TextFieldValue("My own title"))
+        gate.complete(suggestion)
+
+        assertEquals(BookmarkTitleSourceType.Manual, submittedTitleSource())
+    }
+
+    @Test
+    fun `reports a changed tapped suggestion as edited`() = runTest {
+        stubNewBookmark()
+        val gate = CompletableDeferred<BookmarkSuggestion?>()
+        doSuspendableAnswer { gate.await() }.whenever(bookmarkManager).suggestBookmark(episodeUuid, timeSecs)
+        viewModel.load(arguments)
+        viewModel.changeTitle(TextFieldValue("My own title"))
+        gate.complete(suggestion)
+        val offered = viewModel.uiState.value.titleSuggestion as BookmarkViewModel.TitleSuggestion.Available
+        viewModel.onSuggestionTapped(offered.title)
+        viewModel.changeTitle(TextFieldValue("${offered.title} and more"))
+
+        assertEquals(BookmarkTitleSourceType.Edited, submittedTitleSource())
+    }
+
+    @Test
+    fun `reports a tapped suggestion as suggested`() = runTest {
+        stubNewBookmark()
+        val gate = CompletableDeferred<BookmarkSuggestion?>()
+        doSuspendableAnswer { gate.await() }.whenever(bookmarkManager).suggestBookmark(episodeUuid, timeSecs)
+        viewModel.load(arguments)
+        viewModel.changeTitle(TextFieldValue("My own title"))
+        gate.complete(suggestion)
+        val offered = viewModel.uiState.value.titleSuggestion as BookmarkViewModel.TitleSuggestion.Available
+        viewModel.onSuggestionTapped(offered.title)
+
+        assertEquals(BookmarkTitleSourceType.Suggested, submittedTitleSource())
+    }
+
+    @Test
+    fun `reports a transcript bookmark's generated title saved unchanged as suggested`() = runTest {
+        whenever(bookmarkManager.findBookmark("new-id")).thenReturn(Bookmark(uuid = "new-id", title = "Bookmark", passage = "a captured passage"))
+        whenever(bookmarkManager.suggestTitle("a captured passage")).thenReturn(TitleGeneration("A great moment", 0, null))
+        viewModel.load(newBookmarkArguments("new-id"))
+
+        assertEquals(BookmarkTitleSourceType.Suggested, submittedTitleSource())
+    }
+
+    @Test
+    fun `reports the first-words title saved unchanged as fallback`() = runTest {
+        stubNewBookmark()
+        whenever(bookmarkManager.suggestBookmark(episodeUuid, timeSecs))
+            .thenReturn(suggestion.copy(passage = "one two three four five six seven", generation = failedGeneration))
+        viewModel.load(arguments)
+
+        assertEquals(BookmarkTitleSourceType.Fallback, submittedTitleSource())
+    }
+
+    @Test
+    fun `reports a changed first-words title as manual`() = runTest {
+        stubNewBookmark()
+        whenever(bookmarkManager.suggestBookmark(episodeUuid, timeSecs))
+            .thenReturn(suggestion.copy(passage = "one two three four five six seven", generation = failedGeneration))
+        viewModel.load(arguments)
+        viewModel.changeTitle(TextFieldValue("My own title"))
+
+        assertEquals(BookmarkTitleSourceType.Manual, submittedTitleSource())
+    }
+
+    @Test
+    fun `reports a title without any suggestion as manual`() = runTest {
+        stubNewBookmark()
+        whenever(bookmarkManager.suggestBookmark(episodeUuid, timeSecs)).thenReturn(null)
+        viewModel.load(arguments)
+
+        assertEquals(BookmarkTitleSourceType.Manual, submittedTitleSource())
+    }
+
+    @Test
+    fun `reports a title submitted while the suggestion is generating as manual`() = runTest {
+        stubNewBookmark()
+        doSuspendableAnswer { awaitCancellation() }.whenever(bookmarkManager).suggestBookmark(episodeUuid, timeSecs)
+        viewModel.load(arguments)
+
+        assertEquals(BookmarkTitleSourceType.Manual, submittedTitleSource())
+    }
+
+    @Test
+    fun `omits the title source when editing an existing bookmark`() = runTest {
+        whenever(bookmarkManager.findBookmark("existing-id")).thenReturn(Bookmark(uuid = "existing-id", title = "Kept"))
+        viewModel.load(existingBookmarkArguments("existing-id"))
+
+        assertNull(submittedTitleSource())
+    }
+
+    @Test
+    fun `omits the title source when smart bookmarks are off`() = runTest {
+        FeatureFlag.setEnabled(Feature.SMART_BOOKMARKS, false)
+        stubNewBookmark()
+        viewModel.load(arguments)
+
+        assertNull(submittedTitleSource())
+    }
+
+    private fun submittedTitleSource(): BookmarkTitleSourceType? {
+        while (!eventSink.isEmpty()) eventSink.skipEvent()
+        viewModel.onSubmitBookmark()
+        return (eventSink.pollEvent() as BookmarkEditFormSubmittedEvent).titleSource
     }
 
     private suspend fun stubNewBookmark() {

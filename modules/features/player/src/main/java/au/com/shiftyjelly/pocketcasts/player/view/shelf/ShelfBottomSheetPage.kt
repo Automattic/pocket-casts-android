@@ -151,8 +151,15 @@ fun ShelfBottomSheetPage(
                     }
 
                     ShelfItem.StreamSelector -> shelfSharedViewModel.onVideoToggleClick(ShelfItemSource.OverflowMenu)
+
+                    ShelfItem.EpisodeChat -> {
+                        val podcast = playerViewModel.podcast ?: return@MenuShelfItems
+                        val episode = playerViewModel.episode as? PodcastEpisode ?: return@MenuShelfItems
+                        shelfSharedViewModel.onEpisodeChatClick(podcast, episode, enabled, ShelfItemSource.OverflowMenu)
+                    }
                 }
-                if (item != ShelfItem.Cast) onDismiss()
+                val keepsSheetOpen = item == ShelfItem.Cast || (item == ShelfItem.EpisodeChat && !enabled)
+                if (!keepsSheetOpen) onDismiss()
             },
             onMove = { from, to ->
                 shelfViewModel.onShelfItemMove(from, to)

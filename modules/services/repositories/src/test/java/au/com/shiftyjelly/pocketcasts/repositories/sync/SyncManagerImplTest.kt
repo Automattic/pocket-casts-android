@@ -101,6 +101,49 @@ class SyncManagerImplTest {
     }
 
     @Test
+    fun `account created with password reports the onboarding flow`() = runTest {
+        whenever(syncServiceManager.register(any(), any())).thenReturn(createMockLoginResponse(isNew = true))
+
+        syncManager.createUserWithEmailAndPassword(
+            email = "test@example.com",
+            password = "password123",
+            signInSource = SignInSource.UserInitiated.Onboarding,
+            flow = OnboardingFlowType.AccountEncouragement,
+        )
+
+        assertEquals(
+            UserAccountCreatedEvent(
+                source = LoginIdentityType.Password,
+                sourceInCode = SignInSourceType.Onboarding,
+                redirectPath = "none",
+                flow = OnboardingFlowType.AccountEncouragement,
+            ),
+            eventSink.pollEvent(),
+        )
+    }
+
+    @Test
+    fun `account created with google reports the onboarding flow`() = runTest {
+        whenever(syncServiceManager.loginGoogle(any())).thenReturn(createMockLoginResponse(isNew = true))
+
+        syncManager.loginWithGoogle(
+            idToken = "google_token",
+            signInSource = SignInSource.UserInitiated.Onboarding,
+            flow = OnboardingFlowType.AccountEncouragement,
+        )
+
+        assertEquals(
+            UserAccountCreatedEvent(
+                source = LoginIdentityType.Google,
+                sourceInCode = SignInSourceType.Onboarding,
+                redirectPath = "none",
+                flow = OnboardingFlowType.AccountEncouragement,
+            ),
+            eventSink.pollEvent(),
+        )
+    }
+
+    @Test
     fun `should not update user interaction when is not user registration`() = runTest {
         val response = createMockLoginResponse(isNew = false)
         whenever(syncServiceManager.loginGoogle(any())).thenReturn(response)

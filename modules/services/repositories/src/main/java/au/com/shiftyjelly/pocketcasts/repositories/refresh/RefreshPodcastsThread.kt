@@ -53,6 +53,7 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.exception.RefreshTokenExpired
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.utils.extensions.getLaunchIntent
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import coil3.executeBlocking
 import coil3.imageLoader
@@ -644,7 +645,7 @@ class RefreshPodcastsThread(
                 wearBackground = getPodcastNotificationWearBitmap(firstPodcastUuid, podcastManager, context)
             }
 
-            val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)?.apply {
+            val intent = context.getLaunchIntent()?.apply {
                 flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
                 action = Settings.INTENT_OPEN_APP_NEW_EPISODES
             }

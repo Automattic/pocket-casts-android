@@ -270,23 +270,14 @@ enum class Feature(
         hasDevToggle = true,
         addedOn = LocalDate.parse("2026-04-22"),
     ),
-    EPISODE_CHAT_PLAYABLE_QUOTES(
-        key = "episode_chat_playable_quotes",
-        title = "Episode Chat: Playable Quotes",
+    EPISODE_CHAT_FREE_BETA(
+        key = "episode_chat_free_beta",
+        title = "Episode Chat: Free Beta",
         defaultValue = isDebugOrPrototypeBuild,
-        tier = FeatureTier.Plus(),
+        tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
-        addedOn = LocalDate.parse("2026-04-27"),
-    ),
-    AI_SUMMARIES(
-        key = "ai_summaries",
-        title = "AI Summaries",
-        defaultValue = isDebugOrPrototypeBuild,
-        tier = FeatureTier.Plus(),
-        hasFirebaseRemoteFlag = true,
-        hasDevToggle = true,
-        addedOn = LocalDate.parse("2026-05-12"),
+        addedOn = LocalDate.parse("2026-10-05"),
     ),
     GENERATED_CHAPTERS(
         key = "generated_chapters",
@@ -377,6 +368,24 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
         addedOn = LocalDate.parse("2026-09-22"),
+    ),
+    PLAY_IN_APP_MESSAGES(
+        key = "play_in_app_messages",
+        title = "Google Play in-app messages for declined payments",
+        defaultValue = false,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+        addedOn = LocalDate.parse("2026-10-12"),
+    ),
+    RETRY_WITH_PLATFORM_USER_AGENT(
+        key = "retry_with_platform_user_agent",
+        title = "Retry failed media requests with the platform User-Agent",
+        defaultValue = true,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+        addedOn = LocalDate.parse("2026-10-21"),
     ),
 }
 

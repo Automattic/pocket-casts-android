@@ -227,6 +227,80 @@ class MediaButtonEventHandlerTest {
         assertEquals(listOf(MediaEvent.DoubleTap), events)
     }
 
+    @Test
+    fun `play pause resolves without the tap window when toggling immediately`() = runTest {
+        for (isPlaying in listOf(true, false)) {
+            var immediatePlayCount = 0
+            val events = mutableListOf<MediaEvent>()
+            val handler = MediaButtonEventHandler(
+                scopeProvider = { this },
+                onImmediatePlay = { immediatePlayCount++ },
+                onMediaEvent = events::add,
+                isPlaying = { isPlaying },
+                togglesImmediately = true,
+            )
+
+            assertTrue(handler.handle(keyEvent(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE)))
+            runCurrent()
+
+            assertEquals(0, immediatePlayCount)
+            assertEquals(listOf(MediaEvent.SingleTap), events)
+        }
+    }
+
+    @Test
+    fun `headset hook keeps the tap window when toggling immediately`() = runTest {
+        val events = mutableListOf<MediaEvent>()
+        val handler = MediaButtonEventHandler(
+            scopeProvider = { this },
+            onImmediatePlay = {},
+            onMediaEvent = events::add,
+            isPlaying = { true },
+            togglesImmediately = true,
+        )
+
+        handler.handle(keyEvent(KeyEvent.KEYCODE_HEADSETHOOK))
+        handler.handle(keyEvent(KeyEvent.KEYCODE_HEADSETHOOK))
+        advanceUntilIdle()
+
+        assertEquals(listOf(MediaEvent.DoubleTap), events)
+    }
+
+    @Test
+    fun `rapid toggle keys emit separate single taps when toggling immediately`() = runTest {
+        val events = mutableListOf<MediaEvent>()
+        val handler = MediaButtonEventHandler(
+            scopeProvider = { this },
+            onImmediatePlay = {},
+            onMediaEvent = events::add,
+            isPlaying = { true },
+            togglesImmediately = true,
+        )
+
+        handler.handle(keyEvent(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE))
+        handler.handle(keyEvent(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE))
+        advanceUntilIdle()
+
+        assertEquals(listOf(MediaEvent.SingleTap, MediaEvent.SingleTap), events)
+    }
+
+    @Test
+    fun `next key still resolves through the tap queue when toggling immediately`() = runTest {
+        val events = mutableListOf<MediaEvent>()
+        val handler = MediaButtonEventHandler(
+            scopeProvider = { this },
+            onImmediatePlay = {},
+            onMediaEvent = events::add,
+            isPlaying = { true },
+            togglesImmediately = true,
+        )
+
+        handler.handle(keyEvent(KeyEvent.KEYCODE_MEDIA_NEXT))
+        advanceUntilIdle()
+
+        assertEquals(listOf(MediaEvent.DoubleTap), events)
+    }
+
     private fun keyEvent(
         keyCode: Int,
         action: Int = KeyEvent.ACTION_DOWN,

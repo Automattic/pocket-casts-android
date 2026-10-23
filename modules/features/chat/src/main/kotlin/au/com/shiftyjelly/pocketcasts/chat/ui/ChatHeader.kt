@@ -1,0 +1,180 @@
+package au.com.shiftyjelly.pocketcasts.chat.ui
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import au.com.shiftyjelly.pocketcasts.chat.ChatPlayback
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.LocalPodcastColors
+import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
+import au.com.shiftyjelly.pocketcasts.compose.PodcastColorsParameterProvider
+import au.com.shiftyjelly.pocketcasts.compose.components.EpisodeImage
+import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
+import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
+import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory.PlaceholderType
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.images.R as IR
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
+
+@Composable
+internal fun ChatHeader(
+    episodeTitle: String,
+    podcastUuid: String,
+    podcastTitle: String,
+    userEpisode: UserEpisode?,
+    playback: ChatPlayback,
+    onClickClose: () -> Unit,
+    onClickMore: () -> Unit,
+    onClickPlayPause: () -> Unit,
+    theme: ChatTheme,
+    modifier: Modifier = Modifier,
+) {
+    Column(modifier = modifier.fillMaxWidth()) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 8.dp, end = 4.dp),
+        ) {
+            IconButton(onClick = onClickClose) {
+                Icon(
+                    painter = painterResource(IR.drawable.ic_close),
+                    contentDescription = stringResource(LR.string.close),
+                    tint = theme.iconButton,
+                    modifier = Modifier.size(HeaderIconSize),
+                )
+            }
+            Spacer(modifier = Modifier.weight(1f))
+            IconButton(onClick = onClickMore) {
+                Icon(
+                    painter = painterResource(IR.drawable.ic_ellipsis_horizontal),
+                    contentDescription = stringResource(LR.string.more_options),
+                    tint = theme.iconButton,
+                    modifier = Modifier.size(HeaderIconSize),
+                )
+            }
+        }
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 16.dp, end = 4.dp, top = 12.dp, bottom = 12.dp),
+        ) {
+            if (userEpisode != null) {
+                EpisodeImage(
+                    episode = userEpisode,
+                    useEpisodeArtwork = true,
+                    placeholderType = PlaceholderType.Small,
+                    corners = 4.dp,
+                    modifier = Modifier
+                        .size(44.dp)
+                        .clip(RoundedCornerShape(4.dp)),
+                )
+            } else {
+                PodcastImage(
+                    uuid = podcastUuid,
+                    imageSize = 44.dp,
+                    cornerSize = 4.dp,
+                    elevation = null,
+                )
+            }
+            Spacer(modifier = Modifier.width(8.dp))
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .semantics(mergeDescendants = true) {},
+            ) {
+                Text(
+                    text = episodeTitle,
+                    color = theme.primaryText,
+                    fontSize = 13.sp,
+                    lineHeight = 18.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Text(
+                    text = podcastTitle.ifEmpty { if (userEpisode != null) stringResource(LR.string.profile_navigation_files) else "" },
+                    color = theme.tertiaryText,
+                    fontSize = 13.sp,
+                    lineHeight = 18.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+            IconButton(onClick = onClickPlayPause) {
+                Icon(
+                    painter = painterResource(if (playback.isPlaying) IR.drawable.ic_widget_pause else IR.drawable.ic_widget_play),
+                    contentDescription = stringResource(if (playback.isPlaying) LR.string.pause else LR.string.play),
+                    tint = theme.iconButton,
+                    modifier = Modifier.size(24.dp),
+                )
+            }
+        }
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(2.dp)
+                .background(theme.progressTrack),
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(playback.progress)
+                    .height(2.dp)
+                    .background(theme.progress, CircleShape),
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun ChatHeaderPreview(
+    @PreviewParameter(PodcastColorsParameterProvider::class) podcastColors: PodcastColors,
+) {
+    AppTheme(Theme.ThemeType.DARK) {
+        CompositionLocalProvider(LocalPodcastColors provides podcastColors) {
+            val theme = rememberChatTheme()
+            ChatHeader(
+                episodeTitle = "Navigating Life Insurance Choices",
+                podcastUuid = "preview-podcast-uuid",
+                podcastTitle = "Smart Money",
+                userEpisode = null,
+                playback = ChatPlayback(isPlaying = true, positionMs = 30, durationMs = 100),
+                onClickClose = {},
+                onClickMore = {},
+                onClickPlayPause = {},
+                theme = theme,
+                modifier = Modifier.background(theme.background),
+            )
+        }
+    }
+}
+
+private val HeaderIconSize = 20.dp

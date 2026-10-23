@@ -1,5 +1,25 @@
 8.24
 -----
+*   New Features
+    *   Show Google Play's in-app message when a subscription payment is declined, so you can fix the payment without leaving the app
+        ([#6153](https://github.com/Automattic/pocket-casts-android/pull/6153))
+*   Bug Fixes
+    *   Fix tapping the media player or a notification not opening the app after changing the app icon
+        ([#6181](https://github.com/Automattic/pocket-casts-android/pull/6181))
+    *   Fix the add button covering the last file on the Files screen
+        ([#6192](https://github.com/Automattic/pocket-casts-android/pull/6192))
+    *   Fix smart playlists in Android Automotive going empty when the car keeps the app running between drives
+        ([#6196](https://github.com/Automattic/pocket-casts-android/pull/6196))
+    *   Keep the TV from going into standby while an episode is playing in the TV app
+        ([#6199](https://github.com/Automattic/pocket-casts-android/pull/6199))
+    *   Fix playback stopping early when Android backs up the app in the background on Android 16 and newer
+        ([#6205](https://github.com/Automattic/pocket-casts-android/pull/6205))
+    *   Dismiss the Smart Bookmarks tooltip when the More button is tapped
+        ([#6206](https://github.com/Automattic/pocket-casts-android/pull/6206))
+    *   Fix downloads and streams from some hosts, such as Buzzsprout, failing for good after a single failed attempt
+        ([#6212](https://github.com/Automattic/pocket-casts-android/pull/6212))
+    *   Stop showing "Plus expires in X days" to subscribers whose subscription renews automatically
+        ([#5329](https://github.com/Automattic/pocket-casts-android/pull/5329))
 
 
 8.23
@@ -8,12 +28,16 @@
     *   Add a What's new feed with announcements from the Pocket Casts team, opened from the bell on the Profile tab. Unread messages show a dot, which you can turn off in Settings → General, and read messages sync across your devices when you're signed in
         ([#6082](https://github.com/Automattic/pocket-casts-android/pull/6082))
 *   Bug Fixes
+    *   Fix adjusting the volume with the watch crown on the Wear OS Now Playing screen
+        ([#6129](https://github.com/Automattic/pocket-casts-android/pull/6129))
     *   Show the same flat toolbar on every screen opened from Profile
         ([#6093](https://github.com/Automattic/pocket-casts-android/pull/6093))
     *   Fix a crash when refreshing podcasts while the system account service is unavailable
         ([#6105](https://github.com/Automattic/pocket-casts-android/pull/6105))
     *   Fix a crash when opening onboarding or upgrade screens on Android 8.0
         ([#6104](https://github.com/Automattic/pocket-casts-android/pull/6104))
+    *   Fix the player showing a different episode from the one playing after tapping Play next on the current episode
+        ([#6145](https://github.com/Automattic/pocket-casts-android/pull/6145))
 
 8.22
 -----

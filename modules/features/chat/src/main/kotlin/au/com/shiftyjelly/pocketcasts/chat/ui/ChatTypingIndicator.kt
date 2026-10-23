@@ -1,5 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.chat.ui
 
+import androidx.compose.animation.core.InfiniteTransition
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.keyframes
@@ -8,90 +10,67 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.State
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
+import kotlin.math.abs
+import kotlin.math.min
 
 @Composable
 internal fun ChatTypingIndicator(
     theme: ChatTheme,
     modifier: Modifier = Modifier,
-    showBubble: Boolean = true,
-    dotColor: Color = theme.aiBubbleText,
+    transition: InfiniteTransition = rememberInfiniteTransition(label = "typing"),
 ) {
-    val cycleDuration = 1200
-    val transition = rememberInfiniteTransition(label = "typing")
-
-    fun dotKeyframes(delayMs: Int) = infiniteRepeatable<Float>(
-        animation = keyframes {
-            durationMillis = cycleDuration
-            0.3f at 0
-            0.3f at delayMs
-            1f at delayMs + 300
-            0.3f at delayMs + 600
-            0.3f at cycleDuration
-        },
-    )
-
-    val dot1Alpha by transition.animateFloat(
-        initialValue = 0.3f,
-        targetValue = 0.3f,
-        animationSpec = dotKeyframes(0),
-        label = "dot1",
-    )
-    val dot2Alpha by transition.animateFloat(
-        initialValue = 0.3f,
-        targetValue = 0.3f,
-        animationSpec = dotKeyframes(200),
-        label = "dot2",
-    )
-    val dot3Alpha by transition.animateFloat(
-        initialValue = 0.3f,
-        targetValue = 0.3f,
-        animationSpec = dotKeyframes(400),
-        label = "dot3",
-    )
-
-    val shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp, bottomStart = 4.dp, bottomEnd = 16.dp)
-
+    val isReduceMotionEnabled = rememberIsReduceMotionEnabled()
     Row(
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
         verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier.then(
-            if (showBubble) {
-                Modifier
-                    .background(theme.aiBubble, shape)
-                    .padding(horizontal = 14.dp, vertical = 10.dp)
-            } else {
-                Modifier
-            },
-        ),
+        modifier = modifier,
     ) {
-        Box(
-            modifier = Modifier
-                .size(8.dp)
-                .alpha(dot1Alpha)
-                .background(dotColor, CircleShape),
-        )
-        Box(
-            modifier = Modifier
-                .size(8.dp)
-                .alpha(dot2Alpha)
-                .background(dotColor, CircleShape),
-        )
-        Box(
-            modifier = Modifier
-                .size(8.dp)
-                .alpha(dot3Alpha)
-                .background(dotColor, CircleShape),
-        )
+        repeat(DOT_COUNT) { index ->
+            val alpha = transition.dotAlpha(peakMs = index * DOT_STAGGER_MS)
+            Box(
+                modifier = Modifier
+                    .size(8.dp)
+                    .graphicsLayer { this.alpha = if (isReduceMotionEnabled) REDUCED_MOTION_DOT_ALPHA else alpha.value }
+                    .background(theme.primaryText, CircleShape),
+            )
+        }
     }
 }
+
+@Composable
+private fun InfiniteTransition.dotAlpha(peakMs: Int): State<Float> = animateFloat(
+    initialValue = MIN_DOT_ALPHA,
+    targetValue = MIN_DOT_ALPHA,
+    animationSpec = infiniteRepeatable(
+        animation = keyframes {
+            durationMillis = CYCLE_DURATION_MS
+            for (timeMs in 0..CYCLE_DURATION_MS step DOT_STAGGER_MS) {
+                dotAlphaAt(timeMs, peakMs) at timeMs using LinearEasing
+            }
+        },
+    ),
+    label = "dot$peakMs",
+)
+
+private fun dotAlphaAt(timeMs: Int, peakMs: Int): Float {
+    val distance = abs(timeMs - peakMs)
+    return when (min(distance, CYCLE_DURATION_MS - distance)) {
+        0 -> 1f
+        DOT_STAGGER_MS -> 0.6f
+        else -> MIN_DOT_ALPHA
+    }
+}
+
+private const val DOT_COUNT = 3
+private const val DOT_STAGGER_MS = 200
+private const val CYCLE_DURATION_MS = 1200
+private const val MIN_DOT_ALPHA = 0.3f
+private const val REDUCED_MOTION_DOT_ALPHA = 0.6f

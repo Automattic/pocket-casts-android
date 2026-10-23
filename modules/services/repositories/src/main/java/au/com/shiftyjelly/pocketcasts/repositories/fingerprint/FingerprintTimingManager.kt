@@ -84,6 +84,7 @@ class FingerprintTimingManager @Inject constructor(
         PLAYBACK,
         TRANSCRIPT_VIEW,
         BOOKMARK,
+        CHAT,
     }
 
     sealed interface State {
@@ -235,8 +236,8 @@ class FingerprintTimingManager @Inject constructor(
             val gen: Long
             mutex.withLock {
                 // Already prepared for this episode — reuse existing state. A failed preparation may
-                // retry when the user opens the transcript, since the failure could be transient.
-                val retryableFailure = trigger == PrepareTrigger.TRANSCRIPT_VIEW && state is State.Failed
+                // retry when the user opens the transcript or a chat quote, since the failure could be transient.
+                val retryableFailure = canRetryFailedPreparation(trigger) && state is State.Failed
                 if (currentEpisodeUuid == episodeUuid && state !is State.Idle && !retryableFailure) {
                     if (trigger == PrepareTrigger.TRANSCRIPT_VIEW) {
                         currentTrigger = trigger
@@ -300,6 +301,11 @@ class FingerprintTimingManager @Inject constructor(
     fun onTranscriptShown(episodeUuid: String) {
         if (playbackManager.getCurrentEpisode()?.uuid != episodeUuid) return
         prepareForCurrentEpisode(PrepareTrigger.TRANSCRIPT_VIEW)
+    }
+
+    fun onChatQuoteShown(episodeUuid: String) {
+        if (playbackManager.getCurrentEpisode()?.uuid != episodeUuid) return
+        prepareForCurrentEpisode(PrepareTrigger.CHAT)
     }
 
     fun onTranscriptDismissed(episodeUuid: String) {
@@ -1577,6 +1583,8 @@ class FingerprintTimingManager @Inject constructor(
             warnOnMeteredNetwork: Boolean,
             isUnmetered: () -> Boolean,
         ): Boolean = !isDownloaded && warnOnMeteredNetwork && !isUnmetered()
+
+        internal fun canRetryFailedPreparation(trigger: PrepareTrigger): Boolean = trigger == PrepareTrigger.TRANSCRIPT_VIEW || trigger == PrepareTrigger.CHAT
 
         fun interpolate(
             time: Double,

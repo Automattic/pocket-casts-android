@@ -6,12 +6,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import au.com.shiftyjelly.pocketcasts.compose.PlayerColors
 import au.com.shiftyjelly.pocketcasts.compose.ThemeColors
+import au.com.shiftyjelly.pocketcasts.compose.ThemeLightColors
 import au.com.shiftyjelly.pocketcasts.compose.theme
 
 internal data class ChatTheme(
     val background: Color,
     val primaryText: Color,
     val secondaryText: Color,
+    val tertiaryText: Color,
     val iconButton: Color,
     val aiBubble: Color,
     val aiBubbleText: Color,
@@ -22,13 +24,24 @@ internal data class ChatTheme(
     val inputHint: Color,
     val sendButton: Color,
     val sendButtonIcon: Color,
-    val divider: Color,
+    val closeButtonBackground: Color,
+    val progress: Color,
+    val progressTrack: Color,
+    val chipBorder: Color,
+    val quoteTimestamp: Color,
+    val onWhiteText: Color,
+    val sheetHandle: Color,
+    val rating: Color,
+    val errorText: Color,
+    val toastAction: Color,
+    val offlineNote: Color,
 ) {
     companion object {
         fun default(colors: ThemeColors) = ChatTheme(
             background = colors.primaryUi01,
             primaryText = colors.primaryText01,
             secondaryText = colors.primaryText02,
+            tertiaryText = colors.primaryText02,
             iconButton = colors.primaryIcon01,
             aiBubble = colors.primaryUi05,
             aiBubbleText = colors.primaryText01,
@@ -39,24 +52,45 @@ internal data class ChatTheme(
             inputHint = colors.primaryText02,
             sendButton = colors.primaryInteractive01,
             sendButtonIcon = colors.primaryInteractive02,
-            divider = colors.primaryUi05,
+            closeButtonBackground = colors.primaryUi05,
+            progress = colors.primaryInteractive01,
+            progressTrack = colors.primaryText02,
+            chipBorder = colors.primaryUi05,
+            quoteTimestamp = colors.primaryInteractive01,
+            onWhiteText = ThemeLightColors.primaryText01,
+            sheetHandle = ThemeLightColors.primaryUi05,
+            rating = colors.primaryIcon02,
+            errorText = colors.support05,
+            toastAction = ThemeLightColors.primaryInteractive01,
+            offlineNote = colors.primaryText02,
         )
 
         fun player(colors: PlayerColors) = ChatTheme(
             background = colors.background01,
-            primaryText = colors.contrast02,
+            primaryText = colors.contrast01,
             secondaryText = colors.contrast04,
-            iconButton = colors.contrast02,
+            tertiaryText = colors.contrast02,
+            iconButton = colors.contrast01,
             aiBubble = colors.contrast05,
-            aiBubbleText = colors.contrast02,
-            userBubble = colors.contrast01,
-            userBubbleText = colors.background01,
-            inputBackground = colors.contrast05,
-            inputText = colors.contrast02,
-            inputHint = colors.contrast04,
+            aiBubbleText = colors.contrast01,
+            userBubble = colors.contrast06,
+            userBubbleText = colors.contrast01,
+            inputBackground = colors.contrast06,
+            inputText = colors.contrast01,
+            inputHint = colors.contrast03,
             sendButton = colors.contrast01,
             sendButtonIcon = colors.background01,
-            divider = colors.contrast05,
+            closeButtonBackground = colors.contrast05,
+            progress = colors.highlight01,
+            progressTrack = colors.contrast02,
+            chipBorder = colors.contrast05,
+            quoteTimestamp = QuoteTimestampBlue,
+            onWhiteText = ThemeLightColors.primaryText01,
+            sheetHandle = ThemeLightColors.primaryUi05,
+            rating = colors.contrast05,
+            errorText = ErrorRed,
+            toastAction = ThemeLightColors.primaryInteractive01,
+            offlineNote = colors.contrast02.copy(alpha = maxOf(colors.contrast02.alpha, OFFLINE_NOTE_MIN_ALPHA)),
         )
     }
 }
@@ -74,3 +108,7 @@ internal fun rememberChatTheme(): ChatTheme {
         }
     }
 }
+
+private val QuoteTimestampBlue = Color(0xFF2A67F9)
+private val ErrorRed = Color(0xFFF43E37)
+private const val OFFLINE_NOTE_MIN_ALPHA = 0.6f
