@@ -354,6 +354,7 @@ open class PlaybackManager @Inject constructor(
                                 )
                             }
                         }
+                        releaseCastPlayerFromLostSession()
                     }
                 }
             })
