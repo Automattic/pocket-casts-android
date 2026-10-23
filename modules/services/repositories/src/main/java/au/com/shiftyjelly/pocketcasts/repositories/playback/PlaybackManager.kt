@@ -2133,6 +2133,8 @@ open class PlaybackManager @Inject constructor(
             val castPlayer = player as? CastPlayer ?: return@withContext
             if (!castPlayer.isBoundToCurrentSession()) {
                 LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Releasing Cast player from a lost Cast session")
+                cancelUpdateTimer()
+                cancelBufferUpdateTimer()
                 castPlayer.stop()
                 player = null
             }
