@@ -399,6 +399,19 @@ class WhatsNewMessageViewModelTest {
         )
     }
 
+    @Test
+    fun `a files action is offered and not reported when tapped`() = runTest {
+        feedMessages.value = listOf(message("files", page(WhatsNewAction(type = "open_files", label = "Open files", url = null))))
+        val viewModel = createViewModel("files")
+
+        viewModel.uiState.test {
+            val action = (expectMostRecentItem() as UiState.Loaded).pages.single().action
+            assertEquals(WhatsNewMessageViewModel.Action("Open files", WhatsNewActionEvent.OpenFiles), action)
+            viewModel.onActionClick(action!!.event)
+        }
+        verify(eventHorizon, never()).track(any<WhatsNewActionTappedEvent>())
+    }
+
     private fun page(action: WhatsNewAction?) = WhatsNewPage(image = null, heading = "Heading", description = "Description", action = action)
 
     private fun message(id: String, vararg pages: WhatsNewPage) = message(id).copy(content = WhatsNewContent.Pages(pages.toList()))
