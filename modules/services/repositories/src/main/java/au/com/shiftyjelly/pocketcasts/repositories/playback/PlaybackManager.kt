@@ -2107,12 +2107,23 @@ open class PlaybackManager @Inject constructor(
             forcePlayerSwitch = false
             return true
         }
-        // using Chrome Cast make sure the player is connected
-        return if (!castManager.isConnected()) {
-            player is CastPlayer
-        } else {
-            player is SimplePlayer
-        } // otherwise use the ExoPlayer
+        val castPlayer = player as? CastPlayer
+        return castPlayerSwitchRequired(
+            isCastConnected = castManager.isConnected(),
+            isCastPlayer = castPlayer != null,
+            isBoundToCurrentSession = castPlayer?.isBoundToCurrentSession() == true,
+        )
+    }
+
+    private suspend fun releaseCastPlayerFromLostSession() {
+        withContext(Dispatchers.Main) {
+            val castPlayer = player as? CastPlayer ?: return@withContext
+            if (!castPlayer.isBoundToCurrentSession()) {
+                LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Releasing Cast player from a lost Cast session")
+                castPlayer.stop()
+                player = null
+            }
+        }
     }
 
     /**
@@ -2177,6 +2188,7 @@ open class PlaybackManager @Inject constructor(
         cancelUpdateTimer()
         cancelBufferUpdateTimer()
 
+        releaseCastPlayerFromLostSession()
         val currentPlayer = this.player
         val sameEpisode = currentPlayer != null && episode.uuid == currentPlayer.episodeUuid
 
@@ -3086,6 +3098,18 @@ internal enum class CastSessionFailureAction {
     Ignore,
     ShowToast,
     ShowToastAndError,
+}
+
+internal fun castPlayerSwitchRequired(
+    isCastConnected: Boolean,
+    isCastPlayer: Boolean,
+    isBoundToCurrentSession: Boolean,
+): Boolean {
+    return if (isCastConnected) {
+        !isCastPlayer || !isBoundToCurrentSession
+    } else {
+        isCastPlayer
+    }
 }
 
 internal fun castSessionFailureAction(
