@@ -125,6 +125,7 @@ class CastManagerImpl @Inject constructor(
         override fun onSessionStartFailed(session: Session, i: Int) {
             LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Cast session start failed with error code $i")
             sessionListener?.sessionFailed(i, CastManager.SessionFailureType.START)
+            _isConnectedFlow.value = getSessionManager()?.currentCastSession?.isConnected == true
         }
 
         override fun onSessionEnding(session: Session) {
@@ -151,6 +152,7 @@ class CastManagerImpl @Inject constructor(
         override fun onSessionResumeFailed(session: Session, i: Int) {
             LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Cast session resume failed with error code $i")
             sessionListener?.sessionFailed(i, CastManager.SessionFailureType.RESUME)
+            _isConnectedFlow.value = getSessionManager()?.currentCastSession?.isConnected == true
         }
 
         override fun onSessionSuspended(session: Session, i: Int) {
