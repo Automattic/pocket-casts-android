@@ -28,6 +28,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
@@ -44,12 +45,30 @@ class CloudSettingsViewModelTest {
     private val cloudAutoDownloadFlow = MutableStateFlow(false)
     private val cloudDownloadOnlyOnWifiFlow = MutableStateFlow(false)
 
-    private val cloudAddToUpNextSetting = mock<UserSetting<Boolean>> { on { flow } doReturn cloudAddToUpNextFlow }
-    private val deleteLocalFileAfterPlayingSetting = mock<UserSetting<Boolean>> { on { flow } doReturn deleteLocalFileAfterPlayingFlow }
-    private val deleteCloudFileAfterPlayingSetting = mock<UserSetting<Boolean>> { on { flow } doReturn deleteCloudFileAfterPlayingFlow }
-    private val cloudAutoUploadSetting = mock<UserSetting<Boolean>> { on { flow } doReturn cloudAutoUploadFlow }
-    private val cloudAutoDownloadSetting = mock<ReadWriteSetting<Boolean>> { on { flow } doReturn cloudAutoDownloadFlow }
-    private val cloudDownloadOnlyOnWifiSetting = mock<UserSetting<Boolean>> { on { flow } doReturn cloudDownloadOnlyOnWifiFlow }
+    private val cloudAddToUpNextSetting = mock<UserSetting<Boolean>> {
+        on { flow } doReturn cloudAddToUpNextFlow
+        on { value } doAnswer { cloudAddToUpNextFlow.value }
+    }
+    private val deleteLocalFileAfterPlayingSetting = mock<UserSetting<Boolean>> {
+        on { flow } doReturn deleteLocalFileAfterPlayingFlow
+        on { value } doAnswer { deleteLocalFileAfterPlayingFlow.value }
+    }
+    private val deleteCloudFileAfterPlayingSetting = mock<UserSetting<Boolean>> {
+        on { flow } doReturn deleteCloudFileAfterPlayingFlow
+        on { value } doAnswer { deleteCloudFileAfterPlayingFlow.value }
+    }
+    private val cloudAutoUploadSetting = mock<UserSetting<Boolean>> {
+        on { flow } doReturn cloudAutoUploadFlow
+        on { value } doAnswer { cloudAutoUploadFlow.value }
+    }
+    private val cloudAutoDownloadSetting = mock<ReadWriteSetting<Boolean>> {
+        on { flow } doReturn cloudAutoDownloadFlow
+        on { value } doAnswer { cloudAutoDownloadFlow.value }
+    }
+    private val cloudDownloadOnlyOnWifiSetting = mock<UserSetting<Boolean>> {
+        on { flow } doReturn cloudDownloadOnlyOnWifiFlow
+        on { value } doAnswer { cloudDownloadOnlyOnWifiFlow.value }
+    }
 
     private val settings = mock<Settings> {
         on { cloudAddToUpNext } doReturn cloudAddToUpNextSetting
@@ -136,8 +155,6 @@ class CloudSettingsViewModelTest {
 
     @Test
     fun `isSignedInAsPlusOrPatron is false when signed out`() = runTest {
-        // Flip a preference so the assertion can only pass if the combine actually emitted,
-        // rather than matching the UiState() default.
         cloudAutoUploadFlow.value = true
 
         createViewModel().uiState.test {

@@ -59,7 +59,14 @@ class CloudSettingsViewModel @Inject constructor(
     ).stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000L),
-        initialValue = UiState(),
+        initialValue = UiState(
+            cloudAddToUpNext = settings.cloudAddToUpNext.value,
+            deleteLocalFileAfterPlaying = settings.deleteLocalFileAfterPlaying.value,
+            deleteCloudFileAfterPlaying = settings.deleteCloudFileAfterPlaying.value,
+            cloudAutoUpload = settings.cloudAutoUpload.value,
+            cloudAutoDownload = settings.cloudAutoDownload.value,
+            cloudDownloadOnlyOnWifi = settings.cloudDownloadOnlyOnWifi.value,
+        ),
     )
 
     fun onShown() {
@@ -137,12 +144,12 @@ class CloudSettingsViewModel @Inject constructor(
     }
 
     data class UiState(
-        val cloudAddToUpNext: Boolean = false,
-        val deleteLocalFileAfterPlaying: Boolean = false,
-        val deleteCloudFileAfterPlaying: Boolean = false,
-        val cloudAutoUpload: Boolean = false,
-        val cloudAutoDownload: Boolean = false,
-        val cloudDownloadOnlyOnWifi: Boolean = false,
+        val cloudAddToUpNext: Boolean,
+        val deleteLocalFileAfterPlaying: Boolean,
+        val deleteCloudFileAfterPlaying: Boolean,
+        val cloudAutoUpload: Boolean,
+        val cloudAutoDownload: Boolean,
+        val cloudDownloadOnlyOnWifi: Boolean,
         val isSignedInAsPlusOrPatron: Boolean = false,
         val isUpgradeBannerVisible: Boolean = false,
     )
