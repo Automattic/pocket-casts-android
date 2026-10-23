@@ -21,6 +21,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.core.content.IntentCompat
 import androidx.core.net.toUri
 import androidx.media.utils.MediaConstants.PLAYBACK_STATE_EXTRAS_KEY_MEDIA_ID
+import androidx.media3.common.MediaItem
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.CommandButton
 import androidx.media3.session.MediaLibraryService
@@ -449,6 +450,9 @@ class MediaSessionManager(
         pendingPlayer = null
         castStatePlayer = null
         val swapped = currentPlayer.swapPlayer(exoPlayer)
+        if (swapped.currentMediaItem.mediaId == MediaItem.DEFAULT_MEDIA_ID) {
+            swapped.clearMetadata()
+        }
         forwardingPlayer = swapped
         media3Session?.player = swapped
         placeholderPlayer?.release()
@@ -464,7 +468,7 @@ class MediaSessionManager(
         if (currentPlayer.wrappedPlayer is SeedStatePlayer) return
         val seed = SeedStatePlayer(Looper.getMainLooper())
         val swapped = currentPlayer.swapPlayer(seed)
-        swapped.clearMetadata()
+        swapped.clearMetadata(title = context.getString(LR.string.automotive_nothing_playing_title))
         forwardingPlayer = swapped
         media3Session?.player = swapped
         placeholderPlayer?.release()
