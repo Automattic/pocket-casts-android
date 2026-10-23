@@ -16,6 +16,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveLimit
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.utils.extensions.escapeLike
@@ -129,6 +130,25 @@ abstract class PodcastDao {
     fun observeSubscribedOrderByLatestEpisode(orderAsc: Boolean): Flow<List<Podcast>> {
         return if (orderAsc) observeSubscribedOrderByLatestEpisodeAsc() else observeSubscribedOrderByLatestEpisodeDesc()
     }
+
+    @Query(
+        """
+        SELECT podcasts.uuid
+        FROM podcasts
+        WHERE podcasts.subscribed = 1
+          AND EXISTS (SELECT 1 FROM podcast_episodes WHERE podcast_episodes.podcast_id = podcasts.uuid)
+          AND NOT EXISTS (
+            SELECT 1 FROM podcast_episodes
+            WHERE podcast_episodes.podcast_id = podcasts.uuid
+              AND podcast_episodes.archived = 0
+              AND podcast_episodes.playing_status IN (:playingStatusNotPlayed, :playingStatusInProgress)
+          )
+        """,
+    )
+    abstract fun observePlayedPodcastUuids(
+        playingStatusNotPlayed: Int = EpisodePlayingStatus.NOT_PLAYED.ordinal,
+        playingStatusInProgress: Int = EpisodePlayingStatus.IN_PROGRESS.ordinal,
+    ): Flow<List<String>>
 
     @Query(
         """

@@ -3,6 +3,8 @@
 *   New Features
     *   Show Google Play's in-app message when a subscription payment is declined, so you can fix the payment without leaving the app
         ([#6153](https://github.com/Automattic/pocket-casts-android/pull/6153))
+    *   Add an option to hide played podcasts from the Podcasts tab, in the "…" menu
+        ([#6203](https://github.com/Automattic/pocket-casts-android/pull/6203))
 *   Bug Fixes
     *   Fix tapping the media player or a notification not opening the app after changing the app icon
         ([#6181](https://github.com/Automattic/pocket-casts-android/pull/6181))
