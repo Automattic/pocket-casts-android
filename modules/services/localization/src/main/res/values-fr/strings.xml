@@ -1,16 +1,62 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-10-08 15:54:28+0000
+Translation-Revision-Date: 2026-10-20 09:54:26+0000
 Plural-Forms: nplurals=2; plural=n > 1;
 Generator: GlotPress/2.4.0-alpha
 Language: fr
 -->
 <resources>
-    <string name="manual_playlist_no_content_body_alternative">Choisissez des épisodes parmi les podcasts que vous suivez. Autrement, faites un glissement vers la gauche sur n’importe quel épisode pour l’ajouter au fur et à mesure.</string>
+    <string name="chat_about_episode">Discussion à propos de %1$s</string>
+    <string name="chat_now_playing_episode">En cours de lecture : %1$s</string>
+    <string name="chat_undo">Annuler</string>
+    <string name="chat_history_older">Précédent</string>
+    <string name="chat_history_previous_7_days">7 jours précédents</string>
+    <string name="chat_history">Historique de la discussion</string>
+    <string name="chat_deleted">Discussion supprimée</string>
+    <string name="chat_cleared">Discussion effacée</string>
+    <string name="chat_offline_note">Vous êtes hors ligne. Connectez-vous pour poser une question.</string>
+    <string name="chat_answering">Réponse en cours</string>
+    <string name="chat_error_server_on_our_end">Un problème est survenu de notre côté.</string>
+    <string name="chat_not_sent_tap_to_retry">Non envoyé. Touchez pour réessayer.</string>
+    <string name="chat_feedback_send_failed">Impossible d’envoyer vos commentaires. Vérifiez votre connexion.</string>
+    <string name="chat_feedback_sending">Envoi des commentaires</string>
+    <string name="chat_feedback_what_went_wrong">Ce qui s’est passé</string>
+    <string name="chat_beta_sheet_sign_in">Se connecter pour essayer</string>
+    <string name="episode_chat_needs_transcript_message">La fonctionnalité Poser une question sur cet épisode nécessite une transcription. Cet épisode n’en a pas.</string>
+    <string name="onboarding_episode_chat_question_2">Résumer les principaux points à retenir ?</string>
+    <string name="onboarding_episode_chat_answer">Cet épisode traite de l’IA, de la santé et de la productivité.</string>
+    <string name="onboarding_episode_chat_question_1">Quels sont les sujets clés ?</string>
+    <string name="onboarding_episode_chat_title">Poser une question sur cet épisode :</string>
+    <string name="chat_feedback_learn_more">Lire la suite</string>
+    <string name="chat_feedback_legal">L’envoi partage cette conversation avec nous pour nous aider à améliorer la discussion.</string>
+    <string name="chat_feedback_submit">Envoyer vos commentaires</string>
+    <string name="chat_feedback_details_hint">Détails du partage (facultatif)</string>
+    <string name="chat_feedback_reason_other">Autre</string>
+    <string name="chat_feedback_reason_offensive">C’est offensant</string>
+    <string name="chat_feedback_reason_out_of_date">Il n’est plus à jour</string>
+    <string name="chat_feedback_reason_wrong_facts">Il s’est trompé de faits</string>
+    <string name="chat_feedback_reason_not_interesting">Ce n’était pas intéressant</string>
+    <string name="chat_rate_answer_bad">Mauvaise réponse</string>
+    <string name="chat_rate_answer_good">Bonne réponse</string>
+    <string name="chat_feedback_thank_you">Merci pour vos retours</string>
+    <string name="chat_survey_yes">Oui !</string>
+    <string name="chat_survey_not_really">Pas vraiment</string>
+    <string name="chat_survey_title">Vous aimez la fonctionnalité Poser des questions sur cet épisode ?</string>
+    <string name="chat_ai_disclaimer">L’IA peut faire des erreurs, alors revérifiez ses réponses.</string>
+    <string name="chat_suggestion_summarize">Résumer cet épisode</string>
+    <string name="chat_welcome">Posez vos questions sur cet épisode. Ou commencez ici.</string>
+    <string name="chat_input_question_hint">Posez une question…</string>
+    <string name="chat_beta_note">Poser des questions sur cet épisode est en version bêta</string>
+    <string name="chat_beta_sheet_body">Gratuit pour tous pendant la phase de test. Elle deviendra ensuite une fonctionnalité Plus.</string>
+    <string name="chat_beta_sheet_title">Poser des questions sur cet épisode est en version bêta</string>
+    <string name="episode_chat_tooltip_body">Posez-lui toutes vos questions. Il écoutait aussi.</string>
+    <string name="episode_chat_beta_badge">Bêta</string>
+    <string name="episode_chat_shelf_title">Poser une question sur cet épisode</string>
     <string name="manual_playlist_no_content_body">Trouvez un podcast que vous aimez, puis balayez vers la gauche sur n’importe quel épisode pour l’ajouter.</string>
+    <string name="manual_playlist_no_content_body_alternative">Choisissez des épisodes parmi les podcasts que vous suivez. Autrement, balayez vers la gauche sur n’importe quel épisode pour l’ajouter au fur et à mesure.</string>
     <string name="settings_general_whats_new_unread_dot_summary">Affichez un point d’état non lu sur le profil lorsque des messages de nouveautés sont disponibles.</string>
     <string name="settings_general_whats_new_unread_dot">Afficher le point d’état non lu</string>
-    <string name="up_next_as_playlist_replace_body">Lancer cette lecture remplacera votre file d’attente actuelle. Enregistrez cet audio dans une liste de lecture pour le conserver.</string>
+    <string name="up_next_as_playlist_replace_body">Lancer cette lecture remplacera votre file d’attente actuelle. Enregistrez ce contenu dans une liste de lecture pour le conserver.</string>
     <string name="whats_new_message_page_progress">Page %1$d sur %2$d</string>
     <string name="whats_new_poll_answered">Merci de votre retour.</string>
     <string name="whats_new_research_title">Étude auprès des utilisateurs</string>
@@ -36,9 +82,9 @@ Language: fr
     <string name="bookmark_adding_transcript">Ajout de la transcription…</string>
     <string name="settings_app_icon_updated_message_v2">Cette nouvelle icône peut mettre quelques minutes à apparaître. Si le raccourci disparaît de l’écran d’accueil, ajoutez à nouveau Pocket Casts à partir de l’écran Toutes les applications.</string>
     <string name="go_to_episode">Aller à l’épisode</string>
-    <string name="smart_bookmarks_upsell_message">En un geste, Donnez-lui un nom et des mots.</string>
     <string name="smart_bookmarks_upsell_title">Enregistrer les moments qui en valent la peine</string>
     <string name="bookmarks_upgrade_example_passage">C’est une personne que vous recrutez, et non un CV.</string>
+    <string name="smart_bookmarks_upsell_message">En un geste, donnez-lui un nom et des mots.</string>
     <string name="bookmark_edit_transcript_title">Modifier la transcription</string>
     <string name="bookmarks_upgrade_example_title">La salle d’audition</string>
     <string name="bookmark_suggestion_prefix">Suggestion :</string>

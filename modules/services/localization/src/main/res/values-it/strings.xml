@@ -1,56 +1,102 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-10-08 09:54:55+0000
+Translation-Revision-Date: 2026-10-19 14:55:54+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: it
 -->
 <resources>
-    <string name="manual_playlist_no_content_body_alternative">Scegli gli episodi dai podcast che segui. In alternativa, scorri verso sinistra su qualsiasi episodio per aggiungerlo mentre procedi.</string>
+    <string name="chat_about_episode">Parla di %1$s</string>
+    <string name="chat_now_playing_episode">Riproduzione in corso di %1$s</string>
+    <string name="chat_undo">Annulla</string>
+    <string name="chat_history_older">Più vecchi</string>
+    <string name="chat_history_previous_7_days">Precedenti 7 giorni</string>
+    <string name="chat_history">Cronologia della conversazione</string>
+    <string name="chat_deleted">Conversazione eliminata</string>
+    <string name="chat_cleared">Conversazione cancellata</string>
+    <string name="chat_offline_note">Sei offline. Connettiti per fare una domanda.</string>
+    <string name="chat_answering">Risposta</string>
+    <string name="chat_error_server_on_our_end">Si è verificato un problema da parte nostra.</string>
+    <string name="chat_not_sent_tap_to_retry">Non inviato. Tocca per provare di nuovo.</string>
+    <string name="chat_feedback_send_failed">Impossibile inviare il tuo feedback. Controlla la connessione.</string>
+    <string name="chat_feedback_sending">Invio del feedback in corso</string>
+    <string name="chat_feedback_what_went_wrong">Cosa è andato storto</string>
+    <string name="chat_beta_sheet_sign_in">Accedi per provarlo</string>
+    <string name="episode_chat_needs_transcript_message">Chiedi informazioni su questo episodio richiede una trascrizione. Questo episodio non ne ha una.</string>
+    <string name="onboarding_episode_chat_question_2">Riassumere i punti principali?</string>
+    <string name="onboarding_episode_chat_answer">Questo episodio riguarda IA, salute e produttività.</string>
+    <string name="onboarding_episode_chat_question_1">Quali sono gli argomenti chiave?</string>
+    <string name="onboarding_episode_chat_title">Chiedi informazioni su questo episodio:</string>
+    <string name="chat_feedback_learn_more">Scopri di più</string>
+    <string name="chat_feedback_legal">L\'invio condivide questa conversazione con noi per migliorare l\'esperienza.</string>
+    <string name="chat_feedback_submit">Invia feedback</string>
+    <string name="chat_feedback_details_hint">Condividi i dettagli (facoltativo)</string>
+    <string name="chat_feedback_reason_other">Altro</string>
+    <string name="chat_feedback_reason_offensive">È offensivo</string>
+    <string name="chat_feedback_reason_out_of_date">Non è aggiornato</string>
+    <string name="chat_feedback_reason_wrong_facts">Ha sbagliato i fatti</string>
+    <string name="chat_feedback_reason_not_interesting">Non era interessante</string>
+    <string name="chat_rate_answer_bad">Risposta non soddisfacente</string>
+    <string name="chat_rate_answer_good">Risposta soddisfacente</string>
+    <string name="chat_feedback_thank_you">Grazie per il feedback</string>
+    <string name="chat_survey_yes">Sì!</string>
+    <string name="chat_survey_not_really">Non proprio</string>
+    <string name="chat_survey_title">Ti piace Chiedi informazioni su questo episodio?</string>
+    <string name="chat_ai_disclaimer">L\'IA può commettere errori, quindi ricontrolla.</string>
+    <string name="chat_suggestion_summarize">Riassumi questo episodio</string>
+    <string name="chat_welcome">Fai una domanda qualsiasi su questo episodio. Oppure, inizia qui.</string>
+    <string name="chat_input_question_hint">Fai una domanda…</string>
+    <string name="chat_beta_note">Chiedi informazioni su questo episodio è in versione beta</string>
+    <string name="chat_beta_sheet_body">Gratuito per tutti mentre lo testiamo. Diventerà una funzionalità Plus in un secondo momento.</string>
+    <string name="chat_beta_sheet_title">Chiedi informazioni su questo episodio è in versione beta</string>
+    <string name="episode_chat_tooltip_body">Chiedigli qualsiasi cosa. Stava anche ascoltando.</string>
+    <string name="episode_chat_beta_badge">Beta</string>
+    <string name="episode_chat_shelf_title">Chiedi informazioni su questo episodio</string>
     <string name="manual_playlist_no_content_body">Trova un podcast che ti piace, quindi scorri verso sinistra su qualsiasi episodio per aggiungerlo.</string>
-    <string name="settings_general_whats_new_unread_dot_summary">Mostra un punto non letto sul Profilo quando ci sono nuovi messaggi di Novità.</string>
-    <string name="settings_general_whats_new_unread_dot">Show unread dot</string>
-    <string name="up_next_as_playlist_replace_body">La riproduzione di questo elemento sostituirà l\'attuale Prossimo. Salva come playlist per mantenerla.</string>
+    <string name="manual_playlist_no_content_body_alternative">Scegli gli episodi dai podcast che segui. Oppure scorri verso sinistra su qualsiasi episodio per aggiungerlo man mano.</string>
+    <string name="settings_general_whats_new_unread_dot_summary">Mostra un puntino \"non letto\" su Profilo quando ci sono nuovi messaggi in Novità.</string>
+    <string name="settings_general_whats_new_unread_dot">Mostra puntino \"non letto\"</string>
+    <string name="up_next_as_playlist_replace_body">Riprodurre questo episodio sostituirà l\'elenco Successivo attuale. Salvalo come playlist per conservarlo.</string>
     <string name="whats_new_message_page_progress">Pagina %1$d di %2$d</string>
-    <string name="whats_new_poll_answered">Thanks for answering.</string>
+    <string name="whats_new_poll_answered">Grazie per la risposta.</string>
     <string name="whats_new_research_title">Ricerca degli utenti</string>
     <string name="whats_new_feed_unable_to_load">Impossibile caricare le novità</string>
     <string name="whats_new_feed_all_read">Tutti i messaggi contrassegnati come letti</string>
-    <string name="whats_new_feed_read_all">Read all</string>
     <string name="whats_new_feed_unread">Non letti</string>
-    <string name="whats_new_feed_empty_description">Nuove funzionalità, suggerimenti e annunci appariranno\u00A0qui.</string>
+    <string name="whats_new_feed_read_all">Leggi tutto</string>
+    <string name="whats_new_feed_empty_description">Nuove funzionalità, suggerimenti e annunci apparirannou00A0qui.</string>
     <string name="whats_new_feed_empty_title">Ancora nessun messaggio</string>
-    <string name="whats_new_category_research">User Research</string>
-    <string name="whats_new_category_known_issue">problemi noti</string>
     <string name="whats_new_category_announcement">Annuncio</string>
-    <string name="whats_new_category_tip">Suggerimenti e trucchi</string>
     <string name="whats_new_category_new_feature">Nuova funzionalità</string>
+    <string name="whats_new_category_research">Ricerca degli utenti</string>
+    <string name="whats_new_category_known_issue">Problema noto</string>
+    <string name="whats_new_category_tip">Trucchi e suggerimenti</string>
     <string name="bookmark_title_label">Titolo</string>
     <string name="bookmarks_deleted_undo">Annulla</string>
     <string name="device_approve_switch_account_confirm">Cambia account</string>
-    <string name="device_approve_switch_account_message">Questa opzione ti disconnette e rimuove i podcast, i filtri e la cronologia di ascolto su questo dispositivo.</string>
-    <string name="device_approve_switch_account_title">Cambia account</string>
     <string name="device_approve_switch_account">Non sei tu? Cambia account</string>
+    <string name="device_approve_switch_account_message">Questa operazione effettua la disconnessione e rimuove i podcast, i filtri e la cronologia di ascolto su questo dispositivo.</string>
+    <string name="device_approve_switch_account_title">Cambiare account?</string>
     <string name="bookmark_edit_transcript_selection">Passaggio selezionato: %1$s</string>
-    <string name="removed_from_playlist_feedback">Rimuovi dalla playlist</string>
-    <string name="bookmark_adding_transcript">Aggiunta trascrizione…</string>
-    <string name="settings_app_icon_updated_message_v2">La visualizzazione di questa nuova icona potrebbe richiedere alcuni minuti. Se il collegamento alla schermata Home scompare, aggiungi nuovamente Pocket Casts dalla schermata di tutte le app.</string>
+    <string name="removed_from_playlist_feedback">Rimosso dalla playlist</string>
+    <string name="bookmark_adding_transcript">Aggiunta della trascrizione…</string>
+    <string name="settings_app_icon_updated_message_v2">La nuova icona potrebbe richiedere alcuni minuti per comparire. Se il collegamento nella schermata Home scompare, aggiungi nuovamente Pocket Casts dalla schermata di tutte le app.</string>
     <string name="go_to_episode">Vai all\'episodio</string>
-    <string name="smart_bookmarks_upsell_message">Un tocco. Ha un nome, e le parole lo accompagnano.</string>
-    <string name="smart_bookmarks_upsell_title">Salva i pezzi che vale la pena tenere</string>
-    <string name="bookmarks_upgrade_example_passage">Stai scegliendo la persona, non il curriculum.</string>
+    <string name="smart_bookmarks_upsell_message">Basta un tocco. Ha già un titolo e include il testo corrispondente.</string>
+    <string name="smart_bookmarks_upsell_title">Salva i passaggi che vale la pena conservare</string>
+    <string name="bookmarks_upgrade_example_passage">Scegli la persona, non il curriculum.</string>
     <string name="bookmark_edit_transcript_title">Modifica trascrizione</string>
     <string name="bookmarks_upgrade_example_title">Sala delle audizioni</string>
     <string name="bookmark_suggestion_prefix">Suggerimento:</string>
     <string name="bookmark_suggesting_title">Suggerimento di un titolo…</string>
-    <string name="bookmark_player_tip_message">Mantieni la parte che desideri</string>
     <string name="bookmark_new_badge">Nuovo</string>
+    <string name="bookmark_player_tip_message">Conserva la parte che desideri</string>
     <string name="bookmark_edit_transcript_subtitle">Seleziona un passaggio della trascrizione per questo segnalibro</string>
     <string name="bookmark_create_failed">Impossibile aggiungere il segnalibro</string>
     <string name="device_approve_title">Connetti il tuo dispositivo</string>
-    <string name="log_in_with_code_error">Impossibile ottenere il codice di accesso</string>
-    <string name="log_in_with_code_instructions">Scansiona il codice QR con il telefono o vai su %1$s e inserisci questo codice</string>
-    <string name="log_in_with_code">Accedi con un codice QR</string>
+    <string name="log_in_with_code_error">Impossibile recuperare il codice di accesso</string>
+    <string name="log_in_with_code_instructions">Scansiona il codice QR con il telefono oppure vai su %1$s e inserisci questo codice</string>
+    <string name="log_in_with_code">Accedi con un codice</string>
     <string name="search_filters_networks">Reti</string>
     <string name="discover_networks">Reti</string>
     <string name="discover_network">Rete</string>
@@ -60,9 +106,9 @@ Language: it
     <string name="device_approve_expired_title">Il codice QR è scaduto</string>
     <string name="device_approve_connect">Connetti</string>
     <string name="device_approve_signing_in_as">Accesso come…</string>
-    <string name="device_approve_expired_message">Torna al tuo dispositivo per generarne uno nuovo.</string>
-    <string name="device_approve_success_message">Il dispositivo è ora connesso al tuo account.</string>
     <string name="device_approve_success_title">Dispositivo connesso</string>
+    <string name="device_approve_expired_message">Torna sul dispositivo per generarne uno nuovo.</string>
+    <string name="device_approve_success_message">Il tuo dispositivo è ora collegato al tuo account.</string>
     <string name="device_approve_description">L\'ascolto verrà sincronizzato automaticamente.\nPuoi disconnetterti in qualsiasi momento da Impostazioni.</string>
     <string name="tv_settings_subscription_plan">Piano</string>
     <string name="tv_settings_subscription_next_renewal">Prossimo rinnovo</string>
@@ -2429,8 +2475,8 @@ Language: it
         <item quantity="other">Aggiunto a %d playlist</item>
     </plurals>
     <plurals name="changed_playlists">
-        <item quantity="one">Playlist %d modificata</item>
-        <item quantity="other">Playlist %d modificate</item>
+        <item quantity="one">%d playlist modificata</item>
+        <item quantity="other">%d playlist modificate</item>
     </plurals>
     <plurals name="chapter">
         <item quantity="one">capitolo</item>
@@ -2549,8 +2595,8 @@ Language: it
         <item quantity="other">Secondi risparmiati</item>
     </plurals>
     <plurals name="removed_from_playlists">
-        <item quantity="one">Rimuovi dalla playlist%d</item>
-        <item quantity="other">Rimuovi dalla playlist%d</item>
+        <item quantity="one">Rimosso da %d playlist</item>
+        <item quantity="other">Rimosso da %d playlist</item>
     </plurals>
     <plurals name="second">
         <item quantity="one">secondo</item>
