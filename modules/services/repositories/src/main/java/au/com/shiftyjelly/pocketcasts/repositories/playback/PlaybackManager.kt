@@ -1467,19 +1467,22 @@ open class PlaybackManager @Inject constructor(
         }
     }
 
+    private val castSessionMutex = Mutex()
     fun castReconnected() {
         launch(Dispatchers.Main) {
-            if (player != null) {
-                player?.stop()
-                player = null
+            castSessionMutex.withLock {
+                if (player != null) {
+                    player?.stop()
+                    player = null
+                }
+
+                player = playerManager.createCastPlayer(this@PlaybackManager::onPlayerEvent)
+                mediaSessionManager.installCastPlayer()
+                (player as? CastPlayer)?.updateFromRemoteIfRequired()
+                Timber.i("Cast reconnected. Creating media player of type CastPlayer")
+
+                setupUpdateTimer()
             }
-
-            player = playerManager.createCastPlayer(this@PlaybackManager::onPlayerEvent)
-            mediaSessionManager.installCastPlayer()
-            (player as? CastPlayer)?.updateFromRemoteIfRequired()
-            Timber.i("Cast reconnected. Creating media player of type CastPlayer")
-
-            setupUpdateTimer()
         }
     }
 
@@ -1487,8 +1490,10 @@ open class PlaybackManager @Inject constructor(
         upNextQueue.currentEpisode ?: return
         cancelPrefetchNextEpisode()
         launch {
-            if (isPlayerSwitchRequired()) {
-                loadCurrentEpisode(true, sourceView = SourceView.CHROMECAST)
+            castSessionMutex.withLock {
+                if (isPlayerSwitchRequired()) {
+                    loadCurrentEpisode(true, sourceView = SourceView.CHROMECAST)
+                }
             }
         }
     }
@@ -1496,12 +1501,14 @@ open class PlaybackManager @Inject constructor(
     fun castDisconnected() {
         upNextQueue.currentEpisode ?: return
         launch {
-            updateCurrentPositionInDatabase()
+            castSessionMutex.withLock {
+                updateCurrentPositionInDatabase()
 
-            stop()
+                stop()
 
-            if (isPlayerSwitchRequired()) {
-                loadCurrentEpisode(false, sourceView = SourceView.CHROMECAST)
+                if (isPlayerSwitchRequired()) {
+                    loadCurrentEpisode(false, sourceView = SourceView.CHROMECAST)
+                }
             }
         }
     }
