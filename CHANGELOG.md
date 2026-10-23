@@ -20,6 +20,8 @@
         ([#6212](https://github.com/Automattic/pocket-casts-android/pull/6212))
     *   Stop showing "Plus expires in X days" to subscribers whose subscription renews automatically
         ([#5329](https://github.com/Automattic/pocket-casts-android/pull/5329))
+    *   Fix tapping a widget outside its controls not opening the app
+        ([#6222](https://github.com/Automattic/pocket-casts-android/pull/6222))
 
 
 8.23
