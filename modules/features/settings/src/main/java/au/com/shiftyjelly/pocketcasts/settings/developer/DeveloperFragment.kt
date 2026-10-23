@@ -49,6 +49,7 @@ class DeveloperFragment : BaseFragment() {
                 onResetPlaylistsOnboarding = viewModel::resetPlaylistsOnboarding,
                 onResetUpNextSortTooltip = viewModel::resetUpNextSortTooltip,
                 onShowPlaylistTooltips = viewModel::showPlaylistTooltips,
+                onShowSmartBookmarksTooltip = viewModel::showSmartBookmarksTooltip,
                 onResetNotificationsPrompt = viewModel::resetNotificationsPrompt,
                 onShowAppReviewPrompt = viewModel::showAppReviewPrompt,
                 onClearAppReviewSettings = viewModel::clearAppReviewSettings,

@@ -2579,9 +2579,11 @@
     <string name="chat_history">Chat history</string>
     <string name="chat_history_previous_7_days">Previous 7 days</string>
     <string name="chat_history_older">Older</string>
-    <string name="chat_history_empty">Chats you have about episodes will show up here.</string>
+    <string name="chat_history_empty_title">No chats yet</string>
+    <string name="chat_history_empty_body">Ask about an episode and your chat will show up here.</string>
     <string name="chat_undo">Undo</string>
     <string name="chat_now_playing_episode">Now playing %1$s</string>
+    <string name="chat_quote_play_failed">Couldn’t play this part of the episode</string>
     <string name="chat_about_episode">Chat about %1$s</string>
     <string name="chat_not_sent_tap_to_retry">Not sent. Tap to try again.</string>
     <string name="chat_error_server_on_our_end">Something went wrong on our end.</string>
@@ -2589,6 +2591,7 @@
     <string name="chat_clear">Clear chat</string>
     <string name="chat_offline_note">You’re offline. Connect to ask a question.</string>
     <string name="chat_play_quote">Play quote</string>
+    <string name="chat_quote_finding_moment">Finding the moment…</string>
 
     <!--    Tasker Plugin-->
     <string name="must_provide_filter_name">Must provide playlist name</string>

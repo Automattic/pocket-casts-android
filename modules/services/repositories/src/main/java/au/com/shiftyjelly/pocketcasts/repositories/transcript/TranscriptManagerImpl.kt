@@ -42,6 +42,7 @@ class TranscriptManagerImpl @Inject constructor(
 ) : TranscriptManager {
     private val transcriptUrlBlacklist = ConcurrentHashMap<String, String>()
     private val lruCache = LruCache<String, Transcript>(maxSize = 20)
+    private val generatedLruCache = LruCache<String, Transcript.Text>(maxSize = 5)
     private val metaAdapter = moshi.adapter(EpisodeMetaResponse::class.java)
 
     override fun observeIsTranscriptAvailable(episodeUuid: String): Flow<Boolean> {
@@ -65,8 +66,11 @@ class TranscriptManagerImpl @Inject constructor(
 
     override suspend fun loadGeneratedTranscript(episodeUuid: String): Transcript.Text? {
         val generated = loadLocalTranscripts(episodeUuid).firstOrNull { it.isGenerated } ?: return null
+        generatedLruCache[generated.url]?.let { return it }
         val parserWithTranscript = associateWithParser(generated) ?: return null
-        return readTranscript(parserWithTranscript) as? Transcript.Text
+        val transcript = readTranscript(parserWithTranscript) as? Transcript.Text ?: return null
+        generatedLruCache.put(generated.url, transcript)
+        return transcript
     }
 
     private suspend fun findAndCacheTranscript(episodeUuid: String): Transcript? {

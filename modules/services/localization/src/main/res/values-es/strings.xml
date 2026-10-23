@@ -1,11 +1,57 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-10-08 13:57:49+0000
+Translation-Revision-Date: 2026-10-21 09:58:42+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: es
 -->
 <resources>
+    <string name="chat_about_episode">Chatear sobre %1$s</string>
+    <string name="chat_undo">Deshacer</string>
+    <string name="chat_history_previous_7_days">Anteriores 7 días</string>
+    <string name="chat_now_playing_episode">Se está reproduciendo %1$s</string>
+    <string name="chat_history_older">Más antiguos</string>
+    <string name="chat_history">Historial de chat</string>
+    <string name="chat_deleted">Chat eliminado</string>
+    <string name="chat_cleared">Chat borrado</string>
+    <string name="chat_offline_note">No tienes conexión a Internet. Conéctate para hacer una pregunta.</string>
+    <string name="chat_answering">Respondiendo</string>
+    <string name="chat_error_server_on_our_end">Se ha producido un error por nuestra parte.</string>
+    <string name="chat_not_sent_tap_to_retry">No se ha enviado. Toca para intentarlo de nuevo.</string>
+    <string name="chat_feedback_send_failed">No hemos podido enviar tus comentarios. Comprueba tu conexión.</string>
+    <string name="chat_feedback_sending">Enviando comentarios</string>
+    <string name="chat_feedback_what_went_wrong">Qué ha salido mal</string>
+    <string name="chat_beta_sheet_sign_in">Accede para probarlo</string>
+    <string name="episode_chat_needs_transcript_message">La función Preguntar sobre este episodio requiere una transcripción. Este episodio no tiene.</string>
+    <string name="onboarding_episode_chat_answer">Este episodio trata sobre IA, salud y productividad.</string>
+    <string name="onboarding_episode_chat_question_1">¿Cuáles son los temas clave?</string>
+    <string name="chat_feedback_learn_more">Más información</string>
+    <string name="onboarding_episode_chat_question_2">¿Quieres resumir las principales conclusiones?</string>
+    <string name="onboarding_episode_chat_title">Pregunta sobre este episodio:</string>
+    <string name="chat_feedback_legal">Al enviarlos, se compartirá esta conversación con nosotros para ayudar a mejorar el chat.</string>
+    <string name="chat_feedback_details_hint">Compartir detalles (opcional)</string>
+    <string name="chat_feedback_reason_other">Otros</string>
+    <string name="chat_feedback_reason_offensive">Es ofensivo</string>
+    <string name="chat_feedback_submit">Enviar comentarios</string>
+    <string name="chat_feedback_reason_out_of_date">Está obsoleto</string>
+    <string name="chat_feedback_reason_wrong_facts">Los hechos no eran correctos</string>
+    <string name="chat_rate_answer_bad">Mala respuesta</string>
+    <string name="chat_rate_answer_good">Buena respuesta</string>
+    <string name="chat_feedback_thank_you">Gracias por tus comentarios</string>
+    <string name="chat_survey_yes">Sí.</string>
+    <string name="chat_feedback_reason_not_interesting">No era interesante</string>
+    <string name="chat_survey_not_really">En realidad no.</string>
+    <string name="chat_suggestion_summarize">Resumir este episodio</string>
+    <string name="chat_input_question_hint">Haz una pregunta…</string>
+    <string name="chat_survey_title">¿Te gusta la función Preguntar sobre este episodio?</string>
+    <string name="chat_ai_disclaimer">La IA puede cometer errores, así que comprueba sus respuestas.</string>
+    <string name="chat_welcome">Pregunta sobre cualquier aspecto de este episodio. O empieza por aquí.</string>
+    <string name="episode_chat_beta_badge">Versión beta</string>
+    <string name="chat_beta_note">La función Preguntar sobre este episodio está en fase beta</string>
+    <string name="chat_beta_sheet_body">Es gratuita para todos mientras esté en pruebas. Se convertirá en una función Plus más adelante.</string>
+    <string name="chat_beta_sheet_title">La función Preguntar sobre este episodio está en fase beta</string>
+    <string name="episode_chat_tooltip_body">Pregunta lo que quieras. También estaba escuchando.</string>
+    <string name="episode_chat_shelf_title">Preguntar sobre este episodio</string>
     <string name="manual_playlist_no_content_body_alternative">Elige episodios de los podcasts que sigues. O desliza hacia la izquierda en cualquier episodio para añadirlo sobre la marcha.</string>
     <string name="manual_playlist_no_content_body">Busca un podcast que te guste y desliza hacia la izquierda en cualquier episodio para añadirlo.</string>
     <string name="settings_general_whats_new_unread_dot_summary">Muestra un punto de mensaje sin leer en el perfil cuando haya nuevos mensajes de novedades.</string>

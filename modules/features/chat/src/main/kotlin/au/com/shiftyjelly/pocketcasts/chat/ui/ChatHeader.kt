@@ -67,6 +67,7 @@ internal fun ChatHeader(
                     painter = painterResource(IR.drawable.ic_close),
                     contentDescription = stringResource(LR.string.close),
                     tint = theme.iconButton,
+                    modifier = Modifier.size(HeaderIconSize),
                 )
             }
             Spacer(modifier = Modifier.weight(1f))
@@ -75,6 +76,7 @@ internal fun ChatHeader(
                     painter = painterResource(IR.drawable.ic_ellipsis_horizontal),
                     contentDescription = stringResource(LR.string.more_options),
                     tint = theme.iconButton,
+                    modifier = Modifier.size(HeaderIconSize),
                 )
             }
         }
@@ -139,7 +141,7 @@ internal fun ChatHeader(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(2.dp)
-                .background(theme.inputHint),
+                .background(theme.progressTrack),
         ) {
             Box(
                 modifier = Modifier
@@ -174,3 +176,5 @@ private fun ChatHeaderPreview(
         }
     }
 }
+
+private val HeaderIconSize = 20.dp

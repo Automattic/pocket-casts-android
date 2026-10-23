@@ -10,6 +10,8 @@ sealed interface ChatMessage {
 
     data class User(
         val text: String,
+        val failure: ChatSendFailure? = null,
+        val inputType: ChatInputType = ChatInputType.Typed,
         override val uuid: String = UUID.randomUUID().toString(),
     ) : ChatMessage {
         override val role: ChatRole get() = ChatRole.User
@@ -24,7 +26,7 @@ sealed interface ChatMessage {
 
         // Replace `- ` / `* ` bullet markers from the model with a styled bullet glyph.
         val displayText: String by lazy {
-            Regex("""(?m)^\s*[-*]\s+""").replace(text, "•  ")
+            Regex("""(?m)^[ \t]*[-*][ \t]+""").replace(text, "•  ")
         }
     }
 
@@ -35,6 +37,7 @@ sealed interface ChatMessage {
         val startMs: Int = -1,
         val endMs: Int = -1,
         val canPlay: Boolean = false,
+        val isFromGeneratedTranscript: Boolean = false,
         val rating: ChatAnswerRating? = null,
         override val uuid: String = UUID.randomUUID().toString(),
     ) : ChatMessage {
@@ -74,11 +77,12 @@ internal fun ChatMessage.textOrNull(): String? = when (this) {
 internal fun ChatMessage.toEntity(
     episodeUuid: String,
     quoteMetadataAdapter: JsonAdapter<QuoteMetadata>,
+    userMetadataAdapter: JsonAdapter<UserMessageMetadata>,
 ): EpisodeChatMessage {
     val (text, metadata) = when (this) {
-        is ChatMessage.User -> text to null
+        is ChatMessage.User -> text to userMetadataAdapter.toJsonOrNull(this)
         is ChatMessage.Assistant -> text to null
-        is ChatMessage.Quote -> text to quoteMetadataAdapter.toJson(QuoteMetadata(start, end))
+        is ChatMessage.Quote -> text to quoteMetadataAdapter.toJson(QuoteMetadata(start, end, isFromGeneratedTranscript))
     }
     return EpisodeChatMessage(
         uuid = uuid,
@@ -90,11 +94,26 @@ internal fun ChatMessage.toEntity(
     )
 }
 
+private fun JsonAdapter<UserMessageMetadata>.toJsonOrNull(message: ChatMessage.User): String? {
+    val inputType = message.inputType.takeUnless { it == ChatInputType.Typed }
+    if (message.failure == null && inputType == null) return null
+    return toJson(UserMessageMetadata(failure = message.failure?.value, inputType = inputType?.value))
+}
+
 internal fun List<EpisodeChatMessage>.toChatMessages(
     quoteMetadataAdapter: JsonAdapter<QuoteMetadata>,
+    userMetadataAdapter: JsonAdapter<UserMessageMetadata>,
 ) = mapNotNull { entity ->
     when (entity.role) {
-        ChatRole.User.value -> ChatMessage.User(text = entity.text, uuid = entity.uuid)
+        ChatRole.User.value -> {
+            val metadata = entity.metadata?.let { raw -> runCatching { userMetadataAdapter.fromJson(raw) }.getOrNull() }
+            ChatMessage.User(
+                text = entity.text,
+                failure = ChatSendFailure.fromValue(metadata?.failure),
+                inputType = ChatInputType.fromValue(metadata?.inputType) ?: ChatInputType.Typed,
+                uuid = entity.uuid,
+            )
+        }
 
         ChatRole.Quote.value -> entity.toQuoteMessageOrNull(quoteMetadataAdapter)
 
@@ -117,6 +136,7 @@ private fun EpisodeChatMessage.toQuoteMessageOrNull(
         end = parsed.end,
         startMs = parseTimestampMs(parsed.start) ?: -1,
         endMs = parseTimestampMs(parsed.end) ?: -1,
+        isFromGeneratedTranscript = parsed.isFromGeneratedTranscript,
         rating = ChatAnswerRating.fromValue(rating),
         uuid = uuid,
     )

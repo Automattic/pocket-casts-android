@@ -25,4 +25,5 @@ internal val WhatsNewActionEvent.analyticsValue
         WhatsNewActionEvent.CreatePlaylist -> WhatsNewActionType.CreatePlaylist
         WhatsNewActionEvent.OpenLink -> WhatsNewActionType.OpenLink
         WhatsNewActionEvent.OpenNetworks -> WhatsNewActionType.OpenNetworks
+        WhatsNewActionEvent.OpenFiles -> null
     }

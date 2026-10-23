@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -123,12 +124,13 @@ class ChatManagerImplTest {
         val quoteMessage = episodeChatDao.messages[2]
         assertEquals("Quoted text", quoteMessage.text)
         assertEquals(ChatRole.Quote.value, quoteMessage.role)
-        val quote = listOf(quoteMessage).toChatMessages(quoteAdapter()).single() as ChatMessage.Quote
+        val quote = listOf(quoteMessage).toChatMessages(quoteAdapter(), userAdapter()).single() as ChatMessage.Quote
         assertEquals("Quoted text", quote.text)
         assertEquals("00:00:01", quote.start)
         assertEquals("00:00:03", quote.end)
         assertEquals(1_000, quote.startMs)
         assertEquals(3_000, quote.endMs)
+        assertEquals(false, quote.isFromGeneratedTranscript)
     }
 
     @Test
@@ -154,6 +156,42 @@ class ChatManagerImplTest {
     }
 
     @Test
+    fun `send message marks quotes from the generated transcript`() = runTest {
+        transcripts.value = listOf(createTranscript(type = "text/vtt", isGenerated = true, url = "generated-url"))
+        whenever(podcastCacheServiceManager.episodeChat(any(), any())).thenReturn(
+            EpisodeChatResponse(
+                reply = "Assistant reply",
+                quote = EpisodeChatQuote(text = "Quoted text", start = "00:00:01", end = "00:00:03"),
+            ),
+        )
+
+        manager.sendMessage(
+            episodeUuid = EPISODE_UUID,
+            message = ChatMessage.User(text = "Question", uuid = "user-uuid"),
+            allMessages = emptyList(),
+        )
+
+        val quote = episodeChatDao.messages.toChatMessages(quoteAdapter(), userAdapter()).filterIsInstance<ChatMessage.Quote>().single()
+        assertEquals(true, quote.isFromGeneratedTranscript)
+    }
+
+    @Test
+    fun `quotes stored before the generated transcript flag read as not generated`() {
+        val entity = EpisodeChatMessage(
+            uuid = "quote-uuid",
+            episodeUuid = EPISODE_UUID,
+            text = "Quoted text",
+            role = ChatRole.Quote.value,
+            metadata = """{"start":"00:00:01","end":"00:00:03"}""",
+        )
+
+        val quote = listOf(entity).toChatMessages(quoteAdapter(), userAdapter()).single() as ChatMessage.Quote
+
+        assertEquals(1_000, quote.startMs)
+        assertEquals(false, quote.isFromGeneratedTranscript)
+    }
+
+    @Test
     fun `send message stores user message after successful response`() = runTest {
         transcripts.value = listOf(createTranscript())
         whenever(podcastCacheServiceManager.episodeChat(any(), any())).thenReturn(
@@ -173,7 +211,7 @@ class ChatManagerImplTest {
     }
 
     @Test
-    fun `send message requires transcript`() = runTest {
+    fun `send message without a transcript keeps the question as failed on our end`() = runTest {
         val exception = runCatching {
             manager.sendMessage(
                 episodeUuid = EPISODE_UUID,
@@ -183,11 +221,11 @@ class ChatManagerImplTest {
         }.exceptionOrNull() as IllegalStateException
 
         assertEquals("Transcript URL is required to send episode chat messages", exception.message)
-        assertEquals(emptyList<String>(), episodeChatDao.messages.map { it.role })
+        assertEquals(listOf(ChatSendFailure.Server), storedQuestions().map { it.failure })
     }
 
     @Test
-    fun `send message does not store user message when request fails`() = runTest {
+    fun `send message keeps the question as not sent when the network fails`() = runTest {
         transcripts.value = listOf(createTranscript())
         whenever(podcastCacheServiceManager.episodeChat(any(), any())).thenAnswer { throw IOException() }
 
@@ -200,8 +238,76 @@ class ChatManagerImplTest {
         }.exceptionOrNull()
 
         assertEquals(IOException::class, exception!!::class)
-        assertEquals(emptyList<String>(), episodeChatDao.messages.map { it.role })
+        assertEquals(listOf(ChatMessage.User(text = "Question", failure = ChatSendFailure.Network, uuid = "user-uuid")), storedQuestions())
     }
+
+    @Test
+    fun `a failed summarize question keeps its input type`() = runTest {
+        transcripts.value = listOf(createTranscript())
+        whenever(podcastCacheServiceManager.episodeChat(any(), any())).thenAnswer { throw IOException() }
+        val question = ChatMessage.User(text = "Summarize", inputType = ChatInputType.SummaryPrompt, uuid = "user-uuid")
+
+        runCatching { manager.sendMessage(EPISODE_UUID, question, emptyList()) }
+
+        assertEquals(listOf(question.copy(failure = ChatSendFailure.Network)), storedQuestions())
+    }
+
+    @Test
+    fun `a question stored before input types were saved reads as typed with its failure`() = runTest {
+        episodeChatDao.messages += createMessage(uuid = "user-uuid", episodeUuid = EPISODE_UUID, text = "Question")
+            .copy(role = ChatRole.User.value, metadata = """{"failure":"network"}""")
+
+        assertEquals(
+            listOf(ChatMessage.User(text = "Question", failure = ChatSendFailure.Network, inputType = ChatInputType.Typed, uuid = "user-uuid")),
+            storedQuestions(),
+        )
+    }
+
+    @Test
+    fun `send message stores the question before the reply arrives`() = runTest {
+        transcripts.value = listOf(createTranscript())
+        var storedBeforeReply = emptyList<String>()
+        whenever(podcastCacheServiceManager.episodeChat(any(), any())).thenAnswer {
+            storedBeforeReply = episodeChatDao.messages.map { it.uuid }
+            EpisodeChatResponse(reply = "Assistant reply", quote = null)
+        }
+
+        manager.sendMessage(
+            episodeUuid = EPISODE_UUID,
+            message = ChatMessage.User(text = "Question", uuid = "user-uuid"),
+            allMessages = emptyList(),
+        )
+
+        assertEquals(listOf("user-uuid"), storedBeforeReply)
+    }
+
+    @Test
+    fun `resending a failed question clears its failure once answered`() = runTest {
+        transcripts.value = listOf(createTranscript())
+        whenever(podcastCacheServiceManager.episodeChat(any(), any())).thenAnswer { throw IOException() }
+        runCatching {
+            manager.sendMessage(EPISODE_UUID, ChatMessage.User(text = "Question", uuid = "user-uuid"), emptyList())
+        }
+        whenever(podcastCacheServiceManager.episodeChat(any(), any())).thenReturn(
+            EpisodeChatResponse(reply = "Assistant reply", quote = null),
+        )
+
+        manager.sendMessage(EPISODE_UUID, ChatMessage.User(text = "Question", uuid = "user-uuid"), emptyList())
+
+        assertEquals(listOf(ChatMessage.User(text = "Question", uuid = "user-uuid")), storedQuestions())
+        assertEquals(listOf(ChatRole.User.value, ChatRole.Assistant.value), episodeChatDao.messages.sortedBy { it.createdAt }.map { it.role })
+    }
+
+    @Test
+    fun `discarding a message deletes it`() = runTest {
+        episodeChatDao.messages += createMessage(uuid = "message-uuid", episodeUuid = EPISODE_UUID, text = "Question")
+
+        manager.discardMessage("message-uuid")
+
+        assertEquals(emptyList<EpisodeChatMessage>(), episodeChatDao.messages)
+    }
+
+    private suspend fun storedQuestions() = manager.observeMessages(EPISODE_UUID).first().filterIsInstance<ChatMessage.User>()
 
     @Test
     fun `clear messages deletes episode messages`() = runTest {
@@ -214,6 +320,26 @@ class ChatManagerImplTest {
 
         assertEquals(listOf(EPISODE_UUID), episodeChatDao.deletedEpisodeUuids)
         assertEquals(listOf("other-message"), episodeChatDao.messages.map { it.uuid })
+    }
+
+    @Test
+    fun `an episode with chat messages has a chat`() = runTest {
+        episodeChatDao.chats += EpisodeChat(episodeUuid = EPISODE_UUID, podcastUuid = PODCAST_UUID)
+        episodeChatDao.messages += createMessage(uuid = "message-uuid", episodeUuid = EPISODE_UUID, text = "Question")
+
+        assertTrue(manager.hasChatWithMessages(EPISODE_UUID))
+    }
+
+    @Test
+    fun `an episode with an empty chat has no chat`() = runTest {
+        episodeChatDao.chats += EpisodeChat(episodeUuid = EPISODE_UUID, podcastUuid = PODCAST_UUID)
+
+        assertFalse(manager.hasChatWithMessages(EPISODE_UUID))
+    }
+
+    @Test
+    fun `an episode without a chat has no chat`() = runTest {
+        assertFalse(manager.hasChatWithMessages(EPISODE_UUID))
     }
 
     @Test
@@ -274,7 +400,22 @@ class ChatManagerImplTest {
         assertNull(episodeChatDao.messages.single { it.role == ChatRole.Assistant.value }.metadata)
     }
 
+    @Test
+    fun `delete all chats removes every chat and message`() = runTest {
+        episodeChatDao.chats += EpisodeChat(episodeUuid = EPISODE_UUID, podcastUuid = PODCAST_UUID)
+        episodeChatDao.chats += EpisodeChat(episodeUuid = "other-episode-uuid", podcastUuid = PODCAST_UUID)
+        episodeChatDao.messages += createMessage(uuid = "message-1", episodeUuid = EPISODE_UUID, text = "Answer")
+        episodeChatDao.messages += createMessage(uuid = "message-2", episodeUuid = "other-episode-uuid", text = "Answer")
+
+        manager.deleteAllChats()
+
+        assertEquals(emptyList<EpisodeChat>(), episodeChatDao.chats)
+        assertEquals(emptyList<EpisodeChatMessage>(), episodeChatDao.messages)
+    }
+
     private fun quoteAdapter() = Moshi.Builder().build().adapter(QuoteMetadata::class.java)
+
+    private fun userAdapter() = Moshi.Builder().build().adapter(UserMessageMetadata::class.java)
 
     private class TestTokenHandler : TokenHandler {
         override suspend fun getAccessToken() = AccessToken("access-token")
@@ -300,6 +441,11 @@ class ChatManagerImplTest {
             chats.removeAll { it.episodeUuid == episodeUuid }
         }
 
+        override suspend fun deleteAllChats() {
+            chats.clear()
+            messages.clear()
+        }
+
         override suspend fun insertMessage(message: EpisodeChatMessage) {
             insertMessages(listOf(message))
         }
@@ -318,12 +464,20 @@ class ChatManagerImplTest {
             return messages.filter { it.episodeUuid == episodeUuid }.sortedBy { it.createdAt }
         }
 
+        override suspend fun deleteMessage(uuid: String) {
+            messages.removeAll { it.uuid == uuid }
+        }
+
         override suspend fun deleteMessagesByEpisode(episodeUuid: String) {
             deletedEpisodeUuids += episodeUuid
             messages.removeAll { it.episodeUuid == episodeUuid }
         }
 
         override fun observeChatHistory(): Flow<List<EpisodeChatHistoryItem>> = flowOf(emptyList())
+
+        override suspend fun hasChatWithMessages(episodeUuid: String): Boolean {
+            return chats.any { it.episodeUuid == episodeUuid } && messages.any { it.episodeUuid == episodeUuid }
+        }
 
         override suspend fun updateRating(uuid: String, rating: String?) {
             messages.replaceAll { if (it.uuid == uuid) it.copy(rating = rating) else it }

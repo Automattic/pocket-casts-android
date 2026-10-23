@@ -31,10 +31,8 @@ import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.ProvideTextStyle
-import androidx.compose.material.Snackbar
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.Text
-import androidx.compose.material.TextButton
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -44,6 +42,7 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -73,12 +72,12 @@ import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.LocalPodcastColors
 import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
 import au.com.shiftyjelly.pocketcasts.compose.PodcastColorsParameterProvider
-import au.com.shiftyjelly.pocketcasts.compose.components.ThemedSnackbarHost
 import au.com.shiftyjelly.pocketcasts.models.to.EpisodeChatHistoryItem
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatAnswerRating
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatMessage
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filter
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -100,6 +99,7 @@ fun ChatScreen(
     onRateAnswer: (answerUuid: String, rating: ChatAnswerRating) -> Unit,
     snackbarHostState: SnackbarHostState,
     onDismissBetaSheet: () -> Unit,
+    onSignInClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val theme = rememberChatTheme()
@@ -119,6 +119,28 @@ fun ChatScreen(
     BackHandler(enabled = uiState.isBetaSheetVisible) {
         onDismissBetaSheet()
     }
+    val loadedMessageUuids = remember(uiState.episodeUuid, uiState.areMessagesLoaded) {
+        uiState.messages.mapTo(HashSet()) { it.uuid }
+    }
+    var seenBeforeHistoryUuids by remember { mutableStateOf(emptySet<String>()) }
+    var pendingQuestionUuid by remember { mutableStateOf<String?>(null) }
+    LaunchedEffect(uiState.isHistoryVisible) {
+        if (uiState.isHistoryVisible) {
+            val pendingQuestion = uiState.messages.lastOrNull()?.takeIf { uiState.isAwaitingReply && it is ChatMessage.User }
+            pendingQuestionUuid = pendingQuestion?.uuid
+            seenBeforeHistoryUuids = seenBeforeHistoryUuids + uiState.messages.filter { it != pendingQuestion }.map { it.uuid }
+        }
+    }
+    LaunchedEffect(pendingQuestionUuid, uiState.isAwaitingReply) {
+        val uuid = pendingQuestionUuid
+        if (uuid != null && !uiState.isAwaitingReply) {
+            seenBeforeHistoryUuids = seenBeforeHistoryUuids + uuid
+            pendingQuestionUuid = null
+        }
+    }
+    val initialMessageUuids = remember(loadedMessageUuids, uiState.restoredMessageUuids, seenBeforeHistoryUuids) {
+        loadedMessageUuids + uiState.restoredMessageUuids + seenBeforeHistoryUuids
+    }
 
     ProvideTextStyle(LocalTextStyle.current.copy(letterSpacing = 0.sp)) {
         ModalBottomSheetLayout(
@@ -129,8 +151,8 @@ fun ChatScreen(
             sheetContent = {
                 ChatBetaSheet(
                     theme = theme,
-                    buttonText = stringResource(LR.string.got_it),
-                    onClickButton = onDismissBetaSheet,
+                    buttonText = stringResource(if (uiState.isSignInRequired) LR.string.chat_beta_sheet_sign_in else LR.string.got_it),
+                    onClickButton = if (uiState.isSignInRequired) onSignInClick else onDismissBetaSheet,
                 )
             },
             modifier = modifier,
@@ -138,6 +160,7 @@ fun ChatScreen(
             if (uiState.isHistoryVisible) {
                 ChatHistory(
                     sections = uiState.history,
+                    useEpisodeArtwork = uiState.useEpisodeArtwork,
                     onClickBack = onCloseHistory,
                     onClickChat = onOpenHistoryChat,
                     onDeleteChat = onDeleteHistoryChat,
@@ -148,6 +171,7 @@ fun ChatScreen(
                 ProvideReduceMotion {
                     ChatContent(
                         uiState = uiState,
+                        initialMessageUuids = initialMessageUuids,
                         theme = theme,
                         onClickClose = onClickClose,
                         onClickMore = onClickMore,
@@ -169,6 +193,7 @@ fun ChatScreen(
 @Composable
 private fun ChatContent(
     uiState: ChatUiState,
+    initialMessageUuids: Set<String>,
     theme: ChatTheme,
     onClickClose: () -> Unit,
     onClickMore: () -> Unit,
@@ -185,15 +210,12 @@ private fun ChatContent(
     val scrollState = rememberScrollState()
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
-    val loadedMessageUuids = remember(uiState.areMessagesLoaded) { uiState.messages.mapTo(HashSet()) { it.uuid } }
-    val initialMessageUuids = remember(loadedMessageUuids, uiState.restoredMessageUuids) {
-        loadedMessageUuids + uiState.restoredMessageUuids
-    }
 
     val followThresholdPx = with(LocalDensity.current) { FollowNewestThreshold.roundToPx() }
-    var isFollowingNewest by remember { mutableStateOf(true) }
+    var isFollowingNewest by rememberSaveable { mutableStateOf(true) }
     LaunchedEffect(scrollState) {
         snapshotFlow { scrollState.isScrollInProgress }
+            .drop(1)
             .filter { inProgress -> !inProgress }
             .collect { isFollowingNewest = scrollState.maxValue - scrollState.value <= followThresholdPx }
     }
@@ -255,6 +277,7 @@ private fun ChatContent(
                     )
                 }
                 val answerUuidsByLastIndex = uiState.answerUuidsByLastIndex
+                val latestAnswerLastIndex = answerUuidsByLastIndex.keys.maxOrNull()
                 uiState.messages.forEachIndexed { index, message ->
                     key(message.uuid) {
                         val isNew = message.uuid !in initialMessageUuids
@@ -282,6 +305,7 @@ private fun ChatContent(
                                     quote = message.displayText,
                                     timestampLabel = message.timestampLabel,
                                     isPlayable = message.canPlay,
+                                    isLoading = message.uuid == uiState.loadingQuoteUuid,
                                     theme = theme,
                                     onClickPlay = { onPlayQuote(message.uuid) },
                                 )
@@ -307,13 +331,10 @@ private fun ChatContent(
                                 )
                             }
                         }
-                    }
-                }
-                val lastMessage = uiState.messages.lastOrNull()
-                if (lastMessage.isAnswer && !uiState.isAwaitingReply) {
-                    key(lastMessage?.uuid) {
-                        ChatAppear(animate = lastMessage?.uuid !in initialMessageUuids) {
-                            ChatDisclaimer(theme = theme)
+                        if (index == latestAnswerLastIndex) {
+                            ChatAppear(animate = isNew) {
+                                ChatDisclaimer(theme = theme)
+                            }
                         }
                     }
                 }
@@ -354,7 +375,7 @@ private fun ChatContent(
             onSend = onSend,
             isConnected = uiState.isConnected,
             canSend = uiState.canSend,
-            showBetaNote = uiState.isBeta,
+            showBetaNote = uiState.isBetaNoteVisible,
             theme = theme,
         )
     }
@@ -391,47 +412,6 @@ private fun ChatAnswerAppear(
 }
 
 private val ChatMessage?.isAnswer get() = this is ChatMessage.Assistant || this is ChatMessage.Quote
-
-@Composable
-internal fun ChatSnackbarHost(
-    hostState: SnackbarHostState,
-    theme: ChatTheme,
-    modifier: Modifier = Modifier,
-) {
-    ThemedSnackbarHost(
-        hostState = hostState,
-        snackbar = { data, _ ->
-            Snackbar(
-                backgroundColor = Color.White,
-                contentColor = theme.onWhiteText,
-                action = data.actionLabel?.let { label ->
-                    {
-                        TextButton(onClick = data::performAction) {
-                            Text(
-                                text = label,
-                                color = theme.toastAction,
-                                fontSize = 13.sp,
-                                lineHeight = 18.sp,
-                                letterSpacing = 0.sp,
-                                fontWeight = FontWeight.SemiBold,
-                            )
-                        }
-                    }
-                },
-                modifier = Modifier.padding(horizontal = 16.dp),
-            ) {
-                Text(
-                    text = data.message,
-                    fontSize = 13.sp,
-                    lineHeight = 18.sp,
-                    letterSpacing = 0.sp,
-                    fontWeight = FontWeight.SemiBold,
-                )
-            }
-        },
-        modifier = modifier,
-    )
-}
 
 @Composable
 private fun ChatAboutEpisode(
@@ -525,7 +505,7 @@ private fun ChatServerError(
                 painter = painterResource(IR.drawable.ic_alert_small),
                 contentDescription = null,
                 tint = theme.tertiaryText,
-                modifier = Modifier.size(20.dp),
+                modifier = Modifier.size(16.dp),
             )
             Text(
                 text = stringResource(LR.string.chat_error_server_on_our_end),
@@ -574,7 +554,7 @@ private fun ChatScreenPreview(
                     podcastUuid = "preview-podcast-uuid",
                     podcastTitle = "Pocket Casts Weekly",
                     episodeDurationMs = 3_600_000,
-                    isBeta = true,
+                    isBetaNoteVisible = true,
                     areMessagesLoaded = true,
                     messages = listOf(
                         ChatMessage.User(
@@ -589,7 +569,15 @@ private fun ChatScreenPreview(
                             end = "12:18",
                             canPlay = true,
                         ),
+                        ChatMessage.Quote(
+                            text = "Discovery works best when it feels like a friend's recommendation.",
+                            start = "24:30",
+                            end = "24:41",
+                            canPlay = true,
+                            uuid = "preview-loading-quote",
+                        ),
                     ),
+                    loadingQuoteUuid = "preview-loading-quote",
                 ),
                 onClickClose = {},
                 onClickMore = {},
@@ -605,6 +593,7 @@ private fun ChatScreenPreview(
                 onRateAnswer = { _, _ -> },
                 snackbarHostState = remember { SnackbarHostState() },
                 onDismissBetaSheet = {},
+                onSignInClick = {},
             )
         }
     }
@@ -622,7 +611,7 @@ private fun ChatScreenEmptyPreview(
                     episodeTitle = "The future of podcast discovery",
                     podcastUuid = "preview-podcast-uuid",
                     podcastTitle = "Pocket Casts Weekly",
-                    isBeta = true,
+                    isBetaNoteVisible = true,
                     areMessagesLoaded = true,
                 ),
                 onClickClose = {},
@@ -639,6 +628,7 @@ private fun ChatScreenEmptyPreview(
                 onRateAnswer = { _, _ -> },
                 snackbarHostState = remember { SnackbarHostState() },
                 onDismissBetaSheet = {},
+                onSignInClick = {},
             )
         }
     }
@@ -656,7 +646,7 @@ private fun ChatScreenErrorPreview(
                     episodeTitle = "The future of podcast discovery",
                     podcastUuid = "preview-podcast-uuid",
                     podcastTitle = "Pocket Casts Weekly",
-                    isBeta = true,
+                    isBetaNoteVisible = true,
                     areMessagesLoaded = true,
                     error = error,
                     messages = listOf(
@@ -679,6 +669,7 @@ private fun ChatScreenErrorPreview(
                 onRateAnswer = { _, _ -> },
                 snackbarHostState = remember { SnackbarHostState() },
                 onDismissBetaSheet = {},
+                onSignInClick = {},
             )
         }
     }

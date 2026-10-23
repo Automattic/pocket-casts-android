@@ -18,7 +18,9 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -112,6 +114,21 @@ class EpisodeChatDaoTest {
     }
 
     @Test
+    fun testDeleteAllChatsRemovesChatsAndTheirMessages() = runTest {
+        insertChat(EPISODE_UUID)
+        insertChat("other-episode-uuid")
+        episodeChatDao.insertMessage(createMessage(uuid = "message-uuid", episodeUuid = EPISODE_UUID, text = "Message"))
+        episodeChatDao.insertMessage(createMessage(uuid = "other-message-uuid", episodeUuid = "other-episode-uuid", text = "Other message"))
+
+        episodeChatDao.deleteAllChats()
+
+        assertNull(episodeChatDao.getChatByEpisode(EPISODE_UUID))
+        assertNull(episodeChatDao.getChatByEpisode("other-episode-uuid"))
+        assertEquals(emptyList<EpisodeChatMessage>(), episodeChatDao.getMessages(EPISODE_UUID))
+        assertEquals(emptyList<EpisodeChatMessage>(), episodeChatDao.getMessages("other-episode-uuid"))
+    }
+
+    @Test
     fun testUpdateRating() = runTest {
         insertChat()
         val message = createMessage(uuid = "message-uuid", text = "Answer")
@@ -145,6 +162,37 @@ class EpisodeChatDaoTest {
             ),
             episodeChatDao.observeChatHistory().first(),
         )
+    }
+
+    @Test
+    fun testHasChatWithMessagesWhenTheChatHasMessages() = runTest {
+        insertChat()
+        episodeChatDao.insertMessage(createMessage(uuid = "message-uuid", text = "Message"))
+
+        assertTrue(episodeChatDao.hasChatWithMessages(EPISODE_UUID))
+    }
+
+    @Test
+    fun testHasNoChatWithMessagesWhenTheChatIsEmpty() = runTest {
+        insertChat()
+
+        assertFalse(episodeChatDao.hasChatWithMessages(EPISODE_UUID))
+    }
+
+    @Test
+    fun testHasNoChatWithMessagesWithoutAChat() = runTest {
+        insertEpisode()
+
+        assertFalse(episodeChatDao.hasChatWithMessages(EPISODE_UUID))
+    }
+
+    @Test
+    fun testHasNoChatWithMessagesWhenOnlyAnotherEpisodeHasMessages() = runTest {
+        insertChat(EPISODE_UUID)
+        insertChat("other-episode-uuid")
+        episodeChatDao.insertMessage(createMessage(uuid = "other-uuid", episodeUuid = "other-episode-uuid", text = "Other"))
+
+        assertFalse(episodeChatDao.hasChatWithMessages(EPISODE_UUID))
     }
 
     private suspend fun insertChat(episodeUuid: String = EPISODE_UUID) {

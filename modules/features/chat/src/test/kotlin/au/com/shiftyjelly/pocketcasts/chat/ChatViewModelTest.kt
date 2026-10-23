@@ -9,26 +9,45 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.EpisodeChatHistoryItem
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
+import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.preferences.ReadSetting
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatAnswerRating
+import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatInputType
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatManager
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatMessage
+import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatQuoteSeeker
+import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatSendFailure
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ClearedChat
 import au.com.shiftyjelly.pocketcasts.repositories.playback.NetworkConnectionWatcher
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
+import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MutableClock
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.automattic.eventhorizon.EpisodeChatBetaSheetDismissedEvent
 import com.automattic.eventhorizon.EpisodeChatBetaSheetShownEvent
+import com.automattic.eventhorizon.EpisodeChatBetaSheetSignInTappedEvent
 import com.automattic.eventhorizon.EpisodeChatClearUndoneEvent
 import com.automattic.eventhorizon.EpisodeChatClearedEvent
 import com.automattic.eventhorizon.EpisodeChatDeleteUndoneEvent
 import com.automattic.eventhorizon.EpisodeChatDeletedEvent
+import com.automattic.eventhorizon.EpisodeChatDismissedEvent
+import com.automattic.eventhorizon.EpisodeChatEntryPointType
 import com.automattic.eventhorizon.EpisodeChatErrorType
 import com.automattic.eventhorizon.EpisodeChatHistoryRowTappedEvent
+import com.automattic.eventhorizon.EpisodeChatHistorySectionType
 import com.automattic.eventhorizon.EpisodeChatHistoryShownEvent
 import com.automattic.eventhorizon.EpisodeChatInputType
 import com.automattic.eventhorizon.EpisodeChatMessageFailedEvent
@@ -37,6 +56,7 @@ import com.automattic.eventhorizon.EpisodeChatQuotePlayTappedEvent
 import com.automattic.eventhorizon.EpisodeChatQuotePlayUndoneEvent
 import com.automattic.eventhorizon.EpisodeChatQuoteSourceType
 import com.automattic.eventhorizon.EpisodeChatResponseRatedEvent
+import com.automattic.eventhorizon.EpisodeChatResponseRatingClearedEvent
 import com.automattic.eventhorizon.EpisodeChatResponseReceivedEvent
 import com.automattic.eventhorizon.EpisodeChatSentimentType
 import com.automattic.eventhorizon.EpisodeChatShownEvent
@@ -51,6 +71,7 @@ import kotlin.time.TestTimeSource
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.emptyFlow
@@ -71,6 +92,8 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.doSuspendableAnswer
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
@@ -79,13 +102,22 @@ import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ChatViewModelTest {
-    @get:Rule
+    @get:Rule(order = 0)
     val coroutineRule = MainCoroutineRule()
+
+    @get:Rule(order = 1)
+    val featureFlagRule = InMemoryFeatureFlagRule()
 
     private val chatManager = TestChatManager()
     private val playbackState = MutableStateFlow(PlaybackState())
+    private val userSeeks = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    private val upNextQueue = mock<UpNextQueue> {
+        on { queueEpisodes } doReturn emptyList()
+    }
     private val playbackManager = mock<PlaybackManager> {
         on { playbackStateFlow } doReturn playbackState
+        on { userSeeks } doReturn userSeeks
+        on { upNextQueue } doReturn upNextQueue
     }
     private val episode = MutableStateFlow<BaseEpisode>(
         PodcastEpisode(uuid = EPISODE_UUID, publishedDate = Date(), duration = 200.0, playedUpTo = 50.0),
@@ -105,11 +137,25 @@ class ChatViewModelTest {
         on { value } doAnswer { surveySeen.value }
         on { set(any(), any(), any(), any()) } doAnswer { surveySeen.value = it.getArgument(0) }
     }
+    private val subscription = MutableStateFlow<Subscription?>(null)
+    private val cachedSubscriptionSetting = mock<ReadSetting<Subscription?>> {
+        on { value } doAnswer { subscription.value }
+        on { flow } doReturn subscription
+    }
+    private val artworkConfigurationSetting = mock<UserSetting<ArtworkConfiguration>> {
+        on { value } doReturn ArtworkConfiguration(useEpisodeArtwork = true)
+    }
     private val settings = mock<Settings> {
+        on { artworkConfiguration } doReturn artworkConfigurationSetting
         on { episodeChatBetaSheetSeen } doReturn betaSheetSeenSetting
         on { episodeChatSurveySeen } doReturn surveySeenSetting
+        on { cachedSubscription } doReturn cachedSubscriptionSetting
     }
     private val networkConnectionWatcher = TestNetworkConnectionWatcher()
+    private var isLoggedIn = true
+    private val syncManager = mock<SyncManager> {
+        on { isLoggedIn() } doAnswer { isLoggedIn }
+    }
     private val timeSource = TestTimeSource()
     private val clock = MutableClock(Instant.parse("2026-10-14T12:00:00Z"))
 
@@ -122,17 +168,27 @@ class ChatViewModelTest {
         viewModel = createViewModel()
     }
 
+    private val quoteSeeker = mock<ChatQuoteSeeker> {
+        on { quoteTime(any(), any()) } doSuspendableAnswer {
+            val quote = it.arguments[1] as ChatMessage.Quote
+            ChatQuoteSeeker.QuoteTime(timeMs = quote.startMs, referenceTimeMs = null)
+        }
+        on { playbackTimeMs(any(), any()) } doSuspendableAnswer { (it.arguments[1] as ChatQuoteSeeker.QuoteTime).timeMs }
+    }
+
     private fun createViewModel() = ChatViewModel(
         networkConnectionWatcher = networkConnectionWatcher,
         chatManager = chatManager,
         playbackManager = playbackManager,
         episodeManager = episodeManager,
+        quoteSeeker = quoteSeeker,
         eventHorizon = EventHorizon(eventSink),
         settings = settings,
         applicationScope = kotlinx.coroutines.CoroutineScope(coroutineRule.testDispatcher),
         ioDispatcher = coroutineRule.testDispatcher,
         timeSource = timeSource,
         clock = clock,
+        syncManager = syncManager,
     )
 
     @Test
@@ -144,6 +200,7 @@ class ChatViewModelTest {
             podcastTitle = "Podcast title",
             episodeDurationMs = 123_000,
             sourceView = SourceView.PLAYER,
+            entryPoint = ChatEntryPoint.PlayerShelf,
             isBeta = false,
         )
 
@@ -168,9 +225,71 @@ class ChatViewModelTest {
                 source = SourceView.PLAYER.analyticsValue,
                 episodeUuid = EPISODE_UUID,
                 podcastUuid = PODCAST_UUID,
+                hasHistory = false,
+                entryPoint = ChatEntryPoint.PlayerShelf.analyticsValue,
+                isBeta = false,
             ),
             eventSink.pollEvent(),
         )
+    }
+
+    @Test
+    fun `opening the chat through the free beta tracks it as beta`() = runTest {
+        setEpisodeInfo(isBeta = true)
+        advanceUntilIdle()
+
+        val shown = generateSequence { if (eventSink.isEmpty()) null else eventSink.pollEvent() }
+            .filterIsInstance<EpisodeChatShownEvent>()
+            .single()
+        assertEquals(true, shown.isBeta)
+    }
+
+    @Test
+    fun `reopening a chat with messages tracks it as continued`() = runTest {
+        chatManager.messages.value = listOf(ChatMessage.User("Earlier"), ChatMessage.Assistant("Answer"))
+
+        setEpisodeInfo(entryPoint = ChatEntryPoint.MoreActions)
+
+        assertEquals(
+            EpisodeChatShownEvent(
+                source = SourceView.PLAYER.analyticsValue,
+                episodeUuid = EPISODE_UUID,
+                podcastUuid = PODCAST_UUID,
+                hasHistory = true,
+                entryPoint = ChatEntryPoint.MoreActions.analyticsValue,
+                isBeta = false,
+            ),
+            eventSink.pollEvent(),
+        )
+    }
+
+    @Test
+    fun `closing the chat before its messages load still tracks it as shown`() = runTest {
+        chatManager.observedMessages = MutableSharedFlow()
+        setEpisodeInfo()
+
+        viewModel.trackDismissed()
+
+        assertEquals(
+            EpisodeChatShownEvent(
+                source = SourceView.PLAYER.analyticsValue,
+                episodeUuid = EPISODE_UUID,
+                podcastUuid = PODCAST_UUID,
+                hasHistory = null,
+                entryPoint = ChatEntryPoint.PlayerShelf.analyticsValue,
+                isBeta = false,
+            ),
+            eventSink.pollEvent(),
+        )
+        assertTrue(eventSink.pollEvent() is EpisodeChatDismissedEvent)
+    }
+
+    @Test
+    fun `chat shown is tracked once per opened chat`() = runTest {
+        setEpisodeInfo()
+        chatManager.messages.value = listOf(ChatMessage.User("Question"))
+
+        assertEquals(1, List(eventSink.size) { eventSink.pollEvent() }.count { it is EpisodeChatShownEvent })
     }
 
     @Test
@@ -185,6 +304,7 @@ class ChatViewModelTest {
             podcastTitle = "Podcast title",
             episodeDurationMs = 123_000,
             sourceView = SourceView.PLAYER,
+            entryPoint = ChatEntryPoint.PlayerShelf,
             isBeta = false,
         )
 
@@ -246,6 +366,7 @@ class ChatViewModelTest {
                 messageLength = "Summarize this episode".length.toLong(),
                 inputType = EpisodeChatInputType.SummaryPrompt,
                 messageIndex = 1,
+                isRetry = false,
             ),
             eventSink.pollEvent(),
         )
@@ -367,9 +488,10 @@ class ChatViewModelTest {
     }
 
     @Test
-    fun `send tracks message sent after success`() = runTest {
+    fun `send tracks message sent before the answer arrives`() = runTest {
         setEpisodeInfo()
         eventSink.skipEvent()
+        chatManager.sendMessageGate = CompletableDeferred()
         viewModel.onInputTextChange("Question")
 
         viewModel.onSend()
@@ -383,6 +505,7 @@ class ChatViewModelTest {
                 messageLength = "Question".length.toLong(),
                 inputType = EpisodeChatInputType.Typed,
                 messageIndex = 1,
+                isRetry = false,
             ),
             eventSink.pollEvent(),
         )
@@ -407,6 +530,7 @@ class ChatViewModelTest {
                 episodeUuid = EPISODE_UUID,
                 podcastUuid = PODCAST_UUID,
                 durationMs = 2_500,
+                messageIndex = 1,
             ),
             eventSink.pollEvent(),
         )
@@ -420,6 +544,7 @@ class ChatViewModelTest {
 
         sendQuestion("Question")
 
+        assertTrue(eventSink.pollEvent() is EpisodeChatMessageSentEvent)
         assertTrue(eventSink.pollEvent() is EpisodeChatMessageFailedEvent)
         assertTrue(eventSink.isEmpty())
     }
@@ -450,12 +575,15 @@ class ChatViewModelTest {
         viewModel.onSend()
         advanceUntilIdle()
 
+        eventSink.skipEvent()
         assertEquals(
             EpisodeChatMessageFailedEvent(
                 source = SourceView.PLAYER.analyticsValue,
                 episodeUuid = EPISODE_UUID,
                 podcastUuid = PODCAST_UUID,
                 error = EpisodeChatErrorType.Network,
+                inputType = EpisodeChatInputType.Typed,
+                messageIndex = 1,
             ),
             eventSink.pollEvent(),
         )
@@ -519,6 +647,34 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `retry tracks message sent as a retry`() = runTest {
+        setEpisodeInfo()
+        connectToInternet()
+        chatManager.sendMessageException = IOException()
+        viewModel.onInputTextChange("Question")
+        viewModel.onSend()
+        advanceUntilIdle()
+        chatManager.sendMessageException = null
+        eventSink.skipEvent(eventSink.size)
+
+        viewModel.retry()
+        advanceUntilIdle()
+
+        assertEquals(
+            EpisodeChatMessageSentEvent(
+                source = SourceView.PLAYER.analyticsValue,
+                episodeUuid = EPISODE_UUID,
+                podcastUuid = PODCAST_UUID,
+                messageLength = "Question".length.toLong(),
+                inputType = EpisodeChatInputType.Typed,
+                messageIndex = 1,
+                isRetry = true,
+            ),
+            eventSink.pollEvent(),
+        )
+    }
+
+    @Test
     fun `retry keeps the summarize input type`() = runTest {
         setEpisodeInfo()
         connectToInternet()
@@ -533,6 +689,52 @@ class ChatViewModelTest {
 
         assertEquals(
             EpisodeChatInputType.SummaryPrompt,
+            (eventSink.pollEvent() as EpisodeChatMessageSentEvent).inputType,
+        )
+    }
+
+    @Test
+    fun `retrying a reopened summarize question keeps the summarize input type`() = runTest {
+        chatManager.messages.value = listOf(
+            ChatMessage.User(
+                text = "Summarize this episode",
+                failure = ChatSendFailure.Network,
+                inputType = ChatInputType.SummaryPrompt,
+                uuid = "question-uuid",
+            ),
+        )
+        setEpisodeInfo()
+        connectToInternet()
+        advanceUntilIdle()
+        eventSink.skipEvent(eventSink.size)
+
+        viewModel.retry()
+        advanceUntilIdle()
+
+        assertEquals(
+            EpisodeChatInputType.SummaryPrompt,
+            (eventSink.pollEvent() as EpisodeChatMessageSentEvent).inputType,
+        )
+    }
+
+    @Test
+    fun `retrying a reopened typed question after a summarize send tracks it as typed`() = runTest {
+        setEpisodeInfo()
+        connectToInternet()
+        chatManager.sendMessageException = IOException()
+        viewModel.onSummarizeClick("Summarize this episode")
+        advanceUntilIdle()
+        chatManager.sendMessageException = null
+        chatManager.otherMessages.value = listOf(ChatMessage.User(text = "Typed", failure = ChatSendFailure.Network, uuid = "typed-uuid"))
+        viewModel.openHistoryChat(historyItem(OTHER_EPISODE_UUID))
+        advanceUntilIdle()
+        eventSink.skipEvent(eventSink.size)
+
+        viewModel.retry()
+        advanceUntilIdle()
+
+        assertEquals(
+            EpisodeChatInputType.Typed,
             (eventSink.pollEvent() as EpisodeChatMessageSentEvent).inputType,
         )
     }
@@ -687,15 +889,54 @@ class ChatViewModelTest {
     }
 
     @Test
-    fun `clearing a rating is not tracked`() = runTest {
+    fun `clearing a rating tracks the removed rating`() = runTest {
+        chatManager.messages.value = listOf(
+            ChatMessage.User("Q1", uuid = "q1"),
+            ChatMessage.Assistant("A1", uuid = "a1"),
+        )
         setEpisodeInfo()
         eventSink.skipEvent()
-        viewModel.rateAnswer("answer-uuid", ChatAnswerRating.Positive)
+        viewModel.rateAnswer("a1", ChatAnswerRating.Positive)
         eventSink.skipEvent()
 
-        viewModel.rateAnswer("answer-uuid", ChatAnswerRating.Positive)
+        viewModel.rateAnswer("a1", ChatAnswerRating.Positive)
 
-        assertTrue(eventSink.isEmpty())
+        assertEquals(
+            EpisodeChatResponseRatingClearedEvent(
+                source = SourceView.PLAYER.analyticsValue,
+                episodeUuid = EPISODE_UUID,
+                podcastUuid = PODCAST_UUID,
+                previousRating = EpisodeChatSentimentType.Positive,
+                messageIndex = 1,
+            ),
+            eventSink.pollEvent(),
+        )
+    }
+
+    @Test
+    fun `switching a rating tracks the replaced rating`() = runTest {
+        chatManager.messages.value = listOf(
+            ChatMessage.User("Q1", uuid = "q1"),
+            ChatMessage.Assistant("A1", uuid = "a1"),
+        )
+        setEpisodeInfo()
+        eventSink.skipEvent()
+        viewModel.rateAnswer("a1", ChatAnswerRating.Positive)
+        eventSink.skipEvent()
+
+        viewModel.rateAnswer("a1", ChatAnswerRating.Negative)
+
+        assertEquals(
+            EpisodeChatResponseRatedEvent(
+                source = SourceView.PLAYER.analyticsValue,
+                episodeUuid = EPISODE_UUID,
+                podcastUuid = PODCAST_UUID,
+                rating = EpisodeChatSentimentType.Negative,
+                messageIndex = 1,
+                previousRating = EpisodeChatSentimentType.Positive,
+            ),
+            eventSink.pollEvent(),
+        )
     }
 
     @Test
@@ -781,7 +1022,7 @@ class ChatViewModelTest {
 
         sendQuestion("Second")
 
-        assertEquals(listOf(1L, 2L), eventSink.messageIndexes())
+        assertEquals(listOf(1L, 2L, 2L), eventSink.messageIndexes())
         assertEquals(listOf("First", "Response"), chatManager.sentHistories.last())
     }
 
@@ -797,7 +1038,7 @@ class ChatViewModelTest {
         viewModel.retry()
         advanceUntilIdle()
 
-        assertEquals(listOf(1L, 2L), eventSink.messageIndexes())
+        assertEquals(listOf(1L, 2L, 2L), eventSink.messageIndexes())
     }
 
     @Test
@@ -855,21 +1096,103 @@ class ChatViewModelTest {
     }
 
     @Test
-    fun `failed user message is not restored in a new chat session`() = runTest {
+    fun `a question that did not reach us is shown as not sent when the chat reopens`() = runTest {
         setEpisodeInfo()
         chatManager.sendMessageException = IOException()
         viewModel.onInputTextChange("Failed question")
         viewModel.onSend()
         advanceUntilIdle()
-        val failedMessage = viewModel.uiState.value.messages.last()
-        assertTrue(failedMessage is ChatMessage.User)
-        assertEquals("Failed question", (failedMessage as ChatMessage.User).text)
 
         viewModel = createViewModel()
         setEpisodeInfo()
         advanceUntilIdle()
 
-        assertEquals(emptyList<ChatMessage>(), viewModel.uiState.value.messages)
+        val state = viewModel.uiState.value
+        assertEquals(listOf("Failed question"), state.messages.filterIsInstance<ChatMessage.User>().map { it.text })
+        assertEquals(ChatError.NetworkError, state.error)
+    }
+
+    @Test
+    fun `a question we could not answer shows the server error when the chat reopens`() = runTest {
+        chatManager.messages.value = listOf(ChatMessage.User(text = "Question", failure = ChatSendFailure.Server, uuid = "question-uuid"))
+
+        setEpisodeInfo()
+        advanceUntilIdle()
+
+        assertEquals(ChatError.ServerError, viewModel.uiState.value.error)
+    }
+
+    @Test
+    fun `a question left waiting when the chat closed is shown as not sent`() = runTest {
+        chatManager.messages.value = listOf(ChatMessage.User(text = "Question", uuid = "question-uuid"))
+
+        setEpisodeInfo()
+        advanceUntilIdle()
+
+        assertEquals(ChatError.NetworkError, viewModel.uiState.value.error)
+    }
+
+    @Test
+    fun `an answered conversation reopens without an error`() = runTest {
+        chatManager.messages.value = listOf(
+            ChatMessage.User(text = "Question", uuid = "question-uuid"),
+            ChatMessage.Assistant(text = "Answer", uuid = "answer-uuid"),
+        )
+
+        setEpisodeInfo()
+        advanceUntilIdle()
+
+        assertNull(viewModel.uiState.value.error)
+    }
+
+    @Test
+    fun `retrying a reopened question resends it without it in the history`() = runTest {
+        chatManager.messages.value = listOf(
+            ChatMessage.User(text = "First", uuid = "first-uuid"),
+            ChatMessage.Assistant(text = "Answer", uuid = "answer-uuid"),
+            ChatMessage.User(text = "Question", failure = ChatSendFailure.Network, uuid = "question-uuid"),
+        )
+        setEpisodeInfo()
+        advanceUntilIdle()
+
+        viewModel.retry()
+        advanceUntilIdle()
+
+        assertEquals(SendMessage(EPISODE_UUID, "Question"), chatManager.sentMessages.single())
+        assertEquals(listOf("First", "Answer"), chatManager.sentHistories.single())
+        assertNull(viewModel.uiState.value.error)
+    }
+
+    @Test
+    fun `undoing clear chat restores a failed question as not sent`() = runTest {
+        chatManager.messages.value = listOf(ChatMessage.User(text = "Question", failure = ChatSendFailure.Network, uuid = "question-uuid"))
+        setEpisodeInfo()
+        advanceUntilIdle()
+        viewModel.clearChat()
+        advanceUntilIdle()
+        assertNull(viewModel.uiState.value.error)
+
+        viewModel.undoClearChat()
+        advanceUntilIdle()
+
+        assertEquals(ChatError.NetworkError, viewModel.uiState.value.error)
+        viewModel.retry()
+        advanceUntilIdle()
+        assertEquals(SendMessage(EPISODE_UUID, "Question"), chatManager.sentMessages.single())
+    }
+
+    @Test
+    fun `asking something new instead of retrying discards the stored failed question`() = runTest {
+        chatManager.messages.value = listOf(ChatMessage.User(text = "Question", failure = ChatSendFailure.Network, uuid = "question-uuid"))
+        setEpisodeInfo()
+        advanceUntilIdle()
+
+        sendQuestion("Another question")
+
+        assertEquals(listOf("question-uuid"), chatManager.discardedMessageUuids)
+        val messages = viewModel.uiState.value.messages
+        assertEquals(listOf("Another question"), messages.filterIsInstance<ChatMessage.User>().map { it.text })
+        assertEquals(listOf("Response"), messages.filterIsInstance<ChatMessage.Assistant>().map { it.text })
     }
 
     @Test
@@ -1013,7 +1336,7 @@ class ChatViewModelTest {
     }
 
     @Test
-    fun `undoing a clear of only an unsent question does nothing`() = runTest {
+    fun `undoing a clear of only an unsent question brings it back as not sent`() = runTest {
         setEpisodeInfo()
         connectToInternet()
         chatManager.sendMessageException = IOException()
@@ -1025,8 +1348,8 @@ class ChatViewModelTest {
         viewModel.undoClearChat()
         advanceUntilIdle()
 
-        assertEquals(emptyList<ChatMessage>(), viewModel.uiState.value.messages)
-        assertTrue(eventSink.isEmpty())
+        assertEquals(listOf("Question"), viewModel.uiState.value.messages.filterIsInstance<ChatMessage.User>().map { it.text })
+        assertEquals(ChatError.NetworkError, viewModel.uiState.value.error)
     }
 
     @Test
@@ -1119,6 +1442,76 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `playing a quote seeks to the time the seeker resolves`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        whenever(quoteSeeker.playbackTimeMs(any(), any())).thenReturn(31_500)
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID, positionMs = 10_000)
+        playableState(quote)
+
+        viewModel.playQuote(quote.uuid)
+        advanceUntilIdle()
+
+        verify(playbackManager).seekToTimeMsSuspend(org.mockito.kotlin.eq(31_500), anyOrNull())
+    }
+
+    @Test
+    fun `playing a quote drops the seek when the user seeks while it resolves`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        val resolved = CompletableDeferred<Int>()
+        whenever(quoteSeeker.playbackTimeMs(any(), any())).doSuspendableAnswer { resolved.await() }
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID, positionMs = 10_000)
+        playableState(quote)
+
+        viewModel.playQuote(quote.uuid)
+        advanceUntilIdle()
+        userSeeks.emit(Unit)
+        resolved.complete(31_500)
+        advanceUntilIdle()
+
+        verify(playbackManager, never()).seekToTimeMsSuspend(any(), anyOrNull())
+        verify(playbackManager, never()).playQueueSuspend(any(), any())
+    }
+
+    @Test
+    fun `playing a quote drops the seek when the user seeks while the episode loads`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        whenever(quoteSeeker.playbackTimeMs(any(), any())).thenReturn(31_500)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = "other-uuid")
+        whenever(playbackManager.playNowSuspend(any<BaseEpisode>(), any(), any(), any())).doSuspendableAnswer {
+            userSeeks.emit(Unit)
+            playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID)
+            Unit
+        }
+        playableState(quote)
+
+        viewModel.playQuote(quote.uuid)
+        advanceUntilIdle()
+
+        verify(playbackManager, never()).seekToTimeMsSuspend(any(), anyOrNull())
+    }
+
+    @Test
+    fun `playing a quote drops the seek when the episode changes while it resolves`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        val resolved = CompletableDeferred<Int>()
+        whenever(quoteSeeker.playbackTimeMs(any(), any())).doSuspendableAnswer { resolved.await() }
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID, positionMs = 10_000)
+        playableState(quote)
+
+        viewModel.playQuote(quote.uuid)
+        advanceUntilIdle()
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = OTHER_EPISODE_UUID, positionMs = 0)
+        resolved.complete(31_500)
+        advanceUntilIdle()
+
+        verify(playbackManager, never()).seekToTimeMsSuspend(any(), anyOrNull())
+    }
+
+    @Test
     fun `playing a quote offers undo with the episode title`() = runTest {
         val quote = createQuote(startMs = 1_000, endMs = 3_000)
         whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
@@ -1129,7 +1522,7 @@ class ChatViewModelTest {
             viewModel.playQuote(quote.uuid)
             advanceUntilIdle()
 
-            assertEquals(ChatToast.QuotePlaying(episode.value.title), awaitItem())
+            assertEquals(episode.value.title, (awaitItem() as ChatToast.QuotePlaying).episodeTitle)
         }
     }
 
@@ -1153,6 +1546,7 @@ class ChatViewModelTest {
                 source = SourceView.PLAYER.analyticsValue,
                 episodeUuid = EPISODE_UUID,
                 podcastUuid = PODCAST_UUID,
+                isOtherEpisode = false,
             ),
             eventSink.pollEvent(),
         )
@@ -1207,7 +1601,7 @@ class ChatViewModelTest {
         advanceUntilIdle()
         viewModel.playQuote(first.uuid)
         advanceUntilIdle()
-        viewModel.onQuoteUndoExpired()
+        viewModel.onQuoteUndoExpired(quotePlayingToast().undoId)
         playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID, positionMs = 1_500)
         viewModel.playQuote(second.uuid)
         advanceUntilIdle()
@@ -1216,6 +1610,55 @@ class ChatViewModelTest {
         advanceUntilIdle()
 
         verify(playbackManager).seekToTimeMsSuspend(org.mockito.kotlin.eq(1_500), anyOrNull())
+    }
+
+    @Test
+    fun `a quote toast replaced by the next quote keeps the first undo`() = runTest {
+        val first = createQuote(startMs = 1_000, endMs = 3_000)
+        val second = createQuote(startMs = 5_000, endMs = 7_000, uuid = "second-quote-uuid")
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID, positionMs = 10_000)
+        chatManager.messages.value = listOf(first, second)
+        setEpisodeInfo(123_000)
+        advanceUntilIdle()
+        viewModel.playQuote(first.uuid)
+        advanceUntilIdle()
+        val firstToast = quotePlayingToast()
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID, positionMs = 1_500)
+        viewModel.playQuote(second.uuid)
+        advanceUntilIdle()
+        viewModel.onQuoteUndoExpired(firstToast.undoId)
+
+        viewModel.undoQuotePlay()
+        advanceUntilIdle()
+
+        verify(playbackManager).seekToTimeMsSuspend(org.mockito.kotlin.eq(10_000), anyOrNull())
+        verify(playbackManager, never()).seekToTimeMsSuspend(org.mockito.kotlin.eq(1_500), anyOrNull())
+    }
+
+    @Test
+    fun `a quote that could not play drops the undo of the quote before it`() = runTest {
+        val first = createQuote(startMs = 1_000, endMs = 3_000)
+        val second = createQuote(startMs = 5_000, endMs = 7_000, uuid = "second-quote-uuid")
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        whenever(episodeManager.findEpisodeByUuid("other-uuid")).thenReturn(PodcastEpisode(uuid = "other-uuid", publishedDate = Date()))
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID, positionMs = 10_000)
+        chatManager.messages.value = listOf(first, second)
+        setEpisodeInfo(123_000)
+        advanceUntilIdle()
+        viewModel.playQuote(first.uuid)
+        advanceUntilIdle()
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = "other-uuid", positionMs = 1_500)
+        viewModel.playQuote(second.uuid)
+        advanceUntilIdle()
+        eventSink.skipEvent(eventSink.size)
+        assertEquals(ChatToast.QuotePlayFailed, viewModel.toasts.first())
+
+        viewModel.undoQuotePlay()
+        advanceUntilIdle()
+
+        verify(playbackManager, never()).seekToTimeMsSuspend(org.mockito.kotlin.eq(10_000), anyOrNull())
+        assertTrue(eventSink.isEmpty())
     }
 
     @Test
@@ -1265,8 +1708,50 @@ class ChatViewModelTest {
         val quote = createQuote(startMs = 1_000, endMs = 3_000)
         whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
         playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = "other-uuid")
+        whenever(playbackManager.playNowSuspend(org.mockito.kotlin.eq(episode.value), any(), any(), any())).then {
+            playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID)
+            Unit
+        }
         playableState(quote)
         eventSink.skipEvent()
+
+        viewModel.playQuote(quote.uuid)
+        advanceUntilIdle()
+
+        assertEquals(
+            EpisodeChatQuotePlayTappedEvent(
+                source = SourceView.PLAYER.analyticsValue,
+                episodeUuid = EPISODE_UUID,
+                podcastUuid = PODCAST_UUID,
+                quoteSource = EpisodeChatQuoteSourceType.InlineTimestamp,
+                isOtherEpisode = true,
+            ),
+            eventSink.pollEvent(),
+        )
+    }
+
+    @Test
+    fun `a quote whose episode never loads shows that it could not play`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = "other-uuid")
+        playableState(quote)
+
+        viewModel.toasts.test {
+            viewModel.playQuote(quote.uuid)
+            advanceUntilIdle()
+
+            assertEquals(ChatToast.QuotePlayFailed, awaitItem())
+        }
+    }
+
+    @Test
+    fun `a quote tap is tracked before its episode loads even when it never does`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = "other-uuid")
+        playableState(quote)
+        eventSink.skipEvent(eventSink.size)
 
         viewModel.playQuote(quote.uuid)
 
@@ -1280,6 +1765,417 @@ class ChatViewModelTest {
             ),
             eventSink.pollEvent(),
         )
+        advanceUntilIdle()
+        assertTrue(eventSink.isEmpty())
+    }
+
+    @Test
+    fun `a quote whose episode never loads goes back to what was playing`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        val other = PodcastEpisode(uuid = "other-uuid", publishedDate = Date())
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        whenever(episodeManager.findEpisodeByUuid("other-uuid")).thenReturn(other)
+        whenever(upNextQueue.currentEpisode).thenReturn(episode.value)
+        whenever(playbackManager.playNowSuspend(org.mockito.kotlin.eq(other), any(), any(), any())).then {
+            playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = "other-uuid")
+            Unit
+        }
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = "other-uuid", positionMs = 10_000)
+        playableState(quote)
+
+        viewModel.playQuote(quote.uuid)
+        advanceUntilIdle()
+
+        verify(playbackManager).playNowSuspend(org.mockito.kotlin.eq(other), any(), any(), any())
+        verify(playbackManager).seekToTimeMsSuspend(org.mockito.kotlin.eq(10_000), anyOrNull())
+    }
+
+    @Test
+    fun `a quote whose episode never loads keeps an episode started while it was loading`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        val other = PodcastEpisode(uuid = "other-uuid", publishedDate = Date())
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        whenever(episodeManager.findEpisodeByUuid("other-uuid")).thenReturn(other)
+        whenever(upNextQueue.currentEpisode).thenReturn(PodcastEpisode(uuid = "started-uuid", publishedDate = Date()))
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = "other-uuid", positionMs = 10_000)
+        playableState(quote)
+
+        viewModel.toasts.test {
+            viewModel.playQuote(quote.uuid)
+            advanceUntilIdle()
+
+            assertEquals(ChatToast.QuotePlayFailed, awaitItem())
+        }
+        verify(playbackManager, never()).playNowSuspend(org.mockito.kotlin.eq(other), any(), any(), any())
+        verify(playbackManager, never()).seekToTimeMsSuspend(any(), anyOrNull())
+        verify(upNextQueue, never()).changeList(any())
+        verify(upNextQueue).removeEpisode(org.mockito.kotlin.eq(episode.value), any())
+    }
+
+    @Test
+    fun `a quote whose episode never loads keeps it in Up Next when it was already queued`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        whenever(upNextQueue.queueEpisodes).thenReturn(listOf(episode.value))
+        whenever(upNextQueue.currentEpisode).thenReturn(PodcastEpisode(uuid = "started-uuid", publishedDate = Date()))
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = "other-uuid", positionMs = 10_000)
+        playableState(quote)
+
+        viewModel.toasts.test {
+            viewModel.playQuote(quote.uuid)
+            advanceUntilIdle()
+
+            assertEquals(ChatToast.QuotePlayFailed, awaitItem())
+        }
+        verify(upNextQueue, never()).removeEpisode(any(), any())
+    }
+
+    @Test
+    fun `undoing a quote from another episode puts Up Next back in its order`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        val other = PodcastEpisode(uuid = "other-uuid", publishedDate = Date())
+        val queued = listOf(PodcastEpisode(uuid = "queued-1", publishedDate = Date()), PodcastEpisode(uuid = "queued-2", publishedDate = Date()))
+        whenever(upNextQueue.queueEpisodes).thenReturn(queued)
+        whenever(upNextQueue.currentEpisode).thenReturn(other)
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        whenever(episodeManager.findEpisodeByUuid("other-uuid")).thenReturn(other)
+        switchPlaybackOnPlayNow(other)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = "other-uuid", positionMs = 10_000)
+        playableState(quote)
+        viewModel.playQuote(quote.uuid)
+        advanceUntilIdle()
+
+        eventSink.skipEvent(eventSink.size)
+        viewModel.undoQuotePlay()
+        advanceUntilIdle()
+
+        verify(upNextQueue).changeList(queued)
+        assertEquals(true, (eventSink.pollEvent() as EpisodeChatQuotePlayUndoneEvent).isOtherEpisode)
+    }
+
+    @Test
+    fun `undoing a quote from another episode restores its archived and played state`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        val other = PodcastEpisode(uuid = "other-uuid", publishedDate = Date())
+        val quoteEpisode = PodcastEpisode(
+            uuid = EPISODE_UUID,
+            publishedDate = Date(),
+            duration = 600.0,
+            isArchived = true,
+            playingStatus = EpisodePlayingStatus.COMPLETED,
+            playedUpTo = 600.0,
+        )
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(quoteEpisode)
+        whenever(episodeManager.findEpisodeByUuid("other-uuid")).thenReturn(other)
+        switchPlaybackOnPlayNow(other, quoteEpisode)
+        whenever(playbackManager.playNowSuspend(org.mockito.kotlin.same(quoteEpisode), any(), any(), any())).then {
+            quoteEpisode.isArchived = false
+            quoteEpisode.playingStatus = EpisodePlayingStatus.NOT_PLAYED
+            quoteEpisode.playedUpTo = 0.0
+            playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID)
+            Unit
+        }
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = "other-uuid", positionMs = 10_000)
+        playableState(quote)
+        viewModel.playQuote(quote.uuid)
+        advanceUntilIdle()
+
+        viewModel.undoQuotePlay()
+        advanceUntilIdle()
+
+        verify(episodeManager).updatePlayingStatusBlocking(org.mockito.kotlin.same(quoteEpisode), org.mockito.kotlin.eq(EpisodePlayingStatus.COMPLETED))
+        verify(episodeManager).updatePlayedUpToBlocking(org.mockito.kotlin.same(quoteEpisode), org.mockito.kotlin.eq(600.0), org.mockito.kotlin.eq(true))
+        verify(episodeManager).archiveAllInList(listOf(quoteEpisode), null)
+        verify(episodeManager, never()).archiveBlocking(any(), any(), any(), any())
+    }
+
+    @Test
+    fun `undoing a quote when nothing was loaded takes the episode out of Up Next`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        switchPlaybackOnPlayNow(other = null)
+        playbackState.value = PlaybackState()
+        playableState(quote)
+        viewModel.playQuote(quote.uuid)
+        advanceUntilIdle()
+
+        viewModel.undoQuotePlay()
+        advanceUntilIdle()
+
+        val order = inOrder(playbackManager, upNextQueue, episodeManager)
+        order.verify(playbackManager).stop()
+        order.verify(upNextQueue).removeAll()
+        order.verify(episodeManager).updatePlayedUpToBlocking(any(), any(), org.mockito.kotlin.eq(true))
+        verify(playbackManager, never()).removeEpisode(any(), any(), any(), any())
+    }
+
+    @Test
+    fun `undoing a quote in the same episode leaves Up Next alone`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID, positionMs = 10_000)
+        playableState(quote)
+        viewModel.playQuote(quote.uuid)
+        advanceUntilIdle()
+
+        viewModel.undoQuotePlay()
+        advanceUntilIdle()
+
+        verify(upNextQueue, never()).changeList(any())
+        verify(episodeManager, never()).updatePlayingStatusBlocking(any(), any())
+    }
+
+    @Test
+    fun `undoing a quote from another chat after one in the playing episode goes back to that episode`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        val otherQuote = createQuote(startMs = 2_000, endMs = 4_000, uuid = "other-quote-uuid")
+        val playing = episode.value
+        val other = PodcastEpisode(
+            uuid = OTHER_EPISODE_UUID,
+            publishedDate = Date(),
+            duration = 300.0,
+            isArchived = true,
+            playingStatus = EpisodePlayingStatus.COMPLETED,
+            playedUpTo = 300.0,
+        )
+        val queued = listOf(PodcastEpisode(uuid = "queued-1", publishedDate = Date()))
+        whenever(upNextQueue.queueEpisodes).thenReturn(queued)
+        whenever(upNextQueue.currentEpisode).thenReturn(playing)
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(playing)
+        whenever(episodeManager.findEpisodeByUuid(OTHER_EPISODE_UUID)).thenReturn(other)
+        whenever(playbackManager.playNowSuspend(org.mockito.kotlin.same(other), any(), any(), any())).then {
+            playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = OTHER_EPISODE_UUID)
+            Unit
+        }
+        whenever(playbackManager.playNowSuspend(org.mockito.kotlin.same(playing), any(), any(), any())).then {
+            playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID)
+            Unit
+        }
+        playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID, positionMs = 10_000)
+        chatManager.otherMessages.value = listOf(otherQuote)
+        playableState(quote)
+        viewModel.playQuote(quote.uuid)
+        advanceUntilIdle()
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID, positionMs = 1_000)
+        viewModel.openHistoryChat(historyItem(OTHER_EPISODE_UUID))
+        advanceUntilIdle()
+        viewModel.playQuote(otherQuote.uuid)
+        advanceUntilIdle()
+        eventSink.skipEvent(eventSink.size)
+
+        viewModel.undoQuotePlay()
+        advanceUntilIdle()
+
+        assertEquals(true, (eventSink.pollEvent() as EpisodeChatQuotePlayUndoneEvent).isOtherEpisode)
+        verify(playbackManager).playNowSuspend(org.mockito.kotlin.same(playing), any(), any(), any())
+        verify(upNextQueue).changeList(queued)
+        verify(episodeManager).updatePlayingStatusBlocking(org.mockito.kotlin.same(other), org.mockito.kotlin.eq(EpisodePlayingStatus.COMPLETED))
+        verify(episodeManager).archiveAllInList(listOf(other), null)
+        verify(playbackManager).seekToTimeMsSuspend(org.mockito.kotlin.eq(10_000), anyOrNull())
+    }
+
+    private suspend fun quotePlayingToast() = viewModel.toasts.first() as ChatToast.QuotePlaying
+
+    private suspend fun switchPlaybackOnPlayNow(other: BaseEpisode?, quoteEpisode: BaseEpisode = episode.value) {
+        whenever(playbackManager.playNowSuspend(org.mockito.kotlin.eq(quoteEpisode), any(), any(), any())).then {
+            playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID)
+            Unit
+        }
+        if (other != null) {
+            whenever(playbackManager.playNowSuspend(org.mockito.kotlin.eq(other), any(), any(), any())).then {
+                playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = other.uuid)
+                Unit
+            }
+        }
+    }
+
+    @Test
+    fun `a tapped quote loads until it plays`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        val resolved = CompletableDeferred<Int>()
+        whenever(quoteSeeker.playbackTimeMs(any(), any())).doSuspendableAnswer { resolved.await() }
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID)
+        playableState(quote)
+
+        viewModel.playQuote(quote.uuid)
+        assertEquals(quote.uuid, viewModel.uiState.value.loadingQuoteUuid)
+        advanceUntilIdle()
+        assertEquals(quote.uuid, viewModel.uiState.value.loadingQuoteUuid)
+
+        resolved.complete(1_000)
+        advanceUntilIdle()
+
+        assertNull(viewModel.uiState.value.loadingQuoteUuid)
+        verify(playbackManager).playQueueSuspend(any(), any())
+    }
+
+    @Test
+    fun `a tapped quote stops loading when its episode never loads`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = "other-uuid")
+        playableState(quote)
+
+        viewModel.playQuote(quote.uuid)
+        runCurrent()
+        assertEquals(quote.uuid, viewModel.uiState.value.loadingQuoteUuid)
+        advanceUntilIdle()
+
+        assertNull(viewModel.uiState.value.loadingQuoteUuid)
+    }
+
+    @Test
+    fun `a tapped quote stops loading when its episode cannot be found`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        playableState(quote)
+
+        viewModel.playQuote(quote.uuid)
+        advanceUntilIdle()
+
+        assertNull(viewModel.uiState.value.loadingQuoteUuid)
+        verifyNoSeek()
+    }
+
+    @Test
+    fun `a tapped quote stops loading when the user seeks first`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        val resolved = CompletableDeferred<Int>()
+        whenever(quoteSeeker.playbackTimeMs(any(), any())).doSuspendableAnswer { resolved.await() }
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID)
+        playableState(quote)
+
+        viewModel.playQuote(quote.uuid)
+        advanceUntilIdle()
+        userSeeks.emit(Unit)
+        resolved.complete(1_000)
+        advanceUntilIdle()
+
+        assertNull(viewModel.uiState.value.loadingQuoteUuid)
+    }
+
+    @Test
+    fun `tapping a loading quote again is ignored`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        val resolved = CompletableDeferred<Int>()
+        whenever(quoteSeeker.playbackTimeMs(any(), any())).doSuspendableAnswer { resolved.await() }
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID)
+        playableState(quote)
+        eventSink.skipEvent(eventSink.size)
+
+        viewModel.playQuote(quote.uuid)
+        advanceUntilIdle()
+        viewModel.playQuote(quote.uuid)
+        advanceUntilIdle()
+        resolved.complete(1_000)
+        advanceUntilIdle()
+
+        assertTrue(eventSink.pollEvent() is EpisodeChatQuotePlayTappedEvent)
+        assertTrue(eventSink.isEmpty())
+        verify(quoteSeeker, times(1)).playbackTimeMs(any(), any())
+        verify(playbackManager, times(1)).seekToTimeMsSuspend(any(), anyOrNull())
+    }
+
+    @Test
+    fun `tapping another quote moves the loading to it`() = runTest {
+        val first = createQuote(startMs = 1_000, endMs = 3_000)
+        val second = createQuote(startMs = 5_000, endMs = 7_000, uuid = "second-quote-uuid")
+        val resolved = CompletableDeferred<Int>()
+        whenever(quoteSeeker.playbackTimeMs(any(), any())).doSuspendableAnswer { resolved.await() }
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID)
+        chatManager.messages.value = listOf(first, second)
+        setEpisodeInfo()
+        advanceUntilIdle()
+
+        viewModel.playQuote(first.uuid)
+        advanceUntilIdle()
+        viewModel.playQuote(second.uuid)
+        advanceUntilIdle()
+
+        assertEquals(second.uuid, viewModel.uiState.value.loadingQuoteUuid)
+        resolved.complete(5_000)
+        advanceUntilIdle()
+        assertNull(viewModel.uiState.value.loadingQuoteUuid)
+        verify(playbackManager, times(1)).seekToTimeMsSuspend(org.mockito.kotlin.eq(5_000), anyOrNull())
+    }
+
+    @Test
+    fun `switching chats stops showing the quote loading`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        whenever(quoteSeeker.playbackTimeMs(any(), any())).doSuspendableAnswer { CompletableDeferred<Int>().await() }
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID)
+        playableState(quote)
+        viewModel.playQuote(quote.uuid)
+        advanceUntilIdle()
+
+        viewModel.openHistoryChat(historyItem(OTHER_EPISODE_UUID))
+        advanceUntilIdle()
+
+        assertNull(viewModel.uiState.value.loadingQuoteUuid)
+    }
+
+    @Test
+    fun `a playable quote of the loaded episode warms up once`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID)
+        playableState(quote)
+
+        chatManager.messages.value = listOf(ChatMessage.User("Question"), quote)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID, positionMs = 2_000)
+        advanceUntilIdle()
+
+        verify(quoteSeeker, times(1)).warmUpQuote(org.mockito.kotlin.eq(EPISODE_UUID), org.mockito.kotlin.argThat { uuid == quote.uuid })
+        verify(quoteSeeker, times(1)).warmUpFingerprints(EPISODE_UUID)
+    }
+
+    @Test
+    fun `each new playable quote of the loaded episode warms up`() = runTest {
+        val first = createQuote(startMs = 1_000, endMs = 3_000)
+        val second = createQuote(startMs = 5_000, endMs = 7_000, uuid = "second-quote-uuid")
+        playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID)
+        playableState(first)
+
+        chatManager.messages.value = listOf(first, second)
+        advanceUntilIdle()
+
+        verify(quoteSeeker).warmUpQuote(org.mockito.kotlin.eq(EPISODE_UUID), org.mockito.kotlin.argThat { uuid == second.uuid })
+        verify(quoteSeeker, times(1)).warmUpFingerprints(EPISODE_UUID)
+    }
+
+    @Test
+    fun `a quote warms up once its episode is loaded`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        playableState(quote)
+        verify(quoteSeeker, never()).warmUpQuote(any(), any())
+
+        playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID)
+        advanceUntilIdle()
+
+        verify(quoteSeeker).warmUpQuote(org.mockito.kotlin.eq(EPISODE_UUID), any())
+    }
+
+    @Test
+    fun `quotes of an episode that is not loaded do not warm up`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = OTHER_EPISODE_UUID)
+        playableState(quote)
+
+        verify(quoteSeeker, never()).warmUpQuote(any(), any())
+        verify(quoteSeeker, never()).warmUpFingerprints(any())
+    }
+
+    @Test
+    fun `quotes that cannot play do not warm up`() = runTest {
+        val quote = createQuote(startMs = 49_020_000, endMs = 49_500_000)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID)
+        playableState(quote)
+
+        verify(quoteSeeker, never()).warmUpQuote(any(), any())
+        verify(quoteSeeker, never()).warmUpFingerprints(any())
     }
 
     @Test
@@ -1300,6 +2196,7 @@ class ChatViewModelTest {
 
         verify(playbackManager, never()).seekToTimeMsSuspend(any(), anyOrNull())
         verify(playbackManager, never()).playQueueSuspend(any(), any())
+        assertNull(viewModel.uiState.value.loadingQuoteUuid)
     }
 
     @Test
@@ -1526,7 +2423,9 @@ class ChatViewModelTest {
     private fun setEpisodeInfo(
         episodeDurationMs: Int = 123_000,
         sourceView: SourceView = SourceView.PLAYER,
+        entryPoint: ChatEntryPoint = ChatEntryPoint.PlayerShelf,
         isBeta: Boolean = false,
+        requiresSignIn: Boolean = false,
     ) {
         viewModel.setEpisodeInfo(
             episodeUuid = EPISODE_UUID,
@@ -1535,7 +2434,9 @@ class ChatViewModelTest {
             podcastTitle = "Podcast title",
             episodeDurationMs = episodeDurationMs,
             sourceView = sourceView,
+            entryPoint = entryPoint,
             isBeta = isBeta,
+            requiresSignIn = requiresSignIn,
         )
     }
 
@@ -1568,6 +2469,231 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `signed out user always sees the beta sheet asking to sign in`() = runTest {
+        betaSheetSeen.value = true
+        isLoggedIn = false
+
+        setEpisodeInfo(isBeta = true, requiresSignIn = true)
+
+        val state = viewModel.uiState.value
+        assertTrue(state.isBetaSheetVisible)
+        assertTrue(state.isSignInRequired)
+        assertEquals(
+            EpisodeChatBetaSheetShownEvent(
+                source = SourceView.PLAYER.analyticsValue,
+                episodeUuid = EPISODE_UUID,
+                podcastUuid = PODCAST_UUID,
+            ),
+            eventSink.pollEvent(),
+        )
+    }
+
+    @Test
+    fun `tapping sign in on the beta sheet starts sign in and tracks it`() = runTest {
+        isLoggedIn = false
+        setEpisodeInfo(isBeta = true, requiresSignIn = true)
+        eventSink.skipEvent()
+
+        viewModel.navigation.test {
+            viewModel.onSignInClick()
+
+            assertEquals(ChatNavigation.SignIn, awaitItem())
+        }
+        assertEquals(
+            EpisodeChatBetaSheetSignInTappedEvent(
+                source = SourceView.PLAYER.analyticsValue,
+                episodeUuid = EPISODE_UUID,
+                podcastUuid = PODCAST_UUID,
+            ),
+            eventSink.pollEvent(),
+        )
+        assertTrue(viewModel.uiState.value.isBetaSheetVisible)
+    }
+
+    @Test
+    fun `coming back signed in hides the beta sheet and marks it seen`() = runTest {
+        isLoggedIn = false
+        setEpisodeInfo(isBeta = true, requiresSignIn = true)
+        eventSink.skipEvent()
+
+        isLoggedIn = true
+        viewModel.refreshSignIn()
+
+        val state = viewModel.uiState.value
+        assertFalse(state.isBetaSheetVisible)
+        assertFalse(state.isSignInRequired)
+        verify(betaSheetSeenSetting).set(true, updateModifiedAt = false)
+        assertTrue(eventSink.pollEvent() is EpisodeChatShownEvent)
+        assertTrue(eventSink.isEmpty())
+    }
+
+    @Test
+    fun `a plus account signing in leaves beta mode`() = runTest {
+        isLoggedIn = false
+        setEpisodeInfo(isBeta = true, requiresSignIn = true)
+
+        isLoggedIn = true
+        viewModel.refreshSignIn()
+        advanceUntilIdle()
+        assertTrue(viewModel.uiState.value.isBeta)
+
+        subscription.value = Subscription(
+            tier = SubscriptionTier.Plus,
+            billingCycle = BillingCycle.Monthly,
+            platform = SubscriptionPlatform.Android,
+            expiryDate = Instant.now(),
+            isAutoRenewing = true,
+            giftDays = 0,
+        )
+        advanceUntilIdle()
+
+        assertFalse(viewModel.uiState.value.isBeta)
+    }
+
+    @Test
+    fun `a signed out user is not counted as opening the chat until signing in`() = runTest {
+        chatManager.messages.value = listOf(ChatMessage.User(text = "Old question", uuid = "old-uuid"))
+        isLoggedIn = false
+        setEpisodeInfo(isBeta = true, requiresSignIn = true)
+        viewModel.trackDismissed()
+
+        assertTrue(eventSink.pollEvent() is EpisodeChatBetaSheetShownEvent)
+        assertTrue(eventSink.isEmpty())
+
+        isLoggedIn = true
+        viewModel.refreshSignIn()
+        advanceUntilIdle()
+
+        assertEquals(
+            EpisodeChatShownEvent(
+                source = SourceView.PLAYER.analyticsValue,
+                episodeUuid = EPISODE_UUID,
+                podcastUuid = PODCAST_UUID,
+                hasHistory = true,
+                entryPoint = EpisodeChatEntryPointType.SignIn,
+                isBeta = true,
+            ),
+            eventSink.pollEvent(),
+        )
+    }
+
+    @Test
+    fun `a signed out user does not see the saved conversation behind the sign in sheet`() = runTest {
+        chatManager.messages.value = listOf(ChatMessage.User(text = "Old question", uuid = "old-uuid"))
+        isLoggedIn = false
+        setEpisodeInfo(isBeta = true, requiresSignIn = true)
+        advanceUntilIdle()
+
+        assertEquals(emptyList<ChatMessage>(), viewModel.uiState.value.messages)
+
+        isLoggedIn = true
+        viewModel.refreshSignIn()
+        advanceUntilIdle()
+
+        assertEquals(listOf("old-uuid"), viewModel.uiState.value.messages.map { it.uuid })
+    }
+
+    @Test
+    fun `tapping sign in twice starts sign in once`() = runTest {
+        isLoggedIn = false
+        setEpisodeInfo(isBeta = true, requiresSignIn = true)
+        eventSink.skipEvent()
+
+        viewModel.navigation.test {
+            viewModel.onSignInClick()
+            viewModel.onSignInClick()
+
+            assertEquals(ChatNavigation.SignIn, awaitItem())
+            expectNoEvents()
+        }
+        assertEquals(1, eventSink.size)
+    }
+
+    @Test
+    fun `an already signed in user is not asked to sign in`() = runTest {
+        betaSheetSeen.value = true
+
+        setEpisodeInfo(isBeta = true, requiresSignIn = true)
+
+        assertFalse(viewModel.uiState.value.isSignInRequired)
+        assertFalse(viewModel.uiState.value.isBetaSheetVisible)
+    }
+
+    @Test
+    fun `a chat restored after signing in opens without a second beta sheet`() = runTest {
+        setEpisodeInfo(isBeta = true, requiresSignIn = true)
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertFalse(state.isSignInRequired)
+        assertFalse(state.isBetaSheetVisible)
+        assertTrue(state.isBeta)
+        verify(betaSheetSeenSetting).set(true, updateModifiedAt = false)
+        assertEquals(
+            EpisodeChatShownEvent(
+                source = SourceView.PLAYER.analyticsValue,
+                episodeUuid = EPISODE_UUID,
+                podcastUuid = PODCAST_UUID,
+                hasHistory = false,
+                entryPoint = EpisodeChatEntryPointType.SignIn,
+                isBeta = true,
+            ),
+            eventSink.pollEvent(),
+        )
+        assertTrue(eventSink.isEmpty())
+
+        viewModel.refreshSignIn()
+        advanceUntilIdle()
+
+        assertEquals(1, chatManager.createdChats.size)
+        assertTrue(eventSink.isEmpty())
+    }
+
+    @Test
+    fun `a plus account restored after signing in leaves beta mode without the beta sheet`() = runTest {
+        subscription.value = Subscription(
+            tier = SubscriptionTier.Plus,
+            billingCycle = BillingCycle.Monthly,
+            platform = SubscriptionPlatform.Android,
+            expiryDate = Instant.now(),
+            isAutoRenewing = true,
+            giftDays = 0,
+        )
+
+        setEpisodeInfo(isBeta = true, requiresSignIn = true)
+        advanceUntilIdle()
+
+        assertFalse(viewModel.uiState.value.isBeta)
+        assertFalse(viewModel.uiState.value.isBetaSheetVisible)
+        assertEquals(false, (eventSink.pollEvent() as EpisodeChatShownEvent).isBeta)
+        assertTrue(eventSink.isEmpty())
+    }
+
+    @Test
+    fun `coming back without signing in keeps the beta sheet`() = runTest {
+        isLoggedIn = false
+        setEpisodeInfo(isBeta = true, requiresSignIn = true)
+
+        viewModel.refreshSignIn()
+
+        assertTrue(viewModel.uiState.value.isBetaSheetVisible)
+        verify(betaSheetSeenSetting, never()).set(any(), any(), any(), any())
+    }
+
+    @Test
+    fun `dismissing the sign in sheet closes the chat without marking the sheet seen`() = runTest {
+        isLoggedIn = false
+        setEpisodeInfo(isBeta = true, requiresSignIn = true)
+
+        viewModel.navigation.test {
+            viewModel.dismissBetaSheet()
+
+            assertEquals(ChatNavigation.Close, awaitItem())
+        }
+        verify(betaSheetSeenSetting, never()).set(any(), any(), any(), any())
+    }
+
+    @Test
     fun `beta user who saw the sheet does not see it again`() = runTest {
         betaSheetSeen.value = true
 
@@ -1582,6 +2708,27 @@ class ChatViewModelTest {
 
         assertFalse(viewModel.uiState.value.isBetaSheetVisible)
         assertFalse(viewModel.uiState.value.isBeta)
+    }
+
+    @Test
+    fun `plus user sees the beta note while the feature is in beta`() = runTest {
+        FeatureFlag.setEnabled(Feature.EPISODE_CHAT_FREE_BETA, true)
+
+        setEpisodeInfo(isBeta = false)
+        advanceUntilIdle()
+
+        assertTrue(viewModel.uiState.value.isBetaNoteVisible)
+        assertFalse(viewModel.uiState.value.isBetaSheetVisible)
+    }
+
+    @Test
+    fun `nobody sees the beta note once the feature leaves beta`() = runTest {
+        FeatureFlag.setEnabled(Feature.EPISODE_CHAT_FREE_BETA, false)
+
+        setEpisodeInfo(isBeta = true)
+        advanceUntilIdle()
+
+        assertFalse(viewModel.uiState.value.isBetaNoteVisible)
     }
 
     @Test
@@ -1618,6 +2765,39 @@ class ChatViewModelTest {
         assertTrue(state.isHistoryVisible)
         assertEquals(listOf(ChatHistoryGroup.Today, ChatHistoryGroup.PreviousSevenDays), state.history.map { it.group })
         assertEquals(EpisodeChatHistoryShownEvent(source = SourceView.PLAYER.analyticsValue, chatCount = 2), eventSink.pollEvent())
+    }
+
+    @Test
+    fun `showing the history before it loads tracks how many chats there are once it loads`() = runTest {
+        val history = MutableSharedFlow<List<EpisodeChatHistoryItem>>()
+        chatManager.observedHistory = history
+        setEpisodeInfo()
+        advanceUntilIdle()
+        eventSink.skipEvent()
+
+        viewModel.showHistory()
+        assertTrue(eventSink.isEmpty())
+        history.emit(listOf(historyItem(EPISODE_UUID), historyItem(OTHER_EPISODE_UUID, daysAgo = 3)))
+        advanceUntilIdle()
+
+        assertEquals(EpisodeChatHistoryShownEvent(source = SourceView.PLAYER.analyticsValue, chatCount = 2), eventSink.pollEvent())
+        assertTrue(eventSink.isEmpty())
+    }
+
+    @Test
+    fun `closing the history before it loads does not track it as shown`() = runTest {
+        val history = MutableSharedFlow<List<EpisodeChatHistoryItem>>()
+        chatManager.observedHistory = history
+        setEpisodeInfo()
+        advanceUntilIdle()
+        eventSink.skipEvent()
+
+        viewModel.showHistory()
+        viewModel.closeHistory()
+        history.emit(listOf(historyItem(EPISODE_UUID)))
+        advanceUntilIdle()
+
+        assertTrue(eventSink.isEmpty())
     }
 
     @Test
@@ -1677,6 +2857,35 @@ class ChatViewModelTest {
                 source = SourceView.PLAYER.analyticsValue,
                 episodeUuid = OTHER_EPISODE_UUID,
                 podcastUuid = OTHER_PODCAST_UUID,
+                hasHistory = true,
+                entryPoint = ChatEntryPoint.History.analyticsValue,
+                isBeta = false,
+            ),
+            eventSink.pollEvent(),
+        )
+    }
+
+    @Test
+    fun `opening a chat from the history tracks its section and position`() = runTest {
+        chatManager.history.value = listOf(
+            historyItem(EPISODE_UUID, podcastUuid = PODCAST_UUID),
+            historyItem("yesterday-episode", daysAgo = 1),
+            historyItem(OTHER_EPISODE_UUID, daysAgo = 3),
+        )
+        setEpisodeInfo()
+        viewModel.showHistory()
+        eventSink.skipEvent(eventSink.size)
+
+        viewModel.openHistoryChat(historyItem(OTHER_EPISODE_UUID, daysAgo = 3))
+
+        assertEquals(
+            EpisodeChatHistoryRowTappedEvent(
+                source = SourceView.PLAYER.analyticsValue,
+                episodeUuid = OTHER_EPISODE_UUID,
+                podcastUuid = OTHER_PODCAST_UUID,
+                isNowPlaying = false,
+                section = EpisodeChatHistorySectionType.Previous7Days,
+                position = 3,
             ),
             eventSink.pollEvent(),
         )
@@ -1759,16 +2968,168 @@ class ChatViewModelTest {
     }
 
     @Test
-    fun `history cannot open while an answer is pending`() = runTest {
+    fun `sending in the open chat keeps the undo for another deleted chat`() = runTest {
+        val otherMessage = ChatMessage.User(text = "Other question", uuid = "other-message-uuid")
+        chatManager.otherMessages.value = listOf(otherMessage)
         setEpisodeInfo()
-        chatManager.sendMessageGate = CompletableDeferred()
+        connectToInternet()
+        advanceUntilIdle()
+        viewModel.deleteHistoryChat(historyItem(OTHER_EPISODE_UUID))
+        advanceUntilIdle()
+
+        viewModel.undoExpired.test {
+            viewModel.onInputTextChange("New question")
+            viewModel.onSend()
+            advanceUntilIdle()
+            expectNoEvents()
+        }
+        viewModel.undoDeleteChat()
+        advanceUntilIdle()
+
+        assertEquals(listOf(otherMessage), chatManager.otherMessages.value)
+    }
+
+    @Test
+    fun `sending after deleting the open chat expires its undo`() = runTest {
+        chatManager.messages.value = listOf(ChatMessage.User(text = "Question", uuid = "message-uuid"))
+        setEpisodeInfo()
+        connectToInternet()
+        advanceUntilIdle()
+        viewModel.deleteHistoryChat(historyItem(EPISODE_UUID, podcastUuid = PODCAST_UUID))
+        advanceUntilIdle()
+
+        viewModel.undoExpired.test {
+            viewModel.onInputTextChange("New question")
+            viewModel.onSend()
+            advanceUntilIdle()
+            awaitItem()
+        }
+    }
+
+    @Test
+    fun `history opens while an answer is pending and the answer still lands`() = runTest {
+        setEpisodeInfo()
+        connectToInternet()
+        val gate = CompletableDeferred<Unit>()
+        chatManager.sendMessageGate = gate
         viewModel.onInputTextChange("Question")
         viewModel.onSend()
         runCurrent()
 
         viewModel.showHistory()
+        assertTrue(viewModel.uiState.value.isHistoryVisible)
+        assertTrue(viewModel.uiState.value.isAwaitingReply)
+
+        gate.complete(Unit)
+        advanceUntilIdle()
+        viewModel.closeHistory()
+
+        val state = viewModel.uiState.value
+        assertFalse(state.isAwaitingReply)
+        assertNull(state.error)
+        assertEquals(listOf("Question", "Response"), state.messages.map { it.text() })
+        assertEquals(SendMessage(EPISODE_UUID, "Question"), chatManager.sentMessages.single())
+    }
+
+    @Test
+    fun `an answer that fails while the history is open shows its error back in the chat`() = runTest {
+        setEpisodeInfo()
+        connectToInternet()
+        val gate = CompletableDeferred<Unit>()
+        chatManager.sendMessageGate = gate
+        chatManager.sendMessageException = IOException()
+        viewModel.onInputTextChange("Question")
+        viewModel.onSend()
+        runCurrent()
+        viewModel.showHistory()
+
+        gate.complete(Unit)
+        advanceUntilIdle()
+        viewModel.closeHistory()
+
+        val state = viewModel.uiState.value
+        assertFalse(state.isAwaitingReply)
+        assertEquals(ChatError.NetworkError, state.error)
+        assertEquals(listOf("Question"), state.messages.map { it.text() })
+    }
+
+    @Test
+    fun `deleting the open chat from the history while answering stops the answer and undo brings the question back`() = runTest {
+        setEpisodeInfo()
+        connectToInternet()
+        chatManager.sendMessageGate = CompletableDeferred()
+        viewModel.onInputTextChange("Question")
+        viewModel.onSend()
+        runCurrent()
+        viewModel.showHistory()
+
+        viewModel.deleteHistoryChat(historyItem(EPISODE_UUID, podcastUuid = PODCAST_UUID))
+        advanceUntilIdle()
+
+        assertFalse(viewModel.uiState.value.isAwaitingReply)
+        assertEquals(emptyList<ChatMessage>(), viewModel.uiState.value.messages)
+        assertTrue(chatManager.sentMessages.isEmpty())
+
+        viewModel.undoDeleteChat()
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertEquals(listOf("Question"), state.messages.map { it.text() })
+        assertEquals(ChatError.NetworkError, state.error)
+        assertTrue(chatManager.sentMessages.isEmpty())
+    }
+
+    @Test
+    fun `tapping the open chat in the history while answering goes back to the pending answer`() = runTest {
+        setEpisodeInfo()
+        connectToInternet()
+        val gate = CompletableDeferred<Unit>()
+        chatManager.sendMessageGate = gate
+        viewModel.onInputTextChange("Question")
+        viewModel.onSend()
+        runCurrent()
+        viewModel.showHistory()
+
+        viewModel.openHistoryChat(historyItem(EPISODE_UUID, podcastUuid = PODCAST_UUID))
+        runCurrent()
 
         assertFalse(viewModel.uiState.value.isHistoryVisible)
+        assertTrue(viewModel.uiState.value.isAwaitingReply)
+        gate.complete(Unit)
+        advanceUntilIdle()
+        assertEquals(listOf("Question", "Response"), viewModel.uiState.value.messages.map { it.text() })
+        assertEquals(1, chatManager.createdChats.size)
+    }
+
+    @Test
+    fun `opening another chat from the history while answering leaves the question not sent`() = runTest {
+        setEpisodeInfo()
+        connectToInternet()
+        chatManager.sendMessageGate = CompletableDeferred()
+        viewModel.onInputTextChange("Question")
+        viewModel.onSend()
+        runCurrent()
+        viewModel.showHistory()
+
+        viewModel.openHistoryChat(historyItem(OTHER_EPISODE_UUID))
+        advanceUntilIdle()
+        assertFalse(viewModel.uiState.value.isAwaitingReply)
+        viewModel.openHistoryChat(historyItem(EPISODE_UUID, podcastUuid = PODCAST_UUID))
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertEquals(EPISODE_UUID, state.episodeUuid)
+        assertFalse(state.isAwaitingReply)
+        assertEquals(ChatError.NetworkError, state.error)
+        assertEquals(listOf("Question"), state.messages.map { it.text() })
+        assertTrue(chatManager.sentMessages.isEmpty())
+
+        chatManager.sendMessageGate = null
+        viewModel.retry()
+        advanceUntilIdle()
+
+        assertEquals(SendMessage(EPISODE_UUID, "Question"), chatManager.sentMessages.single())
+        assertEquals(listOf("Question", "Response"), viewModel.uiState.value.messages.map { it.text() })
     }
 
     @Test
@@ -1818,10 +3179,52 @@ class ChatViewModelTest {
                 source = SourceView.PLAYER.analyticsValue,
                 episodeUuid = EPISODE_UUID,
                 podcastUuid = PODCAST_UUID,
+                isOtherEpisode = false,
             ),
             eventSink.pollEvent(),
         )
         verify(playbackManager, never()).playNowSuspend(any<BaseEpisode>(), any(), any(), any())
+    }
+
+    @Test
+    fun `undoing a quote when nothing was loaded tracks it as the same episode like the tap`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        switchPlaybackOnPlayNow(other = null)
+        playbackState.value = PlaybackState()
+        playableState(quote)
+        eventSink.skipEvent(eventSink.size)
+        viewModel.playQuote(quote.uuid)
+        advanceUntilIdle()
+        assertEquals(false, (eventSink.pollEvent() as EpisodeChatQuotePlayTappedEvent).isOtherEpisode)
+
+        viewModel.undoQuotePlay()
+        advanceUntilIdle()
+
+        assertEquals(false, (eventSink.pollEvent() as EpisodeChatQuotePlayUndoneEvent).isOtherEpisode)
+    }
+
+    @Test
+    fun `undoing chained quotes tracks another episode when any tap started from one`() = runTest {
+        val first = createQuote(startMs = 1_000, endMs = 3_000)
+        val second = createQuote(startMs = 5_000, endMs = 7_000, uuid = "second-quote-uuid")
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        whenever(episodeManager.findEpisodeByUuid("other-uuid")).thenReturn(PodcastEpisode(uuid = "other-uuid", publishedDate = Date()))
+        switchPlaybackOnPlayNow(other = null)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = "other-uuid", positionMs = 10_000)
+        chatManager.messages.value = listOf(first, second)
+        setEpisodeInfo(123_000)
+        advanceUntilIdle()
+        viewModel.playQuote(first.uuid)
+        advanceUntilIdle()
+        viewModel.playQuote(second.uuid)
+        advanceUntilIdle()
+        eventSink.skipEvent(eventSink.size)
+
+        viewModel.undoQuotePlay()
+        advanceUntilIdle()
+
+        assertEquals(true, (eventSink.pollEvent() as EpisodeChatQuotePlayUndoneEvent).isOtherEpisode)
     }
 
     private fun historyItem(
@@ -1861,7 +3264,18 @@ class ChatViewModelTest {
 
         private fun messagesFor(episodeUuid: String) = if (episodeUuid == OTHER_EPISODE_UUID) otherMessages else messages
 
-        override fun observeHistory(): Flow<List<EpisodeChatHistoryItem>> = history
+        var observedHistory: Flow<List<EpisodeChatHistoryItem>>? = null
+
+        override fun observeHistory(): Flow<List<EpisodeChatHistoryItem>> = observedHistory ?: history
+
+        override suspend fun hasChatWithMessages(episodeUuid: String) = false
+
+        val discardedMessageUuids = mutableListOf<String>()
+
+        override suspend fun discardMessage(uuid: String) {
+            discardedMessageUuids += uuid
+            messages.value = messages.value.filterNot { it.uuid == uuid }
+        }
 
         override suspend fun createChat(episodeUuid: String, podcastUuid: String) {
             createdChats += CreateChat(episodeUuid, podcastUuid)
@@ -1872,11 +3286,17 @@ class ChatViewModelTest {
             message: ChatMessage.User,
             allMessages: List<ChatMessage>,
         ) {
+            val episodeMessages = messagesFor(episodeUuid)
+            episodeMessages.value = episodeMessages.value.filterNot { it.uuid == message.uuid } + message
             sendMessageGate?.await()
-            sendMessageException?.let { throw it }
+            sendMessageException?.let { exception ->
+                val failure = if (exception is IOException) ChatSendFailure.Network else ChatSendFailure.Server
+                episodeMessages.value = episodeMessages.value.map { if (it.uuid == message.uuid) message.copy(failure = failure) else it }
+                throw exception
+            }
             sentMessages += SendMessage(episodeUuid, message.text)
             sentHistories += allMessages.map { it.text() }
-            messages.value += listOf(message, ChatMessage.Assistant(text = "Response", uuid = "response-uuid-${sentMessages.size}"))
+            episodeMessages.value += ChatMessage.Assistant(text = "Response", uuid = "response-uuid-${sentMessages.size}")
         }
 
         override suspend fun clearMessages(episodeUuid: String): ClearedChat {
@@ -1901,11 +3321,7 @@ class ChatViewModelTest {
             savedRatings += answerUuid to rating
         }
 
-        private fun ChatMessage.text() = when (this) {
-            is ChatMessage.User -> text
-            is ChatMessage.Assistant -> text
-            is ChatMessage.Quote -> text
-        }
+        override suspend fun deleteAllChats() = Unit
     }
 
     private data class CreateChat(val episodeUuid: String, val podcastUuid: String)
@@ -1921,4 +3337,10 @@ class ChatViewModelTest {
 
 private fun internetCapabilities() = mock<NetworkCapabilities> {
     on { hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) } doReturn true
+}
+
+private fun ChatMessage.text() = when (this) {
+    is ChatMessage.User -> text
+    is ChatMessage.Assistant -> text
+    is ChatMessage.Quote -> text
 }

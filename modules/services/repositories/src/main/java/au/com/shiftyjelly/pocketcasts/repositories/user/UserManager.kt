@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.models.db.dao.PlaylistDao
 import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatManager
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearSync
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationScheduler
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationSchedulerImpl.Companion.TAG_TRENDING_RECOMMENDATIONS
@@ -87,6 +88,7 @@ class UserManagerImpl @Inject constructor(
     private val endOfYearSync: EndOfYearSync,
     private val notificationScheduler: NotificationScheduler,
     private val whatsNewManager: Lazy<WhatsNewManager>,
+    private val chatManager: Lazy<ChatManager>,
 ) : UserManager,
     CoroutineScope {
 
@@ -182,6 +184,10 @@ class UserManagerImpl @Inject constructor(
                     whatsNewManager.get().forgetReadMessages()
                     settings.showWhatsNewDot.reset()
                     settings.clearPlusPreferences()
+                    if (wasInitiatedByUser) {
+                        runCatching { chatManager.get().deleteAllChats() }
+                            .onFailure { LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, it, "Failed to delete episode chats on sign out") }
+                    }
 
                     userEpisodeManager.removeCloudStatusFromFiles(playbackManager)
 

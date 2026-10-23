@@ -17,6 +17,7 @@ import android.view.KeyEvent
 import androidx.annotation.DrawableRes
 import androidx.annotation.MainThread
 import androidx.annotation.OptIn
+import androidx.annotation.VisibleForTesting
 import androidx.core.content.IntentCompat
 import androidx.core.net.toUri
 import androidx.media.utils.MediaConstants.PLAYBACK_STATE_EXTRAS_KEY_MEDIA_ID
@@ -31,6 +32,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.MediaNotificationControls
 import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneAction
@@ -60,6 +62,7 @@ import io.reactivex.rxkotlin.Observables
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -69,6 +72,8 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -313,31 +318,41 @@ class MediaSessionManager(
 
         forwardingPlayer = PocketCastsForwardingPlayer(
             wrappedPlayer = placeholder,
-            onSkipForward = { scope.launch { commandMutex.withLock { playbackManager.skipForwardSuspend() } } },
-            onSkipBack = { scope.launch { commandMutex.withLock { playbackManager.skipBackwardSuspend() } } },
+            onSkipForward = {
+                val sourceView = media3RequestSource(default = SourceView.UNKNOWN)
+                scope.launch { commandMutex.withLock { playbackManager.skipForwardSuspend(sourceView = sourceView) } }
+            },
+            onSkipBack = {
+                val sourceView = media3RequestSource(default = SourceView.UNKNOWN)
+                scope.launch { commandMutex.withLock { playbackManager.skipBackwardSuspend(sourceView = sourceView) } }
+            },
             onStop = {
                 if (playbackManager.player !is CastPlayer) {
+                    val sourceView = media3RequestSource()
                     if (isAutomotive) {
                         // On Automotive a stop command must fully tear down playback, not just pause
                         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Media3: stop → stop (automotive)")
-                        scope.launch { commandMutex.withLock { playbackManager.stopSuspend(sourceView = SourceView.MEDIA_BUTTON_BROADCAST_ACTION) } }
+                        scope.launch { commandMutex.withLock { playbackManager.stopSuspend(sourceView = sourceView) } }
                     } else {
                         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Media3: stop → pause")
-                        scope.launch { commandMutex.withLock { playbackManager.pauseSuspend(sourceView = SourceView.MEDIA_BUTTON_BROADCAST_ACTION) } }
+                        scope.launch { commandMutex.withLock { playbackManager.pauseSuspend(sourceView = sourceView) } }
                     }
                 }
             },
             onPlay = {
-                scope.launch { commandMutex.withLock { playbackManager.playQueueSuspend(sourceView = SourceView.MEDIA_BUTTON_BROADCAST_ACTION) } }
+                val sourceView = media3RequestSource()
+                scope.launch { commandMutex.withLock { playbackManager.playQueueSuspend(sourceView = sourceView) } }
             },
             onPause = {
-                scope.launch { commandMutex.withLock { playbackManager.pauseSuspend(sourceView = SourceView.MEDIA_BUTTON_BROADCAST_ACTION) } }
+                val sourceView = media3RequestSource()
+                scope.launch { commandMutex.withLock { playbackManager.pauseSuspend(sourceView = sourceView) } }
             },
             onSeekTo = { positionMs ->
+                val sourceView = media3RequestSource()
                 scope.launch {
                     commandMutex.withLock {
                         playbackManager.seekToTimeMsSuspend(positionMs.toInt())
-                        playbackManager.trackPlaybackSeek(positionMs.toInt(), source)
+                        playbackManager.trackPlaybackSeek(positionMs.toInt(), sourceView)
                     }
                 }
             },
@@ -362,6 +377,7 @@ class MediaSessionManager(
             scopeProvider = { scope },
             contextProvider = { context },
             isTv = isTv,
+            isAutomotive = isAutomotive,
             commandMutex = commandMutex,
         )
         media3LibraryCallback = Media3LibrarySessionCallback(
@@ -460,6 +476,16 @@ class MediaSessionManager(
     }
 
     /**
+     * Resolves the analytics source of the Media3 controller that sent the command being handled.
+     * Must be called synchronously from the player callback, before switching threads.
+     */
+    @OptIn(UnstableApi::class)
+    private fun media3RequestSource(default: SourceView = source): SourceView {
+        val packageName = runCatching { media3Session?.controllerForCurrentRequest?.packageName }.getOrNull()
+        return resolveMediaSessionSource(packageName, isAutomotive, default)
+    }
+
+    /**
      * Creates a [CastStatePlayer] and installs it into the Media3 session so that
      * notifications and lock screen controls reflect cast playback state.
      */
@@ -469,17 +495,27 @@ class MediaSessionManager(
         if (!needsMedia3Session) return
         val player = CastStatePlayer(
             applicationLooper = android.os.Looper.getMainLooper(),
-            onPlay = { scope.launch { commandMutex.withLock { playbackManager.playQueueSuspend(sourceView = source) } } },
-            onPause = { scope.launch { commandMutex.withLock { playbackManager.pauseSuspend(sourceView = source) } } },
+            onPlay = {
+                val sourceView = media3RequestSource()
+                scope.launch { commandMutex.withLock { playbackManager.playQueueSuspend(sourceView = sourceView) } }
+            },
+            onPause = {
+                val sourceView = media3RequestSource()
+                scope.launch { commandMutex.withLock { playbackManager.pauseSuspend(sourceView = sourceView) } }
+            },
             onSeekTo = { ms ->
+                val sourceView = media3RequestSource()
                 scope.launch {
                     commandMutex.withLock {
                         playbackManager.seekToTimeMsSuspend(ms.toInt())
-                        playbackManager.trackPlaybackSeek(ms.toInt(), source)
+                        playbackManager.trackPlaybackSeek(ms.toInt(), sourceView)
                     }
                 }
             },
-            onStop = { scope.launch { commandMutex.withLock { playbackManager.pauseSuspend(sourceView = source) } } },
+            onStop = {
+                val sourceView = media3RequestSource()
+                scope.launch { commandMutex.withLock { playbackManager.pauseSuspend(sourceView = sourceView) } }
+            },
         )
         castStatePlayer = player
         installCastPlayerInternal(player)
@@ -504,8 +540,14 @@ class MediaSessionManager(
         pendingPlayer = null
         val swapped = PocketCastsForwardingPlayer(
             wrappedPlayer = castPlayer,
-            onSkipForward = { scope.launch { commandMutex.withLock { playbackManager.skipForwardSuspend() } } },
-            onSkipBack = { scope.launch { commandMutex.withLock { playbackManager.skipBackwardSuspend() } } },
+            onSkipForward = {
+                val sourceView = media3RequestSource(default = SourceView.UNKNOWN)
+                scope.launch { commandMutex.withLock { playbackManager.skipForwardSuspend(sourceView = sourceView) } }
+            },
+            onSkipBack = {
+                val sourceView = media3RequestSource(default = SourceView.UNKNOWN)
+                scope.launch { commandMutex.withLock { playbackManager.skipBackwardSuspend(sourceView = sourceView) } }
+            },
             playGuard = currentPlayer.playGuard,
             isAutomotive = isAutomotive,
         ).also {
@@ -629,6 +671,20 @@ class MediaSessionManager(
                     onError = { Timber.e(it, "Error observing automotive active state") },
                 )
                 .addTo(disposables)
+
+            settings.refreshStateFlow
+                .filter { it is RefreshState.Success || it is RefreshState.Failed }
+                .onEach {
+                    val session = media3Session ?: return@onEach
+                    try {
+                        notifyPlaylistsChanged(session)
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: Exception) {
+                        Timber.e(e, "Failed to notify playlist changes")
+                    }
+                }
+                .launchIn(applicationScope)
         }
 
         val episodeAndState = playbackManager.playbackStateRelay
@@ -745,6 +801,15 @@ class MediaSessionManager(
                 onError = { Timber.e(it, "Error observing Up Next changes") },
             )
             .addTo(disposables)
+    }
+
+    @OptIn(UnstableApi::class)
+    @VisibleForTesting
+    internal suspend fun notifyPlaylistsChanged(session: MediaLibraryService.MediaLibrarySession) {
+        session.notifyChildrenChanged(FILTERS_ROOT, Int.MAX_VALUE, null)
+        playlistManager.playlistPreviewsFlow().first().forEach { playlist ->
+            session.notifyChildrenChanged(playlist.uuid, Int.MAX_VALUE, null)
+        }
     }
 
     @OptIn(UnstableApi::class)
@@ -1243,10 +1308,15 @@ class MediaSessionManager(
         scopeProvider: () -> CoroutineScope,
     ) : MediaSessionCompat.Callback() {
 
+        // Multi-tap media button actions run after the callback returns, so the
+        // source of the controller that sent the last button press is kept here.
+        @Volatile
+        private var mediaButtonSource: SourceView = source
+
         private val mediaButtonEventHandler = MediaButtonEventHandler(
             scopeProvider = scopeProvider,
             onImmediatePlay = {
-                playbackManager.playIfNotPlaying(sourceView = source)
+                playbackManager.playIfNotPlaying(sourceView = mediaButtonSource)
             },
             onMediaEvent = { event ->
                 LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Media button output event: $event")
@@ -1274,6 +1344,7 @@ class MediaSessionManager(
             logEvent(keyEvent.toString())
             if (keyEvent.action == KeyEvent.ACTION_DOWN) {
                 LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Media button Android event: keyCode=${keyEvent.keyCode}")
+                mediaButtonSource = currentSource()
             }
 
             return if (mediaButtonEventHandler.handle(keyEvent)) {
@@ -1302,8 +1373,17 @@ class MediaSessionManager(
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Event from Media Session to $action. ${userInfo.orEmpty()}")
         }
 
+        /**
+         * Resolves the analytics source of the controller that sent the current command.
+         * Only valid while a callback is running, so it must be read before launching a coroutine.
+         */
+        private fun currentSource(default: SourceView = source): SourceView {
+            val packageName = runCatching { mediaSession?.currentControllerInfo?.packageName }.getOrNull()
+            return resolveMediaSessionSource(packageName, isAutomotive, default)
+        }
+
         private fun handleMediaButtonSingleTap() {
-            playbackManager.playPause(sourceView = source)
+            playbackManager.playPause(sourceView = mediaButtonSource)
         }
 
         private fun handleMediaButtonDoubleTap() {
@@ -1319,14 +1399,15 @@ class MediaSessionManager(
                 HeadphoneAction.ADD_BOOKMARK -> onAddBookmark()
 
                 HeadphoneAction.SKIP_FORWARD -> {
-                    onSkipToNext()
+                    val sourceView = mediaButtonSource
+                    skipForward(sourceView)
                     if (!playbackManager.isPlaying()) {
-                        enqueueCommand("play") { playbackManager.playQueueSuspend(source) }
+                        enqueueCommand("play") { playbackManager.playQueueSuspend(sourceView) }
                     }
                 }
 
                 HeadphoneAction.SKIP_BACK -> {
-                    onSkipToPrevious()
+                    skipBackward(mediaButtonSource)
                 }
 
                 HeadphoneAction.NEXT_CHAPTER,
@@ -1352,12 +1433,14 @@ class MediaSessionManager(
             }
 
             logEvent("play")
-            enqueueCommand("play") { playbackManager.playQueueSuspend(sourceView = source) }
+            val sourceView = currentSource()
+            enqueueCommand("play") { playbackManager.playQueueSuspend(sourceView = sourceView) }
         }
 
         override fun onPause() {
             logEvent("pause")
-            enqueueCommand("pause") { playbackManager.pauseSuspend(sourceView = source) }
+            val sourceView = currentSource()
+            enqueueCommand("pause") { playbackManager.pauseSuspend(sourceView = sourceView) }
         }
 
         override fun onPlayFromSearch(query: String?, extras: Bundle?) {
@@ -1368,7 +1451,8 @@ class MediaSessionManager(
         override fun onStop() {
             if (playbackManager.player !is CastPlayer) {
                 logEvent("stop")
-                enqueueCommand("stop") { playbackManager.pauseSuspend(sourceView = source) }
+                val sourceView = currentSource()
+                enqueueCommand("stop") { playbackManager.pauseSuspend(sourceView = sourceView) }
             }
         }
 
@@ -1381,13 +1465,21 @@ class MediaSessionManager(
         }
 
         override fun onRewind() {
-            logEvent("skip backwards")
-            enqueueCommand("skip backwards") { playbackManager.skipBackwardSuspend(sourceView = source) }
+            skipBackward(currentSource())
         }
 
         override fun onFastForward() {
+            skipForward(currentSource())
+        }
+
+        private fun skipBackward(sourceView: SourceView) {
+            logEvent("skip backwards")
+            enqueueCommand("skip backwards") { playbackManager.skipBackwardSuspend(sourceView = sourceView) }
+        }
+
+        private fun skipForward(sourceView: SourceView) {
             logEvent("skip forwards")
-            enqueueCommand("skip forwards") { playbackManager.skipForwardSuspend(sourceView = source) }
+            enqueueCommand("skip forwards") { playbackManager.skipForwardSuspend(sourceView = sourceView) }
         }
 
         override fun onSetRating(rating: RatingCompat?) {
@@ -1402,6 +1494,7 @@ class MediaSessionManager(
 
         override fun onPlayFromMediaId(mediaId: String?, extras: Bundle?) {
             mediaId ?: return
+            val sourceView = currentSource()
             scope.launch {
                 logEvent("play from media id")
 
@@ -1409,7 +1502,7 @@ class MediaSessionManager(
                 val episodeId = autoMediaId.episodeId
                 episodeManager.findEpisodeByUuid(episodeId)?.let { episode ->
                     enqueueCommand("play from media id") {
-                        playbackManager.playNowSuspend(episode = episode, sourceView = source)
+                        playbackManager.playNowSuspend(episode = episode, sourceView = sourceView)
                     }
                 }
             }
@@ -1418,13 +1511,15 @@ class MediaSessionManager(
         override fun onCustomAction(action: String?, extras: Bundle?) {
             action ?: return
 
+            // Skip custom actions were never given a source, so other controllers keep reporting UNKNOWN.
+            val skipSource = currentSource(default = SourceView.UNKNOWN)
             when (action) {
                 APP_ACTION_SKIP_BACK -> enqueueCommand("custom action: skip back") {
-                    playbackManager.skipBackwardSuspend()
+                    playbackManager.skipBackwardSuspend(sourceView = skipSource)
                 }
 
                 APP_ACTION_SKIP_FWD -> enqueueCommand("custom action: skip forward") {
-                    playbackManager.skipForwardSuspend()
+                    playbackManager.skipForwardSuspend(sourceView = skipSource)
                 }
 
                 APP_ACTION_MARK_AS_PLAYED -> actions.markAsPlayed()
@@ -1448,8 +1543,9 @@ class MediaSessionManager(
             if (state is UpNextQueue.State.Loaded) {
                 state.queue.find { it.adapterId == id }?.let { episode ->
                     logEvent("play from skip to queue item")
+                    val sourceView = currentSource()
                     enqueueCommand("skip to queue item") {
-                        playbackManager.playNowSuspend(episode = episode, sourceView = source)
+                        playbackManager.playNowSuspend(episode = episode, sourceView = sourceView)
                     }
                 }
             }
@@ -1457,9 +1553,10 @@ class MediaSessionManager(
 
         override fun onSeekTo(pos: Long) {
             logEvent("seek to $pos")
+            val sourceView = currentSource()
             enqueueCommand("seek to $pos") {
                 playbackManager.seekToTimeMsSuspend(pos.toInt())
-                playbackManager.trackPlaybackSeek(pos.toInt(), SourceView.MEDIA_BUTTON_BROADCAST_ACTION)
+                playbackManager.trackPlaybackSeek(pos.toInt(), sourceView)
             }
         }
     }

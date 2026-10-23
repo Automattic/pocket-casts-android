@@ -160,12 +160,12 @@ private fun ChatOfflineNote(
         Icon(
             painter = painterResource(IR.drawable.ic_wifi_off),
             contentDescription = null,
-            tint = theme.tertiaryText,
+            tint = theme.offlineNote,
             modifier = Modifier.size(16.dp),
         )
         Text(
             text = stringResource(LR.string.chat_offline_note),
-            color = theme.tertiaryText,
+            color = theme.offlineNote,
             fontSize = 13.sp,
         )
     }

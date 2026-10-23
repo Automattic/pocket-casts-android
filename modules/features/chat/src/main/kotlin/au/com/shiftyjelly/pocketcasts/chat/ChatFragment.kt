@@ -21,8 +21,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalAccessibilityManager
 import androidx.compose.ui.platform.LocalResources
+import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.chat.ui.ChatScreen
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
@@ -39,7 +44,11 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import dagger.hilt.android.AndroidEntryPoint
+import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -51,6 +60,7 @@ class ChatFragment : BaseDialogFragment() {
 
     companion object {
         private const val ARGS_KEY = "chat_args"
+        const val SIGN_IN_RESULT_KEY = "episode_chat_sign_in"
 
         fun newInstance(
             episodeUuid: String,
@@ -59,8 +69,10 @@ class ChatFragment : BaseDialogFragment() {
             episodeTitle: String,
             episodeDurationMs: Int,
             sourceView: SourceView,
+            entryPoint: ChatEntryPoint,
             isBeta: Boolean,
             podcastColors: PodcastColors,
+            requiresSignIn: Boolean = false,
         ) = ChatFragment().apply {
             arguments = Bundle().apply {
                 putParcelable(
@@ -72,8 +84,10 @@ class ChatFragment : BaseDialogFragment() {
                         episodeTitle,
                         episodeDurationMs,
                         sourceView,
+                        entryPoint,
                         isBeta,
                         podcastColors,
+                        requiresSignIn,
                     ),
                 )
             }
@@ -93,11 +107,28 @@ class ChatFragment : BaseDialogFragment() {
             podcastTitle = args.podcastTitle,
             episodeDurationMs = args.episodeDurationMs,
             sourceView = args.sourceView,
+            entryPoint = args.entryPoint,
             isBeta = args.isBeta,
+            requiresSignIn = args.requiresSignIn,
         )
         childFragmentManager.setFragmentResultListener(ChatFeedbackFragment.SUBMITTED_RESULT_KEY, this) { _, _ ->
             viewModel.onFeedbackSubmitted()
         }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.navigation.collect { navigation ->
+                    when (navigation) {
+                        ChatNavigation.SignIn -> setFragmentResult(SIGN_IN_RESULT_KEY, Bundle.EMPTY)
+                        ChatNavigation.Close -> dismiss()
+                    }
+                }
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.refreshSignIn()
     }
 
     override fun onCreateView(
@@ -109,32 +140,56 @@ class ChatFragment : BaseDialogFragment() {
         val snackbarHostState = remember { SnackbarHostState() }
         val resources = LocalResources.current
         var shownToast by remember { mutableStateOf<ChatToast?>(null) }
+        val accessibilityManager = LocalAccessibilityManager.current
+        val undoToastTimeoutMs = remember(accessibilityManager) {
+            accessibilityManager?.calculateRecommendedTimeoutMillis(
+                originalTimeoutMillis = UNDO_TOAST_DURATION.inWholeMilliseconds,
+                containsIcons = false,
+                containsText = true,
+                containsControls = true,
+            ) ?: UNDO_TOAST_DURATION.inWholeMilliseconds
+        }
         LaunchedEffect(snackbarHostState) {
             viewModel.toasts.collectLatest { toast ->
-                snackbarHostState.currentSnackbarData?.dismiss()
-                shownToast = toast
-                val result = snackbarHostState.showSnackbar(
-                    message = toast.message(resources),
-                    actionLabel = resources.getString(LR.string.chat_undo).takeIf { toast.isUndoable },
-                    duration = if (toast.isUndoable) SnackbarDuration.Long else SnackbarDuration.Short,
-                )
-                shownToast = null
-                if (result == SnackbarResult.ActionPerformed) {
-                    when (toast) {
-                        ChatToast.ChatCleared -> viewModel.undoClearChat()
-                        ChatToast.ChatDeleted -> viewModel.undoDeleteChat()
-                        is ChatToast.QuotePlaying -> viewModel.undoQuotePlay()
-                        ChatToast.FeedbackThanks -> Unit
+                try {
+                    snackbarHostState.currentSnackbarData?.dismiss()
+                    shownToast = toast
+                    val result = if (toast.isUndoable) {
+                        coroutineScope {
+                            val expiry = launch {
+                                delay(undoToastTimeoutMs)
+                                snackbarHostState.currentSnackbarData?.dismiss()
+                            }
+                            snackbarHostState.showSnackbar(
+                                message = toast.message(resources),
+                                actionLabel = resources.getString(LR.string.chat_undo),
+                                duration = SnackbarDuration.Indefinite,
+                            ).also { expiry.cancel() }
+                        }
+                    } else {
+                        snackbarHostState.showSnackbar(message = toast.message(resources), duration = SnackbarDuration.Short)
                     }
-                } else if (toast is ChatToast.QuotePlaying) {
-                    viewModel.onQuoteUndoExpired()
+                    shownToast = null
+                    if (result == SnackbarResult.ActionPerformed) {
+                        when (toast) {
+                            ChatToast.ChatCleared -> viewModel.undoClearChat()
+                            ChatToast.ChatDeleted -> viewModel.undoDeleteChat()
+                            is ChatToast.QuotePlaying -> viewModel.undoQuotePlay()
+                            ChatToast.FeedbackThanks, ChatToast.QuotePlayFailed -> Unit
+                        }
+                    }
+                } finally {
+                    if (toast is ChatToast.QuotePlaying) {
+                        viewModel.onQuoteUndoExpired(toast.undoId)
+                    }
                 }
             }
         }
-        val hasMessages = uiState.messages.isNotEmpty()
-        LaunchedEffect(hasMessages) {
-            if (hasMessages && shownToast == ChatToast.ChatCleared) {
-                snackbarHostState.currentSnackbarData?.dismiss()
+        LaunchedEffect(snackbarHostState) {
+            viewModel.undoExpired.collect {
+                if (shownToast == ChatToast.ChatCleared || shownToast == ChatToast.ChatDeleted) {
+                    snackbarHostState.currentSnackbarData?.dismiss()
+                }
             }
         }
 
@@ -161,6 +216,7 @@ class ChatFragment : BaseDialogFragment() {
                     onRateAnswer = ::rateAnswer,
                     snackbarHostState = snackbarHostState,
                     onDismissBetaSheet = viewModel::dismissBetaSheet,
+                    onSignInClick = viewModel::onSignInClick,
                     modifier = Modifier.fillMaxSize(),
                 )
             }
@@ -177,6 +233,7 @@ class ChatFragment : BaseDialogFragment() {
             sourceView = args.sourceView,
             podcastColors = viewModel.uiState.value.podcastColors,
             trigger = ChatFeedbackFragment.Trigger.ResponseRating,
+            messageIndex = viewModel.answerMessageIndex(answerUuid),
         )
     }
 
@@ -192,27 +249,29 @@ class ChatFragment : BaseDialogFragment() {
 
     private fun showClearChatOptionsDialog() {
         val dangerColor = requireContext().getThemeColor(UR.attr.support_05)
+        val uiState = viewModel.uiState.value
         val dialog = OptionsDialog().setForceDarkTheme(args.sourceView == SourceView.PLAYER)
-        if (!viewModel.uiState.value.isAwaitingReply) {
+        dialog.addTextOption(
+            titleId = LR.string.chat_history,
+            imageId = IR.drawable.ic_history,
+            click = viewModel::showHistory,
+        )
+        if (uiState.messages.isNotEmpty() || uiState.isAwaitingReply) {
             dialog.addTextOption(
-                titleId = LR.string.chat_history,
-                imageId = IR.drawable.ic_history,
-                click = viewModel::showHistory,
-            )
-        }
-        dialog
-            .addTextOption(
                 titleId = LR.string.chat_clear,
                 titleColor = dangerColor,
                 imageId = IR.drawable.ic_delete,
                 imageColor = dangerColor,
                 click = viewModel::clearChat,
             )
-            .show(parentFragmentManager, "chat_options")
+        }
+        dialog.show(parentFragmentManager, "chat_options")
     }
 
     override fun onDismiss(dialog: DialogInterface) {
-        viewModel.trackDismissed()
+        if (activity?.isChangingConfigurations != true) {
+            viewModel.trackDismissed()
+        }
         showSurveyIfEligible()
         super.onDismiss(dialog)
     }
@@ -249,13 +308,14 @@ class ChatFragment : BaseDialogFragment() {
             else -> playingPodcast?.let(::PodcastColors) ?: args.podcastColors
         }
 
-    private val ChatToast.isUndoable get() = this != ChatToast.FeedbackThanks
+    private val ChatToast.isUndoable get() = this != ChatToast.FeedbackThanks && this != ChatToast.QuotePlayFailed
 
     private fun ChatToast.message(resources: Resources) = when (this) {
         ChatToast.FeedbackThanks -> resources.getString(LR.string.chat_feedback_thank_you)
         ChatToast.ChatCleared -> resources.getString(LR.string.chat_cleared)
         ChatToast.ChatDeleted -> resources.getString(LR.string.chat_deleted)
         is ChatToast.QuotePlaying -> resources.getString(LR.string.chat_now_playing_episode, episodeTitle)
+        ChatToast.QuotePlayFailed -> resources.getString(LR.string.chat_quote_play_failed)
     }
 
     @Parcelize
@@ -266,7 +326,11 @@ class ChatFragment : BaseDialogFragment() {
         val episodeTitle: String,
         val episodeDurationMs: Int,
         val sourceView: SourceView,
+        val entryPoint: ChatEntryPoint,
         val isBeta: Boolean,
         val podcastColors: PodcastColors,
+        val requiresSignIn: Boolean,
     ) : Parcelable
 }
+
+private val UNDO_TOAST_DURATION = 8.seconds

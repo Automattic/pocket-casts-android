@@ -1,6 +1,6 @@
 # What's New mock catalog
 
-`mock-catalog.json` has one message for every page action the admin page can publish: `create_playlist`, `open_link`, `open_networks`, `open_discover`, `open_podcasts`, `open_up_next`, `open_playlists`, `open_profile` and `open_settings`.
+`mock-catalog.json` has one message for every page action the admin page can publish: `create_playlist`, `open_link`, `open_networks`, `open_discover`, `open_podcasts`, `open_up_next`, `open_playlists`, `open_profile`, `open_settings` and `open_files`.
 
 To show it in a debug build, seed it into the app's HTTP cache:
 

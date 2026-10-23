@@ -7,10 +7,12 @@ import android.os.Bundle
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
+import androidx.media3.session.LibraryResult
 import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaSession
 import androidx.media3.session.SessionCommand
 import androidx.media3.session.SessionCommands
+import androidx.media3.session.SessionError
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -365,6 +367,66 @@ class Media3LibrarySessionCallbackTest {
     }
 
     @Test
+    fun `onConnect refreshes podcasts for external client on automotive`() {
+        val automotiveCallback = createAutomotiveCallback()
+        whenever(mockController.packageName).thenReturn("com.android.car.media")
+        whenever(mockSettings.automotiveConnectedToMediaSession()).thenReturn(true)
+
+        automotiveCallback.onConnect(mockSession, mockController)
+
+        verify(podcastManager).refreshPodcastsIfRequired("Automotive connect")
+    }
+
+    @Test
+    fun `onConnect does not refresh podcasts for own package on automotive`() {
+        val automotiveCallback = createAutomotiveCallback()
+
+        automotiveCallback.onConnect(mockSession, mockController)
+
+        verify(podcastManager, never()).refreshPodcastsIfRequired(any())
+    }
+
+    @Test
+    fun `onConnect does not refresh podcasts for external client off automotive`() {
+        whenever(mockController.packageName).thenReturn("com.google.android.projection.gearhead")
+
+        callback.onConnect(mockSession, mockController)
+
+        verify(podcastManager, never()).refreshPodcastsIfRequired(any())
+    }
+
+    @Test
+    fun `onSubscribe accepts legacy browser on automotive without notifying`() {
+        val automotiveCallback = createAutomotiveCallback()
+        whenever(mockController.controllerVersion).thenReturn(MediaSession.ControllerInfo.LEGACY_CONTROLLER_VERSION)
+
+        val result = automotiveCallback.onSubscribe(mockSession, mockController, "playlist-uuid", null).get()
+
+        assertEquals(LibraryResult.RESULT_SUCCESS, result.resultCode)
+        verify(mockSession, never()).notifyChildrenChanged(any(), any<String>(), any(), anyOrNull())
+    }
+
+    @Test
+    fun `onSubscribe accepts media3 browser on automotive and sends its children`() {
+        val automotiveCallback = createAutomotiveCallback()
+        whenever(mockController.controllerVersion).thenReturn(1_000_000)
+
+        val result = automotiveCallback.onSubscribe(mockSession, mockController, "playlist-uuid", null).get()
+
+        assertEquals(LibraryResult.RESULT_SUCCESS, result.resultCode)
+        verify(mockSession).notifyChildrenChanged(mockController, "playlist-uuid", Int.MAX_VALUE, null)
+    }
+
+    @Test
+    fun `onSubscribe keeps the default behaviour off automotive`() {
+        whenever(mockController.controllerVersion).thenReturn(MediaSession.ControllerInfo.LEGACY_CONTROLLER_VERSION)
+
+        val result = callback.onSubscribe(mockSession, mockController, "playlist-uuid", null).get()
+
+        assertEquals(SessionError.ERROR_NOT_SUPPORTED, result.resultCode)
+    }
+
+    @Test
     fun `onCustomCommand delegates to sessionCallback`() {
         val command = SessionCommand(APP_ACTION_STAR, Bundle.EMPTY)
 
@@ -426,6 +488,16 @@ class Media3LibrarySessionCallbackTest {
         automotiveCallback.onPlaybackResumption(mockMediaSession, mockController, false)
 
         verify(mockSettings).setAutomotiveConnectedToMediaSession(true)
+        verify(podcastManager).refreshPodcastsIfRequired("Automotive resumption")
+    }
+
+    @Test
+    fun `onPlaybackResumption does not refresh podcasts off automotive`() = runTest {
+        whenever(playbackManager.getCurrentEpisode()).thenReturn(null)
+
+        callback.onPlaybackResumption(mock(), mockController, false)
+
+        verify(podcastManager, never()).refreshPodcastsIfRequired(any())
     }
 
     @Test

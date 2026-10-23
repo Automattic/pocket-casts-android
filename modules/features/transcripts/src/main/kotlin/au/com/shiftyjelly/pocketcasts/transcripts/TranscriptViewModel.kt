@@ -14,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.payment.SubscriptionOffer
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.payment.getOrNull
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
+import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatManager
 import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.ChapterSeekResult
 import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintTimingManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -22,6 +23,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.transcript.BookmarkTranscript
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.sharing.SharingRequest
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.search.SearchCoordinates
 import au.com.shiftyjelly.pocketcasts.utils.search.SearchMatches
 import au.com.shiftyjelly.pocketcasts.utils.search.kmpSearch
@@ -44,6 +47,7 @@ import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlin.time.Duration.Companion.milliseconds
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
@@ -72,6 +76,7 @@ class TranscriptViewModel @AssistedInject constructor(
     private val eventHorizon: EventHorizon,
     private val sharingClient: TranscriptSharingClient,
     private val bookmarkManager: BookmarkManager,
+    private val chatManager: ChatManager,
     val fingerprintTimingManager: FingerprintTimingManager,
     val playbackManager: PlaybackManager,
 ) : ViewModel() {
@@ -156,14 +161,14 @@ class TranscriptViewModel @AssistedInject constructor(
             }
             _uiState.update { state -> state.copy(transcriptState = transcriptState) }
 
-            if (transcriptState is TranscriptState.Loaded) {
-                trackTranscriptShown(transcriptState.transcript)
-            }
-
             if (transcriptState is TranscriptState.Loaded && transcriptState.transcript is Transcript.Text) {
                 observeSyncedState()
                 // Playback can start after the transcript is shown, for example from the episode details toolbar.
                 observePlaybackForSyncing(episodeUuid)
+            }
+
+            if (transcriptState is TranscriptState.Loaded) {
+                trackTranscriptShown(transcriptState.transcript, episodeUuid)
             }
         }
     }
@@ -500,7 +505,7 @@ class TranscriptViewModel @AssistedInject constructor(
         return bookmark to isNew
     }
 
-    private fun trackTranscriptShown(transcript: Transcript) {
+    private suspend fun trackTranscriptShown(transcript: Transcript, episodeUuid: String) {
         val isPaywallVisible = !_uiState.value.isPlusUser && transcript.isGenerated
         if (isPaywallVisible) {
             track { source, podcastUuid, episodeUuid ->
@@ -511,6 +516,17 @@ class TranscriptViewModel @AssistedInject constructor(
                 )
             }
         } else {
+            val hasEpisodeChat = if (FeatureFlag.isEnabled(Feature.EPISODE_CHAT)) {
+                try {
+                    chatManager.hasChatWithMessages(episodeUuid)
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    null
+                }
+            } else {
+                null
+            }
             track { source, podcastUuid, episodeUuid ->
                 TranscriptShownEvent(
                     type = transcript.type.analyticsValue,
@@ -518,6 +534,7 @@ class TranscriptViewModel @AssistedInject constructor(
                     podcastUuid = podcastUuid,
                     episodeUuid = episodeUuid,
                     source = source,
+                    hasEpisodeChat = hasEpisodeChat,
                 )
             }
         }
