@@ -31,6 +31,11 @@ class CloudSettingsFragment : BaseFragment() {
 
     private val viewModel by viewModels<CloudSettingsViewModel>()
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        viewModel.onShown()
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
