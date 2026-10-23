@@ -20,6 +20,8 @@
         ([#6212](https://github.com/Automattic/pocket-casts-android/pull/6212))
     *   Stop showing "Plus expires in X days" to subscribers whose subscription renews automatically
         ([#5329](https://github.com/Automattic/pocket-casts-android/pull/5329))
+    *   Fix choosing a Cast device sometimes doing nothing after a previous Cast session was lost
+        ([#6226](https://github.com/Automattic/pocket-casts-android/pull/6226))
 
 
 8.23
