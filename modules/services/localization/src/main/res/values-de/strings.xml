@@ -1,11 +1,57 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-10-08 09:57:17+0000
+Translation-Revision-Date: 2026-10-20 11:55:47+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: de
 -->
 <resources>
+    <string name="chat_about_episode">Chat über %1$s</string>
+    <string name="chat_now_playing_episode">Aktuelle Wiedergabe: %1$s</string>
+    <string name="chat_undo">Rückgängig machen</string>
+    <string name="chat_history_older">Älter</string>
+    <string name="chat_history_previous_7_days">Vorherige 7 Tage</string>
+    <string name="chat_history">Chatverlauf</string>
+    <string name="chat_deleted">Chat gelöscht</string>
+    <string name="chat_cleared">Chat geleert</string>
+    <string name="chat_offline_note">Du bist offline. Stelle eine Verbindung her, um eine Frage zu stellen.</string>
+    <string name="chat_answering">Antworten</string>
+    <string name="chat_error_server_on_our_end">Bei dir ist ein Fehler aufgetreten.</string>
+    <string name="chat_not_sent_tap_to_retry">Nicht gesendet. Tippe, um es erneut zu versuchen.</string>
+    <string name="chat_feedback_send_failed">Dein Feedback konnte nicht gesendet werden. Überprüfe deine Verbindung.</string>
+    <string name="chat_feedback_sending">Feedback wird gesendet</string>
+    <string name="chat_feedback_what_went_wrong">Was ist schiefgelaufen?</string>
+    <string name="chat_beta_sheet_sign_in">Melde dich an, um es auszuprobieren</string>
+    <string name="episode_chat_needs_transcript_message">Für \"Fragen zu dieser Folge\" ist ein Transkript erforderlich. Diese Folge hat keins.</string>
+    <string name="onboarding_episode_chat_question_2">Möchtest du eine Zusammenfassung der wichtigsten Punkte?</string>
+    <string name="onboarding_episode_chat_answer">In dieser Folge geht es um KI, Gesundheit und Produktivität.</string>
+    <string name="onboarding_episode_chat_question_1">Was sind die wichtigsten Themen?</string>
+    <string name="onboarding_episode_chat_title">Fragen zu dieser Folge:</string>
+    <string name="chat_feedback_learn_more">Weitere Informationen</string>
+    <string name="chat_feedback_legal">Wenn du das Feedback übermittelst, wird diese Unterhaltung mit uns geteilt, um den Chat zu verbessern.</string>
+    <string name="chat_feedback_submit">Feedback übermitteln</string>
+    <string name="chat_feedback_details_hint">Details teilen (optional)</string>
+    <string name="chat_feedback_reason_other">Sonstiges</string>
+    <string name="chat_feedback_reason_offensive">Die Inhalte sind anstößig</string>
+    <string name="chat_feedback_reason_out_of_date">Die Inhalte sind veraltet</string>
+    <string name="chat_feedback_reason_wrong_facts">Inhalte sind fehlerhaft</string>
+    <string name="chat_feedback_reason_not_interesting">Es war nicht interessant</string>
+    <string name="chat_rate_answer_bad">Schlechte Antwort</string>
+    <string name="chat_rate_answer_good">Gute Antwort</string>
+    <string name="chat_feedback_thank_you">Vielen Dank für dein Feedback.</string>
+    <string name="chat_survey_yes">Ja!</string>
+    <string name="chat_survey_not_really">Nicht wirklich</string>
+    <string name="chat_survey_title">Gefällt dir „Fragen zu dieser Folge“?</string>
+    <string name="chat_ai_disclaimer">Die KI kann Fehler machen. Daher solltest du die Antwort überprüfen.</string>
+    <string name="chat_suggestion_summarize">Diese Folge zusammenfassen</string>
+    <string name="chat_welcome">Stelle eine beliebige Frage zu dieser Folge. Oder beginne hier.</string>
+    <string name="chat_input_question_hint">Eine Frage stellen …</string>
+    <string name="chat_beta_note">„Fragen zu dieser Folge“ ist in der Beta-Phase</string>
+    <string name="chat_beta_sheet_body">In der Testphase für alle kostenlos. Später wird es zu einer Plus-Funktion.</string>
+    <string name="chat_beta_sheet_title">„Fragen zu dieser Folge“ ist in der Beta-Phase</string>
+    <string name="episode_chat_tooltip_body">Frag alles. Es hat auch zugehört.</string>
+    <string name="episode_chat_beta_badge">Beta</string>
+    <string name="episode_chat_shelf_title">Fragen zu dieser Folge</string>
     <string name="manual_playlist_no_content_body_alternative">Wähle Folgen aus den Podcasts, denen du folgst. Oder wische bei jeder Folge nach links, um sie hinzuzufügen.</string>
     <string name="manual_playlist_no_content_body">Finde einen Podcast, der dir gefällt, und wische dann bei jeder Folge nach links, um sie hinzuzufügen.</string>
     <string name="settings_general_whats_new_unread_dot_summary">Einen „Ungelesen“-Punkt im Profil anzeigen, wenn es neue Nachrichten zu Neuigkeiten gibt.</string>
@@ -16,9 +62,9 @@ Language: de
     <string name="whats_new_research_title">Benutzerforschung</string>
     <string name="whats_new_feed_unable_to_load">Neuigkeiten können nicht geladen werden</string>
     <string name="whats_new_feed_all_read">Alle Nachrichten sind als gelesen markiert</string>
-    <string name="whats_new_feed_read_all">Alle lesen</string>
     <string name="whats_new_feed_unread">Ungelesen</string>
     <string name="whats_new_feed_empty_description">Neue Funktionen, Tipps und Ankündigungen werden\u00A0hier angezeigt.</string>
+    <string name="whats_new_feed_read_all">Alle gelesen</string>
     <string name="whats_new_feed_empty_title">Noch keine Nachrichten</string>
     <string name="whats_new_category_research">Benutzerforschung</string>
     <string name="whats_new_category_known_issue">Bekanntes Problem</string>
@@ -34,7 +80,7 @@ Language: de
     <string name="bookmark_edit_transcript_selection">Ausgewählte Passage: %1$s</string>
     <string name="removed_from_playlist_feedback">Aus Playlist entfernt</string>
     <string name="bookmark_adding_transcript">Transkript wird hinzugefügt …</string>
-    <string name="settings_app_icon_updated_message_v2">Es kann ein paar Minuten dauern, bis dieses neue Icon angezeigt wird. Wenn die Verknüpfung auf dem Startbildschirm ausgeblendet wird, füge Pocket Casts erneut über den Bildschirm „Alle Apps“ hinzu.</string>
+    <string name="settings_app_icon_updated_message_v2">Es kann ein paar Minuten dauern, bis dieses neue Icon angezeigt wird. Wenn die Verknüpfung auf deinem Startbildschirm ausgeblendet wird, füge Pocket Casts erneut über den Bildschirm „Alle Apps“ hinzu.</string>
     <string name="go_to_episode">Zur Folge</string>
     <string name="smart_bookmarks_upsell_message">Einmal tippen. Und es wird nach dem gesprochenen Text benannt.</string>
     <string name="smart_bookmarks_upsell_title">Wichtige Teile aufbewahren</string>
@@ -180,8 +226,6 @@ Language: de
     <string name="up_next_sort_duration_tooltip_title">Nach Dauer sortieren</string>
     <string name="transcript_tap_to_seek_streaming_unavailable">Lade die Folge herunter, um zum Suchen zu tippen</string>
     <string name="bookmark_play_from">Abspielen von %s</string>
-    <string name="summary_upsell_description">Werde Plus-Abonnent, um Zugriff auf das Transkript und andere Premium-Funktionen wie Lesezeichen und Ordner zu erhalten.</string>
-    <string name="summary_upsell_title">KI-gestützte Zusammenfassungen</string>
     <string name="tv_create_account_title">Kostenloses Konto erstellen</string>
     <string name="tv_onboarding_sign_in_instructions">Öffne die Kamera und richte sie auf diesen QR-Code</string>
     <string name="tv_onboarding_sign_in_title">Mit deinem Mobiltelefon anmelden</string>
@@ -213,28 +257,9 @@ Language: de
     <string name="blogs_found_followed_badge">PODCAST ABONNIERT</string>
     <string name="blogs_found_feed_detected">Feed gefunden</string>
     <string name="chapters_generated_disclaimer">Diese Kapitel werden automatisch generiert und sind möglicherweise nicht ganz korrekt.</string>
-    <string name="description">Beschreibung</string>
-    <string name="player_tab_summary">Zusammenfassung</string>
-    <string name="summary">Zusammenfassung</string>
-    <string name="episode_summary">Folgenzusammenfassung</string>
-    <string name="chat_stop_quote">Zitat anhalten</string>
     <string name="chat_play_quote">Zitat abspielen</string>
-    <string name="chat_tap_to_retry">Tippen, um es erneut zu versuchen.</string>
-    <string name="chat_error_network">Der Server kann nicht erreicht werden. Überprüfe deine Netzwerkverbindung.</string>
-    <string name="chat_error_server">Es ist ein Fehler aufgetreten. Bitte versuche es erneut.</string>
     <string name="chat_clear">Chat löschen</string>
     <string name="chat_send">Senden</string>
-    <string name="chat_input_hint">Frage zu dieser Folge stellen …</string>
-    <string name="chat_preview_user_2">Wurden praktische Tipps erwähnt?</string>
-    <string name="chat_preview_ai_2">Diese Folge befasst sich mit der Wissenschaft der Gewohnheitsbildung und erforscht, wie kleine tägliche Routinen im Laufe der Zeit zu großen Veränderungen führen können.</string>
-    <string name="chat_preview_user_1">Was war das Hauptthema dieser Folge?</string>
-    <string name="chat_preview_ai_1">Hallo! Ich bin hier, um dir zu helfen, diese Folge zu entdecken. Stell mir Fragen zu den angesprochenen Themen, wichtigen Punkten oder bestimmten Momenten.</string>
-    <string name="chat_thinking">LASS MICH NACHDENKEN …</string>
-    <string name="chat_episode_assistant">FOLGEN-ASSISTENT</string>
-    <string name="chat_context_label_with_duration">Mit dieser Folge chatten … ・ %1$s</string>
-    <string name="chat_context_label">Mit dieser Folge chatten …</string>
-    <string name="chat_paywall_title">Mit dieser Folge chatten</string>
-    <string name="episode_chat">Mit Folge chatten</string>
     <string name="blogs_experiment_banner_body">Blogs sind etwas, das wir ausprobieren. Sie könnten bestehen bleiben, überarbeitet werden oder still und leise verschwinden.</string>
     <string name="blogs_experiment_banner_lead">Es handelt sich um ein Experiment.</string>
     <string name="onboarding_blogs_upsell_sample_label">Blog ・ 24. April</string>
