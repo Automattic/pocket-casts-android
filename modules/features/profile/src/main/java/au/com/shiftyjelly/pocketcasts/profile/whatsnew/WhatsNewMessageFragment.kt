@@ -89,6 +89,8 @@ class WhatsNewMessageFragment : BaseFragment() {
             WhatsNewActionEvent.OpenLink -> action.url?.let { url -> openLink(host, url) }
 
             WhatsNewActionEvent.OpenNetworks -> host.openNetworks()
+
+            WhatsNewActionEvent.OpenFiles -> host.openCloudFiles()
         }
     }
 
