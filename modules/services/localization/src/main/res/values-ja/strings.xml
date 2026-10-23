@@ -1,11 +1,57 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-10-08 09:58:28+0000
+Translation-Revision-Date: 2026-10-20 09:57:02+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="chat_about_episode">%1$s についてチャットする</string>
+    <string name="chat_now_playing_episode">%1$s を再生中 </string>
+    <string name="chat_undo">取り消す</string>
+    <string name="chat_history_older">古い</string>
+    <string name="chat_history_previous_7_days">過去7日間</string>
+    <string name="chat_history">チャットの履歴</string>
+    <string name="chat_deleted">チャットを削除しました</string>
+    <string name="chat_cleared">チャットをクリアしました</string>
+    <string name="chat_offline_note">オフラインになっています。 接続して質問してください。</string>
+    <string name="chat_answering">回答中</string>
+    <string name="chat_error_server_on_our_end">当社側でエラーが発生しました。</string>
+    <string name="chat_not_sent_tap_to_retry">送信されませんでした。 タップしてもう一度お試しください。</string>
+    <string name="chat_feedback_send_failed">フィードバックを送信できませんでした。 接続を確認してください。</string>
+    <string name="chat_feedback_sending">フィードバックを送信中</string>
+    <string name="chat_feedback_what_went_wrong">何が良くなかったか</string>
+    <string name="chat_beta_sheet_sign_in">ログインして試す</string>
+    <string name="episode_chat_needs_transcript_message">「このエピソードについて尋ねる」には、トランスクリプトが必要です。 このエピソードにはトランスクリプトがありません。</string>
+    <string name="onboarding_episode_chat_question_2">主なポイントをまとめますか ?</string>
+    <string name="onboarding_episode_chat_answer">このエピソードは AI、健康、生産性を扱っています。</string>
+    <string name="onboarding_episode_chat_question_1">重要なトピックは何ですか ?</string>
+    <string name="onboarding_episode_chat_title">このエピソードについて尋ねる:</string>
+    <string name="chat_feedback_learn_more">さらに詳しく</string>
+    <string name="chat_feedback_legal">送信するとこの会話が当社と共有され、チャットの改良に役立てられます。</string>
+    <string name="chat_feedback_submit">フィードバックを送信</string>
+    <string name="chat_feedback_details_hint">詳細を共有 (オプション)</string>
+    <string name="chat_feedback_reason_other">その他</string>
+    <string name="chat_feedback_reason_offensive">攻撃的である</string>
+    <string name="chat_feedback_reason_out_of_date">情報が古い</string>
+    <string name="chat_feedback_reason_wrong_facts">事実を間違えていた</string>
+    <string name="chat_feedback_reason_not_interesting">面白くなかった</string>
+    <string name="chat_rate_answer_bad">好ましくない反応</string>
+    <string name="chat_rate_answer_good">好ましい反応</string>
+    <string name="chat_feedback_thank_you">フィードバックをありがとうございます</string>
+    <string name="chat_survey_yes">はい</string>
+    <string name="chat_survey_not_really">あまり</string>
+    <string name="chat_survey_title">「このエピソードについて尋ねる」をお楽しみいただけましたか ?</string>
+    <string name="chat_ai_disclaimer">AI は間違いを犯す可能性があるため、再確認してください。</string>
+    <string name="chat_suggestion_summarize">このエピソードを要約</string>
+    <string name="chat_welcome">このエピソードの内容について尋ねます。 もしくは、ここから開始します。</string>
+    <string name="chat_input_question_hint">質問する…</string>
+    <string name="chat_beta_note">「このエピソードについて尋ねる」はベータ版です</string>
+    <string name="chat_beta_sheet_body">テスト中は全ユーザーに対して無料です。 後ほど Plus 機能になる予定です。</string>
+    <string name="chat_beta_sheet_title">「このエピソードについて尋ねる」はベータ版です</string>
+    <string name="episode_chat_tooltip_body">何かお尋ねください。 聴き取っていました。</string>
+    <string name="episode_chat_beta_badge">ベータ</string>
+    <string name="episode_chat_shelf_title">このエピソードについて尋ねる</string>
     <string name="manual_playlist_no_content_body_alternative">フォローしているポッドキャストからエピソードを選択します。 または、エピソードを左にスワイプして、その都度追加することもできます。</string>
     <string name="manual_playlist_no_content_body">気に入ったポッドキャストを見つけて、エピソードを左にスワイプすると追加できます。</string>
     <string name="settings_general_whats_new_unread_dot_summary">新しい新着情報メッセージがある場合、プロフィールに未読のドットが表示されます。</string>
@@ -180,8 +226,6 @@ Language: ja_JP
     <string name="up_next_sort_duration_tooltip_title">所要時間で並び替え</string>
     <string name="transcript_tap_to_seek_streaming_unavailable">エピソードをダウンロードし、タップして検索</string>
     <string name="bookmark_play_from">%s から再生</string>
-    <string name="summary_upsell_description">Plus サブスクリプションに登録すると、Plus にアクセスし、ブックマークやフォルダーなどのその他のプレミアム機能もご利用いただけます。</string>
-    <string name="summary_upsell_title">AI を活用した概要</string>
     <string name="tv_create_account_title">無料アカウントを作成</string>
     <string name="tv_onboarding_sign_in_instructions">カメラを開き、この QR コードに向けます</string>
     <string name="tv_onboarding_sign_in_title">スマートフォンでログイン</string>
@@ -213,28 +257,9 @@ Language: ja_JP
     <string name="blogs_found_followed_badge">フォローしているポッドキャスト</string>
     <string name="blogs_found_feed_detected">見つかったフィード</string>
     <string name="chapters_generated_disclaimer">これらのチャプターは自動的に生成されており、正確さに欠ける可能性があります。</string>
-    <string name="description">説明</string>
-    <string name="player_tab_summary">概要</string>
-    <string name="summary">概要</string>
-    <string name="episode_summary">エピソードの概要</string>
-    <string name="chat_stop_quote">引用を停止</string>
     <string name="chat_play_quote">引用を再生</string>
-    <string name="chat_tap_to_retry">タップして再試行</string>
-    <string name="chat_error_network">サーバーにアクセスできません。 接続を確認してください。</string>
-    <string name="chat_error_server">エラーが発生しました。 もう一度お試しください。</string>
     <string name="chat_clear">チャットを消去</string>
     <string name="chat_send">送信</string>
-    <string name="chat_input_hint">このエピソードについて尋ねる…</string>
-    <string name="chat_preview_user_2">何か実用的なアドバイスについて言及していましたか ?</string>
-    <string name="chat_preview_ai_2">このエピソードは習慣形成の科学に深く切り込み、日々の小さな習慣がどのようにして時間をかけて大きな変化につながるのかを探ります。</string>
-    <string name="chat_preview_user_1">このエピソードのメインテーマは何でしたか ?</string>
-    <string name="chat_preview_ai_1">こんにちは ! このエピソードの内容確認をお手伝いします。 議論されたトピック、重要なポイント、特定の場面について、何でも質問してください。</string>
-    <string name="chat_thinking">考えています</string>
-    <string name="chat_episode_assistant">エピソードアシスタント</string>
-    <string name="chat_context_label_with_duration">このエピソード (%1$s) についてのチャット</string>
-    <string name="chat_context_label">このエピソードについてのチャット</string>
-    <string name="chat_paywall_title">このエピソードについてチャットする</string>
-    <string name="episode_chat">エピソードについてチャットする</string>
     <string name="blogs_experiment_banner_body">ブログ機能は実験中です。 継続する可能性や、手直しされる可能性、静かに消える可能性があります。</string>
     <string name="blogs_experiment_banner_lead">これは実験です。</string>
     <string name="onboarding_blogs_upsell_sample_label">ブログ・4月24日</string>
