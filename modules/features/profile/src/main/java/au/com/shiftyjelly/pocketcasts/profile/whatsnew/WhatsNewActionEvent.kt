@@ -11,6 +11,7 @@ internal enum class WhatsNewActionEvent(val key: String) {
     CreatePlaylist("create_playlist"),
     OpenLink("open_link"),
     OpenNetworks("open_networks"),
+    OpenFiles("open_files"),
     ;
 
     companion object {
