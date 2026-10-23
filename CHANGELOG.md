@@ -6,6 +6,8 @@
 *   Bug Fixes
     *   Fix tapping the media player or a notification not opening the app after changing the app icon
         ([#6181](https://github.com/Automattic/pocket-casts-android/pull/6181))
+    *   Show a prompt to choose an episode in the car instead of "No Title" when the Up Next queue runs out
+        ([#6031](https://github.com/Automattic/pocket-casts-android/pull/6031))
     *   Fix the add button covering the last file on the Files screen
         ([#6192](https://github.com/Automattic/pocket-casts-android/pull/6192))
     *   Fix smart playlists in Android Automotive going empty when the car keeps the app running between drives

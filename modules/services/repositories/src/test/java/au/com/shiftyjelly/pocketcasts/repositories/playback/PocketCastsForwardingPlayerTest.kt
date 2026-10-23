@@ -204,6 +204,32 @@ class PocketCastsForwardingPlayerTest {
     }
 
     @Test
+    fun `automotive empty timeline reports command availability from its own commands`() {
+        val player = mock<Player> {
+            on { applicationLooper } doReturn Looper.getMainLooper()
+            on { currentTimeline } doReturn Timeline.EMPTY
+            on { isCommandAvailable(any()) } doReturn false
+        }
+        val forwarding = PocketCastsForwardingPlayer(player, isAutomotive = true)
+
+        assertTrue(forwarding.isCommandAvailable(Player.COMMAND_GET_METADATA))
+        assertTrue(forwarding.isCommandAvailable(Player.COMMAND_GET_CURRENT_MEDIA_ITEM))
+        assertFalse(forwarding.isCommandAvailable(Player.COMMAND_PLAY_PAUSE))
+    }
+
+    @Test
+    fun `non-empty timeline delegates command availability to the wrapped player`() {
+        val player = mock<Player> {
+            on { applicationLooper } doReturn Looper.getMainLooper()
+            on { currentTimeline } doReturn Timeline.EMPTY
+            on { isCommandAvailable(Player.COMMAND_GET_TIMELINE) } doReturn true
+        }
+        val forwarding = PocketCastsForwardingPlayer(player, isAutomotive = false)
+
+        assertTrue(forwarding.isCommandAvailable(Player.COMMAND_GET_TIMELINE))
+    }
+
+    @Test
     fun `automotive empty timeline reports null current media item`() {
         val player = mock<Player> {
             on { applicationLooper } doReturn Looper.getMainLooper()
@@ -212,6 +238,30 @@ class PocketCastsForwardingPlayerTest {
         val forwarding: Player = PocketCastsForwardingPlayer(player, isAutomotive = true)
 
         assertNull(forwarding.currentMediaItem)
+    }
+
+    @Test
+    fun `clearMetadata resets to empty metadata`() {
+        forwardingPlayer.updateMetadata(createPodcastEpisode(uuid = "ep-1", title = "Test"), null)
+
+        forwardingPlayer.clearMetadata()
+
+        assertEquals(MediaItem.EMPTY, forwardingPlayer.currentMediaItem)
+        assertEquals(MediaMetadata.EMPTY, forwardingPlayer.mediaMetadata)
+    }
+
+    @Test
+    fun `clearMetadata with title exposes only the title`() {
+        val listener = mock<Player.Listener>()
+        forwardingPlayer.addListener(listener)
+        forwardingPlayer.updateMetadata(createPodcastEpisode(uuid = "ep-1", title = "Test"), null)
+
+        forwardingPlayer.clearMetadata(title = "Choose an episode to play")
+
+        val expected = MediaMetadata.Builder().setTitle("Choose an episode to play").build()
+        assertEquals(expected, forwardingPlayer.mediaMetadata)
+        assertEquals(MediaItem.DEFAULT_MEDIA_ID, forwardingPlayer.currentMediaItem.mediaId)
+        verify(listener).onMediaMetadataChanged(expected)
     }
 
     @Test
