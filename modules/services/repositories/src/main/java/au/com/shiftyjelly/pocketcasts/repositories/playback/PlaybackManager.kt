@@ -1491,7 +1491,9 @@ open class PlaybackManager @Inject constructor(
         cancelPrefetchNextEpisode()
         launch {
             castSessionMutex.withLock {
-                if (isPlayerSwitchRequired()) {
+                val switchRequired = isPlayerSwitchRequired()
+                LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Cast connected with ${player?.name} player, switch required: $switchRequired")
+                if (switchRequired) {
                     loadCurrentEpisode(true, sourceView = SourceView.CHROMECAST)
                 }
             }
