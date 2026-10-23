@@ -2591,6 +2591,10 @@
     <string name="chat_offline_note">You’re offline. Connect to ask a question.</string>
     <string name="chat_play_quote">Play quote</string>
     <string name="chat_quote_finding_moment">Finding the moment…</string>
+    <string name="chat_loading_reading_transcript">Reading the transcript</string>
+    <string name="chat_loading_finding_moments">Finding the right moments</string>
+    <string name="chat_loading_writing_answer">Writing your answer</string>
+    <string name="chat_loading_still_working">Still working on it…</string>
 
     <!--    Tasker Plugin-->
     <string name="must_provide_filter_name">Must provide playlist name</string>

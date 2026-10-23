@@ -1,13 +1,26 @@
 package au.com.shiftyjelly.pocketcasts.chat.ui
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.core.EaseOut
 import androidx.compose.animation.core.InfiniteTransition
 import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
@@ -18,6 +31,7 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -46,9 +60,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextIndent
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.LocalPodcastColors
+import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import kotlinx.coroutines.delay
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -294,15 +315,75 @@ private fun ChatNotSentLabel(
 
 @Composable
 internal fun ThinkingBubble(
+    phase: ChatLoadingPhase,
     theme: ChatTheme,
     modifier: Modifier = Modifier,
     transition: InfiniteTransition = rememberInfiniteTransition(label = "typing"),
 ) {
-    ChatTypingIndicator(
-        theme = theme,
-        modifier = modifier,
-        transition = transition,
-    )
+    val isReduceMotionEnabled = rememberIsReduceMotionEnabled()
+    AnimatedContent(
+        targetState = phase,
+        transitionSpec = {
+            if (isReduceMotionEnabled) {
+                EnterTransition.None togetherWith ExitTransition.None
+            } else {
+                LoadingPhaseEnter togetherWith LoadingPhaseExit using SizeTransform(clip = false)
+            }
+        },
+        contentAlignment = Alignment.TopStart,
+        label = "loadingPhase",
+        modifier = modifier.fillMaxWidth(),
+    ) { shownPhase ->
+        val textRes = shownPhase.textRes
+        if (textRes == null) {
+            Box(
+                contentAlignment = Alignment.CenterStart,
+                modifier = Modifier.heightIn(min = LoadingLineHeight),
+            ) {
+                ChatTypingIndicator(
+                    theme = theme,
+                    transition = transition,
+                )
+            }
+        } else {
+            ChatShimmerText(
+                text = stringResource(textRes),
+                color = theme.inputHint,
+                highlight = theme.primaryText,
+                style = AiMessageTextStyle,
+                modifier = Modifier.clearAndSetSemantics {},
+            )
+        }
+    }
 }
 
+private val LoadingLineHeight = 20.dp
+private val LoadingPhaseEnter = fadeIn(tween(durationMillis = 200, delayMillis = 100)) +
+    slideInVertically(tween(durationMillis = 300, easing = EaseOut)) { height -> height / 3 }
+private val LoadingPhaseExit = fadeOut(tween(durationMillis = 130)) +
+    slideOutVertically(tween(durationMillis = 300, easing = EaseOut)) { height -> -height / 3 }
+
 private val UserBubbleShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp, bottomEnd = 4.dp, bottomStart = 16.dp)
+
+@Preview
+@Composable
+private fun ThinkingBubblePreview(
+    @PreviewParameter(ChatLoadingPhaseParameterProvider::class) phase: ChatLoadingPhase,
+) {
+    AppThemeWithBackground(ThemeType.DARK) {
+        CompositionLocalProvider(LocalPodcastColors provides PodcastColors.ForUserEpisode) {
+            val theme = rememberChatTheme()
+            ThinkingBubble(
+                phase = phase,
+                theme = theme,
+                modifier = Modifier
+                    .background(theme.background)
+                    .padding(16.dp),
+            )
+        }
+    }
+}
+
+private class ChatLoadingPhaseParameterProvider : PreviewParameterProvider<ChatLoadingPhase> {
+    override val values = ChatLoadingPhase.entries.asSequence()
+}
