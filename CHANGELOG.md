@@ -20,7 +20,7 @@
         ([#6212](https://github.com/Automattic/pocket-casts-android/pull/6212))
     *   Stop showing "Plus expires in X days" to subscribers whose subscription renews automatically
         ([#5329](https://github.com/Automattic/pocket-casts-android/pull/5329))
-    *   Fix Up Next and other sync changes staying on the device while episodes are downloading, which could re-add old episodes to Up Next on other devices much later
+    *   Let Up Next and other syncs run while episodes are downloading instead of waiting for the downloads to finish
         ([#6220](https://github.com/Automattic/pocket-casts-android/pull/6220))
 
 
