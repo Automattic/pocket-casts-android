@@ -2653,8 +2653,8 @@ open class PlaybackManager @Inject constructor(
                 player = playerManager.createSimplePlayer(this@PlaybackManager::onPlayerEvent)
                 // Start the service early so it's ready when we install the player later.
                 // The ExoPlayer doesn't exist yet — SimplePlayer creates it lazily in prepare().
-                // When the flag is on, play() starts the foreground service via the gate instead.
-                if (!FeatureFlag.isEnabled(Feature.FOREGROUND_BEFORE_PLAYBACK)) {
+                // When the flag is on, play() starts the foreground service via the gate instead (except on Automotive).
+                if (!FeatureFlag.isEnabled(Feature.FOREGROUND_BEFORE_PLAYBACK) || Util.isAutomotive(application)) {
                     mediaSessionManager.startServiceIfNeeded(application)
                 }
                 Timber.i("Creating media player of type SimplePlayer.")
