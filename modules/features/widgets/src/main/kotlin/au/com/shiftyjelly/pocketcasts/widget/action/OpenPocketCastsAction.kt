@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.widget.action
 
-import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.glance.LocalContext
 import androidx.glance.action.Action
@@ -14,11 +13,9 @@ internal object OpenPocketCastsAction {
     @Composable
     fun action(): Action {
         val context = LocalContext.current
-        val intent = context.getLaunchIntent()
-            ?: Intent(Intent.ACTION_MAIN)
-                .addCategory(Intent.CATEGORY_LAUNCHER)
-                .setPackage(context.packageName)
-                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        val intent = requireNotNull(context.getLaunchIntent()) {
+            "Missing launcher intent for ${context.packageName}"
+        }
         return actionStartActivity(intent)
     }
 }
