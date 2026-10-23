@@ -126,6 +126,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -301,6 +302,7 @@ open class PlaybackManager @Inject constructor(
         val build: (PlaybackContentType) -> Trackable,
     )
     private val pendingContentTypeEvents = mutableListOf<PendingContentTypeEvent>()
+    private val castSessionEvents = Channel<suspend () -> Unit>(Channel.UNLIMITED)
 
     var player: Player?
         get() = _playerFlow.value
@@ -314,6 +316,12 @@ open class PlaybackManager @Inject constructor(
         upNextQueue.setupBlocking()
         mediaSessionManager.startObserving()
         val playbackManagerNetworkWatcher = playbackManagerNetworkWatcherFactory.create(::onSwitchedToMeteredConnection)
+
+        launch {
+            for (castSessionEvent in castSessionEvents) {
+                castSessionEvent()
+            }
+        }
 
         launch {
             updatePausedPlaybackState()
@@ -354,8 +362,8 @@ open class PlaybackManager @Inject constructor(
                                 )
                             }
                         }
-                        releaseCastPlayerFromLostSession()
                     }
+                    castSessionEvents.trySend { releaseCastPlayerFromLostSession() }
                 }
             })
             playbackManagerNetworkWatcher.observeConnection()
@@ -1467,10 +1475,9 @@ open class PlaybackManager @Inject constructor(
         }
     }
 
-    private val castSessionMutex = Mutex()
     fun castReconnected() {
-        launch(Dispatchers.Main) {
-            castSessionMutex.withLock {
+        castSessionEvents.trySend {
+            withContext(Dispatchers.Main) {
                 if (player != null) {
                     player?.stop()
                     player = null
@@ -1479,7 +1486,7 @@ open class PlaybackManager @Inject constructor(
                 player = playerManager.createCastPlayer(this@PlaybackManager::onPlayerEvent)
                 mediaSessionManager.installCastPlayer()
                 (player as? CastPlayer)?.updateFromRemoteIfRequired()
-                Timber.i("Cast reconnected. Creating media player of type CastPlayer")
+                LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Cast reconnected. Creating media player of type CastPlayer")
 
                 setupUpdateTimer()
             }
@@ -1489,28 +1496,24 @@ open class PlaybackManager @Inject constructor(
     fun castConnected() {
         upNextQueue.currentEpisode ?: return
         cancelPrefetchNextEpisode()
-        launch {
-            castSessionMutex.withLock {
-                val switchRequired = isPlayerSwitchRequired()
-                LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Cast connected with ${player?.name} player, switch required: $switchRequired")
-                if (switchRequired) {
-                    loadCurrentEpisode(true, sourceView = SourceView.CHROMECAST)
-                }
+        castSessionEvents.trySend {
+            val switchRequired = isPlayerSwitchRequired()
+            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Cast connected with ${player?.name} player, switch required: $switchRequired")
+            if (switchRequired) {
+                loadCurrentEpisode(true, sourceView = SourceView.CHROMECAST)
             }
         }
     }
 
     fun castDisconnected() {
         upNextQueue.currentEpisode ?: return
-        launch {
-            castSessionMutex.withLock {
-                updateCurrentPositionInDatabase()
+        castSessionEvents.trySend {
+            updateCurrentPositionInDatabase()
 
-                stop()
+            stop()
 
-                if (isPlayerSwitchRequired()) {
-                    loadCurrentEpisode(false, sourceView = SourceView.CHROMECAST)
-                }
+            if (isPlayerSwitchRequired()) {
+                loadCurrentEpisode(false, sourceView = SourceView.CHROMECAST)
             }
         }
     }
