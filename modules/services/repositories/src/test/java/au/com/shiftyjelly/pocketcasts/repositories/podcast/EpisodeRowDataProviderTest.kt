@@ -11,7 +11,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadProgressCach
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
-import io.reactivex.Observable
 import java.util.Date
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineDispatcher
@@ -48,7 +47,7 @@ class EpisodeRowDataProviderTest {
     }
 
     private val upNextQueue = mock<UpNextQueue> {
-        on { changesObservable } doReturn Observable.empty()
+        on { changesFlow } doReturn emptyFlow()
     }
 
     private val bookmarkManager = mock<BookmarkManager> {
