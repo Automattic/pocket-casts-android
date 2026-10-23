@@ -5,15 +5,14 @@ import android.content.pm.ServiceInfo
 import android.os.Binder
 import android.os.IBinder
 import androidx.annotation.OptIn
-import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.DefaultMediaNotificationProvider
 import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaSession
-import androidx.media3.session.MediaStyleNotificationHelper
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationDrawer
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.eventhorizon.PlaybackServiceType
@@ -24,7 +23,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import au.com.shiftyjelly.pocketcasts.images.R as IR
-import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 const val MEDIA_ID_ROOT = "__ROOT__"
 const val PODCASTS_ROOT = "__PODCASTS__"
@@ -63,6 +61,8 @@ open class PlaybackService :
     @Inject lateinit var sleepTimer: SleepTimer
 
     @Inject lateinit var errorReporter: PlaybackServiceErrorReporter
+
+    @Inject lateinit var notificationDrawer: NotificationDrawer
 
     private val job = SupervisorJob()
     override val coroutineContext: CoroutineContext
@@ -164,17 +164,8 @@ open class PlaybackService :
         if (Util.isAutomotive(this)) return
         val session = playbackManager.mediaSessionManager.getMedia3Session()
         try {
-            val title = playbackManager.getCurrentEpisode()?.title ?: getString(LR.string.loading)
-            val builder = NotificationCompat.Builder(this, Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_PLAYBACK.id)
-                .setContentTitle(title)
-                .setSmallIcon(IR.drawable.notification)
-                .setOnlyAlertOnce(true)
-                .setShowWhen(false)
-                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            if (session != null) {
-                builder.setStyle(MediaStyleNotificationHelper.MediaStyle(session))
-            }
-            ServiceCompat.startForeground(this, Settings.NotificationId.PLAYING.value, builder.build(), ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK)
+            val notification = notificationDrawer.buildPreparingNotification(session, playbackManager.getCurrentEpisode()?.title)
+            ServiceCompat.startForeground(this, Settings.NotificationId.PLAYING.value, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK)
             playbackManager.mediaSessionManager.setServiceForeground(true)
             errorReporter.resetFailureCount()
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "startForeground early (preparing, media3)")
