@@ -535,8 +535,7 @@ class MediaSessionManager(
                 }
             },
             onStop = {
-                val sourceView = media3RequestSource()
-                scope.launch { commandMutex.withLock { playbackManager.pauseSuspend(sourceView = sourceView) } }
+                LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Media3: ignoring stop while casting")
             },
         )
         castStatePlayer = player

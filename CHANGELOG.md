@@ -24,6 +24,8 @@
         ([#5329](https://github.com/Automattic/pocket-casts-android/pull/5329))
     *   Let Up Next and other syncs run while episodes are downloading instead of waiting for the downloads to finish
         ([#6220](https://github.com/Automattic/pocket-casts-android/pull/6220))
+    *   Fix Cast playback pausing by itself a couple of seconds after you start casting
+        ([#6227](https://github.com/Automattic/pocket-casts-android/pull/6227))
 
 
 8.23
