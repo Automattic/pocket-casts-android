@@ -1794,7 +1794,6 @@ Language: es
     <string name="settings_notifications_new_episodes">Nuevos episodios</string>
     <string name="settings_manage_downloads_include_starred">Incluir destacados</string>
     <string name="settings_lock_image">imagen de bloqueo</string>
-    <string name="settings_licenses">Licencias</string>
     <string name="settings_learn_more">Aprender más</string>
     <string name="settings_keep_screen_awake_summary">Si se activa esta opción, la pantalla no se bloqueará mientras se reproduzca algo.</string>
     <string name="settings_keep_screen_awake">Mantener la pantalla activa</string>
@@ -2270,7 +2269,6 @@ Language: es
     <string name="podcasts_share_missing_title">Escribe un título para la lista.</string>
     <string name="podcasts_share_create_error">Vaya, no se ha podido compartir.</string>
     <string name="podcasts_share_title">Título</string>
-    <string name="podcasts_share_selected_podcasts">Compartir los podcasts elegidos</string>
     <string name="podcasts_share_select_all">Seleccionar todo</string>
     <string name="podcasts_share_list">Lista compartida</string>
     <string name="podcasts_share_description">Descripción (opcional)</string>
@@ -2315,10 +2313,8 @@ Language: es
     <string name="player_sleep_60_minutes">60 minutos</string>
     <string name="player_sleep_30_minutes">30 minutos</string>
     <string name="player_sleep_15_minutes">15 minutos</string>
-    <string name="player_pip">Entrar en el modo imagen incrustada</string>
     <string name="player_notification_skip_forward">Adelantar %d segundos</string>
     <string name="player_notification_skip_back">Volver atrás %d segundos</string>
-    <string name="player_full_screen">Pantalla completa</string>
     <string name="player_effects_voices_sound_louder">Las voces suenan más alto</string>
     <string name="player_effects_trim_level">Nivel de recorte</string>
     <string name="player_effects_speed_up">Acelerar</string>
@@ -2327,7 +2323,6 @@ Language: es
     <string name="player_effects">Efectos del reproductor</string>
     <string name="player_close">Cerrar reproductor</string>
     <string name="player_chapter_url">URL del capítulo</string>
-    <string name="player_actions">Acciones del episodio</string>
     <string name="player_action_previous_chapter">Capítulo anterior</string>
     <string name="player_action_next_chapter">Capítulo siguiente</string>
     <string name="time_short_seconds">%ds</string>

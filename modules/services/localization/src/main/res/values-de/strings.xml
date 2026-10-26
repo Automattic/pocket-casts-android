@@ -1739,7 +1739,6 @@ Language: de
     <string name="settings_notification_actions">Aktionen</string>
     <string name="settings_notifications_new_episodes">Neue Folgen</string>
     <string name="settings_lock_image">Sperrbild</string>
-    <string name="settings_licenses">Lizenzen</string>
     <string name="settings_learn_more">Weitere Informationen</string>
     <string name="settings_instagram">Instagram-Link</string>
     <string name="settings_inactive_episodes">Inaktive Folgen</string>
@@ -2233,7 +2232,6 @@ Language: de
     <string name="podcasts_share_missing_title">Gib einen Titel für deine Liste ein.</string>
     <string name="podcasts_share_create_error">Ups, Teilen nicht möglich</string>
     <string name="podcasts_share_title">Titel</string>
-    <string name="podcasts_share_selected_podcasts">Ausgewählte Podcasts teilen</string>
     <string name="podcasts_share_select_all">Alle auswählen</string>
     <string name="podcasts_share_list">Geteilte Liste</string>
     <string name="podcasts_share_description">Beschreibung (optional)</string>
@@ -2270,10 +2268,8 @@ Language: de
     <string name="player_sleep_60_minutes">60 Minuten</string>
     <string name="player_sleep_30_minutes">30 Minuten</string>
     <string name="player_sleep_15_minutes">15 Minuten</string>
-    <string name="player_pip">Bild-in-Bild starten</string>
     <string name="player_notification_skip_forward">%d Sek. vor</string>
     <string name="player_notification_skip_back">%d Sek. zurück</string>
-    <string name="player_full_screen">Vollbild</string>
     <string name="player_effects_voices_sound_louder">Stimmen hören sich lauter an</string>
     <string name="player_effects_trim_level">Kürzungsgrad</string>
     <string name="player_effects_speed_up">Schneller</string>
@@ -2282,7 +2278,6 @@ Language: de
     <string name="player_effects">Player-Effekte</string>
     <string name="player_close">Player schließen</string>
     <string name="player_chapter_url">URL des Kapitels</string>
-    <string name="player_actions">Aktionen für Folge</string>
     <string name="player_action_previous_chapter">Vorheriges Kapitel</string>
     <string name="player_action_next_chapter">Nächstes Kapitel</string>
     <string name="time_left">%s übrig</string>

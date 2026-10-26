@@ -1113,7 +1113,6 @@ Language: el_GR
     <string name="settings_manage_downloads_include_starred">Συμπερίληψη αγαπημένων</string>
     <string name="settings_logs">Καταγραφές</string>
     <string name="settings_lock_image">κλείδωμα εικόνας</string>
-    <string name="settings_licenses">Άδειες</string>
     <string name="settings_learn_more">Μάθε περισσότερα</string>
     <string name="settings_keep_screen_awake_summary">Αν είναι ενεργό, η οθόνη δεν θα κλειδώνει κατά την αναπαραγωγή.</string>
     <string name="settings_keep_screen_awake">Κράτα την οθόνη ενεργή</string>
@@ -1549,7 +1548,6 @@ Language: el_GR
     <string name="player_rearrange_actions_shown">Συντόμευση στο πρόγραμμα αναπαραγωγής</string>
     <string name="podcasts_share_list">Κοινόχρηστη λίστα</string>
     <string name="podcasts_share_via">Κοινοποίηση μέσω</string>
-    <string name="podcasts_share_selected_podcasts">Μοιράσου επιλεγμένα podcasts</string>
     <string name="podcasts_menu_share_podcasts">Μοιράσου podcasts</string>
     <string name="podcasts_share">Μοιράσου podcasts</string>
     <string name="podcast_share_episode">Κοινοποίηση επεισοδίου</string>
@@ -1751,11 +1749,9 @@ Language: el_GR
     <string name="player_sleep_60_minutes">60 λεπτά</string>
     <string name="player_sleep_30_minutes">30 λεπτά</string>
     <string name="player_sleep_15_minutes">15 λεπτά</string>
-    <string name="player_pip">Εκκίνηση Εικόνας-σε-εικόνα</string>
     <string name="player_notification_skip_forward">Προώθηση %d δευτερόλεπτα</string>
     <string name="player_notification_skip_back">Πίσω %d δευτερόλεπτα</string>
     <string name="player_more_actions">Περισσότερες ενέργειες</string>
-    <string name="player_full_screen">Πλήρης οθόνη</string>
     <string name="player_effects_trim_silence">Περικοπή Σιωπής</string>
     <string name="player_effects_trim_mild">Ήπια</string>
     <string name="player_effects_trim_medium">Μεσαία</string>
@@ -1766,7 +1762,6 @@ Language: el_GR
     <string name="player_effects_speed">Ταχύτητα</string>
     <string name="player_close">Κλείσιμο παίκτη</string>
     <string name="player_chapter_url">URL Κεφαλαίου</string>
-    <string name="player_actions">Ενέργειες επεισοδίου</string>
     <string name="time_short_hours_minutes">%1$dώ %2$dλ</string>
     <string name="stream_warning_button">Ροή Ούτως ή Άλλως</string>
     <string name="download_warning_on_wifi_button">Λήψη τώρα</string>

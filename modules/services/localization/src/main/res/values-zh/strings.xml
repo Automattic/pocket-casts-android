@@ -1804,7 +1804,6 @@ Language: zh_CN
     <string name="settings_notifications_new_episodes">新剧集</string>
     <string name="settings_manage_downloads_include_starred">包括加星标项</string>
     <string name="settings_lock_image">锁定图像</string>
-    <string name="settings_licenses">许可证</string>
     <string name="settings_learn_more">了解更多</string>
     <string name="settings_keep_screen_awake_summary">如果打开，则播放时不会锁定屏幕。</string>
     <string name="settings_keep_screen_awake">保持屏幕为唤醒状态</string>
@@ -2273,7 +2272,6 @@ Language: zh_CN
     <string name="podcasts_share_missing_title">请为您的列表输入标题。</string>
     <string name="podcasts_share_create_error">糟糕，无法共享</string>
     <string name="podcasts_share_title">标题</string>
-    <string name="podcasts_share_selected_podcasts">共享选定的播客</string>
     <string name="podcasts_share_select_all">选择全部</string>
     <string name="podcasts_share_list">共享列表</string>
     <string name="podcasts_share_description">说明(可不填)</string>
@@ -2318,10 +2316,8 @@ Language: zh_CN
     <string name="player_sleep_60_minutes">60 分钟</string>
     <string name="player_sleep_30_minutes">30 分钟</string>
     <string name="player_sleep_15_minutes">15 分钟</string>
-    <string name="player_pip">输入画中画</string>
     <string name="player_notification_skip_forward">前进 %d 秒</string>
     <string name="player_notification_skip_back">后退 %d 秒</string>
-    <string name="player_full_screen">全屏</string>
     <string name="player_effects_trim_level">剪裁水平</string>
     <string name="player_effects_speed_up">加速</string>
     <string name="player_effects_speed_down">减速</string>
@@ -2329,7 +2325,6 @@ Language: zh_CN
     <string name="player_effects">播放器效果</string>
     <string name="player_close">关闭播放器</string>
     <string name="player_chapter_url">章节 URL</string>
-    <string name="player_actions">剧集操作</string>
     <string name="player_action_previous_chapter">上一章</string>
     <string name="player_action_next_chapter">下一章</string>
     <string name="time_left">%s 剩余</string>
