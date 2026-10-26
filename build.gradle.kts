@@ -444,6 +444,18 @@ subprojects {
             }
         }
 
+        // Without the upload key a release build still succeeds, unsigned, and only fails once something uploads it.
+        tasks.matching { it.name == "packageRelease" || it.name == "packageReleaseBundle" }.configureEach {
+            doFirst {
+                if (!canSignRelease) {
+                    throw GradleException(
+                        "The upload keystore is missing, so this release build would not be signed. " +
+                            "Please run `bundle exec fastlane run configure_apply` to apply secrets.",
+                    )
+                }
+            }
+        }
+
         // Set Gradle property 'au.com.shiftyjelly.pocketcasts.leakcanary=true' to enable Leak Canary.
         // You can do this using the gradle.properties file or any other available Gradle mechanism.
         // See: https://docs.gradle.org/current/userguide/build_environment.html#sec:project_properties
