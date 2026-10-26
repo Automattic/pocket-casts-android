@@ -99,6 +99,7 @@ val secretProperties = loadPropertiesFromFile(secretsFile)
 val useRemoteBuildCacheLocally = "use_remote_build_cache_locally"
 
 gradle.extra["isCi"] = System.getenv("CI")?.toBoolean() ?: false
+gradle.extra["decryptedSecretsDir"] = File(System.getProperty("user.home"), ".configure/pocket-casts-android/secrets")
 gradle.extra["develocityToken"] = secretProperties.getProperty("develocityToken")
 gradle.extra["measureBuildsEnabled"] = secretProperties.getProperty("measureBuildsEnabled")
 
