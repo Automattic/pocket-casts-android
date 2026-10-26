@@ -56,15 +56,7 @@ class PlayButton @JvmOverloads constructor(
 
     companion object {
         fun calculateButtonType(episode: BaseEpisode, streamByDefault: Boolean): PlayButtonType {
-            return when {
-                episode.lastPlaybackFailed() -> PlayButtonType.PLAYBACK_FAILED
-                episode.playing -> PlayButtonType.PAUSE
-                episode.isFinished -> PlayButtonType.PLAYED
-                episode.isDownloaded -> PlayButtonType.PLAY
-                episode.isDownloading || episode.isDownloadPending -> if (streamByDefault) PlayButtonType.PLAY else PlayButtonType.STOP_DOWNLOAD
-                !streamByDefault -> PlayButtonType.DOWNLOAD
-                else -> PlayButtonType.PLAY
-            }
+            return PlayButtonType.from(episode, streamByDefault)
         }
     }
 
