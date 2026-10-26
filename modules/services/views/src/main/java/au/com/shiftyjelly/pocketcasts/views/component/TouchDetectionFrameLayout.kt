@@ -56,6 +56,10 @@ class TouchDetectionFrameLayout @JvmOverloads constructor(
     }
 }
 
+/**
+ * Matches the framework NPE thrown when a child is removed mid-gesture and `ViewGroup` keeps walking its
+ * recycled touch target, so only that crash is swallowed and every other NPE still propagates.
+ */
 internal fun NullPointerException.isRecycledTouchTargetCrash(): Boolean {
     val frame = stackTrace.firstOrNull() ?: return false
     if (frame.className != "android.view.ViewGroup") {
