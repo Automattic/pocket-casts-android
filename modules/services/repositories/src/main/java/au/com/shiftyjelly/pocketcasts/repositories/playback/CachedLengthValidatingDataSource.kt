@@ -125,6 +125,7 @@ internal class CachedLengthValidatingDataSource(
 @OptIn(UnstableApi::class)
 internal class MediaBuildChangedException(message: String) : Cache.CacheException(message)
 
+@OptIn(UnstableApi::class)
 internal fun Cache.discardMixedBuild(key: String, error: Throwable) {
     if (generateSequence(error) { it.cause }.none { it is MediaBuildChangedException }) {
         return
@@ -136,6 +137,7 @@ internal fun Cache.discardMixedBuild(key: String, error: Throwable) {
     }
 }
 
+@OptIn(UnstableApi::class)
 private fun Cache.storeContentLength(key: String, length: Long) {
     val mutations = ContentMetadataMutations()
     ContentMetadataMutations.setContentLength(mutations, length)
