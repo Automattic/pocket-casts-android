@@ -507,8 +507,10 @@ class MediaSessionManager(
         val sourceView = media3RequestSource()
         scope.launch {
             commandMutex.withLock {
-                val episode = playbackManager.upNextQueue.queueEpisodes.find { it.uuid == episodeUuid } ?: return@withLock
-                playbackManager.playNowSuspend(episode = episode, sourceView = sourceView)
+                val episode = playbackManager.upNextQueue.queueEpisodes.find { it.uuid == episodeUuid }
+                if (episode != null) {
+                    playbackManager.playNowSuspend(episode = episode, sourceView = sourceView)
+                }
             }
         }
     }
@@ -873,35 +875,50 @@ class MediaSessionManager(
     private fun observeUpNextQueue() {
         if (isAutomotive) return
         upNextQueueDisposable?.dispose()
-        upNextQueueDisposable = playbackManager.upNextQueue.changesObservable
+        upNextQueueDisposable = Observables.combineLatest(
+            playbackManager.upNextQueue.changesObservable,
+            settings.artworkConfiguration.flow.asObservable(),
+            settings.showArtworkOnLockScreen.flow.asObservable(),
+        ) { state, config, showArtwork -> Triple(state, config.useEpisodeArtwork, showArtwork) }
             .observeOn(Schedulers.io())
-            .map(::buildUpNextMediaItems)
+            .concatMap { (state, useEpisodeArtwork, showArtwork) ->
+                Observable.fromCallable { buildUpNextMediaItems(state, useEpisodeArtwork, showArtwork) }
+                    .doOnError { Timber.e(it, "Failed to build Up Next media items") }
+                    .onErrorResumeNext(Observable.empty())
+            }
             .distinctUntilChanged()
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onNext = { items -> forwardingPlayer?.updateQueue(items) },
+                onNext = { (current, upNext) -> forwardingPlayer?.updateQueue(current, upNext) },
                 onError = { Timber.e(it, "Error observing Up Next queue") },
             )
-            .addTo(disposables)
     }
 
-    private fun buildUpNextMediaItems(state: UpNextQueue.State): List<MediaItem> {
-        if (state !is UpNextQueue.State.Loaded) return emptyList()
-        val useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork
-        val episodes = listOf(state.episode) + state.queue
-        val podcasts = episodes
+    private fun buildUpNextMediaItems(
+        state: UpNextQueue.State,
+        useEpisodeArtwork: Boolean,
+        showArtwork: Boolean,
+    ): Pair<MediaItem?, List<MediaItem>> {
+        if (state !is UpNextQueue.State.Loaded) return null to emptyList()
+        val podcasts = (listOf(state.episode) + state.queue)
             .mapNotNullTo(mutableSetOf()) { (it as? PodcastEpisode)?.podcastUuid }
             .associateWith { podcastManager.findPodcastByUuidBlocking(it) }
-        return episodes.map { episode ->
-            val podcast = (episode as? PodcastEpisode)?.let { podcasts[it.podcastUuid] }
-            MediaItem.Builder()
-                .setMediaId(episode.uuid)
+
+        fun BaseEpisode.toMediaItem(): MediaItem {
+            val podcast = (this as? PodcastEpisode)?.let { podcasts[it.podcastUuid] }
+            val artworkUri = if (showArtwork) {
+                AutoConverter.getPodcastArtworkUri(podcast, this, context, useEpisodeArtwork)
+            } else {
+                null
+            }
+            return MediaItem.Builder()
+                .setMediaId(uuid)
                 .setMediaMetadata(
                     MediaMetadata.Builder()
-                        .setTitle(episode.title)
-                        .setArtist(episode.displaySubtitle(podcast))
-                        .setArtworkUri(AutoConverter.getPodcastArtworkUri(podcast, episode, context, useEpisodeArtwork))
-                        .setDurationMs(episode.durationMs.toLong())
+                        .setTitle(title)
+                        .setArtist(displaySubtitle(podcast))
+                        .setArtworkUri(artworkUri)
+                        .setDurationMs(durationMs.toLong())
                         .setIsBrowsable(false)
                         .setIsPlayable(true)
                         .setMediaType(MediaMetadata.MEDIA_TYPE_PODCAST_EPISODE)
@@ -909,6 +926,8 @@ class MediaSessionManager(
                 )
                 .build()
         }
+
+        return state.episode.toMediaItem() to state.queue.map { it.toMediaItem() }
     }
 
     @OptIn(UnstableApi::class)
@@ -1085,6 +1104,7 @@ class MediaSessionManager(
 
     fun release() {
         disposables.clear()
+        upNextQueueDisposable?.dispose()
         scope.cancel()
         if (needsMedia3Session) {
             lastCustomLayout = emptyList()
