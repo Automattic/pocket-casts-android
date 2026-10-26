@@ -14,21 +14,26 @@ import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
+import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatManager
 import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.ChapterSeekResult
 import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintTimingManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
+import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.sharing.SharingRequest
 import au.com.shiftyjelly.pocketcasts.sharing.SharingResponse
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.search.SearchCoordinates
 import au.com.shiftyjelly.pocketcasts.utils.search.SearchMatches
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.SyncedTranscriptsAutoScrollResumedEvent
 import com.automattic.eventhorizon.SyncedTranscriptsSeekFailedEvent
 import com.automattic.eventhorizon.SyncedTranscriptsSeekUsedEvent
+import com.automattic.eventhorizon.TranscriptShownEvent
 import com.automattic.eventhorizon.TranscriptSourceType
 import java.util.Date
 import kotlin.time.Duration.Companion.seconds
@@ -66,6 +71,9 @@ class TranscriptViewModelTest {
     @get:Rule
     val coroutineRule = MainCoroutineRule()
 
+    @get:Rule
+    val featureFlagRule = InMemoryFeatureFlagRule()
+
     private val transcriptManager = TestTranscriptManager()
     private val signInStateFlow = MutableStateFlow<SignInState>(SignInState.SignedOut)
     private val playbackStateFlow = MutableStateFlow(PlaybackState(episodeUuid = ""))
@@ -82,6 +90,7 @@ class TranscriptViewModelTest {
     }
     private val episodeManager = mock<EpisodeManager>()
     private val bookmarkManager = mock<BookmarkManager>()
+    private val chatManager = mock<ChatManager>()
     private val context = mock<Context> {
         on { getString(any()) } doReturn "Bookmark"
     }
@@ -110,6 +119,7 @@ class TranscriptViewModelTest {
             }
         },
         bookmarkManager = bookmarkManager,
+        chatManager = chatManager,
         fingerprintTimingManager = fingerprintTimingManager,
         playbackManager = playbackManager,
     )
@@ -305,6 +315,51 @@ class TranscriptViewModelTest {
             viewModel.loadTranscript("episode-uuid")
             assertEquals(TranscriptState.Loaded(transcriptManager.avaiableTranscript), awaitItem().transcriptState)
         }
+    }
+
+    @Test
+    fun `track transcript shown on an episode with a chat`() = runTest {
+        FeatureFlag.setEnabled(Feature.EPISODE_CHAT, true)
+        whenever(chatManager.hasChatWithMessages("episode-uuid")).thenReturn(true)
+
+        viewModel.loadTranscript("episode-uuid")
+        runCurrent()
+
+        assertEquals(true, (eventSink.pollEvent() as TranscriptShownEvent).hasEpisodeChat)
+    }
+
+    @Test
+    fun `track transcript shown on an episode without a chat`() = runTest {
+        FeatureFlag.setEnabled(Feature.EPISODE_CHAT, true)
+        whenever(chatManager.hasChatWithMessages("episode-uuid")).thenReturn(false)
+
+        viewModel.loadTranscript("episode-uuid")
+        runCurrent()
+
+        assertEquals(false, (eventSink.pollEvent() as TranscriptShownEvent).hasEpisodeChat)
+    }
+
+    @Test
+    fun `omit the episode chat from transcript shown when the lookup fails`() = runTest {
+        FeatureFlag.setEnabled(Feature.EPISODE_CHAT, true)
+        whenever(chatManager.hasChatWithMessages("episode-uuid")).thenThrow(IllegalStateException())
+
+        viewModel.loadTranscript("episode-uuid")
+        runCurrent()
+
+        assertNull((eventSink.pollEvent() as TranscriptShownEvent).hasEpisodeChat)
+    }
+
+    @Test
+    fun `omit the episode chat from transcript shown when episode chat is disabled`() = runTest {
+        FeatureFlag.setEnabled(Feature.EPISODE_CHAT, false)
+        whenever(chatManager.hasChatWithMessages("episode-uuid")).thenReturn(true)
+
+        viewModel.loadTranscript("episode-uuid")
+        runCurrent()
+
+        assertNull((eventSink.pollEvent() as TranscriptShownEvent).hasEpisodeChat)
+        verify(chatManager, never()).hasChatWithMessages(any())
     }
 
     @Test
@@ -815,5 +870,5 @@ private class TestTranscriptManager : TranscriptManager {
         shouldLoadTranscripts = true
     }
 
-    override suspend fun loadSummaryText(episodeUuid: String): String? = null
+    override suspend fun loadGeneratedChapters(episodeUuid: String) = true
 }

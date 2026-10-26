@@ -42,6 +42,7 @@ class TranscriptManagerImpl @Inject constructor(
 ) : TranscriptManager {
     private val transcriptUrlBlacklist = ConcurrentHashMap<String, String>()
     private val lruCache = LruCache<String, Transcript>(maxSize = 20)
+    private val generatedLruCache = LruCache<String, Transcript.Text>(maxSize = 5)
     private val metaAdapter = moshi.adapter(EpisodeMetaResponse::class.java)
 
     override fun observeIsTranscriptAvailable(episodeUuid: String): Flow<Boolean> {
@@ -65,8 +66,11 @@ class TranscriptManagerImpl @Inject constructor(
 
     override suspend fun loadGeneratedTranscript(episodeUuid: String): Transcript.Text? {
         val generated = loadLocalTranscripts(episodeUuid).firstOrNull { it.isGenerated } ?: return null
+        generatedLruCache[generated.url]?.let { return it }
         val parserWithTranscript = associateWithParser(generated) ?: return null
-        return readTranscript(parserWithTranscript) as? Transcript.Text
+        val transcript = readTranscript(parserWithTranscript) as? Transcript.Text ?: return null
+        generatedLruCache.put(generated.url, transcript)
+        return transcript
     }
 
     private suspend fun findAndCacheTranscript(episodeUuid: String): Transcript? {
@@ -148,35 +152,24 @@ class TranscriptManagerImpl @Inject constructor(
             .getOrNull()
     }
 
-    override suspend fun loadSummaryText(episodeUuid: String): String? {
-        val isChaptersEnabled = FeatureFlag.isEnabled(Feature.GENERATED_CHAPTERS)
-        val isSummaryEnabled = FeatureFlag.isEnabled(Feature.AI_SUMMARIES)
-        if (!isChaptersEnabled && !isSummaryEnabled) return null
+    override suspend fun loadGeneratedChapters(episodeUuid: String): Boolean {
+        if (!FeatureFlag.isEnabled(Feature.GENERATED_CHAPTERS)) return true
 
         return try {
             val generatedTranscript = loadLocalTranscripts(episodeUuid)
-                .firstOrNull { it.isGenerated } ?: return null
+                .firstOrNull { it.isGenerated } ?: return true
 
             val metaUrl = generatedTranscript.url.removeSuffix(".vtt") + "-meta.json"
-            val response = transcriptService.getTranscriptOrThrow(metaUrl)
-            response.use { body ->
-                val meta = metaAdapter.fromJson(body.source()) ?: return@use null
-
-                if (isChaptersEnabled) {
-                    saveAiChaptersIfNeeded(episodeUuid, meta.chapters)
-                }
-
-                if (isSummaryEnabled) {
-                    meta.summary?.takeIf { it.isNotBlank() }
-                } else {
-                    null
-                }
-            }
+            val meta = transcriptService.getTranscriptOrThrow(metaUrl).use { body ->
+                metaAdapter.fromJson(body.source())
+            } ?: return true
+            saveAiChaptersIfNeeded(episodeUuid, meta.chapters)
+            true
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            Timber.tag("Summaries").e(e, "Failed to load summary for episode $episodeUuid")
-            null
+            Timber.tag("GeneratedChapters").e(e, "Failed to load generated chapters for episode $episodeUuid")
+            false
         }
     }
 
@@ -200,7 +193,7 @@ class TranscriptManagerImpl @Inject constructor(
             .mapIndexed { index, chapter -> chapter.copy(index = index) }
         if (dbChapters.isNotEmpty()) {
             chapterManager.updateChapters(episodeUuid, dbChapters)
-            Timber.tag("Summaries").d("Saved ${dbChapters.size} AI chapters for episode $episodeUuid")
+            Timber.tag("GeneratedChapters").d("Saved ${dbChapters.size} AI chapters for episode $episodeUuid")
         }
     }
 
@@ -211,7 +204,7 @@ class TranscriptManagerImpl @Inject constructor(
     }
 }
 
-private val TranscriptsComparator = compareBy<DbTranscript>(
+internal val TranscriptsComparator = compareBy<DbTranscript>(
     { it.isGenerated },
     { TranscriptType.fromMimeType(it.type).priority },
 )

@@ -250,6 +250,22 @@ class ShelfViewModelTest {
     }
 
     @Test
+    fun `given episode chat in free beta, then the episode chat beta badge is shown`() = runTest {
+        FeatureFlag.setEnabled(Feature.EPISODE_CHAT_FREE_BETA, true)
+        initViewModel()
+
+        assertTrue(shelfViewModel.uiState.value.showEpisodeChatBetaBadge)
+    }
+
+    @Test
+    fun `given episode chat out of free beta, then the episode chat beta badge is hidden`() = runTest {
+        FeatureFlag.setEnabled(Feature.EPISODE_CHAT_FREE_BETA, false)
+        initViewModel()
+
+        assertFalse(shelfViewModel.uiState.value.showEpisodeChatBetaBadge)
+    }
+
+    @Test
     fun `given hidden shelf items, when an item is moved, then hidden items keep their saved positions`() = runTest {
         val savedItems = ShelfItem.entries
         val hiddenItems = setOf(ShelfItem.EpisodeChat, ShelfItem.StreamSelector)

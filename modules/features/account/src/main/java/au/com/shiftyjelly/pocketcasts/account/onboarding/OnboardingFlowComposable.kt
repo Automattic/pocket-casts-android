@@ -91,7 +91,7 @@ private fun Content(
                 }
             }
 
-            is OnboardingFlow.DeviceApproval -> exitOnboarding(OnboardingExitInfo.Simple)
+            is OnboardingFlow.DeviceApproval, is OnboardingFlow.EpisodeChatSignIn -> exitOnboarding(OnboardingExitInfo.Simple)
 
             else -> exitOnboarding(OnboardingExitInfo.ShowPlusPromotion)
         }
@@ -155,6 +155,7 @@ private fun onLoginToExistingAccount(
 
         is OnboardingFlow.ReferralLoginOrSignUp,
         is OnboardingFlow.DeviceApproval,
+        is OnboardingFlow.EpisodeChatSignIn,
         -> exitOnboarding(OnboardingExitInfo.Simple)
 
         // this should never happens, login is not initiated from welcome screen

@@ -176,6 +176,18 @@ class FingerprintTimingManagerTest {
     }
 
     @Test
+    fun `failed preparation retries when the transcript or a chat quote is shown`() {
+        assertTrue(FingerprintTimingManager.canRetryFailedPreparation(FingerprintTimingManager.PrepareTrigger.TRANSCRIPT_VIEW))
+        assertTrue(FingerprintTimingManager.canRetryFailedPreparation(FingerprintTimingManager.PrepareTrigger.CHAT))
+    }
+
+    @Test
+    fun `failed preparation does not retry on playback or bookmarks`() {
+        assertFalse(FingerprintTimingManager.canRetryFailedPreparation(FingerprintTimingManager.PrepareTrigger.PLAYBACK))
+        assertFalse(FingerprintTimingManager.canRetryFailedPreparation(FingerprintTimingManager.PrepareTrigger.BOOKMARK))
+    }
+
+    @Test
     fun `alignToWindowGrid aligns to stride boundary`() {
         val aligned = FingerprintTimingManager.alignToWindowGrid(5.7)
         assertEquals(5.0, aligned, 0.001)

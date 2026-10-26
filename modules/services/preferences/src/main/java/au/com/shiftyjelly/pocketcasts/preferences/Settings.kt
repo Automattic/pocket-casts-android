@@ -134,6 +134,7 @@ interface Settings {
         const val SMART_BOOKMARKS_TOOLTIP_DISMISSED = "smart_bookmarks_tooltip_dismissed"
         const val EPISODE_CHAT_TOOLTIP_DISMISSED = "episode_chat_tooltip_dismissed"
         const val EPISODE_CHAT_BETA_SHEET_SEEN = "episode_chat_beta_sheet_seen"
+        const val EPISODE_CHAT_SURVEY_SEEN = "episode_chat_survey_seen"
     }
 
     enum class NotificationChannel(val id: String) {
@@ -607,6 +608,8 @@ interface Settings {
     val episodeChatTooltipDismissed: UserSetting<Boolean>
 
     val episodeChatBetaSheetSeen: UserSetting<Boolean>
+
+    val episodeChatSurveySeen: UserSetting<Boolean>
 
     val showUpNextSortDurationTooltip: UserSetting<Boolean>
 

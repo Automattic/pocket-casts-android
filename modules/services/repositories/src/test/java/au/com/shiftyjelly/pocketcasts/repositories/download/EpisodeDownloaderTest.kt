@@ -11,8 +11,10 @@ import kotlinx.coroutines.test.runTest
 import mockwebserver3.MockResponse
 import mockwebserver3.MockWebServer
 import mockwebserver3.SocketEffect
+import okhttp3.Call
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
+import okhttp3.Request
 import okio.Buffer
 import org.junit.After
 import org.junit.Assert.assertFalse
@@ -78,6 +80,28 @@ class EpisodeDownloaderTest {
         assertEquals(100, progressCache.progressFlow(episode.uuid).value?.percentage)
         assertEquals(server.takeRequest().url, episode.downloadUrl?.toHttpUrl())
         assertEquals("Hello, world!", downloadFile.readText())
+    }
+
+    @Test
+    fun `tag the request with whether the download waits for wifi`() {
+        listOf(true, false).forEach { waitForWifi ->
+            val requests = mutableListOf<Request>()
+            val taggingDownloader = EpisodeDownloader(
+                httpClient = { Call.Factory { request -> OkHttpClient().newCall(request.also(requests::add)) } },
+                progressCache = progressCache,
+                minContentLength = minContentLength,
+                waitForWifi = waitForWifi,
+            )
+            server.enqueue(MockResponse(body = "Hello, world!"))
+
+            taggingDownloader.download(
+                episode = episode,
+                downloadFile = tempDir.newFile(),
+                tempFile = tempDir.newFile(),
+            )
+
+            assertEquals(EpisodeDownloadRequest(waitForWifi), requests.single().tag(EpisodeDownloadRequest::class.java))
+        }
     }
 
     @Test

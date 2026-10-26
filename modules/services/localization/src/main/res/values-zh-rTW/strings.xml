@@ -1,11 +1,57 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-10-08 09:58:04+0000
+Translation-Revision-Date: 2026-10-21 09:55:08+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="chat_about_episode">討論「%1$s」</string>
+    <string name="chat_now_playing_episode">正在播放「%1$s」</string>
+    <string name="chat_undo">復原</string>
+    <string name="chat_history_older">較舊</string>
+    <string name="chat_history_previous_7_days">前 7 天</string>
+    <string name="chat_history">交談記錄</string>
+    <string name="chat_deleted">交談已刪除</string>
+    <string name="chat_cleared">交談已清除</string>
+    <string name="chat_offline_note">你目前為離線狀態。 上線即可提問。</string>
+    <string name="chat_answering">正在回答</string>
+    <string name="chat_error_server_on_our_end">系統發生錯誤。</string>
+    <string name="chat_not_sent_tap_to_retry">未傳送， 點選即可重試。</string>
+    <string name="chat_feedback_send_failed">無法傳送意見回饋， 請檢查連線。</string>
+    <string name="chat_feedback_sending">正在傳送意見回饋</string>
+    <string name="chat_feedback_what_went_wrong">問題狀況</string>
+    <string name="chat_beta_sheet_sign_in">登入即可試試看</string>
+    <string name="episode_chat_needs_transcript_message">如果要詢問關於此單集的內容，需要提供逐字稿。 這個單集並未提供逐字稿。</string>
+    <string name="onboarding_episode_chat_question_2">想做重點總結嗎？</string>
+    <string name="onboarding_episode_chat_answer">這一集主題為 AI、健康與生產力。</string>
+    <string name="onboarding_episode_chat_question_1">主題是什麼？</string>
+    <string name="onboarding_episode_chat_title">詢問這一集的相關內容：</string>
+    <string name="chat_feedback_learn_more">深入瞭解</string>
+    <string name="chat_feedback_legal">送出時，即會與我們分享這次對話的內容，協助我們改善交談功能。</string>
+    <string name="chat_feedback_submit">送出意見回饋</string>
+    <string name="chat_feedback_details_hint">分享詳細資料 (選填)</string>
+    <string name="chat_feedback_reason_other">其他</string>
+    <string name="chat_feedback_reason_offensive">冒犯</string>
+    <string name="chat_feedback_reason_out_of_date">過時</string>
+    <string name="chat_feedback_reason_wrong_facts">不符現實</string>
+    <string name="chat_feedback_reason_not_interesting">不有趣</string>
+    <string name="chat_rate_answer_bad">不佳的回應</string>
+    <string name="chat_rate_answer_good">良好的回應</string>
+    <string name="chat_feedback_thank_you">感謝你的意見回饋</string>
+    <string name="chat_survey_yes">好！</string>
+    <string name="chat_survey_not_really">不太想</string>
+    <string name="chat_survey_title">詢問單集內容的效果好嗎？</string>
+    <string name="chat_ai_disclaimer">AI 可能會犯錯，請仔細檢查。</string>
+    <string name="chat_suggestion_summarize">本集摘要</string>
+    <string name="chat_welcome">歡迎詢問這一集的任何內容。 可從這裡開始。</string>
+    <string name="chat_input_question_hint">提問…</string>
+    <string name="chat_beta_note">詢問單集內容的功能為測試版</string>
+    <string name="chat_beta_sheet_body">測試期間，人人免費。 之後會成為 Plus 功能。</string>
+    <string name="chat_beta_sheet_title">詢問單集內容的功能為測試版</string>
+    <string name="episode_chat_tooltip_body">請隨意問問， 正在等你說話。</string>
+    <string name="episode_chat_beta_badge">測試版</string>
+    <string name="episode_chat_shelf_title">詢問本集內容</string>
     <string name="manual_playlist_no_content_body_alternative">從追蹤的 Podcast 節目中挑選單集。 也可以直接在任意單集上向左滑動，隨時新增。</string>
     <string name="manual_playlist_no_content_body">先找到你喜歡的 Podcast 節目，然後向左滑動，即可隨時新增單集。</string>
     <string name="settings_general_whats_new_unread_dot_summary">如果有新的「最新內容」訊息，個人檔案上會顯示未讀圓點。</string>
@@ -180,8 +226,6 @@ Language: zh_TW
     <string name="up_next_sort_duration_tooltip_title">依長度排序</string>
     <string name="transcript_tap_to_seek_streaming_unavailable">下載單集即可點選並搜尋</string>
     <string name="bookmark_play_from">透過「%s」播放</string>
-    <string name="summary_upsell_description">訂閱 Plus 即可存取逐字稿和其他進階版功能，例如書籤和資料夾。</string>
-    <string name="summary_upsell_title">AI 摘要</string>
     <string name="tv_create_account_title">建立免費帳號</string>
     <string name="tv_onboarding_sign_in_instructions">開啟相機並對準此 QR 碼</string>
     <string name="tv_onboarding_sign_in_title">使用手機登入</string>
@@ -213,28 +257,9 @@ Language: zh_TW
     <string name="blogs_found_feed_detected">找到的摘要</string>
     <string name="blogs_found_headline">大聲朗讀你的部落格</string>
     <string name="chapters_generated_disclaimer">系統會自動產生這些章節，但可能不會完全正確。</string>
-    <string name="description">描述</string>
-    <string name="player_tab_summary">摘要</string>
-    <string name="summary">摘要</string>
-    <string name="episode_summary">單集摘要</string>
-    <string name="chat_stop_quote">停止引文</string>
     <string name="chat_play_quote">播放引文</string>
-    <string name="chat_tap_to_retry">點選以重試</string>
-    <string name="chat_error_network">無法連結至伺服器。 請檢查你的連線。</string>
-    <string name="chat_error_server">發生錯誤。 請再試一次。</string>
     <string name="chat_clear">清除對話</string>
     <string name="chat_send">傳送</string>
-    <string name="chat_input_hint">詢問本集的相關資訊…</string>
-    <string name="chat_preview_user_2">是否有提及任何實用的秘訣？</string>
-    <string name="chat_preview_ai_2">本集深入探討習慣形成的科學，探索微小的日常慣例如何隨時間產生巨大變化。</string>
-    <string name="chat_preview_user_1">本集的主題是什麼？</string>
-    <string name="chat_preview_ai_1">你好！ 我可以協助你探索本集。 你可以詢問討論主題、要點或特定時刻的任何相關資訊。</string>
-    <string name="chat_thinking">正在思考</string>
-    <string name="chat_episode_assistant">單集助理</string>
-    <string name="chat_context_label_with_duration">正在與此單集對話 · %1$s</string>
-    <string name="chat_context_label">正在與此單集對話</string>
-    <string name="chat_paywall_title">與此單集對話</string>
-    <string name="episode_chat">與單集對話</string>
     <string name="blogs_experiment_banner_body">我們正在針對部落格方面進行嘗試。 我們可能會進行保留、重新設計或逐漸淘汰。</string>
     <string name="blogs_experiment_banner_lead">目前仍為實驗階段。</string>
     <string name="onboarding_blogs_upsell_sample_label">部落格· 4 月 24 日</string>

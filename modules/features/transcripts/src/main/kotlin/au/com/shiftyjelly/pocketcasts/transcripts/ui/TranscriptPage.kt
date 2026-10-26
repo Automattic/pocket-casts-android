@@ -28,10 +28,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.compose.KeepScreenOnEffect
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.deeplink.ChangeBookmarkTitleDeepLink
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
@@ -73,7 +73,6 @@ fun TranscriptPage(
     toolbarPadding: PaddingValues = PaddingValues(0.dp),
     transcriptPadding: PaddingValues = PaddingValues(0.dp),
     paywallPadding: PaddingValues = PaddingValues(0.dp),
-    showCloseButton: Boolean = true,
     isBackHandlerEnabled: Boolean = true,
     toolbarTrailingContent: (@Composable (ToolbarColors) -> Unit)? = null,
     onHighlightText: (() -> Unit)? = null,
@@ -109,7 +108,6 @@ fun TranscriptPage(
             Toolbar(
                 searchState = uiState.searchState,
                 hideSearchBar = uiState.isPaywallVisible || !uiState.isTextTranscriptLoaded,
-                showCloseButton = showCloseButton,
                 onClickClose = onClickClose,
                 onUpdateSearchTerm = onUpdateSearchTerm,
                 onClearSearchTerm = onClearSearchTerm,
@@ -582,18 +580,6 @@ private fun UserScrollDetectionEffect(
                     }
                 }
             }
-        }
-    }
-}
-
-@Composable
-private fun KeepScreenOnEffect(keepOn: Boolean) {
-    val view = LocalView.current
-    DisposableEffect(keepOn) {
-        val previousKeepScreenOn = view.keepScreenOn
-        view.keepScreenOn = keepOn
-        onDispose {
-            view.keepScreenOn = previousKeepScreenOn
         }
     }
 }

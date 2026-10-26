@@ -10,9 +10,13 @@ import android.support.v4.media.session.PlaybackStateCompat.ACTION_PLAY
 import android.support.v4.media.session.PlaybackStateCompat.ACTION_SKIP_TO_NEXT
 import android.support.v4.media.session.PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS
 import android.support.v4.media.session.PlaybackStateCompat.ACTION_STOP
+import androidx.annotation.OptIn
 import androidx.core.app.NotificationCompat
 import androidx.media.app.NotificationCompat.MediaStyle
 import androidx.media.session.MediaButtonReceiver
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.session.MediaSession
+import androidx.media3.session.MediaStyleNotificationHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -88,6 +92,42 @@ class NotificationDrawerImpl @Inject constructor(
             .setStyle(mediaStyle)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .build()
+    }
+
+    override fun buildPreparingNotification(
+        sessionToken: MediaSessionCompat.Token,
+    ): Notification {
+        val mediaStyle = MediaStyle()
+            .setMediaSession(sessionToken)
+            .setShowCancelButton(true)
+            .setCancelButtonIntent(stopPendingIntent)
+
+        return notificationHelper.playbackChannelBuilder()
+            .setContentTitle(context.getString(LR.string.loading))
+            .setDeleteIntent(stopPendingIntent)
+            .setOnlyAlertOnce(true)
+            .setShowWhen(false)
+            .setSmallIcon(IR.drawable.notification)
+            .setStyle(mediaStyle)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            .build()
+    }
+
+    @OptIn(UnstableApi::class)
+    override fun buildPreparingNotification(
+        session: MediaSession?,
+        title: String?,
+    ): Notification {
+        val builder = notificationHelper.playbackChannelBuilder()
+            .setContentTitle(title ?: context.getString(LR.string.loading))
+            .setOnlyAlertOnce(true)
+            .setShowWhen(false)
+            .setSmallIcon(IR.drawable.notification)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+        if (session != null) {
+            builder.setStyle(MediaStyleNotificationHelper.MediaStyle(session))
+        }
+        return builder.build()
     }
 
     private fun loadArtwork(episode: BaseEpisode, useEpisodeArtwork: Boolean): Bitmap? {

@@ -1,11 +1,57 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-10-08 15:56:45+0000
+Translation-Revision-Date: 2026-10-20 16:56:40+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+    <string name="chat_about_episode">Пообщаться о %1$s</string>
+    <string name="chat_now_playing_episode">Сейчас воспроизводится %1$s</string>
+    <string name="chat_undo">Отмена</string>
+    <string name="chat_history_older">Предыдущие</string>
+    <string name="chat_history_previous_7_days">Предыдущие 7 дней</string>
+    <string name="chat_history">История чата</string>
+    <string name="chat_deleted">Чат удалён</string>
+    <string name="chat_cleared">Чат очищен</string>
+    <string name="chat_offline_note">Отсутствует подключение к Интернету. Подключитесь, чтобы задать вопрос.</string>
+    <string name="chat_answering">Готовится ответ</string>
+    <string name="chat_error_server_on_our_end">Произошла ошибка на нашей стороне.</string>
+    <string name="chat_not_sent_tap_to_retry">Не отправлено. Нажмите, чтобы попробовать ещё раз.</string>
+    <string name="chat_feedback_send_failed">Не удалось отправить отзыв. Проверьте подключение.</string>
+    <string name="chat_feedback_sending">Отправка отзыва…</string>
+    <string name="chat_feedback_what_went_wrong">Что пошло не так</string>
+    <string name="chat_beta_sheet_sign_in">Войдите, чтобы попробовать</string>
+    <string name="episode_chat_needs_transcript_message">Чтобы задать вопрос об этом выпуске, требуется расшифровка. В этом выпуске её нет.</string>
+    <string name="onboarding_episode_chat_question_2">Сформировать основные выводы?</string>
+    <string name="onboarding_episode_chat_answer">В этом выпуске рассказывается об ИИ, здоровье и производительности.</string>
+    <string name="onboarding_episode_chat_question_1">Каковы ключевые темы?</string>
+    <string name="onboarding_episode_chat_title">Спросить об этом выпуске:</string>
+    <string name="chat_feedback_learn_more">Подробнее</string>
+    <string name="chat_feedback_legal">Отправляя данные, вы делитесь этим диалогом с нами для улучшения работы чата.</string>
+    <string name="chat_feedback_submit">Отправить отзыв</string>
+    <string name="chat_feedback_details_hint">Поделиться сведениями (необязательно)</string>
+    <string name="chat_feedback_reason_other">Другое</string>
+    <string name="chat_feedback_reason_offensive">Это оскорбительно</string>
+    <string name="chat_feedback_reason_out_of_date">Это устарело</string>
+    <string name="chat_feedback_reason_wrong_facts">Факты оказались неверными</string>
+    <string name="chat_feedback_reason_not_interesting">Это было неинтересно</string>
+    <string name="chat_rate_answer_bad">Плохой ответ</string>
+    <string name="chat_rate_answer_good">Хороший ответ</string>
+    <string name="chat_feedback_thank_you">Спасибо за ваш отзыв</string>
+    <string name="chat_survey_yes">Да!</string>
+    <string name="chat_survey_not_really">Пожалуй, нет</string>
+    <string name="chat_survey_title">Нравится спрашивать об этом выпуске?</string>
+    <string name="chat_ai_disclaimer">ИИ может ошибаться, поэтому перепроверьте его.</string>
+    <string name="chat_suggestion_summarize">Суммировать этот выпуск</string>
+    <string name="chat_welcome">Спросите о чём-либо в этом выпуске. Или начните отсюда.</string>
+    <string name="chat_input_question_hint">Задайте вопрос…</string>
+    <string name="chat_beta_note">Спросить об этом выпуске в бета-версии</string>
+    <string name="chat_beta_sheet_body">Бесплатно для всех, пока мы тестируем эту функцию. Позже она станет функцией Plus.</string>
+    <string name="chat_beta_sheet_title">Спросить об этом выпуске в бета-версии</string>
+    <string name="episode_chat_tooltip_body">Спросите что угодно. Он тоже слушал.</string>
+    <string name="episode_chat_beta_badge">Бета-версия</string>
+    <string name="episode_chat_shelf_title">Спросить об этом выпуске</string>
     <string name="manual_playlist_no_content_body_alternative">Выберите выпуски из подкастов, на которые вы подписаны. Также можно смахнуть влево любой выпуск, чтобы сразу добавить его.</string>
     <string name="manual_playlist_no_content_body">Найдите понравившийся подкаст, а затем смахните влево любой выпуск, чтобы добавить его.</string>
     <string name="settings_general_whats_new_unread_dot_summary">Показывать индикатор непрочитанного в профиле при появлении новых сообщений в разделе «Что нового».</string>
@@ -180,8 +226,6 @@ Language: ru
     <string name="up_next_sort_duration_tooltip_title">Сортировать по длительности</string>
     <string name="transcript_tap_to_seek_streaming_unavailable">Скачать выпуск, чтобы искать нажатием</string>
     <string name="bookmark_play_from">Воспроизвести с %s</string>
-    <string name="summary_upsell_description">Подпишитесь на Plus, чтобы пользоваться ею и другими премиум-функциями, такими как закладки и папки.</string>
-    <string name="summary_upsell_title">Сводки на базе ИИ</string>
     <string name="tv_create_account_title">Создать бесплатную учётную запись</string>
     <string name="tv_onboarding_sign_in_instructions">Откройте камеру и наведите на этот QR-код</string>
     <string name="tv_onboarding_sign_in_title">Вход с телефона</string>
@@ -213,28 +257,9 @@ Language: ru
     <string name="blogs_found_followed_badge">ПОДПИСКИ НА ПОДКАСТ</string>
     <string name="blogs_found_feed_detected">Лента найдена</string>
     <string name="chapters_generated_disclaimer">Эти главы сгенерированы автоматически и могут быть не совсем точными.</string>
-    <string name="description">Описание</string>
-    <string name="player_tab_summary">Обзор</string>
-    <string name="summary">Обзор</string>
-    <string name="episode_summary">Обзор выпуска</string>
-    <string name="chat_stop_quote">Остановить цитату</string>
     <string name="chat_play_quote">Воспроизвести цитату</string>
-    <string name="chat_tap_to_retry">Нажмите, чтобы повторить попытку.</string>
-    <string name="chat_error_network">Не удалось подключиться к серверу. Проверьте подключение.</string>
-    <string name="chat_error_server">Что-то пошло не так. Повторите попытку.</string>
     <string name="chat_clear">Очистить чат</string>
     <string name="chat_send">Отправить</string>
-    <string name="chat_input_hint">Спросить об этом выпуске…</string>
-    <string name="chat_preview_user_2">Были ли в нём практические советы?</string>
-    <string name="chat_preview_ai_2">Этот выпуск посвящён науке о формировании привычек. В нём рассказывается, как небольшие ежедневные действия могут со временем вызвать серьёзные изменения.</string>
-    <string name="chat_preview_user_1">Какова главная тема этого выпуска?</string>
-    <string name="chat_preview_ai_1">Здравствуйте! Я здесь, чтобы помочь вам изучить этот выпуск. Спросите меня о темах, основных выводах или конкретных моментах.</string>
-    <string name="chat_thinking">Я ДУМАЮ…</string>
-    <string name="chat_episode_assistant">ПОМОЩНИК ПО ВЫПУСКАМ</string>
-    <string name="chat_context_label_with_duration">Чат по этому выпуску · %1$s</string>
-    <string name="chat_context_label">Чат по этому выпуску</string>
-    <string name="chat_paywall_title">Чат по этому выпуску</string>
-    <string name="episode_chat">Чат по выпуску</string>
     <string name="blogs_experiment_banner_body">Блоги — наша свежая идея. Они могут остаться навсегда, подвергнуться переработке или тихо сойти со сцены.</string>
     <string name="blogs_experiment_banner_lead">Это эксперимент.</string>
     <string name="onboarding_blogs_upsell_sample_label">Блог · 24 апреля</string>

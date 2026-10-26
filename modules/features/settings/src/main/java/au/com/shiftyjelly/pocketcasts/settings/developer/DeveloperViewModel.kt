@@ -193,6 +193,11 @@ class DeveloperViewModel
         settings.showRearrangePlaylistsTooltip.set(true, updateModifiedAt = false)
     }
 
+    fun showSmartBookmarksTooltip() {
+        settings.showSmartBookmarksTooltip.set(true, updateModifiedAt = false)
+        settings.smartBookmarksTooltipDismissed.set(false, updateModifiedAt = false)
+    }
+
     fun resetWhatsNewReadState() {
         whatsNewManager.resetReadState()
     }
@@ -204,6 +209,10 @@ class DeveloperViewModel
 
     fun resetNotificationsPrompt() {
         settings.notificationsPromptAcknowledged.set(false, updateModifiedAt = false)
+    }
+
+    fun resetEpisodeChatSurvey() {
+        settings.episodeChatSurveySeen.set(false, updateModifiedAt = false)
     }
 
     fun showAppReviewPrompt() {

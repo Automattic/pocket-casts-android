@@ -31,6 +31,7 @@ class AppDatabaseTest {
         private const val MIGRATION_DB_136_137 = "migration-test-136-137"
         private const val MIGRATION_DB_137_138 = "migration-test-137-138"
         private const val MIGRATION_DB_138_139 = "migration-test-138-139"
+        private const val MIGRATION_DB_139_140 = "migration-test-139-140"
     }
 
     @Rule @JvmField
@@ -279,6 +280,29 @@ class AppDatabaseTest {
         assertEquals("Existing bump stats should be discarded", 0, countRows(db, "bump_stats"))
     }
 
+    @Test
+    fun migrate139To140AddsEpisodeChatMessageRating() {
+        migrationTestHelper.createDatabase(MIGRATION_DB_139_140, 139).use {
+            it.execSQL(
+                "INSERT INTO podcast_episodes (uuid, episode_description, published_date, title, size_in_bytes, episode_status, " +
+                    "duration, played_up_to, playing_status, podcast_id, added_date, auto_download_status, starred, " +
+                    "thumbnail_status, archived, last_playback_interaction_sync_status, exclude_from_episode_limit, " +
+                    "deselected_chapters, slug, has_generated_transcript) " +
+                    "VALUES ('episode-uuid', '', 0, '', 0, 0, 0, 0, 0, 'podcast-uuid', 0, 0, 0, 0, 0, 0, 0, '', '', 0)",
+            )
+            it.execSQL("INSERT INTO episode_chats (episode_uuid, podcast_uuid, created_at) VALUES ('episode-uuid', 'podcast-uuid', 0)")
+            it.execSQL(
+                "INSERT INTO episode_chat_messages (uuid, episode_uuid, text, role, created_at) " +
+                    "VALUES ('message-uuid', 'episode-uuid', 'Answer', 'assistant', 0)",
+            )
+        }
+
+        val db = migrationTestHelper.runMigrationsAndValidate(MIGRATION_DB_139_140, 140, true, AppDatabase.MIGRATION_139_140)
+
+        assertEquals("Existing chat messages should be kept", 1, countRows(db, "episode_chat_messages"))
+        assertEquals("Existing chat messages should have no rating", 1, countWhere(db, "episode_chat_messages", "rating IS NULL"))
+    }
+
     private fun tableColumns(db: SupportSQLiteDatabase?, tableName: String): List<String> {
         val columns = mutableListOf<String>()
         db?.query("PRAGMA table_info($tableName)")?.use { cursor ->
@@ -397,6 +421,7 @@ class AppDatabaseTest {
                 AppDatabase.MIGRATION_136_137,
                 AppDatabase.MIGRATION_137_138,
                 AppDatabase.MIGRATION_138_139,
+                AppDatabase.MIGRATION_139_140,
             )
             .build()
         // close the database and release any stream resources when the test finishes

@@ -21,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import com.automattic.eventhorizon.ChapterOriginType
 import com.automattic.eventhorizon.ChaptersShownEvent
@@ -30,11 +31,14 @@ import com.automattic.eventhorizon.PlayerChapterSelectedEvent
 import java.time.Instant
 import java.util.Date
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -43,6 +47,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.clearInvocations
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -62,6 +67,9 @@ class ChaptersViewModelTest {
     private val playbackManager = mock<PlaybackManager>()
     private val episodeManager = mock<EpisodeManager>()
     private val settings = mock<Settings>()
+    private val transcriptManager = mock<TranscriptManager> {
+        on { loadGeneratedChapters(any()) } doReturn true
+    }
     private val generatedChapterSeeker = mock<GeneratedChapterSeeker> {
         on { resolvingChapterIndex(any()) } doReturn MutableStateFlow<Int?>(null)
     }
@@ -109,8 +117,68 @@ class ChaptersViewModelTest {
             settings = settings,
             eventHorizon = EventHorizon(eventSink),
             generatedChapterSeeker = generatedChapterSeeker,
+            transcriptManager = transcriptManager,
             ioDispatcher = testDispatcher,
         )
+    }
+
+    @Test
+    fun `episode mode loads generated chapters for its episode`() = runTest {
+        verifyBlocking(transcriptManager) { loadGeneratedChapters("id") }
+    }
+
+    @Test
+    fun `player mode loads generated chapters for each new playing episode`() = runTest {
+        clearInvocations(transcriptManager)
+        playbackStateFlow.value = PlaybackState(episodeUuid = "")
+        ChaptersViewModel(
+            mode = Mode.Player,
+            chapterManager = chapterManager,
+            playbackManager = playbackManager,
+            episodeManager = episodeManager,
+            settings = settings,
+            eventHorizon = EventHorizon(TestEventSink()),
+            generatedChapterSeeker = generatedChapterSeeker,
+            transcriptManager = transcriptManager,
+            ioDispatcher = testDispatcher,
+        )
+
+        playbackStateFlow.value = PlaybackState(episodeUuid = "id")
+        playbackStateFlow.value = PlaybackState(episodeUuid = "id", positionMs = 1_000)
+        playbackStateFlow.value = PlaybackState(episodeUuid = "id2")
+
+        verifyBlocking(transcriptManager) { loadGeneratedChapters("id") }
+        verifyBlocking(transcriptManager) { loadGeneratedChapters("id2") }
+        verifyBlocking(transcriptManager, never()) { loadGeneratedChapters("") }
+    }
+
+    @Test
+    fun `retries generated chapters with backoff while loading fails`() = runTest {
+        clearInvocations(transcriptManager)
+        whenever(transcriptManager.loadGeneratedChapters("id")).thenReturn(false, false, true)
+        ChaptersViewModel(
+            mode = Mode.Episode("id"),
+            chapterManager = chapterManager,
+            playbackManager = playbackManager,
+            episodeManager = episodeManager,
+            settings = settings,
+            eventHorizon = EventHorizon(TestEventSink()),
+            generatedChapterSeeker = generatedChapterSeeker,
+            transcriptManager = transcriptManager,
+            ioDispatcher = testDispatcher,
+        )
+        verifyBlocking(transcriptManager, times(1)) { loadGeneratedChapters("id") }
+
+        advanceTimeBy(5.seconds)
+        runCurrent()
+        verifyBlocking(transcriptManager, times(2)) { loadGeneratedChapters("id") }
+
+        advanceTimeBy(10.seconds)
+        runCurrent()
+        verifyBlocking(transcriptManager, times(3)) { loadGeneratedChapters("id") }
+
+        advanceTimeBy(10.minutes)
+        verifyBlocking(transcriptManager, times(3)) { loadGeneratedChapters("id") }
     }
 
     @Test
@@ -262,6 +330,7 @@ class ChaptersViewModelTest {
             settings = settings,
             eventHorizon = EventHorizon(TestEventSink()),
             generatedChapterSeeker = generatedChapterSeeker,
+            transcriptManager = transcriptManager,
             ioDispatcher = testDispatcher,
         )
 

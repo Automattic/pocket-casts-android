@@ -1,11 +1,57 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-10-07 20:57:18+0000
+Translation-Revision-Date: 2026-10-19 17:56:40+0000
 Plural-Forms: nplurals=2; plural=(n > 1);
 Generator: GlotPress/2.4.0-alpha
 Language: pt_BR
 -->
 <resources>
+    <string name="chat_about_episode">Conversar sobre %1$s</string>
+    <string name="chat_now_playing_episode">Reproduzindo %1$s</string>
+    <string name="chat_undo">Desfazer</string>
+    <string name="chat_history_older">Mais antigos</string>
+    <string name="chat_history_previous_7_days">Últimos 7 dias</string>
+    <string name="chat_history">Histórico de chats</string>
+    <string name="chat_deleted">Chat excluído</string>
+    <string name="chat_cleared">Chat limpo</string>
+    <string name="chat_offline_note">Você está offline. Conecte-se para fazer uma pergunta.</string>
+    <string name="chat_answering">Respondendo</string>
+    <string name="chat_error_server_on_our_end">Ocorreu um erro do nosso lado.</string>
+    <string name="chat_not_sent_tap_to_retry">Não enviado. Toque para tentar novamente.</string>
+    <string name="chat_feedback_send_failed">Não foi possível enviar seu feedback. Verifique sua conexão.</string>
+    <string name="chat_feedback_sending">Enviando feedback</string>
+    <string name="chat_feedback_what_went_wrong">O que deu errado</string>
+    <string name="chat_beta_sheet_sign_in">Faça login para experimentar</string>
+    <string name="episode_chat_needs_transcript_message">Para fazer perguntas sobre este episódio, é necessária uma transcrição. Este episódio não tem uma.</string>
+    <string name="onboarding_episode_chat_question_2">Quer um resumo dos principais tópicos?</string>
+    <string name="onboarding_episode_chat_answer">Este episódio aborda IA, saúde e produtividade.</string>
+    <string name="onboarding_episode_chat_question_1">Quais são os principais tópicos?</string>
+    <string name="onboarding_episode_chat_title">Pergunte sobre este episódio:</string>
+    <string name="chat_feedback_learn_more">Saiba mais</string>
+    <string name="chat_feedback_legal">O envio compartilha esta conversa conosco para ajudar a melhorar o chat.</string>
+    <string name="chat_feedback_submit">Enviar feedback</string>
+    <string name="chat_feedback_details_hint">Compartilhar detalhes (opcional)</string>
+    <string name="chat_feedback_reason_other">Outro</string>
+    <string name="chat_feedback_reason_offensive">É ofensivo</string>
+    <string name="chat_feedback_reason_out_of_date">Está desatualizado</string>
+    <string name="chat_feedback_reason_wrong_facts">Apresentou informações incorretas</string>
+    <string name="chat_feedback_reason_not_interesting">Não foi interessante</string>
+    <string name="chat_rate_answer_bad">Resposta ruim</string>
+    <string name="chat_rate_answer_good">Resposta boa</string>
+    <string name="chat_feedback_thank_you">Obrigado pelo seu feedback</string>
+    <string name="chat_survey_yes">Sim!</string>
+    <string name="chat_survey_not_really">Não muito</string>
+    <string name="chat_survey_title">Está curtindo \"Perguntar sobre este episódio\"?</string>
+    <string name="chat_ai_disclaimer">A IA pode cometer erros, então verifique a veracidade das informações.</string>
+    <string name="chat_suggestion_summarize">Resuma este episódio</string>
+    <string name="chat_welcome">Pergunte sobre o que quiser deste episódio. Ou comece aqui.</string>
+    <string name="chat_input_question_hint">Faça sua pergunta…</string>
+    <string name="chat_beta_note">\"Perguntar sobre este episódio\" está na versão beta</string>
+    <string name="chat_beta_sheet_body">Gratuito para todos enquanto testamos. Isso se tornará uma funcionalidade do Plus futuramente.</string>
+    <string name="chat_beta_sheet_title">\"Perguntar sobre este episódio\" está na versão beta</string>
+    <string name="episode_chat_tooltip_body">Pergunte o que quiser. Ele também estava escutando.</string>
+    <string name="episode_chat_beta_badge">Beta</string>
+    <string name="episode_chat_shelf_title">Perguntar sobre este episódio</string>
     <string name="manual_playlist_no_content_body_alternative">Escolha episódios dos podcasts que você segue. Ou deslize para a esquerda em um episódio para adicioná-lo conforme assiste.</string>
     <string name="manual_playlist_no_content_body">Encontre um podcast que você goste e deslize para a esquerda em um episódio para adicioná-lo.</string>
     <string name="settings_general_whats_new_unread_dot_summary">Mostre um ponto no perfil quando houver novas mensagens de novidades não lidas.</string>
@@ -180,8 +226,6 @@ Language: pt_BR
     <string name="up_next_sort_duration_tooltip_title">Ordenar por duração</string>
     <string name="transcript_tap_to_seek_streaming_unavailable">Baixe o episódio para tocar e procurar</string>
     <string name="bookmark_play_from">Reproduzir de %s</string>
-    <string name="summary_upsell_description">Assine o Plus para ter acesso a essa e outras funcionalidades premium, como favoritos e pastas.</string>
-    <string name="summary_upsell_title">Resumos com tecnologia de IA</string>
     <string name="tv_create_account_title">Crie uma conta gratuita</string>
     <string name="tv_onboarding_sign_in_instructions">Abra a câmera e aponte para este código QR</string>
     <string name="tv_onboarding_sign_in_title">Faça login usando seu telefone</string>
@@ -213,28 +257,9 @@ Language: pt_BR
     <string name="blogs_found_followed_badge">PODCAST SEGUIDO</string>
     <string name="blogs_found_feed_detected">Feed encontrado</string>
     <string name="chapters_generated_disclaimer">Esses capítulos são gerados automaticamente e podem não ser perfeitamente precisos.</string>
-    <string name="description">Descrição</string>
-    <string name="player_tab_summary">Resumo</string>
-    <string name="summary">Resumo</string>
-    <string name="episode_summary">Resumo do episódio</string>
-    <string name="chat_stop_quote">Parar citação</string>
     <string name="chat_play_quote">Reproduzir citação</string>
-    <string name="chat_tap_to_retry">Toque para tentar novamente</string>
-    <string name="chat_error_network">Não foi possível acessar o servidor. Verifique sua conexão.</string>
-    <string name="chat_error_server">Ocorreu um erro. Tente novamente.</string>
     <string name="chat_clear">Apagar conversa</string>
     <string name="chat_send">Enviar</string>
-    <string name="chat_input_hint">Pergunte sobre este episódio…</string>
-    <string name="chat_preview_user_2">Foram mencionadas algumas dicas práticas?</string>
-    <string name="chat_preview_ai_2">Este episódio mergulha na ciência da formação de hábitos, explorando como pequenas rotinas diárias podem levar a grandes mudanças ao longo do tempo.</string>
-    <string name="chat_preview_user_1">Qual foi o tema principal deste episódio?</string>
-    <string name="chat_preview_ai_1">Oi! Estou aqui para ajudar você a conhecer este episódio. Pergunte-me qualquer coisa sobre os assuntos abordados, os principais aprendizados ou momentos específicos.</string>
-    <string name="chat_thinking">PENSANDO</string>
-    <string name="chat_episode_assistant">ASSISTENTE DE EPISÓDIOS</string>
-    <string name="chat_context_label_with_duration">Conversando com este episódio · %1$s</string>
-    <string name="chat_context_label">Conversando com este episódio</string>
-    <string name="chat_paywall_title">Conversar com este episódio</string>
-    <string name="episode_chat">Conversar com episódio</string>
     <string name="blogs_experiment_banner_body">Ainda estamos experimentando os blogs. Pode funcionar, precisar de ajustes ou ser deixado de lado.</string>
     <string name="blogs_experiment_banner_lead">Isso é um experimento.</string>
     <string name="onboarding_blogs_upsell_sample_label">Blog · 24 de abril</string>

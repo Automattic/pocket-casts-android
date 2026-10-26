@@ -65,7 +65,7 @@ fun MenuShelfItems(
                                     isEditable = state.isEditable,
                                     isTranscriptAvailable = state.isTranscriptAvailable,
                                     isVideoEnabled = isVideoEnabled,
-                                    badgeTextId = shelfItemBadgeTextId(listItem, state.isEditable, state.showBookmarkNewBadge),
+                                    badgeTextId = shelfItemBadgeTextId(listItem, state),
                                     onClick = onClick,
                                     modifier = rowDraggableModifier,
                                 )
@@ -94,12 +94,11 @@ fun MenuShelfItems(
 
 private fun shelfItemBadgeTextId(
     item: ShelfItem,
-    isEditable: Boolean,
-    showBookmarkNewBadge: Boolean,
+    state: UiState,
 ): Int? = when {
-    isEditable -> null
-    item == ShelfItem.EpisodeChat -> LR.string.episode_chat_beta_badge
-    item == ShelfItem.Bookmark && showBookmarkNewBadge -> LR.string.bookmark_new_badge
+    state.isEditable -> null
+    item == ShelfItem.EpisodeChat && state.showEpisodeChatBetaBadge -> LR.string.episode_chat_beta_badge
+    item == ShelfItem.Bookmark && state.showBookmarkNewBadge -> LR.string.bookmark_new_badge
     else -> null
 }
 
@@ -117,6 +116,7 @@ private fun MenuShelfItemsNonEditableContentPreview(
                 episode = PodcastEpisode("", publishedDate = Date()),
                 isEditable = false,
                 isTranscriptAvailable = false,
+                showEpisodeChatBetaBadge = true,
             ),
             selectedBackgroundColor = Color.Transparent,
             normalBackgroundColor = Color.Transparent,

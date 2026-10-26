@@ -136,16 +136,10 @@
     <string name="token_refresh_sign_in_error_title">Sign In Error</string>
     <string name="token_refresh_sign_in_error_description">There was a problem and you\'ve been signed out. Tap here to sign back in.</string>
     <string name="view_transcript">View transcript</string>
-    <string name="episode_chat">Chat with Episode</string>
     <string name="episode_chat_shelf_title">Ask about this episode</string>
     <string name="episode_chat_beta_badge">Beta</string>
-    <string name="episode_chat_needs_transcript">Ask about this episode needs a transcript.</string>
+    <string name="episode_chat_needs_transcript_message">Ask about this episode needs a transcript. This episode doesn’t have one.</string>
     <string name="episode_chat_tooltip_body">Ask it anything. It was listening too.</string>
-    <string name="episode_summary">Episode Summary</string>
-    <string name="summary_upsell_title">AI-Powered Summaries</string>
-    <string name="summary_upsell_description">Subscribe to Plus to get access to it and other Premium&#160;features like bookmarks and folders.</string>
-    <string name="description">Description</string>
-    <string name="summary">Summary</string>
     <string name="transcript">Transcript</string>
     <string name="episode_description">Episode Description</string>
     <string name="unstar">Unstar</string>
@@ -388,6 +382,7 @@
         <item quantity="other">%d episodes</item>
     </plurals>
     <string name="empty_play_state">Pick an episode to begin</string>
+    <string name="automotive_nothing_playing_title">Choose an episode to play</string>
 
     <string name="seconds_label">Seconds</string>
     <string name="seconds_singular">1 second</string>
@@ -567,7 +562,6 @@
     <string name="player_tab_chapters" translatable="false">@string/chapters</string>
     <string name="player_tab_notes">Details</string>
     <string name="player_tab_playing">Playing</string>
-    <string name="player_tab_summary">Summary</string>
     <string name="player_tab_playing_wide">Now Playing</string>
     <string name="player_time_saved_detail">In total you have saved %s using this feature.</string>
     <string name="player_time_saved_no_hour">Congrats! You\'re saving time and getting through more podcasts.</string>
@@ -2553,26 +2547,55 @@
     <string name="transcript_tap_to_seek_streaming_unavailable">Download the episode to tap to seek</string>
 
     <!-- Chat -->
-    <string name="chat_paywall_title">Chat with this episode</string>
-    <string name="chat_context_label">Chatting with this episode</string>
-    <string name="chat_context_label_with_duration">Chatting with this episode · %1$s</string>
-    <string name="chat_episode_assistant">EPISODE ASSISTANT</string>
-    <string name="chat_thinking">THINKING</string>
-    <string name="chat_preview_ai_1">Hi! I\'m here to help you explore this episode. Ask me anything about the topics discussed, key takeaways, or specific moments.</string>
-    <string name="chat_preview_user_1">What was the main topic of this episode?</string>
-    <string name="chat_preview_ai_2">This episode dives into the science of habit formation, exploring how small daily routines can lead to big changes over time.</string>
-    <string name="chat_preview_user_2">Were there any practical tips mentioned?</string>
     <string name="chat_beta_sheet_title">Ask about this episode is in beta</string>
     <string name="chat_beta_sheet_body">Free for everyone while we test it. It\'ll become a Plus feature later.</string>
+    <string name="chat_beta_sheet_sign_in">Sign in to try it</string>
     <string name="chat_beta_note">Ask about this episode is in beta</string>
-    <string name="chat_input_hint">Ask about this episode…</string>
+    <string name="chat_input_question_hint">Ask a question…</string>
+    <string name="chat_welcome">Ask about anything in this episode. Or start here.</string>
+    <string name="chat_suggestion_summarize">Summarize this episode</string>
+    <string name="chat_ai_disclaimer">AI can make mistakes, so double-check it.</string>
+    <string name="chat_survey_title">Enjoying Ask about this episode?</string>
+    <string name="chat_survey_not_really">Not really</string>
+    <string name="chat_survey_yes">Yes!</string>
+    <string name="chat_feedback_thank_you">Thanks for your feedback</string>
+    <string name="chat_rate_answer_good">Good response</string>
+    <string name="chat_rate_answer_bad">Bad response</string>
+    <string name="chat_feedback_what_went_wrong">What went wrong</string>
+    <string name="chat_feedback_reason_not_interesting">It wasn’t interesting</string>
+    <string name="chat_feedback_reason_wrong_facts">It got the facts wrong</string>
+    <string name="chat_feedback_reason_out_of_date">It’s out of date</string>
+    <string name="chat_feedback_reason_offensive">It’s offensive</string>
+    <string name="chat_feedback_reason_other">Other</string>
+    <string name="chat_feedback_details_hint">Share details (optional)</string>
+    <string name="chat_feedback_sending">Sending feedback</string>
+    <string name="chat_feedback_send_failed">Couldn’t send your feedback. Check your connection.</string>
+    <string name="chat_feedback_submit">Submit feedback</string>
+    <string name="chat_feedback_legal">Submitting shares this conversation with us to help improve chat.</string>
+    <string name="chat_feedback_learn_more">Learn more</string>
     <string name="chat_send">Send</string>
-    <string name="chat_clear">Clear Chat</string>
-    <string name="chat_error_server">Something went wrong. Please try again.</string>
-    <string name="chat_error_network">Unable to reach the server. Check your connection.</string>
-    <string name="chat_tap_to_retry">Tap to retry</string>
+    <string name="chat_cleared">Chat cleared</string>
+    <string name="chat_deleted">Chat deleted</string>
+    <string name="chat_history">Chat history</string>
+    <string name="chat_history_previous_7_days">Previous 7 days</string>
+    <string name="chat_history_older">Older</string>
+    <string name="chat_history_empty_title">No chats yet</string>
+    <string name="chat_history_empty_body">Ask about an episode and your chat will show up here.</string>
+    <string name="chat_undo">Undo</string>
+    <string name="chat_now_playing_episode">Now playing %1$s</string>
+    <string name="chat_quote_play_failed">Couldn’t play this part of the episode</string>
+    <string name="chat_about_episode">Chat about %1$s</string>
+    <string name="chat_not_sent_tap_to_retry">Not sent. Tap to try again.</string>
+    <string name="chat_error_server_on_our_end">Something went wrong on our end.</string>
+    <string name="chat_answering">Answering</string>
+    <string name="chat_clear">Clear chat</string>
+    <string name="chat_offline_note">You’re offline. Connect to ask a question.</string>
     <string name="chat_play_quote">Play quote</string>
-    <string name="chat_stop_quote">Stop quote</string>
+    <string name="chat_quote_finding_moment">Finding the moment…</string>
+    <string name="chat_loading_reading_transcript">Reading the transcript</string>
+    <string name="chat_loading_finding_moments">Finding the right moments</string>
+    <string name="chat_loading_writing_answer">Writing your answer</string>
+    <string name="chat_loading_still_working">Still working on it…</string>
 
     <!--    Tasker Plugin-->
     <string name="must_provide_filter_name">Must provide playlist name</string>
@@ -2931,6 +2954,10 @@
     <string name="onboarding_preselect_chapters_title">Preselect Chapters: cut to the good stuff</string>
     <string name="onboarding_preselect_chapters_chapter_title">Chapter %1$d</string>
     <string name="onboarding_blogs_title">Blogs: listen to\nwhat you read.</string>
+    <string name="onboarding_episode_chat_title">Ask about this episode:</string>
+    <string name="onboarding_episode_chat_question_1">What are the key topics?</string>
+    <string name="onboarding_episode_chat_answer">This episode covers AI, health, and productivity.</string>
+    <string name="onboarding_episode_chat_question_2">Summarize the main takeaways?</string>
     <string name="onboarding_blogs_upsell_sample_title">Why we redesigned the player</string>
     <string name="onboarding_blogs_upsell_sample_label">Blog · Apr 24</string>
     <string name="onboarding_upgrade_tnc">Terms\u00A0and\u00A0Conditions</string>

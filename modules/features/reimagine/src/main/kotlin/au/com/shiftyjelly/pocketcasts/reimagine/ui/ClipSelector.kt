@@ -116,6 +116,7 @@ internal fun ClipSelector(
             isPlaying = isPlaying,
             shareColors = shareColors,
             listener = listener,
+            modifier = modifier,
         )
     } else {
         TouchClipSelector(
