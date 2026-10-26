@@ -19,6 +19,7 @@ import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 internal class CachedLengthValidatingDataSource(
     private val upstream: DataSource,
     private val cache: Cache,
+    private val validateWhileReading: Boolean = true,
 ) : DataSource {
     private var mediaBuildChanged = false
     private var validatedKey: String? = null
@@ -55,8 +56,10 @@ internal class CachedLengthValidatingDataSource(
                 throw MediaBuildChangedException(message)
             }
         }
-        validatedKey = key
-        validatedLength = servedLength
+        if (validateWhileReading) {
+            validatedKey = key
+            validatedLength = servedLength
+        }
         return length
     }
 
@@ -65,6 +68,8 @@ internal class CachedLengthValidatingDataSource(
         if (key != null) {
             val cachedLength = ContentMetadata.getContentLength(cache.getContentMetadata(key))
             if (cachedLength != C.LENGTH_UNSET.toLong() && cachedLength != validatedLength) {
+                mediaBuildChanged = true
+                validatedKey = null
                 val message = "Media for '$key' changed length from $validatedLength to $cachedLength bytes while reading"
                 LogBuffer.i(LogBuffer.TAG_PLAYBACK, message)
                 throw MediaBuildChangedException(message)
@@ -110,9 +115,10 @@ internal class CachedLengthValidatingDataSource(
     class Factory(
         private val upstreamFactory: DataSource.Factory,
         private val cache: Cache,
+        private val validateWhileReading: Boolean = true,
     ) : DataSource.Factory {
         override fun createDataSource(): DataSource {
-            return CachedLengthValidatingDataSource(upstreamFactory.createDataSource(), cache)
+            return CachedLengthValidatingDataSource(upstreamFactory.createDataSource(), cache, validateWhileReading)
         }
     }
 }

@@ -70,6 +70,10 @@ class ExoPlayerDataSourceFactory @Inject constructor(
         ?.let { CachedLengthValidatingDataSource.Factory(defaultFactory, it) }
         ?: defaultFactory
 
+    private val playerCacheUpstreamFactory = cache
+        ?.let { CachedLengthValidatingDataSource.Factory(defaultFactory, it, validateWhileReading = false) }
+        ?: defaultFactory
+
     val cacheFactory get() = CacheDataSource.Factory()
         .setUpstreamDataSourceFactory(cacheUpstreamFactory)
         .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
@@ -111,6 +115,7 @@ class ExoPlayerDataSourceFactory @Inject constructor(
         }
 
         val cacheFactory = cacheFactory
+            .setUpstreamDataSourceFactory(playerCacheUpstreamFactory)
             .setCacheWriteDataSinkFactory(null)
             .takeIf { episodeLocation.shouldUseCache() }
 

@@ -145,6 +145,31 @@ class CachedLengthValidatingDataSourceTest {
     }
 
     @Test
+    fun `skips the read check when validation while reading is off`() {
+        val readOnlySource = CachedLengthValidatingDataSource(upstream, cache, validateWhileReading = false)
+        upstream.headers = mapOf("Content-Length" to "1000")
+        readOnlySource.open(dataSpec())
+
+        storeCachedLength(900)
+
+        assertEquals(C.RESULT_END_OF_INPUT, readOnlySource.read(ByteArray(10), 0, 10))
+    }
+
+    @Test
+    fun `passes later opens after a build change while reading`() {
+        upstream.headers = mapOf("Content-Length" to "1000")
+        dataSource.open(dataSpec())
+        storeCachedLength(900)
+        assertThrows(MediaBuildChangedException::class.java) { dataSource.read(ByteArray(10), 0, 10) }
+        dataSource.close()
+
+        upstream.headers = mapOf("Content-Range" to "bytes 400-1099/1100", "Content-Length" to "700")
+
+        assertEquals(700L, dataSource.open(dataSpec(position = 400)))
+        assertEquals(900L, cachedLength())
+    }
+
+    @Test
     fun `reads while the cached length is unchanged`() {
         upstream.headers = mapOf("Content-Length" to "1000")
         dataSource.open(dataSpec())
