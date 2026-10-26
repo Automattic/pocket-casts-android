@@ -21,12 +21,15 @@ internal class CachedLengthValidatingDataSource(
     private val cache: Cache,
 ) : DataSource {
     private var mediaBuildChanged = false
+    private var validatedKey: String? = null
+    private var validatedLength = C.LENGTH_UNSET.toLong()
 
     override fun addTransferListener(transferListener: TransferListener) {
         upstream.addTransferListener(transferListener)
     }
 
     override fun open(dataSpec: DataSpec): Long {
+        validatedKey = null
         val length = upstream.open(dataSpec)
         val key = dataSpec.key
         if (key == null || mediaBuildChanged || !FeatureFlag.isEnabled(Feature.VALIDATE_CACHED_MEDIA_LENGTH)) {
@@ -52,10 +55,21 @@ internal class CachedLengthValidatingDataSource(
                 throw MediaBuildChangedException(message)
             }
         }
+        validatedKey = key
+        validatedLength = servedLength
         return length
     }
 
     override fun read(buffer: ByteArray, offset: Int, length: Int): Int {
+        val key = validatedKey
+        if (key != null) {
+            val cachedLength = ContentMetadata.getContentLength(cache.getContentMetadata(key))
+            if (cachedLength != C.LENGTH_UNSET.toLong() && cachedLength != validatedLength) {
+                val message = "Media for '$key' changed length from $validatedLength to $cachedLength bytes while reading"
+                LogBuffer.i(LogBuffer.TAG_PLAYBACK, message)
+                throw MediaBuildChangedException(message)
+            }
+        }
         return upstream.read(buffer, offset, length)
     }
 
@@ -64,6 +78,7 @@ internal class CachedLengthValidatingDataSource(
     override fun getResponseHeaders(): Map<String, List<String>> = upstream.responseHeaders
 
     override fun close() {
+        validatedKey = null
         upstream.close()
     }
 

@@ -135,6 +135,24 @@ class CachedLengthValidatingDataSourceTest {
     }
 
     @Test
+    fun `throws on read when another opener stores a different length`() {
+        upstream.headers = mapOf("Content-Length" to "1000")
+        dataSource.open(dataSpec())
+
+        storeCachedLength(900)
+
+        assertThrows(MediaBuildChangedException::class.java) { dataSource.read(ByteArray(10), 0, 10) }
+    }
+
+    @Test
+    fun `reads while the cached length is unchanged`() {
+        upstream.headers = mapOf("Content-Length" to "1000")
+        dataSource.open(dataSpec())
+
+        assertEquals(C.RESULT_END_OF_INPUT, dataSource.read(ByteArray(10), 0, 10))
+    }
+
+    @Test
     fun `ignores an unknown document size`() {
         storeCachedLength(1000)
         upstream.headers = mapOf("Content-Range" to "bytes 400-899/*")
