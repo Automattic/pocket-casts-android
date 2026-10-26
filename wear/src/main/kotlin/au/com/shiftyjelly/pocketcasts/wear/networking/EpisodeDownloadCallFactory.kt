@@ -24,6 +24,13 @@ class EpisodeDownloadCallFactory(
         }
     }
 
+    /**
+     * Horologist's high-bandwidth call waits for WiFi or cellular to come up before it sends the request.
+     * If it is cancelled during that wait, it drops the request without calling the callback. The download
+     * worker blocks on that callback, so a stopped download would hang its thread forever. This wrapper
+     * makes sure a cancel always ends in exactly one `onFailure`, and that the request never starts after
+     * a cancel.
+     */
     private class CancellableCall(
         private val delegate: Call,
     ) : Call by delegate {
