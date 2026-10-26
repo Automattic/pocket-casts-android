@@ -79,9 +79,6 @@ Read our [Contributing Guide](CONTRIBUTING.md) to learn about reporting issues, 
 
 ## Signing a Release
 
-To build a _signed_ release, add these lines to your local.properties file
-
-    signingKeyStoreFile=/Users/username/git/secret.keystore
-    signingKeyStorePassword=
-    signingKeyAlias=
-    signingKeyPassword=
+Release builds are signed with the upload key, which `bundle exec fastlane run configure_apply` decrypts to `~/.configure/pocket-casts-android/secrets/upload.jks`.
+Its credentials are read from `secret.properties` as `uploadStorePassword`, `uploadKeyAlias`, and `uploadKeyPassword`.
+Without them, release packaging fails rather than producing an unsigned build.
