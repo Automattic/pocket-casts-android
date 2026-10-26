@@ -502,6 +502,7 @@ class PocketCastsForwardingPlayer(
     }
 }
 
+@OptIn(UnstableApi::class)
 private class QueueTimeline(val items: List<MediaItem>) : Timeline() {
     private val indexByMediaId = items.withIndex().associate { (index, item) -> item.mediaId to index }
 
