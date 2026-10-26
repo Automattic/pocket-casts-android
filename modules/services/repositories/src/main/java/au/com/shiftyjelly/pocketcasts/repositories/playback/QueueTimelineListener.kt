@@ -28,55 +28,89 @@ internal class QueueTimelineListener(
 ) : Player.Listener {
     override fun onEvents(player: Player, events: Player.Events) = delegate.onEvents(player, events)
 
-    override fun onTimelineChanged(timeline: Timeline, reason: Int) = delegate.onTimelineChanged(currentTimeline(), reason)
+    override fun onTimelineChanged(timeline: Timeline, reason: Int) {
+        delegate.onTimelineChanged(currentTimeline(), reason)
+    }
 
-    override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) = delegate.onMediaItemTransition(mediaItem, reason)
+    override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+        delegate.onMediaItemTransition(mediaItem, reason)
+    }
 
     override fun onTracksChanged(tracks: Tracks) = delegate.onTracksChanged(tracks)
 
     override fun onMediaMetadataChanged(mediaMetadata: MediaMetadata) = delegate.onMediaMetadataChanged(mediaMetadata)
 
-    override fun onPlaylistMetadataChanged(mediaMetadata: MediaMetadata) = delegate.onPlaylistMetadataChanged(mediaMetadata)
+    override fun onPlaylistMetadataChanged(mediaMetadata: MediaMetadata) {
+        delegate.onPlaylistMetadataChanged(mediaMetadata)
+    }
 
     override fun onIsLoadingChanged(isLoading: Boolean) = delegate.onIsLoadingChanged(isLoading)
 
-    override fun onAvailableCommandsChanged(availableCommands: Player.Commands) = delegate.onAvailableCommandsChanged(availableCommands)
+    override fun onAvailableCommandsChanged(availableCommands: Player.Commands) {
+        delegate.onAvailableCommandsChanged(availableCommands)
+    }
 
-    override fun onTrackSelectionParametersChanged(parameters: TrackSelectionParameters) = delegate.onTrackSelectionParametersChanged(parameters)
+    override fun onTrackSelectionParametersChanged(parameters: TrackSelectionParameters) {
+        delegate.onTrackSelectionParametersChanged(parameters)
+    }
 
     override fun onPlaybackStateChanged(playbackState: Int) = delegate.onPlaybackStateChanged(playbackState)
 
-    override fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int) = delegate.onPlayWhenReadyChanged(playWhenReady, reason)
+    override fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int) {
+        delegate.onPlayWhenReadyChanged(playWhenReady, reason)
+    }
 
-    override fun onPlaybackSuppressionReasonChanged(playbackSuppressionReason: Int) = delegate.onPlaybackSuppressionReasonChanged(playbackSuppressionReason)
+    override fun onPlaybackSuppressionReasonChanged(playbackSuppressionReason: Int) {
+        delegate.onPlaybackSuppressionReasonChanged(playbackSuppressionReason)
+    }
 
     override fun onIsPlayingChanged(isPlaying: Boolean) = delegate.onIsPlayingChanged(isPlaying)
 
     override fun onRepeatModeChanged(repeatMode: Int) = delegate.onRepeatModeChanged(repeatMode)
 
-    override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) = delegate.onShuffleModeEnabledChanged(shuffleModeEnabled)
+    override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) {
+        delegate.onShuffleModeEnabledChanged(shuffleModeEnabled)
+    }
 
     override fun onPlayerError(error: PlaybackException) = delegate.onPlayerError(error)
 
     override fun onPlayerErrorChanged(error: PlaybackException?) = delegate.onPlayerErrorChanged(error)
 
-    override fun onPositionDiscontinuity(oldPosition: Player.PositionInfo, newPosition: Player.PositionInfo, reason: Int) = delegate.onPositionDiscontinuity(oldPosition, newPosition, reason)
+    override fun onPositionDiscontinuity(
+        oldPosition: Player.PositionInfo,
+        newPosition: Player.PositionInfo,
+        reason: Int,
+    ) {
+        delegate.onPositionDiscontinuity(oldPosition, newPosition, reason)
+    }
 
-    override fun onPlaybackParametersChanged(playbackParameters: PlaybackParameters) = delegate.onPlaybackParametersChanged(playbackParameters)
+    override fun onPlaybackParametersChanged(playbackParameters: PlaybackParameters) {
+        delegate.onPlaybackParametersChanged(playbackParameters)
+    }
 
-    override fun onSeekBackIncrementChanged(seekBackIncrementMs: Long) = delegate.onSeekBackIncrementChanged(seekBackIncrementMs)
+    override fun onSeekBackIncrementChanged(seekBackIncrementMs: Long) {
+        delegate.onSeekBackIncrementChanged(seekBackIncrementMs)
+    }
 
-    override fun onSeekForwardIncrementChanged(seekForwardIncrementMs: Long) = delegate.onSeekForwardIncrementChanged(seekForwardIncrementMs)
+    override fun onSeekForwardIncrementChanged(seekForwardIncrementMs: Long) {
+        delegate.onSeekForwardIncrementChanged(seekForwardIncrementMs)
+    }
 
-    override fun onMaxSeekToPreviousPositionChanged(maxSeekToPreviousPositionMs: Long) = delegate.onMaxSeekToPreviousPositionChanged(maxSeekToPreviousPositionMs)
+    override fun onMaxSeekToPreviousPositionChanged(maxSeekToPreviousPositionMs: Long) {
+        delegate.onMaxSeekToPreviousPositionChanged(maxSeekToPreviousPositionMs)
+    }
 
     override fun onAudioSessionIdChanged(audioSessionId: Int) = delegate.onAudioSessionIdChanged(audioSessionId)
 
-    override fun onAudioAttributesChanged(audioAttributes: AudioAttributes) = delegate.onAudioAttributesChanged(audioAttributes)
+    override fun onAudioAttributesChanged(audioAttributes: AudioAttributes) {
+        delegate.onAudioAttributesChanged(audioAttributes)
+    }
 
     override fun onVolumeChanged(volume: Float) = delegate.onVolumeChanged(volume)
 
-    override fun onSkipSilenceEnabledChanged(skipSilenceEnabled: Boolean) = delegate.onSkipSilenceEnabledChanged(skipSilenceEnabled)
+    override fun onSkipSilenceEnabledChanged(skipSilenceEnabled: Boolean) {
+        delegate.onSkipSilenceEnabledChanged(skipSilenceEnabled)
+    }
 
     override fun onDeviceInfoChanged(deviceInfo: DeviceInfo) = delegate.onDeviceInfoChanged(deviceInfo)
 

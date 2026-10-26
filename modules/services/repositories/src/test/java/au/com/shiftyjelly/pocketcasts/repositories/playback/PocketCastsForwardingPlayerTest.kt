@@ -786,10 +786,10 @@ class PocketCastsForwardingPlayerTest {
     @Test
     fun `timeline lists current episode followed by up next`() {
         forwardingPlayer.updateMetadata(createPodcastEpisode(uuid = "current"), createPodcast())
-        forwardingPlayer.updateQueue(listOf(queueItem("next-1"), queueItem("current"), queueItem("next-2")))
+        forwardingPlayer.updateQueue(queueItem("current"), listOf(queueItem("next-1"), queueItem("next-2")))
 
         val timeline = forwardingPlayer.currentTimeline
-        assertEquals(listOf("current", "next-1", "next-2"), (0 until timeline.windowCount).map { timeline.getWindow(it, Timeline.Window()).mediaItem.mediaId })
+        assertEquals(listOf("current", "next-1", "next-2"), timeline.mediaIds())
         assertEquals(0, forwardingPlayer.currentMediaItemIndex)
         assertEquals(0, forwardingPlayer.currentPeriodIndex)
         assertEquals(3, forwardingPlayer.mediaItemCount)
@@ -797,17 +797,38 @@ class PocketCastsForwardingPlayerTest {
     }
 
     @Test
-    fun `timeline uses the queue item for the current episode`() {
-        forwardingPlayer.updateMetadata(createPodcastEpisode(uuid = "current"), createPodcast())
-        val currentItem = queueItem("current")
-        forwardingPlayer.updateQueue(listOf(currentItem, queueItem("next-1")))
+    fun `current window keeps its metadata and uses the up next artwork`() {
+        val episode = createPodcastEpisode(uuid = "current", imageUrl = "https://example.com/raw.jpg", isStarred = true)
+        forwardingPlayer.updateMetadata(episode, createPodcast())
+        forwardingPlayer.updateQueue(queueItem("current", artworkUri = "content://artwork/current"), emptyList())
 
-        assertEquals(currentItem, forwardingPlayer.currentTimeline.getWindow(0, Timeline.Window()).mediaItem)
+        val metadata = forwardingPlayer.currentTimeline.getWindow(0, Timeline.Window()).mediaItem.mediaMetadata
+        assertEquals(HeartRating(true), metadata.userRating)
+        assertEquals(Uri.parse("content://artwork/current"), metadata.artworkUri)
+    }
+
+    @Test
+    fun `current window has no artwork when artwork is hidden`() {
+        val episode = createPodcastEpisode(uuid = "current", imageUrl = "https://example.com/raw.jpg")
+        forwardingPlayer.updateMetadata(episode, createPodcast(), showArtwork = false)
+        forwardingPlayer.updateQueue(queueItem("current", artworkUri = "content://artwork/current"), emptyList())
+
+        assertNull(forwardingPlayer.currentTimeline.getWindow(0, Timeline.Window()).mediaItem.mediaMetadata.artworkUri)
+    }
+
+    @Test
+    fun `timeline does not list the previous up next head after the episode changes`() {
+        forwardingPlayer.updateMetadata(createPodcastEpisode(uuid = "finished"), createPodcast())
+        forwardingPlayer.updateQueue(queueItem("finished"), listOf(queueItem("next-1"), queueItem("next-2")))
+
+        forwardingPlayer.updateMetadata(createPodcastEpisode(uuid = "next-1"), createPodcast())
+
+        assertEquals(listOf("next-1", "next-2"), forwardingPlayer.currentTimeline.mediaIds())
     }
 
     @Test
     fun `timeline falls back to wrapped player without a current episode`() {
-        forwardingPlayer.updateQueue(listOf(queueItem("next-1")))
+        forwardingPlayer.updateQueue(null, listOf(queueItem("next-1")))
 
         assertEquals(Timeline.EMPTY, forwardingPlayer.currentTimeline)
     }
@@ -818,8 +839,8 @@ class PocketCastsForwardingPlayerTest {
         forwardingPlayer.addListener(listener)
         forwardingPlayer.updateMetadata(createPodcastEpisode(uuid = "current"), createPodcast())
 
-        forwardingPlayer.updateQueue(listOf(queueItem("next-1")))
-        forwardingPlayer.updateQueue(listOf(queueItem("next-1")))
+        forwardingPlayer.updateQueue(null, listOf(queueItem("next-1")))
+        forwardingPlayer.updateQueue(null, listOf(queueItem("next-1")))
 
         verify(listener, times(2)).onTimelineChanged(any(), any())
     }
@@ -830,7 +851,7 @@ class PocketCastsForwardingPlayerTest {
         val listener = mock<Player.Listener>()
         forwardingPlayer.addListener(listener)
         forwardingPlayer.updateMetadata(createPodcastEpisode(uuid = "current"), createPodcast())
-        forwardingPlayer.updateQueue(listOf(queueItem("next-1")))
+        forwardingPlayer.updateQueue(null, listOf(queueItem("next-1")))
         verify(mockPlayer).addListener(wrappedListener.capture())
 
         wrappedListener.firstValue.onTimelineChanged(Timeline.EMPTY, Player.TIMELINE_CHANGE_REASON_SOURCE_UPDATE)
@@ -880,7 +901,7 @@ class PocketCastsForwardingPlayerTest {
         val skipped = mutableListOf<String>()
         val player = PocketCastsForwardingPlayer(mockPlayer, onSkipToQueueItem = { skipped += it })
         player.updateMetadata(createPodcastEpisode(uuid = "current"), createPodcast())
-        player.updateQueue(listOf(queueItem("next-1"), queueItem("next-2")))
+        player.updateQueue(null, listOf(queueItem("next-1"), queueItem("next-2")))
 
         player.seekToDefaultPosition(2)
         player.seekTo(1, 5_000)
@@ -895,7 +916,7 @@ class PocketCastsForwardingPlayerTest {
     @Test
     fun `swapPlayer keeps the queue`() {
         forwardingPlayer.updateMetadata(createPodcastEpisode(uuid = "current"), createPodcast())
-        forwardingPlayer.updateQueue(listOf(queueItem("next-1")))
+        forwardingPlayer.updateQueue(null, listOf(queueItem("next-1")))
 
         val swapped = forwardingPlayer.swapPlayer(mockPlayer)
 
@@ -906,17 +927,19 @@ class PocketCastsForwardingPlayerTest {
     fun `automotive does not expose the queue`() {
         val player = PocketCastsForwardingPlayer(mockPlayer, isAutomotive = true)
         player.updateMetadata(createPodcastEpisode(uuid = "current"), createPodcast())
-        player.updateQueue(listOf(queueItem("next-1")))
+        player.updateQueue(null, listOf(queueItem("next-1")))
 
         assertFalse(player.availableCommands.contains(Player.COMMAND_GET_TIMELINE))
         assertFalse(player.availableCommands.contains(Player.COMMAND_SEEK_TO_MEDIA_ITEM))
         assertEquals(Timeline.EMPTY, player.currentTimeline)
     }
 
-    private fun queueItem(mediaId: String) = MediaItem.Builder()
+    private fun queueItem(mediaId: String, artworkUri: String? = null) = MediaItem.Builder()
         .setMediaId(mediaId)
-        .setMediaMetadata(MediaMetadata.Builder().setTitle(mediaId).build())
+        .setMediaMetadata(MediaMetadata.Builder().setTitle(mediaId).setArtworkUri(artworkUri?.let(Uri::parse)).build())
         .build()
+
+    private fun Timeline.mediaIds() = (0 until windowCount).map { getWindow(it, Timeline.Window()).mediaItem.mediaId }
 
     private fun createPodcastEpisode(
         uuid: String = "test-uuid",

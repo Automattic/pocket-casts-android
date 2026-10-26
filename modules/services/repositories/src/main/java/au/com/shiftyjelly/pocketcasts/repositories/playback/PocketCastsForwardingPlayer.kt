@@ -56,8 +56,10 @@ class PocketCastsForwardingPlayer(
 
     internal var currentMediaItem: MediaItem = MediaItem.EMPTY
     internal var previousMediaId: String? = null
-    internal var queueItems: List<MediaItem> = emptyList()
+    internal var upNextItems: List<MediaItem> = emptyList()
         private set
+    private var upNextCurrentItem: MediaItem? = null
+    private var queueTimelineInputs: Triple<MediaItem, MediaItem?, List<MediaItem>>? = null
     private var queueTimeline: QueueTimeline? = null
 
     /**
@@ -80,9 +82,18 @@ class PocketCastsForwardingPlayer(
     @MainThread
     fun swapPlayer(newPlayer: Player): PocketCastsForwardingPlayer {
         checkMainThread()
-        return PocketCastsForwardingPlayer(newPlayer, onSkipForward, onSkipBack, onStop, onPlay, onPause, onSeekTo, onSkipToQueueItem, playGuard, isAutomotive).also {
-            it.copyStateFrom(this)
-        }
+        return PocketCastsForwardingPlayer(
+            newPlayer,
+            onSkipForward,
+            onSkipBack,
+            onStop,
+            onPlay,
+            onPause,
+            onSeekTo,
+            onSkipToQueueItem,
+            playGuard,
+            isAutomotive,
+        ).also { it.copyStateFrom(this) }
     }
 
     @MainThread
@@ -90,8 +101,10 @@ class PocketCastsForwardingPlayer(
         currentMediaItem = other.currentMediaItem
         previousMediaId = other.previousMediaId
         isTransientLoss = other.isTransientLoss
-        queueItems = other.queueItems
-        queueTimeline = buildQueueTimeline()
+        upNextCurrentItem = other.upNextCurrentItem
+        upNextItems = other.upNextItems
+        queueTimelineInputs = other.queueTimelineInputs
+        queueTimeline = other.queueTimeline
     }
 
     /**
@@ -177,13 +190,17 @@ class PocketCastsForwardingPlayer(
     }
 
     /**
-     * Sets the episodes exposed in [getCurrentTimeline] so controllers such as Wear OS can show the
-     * Up Next queue. The item matching the current episode, if any, is listed first.
+     * Sets the Up Next episodes exposed after the current episode in [getCurrentTimeline], so
+     * controllers such as Wear OS can show the queue.
+     *
+     * @param currentItem The Up Next head, used for the current episode's artwork when it matches.
+     * @param upNext The episodes queued after the current one.
      */
     @MainThread
-    fun updateQueue(items: List<MediaItem>) {
+    fun updateQueue(currentItem: MediaItem?, upNext: List<MediaItem>) {
         checkMainThread()
-        queueItems = items
+        upNextCurrentItem = currentItem
+        upNextItems = upNext
         dispatchTimelineIfChanged()
     }
 
@@ -201,13 +218,19 @@ class PocketCastsForwardingPlayer(
 
     override fun getCurrentTimeline(): Timeline = queueTimeline ?: super.getCurrentTimeline()
 
-    override fun getCurrentMediaItemIndex(): Int = if (queueTimeline == null) super.getCurrentMediaItemIndex() else 0
+    override fun getCurrentMediaItemIndex(): Int {
+        return if (queueTimeline == null) super.getCurrentMediaItemIndex() else 0
+    }
 
-    override fun getCurrentPeriodIndex(): Int = if (queueTimeline == null) super.getCurrentPeriodIndex() else 0
+    override fun getCurrentPeriodIndex(): Int {
+        return if (queueTimeline == null) super.getCurrentPeriodIndex() else 0
+    }
 
     override fun getMediaItemCount(): Int = currentTimeline.windowCount
 
-    override fun getMediaItemAt(index: Int): MediaItem = currentTimeline.getWindow(index, Timeline.Window()).mediaItem
+    override fun getMediaItemAt(index: Int): MediaItem {
+        return currentTimeline.getWindow(index, Timeline.Window()).mediaItem
+    }
 
     override fun getAvailableCommands(): Player.Commands {
         if (isEmptyState) {
@@ -258,7 +281,8 @@ class PocketCastsForwardingPlayer(
     private fun skipToQueueItem(mediaItemIndex: Int) {
         val timeline = queueTimeline ?: return
         if (mediaItemIndex !in 1 until timeline.windowCount) return
-        onSkipToQueueItem?.invoke(timeline.getWindow(mediaItemIndex, Timeline.Window()).mediaItem.mediaId)
+        val mediaId = timeline.getWindow(mediaItemIndex, Timeline.Window()).mediaItem.mediaId
+        onSkipToQueueItem?.invoke(mediaId)
     }
 
     override fun seekToNext() {
@@ -384,7 +408,10 @@ class PocketCastsForwardingPlayer(
 
     override fun addListener(listener: Player.Listener) {
         if (supportsQueue) {
-            super.addListener(queueTimelineListeners.getOrPut(listener) { QueueTimelineListener(listener) { currentTimeline } })
+            val queueTimelineListener = queueTimelineListeners.getOrPut(listener) {
+                QueueTimelineListener(listener) { currentTimeline }
+            }
+            super.addListener(queueTimelineListener)
         } else {
             super.addListener(listener)
         }
@@ -403,18 +430,27 @@ class PocketCastsForwardingPlayer(
 
     private fun buildQueueTimeline(): QueueTimeline? {
         if (!supportsQueue || currentMediaItem.mediaId == MediaItem.DEFAULT_MEDIA_ID) return null
-        val current = queueItems.find { it.mediaId == currentMediaItem.mediaId } ?: currentMediaItem.buildUpon()
+        val metadata = currentMediaItem.mediaMetadata
+        val upNextArtworkUri = upNextCurrentItem
+            ?.takeIf { it.mediaId == currentMediaItem.mediaId }
+            ?.mediaMetadata
+            ?.artworkUri
+        val current = currentMediaItem.buildUpon()
             .setMediaMetadata(
-                currentMediaItem.mediaMetadata.buildUpon()
+                metadata.buildUpon()
                     .setArtworkData(null, null)
-                    .setUserRating(null)
+                    .setArtworkUri(metadata.artworkUri?.let { upNextArtworkUri ?: it })
                     .build(),
             )
             .build()
-        return QueueTimeline((listOf(current) + queueItems).distinctBy { it.mediaId })
+        val upNext = upNextItems.filter { it.mediaId != current.mediaId }.distinctBy { it.mediaId }
+        return QueueTimeline(listOf(current) + upNext)
     }
 
     private fun dispatchTimelineIfChanged() {
+        val inputs = Triple(currentMediaItem, upNextCurrentItem, upNextItems)
+        if (inputs == queueTimelineInputs) return
+        queueTimelineInputs = inputs
         val newTimeline = buildQueueTimeline()
         if (newTimeline == queueTimeline) return
         queueTimeline = newTimeline
@@ -495,14 +531,17 @@ private class QueueTimeline(val items: List<MediaItem>) : Timeline() {
 
     override fun getPeriod(periodIndex: Int, period: Period, setIds: Boolean): Period {
         val mediaId = items[periodIndex].mediaId
-        return period.set(mediaId, mediaId, periodIndex, items[periodIndex].durationUs(), 0, AdPlaybackState.NONE, false)
+        val durationUs = items[periodIndex].durationUs()
+        return period.set(mediaId, mediaId, periodIndex, durationUs, 0, AdPlaybackState.NONE, false)
     }
 
     override fun getIndexOfPeriod(uid: Any) = indexByMediaId[uid] ?: C.INDEX_UNSET
 
     override fun getUidOfPeriod(periodIndex: Int): Any = items[periodIndex].mediaId
 
-    private fun MediaItem.durationUs() = mediaMetadata.durationMs?.takeIf { it > 0 }?.let(Util::msToUs) ?: C.TIME_UNSET
+    private fun MediaItem.durationUs(): Long {
+        return mediaMetadata.durationMs?.takeIf { it > 0 }?.let(Util::msToUs) ?: C.TIME_UNSET
+    }
 
     override fun equals(other: Any?) = other is QueueTimeline && other.items == items
 
