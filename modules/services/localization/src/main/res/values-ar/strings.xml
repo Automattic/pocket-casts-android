@@ -1,11 +1,57 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-10-08 20:57:16+0000
+Translation-Revision-Date: 2026-10-20 16:56:58+0000
 Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;
 Generator: GlotPress/2.4.0-alpha
 Language: ar
 -->
 <resources>
+    <string name="chat_about_episode">دردشة حول ⁦%1$s⁩</string>
+    <string name="chat_now_playing_episode">الحلقة الجاري تشغيلها الآن ⁦%1$s⁩</string>
+    <string name="chat_undo">تراجع</string>
+    <string name="chat_history_older">الأقدم</string>
+    <string name="chat_history_previous_7_days">الأيام السبعة السابقة</string>
+    <string name="chat_history">محفوظات الدردشة</string>
+    <string name="chat_deleted">تم حذف الدردشة</string>
+    <string name="chat_cleared">تم مسح الدردشة</string>
+    <string name="chat_offline_note">أنت غير متصل بالإنترنت. يُرجى الاتصال بشبكة الإنترنت حتى تتمكن من طرح سؤالك.</string>
+    <string name="chat_answering">جارٍ الإجابة</string>
+    <string name="chat_error_server_on_our_end">حدث خطأ ما من جانبنا.</string>
+    <string name="chat_not_sent_tap_to_retry">لم يتم الإرسال. اضغط لإعادة المحاولة.</string>
+    <string name="chat_feedback_send_failed">تعذَّر إرسال ملاحظاتك. تحقق من اتصالك بالشبكة.</string>
+    <string name="chat_feedback_sending">جارٍ إرسال الملاحظات</string>
+    <string name="chat_feedback_what_went_wrong">ما الخطأ الذي حدث</string>
+    <string name="chat_beta_sheet_sign_in">سجّل الدخول لتجربة ذلك</string>
+    <string name="episode_chat_needs_transcript_message">تحتاج إلى نصّ مفرّغ للحلقة حتى تتمكن من طرح أسئلة حولها. لا يتوفر نصّ مفرّغ لهذه الحلقة.</string>
+    <string name="onboarding_episode_chat_question_2">هل ترغب في تلخيص أبرز النقاط؟</string>
+    <string name="onboarding_episode_chat_answer">تتناول هذه الحلقة موضوعات حول الذكاء الاصطناعي، وسلامة المواقع، والإنتاجية.</string>
+    <string name="onboarding_episode_chat_question_1">ما الموضوعات الرئيسية؟</string>
+    <string name="onboarding_episode_chat_title">طرح أسئلة حول هذه الحلقة:</string>
+    <string name="chat_feedback_learn_more">معرفة المزيد</string>
+    <string name="chat_feedback_legal">يؤدي الإرسال إلى مشاركة هذه المحادثة معنا لمساعدتنا على تحسين ميزة الدردشة.</string>
+    <string name="chat_feedback_submit">إرسال الملاحظات</string>
+    <string name="chat_feedback_details_hint">مشاركة التفاصيل (اختياري)</string>
+    <string name="chat_feedback_reason_other">أخرى</string>
+    <string name="chat_feedback_reason_offensive">مسيء</string>
+    <string name="chat_feedback_reason_out_of_date">قديم</string>
+    <string name="chat_feedback_reason_wrong_facts">المعلومات المقدَّمة غير صحيحة</string>
+    <string name="chat_feedback_reason_not_interesting">لم يكن مثيرًا للاهتمام</string>
+    <string name="chat_rate_answer_bad">رد سيء</string>
+    <string name="chat_rate_answer_good">رد جيد</string>
+    <string name="chat_feedback_thank_you">شكرًا لك على ملاحظاتك</string>
+    <string name="chat_survey_yes">نعم!</string>
+    <string name="chat_survey_not_really">ليس تمامًا</string>
+    <string name="chat_survey_title">هل تستمتع بطرح أسئلة حول هذه الحلقة؟</string>
+    <string name="chat_ai_disclaimer">قد يُقدِّم الذكاء الاصطناعي معلومات غير صحيحة، لذا تحقق من صحتها.</string>
+    <string name="chat_suggestion_summarize">تلخيص هذه الحلقة</string>
+    <string name="chat_welcome">يمكنك طرح أسئلة حول أي شيء في هذه الحلقة. أو البدء من هنا.</string>
+    <string name="chat_input_question_hint">اطرح سؤالاً…</string>
+    <string name="chat_beta_note">تتوفر خاصية \"طرح أسئلة حول هذه الحلقة\" في الإصدار التجريبي</string>
+    <string name="chat_beta_sheet_body">متاحة مجانًا للجميع أثناء اختبارها. ستصبح لاحقًا ميزة لمشتركي Plus.</string>
+    <string name="chat_beta_sheet_title">تتوفر خاصية \"طرح أسئلة حول هذه الحلقة\" في الإصدار التجريبي</string>
+    <string name="episode_chat_tooltip_body">يمكنك طرح أسئلة حول أي شيء يخطر ببالك. كان يستمع هو الآخر.</string>
+    <string name="episode_chat_beta_badge">الإصدار التجريبي</string>
+    <string name="episode_chat_shelf_title">طرح أسئلة حول هذه الحلقة</string>
     <string name="manual_playlist_no_content_body_alternative">اختر حلقات من حلقات البث الصوتي التي تتابعها. أو اسحب إلى اليسار على أي حلقة لإضافتها أثناء التنقل.</string>
     <string name="manual_playlist_no_content_body">اعثر على بث صوتي ينال إعجابك، ثم مرر لليسار على أي حلقة لإضافته.</string>
     <string name="settings_general_whats_new_unread_dot_summary">اعرض نقطة تشير إلى وجود عناصر غير مقروءة على \"الملف الشخصي\" عند وجود رسائل جديدة في \"ما الجديد\".</string>

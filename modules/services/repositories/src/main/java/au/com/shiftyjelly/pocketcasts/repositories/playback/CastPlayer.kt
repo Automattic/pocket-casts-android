@@ -43,6 +43,7 @@ class CastPlayer(
     private var podcast: Podcast? = null
     private var state: CastPlaybackState = CastPlaybackState.NONE
     private var remoteListenerAdded: Boolean = false
+    private var registeredClient: RemoteMediaClient? = null
     private var localEpisodeUuid: String? = null
     private var remoteEpisodeUuid: String? = null
     private var playbackEffects: PlaybackEffects? = null
@@ -57,6 +58,8 @@ class CastPlayer(
 
     private val remoteMediaClient: RemoteMediaClient?
         get() = castSession?.remoteMediaClient
+
+    private val boundSession: CastSession? = castSession
 
     private val isMediaLoaded: Boolean
         get() = isConnected &&
@@ -98,6 +101,12 @@ class CastPlayer(
         if (remoteMediaClient != null) {
             addRemoteMediaListener()
             setMetadataFromRemote()
+        }
+    }
+
+    suspend fun isBoundToCurrentSession(): Boolean {
+        return withContext(Dispatchers.Main) {
+            boundSession != null && boundSession === castSession
         }
     }
 
@@ -169,8 +178,10 @@ class CastPlayer(
         withContext(Dispatchers.Main) {
             state = CastPlaybackState.STOPPED
             remoteListenerAdded = false
-            remoteMediaClient?.unregisterCallback(remoteMediaClientListener)
-            remoteMediaClient?.unregisterCallback(playPauseCallback)
+            val client = registeredClient ?: remoteMediaClient
+            client?.unregisterCallback(remoteMediaClientListener)
+            client?.unregisterCallback(playPauseCallback)
+            registeredClient = null
             playbackStatsCollector.onStop()
         }
     }
@@ -249,8 +260,9 @@ class CastPlayer(
             return
         }
         remoteListenerAdded = true
-        remoteMediaClient?.registerCallback(remoteMediaClientListener)
-        remoteMediaClient?.registerCallback(playPauseCallback)
+        registeredClient = remoteMediaClient
+        registeredClient?.registerCallback(remoteMediaClientListener)
+        registeredClient?.registerCallback(playPauseCallback)
     }
 
     private suspend fun loadEpisode(episodeUuid: String, currentPositionMs: Int, autoPlay: Boolean) {

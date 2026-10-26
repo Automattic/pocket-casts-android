@@ -10,25 +10,38 @@ import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.EaseOut
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.lerp
+import kotlinx.coroutines.delay
 
 private val LocalIsReduceMotionEnabled = staticCompositionLocalOf { false }
 
@@ -97,6 +110,51 @@ internal fun ChatFadeOut(
         content()
     }
 }
+
+@Composable
+internal fun ChatShimmerText(
+    text: String,
+    color: Color,
+    highlight: Color,
+    style: TextStyle,
+    modifier: Modifier = Modifier,
+) {
+    val isReduceMotionEnabled = rememberIsReduceMotionEnabled()
+    val sweep = remember { Animatable(0f) }
+    LaunchedEffect(isReduceMotionEnabled) {
+        sweep.snapTo(0f)
+        if (isReduceMotionEnabled) return@LaunchedEffect
+        delay(SHIMMER_START_DELAY_MS)
+        while (true) {
+            sweep.animateTo(1f, tween(durationMillis = SHIMMER_SWEEP_MS, easing = LinearEasing))
+            delay(SHIMMER_PAUSE_MS)
+            sweep.snapTo(0f)
+        }
+    }
+    var textWidth by remember { mutableFloatStateOf(0f) }
+    val halfBand = with(LocalDensity.current) { ShimmerHalfBandWidth.toPx() }
+    val center = lerp(-halfBand, textWidth + halfBand, sweep.value)
+    Text(
+        text = text,
+        style = style.copy(
+            brush = Brush.horizontalGradient(
+                colors = listOf(color, highlight, color),
+                startX = center - halfBand,
+                endX = center + halfBand,
+            ),
+        ),
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+        modifier = modifier
+            .wrapContentWidth(Alignment.Start)
+            .onSizeChanged { size -> textWidth = size.width.toFloat() },
+    )
+}
+
+private val ShimmerHalfBandWidth = 20.dp
+private const val SHIMMER_START_DELAY_MS = 400L
+private const val SHIMMER_SWEEP_MS = 870
+private const val SHIMMER_PAUSE_MS = 730L
 
 private const val APPEAR_DURATION_MS = 200
 internal const val ANSWER_CROSS_FADE_MS = 150

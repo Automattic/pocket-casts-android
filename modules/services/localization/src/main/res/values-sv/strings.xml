@@ -1,44 +1,90 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-10-08 11:55:19+0000
+Translation-Revision-Date: 2026-10-20 14:59:09+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
-    <string name="manual_playlist_no_content_body_alternative">Välj avsnitt från de podcasts du följer. Eller svep åt vänster på ett avsnitt för att lägga till det allteftersom.</string>
+    <string name="chat_undo">Ångra</string>
+    <string name="chat_history_older">Äldre</string>
+    <string name="chat_history">Chatthistorik</string>
+    <string name="chat_about_episode">Chatt om %1$s</string>
+    <string name="chat_deleted">Chatt borttagen</string>
+    <string name="chat_cleared">Chatt rensad</string>
+    <string name="chat_now_playing_episode">Spelar nu upp %1$s</string>
+    <string name="chat_history_previous_7_days">Föregående 7 dagar</string>
+    <string name="chat_feedback_send_failed">Kunde inte skicka din feedback. Kontrollera din anslutning.</string>
+    <string name="chat_offline_note">Du är offline. Anslut för att ställa en fråga.</string>
+    <string name="chat_answering">Svarar</string>
+    <string name="chat_error_server_on_our_end">Något gick fel hos oss.</string>
+    <string name="chat_not_sent_tap_to_retry">Inte skickat. Tryck för att försöka igen.</string>
+    <string name="chat_feedback_sending">Skickar feedback</string>
+    <string name="chat_beta_sheet_sign_in">Logga in för att prova det</string>
+    <string name="chat_feedback_what_went_wrong">Vad som gick fel</string>
+    <string name="episode_chat_needs_transcript_message">Fråga om detta avsnitt behöver en transkription. Detta avsnitt har ingen.</string>
+    <string name="chat_feedback_learn_more">Lär dig mer</string>
+    <string name="onboarding_episode_chat_title">Fråga om detta avsnitt:</string>
+    <string name="onboarding_episode_chat_question_2">Sammanfatta det viktigaste att ta med sig?</string>
+    <string name="onboarding_episode_chat_answer">Det här avsnittet handlar om AI, hälsa och produktivitet.</string>
+    <string name="onboarding_episode_chat_question_1">Vilka är de viktigaste ämnena?</string>
+    <string name="chat_feedback_legal">Att skicka delar den här konversationen med oss för att hjälpa till att förbättra chatten.</string>
+    <string name="chat_feedback_submit">Skicka feedback</string>
+    <string name="chat_feedback_details_hint">Dela detaljer (valfritt)</string>
+    <string name="chat_feedback_reason_other">Annat</string>
+    <string name="chat_feedback_reason_offensive">Den är stötande</string>
+    <string name="chat_feedback_reason_out_of_date">Den är föråldrad</string>
+    <string name="chat_feedback_reason_wrong_facts">Den missuppfattade fakta</string>
+    <string name="chat_survey_yes">Ja!</string>
+    <string name="chat_rate_answer_bad">Dåligt svar</string>
+    <string name="chat_rate_answer_good">Bra svar</string>
+    <string name="chat_feedback_thank_you">Tack för din feedback</string>
+    <string name="chat_feedback_reason_not_interesting">Det var inte intressant</string>
+    <string name="chat_survey_not_really">Inte riktigt</string>
+    <string name="chat_input_question_hint">Ställ en fråga …</string>
+    <string name="chat_survey_title">Tycker du om Fråga om detta avsnitt?</string>
+    <string name="chat_ai_disclaimer">AI kan göra misstag, så dubbelkolla det.</string>
+    <string name="chat_suggestion_summarize">Sammanfatta detta avsnitt</string>
+    <string name="chat_welcome">Fråga om vad som helst i detta avsnitt. Eller börja här.</string>
+    <string name="episode_chat_beta_badge">Beta</string>
+    <string name="episode_chat_shelf_title">Fråga om detta avsnitt</string>
+    <string name="chat_beta_note">Fråga om detta avsnitt är i beta</string>
+    <string name="chat_beta_sheet_body">Gratis för alla medan vi testar det. Det kommer att bli en Plus-funktion senare.</string>
+    <string name="chat_beta_sheet_title">Fråga om detta avsnitt är i beta</string>
+    <string name="episode_chat_tooltip_body">Fråga vad som helst. Den lyssnade också.</string>
     <string name="manual_playlist_no_content_body">Hitta en podcast du gillar och svep sedan åt vänster på ett avsnitt för att lägga till det.</string>
-    <string name="settings_general_whats_new_unread_dot_summary">Visa en oläst punkt på profil när det finns nya meddelanden.</string>
-    <string name="settings_general_whats_new_unread_dot">Show unread dot</string>
-    <string name="up_next_as_playlist_replace_body">Om du spelar upp detta ersätts din nuvarande Nästa-prenumeration. Spara den som en spellista för att behålla den.</string>
+    <string name="manual_playlist_no_content_body_alternative">Välj avsnitt från de podcaster du följer. Eller svep åt vänster på ett avsnitt för att lägga till det allteftersom.</string>
+    <string name="settings_general_whats_new_unread_dot_summary">Visa en oläst punkt på Profil när det finns nya \"Vad är nytt\"-meddelanden.</string>
+    <string name="settings_general_whats_new_unread_dot">Visa oläst punkt</string>
+    <string name="up_next_as_playlist_replace_body">Om du spelar upp det här kommer det att ersätta din nuvarande ”Nästa”. Spara den som en spellista för att behålla den.</string>
     <string name="whats_new_message_page_progress">Sida %1$d av %2$d</string>
-    <string name="whats_new_poll_answered">Thanks for answering.</string>
+    <string name="whats_new_poll_answered">Tack för att du svarade.</string>
     <string name="whats_new_research_title">Användarundersökning</string>
-    <string name="whats_new_feed_unable_to_load">Det gick inte att ladda vad som är nytt</string>
     <string name="whats_new_feed_all_read">Alla meddelanden markerade som lästa</string>
-    <string name="whats_new_feed_read_all">Read all</string>
     <string name="whats_new_feed_unread">Oläst</string>
-    <string name="whats_new_feed_empty_description">Nya funktioner, tips och tillkännagivanden kommer att visas\u00A0här.</string>
+    <string name="whats_new_feed_unable_to_load">Det gick inte att hämta \"Vad är nytt\"</string>
+    <string name="whats_new_feed_read_all">Läs alla</string>
+    <string name="whats_new_feed_empty_description">Nya funktioner, tips och tillkännagivanden visas här.</string>
     <string name="whats_new_feed_empty_title">Inga meddelanden ännu</string>
-    <string name="whats_new_category_research">User Research</string>
-    <string name="whats_new_category_known_issue">Ett känt fel.</string>
-    <string name="whats_new_category_announcement">Meddelande</string>
-    <string name="whats_new_category_tip">Personalens tips och råd</string>
     <string name="whats_new_category_new_feature">Ny funktion</string>
+    <string name="whats_new_category_research">Användarundersökning</string>
+    <string name="whats_new_category_known_issue">Känt fel</string>
+    <string name="whats_new_category_announcement">Tillkännagivande</string>
+    <string name="whats_new_category_tip">Tips och råd</string>
     <string name="bookmark_title_label">Rubrik</string>
     <string name="bookmarks_deleted_undo">Ångra</string>
     <string name="device_approve_switch_account_confirm">Växla konto</string>
-    <string name="device_approve_switch_account_message">Detta loggar ut dig och tar bort podcasts, filter och lyssningshistorik på den här enheten.</string>
-    <string name="device_approve_switch_account_title">Växla konto</string>
     <string name="device_approve_switch_account">Inte du? Växla konto</string>
+    <string name="device_approve_switch_account_message">Denna åtgärd loggar ut dig och tar bort podcaster, filter och lyssningshistorik på den här enheten.</string>
+    <string name="device_approve_switch_account_title">Växla konto?</string>
     <string name="bookmark_edit_transcript_selection">Vald passage: %1$s</string>
-    <string name="removed_from_playlist_feedback">Ta bort från spellista</string>
-    <string name="bookmark_adding_transcript">Lägger till transkription …</string>
-    <string name="settings_app_icon_updated_message_v2">Det kan ta några minuter innan den här nya ikonen visas. Om din startskärmsgenväg försvinner lägger du till Pocket Casts igen från skärmen Alla dina appar.</string>
+    <string name="removed_from_playlist_feedback">Togs bort från spellista</string>
+    <string name="bookmark_adding_transcript">Lägger till kopia …</string>
+    <string name="settings_app_icon_updated_message_v2">Det kan ta några minuter innan den här nya ikonen visas. Lägg till Pocket Casts igen från skärmen med alla appar om genvägen på startskärmen försvinner.</string>
     <string name="go_to_episode">Gå till avsnitt</string>
-    <string name="smart_bookmarks_upsell_message">Ett tryck. Den heter och orden kommer med den.</string>
     <string name="smart_bookmarks_upsell_title">Spara de delar som är värda att behålla</string>
-    <string name="bookmarks_upgrade_example_passage">Det är du som skickar personen, inte CV:t.</string>
+    <string name="smart_bookmarks_upsell_message">Ett tryck. Namnet är satt, och orden följer med.</string>
+    <string name="bookmarks_upgrade_example_passage">Du väljer personen, inte CV:t.</string>
     <string name="bookmark_edit_transcript_title">Redigera transkription</string>
     <string name="bookmarks_upgrade_example_title">Provspelningsrummet</string>
     <string name="bookmark_suggestion_prefix">Förslag:</string>
@@ -46,11 +92,11 @@ Language: sv_SE
     <string name="bookmark_player_tip_message">Behåll den del du ville ha</string>
     <string name="bookmark_new_badge">Ny</string>
     <string name="bookmark_edit_transcript_subtitle">Välj en transkriptionspassage för detta bokmärke</string>
-    <string name="bookmark_create_failed">Kunde inte lägga till bokmärke</string>
+    <string name="bookmark_create_failed">Det gick inte att lägga till bokmärke</string>
     <string name="device_approve_title">Anslut din enhet</string>
-    <string name="log_in_with_code_error">Kunde inte hämta din inloggningskod</string>
-    <string name="log_in_with_code_instructions">Skanna QR-koden med din telefon eller gå till %1$s och ange denna kod</string>
-    <string name="log_in_with_code">Logga in med QR-kod</string>
+    <string name="log_in_with_code_error">Det gick inte att hämta din inloggningskod</string>
+    <string name="log_in_with_code_instructions">Skanna QR-koden med din telefon, eller gå till %1$s och ange den här koden</string>
+    <string name="log_in_with_code">Logga in med kod</string>
     <string name="search_filters_networks">Nätverk</string>
     <string name="discover_networks">Nätverk</string>
     <string name="discover_network">Nätverk</string>
@@ -2550,8 +2596,8 @@ Language: sv_SE
         <item quantity="other">Sekunder sparade</item>
     </plurals>
     <plurals name="removed_from_playlists">
-        <item quantity="one">Ta bort från spellista%d</item>
-        <item quantity="other">Ta bort från spellista%d</item>
+        <item quantity="one">Togs bort från %d spellista</item>
+        <item quantity="other">Togs bort från %d spellistor</item>
     </plurals>
     <plurals name="second">
         <item quantity="one">sekund</item>
