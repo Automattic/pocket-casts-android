@@ -16,6 +16,11 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 
 @OptIn(UnstableApi::class)
+/**
+ * Detects when a cache miss fetches a different build of the media (e.g. new dynamically inserted ads) than the
+ * cache holds, by comparing the served file size with the cached length. On a mismatch it evicts the stale cache
+ * and throws a [Cache.CacheException] so [CacheDataSource] retries straight from upstream.
+ */
 internal class CachedLengthValidatingDataSource(
     private val upstream: DataSource,
     private val cache: Cache,
