@@ -112,11 +112,11 @@ class CastManagerImpl @Inject constructor(
     private inner class CastSessionManagerListener : SessionManagerListener<Session> {
 
         override fun onSessionStarting(session: Session) {
-            Timber.i("Cast Session onSessionStarting")
+            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Cast session starting")
         }
 
         override fun onSessionStarted(session: Session, s: String) {
-            Timber.i("Cast Session onSessionStarted")
+            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Cast session started")
             eventHorizon.track(ChromecastStartedCastingEvent)
             sessionListener?.sessionStarted()
             _isConnectedFlow.value = true
@@ -125,25 +125,26 @@ class CastManagerImpl @Inject constructor(
         override fun onSessionStartFailed(session: Session, i: Int) {
             LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Cast session start failed with error code $i")
             sessionListener?.sessionFailed(i, CastManager.SessionFailureType.START)
+            _isConnectedFlow.value = getSessionManager()?.currentCastSession?.isConnected == true
         }
 
         override fun onSessionEnding(session: Session) {
-            Timber.i("Cast Session onSessionEnding")
+            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Cast session ending")
         }
 
         override fun onSessionEnded(session: Session, i: Int) {
-            Timber.i("Cast Session onSessionEnded")
+            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Cast session ended with error code $i")
             eventHorizon.track(ChromecastStoppedCastingEvent)
             sessionListener?.sessionEnded()
             _isConnectedFlow.value = false
         }
 
         override fun onSessionResuming(session: Session, s: String) {
-            Timber.i("Cast Session onSessionResuming")
+            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Cast session resuming")
         }
 
         override fun onSessionResumed(session: Session, b: Boolean) {
-            Timber.i("Cast Session onSessionResumed $sessionListener")
+            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Cast session resumed, was suspended: $b")
             sessionListener?.sessionReconnected()
             _isConnectedFlow.value = true
         }
@@ -151,10 +152,11 @@ class CastManagerImpl @Inject constructor(
         override fun onSessionResumeFailed(session: Session, i: Int) {
             LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Cast session resume failed with error code $i")
             sessionListener?.sessionFailed(i, CastManager.SessionFailureType.RESUME)
+            _isConnectedFlow.value = getSessionManager()?.currentCastSession?.isConnected == true
         }
 
         override fun onSessionSuspended(session: Session, i: Int) {
-            Timber.i("Cast Session onSessionSuspended")
+            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Cast session suspended with reason $i")
             _isConnectedFlow.value = false
         }
     }

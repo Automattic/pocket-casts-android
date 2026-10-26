@@ -128,6 +128,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -311,6 +312,7 @@ open class PlaybackManager @Inject constructor(
         val build: (PlaybackContentType) -> Trackable,
     )
     private val pendingContentTypeEvents = mutableListOf<PendingContentTypeEvent>()
+    private val castSessionEvents = Channel<suspend () -> Unit>(Channel.UNLIMITED)
 
     var player: Player?
         get() = _playerFlow.value
@@ -324,6 +326,12 @@ open class PlaybackManager @Inject constructor(
         upNextQueue.setupBlocking()
         mediaSessionManager.startObserving()
         val playbackManagerNetworkWatcher = playbackManagerNetworkWatcherFactory.create(::onSwitchedToMeteredConnection)
+
+        launch {
+            for (castSessionEvent in castSessionEvents) {
+                castSessionEvent()
+            }
+        }
 
         launch {
             updatePausedPlaybackState()
@@ -365,6 +373,7 @@ open class PlaybackManager @Inject constructor(
                             }
                         }
                     }
+                    castSessionEvents.trySend { releaseCastPlayerFromLostSession() }
                 }
             })
             playbackManagerNetworkWatcher.observeConnection()
@@ -1479,26 +1488,30 @@ open class PlaybackManager @Inject constructor(
     }
 
     fun castReconnected() {
-        launch(Dispatchers.Main) {
-            if (player != null) {
-                player?.stop()
-                player = null
+        castSessionEvents.trySend {
+            withContext(Dispatchers.Main) {
+                if (player != null) {
+                    player?.stop()
+                    player = null
+                }
+
+                player = playerManager.createCastPlayer(this@PlaybackManager::onPlayerEvent)
+                mediaSessionManager.installCastPlayer()
+                (player as? CastPlayer)?.updateFromRemoteIfRequired()
+                LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Cast reconnected. Creating media player of type CastPlayer")
+
+                setupUpdateTimer()
             }
-
-            player = playerManager.createCastPlayer(this@PlaybackManager::onPlayerEvent)
-            mediaSessionManager.installCastPlayer()
-            (player as? CastPlayer)?.updateFromRemoteIfRequired()
-            Timber.i("Cast reconnected. Creating media player of type CastPlayer")
-
-            setupUpdateTimer()
         }
     }
 
     fun castConnected() {
         upNextQueue.currentEpisode ?: return
         cancelPrefetchNextEpisode()
-        launch {
-            if (isPlayerSwitchRequired()) {
+        castSessionEvents.trySend {
+            val switchRequired = isPlayerSwitchRequired()
+            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Cast connected with ${player?.name} player, switch required: $switchRequired")
+            if (switchRequired) {
                 loadCurrentEpisode(true, sourceView = SourceView.CHROMECAST)
             }
         }
@@ -1506,7 +1519,7 @@ open class PlaybackManager @Inject constructor(
 
     fun castDisconnected() {
         upNextQueue.currentEpisode ?: return
-        launch {
+        castSessionEvents.trySend {
             updateCurrentPositionInDatabase()
 
             stop()
@@ -2126,12 +2139,25 @@ open class PlaybackManager @Inject constructor(
             forcePlayerSwitch = false
             return true
         }
-        // using Chrome Cast make sure the player is connected
-        return if (!castManager.isConnected()) {
-            player is CastPlayer
-        } else {
-            player is SimplePlayer
-        } // otherwise use the ExoPlayer
+        val castPlayer = player as? CastPlayer
+        return castPlayerSwitchRequired(
+            isCastConnected = castManager.isConnected(),
+            isCastPlayer = castPlayer != null,
+            isBoundToCurrentSession = castPlayer?.isBoundToCurrentSession() == true,
+        )
+    }
+
+    private suspend fun releaseCastPlayerFromLostSession() {
+        withContext(Dispatchers.Main) {
+            val castPlayer = player as? CastPlayer ?: return@withContext
+            if (!castPlayer.isBoundToCurrentSession()) {
+                LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Releasing Cast player from a lost Cast session")
+                cancelUpdateTimer()
+                cancelBufferUpdateTimer()
+                castPlayer.stop()
+                player = null
+            }
+        }
     }
 
     /**
@@ -2196,6 +2222,7 @@ open class PlaybackManager @Inject constructor(
         cancelUpdateTimer()
         cancelBufferUpdateTimer()
 
+        releaseCastPlayerFromLostSession()
         val currentPlayer = this.player
         val sameEpisode = currentPlayer != null && episode.uuid == currentPlayer.episodeUuid
 
@@ -3146,6 +3173,18 @@ internal enum class CastSessionFailureAction {
     Ignore,
     ShowToast,
     ShowToastAndError,
+}
+
+internal fun castPlayerSwitchRequired(
+    isCastConnected: Boolean,
+    isCastPlayer: Boolean,
+    isBoundToCurrentSession: Boolean,
+): Boolean {
+    return if (isCastConnected) {
+        !isCastPlayer || !isBoundToCurrentSession
+    } else {
+        isCastPlayer
+    }
 }
 
 internal fun castSessionFailureAction(
