@@ -1,11 +1,57 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-10-08 11:58:54+0000
+Translation-Revision-Date: 2026-10-20 11:57:30+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="chat_about_episode">聊聊 %1$s</string>
+    <string name="chat_now_playing_episode">正在播放 %1$s</string>
+    <string name="chat_undo">撤销</string>
+    <string name="chat_history_older">较旧</string>
+    <string name="chat_history_previous_7_days">前 7 天</string>
+    <string name="chat_history">聊天记录</string>
+    <string name="chat_deleted">聊天已删除</string>
+    <string name="chat_cleared">聊天已清除</string>
+    <string name="chat_offline_note">您处于离线状态。 连接后即可提问。</string>
+    <string name="chat_answering">正在回答</string>
+    <string name="chat_error_server_on_our_end">我们这边出了点问题。</string>
+    <string name="chat_not_sent_tap_to_retry">未发送。 轻点以重试。</string>
+    <string name="chat_feedback_send_failed">无法发送您的反馈。 检查您的连接。</string>
+    <string name="chat_feedback_sending">正在发送反馈</string>
+    <string name="chat_feedback_what_went_wrong">出现的问题</string>
+    <string name="chat_beta_sheet_sign_in">登录以尝试</string>
+    <string name="episode_chat_needs_transcript_message">“关于此剧集的提问”功能需要文字转录稿。 此剧集没有文字转录稿。</string>
+    <string name="onboarding_episode_chat_question_2">汇总一下主要要点？</string>
+    <string name="onboarding_episode_chat_answer">此剧集将探讨人工智能、健康和生产力。</string>
+    <string name="onboarding_episode_chat_question_1">有哪些关键议题？</string>
+    <string name="onboarding_episode_chat_title">“关于此剧集的提问”功能：</string>
+    <string name="chat_feedback_learn_more">了解更多</string>
+    <string name="chat_feedback_legal">提交即会将此对话与我们共享，以帮助改进聊天功能。</string>
+    <string name="chat_feedback_submit">提交反馈</string>
+    <string name="chat_feedback_details_hint">共享详细信息（可选）</string>
+    <string name="chat_feedback_reason_other">其他</string>
+    <string name="chat_feedback_reason_offensive">具有冒犯性</string>
+    <string name="chat_feedback_reason_out_of_date">过时了</string>
+    <string name="chat_feedback_reason_wrong_facts">弄错了事实</string>
+    <string name="chat_feedback_reason_not_interesting">没什么意思</string>
+    <string name="chat_rate_answer_bad">不良回复</string>
+    <string name="chat_rate_answer_good">良好回复</string>
+    <string name="chat_feedback_thank_you">感谢您的反馈</string>
+    <string name="chat_survey_yes">是！</string>
+    <string name="chat_survey_not_really">不太喜欢</string>
+    <string name="chat_survey_title">喜欢“关于此剧集的提问”吗？</string>
+    <string name="chat_ai_disclaimer">人工智能可能会出错，所以请务必再次核对。</string>
+    <string name="chat_suggestion_summarize">概述此剧集</string>
+    <string name="chat_welcome">欢迎就此剧集的任何问题提问。 或者从此处开始。</string>
+    <string name="chat_input_question_hint">提问…</string>
+    <string name="chat_beta_note">“关于此剧集的提问”功能处于测试阶段</string>
+    <string name="chat_beta_sheet_body">在测试期间，所有人都可以免费使用。 该功能稍后将作为 Plus 功能推出。</string>
+    <string name="chat_beta_sheet_title">“关于此剧集的提问”功能处于测试阶段</string>
+    <string name="episode_chat_tooltip_body">有什么问题尽管问。 它也在听呢。</string>
+    <string name="episode_chat_beta_badge">测试版</string>
+    <string name="episode_chat_shelf_title">“关于此剧集的提问”功能</string>
     <string name="manual_playlist_no_content_body_alternative">从您关注的播客中选择剧集。 或者在任意剧集上向左滑动，即可边浏览边添加。</string>
     <string name="manual_playlist_no_content_body">找到您喜欢的播客，然后在任意剧集上向左滑动即可添加。</string>
     <string name="settings_general_whats_new_unread_dot_summary">当有新的“最新动态”消息时，在个人资料上显示未读标记。</string>

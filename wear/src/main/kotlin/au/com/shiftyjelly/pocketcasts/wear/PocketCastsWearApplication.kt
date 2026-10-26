@@ -35,6 +35,7 @@ import java.util.concurrent.Executors
 import javax.inject.Inject
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -173,6 +174,8 @@ class PocketCastsWearApplication :
     override val workManagerConfiguration: Configuration
         get() = Configuration.Builder()
             .setWorkerFactory(workerFactory)
+            // Since WorkManager 2.10 CoroutineWorkers default to the executor below, where downloads starve them
+            .setWorkerCoroutineContext(Dispatchers.IO)
             .setExecutor(Executors.newFixedThreadPool(3))
             .setJobSchedulerJobIdRange(1000, 20000)
             .build()

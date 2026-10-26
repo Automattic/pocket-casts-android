@@ -6,6 +6,8 @@
 *   Bug Fixes
     *   Fix tapping the media player or a notification not opening the app after changing the app icon
         ([#6181](https://github.com/Automattic/pocket-casts-android/pull/6181))
+    *   Show a prompt to choose an episode in the car instead of "No Title" when the Up Next queue runs out
+        ([#6031](https://github.com/Automattic/pocket-casts-android/pull/6031))
     *   Fix the add button covering the last file on the Files screen
         ([#6192](https://github.com/Automattic/pocket-casts-android/pull/6192))
     *   Fix smart playlists in Android Automotive going empty when the car keeps the app running between drives
@@ -22,7 +24,12 @@
         ([#5329](https://github.com/Automattic/pocket-casts-android/pull/5329))
     *   Fix tapping a widget outside its controls not opening the app
         ([#6222](https://github.com/Automattic/pocket-casts-android/pull/6222))
-
+    *   Fix choosing a Cast device sometimes doing nothing after a previous Cast session was lost
+        ([#6226](https://github.com/Automattic/pocket-casts-android/pull/6226))
+    *   Let Up Next and other syncs run while episodes are downloading instead of waiting for the downloads to finish
+        ([#6220](https://github.com/Automattic/pocket-casts-android/pull/6220))
+    *   Fix Cast playback pausing by itself a couple of seconds after you start casting
+        ([#6227](https://github.com/Automattic/pocket-casts-android/pull/6227))
 
 8.23
 -----

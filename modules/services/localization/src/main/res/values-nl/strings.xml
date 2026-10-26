@@ -1,11 +1,57 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-10-08 15:57:44+0000
+Translation-Revision-Date: 2026-10-21 09:56:17+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="chat_about_episode">Chat over %1$s</string>
+    <string name="chat_undo">Ongedaan maken</string>
+    <string name="chat_history_older">Ouder</string>
+    <string name="chat_deleted">Chat verwijderd</string>
+    <string name="chat_cleared">Chat gewist</string>
+    <string name="chat_now_playing_episode">Bezig met afspelen  van %1$s</string>
+    <string name="chat_history_previous_7_days">Afgelopen 7 dagen</string>
+    <string name="chat_history">Chatgeschiedenis</string>
+    <string name="chat_offline_note">Je bent offline. Maak verbinding om een vraag te stellen.</string>
+    <string name="chat_feedback_send_failed">Je feedback kon niet verzonden worden. Controleer de verbinding</string>
+    <string name="chat_answering">Beantwoorden</string>
+    <string name="chat_error_server_on_our_end">Er is iets fout gegaan aan onze kant.</string>
+    <string name="chat_not_sent_tap_to_retry">Niet verzonden. Tik om het opnieuw te proberen.</string>
+    <string name="chat_beta_sheet_sign_in">Log in om het te proberen</string>
+    <string name="chat_feedback_sending">Feedback wordt verstuurd</string>
+    <string name="chat_feedback_what_went_wrong">Wat is er misgegaan</string>
+    <string name="episode_chat_needs_transcript_message">Vraag over deze aflevering die een transcriptie nodig heeft. Deze aflevering heeft geen transcript.</string>
+    <string name="onboarding_episode_chat_answer">Deze aflevering gaat over AI, gezondheid en productiviteit.</string>
+    <string name="onboarding_episode_chat_question_1">Wat zijn de belangrijkste onderwerpen?</string>
+    <string name="chat_feedback_learn_more">Meer informatie</string>
+    <string name="chat_feedback_legal">Indienen deelt dit gesprek met ons om de chat te helpen verbeteren.</string>
+    <string name="onboarding_episode_chat_question_2">De belangrijkste punten samenvatten?</string>
+    <string name="onboarding_episode_chat_title">Vraag over deze aflevering:</string>
+    <string name="chat_feedback_submit">Feedback indienen</string>
+    <string name="chat_feedback_details_hint">Details delen (optioneel)</string>
+    <string name="chat_feedback_reason_other">Overige</string>
+    <string name="chat_feedback_reason_offensive">Het is aanstootgevend</string>
+    <string name="chat_feedback_reason_out_of_date">Het is verouderd</string>
+    <string name="chat_feedback_reason_wrong_facts">De feiten kloppen niet</string>
+    <string name="chat_feedback_reason_not_interesting">Het was niet interessant</string>
+    <string name="chat_rate_answer_bad">Slechte respons</string>
+    <string name="chat_rate_answer_good">Goede respons</string>
+    <string name="chat_feedback_thank_you">Bedankt voor je feedback</string>
+    <string name="chat_survey_yes">Ja!</string>
+    <string name="chat_survey_not_really">Niet echt</string>
+    <string name="chat_ai_disclaimer">AI kan fouten maken, dus controleer het goed.</string>
+    <string name="chat_suggestion_summarize">Deze aflevering samenvatten</string>
+    <string name="chat_input_question_hint">Stel een vraag …</string>
+    <string name="chat_survey_title">Vind je het leuk om vragen te stellen over deze aflevering?</string>
+    <string name="chat_welcome">Vraag stellen over iets in deze aflevering. Of start hier.</string>
+    <string name="chat_beta_sheet_body">Gratis voor iedereen terwijl we het testen. Het wordt later een Plus-functie.</string>
+    <string name="episode_chat_tooltip_body">Vraag het wat je wilt. Hij luisterde ook.</string>
+    <string name="episode_chat_beta_badge">Bèta</string>
+    <string name="chat_beta_note">Vraag stellen over deze aflevering is in bèta</string>
+    <string name="chat_beta_sheet_title">Vraag stellen over deze aflevering is in bèta</string>
+    <string name="episode_chat_shelf_title">Vraag stellen over deze aflevering</string>
     <string name="manual_playlist_no_content_body_alternative">Kies afleveringen uit de podcasts die je volgt. Of veeg naar links bij elke aflevering om het toe te voegen terwijl je gaat.</string>
     <string name="manual_playlist_no_content_body">Zoek een podcast die je leuk vindt en veeg vervolgens naar links bij elke aflevering om deze toe te voegen.</string>
     <string name="settings_general_whats_new_unread_dot_summary">Toon een ongelezen punt op profiel wanneer er nieuwe Wat is nieuwe berichten zijn.</string>
@@ -21,24 +67,24 @@ Language: nl
     <string name="whats_new_feed_empty_description">Nieuwe functies, tips en aankondigingen worden hier weergegeven\u00A0.</string>
     <string name="whats_new_feed_empty_title">Nog geen berichten</string>
     <string name="whats_new_category_research">Gebruikersonderzoek</string>
-    <string name="whats_new_category_known_issue">bekende problemen</string>
     <string name="whats_new_category_announcement">Aankondiging</string>
-    <string name="whats_new_category_tip">Tips &amp; tricks van onze medewerkers</string>
     <string name="whats_new_category_new_feature">Nieuwe functie</string>
+    <string name="whats_new_category_known_issue">Bekend probleem</string>
+    <string name="whats_new_category_tip">Tips &amp; tricks</string>
     <string name="bookmark_title_label">Titel</string>
     <string name="bookmarks_deleted_undo">Ongedaan maken</string>
     <string name="device_approve_switch_account_confirm">Account wisselen</string>
     <string name="device_approve_switch_account_message">Dit meldt je af en verwijdert de podcasts, filters en luistergeschiedenis op dit apparaat.</string>
-    <string name="device_approve_switch_account_title">Account wisselen</string>
     <string name="device_approve_switch_account">Ben jij dit niet? Account wisselen</string>
+    <string name="device_approve_switch_account_title">Account wisselen?</string>
     <string name="bookmark_edit_transcript_selection">Geselecteerde passage: %1$s</string>
     <string name="removed_from_playlist_feedback">Verwijderen uit afspeellijst</string>
     <string name="bookmark_adding_transcript">Transcriptie toevoegen …</string>
     <string name="settings_app_icon_updated_message_v2">Het kan een paar minuten duren voordat dit nieuwe pictogram verschijnt. Als de snelkoppeling naar het startscherm verdwijnt, voeg je Pocket Casts opnieuw toe vanuit het scherm Alle apps.</string>
     <string name="go_to_episode">Ga naar aflevering</string>
-    <string name="smart_bookmarks_upsell_message">Eén tik. Het is genoemd, en de woorden komen ermee.</string>
     <string name="smart_bookmarks_upsell_title">Bewaar de onderdelen die je moet bewaren</string>
     <string name="bookmarks_upgrade_example_passage">Jij bent de persoon aan het casten, niet de cv.</string>
+    <string name="smart_bookmarks_upsell_message">Eén tik. Het is genoemd, en de woorden komen mee.</string>
     <string name="bookmark_edit_transcript_title">Transcriptie bewerken</string>
     <string name="bookmarks_upgrade_example_title">De auditieruimte</string>
     <string name="bookmark_suggestion_prefix">Suggestie:</string>
@@ -50,7 +96,7 @@ Language: nl
     <string name="device_approve_title">Verbind je apparaat</string>
     <string name="log_in_with_code_error">Kon je inlogcode niet ophalen</string>
     <string name="log_in_with_code_instructions">Scan de QR-code met je telefoon of ga naar %1$s en voer deze code in</string>
-    <string name="log_in_with_code">Inloggen met QR-code.</string>
+    <string name="log_in_with_code">Inloggen met code</string>
     <string name="search_filters_networks">Netwerken</string>
     <string name="discover_networks">Netwerken</string>
     <string name="discover_network">Netwerk</string>
@@ -2429,8 +2475,8 @@ Language: nl
         <item quantity="other">Toevoegen aan %d playlists</item>
     </plurals>
     <plurals name="changed_playlists">
-        <item quantity="one">Gewijzigde %d afspeellijst</item>
-        <item quantity="other">Gewijzigde %d afspeellijsten</item>
+        <item quantity="one">%d afspeellijst gewijzigd</item>
+        <item quantity="other">%d afspeellijsten gewijzigd</item>
     </plurals>
     <plurals name="chapter">
         <item quantity="one">hoofdstuk</item>
@@ -2549,8 +2595,8 @@ Language: nl
         <item quantity="other">Seconden opgeslagen</item>
     </plurals>
     <plurals name="removed_from_playlists">
-        <item quantity="one">Verwijderen uit afspeellijst%d</item>
-        <item quantity="other">Verwijderen uit afspeellijst%d</item>
+        <item quantity="one">%d verwijderd uit afspeellijst</item>
+        <item quantity="other">%d verwijderd uit afspeellijsten</item>
     </plurals>
     <plurals name="second">
         <item quantity="one">seconde</item>

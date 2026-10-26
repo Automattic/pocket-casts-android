@@ -18,9 +18,11 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.MainThread
 import androidx.annotation.OptIn
 import androidx.annotation.VisibleForTesting
+import androidx.core.content.ContextCompat
 import androidx.core.content.IntentCompat
 import androidx.core.net.toUri
 import androidx.media.utils.MediaConstants.PLAYBACK_STATE_EXTRAS_KEY_MEDIA_ID
+import androidx.media3.common.MediaItem
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.CommandButton
 import androidx.media3.session.MediaLibraryService
@@ -68,6 +70,9 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -80,9 +85,16 @@ import kotlinx.coroutines.rx2.asObservable
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+
+enum class ForegroundStart {
+    Started,
+    Unconfirmed,
+    Refused,
+}
 
 class MediaSessionManager(
     val playbackManager: PlaybackManager,
@@ -100,6 +112,7 @@ class MediaSessionManager(
     companion object {
         const val EXTRA_TRANSIENT = "pocketcasts_transient_loss"
         const val ACTION_NOT_SUPPORTED = "action_not_supported"
+        const val ACTION_START_PLAYBACK_FOREGROUND = "au.com.shiftyjelly.pocketcasts.action.START_PLAYBACK_FOREGROUND"
 
         // These manufacturers have issues when the skip to next/previous track are missing from the media session.
         private val MANUFACTURERS_TO_HIDE_CUSTOM_SKIP_BUTTONS = listOf("mercedes-benz")
@@ -214,6 +227,16 @@ class MediaSessionManager(
 
     @Volatile
     private var forwardingPlayer: PocketCastsForwardingPlayer? = null
+
+    private val _isServiceForeground = MutableStateFlow(false)
+    val isServiceForeground: StateFlow<Boolean> = _isServiceForeground.asStateFlow()
+
+    fun setServiceForeground(foreground: Boolean) {
+        _isServiceForeground.value = foreground
+    }
+
+    @Volatile
+    var isSwitchingPlayer: Boolean = false
 
     @Volatile
     internal var media3Callback: Media3SessionCallback? = null
@@ -449,6 +472,9 @@ class MediaSessionManager(
         pendingPlayer = null
         castStatePlayer = null
         val swapped = currentPlayer.swapPlayer(exoPlayer)
+        if (swapped.currentMediaItem.mediaId == MediaItem.DEFAULT_MEDIA_ID) {
+            swapped.clearMetadata()
+        }
         forwardingPlayer = swapped
         media3Session?.player = swapped
         placeholderPlayer?.release()
@@ -464,7 +490,7 @@ class MediaSessionManager(
         if (currentPlayer.wrappedPlayer is SeedStatePlayer) return
         val seed = SeedStatePlayer(Looper.getMainLooper())
         val swapped = currentPlayer.swapPlayer(seed)
-        swapped.clearMetadata()
+        swapped.clearMetadata(title = context.getString(LR.string.automotive_nothing_playing_title))
         forwardingPlayer = swapped
         media3Session?.player = swapped
         placeholderPlayer?.release()
@@ -509,8 +535,7 @@ class MediaSessionManager(
                 }
             },
             onStop = {
-                val sourceView = media3RequestSource()
-                scope.launch { commandMutex.withLock { playbackManager.pauseSuspend(sourceView = sourceView) } }
+                LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Media3: ignoring stop while casting")
             },
         )
         castStatePlayer = player
@@ -628,28 +653,59 @@ class MediaSessionManager(
     }
 
     fun startServiceIfNeeded(context: Context) {
-        if (needsMedia3Session) {
-            if (media3Session != null) return
-        }
         val component = resolveMediaBrowserServiceComponent(context)
         if (component == null) {
             Timber.e("No enabled media browser service found in manifest")
             return
         }
+        if (needsMedia3Session && media3Session != null) return
         try {
             context.startService(Intent().setComponent(component))
         } catch (e: Exception) {
             LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Failed to start ${component.className}: $e")
-            errorReporter.trackServiceStartFailed(
-                service = if (component.className == LegacyPlaybackService::class.java.name) {
-                    PlaybackServiceType.Legacy
-                } else {
-                    PlaybackServiceType.Media3
-                },
-                error = e,
-                source = playbackManager.lastPlaybackSource,
-            )
+            trackServiceStartFailed(component, e)
         }
+    }
+
+    private fun trackServiceStartFailed(component: ComponentName, error: Throwable) {
+        errorReporter.trackServiceStartFailed(
+            service = if (component.className == LegacyPlaybackService::class.java.name) {
+                PlaybackServiceType.Legacy
+            } else {
+                PlaybackServiceType.Media3
+            },
+            error = error,
+            source = playbackManager.lastPlaybackSource,
+        )
+    }
+
+    private fun startServiceForeground(context: Context, component: ComponentName): ForegroundStart {
+        if (_isServiceForeground.value) return ForegroundStart.Started
+        val intent = Intent(ACTION_START_PLAYBACK_FOREGROUND).setComponent(component)
+        return try {
+            ContextCompat.startForegroundService(context, intent)
+            ForegroundStart.Unconfirmed
+        } catch (e: Exception) {
+            LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Failed to start foreground service ${component.className}: $e")
+            trackServiceStartFailed(component, e)
+            setServiceForeground(false)
+            ForegroundStart.Refused
+        }
+    }
+
+    suspend fun ensureForegroundServiceStarted(context: Context, timeoutMs: Long = 2000L): ForegroundStart {
+        if (_isServiceForeground.value) return ForegroundStart.Started
+        val component = resolveMediaBrowserServiceComponent(context)
+        if (component == null) {
+            Timber.e("No enabled media browser service found for foreground start")
+            return ForegroundStart.Unconfirmed
+        }
+        if (startServiceForeground(context, component) == ForegroundStart.Refused) return ForegroundStart.Refused
+        if (_isServiceForeground.value) return ForegroundStart.Started
+        return withTimeoutOrNull(timeoutMs) {
+            isServiceForeground.first { it }
+            ForegroundStart.Started
+        } ?: ForegroundStart.Unconfirmed
     }
 
     @OptIn(UnstableApi::class)
