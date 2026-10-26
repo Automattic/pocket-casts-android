@@ -52,6 +52,7 @@ class PrefetchWorker @AssistedInject constructor(
 
             return Result.success()
         } catch (exception: Exception) {
+            episodeUuid?.let { sourceFactory.discardMixedBuild(it, exception) }
             val errorMessage = "Failed to prefetch episode '$episodeUuid' for url '$downloadUrl' worker id: '$id'"
             Timber.tag(TAG).e(exception, errorMessage)
             LogBuffer.e(LogBuffer.TAG_PLAYBACK, exception, errorMessage)

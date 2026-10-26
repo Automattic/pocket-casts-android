@@ -68,6 +68,7 @@ class CacheWorker @AssistedInject constructor(
             val outputData = Data.Builder().putString(EPISODE_UUID_KEY, episodeUuid).build()
             return Result.success(outputData)
         } catch (exception: Exception) {
+            episodeUuid?.let { sourceFactory.discardMixedBuild(it, exception) }
             if (cancelledForCap) {
                 LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Caching stopped after reaching the $maxCacheBytes byte cap for episode id: $episodeUuid worker id: '$id'")
                 return Result.failure()

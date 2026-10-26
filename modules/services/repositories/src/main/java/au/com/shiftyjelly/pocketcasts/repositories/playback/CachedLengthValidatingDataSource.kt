@@ -15,12 +15,12 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 
-@OptIn(UnstableApi::class)
 /**
  * Detects when a cache miss fetches a different build of the media (e.g. new dynamically inserted ads) than the
  * cache holds, by comparing the served file size with the cached length. On a mismatch it evicts the stale cache
  * and throws a [Cache.CacheException] so [CacheDataSource] retries straight from upstream.
  */
+@OptIn(UnstableApi::class)
 internal class CachedLengthValidatingDataSource(
     private val upstream: DataSource,
     private val cache: Cache,
@@ -47,7 +47,7 @@ internal class CachedLengthValidatingDataSource(
         }
         val cachedLength = ContentMetadata.getContentLength(cache.getContentMetadata(key))
         when (cachedLength) {
-            C.LENGTH_UNSET.toLong() -> storeLength(key, servedLength)
+            C.LENGTH_UNSET.toLong() -> cache.storeContentLength(key, servedLength)
 
             servedLength -> Unit
 
@@ -55,7 +55,7 @@ internal class CachedLengthValidatingDataSource(
                 mediaBuildChanged = true
                 upstream.close()
                 cache.removeResource(key)
-                storeLength(key, servedLength)
+                cache.storeContentLength(key, servedLength)
                 val message = "Media for '$key' changed length from $cachedLength to $servedLength bytes"
                 LogBuffer.i(LogBuffer.TAG_PLAYBACK, message)
                 throw MediaBuildChangedException(message)
@@ -111,12 +111,6 @@ internal class CachedLengthValidatingDataSource(
             ?.firstOrNull()
     }
 
-    private fun storeLength(key: String, length: Long) {
-        val mutations = ContentMetadataMutations()
-        ContentMetadataMutations.setContentLength(mutations, length)
-        cache.applyContentMetadataMutations(key, mutations)
-    }
-
     class Factory(
         private val upstreamFactory: DataSource.Factory,
         private val cache: Cache,
@@ -130,3 +124,20 @@ internal class CachedLengthValidatingDataSource(
 
 @OptIn(UnstableApi::class)
 internal class MediaBuildChangedException(message: String) : Cache.CacheException(message)
+
+internal fun Cache.discardMixedBuild(key: String, error: Throwable) {
+    if (generateSequence(error) { it.cause }.none { it is MediaBuildChangedException }) {
+        return
+    }
+    val length = ContentMetadata.getContentLength(getContentMetadata(key))
+    removeResource(key)
+    if (length != C.LENGTH_UNSET.toLong()) {
+        storeContentLength(key, length)
+    }
+}
+
+private fun Cache.storeContentLength(key: String, length: Long) {
+    val mutations = ContentMetadataMutations()
+    ContentMetadataMutations.setContentLength(mutations, length)
+    applyContentMetadataMutations(key, mutations)
+}

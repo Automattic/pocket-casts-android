@@ -88,6 +88,10 @@ class ExoPlayerDataSourceFactory @Inject constructor(
 
     val upstreamFactory: DataSource.Factory get() = defaultFactory
 
+    fun discardMixedBuild(cacheKey: String, error: Throwable) {
+        cache?.discardMixedBuild(cacheKey, error)
+    }
+
     fun cachedLengthAt(cacheKey: String, position: Long, length: Long): Long = cache?.getCachedLength(cacheKey, position, length) ?: -1L
 
     fun createMediaSource(

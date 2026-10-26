@@ -14,6 +14,7 @@ import androidx.media3.datasource.cache.SimpleCache
 import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import java.io.IOException
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertThrows
@@ -250,6 +251,28 @@ class CachedLengthValidatingDataSourceTest {
         .setPosition(position)
         .setLength(length)
         .build()
+
+    @Test
+    fun `discards a mixed build and keeps the stored length`() {
+        storeCachedLength(900)
+        cacheBytes(position = 0, length = 400)
+
+        cache.discardMixedBuild(KEY, IOException(MediaBuildChangedException("changed")))
+
+        assertEquals(0L, cache.getCachedBytes(KEY, 0, 400))
+        assertEquals(900L, cachedLength())
+    }
+
+    @Test
+    fun `keeps the cache when the error is not a build change`() {
+        storeCachedLength(900)
+        cacheBytes(position = 0, length = 400)
+
+        cache.discardMixedBuild(KEY, IOException("network"))
+
+        assertEquals(400L, cache.getCachedBytes(KEY, 0, 400))
+        assertEquals(900L, cachedLength())
+    }
 
     private fun storeCachedLength(length: Long) {
         val mutations = ContentMetadataMutations()
