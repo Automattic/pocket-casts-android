@@ -14,10 +14,17 @@ class SwipeRowState internal constructor(
     internal val draggableState: AnchoredDraggableState<SwipeRowAnchor>,
     private val scope: CoroutineScope,
 ) {
-    val isOpen get() = draggableState.targetValue != SwipeRowAnchor.Resting
+    internal var controller: SwipeRowController? = null
+
+    val isOpen get() = controller?.isOpen ?: (draggableState.targetValue != SwipeRowAnchor.Resting)
 
     fun settle() {
-        scope.launch { settleAndWait() }
+        val controller = controller
+        if (controller != null) {
+            controller.settle()
+        } else {
+            scope.launch { settleAndWait() }
+        }
     }
 
     internal suspend fun settleAndWait() {
