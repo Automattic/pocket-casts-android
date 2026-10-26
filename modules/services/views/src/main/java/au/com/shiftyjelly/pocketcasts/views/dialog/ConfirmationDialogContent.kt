@@ -181,7 +181,7 @@ private fun DialogButton(
                 .shadow(elevation, shape)
                 .background(backgroundColor, shape)
                 .then(if (border != null) Modifier.border(border, shape) else Modifier)
-                .indication(interactionSource, ripple()),
+                .indication(interactionSource, ripple(color = textColor)),
         )
         Text(
             text = text,
