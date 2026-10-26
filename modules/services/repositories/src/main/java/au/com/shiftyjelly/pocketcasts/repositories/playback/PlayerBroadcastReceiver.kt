@@ -89,7 +89,7 @@ class PlayerBroadcastReceiver : BroadcastReceiver() {
 }
 
 internal fun PlaybackManager.onPlaybackNotificationDismissed(sourceView: SourceView) {
-    if (isPlaying() || playbackStateRelay.blockingFirst().transientLoss) {
+    if (mediaSessionManager.isServiceForeground.value) {
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Playback notification removed while in the foreground, not pausing")
     } else {
         pause(sourceView = sourceView)

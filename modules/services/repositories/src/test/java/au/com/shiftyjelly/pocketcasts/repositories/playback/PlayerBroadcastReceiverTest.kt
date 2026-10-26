@@ -2,10 +2,9 @@ package au.com.shiftyjelly.pocketcasts.repositories.playback
 
 import android.content.Intent
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
-import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState.State
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlayerBroadcastReceiver.Companion.INTENT_ACTION_SKIP_FORWARD
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlayerBroadcastReceiver.Companion.INTENT_EXTRA_SECONDS
-import com.jakewharton.rxrelay2.BehaviorRelay
+import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
@@ -63,8 +62,8 @@ class PlayerBroadcastReceiverTest {
     }
 
     @Test
-    fun `notification dismissal while playing does not pause`() {
-        val playbackManager = playbackManager(isPlaying = true)
+    fun `notification dismissal while the service is in the foreground does not pause`() {
+        val playbackManager = playbackManager(isServiceForeground = true)
 
         playbackManager.onPlaybackNotificationDismissed(SourceView.PLAYER_BROADCAST_ACTION)
 
@@ -72,28 +71,20 @@ class PlayerBroadcastReceiverTest {
     }
 
     @Test
-    fun `notification dismissal while not playing pauses`() {
-        val playbackManager = playbackManager(isPlaying = false)
+    fun `notification dismissal while the service is not in the foreground pauses`() {
+        val playbackManager = playbackManager(isServiceForeground = false)
 
         playbackManager.onPlaybackNotificationDismissed(SourceView.PLAYER_BROADCAST_ACTION)
 
         verify(playbackManager).pause(sourceView = SourceView.PLAYER_BROADCAST_ACTION)
     }
 
-    @Test
-    fun `notification dismissal during a transient focus loss does not pause`() {
-        val playbackManager = playbackManager(isPlaying = false, transientLoss = true)
-
-        playbackManager.onPlaybackNotificationDismissed(SourceView.PLAYER_BROADCAST_ACTION)
-
-        verify(playbackManager, never()).pause(any(), any())
-    }
-
-    private fun playbackManager(isPlaying: Boolean, transientLoss: Boolean = false): PlaybackManager {
-        val state = PlaybackState(state = if (isPlaying) State.PLAYING else State.PAUSED, transientLoss = transientLoss)
+    private fun playbackManager(isServiceForeground: Boolean): PlaybackManager {
+        val mediaSessionManager = mock<MediaSessionManager> {
+            on { this.isServiceForeground } doReturn MutableStateFlow(isServiceForeground)
+        }
         return mock {
-            on { isPlaying() } doReturn isPlaying
-            on { playbackStateRelay } doReturn BehaviorRelay.createDefault(state)
+            on { this.mediaSessionManager } doReturn mediaSessionManager
         }
     }
 
