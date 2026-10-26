@@ -18,8 +18,16 @@ fun Duration.toHhMmSs() = buildString {
 }
 
 fun Duration.toSecondsWithSingleMilli() = toComponents { hours, minutes, seconds, nanoseconds ->
-    val totalSeconds = hours * 3600 + minutes * 60 + seconds
-    val milliseconds = (nanoseconds + 50_000_000) / 100_000_000
+    var totalSeconds = hours * 3600 + minutes * 60 + seconds
+    var milliseconds = (nanoseconds + 50_000_000) / 100_000_000
+    // Rounding nanoseconds to one decimal digit can itself round up to 10
+    // (e.g. 950ms+ rounds to "10"), which would otherwise be emitted
+    // verbatim as a bogus two-digit fraction like "1.10". Carry that into
+    // the whole-seconds part instead, same as a normal round-up.
+    if (milliseconds == 10) {
+        totalSeconds += 1
+        milliseconds = 0
+    }
     buildString {
         append(totalSeconds)
         if (milliseconds != 0) {
