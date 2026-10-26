@@ -18,7 +18,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -59,7 +58,7 @@ fun EpisodePlayButton(
     fromListUuid: String? = null,
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
-    var isMenuExpanded by rememberSaveable { mutableStateOf(false) }
+    var isMenuExpanded by remember { mutableStateOf(false) }
     val buttonColor = if (buttonType == PlayButtonType.PLAYED) MaterialTheme.theme.colors.primaryIcon02 else tint
     val topPadding = with(LocalDensity.current) { 1.dp.toPx().toInt().toDp() }
     Box(
