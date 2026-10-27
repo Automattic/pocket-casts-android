@@ -883,9 +883,48 @@ class ChatViewModelTest {
                 podcastUuid = PODCAST_UUID,
                 rating = EpisodeChatSentimentType.Negative,
                 messageIndex = 2,
+                question = "Q2",
+                answer = "A2",
             ),
             eventSink.pollEvent(),
         )
+    }
+
+    @Test
+    fun `rating an answer with a quote tracks the quote with the answer`() = runTest {
+        chatManager.messages.value = listOf(
+            ChatMessage.User("Q1", uuid = "q1"),
+            ChatMessage.Assistant("A1", uuid = "a1"),
+            ChatMessage.Quote(text = "Quote", start = "1:00", end = "1:10", uuid = "a1-quote"),
+            ChatMessage.User("Q2", uuid = "q2"),
+            ChatMessage.Assistant("A2", uuid = "a2"),
+        )
+        setEpisodeInfo()
+        advanceUntilIdle()
+        eventSink.skipEvent()
+
+        viewModel.rateAnswer("a1", ChatAnswerRating.Negative)
+
+        val event = eventSink.pollEvent() as EpisodeChatResponseRatedEvent
+        assertEquals("Q1", event.question)
+        assertEquals("A1\n\nQuote", event.answer)
+    }
+
+    @Test
+    fun `rating an answer truncates the tracked question and answer`() = runTest {
+        chatManager.messages.value = listOf(
+            ChatMessage.User("q".repeat(1_500), uuid = "q1"),
+            ChatMessage.Assistant("a".repeat(1_500), uuid = "a1"),
+        )
+        setEpisodeInfo()
+        advanceUntilIdle()
+        eventSink.skipEvent()
+
+        viewModel.rateAnswer("a1", ChatAnswerRating.Positive)
+
+        val event = eventSink.pollEvent() as EpisodeChatResponseRatedEvent
+        assertEquals("q".repeat(1_000), event.question)
+        assertEquals("a".repeat(1_000), event.answer)
     }
 
     @Test
@@ -934,6 +973,8 @@ class ChatViewModelTest {
                 rating = EpisodeChatSentimentType.Negative,
                 messageIndex = 1,
                 previousRating = EpisodeChatSentimentType.Positive,
+                question = "Q1",
+                answer = "A1",
             ),
             eventSink.pollEvent(),
         )
