@@ -63,6 +63,7 @@ dependencies {
     implementation(libs.fragment.compose)
     implementation(libs.fragment.ktx)
     implementation(libs.lifecycle.reactivestreams.ktx)
+    implementation(libs.lifecycle.runtime.compose)
     implementation(libs.okhttp)
     implementation(libs.rx2.android)
     implementation(libs.rx2.kotlin)
