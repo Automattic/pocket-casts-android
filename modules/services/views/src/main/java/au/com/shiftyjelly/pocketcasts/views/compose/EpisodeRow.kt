@@ -168,7 +168,7 @@ internal fun EpisodeRow(
     }
 }
 
-private fun EpisodeRowTrailing.content(
+internal fun EpisodeRowTrailing.content(
     episode: BaseEpisode,
     buttonType: PlayButtonType,
     colors: EpisodeRowColors,
