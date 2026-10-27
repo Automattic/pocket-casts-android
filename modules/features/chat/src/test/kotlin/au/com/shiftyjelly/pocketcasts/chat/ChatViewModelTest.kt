@@ -528,7 +528,8 @@ class ChatViewModelTest {
         )
 
         assertEquals(emptyList<String>(), ChatUiState(messages = answered, isAwaitingReply = true).followUps)
-        assertEquals(emptyList<String>(), ChatUiState(messages = answered + ChatMessage.User(text = "Q2", uuid = "q2")).followUps)
+        val unanswered = answered + ChatMessage.User(text = "Q2", uuid = "q2")
+        assertEquals(emptyList<String>(), ChatUiState(messages = unanswered).followUps)
     }
 
     @Test
