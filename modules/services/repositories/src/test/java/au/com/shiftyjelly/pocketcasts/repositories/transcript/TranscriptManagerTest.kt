@@ -20,6 +20,7 @@ import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.advanceTimeBy
@@ -226,6 +227,17 @@ class TranscriptManagerTest {
         val transcript = transcriptManager.loadTranscript("episode-id")!!
 
         assertFalse(transcript.isGenerated)
+    }
+
+    @Test
+    fun `generated transcript is available only when one is stored`() = runTest {
+        localTranscriptsFlow.value = listOf(vttDbTranscript)
+
+        assertFalse(transcriptManager.observeIsGeneratedTranscriptAvailable("episode-id").first())
+
+        localTranscriptsFlow.value = listOf(vttDbTranscript, generatedVttTranscript)
+
+        assertTrue(transcriptManager.observeIsGeneratedTranscriptAvailable("episode-id").first())
     }
 
     @Test

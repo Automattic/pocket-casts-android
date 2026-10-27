@@ -184,15 +184,23 @@ class ShelfSharedViewModel @Inject constructor(
                         uiState.map { state ->
                             val isTranscriptButtonVisible = (ShelfItem.Transcript in state.playerShelfItems) ||
                                 (isOverflowMenuOpen && ShelfItem.Transcript in state.playerBottomSheetShelfItems)
-                            val needsTranscript = isTranscriptButtonVisible || ShelfItem.EpisodeChat in state.shelfItems
-                            (state.episode as? PodcastEpisode)?.takeIf { needsTranscript }
+                            val needsGeneratedTranscript = ShelfItem.EpisodeChat in state.shelfItems
+                            val needsTranscript = isTranscriptButtonVisible || needsGeneratedTranscript
+                            (state.episode as? PodcastEpisode)
+                                ?.takeIf { needsTranscript }
+                                ?.let { episode -> episode to needsGeneratedTranscript }
                         }
                     }
                 }
-                .distinctUntilChangedBy { it?.uuid }
-                .collect { episode ->
-                    if (episode == null) return@collect
-                    if (transcriptManager.observeIsTranscriptAvailable(episode.uuid).first()) return@collect
+                .distinctUntilChangedBy { it?.first?.uuid }
+                .collect { request ->
+                    val (episode, needsGeneratedTranscript) = request ?: return@collect
+                    val availability = if (needsGeneratedTranscript) {
+                        transcriptManager.observeIsGeneratedTranscriptAvailable(episode.uuid)
+                    } else {
+                        transcriptManager.observeIsTranscriptAvailable(episode.uuid)
+                    }
+                    if (availability.first()) return@collect
                     showNotesManager.loadShowNotes(podcastUuid = episode.podcastUuid, episodeUuid = episode.uuid)
                 }
         }

@@ -557,6 +557,35 @@ class ShelfSharedViewModelTest {
     }
 
     @Test
+    fun `given episode chat enabled and only an author transcript, when player opened, then show notes are loaded`() = runTest {
+        initViewModel(
+            currentEpisode = transcriptEpisode,
+            shelfItems = transcriptInOverflowItems,
+            isTranscriptAvailable = true,
+            isGeneratedTranscriptAvailable = false,
+            isEpisodeChatEnabled = true,
+        )
+
+        shelfSharedViewModel.setPlayerOpen(true)
+
+        verify(showNotesManager).loadShowNotes(podcastUuid = "podcastUuid", episodeUuid = "episodeUuid")
+    }
+
+    @Test
+    fun `given episode chat enabled and a generated transcript, when player opened, then show notes are not loaded`() = runTest {
+        initViewModel(
+            currentEpisode = transcriptEpisode,
+            shelfItems = transcriptInOverflowItems,
+            isTranscriptAvailable = true,
+            isEpisodeChatEnabled = true,
+        )
+
+        shelfSharedViewModel.setPlayerOpen(true)
+
+        verify(showNotesManager, never()).loadShowNotes(any(), any())
+    }
+
+    @Test
     fun `given paid user, when episode chat clicked, then chat is shown`() = runTest {
         initViewModel(subscription = plusSubscription)
         val podcast = Podcast(uuid = "podcastUuid")
