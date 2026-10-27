@@ -83,9 +83,11 @@ internal fun ChatMessage.toEntity(
 ): EpisodeChatMessage {
     val (text, metadata) = when (this) {
         is ChatMessage.User -> text to userMetadataAdapter.toJsonOrNull(this)
+
         is ChatMessage.Assistant -> text to followUps.takeIf { it.isNotEmpty() }?.let {
             assistantMetadataAdapter.toJson(AssistantMessageMetadata(followUps = it))
         }
+
         is ChatMessage.Quote -> text to quoteMetadataAdapter.toJson(QuoteMetadata(start, end, isFromGeneratedTranscript))
     }
     return EpisodeChatMessage(

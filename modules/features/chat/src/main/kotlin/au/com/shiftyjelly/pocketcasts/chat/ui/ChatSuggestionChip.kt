@@ -2,11 +2,14 @@ package au.com.shiftyjelly.pocketcasts.chat.ui
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -66,6 +69,33 @@ internal fun ChatWelcome(
                         )
                     }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+internal fun ChatFollowUps(
+    followUps: List<String>,
+    isSuggestionEnabled: Boolean,
+    onClickSuggestion: (String, ChatInputType) -> Unit,
+    theme: ChatTheme,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = modifier
+            .fillMaxWidth()
+            .horizontalScroll(rememberScrollState()),
+    ) {
+        followUps.forEach { followUp ->
+            key(followUp) {
+                ChatSuggestionChip(
+                    text = followUp,
+                    enabled = isSuggestionEnabled,
+                    onClick = { onClickSuggestion(followUp, ChatInputType.FollowUp) },
+                    theme = theme,
+                )
             }
         }
     }
