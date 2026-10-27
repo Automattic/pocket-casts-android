@@ -27,6 +27,10 @@ internal fun List<ChatMessage>.ratedAnswer(answerUuid: String): ChatRatedAnswer?
     )
 }
 
-internal fun String.truncatedForAnalytics() = take(MAX_ANALYTICS_TEXT_LENGTH)
+internal fun String.truncatedForAnalytics(): String {
+    if (length <= MAX_ANALYTICS_TEXT_LENGTH) return this
+    val end = if (this[MAX_ANALYTICS_TEXT_LENGTH - 1].isHighSurrogate()) MAX_ANALYTICS_TEXT_LENGTH - 1 else MAX_ANALYTICS_TEXT_LENGTH
+    return substring(0, end)
+}
 
 private const val MAX_ANALYTICS_TEXT_LENGTH = 1000
