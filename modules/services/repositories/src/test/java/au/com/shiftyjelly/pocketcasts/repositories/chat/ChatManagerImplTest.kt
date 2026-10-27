@@ -117,7 +117,7 @@ class ChatManagerImplTest {
         val quoteMessage = episodeChatDao.messages[2]
         assertEquals("Quoted text", quoteMessage.text)
         assertEquals(ChatRole.Quote.value, quoteMessage.role)
-        val quote = listOf(quoteMessage).toChatMessages(quoteAdapter(), userAdapter()).single() as ChatMessage.Quote
+        val quote = listOf(quoteMessage).toChatMessages(quoteAdapter(), userAdapter(), assistantAdapter()).single() as ChatMessage.Quote
         assertEquals("Quoted text", quote.text)
         assertEquals("00:00:01", quote.start)
         assertEquals("00:00:03", quote.end)
@@ -142,7 +142,7 @@ class ChatManagerImplTest {
             allMessages = emptyList(),
         )
 
-        val quote = episodeChatDao.messages.toChatMessages(quoteAdapter(), userAdapter()).filterIsInstance<ChatMessage.Quote>().single()
+        val quote = episodeChatDao.messages.toChatMessages(quoteAdapter(), userAdapter(), assistantAdapter()).filterIsInstance<ChatMessage.Quote>().single()
         assertEquals(true, quote.isFromGeneratedTranscript)
     }
 
@@ -156,10 +156,36 @@ class ChatManagerImplTest {
             metadata = """{"start":"00:00:01","end":"00:00:03"}""",
         )
 
-        val quote = listOf(entity).toChatMessages(quoteAdapter(), userAdapter()).single() as ChatMessage.Quote
+        val quote = listOf(entity).toChatMessages(quoteAdapter(), userAdapter(), assistantAdapter()).single() as ChatMessage.Quote
 
         assertEquals(1_000, quote.startMs)
         assertEquals(false, quote.isFromGeneratedTranscript)
+    }
+
+    @Test
+    fun `send message stores the follow-up questions on the answer`() = runTest {
+        transcripts.value = listOf(createTranscript())
+        whenever(podcastCacheServiceManager.episodeChat(any(), any())).thenReturn(
+            EpisodeChatResponse(
+                reply = "Assistant reply",
+                quote = null,
+                suggestedQuestions = listOf(" Who is the guest? ", "", "What changed?", "What changed?"),
+            ),
+        )
+
+        manager.sendMessage(EPISODE_UUID, PODCAST_UUID, ChatMessage.User(text = "Question", uuid = "user-uuid"), emptyList())
+
+        val answer = manager.observeMessages(EPISODE_UUID).first().filterIsInstance<ChatMessage.Assistant>().single()
+        assertEquals(listOf("Who is the guest?", "What changed?"), answer.followUps)
+    }
+
+    @Test
+    fun `answers stored before follow-ups read without them`() = runTest {
+        episodeChatDao.messages += createMessage(uuid = "answer-uuid", episodeUuid = EPISODE_UUID, text = "Answer")
+
+        val answer = manager.observeMessages(EPISODE_UUID).first().single() as ChatMessage.Assistant
+
+        assertEquals(emptyList<String>(), answer.followUps)
     }
 
     @Test
@@ -425,6 +451,8 @@ class ChatManagerImplTest {
     private fun quoteAdapter() = Moshi.Builder().build().adapter(QuoteMetadata::class.java)
 
     private fun userAdapter() = Moshi.Builder().build().adapter(UserMessageMetadata::class.java)
+
+    private fun assistantAdapter() = Moshi.Builder().build().adapter(AssistantMessageMetadata::class.java)
 
     private class TestTokenHandler : TokenHandler {
         override suspend fun getAccessToken() = AccessToken("access-token")
