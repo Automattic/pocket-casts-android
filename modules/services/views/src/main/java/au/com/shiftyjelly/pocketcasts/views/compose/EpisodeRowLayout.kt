@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
@@ -104,6 +106,8 @@ internal class MultiSelectionTransition(isMultiSelecting: Boolean) {
     val progress = Animatable(if (isMultiSelecting) 1f else 0f)
     val checkboxAlpha = Animatable(if (isMultiSelecting) 1f else 0f)
     val trailingAlpha = Animatable(if (isMultiSelecting) 0f else 1f)
+    val isCheckboxShown by derivedStateOf { progress.value > 0f || checkboxAlpha.value > 0f }
+    val isTrailingShown by derivedStateOf { progress.value < 1f || trailingAlpha.value > 0f }
 
     suspend fun update(isMultiSelecting: Boolean, animate: Boolean) {
         val target = if (isMultiSelecting) 1f else 0f
@@ -159,9 +163,8 @@ internal fun EpisodeRowMainLayout(
     trailing: (@Composable () -> Unit)?,
     content: @Composable () -> Unit,
 ) {
-    val progress = transition.progress.value
-    val showCheckbox = checkbox != null && (progress > 0f || transition.checkboxAlpha.value > 0f)
-    val showTrailing = trailing != null && (progress < 1f || transition.trailingAlpha.value > 0f)
+    val showCheckbox = checkbox != null && transition.isCheckboxShown
+    val showTrailing = trailing != null && transition.isTrailingShown
     Layout(
         contents = listOf(
             { if (showCheckbox) Box(Modifier.graphicsLayer { alpha = transition.checkboxAlpha.value }, propagateMinConstraints = true) { checkbox() } else Unit },
@@ -170,6 +173,7 @@ internal fun EpisodeRowMainLayout(
             { if (showTrailing) Box(Modifier.graphicsLayer { alpha = transition.trailingAlpha.value }, propagateMinConstraints = true) { trailing() } else Unit },
         ),
     ) { (checkboxes, artworks, contents, trailings), constraints ->
+        val progress = transition.progress.value
         val width = constraints.maxWidth
         val margin = 16.dp.roundToPx()
         val verticalMargin = 12.dp.roundToPx()
