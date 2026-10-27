@@ -3,6 +3,8 @@
 *   Bug Fixes
     *   Fix Wear OS episode downloads not switching to WiFi
         ([#6100](https://github.com/Automattic/pocket-casts-android/pull/6100))
+    *   Fix a rare crash when tapping with two fingers while a screen is changing
+        ([#6107](https://github.com/Automattic/pocket-casts-android/pull/6107))
     *   Fix playback stopping right after it starts when another app removes the playback notification
         ([#6217](https://github.com/Automattic/pocket-casts-android/pull/6217))
 
