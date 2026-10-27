@@ -165,6 +165,11 @@ private fun StatusImage(
 }
 
 @Composable
+fun fileStatusText(data: UserEpisodeRowData, hideErrorDetails: Boolean = false): String {
+    return FileStatus.from(data, hideErrorDetails).text.resolve(data.episode)
+}
+
+@Composable
 private fun FileStatusText.resolve(episode: UserEpisode): String = when (this) {
     is FileStatusText.Raw -> text
     is FileStatusText.Resource -> if (progress == null) stringResource(id) else stringResource(id, progress)

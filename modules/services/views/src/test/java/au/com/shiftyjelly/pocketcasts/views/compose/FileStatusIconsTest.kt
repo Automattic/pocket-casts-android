@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeRowData
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import java.util.Date
+import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -22,6 +23,25 @@ class FileStatusIconsTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
+    private fun rowData(
+        downloadStatus: EpisodeDownloadStatus,
+        serverStatus: UserEpisodeServerStatus,
+        hasBookmarks: Boolean,
+    ) = UserEpisodeRowData(
+        episode = UserEpisode(
+            uuid = "uuid",
+            publishedDate = Date(),
+            duration = 3600.0,
+            downloadStatus = downloadStatus,
+            serverStatus = serverStatus,
+        ),
+        downloadProgress = 40,
+        uploadProgress = 50,
+        playbackState = PlaybackState(),
+        isInUpNext = false,
+        hasBookmarks = hasBookmarks,
+    )
+
     private fun setContent(
         downloadStatus: EpisodeDownloadStatus = EpisodeDownloadStatus.DownloadNotRequested,
         serverStatus: UserEpisodeServerStatus = UserEpisodeServerStatus.LOCAL,
@@ -29,23 +49,7 @@ class FileStatusIconsTest {
     ) {
         composeTestRule.setContent {
             AppTheme(Theme.ThemeType.LIGHT) {
-                FileStatusIcons(
-                    data = UserEpisodeRowData(
-                        episode = UserEpisode(
-                            uuid = "uuid",
-                            publishedDate = Date(),
-                            duration = 3600.0,
-                            downloadStatus = downloadStatus,
-                            serverStatus = serverStatus,
-                        ),
-                        downloadProgress = 40,
-                        uploadProgress = 50,
-                        playbackState = PlaybackState(),
-                        isInUpNext = false,
-                        hasBookmarks = hasBookmarks,
-                    ),
-                    tint = Color.Red,
-                )
+                FileStatusIcons(data = rowData(downloadStatus, serverStatus, hasBookmarks), tint = Color.Red)
             }
         }
     }
@@ -71,5 +75,15 @@ class FileStatusIconsTest {
 
         composeTestRule.onNodeWithText("Uploading… (50%)").assertExists()
         composeTestRule.onNodeWithContentDescription("Bookmarks").assertDoesNotExist()
+    }
+
+    @Test
+    fun `status text matches the shown text`() {
+        var statusText = ""
+        composeTestRule.setContent {
+            statusText = fileStatusText(rowData(EpisodeDownloadStatus.Downloading, UserEpisodeServerStatus.LOCAL, hasBookmarks = false))
+        }
+
+        assertEquals("Downloading… (40%)", statusText)
     }
 }
