@@ -75,7 +75,7 @@ fun EpisodeRow(
     colors: EpisodeRowColors = EpisodeRowDefaults.colors(),
 ) {
     key(episode.uuid) {
-        val rowDataFlow = remember { rowDataProvider.episodeRowDataFlow(episode.uuid) }
+        val rowDataFlow = remember(rowDataProvider) { rowDataProvider.episodeRowDataFlow(episode.uuid) }
         val rowData by rowDataFlow.collectAsStateWithLifecycle(initialValue = InitialRowData)
         EpisodeRow(
             episode = episode,
