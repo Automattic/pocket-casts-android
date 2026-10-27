@@ -5,6 +5,8 @@
         ([#6100](https://github.com/Automattic/pocket-casts-android/pull/6100))
     *   Fix a rare crash when tapping with two fingers while a screen is changing
         ([#6107](https://github.com/Automattic/pocket-casts-android/pull/6107))
+    *   Fix playback stopping right after it starts when another app removes the playback notification
+        ([#6217](https://github.com/Automattic/pocket-casts-android/pull/6217))
 
 
 8.24
@@ -41,6 +43,8 @@
         ([#6220](https://github.com/Automattic/pocket-casts-android/pull/6220))
     *   Fix Cast playback pausing by itself a couple of seconds after you start casting
         ([#6227](https://github.com/Automattic/pocket-casts-android/pull/6227))
+    *   Fix streamed episodes with dynamically inserted ads ending a little early, before the outro
+        ([#6213](https://github.com/Automattic/pocket-casts-android/pull/6213))
 
 8.23
 -----

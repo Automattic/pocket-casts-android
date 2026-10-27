@@ -1800,7 +1800,6 @@ Language: ru
     <string name="settings_notifications_new_episodes">Новые выпуски</string>
     <string name="settings_manage_downloads_include_starred">Включить избранное</string>
     <string name="settings_lock_image">блокировать изображение</string>
-    <string name="settings_licenses">Лицензии</string>
     <string name="settings_learn_more">Подробнее</string>
     <string name="settings_keep_screen_awake_summary">Если этот параметр включён, экран не будет блокироваться во время воспроизведения.</string>
     <string name="settings_keep_screen_awake">Не допускать блокировки экрана</string>
@@ -2268,7 +2267,6 @@ Language: ru
     <string name="podcasts_share_missing_title">Укажите заголовок для вашего списка.</string>
     <string name="podcasts_share_create_error">Ой, не удаётся поделиться</string>
     <string name="podcasts_share_title">Заголовок</string>
-    <string name="podcasts_share_selected_podcasts">Поделиться выбранными подкастами</string>
     <string name="podcasts_share_select_all">Выделить все</string>
     <string name="podcasts_share_list">Общий список</string>
     <string name="podcasts_share_description">Описание (необязательно)</string>
@@ -2313,10 +2311,8 @@ Language: ru
     <string name="player_sleep_60_minutes">1 час</string>
     <string name="player_sleep_30_minutes">30 минут</string>
     <string name="player_sleep_15_minutes">15 минут</string>
-    <string name="player_pip">Ввести «картинку в картинке»</string>
     <string name="player_notification_skip_forward">Вперед на %d с.</string>
     <string name="player_notification_skip_back">Назад на %d с.</string>
-    <string name="player_full_screen">Полноэкранный режим</string>
     <string name="player_effects_voices_sound_louder">Голоса звучат громче</string>
     <string name="player_effects_trim_level">Громкость в паузах</string>
     <string name="player_effects_speed_up">Быстрее</string>
@@ -2325,7 +2321,6 @@ Language: ru
     <string name="player_effects">Эффекты плеера</string>
     <string name="player_close">Закрыть плеер</string>
     <string name="player_chapter_url">URL-адрес главы</string>
-    <string name="player_actions">Действия в выпуске</string>
     <string name="player_action_previous_chapter">Предыдущая глава</string>
     <string name="player_action_next_chapter">Следующая глава</string>
     <string name="time_left">%s осталось</string>

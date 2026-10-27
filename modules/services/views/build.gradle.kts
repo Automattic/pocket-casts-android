@@ -13,6 +13,11 @@ android {
         viewBinding = true
         compose = true
     }
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
+    }
 }
 
 dependencies {
@@ -61,9 +66,12 @@ dependencies {
     implementation(libs.rx2.kotlin)
     implementation(libs.timber)
 
+    debugImplementation(libs.compose.ui.test.manifest)
+
     implementation(projects.modules.services.images)
     implementation(projects.modules.services.localization)
 
+    testImplementation(libs.compose.ui.test.junit)
     testImplementation(libs.coroutines.test)
     testImplementation(libs.junit)
     testImplementation(libs.mockito.core)

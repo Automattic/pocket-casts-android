@@ -501,7 +501,6 @@
     <string name="player_action_next_chapter">Next chapter</string>
     <string name="player_action_previous_chapter">Previous chapter</string>
     <string name="player_action_show_video">Show video</string>
-    <string name="player_actions">Episode actions</string>
     <string name="player_battery_warning_snackbar">Your battery restrictions may cause playback interruptions.</string>
     <string name="player_battery_warning_snackbar_action">update</string>
     <string name="player_chapter_url">Chapter URL</string>
@@ -521,13 +520,11 @@
     <string name="player_effects_voices_sound_louder">Voices sound louder</string>
     <string name="player_effects_volume_boost">Volume Boost</string>
     <string name="player_end_playback_clear_up_next">Close and clear Up Next</string>
-    <string name="player_full_screen">Full screen</string>
     <string name="player_more_actions">More actions</string>
     <string name="player_notification_skip_back">Back %d secs</string>
     <string name="player_notification_skip_back_seconds">Back %d seconds</string>
     <string name="player_notification_skip_forward">Forward %d secs</string>
     <string name="player_notification_skip_forward_seconds">Forward %d seconds</string>
-    <string name="player_pip">Enter Picture-in-picture</string>
     <string name="player_sleep_15_minutes">15 minutes</string>
     <string name="player_sleep_30_minutes">30 minutes</string>
     <string name="player_sleep_1_minute">1 minute</string>
@@ -676,7 +673,6 @@
     <string name="podcasts_share_failed">Sharing Failed</string>
     <string name="podcasts_share_failed_description">Something went wrong creating your share page.</string>
     <string name="podcasts_share_select_all">Select all</string>
-    <string name="podcasts_share_selected_podcasts">Share selected podcasts</string>
     <string name="podcasts_share_subscribe_to_all">FOLLOW ALL</string>
     <string name="podcasts_share_title">Title</string>
     <string name="podcasts_share_create_error">Oops unable to share</string>
@@ -1681,7 +1677,6 @@
     <string name="settings_keep_screen_awake">Keep screen awake</string>
     <string name="settings_keep_screen_awake_summary">If on, the screen won\'t lock while playing.</string>
     <string name="settings_learn_more">Learn More</string>
-    <string name="settings_licenses">Licenses</string>
     <string name="settings_lock_image">lock image</string>
     <string name="settings_manage_downloads_include_starred">Include starred</string>
     <string name="settings_manage_downloads_total">Total</string>

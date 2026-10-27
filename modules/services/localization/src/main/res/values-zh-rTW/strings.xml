@@ -1771,7 +1771,6 @@ Language: zh_TW
     <string name="settings_notification_actions">動作</string>
     <string name="settings_manage_downloads_include_starred">包括加星號項目</string>
     <string name="settings_lock_image">鎖定圖片</string>
-    <string name="settings_licenses">授權</string>
     <string name="settings_keep_screen_awake_summary">若啟用，播放時螢幕不會鎖定。</string>
     <string name="settings_keep_screen_awake">保持螢幕喚醒</string>
     <string name="settings_instagram">Instagram 連結</string>
@@ -2256,7 +2255,6 @@ Language: zh_TW
     <string name="podcasts_share_missing_title">請為清單輸入標題。</string>
     <string name="podcasts_share_create_error">糟糕，無法分享</string>
     <string name="podcasts_share_title">標題</string>
-    <string name="podcasts_share_selected_podcasts">分享選取的 Podcast</string>
     <string name="podcasts_share_select_all">全部選取</string>
     <string name="podcasts_share_list">已分享的清單</string>
     <string name="podcasts_share_description">說明 (選填)</string>
@@ -2297,10 +2295,8 @@ Language: zh_TW
     <string name="player_sleep_60_minutes">60 分鐘</string>
     <string name="player_sleep_30_minutes">30 分鐘</string>
     <string name="player_sleep_15_minutes">15 分鐘</string>
-    <string name="player_pip">進入子母畫面</string>
     <string name="player_notification_skip_forward">往前 %d 秒</string>
     <string name="player_notification_skip_back">倒退 %d 秒</string>
-    <string name="player_full_screen">全螢幕</string>
     <string name="player_effects_voices_sound_louder">音量更大聲</string>
     <string name="player_effects_trim_level">修剪等級</string>
     <string name="player_effects_speed_up">加速</string>
@@ -2308,7 +2304,6 @@ Language: zh_TW
     <string name="player_effects_speed">速度</string>
     <string name="player_effects">播放器效果</string>
     <string name="player_close">關閉播放器</string>
-    <string name="player_actions">單集動作</string>
     <string name="player_action_previous_chapter">上一節</string>
     <string name="player_action_next_chapter">下一節</string>
     <string name="time_left">剩下 %s</string>

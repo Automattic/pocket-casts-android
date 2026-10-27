@@ -1790,7 +1790,6 @@ Language: ar
     <string name="settings_manage_downloads_total">الإجمالي</string>
     <string name="settings_manage_downloads_include_starred">تضمين</string>
     <string name="settings_lock_image">lock image</string>
-    <string name="settings_licenses">التراخيص</string>
     <string name="settings_learn_more">أعرف أكثر</string>
     <string name="settings_keep_screen_awake_summary">إذا كان قيد التشغيل، فلن تقفل الشاشة في أثناء التشغيل.</string>
     <string name="settings_keep_screen_awake">إبقاء الشاشة نشطة</string>
@@ -2248,7 +2247,6 @@ Language: ar
     <string name="podcasts_share_missing_title">يرجى إدخال اسم لقائمتك.</string>
     <string name="podcasts_share_create_error">عذرًا، تتعذر المشاركة</string>
     <string name="podcasts_share_title">الاسم</string>
-    <string name="podcasts_share_selected_podcasts">مشاركة حلقات البث الصوتي المُحدَّدة</string>
     <string name="podcasts_share_select_all">تحديد الكل</string>
     <string name="podcasts_share_list">قائمة مشتركة</string>
     <string name="podcasts_share_description">الوصف (إختياري)</string>
@@ -2310,11 +2308,9 @@ Language: ar
     <string name="player_sleep_60_minutes">60 دقيقة</string>
     <string name="player_sleep_30_minutes">30 دقيقة</string>
     <string name="player_sleep_15_minutes">15 دقيقة</string>
-    <string name="player_pip">دخول صورة داخل صورة</string>
     <string name="player_notification_skip_forward">تقديم %d من الثواني</string>
     <string name="player_notification_skip_back">الرجوع %d من الثواني</string>
     <string name="player_more_actions">المزيد من الإجراءات</string>
-    <string name="player_full_screen">وضع ملء الشاشة</string>
     <string name="player_effects_volume_boost">تعزيز الصوت</string>
     <string name="player_effects_voices_sound_louder">تبدو الأصوات أعلى</string>
     <string name="player_effects_trim_silence">إزالة السكوت</string>
@@ -2328,7 +2324,6 @@ Language: ar
     <string name="player_effects">تأثيرات المُشغِّل</string>
     <string name="player_close">إغلاق المُشغِّل</string>
     <string name="player_chapter_url">عنوان URL الخاص بالفصل</string>
-    <string name="player_actions">أحداث الحلقة</string>
     <string name="player_action_previous_chapter">الفصل السابق</string>
     <string name="player_action_next_chapter">الفصل التالي</string>
     <string name="time_left">متبقي %s</string>

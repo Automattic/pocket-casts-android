@@ -1790,7 +1790,6 @@ Language: ca
     <string name="settings_notifications_new_episodes">Episodis nous</string>
     <string name="settings_logs">Registres</string>
     <string name="settings_lock_image">imatge de bloqueig</string>
-    <string name="settings_licenses">Llicències</string>
     <string name="settings_keep_screen_awake_summary">Si aquesta opció està activada, la pantalla no es bloquejarà mentre es reprodueixi alguna cosa.</string>
     <string name="settings_auto_archive_limit_1">1 episodi més recent</string>
     <string name="settings_auto_archive_inactive_never">Mai</string>
@@ -2239,7 +2238,6 @@ Language: ca
     <string name="podcasts_share_missing_title">Introdueix un títol per a la teva llista.</string>
     <string name="podcasts_share_create_error">Vaja, no s\'ha pogut compartir</string>
     <string name="podcasts_share_title">Títol</string>
-    <string name="podcasts_share_selected_podcasts">Comparteix els pòdcasts triats</string>
     <string name="podcasts_share_select_all">Selecciona-ho tot</string>
     <string name="podcasts_share_list">Llista compartida</string>
     <string name="podcasts_share_0_selected">0 triats</string>
@@ -2266,11 +2264,9 @@ Language: ca
     <string name="player_sleep_15_minutes">15 minuts</string>
     <string name="player_notification_skip_forward">Avançar %d segons</string>
     <string name="player_notification_skip_back">Endarrerir %d segons</string>
-    <string name="player_full_screen">Pantalla completa</string>
     <string name="player_effects_trim_level">Nivell de retall</string>
     <string name="player_effects">Efectes de reproducció</string>
     <string name="player_chapter_url">URL del capítol</string>
-    <string name="player_actions">Accions de l\'episodi</string>
     <string name="time_left">Queden %s</string>
     <string name="time_short_seconds">%ds</string>
     <string name="time_short_minutes">%dm</string>
@@ -2344,7 +2340,6 @@ Language: ca
     <string name="player_up_next_move_to_bottom">Mou al final</string>
     <string name="player_up_next_empty">No hi ha res a la cua de «Tot seguit»</string>
     <string name="player_up_next_clear_queue_button">Esborra la llista «Tot seguit»</string>
-    <string name="player_pip">Entra al mode Imatge sobre imatge (PiP)</string>
     <string name="player_effects_trim_silence">Retalla els silencis</string>
     <string name="player_effects_speed_up">Accelera</string>
     <string name="player_effects_speed_down">Alenteix</string>

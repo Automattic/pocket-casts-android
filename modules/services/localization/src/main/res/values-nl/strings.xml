@@ -1795,7 +1795,6 @@ Language: nl
     <string name="settings_notifications_new_episodes">Nieuwe afleveringen</string>
     <string name="settings_manage_downloads_include_starred">Favorieten toevoegen</string>
     <string name="settings_lock_image">afbeelding vergrendeling</string>
-    <string name="settings_licenses">Licenties</string>
     <string name="settings_learn_more">Meer weten</string>
     <string name="settings_keep_screen_awake_summary">Indien ingeschakeld, vergrendelt het scherm niet tijdens afspelen.</string>
     <string name="settings_keep_screen_awake">Scherm geactiveerd houden</string>
@@ -2267,7 +2266,6 @@ Language: nl
     <string name="podcasts_share_missing_title">Voer een titel in voor je lijst.</string>
     <string name="podcasts_share_create_error">Oeps, we kunnen dit niet delen</string>
     <string name="podcasts_share_title">Titel</string>
-    <string name="podcasts_share_selected_podcasts">Geselecteerde podcasts delen</string>
     <string name="podcasts_share_select_all">Alles selecteren</string>
     <string name="podcasts_share_list">Gedeelde lijst</string>
     <string name="podcasts_share_description">Beschrijving (optioneel)</string>
@@ -2310,10 +2308,8 @@ Language: nl
     <string name="player_sleep_60_minutes">60 minuten</string>
     <string name="player_sleep_30_minutes">30 minuten</string>
     <string name="player_sleep_15_minutes">15 minuten</string>
-    <string name="player_pip">Ga naar beeld-in-beeld</string>
     <string name="player_notification_skip_forward">%d seconden doorspoelen</string>
     <string name="player_notification_skip_back">%d seconden terugspoelen</string>
-    <string name="player_full_screen">Volledig scherm</string>
     <string name="player_effects_voices_sound_louder">Stemmen klinken luider</string>
     <string name="player_effects_trim_level">Niveau van wegfilteren</string>
     <string name="player_effects_speed_up">Versnellen</string>
@@ -2322,7 +2318,6 @@ Language: nl
     <string name="player_effects">Speler effecten</string>
     <string name="player_close">Speler sluiten</string>
     <string name="player_chapter_url">Hoofdstuk-URL</string>
-    <string name="player_actions">Acties aflevering</string>
     <string name="player_action_previous_chapter">Eerder hoofdstuk</string>
     <string name="player_action_next_chapter">Volgend hoofdstuk</string>
     <string name="time_left">%s over</string>

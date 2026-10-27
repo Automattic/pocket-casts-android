@@ -1797,7 +1797,6 @@ Language: sv_SE
     <string name="settings_notifications_new_episodes">Nya avsnitt</string>
     <string name="settings_manage_downloads_include_starred">Inkludera stjärnmärkta</string>
     <string name="settings_lock_image">lås bild</string>
-    <string name="settings_licenses">Licenser</string>
     <string name="settings_learn_more">Lär dig mer</string>
     <string name="settings_keep_screen_awake_summary">Om detta är aktiverat låses inte skärmen under uppspelning.</string>
     <string name="settings_keep_screen_awake">Håll skärmen vaken</string>
@@ -2260,7 +2259,6 @@ Language: sv_SE
     <string name="podcasts_share_via">Dela via</string>
     <string name="podcasts_share_missing_podcast">Välj minst en podcast.</string>
     <string name="podcasts_share_title">Rubrik</string>
-    <string name="podcasts_share_selected_podcasts">Dela valda podcasts</string>
     <string name="podcasts_share_select_all">Välj alla</string>
     <string name="podcasts_share_list">Delad lista</string>
     <string name="podcasts_share_description">Beskrivning (valfritt)</string>
@@ -2301,10 +2299,8 @@ Language: sv_SE
     <string name="player_sleep_60_minutes">60 minuter</string>
     <string name="player_sleep_30_minutes">30 minuter</string>
     <string name="player_sleep_15_minutes">15 minuter</string>
-    <string name="player_pip">Aktivera bild-i-bild </string>
     <string name="player_notification_skip_forward">Framåt %d sekunder</string>
     <string name="player_notification_skip_back">Bakåt %d sekunder</string>
-    <string name="player_full_screen">Fullskärm</string>
     <string name="player_effects_voices_sound_louder">Röster låter starkare</string>
     <string name="player_effects_trim_level">Trimningsnivå</string>
     <string name="player_effects_speed_up">Snabba upp</string>
@@ -2313,7 +2309,6 @@ Language: sv_SE
     <string name="player_effects">Spelareffekter</string>
     <string name="player_close">Stäng spelare</string>
     <string name="player_chapter_url">Kapitel-URL</string>
-    <string name="player_actions">Avsnittsåtgärder</string>
     <string name="player_action_previous_chapter">Föregående kapitel</string>
     <string name="player_action_next_chapter">Nästa kapitel</string>
     <string name="time_short_seconds">%ds</string>

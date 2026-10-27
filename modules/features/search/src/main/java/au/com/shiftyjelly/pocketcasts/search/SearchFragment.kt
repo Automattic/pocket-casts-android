@@ -31,7 +31,6 @@ import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
-import au.com.shiftyjelly.pocketcasts.models.to.EpisodeItem
 import au.com.shiftyjelly.pocketcasts.models.to.ImprovedSearchResultItem
 import au.com.shiftyjelly.pocketcasts.models.to.SearchHistoryEntry
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
@@ -368,10 +367,6 @@ class SearchFragment : BaseFragment() {
         }
     }
 
-    private fun onEpisodeClick(episodeItem: EpisodeItem) {
-        onEpisodeClick(SearchHistoryEntry.fromEpisode(episodeItem.toEpisode(), episodeItem.podcastTitle))
-    }
-
     private fun onEpisodeClick(episode: SearchHistoryEntry.Episode) {
         viewModel.trackSearchResultTapped(
             source = source,
@@ -400,10 +395,6 @@ class SearchFragment : BaseFragment() {
         searchHistoryViewModel.add(podcast)
         listener?.onSearchPodcastClick(podcast.uuid, SourceView.SEARCH)
         binding?.searchView?.let { UiUtil.hideKeyboard(it) }
-    }
-
-    private fun onSubscribeToPodcast(podcast: Podcast) {
-        viewModel.onSubscribeToPodcast(podcast)
     }
 
     private fun onFolderClick(folder: Folder, podcasts: List<Podcast>) {
