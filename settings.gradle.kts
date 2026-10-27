@@ -94,12 +94,13 @@ include(":modules:services:views")
 include(":modules:services:sharedtest")
 
 val developerProperties = loadPropertiesFromFile(File("${rootDir.path}/developer.properties"))
-val secretsFile = File("${rootDir.path}/secret.properties")
+val decryptedSecretsDir = File(System.getProperty("user.home"), ".configure/pocket-casts-android/secrets")
+val secretsFile = File(decryptedSecretsDir, "secret.properties")
 val secretProperties = loadPropertiesFromFile(secretsFile)
 val useRemoteBuildCacheLocally = "use_remote_build_cache_locally"
 
 gradle.extra["isCi"] = System.getenv("CI")?.toBoolean() ?: false
-gradle.extra["decryptedSecretsDir"] = File(System.getProperty("user.home"), ".configure/pocket-casts-android/secrets")
+gradle.extra["decryptedSecretsDir"] = decryptedSecretsDir
 gradle.extra["develocityToken"] = secretProperties.getProperty("develocityToken")
 gradle.extra["measureBuildsEnabled"] = secretProperties.getProperty("measureBuildsEnabled")
 
