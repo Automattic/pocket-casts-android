@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.graphics.createBitmap
+import androidx.core.graphics.withTranslation
 
 @Composable
 internal fun DrawableIcon(
@@ -58,12 +59,10 @@ internal fun FitCenterDrawableIcon(
                 drawable.setTintList(ColorStateList.valueOf(tint.toArgb()))
                 drawable.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
                 drawIntoCanvas { canvas ->
-                    val nativeCanvas = canvas.nativeCanvas
-                    val count = nativeCanvas.save()
-                    nativeCanvas.translate((size.width - drawable.intrinsicWidth * scale) / 2f, (size.height - drawable.intrinsicHeight * scale) / 2f)
-                    nativeCanvas.scale(scale, scale)
-                    drawable.draw(nativeCanvas)
-                    nativeCanvas.restoreToCount(count)
+                    canvas.nativeCanvas.withTranslation((size.width - drawable.intrinsicWidth * scale) / 2f, (size.height - drawable.intrinsicHeight * scale) / 2f) {
+                        scale(scale, scale)
+                        drawable.draw(this)
+                    }
                 }
             }
         },
