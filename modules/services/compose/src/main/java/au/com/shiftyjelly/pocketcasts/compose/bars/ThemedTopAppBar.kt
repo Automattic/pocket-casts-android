@@ -2,12 +2,16 @@
 
 package au.com.shiftyjelly.pocketcasts.compose.bars
 
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.animation.graphics.res.animatedVectorResource
 import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
 import androidx.compose.animation.graphics.vector.AnimatedImageVector
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
@@ -31,6 +35,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
+import au.com.shiftyjelly.pocketcasts.compose.text.TextViewAlignment
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -66,6 +72,11 @@ sealed interface NavigationButton {
         override val image get() = Icons.Default.Close
         override val contentDescription get() = LR.string.close
     }
+
+    data class Drawable(
+        @DrawableRes val drawableId: Int,
+        @StringRes override val contentDescription: Int,
+    ) : NavigationButton
 
     data class CloseBack(val isClose: Boolean) : Animated {
         @get:Composable
@@ -188,17 +199,31 @@ fun NavigationIconButton(
     val painter = when (navigationButton) {
         is NavigationButton.Simple -> rememberVectorPainter(navigationButton.image)
         is NavigationButton.Animated -> rememberAnimatedVectorPainter(navigationButton.image, navigationButton.atEnd)
+        is NavigationButton.Drawable -> painterResource(navigationButton.drawableId)
     }
 
     IconButton(
         onClick = onClick,
         modifier = modifier,
     ) {
-        Icon(
-            painter,
-            stringResource(navigationButton.contentDescription),
-            tint = tint,
-        )
+        if (navigationButton is NavigationButton.Drawable) {
+            Box(
+                contentAlignment = TextViewAlignment.Center,
+                modifier = Modifier.fillMaxSize(),
+            ) {
+                Icon(
+                    painter,
+                    stringResource(navigationButton.contentDescription),
+                    tint = tint,
+                )
+            }
+        } else {
+            Icon(
+                painter,
+                stringResource(navigationButton.contentDescription),
+                tint = tint,
+            )
+        }
     }
 }
 
