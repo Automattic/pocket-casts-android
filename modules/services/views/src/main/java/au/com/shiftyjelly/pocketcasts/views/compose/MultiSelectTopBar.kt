@@ -46,6 +46,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
@@ -80,15 +81,16 @@ fun <T> MultiSelectTopBar(
     includeStatusBarPadding: Boolean = true,
 ) {
     val context = LocalContext.current
+    val resources = LocalResources.current
     val selectedCount by controller.selectedCount.collectAsStateWithLifecycle()
     val toolbarItems by controller.toolbarItems.collectAsStateWithLifecycle()
-    val staticItems = remember(menuRes, context) { menuRes?.let { staticMultiSelectToolbarItems(context.resources, it) } }
+    val staticItems = remember(menuRes, resources) { menuRes?.let { staticMultiSelectToolbarItems(resources, it) } }
     MultiSelectTopBar(
         title = selectedCount.toString(),
         items = staticItems ?: toolbarItems,
         onNavigationClick = controller::exit,
         onItemClick = { itemId ->
-            context.getActivity()?.let { activity -> controller.onMenuItemSelected(itemId, context.resources, activity) }
+            context.getActivity()?.let { activity -> controller.onMenuItemSelected(itemId, resources, activity) }
         },
         onBottomSheetClick = { sheet ->
             val helper = controller.helper as? MultiSelectEpisodesHelper
@@ -215,6 +217,9 @@ private fun RowScope.OverflowMenuButton(
         }
         onDispose {}
     }
+    DisposableEffect(popup) {
+        onDispose { popup?.dismiss() }
+    }
     ToolbarButton(
         contentDescription = style.contentDescription,
         onClick = { popup?.show() },
@@ -335,7 +340,7 @@ private fun MultiSelectTopBarPreview(
     AppTheme(themeType) {
         MultiSelectTopBar(
             title = "2",
-            items = staticMultiSelectToolbarItems(LocalContext.current.resources, R.menu.menu_multiselect_upnext),
+            items = staticMultiSelectToolbarItems(LocalResources.current, R.menu.menu_multiselect_upnext),
             onNavigationClick = {},
             onItemClick = {},
             onBottomSheetClick = {},
