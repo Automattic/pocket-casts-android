@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.views.compose
 
 import android.content.Context
+import android.content.res.TypedArray
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.Menu
@@ -292,36 +293,34 @@ private fun ToolbarButton(
 private class ToolbarTitleStyle(val textSizePx: Int, val letterSpacing: Float, val isMedium: Boolean)
 
 private fun Context.toolbarTitleStyle(): ToolbarTitleStyle {
-    val toolbar = obtainStyledAttributes(null, intArrayOf(androidx.appcompat.R.attr.titleTextAppearance), androidx.appcompat.R.attr.toolbarStyle, 0)
-    val appearance = toolbar.getResourceId(0, 0)
-    toolbar.recycle()
-    val attrs = obtainStyledAttributes(appearance, intArrayOf(android.R.attr.textSize, android.R.attr.fontFamily, android.R.attr.letterSpacing))
-    val style = ToolbarTitleStyle(
-        textSizePx = attrs.getDimensionPixelSize(0, TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 20f, resources.displayMetrics).roundToInt()),
-        letterSpacing = attrs.getFloat(2, 0f),
-        isMedium = attrs.getString(1) == "sans-serif-medium",
+    val appearance = styledAttribute(androidx.appcompat.R.attr.titleTextAppearance, defStyleAttr = androidx.appcompat.R.attr.toolbarStyle) { getResourceId(0, 0) }
+    val defaultSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 20f, resources.displayMetrics).roundToInt()
+    return ToolbarTitleStyle(
+        textSizePx = styledAttribute(android.R.attr.textSize, defStyleRes = appearance) { getDimensionPixelSize(0, defaultSize) },
+        letterSpacing = styledAttribute(android.R.attr.letterSpacing, defStyleRes = appearance) { getFloat(0, 0f) },
+        isMedium = styledAttribute(android.R.attr.fontFamily, defStyleRes = appearance) { getString(0) } == "sans-serif-medium",
     )
-    attrs.recycle()
-    return style
 }
 
 private class OverflowButtonStyle(val paddingStartPx: Int, val paddingEndPx: Int, @DrawableRes val iconRes: Int, val contentDescription: String)
 
 private fun Context.overflowButtonStyle(): OverflowButtonStyle {
-    val attrs = obtainStyledAttributes(
-        null,
-        intArrayOf(android.R.attr.contentDescription, android.R.attr.paddingStart, android.R.attr.paddingEnd, androidx.appcompat.R.attr.srcCompat),
-        androidx.appcompat.R.attr.actionOverflowButtonStyle,
-        0,
+    val style = androidx.appcompat.R.attr.actionOverflowButtonStyle
+    return OverflowButtonStyle(
+        paddingStartPx = styledAttribute(android.R.attr.paddingStart, defStyleAttr = style) { getDimensionPixelSize(0, 0) },
+        paddingEndPx = styledAttribute(android.R.attr.paddingEnd, defStyleAttr = style) { getDimensionPixelSize(0, 0) },
+        iconRes = styledAttribute(androidx.appcompat.R.attr.srcCompat, defStyleAttr = style) { getResourceId(0, IR.drawable.ic_more_vert_black_24dp) },
+        contentDescription = styledAttribute(android.R.attr.contentDescription, defStyleAttr = style) { getString(0) } ?: getString(LR.string.more_options),
     )
-    val style = OverflowButtonStyle(
-        paddingStartPx = attrs.getDimensionPixelSize(1, 0),
-        paddingEndPx = attrs.getDimensionPixelSize(2, 0),
-        iconRes = attrs.getResourceId(3, IR.drawable.ic_more_vert_black_24dp),
-        contentDescription = attrs.getString(0) ?: getString(LR.string.more_options),
-    )
-    attrs.recycle()
-    return style
+}
+
+private fun <T> Context.styledAttribute(attr: Int, defStyleAttr: Int = 0, defStyleRes: Int = 0, read: TypedArray.() -> T): T {
+    val attrs = obtainStyledAttributes(null, intArrayOf(attr), defStyleAttr, defStyleRes)
+    return try {
+        attrs.read()
+    } finally {
+        attrs.recycle()
+    }
 }
 
 private val TitleAlignment = Alignment.Vertical { size, space -> (space - size) / 2 }
