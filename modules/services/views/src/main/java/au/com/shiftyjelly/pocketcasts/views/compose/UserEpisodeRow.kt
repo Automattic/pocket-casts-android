@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.views.compose
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
@@ -42,25 +43,27 @@ fun UserEpisodeRow(
     animateMultiSelection: Boolean = false,
     colors: EpisodeRowColors = EpisodeRowDefaults.colors(),
 ) {
-    val rowDataFlow = remember(episode.uuid) { rowDataProvider.userEpisodeRowDataFlow(episode.uuid) }
-    val rowData by rowDataFlow.collectAsStateWithLifecycle(initialValue = null)
-    UserEpisodeRow(
-        episode = episode,
-        rowData = rowData,
-        imageRequestFactory = imageRequestFactory,
-        swipeActions = swipeActions,
-        trailing = trailing,
-        onClick = onClick,
-        onLongClick = onLongClick,
-        onSwipeAction = onSwipeAction,
-        modifier = modifier,
-        useEpisodeArtwork = useEpisodeArtwork,
-        streamByDefault = streamByDefault,
-        isMultiSelecting = isMultiSelecting,
-        isSelected = isSelected,
-        animateMultiSelection = animateMultiSelection,
-        colors = colors,
-    )
+    key(episode.uuid) {
+        val rowDataFlow = remember { rowDataProvider.userEpisodeRowDataFlow(episode.uuid) }
+        val rowData by rowDataFlow.collectAsStateWithLifecycle(initialValue = null)
+        UserEpisodeRow(
+            episode = episode,
+            rowData = rowData,
+            imageRequestFactory = imageRequestFactory,
+            swipeActions = swipeActions,
+            trailing = trailing,
+            onClick = onClick,
+            onLongClick = onLongClick,
+            onSwipeAction = onSwipeAction,
+            modifier = modifier,
+            useEpisodeArtwork = useEpisodeArtwork,
+            streamByDefault = streamByDefault,
+            isMultiSelecting = isMultiSelecting,
+            isSelected = isSelected,
+            animateMultiSelection = animateMultiSelection,
+            colors = colors,
+        )
+    }
 }
 
 @Composable
@@ -85,10 +88,7 @@ internal fun UserEpisodeRow(
     val statusData = rowData ?: UserEpisodeRowData(episode, 0, 0, PlaybackState(), isInUpNext = false, hasBookmarks = false)
     val playbackState = statusData.playbackState
     val isPlaying = playbackState.isPlaying && playbackState.episodeUuid == episode.uuid
-    val buttonType = remember(episode, isPlaying, streamByDefault) {
-        episode.playing = isPlaying
-        PlayButtonType.from(episode, streamByDefault)
-    }
+    val buttonType = PlayButtonType.from(episode, streamByDefault, isPlaying)
     val dateFormatter = remember(context) { RelativeDateFormatter(context) }
     val date = episode.getSummaryText(dateFormatter, colors.tint.toArgb(), showDuration = false, context)
     val actions = swipeActions()
