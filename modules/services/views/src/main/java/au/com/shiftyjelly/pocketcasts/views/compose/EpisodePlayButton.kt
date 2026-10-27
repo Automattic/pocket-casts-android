@@ -7,6 +7,7 @@ import android.widget.PopupMenu
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ripple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -71,15 +73,24 @@ fun EpisodePlayButton(
     val currentListener by rememberUpdatedState(listener)
     val anchor = remember { mutableStateOf<View?>(null) }
     val dragToOpenListener = remember { mutableStateOf<View.OnTouchListener?>(null) }
+    val interactionSource = remember { MutableInteractionSource() }
+    val currentPress = remember { mutableStateOf<PressInteraction.Press?>(null) }
+    LaunchedEffect(interactionSource) {
+        interactionSource.interactions.collect { interaction ->
+            currentPress.value = (interaction as? PressInteraction.Press)
+        }
+    }
     val buttonColor = if (buttonType == PlayButtonType.PLAYED) MaterialTheme.theme.colors.primaryIcon02 else tint
     val topPadding = with(LocalDensity.current) { 1.dp.toPx().toInt().toDp() }
     Box(
         modifier = modifier
             .width(52.dp)
             .semantics { contentDescription = buttonType.label }
-            .forwardTouches(anchor, dragToOpenListener)
+            .forwardTouches(anchor, dragToOpenListener) {
+                currentPress.value?.let { interactionSource.tryEmit(PressInteraction.Cancel(it)) }
+            }
             .combinedClickable(
-                interactionSource = remember { MutableInteractionSource() },
+                interactionSource = interactionSource,
                 indication = ripple(bounded = false),
                 onClick = {
                     when (buttonType) {
@@ -156,21 +167,30 @@ fun EpisodePlayButton(
 private fun Modifier.forwardTouches(
     anchor: State<View?>,
     touchListener: State<View.OnTouchListener?>,
+    onForwardingStarted: () -> Unit,
 ) = pointerInput(Unit) {
     awaitPointerEventScope {
         var downTime = 0L
+        var isForwarding = false
         while (true) {
             val event = awaitPointerEvent(PointerEventPass.Initial)
             val change = event.changes.first()
             val action = when {
-                change.changedToDownIgnoreConsumed() -> MotionEvent.ACTION_DOWN.also { downTime = change.uptimeMillis }
+                change.changedToDownIgnoreConsumed() -> MotionEvent.ACTION_DOWN.also {
+                    downTime = change.uptimeMillis
+                    isForwarding = false
+                }
+
                 change.changedToUpIgnoreConsumed() -> MotionEvent.ACTION_UP
+
                 else -> MotionEvent.ACTION_MOVE
             }
             val anchorView = anchor.value ?: continue
             val onTouch = touchListener.value ?: continue
             val motionEvent = MotionEvent.obtain(downTime, change.uptimeMillis, action, change.position.x, change.position.y, 0)
             if (onTouch.onTouch(anchorView, motionEvent)) {
+                if (!isForwarding) onForwardingStarted()
+                isForwarding = true
                 event.changes.forEach { it.consume() }
             }
             motionEvent.recycle()
