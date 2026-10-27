@@ -1,10 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.views.compose
 
+import android.widget.PopupMenu
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.longClick
 import androidx.compose.ui.test.onNodeWithContentDescription
-import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
@@ -24,6 +24,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.Shadows.shadowOf
+import org.robolectric.shadows.ShadowPopupMenu
 
 @RunWith(RobolectricTestRunner::class)
 class EpisodePlayButtonTest {
@@ -118,27 +120,38 @@ class EpisodePlayButtonTest {
         assertTrue(eventSink.isEmpty())
     }
 
+    private fun longPressMenu(contentDescription: String): PopupMenu {
+        composeTestRule.onNodeWithContentDescription(contentDescription).performTouchInput { longClick() }
+        composeTestRule.waitForIdle()
+        return ShadowPopupMenu.getLatestPopupMenu()
+    }
+
+    private fun PopupMenu.visibleTitles() = (0 until menu.size()).map { menu.getItem(it) }.filter { it.isVisible }.map { it.title.toString() }
+
+    private fun PopupMenu.select(title: String) {
+        val item = (0 until menu.size()).map { menu.getItem(it) }.first { it.title == title }
+        shadowOf(this).onMenuItemClickListener.onMenuItemClick(item)
+    }
+
     @Test
     fun `long press menu offers download and runs the selected action`() {
         setContent(PlayButtonType.PLAY)
 
-        composeTestRule.onNodeWithContentDescription("Play").performTouchInput { longClick() }
-        composeTestRule.onNodeWithText("Play next").assertExists()
-        composeTestRule.onNodeWithText("Play last").assertExists()
-        composeTestRule.onNodeWithText("Stream").assertDoesNotExist()
-        composeTestRule.onNodeWithText("Stop downloading").assertDoesNotExist()
-        composeTestRule.onNodeWithText("Download").performClick()
+        val popup = longPressMenu("Play")
+        assertTrue(shadowOf(popup).isShowing)
+        assertEquals(listOf("Play next", "Play last", "Download"), popup.visibleTitles())
+        popup.select("Download")
 
         assertEquals(listOf("download episode"), calls)
-        composeTestRule.onNodeWithText("Play next").assertDoesNotExist()
     }
 
     @Test
     fun `long press menu on download button offers stream`() {
         setContent(PlayButtonType.DOWNLOAD)
 
-        composeTestRule.onNodeWithContentDescription("Download").performTouchInput { longClick() }
-        composeTestRule.onNodeWithText("Stream").performClick()
+        val popup = longPressMenu("Download")
+        assertEquals(listOf("Play next", "Play last", "Stream"), popup.visibleTitles())
+        popup.select("Stream")
 
         assertEquals(listOf("play episode"), calls)
     }
@@ -147,20 +160,21 @@ class EpisodePlayButtonTest {
     fun `long press menu while downloading offers stop downloading`() {
         setContent(PlayButtonType.STOP_DOWNLOAD, downloadStatus = EpisodeDownloadStatus.Downloading)
 
-        composeTestRule.onNodeWithContentDescription("Stop Downloading").performTouchInput { longClick() }
-        composeTestRule.onNodeWithText("Download").assertDoesNotExist()
-        composeTestRule.onNodeWithText("Play next").performClick()
+        val popup = longPressMenu("Stop Downloading")
+        assertEquals(listOf("Play next", "Play last", "Stop downloading"), popup.visibleTitles())
+        popup.select("Play next")
+        popup.select("Stop downloading")
 
-        assertEquals(listOf("playNext episode"), calls)
+        assertEquals(listOf("playNext episode", "stopDownloading episode"), calls)
     }
 
     @Test
     fun `long press menu play last queues the episode`() {
-        setContent(PlayButtonType.STOP_DOWNLOAD, downloadStatus = EpisodeDownloadStatus.Queued)
+        setContent(PlayButtonType.PLAY, downloadStatus = EpisodeDownloadStatus.Downloaded)
 
-        composeTestRule.onNodeWithContentDescription("Stop Downloading").performTouchInput { longClick() }
-        composeTestRule.onNodeWithText("Stop downloading").assertExists()
-        composeTestRule.onNodeWithText("Play last").performClick()
+        val popup = longPressMenu("Play")
+        assertEquals(listOf("Play next", "Play last"), popup.visibleTitles())
+        popup.select("Play last")
 
         assertEquals(listOf("playLast episode"), calls)
     }

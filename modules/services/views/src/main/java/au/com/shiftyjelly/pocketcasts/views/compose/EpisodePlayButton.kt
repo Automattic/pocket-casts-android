@@ -1,5 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.views.compose
 
+import android.view.MotionEvent
+import android.view.View
+import android.widget.PopupMenu
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -9,28 +12,31 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.DropdownMenu
-import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.material.ripple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.changedToDownIgnoreConsumed
+import androidx.compose.ui.input.pointer.changedToUpIgnoreConsumed
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
@@ -39,6 +45,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.views.R
 import au.com.shiftyjelly.pocketcasts.views.buttons.PlayButton
 import au.com.shiftyjelly.pocketcasts.views.buttons.PlayButtonMenuItem
 import au.com.shiftyjelly.pocketcasts.views.buttons.PlayButtonType
@@ -57,15 +64,19 @@ fun EpisodePlayButton(
     modifier: Modifier = Modifier,
     fromListUuid: String? = null,
 ) {
+    val context = LocalContext.current
     val keyboardController = LocalSoftwareKeyboardController.current
-    var isMenuExpanded by remember(episode.uuid) { mutableStateOf(false) }
+    val currentEpisode by rememberUpdatedState(episode)
+    val currentListener by rememberUpdatedState(listener)
+    val anchor = remember { mutableStateOf<View?>(null) }
+    val dragToOpenListener = remember { mutableStateOf<View.OnTouchListener?>(null) }
     val buttonColor = if (buttonType == PlayButtonType.PLAYED) MaterialTheme.theme.colors.primaryIcon02 else tint
     val topPadding = with(LocalDensity.current) { 1.dp.toPx().toInt().toDp() }
     Box(
-        contentAlignment = TruncatedCenter,
         modifier = modifier
             .width(52.dp)
             .semantics { contentDescription = buttonType.label }
+            .forwardTouches(anchor, dragToOpenListener)
             .combinedClickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = ripple(bounded = false),
@@ -91,43 +102,89 @@ fun EpisodePlayButton(
                         PlayButtonType.PLAYED -> listener.onPlayedClicked(episode.uuid)
                     }
                 },
-                onLongClick = { isMenuExpanded = true },
-            )
-            .padding(top = topPadding),
-    ) {
-        DrawableIcon(
-            drawableId = buttonType.drawableId,
-            tint = buttonColor,
-            modifier = Modifier.size(32.dp),
-        )
-        ProgressCircle(
-            state = ProgressCircleState.forEpisode(episode, isPlayed = buttonType == PlayButtonType.PLAYED),
-            color = buttonColor,
-            modifier = Modifier.size(32.dp),
-        )
-        DropdownMenu(
-            expanded = isMenuExpanded,
-            onDismissRequest = { isMenuExpanded = false },
-        ) {
-            PlayButtonMenuItem.visibleItems(episode.downloadStatus, buttonType).forEach { item ->
-                DropdownMenuItem(
-                    onClick = {
-                        isMenuExpanded = false
-                        when (item) {
-                            PlayButtonMenuItem.PlayNext -> listener.onPlayNext(episode.uuid)
-                            PlayButtonMenuItem.PlayLast -> listener.onPlayLast(episode.uuid)
-                            PlayButtonMenuItem.Download -> listener.onDownload(episode.uuid)
-                            PlayButtonMenuItem.Stream -> listener.onPlayClicked(episode.uuid)
-                            PlayButtonMenuItem.StopDownloading -> listener.onStopDownloading(episode.uuid)
+                onLongClick = {
+                    anchor.value?.let { anchorView ->
+                        val popup = PopupMenu(context, anchorView)
+                        dragToOpenListener.value = popup.dragToOpenListener
+                        popup.inflate(R.menu.play_button)
+                        val visibleItems = PlayButtonMenuItem.visibleItems(episode.downloadStatus, buttonType)
+                        PlayButtonMenuItem.entries.forEach { item ->
+                            popup.menu.findItem(item.menuId).isVisible = item in visibleItems
                         }
-                    },
-                ) {
-                    Text(text = stringResource(item.titleId))
-                }
-            }
+                        popup.setOnMenuItemClickListener { menuItem ->
+                            val uuid = currentEpisode.uuid
+                            when (PlayButtonMenuItem.entries.firstOrNull { it.menuId == menuItem.itemId }) {
+                                PlayButtonMenuItem.PlayNext -> currentListener.onPlayNext(uuid)
+                                PlayButtonMenuItem.PlayLast -> currentListener.onPlayLast(uuid)
+                                PlayButtonMenuItem.Download -> currentListener.onDownload(uuid)
+                                PlayButtonMenuItem.Stream -> currentListener.onPlayClicked(uuid)
+                                PlayButtonMenuItem.StopDownloading -> currentListener.onStopDownloading(uuid)
+                                null -> Unit
+                            }
+                            true
+                        }
+                        popup.show()
+                    }
+                },
+            ),
+    ) {
+        AndroidView(
+            factory = { viewContext -> View(viewContext).apply { isLongClickable = true }.also { anchor.value = it } },
+            modifier = Modifier.matchParentSize(),
+        )
+        Box(
+            contentAlignment = TruncatedCenter,
+            modifier = Modifier
+                .matchParentSize()
+                .padding(top = topPadding),
+        ) {
+            DrawableIcon(
+                drawableId = buttonType.drawableId,
+                tint = buttonColor,
+                modifier = Modifier.size(32.dp),
+            )
+            ProgressCircle(
+                state = ProgressCircleState.forEpisode(episode, isPlayed = buttonType == PlayButtonType.PLAYED),
+                color = buttonColor,
+                modifier = Modifier.size(32.dp),
+            )
         }
     }
 }
+
+private fun Modifier.forwardTouches(
+    anchor: State<View?>,
+    touchListener: State<View.OnTouchListener?>,
+) = pointerInput(Unit) {
+    awaitPointerEventScope {
+        var downTime = 0L
+        while (true) {
+            val event = awaitPointerEvent(PointerEventPass.Initial)
+            val change = event.changes.first()
+            val action = when {
+                change.changedToDownIgnoreConsumed() -> MotionEvent.ACTION_DOWN.also { downTime = change.uptimeMillis }
+                change.changedToUpIgnoreConsumed() -> MotionEvent.ACTION_UP
+                else -> MotionEvent.ACTION_MOVE
+            }
+            val anchorView = anchor.value ?: continue
+            val onTouch = touchListener.value ?: continue
+            val motionEvent = MotionEvent.obtain(downTime, change.uptimeMillis, action, change.position.x, change.position.y, 0)
+            if (onTouch.onTouch(anchorView, motionEvent)) {
+                event.changes.forEach { it.consume() }
+            }
+            motionEvent.recycle()
+        }
+    }
+}
+
+private val PlayButtonMenuItem.menuId
+    get() = when (this) {
+        PlayButtonMenuItem.PlayNext -> R.id.play_next
+        PlayButtonMenuItem.PlayLast -> R.id.play_last
+        PlayButtonMenuItem.Download -> R.id.download
+        PlayButtonMenuItem.Stream -> R.id.stream
+        PlayButtonMenuItem.StopDownloading -> R.id.stop_downloading
+    }
 
 private val TruncatedCenter = Alignment { size, space, _ ->
     IntOffset((space.width - size.width) / 2, (space.height - size.height) / 2)
