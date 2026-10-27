@@ -13,10 +13,10 @@ enum class PlayButtonType(val drawableId: Int, val label: String) {
     ;
 
     companion object {
-        fun from(episode: BaseEpisode, streamByDefault: Boolean): PlayButtonType {
+        fun from(episode: BaseEpisode, streamByDefault: Boolean, isPlaying: Boolean = episode.playing): PlayButtonType {
             return when {
                 episode.lastPlaybackFailed() -> PLAYBACK_FAILED
-                episode.playing -> PAUSE
+                isPlaying -> PAUSE
                 episode.isFinished -> PLAYED
                 episode.isDownloaded -> PLAY
                 episode.isDownloading || episode.isDownloadPending -> if (streamByDefault) PLAY else STOP_DOWNLOAD
