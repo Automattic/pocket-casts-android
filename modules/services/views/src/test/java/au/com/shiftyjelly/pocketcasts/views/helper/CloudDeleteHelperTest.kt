@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.views.helper
 
 import android.os.Looper
 import android.view.View
+import androidx.core.view.isVisible
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
@@ -16,6 +17,7 @@ import java.util.Date
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
@@ -75,6 +77,7 @@ class CloudDeleteHelperTest {
 
         verify(userEpisodeManager).removeFromCloud(episode)
         verifyBlocking(userEpisodeManager, never()) { delete(any(), any()) }
+        verifyNoInteractions(downloadQueue)
     }
 
     @Test
@@ -85,6 +88,7 @@ class CloudDeleteHelperTest {
 
         verify(userEpisodeManager).removeFromCloud(episode)
         verifyBlocking(userEpisodeManager) { delete(episode, playbackManager) }
+        verifyNoInteractions(downloadQueue)
     }
 
     @Test
@@ -114,6 +118,26 @@ class CloudDeleteHelperTest {
         }
 
         assertEquals(listOf(DeleteState.Everywhere, DeleteState.DeviceOnly), chosenStates)
+    }
+
+    @Test
+    fun `device only and cloud dialogs confirm their own state without a secondary button`() {
+        val episodes = listOf(userEpisode(downloaded = true, uploaded = true))
+        val controller = Robolectric.buildActivity(HiltShimActivity::class.java).setup()
+        val fragmentManager = controller.get().supportFragmentManager
+
+        listOf(DeleteState.DeviceOnly, DeleteState.Cloud).forEach { state ->
+            val chosenStates = mutableListOf<DeleteState>()
+            val dialog = CloudDeleteHelper.getDeleteDialog(episodes, state, { _, chosen -> chosenStates += chosen }, controller.get().resources)
+            dialog.show(fragmentManager, "delete_warning")
+            shadowOf(Looper.getMainLooper()).idle()
+
+            assertFalse(dialog.requireView().findViewById<View>(R.id.btnSecondary).isVisible)
+            dialog.requireView().findViewById<View>(R.id.btnConfirm).performClick()
+            shadowOf(Looper.getMainLooper()).idle()
+
+            assertEquals(listOf(state), chosenStates)
+        }
     }
 
     private fun delete(episode: UserEpisode, state: DeleteState) {
