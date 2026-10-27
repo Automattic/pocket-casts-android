@@ -23,7 +23,6 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.clearAndSetSemantics
-import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -136,7 +135,7 @@ internal fun EpisodeRowTitle(
 ) {
     Layout(
         contents = listOf(
-            { TextViewLine(AnnotatedString(title), 16.sp, color, maxLines = 2, modifier = Modifier.clearAndSetSemantics { heading() }) },
+            { TextViewLine(AnnotatedString(title), 16.sp, color, maxLines = 2, modifier = Modifier.clearAndSetSemantics {}) },
             { if (starTint != null) FitCenterDrawableIcon(IR.drawable.ic_starred_row, starTint, Modifier.width(16.dp)) },
         ),
     ) { (titles, stars), constraints ->
@@ -151,9 +150,20 @@ internal fun EpisodeRowTitle(
     }
 }
 
-internal fun Spanned.toUpperCaseAnnotatedString() = buildAnnotatedString {
-    append(this@toUpperCaseAnnotatedString.toString().uppercase(Locale.getDefault()))
-    getSpans(0, length, ForegroundColorSpan::class.java).forEach { span ->
-        addStyle(SpanStyle(color = Color(span.foregroundColor)), getSpanStart(span), getSpanEnd(span))
+internal fun Spanned.toUpperCaseAnnotatedString(): AnnotatedString {
+    val locale = Locale.getDefault()
+    val spans = getSpans(0, length, ForegroundColorSpan::class.java)
+    val boundaries = (spans.flatMap { listOf(getSpanStart(it), getSpanEnd(it)) } + listOf(0, length)).distinct().sorted()
+    val offsets = mutableMapOf(0 to 0)
+    val text = StringBuilder()
+    boundaries.zipWithNext { start, end ->
+        text.append(substring(start, end).uppercase(locale))
+        offsets[end] = text.length
+    }
+    return buildAnnotatedString {
+        append(text)
+        spans.forEach { span ->
+            addStyle(SpanStyle(color = Color(span.foregroundColor)), offsets.getValue(getSpanStart(span)), offsets.getValue(getSpanEnd(span)))
+        }
     }
 }

@@ -45,7 +45,7 @@ class EpisodeRowPartsTest {
     }
 
     @Test
-    fun `title is an accessibility heading without its own text node`() {
+    fun `title leaves the description to the row`() {
         composeTestRule.setContent {
             AppTheme(Theme.ThemeType.LIGHT) {
                 EpisodeRowTitle("Episode title", Color.Black, starTint = Color.Yellow)
@@ -53,7 +53,7 @@ class EpisodeRowPartsTest {
         }
 
         composeTestRule.onNodeWithText("Episode title").assertDoesNotExist()
-        composeTestRule.onNode(SemanticsMatcher.keyIsDefined(SemanticsProperties.Heading)).assertExists()
+        composeTestRule.onNode(SemanticsMatcher.keyIsDefined(SemanticsProperties.Heading)).assertDoesNotExist()
     }
 
     @Test
@@ -66,5 +66,17 @@ class EpisodeRowPartsTest {
 
         assertEquals("BONUS • TODAY", text.text)
         assertEquals(listOf(Color.Red to (0 until 5)), text.spanStyles.map { it.item.color to (it.start until it.end) })
+    }
+
+    @Test
+    fun `header tint follows prefixes that grow when upper cased`() {
+        val summary = SpannableString("straße • Today").apply {
+            setSpan(ForegroundColorSpan(android.graphics.Color.RED), 0, 6, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+
+        val text = summary.toUpperCaseAnnotatedString()
+
+        assertEquals("STRASSE • TODAY", text.text)
+        assertEquals(listOf(0 until 7), text.spanStyles.map { it.start until it.end })
     }
 }
