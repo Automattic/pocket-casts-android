@@ -1754,7 +1754,6 @@ Language: it
     <string name="settings_notification_actions">Azioni</string>
     <string name="settings_notifications_new_episodes">Nuovi episodi</string>
     <string name="settings_lock_image">immagine del blocco</string>
-    <string name="settings_licenses">Licenze</string>
     <string name="settings_learn_more">Scopri di più</string>
     <string name="settings_keep_screen_awake">Tieni lo schermo attivo</string>
     <string name="settings_instagram">link instagram</string>
@@ -2232,7 +2231,6 @@ Language: it
     <string name="podcasts_share_missing_title">Inserisci un titolo per il tuo elenco.</string>
     <string name="podcasts_share_create_error">Ops, impossibile effettuare la condivisione</string>
     <string name="podcasts_share_title">Titolo</string>
-    <string name="podcasts_share_selected_podcasts">Condividi i podcast selezionati</string>
     <string name="podcasts_share_select_all">Seleziona tutto</string>
     <string name="podcasts_share_list">Elenco condiviso</string>
     <string name="podcasts_share_description">Descrizione (opzionale)</string>
@@ -2262,17 +2260,14 @@ Language: it
     <string name="player_sleep_60_minutes">60 minuti</string>
     <string name="player_sleep_30_minutes">30 minuti</string>
     <string name="player_sleep_15_minutes">15 minuti</string>
-    <string name="player_pip">Inserisci l\'immagine nell\'immagine</string>
     <string name="player_notification_skip_forward">Avanti di %d secondi</string>
     <string name="player_notification_skip_back">Indietro di %d secondi</string>
-    <string name="player_full_screen">Schermo intero</string>
     <string name="player_effects_speed_up">Velocizza</string>
     <string name="player_effects_speed_down">Riduci la velocità</string>
     <string name="player_effects_speed">Velocità</string>
     <string name="player_effects">Effetti del lettore</string>
     <string name="player_close">Chiudi lettore</string>
     <string name="player_chapter_url">URL del capitolo</string>
-    <string name="player_actions">Azioni dell\'episodio</string>
     <string name="player_action_previous_chapter">Capitolo precedente</string>
     <string name="time_short_seconds">%d s</string>
     <string name="time_short_minutes">%d m</string>

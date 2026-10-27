@@ -1790,7 +1790,6 @@ Language: ko_KR
     <string name="settings_manage_downloads_total">합계</string>
     <string name="settings_manage_downloads_include_starred">별 표시 포함</string>
     <string name="settings_lock_image">잠금 이미지</string>
-    <string name="settings_licenses">라이선스</string>
     <string name="settings_learn_more">더 알아보기</string>
     <string name="settings_keep_screen_awake_summary">켜진 경우, 재생 중 화면이 잠기지 않습니다.</string>
     <string name="settings_keep_screen_awake">활성 상태로 화면 유지</string>
@@ -2248,7 +2247,6 @@ Language: ko_KR
     <string name="podcasts_share_missing_title">목록의 제목을 입력하세요.</string>
     <string name="podcasts_share_create_error">공유할 수 없음</string>
     <string name="podcasts_share_title">제목</string>
-    <string name="podcasts_share_selected_podcasts">선택한 팟캐스트 공유</string>
     <string name="podcasts_share_select_all">모두 선택</string>
     <string name="podcasts_share_list">공유한 목록</string>
     <string name="podcasts_share_description">설명(선택 사항)</string>
@@ -2310,11 +2308,9 @@ Language: ko_KR
     <string name="player_sleep_60_minutes">60분</string>
     <string name="player_sleep_30_minutes">30분</string>
     <string name="player_sleep_15_minutes">15분</string>
-    <string name="player_pip">화면 속 화면 입력</string>
     <string name="player_notification_skip_forward">앞으로 %d초</string>
     <string name="player_notification_skip_back">뒤로 %d초</string>
     <string name="player_more_actions">추가 작업</string>
-    <string name="player_full_screen">전체 화면</string>
     <string name="player_effects_volume_boost">Volume Boost</string>
     <string name="player_effects_voices_sound_louder">목소리 사운드 더 크게</string>
     <string name="player_effects_trim_silence">Trim Silence</string>
@@ -2328,7 +2324,6 @@ Language: ko_KR
     <string name="player_effects">플레이어 효과</string>
     <string name="player_close">플레이어 닫기</string>
     <string name="player_chapter_url">챕터 URL</string>
-    <string name="player_actions">에피소드 작업</string>
     <string name="player_action_previous_chapter">이전 챕터</string>
     <string name="player_action_next_chapter">다음 챕터</string>
     <string name="time_left">%s 남음</string>

@@ -1804,7 +1804,6 @@ Language: ja_JP
     <string name="settings_notifications_new_episodes">新規エピソード</string>
     <string name="settings_manage_downloads_include_starred">星付きを含める</string>
     <string name="settings_lock_image">ロック画像</string>
-    <string name="settings_licenses">ライセンス</string>
     <string name="settings_learn_more">もっと詳しく知る</string>
     <string name="settings_keep_screen_awake_summary">オンにすると、再生中に画面がロックされなくなります。</string>
     <string name="settings_keep_screen_awake">画面を消灯しない</string>
@@ -2272,7 +2271,6 @@ Language: ja_JP
     <string name="podcasts_share_missing_title">リストのタイトルを入力してください。</string>
     <string name="podcasts_share_create_error">共有に失敗しました</string>
     <string name="podcasts_share_title">タイトル</string>
-    <string name="podcasts_share_selected_podcasts">選択したポッドキャストを共有</string>
     <string name="podcasts_share_select_all">すべて選択</string>
     <string name="podcasts_share_list">共有リスト</string>
     <string name="podcasts_share_description">詳細説明 (オプション)</string>
@@ -2317,10 +2315,8 @@ Language: ja_JP
     <string name="player_sleep_60_minutes">60分</string>
     <string name="player_sleep_30_minutes">30分</string>
     <string name="player_sleep_15_minutes">15分</string>
-    <string name="player_pip">ピクチャーインピクチャーに切り替え</string>
     <string name="player_notification_skip_forward">%d秒早送り</string>
     <string name="player_notification_skip_back">%d秒巻き戻し</string>
-    <string name="player_full_screen">フルスクリーン表示</string>
     <string name="player_effects_voices_sound_louder">音声のボリュームをアップ</string>
     <string name="player_effects_trim_level">カットレベル</string>
     <string name="player_effects_speed_up">スピードアップ</string>
@@ -2329,7 +2325,6 @@ Language: ja_JP
     <string name="player_effects">プレーヤーのエフェクト</string>
     <string name="player_close">プレーヤーを閉じる</string>
     <string name="player_chapter_url">チャプターの URL</string>
-    <string name="player_actions">エピソードアクション</string>
     <string name="player_action_previous_chapter">前のチャプター</string>
     <string name="player_action_next_chapter">次のチャプター</string>
     <string name="time_left">残り%s</string>

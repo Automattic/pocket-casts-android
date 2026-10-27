@@ -723,7 +723,6 @@ Language: nb_NO
     <string name="settings_manage_downloads_total">Totalt</string>
     <string name="settings_manage_downloads_include_starred">Inkluder med stjerner</string>
     <string name="settings_lock_image">låsebilde</string>
-    <string name="settings_licenses">Lisenser</string>
     <string name="settings_learn_more">Finn ut mer</string>
     <string name="settings_keep_screen_awake_summary">Hvis på, låses ikke skjermen under avspilling.</string>
     <string name="settings_keep_screen_awake">Hold skjermen våken</string>
@@ -1169,7 +1168,6 @@ Language: nb_NO
     <string name="podcasts_share_missing_title">Angi en tittel for listen.</string>
     <string name="podcasts_share_create_error">Obs, kan ikke dele</string>
     <string name="podcasts_share_title">Tittel</string>
-    <string name="podcasts_share_selected_podcasts">Del valgte podcaster</string>
     <string name="podcasts_share_select_all">Velg alle</string>
     <string name="podcasts_share_list">Delt liste</string>
     <string name="podcasts_share_description">Beskrivelse (valgfritt)</string>
@@ -1231,11 +1229,9 @@ Language: nb_NO
     <string name="player_sleep_60_minutes">60 minutter</string>
     <string name="player_sleep_30_minutes">30 minutter</string>
     <string name="player_sleep_15_minutes">15 minutter</string>
-    <string name="player_pip">Gå inn i bilde-i-bilde</string>
     <string name="player_notification_skip_forward">Fremr %d sekunder</string>
     <string name="player_notification_skip_back">Tilbake %d sekunder</string>
     <string name="player_more_actions">Flere handlinger</string>
-    <string name="player_full_screen">Full skjerm</string>
     <string name="player_effects_volume_boost">Volumøkning</string>
     <string name="player_effects_voices_sound_louder">Stemmer blir høyere</string>
     <string name="player_effects_trim_silence">Kutt av stillhet</string>
@@ -1249,7 +1245,6 @@ Language: nb_NO
     <string name="player_effects">Effekter i avspiller</string>
     <string name="player_close">Velg avspiller</string>
     <string name="player_chapter_url">URL for kapittel</string>
-    <string name="player_actions">Episodehandlinger</string>
     <string name="player_action_previous_chapter">Forrige kapittel</string>
     <string name="player_action_next_chapter">Neste kapittel</string>
     <string name="time_short_seconds">%d s</string>
