@@ -352,7 +352,7 @@ class ChatViewModelTest {
         connectToInternet()
         viewModel.onInputTextChange("Draft")
 
-        viewModel.onSummarizeClick("Summarize this episode")
+        viewModel.onSuggestionClick("Summarize this episode", ChatInputType.SummaryPrompt)
         advanceUntilIdle()
 
         assertEquals(SendMessage(EPISODE_UUID, "Summarize this episode"), chatManager.sentMessages.single())
@@ -380,7 +380,7 @@ class ChatViewModelTest {
         viewModel.onSend()
         advanceUntilIdle()
 
-        viewModel.onSummarizeClick("Summarize this episode")
+        viewModel.onSuggestionClick("Summarize this episode", ChatInputType.SummaryPrompt)
         advanceUntilIdle()
 
         assertEquals(
@@ -402,7 +402,7 @@ class ChatViewModelTest {
         viewModel.onSend()
         advanceUntilIdle()
 
-        viewModel.onSummarizeClick("Summarize this episode")
+        viewModel.onSuggestionClick("Summarize this episode", ChatInputType.SummaryPrompt)
         gate.complete(Unit)
         advanceUntilIdle()
 
@@ -415,11 +415,76 @@ class ChatViewModelTest {
         setEpisodeInfo()
         connectToInternet()
 
-        viewModel.onSummarizeClick("Summarize this episode")
+        viewModel.onSuggestionClick("Summarize this episode", ChatInputType.SummaryPrompt)
         advanceUntilIdle()
 
         assertFalse(viewModel.uiState.value.areMessagesLoaded)
         assertTrue(chatManager.sentMessages.isEmpty())
+    }
+
+    @Test
+    fun `an empty chat loads the starter questions`() = runTest {
+        chatManager.starterQuestions = listOf("Who is the guest?", "What changed?")
+        setEpisodeInfo()
+        advanceUntilIdle()
+
+        assertEquals(listOf(CreateChat(EPISODE_UUID, PODCAST_UUID)), chatManager.starterQuestionRequests)
+        assertEquals(listOf("Who is the guest?", "What changed?"), viewModel.uiState.value.starterQuestions)
+    }
+
+    @Test
+    fun `a chat with messages does not load the starter questions`() = runTest {
+        chatManager.messages.value = listOf(ChatMessage.User(text = "Q1", uuid = "q1"))
+        setEpisodeInfo()
+        advanceUntilIdle()
+
+        assertTrue(chatManager.starterQuestionRequests.isEmpty())
+    }
+
+    @Test
+    fun `clearing a chat loads the starter questions`() = runTest {
+        chatManager.messages.value = listOf(ChatMessage.User(text = "Q1", uuid = "q1"))
+        chatManager.starterQuestions = listOf("Who is the guest?")
+        setEpisodeInfo()
+        advanceUntilIdle()
+
+        viewModel.clearChat()
+        advanceUntilIdle()
+
+        assertEquals(listOf("Who is the guest?"), viewModel.uiState.value.starterQuestions)
+    }
+
+    @Test
+    fun `starter questions wait for sign in`() = runTest {
+        isLoggedIn = false
+        setEpisodeInfo(isBeta = true, requiresSignIn = true)
+        advanceUntilIdle()
+
+        assertTrue(chatManager.starterQuestionRequests.isEmpty())
+    }
+
+    @Test
+    fun `starter question click sends it as a suggested prompt`() = runTest {
+        setEpisodeInfo()
+        connectToInternet()
+
+        viewModel.onSuggestionClick("Who is the guest?", ChatInputType.SuggestedPrompt)
+        advanceUntilIdle()
+
+        assertEquals(SendMessage(EPISODE_UUID, "Who is the guest?"), chatManager.sentMessages.single())
+        eventSink.skipEvent()
+        assertEquals(
+            EpisodeChatMessageSentEvent(
+                source = SourceView.PLAYER.analyticsValue,
+                episodeUuid = EPISODE_UUID,
+                podcastUuid = PODCAST_UUID,
+                messageLength = "Who is the guest?".length.toLong(),
+                inputType = EpisodeChatInputType.SuggestedPrompt,
+                messageIndex = 1,
+                isRetry = false,
+            ),
+            eventSink.pollEvent(),
+        )
     }
 
     @Test
@@ -428,7 +493,7 @@ class ChatViewModelTest {
         networkConnectionWatcher.networkCapabilities.value = null
         advanceUntilIdle()
 
-        viewModel.onSummarizeClick("Summarize this episode")
+        viewModel.onSuggestionClick("Summarize this episode", ChatInputType.SummaryPrompt)
         advanceUntilIdle()
 
         assertTrue(chatManager.sentMessages.isEmpty())
@@ -679,7 +744,7 @@ class ChatViewModelTest {
         setEpisodeInfo()
         connectToInternet()
         chatManager.sendMessageException = IOException()
-        viewModel.onSummarizeClick("Summarize this episode")
+        viewModel.onSuggestionClick("Summarize this episode", ChatInputType.SummaryPrompt)
         advanceUntilIdle()
         chatManager.sendMessageException = null
         eventSink.skipEvent(eventSink.size)
@@ -722,7 +787,7 @@ class ChatViewModelTest {
         setEpisodeInfo()
         connectToInternet()
         chatManager.sendMessageException = IOException()
-        viewModel.onSummarizeClick("Summarize this episode")
+        viewModel.onSuggestionClick("Summarize this episode", ChatInputType.SummaryPrompt)
         advanceUntilIdle()
         chatManager.sendMessageException = null
         chatManager.otherMessages.value = listOf(ChatMessage.User(text = "Typed", failure = ChatSendFailure.Network, uuid = "typed-uuid"))
@@ -3269,6 +3334,14 @@ class ChatViewModelTest {
         override fun observeHistory(): Flow<List<EpisodeChatHistoryItem>> = observedHistory ?: history
 
         override suspend fun hasChatWithMessages(episodeUuid: String) = false
+
+        var starterQuestions = emptyList<String>()
+        val starterQuestionRequests = mutableListOf<CreateChat>()
+
+        override suspend fun getStarterQuestions(episodeUuid: String, podcastUuid: String): List<String> {
+            starterQuestionRequests += CreateChat(episodeUuid, podcastUuid)
+            return starterQuestions
+        }
 
         val discardedMessageUuids = mutableListOf<String>()
 

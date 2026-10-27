@@ -140,6 +140,7 @@ class ChatViewModel @Inject constructor(
     private var pendingShownEntryPoint: ChatEntryPoint? = null
     private var hasReceivedAnswer = false
     private var hasSubmittedFeedback = false
+    private var starterQuestionsEpisodeUuid: String? = null
     private lateinit var sourceView: SourceView
 
     init {
@@ -229,6 +230,7 @@ class ChatViewModel @Inject constructor(
     private fun openChat(episode: ChatEpisode, entryPoint: ChatEntryPoint) {
         sendJob?.cancel()
         transientUserMessage = null
+        starterQuestionsEpisodeUuid = null
         isAdoptingUnansweredQuestion = true
         quoteLoadId.incrementAndGet()
         _uiState.update {
@@ -246,6 +248,7 @@ class ChatViewModel @Inject constructor(
                 isAwaitingReply = false,
                 error = null,
                 answerRatings = emptyMap(),
+                starterQuestions = emptyList(),
             )
         }
         trackShownIfPending(hasHistory = null)
@@ -273,7 +276,20 @@ class ChatViewModel @Inject constructor(
                 }
                 if (messagesEpisodeUuid == chatEpisode.value?.uuid) {
                     trackShownIfPending(hasHistory = messages.isNotEmpty())
+                    if (messages.isEmpty()) loadStarterQuestions()
                 }
+            }
+        }
+    }
+
+    private fun loadStarterQuestions() {
+        val episode = chatEpisode.value ?: return
+        if (starterQuestionsEpisodeUuid == episode.uuid) return
+        starterQuestionsEpisodeUuid = episode.uuid
+        viewModelScope.launch {
+            val questions = chatManager.getStarterQuestions(episode.uuid, episode.podcastUuid)
+            _uiState.update { state ->
+                if (state.episodeUuid == episode.uuid) state.copy(starterQuestions = questions) else state
             }
         }
     }
@@ -578,10 +594,10 @@ class ChatViewModel @Inject constructor(
         performSend(message = ChatMessage.User(text = text, inputType = ChatInputType.Typed))
     }
 
-    fun onSummarizeClick(text: String) {
+    fun onSuggestionClick(text: String, inputType: ChatInputType) {
         val state = _uiState.value
         if (!state.areMessagesLoaded || state.isAwaitingReply || !state.isConnected) return
-        performSend(message = ChatMessage.User(text = text, inputType = ChatInputType.SummaryPrompt))
+        performSend(message = ChatMessage.User(text = text, inputType = inputType))
     }
 
     fun retry() {
@@ -1123,6 +1139,7 @@ data class ChatUiState(
     val answerRatings: Map<String, ChatAnswerRating> = emptyMap(),
     val restoredMessageUuids: Set<String> = emptySet(),
     val loadingQuoteUuid: String? = null,
+    val starterQuestions: List<String> = emptyList(),
 ) {
     val canSend: Boolean get() = inputText.isNotBlank() && isConnected && !isAwaitingReply
 
@@ -1154,6 +1171,7 @@ private val ChatInputType.analyticsValue
     get() = when (this) {
         ChatInputType.Typed -> EpisodeChatInputType.Typed
         ChatInputType.SummaryPrompt -> EpisodeChatInputType.SummaryPrompt
+        ChatInputType.SuggestedPrompt -> EpisodeChatInputType.SuggestedPrompt
     }
 
 data class ChatPlayingEpisode(
