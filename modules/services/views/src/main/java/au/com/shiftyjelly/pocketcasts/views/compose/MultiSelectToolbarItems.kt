@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.views.compose
 import android.content.res.Resources
 import android.view.MenuItem
 import androidx.annotation.DrawableRes
-import androidx.annotation.MenuRes
 import androidx.annotation.StringRes
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectAction
@@ -68,7 +67,7 @@ fun multiSelectToolbarItems(
     )
 }
 
-fun staticMultiSelectToolbarItems(resources: Resources, @MenuRes menuRes: Int): MultiSelectToolbarItems {
+fun staticMultiSelectToolbarItems(resources: Resources, menuRes: Int): MultiSelectToolbarItems {
     val icons = mutableListOf<MultiSelectToolbarItem>()
     val overflow = mutableListOf<MultiSelectToolbarItem>()
     resources.getXml(menuRes).use { parser ->
