@@ -82,7 +82,7 @@ fun EpisodePlayButton(
         }
     }
     val buttonColor = if (buttonType == PlayButtonType.PLAYED) MaterialTheme.theme.colors.primaryIcon02 else tint
-    val topPadding = with(LocalDensity.current) { 1.dp.toPx().toInt().toDp() }
+    val topPadding = with(LocalDensity.current) { 1.dp.roundToPx().toDp() }
     Box(
         modifier = modifier
             .width(52.dp)
