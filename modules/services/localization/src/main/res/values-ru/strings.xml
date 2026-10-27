@@ -18,8 +18,6 @@ Language: ru
     <string name="chat_answering">Готовится ответ</string>
     <string name="chat_error_server_on_our_end">Произошла ошибка на нашей стороне.</string>
     <string name="chat_not_sent_tap_to_retry">Не отправлено. Нажмите, чтобы попробовать ещё раз.</string>
-    <string name="chat_feedback_send_failed">Не удалось отправить отзыв. Проверьте подключение.</string>
-    <string name="chat_feedback_sending">Отправка отзыва…</string>
     <string name="chat_feedback_what_went_wrong">Что пошло не так</string>
     <string name="chat_beta_sheet_sign_in">Войдите, чтобы попробовать</string>
     <string name="episode_chat_needs_transcript_message">Чтобы задать вопрос об этом выпуске, требуется расшифровка. В этом выпуске её нет.</string>

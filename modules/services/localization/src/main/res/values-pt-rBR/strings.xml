@@ -18,8 +18,6 @@ Language: pt_BR
     <string name="chat_answering">Respondendo</string>
     <string name="chat_error_server_on_our_end">Ocorreu um erro do nosso lado.</string>
     <string name="chat_not_sent_tap_to_retry">Não enviado. Toque para tentar novamente.</string>
-    <string name="chat_feedback_send_failed">Não foi possível enviar seu feedback. Verifique sua conexão.</string>
-    <string name="chat_feedback_sending">Enviando feedback</string>
     <string name="chat_feedback_what_went_wrong">O que deu errado</string>
     <string name="chat_beta_sheet_sign_in">Faça login para experimentar</string>
     <string name="episode_chat_needs_transcript_message">Para fazer perguntas sobre este episódio, é necessária uma transcrição. Este episódio não tem uma.</string>

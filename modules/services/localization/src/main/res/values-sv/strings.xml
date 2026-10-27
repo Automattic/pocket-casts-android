@@ -14,12 +14,10 @@ Language: sv_SE
     <string name="chat_cleared">Chatt rensad</string>
     <string name="chat_now_playing_episode">Spelar nu upp %1$s</string>
     <string name="chat_history_previous_7_days">Föregående 7 dagar</string>
-    <string name="chat_feedback_send_failed">Kunde inte skicka din feedback. Kontrollera din anslutning.</string>
     <string name="chat_offline_note">Du är offline. Anslut för att ställa en fråga.</string>
     <string name="chat_answering">Svarar</string>
     <string name="chat_error_server_on_our_end">Något gick fel hos oss.</string>
     <string name="chat_not_sent_tap_to_retry">Inte skickat. Tryck för att försöka igen.</string>
-    <string name="chat_feedback_sending">Skickar feedback</string>
     <string name="chat_beta_sheet_sign_in">Logga in för att prova det</string>
     <string name="chat_feedback_what_went_wrong">Vad som gick fel</string>
     <string name="episode_chat_needs_transcript_message">Fråga om detta avsnitt behöver en transkription. Detta avsnitt har ingen.</string>

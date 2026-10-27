@@ -18,8 +18,6 @@ Language: ar
     <string name="chat_answering">جارٍ الإجابة</string>
     <string name="chat_error_server_on_our_end">حدث خطأ ما من جانبنا.</string>
     <string name="chat_not_sent_tap_to_retry">لم يتم الإرسال. اضغط لإعادة المحاولة.</string>
-    <string name="chat_feedback_send_failed">تعذَّر إرسال ملاحظاتك. تحقق من اتصالك بالشبكة.</string>
-    <string name="chat_feedback_sending">جارٍ إرسال الملاحظات</string>
     <string name="chat_feedback_what_went_wrong">ما الخطأ الذي حدث</string>
     <string name="chat_beta_sheet_sign_in">سجّل الدخول لتجربة ذلك</string>
     <string name="episode_chat_needs_transcript_message">تحتاج إلى نصّ مفرّغ للحلقة حتى تتمكن من طرح أسئلة حولها. لا يتوفر نصّ مفرّغ لهذه الحلقة.</string>

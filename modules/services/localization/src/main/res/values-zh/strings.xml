@@ -18,8 +18,6 @@ Language: zh_CN
     <string name="chat_answering">正在回答</string>
     <string name="chat_error_server_on_our_end">我们这边出了点问题。</string>
     <string name="chat_not_sent_tap_to_retry">未发送。 轻点以重试。</string>
-    <string name="chat_feedback_send_failed">无法发送您的反馈。 检查您的连接。</string>
-    <string name="chat_feedback_sending">正在发送反馈</string>
     <string name="chat_feedback_what_went_wrong">出现的问题</string>
     <string name="chat_beta_sheet_sign_in">登录以尝试</string>
     <string name="episode_chat_needs_transcript_message">“关于此剧集的提问”功能需要文字转录稿。 此剧集没有文字转录稿。</string>
