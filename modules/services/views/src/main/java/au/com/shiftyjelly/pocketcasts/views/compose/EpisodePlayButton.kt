@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.views.compose
 
+import android.content.Context
 import android.view.MotionEvent
 import android.view.View
 import android.widget.PopupMenu
@@ -129,7 +130,7 @@ fun EpisodePlayButton(
             ),
     ) {
         AndroidView(
-            factory = { viewContext -> View(viewContext).apply { isLongClickable = true }.also { anchor.value = it } },
+            factory = { viewContext -> PopupAnchorView(viewContext).also { anchor.value = it } },
             modifier = Modifier.matchParentSize(),
         )
         Box(
@@ -175,6 +176,14 @@ private fun Modifier.forwardTouches(
             motionEvent.recycle()
         }
     }
+}
+
+private class PopupAnchorView(context: Context) : View(context) {
+    init {
+        isLongClickable = true
+    }
+
+    override fun dispatchTouchEvent(event: MotionEvent) = false
 }
 
 private val PlayButtonMenuItem.menuId
