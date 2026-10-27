@@ -87,6 +87,20 @@ class MultiSelectRearrangeStateTest {
     }
 
     @Test
+    fun `the saved order rebuild moves the hidden header back after a drag`() {
+        val state = createState()
+        val hiddenHeader = MultiSelectRearrangeTitle(LR.string.multiselect_actions_hidden)
+
+        state.onItemMove(fromPosition = 1, toPosition = 2)
+        assertEquals(hiddenHeader, state.items.value[6])
+
+        state.onItemTouchFinished(2)
+        state.onSettingsChanged(state.items.value.filterIsInstance<MultiSelectAction>().map { it.groupId })
+
+        assertEquals(hiddenHeader, state.items.value[5])
+    }
+
+    @Test
     fun `saved order rebuilds the headers around the toolbar actions`() {
         val state = createState()
 
