@@ -91,7 +91,7 @@ internal fun UserEpisodeRow(
     }
     val dateFormatter = remember(context) { RelativeDateFormatter(context) }
     val date = episode.getSummaryText(dateFormatter, colors.tint.toArgb(), showDuration = false, context)
-    val actions = remember(episode, rowData) { swipeActions() }
+    val actions = swipeActions()
     val isGreyedOut = episode.playingStatus == EpisodePlayingStatus.COMPLETED || episode.isArchived
     EpisodeRowContainer(
         swipeRowState = rememberSwipeRowState(episode.uuid),
