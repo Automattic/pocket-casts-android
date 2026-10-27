@@ -149,6 +149,8 @@ class ChatViewModel @Inject constructor(
                 val isConnected = capabilities != null &&
                     capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
                 _uiState.update { it.copy(isConnected = isConnected) }
+                val state = _uiState.value
+                if (isConnected && state.areMessagesLoaded && state.messages.isEmpty()) loadStarterQuestions()
             }
         }
     }
@@ -288,6 +290,9 @@ class ChatViewModel @Inject constructor(
         starterQuestionsEpisodeUuid = episode.uuid
         viewModelScope.launch {
             val questions = chatManager.getStarterQuestions(episode.uuid, episode.podcastUuid)
+            if (questions.isEmpty() && starterQuestionsEpisodeUuid == episode.uuid) {
+                starterQuestionsEpisodeUuid = null
+            }
             _uiState.update { state ->
                 if (state.episodeUuid == episode.uuid) state.copy(starterQuestions = questions) else state
             }

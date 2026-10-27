@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.key
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -31,6 +32,7 @@ internal fun ChatWelcome(
     modifier: Modifier = Modifier,
 ) {
     val summarize = stringResource(LR.string.chat_suggestion_summarize)
+    val animateStarterQuestions = remember { starterQuestions.isEmpty() }
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.End,
@@ -55,7 +57,7 @@ internal fun ChatWelcome(
             )
             starterQuestions.forEach { question ->
                 key(question) {
-                    ChatAppear(animate = true) {
+                    ChatAppear(animate = animateStarterQuestions) {
                         ChatSuggestionChip(
                             text = question,
                             enabled = isSuggestionEnabled,

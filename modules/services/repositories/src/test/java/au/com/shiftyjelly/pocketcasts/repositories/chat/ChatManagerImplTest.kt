@@ -272,7 +272,7 @@ class ChatManagerImplTest {
     @Test
     fun `starter questions are requested for the episode`() = runTest {
         whenever(podcastCacheServiceManager.episodeChatStarterQuestions(any(), any())).thenReturn(
-            EpisodeChatStarterQuestionsResponse(suggestedQuestions = listOf(" Who is the guest? ", "", "What changed?")),
+            EpisodeChatStarterQuestionsResponse(suggestedQuestions = listOf(" Who is the guest? ", "", "What changed?", "Who is the guest?")),
         )
 
         val questions = manager.getStarterQuestions(EPISODE_UUID, PODCAST_UUID)

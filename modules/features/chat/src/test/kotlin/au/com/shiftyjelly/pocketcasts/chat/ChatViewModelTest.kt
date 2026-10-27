@@ -455,6 +455,29 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `starter questions load again once back online after a failed load`() = runTest {
+        setEpisodeInfo()
+        advanceUntilIdle()
+        chatManager.starterQuestions = listOf("Who is the guest?")
+
+        connectToInternet()
+
+        assertEquals(2, chatManager.starterQuestionRequests.size)
+        assertEquals(listOf("Who is the guest?"), viewModel.uiState.value.starterQuestions)
+    }
+
+    @Test
+    fun `loaded starter questions are not requested again`() = runTest {
+        chatManager.starterQuestions = listOf("Who is the guest?")
+        setEpisodeInfo()
+        advanceUntilIdle()
+
+        connectToInternet()
+
+        assertEquals(1, chatManager.starterQuestionRequests.size)
+    }
+
+    @Test
     fun `starter questions wait for sign in`() = runTest {
         isLoggedIn = false
         setEpisodeInfo(isBeta = true, requiresSignIn = true)

@@ -112,7 +112,7 @@ class ChatManagerImpl @Inject constructor(
             podcastCacheServiceManager.episodeChatStarterQuestions(
                 authorization = authorization(),
                 request = EpisodeChatStarterQuestionsRequest(podcastUuid = podcastUuid, episodeUuid = episodeUuid),
-            ).suggestedQuestions.map(String::trim).filter(String::isNotEmpty)
+            ).suggestedQuestions.map(String::trim).filter(String::isNotEmpty).distinct()
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
