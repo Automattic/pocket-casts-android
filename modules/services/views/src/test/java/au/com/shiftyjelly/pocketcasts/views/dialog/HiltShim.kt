@@ -2,16 +2,23 @@ package au.com.shiftyjelly.pocketcasts.views.dialog
 
 import android.app.Application
 import android.os.Bundle
+import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.ThemeSetting
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectToolbar
+import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectToolbar_GeneratedInjector
+import com.automattic.eventhorizon.EventHorizon
 import dagger.hilt.android.components.FragmentComponent
+import dagger.hilt.android.components.ViewComponent
 import dagger.hilt.android.flags.FragmentGetContextFix
 import dagger.hilt.android.internal.builders.FragmentComponentBuilder
+import dagger.hilt.android.internal.builders.ViewComponentBuilder
 import dagger.hilt.android.internal.managers.FragmentComponentManager
+import dagger.hilt.android.internal.managers.ViewComponentManager
 import dagger.hilt.internal.GeneratedComponent
 import dagger.hilt.internal.GeneratedComponentManager
 import dagger.hilt.internal.GeneratedComponentManagerHolder
@@ -50,8 +57,11 @@ class HiltShimActivity :
         FragmentComponentManager.FragmentComponentBuilderEntryPoint,
         FragmentComponentBuilder,
         FragmentComponent,
+        ViewComponentManager.ViewComponentBuilderEntryPoint,
         ConfirmationDialog_GeneratedInjector {
         override fun fragmentComponentBuilder() = this
+
+        override fun viewComponentBuilder() = ViewShim
 
         override fun fragment(fragment: Fragment) = this
 
@@ -59,6 +69,19 @@ class HiltShimActivity :
 
         override fun injectConfirmationDialog(confirmationDialog: ConfirmationDialog) {
             confirmationDialog.theme = lightTheme
+        }
+    }
+
+    private object ViewShim :
+        ViewComponentBuilder,
+        ViewComponent,
+        MultiSelectToolbar_GeneratedInjector {
+        override fun view(view: View) = this
+
+        override fun build() = this
+
+        override fun injectMultiSelectToolbar(multiSelectToolbar: MultiSelectToolbar) {
+            multiSelectToolbar.eventHorizon = EventHorizon {}
         }
     }
 }
