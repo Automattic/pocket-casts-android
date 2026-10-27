@@ -5,7 +5,7 @@
   "files_to_copy": [
     {
       "file": "android/pocket-casts/secret.properties",
-      "destination": "secret.properties",
+      "destination": "~/.configure/pocketcasts-android/secrets/secret.properties",
       "encrypt": true
     },
     {
@@ -40,7 +40,7 @@
     },
     {
       "file": "android/pocket-casts/android.keystore",
-      "destination": "release.keystore",
+      "destination": "~/.configure/pocketcasts-android/secrets/upload.jks",
       "encrypt": true
     }
   ],
