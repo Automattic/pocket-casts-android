@@ -46,7 +46,7 @@ internal fun EpisodeRowArtwork(
     imageRequestFactory: PocketCastsImageRequestFactory,
     isGreyedOut: Boolean,
 ) {
-    val request = remember(episode.uuid, useEpisodeArtwork, imageRequestFactory) { imageRequestFactory.create(episode, useEpisodeArtwork) }
+    val request = remember(episode, useEpisodeArtwork, imageRequestFactory) { imageRequestFactory.create(episode, useEpisodeArtwork) }
     EpisodeRowArtwork(request, alpha = if (isGreyedOut) 0.5f else 1f, elevation = if (isGreyedOut) 0f else 2f)
 }
 
