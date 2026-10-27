@@ -1,7 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.views.compose
 
-import android.content.Context
-import android.util.TypedValue
 import androidx.annotation.AttrRes
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -25,6 +23,7 @@ import au.com.shiftyjelly.pocketcasts.compose.swipe.rememberSwipeRowState
 import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
 import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
+import au.com.shiftyjelly.pocketcasts.ui.extensions.getAttrTextStyleColor
 import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeAction
 import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeRowActions
 import au.com.shiftyjelly.pocketcasts.views.swipe.trailingSwipeRowActions
@@ -46,7 +45,7 @@ fun UnavailableEpisodeRow(
     colors: EpisodeRowColors = EpisodeRowDefaults.colors(),
 ) {
     val context = LocalContext.current
-    val date = remember(context, episode.publishedAt) { RelativeDateFormatter(context).format(Date.from(episode.publishedAt)) }
+    val date = RelativeDateFormatter(context).format(Date.from(episode.publishedAt))
     val request = remember(episode.podcastUuid, imageRequestFactory) { imageRequestFactory.createForPodcast(episode.podcastUuid) }
     EpisodeRowContainer(
         swipeRowState = rememberSwipeRowState(episode.episodeUuid),
@@ -139,11 +138,5 @@ private const val UNAVAILABLE_ALPHA = 0.4f
 @Composable
 private fun textAppearanceColor(@AttrRes styleAttr: Int): Color {
     val context = LocalContext.current
-    return remember(context, styleAttr) { Color(context.textAppearanceColor(styleAttr)) }
-}
-
-private fun Context.textAppearanceColor(@AttrRes styleAttr: Int): Int {
-    val style = TypedValue().also { theme.resolveAttribute(styleAttr, it, true) }.resourceId
-    val attributes = obtainStyledAttributes(style, intArrayOf(android.R.attr.textColor))
-    return attributes.getColor(0, 0).also { attributes.recycle() }
+    return remember(context, styleAttr) { Color(context.getAttrTextStyleColor(styleAttr)) }
 }
