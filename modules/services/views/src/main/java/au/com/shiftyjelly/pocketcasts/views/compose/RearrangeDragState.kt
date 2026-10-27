@@ -8,7 +8,6 @@ import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.awaitLongPressOrCancellation
 import androidx.compose.foundation.lazy.LazyListItemInfo
-import androidx.compose.foundation.lazy.LazyListLayoutInfo
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -51,7 +50,7 @@ internal class RearrangeDragState(
     private var startTop = 0
     private var initialTouchY = 0f
     private var handleDownKey: Any? = null
-    private var pendingLayout: LazyListLayoutInfo? = null
+    private var pendingMoveIndex: Int? = null
     private var scrollJob: Job? = null
     private var dragScrollStart = Long.MIN_VALUE
     private val lift = Animatable(0f)
@@ -81,13 +80,19 @@ internal class RearrangeDragState(
 
     internal fun takeHandleDown() = handleDownKey.also { handleDownKey = null }
 
+    internal fun clearHandleDown() {
+        handleDownKey = null
+    }
+
     internal fun reorderableKeyAt(y: Float): Any? = listState.layoutInfo.visibleItemsInfo
         .lastOrNull { y >= top(it) && y <= top(it) + it.size }
         ?.key
         ?.takeIf(isReorderable)
 
     internal fun select(key: Any, touchY: Float, fromHandle: Boolean): Boolean {
+        if (recoveringKey != null) return false
         val info = itemInfo(key) ?: return false
+        pendingMoveIndex = null
         startTop = top(info)
         initialTouchY = touchY
         dy = 0f
@@ -119,6 +124,7 @@ internal class RearrangeDragState(
     internal fun release() {
         val key = selectedKey ?: return
         val translation = translationY(key)
+        pendingMoveIndex = null
         scrollJob?.cancel()
         dragScrollStart = Long.MIN_VALUE
         selectedKey = null
@@ -136,12 +142,13 @@ internal class RearrangeDragState(
     private fun moveIfNecessary() {
         val layout = listState.layoutInfo
         val key = selectedKey ?: return
-        if (layout === pendingLayout) return
+        val index = itemInfo(key)?.index ?: return
+        if (index == pendingMoveIndex) return
         val bounds = layout.visibleItemsInfo.map { DragItemBounds(it.key, top(it), top(it) + it.size) }
         val selected = bounds.firstOrNull { it.key == key } ?: return
         val target = ItemTouchDragRules.dropTarget(selected, bounds, startTop + dy) ?: return
         if (isReorderable(target.key)) {
-            pendingLayout = layout
+            pendingMoveIndex = index
             onMove(key, target.key)
         }
     }
@@ -177,25 +184,29 @@ internal val AccelerateDecelerate = Easing { (cos((it + 1) * PI) / 2 + 0.5).toFl
 
 internal fun Modifier.rearrangeDragGestures(state: RearrangeDragState) = pointerInput(state) {
     awaitEachGesture {
-        val down = awaitFirstDown(requireUnconsumed = false)
-        val handleKey = state.takeHandleDown()
-        val key = if (handleKey != null) {
-            handleKey
-        } else {
-            if (awaitLongPressOrCancellation(down.id) == null) return@awaitEachGesture
-            state.reorderableKeyAt(down.position.y) ?: return@awaitEachGesture
-        }
-        if (!state.select(key, down.position.y, fromHandle = handleKey != null)) return@awaitEachGesture
-        var isFirstMove = true
-        while (true) {
-            val event = awaitPointerEvent(PointerEventPass.Initial)
-            val change = event.changes.firstOrNull { it.id == down.id }
-            if (change == null || !change.pressed) break
-            change.consume()
-            if (event.type == PointerEventType.Move) {
-                if (isFirstMove) isFirstMove = false else state.onPointerMove(change.position.y)
+        try {
+            val down = awaitFirstDown(requireUnconsumed = false)
+            val handleKey = state.takeHandleDown()
+            val key = if (handleKey != null) {
+                handleKey
+            } else {
+                if (awaitLongPressOrCancellation(down.id) == null) return@awaitEachGesture
+                state.reorderableKeyAt(down.position.y) ?: return@awaitEachGesture
             }
+            if (!state.select(key, down.position.y, fromHandle = handleKey != null)) return@awaitEachGesture
+            var isFirstMove = true
+            while (true) {
+                val event = awaitPointerEvent(PointerEventPass.Initial)
+                val change = event.changes.firstOrNull { it.id == down.id }
+                if (change == null || !change.pressed) break
+                change.consume()
+                if (event.type == PointerEventType.Move) {
+                    if (isFirstMove) isFirstMove = false else state.onPointerMove(change.position.y)
+                }
+            }
+            state.release()
+        } finally {
+            state.clearHandleDown()
         }
-        state.release()
     }
 }
