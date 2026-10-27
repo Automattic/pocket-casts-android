@@ -362,7 +362,7 @@ private fun ChatContent(
                                 ChatDisclaimer(theme = theme)
                             }
                             val followUps = uiState.followUps
-                            if (index == uiState.messages.lastIndex && followUps.isNotEmpty()) {
+                            if (followUps.isNotEmpty()) {
                                 ChatAppear(animate = isNew) {
                                     ChatFollowUps(
                                         followUps = followUps,
@@ -598,7 +598,11 @@ private fun ChatScreenPreview(
                         ),
                         ChatMessage.Assistant(
                             text = "The hosts focused on making discovery feel personal without adding friction.",
-                            followUps = listOf("How do recommendations work?", "Who is the guest?", "What changed this year?"),
+                            followUps = listOf(
+                                "How do recommendations work?",
+                                "Who is the guest?",
+                                "What changed this year?",
+                            ),
                         ),
                         ChatMessage.Quote(
                             text = "The important idea is to keep the interface simple while still surfacing useful context.",

@@ -19,8 +19,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatInputType
@@ -85,8 +87,9 @@ internal fun ChatFollowUps(
     Row(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         modifier = modifier
-            .fillMaxWidth()
-            .horizontalScroll(rememberScrollState()),
+            .bleedToEnd(FollowUpsEndBleed)
+            .horizontalScroll(rememberScrollState())
+            .padding(end = FollowUpsEndBleed),
     ) {
         followUps.forEach { followUp ->
             key(followUp) {
@@ -100,6 +103,16 @@ internal fun ChatFollowUps(
         }
     }
 }
+
+private fun Modifier.bleedToEnd(bleed: Dp) = layout { measurable, constraints ->
+    val bleedPx = bleed.roundToPx()
+    val placeable = measurable.measure(constraints.copy(minWidth = 0, maxWidth = constraints.maxWidth + bleedPx))
+    layout(constraints.maxWidth, placeable.height) {
+        placeable.place(0, 0)
+    }
+}
+
+private val FollowUpsEndBleed = 16.dp
 
 @Composable
 private fun ChatSuggestionChip(
