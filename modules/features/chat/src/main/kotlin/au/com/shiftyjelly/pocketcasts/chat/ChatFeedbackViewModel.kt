@@ -2,26 +2,21 @@ package au.com.shiftyjelly.pocketcasts.chat
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
-import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatFeedback
-import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatFeedbackManager
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatManager
-import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatMessage
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.eventhorizon.EpisodeChatFeedbackFormDismissedEvent
 import com.automattic.eventhorizon.EpisodeChatFeedbackFormShownEvent
 import com.automattic.eventhorizon.EpisodeChatFeedbackReasonType
-import com.automattic.eventhorizon.EpisodeChatFeedbackSubmitFailedEvent
 import com.automattic.eventhorizon.EpisodeChatFeedbackSubmitTappedEvent
 import com.automattic.eventhorizon.EpisodeChatFeedbackSubmittedEvent
 import com.automattic.eventhorizon.EpisodeChatFeedbackTriggerType
 import com.automattic.eventhorizon.EventHorizon
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -34,13 +29,12 @@ import kotlinx.coroutines.launch
 class ChatFeedbackViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val chatManager: ChatManager,
-    private val feedbackManager: ChatFeedbackManager,
     private val eventHorizon: EventHorizon,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(
         UiState(
-            reason = savedStateHandle.get<ChatFeedback.Reason>(REASON_KEY),
+            reason = savedStateHandle.get<ChatFeedbackReason>(REASON_KEY),
             details = savedStateHandle[DETAILS_KEY] ?: "",
         ),
     )
@@ -54,6 +48,7 @@ class ChatFeedbackViewModel @Inject constructor(
     private lateinit var sourceView: SourceView
     private lateinit var trigger: EpisodeChatFeedbackTriggerType
     private var messageIndex: Long? = null
+    private var answerUuid: String? = null
 
     private var isSubmitted: Boolean
         get() = savedStateHandle[IS_SUBMITTED_KEY] ?: false
@@ -71,12 +66,14 @@ class ChatFeedbackViewModel @Inject constructor(
         sourceView: SourceView,
         trigger: EpisodeChatFeedbackTriggerType,
         messageIndex: Long?,
+        answerUuid: String?,
     ) {
         this.episodeUuid = episodeUuid
         this.podcastUuid = podcastUuid
         this.sourceView = sourceView
         this.trigger = trigger
         this.messageIndex = messageIndex
+        this.answerUuid = answerUuid
         if (savedStateHandle.get<Boolean>(IS_SHOWN_TRACKED_KEY) == true) return
         savedStateHandle[IS_SHOWN_TRACKED_KEY] = true
         eventHorizon.track(
@@ -90,7 +87,7 @@ class ChatFeedbackViewModel @Inject constructor(
         )
     }
 
-    fun onReasonSelected(reason: ChatFeedback.Reason) {
+    fun onReasonSelected(reason: ChatFeedbackReason) {
         savedStateHandle[REASON_KEY] = reason
         _uiState.update { it.copy(reason = reason) }
     }
@@ -104,7 +101,7 @@ class ChatFeedbackViewModel @Inject constructor(
     fun submit() {
         val state = _uiState.value
         val reason = state.reason ?: return
-        if (isSubmitted || state.isSubmitting) return
+        if (isSubmitted) return
         val details = state.detailsToSend
         eventHorizon.track(
             EpisodeChatFeedbackSubmitTappedEvent(
@@ -117,50 +114,35 @@ class ChatFeedbackViewModel @Inject constructor(
                 hasDetails = details.isNotEmpty(),
             ),
         )
-        _uiState.update { it.copy(isSubmitting = true, hasSubmitError = false) }
-        val request = applicationScope.async {
-            runCatching {
-                feedbackManager.submit(
-                    ChatFeedback(
-                        episodeUuid = episodeUuid,
-                        podcastUuid = podcastUuid,
-                        reason = reason,
-                        details = details,
-                        conversation = chatManager.observeMessages(episodeUuid).first().dropLastWhile { it is ChatMessage.User },
-                    ),
-                )
-            }.onSuccess {
-                eventHorizon.track(
-                    EpisodeChatFeedbackSubmittedEvent(
-                        source = sourceView.analyticsValue,
-                        episodeUuid = episodeUuid,
-                        podcastUuid = podcastUuid,
-                        trigger = trigger,
-                        reason = reason.analyticsValue,
-                        hasDetails = details.isNotEmpty(),
-                        messageIndex = messageIndex,
-                    ),
-                )
-            }.onFailure {
-                LogBuffer.e(LOG_TAG, it, "Failed to submit episode chat feedback")
-                eventHorizon.track(
-                    EpisodeChatFeedbackSubmitFailedEvent(
-                        source = sourceView.analyticsValue,
-                        episodeUuid = episodeUuid,
-                        podcastUuid = podcastUuid,
-                        trigger = trigger,
-                        messageIndex = messageIndex,
-                    ),
-                )
-            }
+        isSubmitted = true
+        _submitted.trySend(Unit)
+        applicationScope.launch {
+            val ratedAnswer = answerUuid?.let { findRatedAnswer(it) }
+            eventHorizon.track(
+                EpisodeChatFeedbackSubmittedEvent(
+                    source = sourceView.analyticsValue,
+                    episodeUuid = episodeUuid,
+                    podcastUuid = podcastUuid,
+                    trigger = trigger,
+                    reason = reason.analyticsValue,
+                    hasDetails = details.isNotEmpty(),
+                    messageIndex = messageIndex,
+                    details = details.takeIf { it.isNotEmpty() }?.truncatedForAnalytics(),
+                    question = ratedAnswer?.question,
+                    answer = ratedAnswer?.answer,
+                ),
+            )
         }
-        viewModelScope.launch {
-            if (request.await().isSuccess) {
-                isSubmitted = true
-                _submitted.send(Unit)
-            } else {
-                _uiState.update { it.copy(isSubmitting = false, hasSubmitError = true) }
-            }
+    }
+
+    private suspend fun findRatedAnswer(answerUuid: String): ChatRatedAnswer? {
+        return try {
+            chatManager.observeMessages(episodeUuid).first().ratedAnswer(answerUuid)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            LogBuffer.e(LOG_TAG, e, "Failed to read the rated episode chat answer")
+            null
         }
     }
 
@@ -178,13 +160,11 @@ class ChatFeedbackViewModel @Inject constructor(
     }
 
     data class UiState(
-        val reason: ChatFeedback.Reason? = null,
+        val reason: ChatFeedbackReason? = null,
         val details: String = "",
-        val isSubmitting: Boolean = false,
-        val hasSubmitError: Boolean = false,
     ) {
-        val canSubmit get() = reason != null && !isSubmitting
-        val showDetails get() = reason == ChatFeedback.Reason.Other
+        val canSubmit get() = reason != null
+        val showDetails get() = reason == ChatFeedbackReason.Other
         val detailsToSend get() = if (showDetails) details.trim() else ""
     }
 
@@ -198,11 +178,11 @@ class ChatFeedbackViewModel @Inject constructor(
     }
 }
 
-private val ChatFeedback.Reason.analyticsValue
+private val ChatFeedbackReason.analyticsValue
     get() = when (this) {
-        ChatFeedback.Reason.NotInteresting -> EpisodeChatFeedbackReasonType.NotInteresting
-        ChatFeedback.Reason.WrongFacts -> EpisodeChatFeedbackReasonType.WrongFacts
-        ChatFeedback.Reason.OutOfDate -> EpisodeChatFeedbackReasonType.OutOfDate
-        ChatFeedback.Reason.Offensive -> EpisodeChatFeedbackReasonType.Offensive
-        ChatFeedback.Reason.Other -> EpisodeChatFeedbackReasonType.Other
+        ChatFeedbackReason.NotInteresting -> EpisodeChatFeedbackReasonType.NotInteresting
+        ChatFeedbackReason.WrongFacts -> EpisodeChatFeedbackReasonType.WrongFacts
+        ChatFeedbackReason.OutOfDate -> EpisodeChatFeedbackReasonType.OutOfDate
+        ChatFeedbackReason.Offensive -> EpisodeChatFeedbackReasonType.Offensive
+        ChatFeedbackReason.Other -> EpisodeChatFeedbackReasonType.Other
     }

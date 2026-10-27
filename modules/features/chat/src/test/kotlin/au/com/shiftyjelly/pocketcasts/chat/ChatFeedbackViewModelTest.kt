@@ -7,8 +7,6 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.models.to.EpisodeChatHistoryItem
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatAnswerRating
-import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatFeedback
-import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatFeedbackManager
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatManager
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatMessage
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ClearedChat
@@ -16,13 +14,10 @@ import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import com.automattic.eventhorizon.EpisodeChatFeedbackFormDismissedEvent
 import com.automattic.eventhorizon.EpisodeChatFeedbackFormShownEvent
 import com.automattic.eventhorizon.EpisodeChatFeedbackReasonType
-import com.automattic.eventhorizon.EpisodeChatFeedbackSubmitFailedEvent
 import com.automattic.eventhorizon.EpisodeChatFeedbackSubmitTappedEvent
 import com.automattic.eventhorizon.EpisodeChatFeedbackSubmittedEvent
 import com.automattic.eventhorizon.EpisodeChatFeedbackTriggerType
 import com.automattic.eventhorizon.EventHorizon
-import java.io.IOException
-import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.SupervisorJob
@@ -32,6 +27,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -43,24 +39,22 @@ class ChatFeedbackViewModelTest {
 
     private val eventSink = TestEventSink()
     private val savedStateHandle = SavedStateHandle()
-    private val conversation = listOf(
+    private var storedMessages: List<ChatMessage> = listOf(
         ChatMessage.User(text = "Question", uuid = "user-uuid"),
         ChatMessage.Assistant(text = "Answer", uuid = "assistant-uuid"),
     )
-    private var storedMessages: List<ChatMessage> = conversation
-    private val feedbackManager = TestChatFeedbackManager()
 
     private fun createViewModel(
         trigger: EpisodeChatFeedbackTriggerType = EpisodeChatFeedbackTriggerType.SessionSurvey,
         messageIndex: Long? = null,
+        answerUuid: String? = null,
     ) = ChatFeedbackViewModel(
         savedStateHandle = savedStateHandle,
         chatManager = TestChatManager(storedMessages),
-        feedbackManager = feedbackManager,
         eventHorizon = EventHorizon(eventSink),
         applicationScope = CoroutineScope(SupervisorJob() + coroutineRule.testDispatcher),
     ).apply {
-        onShown(EPISODE_UUID, PODCAST_UUID, SourceView.PLAYER, trigger, messageIndex)
+        onShown(EPISODE_UUID, PODCAST_UUID, SourceView.PLAYER, trigger, messageIndex, answerUuid)
     }
 
     @Test
@@ -83,61 +77,53 @@ class ChatFeedbackViewModelTest {
     @Test
     fun `cannot submit without a reason`() {
         val viewModel = createViewModel()
+        eventSink.skipEvent()
 
         assertFalse(viewModel.uiState.value.canSubmit)
         viewModel.submit()
-        assertTrue(feedbackManager.submitted.isEmpty())
+        assertTrue(eventSink.isEmpty())
     }
 
     @Test
     fun `details show only for other and are sent trimmed`() = runTest {
         val viewModel = createViewModel()
-        viewModel.onReasonSelected(ChatFeedback.Reason.WrongFacts)
+        viewModel.onReasonSelected(ChatFeedbackReason.WrongFacts)
         assertFalse(viewModel.uiState.value.showDetails)
 
-        viewModel.onReasonSelected(ChatFeedback.Reason.Other)
+        viewModel.onReasonSelected(ChatFeedbackReason.Other)
         viewModel.onDetailsChange("  It missed the guest  ")
         assertTrue(viewModel.uiState.value.showDetails)
-
-        viewModel.submit()
-        advanceUntilIdle()
-
-        assertEquals(
-            ChatFeedback(
-                episodeUuid = EPISODE_UUID,
-                podcastUuid = PODCAST_UUID,
-                reason = ChatFeedback.Reason.Other,
-                details = "It missed the guest",
-                conversation = conversation,
-            ),
-            feedbackManager.submitted.single(),
-        )
-    }
-
-    @Test
-    fun `an unanswered question at the end is not sent with the feedback`() = runTest {
-        storedMessages = conversation + ChatMessage.User(text = "Not sent", uuid = "unsent-uuid")
-        val viewModel = createViewModel()
-        viewModel.onReasonSelected(ChatFeedback.Reason.WrongFacts)
-
-        viewModel.submit()
-        advanceUntilIdle()
-
-        assertEquals(conversation, feedbackManager.submitted.single().conversation)
-    }
-
-    @Test
-    fun `details typed before switching away from other are not sent`() = runTest {
-        val viewModel = createViewModel()
-        viewModel.onReasonSelected(ChatFeedback.Reason.Other)
-        viewModel.onDetailsChange("Draft")
-        viewModel.onReasonSelected(ChatFeedback.Reason.Offensive)
         eventSink.skipEvent()
 
         viewModel.submit()
         advanceUntilIdle()
 
-        assertEquals("", feedbackManager.submitted.single().details)
+        assertTrue(eventSink.pollEvent() is EpisodeChatFeedbackSubmitTappedEvent)
+        assertEquals(
+            EpisodeChatFeedbackSubmittedEvent(
+                source = SourceView.PLAYER.analyticsValue,
+                episodeUuid = EPISODE_UUID,
+                podcastUuid = PODCAST_UUID,
+                trigger = EpisodeChatFeedbackTriggerType.SessionSurvey,
+                reason = EpisodeChatFeedbackReasonType.Other,
+                hasDetails = true,
+                details = "It missed the guest",
+            ),
+            eventSink.pollEvent(),
+        )
+    }
+
+    @Test
+    fun `details typed before switching away from other are not sent`() = runTest {
+        val viewModel = createViewModel()
+        viewModel.onReasonSelected(ChatFeedbackReason.Other)
+        viewModel.onDetailsChange("Draft")
+        viewModel.onReasonSelected(ChatFeedbackReason.Offensive)
+        eventSink.skipEvent()
+
+        viewModel.submit()
+        advanceUntilIdle()
+
         assertEquals(
             EpisodeChatFeedbackSubmitTappedEvent(
                 source = SourceView.PLAYER.analyticsValue,
@@ -149,12 +135,13 @@ class ChatFeedbackViewModelTest {
             ),
             eventSink.pollEvent(),
         )
+        assertNull((eventSink.pollEvent() as EpisodeChatFeedbackSubmittedEvent).details)
     }
 
     @Test
     fun `submits only once and does not track dismissal after submitting`() = runTest {
         val viewModel = createViewModel()
-        viewModel.onReasonSelected(ChatFeedback.Reason.NotInteresting)
+        viewModel.onReasonSelected(ChatFeedbackReason.NotInteresting)
         eventSink.skipEvent()
 
         viewModel.submit()
@@ -164,72 +151,38 @@ class ChatFeedbackViewModelTest {
         viewModel.onDismissed()
         advanceUntilIdle()
 
-        assertEquals(1, feedbackManager.submitted.size)
         assertTrue(eventSink.pollEvent() is EpisodeChatFeedbackSubmitTappedEvent)
         assertTrue(eventSink.pollEvent() is EpisodeChatFeedbackSubmittedEvent)
         assertTrue(eventSink.isEmpty())
     }
 
     @Test
-    fun `submitting locks the form and emits submitted on success`() = runTest {
+    fun `submitting emits submitted right away`() = runTest {
         val viewModel = createViewModel()
-        viewModel.onReasonSelected(ChatFeedback.Reason.WrongFacts)
+        viewModel.onReasonSelected(ChatFeedbackReason.WrongFacts)
 
         viewModel.submitted.test {
             viewModel.submit()
-            assertTrue(viewModel.uiState.value.isSubmitting)
-            assertFalse(viewModel.uiState.value.canSubmit)
 
-            advanceUntilIdle()
             awaitItem()
         }
-        assertFalse(viewModel.uiState.value.hasSubmitError)
     }
 
     @Test
-    fun `failed submit keeps the selection and allows trying again`() = runTest {
-        feedbackManager.failure = IOException("offline")
-        val viewModel = createViewModel()
-        viewModel.onReasonSelected(ChatFeedback.Reason.Other)
-        viewModel.onDetailsChange("Missed the guest")
-        eventSink.skipEvent()
-
-        viewModel.submitted.test {
-            viewModel.submit()
-            advanceUntilIdle()
-
-            val state = viewModel.uiState.value
-            assertFalse(state.isSubmitting)
-            assertTrue(state.hasSubmitError)
-            assertEquals(ChatFeedback.Reason.Other, state.reason)
-            assertEquals("Missed the guest", state.details)
-            expectNoEvents()
-
-            feedbackManager.failure = null
-            viewModel.submit()
-            assertFalse(viewModel.uiState.value.hasSubmitError)
-            advanceUntilIdle()
-            awaitItem()
-        }
-        assertTrue(eventSink.pollEvent() is EpisodeChatFeedbackSubmitTappedEvent)
-        assertEquals(
-            EpisodeChatFeedbackSubmitFailedEvent(
-                source = SourceView.PLAYER.analyticsValue,
-                episodeUuid = EPISODE_UUID,
-                podcastUuid = PODCAST_UUID,
-                trigger = EpisodeChatFeedbackTriggerType.SessionSurvey,
-            ),
-            eventSink.pollEvent(),
+    fun `submit from a thumbs down tracks the rated question and answer`() = runTest {
+        storedMessages = listOf(
+            ChatMessage.User(text = "First question", uuid = "q1"),
+            ChatMessage.Assistant(text = "First answer", uuid = "a1"),
+            ChatMessage.Quote(text = "A quote", start = "1:00", end = "1:10", uuid = "a1-quote"),
+            ChatMessage.User(text = "Second question", uuid = "q2"),
+            ChatMessage.Assistant(text = "Second answer", uuid = "a2"),
         )
-        assertTrue(eventSink.pollEvent() is EpisodeChatFeedbackSubmitTappedEvent)
-        assertTrue(eventSink.pollEvent() is EpisodeChatFeedbackSubmittedEvent)
-        assertTrue(eventSink.isEmpty())
-    }
-
-    @Test
-    fun `successful submit tracks the feedback for the rated answer`() = runTest {
-        val viewModel = createViewModel(trigger = EpisodeChatFeedbackTriggerType.ResponseRating, messageIndex = 2)
-        viewModel.onReasonSelected(ChatFeedback.Reason.WrongFacts)
+        val viewModel = createViewModel(
+            trigger = EpisodeChatFeedbackTriggerType.ResponseRating,
+            messageIndex = 1,
+            answerUuid = "a1",
+        )
+        viewModel.onReasonSelected(ChatFeedbackReason.WrongFacts)
 
         viewModel.submit()
         advanceUntilIdle()
@@ -241,7 +194,7 @@ class ChatFeedbackViewModelTest {
                     episodeUuid = EPISODE_UUID,
                     podcastUuid = PODCAST_UUID,
                     trigger = EpisodeChatFeedbackTriggerType.ResponseRating,
-                    messageIndex = 2,
+                    messageIndex = 1,
                 ),
                 EpisodeChatFeedbackSubmitTappedEvent(
                     source = SourceView.PLAYER.analyticsValue,
@@ -250,7 +203,7 @@ class ChatFeedbackViewModelTest {
                     trigger = EpisodeChatFeedbackTriggerType.ResponseRating,
                     reason = EpisodeChatFeedbackReasonType.WrongFacts,
                     hasDetails = false,
-                    messageIndex = 2,
+                    messageIndex = 1,
                 ),
                 EpisodeChatFeedbackSubmittedEvent(
                     source = SourceView.PLAYER.analyticsValue,
@@ -259,7 +212,9 @@ class ChatFeedbackViewModelTest {
                     trigger = EpisodeChatFeedbackTriggerType.ResponseRating,
                     reason = EpisodeChatFeedbackReasonType.WrongFacts,
                     hasDetails = false,
-                    messageIndex = 2,
+                    messageIndex = 1,
+                    question = "First question",
+                    answer = "First answer\n\nA quote",
                 ),
             ),
             List(eventSink.size) { eventSink.pollEvent() },
@@ -267,28 +222,68 @@ class ChatFeedbackViewModelTest {
     }
 
     @Test
-    fun `feedback sent after the form closes is still tracked as submitted`() = runTest {
-        val gate = CompletableDeferred<Unit>()
-        feedbackManager.gate = gate
-        val viewModelStore = ViewModelStore()
+    fun `submit from the session survey does not track a question or answer`() = runTest {
         val viewModel = createViewModel()
-        viewModelStore.put("feedback", viewModel)
-        viewModel.onReasonSelected(ChatFeedback.Reason.WrongFacts)
+        viewModel.onReasonSelected(ChatFeedbackReason.Other)
+        viewModel.onDetailsChange("Not useful")
+        eventSink.skipEvent()
+
         viewModel.submit()
         advanceUntilIdle()
-        eventSink.skipEvent(eventSink.size)
+        eventSink.skipEvent()
 
-        viewModelStore.clear()
-        gate.complete(Unit)
+        val event = eventSink.pollEvent() as EpisodeChatFeedbackSubmittedEvent
+        assertEquals("Not useful", event.details)
+        assertNull(event.question)
+        assertNull(event.answer)
+    }
+
+    @Test
+    fun `submit still tracks when the rated answer is gone`() = runTest {
+        storedMessages = emptyList()
+        val viewModel = createViewModel(
+            trigger = EpisodeChatFeedbackTriggerType.ResponseRating,
+            messageIndex = 1,
+            answerUuid = "assistant-uuid",
+        )
+        viewModel.onReasonSelected(ChatFeedbackReason.WrongFacts)
+        eventSink.skipEvent()
+
+        viewModel.submit()
         advanceUntilIdle()
+        eventSink.skipEvent()
 
-        assertTrue(eventSink.pollEvent() is EpisodeChatFeedbackSubmittedEvent)
+        val event = eventSink.pollEvent() as EpisodeChatFeedbackSubmittedEvent
+        assertNull(event.question)
+        assertNull(event.answer)
+    }
+
+    @Test
+    fun `feedback submitted as the form closes is still tracked`() = runTest {
+        val viewModelStore = ViewModelStore()
+        val viewModel = createViewModel(
+            trigger = EpisodeChatFeedbackTriggerType.ResponseRating,
+            messageIndex = 1,
+            answerUuid = "assistant-uuid",
+        )
+        viewModelStore.put("feedback", viewModel)
+        viewModel.onReasonSelected(ChatFeedbackReason.WrongFacts)
+        eventSink.skipEvent()
+
+        viewModel.submit()
+        viewModelStore.clear()
+        advanceUntilIdle()
+        eventSink.skipEvent()
+
+        val event = eventSink.pollEvent() as EpisodeChatFeedbackSubmittedEvent
+        assertEquals("Question", event.question)
+        assertEquals("Answer", event.answer)
     }
 
     @Test
     fun `restored after a successful submit emits submitted again`() = runTest {
         createViewModel().apply {
-            onReasonSelected(ChatFeedback.Reason.WrongFacts)
+            onReasonSelected(ChatFeedbackReason.WrongFacts)
             submit()
         }
         advanceUntilIdle()
@@ -301,7 +296,7 @@ class ChatFeedbackViewModelTest {
     @Test
     fun `details are capped`() {
         val viewModel = createViewModel()
-        viewModel.onReasonSelected(ChatFeedback.Reason.Other)
+        viewModel.onReasonSelected(ChatFeedbackReason.Other)
 
         viewModel.onDetailsChange("a".repeat(1_500))
 
@@ -324,18 +319,6 @@ class ChatFeedbackViewModelTest {
             ),
             eventSink.pollEvent(),
         )
-    }
-
-    private class TestChatFeedbackManager : ChatFeedbackManager {
-        val submitted = mutableListOf<ChatFeedback>()
-        var failure: Exception? = null
-        var gate: CompletableDeferred<Unit>? = null
-
-        override suspend fun submit(feedback: ChatFeedback) {
-            gate?.await()
-            failure?.let { throw it }
-            submitted += feedback
-        }
     }
 
     private class TestChatManager(private val messages: List<ChatMessage>) : ChatManager {
