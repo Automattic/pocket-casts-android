@@ -24,6 +24,7 @@ import androidx.compose.material.RippleConfiguration
 import androidx.compose.material.ripple.RippleAlpha
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.remember
@@ -81,7 +82,15 @@ fun SwipeRow(
             minFlingVelocity = ViewConfiguration.get(context).scaledMinimumFlingVelocity.toFloat(),
             performHapticFeedback = { view.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK) },
             onSwipeAction = { action -> action.onClick(state) },
-        ).also { state.controller = it }
+        )
+    }
+    DisposableEffect(state, controller) {
+        state.controller = controller
+        onDispose {
+            if (state.controller === controller) {
+                state.controller = null
+            }
+        }
     }
     val shownLeadingActions = if (controller.isLocked) controller.leadingActions else leadingActions.take(3)
     val shownTrailingActions = if (controller.isLocked) controller.trailingActions else trailingActions.take(3)

@@ -157,6 +157,25 @@ abstract class MultiActionSwipeRowTest {
     }
 
     @Test
+    fun `holding the pointer after a full swipe ignores the rest of the gesture`() {
+        rule.onNodeWithTag(ROW).performTouchInput {
+            down(center)
+            repeat(20) { moveBy(Offset(width / 18f, 0f)) }
+        }
+        advance()
+
+        rule.onNodeWithTag(ROW).performTouchInput { repeat(10) { moveBy(Offset(-width / 10f, 0f)) } }
+        advance(16)
+        assertContentAt(0.dp)
+
+        rule.onNodeWithTag(ROW).performTouchInput { up() }
+        advance()
+
+        assertEquals(mapOf("Top" to 1), clicks)
+        assertContentAt(0.dp)
+    }
+
+    @Test
     fun `crossing the full swipe threshold performs haptic feedback`() {
         rule.onNodeWithTag(ROW).performTouchInput {
             down(center)
