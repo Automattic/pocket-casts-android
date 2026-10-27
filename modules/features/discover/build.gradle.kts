@@ -12,6 +12,11 @@ android {
         viewBinding = true
         compose = true
     }
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
+    }
 }
 
 dependencies {
@@ -65,13 +70,17 @@ dependencies {
     implementation(projects.modules.services.localization)
     implementation(projects.modules.services.utils)
 
+    debugImplementation(libs.compose.ui.test.manifest)
+
     testImplementation(libs.androidx.arch.core)
+    testImplementation(libs.compose.ui.test.junit)
     testImplementation(libs.coroutines.test)
     testImplementation(libs.junit)
     testImplementation(libs.moshi)
     testImplementation(libs.okHttp.mockwebserver)
     testImplementation(libs.okhttp)
     testImplementation(libs.retrofit)
+    testImplementation(libs.robolectric)
     testImplementation(libs.retrofit.moshi)
     testImplementation(libs.mockito.kotlin)
     testImplementation(projects.modules.services.sharedtest)
