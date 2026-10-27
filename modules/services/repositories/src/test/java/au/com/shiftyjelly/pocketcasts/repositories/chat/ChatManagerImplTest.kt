@@ -9,6 +9,8 @@ import au.com.shiftyjelly.pocketcasts.servers.podcast.ConversationMessage
 import au.com.shiftyjelly.pocketcasts.servers.podcast.EpisodeChatQuote
 import au.com.shiftyjelly.pocketcasts.servers.podcast.EpisodeChatRequest
 import au.com.shiftyjelly.pocketcasts.servers.podcast.EpisodeChatResponse
+import au.com.shiftyjelly.pocketcasts.servers.podcast.EpisodeChatStarterQuestionsRequest
+import au.com.shiftyjelly.pocketcasts.servers.podcast.EpisodeChatStarterQuestionsResponse
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.TokenHandler
 import com.squareup.moshi.Moshi
@@ -27,6 +29,7 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -264,6 +267,44 @@ class ChatManagerImplTest {
 
         assertEquals(listOf(ChatMessage.User(text = "Question", uuid = "user-uuid")), storedQuestions())
         assertEquals(listOf(ChatRole.User.value, ChatRole.Assistant.value), episodeChatDao.messages.sortedBy { it.createdAt }.map { it.role })
+    }
+
+    @Test
+    fun `starter questions are requested for the episode`() = runTest {
+        whenever(podcastCacheServiceManager.episodeChatStarterQuestions(any(), any())).thenReturn(
+            EpisodeChatStarterQuestionsResponse(suggestedQuestions = listOf(" Who is the guest? ", "", "What changed?")),
+        )
+
+        val questions = manager.getStarterQuestions(EPISODE_UUID, PODCAST_UUID)
+
+        verify(podcastCacheServiceManager).episodeChatStarterQuestions(
+            "Bearer access-token",
+            EpisodeChatStarterQuestionsRequest(podcastUuid = PODCAST_UUID, episodeUuid = EPISODE_UUID),
+        )
+        assertEquals(listOf("Who is the guest?", "What changed?"), questions)
+    }
+
+    @Test
+    fun `starter questions are kept for the episode`() = runTest {
+        whenever(podcastCacheServiceManager.episodeChatStarterQuestions(any(), any())).thenReturn(
+            EpisodeChatStarterQuestionsResponse(suggestedQuestions = listOf("Who is the guest?")),
+        )
+
+        manager.getStarterQuestions(EPISODE_UUID, PODCAST_UUID)
+        val questions = manager.getStarterQuestions(EPISODE_UUID, PODCAST_UUID)
+
+        verify(podcastCacheServiceManager, times(1)).episodeChatStarterQuestions(any(), any())
+        assertEquals(listOf("Who is the guest?"), questions)
+    }
+
+    @Test
+    fun `starter questions are empty and retried when the request fails`() = runTest {
+        whenever(podcastCacheServiceManager.episodeChatStarterQuestions(any(), any())).thenAnswer { throw IOException() }
+
+        assertEquals(emptyList<String>(), manager.getStarterQuestions(EPISODE_UUID, PODCAST_UUID))
+        assertEquals(emptyList<String>(), manager.getStarterQuestions(EPISODE_UUID, PODCAST_UUID))
+
+        verify(podcastCacheServiceManager, times(2)).episodeChatStarterQuestions(any(), any())
     }
 
     @Test

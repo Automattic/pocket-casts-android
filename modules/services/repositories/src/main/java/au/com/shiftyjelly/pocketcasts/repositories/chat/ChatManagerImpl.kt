@@ -7,11 +7,14 @@ import au.com.shiftyjelly.pocketcasts.servers.podcast.ConversationMessage
 import au.com.shiftyjelly.pocketcasts.servers.podcast.EpisodeChatQuote
 import au.com.shiftyjelly.pocketcasts.servers.podcast.EpisodeChatRequest
 import au.com.shiftyjelly.pocketcasts.servers.podcast.EpisodeChatResponse
+import au.com.shiftyjelly.pocketcasts.servers.podcast.EpisodeChatStarterQuestionsRequest
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.TokenHandler
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.squareup.moshi.Moshi
 import java.io.IOException
 import java.util.Date
+import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.CancellationException
@@ -28,6 +31,7 @@ class ChatManagerImpl @Inject constructor(
 ) : ChatManager {
     private val quoteMetadataAdapter = moshi.adapter(QuoteMetadata::class.java)
     private val userMetadataAdapter = moshi.adapter(UserMessageMetadata::class.java)
+    private val starterQuestions = ConcurrentHashMap<String, List<String>>()
 
     override fun observeMessages(episodeUuid: String): Flow<List<ChatMessage>> {
         return episodeChatDao.observeMessages(episodeUuid).map { it.toChatMessages(quoteMetadataAdapter, userMetadataAdapter) }
@@ -96,13 +100,36 @@ class ChatManagerImpl @Inject constructor(
             conversationHistory = history,
         )
 
-        val accessToken = checkNotNull(tokenHandler.getAccessToken()) {
-            "Access token is required to send episode chat messages"
-        }
         return podcastCacheServiceManager.episodeChat(
-            authorization = "Bearer ${accessToken.value}",
+            authorization = authorization(),
             request = request,
         )
+    }
+
+    override suspend fun getStarterQuestions(episodeUuid: String, podcastUuid: String): List<String> {
+        starterQuestions[episodeUuid]?.let { return it }
+        val questions = try {
+            podcastCacheServiceManager.episodeChatStarterQuestions(
+                authorization = authorization(),
+                request = EpisodeChatStarterQuestionsRequest(podcastUuid = podcastUuid, episodeUuid = episodeUuid),
+            ).suggestedQuestions.map(String::trim).filter(String::isNotEmpty)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            LogBuffer.e(LOG_TAG, e, "Failed to load episode chat starter questions")
+            emptyList()
+        }
+        if (questions.isNotEmpty()) {
+            starterQuestions[episodeUuid] = questions
+        }
+        return questions
+    }
+
+    private suspend fun authorization(): String {
+        val accessToken = checkNotNull(tokenHandler.getAccessToken()) {
+            "Access token is required for episode chat"
+        }
+        return "Bearer ${accessToken.value}"
     }
 
     override suspend fun discardMessage(uuid: String) {
@@ -140,5 +167,9 @@ class ChatManagerImpl @Inject constructor(
 
     override suspend fun deleteAllChats() {
         episodeChatDao.deleteAllChats()
+    }
+
+    private companion object {
+        const val LOG_TAG = "EpisodeChat"
     }
 }

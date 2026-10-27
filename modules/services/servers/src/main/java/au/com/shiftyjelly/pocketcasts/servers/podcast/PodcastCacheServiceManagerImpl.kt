@@ -90,6 +90,13 @@ class PodcastCacheServiceManagerImpl @Inject constructor(
         )
     }
 
+    override suspend fun episodeChatStarterQuestions(
+        authorization: String,
+        request: EpisodeChatStarterQuestionsRequest,
+    ): EpisodeChatStarterQuestionsResponse {
+        return service.episodeChatStarterQuestions(authorization, request)
+    }
+
     override suspend fun enrichBookmark(authorization: String, request: BookmarkEnrichRequest): BookmarkEnrichResponse {
         return service.enrichBookmark(authorization, request)
     }
