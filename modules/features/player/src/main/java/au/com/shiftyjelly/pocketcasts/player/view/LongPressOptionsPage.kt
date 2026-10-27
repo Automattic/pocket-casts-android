@@ -9,11 +9,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.LocalRippleConfiguration
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.RippleConfiguration
 import androidx.compose.material.ripple
+import androidx.compose.material.ripple.RippleAlpha
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
@@ -69,28 +74,35 @@ private fun OptionRow(
     label: String,
     onClick: () -> Unit,
 ) {
-    Box(
-        contentAlignment = TextViewAlignment.CenterStart,
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(64.dp)
-            .semantics { contentDescription = label }
-            .clickable(
-                interactionSource = null,
-                indication = ripple(color = MaterialTheme.theme.colors.playerContrast01),
-                onClick = onClick,
-            ),
-    ) {
-        TextViewText(
-            text = label,
-            fontSize = 16.sp,
-            color = MaterialTheme.theme.colors.playerContrast01,
+    CompositionLocalProvider(LocalRippleConfiguration provides OptionRippleConfiguration) {
+        Box(
+            contentAlignment = TextViewAlignment.CenterStart,
             modifier = Modifier
-                .padding(start = 32.dp)
-                .clearAndSetSemantics {},
-        )
+                .fillMaxWidth()
+                .height(64.dp)
+                .semantics { contentDescription = label }
+                .clickable(
+                    interactionSource = null,
+                    indication = ripple(),
+                    onClick = onClick,
+                ),
+        ) {
+            TextViewText(
+                text = label,
+                fontSize = 16.sp,
+                color = MaterialTheme.theme.colors.playerContrast01,
+                modifier = Modifier
+                    .padding(start = 32.dp)
+                    .clearAndSetSemantics {},
+            )
+        }
     }
 }
+
+private val OptionRippleConfiguration = RippleConfiguration(
+    color = Color.White,
+    rippleAlpha = RippleAlpha(draggedAlpha = 0.2f, focusedAlpha = 0.2f, hoveredAlpha = 0.2f, pressedAlpha = 0.2f),
+)
 
 @Preview
 @Composable
