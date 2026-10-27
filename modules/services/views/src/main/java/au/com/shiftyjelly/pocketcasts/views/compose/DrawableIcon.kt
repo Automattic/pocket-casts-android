@@ -44,6 +44,33 @@ internal fun DrawableIcon(
 }
 
 @Composable
+internal fun FitCenterDrawableIcon(
+    @DrawableRes drawableId: Int,
+    tint: Color,
+    modifier: Modifier = Modifier,
+) {
+    val context = LocalContext.current
+    val drawable = remember(drawableId, context) { AppCompatResources.getDrawable(context, drawableId)?.mutate() }
+    Spacer(
+        modifier.drawBehind {
+            if (drawable != null) {
+                val scale = minOf(1f * size.width / drawable.intrinsicWidth, 1f * size.height / drawable.intrinsicHeight)
+                drawable.setTintList(ColorStateList.valueOf(tint.toArgb()))
+                drawable.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
+                drawIntoCanvas { canvas ->
+                    val nativeCanvas = canvas.nativeCanvas
+                    val count = nativeCanvas.save()
+                    nativeCanvas.translate((size.width - drawable.intrinsicWidth * scale) / 2f, (size.height - drawable.intrinsicHeight * scale) / 2f)
+                    nativeCanvas.scale(scale, scale)
+                    drawable.draw(nativeCanvas)
+                    nativeCanvas.restoreToCount(count)
+                }
+            }
+        },
+    )
+}
+
+@Composable
 internal fun GradientDrawableIcon(
     @DrawableRes drawableId: Int,
     startColor: Color,
