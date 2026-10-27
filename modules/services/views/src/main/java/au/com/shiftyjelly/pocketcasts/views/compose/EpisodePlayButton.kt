@@ -32,7 +32,7 @@ import androidx.compose.ui.input.pointer.changedToUpIgnoreConsumed
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
@@ -52,6 +52,7 @@ import au.com.shiftyjelly.pocketcasts.views.R
 import au.com.shiftyjelly.pocketcasts.views.buttons.PlayButton
 import au.com.shiftyjelly.pocketcasts.views.buttons.PlayButtonMenuItem
 import au.com.shiftyjelly.pocketcasts.views.buttons.PlayButtonType
+import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import com.automattic.eventhorizon.DiscoverListEpisodePlayEvent
 import com.automattic.eventhorizon.EventHorizon
 import java.util.Date
@@ -68,7 +69,7 @@ fun EpisodePlayButton(
     fromListUuid: String? = null,
 ) {
     val context = LocalContext.current
-    val keyboardController = LocalSoftwareKeyboardController.current
+    val view = LocalView.current
     val currentEpisode by rememberUpdatedState(episode)
     val currentListener by rememberUpdatedState(listener)
     val anchor = remember { mutableStateOf<View?>(null) }
@@ -100,7 +101,7 @@ fun EpisodePlayButton(
                                 eventHorizon.track(DiscoverListEpisodePlayEvent(listId = fromListUuid, podcastUuid = podcastUuid))
                             }
                             listener.onPlayClicked(episode.uuid)
-                            keyboardController?.hide()
+                            UiUtil.hideKeyboard(view)
                         }
 
                         PlayButtonType.PAUSE -> listener.onPauseClicked()
