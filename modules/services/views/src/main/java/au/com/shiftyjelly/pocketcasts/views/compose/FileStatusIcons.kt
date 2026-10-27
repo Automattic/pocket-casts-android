@@ -1,8 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.views.compose
 
 import android.content.res.ColorStateList
-import android.graphics.Paint
-import android.graphics.Typeface
 import android.widget.ProgressBar
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.Column
@@ -10,9 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -20,18 +16,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.layout.FirstBaseline
-import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
@@ -59,59 +52,90 @@ fun FileStatusIcons(
     modifier: Modifier = Modifier,
     hideErrorDetails: Boolean = false,
 ) {
+    FileStatusIcons(data, EpisodeRowDefaults.colors(tint = tint), hideErrorDetails, modifier)
+}
+
+@Composable
+internal fun FileStatusIcons(
+    data: UserEpisodeRowData,
+    colors: EpisodeRowColors,
+    hideErrorDetails: Boolean,
+    modifier: Modifier = Modifier,
+) {
     val status = FileStatus.from(data, hideErrorDetails)
     val episode = data.episode
-    val isGreyedOut = episode.playingStatus == EpisodePlayingStatus.COMPLETED || episode.isArchived
+    StatusLine(
+        text = status.text.resolve(episode),
+        bottomPadding = with(LocalDensity.current) { 12.dp.toPx().toInt().toDp() },
+        isGreyedOut = episode.playingStatus == EpisodePlayingStatus.COMPLETED || episode.isArchived,
+        colors = colors,
+        modifier = modifier,
+        isInUpNext = data.isInUpNext,
+        iconId = status.icon?.drawableId,
+        iconTint = when (status.icon) {
+            FileStatusIcon.PlaybackFailed, null -> null
+            FileStatusIcon.Downloaded -> colors.theme.support02
+            else -> colors.theme.primaryIcon02
+        },
+        isUploaded = status.isUploaded,
+        hasBookmarks = data.hasBookmarks,
+        progressCircle = status.progressCircle,
+        isBuffering = status.isBuffering,
+    )
+}
+
+@Composable
+internal fun StatusLine(
+    text: String,
+    bottomPadding: Dp,
+    isGreyedOut: Boolean,
+    colors: EpisodeRowColors,
+    modifier: Modifier = Modifier,
+    isInUpNext: Boolean = false,
+    @DrawableRes iconId: Int? = null,
+    iconTint: Color? = null,
+    isUploaded: Boolean = false,
+    hasBookmarks: Boolean = false,
+    progressCircle: ProgressCircleState? = null,
+    isBuffering: Boolean = false,
+) {
     val imageAlpha = if (isGreyedOut) 0.5f else 1f
-    val colors = MaterialTheme.theme.colors
-    val captionColor = colors.primaryText02
-    val textSizePx = with(LocalDensity.current) { StatusTextSize.roundToPx() }
-    val lineMetrics = remember(textSizePx) {
-        Paint().apply {
-            textSize = textSizePx.toFloat()
-            typeface = Typeface.SANS_SERIF
-        }.fontMetricsInt
-    }
+    val captionColor = colors.theme.primaryText02
     Row(
         verticalAlignment = TruncatedCenterVertically,
-        modifier = modifier.padding(bottom = with(LocalDensity.current) { 12.dp.toPx().toInt().toDp() }),
+        modifier = modifier.padding(bottom = bottomPadding),
     ) {
-        if (data.isInUpNext) {
-            StatusImage(IR.drawable.ic_upnext, colors.support01)
+        if (isInUpNext) {
+            StatusImage(IR.drawable.ic_upnext, colors.theme.support01)
         }
-        status.icon?.let { icon ->
-            val iconTint = when (icon) {
-                FileStatusIcon.PlaybackFailed -> null
-                FileStatusIcon.Downloaded -> colors.support02
-                else -> colors.primaryIcon02
-            }
-            StatusImage(icon.drawableId, iconTint, Modifier.imageViewAlpha(imageAlpha))
+        if (iconId != null) {
+            StatusImage(iconId, iconTint, Modifier.imageViewAlpha(imageAlpha))
         }
-        if (status.isUploaded) {
+        if (isUploaded) {
             GradientDrawableIcon(
                 drawableId = IR.drawable.ic_cloud,
-                startColor = colors.gradient01A,
-                endColor = colors.gradient01E,
+                startColor = colors.theme.gradient01A,
+                endColor = colors.theme.gradient01E,
                 modifier = Modifier
                     .padding(end = 4.dp)
                     .size(16.dp)
                     .alpha(imageAlpha),
             )
         }
-        if (data.hasBookmarks) {
+        if (hasBookmarks) {
             val bookmarksDescription = stringResource(LR.string.bookmarks)
             StatusImage(
                 drawableId = IR.drawable.ic_bookmark,
-                tint = tint,
+                tint = colors.tint,
                 modifier = Modifier
                     .imageViewAlpha(imageAlpha)
                     .semantics { contentDescription = bookmarksDescription },
             )
         }
-        status.progressCircle?.let { state ->
+        progressCircle?.let { state ->
             ProgressCircle(state, captionColor, Modifier.padding(end = 4.dp).size(16.dp))
         }
-        if (status.isBuffering) {
+        if (isBuffering) {
             val captionArgb = captionColor.toArgb()
             AndroidView(
                 factory = { context -> ProgressBar(context, null, 0, AppCompatR.style.Widget_AppCompat_ProgressBar) },
@@ -119,37 +143,26 @@ fun FileStatusIcons(
                 modifier = Modifier.padding(end = 4.dp).size(16.dp),
             )
         }
-        Text(
-            text = status.text.resolve(episode),
-            color = if (isGreyedOut) captionColor.copy(alpha = 128 / 255f) else captionColor,
-            style = TextStyle(fontSize = with(LocalDensity.current) { textSizePx.toSp() }, fontFamily = FontFamily.SansSerif, letterSpacing = 0.02.em),
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
+        TextViewLine(
+            text = AnnotatedString(text),
+            size = StatusTextSize,
+            color = colors.secondaryText(isGreyedOut),
+            letterSpacing = 0.02.em,
             modifier = Modifier
                 .weight(1f, fill = false)
-                .align(Alignment.Top)
-                .textViewLineBox(lineMetrics),
+                .align(Alignment.Top),
         )
     }
 }
 
 private val StatusTextSize = 13.sp
 
-private fun Modifier.textViewLineBox(metrics: Paint.FontMetricsInt): Modifier {
-    return layout { measurable, constraints ->
-        val placeable = measurable.measure(constraints)
-        layout(placeable.width, metrics.bottom - metrics.top) {
-            placeable.place(0, -metrics.top - placeable[FirstBaseline])
-        }
-    }
-}
+internal fun Modifier.imageViewAlpha(alpha: Float) = graphicsLayer(alpha = alpha, compositingStrategy = CompositingStrategy.ModulateAlpha)
 
-private fun Modifier.imageViewAlpha(alpha: Float) = graphicsLayer(alpha = alpha, compositingStrategy = CompositingStrategy.ModulateAlpha)
-
-private val TruncatedCenterVertically = Alignment.Vertical { size, space -> (space - size) / 2 }
+internal val TruncatedCenterVertically = Alignment.Vertical { size, space -> (space - size) / 2 }
 
 @Composable
-private fun StatusImage(
+internal fun StatusImage(
     @DrawableRes drawableId: Int,
     tint: Color?,
     modifier: Modifier = Modifier,
