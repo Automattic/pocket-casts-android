@@ -134,13 +134,14 @@ private fun rememberRearrangeDragState(listState: LazyListState): RearrangeDragS
     val scope = rememberCoroutineScope()
     val haptics = LocalHapticFeedback.current
     val context = LocalContext.current
-    return remember(listState, scope, haptics, context) {
+    val density = LocalDensity.current
+    return remember(listState, scope, haptics, context, density) {
         RearrangeDragState(
             listState = listState,
             scope = scope,
             haptics = haptics,
             liftElevation = 16.dpToPx(context).toFloat(),
-            maxDragScroll = context.resources.getDimensionPixelSize(androidx.recyclerview.R.dimen.item_touch_helper_max_drag_scroll_per_frame),
+            maxDragScroll = with(density) { 20.dp.roundToPx() },
         )
     }
 }
