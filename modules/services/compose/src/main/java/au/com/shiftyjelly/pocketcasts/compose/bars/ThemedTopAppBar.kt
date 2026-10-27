@@ -11,7 +11,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
@@ -35,7 +35,6 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -43,6 +42,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.images.DrawableImage
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.text.TextViewAlignment
 import au.com.shiftyjelly.pocketcasts.compose.theme
@@ -196,33 +196,26 @@ fun NavigationIconButton(
     navigationButton: NavigationButton = NavigationButton.Back,
     tint: Color = MaterialTheme.theme.colors.secondaryIcon01,
 ) {
-    val painter = when (navigationButton) {
-        is NavigationButton.Simple -> rememberVectorPainter(navigationButton.image)
-        is NavigationButton.Animated -> rememberAnimatedVectorPainter(navigationButton.image, navigationButton.atEnd)
-        is NavigationButton.Drawable -> painterResource(navigationButton.drawableId)
-    }
-
     IconButton(
         onClick = onClick,
         modifier = modifier,
     ) {
-        if (navigationButton is NavigationButton.Drawable) {
-            Box(
+        val contentDescription = stringResource(navigationButton.contentDescription)
+        when (navigationButton) {
+            is NavigationButton.Drawable -> Box(
                 contentAlignment = TextViewAlignment.Center,
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.size(48.dp),
             ) {
-                Icon(
-                    painter,
-                    stringResource(navigationButton.contentDescription),
+                DrawableImage(
+                    drawableId = navigationButton.drawableId,
+                    contentDescription = contentDescription,
                     tint = tint,
                 )
             }
-        } else {
-            Icon(
-                painter,
-                stringResource(navigationButton.contentDescription),
-                tint = tint,
-            )
+
+            is NavigationButton.Simple -> Icon(rememberVectorPainter(navigationButton.image), contentDescription, tint = tint)
+
+            is NavigationButton.Animated -> Icon(rememberAnimatedVectorPainter(navigationButton.image, navigationButton.atEnd), contentDescription, tint = tint)
         }
     }
 }
