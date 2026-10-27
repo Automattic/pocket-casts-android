@@ -7,6 +7,8 @@ import android.os.Handler
 import android.os.Looper
 import android.view.ViewGroup
 import android.webkit.WebView
+import androidx.webkit.WebViewCompat
+import androidx.webkit.WebViewFeature
 
 private const val FOCUSED_NODE_URL_KEY = "url"
 
@@ -52,9 +54,12 @@ internal fun webViewLinkUrl(
 }
 
 fun WebView.blockRemoteContentOnInProcessRenderer() {
-    val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as? ActivityManager
-    val rendererLikelyInProcess = activityManager?.isLowRamDevice == true ||
-        Build.VERSION.SDK_INT <= Build.VERSION_CODES.O_MR1
+    val rendererLikelyInProcess = if (WebViewFeature.isFeatureSupported(WebViewFeature.MULTI_PROCESS)) {
+        !WebViewCompat.isMultiProcessEnabled()
+    } else {
+        val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as? ActivityManager
+        activityManager?.isLowRamDevice == true || Build.VERSION.SDK_INT <= Build.VERSION_CODES.O_MR1
+    }
     settings.blockNetworkLoads = rendererLikelyInProcess
     settings.loadsImagesAutomatically = !rendererLikelyInProcess
 }
