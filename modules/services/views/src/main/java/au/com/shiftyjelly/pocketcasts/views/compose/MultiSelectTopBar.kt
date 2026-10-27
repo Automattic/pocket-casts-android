@@ -50,12 +50,18 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getActivity
+import au.com.shiftyjelly.pocketcasts.views.R
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBottomSheet
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
 import com.automattic.eventhorizon.EventHorizon
@@ -321,3 +327,20 @@ private fun Context.overflowButtonStyle(): OverflowButtonStyle {
 private val TitleAlignment = Alignment.Vertical { size, space -> (space - size) / 2 }
 
 private val ActionAlignment = Alignment.Vertical { size, space -> space / 2 - size / 2 }
+
+@Preview
+@Composable
+private fun MultiSelectTopBarPreview(
+    @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
+) {
+    AppTheme(themeType) {
+        MultiSelectTopBar(
+            title = "2",
+            items = staticMultiSelectToolbarItems(LocalContext.current.resources, R.menu.menu_multiselect_upnext),
+            onNavigationClick = {},
+            onItemClick = {},
+            onBottomSheetClick = {},
+            includeStatusBarPadding = false,
+        )
+    }
+}
