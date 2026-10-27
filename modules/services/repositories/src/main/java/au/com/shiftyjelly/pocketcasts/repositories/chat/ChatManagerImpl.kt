@@ -5,7 +5,6 @@ import au.com.shiftyjelly.pocketcasts.models.db.dao.TranscriptDao
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeChat
 import au.com.shiftyjelly.pocketcasts.models.entity.Transcript
 import au.com.shiftyjelly.pocketcasts.models.to.EpisodeChatHistoryItem
-import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptsComparator
 import au.com.shiftyjelly.pocketcasts.servers.podcast.ConversationMessage
 import au.com.shiftyjelly.pocketcasts.servers.podcast.EpisodeChatQuote
 import au.com.shiftyjelly.pocketcasts.servers.podcast.EpisodeChatRequest
@@ -52,13 +51,14 @@ class ChatManagerImpl @Inject constructor(
 
     override suspend fun sendMessage(
         episodeUuid: String,
+        podcastUuid: String,
         message: ChatMessage.User,
         allMessages: List<ChatMessage>,
     ) {
         val question = message.copy(failure = null).toEntity(episodeUuid, quoteMetadataAdapter, userMetadataAdapter)
         episodeChatDao.insertMessage(question)
         val reply = try {
-            requestReply(episodeUuid, message, allMessages)
+            requestReply(episodeUuid, podcastUuid, message, allMessages)
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
@@ -68,10 +68,10 @@ class ChatManagerImpl @Inject constructor(
             throw e
         }
 
-        val aiReply = ChatMessage.Assistant(text = reply.response.reply)
+        val aiReply = ChatMessage.Assistant(text = reply.reply)
         val replies = listOfNotNull(
             aiReply,
-            reply.response.quote?.toQuoteMessage(isFromGeneratedTranscript = reply.isFromGeneratedTranscript),
+            reply.quote?.toQuoteMessage(),
         )
         val createdAtMs = maxOf(System.currentTimeMillis(), question.createdAt.time + 1)
         episodeChatDao.insertMessages(
@@ -84,9 +84,10 @@ class ChatManagerImpl @Inject constructor(
 
     private suspend fun requestReply(
         episodeUuid: String,
+        podcastUuid: String,
         message: ChatMessage.User,
         allMessages: List<ChatMessage>,
-    ): ChatReply {
+    ): EpisodeChatResponse {
         val history = allMessages.mapNotNull { msg ->
             val content = msg.textOrNull() ?: return@mapNotNull null
             ConversationMessage(role = msg.role.apiRole, content = content)
@@ -96,6 +97,8 @@ class ChatManagerImpl @Inject constructor(
             "Transcript URL is required to send episode chat messages"
         }
         val request = EpisodeChatRequest(
+            podcastUuid = podcastUuid,
+            episodeUuid = episodeUuid,
             transcriptUrl = transcript.url,
             message = message.text,
             conversationHistory = history,
@@ -104,18 +107,17 @@ class ChatManagerImpl @Inject constructor(
         val accessToken = checkNotNull(tokenHandler.getAccessToken()) {
             "Access token is required to send episode chat messages"
         }
-        val response = podcastCacheServiceManager.episodeChat(
+        return podcastCacheServiceManager.episodeChat(
             authorization = "Bearer ${accessToken.value}",
             request = request,
         )
-        return ChatReply(response, isFromGeneratedTranscript = transcript.isGenerated)
     }
 
     override suspend fun discardMessage(uuid: String) {
         episodeChatDao.deleteMessage(uuid)
     }
 
-    private fun EpisodeChatQuote.toQuoteMessage(isFromGeneratedTranscript: Boolean): ChatMessage.Quote? {
+    private fun EpisodeChatQuote.toQuoteMessage(): ChatMessage.Quote? {
         val quoteText = text.takeIf { it.isNotBlank() } ?: return null
         val quoteStart = start.orEmpty()
         val quoteEnd = end.orEmpty()
@@ -125,7 +127,7 @@ class ChatManagerImpl @Inject constructor(
             end = quoteEnd,
             startMs = parseTimestampMs(quoteStart) ?: -1,
             endMs = parseTimestampMs(quoteEnd) ?: -1,
-            isFromGeneratedTranscript = isFromGeneratedTranscript,
+            isFromGeneratedTranscript = true,
         )
     }
 
@@ -148,14 +150,7 @@ class ChatManagerImpl @Inject constructor(
         episodeChatDao.deleteAllChats()
     }
 
-    // Pick transcript for chat: prefer author-provided (non-generated) over Pocket Casts-generated.
     private suspend fun selectTranscript(episodeUuid: String): Transcript? {
-        val transcripts = transcriptDao.observeTranscripts(episodeUuid).first()
-        return transcripts.minWithOrNull(TranscriptsComparator)
+        return transcriptDao.observeTranscripts(episodeUuid).first().firstOrNull { it.isGenerated }
     }
 }
-
-private class ChatReply(
-    val response: EpisodeChatResponse,
-    val isFromGeneratedTranscript: Boolean,
-)

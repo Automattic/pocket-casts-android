@@ -93,6 +93,7 @@ class ChatManagerImplTest {
 
         manager.sendMessage(
             episodeUuid = EPISODE_UUID,
+            podcastUuid = PODCAST_UUID,
             message = ChatMessage.User(text = "What happened?", uuid = "user-uuid"),
             allMessages = listOf(
                 ChatMessage.User(text = "Earlier question", uuid = "earlier-user-uuid"),
@@ -106,7 +107,9 @@ class ChatManagerImplTest {
         assertEquals("Bearer access-token", authorizationCaptor.firstValue)
         assertEquals(
             EpisodeChatRequest(
-                transcriptUrl = "author-url",
+                podcastUuid = PODCAST_UUID,
+                episodeUuid = EPISODE_UUID,
+                transcriptUrl = "generated-url",
                 message = "What happened?",
                 conversationHistory = listOf(
                     ConversationMessage(role = "user", content = "Earlier question"),
@@ -130,11 +133,11 @@ class ChatManagerImplTest {
         assertEquals("00:00:03", quote.end)
         assertEquals(1_000, quote.startMs)
         assertEquals(3_000, quote.endMs)
-        assertEquals(false, quote.isFromGeneratedTranscript)
+        assertEquals(true, quote.isFromGeneratedTranscript)
     }
 
     @Test
-    fun `send message prefers a timed author transcript over html`() = runTest {
+    fun `send message uses the generated transcript over author transcripts`() = runTest {
         transcripts.value = listOf(
             createTranscript(type = "text/html", isGenerated = false, url = "html-url"),
             createTranscript(type = "text/vtt", isGenerated = false, url = "vtt-url"),
@@ -146,13 +149,14 @@ class ChatManagerImplTest {
 
         manager.sendMessage(
             episodeUuid = EPISODE_UUID,
+            podcastUuid = PODCAST_UUID,
             message = ChatMessage.User(text = "Question", uuid = "user-uuid"),
             allMessages = emptyList(),
         )
 
         val requestCaptor = argumentCaptor<EpisodeChatRequest>()
         verify(podcastCacheServiceManager).episodeChat(any(), requestCaptor.capture())
-        assertEquals("vtt-url", requestCaptor.firstValue.transcriptUrl)
+        assertEquals("generated-url", requestCaptor.firstValue.transcriptUrl)
     }
 
     @Test
@@ -167,6 +171,7 @@ class ChatManagerImplTest {
 
         manager.sendMessage(
             episodeUuid = EPISODE_UUID,
+            podcastUuid = PODCAST_UUID,
             message = ChatMessage.User(text = "Question", uuid = "user-uuid"),
             allMessages = emptyList(),
         )
@@ -200,6 +205,7 @@ class ChatManagerImplTest {
 
         manager.sendMessage(
             episodeUuid = EPISODE_UUID,
+            podcastUuid = PODCAST_UUID,
             message = ChatMessage.User(text = "Retry message", uuid = "retry-user-uuid"),
             allMessages = emptyList(),
         )
@@ -212,9 +218,11 @@ class ChatManagerImplTest {
 
     @Test
     fun `send message without a transcript keeps the question as failed on our end`() = runTest {
+        transcripts.value = listOf(createTranscript(isGenerated = false))
         val exception = runCatching {
             manager.sendMessage(
                 episodeUuid = EPISODE_UUID,
+                podcastUuid = PODCAST_UUID,
                 message = ChatMessage.User(text = "Question", uuid = "user-uuid"),
                 allMessages = emptyList(),
             )
@@ -232,6 +240,7 @@ class ChatManagerImplTest {
         val exception = runCatching {
             manager.sendMessage(
                 episodeUuid = EPISODE_UUID,
+                podcastUuid = PODCAST_UUID,
                 message = ChatMessage.User(text = "Question", uuid = "user-uuid"),
                 allMessages = emptyList(),
             )
@@ -247,7 +256,7 @@ class ChatManagerImplTest {
         whenever(podcastCacheServiceManager.episodeChat(any(), any())).thenAnswer { throw IOException() }
         val question = ChatMessage.User(text = "Summarize", inputType = ChatInputType.SummaryPrompt, uuid = "user-uuid")
 
-        runCatching { manager.sendMessage(EPISODE_UUID, question, emptyList()) }
+        runCatching { manager.sendMessage(EPISODE_UUID, PODCAST_UUID, question, emptyList()) }
 
         assertEquals(listOf(question.copy(failure = ChatSendFailure.Network)), storedQuestions())
     }
@@ -274,6 +283,7 @@ class ChatManagerImplTest {
 
         manager.sendMessage(
             episodeUuid = EPISODE_UUID,
+            podcastUuid = PODCAST_UUID,
             message = ChatMessage.User(text = "Question", uuid = "user-uuid"),
             allMessages = emptyList(),
         )
@@ -286,13 +296,13 @@ class ChatManagerImplTest {
         transcripts.value = listOf(createTranscript())
         whenever(podcastCacheServiceManager.episodeChat(any(), any())).thenAnswer { throw IOException() }
         runCatching {
-            manager.sendMessage(EPISODE_UUID, ChatMessage.User(text = "Question", uuid = "user-uuid"), emptyList())
+            manager.sendMessage(EPISODE_UUID, PODCAST_UUID, ChatMessage.User(text = "Question", uuid = "user-uuid"), emptyList())
         }
         whenever(podcastCacheServiceManager.episodeChat(any(), any())).thenReturn(
             EpisodeChatResponse(reply = "Assistant reply", quote = null),
         )
 
-        manager.sendMessage(EPISODE_UUID, ChatMessage.User(text = "Question", uuid = "user-uuid"), emptyList())
+        manager.sendMessage(EPISODE_UUID, PODCAST_UUID, ChatMessage.User(text = "Question", uuid = "user-uuid"), emptyList())
 
         assertEquals(listOf(ChatMessage.User(text = "Question", uuid = "user-uuid")), storedQuestions())
         assertEquals(listOf(ChatRole.User.value, ChatRole.Assistant.value), episodeChatDao.messages.sortedBy { it.createdAt }.map { it.role })
@@ -392,6 +402,7 @@ class ChatManagerImplTest {
 
         manager.sendMessage(
             episodeUuid = EPISODE_UUID,
+            podcastUuid = PODCAST_UUID,
             message = ChatMessage.User(text = "Question", uuid = "user-uuid"),
             allMessages = emptyList(),
         )
@@ -490,7 +501,7 @@ class ChatManagerImplTest {
 
         fun createTranscript(
             type: String = "text/vtt",
-            isGenerated: Boolean = false,
+            isGenerated: Boolean = true,
             url: String = "transcript-url",
         ) = Transcript(
             episodeUuid = EPISODE_UUID,

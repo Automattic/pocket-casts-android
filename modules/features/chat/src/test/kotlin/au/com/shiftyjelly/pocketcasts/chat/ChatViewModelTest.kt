@@ -3283,6 +3283,7 @@ class ChatViewModelTest {
 
         override suspend fun sendMessage(
             episodeUuid: String,
+            podcastUuid: String,
             message: ChatMessage.User,
             allMessages: List<ChatMessage>,
         ) {

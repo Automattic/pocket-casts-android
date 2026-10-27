@@ -808,7 +808,7 @@ class ChatViewModel @Inject constructor(
                 }
                 supersededQuestionUuid?.let { chatManager.discardMessage(it) }
                 val sentAt = timeSource.markNow()
-                chatManager.sendMessage(episodeUuid, message, currentMessages)
+                chatManager.sendMessage(episodeUuid, podcastUuid, message, currentMessages)
                 val responseDuration = sentAt.elapsedNow()
                 transientUserMessage = null
                 hasReceivedAnswer = true
