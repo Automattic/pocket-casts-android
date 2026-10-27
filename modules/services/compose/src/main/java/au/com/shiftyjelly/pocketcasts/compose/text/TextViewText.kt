@@ -3,7 +3,10 @@ package au.com.shiftyjelly.pocketcasts.compose.text
 import android.graphics.Paint
 import android.graphics.Typeface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -75,11 +78,11 @@ fun TextViewText(
         textAlign = textAlign,
         lineBreak = LineBreak.Paragraph,
     )
-    val holder = remember { TextViewLayout() }
+    var lines by remember { mutableStateOf<TextViewLines?>(null) }
     Layout(
         modifier = modifier
             .semantics { this.text = AnnotatedString(text) }
-            .drawBehind { holder.draw(this) },
+            .drawBehind { lines?.draw(this) },
     ) { _, constraints ->
         val result = textMeasurer.measure(
             text = text,
@@ -88,42 +91,22 @@ fun TextViewText(
             maxLines = maxLines,
             constraints = Constraints(minWidth = constraints.minWidth, maxWidth = constraints.maxWidth),
         )
-        holder.update(result, metrics, spacingExtraPx, lineSpacingMultiplier)
+        val measured = TextViewLines.from(result, metrics, spacingExtraPx, lineSpacingMultiplier)
+        lines = measured
         layout(
             width = result.size.width,
-            height = holder.height.coerceIn(constraints.minHeight, constraints.maxHeight),
-            alignmentLines = mapOf(FirstBaseline to holder.baselines.first(), LastBaseline to holder.baselines.last()),
+            height = measured.height.coerceIn(constraints.minHeight, constraints.maxHeight),
+            alignmentLines = mapOf(FirstBaseline to measured.baselines.first(), LastBaseline to measured.baselines.last()),
         ) {}
     }
 }
 
-private class TextViewLayout {
-    private var result: TextLayoutResult? = null
-    var baselines = intArrayOf(0)
-        private set
-    var height = 0
-        private set
-
-    fun update(result: TextLayoutResult, metrics: Paint.FontMetricsInt, spacingExtra: Int, spacingMultiplier: Float) {
-        val lineCount = result.lineCount
-        val newBaselines = IntArray(lineCount)
-        val needsSpacing = spacingExtra != 0 || spacingMultiplier != 1f
-        var y = 0
-        for (line in 0 until lineCount) {
-            val isLast = line == lineCount - 1
-            val above = if (line == 0) metrics.top else metrics.ascent
-            val below = if (isLast) metrics.bottom else metrics.descent
-            val extra = if (needsSpacing && !isLast) roundExtra((below - above) * (spacingMultiplier - 1.0) + spacingExtra) else 0
-            newBaselines[line] = y - above
-            y += below - above + extra
-        }
-        this.result = result
-        baselines = newBaselines
-        height = y
-    }
-
+private class TextViewLines(
+    private val result: TextLayoutResult,
+    val baselines: IntArray,
+    val height: Int,
+) {
     fun draw(scope: DrawScope) {
-        val result = result ?: return
         for (line in 0 until result.lineCount) {
             val offset = baselines[line] - result.getLineBaseline(line).roundToInt()
             val top = if (line == 0) 0f else result.getLineTop(line) + offset
@@ -136,7 +119,25 @@ private class TextViewLayout {
         }
     }
 
-    private fun roundExtra(extra: Double): Int {
-        return if (extra >= 0) (extra + 0.5).toInt() else -(-extra + 0.5).toInt()
+    companion object {
+        fun from(result: TextLayoutResult, metrics: Paint.FontMetricsInt, spacingExtra: Int, spacingMultiplier: Float): TextViewLines {
+            val lineCount = result.lineCount
+            val baselines = IntArray(lineCount)
+            val needsSpacing = spacingExtra != 0 || spacingMultiplier != 1f
+            var y = 0
+            for (line in 0 until lineCount) {
+                val isLast = line == lineCount - 1
+                val above = if (line == 0) metrics.top else metrics.ascent
+                val below = if (isLast) metrics.bottom else metrics.descent
+                val extra = if (needsSpacing && !isLast) roundExtra((below - above) * (spacingMultiplier - 1.0) + spacingExtra) else 0
+                baselines[line] = y - above
+                y += below - above + extra
+            }
+            return TextViewLines(result, baselines, y)
+        }
+
+        private fun roundExtra(extra: Double): Int {
+            return if (extra >= 0) (extra + 0.5).toInt() else -(-extra + 0.5).toInt()
+        }
     }
 }
