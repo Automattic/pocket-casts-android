@@ -18,10 +18,12 @@ import com.automattic.eventhorizon.EpisodeChatFeedbackSubmitTappedEvent
 import com.automattic.eventhorizon.EpisodeChatFeedbackSubmittedEvent
 import com.automattic.eventhorizon.EpisodeChatFeedbackTriggerType
 import com.automattic.eventhorizon.EventHorizon
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -39,6 +41,7 @@ class ChatFeedbackViewModelTest {
 
     private val eventSink = TestEventSink()
     private val savedStateHandle = SavedStateHandle()
+    private var messagesGate: CompletableDeferred<Unit>? = null
     private var storedMessages: List<ChatMessage> = listOf(
         ChatMessage.User(text = "Question", uuid = "user-uuid"),
         ChatMessage.Assistant(text = "Answer", uuid = "assistant-uuid"),
@@ -50,7 +53,7 @@ class ChatFeedbackViewModelTest {
         answerUuid: String? = null,
     ) = ChatFeedbackViewModel(
         savedStateHandle = savedStateHandle,
-        chatManager = TestChatManager(storedMessages),
+        chatManager = TestChatManager(storedMessages) { messagesGate?.await() },
         eventHorizon = EventHorizon(eventSink),
         applicationScope = CoroutineScope(SupervisorJob() + coroutineRule.testDispatcher),
     ).apply {
@@ -270,8 +273,12 @@ class ChatFeedbackViewModelTest {
         viewModel.onReasonSelected(ChatFeedbackReason.WrongFacts)
         eventSink.skipEvent()
 
+        messagesGate = CompletableDeferred()
+
         viewModel.submit()
+        advanceUntilIdle()
         viewModelStore.clear()
+        messagesGate?.complete(Unit)
         advanceUntilIdle()
         eventSink.skipEvent()
 
@@ -321,8 +328,14 @@ class ChatFeedbackViewModelTest {
         )
     }
 
-    private class TestChatManager(private val messages: List<ChatMessage>) : ChatManager {
-        override fun observeMessages(episodeUuid: String): Flow<List<ChatMessage>> = flowOf(messages)
+    private class TestChatManager(
+        private val messages: List<ChatMessage>,
+        private val beforeMessages: suspend () -> Unit,
+    ) : ChatManager {
+        override fun observeMessages(episodeUuid: String): Flow<List<ChatMessage>> = flow {
+            beforeMessages()
+            emit(messages)
+        }
 
         override fun observeHistory(): Flow<List<EpisodeChatHistoryItem>> = flowOf(emptyList())
 

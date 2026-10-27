@@ -928,6 +928,35 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `rating an answer without a question before it tracks only the answer`() = runTest {
+        chatManager.messages.value = listOf(ChatMessage.Assistant("A1", uuid = "a1"))
+        setEpisodeInfo()
+        advanceUntilIdle()
+        eventSink.skipEvent()
+
+        viewModel.rateAnswer("a1", ChatAnswerRating.Positive)
+
+        val event = eventSink.pollEvent() as EpisodeChatResponseRatedEvent
+        assertNull(event.question)
+        assertEquals("A1", event.answer)
+    }
+
+    @Test
+    fun `rating an answer does not split an emoji when truncating`() = runTest {
+        chatManager.messages.value = listOf(
+            ChatMessage.User("Q1", uuid = "q1"),
+            ChatMessage.Assistant("a".repeat(999) + "\uD83C\uDF99", uuid = "a1"),
+        )
+        setEpisodeInfo()
+        advanceUntilIdle()
+        eventSink.skipEvent()
+
+        viewModel.rateAnswer("a1", ChatAnswerRating.Positive)
+
+        assertEquals("a".repeat(999), (eventSink.pollEvent() as EpisodeChatResponseRatedEvent).answer)
+    }
+
+    @Test
     fun `clearing a rating tracks the removed rating`() = runTest {
         chatManager.messages.value = listOf(
             ChatMessage.User("Q1", uuid = "q1"),
