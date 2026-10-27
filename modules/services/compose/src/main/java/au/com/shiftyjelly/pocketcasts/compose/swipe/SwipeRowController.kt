@@ -76,6 +76,8 @@ internal class SwipeRowController(
 
     private var isFlinging = false
 
+    private var isGestureConsumed = false
+
     private var targetPosition = SwipeDirection.None
 
     private var swipeDirection = SwipeDirection.None
@@ -133,6 +135,7 @@ internal class SwipeRowController(
     }
 
     fun onDragStarted() {
+        isGestureConsumed = false
         if (isLocked) {
             return
         }
@@ -142,7 +145,7 @@ internal class SwipeRowController(
     }
 
     fun onDrag(delta: Float) {
-        if (isLocked) {
+        if (isLocked || isGestureConsumed) {
             return
         }
         updateSwipeDirection(delta)
@@ -154,7 +157,7 @@ internal class SwipeRowController(
     }
 
     fun onDragStopped(velocity: Float) {
-        if (isLocked) {
+        if (isLocked || isGestureConsumed) {
             return
         }
         if (velocity.absoluteValue > minFlingVelocity) {
@@ -170,6 +173,7 @@ internal class SwipeRowController(
     }
 
     fun clearTranslation() {
+        isGestureConsumed = false
         clearGesture()
         swipedJob?.cancel()
         swipedJob = null
@@ -246,6 +250,7 @@ internal class SwipeRowController(
             return
         }
         updateLocked(true)
+        isGestureConsumed = true
         val isLeading = translation > 0
         val primaryAction = (if (isLeading) leadingActions else trailingActions).firstOrNull()
         primaryAction?.let(onSwipeAction)
