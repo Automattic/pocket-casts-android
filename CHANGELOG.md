@@ -7,6 +7,8 @@
         ([#6107](https://github.com/Automattic/pocket-casts-android/pull/6107))
     *   Fix playback stopping right after it starts when another app removes the playback notification
         ([#6217](https://github.com/Automattic/pocket-casts-android/pull/6217))
+    *   Fix a crash on Android 8 devices when the full-screen player loaded show notes containing remote images
+        ([#5847](https://github.com/Automattic/pocket-casts-android/pull/5847))
 
 
 8.24

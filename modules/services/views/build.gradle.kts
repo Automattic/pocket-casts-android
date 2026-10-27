@@ -55,6 +55,7 @@ dependencies {
     implementation(libs.androidx.cardview)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.viewpager)
+    implementation(libs.androidx.webkit)
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.coroutines.core)
