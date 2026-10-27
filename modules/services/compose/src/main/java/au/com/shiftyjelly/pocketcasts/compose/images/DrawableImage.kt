@@ -22,6 +22,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.constrainWidth
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.withMatrix
 
 @Composable
 fun DrawableImage(
@@ -61,11 +62,7 @@ fun DrawableImage(
                     )
                 }
                 drawIntoCanvas { canvas ->
-                    val nativeCanvas = canvas.nativeCanvas
-                    val count = nativeCanvas.save()
-                    nativeCanvas.concat(matrix)
-                    drawable.draw(nativeCanvas)
-                    nativeCanvas.restoreToCount(count)
+                    canvas.nativeCanvas.withMatrix(matrix) { drawable.draw(this) }
                 }
             },
     )

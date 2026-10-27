@@ -42,9 +42,10 @@ fun ViewMaterialButton(
     elevation: Dp = 2.dp,
     verticalPadding: Dp = 4.dp,
     strokeColor: Color? = null,
+    maxLines: Int = Int.MAX_VALUE,
 ) {
     val density = LocalDensity.current
-    val cornerRadiusPx = with(density) { cornerRadius?.roundToPx()?.toFloat() ?: 4.dp.toPx() }
+    val cornerRadiusPx = with(density) { (cornerRadius ?: 4.dp).roundToPx().toFloat() }
     val strokeWidthPx = with(density) { 1.dp.roundToPx().toFloat() }
     val insetVertical = with(density) { 6.dp.toPx().toInt().toDp() }
     val shape = RoundedCornerShape(cornerRadiusPx)
@@ -83,7 +84,7 @@ fun ViewMaterialButton(
                 fontWeight = FontWeight.Medium,
                 letterSpacing = letterSpacing,
                 textAlign = TextAlign.Center,
-                maxLines = 1,
+                maxLines = maxLines,
                 modifier = Modifier.fillMaxWidth(),
             )
         }
