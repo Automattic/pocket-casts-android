@@ -493,6 +493,45 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `follow-up click sends it as a follow-up`() = runTest {
+        setEpisodeInfo()
+        connectToInternet()
+
+        viewModel.onSuggestionClick("Who is the guest?", ChatInputType.FollowUp)
+        advanceUntilIdle()
+
+        assertEquals(SendMessage(EPISODE_UUID, "Who is the guest?"), chatManager.sentMessages.single())
+        eventSink.skipEvent()
+        assertEquals(EpisodeChatInputType.FollowUp, (eventSink.pollEvent() as EpisodeChatMessageSentEvent).inputType)
+    }
+
+    @Test
+    fun `follow-ups come from the latest answer`() {
+        val state = ChatUiState(
+            messages = listOf(
+                ChatMessage.User(text = "Q1", uuid = "q1"),
+                ChatMessage.Assistant(text = "A1", followUps = listOf("Old"), uuid = "a1"),
+                ChatMessage.User(text = "Q2", uuid = "q2"),
+                ChatMessage.Assistant(text = "A2", followUps = listOf("New"), uuid = "a2"),
+                ChatMessage.Quote(text = "Quote", start = "00:01", end = "00:02", uuid = "quote"),
+            ),
+        )
+
+        assertEquals(listOf("New"), state.followUps)
+    }
+
+    @Test
+    fun `follow-ups hide while a question waits for its answer`() {
+        val answered = listOf(
+            ChatMessage.User(text = "Q1", uuid = "q1"),
+            ChatMessage.Assistant(text = "A1", followUps = listOf("Old"), uuid = "a1"),
+        )
+
+        assertEquals(emptyList<String>(), ChatUiState(messages = answered, isAwaitingReply = true).followUps)
+        assertEquals(emptyList<String>(), ChatUiState(messages = answered + ChatMessage.User(text = "Q2", uuid = "q2")).followUps)
+    }
+
+    @Test
     fun `starter questions wait for sign in`() = runTest {
         isLoggedIn = false
         setEpisodeInfo(isBeta = true, requiresSignIn = true)

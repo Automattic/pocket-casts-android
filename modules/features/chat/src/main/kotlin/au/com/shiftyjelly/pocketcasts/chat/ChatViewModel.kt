@@ -1149,6 +1149,15 @@ data class ChatUiState(
 ) {
     val canSend: Boolean get() = inputText.isNotBlank() && isConnected && !isAwaitingReply
 
+    val followUps: List<String>
+        get() {
+            if (isAwaitingReply) return emptyList()
+            val answerUuid = answerUuidsByLastIndex[messages.lastIndex] ?: return emptyList()
+            return messages.firstNotNullOfOrNull { message ->
+                (message as? ChatMessage.Assistant)?.takeIf { it.uuid == answerUuid }?.followUps
+            }.orEmpty()
+        }
+
     val answerUuidsByLastIndex: Map<Int, String>
         get() = buildMap {
             var answerUuid: String? = null
@@ -1178,6 +1187,7 @@ private val ChatInputType.analyticsValue
         ChatInputType.Typed -> EpisodeChatInputType.Typed
         ChatInputType.SummaryPrompt -> EpisodeChatInputType.SummaryPrompt
         ChatInputType.SuggestedPrompt -> EpisodeChatInputType.SuggestedPrompt
+        ChatInputType.FollowUp -> EpisodeChatInputType.FollowUp
     }
 
 data class ChatPlayingEpisode(
