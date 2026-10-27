@@ -52,6 +52,7 @@ internal fun MultiSelectBottomSheetPage(
                     size = 18.sp,
                     color = MaterialTheme.theme.colors.primaryText02,
                     isMedium = true,
+                    maxLines = Int.MAX_VALUE,
                     modifier = Modifier.padding(start = 16.dp),
                 )
                 Box(modifier = Modifier.matchParentSize()) {
