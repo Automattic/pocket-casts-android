@@ -32,6 +32,7 @@ data class ConversationMessage(
 data class EpisodeChatResponse(
     @Json(name = "reply") val reply: String,
     @Json(name = "quote") val quote: EpisodeChatQuote?,
+    @Json(name = "suggested_questions") val suggestedQuestions: List<String>? = null,
 )
 
 @JsonClass(generateAdapter = true)
