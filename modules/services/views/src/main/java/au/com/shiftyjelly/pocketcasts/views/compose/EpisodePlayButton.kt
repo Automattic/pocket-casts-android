@@ -58,7 +58,7 @@ fun EpisodePlayButton(
     fromListUuid: String? = null,
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
-    var isMenuExpanded by remember { mutableStateOf(false) }
+    var isMenuExpanded by remember(episode.uuid) { mutableStateOf(false) }
     val buttonColor = if (buttonType == PlayButtonType.PLAYED) MaterialTheme.theme.colors.primaryIcon02 else tint
     val topPadding = with(LocalDensity.current) { 1.dp.toPx().toInt().toDp() }
     Box(
