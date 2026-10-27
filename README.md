@@ -80,5 +80,5 @@ Read our [Contributing Guide](CONTRIBUTING.md) to learn about reporting issues, 
 ## Signing a Release
 
 Release builds are signed with the upload key, which `bundle exec fastlane run configure_apply` decrypts to `~/.configure/pocket-casts-android/secrets/upload.jks`.
-Its credentials are read from `secret.properties` as `uploadStorePassword`, `uploadKeyAlias`, and `uploadKeyPassword`.
+Its credentials are read from `secret.properties`, which `configure_apply` decrypts to the same directory, as `signingKeyStorePassword`, `signingKeyAlias`, and `signingKeyPassword`.
 Without them, release packaging fails rather than producing an unsigned build.

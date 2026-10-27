@@ -79,9 +79,9 @@ project.apply {
 
         // App Signing
         val uploadKeystore = File(gradle.extra["decryptedSecretsDir"] as File, "upload.jks")
-        val uploadStorePassword = secretProperties.getProperty("uploadStorePassword")
-        val uploadKeyAlias = secretProperties.getProperty("uploadKeyAlias")
-        val uploadKeyPassword = secretProperties.getProperty("uploadKeyPassword")
+        val uploadStorePassword = secretProperties.getProperty("signingKeyStorePassword")
+        val uploadKeyAlias = secretProperties.getProperty("signingKeyAlias")
+        val uploadKeyPassword = secretProperties.getProperty("signingKeyPassword")
         val canSignRelease = uploadKeystore.exists() &&
             listOf(uploadStorePassword, uploadKeyAlias, uploadKeyPassword).none { it.isNullOrBlank() }
         set("canSignRelease", canSignRelease)
