@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.graphics.createBitmap
 
 @Composable
 internal fun DrawableIcon(
@@ -66,7 +67,7 @@ internal fun GradientDrawableIcon(
 
 private fun gradientBitmap(drawable: Drawable, width: Int, height: Int, startColor: Int, endColor: Int): Bitmap? {
     if (width <= 0 || height <= 0) return null
-    val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+    val bitmap = createBitmap(width, height)
     val canvas = Canvas(bitmap)
     drawable.setBounds(0, 0, width, height)
     drawable.draw(canvas)
