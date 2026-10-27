@@ -49,6 +49,10 @@ class TranscriptManagerImpl @Inject constructor(
         return transcriptDao.observeTranscripts(episodeUuid).map { it.isNotEmpty() }
     }
 
+    override fun observeIsGeneratedTranscriptAvailable(episodeUuid: String): Flow<Boolean> {
+        return transcriptDao.observeTranscripts(episodeUuid).map { transcripts -> transcripts.any { it.isGenerated } }
+    }
+
     override suspend fun loadTranscript(
         episodeUuid: String,
     ): Transcript? {

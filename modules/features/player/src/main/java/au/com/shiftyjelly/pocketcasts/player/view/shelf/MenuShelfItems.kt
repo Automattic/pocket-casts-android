@@ -64,6 +64,7 @@ fun MenuShelfItems(
                                     item = listItem,
                                     isEditable = state.isEditable,
                                     isTranscriptAvailable = state.isTranscriptAvailable,
+                                    isEpisodeChatAvailable = state.isEpisodeChatAvailable,
                                     isVideoEnabled = isVideoEnabled,
                                     badgeTextId = shelfItemBadgeTextId(listItem, state),
                                     onClick = onClick,

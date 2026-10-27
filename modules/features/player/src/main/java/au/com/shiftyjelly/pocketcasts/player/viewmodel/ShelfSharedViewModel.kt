@@ -153,7 +153,13 @@ class ShelfSharedViewModel @Inject constructor(
         shelfUpNextFlow,
         shelfUpNextFlow
             .mapNotNull { state -> (state as? UpNextQueue.State.Loaded)?.episode?.uuid }
-            .flatMapLatest { episodeUuid -> transcriptManager.observeIsTranscriptAvailable(episodeUuid) },
+            .flatMapLatest { episodeUuid ->
+                combine(
+                    transcriptManager.observeIsTranscriptAvailable(episodeUuid),
+                    transcriptManager.observeIsGeneratedTranscriptAvailable(episodeUuid),
+                    ::TranscriptAvailability,
+                )
+            },
         videoStateFlow,
         promoStateFlow,
         ::createUiState,
@@ -195,7 +201,7 @@ class ShelfSharedViewModel @Inject constructor(
     private fun createUiState(
         shelfItems: List<ShelfItem>,
         shelfUpNext: UpNextQueue.State,
-        isTranscriptAvailable: Boolean,
+        transcriptAvailability: TranscriptAvailability,
         videoState: VideoState,
         promoState: PromoState,
     ): UiState {
@@ -208,12 +214,18 @@ class ShelfSharedViewModel @Inject constructor(
         return uiState.value.copy(
             shelfItems = shelfItems.filter { it.showIf(episode) && (it != ShelfItem.StreamSelector || canToggleVideo) },
             episode = episode,
-            isTranscriptAvailable = isTranscriptAvailable,
+            isTranscriptAvailable = transcriptAvailability.isTranscriptAvailable,
+            isEpisodeChatAvailable = transcriptAvailability.isGeneratedTranscriptAvailable,
             isVideoRenderingEnabled = videoState.renderingEnabled && streamHasVideo,
             isSmartBookmarksPromoActive = promoState.isSmartBookmarksPromoActive,
             isEpisodeChatPromoActive = promoState.isEpisodeChatPromoActive,
         )
     }
+
+    private data class TranscriptAvailability(
+        val isTranscriptAvailable: Boolean,
+        val isGeneratedTranscriptAvailable: Boolean,
+    )
 
     private data class PromoState(
         val isSmartBookmarksPromoActive: Boolean,
@@ -453,10 +465,10 @@ class ShelfSharedViewModel @Inject constructor(
     fun onEpisodeChatClick(
         podcast: Podcast,
         episode: PodcastEpisode,
-        isTranscriptAvailable: Boolean,
+        isEpisodeChatAvailable: Boolean,
         source: ShelfItemSource,
     ) {
-        if (!isTranscriptAvailable) {
+        if (!isEpisodeChatAvailable) {
             eventHorizon.track(
                 EpisodeChatUnavailableTappedEvent(
                     episodeUuid = episode.uuid,
@@ -522,6 +534,7 @@ class ShelfSharedViewModel @Inject constructor(
         val shelfItems: List<ShelfItem> = emptyList(),
         val episode: BaseEpisode? = null,
         val isTranscriptAvailable: Boolean = false,
+        val isEpisodeChatAvailable: Boolean = false,
         val isVideoRenderingEnabled: Boolean = true,
         val isSmartBookmarksPromoActive: Boolean = false,
         val isEpisodeChatPromoActive: Boolean = false,
@@ -536,7 +549,7 @@ class ShelfSharedViewModel @Inject constructor(
             get() = isSmartBookmarksPromoActive && ShelfItem.Bookmark in playerBottomSheetShelfItems
         val showEpisodeChatTooltip: Boolean
             get() = isEpisodeChatPromoActive &&
-                isTranscriptAvailable &&
+                isEpisodeChatAvailable &&
                 ShelfItem.EpisodeChat in playerBottomSheetShelfItems &&
                 !showBookmarkTooltip &&
                 !showBookmarkOverflowTooltip
