@@ -108,7 +108,7 @@ private fun Modifier.bleedToEnd(bleed: Dp) = layout { measurable, constraints ->
     val bleedPx = bleed.roundToPx()
     val placeable = measurable.measure(constraints.copy(minWidth = 0, maxWidth = constraints.maxWidth + bleedPx))
     layout(constraints.maxWidth, placeable.height) {
-        placeable.place(0, 0)
+        placeable.placeRelative(0, 0)
     }
 }
 
