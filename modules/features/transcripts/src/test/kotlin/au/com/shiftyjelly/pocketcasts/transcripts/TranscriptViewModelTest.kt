@@ -856,6 +856,8 @@ private class TestTranscriptManager : TranscriptManager {
 
     override fun observeIsTranscriptAvailable(episodeUuid: String) = emptyFlow<Boolean>()
 
+    override fun observeIsGeneratedTranscriptAvailable(episodeUuid: String) = emptyFlow<Boolean>()
+
     override suspend fun loadTranscript(episodeUuid: String): Transcript? {
         yield()
         return avaiableTranscript.takeIf { shouldLoadTranscripts }

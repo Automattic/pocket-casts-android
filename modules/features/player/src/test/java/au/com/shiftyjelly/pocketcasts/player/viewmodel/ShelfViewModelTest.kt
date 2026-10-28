@@ -59,6 +59,23 @@ class ShelfViewModelTest {
     private lateinit var shelfViewModel: ShelfViewModel
 
     @Test
+    fun `given only an author transcript, then episode chat is unavailable`() = runTest {
+        initViewModel(isGeneratedTranscriptAvailable = false)
+
+        val state = shelfViewModel.uiState.value
+
+        assertTrue(state.isTranscriptAvailable)
+        assertFalse(state.isEpisodeChatAvailable)
+    }
+
+    @Test
+    fun `given a generated transcript, then episode chat is available`() = runTest {
+        initViewModel(isGeneratedTranscriptAvailable = true)
+
+        assertTrue(shelfViewModel.uiState.value.isEpisodeChatAvailable)
+    }
+
+    @Test
     fun `given editable state, when setData is called, then minimum 4 shelf items should be passed in argument`() = runTest {
         val items = listOf(
             mock<ShelfItem>(),
@@ -297,9 +314,11 @@ class ShelfViewModelTest {
         isEditable: Boolean = true,
         version: String = "8.21",
         savedItems: List<ShelfItem> = ShelfItem.entries,
+        isGeneratedTranscriptAvailable: Boolean = true,
     ) {
         val episodeId = "testEpisodeId"
         whenever(transcriptManager.observeIsTranscriptAvailable(episodeId)).thenReturn(flowOf(true))
+        whenever(transcriptManager.observeIsGeneratedTranscriptAvailable(episodeId)).thenReturn(flowOf(isGeneratedTranscriptAvailable))
         val userSetting = mock<UserSetting<List<ShelfItem>>>()
         whenever(userSetting.value).thenReturn(savedItems)
         whenever(settings.shelfItems).thenReturn(userSetting)

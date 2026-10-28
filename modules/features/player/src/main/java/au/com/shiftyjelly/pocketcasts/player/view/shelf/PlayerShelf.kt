@@ -93,6 +93,7 @@ fun PlayerShelf(
     PlayerShelfContent(
         shelfItems = shelfItemsState.playerShelfItems,
         isTranscriptAvailable = shelfItemsState.isTranscriptAvailable,
+        isEpisodeChatAvailable = shelfItemsState.isEpisodeChatAvailable,
         isVideoEnabled = shelfItemsState.isVideoRenderingEnabled,
         playerShelfData = playerShelfData,
         playerColors = playerColors,
@@ -165,7 +166,7 @@ fun PlayerShelf(
         onEpisodeChatClick = {
             val podcast = playerViewModel.podcast ?: return@PlayerShelfContent
             val episode = playerViewModel.episode as? PodcastEpisode ?: return@PlayerShelfContent
-            shelfSharedViewModel.onEpisodeChatClick(podcast, episode, shelfItemsState.isTranscriptAvailable, ShelfItemSource.Shelf)
+            shelfSharedViewModel.onEpisodeChatClick(podcast, episode, shelfItemsState.isEpisodeChatAvailable, ShelfItemSource.Shelf)
         },
         showBookmarkTooltip = shelfItemsState.showBookmarkTooltip,
         showBookmarkOverflowTooltip = shelfItemsState.showBookmarkOverflowTooltip,
@@ -181,6 +182,7 @@ fun PlayerShelf(
 private fun PlayerShelfContent(
     shelfItems: List<ShelfItem>,
     isTranscriptAvailable: Boolean,
+    isEpisodeChatAvailable: Boolean,
     isVideoEnabled: Boolean,
     playerShelfData: PlayerShelfData,
     onEffectsClick: () -> Unit,
@@ -307,7 +309,7 @@ private fun PlayerShelfContent(
                 )
 
                 ShelfItem.EpisodeChat -> EpisodeChatButton(
-                    isTranscriptAvailable = isTranscriptAvailable,
+                    isEpisodeChatAvailable = isEpisodeChatAvailable,
                     playerColors = playerColors,
                     onClick = onEpisodeChatClick,
                 )
@@ -525,11 +527,11 @@ private fun AddToPlaylistButton(
 
 @Composable
 private fun EpisodeChatButton(
-    isTranscriptAvailable: Boolean,
+    isEpisodeChatAvailable: Boolean,
     playerColors: PlayerColors,
     onClick: () -> Unit,
 ) {
-    val alpha = if (isTranscriptAvailable) 1f else 0.4f
+    val alpha = if (isEpisodeChatAvailable) 1f else 0.4f
     IconButton(onClick = onClick) {
         Icon(
             painterResource(id = IR.drawable.ic_episode_chat),
@@ -620,6 +622,7 @@ private fun PlayerShelfPreview(
         PlayerShelfContent(
             shelfItems = ShelfItem.entries.toList().take(4),
             isTranscriptAvailable = false,
+            isEpisodeChatAvailable = false,
             isVideoEnabled = true,
             playerShelfData = PlayerShelfData(),
             onEffectsClick = {},

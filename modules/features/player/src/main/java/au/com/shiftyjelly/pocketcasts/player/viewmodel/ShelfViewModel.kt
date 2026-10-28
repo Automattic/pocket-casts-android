@@ -55,6 +55,12 @@ class ShelfViewModel @AssistedInject constructor(
                 }
         }
         viewModelScope.launch {
+            transcriptManager.observeIsGeneratedTranscriptAvailable(episodeId)
+                .collectLatest { isAvailable ->
+                    _uiState.update { it.copy(isEpisodeChatAvailable = isAvailable) }
+                }
+        }
+        viewModelScope.launch {
             FeatureFlag.isEnabledFlow(Feature.SMART_BOOKMARKS).map { isSmartBookmarksEnabled ->
                 isSmartBookmarksEnabled && isSmartBookmarksPromoRelease
             }.collectLatest { showBadge ->
@@ -184,6 +190,7 @@ class ShelfViewModel @AssistedInject constructor(
         val shelfRowItems: List<ShelfRowItem> = emptyList(),
         val episode: BaseEpisode? = null,
         val isTranscriptAvailable: Boolean = false,
+        val isEpisodeChatAvailable: Boolean = false,
         val showBookmarkNewBadge: Boolean = false,
         val showEpisodeChatBetaBadge: Boolean = false,
     )
