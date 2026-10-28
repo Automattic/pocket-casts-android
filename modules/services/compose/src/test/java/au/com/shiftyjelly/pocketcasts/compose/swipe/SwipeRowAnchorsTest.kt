@@ -87,26 +87,6 @@ class SwipeRowAnchorsTest {
     )
 
     @Test
-    fun `revealing actions settles past a third of their width`() {
-        assertEquals(24f, positionalThreshold(distance = 72f))
-        assertEquals(72f, positionalThreshold(distance = 216f))
-    }
-
-    @Test
-    fun `a full swipe settles once the drag passes the full swipe threshold`() {
-        val threshold = positionalThreshold(distance = ROW_WIDTH * FULL_SWIPE_ANCHOR_MULTIPLIER - 72f)
-
-        assertEquals(128f, threshold)
-    }
-
-    @Test
-    fun `the full swipe threshold grows with the revealed actions`() {
-        val threshold = positionalThreshold(distance = ROW_WIDTH * FULL_SWIPE_ANCHOR_MULTIPLIER - 216f)
-
-        assertEquals(24f, threshold)
-    }
-
-    @Test
     fun `the full swipe threshold never drops below its minimum`() {
         assertEquals(200f, swipeRowFullSwipeThreshold(revealedWidthPx = 72f, marginPx = 24f, minThresholdPx = 200f))
         assertEquals(240f, swipeRowFullSwipeThreshold(revealedWidthPx = 216f, marginPx = 24f, minThresholdPx = 200f))
@@ -118,12 +98,6 @@ class SwipeRowAnchorsTest {
         assertEquals(listOf(150f, 300f), (0 until 2).map { swipeRowActionEdge(it, count = 2, revealedWidthPx = 300f) })
         assertEquals(listOf(100f, 200f, 300f), (0 until 3).map { swipeRowActionEdge(it, count = 3, revealedWidthPx = 300f) })
     }
-
-    private fun positionalThreshold(distance: Float) = swipeRowPositionalThreshold(
-        distance = distance,
-        rowWidthPx = ROW_WIDTH,
-        fullSwipeThresholdPx = { revealedWidthPx -> swipeRowFullSwipeThreshold(revealedWidthPx, marginPx = 24f, minThresholdPx = 200f) },
-    )
 
     private companion object {
         const val ROW_WIDTH = 1080f

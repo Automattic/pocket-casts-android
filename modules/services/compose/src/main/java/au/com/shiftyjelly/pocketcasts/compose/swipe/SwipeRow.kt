@@ -1,7 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.compose.swipe
 
+import android.view.ViewConfiguration
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.exponentialDecay
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -10,6 +12,8 @@ import androidx.compose.foundation.gestures.DraggableAnchors
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.anchoredDraggable
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.snapping.SnapLayoutInfoProvider
+import androidx.compose.foundation.gestures.snapping.snapFlingBehavior
 import androidx.compose.foundation.interaction.DragInteraction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
@@ -30,6 +34,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -43,6 +48,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalView
@@ -59,6 +65,7 @@ import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvi
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import kotlin.math.absoluteValue
+import kotlin.math.sign
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filter
 import androidx.compose.material.MaterialTheme as Material
@@ -109,15 +116,38 @@ internal fun swipeRowFullSwipeThreshold(
     minThresholdPx: Float,
 ) = (revealedWidthPx + marginPx).coerceAtLeast(minThresholdPx)
 
-internal fun swipeRowPositionalThreshold(
-    distance: Float,
-    rowWidthPx: Float,
-    fullSwipeThresholdPx: (Float) -> Float,
-) = if (distance < rowWidthPx) {
-    distance / 3f
-} else {
-    val revealedWidthPx = rowWidthPx * FULL_SWIPE_ANCHOR_MULTIPLIER - distance
-    fullSwipeThresholdPx(revealedWidthPx) - revealedWidthPx
+internal data class SwipeRowSide(
+    val revealedWidthPx: Float,
+    val fullSwipeThresholdPx: Float?,
+)
+
+internal fun swipeRowTarget(
+    offset: Float,
+    velocity: Float,
+    lastDragDirection: Float,
+    minFlingVelocity: Float,
+    leading: SwipeRowSide,
+    trailing: SwipeRowSide,
+): SwipeRowAnchor {
+    val isLeading = offset > 0f
+    val side = if (isLeading) leading else trailing
+    if (offset == 0f || side.revealedWidthPx == 0f) {
+        return SwipeRowAnchor.Resting
+    }
+    val distance = offset.absoluteValue
+    val direction = if (velocity != 0f) velocity.sign else lastDragDirection
+    val isClosing = if (isLeading) direction < 0f else direction > 0f
+    val isFling = velocity.absoluteValue >= minFlingVelocity
+    val openThreshold = if (isClosing) side.revealedWidthPx * 2 / 3 else side.revealedWidthPx / 3
+    val revealed = if (isLeading) SwipeRowAnchor.Leading else SwipeRowAnchor.Trailing
+    val full = if (isLeading) SwipeRowAnchor.FullLeading else SwipeRowAnchor.FullTrailing
+    return when {
+        isFling && isClosing -> SwipeRowAnchor.Resting
+        side.fullSwipeThresholdPx != null && distance >= side.fullSwipeThresholdPx -> full
+        isFling -> revealed
+        distance < openThreshold -> SwipeRowAnchor.Resting
+        else -> revealed
+    }
 }
 
 internal fun swipeRowActionEdge(
@@ -164,12 +194,6 @@ fun SwipeRow(
         { revealedWidthPx: Float -> swipeRowFullSwipeThreshold(revealedWidthPx, fullSwipeThresholdMarginPx, fullSwipeMinThresholdPx) }
     }
     var rowWidthPx by remember { mutableIntStateOf(0) }
-    val flingBehavior = AnchoredDraggableDefaults.flingBehavior(
-        state = state.draggableState,
-        positionalThreshold = remember(rowWidthPx, fullSwipeThresholdPx) {
-            { distance -> swipeRowPositionalThreshold(distance, rowWidthPx.toFloat(), fullSwipeThresholdPx) }
-        },
-    )
 
     val leadingWidthPx = actionWidthPx * shownLeadingActions.size
     val trailingWidthPx = actionWidthPx * shownTrailingActions.size
@@ -188,14 +212,45 @@ fun SwipeRow(
         state.draggableState.updateAnchors(anchors)
     }
 
-    val leadingFullSwipeThresholdPx by rememberUpdatedState(fullSwipeThresholdPx(leadingWidthPx).takeIf { isLeadingFullSwipeEnabled })
-    val trailingFullSwipeThresholdPx by rememberUpdatedState(fullSwipeThresholdPx(trailingWidthPx).takeIf { isTrailingFullSwipeEnabled })
+    val leadingSide by rememberUpdatedState(
+        SwipeRowSide(leadingWidthPx, fullSwipeThresholdPx(leadingWidthPx).takeIf { isLeadingFullSwipeEnabled }),
+    )
+    val trailingSide by rememberUpdatedState(
+        SwipeRowSide(trailingWidthPx, fullSwipeThresholdPx(trailingWidthPx).takeIf { isTrailingFullSwipeEnabled }),
+    )
     val isFullSwipeThresholdReached by remember(state) {
         derivedStateOf {
             val offset = state.settledOffset
-            val threshold = if (offset > 0f) leadingFullSwipeThresholdPx else trailingFullSwipeThresholdPx
+            val threshold = (if (offset > 0f) leadingSide else trailingSide).fullSwipeThresholdPx
             threshold != null && offset.absoluteValue >= threshold
         }
+    }
+
+    val lastDragDirection = remember(state) { mutableFloatStateOf(0f) }
+    LaunchedEffect(state) {
+        var previousOffset = state.settledOffset
+        snapshotFlow { state.settledOffset }.collect { offset ->
+            if (offset != previousOffset) {
+                lastDragDirection.floatValue = (offset - previousOffset).sign
+                previousOffset = offset
+            }
+        }
+    }
+    val minFlingVelocity = ViewConfiguration.get(LocalContext.current).scaledMinimumFlingVelocity.toFloat()
+    val flingBehavior = remember(state, minFlingVelocity) {
+        snapFlingBehavior(
+            snapLayoutInfoProvider = object : SnapLayoutInfoProvider {
+                override fun calculateApproachOffset(velocity: Float, decayOffset: Float) = 0f
+
+                override fun calculateSnapOffset(velocity: Float): Float {
+                    val offset = state.draggableState.requireOffset()
+                    val target = swipeRowTarget(offset, velocity, lastDragDirection.floatValue, minFlingVelocity, leadingSide, trailingSide)
+                    return state.draggableState.anchors.positionOf(target) - offset
+                }
+            },
+            decayAnimationSpec = exponentialDecay(),
+            snapAnimationSpec = AnchoredDraggableDefaults.SnapAnimationSpec,
+        )
     }
     val hapticFeedback = LocalHapticFeedback.current
     LaunchedEffect(state) {
