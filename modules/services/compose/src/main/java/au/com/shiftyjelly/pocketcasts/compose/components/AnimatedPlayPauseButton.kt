@@ -2,12 +2,17 @@ package au.com.shiftyjelly.pocketcasts.compose.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -96,6 +101,74 @@ fun AnimatedPlayPauseButton(
     }
 }
 
+private const val PLAY_BUTTON_FRAME_PLAYING = 0
+private const val PLAY_BUTTON_FRAME_PAUSED_END = 9
+private const val PLAY_BUTTON_FRAME_PAUSED = 10
+private const val PLAY_BUTTON_FRAME_PLAYING_END = 19
+private const val PLAY_BUTTON_DESCRIPTION = "Play button"
+private const val PAUSE_BUTTON_DESCRIPTION = "Pause button"
+
+@Composable
+fun AnimatedPlayButton(
+    isPlaying: Boolean,
+    onClick: () -> Unit,
+    iconSize: Dp,
+    iconTint: Color,
+    modifier: Modifier = Modifier,
+    circleColor: Color = Color.White,
+) {
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(UR.raw.large_play_button))
+    val lottieAnimatable = rememberLottieAnimatable()
+    var displayedIsPlaying by remember { mutableStateOf<Boolean?>(null) }
+
+    val dynamicProperties = rememberLottieDynamicProperties(
+        rememberLottieDynamicProperty(
+            property = LottieProperty.COLOR_FILTER,
+            value = SimpleColorFilter(iconTint.toArgb()),
+            keyPath = arrayOf("**"),
+        ),
+    )
+
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier
+            .clip(CircleShape)
+            .background(circleColor)
+            .semantics(mergeDescendants = true) {
+                contentDescription = if (isPlaying) PAUSE_BUTTON_DESCRIPTION else PLAY_BUTTON_DESCRIPTION
+            }
+            .clickable(onClick = onClick),
+    ) {
+        LottieAnimation(
+            composition = composition,
+            progress = { lottieAnimatable.progress },
+            dynamicProperties = dynamicProperties,
+            modifier = Modifier.size(iconSize),
+        )
+    }
+
+    LaunchedEffect(composition, isPlaying) {
+        val loadedComposition = composition ?: return@LaunchedEffect
+        val previousIsPlaying = displayedIsPlaying
+        displayedIsPlaying = isPlaying
+        if (previousIsPlaying == null || previousIsPlaying == isPlaying) {
+            val frame = if (isPlaying) PLAY_BUTTON_FRAME_PLAYING else PLAY_BUTTON_FRAME_PAUSED
+            lottieAnimatable.snapTo(loadedComposition, progress = loadedComposition.getProgressForFrame(frame.toFloat()))
+        } else {
+            val (minFrame, maxFrame) = if (isPlaying) {
+                PLAY_BUTTON_FRAME_PAUSED to PLAY_BUTTON_FRAME_PLAYING_END
+            } else {
+                PLAY_BUTTON_FRAME_PLAYING to PLAY_BUTTON_FRAME_PAUSED_END
+            }
+            lottieAnimatable.animate(
+                composition = loadedComposition,
+                clipSpec = LottieClipSpec.Frame(minFrame, maxFrame),
+                initialProgress = loadedComposition.getProgressForFrame(minFrame.toFloat()),
+            )
+        }
+    }
+}
+
 @Preview(widthDp = 80, heightDp = 80)
 @Composable
 private fun AnimatedPlayButtonPreview() {
@@ -103,4 +176,27 @@ private fun AnimatedPlayButtonPreview() {
         isPlaying = false,
         onClick = {},
     )
+}
+
+@Preview(widthDp = 120, heightDp = 64)
+@Composable
+private fun AnimatedPlayButtonStatesPreview() {
+    Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+        AnimatedPlayButton(
+            isPlaying = false,
+            onClick = {},
+            iconSize = 24.dp,
+            iconTint = Color.White,
+            circleColor = Color.Black,
+            modifier = Modifier.size(64.dp),
+        )
+        AnimatedPlayButton(
+            isPlaying = true,
+            onClick = {},
+            iconSize = 24.dp,
+            iconTint = Color.White,
+            circleColor = Color.Black,
+            modifier = Modifier.size(32.dp),
+        )
+    }
 }

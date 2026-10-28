@@ -1,11 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.views.dialog
 
 import android.app.Dialog
+import android.content.Context
 import android.content.DialogInterface
-import android.content.res.ColorStateList
 import android.content.res.Resources
+import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.util.TypedValue
 import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
 import android.view.View
@@ -13,15 +13,19 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.annotation.AttrRes
 import androidx.annotation.DrawableRes
+import androidx.appcompat.content.res.AppCompatResources
+import androidx.compose.material.MaterialTheme
+import androidx.compose.runtime.remember
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.sp
 import androidx.core.view.doOnLayout
-import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentManager
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
+import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
-import au.com.shiftyjelly.pocketcasts.views.databinding.FragmentConfirmationBinding
-import au.com.shiftyjelly.pocketcasts.views.extensions.setSystemWindowInsetToPadding
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -58,7 +62,6 @@ open class ConfirmationDialog : BottomSheetDialogFragment() {
     private var displayConfirmButtonFirst: Boolean = false
     private var removeSecondaryButtonBorder: Boolean = false
     private var summaryTextSize: Float? = null
-    private var binding: FragmentConfirmationBinding? = null
     private var isDismissedWithoutAction = true
 
     @Inject lateinit var theme: Theme
@@ -113,20 +116,48 @@ open class ConfirmationDialog : BottomSheetDialogFragment() {
         return BottomSheetDialog(context, UR.style.BottomSheetDialogThemeDark)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = FragmentConfirmationBinding.inflate(inflater, container, false)
-        return binding?.root
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
+    ) = contentWithoutConsumedInsets {
+        val dialogContext = requireDialog().context
+        val themeType = if (forceDarkTheme && !theme.isDarkTheme) Theme.ThemeType.DARK else theme.activeTheme
+        AppTheme(themeType) {
+            ConfirmationDialogContent(
+                title = title,
+                summary = summary,
+                icon = remember { iconDrawable(dialogContext) },
+                buttonType = buttonType,
+                secondaryType = secondaryType,
+                onConfirm = {
+                    onConfirm?.invoke()
+                    isDismissedWithoutAction = false
+                    dismiss()
+                },
+                onSecondary = {
+                    onSecondary?.invoke()
+                    isDismissedWithoutAction = false
+                    dismiss()
+                },
+                summaryColor = summaryTextColorAttr?.let { Color(dialogContext.getThemeColor(it)) } ?: MaterialTheme.theme.colors.primaryText02,
+                summaryTextSize = summaryTextSize?.sp,
+                secondaryTextColor = secondaryTextColorAttr?.let { Color(dialogContext.getThemeColor(it)) },
+                displayConfirmButtonFirst = displayConfirmButtonFirst,
+                removeSecondaryButtonBorder = removeSecondaryButtonBorder,
+            )
+        }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        binding = null
+    private fun iconDrawable(context: Context): Drawable? {
+        if (iconId == 0) return null
+        val drawable = AppCompatResources.getDrawable(context, iconId)?.mutate() ?: return null
+        iconTintAttr?.let { drawable.setTint(context.getThemeColor(it)) }
+        return drawable
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        val binding = binding ?: return
 
         view.doOnLayout {
             val dialog = dialog as BottomSheetDialog
@@ -135,74 +166,6 @@ open class ConfirmationDialog : BottomSheetDialogFragment() {
             behavior.state = BottomSheetBehavior.STATE_EXPANDED
             behavior.peekHeight = 0
             behavior.skipCollapsed = true
-        }
-
-        val context = view.context
-
-        binding.lblTitle.isVisible = title != null
-        binding.lblTitle.text = title
-        binding.lblSummary.isVisible = summary != null
-        binding.lblSummary.text = summary
-        summaryTextColorAttr?.let { binding.lblSummary.setTextColor(context.getThemeColor(it)) }
-        summaryTextSize?.let { binding.lblSummary.setTextSize(TypedValue.COMPLEX_UNIT_SP, it) }
-        binding.imgIcon.isVisible = iconId != 0
-        if (iconId != 0) {
-            binding.imgIcon.setImageResource(iconId)
-            iconTintAttr?.let { binding.imgIcon.imageTintList = ColorStateList.valueOf(context.getThemeColor(it)) }
-        }
-
-        val layout = binding.root as ViewGroup
-        layout.setSystemWindowInsetToPadding(bottom = true)
-
-        val btnConfirm = binding.btnConfirm
-        val btnSecondary = binding.btnSecondary
-        val bottomPaddingView = binding.bottomPaddingView
-
-        with(layout) {
-            removeView(btnConfirm)
-            removeView(btnSecondary)
-            removeView(bottomPaddingView)
-            if (displayConfirmButtonFirst) {
-                addView(btnConfirm)
-                addView(btnSecondary)
-            } else {
-                addView(btnSecondary)
-                addView(btnConfirm)
-            }
-            addView(bottomPaddingView)
-        }
-
-        btnConfirm.text = buttonType.text
-        btnConfirm.setOnClickListener {
-            onConfirm?.invoke()
-            isDismissedWithoutAction = false
-            dismiss()
-        }
-
-        val dangerColor = context.getThemeColor(UR.attr.support_05)
-        val defaultColor = context.getThemeColor(UR.attr.support_01)
-
-        val buttonColor = if (buttonType is ButtonType.Danger) dangerColor else defaultColor
-        btnConfirm.backgroundTintList = ColorStateList.valueOf(buttonColor)
-
-        val secondaryButtonColor =
-            secondaryTextColorAttr?.let { context.getThemeColor(it) } ?: if (secondaryType is ButtonType.Danger) dangerColor else defaultColor
-
-        if (removeSecondaryButtonBorder) {
-            btnSecondary.strokeColor = null
-            btnSecondary.strokeWidth = 0
-        } else {
-            btnSecondary.strokeColor = ColorStateList.valueOf(secondaryButtonColor)
-            btnSecondary.strokeWidth = 2.dpToPx(context)
-        }
-
-        btnSecondary.setTextColor(secondaryButtonColor)
-        btnSecondary.isVisible = secondaryType != null
-        btnSecondary.text = secondaryType?.text
-        btnSecondary.setOnClickListener {
-            onSecondary?.invoke()
-            isDismissedWithoutAction = false
-            dismiss()
         }
     }
 
