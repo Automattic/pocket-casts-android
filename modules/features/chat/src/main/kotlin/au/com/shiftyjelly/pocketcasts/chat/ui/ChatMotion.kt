@@ -76,12 +76,13 @@ internal fun ChatAppear(
     modifier: Modifier = Modifier,
     rise: Dp = 0.dp,
     durationMillis: Int = APPEAR_DURATION_MS,
+    delayMillis: Int = 0,
     content: @Composable () -> Unit,
 ) {
     val isReduceMotionEnabled = rememberIsReduceMotionEnabled()
     val progress = remember { Animatable(if (animate && !isReduceMotionEnabled) 0f else 1f) }
     LaunchedEffect(progress) {
-        progress.animateTo(1f, tween(durationMillis = durationMillis, easing = EaseOut))
+        progress.animateTo(1f, tween(durationMillis = durationMillis, delayMillis = delayMillis, easing = EaseOut))
     }
     Box(
         modifier = modifier.graphicsLayer {

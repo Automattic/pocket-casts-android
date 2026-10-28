@@ -43,23 +43,37 @@ internal fun ChatWelcome(
         horizontalAlignment = Alignment.End,
         modifier = modifier.fillMaxWidth(),
     ) {
-        Text(
-            text = stringResource(LR.string.chat_welcome),
-            color = theme.primaryText,
-            fontSize = 15.sp,
-            lineHeight = 20.sp,
-            modifier = Modifier.fillMaxWidth(),
-        )
+        ChatAppear(
+            animate = true,
+            rise = WelcomeRise,
+            durationMillis = WELCOME_APPEAR_MS,
+            delayMillis = WELCOME_DELAY_MS,
+        ) {
+            Text(
+                text = stringResource(LR.string.chat_welcome),
+                color = theme.primaryText,
+                fontSize = 15.sp,
+                lineHeight = 20.sp,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
         Column(
             verticalArrangement = Arrangement.spacedBy(12.dp),
             horizontalAlignment = Alignment.End,
         ) {
-            ChatSuggestionChip(
-                text = summarize,
-                enabled = isSuggestionEnabled,
-                onClick = { onClickSuggestion(summarize, ChatInputType.SummaryPrompt) },
-                theme = theme,
-            )
+            ChatAppear(
+                animate = true,
+                rise = WelcomeRise,
+                durationMillis = WELCOME_APPEAR_MS,
+                delayMillis = WELCOME_DELAY_MS + WELCOME_STAGGER_MS,
+            ) {
+                ChatSuggestionChip(
+                    text = summarize,
+                    enabled = isSuggestionEnabled,
+                    onClick = { onClickSuggestion(summarize, ChatInputType.SummaryPrompt) },
+                    theme = theme,
+                )
+            }
             starterQuestions.forEach { question ->
                 key(question) {
                     ChatAppear(animate = animateStarterQuestions) {
@@ -113,6 +127,10 @@ private fun Modifier.bleedToEnd(bleed: Dp) = layout { measurable, constraints ->
 }
 
 private val FollowUpsEndBleed = 16.dp
+private val WelcomeRise = 3.dp
+private const val WELCOME_APPEAR_MS = 300
+private const val WELCOME_DELAY_MS = 300
+private const val WELCOME_STAGGER_MS = 150
 
 @Composable
 private fun ChatSuggestionChip(
