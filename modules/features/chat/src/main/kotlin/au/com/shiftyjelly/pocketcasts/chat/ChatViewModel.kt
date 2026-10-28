@@ -148,9 +148,10 @@ class ChatViewModel @Inject constructor(
             networkConnectionWatcher.networkCapabilities.collect { capabilities ->
                 val isConnected = capabilities != null &&
                     capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                val wasConnected = _uiState.value.isConnected
                 _uiState.update { it.copy(isConnected = isConnected) }
                 val state = _uiState.value
-                if (isConnected && state.areMessagesLoaded && state.messages.isEmpty()) loadStarterQuestions()
+                if (!wasConnected && isConnected && state.areMessagesLoaded && state.messages.isEmpty()) loadStarterQuestions()
             }
         }
     }

@@ -458,6 +458,8 @@ class ChatViewModelTest {
     fun `starter questions load again once back online after a failed load`() = runTest {
         setEpisodeInfo()
         advanceUntilIdle()
+        networkConnectionWatcher.networkCapabilities.value = null
+        advanceUntilIdle()
         chatManager.starterQuestions = listOf("Who is the guest?")
 
         connectToInternet()
@@ -467,9 +469,22 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `failed starter questions are not requested again while the connection stays online`() = runTest {
+        setEpisodeInfo()
+        advanceUntilIdle()
+
+        connectToInternet()
+        connectToInternet()
+
+        assertEquals(1, chatManager.starterQuestionRequests.size)
+    }
+
+    @Test
     fun `loaded starter questions are not requested again`() = runTest {
         chatManager.starterQuestions = listOf("Who is the guest?")
         setEpisodeInfo()
+        advanceUntilIdle()
+        networkConnectionWatcher.networkCapabilities.value = null
         advanceUntilIdle()
 
         connectToInternet()
