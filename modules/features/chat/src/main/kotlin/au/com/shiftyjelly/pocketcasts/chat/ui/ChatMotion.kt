@@ -26,7 +26,6 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -34,16 +33,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.LayoutCoordinates
-import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
@@ -176,23 +176,28 @@ internal fun ChatShimmerText(
             sweep.snapTo(0f)
         }
     }
-    var textWidth by remember { mutableFloatStateOf(0f) }
-    val halfBand = with(LocalDensity.current) { ShimmerHalfBandWidth.toPx() }
-    val center = lerp(-halfBand, textWidth + halfBand, sweep.value)
+    val textLayout = remember { mutableStateOf<TextLayoutResult?>(null) }
     Text(
         text = text,
-        style = style.copy(
-            brush = Brush.horizontalGradient(
-                colors = listOf(color, highlight, color),
-                startX = center - halfBand,
-                endX = center + halfBand,
-            ),
-        ),
+        style = style,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
+        onTextLayout = { result -> textLayout.value = result },
         modifier = modifier
             .wrapContentWidth(Alignment.Start)
-            .onSizeChanged { size -> textWidth = size.width.toFloat() },
+            .drawWithContent {
+                val layout = textLayout.value ?: return@drawWithContent
+                val halfBand = ShimmerHalfBandWidth.toPx()
+                val center = lerp(-halfBand, size.width + halfBand, sweep.value)
+                drawText(
+                    textLayoutResult = layout,
+                    brush = Brush.horizontalGradient(
+                        colors = listOf(color, highlight, color),
+                        startX = center - halfBand,
+                        endX = center + halfBand,
+                    ),
+                )
+            },
     )
 }
 
