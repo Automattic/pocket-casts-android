@@ -54,6 +54,7 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.CustomAccessibilityAction
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
@@ -182,6 +183,7 @@ fun SwipeRow(
     trailingActions: List<SwipeRowAction>,
     modifier: Modifier = Modifier,
     isSwipeEnabled: Boolean = true,
+    actionIcon: @Composable (SwipeRowAction) -> Unit = { action -> SwipeRowActionIcon(action) },
     content: @Composable () -> Unit,
 ) {
     val shownLeadingActions = leadingActions.take(MAX_ACTIONS_PER_SIDE)
@@ -315,6 +317,7 @@ fun SwipeRow(
                 rowWidthPx = rowWidthPx.toFloat(),
                 primaryExpansion = { primaryExpansion },
                 isLeading = true,
+                actionIcon = actionIcon,
             )
             SwipeRowActionSlabs(
                 actions = shownTrailingActions,
@@ -322,6 +325,7 @@ fun SwipeRow(
                 rowWidthPx = rowWidthPx.toFloat(),
                 primaryExpansion = { primaryExpansion },
                 isLeading = false,
+                actionIcon = actionIcon,
             )
         }
 
@@ -359,6 +363,7 @@ private fun BoxScope.SwipeRowActionSlabs(
     rowWidthPx: Float,
     primaryExpansion: () -> Float,
     isLeading: Boolean,
+    actionIcon: @Composable (SwipeRowAction) -> Unit,
 ) {
     for (index in actions.indices.reversed()) {
         val action = actions[index]
@@ -379,22 +384,28 @@ private fun BoxScope.SwipeRowActionSlabs(
                 .clickable(
                     enabled = state.isOpen,
                     onClick = { action.onClick(state) },
-                ),
-        ) {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .width(ActionIconSize + ActionHorizontalPadding)
-                    .fillMaxHeight(),
-            ) {
-                Icon(
-                    painter = painterResource(action.iconId),
-                    contentDescription = action.contentDescription,
-                    tint = action.iconTint,
-                    modifier = Modifier.size(ActionIconSize),
                 )
-            }
+                .semantics { contentDescription = action.contentDescription },
+        ) {
+            actionIcon(action)
         }
+    }
+}
+
+@Composable
+private fun SwipeRowActionIcon(action: SwipeRowAction) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .width(ActionIconSize + ActionHorizontalPadding)
+            .fillMaxHeight(),
+    ) {
+        Icon(
+            painter = painterResource(action.iconId),
+            contentDescription = null,
+            tint = action.iconTint,
+            modifier = Modifier.size(ActionIconSize),
+        )
     }
 }
 
