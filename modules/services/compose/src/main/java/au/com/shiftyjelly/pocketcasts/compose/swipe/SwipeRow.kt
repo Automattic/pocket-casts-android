@@ -243,7 +243,15 @@ fun SwipeRow(
     )
 
     Box(
-        modifier = modifier.onSizeChanged { rowWidthPx = it.width },
+        modifier = modifier
+            .onSizeChanged { rowWidthPx = it.width }
+            .anchoredDraggable(
+                state = state.draggableState,
+                orientation = Orientation.Horizontal,
+                enabled = isSwipeEnabled,
+                interactionSource = interactionSource,
+                flingBehavior = flingBehavior,
+            ),
     ) {
         CompositionLocalProvider(LocalRippleConfiguration provides ActionRippleConfiguration) {
             SwipeRowActionSlabs(
@@ -266,13 +274,6 @@ fun SwipeRow(
         Box(
             modifier = Modifier
                 .graphicsLayer { translationX = state.settledOffset }
-                .anchoredDraggable(
-                    state = state.draggableState,
-                    orientation = Orientation.Horizontal,
-                    enabled = isSwipeEnabled,
-                    interactionSource = interactionSource,
-                    flingBehavior = flingBehavior,
-                )
                 .semantics {
                     customActions = actions.map { action ->
                         CustomAccessibilityAction(action.contentDescription) {
