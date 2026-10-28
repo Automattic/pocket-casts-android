@@ -384,10 +384,10 @@ internal fun ThinkingBubble(
 }
 
 private val LoadingLineHeight = 20.dp
-private val LoadingPhaseEnter = fadeIn(tween(durationMillis = 200, delayMillis = 100)) +
-    slideInVertically(tween(durationMillis = 300, easing = EaseOut)) { height -> height / 3 }
-private val LoadingPhaseExit = fadeOut(tween(durationMillis = 130)) +
-    slideOutVertically(tween(durationMillis = 300, easing = EaseOut)) { height -> -height / 3 }
+private val LoadingPhaseEnter = fadeIn(tween(durationMillis = 250, delayMillis = 150)) +
+    slideInVertically(tween(durationMillis = 250, delayMillis = 150, easing = EaseOut)) { height -> height / 4 }
+private val LoadingPhaseExit = fadeOut(tween(durationMillis = 150)) +
+    slideOutVertically(tween(durationMillis = 150, easing = EaseOut)) { height -> -height * 3 / 20 }
 
 private val UserBubbleShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp, bottomEnd = 4.dp, bottomStart = 16.dp)
 

@@ -33,7 +33,10 @@ internal enum class ChatLoadingPhase(
 }
 
 @Composable
-internal fun rememberChatLoadingPhase(isAwaitingReply: Boolean): ChatLoadingPhase {
+internal fun rememberChatLoadingPhase(
+    isAwaitingReply: Boolean,
+    startDelay: Duration = Duration.ZERO,
+): ChatLoadingPhase {
     var awaitingSinceMs by rememberSaveable { mutableStateOf<Long?>(null) }
     var phase by rememberSaveable { mutableStateOf(ChatLoadingPhase.Dots) }
     LaunchedEffect(isAwaitingReply) {
@@ -41,7 +44,7 @@ internal fun rememberChatLoadingPhase(isAwaitingReply: Boolean): ChatLoadingPhas
             awaitingSinceMs = null
             return@LaunchedEffect
         }
-        val sinceMs = awaitingSinceMs ?: SystemClock.elapsedRealtime().also { awaitingSinceMs = it }
+        val sinceMs = awaitingSinceMs ?: (SystemClock.elapsedRealtime() + startDelay.inWholeMilliseconds).also { awaitingSinceMs = it }
         while (true) {
             val elapsed = (SystemClock.elapsedRealtime() - sinceMs).milliseconds
             phase = ChatLoadingPhase.at(elapsed)

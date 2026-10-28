@@ -7,6 +7,7 @@ import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.InfiniteTransition
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -87,6 +88,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatInputType
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatMessage
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import kotlin.math.roundToInt
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filter
@@ -150,7 +153,14 @@ fun ChatScreen(
             pendingQuestionUuid = null
         }
     }
-    val loadingPhase = rememberChatLoadingPhase(uiState.isAwaitingReply)
+    var flyingSuggestion by remember { mutableStateOf<FlyingSuggestion?>(null) }
+    LaunchedEffect(uiState.isAwaitingReply) {
+        if (!uiState.isAwaitingReply) flyingSuggestion = null
+    }
+    val loadingPhase = rememberChatLoadingPhase(
+        isAwaitingReply = uiState.isAwaitingReply,
+        startDelay = if (flyingSuggestion != null) FLY_IN_DURATION_MS.milliseconds else Duration.ZERO,
+    )
     val initialMessageUuids = remember(loadedMessageUuids, uiState.restoredMessageUuids, seenBeforeHistoryUuids) {
         loadedMessageUuids + uiState.restoredMessageUuids + seenBeforeHistoryUuids
     }
@@ -186,6 +196,8 @@ fun ChatScreen(
                         uiState = uiState,
                         initialMessageUuids = initialMessageUuids,
                         loadingPhase = loadingPhase,
+                        flyingSuggestion = flyingSuggestion,
+                        onFlyingSuggestionChange = { flyingSuggestion = it },
                         theme = theme,
                         onClickClose = onClickClose,
                         onClickMore = onClickMore,
@@ -209,6 +221,8 @@ private fun ChatContent(
     uiState: ChatUiState,
     initialMessageUuids: Set<String>,
     loadingPhase: ChatLoadingPhase,
+    flyingSuggestion: FlyingSuggestion?,
+    onFlyingSuggestionChange: (FlyingSuggestion?) -> Unit,
     theme: ChatTheme,
     onClickClose: () -> Unit,
     onClickMore: () -> Unit,
@@ -228,7 +242,6 @@ private fun ChatContent(
     val isWelcomeVisible = uiState.areMessagesLoaded && uiState.messages.isEmpty() && !uiState.isAwaitingReply
     var welcomeTopInRoot by remember { mutableFloatStateOf(0f) }
     var contentTopInRoot by remember { mutableFloatStateOf(0f) }
-    var flyingSuggestion by remember { mutableStateOf<FlyingSuggestion?>(null) }
     var exitingWelcome by remember { mutableStateOf<ExitingWelcome?>(null) }
     fun exitWelcome(tappedSuggestion: String?) {
         if (isWelcomeVisible && !isReduceMotionEnabled) {
@@ -256,9 +269,6 @@ private fun ChatContent(
         if (uiState.isAwaitingReply && newestMessage is ChatMessage.User) {
             isFollowingNewest = true
         }
-    }
-    LaunchedEffect(newestMessage?.uuid) {
-        if (newestMessage is ChatMessage.User) flyingSuggestion = null
     }
     LaunchedEffect(uiState.messages.size, uiState.isAwaitingReply, scrollState.maxValue) {
         if (isFollowingNewest && !scrollState.isScrollInProgress) {
@@ -335,7 +345,7 @@ private fun ChatContent(
                         isLoadingStarterQuestions = uiState.isLoadingStarterQuestions,
                         isSuggestionEnabled = uiState.isConnected,
                         onClickSuggestion = { text, inputType, topInRoot ->
-                            if (!isReduceMotionEnabled) flyingSuggestion = FlyingSuggestion(text, topInRoot)
+                            if (!isReduceMotionEnabled) onFlyingSuggestionChange(FlyingSuggestion(text, topInRoot))
                             exitWelcome(tappedSuggestion = text)
                             onClickSuggestion(text, inputType)
                         },
@@ -443,7 +453,12 @@ private fun ChatContent(
                 }
                 AnimatedVisibility(
                     visible = uiState.isAwaitingReply || uiState.isAnswerLanding(initialMessageUuids),
-                    enter = EnterTransition.None,
+                    enter = if (isReduceMotionEnabled) {
+                        EnterTransition.None
+                    } else {
+                        val settleMillis = if (flyingSuggestion != null) FLY_IN_DURATION_MS else 0
+                        fadeIn(tween(durationMillis = THINKING_APPEAR_MS, delayMillis = settleMillis + THINKING_DELAY_MS))
+                    },
                     exit = if (uiState.error != null && !isReduceMotionEnabled) {
                         fadeOut(tween(ANSWER_CROSS_FADE_MS))
                     } else {
@@ -475,6 +490,7 @@ private fun ChatContent(
             text = uiState.inputText,
             onTextChange = onInputTextChange,
             onSend = {
+                onFlyingSuggestionChange(null)
                 exitWelcome(tappedSuggestion = null)
                 onSend()
             },
@@ -488,6 +504,8 @@ private fun ChatContent(
 
 private val FollowNewestThreshold = 48.dp
 private const val WELCOME_EXIT_TOTAL_MS = 500L
+private const val THINKING_APPEAR_MS = 300
+private const val THINKING_DELAY_MS = 250
 
 private data class FlyingSuggestion(
     val text: String,
