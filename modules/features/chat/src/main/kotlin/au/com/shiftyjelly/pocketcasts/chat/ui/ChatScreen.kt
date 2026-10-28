@@ -382,7 +382,7 @@ private fun ChatContent(
                         UserMessageBubble(
                             text = flight.text,
                             theme = theme,
-                            chipMorph = flightChipMorph(progress),
+                            chipMorph = { flightChipMorph(progress()) },
                         )
                     }
                 }

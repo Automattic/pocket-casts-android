@@ -129,7 +129,7 @@ internal fun ChatFlight(
     toY: Float,
     onLand: () -> Unit,
     modifier: Modifier = Modifier,
-    content: @Composable (progress: Float) -> Unit,
+    content: @Composable (progress: () -> Float) -> Unit,
 ) {
     val currentOnLand by rememberUpdatedState(onLand)
     val progress = remember { Animatable(0f) }
@@ -140,7 +140,7 @@ internal fun ChatFlight(
     Box(
         modifier = modifier.offset { IntOffset(0, lerp(fromY, toY, progress.value).roundToInt()) },
     ) {
-        content(progress.value)
+        content(remember(progress) { { progress.value } })
     }
 }
 
