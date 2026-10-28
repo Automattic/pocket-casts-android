@@ -709,6 +709,18 @@ open class PlaybackManager @Inject constructor(
         launch { playQueueSuspend(sourceView, showedStreamWarning) }
     }
 
+    /** The one play being held for the Automotive start-up sync, if any. See [playQueueSuspend]. */
+    @Volatile
+    private var heldAutomotivePlay: Job? = null
+
+    private fun cancelHeldAutomotivePlay() {
+        heldAutomotivePlay?.let {
+            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Automotive start-up sync: held play cancelled")
+            it.cancel()
+            heldAutomotivePlay = null
+        }
+    }
+
     suspend fun playQueueSuspend(
         sourceView: SourceView = SourceView.UNKNOWN,
         showedStreamWarning: Boolean = false,
@@ -716,13 +728,14 @@ open class PlaybackManager @Inject constructor(
         if (automotiveStartupSync.isPending) {
             // First play after the car app started: let the start-up sync finish first so the car
             // resumes where the account is, not where this car was. Handed off to its own coroutine
-            // so the media session's command lock isn't held while we wait; a pause or stop in the
-            // meantime cancels the held play.
+            // so the media session's command lock isn't held while we wait. Only one play is ever
+            // held: a new one replaces it, and a pause or stop in the meantime cancels it.
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Automotive start-up sync: holding play from source=$sourceView, ${automotiveStartupSync.describeState()}")
-            launch {
-                if (automotiveStartupSync.awaitSynced()) {
-                    playQueueSuspend(sourceView, showedStreamWarning)
-                }
+            heldAutomotivePlay?.cancel()
+            heldAutomotivePlay = launch {
+                automotiveStartupSync.awaitSynced()
+                heldAutomotivePlay = null
+                playQueueSuspend(sourceView, showedStreamWarning)
             }
             return
         }
@@ -1081,7 +1094,7 @@ open class PlaybackManager @Inject constructor(
 
     suspend fun pauseSuspend(transientLoss: Boolean = false, sourceView: SourceView = SourceView.UNKNOWN) {
         if (!transientLoss) {
-            automotiveStartupSync.cancelPendingPlay()
+            cancelHeldAutomotivePlay()
             focusManager.giveUpAudioFocus()
             playbackStateRelay.blockingFirst().let { playbackState ->
                 playbackStateRelay.accept(playbackState.copy(transientLoss = false))
@@ -1112,7 +1125,7 @@ open class PlaybackManager @Inject constructor(
     }
 
     suspend fun stopSuspend(isAudioFocusFailed: Boolean = false, sourceView: SourceView = SourceView.UNKNOWN) {
-        automotiveStartupSync.cancelPendingPlay()
+        cancelHeldAutomotivePlay()
         flushPendingContentTypeEvents()
         if (!isAudioFocusFailed) {
             trackPlaybackEvent(sourceView) { source, contentType ->

@@ -17,15 +17,17 @@ import javax.inject.Singleton
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withTimeoutOrNull
 
 /**
- * Holds the first play after the Android Automotive app starts until the car has a network
- * connection and one refresh (feed refresh plus account sync) has completed, so the car resumes
- * the episode and position the account was last at rather than whatever it had locally.
+ * Runs the Android Automotive start-up sync once per car start, so the first play can wait for
+ * it and resume the episode and position the account was last at rather than whatever the car
+ * had locally.
  *
  * The car app only refreshes once at process start. Cars usually start the app before their
  * data connection is up, so that attempt fails in the first second and nothing retries until
@@ -33,8 +35,11 @@ import kotlinx.coroutines.withTimeoutOrNull
  * pushes that position back to the account, which is the long-running Automotive sync issue.
  *
  * One attempt per process start, bounded by [NETWORK_TIMEOUT] and [REFRESH_TIMEOUT]. If the
- * network never comes up or the refresh fails, playback goes ahead from the local state as it
- * does today. Signed-out users are never held, since there is nothing to sync.
+ * network never comes up or the refresh fails, the held play goes ahead from the local state as
+ * it does today. Signed-out users are never held, since there is nothing to sync.
+ *
+ * The sync runs in its own job on the application scope, so a caller that stops waiting (for
+ * example a held play that the user cancelled with pause) never cancels the sync itself.
  *
  * On other platforms this is a no-op: [isPending] is always false.
  */
@@ -60,8 +65,7 @@ class AutomotiveStartupSync @Inject constructor(
     @Volatile
     private var processStartMs = System.currentTimeMillis()
 
-    @Volatile
-    private var pendingPlayCancelled = false
+    private var syncJob: Deferred<Unit>? = null
 
     /** True while the start-up sync has not yet run for this process. */
     val isPending: Boolean
@@ -71,7 +75,7 @@ class AutomotiveStartupSync @Inject constructor(
     fun reset() {
         if (!isAutomotive) return
         processStartMs = System.currentTimeMillis()
-        pendingPlayCancelled = false
+        syncJob = null
         done = false
     }
 
@@ -80,33 +84,22 @@ class AutomotiveStartupSync @Inject constructor(
         "refreshState=${settings.getRefreshState()}, lastRefresh=${settings.getLastRefreshDate()}"
 
     /**
-     * The user paused or stopped while a play was being held, so that play should not go ahead
-     * once the sync finishes.
+     * Waits for the start-up sync, starting it if nothing else has. Cancelling the caller stops
+     * the wait but not the sync.
      */
-    fun cancelPendingPlay() {
-        if (!done) {
-            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Automotive start-up sync: held play cancelled")
-            pendingPlayCancelled = true
-        }
-    }
-
-    /**
-     * Waits for the start-up sync, running it if nothing else has. Returns true when the held
-     * play should go ahead, false when it was cancelled while waiting.
-     */
-    suspend fun awaitSynced(): Boolean {
-        if (done) return true
-        pendingPlayCancelled = false
-        mutex.withLock {
-            if (!done) {
+    suspend fun awaitSynced() {
+        if (done) return
+        val job = mutex.withLock {
+            if (done) return
+            syncJob ?: applicationScope.async {
                 try {
                     runStartupSync()
                 } finally {
                     done = true
                 }
-            }
+            }.also { syncJob = it }
         }
-        return !pendingPlayCancelled
+        job.await()
     }
 
     private suspend fun runStartupSync() {
@@ -132,13 +125,18 @@ class AutomotiveStartupSync @Inject constructor(
         // The start-up attempt may have reached the network check and set the run-now throttle
         // before its sync failed; clear it so this refresh isn't skipped as "too soon".
         RefreshPodcastsThread.clearLastRefreshTime()
+        // The refresh runs on the application scope, not as a child of the timeout: the refresh
+        // thread blocks and ignores cancellation, so a child would make the timeout wait for the
+        // whole refresh, and cancelling it could abort an account sync partway through. The
+        // timeout only bounds how long the held play waits.
+        val refresh = applicationScope.async { RefreshPodcastsTask.runNowSync(context, applicationScope) }
         val finished = withTimeoutOrNull(refreshTimeout) {
-            RefreshPodcastsTask.runNowSync(context, applicationScope)
+            refresh.await()
             true
         } ?: false
         LogBuffer.i(
             LogBuffer.TAG_PLAYBACK,
-            "Automotive start-up sync: refresh ${if (finished) "finished" else "timed out"} after ${System.currentTimeMillis() - startMs} ms, " +
+            "Automotive start-up sync: refresh ${if (finished) "finished" else "still running"} after ${System.currentTimeMillis() - startMs} ms, " +
                 "state=${settings.getRefreshState()}",
         )
     }
