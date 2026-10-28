@@ -406,7 +406,6 @@ private fun ChatContent(
                 }
                 val answerStream = rememberChatAnswerStream(uiState.messages, initialMessageUuids)
                 val answerUuidsByLastIndex = uiState.answerUuidsByLastIndex
-                val latestAnswerLastIndex = answerUuidsByLastIndex.keys.maxOrNull()
                 uiState.messages.forEachIndexed { index, message ->
                     if (answerStream?.hasStarted(message.uuid) == false) return@forEachIndexed
                     key(message.uuid) {
@@ -492,7 +491,7 @@ private fun ChatContent(
                                 )
                             }
                         }
-                        if (index == latestAnswerLastIndex && !isStreaming) {
+                        if (index == uiState.messages.lastIndex && index in answerUuidsByLastIndex && !isStreaming) {
                             ChatAppear(
                                 animate = isNew,
                                 rise = AnswerFooterRise,
