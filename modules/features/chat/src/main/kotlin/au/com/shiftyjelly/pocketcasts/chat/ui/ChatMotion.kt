@@ -10,6 +10,7 @@ import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.EaseOut
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.tween
@@ -33,7 +34,9 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.onPlaced
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
@@ -99,16 +102,41 @@ internal fun ChatAppear(
 internal fun ChatFadeOut(
     durationMillis: Int,
     modifier: Modifier = Modifier,
+    delayMillis: Int = 0,
     content: @Composable () -> Unit,
 ) {
     val visibility = remember { MutableTransitionState(true).apply { targetState = false } }
     AnimatedVisibility(
         visibleState = visibility,
         enter = EnterTransition.None,
-        exit = if (rememberIsReduceMotionEnabled()) ExitTransition.None else fadeOut(tween(durationMillis)),
+        exit = if (rememberIsReduceMotionEnabled()) ExitTransition.None else fadeOut(tween(durationMillis, delayMillis = delayMillis)),
         modifier = modifier,
     ) {
         content()
+    }
+}
+
+@Composable
+internal fun ChatFlyIn(
+    fromTopInRoot: Float,
+    modifier: Modifier = Modifier,
+    content: @Composable (fillAlpha: () -> Float) -> Unit,
+) {
+    var distance by remember { mutableStateOf<Float?>(null) }
+    val progress = remember { Animatable(0f) }
+    LaunchedEffect(distance != null) {
+        if (distance != null) progress.animateTo(1f, tween(durationMillis = FLY_IN_DURATION_MS, easing = FastOutSlowInEasing))
+    }
+    Box(
+        modifier = modifier
+            .onPlaced { coordinates ->
+                if (distance == null) distance = fromTopInRoot - coordinates.positionInRoot().y
+            }
+            .graphicsLayer {
+                translationY = (distance ?: 0f) * (1f - progress.value)
+            },
+    ) {
+        content { ((progress.value - FLY_IN_FILL_START) / FLY_IN_FILL_FRACTION).coerceIn(0f, 1f) }
     }
 }
 
@@ -158,4 +186,7 @@ private const val SHIMMER_SWEEP_MS = 870
 private const val SHIMMER_PAUSE_MS = 730L
 
 private const val APPEAR_DURATION_MS = 200
+internal const val FLY_IN_DURATION_MS = 450
+private const val FLY_IN_FILL_START = 0.45f
+private const val FLY_IN_FILL_FRACTION = 0.25f
 internal const val ANSWER_CROSS_FADE_MS = 150

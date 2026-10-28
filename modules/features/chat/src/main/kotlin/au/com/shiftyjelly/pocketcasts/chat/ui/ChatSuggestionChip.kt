@@ -26,8 +26,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -37,6 +40,8 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.layout
+import androidx.compose.ui.layout.onPlaced
+import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -51,9 +56,11 @@ internal fun ChatWelcome(
     starterQuestions: List<String>,
     isLoadingStarterQuestions: Boolean,
     isSuggestionEnabled: Boolean,
-    onClickSuggestion: (String, ChatInputType) -> Unit,
+    onClickSuggestion: (text: String, inputType: ChatInputType, topInRoot: Float) -> Unit,
     theme: ChatTheme,
     modifier: Modifier = Modifier,
+    exitingSuggestion: String? = null,
+    isExiting: Boolean = false,
 ) {
     val summarize = stringResource(LR.string.chat_suggestion_summarize)
     val sweep = rememberInfiniteTransition(label = "skeletonSweep").animateFloat(
@@ -67,12 +74,7 @@ internal fun ChatWelcome(
         horizontalAlignment = Alignment.End,
         modifier = modifier.fillMaxWidth(),
     ) {
-        ChatAppear(
-            animate = true,
-            rise = WelcomeRise,
-            durationMillis = WELCOME_APPEAR_MS,
-            delayMillis = WELCOME_DELAY_MS,
-        ) {
+        WelcomeItem(order = 0, isExiting = isExiting, delayMillis = WELCOME_DELAY_MS) {
             Text(
                 text = stringResource(LR.string.chat_welcome),
                 color = theme.primaryText,
@@ -85,39 +87,71 @@ internal fun ChatWelcome(
             verticalArrangement = Arrangement.spacedBy(12.dp),
             horizontalAlignment = Alignment.End,
         ) {
-            ChatAppear(
-                animate = true,
-                rise = WelcomeRise,
-                durationMillis = WELCOME_APPEAR_MS,
-                delayMillis = WELCOME_DELAY_MS + WELCOME_STAGGER_MS,
-            ) {
+            WelcomeItem(order = 1, isExiting = isExiting, delayMillis = WELCOME_DELAY_MS + WELCOME_STAGGER_MS) {
                 ChatSuggestionChip(
                     text = summarize,
                     enabled = isSuggestionEnabled,
-                    onClick = { onClickSuggestion(summarize, ChatInputType.SummaryPrompt) },
+                    onClick = { topInRoot -> onClickSuggestion(summarize, ChatInputType.SummaryPrompt, topInRoot) },
                     theme = theme,
+                    modifier = Modifier.hiddenIf(summarize == exitingSuggestion),
                 )
             }
-            repeat(maxOf(SkeletonWidthFractions.size, starterQuestions.size)) { index ->
+            val slotCount = if (isLoadingStarterQuestions) maxOf(SkeletonWidthFractions.size, starterQuestions.size) else starterQuestions.size
+            repeat(slotCount) { index ->
                 val question = starterQuestions.getOrNull(index)
-                ChatStarterQuestionSlot(
-                    index = index,
-                    question = question,
-                    isLoading = isLoadingStarterQuestions,
-                    sweepMillis = { sweep.value },
-                    theme = theme,
-                ) { text ->
+                val chip: @Composable (String) -> Unit = { text ->
                     ChatSuggestionChip(
                         text = text,
                         enabled = isSuggestionEnabled,
-                        onClick = { onClickSuggestion(text, ChatInputType.SuggestedPrompt) },
+                        onClick = { topInRoot -> onClickSuggestion(text, ChatInputType.SuggestedPrompt, topInRoot) },
                         theme = theme,
+                        modifier = Modifier.hiddenIf(text == exitingSuggestion),
+                    )
+                }
+                if (isExiting) {
+                    WelcomeItem(order = index + 2, isExiting = true, delayMillis = 0) {
+                        if (question != null) {
+                            chip(question)
+                        } else {
+                            ChatSkeletonChip(index = index, sweepMillis = { sweep.value }, theme = theme)
+                        }
+                    }
+                } else {
+                    ChatStarterQuestionSlot(
+                        index = index,
+                        question = question,
+                        isLoading = isLoadingStarterQuestions,
+                        sweepMillis = { sweep.value },
+                        theme = theme,
+                        chip = chip,
                     )
                 }
             }
         }
     }
 }
+
+@Composable
+private fun WelcomeItem(
+    order: Int,
+    isExiting: Boolean,
+    delayMillis: Int,
+    content: @Composable () -> Unit,
+) {
+    if (isExiting) {
+        ChatFadeOut(durationMillis = WELCOME_EXIT_MS, delayMillis = order * WELCOME_EXIT_STAGGER_MS, content = content)
+    } else {
+        ChatAppear(
+            animate = true,
+            rise = WelcomeRise,
+            durationMillis = WELCOME_APPEAR_MS,
+            delayMillis = delayMillis,
+            content = content,
+        )
+    }
+}
+
+private fun Modifier.hiddenIf(hidden: Boolean) = if (hidden) alpha(0f) else this
 
 @Composable
 private fun ChatStarterQuestionSlot(
@@ -143,7 +177,6 @@ private fun ChatStarterQuestionSlot(
             )
         }
     }
-    val widthFraction = SkeletonWidthFractions.getOrElse(index) { SkeletonWidthFractions.last() }
     AnimatedVisibility(
         visible = question != null || isLoading,
         enter = EnterTransition.None,
@@ -157,9 +190,8 @@ private fun ChatStarterQuestionSlot(
             Box(contentAlignment = Alignment.CenterEnd) {
                 if (showsSkeleton && questionAlpha.value < 1f) {
                     ChatSkeletonChip(
-                        widthFraction = widthFraction,
-                        lagMillis = if (index == 0) 0 else SKELETON_SWEEP_LAG_MS,
-                        sweepMillis = if (isReduceMotionEnabled) null else sweepMillis,
+                        index = index,
+                        sweepMillis = sweepMillis,
                         theme = theme,
                         modifier = Modifier.graphicsLayer { alpha = 1f - questionAlpha.value },
                     )
@@ -176,12 +208,14 @@ private fun ChatStarterQuestionSlot(
 
 @Composable
 private fun ChatSkeletonChip(
-    widthFraction: Float,
-    lagMillis: Int,
-    sweepMillis: (() -> Float)?,
+    index: Int,
+    sweepMillis: () -> Float,
     theme: ChatTheme,
     modifier: Modifier = Modifier,
 ) {
+    val isReduceMotionEnabled = rememberIsReduceMotionEnabled()
+    val widthFraction = SkeletonWidthFractions.getOrElse(index) { SkeletonWidthFractions.last() }
+    val lagMillis = if (index == 0) 0 else SKELETON_SWEEP_LAG_MS
     val density = LocalDensity.current
     val halfBand = with(density) { SkeletonHalfBand.toPx() }
     val speed = with(density) { SKELETON_SWEEP_DP_PER_MS.dp.toPx() }
@@ -194,7 +228,7 @@ private fun ChatSkeletonChip(
             .clip(CircleShape)
             .drawBehind {
                 drawRect(fill)
-                if (sweepMillis != null) {
+                if (!isReduceMotionEnabled) {
                     val left = size.width / widthFraction - size.width
                     val center = (sweepMillis() - lagMillis) * speed - halfBand - left
                     drawRect(
@@ -213,6 +247,8 @@ private val WelcomeRise = 3.dp
 private const val WELCOME_APPEAR_MS = 300
 private const val WELCOME_DELAY_MS = 300
 private const val WELCOME_STAGGER_MS = 150
+private const val WELCOME_EXIT_MS = 250
+private const val WELCOME_EXIT_STAGGER_MS = 30
 private val SkeletonWidthFractions = listOf(0.735f, 0.725f, 0.35f)
 private val SkeletonHeight = 44.dp
 private val SkeletonHalfBand = 110.dp
@@ -269,20 +305,22 @@ private val FollowUpsEndBleed = 16.dp
 private fun ChatSuggestionChip(
     text: String,
     enabled: Boolean,
-    onClick: () -> Unit,
+    onClick: (topInRoot: Float) -> Unit,
     theme: ChatTheme,
     modifier: Modifier = Modifier,
 ) {
+    var topInRoot by remember { mutableFloatStateOf(0f) }
     Text(
         text = text,
         color = theme.primaryText,
         fontSize = 15.sp,
         lineHeight = 20.sp,
         modifier = modifier
+            .onPlaced { coordinates -> topInRoot = coordinates.positionInRoot().y }
             .alpha(if (enabled) 1f else DISABLED_ALPHA)
             .clip(CircleShape)
             .border(1.dp, theme.chipBorder, CircleShape)
-            .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
+            .clickable(enabled = enabled, role = Role.Button, onClick = { onClick(topInRoot) })
             .defaultMinSize(minHeight = 44.dp)
             .padding(horizontal = 16.dp, vertical = 12.dp),
     )

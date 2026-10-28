@@ -40,6 +40,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
@@ -275,6 +276,7 @@ internal fun UserMessageBubble(
     isNotSent: Boolean = false,
     isRetryEnabled: Boolean = true,
     onRetry: () -> Unit = {},
+    fillAlpha: () -> Float = { 1f },
 ) {
     Column(
         horizontalAlignment = Alignment.End,
@@ -302,7 +304,7 @@ internal fun UserMessageBubble(
                 modifier = Modifier
                     .widthIn(max = 250.dp)
                     .clip(UserBubbleShape)
-                    .background(theme.userBubble)
+                    .drawBehind { drawRect(theme.userBubble, alpha = fillAlpha()) }
                     .padding(horizontal = 16.dp, vertical = 10.dp),
             )
             if (isNotSent) {
