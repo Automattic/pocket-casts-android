@@ -125,6 +125,7 @@ import kotlin.math.roundToInt
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow
@@ -709,15 +710,17 @@ open class PlaybackManager @Inject constructor(
         launch { playQueueSuspend(sourceView, showedStreamWarning) }
     }
 
-    /** The one play being held for the Automotive start-up sync, if any. See [playQueueSuspend]. */
-    @Volatile
-    private var heldAutomotivePlay: Job? = null
+    /**
+     * The one play being held for the Automotive start-up sync, if any. See [playQueueSuspend].
+     * Swapped atomically: the car's play paths don't all go through [commandMutex], so two plays
+     * can reach the hold on different threads at the same moment.
+     */
+    private val heldAutomotivePlay = AtomicReference<Job?>(null)
 
     private fun cancelHeldAutomotivePlay() {
-        heldAutomotivePlay?.let {
+        heldAutomotivePlay.getAndSet(null)?.let {
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Automotive start-up sync: held play cancelled")
             it.cancel()
-            heldAutomotivePlay = null
         }
     }
 
@@ -731,12 +734,16 @@ open class PlaybackManager @Inject constructor(
             // so the media session's command lock isn't held while we wait. Only one play is ever
             // held: a new one replaces it, and a pause or stop in the meantime cancels it.
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Automotive start-up sync: holding play from source=$sourceView, ${automotiveStartupSync.describeState()}")
-            heldAutomotivePlay?.cancel()
-            heldAutomotivePlay = launch {
+            // Started lazily so the job is stored before it can run, and cleared only if the field
+            // still holds this job, so a newer held play is never dropped.
+            lateinit var heldPlay: Job
+            heldPlay = launch(start = CoroutineStart.LAZY) {
                 automotiveStartupSync.awaitSynced()
-                heldAutomotivePlay = null
+                heldAutomotivePlay.compareAndSet(heldPlay, null)
                 playQueueSuspend(sourceView, showedStreamWarning)
             }
+            heldAutomotivePlay.getAndSet(heldPlay)?.cancel()
+            heldPlay.start()
             return
         }
         if (upNextQueue.currentEpisode != null) {
