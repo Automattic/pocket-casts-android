@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.playback
 import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
+import android.net.ConnectivityManager
 import android.os.Bundle
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
@@ -547,6 +548,7 @@ class Media3LibrarySessionCallbackTest {
         whenever(automotivePackageManager.getApplicationInfo(any<String>(), any<Int>())).thenReturn(appInfo)
         whenever(automotiveContext.packageManager).thenReturn(automotivePackageManager)
         whenever(automotiveContext.packageName).thenReturn("au.com.shiftyjelly.pocketcasts.debug")
+        whenever(automotiveContext.getSystemService(Context.CONNECTIVITY_SERVICE)).thenReturn(mock<ConnectivityManager>())
 
         return Media3LibrarySessionCallback(
             sessionCallback = sessionCallback,
