@@ -424,7 +424,12 @@ private fun ChatContent(
                             }
                         }
                         answerUuidsByLastIndex[index]?.takeUnless { isStreaming }?.let { answerUuid ->
-                            ChatAppear(animate = isNew) {
+                            ChatAppear(
+                                animate = isNew,
+                                rise = AnswerFooterRise,
+                                durationMillis = ANSWER_FOOTER_APPEAR_MS,
+                                delayMillis = ANSWER_FOOTER_DELAY_MS,
+                            ) {
                                 ChatAnswerRatingRow(
                                     rating = uiState.answerRatings[answerUuid],
                                     onRate = { rating -> onRateAnswer(answerUuid, rating) },
@@ -434,12 +439,22 @@ private fun ChatContent(
                             }
                         }
                         if (index == latestAnswerLastIndex && !isStreaming) {
-                            ChatAppear(animate = isNew) {
+                            ChatAppear(
+                                animate = isNew,
+                                rise = AnswerFooterRise,
+                                durationMillis = ANSWER_FOOTER_APPEAR_MS,
+                                delayMillis = ANSWER_FOOTER_DELAY_MS,
+                            ) {
                                 ChatDisclaimer(theme = theme)
                             }
                             val followUps = uiState.followUps
                             if (followUps.isNotEmpty()) {
-                                ChatAppear(animate = isNew) {
+                                ChatAppear(
+                                    animate = isNew,
+                                    rise = FollowUpsRise,
+                                    durationMillis = FOLLOW_UPS_APPEAR_MS,
+                                    delayMillis = FOLLOW_UPS_DELAY_MS,
+                                ) {
                                     ChatFollowUps(
                                         followUps = followUps,
                                         isSuggestionEnabled = uiState.isConnected,
@@ -506,6 +521,12 @@ private val FollowNewestThreshold = 48.dp
 private const val WELCOME_EXIT_TOTAL_MS = 500L
 private const val THINKING_APPEAR_MS = 300
 private const val THINKING_DELAY_MS = 250
+private val AnswerFooterRise = 7.dp
+private const val ANSWER_FOOTER_APPEAR_MS = 220
+private const val ANSWER_FOOTER_DELAY_MS = 150
+private val FollowUpsRise = 16.dp
+private const val FOLLOW_UPS_APPEAR_MS = 300
+private const val FOLLOW_UPS_DELAY_MS = 350
 
 private data class FlyingSuggestion(
     val text: String,
