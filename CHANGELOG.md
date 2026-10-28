@@ -9,6 +9,8 @@
         ([#6217](https://github.com/Automattic/pocket-casts-android/pull/6217))
     *   Fix a crash on Android 8 devices when the full-screen player loaded show notes containing remote images
         ([#5847](https://github.com/Automattic/pocket-casts-android/pull/5847))
+    *   Wait for the car's connection and a sync before the first play on Android Automotive, so the car picks up where your other devices left off
+        ([#6264](https://github.com/Automattic/pocket-casts-android/pull/6264))
 
 
 8.24

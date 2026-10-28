@@ -47,6 +47,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.asAlbumArtConte
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getLaunchActivityPendingIntent
@@ -363,6 +364,16 @@ class MediaSessionManager(
             },
             onPlay = {
                 val sourceView = media3RequestSource()
+                if (isAutomotive) {
+                    // Diagnostic for the Automotive start-up sync issue (PCDROID-536): the car can start
+                    // playback with a plain play command instead of a resumption request.
+                    LogBuffer.i(
+                        LogBuffer.TAG_PLAYBACK,
+                        "Media3: play from $sourceView (automotive), " +
+                            "networkConnected=${Network.isConnected(context)}, " +
+                            "refreshState=${settings.getRefreshState()}",
+                    )
+                }
                 scope.launch { commandMutex.withLock { playbackManager.playQueueSuspend(sourceView = sourceView) } }
             },
             onPause = {
@@ -380,7 +391,14 @@ class MediaSessionManager(
             },
             playGuard = {
                 if (Util.isAutomotive(context) && !settings.automotiveConnectedToMediaSession()) {
-                    LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Auto start playback ignored just after automotive app restart.")
+                    // Diagnostic for the Automotive start-up sync issue (PCDROID-536): this is the car's
+                    // own auto-play arriving before the 1 s connect window, so record the state it found.
+                    LogBuffer.i(
+                        LogBuffer.TAG_PLAYBACK,
+                        "Auto start playback ignored just after automotive app restart. " +
+                            "networkConnected=${Network.isConnected(context)}, " +
+                            "refreshState=${settings.getRefreshState()}",
+                    )
                     false
                 } else {
                     true

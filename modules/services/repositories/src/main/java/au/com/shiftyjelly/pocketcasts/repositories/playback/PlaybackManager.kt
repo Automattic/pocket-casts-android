@@ -125,6 +125,7 @@ import kotlin.math.roundToInt
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow
@@ -166,6 +167,7 @@ open class PlaybackManager @Inject constructor(
     private val userEpisodeManager: UserEpisodeManager,
     private val eventHorizon: EventHorizon,
     private val syncManager: SyncManager,
+    private val automotiveStartupSync: AutomotiveStartupSync,
     private val bookmarkManager: BookmarkManager,
     private val showNotesManager: ShowNotesManager,
     private val chapterManager: ChapterManager,
@@ -708,10 +710,42 @@ open class PlaybackManager @Inject constructor(
         launch { playQueueSuspend(sourceView, showedStreamWarning) }
     }
 
+    /**
+     * The one play being held for the Automotive start-up sync, if any. See [playQueueSuspend].
+     * Swapped atomically: the car's play paths don't all go through [commandMutex], so two plays
+     * can reach the hold on different threads at the same moment.
+     */
+    private val heldAutomotivePlay = AtomicReference<Job?>(null)
+
+    private fun cancelHeldAutomotivePlay() {
+        heldAutomotivePlay.getAndSet(null)?.let {
+            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Automotive start-up sync: held play cancelled")
+            it.cancel()
+        }
+    }
+
     suspend fun playQueueSuspend(
         sourceView: SourceView = SourceView.UNKNOWN,
         showedStreamWarning: Boolean = false,
     ) {
+        if (automotiveStartupSync.isPending) {
+            // First play after the car app started: let the start-up sync finish first so the car
+            // resumes where the account is, not where this car was. Handed off to its own coroutine
+            // so the media session's command lock isn't held while we wait. Only one play is ever
+            // held: a new one replaces it, and a pause or stop in the meantime cancels it.
+            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Automotive start-up sync: holding play from source=$sourceView, ${automotiveStartupSync.describeState()}")
+            // Started lazily so the job is stored before it can run, and cleared only if the field
+            // still holds this job, so a newer held play is never dropped.
+            lateinit var heldPlay: Job
+            heldPlay = launch(start = CoroutineStart.LAZY) {
+                automotiveStartupSync.awaitSynced()
+                heldAutomotivePlay.compareAndSet(heldPlay, null)
+                playQueueSuspend(sourceView, showedStreamWarning)
+            }
+            heldAutomotivePlay.getAndSet(heldPlay)?.cancel()
+            heldPlay.start()
+            return
+        }
         if (upNextQueue.currentEpisode != null) {
             loadEpisodeWhenRequired(sourceView, showedStreamWarning)
         }
@@ -1067,6 +1101,7 @@ open class PlaybackManager @Inject constructor(
 
     suspend fun pauseSuspend(transientLoss: Boolean = false, sourceView: SourceView = SourceView.UNKNOWN) {
         if (!transientLoss) {
+            cancelHeldAutomotivePlay()
             focusManager.giveUpAudioFocus()
             playbackStateRelay.blockingFirst().let { playbackState ->
                 playbackStateRelay.accept(playbackState.copy(transientLoss = false))
@@ -1097,6 +1132,7 @@ open class PlaybackManager @Inject constructor(
     }
 
     suspend fun stopSuspend(isAudioFocusFailed: Boolean = false, sourceView: SourceView = SourceView.UNKNOWN) {
+        cancelHeldAutomotivePlay()
         flushPendingContentTypeEvents()
         if (!isAudioFocusFailed) {
             trackPlaybackEvent(sourceView) { source, contentType ->
