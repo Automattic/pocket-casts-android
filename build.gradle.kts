@@ -445,7 +445,7 @@ subprojects {
         }
 
         // Without the upload key a release build still succeeds, unsigned, and only fails once something uploads it.
-        tasks.matching { it.name == "packageRelease" || it.name == "packageReleaseBundle" }.configureEach {
+        tasks.matching { it.name.matches(Regex("package(Release|Prototype)(Bundle)?")) }.configureEach {
             doFirst {
                 if (!canSignRelease) {
                     throw GradleException(
