@@ -164,7 +164,6 @@ class ChatManagerImplTest {
 
     @Test
     fun `send message stores the follow-up questions on the answer`() = runTest {
-        transcripts.value = listOf(createTranscript())
         whenever(podcastCacheServiceManager.episodeChat(any(), any())).thenReturn(
             EpisodeChatResponse(
                 reply = "Assistant reply",
