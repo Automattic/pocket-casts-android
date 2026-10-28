@@ -449,7 +449,7 @@ subprojects {
             doFirst {
                 if (!canSignRelease) {
                     throw GradleException(
-                        "The upload keystore is missing, so this release build would not be signed. " +
+                        "The upload keystore or its credentials are missing, so this release build would not be signed. " +
                             "Please run `bundle exec fastlane run configure_apply` to apply secrets.",
                     )
                 }
