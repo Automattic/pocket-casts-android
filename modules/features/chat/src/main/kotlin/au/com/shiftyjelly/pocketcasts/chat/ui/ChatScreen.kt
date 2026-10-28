@@ -6,6 +6,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.EaseOut
 import androidx.compose.animation.core.InfiniteTransition
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
@@ -273,9 +274,18 @@ private fun ChatContent(
             isFollowingNewest = true
         }
     }
+    val smoothFollowMaxPx = with(LocalDensity.current) { SmoothFollowMaxDistance.roundToPx() }
+    var hasFollowed by remember { mutableStateOf(false) }
     LaunchedEffect(uiState.messages.size, uiState.isAwaitingReply, scrollState.maxValue) {
         if (isFollowingNewest && !scrollState.isScrollInProgress) {
-            scrollState.scrollTo(scrollState.maxValue)
+            val distance = scrollState.maxValue - scrollState.value
+            val isSmooth = hasFollowed && distance in 1..smoothFollowMaxPx && !isReduceMotionEnabled
+            if (scrollState.maxValue > 0) hasFollowed = true
+            if (isSmooth) {
+                scrollState.animateScrollTo(scrollState.maxValue, tween(durationMillis = SMOOTH_FOLLOW_MS, easing = EaseOut))
+            } else {
+                scrollState.scrollTo(scrollState.maxValue)
+            }
         }
     }
 
@@ -558,6 +568,8 @@ private fun ChatContent(
 }
 
 private val FollowNewestThreshold = 48.dp
+private val SmoothFollowMaxDistance = 400.dp
+private const val SMOOTH_FOLLOW_MS = 250
 private const val WELCOME_EXIT_TOTAL_MS = 500L
 private const val THINKING_APPEAR_MS = 300
 private const val THINKING_DELAY_MS = 250
