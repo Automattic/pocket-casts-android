@@ -572,6 +572,22 @@ class ShelfSharedViewModelTest {
     }
 
     @Test
+    fun `given only an author transcript, when episode chat is turned on with the player open, then show notes are loaded`() = runTest {
+        initViewModel(
+            currentEpisode = transcriptEpisode,
+            shelfItems = transcriptOnShelfItems,
+            isTranscriptAvailable = true,
+            isGeneratedTranscriptAvailable = false,
+        )
+        shelfSharedViewModel.setPlayerOpen(true)
+        verify(showNotesManager, never()).loadShowNotes(any(), any())
+
+        FeatureFlag.setEnabled(Feature.EPISODE_CHAT, true)
+
+        verify(showNotesManager).loadShowNotes(podcastUuid = "podcastUuid", episodeUuid = "episodeUuid")
+    }
+
+    @Test
     fun `given episode chat enabled and a generated transcript, when player opened, then show notes are not loaded`() = runTest {
         initViewModel(
             currentEpisode = transcriptEpisode,

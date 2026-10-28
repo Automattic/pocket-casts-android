@@ -1,10 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.repositories.chat
 
 import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeChatDao
-import au.com.shiftyjelly.pocketcasts.models.db.dao.TranscriptDao
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeChat
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeChatMessage
-import au.com.shiftyjelly.pocketcasts.models.entity.Transcript
 import au.com.shiftyjelly.pocketcasts.models.to.EpisodeChatHistoryItem
 import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
 import au.com.shiftyjelly.pocketcasts.servers.podcast.ConversationMessage
@@ -28,22 +26,16 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
-import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 class ChatManagerImplTest {
     private val episodeChatDao = TestEpisodeChatDao()
-    private val transcripts = MutableStateFlow(emptyList<Transcript>())
-    private val transcriptDao = mock<TranscriptDao> {
-        on { observeTranscripts(any()) } doReturn transcripts
-    }
     private val podcastCacheServiceManager = mock<PodcastCacheServiceManager>()
     private val tokenHandler = TestTokenHandler()
     private val manager = ChatManagerImpl(
         episodeChatDao = episodeChatDao,
-        transcriptDao = transcriptDao,
         podcastCacheServiceManager = podcastCacheServiceManager,
         tokenHandler = tokenHandler,
         moshi = Moshi.Builder().build(),
@@ -76,10 +68,6 @@ class ChatManagerImplTest {
 
     @Test
     fun `send message stores user message and assistant response with quote`() = runTest {
-        transcripts.value = listOf(
-            createTranscript(type = "text/vtt", isGenerated = true, url = "generated-url"),
-            createTranscript(type = "application/json", isGenerated = false, url = "author-url"),
-        )
         whenever(podcastCacheServiceManager.episodeChat(any(), any())).thenReturn(
             EpisodeChatResponse(
                 reply = "Assistant reply",
@@ -109,7 +97,6 @@ class ChatManagerImplTest {
             EpisodeChatRequest(
                 podcastUuid = PODCAST_UUID,
                 episodeUuid = EPISODE_UUID,
-                transcriptUrl = "generated-url",
                 message = "What happened?",
                 conversationHistory = listOf(
                     ConversationMessage(role = "user", content = "Earlier question"),
@@ -137,31 +124,7 @@ class ChatManagerImplTest {
     }
 
     @Test
-    fun `send message uses the generated transcript over author transcripts`() = runTest {
-        transcripts.value = listOf(
-            createTranscript(type = "text/html", isGenerated = false, url = "html-url"),
-            createTranscript(type = "text/vtt", isGenerated = false, url = "vtt-url"),
-            createTranscript(type = "text/vtt", isGenerated = true, url = "generated-url"),
-        )
-        whenever(podcastCacheServiceManager.episodeChat(any(), any())).thenReturn(
-            EpisodeChatResponse(reply = "Assistant reply", quote = null),
-        )
-
-        manager.sendMessage(
-            episodeUuid = EPISODE_UUID,
-            podcastUuid = PODCAST_UUID,
-            message = ChatMessage.User(text = "Question", uuid = "user-uuid"),
-            allMessages = emptyList(),
-        )
-
-        val requestCaptor = argumentCaptor<EpisodeChatRequest>()
-        verify(podcastCacheServiceManager).episodeChat(any(), requestCaptor.capture())
-        assertEquals("generated-url", requestCaptor.firstValue.transcriptUrl)
-    }
-
-    @Test
     fun `send message marks quotes from the generated transcript`() = runTest {
-        transcripts.value = listOf(createTranscript(type = "text/vtt", isGenerated = true, url = "generated-url"))
         whenever(podcastCacheServiceManager.episodeChat(any(), any())).thenReturn(
             EpisodeChatResponse(
                 reply = "Assistant reply",
@@ -198,7 +161,6 @@ class ChatManagerImplTest {
 
     @Test
     fun `send message stores user message after successful response`() = runTest {
-        transcripts.value = listOf(createTranscript())
         whenever(podcastCacheServiceManager.episodeChat(any(), any())).thenReturn(
             EpisodeChatResponse(reply = "Assistant reply", quote = null),
         )
@@ -217,24 +179,23 @@ class ChatManagerImplTest {
     }
 
     @Test
-    fun `send message without a transcript keeps the question as failed on our end`() = runTest {
-        transcripts.value = listOf(createTranscript(isGenerated = false))
-        val exception = runCatching {
+    fun `send message keeps the question as failed on our end when the server fails`() = runTest {
+        whenever(podcastCacheServiceManager.episodeChat(any(), any())).thenAnswer { throw IllegalStateException() }
+
+        runCatching {
             manager.sendMessage(
                 episodeUuid = EPISODE_UUID,
                 podcastUuid = PODCAST_UUID,
                 message = ChatMessage.User(text = "Question", uuid = "user-uuid"),
                 allMessages = emptyList(),
             )
-        }.exceptionOrNull() as IllegalStateException
+        }
 
-        assertEquals("Transcript URL is required to send episode chat messages", exception.message)
         assertEquals(listOf(ChatSendFailure.Server), storedQuestions().map { it.failure })
     }
 
     @Test
     fun `send message keeps the question as not sent when the network fails`() = runTest {
-        transcripts.value = listOf(createTranscript())
         whenever(podcastCacheServiceManager.episodeChat(any(), any())).thenAnswer { throw IOException() }
 
         val exception = runCatching {
@@ -252,7 +213,6 @@ class ChatManagerImplTest {
 
     @Test
     fun `a failed summarize question keeps its input type`() = runTest {
-        transcripts.value = listOf(createTranscript())
         whenever(podcastCacheServiceManager.episodeChat(any(), any())).thenAnswer { throw IOException() }
         val question = ChatMessage.User(text = "Summarize", inputType = ChatInputType.SummaryPrompt, uuid = "user-uuid")
 
@@ -274,7 +234,6 @@ class ChatManagerImplTest {
 
     @Test
     fun `send message stores the question before the reply arrives`() = runTest {
-        transcripts.value = listOf(createTranscript())
         var storedBeforeReply = emptyList<String>()
         whenever(podcastCacheServiceManager.episodeChat(any(), any())).thenAnswer {
             storedBeforeReply = episodeChatDao.messages.map { it.uuid }
@@ -293,7 +252,6 @@ class ChatManagerImplTest {
 
     @Test
     fun `resending a failed question clears its failure once answered`() = runTest {
-        transcripts.value = listOf(createTranscript())
         whenever(podcastCacheServiceManager.episodeChat(any(), any())).thenAnswer { throw IOException() }
         runCatching {
             manager.sendMessage(EPISODE_UUID, PODCAST_UUID, ChatMessage.User(text = "Question", uuid = "user-uuid"), emptyList())
@@ -392,7 +350,6 @@ class ChatManagerImplTest {
 
     @Test
     fun `blank quote text is ignored`() = runTest {
-        transcripts.value = listOf(createTranscript())
         whenever(podcastCacheServiceManager.episodeChat(any(), any())).thenReturn(
             EpisodeChatResponse(
                 reply = "Assistant reply",
@@ -498,18 +455,6 @@ class ChatManagerImplTest {
     private companion object {
         const val EPISODE_UUID = "episode-uuid"
         const val PODCAST_UUID = "podcast-uuid"
-
-        fun createTranscript(
-            type: String = "text/vtt",
-            isGenerated: Boolean = true,
-            url: String = "transcript-url",
-        ) = Transcript(
-            episodeUuid = EPISODE_UUID,
-            url = url,
-            type = type,
-            isGenerated = isGenerated,
-            language = "en",
-        )
 
         fun createMessage(
             uuid: String,

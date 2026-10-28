@@ -192,7 +192,7 @@ class ShelfSharedViewModel @Inject constructor(
                         }
                     }
                 }
-                .distinctUntilChangedBy { it?.first?.uuid }
+                .distinctUntilChangedBy { it?.first?.uuid to it?.second }
                 .collect { request ->
                     val (episode, needsGeneratedTranscript) = request ?: return@collect
                     val availability = if (needsGeneratedTranscript) {

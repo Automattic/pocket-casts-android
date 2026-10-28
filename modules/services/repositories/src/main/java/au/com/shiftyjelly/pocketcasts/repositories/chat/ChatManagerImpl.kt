@@ -1,9 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.repositories.chat
 
 import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeChatDao
-import au.com.shiftyjelly.pocketcasts.models.db.dao.TranscriptDao
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeChat
-import au.com.shiftyjelly.pocketcasts.models.entity.Transcript
 import au.com.shiftyjelly.pocketcasts.models.to.EpisodeChatHistoryItem
 import au.com.shiftyjelly.pocketcasts.servers.podcast.ConversationMessage
 import au.com.shiftyjelly.pocketcasts.servers.podcast.EpisodeChatQuote
@@ -19,13 +17,11 @@ import javax.inject.Singleton
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 @Singleton
 class ChatManagerImpl @Inject constructor(
     private val episodeChatDao: EpisodeChatDao,
-    private val transcriptDao: TranscriptDao,
     private val podcastCacheServiceManager: PodcastCacheServiceManager,
     private val tokenHandler: TokenHandler,
     moshi: Moshi,
@@ -93,13 +89,9 @@ class ChatManagerImpl @Inject constructor(
             ConversationMessage(role = msg.role.apiRole, content = content)
         }
 
-        val transcript = checkNotNull(selectTranscript(episodeUuid)) {
-            "Transcript URL is required to send episode chat messages"
-        }
         val request = EpisodeChatRequest(
             podcastUuid = podcastUuid,
             episodeUuid = episodeUuid,
-            transcriptUrl = transcript.url,
             message = message.text,
             conversationHistory = history,
         )
@@ -148,9 +140,5 @@ class ChatManagerImpl @Inject constructor(
 
     override suspend fun deleteAllChats() {
         episodeChatDao.deleteAllChats()
-    }
-
-    private suspend fun selectTranscript(episodeUuid: String): Transcript? {
-        return transcriptDao.observeTranscripts(episodeUuid).first().firstOrNull { it.isGenerated }
     }
 }
