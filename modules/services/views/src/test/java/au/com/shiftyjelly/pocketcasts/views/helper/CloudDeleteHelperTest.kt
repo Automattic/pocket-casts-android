@@ -81,6 +81,7 @@ class CloudDeleteHelperTest {
 
         verify(userEpisodeManager).removeFromCloud(episode)
         verifyBlocking(userEpisodeManager, never()) { delete(any(), any()) }
+        verifyNoInteractions(downloadQueue)
     }
 
     @Test
@@ -91,6 +92,7 @@ class CloudDeleteHelperTest {
 
         verify(userEpisodeManager).removeFromCloud(episode)
         verifyBlocking(userEpisodeManager) { delete(episode, playbackManager) }
+        verifyNoInteractions(downloadQueue)
     }
 
     @Test
@@ -122,6 +124,30 @@ class CloudDeleteHelperTest {
         }
 
         assertEquals(listOf(DeleteState.Everywhere, DeleteState.DeviceOnly), chosenStates)
+    }
+
+    @Test
+    fun `device only and cloud dialogs confirm their own state without a secondary button`() {
+        val episodes = listOf(userEpisode(downloaded = true, uploaded = true))
+        val controller = Robolectric.buildActivity(HiltShimActivity::class.java).setup()
+        val fragmentManager = controller.get().supportFragmentManager
+        val resources = controller.get().resources
+
+        mapOf(
+            DeleteState.DeviceOnly to LR.string.profile_delete_from_device,
+            DeleteState.Cloud to LR.string.profile_delete_from_cloud,
+        ).forEach { (state, buttonText) ->
+            val chosenStates = mutableListOf<DeleteState>()
+            val dialog = CloudDeleteHelper.getDeleteDialog(episodes, state, { _, chosen -> chosenStates += chosen }, resources)
+            dialog.show(fragmentManager, "delete_warning")
+            shadowOf(Looper.getMainLooper()).idle()
+
+            composeRule.onNodeWithText(resources.getString(LR.string.profile_delete_from_device_only)).assertDoesNotExist()
+            composeRule.onNodeWithText(resources.getString(buttonText)).performClick()
+            shadowOf(Looper.getMainLooper()).idle()
+
+            assertEquals(listOf(state), chosenStates)
+        }
     }
 
     private fun delete(episode: UserEpisode, state: DeleteState) {
