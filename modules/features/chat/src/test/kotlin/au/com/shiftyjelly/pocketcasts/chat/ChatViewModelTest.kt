@@ -433,6 +433,44 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `starter questions show as loading until they arrive`() = runTest {
+        val questions = CompletableDeferred<List<String>>()
+        chatManager.starterQuestionsResult = questions
+        setEpisodeInfo()
+        runCurrent()
+
+        assertTrue(viewModel.uiState.value.isLoadingStarterQuestions)
+
+        questions.complete(listOf("Who is the guest?"))
+        advanceUntilIdle()
+
+        assertFalse(viewModel.uiState.value.isLoadingStarterQuestions)
+        assertEquals(listOf("Who is the guest?"), viewModel.uiState.value.starterQuestions)
+    }
+
+    @Test
+    fun `failed starter questions stop loading`() = runTest {
+        setEpisodeInfo()
+        advanceUntilIdle()
+
+        assertFalse(viewModel.uiState.value.isLoadingStarterQuestions)
+        assertTrue(viewModel.uiState.value.starterQuestions.isEmpty())
+    }
+
+    @Test
+    fun `switching episodes while starter questions load stops loading`() = runTest {
+        chatManager.starterQuestionsResult = CompletableDeferred()
+        setEpisodeInfo()
+        runCurrent()
+        chatManager.otherMessages.value = listOf(ChatMessage.User(text = "Q1", uuid = "q1"))
+
+        viewModel.openHistoryChat(historyItem(OTHER_EPISODE_UUID))
+        runCurrent()
+
+        assertFalse(viewModel.uiState.value.isLoadingStarterQuestions)
+    }
+
+    @Test
     fun `a chat with messages does not load the starter questions`() = runTest {
         chatManager.messages.value = listOf(ChatMessage.User(text = "Q1", uuid = "q1"))
         setEpisodeInfo()
@@ -3416,9 +3454,11 @@ class ChatViewModelTest {
         var starterQuestions = emptyList<String>()
         val starterQuestionRequests = mutableListOf<CreateChat>()
 
+        var starterQuestionsResult: CompletableDeferred<List<String>>? = null
+
         override suspend fun getStarterQuestions(episodeUuid: String, podcastUuid: String): List<String> {
             starterQuestionRequests += CreateChat(episodeUuid, podcastUuid)
-            return starterQuestions
+            return starterQuestionsResult?.await() ?: starterQuestions
         }
 
         val discardedMessageUuids = mutableListOf<String>()
