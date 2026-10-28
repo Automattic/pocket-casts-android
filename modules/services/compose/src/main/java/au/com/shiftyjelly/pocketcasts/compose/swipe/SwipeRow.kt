@@ -60,6 +60,7 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import kotlin.math.absoluteValue
 import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.filter
 import androidx.compose.material.MaterialTheme as Material
 
 private val ActionIconSize = 24.dp
@@ -70,6 +71,8 @@ private val FullSwipeThresholdMargin = 24.dp
 internal const val FULL_SWIPE_ANCHOR_MULTIPLIER = 2
 
 private const val MAX_ACTIONS_PER_SIDE = 3
+
+private val FullSwipeAnchors = setOf(SwipeRowAnchor.FullLeading, SwipeRowAnchor.FullTrailing)
 
 private val SwipeRowState.settledOffset
     get() = draggableState.offset.let { offset -> if (offset.isNaN()) 0f else offset }
@@ -198,6 +201,7 @@ fun SwipeRow(
     LaunchedEffect(state) {
         snapshotFlow { isFullSwipeThresholdReached }
             .drop(1)
+            .filter { state.draggableState.settledValue !in FullSwipeAnchors }
             .collect { hapticFeedback.performHapticFeedback(HapticFeedbackType.ContextClick) }
     }
 
