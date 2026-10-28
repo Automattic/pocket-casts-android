@@ -65,6 +65,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
@@ -315,7 +316,7 @@ internal fun UserMessageBubble(
                 fontSize = 15.sp,
                 lineHeight = 20.sp,
                 modifier = Modifier
-                    .widthIn(max = 250.dp)
+                    .widthIn(max = if (chipMorph >= CHIP_WIDTH_MORPH_POINT) Dp.Unspecified else UserBubbleMaxWidth)
                     .clip(shape)
                     .background(theme.userBubble.copy(alpha = theme.userBubble.alpha * (1f - chipMorph)))
                     .then(if (chipMorph > 0f) Modifier.border(1.dp, theme.chipBorder.copy(alpha = theme.chipBorder.alpha * chipMorph), shape) else Modifier)
@@ -413,6 +414,8 @@ private fun chipMorphShape(chipMorph: Float) = RoundedCornerShape(
 )
 
 private val ChipCornerRadius = 22.dp
+private val UserBubbleMaxWidth = 250.dp
+private const val CHIP_WIDTH_MORPH_POINT = 0.5f
 
 @Preview
 @Composable
