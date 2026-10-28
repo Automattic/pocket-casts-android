@@ -81,6 +81,7 @@ import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.LocalPodcastColors
 import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
+import kotlin.math.ceil
 import kotlinx.coroutines.delay
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -419,7 +420,7 @@ private fun DrawScope.drawUserBubble(chipMorph: Float, theme: ChatTheme) {
         color = theme.userBubble.copy(alpha = theme.userBubble.alpha * (1f - chipMorph)),
     )
     if (chipMorph > 0f) {
-        val strokeWidth = ChipBorderWidth.toPx()
+        val strokeWidth = ceil(ChipBorderWidth.toPx())
         inset(strokeWidth / 2) {
             drawOutline(
                 outline = shape.createOutline(size, layoutDirection, this),

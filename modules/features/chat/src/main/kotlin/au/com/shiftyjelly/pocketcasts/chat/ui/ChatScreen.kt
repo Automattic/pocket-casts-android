@@ -297,13 +297,14 @@ private fun ChatContent(
             isFollowingNewest = true
         }
     }
-    val smoothFollowMaxPx = with(LocalDensity.current) { SmoothFollowMaxDistance.roundToPx() }
+    val smoothFollowMaxPx by rememberUpdatedState(with(LocalDensity.current) { SmoothFollowMaxDistance.roundToPx() })
+    val isSmoothFollowEnabled by rememberUpdatedState(!isReduceMotionEnabled)
     var hasFollowed by remember { mutableStateOf(false) }
-    LaunchedEffect(uiState.messages.size, uiState.isAwaitingReply, isReduceMotionEnabled) {
+    LaunchedEffect(uiState.messages.size, uiState.isAwaitingReply) {
         snapshotFlow { scrollState.maxValue }.collectLatest { maxValue ->
             if (isFollowingNewest && !isUserScrolling) {
                 val distance = maxValue - scrollState.value
-                val isSmooth = hasFollowed && distance in 1..smoothFollowMaxPx && !isReduceMotionEnabled
+                val isSmooth = hasFollowed && distance in 1..smoothFollowMaxPx && isSmoothFollowEnabled
                 if (maxValue > 0) hasFollowed = true
                 isAutoScrolling = true
                 try {

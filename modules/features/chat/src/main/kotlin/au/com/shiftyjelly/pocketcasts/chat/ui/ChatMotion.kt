@@ -196,6 +196,7 @@ internal fun ChatShimmerText(
                         startX = center - halfBand,
                         endX = center + halfBand,
                     ),
+                    alpha = 1f,
                 )
             },
     )
