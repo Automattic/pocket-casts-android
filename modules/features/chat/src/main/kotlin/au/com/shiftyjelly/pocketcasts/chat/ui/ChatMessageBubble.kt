@@ -128,7 +128,7 @@ internal fun String.withHangingBullets(indent: TextUnit): AnnotatedString {
 }
 
 private const val BULLET_PREFIX = "•  "
-private const val ZERO_WIDTH_SPACE = "\u200B"
+internal const val ZERO_WIDTH_SPACE = "\u200B"
 
 private val AiMessageTextStyle = TextStyle(fontSize = 15.sp, lineHeight = 20.sp)
 

@@ -29,4 +29,17 @@ class ChatAnswerStreamTest {
 
         assertEquals(quote.displayText.length, quote.revealTickCount())
     }
+
+    @Test
+    fun `each message of an answer starts after the previous one and a pause`() {
+        val offsets = answerTickOffsets(listOf(10, 20, 5))
+
+        assertEquals(listOf(0, 10 + MESSAGE_PAUSE_TICKS, 30 + 2 * MESSAGE_PAUSE_TICKS), offsets.take(3))
+        assertEquals(35 + 2 * MESSAGE_PAUSE_TICKS, answerTotalTicks(listOf(10, 20, 5)))
+    }
+
+    @Test
+    fun `an empty answer has no ticks`() {
+        assertEquals(0, answerTotalTicks(emptyList()))
+    }
 }

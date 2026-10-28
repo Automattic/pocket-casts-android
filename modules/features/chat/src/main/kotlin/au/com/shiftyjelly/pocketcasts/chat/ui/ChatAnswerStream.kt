@@ -70,10 +70,8 @@ internal fun rememberChatAnswerStream(
     val answerUuid = answer.firstOrNull()?.uuid?.takeIf { answer.none { message -> message.uuid in initialMessageUuids } }
     val isReduceMotionEnabled = rememberIsReduceMotionEnabled()
     val tickCounts = remember(answer) { answer.map { message -> message.uuid to message.revealTickCount() } }
-    val tickOffsets = remember(tickCounts) {
-        tickCounts.runningFold(0) { offset, (_, count) -> offset + count + MESSAGE_PAUSE_TICKS }
-    }
-    val totalTicks = if (tickCounts.isEmpty()) 0 else tickOffsets[tickCounts.lastIndex] + tickCounts.last().second
+    val tickOffsets = remember(tickCounts) { answerTickOffsets(tickCounts.map { (_, count) -> count }) }
+    val totalTicks = answerTotalTicks(tickCounts.map { (_, count) -> count })
     val progress = remember(answerUuid) {
         Animatable(if (isReduceMotionEnabled) totalTicks.toFloat() else 0f)
     }
@@ -100,9 +98,13 @@ internal fun ChatMessage.revealTickCount(): Int = when (this) {
     is ChatMessage.User -> 0
 }
 
+internal fun answerTickOffsets(tickCounts: List<Int>): List<Int> = tickCounts.runningFold(0) { offset, count -> offset + count + MESSAGE_PAUSE_TICKS }
+
+internal fun answerTotalTicks(tickCounts: List<Int>): Int = if (tickCounts.isEmpty()) 0 else answerTickOffsets(tickCounts)[tickCounts.lastIndex] + tickCounts.last()
+
 private fun revealDurationMillis(ticks: Float) = (ticks * REVEAL_MS_PER_TICK).roundToInt().coerceAtMost(REVEAL_MAX_DURATION_MS)
 
 private const val REVEAL_MS_PER_TICK = 10
 private const val REVEAL_MAX_DURATION_MS = 6_000
 private const val REVEAL_START_DELAY_MS = 150
-private const val MESSAGE_PAUSE_TICKS = PARAGRAPH_PAUSE_TICKS
+internal const val MESSAGE_PAUSE_TICKS = PARAGRAPH_PAUSE_TICKS

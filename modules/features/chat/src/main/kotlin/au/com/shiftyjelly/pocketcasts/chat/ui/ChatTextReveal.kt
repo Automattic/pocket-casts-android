@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.chat.ui
 
-import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Rect
@@ -38,9 +37,8 @@ internal class TextRevealTimeline(text: AnnotatedString) {
     }
 }
 
-private fun Char.isVisible() = !isWhitespace() && this != '​'
+private fun Char.isVisible() = !isWhitespace() && this != ZERO_WIDTH_SPACE.single()
 
-@Stable
 internal class TextWipe {
     var layout: TextLayoutResult? = null
 
