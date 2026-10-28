@@ -38,7 +38,9 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
@@ -140,6 +142,16 @@ internal fun ChatFlight(
     ) {
         content(progress.value)
     }
+}
+
+internal class PlacedCoordinates {
+    private var coordinates: LayoutCoordinates? = null
+
+    fun onPlaced(placed: LayoutCoordinates) {
+        coordinates = placed
+    }
+
+    fun topInRoot() = coordinates?.takeIf { it.isAttached }?.positionInRoot()?.y ?: 0f
 }
 
 internal fun flightChipMorph(progress: Float) = 1f - ((progress - FLY_IN_FILL_START) / FLY_IN_FILL_FRACTION).coerceIn(0f, 1f)

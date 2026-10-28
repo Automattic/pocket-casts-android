@@ -5,9 +5,6 @@ import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.border
@@ -26,9 +23,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
-import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -41,7 +39,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.onPlaced
-import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -49,6 +46,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatInputType
+import kotlinx.coroutines.delay
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -59,23 +57,29 @@ internal fun ChatWelcome(
     onClickSuggestion: (text: String, inputType: ChatInputType, topInRoot: Float) -> Unit,
     theme: ChatTheme,
     modifier: Modifier = Modifier,
+    animate: Boolean = true,
     exitingSuggestion: String? = null,
     isExiting: Boolean = false,
 ) {
     fun isTapped(text: String) = isExiting && text == exitingSuggestion
     val summarize = stringResource(LR.string.chat_suggestion_summarize)
-    val sweep = rememberInfiniteTransition(label = "skeletonSweep").animateFloat(
-        initialValue = 0f,
-        targetValue = SKELETON_SWEEP_PERIOD_MS.toFloat(),
-        animationSpec = infiniteRepeatable(tween(durationMillis = SKELETON_SWEEP_PERIOD_MS, easing = LinearEasing)),
-        label = "skeletonSweepMs",
-    )
+    var isSkeletonExitRunning by remember { mutableStateOf(isLoadingStarterQuestions) }
+    LaunchedEffect(isLoadingStarterQuestions) {
+        if (isLoadingStarterQuestions) {
+            isSkeletonExitRunning = true
+        } else {
+            delay(SKELETON_EXIT_MS)
+            isSkeletonExitRunning = false
+        }
+    }
+    val hasSkeletons = isLoadingStarterQuestions || isSkeletonExitRunning
+    val sweepMillis = rememberSkeletonSweep(isRunning = hasSkeletons)
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.End,
         modifier = modifier.fillMaxWidth(),
     ) {
-        WelcomeItem(order = 0, isExiting = isExiting, delayMillis = WELCOME_DELAY_MS) {
+        WelcomeItem(order = 0, isExiting = isExiting, animate = animate, delayMillis = WELCOME_DELAY_MS) {
             Text(
                 text = stringResource(LR.string.chat_welcome),
                 color = theme.primaryText,
@@ -91,6 +95,7 @@ internal fun ChatWelcome(
             WelcomeItem(
                 order = 1,
                 isExiting = isExiting,
+                animate = animate,
                 delayMillis = WELCOME_DELAY_MS + WELCOME_STAGGER_MS,
                 isHeld = isTapped(summarize),
             ) {
@@ -102,7 +107,7 @@ internal fun ChatWelcome(
                     modifier = Modifier.hiddenIf(isTapped(summarize)),
                 )
             }
-            val slotCount = if (isLoadingStarterQuestions) maxOf(SkeletonWidthFractions.size, starterQuestions.size) else starterQuestions.size
+            val slotCount = if (hasSkeletons) maxOf(SkeletonWidthFractions.size, starterQuestions.size) else starterQuestions.size
             repeat(slotCount) { index ->
                 val question = starterQuestions.getOrNull(index)
                 val chip: @Composable (String) -> Unit = { text ->
@@ -115,11 +120,11 @@ internal fun ChatWelcome(
                     )
                 }
                 if (isExiting) {
-                    WelcomeItem(order = index + 2, isExiting = true, delayMillis = 0, isHeld = question != null && isTapped(question)) {
+                    WelcomeItem(order = index + 2, isExiting = true, isHeld = question != null && isTapped(question)) {
                         if (question != null) {
                             chip(question)
                         } else {
-                            ChatSkeletonChip(index = index, sweepMillis = { sweep.value }, theme = theme)
+                            ChatSkeletonChip(index = index, sweepMillis = sweepMillis, theme = theme)
                         }
                     }
                 } else {
@@ -127,7 +132,8 @@ internal fun ChatWelcome(
                         index = index,
                         question = question,
                         isLoading = isLoadingStarterQuestions,
-                        sweepMillis = { sweep.value },
+                        animate = animate,
+                        sweepMillis = sweepMillis,
                         theme = theme,
                         chip = chip,
                     )
@@ -138,10 +144,25 @@ internal fun ChatWelcome(
 }
 
 @Composable
+private fun rememberSkeletonSweep(isRunning: Boolean): () -> Float {
+    val isReduceMotionEnabled = rememberIsReduceMotionEnabled()
+    val sweep = remember { Animatable(0f) }
+    LaunchedEffect(isRunning, isReduceMotionEnabled) {
+        if (!isRunning || isReduceMotionEnabled) return@LaunchedEffect
+        while (true) {
+            sweep.snapTo(0f)
+            sweep.animateTo(SKELETON_SWEEP_PERIOD_MS.toFloat(), tween(SKELETON_SWEEP_PERIOD_MS, easing = LinearEasing))
+        }
+    }
+    return remember(sweep) { { sweep.value } }
+}
+
+@Composable
 private fun WelcomeItem(
     order: Int,
     isExiting: Boolean,
-    delayMillis: Int,
+    animate: Boolean = true,
+    delayMillis: Int = 0,
     isHeld: Boolean = false,
     content: @Composable () -> Unit,
 ) {
@@ -156,7 +177,7 @@ private fun WelcomeItem(
         )
     } else {
         ChatAppear(
-            animate = true,
+            animate = animate,
             rise = WelcomeRise,
             durationMillis = WELCOME_APPEAR_MS,
             delayMillis = delayMillis,
@@ -172,22 +193,31 @@ private fun ChatStarterQuestionSlot(
     index: Int,
     question: String?,
     isLoading: Boolean,
+    animate: Boolean,
     sweepMillis: () -> Float,
     theme: ChatTheme,
     chip: @Composable (String) -> Unit,
 ) {
     val isReduceMotionEnabled = rememberIsReduceMotionEnabled()
-    val showsSkeleton = remember { question == null }
+    var showsSkeleton by remember { mutableStateOf(question == null) }
     val questionAlpha = remember { Animatable(if (question == null) 0f else 1f) }
+    val isSkeletonVisible by remember { derivedStateOf { questionAlpha.value < 1f } }
     LaunchedEffect(question != null, isReduceMotionEnabled) {
         when {
-            question == null -> questionAlpha.snapTo(0f)
+            question == null -> {
+                showsSkeleton = true
+                questionAlpha.snapTo(0f)
+            }
 
             isReduceMotionEnabled -> questionAlpha.snapTo(1f)
 
             else -> questionAlpha.animateTo(
                 1f,
-                tween(durationMillis = STARTER_CROSS_FADE_MS, delayMillis = index * STARTER_CROSS_FADE_STAGGER_MS, easing = LinearEasing),
+                tween(
+                    durationMillis = STARTER_CROSS_FADE_MS,
+                    delayMillis = index * STARTER_CROSS_FADE_STAGGER_MS,
+                    easing = LinearEasing,
+                ),
             )
         }
     }
@@ -197,12 +227,12 @@ private fun ChatStarterQuestionSlot(
         exit = if (isReduceMotionEnabled) ExitTransition.None else fadeOut(tween(STARTER_CROSS_FADE_MS)),
     ) {
         ChatAppear(
-            animate = true,
+            animate = animate,
             durationMillis = SKELETON_APPEAR_MS,
             delayMillis = SKELETON_DELAY_MS + index * SKELETON_STAGGER_MS,
         ) {
             Box(contentAlignment = Alignment.CenterEnd) {
-                if (showsSkeleton && questionAlpha.value < 1f) {
+                if (showsSkeleton && isSkeletonVisible) {
                     ChatSkeletonChip(
                         index = index,
                         sweepMillis = sweepMillis,
@@ -276,6 +306,7 @@ private const val SKELETON_DELAY_MS = WELCOME_DELAY_MS + 350
 private const val SKELETON_STAGGER_MS = 80
 private const val STARTER_CROSS_FADE_MS = 250
 private const val STARTER_CROSS_FADE_STAGGER_MS = 100
+private const val SKELETON_EXIT_MS = STARTER_CROSS_FADE_MS + 2L * STARTER_CROSS_FADE_STAGGER_MS
 
 @Composable
 internal fun ChatFollowUps(
@@ -323,18 +354,18 @@ private fun ChatSuggestionChip(
     theme: ChatTheme,
     modifier: Modifier = Modifier,
 ) {
-    var topInRoot by remember { mutableFloatStateOf(0f) }
+    val position = remember { PlacedCoordinates() }
     Text(
         text = text,
         color = theme.primaryText,
         fontSize = 15.sp,
         lineHeight = 20.sp,
         modifier = modifier
-            .onPlaced { coordinates -> topInRoot = coordinates.positionInRoot().y }
+            .onPlaced(position::onPlaced)
             .alpha(if (enabled) 1f else DISABLED_ALPHA)
             .clip(CircleShape)
             .border(1.dp, theme.chipBorder, CircleShape)
-            .clickable(enabled = enabled, role = Role.Button, onClick = { onClick(topInRoot) })
+            .clickable(enabled = enabled, role = Role.Button, onClick = { onClick(position.topInRoot()) })
             .defaultMinSize(minHeight = 44.dp)
             .padding(horizontal = 16.dp, vertical = 12.dp),
     )

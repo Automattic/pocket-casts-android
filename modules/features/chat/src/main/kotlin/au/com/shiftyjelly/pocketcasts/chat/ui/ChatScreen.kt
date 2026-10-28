@@ -15,6 +15,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.interaction.DragInteraction
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -44,7 +45,6 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -143,8 +143,10 @@ fun ChatScreen(
     }
     var seenBeforeHistoryUuids by remember { mutableStateOf(emptySet<String>()) }
     var pendingQuestionUuid by remember { mutableStateOf<String?>(null) }
+    var flyingSuggestion by remember { mutableStateOf<FlyingSuggestion?>(null) }
     LaunchedEffect(uiState.isHistoryVisible) {
         if (uiState.isHistoryVisible) {
+            flyingSuggestion = flyingSuggestion?.copy(hasLanded = true)
             val pendingQuestion = uiState.messages.lastOrNull()?.takeIf { uiState.isAwaitingReply && it is ChatMessage.User }
             pendingQuestionUuid = pendingQuestion?.uuid
             seenBeforeHistoryUuids = seenBeforeHistoryUuids + uiState.messages.filter { it != pendingQuestion }.map { it.uuid }
@@ -157,9 +159,12 @@ fun ChatScreen(
             pendingQuestionUuid = null
         }
     }
-    var flyingSuggestion by remember { mutableStateOf<FlyingSuggestion?>(null) }
-    LaunchedEffect(uiState.isAwaitingReply) {
-        if (!uiState.isAwaitingReply) flyingSuggestion = null
+    LaunchedEffect(uiState.isAwaitingReply, flyingSuggestion?.hasLanded) {
+        if (!uiState.isAwaitingReply && flyingSuggestion?.hasLanded == true) flyingSuggestion = null
+    }
+    var isWelcomeEntered by rememberSaveable(uiState.episodeUuid) { mutableStateOf(false) }
+    LaunchedEffect(uiState.messages.isEmpty()) {
+        if (uiState.messages.isNotEmpty()) isWelcomeEntered = false
     }
     val loadingPhase = rememberChatLoadingPhase(
         isAwaitingReply = uiState.isAwaitingReply,
@@ -202,6 +207,8 @@ fun ChatScreen(
                         loadingPhase = loadingPhase,
                         flyingSuggestion = flyingSuggestion,
                         onFlyingSuggestionChange = { flyingSuggestion = it },
+                        isWelcomeEntered = isWelcomeEntered,
+                        onWelcomeEnter = { isWelcomeEntered = true },
                         theme = theme,
                         onClickClose = onClickClose,
                         onClickMore = onClickMore,
@@ -227,6 +234,8 @@ private fun ChatContent(
     loadingPhase: ChatLoadingPhase,
     flyingSuggestion: FlyingSuggestion?,
     onFlyingSuggestionChange: (FlyingSuggestion?) -> Unit,
+    isWelcomeEntered: Boolean,
+    onWelcomeEnter: () -> Unit,
     theme: ChatTheme,
     onClickClose: () -> Unit,
     onClickMore: () -> Unit,
@@ -244,8 +253,9 @@ private fun ChatContent(
     val coroutineScope = rememberCoroutineScope()
     val isReduceMotionEnabled = rememberIsReduceMotionEnabled()
     val isWelcomeVisible = uiState.areMessagesLoaded && uiState.messages.isEmpty() && !uiState.isAwaitingReply
-    var welcomeTopInRoot by remember { mutableFloatStateOf(0f) }
-    var contentTopInRoot by remember { mutableFloatStateOf(0f) }
+    val currentOnWelcomeEnter by rememberUpdatedState(onWelcomeEnter)
+    val welcomePosition = remember { PlacedCoordinates() }
+    val contentPosition = remember { PlacedCoordinates() }
     var exitingWelcome by remember { mutableStateOf<ExitingWelcome?>(null) }
     fun exitWelcome(tappedSuggestion: String?) {
         if (isWelcomeVisible && !isReduceMotionEnabled) {
@@ -253,7 +263,7 @@ private fun ChatContent(
                 starterQuestions = uiState.starterQuestions,
                 isLoadingStarterQuestions = uiState.isLoadingStarterQuestions,
                 tappedSuggestion = tappedSuggestion,
-                topInRoot = welcomeTopInRoot,
+                topInRoot = welcomePosition.topInRoot(),
             )
         }
     }
@@ -262,11 +272,23 @@ private fun ChatContent(
 
     val followThresholdPx = with(LocalDensity.current) { FollowNewestThreshold.roundToPx() }
     var isFollowingNewest by rememberSaveable { mutableStateOf(true) }
+    var isUserScrolling by remember { mutableStateOf(false) }
+    var isAutoScrolling by remember { mutableStateOf(false) }
+    LaunchedEffect(scrollState) {
+        scrollState.interactionSource.interactions.collect { interaction ->
+            if (interaction is DragInteraction.Start) isUserScrolling = true
+        }
+    }
     LaunchedEffect(scrollState) {
         snapshotFlow { scrollState.isScrollInProgress }
             .drop(1)
             .filter { inProgress -> !inProgress }
-            .collect { isFollowingNewest = scrollState.maxValue - scrollState.value <= followThresholdPx }
+            .collect {
+                if (isUserScrolling || !isAutoScrolling) {
+                    isFollowingNewest = scrollState.maxValue - scrollState.value <= followThresholdPx
+                }
+                isUserScrolling = false
+            }
     }
     val newestMessage = uiState.messages.lastOrNull()
     LaunchedEffect(newestMessage?.uuid, uiState.isAwaitingReply) {
@@ -277,14 +299,22 @@ private fun ChatContent(
     val smoothFollowMaxPx = with(LocalDensity.current) { SmoothFollowMaxDistance.roundToPx() }
     var hasFollowed by remember { mutableStateOf(false) }
     LaunchedEffect(uiState.messages.size, uiState.isAwaitingReply, scrollState.maxValue) {
-        if (isFollowingNewest && !scrollState.isScrollInProgress) {
+        if (isFollowingNewest && !isUserScrolling) {
             val distance = scrollState.maxValue - scrollState.value
             val isSmooth = hasFollowed && distance in 1..smoothFollowMaxPx && !isReduceMotionEnabled
             if (scrollState.maxValue > 0) hasFollowed = true
-            if (isSmooth) {
-                scrollState.animateScrollTo(scrollState.maxValue, tween(durationMillis = SMOOTH_FOLLOW_MS, easing = EaseOut))
-            } else {
-                scrollState.scrollTo(scrollState.maxValue)
+            isAutoScrolling = true
+            try {
+                if (isSmooth) {
+                    scrollState.animateScrollTo(
+                        scrollState.maxValue,
+                        tween(durationMillis = SMOOTH_FOLLOW_MS, easing = EaseOut),
+                    )
+                } else {
+                    scrollState.scrollTo(scrollState.maxValue)
+                }
+            } finally {
+                isAutoScrolling = false
             }
         }
     }
@@ -315,7 +345,7 @@ private fun ChatContent(
         Box(
             modifier = Modifier
                 .weight(1f)
-                .onPlaced { coordinates -> contentTopInRoot = coordinates.positionInRoot().y },
+                .onPlaced(contentPosition::onPlaced),
         ) {
             exitingWelcome?.let { exiting ->
                 key(exiting) {
@@ -328,7 +358,7 @@ private fun ChatContent(
                         exitingSuggestion = exiting.tappedSuggestion,
                         isExiting = true,
                         modifier = Modifier
-                            .offset { IntOffset(0, (exiting.topInRoot - contentTopInRoot).roundToInt()) }
+                            .offset { IntOffset(0, (exiting.topInRoot - contentPosition.topInRoot()).roundToInt()) }
                             .padding(horizontal = 16.dp)
                             .clearAndSetSemantics {},
                     )
@@ -340,9 +370,10 @@ private fun ChatContent(
             }
             flyingSuggestion?.takeUnless { it.hasLanded }?.let { flight ->
                 key(flight.startMillis) {
+                    val contentTop = contentPosition.topInRoot()
                     ChatFlight(
-                        fromY = flight.fromTopInRoot - contentTopInRoot,
-                        toY = flight.toTopInRoot - contentTopInRoot,
+                        fromY = flight.fromTopInRoot - contentTop,
+                        toY = flight.toTopInRoot - contentTop,
                         onLand = { onFlyingSuggestionChange(flight.copy(hasLanded = true)) },
                         modifier = Modifier
                             .padding(horizontal = 16.dp)
@@ -364,17 +395,22 @@ private fun ChatContent(
                     .padding(start = 16.dp, end = 16.dp, top = 24.dp, bottom = 12.dp),
             ) {
                 val typingTransition = rememberInfiniteTransition(label = "typing")
-                val thinkingAlpha = remember { Animatable(if (uiState.isAwaitingReply) 1f else 0f) }
-                LaunchedEffect(uiState.isAwaitingReply, isReduceMotionEnabled) {
+                val awaitedQuestionUuid = uiState.messages.lastOrNull()?.uuid?.takeIf { uiState.isAwaitingReply }
+                val enteredWhileAwaitingUuid = remember { awaitedQuestionUuid }
+                val thinkingAlpha = remember { Animatable(if (awaitedQuestionUuid != null) 1f else 0f) }
+                LaunchedEffect(awaitedQuestionUuid, isReduceMotionEnabled) {
                     when {
-                        !uiState.isAwaitingReply -> Unit
+                        awaitedQuestionUuid == null -> Unit
 
-                        isReduceMotionEnabled -> thinkingAlpha.snapTo(1f)
+                        isReduceMotionEnabled || awaitedQuestionUuid == enteredWhileAwaitingUuid -> thinkingAlpha.snapTo(1f)
 
                         else -> {
                             thinkingAlpha.snapTo(0f)
                             val settleMillis = flyingSuggestion?.remainingFlight()?.inWholeMilliseconds?.toInt() ?: 0
-                            thinkingAlpha.animateTo(1f, tween(durationMillis = THINKING_APPEAR_MS, delayMillis = settleMillis + THINKING_DELAY_MS))
+                            thinkingAlpha.animateTo(
+                                1f,
+                                tween(durationMillis = THINKING_APPEAR_MS, delayMillis = settleMillis + THINKING_DELAY_MS),
+                            )
                         }
                     }
                 }
@@ -385,22 +421,30 @@ private fun ChatContent(
                     )
                 }
                 if (isWelcomeVisible) {
+                    val animateWelcome = remember { !isWelcomeEntered }
+                    LaunchedEffect(Unit) { currentOnWelcomeEnter() }
+                    val canSendSuggestion = !uiState.isAwaitingReply && uiState.isConnected && flyingSuggestion?.hasLanded != false
                     ChatWelcome(
                         starterQuestions = uiState.starterQuestions,
                         isLoadingStarterQuestions = uiState.isLoadingStarterQuestions,
                         isSuggestionEnabled = uiState.isConnected,
                         onClickSuggestion = { text, inputType, topInRoot ->
-                            if (!isReduceMotionEnabled) {
+                            if (canSendSuggestion && !isReduceMotionEnabled) {
                                 onFlyingSuggestionChange(
-                                    FlyingSuggestion(text = text, fromTopInRoot = topInRoot, toTopInRoot = welcomeTopInRoot),
+                                    FlyingSuggestion(
+                                        text = text,
+                                        fromTopInRoot = topInRoot,
+                                        toTopInRoot = welcomePosition.topInRoot(),
+                                    ),
                                 )
+                                exitWelcome(tappedSuggestion = text)
                             }
-                            exitWelcome(tappedSuggestion = text)
                             onClickSuggestion(text, inputType)
                         },
                         theme = theme,
+                        animate = animateWelcome,
                         modifier = Modifier
-                            .onPlaced { coordinates -> welcomeTopInRoot = coordinates.positionInRoot().y }
+                            .onPlaced(welcomePosition::onPlaced)
                             .alpha(if (exitingWelcome != null) 0f else 1f),
                     )
                 }
@@ -432,7 +476,7 @@ private fun ChatContent(
                                 AiMessageBubble(
                                     text = message.displayText,
                                     theme = theme,
-                                    revealProgress = answerStream?.revealProgress(message.uuid),
+                                    revealProgress = answerStream?.takeIf { isStreaming }?.revealProgress(message.uuid),
                                 )
                             }
 
@@ -451,7 +495,7 @@ private fun ChatContent(
                                     isPlayable = message.canPlay,
                                     isLoading = message.uuid == uiState.loadingQuoteUuid,
                                     theme = theme,
-                                    revealProgress = answerStream?.revealProgress(message.uuid),
+                                    revealProgress = answerStream?.takeIf { isStreaming }?.revealProgress(message.uuid),
                                     onClickPlay = { onPlayQuote(message.uuid) },
                                 )
                             }
