@@ -1,7 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.views.helper
 
 import android.os.Looper
-import android.view.View
+import androidx.compose.ui.test.junit4.v2.createEmptyComposeRule
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
@@ -9,13 +11,13 @@ import au.com.shiftyjelly.pocketcasts.models.type.UserEpisodeServerStatus
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadQueue
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
-import au.com.shiftyjelly.pocketcasts.views.R
 import au.com.shiftyjelly.pocketcasts.views.dialog.HiltShimActivity
 import au.com.shiftyjelly.pocketcasts.views.dialog.HiltShimApplication
 import java.util.Date
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import org.junit.Assert.assertEquals
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
@@ -28,10 +30,14 @@ import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @RunWith(RobolectricTestRunner::class)
 @Config(application = HiltShimApplication::class)
 class CloudDeleteHelperTest {
+    @get:Rule
+    val composeRule = createEmptyComposeRule()
+
     private val downloadQueue = mock<DownloadQueue>()
     private val playbackManager = mock<PlaybackManager>()
     private val userEpisodeManager = mock<UserEpisodeManager>()
@@ -105,11 +111,13 @@ class CloudDeleteHelperTest {
         val controller = Robolectric.buildActivity(HiltShimActivity::class.java).setup()
         val fragmentManager = controller.get().supportFragmentManager
 
-        listOf(R.id.btnConfirm, R.id.btnSecondary).forEach { buttonId ->
-            val dialog = CloudDeleteHelper.getDeleteDialog(episodes, DeleteState.Everywhere, { _, state -> chosenStates += state }, controller.get().resources)
+        val resources = controller.get().resources
+
+        listOf(LR.string.profile_delete_everywhere, LR.string.profile_delete_from_device_only).forEach { buttonText ->
+            val dialog = CloudDeleteHelper.getDeleteDialog(episodes, DeleteState.Everywhere, { _, state -> chosenStates += state }, resources)
             dialog.show(fragmentManager, "delete_warning")
             shadowOf(Looper.getMainLooper()).idle()
-            dialog.requireView().findViewById<View>(buttonId).performClick()
+            composeRule.onNodeWithText(resources.getString(buttonText)).performClick()
             shadowOf(Looper.getMainLooper()).idle()
         }
 
