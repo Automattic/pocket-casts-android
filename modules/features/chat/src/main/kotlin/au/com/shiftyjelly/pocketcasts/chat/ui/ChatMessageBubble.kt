@@ -33,6 +33,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -49,7 +50,6 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
-import androidx.compose.ui.semantics.text
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.Placeholder
@@ -88,34 +88,42 @@ internal fun AiMessageBubble(
     val bulletIndent = remember(textMeasurer, density) {
         with(density) { textMeasurer.measure(BULLET_PREFIX, AiMessageTextStyle).size.width.toSp() }
     }
-    val (styledText, words) = remember(text, bulletIndent) { text.withHangingBullets(bulletIndent) }
-    val chunks = remember(words) { revealChunks(words.size) }
-    val shownText = revealProgress?.let { progress -> styledText.revealed(words, chunks, progress(), theme.aiBubbleText) } ?: styledText
+    val styledText = remember(text, bulletIndent) { text.withHangingBullets(bulletIndent) }
+    val wipe = remember { TextWipe() }
     Text(
-        text = shownText,
+        text = styledText,
         color = theme.aiBubbleText,
         style = AiMessageTextStyle,
+        onTextLayout = wipe::onTextLayout,
         modifier = modifier
             .fillMaxWidth()
-            .withFullTextSemantics(shownText, styledText),
+            .revealedBy(wipe, styledText, revealProgress),
     )
 }
 
-internal fun String.withHangingBullets(indent: TextUnit): Pair<AnnotatedString, List<IntRange>> {
+@Composable
+private fun Modifier.revealedBy(
+    wipe: TextWipe,
+    text: AnnotatedString,
+    revealProgress: (() -> Float)?,
+): Modifier {
+    if (revealProgress == null) return this
+    val timeline = remember(text) { TextRevealTimeline(text) }
+    return textWipe(wipe) { timeline.revealedLength(revealProgress()) }
+}
+
+internal fun String.withHangingBullets(indent: TextUnit): AnnotatedString {
     val lines = lines()
-    val words = mutableListOf<IntRange>()
-    val text = buildAnnotatedString {
+    return buildAnnotatedString {
         lines.forEachIndexed { index, line ->
             val isBullet = line.startsWith(BULLET_PREFIX)
             if (isBullet && lines.getOrNull(index - 1)?.startsWith(BULLET_PREFIX) == true) {
                 withStyle(ParagraphStyle()) { append(ZERO_WIDTH_SPACE) }
             }
             val paragraphStyle = if (isBullet) ParagraphStyle(textIndent = TextIndent(restLine = indent)) else ParagraphStyle()
-            words += wordRanges(line, startOffset = length)
             withStyle(paragraphStyle) { append(line.ifEmpty { ZERO_WIDTH_SPACE }) }
         }
     }
-    return text to words
 }
 
 private const val BULLET_PREFIX = "•  "
@@ -137,21 +145,7 @@ internal fun AiQuoteBubble(
     val timestampColor = if (isPlayable) theme.quoteTimestamp else theme.secondaryText
     val quoteColor = if (isLoading) theme.aiBubbleText.copy(alpha = LOADING_QUOTE_ALPHA) else theme.aiBubbleText
     val text = remember(quote, timestampLabel, timestampColor, quoteColor, isLoading) {
-        buildAnnotatedString {
-            withStyle(SpanStyle(fontStyle = FontStyle.Italic, color = quoteColor)) {
-                append(quote)
-            }
-            if (timestampLabel.isNotEmpty()) {
-                append(" ")
-                withStyle(SpanStyle(color = timestampColor)) {
-                    append(quoteTimestampText(timestampLabel))
-                }
-            }
-            if (isLoading) {
-                append(" ")
-                appendInlineContent(QUOTE_SPINNER_ID, alternateText = " ")
-            }
-        }
+        quoteText(quote, timestampLabel, quoteColor, timestampColor, isLoading)
     }
     val spinnerSize = with(LocalDensity.current) { QuoteSpinnerSize.toSp() }
     val inlineContent = remember(timestampColor, spinnerSize) {
@@ -163,19 +157,20 @@ internal fun AiQuoteBubble(
             },
         )
     }
-    val words = remember(text) { wordRanges(text.text) }
-    val chunks = remember(words) { revealChunks(words.size) }
-    val progress = revealProgress?.invoke()
-    val isRevealed = progress == null || progress >= revealedChunkTarget(chunks.size)
-    val shownText = progress?.let { text.revealed(words, chunks, it, theme.aiBubbleText) } ?: text
+    val wipe = remember { TextWipe() }
+    val revealTicks = remember(text) { TextRevealTimeline(text).ticks }
+    val isRevealed by remember(revealProgress, revealTicks) {
+        derivedStateOf { revealProgress == null || revealProgress() >= revealTicks }
+    }
     val loadingDescription = stringResource(LR.string.chat_quote_finding_moment)
     Column(
         verticalArrangement = Arrangement.spacedBy(4.dp),
         modifier = modifier.fillMaxWidth(),
     ) {
         Text(
-            text = shownText,
+            text = text,
             inlineContent = inlineContent,
+            onTextLayout = wipe::onTextLayout,
             color = theme.aiBubbleText,
             fontSize = 15.sp,
             lineHeight = 20.sp,
@@ -192,7 +187,7 @@ internal fun AiQuoteBubble(
                         Modifier
                     },
                 )
-                .withFullTextSemantics(shownText, text)
+                .revealedBy(wipe, text, revealProgress)
                 .then(
                     if (isLoading) {
                         Modifier.semantics { stateDescription = loadingDescription }
@@ -210,10 +205,26 @@ internal fun AiQuoteBubble(
 
 internal fun quoteTimestampText(timestampLabel: String) = if (timestampLabel.isEmpty()) "" else "($timestampLabel)"
 
-private fun Modifier.withFullTextSemantics(shownText: AnnotatedString, fullText: AnnotatedString) = if (shownText === fullText) {
-    this
-} else {
-    clearAndSetSemantics { text = fullText }
+internal fun quoteText(
+    quote: String,
+    timestampLabel: String,
+    quoteColor: Color = Color.Unspecified,
+    timestampColor: Color = Color.Unspecified,
+    isLoading: Boolean = false,
+) = buildAnnotatedString {
+    withStyle(SpanStyle(fontStyle = FontStyle.Italic, color = quoteColor)) {
+        append(quote)
+    }
+    if (timestampLabel.isNotEmpty()) {
+        append(" ")
+        withStyle(SpanStyle(color = timestampColor)) {
+            append(quoteTimestampText(timestampLabel))
+        }
+    }
+    if (isLoading) {
+        append(" ")
+        appendInlineContent(QUOTE_SPINNER_ID, alternateText = " ")
+    }
 }
 
 @Composable
