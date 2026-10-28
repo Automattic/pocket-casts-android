@@ -62,6 +62,7 @@ internal fun ChatWelcome(
     exitingSuggestion: String? = null,
     isExiting: Boolean = false,
 ) {
+    fun isTapped(text: String) = isExiting && text == exitingSuggestion
     val summarize = stringResource(LR.string.chat_suggestion_summarize)
     val sweep = rememberInfiniteTransition(label = "skeletonSweep").animateFloat(
         initialValue = 0f,
@@ -87,13 +88,18 @@ internal fun ChatWelcome(
             verticalArrangement = Arrangement.spacedBy(12.dp),
             horizontalAlignment = Alignment.End,
         ) {
-            WelcomeItem(order = 1, isExiting = isExiting, delayMillis = WELCOME_DELAY_MS + WELCOME_STAGGER_MS) {
+            WelcomeItem(
+                order = 1,
+                isExiting = isExiting,
+                delayMillis = WELCOME_DELAY_MS + WELCOME_STAGGER_MS,
+                isHeld = isTapped(summarize),
+            ) {
                 ChatSuggestionChip(
                     text = summarize,
                     enabled = isSuggestionEnabled,
                     onClick = { topInRoot -> onClickSuggestion(summarize, ChatInputType.SummaryPrompt, topInRoot) },
                     theme = theme,
-                    modifier = Modifier.hiddenIf(summarize == exitingSuggestion),
+                    modifier = Modifier.hiddenIf(isTapped(summarize)),
                 )
             }
             val slotCount = if (isLoadingStarterQuestions) maxOf(SkeletonWidthFractions.size, starterQuestions.size) else starterQuestions.size
@@ -105,11 +111,11 @@ internal fun ChatWelcome(
                         enabled = isSuggestionEnabled,
                         onClick = { topInRoot -> onClickSuggestion(text, ChatInputType.SuggestedPrompt, topInRoot) },
                         theme = theme,
-                        modifier = Modifier.hiddenIf(text == exitingSuggestion),
+                        modifier = Modifier.hiddenIf(isTapped(text)),
                     )
                 }
                 if (isExiting) {
-                    WelcomeItem(order = index + 2, isExiting = true, delayMillis = 0) {
+                    WelcomeItem(order = index + 2, isExiting = true, delayMillis = 0, isHeld = question != null && isTapped(question)) {
                         if (question != null) {
                             chip(question)
                         } else {
@@ -136,10 +142,18 @@ private fun WelcomeItem(
     order: Int,
     isExiting: Boolean,
     delayMillis: Int,
+    isHeld: Boolean = false,
     content: @Composable () -> Unit,
 ) {
-    if (isExiting) {
-        ChatFadeOut(durationMillis = WELCOME_EXIT_MS, delayMillis = order * WELCOME_EXIT_STAGGER_MS, content = content)
+    if (isHeld) {
+        content()
+    } else if (isExiting) {
+        ChatFadeOut(
+            durationMillis = WELCOME_EXIT_MS,
+            delayMillis = order * WELCOME_EXIT_STAGGER_MS,
+            easing = LinearEasing,
+            content = content,
+        )
     } else {
         ChatAppear(
             animate = true,

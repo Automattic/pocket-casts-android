@@ -9,13 +9,16 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.EaseInOut
 import androidx.compose.animation.core.EaseOut
+import androidx.compose.animation.core.Easing
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -26,6 +29,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
@@ -34,16 +38,16 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.layout.onPlaced
 import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
+import kotlin.math.roundToInt
 import kotlinx.coroutines.delay
 
 private val LocalIsReduceMotionEnabled = staticCompositionLocalOf { false }
@@ -103,13 +107,14 @@ internal fun ChatFadeOut(
     durationMillis: Int,
     modifier: Modifier = Modifier,
     delayMillis: Int = 0,
+    easing: Easing = FastOutSlowInEasing,
     content: @Composable () -> Unit,
 ) {
     val visibility = remember { MutableTransitionState(true).apply { targetState = false } }
     AnimatedVisibility(
         visibleState = visibility,
         enter = EnterTransition.None,
-        exit = if (rememberIsReduceMotionEnabled()) ExitTransition.None else fadeOut(tween(durationMillis, delayMillis = delayMillis)),
+        exit = if (rememberIsReduceMotionEnabled()) ExitTransition.None else fadeOut(tween(durationMillis, delayMillis = delayMillis, easing = easing)),
         modifier = modifier,
     ) {
         content()
@@ -117,28 +122,27 @@ internal fun ChatFadeOut(
 }
 
 @Composable
-internal fun ChatFlyIn(
-    fromTopInRoot: Float,
+internal fun ChatFlight(
+    fromY: Float,
+    toY: Float,
+    onLand: () -> Unit,
     modifier: Modifier = Modifier,
-    content: @Composable (fillAlpha: () -> Float) -> Unit,
+    content: @Composable (progress: Float) -> Unit,
 ) {
-    var distance by remember { mutableStateOf<Float?>(null) }
+    val currentOnLand by rememberUpdatedState(onLand)
     val progress = remember { Animatable(0f) }
-    LaunchedEffect(distance != null) {
-        if (distance != null) progress.animateTo(1f, tween(durationMillis = FLY_IN_DURATION_MS, easing = FastOutSlowInEasing))
+    LaunchedEffect(progress) {
+        progress.animateTo(1f, tween(durationMillis = FLY_IN_DURATION_MS, easing = EaseInOut))
+        currentOnLand()
     }
     Box(
-        modifier = modifier
-            .onPlaced { coordinates ->
-                if (distance == null) distance = fromTopInRoot - coordinates.positionInRoot().y
-            }
-            .graphicsLayer {
-                translationY = (distance ?: 0f) * (1f - progress.value)
-            },
+        modifier = modifier.offset { IntOffset(0, lerp(fromY, toY, progress.value).roundToInt()) },
     ) {
-        content { ((progress.value - FLY_IN_FILL_START) / FLY_IN_FILL_FRACTION).coerceIn(0f, 1f) }
+        content(progress.value)
     }
 }
+
+internal fun flightChipMorph(progress: Float) = 1f - ((progress - FLY_IN_FILL_START) / FLY_IN_FILL_FRACTION).coerceIn(0f, 1f)
 
 @Composable
 internal fun ChatShimmerText(

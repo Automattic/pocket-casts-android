@@ -14,6 +14,7 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -41,7 +42,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
@@ -67,6 +67,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.lerp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.LocalPodcastColors
@@ -287,8 +288,9 @@ internal fun UserMessageBubble(
     isNotSent: Boolean = false,
     isRetryEnabled: Boolean = true,
     onRetry: () -> Unit = {},
-    fillAlpha: () -> Float = { 1f },
+    chipMorph: Float = 0f,
 ) {
+    val shape = if (chipMorph == 0f) UserBubbleShape else chipMorphShape(chipMorph)
     Column(
         horizontalAlignment = Alignment.End,
         modifier = modifier.fillMaxWidth(),
@@ -314,9 +316,10 @@ internal fun UserMessageBubble(
                 lineHeight = 20.sp,
                 modifier = Modifier
                     .widthIn(max = 250.dp)
-                    .clip(UserBubbleShape)
-                    .drawBehind { drawRect(theme.userBubble, alpha = fillAlpha()) }
-                    .padding(horizontal = 16.dp, vertical = 10.dp),
+                    .clip(shape)
+                    .background(theme.userBubble.copy(alpha = theme.userBubble.alpha * (1f - chipMorph)))
+                    .then(if (chipMorph > 0f) Modifier.border(1.dp, theme.chipBorder.copy(alpha = theme.chipBorder.alpha * chipMorph), shape) else Modifier)
+                    .padding(horizontal = 16.dp, vertical = lerp(10.dp, 12.dp, chipMorph)),
             )
             if (isNotSent) {
                 ChatNotSentLabel(theme = theme)
@@ -401,6 +404,15 @@ private val LoadingPhaseExit = fadeOut(tween(durationMillis = 150)) +
     slideOutVertically(tween(durationMillis = 150, easing = EaseOut)) { height -> -height * 3 / 20 }
 
 private val UserBubbleShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp, bottomEnd = 4.dp, bottomStart = 16.dp)
+
+private fun chipMorphShape(chipMorph: Float) = RoundedCornerShape(
+    topStart = lerp(16.dp, ChipCornerRadius, chipMorph),
+    topEnd = lerp(16.dp, ChipCornerRadius, chipMorph),
+    bottomEnd = lerp(4.dp, ChipCornerRadius, chipMorph),
+    bottomStart = lerp(16.dp, ChipCornerRadius, chipMorph),
+)
+
+private val ChipCornerRadius = 22.dp
 
 @Preview
 @Composable
