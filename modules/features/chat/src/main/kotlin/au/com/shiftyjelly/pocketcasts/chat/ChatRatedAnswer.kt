@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.chat
 
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatMessage
+import java.text.BreakIterator
 
 internal data class ChatRatedAnswer(
     val question: String?,
@@ -29,8 +30,8 @@ internal fun List<ChatMessage>.ratedAnswer(answerUuid: String): ChatRatedAnswer?
 
 internal fun String.truncatedForAnalytics(): String {
     if (length <= MAX_ANALYTICS_TEXT_LENGTH) return this
-    val end = if (this[MAX_ANALYTICS_TEXT_LENGTH - 1].isHighSurrogate()) MAX_ANALYTICS_TEXT_LENGTH - 1 else MAX_ANALYTICS_TEXT_LENGTH
-    return substring(0, end)
+    val characters = BreakIterator.getCharacterInstance().apply { setText(this@truncatedForAnalytics) }
+    return substring(0, characters.preceding(MAX_ANALYTICS_TEXT_LENGTH + 1).coerceAtLeast(0))
 }
 
 private const val MAX_ANALYTICS_TEXT_LENGTH = 1000
