@@ -433,6 +433,44 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `starter questions show as loading until they arrive`() = runTest {
+        val questions = CompletableDeferred<List<String>>()
+        chatManager.starterQuestionsResult = questions
+        setEpisodeInfo()
+        runCurrent()
+
+        assertTrue(viewModel.uiState.value.isLoadingStarterQuestions)
+
+        questions.complete(listOf("Who is the guest?"))
+        advanceUntilIdle()
+
+        assertFalse(viewModel.uiState.value.isLoadingStarterQuestions)
+        assertEquals(listOf("Who is the guest?"), viewModel.uiState.value.starterQuestions)
+    }
+
+    @Test
+    fun `failed starter questions stop loading`() = runTest {
+        setEpisodeInfo()
+        advanceUntilIdle()
+
+        assertFalse(viewModel.uiState.value.isLoadingStarterQuestions)
+        assertTrue(viewModel.uiState.value.starterQuestions.isEmpty())
+    }
+
+    @Test
+    fun `switching episodes while starter questions load stops loading`() = runTest {
+        chatManager.starterQuestionsResult = CompletableDeferred()
+        setEpisodeInfo()
+        runCurrent()
+        chatManager.otherMessages.value = listOf(ChatMessage.User(text = "Q1", uuid = "q1"))
+
+        viewModel.openHistoryChat(historyItem(OTHER_EPISODE_UUID))
+        runCurrent()
+
+        assertFalse(viewModel.uiState.value.isLoadingStarterQuestions)
+    }
+
+    @Test
     fun `a chat with messages does not load the starter questions`() = runTest {
         chatManager.messages.value = listOf(ChatMessage.User(text = "Q1", uuid = "q1"))
         setEpisodeInfo()
@@ -490,6 +528,46 @@ class ChatViewModelTest {
         connectToInternet()
 
         assertEquals(1, chatManager.starterQuestionRequests.size)
+    }
+
+    @Test
+    fun `follow-up click sends it as a follow-up`() = runTest {
+        setEpisodeInfo()
+        connectToInternet()
+
+        viewModel.onSuggestionClick("Who is the guest?", ChatInputType.FollowUp)
+        advanceUntilIdle()
+
+        assertEquals(SendMessage(EPISODE_UUID, "Who is the guest?"), chatManager.sentMessages.single())
+        eventSink.skipEvent()
+        assertEquals(EpisodeChatInputType.FollowUp, (eventSink.pollEvent() as EpisodeChatMessageSentEvent).inputType)
+    }
+
+    @Test
+    fun `follow-ups come from the latest answer`() {
+        val state = ChatUiState(
+            messages = listOf(
+                ChatMessage.User(text = "Q1", uuid = "q1"),
+                ChatMessage.Assistant(text = "A1", followUps = listOf("Old"), uuid = "a1"),
+                ChatMessage.User(text = "Q2", uuid = "q2"),
+                ChatMessage.Assistant(text = "A2", followUps = listOf("New"), uuid = "a2"),
+                ChatMessage.Quote(text = "Quote", start = "00:01", end = "00:02", uuid = "quote"),
+            ),
+        )
+
+        assertEquals(listOf("New"), state.followUps)
+    }
+
+    @Test
+    fun `follow-ups hide while a question waits for its answer`() {
+        val answered = listOf(
+            ChatMessage.User(text = "Q1", uuid = "q1"),
+            ChatMessage.Assistant(text = "A1", followUps = listOf("Old"), uuid = "a1"),
+        )
+
+        assertEquals(emptyList<String>(), ChatUiState(messages = answered, isAwaitingReply = true).followUps)
+        val unanswered = answered + ChatMessage.User(text = "Q2", uuid = "q2")
+        assertEquals(emptyList<String>(), ChatUiState(messages = unanswered).followUps)
     }
 
     @Test
@@ -3376,9 +3454,11 @@ class ChatViewModelTest {
         var starterQuestions = emptyList<String>()
         val starterQuestionRequests = mutableListOf<CreateChat>()
 
+        var starterQuestionsResult: CompletableDeferred<List<String>>? = null
+
         override suspend fun getStarterQuestions(episodeUuid: String, podcastUuid: String): List<String> {
             starterQuestionRequests += CreateChat(episodeUuid, podcastUuid)
-            return starterQuestions
+            return starterQuestionsResult?.await() ?: starterQuestions
         }
 
         val discardedMessageUuids = mutableListOf<String>()

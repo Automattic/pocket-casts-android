@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.chat
 
 import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeChatDao
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeChat
+import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeChatMessage
 import au.com.shiftyjelly.pocketcasts.models.to.EpisodeChatHistoryItem
 import au.com.shiftyjelly.pocketcasts.servers.podcast.ConversationMessage
 import au.com.shiftyjelly.pocketcasts.servers.podcast.EpisodeChatQuote
@@ -31,10 +32,11 @@ class ChatManagerImpl @Inject constructor(
 ) : ChatManager {
     private val quoteMetadataAdapter = moshi.adapter(QuoteMetadata::class.java)
     private val userMetadataAdapter = moshi.adapter(UserMessageMetadata::class.java)
+    private val assistantMetadataAdapter = moshi.adapter(AssistantMessageMetadata::class.java)
     private val starterQuestions = ConcurrentHashMap<String, List<String>>()
 
     override fun observeMessages(episodeUuid: String): Flow<List<ChatMessage>> {
-        return episodeChatDao.observeMessages(episodeUuid).map { it.toChatMessages(quoteMetadataAdapter, userMetadataAdapter) }
+        return episodeChatDao.observeMessages(episodeUuid).map { it.toChatMessages() }
     }
 
     override fun observeHistory(): Flow<List<EpisodeChatHistoryItem>> {
@@ -55,7 +57,7 @@ class ChatManagerImpl @Inject constructor(
         message: ChatMessage.User,
         allMessages: List<ChatMessage>,
     ) {
-        val question = message.copy(failure = null).toEntity(episodeUuid, quoteMetadataAdapter, userMetadataAdapter)
+        val question = message.copy(failure = null).toEntity(episodeUuid)
         episodeChatDao.insertMessage(question)
         val reply = try {
             requestReply(episodeUuid, podcastUuid, message, allMessages)
@@ -63,12 +65,15 @@ class ChatManagerImpl @Inject constructor(
             throw e
         } catch (e: Exception) {
             val failure = if (e is IOException) ChatSendFailure.Network else ChatSendFailure.Server
-            val failedQuestion = message.copy(failure = failure).toEntity(episodeUuid, quoteMetadataAdapter, userMetadataAdapter)
+            val failedQuestion = message.copy(failure = failure).toEntity(episodeUuid)
             runCatching { episodeChatDao.insertMessage(failedQuestion.copy(createdAt = question.createdAt)) }
             throw e
         }
 
-        val aiReply = ChatMessage.Assistant(text = reply.reply)
+        val aiReply = ChatMessage.Assistant(
+            text = reply.reply,
+            followUps = reply.suggestedQuestions.orEmpty().map(String::trim).filter(String::isNotEmpty).distinct(),
+        )
         val replies = listOfNotNull(
             aiReply,
             reply.quote?.toQuoteMessage(),
@@ -76,7 +81,7 @@ class ChatManagerImpl @Inject constructor(
         val createdAtMs = maxOf(System.currentTimeMillis(), question.createdAt.time + 1)
         episodeChatDao.insertMessages(
             replies.mapIndexed { index, chatMessage ->
-                chatMessage.toEntity(episodeUuid, quoteMetadataAdapter, userMetadataAdapter)
+                chatMessage.toEntity(episodeUuid)
                     .copy(createdAt = Date(createdAtMs + index))
             },
         )
@@ -152,7 +157,7 @@ class ChatManagerImpl @Inject constructor(
 
     override suspend fun clearMessages(episodeUuid: String): ClearedChat {
         val entities = episodeChatDao.takeMessages(episodeUuid)
-        return StoredClearedChat(entities, entities.toChatMessages(quoteMetadataAdapter, userMetadataAdapter))
+        return StoredClearedChat(entities, entities.toChatMessages())
     }
 
     override suspend fun restoreMessages(clearedChat: ClearedChat) {
@@ -168,6 +173,19 @@ class ChatManagerImpl @Inject constructor(
     override suspend fun deleteAllChats() {
         episodeChatDao.deleteAllChats()
     }
+
+    private fun List<EpisodeChatMessage>.toChatMessages() = toChatMessages(
+        quoteMetadataAdapter,
+        userMetadataAdapter,
+        assistantMetadataAdapter,
+    )
+
+    private fun ChatMessage.toEntity(episodeUuid: String) = toEntity(
+        episodeUuid,
+        quoteMetadataAdapter,
+        userMetadataAdapter,
+        assistantMetadataAdapter,
+    )
 
     private companion object {
         const val LOG_TAG = "EpisodeChat"
