@@ -164,12 +164,8 @@ class ChaptersViewModel @AssistedInject constructor(
         }
     }
 
-    private val _generatedChaptersTurnedOff = MutableSharedFlow<Unit>()
-    val generatedChaptersTurnedOff = _generatedChaptersTurnedOff.asSharedFlow()
-
     fun turnOffGeneratedChapters() {
         setShowGeneratedChapters(false)
-        viewModelScope.launch { _generatedChaptersTurnedOff.emit(Unit) }
     }
 
     fun turnOnGeneratedChapters() {

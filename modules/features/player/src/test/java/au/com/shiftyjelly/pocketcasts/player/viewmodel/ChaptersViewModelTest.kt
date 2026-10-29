@@ -439,16 +439,6 @@ class ChaptersViewModelTest {
     }
 
     @Test
-    fun `turn off generated chapters emits a single turned off event`() = runTest {
-        chaptersViewModel.generatedChaptersTurnedOff.test {
-            chaptersViewModel.turnOffGeneratedChapters()
-
-            assertEquals(Unit, awaitItem())
-            expectNoEvents()
-        }
-    }
-
-    @Test
     fun `turn on generated chapters enables the setting and tracks it`() = runTest {
         chaptersViewModel.turnOffGeneratedChapters()
         eventSink.pollEvent()

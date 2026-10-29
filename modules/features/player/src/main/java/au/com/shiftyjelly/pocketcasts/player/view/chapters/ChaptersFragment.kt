@@ -74,7 +74,7 @@ class ChaptersFragment : BaseFragment() {
                     showSubscriptionIcon = state.showSubscriptionIcon,
                     onChapterClick = viewModel::playChapter,
                     onSkipChaptersClick = viewModel::enableTogglingOrUpsell,
-                    onTurnOffGeneratedClick = viewModel::turnOffGeneratedChapters,
+                    onTurnOffGeneratedClick = ::turnOffGeneratedChapters,
                     onSelectionChange = viewModel::selectChapter,
                     onUrlClick = ::openChapterUrl,
                     resolvingChapterIndex = resolvingChapterIndex,
@@ -97,12 +97,6 @@ class ChaptersFragment : BaseFragment() {
                 LaunchedEffect(Unit) {
                     viewModel.showUpsell.collect {
                         showUpsell()
-                    }
-                }
-
-                LaunchedEffect(Unit) {
-                    viewModel.generatedChaptersTurnedOff.collect {
-                        showGeneratedChaptersTurnedOff()
                     }
                 }
             }
@@ -138,7 +132,9 @@ class ChaptersFragment : BaseFragment() {
         OnboardingLauncher.openOnboardingFlow(requireActivity(), onboardingFlow)
     }
 
-    private fun showGeneratedChaptersTurnedOff() {
+    private fun turnOffGeneratedChapters() {
+        val viewModel = viewModel
+        viewModel.turnOffGeneratedChapters()
         val snackBarView = (activity as? FragmentHostListener)?.snackBarView() ?: return
         Snackbar.make(snackBarView, getString(LR.string.chapters_generated_turned_off), Snackbar.LENGTH_LONG)
             .setAction(LR.string.chapters_generated_undo) { viewModel.turnOnGeneratedChapters() }
