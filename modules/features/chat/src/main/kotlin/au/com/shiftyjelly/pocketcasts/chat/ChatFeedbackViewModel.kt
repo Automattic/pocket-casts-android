@@ -9,7 +9,6 @@ import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.eventhorizon.EpisodeChatFeedbackFormDismissedEvent
 import com.automattic.eventhorizon.EpisodeChatFeedbackFormShownEvent
 import com.automattic.eventhorizon.EpisodeChatFeedbackReasonType
-import com.automattic.eventhorizon.EpisodeChatFeedbackSubmitTappedEvent
 import com.automattic.eventhorizon.EpisodeChatFeedbackSubmittedEvent
 import com.automattic.eventhorizon.EpisodeChatFeedbackTriggerType
 import com.automattic.eventhorizon.EventHorizon
@@ -103,17 +102,6 @@ class ChatFeedbackViewModel @Inject constructor(
         val reason = state.reason ?: return
         if (isSubmitted) return
         val details = state.detailsToSend
-        eventHorizon.track(
-            EpisodeChatFeedbackSubmitTappedEvent(
-                source = sourceView.analyticsValue,
-                episodeUuid = episodeUuid,
-                podcastUuid = podcastUuid,
-                trigger = trigger,
-                messageIndex = messageIndex,
-                reason = reason.analyticsValue,
-                hasDetails = details.isNotEmpty(),
-            ),
-        )
         isSubmitted = true
         _submitted.trySend(Unit)
         applicationScope.launch {

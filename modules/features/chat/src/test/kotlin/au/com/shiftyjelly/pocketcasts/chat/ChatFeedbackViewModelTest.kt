@@ -14,7 +14,6 @@ import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import com.automattic.eventhorizon.EpisodeChatFeedbackFormDismissedEvent
 import com.automattic.eventhorizon.EpisodeChatFeedbackFormShownEvent
 import com.automattic.eventhorizon.EpisodeChatFeedbackReasonType
-import com.automattic.eventhorizon.EpisodeChatFeedbackSubmitTappedEvent
 import com.automattic.eventhorizon.EpisodeChatFeedbackSubmittedEvent
 import com.automattic.eventhorizon.EpisodeChatFeedbackTriggerType
 import com.automattic.eventhorizon.EventHorizon
@@ -101,7 +100,6 @@ class ChatFeedbackViewModelTest {
         viewModel.submit()
         advanceUntilIdle()
 
-        assertTrue(eventSink.pollEvent() is EpisodeChatFeedbackSubmitTappedEvent)
         assertEquals(
             EpisodeChatFeedbackSubmittedEvent(
                 source = SourceView.PLAYER.analyticsValue,
@@ -127,17 +125,6 @@ class ChatFeedbackViewModelTest {
         viewModel.submit()
         advanceUntilIdle()
 
-        assertEquals(
-            EpisodeChatFeedbackSubmitTappedEvent(
-                source = SourceView.PLAYER.analyticsValue,
-                episodeUuid = EPISODE_UUID,
-                podcastUuid = PODCAST_UUID,
-                trigger = EpisodeChatFeedbackTriggerType.SessionSurvey,
-                reason = EpisodeChatFeedbackReasonType.Offensive,
-                hasDetails = false,
-            ),
-            eventSink.pollEvent(),
-        )
         assertNull((eventSink.pollEvent() as EpisodeChatFeedbackSubmittedEvent).details)
     }
 
@@ -154,7 +141,6 @@ class ChatFeedbackViewModelTest {
         viewModel.onDismissed()
         advanceUntilIdle()
 
-        assertTrue(eventSink.pollEvent() is EpisodeChatFeedbackSubmitTappedEvent)
         assertTrue(eventSink.pollEvent() is EpisodeChatFeedbackSubmittedEvent)
         assertTrue(eventSink.isEmpty())
     }
@@ -199,15 +185,6 @@ class ChatFeedbackViewModelTest {
                     trigger = EpisodeChatFeedbackTriggerType.ResponseRating,
                     messageIndex = 1,
                 ),
-                EpisodeChatFeedbackSubmitTappedEvent(
-                    source = SourceView.PLAYER.analyticsValue,
-                    episodeUuid = EPISODE_UUID,
-                    podcastUuid = PODCAST_UUID,
-                    trigger = EpisodeChatFeedbackTriggerType.ResponseRating,
-                    reason = EpisodeChatFeedbackReasonType.WrongFacts,
-                    hasDetails = false,
-                    messageIndex = 1,
-                ),
                 EpisodeChatFeedbackSubmittedEvent(
                     source = SourceView.PLAYER.analyticsValue,
                     episodeUuid = EPISODE_UUID,
@@ -233,7 +210,6 @@ class ChatFeedbackViewModelTest {
 
         viewModel.submit()
         advanceUntilIdle()
-        eventSink.skipEvent()
 
         val event = eventSink.pollEvent() as EpisodeChatFeedbackSubmittedEvent
         assertEquals("Not useful", event.details)
@@ -254,7 +230,6 @@ class ChatFeedbackViewModelTest {
 
         viewModel.submit()
         advanceUntilIdle()
-        eventSink.skipEvent()
 
         val event = eventSink.pollEvent() as EpisodeChatFeedbackSubmittedEvent
         assertNull(event.question)
@@ -280,7 +255,6 @@ class ChatFeedbackViewModelTest {
         viewModelStore.clear()
         messagesGate?.complete(Unit)
         advanceUntilIdle()
-        eventSink.skipEvent()
 
         val event = eventSink.pollEvent() as EpisodeChatFeedbackSubmittedEvent
         assertEquals("Question", event.question)
