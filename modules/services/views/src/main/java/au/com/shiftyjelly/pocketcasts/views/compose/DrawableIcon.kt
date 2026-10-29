@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.graphics.createBitmap
+import androidx.core.graphics.withTranslation
 
 @Composable
 internal fun DrawableIcon(
@@ -38,6 +39,31 @@ internal fun DrawableIcon(
                 drawable.setTintList(tint?.let { ColorStateList.valueOf(it.toArgb()) })
                 drawable.setBounds(0, 0, size.width.toInt(), size.height.toInt())
                 drawIntoCanvas { drawable.draw(it.nativeCanvas) }
+            }
+        },
+    )
+}
+
+@Composable
+internal fun FitCenterDrawableIcon(
+    @DrawableRes drawableId: Int,
+    tint: Color,
+    modifier: Modifier = Modifier,
+) {
+    val context = LocalContext.current
+    val drawable = remember(drawableId, context) { AppCompatResources.getDrawable(context, drawableId)?.mutate() }
+    Spacer(
+        modifier.drawBehind {
+            if (drawable != null) {
+                val scale = minOf(1f * size.width / drawable.intrinsicWidth, 1f * size.height / drawable.intrinsicHeight)
+                drawable.setTintList(ColorStateList.valueOf(tint.toArgb()))
+                drawable.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
+                drawIntoCanvas { canvas ->
+                    canvas.nativeCanvas.withTranslation((size.width - drawable.intrinsicWidth * scale) / 2f, (size.height - drawable.intrinsicHeight * scale) / 2f) {
+                        scale(scale, scale)
+                        drawable.draw(this)
+                    }
+                }
             }
         },
     )
