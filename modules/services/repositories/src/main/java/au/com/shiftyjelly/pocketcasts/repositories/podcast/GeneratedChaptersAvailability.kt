@@ -25,7 +25,8 @@ class GeneratedChaptersAvailability @Inject constructor(
         isAvailable && showGeneratedChapters
     }.distinctUntilChanged()
 
-    fun isAllowed(): Boolean = FeatureFlag.isEnabled(Feature.GENERATED_CHAPTERS) &&
-        settings.cachedSubscription.value != null &&
-        settings.showGeneratedChapters.value
+    fun isAvailable(): Boolean = FeatureFlag.isEnabled(Feature.GENERATED_CHAPTERS) &&
+        settings.cachedSubscription.value != null
+
+    fun isAllowed(): Boolean = isAvailable() && settings.showGeneratedChapters.value
 }

@@ -25,6 +25,7 @@ class GeneratedChaptersAvailabilityTest {
     fun `not allowed for free users`() = runTest {
         val fixture = GeneratedChaptersFixture(initialSubscription = null)
 
+        assertFalse(fixture.availability.isAvailable())
         assertFalse(fixture.availability.isAllowed())
         fixture.availability.isAvailableFlow.test { assertFalse(awaitItem()) }
         fixture.availability.isAllowedFlow.test { assertFalse(awaitItem()) }
@@ -62,6 +63,7 @@ class GeneratedChaptersAvailabilityTest {
     fun `available but not allowed when the setting is off`() = runTest {
         val fixture = GeneratedChaptersFixture(initialShowGeneratedChapters = false)
 
+        assertTrue(fixture.availability.isAvailable())
         assertFalse(fixture.availability.isAllowed())
         fixture.availability.isAvailableFlow.test { assertTrue(awaitItem()) }
         fixture.availability.isAllowedFlow.test { assertFalse(awaitItem()) }
