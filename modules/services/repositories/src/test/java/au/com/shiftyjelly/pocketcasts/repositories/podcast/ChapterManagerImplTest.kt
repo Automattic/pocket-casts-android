@@ -8,8 +8,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.models.to.ChapterOrigin
 import au.com.shiftyjelly.pocketcasts.models.to.Chapters
 import au.com.shiftyjelly.pocketcasts.models.to.DbChapter
-import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintTimingManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
@@ -26,7 +25,6 @@ import okhttp3.HttpUrl.Companion.toHttpUrl
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
@@ -36,13 +34,7 @@ class ChapterManagerImplTest {
 
     private val chapterDao = mock<ChapterDao>()
     private val episodeManager = mock<EpisodeManager>()
-    private val showGeneratedChaptersFlow = MutableStateFlow(true)
-    private val showGeneratedChaptersSetting = mock<UserSetting<Boolean>> {
-        on { flow } doReturn showGeneratedChaptersFlow
-    }
-    private val settings = mock<Settings> {
-        on { showGeneratedChapters } doReturn showGeneratedChaptersSetting
-    }
+    private val generatedChapters = GeneratedChaptersFixture()
 
     // Non-Phone platform keeps alignment off, so these tests observe the raw reference timeline.
     private val chapterManager = ChapterManagerImpl(
@@ -50,7 +42,7 @@ class ChapterManagerImplTest {
         episodeManager = episodeManager,
         fingerprintTimingManager = Lazy { mock<FingerprintTimingManager>() },
         appPlatform = AppPlatform.Automotive,
-        settings = settings,
+        generatedChaptersAvailability = generatedChapters.availability,
     )
 
     @Test
@@ -854,7 +846,7 @@ class ChapterManagerImplTest {
     @Test
     fun `observe hides generated chapters when feature is on but the setting is off`() = runBlocking {
         FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
-        showGeneratedChaptersFlow.value = false
+        generatedChapters.showGeneratedChaptersFlow.value = false
         val episode = PodcastEpisode("id", publishedDate = Date(), duration = 0.002)
 
         whenever(chapterDao.observeChaptersForEpisode("id")).thenReturn(flowOf(generatedChaptersFixture))
@@ -878,11 +870,61 @@ class ChapterManagerImplTest {
         chapterManager.observerChaptersForEpisode("id").test {
             assertEquals(listOf("Embedded", "Generated"), awaitItem().map { it.title })
 
-            showGeneratedChaptersFlow.value = false
+            generatedChapters.showGeneratedChaptersFlow.value = false
             assertEquals(listOf("Embedded"), awaitItem().map { it.title })
 
-            showGeneratedChaptersFlow.value = true
+            generatedChapters.showGeneratedChaptersFlow.value = true
             assertEquals(listOf("Embedded", "Generated"), awaitItem().map { it.title })
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `observe hides generated chapters from free users`() = runBlocking {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        generatedChapters.subscriptionFlow.value = null
+        val episode = PodcastEpisode("id", publishedDate = Date(), duration = 0.002)
+
+        whenever(chapterDao.observeChaptersForEpisode("id")).thenReturn(flowOf(generatedChaptersFixture))
+        whenever(episodeManager.findEpisodeByUuidFlow("id")).thenReturn(flowOf(episode))
+
+        chapterManager.observerChaptersForEpisode("id").test {
+            assertEquals(listOf("Embedded"), awaitItem().map { it.title })
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `observe keeps generated chapters for Patron users`() = runBlocking {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        generatedChapters.subscriptionFlow.value = testSubscription(SubscriptionTier.Patron)
+        val episode = PodcastEpisode("id", publishedDate = Date(), duration = 0.002)
+
+        whenever(chapterDao.observeChaptersForEpisode("id")).thenReturn(flowOf(generatedChaptersFixture))
+        whenever(episodeManager.findEpisodeByUuidFlow("id")).thenReturn(flowOf(episode))
+
+        chapterManager.observerChaptersForEpisode("id").test {
+            assertEquals(listOf("Embedded", "Generated"), awaitItem().map { it.title })
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `observe hides generated chapters when Plus lapses`() = runBlocking {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        val episode = PodcastEpisode("id", publishedDate = Date(), duration = 0.002)
+
+        whenever(chapterDao.observeChaptersForEpisode("id")).thenReturn(flowOf(generatedChaptersFixture))
+        whenever(episodeManager.findEpisodeByUuidFlow("id")).thenReturn(flowOf(episode))
+
+        chapterManager.observerChaptersForEpisode("id").test {
+            assertEquals(listOf("Embedded", "Generated"), awaitItem().map { it.title })
+
+            generatedChapters.subscriptionFlow.value = null
+            assertEquals(listOf("Embedded"), awaitItem().map { it.title })
 
             cancelAndIgnoreRemainingEvents()
         }

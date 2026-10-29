@@ -7,7 +7,10 @@ import au.com.shiftyjelly.pocketcasts.models.to.DbChapter
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptEntry
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptType
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.GeneratedChaptersFixture
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.testSubscription
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.HtmlParser.ScriptDetectedException
 import au.com.shiftyjelly.pocketcasts.servers.podcast.TranscriptService
 import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
@@ -55,6 +58,7 @@ class TranscriptManagerTest {
     private val chapterManager: ChapterManager = mock<ChapterManager> {
         on { observerChaptersForEpisode(any()) } doReturn flowOf(Chapters(emptyList()))
     }.also { runBlocking { whenever(it.hasChapters(any())).thenReturn(false) } }
+    private val generatedChapters = GeneratedChaptersFixture()
 
     private val vttDbTranscript = createDbTranscript("text/vtt")
     private val srtDbTranscript = createDbTranscript("application/srt")
@@ -76,6 +80,7 @@ class TranscriptManagerTest {
             )
         },
         chapterManager = chapterManager,
+        generatedChaptersAvailability = generatedChapters.availability,
         moshi = Moshi.Builder().build(),
         parsers = parsers,
     )
@@ -441,6 +446,7 @@ class TranscriptManagerTest {
                 on { findByUuid(any()) } doReturn PodcastEpisode(uuid = "episode-id", podcastUuid = "podcast-id", publishedDate = Date())
             },
             chapterManager = chapterManagerWithExisting,
+            generatedChaptersAvailability = generatedChapters.availability,
             moshi = Moshi.Builder().build(),
             parsers = parsers,
         )
@@ -471,6 +477,56 @@ class TranscriptManagerTest {
 
         assertEquals(0, service.metaRequestCount)
         verify(chapterManager, never()).updateChapters(any(), any())
+    }
+
+    @Test
+    fun `do not fetch meta for free users`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        generatedChapters.subscriptionFlow.value = null
+        localTranscriptsFlow.value = listOf(generatedVttTranscript)
+        service.metaJsonResponse = META_JSON_WITH_CHAPTERS
+
+        assertTrue(transcriptManager.loadGeneratedChapters("episode-id"))
+
+        assertEquals(0, service.metaRequestCount)
+        verify(chapterManager, never()).updateChapters(any(), any())
+    }
+
+    @Test
+    fun `do not fetch meta when the generated chapters setting is off`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        generatedChapters.showGeneratedChaptersFlow.value = false
+        localTranscriptsFlow.value = listOf(generatedVttTranscript)
+        service.metaJsonResponse = META_JSON_WITH_CHAPTERS
+
+        assertTrue(transcriptManager.loadGeneratedChapters("episode-id"))
+
+        assertEquals(0, service.metaRequestCount)
+    }
+
+    @Test
+    fun `fetch meta for Patron users`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        generatedChapters.subscriptionFlow.value = testSubscription(SubscriptionTier.Patron)
+        localTranscriptsFlow.value = listOf(generatedVttTranscript)
+        service.metaJsonResponse = META_JSON_WITH_CHAPTERS
+
+        assertTrue(transcriptManager.loadGeneratedChapters("episode-id"))
+
+        assertEquals(1, service.metaRequestCount)
+    }
+
+    @Test
+    fun `stop fetching meta after Plus lapses`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        localTranscriptsFlow.value = listOf(generatedVttTranscript)
+        service.metaJsonResponse = META_JSON_WITH_CHAPTERS
+
+        transcriptManager.loadGeneratedChapters("episode-id")
+        generatedChapters.subscriptionFlow.value = null
+        transcriptManager.loadGeneratedChapters("episode-id")
+
+        assertEquals(1, service.metaRequestCount)
     }
 
     @Test
