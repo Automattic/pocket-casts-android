@@ -95,6 +95,7 @@ import kotlin.math.roundToInt
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
@@ -296,25 +297,28 @@ private fun ChatContent(
             isFollowingNewest = true
         }
     }
-    val smoothFollowMaxPx = with(LocalDensity.current) { SmoothFollowMaxDistance.roundToPx() }
+    val smoothFollowMaxPx by rememberUpdatedState(with(LocalDensity.current) { SmoothFollowMaxDistance.roundToPx() })
+    val isSmoothFollowEnabled by rememberUpdatedState(!isReduceMotionEnabled)
     var hasFollowed by remember { mutableStateOf(false) }
-    LaunchedEffect(uiState.messages.size, uiState.isAwaitingReply, scrollState.maxValue) {
-        if (isFollowingNewest && !isUserScrolling) {
-            val distance = scrollState.maxValue - scrollState.value
-            val isSmooth = hasFollowed && distance in 1..smoothFollowMaxPx && !isReduceMotionEnabled
-            if (scrollState.maxValue > 0) hasFollowed = true
-            isAutoScrolling = true
-            try {
-                if (isSmooth) {
-                    scrollState.animateScrollTo(
-                        scrollState.maxValue,
-                        tween(durationMillis = SMOOTH_FOLLOW_MS, easing = EaseOut),
-                    )
-                } else {
-                    scrollState.scrollTo(scrollState.maxValue)
+    LaunchedEffect(uiState.messages.size, uiState.isAwaitingReply) {
+        snapshotFlow { scrollState.maxValue }.collectLatest { maxValue ->
+            if (isFollowingNewest && !isUserScrolling) {
+                val distance = maxValue - scrollState.value
+                val isSmooth = hasFollowed && distance in 1..smoothFollowMaxPx && isSmoothFollowEnabled
+                if (maxValue > 0) hasFollowed = true
+                isAutoScrolling = true
+                try {
+                    if (isSmooth) {
+                        scrollState.animateScrollTo(
+                            maxValue,
+                            tween(durationMillis = SMOOTH_FOLLOW_MS, easing = EaseOut),
+                        )
+                    } else {
+                        scrollState.scrollTo(maxValue)
+                    }
+                } finally {
+                    isAutoScrolling = false
                 }
-            } finally {
-                isAutoScrolling = false
             }
         }
     }
@@ -382,7 +386,7 @@ private fun ChatContent(
                         UserMessageBubble(
                             text = flight.text,
                             theme = theme,
-                            chipMorph = flightChipMorph(progress),
+                            chipMorph = { flightChipMorph(progress()) },
                         )
                     }
                 }

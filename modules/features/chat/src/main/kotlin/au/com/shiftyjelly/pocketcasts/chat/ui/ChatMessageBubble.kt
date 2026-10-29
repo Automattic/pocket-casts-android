@@ -14,7 +14,6 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -41,8 +40,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawOutline
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.inset
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -65,15 +69,19 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
+import androidx.compose.ui.unit.offset
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.LocalPodcastColors
 import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
+import kotlin.math.ceil
 import kotlinx.coroutines.delay
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -289,9 +297,9 @@ internal fun UserMessageBubble(
     isNotSent: Boolean = false,
     isRetryEnabled: Boolean = true,
     onRetry: () -> Unit = {},
-    chipMorph: Float = 0f,
+    chipMorph: () -> Float = { 0f },
 ) {
-    val shape = if (chipMorph == 0f) UserBubbleShape else chipMorphShape(chipMorph)
+    val isChipWidth by remember(chipMorph) { derivedStateOf { chipMorph() >= CHIP_WIDTH_MORPH_POINT } }
     Column(
         horizontalAlignment = Alignment.End,
         modifier = modifier.fillMaxWidth(),
@@ -316,11 +324,10 @@ internal fun UserMessageBubble(
                 fontSize = 15.sp,
                 lineHeight = 20.sp,
                 modifier = Modifier
-                    .widthIn(max = if (chipMorph >= CHIP_WIDTH_MORPH_POINT) Dp.Unspecified else UserBubbleMaxWidth)
-                    .clip(shape)
-                    .background(theme.userBubble.copy(alpha = theme.userBubble.alpha * (1f - chipMorph)))
-                    .then(if (chipMorph > 0f) Modifier.border(1.dp, theme.chipBorder.copy(alpha = theme.chipBorder.alpha * chipMorph), shape) else Modifier)
-                    .padding(horizontal = 16.dp, vertical = lerp(10.dp, 12.dp, chipMorph)),
+                    .widthIn(max = if (isChipWidth) Dp.Unspecified else UserBubbleMaxWidth)
+                    .drawBehind { drawUserBubble(chipMorph(), theme) }
+                    .padding(horizontal = 16.dp)
+                    .verticalPadding { lerp(10.dp, 12.dp, chipMorph()) },
             )
             if (isNotSent) {
                 ChatNotSentLabel(theme = theme)
@@ -406,6 +413,32 @@ private val LoadingPhaseExit = fadeOut(tween(durationMillis = 150)) +
 
 private val UserBubbleShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp, bottomEnd = 4.dp, bottomStart = 16.dp)
 
+private fun DrawScope.drawUserBubble(chipMorph: Float, theme: ChatTheme) {
+    val shape = if (chipMorph == 0f) UserBubbleShape else chipMorphShape(chipMorph)
+    drawOutline(
+        outline = shape.createOutline(size, layoutDirection, this),
+        color = theme.userBubble.copy(alpha = theme.userBubble.alpha * (1f - chipMorph)),
+    )
+    if (chipMorph > 0f) {
+        val strokeWidth = ceil(ChipBorderWidth.toPx())
+        inset(strokeWidth / 2) {
+            drawOutline(
+                outline = shape.createOutline(size, layoutDirection, this),
+                color = theme.chipBorder.copy(alpha = theme.chipBorder.alpha * chipMorph),
+                style = Stroke(strokeWidth),
+            )
+        }
+    }
+}
+
+private fun Modifier.verticalPadding(padding: Density.() -> Dp) = layout { measurable, constraints ->
+    val vertical = padding().roundToPx()
+    val placeable = measurable.measure(constraints.offset(vertical = -vertical * 2))
+    layout(placeable.width, constraints.constrainHeight(placeable.height + vertical * 2)) {
+        placeable.place(0, vertical)
+    }
+}
+
 private fun chipMorphShape(chipMorph: Float) = RoundedCornerShape(
     topStart = lerp(16.dp, ChipCornerRadius, chipMorph),
     topEnd = lerp(16.dp, ChipCornerRadius, chipMorph),
@@ -414,6 +447,7 @@ private fun chipMorphShape(chipMorph: Float) = RoundedCornerShape(
 )
 
 private val ChipCornerRadius = 22.dp
+private val ChipBorderWidth = 1.dp
 private val UserBubbleMaxWidth = 250.dp
 private const val CHIP_WIDTH_MORPH_POINT = 0.5f
 
