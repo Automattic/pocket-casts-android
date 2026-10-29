@@ -1,9 +1,12 @@
 package au.com.shiftyjelly.pocketcasts.chat.ui
 
+import android.os.SystemClock
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.EaseOut
 import androidx.compose.animation.core.InfiniteTransition
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
@@ -12,6 +15,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.interaction.DragInteraction
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,6 +24,7 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -49,9 +54,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onPlaced
+import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -59,6 +68,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
@@ -67,6 +77,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.chat.ChatError
@@ -80,6 +91,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatAnswerRating
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatInputType
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatMessage
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
+import kotlin.math.roundToInt
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filter
@@ -129,8 +143,10 @@ fun ChatScreen(
     }
     var seenBeforeHistoryUuids by remember { mutableStateOf(emptySet<String>()) }
     var pendingQuestionUuid by remember { mutableStateOf<String?>(null) }
+    var flyingSuggestion by remember { mutableStateOf<FlyingSuggestion?>(null) }
     LaunchedEffect(uiState.isHistoryVisible) {
         if (uiState.isHistoryVisible) {
+            flyingSuggestion = flyingSuggestion?.copy(hasLanded = true)
             val pendingQuestion = uiState.messages.lastOrNull()?.takeIf { uiState.isAwaitingReply && it is ChatMessage.User }
             pendingQuestionUuid = pendingQuestion?.uuid
             seenBeforeHistoryUuids = seenBeforeHistoryUuids + uiState.messages.filter { it != pendingQuestion }.map { it.uuid }
@@ -143,7 +159,17 @@ fun ChatScreen(
             pendingQuestionUuid = null
         }
     }
-    val loadingPhase = rememberChatLoadingPhase(uiState.isAwaitingReply)
+    LaunchedEffect(uiState.isAwaitingReply, flyingSuggestion?.hasLanded) {
+        if (!uiState.isAwaitingReply && flyingSuggestion?.hasLanded == true) flyingSuggestion = null
+    }
+    var isWelcomeEntered by rememberSaveable(uiState.episodeUuid) { mutableStateOf(false) }
+    LaunchedEffect(uiState.messages.isEmpty()) {
+        if (uiState.messages.isNotEmpty()) isWelcomeEntered = false
+    }
+    val loadingPhase = rememberChatLoadingPhase(
+        isAwaitingReply = uiState.isAwaitingReply,
+        startDelay = flyingSuggestion?.remainingFlight() ?: Duration.ZERO,
+    )
     val initialMessageUuids = remember(loadedMessageUuids, uiState.restoredMessageUuids, seenBeforeHistoryUuids) {
         loadedMessageUuids + uiState.restoredMessageUuids + seenBeforeHistoryUuids
     }
@@ -179,6 +205,10 @@ fun ChatScreen(
                         uiState = uiState,
                         initialMessageUuids = initialMessageUuids,
                         loadingPhase = loadingPhase,
+                        flyingSuggestion = flyingSuggestion,
+                        onFlyingSuggestionChange = { flyingSuggestion = it },
+                        isWelcomeEntered = isWelcomeEntered,
+                        onWelcomeEnter = { isWelcomeEntered = true },
                         theme = theme,
                         onClickClose = onClickClose,
                         onClickMore = onClickMore,
@@ -202,6 +232,10 @@ private fun ChatContent(
     uiState: ChatUiState,
     initialMessageUuids: Set<String>,
     loadingPhase: ChatLoadingPhase,
+    flyingSuggestion: FlyingSuggestion?,
+    onFlyingSuggestionChange: (FlyingSuggestion?) -> Unit,
+    isWelcomeEntered: Boolean,
+    onWelcomeEnter: () -> Unit,
     theme: ChatTheme,
     onClickClose: () -> Unit,
     onClickMore: () -> Unit,
@@ -217,16 +251,44 @@ private fun ChatContent(
 ) {
     val scrollState = rememberScrollState()
     val coroutineScope = rememberCoroutineScope()
+    val isReduceMotionEnabled = rememberIsReduceMotionEnabled()
+    val isWelcomeVisible = uiState.areMessagesLoaded && uiState.messages.isEmpty() && !uiState.isAwaitingReply
+    val currentOnWelcomeEnter by rememberUpdatedState(onWelcomeEnter)
+    val welcomePosition = remember { PlacedCoordinates() }
+    val contentPosition = remember { PlacedCoordinates() }
+    var exitingWelcome by remember { mutableStateOf<ExitingWelcome?>(null) }
+    fun exitWelcome(tappedSuggestion: String?) {
+        if (isWelcomeVisible && !isReduceMotionEnabled) {
+            exitingWelcome = ExitingWelcome(
+                starterQuestions = uiState.starterQuestions,
+                isLoadingStarterQuestions = uiState.isLoadingStarterQuestions,
+                tappedSuggestion = tappedSuggestion,
+                topInRoot = welcomePosition.topInRoot(),
+            )
+        }
+    }
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
 
     val followThresholdPx = with(LocalDensity.current) { FollowNewestThreshold.roundToPx() }
     var isFollowingNewest by rememberSaveable { mutableStateOf(true) }
+    var isUserScrolling by remember { mutableStateOf(false) }
+    var isAutoScrolling by remember { mutableStateOf(false) }
+    LaunchedEffect(scrollState) {
+        scrollState.interactionSource.interactions.collect { interaction ->
+            if (interaction is DragInteraction.Start) isUserScrolling = true
+        }
+    }
     LaunchedEffect(scrollState) {
         snapshotFlow { scrollState.isScrollInProgress }
             .drop(1)
             .filter { inProgress -> !inProgress }
-            .collect { isFollowingNewest = scrollState.maxValue - scrollState.value <= followThresholdPx }
+            .collect {
+                if (isUserScrolling || !isAutoScrolling) {
+                    isFollowingNewest = scrollState.maxValue - scrollState.value <= followThresholdPx
+                }
+                isUserScrolling = false
+            }
     }
     val newestMessage = uiState.messages.lastOrNull()
     LaunchedEffect(newestMessage?.uuid, uiState.isAwaitingReply) {
@@ -234,9 +296,26 @@ private fun ChatContent(
             isFollowingNewest = true
         }
     }
+    val smoothFollowMaxPx = with(LocalDensity.current) { SmoothFollowMaxDistance.roundToPx() }
+    var hasFollowed by remember { mutableStateOf(false) }
     LaunchedEffect(uiState.messages.size, uiState.isAwaitingReply, scrollState.maxValue) {
-        if (isFollowingNewest && !scrollState.isScrollInProgress) {
-            scrollState.scrollTo(scrollState.maxValue)
+        if (isFollowingNewest && !isUserScrolling) {
+            val distance = scrollState.maxValue - scrollState.value
+            val isSmooth = hasFollowed && distance in 1..smoothFollowMaxPx && !isReduceMotionEnabled
+            if (scrollState.maxValue > 0) hasFollowed = true
+            isAutoScrolling = true
+            try {
+                if (isSmooth) {
+                    scrollState.animateScrollTo(
+                        scrollState.maxValue,
+                        tween(durationMillis = SMOOTH_FOLLOW_MS, easing = EaseOut),
+                    )
+                } else {
+                    scrollState.scrollTo(scrollState.maxValue)
+                }
+            } finally {
+                isAutoScrolling = false
+            }
         }
     }
 
@@ -263,7 +342,51 @@ private fun ChatContent(
             theme = theme,
         )
 
-        Box(modifier = Modifier.weight(1f)) {
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .onPlaced(contentPosition::onPlaced),
+        ) {
+            exitingWelcome?.let { exiting ->
+                key(exiting) {
+                    ChatWelcome(
+                        starterQuestions = exiting.starterQuestions,
+                        isLoadingStarterQuestions = exiting.isLoadingStarterQuestions,
+                        isSuggestionEnabled = uiState.isConnected,
+                        onClickSuggestion = { _, _, _ -> },
+                        theme = theme,
+                        exitingSuggestion = exiting.tappedSuggestion,
+                        isExiting = true,
+                        modifier = Modifier
+                            .offset { IntOffset(0, (exiting.topInRoot - contentPosition.topInRoot()).roundToInt()) }
+                            .padding(horizontal = 16.dp)
+                            .clearAndSetSemantics {},
+                    )
+                    LaunchedEffect(Unit) {
+                        delay(WELCOME_EXIT_TOTAL_MS)
+                        exitingWelcome = null
+                    }
+                }
+            }
+            flyingSuggestion?.takeUnless { it.hasLanded }?.let { flight ->
+                key(flight.startMillis) {
+                    val contentTop = contentPosition.topInRoot()
+                    ChatFlight(
+                        fromY = flight.fromTopInRoot - contentTop,
+                        toY = flight.toTopInRoot - contentTop,
+                        onLand = { onFlyingSuggestionChange(flight.copy(hasLanded = true)) },
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp)
+                            .clearAndSetSemantics {},
+                    ) { progress ->
+                        UserMessageBubble(
+                            text = flight.text,
+                            theme = theme,
+                            chipMorph = flightChipMorph(progress),
+                        )
+                    }
+                }
+            }
             Column(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 modifier = Modifier
@@ -272,23 +395,61 @@ private fun ChatContent(
                     .padding(start = 16.dp, end = 16.dp, top = 24.dp, bottom = 12.dp),
             ) {
                 val typingTransition = rememberInfiniteTransition(label = "typing")
+                val awaitedQuestionUuid = uiState.messages.lastOrNull()?.uuid?.takeIf { uiState.isAwaitingReply }
+                val enteredWhileAwaitingUuid = remember { awaitedQuestionUuid }
+                val thinkingAlpha = remember { Animatable(if (awaitedQuestionUuid != null) 1f else 0f) }
+                LaunchedEffect(awaitedQuestionUuid, isReduceMotionEnabled) {
+                    when {
+                        awaitedQuestionUuid == null -> Unit
+
+                        isReduceMotionEnabled || awaitedQuestionUuid == enteredWhileAwaitingUuid -> thinkingAlpha.snapTo(1f)
+
+                        else -> {
+                            thinkingAlpha.snapTo(0f)
+                            val settleMillis = flyingSuggestion?.remainingFlight()?.inWholeMilliseconds?.toInt() ?: 0
+                            thinkingAlpha.animateTo(
+                                1f,
+                                tween(durationMillis = THINKING_APPEAR_MS, delayMillis = settleMillis + THINKING_DELAY_MS),
+                            )
+                        }
+                    }
+                }
                 if (uiState.otherPlayingEpisode != null) {
                     ChatAboutEpisode(
                         episodeTitle = uiState.episodeTitle,
                         theme = theme,
                     )
                 }
-                if (uiState.areMessagesLoaded && uiState.messages.isEmpty() && !uiState.isAwaitingReply) {
+                if (isWelcomeVisible) {
+                    val animateWelcome = remember { !isWelcomeEntered }
+                    LaunchedEffect(Unit) { currentOnWelcomeEnter() }
+                    val canSendSuggestion = !uiState.isAwaitingReply && uiState.isConnected && flyingSuggestion?.hasLanded != false
                     ChatWelcome(
                         starterQuestions = uiState.starterQuestions,
+                        isLoadingStarterQuestions = uiState.isLoadingStarterQuestions,
                         isSuggestionEnabled = uiState.isConnected,
-                        onClickSuggestion = onClickSuggestion,
+                        onClickSuggestion = { text, inputType, topInRoot ->
+                            if (canSendSuggestion && !isReduceMotionEnabled) {
+                                onFlyingSuggestionChange(
+                                    FlyingSuggestion(
+                                        text = text,
+                                        fromTopInRoot = topInRoot,
+                                        toTopInRoot = welcomePosition.topInRoot(),
+                                    ),
+                                )
+                                exitWelcome(tappedSuggestion = text)
+                            }
+                            onClickSuggestion(text, inputType)
+                        },
                         theme = theme,
+                        animate = animateWelcome,
+                        modifier = Modifier
+                            .onPlaced(welcomePosition::onPlaced)
+                            .alpha(if (exitingWelcome != null) 0f else 1f),
                     )
                 }
                 val answerStream = rememberChatAnswerStream(uiState.messages, initialMessageUuids)
                 val answerUuidsByLastIndex = uiState.answerUuidsByLastIndex
-                val latestAnswerLastIndex = answerUuidsByLastIndex.keys.maxOrNull()
                 uiState.messages.forEachIndexed { index, message ->
                     if (answerStream?.hasStarted(message.uuid) == false) return@forEachIndexed
                     key(message.uuid) {
@@ -308,13 +469,14 @@ private fun ChatContent(
                                 replacesTypingIndicator = replacesTypingIndicator,
                                 loadingPhase = loadingPhase,
                                 typingTransition = typingTransition,
+                                thinkingAlpha = { thinkingAlpha.value },
                                 theme = theme,
                                 modifier = skipStreamOnTap,
                             ) {
                                 AiMessageBubble(
                                     text = message.displayText,
                                     theme = theme,
-                                    revealProgress = answerStream?.revealProgress(message.uuid),
+                                    revealProgress = answerStream?.takeIf { isStreaming }?.revealProgress(message.uuid),
                                 )
                             }
 
@@ -323,6 +485,7 @@ private fun ChatContent(
                                 replacesTypingIndicator = replacesTypingIndicator,
                                 loadingPhase = loadingPhase,
                                 typingTransition = typingTransition,
+                                thinkingAlpha = { thinkingAlpha.value },
                                 theme = theme,
                                 modifier = skipStreamOnTap,
                             ) {
@@ -332,23 +495,38 @@ private fun ChatContent(
                                     isPlayable = message.canPlay,
                                     isLoading = message.uuid == uiState.loadingQuoteUuid,
                                     theme = theme,
-                                    revealProgress = answerStream?.revealProgress(message.uuid),
+                                    revealProgress = answerStream?.takeIf { isStreaming }?.revealProgress(message.uuid),
                                     onClickPlay = { onPlayQuote(message.uuid) },
                                 )
                             }
 
-                            is ChatMessage.User -> ChatAppear(animate = isNew, rise = 8.dp) {
-                                UserMessageBubble(
-                                    text = message.text,
-                                    theme = theme,
-                                    isNotSent = index == uiState.messages.lastIndex && uiState.error == ChatError.NetworkError,
-                                    isRetryEnabled = uiState.isConnected,
-                                    onRetry = onRetry,
-                                )
+                            is ChatMessage.User -> {
+                                val flewIn = remember { isNew && flyingSuggestion?.text == message.text }
+                                val isInFlight = flewIn && flyingSuggestion?.hasLanded == false
+                                val bubble = @Composable {
+                                    UserMessageBubble(
+                                        text = message.text,
+                                        theme = theme,
+                                        isNotSent = index == uiState.messages.lastIndex && uiState.error == ChatError.NetworkError,
+                                        isRetryEnabled = uiState.isConnected,
+                                        onRetry = onRetry,
+                                        modifier = Modifier.alpha(if (isInFlight) 0f else 1f),
+                                    )
+                                }
+                                if (flewIn) {
+                                    bubble()
+                                } else {
+                                    ChatAppear(animate = isNew, rise = 8.dp, content = bubble)
+                                }
                             }
                         }
                         answerUuidsByLastIndex[index]?.takeUnless { isStreaming }?.let { answerUuid ->
-                            ChatAppear(animate = isNew) {
+                            ChatAppear(
+                                animate = isNew,
+                                rise = AnswerFooterRise,
+                                durationMillis = ANSWER_FOOTER_APPEAR_MS,
+                                delayMillis = ANSWER_FOOTER_DELAY_MS,
+                            ) {
                                 ChatAnswerRatingRow(
                                     rating = uiState.answerRatings[answerUuid],
                                     onRate = { rating -> onRateAnswer(answerUuid, rating) },
@@ -357,13 +535,23 @@ private fun ChatContent(
                                 )
                             }
                         }
-                        if (index == latestAnswerLastIndex && !isStreaming) {
-                            ChatAppear(animate = isNew) {
+                        if (index == uiState.messages.lastIndex && index in answerUuidsByLastIndex && !isStreaming) {
+                            ChatAppear(
+                                animate = isNew,
+                                rise = AnswerFooterRise,
+                                durationMillis = ANSWER_FOOTER_APPEAR_MS,
+                                delayMillis = ANSWER_FOOTER_DELAY_MS,
+                            ) {
                                 ChatDisclaimer(theme = theme)
                             }
                             val followUps = uiState.followUps
                             if (followUps.isNotEmpty()) {
-                                ChatAppear(animate = isNew) {
+                                ChatAppear(
+                                    animate = isNew,
+                                    rise = FollowUpsRise,
+                                    durationMillis = FOLLOW_UPS_APPEAR_MS,
+                                    delayMillis = FOLLOW_UPS_DELAY_MS,
+                                ) {
                                     ChatFollowUps(
                                         followUps = followUps,
                                         isSuggestionEnabled = uiState.isConnected,
@@ -375,7 +563,6 @@ private fun ChatContent(
                         }
                     }
                 }
-                val isReduceMotionEnabled = rememberIsReduceMotionEnabled()
                 AnimatedVisibility(
                     visible = uiState.isAwaitingReply || uiState.isAnswerLanding(initialMessageUuids),
                     enter = EnterTransition.None,
@@ -389,6 +576,7 @@ private fun ChatContent(
                         phase = loadingPhase,
                         theme = theme,
                         transition = typingTransition,
+                        modifier = Modifier.graphicsLayer { alpha = thinkingAlpha.value },
                     )
                 }
                 if (uiState.error == ChatError.ServerError) {
@@ -409,7 +597,11 @@ private fun ChatContent(
         ChatInputBar(
             text = uiState.inputText,
             onTextChange = onInputTextChange,
-            onSend = onSend,
+            onSend = {
+                onFlyingSuggestionChange(null)
+                exitWelcome(tappedSuggestion = null)
+                onSend()
+            },
             isConnected = uiState.isConnected,
             canSend = uiState.canSend,
             showBetaNote = uiState.isBetaNoteVisible,
@@ -419,6 +611,34 @@ private fun ChatContent(
 }
 
 private val FollowNewestThreshold = 48.dp
+private val SmoothFollowMaxDistance = 400.dp
+private const val SMOOTH_FOLLOW_MS = 250
+private const val WELCOME_EXIT_TOTAL_MS = 500L
+private const val THINKING_APPEAR_MS = 300
+private const val THINKING_DELAY_MS = 250
+private val AnswerFooterRise = 7.dp
+private const val ANSWER_FOOTER_APPEAR_MS = 220
+private const val ANSWER_FOOTER_DELAY_MS = 150
+private val FollowUpsRise = 16.dp
+private const val FOLLOW_UPS_APPEAR_MS = 300
+private const val FOLLOW_UPS_DELAY_MS = 350
+
+private data class FlyingSuggestion(
+    val text: String,
+    val fromTopInRoot: Float,
+    val toTopInRoot: Float,
+    val startMillis: Long = SystemClock.uptimeMillis(),
+    val hasLanded: Boolean = false,
+) {
+    fun remainingFlight() = (FLY_IN_DURATION_MS - (SystemClock.uptimeMillis() - startMillis)).coerceAtLeast(0).milliseconds
+}
+
+private data class ExitingWelcome(
+    val starterQuestions: List<String>,
+    val isLoadingStarterQuestions: Boolean,
+    val tappedSuggestion: String?,
+    val topInRoot: Float,
+)
 
 private fun ChatUiState.isAnswerLanding(initialMessageUuids: Set<String>): Boolean {
     val newestMessage = messages.lastOrNull()
@@ -431,6 +651,7 @@ private fun ChatAnswerAppear(
     replacesTypingIndicator: Boolean,
     loadingPhase: ChatLoadingPhase,
     typingTransition: InfiniteTransition,
+    thinkingAlpha: () -> Float,
     theme: ChatTheme,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
@@ -443,6 +664,7 @@ private fun ChatAnswerAppear(
                     phase = loadingPhase,
                     theme = theme,
                     transition = typingTransition,
+                    modifier = Modifier.graphicsLayer { alpha = thinkingAlpha() },
                 )
             }
         }

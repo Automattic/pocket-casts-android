@@ -10,39 +10,49 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatMessage
 import kotlin.math.roundToInt
 
 @Stable
 internal class ChatAnswerStream(
     private val progress: Animatable<Float, AnimationVector1D>,
-    private val chunkOffsets: Map<String, Int>,
-    totalChunks: Int,
+    private val tickOffsets: Map<String, Int>,
+    totalTicks: Int,
 ) {
-    private val target = revealedChunkTarget(totalChunks).toFloat()
+    private val target = totalTicks.toFloat()
 
     private val startedUuids by derivedStateOf {
-        chunkOffsets.filterValues { offset -> offset == 0 || progress.value > offset }.keys
+        tickOffsets.filterValues { offset -> offset == 0 || progress.value > offset }.keys
     }
 
     val isComplete by derivedStateOf { progress.value >= target }
 
-    fun isStreaming(uuid: String) = uuid in chunkOffsets && !isComplete
+    fun isStreaming(uuid: String) = uuid in tickOffsets && !isComplete
 
-    fun hasStarted(uuid: String) = uuid !in chunkOffsets || uuid in startedUuids
+    fun hasStarted(uuid: String) = uuid !in tickOffsets || uuid in startedUuids
 
-    private val revealProgressByUuid: Map<String, () -> Float> = chunkOffsets.mapValues { (_, offset) ->
+    private val revealProgressByUuid: Map<String, () -> Float> = tickOffsets.mapValues { (_, offset) ->
         { progress.value - offset }
     }
 
     fun revealProgress(uuid: String): (() -> Float)? = revealProgressByUuid[uuid]
 
     suspend fun play(isReduceMotionEnabled: Boolean) {
-        val remainingChunks = target - progress.value
+        val remainingTicks = target - progress.value
         when {
-            remainingChunks <= 0f -> Unit
+            remainingTicks <= 0f -> Unit
+
             isReduceMotionEnabled -> progress.snapTo(target)
-            else -> progress.animateTo(target, tween(durationMillis = revealDurationMillis(remainingChunks), easing = LinearEasing))
+
+            else -> progress.animateTo(
+                target,
+                tween(
+                    durationMillis = revealDurationMillis(remainingTicks),
+                    delayMillis = if (progress.value == 0f) REVEAL_START_DELAY_MS else 0,
+                    easing = LinearEasing,
+                ),
+            )
         }
     }
 
@@ -59,18 +69,18 @@ internal fun rememberChatAnswerStream(
     val answer = messages.takeLastWhile { it.isAnswer }
     val answerUuid = answer.firstOrNull()?.uuid?.takeIf { answer.none { message -> message.uuid in initialMessageUuids } }
     val isReduceMotionEnabled = rememberIsReduceMotionEnabled()
-    val chunkCounts = remember(answer) { answer.map { message -> message.uuid to message.revealChunkCount() } }
-    val totalChunks = chunkCounts.sumOf { (_, count) -> count }
+    val tickCounts = remember(answer) { answer.map { message -> message.uuid to message.revealTickCount() } }
+    val tickOffsets = remember(tickCounts) { answerTickOffsets(tickCounts.map { (_, count) -> count }) }
+    val totalTicks = answerTotalTicks(tickCounts.map { (_, count) -> count })
     val progress = remember(answerUuid) {
-        Animatable(if (isReduceMotionEnabled) revealedChunkTarget(totalChunks).toFloat() else 0f)
+        Animatable(if (isReduceMotionEnabled) totalTicks.toFloat() else 0f)
     }
-    val stream = remember(progress, chunkCounts) {
+    val stream = remember(progress, tickCounts) {
         answerUuid?.let {
-            val offsets = chunkCounts.runningFold(0) { offset, (_, count) -> offset + count }
             ChatAnswerStream(
                 progress = progress,
-                chunkOffsets = chunkCounts.mapIndexed { index, (uuid, _) -> uuid to offsets[index] }.toMap(),
-                totalChunks = totalChunks,
+                tickOffsets = tickCounts.mapIndexed { index, (uuid, _) -> uuid to tickOffsets[index] }.toMap(),
+                totalTicks = totalTicks,
             )
         }
     }
@@ -82,15 +92,19 @@ internal fun rememberChatAnswerStream(
 
 internal val ChatMessage?.isAnswer get() = this is ChatMessage.Assistant || this is ChatMessage.Quote
 
-internal fun ChatMessage.revealChunkCount(): Int = revealChunks(revealWordCount()).size
-
-internal fun ChatMessage.revealWordCount(): Int = when (this) {
-    is ChatMessage.Assistant -> wordRanges(displayText).size
-    is ChatMessage.Quote -> wordRanges(displayText).size + wordRanges(quoteTimestampText(timestampLabel)).size
+internal fun ChatMessage.revealTickCount(): Int = when (this) {
+    is ChatMessage.Assistant -> TextRevealTimeline(displayText.withHangingBullets(0.sp)).ticks
+    is ChatMessage.Quote -> TextRevealTimeline(quoteText(displayText, timestampLabel)).ticks
     is ChatMessage.User -> 0
 }
 
-private fun revealDurationMillis(chunks: Float) = (chunks * REVEAL_MS_PER_CHUNK).roundToInt().coerceAtMost(REVEAL_MAX_DURATION_MS)
+internal fun answerTickOffsets(tickCounts: List<Int>): List<Int> = tickCounts.runningFold(0) { offset, count -> offset + count + MESSAGE_PAUSE_TICKS }
 
-private const val REVEAL_MS_PER_CHUNK = 120
-private const val REVEAL_MAX_DURATION_MS = 4_000
+internal fun answerTotalTicks(tickCounts: List<Int>): Int = if (tickCounts.isEmpty()) 0 else answerTickOffsets(tickCounts)[tickCounts.lastIndex] + tickCounts.last()
+
+private fun revealDurationMillis(ticks: Float) = (ticks * REVEAL_MS_PER_TICK).roundToInt().coerceAtMost(REVEAL_MAX_DURATION_MS)
+
+private const val REVEAL_MS_PER_TICK = 10
+private const val REVEAL_MAX_DURATION_MS = 6_000
+private const val REVEAL_START_DELAY_MS = 150
+internal const val MESSAGE_PAUSE_TICKS = PARAGRAPH_PAUSE_TICKS
