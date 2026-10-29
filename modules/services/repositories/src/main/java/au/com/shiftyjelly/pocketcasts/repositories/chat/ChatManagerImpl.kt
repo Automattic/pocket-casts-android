@@ -20,12 +20,13 @@ import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 
 @Singleton
 class ChatManagerImpl @Inject constructor(
@@ -117,14 +118,20 @@ class ChatManagerImpl @Inject constructor(
     }
 
     override suspend fun getStarterQuestions(episodeUuid: String, podcastUuid: String): List<String> {
-        val request = starterQuestions.computeIfAbsent(episodeUuid) {
-            scope.async { fetchStarterQuestions(episodeUuid, podcastUuid) }
+        val request = CompletableDeferred<List<String>>()
+        starterQuestions.putIfAbsent(episodeUuid, request)?.let { return it.await() }
+        scope.launch {
+            var questions = emptyList<String>()
+            try {
+                questions = fetchStarterQuestions(episodeUuid, podcastUuid)
+            } finally {
+                if (questions.isEmpty()) {
+                    starterQuestions.remove(episodeUuid, request)
+                }
+                request.complete(questions)
+            }
         }
-        val questions = request.await()
-        if (questions.isEmpty()) {
-            starterQuestions.remove(episodeUuid, request)
-        }
-        return questions
+        return request.await()
     }
 
     private suspend fun fetchStarterQuestions(episodeUuid: String, podcastUuid: String): List<String> {

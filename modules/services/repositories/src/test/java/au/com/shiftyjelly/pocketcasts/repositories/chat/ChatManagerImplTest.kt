@@ -360,6 +360,22 @@ class ChatManagerImplTest {
     }
 
     @Test
+    fun `starter questions are retried when the request fails after the caller is cancelled`() = runTest {
+        val response = CompletableDeferred<EpisodeChatStarterQuestionsResponse>()
+        whenever(podcastCacheServiceManager.episodeChatStarterQuestions(any(), any())) doSuspendableAnswer { response.await() }
+
+        val cancelled = async { manager.getStarterQuestions(EPISODE_UUID, PODCAST_UUID) }
+        testScheduler.runCurrent()
+        cancelled.cancel()
+        response.completeExceptionally(IOException())
+        whenever(podcastCacheServiceManager.episodeChatStarterQuestions(any(), any())).thenReturn(
+            EpisodeChatStarterQuestionsResponse(suggestedQuestions = listOf("Who is the guest?")),
+        )
+
+        assertEquals(listOf("Who is the guest?"), manager.getStarterQuestions(EPISODE_UUID, PODCAST_UUID))
+    }
+
+    @Test
     fun `starter questions are retried after an empty response`() = runTest {
         whenever(podcastCacheServiceManager.episodeChatStarterQuestions(any(), any())).thenReturn(
             EpisodeChatStarterQuestionsResponse(suggestedQuestions = emptyList()),
