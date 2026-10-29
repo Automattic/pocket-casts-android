@@ -61,6 +61,7 @@ fun TvSettingsModal(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var subScreen by remember { mutableStateOf<TvSettingsSubScreen?>(null) }
+    var lastSubScreen by remember { mutableStateOf<TvSettingsSubScreen?>(null) }
 
     LaunchedEffect(subScreen) {
         when (subScreen) {
@@ -102,9 +103,11 @@ fun TvSettingsModal(
             TvSettingsMenuContent(
                 isSignedIn = uiState.isSignedIn,
                 useEpisodeArtwork = uiState.useEpisodeArtwork,
-                onSubscription = { subScreen = TvSettingsSubScreen.Subscription },
-                onPrivacyPolicy = { subScreen = TvSettingsSubScreen.PrivacyPolicy },
-                onTermsOfUse = { subScreen = TvSettingsSubScreen.TermsOfUse },
+                initialFocus = lastSubScreen,
+                onOpenSubScreen = {
+                    lastSubScreen = it
+                    subScreen = it
+                },
                 onToggleEpisodeArtwork = { viewModel.setUseEpisodeArtwork(!uiState.useEpisodeArtwork) },
             )
         }
@@ -121,31 +124,41 @@ private enum class TvSettingsSubScreen {
 private fun ColumnScope.TvSettingsMenuContent(
     isSignedIn: Boolean,
     useEpisodeArtwork: Boolean,
-    onSubscription: () -> Unit,
-    onPrivacyPolicy: () -> Unit,
-    onTermsOfUse: () -> Unit,
+    initialFocus: TvSettingsSubScreen?,
+    onOpenSubScreen: (TvSettingsSubScreen) -> Unit,
     onToggleEpisodeArtwork: () -> Unit,
 ) {
     val focusRequester = remember { FocusRequester() }
-    LaunchedEffect(isSignedIn) {
+    val focusedSubScreen = when {
+        initialFocus != null && (initialFocus != TvSettingsSubScreen.Subscription || isSignedIn) -> initialFocus
+        isSignedIn -> TvSettingsSubScreen.Subscription
+        else -> TvSettingsSubScreen.PrivacyPolicy
+    }
+    LaunchedEffect(focusedSubScreen) {
         focusRequester.requestFocus()
+    }
+    fun focusModifier(item: TvSettingsSubScreen) = if (item == focusedSubScreen) {
+        Modifier.focusRequester(focusRequester)
+    } else {
+        Modifier
     }
 
     if (isSignedIn) {
         TvModalButton(
             text = stringResource(LR.string.tv_settings_subscription_title),
-            onClick = onSubscription,
-            modifier = Modifier.focusRequester(focusRequester),
+            onClick = { onOpenSubScreen(TvSettingsSubScreen.Subscription) },
+            modifier = focusModifier(TvSettingsSubScreen.Subscription),
         )
     }
     TvModalButton(
         text = stringResource(LR.string.profile_privacy_policy),
-        onClick = onPrivacyPolicy,
-        modifier = if (isSignedIn) Modifier else Modifier.focusRequester(focusRequester),
+        onClick = { onOpenSubScreen(TvSettingsSubScreen.PrivacyPolicy) },
+        modifier = focusModifier(TvSettingsSubScreen.PrivacyPolicy),
     )
     TvModalButton(
         text = stringResource(LR.string.profile_terms_of_use),
-        onClick = onTermsOfUse,
+        onClick = { onOpenSubScreen(TvSettingsSubScreen.TermsOfUse) },
+        modifier = focusModifier(TvSettingsSubScreen.TermsOfUse),
     )
     TvSettingsDivider()
     TvSettingsToggleRow(
@@ -376,9 +389,8 @@ private fun TvSettingsMenuSignedInPreview() {
             TvSettingsMenuContent(
                 isSignedIn = true,
                 useEpisodeArtwork = true,
-                onSubscription = {},
-                onPrivacyPolicy = {},
-                onTermsOfUse = {},
+                initialFocus = null,
+                onOpenSubScreen = {},
                 onToggleEpisodeArtwork = {},
             )
         }
@@ -393,9 +405,8 @@ private fun TvSettingsMenuSignedOutPreview() {
             TvSettingsMenuContent(
                 isSignedIn = false,
                 useEpisodeArtwork = false,
-                onSubscription = {},
-                onPrivacyPolicy = {},
-                onTermsOfUse = {},
+                initialFocus = null,
+                onOpenSubScreen = {},
                 onToggleEpisodeArtwork = {},
             )
         }
