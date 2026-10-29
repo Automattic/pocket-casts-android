@@ -262,7 +262,6 @@ private fun ChatContent(
         if (isWelcomeVisible && !isReduceMotionEnabled) {
             exitingWelcome = ExitingWelcome(
                 starterQuestions = uiState.starterQuestions,
-                isLoadingStarterQuestions = uiState.isLoadingStarterQuestions,
                 tappedSuggestion = tappedSuggestion,
                 topInRoot = welcomePosition.topInRoot(),
             )
@@ -355,7 +354,6 @@ private fun ChatContent(
                 key(exiting) {
                     ChatWelcome(
                         starterQuestions = exiting.starterQuestions,
-                        isLoadingStarterQuestions = exiting.isLoadingStarterQuestions,
                         isSuggestionEnabled = uiState.isConnected,
                         onClickSuggestion = { _, _, _ -> },
                         theme = theme,
@@ -430,7 +428,6 @@ private fun ChatContent(
                     val canSendSuggestion = !uiState.isAwaitingReply && uiState.isConnected && flyingSuggestion?.hasLanded != false
                     ChatWelcome(
                         starterQuestions = uiState.starterQuestions,
-                        isLoadingStarterQuestions = uiState.isLoadingStarterQuestions,
                         isSuggestionEnabled = uiState.isConnected,
                         onClickSuggestion = { text, inputType, topInRoot ->
                             if (canSendSuggestion && !isReduceMotionEnabled) {
@@ -639,7 +636,6 @@ private data class FlyingSuggestion(
 
 private data class ExitingWelcome(
     val starterQuestions: List<String>,
-    val isLoadingStarterQuestions: Boolean,
     val tappedSuggestion: String?,
     val topInRoot: Float,
 )
