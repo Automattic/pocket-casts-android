@@ -631,6 +631,9 @@
     <string name="chapters_generated_turn_off">Turn off generated chapters</string>
     <string name="chapters_generated_turned_off">Turned off generated chapters</string>
     <string name="chapters_generated_undo">Undo</string>
+    <string name="chapters_generated_off_title">Generated chapters are off</string>
+    <string name="chapters_generated_off_message">Turn them back on to jump straight to the part you came for.</string>
+    <string name="chapters_generated_turn_on">Turn on</string>
     <string name="chapters_generated_disclaimer">These chapters are automatically generated and may not be perfectly accurate.</string>
     <!-- %1$d is the current selected chapter. %2$d is the total number of chapters. -->
     <string name="chapter_count_summary">%1$d of %2$d</string>
