@@ -1,12 +1,17 @@
 package au.com.shiftyjelly.pocketcasts.views.compose
 
 import android.widget.PopupMenu
+import androidx.compose.foundation.layout.height
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.longClick
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performMouseInput
 import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
@@ -19,6 +24,7 @@ import com.automattic.eventhorizon.DiscoverListEpisodePlayEvent
 import com.automattic.eventhorizon.EventHorizon
 import java.util.Date
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -53,6 +59,7 @@ class EpisodePlayButtonTest {
         type: PlayButtonType,
         downloadStatus: EpisodeDownloadStatus = EpisodeDownloadStatus.DownloadNotRequested,
         fromListUuid: String? = null,
+        modifier: Modifier = Modifier,
     ) {
         composeTestRule.setContent {
             AppTheme(Theme.ThemeType.LIGHT) {
@@ -63,6 +70,7 @@ class EpisodePlayButtonTest {
                     listener = listener,
                     eventHorizon = EventHorizon(eventSink),
                     fromListUuid = fromListUuid,
+                    modifier = modifier,
                 )
             }
         }
@@ -143,6 +151,22 @@ class EpisodePlayButtonTest {
         popup.select("Download")
 
         assertEquals(listOf("download episode"), calls)
+    }
+
+    @Test
+    fun `hovering off the button after a long press does not reopen the menu`() {
+        setContent(PlayButtonType.PLAY, modifier = Modifier.height(48.dp))
+        val popup = longPressMenu("Play")
+        popup.dismiss()
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithContentDescription("Play").performMouseInput {
+            moveTo(center)
+            moveTo(Offset(width * 4f, height * 4f))
+        }
+        composeTestRule.waitForIdle()
+
+        assertFalse(shadowOf(popup).isShowing)
     }
 
     @Test

@@ -176,6 +176,7 @@ private fun Modifier.forwardTouches(
         while (true) {
             val event = awaitPointerEvent(PointerEventPass.Initial)
             val change = event.changes.first()
+            if (!change.pressed && !change.previousPressed) continue
             val action = when {
                 change.changedToDownIgnoreConsumed() -> MotionEvent.ACTION_DOWN.also {
                     downTime = change.uptimeMillis
