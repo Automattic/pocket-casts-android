@@ -930,6 +930,50 @@ class ChapterManagerImplTest {
         }
     }
 
+    @Test
+    fun `generated chapters are turned off when stored and hidden by the setting`() = runBlocking {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        whenever(chapterDao.observeGeneratedCountForEpisode("id")).thenReturn(flowOf(2))
+
+        chapterManager.observeGeneratedChaptersTurnedOff("id").test {
+            assertEquals(false, awaitItem())
+
+            generatedChapters.showGeneratedChaptersFlow.value = false
+            assertEquals(true, awaitItem())
+
+            generatedChapters.showGeneratedChaptersFlow.value = true
+            assertEquals(false, awaitItem())
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `generated chapters are not turned off without stored generated chapters`() = runBlocking {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        generatedChapters.showGeneratedChaptersFlow.value = false
+        whenever(chapterDao.observeGeneratedCountForEpisode("id")).thenReturn(flowOf(0))
+
+        chapterManager.observeGeneratedChaptersTurnedOff("id").test {
+            assertEquals(false, awaitItem())
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `generated chapters are not turned off while the feature is disabled`() = runBlocking {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, false)
+        generatedChapters.showGeneratedChaptersFlow.value = false
+        whenever(chapterDao.observeGeneratedCountForEpisode("id")).thenReturn(flowOf(2))
+
+        chapterManager.observeGeneratedChaptersTurnedOff("id").test {
+            assertEquals(false, awaitItem())
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
     private val generatedChaptersFixture = listOf(
         DbChapter(index = 0, episodeUuid = "id", startTimeMs = 0, endTimeMs = 1, title = "Embedded", origin = ChapterOrigin.PodcastIndex),
         DbChapter(index = 1, episodeUuid = "id", startTimeMs = 1, endTimeMs = 2, title = "Generated", origin = ChapterOrigin.Generated),

@@ -76,6 +76,14 @@ class ChapterManagerImpl @Inject constructor(
         }.distinctUntilChanged()
     }
 
+    override fun observeGeneratedChaptersTurnedOff(episodeUuid: String) = combine(
+        chapterDao.observeGeneratedCountForEpisode(episodeUuid),
+        generatedChaptersAvailability.isAvailableFlow,
+        generatedChaptersAvailability.isAllowedFlow,
+    ) { generatedCount, isAvailable, isAllowed ->
+        isAvailable && !isAllowed && generatedCount > 0
+    }.distinctUntilChanged()
+
     /**
      * Translate generated chapters from reference time to stream time using the fingerprint map.
      * Embedded chapters already match the file, so they are left untouched.

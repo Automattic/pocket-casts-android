@@ -61,6 +61,9 @@ abstract class ChapterDao {
     @Query("SELECT COUNT(*) FROM episode_chapters WHERE episode_uuid IS :episodeUuid AND origin = :origin")
     abstract suspend fun countGeneratedForEpisode(episodeUuid: String, origin: Int = ChapterOrigin.Generated.id): Int
 
+    @Query("SELECT COUNT(*) FROM episode_chapters WHERE episode_uuid IS :episodeUuid AND origin = :origin")
+    abstract fun observeGeneratedCountForEpisode(episodeUuid: String, origin: Int = ChapterOrigin.Generated.id): Flow<Int>
+
     @Query("SELECT * FROM episode_chapters WHERE episode_uuid IS :episodeUuid ORDER BY start_time ASC")
     protected abstract fun observeRawChaptersForEpisode(episodeUuid: String): Flow<List<Chapter>>
 
