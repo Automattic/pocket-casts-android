@@ -165,7 +165,7 @@ fun EpisodePlayButton(
     }
 }
 
-private fun Modifier.forwardTouches(
+internal fun Modifier.forwardTouches(
     anchor: State<View?>,
     touchListener: State<View.OnTouchListener?>,
     onForwardingStarted: () -> Unit,
@@ -200,7 +200,7 @@ private fun Modifier.forwardTouches(
     }
 }
 
-private class PopupAnchorView(context: Context) : View(context) {
+internal class PopupAnchorView(context: Context) : View(context) {
     init {
         isLongClickable = true
     }
@@ -217,7 +217,7 @@ private val PlayButtonMenuItem.menuId
         PlayButtonMenuItem.StopDownloading -> R.id.stop_downloading
     }
 
-private val TruncatedCenter = Alignment { size, space, _ ->
+internal val TruncatedCenter = Alignment { size, space, _ ->
     IntOffset((space.width - size.width) / 2, (space.height - size.height) / 2)
 }
 
