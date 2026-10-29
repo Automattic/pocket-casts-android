@@ -423,31 +423,33 @@ private fun ChatContent(
                     )
                 }
                 if (isWelcomeVisible) {
-                    val animateWelcome = remember { !isWelcomeEntered }
-                    LaunchedEffect(Unit) { currentOnWelcomeEnter() }
-                    val canSendSuggestion = !uiState.isAwaitingReply && uiState.isConnected && flyingSuggestion?.hasLanded != false
-                    ChatWelcome(
-                        starterQuestions = uiState.starterQuestions,
-                        isSuggestionEnabled = uiState.isConnected,
-                        onClickSuggestion = { text, inputType, topInRoot ->
-                            if (canSendSuggestion && !isReduceMotionEnabled) {
-                                onFlyingSuggestionChange(
-                                    FlyingSuggestion(
-                                        text = text,
-                                        fromTopInRoot = topInRoot,
-                                        toTopInRoot = welcomePosition.topInRoot(),
-                                    ),
-                                )
-                                exitWelcome(tappedSuggestion = text)
-                            }
-                            onClickSuggestion(text, inputType)
-                        },
-                        theme = theme,
-                        animate = animateWelcome,
-                        modifier = Modifier
-                            .onPlaced(welcomePosition::onPlaced)
-                            .alpha(if (exitingWelcome != null) 0f else 1f),
-                    )
+                    key(uiState.episodeUuid) {
+                        val animateWelcome = remember { !isWelcomeEntered }
+                        LaunchedEffect(Unit) { currentOnWelcomeEnter() }
+                        val canSendSuggestion = !uiState.isAwaitingReply && uiState.isConnected && flyingSuggestion?.hasLanded != false
+                        ChatWelcome(
+                            starterQuestions = uiState.starterQuestions,
+                            isSuggestionEnabled = uiState.isConnected,
+                            onClickSuggestion = { text, inputType, topInRoot ->
+                                if (canSendSuggestion && !isReduceMotionEnabled) {
+                                    onFlyingSuggestionChange(
+                                        FlyingSuggestion(
+                                            text = text,
+                                            fromTopInRoot = topInRoot,
+                                            toTopInRoot = welcomePosition.topInRoot(),
+                                        ),
+                                    )
+                                    exitWelcome(tappedSuggestion = text)
+                                }
+                                onClickSuggestion(text, inputType)
+                            },
+                            theme = theme,
+                            animate = animateWelcome,
+                            modifier = Modifier
+                                .onPlaced(welcomePosition::onPlaced)
+                                .alpha(if (exitingWelcome != null) 0f else 1f),
+                        )
+                    }
                 }
                 val answerStream = rememberChatAnswerStream(uiState.messages, initialMessageUuids)
                 val answerUuidsByLastIndex = uiState.answerUuidsByLastIndex
