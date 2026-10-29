@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -34,6 +35,7 @@ import androidx.tv.material3.Button
 import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import au.com.shiftyjelly.pocketcasts.component.LocalTvModalBackdrop
 import au.com.shiftyjelly.pocketcasts.component.TvModal
 import au.com.shiftyjelly.pocketcasts.component.TvModalButton
 import au.com.shiftyjelly.pocketcasts.component.TvModalSurface
@@ -62,6 +64,13 @@ fun TvSettingsModal(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var subScreen by remember { mutableStateOf<TvSettingsSubScreen?>(null) }
     var lastSubScreen by remember { mutableStateOf<TvSettingsSubScreen?>(null) }
+    val isSubScreenOpen = subScreen != null
+    val backdrop = LocalTvModalBackdrop.current
+    val backdropKey = remember { Any() }
+    DisposableEffect(isSubScreenOpen) {
+        backdrop.setActive(backdropKey, isSubScreenOpen)
+        onDispose { backdrop.setActive(backdropKey, false) }
+    }
 
     LaunchedEffect(subScreen) {
         when (subScreen) {
