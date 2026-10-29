@@ -17,11 +17,14 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.jakewharton.rxrelay2.BehaviorRelay
 import java.util.Date
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -50,9 +53,13 @@ class ChatStarterQuestionsPrefetcherTest {
         on { observeIsGeneratedTranscriptAvailable(any()) } doReturn MutableStateFlow(false)
     }
     private val episodesWithMessages = mutableSetOf<String>()
+    private var episodesWithMessagesError: Exception? = null
     private val prefetchedEpisodeUuids = mutableListOf<String>()
     private val chatManager = mock<ChatManager> {
-        on { hasChatWithMessages(any()) } doSuspendableAnswer { it.getArgument<String>(0) in episodesWithMessages }
+        on { hasChatWithMessages(any()) } doSuspendableAnswer {
+            episodesWithMessagesError?.let { error -> throw error }
+            it.getArgument<String>(0) in episodesWithMessages
+        }
         on { getStarterQuestions(any(), any()) } doSuspendableAnswer {
             prefetchedEpisodeUuids += it.getArgument<String>(0)
             listOf("Who is the guest?")
@@ -118,6 +125,29 @@ class ChatStarterQuestionsPrefetcherTest {
     }
 
     @Test
+    fun `do not prefetch episodes skipped past quickly`() = runTest {
+        startPrefetching()
+
+        skipTo(EPISODE, isGeneratedTranscriptAvailable = true)
+        advanceTimeBy(1.seconds)
+        play(OTHER_EPISODE, isGeneratedTranscriptAvailable = true)
+
+        assertEquals(listOf(OTHER_EPISODE.uuid), prefetchedEpisodeUuids)
+    }
+
+    @Test
+    fun `keep prefetching after a failure`() = runTest {
+        startPrefetching()
+        episodesWithMessagesError = IllegalStateException()
+        play(EPISODE, isGeneratedTranscriptAvailable = true)
+        episodesWithMessagesError = null
+
+        play(OTHER_EPISODE, isGeneratedTranscriptAvailable = true)
+
+        assertEquals(listOf(OTHER_EPISODE.uuid), prefetchedEpisodeUuids)
+    }
+
+    @Test
     fun `do not prefetch an episode left before its transcript is available`() = runTest {
         startPrefetching()
         play(EPISODE)
@@ -176,6 +206,7 @@ class ChatStarterQuestionsPrefetcherTest {
         assertEquals(emptyList<String>(), prefetchedEpisodeUuids)
 
         isLoggedIn.accept(true)
+        waitForCurrentEpisode()
 
         assertEquals(listOf(EPISODE.uuid), prefetchedEpisodeUuids)
     }
@@ -209,6 +240,7 @@ class ChatStarterQuestionsPrefetcherTest {
         assertEquals(emptyList<String>(), prefetchedEpisodeUuids)
 
         lifecycleOwner.currentState = Lifecycle.State.STARTED
+        waitForCurrentEpisode()
 
         assertEquals(listOf(EPISODE.uuid), prefetchedEpisodeUuids)
     }
@@ -233,7 +265,17 @@ class ChatStarterQuestionsPrefetcherTest {
         scope = CoroutineScope(backgroundScope.coroutineContext + UnconfinedTestDispatcher(testScheduler)),
     ).apply { prefetchForCurrentEpisode() }
 
-    private fun play(episode: BaseEpisode, isGeneratedTranscriptAvailable: Boolean = false) {
+    private fun TestScope.play(episode: BaseEpisode, isGeneratedTranscriptAvailable: Boolean = false) {
+        skipTo(episode, isGeneratedTranscriptAvailable)
+        waitForCurrentEpisode()
+    }
+
+    private fun TestScope.waitForCurrentEpisode() {
+        advanceTimeBy(ChatStarterQuestionsPrefetcher.CURRENT_EPISODE_DELAY)
+        runCurrent()
+    }
+
+    private fun skipTo(episode: BaseEpisode, isGeneratedTranscriptAvailable: Boolean = false) {
         generatedTranscript(episode.uuid).value = isGeneratedTranscriptAvailable
         upNextChanges.value = UpNextQueue.State.Loaded(episode, podcast = null, queue = emptyList())
     }
