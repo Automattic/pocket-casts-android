@@ -419,7 +419,7 @@ class TranscriptManagerTest {
     }
 
     @Test
-    fun `do not save ai chapters when existing chapters present`() = runTest {
+    fun `do not fetch meta when existing chapters present`() = runTest {
         FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
         localTranscriptsFlow.value = listOf(generatedVttTranscript)
         service.metaJsonResponse = META_JSON_WITH_CHAPTERS
@@ -445,8 +445,9 @@ class TranscriptManagerTest {
             parsers = parsers,
         )
 
-        managerWithChapters.loadGeneratedChapters("episode-id")
+        assertTrue(managerWithChapters.loadGeneratedChapters("episode-id"))
 
+        assertEquals(0, service.metaRequestCount)
         verify(chapterManagerWithExisting, never()).updateChapters(any(), any())
     }
 
