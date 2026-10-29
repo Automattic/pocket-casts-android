@@ -160,6 +160,8 @@ class TranscriptManagerImpl @Inject constructor(
         if (!FeatureFlag.isEnabled(Feature.GENERATED_CHAPTERS)) return true
 
         return try {
+            if (chapterManager.hasChapters(episodeUuid)) return true
+
             val generatedTranscript = loadLocalTranscripts(episodeUuid)
                 .firstOrNull { it.isGenerated } ?: return true
 
@@ -179,8 +181,6 @@ class TranscriptManagerImpl @Inject constructor(
 
     private suspend fun saveAiChaptersIfNeeded(episodeUuid: String, chapters: List<EpisodeMetaResponse.MetaChapter>?) {
         if (chapters.isNullOrEmpty()) return
-
-        if (chapterManager.hasChapters(episodeUuid)) return
 
         val dbChapters = chapters
             .mapNotNull { chapter ->
