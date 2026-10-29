@@ -25,9 +25,9 @@ import au.com.shiftyjelly.pocketcasts.player.view.chapters.ChaptersViewModel.Mod
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
-import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
+import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import com.google.android.material.snackbar.Snackbar
@@ -135,7 +135,10 @@ class ChaptersFragment : BaseFragment() {
     private fun turnOffGeneratedChapters() {
         val viewModel = viewModel
         viewModel.turnOffGeneratedChapters()
-        val snackBarView = (activity as? FragmentHostListener)?.snackBarView() ?: return
+        val snackBarView = when (val parent = parentFragment) {
+            is BaseDialogFragment -> parent.snackBarView()
+            else -> parent?.view
+        } ?: return
         Snackbar.make(snackBarView, getString(LR.string.chapters_generated_turned_off), Snackbar.LENGTH_LONG)
             .setAction(LR.string.chapters_generated_undo) { viewModel.turnOnGeneratedChapters() }
             .show()
