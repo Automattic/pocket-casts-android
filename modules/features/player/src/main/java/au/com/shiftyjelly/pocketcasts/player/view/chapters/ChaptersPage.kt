@@ -31,54 +31,63 @@ fun ChaptersPage(
     onUrlClick: (Chapter) -> Unit,
     onSkipChaptersClick: (Boolean) -> Unit,
     onTurnOffGeneratedClick: () -> Unit,
+    showOffState: Boolean,
+    onTurnOnGeneratedClick: () -> Unit,
     isTogglingChapters: Boolean,
     showSubscriptionIcon: Boolean,
     modifier: Modifier = Modifier,
     resolvingChapterIndex: Int? = null,
 ) {
-    LazyColumn(
-        state = lazyListState,
-        contentPadding = if (Build.VERSION.SDK_INT > 29) {
-            WindowInsets.navigationBars.asPaddingValues()
-        } else {
-            PaddingValues(bottom = 56.dp)
-        },
-        modifier = modifier
-            .background(LocalChaptersTheme.current.background)
-            .fillMaxSize()
-            .padding(top = if (showHeader) 0.dp else 16.dp),
-    ) {
-        val selectedCount = chapters.count { it.chapter.selected }
-        if (showHeader) {
-            item {
-                ChaptersHeader(
-                    totalChaptersCount = totalChaptersCount,
-                    hiddenChaptersCount = totalChaptersCount - selectedCount,
-                    onSkipChaptersClick = onSkipChaptersClick,
-                    isTogglingChapters = isTogglingChapters,
-                    showSubscriptionIcon = showSubscriptionIcon,
-                    isGenerated = hasGeneratedChapters,
-                    onTurnOffGeneratedClick = onTurnOffGeneratedClick,
-                )
+    if (showOffState) {
+        ChaptersOffState(
+            onTurnOnClick = onTurnOnGeneratedClick,
+            modifier = modifier,
+        )
+    } else {
+        LazyColumn(
+            state = lazyListState,
+            contentPadding = if (Build.VERSION.SDK_INT > 29) {
+                WindowInsets.navigationBars.asPaddingValues()
+            } else {
+                PaddingValues(bottom = 56.dp)
+            },
+            modifier = modifier
+                .background(LocalChaptersTheme.current.background)
+                .fillMaxSize()
+                .padding(top = if (showHeader) 0.dp else 16.dp),
+        ) {
+            val selectedCount = chapters.count { it.chapter.selected }
+            if (showHeader) {
+                item {
+                    ChaptersHeader(
+                        totalChaptersCount = totalChaptersCount,
+                        hiddenChaptersCount = totalChaptersCount - selectedCount,
+                        onSkipChaptersClick = onSkipChaptersClick,
+                        isTogglingChapters = isTogglingChapters,
+                        showSubscriptionIcon = showSubscriptionIcon,
+                        isGenerated = hasGeneratedChapters,
+                        onTurnOffGeneratedClick = onTurnOffGeneratedClick,
+                    )
+                }
             }
-        }
-        itemsIndexed(chapters, key = { _, state -> state.chapter.index }) { index, state ->
-            ChapterRow(
-                state = state,
-                isTogglingChapters = isTogglingChapters,
-                selectedCount = selectedCount,
-                onSelectionChange = onSelectionChange,
-                onClick = { onChapterClick(state.chapter) },
-                onUrlClick = { onUrlClick(state.chapter) },
-                isResolving = state.chapter.index == resolvingChapterIndex,
-                modifier = Modifier.animateItem(),
-            )
-            if (index < chapters.lastIndex) {
-                Divider(
-                    color = LocalChaptersTheme.current.divider,
-                    thickness = 1.dp,
-                    modifier = Modifier.padding(horizontal = 20.dp),
+            itemsIndexed(chapters, key = { _, state -> state.chapter.index }) { index, state ->
+                ChapterRow(
+                    state = state,
+                    isTogglingChapters = isTogglingChapters,
+                    selectedCount = selectedCount,
+                    onSelectionChange = onSelectionChange,
+                    onClick = { onChapterClick(state.chapter) },
+                    onUrlClick = { onUrlClick(state.chapter) },
+                    isResolving = state.chapter.index == resolvingChapterIndex,
+                    modifier = Modifier.animateItem(),
                 )
+                if (index < chapters.lastIndex) {
+                    Divider(
+                        color = LocalChaptersTheme.current.divider,
+                        thickness = 1.dp,
+                        modifier = Modifier.padding(horizontal = 20.dp),
+                    )
+                }
             }
         }
     }
