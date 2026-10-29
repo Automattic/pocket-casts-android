@@ -27,6 +27,7 @@ import com.automattic.eventhorizon.DeselectChaptersToggledOffEvent
 import com.automattic.eventhorizon.DeselectChaptersToggledOnEvent
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.PlayerChapterSelectedEvent
+import com.automattic.eventhorizon.SettingsGeneralGeneratedChaptersToggledEvent
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -161,6 +162,23 @@ class ChaptersViewModel @AssistedInject constructor(
         } else {
             viewModelScope.launch { _showUpsell.emit(Unit) }
         }
+    }
+
+    private val _generatedChaptersTurnedOff = MutableSharedFlow<Unit>()
+    val generatedChaptersTurnedOff = _generatedChaptersTurnedOff.asSharedFlow()
+
+    fun turnOffGeneratedChapters() {
+        setShowGeneratedChapters(false)
+        viewModelScope.launch { _generatedChaptersTurnedOff.emit(Unit) }
+    }
+
+    fun turnOnGeneratedChapters() {
+        setShowGeneratedChapters(true)
+    }
+
+    private fun setShowGeneratedChapters(show: Boolean) {
+        eventHorizon.track(SettingsGeneralGeneratedChaptersToggledEvent(enabled = show))
+        settings.showGeneratedChapters.set(show, updateModifiedAt = true)
     }
 
     fun selectChapter(select: Boolean, chapter: Chapter) {
