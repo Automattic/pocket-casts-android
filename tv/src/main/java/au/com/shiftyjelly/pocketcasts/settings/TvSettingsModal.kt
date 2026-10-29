@@ -71,21 +71,8 @@ fun TvSettingsModal(
         }
     }
 
-    TvModal(
-        onDismissRequest = onDismissRequest,
-        modifier = modifier,
-    ) {
-        LaunchedEffect(Unit) {
-            viewModel.trackSettingsShown()
-        }
-        TvSettingsMenuContent(
-            isSignedIn = uiState.isSignedIn,
-            useEpisodeArtwork = uiState.useEpisodeArtwork,
-            onSubscription = { subScreen = TvSettingsSubScreen.Subscription },
-            onPrivacyPolicy = { subScreen = TvSettingsSubScreen.PrivacyPolicy },
-            onTermsOfUse = { subScreen = TvSettingsSubScreen.TermsOfUse },
-            onToggleEpisodeArtwork = { viewModel.setUseEpisodeArtwork(!uiState.useEpisodeArtwork) },
-        )
+    LaunchedEffect(Unit) {
+        viewModel.trackSettingsShown()
     }
 
     when (subScreen) {
@@ -108,7 +95,19 @@ fun TvSettingsModal(
             onDismissRequest = { subScreen = null },
         )
 
-        null -> Unit
+        null -> TvModal(
+            onDismissRequest = onDismissRequest,
+            modifier = modifier,
+        ) {
+            TvSettingsMenuContent(
+                isSignedIn = uiState.isSignedIn,
+                useEpisodeArtwork = uiState.useEpisodeArtwork,
+                onSubscription = { subScreen = TvSettingsSubScreen.Subscription },
+                onPrivacyPolicy = { subScreen = TvSettingsSubScreen.PrivacyPolicy },
+                onTermsOfUse = { subScreen = TvSettingsSubScreen.TermsOfUse },
+                onToggleEpisodeArtwork = { viewModel.setUseEpisodeArtwork(!uiState.useEpisodeArtwork) },
+            )
+        }
     }
 }
 
