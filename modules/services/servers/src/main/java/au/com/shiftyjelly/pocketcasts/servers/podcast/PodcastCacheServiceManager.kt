@@ -21,5 +21,6 @@ interface PodcastCacheServiceManager {
     suspend fun getEpisodeUrl(episode: PodcastEpisode): String?
     suspend fun suggestedFolders(request: SuggestedFoldersRequest): List<SuggestedFolder>
     suspend fun episodeChat(authorization: String, request: EpisodeChatRequest): EpisodeChatResponse
+    suspend fun episodeChatStarterQuestions(authorization: String, request: EpisodeChatStarterQuestionsRequest): EpisodeChatStarterQuestionsResponse
     suspend fun enrichBookmark(authorization: String, request: BookmarkEnrichRequest): BookmarkEnrichResponse
 }

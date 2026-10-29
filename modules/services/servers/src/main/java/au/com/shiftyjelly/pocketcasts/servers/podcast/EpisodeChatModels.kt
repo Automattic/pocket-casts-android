@@ -12,6 +12,17 @@ data class EpisodeChatRequest(
 )
 
 @JsonClass(generateAdapter = true)
+data class EpisodeChatStarterQuestionsRequest(
+    @Json(name = "podcast_uuid") val podcastUuid: String,
+    @Json(name = "episode_uuid") val episodeUuid: String,
+)
+
+@JsonClass(generateAdapter = true)
+data class EpisodeChatStarterQuestionsResponse(
+    @Json(name = "suggested_questions") val suggestedQuestions: List<String>,
+)
+
+@JsonClass(generateAdapter = true)
 data class ConversationMessage(
     @Json(name = "role") val role: String,
     @Json(name = "content") val content: String,

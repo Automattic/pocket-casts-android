@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -18,16 +20,19 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatInputType
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 internal fun ChatWelcome(
+    starterQuestions: List<String>,
     isSuggestionEnabled: Boolean,
-    onClickSuggestion: (String) -> Unit,
+    onClickSuggestion: (String, ChatInputType) -> Unit,
     theme: ChatTheme,
     modifier: Modifier = Modifier,
 ) {
     val summarize = stringResource(LR.string.chat_suggestion_summarize)
+    val animateStarterQuestions = remember { starterQuestions.isEmpty() }
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.End,
@@ -40,12 +45,29 @@ internal fun ChatWelcome(
             lineHeight = 20.sp,
             modifier = Modifier.fillMaxWidth(),
         )
-        ChatSuggestionChip(
-            text = summarize,
-            enabled = isSuggestionEnabled,
-            onClick = { onClickSuggestion(summarize) },
-            theme = theme,
-        )
+        Column(
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalAlignment = Alignment.End,
+        ) {
+            ChatSuggestionChip(
+                text = summarize,
+                enabled = isSuggestionEnabled,
+                onClick = { onClickSuggestion(summarize, ChatInputType.SummaryPrompt) },
+                theme = theme,
+            )
+            starterQuestions.forEach { question ->
+                key(question) {
+                    ChatAppear(animate = animateStarterQuestions) {
+                        ChatSuggestionChip(
+                            text = question,
+                            enabled = isSuggestionEnabled,
+                            onClick = { onClickSuggestion(question, ChatInputType.SuggestedPrompt) },
+                            theme = theme,
+                        )
+                    }
+                }
+            }
+        }
     }
 }
 

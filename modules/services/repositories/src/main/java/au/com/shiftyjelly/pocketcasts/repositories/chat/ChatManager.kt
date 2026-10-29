@@ -22,6 +22,11 @@ interface ChatManager {
         allMessages: List<ChatMessage>,
     )
 
+    suspend fun getStarterQuestions(
+        episodeUuid: String,
+        podcastUuid: String,
+    ): List<String>
+
     suspend fun discardMessage(uuid: String)
 
     suspend fun clearMessages(episodeUuid: String): ClearedChat

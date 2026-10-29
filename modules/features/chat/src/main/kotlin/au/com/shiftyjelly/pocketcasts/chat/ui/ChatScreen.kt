@@ -77,6 +77,7 @@ import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
 import au.com.shiftyjelly.pocketcasts.compose.PodcastColorsParameterProvider
 import au.com.shiftyjelly.pocketcasts.models.to.EpisodeChatHistoryItem
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatAnswerRating
+import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatInputType
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatMessage
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import kotlinx.coroutines.delay
@@ -97,7 +98,7 @@ fun ChatScreen(
     onClickPlayPause: () -> Unit,
     onInputTextChange: (String) -> Unit,
     onSend: () -> Unit,
-    onClickSuggestion: (String) -> Unit,
+    onClickSuggestion: (String, ChatInputType) -> Unit,
     onRetry: () -> Unit,
     onPlayQuote: (quoteUuid: String) -> Unit,
     onRateAnswer: (answerUuid: String, rating: ChatAnswerRating) -> Unit,
@@ -207,7 +208,7 @@ private fun ChatContent(
     onClickPlayPause: () -> Unit,
     onInputTextChange: (String) -> Unit,
     onSend: () -> Unit,
-    onClickSuggestion: (String) -> Unit,
+    onClickSuggestion: (String, ChatInputType) -> Unit,
     onRetry: () -> Unit,
     onPlayQuote: (quoteUuid: String) -> Unit,
     onRateAnswer: (answerUuid: String, rating: ChatAnswerRating) -> Unit,
@@ -279,6 +280,7 @@ private fun ChatContent(
                 }
                 if (uiState.areMessagesLoaded && uiState.messages.isEmpty() && !uiState.isAwaitingReply) {
                     ChatWelcome(
+                        starterQuestions = uiState.starterQuestions,
                         isSuggestionEnabled = uiState.isConnected,
                         onClickSuggestion = onClickSuggestion,
                         theme = theme,
@@ -610,7 +612,7 @@ private fun ChatScreenPreview(
                 onClickPlayPause = {},
                 onInputTextChange = {},
                 onSend = {},
-                onClickSuggestion = {},
+                onClickSuggestion = { _, _ -> },
                 onRetry = {},
                 onPlayQuote = {},
                 onRateAnswer = { _, _ -> },
@@ -636,6 +638,11 @@ private fun ChatScreenEmptyPreview(
                     podcastTitle = "Pocket Casts Weekly",
                     isBetaNoteVisible = true,
                     areMessagesLoaded = true,
+                    starterQuestions = listOf(
+                        "Who is the guest?",
+                        "How do recommendations work?",
+                        "What changed this year?",
+                    ),
                 ),
                 onClickClose = {},
                 onClickMore = {},
@@ -645,7 +652,7 @@ private fun ChatScreenEmptyPreview(
                 onClickPlayPause = {},
                 onInputTextChange = {},
                 onSend = {},
-                onClickSuggestion = {},
+                onClickSuggestion = { _, _ -> },
                 onRetry = {},
                 onPlayQuote = {},
                 onRateAnswer = { _, _ -> },
@@ -686,7 +693,7 @@ private fun ChatScreenErrorPreview(
                 onClickPlayPause = {},
                 onInputTextChange = {},
                 onSend = {},
-                onClickSuggestion = {},
+                onClickSuggestion = { _, _ -> },
                 onRetry = {},
                 onPlayQuote = {},
                 onRateAnswer = { _, _ -> },
