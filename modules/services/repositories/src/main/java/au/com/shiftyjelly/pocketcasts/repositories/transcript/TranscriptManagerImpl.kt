@@ -8,9 +8,8 @@ import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptType
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.GeneratedChaptersAvailability
 import au.com.shiftyjelly.pocketcasts.servers.podcast.TranscriptService
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.squareup.moshi.Moshi
 import java.util.concurrent.ConcurrentHashMap
@@ -37,6 +36,7 @@ class TranscriptManagerImpl @Inject constructor(
     private val transcriptService: TranscriptService,
     private val episodeManager: EpisodeManager,
     private val chapterManager: ChapterManager,
+    private val generatedChaptersAvailability: GeneratedChaptersAvailability,
     private val moshi: Moshi,
     private val parsers: Map<TranscriptType, @JvmSuppressWildcards TranscriptParser>,
 ) : TranscriptManager {
@@ -157,7 +157,7 @@ class TranscriptManagerImpl @Inject constructor(
     }
 
     override suspend fun loadGeneratedChapters(episodeUuid: String): Boolean {
-        if (!FeatureFlag.isEnabled(Feature.GENERATED_CHAPTERS)) return true
+        if (!generatedChaptersAvailability.isAllowed()) return true
 
         return try {
             val generatedTranscript = loadLocalTranscripts(episodeUuid)
