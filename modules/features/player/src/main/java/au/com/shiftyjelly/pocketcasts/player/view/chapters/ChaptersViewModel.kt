@@ -115,7 +115,9 @@ class ChaptersViewModel @AssistedInject constructor(
         settings.cachedSubscription.flow,
         isTogglingChapters,
         ::createUiState,
-    )
+    ).combine(chapterManager.observeGeneratedChaptersTurnedOff(episodeId)) { state, isGeneratedChaptersOff ->
+        state.copy(isGeneratedChaptersOff = isGeneratedChaptersOff)
+    }
 
     private var playChapterJob: Job? = null
 
@@ -308,8 +310,11 @@ class ChaptersViewModel @AssistedInject constructor(
         val isTogglingChapters: Boolean = false,
         val canSkipChapters: Boolean = false,
         val showHeader: Boolean = false,
+        val isGeneratedChaptersOff: Boolean = false,
     ) {
         val chaptersCount = allChapters.size
+        val showOffState get() = chaptersCount == 0 && isGeneratedChaptersOff
+        val showChaptersTab get() = chaptersCount > 0 || isGeneratedChaptersOff
         val deselectedChaptersCount get() = allChapters.count { !it.chapter.selected }
         val chapters get() = if (isTogglingChapters) allChapters else allChapters.filter { it.chapter.selected }
         val showSubscriptionIcon get() = !isTogglingChapters && !canSkipChapters

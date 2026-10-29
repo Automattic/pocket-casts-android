@@ -249,7 +249,7 @@ class EpisodeContainerFragment :
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 chaptersViewModel.uiState.collect {
-                    adapter.update(addChapters = it.chaptersCount > 0)
+                    adapter.update(addChapters = it.showChaptersTab)
                 }
             }
         }

@@ -93,6 +93,7 @@ class ChaptersViewModelTest {
     private val playbackStateFlow = MutableStateFlow(PlaybackState(episodeUuid = "id"))
     private val episodeFlow = MutableStateFlow<BaseEpisode>(episode)
     private val chaptersFlow = MutableStateFlow(chapters)
+    private val generatedChaptersOffFlow = MutableStateFlow(false)
     private val plusSubscription = Subscription(
         tier = SubscriptionTier.Plus,
         billingCycle = BillingCycle.Monthly,
@@ -113,6 +114,7 @@ class ChaptersViewModelTest {
         whenever(playbackManager.playbackStateFlow).thenReturn(playbackStateFlow)
         whenever(episodeManager.findEpisodeByUuidFlow("id")).thenReturn(episodeFlow)
         whenever(chapterManager.observerChaptersForEpisode("id")).thenReturn(chaptersFlow)
+        whenever(chapterManager.observeGeneratedChaptersTurnedOff("id")).thenReturn(generatedChaptersOffFlow)
         val userSetting = mock<UserSetting<Subscription?>>()
         whenever(userSetting.flow).thenReturn(subscriptionFlow)
         whenever(settings.cachedSubscription).thenReturn(userSetting)
@@ -447,6 +449,43 @@ class ChaptersViewModelTest {
 
         verify(showGeneratedChapters).set(true, updateModifiedAt = true)
         assertEquals(SettingsGeneralGeneratedChaptersToggledEvent(enabled = true), eventSink.pollEvent())
+    }
+
+    @Test
+    fun `show off state when generated chapters are turned off`() = runTest {
+        chaptersViewModel.uiState.test {
+            val visible = awaitItem()
+            assertFalse(visible.showOffState)
+            assertTrue(visible.showChaptersTab)
+
+            chaptersFlow.value = Chapters()
+            generatedChaptersOffFlow.value = true
+            val off = expectMostRecentItem()
+            assertTrue(off.showOffState)
+            assertTrue(off.showChaptersTab)
+        }
+    }
+
+    @Test
+    fun `hide chapters tab when there are no chapters and generated chapters are not turned off`() = runTest {
+        chaptersFlow.value = Chapters()
+
+        chaptersViewModel.uiState.test {
+            val state = awaitItem()
+            assertFalse(state.showOffState)
+            assertFalse(state.showChaptersTab)
+        }
+    }
+
+    @Test
+    fun `do not show off state while other chapters are visible`() = runTest {
+        generatedChaptersOffFlow.value = true
+
+        chaptersViewModel.uiState.test {
+            val state = awaitItem()
+            assertFalse(state.showOffState)
+            assertTrue(state.showChaptersTab)
+        }
     }
 
     private fun createViewModel() = ChaptersViewModel(
