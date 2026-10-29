@@ -11,6 +11,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.res.Resources
 import android.service.notification.StatusBarNotification
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -41,6 +42,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.spy
 import org.mockito.kotlin.whenever
@@ -80,10 +82,12 @@ class NewEpisodeNotificationsTest {
     private val podcast1 = Podcast(uuid = "podcast-1", title = "Podcast 1", isSubscribed = true, isShowNotifications = true)
     private val podcast2 = Podcast(uuid = "podcast-2", title = "Podcast 2", isSubscribed = true, isShowNotifications = true)
 
-    private val loggedErrors = mutableListOf<Throwable>()
+    private val loggedErrors = mutableListOf<String>()
     private val errorTree = object : Timber.Tree() {
         override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
-            t?.let(loggedErrors::add)
+            if (priority >= Log.ERROR || t != null) {
+                loggedErrors.add(message)
+            }
         }
     }
 
@@ -108,7 +112,7 @@ class NewEpisodeNotificationsTest {
     fun tearDown() {
         Timber.uproot(errorTree)
         SingletonImageLoader.reset()
-        assertEquals(emptyList<Throwable>(), loggedErrors)
+        assertEquals(emptyList<String>(), loggedErrors)
     }
 
     @Test
@@ -174,6 +178,34 @@ class NewEpisodeNotificationsTest {
         assertEquals((5 until 25).map { tag("episode-$it") }.toSet(), activeTags())
     }
 
+    @Test
+    fun `a failing episode does not stop the rest of the refresh from showing`() {
+        whenever(notificationHelper.episodeNotificationChannelBuilder())
+            .doAnswer { NotificationCompat.Builder(context, "episode") }
+            .doThrow(IllegalStateException("Broken episode"))
+            .doAnswer { NotificationCompat.Builder(context, "episode") }
+
+        refresh(episode("episode-1", podcast1), episode("episode-2", podcast2))
+
+        assertTrue(tag("episode-2") in activeTags())
+        assertTrue(tag("episode-1") !in activeTags())
+        assertTrue(loggedErrors.single().contains("episode-1"))
+        loggedErrors.clear()
+    }
+
+    @Test
+    fun `a failing summary does not stop the episodes from showing`() {
+        whenever(notificationHelper.episodeNotificationChannelBuilder())
+            .doThrow(IllegalStateException("Broken summary"))
+            .doAnswer { NotificationCompat.Builder(context, "episode") }
+
+        refresh(episode("episode-1", podcast1), episode("episode-2", podcast2))
+
+        assertEquals(setOf(tag("episode-1"), tag("episode-2")), activeTags())
+        assertTrue(loggedErrors.single().contains("summary"))
+        loggedErrors.clear()
+    }
+
     private fun refresh(vararg episodes: Pair<PodcastEpisode, Podcast>) {
         val podcastManager = mock<PodcastManager> {
             on { countNotificationsOnBlocking() } doReturn 2
@@ -187,7 +219,9 @@ class NewEpisodeNotificationsTest {
         RefreshPodcastsThread.updateNotifications(Date(0), settings, podcastManager, episodeManager, notificationHelper, context)
     }
 
-    private fun episode(uuid: String, podcast: Podcast) = PodcastEpisode(uuid = uuid, podcastUuid = podcast.uuid, title = uuid, publishedDate = Date()) to podcast
+    private fun episode(uuid: String, podcast: Podcast) = PodcastEpisode(uuid = uuid, podcastUuid = podcast.uuid, title = uuid, publishedDate = publishedDate) to podcast
+
+    private val publishedDate = Date(1_700_000_000_000)
 
     private fun tag(episodeUuid: String) = NotificationBroadcastReceiver.NOTIFICATION_TAG_NEW_EPISODES_PREFIX + episodeUuid
 
