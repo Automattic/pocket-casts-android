@@ -55,6 +55,7 @@ internal fun EpisodeRowArtwork(
     alpha: Float,
     elevation: Float,
     modifier: Modifier = Modifier,
+    cardAlpha: Float = 1f,
 ) {
     val context = LocalContext.current
     val cardBackground = remember(context) { cardBackgroundColor(context) }
@@ -66,6 +67,7 @@ internal fun EpisodeRowArtwork(
         modifier = modifier
             .fillMaxSize()
             .graphicsLayer {
+                this.alpha = cardAlpha
                 shadowElevation = (elevation * density).toInt().toFloat()
                 shape = RoundedCornerShape(4.dp)
                 clip = true
