@@ -289,7 +289,7 @@ enum class Feature(
         addedOn = LocalDate.parse("2026-10-05"),
     ),
     GENERATED_CHAPTERS(
-        key = "generated_chapters",
+        key = "generated_chapters_relaunch",
         title = "AI-Generated Chapters",
         defaultValue = isDebugOrPrototypeBuild,
         tier = FeatureTier.Free,
