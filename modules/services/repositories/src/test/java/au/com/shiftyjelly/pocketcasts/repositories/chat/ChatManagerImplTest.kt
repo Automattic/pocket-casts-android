@@ -16,10 +16,15 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.TokenHandler
 import com.squareup.moshi.Moshi
 import java.io.IOException
 import java.util.Date
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -28,11 +33,13 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class ChatManagerImplTest {
     private val episodeChatDao = TestEpisodeChatDao()
     private val podcastCacheServiceManager = mock<PodcastCacheServiceManager>()
@@ -41,6 +48,7 @@ class ChatManagerImplTest {
         episodeChatDao = episodeChatDao,
         podcastCacheServiceManager = podcastCacheServiceManager,
         tokenHandler = tokenHandler,
+        scope = CoroutineScope(UnconfinedTestDispatcher()),
         moshi = Moshi.Builder().build(),
     )
 
@@ -320,6 +328,46 @@ class ChatManagerImplTest {
 
         verify(podcastCacheServiceManager, times(1)).episodeChatStarterQuestions(any(), any())
         assertEquals(listOf("Who is the guest?"), questions)
+    }
+
+    @Test
+    fun `starter questions share a request in flight`() = runTest {
+        val response = CompletableDeferred<EpisodeChatStarterQuestionsResponse>()
+        whenever(podcastCacheServiceManager.episodeChatStarterQuestions(any(), any())) doSuspendableAnswer { response.await() }
+
+        val prefetch = async { manager.getStarterQuestions(EPISODE_UUID, PODCAST_UUID) }
+        val open = async { manager.getStarterQuestions(EPISODE_UUID, PODCAST_UUID) }
+        testScheduler.runCurrent()
+        response.complete(EpisodeChatStarterQuestionsResponse(suggestedQuestions = listOf("Who is the guest?")))
+
+        assertEquals(listOf("Who is the guest?"), prefetch.await())
+        assertEquals(listOf("Who is the guest?"), open.await())
+        verify(podcastCacheServiceManager, times(1)).episodeChatStarterQuestions(any(), any())
+    }
+
+    @Test
+    fun `starter questions keep loading when the caller is cancelled`() = runTest {
+        val response = CompletableDeferred<EpisodeChatStarterQuestionsResponse>()
+        whenever(podcastCacheServiceManager.episodeChatStarterQuestions(any(), any())) doSuspendableAnswer { response.await() }
+
+        val cancelled = async { manager.getStarterQuestions(EPISODE_UUID, PODCAST_UUID) }
+        testScheduler.runCurrent()
+        cancelled.cancel()
+        response.complete(EpisodeChatStarterQuestionsResponse(suggestedQuestions = listOf("Who is the guest?")))
+
+        assertEquals(listOf("Who is the guest?"), manager.getStarterQuestions(EPISODE_UUID, PODCAST_UUID))
+        verify(podcastCacheServiceManager, times(1)).episodeChatStarterQuestions(any(), any())
+    }
+
+    @Test
+    fun `starter questions are retried after an empty response`() = runTest {
+        whenever(podcastCacheServiceManager.episodeChatStarterQuestions(any(), any())).thenReturn(
+            EpisodeChatStarterQuestionsResponse(suggestedQuestions = emptyList()),
+            EpisodeChatStarterQuestionsResponse(suggestedQuestions = listOf("Who is the guest?")),
+        )
+
+        assertEquals(emptyList<String>(), manager.getStarterQuestions(EPISODE_UUID, PODCAST_UUID))
+        assertEquals(listOf("Who is the guest?"), manager.getStarterQuestions(EPISODE_UUID, PODCAST_UUID))
     }
 
     @Test
