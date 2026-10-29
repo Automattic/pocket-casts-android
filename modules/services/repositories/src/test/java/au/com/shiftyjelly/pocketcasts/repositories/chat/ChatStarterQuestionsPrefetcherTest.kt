@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.chat
 
+import android.net.NetworkCapabilities
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.testing.TestLifecycleOwner
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
@@ -8,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.ReadSetting
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.playback.NetworkConnectionWatcher
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
@@ -75,6 +77,13 @@ class ChatStarterQuestionsPrefetcherTest {
             on { flow } doReturn subscription
         }
         on { this.cachedSubscription } doReturn cachedSubscription
+    }
+    private val internetCapabilities = mock<NetworkCapabilities> {
+        on { hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) } doReturn true
+    }
+    private val networkCapabilities = MutableStateFlow<NetworkCapabilities?>(internetCapabilities)
+    private val networkConnectionWatcher = object : NetworkConnectionWatcher {
+        override val networkCapabilities = this@ChatStarterQuestionsPrefetcherTest.networkCapabilities
     }
     private val lifecycleOwner = TestLifecycleOwner(Lifecycle.State.RESUMED, coroutineRule.testDispatcher)
 
@@ -246,6 +255,41 @@ class ChatStarterQuestionsPrefetcherTest {
     }
 
     @Test
+    fun `do not prefetch while offline`() = runTest {
+        networkCapabilities.value = null
+        startPrefetching()
+
+        play(EPISODE, isGeneratedTranscriptAvailable = true)
+
+        assertEquals(emptyList<String>(), prefetchedEpisodeUuids)
+    }
+
+    @Test
+    fun `prefetch once the connection is back`() = runTest {
+        networkCapabilities.value = null
+        startPrefetching()
+        play(EPISODE, isGeneratedTranscriptAvailable = true)
+
+        networkCapabilities.value = internetCapabilities
+        waitForCurrentEpisode()
+
+        assertEquals(listOf(EPISODE.uuid), prefetchedEpisodeUuids)
+    }
+
+    @Test
+    fun `check again when the connection comes back after a drop`() = runTest {
+        startPrefetching()
+        play(EPISODE, isGeneratedTranscriptAvailable = true)
+
+        networkCapabilities.value = null
+        waitForCurrentEpisode()
+        networkCapabilities.value = internetCapabilities
+        waitForCurrentEpisode()
+
+        assertEquals(listOf(EPISODE.uuid, EPISODE.uuid), prefetchedEpisodeUuids)
+    }
+
+    @Test
     fun `start prefetching only once`() = runTest {
         val prefetcher = startPrefetching()
         prefetcher.prefetchForCurrentEpisode()
@@ -261,6 +305,7 @@ class ChatStarterQuestionsPrefetcherTest {
         chatManager = chatManager,
         syncManager = syncManager,
         settings = settings,
+        networkConnectionWatcher = networkConnectionWatcher,
         processLifecycleOwner = lifecycleOwner,
         scope = CoroutineScope(backgroundScope.coroutineContext + UnconfinedTestDispatcher(testScheduler)),
     ).apply { prefetchForCurrentEpisode() }
