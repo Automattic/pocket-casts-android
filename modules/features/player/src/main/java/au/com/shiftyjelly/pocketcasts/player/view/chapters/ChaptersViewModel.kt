@@ -57,6 +57,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 
 @HiltViewModel(assistedFactory = ChaptersViewModel.Factory::class)
 class ChaptersViewModel @AssistedInject constructor(
@@ -73,22 +74,36 @@ class ChaptersViewModel @AssistedInject constructor(
 ) : ViewModel() {
     private val isTogglingChapters = MutableStateFlow(false)
 
+    private val generatedChaptersLoad = MutableStateFlow<GeneratedChaptersLoad?>(null)
+
     init {
         viewModelScope.launch(ioDispatcher) {
             combine(
                 mode.episodeIdFlow().filter { it.isNotEmpty() },
                 generatedChaptersAvailability.isAllowedFlow,
-                ::Pair,
-            ).collectLatest { (episodeId, isAllowed) ->
-                if (!isAllowed) return@collectLatest
-                var retryDelay = 5.seconds
-                while (!transcriptManager.loadGeneratedChapters(episodeId) && retryDelay <= 2.minutes) {
-                    delay(retryDelay)
-                    retryDelay *= 2
-                }
-            }
+                ::GeneratedChaptersLoad,
+            ).collectLatest(::loadGeneratedChapters)
         }
     }
+
+    private suspend fun loadGeneratedChapters(load: GeneratedChaptersLoad) {
+        generatedChaptersLoad.value = load
+        if (!load.isEnabled) return
+        var isLoaded = transcriptManager.loadGeneratedChapters(load.episodeId)
+        if (!isLoaded || !load.isEnabled || !awaitSavedChapters(load.episodeId)) {
+            generatedChaptersLoad.value = load.copy(isFinished = true)
+        }
+        var retryDelay = 5.seconds
+        while (!isLoaded && retryDelay <= 2.minutes) {
+            delay(retryDelay)
+            retryDelay *= 2
+            isLoaded = transcriptManager.loadGeneratedChapters(load.episodeId)
+        }
+    }
+
+    private suspend fun awaitSavedChapters(episodeId: String) = withTimeoutOrNull(SAVED_CHAPTERS_TIMEOUT) {
+        chapterManager.observerChaptersForEpisode(episodeId).first { it.isNotEmpty() }
+    } != null
 
     val uiState = mode.uiStateFlow().stateIn(viewModelScope, SharingStarted.Lazily, UiState())
 
@@ -115,10 +130,21 @@ class ChaptersViewModel @AssistedInject constructor(
         playbackManager.playbackStateFlow,
         episodeManager.findEpisodeByUuidFlow(episodeId),
         chapterManager.observerChaptersForEpisode(episodeId),
-        settings.cachedSubscription.flow,
+        combine(settings.cachedSubscription.flow, generatedChaptersStatusFlow(episodeId), ::Pair),
         isTogglingChapters,
         ::createUiState,
     )
+
+    private fun generatedChaptersStatusFlow(episodeId: String) = combine(
+        settings.showGeneratedChapters.flow,
+        generatedChaptersLoad,
+    ) { isEnabled, load ->
+        when {
+            !isEnabled -> GeneratedChaptersStatus.NotEnabled
+            load == GeneratedChaptersLoad(episodeId, isEnabled = true, isFinished = true) -> GeneratedChaptersStatus.Loaded
+            else -> GeneratedChaptersStatus.Loading
+        }
+    }
 
     private var playChapterJob: Job? = null
 
@@ -179,7 +205,11 @@ class ChaptersViewModel @AssistedInject constructor(
         setShowGeneratedChapters(true, GeneratedChaptersToggleSourceType.Undo)
     }
 
-    private fun setShowGeneratedChapters(show: Boolean, source: GeneratedChaptersToggleSourceType) {
+    fun generateChapters() {
+        setShowGeneratedChapters(true, source = null)
+    }
+
+    private fun setShowGeneratedChapters(show: Boolean, source: GeneratedChaptersToggleSourceType?) {
         eventHorizon.track(SettingsGeneralGeneratedChaptersToggledEvent(enabled = show, source = source))
         settings.showGeneratedChapters.set(show, updateModifiedAt = true)
     }
@@ -249,21 +279,24 @@ class ChaptersViewModel @AssistedInject constructor(
         playbackState: PlaybackState,
         episode: BaseEpisode,
         chapters: Chapters,
-        subscription: Subscription?,
+        subscriptionAndStatus: Pair<Subscription?, GeneratedChaptersStatus>,
         isToggling: Boolean,
-    ) = UiState(
-        podcast = playbackState.podcast,
-        allChapters = chapters.toChapterStates(playbackPosition(playbackState, episode)),
-        hasGeneratedChapters = chapters.hasGeneratedChapters,
-        isTogglingChapters = isToggling,
-        canSkipChapters = subscription != null,
-        showHeader = episode is PodcastEpisode,
-        isGeneratedChaptersOff = chapters.hasHiddenGeneratedChapters,
-        showUpsell = subscription == null &&
-            chapters.isEmpty() &&
-            episode is PodcastEpisode &&
-            FeatureFlag.isEnabled(Feature.GENERATED_CHAPTERS),
-    )
+    ): UiState {
+        val (subscription, generatedChaptersStatus) = subscriptionAndStatus
+        val isGeneratedChaptersEpisode = episode is PodcastEpisode && FeatureFlag.isEnabled(Feature.GENERATED_CHAPTERS)
+        return UiState(
+            podcast = playbackState.podcast,
+            allChapters = chapters.toChapterStates(playbackPosition(playbackState, episode)),
+            hasGeneratedChapters = chapters.hasGeneratedChapters,
+            isTogglingChapters = isToggling,
+            canSkipChapters = subscription != null,
+            showHeader = episode is PodcastEpisode,
+            isGeneratedChaptersOff = chapters.hasHiddenGeneratedChapters,
+            showUpsell = subscription == null && chapters.isEmpty() && isGeneratedChaptersEpisode,
+            canGenerateChapters = subscription != null && isGeneratedChaptersEpisode,
+            generatedChaptersStatus = generatedChaptersStatus,
+        )
+    }
 
     private fun playbackPosition(playbackState: PlaybackState, episode: BaseEpisode) = when (mode) {
         is Mode.Episode -> if (playbackState.episodeUuid == mode.episodeId) {
@@ -322,14 +355,47 @@ class ChaptersViewModel @AssistedInject constructor(
         val showHeader: Boolean = false,
         val isGeneratedChaptersOff: Boolean = false,
         val showUpsell: Boolean = false,
+        val canGenerateChapters: Boolean = false,
+        val generatedChaptersStatus: GeneratedChaptersStatus = GeneratedChaptersStatus.NotEnabled,
     ) {
         val chaptersCount = allChapters.size
-        val showOffState get() = chaptersCount == 0 && isGeneratedChaptersOff
-        val showChaptersTab get() = chaptersCount > 0 || isGeneratedChaptersOff || showUpsell
+        val emptyState get() = when {
+            chaptersCount > 0 -> null
+
+            isGeneratedChaptersOff -> EmptyState.GeneratedChaptersOff
+
+            !canGenerateChapters -> null
+
+            else -> when (generatedChaptersStatus) {
+                GeneratedChaptersStatus.NotEnabled -> EmptyState.NoChaptersYet
+                GeneratedChaptersStatus.Loading -> EmptyState.GeneratingChapters
+                GeneratedChaptersStatus.Loaded -> EmptyState.NoGeneratedChapters
+            }
+        }
+        val showChaptersTab get() = chaptersCount > 0 || emptyState != null || showUpsell
         val deselectedChaptersCount get() = allChapters.count { !it.chapter.selected }
         val chapters get() = if (isTogglingChapters) allChapters else allChapters.filter { it.chapter.selected }
         val showSubscriptionIcon get() = !isTogglingChapters && !canSkipChapters
     }
+
+    enum class GeneratedChaptersStatus {
+        NotEnabled,
+        Loading,
+        Loaded,
+    }
+
+    enum class EmptyState {
+        GeneratedChaptersOff,
+        NoChaptersYet,
+        GeneratingChapters,
+        NoGeneratedChapters,
+    }
+
+    private data class GeneratedChaptersLoad(
+        val episodeId: String,
+        val isEnabled: Boolean,
+        val isFinished: Boolean = false,
+    )
 
     sealed interface ChapterState {
         val chapter: Chapter
@@ -347,5 +413,9 @@ class ChaptersViewModel @AssistedInject constructor(
     @AssistedFactory
     interface Factory {
         fun create(mode: Mode): ChaptersViewModel
+    }
+
+    private companion object {
+        val SAVED_CHAPTERS_TIMEOUT = 1.seconds
     }
 }
