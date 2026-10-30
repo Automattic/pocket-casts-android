@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.wear.ui.episode
 
 import android.app.Application
 import android.content.Context
+import android.graphics.Bitmap
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.Color
@@ -50,8 +51,7 @@ import com.automattic.eventhorizon.EventHorizon
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -95,6 +95,7 @@ class EpisodeViewModel @Inject constructor(
     private val audioOutputSelectorHelper: AudioOutputSelectorHelper,
     private val userEpisodeManager: UserEpisodeManager,
     @DefaultDispatcher private val backgroundDispatcher: CoroutineDispatcher,
+    private val imageLoader: ImageLoader,
 ) : AndroidViewModel(appContext as Application) {
     private var playAttempt: Job? = null
     private val sourceView = SourceView.EPISODE_DETAILS
@@ -451,31 +452,23 @@ class EpisodeViewModel @Inject constructor(
         }
     }
 
-    private suspend fun extractColorFromEpisodeArtwork(userEpisode: UserEpisode): Color = userEpisode.artworkUrl?.let { artworkUrl ->
-        val context = getApplication<Application>()
-        val loader = ImageLoader(context)
-        val request = ImageRequest.Builder(context)
+    private suspend fun extractColorFromEpisodeArtwork(userEpisode: UserEpisode): Color {
+        val artworkUrl = userEpisode.artworkUrl ?: return Color.White
+        val request = ImageRequest.Builder(getApplication<Application>())
             .data(artworkUrl)
             .allowHardware(false) // Disable hardware bitmaps.
             .build()
 
-        val successResult = loader.execute(request) as? SuccessResult
-            ?: return@let null
-        val bitmap = successResult.image.toBitmap()
-
-        // Set a timeout to make sure the user isn't blocked for too long just
-        // because we're trying to extract a tint color.
-        withTimeoutOrNull(2000L) {
-            suspendCoroutine { continuation ->
-                Palette.from(bitmap).generate { palette ->
-                    val lightVibrantHsl = palette?.lightVibrantSwatch?.hsl
-                    continuation.resume(
-                        lightVibrantHsl?.let { hsl ->
-                            Color.hsl(hsl[0], hsl[1], hsl[2])
-                        },
-                    )
-                }
-            }
+        val color = withTimeoutOrNull(2.seconds) {
+            val successResult = imageLoader.execute(request) as? SuccessResult ?: return@withTimeoutOrNull null
+            val bitmap = successResult.image.toBitmap()
+            withContext(backgroundDispatcher) { bitmap.lightVibrantColor() }
         }
-    } ?: Color.White
+        return color ?: Color.White
+    }
+}
+
+internal fun Bitmap.lightVibrantColor(): Color? {
+    val hsl = Palette.from(this).generate().lightVibrantSwatch?.hsl ?: return null
+    return Color.hsl(hsl[0], hsl[1], hsl[2])
 }
