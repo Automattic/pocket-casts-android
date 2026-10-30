@@ -449,6 +449,42 @@ class ChaptersViewModelTest {
         assertEquals(SettingsGeneralGeneratedChaptersToggledEvent(enabled = true), eventSink.pollEvent())
     }
 
+    @Test
+    fun `show off state when generated chapters are turned off`() = runTest {
+        chaptersViewModel.uiState.test {
+            val visible = awaitItem()
+            assertFalse(visible.showOffState)
+            assertTrue(visible.showChaptersTab)
+
+            chaptersFlow.value = Chapters(hasHiddenGeneratedChapters = true)
+            val off = awaitItem()
+            assertTrue(off.showOffState)
+            assertTrue(off.showChaptersTab)
+        }
+    }
+
+    @Test
+    fun `hide chapters tab when there are no chapters and generated chapters are not turned off`() = runTest {
+        chaptersFlow.value = Chapters()
+
+        chaptersViewModel.uiState.test {
+            val state = awaitItem()
+            assertFalse(state.showOffState)
+            assertFalse(state.showChaptersTab)
+        }
+    }
+
+    @Test
+    fun `do not show off state while other chapters are visible`() = runTest {
+        chaptersFlow.value = Chapters(chapters.toList(), hasHiddenGeneratedChapters = true)
+
+        chaptersViewModel.uiState.test {
+            val state = awaitItem()
+            assertFalse(state.showOffState)
+            assertTrue(state.showChaptersTab)
+        }
+    }
+
     private fun createViewModel() = ChaptersViewModel(
         mode = Mode.Episode("id"),
         chapterManager = chapterManager,

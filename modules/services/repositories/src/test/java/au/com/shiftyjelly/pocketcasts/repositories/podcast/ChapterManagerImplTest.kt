@@ -930,6 +930,58 @@ class ChapterManagerImplTest {
         }
     }
 
+    @Test
+    fun `observe flags hidden generated chapters in the same emission`() = runBlocking {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        val episode = PodcastEpisode("id", publishedDate = Date(), duration = 0.002)
+        whenever(chapterDao.observeChaptersForEpisode("id")).thenReturn(flowOf(generatedChaptersFixture))
+        whenever(episodeManager.findEpisodeByUuidFlow("id")).thenReturn(flowOf(episode))
+
+        chapterManager.observerChaptersForEpisode("id").test {
+            assertEquals(false, awaitItem().hasHiddenGeneratedChapters)
+
+            generatedChapters.showGeneratedChaptersFlow.value = false
+            val hidden = awaitItem()
+            assertEquals(listOf("Embedded"), hidden.map { it.title })
+            assertEquals(true, hidden.hasHiddenGeneratedChapters)
+
+            generatedChapters.showGeneratedChaptersFlow.value = true
+            assertEquals(false, awaitItem().hasHiddenGeneratedChapters)
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `observe does not flag hidden generated chapters without stored generated chapters`() = runBlocking {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        generatedChapters.showGeneratedChaptersFlow.value = false
+        val episode = PodcastEpisode("id", publishedDate = Date(), duration = 0.002)
+        whenever(chapterDao.observeChaptersForEpisode("id")).thenReturn(flowOf(generatedChaptersFixture.filterNot { it.origin == ChapterOrigin.Generated }))
+        whenever(episodeManager.findEpisodeByUuidFlow("id")).thenReturn(flowOf(episode))
+
+        chapterManager.observerChaptersForEpisode("id").test {
+            assertEquals(false, awaitItem().hasHiddenGeneratedChapters)
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `observe does not flag hidden generated chapters while the feature is disabled`() = runBlocking {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, false)
+        generatedChapters.showGeneratedChaptersFlow.value = false
+        val episode = PodcastEpisode("id", publishedDate = Date(), duration = 0.002)
+        whenever(chapterDao.observeChaptersForEpisode("id")).thenReturn(flowOf(generatedChaptersFixture))
+        whenever(episodeManager.findEpisodeByUuidFlow("id")).thenReturn(flowOf(episode))
+
+        chapterManager.observerChaptersForEpisode("id").test {
+            assertEquals(false, awaitItem().hasHiddenGeneratedChapters)
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
     private val generatedChaptersFixture = listOf(
         DbChapter(index = 0, episodeUuid = "id", startTimeMs = 0, endTimeMs = 1, title = "Embedded", origin = ChapterOrigin.PodcastIndex),
         DbChapter(index = 1, episodeUuid = "id", startTimeMs = 1, endTimeMs = 2, title = "Generated", origin = ChapterOrigin.Generated),

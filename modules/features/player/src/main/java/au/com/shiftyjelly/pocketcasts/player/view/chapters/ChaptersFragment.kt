@@ -75,6 +75,8 @@ class ChaptersFragment : BaseFragment() {
                     onChapterClick = viewModel::playChapter,
                     onSkipChaptersClick = viewModel::enableTogglingOrUpsell,
                     onTurnOffGeneratedClick = ::turnOffGeneratedChapters,
+                    showOffState = state.showOffState,
+                    onTurnOnGeneratedClick = viewModel::turnOnGeneratedChapters,
                     onSelectionChange = viewModel::selectChapter,
                     onUrlClick = ::openChapterUrl,
                     resolvingChapterIndex = resolvingChapterIndex,

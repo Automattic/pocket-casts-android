@@ -251,6 +251,7 @@ class ChaptersViewModel @AssistedInject constructor(
         isTogglingChapters = isToggling,
         canSkipChapters = subscription != null,
         showHeader = episode is PodcastEpisode,
+        isGeneratedChaptersOff = chapters.hasHiddenGeneratedChapters,
     )
 
     private fun playbackPosition(playbackState: PlaybackState, episode: BaseEpisode) = when (mode) {
@@ -308,8 +309,11 @@ class ChaptersViewModel @AssistedInject constructor(
         val isTogglingChapters: Boolean = false,
         val canSkipChapters: Boolean = false,
         val showHeader: Boolean = false,
+        val isGeneratedChaptersOff: Boolean = false,
     ) {
         val chaptersCount = allChapters.size
+        val showOffState get() = chaptersCount == 0 && isGeneratedChaptersOff
+        val showChaptersTab get() = chaptersCount > 0 || isGeneratedChaptersOff
         val deselectedChaptersCount get() = allChapters.count { !it.chapter.selected }
         val chapters get() = if (isTogglingChapters) allChapters else allChapters.filter { it.chapter.selected }
         val showSubscriptionIcon get() = !isTogglingChapters && !canSkipChapters
