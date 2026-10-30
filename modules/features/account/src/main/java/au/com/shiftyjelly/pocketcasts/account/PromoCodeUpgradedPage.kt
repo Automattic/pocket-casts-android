@@ -46,7 +46,7 @@ internal fun PromoCodeUpgradedPage(
     ) {
         Box(
             modifier = Modifier
-                .padding(top = 4.dp)
+                .padding(top = 12.dp)
                 .size(width = 48.dp, height = 4.dp)
                 .background(MaterialTheme.theme.colors.playerContrast01, RoundedCornerShape(3.dp)),
         )
@@ -54,7 +54,7 @@ internal fun PromoCodeUpgradedPage(
             drawableId = logoRes,
             contentDescription = null,
             modifier = Modifier
-                .padding(top = 24.dp)
+                .padding(top = 8.dp)
                 .size(width = 156.dp, height = 148.dp),
         )
         TextViewText(
