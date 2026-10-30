@@ -433,41 +433,42 @@ class ChatViewModelTest {
     }
 
     @Test
-    fun `starter questions show as loading until they arrive`() = runTest {
+    fun `starter questions are added when they arrive`() = runTest {
         val questions = CompletableDeferred<List<String>>()
         chatManager.starterQuestionsResult = questions
         setEpisodeInfo()
         runCurrent()
 
-        assertTrue(viewModel.uiState.value.isLoadingStarterQuestions)
+        assertTrue(viewModel.uiState.value.starterQuestions.isEmpty())
 
         questions.complete(listOf("Who is the guest?"))
         advanceUntilIdle()
 
-        assertFalse(viewModel.uiState.value.isLoadingStarterQuestions)
         assertEquals(listOf("Who is the guest?"), viewModel.uiState.value.starterQuestions)
     }
 
     @Test
-    fun `failed starter questions stop loading`() = runTest {
+    fun `failed starter questions leave only the summary suggestion`() = runTest {
         setEpisodeInfo()
         advanceUntilIdle()
 
-        assertFalse(viewModel.uiState.value.isLoadingStarterQuestions)
         assertTrue(viewModel.uiState.value.starterQuestions.isEmpty())
     }
 
     @Test
-    fun `switching episodes while starter questions load stops loading`() = runTest {
-        chatManager.starterQuestionsResult = CompletableDeferred()
+    fun `starter questions arriving after switching episodes are dropped`() = runTest {
+        val questions = CompletableDeferred<List<String>>()
+        chatManager.starterQuestionsResult = questions
         setEpisodeInfo()
         runCurrent()
         chatManager.otherMessages.value = listOf(ChatMessage.User(text = "Q1", uuid = "q1"))
 
         viewModel.openHistoryChat(historyItem(OTHER_EPISODE_UUID))
         runCurrent()
+        questions.complete(listOf("Who is the guest?"))
+        advanceUntilIdle()
 
-        assertFalse(viewModel.uiState.value.isLoadingStarterQuestions)
+        assertTrue(viewModel.uiState.value.starterQuestions.isEmpty())
     }
 
     @Test

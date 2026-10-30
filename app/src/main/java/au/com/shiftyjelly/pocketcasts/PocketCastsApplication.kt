@@ -18,6 +18,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.appreview.AppReviewExceptionHandler
 import au.com.shiftyjelly.pocketcasts.repositories.appreview.AppReviewManager
+import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatStarterQuestionsPrefetcher
 import au.com.shiftyjelly.pocketcasts.repositories.di.ProcessLifecycle
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadStatusObserver
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearSync
@@ -146,6 +147,8 @@ class PocketCastsApplication :
     @Inject lateinit var shortcutsSynchronizer: DynamicShortcutsSynchronizer
 
     @Inject lateinit var playlistInteractionNotifier: PlaylistInteractionNotifier
+
+    @Inject lateinit var chatStarterQuestionsPrefetcher: ChatStarterQuestionsPrefetcher
 
     @Inject lateinit var appReviewManager: AppReviewManager
 
@@ -354,6 +357,7 @@ class PocketCastsApplication :
         engageSdkBridge.registerIntegration()
         shortcutsSynchronizer.keepShortcutsInSync()
         playlistInteractionNotifier.monitorPlaylistsInteraction()
+        chatStarterQuestionsPrefetcher.prefetchForCurrentEpisode()
         applicationScope.launch { appReviewManager.monitorAppReviewReasons() }
 
         keepPlayerWidgetsUpdated()

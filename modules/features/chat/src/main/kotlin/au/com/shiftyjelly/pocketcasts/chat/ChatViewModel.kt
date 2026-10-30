@@ -252,7 +252,6 @@ class ChatViewModel @Inject constructor(
                 error = null,
                 answerRatings = emptyMap(),
                 starterQuestions = emptyList(),
-                isLoadingStarterQuestions = false,
             )
         }
         trackShownIfPending(hasHistory = null)
@@ -290,9 +289,6 @@ class ChatViewModel @Inject constructor(
         val episode = chatEpisode.value ?: return
         if (starterQuestionsEpisodeUuid == episode.uuid) return
         starterQuestionsEpisodeUuid = episode.uuid
-        _uiState.update { state ->
-            if (state.starterQuestions.isEmpty()) state.copy(isLoadingStarterQuestions = true) else state
-        }
         viewModelScope.launch {
             val questions = chatManager.getStarterQuestions(episode.uuid, episode.podcastUuid)
             if (questions.isEmpty() && starterQuestionsEpisodeUuid == episode.uuid) {
@@ -300,7 +296,7 @@ class ChatViewModel @Inject constructor(
             }
             _uiState.update { state ->
                 if (state.episodeUuid == episode.uuid) {
-                    state.copy(starterQuestions = questions, isLoadingStarterQuestions = false)
+                    state.copy(starterQuestions = questions)
                 } else {
                     state
                 }
@@ -1154,7 +1150,6 @@ data class ChatUiState(
     val restoredMessageUuids: Set<String> = emptySet(),
     val loadingQuoteUuid: String? = null,
     val starterQuestions: List<String> = emptyList(),
-    val isLoadingStarterQuestions: Boolean = false,
 ) {
     val canSend: Boolean get() = inputText.isNotBlank() && isConnected && !isAwaitingReply
 
