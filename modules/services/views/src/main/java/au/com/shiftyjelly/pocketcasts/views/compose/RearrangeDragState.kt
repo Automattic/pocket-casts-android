@@ -130,12 +130,15 @@ internal class RearrangeDragState(
         selectedKey = null
         recoveringKey = key
         scope.launch {
-            recoverTranslation.snapTo(translation)
-            recoverTranslation.animateTo(0f, tween(250, easing = AccelerateDecelerate))
-            recoveringKey = null
-            liftedKey = null
+            try {
+                recoverTranslation.snapTo(translation)
+                recoverTranslation.animateTo(0f, tween(250, easing = AccelerateDecelerate))
+            } finally {
+                recoveringKey = null
+                liftedKey = null
+                onDrop(key)
+            }
             lift.snapTo(0f)
-            onDrop(key)
         }
     }
 
