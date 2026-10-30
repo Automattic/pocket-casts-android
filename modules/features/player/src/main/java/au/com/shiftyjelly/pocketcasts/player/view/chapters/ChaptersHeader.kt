@@ -110,9 +110,9 @@ fun ChaptersHeader(
 }
 
 @Composable
-private fun GeneratedChaptersMenu(
+internal fun GeneratedChaptersMenu(
     showSubscriptionIcon: Boolean,
-    onPreselectClick: () -> Unit,
+    onPreselectClick: (() -> Unit)?,
     onTurnOffClick: () -> Unit,
 ) {
     var isMenuShown by remember { mutableStateOf(false) }
@@ -128,16 +128,18 @@ private fun GeneratedChaptersMenu(
             expanded = isMenuShown,
             onDismissRequest = { isMenuShown = false },
         ) {
-            GeneratedChaptersMenuItem(
-                iconRes = IR.drawable.ic_tick_circle,
-                textRes = LR.string.skip_chapters,
-                color = MaterialTheme.theme.colors.primaryText01,
-                showSubscriptionIcon = showSubscriptionIcon,
-                onClick = {
-                    isMenuShown = false
-                    onPreselectClick()
-                },
-            )
+            if (onPreselectClick != null) {
+                GeneratedChaptersMenuItem(
+                    iconRes = IR.drawable.ic_tick_circle,
+                    textRes = LR.string.skip_chapters,
+                    color = MaterialTheme.theme.colors.primaryText01,
+                    showSubscriptionIcon = showSubscriptionIcon,
+                    onClick = {
+                        isMenuShown = false
+                        onPreselectClick()
+                    },
+                )
+            }
             GeneratedChaptersMenuItem(
                 iconRes = IR.drawable.ic_minus,
                 textRes = LR.string.chapters_generated_turn_off,

@@ -69,7 +69,7 @@ fun ChaptersNoGeneratedChapters(
 
 @Composable
 private fun ChaptersBannerContainer(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
     Box(
