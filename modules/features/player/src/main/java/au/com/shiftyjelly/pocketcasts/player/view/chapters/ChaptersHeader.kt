@@ -71,10 +71,10 @@ fun ChaptersHeader(
                 Spacer(Modifier.width(8.dp))
             }
             TextH50(
-                text = if (isGenerated && hiddenChaptersCount == 0) {
-                    pluralStringResource(LR.plurals.chapters_generated_count, totalChaptersCount, totalChaptersCount)
-                } else {
-                    getHeaderTitle(totalChaptersCount, hiddenChaptersCount)
+                text = when {
+                    !isGenerated -> getHeaderTitle(totalChaptersCount, hiddenChaptersCount)
+                    hiddenChaptersCount > 0 -> pluralStringResource(LR.plurals.chapters_generated_count_with_hidden, totalChaptersCount, totalChaptersCount, hiddenChaptersCount)
+                    else -> pluralStringResource(LR.plurals.chapters_generated_count, totalChaptersCount, totalChaptersCount)
                 },
                 color = LocalChaptersTheme.current.headerTitle,
                 modifier = Modifier
@@ -309,6 +309,15 @@ private fun ChaptersHeaderPreview(theme: Theme.ThemeType) {
                     onSkipChaptersClick = {},
                     isTogglingChapters = false,
                     showSubscriptionIcon = true,
+                    isGenerated = true,
+                    onTurnOffGeneratedClick = {},
+                )
+                ChaptersHeader(
+                    totalChaptersCount = 6,
+                    hiddenChaptersCount = 2,
+                    onSkipChaptersClick = {},
+                    isTogglingChapters = false,
+                    showSubscriptionIcon = false,
                     isGenerated = true,
                     onTurnOffGeneratedClick = {},
                 )
