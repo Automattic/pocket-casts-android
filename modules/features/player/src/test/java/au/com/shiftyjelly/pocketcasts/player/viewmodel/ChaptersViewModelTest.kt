@@ -11,7 +11,6 @@ import au.com.shiftyjelly.pocketcasts.models.to.Chapters
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
 import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
-import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.player.view.chapters.ChaptersViewModel
 import au.com.shiftyjelly.pocketcasts.player.view.chapters.ChaptersViewModel.Mode
@@ -89,8 +88,7 @@ class ChaptersViewModelTest {
         on { resolvingChapterIndex(any()) } doReturn MutableStateFlow<Int?>(null)
     }
 
-    private val paymentClient = PaymentClient.test()
-    private val episode = PodcastEpisode(uuid = "id", publishedDate = Date(), hasGeneratedTranscript = true)
+    private val episode = PodcastEpisode(uuid = "id", publishedDate = Date())
     private val chapters = Chapters(
         listOf(
             Chapter("1", 0.milliseconds, 100.milliseconds, selected = true, index = 0, uiIndex = 1),
@@ -137,7 +135,6 @@ class ChaptersViewModelTest {
             generatedChapterSeeker = generatedChapterSeeker,
             transcriptManager = transcriptManager,
             generatedChaptersAvailability = generatedChaptersAvailability,
-            paymentClient = paymentClient,
             ioDispatcher = testDispatcher,
         )
     }
@@ -182,7 +179,6 @@ class ChaptersViewModelTest {
             generatedChapterSeeker = generatedChapterSeeker,
             transcriptManager = transcriptManager,
             generatedChaptersAvailability = generatedChaptersAvailability,
-            paymentClient = paymentClient,
             ioDispatcher = testDispatcher,
         )
 
@@ -209,7 +205,6 @@ class ChaptersViewModelTest {
             generatedChapterSeeker = generatedChapterSeeker,
             transcriptManager = transcriptManager,
             generatedChaptersAvailability = generatedChaptersAvailability,
-            paymentClient = paymentClient,
             ioDispatcher = testDispatcher,
         )
         verifyBlocking(transcriptManager, times(1)) { loadGeneratedChapters("id") }
@@ -377,7 +372,6 @@ class ChaptersViewModelTest {
             generatedChapterSeeker = generatedChapterSeeker,
             transcriptManager = transcriptManager,
             generatedChaptersAvailability = generatedChaptersAvailability,
-            paymentClient = paymentClient,
             ioDispatcher = testDispatcher,
         )
 
@@ -510,7 +504,7 @@ class ChaptersViewModelTest {
     }
 
     @Test
-    fun `show upsell for free users on an episode with a generated transcript and no chapters`() = runTest {
+    fun `show upsell for free users on a podcast episode without chapters`() = runTest {
         FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
         subscriptionFlow.value = null
         chaptersFlow.value = Chapters()
@@ -543,11 +537,23 @@ class ChaptersViewModelTest {
     }
 
     @Test
-    fun `do not show upsell without a generated transcript`() = runTest {
+    fun `show upsell on podcast episodes without a generated transcript`() = runTest {
         FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
         subscriptionFlow.value = null
         chaptersFlow.value = Chapters()
         episodeFlow.value = episode.copy(hasGeneratedTranscript = false)
+
+        chaptersViewModel.uiState.test {
+            assertTrue(awaitItem().showUpsell)
+        }
+    }
+
+    @Test
+    fun `do not show upsell for user files`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        subscriptionFlow.value = null
+        chaptersFlow.value = Chapters()
+        episodeFlow.value = UserEpisode(uuid = "id", publishedDate = Date())
 
         chaptersViewModel.uiState.test {
             val state = awaitItem()
@@ -577,7 +583,6 @@ class ChaptersViewModelTest {
         generatedChapterSeeker = generatedChapterSeeker,
         transcriptManager = transcriptManager,
         generatedChaptersAvailability = generatedChaptersAvailability,
-        paymentClient = paymentClient,
         ioDispatcher = testDispatcher,
     )
 }

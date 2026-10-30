@@ -9,11 +9,6 @@ import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.models.to.Chapters
 import au.com.shiftyjelly.pocketcasts.models.to.toChapterOriginType
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
-import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
-import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
-import au.com.shiftyjelly.pocketcasts.payment.SubscriptionOffer
-import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
-import au.com.shiftyjelly.pocketcasts.payment.getOrNull
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.GeneratedChapterSeeker
@@ -58,7 +53,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -75,7 +69,6 @@ class ChaptersViewModel @AssistedInject constructor(
     private val generatedChapterSeeker: GeneratedChapterSeeker,
     private val transcriptManager: TranscriptManager,
     private val generatedChaptersAvailability: GeneratedChaptersAvailability,
-    private val paymentClient: PaymentClient,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     private val isTogglingChapters = MutableStateFlow(false)
@@ -98,11 +91,6 @@ class ChaptersViewModel @AssistedInject constructor(
     }
 
     val uiState = mode.uiStateFlow().stateIn(viewModelScope, SharingStarted.Lazily, UiState())
-
-    val isFreeTrialAvailable = flow {
-        val plans = paymentClient.loadSubscriptionPlans().getOrNull()
-        emit(plans?.findOfferPlan(SubscriptionTier.Plus, BillingCycle.Monthly, SubscriptionOffer.Trial) != null)
-    }.stateIn(viewModelScope, SharingStarted.Lazily, false)
 
     val resolvingChapterIndex = generatedChapterSeeker
         .resolvingChapterIndex(playbackManager.playbackStateFlow.map { it.episodeUuid })
@@ -273,7 +261,7 @@ class ChaptersViewModel @AssistedInject constructor(
         isGeneratedChaptersOff = chapters.hasHiddenGeneratedChapters,
         showUpsell = subscription == null &&
             chapters.isEmpty() &&
-            (episode as? PodcastEpisode)?.hasGeneratedTranscript == true &&
+            episode is PodcastEpisode &&
             FeatureFlag.isEnabled(Feature.GENERATED_CHAPTERS),
     )
 
