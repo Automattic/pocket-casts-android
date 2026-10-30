@@ -88,7 +88,6 @@ dependencies {
     implementation(projects.modules.features.chat)
     implementation(projects.modules.features.reimagine)
     implementation(projects.modules.services.images)
-    implementation(projects.modules.services.payment)
 
     debugImplementation(libs.compose.ui.test.manifest)
 

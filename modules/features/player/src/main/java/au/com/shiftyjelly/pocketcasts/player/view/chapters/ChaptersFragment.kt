@@ -65,9 +65,7 @@ class ChaptersFragment : BaseFragment() {
                 val lazyListState = rememberLazyListState()
 
                 if (state.showUpsell) {
-                    val isFreeTrialAvailable by viewModel.isFreeTrialAvailable.collectAsState()
                     ChaptersUpsell(
-                        isFreeTrialAvailable = isFreeTrialAvailable,
                         onUpgradeClick = ::showGeneratedChaptersUpsell,
                         modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection()),
                     )
