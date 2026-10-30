@@ -1,6 +1,8 @@
 8.25
 -----
 *   Bug Fixes
+    *   Keep episodes you've started listening to when a podcast's episode limit archives older episodes
+        ([#6154](https://github.com/Automattic/pocket-casts-android/pull/6154))
     *   Fix Wear OS episode downloads not switching to WiFi
         ([#6100](https://github.com/Automattic/pocket-casts-android/pull/6100))
     *   Fix a rare crash when tapping with two fingers while a screen is changing
@@ -11,7 +13,6 @@
         ([#5847](https://github.com/Automattic/pocket-casts-android/pull/5847))
     *   Fix the Settings menu showing through Subscription, Privacy policy and Terms of use in the TV app
         ([#6284](https://github.com/Automattic/pocket-casts-android/pull/6284))
-
 
 8.24
 -----
