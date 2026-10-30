@@ -264,7 +264,11 @@ class SearchFragment : BaseFragment() {
             }
         }
 
-        Column(modifier = Modifier.background(MaterialTheme.theme.colors.primaryUi01)) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.theme.colors.primaryUi01),
+        ) {
             SearchToolbar(
                 query = query,
                 isFloating = floating,

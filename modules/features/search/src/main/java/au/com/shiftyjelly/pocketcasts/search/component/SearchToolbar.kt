@@ -71,9 +71,12 @@ internal fun SearchToolbar(
         val themedContext = ContextThemeWrapper(context, R.style.Widget_AppCompat_SearchView_PCAccent)
         requireNotNull(AppCompatResources.getDrawable(themedContext, androidx.appcompat.R.drawable.abc_textfield_search_material))
     }
-    val platePadding = with(LocalDensity.current) {
-        val rect = Rect().also(plate::getPadding)
-        PaddingValues(rect.left.toDp(), rect.top.toDp(), rect.right.toDp(), rect.bottom.toDp())
+    val density = LocalDensity.current
+    val platePadding = remember(plate, density) {
+        with(density) {
+            val rect = Rect().also(plate::getPadding)
+            PaddingValues(rect.left.toDp(), rect.top.toDp(), rect.right.toDp(), rect.bottom.toDp())
+        }
     }
     var isFocused by remember { mutableStateOf(false) }
     val textStyle = TextStyle(
