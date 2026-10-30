@@ -3,6 +3,9 @@ package au.com.shiftyjelly.pocketcasts.repositories.fingerprint
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.models.to.ChapterOrigin
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.GeneratedChaptersFixture
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.testSubscription
 import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
@@ -54,6 +57,8 @@ class GeneratedChapterSeekerTest {
 
     private lateinit var timingManager: FingerprintTimingManager
 
+    private val generatedChapters = GeneratedChaptersFixture()
+
     @Before
     fun setUp() {
         FeatureFlag.setEnabled(Feature.SYNCED_TRANSCRIPTS, true)
@@ -68,6 +73,7 @@ class GeneratedChapterSeekerTest {
         fingerprintTimingManager = Lazy { timingManager },
         appPlatform = appPlatform,
         decodePolicy = mock { on { current() } doReturn policy },
+        generatedChaptersAvailability = generatedChapters.availability,
     )
 
     @Test
@@ -105,6 +111,42 @@ class GeneratedChapterSeekerTest {
 
         assertNull(seeker().resolveSeekTime(episode, generatedChapter))
         verifyBlocking(timingManager, never()) { resolvePlaybackTime(any(), any()) }
+    }
+
+    @Test
+    fun `returns null for free users`() = runTest {
+        generatedChapters.subscriptionFlow.value = null
+
+        assertNull(seeker().resolveSeekTime(episode, generatedChapter))
+        verify(timingManager, never()).densePlaybackTime(any(), any())
+        verifyBlocking(timingManager, never()) { resolvePlaybackTime(any(), any()) }
+    }
+
+    @Test
+    fun `returns null when generated chapters flag is off`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, false)
+
+        assertNull(seeker().resolveSeekTime(episode, generatedChapter))
+        verifyBlocking(timingManager, never()) { resolvePlaybackTime(any(), any()) }
+    }
+
+    @Test
+    fun `resolves for Patron users`() = runTest {
+        generatedChapters.subscriptionFlow.value = testSubscription(SubscriptionTier.Patron)
+        timingManager = mock { on { densePlaybackTime(eq("episode-uuid"), eq(100.seconds)) } doReturn 131.5.seconds }
+
+        assertEquals(131.5.seconds, seeker().resolveSeekTime(episode, generatedChapter))
+    }
+
+    @Test
+    fun `stops resolving after Plus lapses`() = runTest {
+        timingManager = mock { on { densePlaybackTime(eq("episode-uuid"), eq(100.seconds)) } doReturn 131.5.seconds }
+        val seeker = seeker()
+        assertEquals(131.5.seconds, seeker.resolveSeekTime(episode, generatedChapter))
+
+        generatedChapters.subscriptionFlow.value = null
+
+        assertNull(seeker.resolveSeekTime(episode, generatedChapter))
     }
 
     @Test

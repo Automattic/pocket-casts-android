@@ -21,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.GeneratedChaptersAvailability
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import com.automattic.eventhorizon.ChapterOriginType
@@ -47,6 +48,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.clearInvocations
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
@@ -69,6 +71,10 @@ class ChaptersViewModelTest {
     private val settings = mock<Settings>()
     private val transcriptManager = mock<TranscriptManager> {
         on { loadGeneratedChapters(any()) } doReturn true
+    }
+    private val isGeneratedChaptersAllowed = MutableStateFlow(true)
+    private val generatedChaptersAvailability = mock<GeneratedChaptersAvailability> {
+        on { isAllowedFlow } doReturn isGeneratedChaptersAllowed
     }
     private val generatedChapterSeeker = mock<GeneratedChapterSeeker> {
         on { resolvingChapterIndex(any()) } doReturn MutableStateFlow<Int?>(null)
@@ -118,6 +124,7 @@ class ChaptersViewModelTest {
             eventHorizon = EventHorizon(eventSink),
             generatedChapterSeeker = generatedChapterSeeker,
             transcriptManager = transcriptManager,
+            generatedChaptersAvailability = generatedChaptersAvailability,
             ioDispatcher = testDispatcher,
         )
     }
@@ -125,6 +132,27 @@ class ChaptersViewModelTest {
     @Test
     fun `episode mode loads generated chapters for its episode`() = runTest {
         verifyBlocking(transcriptManager) { loadGeneratedChapters("id") }
+    }
+
+    @Test
+    fun `does not load generated chapters while they are not allowed`() = runTest {
+        clearInvocations(transcriptManager)
+        isGeneratedChaptersAllowed.value = false
+        createViewModel()
+
+        verifyBlocking(transcriptManager, never()) { loadGeneratedChapters(any()) }
+    }
+
+    @Test
+    fun `loads generated chapters when they become allowed`() = runTest {
+        clearInvocations(transcriptManager)
+        isGeneratedChaptersAllowed.value = false
+        createViewModel()
+        verifyBlocking(transcriptManager, never()) { loadGeneratedChapters(any()) }
+
+        isGeneratedChaptersAllowed.value = true
+
+        verifyBlocking(transcriptManager, atLeastOnce()) { loadGeneratedChapters("id") }
     }
 
     @Test
@@ -140,6 +168,7 @@ class ChaptersViewModelTest {
             eventHorizon = EventHorizon(TestEventSink()),
             generatedChapterSeeker = generatedChapterSeeker,
             transcriptManager = transcriptManager,
+            generatedChaptersAvailability = generatedChaptersAvailability,
             ioDispatcher = testDispatcher,
         )
 
@@ -165,6 +194,7 @@ class ChaptersViewModelTest {
             eventHorizon = EventHorizon(TestEventSink()),
             generatedChapterSeeker = generatedChapterSeeker,
             transcriptManager = transcriptManager,
+            generatedChaptersAvailability = generatedChaptersAvailability,
             ioDispatcher = testDispatcher,
         )
         verifyBlocking(transcriptManager, times(1)) { loadGeneratedChapters("id") }
@@ -331,6 +361,7 @@ class ChaptersViewModelTest {
             eventHorizon = EventHorizon(TestEventSink()),
             generatedChapterSeeker = generatedChapterSeeker,
             transcriptManager = transcriptManager,
+            generatedChaptersAvailability = generatedChaptersAvailability,
             ioDispatcher = testDispatcher,
         )
 
@@ -395,4 +426,17 @@ class ChaptersViewModelTest {
             assertEquals(Unit, awaitItem())
         }
     }
+
+    private fun createViewModel() = ChaptersViewModel(
+        mode = Mode.Episode("id"),
+        chapterManager = chapterManager,
+        playbackManager = playbackManager,
+        episodeManager = episodeManager,
+        settings = settings,
+        eventHorizon = EventHorizon(TestEventSink()),
+        generatedChapterSeeker = generatedChapterSeeker,
+        transcriptManager = transcriptManager,
+        generatedChaptersAvailability = generatedChaptersAvailability,
+        ioDispatcher = testDispatcher,
+    )
 }

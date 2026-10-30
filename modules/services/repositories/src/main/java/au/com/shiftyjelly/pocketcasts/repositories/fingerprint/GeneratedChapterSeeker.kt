@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.fingerprint
 
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.GeneratedChaptersAvailability
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
@@ -38,6 +39,7 @@ class GeneratedChapterSeeker @Inject constructor(
     private val fingerprintTimingManager: Lazy<FingerprintTimingManager>,
     private val appPlatform: AppPlatform,
     private val decodePolicy: FingerprintDecodePolicy,
+    private val generatedChaptersAvailability: GeneratedChaptersAvailability,
 ) {
     data class ResolvingChapter(val episodeUuid: String, val chapterIndex: Int)
 
@@ -146,5 +148,5 @@ class GeneratedChapterSeeker @Inject constructor(
         appPlatform == AppPlatform.Phone &&
         decodePolicy.current() != FingerprintPolicy.DISABLED &&
         FeatureFlag.isEnabled(Feature.SYNCED_TRANSCRIPTS) &&
-        FeatureFlag.isEnabled(Feature.GENERATED_CHAPTERS)
+        generatedChaptersAvailability.isAllowed()
 }

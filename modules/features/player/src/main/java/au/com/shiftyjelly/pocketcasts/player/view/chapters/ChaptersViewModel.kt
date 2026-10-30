@@ -16,6 +16,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.GeneratedChaptersAvailability
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
 import com.automattic.eventhorizon.ChapterLinkClickedEvent
 import com.automattic.eventhorizon.ChaptersShownEvent
@@ -63,21 +64,25 @@ class ChaptersViewModel @AssistedInject constructor(
     private val eventHorizon: EventHorizon,
     private val generatedChapterSeeker: GeneratedChapterSeeker,
     private val transcriptManager: TranscriptManager,
+    private val generatedChaptersAvailability: GeneratedChaptersAvailability,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     private val isTogglingChapters = MutableStateFlow(false)
 
     init {
         viewModelScope.launch(ioDispatcher) {
-            mode.episodeIdFlow()
-                .filter { it.isNotEmpty() }
-                .collectLatest { episodeId ->
-                    var retryDelay = 5.seconds
-                    while (!transcriptManager.loadGeneratedChapters(episodeId) && retryDelay <= 2.minutes) {
-                        delay(retryDelay)
-                        retryDelay *= 2
-                    }
+            combine(
+                mode.episodeIdFlow().filter { it.isNotEmpty() },
+                generatedChaptersAvailability.isAllowedFlow,
+                ::Pair,
+            ).collectLatest { (episodeId, isAllowed) ->
+                if (!isAllowed) return@collectLatest
+                var retryDelay = 5.seconds
+                while (!transcriptManager.loadGeneratedChapters(episodeId) && retryDelay <= 2.minutes) {
+                    delay(retryDelay)
+                    retryDelay *= 2
                 }
+            }
         }
     }
 
