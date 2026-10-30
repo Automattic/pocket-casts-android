@@ -136,7 +136,11 @@ abstract class PodcastDao {
         SELECT podcasts.uuid
         FROM podcasts
         WHERE podcasts.subscribed = 1
-          AND EXISTS (SELECT 1 FROM podcast_episodes WHERE podcast_episodes.podcast_id = podcasts.uuid)
+          AND EXISTS (
+            SELECT 1 FROM podcast_episodes
+            WHERE podcast_episodes.podcast_id = podcasts.uuid
+              AND podcast_episodes.playing_status = :playingStatusCompleted
+          )
           AND NOT EXISTS (
             SELECT 1 FROM podcast_episodes
             WHERE podcast_episodes.podcast_id = podcasts.uuid
@@ -148,6 +152,7 @@ abstract class PodcastDao {
     abstract fun observePlayedPodcastUuids(
         playingStatusNotPlayed: Int = EpisodePlayingStatus.NOT_PLAYED.ordinal,
         playingStatusInProgress: Int = EpisodePlayingStatus.IN_PROGRESS.ordinal,
+        playingStatusCompleted: Int = EpisodePlayingStatus.COMPLETED.ordinal,
     ): Flow<List<String>>
 
     @Query(

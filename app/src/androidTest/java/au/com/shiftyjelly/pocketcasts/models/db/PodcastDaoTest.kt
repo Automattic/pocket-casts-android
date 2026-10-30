@@ -189,6 +189,7 @@ class PodcastDaoTest {
         val archivedUnplayed = insertSubscribedPodcastWithEpisodes(EpisodePlayingStatus.COMPLETED to false, EpisodePlayingStatus.NOT_PLAYED to true)
         val inProgress = insertSubscribedPodcastWithEpisodes(EpisodePlayingStatus.COMPLETED to false, EpisodePlayingStatus.IN_PROGRESS to false)
         val unplayed = insertSubscribedPodcastWithEpisodes(EpisodePlayingStatus.NOT_PLAYED to false)
+        val allArchivedUnplayed = insertSubscribedPodcastWithEpisodes(EpisodePlayingStatus.NOT_PLAYED to true)
         val withoutEpisodes = insertSubscribedPodcastWithEpisodes()
         val unsubscribed = Podcast(uuid = UUID.randomUUID().toString(), isSubscribed = false)
         podcastDao.insertSuspend(unsubscribed)
@@ -199,6 +200,7 @@ class PodcastDaoTest {
         assertEquals(setOf(played.uuid, archivedUnplayed.uuid), playedUuids)
         assertFalse(inProgress.uuid in playedUuids)
         assertFalse(unplayed.uuid in playedUuids)
+        assertFalse(allArchivedUnplayed.uuid in playedUuids)
         assertFalse(withoutEpisodes.uuid in playedUuids)
     }
 
