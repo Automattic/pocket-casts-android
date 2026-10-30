@@ -54,6 +54,7 @@ fun TextViewText(
     lineSpacingMultiplier: Float = 1f,
     textAlign: TextAlign = TextAlign.Start,
     maxLines: Int = Int.MAX_VALUE,
+    includeFontPadding: Boolean = true,
 ) {
     val density = LocalDensity.current
     val textMeasurer = rememberTextMeasurer()
@@ -91,7 +92,7 @@ fun TextViewText(
             maxLines = maxLines,
             constraints = Constraints(minWidth = constraints.minWidth, maxWidth = constraints.maxWidth),
         )
-        val measured = TextViewLines.from(result, metrics, spacingExtraPx, lineSpacingMultiplier)
+        val measured = TextViewLines.from(result, metrics, spacingExtraPx, lineSpacingMultiplier, includeFontPadding)
         lines = measured
         layout(
             width = result.size.width,
@@ -120,15 +121,15 @@ private class TextViewLines(
     }
 
     companion object {
-        fun from(result: TextLayoutResult, metrics: Paint.FontMetricsInt, spacingExtra: Int, spacingMultiplier: Float): TextViewLines {
+        fun from(result: TextLayoutResult, metrics: Paint.FontMetricsInt, spacingExtra: Int, spacingMultiplier: Float, includeFontPadding: Boolean): TextViewLines {
             val lineCount = result.lineCount
             val baselines = IntArray(lineCount)
             val needsSpacing = spacingExtra != 0 || spacingMultiplier != 1f
             var y = 0
             for (line in 0 until lineCount) {
                 val isLast = line == lineCount - 1
-                val above = if (line == 0) metrics.top else metrics.ascent
-                val below = if (isLast) metrics.bottom else metrics.descent
+                val above = if (line == 0 && includeFontPadding) metrics.top else metrics.ascent
+                val below = if (isLast && includeFontPadding) metrics.bottom else metrics.descent
                 val extra = if (needsSpacing && !isLast) roundExtra((below - above) * (spacingMultiplier - 1.0) + spacingExtra) else 0
                 baselines[line] = y - above
                 y += below - above + extra
