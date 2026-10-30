@@ -57,6 +57,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 
 @HiltViewModel(assistedFactory = ChaptersViewModel.Factory::class)
 class ChaptersViewModel @AssistedInject constructor(
@@ -89,7 +90,9 @@ class ChaptersViewModel @AssistedInject constructor(
         generatedChaptersLoad.value = load
         if (!load.isEnabled) return
         var isLoaded = transcriptManager.loadGeneratedChapters(load.episodeId)
-        generatedChaptersLoad.value = load.copy(isFinished = true)
+        if (!isLoaded || !load.isEnabled || !awaitSavedChapters(load.episodeId)) {
+            generatedChaptersLoad.value = load.copy(isFinished = true)
+        }
         var retryDelay = 5.seconds
         while (!isLoaded && retryDelay <= 2.minutes) {
             delay(retryDelay)
@@ -97,6 +100,10 @@ class ChaptersViewModel @AssistedInject constructor(
             isLoaded = transcriptManager.loadGeneratedChapters(load.episodeId)
         }
     }
+
+    private suspend fun awaitSavedChapters(episodeId: String) = withTimeoutOrNull(SAVED_CHAPTERS_TIMEOUT) {
+        chapterManager.observerChaptersForEpisode(episodeId).first { it.isNotEmpty() }
+    } != null
 
     val uiState = mode.uiStateFlow().stateIn(viewModelScope, SharingStarted.Lazily, UiState())
 
@@ -406,5 +413,9 @@ class ChaptersViewModel @AssistedInject constructor(
     @AssistedFactory
     interface Factory {
         fun create(mode: Mode): ChaptersViewModel
+    }
+
+    private companion object {
+        val SAVED_CHAPTERS_TIMEOUT = 1.seconds
     }
 }
