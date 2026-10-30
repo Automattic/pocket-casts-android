@@ -49,6 +49,8 @@ dependencies {
     implementation(libs.aboutlibraries.core)
     implementation(libs.androidx.core.ktx)
     implementation(libs.compose.animation)
+    implementation(libs.coil.compose)
+    implementation(libs.compose.livedata)
     implementation(libs.compose.material)
     implementation(libs.compose.material.icons.extended)
     implementation(libs.compose.rxjava2)
