@@ -412,6 +412,7 @@ interface Settings {
 
     val podcastBadgeType: UserSetting<BadgeType>
     val podcastGridLayout: UserSetting<PodcastGridLayoutType>
+    val hidePlayedPodcasts: UserSetting<Boolean>
 
     fun getNotificationLastSeen(): Date?
     fun setNotificationLastSeen(lastSeen: Date?)

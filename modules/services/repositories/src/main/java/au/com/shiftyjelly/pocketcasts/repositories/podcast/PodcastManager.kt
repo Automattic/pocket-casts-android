@@ -41,6 +41,7 @@ interface PodcastManager {
 
     fun observePodcastsSortedByLatestEpisode(): Flow<List<Podcast>>
     fun observePodcastsBySortedRecentlyPlayed(): Flow<List<Podcast>>
+    fun observePlayedPodcastUuids(): Flow<Set<String>>
     fun observePodcastsSortedByUserChoice(folder: Folder): Flow<List<Podcast>>
     fun observeSubscribedWebFeedPodcasts(): Flow<List<Podcast>>
     fun findSubscribedNoOrderFlow(): Flow<List<Podcast>>
