@@ -2,12 +2,19 @@ package au.com.shiftyjelly.pocketcasts.account
 
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import au.com.shiftyjelly.pocketcasts.account.databinding.FragmentPromocodeUpgradedBinding
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.displayCutout
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.union
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.ui.Modifier
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
-import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private const val ARG_DESCRIPTION = "description"
 
@@ -23,29 +30,19 @@ class PromoCodeUpgradedFragment : BaseDialogFragment() {
         }
     }
 
+    override val includeNavigationBarPadding = false
+
     val codeDescription: String
         get() = arguments?.getString(ARG_DESCRIPTION) ?: ""
 
-    private var binding: FragmentPromocodeUpgradedBinding? = null
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = FragmentPromocodeUpgradedBinding.inflate(inflater, container, false)
-        return binding?.root
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        binding = null
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        val binding = binding ?: return
-
-        binding.imgLogo.setImageDrawable(theme.verticalPlusLogo(binding.imgLogo.context))
-        binding.lblDescription.text = "$codeDescription\n${getString(LR.string.profile_promo_upgraded_welcome)}"
-
-        binding.btnDone.setOnClickListener { dismiss() }
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) = contentWithoutConsumedInsets {
+        AppTheme(theme.activeTheme) {
+            PromoCodeUpgradedPage(
+                codeDescription = codeDescription,
+                logoRes = theme.verticalPlusLogoRes(),
+                onDoneClick = ::dismiss,
+                modifier = Modifier.windowInsetsPadding(WindowInsets.systemBars.union(WindowInsets.displayCutout).only(WindowInsetsSides.Bottom)),
+            )
+        }
     }
 }
