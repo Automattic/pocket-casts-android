@@ -15,12 +15,12 @@
     },
     {
       "file": "android/pocket-casts/google-upload-credentials.json",
-      "destination": "google-upload-credentials.json",
+      "destination": "~/.configure/pocket-casts-android/secrets/google-upload-credentials.json",
       "encrypt": true
     },
     {
       "file": "android/pocket-casts/firebase.secrets.json",
-      "destination": ".configure-files/firebase.secrets.json",
+      "destination": "~/.configure/pocket-casts-android/secrets/firebase.secrets.json",
       "encrypt": true
     },
     {
