@@ -56,6 +56,7 @@ import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import com.automattic.eventhorizon.ArchivedEpisodeBehaviorType
 import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.GeneratedChaptersToggleSourceType
 import com.automattic.eventhorizon.RowActionType
 import com.automattic.eventhorizon.SettingsGeneralArchivedEpisodesApplyToExistingEvent
 import com.automattic.eventhorizon.SettingsGeneralArchivedEpisodesChangedEvent
@@ -323,6 +324,7 @@ class PlaybackSettingsFragment : BaseFragment() {
                                         eventHorizon.track(
                                             SettingsGeneralGeneratedChaptersToggledEvent(
                                                 enabled = isGeneratedChaptersEnabled,
+                                                source = GeneratedChaptersToggleSourceType.Settings,
                                             ),
                                         )
                                         settings.showGeneratedChapters.set(isGeneratedChaptersEnabled, updateModifiedAt = true)

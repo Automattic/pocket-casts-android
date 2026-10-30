@@ -142,7 +142,7 @@ class ChaptersFragment : BaseFragment() {
             else -> parent?.view
         } ?: return
         Snackbar.make(snackBarView, getString(LR.string.chapters_generated_turned_off), Snackbar.LENGTH_LONG)
-            .setAction(LR.string.chapters_generated_undo) { viewModel.turnOnGeneratedChapters() }
+            .setAction(LR.string.chapters_generated_undo) { viewModel.undoTurnOffGeneratedChapters() }
             .show()
     }
 
