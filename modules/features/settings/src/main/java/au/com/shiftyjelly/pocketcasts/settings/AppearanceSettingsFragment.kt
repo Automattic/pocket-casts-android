@@ -7,27 +7,26 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.core.view.isVisible
-import androidx.core.view.updatePadding
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
-import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
+import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
-import au.com.shiftyjelly.pocketcasts.settings.databinding.FragmentSettingsAppearanceBinding
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
@@ -37,16 +36,15 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.AppIcon
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.worker.RefreshArtworkWorker
-import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
-import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
-class AppearanceSettingsFragment : BaseFragment() {
+class AppearanceSettingsFragment :
+    BaseFragment(),
+    AppearanceListener {
     companion object {
         fun newInstance(): AppearanceSettingsFragment {
             return AppearanceSettingsFragment()
@@ -58,7 +56,14 @@ class AppearanceSettingsFragment : BaseFragment() {
     @Inject lateinit var subscriptionManager: SubscriptionManager
 
     private val viewModel: SettingsAppearanceViewModel by viewModels()
-    private var binding: FragmentSettingsAppearanceBinding? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        useSystemTheme = theme.getUseSystemTheme()
+        isUpgradeClosed = settings.getUpgradeClosedAppearSettings()
+    }
+    private var useSystemTheme by mutableStateOf(false)
+    private var isUpgradeClosed by mutableStateOf(false)
     private var themes by mutableStateOf(emptyList<Theme.ThemeType>())
     private var selectedTheme by mutableStateOf<Theme.ThemeType?>(null)
     private var appIcons by mutableStateOf(emptyList<AppIcon.AppIconType>())
@@ -67,49 +72,49 @@ class AppearanceSettingsFragment : BaseFragment() {
     private var themeScrollRequest by mutableIntStateOf(0)
     private var appIconScrollRequest by mutableIntStateOf(0)
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = FragmentSettingsAppearanceBinding.inflate(inflater, container, false)
-        return binding?.root
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        binding = null
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) = contentWithoutConsumedInsets {
+        val bottomInsetPx by settings.bottomInset.collectAsStateWithLifecycle(0)
+        val showArtworkOnLockScreen by viewModel.showArtworkOnLockScreen.collectAsStateWithLifecycle()
+        val artworkConfiguration by viewModel.artworkConfiguration.collectAsStateWithLifecycle()
+        val useDarkUpNext by settings.useDarkUpNextTheme.flow.collectAsStateWithLifecycle()
+        val useDynamicColorsForWidget by settings.useDynamicColorsForWidget.flow.collectAsStateWithLifecycle()
+        AppTheme(theme.activeTheme) {
+            AppearanceSettingsPage(
+                switches = AppearanceSwitches(
+                    useSystemTheme = useSystemTheme,
+                    showArtworkOnLockScreen = showArtworkOnLockScreen,
+                    useEpisodeArtwork = artworkConfiguration.useEpisodeArtwork,
+                    useDarkUpNext = useDarkUpNext,
+                    useDynamicColorsForWidget = useDynamicColorsForWidget,
+                ),
+                showWidgetSection = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S,
+                showUpgradeBanner = signInState?.isSignedInAsPlusOrPatron == false && !isUpgradeClosed,
+                bottomInset = with(LocalDensity.current) { bottomInsetPx.toDp() },
+                listener = this,
+                themePicker = { ThemePicker() },
+                appIconPicker = { AppIconPicker() },
+                toolbarModifier = Modifier.pointerInput(Unit) {
+                    detectTapGestures(onLongPress = { theme.toggleDarkLightThemeActivity(requireActivity() as AppCompatActivity) })
+                },
+            )
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val binding = binding ?: return
-
-        binding.toolbar.setup(title = getString(LR.string.settings_title_appearance), navigationIcon = BackArrow, activity = activity, theme = theme)
-
-        binding.themeRecyclerView.setContentWithViewCompositionStrategy {
-            AppTheme(theme.activeTheme) { ThemePicker() }
-        }
-        binding.appIconRecyclerView.setContentWithViewCompositionStrategy {
-            AppTheme(theme.activeTheme) { AppIconPicker() }
-        }
-
         viewModel.createAccountState.observe(viewLifecycleOwner) { state ->
-            when (state) {
-                is SettingsAppearanceState.ThemesAndIconsLoading -> {}
-
-                is SettingsAppearanceState.ThemesAndIconsLoaded -> {
-                    themes = state.themeList
-                    selectedTheme = state.currentThemeType
-                    appIcons = state.iconList
-                    selectedAppIcon = state.currentAppIcon
-                    scrollToCurrentTheme()
-                    scrollToCurrentAppIcon()
-                }
-
-                else -> {}
+            if (state is SettingsAppearanceState.ThemesAndIconsLoaded) {
+                themes = state.themeList
+                selectedTheme = state.currentThemeType
+                appIcons = state.iconList
+                selectedAppIcon = state.currentAppIcon
+                scrollToCurrentTheme()
+                scrollToCurrentAppIcon()
             }
         }
 
         viewModel.signInState.observe(viewLifecycleOwner) { signInState ->
-
             viewModel.changeThemeType.let { changeThemeType ->
                 val beforeThemeType = changeThemeType.first
                 val afterThemeType = changeThemeType.second
@@ -118,7 +123,7 @@ class AppearanceSettingsFragment : BaseFragment() {
                     if (signInState.isSignedInAsPlusOrPatron) {
                         (activity as? AppCompatActivity)?.let {
                             theme.updateTheme(it, afterThemeType)
-                            binding.swtSystemTheme.isChecked = theme.getUseSystemTheme() // Update switch if changing the theme updated the setting
+                            useSystemTheme = theme.getUseSystemTheme() // Update switch if changing the theme updated the setting
                             viewModel.updateChangeThemeType(Pair(null, null))
                         }
                     } else {
@@ -137,12 +142,7 @@ class AppearanceSettingsFragment : BaseFragment() {
                     if (signInState.isSignedInAsPlusOrPatron) {
                         viewModel.updateGlobalIcon(afterAppIconType)
                         viewModel.updateChangeAppIconType(Pair(null, null))
-
-                        AlertDialog.Builder(binding.appIconRecyclerView.context)
-                            .setTitle(LR.string.settings_app_icon_updated)
-                            .setMessage(LR.string.settings_app_icon_updated_message_v2)
-                            .setPositiveButton(LR.string.settings_app_icon_ok, null)
-                            .show()
+                        showAppIconUpdatedDialog()
                     } else {
                         selectedAppIcon = beforeAppIconType
                         scrollToCurrentAppIcon()
@@ -150,87 +150,48 @@ class AppearanceSettingsFragment : BaseFragment() {
                 }
             }
 
-            viewLifecycleOwner.lifecycleScope.launch {
-                viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    settings.bottomInset.collect {
-                        binding.nestedScrollView.updatePadding(bottom = it)
-                    }
-                }
-            }
-
             this.signInState = signInState
-            binding.upgradeGroup.isVisible = !signInState.isSignedInAsPlusOrPatron && !settings.getUpgradeClosedAppearSettings()
         }
 
         viewModel.loadThemesAndIcons()
-
-        binding.swtSystemTheme.isChecked = theme.getUseSystemTheme()
-        binding.swtSystemTheme.setOnCheckedChangeListener { _, isChecked ->
-            viewModel.useAndroidLightDarkMode(isChecked, activity as? AppCompatActivity)
-        }
-        binding.btnSystemTheme.setOnClickListener {
-            binding.swtSystemTheme.isChecked = !binding.swtSystemTheme.isChecked
-        }
-
-        binding.swtDarkUpNext.isChecked = settings.useDarkUpNextTheme.value
-        binding.swtDarkUpNext.setOnCheckedChangeListener { _, isChecked ->
-            viewModel.updateUpNextDarkTheme(isChecked)
-        }
-        binding.btnUseDarkUpNext.setOnClickListener {
-            binding.swtDarkUpNext.isChecked = !binding.swtDarkUpNext.isChecked
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            binding.dividerViewWidget.isVisible = true
-            binding.lblWidget.isVisible = true
-            binding.lblUseDynamicColorsForWidget.isVisible = true
-            binding.lblDynamicColorsForWidgetDetails.isVisible = true
-            binding.swtDynamicColorsForWidget.isVisible = true
-            binding.btnUseDynamicColorsForWidget.isVisible = true
-        }
-        binding.swtDynamicColorsForWidget.isChecked = settings.useDynamicColorsForWidget.value
-        binding.swtDynamicColorsForWidget.setOnCheckedChangeListener { _, isChecked ->
-            viewModel.updateWidgetForDynamicColors(isChecked)
-        }
-        binding.btnUseDynamicColorsForWidget.setOnClickListener {
-            binding.swtDynamicColorsForWidget.isChecked = !binding.swtDynamicColorsForWidget.isChecked
-        }
-
-        binding.swtShowArtwork.isChecked = viewModel.showArtworkOnLockScreen.value
-        binding.swtShowArtwork.setOnCheckedChangeListener { _, isChecked ->
-            viewModel.updateShowArtworkOnLockScreen(isChecked)
-        }
-        binding.btnShowArtwork.setOnClickListener {
-            binding.swtShowArtwork.isChecked = !binding.swtShowArtwork.isChecked
-        }
-
-        binding.swtUseEpisodeArtwork.isChecked = viewModel.artworkConfiguration.value.useEpisodeArtwork
-        binding.swtUseEpisodeArtwork.setOnCheckedChangeListener { _, isChecked ->
-            viewModel.updateUseEpisodeArtwork(isChecked)
-        }
-        binding.btnUseEpisodeArtwork.setOnClickListener {
-            binding.swtUseEpisodeArtwork.isChecked = !binding.swtUseEpisodeArtwork.isChecked
-        }
-
-        binding.lblEpisodeArtworkConfiguration.setOnClickListener {
-            showEpisodeArtworkConfigurationFragment()
-        }
-
-        binding.lblRefreshAllPodcastArtwork.setOnClickListener {
-            refreshArtwork()
-        }
-
-        binding.upgradeBannerBackground.setOnClickListener {
-            openOnboardingFlow()
-        }
-
-        binding.btnCloseUpgrade.setOnClickListener {
-            viewModel.onUpgradeBannerDismissed(SourceView.APPEARANCE)
-            settings.setUpgradeClosedAppearSettings(true)
-            binding.upgradeGroup.isVisible = false
-        }
-
         viewModel.onShown()
+    }
+
+    override fun onNavigationClick() {
+        requireActivity().onBackPressedDispatcher.onBackPressed()
+    }
+
+    override fun onUseSystemThemeChange(checked: Boolean) {
+        useSystemTheme = checked
+        viewModel.useAndroidLightDarkMode(checked, activity as? AppCompatActivity)
+    }
+
+    override fun onShowArtworkOnLockScreenChange(checked: Boolean) = viewModel.updateShowArtworkOnLockScreen(checked)
+
+    override fun onUseEpisodeArtworkChange(checked: Boolean) = viewModel.updateUseEpisodeArtwork(checked)
+
+    override fun onUseDarkUpNextChange(checked: Boolean) = viewModel.updateUpNextDarkTheme(checked)
+
+    override fun onUseDynamicColorsForWidgetChange(checked: Boolean) = viewModel.updateWidgetForDynamicColors(checked)
+
+    override fun onEpisodeArtworkConfigurationClick() = showEpisodeArtworkConfigurationFragment()
+
+    override fun onRefreshArtworkClick() = refreshArtwork()
+
+    override fun onUpgradeClick() = openOnboardingFlow()
+
+    override fun onCloseUpgradeClick() {
+        viewModel.onUpgradeBannerDismissed(SourceView.APPEARANCE)
+        settings.setUpgradeClosedAppearSettings(true)
+        isUpgradeClosed = true
+    }
+
+    private fun showAppIconUpdatedDialog() {
+        AlertDialog.Builder(requireContext())
+            .setTitle(LR.string.settings_app_icon_updated)
+            .setMessage(LR.string.settings_app_icon_updated_message_v2)
+            .setPositiveButton(LR.string.settings_app_icon_ok, null)
+            .show()
     }
 
     private fun openOnboardingFlow(tier: SubscriptionTier? = null, source: OnboardingUpgradeSource = OnboardingUpgradeSource.APPEARANCE) {
@@ -321,7 +282,7 @@ class AppearanceSettingsFragment : BaseFragment() {
             selectedTheme = afterThemeType
             (activity as? AppCompatActivity)?.let {
                 theme.updateTheme(it, afterThemeType)
-                binding?.swtSystemTheme?.isChecked = theme.getUseSystemTheme() // Update switch if changing the theme updated the setting
+                useSystemTheme = theme.getUseSystemTheme() // Update switch if changing the theme updated the setting
                 viewModel.onThemeChanged(afterThemeType)
             }
         } else {
@@ -336,12 +297,7 @@ class AppearanceSettingsFragment : BaseFragment() {
         selectedAppIcon = afterAppIconType
         if (afterAppIconType.isValid(signInState)) {
             viewModel.updateGlobalIcon(afterAppIconType)
-
-            AlertDialog.Builder(requireContext())
-                .setTitle(LR.string.settings_app_icon_updated)
-                .setMessage(LR.string.settings_app_icon_updated_message_v2)
-                .setPositiveButton(LR.string.settings_app_icon_ok, null)
-                .show()
+            showAppIconUpdatedDialog()
         } else {
             viewModel.updateChangeAppIconType(Pair(beforeAppIconType, afterAppIconType))
             openOnboardingFlow(afterAppIconType.tier, source = OnboardingUpgradeSource.ICONS)
