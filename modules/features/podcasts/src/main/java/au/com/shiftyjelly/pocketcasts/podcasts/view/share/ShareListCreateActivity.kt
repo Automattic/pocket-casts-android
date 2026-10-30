@@ -23,7 +23,6 @@ class ShareListCreateActivity : AppCompatActivity() {
         enableEdgeToEdge(navigationBarStyle = theme.getNavigationBarStyle(this))
         setContentView(FrameLayout(this).apply { id = VR.id.container })
 
-
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
                 .replace(VR.id.container, ShareListCreateFragment())

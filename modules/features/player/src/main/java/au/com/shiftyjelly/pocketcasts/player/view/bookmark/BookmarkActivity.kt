@@ -29,7 +29,6 @@ class BookmarkActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(FrameLayout(this).apply { id = VR.id.container })
 
-
         if (savedInstanceState == null) {
             supportFragmentManager.commitNow {
                 replace(VR.id.container, BookmarkFragment.newInstance(args))

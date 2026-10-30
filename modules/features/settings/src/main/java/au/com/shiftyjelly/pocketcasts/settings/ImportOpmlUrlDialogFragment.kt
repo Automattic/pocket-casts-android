@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.settings
 
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -14,6 +15,7 @@ import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 class ImportOpmlUrlDialogFragment : DialogFragment() {
+    @SuppressLint("PrivateResource")
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val view = LayoutInflater.from(requireContext()).inflate(androidx.preference.R.layout.preference_dialog_edittext, null)
         view.findViewById<View>(android.R.id.message).isVisible = false
