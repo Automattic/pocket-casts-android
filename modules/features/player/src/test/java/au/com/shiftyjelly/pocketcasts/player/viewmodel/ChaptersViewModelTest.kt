@@ -626,6 +626,21 @@ class ChaptersViewModelTest {
     }
 
     @Test
+    fun `keep generating until chapters saved by a successful load arrive`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        chaptersFlow.value = Chapters()
+        showGeneratedChaptersFlow.value = true
+
+        createViewModel().uiState.test {
+            assertEquals(EmptyState.GeneratingChapters, awaitItem().emptyState)
+
+            chaptersFlow.value = chapters
+            assertNull(awaitItem().emptyState)
+            expectNoEvents()
+        }
+    }
+
+    @Test
     fun `show no chapters for this episode when loading fails`() = runTest {
         FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
         chaptersFlow.value = Chapters()
@@ -646,6 +661,7 @@ class ChaptersViewModelTest {
         showGeneratedChaptersFlow.value = true
 
         chaptersViewModel.uiState.test {
+            assertEquals(EmptyState.GeneratingChapters, awaitItem().emptyState)
             assertEquals(EmptyState.NoGeneratedChapters, awaitItem().emptyState)
 
             chaptersFlow.value = chapters
