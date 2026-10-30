@@ -48,13 +48,13 @@ internal fun PromoCodeUpgradedPage(
             modifier = Modifier
                 .padding(top = 12.dp)
                 .size(width = 48.dp, height = 4.dp)
-                .background(MaterialTheme.theme.colors.playerContrast01, RoundedCornerShape(3.dp)),
+                .background(MaterialTheme.theme.colors.primaryIcon02, RoundedCornerShape(3.dp)),
         )
         DrawableImage(
             drawableId = logoRes,
             contentDescription = null,
             modifier = Modifier
-                .padding(top = 8.dp)
+                .padding(top = 16.dp)
                 .size(width = 156.dp, height = 148.dp),
         )
         TextViewText(
