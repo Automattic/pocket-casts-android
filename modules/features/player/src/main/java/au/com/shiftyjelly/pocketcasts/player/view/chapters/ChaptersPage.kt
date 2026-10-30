@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -16,11 +15,8 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.Divider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
-import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -34,6 +30,7 @@ fun ChaptersPage(
     onChapterClick: (Chapter) -> Unit,
     onUrlClick: (Chapter) -> Unit,
     onSkipChaptersClick: (Boolean) -> Unit,
+    onTurnOffGeneratedClick: () -> Unit,
     isTogglingChapters: Boolean,
     showSubscriptionIcon: Boolean,
     modifier: Modifier = Modifier,
@@ -60,17 +57,8 @@ fun ChaptersPage(
                     onSkipChaptersClick = onSkipChaptersClick,
                     isTogglingChapters = isTogglingChapters,
                     showSubscriptionIcon = showSubscriptionIcon,
-                )
-            }
-        }
-        if (hasGeneratedChapters) {
-            item {
-                TextP50(
-                    text = stringResource(LR.string.chapters_generated_disclaimer),
-                    color = LocalChaptersTheme.current.headerTitle,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 20.dp, vertical = 8.dp),
+                    isGenerated = hasGeneratedChapters,
+                    onTurnOffGeneratedClick = onTurnOffGeneratedClick,
                 )
             }
         }

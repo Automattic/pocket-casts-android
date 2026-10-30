@@ -27,8 +27,10 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
+import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import kotlinx.coroutines.delay
@@ -72,6 +74,7 @@ class ChaptersFragment : BaseFragment() {
                     showSubscriptionIcon = state.showSubscriptionIcon,
                     onChapterClick = viewModel::playChapter,
                     onSkipChaptersClick = viewModel::enableTogglingOrUpsell,
+                    onTurnOffGeneratedClick = ::turnOffGeneratedChapters,
                     onSelectionChange = viewModel::selectChapter,
                     onUrlClick = ::openChapterUrl,
                     resolvingChapterIndex = resolvingChapterIndex,
@@ -127,6 +130,18 @@ class ChaptersFragment : BaseFragment() {
             source = source,
         )
         OnboardingLauncher.openOnboardingFlow(requireActivity(), onboardingFlow)
+    }
+
+    private fun turnOffGeneratedChapters() {
+        val viewModel = viewModel
+        viewModel.turnOffGeneratedChapters()
+        val snackBarView = when (val parent = parentFragment) {
+            is BaseDialogFragment -> parent.snackBarView()
+            else -> parent?.view
+        } ?: return
+        Snackbar.make(snackBarView, getString(LR.string.chapters_generated_turned_off), Snackbar.LENGTH_LONG)
+            .setAction(LR.string.chapters_generated_undo) { viewModel.turnOnGeneratedChapters() }
+            .show()
     }
 
     private val ChaptersViewModel.Mode.themeType get() = when (this) {

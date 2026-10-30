@@ -618,6 +618,19 @@
     <string name="number_of_chapters_summary_plural">%1$d chapters &#x2022; %2$d hidden</string>
     <string name="number_of_chapters_summary_singular">1 chapter &#x2022; %d hidden</string>
     <string name="skip_chapters_plus_prompt">Preselect chapters and more with Pocket Casts Plus</string>
+    <!-- Header of the chapters list when the chapters are generated. %d is the number of chapters. -->
+    <plurals name="chapters_generated_count">
+        <item quantity="one">%d Generated Chapter</item>
+        <item quantity="other">%d Generated Chapters</item>
+    </plurals>
+    <!-- %1$d is the number of generated chapters. %2$d is the number of hidden chapters. -->
+    <plurals name="chapters_generated_count_with_hidden">
+        <item quantity="one">%1$d Generated Chapter &#x2022; %2$d hidden</item>
+        <item quantity="other">%1$d Generated Chapters &#x2022; %2$d hidden</item>
+    </plurals>
+    <string name="chapters_generated_turn_off">Turn off generated chapters</string>
+    <string name="chapters_generated_turned_off">Turned off generated chapters</string>
+    <string name="chapters_generated_undo">Undo</string>
     <string name="chapters_generated_disclaimer">These chapters are automatically generated and may not be perfectly accurate.</string>
     <!-- %1$d is the current selected chapter. %2$d is the total number of chapters. -->
     <string name="chapter_count_summary">%1$d of %2$d</string>

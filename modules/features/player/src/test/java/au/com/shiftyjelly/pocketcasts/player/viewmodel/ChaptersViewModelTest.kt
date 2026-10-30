@@ -29,6 +29,7 @@ import com.automattic.eventhorizon.ChaptersShownEvent
 import com.automattic.eventhorizon.ChaptersShownSource
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.PlayerChapterSelectedEvent
+import com.automattic.eventhorizon.SettingsGeneralGeneratedChaptersToggledEvent
 import java.time.Instant
 import java.util.Date
 import kotlin.time.Duration.Companion.milliseconds
@@ -103,6 +104,7 @@ class ChaptersViewModelTest {
     private val subscriptionFlow = MutableStateFlow<Subscription?>(plusSubscription)
 
     private val eventSink = TestEventSink()
+    private val showGeneratedChapters = mock<UserSetting<Boolean>>()
 
     private lateinit var chaptersViewModel: ChaptersViewModel
 
@@ -114,6 +116,7 @@ class ChaptersViewModelTest {
         val userSetting = mock<UserSetting<Subscription?>>()
         whenever(userSetting.flow).thenReturn(subscriptionFlow)
         whenever(settings.cachedSubscription).thenReturn(userSetting)
+        whenever(settings.showGeneratedChapters).thenReturn(showGeneratedChapters)
 
         chaptersViewModel = ChaptersViewModel(
             mode = Mode.Episode(episode.uuid),
@@ -425,6 +428,25 @@ class ChaptersViewModelTest {
             chaptersViewModel.playChapter(chapters[0])
             assertEquals(Unit, awaitItem())
         }
+    }
+
+    @Test
+    fun `turn off generated chapters disables the setting and tracks it`() = runTest {
+        chaptersViewModel.turnOffGeneratedChapters()
+
+        verify(showGeneratedChapters).set(false, updateModifiedAt = true)
+        assertEquals(SettingsGeneralGeneratedChaptersToggledEvent(enabled = false), eventSink.pollEvent())
+    }
+
+    @Test
+    fun `turn on generated chapters enables the setting and tracks it`() = runTest {
+        chaptersViewModel.turnOffGeneratedChapters()
+        eventSink.pollEvent()
+
+        chaptersViewModel.turnOnGeneratedChapters()
+
+        verify(showGeneratedChapters).set(true, updateModifiedAt = true)
+        assertEquals(SettingsGeneralGeneratedChaptersToggledEvent(enabled = true), eventSink.pollEvent())
     }
 
     private fun createViewModel() = ChaptersViewModel(
