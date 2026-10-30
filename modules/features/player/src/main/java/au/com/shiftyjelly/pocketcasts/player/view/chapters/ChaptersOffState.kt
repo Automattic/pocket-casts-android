@@ -45,6 +45,8 @@ fun ChaptersOffState(
                 primaryText = chaptersTheme.headerToggle,
                 secondaryText = chaptersTheme.headerTitle,
                 icon = chaptersTheme.headerToggle,
+                button = chaptersTheme.headerToggle,
+                buttonText = chaptersTheme.background,
             ),
         )
     }
