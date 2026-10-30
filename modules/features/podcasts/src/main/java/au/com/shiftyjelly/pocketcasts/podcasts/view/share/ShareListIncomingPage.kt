@@ -147,7 +147,7 @@ private fun ShareListIncomingList(
                 ShareListIncomingHeader(title = title, description = description)
             }
         }
-        items(podcasts.orEmpty(), key = { it.uuid }) { podcast ->
+        items(podcasts.orEmpty()) { podcast ->
             ShareListIncomingPodcastRow(
                 podcast = podcast,
                 isSubscribed = podcast.uuid in subscribedUuids || podcast.uuid in optimisticallySubscribed,
