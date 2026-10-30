@@ -19,7 +19,6 @@ build/
 *.ipr
 
 # Android
-google-services.json
 google-upload-credentials.json
 
 ### fastlane ###
@@ -48,6 +47,7 @@ fastlane/README.md
 #
 # See https://linear.app/a8c/issue/AINFRA-3485
 secret.properties
+google-services.json
 
 # secrets
 .configure-files/firebase.secrets.json

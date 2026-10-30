@@ -11,6 +11,7 @@ import com.automattic.android.measure.reporters.SlowSlowTasksMetricsReporter
 import com.diffplug.gradle.spotless.SpotlessTask
 import com.google.devtools.ksp.gradle.KspExtension
 import com.google.devtools.ksp.gradle.KspGradleSubplugin
+import com.google.gms.googleservices.GoogleServicesTask
 import io.sentry.android.gradle.extensions.InstrumentationFeature
 import io.sentry.android.gradle.extensions.SentryPluginExtension
 import io.sentry.android.gradle.tasks.SentryCliExecTask
@@ -470,6 +471,47 @@ subprojects {
             lintChecks(libs.security.lint)
             lintChecks(libs.wordpress.lint)
         }
+    }
+
+    plugins.withId(rootProject.libs.plugins.google.services.get().pluginId) {
+        applyReleaseGoogleServicesJson()
+    }
+}
+
+fun Project.applyReleaseGoogleServicesJson() {
+    val decryptedGoogleServicesJson = File(gradle.extra["decryptedSecretsDir"] as File, "google-services.json")
+    val staleGoogleServicesJson = file("google-services.json")
+
+    if (staleGoogleServicesJson.exists()) {
+        val message = "$staleGoogleServicesJson predates the move out of the checkout. It is no longer read; delete it."
+        // CI checkouts grow one of their own whenever a job builds a base revision that predates this
+        // change, and nobody is there to delete it. Drop this branch once no supported base copies it.
+        if (gradle.extra["isCi"] == true) {
+            logger.warn(message)
+        } else {
+            throw GradleException(message)
+        }
+    }
+
+    // The google-services plugin registers the task from an `onVariants` callback that AGP fires during
+    // its own `afterEvaluate`. Configuration actions run in attachment order, so a rule attached while
+    // this script evaluates runs before the plugin's and has its value overwritten; `afterEvaluate` puts
+    // ours last.
+    afterEvaluate {
+        // `debug` and `debugProd` keep reading the files tracked under `src/`, which point at a separate Firebase project.
+        tasks.withType<GoogleServicesTask>()
+            .matching { it.name.matches(Regex("process(Release|Prototype)GoogleServices")) }
+            .configureEach {
+                googleServicesJsonFiles.set(listOf(decryptedGoogleServicesJson))
+                doFirst {
+                    if (!decryptedGoogleServicesJson.exists()) {
+                        throw GradleException(
+                            "$decryptedGoogleServicesJson is missing. " +
+                                "Please run `bundle exec fastlane run configure_apply` to apply secrets.",
+                        )
+                    }
+                }
+            }
     }
 }
 
