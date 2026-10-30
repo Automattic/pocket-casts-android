@@ -74,7 +74,7 @@ internal fun CategoriesBottomSheetPage(
             contentPadding = contentPadding,
             modifier = Modifier.fillMaxWidth().weight(1f),
         ) {
-            items(categories, key = { it.id }) { category ->
+            items(categories) { category ->
                 CategoryRow(
                     category = category,
                     onClick = { onCategoryClick(category) },
