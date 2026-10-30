@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.Chapters
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
 import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
+import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.player.view.chapters.ChaptersViewModel
 import au.com.shiftyjelly.pocketcasts.player.view.chapters.ChaptersViewModel.Mode
@@ -23,7 +24,10 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.GeneratedChaptersAvailability
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
+import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.automattic.eventhorizon.ChapterOriginType
 import com.automattic.eventhorizon.ChaptersShownEvent
 import com.automattic.eventhorizon.ChaptersShownSource
@@ -67,6 +71,9 @@ class ChaptersViewModelTest {
     @get:Rule
     val coroutineRule = MainCoroutineRule(testDispatcher)
 
+    @get:Rule
+    val featureFlagRule = InMemoryFeatureFlagRule()
+
     private val chapterManager = mock<ChapterManager>()
     private val playbackManager = mock<PlaybackManager>()
     private val episodeManager = mock<EpisodeManager>()
@@ -82,7 +89,8 @@ class ChaptersViewModelTest {
         on { resolvingChapterIndex(any()) } doReturn MutableStateFlow<Int?>(null)
     }
 
-    private val episode = PodcastEpisode(uuid = "id", publishedDate = Date())
+    private val paymentClient = PaymentClient.test()
+    private val episode = PodcastEpisode(uuid = "id", publishedDate = Date(), hasGeneratedTranscript = true)
     private val chapters = Chapters(
         listOf(
             Chapter("1", 0.milliseconds, 100.milliseconds, selected = true, index = 0, uiIndex = 1),
@@ -129,6 +137,7 @@ class ChaptersViewModelTest {
             generatedChapterSeeker = generatedChapterSeeker,
             transcriptManager = transcriptManager,
             generatedChaptersAvailability = generatedChaptersAvailability,
+            paymentClient = paymentClient,
             ioDispatcher = testDispatcher,
         )
     }
@@ -173,6 +182,7 @@ class ChaptersViewModelTest {
             generatedChapterSeeker = generatedChapterSeeker,
             transcriptManager = transcriptManager,
             generatedChaptersAvailability = generatedChaptersAvailability,
+            paymentClient = paymentClient,
             ioDispatcher = testDispatcher,
         )
 
@@ -199,6 +209,7 @@ class ChaptersViewModelTest {
             generatedChapterSeeker = generatedChapterSeeker,
             transcriptManager = transcriptManager,
             generatedChaptersAvailability = generatedChaptersAvailability,
+            paymentClient = paymentClient,
             ioDispatcher = testDispatcher,
         )
         verifyBlocking(transcriptManager, times(1)) { loadGeneratedChapters("id") }
@@ -366,6 +377,7 @@ class ChaptersViewModelTest {
             generatedChapterSeeker = generatedChapterSeeker,
             transcriptManager = transcriptManager,
             generatedChaptersAvailability = generatedChaptersAvailability,
+            paymentClient = paymentClient,
             ioDispatcher = testDispatcher,
         )
 
@@ -497,6 +509,64 @@ class ChaptersViewModelTest {
         }
     }
 
+    @Test
+    fun `show upsell for free users on an episode with a generated transcript and no chapters`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        subscriptionFlow.value = null
+        chaptersFlow.value = Chapters()
+
+        chaptersViewModel.uiState.test {
+            val state = awaitItem()
+            assertTrue(state.showUpsell)
+            assertTrue(state.showChaptersTab)
+        }
+    }
+
+    @Test
+    fun `do not show upsell to subscribers`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        chaptersFlow.value = Chapters()
+
+        chaptersViewModel.uiState.test {
+            assertFalse(awaitItem().showUpsell)
+        }
+    }
+
+    @Test
+    fun `do not show upsell when the episode has chapters`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        subscriptionFlow.value = null
+
+        chaptersViewModel.uiState.test {
+            assertFalse(awaitItem().showUpsell)
+        }
+    }
+
+    @Test
+    fun `do not show upsell without a generated transcript`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        subscriptionFlow.value = null
+        chaptersFlow.value = Chapters()
+        episodeFlow.value = episode.copy(hasGeneratedTranscript = false)
+
+        chaptersViewModel.uiState.test {
+            val state = awaitItem()
+            assertFalse(state.showUpsell)
+            assertFalse(state.showChaptersTab)
+        }
+    }
+
+    @Test
+    fun `do not show upsell while the feature is disabled`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, false)
+        subscriptionFlow.value = null
+        chaptersFlow.value = Chapters()
+
+        chaptersViewModel.uiState.test {
+            assertFalse(awaitItem().showUpsell)
+        }
+    }
+
     private fun createViewModel() = ChaptersViewModel(
         mode = Mode.Episode("id"),
         chapterManager = chapterManager,
@@ -507,6 +577,7 @@ class ChaptersViewModelTest {
         generatedChapterSeeker = generatedChapterSeeker,
         transcriptManager = transcriptManager,
         generatedChaptersAvailability = generatedChaptersAvailability,
+        paymentClient = paymentClient,
         ioDispatcher = testDispatcher,
     )
 }

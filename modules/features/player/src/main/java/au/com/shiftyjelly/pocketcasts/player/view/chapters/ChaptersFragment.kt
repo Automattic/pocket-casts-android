@@ -64,24 +64,33 @@ class ChaptersFragment : BaseFragment() {
             ChaptersTheme(state.podcast) {
                 val lazyListState = rememberLazyListState()
 
-                ChaptersPage(
-                    lazyListState = lazyListState,
-                    chapters = state.chapters,
-                    showHeader = state.showHeader,
-                    hasGeneratedChapters = state.hasGeneratedChapters,
-                    totalChaptersCount = state.chaptersCount,
-                    isTogglingChapters = state.isTogglingChapters,
-                    showSubscriptionIcon = state.showSubscriptionIcon,
-                    onChapterClick = viewModel::playChapter,
-                    onSkipChaptersClick = viewModel::enableTogglingOrUpsell,
-                    onTurnOffGeneratedClick = ::turnOffGeneratedChapters,
-                    showOffState = state.showOffState,
-                    onTurnOnGeneratedClick = viewModel::turnOnGeneratedChapters,
-                    onSelectionChange = viewModel::selectChapter,
-                    onUrlClick = ::openChapterUrl,
-                    resolvingChapterIndex = resolvingChapterIndex,
-                    modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection()),
-                )
+                if (state.showUpsell) {
+                    val isFreeTrialAvailable by viewModel.isFreeTrialAvailable.collectAsState()
+                    ChaptersUpsell(
+                        isFreeTrialAvailable = isFreeTrialAvailable,
+                        onUpgradeClick = ::showGeneratedChaptersUpsell,
+                        modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection()),
+                    )
+                } else {
+                    ChaptersPage(
+                        lazyListState = lazyListState,
+                        chapters = state.chapters,
+                        showHeader = state.showHeader,
+                        hasGeneratedChapters = state.hasGeneratedChapters,
+                        totalChaptersCount = state.chaptersCount,
+                        isTogglingChapters = state.isTogglingChapters,
+                        showSubscriptionIcon = state.showSubscriptionIcon,
+                        onChapterClick = viewModel::playChapter,
+                        onSkipChaptersClick = viewModel::enableTogglingOrUpsell,
+                        onTurnOffGeneratedClick = ::turnOffGeneratedChapters,
+                        showOffState = state.showOffState,
+                        onTurnOnGeneratedClick = viewModel::turnOnGeneratedChapters,
+                        onSelectionChange = viewModel::selectChapter,
+                        onUrlClick = ::openChapterUrl,
+                        resolvingChapterIndex = resolvingChapterIndex,
+                        modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection()),
+                    )
+                }
 
                 LaunchedEffect(Unit) {
                     viewModel.scrollToChapter.collect {
@@ -124,6 +133,10 @@ class ChaptersFragment : BaseFragment() {
 
     private fun showPlayer() {
         (parentFragment as? PlayerContainerFragment)?.openPlayer()
+    }
+
+    private fun showGeneratedChaptersUpsell() {
+        OnboardingLauncher.openOnboardingFlow(requireActivity(), OnboardingFlow.Upsell(source = OnboardingUpgradeSource.GENERATED_CHAPTERS))
     }
 
     private fun showUpsell() {
