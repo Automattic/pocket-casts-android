@@ -691,8 +691,8 @@ class SettingsImpl @Inject constructor(
     )
 
     override val showGeneratedChapters: UserSetting<Boolean> = UserSetting.BoolPref(
-        sharedPrefKey = "showGeneratedChapters",
-        defaultValue = true,
+        sharedPrefKey = "autoGenerateChapters",
+        defaultValue = false,
         sharedPrefs = sharedPreferences,
     )
 
