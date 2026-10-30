@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <item name="toolbar" type="id" />
     <item name="multi_swipe_helper_previous_elevation" type="id"/>
 
     <item name="spring_animation_id_translation_x" type="id" />
