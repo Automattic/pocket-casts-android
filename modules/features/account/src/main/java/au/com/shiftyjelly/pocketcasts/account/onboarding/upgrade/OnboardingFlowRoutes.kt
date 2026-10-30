@@ -353,6 +353,7 @@ object OnboardingFlowRoutes {
                 OnboardingUpgradeSource.SETTINGS,
                 OnboardingUpgradeSource.SLUMBER_STUDIOS,
                 OnboardingUpgradeSource.UP_NEXT_SHUFFLE,
+                OnboardingUpgradeSource.GENERATED_CHAPTERS,
                 OnboardingUpgradeSource.GENERATED_TRANSCRIPTS,
                 OnboardingUpgradeSource.EPISODE_CHAT,
                 OnboardingUpgradeSource.DEEP_LINK,

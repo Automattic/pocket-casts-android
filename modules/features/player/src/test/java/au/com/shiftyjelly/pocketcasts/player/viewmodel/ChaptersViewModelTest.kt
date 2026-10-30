@@ -23,7 +23,10 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.GeneratedChaptersAvailability
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
+import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.automattic.eventhorizon.ChapterOriginType
 import com.automattic.eventhorizon.ChaptersShownEvent
 import com.automattic.eventhorizon.ChaptersShownSource
@@ -66,6 +69,9 @@ class ChaptersViewModelTest {
 
     @get:Rule
     val coroutineRule = MainCoroutineRule(testDispatcher)
+
+    @get:Rule
+    val featureFlagRule = InMemoryFeatureFlagRule()
 
     private val chapterManager = mock<ChapterManager>()
     private val playbackManager = mock<PlaybackManager>()
@@ -494,6 +500,76 @@ class ChaptersViewModelTest {
             val state = awaitItem()
             assertFalse(state.showOffState)
             assertTrue(state.showChaptersTab)
+        }
+    }
+
+    @Test
+    fun `show upsell for free users on a podcast episode without chapters`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        subscriptionFlow.value = null
+        chaptersFlow.value = Chapters()
+
+        chaptersViewModel.uiState.test {
+            val state = awaitItem()
+            assertTrue(state.showUpsell)
+            assertTrue(state.showChaptersTab)
+        }
+    }
+
+    @Test
+    fun `do not show upsell to subscribers`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        chaptersFlow.value = Chapters()
+
+        chaptersViewModel.uiState.test {
+            assertFalse(awaitItem().showUpsell)
+        }
+    }
+
+    @Test
+    fun `do not show upsell when the episode has chapters`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        subscriptionFlow.value = null
+
+        chaptersViewModel.uiState.test {
+            assertFalse(awaitItem().showUpsell)
+        }
+    }
+
+    @Test
+    fun `show upsell on podcast episodes without a generated transcript`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        subscriptionFlow.value = null
+        chaptersFlow.value = Chapters()
+        episodeFlow.value = episode.copy(hasGeneratedTranscript = false)
+
+        chaptersViewModel.uiState.test {
+            assertTrue(awaitItem().showUpsell)
+        }
+    }
+
+    @Test
+    fun `do not show upsell for user files`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        subscriptionFlow.value = null
+        chaptersFlow.value = Chapters()
+        episodeFlow.value = UserEpisode(uuid = "id", publishedDate = Date())
+
+        chaptersViewModel.uiState.test {
+            val state = awaitItem()
+            assertFalse(state.showUpsell)
+            assertFalse(state.showChaptersTab)
+        }
+    }
+
+    @Test
+    fun `do not show upsell while the feature is disabled`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, false)
+        subscriptionFlow.value = null
+        chaptersFlow.value = Chapters()
+
+        chaptersViewModel.uiState.test {
+            assertFalse(awaitItem().showUpsell)
         }
     }
 

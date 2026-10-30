@@ -18,6 +18,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.GeneratedChaptersAvailability
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.automattic.eventhorizon.ChapterLinkClickedEvent
 import com.automattic.eventhorizon.ChaptersShownEvent
 import com.automattic.eventhorizon.ChaptersShownSource
@@ -257,6 +259,10 @@ class ChaptersViewModel @AssistedInject constructor(
         canSkipChapters = subscription != null,
         showHeader = episode is PodcastEpisode,
         isGeneratedChaptersOff = chapters.hasHiddenGeneratedChapters,
+        showUpsell = subscription == null &&
+            chapters.isEmpty() &&
+            episode is PodcastEpisode &&
+            FeatureFlag.isEnabled(Feature.GENERATED_CHAPTERS),
     )
 
     private fun playbackPosition(playbackState: PlaybackState, episode: BaseEpisode) = when (mode) {
@@ -315,10 +321,11 @@ class ChaptersViewModel @AssistedInject constructor(
         val canSkipChapters: Boolean = false,
         val showHeader: Boolean = false,
         val isGeneratedChaptersOff: Boolean = false,
+        val showUpsell: Boolean = false,
     ) {
         val chaptersCount = allChapters.size
         val showOffState get() = chaptersCount == 0 && isGeneratedChaptersOff
-        val showChaptersTab get() = chaptersCount > 0 || isGeneratedChaptersOff
+        val showChaptersTab get() = chaptersCount > 0 || isGeneratedChaptersOff || showUpsell
         val deselectedChaptersCount get() = allChapters.count { !it.chapter.selected }
         val chapters get() = if (isTogglingChapters) allChapters else allChapters.filter { it.chapter.selected }
         val showSubscriptionIcon get() = !isTogglingChapters && !canSkipChapters
