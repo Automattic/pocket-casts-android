@@ -931,44 +931,52 @@ class ChapterManagerImplTest {
     }
 
     @Test
-    fun `generated chapters are turned off when stored and hidden by the setting`() = runBlocking {
+    fun `observe flags hidden generated chapters in the same emission`() = runBlocking {
         FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
-        whenever(chapterDao.observeGeneratedCountForEpisode("id")).thenReturn(flowOf(2))
+        val episode = PodcastEpisode("id", publishedDate = Date(), duration = 0.002)
+        whenever(chapterDao.observeChaptersForEpisode("id")).thenReturn(flowOf(generatedChaptersFixture))
+        whenever(episodeManager.findEpisodeByUuidFlow("id")).thenReturn(flowOf(episode))
 
-        chapterManager.observeGeneratedChaptersTurnedOff("id").test {
-            assertEquals(false, awaitItem())
+        chapterManager.observerChaptersForEpisode("id").test {
+            assertEquals(false, awaitItem().hasHiddenGeneratedChapters)
 
             generatedChapters.showGeneratedChaptersFlow.value = false
-            assertEquals(true, awaitItem())
+            val hidden = awaitItem()
+            assertEquals(listOf("Embedded"), hidden.map { it.title })
+            assertEquals(true, hidden.hasHiddenGeneratedChapters)
 
             generatedChapters.showGeneratedChaptersFlow.value = true
-            assertEquals(false, awaitItem())
+            assertEquals(false, awaitItem().hasHiddenGeneratedChapters)
 
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun `generated chapters are not turned off without stored generated chapters`() = runBlocking {
+    fun `observe does not flag hidden generated chapters without stored generated chapters`() = runBlocking {
         FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
         generatedChapters.showGeneratedChaptersFlow.value = false
-        whenever(chapterDao.observeGeneratedCountForEpisode("id")).thenReturn(flowOf(0))
+        val episode = PodcastEpisode("id", publishedDate = Date(), duration = 0.002)
+        whenever(chapterDao.observeChaptersForEpisode("id")).thenReturn(flowOf(generatedChaptersFixture.filterNot { it.origin == ChapterOrigin.Generated }))
+        whenever(episodeManager.findEpisodeByUuidFlow("id")).thenReturn(flowOf(episode))
 
-        chapterManager.observeGeneratedChaptersTurnedOff("id").test {
-            assertEquals(false, awaitItem())
+        chapterManager.observerChaptersForEpisode("id").test {
+            assertEquals(false, awaitItem().hasHiddenGeneratedChapters)
 
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun `generated chapters are not turned off while the feature is disabled`() = runBlocking {
+    fun `observe does not flag hidden generated chapters while the feature is disabled`() = runBlocking {
         FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, false)
         generatedChapters.showGeneratedChaptersFlow.value = false
-        whenever(chapterDao.observeGeneratedCountForEpisode("id")).thenReturn(flowOf(2))
+        val episode = PodcastEpisode("id", publishedDate = Date(), duration = 0.002)
+        whenever(chapterDao.observeChaptersForEpisode("id")).thenReturn(flowOf(generatedChaptersFixture))
+        whenever(episodeManager.findEpisodeByUuidFlow("id")).thenReturn(flowOf(episode))
 
-        chapterManager.observeGeneratedChaptersTurnedOff("id").test {
-            assertEquals(false, awaitItem())
+        chapterManager.observerChaptersForEpisode("id").test {
+            assertEquals(false, awaitItem().hasHiddenGeneratedChapters)
 
             cancelAndIgnoreRemainingEvents()
         }

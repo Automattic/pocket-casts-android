@@ -115,9 +115,7 @@ class ChaptersViewModel @AssistedInject constructor(
         settings.cachedSubscription.flow,
         isTogglingChapters,
         ::createUiState,
-    ).combine(chapterManager.observeGeneratedChaptersTurnedOff(episodeId)) { state, isGeneratedChaptersOff ->
-        state.copy(isGeneratedChaptersOff = isGeneratedChaptersOff)
-    }
+    )
 
     private var playChapterJob: Job? = null
 
@@ -253,6 +251,7 @@ class ChaptersViewModel @AssistedInject constructor(
         isTogglingChapters = isToggling,
         canSkipChapters = subscription != null,
         showHeader = episode is PodcastEpisode,
+        isGeneratedChaptersOff = chapters.hasHiddenGeneratedChapters,
     )
 
     private fun playbackPosition(playbackState: PlaybackState, episode: BaseEpisode) = when (mode) {

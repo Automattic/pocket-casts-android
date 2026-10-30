@@ -52,15 +52,18 @@ class ChapterManagerImpl @Inject constructor(
         val rawChapters = combine(
             episodeManager.findEpisodeByUuidFlow(episodeUuid).distinctUntilChangedBy(BaseEpisode::deselectedChapters),
             chapterDao.observeChaptersForEpisode(episodeUuid),
-            generatedChaptersAvailability.isAllowedFlow,
-        ) { episode, dbChapters, isGeneratedChaptersAllowed ->
+            generatedChaptersAvailability.visibilityFlow,
+        ) { episode, dbChapters, generatedChaptersVisibility ->
             // Already-saved generated chapters must stay hidden while the feature is off or the user opts out.
-            val visibleChapters = if (isGeneratedChaptersAllowed) {
+            val visibleChapters = if (generatedChaptersVisibility == GeneratedChaptersAvailability.Visibility.Shown) {
                 dbChapters
             } else {
                 dbChapters.filterNot { it.origin == ChapterOrigin.Generated }
             }
-            Chapters(visibleChapters.fixChapterTimestamps(episode))
+            Chapters(
+                items = visibleChapters.fixChapterTimestamps(episode),
+                hasHiddenGeneratedChapters = generatedChaptersVisibility == GeneratedChaptersAvailability.Visibility.Hidden && dbChapters.any { it.origin == ChapterOrigin.Generated },
+            )
         }
 
         // Generated chapter timestamps are in the server reference timeline; align them to the real audio
@@ -75,14 +78,6 @@ class ChapterManagerImpl @Inject constructor(
             alignGeneratedChapters(episodeUuid, chapters)
         }.distinctUntilChanged()
     }
-
-    override fun observeGeneratedChaptersTurnedOff(episodeUuid: String) = combine(
-        chapterDao.observeGeneratedCountForEpisode(episodeUuid),
-        generatedChaptersAvailability.isAvailableFlow,
-        generatedChaptersAvailability.isAllowedFlow,
-    ) { generatedCount, isAvailable, isAllowed ->
-        isAvailable && !isAllowed && generatedCount > 0
-    }.distinctUntilChanged()
 
     /**
      * Translate generated chapters from reference time to stream time using the fingerprint map.
@@ -153,7 +148,7 @@ class ChapterManagerImpl @Inject constructor(
                 }
                 .filter { it.duration > Duration.ZERO }
                 .mapIndexed { index, chapter -> chapter.copy(uiIndex = index + 1) }
-            return Chapters(aligned)
+            return Chapters(aligned, chapters.hasHiddenGeneratedChapters)
         }
     }
 }

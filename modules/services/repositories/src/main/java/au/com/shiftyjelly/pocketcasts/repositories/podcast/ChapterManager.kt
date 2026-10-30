@@ -21,6 +21,4 @@ interface ChapterManager {
     suspend fun hasGeneratedChapters(episodeUuid: String): Boolean
 
     fun observerChaptersForEpisode(episodeUuid: String): Flow<Chapters>
-
-    fun observeGeneratedChaptersTurnedOff(episodeUuid: String): Flow<Boolean>
 }

@@ -18,6 +18,17 @@ class GeneratedChaptersAvailability @Inject constructor(
         isFeatureEnabled && subscription != null
     }.distinctUntilChanged()
 
+    val visibilityFlow: Flow<Visibility> = combine(
+        isAvailableFlow,
+        settings.showGeneratedChapters.flow,
+    ) { isAvailable, showGeneratedChapters ->
+        when {
+            !isAvailable -> Visibility.Unavailable
+            showGeneratedChapters -> Visibility.Shown
+            else -> Visibility.Hidden
+        }
+    }.distinctUntilChanged()
+
     val isAllowedFlow: Flow<Boolean> = combine(
         isAvailableFlow,
         settings.showGeneratedChapters.flow,
@@ -29,4 +40,10 @@ class GeneratedChaptersAvailability @Inject constructor(
         settings.cachedSubscription.value != null
 
     fun isAllowed(): Boolean = isAvailable() && settings.showGeneratedChapters.value
+
+    enum class Visibility {
+        Unavailable,
+        Hidden,
+        Shown,
+    }
 }

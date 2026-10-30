@@ -6,6 +6,7 @@ import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -91,6 +92,25 @@ class GeneratedChaptersAvailabilityTest {
 
             FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, false)
             assertFalse(awaitItem())
+        }
+    }
+
+    @Test
+    fun `visibility moves straight from shown to unavailable when Plus lapses`() = runTest {
+        val fixture = GeneratedChaptersFixture()
+
+        fixture.availability.visibilityFlow.test {
+            assertEquals(GeneratedChaptersAvailability.Visibility.Shown, awaitItem())
+
+            fixture.showGeneratedChaptersFlow.value = false
+            assertEquals(GeneratedChaptersAvailability.Visibility.Hidden, awaitItem())
+
+            fixture.showGeneratedChaptersFlow.value = true
+            assertEquals(GeneratedChaptersAvailability.Visibility.Shown, awaitItem())
+
+            fixture.subscriptionFlow.value = null
+            assertEquals(GeneratedChaptersAvailability.Visibility.Unavailable, awaitItem())
+            expectNoEvents()
         }
     }
 }
