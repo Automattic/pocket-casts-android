@@ -403,6 +403,20 @@ class PlaybackSettingsFragment : BaseFragment() {
                             )
                         }
 
+                        SettingsItems.SETTINGS_HEADER_CHAPTERS -> {
+                            val isGeneratedChaptersAvailable by generatedChaptersAvailability.isAvailableFlow
+                                .collectAsStateWithLifecycle(initialValue = generatedChaptersAvailability.isAvailable())
+                            if (isGeneratedChaptersAvailable) {
+                                Column {
+                                    Spacer(modifier = Modifier.height(SettingsSection.verticalPadding))
+                                    SettingSectionHeader(
+                                        text = stringResource(LR.string.chapters),
+                                        indent = false,
+                                    )
+                                }
+                            }
+                        }
+
                         SettingsItems.SETTINGS_HEADER_SLEEP_TIMER -> {
                             Column {
                                 Spacer(modifier = Modifier.height(SettingsSection.verticalPadding))
@@ -771,12 +785,13 @@ private enum class SettingsItems {
     SETTINGS_SKIP_BACK_TIME,
     SETTINGS_KEEP_SCREEN_AWAKE,
     SETTINGS_OPEN_PLAYER_AUTOMATICALLY,
-    SETTINGS_GENERATED_CHAPTERS,
     SETTINGS_INTELLIGENT_PLAYBACK,
     SETTINGS_PLAY_UP_NEXT_EPISODE,
     SETTINGS_ADJUST_REMAINING_TIME,
     SETTINGS_GENERAL_AUTOPLAY,
     SETTINGS_AUDIO_ONLY,
+    SETTINGS_HEADER_CHAPTERS,
+    SETTINGS_GENERATED_CHAPTERS,
     SETTINGS_HEADER_SLEEP_TIMER,
     SETTINGS_SLEEP_TIMER_RESTART,
     SETTINGS_SLEEP_TIMER_SHAKE,
