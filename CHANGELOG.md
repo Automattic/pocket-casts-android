@@ -1,5 +1,8 @@
 8.25
 -----
+*   New Features
+    *   Add an option to hide played podcasts from the Podcasts tab, in the "…" menu
+        ([#6203](https://github.com/Automattic/pocket-casts-android/pull/6203))
 *   Bug Fixes
     *   Fix Wear OS episode downloads not switching to WiFi
         ([#6100](https://github.com/Automattic/pocket-casts-android/pull/6100))
