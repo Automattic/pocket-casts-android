@@ -638,6 +638,13 @@
     <string name="chapters_generated_upsell_message">With Pocket Casts Plus, no more scrubbing. Jump straight to the part you came&#160;for.</string>
     <string name="chapters_generated_upsell_button">Get generated chapters</string>
     <string name="chapters_generated_disclaimer">These chapters are automatically generated and may not be perfectly accurate.</string>
+    <string name="chapters_generated_none_yet_title">No chapters yet</string>
+    <string name="chapters_generated_none_yet_message">Generate chapters and skip straight to the part you&#160;want.</string>
+    <string name="chapters_generated_generate">Generate chapters</string>
+    <string name="chapters_generated_ai_note">Chapters are generated using AI and may not be perfectly accurate.</string>
+    <string name="chapters_generated_generating">Generating chapters…</string>
+    <string name="chapters_generated_generating_note">This can take a minute for longer episodes. Chapters will show on the player when they\'re ready.</string>
+    <string name="chapters_generated_none_title">No chapters for this episode</string>
     <!-- %1$d is the current selected chapter. %2$d is the total number of chapters. -->
     <string name="chapter_count_summary">%1$d of %2$d</string>
     <plurals name="chapter">
