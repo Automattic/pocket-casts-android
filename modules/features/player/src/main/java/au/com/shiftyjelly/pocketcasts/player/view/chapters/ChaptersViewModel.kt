@@ -9,6 +9,11 @@ import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.models.to.Chapters
 import au.com.shiftyjelly.pocketcasts.models.to.toChapterOriginType
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
+import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
+import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionOffer
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.payment.getOrNull
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.GeneratedChapterSeeker
@@ -18,6 +23,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.GeneratedChaptersAvailability
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.automattic.eventhorizon.ChapterLinkClickedEvent
 import com.automattic.eventhorizon.ChaptersShownEvent
 import com.automattic.eventhorizon.ChaptersShownSource
@@ -51,6 +58,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -67,6 +75,7 @@ class ChaptersViewModel @AssistedInject constructor(
     private val generatedChapterSeeker: GeneratedChapterSeeker,
     private val transcriptManager: TranscriptManager,
     private val generatedChaptersAvailability: GeneratedChaptersAvailability,
+    private val paymentClient: PaymentClient,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     private val isTogglingChapters = MutableStateFlow(false)
@@ -89,6 +98,11 @@ class ChaptersViewModel @AssistedInject constructor(
     }
 
     val uiState = mode.uiStateFlow().stateIn(viewModelScope, SharingStarted.Lazily, UiState())
+
+    val isFreeTrialAvailable = flow {
+        val plans = paymentClient.loadSubscriptionPlans().getOrNull()
+        emit(plans?.findOfferPlan(SubscriptionTier.Plus, BillingCycle.Monthly, SubscriptionOffer.Trial) != null)
+    }.stateIn(viewModelScope, SharingStarted.Lazily, false)
 
     val resolvingChapterIndex = generatedChapterSeeker
         .resolvingChapterIndex(playbackManager.playbackStateFlow.map { it.episodeUuid })
@@ -257,6 +271,10 @@ class ChaptersViewModel @AssistedInject constructor(
         canSkipChapters = subscription != null,
         showHeader = episode is PodcastEpisode,
         isGeneratedChaptersOff = chapters.hasHiddenGeneratedChapters,
+        showUpsell = subscription == null &&
+            chapters.isEmpty() &&
+            (episode as? PodcastEpisode)?.hasGeneratedTranscript == true &&
+            FeatureFlag.isEnabled(Feature.GENERATED_CHAPTERS),
     )
 
     private fun playbackPosition(playbackState: PlaybackState, episode: BaseEpisode) = when (mode) {
@@ -315,10 +333,11 @@ class ChaptersViewModel @AssistedInject constructor(
         val canSkipChapters: Boolean = false,
         val showHeader: Boolean = false,
         val isGeneratedChaptersOff: Boolean = false,
+        val showUpsell: Boolean = false,
     ) {
         val chaptersCount = allChapters.size
         val showOffState get() = chaptersCount == 0 && isGeneratedChaptersOff
-        val showChaptersTab get() = chaptersCount > 0 || isGeneratedChaptersOff
+        val showChaptersTab get() = chaptersCount > 0 || isGeneratedChaptersOff || showUpsell
         val deselectedChaptersCount get() = allChapters.count { !it.chapter.selected }
         val chapters get() = if (isTogglingChapters) allChapters else allChapters.filter { it.chapter.selected }
         val showSubscriptionIcon get() = !isTogglingChapters && !canSkipChapters
