@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.search.component
 
+import android.annotation.SuppressLint
 import android.graphics.Rect
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.view.ContextThemeWrapper
@@ -54,6 +55,7 @@ import au.com.shiftyjelly.pocketcasts.search.R
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
+@SuppressLint("PrivateResource")
 @Composable
 internal fun SearchToolbar(
     query: String,
