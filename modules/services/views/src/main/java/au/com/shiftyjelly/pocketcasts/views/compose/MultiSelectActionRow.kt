@@ -22,14 +22,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectAction
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 @Composable
 internal fun MultiSelectActionRow(
     action: MultiSelectAction,
     modifier: Modifier = Modifier,
+    dragHandleModifier: Modifier? = null,
 ) {
     val density = LocalDensity.current
     val iconWidth = rememberDrawableWidth(action.iconRes)
+    val handleWidth = if (dragHandleModifier == null) 0 else rememberDrawableWidth(IR.drawable.ic_reorder) + with(density) { 16.dp.roundToPx() }
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -51,10 +54,20 @@ internal fun MultiSelectActionRow(
             modifier = Modifier
                 .padding(
                     start = with(density) { (16.dp.roundToPx() + iconWidth + 24.dp.roundToPx()).toDp() },
-                    end = 24.dp,
+                    end = with(density) { (24.dp.roundToPx() + handleWidth).toDp() },
                 )
                 .align(Alignment.CenterStart),
         )
+        if (dragHandleModifier != null) {
+            WrapContentDrawable(
+                drawableId = IR.drawable.ic_reorder,
+                tint = MaterialTheme.theme.colors.primaryIcon02,
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .padding(end = 16.dp)
+                    .then(dragHandleModifier),
+            )
+        }
     }
 }
 

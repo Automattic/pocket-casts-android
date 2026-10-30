@@ -162,7 +162,7 @@ internal fun MultiSelectTopBar(
 }
 
 @Composable
-private fun ToolbarTitle(title: String, color: Color, modifier: Modifier = Modifier) {
+internal fun ToolbarTitle(title: String, color: Color, modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val style = remember(context) { context.toolbarTitleStyle() }
     TextViewLine(
@@ -243,7 +243,7 @@ private fun RowScope.OverflowMenuButton(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun ToolbarButton(
+internal fun ToolbarButton(
     contentDescription: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -328,7 +328,7 @@ private fun <T> Context.styledAttribute(attr: Int, defStyleAttr: Int = 0, defSty
     }
 }
 
-private val TitleAlignment = Alignment.Vertical { size, space -> (space - size) / 2 }
+internal val TitleAlignment = Alignment.Vertical { size, space -> (space - size) / 2 }
 
 private val ActionAlignment = Alignment.Vertical { size, space -> space / 2 - size / 2 }
 

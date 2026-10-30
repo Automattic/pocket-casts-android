@@ -9,9 +9,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -42,6 +45,7 @@ class RearrangeDragStateTest {
     private val moves = mutableListOf<Pair<Int, Int>>()
     private val starts = mutableListOf<Any>()
     private val drops = mutableListOf<Any>()
+    private var isShown by mutableStateOf(true)
 
     @Test
     fun `auto scrolling past a row moves it without reverting`() {
@@ -82,6 +86,22 @@ class RearrangeDragStateTest {
     }
 
     @Test
+    fun `closing the screen while the drop is recovering still drops`() {
+        setContent()
+        rule.mainClock.autoAdvance = false
+
+        rule.onNodeWithTag("handle1").performTouchInput {
+            down(center)
+            up()
+        }
+        rule.mainClock.advanceTimeBy(100)
+        isShown = false
+        rule.mainClock.advanceTimeBy(100)
+
+        assertEquals(listOf<Any>(1), drops)
+    }
+
+    @Test
     fun `a second finger on a handle does not start the next gesture`() {
         setContent()
         val row0 = rule.onNodeWithTag("row0").fetchSemanticsNode().boundsInRoot
@@ -105,6 +125,7 @@ class RearrangeDragStateTest {
 
     private fun setContent() {
         rule.setContent {
+            if (!isShown) return@setContent
             val listState = rememberLazyListState()
             val scope = rememberCoroutineScope()
             val haptics = LocalHapticFeedback.current
