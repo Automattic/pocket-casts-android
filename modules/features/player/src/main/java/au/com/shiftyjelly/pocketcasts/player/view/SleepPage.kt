@@ -1,6 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.player.view
 
-import android.animation.ValueAnimator
+import android.provider.Settings
 import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -23,8 +23,8 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
-import androidx.core.graphics.withTranslation
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontFamily
@@ -32,6 +32,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.graphics.withTranslation
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.buttons.ViewMaterialButton
 import au.com.shiftyjelly.pocketcasts.compose.components.NumberStepper
@@ -43,11 +44,11 @@ import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import com.airbnb.lottie.LottieDrawable
 import com.airbnb.lottie.LottieProperty
-import com.airbnb.lottie.compose.animateLottieCompositionAsState
-import com.airbnb.lottie.model.KeyPath
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
+import com.airbnb.lottie.model.KeyPath
 import kotlin.math.floor
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -262,6 +263,8 @@ private fun SleepSeparator(colors: SleepColors) {
 private fun SleepAnimation(colors: SleepColors) {
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.sleep_button))
     val progress by animateLottieCompositionAsState(composition, iterations = LottieConstants.IterateForever)
+    val context = LocalContext.current
+    val animationsEnabled = remember(context) { Settings.Global.getFloat(context.contentResolver, Settings.Global.ANIMATOR_DURATION_SCALE, 1f) != 0f }
     val tint = colors.highlight.toArgb()
     val drawable = remember(composition, tint) {
         LottieDrawable().apply {
@@ -277,7 +280,7 @@ private fun SleepAnimation(colors: SleepColors) {
                 val width = drawable.intrinsicWidth
                 val height = drawable.intrinsicHeight
                 if (width <= 0 || height <= 0) return@drawBehind
-                drawable.progress = if (ValueAnimator.areAnimatorsEnabled()) progress else composition?.let { it.getProgressForFrame(floor(it.endFrame)) } ?: 0f
+                drawable.progress = if (animationsEnabled) progress else composition?.let { it.getProgressForFrame(floor(it.endFrame)) } ?: 0f
                 drawable.setBounds(0, 0, width, height)
                 val scale = maxOf(size.width / width, size.height / height)
                 val canvas = drawContext.canvas.nativeCanvas
@@ -309,8 +312,8 @@ private fun SleepRunningTime(state: SleepState.RunningTime, colors: SleepColors,
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier.padding(start = 32.dp, top = 32.dp, end = 32.dp),
         ) {
-            SleepButton(stringResource(LR.string.player_sleep_add_1_minute), colors, Modifier.weight(1f)) { listener.onAddMinutesClick(1) }
-            SleepButton(stringResource(LR.string.player_sleep_add_5_minutes), colors, Modifier.weight(1f)) { listener.onAddMinutesClick(5) }
+            SleepButton(stringResource(LR.string.player_sleep_add_1_minute), colors, onClick = { listener.onAddMinutesClick(1) }, modifier = Modifier.weight(1f))
+            SleepButton(stringResource(LR.string.player_sleep_add_5_minutes), colors, onClick = { listener.onAddMinutesClick(5) }, modifier = Modifier.weight(1f))
         }
         if (state.hasChapters) {
             SleepWideButton(LR.string.player_sleep_timer_end_of_chapter, colors, listener::onExtendEndOfChapterClick)
@@ -351,7 +354,7 @@ private fun SleepWideButton(@StringRes textRes: Int, colors: SleepColors, onClic
 }
 
 @Composable
-private fun SleepButton(text: String, colors: SleepColors, modifier: Modifier = Modifier, onClick: () -> Unit) {
+private fun SleepButton(text: String, colors: SleepColors, onClick: () -> Unit, modifier: Modifier = Modifier) {
     ViewMaterialButton(
         text = text,
         onClick = onClick,
