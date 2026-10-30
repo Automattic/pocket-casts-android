@@ -43,6 +43,7 @@ import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
@@ -58,6 +59,7 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.clearInvocations
+import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.mock
@@ -86,7 +88,7 @@ class ChaptersViewModelTest {
     }
     private val isGeneratedChaptersAllowed = MutableStateFlow(true)
     private val generatedChaptersAvailability = mock<GeneratedChaptersAvailability> {
-        on { isAllowedFlow } doReturn isGeneratedChaptersAllowed
+        on { isAllowedFlow } doAnswer { combine(isGeneratedChaptersAllowed, showGeneratedChaptersFlow) { isAllowed, show -> isAllowed && show } }
     }
     private val generatedChapterSeeker = mock<GeneratedChapterSeeker> {
         on { resolvingChapterIndex(any()) } doReturn MutableStateFlow<Int?>(null)
@@ -148,6 +150,7 @@ class ChaptersViewModelTest {
 
     @Test
     fun `episode mode loads generated chapters for its episode`() = runTest {
+        showGeneratedChaptersFlow.value = true
         verifyBlocking(transcriptManager) { loadGeneratedChapters("id") }
     }
 
@@ -162,6 +165,7 @@ class ChaptersViewModelTest {
 
     @Test
     fun `loads generated chapters when they become allowed`() = runTest {
+        showGeneratedChaptersFlow.value = true
         clearInvocations(transcriptManager)
         isGeneratedChaptersAllowed.value = false
         createViewModel()
@@ -174,6 +178,8 @@ class ChaptersViewModelTest {
 
     @Test
     fun `player mode loads generated chapters for each new playing episode`() = runTest {
+        showGeneratedChaptersFlow.value = true
+        whenever(chapterManager.observerChaptersForEpisode("id2")).thenReturn(chaptersFlow)
         clearInvocations(transcriptManager)
         playbackStateFlow.value = PlaybackState(episodeUuid = "")
         ChaptersViewModel(
@@ -200,6 +206,7 @@ class ChaptersViewModelTest {
 
     @Test
     fun `retries generated chapters with backoff while loading fails`() = runTest {
+        showGeneratedChaptersFlow.value = true
         clearInvocations(transcriptManager)
         whenever(transcriptManager.loadGeneratedChapters("id")).thenReturn(false, false, true)
         ChaptersViewModel(
