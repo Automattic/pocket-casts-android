@@ -20,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
 import java.time.Instant
+import java.util.Date
 import javax.inject.Inject
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.collect
@@ -57,7 +58,7 @@ class SubCancelledFragment : BaseFragment() {
                 viewModel.signInState.collect { signInState ->
                     val expiryDate = (signInState as? SignInState.SignedIn)?.subscription?.expiryDate ?: Instant.now()
                     runCatching {
-                        dateFormatter.format(expiryDate)
+                        dateFormatter.format(Date.from(expiryDate))
                     }.onSuccess {
                         expiryHint = getString(LR.string.profile_sub_cancel_hint0) + " " + it
                     }.onFailure {
