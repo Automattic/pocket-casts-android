@@ -92,6 +92,7 @@ class ChatSurveyFragment : BaseDialogFragment() {
                 podcastColors = args.podcastColors,
                 trigger = ChatFeedbackFragment.Trigger.SessionSurvey,
                 messageIndex = null,
+                answerUuid = null,
             )
         }
         dismiss()

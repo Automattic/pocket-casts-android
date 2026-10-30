@@ -933,14 +933,19 @@ class ChatViewModel @Inject constructor(
 
     private fun trackAnswerRated(answerUuid: String, rating: ChatAnswerRating?, previousRating: ChatAnswerRating?) {
         val event = when {
-            rating != null -> EpisodeChatResponseRatedEvent(
-                source = sourceView.analyticsValue,
-                episodeUuid = episodeUuid,
-                podcastUuid = podcastUuid,
-                rating = rating.analyticsValue,
-                messageIndex = answerMessageIndex(answerUuid),
-                previousRating = previousRating?.analyticsValue,
-            )
+            rating != null -> {
+                val ratedAnswer = _uiState.value.messages.ratedAnswer(answerUuid)
+                EpisodeChatResponseRatedEvent(
+                    source = sourceView.analyticsValue,
+                    episodeUuid = episodeUuid,
+                    podcastUuid = podcastUuid,
+                    rating = rating.analyticsValue,
+                    messageIndex = answerMessageIndex(answerUuid),
+                    previousRating = previousRating?.analyticsValue,
+                    question = ratedAnswer?.question,
+                    answer = ratedAnswer?.answer,
+                )
+            }
 
             previousRating != null -> EpisodeChatResponseRatingClearedEvent(
                 source = sourceView.analyticsValue,

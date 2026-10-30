@@ -1064,9 +1064,93 @@ class ChatViewModelTest {
                 podcastUuid = PODCAST_UUID,
                 rating = EpisodeChatSentimentType.Negative,
                 messageIndex = 2,
+                question = "Q2",
+                answer = "A2",
             ),
             eventSink.pollEvent(),
         )
+    }
+
+    @Test
+    fun `rating an answer with a quote tracks the quote with the answer`() = runTest {
+        chatManager.messages.value = listOf(
+            ChatMessage.User("Q1", uuid = "q1"),
+            ChatMessage.Assistant("A1", uuid = "a1"),
+            ChatMessage.Quote(text = "Quote", start = "1:00", end = "1:10", uuid = "a1-quote"),
+            ChatMessage.User("Q2", uuid = "q2"),
+            ChatMessage.Assistant("A2", uuid = "a2"),
+        )
+        setEpisodeInfo()
+        advanceUntilIdle()
+        eventSink.skipEvent()
+
+        viewModel.rateAnswer("a1", ChatAnswerRating.Negative)
+
+        val event = eventSink.pollEvent() as EpisodeChatResponseRatedEvent
+        assertEquals("Q1", event.question)
+        assertEquals("A1\n\nQuote", event.answer)
+    }
+
+    @Test
+    fun `rating an answer truncates the tracked question and answer`() = runTest {
+        chatManager.messages.value = listOf(
+            ChatMessage.User("q".repeat(1_500), uuid = "q1"),
+            ChatMessage.Assistant("a".repeat(1_500), uuid = "a1"),
+        )
+        setEpisodeInfo()
+        advanceUntilIdle()
+        eventSink.skipEvent()
+
+        viewModel.rateAnswer("a1", ChatAnswerRating.Positive)
+
+        val event = eventSink.pollEvent() as EpisodeChatResponseRatedEvent
+        assertEquals("q".repeat(1_000), event.question)
+        assertEquals("a".repeat(1_000), event.answer)
+    }
+
+    @Test
+    fun `rating an answer without a question before it tracks only the answer`() = runTest {
+        chatManager.messages.value = listOf(ChatMessage.Assistant("A1", uuid = "a1"))
+        setEpisodeInfo()
+        advanceUntilIdle()
+        eventSink.skipEvent()
+
+        viewModel.rateAnswer("a1", ChatAnswerRating.Positive)
+
+        val event = eventSink.pollEvent() as EpisodeChatResponseRatedEvent
+        assertNull(event.question)
+        assertEquals("A1", event.answer)
+    }
+
+    @Test
+    fun `rating an answer does not split an emoji when truncating`() = runTest {
+        chatManager.messages.value = listOf(
+            ChatMessage.User("Q1", uuid = "q1"),
+            ChatMessage.Assistant("a".repeat(999) + "\uD83C\uDF99", uuid = "a1"),
+        )
+        setEpisodeInfo()
+        advanceUntilIdle()
+        eventSink.skipEvent()
+
+        viewModel.rateAnswer("a1", ChatAnswerRating.Positive)
+
+        assertEquals("a".repeat(999), (eventSink.pollEvent() as EpisodeChatResponseRatedEvent).answer)
+    }
+
+    @Test
+    fun `rating an answer does not split a flag or a joined emoji when truncating`() = runTest {
+        chatManager.messages.value = listOf(
+            ChatMessage.User("a".repeat(998) + "\uD83C\uDDE6\uD83C\uDDFA", uuid = "q1"),
+            ChatMessage.Assistant("a".repeat(996) + "\uD83D\uDC68\u200D\uD83D\uDC69\u200D\uD83D\uDC67", uuid = "a1"),
+        )
+        setEpisodeInfo()
+        eventSink.skipEvent()
+
+        viewModel.rateAnswer("a1", ChatAnswerRating.Positive)
+
+        val event = eventSink.pollEvent() as EpisodeChatResponseRatedEvent
+        assertEquals("a".repeat(998), event.question)
+        assertEquals("a".repeat(996), event.answer)
     }
 
     @Test
@@ -1115,6 +1199,8 @@ class ChatViewModelTest {
                 rating = EpisodeChatSentimentType.Negative,
                 messageIndex = 1,
                 previousRating = EpisodeChatSentimentType.Positive,
+                question = "Q1",
+                answer = "A1",
             ),
             eventSink.pollEvent(),
         )
