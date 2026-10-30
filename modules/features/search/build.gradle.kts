@@ -9,7 +9,6 @@ android {
     namespace = "au.com.shiftyjelly.pocketcasts.search"
     buildFeatures {
         buildConfig = true
-        viewBinding = true
         compose = true
     }
 }
