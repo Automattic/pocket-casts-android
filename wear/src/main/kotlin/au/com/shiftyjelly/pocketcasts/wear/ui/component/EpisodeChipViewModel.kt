@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.rx2.asFlow
 
 @HiltViewModel
 class EpisodeChipViewModel @Inject constructor(
@@ -24,8 +23,7 @@ class EpisodeChipViewModel @Inject constructor(
 
     val upNextQueue: Flow<UpNextQueue.State> = playbackManager
         .upNextQueue
-        .getChangesObservableWithLiveCurrentEpisode(episodeManager, podcastManager)
-        .asFlow()
+        .getChangesFlowWithLiveCurrentEpisode(episodeManager, podcastManager)
 
     fun observeByUuid(episode: BaseEpisode): StateFlow<BaseEpisode> = episodeManager
         .findEpisodeByUuidFlow(episode.uuid)
