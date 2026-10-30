@@ -404,7 +404,9 @@ class PlaybackSettingsFragment : BaseFragment() {
                         }
 
                         SettingsItems.SETTINGS_HEADER_CHAPTERS -> {
-                            if (FeatureFlag.isEnabled(Feature.GENERATED_CHAPTERS)) {
+                            val isGeneratedChaptersAvailable by generatedChaptersAvailability.isAvailableFlow
+                                .collectAsStateWithLifecycle(initialValue = generatedChaptersAvailability.isAvailable())
+                            if (isGeneratedChaptersAvailable) {
                                 Column {
                                     Spacer(modifier = Modifier.height(SettingsSection.verticalPadding))
                                     SettingSectionHeader(
