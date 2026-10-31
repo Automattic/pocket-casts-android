@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="emailLayout" type="id" />
+    <item name="txtEmail" type="id" />
+    <item name="passwordLayout" type="id" />
+    <item name="txtPwd" type="id" />
+</resources>
