@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -14,6 +15,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.content.IntentCompat.getParcelableExtra
 import androidx.core.net.toUri
+import androidx.fragment.app.FragmentContainerView
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
@@ -23,7 +25,6 @@ import au.com.shiftyjelly.pocketcasts.preferences.NotificationSound
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.settings.R
-import au.com.shiftyjelly.pocketcasts.settings.databinding.FragmentNotificationSettingsBinding
 import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreferenceType
 import au.com.shiftyjelly.pocketcasts.settings.util.TextResource
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
@@ -69,7 +70,6 @@ internal class NotificationsSettingsFragment :
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        val binding = FragmentNotificationSettingsBinding.inflate(inflater, container, false)
         val composeView = contentWithoutConsumedInsets {
             AppThemeWithBackground(theme.activeTheme) {
                 val bottomInset = settings.bottomInset.collectAsStateWithLifecycle(0)
@@ -106,9 +106,10 @@ internal class NotificationsSettingsFragment :
                 )
             }
         }
-        binding.root.addView(composeView, 0)
-
-        return binding.root
+        return FrameLayout(requireContext()).apply {
+            addView(composeView)
+            addView(FragmentContainerView(context).apply { id = R.id.fragment_container })
+        }
     }
 
     override fun onResume() {
