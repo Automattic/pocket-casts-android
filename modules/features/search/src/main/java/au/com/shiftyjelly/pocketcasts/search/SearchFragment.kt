@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -264,6 +263,15 @@ class SearchFragment : BaseFragment() {
             }
         }
 
+        LaunchedEffect(state) {
+            if (state is SearchUiState.Suggestions && state.searchTerm.isNullOrBlank()) {
+                searchHistoryViewModel.start()
+            }
+            if (viewModel.isFragmentChangingConfigurations && viewModel.showSearchHistory) {
+                isHistoryVisible = true
+            }
+        }
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -280,9 +288,6 @@ class SearchFragment : BaseFragment() {
             )
 
             Box(modifier = Modifier.gone(!isHistoryVisible)) {
-                if (state is SearchUiState.Suggestions && state.searchTerm.isNullOrBlank()) {
-                    searchHistoryViewModel.start()
-                }
                 SearchHistoryPage(
                     viewModel = searchHistoryViewModel,
                     onClick = ::navigateFromSearchHistoryEntry,
@@ -294,11 +299,6 @@ class SearchFragment : BaseFragment() {
                     },
                     onScroll = ::hideKeyboard,
                 )
-                SideEffect {
-                    if (viewModel.isFragmentChangingConfigurations && viewModel.showSearchHistory) {
-                        isHistoryVisible = true
-                    }
-                }
             }
 
             Box(modifier = Modifier.gone(state !is SearchUiState.Suggestions || state.searchTerm.isNullOrBlank())) {
