@@ -30,6 +30,7 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Constraints
@@ -89,11 +90,11 @@ internal fun AppearancePicker(
 
 @Composable
 private fun rememberCellWidth(): Int {
-    val context = LocalContext.current
+    val resources = LocalResources.current
     val density = LocalDensity.current
     val screenWidth = LocalConfiguration.current.screenWidthDp
-    return remember(context, density, screenWidth) {
-        val mainWidth = context.resources.displayMetrics.widthPixels
+    return remember(resources, density, screenWidth) {
+        val mainWidth = resources.displayMetrics.widthPixels
         val maxCellWidth = (124 * density.density).toInt().toFloat()
         val peekWidth = (30 * density.density).toInt().toFloat()
         min(maxCellWidth, (mainWidth - peekWidth - 4) / 3).toInt()
