@@ -1,87 +1,71 @@
 package au.com.shiftyjelly.pocketcasts.account
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.EditorInfo
-import androidx.core.view.isVisible
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import au.com.shiftyjelly.pocketcasts.account.databinding.FragmentSignInBinding
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.SignInError
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.SignInState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.SignInViewModel
-import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
-import au.com.shiftyjelly.pocketcasts.ui.extensions.getTintedDrawable
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.utils.Util
-import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
-import au.com.shiftyjelly.pocketcasts.views.extensions.addOnTextChanged
-import au.com.shiftyjelly.pocketcasts.views.extensions.showKeyboard
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import dagger.hilt.android.AndroidEntryPoint
-import au.com.shiftyjelly.pocketcasts.images.R as IR
-import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
 class SignInFragment : BaseFragment() {
 
     private val viewModel: SignInViewModel by viewModels()
-    private var binding: FragmentSignInBinding? = null
+    private var form by mutableStateOf(SignInForm())
+    private var fieldsState: SignInFieldsState? = null
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = FragmentSignInBinding.inflate(inflater, container, false)
-        return binding?.root
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        binding = null
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) = contentWithoutConsumedInsets {
+        AppTheme(theme.activeTheme) {
+            val isCar = Util.isCarUiMode(requireContext())
+            val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
+            val form = form
+            val fieldsState = rememberSignInFieldsState().also { this@SignInFragment.fieldsState = it }
+            SignInPage(
+                state = SignInPageState(
+                    isCar = isCar,
+                    isLandscape = isLandscape,
+                    isFormValid = !form.isEmailInvalid && !form.isPasswordInvalid,
+                    isLoading = form.isLoading,
+                    isProgressVisible = form.isProgressVisible,
+                    errorText = form.errorText,
+                ),
+                onSignInClick = ::signIn,
+                onForgotPasswordClick = { findNavController().navigate(R.id.action_signInFragment_to_resetPasswordFragment) },
+                fields = {
+                    SignInFields(
+                        state = fieldsState,
+                        isCar = isCar,
+                        isLandscape = isLandscape,
+                        isEmailInvalid = form.isEmailInvalid,
+                        onEmailChange = viewModel::updateEmail,
+                        onPasswordChange = viewModel::updatePassword,
+                        onSubmit = ::signIn,
+                    )
+                },
+            )
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val binding = binding ?: return
-        val progress = binding.progress
-        val txtEmail = binding.txtEmail
-        val txtPwd = binding.txtPwd
-        val txtError = binding.txtError
-        val btnSignIn = binding.btnSignIn
-        val btnReset = binding.btnReset
-
-        progress.isVisible = false
+        form = SignInForm()
 
         viewModel.clearValues()
-
-        txtEmail.setText(viewModel.email.value)
-        txtEmail.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_DONE) {
-                txtPwd.requestFocus()
-                return@setOnEditorActionListener true
-            }
-            false
-        }
-
-        txtPwd.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_DONE) {
-                signIn(viewModel)
-                return@setOnEditorActionListener true
-            }
-            false
-        }
-
-        if (!Util.isCarUiMode(view.context)) {
-            txtEmail.showKeyboard()
-        }
-        txtEmail.addOnTextChanged {
-            viewModel.updateEmail(it)
-        }
-
-        txtPwd.addOnTextChanged {
-            viewModel.updatePassword(it)
-        }
 
         viewModel.signInState.observe(viewLifecycleOwner) {
             when (it) {
@@ -90,7 +74,7 @@ class SignInFragment : BaseFragment() {
                 }
 
                 is SignInState.Failure -> {
-                    progress.isVisible = false
+                    form = form.copy(isProgressVisible = false)
 
                     val invalidEmail = it.errors.contains(SignInError.INVALID_EMAIL)
                     val invalidPwd = it.errors.contains(SignInError.INVALID_PASSWORD)
@@ -100,21 +84,19 @@ class SignInFragment : BaseFragment() {
 
                     if (serverFail) {
                         val error = it.message ?: "Check your email and password"
-                        txtError.text = error
-                        txtError.isVisible = true
+                        form = form.copy(errorText = error)
                         viewModel.clearServerError()
                     }
                 }
 
                 is SignInState.Loading -> {
-                    txtError.text = ""
-                    progress.isVisible = true
+                    form = form.copy(errorText = form.errorText?.let { "" }, isProgressVisible = true)
 
                     updateForm(invalidEmail = false, invalidPwd = false, loading = true)
                 }
 
                 is SignInState.Success -> {
-                    progress.isVisible = false
+                    form = form.copy(isProgressVisible = false)
                     if (findNavController().graph.startDestinationId == R.id.promoCodeFragment) {
                         findNavController().popBackStack(R.id.promoCodeFragment, false)
                     } else {
@@ -123,52 +105,37 @@ class SignInFragment : BaseFragment() {
                 }
             }
         }
-
-        btnSignIn.setOnClickListener {
-            signIn(viewModel)
-        }
-
-        btnReset.setOnClickListener {
-            findNavController().navigate(R.id.action_signInFragment_to_resetPasswordFragment)
-        }
     }
 
-    private fun signIn(viewModel: SignInViewModel) {
-        val binding = binding ?: return
-        binding.progress.isVisible = true
-        UiUtil.hideKeyboard(binding.txtPwd)
+    override fun onDestroyView() {
+        super.onDestroyView()
+        fieldsState = null
+    }
+
+    private fun signIn() {
+        val view = view ?: return
+        form = form.copy(isProgressVisible = true)
+        UiUtil.hideKeyboard(view)
         viewModel.signIn()
     }
 
     override fun onPause() {
         super.onPause()
 
-        val binding = binding ?: return
-        UiUtil.hideKeyboard(binding.root)
+        val view = view ?: return
+        UiUtil.hideKeyboard(view)
     }
 
     private fun updateForm(invalidEmail: Boolean, invalidPwd: Boolean, loading: Boolean) {
-        val binding = binding ?: return
-
-        val view = binding.root
-        val context = view.context
-
-        val emailColor = context.getThemeColor(UR.attr.primary_interactive_01)
-        val emailDrawable = context.getTintedDrawable(IR.drawable.ic_mail, emailColor)
-        val passwordDrawable = context.getTintedDrawable(IR.drawable.ic_password, emailColor)
-
-        val tickColor = context.getThemeColor(UR.attr.support_02)
-        val tickDrawable = if (!invalidEmail) context.getTintedDrawable(IR.drawable.ic_tick_circle, tickColor) else null
-        val max = 32.dpToPx(context)
-        emailDrawable?.setBounds(0, 0, max, max)
-        passwordDrawable?.setBounds(0, 0, max, max)
-        tickDrawable?.setBounds(0, 0, max, max)
-
-        binding.txtEmail.setCompoundDrawables(emailDrawable, null, tickDrawable, null)
-        binding.txtPwd.setCompoundDrawablesRelative(passwordDrawable, null, null, null)
-
-        val bothMatch = !invalidEmail && !invalidPwd
-        binding.btnSignIn.isEnabled = bothMatch && !loading
-        binding.btnSignIn.alpha = if (bothMatch) 1.0f else 0.2f
+        form = form.copy(isEmailInvalid = invalidEmail, isPasswordInvalid = invalidPwd, isLoading = loading)
+        fieldsState?.updateIcons(invalidEmail)
     }
 }
+
+private data class SignInForm(
+    val isEmailInvalid: Boolean = false,
+    val isPasswordInvalid: Boolean = false,
+    val isLoading: Boolean = false,
+    val isProgressVisible: Boolean = false,
+    val errorText: String? = null,
+)
