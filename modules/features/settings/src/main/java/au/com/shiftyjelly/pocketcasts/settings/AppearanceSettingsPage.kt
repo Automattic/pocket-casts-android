@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ripple
@@ -118,14 +119,12 @@ internal fun AppearanceSettingsPage(
                 details = stringResource(LR.string.settings_show_artwork_details),
                 checked = switches.showArtworkOnLockScreen,
                 onCheckedChange = listener::onShowArtworkOnLockScreenChange,
-                switchContentDescription = stringResource(LR.string.settings_show_artwork),
             )
             SwitchRow(
                 title = stringResource(LR.string.settings_use_episode_artwork),
                 details = stringResource(LR.string.settings_use_episode_artwork_details),
                 checked = switches.useEpisodeArtwork,
                 onCheckedChange = listener::onUseEpisodeArtworkChange,
-                switchContentDescription = stringResource(LR.string.settings_use_episode_artwork),
             )
             TextRow(LR.string.settings_use_episode_artwork_advanced, listener::onEpisodeArtworkConfigurationClick)
             TextRow(LR.string.settings_refresh_all_podcast_artwork, listener::onRefreshArtworkClick)
@@ -212,7 +211,6 @@ private fun SwitchRow(
     titleEndMargin: Dp = 16.dp,
     switchMarginTop: Dp = 4.dp,
     switchCentered: Boolean = false,
-    switchContentDescription: String? = null,
 ) {
     val colors = MaterialTheme.theme.colors
     Layout(
@@ -238,11 +236,10 @@ private fun SwitchRow(
             AndroidView(
                 factory = { context ->
                     Switch(context).apply {
-                        if (switchContentDescription == null) importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+                        importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
                     }
                 },
                 update = { switch ->
-                    switch.contentDescription = switchContentDescription
                     switch.setOnCheckedChangeListener(null)
                     switch.isChecked = checked
                     switch.setOnCheckedChangeListener { _, isChecked -> onCheckedChange(isChecked) }
@@ -252,7 +249,7 @@ private fun SwitchRow(
         modifier = Modifier
             .padding(top = topMargin)
             .fillMaxWidth()
-            .clickable { onCheckedChange(!checked) },
+            .toggleable(value = checked, role = Role.Switch, onValueChange = onCheckedChange),
     ) { measurables, constraints ->
         val width = constraints.maxWidth
         val start = 72.dp.roundToPx()
