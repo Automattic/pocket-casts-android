@@ -10,4 +10,32 @@
         <item name="hintTextColor">?attr/primary_interactive_01</item>
         <item name="android:textColorHint">?attr/primary_text_02</item>
     </style>
+
+    <style name="PCPasswordTextInputLayout" parent="PCTextInputLayout">
+        <item name="passwordToggleEnabled">true</item>
+    </style>
+
+    <style name="PCCarTextInputLayout" parent="PCTextInputLayout">
+        <item name="hintTextAppearance">@style/TextAppearanceCarHint</item>
+    </style>
+
+    <style name="PCCarPasswordTextInputLayout" parent="PCPasswordTextInputLayout">
+        <item name="hintTextAppearance">@style/TextAppearanceCarHint</item>
+    </style>
+
+    <style name="ThemeOverlay.PocketCasts.TextInput" parent="">
+        <item name="textInputStyle">@style/PCTextInputLayout</item>
+    </style>
+
+    <style name="ThemeOverlay.PocketCasts.PasswordTextInput" parent="">
+        <item name="textInputStyle">@style/PCPasswordTextInputLayout</item>
+    </style>
+
+    <style name="ThemeOverlay.PocketCasts.CarTextInput" parent="">
+        <item name="textInputStyle">@style/PCCarTextInputLayout</item>
+    </style>
+
+    <style name="ThemeOverlay.PocketCasts.CarPasswordTextInput" parent="">
+        <item name="textInputStyle">@style/PCCarPasswordTextInputLayout</item>
+    </style>
 </resources>
