@@ -54,14 +54,15 @@ class AutoAddSettingsFragment :
             val state by viewModel.autoAddPodcasts.observeAsState()
             val bottomInsetPx by settings.bottomInset.collectAsStateWithLifecycle(0)
             AppTheme(theme.activeTheme) {
-                val currentState = state ?: return@AppTheme
+                val currentState = state
                 AutoAddSettingsPage(
-                    options = options(currentState),
-                    footer = when (currentState.behaviour) {
+                    options = currentState?.let { options(it) }.orEmpty(),
+                    footer = when (currentState?.behaviour) {
                         AutoAddUpNextLimitBehaviour.ONLY_ADD_TO_TOP -> stringResource(LR.string.settings_auto_up_next_limit_reached_top_summary, currentState.limit)
                         AutoAddUpNextLimitBehaviour.STOP_ADDING -> stringResource(LR.string.settings_auto_up_next_limit_reached_stop_summary, currentState.limit)
+                        null -> null
                     },
-                    podcasts = currentState.autoAddPodcasts,
+                    podcasts = currentState?.autoAddPodcasts.orEmpty(),
                     bottomInset = with(LocalDensity.current) { bottomInsetPx.toDp() },
                     onPodcastClick = ::showPodcastOptions,
                     onNavigationClick = { requireActivity().onBackPressedDispatcher.onBackPressed() },

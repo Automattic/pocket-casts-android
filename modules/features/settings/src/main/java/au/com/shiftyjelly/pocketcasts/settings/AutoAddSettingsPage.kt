@@ -58,7 +58,7 @@ internal data class AutoAddOption(
 @Composable
 internal fun AutoAddSettingsPage(
     options: List<AutoAddOption>,
-    footer: String,
+    footer: String?,
     podcasts: List<Podcast>,
     bottomInset: Dp,
     onPodcastClick: (Podcast) -> Unit,
@@ -89,32 +89,34 @@ internal fun AutoAddSettingsPage(
                 .weight(1f),
         ) {
             items(options) { option -> OptionRow(option) }
-            item {
-                TextViewText(
-                    text = footer,
-                    fontSize = 14.sp,
-                    color = colors.primaryText02,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 56.dp, top = 16.dp, end = 24.dp, bottom = 16.dp),
-                )
-            }
-            item {
-                Spacer(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(1.dp)
-                        .background(colors.primaryUi05),
-                )
-                TextViewText(
-                    text = stringResource(LR.string.settings_auto_up_next_podcasts),
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = colors.support01,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 56.dp, top = 16.dp, end = 24.dp, bottom = 16.dp),
-                )
+            if (footer != null) {
+                item {
+                    TextViewText(
+                        text = footer,
+                        fontSize = 14.sp,
+                        color = colors.primaryText02,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 56.dp, top = 16.dp, end = 24.dp, bottom = 16.dp),
+                    )
+                }
+                item {
+                    Spacer(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(1.dp)
+                            .background(colors.primaryUi05),
+                    )
+                    TextViewText(
+                        text = stringResource(LR.string.settings_auto_up_next_podcasts),
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = colors.support01,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 56.dp, top = 16.dp, end = 24.dp, bottom = 16.dp),
+                    )
+                }
             }
             items(podcasts, key = { it.uuid }) { podcast ->
                 PodcastRow(podcast = podcast, onClick = { onPodcastClick(podcast) })
