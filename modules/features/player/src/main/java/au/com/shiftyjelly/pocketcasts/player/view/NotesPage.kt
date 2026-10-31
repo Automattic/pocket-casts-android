@@ -207,7 +207,7 @@ private fun rememberTextViewWidth(text: String, fontSize: TextUnit, letterSpacin
     val density = LocalDensity.current
     return remember(text, fontSize, letterSpacing, density) {
         val paint = TextPaint(Paint.ANTI_ALIAS_FLAG).apply {
-            textSize = with(density) { fontSize.toPx() }
+            textSize = with(density) { fontSize.roundToPx().toFloat() }
             this.letterSpacing = letterSpacing
             typeface = Typeface.SANS_SERIF
         }
