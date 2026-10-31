@@ -55,15 +55,17 @@ fun TextViewText(
     textAlign: TextAlign = TextAlign.Start,
     maxLines: Int = Int.MAX_VALUE,
     includeFontPadding: Boolean = true,
+    fontFamily: FontFamily = FontFamily.SansSerif,
 ) {
     val density = LocalDensity.current
     val textMeasurer = rememberTextMeasurer()
     val textSizePx = with(density) { fontSize.roundToPx() }
     val spacingExtraPx = with(density) { lineSpacingExtra.roundToPx() }
-    val metrics = remember(textSizePx, fontWeight) {
+    val metrics = remember(textSizePx, fontWeight, fontFamily) {
         Paint().apply {
             textSize = textSizePx.toFloat()
             typeface = when {
+                fontFamily == FontFamily.Monospace -> Typeface.create(Typeface.MONOSPACE, if (fontWeight >= FontWeight.Bold) Typeface.BOLD else Typeface.NORMAL)
                 fontWeight >= FontWeight.Bold -> Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD)
                 fontWeight >= FontWeight.Medium -> Typeface.create("sans-serif-medium", Typeface.NORMAL)
                 else -> Typeface.SANS_SERIF
@@ -73,7 +75,7 @@ fun TextViewText(
     val style = TextStyle(
         color = color,
         fontSize = with(density) { textSizePx.toSp() },
-        fontFamily = FontFamily.SansSerif,
+        fontFamily = fontFamily,
         fontWeight = fontWeight,
         letterSpacing = letterSpacing,
         textAlign = textAlign,
