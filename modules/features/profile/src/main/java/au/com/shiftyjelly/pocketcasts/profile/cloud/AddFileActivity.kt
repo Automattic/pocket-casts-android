@@ -9,8 +9,8 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.provider.OpenableColumns
+import android.view.ViewGroup
 import android.widget.Toast
-import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.annotation.StringRes
@@ -23,6 +23,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.ComposeView
 import androidx.core.content.IntentCompat
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
@@ -161,6 +162,7 @@ class AddFileActivity :
         set(value) {
             field = value
             fileTint = value
+            contentView.requestFocus()
 
             if (value == 0) {
                 showImageView()
@@ -185,6 +187,7 @@ class AddFileActivity :
     private var isImageClickable by mutableStateOf(false)
     private var selectedIndex by mutableIntStateOf(1)
     private var colours = emptyList<AddFileColour>()
+    private lateinit var contentView: ComposeView
 
     val existingUuid: String?
         get() = intent.getStringExtra(EXTRA_EXISTING_EPISODE_UUID)
@@ -208,7 +211,11 @@ class AddFileActivity :
         theme.updateWindowStatusBarIcons(window = window)
 
         colours = if (Theme.isDark(this)) darkThemeColors() else lightThemeColors()
-        setContent {
+        contentView = ComposeView(this)
+        contentView.isFocusableInTouchMode = true
+        contentView.descendantFocusability = ViewGroup.FOCUS_BEFORE_DESCENDANTS
+        setContentView(contentView)
+        contentView.setContent {
             AppTheme(theme.activeTheme) {
                 AddFilePage(
                     state = AddFilePageState(
