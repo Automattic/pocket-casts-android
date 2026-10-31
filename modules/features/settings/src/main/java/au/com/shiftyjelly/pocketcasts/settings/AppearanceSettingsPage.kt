@@ -5,6 +5,9 @@ import android.view.View
 import android.widget.Switch
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.InteractionSource
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -19,6 +22,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ripple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -186,16 +190,23 @@ private fun Divider(top: Dp) {
 
 @Composable
 private fun TextRow(titleRes: Int, onClick: () -> Unit) {
-    TextViewText(
-        text = stringResource(titleRes),
-        fontSize = 15.sp,
-        fontWeight = FontWeight.Medium,
-        color = MaterialTheme.theme.colors.primaryText01,
+    val interactionSource = remember { MutableInteractionSource() }
+    Box(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(start = 72.dp, top = 16.dp, end = 16.dp, bottom = 16.dp),
-    )
+            .clickable(interactionSource = interactionSource, indication = null, onClick = onClick),
+    ) {
+        SelectableItemBackground(interactionSource, Modifier.matchParentSize())
+        TextViewText(
+            text = stringResource(titleRes),
+            fontSize = 15.sp,
+            fontWeight = FontWeight.Medium,
+            color = MaterialTheme.theme.colors.primaryText01,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 72.dp, top = 16.dp, end = 16.dp, bottom = 16.dp),
+        )
+    }
 }
 
 @SuppressLint("UseSwitchCompatOrMaterialCode")
@@ -213,8 +224,10 @@ private fun SwitchRow(
     switchCentered: Boolean = false,
 ) {
     val colors = MaterialTheme.theme.colors
+    val interactionSource = remember { MutableInteractionSource() }
     Layout(
         content = {
+            SelectableItemBackground(interactionSource)
             TextViewText(
                 text = title,
                 fontSize = 15.sp,
@@ -249,21 +262,29 @@ private fun SwitchRow(
         modifier = Modifier
             .padding(top = topMargin)
             .fillMaxWidth()
-            .toggleable(value = checked, role = Role.Switch, onValueChange = onCheckedChange),
+            .toggleable(
+                value = checked,
+                interactionSource = interactionSource,
+                indication = null,
+                role = Role.Switch,
+                onValueChange = onCheckedChange,
+            ),
     ) { measurables, constraints ->
         val width = constraints.maxWidth
         val start = 72.dp.roundToPx()
-        val switch = measurables[2].measure(Constraints())
+        val switch = measurables[3].measure(Constraints())
         val switchStart = width - 24.dp.roundToPx() - switch.width
         val titleWidth = switchStart - titleEndMargin.roundToPx() - start
-        val title = measurables[0].measure(Constraints.fixedWidth(titleWidth))
+        val title = measurables[1].measure(Constraints.fixedWidth(titleWidth))
         val detailsWidth = switchStart - 16.dp.roundToPx() - start
-        val detailsPlaceable = measurables[1].measure(Constraints(maxWidth = detailsWidth))
+        val detailsPlaceable = measurables[2].measure(Constraints(maxWidth = detailsWidth))
         val detailsTop = title.height + if (details != null) 8.dp.roundToPx() else 0
         val height = if (details != null) detailsTop + detailsPlaceable.height else title.height
         val marginTop = switchMarginTop.roundToPx()
         val switchY = if (switchCentered) marginTop + ((title.height - marginTop - switch.height) * 0.5f).roundToInt() else marginTop
+        val background = measurables[0].measure(Constraints.fixed(width, height))
         layout(width, height) {
+            background.place(0, 0)
             title.place(start, 0)
             detailsPlaceable.place(start, detailsTop)
             switch.place(switchStart, switchY)
@@ -278,11 +299,13 @@ private fun UpgradeBanner(listener: AppearanceListener) {
     val logo = remember(context) {
         context.obtainStyledAttributes(intArrayOf(UR.attr.plus_logo)).use { it.getResourceId(0, 0) }
     }
+    val interactionSource = remember { MutableInteractionSource() }
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = listener::onUpgradeClick),
+            .clickable(interactionSource = interactionSource, indication = null, onClick = listener::onUpgradeClick),
     ) {
+        SelectableItemBackground(interactionSource, Modifier.matchParentSize())
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxWidth(),
@@ -332,4 +355,28 @@ private fun UpgradeBanner(listener: AppearanceListener) {
             )
         }
     }
+}
+
+@Composable
+private fun SelectableItemBackground(interactionSource: InteractionSource, modifier: Modifier = Modifier) {
+    val context = LocalContext.current
+    val view = remember(context) {
+        View(context).apply {
+            background = context.obtainStyledAttributes(intArrayOf(android.R.attr.selectableItemBackground)).use { it.getDrawable(0) }
+            importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+        }
+    }
+    LaunchedEffect(view, interactionSource) {
+        interactionSource.interactions.collect { interaction ->
+            when (interaction) {
+                is PressInteraction.Press -> {
+                    view.drawableHotspotChanged(interaction.pressPosition.x, interaction.pressPosition.y)
+                    view.isPressed = true
+                }
+
+                is PressInteraction.Release, is PressInteraction.Cancel -> view.isPressed = false
+            }
+        }
+    }
+    AndroidView(factory = { view }, modifier = modifier)
 }
