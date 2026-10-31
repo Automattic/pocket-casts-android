@@ -29,6 +29,7 @@ import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.graphics.toColorInt
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -290,7 +291,7 @@ class EffectsFragment : BaseDialogFragment() {
 
         if (podcastEffectsData?.showCustomEffectsSettings == true) {
             val selectedTabTextColor = podcastHeaderBackgroundColor?.let {
-                Color(android.graphics.Color.parseColor(ColorUtils.colorIntToHexString(it)))
+                Color(ColorUtils.colorIntToHexString(it).toColorInt())
             } ?: Color.Black
             EffectsSettingsSegmentedTabBar(
                 selectedItem = if (podcast.overrideGlobalEffects) {
