@@ -43,6 +43,9 @@ fun ViewMaterialButton(
     verticalPadding: Dp = 4.dp,
     strokeColor: Color? = null,
     maxLines: Int = Int.MAX_VALUE,
+    horizontalPadding: Dp = 16.dp,
+    fontWeight: FontWeight = FontWeight.Medium,
+    enabled: Boolean = true,
 ) {
     val density = LocalDensity.current
     val cornerRadiusPx = with(density) { (cornerRadius ?: 4.dp).roundToPx().toFloat() }
@@ -74,14 +77,14 @@ fun ViewMaterialButton(
                     }
                 }
                 .clip(shape)
-                .clickable(role = Role.Button, onClick = onClick)
-                .padding(horizontal = 16.dp, vertical = verticalPadding),
+                .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
+                .padding(horizontal = horizontalPadding, vertical = verticalPadding),
         ) {
             TextViewText(
                 text = text,
                 fontSize = fontSize,
                 color = textColor,
-                fontWeight = FontWeight.Medium,
+                fontWeight = fontWeight,
                 letterSpacing = letterSpacing,
                 textAlign = TextAlign.Center,
                 maxLines = maxLines,
