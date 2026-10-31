@@ -69,6 +69,7 @@ class SleepFragment :
 
     private val viewModel: PlayerViewModel by activityViewModels()
     private var timerJob: Job? = null
+    private var isUserDragging = false
 
     private val args get() = requireArguments().requireParcelable<Args>(NEW_INSTANCE_ARG)
 
@@ -136,12 +137,26 @@ class SleepFragment :
             setDialogTint(backgroundColor)
         }
 
-        (dialog as? BottomSheetDialog)?.behavior?.state = BottomSheetBehavior.STATE_EXPANDED
+        isUserDragging = false
+        (dialog as? BottomSheetDialog)?.behavior?.let { behavior ->
+            behavior.addBottomSheetCallback(
+                object : BottomSheetBehavior.BottomSheetCallback() {
+                    override fun onStateChanged(bottomSheet: View, newState: Int) {
+                        if (newState == BottomSheetBehavior.STATE_DRAGGING) {
+                            isUserDragging = true
+                        }
+                    }
+
+                    override fun onSlide(bottomSheet: View, slideOffset: Float) = Unit
+                },
+            )
+            behavior.state = BottomSheetBehavior.STATE_EXPANDED
+        }
     }
 
     private fun resettleExpanded() {
         val behavior = (dialog as? BottomSheetDialog)?.behavior ?: return
-        if (behavior.state == BottomSheetBehavior.STATE_SETTLING) {
+        if (!isUserDragging && behavior.state == BottomSheetBehavior.STATE_SETTLING) {
             behavior.state = BottomSheetBehavior.STATE_EXPANDED
         }
     }
