@@ -31,6 +31,7 @@ import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.em
@@ -72,7 +73,7 @@ fun TextViewText(
     }
     val style = TextStyle(
         color = color,
-        fontSize = with(density) { textSizePx.toSp() },
+        fontSize = textSizePx.toLinearSp(density.density),
         fontFamily = FontFamily.SansSerif,
         fontWeight = fontWeight,
         letterSpacing = letterSpacing,
@@ -91,6 +92,7 @@ fun TextViewText(
             overflow = TextOverflow.Ellipsis,
             maxLines = maxLines,
             constraints = Constraints(minWidth = constraints.minWidth, maxWidth = constraints.maxWidth),
+            density = Density(density.density),
         )
         val measured = TextViewLines.from(result, metrics, spacingExtraPx, lineSpacingMultiplier, includeFontPadding)
         lines = measured
@@ -100,6 +102,11 @@ fun TextViewText(
             alignmentLines = mapOf(FirstBaseline to measured.baselines.first(), LastBaseline to measured.baselines.last()),
         ) {}
     }
+}
+
+private fun Int.toLinearSp(density: Float): TextUnit {
+    val sp = this / density
+    return (if (sp * density < this) Math.nextUp(sp) else sp).sp
 }
 
 private class TextViewLines(
