@@ -50,14 +50,11 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/themeLayout" />
 
-            <androidx.recyclerview.widget.RecyclerView
+            <androidx.compose.ui.platform.ComposeView
                 android:id="@+id/themeRecyclerView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:clipToPadding="false"
-                android:paddingStart="72dp"
-                android:paddingEnd="8dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/lblTheme" />
@@ -119,14 +116,11 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/dividerView0" />
 
-            <androidx.recyclerview.widget.RecyclerView
+            <androidx.compose.ui.platform.ComposeView
                 android:id="@+id/appIconRecyclerView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:clipToPadding="false"
-                android:paddingStart="72dp"
-                android:paddingEnd="16dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/lblAppIcon" />

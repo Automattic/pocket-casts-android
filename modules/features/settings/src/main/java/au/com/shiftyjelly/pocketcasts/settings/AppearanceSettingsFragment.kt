@@ -7,16 +7,23 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.doOnLayout
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
+import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
@@ -26,7 +33,9 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.SettingsAppearanceState
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.SettingsAppearanceViewModel
+import au.com.shiftyjelly.pocketcasts.ui.helper.AppIcon
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.worker.RefreshArtworkWorker
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
@@ -50,6 +59,13 @@ class AppearanceSettingsFragment : BaseFragment() {
 
     private val viewModel: SettingsAppearanceViewModel by viewModels()
     private var binding: FragmentSettingsAppearanceBinding? = null
+    private var themes by mutableStateOf(emptyList<Theme.ThemeType>())
+    private var selectedTheme by mutableStateOf<Theme.ThemeType?>(null)
+    private var appIcons by mutableStateOf(emptyList<AppIcon.AppIconType>())
+    private var selectedAppIcon by mutableStateOf<AppIcon.AppIconType?>(null)
+    private var signInState by mutableStateOf<SignInState?>(null)
+    private var themeScrollRequest by mutableIntStateOf(0)
+    private var appIconScrollRequest by mutableIntStateOf(0)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentSettingsAppearanceBinding.inflate(inflater, container, false)
@@ -68,50 +84,23 @@ class AppearanceSettingsFragment : BaseFragment() {
 
         binding.toolbar.setup(title = getString(LR.string.settings_title_appearance), navigationIcon = BackArrow, activity = activity, theme = theme)
 
-        binding.themeRecyclerView.layoutManager = LinearLayoutManager(context, RecyclerView.HORIZONTAL, false)
-        binding.appIconRecyclerView.layoutManager = LinearLayoutManager(context, RecyclerView.HORIZONTAL, false)
-
-        binding.themeRecyclerView.doOnLayout { scrollToCurrentTheme() }
-        binding.appIconRecyclerView.doOnLayout { scrollToCurrentAppIcon() }
+        binding.themeRecyclerView.setContentWithViewCompositionStrategy {
+            AppTheme(theme.activeTheme) { ThemePicker() }
+        }
+        binding.appIconRecyclerView.setContentWithViewCompositionStrategy {
+            AppTheme(theme.activeTheme) { AppIconPicker() }
+        }
 
         viewModel.createAccountState.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is SettingsAppearanceState.ThemesAndIconsLoading -> {}
 
                 is SettingsAppearanceState.ThemesAndIconsLoaded -> {
-                    val mainWidth = activity?.resources?.displayMetrics?.widthPixels // Display metrics gives the app size not the display, it's badly named. Works in chromebooks and split screen
-                    val isSignedInAsPlusOrPatron = viewModel.signInState.value?.isSignedInAsPlusOrPatron ?: false
-                    binding.themeRecyclerView.adapter = AppearanceThemeSettingsAdapter(mainWidth, isSignedInAsPlusOrPatron, state.currentThemeType, state.themeList) { beforeThemeType, afterThemeType, validTheme ->
-                        if (validTheme) {
-                            (activity as? AppCompatActivity)?.let {
-                                theme.updateTheme(it, afterThemeType)
-                                binding.swtSystemTheme.isChecked = theme.getUseSystemTheme() // Update switch if changing the theme updated the setting
-                                viewModel.onThemeChanged(afterThemeType)
-                            }
-                        } else {
-                            viewModel.updateChangeThemeType(Pair(beforeThemeType, afterThemeType))
-                            openOnboardingFlow(source = OnboardingUpgradeSource.THEMES)
-                            scrollToCurrentTheme()
-                        }
-                    }
-                    binding.themeRecyclerView.setHasFixedSize(true)
+                    themes = state.themeList
+                    selectedTheme = state.currentThemeType
+                    appIcons = state.iconList
+                    selectedAppIcon = state.currentAppIcon
                     scrollToCurrentTheme()
-
-                    binding.appIconRecyclerView.adapter = AppearanceIconSettingsAdapter(mainWidth, viewModel.signInState.value, state.currentAppIcon, state.iconList) { beforeAppIconType, afterAppIconType, validIcon ->
-                        if (validIcon) {
-                            viewModel.updateGlobalIcon(afterAppIconType)
-
-                            AlertDialog.Builder(binding.appIconRecyclerView.context)
-                                .setTitle(LR.string.settings_app_icon_updated)
-                                .setMessage(LR.string.settings_app_icon_updated_message_v2)
-                                .setPositiveButton(LR.string.settings_app_icon_ok, null)
-                                .show()
-                        } else {
-                            viewModel.updateChangeAppIconType(Pair(beforeAppIconType, afterAppIconType))
-                            openOnboardingFlow(afterAppIconType.tier, source = OnboardingUpgradeSource.ICONS)
-                        }
-                    }
-                    binding.appIconRecyclerView.setHasFixedSize(true)
                     scrollToCurrentAppIcon()
                 }
 
@@ -134,7 +123,7 @@ class AppearanceSettingsFragment : BaseFragment() {
                         }
                     } else {
                         viewModel.updateChangeThemeType(Pair(null, null))
-                        (binding.themeRecyclerView.adapter as? AppearanceThemeSettingsAdapter)?.updateTheme(beforeThemeType)
+                        selectedTheme = beforeThemeType
                         scrollToCurrentTheme()
                     }
                 }
@@ -155,7 +144,7 @@ class AppearanceSettingsFragment : BaseFragment() {
                             .setPositiveButton(LR.string.settings_app_icon_ok, null)
                             .show()
                     } else {
-                        (binding.appIconRecyclerView.adapter as? AppearanceIconSettingsAdapter)?.updateAppIcon(beforeAppIconType)
+                        selectedAppIcon = beforeAppIconType
                         scrollToCurrentAppIcon()
                     }
                 }
@@ -169,8 +158,7 @@ class AppearanceSettingsFragment : BaseFragment() {
                 }
             }
 
-            (binding.themeRecyclerView.adapter as? AppearanceThemeSettingsAdapter)?.updatePlusSignedIn(signInState.isSignedInAsPlusOrPatron)
-            (binding.appIconRecyclerView.adapter as? AppearanceIconSettingsAdapter)?.updatePlusSignedIn(signInState)
+            this.signInState = signInState
             binding.upgradeGroup.isVisible = !signInState.isSignedInAsPlusOrPatron && !settings.getUpgradeClosedAppearSettings()
         }
 
@@ -253,16 +241,110 @@ class AppearanceSettingsFragment : BaseFragment() {
     }
 
     private fun scrollToCurrentTheme() {
-        (binding?.themeRecyclerView?.adapter as? AppearanceThemeSettingsAdapter)?.let { adapter ->
-            val selectedIndex = adapter.selectedThemeIndex() ?: 0
-            binding?.themeRecyclerView?.scrollToPosition(selectedIndex)
-        }
+        themeScrollRequest++
     }
 
     private fun scrollToCurrentAppIcon() {
-        (binding?.appIconRecyclerView?.adapter as? AppearanceIconSettingsAdapter)?.let { adapter ->
-            val selectedIndex = adapter.selectedIconIndex() ?: 0
-            binding?.appIconRecyclerView?.scrollToPosition(selectedIndex)
+        appIconScrollRequest++
+    }
+
+    @Composable
+    private fun ThemePicker() {
+        val isPlusOrPatron = signInState?.isSignedInAsPlusOrPatron == true
+        AppearancePicker(
+            options = themes.map { themeType ->
+                val isLocked = themeType.isPlus && !isPlusOrPatron
+                val isSelected = themeType == selectedTheme
+                AppearanceOption(
+                    imageResId = themeType.iconResourceId,
+                    label = stringResource(themeType.labelId),
+                    imageContentDescription = stringResource(LR.string.settings_theme),
+                    badgeResId = when {
+                        isLocked -> R.drawable.ic_locked_plus
+                        isSelected -> R.drawable.ic_circle_tick
+                        else -> null
+                    },
+                    isSelected = isSelected,
+                    isLocked = isLocked,
+                )
+            },
+            isTall = true,
+            endPadding = 8.dp,
+            scrollRequest = themeScrollRequest,
+            onClick = { index -> onThemeClick(themes[index]) },
+        )
+    }
+
+    @Composable
+    private fun AppIconPicker() {
+        val signInState = signInState
+        AppearancePicker(
+            options = appIcons.map { appIcon ->
+                val isLocked = !appIcon.isValid(signInState)
+                val isSelected = appIcon == selectedAppIcon
+                AppearanceOption(
+                    imageResId = appIcon.settingsIcon,
+                    label = stringResource(appIcon.labelId),
+                    imageContentDescription = stringResource(LR.string.settings_app_icon),
+                    badgeResId = when {
+                        isLocked -> when (appIcon.tier) {
+                            SubscriptionTier.Plus -> R.drawable.ic_locked_plus
+                            SubscriptionTier.Patron -> R.drawable.ic_locked_patron
+                            null -> null
+                        }
+
+                        isSelected -> R.drawable.ic_circle_tick
+
+                        else -> null
+                    },
+                    isSelected = isSelected,
+                    isLocked = isLocked,
+                )
+            },
+            isTall = false,
+            endPadding = 16.dp,
+            scrollRequest = appIconScrollRequest,
+            onClick = { index -> onAppIconClick(appIcons[index]) },
+        )
+    }
+
+    private fun AppIcon.AppIconType.isValid(signInState: SignInState?) = when (tier) {
+        SubscriptionTier.Plus -> signInState?.isSignedInAsPlusOrPatron == true
+        SubscriptionTier.Patron -> signInState?.isSignedInAsPatron == true
+        null -> true
+    }
+
+    private fun onThemeClick(afterThemeType: Theme.ThemeType) {
+        val beforeThemeType = selectedTheme ?: return
+        val validTheme = !afterThemeType.isPlus || signInState?.isSignedInAsPlusOrPatron == true
+        if (validTheme) {
+            selectedTheme = afterThemeType
+            (activity as? AppCompatActivity)?.let {
+                theme.updateTheme(it, afterThemeType)
+                binding?.swtSystemTheme?.isChecked = theme.getUseSystemTheme() // Update switch if changing the theme updated the setting
+                viewModel.onThemeChanged(afterThemeType)
+            }
+        } else {
+            viewModel.updateChangeThemeType(Pair(beforeThemeType, afterThemeType))
+            openOnboardingFlow(source = OnboardingUpgradeSource.THEMES)
+            scrollToCurrentTheme()
+        }
+    }
+
+    private fun onAppIconClick(afterAppIconType: AppIcon.AppIconType) {
+        val beforeAppIconType = selectedAppIcon ?: return
+        selectedAppIcon = afterAppIconType
+        if (afterAppIconType.isValid(signInState)) {
+            viewModel.updateGlobalIcon(afterAppIconType)
+
+            AlertDialog.Builder(requireContext())
+                .setTitle(LR.string.settings_app_icon_updated)
+                .setMessage(LR.string.settings_app_icon_updated_message_v2)
+                .setPositiveButton(LR.string.settings_app_icon_ok, null)
+                .show()
+        } else {
+            viewModel.updateChangeAppIconType(Pair(beforeAppIconType, afterAppIconType))
+            openOnboardingFlow(afterAppIconType.tier, source = OnboardingUpgradeSource.ICONS)
         }
     }
 
