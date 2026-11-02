@@ -629,6 +629,7 @@
         <item quantity="other">%1$d Generated Chapters &#x2022; %2$d hidden</item>
     </plurals>
     <string name="chapters_generated_turn_off">Turn off generated chapters</string>
+    <string name="chapters_generated_start_not_found">Couldn\'t find this chapter\'s exact start, so playback may be slightly off.</string>
     <string name="chapters_generated_turned_off">Turned off generated chapters</string>
     <string name="chapters_generated_undo">Undo</string>
     <string name="chapters_generated_off_title">Generated chapters are off</string>
