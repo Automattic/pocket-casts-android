@@ -28,6 +28,8 @@ import com.automattic.eventhorizon.DeselectChaptersChapterSelectedEvent
 import com.automattic.eventhorizon.DeselectChaptersToggledOffEvent
 import com.automattic.eventhorizon.DeselectChaptersToggledOnEvent
 import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.GeneratedChaptersPromptShownEvent
+import com.automattic.eventhorizon.GeneratedChaptersPromptType
 import com.automattic.eventhorizon.GeneratedChaptersToggleSourceType
 import com.automattic.eventhorizon.PlayerChapterSelectedEvent
 import com.automattic.eventhorizon.SettingsGeneralGeneratedChaptersToggledEvent
@@ -243,7 +245,19 @@ class ChaptersViewModel @AssistedInject constructor(
 
             val episode = episodeManager.findEpisodeByUuid(episodeId) ?: return@launch
             val chapters = chapterManager.observerChaptersForEpisode(episodeId).first()
-            if (chapters.isEmpty()) return@launch
+            if (chapters.isEmpty()) {
+                uiState.value.generatedChaptersPrompt?.let { prompt ->
+                    eventHorizon.track(
+                        GeneratedChaptersPromptShownEvent(
+                            episodeUuid = episodeId,
+                            podcastUuid = episode.podcastOrSubstituteUuid,
+                            prompt = prompt,
+                            source = source,
+                        ),
+                    )
+                }
+                return@launch
+            }
             eventHorizon.track(
                 ChaptersShownEvent(
                     episodeUuid = episodeId,
@@ -359,6 +373,12 @@ class ChaptersViewModel @AssistedInject constructor(
         val generatedChaptersStatus: GeneratedChaptersStatus = GeneratedChaptersStatus.NotEnabled,
     ) {
         val chaptersCount = allChapters.size
+        val generatedChaptersPrompt get() = when {
+            showUpsell -> GeneratedChaptersPromptType.PlusUpsell
+            emptyState == EmptyState.NoChaptersYet -> GeneratedChaptersPromptType.NoChaptersYet
+            emptyState == EmptyState.GeneratedChaptersOff -> GeneratedChaptersPromptType.GeneratedChaptersOff
+            else -> null
+        }
         val emptyState get() = when {
             chaptersCount > 0 -> null
 
