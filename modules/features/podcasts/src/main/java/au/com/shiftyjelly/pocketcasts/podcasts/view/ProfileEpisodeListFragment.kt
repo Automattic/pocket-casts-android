@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
@@ -202,10 +203,6 @@ class ProfileEpisodeListFragment : BaseFragment() {
         }
     }
 
-    private val multiSelectController by lazy {
-        MultiSelectController(multiSelectHelper, viewLifecycleOwner.lifecycleScope, mode.source)
-    }
-
     private val manageDownloadsSize = MutableStateFlow<Long?>(null)
 
     private val listResetKey = MutableStateFlow(0)
@@ -215,11 +212,12 @@ class ProfileEpisodeListFragment : BaseFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) = contentWithoutConsumedInsets {
         val state by viewModel.state.collectAsStateWithLifecycle()
         val searchQuery by viewModel.searchQueryFlow.collectAsStateWithLifecycle()
-        val isFreeAccountBannerVisible by freeAccountBannerVisibility().collectAsStateWithLifecycle(false)
+        val controller = remember { MultiSelectController(multiSelectHelper, viewLifecycleOwner.lifecycleScope, mode.source) }
+        val isFreeAccountBannerVisible by remember { freeAccountBannerVisibility() }.collectAsStateWithLifecycle(false)
         val manageDownloadsSize by manageDownloadsSize.collectAsStateWithLifecycle()
         val bottomInset by settings.bottomInset.collectAsStateWithLifecycle(0)
         val listResetKey by listResetKey.collectAsStateWithLifecycle()
-        val isMultiSelecting by multiSelectController.isMultiSelecting.collectAsStateWithLifecycle()
+        val isMultiSelecting by controller.isMultiSelecting.collectAsStateWithLifecycle()
         AppTheme(theme.activeTheme) {
             ProfileEpisodeListPage(
                 title = stringResource(mode.titleRes),
@@ -233,11 +231,11 @@ class ProfileEpisodeListFragment : BaseFragment() {
                 listResetKey = listResetKey,
                 listener = pageListener,
                 multiSelectTopBar = if (isMultiSelecting) {
-                    { MultiSelectTopBar(multiSelectController, eventHorizon) }
+                    { MultiSelectTopBar(controller, eventHorizon) }
                 } else {
                     null
                 },
-                episodeRow = { episode -> EpisodeRow(episode, isMultiSelecting) },
+                episodeRow = { episode -> EpisodeRow(episode, controller, isMultiSelecting) },
                 toolbarModifier = Modifier.pointerInput(Unit) {
                     detectTapGestures(onLongPress = { theme.toggleDarkLightThemeActivity(requireActivity() as AppCompatActivity) })
                 },
@@ -246,8 +244,8 @@ class ProfileEpisodeListFragment : BaseFragment() {
     }
 
     @Composable
-    private fun EpisodeRow(episode: PodcastEpisode, isMultiSelecting: Boolean) {
-        val selected by multiSelectController.selected.collectAsStateWithLifecycle()
+    private fun EpisodeRow(episode: PodcastEpisode, controller: MultiSelectController<BaseEpisode>, isMultiSelecting: Boolean) {
+        val selected by controller.selected.collectAsStateWithLifecycle()
         EpisodeRow(
             episode = episode,
             rowDataProvider = rowDataProvider,
@@ -275,7 +273,7 @@ class ProfileEpisodeListFragment : BaseFragment() {
             useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork(mode.artworkElement),
             streamByDefault = settings.streamingMode.value,
             isMultiSelecting = isMultiSelecting,
-            isSelected = selected.let { multiSelectHelper.isSelected(episode) },
+            isSelected = selected.any { it.uuid == episode.uuid },
             animateMultiSelection = true,
         )
     }

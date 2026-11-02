@@ -4,11 +4,13 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -33,6 +35,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.Banner
 import au.com.shiftyjelly.pocketcasts.compose.components.NoContentBanner
 import au.com.shiftyjelly.pocketcasts.compose.components.SearchBar
 import au.com.shiftyjelly.pocketcasts.compose.images.DrawableImage
+import au.com.shiftyjelly.pocketcasts.compose.text.TextViewAlignment
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.podcasts.view.ProfileEpisodeListViewModel.State
@@ -183,14 +186,28 @@ private fun EpisodeList(
 
 @Composable
 private fun MoreOptionsAction(tint: Color, onClick: () -> Unit) {
-    ToolbarButton(
-        contentDescription = stringResource(LR.string.podcasts_menu_more_options),
-        onClick = onClick,
+    Box(
         modifier = Modifier
             .offset(x = 4.dp)
-            .size(width = 48.dp, height = 56.dp),
+            .fillMaxHeight()
+            .width(48.dp),
     ) {
-        DrawableImage(IR.drawable.ic_more_vert_black_24dp, contentDescription = null, tint = tint, modifier = Modifier.size(24.dp).align(Alignment.Center))
+        ToolbarButton(
+            contentDescription = stringResource(LR.string.podcasts_menu_more_options),
+            onClick = onClick,
+            modifier = Modifier
+                .size(48.dp)
+                .align(TextViewAlignment.Center),
+        ) {
+            DrawableImage(
+                drawableId = IR.drawable.ic_more_vert_black_24dp,
+                contentDescription = null,
+                tint = tint,
+                modifier = Modifier
+                    .size(24.dp)
+                    .align(TextViewAlignment.Center),
+            )
+        }
     }
 }
 
