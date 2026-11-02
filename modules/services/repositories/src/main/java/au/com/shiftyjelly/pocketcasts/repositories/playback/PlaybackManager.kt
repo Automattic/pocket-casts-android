@@ -1383,6 +1383,7 @@ open class PlaybackManager @Inject constructor(
             val generated = episode?.let { generatedChapterSeeker.get().resolveSeek(it, chapter) }
             // Resolving can take seconds; drop the seek if the episode changed meanwhile.
             if (episode != null && getCurrentEpisode()?.uuid != episode.uuid) return null
+            if (pendingChapterSeek !== chapter) return null
             val position = generated?.playbackTime ?: chapter.startTime
             seekToTimeMsInternal(position)
             return ChapterSeek(chapter, position, generated)
