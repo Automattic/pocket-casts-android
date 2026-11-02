@@ -243,7 +243,7 @@ private fun RowScope.OverflowMenuButton(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-internal fun ToolbarButton(
+fun ToolbarButton(
     contentDescription: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
