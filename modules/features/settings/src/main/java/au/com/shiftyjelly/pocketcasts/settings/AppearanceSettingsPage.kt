@@ -1,10 +1,16 @@
 package au.com.shiftyjelly.pocketcasts.settings
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.view.View
+import android.widget.FrameLayout
+import android.widget.ImageView
 import android.widget.Switch
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.FocusInteraction
 import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
@@ -28,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
@@ -112,6 +119,7 @@ internal fun AppearanceSettingsPage(
                 titlePaddingTop = 16.dp,
                 switchCentered = true,
                 switchMarginTop = 4.dp,
+                highlightOnTop = true,
             )
             Divider(top = 16.dp)
             SectionHeader(LR.string.settings_app_icon)
@@ -143,6 +151,7 @@ internal fun AppearanceSettingsPage(
                 titlePaddingTop = 16.dp,
                 switchCentered = true,
                 switchMarginTop = 12.dp,
+                highlightOnTop = true,
             )
             if (showWidgetSection) {
                 Divider(top = 16.dp)
@@ -156,6 +165,7 @@ internal fun AppearanceSettingsPage(
                     titlePaddingTop = 16.dp,
                     switchCentered = true,
                     switchMarginTop = 12.dp,
+                    highlightOnTop = true,
                 )
             }
             Divider(top = 16.dp)
@@ -222,9 +232,11 @@ private fun SwitchRow(
     titleEndMargin: Dp = 16.dp,
     switchMarginTop: Dp = 4.dp,
     switchCentered: Boolean = false,
+    highlightOnTop: Boolean = false,
 ) {
     val colors = MaterialTheme.theme.colors
     val interactionSource = remember { MutableInteractionSource() }
+    val haloPadding = with(LocalDensity.current) { 8.dp.roundToPx() }
     Layout(
         content = {
             SelectableItemBackground(interactionSource)
@@ -248,11 +260,18 @@ private fun SwitchRow(
             }
             AndroidView(
                 factory = { context ->
-                    Switch(context).apply {
-                        importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
+                    FrameLayout(context).apply {
+                        background = ColorDrawable(Color.TRANSPARENT)
+                        setPadding(haloPadding, haloPadding, haloPadding, haloPadding)
+                        addView(
+                            Switch(context).apply {
+                                importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
+                            },
+                        )
                     }
                 },
-                update = { switch ->
+                update = { container ->
+                    val switch = container.getChildAt(0) as Switch
                     switch.setOnCheckedChangeListener(null)
                     switch.isChecked = checked
                     switch.setOnCheckedChangeListener { _, isChecked -> onCheckedChange(isChecked) }
@@ -273,7 +292,9 @@ private fun SwitchRow(
         val width = constraints.maxWidth
         val start = 72.dp.roundToPx()
         val switch = measurables[3].measure(Constraints())
-        val switchStart = width - 24.dp.roundToPx() - switch.width
+        val switchWidth = switch.width - 2 * haloPadding
+        val switchHeight = switch.height - 2 * haloPadding
+        val switchStart = width - 24.dp.roundToPx() - switchWidth
         val titleWidth = switchStart - titleEndMargin.roundToPx() - start
         val title = measurables[1].measure(Constraints.fixedWidth(titleWidth))
         val detailsWidth = switchStart - 16.dp.roundToPx() - start
@@ -281,13 +302,14 @@ private fun SwitchRow(
         val detailsTop = title.height + if (details != null) 8.dp.roundToPx() else 0
         val height = if (details != null) detailsTop + detailsPlaceable.height else title.height
         val marginTop = switchMarginTop.roundToPx()
-        val switchY = if (switchCentered) marginTop + ((title.height - marginTop - switch.height) * 0.5f).roundToInt() else marginTop
+        val switchY = if (switchCentered) marginTop + ((title.height - marginTop - switchHeight) * 0.5f).roundToInt() else marginTop
         val background = measurables[0].measure(Constraints.fixed(width, height))
         layout(width, height) {
-            background.place(0, 0)
+            if (!highlightOnTop) background.place(0, 0)
             title.place(start, 0)
             detailsPlaceable.place(start, detailsTop)
-            switch.place(switchStart, switchY)
+            switch.place(switchStart - haloPadding, switchY - haloPadding)
+            if (highlightOnTop) background.place(0, 0)
         }
     }
 }
@@ -299,6 +321,7 @@ private fun UpgradeBanner(listener: AppearanceListener) {
     val logo = remember(context) {
         context.obtainStyledAttributes(intArrayOf(UR.attr.plus_logo)).use { it.getResourceId(0, 0) }
     }
+    val logoDescription = stringResource(LR.string.pocket_casts_plus)
     val interactionSource = remember { MutableInteractionSource() }
     Box(
         modifier = Modifier
@@ -310,9 +333,14 @@ private fun UpgradeBanner(listener: AppearanceListener) {
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxWidth(),
         ) {
-            DrawableImage(
-                drawableId = logo,
-                contentDescription = stringResource(LR.string.pocket_casts_plus),
+            AndroidView(
+                factory = { context ->
+                    ImageView(context).apply {
+                        scaleType = ImageView.ScaleType.FIT_XY
+                        setImageResource(logo)
+                        contentDescription = logoDescription
+                    }
+                },
                 modifier = Modifier
                     .padding(top = 16.dp)
                     .size(width = 232.dp, height = 32.dp),
@@ -361,7 +389,7 @@ private fun UpgradeBanner(listener: AppearanceListener) {
 private fun SelectableItemBackground(interactionSource: InteractionSource, modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val view = remember(context) {
-        View(context).apply {
+        FocusableBackgroundView(context).apply {
             background = context.obtainStyledAttributes(intArrayOf(android.R.attr.selectableItemBackground)).use { it.getDrawable(0) }
             importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
         }
@@ -375,8 +403,25 @@ private fun SelectableItemBackground(interactionSource: InteractionSource, modif
                 }
 
                 is PressInteraction.Release, is PressInteraction.Cancel -> view.isPressed = false
+
+                is FocusInteraction.Focus -> view.isFocusHighlighted = true
+
+                is FocusInteraction.Unfocus -> view.isFocusHighlighted = false
             }
         }
     }
     AndroidView(factory = { view }, modifier = modifier)
+}
+
+private class FocusableBackgroundView(context: Context) : View(context) {
+    var isFocusHighlighted = false
+        set(value) {
+            field = value
+            refreshDrawableState()
+        }
+
+    override fun onCreateDrawableState(extraSpace: Int): IntArray {
+        val state = super.onCreateDrawableState(extraSpace + 1)
+        return if (isFocusHighlighted) mergeDrawableStates(state, intArrayOf(android.R.attr.state_focused)) else state
+    }
 }
