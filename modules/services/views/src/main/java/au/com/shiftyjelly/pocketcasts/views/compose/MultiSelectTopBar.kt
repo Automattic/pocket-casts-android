@@ -79,6 +79,7 @@ fun <T> MultiSelectTopBar(
     modifier: Modifier = Modifier,
     @MenuRes menuRes: Int? = null,
     includeStatusBarPadding: Boolean = true,
+    @DrawableRes navigationIconId: Int = IR.drawable.ic_arrow_back,
 ) {
     val context = LocalContext.current
     val resources = LocalResources.current
@@ -104,6 +105,7 @@ fun <T> MultiSelectTopBar(
             }
         },
         includeStatusBarPadding = includeStatusBarPadding,
+        navigationIconId = navigationIconId,
         modifier = modifier,
     )
 }
@@ -117,6 +119,7 @@ internal fun MultiSelectTopBar(
     onBottomSheetClick: (MultiSelectToolbarOverflow.BottomSheet) -> Unit,
     modifier: Modifier = Modifier,
     includeStatusBarPadding: Boolean = true,
+    @DrawableRes navigationIconId: Int = IR.drawable.ic_arrow_back,
 ) {
     val tint = MaterialTheme.theme.colors.primaryInteractive02
     val titleStartPadding = with(LocalDensity.current) { (72.dp.roundToPx() - 56.dp.roundToPx()).toDp() }
@@ -134,7 +137,7 @@ internal fun MultiSelectTopBar(
                 .width(56.dp)
                 .fillMaxHeight(),
         ) {
-            DrawableIcon(IR.drawable.ic_arrow_back, tint, Modifier.size(24.dp).align(Alignment.Center))
+            DrawableIcon(navigationIconId, tint, Modifier.size(24.dp).align(Alignment.Center))
         }
         ToolbarTitle(
             title = title,
